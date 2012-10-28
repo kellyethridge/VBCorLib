@@ -1,0 +1,72 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="Text/html; charset=iso-8859-1">
+  <meta name="Author" content = "m.stamenov" >
+  <meta name="GENERATOR" content="VBDOX [2.0.16]" >
+  <link REL="stylesheet" TYPE="text/css" HREF="backsdk4.css">
+  <script SRC="langref.js"></script>
+  <title>IObject:&nbsp;Equals</title>
+</head>
+<BODY TOPMARGIN="0">
+<TABLE CLASS="buttonbarshade" CELLSPACING=0><TR><TD>&nbsp;</TD></TR></TABLE>
+<TABLE CLASS="buttonbartable" CELLSPACING=0>
+<TR ID="hdr"><TD CLASS="runninghead" NOWRAP>IObject:&nbsp;Equals</TD></TR>
+</TABLE>
+<!-- ============ METHOD ENTRY ============ -->
+<H1>Equals</H1>
+<P>
+ Returns a boolean indicating the equality of this instance versus the
+ passed in value.
+
+<p><br>
+</p><br>
+<PRE class=syntax><B><font class="keyword">&nbsp;Public</font><font class="keyword">&nbsp;Function</font><font class="identifier">&nbsp;Equals</font>(
+	&nbsp;<font class="keyword">&nbsp;ByRef</font><font class="identifier">&nbsp;Value</font><font class="keyword">&nbsp;As</font><font class="keyword">&nbsp;Variant</font>&nbsp;)<font class="keyword">&nbsp;As</font><font class="keyword">&nbsp;Boolean</font></B></PRE>
+<H4>Parameters</H4>
+<DL>
+<DT><I>Value</I></TD>
+<DD>
+[ByRef]
+ <B>Variant</B>.
+  The value to compare this instance against for equality.
+ 
+</DD>
+</DL>
+<H4>Return Values</H4>
+<B>Boolean</B>&nbsp;-&nbsp; Boolean indicating the equality of this instance and the value.
+ 
+<H4>Remarks</H4>
+<P> <p>This should be overridden to provide the type of equality
+ checking that is appropriate for each class.  Most classes simply
+ check to see if the value is the same object instance as this object,
+ meaning, they are both the same object in memory. cDateTime checks to
+ see if the value has the same date as this instance, and TimeSpan
+ checks to see if the value has the same number of milliseconds as this
+ instance to determine equality.</p>
+ <p>This method should not throw an exception if the wrong datatype is
+ supplied. Instead, it should just return <i>False</i> to indicate that
+ the value is not equal to this object instance.</p>
+ <p><b>What should Equals when</b><br>
+ <table>
+   <tr>
+       <th width="50%">What should Equals return when</td><th>Returns</td>
+   </tr>
+   <tr>
+       <td>Two Variables Point to the same object</td><td>True</td>
+   </tr>
+   <tr>
+       <td>Two objects represent the same internal value</td><td>True</td>
+   </tr>
+ </table></P>
+<H4>See Also</H4>
+<P>
+<A HREF="IObject.html">Class IObject Overview</A>
+<A HREF="IObject.html#public_props">IObject Properties</A>
+<A HREF="IObject.html#public_methods">IObject Methods</A>
+
+<B><A HREF="IObject.GetHashCode.html">GetHashCode</A></B>
+<DIV class=footer>Build on Sunday, May 06, 2007 by VBDOX <BR>Copyright &copy; 2000 - 2003 M.Stamenov</DIV>
+<DIV class=footer style="COLOR: #000000; FONT-SIZE: 90%">
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="Text/html; charset=iso-8859-1">
+  <meta name="Author" content = "m.stamenov" >
+  <meta name="GENERATOR" content="VBDOX [2.0.16]" >
+  <link REL="stylesheet" TYPE="text/css" HREF="backsdk4.css">
+  <script SRC="langref.js"></script>
+  <title>IObject:&nbsp;GetHashCode</title>
+</head>
+<BODY TOPMARGIN="0">
+<TABLE CLASS="buttonbarshade" CELLSPACING=0><TR><TD>&nbsp;</TD></TR></TABLE>
+<TABLE CLASS="buttonbartable" CELLSPACING=0>
+<TR ID="hdr"><TD CLASS="runninghead" NOWRAP>IObject:&nbsp;GetHashCode</TD></TR>
+</TABLE>
+<!-- ============ METHOD ENTRY ============ -->
+<H1>GetHashCode</H1>
+<P>
+ Returns a pseudo-unique number to identify this object instance.
+
+<p><br>
+</p><br>
+<PRE class=syntax><B><font class="keyword">&nbsp;Public</font><font class="keyword">&nbsp;Function</font><font class="identifier">&nbsp;GetHashCode</font>&nbsp;(&nbsp;)<font class="keyword">&nbsp;As</font><font class="keyword">&nbsp;Long</font></B></PRE>
+<H4>Return Values</H4>
+<B>Long</B>&nbsp;-&nbsp; The number representing this instance.
+ 
+<H4>Remarks</H4>
+<P> <p>A hashcode is used by VBCorLib to help distinguish different
+ instances of objects. The Hashtable uses an objects hashcode to help
+ search for a specific object. Since there is a finite set of numbers, each
+ hashcode is not truly unique. A generated set of hashcodes should produce
+ an evenly distributed set of values for a specific class type.</p>
+ <p>This should be overridden to provide a value to identify
+ this object instance. Most objects return their location in memory,
+ unless the objects need to be considered the same as other objects.
+ This occurs for both cDateTime and TimeSpan objects for example. All cDateTime
+ objects that have the same date will generate the same hashcode. Same
+ for TimeSpan. If the spans are the same, so are the hashcodes.</p>
+ <p>A default implementation for this method could be<br>
+ <pre>
+ Public Function GetHashCode() As Long
+     GetHashCode = ObjPtr(CUnk(Me))
+ End Function
+ </pre>
+
+</P>
+<H4>See Also</H4>
+<P>
+<A HREF="IObject.html">Class IObject Overview</A>
+<A HREF="IObject.html#public_props">IObject Properties</A>
+<A HREF="IObject.html#public_methods">IObject Methods</A>
+<B><A HREF="IObject.Equals.html">Equals</A></B>
+<B><A HREF="IObject.ToString.html">ToString</A></B>
+<DIV class=footer>Build on Sunday, May 06, 2007 by VBDOX <BR>Copyright &copy; 2000 - 2003 M.Stamenov</DIV>
+<DIV class=footer style="COLOR: #000000; FONT-SIZE: 90%">
+</body>
+</html>

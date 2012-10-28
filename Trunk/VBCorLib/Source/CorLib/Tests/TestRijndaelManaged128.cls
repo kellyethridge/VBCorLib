@@ -1,0 +1,38 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "TestRijndaelManaged128"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+'
+' TestRijndaelManaged128
+'
+Option Explicit
+
+Private csp As RijndaelManaged
+
+Public Sub Setup()
+    Set csp = New RijndaelManaged
+    csp.KeySize = 128
+End Sub
+
+
+Public Sub AutoGenerateKeyAndIV()
+    Dim b() As Byte
+    b = csp.Key
+    Assert.IsFalse cArray.IsNull(b), "Key should not be null."
+    Assert.AreEqual 16, cArray.GetLength(b), "Key should be 16 bytes."
+    
+    Erase b
+    b = csp.IV
+    Assert.IsFalse cArray.IsNull(b), "IV should not be null."
+    Assert.AreEqual 16, cArray.GetLength(b), "IV should be 16 bytes."
+End Sub
+

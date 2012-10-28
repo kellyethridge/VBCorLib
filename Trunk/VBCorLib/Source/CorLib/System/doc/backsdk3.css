@@ -1,0 +1,17 @@
+body     { font-size: 75%; font-family: "Verdana, sans-serif"; }
+table    { font-size: 75%; font-family: "Verdana, sans-serif"; margin-top: 12; }
+th       { padding: 4,12,4,0; }
+td       { padding: 4,12,4,0; }
+h1       { font-weight: bold; font-size: 76%; font-family: "Tahoma, Verdana, sans-serif"; }
+h2       { font-weight: bold; font-size: 84%; font-family: "Tahoma, Verdana, sans-serif"; }
+h3       { font-weight: bold; font-size: 86%; font-family: "Tahoma, Verdana, sans-serif"; }
+h4       { font-weight: bold; font-size: 88%; margin-top: 3pt; font-family: "Tahoma, Verdana, sans-serif"; }
+h5       { font-weight: bold; font-size: 90%; margin-top: 3pt; font-family: "Tahoma, Verdana, sans-serif"; }
+code     { font-size: 81%; font-family: "Lucida Sans Typewriter, Courier New, monospace"; }
+pre      { font-size: 81%; font-family: "Lucida Sans Typewriter, Courier New, monospace"; }
+dt       { margin-top: 3pt; }
+li       { margin-top: 3pt; }
+img      { vertical-align: middle; }
+.indent1 { margin-left: 12pt; }
+.indent2 { margin-left: 24pt; }
+.indent3 { margin-left: 36pt; }
