@@ -1,0 +1,37 @@
+<!doctype html public "-//IETF//DTD HTML//EN">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="Text/html; charset=iso-8859-1">
+  <meta name="Author" content = "m.stamenov" >
+  <meta name="GENERATOR" content="VBDOX [2.0.16]" >
+</head>
+<body>
+<ul>
+<li> <object type="text/sitemap">
+<param name="Name" value="">
+<param name="Name" value="">
+<param name="Local" value="prj.html">
+</object>
+<li> <object type="text/sitemap">
+<param name="Name" value="IObject">
+<param name="Name" value="IObject">
+<param name="Local" value="IObject.html">
+</object>
+<li> <object type="text/sitemap">
+<param name="Name" value="Equals">
+<param name="Name" value="Equals">
+<param name="Local" value="IObject.Equals.html">
+</object>
+<li> <object type="text/sitemap">
+<param name="Name" value="GetHashCode">
+<param name="Name" value="GetHashCode">
+<param name="Local" value="IObject.GetHashCode.html">
+</object>
+<li> <object type="text/sitemap">
+<param name="Name" value="ToString">
+<param name="Name" value="ToString">
+<param name="Local" value="IObject.ToString.html">
+</object>
+</ul>
+</body>
+</html>

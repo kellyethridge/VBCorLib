@@ -1,0 +1,62 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="Text/html; charset=iso-8859-1">
+  <meta name="Author" content = "m.stamenov" >
+  <meta name="GENERATOR" content="VBDOX [2.0.16]" >
+  <link REL="stylesheet" TYPE="text/css" HREF="backsdk4.css">
+  <script SRC="langref.js"></script>
+<script type="text/javascript"><!--
+google_ad_client = "pub-8657535984404907";
+google_ad_width = 468;
+google_ad_height = 60;
+google_ad_format = "468x60_as";
+google_ad_type = "text_image";
+google_ad_channel = "";
+//-->
+</script>
+<script type="text/javascript"
+  src="http://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script>
+  <title>ArrayList:&nbsp;Add</title>
+</head>
+<BODY TOPMARGIN="0">
+<TABLE CLASS="buttonbarshade" CELLSPACING=0><TR><TD>&nbsp;</TD></TR></TABLE>
+<TABLE CLASS="buttonbartable" CELLSPACING=0>
+<TR ID="hdr"><TD CLASS="runninghead" NOWRAP>ArrayList:&nbsp;Add</TD></TR>
+</TABLE>
+<!-- ============ METHOD ENTRY ============ -->
+<H1>Add</H1>
+<P>
+ Adds a new item to the end of the list.
+
+<p><br>
+</p><br>
+<PRE class=syntax><B><font class="keyword">&nbsp;Public</font><font class="keyword">&nbsp;Function</font><font class="identifier">&nbsp;Add</font>(
+	&nbsp;<font class="keyword">&nbsp;ByRef</font><font class="identifier">&nbsp;Value</font><font class="keyword">&nbsp;As</font><font class="keyword">&nbsp;Variant</font>&nbsp;)<font class="keyword">&nbsp;As</font><font class="keyword">&nbsp;Long</font></B></PRE>
+<H4>Parameters</H4>
+<DL>
+<DT><I>Value</I></TD>
+<DD>
+[ByRef]
+ <B>Variant</B>.
+  The item to be added to the list.
+ 
+</DD>
+</DL>
+<H4>Return Values</H4>
+<B>Long</B>&nbsp;-&nbsp; The index at which the item was added.
+ 
+<H4>Remarks</H4>
+<P> <h4>Exceptions</h4><table><tr><th width="50%">Exception Type</th><th>Condition</th></tr><tr><td>NotSupportedException</td><td>The <b>ArrayList</b> is Read-Only<br>- or -<br>The <b>ArrayList</b> is Fixed-Size.</td></tr></table><h4>Example</h4>In the following example, several items are added to an <b>ArrayList</b>object and then iterated over, displaying the items in the list.<pre>Private Sub Main()    Dim list As New ArrayList         add several elements to the ArrayList    list.Add "Humpty"    list.Add "Dumpty"    list.Add "sat"    list.Add "on"    list.Add "a"    list.Add "wall."         Display the contents of the ArrayList    PrintValues list         Wait for user to press return key    Console.ReadLine    End SubPrivate Sub PrintValues(ByVal en As IEnumerable)    Const Space As String = " "        Dim value As Variant         Iterate over the list    For Each value In en         Write each value onto the same line        Console.WriteValue value        Console.WriteValue Space    Next valueEnd Sub This code produces the following output. Humpty Dumpty sat on a wall.</pre>The items are added to the list, then a For..Each statement is usedto iterate over the list, displaying the name in the Console window.</P>
+<H4>See Also</H4>
+<P>
+<A HREF="ArrayList.html">Class ArrayList Overview</A>
+<A HREF="ArrayList.html#public_props">ArrayList Properties</A>
+<A HREF="ArrayList.html#public_methods">ArrayList Methods</A>
+
+<B><A HREF="ArrayList.AddRange.html">AddRange</A></B>
+<DIV class=footer>Build on Sunday, September 09, 2007 by VBDOX <BR>Copyright &copy; 2000 - 2003 M.Stamenov</DIV>
+<DIV class=footer style="COLOR: #000000; FONT-SIZE: 90%">
+</body>
+</html>
