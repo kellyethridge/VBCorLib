@@ -23,6 +23,18 @@ Public Sub AssertArgumentNullException(ByVal Err As ErrObject, ByRef ParamName A
     Assert.That ArgEx.ParamName, Iz.EqualTo(ParamName), "Wrong parameter name."
 End Sub
 
+Public Sub AssertArgumentOutOfRangeException(ByVal Err As ErrObject, ByRef ParamName As String, ByRef ActualValue As Variant)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is ArgumentOutOfRangeException Then
+        Assert.Fail "Expected an ArgumentOutOfRangeException but was " & TypeName(Ex) & "."
+    End If
+    Dim ArgEx As ArgumentOutOfRangeException
+    Set ArgEx = Ex
+    Assert.That ArgEx.ParamName, Iz.EqualTo(ParamName)
+    Assert.That ArgEx.ActualValue, Iz.EqualTo(ActualValue)
+End Sub
+
 Public Sub AssertIndexOutOfRangeException(ByVal Err As ErrObject)
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
