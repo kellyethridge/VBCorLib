@@ -6,100 +6,111 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestcArray"
+Attribute VB_Name = "cArrayTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ICategorizable
+Implements ITestCaseSource
 
-Public Sub TestLengthOf1DArray()
-    Dim arr(1 To 10) As Long
-    Assert.AreEqual 10, cArray.GetLength(arr), "Length should be 10."
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Array Tests"
 End Sub
 
-Public Sub TestLengthof2DArray()
-    Dim arr(1 To 10, 1 To 15) As Long
-    Assert.AreEqual 150, cArray.GetLength(arr), "Length should be 100."
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Dim LongArray()     As Long
+    Dim Var             As Variant
+    Dim ObjectArray()   As Object
+        
+    Select Case Test.MethodName
+        Case "GetLength_WithValue_ReturnsExpected"
+            ReDim LongArray(1 To 10)
+            Test.Use(LongArray).Expect 10
+            
+            ReDim LongArray(1 To 10, 1 To 15)
+            Test.Use(LongArray).Expect 150
+        
+            ReDim LongArray(1 To 10, 1 To 15)
+            Test.Use(LongArray, 2).Expect 15
+    
+            ReDim Var(1 To 10) As Long
+            Test.Use(Var).Expect 10
+            
+        Case "IsNull_WithValue_ReturnsExpected"
+            Erase LongArray
+            Test.Use(LongArray).Expect True
+            
+            Erase ObjectArray
+            Test.Use(ObjectArray).Expect True
+            
+            Test.Use(Array()).Expect False
+            
+    End Select
 End Sub
 
-Public Sub TestSpecificDimension()
-    Dim arr(1 To 10, 1 To 15)
-    Assert.AreEqual 15, cArray.GetLength(arr, 2)
-End Sub
+Public Function GetLength_WithValue_ReturnsExpected(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
+    GetLength_WithValue_ReturnsExpected = carray.GetLength(Arr, Dimension)
+End Function
 
-Public Sub TestGetLengthInVariantByRef()
-    Dim arr As Variant
-    ReDim arr(1 To 10) As Long
-    Assert.AreEqual 10, cArray.GetLength(arr), "Lenght should be 10."
-End Sub
-
-Public Sub TestGetLengthRankError()
-    Dim arr(1 To 10, 1 To 15)
+Public Sub GetLength_WithInvalidDimension_Throws()
+    Dim Arr(1 To 10, 1 To 15)
+    
     On Error GoTo errTrap
-    cArray.GetLength arr, 3
-    On Error GoTo 0
+    carray.GetLength Arr, 3
     Assert.Fail "An exception should have been thrown."
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should have been caught."
-    Assert.IsTrue TypeOf Ex Is IndexOutOfRangeException, "Incorrect exception was caught."
+    Catch Ex
+    Assert.That TypeOf Ex Is IndexOutOfRangeException, Iz.True, "Incorrect exception was caught."
 End Sub
 
-Public Sub TestIsArrayError()
+Public Sub GetLength_WithNonArray_Throws()
     Dim NotAnArray As Long
-    Dim Ex As Exception
     
     On Error GoTo errTrap
-    cArray.GetLength NotAnArray
-    On Error GoTo 0
+    carray.GetLength NotAnArray
     Assert.Fail "An exception should have been thrown."
 
 errTrap:
-    Assert.IsTrue Catch(Ex), "An exception should have been caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Incorrect exception caught."
+    Dim Ex As Exception
+    Catch Ex
+    Assert.That TypeOf Ex Is ArgumentException, Iz.True, "Incorrect exception caught."
 End Sub
 
-Public Sub TestGetLengthNullArray()
-    Dim Ex As Exception
+Public Sub GetLength_WithUninitializedArray_Throws()
     Dim NullArray() As Long
     
     On Error GoTo errTrap
-    cArray.GetLength NullArray
-    On Error GoTo 0
+    carray.GetLength NullArray
     Assert.Fail "An exception should have been thrown."
     
 errTrap:
-    Assert.IsTrue Catch(Ex), "An exception should have been caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentNullException, "Incorrect exception caught."
+    Dim Ex As Exception
+    Catch Ex
+    Assert.That TypeOf Ex Is ArgumentNullException, Iz.True, "Incorrect exception caught."
 End Sub
 
-Public Sub TestIsNullArrayTrue()
-    Dim NullArray() As Long
-    Assert.IsTrue cArray.IsNull(NullArray), "IsNull should return True for 'NullArray'."
-    
-    Dim NullObjArray() As Object
-    Assert.IsTrue cArray.IsNull(NullObjArray), "IsNull should return True for 'NullObjArray'."
-    
-    ReDim NullArray(0)
-    Assert.IsFalse cArray.IsNull(NullArray), "IsNull should return false for 'NullArray'."
-End Sub
+Public Function IsNull_WithValue_ReturnsExpected(ByRef Arr As Variant) As Boolean
+    IsNull_WithValue_ReturnsExpected = carray.IsNull(Arr)
+End Function
 
 Public Sub TestGetRankFor1DArray()
-    Dim arr(0) As Long
-    Assert.AreEqual 1, cArray.GetRank(arr), "Rank should be 1."
+    Dim Arr(0) As Long
+    Assert.AreEqual 1, carray.GetRank(Arr), "Rank should be 1."
 End Sub
 
 Public Sub TestGetRankFor2DArray()
-    Dim arr(0, 0) As Long
-    Assert.AreEqual 2, cArray.GetRank(arr), "Rank should be 2."
+    Dim Arr(0, 0) As Long
+    Assert.AreEqual 2, carray.GetRank(Arr), "Rank should be 2."
 End Sub
 
 Public Sub TestGetRankFromVariantByRef()
-    Dim arr As Variant
-    ReDim arr(0, 0, 0) As Long
-    Assert.AreEqual 3, cArray.GetRank(arr), "Rank should be 3."
+    Dim Arr As Variant
+    ReDim Arr(0, 0, 0) As Long
+    Assert.AreEqual 3, carray.GetRank(Arr), "Rank should be 3."
 End Sub
 
 Public Sub TestGetRankNullArray()
@@ -107,7 +118,7 @@ Public Sub TestGetRankNullArray()
     Dim NullArray() As Long
     
     On Error GoTo errTrap
-    cArray.GetRank NullArray
+    carray.GetRank NullArray
     On Error GoTo 0
     Assert.Fail "An exception should have been thrown."
     
@@ -120,7 +131,7 @@ Public Sub TestGetRankNotAnArray()
     Dim NotAnArray As Long
     Dim Ex As Exception
     On Error GoTo errTrap
-    cArray.GetRank NotAnArray
+    carray.GetRank NotAnArray
     On Error GoTo 0
     Assert.Fail "An exception should have been thrown."
     
@@ -137,7 +148,7 @@ Public Sub TestClearAllLongs()
     For i = 0 To 100
         a(i) = i
     Next i
-    cArray.Clear a, 0, 101
+    carray.Clear a, 0, 101
     For i = 0 To 100
         Assert.AreEqual 0, a(i)
     Next i
@@ -151,7 +162,7 @@ Public Sub TestClearSomeLongs()
     For i = 0 To 100
         a(i) = i
     Next i
-    cArray.Clear a, 25, 30
+    carray.Clear a, 25, 30
     For i = 0 To 100
         If i < 25 Or i > 54 Then
             Assert.AreEqual i, a(i)
@@ -170,7 +181,7 @@ Public Sub TestClearSomeUDTs()
         a(i).Data1 = i
     Next i
 
-    cArray.Clear a, 10, 91
+    carray.Clear a, 10, 91
     
     For i = 10 To 100
         Assert.AreEqual 0, a(i).Data1
@@ -186,7 +197,7 @@ Public Sub TestClearSomeStrings()
         a(i) = "Item " & i
     Next i
     
-    cArray.Clear a, 3, 5
+    carray.Clear a, 3, 5
     
     For i = 0 To 10
         If i < 3 Or i > 7 Then
@@ -200,10 +211,12 @@ End Sub
 Public Sub ForEachAssignNumber()
     Dim a(10) As Long
     
-    cArray.ForEach a, AddressOf SetToNumber
+    carray.ForEach a, AddressOf SetToNumber
     
     Dim i As Long
     For i = 0 To 10
         Assert.AreEqual 5, a(i)
     Next i
 End Sub
+
+
