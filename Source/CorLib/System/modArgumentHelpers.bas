@@ -69,7 +69,10 @@ Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull
     ' array is passed to any cArray method, it will technically never
     ' be uninitialized, just zero-length.
     Select Case vt And &HFF
-        Case vbObject, vbUserDefinedType: If MemLong(GetArrayPointer + PVDATA_OFFSET) = vbNullPtr Then GetArrayPointer = vbNullPtr
+        Case vbObject, vbUserDefinedType
+            If UBound(Arr) < LBound(Arr) Then
+                GetArrayPointer = vbNullPtr
+            End If
     End Select
     
     If ThrowOnNull Then

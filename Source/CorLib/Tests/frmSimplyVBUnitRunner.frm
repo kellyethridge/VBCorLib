@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#3.0#0"; "SimplyVBUnit.Component.ocx"
+Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#3.1#0"; "SimplyVBUnit.Component.ocx"
 Begin VB.Form frmSimplyVBUnitRunner 
    Caption         =   "Simply VB Unit"
    ClientHeight    =   7080
@@ -294,7 +294,7 @@ Private Sub Form_Load()
 
     Dim cArrayTests As TestSuite
     Set cArrayTests = Sim.NewTestSuite("cArray Tests")
-    cArrayTests.Add New TestcArray
+    cArrayTests.Add New cArrayTests
     cArrayTests.Add New TestInvalidCastException
     cArrayTests.Add New TestDefInvalidCast
     cArrayTests.Add New TestDefaultComparer
