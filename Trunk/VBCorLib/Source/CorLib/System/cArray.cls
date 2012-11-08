@@ -1526,55 +1526,55 @@ End Function
 
 ''
 ' Attempt to use a specialized search for a specific data type.
-Private Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
+Private Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal startIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA)
-        Case vbLong:                    RetVal = SZBinarySearch(pSA, VarPtr(CLng(Value)), StartIndex, Length, AddressOf CompareLongs)
-        Case vbString:                  RetVal = SZBinarySearch(pSA, VarPtr(StrPtr(Value)), StartIndex, Length, AddressOf CompareStrings)
-        Case vbDouble:                  RetVal = SZBinarySearch(pSA, VarPtr(CDbl(Value)), StartIndex, Length, AddressOf CompareDoubles)
-        Case vbObject, vbDataObject:    RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf CompareIComparable)
-        Case vbVariant:                 RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf CompareVariants)
-        Case vbInteger:                 RetVal = SZBinarySearch(pSA, VarPtr(CInt(Value)), StartIndex, Length, AddressOf CompareIntegers)
-        Case vbSingle:                  RetVal = SZBinarySearch(pSA, VarPtr(CSng(Value)), StartIndex, Length, AddressOf CompareSingles)
-        Case vbCurrency:                RetVal = SZBinarySearch(pSA, VarPtr(CCur(Value)), StartIndex, Length, AddressOf CompareCurrencies)
-        Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), StartIndex, Length, AddressOf CompareDates)
-        Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), StartIndex, Length, AddressOf CompareBooleans)
-        Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), StartIndex, Length, AddressOf CompareBytes)
+        Case vbLong:                    RetVal = SZBinarySearch(pSA, VarPtr(CLng(Value)), startIndex, Length, AddressOf CompareLongs)
+        Case vbString:                  RetVal = SZBinarySearch(pSA, VarPtr(StrPtr(Value)), startIndex, Length, AddressOf CompareStrings)
+        Case vbDouble:                  RetVal = SZBinarySearch(pSA, VarPtr(CDbl(Value)), startIndex, Length, AddressOf CompareDoubles)
+        Case vbObject, vbDataObject:    RetVal = SZBinarySearch(pSA, VarPtr(Value), startIndex, Length, AddressOf CompareIComparable)
+        Case vbVariant:                 RetVal = SZBinarySearch(pSA, VarPtr(Value), startIndex, Length, AddressOf CompareVariants)
+        Case vbInteger:                 RetVal = SZBinarySearch(pSA, VarPtr(CInt(Value)), startIndex, Length, AddressOf CompareIntegers)
+        Case vbSingle:                  RetVal = SZBinarySearch(pSA, VarPtr(CSng(Value)), startIndex, Length, AddressOf CompareSingles)
+        Case vbCurrency:                RetVal = SZBinarySearch(pSA, VarPtr(CCur(Value)), startIndex, Length, AddressOf CompareCurrencies)
+        Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), startIndex, Length, AddressOf CompareDates)
+        Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), startIndex, Length, AddressOf CompareBooleans)
+        Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), startIndex, Length, AddressOf CompareBytes)
         Case Else: Exit Function
     End Select
     TrySZBinarySearch = True
 End Function
 
-Private Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
+Private Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal startIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA) And &HFF
-        Case vbLong:                    RetVal = SZIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualsLong)
-        Case vbString:                  RetVal = SZIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualsString)
-        Case vbDouble:                  RetVal = SZIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualsDouble)
-        Case vbDate:                    RetVal = SZIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualsDate)
-        Case vbObject, vbDataObject:    RetVal = SZIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualsObject)
-        Case vbVariant:                 RetVal = SZIndexOf(pSA, VarPtr(Value), StartIndex, Count, AddressOf EqualsVariants)
-        Case vbInteger:                 RetVal = SZIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualsInteger)
-        Case vbSingle:                  RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualsSingle)
-        Case vbByte:                    RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualsByte)
-        Case vbBoolean:                 RetVal = SZIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualsBoolean)
-        Case vbCurrency:                RetVal = SZIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualsCurrency)
+        Case vbLong:                    RetVal = SZIndexOf(pSA, VarPtr(CLng(Value)), startIndex, Count, AddressOf EqualsLong)
+        Case vbString:                  RetVal = SZIndexOf(pSA, VarPtr(StrPtr(Value)), startIndex, Count, AddressOf EqualsString)
+        Case vbDouble:                  RetVal = SZIndexOf(pSA, VarPtr(CDbl(Value)), startIndex, Count, AddressOf EqualsDouble)
+        Case vbDate:                    RetVal = SZIndexOf(pSA, VarPtr(CDate(Value)), startIndex, Count, AddressOf EqualsDate)
+        Case vbObject, vbDataObject:    RetVal = SZIndexOf(pSA, VarPtr(ObjPtr(Value)), startIndex, Count, AddressOf EqualsObject)
+        Case vbVariant:                 RetVal = SZIndexOf(pSA, VarPtr(Value), startIndex, Count, AddressOf EqualsVariants)
+        Case vbInteger:                 RetVal = SZIndexOf(pSA, VarPtr(CInt(Value)), startIndex, Count, AddressOf EqualsInteger)
+        Case vbSingle:                  RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), startIndex, Count, AddressOf EqualsSingle)
+        Case vbByte:                    RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), startIndex, Count, AddressOf EqualsByte)
+        Case vbBoolean:                 RetVal = SZIndexOf(pSA, VarPtr(CBool(Value)), startIndex, Count, AddressOf EqualsBoolean)
+        Case vbCurrency:                RetVal = SZIndexOf(pSA, VarPtr(CCur(Value)), startIndex, Count, AddressOf EqualsCurrency)
         Case Else: Exit Function
     End Select
     TrySZIndexOf = True
 End Function
 
-Private Function TrySZLastIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
+Private Function TrySZLastIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal startIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA) And &HFF
-        Case vbLong:                    RetVal = SZLastIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualsLong)
-        Case vbString:                  RetVal = SZLastIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualsString)
-        Case vbDouble:                  RetVal = SZLastIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualsDouble)
-        Case vbDate:                    RetVal = SZLastIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualsDate)
-        Case vbObject, vbDataObject:    RetVal = SZLastIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualsObject)
-        Case vbVariant:                 RetVal = SZLastIndexOf(pSA, VarPtr(Value), StartIndex, Count, AddressOf EqualsVariants)
-        Case vbInteger:                 RetVal = SZLastIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualsInteger)
-        Case vbSingle:                  RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualsSingle)
-        Case vbByte:                    RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualsByte)
-        Case vbBoolean:                 RetVal = SZLastIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualsBoolean)
-        Case vbCurrency:                RetVal = SZLastIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualsCurrency)
+        Case vbLong:                    RetVal = SZLastIndexOf(pSA, VarPtr(CLng(Value)), startIndex, Count, AddressOf EqualsLong)
+        Case vbString:                  RetVal = SZLastIndexOf(pSA, VarPtr(StrPtr(Value)), startIndex, Count, AddressOf EqualsString)
+        Case vbDouble:                  RetVal = SZLastIndexOf(pSA, VarPtr(CDbl(Value)), startIndex, Count, AddressOf EqualsDouble)
+        Case vbDate:                    RetVal = SZLastIndexOf(pSA, VarPtr(CDate(Value)), startIndex, Count, AddressOf EqualsDate)
+        Case vbObject, vbDataObject:    RetVal = SZLastIndexOf(pSA, VarPtr(ObjPtr(Value)), startIndex, Count, AddressOf EqualsObject)
+        Case vbVariant:                 RetVal = SZLastIndexOf(pSA, VarPtr(Value), startIndex, Count, AddressOf EqualsVariants)
+        Case vbInteger:                 RetVal = SZLastIndexOf(pSA, VarPtr(CInt(Value)), startIndex, Count, AddressOf EqualsInteger)
+        Case vbSingle:                  RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), startIndex, Count, AddressOf EqualsSingle)
+        Case vbByte:                    RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), startIndex, Count, AddressOf EqualsByte)
+        Case vbBoolean:                 RetVal = SZLastIndexOf(pSA, VarPtr(CBool(Value)), startIndex, Count, AddressOf EqualsBoolean)
+        Case vbCurrency:                RetVal = SZLastIndexOf(pSA, VarPtr(CCur(Value)), startIndex, Count, AddressOf EqualsCurrency)
         Case Else: Exit Function
     End Select
     TrySZLastIndexOf = True

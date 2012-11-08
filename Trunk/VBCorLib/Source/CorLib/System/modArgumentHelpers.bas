@@ -31,58 +31,6 @@ Option Explicit
 
 
 ''
-' Retrieves the pointer to an array's SafeArray structure.
-'
-' @param arr The array to retrieve the pointer to.
-' @return A pointer to a SafeArray structure or 0 if the array is null.
-'
-Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull As Boolean = False) As Long
-    Const BYREF_ARRAY As Long = VT_BYREF Or vbArray
-    
-    Dim vt As Long
-    
-    vt = VariantType(Arr)
-    Select Case vt And BYREF_ARRAY
-        ' we have to double deref the original array pointer because
-        ' the variant held a pointer to the original array variable.
-        Case BYREF_ARRAY:   GetArrayPointer = MemLong(MemLong(VarPtr(Arr) + VARIANTDATA_OFFSET))
-        ' we won't need to deref again if the original array was dimensioned
-        ' as a variant ie:
-        '    Dim arr As Variant
-        '    ReDim arr(1 To 10) As Long
-        '
-        ' The passed in variant will be the array variable, not a ByRef
-        ' pointer to the array variable.
-        Case vbArray:       GetArrayPointer = MemLong(VarPtr(Arr) + VARIANTDATA_OFFSET)
-        ' you bad person
-        Case Else:          Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayRequired), "Arr")
-    End Select
-    
-    ' HACK HACK HACK
-    '
-    ' When an uninitialized array of objects or UDTs is passed into a
-    ' function as a ByRef Variant, the array is initialized with just the
-    ' SafeArrayDescriptor, at which point, it is a valid array and can
-    ' be used by UBound and LBound after the call. So, now we're just
-    ' going to assume that any object or UDT array that has just the descriptor
-    ' allocated was Null to begin with. That means whenever an Object or UDT
-    ' array is passed to any cArray method, it will technically never
-    ' be uninitialized, just zero-length.
-    Select Case vt And &HFF
-        Case vbObject, vbUserDefinedType
-            If UBound(Arr) < LBound(Arr) Then
-                GetArrayPointer = vbNullPtr
-            End If
-    End Select
-    
-    If ThrowOnNull Then
-        If GetArrayPointer = vbNullPtr Then
-            Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Arr")
-        End If
-    End If
-End Function
-
-''
 ' Returns an optional value or a default value if the optional value is missing.
 '
 ' @param OptionalValue The optional variant value.

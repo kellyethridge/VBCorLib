@@ -275,6 +275,7 @@ Private Sub Form_Load()
     
     AddTest New TestcString
     AddTest New TestStringBuilder
+    AddTest New TestDefaultComparer
 
     Dim ExceptionTests As TestSuite
     Set ExceptionTests = Sim.NewTestSuite("Exception Tests")
@@ -289,15 +290,15 @@ Private Sub Form_Load()
     ExceptionTests.Add New TestArgumentOutOfRange
     ExceptionTests.Add New TestDefArgumentOutOfRange
     ExceptionTests.Add New TestExceptionMethods
+    ExceptionTests.Add New TestInvalidCastException
+    ExceptionTests.Add New TestDefInvalidCast
     AddTest ExceptionTests
     
 
     Dim cArrayTests As TestSuite
     Set cArrayTests = Sim.NewTestSuite("cArray Tests")
     cArrayTests.Add New cArrayTests
-    cArrayTests.Add New TestInvalidCastException
-    cArrayTests.Add New TestDefInvalidCast
-    cArrayTests.Add New TestDefaultComparer
+    cArrayTests.Add New cArrayCopyTests
     cArrayTests.Add New TestPosNumBinarySearch
     cArrayTests.Add New TestMixNumBinarySearch
     cArrayTests.Add New TestArraySort
@@ -305,7 +306,6 @@ Private Sub Form_Load()
     cArrayTests.Add New TestArrayReverse
     cArrayTests.Add New TestArrayIndexOf
     cArrayTests.Add New TestArrayLastIndexOf
-    cArrayTests.Add New TestArrayCopy
     cArrayTests.Add New TestArrayCreation
     AddTest cArrayTests
     
