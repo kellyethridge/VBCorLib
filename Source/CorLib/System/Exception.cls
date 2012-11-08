@@ -256,7 +256,6 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Message As String, ByRef InnerException As Exception)
-    Set mBase = Nothing
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
 End Sub
 

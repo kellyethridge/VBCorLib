@@ -91,9 +91,9 @@ End Property
 '
 Public Sub SetValue(ByVal Name As String, ByRef Value As Variant)
     If IsObject(Value) Then
-        Set values(Name) = Value
+        Set Values(Name) = Value
     Else
-        values(Name) = Value
+        Values(Name) = Value
     End If
 End Sub
 
@@ -105,7 +105,7 @@ End Sub
 '
 Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant) As Variant
     ' Steal the returned value from the Hashtable.
-    Call Helper.MoveVariant(GetValue, values(Name))
+    Call Helper.MoveVariant(GetValue, Values(Name))
     
     ' An empty value is the default return value for a key
     ' that does not exist in a Hashtable. It is also a valid
@@ -115,7 +115,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
     ' having to call into the Hashtable twice unless the
     ' returned value is Empty.
     If IsEmpty(GetValue) Then
-        If Not values.Contains(Name) Then Call VariantCopyInd(GetValue, Default)
+        If Not Values.Contains(Name) Then Call VariantCopyInd(GetValue, Default)
     End If
 End Function
 
@@ -157,7 +157,7 @@ End Property
 '
 Public Property Get Message() As String
     If cString.IsNull(mMessage) Then
-        Message = Environment.GetResourceString(Exception_WasThrown, mSubclassName)
+        Message = Resources.GetString(Exception_WasThrown, mSubclassName)
     Else
         Message = mMessage
     End If
@@ -377,9 +377,9 @@ End Sub
 '
 ' @return An initalized Hashtable used to store values.
 '
-Private Property Get values() As Hashtable
+Private Property Get Values() As Hashtable
     If mValues Is Nothing Then Set mValues = New Hashtable
-    Set values = mValues
+    Set Values = mValues
 End Property
 
 

@@ -27,10 +27,10 @@ Private Const DELEGATE_ASM As Currency = -368956918007638.6215@     ' from Matt 
 ' The structure of the lightweight COM function delegator object.
 
 Public Type FunctionDelegator
-    pVTable As Long
-    pfn As Long
-    cRefs As Long
-    Func(3) As Long
+    pVTable     As Long
+    pfn         As Long
+    cRefs       As Long
+    Func(3)     As Long
 End Type
 
 ''
