@@ -42,24 +42,6 @@ Private mMSVCLib    As Long
 
 
 ''
-' Returns an ASM memory swapping routine.
-'
-' @param Size The number of bytes to be swapped.
-' @return A swapper that swaps the specified number of bytes at a time.
-'
-Public Function GetSwapper(ByVal size As Long) As ISwap
-    Select Case size
-        Case 4:     Set GetSwapper = NewDelegator(mHelper.Func(3))
-        Case 8:     Set GetSwapper = NewDelegator(mHelper.Func(4))
-        Case 16:    Set GetSwapper = NewDelegator(mHelper.Func(5))
-        Case 2:     Set GetSwapper = NewDelegator(mHelper.Func(6))
-        Case 1:     Set GetSwapper = NewDelegator(mHelper.Func(7))
-        Case Else
-            Throw Cor.NewArgumentOutOfRangeException("Not a valid swapper size. Must be {1,2,4,8,16}.")
-    End Select
-End Function
-
-''
 ' Creates the helper object.
 '
 Public Sub InitHelper()

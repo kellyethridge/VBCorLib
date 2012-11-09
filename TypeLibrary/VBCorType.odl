@@ -1,12 +1,12 @@
 //
-// VCorLib 2.3 Type Library
+// VCorLib 3.0 Type Library
 //
 
 [
-    helpstring("VB.EXT: VBCorLib 2.3 Type Library"),
-    uuid(6EE2DC8E-9AF7-406b-B88C-ADF03F24A85A),
+    helpstring("VB.EXT: VBCorLib 3.0 Type Library"),
+    uuid(1F852AFD-5C0A-46d0-8AA1-4319E8EF72C0),
 	lcid(0x00000000),
-	version(2.3)
+	version(3.0)
 ]
 library VBCorType {
     importlib("stdole2.tlb");
@@ -15,38 +15,37 @@ library VBCorType {
     typedef [public] long HANDLE;
 
     // This is just for internal use.
-	typedef unsigned char byte;
-	typedef long  DWORD;
-	typedef short WORD;
+    typedef unsigned char byte;
+    typedef long  DWORD;
+    typedef short WORD;
     typedef long  LPVOID;
-
 
     //
     // Public Enums
     //
-	typedef enum BOOL {
-		BOOL_FALSE	= 0,
-		BOOL_TRUE	= 1
-	} BOOL;
+    typedef enum BOOL {
+	    BOOL_FALSE	= 0,
+	    BOOL_TRUE	= 1
+    } BOOL;
 
     typedef enum STGC {
-        STGC_DEFAULT                            = 0,
-        STGC_OVERWRITE                          = 1,
-        STGC_ONLYIFCURRENT                      = 2,
-        STGC_DANGEROUSLYCOMMITMERELYTODISKCACHE = 4,
-        STGC_CONSOLIDATE                        = 8
+	STGC_DEFAULT				= 0,
+	STGC_OVERWRITE				= 1,
+	STGC_ONLYIFCURRENT			= 2,
+	STGC_DANGEROUSLYCOMMITMERELYTODISKCACHE = 4,
+	STGC_CONSOLIDATE			= 8
     } STGC;
 
     typedef enum STATFLAG {
-        STATFLAG_DEFAULT    = 0,
-        STATFLAG_NONAME     = 1,
-        STATFLAG_NOOPEN     = 2
+	STATFLAG_DEFAULT    = 0,
+	STATFLAG_NONAME     = 1,
+	STATFLAG_NOOPEN     = 2
     } STATFLAG;
 
     typedef enum STREAM_SEEK {
-        STREAM_SEEK_SET = 0,
-        STREAM_SEEK_CUR = 1,
-        STREAM_SEEK_END = 2
+	STREAM_SEEK_SET = 0,
+	STREAM_SEEK_CUR = 1,
+	STREAM_SEEK_END = 2
     } STREAM_SEEK;
 
 
@@ -180,72 +179,72 @@ library VBCorType {
 	} VBGUID;
 
 	typedef struct STATSTG {
-	    long        pwcsName;
-	    long        type;
-	    currency    cbSize;
-	    currency    mtime;
-	    currency    ctime;
-        currency    atime;
-        long        grfMode;
-        long        grfLocksSupported;
-        VBGUID      clsid;
-        long        grfStateBits;
-        long        reserved;
+	    long	pwcsName;
+	    long	type;
+	    currency	cbSize;
+	    currency	mtime;
+	    currency	ctime;
+	currency    atime;
+	long	    grfMode;
+	long	    grfLocksSupported;
+	VBGUID	    clsid;
+	long	    grfStateBits;
+	long	    reserved;
     } STATSTG;
 
     typedef struct SafeArrayBound {
-        long cElements;
-        long lLbound;
+	long cElements;
+	long lLbound;
     } SafeArrayBound;
 
     typedef struct SafeArray1d {
-        short   cDims;
-        short   fFeatures;
-        long    cbElements;
-        long    cLocks;
-        long    pvData;
-        long    cElements;
-        long    lLbound;
+	short	cDims;
+	short	fFeatures;
+	long	cbElements;
+	long	cLocks;
+	long	pvData;
+	long	cElements;
+	long	lLbound;
     } SafeArray1d;
 
     typedef struct SafeArray {
-        short   cDims;
-        short   fFeatures;
-        long    cbElements;
-        long    cLocks;
-        long    pvData;
+	short	cDims;
+	short	fFeatures;
+	long	cbElements;
+	long	cLocks;
+	long	pvData;
     } SafeArray;
 
     typedef struct USEROBJECTFLAGS {
-        BOOL fInherit;
-        BOOL fReserved;
-        long dwFlags;
+	BOOL fInherit;
+	BOOL fReserved;
+	long dwFlags;
     } USEROBJECTFLAGS;
     
     typedef struct CPINFO {
-        long MaxCharSize;
-        byte DefaultChar[2];
-        byte LeadByte[12];
+	long MaxCharSize;
+	byte DefaultChar[2];
+	byte LeadByte[12];
     } CPINFO;
 
     typedef struct ICONINFO {
-        long fIcon;
-        long xHotSpot;
-        long yHotSpot;
-        long hbmMask;
-        long hbmColor;
+	long fIcon;
+	long xHotSpot;
+	long yHotSpot;
+	long hbmMask;
+	long hbmColor;
     } ICONINFO;
 
     typedef struct SYSTEM_INFO {
-        DWORD  dwPageSize;
-        LPVOID lpMinimumApplicationAddress;
-        LPVOID lpMaximumApplicationAddress;
-        DWORD  dwActiveProcessorMask;
-        DWORD  dwNumberOfProcessors;
-        DWORD  dwProcessorType;
-        DWORD  dwAllocationGranularity;
-        WORD  wProcessorLevel;
-        WORD  wProcessorRevision;
+	DWORD  dwPageSize;
+	LPVOID lpMinimumApplicationAddress;
+	LPVOID lpMaximumApplicationAddress;
+	DWORD  dwActiveProcessorMask;
+	DWORD  dwNumberOfProcessors;
+	DWORD  dwProcessorType;
+	DWORD  dwAllocationGranularity;
+	WORD  wProcessorLevel;
+	WORD  wProcessorRevision;
     } SYSTEM_INFO;
 
 
@@ -260,16 +259,16 @@ library VBCorType {
 	]
 	interface IStream : IUnknown
 	{
-        HRESULT Read([in] void * pv, [in] long cb, [in] long * pcbRead);
-        HRESULT Write([in] void * pv, [in] long cb, [in] long * pcbWritten);
-        HRESULT Seek([in] currency dLibMove, [in] long dwOrigin, [in] currency pLibNewPosition);
-        HRESULT SetSize([in] currency LibNewSize);
-        HRESULT CopyTo([in] IStream * pstm);
-        HRESULT Commit([in] STGC grfCommitFlags);
-        HRESULT Revert();
-        HRESULT LockRegion([in] currency LibOffset, [in] currency cb, [in] long dwLockType);
-        HRESULT UnlockRegion([in] currency LibOffset, [in] currency cb, [in] long dwLockType);
-        HRESULT Stat([in] STATSTG * pstatstg, [in] long grfStatFlag);
+	HRESULT Read([in] void * pv, [in] long cb, [in] long * pcbRead);
+	HRESULT Write([in] void * pv, [in] long cb, [in] long * pcbWritten);
+	HRESULT Seek([in] currency dLibMove, [in] long dwOrigin, [in] currency pLibNewPosition);
+	HRESULT SetSize([in] currency LibNewSize);
+	HRESULT CopyTo([in] IStream * pstm);
+	HRESULT Commit([in] STGC grfCommitFlags);
+	HRESULT Revert();
+	HRESULT LockRegion([in] currency LibOffset, [in] currency cb, [in] long dwLockType);
+	HRESULT UnlockRegion([in] currency LibOffset, [in] currency cb, [in] long dwLockType);
+	HRESULT Stat([in] STATSTG * pstatstg, [in] long grfStatFlag);
 		HRESULT Clone([out, retval] IStream ** RetVal);
 	};
 	
@@ -278,9 +277,9 @@ library VBCorType {
 	]
 	interface IVBUnknown
 	{
-        long QueryInterface([in] void * riid, [in, out] long * ppvObj);
-        long AddRef();
-        long Release();
+	long QueryInterface([in] void * riid, [in, out] long * ppvObj);
+	long AddRef();
+	long Release();
     }
 
 	[
@@ -288,176 +287,168 @@ library VBCorType {
 	]
     interface IRecordInfo : IUnknown
     {
-        HRESULT RecordInit([in] long pvNew);
-        HRESULT RecordClear([in] long pvExisting);
-        HRESULT RecordCopy([in] long pvExisting, [in] long pvNew);
-        HRESULT GetGuid([out, retval] VBGUID * RetVal);
-        HRESULT GetName([out, retval] BSTR * RetVal);
-        HRESULT GetSize([out, retval] long * RetVal);
-        HRESULT GetTypeInfo([out, retval] long * RetVal);
-        HRESULT GetField([in] long pvData, [in] LPWSTR szFieldName, [out, retval] VARIANT * RetVal);
-        HRESULT GetFieldNoCopy([in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField, [in] long * ppvDataCArray);
-        HRESULT PutField([in] long wFlags, [in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField);
-        HRESULT PutFieldNoCopy([in] long wFlags, [in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField);
-        HRESULT GetFieldNames([in] long * pcNames, [in] BSTR * rgBstrNames);
-        BOOL    IsMatchingType([in] IRecordInfo * pRecordInfo);
-        long    RecordCreate();
-        HRESULT RecordCreateCopy([in] long * pvSource, [out, retval] long * RetVal);
-        HRESULT RecordDestroy([in] long pvRecord);
+	HRESULT RecordInit([in] long pvNew);
+	HRESULT RecordClear([in] long pvExisting);
+	HRESULT RecordCopy([in] long pvExisting, [in] long pvNew);
+	HRESULT GetGuid([out, retval] VBGUID * RetVal);
+	HRESULT GetName([out, retval] BSTR * RetVal);
+	HRESULT GetSize([out, retval] long * RetVal);
+	HRESULT GetTypeInfo([out, retval] long * RetVal);
+	HRESULT GetField([in] long pvData, [in] LPWSTR szFieldName, [out, retval] VARIANT * RetVal);
+	HRESULT GetFieldNoCopy([in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField, [in] long * ppvDataCArray);
+	HRESULT PutField([in] long wFlags, [in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField);
+	HRESULT PutFieldNoCopy([in] long wFlags, [in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField);
+	HRESULT GetFieldNames([in] long * pcNames, [in] BSTR * rgBstrNames);
+	BOOL	IsMatchingType([in] IRecordInfo * pRecordInfo);
+	long	RecordCreate();
+	HRESULT RecordCreateCopy([in] long * pvSource, [out, retval] long * RetVal);
+	HRESULT RecordDestroy([in] long pvRecord);
     }
 
     [
-        uuid(244DC6C5-16BD-4d02-9D02-226B0C171603), odl
+	uuid(244DC6C5-16BD-4d02-9D02-226B0C171603), odl
     ]
     interface Helper : IUnknown
     {
-        void Swap4([in] void * x, [in] void * y);
-        void Swap8([in] void * x, [in] void * y);
-        void Swap16([in] void * x, [in] void * y);
-        void Swap2([in] void * x, [in] void * y);
-        void Swap1([in] void * x, [in] void * y);
-        long DerefEBP([in] long Offset);
-        void MoveVariant([in] VARIANT * Dst, [in] VARIANT * Src);
-        long Ecvt([in] double Value, [in] long Precision, [in] long * Decimal, [in] long * Sign);
-        long ShiftRight([in] long Value, [in] long Count);
-        long ShiftLeft([in] long Value, [in] long Count);
-        long UAdd([in] long x, [in] long y);
-        void UAdd64([in] long * xh, [in] long * xl, [in] long yh, [in] long yl);
+	void Swap4([in] void * x, [in] void * y);
+	void Swap8([in] void * x, [in] void * y);
+	void Swap16([in] void * x, [in] void * y);
+	void Swap2([in] void * x, [in] void * y);
+	void Swap1([in] void * x, [in] void * y);
+	long DerefEBP([in] long Offset);
+	void MoveVariant([in] VARIANT * Dst, [in] VARIANT * Src);
+	long Ecvt([in] double Value, [in] long Precision, [in] long * Decimal, [in] long * Sign);
+	long ShiftRight([in] long Value, [in] long Count);
+	long ShiftLeft([in] long Value, [in] long Count);
+	long UAdd([in] long x, [in] long y);
+	void UAdd64([in] long * xh, [in] long * xl, [in] long yh, [in] long yl);
     }
 
     [
-        uuid(DECA6F21-BD22-4303-BC15-E45636505044), odl
+	uuid(DECA6F21-BD22-4303-BC15-E45636505044), odl
     ]
     interface IOneArgReturnBool : IUnknown
     {
-        boolean Call([in] long Arg);
+	boolean Call([in] long Arg);
     }
 
     [
-        uuid(B9DC947B-5BE0-4572-873C-C08E891FAF71), odl
+	uuid(B9DC947B-5BE0-4572-873C-C08E891FAF71), odl
     ]
     interface IOneArgReturnVoid : IUnknown
     {
-        void Call([in] long lpArg);
+	void Call([in] long lpArg);
     }
     
     [
-        uuid(C7F4D1EC-F31E-4058-9DBE-647DF9EBC9BE), odl
+	uuid(C7F4D1EC-F31E-4058-9DBE-647DF9EBC9BE), odl
     ]
     interface IOneRefReturnLong : IUnknown
-    {   
-        long Call([in] void * Arg);
+    {	
+	long Call([in] void * Arg);
     }
     
     [
-        uuid(B196B283-BAB4-101A-B69C-00AA00341D07), odl
+	uuid(B196B283-BAB4-101A-B69C-00AA00341D07), odl
     ]
     interface IProvideClassInfo :IVBUnknown
     {
-        long GetClassInfo([in] long * ppTI);
+	long GetClassInfo([in] long * ppTI);
     }
 
     [
-        uuid(40A8C97E-FD06-4dd0-8039-0D13B5A80ED8), odl
+	uuid(40A8C97E-FD06-4dd0-8039-0D13B5A80ED8), odl
     ]
     interface ISortRoutine : IUnknown
     {
-        void Call([in] long * pSA, [in] long Left, [in] long Right);
+	void Call([in] long * pSA, [in] long Left, [in] long Right);
     }
 
     [
-        uuid(D113B2BE-C8C0-4da3-9252-3630E9893646), odl
-    ]
-    interface ISwap : IUnknown
-    {
-        void Call([in] long Bogus, [in] void * x, [in] void * y);
-    }
-
-    [
-        uuid(30C64962-0541-4ee6-8EC7-5EFA3C808ED0), odl
+	uuid(30C64962-0541-4ee6-8EC7-5EFA3C808ED0), odl
     ]
     interface ITwoArgReturnLong : IUnknown
     {
-        long Call([in] long x, [in] long y);
+	long Call([in] long x, [in] long y);
     }
 
     [
-        uuid(3A7A8F77-A63D-4fbd-81E4-2EC6020F0F75), odl
+	uuid(3A7A8F77-A63D-4fbd-81E4-2EC6020F0F75), odl
     ]
     interface ITwoArgReturnVoid : IUnknown
     {
-        void Call([in] long x, [in] long y);
+	void Call([in] long x, [in] long y);
     }
     
     [
-        uuid(821C2117-3C0E-4245-AACB-6D468A3A0787), odl
+	uuid(821C2117-3C0E-4245-AACB-6D468A3A0787), odl
     ]
     interface ITwoRefReturnBool : IUnknown
     {
-        boolean Call([in] void * x, [in] void * y);
+	boolean Call([in] void * x, [in] void * y);
     }
     
     [
-        uuid(F6811C30-06B4-47a4-9217-BDD97FBF9C75), odl
+	uuid(F6811C30-06B4-47a4-9217-BDD97FBF9C75), odl
     ]
     interface ITwoRefReturnLong : IUnknown
     {
-        long Call([in] void * x, [in] void * y);
+	long Call([in] void * x, [in] void * y);
     }
 
     [
-        uuid(6F2AB419-A80B-4129-B9C2-E81C528AE3E2), odl
+	uuid(6F2AB419-A80B-4129-B9C2-E81C528AE3E2), odl
     ]
     interface ITwoArgReturnBool : IUnknown
     {
-        boolean Call([in] long x, [in] long y);
+	boolean Call([in] long x, [in] long y);
     }
 
     [
-        uuid(FCE19D3D-99F1-435d-8184-8119B95EB47C), odl
+	uuid(FCE19D3D-99F1-435d-8184-8119B95EB47C), odl
     ]
     interface IWin32API : IDispatch
     {
-        HRESULT CopyFile([in] BSTR * ExistingFileName, [in] BSTR * NewFileName, [in] boolean FailIfExists, [out, retval] long * RetVal);
-        HRESULT CreateDirectory([in] BSTR * PathName, [in, defaultvalue(0)] long lpSecurityAttributes, [out, retval] long * RetVal);
-        HRESULT CreateFileMapping([in] long hFile, [in] long lpSecurityAttributes, [in] long flProtect, [in] long MaximumSizeHigh, [in] long MaximumSizeLow, [in] BSTR * Name, [out, retval] long * RetVal);
-        HRESULT DeleteFile([in] BSTR * FileName, [out, retval] long * RetVal);
-        HRESULT ExpandEnvironmentStrings([in] BSTR * lpSrc, [in] BSTR * lpDst, [in] long nSize, [out, retval] long * RetVal);
-        HRESULT FindFirstFile([in] BSTR * FileName, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
-        HRESULT FindNextFile([in] long hFindFile, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
-        HRESULT GetCurrentDirectory([in] long BufferLength, [in] BSTR * Buffer, [out, retval] long * RetVal);
-        HRESULT GetComputerName([in] BSTR * Buffer, [in] long * Size, [out, retval] long * RetVal);
-        HRESULT GetEnvironmentStrings([out, retval] BSTR * RetVal);
-        HRESULT GetEnvironmentVariable([in] BSTR * Name, [in] BSTR * Buffer, [in] long Size, [out, retval] long * RetVal);
-        HRESULT GetFileAttributes([in] BSTR * FileName, [out, retval] long * RetVal);
-        HRESULT GetFileAttributesEx([in] BSTR * FileName, [in] long fInfoLevelId, [in] WIN32_FILE_ATTRIBUTE_DATA * lpFileInformation, [out, retval] long * RetVal);
-        HRESULT GetFullPathName([in] BSTR * FileName,[in] long BufferLength, [in] BSTR * Buffer, [in] long lpFilePart, [out, retval] long * RetVal);
-        HRESULT GetLocaleInfo([in] long Locale, [in] long LCType, [in] BSTR * lpLCData, [in] long cchData, [out, retval] long * RetVal);
-        HRESULT GetSystemDirectory([in] BSTR * Buffer, [in] long Size, [out, retval] long * RetVal);
-        HRESULT GetTempFileName([in] BSTR * PathName, [in] BSTR * PrefixString, [in] long Unique, [in] BSTR * TempFileName, [out, retval] long * RetVal);
-        HRESULT GetTempPath([in] long BufferLength, [in] BSTR * Buffer, [out, retval] long * RetVal);
-        HRESULT MoveFile([in] BSTR * ExistingFileName, [in] BSTR * NewFileName, [out, retval] long * RetVal);
-        HRESULT RegOpenKeyEx([in] long hKey, [in] BSTR * SubKey, [in] long Options, [in] long Desired, [in] long * Result, [out, retval] long * RetVal);
-        HRESULT RegQueryInfoKey([in] long hKey, [in] BSTR * lpClass, [in] long lpcClass, [in] long lpReserve, [in] long lpcSubKeys, [in] long lpcMaxSubKeyLen, [in] long lpcMaxClassLen, [in] long lpcValues, [in] long lpMaxValueNameLen, [in] long lpMaxValueLen, [in] long lpSecurityDescriptor, [in] long lpLastWriteTime, [out, retval] long * RetVal);
-        HRESULT RegCreateKeyEx([in] long hKey, [in] BSTR * lpSubKey, [in] long Reserved, [in] BSTR * lpClass, [in] long dwOptions, [in] long samDesired, [in] long lpSecurityAttributes, [in] long * phkResult, [in] long * lpdwDisposition, [out, retval] long * RetVal);
-        HRESULT RegDeleteKey([in] long hKey, [in] BSTR * lpSubKey, [out, retval] long * RetVal);
-        HRESULT RegEnumKeyEx([in] long hKey, [in] long dwIndex, [in] BSTR * lpName, [in] long * lpcName, [in] long lpReserved, [in] BSTR * lpClass, [in] long * lpcClass, [in] CURRENCY * lpftLastWriteTime, [out, retval] long * RetVal);
-        HRESULT RegEnumValue([in] long hKey, [in] long dwIndex, [in] BSTR * lpValueName, [in] long * lpcValueName, [in] long lpReserved, [in] long lpType, [in] long lpData, [in] long lpcbData, [out, retval] long * RetVal);
-        HRESULT RegSetValueEx([in] long hKey, [in] BSTR * ValueName, [in] long ValueType, [in] long lpData, [in] long cbData, [out, retval] long * RetVal);
-        HRESULT RegSetValueExStr([in] long hKey, [in] BSTR * ValueName, [in] long ValueType, [in] BSTR * Data, [out, retval] long * RetVal);
-        HRESULT RegQueryValueEx([in] long hKey, [in] BSTR * ValueName, [in] long * ValueType, [in] long lpData, [in] long * lpcbData, [out, retval] long * RetVal);
-        HRESULT RegQueryValueExStr([in] long hKey, [in] BSTR * ValueName, [in] long * ValueType, [in] BSTR * Data, [out, retval] long * RetVal);
-        HRESULT RegDeleteValue([in] long hKey, [in] BSTR * lpValueName, [out, retval] long * RetVal);
-        HRESULT RemoveDirectory([in] BSTR * PathName, [out, retval] long * RetVal);
-        HRESULT SetCurrentDirectory([in] BSTR * PathName, [out, retval] long * RetVal);
-        HRESULT SetEnvironmentVariable([in] BSTR * Name, [in] BSTR * Value, [out, retval] long * RetVal);
-        HRESULT SetFileAttributes([in] BSTR * FileName, [in] long dwFileAttributes, [out, retval] long * RetVal);
-        HRESULT CreateFile([in] BSTR * FileName, [in] long DesiredAccess, [in] long ShareMode, [in] long lpSecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile, [out, retval] long * RetVal);
-        HRESULT GetLongPathName([in] BSTR * ShortPath, [in] BSTR * LongPath, [in] long LongPathBufferSize, [out, retval] long * RetVal);
-        HRESULT WritePrivateProfileString([in] BSTR * AppName, [in] BSTR * KeyName, [in] BSTR * Value, [in] BSTR * FileName, [out, retval] long * RetVal);
-        HRESULT WritePrivateProfileSection([in] BSTR * AppName, [in] BSTR * Value, [in] BSTR * FileName, [out, retval] long * RetVal);
-        HRESULT GetPrivateProfileString([in] BSTR * AppName, [in] BSTR * KeyName, [in] BSTR * Default, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
-        HRESULT GetPrivateProfileSection([in] BSTR * AppName, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
+	HRESULT CopyFile([in] BSTR * ExistingFileName, [in] BSTR * NewFileName, [in] boolean FailIfExists, [out, retval] long * RetVal);
+	HRESULT CreateDirectory([in] BSTR * PathName, [in, defaultvalue(0)] long lpSecurityAttributes, [out, retval] long * RetVal);
+	HRESULT CreateFileMapping([in] long hFile, [in] long lpSecurityAttributes, [in] long flProtect, [in] long MaximumSizeHigh, [in] long MaximumSizeLow, [in] BSTR * Name, [out, retval] long * RetVal);
+	HRESULT DeleteFile([in] BSTR * FileName, [out, retval] long * RetVal);
+	HRESULT ExpandEnvironmentStrings([in] BSTR * lpSrc, [in] BSTR * lpDst, [in] long nSize, [out, retval] long * RetVal);
+	HRESULT FindFirstFile([in] BSTR * FileName, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
+	HRESULT FindNextFile([in] long hFindFile, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
+	HRESULT GetCurrentDirectory([in] long BufferLength, [in] BSTR * Buffer, [out, retval] long * RetVal);
+	HRESULT GetComputerName([in] BSTR * Buffer, [in] long * Size, [out, retval] long * RetVal);
+	HRESULT GetEnvironmentStrings([out, retval] BSTR * RetVal);
+	HRESULT GetEnvironmentVariable([in] BSTR * Name, [in] BSTR * Buffer, [in] long Size, [out, retval] long * RetVal);
+	HRESULT GetFileAttributes([in] BSTR * FileName, [out, retval] long * RetVal);
+	HRESULT GetFileAttributesEx([in] BSTR * FileName, [in] long fInfoLevelId, [in] WIN32_FILE_ATTRIBUTE_DATA * lpFileInformation, [out, retval] long * RetVal);
+	HRESULT GetFullPathName([in] BSTR * FileName,[in] long BufferLength, [in] BSTR * Buffer, [in] long lpFilePart, [out, retval] long * RetVal);
+	HRESULT GetLocaleInfo([in] long Locale, [in] long LCType, [in] BSTR * lpLCData, [in] long cchData, [out, retval] long * RetVal);
+	HRESULT GetSystemDirectory([in] BSTR * Buffer, [in] long Size, [out, retval] long * RetVal);
+	HRESULT GetTempFileName([in] BSTR * PathName, [in] BSTR * PrefixString, [in] long Unique, [in] BSTR * TempFileName, [out, retval] long * RetVal);
+	HRESULT GetTempPath([in] long BufferLength, [in] BSTR * Buffer, [out, retval] long * RetVal);
+	HRESULT MoveFile([in] BSTR * ExistingFileName, [in] BSTR * NewFileName, [out, retval] long * RetVal);
+	HRESULT RegOpenKeyEx([in] long hKey, [in] BSTR * SubKey, [in] long Options, [in] long Desired, [in] long * Result, [out, retval] long * RetVal);
+	HRESULT RegQueryInfoKey([in] long hKey, [in] BSTR * lpClass, [in] long lpcClass, [in] long lpReserve, [in] long lpcSubKeys, [in] long lpcMaxSubKeyLen, [in] long lpcMaxClassLen, [in] long lpcValues, [in] long lpMaxValueNameLen, [in] long lpMaxValueLen, [in] long lpSecurityDescriptor, [in] long lpLastWriteTime, [out, retval] long * RetVal);
+	HRESULT RegCreateKeyEx([in] long hKey, [in] BSTR * lpSubKey, [in] long Reserved, [in] BSTR * lpClass, [in] long dwOptions, [in] long samDesired, [in] long lpSecurityAttributes, [in] long * phkResult, [in] long * lpdwDisposition, [out, retval] long * RetVal);
+	HRESULT RegDeleteKey([in] long hKey, [in] BSTR * lpSubKey, [out, retval] long * RetVal);
+	HRESULT RegEnumKeyEx([in] long hKey, [in] long dwIndex, [in] BSTR * lpName, [in] long * lpcName, [in] long lpReserved, [in] BSTR * lpClass, [in] long * lpcClass, [in] CURRENCY * lpftLastWriteTime, [out, retval] long * RetVal);
+	HRESULT RegEnumValue([in] long hKey, [in] long dwIndex, [in] BSTR * lpValueName, [in] long * lpcValueName, [in] long lpReserved, [in] long lpType, [in] long lpData, [in] long lpcbData, [out, retval] long * RetVal);
+	HRESULT RegSetValueEx([in] long hKey, [in] BSTR * ValueName, [in] long ValueType, [in] long lpData, [in] long cbData, [out, retval] long * RetVal);
+	HRESULT RegSetValueExStr([in] long hKey, [in] BSTR * ValueName, [in] long ValueType, [in] BSTR * Data, [out, retval] long * RetVal);
+	HRESULT RegQueryValueEx([in] long hKey, [in] BSTR * ValueName, [in] long * ValueType, [in] long lpData, [in] long * lpcbData, [out, retval] long * RetVal);
+	HRESULT RegQueryValueExStr([in] long hKey, [in] BSTR * ValueName, [in] long * ValueType, [in] BSTR * Data, [out, retval] long * RetVal);
+	HRESULT RegDeleteValue([in] long hKey, [in] BSTR * lpValueName, [out, retval] long * RetVal);
+	HRESULT RemoveDirectory([in] BSTR * PathName, [out, retval] long * RetVal);
+	HRESULT SetCurrentDirectory([in] BSTR * PathName, [out, retval] long * RetVal);
+	HRESULT SetEnvironmentVariable([in] BSTR * Name, [in] BSTR * Value, [out, retval] long * RetVal);
+	HRESULT SetFileAttributes([in] BSTR * FileName, [in] long dwFileAttributes, [out, retval] long * RetVal);
+	HRESULT CreateFile([in] BSTR * FileName, [in] long DesiredAccess, [in] long ShareMode, [in] long lpSecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile, [out, retval] long * RetVal);
+	HRESULT GetLongPathName([in] BSTR * ShortPath, [in] BSTR * LongPath, [in] long LongPathBufferSize, [out, retval] long * RetVal);
+	HRESULT WritePrivateProfileString([in] BSTR * AppName, [in] BSTR * KeyName, [in] BSTR * Value, [in] BSTR * FileName, [out, retval] long * RetVal);
+	HRESULT WritePrivateProfileSection([in] BSTR * AppName, [in] BSTR * Value, [in] BSTR * FileName, [out, retval] long * RetVal);
+	HRESULT GetPrivateProfileString([in] BSTR * AppName, [in] BSTR * KeyName, [in] BSTR * Default, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
+	HRESULT GetPrivateProfileSection([in] BSTR * AppName, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
     }
 
 
@@ -469,26 +460,26 @@ library VBCorType {
 	[dllname("Constants")]
 	module Constants {
 		const long MAX_PATH_A					= 0x00000104;
-		const long MAX_PATH_W                   = 0x00007FFF;
+		const long MAX_PATH_W			= 0x00007FFF;
 		const long FORMAT_MESSAGE_FROM_SYSTEM	= 0x00001000;
 		const long TIME_ZONE_ID_DAYLIGHT		= 0x00000002;
 		const long TIME_ZONE_ID_INVALID			= 0xFFFFFFFF;
 		const long TIME_ZONE_ID_STANDARD		= 0x00000001;
 		const long TIME_ZONE_ID_UNKNOWN			= 0x00000000;
-		const long FADF_AUTO                    = 0x00000001;
-		const long FADF_BSTR                    = 0x00000100;
-		const long FADF_DISPATCH                = 0x00000400;
-		const long FADF_EMBEDDED                = 0x00000004;
-		const long FADF_FIXEDSIZE               = 0x00000010;
-		const long FADF_HAVEIID                 = 0x00000040;
-		const long FADF_HAVEVARTYPE             = 0x00000080;
-		const long FADF_RECORD                  = 0x00000020;
-		const long FADF_STATIC                  = 0x00000002;
-		const long FADF_UNKNOWN                 = 0x00000200;
-		const long FADF_VARIANT                 = 0x00000800;
-        const long E_FAIL                       = 0x80004005;
-        const long E_NOINTERFACE                = 0x80004002;
-        const long S_OK                         = 0x00000000;
+		const long FADF_AUTO			= 0x00000001;
+		const long FADF_BSTR			= 0x00000100;
+		const long FADF_DISPATCH		= 0x00000400;
+		const long FADF_EMBEDDED		= 0x00000004;
+		const long FADF_FIXEDSIZE		= 0x00000010;
+		const long FADF_HAVEIID 		= 0x00000040;
+		const long FADF_HAVEVARTYPE		= 0x00000080;
+		const long FADF_RECORD			= 0x00000020;
+		const long FADF_STATIC			= 0x00000002;
+		const long FADF_UNKNOWN 		= 0x00000200;
+		const long FADF_VARIANT 		= 0x00000800;
+	const long E_FAIL			= 0x80004005;
+	const long E_NOINTERFACE		= 0x80004002;
+	const long S_OK 			= 0x00000000;
 
 	}
 
@@ -499,7 +490,7 @@ library VBCorType {
 	module Kernel32 {
 		[entry("CloseHandle"), usesgetlasterror]				long CloseHandle([in] long hObject);
 		[entry("CopyFileA"), usesgetlasterror]					long CopyFileA([in] LPSTR Source, [in] LPSTR Destination, [in] BOOL FailIfExists);
-	    [entry("CopyFileW"), usesgetlasterror]                  long CopyFileW([in] LPWSTR Source, [in] LPWSTR Destination, [in] BOOL FailIfExists);
+	    [entry("CopyFileW"), usesgetlasterror]		    long CopyFileW([in] LPWSTR Source, [in] LPWSTR Destination, [in] BOOL FailIfExists);
 	    [entry("RtlMoveMemory")]								void CopyMemory([in] void * Destination,[in] void * Source, [in] long Length);
 		[entry("CreateDirectoryA"), usesgetlasterror]			long CreateDirectoryA([in] LPSTR PathName, [in] void * SecurityAttributes);
 		[entry("CreateDirectoryW"), usesgetlasterror]			long CreateDirectoryW([in] LPWSTR PathName, [in] void * SecurityAttributes);
@@ -512,8 +503,8 @@ library VBCorType {
 		[entry("EnumResourceLanguagesW"), usesgetlasterror]		long EnumResourceLanguages([in] long hModule, [in] long lpType, [in] long lpName, [in] long lpEnumFunc, [in] long lParam);
 		[entry("EnumResourceNamesW"), usesgetlasterror]			long EnumResourceNames([in] long hModule, [in] long lpType, [in] long lpEnumFunc, [in] long lParam);
 		[entry("EnumResourceTypesW"), usesgetlasterror]			long EnumResourceTypes([in] long hModule, [in] long lpEnumFunc, [in] long lParam);
-		[entry("ExpandEnvironmentStringsA"), usesgetlasterror]  long ExpandEnvironmentStringsA([in] LPSTR lpSrc, [in] LPSTR lpDst, [in] long nSize);
-		[entry("ExpandEnvironmentStringsW"), usesgetlasterror]  long ExpandEnvironmentStringsW([in] LPWSTR lpSrc, [in] LPWSTR lpDst, [in] long nSize);
+		[entry("ExpandEnvironmentStringsA"), usesgetlasterror]	long ExpandEnvironmentStringsA([in] LPSTR lpSrc, [in] LPSTR lpDst, [in] long nSize);
+		[entry("ExpandEnvironmentStringsW"), usesgetlasterror]	long ExpandEnvironmentStringsW([in] LPWSTR lpSrc, [in] LPWSTR lpDst, [in] long nSize);
 		[entry("FindClose"), usesgetlasterror]					long FindClose([in] long hFile);
 		[entry("FindFirstFileA"), usesgetlasterror]				long FindFirstFileA([in] LPSTR FileName, [in] WIN32_FIND_DATAA * FindFileData);
 		[entry("FindFirstFileW"), usesgetlasterror]				long FindFirstFileW([in] LPWSTR FileName, [in] WIN32_FIND_DATAW * FindFileData);
@@ -525,15 +516,15 @@ library VBCorType {
 		[entry("FreeEnvironmentStringsW"), usesgetlasterror]	long FreeEnvironmentStringsW([in] long lpszEnvironmentBlock);
 		[entry("FreeLibrary"), usesgetlasterror]				long FreeLibrary([in] long hModule);
 		[entry("GetCommandLineW")]								long GetCommandLineW();
-		[entry("GetComputerNameA"), usesgetlasterror]           long GetComputerNameA([in] LPSTR lpBuffer, [in] long * lpnSize);
-		[entry("GetComputerNameW"), usesgetlasterror]           long GetComputerNameW([in] LPWSTR lpBuffer, [in] long * lpnSize);
-		[entry("GetCurrentDirectoryA"), usesgetlasterror]       long GetCurrentDirectoryA([in] long BufferLength, [in] LPSTR Buffer);
-		[entry("GetCurrentDirectoryW"), usesgetlasterror]       long GetCurrentDirectoryW([in] long BufferLength, [in] LPWSTR Buffer);
-        [entry("GetCurrentProcess")]							long GetCurrentProcess();
+		[entry("GetComputerNameA"), usesgetlasterror]		long GetComputerNameA([in] LPSTR lpBuffer, [in] long * lpnSize);
+		[entry("GetComputerNameW"), usesgetlasterror]		long GetComputerNameW([in] LPWSTR lpBuffer, [in] long * lpnSize);
+		[entry("GetCurrentDirectoryA"), usesgetlasterror]	long GetCurrentDirectoryA([in] long BufferLength, [in] LPSTR Buffer);
+		[entry("GetCurrentDirectoryW"), usesgetlasterror]	long GetCurrentDirectoryW([in] long BufferLength, [in] LPWSTR Buffer);
+	[entry("GetCurrentProcess")]							long GetCurrentProcess();
 		[entry("GetEnvironmentStringsA")]						long GetEnvironmentStringsA();
 		[entry("GetEnvironmentStringsW")]						long GetEnvironmentStringsW();
-		[entry("GetEnvironmentVariableA"), usesgetlasterror]    long GetEnvironmentVariableA([in] LPSTR lpName, [in] LPSTR lpBuffer, [in] long nSize);
-		[entry("GetEnvironmentVariableW"), usesgetlasterror]    long GetEnvironmentVariableW([in] LPWSTR lpName, [in] LPWSTR lpBuffer, [in] long nSize);
+		[entry("GetEnvironmentVariableA"), usesgetlasterror]	long GetEnvironmentVariableA([in] LPSTR lpName, [in] LPSTR lpBuffer, [in] long nSize);
+		[entry("GetEnvironmentVariableW"), usesgetlasterror]	long GetEnvironmentVariableW([in] LPWSTR lpName, [in] LPWSTR lpBuffer, [in] long nSize);
 		[entry("GetFileAttributesA"), usesgetlasterror]			long GetFileAttributesA([in] LPSTR FileName);
 		[entry("GetFileAttributesW"), usesgetlasterror]			long GetFileAttributesW([in] LPWSTR FileName);
 		[entry("GetFileAttributesExA"), usesgetlasterror]		long GetFileAttributesExA([in] LPSTR FileName, [in] long InfoLevelId, [in] void * FileInformation);
@@ -544,8 +535,8 @@ library VBCorType {
 		[entry("GetFullPathNameW"), usesgetlasterror]			long GetFullPathNameW([in] LPWSTR FileName, [in] long BufferLength, [in] LPWSTR Buffer, [in] void * FilePart);
 		[entry("GetLocaleInfoA"), usesgetlasterror]				long GetLocaleInfoA([in] long Locale, [in] long LCType, [in] LPSTR lpLCData, [in] long cchData);
 		[entry("GetLocaleInfoW"), usesgetlasterror]				long GetLocaleInfoW([in] long Locale, [in] long LCType, [in] LPWSTR lpLCData, [in] long cchData);
-		[entry("GetLocalTime")]                                 void GetLocalTime([in] SYSTEMTIME * lpSystemTime);
-        [entry("GetLogicalDrives"), usesgetlasterror]			long GetLogicalDrives();
+		[entry("GetLocalTime")] 				void GetLocalTime([in] SYSTEMTIME * lpSystemTime);
+	[entry("GetLogicalDrives"), usesgetlasterror]			long GetLogicalDrives();
 		[entry("GetProcAddress"), usesgetlasterror]				long GetProcAddress([in] long hModule, [in] LPSTR lpProcName);
 		[entry("GetSystemDefaultLCID")]							long GetSystemDefaultLCID();
 		[entry("GetSystemDirectoryA"), usesgetlasterror]		long GetSystemDirectoryA([in] LPSTR Buffer, [in] long Size);
@@ -574,8 +565,8 @@ library VBCorType {
 		[entry("SetCurrentDirectoryA"), usesgetlasterror]		long SetCurrentDirectoryA([in] LPSTR PathName);
 		[entry("SetCurrentDirectoryW"), usesgetlasterror]		long SetCurrentDirectoryW([in] LPWSTR PathName);
 		[entry("SetEndOfFile"), usesgetlasterror]				long SetEndOfFile([in] long hFile);
-		[entry("SetEnvironmentVariableA"), usesgetlasterror]    long SetEnvironmentVariableA([in] LPSTR lpName, [in] LPSTR lpValue);
-		[entry("SetEnvironmentVariableW"), usesgetlasterror]    long SetEnvironmentVariableW([in] LPWSTR lpName, [in] LPWSTR lpValue);
+		[entry("SetEnvironmentVariableA"), usesgetlasterror]	long SetEnvironmentVariableA([in] LPSTR lpName, [in] LPSTR lpValue);
+		[entry("SetEnvironmentVariableW"), usesgetlasterror]	long SetEnvironmentVariableW([in] LPWSTR lpName, [in] LPWSTR lpValue);
 		[entry("SetFileAttributesA"), usesgetlasterror]			long SetFileAttributesA([in] LPSTR FileName, [in] long FileAttributes);
 		[entry("SetFileAttributesW"), usesgetlasterror]			long SetFileAttributesW([in] LPWSTR FileName, [in] long FileAttributes);
 		[entry("SetFilePointer"), usesgetlasterror]				long SetFilePointer([in] long hFile, [in] long lDistanceToMove, [in] void * lpDistanceToMoveHigh, [in] long dwMoveMethod);
@@ -585,30 +576,30 @@ library VBCorType {
 		[entry("UnmapViewOfFile"), usesgetlasterror]			long UnmapViewOfFile([in] long lpBaseAddress);
 		[entry("WriteFile"), usesgetlasterror]					long WriteFile([in] long hFile, [in] void * lpBuffer, [in] long nNumberOfBytesToWrite, [in] long * lpNumberOfBytesWritten, [in] void * lpOverlapped);
 		[entry("RtlZeroMemory")]								void ZeroMemory([in] void * Destination, [in] long Length);
-        [entry("WritePrivateProfileStringA"), usesgetlasterror] long WritePrivateProfileStringA([in] LPSTR lpAppName, [in] LPSTR lpKeyName, [in] LPSTR lpString, [in] LPSTR lpFileName);
-        [entry("WritePrivateProfileStringW"), usesgetlasterror] long WritePrivateProfileStringW([in] LPWSTR lpAppName, [in] LPWSTR lpKeyName, [in] LPWSTR lpString, [in] LPWSTR lpFileName);
-        [entry("WritePrivateProfileSectionA"),usesgetlasterror] long WritePrivateProfileSectionA([in] LPSTR lpAppName, [in] LPSTR lpString, [in] LPSTR lpFileName);
-        [entry("WritePrivateProfileSectionW"),usesgetlasterror] long WritePrivateProfileSectionW([in] LPWSTR lpAppName, [in] LPWSTR lpString, [in] LPWSTR lpFileName);
-        [entry("GetPrivateProfileStringA")]                     long GetPrivateProfileStringA([in] LPSTR lpAppName, [in] LPSTR lpKeyName, [in] LPSTR lpDefault, [in] LPSTR lpReturnedString, [in] long nSize, [in] LPSTR lpFileName);
-        [entry("GetPrivateProfileStringW")]                     long GetPrivateProfileStringW([in] LPWSTR lpAppName, [in] LPWSTR lpKeyName, [in] LPWSTR lpDefault, [in] LPWSTR lpReturnedString, [in] long nSize, [in] LPWSTR lpFileName);
-        [entry("GetPrivateProfileSectionA")]                    long GetPrivateProfileSectionA([in] LPSTR lpAppName, [in] LPSTR lpReturnedString, [in] long nSize, [in] LPSTR lpFileName);
-        [entry("GetPrivateProfileSectionW")]                    long GetPrivateProfileSectionW([in] LPWSTR lpAppName, [in] LPWSTR lpReturnedString, [in] long nSize, [in] LPWSTR lpFileName);
-        [entry("IsDBCSLeadByteEx"), usesgetlasterror]           long IsDBCSLeadByteEx([in] long CodePage, [in] byte TestChar);
-        [entry("MultiByteToWideChar"), usesgetlasterror]        long MultiByteToWideChar([in] long CodePage, [in] long dwFlags, [in] void * lpMultiByteStr, [in] long cbMultiByte, [in] void * lpWideCharStr, [in] long cchWideChar);
-        [entry("GetACP")]                                       long GetACP();
-        [entry("QueryPerformanceCounter"), usesgetlasterror]    long QueryPerformanceCounter([in] CURRENCY * lpPerformanceCount);
-        [entry("QueryPerformanceFrequency"), usesgetlasterror]  long QueryPerformanceFrequency([in] CURRENCY * lpFrequency);
-        [entry("GetCPInfo"), usesgetlasterror]                  long GetCPInfo([in] long CodePage, [in] CPINFO * lpCPInfo);
-        [entry("WideCharToMultiByte"), usesgetlasterror]        long WideCharToMultiByte([in] long CodePage, [in] long dwFlags, [in] short * lpWideCharStr, [in] long cchWideChar, [in] byte * lpMultiByteStr, [in] long cchMultiByte, [in] LPSTR lpDefaultChar, [in] long lpUsedDefaultChar);
-        [entry("GetCalendarInfoA"), usesgetlasterror]           long GetCalendarInfo([in] long Locale, [in] long Calendar, [in] long CalType, [in] LPSTR lpCalData, [in] long cchData, [in] void * lpValue);
-        [entry("GetVolumeInformationA"), usesgetlasterror]      long GetVolumeInformation([in] LPSTR lpRootPathName, [in] LPSTR lpVolumeNameBuffer, [in] long nVolumeNameSize, [in] void * lpVolumeSerialNumber, [in] long * lpMaximumComponentLength, [in] long * lpFileSystemFlags, [in] LPSTR lpFileSystemNameBuffer, [in] long nFileSystemNameSize);
-        [entry("SetVolumeLabelA"), usesgetlasterror]            long SetVolumeLabel([in] LPSTR lpRootPathName, [in] LPSTR lpVolumeName);
-        [entry("GetDriveTypeA")]                                long GetDriveType([in] LPSTR lpRootPathName);
-        [entry("GetDiskFreeSpaceExA"), usesgetlasterror]        long GetDiskFreeSpaceEx([in] LPSTR lpDirectoryName, [in] CURRENCY * lpFreeBytesAvailableToCaller, [in] CURRENCY * lpTotalNumberOfBytes, [in] CURRENCY * lpTotalNumberOfFreeBytes);
-        [entry("GetLongPathNameA"), usesgetlasterror]           long GetLongPathNameA([in] LPSTR lpszShortPath, [in] LPSTR lpszLongPath, [in] long cchBuffer);
-        [entry("GetLongPathNameW"), usesgetlasterror]           long GetLongPathNameW([in] LPWSTR lpszShortPath, [in] LPWSTR lpszLongPath, [in] long cchBuffer);
-        [entry("RtlFillMemory")]                                void FillMemory([in] void * Destination, [in] long Length, [in] byte Fill);
-        [entry("GetSystemInfo")]                                void GetSystemInfo([in] SYSTEM_INFO * lpSystemInfo);
+	[entry("WritePrivateProfileStringA"), usesgetlasterror] long WritePrivateProfileStringA([in] LPSTR lpAppName, [in] LPSTR lpKeyName, [in] LPSTR lpString, [in] LPSTR lpFileName);
+	[entry("WritePrivateProfileStringW"), usesgetlasterror] long WritePrivateProfileStringW([in] LPWSTR lpAppName, [in] LPWSTR lpKeyName, [in] LPWSTR lpString, [in] LPWSTR lpFileName);
+	[entry("WritePrivateProfileSectionA"),usesgetlasterror] long WritePrivateProfileSectionA([in] LPSTR lpAppName, [in] LPSTR lpString, [in] LPSTR lpFileName);
+	[entry("WritePrivateProfileSectionW"),usesgetlasterror] long WritePrivateProfileSectionW([in] LPWSTR lpAppName, [in] LPWSTR lpString, [in] LPWSTR lpFileName);
+	[entry("GetPrivateProfileStringA")]			long GetPrivateProfileStringA([in] LPSTR lpAppName, [in] LPSTR lpKeyName, [in] LPSTR lpDefault, [in] LPSTR lpReturnedString, [in] long nSize, [in] LPSTR lpFileName);
+	[entry("GetPrivateProfileStringW")]			long GetPrivateProfileStringW([in] LPWSTR lpAppName, [in] LPWSTR lpKeyName, [in] LPWSTR lpDefault, [in] LPWSTR lpReturnedString, [in] long nSize, [in] LPWSTR lpFileName);
+	[entry("GetPrivateProfileSectionA")]			long GetPrivateProfileSectionA([in] LPSTR lpAppName, [in] LPSTR lpReturnedString, [in] long nSize, [in] LPSTR lpFileName);
+	[entry("GetPrivateProfileSectionW")]			long GetPrivateProfileSectionW([in] LPWSTR lpAppName, [in] LPWSTR lpReturnedString, [in] long nSize, [in] LPWSTR lpFileName);
+	[entry("IsDBCSLeadByteEx"), usesgetlasterror]		long IsDBCSLeadByteEx([in] long CodePage, [in] byte TestChar);
+	[entry("MultiByteToWideChar"), usesgetlasterror]	long MultiByteToWideChar([in] long CodePage, [in] long dwFlags, [in] void * lpMultiByteStr, [in] long cbMultiByte, [in] void * lpWideCharStr, [in] long cchWideChar);
+	[entry("GetACP")]					long GetACP();
+	[entry("QueryPerformanceCounter"), usesgetlasterror]	long QueryPerformanceCounter([in] CURRENCY * lpPerformanceCount);
+	[entry("QueryPerformanceFrequency"), usesgetlasterror]	long QueryPerformanceFrequency([in] CURRENCY * lpFrequency);
+	[entry("GetCPInfo"), usesgetlasterror]			long GetCPInfo([in] long CodePage, [in] CPINFO * lpCPInfo);
+	[entry("WideCharToMultiByte"), usesgetlasterror]	long WideCharToMultiByte([in] long CodePage, [in] long dwFlags, [in] short * lpWideCharStr, [in] long cchWideChar, [in] byte * lpMultiByteStr, [in] long cchMultiByte, [in] LPSTR lpDefaultChar, [in] long lpUsedDefaultChar);
+	[entry("GetCalendarInfoA"), usesgetlasterror]		long GetCalendarInfo([in] long Locale, [in] long Calendar, [in] long CalType, [in] LPSTR lpCalData, [in] long cchData, [in] void * lpValue);
+	[entry("GetVolumeInformationA"), usesgetlasterror]	long GetVolumeInformation([in] LPSTR lpRootPathName, [in] LPSTR lpVolumeNameBuffer, [in] long nVolumeNameSize, [in] void * lpVolumeSerialNumber, [in] long * lpMaximumComponentLength, [in] long * lpFileSystemFlags, [in] LPSTR lpFileSystemNameBuffer, [in] long nFileSystemNameSize);
+	[entry("SetVolumeLabelA"), usesgetlasterror]		long SetVolumeLabel([in] LPSTR lpRootPathName, [in] LPSTR lpVolumeName);
+	[entry("GetDriveTypeA")]				long GetDriveType([in] LPSTR lpRootPathName);
+	[entry("GetDiskFreeSpaceExA"), usesgetlasterror]	long GetDiskFreeSpaceEx([in] LPSTR lpDirectoryName, [in] CURRENCY * lpFreeBytesAvailableToCaller, [in] CURRENCY * lpTotalNumberOfBytes, [in] CURRENCY * lpTotalNumberOfFreeBytes);
+	[entry("GetLongPathNameA"), usesgetlasterror]		long GetLongPathNameA([in] LPSTR lpszShortPath, [in] LPSTR lpszLongPath, [in] long cchBuffer);
+	[entry("GetLongPathNameW"), usesgetlasterror]		long GetLongPathNameW([in] LPWSTR lpszShortPath, [in] LPWSTR lpszLongPath, [in] long cchBuffer);
+	[entry("RtlFillMemory")]				void FillMemory([in] void * Destination, [in] long Length, [in] byte Fill);
+	[entry("GetSystemInfo")]				void GetSystemInfo([in] SYSTEM_INFO * lpSystemInfo);
     }
 
 	[
@@ -616,25 +607,25 @@ library VBCorType {
 		helpstring("Access to API functions within the Oleaut32.dll system file.")
 	]
 	module OleAut32 {
-		[entry("OleLoadPicture")]           HRESULT OleLoadPicture([in] IStream * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
-        [entry("SafeArrayCopyData")]        HRESULT SafeArrayCopyData([in] long psaSource, [in] long psaTarget);
-        [entry("SafeArrayCreate")]          long    SafeArrayCreate([in] VBA.vbVarType vt, [in] long cDims, [in] SafeArrayBound * rgsaBounds);
-        [entry("SafeArrayCreateVector")]    long    SafeArrayCreateVector([in] VBA.vbVarType vt, [in] long lLbound, [in] long cElements);
-        [entry("SafeArrayCreateVectorEx")]  long    SafeArrayCreateVectorEx([in] VBA.vbVarType vt, [in] long lLbound, [in] long cElements, [in, defaultvalue(0)] long pvExtra);
-        [entry("SafeArrayDestroyData")]     HRESULT SafeArrayDestroyData([in] long psa);
-        [entry("SafeArrayGetDim")]          long    SafeArrayGetDim([in] long psa);
-        [entry("SafeArrayGetElemsize")]     long    SafeArrayGetElemsize([in] long psa);
-        [entry("SafeArrayGetLBound")]       HRESULT SafeArrayGetLBound([in] long psa, [in] long nDim, [out, retval] long * plLbound);
-        [entry("SafeArrayGetRecordInfo")]   HRESULT SafeArrayGetRecordInfo([in] long psa, [out, retval] IRecordInfo ** RetVal);
-        [entry("SafeArrayGetUBound")]       HRESULT SafeArrayGetUBound([in] long psa, [in] long nDim, [out, retval] long * RetVal);
-        [entry("SafeArrayGetVartype")]      HRESULT SafeArrayGetVartype([in] long psa, [out, retval] VBA.vbVarType * RetVal);
-        [entry("SafeArrayLock")]            HRESULT SafeArrayLock([in] long psa);
-        [entry("SafeArrayUnlock")]          HRESULT SafeArrayUnlock([in] long psa);
-		[entry("SysAllocString")]           BSTR    SysAllocString([in] long sz);
-        [entry("SysAllocStringLen")]        BSTR    SysAllocStringLen([in] long psz, [in] long cch);
-        [entry("VariantCopy")]              HRESULT VariantCopy([in] VARIANT * pvarDest, [in] VARIANT * pvarSrc);
-        [entry("VariantCopyInd")]           HRESULT VariantCopyInd([in] VARIANT * pvarDest, [in] VARIANT * pvarSrc);
-        [entry("OleCreatePictureIndirect")] long    OleCreatePictureIndirect([in] void * lpPictDesc, [in] VBGUID * riid, [in] long fOwn, [in] void * lplpvObj);
+		[entry("OleLoadPicture")]	    HRESULT OleLoadPicture([in] IStream * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
+	[entry("SafeArrayCopyData")]	    HRESULT SafeArrayCopyData([in] long psaSource, [in] long psaTarget);
+	[entry("SafeArrayCreate")]	    long    SafeArrayCreate([in] VBA.vbVarType vt, [in] long cDims, [in] SafeArrayBound * rgsaBounds);
+	[entry("SafeArrayCreateVector")]    long    SafeArrayCreateVector([in] VBA.vbVarType vt, [in] long lLbound, [in] long cElements);
+	[entry("SafeArrayCreateVectorEx")]  long    SafeArrayCreateVectorEx([in] VBA.vbVarType vt, [in] long lLbound, [in] long cElements, [in, defaultvalue(0)] long pvExtra);
+	[entry("SafeArrayDestroyData")]     HRESULT SafeArrayDestroyData([in] long psa);
+	[entry("SafeArrayGetDim")]	    long    SafeArrayGetDim([in] long psa);
+	[entry("SafeArrayGetElemsize")]     long    SafeArrayGetElemsize([in] long psa);
+	[entry("SafeArrayGetLBound")]	    HRESULT SafeArrayGetLBound([in] long psa, [in] long nDim, [out, retval] long * plLbound);
+	[entry("SafeArrayGetRecordInfo")]   HRESULT SafeArrayGetRecordInfo([in] long psa, [out, retval] IRecordInfo ** RetVal);
+	[entry("SafeArrayGetUBound")]	    HRESULT SafeArrayGetUBound([in] long psa, [in] long nDim, [out, retval] long * RetVal);
+	[entry("SafeArrayGetVartype")]	    HRESULT SafeArrayGetVartype([in] long psa, [out, retval] VBA.vbVarType * RetVal);
+	[entry("SafeArrayLock")]	    HRESULT SafeArrayLock([in] long psa);
+	[entry("SafeArrayUnlock")]	    HRESULT SafeArrayUnlock([in] long psa);
+		[entry("SysAllocString")]	    BSTR    SysAllocString([in] long sz);
+	[entry("SysAllocStringLen")]	    BSTR    SysAllocStringLen([in] long psz, [in] long cch);
+	[entry("VariantCopy")]		    HRESULT VariantCopy([in] VARIANT * pvarDest, [in] VARIANT * pvarSrc);
+	[entry("VariantCopyInd")]	    HRESULT VariantCopyInd([in] VARIANT * pvarDest, [in] VARIANT * pvarSrc);
+	[entry("OleCreatePictureIndirect")] long    OleCreatePictureIndirect([in] void * lpPictDesc, [in] VBGUID * riid, [in] long fOwn, [in] void * lplpvObj);
 
 	}
 
@@ -649,10 +640,10 @@ library VBCorType {
 		[entry("CoTaskMemAlloc")]			long	CoTaskMemAlloc([in] long cb);
 		[entry("CoTaskMemFree")]			void	CoTaskMemFree([in] long pv);
 		[entry("CreateStreamOnHGlobal")]	void	CreateStreamOnHGlobal([in] long hGlobal, [in] BOOL fDeleteOnRelease, [in, out] IStream ** Stream);
-        [entry("IIDFromString")]            HRESULT GUIDFromString([in] LPWSTR lpsz, [out, retval] VBGUID * RetVal);
-        [entry("IsEqualGUID")]              long    IsEqualGUID([in] void * rguid1, [in] void * rguid2);
-        [entry("StringFromGUID2")]          long    StringFromGUID2([in] VBGUID * rguid, [in] LPWSTR lpsz, [in] long cbMax);
-        [entry("ProgIDFromCLSID")]          long    ProgIDFromCLSID([in] VBGUID * CLSID, [in] long * lplpszProgID);
+	[entry("IIDFromString")]	    HRESULT GUIDFromString([in] LPWSTR lpsz, [out, retval] VBGUID * RetVal);
+	[entry("IsEqualGUID")]		    long    IsEqualGUID([in] void * rguid1, [in] void * rguid2);
+	[entry("StringFromGUID2")]	    long    StringFromGUID2([in] VBGUID * rguid, [in] LPWSTR lpsz, [in] long cbMax);
+	[entry("ProgIDFromCLSID")]	    long    ProgIDFromCLSID([in] VBGUID * CLSID, [in] long * lplpszProgID);
 	}
 	
 	[
@@ -660,49 +651,49 @@ library VBCorType {
 	    helpstring("Access to API functions within the Advapi32.dll system file.")
 	]
 	module Advapi32 {
-	    [entry("GetUserNameA"), usesgetlasterror]              long GetUserNameA([in] LPSTR lpBuffer, [in] long * nSize);
-	    [entry("CryptAcquireContextA"), usesgetlasterror]      long CryptAcquireContext([in] long * hProv, [in] LPSTR pszContainer, [in] LPSTR pszProvider, [in] long dwProvType, [in] long dwFlags);
-	    [entry("CryptReleaseContext"), usesgetlasterror]       long CryptReleaseContext([in] long hProv, [in] long dwFlags);
-        [entry("CryptGenRandom"), usesgetlasterror]            long CryptGenRandom([in] long hProv, [in] long dwLen, [in] void * pbBuffer);
-        [entry("CryptEncrypt"), usesgetlasterror]              long CryptEncrypt([in] long hKey, [in] long hHash, [in] BOOL Final, [in] long dwFlags, [in] void * pbData, [in] long * pdwDataLen, [in] long dwBufLen);
-        [entry("CryptDecrypt"), usesgetlasterror]              long CryptDecrypt([in] long hKey, [in] long hHash, [in] BOOL Final, [in] long dwFlags, [in] void * pbData, [in] long * pdwDataLen);
-        [entry("CryptSetKeyParam"), usesgetlasterror]          long CryptSetKeyParam([in] long hKey, [in] long dwParam, [in] void * pbData, [in] long dwFlags);
-        [entry("CryptImportKey"), usesgetlasterror]            long CryptImportKey([in] long hProv, [in] void * pbData, [in] long dwDataLen, [in] long hPubKey, [in] long dwFlags, [in] long * phKey);
-        [entry("CryptDestroyKey"), usesgetlasterror]           long CryptDestroyKey([in] long hKey);
-        [entry("CryptExportKey"), usesgetlasterror]            long CryptExportKey([in] long hKey, [in] long hExpKey, [in] long dwBlobType, [in] long dwFlags, [in] void * pbData, [in] long * pdwDataLen);
-        [entry("CryptCreateHash"), usesgetlasterror]           long CryptCreateHash([in] long hProv, [in] long AlgId, [in] long hKey, [in] long dwFlags, [in] long * phHash);
-        [entry("CryptHashData"), usesgetlasterror]             long CryptHashData([in] long hHash, [in] void * pbData, [in] long dwDataLen, [in] long dwFlags);
-        [entry("CryptDestroyHash"), usesgetlasterror]          long CryptDestroyHash([in] long hHash);
-        [entry("CryptGetHashParam"), usesgetlasterror]         long CryptGetHashParam([in] long hHash, [in] long dwParam, [in] void * pbData, [in] long * pdwDataLen, [in] long dwFlags);
-        [entry("CryptGetProvParam"), usesgetlasterror]         long CryptGetProvParam([in] long hProv, [in] long dwParam, [in] void * pbData, [in] long * pdwDataLen, [in] long dwFlags);
-        [entry("CryptGenKey"), usesgetlasterror]               long CryptGenKey([in] long hProv, [in] long AlgId, [in] long dwFlags, [in] long * phKey);
-        [entry("CryptEnumProvidersA"), usesgetlasterror]       long CryptEnumProviders([in] long dwIndex, [in] void * pdwReserved, [in] long dwFlags, [in] long * pdwProvType, [in] LPSTR pszProvName, [in] long * pcbProvName);
-        [entry("CryptGetUserKey"), usesgetlasterror]           long CryptGetUserKey([in] long hProv, [in] long dwKeySpec, [in] long * phUserKey);
-        [entry("CryptGetKeyParam"), usesgetlasterror]          long CryptGetKeyParam([in] long hKey, [in] long dwParam, [in] void * pbData, [in] long * pdwDataLen, [in] long dwFlags);
-        [entry("CryptVerifySignatureA"), usesgetlasterror]     long CryptVerifySignature([in] long hHash, [in] void * pbSignature, [in] long dwSigLen, [in] long hPubKey, [in] LPSTR sDescription, [in] long dwFlats);
-        [entry("CryptSetHashParam"), usesgetlasterror]         long CryptSetHashParam([in] long hHash, [in] long dwParam, [in] void * pbData, [in] long dwFlags);
-        [entry("CryptSignHashA"), usesgetlasterror]            long CryptSignHash([in] long hHash, [in] long dwKeySpec, [in] LPSTR sDescription, [in] long dwFlags, [in] void * pbSignature, [in] long * pdwSigLen);
-        [entry("RegOpenKeyExA")]                               long RegOpenKeyExA([in] long hKey, [in] LPSTR lpSubKey, [in] long ulOptions, [in] long samDesired, [in] long * phkResult);
-        [entry("RegOpenKeyExW")]                               long RegOpenKeyExW([in] long hKey, [in] LPWSTR lpSubKey, [in] long ulOptions, [in] long samDesired, [in] long * phkResult);
-        [entry("RegCloseKey")]                                 long RegCloseKey([in] long hKey);
-        [entry("RegQueryInfoKeyA")]                            long RegQueryInfoKeyA([in] long hKey, [in] LPSTR lpClass, [in] void * lpcClass, [in] long lpReserve, [in] void * lpcSubKeys, [in] void * lpcMaxSubKeyLen, [in] void * lpcMaxClassLen, [in] void * lpcValues, [in] void * lpcMaxValueNameLen, [in] void * lpcMaxValueLen, [in] void * lpcbSecurityDescriptor, [in] void * lpftLastWriteTime);
-        [entry("RegQueryInfoKeyW")]                            long RegQueryInfoKeyW([in] long hKey, [in] LPWSTR lpClass, [in] void * lpcClass, [in] long lpReserve, [in] void * lpcSubKeys, [in] void * lpcMaxSubKeyLen, [in] void * lpcMaxClassLen, [in] void * lpcValues, [in] void * lpcMaxValueNameLen, [in] void * lpcMaxValueLen, [in] void * lpcbSecurityDescriptor, [in] void * lpftLastWriteTime);
-        [entry("RegCreateKeyExA")]                             long RegCreateKeyExA([in] long hKey, [in] LPSTR lpSubKey, [in] long Reserved, [in] LPSTR lpClass, [in] long dwOptions, [in] long samDesired, [in] long lpSecurityAttributes, [in] long * phkResult, [in] long * lpdwDisposition);
-        [entry("RegCreateKeyExW")]                             long RegCreateKeyExW([in] long hKey, [in] LPWSTR lpSubKey, [in] long Reserved, [in] LPWSTR lpClass, [in] long dwOptions, [in] long samDesired, [in] long lpSecurityAttributes, [in] long * phkResult, [in] long * lpdwDisposition);
-        [entry("RegDeleteKeyA")]                               long RegDeleteKeyA([in] long hKey, [in] LPSTR lpSubKey);
-        [entry("RegDeleteKeyW")]                               long RegDeleteKeyW([in] long hKey, [in] LPWSTR lpSubKey);
-        [entry("RegEnumKeyExA")]                               long RegEnumKeyExA([in] long hKey, [in] long dwIndex, [in] LPSTR lpName, [in] long * lpcName, [in] long lpReserved, [in] LPSTR lpClass, [in] long * lpcClass, [in] CURRENCY * lpftLastWriteTime);
-        [entry("RegEnumKeyExW")]                               long RegEnumKeyExW([in] long hKey, [in] long dwIndex, [in] LPWSTR lpName, [in] long * lpcName, [in] long lpReserved, [in] LPWSTR lpClass, [in] long * lpcClass, [in] CURRENCY * lpftLastWriteTime);
-        [entry("RegEnumValueA")]                               long RegEnumValueA([in] long hKey, [in] long dwIndex, [in] LPSTR lpName, [in] long * lpcValueName, [in] long lpReserved, [in] long lpType, [in] long lpData, [in] long lpcbData);
-        [entry("RegEnumValueW")]                               long RegEnumValueW([in] long hKey, [in] long dwIndex, [in] LPWSTR lpName, [in] long * lpcValueName, [in] long lpReserved, [in] long lpType, [in] long lpData, [in] long lpcbData);
-        [entry("RegSetValueExA")]                              long RegSetValueExA([in] long hKey, [in] LPSTR lpValueName, [in] long Reserved, [in] long dwType, [in] long lpData, [in] long cbData);
-        [entry("RegSetValueExW")]                              long RegSetValueExW([in] long hKey, [in] LPWSTR lpValueName, [in] long Reserved, [in] long dwType, [in] long lpData, [in] long cbData);
-        [entry("RegQueryValueExA")]                            long RegQueryValueExA([in] long hKey, [in] LPSTR lpValueName, [in] long lpReserved, [in] long * lpType, [in] void * lpData, [in] long * lpcbData);
-        [entry("RegQueryValueExW")]                            long RegQueryValueExW([in] long hKey, [in] LPWSTR lpValueName, [in] long lpReserved, [in] long * lpType, [in] void * lpData, [in] long * lpcbData);
-        [entry("RegFlushKey")]                                 long RegFlushKey([in] long hKey);
-        [entry("RegDeleteValueA")]                             long RegDeleteValueA([in] long hKey, [in] LPSTR lpValueName);
-        [entry("RegDeleteValueW")]                             long RegDeleteValueW([in] long hKey, [in] LPWSTR lpValueName);
-        [entry("RegConnectRegistryA")]                         long RegConnectRegistry([in] LPSTR lpMachineName, [in] long hKey, [in] long * phkResult);
+	    [entry("GetUserNameA"), usesgetlasterror]		   long GetUserNameA([in] LPSTR lpBuffer, [in] long * nSize);
+	    [entry("CryptAcquireContextA"), usesgetlasterror]	   long CryptAcquireContext([in] long * hProv, [in] LPSTR pszContainer, [in] LPSTR pszProvider, [in] long dwProvType, [in] long dwFlags);
+	    [entry("CryptReleaseContext"), usesgetlasterror]	   long CryptReleaseContext([in] long hProv, [in] long dwFlags);
+	[entry("CryptGenRandom"), usesgetlasterror]	       long CryptGenRandom([in] long hProv, [in] long dwLen, [in] void * pbBuffer);
+	[entry("CryptEncrypt"), usesgetlasterror]	       long CryptEncrypt([in] long hKey, [in] long hHash, [in] BOOL Final, [in] long dwFlags, [in] void * pbData, [in] long * pdwDataLen, [in] long dwBufLen);
+	[entry("CryptDecrypt"), usesgetlasterror]	       long CryptDecrypt([in] long hKey, [in] long hHash, [in] BOOL Final, [in] long dwFlags, [in] void * pbData, [in] long * pdwDataLen);
+	[entry("CryptSetKeyParam"), usesgetlasterror]	       long CryptSetKeyParam([in] long hKey, [in] long dwParam, [in] void * pbData, [in] long dwFlags);
+	[entry("CryptImportKey"), usesgetlasterror]	       long CryptImportKey([in] long hProv, [in] void * pbData, [in] long dwDataLen, [in] long hPubKey, [in] long dwFlags, [in] long * phKey);
+	[entry("CryptDestroyKey"), usesgetlasterror]	       long CryptDestroyKey([in] long hKey);
+	[entry("CryptExportKey"), usesgetlasterror]	       long CryptExportKey([in] long hKey, [in] long hExpKey, [in] long dwBlobType, [in] long dwFlags, [in] void * pbData, [in] long * pdwDataLen);
+	[entry("CryptCreateHash"), usesgetlasterror]	       long CryptCreateHash([in] long hProv, [in] long AlgId, [in] long hKey, [in] long dwFlags, [in] long * phHash);
+	[entry("CryptHashData"), usesgetlasterror]	       long CryptHashData([in] long hHash, [in] void * pbData, [in] long dwDataLen, [in] long dwFlags);
+	[entry("CryptDestroyHash"), usesgetlasterror]	       long CryptDestroyHash([in] long hHash);
+	[entry("CryptGetHashParam"), usesgetlasterror]	       long CryptGetHashParam([in] long hHash, [in] long dwParam, [in] void * pbData, [in] long * pdwDataLen, [in] long dwFlags);
+	[entry("CryptGetProvParam"), usesgetlasterror]	       long CryptGetProvParam([in] long hProv, [in] long dwParam, [in] void * pbData, [in] long * pdwDataLen, [in] long dwFlags);
+	[entry("CryptGenKey"), usesgetlasterror]	       long CryptGenKey([in] long hProv, [in] long AlgId, [in] long dwFlags, [in] long * phKey);
+	[entry("CryptEnumProvidersA"), usesgetlasterror]       long CryptEnumProviders([in] long dwIndex, [in] void * pdwReserved, [in] long dwFlags, [in] long * pdwProvType, [in] LPSTR pszProvName, [in] long * pcbProvName);
+	[entry("CryptGetUserKey"), usesgetlasterror]	       long CryptGetUserKey([in] long hProv, [in] long dwKeySpec, [in] long * phUserKey);
+	[entry("CryptGetKeyParam"), usesgetlasterror]	       long CryptGetKeyParam([in] long hKey, [in] long dwParam, [in] void * pbData, [in] long * pdwDataLen, [in] long dwFlags);
+	[entry("CryptVerifySignatureA"), usesgetlasterror]     long CryptVerifySignature([in] long hHash, [in] void * pbSignature, [in] long dwSigLen, [in] long hPubKey, [in] LPSTR sDescription, [in] long dwFlats);
+	[entry("CryptSetHashParam"), usesgetlasterror]	       long CryptSetHashParam([in] long hHash, [in] long dwParam, [in] void * pbData, [in] long dwFlags);
+	[entry("CryptSignHashA"), usesgetlasterror]	       long CryptSignHash([in] long hHash, [in] long dwKeySpec, [in] LPSTR sDescription, [in] long dwFlags, [in] void * pbSignature, [in] long * pdwSigLen);
+	[entry("RegOpenKeyExA")]			       long RegOpenKeyExA([in] long hKey, [in] LPSTR lpSubKey, [in] long ulOptions, [in] long samDesired, [in] long * phkResult);
+	[entry("RegOpenKeyExW")]			       long RegOpenKeyExW([in] long hKey, [in] LPWSTR lpSubKey, [in] long ulOptions, [in] long samDesired, [in] long * phkResult);
+	[entry("RegCloseKey")]				       long RegCloseKey([in] long hKey);
+	[entry("RegQueryInfoKeyA")]			       long RegQueryInfoKeyA([in] long hKey, [in] LPSTR lpClass, [in] void * lpcClass, [in] long lpReserve, [in] void * lpcSubKeys, [in] void * lpcMaxSubKeyLen, [in] void * lpcMaxClassLen, [in] void * lpcValues, [in] void * lpcMaxValueNameLen, [in] void * lpcMaxValueLen, [in] void * lpcbSecurityDescriptor, [in] void * lpftLastWriteTime);
+	[entry("RegQueryInfoKeyW")]			       long RegQueryInfoKeyW([in] long hKey, [in] LPWSTR lpClass, [in] void * lpcClass, [in] long lpReserve, [in] void * lpcSubKeys, [in] void * lpcMaxSubKeyLen, [in] void * lpcMaxClassLen, [in] void * lpcValues, [in] void * lpcMaxValueNameLen, [in] void * lpcMaxValueLen, [in] void * lpcbSecurityDescriptor, [in] void * lpftLastWriteTime);
+	[entry("RegCreateKeyExA")]			       long RegCreateKeyExA([in] long hKey, [in] LPSTR lpSubKey, [in] long Reserved, [in] LPSTR lpClass, [in] long dwOptions, [in] long samDesired, [in] long lpSecurityAttributes, [in] long * phkResult, [in] long * lpdwDisposition);
+	[entry("RegCreateKeyExW")]			       long RegCreateKeyExW([in] long hKey, [in] LPWSTR lpSubKey, [in] long Reserved, [in] LPWSTR lpClass, [in] long dwOptions, [in] long samDesired, [in] long lpSecurityAttributes, [in] long * phkResult, [in] long * lpdwDisposition);
+	[entry("RegDeleteKeyA")]			       long RegDeleteKeyA([in] long hKey, [in] LPSTR lpSubKey);
+	[entry("RegDeleteKeyW")]			       long RegDeleteKeyW([in] long hKey, [in] LPWSTR lpSubKey);
+	[entry("RegEnumKeyExA")]			       long RegEnumKeyExA([in] long hKey, [in] long dwIndex, [in] LPSTR lpName, [in] long * lpcName, [in] long lpReserved, [in] LPSTR lpClass, [in] long * lpcClass, [in] CURRENCY * lpftLastWriteTime);
+	[entry("RegEnumKeyExW")]			       long RegEnumKeyExW([in] long hKey, [in] long dwIndex, [in] LPWSTR lpName, [in] long * lpcName, [in] long lpReserved, [in] LPWSTR lpClass, [in] long * lpcClass, [in] CURRENCY * lpftLastWriteTime);
+	[entry("RegEnumValueA")]			       long RegEnumValueA([in] long hKey, [in] long dwIndex, [in] LPSTR lpName, [in] long * lpcValueName, [in] long lpReserved, [in] long lpType, [in] long lpData, [in] long lpcbData);
+	[entry("RegEnumValueW")]			       long RegEnumValueW([in] long hKey, [in] long dwIndex, [in] LPWSTR lpName, [in] long * lpcValueName, [in] long lpReserved, [in] long lpType, [in] long lpData, [in] long lpcbData);
+	[entry("RegSetValueExA")]			       long RegSetValueExA([in] long hKey, [in] LPSTR lpValueName, [in] long Reserved, [in] long dwType, [in] long lpData, [in] long cbData);
+	[entry("RegSetValueExW")]			       long RegSetValueExW([in] long hKey, [in] LPWSTR lpValueName, [in] long Reserved, [in] long dwType, [in] long lpData, [in] long cbData);
+	[entry("RegQueryValueExA")]			       long RegQueryValueExA([in] long hKey, [in] LPSTR lpValueName, [in] long lpReserved, [in] long * lpType, [in] void * lpData, [in] long * lpcbData);
+	[entry("RegQueryValueExW")]			       long RegQueryValueExW([in] long hKey, [in] LPWSTR lpValueName, [in] long lpReserved, [in] long * lpType, [in] void * lpData, [in] long * lpcbData);
+	[entry("RegFlushKey")]				       long RegFlushKey([in] long hKey);
+	[entry("RegDeleteValueA")]			       long RegDeleteValueA([in] long hKey, [in] LPSTR lpValueName);
+	[entry("RegDeleteValueW")]			       long RegDeleteValueW([in] long hKey, [in] LPWSTR lpValueName);
+	[entry("RegConnectRegistryA")]			       long RegConnectRegistry([in] LPSTR lpMachineName, [in] long hKey, [in] long * phkResult);
 
 	}
 
@@ -715,25 +706,25 @@ library VBCorType {
 	}
 
     [
-        dllname("user32.dll"),
-        helpstring("Access to API functions within the User32.dll system file.")
+	dllname("user32.dll"),
+	helpstring("Access to API functions within the User32.dll system file.")
     ]
     module User32 {
-        [entry("SendMessageTimeoutA"), usesgetlasterror]        long  SendMessageTimeout([in] long hWnd, [in] long Msg, [in] long wParam, [in] long lParam, [in] long fuFlags, [in] long uTimeout, [in] long * lpdwResult);
-        [entry("GetKeyState")]                                  short GetKeyState([in] long nVirtKey);
-        [entry("CharLowerA")]                                   long  CharLower([in] long Char);
-        [entry("SetTimer"), usesgetlasterror]                   long  SetTimer([in] long hwnd, [in] long nIDEvent, [in] long uElapse, [in] long lpTimerFunc);
-        [entry("KillTimer"), usesgetlasterror]                  long  KillTimer([in] long hwnd, [in] long nIDEvent);
-        [entry("CreateIconFromResource"), usesgetlasterror]     long  CreateIconFromResource([in] byte * PresBits, [in] long dwResSize, [in] long fIcon, [in] long dwVer);
-        [entry("GetIconInfo"), usesgetlasterror]                long  GetIconInfo([in] long hIcon, [in] ICONINFO * pIconInfo);
+	[entry("SendMessageTimeoutA"), usesgetlasterror]	long  SendMessageTimeout([in] long hWnd, [in] long Msg, [in] long wParam, [in] long lParam, [in] long fuFlags, [in] long uTimeout, [in] long * lpdwResult);
+	[entry("GetKeyState")]					short GetKeyState([in] long nVirtKey);
+	[entry("CharLowerA")]					long  CharLower([in] long Char);
+	[entry("SetTimer"), usesgetlasterror]			long  SetTimer([in] long hwnd, [in] long nIDEvent, [in] long uElapse, [in] long lpTimerFunc);
+	[entry("KillTimer"), usesgetlasterror]			long  KillTimer([in] long hwnd, [in] long nIDEvent);
+	[entry("CreateIconFromResource"), usesgetlasterror]	long  CreateIconFromResource([in] byte * PresBits, [in] long dwResSize, [in] long fIcon, [in] long dwVer);
+	[entry("GetIconInfo"), usesgetlasterror]		long  GetIconInfo([in] long hIcon, [in] ICONINFO * pIconInfo);
 
     }
 
     [
-        dllname("shfolder.dll"),
-        helpstring("Access to API functions in the Shfolder.dll system file.")
+	dllname("shfolder.dll"),
+	helpstring("Access to API functions in the Shfolder.dll system file.")
     ]
     module Shfolder {
-        [entry("SHGetFolderPathA")] HRESULT SHGetFolderPath([in] long Hwnd, [in] long nFolder, [in] long hToken, [in] long dwFlags, [in] LPSTR pszPath);
+	[entry("SHGetFolderPathA")] HRESULT SHGetFolderPath([in] long Hwnd, [in] long nFolder, [in] long hToken, [in] long dwFlags, [in] LPSTR pszPath);
     }
 }
