@@ -170,7 +170,7 @@ library VBCorType {
 		byte	wReserved;
 	} OSVERSIONINFOEXW;
 
-    typedef [uuid(B87B4912-6B3D-4914-B7AA-950CA2E61482)]
+        typedef [uuid(B87B4912-6B3D-4914-B7AA-950CA2E61482)]
 	struct VBGUID {
 		long	Data1;
 		short	Data2;
@@ -621,7 +621,7 @@ library VBCorType {
 	[entry("SafeArrayGetVartype")]	    HRESULT SafeArrayGetVartype([in] long psa, [out, retval] VBA.vbVarType * RetVal);
 	[entry("SafeArrayLock")]	    HRESULT SafeArrayLock([in] long psa);
 	[entry("SafeArrayUnlock")]	    HRESULT SafeArrayUnlock([in] long psa);
-		[entry("SysAllocString")]	    BSTR    SysAllocString([in] long sz);
+		[entry("SysAllocString")]   BSTR    SysAllocString([in] long sz);
 	[entry("SysAllocStringLen")]	    BSTR    SysAllocStringLen([in] long psz, [in] long cch);
 	[entry("VariantCopy")]		    HRESULT VariantCopy([in] VARIANT * pvarDest, [in] VARIANT * pvarSrc);
 	[entry("VariantCopyInd")]	    HRESULT VariantCopyInd([in] VARIANT * pvarDest, [in] VARIANT * pvarSrc);
@@ -634,16 +634,16 @@ library VBCorType {
 		helpstring("Access to API functions within the Ole32.dll system file.")
 	]
 	module Ole32 {
-		[entry("CLSIDFromProgID")]			HRESULT CLSIDFromProgID([in] LPWSTR ProgID, [out, retval] VBGUID * RetVal);
-		[entry("CLSIDFromString")]			HRESULT CLSIDFromString([in] LPWSTR lpSz, [out, retval] VBGUID * RetVal);
-		[entry("CoCreateGuid")]				HRESULT CoCreateGuid([out, retval] VBGUID * RetVal);
-		[entry("CoTaskMemAlloc")]			long	CoTaskMemAlloc([in] long cb);
-		[entry("CoTaskMemFree")]			void	CoTaskMemFree([in] long pv);
-		[entry("CreateStreamOnHGlobal")]	void	CreateStreamOnHGlobal([in] long hGlobal, [in] BOOL fDeleteOnRelease, [in, out] IStream ** Stream);
-	[entry("IIDFromString")]	    HRESULT GUIDFromString([in] LPWSTR lpsz, [out, retval] VBGUID * RetVal);
-	[entry("IsEqualGUID")]		    long    IsEqualGUID([in] void * rguid1, [in] void * rguid2);
-	[entry("StringFromGUID2")]	    long    StringFromGUID2([in] VBGUID * rguid, [in] LPWSTR lpsz, [in] long cbMax);
-	[entry("ProgIDFromCLSID")]	    long    ProgIDFromCLSID([in] VBGUID * CLSID, [in] long * lplpszProgID);
+	[entry("CLSIDFromProgID")]		HRESULT CLSIDFromProgID([in] LPWSTR ProgID, [out, retval] VBGUID * RetVal);
+	[entry("CLSIDFromString")]		HRESULT CLSIDFromString([in] LPWSTR lpSz, [out, retval] VBGUID * RetVal);
+	[entry("CoCreateGuid")]			HRESULT CoCreateGuid([out, retval] VBGUID * RetVal);
+	[entry("CoTaskMemAlloc")]		long	CoTaskMemAlloc([in] long cb);
+	[entry("CoTaskMemFree")]		void	CoTaskMemFree([in] long pv);
+	[entry("CreateStreamOnHGlobal")]	void	CreateStreamOnHGlobal([in] long hGlobal, [in] BOOL fDeleteOnRelease, [in, out] IStream ** Stream);
+	[entry("IIDFromString")]	        HRESULT GUIDFromString([in] LPWSTR lpsz, [out, retval] VBGUID * RetVal);
+	[entry("IsEqualGUID")]		        long    IsEqualGUID([in] void * rguid1, [in] void * rguid2);
+	[entry("StringFromGUID2")]	        long    StringFromGUID2([in] VBGUID * rguid, [in] LPWSTR lpsz, [in] long cbMax);
+	[entry("ProgIDFromCLSID")]	        long    ProgIDFromCLSID([in] VBGUID * CLSID, [in] long * lplpszProgID);
 	}
 	
 	[
