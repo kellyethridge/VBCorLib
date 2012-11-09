@@ -685,10 +685,10 @@ End Function
 ' to be created.</p>
 '
 Public Function NewArray(ByVal ArrayType As ciArrayTypes, ParamArray ArrayElements() As Variant) As Variant
-    Dim args() As Variant
+    Dim Args() As Variant
     
-    Call Helper.Swap4(ByVal ArrPtr(args), ByVal Helper.DerefEBP(16))
-    NewArray = InternalNewArray(ArrayType, args)
+    Call Helper.Swap4(ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16))
+    NewArray = InternalNewArray(ArrayType, Args)
 End Function
 
 ''
@@ -860,11 +860,14 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     
     Select Case ElemSize
         Case 1, 2, 4, 8, 16
-            Dim swapper As ISwap
-            Set swapper = GetSwapper(ElemSize)
-            
             Do While pLowElem < pHighElem
-                Call swapper.Call(vbNullPtr, ByVal pLowElem, ByVal pHighElem)
+                Select Case ElemSize
+                    Case 1: Helper.Swap1 ByVal pLowElem, ByVal pHighElem
+                    Case 2: Helper.Swap2 ByVal pLowElem, ByVal pHighElem
+                    Case 4: Helper.Swap4 ByVal pLowElem, ByVal pHighElem
+                    Case 8: Helper.Swap8 ByVal pLowElem, ByVal pHighElem
+                    Case 16: Helper.Swap16 ByVal pLowElem, ByVal pHighElem
+                End Select
                 pLowElem = pLowElem + ElemSize
                 pHighElem = pHighElem - ElemSize
             Loop
@@ -997,15 +1000,15 @@ End Sub
 
 ' This is Friend to allow access from the Constructors.NewArray function.
 '
-Friend Function InternalNewArray(ByVal ArrayType As ciArrayTypes, ByRef args() As Variant) As Variant
+Friend Function InternalNewArray(ByVal ArrayType As ciArrayTypes, ByRef Args() As Variant) As Variant
     Dim UpperBound  As Long
-    UpperBound = UBound(args)
+    UpperBound = UBound(Args)
     
     Dim Ret As Variant
     Ret = CreateInstance(ArrayType, UpperBound + 1)
     
     If UpperBound >= 0 Then
-        Call CopyEx(args, 0, Ret, 0, UpperBound + 1)
+        Call CopyEx(Args, 0, Ret, 0, UpperBound + 1)
     End If
     
     InternalNewArray = Ret
