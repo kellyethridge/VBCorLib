@@ -15,38 +15,41 @@ Option Explicit
 
 Private Const EXPECTED_MESSAGE As String = "User Error."
 
-Private ex As ArgumentException
+Private Ex As ArgumentException
 Private Inner As Exception
 
 Public Sub Setup()
     Set Inner = New Exception
-    Set ex = Cor.NewArgumentException(EXPECTED_MESSAGE, , Inner)
+    Set Ex = Cor.NewArgumentException(EXPECTED_MESSAGE, , Inner)
 End Sub
 
 Public Sub TestUserDefinedMessage()
-    Assert.AreEqual EXPECTED_MESSAGE, ex.Message, "Message should return 'User Error.'"
+    Assert.AreEqual EXPECTED_MESSAGE, Ex.Message, "Message should return 'User Error.'"
 End Sub
 
 Public Sub TestUserDefinedInnerException()
-    Set ex = Cor.NewArgumentException(EXPECTED_MESSAGE, , Inner)
-    Assert.AreEqual Inner, ex.InnerException, "InnerException should return Inner instance."
+    Set Ex = Cor.NewArgumentException(EXPECTED_MESSAGE, , Inner)
+    Assert.AreEqual Inner, Ex.InnerException, "InnerException should return Inner instance."
 End Sub
 
 Public Sub TestGetBaseException()
     Dim firstLevelEx As ArgumentException
-    Set firstLevelEx = Cor.NewArgumentException(EXPECTED_MESSAGE, , ex)
+    Set firstLevelEx = Cor.NewArgumentException(EXPECTED_MESSAGE, , Ex)
     Assert.AreEqual Inner, firstLevelEx.GetBaseException, "GetBaseException should return Inner instance."
 End Sub
 
 Public Sub TestUserDefinedToString()
-    Assert.IsTrue Len(ex.ToString) > 0, "ToString return wrong value."
+'    Assert.IsTrue Len(Ex.ToString) > 0, "ToString return wrong value."
+    Dim s As String
+    s = Ex.ToString
+    Assert.That s, Iz.Not.Empty
 End Sub
 
 Public Sub TestPersitence()
     Dim Copy As ArgumentException
     Dim Bag As New PropertyBag
     
-    Bag.WriteProperty "ex", ex
+    Bag.WriteProperty "ex", Ex
     Set Copy = Bag.ReadProperty("ex")
     
     Assert.AreEqual EXPECTED_MESSAGE, Copy.Message, "Message should return 'User Error.'"

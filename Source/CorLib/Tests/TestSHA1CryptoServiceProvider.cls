@@ -25,7 +25,7 @@ Public Sub Setup()
     Set csp = New SHA1CryptoServiceProvider
     
     FF = FreeFile
-    Open App.Path & "\Cryptography Files\SHA1_Hashes.txt" For Input As #FF
+    Open GetCryptoPath("SHA1_Hashes.txt") For Input As #FF
 End Sub
 
 Public Sub TearDown()
@@ -118,7 +118,7 @@ Public Sub GetHashBeforeFinishedShouldFail()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is InvalidOperationException, "Wrong exception type."
 End Sub
 

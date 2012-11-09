@@ -25,8 +25,7 @@ Attribute VB_Name = "Resources"
 Option Explicit
 
 Public Enum ResourceStringId
-    Exception_WasThrown = 1
-    ArrayTypeMismatch_Conversion = 101
+    Exception_WasThrown = 101
     ArrayTypeMismatch_Incompatible = 102
     ArrayTypeMismatch_Exception = 103
     ArrayTypeMismatch_Compare = 104
@@ -96,7 +95,7 @@ Private mBuilder As New StringBuilder
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
     Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4)))
-    GetString cString.FormatArray(LoadResString(ResourceId), vArgs)
+    GetString = cString.FormatArray(LoadResString(ResourceId), vArgs)
 End Function
 
 Public Function ModuleEBPOffset(ByVal Offset As Long) As Long
