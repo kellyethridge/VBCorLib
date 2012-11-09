@@ -34,27 +34,39 @@ Private Type HelperType
     Func(17)    As Long
 End Type
 
-Public Helper As Helper
-
-Private mHelper     As HelperType
+Private mHelper     As Helper
 Private mAsm()      As Long
 Private mMSVCLib    As Long
 
 
-''
-' Creates the helper object.
-'
-Public Sub InitHelper()
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Public Methods
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Public Property Get Helper() As Helper
+    If mHelper Is Nothing Then
+        InitHelper
+    End If
+    
+    Set Helper = mHelper
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Private Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub InitHelper()
+    Const OutOfMemoryCode As Long = 7
     Call InitAsm
     
-    Dim this As Long
-    this = CoTaskMemAlloc(LenB(mHelper))
-    If this = 0 Then Err.Raise 7
+    Dim HelperStruct    As HelperType
+    Dim This            As Long
+    This = CoTaskMemAlloc(LenB(HelperStruct))
+    If This = 0 Then Err.Raise OutOfMemoryCode
     
-    With mHelper
+    With HelperStruct
         .Func(0) = FuncAddr(AddressOf QueryInterface)
-        .Func(1) = FuncAddr(AddressOf AddRefRelease)
-        .Func(2) = .Func(1)
+        .Func(1) = FuncAddr(AddressOf AddRef)
+        .Func(2) = FuncAddr(AddressOf Release)
         .Func(3) = VarPtr(mAsm(0))
         .Func(4) = VarPtr(mAsm(5))
         .Func(5) = VarPtr(mAsm(13))
@@ -68,12 +80,12 @@ Public Sub InitHelper()
         .Func(13) = VarPtr(mAsm(80))
         .Func(14) = VarPtr(mAsm(84))
         
-        .pVTable = this + 4
+        .pVTable = This + 4
     End With
     
-    Call CopyMemory(ByVal this, mHelper, LenB(mHelper))
+    Call CopyMemory(ByVal This, HelperStruct, LenB(HelperStruct))
     
-    ObjectPtr(Helper) = this
+    ObjectPtr(mHelper) = This
 End Sub
 
 Private Sub InitAsm()
@@ -208,10 +220,17 @@ End Sub
 
 
 
-Private Function QueryInterface(ByVal this As Long, ByVal riid As Long, pvObj As Long) As Long
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IUnknown Interface Methods
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function QueryInterface(ByVal This As Long, ByVal riid As Long, pvObj As Long) As Long
     QueryInterface = E_NOINTERFACE
 End Function
-Private Function AddRefRelease(ByVal this As Long) As Long
+
+Private Function AddRef(ByVal This As Long) As Long
     ' do nothing
-    CoTaskMemFree this
+End Function
+
+Private Function Release(ByVal This As Long) As Long
+    CoTaskMemFree This
 End Function

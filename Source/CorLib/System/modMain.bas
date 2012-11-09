@@ -21,36 +21,50 @@ Attribute VB_Name = "modMain"
 '
 Option Explicit
 
-Public InIDE        As Boolean
-Public InDebugger   As Boolean
+Private mInIDE        As Boolean
+Private mInDebugger   As Boolean
 
+Public Property Get InIDE() As Boolean
+    InIDE = mInIDE
+End Property
+
+Public Property Get InDebugger() As Boolean
+    InDebugger = mInDebugger
+End Property
 
 Private Sub Main()
-    Debug.Assert SetInIDE
-    
+    Call SetInIDE
     Call SetInDebugger
     Call InitWin32Api
-    Call InitHelper
     Call InitPublicFunctions
     Call InitcDateTimeHelpers
     Call InitEncodingHelpers
 End Sub
 
+''
+' This is to determine if the compiled dll is being used in the
+' VB6 IDE by another project. This is primarily so that the console
+' class can disable the exit button if we are running in an IDE.
+'
 Private Sub SetInDebugger()
-    Dim result As String
-    result = String$(1024, 0)
+    Dim Result As String
+    Result = String$(1024, 0)
     
-    Call GetModuleFileName(vbNullPtr, result, Len(result))
+    Call GetModuleFileName(vbNullPtr, Result, Len(Result))
     
     Dim i As Long
-    i = InStr(result, vbNullChar)
+    i = InStr(Result, vbNullChar)
     
-    result = Left$(result, i - 1)
+    Result = Left$(Result, i - 1)
     
-    InDebugger = (UCase$(Right$(result, 8)) = "\VB6.EXE")
+    mInDebugger = (UCase$(Right$(Result, 8)) = "\VB6.EXE")
 End Sub
 
-Private Function SetInIDE() As Boolean
-    InIDE = True
-    SetInIDE = True
-End Function
+Private Sub SetInIDE()
+    On Error GoTo errTrap
+    Debug.Assert 1 \ 0
+    Exit Sub
+    
+errTrap:
+    mInIDE = True
+End Sub
