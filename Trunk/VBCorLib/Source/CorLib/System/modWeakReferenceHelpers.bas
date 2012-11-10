@@ -41,19 +41,19 @@ Private Const IID_IProvideClassInfo_Data1   As Long = &HB196B283
 
 ' our lightweight object that replaces the existing VTable.
 Public Type WeakRefHookType
-    VTable(3) As Long
+    VTable(3)       As Long
     pOriginalVTable As Long
-    Target As IProvideClassInfo
-    pOwner As Long
+    Target          As IProvideClassInfo
+    pOwner          As Long
 End Type
 
 ' Used to access a WeakRefHookType through a pointer.
 Private Type WeakSafeArray
-    pVTable As Long
-    This As IUnknown
-    pRelease As Long
-    SA As SafeArray1d
-    WeakRef() As WeakRefHookType
+    pVTable             As Long
+    This                As IUnknown
+    pRelease            As Long
+    SA                  As SafeArray1d
+    WeakRef()           As WeakRefHookType
 End Type
 
 
