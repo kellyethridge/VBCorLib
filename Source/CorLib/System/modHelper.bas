@@ -29,12 +29,31 @@ Attribute VB_Name = "modHelper"
 '
 Option Explicit
 
-Private Type HelperType
+Private Const OutOfMemoryError      As Long = 7
+Private Const OffsetToFirstFunction As Long = 4
+Private Const Swap4Offset           As Long = 0
+Private Const Swap8Offset           As Long = 5
+Private Const Swap16Offset          As Long = 13
+Private Const Swap2Offset           As Long = 25
+Private Const Swap1Offset           As Long = 31
+Private Const DerefEBPOffset        As Long = 36
+Private Const MoveVariantOffset     As Long = 39
+Private Const EcvtCallOffset        As Long = 50
+Private Const ShiftRightOffset      As Long = 72
+Private Const ShiftLeftOffset       As Long = 76
+Private Const UAddOffset            As Long = 80
+Private Const UAdd64Offset          As Long = 84
+
+
+' We expose this directly so we don't have to manage reference counting. This requires
+' a call to InitHelper before it can be used. The call is currently made in Main.
+Public Helper As IHelper
+
+Private Type HelperVTable
     pVTable     As Long
     Func(17)    As Long
 End Type
 
-Private mHelper     As Helper
 Private mAsm()      As Long
 Private mMSVCLib    As Long
 
@@ -42,50 +61,49 @@ Private mMSVCLib    As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Public Methods
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Public Property Get Helper() As Helper
-    If mHelper Is Nothing Then
-        InitHelper
-    End If
+Public Sub InitHelper()
+    Dim Table As HelperVTable
     
-    Set Helper = mHelper
-End Property
+    Call InitAsm
+    Call InitVTable(Table)
+    Call AllocateObject(Table)
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub InitHelper()
-    Const OutOfMemoryCode As Long = 7
-    Call InitAsm
-    
-    Dim HelperStruct    As HelperType
-    Dim This            As Long
-    This = CoTaskMemAlloc(LenB(HelperStruct))
-    If This = 0 Then Err.Raise OutOfMemoryCode
-    
-    With HelperStruct
+Private Sub InitVTable(ByRef Table As HelperVTable)
+    With Table
         .Func(0) = FuncAddr(AddressOf QueryInterface)
         .Func(1) = FuncAddr(AddressOf AddRef)
         .Func(2) = FuncAddr(AddressOf Release)
-        .Func(3) = VarPtr(mAsm(0))
-        .Func(4) = VarPtr(mAsm(5))
-        .Func(5) = VarPtr(mAsm(13))
-        .Func(6) = VarPtr(mAsm(25))
-        .Func(7) = VarPtr(mAsm(31))
-        .Func(8) = VarPtr(mAsm(36))
-        .Func(9) = VarPtr(mAsm(39))
-        .Func(10) = VarPtr(mAsm(50))
-        .Func(11) = VarPtr(mAsm(72))
-        .Func(12) = VarPtr(mAsm(76))
-        .Func(13) = VarPtr(mAsm(80))
-        .Func(14) = VarPtr(mAsm(84))
-        
-        .pVTable = This + 4
+        .Func(3) = VarPtr(mAsm(Swap4Offset))
+        .Func(4) = VarPtr(mAsm(Swap8Offset))
+        .Func(5) = VarPtr(mAsm(Swap16Offset))
+        .Func(6) = VarPtr(mAsm(Swap2Offset))
+        .Func(7) = VarPtr(mAsm(Swap1Offset))
+        .Func(8) = VarPtr(mAsm(DerefEBPOffset))
+        .Func(9) = VarPtr(mAsm(MoveVariantOffset))
+        .Func(10) = VarPtr(mAsm(EcvtCallOffset))
+        .Func(11) = VarPtr(mAsm(ShiftRightOffset))
+        .Func(12) = VarPtr(mAsm(ShiftLeftOffset))
+        .Func(13) = VarPtr(mAsm(UAddOffset))
+        .Func(14) = VarPtr(mAsm(UAdd64Offset))
     End With
+End Sub
+
+Private Sub AllocateObject(ByRef Table As HelperVTable)
+    Dim This As Long
+    This = CoTaskMemAlloc(LenB(Table))
+    If This = vbNullPtr Then _
+        Err.Raise OutOfMemoryError
+        
+    Table.pVTable = This + OffsetToFirstFunction
     
-    Call CopyMemory(ByVal This, HelperStruct, LenB(HelperStruct))
+    Call CopyMemory(ByVal This, Table, LenB(Table))
     
-    ObjectPtr(mHelper) = This
+    ObjectPtr(Helper) = This
 End Sub
 
 Private Sub InitAsm()
@@ -232,5 +250,5 @@ Private Function AddRef(ByVal This As Long) As Long
 End Function
 
 Private Function Release(ByVal This As Long) As Long
-    CoTaskMemFree This
+    Call CoTaskMemFree(This)
 End Function

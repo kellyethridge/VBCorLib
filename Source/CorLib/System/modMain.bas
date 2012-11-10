@@ -35,6 +35,7 @@ End Property
 Private Sub Main()
     Call SetInIDE
     Call SetInDebugger
+    Call InitHelper
     Call InitWin32Api
     Call InitPublicFunctions
     Call InitcDateTimeHelpers
