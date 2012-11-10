@@ -50,7 +50,7 @@ End Type
 ' Used to access a WeakRefHookType through a pointer.
 Private Type WeakSafeArray
     pVTable As Long
-    this As IUnknown
+    This As IUnknown
     pRelease As Long
     SA As SafeArray1d
     WeakRef() As WeakRefHookType
@@ -83,7 +83,7 @@ Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As 
         With mWeak
             .pRelease = FuncAddr(AddressOf WeakReferenceArray_Release)
             .pVTable = VarPtr(.pVTable)
-            ObjectPtr(.this) = VarPtr(mWeak)
+            ObjectPtr(.This) = VarPtr(mWeak)
             SAPtr(.WeakRef) = VarPtr(.SA)
             
             With .SA
@@ -94,15 +94,15 @@ Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As 
         End With
     End If
     
-    Dim this As Long
-    this = CoTaskMemAlloc(LenB(Weak))
+    Dim This As Long
+    This = CoTaskMemAlloc(LenB(Weak))
     
     ' Since all the Exception classes use a WeakReference
     ' object, we can't throw an exception object, because it
     ' will need to create the WeakReference. And if we have
     ' failed to create this WeakReference, we will most certainly
     ' fail to create the WeakReferences for any Exceptions thrown.
-    If this = 0 Then Err.Raise 7    ' don't use OutOfMemoryException since it may fail to create.
+    If This = 0 Then Err.Raise 7    ' don't use OutOfMemoryException since it may fail to create.
     
     With Weak
         .VTable(0) = FuncAddr(AddressOf WeakReference_QueryInterface)
@@ -117,14 +117,14 @@ Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As 
         
         MemLong(VarPtr(.Target)) = pUnk
         .pOriginalVTable = MemLong(pUnk)
-        MemLong(pUnk) = this
+        MemLong(pUnk) = This
         
         .pOwner = ObjPtr(Owner)
     End With
     
-    Call CopyMemory(ByVal this, Weak, LenB(Weak))
+    Call CopyMemory(ByVal This, Weak, LenB(Weak))
     Call ZeroMemory(Weak, LenB(Weak))
-    InitWeakReference = this
+    InitWeakReference = This
 End Function
 
 ''
@@ -136,18 +136,18 @@ End Function
 ' @return S_OK is returned on success, otherwise E_NOINTERFACE.
 ' @remarks This is the function used in the VTable QueryInterface.
 '
-Private Function WeakReference_QueryInterface(ByRef this As Long, ByRef riid As VBGUID, ByRef pvObj As Long) As Long
+Private Function WeakReference_QueryInterface(ByRef This As Long, ByRef riid As VBGUID, ByRef pvObj As Long) As Long
     Dim OldVTable As Long
     
-    OldVTable = this
+    OldVTable = This
     pvObj = 0
     
-    mWeak.SA.pvData = this
+    mWeak.SA.pvData = This
     With mWeak.WeakRef(0)
-        this = .pOriginalVTable
+        This = .pOriginalVTable
         WeakReference_QueryInterface = .Target.QueryInterface(riid, pvObj)
         If pvObj <> 0 Then
-            If pvObj = VarPtr(this) Then
+            If pvObj = VarPtr(This) Then
                 Dim fOK As Boolean
                 Select Case riid.Data1
                     Case IID_IUnknown_Data1
@@ -163,7 +163,7 @@ Private Function WeakReference_QueryInterface(ByRef this As Long, ByRef riid As 
             End If
         End If
     End With
-    this = OldVTable
+    This = OldVTable
 End Function
 
 ''
@@ -172,18 +172,18 @@ End Function
 ' @param this The pointer to the controlling IUnknown VTable.
 ' @return The number of references so far.
 '
-Private Function WeakReference_AddRef(ByRef this As Long) As Long
+Private Function WeakReference_AddRef(ByRef This As Long) As Long
     Dim OldVTable As Long
-    OldVTable = this
+    OldVTable = This
     
-    mWeak.SA.pvData = this
+    mWeak.SA.pvData = This
     
     With mWeak.WeakRef(0)
-        this = .pOriginalVTable
+        This = .pOriginalVTable
         WeakReference_AddRef = .Target.AddRef
     End With
     
-    this = OldVTable
+    This = OldVTable
 End Function
 
 ''
@@ -193,22 +193,22 @@ End Function
 ' @param this The pointer to the controllin IUnknown VTable.
 ' @return The number of references so far.
 '
-Private Function WeakReference_Release(ByRef this As Long) As Long
+Private Function WeakReference_Release(ByRef This As Long) As Long
     Dim OldVTable As Long
-    OldVTable = this
+    OldVTable = This
     
     With mWeak
-        .SA.pvData = this
+        .SA.pvData = This
     
         With .WeakRef(0)
-            this = .pOriginalVTable
+            This = .pOriginalVTable
             
             If Not .Target Is Nothing Then
                 WeakReference_Release = .Target.Release
             End If
             
             If (WeakReference_Release > 0) And (.pOwner <> 0) Then
-                this = OldVTable
+                This = OldVTable
             Else
                 ObjectPtr(.Target) = 0
                 If .pOwner <> 0 Then
@@ -218,7 +218,7 @@ Private Function WeakReference_Release(ByRef this As Long) As Long
                     ObjectPtr(Owner) = 0
                     .pOwner = 0
                 End If
-                Call CoTaskMemFree(this)
+                Call CoTaskMemFree(This)
             End If
         End With
     End With
@@ -233,24 +233,24 @@ End Function
 ' @param ppTypeInfo A pointer to the ITypeInfo object.
 ' @return Error codes.
 '
-Private Function WeakReference_GetClassInfo(ByRef this As Long, ByRef ppTypeInfo As Long) As Long
+Private Function WeakReference_GetClassInfo(ByRef This As Long, ByRef ppTypeInfo As Long) As Long
     Dim OldVTable As Long
-    OldVTable = this
+    OldVTable = This
     
-    mWeak.SA.pvData = this
+    mWeak.SA.pvData = This
     
     With mWeak.WeakRef(0)
-        this = .pOriginalVTable
+        This = .pOriginalVTable
         WeakReference_GetClassInfo = .Target.GetClassInfo(ppTypeInfo)
     End With
     
-    this = OldVTable
+    This = OldVTable
 End Function
 
 
 ''
 ' Used to kill the mWeak.WeakRef array connection.
 '
-Private Function WeakReferenceArray_Release(ByVal this As Long) As Long
+Private Function WeakReferenceArray_Release(ByVal This As Long) As Long
     SAPtr(mWeak.WeakRef) = 0
 End Function
