@@ -100,7 +100,6 @@ Private Sub AllocateObject(ByRef Table As HelperVTable)
         Err.Raise OutOfMemoryError
         
     Table.pVTable = This + OffsetToFirstFunction
-    
     Call CopyMemory(ByVal This, Table, LenB(Table))
     
     ObjectPtr(Helper) = This

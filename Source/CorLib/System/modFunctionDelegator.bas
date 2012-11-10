@@ -1,30 +1,31 @@
 Attribute VB_Name = "modFunctionDelegator"
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: modFunctionDelegator
+' Module: modFunctionDelegator
 '
 Option Explicit
 
-Private Const DELEGATE_ASM As Currency = -368956918007638.6215@     ' from Matt Curland
-
-''
-' The structure of the lightweight COM function delegator object.
+Private Const DelegationCode        As Currency = -368956918007638.6215@     ' delegator code from Matt Curland
+Private Const VTableFunctionOffset  As Long = 12
 
 Public Type FunctionDelegator
     pVTable     As Long
@@ -33,23 +34,9 @@ Public Type FunctionDelegator
     Func(3)     As Long
 End Type
 
-''
-' holds the ASM code used to delegate to the function address
-Private mDelegateASM As Currency
 
-''
-' holds a pointer to the delegate asm code
-Private mAsm As Long
-
-''
-' holds the addresses to the VTable functions
-'
-Private mInitDelegatorQueryInterface    As Long
-Private mInitDelegatorAddRelease        As Long
-Private mNewDelegatorQueryInterface     As Long
-Private mNewDelegatorAddRef             As Long
-Private mNewDelegatorRelease            As Long
-
+Private mDelegatorLayout    As FunctionDelegator
+Private mDelegateCode       As Currency
 
 ''
 ' Returns an object using a supplied function delegator structure
@@ -61,16 +48,15 @@ Private mNewDelegatorRelease            As Long
 ' @return A lightweight object that can be used to call the function address.
 '
 Public Function InitDelegator(ByRef Delegator As FunctionDelegator, Optional ByVal pfn As Long = 0) As IUnknown
-    If mAsm = 0 Then Init
+    Init
     
     With Delegator
         .pfn = pfn
         .pVTable = VarPtr(.Func(0))
-        .Func(0) = mInitDelegatorQueryInterface
-        .Func(1) = mInitDelegatorAddRelease
-        .Func(2) = mInitDelegatorAddRelease
-        .Func(3) = mAsm
-        .pfn = pfn
+        .Func(0) = FuncAddr(AddressOf InitDelegator_QueryInterface)
+        .Func(1) = FuncAddr(AddressOf InitDelegator_AddRefRelease)
+        .Func(2) = FuncAddr(AddressOf InitDelegator_AddRefRelease)
+        .Func(3) = VarPtr(mDelegateCode)
     End With
     
     ObjectPtr(InitDelegator) = VarPtr(Delegator)
@@ -85,26 +71,18 @@ End Function
 ' @return A lightweight COM object used to call a function.
 '
 Public Function NewDelegator(ByVal pfn As Long) As IUnknown
-    Dim this As Long
-    Dim Struct As FunctionDelegator
-    
-    If mAsm = 0 Then Init
+    Init
 
-    this = CoTaskMemAlloc(LenB(Struct))
-    If this = 0 Then Throw New OutOfMemoryException
+    Dim This As Long
+    This = CoTaskMemAlloc(LenB(mDelegatorLayout))
+    If This = vbNullPtr Then _
+        Throw New OutOfMemoryException
     
-    With Struct
-        .pVTable = this + 12
-        .Func(0) = mNewDelegatorQueryInterface
-        .Func(1) = mNewDelegatorAddRef
-        .Func(2) = mNewDelegatorRelease
-        .Func(3) = mAsm
-        .pfn = pfn
-        .cRefs = 1
-    End With
+    mDelegatorLayout.pfn = pfn
+    mDelegatorLayout.pVTable = This + VTableFunctionOffset
         
-    CopyMemory ByVal this, Struct, LenB(Struct)
-    ObjectPtr(NewDelegator) = this
+    CopyMemory ByVal This, mDelegatorLayout, LenB(mDelegatorLayout)
+    ObjectPtr(NewDelegator) = This
 End Function
 
 
@@ -112,27 +90,30 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Init()
-    mDelegateASM = DELEGATE_ASM
-    mAsm = VarPtr(mDelegateASM)
-    
-    Call VirtualProtect(mDelegateASM, 8, PAGE_EXECUTE_READWRITE, 0&)
-    
-    mInitDelegatorQueryInterface = FuncAddr(AddressOf InitDelegator_QueryInterface)
-    mInitDelegatorAddRelease = FuncAddr(AddressOf InitDelegator_AddRefRelease)
-    mNewDelegatorQueryInterface = FuncAddr(AddressOf NewDelegator_QueryInterface)
-    mNewDelegatorAddRef = FuncAddr(AddressOf NewDelegator_AddRef)
-    mNewDelegatorRelease = FuncAddr(AddressOf NewDelegator_Release)
+    If mDelegateCode = 0 Then
+        mDelegateCode = DelegationCode
+        
+        VirtualProtect mDelegateCode, 8, PAGE_EXECUTE_READWRITE, 0&
+        
+        With mDelegatorLayout
+            .Func(0) = FuncAddr(AddressOf NewDelegator_QueryInterface)
+            .Func(1) = FuncAddr(AddressOf NewDelegator_AddRef)
+            .Func(2) = FuncAddr(AddressOf NewDelegator_Release)
+            .Func(3) = VarPtr(mDelegateCode)
+            .cRefs = 1
+        End With
+    End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   VTable functions used by a user supplied lightweight COM function delegator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function InitDelegator_QueryInterface(ByVal this As Long, ByVal riid As Long, ByRef pvObj As Long) As Long
-    pvObj = this
+Private Function InitDelegator_QueryInterface(ByVal This As Long, ByVal riid As Long, ByRef pvObj As Long) As Long
+    pvObj = This
 End Function
 
-Private Function InitDelegator_AddRefRelease(ByVal this As Long) As Long
+Private Function InitDelegator_AddRefRelease(ByVal This As Long) As Long
     ' do nothing
 End Function
 
@@ -140,21 +121,22 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   VTable functions used by a newly created lightweight COM function delegator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function NewDelegator_QueryInterface(ByRef this As FunctionDelegator, ByVal riid As Long, ByRef pvObj As Long) As Long
-    pvObj = VarPtr(this)
-    NewDelegator_AddRef this
+Private Function NewDelegator_QueryInterface(ByRef This As FunctionDelegator, ByVal riid As Long, ByRef pvObj As Long) As Long
+    pvObj = VarPtr(This)
+    This.cRefs = This.cRefs + 1
 End Function
-Private Function NewDelegator_AddRef(ByRef this As FunctionDelegator) As Long
-    With this
-        .cRefs = .cRefs + 1
-        NewDelegator_AddRef = .cRefs
-    End With
+
+Private Function NewDelegator_AddRef(ByRef This As FunctionDelegator) As Long
+    This.cRefs = This.cRefs + 1
+    NewDelegator_AddRef = This.cRefs
 End Function
-Private Function NewDelegator_Release(ByRef this As FunctionDelegator) As Long
-    With this
-        .cRefs = .cRefs - 1
-        NewDelegator_Release = .cRefs
-        If .cRefs = 0 Then CoTaskMemFree VarPtr(this)
-    End With
+
+Private Function NewDelegator_Release(ByRef This As FunctionDelegator) As Long
+    This.cRefs = This.cRefs - 1
+    If This.cRefs = 0 Then
+        Call CoTaskMemFree(VarPtr(This))
+    End If
+    
+    NewDelegator_Release = This.cRefs
 End Function
 

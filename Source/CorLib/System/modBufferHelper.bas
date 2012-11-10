@@ -28,11 +28,11 @@ Attribute VB_Name = "modBufferHelper"
 Option Explicit
 
 Public Type WordBuffer
-    pVTable As Long
-    this As IUnknown
-    pRelease As Long
-    Data() As Integer
-    SA As SafeArray1d
+    pVTable     As Long
+    This        As IUnknown
+    pRelease    As Long
+    Data()      As Integer
+    SA          As SafeArray1d
 End Type
 
 Private mpRelease As Long
@@ -56,7 +56,7 @@ Public Sub InitWordBuffer(ByRef Buffer As WordBuffer, ByVal pData As Long, ByVal
         .pVTable = VarPtr(.pVTable)
         .pRelease = mpRelease
         SAPtr(.Data) = VarPtr(.SA)
-        ObjectPtr(.this) = VarPtr(.pVTable)
+        ObjectPtr(.This) = VarPtr(.pVTable)
     End With
 End Sub
 
@@ -68,8 +68,8 @@ End Sub
 ' object in the WordBuffer is set to Nothing, causing this function
 ' to be called, allowing the WordBuffer to disconnect the array.
 '
-Private Function WordBuffer_Release(ByRef this As WordBuffer) As Long
-    SAPtr(this.Data) = vbNullPtr
-    this.SA.pvData = vbNullPtr
+Private Function WordBuffer_Release(ByRef This As WordBuffer) As Long
+    SAPtr(This.Data) = vbNullPtr
+    This.SA.pvData = vbNullPtr
 End Function
 
