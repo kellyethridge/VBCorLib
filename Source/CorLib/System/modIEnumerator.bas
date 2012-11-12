@@ -1,99 +1,71 @@
 Attribute VB_Name = "modIEnumerator"
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: modIEnumerator
+' Module: modIEnumerator
 '
 
+''
+' This module is to support the For Each method for classes that implement IEnumerator
+'
 Option Explicit
 
-Private Const E_NOINTERFACE As Long = &H80004002
-Private Const ENUM_FINISHED As Long = 1
+Private Const E_NOINTERFACE             As Long = &H80004002
+Private Const ENUM_FINISHED             As Long = 1
+Private Const OffsetToFirstFunction     As Long = 8
+Private Const IID_IUnknown_Data1        As Long = 0
+Private Const IID_IEnumVariant_Data1    As Long = &H20404
 
-
-' This is the type that will wrap the user enumerator.
-' When a new IEnumVariant compatible object is created,
-' it will have the internal structure of UserEnumWrapperType
-Private Type UserEnumWrapperType
-   pVTable  As Long
-   cRefs    As Long
-   UserEnum As IEnumerator
+Private Type EnumeratorWrapper
+   pVTable      As Long
+   cRefs        As Long
+   Func(0 To 6) As Long
+   Enumerator   As IEnumerator
 End Type
 
-' This is an array of pointers to functions that the
-' object's VTable will point to.
-Private Type VTable
-   Functions(0 To 6) As Long
-End Type
-
-
-
-' The created VTable of function pointers
-Private mVTable As VTable
-
-' Pointer to the mVTable memory address.
-Private mpVTable As Long
-
-' GUIDs to identify IUnknown and IEnumVariant when
-' the interface is queried.
-Private IID_IUnknown As VBGUID
-Private Const IID_IUnknown_Data1 As Long = 0
-Private IID_IEnumVariant As VBGUID
-Private Const IID_IEnumVariant_Data1 As Long = &H20404
-
+Private IID_IUnknown        As VBGUID
+Private IID_IEnumVariant    As VBGUID
+Private mInitialized        As Boolean
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '  Public Functions
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-' Creates the LightWeight object that will wrap the user's enumerator.
-Public Function CreateEnumerator(ByVal Obj As IEnumerator) As stdole.IUnknown
-    Dim This    As Long
-    Dim Struct  As UserEnumWrapperType
+Public Function CreateEnumerator(ByVal Enumerator As IEnumerator) As IUnknown
+    Dim Wrapper As EnumeratorWrapper
     
-    If mpVTable = 0 Then Call Init
-    
-    ' allocate memory to place the new object.
-    This = CoTaskMemAlloc(Len(Struct))
-    If This = vbNullPtr Then Throw New OutOfMemoryException
-    
-    ' fill the structure of the new wrapper object
-    With Struct
-        Set .UserEnum = Obj
-        .cRefs = 1
-        .pVTable = mpVTable
-    End With
-    
-    ' move the structure to the allocated memory to complete the object
-    Call CopyMemory(ByVal This, ByVal VarPtr(Struct), LenB(Struct))
-    Call ZeroMemory(ByVal VarPtr(Struct), LenB(Struct))
-    
-    ' assign the return value to the newly create object.
-    ObjectPtr(CreateEnumerator) = This
+    Call Initialize
+    Call InitVTable(Wrapper)
+    Set CreateEnumerator = AllocateObject(Wrapper, Enumerator)
 End Function
 
 
-
-' setup the guids and vtable function pointers.
-Private Sub Init()
-    Call InitGUIDS
-    Call InitVTable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Private Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Initialize()
+    If Not mInitialized Then
+        InitGUIDS
+        mInitialized = True
+    End If
 End Sub
 
 Private Sub InitGUIDS()
@@ -108,20 +80,32 @@ Private Sub InitGUIDS()
     End With
 End Sub
 
-Private Sub InitVTable()
-    With mVTable
-        .Functions(0) = FuncAddr(AddressOf QueryInterface)
-        .Functions(1) = FuncAddr(AddressOf AddRef)
-        .Functions(2) = FuncAddr(AddressOf Release)
-        .Functions(3) = FuncAddr(AddressOf IEnumVariant_Next)
-        .Functions(4) = FuncAddr(AddressOf IEnumVariant_Skip)
-        .Functions(5) = FuncAddr(AddressOf IEnumVariant_Reset)
-        .Functions(6) = FuncAddr(AddressOf IEnumVariant_Clone)
-        
-        mpVTable = VarPtr(.Functions(0))
-   End With
+Private Sub InitVTable(ByRef Table As EnumeratorWrapper)
+    With Table
+        .cRefs = 1
+        .Func(0) = FuncAddr(AddressOf QueryInterface)
+        .Func(1) = FuncAddr(AddressOf AddRef)
+        .Func(2) = FuncAddr(AddressOf Release)
+        .Func(3) = FuncAddr(AddressOf IEnumVariant_Next)
+        .Func(4) = FuncAddr(AddressOf IEnumVariant_Skip)
+        .Func(5) = FuncAddr(AddressOf IEnumVariant_Reset)
+        .Func(6) = FuncAddr(AddressOf IEnumVariant_Clone)
+    End With
 End Sub
 
+Private Function AllocateObject(ByRef Wrapper As EnumeratorWrapper, ByVal Enumerator As IEnumerator) As IUnknown
+    Dim This As Long
+    This = CoTaskMemAlloc(Len(Wrapper))
+    If This = vbNullPtr Then _
+        Throw New OutOfMemoryException
+    
+    Wrapper.pVTable = This + OffsetToFirstFunction
+    Set Wrapper.Enumerator = Enumerator
+    Call CopyMemory(ByVal This, Wrapper, LenB(Wrapper))
+    Call ZeroMemory(Wrapper, LenB(Wrapper)) ' we zero the structure to prevent the Wrapper.Enumerator reference count from changing.
+    
+    ObjectPtr(AllocateObject) = This
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -131,19 +115,17 @@ End Sub
 ' When VB queries the interface, we support only two.
 ' IUnknown
 ' IEnumVariant
-Private Function QueryInterface(ByRef This As UserEnumWrapperType, _
-                                ByRef riid As VBGUID, _
-                                ByRef pvObj As Long) As Long
-    Dim ok As BOOL
+Private Function QueryInterface(ByRef This As EnumeratorWrapper, ByRef riid As VBGUID, ByRef pvObj As Long) As Long
+    Dim IsMatch As Boolean
     
     Select Case riid.Data1
         Case IID_IEnumVariant_Data1
-            ok = IsEqualGUID(riid, IID_IEnumVariant)
+            IsMatch = CBool(IsEqualGUID(riid, IID_IEnumVariant))
         Case IID_IUnknown_Data1
-            ok = IsEqualGUID(riid, IID_IUnknown)
+            IsMatch = CBool(IsEqualGUID(riid, IID_IUnknown))
     End Select
     
-    If ok Then
+    If IsMatch Then
         pvObj = VarPtr(This)
         Call AddRef(This)
     Else
@@ -151,54 +133,42 @@ Private Function QueryInterface(ByRef This As UserEnumWrapperType, _
     End If
 End Function
 
-
-' increment the number of references to the object.
-Private Function AddRef(ByRef This As UserEnumWrapperType) As Long
-    With This
-        .cRefs = .cRefs + 1
-        AddRef = .cRefs
-    End With
+Private Function AddRef(ByRef This As EnumeratorWrapper) As Long
+    This.cRefs = This.cRefs + 1
+    AddRef = This.cRefs
 End Function
 
-
-' decrement the number of references to the object, checking
-' to see if the last reference was released.
-Private Function Release(ByRef This As UserEnumWrapperType) As Long
-    With This
-        .cRefs = .cRefs - 1
-        Release = .cRefs
-        If .cRefs = 0 Then Call Delete(This)
-    End With
+Private Function Release(ByRef This As EnumeratorWrapper) As Long
+    This.cRefs = This.cRefs - 1
+    Release = This.cRefs
+    
+    If This.cRefs = 0 Then
+        Call Delete(This)
+    End If
 End Function
 
-
-' cleans up the lightweight objects and releases the memory
-Private Sub Delete(ByRef This As UserEnumWrapperType)
-   Set This.UserEnum = Nothing
+Private Sub Delete(ByRef This As EnumeratorWrapper)
+   Set This.Enumerator = Nothing
    Call CoTaskMemFree(VarPtr(This))
 End Sub
 
-
-' move to the next element and return it, signaling if we have reached the end.
-Private Function IEnumVariant_Next(ByRef This As UserEnumWrapperType, ByVal celt As Long, ByRef prgVar As Variant, ByVal pceltFetched As Long) As Long
-    If This.UserEnum.MoveNext Then
-        Call Helper.MoveVariant(prgVar, This.UserEnum.Current)
+Private Function IEnumVariant_Next(ByRef This As EnumeratorWrapper, ByVal celt As Long, ByRef prgVar As Variant, ByVal pceltFetched As Long) As Long
+    Const NumberOfItemsFetched As Long = 1
+    
+    If This.Enumerator.MoveNext Then
+        Call Helper.MoveVariant(prgVar, This.Enumerator.Current)
         
-        ' check to see if the pointer is valid (not zero)
-        ' before we write to that memory location.
-        If pceltFetched Then
-            MemLong(pceltFetched) = 1
+        If pceltFetched <> vbNullPtr Then
+            MemLong(pceltFetched) = NumberOfItemsFetched
         End If
     Else
         IEnumVariant_Next = ENUM_FINISHED
     End If
 End Function
 
-
-' skip the requested number of elements as long as we don't run out of them.
-Private Function IEnumVariant_Skip(ByRef This As UserEnumWrapperType, ByVal celt As Long) As Long
+Private Function IEnumVariant_Skip(ByRef This As EnumeratorWrapper, ByVal celt As Long) As Long
     Do While celt > 0
-        If This.UserEnum.MoveNext = False Then
+        If Not This.Enumerator.MoveNext Then
             IEnumVariant_Skip = ENUM_FINISHED
             Exit Function
         End If
@@ -206,16 +176,12 @@ Private Function IEnumVariant_Skip(ByRef This As UserEnumWrapperType, ByVal celt
     Loop
 End Function
 
-
-' request the user enum to reset.
-Private Function IEnumVariant_Reset(ByRef This As UserEnumWrapperType) As Long
-   Call This.UserEnum.Reset
+Private Function IEnumVariant_Reset(ByRef This As EnumeratorWrapper) As Long
+   Call This.Enumerator.Reset
 End Function
 
-
-' we just return a reference to the original object.
-Private Function IEnumVariant_Clone(ByRef This As UserEnumWrapperType, ByRef ppenum As stdole.IUnknown) As Long
+Private Function IEnumVariant_Clone(ByRef This As EnumeratorWrapper, ByRef ppenum As stdole.IUnknown) As Long
     Dim o As ICloneable
-    Set o = This.UserEnum
+    Set o = This.Enumerator
     Set ppenum = o.Clone
 End Function
