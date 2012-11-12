@@ -64,9 +64,9 @@ Private mMSVCLib    As Long
 Public Sub InitHelper()
     Dim Table As HelperVTable
     
-    Call InitAsm
-    Call InitVTable(Table)
-    Call AllocateObject(Table)
+    InitAsm
+    InitVTable Table
+    AllocateObject Table
 End Sub
 
 
@@ -100,7 +100,7 @@ Private Sub AllocateObject(ByRef Table As HelperVTable)
         Err.Raise OutOfMemoryError
         
     Table.pVTable = This + OffsetToFirstFunction
-    Call CopyMemory(ByVal This, Table, LenB(Table))
+    CopyMemory ByVal This, Table, LenB(Table)
     
     ObjectPtr(Helper) = This
 End Sub
@@ -249,5 +249,5 @@ Private Function AddRef(ByVal This As Long) As Long
 End Function
 
 Private Function Release(ByVal This As Long) As Long
-    Call CoTaskMemFree(This)
+    CoTaskMemFree This
 End Function

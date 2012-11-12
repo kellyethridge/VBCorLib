@@ -32,7 +32,7 @@ Public Sub Copy_WithLongs_CopiesAllElements()
     Assert.That Target, Iz.EqualTo(Source)
 End Sub
 
-Public Sub Copyt_WithStrings_CopiesAllElements()
+Public Sub Copy_WithStrings_CopiesAllElements()
     Dim Source() As String
     Dim Target() As String
     Source = NewStrings("1", "2", "3", "4", "5")

@@ -587,7 +587,12 @@ End Sub
 ' End Sub
 ' </pre>
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Count As Long, Optional ByVal AddressOfCopier As Long)
-    Call InternalCopy(SourceArray, DestinationArray, Count, AddressOfCopier)
+    If IsNull(SourceArray) Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "SourceArray")
+    If IsNull(DestinationArray) Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "DestinationArray")
+        
+    Call InternalCopy(SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Count, AddressOfCopier)
 End Sub
 
 ''
@@ -610,7 +615,7 @@ End Sub
 ' End Sub
 ' </pre>
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Count As Long, Optional ByVal AddressOfCopier As Long = 0)
-    Call InternalCopy(SourceArray, DestinationArray, Count, AddressOfCopier, SourceIndex, DestinationIndex)
+    Call InternalCopy(SourceArray, SourceIndex, DestinationArray, DestinationIndex, Count, AddressOfCopier)
 End Sub
 
 ''
@@ -1076,26 +1081,25 @@ End Sub
 ' being used as source and destination and calls the appropriate copy method
 ' for any possible casting between arrays.
 '
-Private Sub InternalCopy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Count As Long, ByVal AddressOfCopier As Long, Optional ByRef SourceIndex As Variant, Optional ByRef DestinationIndex As Variant)
+Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Count As Long, ByVal AddressOfCopier As Long)
     Dim pSourceSafeArray As Long
-    pSourceSafeArray = GetArrayPointer(SourceArray, True)
-    
+    pSourceSafeArray = GetArrayPointer(SourceArray)
+    If pSourceSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "SourceArray")
+
     Dim pDestinationSafeArray As Long
-    pDestinationSafeArray = GetArrayPointer(DestinationArray, True)
-    
-    Dim SourceElemIndex         As Long
-    Dim DestinationElemIndex    As Long
-    If GetOptionalLongPair(SourceIndex, LBound(SourceArray), SourceElemIndex, DestinationIndex, LBound(DestinationArray), DestinationElemIndex) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(SourceIndex), "SourceIndex", "DestinationIndex"))
+    pDestinationSafeArray = GetArrayPointer(DestinationArray)
+    If pDestinationSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "DestinationArray")
     
     Dim Result As Long
     ' verify the range of the source array.
-    Result = VerifyArrayRange(pSourceSafeArray, SourceElemIndex, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "SourceArray", SourceElemIndex, "SourceIndex", Count, "Count", IsMissing(SourceIndex)
+    Result = VerifyArrayRange(pSourceSafeArray, SourceIndex, Count)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "SourceArray", SourceIndex, "SourceIndex", Count, "Count" ', IsMissing(SourceIndex)
     
     ' verify the range of the destination array.
-    Result = VerifyArrayRange(pDestinationSafeArray, DestinationElemIndex, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "DestinationArray", DestinationElemIndex, "DestinationIndex", Count, "Count", IsMissing(DestinationIndex)
+    Result = VerifyArrayRange(pDestinationSafeArray, DestinationIndex, Count)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "DestinationArray", DestinationIndex, "DestinationIndex", Count, "Count" ', IsMissing(DestinationIndex)
     
     Dim srcArrayType As VbVarType
     srcArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
@@ -1108,13 +1112,13 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByRef DestinationArray As
             Select Case srcArrayType
                 Case vbObject, vbDataObject
                     If IsEqualGUID(ByVal pSourceSafeArray - SIZEOF_GUID, ByVal pDestinationSafeArray - SIZEOF_GUID) <> BOOL_FALSE Then
-                        Call CopyReferenceTypes(pSourceSafeArray, SourceElemIndex, pDestinationSafeArray, DestinationElemIndex, Count)
+                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
                     Else
-                        Call CopyObjectTypesCast(pSourceSafeArray, SourceElemIndex, pDestinationSafeArray, DestinationElemIndex, Count)
+                        Call CopyObjectTypesCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
                     End If
                     
                 Case vbString, vbVariant
-                    Call CopyReferenceTypes(pSourceSafeArray, SourceElemIndex, pDestinationSafeArray, DestinationElemIndex, Count)
+                    Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
                     
                 Case vbUserDefinedType
                     Dim SrcUDT As IRecordInfo
@@ -1124,13 +1128,13 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByRef DestinationArray As
                     Set DstUDT = SafeArrayGetRecordInfo(pDestinationSafeArray)
                     
                     If SrcUDT.IsMatchingType(DstUDT) Then
-                        Call CopyReferenceTypes(pSourceSafeArray, SourceElemIndex, pDestinationSafeArray, DestinationElemIndex, Count)
+                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
                     Else
                         Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
                     End If
                     
                 Case Else
-                    Call CopyValueTypes(pSourceSafeArray, SourceElemIndex, pDestinationSafeArray, DestinationElemIndex, Count)
+                    Call CopyValueTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
             End Select
         Else
             ' Attempt to copy by casting from one datatype to another.
@@ -1139,11 +1143,11 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByRef DestinationArray As
             If pfn = 0 Then _
                 Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             
-            Call CopyWithCast(pSourceSafeArray, SourceElemIndex, pDestinationSafeArray, DestinationElemIndex, Count, pfn)
+            Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count, pfn)
         End If
     Else
         ' Use the user callback method as the casting function.
-        Call CopyWithCast(pSourceSafeArray, SourceElemIndex, pDestinationSafeArray, DestinationElemIndex, Count, AddressOfCopier)
+        Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count, AddressOfCopier)
     End If
 End Sub
 
