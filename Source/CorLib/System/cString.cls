@@ -71,13 +71,13 @@ End Function
 ' @param Count The number of characters to use.
 ' @return A string created from the chars in an integer array.
 '
-Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef index As Variant, Optional ByRef count As Variant) As String
+Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim result      As Long
+    Dim Result      As Long
     
-    result = GetOptionalArrayRange(SAPtr(Chars), index, ElemIndex, count, ElemCount)
-    If result <> NO_ERROR Then Call ThrowArrayRangeException(result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(index))
+    Result = GetOptionalArrayRange(SAPtr(Chars), Index, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
     If ElemCount = 0 Then
         ' We don't want a Null string returned.
@@ -91,60 +91,60 @@ End Function
 ''
 ' Formats a string by replacing each argument with the formatted equivalent.
 '
-' @param fmt The string containing formatting information.
+' @param FormatText The string containing formatting information.
 ' @param args A list of arguments to use in replacing the formatting information.
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 ' @include "..\Includes\cString.Format.txt"
-Public Function Format(ByRef fmt As String, ParamArray args() As Variant) As String
+Public Function Format(ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
     Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16))
-    Format = FormatArrayEx(Nothing, fmt, vArgs)
+    Format = FormatArrayEx(Nothing, FormatText, vArgs)
 End Function
 
 ''
 ' Formats a string by replacing each argument with the formatted equivalent.
 '
 ' @param provider A custom format provider that is used to format the argument instead of the default formatting.
-' @param fmt The string containing formatting information.
+' @param FormatText The string containing formatting information.
 ' @param args A list of arguments to use in replacing the formatting information.
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 '
-Public Function FormatEx(ByVal Provider As IFormatProvider, ByRef fmt As String, ParamArray args() As Variant) As String
+Public Function FormatEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
     Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(20))
-    FormatEx = FormatArrayEx(Provider, fmt, vArgs)
+    FormatEx = FormatArrayEx(Provider, FormatText, vArgs)
 End Function
 
 ''
 ' Formats a string by replacing each argument with the formatted equivalent.
 '
-' @param fmt The string containing formatting information.
+' @param FormatText The string containing formatting information.
 ' @param args A list of arguments to use in replacing the formatting information.
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 '
-Public Function FormatArray(ByRef fmt As String, ByRef args() As Variant) As String
-    FormatArray = FormatArrayEx(Nothing, fmt, args)
+Public Function FormatArray(ByRef FormatText As String, ByRef Args() As Variant) As String
+    FormatArray = FormatArrayEx(Nothing, FormatText, Args)
 End Function
 
 ''
 ' Formats a string by replacing each argument with the formatted equivalent.
 '
 ' @param provider A custom format provider that is used to format the argument instead of the default formatting.
-' @param fmt The string containing formatting information.
+' @param FormatText The string containing formatting information.
 ' @param args A list of arguments to use in replacing the formatting information.
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 '
-Public Function FormatArrayEx(ByVal Provider As IFormatProvider, ByRef fmt As String, ByRef args() As Variant) As String
+Public Function FormatArrayEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ByRef Args() As Variant) As String
     mBuilder.Length = 0
-    Call mBuilder.InternalAppendFormat(Provider, fmt, args)
+    Call mBuilder.InternalAppendFormat(Provider, FormatText, Args)
     FormatArrayEx = mBuilder.ToString
 End Function
 
@@ -159,18 +159,18 @@ End Function
 Public Function ToCharArray(ByRef s As String, Optional ByRef startIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim result      As Long
-    result = GetOptionalListRange(Len(s), startIndex, ElemIndex, Length, ElemCount)
-    If result <> NO_ERROR Then Call ThrowListRangeException(result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex))
+    Dim Result      As Long
+    Result = GetOptionalListRange(Len(s), startIndex, ElemIndex, Length, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex))
     
-    Dim ret() As Integer
+    Dim Ret() As Integer
     If ElemCount > 0 Then
-        ReDim ret(0 To ElemCount - 1)
-        Call CopyMemory(ret(0), ByVal StrPtr(s) + ElemIndex * 2, ElemCount * 2)
+        ReDim Ret(0 To ElemCount - 1)
+        Call CopyMemory(Ret(0), ByVal StrPtr(s) + ElemIndex * 2, ElemCount * 2)
     Else
-        ret = Cor.NewIntegers()
+        Ret = Cor.NewIntegers()
     End If
-    ToCharArray = ret
+    ToCharArray = Ret
 End Function
 
 ''
@@ -335,7 +335,7 @@ End Function
 ' @param Count The number of strings elements to join together.
 ' @return A string containing elements joined from the array separated by the delimiter.
 '
-Public Function Join(ByRef Arr As Variant, Optional ByRef Delimiter As Variant, Optional ByRef index As Variant, Optional ByRef count As Variant) As String
+Public Function Join(ByRef Arr As Variant, Optional ByRef Delimiter As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim pSA         As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -354,12 +354,12 @@ Public Function Join(ByRef Arr As Variant, Optional ByRef Delimiter As Variant, 
     lb = LBound(Arr)
     ub = UBound(Arr)
     
-    ElemIndex = GetOptionalLong(index, lb)
-    ElemCount = GetOptionalLong(count, ub - ElemIndex + 1)
+    ElemIndex = GetOptionalLong(Index, lb)
+    ElemCount = GetOptionalLong(Count, ub - ElemIndex + 1)
     
-    Dim result As Long
-    result = VerifyArrayRange(pSA, ElemIndex, ElemCount)
-    If result <> NO_ERROR Then Call ThrowArrayRangeException(result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(index))
+    Dim Result As Long
+    Result = VerifyArrayRange(pSA, ElemIndex, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
     With mJoinSA
         .cElements = ElemCount
@@ -378,18 +378,18 @@ End Function
 ' @param Count The number of characters to be removed.
 ' @return A new string with the substring removed.
 '
-Public Function Remove(ByRef s As String, ByVal startIndex As Long, ByVal count As Long) As String
+Public Function Remove(ByRef s As String, ByVal startIndex As Long, ByVal Count As Long) As String
     Dim CharCount As Long
     CharCount = Len(s)
     
-    Dim result As Long
-    result = VerifyListRange(CharCount, startIndex, count)
-    If result <> NO_ERROR Then Call ThrowListRangeException(result, startIndex, "StartIndex", count, "Count")
+    Dim Result As Long
+    Result = VerifyListRange(CharCount, startIndex, Count)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, startIndex, "StartIndex", Count, "Count")
     
     Dim sp As Long
     sp = StrPtr(s)
-    Remove = SysAllocStringLen(sp, CharCount - count)
-    Call CopyMemory(ByVal StrPtr(Remove) + startIndex * 2, ByVal sp + (startIndex + count) * 2, (CharCount - (startIndex + count)) * 2)
+    Remove = SysAllocStringLen(sp, CharCount - Count)
+    Call CopyMemory(ByVal StrPtr(Remove) + startIndex * 2, ByVal sp + (startIndex + Count) * 2, (CharCount - (startIndex + Count)) * 2)
 End Function
 
 ''
@@ -402,8 +402,8 @@ End Function
 ' @return The index of a character from the set, or -1 if none are found.
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
-Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByVal index As Variant, Optional ByVal count As Variant) As Long
-    IndexOfAny = InternalIndexOfAny(s, OfAny, index, count, True)
+Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByVal Index As Variant, Optional ByVal Count As Variant) As Long
+    IndexOfAny = InternalIndexOfAny(s, OfAny, Index, Count, True)
 End Function
 
 ''
@@ -417,8 +417,8 @@ End Function
 ' @return The index of a character from the set, or -1 if none are found.
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
-Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByVal index As Variant, Optional ByVal count As Variant) As Long
-    LastIndexOfAny = InternalIndexOfAny(s, OfAny, index, count, False)
+Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByVal Index As Variant, Optional ByVal Count As Variant) As Long
+    LastIndexOfAny = InternalIndexOfAny(s, OfAny, Index, Count, False)
 End Function
 
 ''
@@ -430,12 +430,12 @@ End Function
 ' @return A string containing the new string created from the insertion.
 ' @remarks Index is zero-based.
 '
-Public Function Insert(ByRef s As String, ByVal index As Long, ByRef value As String) As String
-    If index < 0 Or index > Len(s) Then _
-        Throw Cor.NewArgumentOutOfRangeException(cString.Format("Index must be between 0 and {0}.", Len(s)), "Index", index)
+Public Function Insert(ByRef s As String, ByVal Index As Long, ByRef Value As String) As String
+    If Index < 0 Or Index > Len(s) Then _
+        Throw Cor.NewArgumentOutOfRangeException(cString.Format("Index must be between 0 and {0}.", Len(s)), "Index", Index)
     
     Dim ValueLength As Long
-    ValueLength = Len(value)
+    ValueLength = Len(Value)
     
     If ValueLength = 0 Then
         Insert = s
@@ -451,10 +451,10 @@ Public Function Insert(ByRef s As String, ByVal index As Long, ByRef value As St
     ptrInsert = StrPtr(Insert)
     
     ValueLength = ValueLength * 2
-    index = index * 2
-    Call CopyMemory(ByVal ptrInsert, ByVal PtrS, index)
-    Call CopyMemory(ByVal ptrInsert + index, ByVal StrPtr(value), ValueLength)
-    Call CopyMemory(ByVal ptrInsert + index + ValueLength, ByVal PtrS + index, LenB(Insert) - (index + ValueLength))
+    Index = Index * 2
+    Call CopyMemory(ByVal ptrInsert, ByVal PtrS, Index)
+    Call CopyMemory(ByVal ptrInsert + Index, ByVal StrPtr(Value), ValueLength)
+    Call CopyMemory(ByVal ptrInsert + Index + ValueLength, ByVal PtrS + Index, LenB(Insert) - (Index + ValueLength))
 End Function
 
 Public Function CharCount(ByRef s As String, ByVal Char As Variant) As Long
@@ -478,19 +478,19 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, ByRef index As Variant, ByRef count As Variant, ByVal ForwardSearch As Boolean) As Long
+Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, ByRef Index As Variant, ByRef Count As Variant, ByVal ForwardSearch As Boolean) As Long
     mString.SA.pvData = StrPtr(s)
     mString.SA.cElements = Len(s)
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim result      As Long
+    Dim Result      As Long
     If ForwardSearch Then
-        result = GetOptionalArrayRange(VarPtr(mString.SA), index, ElemIndex, count, ElemCount)
+        Result = GetOptionalArrayRange(VarPtr(mString.SA), Index, ElemIndex, Count, ElemCount)
     Else
-        result = GetOptionalArrayRangeReverse(VarPtr(mString.SA), index, ElemIndex, count, ElemCount)
+        Result = GetOptionalArrayRangeReverse(VarPtr(mString.SA), Index, ElemIndex, Count, ElemCount)
     End If
-    If result <> NO_ERROR Then Call ThrowArrayRangeException(result, "s", ElemIndex, "Index", ElemCount, "Count", IsMissing(index))
+    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "s", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
 
     Dim Chars() As Integer
     Select Case VarType(OfAny)

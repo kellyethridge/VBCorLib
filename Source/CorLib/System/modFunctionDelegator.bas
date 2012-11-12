@@ -25,7 +25,7 @@ Attribute VB_Name = "modFunctionDelegator"
 Option Explicit
 
 Private Const DelegationCode        As Currency = -368956918007638.6215@     ' delegator code from Matt Curland
-Private Const VTableFunctionOffset  As Long = 12
+Private Const OffsetToFirstFunction As Long = 12
 
 Public Type FunctionDelegator
     pVTable     As Long
@@ -79,7 +79,7 @@ Public Function NewDelegator(ByVal pfn As Long) As IUnknown
         Throw New OutOfMemoryException
     
     mDelegatorLayout.pfn = pfn
-    mDelegatorLayout.pVTable = This + VTableFunctionOffset
+    mDelegatorLayout.pVTable = This + OffsetToFirstFunction
         
     CopyMemory ByVal This, mDelegatorLayout, LenB(mDelegatorLayout)
     ObjectPtr(NewDelegator) = This
