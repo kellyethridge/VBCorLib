@@ -346,9 +346,9 @@ End Function
 ' @param value A value designated as the value of the pair.
 ' @return A new DictionaryEntry containing a key/value pair.
 '
-Public Function NewDictionaryEntry(ByRef Key As Variant, ByRef value As Variant) As DictionaryEntry
+Public Function NewDictionaryEntry(ByRef Key As Variant, ByRef Value As Variant) As DictionaryEntry
     Set NewDictionaryEntry = New DictionaryEntry
-    Call NewDictionaryEntry.Init(Key, value)
+    Call NewDictionaryEntry.Init(Key, Value)
 End Function
 
 ''
@@ -359,9 +359,9 @@ End Function
 ' @param capacity An initial list size.
 ' @return A new SortedList object with the specific initializations.
 '
-Public Function NewSortedList(Optional ByVal List As IDictionary, Optional ByVal Comparer As IComparer, Optional ByVal Capacity As Long = 16) As SortedList
+Public Function NewSortedList(Optional ByVal list As IDictionary, Optional ByVal Comparer As IComparer, Optional ByVal Capacity As Long = 16) As SortedList
     Set NewSortedList = New SortedList
-    Call NewSortedList.Init(List, Comparer, Capacity)
+    Call NewSortedList.Init(list, Comparer, Capacity)
 End Function
 
 ''
@@ -371,9 +371,9 @@ End Function
 ' @param value The value to initialize all the bits to (True = 1, False = 0).
 ' @return A new BitArray object set to the specified length with the specified value.
 '
-Public Function NewBitArray(ByVal Length As Long, Optional ByVal value As Boolean = False) As BitArray
+Public Function NewBitArray(ByVal Length As Long, Optional ByVal Value As Boolean = False) As BitArray
     Set NewBitArray = New BitArray
-    Call NewBitArray.Init(Length, value)
+    Call NewBitArray.Init(Length, Value)
 End Function
 
 ''
@@ -618,9 +618,9 @@ End Function
 ' does not release the byte Buffer. The user still must maintain a reference to the
 ' array and keep it alive for the duration of the MemoryStream's life.
 '
-Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByVal index As Variant, Optional ByVal count As Variant, Optional ByVal Writable As Boolean = True) As MemoryStream
+Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByVal Index As Variant, Optional ByVal Count As Variant, Optional ByVal Writable As Boolean = True) As MemoryStream
     Set NewMemoryStream = New MemoryStream
-    Call NewMemoryStream.Init(Buffer, index, count, Writable)
+    Call NewMemoryStream.Init(Buffer, Index, Count, Writable)
 End Function
 
 ''
@@ -634,9 +634,9 @@ End Function
 ' Count will override this value.
 ' @return A new StringBuilder with s already placed in the buffer.
 '
-Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef startIndex As Variant, Optional ByRef count As Variant, Optional ByVal Capacity As Long = 512) As StringBuilder
+Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Capacity As Long = 512) As StringBuilder
     Set NewStringBuilder = New StringBuilder
-    Call NewStringBuilder.Init(s, startIndex, count, Capacity)
+    Call NewStringBuilder.Init(s, startIndex, Count, Capacity)
 End Function
 
 ''
@@ -927,8 +927,8 @@ End Function
 ' @param Kind Specifies whether the cDateTime is a UTC, Local, or unspecified time type.
 ' @return A cDateTime object.
 '
-Public Function NewDate(ByVal value As Date, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
-    Set NewDate = modStaticClasses.cDateTime.FromOADate(value, Kind)
+Public Function NewDate(ByVal Value As Date, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
+    Set NewDate = modStaticClasses.cDateTime.FromOADate(Value, Kind)
 End Function
 
 ''
@@ -1069,9 +1069,9 @@ End Function
 ' to be created.</p>
 '
 Public Function NewArray(ByVal ArrayType As ciArrayTypes, ParamArray ArrayElements() As Variant) As Variant
-    Dim args() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(args), ByVal Helper.DerefEBP(16))
-    NewArray = cArray.InternalNewArray(ArrayType, args)
+    Dim Args() As Variant
+    Call Helper.Swap4(ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16))
+    NewArray = cArray.InternalNewArray(ArrayType, Args)
 End Function
 
 ''
@@ -1254,21 +1254,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewLongs(ParamArray Values() As Variant) As Long()
-    Dim ret()   As Long
+    Dim Ret()   As Long
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbLong, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbLong, 0, 0)
     End If
     
-    NewLongs = ret
+    NewLongs = Ret
 End Function
 
 ''
@@ -1280,21 +1280,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewBytes(ParamArray Values() As Variant) As Byte()
-    Dim ret()   As Byte
+    Dim Ret()   As Byte
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbByte, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, 0)
     End If
     
-    NewBytes = ret
+    NewBytes = Ret
 End Function
 
 ''
@@ -1306,21 +1306,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewIntegers(ParamArray Values() As Variant) As Integer()
-    Dim ret()   As Integer
+    Dim Ret()   As Integer
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbInteger, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbInteger, 0, 0)
     End If
     
-    NewIntegers = ret
+    NewIntegers = Ret
 End Function
 
 ''
@@ -1332,21 +1332,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewStrings(ParamArray Values() As Variant) As String()
-    Dim ret()   As String
+    Dim Ret()   As String
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbString, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbString, 0, 0)
     End If
     
-    NewStrings = ret
+    NewStrings = Ret
 End Function
 
 ''
@@ -1358,21 +1358,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewSingles(ParamArray Values() As Variant) As Single()
-    Dim ret()   As Single
+    Dim Ret()   As Single
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbSingle, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbSingle, 0, 0)
     End If
     
-    NewSingles = ret
+    NewSingles = Ret
 End Function
 
 ''
@@ -1384,21 +1384,39 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewDoubles(ParamArray Values() As Variant) As Double()
-    Dim ret()   As Double
+    Dim Ret()   As Double
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbDouble, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbDouble, 0, 0)
     End If
     
-    NewDoubles = ret
+    NewDoubles = Ret
+End Function
+
+Public Function NewDecimals(ParamArray Values() As Variant) As Variant()
+    Dim Result()    As Variant
+    Dim ub          As Long
+    
+    ub = UBound(Values)
+    If ub >= 0 Then
+        ReDim Result(0 To ub)
+        Dim i As Long
+        For i = 0 To ub
+            Result(i) = CDec(Values(i))
+        Next
+    Else
+        SAPtr(Result) = SafeArrayCreateVector(vbVariant, 0, 0)
+    End If
+    
+    NewDecimals = Result
 End Function
 
 ''
@@ -1410,21 +1428,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewDates(ParamArray Values() As Variant) As Date()
-    Dim ret()   As Date
+    Dim Ret()   As Date
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbDate, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbDate, 0, 0)
     End If
     
-    NewDates = ret
+    NewDates = Ret
 End Function
 
 ''
@@ -1436,21 +1454,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewCurrencys(ParamArray Values() As Variant) As Currency()
-    Dim ret()   As Currency
+    Dim Ret()   As Currency
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbCurrency, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbCurrency, 0, 0)
     End If
     
-    NewCurrencys = ret
+    NewCurrencys = Ret
 End Function
 
 ''
@@ -1462,21 +1480,21 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewBooleans(ParamArray Values() As Variant) As Boolean()
-    Dim ret()   As Boolean
+    Dim Ret()   As Boolean
     Dim ub      As Long
     
     ub = UBound(Values)
     If ub >= 0 Then
-        ReDim ret(0 To ub)
+        ReDim Ret(0 To ub)
         Dim i As Long
         For i = 0 To ub
-            ret(i) = Values(i)
+            Ret(i) = Values(i)
         Next i
     Else
-        SAPtr(ret) = SafeArrayCreateVector(vbBoolean, 0, 0)
+        SAPtr(Ret) = SafeArrayCreateVector(vbBoolean, 0, 0)
     End If
     
-    NewBooleans = ret
+    NewBooleans = Ret
 End Function
 
 ''
@@ -1724,9 +1742,9 @@ End Function
 ' vbDecimal<br>
 ' vbByte Or vbArray<br>
 '
-Public Function NewBigInteger(ByRef value As Variant) As BigInteger
+Public Function NewBigInteger(ByRef Value As Variant) As BigInteger
     Set NewBigInteger = New BigInteger
-    Call NewBigInteger.Init(value)
+    Call NewBigInteger.Init(Value)
 End Function
 
 ''
@@ -1752,20 +1770,20 @@ End Function
 ' Set b = BInt(<i>somevalue</i>)
 ' </pre>
 '
-Public Function BInt(ByRef value As Variant) As BigInteger
-    Select Case VarType(value)
+Public Function BInt(ByRef Value As Variant) As BigInteger
+    Select Case VarType(Value)
         Case vbObject, vbDataObject
-            If value Is Nothing Then
+            If Value Is Nothing Then
                 Set BInt = BigInteger.Zero
             Else
-                Set BInt = value
+                Set BInt = Value
             End If
             
         Case vbString
-            Set BInt = BigInteger.Parse(value)
+            Set BInt = BigInteger.Parse(Value)
             
         Case Else
-            Set BInt = NewBigInteger(value)
+            Set BInt = NewBigInteger(Value)
     End Select
 End Function
 

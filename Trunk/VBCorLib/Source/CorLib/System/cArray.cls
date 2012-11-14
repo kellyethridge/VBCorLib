@@ -586,13 +586,13 @@ End Sub
 '     dst = src.Name
 ' End Sub
 ' </pre>
-Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Count As Long, Optional ByVal AddressOfCopier As Long)
+Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long, Optional ByVal AddressOfCopier As Long)
     If IsNull(SourceArray) Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "SourceArray")
     If IsNull(DestinationArray) Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "DestinationArray")
-        
-    Call InternalCopy(SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Count, AddressOfCopier)
+    
+    Call InternalCopy(SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length, AddressOfCopier)
 End Sub
 
 ''
@@ -614,8 +614,8 @@ End Sub
 '     dst = src.Name
 ' End Sub
 ' </pre>
-Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Count As Long, Optional ByVal AddressOfCopier As Long = 0)
-    Call InternalCopy(SourceArray, SourceIndex, DestinationArray, DestinationIndex, Count, AddressOfCopier)
+Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long, Optional ByVal AddressOfCopier As Long = 0)
+    Call InternalCopy(SourceArray, SourceIndex, DestinationArray, DestinationIndex, Length, AddressOfCopier)
 End Sub
 
 ''
@@ -706,31 +706,59 @@ End Function
 '
 Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long = 0) As Long
     Dim pSafeArray  As Long
-    Dim Rank        As Long
+'    Dim Rank        As Long
     
     pSafeArray = GetArrayPointer(Arr, True)
+'    Rank = SafeArrayGetDim(pSafeArray)
+'    If Dimension > Rank Then _
+'        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(IndexOutOfRange_Dimension))
+'
+'    pSafeArray = pSafeArray + SIZEOF_SAFEARRAY
+'    If Dimension < 1 Then
+'        ' optimize for 99% of calls
+'        If Rank = 1 Then
+'            GetLength = MemLong(pSafeArray)
+'            Exit Function
+'        End If
+'
+'        ' calculate the product of all the dimension sizes.
+'        GetLength = 1
+'        Dim i As Long
+'        For i = pSafeArray To pSafeArray + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
+'            GetLength = GetLength * MemLong(i)
+'        Next i
+'    Else
+'        ' get the size of a specific dimension.
+'        pSafeArray = pSafeArray + (Rank - Dimension) * SIZEOF_SAFEARRAYBOUND
+'        GetLength = MemLong(pSafeArray)
+'    End If
+    GetLength = InternalGetLength(pSafeArray, Dimension)
+End Function
+
+Private Function InternalGetLength(ByVal pSafeArray As Long, ByVal Dimension As Long) As Long
+    Dim Rank As Long
     Rank = SafeArrayGetDim(pSafeArray)
     If Dimension > Rank Then _
         Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(IndexOutOfRange_Dimension))
-    
+        
     pSafeArray = pSafeArray + SIZEOF_SAFEARRAY
     If Dimension < 1 Then
         ' optimize for 99% of calls
         If Rank = 1 Then
-            GetLength = MemLong(pSafeArray)
+            InternalGetLength = MemLong(pSafeArray)
             Exit Function
         End If
         
         ' calculate the product of all the dimension sizes.
-        GetLength = 1
+        InternalGetLength = 1
         Dim i As Long
         For i = pSafeArray To pSafeArray + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
-            GetLength = GetLength * MemLong(i)
+            InternalGetLength = InternalGetLength * MemLong(i)
         Next i
     Else
         ' get the size of a specific dimension.
         pSafeArray = pSafeArray + (Rank - Dimension) * SIZEOF_SAFEARRAYBOUND
-        GetLength = MemLong(pSafeArray)
+        InternalGetLength = MemLong(pSafeArray)
     End If
 End Function
 
@@ -1081,25 +1109,30 @@ End Sub
 ' being used as source and destination and calls the appropriate copy method
 ' for any possible casting between arrays.
 '
-Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Count As Long, ByVal AddressOfCopier As Long)
+Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long, ByVal AddressOfCopier As Long)
     Dim pSourceSafeArray As Long
     pSourceSafeArray = GetArrayPointer(SourceArray)
-    If pSourceSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "SourceArray")
-
     Dim pDestinationSafeArray As Long
     pDestinationSafeArray = GetArrayPointer(DestinationArray)
+    Dim SourceLength As Long
+    SourceLength = InternalGetLength(pSourceSafeArray, 0)
+    Dim DestinationLength As Long
+    DestinationLength = InternalGetLength(pDestinationSafeArray, 0)
+    
+    If pSourceSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "SourceArray")
     If pDestinationSafeArray = vbNullPtr Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "DestinationArray")
-    
-    Dim Result As Long
-    ' verify the range of the source array.
-    Result = VerifyArrayRange(pSourceSafeArray, SourceIndex, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "SourceArray", SourceIndex, "SourceIndex", Count, "Count" ', IsMissing(SourceIndex)
-    
-    ' verify the range of the destination array.
-    Result = VerifyArrayRange(pDestinationSafeArray, DestinationIndex, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "DestinationArray", DestinationIndex, "DestinationIndex", Count, "Count" ', IsMissing(DestinationIndex)
+    If Length < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Length", Length)
+    If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Arg_LongerThanSrcArray))
+    If Length + DestinationIndex - LBound(DestinationArray) > DestinationLength Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Arg_LongerThanDestArray))
+    If SourceIndex < LBound(SourceArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_ArrayLB), "SourceIndex")
+    If DestinationIndex < LBound(DestinationArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_ArrayLB), "DestinationIndex")
     
     Dim srcArrayType As VbVarType
     srcArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
@@ -1112,13 +1145,13 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
             Select Case srcArrayType
                 Case vbObject, vbDataObject
                     If IsEqualGUID(ByVal pSourceSafeArray - SIZEOF_GUID, ByVal pDestinationSafeArray - SIZEOF_GUID) <> BOOL_FALSE Then
-                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
+                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
                     Else
-                        Call CopyObjectTypesCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
+                        Call CopyObjectTypesCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
                     End If
                     
                 Case vbString, vbVariant
-                    Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
+                    Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
                     
                 Case vbUserDefinedType
                     Dim SrcUDT As IRecordInfo
@@ -1128,13 +1161,13 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
                     Set DstUDT = SafeArrayGetRecordInfo(pDestinationSafeArray)
                     
                     If SrcUDT.IsMatchingType(DstUDT) Then
-                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
+                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
                     Else
                         Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
                     End If
                     
                 Case Else
-                    Call CopyValueTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count)
+                    Call CopyValueTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
             End Select
         Else
             ' Attempt to copy by casting from one datatype to another.
@@ -1143,11 +1176,11 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
             If pfn = 0 Then _
                 Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             
-            Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count, pfn)
+            Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, pfn)
         End If
     Else
         ' Use the user callback method as the casting function.
-        Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Count, AddressOfCopier)
+        Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, AddressOfCopier)
     End If
 End Sub
 
@@ -1303,6 +1336,7 @@ Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType 
         Case vbLong
             Select Case dstType
                 Case vbDouble:      Ret = FuncAddr(AddressOf WidenLongToDouble)
+                Case vbSingle:      Ret = FuncAddr(AddressOf WidenLongToSingle)
                 Case vbString:      Ret = FuncAddr(AddressOf WidenLongToString)
                 Case vbCurrency:    Ret = FuncAddr(AddressOf WidenLongToCurrency)
                 Case vbVariant:     Ret = FuncAddr(AddressOf WidenLongToVariant)
@@ -1326,6 +1360,11 @@ Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType 
                 Case vbCurrency:    Ret = FuncAddr(AddressOf WidenByteToCurrency)
                 Case vbVariant:     Ret = FuncAddr(AddressOf WidenByteToVariant)
             End Select
+        Case vbDouble
+            Select Case dstType
+                Case vbString:      Ret = FuncAddr(AddressOf WidenDoubleToString)
+                Case vbVariant:     Ret = FuncAddr(AddressOf WidenDoubleToVariant)
+            End Select
         Case vbSingle
             Select Case dstType
                 Case vbDouble:      Ret = FuncAddr(AddressOf WidenSingleToDouble)
@@ -1346,6 +1385,7 @@ Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType 
             Select Case dstType
                 Case vbString:      Ret = FuncAddr(AddressOf WidenCurrencyToString)
                 Case vbVariant:     Ret = FuncAddr(AddressOf WidenCurrencyToVariant)
+                Case vbDouble:      Ret = FuncAddr(AddressOf WidenCurrencyToDouble)
             End Select
         Case vbString
             Select Case dstType

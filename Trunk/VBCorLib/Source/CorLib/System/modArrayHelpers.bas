@@ -230,6 +230,7 @@ End Function
 ' needing to modify code. Only the address of the specific routine is needed.
 '
 Public Sub WidenLongToDouble(ByRef x As Double, ByRef y As Long): x = y: End Sub
+Public Sub WidenLongToSingle(ByRef x As Single, ByRef y As Long): x = y: End Sub
 Public Sub WidenLongToString(ByRef x As String, ByRef y As Long): x = y: End Sub
 Public Sub WidenLongToCurrency(ByRef x As Currency, ByRef y As Long): x = y: End Sub
 Public Sub WidenLongToVariant(ByRef x As Variant, ByRef y As Long): x = y: End Sub
@@ -255,7 +256,10 @@ Public Sub WidenDateToVariant(ByRef x As Variant, ByRef y As Date): x = y: End S
 Public Sub WidenObjectToVariant(ByRef x As Variant, ByRef y As Object): Set x = y: End Sub
 Public Sub WidenCurrencyToString(ByRef x As String, ByRef y As Currency): x = y: End Sub
 Public Sub WidenCurrencyToVariant(ByRef x As Variant, ByRef y As Currency): x = y: End Sub
+Public Sub WidenCurrencyToDouble(ByRef x As Double, ByRef y As Currency): x = y: End Sub
 Public Sub WidenStringToVariant(ByRef x As Variant, ByRef y As String): x = y: End Sub
+Public Sub WidenDoubleToString(ByRef x As String, ByRef y As Double): x = y: End Sub
+Public Sub WidenDoubleToVariant(ByRef x As Variant, ByRef y As Double): x = y: End Sub
 
 ' Functions used to assign variants to narrower variables.
 Public Sub NarrowVariantToLong(ByRef x As Long, ByRef y As Variant): x = y: End Sub
