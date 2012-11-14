@@ -706,32 +706,7 @@ End Function
 '
 Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long = 0) As Long
     Dim pSafeArray  As Long
-'    Dim Rank        As Long
-    
     pSafeArray = GetArrayPointer(Arr, True)
-'    Rank = SafeArrayGetDim(pSafeArray)
-'    If Dimension > Rank Then _
-'        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(IndexOutOfRange_Dimension))
-'
-'    pSafeArray = pSafeArray + SIZEOF_SAFEARRAY
-'    If Dimension < 1 Then
-'        ' optimize for 99% of calls
-'        If Rank = 1 Then
-'            GetLength = MemLong(pSafeArray)
-'            Exit Function
-'        End If
-'
-'        ' calculate the product of all the dimension sizes.
-'        GetLength = 1
-'        Dim i As Long
-'        For i = pSafeArray To pSafeArray + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
-'            GetLength = GetLength * MemLong(i)
-'        Next i
-'    Else
-'        ' get the size of a specific dimension.
-'        pSafeArray = pSafeArray + (Rank - Dimension) * SIZEOF_SAFEARRAYBOUND
-'        GetLength = MemLong(pSafeArray)
-'    End If
     GetLength = InternalGetLength(pSafeArray, Dimension)
 End Function
 
