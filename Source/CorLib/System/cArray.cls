@@ -592,7 +592,7 @@ Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant,
     If IsNull(DestinationArray) Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "DestinationArray")
     
-    Call InternalCopy(SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length, AddressOfCopier)
+    InternalCopy SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length, AddressOfCopier
 End Sub
 
 ''
@@ -615,7 +615,7 @@ End Sub
 ' End Sub
 ' </pre>
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long, Optional ByVal AddressOfCopier As Long = 0)
-    Call InternalCopy(SourceArray, SourceIndex, DestinationArray, DestinationIndex, Length, AddressOfCopier)
+    InternalCopy SourceArray, SourceIndex, DestinationArray, DestinationIndex, Length, AddressOfCopier
 End Sub
 
 ''
@@ -1145,13 +1145,13 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
             Select Case srcArrayType
                 Case vbObject, vbDataObject
                     If IsEqualGUID(ByVal pSourceSafeArray - SIZEOF_GUID, ByVal pDestinationSafeArray - SIZEOF_GUID) <> BOOL_FALSE Then
-                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
+                        CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
                     Else
-                        Call CopyObjectTypesCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
+                        CopyObjectTypesCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
                     End If
                     
                 Case vbString, vbVariant
-                    Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
+                    CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
                     
                 Case vbUserDefinedType
                     Dim SrcUDT As IRecordInfo
@@ -1160,27 +1160,24 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
                     Set SrcUDT = SafeArrayGetRecordInfo(pSourceSafeArray)
                     Set DstUDT = SafeArrayGetRecordInfo(pDestinationSafeArray)
                     
-                    If SrcUDT.IsMatchingType(DstUDT) Then
-                        Call CopyReferenceTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
-                    Else
+                    If SrcUDT.IsMatchingType(DstUDT) = BOOL_FALSE Then _
                         Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
-                    End If
+                        
+                    CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
                     
                 Case Else
-                    Call CopyValueTypes(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length)
+                    CopyValueTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
             End Select
         Else
-            ' Attempt to copy by casting from one datatype to another.
             Dim pfn As Long
             pfn = GetAssigningFunction(srcArrayType, dstArrayType)
             If pfn = 0 Then _
                 Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             
-            Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, pfn)
+            CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, pfn
         End If
     Else
-        ' Use the user callback method as the casting function.
-        Call CopyWithCast(pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, AddressOfCopier)
+        CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, AddressOfCopier
     End If
 End Sub
 
@@ -1196,7 +1193,7 @@ Private Sub CopyValueTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVa
     Dim pDstElem As Long
     pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(dstpSA, 1)) * ElemSize
     
-    Call CopyMemory(ByVal pDstElem, ByVal pSrcElem, Length * ElemSize)
+    CopyMemory ByVal pDstElem, ByVal pSrcElem, Length * ElemSize
 End Sub
 
 ' Copies reference types, dealing with possible overlapping source and destination regions.
@@ -1211,8 +1208,8 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
         Case vbUserDefinedType:     IIDOffset = 4
     End Select
     
-    Call CopyMemory(ByVal VarPtr(srcSA.SA) - IIDOffset, ByVal srcpSA - IIDOffset, LenB(srcSA.SA) + IIDOffset)
-    Call CopyMemory(ByVal VarPtr(dstSA.SA) - IIDOffset, ByVal dstpSA - IIDOffset, LenB(dstSA.SA) + IIDOffset)
+    CopyMemory ByVal VarPtr(srcSA.SA) - IIDOffset, ByVal srcpSA - IIDOffset, LenB(srcSA.SA) + IIDOffset
+    CopyMemory ByVal VarPtr(dstSA.SA) - IIDOffset, ByVal dstpSA - IIDOffset, LenB(dstSA.SA) + IIDOffset
     
     If srcpSA = dstpSA Then
         ' test for overlapping source and destination portion of the same array
@@ -1223,10 +1220,10 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
                 .pvData = .pvData + (SourceIndex + Length) * .cbElements
                 .cElements = DestinationIndex - SourceIndex
             End With
-            Call SafeArrayDestroyData(VarPtr(ClearSA.SA))
+            SafeArrayDestroyData VarPtr(ClearSA.SA)
             
             With srcSA.SA
-                Call CopyMemory(ByVal .pvData + (DestinationIndex - .lLbound) * .cbElements, ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, Length * .cbElements)
+                CopyMemory ByVal .pvData + (DestinationIndex - .lLbound) * .cbElements, ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, Length * .cbElements
     
                 ' If we have moved reference type values, then we need to
                 ' fill in the uncovered portion of the original values
@@ -1235,7 +1232,7 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
                 ' moved the references without making copies to objects or strings.
                 ' Once the uncovered portion is set up, we can copy backwards using
                 ' the standard reference copy method without stepping on ourselves.
-                Call ZeroMemory(ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, (DestinationIndex - SourceIndex) * .cbElements)
+                ZeroMemory ByVal .pvData + (SourceIndex - .lLbound) * .cbElements, (DestinationIndex - SourceIndex) * .cbElements
             End With
             
             Length = DestinationIndex - SourceIndex
@@ -1246,10 +1243,10 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
         End If
     End If
     
-    Call SetCopyArrayDescriptor(srcSA.SA, SourceIndex, Length)
-    Call SetCopyArrayDescriptor(dstSA.SA, DestinationIndex, Length)
+    SetCopyArrayDescriptor srcSA.SA, SourceIndex, Length
+    SetCopyArrayDescriptor dstSA.SA, DestinationIndex, Length
     
-    Call SafeArrayCopyData(VarPtr(srcSA.SA), VarPtr(dstSA.SA))
+    SafeArrayCopyData VarPtr(srcSA.SA), VarPtr(dstSA.SA)
 End Sub
 
 Private Sub CopyWithCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long, ByVal pfn As Long)

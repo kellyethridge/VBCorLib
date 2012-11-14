@@ -5,7 +5,7 @@ Public Sub AssertArgumentException(ByVal Err As ErrObject, Optional ByRef ParamN
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentException Then
-        Assert.Fail "Expected an ArgumentException but was '" & TypeName(Ex) & "'."
+        Assert.Fail "Expected 'ArgumentException' but was '" & TypeName(Ex) & "'."
     End If
     
     If Len(ParamName) > 0 Then
@@ -19,7 +19,7 @@ Public Sub AssertArgumentNullException(ByVal Err As ErrObject, ByRef ParamName A
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentNullException Then
-        Assert.Fail "Expected an ArgumentNullException but was '" & TypeName(Ex) & "'."
+        Assert.Fail "Expected 'ArgumentNullException' but was '" & TypeName(Ex) & "'."
     End If
     Dim ArgEx As ArgumentNullException
     Set ArgEx = Ex
@@ -30,7 +30,7 @@ Public Sub AssertArgumentOutOfRangeException(ByVal Err As ErrObject, Optional By
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentOutOfRangeException Then
-        Assert.Fail "Expected an ArgumentOutOfRangeException but was " & TypeName(Ex) & "."
+        Assert.Fail "Expected 'ArgumentOutOfRangeException' but was '" & TypeName(Ex) & "'."
     End If
     
     If Len(ParamName) > 0 Then
@@ -48,10 +48,17 @@ Public Sub AssertIndexOutOfRangeException(ByVal Err As ErrObject)
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is IndexOutOfRangeException Then
-        Assert.Fail "Expected an IndexOutOfRangeException but was '" & TypeName(Ex) & "'."
+        Assert.Fail "Expected 'IndexOutOfRangeException' but was '" & TypeName(Ex) & "'."
     End If
 End Sub
 
+Public Sub AssertArrayTypeMismatchException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is ArrayTypeMismatchException Then
+        Assert.Fail "Expected 'ArrayTypeMismatchException' but was '" & TypeName(Ex) & "'."
+    End If
+End Sub
 
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
     If Not catch(AssertExceptionThrown, Err) Then
