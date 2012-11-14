@@ -52,6 +52,7 @@ Public Enum ResourceStringId
     ArgumentOutOfRange_NeedPosNum = 713
     ArgumentOutOfRange_OutsideConsoleBoundry = 714
     ArgumentOutOfRange_Enum = 715
+    ArgumentOutOfRange_ArrayLB = 716
     Argument_InvalidCountOffset = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802
@@ -73,6 +74,8 @@ Public Enum ResourceStringId
     Argument_StreamNotReadable = 818
     Argument_StreamNotWritable = 819
     Argument_StreamNotSeekable = 820
+    Arg_LongerThanSrcArray = 821
+    Arg_LongerThanDestArray = 822
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902
