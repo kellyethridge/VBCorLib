@@ -49,9 +49,10 @@ Option Explicit
 ' a GUID for objects and user-defined types. This is to
 ' help in the correct copying of those types of elements.
 Private Type GuidSafeArray1d
-    Guid As VBGUID
-    SA As SafeArray1d
+    Guid    As VBGUID
+    SA      As SafeArray1d
 End Type
+
 
 ''
 ' Represents the available array types that can be created using
@@ -155,9 +156,9 @@ Public Function Find(ByRef Arr As Variant, ByVal AddressOfMatch As Long) As Vari
     
     Index = FindIndex(Arr, AddressOfMatch)
     If Index >= LBound(Arr) Then
-        Call VariantCopyInd(Find, Arr(Index))
+        VariantCopyInd Find, Arr(Index)
     Else
-        Call AssignDefaultElementValue(Arr, Find)
+        AssignDefaultElementValue Arr, Find
     End If
 End Function
 
@@ -189,7 +190,8 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfMatch As Long, Op
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     Result = GetOptionalArrayRange(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -293,7 +295,7 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfMatch As Long) As V
             pDstElem = MemLong(pReturnSafeArray + PVDATA_OFFSET)
             
             For i = 0 To MatchCount - 1
-                Call UDT.RecordCopy(pvData + (MatchedIndexes(i) - LowerBound) * ElemSize, pDstElem)
+                UDT.RecordCopy pvData + (MatchedIndexes(i) - LowerBound) * ElemSize, pDstElem
                 pDstElem = pDstElem + ElemSize
             Next i
             
@@ -333,9 +335,9 @@ Public Function FindLast(ByRef Arr As Variant, ByVal AddressOfMatch As Long) As 
     
     Index = FindLastIndex(Arr, AddressOfMatch)
     If Index >= LBound(Arr) Then
-        Call VariantCopyInd(FindLast, Arr(Index))
+        VariantCopyInd FindLast, Arr(Index)
     Else
-        Call AssignDefaultElementValue(Arr, FindLast)
+        AssignDefaultElementValue Arr, FindLast
     End If
 End Function
 
@@ -368,7 +370,8 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfMatch As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     Result = GetOptionalArrayRangeReverse(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -453,7 +456,7 @@ Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        Call mForEach.Call(pElem)
+        mForEach.Call pElem
         pElem = pElem + ElemSize
     Next i
 End Sub
@@ -484,7 +487,8 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
     Dim ElemIndex   As Long
     Dim Result      As Long
     Result = GetOptionalArrayRange(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
         
     On Error GoTo errTrap
     If Comparer Is Nothing Then
@@ -533,7 +537,8 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long)
     
     Dim Result As Long
     Result = VerifyArrayRange(pSafeArray, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", Index, "Index", Count, "Count")
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Arr", Index, "Index", Count, "Count"
     
     If Count = 0 Then Exit Sub
     
@@ -554,19 +559,19 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long)
             pElem = MemLong(pSafeArray + PVDATA_OFFSET)
             
             ' optimize by zeroing out the memory directly.
-            Call ZeroMemory(ByVal pElem + (Index - LBound(Arr)) * ElemSize, Count * ElemSize)
+            ZeroMemory ByVal pElem + (Index - LBound(Arr)) * ElemSize, Count * ElemSize
             Exit Sub
     End Select
     
     Dim SubArray As GuidSafeArray1d
-    Call CopyMemory(ByVal VarPtr(SubArray.SA) - IIDOffset, ByVal pSafeArray - IIDOffset, Len(SubArray.SA) + IIDOffset)
+    CopyMemory ByVal VarPtr(SubArray.SA) - IIDOffset, ByVal pSafeArray - IIDOffset, Len(SubArray.SA) + IIDOffset
     
     With SubArray.SA
         .fFeatures = .fFeatures Or FADF_FIXEDSIZE Or FADF_STATIC Or FADF_AUTO
         .pvData = .pvData + (Index - LBound(Arr)) * .cbElements
         .cElements = Count
     End With
-    Call SafeArrayDestroyData(VarPtr(SubArray.SA))
+    SafeArrayDestroyData VarPtr(SubArray.SA)
 End Sub
 
 ''
@@ -691,8 +696,7 @@ End Function
 '
 Public Function NewArray(ByVal ArrayType As ciArrayTypes, ParamArray ArrayElements() As Variant) As Variant
     Dim Args() As Variant
-    
-    Call Helper.Swap4(ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16))
+    Helper.Swap4 ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16)
     NewArray = InternalNewArray(ArrayType, Args)
 End Function
 
@@ -764,7 +768,8 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     Result = GetOptionalArrayRange(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     On Error GoTo errTrap
     If Comparer Is Nothing Then
@@ -816,7 +821,8 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     Result = GetOptionalArrayRangeReverse(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
 
     On Error GoTo errTrap
     If Comparer Is Nothing Then
@@ -855,7 +861,8 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     Result = GetOptionalArrayRange(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -885,13 +892,13 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
             pSwapBuffer = CoTaskMemAlloc(ElemSize)
             
             Do While pLowElem < pHighElem
-                Call CopyMemory(ByVal pSwapBuffer, ByVal pLowElem, ElemSize)
-                Call CopyMemory(ByVal pLowElem, ByVal pHighElem, ElemSize)
-                Call CopyMemory(ByVal pHighElem, ByVal pSwapBuffer, ElemSize)
+                CopyMemory ByVal pSwapBuffer, ByVal pLowElem, ElemSize
+                CopyMemory ByVal pLowElem, ByVal pHighElem, ElemSize
+                CopyMemory ByVal pHighElem, ByVal pSwapBuffer, ElemSize
                 pLowElem = pLowElem + ElemSize
                 pHighElem = pHighElem - ElemSize
             Loop
-            Call CoTaskMemFree(pSwapBuffer)
+            CoTaskMemFree pSwapBuffer
     End Select
 End Sub
 
@@ -917,7 +924,7 @@ End Sub
 '
 ' @include "..\Includes\cArray_Sort.txt"
 Public Sub Sort(ByRef Keys As Variant, Optional ByVal Comparer As Variant)
-    Call InternalSort(Keys, Empty, , , Comparer)
+    InternalSort Keys, Empty, , , Comparer
 End Sub
 
 ''
@@ -944,7 +951,7 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortEx(ByRef Keys As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As Variant)
-    Call InternalSort(Keys, Empty, Index, Count, Comparer)
+    InternalSort Keys, Empty, Index, Count, Comparer
 End Sub
 
 ''
@@ -970,7 +977,7 @@ End Sub
 '
 ' @include "..\Includes\cArray.SortKey.txt"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByVal Comparer As Variant)
-    Call InternalSort(Keys, Items, , , Comparer)
+    InternalSort Keys, Items, , , Comparer
 End Sub
 
 ''
@@ -998,7 +1005,7 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As Variant)
-    Call InternalSort(Keys, Items, Index, Count, Comparer)
+    InternalSort Keys, Items, Index, Count, Comparer
 End Sub
 
 
@@ -1016,7 +1023,7 @@ Friend Function InternalNewArray(ByVal ArrayType As ciArrayTypes, ByRef Args() A
     Ret = CreateInstance(ArrayType, UpperBound + 1)
     
     If UpperBound >= 0 Then
-        Call CopyEx(Args, 0, Ret, 0, UpperBound + 1)
+        CopyEx Args, 0, Ret, 0, UpperBound + 1
     End If
     
     InternalNewArray = Ret
@@ -1146,7 +1153,7 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
         Else
             Dim pfn As Long
             pfn = GetAssigningFunction(srcArrayType, dstArrayType)
-            If pfn = 0 Then _
+            If pfn = vbNullPtr Then _
                 Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             
             CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, pfn
@@ -1246,7 +1253,7 @@ Private Sub CopyWithCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal 
     mAssignDelegator.pfn = pfn
     
     Do While Length > 0
-        Call mAssigner.Call(dst, src)
+        mAssigner.Call dst, src
         src = src + srcSize
         dst = dst + dstSize
         Length = Length - 1
@@ -1286,7 +1293,9 @@ Private Sub CopyObjectTypesCast(ByVal srcpSA As Long, ByVal SourceIndex As Long,
         End If
         
         ObjectPtr(dstObj) = MemLong(pDstElem)
-        If Not dstObj Is Nothing Then Call dstObj.Release
+        If Not dstObj Is Nothing Then
+            dstObj.Release
+        End If
         MemLong(pDstElem) = pObj
         
         pSrcElem = pSrcElem + 4
@@ -1393,7 +1402,8 @@ Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, Optional
     
     Dim Result As Long
     Result = GetOptionalArrayRange(pKeysSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Keys", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Keys", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     ' set up items to be sorted with keys
     If IsArray(Items) Then
@@ -1406,16 +1416,16 @@ Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, Optional
            (UBound(Keys) <> UBound(Items)) Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_MatchingBounds))
         
-        Call SetSortItems(pItemsSafeArray)
+        SetSortItems pItemsSafeArray
     End If
     
     On Error GoTo errTrap
-    Call ClearException
+    ClearException
     Do
         Select Case VarType(Comparer)
             ' use an IComparer object to sort with.
             Case vbObject
-                Call SetSortKeys(pKeysSafeArray)
+                SetSortKeys pKeysSafeArray
                 
                 If Comparer Is Nothing Then
                     Set SortComparer = VBCorLib.Comparer.Default
@@ -1423,14 +1433,14 @@ Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, Optional
                     Set SortComparer = Comparer
                 End If
                 
-                Call QuickSortGeneral(Keys, ElemIndex, ElemIndex + ElemCount - 1)
+                QuickSortGeneral Keys, ElemIndex, ElemIndex + ElemCount - 1
                 Exit Do
                 
             ' Use a callback method to sort with.
             ' This allows a user to supply a highspeed comarison
             ' routine to compare two elements of the array.
             Case vbLong
-                Call CallbackSorter.Sort(pKeysSafeArray, pItemsSafeArray, ElemIndex, ElemIndex + ElemCount - 1, Comparer)
+                CallbackSorter.Sort pKeysSafeArray, pItemsSafeArray, ElemIndex, ElemIndex + ElemCount - 1, Comparer
                 Exit Do
                 
             ' try optimized routines first, then fallback to the default IComparer object.
@@ -1449,12 +1459,10 @@ Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, Optional
     Loop
     
 errTrap:
-    Call ClearSortKeys
-    Call ClearSortItems
+    ClearSortKeys
+    ClearSortItems
     Set SortComparer = Nothing
-    
-    Dim Ex As Exception
-    If Catch(Ex) Then Throw Ex
+    Throw
 End Sub
 
 Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Long, ByVal Length As Long)
@@ -1617,7 +1625,7 @@ Private Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As
         Case Else: Exit Function
     End Select
     mSortDelegator.pfn = pfn
-    Call mSorter.Call(pSA, Left, Right)
+    mSorter.Call pSA, Left, Right
     TrySZSort = True
 End Function
 
