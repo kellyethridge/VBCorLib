@@ -6,220 +6,190 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestArraySort"
+Attribute VB_Name = "cArraySortTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ITestCaseSource
 
-Public Sub TestSortLongs()
-    Dim a() As Long
-    FillArray a, 100, 1000
-    cArray.Sort a
-    AssertValueTypes a
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As simplyvbcomp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "Sort_WithPrimitives_SortsAscending"
+            Test.Use NewBytes(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewIntegers(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewSingles(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewDoubles(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewCurrencys(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewStrings("c", "d", "a", "B", "A")
+            Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#)
+            Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            
+    End Select
 End Sub
 
-Public Sub TestSortStrings()
+Public Sub Sort_WithPrimitives_SortsAscending(ByRef Arr As Variant)
+    cArray.Sort Arr
+    
+    Assert.That Arr, Iz.Ordered
+End Sub
+
+Public Sub Sort_WithComparer_SortsValues()
+    Dim Arr() As Long
+    Arr = NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2)
+    
+    cArray.Sort Arr, New DescendingComparer
+    
+    Assert.That Arr, Iz.Ordered.Descending
+End Sub
+
+Public Sub Sort_WithComparableObjects_SortsObjects()
+    Dim a(4) As Int32
+    Set a(0) = MakeInt32(3)
+    Set a(1) = MakeInt32(2)
+    Set a(2) = MakeInt32(5)
+    Set a(3) = MakeInt32(4)
+    Set a(4) = MakeInt32(0)
+    
+    cArray.Sort a
+    
+    Assert.That a, Iz.Ordered.Using(New ComparableComparer)
+End Sub
+
+Public Sub Sort_WithCallback_SortsStrings()
     Dim a() As String
-    FillArray a, 100, 1000
-    cArray.Sort a
-    AssertValueTypes a
-End Sub
-
-Public Sub TestSortObjects()
-    Dim a() As Int32
-    Dim i As Long
+    a = NewStrings("c", "d", "a", "B", "A")
     
-    ReDim a(0 To 100)
-    Rnd -13
-    For i = 0 To UBound(a)
-        Set a(i) = New Int32
-        a(i).mValue = Int(Rnd * 100)
-    Next i
+    cArray.Sort a, AddressOf CompareStringsAscending
     
-    cArray.Sort a
-    
-    For i = 0 To UBound(a) - 1
-        Assert.IsTrue a(i).mValue <= a(i + 1).mValue, "Elements out of order at " & i & " and " & i + 1 & "."
-    Next i
-    
+    Assert.That a, Iz.Ordered
 End Sub
 
-Public Sub TestSortInteger()
-    Dim a() As Integer
-    FillArray a, 100, 1000
-    cArray.Sort a
-    AssertValueTypes a
-End Sub
-
-Public Sub TestSortBytes()
-    Dim a() As Byte
-    FillArray a, 100, 255
-    cArray.Sort a
-    AssertValueTypes a
-End Sub
-
-Public Sub TestSortKeysAndItems()
-    Dim k() As Long
-    Dim i() As Byte
-
-    FillArray k, 100, 1000
-    FillArray i, 100, 255
-    cArray.SortKey k, i
-    AssertValueTypes k
-    AssertValueTypes i
-End Sub
-
-Public Sub TestWithComparer()
-    Dim k() As Long
-    Dim i() As Byte
-
-    FillArray k, 100, 1000
-    FillArray i, 100, 255
-    cArray.SortKey k, i, comparer.Default
-    AssertValueTypes k
-    AssertValueTypes i
-End Sub
-
-Public Sub TestWithStringComparer()
-    Dim s(100) As String
-    Dim i As Long
-    
-    Rnd -13
-    For i = 0 To 100
-        s(i) = "Value " & Chr$(Int(Rnd * 255))
-    Next i
-    cArray.Sort s, comparer.Default
-    AssertValueTypes s
-End Sub
-
-Public Sub TestSortVariants()
-    Dim a() As Variant
-    FillArray a, 100, 1000
-    cArray.Sort a
-    AssertValueTypes a
-End Sub
-
-Public Sub TestGeneralSort()
-    Dim a() As Long
-    FillArray a, 100, 1000
-    cArray.Sort a, comparer.Default
-    AssertValueTypes a
-End Sub
-
-Public Sub TestNonComparableElements()
-    Dim a() As Variant
-    Dim b() As Long
-    FillArray a, 100, 1000
-    a(39) = b
-    On Error GoTo errTrap
-    cArray.Sort a
-    On Error GoTo 0
-    Assert.Fail "Should have thrown an error."
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "Should have caught an exception."
-    Assert.IsTrue TypeOf Ex Is InvalidOperationException, "Wrong exception type caught."
-End Sub
-
-Public Sub TestLengthTooLong()
-    Dim a(10) As Long
-    
-    On Error GoTo errTrap
-    cArray.BinarySearch a, 1, 0, 12
-    On Error GoTo 0
-    Assert.Fail "An exception should have been raised."
-    
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should have been caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
-End Sub
-
-Public Sub TestSortSubArray()
-    Dim a() As Long
-    FillArray a, 100, 1000
-    cArray.SortEx a, 26, 24
-    
-    Dim i As Long
-    Dim j As Long
-    Rnd -13
-    For i = 0 To 98
-        j = Int(Rnd * 1000)
-        If i <= 25 Or i >= 50 Then
-            Assert.AreEqual j, a(i), "Sorted outside sub-array."
-        Else
-            ' we don't want to bleed into the unsorted list with a(i + 1).
-            If i < 49 Then Assert.IsTrue a(i) <= a(i + 1), "sub-array not sorted."
-        End If
-    Next i
-End Sub
-
-Public Sub TestSortStringCallback()
-    Dim a(100) As String
-    Dim i As Long
-    
-    Rnd -13
-    For i = 0 To 100
-        a(i) = "String " & Int(Rnd * 1000)
-    Next i
-    
-    cArray.Sort a, AddressOf CompareStrings
-    
-    AssertValueTypes a
-End Sub
-
-Public Sub TestSortUDTCallback()
-    Dim a(100) As VBGUID
-    Dim l(100) As Long
-    Dim i As Long
-    
-    Rnd -13
-    For i = 0 To 100
-        a(i).Data1 = Rnd * 1000
-        l(i) = a(i).Data1
-    Next i
+Public Sub Sort_WithCallback_SortsUDTs()
+    Dim a(4) As VBGUID
+    a(0).Data1 = 3
+    a(1).Data1 = 2
+    a(2).Data1 = 4
+    a(3).Data1 = 1
+    a(4).Data1 = 6
     
     cArray.Sort a, AddressOf CompareVBGuids
-    cArray.Sort l
     
-    For i = 0 To 100
-        Assert.AreEqual l(i), a(i).Data1
-    Next i
+    Assert.That a, Iz.Ordered.Using(New VBGuidComparer)
 End Sub
 
-Public Sub TestNonZeroLBound()
-    Dim a(1 To 10) As Double
-    Dim i As Long
+Public Sub Sort_WithNonComparableValues_Throws()
+    On Error GoTo errTrap
+    Dim Arr As Variant
+    Arr = Array(3, 2, "4", 1)
     
-    Rnd -13
-    For i = 1 To 10
-        a(i) = Rnd * 10000
-    Next i
+    cArray.Sort Arr
     
-    cArray.Sort a
-    
-    AssertValueTypes a
+errTrap:
+    AssertInvalidOperationException Err
 End Sub
 
-
-Private Sub FillArray(ByRef arr As Variant, ByVal Size As Long, ByVal maxValue As Long)
-    Dim i As Long
-
-    ReDim arr(0 To Size - 1)
-    Rnd -13
-    For i = LBound(arr) To UBound(arr)
-        arr(i) = Int(Rnd * maxValue)
-    Next i
-End Sub
-
-Private Sub AssertValueTypes(ByRef arr As Variant)
-    Dim i As Long
+Public Sub Sort_WithNonZeroLBound_SortsValues()
+    Dim Arr(5 To 9) As Long
+    Arr(5) = 5
+    Arr(6) = 2
+    Arr(7) = 3
+    Arr(8) = 6
+    Arr(9) = 1
     
-    For i = LBound(arr) To UBound(arr) - 1
-        Assert.IsTrue arr(i) <= arr(i + 1), "Element out of order at " & i & "."
-    Next i
+    cArray.Sort Arr
+    
+    Assert.That Arr, Iz.Ordered
 End Sub
+
+Public Sub SortEx_WhenCalled_SortsSubArray()
+    Dim a() As Long
+    a = NewLongs(6, 5, 4, 1, 3, 2, 1, 0)
+    
+    cArray.SortEx a, 2, 4
+    
+    Dim Expected() As Long
+    Expected = NewLongs(6, 5, 1, 2, 3, 4, 1, 0)
+    Assert.That a, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SortEx_WithComparer_SortsSubArray()
+    Dim a() As Long
+    a = NewLongs(5, 6, 4, 1, 3, 2, 1, 0)
+    
+    cArray.SortEx a, 2, 4, New DescendingComparer
+    
+    Dim Expected() As Long
+    Expected = NewLongs(5, 6, 4, 3, 2, 1, 1, 0)
+    Assert.That a, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SortKeys_WhenCalled_SortsKeys()
+    Dim Keys(4) As Long
+    Dim Items(4) As Long
+    Keys(0) = 3: Items(0) = 1
+    Keys(1) = 5: Items(1) = 2
+    Keys(2) = 2: Items(2) = 3
+    Keys(3) = 6: Items(3) = 4
+    Keys(4) = 1: Items(4) = 5
+    
+    cArray.SortKey Keys, Items
+    
+    Assert.That Keys, Iz.Ordered
+End Sub
+
+Public Sub SortKeys_WhenCalled_SortsItemsByKeys()
+    Dim Keys(4) As Long
+    Dim Items(4) As Long
+    Keys(0) = 3: Items(0) = 1
+    Keys(1) = 5: Items(1) = 2
+    Keys(2) = 2: Items(2) = 3
+    Keys(3) = 6: Items(3) = 4
+    Keys(4) = 1: Items(4) = 5
+    
+    cArray.SortKey Keys, Items
+    
+    Dim Expected() As Long
+    Expected = NewLongs(5, 3, 1, 2, 4)
+    Assert.That Items, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SortKeys_WithComparer_SortsKeys()
+    Dim Keys(4) As Long
+    Dim Items(4) As Long
+    Keys(0) = 3: Items(0) = 1
+    Keys(1) = 5: Items(1) = 2
+    Keys(2) = 2: Items(2) = 3
+    Keys(3) = 6: Items(3) = 4
+    Keys(4) = 1: Items(4) = 5
+    
+    cArray.SortKey Keys, Items, New DescendingComparer
+    
+    Assert.That Keys, Iz.Ordered.Descending
+End Sub
+
+Public Sub SortKeys_WithComparer_SortsItemsByKeys()
+    Dim Keys(4) As Long
+    Dim Items(4) As Long
+    Keys(0) = 3: Items(0) = 1
+    Keys(1) = 5: Items(1) = 2
+    Keys(2) = 2: Items(2) = 3
+    Keys(3) = 6: Items(3) = 4
+    Keys(4) = 1: Items(4) = 5
+    
+    cArray.SortKey Keys, Items, New DescendingComparer
+    
+    Dim Expected() As Long
+    Expected = NewLongs(4, 2, 1, 3, 5)
+    Assert.That Items, Iz.EqualTo(Expected)
+End Sub
+
+Private Function MakeInt32(ByVal value As Long) As Int32
+    Set MakeInt32 = New Int32
+    MakeInt32.mValue = value
+End Function
+
 
 

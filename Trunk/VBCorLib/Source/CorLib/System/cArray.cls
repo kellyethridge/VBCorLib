@@ -1116,15 +1116,15 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
     If DestinationIndex < LBound(DestinationArray) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_ArrayLB), "DestinationIndex")
     
-    Dim srcArrayType As VbVarType
-    srcArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
+    Dim SourceArrayType As VbVarType
+    SourceArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
     
-    Dim dstArrayType As VbVarType
-    dstArrayType = VarType(DestinationArray) And &HFF   ' knock off the vbArray bit.
+    Dim DestinationArrayType As VbVarType
+    DestinationArrayType = VarType(DestinationArray) And &HFF   ' knock off the vbArray bit.
     
     If AddressOfCopier = 0 Then
-        If srcArrayType = dstArrayType Then
-            Select Case srcArrayType
+        If SourceArrayType = DestinationArrayType Then
+            Select Case SourceArrayType
                 Case vbObject, vbDataObject
                     If IsEqualGUID(ByVal pSourceSafeArray - SIZEOF_GUID, ByVal pDestinationSafeArray - SIZEOF_GUID) <> BOOL_FALSE Then
                         CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
@@ -1151,12 +1151,12 @@ Private Sub InternalCopy(ByRef SourceArray As Variant, ByVal SourceIndex As Long
                     CopyValueTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
             End Select
         Else
-            Dim pfn As Long
-            pfn = GetAssigningFunction(srcArrayType, dstArrayType)
-            If pfn = vbNullPtr Then _
+            Dim Assigner As Long
+            Assigner = GetAssigningFunction(SourceArrayType, DestinationArrayType)
+            If Assigner = vbNullPtr Then _
                 Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             
-            CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, pfn
+            CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, Assigner
         End If
     Else
         CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, AddressOfCopier
@@ -1263,48 +1263,49 @@ End Sub
 ' Copies objects and checks for compatible interfaces during the copy.
 '
 Private Sub CopyObjectTypesCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
-    Dim srcLowerBound As Long
-    srcLowerBound = SafeArrayGetLBound(srcpSA, 1)
+    Const SizeOfPointer As Long = 4
+    Dim SrcLowerBound As Long
+    SrcLowerBound = SafeArrayGetLBound(srcpSA, 1)
     
-    Dim dstLowerBound As Long
-    dstLowerBound = SafeArrayGetLBound(dstpSA, 1)
+    Dim DstLowerBound As Long
+    DstLowerBound = SafeArrayGetLBound(dstpSA, 1)
     
     Dim pSrcElem As Long
-    pSrcElem = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - srcLowerBound) * 4
+    pSrcElem = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - SrcLowerBound) * SizeOfPointer
     
     Dim pDstElem As Long
-    pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - dstLowerBound) * 4
+    pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - DstLowerBound) * SizeOfPointer
     
     Dim pDstGuid As Long
     pDstGuid = dstpSA - SIZEOF_GUID
     
     Dim pObj    As Long
-    Dim srcObj  As IVBUnknown
-    Dim dstObj  As IVBUnknown
+    Dim SrcObj  As IVBUnknown
+    Dim DstObj  As IVBUnknown
     Do While Length > 0
-        ObjectPtr(srcObj) = MemLong(pSrcElem)
+        ObjectPtr(SrcObj) = MemLong(pSrcElem)
         pObj = 0
-        If Not srcObj Is Nothing Then
-            If srcObj.QueryInterface(ByVal pDstGuid, pObj) = E_NOINTERFACE Then
-                ObjectPtr(srcObj) = 0
-                ObjectPtr(dstObj) = 0
+        If Not SrcObj Is Nothing Then
+            If SrcObj.QueryInterface(ByVal pDstGuid, pObj) = E_NOINTERFACE Then
+                ObjectPtr(SrcObj) = vbNullPtr
+                ObjectPtr(DstObj) = vbNullPtr
                 Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             End If
         End If
         
-        ObjectPtr(dstObj) = MemLong(pDstElem)
-        If Not dstObj Is Nothing Then
-            dstObj.Release
+        ObjectPtr(DstObj) = MemLong(pDstElem)
+        If Not DstObj Is Nothing Then
+            DstObj.Release
         End If
         MemLong(pDstElem) = pObj
         
-        pSrcElem = pSrcElem + 4
-        pDstElem = pDstElem + 4
+        pSrcElem = pSrcElem + SizeOfPointer
+        pDstElem = pDstElem + SizeOfPointer
         Length = Length - 1
     Loop
     
-    ObjectPtr(srcObj) = 0
-    ObjectPtr(dstObj) = 0
+    ObjectPtr(SrcObj) = vbNullPtr
+    ObjectPtr(DstObj) = vbNullPtr
 End Sub
 
 ' Returns the address to a function that can assign one
@@ -1409,12 +1410,12 @@ Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, Optional
     If IsArray(Items) Then
         pItemsSafeArray = GetArrayPointer(Items)
         If pItemsSafeArray = 0 Then _
-            Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Items")
+            Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Items")
         
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_MatchingBounds))
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_MatchingBounds))
         
         SetSortItems pItemsSafeArray
     End If
