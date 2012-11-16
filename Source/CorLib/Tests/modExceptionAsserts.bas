@@ -5,7 +5,7 @@ Public Sub AssertArgumentException(ByVal Err As ErrObject, Optional ByRef ParamN
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentException Then
-        Assert.Fail "Expected 'ArgumentException' but was '" & TypeName(Ex) & "'."
+        WrongException "ArgumentException", Ex
     End If
     
     If Len(ParamName) > 0 Then
@@ -19,7 +19,7 @@ Public Sub AssertArgumentNullException(ByVal Err As ErrObject, ByRef ParamName A
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentNullException Then
-        Assert.Fail "Expected 'ArgumentNullException' but was '" & TypeName(Ex) & "'."
+        WrongException "ArgumentNullException", Ex
     End If
     Dim ArgEx As ArgumentNullException
     Set ArgEx = Ex
@@ -30,7 +30,7 @@ Public Sub AssertArgumentOutOfRangeException(ByVal Err As ErrObject, Optional By
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentOutOfRangeException Then
-        Assert.Fail "Expected 'ArgumentOutOfRangeException' but was '" & TypeName(Ex) & "'."
+        WrongException "ArgumentOutOfRangeException", Ex
     End If
     
     If Len(ParamName) > 0 Then
@@ -48,7 +48,7 @@ Public Sub AssertIndexOutOfRangeException(ByVal Err As ErrObject)
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is IndexOutOfRangeException Then
-        Assert.Fail "Expected 'IndexOutOfRangeException' but was '" & TypeName(Ex) & "'."
+        WrongException "IndexOutOfRangeException", Ex
     End If
 End Sub
 
@@ -56,12 +56,24 @@ Public Sub AssertArrayTypeMismatchException(ByVal Err As ErrObject)
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArrayTypeMismatchException Then
-        Assert.Fail "Expected 'ArrayTypeMismatchException' but was '" & TypeName(Ex) & "'."
+        WrongException "ArrayTypeMismatchException", Ex
+    End If
+End Sub
+
+Public Sub AssertInvalidOperationException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is InvalidOperationException Then
+        WrongException "InvalidOperationException", Ex
     End If
 End Sub
 
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
-    If Not catch(AssertExceptionThrown, Err) Then
+    If Not Catch(AssertExceptionThrown, Err) Then
         Assert.Fail "An exception should be thrown."
     End If
 End Function
+
+Private Sub WrongException(ByVal Expected As String, ByVal Actual As Exception)
+    Assert.Fail "Expected '" & Expected & "' but was '" & TypeName(Actual) & "'."
+End Sub

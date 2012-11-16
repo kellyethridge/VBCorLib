@@ -1,14 +1,14 @@
 Attribute VB_Name = "modSorterCallbacks"
 Option Explicit
 
-Public Function CompareStrings(ByRef x As String, ByRef y As String) As Long
-    CompareStrings = StrComp(x, y)
+Public Function CompareStringsAscending(ByRef X As String, ByRef Y As String) As Long
+    CompareStringsAscending = StrComp(X, Y)
 End Function
 
-Public Function CompareVBGuids(ByRef x As VBGUID, ByRef y As VBGUID) As Long
-    If x.Data1 < y.Data1 Then
+Public Function CompareVBGuids(ByRef X As VBGUID, ByRef Y As VBGUID) As Long
+    If X.Data1 < Y.Data1 Then
         CompareVBGuids = -1
-    ElseIf x.Data1 > y.Data1 Then
+    ElseIf X.Data1 > Y.Data1 Then
         CompareVBGuids = 1
     End If
 End Function

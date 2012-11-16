@@ -92,32 +92,53 @@ End Function
 ' They allow a virtual comparison routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
 Public Function CompareLongs(ByRef x As Long, ByRef y As Long) As Long
-    If x > y Then CompareLongs = 1: Exit Function
-    If x < y Then CompareLongs = -1
+    If x > y Then
+        CompareLongs = 1
+    ElseIf x < y Then
+        CompareLongs = -1
+    End If
 End Function
 Public Function CompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
-    If x > y Then CompareIntegers = 1: Exit Function
-    If x < y Then CompareIntegers = -1
+    If x > y Then
+        CompareIntegers = 1
+    ElseIf x < y Then
+        CompareIntegers = -1
+    End If
 End Function
 Public Function CompareStrings(ByRef x As String, ByRef y As String) As Long
-    If x > y Then CompareStrings = 1: Exit Function
-    If x < y Then CompareStrings = -1
+    If x > y Then
+        CompareStrings = 1
+    ElseIf x < y Then
+        CompareStrings = -1
+    End If
 End Function
 Public Function CompareDoubles(ByRef x As Double, ByRef y As Double) As Long
-    If x > y Then CompareDoubles = 1: Exit Function
-    If x < y Then CompareDoubles = -1
+    If x > y Then
+        CompareDoubles = 1
+    ElseIf x < y Then
+        CompareDoubles = -1
+    End If
 End Function
 Public Function CompareSingles(ByRef x As Single, ByRef y As Single) As Long
-    If x > y Then CompareSingles = 1: Exit Function
-    If x < y Then CompareSingles = -1
+    If x > y Then
+        CompareSingles = 1
+    ElseIf x < y Then
+        CompareSingles = -1
+    End If
 End Function
 Public Function CompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
-    If x > y Then CompareBytes = 1: Exit Function
-    If x < y Then CompareBytes = -1
+    If x > y Then
+        CompareBytes = 1
+    ElseIf x < y Then
+        CompareBytes = -1
+    End If
 End Function
 Public Function CompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
-    If x > y Then CompareBooleans = 1: Exit Function
-    If x < y Then CompareBooleans = -1
+    If x > y Then
+        CompareBooleans = 1
+    ElseIf x < y Then
+        CompareBooleans = -1
+    End If
 End Function
 Public Function CompareDates(ByRef x As Date, ByRef y As Date) As Long
     CompareDates = DateDiff("s", y, x)
@@ -136,12 +157,14 @@ Public Function CompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
     
     Select Case VarType(x)
         Case vbNull
-            If IsNull(y) Then Exit Function
-            CompareVariants = -1
+            If Not IsNull(y) Then
+                CompareVariants = -1
+            End If
             Exit Function
         Case vbEmpty
-            If IsEmpty(y) Then Exit Function
-            CompareVariants = -1
+            If Not IsEmpty(y) Then
+                CompareVariants = -1
+            End If
             Exit Function
         Case vbObject, vbDataObject
             If TypeOf x Is IComparable Then
@@ -150,14 +173,14 @@ Public Function CompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
                 Exit Function
             End If
         Case VarType(y)
-            If x = y Then Exit Function
             If x < y Then
                 CompareVariants = -1
-            Else
+            ElseIf x > y Then
                 CompareVariants = 1
             End If
             Exit Function
     End Select
+    
     Select Case VarType(y)
         Case vbNull, vbEmpty
             CompareVariants = 1
