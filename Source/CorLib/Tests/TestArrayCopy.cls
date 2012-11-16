@@ -380,7 +380,7 @@ Public Sub CopyEx_WithObjects_CopiesElements()
     Assert.That Target(2), Iz.SameAs(Source(1))
 End Sub
 
-Public Sub TestObjectsToSelf()
+Public Sub CopyEx_WithObjectsToSameArray_CopiesElements()
     Dim Item1 As New Int32
     Dim Item2 As New Int32
     Dim Item3 As New Int32
