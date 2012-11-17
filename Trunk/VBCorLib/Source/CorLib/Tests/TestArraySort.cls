@@ -31,16 +31,26 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As simplyvbcomp.TestCaseColl
 End Sub
 
 Public Sub Sort_WithPrimitives_SortsAscending(ByRef Arr As Variant)
-    cArray.Sort Arr
+    carray.Sort Arr
     
     Assert.That Arr, Iz.Ordered
+End Sub
+
+Public Sub Sort_WithNullArray_Throws()
+    On Error GoTo errTrap
+    Dim Arr() As Long
+    
+    carray.Sort Arr
+    
+errTrap:
+    AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub Sort_WithComparer_SortsValues()
     Dim Arr() As Long
     Arr = NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2)
     
-    cArray.Sort Arr, New DescendingComparer
+    carray.Sort Arr, New DescendingComparer
     
     Assert.That Arr, Iz.Ordered.Descending
 End Sub
@@ -53,7 +63,7 @@ Public Sub Sort_WithComparableObjects_SortsObjects()
     Set a(3) = MakeInt32(4)
     Set a(4) = MakeInt32(0)
     
-    cArray.Sort a
+    carray.Sort a
     
     Assert.That a, Iz.Ordered.Using(New ComparableComparer)
 End Sub
@@ -62,7 +72,7 @@ Public Sub Sort_WithCallback_SortsStrings()
     Dim a() As String
     a = NewStrings("c", "d", "a", "B", "A")
     
-    cArray.Sort a, AddressOf CompareStringsAscending
+    carray.Sort a, AddressOf CompareStringsAscending
     
     Assert.That a, Iz.Ordered
 End Sub
@@ -75,7 +85,7 @@ Public Sub Sort_WithCallback_SortsUDTs()
     a(3).Data1 = 1
     a(4).Data1 = 6
     
-    cArray.Sort a, AddressOf CompareVBGuids
+    carray.Sort a, AddressOf CompareVBGuids
     
     Assert.That a, Iz.Ordered.Using(New VBGuidComparer)
 End Sub
@@ -85,7 +95,7 @@ Public Sub Sort_WithNonComparableValues_Throws()
     Dim Arr As Variant
     Arr = Array(3, 2, "4", 1)
     
-    cArray.Sort Arr
+    carray.Sort Arr
     
 errTrap:
     AssertInvalidOperationException Err
@@ -99,7 +109,7 @@ Public Sub Sort_WithNonZeroLBound_SortsValues()
     Arr(8) = 6
     Arr(9) = 1
     
-    cArray.Sort Arr
+    carray.Sort Arr
     
     Assert.That Arr, Iz.Ordered
 End Sub
@@ -108,7 +118,7 @@ Public Sub SortEx_WhenCalled_SortsSubArray()
     Dim a() As Long
     a = NewLongs(6, 5, 4, 1, 3, 2, 1, 0)
     
-    cArray.SortEx a, 2, 4
+    carray.SortEx a, 2, 4
     
     Dim Expected() As Long
     Expected = NewLongs(6, 5, 1, 2, 3, 4, 1, 0)
@@ -119,11 +129,21 @@ Public Sub SortEx_WithComparer_SortsSubArray()
     Dim a() As Long
     a = NewLongs(5, 6, 4, 1, 3, 2, 1, 0)
     
-    cArray.SortEx a, 2, 4, New DescendingComparer
+    carray.SortEx a, 2, 4, New DescendingComparer
     
     Dim Expected() As Long
     Expected = NewLongs(5, 6, 4, 3, 2, 1, 1, 0)
     Assert.That a, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SortEx_WithNullArray_Throws()
+    On Error GoTo errTrap
+    Dim a() As Long
+    
+    carray.SortEx a, 2, 4
+    
+errTrap:
+    AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub SortKeys_WhenCalled_SortsKeys()
@@ -135,7 +155,7 @@ Public Sub SortKeys_WhenCalled_SortsKeys()
     Keys(3) = 6: Items(3) = 4
     Keys(4) = 1: Items(4) = 5
     
-    cArray.SortKey Keys, Items
+    carray.SortKey Keys, Items
     
     Assert.That Keys, Iz.Ordered
 End Sub
@@ -149,7 +169,7 @@ Public Sub SortKeys_WhenCalled_SortsItemsByKeys()
     Keys(3) = 6: Items(3) = 4
     Keys(4) = 1: Items(4) = 5
     
-    cArray.SortKey Keys, Items
+    carray.SortKey Keys, Items
     
     Dim Expected() As Long
     Expected = NewLongs(5, 3, 1, 2, 4)
@@ -165,7 +185,7 @@ Public Sub SortKeys_WithComparer_SortsKeys()
     Keys(3) = 6: Items(3) = 4
     Keys(4) = 1: Items(4) = 5
     
-    cArray.SortKey Keys, Items, New DescendingComparer
+    carray.SortKey Keys, Items, New DescendingComparer
     
     Assert.That Keys, Iz.Ordered.Descending
 End Sub
@@ -179,7 +199,7 @@ Public Sub SortKeys_WithComparer_SortsItemsByKeys()
     Keys(3) = 6: Items(3) = 4
     Keys(4) = 1: Items(4) = 5
     
-    cArray.SortKey Keys, Items, New DescendingComparer
+    carray.SortKey Keys, Items, New DescendingComparer
     
     Dim Expected() As Long
     Expected = NewLongs(4, 2, 1, 3, 5)

@@ -81,6 +81,7 @@ Public Enum ResourceStringId
     ArgumentNull_Stream = 902
     ArgumentNull_Collection = 903
     ArgumentNull_TimeSpan = 904
+    ArgumentNull_Generic = 905
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
     InvalidOperation_EmptyStack = 1100

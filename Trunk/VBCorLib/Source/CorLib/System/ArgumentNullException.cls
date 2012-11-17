@@ -58,7 +58,6 @@ Implements ArgumentException
 
 Private Const PROP_PARAMNAME         As String = "ParamName"
 Private Const PROP_BASE              As String = "Base"
-Private Const DEF_PARAMNAME          As String = vbNullString
 Private Const DEF_HRESULT            As Long = E_POINTER
 
 ' This can do it all.
@@ -84,7 +83,7 @@ End Property
 ' @see Exception
 '
 Public Property Get ParamName() As String
-    ParamName = mBase.GetValue(PROP_PARAMNAME, DEF_PARAMNAME)
+    ParamName = mBase.GetValue(PROP_PARAMNAME, "")
 End Property
 
 ''
@@ -242,9 +241,15 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByRef InnerException As Exception)
+Friend Sub Init(ByVal Message As String, ByRef ParamName As String, ByRef InnerException As Exception)
+    If Len(Message) = 0 Then
+        Message = Resources.GetString(ArgumentNull_Generic)
+    End If
+    
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
-    If Len(ParamName) > 0 Then Call mBase.SetValue(PROP_PARAMNAME, ParamName)
+    If Len(ParamName) > 0 Then
+        mBase.SetValue PROP_PARAMNAME, ParamName
+    End If
 End Sub
 
 
@@ -252,7 +257,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Call Init(Environment.GetResourceString(ArgumentNull_Exception), DEF_PARAMNAME, Nothing)
+    Init "", "", Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
@@ -260,7 +265,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty(PROP_BASE, mBase)
+    PropBag.WriteProperty PROP_BASE, mBase
 End Sub
 
 

@@ -906,7 +906,7 @@ End Sub
 ' Sorts an entire array. An optionally supplied comparer object can be
 ' used to compare special elements, such as userdefined values.
 '
-' @param Keys The array to sort.
+' @param Arr The array to sort.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
 ' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
@@ -923,8 +923,11 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 ' @include "..\Includes\cArray_Sort.txt"
-Public Sub Sort(ByRef Keys As Variant, Optional ByVal Comparer As Variant)
-    InternalSort Keys, Empty, , , Comparer
+Public Sub Sort(ByRef Arr As Variant, Optional ByVal Comparer As Variant)
+    If IsNull(Arr) Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+        
+    InternalSort Arr, Empty, , , Comparer
 End Sub
 
 ''
@@ -932,7 +935,7 @@ End Sub
 ' supplied comparer object can be used to compare special elements, such as
 ' userdefined values.
 '
-' @param Keys The array to sort.
+' @param Arr The array to sort.
 ' @param Index The starting index in the array to start sorting.
 ' @param Count The number of elements to be sorted.
 ' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
@@ -950,8 +953,11 @@ End Sub
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-Public Sub SortEx(ByRef Keys As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As Variant)
-    InternalSort Keys, Empty, Index, Count, Comparer
+Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As Variant)
+    If IsNull(Arr) Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+        
+    InternalSort Arr, Empty, Index, Count, Comparer
 End Sub
 
 ''
