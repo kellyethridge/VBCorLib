@@ -29,7 +29,7 @@ Public Enum ResourceStringId
     ArrayTypeMismatch_Incompatible = 102
     ArrayTypeMismatch_Exception = 103
     ArrayTypeMismatch_Compare = 104
-    Rank_MultiDimension = 200
+    Rank_MultiDimNotSupported = 200
     IndexOutOfRange_Dimension = 300
     IOException_Exception = 400
     IOException_DirectoryExists = 401
@@ -76,6 +76,7 @@ Public Enum ResourceStringId
     Argument_StreamNotSeekable = 820
     Arg_LongerThanSrcArray = 821
     Arg_LongerThanDestArray = 822
+    Argument_InvalidComparer = 823
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902

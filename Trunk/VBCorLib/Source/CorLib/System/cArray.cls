@@ -490,7 +490,7 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
     If Result <> NO_ERROR Then _
         ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
         
-    On Error GoTo errTrap
+    On Error GoTo ErrTrap
     If Comparer Is Nothing Then
         If TrySZBinarySearch(pSafeArray, Value, ElemIndex, ElemCount, BinarySearch) Then Exit Function
         Set Comparer = VBCorLib.Comparer.Default
@@ -520,7 +520,7 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
     LowerBound = SafeArrayGetLBound(pSafeArray, 1)
     BinarySearch = (Not (LowIndex - LowerBound)) + LowerBound
     Exit Function
-errTrap:
+ErrTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
@@ -771,7 +771,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     If Result <> NO_ERROR Then _
         ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
-    On Error GoTo errTrap
+    On Error GoTo ErrTrap
     If Comparer Is Nothing Then
         ' if no comparer was supplied, then try some optimized routines.
         If TrySZIndexOf(pSafeArray, Value, ElemIndex, ElemCount, IndexOf) Then Exit Function
@@ -789,7 +789,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Loop
     IndexOf = LBound(Arr) - 1
     Exit Function
-errTrap:
+ErrTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
@@ -824,7 +824,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     If Result <> NO_ERROR Then _
         ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
 
-    On Error GoTo errTrap
+    On Error GoTo ErrTrap
     If Comparer Is Nothing Then
         ' if no comparer was supplied, then try some optimized routines.
         If TrySZLastIndexOf(pSafeArray, Value, ElemIndex, ElemCount, LastIndexOf) Then Exit Function
@@ -842,7 +842,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     Loop
     LastIndexOf = LBound(Arr) - 1
     Exit Function
-errTrap:
+ErrTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
@@ -923,11 +923,13 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 ' @include "..\Includes\cArray_Sort.txt"
-Public Sub Sort(ByRef Arr As Variant, Optional ByVal Comparer As Variant)
+Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
         
-    InternalSort Arr, Empty, , , Comparer
+    Dim Length As Long
+    Length = UBound(Arr) - LBound(Arr) + 1
+    InternalSort Arr, Empty, LBound(Arr), Length, Comparer
 End Sub
 
 ''
@@ -953,11 +955,11 @@ End Sub
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As Variant)
+Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
         
-    InternalSort Arr, Empty, Index, Count, Comparer
+    InternalSort Arr, Empty, Index, Length, Comparer
 End Sub
 
 ''
@@ -982,8 +984,13 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 ' @include "..\Includes\cArray.SortKey.txt"
-Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByVal Comparer As Variant)
-    InternalSort Keys, Items, , , Comparer
+Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
+    If IsNull(Keys) Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Keys")
+    
+    Dim Length As Long
+    Length = UBound(Keys) - LBound(Keys) + 1
+    InternalSort Keys, Items, LBound(Keys), Length, Comparer
 End Sub
 
 ''
@@ -1010,7 +1017,7 @@ End Sub
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As Variant)
+Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByRef Comparer As Variant)
     InternalSort Keys, Items, Index, Count, Comparer
 End Sub
 
@@ -1399,34 +1406,42 @@ End Function
 ''
 ' Perform the sorting. If no comparer is supplied, then optimized sorting routines
 ' will be attempted, otherwise, the general routine will be used with the comparer.
-Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByRef Comparer As Variant)
+Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Count As Long, ByRef Comparer As Variant)
     Dim pKeysSafeArray  As Long
     Dim pItemsSafeArray As Long
-    Dim ElemIndex       As Long
-    Dim ElemCount       As Long
     
     pKeysSafeArray = GetArrayPointer(Keys)
+    If pKeysSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Keys")
+    If SafeArrayGetDim(pKeysSafeArray) > 1 Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+    If Index < LBound(Keys) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "Index")
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Length")
+    If Index + Count - 1 > UBound(Keys) Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidCountOffset))
     
-    Dim Result As Long
-    Result = GetOptionalArrayRange(pKeysSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Keys", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
-    
-    ' set up items to be sorted with keys
-    If IsArray(Items) Then
-        pItemsSafeArray = GetArrayPointer(Items)
-        If pItemsSafeArray = 0 Then _
-            Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Items")
-        
-        ' Items array must match the Keys array in size and bounds.
-        If (LBound(Keys) <> LBound(Items)) Or _
-           (UBound(Keys) <> UBound(Items)) Then _
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_MatchingBounds))
-        
-        SetSortItems pItemsSafeArray
+    If Not IsEmpty(Items) Then
+        If IsArray(Items) Then
+            pItemsSafeArray = GetArrayPointer(Items)
+            If pItemsSafeArray = vbNullPtr Then _
+                Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Items")
+            If SafeArrayGetDim(pItemsSafeArray) > 1 Then _
+                Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+                
+            ' Items array must match the Keys array in size and bounds.
+            If (LBound(Keys) <> LBound(Items)) Or _
+               (UBound(Keys) <> UBound(Items)) Then _
+                Throw Cor.NewArgumentException(Resources.GetString(Argument_MatchingBounds))
+            
+            SetSortItems pItemsSafeArray
+        Else
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_ArrayRequired), "Items")
+        End If
     End If
     
-    On Error GoTo errTrap
+    On Error GoTo ErrTrap
     ClearException
     Do
         Select Case VarType(Comparer)
@@ -1440,32 +1455,33 @@ Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, Optional
                     Set SortComparer = Comparer
                 End If
                 
-                QuickSortGeneral Keys, ElemIndex, ElemIndex + ElemCount - 1
+                QuickSortGeneral Keys, Index, Index + Count - 1
                 Exit Do
                 
             ' Use a callback method to sort with.
             ' This allows a user to supply a highspeed comarison
             ' routine to compare two elements of the array.
             Case vbLong
-                CallbackSorter.Sort pKeysSafeArray, pItemsSafeArray, ElemIndex, ElemIndex + ElemCount - 1, Comparer
+                CallbackSorter.Sort pKeysSafeArray, pItemsSafeArray, Index, Index + Count - 1, Comparer
                 Exit Do
                 
             ' try optimized routines first, then fallback to the default IComparer object.
             Case vbError
-                If TrySZSort(pKeysSafeArray, ElemIndex, ElemIndex + ElemCount - 1) Then Exit Do
-                
+                If Not TrySZSort(pKeysSafeArray, Index, Index + Count - 1) Then
                 ' If we get here, then no optimized routine existed,
                 ' so we'll set our comparer to the default and loop
                 ' around again, letting this case statement fall
                 ' into the QuickSortGeneral routine.
-                Set Comparer = VBCorLib.Comparer.Default
-            
+                    SetSortKeys pKeysSafeArray
+                    Set SortComparer = VBCorLib.Comparer.Default
+                    QuickSortGeneral Keys, Index, Index + Count - 1
+                End If
             Case Else
-                Throw Cor.NewArgumentException("Invalid Comparer.", "Comparer")
+                Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidComparer), "Comparer")
         End Select
     Loop
     
-errTrap:
+ErrTrap:
     ClearSortKeys
     ClearSortItems
     Set SortComparer = Nothing

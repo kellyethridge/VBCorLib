@@ -303,47 +303,55 @@ Public Sub NarrowVariantToObject(ByRef x As Object, ByRef y As Variant): Set x =
 '   all-purpose sort routine, but it would be too slow.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Sub SetSortKeys(ByVal pSA As Long)
-    Call CopyMemory(mSortKeys.SA, ByVal pSA, SIZEOF_SAFEARRAY1D)
+    CopyMemory mSortKeys.SA, ByVal pSA, SIZEOF_SAFEARRAY1D
     Select Case mSortKeys.SA.cbElements
         Case 1, 2, 4, 8, 16
         Case Else: mSortKeys.Buffer = CoTaskMemAlloc(mSortKeys.SA.cbElements)
     End Select
 End Sub
+
 Public Sub ClearSortKeys()
-    If mSortKeys.Buffer Then Call CoTaskMemFree(mSortKeys.Buffer)
+    If mSortKeys.Buffer Then
+        CoTaskMemFree mSortKeys.Buffer
+    End If
     mSortKeys.Buffer = 0
 End Sub
+
 Public Sub SetSortItems(ByVal pSA As Long)
-    Call CopyMemory(mSortItems.SA, ByVal pSA, SIZEOF_SAFEARRAY1D)
+    CopyMemory mSortItems.SA, ByVal pSA, SIZEOF_SAFEARRAY1D
     Select Case mSortItems.SA.cbElements
         Case 1, 2, 4, 8, 16
-        Case Else: mSortItems.Buffer = CoTaskMemAlloc(mSortItems.SA.cbElements)
+        Case Else
+            mSortItems.Buffer = CoTaskMemAlloc(mSortItems.SA.cbElements)
     End Select
     mHasSortItems = True
 End Sub
+
 Public Sub ClearSortItems()
     If mHasSortItems Then
-        Call CoTaskMemFree(mSortItems.Buffer)
+        CoTaskMemFree mSortItems.Buffer
         mSortItems.Buffer = 0
         mHasSortItems = False
     End If
 End Sub
+
 Public Sub SwapSortItems(ByRef Items As SortItems, ByVal i As Long, ByVal j As Long)
     With Items.SA
         Select Case .cbElements
-            Case 4:     Call Helper.Swap4(ByVal .pvData + i * 4, ByVal .pvData + j * 4)
-            Case 8:     Call Helper.Swap8(ByVal .pvData + i * 8, ByVal .pvData + j * 8)
-            Case 2:     Call Helper.Swap2(ByVal .pvData + i * 2, ByVal .pvData + j * 2)
-            Case 16:    Call Helper.Swap16(ByVal .pvData + i * 16, ByVal .pvData + j * 16)
-            Case 1:     Call Helper.Swap1(ByVal .pvData + i, ByVal .pvData + j)
+            Case 1:     Helper.Swap1 ByVal .pvData + i, ByVal .pvData + j
+            Case 2:     Helper.Swap2 ByVal .pvData + i * 2, ByVal .pvData + j * 2
+            Case 4:     Helper.Swap4 ByVal .pvData + i * 4, ByVal .pvData + j * 4
+            Case 8:     Helper.Swap8 ByVal .pvData + i * 8, ByVal .pvData + j * 8
+            Case 16:    Helper.Swap16 ByVal .pvData + i * 16, ByVal .pvData + j * 16
             Case Else
                 ' primarily for UDTs
-                Call CopyMemory(ByVal Items.Buffer, ByVal .pvData + i * .cbElements, .cbElements)
-                Call CopyMemory(ByVal .pvData + i * .cbElements, ByVal .pvData + j * .cbElements, .cbElements)
-                Call CopyMemory(ByVal .pvData + j * .cbElements, ByVal Items.Buffer, .cbElements)
+                CopyMemory ByVal Items.Buffer, ByVal .pvData + i * .cbElements, .cbElements
+                CopyMemory ByVal .pvData + i * .cbElements, ByVal .pvData + j * .cbElements, .cbElements
+                CopyMemory ByVal .pvData + j * .cbElements, ByVal Items.Buffer, .cbElements
         End Select
     End With
 End Sub
+
 Public Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Long, t As Long
     Do While Left < Right
@@ -352,18 +360,19 @@ Public Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right A
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortLong(Keys, Left, j)
+            If Left < j Then QuickSortLong Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortLong(Keys, i, Right)
+            If i < Right Then QuickSortLong Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As String
     Do While Left < Right
@@ -372,19 +381,20 @@ Public Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Rig
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then Call Helper.Swap4(Keys(i), Keys(j)): If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then Helper.Swap4 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortString(Keys, Left, j)
+            If Left < j Then QuickSortString Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortString(Keys, i, Right)
+            If i < Right Then QuickSortString Keys, i, Right
             Right = j
         End If
         StringPtr(x) = 0
     Loop
 End Sub
+
 Public Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Variant, Key As IComparable
     Do While Left < Right
@@ -393,18 +403,19 @@ Public Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Rig
             Set Key = Keys(i): Do While Key.CompareTo(x) < 0: i = i + 1: Set Key = Keys(i): Loop
             Set Key = Keys(j): Do While Key.CompareTo(x) > 0: j = j - 1: Set Key = Keys(j): Loop
             If i > j Then Exit Do
-            If i < j Then Call Helper.Swap4(Keys(i), Keys(j)): If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then Helper.Swap4 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortObject(Keys, Left, j)
+            If Left < j Then QuickSortObject Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortObject(Keys, i, Right)
+            If i < Right Then QuickSortObject Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortInteger(ByRef Keys() As Integer, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Integer, t As Integer
     Do While Left < Right
@@ -413,18 +424,19 @@ Public Sub QuickSortInteger(ByRef Keys() As Integer, ByVal Left As Long, ByVal R
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortInteger(Keys, Left, j)
+            If Left < j Then QuickSortInteger Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortInteger(Keys, i, Right)
+            If i < Right Then QuickSortInteger Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortByte(ByRef Keys() As Byte, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Byte, t As Byte
     Do While Left < Right
@@ -433,18 +445,19 @@ Public Sub QuickSortByte(ByRef Keys() As Byte, ByVal Left As Long, ByVal Right A
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortByte(Keys, Left, j)
+            If Left < j Then QuickSortByte Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortByte(Keys, i, Right)
+            If i < Right Then QuickSortByte Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortDouble(ByRef Keys() As Double, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Double, t As Double
     Do While Left < Right
@@ -453,18 +466,19 @@ Public Sub QuickSortDouble(ByRef Keys() As Double, ByVal Left As Long, ByVal Rig
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortDouble(Keys, Left, j)
+            If Left < j Then QuickSortDouble Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortDouble(Keys, i, Right)
+            If i < Right Then QuickSortDouble Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortSingle(ByRef Keys() As Single, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Single, t As Single
     Do While Left < Right
@@ -473,18 +487,19 @@ Public Sub QuickSortSingle(ByRef Keys() As Single, ByVal Left As Long, ByVal Rig
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortSingle(Keys, Left, j)
+            If Left < j Then QuickSortSingle Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortSingle(Keys, i, Right)
+            If i < Right Then QuickSortSingle Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortCurrency(ByRef Keys() As Currency, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Currency, t As Currency
     Do While Left < Right
@@ -493,18 +508,19 @@ Public Sub QuickSortCurrency(ByRef Keys() As Currency, ByVal Left As Long, ByVal
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortCurrency(Keys, Left, j)
+            If Left < j Then QuickSortCurrency Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortCurrency(Keys, i, Right)
+            If i < Right Then QuickSortCurrency Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortBoolean(ByRef Keys() As Boolean, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Boolean, t As Boolean
     Do While Left < Right
@@ -513,54 +529,56 @@ Public Sub QuickSortBoolean(ByRef Keys() As Boolean, ByVal Left As Long, ByVal R
             Do While Keys(i) < x: i = i + 1: Loop
             Do While Keys(j) > x: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortBoolean(Keys, Left, j)
+            If Left < j Then QuickSortBoolean Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortBoolean(Keys, i, Right)
+            If i < Right Then QuickSortBoolean Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Variant
     Do While Left < Right
-        i = Left: j = Right: Call VariantCopyInd(x, Keys((i + j) \ 2))
+        i = Left: j = Right: VariantCopyInd x, Keys((i + j) \ 2)
         Do
             Do While CompareVariants(Keys(i), x) < 0: i = i + 1: Loop
             Do While CompareVariants(Keys(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then Call Helper.Swap16(Keys(i), Keys(j)): If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then Helper.Swap16 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortVariant(Keys, Left, j)
+            If Left < j Then QuickSortVariant Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortVariant(Keys, i, Right)
+            If i < Right Then QuickSortVariant Keys, i, Right
             Right = j
         End If
     Loop
 End Sub
+
 Public Sub QuickSortGeneral(ByRef Keys As Variant, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Variant
     Do While Left < Right
-        i = Left: j = Right: Call VariantCopyInd(x, Keys((i + j) \ 2))
+        i = Left: j = Right: VariantCopyInd x, Keys((i + j) \ 2)
         Do
             Do While SortComparer.Compare(Keys(i), x) < 0: i = i + 1: Loop
             Do While SortComparer.Compare(Keys(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then SwapSortItems mSortKeys, i, j: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            If i < j Then SwapSortItems mSortKeys, i, j: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortGeneral(Keys, Left, j)
+            If Left < j Then QuickSortGeneral Keys, Left, j
             Left = i
         Else
-            If i < Right Then Call QuickSortGeneral(Keys, i, Right)
+            If i < Right Then QuickSortGeneral Keys, i, Right
             Right = j
         End If
     Loop

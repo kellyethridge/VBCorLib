@@ -68,6 +68,14 @@ Public Sub AssertInvalidOperationException(ByVal Err As ErrObject)
     End If
 End Sub
 
+Public Sub AssertRankException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is RankException Then
+        WrongException "RankException", Ex
+    End If
+End Sub
+
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
     If Not Catch(AssertExceptionThrown, Err) Then
         Assert.Fail "An exception should be thrown."

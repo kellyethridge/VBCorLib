@@ -327,9 +327,7 @@ Command32=""
 Name="VBCorLib"
 HelpContextID="0"
 Description="VB.EXT: VBCorLib 3.0"
-CompatibleMode="2"
-CompatibleEXE32="..\..\Binaries\Compatibility\VBCorLib.cmp"
-VersionCompatible32="1"
+CompatibleMode="1"
 MajorVer=3
 MinorVer=0
 RevisionVer=0
@@ -453,3 +451,15 @@ Comment=
 
 [MS Transaction Server]
 AutoRefresh=1
+
+[vbAdvance]
+IsConsole=0
+HasStubFile=0
+GenerateMap=0
+TSAware=0
+XPManifest=0
+ResBuildName=.\VBCorLib.dll
+ReplaceIcon=0
+SendCommandArgs=0
+SymbDbgPref=0
+RevisionVersion=0
