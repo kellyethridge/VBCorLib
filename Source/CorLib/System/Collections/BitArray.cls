@@ -112,7 +112,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If Index < LBound(DstArray) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "index", Index)
     If cArray.GetRank(DstArray) <> 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimension))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     
     Select Case VarType(DstArray)
         Case vbLongArray
@@ -404,10 +404,10 @@ Friend Sub InitFromBytes(ByRef Values() As Byte)
     If cArray.IsNull(Values) Then _
         Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "values")
     
-    Dim Size As Long
-    Size = cArray.GetLength(Values, 1)
-    Me.Length = Size * 8
-    Call CopyMemory(mBits(0), Values(0), Size)
+    Dim size As Long
+    size = cArray.GetLength(Values, 1)
+    Me.Length = size * 8
+    Call CopyMemory(mBits(0), Values(0), size)
 End Sub
 
 Friend Sub InitFromLongs(ByRef Values() As Long)

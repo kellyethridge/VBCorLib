@@ -123,7 +123,7 @@ Public Function GetOptionalArrayRange(ByVal pSafeArray As Long, _
     
     ' Ensure we only have a 1-Dimension array.
     If SafeArrayGetDim(pSafeArray) <> 1 Then
-        GetOptionalArrayRange = Rank_MultiDimension
+        GetOptionalArrayRange = Rank_MultiDimNotSupported
         Exit Function
     End If
     
@@ -187,7 +187,7 @@ Public Function GetOptionalArrayRangeReverse(ByVal pSafeArray As Long, _
     
     ' Ensure we only have a 1-Dimension array.
     If SafeArrayGetDim(pSafeArray) <> 1 Then
-        GetOptionalArrayRangeReverse = Rank_MultiDimension
+        GetOptionalArrayRangeReverse = Rank_MultiDimNotSupported
         Exit Function
     End If
     
@@ -242,7 +242,7 @@ Public Function VerifyArrayRange(ByVal pSafeArray As Long, ByVal Index As Long, 
     
     ' Ensure we only have a 1-Dimension array.
     If SafeArrayGetDim(pSafeArray) <> 1 Then
-        VerifyArrayRange = Rank_MultiDimension
+        VerifyArrayRange = Rank_MultiDimNotSupported
         Exit Function
     End If
     
@@ -287,7 +287,7 @@ Public Function VerifyArrayRangeReverse(ByVal pSafeArray As Long, ByVal Index As
     
     ' Ensure we only have a 1-Dimension array.
     If SafeArrayGetDim(pSafeArray) <> 1 Then
-        VerifyArrayRangeReverse = Rank_MultiDimension
+        VerifyArrayRangeReverse = Rank_MultiDimNotSupported
         Exit Function
     End If
     
@@ -327,7 +327,7 @@ Public Sub ThrowArrayRangeException(ByVal ErrorCode As Long, ByRef ArrayName As 
     Message = Environment.GetResourceString(ErrorCode)
     Select Case ErrorCode
         Case ArgumentNull_Array:                Throw Cor.NewArgumentNullException(Message, ArrayName)
-        Case Rank_MultiDimension:               Throw Cor.NewRankException(Message)
+        Case Rank_MultiDimNotSupported:               Throw Cor.NewRankException(Message)
         Case Argument_ParamRequired:            Throw Cor.NewArgumentException(Message, IIf(IsIndexMissing, IndexName, CountName))
         Case ArgumentOutOfRange_LBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
         Case ArgumentOutOfRange_UBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)

@@ -636,13 +636,13 @@ End Function
 ' @param Format The formatting command to retrieve all the patterns for.
 ' @return An array of all the requested formatting patterns.
 '
-Public Function GetAllDateTimePatterns(Optional ByRef Format As Variant) As String()
+Public Function GetAllDateTimePatterns(Optional ByRef format As Variant) As String()
     Call VerifyLoaded
-    If IsMissing(Format) Then
+    If IsMissing(format) Then
         GetAllDateTimePatterns = CombineAllDateTimePatterns
     Else
-        If VarType(Format) = vbString Then Format = Asc(Format)
-        GetAllDateTimePatterns = GetSpecificDateTimePattern(Format)
+        If VarType(format) = vbString Then format = Asc(format)
+        GetAllDateTimePatterns = GetSpecificDateTimePattern(format)
     End If
 End Function
 
@@ -738,9 +738,9 @@ End Function
 ' u - UniversalSortableDateTimePattern<br>
 ' y,Y - YearMonthPattern<br>
 '
-Public Function Format(ByRef Value As Variant, Optional ByVal fmt As String) As String
+Public Function format(ByRef Value As Variant, Optional ByVal fmt As String) As String
     Call VerifyLoaded
-    Format = CustomFormat(cDateTime.GetcDateTime(Value), GetPattern(fmt))
+    format = CustomFormat(cDateTime.GetcDateTime(Value), GetPattern(fmt))
 End Function
 
 ''
@@ -922,9 +922,9 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
                     Case vbLowerZ
                         If ZoneOffset Is Nothing Then Set ZoneOffset = TimeZone.CurrentTimeZone.GetUtcOffset(dt)
                         Select Case cnt
-                            Case 1:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "0;-0"))
-                            Case 2:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00"))
-                            Case Else:      Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.Format$(ZoneOffset.Minutes, "00"))
+                            Case 1:         Call sb.AppendString(VBA.format$(ZoneOffset.Hours, "0;-0"))
+                            Case 2:         Call sb.AppendString(VBA.format$(ZoneOffset.Hours, "00;-00"))
+                            Case Else:      Call sb.AppendString(VBA.format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.format$(ZoneOffset.Minutes, "00"))
                         End Select
                     
                     Case vbPercent
@@ -1171,7 +1171,7 @@ Private Sub AssignDayNames(ByRef Source() As String, ByRef DayNames() As String)
     Call VerifyLoaded
 
     If cArray.GetRank(Source) <> 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimension))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If cArray.GetLength(Source) <> 7 Then _
         Throw Cor.NewArgumentException("Array must contain exactly 7 elements.")
     
@@ -1183,7 +1183,7 @@ Private Sub AssignMonthNames(ByRef Source() As String, ByRef MonthNames() As Str
     Call VerifyWritable
     Call VerifyLoaded
     If cArray.GetRank(Source) <> 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimension))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If cArray.GetLength(Source) <> 13 Then _
         Throw Cor.NewArgumentException("Array must contain exactly 13 elements.")
         
