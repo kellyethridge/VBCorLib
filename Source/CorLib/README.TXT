@@ -1,9 +1,10 @@
 ** VBCorLib **
 
 version 3.0 (BREAKING CHANGES)
-	* Fixed broken cArray.IndexOf when searching byte arrays.
-	* Fixed broken cArray.LastIndexOf when searching byte arrays.
+	* Fixed cArray.IndexOf when searching byte arrays.
+	* Fixed cArray.LastIndexOf when searching byte arrays.
 	* Fixed array comparison of objects. Would break if element was Nothing.
+	* Fixed cArray.FindIndex. Returned incorrect result when supplying index.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

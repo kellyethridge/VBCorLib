@@ -4,6 +4,8 @@ Attribute VB_Name = "modFindersCallbacks"
 '
 Option Explicit
 
+
+
 Public Function FindHelloString(ByRef s As String) As Boolean
     FindHelloString = (s = "Hello")
 End Function

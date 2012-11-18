@@ -139,7 +139,7 @@ Public Function BinarySearch(ByRef Value As Variant, Optional ByRef Index As Var
     End If
     
     If Comparer Is Nothing Then Set Comparer = mComparer
-    BinarySearch = cArray.BinarySearch(mItems, Value, ElemIndex, ElemCount, Comparer)
+    BinarySearch = cArray.BinarySearchEx(mItems, Value, ElemIndex, ElemCount, Comparer)
 End Function
 
 ''
@@ -276,12 +276,12 @@ End Function
 ' parameters, the GetEnumerator must be called instead of simply passing the object
 ' to the For..Each. This allows for a portion of the list to be enumerated.
 ' @include "..\..\Includes\ArrayListGetEnumerator.txt"
-Public Function GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
+Public Function GetEnumerator(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As Object
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mCount, startIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
     
     Dim Ret As New ArrayListEnumerator
     Call Ret.Init(Me, ElemIndex, ElemCount)
@@ -329,12 +329,12 @@ End Function
 ' @remarks If there is special compare logic necessary, then a comparer
 ' object can be supplied. The compare object must implement the IComparer interface.
 '
-Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function IndexOf(ByRef Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> 0 Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mCount, startIndex, ElemIndex, Count, ElemCount)
+    If Result <> 0 Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
     
     If mCount = 0 Then
         IndexOf = -1
@@ -472,12 +472,12 @@ End Property
 ' @remarks The search is performed from the end of the list towards the
 ' beginning. If a startindex
 '
-Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemIndex As Long
     Dim ElemCount As Long
     
-    If GetOptionalLongPair(StartIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(StartIndex), "StartIndex", "Count"))
+    If GetOptionalLongPair(startIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(startIndex), "StartIndex", "Count"))
     If ElemIndex >= mCount Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection), "StartIndex", ElemIndex)
     If ElemCount < 0 Then _
@@ -602,12 +602,12 @@ End Sub
 ' @remarks The list is sorted in ascending order by default. By providing
 ' a custom comaprer, the list can be sorted in special ways, such as descending order.
 '
-Public Sub Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+Public Sub Sort(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> 0 Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mCount, startIndex, ElemIndex, Count, ElemCount)
+    If Result <> 0 Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
 
     If Comparer Is Nothing Then Set Comparer = mComparer
     Call cArray.SortEx(mItems, ElemIndex, ElemCount, Comparer)
@@ -782,7 +782,7 @@ Private Sub Class_InitProperties()
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     With PropBag
         mCount = .ReadProperty(PROP_COUNT, 0)
         Call EnsureCapacity(.ReadProperty(PROP_CAPACITY, DEF_CAPACITY))
@@ -814,12 +814,12 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
     End With
     Exit Sub
     
-ErrTrap:
+errTrap:
     Throw Cor.NewSerializationException(Err.Description)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     With PropBag
         Dim i As Long
         For i = 0 To mCount - 1
@@ -855,7 +855,7 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
     End With
     Exit Sub
     
-ErrTrap:
+errTrap:
     Throw Cor.NewSerializationException(Err.Description)
 End Sub
 
