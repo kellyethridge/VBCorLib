@@ -490,7 +490,7 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
     If Result <> NO_ERROR Then _
         ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
         
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     If Comparer Is Nothing Then
         If TrySZBinarySearch(pSafeArray, Value, ElemIndex, ElemCount, BinarySearch) Then Exit Function
         Set Comparer = VBCorLib.Comparer.Default
@@ -520,7 +520,7 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
     LowerBound = SafeArrayGetLBound(pSafeArray, 1)
     BinarySearch = (Not (LowIndex - LowerBound)) + LowerBound
     Exit Function
-ErrTrap:
+errTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
@@ -531,16 +531,19 @@ End Function
 ' @param Index The starting element to being clearing.
 ' @param Count The number of elements to be cleared.
 '
-Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long)
-    Dim pSafeArray As Long
+Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long)
+    Dim pSafeArray  As Long
     pSafeArray = GetArrayPointer(Arr)
+    If pSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+    If Index < LBound(Arr) Then _
+        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+    If Length < 0 Then _
+        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Length - 1 > UBound(Arr) Then _
+        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(Argument_InvalidOffLen))
     
-    Dim Result As Long
-    Result = VerifyArrayRange(pSafeArray, Index, Count)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Arr", Index, "Index", Count, "Count"
-    
-    If Count = 0 Then Exit Sub
+    If Length = 0 Then Exit Sub
     
     Dim IIDOffset As Long
     Select Case VarType(Arr) And &HFF   ' knock off the vbArray bit
@@ -559,7 +562,7 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long)
             pElem = MemLong(pSafeArray + PVDATA_OFFSET)
             
             ' optimize by zeroing out the memory directly.
-            ZeroMemory ByVal pElem + (Index - LBound(Arr)) * ElemSize, Count * ElemSize
+            ZeroMemory ByVal pElem + (Index - LBound(Arr)) * ElemSize, Length * ElemSize
             Exit Sub
     End Select
     
@@ -569,7 +572,7 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long)
     With SubArray.SA
         .fFeatures = .fFeatures Or FADF_FIXEDSIZE Or FADF_STATIC Or FADF_AUTO
         .pvData = .pvData + (Index - LBound(Arr)) * .cbElements
-        .cElements = Count
+        .cElements = Length
     End With
     SafeArrayDestroyData VarPtr(SubArray.SA)
 End Sub
@@ -710,7 +713,10 @@ End Function
 '
 Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long = 0) As Long
     Dim pSafeArray  As Long
-    pSafeArray = GetArrayPointer(Arr, True)
+    pSafeArray = GetArrayPointer(Arr)
+    If pSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+    
     GetLength = InternalGetLength(pSafeArray, Dimension)
 End Function
 
@@ -747,7 +753,12 @@ End Function
 ' @param arr The array to retrieve the number of dimensions from.
 ' @return The number of dimension in the array.
 Public Function GetRank(ByRef Arr As Variant) As Long
-    GetRank = SafeArrayGetDim(GetArrayPointer(Arr, True))
+    Dim pSafeArray  As Long
+    pSafeArray = GetArrayPointer(Arr)
+    If pSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+        
+    GetRank = SafeArrayGetDim(pSafeArray)
 End Function
 
 ''
@@ -760,7 +771,7 @@ End Function
 ' @param Comparer An optional comparer, primarily used for User-Defined types.
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
-Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     
@@ -771,7 +782,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     
     Dim ElemIndex As Long
     Dim ElemCount As Long
-    ElemIndex = GetOptionalLong(StartIndex, LBound(Arr))
+    ElemIndex = GetOptionalLong(startIndex, LBound(Arr))
     ElemCount = GetOptionalLong(Count, UBound(Arr) - ElemIndex + 1)
 
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
@@ -781,7 +792,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_UBound))
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     If Comparer Is Nothing Then
         ' if no comparer was supplied, then try some optimized routines.
         If TrySZIndexOf(pSafeArray, Value, ElemIndex, ElemCount, IndexOf) Then Exit Function
@@ -799,7 +810,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Loop
     IndexOf = LBound(Arr) - 1
     Exit Function
-ErrTrap:
+errTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
@@ -823,7 +834,7 @@ End Function
 ' @return Value indicating the index the value was found. If no value was found,
 ' then one less than the lower bound of the array is returned.
 '
-Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     
@@ -834,9 +845,9 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    
-    ElemIndex = GetOptionalLong(StartIndex, UBound(Arr))
+    ElemIndex = GetOptionalLong(startIndex, UBound(Arr))
     ElemCount = GetOptionalLong(Count, ElemIndex - LBound(Arr) + 1)
+    
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_ArrayBounds), "StartIndex")
     If ElemCount < 0 Then _
@@ -844,7 +855,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound))
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     If Comparer Is Nothing Then
         ' if no comparer was supplied, then try some optimized routines.
         If TrySZLastIndexOf(pSafeArray, Value, ElemIndex, ElemCount, LastIndexOf) Then Exit Function
@@ -862,14 +873,14 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     Loop
     LastIndexOf = LBound(Arr) - 1
     Exit Function
-ErrTrap:
+errTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
 ''
 ' Reverses the elements in a subportion of an array.
 '
-' @param arr The array to reverse.
+' @param Arr The array to reverse.
 ' @param Index The starting element to begin reversing elements.
 ' @param Count The number of elements to reverse in the array.
 '
@@ -877,12 +888,23 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     
+    If pSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+    If SafeArrayGetDim(pSafeArray) > 1 Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+    
     Dim Result      As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Result = GetOptionalArrayRange(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    ElemIndex = GetOptionalLong(Index, LBound(Arr))
+    ElemCount = GetOptionalLong(Count, UBound(Arr) - ElemIndex + 1)
+    
+    If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "Index")
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
+    If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -1460,47 +1482,43 @@ Private Sub InternalSort(ByRef Keys As Variant, ByRef Items As Variant, ByVal In
         SetSortItems pItemsSafeArray
     End If
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     ClearException
-    Do
-        Select Case VarType(Comparer)
-            ' use an IComparer object to sort with.
-            Case vbObject
-                SetSortKeys pKeysSafeArray
-                
-                If Comparer Is Nothing Then
-                    Set SortComparer = VBCorLib.Comparer.Default
-                Else
-                    Set SortComparer = Comparer
-                End If
-                
-                QuickSortGeneral Keys, Index, Index + Length - 1
-                Exit Do
-                
-            ' Use a callback method to sort with.
-            ' This allows a user to supply a highspeed comarison
-            ' routine to compare two elements of the array.
-            Case vbLong
-                CallbackSorter.Sort pKeysSafeArray, pItemsSafeArray, Index, Index + Length - 1, Comparer
-                Exit Do
-                
-            ' try optimized routines first, then fallback to the default IComparer object.
-            Case vbError
-                If Not TrySZSort(pKeysSafeArray, Index, Index + Length - 1) Then
+    Select Case VarType(Comparer)
+        ' use an IComparer object to sort with.
+        Case vbObject
+            SetSortKeys pKeysSafeArray
+            
+            If Comparer Is Nothing Then
+                Set SortComparer = VBCorLib.Comparer.Default
+            Else
+                Set SortComparer = Comparer
+            End If
+            
+            QuickSortGeneral Keys, Index, Index + Length - 1
+            
+        ' Use a callback method to sort with.
+        ' This allows a user to supply a highspeed comarison
+        ' routine to compare two elements of the array.
+        Case vbLong
+            CallbackSorter.Sort pKeysSafeArray, pItemsSafeArray, Index, Index + Length - 1, Comparer
+            
+        ' try optimized routines first, then fallback to the default IComparer object.
+        Case vbError
+            If Not TrySZSort(pKeysSafeArray, Index, Index + Length - 1) Then
                 ' If we get here, then no optimized routine existed,
                 ' so we'll set our comparer to the default and loop
                 ' around again, letting this case statement fall
                 ' into the QuickSortGeneral routine.
-                    SetSortKeys pKeysSafeArray
-                    Set SortComparer = VBCorLib.Comparer.Default
-                    QuickSortGeneral Keys, Index, Index + Length - 1
-                End If
-            Case Else
-                Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidComparer), "Comparer")
-        End Select
-    Loop
+                SetSortKeys pKeysSafeArray
+                Set SortComparer = VBCorLib.Comparer.Default
+                QuickSortGeneral Keys, Index, Index + Length - 1
+            End If
+        Case Else
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidComparer), "Comparer")
+    End Select
     
-ErrTrap:
+errTrap:
     ClearSortKeys
     ClearSortItems
     Set SortComparer = Nothing
@@ -1595,55 +1613,55 @@ End Function
 
 ''
 ' Attempt to use a specialized search for a specific data type.
-Private Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
+Private Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal startIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA)
-        Case vbLong:                    RetVal = SZBinarySearch(pSA, VarPtr(CLng(Value)), StartIndex, Length, AddressOf CompareLongs)
-        Case vbString:                  RetVal = SZBinarySearch(pSA, VarPtr(StrPtr(Value)), StartIndex, Length, AddressOf CompareStrings)
-        Case vbDouble:                  RetVal = SZBinarySearch(pSA, VarPtr(CDbl(Value)), StartIndex, Length, AddressOf CompareDoubles)
-        Case vbObject, vbDataObject:    RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf CompareIComparable)
-        Case vbVariant:                 RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf CompareVariants)
-        Case vbInteger:                 RetVal = SZBinarySearch(pSA, VarPtr(CInt(Value)), StartIndex, Length, AddressOf CompareIntegers)
-        Case vbSingle:                  RetVal = SZBinarySearch(pSA, VarPtr(CSng(Value)), StartIndex, Length, AddressOf CompareSingles)
-        Case vbCurrency:                RetVal = SZBinarySearch(pSA, VarPtr(CCur(Value)), StartIndex, Length, AddressOf CompareCurrencies)
-        Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), StartIndex, Length, AddressOf CompareDates)
-        Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), StartIndex, Length, AddressOf CompareBooleans)
-        Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), StartIndex, Length, AddressOf CompareBytes)
+        Case vbLong:                    RetVal = SZBinarySearch(pSA, VarPtr(CLng(Value)), startIndex, Length, AddressOf CompareLongs)
+        Case vbString:                  RetVal = SZBinarySearch(pSA, VarPtr(StrPtr(Value)), startIndex, Length, AddressOf CompareStrings)
+        Case vbDouble:                  RetVal = SZBinarySearch(pSA, VarPtr(CDbl(Value)), startIndex, Length, AddressOf CompareDoubles)
+        Case vbObject, vbDataObject:    RetVal = SZBinarySearch(pSA, VarPtr(Value), startIndex, Length, AddressOf CompareIComparable)
+        Case vbVariant:                 RetVal = SZBinarySearch(pSA, VarPtr(Value), startIndex, Length, AddressOf CompareVariants)
+        Case vbInteger:                 RetVal = SZBinarySearch(pSA, VarPtr(CInt(Value)), startIndex, Length, AddressOf CompareIntegers)
+        Case vbSingle:                  RetVal = SZBinarySearch(pSA, VarPtr(CSng(Value)), startIndex, Length, AddressOf CompareSingles)
+        Case vbCurrency:                RetVal = SZBinarySearch(pSA, VarPtr(CCur(Value)), startIndex, Length, AddressOf CompareCurrencies)
+        Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), startIndex, Length, AddressOf CompareDates)
+        Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), startIndex, Length, AddressOf CompareBooleans)
+        Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), startIndex, Length, AddressOf CompareBytes)
         Case Else: Exit Function
     End Select
     TrySZBinarySearch = True
 End Function
 
-Private Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
+Private Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal startIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA) And &HFF
-        Case vbLong:                    RetVal = SZIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualsLong)
-        Case vbString:                  RetVal = SZIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualsString)
-        Case vbDouble:                  RetVal = SZIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualsDouble)
-        Case vbDate:                    RetVal = SZIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualsDate)
-        Case vbObject, vbDataObject:    RetVal = SZIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualsObject)
-        Case vbVariant:                 RetVal = SZIndexOf(pSA, VarPtr(Value), StartIndex, Count, AddressOf EqualsVariants)
-        Case vbInteger:                 RetVal = SZIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualsInteger)
-        Case vbSingle:                  RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualsSingle)
-        Case vbByte:                    RetVal = SZIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualsByte)
-        Case vbBoolean:                 RetVal = SZIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualsBoolean)
-        Case vbCurrency:                RetVal = SZIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualsCurrency)
+        Case vbLong:                    RetVal = SZIndexOf(pSA, VarPtr(CLng(Value)), startIndex, Count, AddressOf EqualsLong)
+        Case vbString:                  RetVal = SZIndexOf(pSA, VarPtr(StrPtr(Value)), startIndex, Count, AddressOf EqualsString)
+        Case vbDouble:                  RetVal = SZIndexOf(pSA, VarPtr(CDbl(Value)), startIndex, Count, AddressOf EqualsDouble)
+        Case vbDate:                    RetVal = SZIndexOf(pSA, VarPtr(CDate(Value)), startIndex, Count, AddressOf EqualsDate)
+        Case vbObject, vbDataObject:    RetVal = SZIndexOf(pSA, VarPtr(ObjPtr(Value)), startIndex, Count, AddressOf EqualsObject)
+        Case vbVariant:                 RetVal = SZIndexOf(pSA, VarPtr(Value), startIndex, Count, AddressOf EqualsVariants)
+        Case vbInteger:                 RetVal = SZIndexOf(pSA, VarPtr(CInt(Value)), startIndex, Count, AddressOf EqualsInteger)
+        Case vbSingle:                  RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), startIndex, Count, AddressOf EqualsSingle)
+        Case vbByte:                    RetVal = SZIndexOf(pSA, VarPtr(CByte(Value)), startIndex, Count, AddressOf EqualsByte)
+        Case vbBoolean:                 RetVal = SZIndexOf(pSA, VarPtr(CBool(Value)), startIndex, Count, AddressOf EqualsBoolean)
+        Case vbCurrency:                RetVal = SZIndexOf(pSA, VarPtr(CCur(Value)), startIndex, Count, AddressOf EqualsCurrency)
         Case Else: Exit Function
     End Select
     TrySZIndexOf = True
 End Function
 
-Private Function TrySZLastIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
+Private Function TrySZLastIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal startIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA) And &HFF
-        Case vbLong:                    RetVal = SZLastIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualsLong)
-        Case vbString:                  RetVal = SZLastIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualsString)
-        Case vbDouble:                  RetVal = SZLastIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualsDouble)
-        Case vbDate:                    RetVal = SZLastIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualsDate)
-        Case vbObject, vbDataObject:    RetVal = SZLastIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualsObject)
-        Case vbVariant:                 RetVal = SZLastIndexOf(pSA, VarPtr(Value), StartIndex, Count, AddressOf EqualsVariants)
-        Case vbInteger:                 RetVal = SZLastIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualsInteger)
-        Case vbSingle:                  RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualsSingle)
-        Case vbByte:                    RetVal = SZLastIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualsByte)
-        Case vbBoolean:                 RetVal = SZLastIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualsBoolean)
-        Case vbCurrency:                RetVal = SZLastIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualsCurrency)
+        Case vbLong:                    RetVal = SZLastIndexOf(pSA, VarPtr(CLng(Value)), startIndex, Count, AddressOf EqualsLong)
+        Case vbString:                  RetVal = SZLastIndexOf(pSA, VarPtr(StrPtr(Value)), startIndex, Count, AddressOf EqualsString)
+        Case vbDouble:                  RetVal = SZLastIndexOf(pSA, VarPtr(CDbl(Value)), startIndex, Count, AddressOf EqualsDouble)
+        Case vbDate:                    RetVal = SZLastIndexOf(pSA, VarPtr(CDate(Value)), startIndex, Count, AddressOf EqualsDate)
+        Case vbObject, vbDataObject:    RetVal = SZLastIndexOf(pSA, VarPtr(ObjPtr(Value)), startIndex, Count, AddressOf EqualsObject)
+        Case vbVariant:                 RetVal = SZLastIndexOf(pSA, VarPtr(Value), startIndex, Count, AddressOf EqualsVariants)
+        Case vbInteger:                 RetVal = SZLastIndexOf(pSA, VarPtr(CInt(Value)), startIndex, Count, AddressOf EqualsInteger)
+        Case vbSingle:                  RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), startIndex, Count, AddressOf EqualsSingle)
+        Case vbByte:                    RetVal = SZLastIndexOf(pSA, VarPtr(CByte(Value)), startIndex, Count, AddressOf EqualsByte)
+        Case vbBoolean:                 RetVal = SZLastIndexOf(pSA, VarPtr(CBool(Value)), startIndex, Count, AddressOf EqualsBoolean)
+        Case vbCurrency:                RetVal = SZLastIndexOf(pSA, VarPtr(CCur(Value)), startIndex, Count, AddressOf EqualsCurrency)
         Case Else: Exit Function
     End Select
     TrySZLastIndexOf = True

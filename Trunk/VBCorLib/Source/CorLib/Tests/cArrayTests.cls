@@ -15,11 +15,11 @@ Option Explicit
 Implements ICategorizable
 Implements ITestCaseSource
 
-Private Sub ICategorizable_Categorize(ByVal Cat As simplyvbcomp.CategoryCollector)
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "Array Tests"
 End Sub
 
-Private Sub ITestCaseSource_GetTestCases(ByVal Test As simplyvbcomp.TestCaseCollector)
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Dim LongArray()     As Long
     Dim Var             As Variant
     Dim ObjectArray()   As Object
@@ -116,6 +116,42 @@ Public Sub GetRank_WithNonArray_Throws()
     cArray.GetRank NotAnArray
     
     AssertArgumentException Err, "Arr"
+End Sub
+
+Public Sub Clear_WithNullArray_Throws()
+    Dim Arr() As Long
+    
+    On Error Resume Next
+    cArray.Clear Arr, 0, 0
+    
+    AssertArgumentNullException Err, "Arr"
+End Sub
+
+Public Sub Clear_WithIndexLessThanLBound_Throws()
+    Dim Arr(0) As Long
+    
+    On Error Resume Next
+    cArray.Clear Arr, -1, 1
+    
+    AssertIndexOutOfRangeException Err
+End Sub
+
+Public Sub Clear_WithLengthLessThanZero_Throws()
+    Dim Arr(0) As Long
+    
+    On Error Resume Next
+    cArray.Clear Arr, 0, -1
+    
+    AssertIndexOutOfRangeException Err
+End Sub
+
+Public Sub Clear_WithIndexAndLengthGreaterThanUBound_Throws()
+    Dim Arr(0) As Long
+    
+    On Error Resume Next
+    cArray.Clear Arr, 0, 2
+    
+    AssertIndexOutOfRangeException Err
 End Sub
 
 Public Sub Clear_WithLongs_SetsAllToZero()
