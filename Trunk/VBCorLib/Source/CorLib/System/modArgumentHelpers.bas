@@ -29,7 +29,6 @@ Attribute VB_Name = "modArgumentHelpers"
 '
 Option Explicit
 
-
 ''
 ' Returns an optional value or a default value if the optional value is missing.
 '

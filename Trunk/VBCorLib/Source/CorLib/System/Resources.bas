@@ -79,6 +79,7 @@ Public Enum ResourceStringId
     Arg_LongerThanSrcArray = 821
     Arg_LongerThanDestArray = 822
     Argument_InvalidComparer = 823
+    Arg_MustBeVbVarType = 824
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902

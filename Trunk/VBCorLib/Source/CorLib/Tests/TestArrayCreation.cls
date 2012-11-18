@@ -15,107 +15,115 @@ Option Explicit
 Implements ITestCaseSource
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
-
+    Select Case Test.MethodName
+        Case "NewXxx_WithValues_ReturnsExpected"
+            Test.Use NewBytes(1, 2, 3), vbByte, Array(CByte(1), CByte(2), CByte(3))
+            Test.Use NewIntegers(1, 2, 3), vbInteger, Array(1, 2, 3)
+            Test.Use NewLongs(1, 2, 3), vbLong, Array(1&, 2&, 3&)
+            Test.Use NewSingles(1, 2, 3), vbSingle, Array(1!, 2!, 3!)
+            Test.Use NewDoubles(1, 2, 3), vbDouble, Array(1#, 2#, 3#)
+            Test.Use NewCurrencys(1, 2, 3), vbCurrency, Array(1@, 2@, 3@)
+            Test.Use NewBooleans(True, False), vbBoolean, Array(True, False)
+            Test.Use NewDates(#1/1/2001#, #1/2/2001#), vbDate, Array(#1/1/2001#, #1/2/2001#)
+            Test.Use NewDecimals(1, 2), vbVariant, Array(CDec(1), CDec(2))
+            Test.Use NewStrings("1", "2", "3"), vbString, Array("1", "2", "3")
+            
+        Case "CreateInstance_WithOneDimension_CreatesExpected"
+            Test.Use VbVarType.vbByte, 0, NewBytes()
+            Test.Use VbVarType.vbByte, 1, NewBytes(0)
+            Test.Use VbVarType.vbInteger, 1, NewIntegers(0)
+            Test.Use VbVarType.vbLong, 1, NewLongs(0)
+            Test.Use VbVarType.vbLong, 0, NewLongs()
+            Test.Use VbVarType.vbSingle, 1, NewSingles(0)
+            Test.Use VbVarType.vbDouble, 1, NewDoubles(0)
+            Test.Use VbVarType.vbCurrency, 1, NewCurrencys(0)
+            Test.Use VbVarType.vbDate, 1, NewDates(#12:00:00 AM#)
+            Test.Use VbVarType.vbString, 1, NewStrings("")
+            Test.Use VbVarType.vbBoolean, 1, NewBooleans(False)
+            Test.Use VbVarType.vbVariant, 1, NewVariants(Empty)
+            
+        Case "NewArray_WithValues_ReturnsExpected"
+            Test.Use VbVarType.vbByte, 1, NewBytes(1)
+            Test.Use VbVarType.vbInteger, 1, NewIntegers(1)
+            Test.Use VbVarType.vbLong, 1, NewLongs(1)
+            Test.Use VbVarType.vbSingle, 1, NewSingles(1)
+            Test.Use VbVarType.vbDouble, 1, NewDoubles(1)
+            Test.Use VbVarType.vbString, "1", NewStrings("1")
+            
+        Case "CreateInstance_WithInvalidVbVarType_Throws"
+            Test.Use VbVarType.vbArray
+            Test.Use VbVarType.vbDataObject
+            Test.Use VbVarType.vbEmpty
+            Test.Use VbVarType.vbError
+            Test.Use VbVarType.vbNull
+            Test.Use VbVarType.vbUserDefinedType
+            
+    End Select
 End Sub
 
-
-
-Public Sub TestCreateLong()
-    Dim a() As Long
-    a = NewLongs(1, 2, 3, 4, 5)
-    Dim i As Long
-    For i = 0 To 4
-        Assert.AreEqual i + 1, a(i)
-    Next i
+Public Sub NewXxx_WithValues_ReturnsExpected(ByRef Actual As Variant, ByVal ExpectedType As VbVarType, ByRef Expected As Variant)
+    Assert.That VarType(Actual), Iz.EqualTo(ExpectedType Or vbArray)
+    Assert.That Actual, Iz.EqualTo(Expected).Strict
 End Sub
 
-Public Sub TestEmptyArray()
-    Dim a() As Long
-    a = cArray.CreateInstance(vbLong)
-    Assert.AreEqual -1, UBound(a)
-End Sub
-
-Public Sub TestCreateLong2()
-    Dim a() As Long
-    Dim i As Long
+Public Sub CreateInstance_WithOneDimension_CreatesExpected(ByVal vbType As VbVarType, ByVal Length As Long, ByRef Expected As Variant)
+    Dim Actual As Variant
     
-    a = NewLongs(89, 191, 409, 907, 1973, 4327, 9461, 20743, 45481, 99607, 218287)
-    Assert.AreEqual 10, UBound(a), "NewArray should return 11 elements."
+    Actual = cArray.CreateInstance(vbType, Length)
     
-    For i = 0 To UBound(a)
-        Assert.AreEqual Choose(i + 1, 89, 191, 409, 907, 1973, 4327, 9461, 20743, 45481, 99607, 218287), a(i)
-    Next i
+    Assert.That Actual, Iz.EqualTo(Expected).Strict
 End Sub
 
-Public Sub TestCreateString()
-    Dim a() As String
-    Dim i As Long
+Public Sub NewArray_WithValues_ReturnsExpected(ByVal ArrayType As VbVarType, ByRef Data As Variant, ByRef Expected As Variant)
+    Dim Actual As Variant
     
-    a = NewStrings("hi", "bye", "hi again")
-    Assert.AreEqual 3, cArray.GetLength(a)
+    Actual = NewArray(ArrayType, Data)
     
-    For i = 0 To UBound(a)
-        Assert.AreEqual Choose(i + 1, "hi", "bye", "hi again"), a(i)
-    Next i
+    Assert.That Actual, Iz.EqualTo(Expected).Strict
 End Sub
 
-Public Sub TestGlobalCreation()
-    Dim a() As String
-    Dim i As Long
+Public Sub CreateInstance_WithInvalidVbVarType_Throws(ByVal ElementType As VbVarType)
+    On Error Resume Next
     
-    a = NewArray(vbString, 1, 2, 3, 4)
-    Assert.That a, Iz.Not.Empty
-    Assert.IsFalse cArray.IsNull(a)
-    Assert.AreEqual 4, cArray.GetLength(a)
+    cArray.CreateInstance ElementType
     
-    For i = 0 To UBound(a)
-        Assert.AreEqual Choose(i + 1, "1", "2", "3", "4"), a(i)
-    Next i
+    AssertArgumentException Err, "ElementType"
 End Sub
 
-Public Sub TestCreateEmptyByte()
-    Dim b() As Byte
-    b = cArray.CreateInstance(vbByte, 0)
-    Assert.IsFalse cArray.IsNull(b), "Array should not be null."
-    Assert.AreEqual 0, cArray.GetLength(b)
-End Sub
-
-Public Sub TestCreate4Byte()
-    Dim b() As Byte
-    b = cArray.CreateInstance(vbByte, 4)
-    Assert.IsFalse cArray.IsNull(b)
-    Assert.AreEqual 4, cArray.GetLength(b)
-End Sub
-
-Public Sub TestEmptyNewArray()
-    Dim l() As Long
-    l = NewArray(vbLong)
-    Assert.IsFalse cArray.IsNull(l)
-    Assert.AreEqual 0, cArray.GetLength(l)
-End Sub
-
-Public Sub TestNewBytes()
-    Dim b() As Byte
-    b = Cor.NewBytes
-    Assert.IsFalse cArray.IsNull(b), "b should not be null."
-    Assert.AreEqual 0, cArray.GetLength(b), "b should be zero length."
+Public Sub CreateInstance_WithTwoDimensions_CreatesExpected()
+    Dim Actual() As Long
     
-    b = Cor.NewBytes(1, 2, 3)
-    Assert.AreEqual 3, cArray.GetLength(b), "b should be 3 bytes."
-    Assert.AreEqual 1, b(0)
-    Assert.AreEqual 2, b(1)
-    Assert.AreEqual 3, b(2)
+    Actual = cArray.CreateInstance(vbLong, 1, 2)
+    
+    Dim Expected() As Long
+    ReDim Expected(0, 1)
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestNewVariants()
-    Dim v() As Variant
-    v = Cor.NewVariants
-    Assert.IsFalse cArray.IsNull(v), "v should not be null."
-    Assert.AreEqual 0, cArray.GetLength(v), "v should be zero length."
+Public Sub CreateInstance_WithThreeDimensions_CreatesExpected()
+    Dim Actual() As Long
     
-    v = Cor.NewVariants(1, 2, 3)
-    Assert.AreEqual 3, cArray.GetLength(v), "v should be 3 elements."
-    Assert.AreEqual 1, v(0)
-    Assert.AreEqual 2, v(1)
-    Assert.AreEqual 3, v(2)
+    Actual = cArray.CreateInstance(vbLong, 1, 2, 3)
+    
+    Dim Expected() As Long
+    ReDim Expected(0, 1, 2)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CreateInstance_WithLength1LessThanZero_Throws()
+    On Error Resume Next
+    
+    cArray.CreateInstance vbLong, -1
+    
+    AssertArgumentOutOfRangeException Err, "Length1"
+End Sub
+
+Public Sub CreateInstance_WithZeroOneAndTwoLength_CreatesExpected()
+    Dim Actual() As Long
+    
+    Actual = cArray.CreateInstance(vbLong, 0, 1, 2)
+    
+    Assert.That UBound(Actual, 1), Iz.EqualTo(-1)
+    Assert.That UBound(Actual, 2), Iz.EqualTo(0)
+    Assert.That UBound(Actual, 3), Iz.EqualTo(1)
 End Sub
