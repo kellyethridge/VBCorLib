@@ -145,16 +145,16 @@ Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, 
     Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim Size As Long
-    Size = Encoding_GetMaxByteCount(ElemCount)
+    Dim size As Long
+    size = Encoding_GetMaxByteCount(ElemCount)
     
     Dim Ret() As Byte
-    If Size > 0 Then
-        ReDim Ret(0 To Size - 1)
+    If size > 0 Then
+        ReDim Ret(0 To size - 1)
         
         Dim ByteCount As Long
-        ByteCount = WideCharToMultiByte(mCodePage, 0, mChars(ElemIndex), ElemCount, Ret(0), Size, vbNullString, 0)
-        If ByteCount <> Size Then ReDim Preserve Ret(0 To ByteCount - 1)
+        ByteCount = WideCharToMultiByte(mCodePage, 0, mChars(ElemIndex), ElemCount, Ret(0), size, vbNullString, 0)
+        If ByteCount <> size Then ReDim Preserve Ret(0 To ByteCount - 1)
     Else
         Ret = Cor.NewBytes()
     End If
@@ -176,7 +176,7 @@ Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, 
         
         Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, RequiredSize)
         Select Case Result
-            Case Argument_InvalidCountOffset:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Bytes")
+            Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Bytes")
             Case Is <> NO_ERROR:                Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", 0, vbNullString)
         End Select
         
@@ -205,14 +205,14 @@ Private Function Encoding_GetChars(Bytes() As Byte, Optional Index As Variant, O
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim Size As Long
-    Size = Encoding_GetMaxCharCount(ElemCount)
+    Dim size As Long
+    size = Encoding_GetMaxCharCount(ElemCount)
     
     Dim Ret() As Integer
-    If Size > 0 Then
-        ReDim Ret(0 To Size - 1)
-        Size = Encoding_GetCharsEx(Bytes, Index, Count, Ret, 0)
-        ReDim Preserve Ret(0 To Size - 1)
+    If size > 0 Then
+        ReDim Ret(0 To size - 1)
+        size = Encoding_GetCharsEx(Bytes, Index, Count, Ret, 0)
+        ReDim Preserve Ret(0 To size - 1)
     Else
         Ret = Cor.NewIntegers()
     End If
@@ -232,7 +232,7 @@ Private Function Encoding_GetCharsEx(Bytes() As Byte, ByVal ByteIndex As Long, B
         
         Result = VerifyArrayRange(SAPtr(Chars), CharIndex, RequiredSize)
         Select Case Result
-            Case Argument_InvalidCountOffset:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
+            Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
             Case Is <> NO_ERROR:                Call ThrowArrayRangeException(Result, "Chars", CharIndex, "CharIndex", 0, vbNullString)
         End Select
         
@@ -283,15 +283,15 @@ Private Function Encoding_GetString(Bytes() As Byte, Optional Index As Variant, 
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim Size As Long
-    Size = Encoding_GetMaxCharCount(Count)
+    Dim size As Long
+    size = Encoding_GetMaxCharCount(Count)
     
     Dim Ret As String
-    Ret = SysAllocStringLen(0, Size)
+    Ret = SysAllocStringLen(0, size)
     Call AttachChars(Ret, mChars, mCharsSA)
-    Size = Encoding_GetCharsEx(Bytes, ElemIndex, ElemCount, mChars, 0)
+    size = Encoding_GetCharsEx(Bytes, ElemIndex, ElemCount, mChars, 0)
     SAPtr(mChars) = 0
-    Encoding_GetString = Left$(Ret, Size)
+    Encoding_GetString = Left$(Ret, size)
 End Function
 
 Private Property Get Encoding_HeaderName() As String

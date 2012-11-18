@@ -172,7 +172,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "InputOffset", InputOffset)
     If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCountOffset))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
 
     If mIsEncrypting Then
         TransformFinalBlock = EncryptFinalBlock(InputBuffer, InputOffset, InputCount)
@@ -284,16 +284,16 @@ Private Function EncryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' We subtract the number of padding bytes that were not added.
     TotalBytes = TotalBytes - CryptoHelper.PadBlock(OutputBuffer, FullBlocks * mBlockSize + RemainingBytes, mPadding, mBlockSize - RemainingBytes, mBlockSize)
 
-    Dim Size As Long
-    Size = TotalBytes - mBlockSize ' We don't want to include the CryptoAPI padding block as part of the data to encrypt.
-    If CryptEncrypt(mCipherKey, 0, True, 0, OutputBuffer(0), Size, TotalBytes) = 0 Then _
+    Dim size As Long
+    size = TotalBytes - mBlockSize ' We don't want to include the CryptoAPI padding block as part of the data to encrypt.
+    If CryptEncrypt(mCipherKey, 0, True, 0, OutputBuffer(0), size, TotalBytes) = 0 Then _
         Throw Cor.NewCryptographicException("Encryption failed: " & GetErrorMessage(Err.LastDllError))
 
     ' Size will be set to the total bytes encrypted, including the additional block of padding.
     ' We don't want that additional block of padding from the CryptoAPI since we've added our own,
     ' so we will just strip of the last block of bytes.
     Dim NewSize As Long
-    NewSize = Size - mBlockSize
+    NewSize = size - mBlockSize
     If NewSize > 0 Then
         ReDim Preserve OutputBuffer(0 To NewSize - 1)
     Else

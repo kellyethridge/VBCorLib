@@ -164,7 +164,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "InputOffset", InputOffset)
     If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCountOffset))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim Ret() As Byte
     If InputCount > 0 Then
@@ -310,14 +310,14 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     Result = GetOptionalArrayRange(pSA, Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Source", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    On Error GoTo errTrap
+    On Error GoTo ErrTrap
     Call ClearException
     
     Dim Bytes() As Byte
     SAPtr(Bytes) = pSA
     Call HashCore(Bytes, ElemIndex, ElemCount)
 
-errTrap:
+ErrTrap:
     SAPtr(Bytes) = vbNullPtr
     
     Dim Ex As Exception

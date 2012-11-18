@@ -48,8 +48,8 @@ Implements ICryptoTransform
 Private Type Temps
     ' we want these to remain in this layout so we can use CopyMemory.
     T0 As Long
-    T1 As Long
-    T2 As Long
+    t1 As Long
+    t2 As Long
     T3 As Long
     T4 As Long
     T5 As Long
@@ -195,7 +195,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "InputOffset", InputOffset)
     If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCountOffset))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     If mIsEncrypting Then
         TransformFinalBlock = EncryptFinalBlock(InputBuffer, InputOffset, InputCount)
@@ -650,8 +650,8 @@ Private Sub Encrypt128(ByRef Bytes() As Byte, ByVal Index As Long)
         Dim i As Long
         For i = 1 To mNr - 1
             .T0 = mT0(.s(0)) Xor mT1(.s(5)) Xor mT2(.s(10)) Xor mT3(.s(15)) Xor mExpKey(j)
-            .T1 = mT0(.s(4)) Xor mT1(.s(9)) Xor mT2(.s(14)) Xor mT3(.s(3)) Xor mExpKey(j + 1)
-            .T2 = mT0(.s(8)) Xor mT1(.s(13)) Xor mT2(.s(2)) Xor mT3(.s(7)) Xor mExpKey(j + 2)
+            .t1 = mT0(.s(4)) Xor mT1(.s(9)) Xor mT2(.s(14)) Xor mT3(.s(3)) Xor mExpKey(j + 1)
+            .t2 = mT0(.s(8)) Xor mT1(.s(13)) Xor mT2(.s(2)) Xor mT3(.s(7)) Xor mExpKey(j + 2)
             .T3 = mT0(.s(12)) Xor mT1(.s(1)) Xor mT2(.s(6)) Xor mT3(.s(11)) Xor mExpKey(j + 3)
             
             j = j + 4
@@ -684,8 +684,8 @@ Private Sub Encrypt192(ByRef Bytes() As Byte, ByVal Index As Long)
         Dim i As Long
         For i = 1 To mNr - 1
             .T0 = mT0(.s(0)) Xor mT1(.s(5)) Xor mT2(.s(10)) Xor mT3(.s(15)) Xor mExpKey(j)
-            .T1 = mT0(.s(4)) Xor mT1(.s(9)) Xor mT2(.s(14)) Xor mT3(.s(19)) Xor mExpKey(j + 1)
-            .T2 = mT0(.s(8)) Xor mT1(.s(13)) Xor mT2(.s(18)) Xor mT3(.s(23)) Xor mExpKey(j + 2)
+            .t1 = mT0(.s(4)) Xor mT1(.s(9)) Xor mT2(.s(14)) Xor mT3(.s(19)) Xor mExpKey(j + 1)
+            .t2 = mT0(.s(8)) Xor mT1(.s(13)) Xor mT2(.s(18)) Xor mT3(.s(23)) Xor mExpKey(j + 2)
             .T3 = mT0(.s(12)) Xor mT1(.s(17)) Xor mT2(.s(22)) Xor mT3(.s(3)) Xor mExpKey(j + 3)
             .T4 = mT0(.s(16)) Xor mT1(.s(21)) Xor mT2(.s(2)) Xor mT3(.s(7)) Xor mExpKey(j + 4)
             .T5 = mT0(.s(20)) Xor mT1(.s(1)) Xor mT2(.s(6)) Xor mT3(.s(11)) Xor mExpKey(j + 5)
@@ -723,8 +723,8 @@ Private Sub Encrypt256(ByRef Bytes() As Byte, ByVal Index As Long)
         Dim i As Long
         For i = 1 To mNr - 1
             .T0 = mT0(.s(0)) Xor mT1(.s(5)) Xor mT2(.s(14)) Xor mT3(.s(19)) Xor mExpKey(j)
-            .T1 = mT0(.s(4)) Xor mT1(.s(9)) Xor mT2(.s(18)) Xor mT3(.s(23)) Xor mExpKey(j + 1)
-            .T2 = mT0(.s(8)) Xor mT1(.s(13)) Xor mT2(.s(22)) Xor mT3(.s(27)) Xor mExpKey(j + 2)
+            .t1 = mT0(.s(4)) Xor mT1(.s(9)) Xor mT2(.s(18)) Xor mT3(.s(23)) Xor mExpKey(j + 1)
+            .t2 = mT0(.s(8)) Xor mT1(.s(13)) Xor mT2(.s(22)) Xor mT3(.s(27)) Xor mExpKey(j + 2)
             .T3 = mT0(.s(12)) Xor mT1(.s(17)) Xor mT2(.s(26)) Xor mT3(.s(31)) Xor mExpKey(j + 3)
             .T4 = mT0(.s(16)) Xor mT1(.s(21)) Xor mT2(.s(30)) Xor mT3(.s(3)) Xor mExpKey(j + 4)
             .T5 = mT0(.s(20)) Xor mT1(.s(25)) Xor mT2(.s(2)) Xor mT3(.s(7)) Xor mExpKey(j + 5)
@@ -763,8 +763,8 @@ Private Sub Decrypt128(ByRef Bytes() As Byte, ByVal Index As Long)
         Dim i As Long
         For i = 1 To mNr - 1
             .T0 = mT0(.s(0)) Xor mT1(.s(13)) Xor mT2(.s(10)) Xor mT3(.s(7)) Xor mExpKey(j)
-            .T1 = mT0(.s(4)) Xor mT1(.s(1)) Xor mT2(.s(14)) Xor mT3(.s(11)) Xor mExpKey(j + 1)
-            .T2 = mT0(.s(8)) Xor mT1(.s(5)) Xor mT2(.s(2)) Xor mT3(.s(15)) Xor mExpKey(j + 2)
+            .t1 = mT0(.s(4)) Xor mT1(.s(1)) Xor mT2(.s(14)) Xor mT3(.s(11)) Xor mExpKey(j + 1)
+            .t2 = mT0(.s(8)) Xor mT1(.s(5)) Xor mT2(.s(2)) Xor mT3(.s(15)) Xor mExpKey(j + 2)
             .T3 = mT0(.s(12)) Xor mT1(.s(9)) Xor mT2(.s(6)) Xor mT3(.s(3)) Xor mExpKey(j + 3)
             j = j + 4
 
@@ -796,8 +796,8 @@ Private Sub Decrypt192(ByRef Bytes() As Byte, ByVal Index As Long)
         Dim i As Long
         For i = 1 To mNr - 1
             .T0 = mT0(.s(0)) Xor mT1(.s(21)) Xor mT2(.s(18)) Xor mT3(.s(15)) Xor mExpKey(j)
-            .T1 = mT0(.s(4)) Xor mT1(.s(1)) Xor mT2(.s(22)) Xor mT3(.s(19)) Xor mExpKey(j + 1)
-            .T2 = mT0(.s(8)) Xor mT1(.s(5)) Xor mT2(.s(2)) Xor mT3(.s(23)) Xor mExpKey(j + 2)
+            .t1 = mT0(.s(4)) Xor mT1(.s(1)) Xor mT2(.s(22)) Xor mT3(.s(19)) Xor mExpKey(j + 1)
+            .t2 = mT0(.s(8)) Xor mT1(.s(5)) Xor mT2(.s(2)) Xor mT3(.s(23)) Xor mExpKey(j + 2)
             .T3 = mT0(.s(12)) Xor mT1(.s(9)) Xor mT2(.s(6)) Xor mT3(.s(3)) Xor mExpKey(j + 3)
             .T4 = mT0(.s(16)) Xor mT1(.s(13)) Xor mT2(.s(10)) Xor mT3(.s(7)) Xor mExpKey(j + 4)
             .T5 = mT0(.s(20)) Xor mT1(.s(17)) Xor mT2(.s(14)) Xor mT3(.s(11)) Xor mExpKey(j + 5)
@@ -835,8 +835,8 @@ Private Sub Decrypt256(ByRef Bytes() As Byte, ByVal Index As Long)
         Dim i As Long
         For i = 1 To mNr - 1
             .T0 = mT0(.s(0)) Xor mT1(.s(29)) Xor mT2(.s(22)) Xor mT3(.s(19)) Xor mExpKey(j)
-            .T1 = mT0(.s(4)) Xor mT1(.s(1)) Xor mT2(.s(26)) Xor mT3(.s(23)) Xor mExpKey(j + 1)
-            .T2 = mT0(.s(8)) Xor mT1(.s(5)) Xor mT2(.s(30)) Xor mT3(.s(27)) Xor mExpKey(j + 2)
+            .t1 = mT0(.s(4)) Xor mT1(.s(1)) Xor mT2(.s(26)) Xor mT3(.s(23)) Xor mExpKey(j + 1)
+            .t2 = mT0(.s(8)) Xor mT1(.s(5)) Xor mT2(.s(30)) Xor mT3(.s(27)) Xor mExpKey(j + 2)
             .T3 = mT0(.s(12)) Xor mT1(.s(9)) Xor mT2(.s(2)) Xor mT3(.s(31)) Xor mExpKey(j + 3)
             .T4 = mT0(.s(16)) Xor mT1(.s(13)) Xor mT2(.s(6)) Xor mT3(.s(3)) Xor mExpKey(j + 4)
             .T5 = mT0(.s(20)) Xor mT1(.s(17)) Xor mT2(.s(10)) Xor mT3(.s(7)) Xor mExpKey(j + 5)
@@ -867,18 +867,18 @@ Private Sub CreateExpandedKey(ByRef RgbKey() As Byte)
     
     Call CopyMemory(mExpKey(0), RgbKey(0), cArray.GetLength(RgbKey))
     
-    Dim W As Long
+    Dim w As Long
     Dim i As Long
     
     For i = mNk To UBound(mExpKey)
-        W = mExpKey(i - 1)
+        w = mExpKey(i - 1)
         If (i Mod mNk) = 0 Then
-            W = SubWord(RRotate(W, 8))
-            W = W Xor mRCon(i \ mNk - 1)
+            w = SubWord(RRotate(w, 8))
+            w = w Xor mRCon(i \ mNk - 1)
         ElseIf (mNk > 6) And ((i Mod mNk) = 4) Then
-            W = SubWord(W)
+            w = SubWord(w)
         End If
-        mExpKey(i) = mExpKey(i - mNk) Xor W
+        mExpKey(i) = mExpKey(i - mNk) Xor w
     Next i
     
     If (Not mIsEncrypting) And (mMode <> CipherMode.CFB) Then
@@ -917,12 +917,12 @@ Private Function CreateDecryptionKey(ByRef ExpKey() As Long) As Long()
 
     Dim i    As Long
     Dim j    As Long
-    Dim K    As Long
-    K = mNb * mNr
+    Dim k    As Long
+    k = mNb * mNr
     For i = 0 To mNr
-        Call CopyMemory(Ret(j), ExpKey(K), mBlockSizeBytes)
+        Call CopyMemory(Ret(j), ExpKey(k), mBlockSizeBytes)
         j = j + mNb
-        K = K - mNb
+        k = k - mNb
     Next i
     
     Dim Te4(0 To 255) As Long

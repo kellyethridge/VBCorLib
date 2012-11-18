@@ -483,7 +483,7 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
     If ElemCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", ElemCount)
     If ElemIndex - ElemCount + 1 < 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCountOffset), "Count")
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
     
     If mCount = 0 Then
         LastIndexOf = -1
@@ -697,17 +697,17 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     mCapacity = NewCapacity
 End Sub
 
-Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
+Private Sub InsertSpace(ByVal Index As Long, ByVal size As Long)
     If Index < mCount Then
-        Call CopyMemory(mItems(Index + Size), mItems(Index), (mCount - Index) * 16)
-        Call ZeroMemory(mItems(Index), Size * 16)
+        Call CopyMemory(mItems(Index + size), mItems(Index), (mCount - Index) * 16)
+        Call ZeroMemory(mItems(Index), size * 16)
     End If
 End Sub
 
-Private Sub RemoveSpace(ByVal Index As Long, ByVal Size As Long)
+Private Sub RemoveSpace(ByVal Index As Long, ByVal size As Long)
     If Index < mCount - 1 Then
-        Call CopyMemory(mItems(Index), mItems(Index + Size), (mCount - Index - Size) * 16)
-        Call ZeroMemory(mItems(mCount - Size), Size * 16)
+        Call CopyMemory(mItems(Index), mItems(Index + size), (mCount - Index - size) * 16)
+        Call ZeroMemory(mItems(mCount - size), size * 16)
     End If
 End Sub
 
@@ -782,7 +782,7 @@ Private Sub Class_InitProperties()
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    On Error GoTo errTrap
+    On Error GoTo ErrTrap
     With PropBag
         mCount = .ReadProperty(PROP_COUNT, 0)
         Call EnsureCapacity(.ReadProperty(PROP_CAPACITY, DEF_CAPACITY))
@@ -814,12 +814,12 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
     End With
     Exit Sub
     
-errTrap:
+ErrTrap:
     Throw Cor.NewSerializationException(Err.Description)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    On Error GoTo errTrap
+    On Error GoTo ErrTrap
     With PropBag
         Dim i As Long
         For i = 0 To mCount - 1
@@ -855,7 +855,7 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
     End With
     Exit Sub
     
-errTrap:
+ErrTrap:
     Throw Cor.NewSerializationException(Err.Description)
 End Sub
 

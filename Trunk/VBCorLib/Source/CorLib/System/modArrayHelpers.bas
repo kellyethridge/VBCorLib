@@ -91,103 +91,103 @@ End Function
 ' This is a set of comparison routines used by function delegation calls.
 ' They allow a virtual comparison routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
-Public Function CompareLongs(ByRef x As Long, ByRef y As Long) As Long
-    If x > y Then
+Public Function CompareLongs(ByRef X As Long, ByRef Y As Long) As Long
+    If X > Y Then
         CompareLongs = 1
-    ElseIf x < y Then
+    ElseIf X < Y Then
         CompareLongs = -1
     End If
 End Function
-Public Function CompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
-    If x > y Then
+Public Function CompareIntegers(ByRef X As Integer, ByRef Y As Integer) As Long
+    If X > Y Then
         CompareIntegers = 1
-    ElseIf x < y Then
+    ElseIf X < Y Then
         CompareIntegers = -1
     End If
 End Function
-Public Function CompareStrings(ByRef x As String, ByRef y As String) As Long
-    If x > y Then
+Public Function CompareStrings(ByRef X As String, ByRef Y As String) As Long
+    If X > Y Then
         CompareStrings = 1
-    ElseIf x < y Then
+    ElseIf X < Y Then
         CompareStrings = -1
     End If
 End Function
-Public Function CompareDoubles(ByRef x As Double, ByRef y As Double) As Long
-    If x > y Then
+Public Function CompareDoubles(ByRef X As Double, ByRef Y As Double) As Long
+    If X > Y Then
         CompareDoubles = 1
-    ElseIf x < y Then
+    ElseIf X < Y Then
         CompareDoubles = -1
     End If
 End Function
-Public Function CompareSingles(ByRef x As Single, ByRef y As Single) As Long
-    If x > y Then
+Public Function CompareSingles(ByRef X As Single, ByRef Y As Single) As Long
+    If X > Y Then
         CompareSingles = 1
-    ElseIf x < y Then
+    ElseIf X < Y Then
         CompareSingles = -1
     End If
 End Function
-Public Function CompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
-    If x > y Then
+Public Function CompareBytes(ByRef X As Byte, ByRef Y As Byte) As Long
+    If X > Y Then
         CompareBytes = 1
-    ElseIf x < y Then
+    ElseIf X < Y Then
         CompareBytes = -1
     End If
 End Function
-Public Function CompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
-    If x > y Then
+Public Function CompareBooleans(ByRef X As Boolean, ByRef Y As Boolean) As Long
+    If X > Y Then
         CompareBooleans = 1
-    ElseIf x < y Then
+    ElseIf X < Y Then
         CompareBooleans = -1
     End If
 End Function
-Public Function CompareDates(ByRef x As Date, ByRef y As Date) As Long
-    CompareDates = DateDiff("s", y, x)
+Public Function CompareDates(ByRef X As Date, ByRef Y As Date) As Long
+    CompareDates = DateDiff("s", Y, X)
 End Function
-Public Function CompareCurrencies(ByRef x As Currency, ByRef y As Currency) As Long
-    If x > y Then CompareCurrencies = 1: Exit Function
-    If x < y Then CompareCurrencies = -1
+Public Function CompareCurrencies(ByRef X As Currency, ByRef Y As Currency) As Long
+    If X > Y Then CompareCurrencies = 1: Exit Function
+    If X < Y Then CompareCurrencies = -1
 End Function
-Public Function CompareIComparable(ByRef x As Object, ByRef y As Variant) As Long
+Public Function CompareIComparable(ByRef X As Object, ByRef Y As Variant) As Long
     Dim comparableX As IComparable
-    Set comparableX = x
-    CompareIComparable = comparableX.CompareTo(y)
+    Set comparableX = X
+    CompareIComparable = comparableX.CompareTo(Y)
 End Function
-Public Function CompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
+Public Function CompareVariants(ByRef X As Variant, ByRef Y As Variant) As Long
     Dim Comparable As IComparable
     
-    Select Case VarType(x)
+    Select Case VarType(X)
         Case vbNull
-            If Not IsNull(y) Then
+            If Not IsNull(Y) Then
                 CompareVariants = -1
             End If
             Exit Function
         Case vbEmpty
-            If Not IsEmpty(y) Then
+            If Not IsEmpty(Y) Then
                 CompareVariants = -1
             End If
             Exit Function
         Case vbObject, vbDataObject
-            If TypeOf x Is IComparable Then
-                Set Comparable = x
-                CompareVariants = Comparable.CompareTo(y)
+            If TypeOf X Is IComparable Then
+                Set Comparable = X
+                CompareVariants = Comparable.CompareTo(Y)
                 Exit Function
             End If
-        Case VarType(y)
-            If x < y Then
+        Case VarType(Y)
+            If X < Y Then
                 CompareVariants = -1
-            ElseIf x > y Then
+            ElseIf X > Y Then
                 CompareVariants = 1
             End If
             Exit Function
     End Select
     
-    Select Case VarType(y)
+    Select Case VarType(Y)
         Case vbNull, vbEmpty
             CompareVariants = 1
         Case vbObject, vbDataObject
-            If TypeOf y Is IComparable Then
-                Set Comparable = y
-                CompareVariants = -Comparable.CompareTo(x)
+            If TypeOf Y Is IComparable Then
+                Set Comparable = Y
+                CompareVariants = -Comparable.CompareTo(X)
                 Exit Function
             Else
                 Throw Cor.NewArgumentException("Object must implement IComparable interface.")
@@ -202,49 +202,53 @@ End Function
 ' They allow a virtual equality routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
 '
-Public Function EqualsLong(ByRef x As Long, ByRef y As Long) As Boolean: EqualsLong = (x = y): End Function
-Public Function EqualsString(ByRef x As String, ByRef y As String) As Boolean: EqualsString = (x = y): End Function
-Public Function EqualsDouble(ByRef x As Double, ByRef y As Double) As Boolean: EqualsDouble = (x = y): End Function
-Public Function EqualsInteger(ByRef x As Integer, ByRef y As Integer) As Boolean: EqualsInteger = (x = y): End Function
-Public Function EqualsSingle(ByRef x As Single, ByRef y As Single) As Boolean: EqualsSingle = (x = y): End Function
-Public Function EqualsDate(ByRef x As Date, ByRef y As Date) As Boolean: EqualsDate = (DateDiff("s", x, y) = 0): End Function
-Public Function EqualsByte(ByRef x As Byte, ByRef y As Byte) As Boolean: EqualsByte = (x = y): End Function
-Public Function EqualsBoolean(ByRef x As Boolean, ByRef y As Boolean) As Boolean: EqualsBoolean = (x = y): End Function
-Public Function EqualsCurrency(ByRef x As Currency, ByRef y As Currency) As Boolean: EqualsCurrency = (x = y): End Function
-Public Function EqualsObject(ByRef x As Object, ByRef y As Object) As Boolean
-    Dim o As IObject
-    If TypeOf x Is IObject Then
-        Set o = x
-        EqualsObject = o.Equals(y)
+Public Function EqualsLong(ByRef X As Long, ByRef Y As Long) As Boolean: EqualsLong = (X = Y): End Function
+Public Function EqualsString(ByRef X As String, ByRef Y As String) As Boolean: EqualsString = (X = Y): End Function
+Public Function EqualsDouble(ByRef X As Double, ByRef Y As Double) As Boolean: EqualsDouble = (X = Y): End Function
+Public Function EqualsInteger(ByRef X As Integer, ByRef Y As Integer) As Boolean: EqualsInteger = (X = Y): End Function
+Public Function EqualsSingle(ByRef X As Single, ByRef Y As Single) As Boolean: EqualsSingle = (X = Y): End Function
+Public Function EqualsDate(ByRef X As Date, ByRef Y As Date) As Boolean: EqualsDate = (DateDiff("s", X, Y) = 0): End Function
+Public Function EqualsByte(ByRef X As Byte, ByRef Y As Byte) As Boolean: EqualsByte = (X = Y): End Function
+Public Function EqualsBoolean(ByRef X As Boolean, ByRef Y As Boolean) As Boolean: EqualsBoolean = (X = Y): End Function
+Public Function EqualsCurrency(ByRef X As Currency, ByRef Y As Currency) As Boolean: EqualsCurrency = (X = Y): End Function
+Public Function EqualsObject(ByRef X As Object, ByRef Y As Object) As Boolean
+    If Not X Is Nothing Then
+        If TypeOf X Is IObject Then
+            Dim Obj As IObject
+            Set Obj = X
+            EqualsObject = Obj.Equals(Y)
+        Else
+            EqualsObject = X Is Y
+        End If
     Else
-        EqualsObject = x Is y
+        EqualsObject = Y Is Nothing
     End If
 End Function
 
-Public Function EqualsVariants(ByRef x As Variant, ByRef y As Variant) As Boolean
+Public Function EqualsVariants(ByRef X As Variant, ByRef Y As Variant) As Boolean
     Dim o As IObject
-    Select Case VarType(x)
+    Select Case VarType(X)
         Case vbObject
-            If x Is Nothing Then
-                If IsObject(y) Then
-                    EqualsVariants = (y Is Nothing)
+            If X Is Nothing Then
+                If IsObject(Y) Then
+                    EqualsVariants = (Y Is Nothing)
                 End If
-            ElseIf TypeOf x Is IObject Then
-                Set o = x
-                EqualsVariants = o.Equals(y)
-            ElseIf IsObject(y) Then
-                If y Is Nothing Then Exit Function
-                If TypeOf y Is IObject Then
-                    Set o = y
-                    EqualsVariants = o.Equals(x)
+            ElseIf TypeOf X Is IObject Then
+                Set o = X
+                EqualsVariants = o.Equals(Y)
+            ElseIf IsObject(Y) Then
+                If Y Is Nothing Then Exit Function
+                If TypeOf Y Is IObject Then
+                    Set o = Y
+                    EqualsVariants = o.Equals(X)
                 Else
-                    EqualsVariants = (x Is y)
+                    EqualsVariants = (X Is Y)
                 End If
             End If
         Case vbNull
-            EqualsVariants = IsNull(y)
-        Case VarType(y)
-            EqualsVariants = (x = y)
+            EqualsVariants = IsNull(Y)
+        Case VarType(Y)
+            EqualsVariants = (X = Y)
     End Select
 End Function
 
@@ -252,49 +256,49 @@ End Function
 ' They allow a virtual casting routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
 '
-Public Sub WidenLongToDouble(ByRef x As Double, ByRef y As Long): x = y: End Sub
-Public Sub WidenLongToSingle(ByRef x As Single, ByRef y As Long): x = y: End Sub
-Public Sub WidenLongToString(ByRef x As String, ByRef y As Long): x = y: End Sub
-Public Sub WidenLongToCurrency(ByRef x As Currency, ByRef y As Long): x = y: End Sub
-Public Sub WidenLongToVariant(ByRef x As Variant, ByRef y As Long): x = y: End Sub
-Public Sub WidenIntegerToLong(ByRef x As Long, ByRef y As Integer): x = y: End Sub
-Public Sub WidenIntegerToSingle(ByRef x As Single, ByRef y As Integer): x = y: End Sub
-Public Sub WidenIntegerToDouble(ByRef x As Double, ByRef y As Integer): x = y: End Sub
-Public Sub WidenIntegerToString(ByRef x As String, ByRef y As Integer): x = y: End Sub
-Public Sub WidenIntegerToCurrency(ByRef x As Currency, ByRef y As Integer): x = y: End Sub
-Public Sub WidenIntegerToVariant(ByRef x As Variant, ByRef y As Integer): x = y: End Sub
-Public Sub WidenByteToInteger(ByRef x As Integer, ByRef y As Byte): x = y: End Sub
-Public Sub WidenByteToLong(ByRef x As Long, ByRef y As Byte): x = y: End Sub
-Public Sub WidenByteToSingle(ByRef x As Single, ByRef y As Byte): x = y: End Sub
-Public Sub WidenByteToDouble(ByRef x As Double, ByRef y As Byte): x = y: End Sub
-Public Sub WidenByteToString(ByRef x As String, ByRef y As Byte): x = y: End Sub
-Public Sub WidenByteToCurrency(ByRef x As Currency, ByRef y As Byte): x = y: End Sub
-Public Sub WidenByteToVariant(ByRef x As Variant, ByRef y As Byte): x = y: End Sub
-Public Sub WidenSingleToDouble(ByRef x As Double, ByRef y As Single): x = y: End Sub
-Public Sub WidenSingleToString(ByRef x As String, ByRef y As Single): x = y: End Sub
-Public Sub WidenSingleToVariant(ByRef x As Variant, ByRef y As Single): x = y: End Sub
-Public Sub WidenDateToDouble(ByRef x As Double, ByRef y As Date): x = y: End Sub
-Public Sub WidenDateToString(ByRef x As String, ByRef y As Date): x = y: End Sub
-Public Sub WidenDateToVariant(ByRef x As Variant, ByRef y As Date): x = y: End Sub
-Public Sub WidenObjectToVariant(ByRef x As Variant, ByRef y As Object): Set x = y: End Sub
-Public Sub WidenCurrencyToString(ByRef x As String, ByRef y As Currency): x = y: End Sub
-Public Sub WidenCurrencyToVariant(ByRef x As Variant, ByRef y As Currency): x = y: End Sub
-Public Sub WidenCurrencyToDouble(ByRef x As Double, ByRef y As Currency): x = y: End Sub
-Public Sub WidenStringToVariant(ByRef x As Variant, ByRef y As String): x = y: End Sub
-Public Sub WidenDoubleToString(ByRef x As String, ByRef y As Double): x = y: End Sub
-Public Sub WidenDoubleToVariant(ByRef x As Variant, ByRef y As Double): x = y: End Sub
+Public Sub WidenLongToDouble(ByRef X As Double, ByRef Y As Long): X = Y: End Sub
+Public Sub WidenLongToSingle(ByRef X As Single, ByRef Y As Long): X = Y: End Sub
+Public Sub WidenLongToString(ByRef X As String, ByRef Y As Long): X = Y: End Sub
+Public Sub WidenLongToCurrency(ByRef X As Currency, ByRef Y As Long): X = Y: End Sub
+Public Sub WidenLongToVariant(ByRef X As Variant, ByRef Y As Long): X = Y: End Sub
+Public Sub WidenIntegerToLong(ByRef X As Long, ByRef Y As Integer): X = Y: End Sub
+Public Sub WidenIntegerToSingle(ByRef X As Single, ByRef Y As Integer): X = Y: End Sub
+Public Sub WidenIntegerToDouble(ByRef X As Double, ByRef Y As Integer): X = Y: End Sub
+Public Sub WidenIntegerToString(ByRef X As String, ByRef Y As Integer): X = Y: End Sub
+Public Sub WidenIntegerToCurrency(ByRef X As Currency, ByRef Y As Integer): X = Y: End Sub
+Public Sub WidenIntegerToVariant(ByRef X As Variant, ByRef Y As Integer): X = Y: End Sub
+Public Sub WidenByteToInteger(ByRef X As Integer, ByRef Y As Byte): X = Y: End Sub
+Public Sub WidenByteToLong(ByRef X As Long, ByRef Y As Byte): X = Y: End Sub
+Public Sub WidenByteToSingle(ByRef X As Single, ByRef Y As Byte): X = Y: End Sub
+Public Sub WidenByteToDouble(ByRef X As Double, ByRef Y As Byte): X = Y: End Sub
+Public Sub WidenByteToString(ByRef X As String, ByRef Y As Byte): X = Y: End Sub
+Public Sub WidenByteToCurrency(ByRef X As Currency, ByRef Y As Byte): X = Y: End Sub
+Public Sub WidenByteToVariant(ByRef X As Variant, ByRef Y As Byte): X = Y: End Sub
+Public Sub WidenSingleToDouble(ByRef X As Double, ByRef Y As Single): X = Y: End Sub
+Public Sub WidenSingleToString(ByRef X As String, ByRef Y As Single): X = Y: End Sub
+Public Sub WidenSingleToVariant(ByRef X As Variant, ByRef Y As Single): X = Y: End Sub
+Public Sub WidenDateToDouble(ByRef X As Double, ByRef Y As Date): X = Y: End Sub
+Public Sub WidenDateToString(ByRef X As String, ByRef Y As Date): X = Y: End Sub
+Public Sub WidenDateToVariant(ByRef X As Variant, ByRef Y As Date): X = Y: End Sub
+Public Sub WidenObjectToVariant(ByRef X As Variant, ByRef Y As Object): Set X = Y: End Sub
+Public Sub WidenCurrencyToString(ByRef X As String, ByRef Y As Currency): X = Y: End Sub
+Public Sub WidenCurrencyToVariant(ByRef X As Variant, ByRef Y As Currency): X = Y: End Sub
+Public Sub WidenCurrencyToDouble(ByRef X As Double, ByRef Y As Currency): X = Y: End Sub
+Public Sub WidenStringToVariant(ByRef X As Variant, ByRef Y As String): X = Y: End Sub
+Public Sub WidenDoubleToString(ByRef X As String, ByRef Y As Double): X = Y: End Sub
+Public Sub WidenDoubleToVariant(ByRef X As Variant, ByRef Y As Double): X = Y: End Sub
 
 ' Functions used to assign variants to narrower variables.
-Public Sub NarrowVariantToLong(ByRef x As Long, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToInteger(ByRef x As Integer, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToDouble(ByRef x As Double, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToString(ByRef x As String, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToSingle(ByRef x As Single, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToByte(ByRef x As Byte, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToDate(ByRef x As Date, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToBoolean(ByRef x As Boolean, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToCurrency(ByRef x As Currency, ByRef y As Variant): x = y: End Sub
-Public Sub NarrowVariantToObject(ByRef x As Object, ByRef y As Variant): Set x = y: End Sub
+Public Sub NarrowVariantToLong(ByRef X As Long, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToInteger(ByRef X As Integer, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToDouble(ByRef X As Double, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToString(ByRef X As String, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToSingle(ByRef X As Single, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToByte(ByRef X As Byte, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToDate(ByRef X As Date, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToBoolean(ByRef X As Boolean, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToCurrency(ByRef X As Currency, ByRef Y As Variant): X = Y: End Sub
+Public Sub NarrowVariantToObject(ByRef X As Object, ByRef Y As Variant): Set X = Y: End Sub
 
 
 
@@ -353,12 +357,12 @@ Public Sub SwapSortItems(ByRef Items As SortItems, ByVal i As Long, ByVal j As L
 End Sub
 
 Public Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Long, t As Long
+    Dim i As Long, j As Long, X As Long, t As Long
     Do While Left < Right
-        i = Left: j = Right: x = Keys((i + j) \ 2)
+        i = Left: j = Right: X = Keys((i + j) \ 2)
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -374,12 +378,12 @@ Public Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right A
 End Sub
 
 Public Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As String
+    Dim i As Long, j As Long, X As String
     Do While Left < Right
-        i = Left: j = Right: x = StringRef(Keys((i + j) \ 2))
+        i = Left: j = Right: X = StringRef(Keys((i + j) \ 2))
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then Helper.Swap4 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -391,17 +395,17 @@ Public Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Rig
             If i < Right Then QuickSortString Keys, i, Right
             Right = j
         End If
-        StringPtr(x) = 0
+        StringPtr(X) = 0
     Loop
 End Sub
 
 Public Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Variant, Key As IComparable
+    Dim i As Long, j As Long, X As Variant, Key As IComparable
     Do While Left < Right
-        i = Left: j = Right: Set x = Keys((i + j) \ 2)
+        i = Left: j = Right: Set X = Keys((i + j) \ 2)
         Do
-            Set Key = Keys(i): Do While Key.CompareTo(x) < 0: i = i + 1: Set Key = Keys(i): Loop
-            Set Key = Keys(j): Do While Key.CompareTo(x) > 0: j = j - 1: Set Key = Keys(j): Loop
+            Set Key = Keys(i): Do While Key.CompareTo(X) < 0: i = i + 1: Set Key = Keys(i): Loop
+            Set Key = Keys(j): Do While Key.CompareTo(X) > 0: j = j - 1: Set Key = Keys(j): Loop
             If i > j Then Exit Do
             If i < j Then Helper.Swap4 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -417,12 +421,12 @@ Public Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Rig
 End Sub
 
 Public Sub QuickSortInteger(ByRef Keys() As Integer, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Integer, t As Integer
+    Dim i As Long, j As Long, X As Integer, t As Integer
     Do While Left < Right
-        i = Left: j = Right: x = Keys((i + j) \ 2)
+        i = Left: j = Right: X = Keys((i + j) \ 2)
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -438,12 +442,12 @@ Public Sub QuickSortInteger(ByRef Keys() As Integer, ByVal Left As Long, ByVal R
 End Sub
 
 Public Sub QuickSortByte(ByRef Keys() As Byte, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Byte, t As Byte
+    Dim i As Long, j As Long, X As Byte, t As Byte
     Do While Left < Right
-        i = Left: j = Right: x = Keys((i + j) \ 2)
+        i = Left: j = Right: X = Keys((i + j) \ 2)
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -459,12 +463,12 @@ Public Sub QuickSortByte(ByRef Keys() As Byte, ByVal Left As Long, ByVal Right A
 End Sub
 
 Public Sub QuickSortDouble(ByRef Keys() As Double, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Double, t As Double
+    Dim i As Long, j As Long, X As Double, t As Double
     Do While Left < Right
-        i = Left: j = Right: x = Keys((i + j) \ 2)
+        i = Left: j = Right: X = Keys((i + j) \ 2)
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -480,12 +484,12 @@ Public Sub QuickSortDouble(ByRef Keys() As Double, ByVal Left As Long, ByVal Rig
 End Sub
 
 Public Sub QuickSortSingle(ByRef Keys() As Single, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Single, t As Single
+    Dim i As Long, j As Long, X As Single, t As Single
     Do While Left < Right
-        i = Left: j = Right: x = Keys((i + j) \ 2)
+        i = Left: j = Right: X = Keys((i + j) \ 2)
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -501,12 +505,12 @@ Public Sub QuickSortSingle(ByRef Keys() As Single, ByVal Left As Long, ByVal Rig
 End Sub
 
 Public Sub QuickSortCurrency(ByRef Keys() As Currency, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Currency, t As Currency
+    Dim i As Long, j As Long, X As Currency, t As Currency
     Do While Left < Right
-        i = Left: j = Right: x = Keys((i + j) \ 2)
+        i = Left: j = Right: X = Keys((i + j) \ 2)
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -522,12 +526,12 @@ Public Sub QuickSortCurrency(ByRef Keys() As Currency, ByVal Left As Long, ByVal
 End Sub
 
 Public Sub QuickSortBoolean(ByRef Keys() As Boolean, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Boolean, t As Boolean
+    Dim i As Long, j As Long, X As Boolean, t As Boolean
     Do While Left < Right
-        i = Left: j = Right: x = Keys((i + j) \ 2)
+        i = Left: j = Right: X = Keys((i + j) \ 2)
         Do
-            Do While Keys(i) < x: i = i + 1: Loop
-            Do While Keys(j) > x: j = j - 1: Loop
+            Do While Keys(i) < X: i = i + 1: Loop
+            Do While Keys(j) > X: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then t = Keys(i): Keys(i) = Keys(j): Keys(j) = t: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -543,12 +547,12 @@ Public Sub QuickSortBoolean(ByRef Keys() As Boolean, ByVal Left As Long, ByVal R
 End Sub
 
 Public Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Variant
+    Dim i As Long, j As Long, X As Variant
     Do While Left < Right
-        i = Left: j = Right: VariantCopyInd x, Keys((i + j) \ 2)
+        i = Left: j = Right: VariantCopyInd X, Keys((i + j) \ 2)
         Do
-            Do While CompareVariants(Keys(i), x) < 0: i = i + 1: Loop
-            Do While CompareVariants(Keys(j), x) > 0: j = j - 1: Loop
+            Do While CompareVariants(Keys(i), X) < 0: i = i + 1: Loop
+            Do While CompareVariants(Keys(j), X) > 0: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then Helper.Swap16 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -564,12 +568,12 @@ Public Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal R
 End Sub
 
 Public Sub QuickSortGeneral(ByRef Keys As Variant, ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Variant
+    Dim i As Long, j As Long, X As Variant
     Do While Left < Right
-        i = Left: j = Right: VariantCopyInd x, Keys((i + j) \ 2)
+        i = Left: j = Right: VariantCopyInd X, Keys((i + j) \ 2)
         Do
-            Do While SortComparer.Compare(Keys(i), x) < 0: i = i + 1: Loop
-            Do While SortComparer.Compare(Keys(j), x) > 0: j = j - 1: Loop
+            Do While SortComparer.Compare(Keys(i), X) < 0: i = i + 1: Loop
+            Do While SortComparer.Compare(Keys(j), X) > 0: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then SwapSortItems mSortKeys, i, j: If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1

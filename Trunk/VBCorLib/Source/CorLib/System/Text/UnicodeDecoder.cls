@@ -92,22 +92,22 @@ Private Function Decoder_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim result As Long
-    result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
-    If result <> NO_ERROR Then ThrowArrayRangeException result, "Bytes", Index, "Index", Count, "Count"
+    Dim Result As Long
+    Result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", Index, "Index", Count, "Count"
     
     Decoder_GetCharCount = InternalGetCharCount(Count)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim result As Long
-    result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If result <> NO_ERROR Then ThrowArrayRangeException result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
+    Dim Result As Long
+    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
     
-    result = VerifyArrayRange(SAPtr(Chars), CharIndex, InternalGetCharCount(ByteCount))
-    Select Case result
-        Case Argument_InvalidCountOffset:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
-        Case Is <> NO_ERROR:                ThrowArrayRangeException result, "Chars", CharIndex, "CharIndex", 0, vbNullString
+    Result = VerifyArrayRange(SAPtr(Chars), CharIndex, InternalGetCharCount(ByteCount))
+    Select Case Result
+        Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
+        Case Is <> NO_ERROR:                ThrowArrayRangeException Result, "Chars", CharIndex, "CharIndex", 0, vbNullString
     End Select
     
     If mIsBigEndian Then
