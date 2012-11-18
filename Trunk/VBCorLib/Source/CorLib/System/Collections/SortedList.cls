@@ -68,7 +68,7 @@ Private mVersion    As Long
 ' @remark key must be unique.
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
     Dim i As Long
-    i = cArray.BinarySearch(mKeys, Key, 0, mCount, mComparer)
+    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i >= 0 Then _
         Throw Cor.NewArgumentException("An element with this key already exists.", "key")
     
@@ -157,7 +157,7 @@ End Function
 ' @return Indication of the key existing in the list.
 '
 Public Function ContainsKey(ByRef Key As Variant) As Boolean
-    ContainsKey = (cArray.BinarySearch(mKeys, Key, 0, mCount, mComparer) >= 0)
+    ContainsKey = (cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer) >= 0)
 End Function
 
 ''
@@ -341,7 +341,7 @@ End Property
 Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     Dim i As Long
-    i = cArray.BinarySearch(mKeys, Key, 0, mCount, mComparer)
+    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i < 0 Then Exit Property
     Call VariantCopy(Item, mValues(i))
 End Property
@@ -357,7 +357,7 @@ End Property
 '
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim i As Long
-    i = cArray.BinarySearch(mKeys, Key, 0, mCount, mComparer)
+    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i < 0 Then
         Call Add(Key, Value)
     Else
@@ -377,7 +377,7 @@ End Property
 '
 Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim i As Long
-    i = cArray.BinarySearch(mKeys, Key, 0, mCount, mComparer)
+    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i < 0 Then
         Call Add(Key, Value)
     Else
@@ -414,7 +414,7 @@ End Function
 Public Sub Remove(ByRef Key As Variant)
     Dim i As Long
     If mCount = 0 Then Exit Sub
-    i = cArray.BinarySearch(mKeys, Key, 0, mCount, mComparer)
+    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i >= 0 Then Call RemoveAt(i)
 End Sub
 

@@ -14,7 +14,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
 
-Private Sub ITestCaseSource_GetTestCases(ByVal Test As simplyvbcomp.TestCaseCollector)
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "Sort_WithPrimitives_SortsAscending"
             Test.Use NewBytes(7, 8, 9, 6, 5, 4, 1, 3, 2)
@@ -37,44 +37,44 @@ Public Sub Sort_WithPrimitives_SortsAscending(ByRef Arr As Variant)
 End Sub
 
 Public Sub Sort_WithNullArray_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr() As Long
     
     cArray.Sort Arr
     
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub Sort_WithMultiDimensionArray_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr() As Long
     ReDim Arr(1, 1)
     
     cArray.Sort Arr
     
-ErrTrap:
+errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub Sort_WithNonComparableValues_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr As Variant
     Arr = Array(3, 2, "4", 1)
     
     cArray.Sort Arr
     
-ErrTrap:
+errTrap:
     AssertInvalidOperationException Err
 End Sub
 
 Public Sub Sort_WithInvalidComparer_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr(0) As Long
     
     cArray.Sort Arr, "Comparer"
     
-ErrTrap:
+errTrap:
     AssertArgumentException Err, "Comparer"
 End Sub
 
@@ -137,52 +137,52 @@ Public Sub Sort_WithNonZeroLBound_SortsValues()
 End Sub
 
 Public Sub SortEx_WithNullArray_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim a() As Long
     
     cArray.SortEx a, 2, 4
     
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub SortEx_WithMultiDimensionArray_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr(1, 1) As Long
     
     cArray.SortEx Arr, 0, 1
     
-ErrTrap:
+errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub SortEx_WithIndexLessThanLBound_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr(0) As Long
     
     cArray.SortEx Arr, -1, 1
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub SortEx_WithLengthLessThanZero_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr(0) As Long
     
     cArray.SortEx Arr, 0, -1
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
 Public Sub SortEx_WithRangeExtendingPassedEndOfArray_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Arr(1 To 10) As Long
     
     cArray.SortEx Arr, 1, 11
     
-ErrTrap:
+errTrap:
     AssertArgumentException Err
 End Sub
 
@@ -209,68 +209,68 @@ Public Sub SortEx_WithComparer_SortsSubArray()
 End Sub
 
 Public Sub SortKey_WithNullKeysArray_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Keys() As Long
     Dim Items(0) As Long
     
     cArray.SortKey Keys, Items
     
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Keys"
 End Sub
 
 Public Sub SortKey_WithNullItemsArray_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Keys(0) As Long
     Dim Items() As Long
     
     cArray.SortKey Keys, Items
     
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Items"
 End Sub
 
 Public Sub SortKey_WithMultiDimensionKeys_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Keys(0, 0) As Long
     Dim Items(0) As Long
     
     cArray.SortKey Keys, Items
     
-ErrTrap:
+errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub SortKey_WithMultiDimensionItems_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Keys(0) As Long
     Dim Items(0, 0) As Long
     
     cArray.SortKey Keys, Items
     
-ErrTrap:
+errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub SortKey_WithInvalidItems_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Keys(0) As Long
     Dim InvalidItems As Long
     
     cArray.SortKey Keys, InvalidItems
     
-ErrTrap:
+errTrap:
     AssertArgumentException Err, "Items"
 End Sub
 
 Public Sub SortKeyEx_WithNullKeys_Throws()
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Dim Keys() As Long
     Dim Items(0) As Long
     
     cArray.SortKeyEx Keys, Items, 0, 1
     
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Keys"
 End Sub
 
@@ -333,11 +333,6 @@ Public Sub SortKey_WithComparer_SortsItemsByKeys()
     Expected = NewLongs(4, 2, 1, 3, 5)
     Assert.That Items, Iz.EqualTo(Expected)
 End Sub
-
-Private Function MakeInt32(ByVal value As Long) As Int32
-    Set MakeInt32 = New Int32
-    MakeInt32.mValue = value
-End Function
 
 
 

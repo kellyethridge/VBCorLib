@@ -142,7 +142,6 @@ Private Sub Form_Load()
     AddTest New TestResourceWriter
     AddTest New TestTicker
     AddTest New TestINIFile
-    AddTest New TestcArrayFinds
     AddTest New TestDriveInfo
     AddTest New TestCustomFormatter
     AddTest New TestResourceManager
@@ -299,14 +298,13 @@ Private Sub Form_Load()
     Set cArrayTests = Sim.NewTestSuite("cArray Tests")
     cArrayTests.Add New cArrayTests
     cArrayTests.Add New cArrayCopyTests
-    cArrayTests.Add New TestPosNumBinarySearch
-    cArrayTests.Add New TestMixNumBinarySearch
     cArrayTests.Add New cArraySortTests
-    cArrayTests.Add New TestArrayBinarySearch
+    cArrayTests.Add New cArrayBinarySearchTests
     cArrayTests.Add New cArrayReverseTests
     cArrayTests.Add New cArrayIndexOfTests
     cArrayTests.Add New cArrayLastIndexOfTests
     cArrayTests.Add New TestArrayCreation
+    cArrayTests.Add New cArrayFindTests
     AddTest cArrayTests
     
     
@@ -341,8 +339,6 @@ End Sub
 
 
 Private Sub Form_Initialize()
-'    Caption = "Simply VB Unit - " & App.Title
-'    Me.SimplyVBUnitCtl1.Init App.EXEName
     Me.UIRunner1.Init App
 End Sub
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
