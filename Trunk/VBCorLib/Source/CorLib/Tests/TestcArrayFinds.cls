@@ -18,16 +18,17 @@ Option Explicit
 Implements ITestCaseSource
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Dim Arr(-1 To 1) As Long
+    Dim ArrInt32() As Int32
+    
     Select Case Test.MethodName
         Case "FindIndex_WithValues_ReturnsExpected"
-            Test.Use NewLongs(1, 2, 3, 4, 5), 3, 2
-            Test.Use NewLongs(1, 2, 3, 4, 5), 6, -1
-            
-            Dim Arr(-1 To 1) As Long
+            Test.Use NewLongs(1, 2, 3, 3, 5), 3, 2
+            Test.Use NewLongs(1, 2, 3, 3, 5), 6, -1
             Test.Use Arr, 1, -2
         
         Case "Find_WithValues_ReturnsExpected"
-            Dim ArrInt32(1) As Int32
+            ReDim ArrInt32(1)
             Set ArrInt32(0) = MakeInt32(1)
             Set ArrInt32(1) = MakeInt32(2)
             Test.Use NewBytes(1, 2, 3, 4, 5), AddressOf FindByteCallback, 3, CByte(3)
@@ -46,6 +47,25 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewCurrencys(1, 2, 3, 4, 5), AddressOf FindCurrencyCallback, 0, 0@
             Test.Use NewDates(#1/1/2001#), AddressOf FindDateCallback, #1/2/2001#, #12:00:00 AM#
             Test.Use ArrInt32, AddressOf FindInt32Callback, 3, Nothing
+            
+        Case "FindLastIndex_WithValues_ReturnsExpected"
+            Test.Use NewLongs(1, 3, 3, 4, 5), 3, 2
+            Test.Use NewLongs(1, 3, 3, 4, 5), 6, -1
+            Test.Use Arr, 1, -2
+        
+        Case "FindAll_WithValues_ReturnsExpected"
+            Test.Use NewLongs(1, 1, 2, 2, 2, 3, 3, 4), AddressOf FindLongCallback, 2, NewLongs(2, 2, 2)
+            Test.Use NewLongs(1, 1, 2, 2, 2, 3, 3, 4), AddressOf FindLongCallback, 5, NewLongs()
+            ReDim ArrInt32(3)
+            Set ArrInt32(0) = MakeInt32(1)
+            Set ArrInt32(1) = MakeInt32(2)
+            Set ArrInt32(2) = MakeInt32(3)
+            Set ArrInt32(3) = MakeInt32(2)
+            Test.Use ArrInt32, AddressOf FindInt32Callback, 2, Array(ArrInt32(1), ArrInt32(3))
+            
+        Case "TrueForAll_WithValues_ReturnsExpected"
+            Test.Use NewLongs(1, 1, 1), AddressOf FindLongCallback, 1, True
+            Test.Use NewLongs(1, 2, 1), AddressOf FindLongCallback, 1, False
     End Select
 End Sub
 
@@ -65,6 +85,33 @@ Public Sub Find_WithValues_ReturnsExpected(ByRef Arr As Variant, ByVal AddressOf
     MoveVariant Actual, cArray.find(Arr, AddressOfPredicate)
     
     Assert.That Actual, Iz.EqualTo(Expected).Strict
+End Sub
+
+Public Sub FindLastIndex_WithValues_ReturnsExpected(ByRef Arr As Variant, ByVal ValueToFind As Long, ByVal Expected As Long)
+    cArrayCallbacks.FindCallbackValue = ValueToFind
+    Dim Actual As Long
+    
+    Actual = cArray.FindLastIndex(Arr, AddressOf FindLongCallback)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub FindAll_WithValues_ReturnsExpected(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, ByRef ValueToFind, ByRef Expected As Variant)
+    cArrayCallbacks.FindCallbackValue = ValueToFind
+    Dim Actual As Variant
+    
+    Actual = cArray.FindAll(Arr, AddressOfPredicate)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub TrueForAll_WithValues_ReturnsExpected(ByRef Arr As Variant, ByVal AddressOffPredicate As Long, ByRef ValueToTest, ByVal Expected As Boolean)
+    cArrayCallbacks.FindCallbackValue = ValueToTest
+    Dim Actual As Variant
+    
+    Actual = cArray.TrueForAll(Arr, AddressOffPredicate)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Find_WithUDT_ReturnsFoundUDT()
@@ -173,93 +220,78 @@ Public Sub Exists_WithNonExistingValue_ReturnsFalse()
     Assert.That Actual, Iz.False
 End Sub
 
+Public Sub FindLastIndex_WithNullArray_Throws()
+    Dim Arr() As Long
+    
+    On Error Resume Next
+    cArray.FindLastIndex Arr, AddressOf FindLongCallback
+    
+    AssertArgumentNullException Err, "Arr"
+End Sub
 
-'Public Sub TestFindAllObjects()
-'    Dim a(1 To 50) As Int32
-'    Dim i As Long
-'
-'    For i = 1 To 50
-'        Set a(i) = New Int32
-'        a(i).mValue = i
-'    Next i
-'    a(12).mValue = 32
-'    a(15).mValue = 32
-'    a(30).mValue = 32
-'    a(45).mValue = 32
-'
-'    Dim o() As Int32
-'    o = cArray.FindAll(a, AddressOf FindInt32)
-'    Assert.AreEqual 5, cArray.GetLength(o)
-'
-'    Assert.AreEqual a(12), o(0)
-'    Assert.AreEqual a(15), o(1)
-'    Assert.AreEqual a(30), o(2)
-'    Assert.AreEqual a(32), o(3)
-'    Assert.AreEqual a(45), o(4)
-'End Sub
-'
-'Public Sub TestFindNoObjects()
-'    Dim a(10) As Int32
-'    Dim i As Long
-'
-'    For i = 0 To 10
-'        Set a(i) = New Int32
-'    Next i
-'
-'    Dim o() As Int32
-'    o = cArray.FindAll(a, AddressOf FindInt32)
-'
-'    Assert.AreEqual 0, cArray.GetLength(o)
-'End Sub
-'
-'Public Sub TestFindLastIndex()
-'    Dim a(10) As String
-'    Dim i As Long
-'
-'    For i = 0 To 10
-'        a(i) = "Item " & i
-'    Next i
-'
-'    a(3) = "Hello"
-'    a(4) = "Hello"
-'    Assert.AreEqual 4, cArray.FindLastIndex(a, AddressOf FindHelloString)
-'    Assert.AreEqual "Hello", cArray.FindLast(a, AddressOf FindHelloString)
-'
-'    a(3) = "Bye"
-'    a(4) = "Bye"
-'    Assert.AreEqual -1, cArray.FindLastIndex(a, AddressOf FindHelloString)
-'    Assert.AreEqual "", cArray.FindLast(a, AddressOf FindHelloString)
-'End Sub
-'
-'Public Sub TestTrueForAll()
-'    Dim a(10) As String
-'    Dim i As Long
-'
-'    For i = 0 To 10
-'        a(i) = "Hello"
-'    Next i
-'
-'    Assert.IsTrue cArray.TrueForAll(a, AddressOf FindHelloString)
-'
-'    a(4) = "Bye"
-'    Assert.IsFalse cArray.TrueForAll(a, AddressOf FindHelloString)
-'End Sub
+Public Sub FindLastIndex_WithIndexLessThanLBounds_Throws()
+    Dim Arr(0) As Long
+    
+    On Error Resume Next
+    cArray.FindLastIndex Arr, AddressOf FindLongCallback, -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
-'Public Sub TestFindAllUDTs()
-'    Dim a(20) As VBGUID
-'    Dim i As Long
-'    Dim g As Variant
-'
-'    a(5).Data1 = 7
-'    a(9).Data1 = 7
-'    a(10).Data1 = 7
-'    a(16).Data1 = 7
-'    a(20).Data1 = 7
-'
-'    g = cArray.FindAll(a, AddressOf FindVBGuid)
-'    Assert.AreEqual 5, cArray.GetLength(g)
-'
-'    For i = 0 To 4
-'        Assert.AreEqual 7, g(i).Data1
-'    Next i
-'End Sub
+Public Sub FindLastIndex_WithCountLessThanZero_Throws()
+    Dim Arr(0) As Long
+    
+    On Error Resume Next
+    cArray.FindLastIndex Arr, AddressOf FindLongCallback, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub FindLastIndex_WithIndexAndCountPassedEndOfArray_Throws()
+    Dim Arr(0) As Long
+    
+    On Error Resume Next
+    cArray.FindLastIndex Arr, AddressOf FindLongCallback, 0, 2
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub FindLast_WithExistingValue_ReturnsLastInstance()
+    cArrayCallbacks.FindCallbackValue = 2
+    Dim Arr(2) As Int32
+    Set Arr(0) = MakeInt32(2)
+    Set Arr(1) = MakeInt32(2)
+    Set Arr(2) = MakeInt32(3)
+    Dim Actual As Int32
+    
+    Set Actual = cArray.FindLast(Arr, AddressOf FindInt32Callback)
+    
+    Assert.That Actual, Iz.SameAs(Arr(1))
+End Sub
+
+Public Sub FindLast_WithNonExistingValue_ReturnsDefault()
+    cArrayCallbacks.FindCallbackValue = 4
+    Dim Arr(2) As Int32
+    Set Arr(0) = MakeInt32(2)
+    Set Arr(1) = MakeInt32(2)
+    Set Arr(2) = MakeInt32(3)
+    Dim Actual As Int32
+    
+    Set Actual = cArray.FindLast(Arr, AddressOf FindInt32Callback)
+    
+    Assert.That Actual, Iz.Nothing
+End Sub
+
+Public Sub FindAll_WithUDTs_ReturnsFoundUDTs()
+    cArrayCallbacks.FindCallbackValue = 2
+    Dim Arr(2) As VBGUID
+    Arr(1).Data1 = 2
+    Arr(2).Data1 = 2
+    Dim Actual() As VBGUID
+    
+    Actual = cArray.FindAll(Arr, AddressOf FindVBGuidCallback)
+    
+    Assert.That UBound(Actual), Iz.EqualTo(1)
+    Assert.That Actual(0).Data1, Iz.EqualTo(2)
+    Assert.That Actual(1).Data1, Iz.EqualTo(2)
+End Sub

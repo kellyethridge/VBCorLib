@@ -242,16 +242,18 @@ End Function
 '
 ' @include "..\Includes\cArray.Find.txt"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
-    mFindDelegator.pfn = AddressOfPredicate
-    
     Dim pSafeArray As Long
-    pSafeArray = GetArrayPointer(Arr, True)
-    
+    pSafeArray = GetArrayPointer(Arr)
+    If pSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+    If SafeArrayGetDim(pSafeArray) > 1 Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        
     Dim LowerBound As Long
-    LowerBound = SafeArrayGetLBound(pSafeArray, 1)
+    LowerBound = LBound(Arr)
     
     Dim Count As Long
-    Count = SafeArrayGetUBound(pSafeArray, 1) - LowerBound + 1
+    Count = UBound(Arr) - LowerBound + 1
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -259,6 +261,8 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     Dim pElem As Long
     pElem = MemLong(pSafeArray + PVDATA_OFFSET)
     
+    
+    mFindDelegator.pfn = AddressOfPredicate
     
     ' iterate each array element, passing the memory address
     ' to the user supplied AddressOf callback. This will appear
@@ -270,7 +274,9 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     ReDim MatchedIndexes(0 To 31)
     For i = LowerBound To LowerBound + Count - 1
         If mFinder.Call(pElem) = True Then
-            If MatchCount > UBound(MatchedIndexes) Then ReDim Preserve MatchedIndexes(0 To MatchCount * 2 - 1)
+            If MatchCount > UBound(MatchedIndexes) Then
+                ReDim Preserve MatchedIndexes(0 To MatchCount * 2 - 1)
+            End If
             MatchedIndexes(MatchCount) = i
             MatchCount = MatchCount + 1
         End If
@@ -373,23 +379,30 @@ End Function
 '
 ' @include "..\Includes\cArray.Find.txt"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    mFindDelegator.pfn = AddressOfPredicate
-    
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
-    
-    Dim Result      As Long
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Result = GetOptionalArrayRangeReverse(pSafeArray, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
-    
+    If pSafeArray = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
+    If SafeArrayGetDim(pSafeArray) > 1 Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+
+    Dim ElemIndex As Long
+    Dim ElemCount As Long
+    ElemIndex = GetOptionalLong(Index, UBound(Arr))
+    ElemCount = GetOptionalLong(Count, ElemIndex + 1)
+    If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_ArrayBounds), "Index")
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
+    If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound))
+        
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
     
     Dim pElem As Long
     pElem = MemLong(pSafeArray + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
+    mFindDelegator.pfn = AddressOfPredicate
     
     Dim i As Long
     For i = ElemCount To 1 Step -1
@@ -425,7 +438,9 @@ Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Lon
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
-    
+    If SafeArrayGetDim(pSafeArray) > 1 Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
     
@@ -463,7 +478,9 @@ Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Arr")
-        
+    If SafeArrayGetDim(pSafeArray) > 1 Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
     
