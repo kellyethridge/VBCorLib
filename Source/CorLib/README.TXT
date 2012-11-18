@@ -1,10 +1,17 @@
 ** VBCorLib **
 
 version 3.0 (BREAKING CHANGES)
+	* Fixed cArray.Copy(Ex) for type Double.
+	* Added NewDecimals array creator.
 	* Fixed cArray.IndexOf when searching byte arrays.
 	* Fixed cArray.LastIndexOf when searching byte arrays.
 	* Fixed array comparison of objects. Would break if element was Nothing.
 	* Fixed cArray.FindIndex. Returned incorrect result when supplying index.
+	* Refactored cArray.BinarySearch signature to include a cArray.BinarySearchEx, removing need for optional values. *POSSIBLE BREAKING*
+	* Updated cArray.CreateInstance to build multi-dimension arrays in same order as VB6. *BREAKING*
+	* Updated cArray.CreateInstance to support multi-dimension arrays with selected 0 lengths.
+	* Removed ciArrayTypes. Replaced with VbVarType. *BREAKING*
+	* Removed cArray.NewArray. *BREAKING*
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -719,7 +719,7 @@ End Sub
 ''
 ' Initializes a new array of the specified type in up to 3 dimensions.
 '
-' @param ArrayType The data type the array represents.
+' @param ElementType The data type the array represents.
 ' @param length1 The number of elements in the first dimension.
 ' @param length2 The number of elements in the second dimension.
 ' @param length3 The number of elements in the third dimension.
@@ -733,41 +733,41 @@ End Sub
 ' to be created. The array must also be assigned at the end of the code
 ' so VB can optimize returning the Variant datatype and not copy it when possible.</p>
 '
-Public Function CreateInstance(ByVal ArrayType As vbVarType, Optional ByVal length1 As Long = 0, Optional ByRef length2 As Variant, Optional ByRef length3 As Variant) As Variant
-    Dim bounds(2)   As SafeArrayBound
+Public Function CreateInstance(ByVal ElementType As vbVarType, Optional ByVal Length1 As Long = 0, Optional ByRef Length2 As Variant, Optional ByRef Length3 As Variant) As Variant
+    Dim Bounds(2)   As SafeArrayBound
     Dim Rank        As Long
-    Dim Length      As Long
+    
+    Select Case ElementType
+        Case vbByte, vbInteger, vbLong, vbDouble, vbSingle, vbBoolean, vbCurrency, vbDate, vbString, vbObject, vbVariant
+        Case Else
+            Throw Cor.NewArgumentException(Resources.GetString(Arg_MustBeVbVarType), "ElementType")
+    End Select
+    
+    If Length1 < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Length1", Length1)
     
     Rank = 1
-    If length1 < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "length1", length1)
-    bounds(2).cElements = length1
+    Bounds(0).cElements = Length1
     
-    If Not IsMissing(length2) Then
+    If Not IsMissing(Length2) Then
+        If CLng(Length2) < 0 Then _
+            Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Length2", Length2)
+        
         Rank = 2
-        Length = length2
-        If Length < 0 Then _
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "length2", length2)
-        If Length = 0 And bounds(2).cElements <> 0 Then _
-            Throw Cor.NewArgumentException("If defining one dimension as 0, then all other defined dimensions must be 0.", "length2")
-        
-        bounds(1).cElements = Length
-    End If
-    If Not IsMissing(length3) Then
-        If Rank <> 2 Then Throw Cor.NewArgumentException("Cannot specifiy dimension without dimension 2.", "length3")
-        Rank = 3
-        Length = length3
-        If Length < 0 Then _
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "length3", length3)
-        If Length = 0 And bounds(1).cElements <> 0 Then _
-            Throw Cor.NewArgumentException("If defining one dimension as 0, then all other defined dimensions must be 0.", "length2")
-        
-        bounds(0).cElements = Length
+        Bounds(1).cElements = Length2
+    
+        If Not IsMissing(Length3) Then
+            If CLng(Length3) < 0 Then _
+                Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Length3", Length3)
+            
+            Rank = 3
+            Bounds(2).cElements = Length3
+        End If
     End If
         
     Dim Ret As Variant
-    VariantType(Ret) = ArrayType Or vbArray
-    MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreate(ArrayType, Rank, bounds(3 - Rank))
+    VariantType(Ret) = ElementType Or vbArray
+    MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreate(ElementType, Rank, Bounds(0))
     
     ' Elements of a size that are a multiple of 4 will not create a new array
     ' when being returned. All other datatype sizes will cause a new array
@@ -1215,27 +1215,6 @@ Private Sub CleanUpSortRoutine()
     ClearSortItems
     Set SortComparer = Nothing
 End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-' This is Friend to allow access from the Constructors.NewArray function.
-'
-Friend Function InternalNewArray(ByVal ArrayType As vbVarType, ByRef Args() As Variant) As Variant
-    Dim UpperBound  As Long
-    UpperBound = UBound(Args)
-    
-    Dim Ret As Variant
-    Ret = CreateInstance(ArrayType, UpperBound + 1)
-    
-    If UpperBound >= 0 Then
-        CopyEx Args, 0, Ret, 0, UpperBound + 1
-    End If
-    
-    InternalNewArray = Ret
-End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

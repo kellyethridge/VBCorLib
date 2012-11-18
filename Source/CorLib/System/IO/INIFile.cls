@@ -146,16 +146,16 @@ Public Function GetString(ByVal Section As String, ByVal Key As String, Optional
     ' MSDN says we cannot pass in a null value for the default.
     If cString.IsNull(Default) Then Default = ""
     
-    Dim Size    As Long
+    Dim size    As Long
     Dim Buf     As String
-    Size = 512
+    size = 512
     Do
-        Size = Size * 2
-        Buf = String$(Size, vbNullChar)
-        Size = API.GetPrivateProfileString(Section, Key, Default, Buf, Size, mFileName)
-    Loop While Size = Len(Buf) - 1
+        size = size * 2
+        Buf = String$(size, vbNullChar)
+        size = API.GetPrivateProfileString(Section, Key, Default, Buf, size, mFileName)
+    Loop While size = Len(Buf) - 1
     
-    GetString = Left$(Buf, Size)
+    GetString = Left$(Buf, size)
 End Function
 
 ''
@@ -410,22 +410,22 @@ Public Function GetValues(ByVal Section As String) As IDictionary
         Throw Cor.NewArgumentException("Section cannot be an empty string.", "Section")
     
     Dim Buf     As String
-    Dim Size    As Long
-    Size = 16384
+    Dim size    As Long
+    size = 16384
     Do
-        Size = Size * 2
-        If Not Environment.IsNT Then Size = MathExt.Min(32767, Size)
+        size = size * 2
+        If Not Environment.IsNT Then size = MathExt.Min(32767, size)
         
-        Buf = String$(Size, vbNullChar)
-        Size = API.GetPrivateProfileSection(Section, Buf, Size, mFileName)
-    Loop While Size = Len(Buf) - 2
+        Buf = String$(size, vbNullChar)
+        size = API.GetPrivateProfileSection(Section, Buf, size, mFileName)
+    Loop While size = Len(Buf) - 2
     
     Dim Ret As Hashtable
     Set Ret = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, Comparer:=New CaseInsensitiveComparer)
     
-    If Size > 0 Then
+    If size > 0 Then
         Dim Entries() As String
-        Entries = Split(Left$(Buf, Size - 1), vbNullChar)
+        Entries = Split(Left$(Buf, size - 1), vbNullChar)
     
         Dim KeyValue()  As String
         Dim i           As Long
@@ -496,7 +496,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function ConvertTo(ByVal ConvertType As VbVarType, ByRef s As String, ByRef Default As Variant) As Variant
+Private Function ConvertTo(ByVal ConvertType As vbVarType, ByRef s As String, ByRef Default As Variant) As Variant
     On Error GoTo errDefault
     Select Case ConvertType
         Case vbInteger:     ConvertTo = CInt(s)

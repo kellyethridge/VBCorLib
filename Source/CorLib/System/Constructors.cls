@@ -1068,10 +1068,21 @@ End Function
 ' when being returned. All other datatype sizes will cause a new array
 ' to be created.</p>
 '
-Public Function NewArray(ByVal ArrayType As vbVarType, ParamArray ArrayElements() As Variant) As Variant
+Public Function NewArray(ByVal ElementType As vbVarType, ParamArray ArrayElements() As Variant) As Variant
     Dim Args() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16))
-    NewArray = cArray.InternalNewArray(ArrayType, Args)
+    Helper.Swap4 ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16)
+    
+    Dim Length As Long
+    Length = UBound(Args) + 1
+    
+    Dim Ret As Variant
+    Ret = cArray.CreateInstance(ElementType, Length)
+    
+    If Length > 0 Then
+        cArray.CopyEx Args, 0, Ret, 0, Length
+    End If
+    
+    NewArray = Ret
 End Function
 
 ''
@@ -1254,19 +1265,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewLongs(ParamArray Values() As Variant) As Long()
-    Dim Ret()   As Long
-    Dim ub      As Long
+    Dim Ret() As Long
+    SAPtr(Ret) = SafeArrayCreateVector(vbLong, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbLong, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewLongs = Ret
 End Function
@@ -1280,19 +1285,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewBytes(ParamArray Values() As Variant) As Byte()
-    Dim Ret()   As Byte
-    Dim ub      As Long
+    Dim Ret() As Byte
+    SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewBytes = Ret
 End Function
@@ -1306,19 +1305,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewIntegers(ParamArray Values() As Variant) As Integer()
-    Dim Ret()   As Integer
-    Dim ub      As Long
+    Dim Ret() As Integer
+    SAPtr(Ret) = SafeArrayCreateVector(vbInteger, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbInteger, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewIntegers = Ret
 End Function
@@ -1332,19 +1325,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewStrings(ParamArray Values() As Variant) As String()
-    Dim Ret()   As String
-    Dim ub      As Long
+    Dim Ret() As String
+    SAPtr(Ret) = SafeArrayCreateVector(vbString, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbString, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewStrings = Ret
 End Function
@@ -1358,19 +1345,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewSingles(ParamArray Values() As Variant) As Single()
-    Dim Ret()   As Single
-    Dim ub      As Long
+    Dim Ret() As Single
+    SAPtr(Ret) = SafeArrayCreateVector(vbSingle, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbSingle, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewSingles = Ret
 End Function
@@ -1384,39 +1365,35 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewDoubles(ParamArray Values() As Variant) As Double()
-    Dim Ret()   As Double
-    Dim ub      As Long
+    Dim Ret() As Double
+    SAPtr(Ret) = SafeArrayCreateVector(vbDouble, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbDouble, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewDoubles = Ret
 End Function
 
+''
+' Returns an array of Decimals generated from the values passed in.
+'
+' @param Values The values to create the array from.
+' @remarks The values need to be convertable to a Decimal or an exception will occur.
+' <p>The array is zero-based.</p>
+' <p>If no values are passed in then an empty array is returned, not a null array.</p>
+'
 Public Function NewDecimals(ParamArray Values() As Variant) As Variant()
-    Dim Result()    As Variant
-    Dim ub          As Long
+    Dim Ret() As Variant
+    SAPtr(Ret) = SafeArrayCreateVector(vbVariant, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Result(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Result(i) = CDec(Values(i))
-        Next
-    Else
-        SAPtr(Result) = SafeArrayCreateVector(vbVariant, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = CDec(Values(i))
+    Next
     
-    NewDecimals = Result
+    NewDecimals = Ret
 End Function
 
 ''
@@ -1428,19 +1405,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewDates(ParamArray Values() As Variant) As Date()
-    Dim Ret()   As Date
-    Dim ub      As Long
+    Dim Ret() As Date
+    SAPtr(Ret) = SafeArrayCreateVector(vbDate, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbDate, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewDates = Ret
 End Function
@@ -1454,19 +1425,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewCurrencys(ParamArray Values() As Variant) As Currency()
-    Dim Ret()   As Currency
-    Dim ub      As Long
+    Dim Ret() As Currency
+    SAPtr(Ret) = SafeArrayCreateVector(vbCurrency, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbCurrency, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewCurrencys = Ret
 End Function
@@ -1480,19 +1445,13 @@ End Function
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
 Public Function NewBooleans(ParamArray Values() As Variant) As Boolean()
-    Dim Ret()   As Boolean
-    Dim ub      As Long
+    Dim Ret() As Boolean
+    SAPtr(Ret) = SafeArrayCreateVector(vbBoolean, 0, UBound(Values) + 1)
     
-    ub = UBound(Values)
-    If ub >= 0 Then
-        ReDim Ret(0 To ub)
-        Dim i As Long
-        For i = 0 To ub
-            Ret(i) = Values(i)
-        Next i
-    Else
-        SAPtr(Ret) = SafeArrayCreateVector(vbBoolean, 0, 0)
-    End If
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Ret(i) = Values(i)
+    Next
     
     NewBooleans = Ret
 End Function
