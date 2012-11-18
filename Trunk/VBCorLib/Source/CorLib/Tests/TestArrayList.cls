@@ -54,7 +54,7 @@ End Sub
 
 Public Sub TestAddRangeFromArray()
     Dim a() As Long
-    a = cArray.NewArray(ciLong, 1, 2, 3)
+    a = NewLongs(1, 2, 3)
     
     list.AddRange a
     Assert.AreEqual 3, list.Count
@@ -65,7 +65,7 @@ End Sub
 
 Public Sub TestAddRangeFromICollection()
     Dim a As New ArrayList
-    a.AddRange cArray.NewArray(ciLong, 1, 2, 3)
+    a.AddRange NewLongs(1, 2, 3)
     
     list.AddRange a
     Assert.AreEqual 3, list.Count
@@ -75,7 +75,7 @@ Public Sub TestAddRangeFromICollection()
 End Sub
 
 Public Sub TestSetItem()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3, 4, 5)
+    list.AddRange NewLongs(1, 2, 3, 4, 5)
     list(2) = "Hello"
     Assert.AreEqual 5, list.Count
     Assert.AreEqual 1, list(0)
@@ -114,7 +114,7 @@ Public Sub TestCopyToIndexOffset()
 End Sub
 
 Public Sub TestEnumerator()
-    list.AddRange cor.NewStrings("Item1", "Item2", "Item3")
+    list.AddRange Cor.NewStrings("Item1", "Item2", "Item3")
     
     Dim i As Long
     i = 1
@@ -127,34 +127,34 @@ Public Sub TestEnumerator()
 End Sub
 
 Public Sub TestInsertRangeArray()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3, 4)
-    list.InsertRange 2, cArray.NewArray(ciString, "Item1", "Item2", "Item3")
+    list.AddRange NewLongs(1, 2, 3, 4)
+    list.Insertrange 2, NewStrings("Item1", "Item2", "Item3")
     AssertInsert
 End Sub
 
 Public Sub TestInsertRangecollection()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3, 4)
+    list.AddRange NewLongs(1, 2, 3, 4)
     Dim col As New Collection
     col.Add "Item1"
     col.Add "Item2"
     col.Add "Item3"
-    list.InsertRange 2, col
+    list.Insertrange 2, col
     AssertInsert
 End Sub
 
 Public Sub TestContains()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3)
+    list.AddRange NewLongs(1, 2, 3)
     Assert.IsTrue list.Contains(1&), "list should contain 1."
 End Sub
 
 Public Sub TestNotContains()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3)
+    list.AddRange NewLongs(1, 2, 3)
     Assert.IsFalse list.Contains(4), "list should not contain 4."
 End Sub
 
 Public Sub TestToArrayWithEmptyList()
     Dim l() As Long
-    l = list.ToArray(ciLong)
+    l = list.ToArray(vbLong)
     Assert.AreEqual 0, cArray.GetLength(l)
 End Sub
 

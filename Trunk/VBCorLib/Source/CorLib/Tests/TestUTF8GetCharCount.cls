@@ -24,14 +24,14 @@ Public Sub Setup()
 End Sub
 
 Public Sub TestAllAscii()
-    b = cArray.NewArray(ciByte, 85, 84, 70, 56, 32, 69, 110, 99, 111, 100, 105, 110, 103, 32, 69, 120, 97, 109, 112, 108, 101)
+    b = NewBytes(85, 84, 70, 56, 32, 69, 110, 99, 111, 100, 105, 110, 103, 32, 69, 120, 97, 109, 112, 108, 101)
     
     Assert.AreEqual 21, e.GetCharCount(b)
     Assert.AreEqual 8, e.GetCharCount(b, 2, 8)
 End Sub
 
 Public Sub Test2ByteChars()
-    b = e.GetBytes(cArray.NewArray(ciInteger, &HD801, &HDC01))
+    b = e.GetBytes(NewIntegers(&HD801, &HDC01))
     Assert.AreEqual 2, e.GetCharCount(b)
 End Sub
 
@@ -65,43 +65,43 @@ End Sub
 
 
 Public Sub TestOverLong1()
-    b = cArray.NewArray(ciByte, &HC0, &H8A)
+    b = NewBytes(&HC0, &H8A)
     On Error GoTo errTrap
     e.GetCharCount b
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
 End Sub
 
 Public Sub TestOverLong2()
-    b = cArray.NewArray(ciByte, &HE0, &H80, &H8A)
+    b = NewBytes(&HE0, &H80, &H8A)
     On Error GoTo errTrap
     e.GetCharCount b
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
 
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
 End Sub
 
 Public Sub TestOverLong3()
-    b = cArray.NewArray(ciByte, &HF0, &H80, &H80, &H8A)
+    b = NewBytes(&HF0, &H80, &H80, &H8A)
     On Error GoTo errTrap
     e.GetCharCount b
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
 
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is ArgumentException
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is ArgumentException
 End Sub
 
 Public Sub TestZeroLengthArray()
-    b = cArray.CreateInstance(ciByte)
+    b = cArray.CreateInstance(vbByte)
     Assert.AreEqual 0, e.GetCharCount(b)
 End Sub

@@ -293,7 +293,7 @@ Public Function GetSubKeyNames() As String()
     KeyCount = Me.SubKeyCount
     
     Dim Ret() As String
-    Ret = cArray.CreateInstance(ciString, KeyCount)
+    Ret = cArray.CreateInstance(vbString, KeyCount)
     
     Do While KeyCount > 0
         KeyCount = KeyCount - 1
@@ -333,7 +333,7 @@ Public Function GetValueNames() As String()
     ValueCount = Me.ValueCount
     
     Dim Ret() As String
-    Ret = cArray.CreateInstance(ciString, ValueCount)
+    Ret = cArray.CreateInstance(vbString, ValueCount)
     
     Do While ValueCount > 0
         ValueCount = ValueCount - 1
@@ -707,14 +707,14 @@ End Function
 
 Private Function SetValueBinary(ByRef Name As String, ByRef Value As Variant) As Long
     Dim lpData  As Long
-    Dim Size    As Long
+    Dim size    As Long
     
     If Not cArray.IsNull(Value) Then
-        Size = cArray.GetLength(Value)
-        If Size > 0 Then lpData = MemLong(GetArrayPointer(Value) + PVDATA_OFFSET)
+        size = cArray.GetLength(Value)
+        If size > 0 Then lpData = MemLong(GetArrayPointer(Value) + PVDATA_OFFSET)
     End If
     
-    SetValueBinary = API.RegSetValueEx(mHKey, Name, REG_BINARY, lpData, Size)
+    SetValueBinary = API.RegSetValueEx(mHKey, Name, REG_BINARY, lpData, size)
 End Function
 
 Private Function SetValueQWord(ByRef Name As String, ByVal Value As Currency) As Long

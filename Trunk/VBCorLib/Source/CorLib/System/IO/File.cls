@@ -604,5 +604,5 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    mDirectorySeparators = cArray.NewArray(ciInteger, Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+    mDirectorySeparators = Cor.NewIntegers(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
 End Sub

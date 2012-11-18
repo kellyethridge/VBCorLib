@@ -1142,7 +1142,7 @@ Private Sub ReadStringArray(ByRef a() As String, ByVal Name As String, ByVal bag
     With bag
         Dim Count As Long
         Count = .ReadProperty(Name & "_Count", 0)
-        a = cArray.CreateInstance(ciString, Count)
+        a = cArray.CreateInstance(vbString, Count)
         
         Dim i As Long
         For i = 0 To Count - 1

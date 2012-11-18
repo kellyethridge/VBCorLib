@@ -56,39 +56,6 @@ Private Type GuidSafeArray1d
     SA      As SafeArray1d
 End Type
 
-
-''
-' Represents the available array types that can be created using
-' CreateInstance. The values corrispond the vbVarType enum.
-'
-' @param ciLong Same as vbLong
-' @param ciInteger Same as vbInteger
-' @param ciByte Same as vbByte
-' @param ciDouble Same as vbDouble
-' @param ciSingle Same as vbSingle
-' @param ciBoolean Same as vbBoolean
-' @param ciDate Same as vbDate
-' @param ciString Same as vbString
-' @param ciCurrency Same as vbCurrency
-' @param ciVariant Same as vbVariant
-' @param ciObject Same as vbObject
-'
-Public Enum ciArrayTypes
-    ciLong = vbLong
-    ciInteger = vbInteger
-    ciByte = vbByte
-    ciDouble = vbDouble
-    ciSingle = vbSingle
-    ciBoolean = vbBoolean
-    ciDate = vbDate
-    ciString = vbString
-    ciCurrency = vbCurrency
-    ciVariant = vbVariant
-    ciObject = vbObject
-End Enum
-
-
-
 Private mBinarySearchDelegator  As FunctionDelegator
 Private mBinarySearchComparer   As ITwoArgReturnLong
 
@@ -702,10 +669,10 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     If DestinationIndex < LBound(DestinationArray) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_ArrayLB), "DestinationIndex")
     
-    Dim SourceArrayType As VbVarType
+    Dim SourceArrayType As vbVarType
     SourceArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
     
-    Dim DestinationArrayType As VbVarType
+    Dim DestinationArrayType As vbVarType
     DestinationArrayType = VarType(DestinationArray) And &HFF   ' knock off the vbArray bit.
     
     If AddressOfCopier = 0 Then
@@ -766,7 +733,7 @@ End Sub
 ' to be created. The array must also be assigned at the end of the code
 ' so VB can optimize returning the Variant datatype and not copy it when possible.</p>
 '
-Public Function CreateInstance(ByVal ArrayType As ciArrayTypes, Optional ByVal length1 As Long = 0, Optional ByRef length2 As Variant, Optional ByRef length3 As Variant) As Variant
+Public Function CreateInstance(ByVal ArrayType As vbVarType, Optional ByVal length1 As Long = 0, Optional ByRef length2 As Variant, Optional ByRef length3 As Variant) As Variant
     Dim bounds(2)   As SafeArrayBound
     Dim Rank        As Long
     Dim Length      As Long
@@ -807,23 +774,6 @@ Public Function CreateInstance(ByVal ArrayType As ciArrayTypes, Optional ByVal l
     ' to be created. The array must also be assigned at the end of the code
     ' so VB can optimize returning the Variant datatype and not copy it when possible.
     CreateInstance = Ret
-End Function
-
-''
-' Creates an array of values.
-'
-' @param arraytype The target datatype of the resultant array and the values to be converted to.
-' @param arrayelements The values to be put into the new array.
-' @return An array of the specified datatype and containing the array elements with conversion.
-' Or an empty array if no elements are defined.
-' <p>Elements of a size that are a multiple of 4 will not create a new array
-' when being returned. All other datatype sizes will cause a new array
-' to be created.</p>
-'
-Public Function NewArray(ByVal ArrayType As ciArrayTypes, ParamArray ArrayElements() As Variant) As Variant
-    Dim Args() As Variant
-    Helper.Swap4 ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16)
-    NewArray = InternalNewArray(ArrayType, Args)
 End Function
 
 ''
@@ -1273,7 +1223,7 @@ End Sub
 
 ' This is Friend to allow access from the Constructors.NewArray function.
 '
-Friend Function InternalNewArray(ByVal ArrayType As ciArrayTypes, ByRef Args() As Variant) As Variant
+Friend Function InternalNewArray(ByVal ArrayType As vbVarType, ByRef Args() As Variant) As Variant
     Dim UpperBound  As Long
     UpperBound = UBound(Args)
     
@@ -1493,7 +1443,7 @@ End Sub
 ' datatype to another datatype. If the datatypes are not
 ' compatible then 0 is returned.
 '
-Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType As VbVarType) As Long
+Private Function GetAssigningFunction(ByVal srcType As vbVarType, ByVal dstType As vbVarType) As Long
     Dim Ret As Long
     Select Case srcType
         Case vbLong

@@ -77,14 +77,14 @@ End Sub
 
 Public Sub TestToArray()
     Dim a() As Long
-    a = list.ToArray(ciLong)
+    a = list.ToArray(vbLong)
     For i = 0 To 9
         Assert.AreEqual i + 1, a(i)
     Next i
 End Sub
 
 Public Sub TestSetRange()
-    list.SetRange 2, cArray.NewArray(ciString, "Item 3", "Item 4", "Item 5")
+    list.SetRange 2, NewStrings("Item 3", "Item 4", "Item 5")
     Assert.AreEqual 10, list.Count, "Count should return 10."
     For i = 0 To 9
         If i >= 2 And i <= 4 Then

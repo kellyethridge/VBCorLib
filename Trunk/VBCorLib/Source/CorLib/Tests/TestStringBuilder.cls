@@ -49,7 +49,7 @@ Public Sub TestChars()
 End Sub
 
 Public Sub TestSetLengthPastCapacity()
-    sb.capacity = 10
+    sb.Capacity = 10
     sb.Append "12345"
     sb.Length = 20
     
@@ -116,7 +116,7 @@ End Sub
 Public Sub TestInsertChars()
     sb.Append "1234567890"
     Dim chars() As Integer
-    chars = cArray.NewArray(ciInteger, 97, 97, 97)
+    chars = NewIntegers(97, 97, 97)
     sb.Insertchars 2, chars
     Assert.AreEqual "12aaa34567890", sb.ToString
 End Sub
@@ -124,7 +124,7 @@ End Sub
 Public Sub TestInsertCharsAtEnd()
     sb.Append "Hello"
     Dim chars() As Integer
-    chars = cArray.NewArray(ciInteger, 97, 97, 97)
+    chars = NewIntegers(97, 97, 97)
     sb.Insertchars 5, chars
     Assert.AreEqual "Helloaaa", sb.ToString
 End Sub
@@ -132,7 +132,7 @@ End Sub
 Public Sub TestInsertSubChars()
     sb.Append "1234567890"
     Dim chars() As Integer
-    chars = cArray.NewArray(ciInteger, 97, 98, 99, 100)
+    chars = NewIntegers(97, 98, 99, 100)
     sb.Insertchars 2, chars, 1, 3
     Assert.AreEqual "12bcd34567890", sb.ToString
 End Sub
@@ -351,7 +351,7 @@ Public Sub TestFailedCloseEscape()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception caught."
 End Sub
 
@@ -363,7 +363,7 @@ Public Sub TestFailedOpenEscape()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception caught."
 End Sub
 
@@ -375,7 +375,7 @@ Public Sub TestMissingIndex()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception caught."
 End Sub
 

@@ -357,8 +357,8 @@ End Property
 '
 ' @return A DirectoryInfo object of the root.
 '
-Public Property Get Root() As DirectoryInfo
-    Set Root = Cor.NewDirectoryInfo(Path.GetPathRoot(mPath))
+Public Property Get root() As DirectoryInfo
+    Set root = Cor.NewDirectoryInfo(Path.GetPathRoot(mPath))
 End Property
 
 ''
@@ -413,7 +413,7 @@ Public Function GetDirectories(Optional ByVal SearchPattern As String = "*") As 
         ' No subdirectories were found.
         ' LAME SPEC: .NET actually returns a zero-length array, where the
         ' MSDN says it returns the root directory.
-        Ret = cArray.CreateInstance(ciObject)
+        Ret = cArray.CreateInstance(vbObject)
     End If
     GetDirectories = Ret
 End Function
@@ -451,7 +451,7 @@ Public Function GetFiles(Optional ByVal SearchPattern As String = "*") As FileIn
             Set Ret(i) = Cor.NewFileInfo(Path.Combine(mPath, Files(i)))
         Next i
     Else
-        Ret = cArray.CreateInstance(ciObject)
+        Ret = cArray.CreateInstance(vbObject)
     End If
     GetFiles = Ret
 End Function
@@ -488,7 +488,7 @@ Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*")
         Next i
     Else
         ' None found, so return an empty array.
-        Ret = cArray.CreateInstance(ciObject)
+        Ret = cArray.CreateInstance(vbObject)
     End If
     
     GetFileSystemInfos = Ret

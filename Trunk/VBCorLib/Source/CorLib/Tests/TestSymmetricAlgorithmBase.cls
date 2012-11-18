@@ -130,7 +130,7 @@ End Sub
 Public Sub SetIV()
     Dim base As New SymmetricAlgorithmBase
     Dim IV() As Byte
-    IV = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    IV = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     base.BlockSize = 64
     base.SetIV IV
     
@@ -142,7 +142,7 @@ Public Sub SetInvalidIVLength()
     base.BlockSize = 64
     
     Dim IV() As Byte
-    IV = NewArray(ciByte, 1, 2, 3, 4)
+    IV = NewArray(vbByte, 1, 2, 3, 4)
     
     On Error GoTo errTrap
     base.SetIV IV

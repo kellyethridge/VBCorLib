@@ -229,7 +229,7 @@ End Function
 '
 Public Function ToArray() As Variant()
     Dim Ret() As Variant
-    Ret = cArray.CreateInstance(ciVariant, mCount)
+    Ret = cArray.CreateInstance(vbVariant, mCount)
     If mCount > 0 Then Call CopyTo(Ret, 0)
     ToArray = Ret
 End Function

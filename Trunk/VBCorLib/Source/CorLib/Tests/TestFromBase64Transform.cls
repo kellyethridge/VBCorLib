@@ -31,7 +31,7 @@ End Sub
 
 Public Sub TestTransfromBackTo123()
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 81, 73, 68)
+    b = NewArray(vbByte, 65, 81, 73, 68)
     
     Dim original(2) As Byte
     Assert.AreEqual 3, Trans.TransformBlock(b, 0, 4, original, 0)
@@ -42,7 +42,7 @@ End Sub
 
 Public Sub TestTransformBackTo123456()
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 81, 73, 68, 66, 65, 85, 71)
+    b = NewArray(vbByte, 65, 81, 73, 68, 66, 65, 85, 71)
     
     Dim original(5) As Byte
     Assert.AreEqual 6, Trans.TransformBlock(b, 0, 8, original, 0)
@@ -55,7 +55,7 @@ End Sub
 
 Public Sub TestTransformBackTo123456InTwoCalls()
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 81, 73, 68, 66, 65, 85, 71)
+    b = NewArray(vbByte, 65, 81, 73, 68, 66, 65, 85, 71)
     
     Dim original(5) As Byte
     Assert.AreEqual 3, Trans.TransformBlock(b, 0, 6, original, 0)
@@ -77,7 +77,7 @@ End Sub
 
 Public Sub TestTransformBackTo123456IgnoringWhiteSpaces()
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 13, 81, 73, 9, 68, 66, 32, 10, 65, 85, 71)
+    b = NewArray(vbByte, 65, 13, 81, 73, 9, 68, 66, 32, 10, 65, 85, 71)
     
     Dim original(5) As Byte
     Assert.AreEqual 6, Trans.TransformBlock(b, 0, cArray.GetLength(b), original, 0)
@@ -91,7 +91,7 @@ Public Sub TestTranformDoNotIgnoreWhiteSpaces()
     Set Trans = Cor.NewFromBase64Transform(DoNotIgnoreWhiteSpaces)
     
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 13, 81, 73, 9, 68, 66, 32, 10, 65, 85, 71)
+    b = NewArray(vbByte, 65, 13, 81, 73, 9, 68, 66, 32, 10, 65, 85, 71)
 
     Dim original(5) As Byte
     On Error GoTo errTrap
@@ -100,14 +100,14 @@ Public Sub TestTranformDoNotIgnoreWhiteSpaces()
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is FormatException, "Wrong exception type caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception type caught."
 End Sub
 
 Public Sub TestTransformWithOneTerminationCharacter()
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 81, 73, 61)
+    b = NewArray(vbByte, 65, 81, 73, 61)
     Dim original(3) As Byte
     Assert.AreEqual 2, Trans.TransformBlock(b, 0, 4, original, 0)
     Assert.AreEqual 1, original(0)
@@ -117,7 +117,7 @@ End Sub
 
 Public Sub TestTransformWithTwoTerminationCharacters()
     Dim b() As Byte
-    b = NewArray(ciByte, 67, 103, 61, 61)
+    b = NewArray(vbByte, 67, 103, 61, 61)
     Dim original(1) As Byte
     Assert.AreEqual 1, Trans.TransformBlock(b, 0, 4, original, 0)
     Assert.AreEqual 10, original(0)
@@ -126,7 +126,7 @@ End Sub
 
 Public Sub TestTransformWithThreeTerminationCharacters()
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 61, 61, 61)
+    b = NewArray(vbByte, 65, 61, 61, 61)
     Dim original(1) As Byte
     On Error GoTo errTrap
     Trans.TransformBlock b, 0, 4, original, 0
@@ -134,24 +134,24 @@ Public Sub TestTransformWithThreeTerminationCharacters()
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is FormatException, "Wrong exception type caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception type caught."
     
 End Sub
 
 Public Sub TestIncrementalTransform()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    b = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     b = Encoding.ASCII.GetBytes(Convert.ToBase64String(b))
     
     Dim b2(7) As Byte
     Dim t2 As New FromBase64Transform
-    Dim p As Long
+    Dim P As Long
     Dim i As Long
     Dim j As Long
     For i = 0 To UBound(b)
-        p = p + t2.TransformBlock(b, i, 1, b2, p)
+        P = P + t2.TransformBlock(b, i, 1, b2, P)
         Select Case i
             Case 0 To 2
                 For j = 0 To 7
@@ -186,7 +186,7 @@ End Sub
 
 Public Sub TestTransformFinalBackTo123()
     Dim b() As Byte
-    b = NewArray(ciByte, 65, 81, 73, 68)
+    b = NewArray(vbByte, 65, 81, 73, 68)
     
     Dim original() As Byte
     original = Trans.TransformFinalBlock(b, 0, 4)
@@ -198,7 +198,7 @@ End Sub
 
 Public Sub TestTransformFinalIncrementalToOne()
     Dim b() As Byte
-    b = NewArray(ciByte, 1)
+    b = NewArray(vbByte, 1)
     b = Encoding.ASCII.GetBytes(Convert.ToBase64String(b))
     
     Dim i As Long
@@ -217,7 +217,7 @@ End Sub
 
 Public Sub TestTransformFinal1BytePartialIncrementalToOne()
     Dim b() As Byte
-    b = NewArray(ciByte, 1)
+    b = NewArray(vbByte, 1)
     b = Encoding.ASCII.GetBytes(Convert.ToBase64String(b))
     
     Dim b2() As Byte
@@ -240,7 +240,7 @@ End Sub
 
 Public Sub TestTransformFinal2BytePartialIncrementalToOne()
     Dim b() As Byte
-    b = NewArray(ciByte, 1)
+    b = NewArray(vbByte, 1)
     b = Encoding.ASCII.GetBytes(Convert.ToBase64String(b))
     
     Dim b2() As Byte
@@ -261,7 +261,7 @@ End Sub
 
 Public Sub TestTransformFinal3BytePartialIncrementalToOne()
     Dim b() As Byte
-    b = NewArray(ciByte, 1)
+    b = NewArray(vbByte, 1)
     b = Encoding.ASCII.GetBytes(Convert.ToBase64String(b))
     
     Dim b2() As Byte

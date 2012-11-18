@@ -127,7 +127,7 @@ End Function
 ' in the value to be written. Indexes are indicate by enclosing the
 ' specific index in curly braces {}. The indexes start at 0.
 '
-Public Sub WriteValue(ByRef Value As Variant, ParamArray args() As Variant)
+Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
     Call InternalWriteValue(Value, a)
@@ -146,7 +146,7 @@ End Sub
 ' passed in using Cor.NewStringWriter. If no culture was specified, then
 ' the current culture for this computer is used.</p>
 '
-Public Sub WriteLine(ParamArray values() As Variant)
+Public Sub WriteLine(ParamArray Values() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(12))
     Call InternalWriteLine(a)
@@ -183,9 +183,9 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal sb As StringBuilder, ByVal provider As IFormatProvider)
+Friend Sub Init(ByVal sb As StringBuilder, ByVal Provider As IFormatProvider)
     Set mSB = sb
-    Set mProvider = provider
+    Set mProvider = Provider
 End Sub
 
 
@@ -200,7 +200,7 @@ Private Sub VerifyIsOpen()
     If mIsClosed Then Throw Cor.NewObjectDisposedException("StringWriter", "Cannot write to a closed StringWriter.")
 End Sub
 
-Private Sub InternalWrite(ByRef Value As String, ByRef args() As Variant, ByVal NewLine As Boolean)
+Private Sub InternalWrite(ByRef Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
     Dim s As String
     
     Call VerifyIsOpen
@@ -208,31 +208,31 @@ Private Sub InternalWrite(ByRef Value As String, ByRef args() As Variant, ByVal 
     If NewLine Then s = mNewLine
     s = Value & s
     
-    Call mSB.InternalAppendFormat(Nothing, s, args)
+    Call mSB.InternalAppendFormat(Nothing, s, Args)
 End Sub
 
-Private Sub InternalWriteLine(ByRef args() As Variant)
+Private Sub InternalWriteLine(ByRef Args() As Variant)
     Dim ub As Long
     Dim s As String
     
-    ub = UBound(args)
+    ub = UBound(Args)
     
-    If ub >= 0 Then s = Convert.ToString(args(0))
+    If ub >= 0 Then s = Convert.ToString(Args(0))
     If ub > 0 Then
         Dim i As Long
         For i = 1 To ub
-            Call Helper.MoveVariant(args(i - 1), args(i))
+            Call Helper.MoveVariant(Args(i - 1), Args(i))
         Next i
-        ReDim Preserve args(UBound(args) - 1)
+        ReDim Preserve Args(UBound(Args) - 1)
     ElseIf ub = 0 Then
-        args = cArray.CreateInstance(ciVariant)
+        Args = cArray.CreateInstance(vbVariant)
     End If
     
-    Call InternalWrite(s, args, True)
+    Call InternalWrite(s, Args, True)
 End Sub
 
-Private Sub InternalWriteValue(ByRef Value As Variant, ByRef args() As Variant)
-    Call InternalWrite(Convert.ToString(Value), args, False)
+Private Sub InternalWriteValue(ByRef Value As Variant, ByRef Args() As Variant)
+    Call InternalWrite(Convert.ToString(Value), Args, False)
 End Sub
 
 
@@ -305,7 +305,7 @@ Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
     Call InternalWriteLine(a)
 End Sub
 
-Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray args() As Variant)
+Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
     Call InternalWriteValue(Value, a)

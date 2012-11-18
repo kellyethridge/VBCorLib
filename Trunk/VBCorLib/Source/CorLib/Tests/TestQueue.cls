@@ -88,7 +88,7 @@ Public Sub TestContainsWithComparer()
         Q.Enqueue i
     Next i
     
-    Assert.IsTrue Q.Contains(99&, comparer.Default), "q should contain 99."
+    Assert.IsTrue Q.Contains(99&, Comparer.Default), "q should contain 99."
 End Sub
 
 Public Sub TestCopyTo()
@@ -219,7 +219,7 @@ End Sub
 
 Public Sub TestInitWithElements()
     Dim a() As Long
-    a = NewArray(ciLong, 1, 2, 3, 4, 5)
+    a = NewArray(vbLong, 1, 2, 3, 4, 5)
     
     Set Q = NewQueue(a)
     Assert.AreEqual 5, Q.Count

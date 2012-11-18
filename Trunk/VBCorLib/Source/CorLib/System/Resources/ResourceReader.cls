@@ -212,7 +212,7 @@ Private Function GetNextResource(ByRef ReturnKey As ResourceKey, ByRef ReturnVal
     Set ReturnKey = Cor.NewResourceKey(Header.ResourceName, Header.ResourceType, Header.LanguageID)
     
     Dim Data() As Byte
-    Data = cArray.CreateInstance(ciByte, Header.DataSize)
+    Data = cArray.CreateInstance(vbByte, Header.DataSize)
     Call mReader.Read(Data, 0, Header.DataSize)
     
     If mDecoders.Contains(Header.ResourceType) Then
@@ -285,11 +285,11 @@ End Sub
 Private Function GetOrdinalOrName() As Variant
     
     ' Get the first 2 bytes.
-    Dim Ch As Integer
-    Ch = mReader.ReadInteger
+    Dim ch As Integer
+    ch = mReader.ReadInteger
     
     ' If the first 2 bytes equal &HFFFF then we have a number.
-    If Ch = -1 Then
+    If ch = -1 Then
         ' So the next 2 bytes represent a 16bit number.
         GetOrdinalOrName = CLng(mReader.ReadInteger)
     Else
@@ -304,12 +304,12 @@ Private Function GetOrdinalOrName() As Variant
         NameBuilder.Length = 0
         
         ' Keep doing this until we reach a terminating null.
-        Do While Ch <> 0
+        Do While ch <> 0
             ' Append the first character we retrieved.
-            Call NameBuilder.AppendChar(Ch)
+            Call NameBuilder.AppendChar(ch)
             
             ' And get the next character.
-            Ch = mReader.ReadInteger
+            ch = mReader.ReadInteger
         Loop
         
         ' Return the name.

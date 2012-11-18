@@ -101,15 +101,15 @@ Public Sub TestNumber()
     Assert.AreEqual "(123.00)", info.Format(-123, "n")
 
     Dim sizes() As Long
-    sizes = cArray.NewArray(ciLong, 1, 2, 3)
+    sizes = NewLongs(1, 2, 3)
     info.NumberGroupSizes = sizes
     Assert.AreEqual "12,345,67,8.00", info.Format(12345678, "n")
 
-    sizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    sizes = NewLongs(1, 2, 1, 0)
     info.NumberGroupSizes = sizes
     Assert.AreEqual "12345,6,78,9.00", info.Format(123456789, "n")
     
-    sizes = cArray.NewArray(ciLong, 2, 3)
+    sizes = NewLongs(2, 3)
     info.NumberGroupSizes = sizes
     Assert.AreEqual "1.00", info.Format(1, "n")
     Assert.AreEqual "100,000,00.00", info.Format(10000000, "n")
@@ -132,10 +132,10 @@ Public Sub TestCurrency()
     info.CurrencyNegativePattern = [$ n-]
     Assert.AreEqual "¤ 123.00-", info.Format(-123, "c")
     
-    info.CurrencyGroupSizes = cArray.NewArray(ciLong, 1, 2, 3)
+    info.CurrencyGroupSizes = NewLongs(1, 2, 3)
     Assert.AreEqual "¤12,345,67,8.00", info.Format(12345678, "c")
     
-    info.CurrencyGroupSizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    info.CurrencyGroupSizes = NewLongs(1, 2, 1, 0)
     Assert.AreEqual "¤12345,6,78,9.00", info.Format(123456789, "c")
 End Sub
 
@@ -158,10 +158,10 @@ Public Sub TestPercent()
     info.PercentNegativePattern = [-%#]
     Assert.AreEqual "-%12,300.00", info.Format(-123, "p")
     
-    info.PercentGroupSizes = cArray.NewArray(ciLong, 1, 2, 3)
+    info.PercentGroupSizes = NewLongs(1, 2, 3)
     Assert.AreEqual "1,234,567,80,0.00 %", info.Format(12345678, "p")
     
-    info.PercentGroupSizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    info.PercentGroupSizes = NewLongs(1, 2, 1, 0)
     Assert.AreEqual "1234567,8,90,0.00 %", info.Format(123456789, "p")
 End Sub
 

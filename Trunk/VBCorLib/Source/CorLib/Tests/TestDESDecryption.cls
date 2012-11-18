@@ -80,7 +80,7 @@ Public Sub TestTransformBlock()
         Else
             Assert.AreEqual (UBound(CT) + 1) - (csp.BlockSize \ 8), AmountTransformed, "Wrong amount transformed."
             If AmountTransformed = 0 Then
-                NewPT = cArray.CreateInstance(ciByte)
+                NewPT = cArray.CreateInstance(vbByte)
             Else
                 ReDim Preserve NewPT(0 To AmountTransformed - 1)
             End If

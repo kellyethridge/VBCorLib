@@ -201,7 +201,7 @@ End Sub
 '
 Public Function ToArray() As Variant()
     Dim Ret() As Variant
-    Ret = cArray.CreateInstance(ciVariant, mCount)
+    Ret = cArray.CreateInstance(vbVariant, mCount)
     
     Dim i As Long
     For i = 0 To mCount - 1

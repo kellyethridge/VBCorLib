@@ -303,7 +303,7 @@ Private Sub Form_Load()
     cArrayTests.Add New cArrayReverseTests
     cArrayTests.Add New cArrayIndexOfTests
     cArrayTests.Add New cArrayLastIndexOfTests
-    cArrayTests.Add New TestArrayCreation
+    cArrayTests.Add New cArrayCreateInstanceTests
     cArrayTests.Add New cArrayFindTests
     AddTest cArrayTests
     

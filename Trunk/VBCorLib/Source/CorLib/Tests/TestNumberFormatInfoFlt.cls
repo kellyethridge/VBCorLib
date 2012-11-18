@@ -77,9 +77,9 @@ Public Sub TestDecimal()
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is FormatException, "Wrong exception type caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception type caught."
 End Sub
 
 Public Sub TestNumber()
@@ -109,15 +109,15 @@ Public Sub TestNumber()
     Assert.AreEqual "(123.00)", info.Format(-123#, "n")
 
     Dim sizes() As Long
-    sizes = cArray.NewArray(ciLong, 1, 2, 3)
+    sizes = NewLongs(1, 2, 3)
     info.NumberGroupSizes = sizes
     Assert.AreEqual "12,345,67,8.91", info.Format(12345678.91, "n")
 
-    sizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    sizes = NewLongs(1, 2, 1, 0)
     info.NumberGroupSizes = sizes
     Assert.AreEqual "12345,6,78,9.12", info.Format(123456789.12, "n")
     
-    info.NumberGroupSizes = cArray.CreateInstance(ciLong)
+    info.NumberGroupSizes = cArray.CreateInstance(vbLong)
     Assert.AreEqual "1234567890", info.Format(1234567890#, "n0")
 End Sub
 
@@ -147,13 +147,13 @@ Public Sub TestCurrency()
     info.CurrencyNegativePattern = [($n)]
     Assert.AreEqual "(¤123.00)", info.Format(-123#, "c")
 
-    info.CurrencyGroupSizes = cArray.NewArray(ciLong, 1, 2, 3)
+    info.CurrencyGroupSizes = NewLongs(1, 2, 3)
     Assert.AreEqual "¤12,345,67,8.91", info.Format(12345678.91, "c")
 
-    info.CurrencyGroupSizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    info.CurrencyGroupSizes = NewLongs(1, 2, 1, 0)
     Assert.AreEqual "¤12345,6,78,9.12", info.Format(123456789.12, "c")
     
-    info.CurrencyGroupSizes = cArray.CreateInstance(ciLong)
+    info.CurrencyGroupSizes = cArray.CreateInstance(vbLong)
     Assert.AreEqual "¤1234567890", info.Format(1234567890#, "c0")
 End Sub
 
@@ -180,13 +180,13 @@ Public Sub TestPercent()
     info.PercentNegativePattern = [-%#]
     Assert.AreEqual "-%12,300.00", info.Format(-123#, "p")
 
-    info.PercentGroupSizes = cArray.NewArray(ciLong, 1, 2, 3)
+    info.PercentGroupSizes = NewLongs(1, 2, 3)
     Assert.AreEqual "1,234,567,89,1.00 %", info.Format(12345678.91, "p")
 
-    info.PercentGroupSizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    info.PercentGroupSizes = NewLongs(1, 2, 1, 0)
     Assert.AreEqual "1234567,8,91,2.00 %", info.Format(123456789.12, "p")
     
-    info.PercentGroupSizes = cArray.CreateInstance(ciLong)
+    info.PercentGroupSizes = cArray.CreateInstance(vbLong)
     Assert.AreEqual "123456789000 %", info.Format(1234567890#, "p0")
 End Sub
 

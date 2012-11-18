@@ -43,8 +43,8 @@ Public DaysToMonth()            As Long
 ' Initialize the values used by the cDateTime class.
 '
 Public Sub InitcDateTimeHelpers()
-    DaysToMonth = cArray.NewArray(ciLong, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365)
-    DaysToMonthLeapYear = cArray.NewArray(ciLong, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366)
+    DaysToMonth = Cor.NewLongs(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365)
+    DaysToMonthLeapYear = Cor.NewLongs(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366)
 End Sub
 
 

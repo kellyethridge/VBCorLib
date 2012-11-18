@@ -219,7 +219,7 @@ End Enum
 Private Type NumberType
     Scale       As Long
     Precision   As Long
-    IsNegative  As BOOL
+    isNegative  As BOOL
     Digits()    As Byte
     DigitsSA    As SafeArray1d
 End Type
@@ -941,7 +941,7 @@ End Property
 ' @param fmt The formatting to perform on the value.
 ' @return The formatted value as a string.
 '
-Public Function Format(ByRef Value As Variant, Optional ByRef fmt As String) As String
+Public Function format(ByRef Value As Variant, Optional ByRef fmt As String) As String
     Call VerifyLoaded
     
     Dim vt As Long
@@ -951,13 +951,13 @@ Public Function Format(ByRef Value As Variant, Optional ByRef fmt As String) As 
     End If
     Select Case vt
         Case vbLong, vbInteger, vbByte
-            Format = FormatInt32(Value, fmt)
+            format = FormatInt32(Value, fmt)
         Case vbDouble
-            Format = FormatDouble(Value, fmt)
+            format = FormatDouble(Value, fmt)
         Case vbSingle
-            Format = FormatSingle(Value, fmt)
+            format = FormatSingle(Value, fmt)
         Case Else
-            Format = Value
+            format = Value
     End Select
 End Function
 
@@ -1100,11 +1100,11 @@ Private Function ParseGroupSizes(ByRef src As String) As Long()
     ParseGroupSizes = Ret
 End Function
 
-Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As String
+Private Function FormatSingle(ByVal Value As Single, ByRef format As String) As String
     Dim Precision   As Long
     Dim FormatType  As Long
     
-    Call GetFormatSpecifierParts(Format, FormatType, Precision)
+    Call GetFormatSpecifierParts(format, FormatType, Precision)
 
     If ((FormatType And &HFFDF) <> GeneralFormat) And (FormatType <> CustomFormat) Then
         Call DoubleToNumber(Value, SINGLE_PRECISION)
@@ -1136,9 +1136,9 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
 
         Case Else
             If Value < 0 Then
-                FormatSingle = mProps.NegativeSign & VBA.Format$(Abs(Value), Format)
+                FormatSingle = mProps.NegativeSign & VBA.format$(Abs(Value), format)
             Else
-                FormatSingle = VBA.Format$(Value, Format)
+                FormatSingle = VBA.format$(Value, format)
             End If
             Exit Function
     End Select
@@ -1149,11 +1149,11 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
     End If
 End Function
 
-Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As String
+Private Function FormatDouble(ByVal Value As Double, ByRef format As String) As String
     Dim Precision   As Long
     Dim FormatType  As Long
     
-    Call GetFormatSpecifierParts(Format, FormatType, Precision)
+    Call GetFormatSpecifierParts(format, FormatType, Precision)
     
     If ((FormatType And &HFFDF) <> GeneralFormat) And (FormatType <> CustomFormat) Then
         Call DoubleToNumber(Value, DOUBLE_PRECISION)
@@ -1184,9 +1184,9 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
         
         Case Else
             If Value < 0# Then
-                FormatDouble = mProps.NegativeSign & VBA.Format$(Abs(Value), Format)
+                FormatDouble = mProps.NegativeSign & VBA.format$(Abs(Value), format)
             Else
-                FormatDouble = VBA.Format$(Value, Format)
+                FormatDouble = VBA.format$(Value, format)
             End If
             Exit Function
     End Select
@@ -1197,11 +1197,11 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
     End If
 End Function
 
-Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As String
+Private Function FormatInt32(ByRef Value As Variant, ByRef format As String) As String
     Dim Digits      As Long
     Dim FormatType  As Long
 
-    Call GetFormatSpecifierParts(Format, FormatType, Digits)
+    Call GetFormatSpecifierParts(format, FormatType, Digits)
     
     If ((FormatType And &HFFDF) <> HexFormat) And (FormatType <> CustomFormat) Then
         Call Int32ToNumber(Value)
@@ -1237,9 +1237,9 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
         
         Case Else
             If Value < 0 Then
-                FormatInt32 = mProps.NegativeSign & VBA.Format$(Abs(Value), Format)
+                FormatInt32 = mProps.NegativeSign & VBA.format$(Abs(Value), format)
             Else
-                FormatInt32 = VBA.Format$(Value, Format)
+                FormatInt32 = VBA.format$(Value, format)
             End If
             Exit Function
     End Select
@@ -1256,7 +1256,7 @@ Private Sub FormatNumber(ByVal DecimalPlaces As Long)
     Call RoundNumber(DecimalPlaces + mNumber.Scale)
     
     Dim Pattern As String
-    If mNumber.IsNegative Then
+    If mNumber.isNegative Then
         Pattern = mNumberNegativePatterns(mProps.NumberNegativePattern)
     Else
         Pattern = "#"
@@ -1265,15 +1265,15 @@ Private Sub FormatNumber(ByVal DecimalPlaces As Long)
     mFormatSpecifier.SA.pvData = StrPtr(Pattern)
     
     Dim i As Long
-    Dim Ch As Integer
+    Dim ch As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Data(i)
-            Select Case Ch
+            ch = mFormatSpecifier.Data(i)
+            Select Case ch
                 Case vbPound:    Call FormatGroups(DecimalPlaces, .NumberGroupSizes, .NumberGroupSeparator, .NumberDecimalSeparator)
                 Case vbMinus:    Call AppendString(.NegativeSign)
                 Case Else
-                    mOutput(mOutputPos) = Ch
+                    mOutput(mOutputPos) = ch
                     mOutputPos = mOutputPos + 1
             End Select
         Next i
@@ -1285,7 +1285,7 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
     Call RoundNumber(DecimalPlaces + mNumber.Scale)
     
     Dim Pattern As String
-    If mNumber.IsNegative Then
+    If mNumber.isNegative Then
         Pattern = mCurrencyNegativePatterns(mProps.CurrencyNegativePattern)
     Else
         Pattern = mCurrencyPositivePatterns(mProps.CurrencyPositivePattern)
@@ -1294,16 +1294,16 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
     mFormatSpecifier.SA.pvData = StrPtr(Pattern)
     
     Dim i As Long
-    Dim Ch As Integer
+    Dim ch As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Data(i)
-            Select Case Ch
+            ch = mFormatSpecifier.Data(i)
+            Select Case ch
                 Case vbPound:    Call FormatGroups(DecimalPlaces, .CurrencyGroupSizes, .CurrencyGroupSeparator, .CurrencyDecimalSeparator)
                 Case vbMinus:    Call AppendString(.NegativeSign)
                 Case vbDollar:   Call AppendString(.CurrencySymbol)
                 Case Else
-                    mOutput(mOutputPos) = Ch
+                    mOutput(mOutputPos) = ch
                     mOutputPos = mOutputPos + 1
             End Select
         Next i
@@ -1312,7 +1312,7 @@ End Sub
 
 Private Sub FormatPercent(ByVal DecimalPlaces As Long)
     Dim Pattern As String
-    If mNumber.IsNegative Then
+    If mNumber.isNegative Then
         Pattern = mPercentNegativePatterns(mProps.PercentNegativePattern)
     Else
         Pattern = mPercentPositivePatterns(mProps.PercentPositivePattern)
@@ -1321,16 +1321,16 @@ Private Sub FormatPercent(ByVal DecimalPlaces As Long)
     mFormatSpecifier.SA.pvData = StrPtr(Pattern)
     
     Dim i As Long
-    Dim Ch As Integer
+    Dim ch As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Data(i)
-            Select Case Ch
+            ch = mFormatSpecifier.Data(i)
+            Select Case ch
                 Case vbPound:    Call FormatGroups(DecimalPlaces, .PercentGroupSizes, .PercentGroupSeparator, .PercentDecimalSeparator)
                 Case vbMinus:    Call AppendString(.NegativeSign)
                 Case vbPercent:  Call AppendString(.PercentSymbol)
                 Case Else
-                    mOutput(mOutputPos) = Ch
+                    mOutput(mOutputPos) = ch
                     mOutputPos = mOutputPos + 1
             End Select
         Next i
@@ -1349,10 +1349,10 @@ End Sub
 Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long, ByRef GroupSeparator As String, ByRef DecimalSeparator As String)
     Dim i As Long
     Dim j As Long
-    Dim Ch As Integer
+    Dim ch As Integer
     Dim remainingdigits As Long
     Dim DigitCount As Long
-    Dim Size As Long
+    Dim size As Long
     
     With mNumber
         If .Scale > 0 Then
@@ -1363,27 +1363,27 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             remainingdigits = .Scale - j
             If remainingdigits < 0 Then remainingdigits = .Scale
             
-            If UBound(GroupSizes) >= 0 Then Size = GroupSizes(UBound(GroupSizes))
-            If remainingdigits = Size Then
+            If UBound(GroupSizes) >= 0 Then size = GroupSizes(UBound(GroupSizes))
+            If remainingdigits = size Then
                 DigitCount = -1
-            ElseIf Size > 0 Then
-                DigitCount = remainingdigits Mod Size
-                If DigitCount = 0 Then DigitCount = Size
+            ElseIf size > 0 Then
+                DigitCount = remainingdigits Mod size
+                If DigitCount = 0 Then DigitCount = size
             Else
                 DigitCount = remainingdigits
             End If
             i = 0
-            Ch = .Digits(i)
+            ch = .Digits(i)
             Do While remainingdigits > 0
                 If DigitCount = 0 Then
                     Call AppendString(GroupSeparator)
-                    DigitCount = Size
+                    DigitCount = size
                 End If
-                If Ch = 0 Then
+                If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
                 Else
-                    mOutput(mOutputPos) = Ch
-                    Ch = .Digits(i + 1)
+                    mOutput(mOutputPos) = ch
+                    ch = .Digits(i + 1)
                 End If
                 i = i + 1
                 mOutputPos = mOutputPos + 1
@@ -1395,23 +1395,23 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             mOutputPos = mOutputPos + 1
         End If
         
-        If (i = 0 Or Ch <> 0) Or (i < .Scale And Ch = 0) Then
-            Size = UBound(GroupSizes)
+        If (i = 0 Or ch <> 0) Or (i < .Scale And ch = 0) Then
+            size = UBound(GroupSizes)
             DigitCount = 0
             'digitcount = GroupSizes(size)
-            Ch = .Digits(i)
+            ch = .Digits(i)
             For j = i To .Scale - 1
                 If DigitCount = 0 Then
                     Call AppendString(GroupSeparator)
-                    Size = Size - 1
-                    If Size < 0 Then Size = 0
-                    DigitCount = GroupSizes(Size)
+                    size = size - 1
+                    If size < 0 Then size = 0
+                    DigitCount = GroupSizes(size)
                 End If
-                If Ch = 0 Then
+                If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
                 Else
-                    mOutput(mOutputPos) = Ch
-                    Ch = .Digits(i + 1)
+                    mOutput(mOutputPos) = ch
+                    ch = .Digits(i + 1)
                 End If
                 i = i + 1
                 mOutputPos = mOutputPos + 1
@@ -1432,14 +1432,14 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
                 i = i + 1
                 DecimalPlaces = DecimalPlaces - 1
             Loop
-            If Ch <> 0 Then Ch = .Digits(i)
+            If ch <> 0 Then ch = .Digits(i)
             Do While DecimalPlaces > 0
-                If Ch = 0 Then
+                If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
                 Else
-                    mOutput(mOutputPos) = Ch
+                    mOutput(mOutputPos) = ch
                     i = i + 1
-                    Ch = .Digits(i)
+                    ch = .Digits(i)
                 End If
                 mOutputPos = mOutputPos + 1
                 DecimalPlaces = DecimalPlaces - 1
@@ -1458,15 +1458,15 @@ End Sub
 ' alpha characters that are in the output string.
 '
 Private Sub FormatHex(ByVal Value As Long, ByVal Digits As Long, ByVal CaseOffset As Long)
-    Dim Ch As Integer
+    Dim ch As Integer
     
     mOutputPos = BUFFER_SIZE - 1
     Do While Value <> 0
-        Ch = Value And &HF
-        If Ch > 9 Then
-            mOutput(mOutputPos) = Ch + CaseOffset  ' add the offset to upper or lower 'a-f' or 'A-F'.
+        ch = Value And &HF
+        If ch > 9 Then
+            mOutput(mOutputPos) = ch + CaseOffset  ' add the offset to upper or lower 'a-f' or 'A-F'.
         Else
-            mOutput(mOutputPos) = vbZero + Ch
+            mOutput(mOutputPos) = vbZero + ch
         End If
         mOutputPos = mOutputPos - 1
         If Value < 0 Then
@@ -1494,7 +1494,7 @@ End Sub
 Private Sub FormatDecimal(ByVal Digits As Long)
     With mNumber
         ' Add the negative sign if necessary.
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .isNegative Then Call AppendString(mProps.NegativeSign)
         
         ' Insert the leading zeros until we reach the first digit.
         Do While Digits > .Scale
@@ -1527,28 +1527,28 @@ Private Sub FormatScientific(ByVal Digits As Long, ByVal ExpChar As Integer)
     
     With mNumber
         ' Simply add the negative sign first.
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .isNegative Then Call AppendString(mProps.NegativeSign)
         
         ' We need to represent "digits" number of digits in the precision.
         ' After the first digit is ouptput we put the decimal separator, since
         ' all scientific notation has a leading digit-period-digits format.
         Dim i As Long
-        Dim Ch As Integer
+        Dim ch As Integer
         Dim OutOfDigits As Boolean
         Do While Digits >= 0
             If i = 1 Then
                 Call AppendString(mProps.NumberDecimalSeparator)
             End If
-            If Not OutOfDigits Then Ch = .Digits(i)
+            If Not OutOfDigits Then ch = .Digits(i)
             
             ' Simply copy the digit to the output buffer, or place
             ' a 0 in the output buffer if we have run out of digits
             ' but required more digits to be displayed.
-            If Ch = 0 Then
+            If ch = 0 Then
                 mOutput(mOutputPos) = vbZero
                 OutOfDigits = True
             Else
-                mOutput(mOutputPos) = Ch
+                mOutput(mOutputPos) = ch
             End If
             i = i + 1
             mOutputPos = mOutputPos + 1
@@ -1601,7 +1601,7 @@ Private Sub RoundNumber(ByVal Digits As Long)
         End If
         If Digits = 0 Then
             .Scale = 0
-            .IsNegative = BOOL_FALSE
+            .isNegative = BOOL_FALSE
         End If
         .Digits(Digits) = vbNullPtr
     End With
@@ -1647,14 +1647,14 @@ Private Sub GetFormatSpecifierParts(ByRef FormatSpecifier As String, ByRef Forma
                         
                         Precision = 0   ' we need to reset this because it's a ByRef variable.
                         
-                        Dim Ch As Long
+                        Dim ch As Long
                         Dim i As Long
                         For i = 1 To FormatSpecifierLength - 1
-                            Ch = .Data(i)
+                            ch = .Data(i)
                             
-                            Select Case Ch
+                            Select Case ch
                                 Case vbZero To vbNine
-                                    Precision = Precision * 10 + Ch - vbZero
+                                    Precision = Precision * 10 + ch - vbZero
                                 Case Else
                                     FormatType = CustomFormat
                                     Precision = DEFAULT_PRECISION
@@ -1696,9 +1696,9 @@ Private Sub Int32ToNumber(ByVal Value As Long)
             Else
                 Value = -Value
             End If
-            .IsNegative = BOOL_TRUE
+            .isNegative = BOOL_TRUE
         Else
-            .IsNegative = BOOL_FALSE
+            .isNegative = BOOL_FALSE
         End If
         
         ' We determine the number of characters first because we
@@ -1760,10 +1760,10 @@ Private Sub DoubleToNumber(ByVal Value As Double, ByVal Precision As Long)
                 mNumber.[Scale] = SCALE_NAN
             Else
                 mNumber.[Scale] = SCALE_INF
-                mNumber.IsNegative = (Value < 0#)
+                mNumber.isNegative = (Value < 0#)
             End If
         Else
-            mNumber.DigitsSA.pvData = Helper.Ecvt(Value, Precision, mNumber.Scale, mNumber.IsNegative)
+            mNumber.DigitsSA.pvData = Helper.Ecvt(Value, Precision, mNumber.Scale, mNumber.isNegative)
             If Value = 0# Then Precision = 0
         End If
     End With
@@ -1773,7 +1773,7 @@ Private Sub FormatGeneralInt32(ByVal Precision As Long, ByVal ExpChar As Long)
     If Precision = DEFAULT_PRECISION Or Precision = 0 Then Precision = INTEGER_PRECISION
     
     With mNumber
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .isNegative Then Call AppendString(mProps.NegativeSign)
         
         ' If the requested precision is less than the
         ' actuall number of digits, then we have to
@@ -1800,7 +1800,7 @@ End Sub
 
 Private Sub FormatGeneralDouble(ByVal Digits As Long, ByVal ExpChar As Integer)
     With mNumber
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .isNegative Then Call AppendString(mProps.NegativeSign)
         
         Dim DP As Long
         DP = .Scale
@@ -1815,11 +1815,11 @@ Private Sub FormatGeneralDouble(ByVal Digits As Long, ByVal ExpChar As Integer)
             DP = 0
         End If
         
-        Dim Ch As Integer
+        Dim ch As Integer
         Dim i As Long
-        Ch = .Digits(i)
+        ch = .Digits(i)
         
-        Do While Ch <> 0
+        Do While ch <> 0
             If i = DP Then
                 Call AppendString(mProps.NumberDecimalSeparator)
                 If Not hasexponent Then
@@ -1829,10 +1829,10 @@ Private Sub FormatGeneralDouble(ByVal Digits As Long, ByVal ExpChar As Integer)
                     Next DP
                 End If
             End If
-            mOutput(mOutputPos) = Ch
+            mOutput(mOutputPos) = ch
             mOutputPos = mOutputPos + 1
             i = i + 1
-            Ch = .Digits(i)
+            ch = .Digits(i)
         Loop
         If hasexponent Then
             Call FormatExponent(.Scale - 1, ExpChar, 2)
@@ -1849,7 +1849,7 @@ Private Sub FormatFixedInt32(ByVal Precision As Long)
     If Precision = DEFAULT_PRECISION Then Precision = mProps.NumberDecimalDigits
     
     With mNumber
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .isNegative Then Call AppendString(mProps.NegativeSign)
         
         Dim i As Long
         If .Precision = 0 Then
@@ -1877,9 +1877,9 @@ Private Sub FormatFixedDouble(ByVal Precision As Long)
     Call RoundNumber(Precision + mNumber.Scale)
     
     Dim i As Long
-    Dim Ch As Integer
+    Dim ch As Integer
     With mNumber
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .isNegative Then Call AppendString(mProps.NegativeSign)
         
         If .Scale > 0 Then
             For i = 0 To .Scale - 1
@@ -1894,12 +1894,12 @@ Private Sub FormatFixedDouble(ByVal Precision As Long)
         If Precision > 0 Then
             Call AppendString(mProps.NumberDecimalSeparator)
             Do While Precision > 0
-                If i >= 0 Then Ch = .Digits(i)
-                If Ch = 0 Then
+                If i >= 0 Then ch = .Digits(i)
+                If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
                     If i < 0 Then i = i + 1
                 Else
-                    mOutput(mOutputPos) = Ch
+                    mOutput(mOutputPos) = ch
                     i = i + 1
                 End If
                 mOutputPos = mOutputPos + 1
@@ -1936,7 +1936,7 @@ Private Function IsValidNumber(ByRef RetVal As String) As Boolean
         Case SCALE_NAN
             RetVal = mProps.NaNSymbol
         Case SCALE_INF
-            If mNumber.IsNegative Then
+            If mNumber.isNegative Then
                 RetVal = mProps.NegativeInfinitySymbol
             Else
                 RetVal = mProps.PositiveInfinitySymbol
@@ -2025,7 +2025,7 @@ Private Sub ReadLongArray(ByRef a() As Long, ByVal Name As String, ByVal bag As 
         Dim Count As Long
         Count = .ReadProperty(Name & "_Count", 0)
         If Count = 0 Then
-            a = cArray.CreateInstance(ciLong)
+            a = cArray.CreateInstance(vbLong)
             Exit Sub
         End If
         
@@ -2050,11 +2050,11 @@ Private Sub WriteLongArray(ByRef a() As Long, ByVal Name As String, ByVal bag As
 End Sub
 
 Private Sub InitPatterns()
-    mNumberNegativePatterns = cArray.NewArray(ciString, "(#)", "-#", "- #", "#-", "# -")
-    mCurrencyNegativePatterns = cArray.NewArray(ciString, "($#)", "-$#", "$-#", "$#-", "(#$)", "-#$", "#-$", "#$-", "-# $", "-$ #", "# $-", "$ #-", "$ -#", "#- $", "($ #)", "(# $)")
-    mCurrencyPositivePatterns = cArray.NewArray(ciString, "$#", "#$", "$ #", "# $")
-    mPercentNegativePatterns = cArray.NewArray(ciString, "-# %", "-#%", "-%#")
-    mPercentPositivePatterns = cArray.NewArray(ciString, "# %", "#%", "%#")
+    mNumberNegativePatterns = Cor.NewStrings("(#)", "-#", "- #", "#-", "# -")
+    mCurrencyNegativePatterns = Cor.NewStrings("($#)", "-$#", "$-#", "$#-", "(#$)", "-#$", "#-$", "#$-", "-# $", "-$ #", "# $-", "$ #-", "$ -#", "#- $", "($ #)", "(# $)")
+    mCurrencyPositivePatterns = Cor.NewStrings("$#", "#$", "$ #", "# $")
+    mPercentNegativePatterns = Cor.NewStrings("-# %", "-#%", "-%#")
+    mPercentPositivePatterns = Cor.NewStrings("# %", "#%", "%#")
 End Sub
 
 

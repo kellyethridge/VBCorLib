@@ -27,24 +27,24 @@ Public Sub TestGetByteCount()
 End Sub
 
 Public Sub TestGetBytes()
-    Dim expected() As Byte
-    Dim actual() As Byte
+    Dim Expected() As Byte
+    Dim Actual() As Byte
     Dim i As Long
     
-    expected = GetEncodedBytes
+    Expected = GetEncodedBytes
     
-    actual = en.GetBytes(GetChars)
+    Actual = en.GetBytes(GetChars)
     
-    For i = 0 To UBound(actual)
-        Assert.AreEqual expected(i), actual(i)
+    For i = 0 To UBound(Actual)
+        Assert.AreEqual Expected(i), Actual(i)
     Next i
 End Sub
 
 Public Sub TestGetCharCount()
-    Dim expected() As Byte
+    Dim Expected() As Byte
     
-    expected = GetEncodedBytes
-    Assert.AreEqual 65536, en.GetCharCount(expected)
+    Expected = GetEncodedBytes
+    Assert.AreEqual 65536, en.GetCharCount(Expected)
 End Sub
 
 Public Sub TestGetBytesFromString()
@@ -97,7 +97,7 @@ Public Sub TestDecodeEmptyArray()
     Dim b() As Byte
     Dim ch() As Integer
     
-    b = cArray.CreateInstance(ciByte)
+    b = cArray.CreateInstance(vbByte)
     ch = en.GetChars(b)
     Assert.IsFalse cArray.IsNull(ch), "Array should not be null."
     Assert.AreEqual 0, cArray.GetLength(ch)

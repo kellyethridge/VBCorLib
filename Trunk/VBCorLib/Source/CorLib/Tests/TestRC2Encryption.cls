@@ -17,20 +17,20 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private csp As RC2CryptoServiceProvider
-Private trans As CryptoAPITransform
+Private Trans As CryptoAPITransform
 
 Public Sub Setup()
     Set csp = New RC2CryptoServiceProvider
-    csp.Key = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6)
-    csp.IV = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    csp.Key = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6)
+    csp.IV = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     csp.Padding = PKCS7
     csp.Mode = CBC
-    Set trans = csp.CreateEncryptor
+    Set Trans = csp.CreateEncryptor
 End Sub
 
 Public Sub EncryptOneByte()
     Dim b() As Byte
-    b = NewArray(ciByte, 1)
+    b = NewArray(vbByte, 1)
     
     Dim t As ICryptoTransform
     Set t = csp.CreateEncryptor

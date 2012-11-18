@@ -68,7 +68,7 @@ Public Sub TestEmptyArray()
     Dim b() As Byte
     Dim ch() As Integer
     
-    b = cArray.CreateInstance(ciByte)
+    b = cArray.CreateInstance(vbByte)
     ch = en.GetChars(b)
     Assert.IsFalse cArray.IsNull(ch), "Array should not be null."
     Assert.AreEqual 0, cArray.GetLength(ch)

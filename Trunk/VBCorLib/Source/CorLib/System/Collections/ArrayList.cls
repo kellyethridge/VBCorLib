@@ -625,7 +625,7 @@ End Sub
 ' <p>No items will be narrowed in the conversion. For example, a Double will
 ' not be converted to a Long. An exception will be thrown.</p>
 '
-Public Function ToArray(Optional ByVal ArrayType As ciArrayTypes = ciVariant) As Variant
+Public Function ToArray(Optional ByVal ArrayType As vbVarType = vbVariant) As Variant
     Dim Ret As Variant
     Ret = cArray.CreateInstance(ArrayType, mCount)
     If mCount > 0 Then Call cArray.CopyEx(mItems, 0, Ret, 0, mCount)

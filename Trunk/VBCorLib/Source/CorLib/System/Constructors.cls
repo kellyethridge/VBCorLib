@@ -1068,7 +1068,7 @@ End Function
 ' when being returned. All other datatype sizes will cause a new array
 ' to be created.</p>
 '
-Public Function NewArray(ByVal ArrayType As ciArrayTypes, ParamArray ArrayElements() As Variant) As Variant
+Public Function NewArray(ByVal ArrayType As vbVarType, ParamArray ArrayElements() As Variant) As Variant
     Dim Args() As Variant
     Call Helper.Swap4(ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16))
     NewArray = cArray.InternalNewArray(ArrayType, Args)

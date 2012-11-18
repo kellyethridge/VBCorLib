@@ -23,32 +23,32 @@ Private Const TEST_GUID_UPPER As String = "{C200E360-38C5-11CE-AE62-08002B2B79FF
 
 Public Sub TestToString()
     Dim s As String
-    Dim G As VBCorLib.Guid
+    Dim g As VBCorLib.Guid
     
-    Set G = Guid.Parse(TEST_GUID)
+    Set g = Guid.Parse(TEST_GUID)
     
-    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", G.ToString
-    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", G.ToString("B")
-    Assert.AreEqual "(C200E360-38C5-11CE-AE62-08002B2B79EF)", G.ToString("P")
-    Assert.AreEqual "C200E360-38C5-11CE-AE62-08002B2B79EF", G.ToString("D")
-    Assert.AreEqual "C200E36038C511CEAE6208002B2B79EF", G.ToString("N")
+    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", g.ToString
+    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", g.ToString("B")
+    Assert.AreEqual "(C200E360-38C5-11CE-AE62-08002B2B79EF)", g.ToString("P")
+    Assert.AreEqual "C200E360-38C5-11CE-AE62-08002B2B79EF", g.ToString("D")
+    Assert.AreEqual "C200E36038C511CEAE6208002B2B79EF", g.ToString("N")
     
 End Sub
 
 Public Sub TestParse()
-    Dim G As VBCorLib.Guid
+    Dim g As VBCorLib.Guid
     
-    Set G = Guid.Parse("{C200E360-38C5-11CE-AE62-08002B2B79EF}")
-    Assert.AreEqual TEST_GUID, G.ToString
+    Set g = Guid.Parse("{C200E360-38C5-11CE-AE62-08002B2B79EF}")
+    Assert.AreEqual TEST_GUID, g.ToString
     
-    Set G = Guid.Parse("(C200E360-38C5-11CE-AE62-08002B2B79EF)")
-    Assert.AreEqual TEST_GUID, G.ToString
+    Set g = Guid.Parse("(C200E360-38C5-11CE-AE62-08002B2B79EF)")
+    Assert.AreEqual TEST_GUID, g.ToString
     
-    Set G = Guid.Parse("C200E360-38C5-11CE-AE62-08002B2B79EF")
-    Assert.AreEqual TEST_GUID, G.ToString
+    Set g = Guid.Parse("C200E360-38C5-11CE-AE62-08002B2B79EF")
+    Assert.AreEqual TEST_GUID, g.ToString
     
-    Set G = Guid.Parse("C200E36038C511CEAE6208002B2B79EF")
-    Assert.AreEqual TEST_GUID, G.ToString
+    Set g = Guid.Parse("C200E36038C511CEAE6208002B2B79EF")
+    Assert.AreEqual TEST_GUID, g.ToString
 
 End Sub
 
@@ -109,11 +109,11 @@ Public Sub TestGetHashCode()
 End Sub
 
 Public Sub TestToByteArray()
-    Dim G As VBCorLib.Guid
+    Dim g As VBCorLib.Guid
     Dim b() As Byte
     
-    Set G = Guid.Parse(TEST_GUID)
-    b = G.ToByteArray
+    Set g = Guid.Parse(TEST_GUID)
+    b = g.ToByteArray
     Assert.AreEqual &H60, b(0)
     Assert.AreEqual &HE3, b(1)
     Assert.AreEqual 0, b(2)
@@ -133,14 +133,14 @@ Public Sub TestToByteArray()
 End Sub
 
 Public Sub TestFromByteArray()
-    Dim G As VBCorLib.Guid
+    Dim g As VBCorLib.Guid
     Dim b() As Byte
     
-    b = cArray.NewArray(ciByte, &H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF)
+    b = NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF)
     
-    Set G = Guid.FromByteArray(b)
+    Set g = Guid.FromByteArray(b)
     
-    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", G.ToString
+    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", g.ToString
 End Sub
 
 Public Sub TestPersistence()
