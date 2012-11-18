@@ -272,14 +272,14 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim Size As Long
-    Size = GetMaxCharCount(ElemCount)
+    Dim size As Long
+    size = GetMaxCharCount(ElemCount)
     
     Dim Ret() As Integer
     If ElemCount > 0 Then
-        ReDim Ret(0 To Size - 1)
-        Size = InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0, Nothing)
-        ReDim Preserve Ret(0 To Size - 1)
+        ReDim Ret(0 To size - 1)
+        size = InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0, Nothing)
+        ReDim Preserve Ret(0 To size - 1)
     Else
         Ret = Cor.NewIntegers()
     End If
@@ -324,19 +324,19 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim Size As Long
-    Size = GetMaxCharCount(ElemCount)
+    Dim size As Long
+    size = GetMaxCharCount(ElemCount)
     
     Dim Ret As String
-    Ret = SysAllocStringLen(0, Size)
+    Ret = SysAllocStringLen(0, size)
     With mCharsSA
         .pvData = StrPtr(Ret)
         .lLbound = 0
-        .cElements = Size
+        .cElements = size
     End With
     SAPtr(mChars) = VarPtr(mCharsSA)
-    Size = InternalGetChars(Bytes, ElemIndex, ElemCount, mChars, 0, Nothing)
-    GetString = Left$(Ret, Size)
+    size = InternalGetChars(Bytes, ElemIndex, ElemCount, mChars, 0, Nothing)
+    GetString = Left$(Ret, size)
 End Function
 
 ''
@@ -561,7 +561,7 @@ End Function
 Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF8Decoder) As Long
     Dim BytesInSequence As Long
     Dim b               As Byte
-    Dim Ch              As Long
+    Dim ch              As Long
     Dim CharCount       As Long
     Dim BytesLeft       As Long
     Dim putChars        As Boolean
@@ -578,7 +578,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     End If
     If Not Decoder Is Nothing Then
         BytesLeft = Decoder.BytesLeft
-        Ch = Decoder.Char
+        ch = Decoder.Char
         BytesInSequence = Decoder.BytesInSequence
     End If
     
@@ -599,7 +599,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
             BytesInSequence = 0
             CharCount = CharCount + 1
         ElseIf BytesInSequence = 0 Then
-            Ch = b
+            ch = b
             ' we count off the number of bits set starting from
             ' the highest bit. No more than 4 should be found.
             ' This will tell us how many bytes need to be put together
@@ -611,14 +611,14 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
             BytesLeft = BytesInSequence - 1
             Select Case BytesInSequence
                 Case 2      ' 110xxxxx format
-                    Ch = Ch And &H1F
-                    If Ch < 2 Then Call ByteStreamError(ByteIndex)
+                    ch = ch And &H1F
+                    If ch < 2 Then Call ByteStreamError(ByteIndex)
                 Case 3      ' 1110xxxx format
-                    Ch = Ch And &HF
+                    ch = ch And &HF
                 Case 4      ' 11110xxx format
-                    Ch = Ch And &H7
-                    If Ch <> 0 Then
-                        If Ch <> &H4 Then Call ByteStreamError(ByteIndex)
+                    ch = ch And &H7
+                    If ch <> 0 Then
+                        If ch <> &H4 Then Call ByteStreamError(ByteIndex)
                     End If
                 Case Else
                     Call ByteStreamError(ByteIndex)
@@ -627,42 +627,42 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
             ' if we get in here then we must be on bytes 2-4 in a byte sequence,
             ' so they all will look like 10xxxxxx.
             If (b And &HC0) <> &H80 Then Call ByteStreamError(ByteIndex)
-            Ch = Ch * &H40
-            Ch = Ch + (b And &H3F)
+            ch = ch * &H40
+            ch = ch + (b And &H3F)
             BytesLeft = BytesLeft - 1
             Select Case BytesInSequence
                 Case 2      ' 110xxxxx 10xxxxxx -  char from &h80 to &h7ff
-                    If Ch = 0 Then Call ByteStreamError(ByteIndex)
+                    If ch = 0 Then Call ByteStreamError(ByteIndex)
                     If BytesLeft = 0 Then
                         If putChars Then
                             If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
-                            Chars(CharIndex) = Ch
+                            Chars(CharIndex) = ch
                             CharIndex = CharIndex + 1
                         End If
                         BytesInSequence = 0
                         CharCount = CharCount + 1
                     End If
                 Case 3      ' 1110xxxx 10xxxxxx 10xxxxxx - char from &h800 to &hffff, including &hd800-&hdfff for bad surrogates
-                    If Ch = 0 Then Call ByteStreamError(ByteIndex)
+                    If ch = 0 Then Call ByteStreamError(ByteIndex)
                     Select Case BytesLeft
                         Case 0
                             If putChars Then
                                 If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
-                                Chars(CharIndex) = AsWord(Ch)
+                                Chars(CharIndex) = AsWord(ch)
                                 CharIndex = CharIndex + 1
                             End If
                             BytesInSequence = 0
                             CharCount = CharCount + 1
                         Case 1  ' check for shortest form conformity
-                            If Ch < &H20 Then Call ByteStreamError(ByteIndex)
+                            If ch < &H20 Then Call ByteStreamError(ByteIndex)
                     End Select
                 Case 4      ' 11110XXX 10XXxxxx 10xxxxxx 10xxxxxx - used for surrogate pairs
                     If BytesLeft = 0 Then
                         Dim hs As Long
                         Dim ls As Long
                         
-                        ls = (Ch And &H3FF) + &HDC00&
-                        hs = (Ch \ &H400) + &HD7C0&
+                        ls = (ch And &H3FF) + &HDC00&
+                        hs = (ch \ &H400) + &HD7C0&
                         If ls < &HDC00& Or ls > &HDFFF& Then Call ByteStreamError(ByteIndex)
                         If hs < &HD800& Or hs > &HDBFF& Then Call ByteStreamError(ByteIndex)
                         If putChars Then
@@ -675,7 +675,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         BytesInSequence = 0
                     Else
                         ' check for shortest form conformity
-                        If Ch = 0 Then Call ByteStreamError(ByteIndex)
+                        If ch = 0 Then Call ByteStreamError(ByteIndex)
                     End If
                 Case Else
                     Call ByteStreamError(ByteIndex)
@@ -691,7 +691,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         If BytesLeft = 0 Then
             Decoder.Char = 0
         Else
-            Decoder.Char = Ch
+            Decoder.Char = ch
         End If
         Decoder.BytesInSequence = BytesInSequence
     End If
@@ -707,7 +707,7 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
     If Count < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
     If Index + Count - 1 > UBound(Chars) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCountOffset), "Count")
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
 
     If Not Encoder Is Nothing Then HasHighSurrogate = (Encoder.HighSurrogateChar <> 0)
     
@@ -774,7 +774,7 @@ End Function
 
 Private Sub ByteStreamError(ByVal Index As Long)
     If Not mThrowException Then Exit Sub
-    Throw Cor.NewArgumentException(cString.Format("An invalid byte was found at index {0}.", Index), "Bytes")
+    Throw Cor.NewArgumentException(cString.format("An invalid byte was found at index {0}.", Index), "Bytes")
 End Sub
 
 

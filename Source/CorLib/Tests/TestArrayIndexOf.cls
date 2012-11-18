@@ -6,116 +6,123 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestArrayIndexOf"
+Attribute VB_Name = "cArrayIndexOfTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ITestCaseSource
 
-Public Sub TestLong()
-    Dim a() As Long
-    Dim i As Long
-    
-    ReDim a(-1 To 100)
-    For i = 0 To UBound(a)
-        a(i) = i
-    Next i
-    
-    i = cArray.IndexOf(a, CLng(UBound(a)))
-    
-    Assert.AreEqual UBound(a), i, "IndexOf should return " & UBound(a)
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "IndexOf_WithValues_ReturnsExpected"
+            Test.Use NewBytes(1, 2, 3, 4, 5, 6), 4, 3
+            Test.Use NewLongs(1, 2, 3, 4, 5, 6), 7, -1
+            Test.Use NewIntegers(1, 2, 3, 4, 5, 6), 4, 3
+            Test.Use NewLongs(1, 2, 3, 4, 5, 6), 4, 3
+            Test.Use NewDoubles(1, 2, 3, 4, 5, 6), 4, 3
+            Test.Use NewSingles(1, 2, 3, 4, 5, 6), 4, 3
+            Test.Use NewCurrencys(1, 2, 3, 4, 5, 6), 4, 3
+            Test.Use NewStrings("1", "2", "3", "4", "5", "6"), "4", 3
+            Test.Use NewDates(#1/1/2001#, #2/1/2001#, #3/1/2001#, #4/1/2001#, #5/1/2001#, #6/1/2001#), #4/1/2001#, 3
+            Test.Use NewVariants("1", "2", "3", "4", "5", "6"), "4", 3
+            
+            Dim Arr(2) As Int32
+            Set Arr(0) = New Int32
+            Set Arr(1) = New Int32
+            Set Arr(2) = New Int32
+            Test.Use Arr, Arr(2), 2
+            Test.Use Arr, New Int32, -1
+            Set Arr(2) = Nothing
+            Test.Use Arr, Nothing, 2
+            
+            Dim ArrLongs(1 To 3) As Long
+            Test.Use ArrLongs, 1, 0
+            
+    End Select
 End Sub
 
-Public Sub TestString()
-    Dim a() As String
-    Dim i As Long
+Public Sub IndexOf_WithValues_ReturnsExpected(ByRef Arr As Variant, ByRef Value As Variant, ByVal Expected As Long)
+    Dim Actual As Long
     
-    ReDim a(0 To 100)
-    For i = 0 To UBound(a)
-        a(i) = "Item " & i
-    Next i
+    Actual = cArray.IndexOf(Arr, Value)
     
-    i = cArray.IndexOf(a, "Item " & UBound(a))
-    Assert.AreEqual UBound(a), i, "IndexOf should return " & UBound(a)
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestDate()
-    Dim a() As Date
-    Dim i As Long
+Public Sub IndexOf_WithDefaultComparer_ReturnsExpected()
+    Dim Actual As Long
+    Dim Arr(2) As Int32
+    Set Arr(0) = New Int32
+    Set Arr(1) = New Int32
+    Set Arr(2) = New Int32
+    Arr(1).mValue = 10
+    Dim Value As New Int32
+    Value.mValue = 10
     
-    ReDim a(0 To 100)
-    For i = 0 To 100
-        a(i) = DateSerial(i, 1, 1)
-    Next i
+    Actual = cArray.IndexOf(Arr, Value, Comparer:=Comparer.Default)
     
-    i = cArray.IndexOf(a, DateSerial(59, 1, 1))
-    Assert.AreEqual 59, i, "IndexOf should return 59"
+    Const Expected As Long = 1
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestVariant()
-    Dim a() As Variant
-    Dim i As Long
+Public Sub IndexOf_WithNullArray_Throws()
+    Dim Arr() As Long
     
-    ReDim a(0 To 100)
-    For i = 0 To 100
-        a(i) = "Item " & i
-    Next i
-    Set a(88) = Me
+    On Error GoTo ErrTrap
+    cArray.IndexOf Arr, 1
     
-    i = cArray.IndexOf(a, Me)
-    Assert.AreEqual 88, i, "IndexOf should return 88"
+ErrTrap:
+    AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Sub TestDefaultComparer()
-    Dim a() As String
-    Dim i As Long
+Public Sub IndexOf_WithMuliDimensionArray_Throws()
+    Dim Arr(0, 0) As Long
     
-    ReDim a(0 To 100)
-    For i = 0 To 100
-        a(i) = "Item " & i
-    Next i
+    On Error GoTo ErrTrap
+    cArray.IndexOf Arr, 0
     
-    i = cArray.IndexOf(a, "Item 88", , , comparer.Default)
-    Assert.AreEqual 88, i, "IndexOf should return 88."
+ErrTrap:
+    AssertRankException Err
 End Sub
 
-Public Sub TestNotInSubArray()
-    Dim a() As Long
-    Dim i As Long
+Public Sub IndexOf_WithStartIndexLessThanLBound_Throws()
+    Dim Arr(0) As Long
     
-    ReDim a(-1 To 100)
-    For i = 0 To 100
-        a(i) = i
-    Next i
+    On Error GoTo ErrTrap
+    cArray.IndexOf Arr, 0, -1
     
-    i = cArray.IndexOf(a, 50&, 20, 20)
-    Assert.AreEqual -2, i, "IndexOfEx should return -1."
+ErrTrap:
+    AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub TestObject()
-    Dim a() As Int32
-    Dim i As Long
+Public Sub IndexOf_WithStartIndexGreaterThanUBound_Throws()
+    Dim Arr(0) As Long
     
-    ReDim a(1 To 10)
-    For i = 1 To 10
-        Set a(i) = New Int32
-        a(i).mValue = i
-    Next i
+    On Error GoTo ErrTrap
+    cArray.IndexOf Arr, 0, 1
     
-    i = cArray.IndexOf(a, a(5))
-    Assert.AreEqual 5, i
+ErrTrap:
+    AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub TestNothing()
-    Dim a() As Variant
-    Dim i As Long
+Public Sub IndexOf_WithCountLessThanZero_Throws()
+    Dim Arr(0) As Long
     
-    ReDim a(0 To 100)
-    For i = 0 To 100
-        a(i) = "Item " & i
-    Next i
-    Set a(UBound(a)) = Nothing
-    i = cArray.IndexOf(a, Nothing)
-    Assert.AreEqual UBound(a), i, "IndexOf should return " & UBound(a)
+    On Error GoTo ErrTrap
+    cArray.IndexOf Arr, 0, 0, -1
+    
+ErrTrap:
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub IndexOf_WithStartIndexAndCountGreaterThanUBound_Throws()
+    Dim Arr(0) As Long
+    
+    On Error GoTo ErrTrap
+    cArray.IndexOf Arr, 0, 0, 2
+    
+ErrTrap:
+    AssertArgumentOutOfRangeException Err
 End Sub

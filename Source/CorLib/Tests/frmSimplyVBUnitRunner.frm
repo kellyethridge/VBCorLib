@@ -304,8 +304,8 @@ Private Sub Form_Load()
     cArrayTests.Add New cArraySortTests
     cArrayTests.Add New TestArrayBinarySearch
     cArrayTests.Add New TestArrayReverse
-    cArrayTests.Add New TestArrayIndexOf
-    cArrayTests.Add New TestArrayLastIndexOf
+    cArrayTests.Add New cArrayIndexOfTests
+    cArrayTests.Add New cArrayLastIndexOfTests
     cArrayTests.Add New TestArrayCreation
     AddTest cArrayTests
     

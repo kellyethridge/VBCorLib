@@ -229,7 +229,7 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     
     Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, InternalGetByteCount(CharCount))
     Select Case Result
-        Case Argument_InvalidCountOffset:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Bytes")
+        Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Bytes")
         Case Is <> NO_ERROR:                ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", 0, vbNullString
     End Select
     
@@ -297,7 +297,7 @@ Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal
 
     Result = VerifyArrayRange(SAPtr(Chars), CharIndex, InternalGetCharCount(ByteCount))
     Select Case Result
-        Case Argument_InvalidCountOffset:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
+        Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
         Case Is <> NO_ERROR:                ThrowArrayRangeException Result, "Chars", CharIndex, "CharIndex", 0, vbNullString
     End Select
     
@@ -367,14 +367,14 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
-    Dim Size As Long
-    Size = InternalGetCharCount(ElemCount)
-    GetString = SysAllocStringLen(0, Size)
+    Dim size As Long
+    size = InternalGetCharCount(ElemCount)
+    GetString = SysAllocStringLen(0, size)
     
     With mCharsSA
         .pvData = StrPtr(GetString)
         .lLbound = 0
-        .cElements = Size
+        .cElements = size
     End With
     SAPtr(mChars) = VarPtr(mCharsSA)
     Call InternalGetChars(Bytes, ElemIndex, ElemCount, mChars, 0)
@@ -466,11 +466,11 @@ Private Function InternalGetBytes(ByVal CharIndex As Long, ByVal CharCount As Lo
     
     If mIsBigEndian Then
         Dim i As Long
-        Dim Ch As Long
+        Dim ch As Long
         For i = 0 To CharCount - 1
-            Ch = mChars(CharIndex + i)
-            Bytes(ByteIndex) = (Ch \ &H100) And &HFF
-            Bytes(ByteIndex + 1) = Ch And &HFF
+            ch = mChars(CharIndex + i)
+            Bytes(ByteIndex) = (ch \ &H100) And &HFF
+            Bytes(ByteIndex + 1) = ch And &HFF
             ByteIndex = ByteIndex + 2
         Next i
     Else
@@ -485,11 +485,11 @@ Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long
     
     If mIsBigEndian Then
         Dim i As Long
-        Dim Ch As Long
+        Dim ch As Long
         For i = 0 To ByteCount - 1 Step 2
-            Ch = Bytes(ByteIndex + i) * &H100
-            Ch = Ch Or Bytes(ByteIndex + i + 1)
-            Chars(CharIndex) = AsWord(Ch)
+            ch = Bytes(ByteIndex + i) * &H100
+            ch = ch Or Bytes(ByteIndex + i + 1)
+            Chars(CharIndex) = AsWord(ch)
             CharIndex = CharIndex + 1
         Next i
     Else

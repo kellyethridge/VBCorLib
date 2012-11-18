@@ -54,9 +54,9 @@ Private mCount      As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
-    Set mList = List
-    mVersion = List.Version
+Friend Sub Init(ByVal list As ArrayList, ByVal Index As Long, ByVal Count As Long)
+    Set mList = list
+    mVersion = list.Version
     mIndex = Index
     mCount = Count
 End Sub
@@ -306,7 +306,7 @@ Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartInd
     If ElemCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", ElemCount)
     If ElemIndex - ElemCount + 1 < 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCountOffset), "Count")
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
 
     Dim Index As Long
     Index = mList.LastIndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
@@ -347,7 +347,7 @@ Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
     If Index < 0 Or Count < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), IIf(Index < 0, "index", "count"), IIf(Index < 0, Index, Count))
     If Index + Count > mCount Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCountOffset), "count")
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "count")
     
     Call mList.RemoveRange(mIndex + Index, Count)
     mCount = mCount - Count

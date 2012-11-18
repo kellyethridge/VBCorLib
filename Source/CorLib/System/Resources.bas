@@ -53,7 +53,9 @@ Public Enum ResourceStringId
     ArgumentOutOfRange_OutsideConsoleBoundry = 714
     ArgumentOutOfRange_Enum = 715
     ArgumentOutOfRange_ArrayLB = 716
-    Argument_InvalidCountOffset = 800
+    ArgumentOutOfRange_ArrayBounds = 717
+    ArgumentOutOfRange_Count = 718
+    Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802
     Argument_ArrayRequired = 803

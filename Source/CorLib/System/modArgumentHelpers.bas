@@ -152,7 +152,7 @@ Public Function GetOptionalArrayRange(ByVal pSafeArray As Long, _
     
     ' Can't have the range extend past the end of the array.
     If ReturnIndex + ReturnCount - 1 > UpperBound Then
-        GetOptionalArrayRange = Argument_InvalidCountOffset
+        GetOptionalArrayRange = Argument_InvalidOffLen
     End If
 End Function
 
@@ -216,7 +216,7 @@ Public Function GetOptionalArrayRangeReverse(ByVal pSafeArray As Long, _
     
     ' Can't have the range extend past the beginning of the array.
     If ReturnIndex - ReturnCount + 1 < LowerBound Then
-        GetOptionalArrayRangeReverse = Argument_InvalidCountOffset
+        GetOptionalArrayRangeReverse = Argument_InvalidOffLen
     End If
 End Function
 
@@ -260,7 +260,7 @@ Public Function VerifyArrayRange(ByVal pSafeArray As Long, ByVal Index As Long, 
     
     ' Can't have the range extend past the end of the array.
     If Index + Count - 1 > SafeArrayGetUBound(pSafeArray, 1) Then
-        VerifyArrayRange = Argument_InvalidCountOffset
+        VerifyArrayRange = Argument_InvalidOffLen
     End If
 End Function
 
@@ -305,7 +305,7 @@ Public Function VerifyArrayRangeReverse(ByVal pSafeArray As Long, ByVal Index As
     
     ' Can't have the range extend past the beginning of the array.
     If Index - Count + 1 < SafeArrayGetLBound(pSafeArray, 1) Then
-        VerifyArrayRangeReverse = Argument_InvalidCountOffset
+        VerifyArrayRangeReverse = Argument_InvalidOffLen
     End If
 End Function
 
@@ -332,7 +332,7 @@ Public Sub ThrowArrayRangeException(ByVal ErrorCode As Long, ByRef ArrayName As 
         Case ArgumentOutOfRange_LBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
         Case ArgumentOutOfRange_UBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
         Case ArgumentOutOfRange_NeedNonNegNum:  Throw Cor.NewArgumentOutOfRangeException(Message, CountName, Count)
-        Case Argument_InvalidCountOffset:       Throw Cor.NewArgumentException(Message, CountName)
+        Case Argument_InvalidOffLen:       Throw Cor.NewArgumentException(Message, CountName)
         Case Else:                              Throw Cor.NewArgumentException(Message)
     End Select
 End Sub
@@ -357,7 +357,7 @@ Public Function VerifyListRange(ByVal RangeSize As Long, ByVal Index As Long, By
     End If
 
     If Index + Count > RangeSize Then
-        VerifyListRange = Argument_InvalidCountOffset
+        VerifyListRange = Argument_InvalidOffLen
     End If
 End Function
 
@@ -388,7 +388,7 @@ Public Sub ThrowListRangeException(ByVal ErrorCode As Long, ByVal Index As Long,
         Case Argument_ParamRequired:                Throw Cor.NewArgumentException(Message, IIf(IsIndexMissing, IndexName, CountName))
         Case ArgumentOutOfRange_LBound:             Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
         Case ArgumentOutOfRange_NeedNonNegNum:      Throw Cor.NewArgumentOutOfRangeException(Message, CountName, Count)
-        Case Argument_InvalidCountOffset:           Throw Cor.NewArgumentException("The index plus the count extends past the end of the list or string", "Count")
+        Case Argument_InvalidOffLen:           Throw Cor.NewArgumentException("The index plus the count extends past the end of the list or string", "Count")
     End Select
 End Sub
 
@@ -432,7 +432,7 @@ Public Function GetOptionalListRange(ByVal RangeSize As Long, _
     
     ' Can't have the range extend past the beginning of the array.
     If ReturnIndex + ReturnCount > RangeSize Then
-        GetOptionalListRange = Argument_InvalidCountOffset
+        GetOptionalListRange = Argument_InvalidOffLen
     End If
 End Function
 
@@ -461,7 +461,7 @@ Public Function GetOptionalListRangeReverse(ByVal RangeSize As Long, _
     
     ' Can't have the range extend past the beginning of the array.
     If ReturnIndex - ReturnCount + 1 < 0 Then
-        GetOptionalListRangeReverse = Argument_InvalidCountOffset
+        GetOptionalListRangeReverse = Argument_InvalidOffLen
     End If
 End Function
 

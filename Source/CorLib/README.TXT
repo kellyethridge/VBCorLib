@@ -1,33 +1,36 @@
-** VBCorLib 2.3 **
-- Updated ASM code to not trigger DEP protection.
-- Updated ArrayList to include the ArrayList.Adapter method, wrapping an IList object.
-- Fixed the StringBuilder.Remove method.
-- Updated Console class to automatically disable the close button on a command prompt when working in the IDE.
-- Added TryParse to TimeSpan.
-- Added TryParse to cDateTime.
+** VBCorLib **
 
+version 3.0 (BREAKING CHANGES)
+	* Fixed broken cArray.IndexOf when searching byte arrays.
+	* Fixed broken cArray.LastIndexOf when searching byte arrays.
+	* Fixed array comparison of objects. Would break if element was Nothing.
 
-** VBCorLib 2.2 **
-- Added the BigInteger class
-- Fixed Queue class. Incorrectly zeroed out memory, causing a crash.
-- Fixed Path class. Incorrectly handled files begining with a period.
-- Fixed Path class. Incorrectly handled directory names that include '..' to move up a directory.
-- Fixed HebrewCalendard class. Incorrectly handled day 355 of a leap year.
-- Fixed JapaneseCalender class. Incorrectly handled the start of each year after the first of an era.
-- Fixed DSAParameter class. Now includes the J parameter on XML export.
+version 2.3
+	* Updated ASM code to not trigger DEP protection.
+	* Updated ArrayList to include the ArrayList.Adapter method, wrapping an IList object.
+	* Fixed the StringBuilder.Remove method.
+	* Updated Console class to automatically disable the close button on a command prompt when working in the IDE.
+	* Added TryParse to TimeSpan.
+	* Added TryParse to cDateTime.
 
+version 2.2
+	* Added the BigInteger class
+	* Fixed Queue class. Incorrectly zeroed out memory, causing a crash.
+	* Fixed Path class. Incorrectly handled files begining with a period.
+	* Fixed Path class. Incorrectly handled directory names that include '..' to move up a directory.
+	* Fixed HebrewCalendard class. Incorrectly handled day 355 of a leap year.
+	* Fixed JapaneseCalender class. Incorrectly handled the start of each year after the first of an era.
+	* Fixed DSAParameter class. Now includes the J parameter on XML export.
 
-** New in Version 2.1 **
-- Added Wide Character API support to INIFile and INISectionWriter classes
-- Added EmptyGuid to the GuidStatic class.
-- Fixed the Wide Character support for file API calls used on NT machines.
-- Fixed the return types for SHA384Static and SHA512Static create methods.
+version 2.1
+	* Added Wide Character API support to INIFile and INISectionWriter classes
+	* Added EmptyGuid to the GuidStatic class.
+	* Fixed the Wide Character support for file API calls used on NT machines.
+	* Fixed the return types for SHA384Static and SHA512Static create methods.
 
-
-
-** New in Version 2.0 **
-Many many cryptography classes have been added.
-This list is only a portion of all the additions and changes to the library.
+version 2.0
+	* Many many cryptography classes have been added.
+	* This list is only a portion of all the additions and changes to the library.
 
 Symmetric Algorithms
 --------------------
