@@ -65,7 +65,7 @@ End Sub
 
 Public Sub TestAddRangeFromArray()
     Dim a() As Long
-    a = cArray.NewArray(ciLong, 1, 2, 3)
+    a = NewLongs(1, 2, 3)
     
     list.AddRange a
     Assert.AreEqual 3, list.Count
@@ -76,7 +76,7 @@ Public Sub TestAddRangeFromArray()
 End Sub
 
 Public Sub TestSetItem()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3, 4, 5)
+    list.AddRange NewLongs(1, 2, 3, 4, 5)
     list(2) = "Hello"
     Assert.AreEqual 5, list.Count
     Assert.AreEqual 1, list(0)
@@ -117,7 +117,7 @@ Public Sub TestCopyToIndexOffset()
 End Sub
 
 Public Sub TestEnumerator()
-    list.AddRange cArray.NewArray(ciString, "Item1", "Item2", "Item3")
+    list.AddRange NewStrings("Item1", "Item2", "Item3")
     
     Dim v As Variant
     For Each v In list
@@ -175,14 +175,14 @@ Public Sub TestInsertAtEnd()
 End Sub
 
 Public Sub TestInsertRangeArray()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3, 4)
-    list.Insertrange 2, cArray.NewArray(ciString, "Item1", "Item2", "Item3")
+    list.AddRange NewLongs(1, 2, 3, 4)
+    list.Insertrange 2, NewStrings("Item1", "Item2", "Item3")
     AssertInsert
     AssertOriginalList
 End Sub
 
 Public Sub TestInsertRangecollection()
-    list.AddRange cArray.NewArray(ciLong, 1, 2, 3, 4)
+    list.AddRange NewLongs(1, 2, 3, 4)
     Dim col As New Collection
     col.Add "Item1"
     col.Add "Item2"
@@ -279,7 +279,7 @@ Public Sub TestToArray()
         list.Add i
     Next i
     Dim a() As Long
-    a = list.ToArray(ciLong)
+    a = list.ToArray(vbLong)
     For i = 0 To 9
         Assert.AreEqual i + 1, a(i)
     Next i
@@ -290,7 +290,7 @@ Public Sub TestSetRange()
     For i = 1 To 10
         list.Add i
     Next i
-    list.SetRange 2, cArray.NewArray(ciString, "Item 3", "Item 4", "Item 5")
+    list.SetRange 2, NewStrings("Item 3", "Item 4", "Item 5")
     Assert.AreEqual 10, list.Count, "Count should return 10."
     For i = 0 To 9
         If i >= 2 And i <= 4 Then

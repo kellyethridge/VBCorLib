@@ -32,17 +32,17 @@ Public Sub TestGetPreamble()
 End Sub
 
 Public Sub TestPlus()
-    b = cArray.NewArray(ciByte, 43)
+    b = NewBytes(43)
     Assert.AreEqual 0, e.GetCharCount(b)
 End Sub
 
 Public Sub TestOneNonDirect()
-    b = cArray.NewArray(ciByte, 33)
+    b = NewBytes(33)
     Assert.AreEqual 1, e.GetCharCount(b)
 End Sub
 
 Public Sub TestPlusMinus()
-    b = cArray.NewArray(ciByte, 43, 45)
+    b = NewBytes(43, 45)
     Assert.AreEqual 1, e.GetCharCount(b)
 End Sub
 
@@ -53,7 +53,7 @@ End Sub
 
 Public Sub TestJapaneseWord_nihongo()
     Dim ch() As Integer
-    ch = cArray.NewArray(ciInteger, &H65E5, &H672C, &H8A9E)
+    ch = NewIntegers(&H65E5, &H672C, &H8A9E)
     b = e.GetBytes(ch)
     Assert.AreEqual 3, e.GetCharCount(b)
 End Sub
@@ -86,6 +86,6 @@ End Sub
 Public Sub TestEmptyArray()
     Dim b() As Byte
     
-    b = cArray.CreateInstance(ciByte)
+    b = cArray.CreateInstance(vbByte)
     Assert.AreEqual 0, e.GetCharCount(b)
 End Sub

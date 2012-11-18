@@ -53,7 +53,7 @@ End Sub
 Public Sub TestBinary()
     Dim b() As Byte
     
-    Key.SetValue "Bytes", cArray.NewArray(ciByte, 1, 2, 3)
+    Key.SetValue "Bytes", NewBytes(1, 2, 3)
     b = Key.GetValue("Bytes")
     Assert.AreEqual 0, LBound(b), "Should have an lbound of 0."
     Assert.AreEqual 2, UBound(b), "Should have a ubound of 2."
@@ -65,7 +65,7 @@ End Sub
 Public Sub TestBinaryMissingWithDefault()
     Dim b() As Byte
     
-    b = Key.GetValue("Missing", cArray.NewArray(ciByte, 3, 2, 1))
+    b = Key.GetValue("Missing", NewBytes(3, 2, 1))
     Assert.AreEqual 0, LBound(b), "should have an lbound of 0."
     Assert.AreEqual 2, UBound(b), "should have a ubound of 2."
     Assert.AreEqual 3, b(0)

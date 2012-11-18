@@ -57,7 +57,7 @@ End Sub
 Public Sub TestGetBytesFromSurrogatePair()
     Dim ch() As Integer
     
-    ch = cArray.NewArray(ciInteger, &HD800, &HDC00)
+    ch = NewIntegers(&HD800, &HDC00)
     b = e.GetBytes(ch)
     Assert.AreEqual 4, cArray.GetLength(b)
     Assert.AreEqual 240, b(0)
@@ -69,7 +69,7 @@ End Sub
 Public Sub TestGetBytesFromHighSurrogateOnly()
     Dim ch() As Integer
     
-    ch = cArray.NewArray(ciInteger, &HD801)
+    ch = NewIntegers(&HD801)
     b = e.GetBytes(ch)
     Assert.AreEqual 3, cArray.GetLength(b)
     Assert.AreEqual 237, b(0)
@@ -88,7 +88,7 @@ End Sub
 Public Sub TestGetBytesExFromHighSurrogateOnly()
     Dim ch() As Integer
     
-    ch = cArray.NewArray(ciInteger, &HD801)
+    ch = NewIntegers(&HD801)
     ReDim b(0 To e.GetByteCount(ch) - 1)
     Assert.AreEqual 3, e.GetBytesEx(ch, 0, 1, b, 0)
     Assert.AreEqual 3, cArray.GetLength(b)
@@ -107,7 +107,7 @@ Public Sub TestGetBytesExFromLowSurrogateOnly()
 End Sub
 
 Public Sub TestGetBytesFromAll()
-    b = e.GetBytes(cArray.NewArray(ciInteger, 97, &HD801, &HDC01, &H600))
+    b = e.GetBytes(NewIntegers(97, &HD801, &HDC01, &H600))
     Assert.AreEqual 7, cArray.GetLength(b)
     Assert.AreEqual 97, b(0)
     Assert.AreEqual 240, b(1)
@@ -119,7 +119,7 @@ Public Sub TestGetBytesFromAll()
 End Sub
 
 Public Sub TestGetBytesFromSubArray()
-    b = e.GetBytes(cArray.NewArray(ciInteger, 97, &HD801, &HDC01, &H600), 1, 2)
+    b = e.GetBytes(NewIntegers(97, &HD801, &HDC01, &H600), 1, 2)
     Assert.AreEqual 4, cArray.GetLength(b)
     Assert.AreEqual 240, b(0)
     Assert.AreEqual 144, b(1)
@@ -129,7 +129,7 @@ End Sub
 
 Public Sub TestGetBytesEx()
     ReDim b(6)
-    Assert.AreEqual 7, e.GetBytesEx(cArray.NewArray(ciInteger, 97, &HD801, &HDC01, &H600), 0, 4, b, 0)
+    Assert.AreEqual 7, e.GetBytesEx(NewIntegers(97, &HD801, &HDC01, &H600), 0, 4, b, 0)
     Assert.AreEqual 97, b(0)
     Assert.AreEqual 240, b(1)
     Assert.AreEqual 144, b(2)
@@ -143,13 +143,13 @@ Public Sub TestGetBytesExBytesTooSmall()
     ReDim b(5)
     
     On Error GoTo errTrap
-    e.GetBytesEx cArray.NewArray(ciInteger, 97, &HD801, &HDC01, &H600), 0, 4, b, 0
+    e.GetBytesEx NewIntegers(97, &HD801, &HDC01, &H600), 0, 4, b, 0
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
 End Sub
 
 Public Sub TestEncoder()
@@ -186,7 +186,7 @@ Public Sub TestEncodeChars0To1000()
     Dim i As Long
     Dim b() As Byte
     Dim fileBytes() As Byte
-    Dim ff As Integer
+    Dim FF As Integer
     
     ReDim ch(1000)
     For i = 0 To 1000
@@ -195,11 +195,11 @@ Public Sub TestEncodeChars0To1000()
     b = e.GetBytes(ch)
     
     Assert.AreEqual 1874, cArray.GetLength(b)
-    ff = FreeFile
-    Open App.Path & "\UTF8_Chars_0to1000.txt" For Binary As #ff
-    ReDim fileBytes(0 To LOF(ff) - 1)
-    Get #ff, , fileBytes
-    Close #ff
+    FF = FreeFile
+    Open App.Path & "\UTF8_Chars_0to1000.txt" For Binary As #FF
+    ReDim fileBytes(0 To LOF(FF) - 1)
+    Get #FF, , fileBytes
+    Close #FF
     
     For i = 0 To cArray.GetLength(b) - 1
         Assert.AreEqual fileBytes(i), b(i)

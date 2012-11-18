@@ -39,7 +39,7 @@ Public Sub TestCopySourceNotFound()
 
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is FileNotFoundException, "Wrong exception type caught."
 End Sub
 
@@ -51,7 +51,7 @@ Public Sub TestCopyNoOverwrite()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is IOException, "Wrong exception type caught."
 End Sub
 
@@ -74,7 +74,7 @@ Public Sub TestCopyOverFolderNoOverwrite()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is IOException, "Wrong exception type caught."
 End Sub
 
@@ -148,7 +148,7 @@ End Sub
 Public Sub TestWriteAllLines()
     Dim s() As String
     
-    s = cArray.NewArray(ciString, "One", "Two", "Three", "Four", "", "Six", "")
+    s = NewStrings("One", "Two", "Three", "Four", "", "Six", "")
     File.WriteAllLines Path.Combine(App.Path, "Dummy Test Files\TestWriteAllLines.txt"), s
     
     Erase s

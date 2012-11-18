@@ -149,7 +149,7 @@ End Sub
 
 Public Sub TestInitWithElements()
     Dim a() As Long
-    a = NewArray(ciLong, 1, 2, 3, 4, 5)
+    a = NewArray(vbLong, 1, 2, 3, 4, 5)
     
     Set st = NewStack(a)
     Assert.AreEqual 5, st.Count

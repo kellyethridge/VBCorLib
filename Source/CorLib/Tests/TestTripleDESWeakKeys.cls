@@ -18,30 +18,30 @@ Option Explicit
 
 Public Sub TestWeakKey128()
     Dim b() As Byte
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4)
     Assert.IsTrue TripleDES.IsWeakKey(b), "Key should be weak."
     
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 5)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 5)
     Assert.IsTrue TripleDES.IsWeakKey(b), "Key should be weak."
 
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6)
     Assert.IsFalse TripleDES.IsWeakKey(b), "Key should not be weak."
 End Sub
 
 Public Sub TestWeakKey192()
     Dim b() As Byte
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4)
     Assert.IsTrue TripleDES.IsWeakKey(b)
     
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 5)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 5)
     Assert.IsTrue TripleDES.IsWeakKey(b)
     
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 6, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 6, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6)
     Assert.IsFalse TripleDES.IsWeakKey(b)
     
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6, 3, 4, 3, 4, 3, 4, 3, 4)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6, 3, 4, 3, 4, 3, 4, 3, 4)
     Assert.IsFalse TripleDES.IsWeakKey(b)
 
-    b = NewArray(ciByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6)
+    b = NewArray(vbByte, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 4, 3, 6)
     Assert.IsTrue TripleDES.IsWeakKey(b)
 End Sub

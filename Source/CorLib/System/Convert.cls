@@ -118,13 +118,13 @@ Public Function ToBase64String(ByRef Bytes() As Byte, Optional ByRef Index As Va
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
-    Dim Size As Long
-    Size = ElemCount + ElemCount \ 3
-    If (Size Mod 4) <> 0 Then Size = Size + (4 - (Size Mod 4))
+    Dim size As Long
+    size = ElemCount + ElemCount \ 3
+    If (size Mod 4) <> 0 Then size = size + (4 - (size Mod 4))
     
-    If InsertLineBreaks Then Size = Size + ((Size - 1) \ 76) * 2
+    If InsertLineBreaks Then size = size + ((size - 1) \ 76) * 2
     
-    ToBase64String = SysAllocStringLen(0, Size)
+    ToBase64String = SysAllocStringLen(0, size)
     mChars.SA.pvData = StrPtr(ToBase64String)
     mChars.SA.cElements = Len(ToBase64String)
     Call ToBase64CharArray(Bytes, ElemIndex, ElemCount, mChars.Data, 0, InsertLineBreaks)
@@ -153,8 +153,8 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal OffsetIn As Lon
     Result = VerifyArrayRange(SAPtr(OutArray), OffsetOut, Length)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "OutArray", OffsetOut, "OffsetOut", Length, "Length")
     
-    Dim Size As Long
-    Size = OffsetIn + (Length - (Length Mod 3))
+    Dim size As Long
+    size = OffsetIn + (Length - (Length Mod 3))
     
     Dim CharCapacity As Long
     CharCapacity = Length + Length \ 3
@@ -171,7 +171,7 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal OffsetIn As Lon
     
     Dim i           As Long
     Dim CharCount   As Long
-    For i = OffsetIn To Size - 1 Step 3
+    For i = OffsetIn To size - 1 Step 3
         If InsertLineBreaks And (CharCount = 76) Then
             OutArray(OffsetOut) = vbReturn
             OutArray(OffsetOut + 1) = vbLineFeed
@@ -202,15 +202,15 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal OffsetIn As Lon
     ' the current unfilled buffer.
     Select Case Length Mod 3
         Case 1
-            OutArray(OffsetOut) = Base64Bytes((InArray(Size) And &HFC) \ 4)
-            OutArray(OffsetOut + 1) = Base64Bytes((InArray(Size) And &H3) * &H10)
+            OutArray(OffsetOut) = Base64Bytes((InArray(size) And &HFC) \ 4)
+            OutArray(OffsetOut + 1) = Base64Bytes((InArray(size) And &H3) * &H10)
             OutArray(OffsetOut + 2) = vbEqual
             OutArray(OffsetOut + 3) = vbEqual
             OffsetOut = OffsetOut + 4
         Case 2
-            OutArray(OffsetOut) = Base64Bytes((InArray(Size) And &HFC) \ 4)
-            OutArray(OffsetOut + 1) = Base64Bytes(((InArray(Size) And &H3) * &H10) Or ((InArray(Size + 1) And &HF0) \ &H10))
-            OutArray(OffsetOut + 2) = Base64Bytes((InArray(Size + 1) And &HF) * 4)
+            OutArray(OffsetOut) = Base64Bytes((InArray(size) And &HFC) \ 4)
+            OutArray(OffsetOut + 1) = Base64Bytes(((InArray(size) And &H3) * &H10) Or ((InArray(size + 1) And &HF0) \ &H10))
+            OutArray(OffsetOut + 2) = Base64Bytes((InArray(size + 1) And &HF) * 4)
             OutArray(OffsetOut + 3) = vbEqual
             OffsetOut = OffsetOut + 4
     End Select
@@ -231,13 +231,13 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
     Result = VerifyArrayRange(SAPtr(InArray), Offset, Length)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InArray", Offset, "Offset", Length, "Length")
     
-    Dim ret() As Byte
-    ret = cArray.CreateInstance(ciByte, Length) ' use length because 1 char equals 6 bits, so we will have extra room.
+    Dim Ret() As Byte
+    Ret = cArray.CreateInstance(vbByte, Length) ' use length because 1 char equals 6 bits, so we will have extra room.
 
     Dim i           As Long
     Dim j           As Long
     Dim Bits        As Long
-    Dim BitCount    As Long
+    Dim bitCount    As Long
     Dim ch          As Integer
     Dim CharCount   As Long
     Dim TermCount   As Long
@@ -257,12 +257,12 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
                     Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
                 
                 Bits = (Bits * &H40) Or Base64CharToBits(InArray(i))
-                BitCount = BitCount + 6
-                If BitCount >= 8 Then
-                    ret(j) = Helper.ShiftRight(Bits, BitCount - 8) And &HFF
+                bitCount = bitCount + 6
+                If bitCount >= 8 Then
+                    Ret(j) = Helper.ShiftRight(Bits, bitCount - 8) And &HFF
                     j = j + 1
-                    BitCount = BitCount - 8
-                    Bits = Bits And (Powers(BitCount) - 1)
+                    bitCount = bitCount - 8
+                    Bits = Bits And (Powers(bitCount) - 1)
                 End If
                 CharCount = CharCount + 1
             
@@ -276,16 +276,16 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
     If (CharCount Mod 4) <> 0 Then _
         Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidNumberOfCharacters))
     
-    Do While BitCount >= 8
-        ret(j) = Helper.ShiftRight(Bits, BitCount - 8) And &HFF
+    Do While bitCount >= 8
+        Ret(j) = Helper.ShiftRight(Bits, bitCount - 8) And &HFF
         j = j + 1
-        BitCount = BitCount - 8
-        Bits = Bits And (Powers(BitCount) - 1)
+        bitCount = bitCount - 8
+        Bits = Bits And (Powers(bitCount) - 1)
     Loop
     
-    If j - 1 <> UBound(ret) Then ReDim Preserve ret(0 To j - 1)
+    If j - 1 <> UBound(Ret) Then ReDim Preserve Ret(0 To j - 1)
     
-    FromBase64CharArray = ret
+    FromBase64CharArray = Ret
 End Function
 
 ''
@@ -309,7 +309,7 @@ End Function
 ' @param Provider A formatting provider to help custom formatting.
 ' @return A string representation of the value.
 '
-Public Function ToString(ByRef Value As Variant, Optional ByVal Format As String, Optional ByVal Provider As IFormatProvider) As String
+Public Function ToString(ByRef Value As Variant, Optional ByVal format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim vt As Long
     vt = VarType(Value)
     If vt = vbVariant Then
@@ -321,19 +321,19 @@ Public Function ToString(ByRef Value As Variant, Optional ByVal Format As String
             Dim nf As NumberFormatInfo
             If Not Provider Is Nothing Then Set nf = Provider.GetFormat("numberformatinfo")
             If nf Is Nothing Then Set nf = NumberFormatInfo.CurrentInfo
-            ToString = nf.Format(Value, Format)
+            ToString = nf.format(Value, format)
         Case vbDate
             Dim df As DateTimeFormatInfo
             If Not Provider Is Nothing Then Set df = Provider.GetFormat("datetimeformatinfo")
             If df Is Nothing Then Set df = DateTimeFormatInfo.CurrentInfo
-            ToString = df.Format(Value, Format)
+            ToString = df.format(Value, format)
         Case vbObject
             If Value Is Nothing Then
                 ToString = "Nothing"
             ElseIf TypeOf Value Is IFormattable Then
                 Dim f As IFormattable
                 Set f = Value
-                ToString = f.ToString(Format, Provider)
+                ToString = f.ToString(format, Provider)
             ElseIf TypeOf Value Is IObject Then
                 Dim o As IObject
                 Set o = Value

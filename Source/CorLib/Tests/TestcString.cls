@@ -32,23 +32,23 @@ Public Sub TestToCharArray()
 End Sub
 
 Public Sub TestFromCharArray()
-    Dim Chars() As Integer
-    ReDim Chars(25)
+    Dim chars() As Integer
+    ReDim chars(25)
     Dim i As Long
     For i = 0 To 25
-        Chars(i) = i + 65
+        chars(i) = i + 65
     Next i
     
     Dim s As String
-    s = cString.FromCharArray(Chars)
+    s = cString.FromCharArray(chars)
     Assert.AreEqual "ABCDEFGHIJKLMNOPQRSTUVWXYZ", s
 End Sub
 
 Public Sub TestFromEmptyCharArray()
-    Dim Chars() As Integer
-    Chars = Cor.NewIntegers()
+    Dim chars() As Integer
+    chars = Cor.NewIntegers()
     
-    Assert.AreEqual "", cString.FromCharArray(Chars)
+    Assert.AreEqual "", cString.FromCharArray(chars)
 End Sub
 
 Public Sub TestEmptyToCharArray()
@@ -84,62 +84,62 @@ Public Sub TestPadRightTooShort()
 End Sub
 
 Public Sub TestTrimStart()
-    Dim Chars() As Integer
+    Dim chars() As Integer
     Dim s As String
     
-    Chars = cString.ToCharArray("abc")
+    chars = cString.ToCharArray("abc")
     s = "cabhi"
-    s = cString.TrimStart(s, Chars)
+    s = cString.TrimStart(s, chars)
     Assert.AreEqual "hi", s
 End Sub
 
 Public Sub TestTrimStartNoTrim()
-    Dim Chars(0) As Integer
+    Dim chars(0) As Integer
     Dim s As String
     
-    Chars(0) = 48
+    chars(0) = 48
     s = "hello"
-    s = cString.TrimStart(s, Chars)
+    s = cString.TrimStart(s, chars)
     Assert.AreEqual "hello", s
 End Sub
 
 Public Sub TestTrimStartAllTrimmed()
-    Dim Chars(0) As Integer
+    Dim chars(0) As Integer
     Dim s As String
     
-    Chars(0) = 48
+    chars(0) = 48
     s = "00000"
-    s = cString.TrimStart(s, Chars)
+    s = cString.TrimStart(s, chars)
     Assert.AreEqual "", s
 End Sub
 
 Public Sub TestTrimEnd()
-    Dim Chars() As Integer
+    Dim chars() As Integer
     Dim s As String
     
-    Chars = cString.ToCharArray("abc")
+    chars = cString.ToCharArray("abc")
     s = "hicab"
-    s = cString.TrimEnd(s, Chars)
+    s = cString.TrimEnd(s, chars)
     Assert.AreEqual "hi", s
 End Sub
 
 Public Sub TestTrimEndNoTrim()
-    Dim Chars(0) As Integer
+    Dim chars(0) As Integer
     Dim s As String
     
-    Chars(0) = 48
+    chars(0) = 48
     s = "hello"
-    s = cString.TrimEnd(s, Chars)
+    s = cString.TrimEnd(s, chars)
     Assert.AreEqual "hello", s
 End Sub
 
 Public Sub TestTrimEndAllTrimmed()
-    Dim Chars(0) As Integer
+    Dim chars(0) As Integer
     Dim s As String
     
-    Chars(0) = 48
+    chars(0) = 48
     s = "00000"
-    s = cString.TrimEnd(s, Chars)
+    s = cString.TrimEnd(s, chars)
     Assert.AreEqual "", s
 End Sub
 
@@ -237,7 +237,7 @@ Public Sub TestIndexOfAnyString()
 End Sub
 
 Public Sub TestIndexOfAnyChars()
-    Assert.AreEqual 0, cString.IndexOfAny("abc", NewArray(ciInteger, 98, 97))
+    Assert.AreEqual 0, cString.IndexOfAny("abc", NewArray(vbInteger, 98, 97))
 End Sub
 
 Public Sub TestIndexOfAnyNotFound()

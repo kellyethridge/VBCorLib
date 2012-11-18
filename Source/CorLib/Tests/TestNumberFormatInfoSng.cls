@@ -90,15 +90,15 @@ Public Sub TestNumber()
     Assert.AreEqual "(123.00)", info.Format(-123!, "n")
 
     Dim sizes() As Long
-    sizes = cArray.NewArray(ciLong, 1, 2, 3)
+    sizes = NewLongs(1, 2, 3)
     info.NumberGroupSizes = sizes
     Assert.AreEqual "12,345,68,0.00", info.Format(1.234568E+07!, "n")
 
-    sizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    sizes = NewLongs(1, 2, 1, 0)
     info.NumberGroupSizes = sizes
     Assert.AreEqual "12345,6,80,0.00", info.Format(1.234568E+08!, "n")
     
-    info.NumberGroupSizes = cArray.CreateInstance(ciLong)
+    info.NumberGroupSizes = cArray.CreateInstance(vbLong)
     Assert.AreEqual "1234568000", info.Format(1.234568E+09!, "n0")
 End Sub
 
@@ -127,13 +127,13 @@ Public Sub TestCurrency()
     info.CurrencyNegativePattern = [($n)]
     Assert.AreEqual "(¤123.00)", info.Format(-123!, "c")
 
-    info.CurrencyGroupSizes = cArray.NewArray(ciLong, 1, 2, 3)
+    info.CurrencyGroupSizes = NewLongs(1, 2, 3)
     Assert.AreEqual "¤12,345,68,0.00", info.Format(1.234568E+07!, "c")
 
-    info.CurrencyGroupSizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    info.CurrencyGroupSizes = NewLongs(1, 2, 1, 0)
     Assert.AreEqual "¤12345,6,80,0.00", info.Format(1.234568E+08!, "c")
     
-    info.CurrencyGroupSizes = cArray.CreateInstance(ciLong)
+    info.CurrencyGroupSizes = cArray.CreateInstance(vbLong)
     Assert.AreEqual "¤1234568000", info.Format(1.234568E+09!, "c0")
 End Sub
 
@@ -160,13 +160,13 @@ Public Sub TestPercent()
     info.PercentNegativePattern = [-%#]
     Assert.AreEqual "-%12,300.00", info.Format(-123!, "p")
 
-    info.PercentGroupSizes = cArray.NewArray(ciLong, 1, 2, 3)
+    info.PercentGroupSizes = NewLongs(1, 2, 3)
     Assert.AreEqual "1,234,568,00,0.00 %", info.Format(1.234568E+07!, "p")
 
-    info.PercentGroupSizes = cArray.NewArray(ciLong, 1, 2, 1, 0)
+    info.PercentGroupSizes = NewLongs(1, 2, 1, 0)
     Assert.AreEqual "1234568,0,00,0.00 %", info.Format(1.234568E+08!, "p")
     
-    info.PercentGroupSizes = cArray.CreateInstance(ciLong)
+    info.PercentGroupSizes = cArray.CreateInstance(vbLong)
     Assert.AreEqual "123456800000 %", info.Format(1.234568E+09!, "p0")
 End Sub
 

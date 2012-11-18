@@ -173,12 +173,12 @@ Public Property Get MachineName() As String
     Dim size As Long
     size = MAX_COMPUTERNAME_LENGTH + 1
     
-    Dim ret As String
-    ret = String$(size, 0)
-    If API.GetComputerName(ret, size) = BOOL_FALSE Then _
+    Dim Ret As String
+    Ret = String$(size, 0)
+    If API.GetComputerName(Ret, size) = BOOL_FALSE Then _
         Throw Cor.NewInvalidOperationException(GetErrorMessage(Err.LastDllError))
     
-    MachineName = Left$(ret, size)
+    MachineName = Left$(Ret, size)
 End Property
 
 ''
@@ -207,12 +207,12 @@ End Property
 ' @remarks Generally this will be C:\Windows\System32 or C:\Winnt\System32 for NT4 system.
 '
 Public Property Get SystemDirectory() As String
-    Dim ret As String
-    ret = String$(MAX_PATH + 1, 0)
+    Dim Ret As String
+    Ret = String$(MAX_PATH + 1, 0)
     
     Dim size As Long
-    size = API.GetSystemDirectory(ret, Len(ret))
-    If size > 0 Then SystemDirectory = Left$(ret, size)
+    size = API.GetSystemDirectory(Ret, Len(Ret))
+    If size > 0 Then SystemDirectory = Left$(Ret, size)
 End Property
 
 ''
@@ -295,9 +295,9 @@ Public Property Get UserName() As String
     Dim size As Long
     size = UNLEN + 1
     
-    Dim ret As String
-    ret = String$(size, 0)
-    If GetUserNameA(ret, size) <> BOOL_FALSE Then UserName = Left$(ret, size - 1)
+    Dim Ret As String
+    Ret = String$(size, 0)
+    If GetUserNameA(Ret, size) <> BOOL_FALSE Then UserName = Left$(Ret, size - 1)
 End Property
 
 ''
@@ -385,9 +385,9 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
     Dim ArgIndex    As Long
     Dim Escaped     As Boolean
     Dim Quoted      As Boolean
-    Dim index       As Long
-    Do While index < Length
-        Select Case Chars(index)
+    Dim Index       As Long
+    Do While Index < Length
+        Select Case Chars(Index)
             Case vbBackSlash
                 If Escaped Then
                     ' We have two back slashes in a row,
@@ -423,9 +423,9 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     ' to the argument as if it were escaped.
                     
                     ' Do we have enough character left?
-                    If index + 1 < Length Then
+                    If Index + 1 < Length Then
                         ' We have enough, so check for 2nd quote.
-                        If Chars(index + 1) = vbDoubleQuote Then
+                        If Chars(Index + 1) = vbDoubleQuote Then
                             ' We have two quotes, so escape it.
                             ArgBuffer(ArgIndex) = vbDoubleQuote
                             ArgIndex = ArgIndex + 1
@@ -464,11 +464,11 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     Escaped = False
                 End If
                 
-                ArgBuffer(ArgIndex) = Chars(index)
+                ArgBuffer(ArgIndex) = Chars(Index)
                 ArgIndex = ArgIndex + 1
         End Select
         
-        index = index + 1
+        Index = Index + 1
     Loop
     
     ' If a backslash was the last character in the line, then
@@ -481,7 +481,7 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                 
     If ArgIndex > 0 Then Call Arguments.Add(SysAllocStringLen(VarPtr(ArgBuffer(0)), ArgIndex))
     
-    ParseCommandLineArgs = Arguments.ToArray(ciString)
+    ParseCommandLineArgs = Arguments.ToArray(vbString)
 End Function
 
 ''
@@ -509,10 +509,10 @@ Public Function GetEnvironmentVariable(ByVal Name As String, Optional ByVal Targ
                 Buf = String$(size, 0)
                 size = API.GetEnvironmentVariable(Name, Buf, Len(Buf))
                 If size = 0 Then
-                    Dim result As Long
-                    result = Err.LastDllError
-                    If result = ERROR_ENVVAR_NOT_FOUND Or (result = 0) Then Exit Function
-                    IOError result, "Name"
+                    Dim Result As Long
+                    Result = Err.LastDllError
+                    If Result = ERROR_ENVVAR_NOT_FOUND Or (Result = 0) Then Exit Function
+                    IOError Result, "Name"
                 End If
             Loop While size > Len(Buf)
             GetEnvironmentVariable = Left$(Buf, size)
@@ -542,14 +542,14 @@ End Function
 ' targets will retrieve the variable value from the registry.</p>
 '
 Public Function GetEnvironmentVariables(Optional ByVal Target As EnvironmentVariableTarget = Process) As IDictionary
-    Dim ret As New Hashtable
+    Dim Ret As New Hashtable
     Dim rk  As RegistryKey
     
     If Target = EnvironmentVariableTarget.Process Then
         ' use the GetEnvironmentStrings api to allow for realtime
         ' updating of the environment variables for the current
         ' process. VB's Environ does not reflect variable changes.
-        Set ret = InternalGetEnvironmentVariables
+        Set Ret = InternalGetEnvironmentVariables
     Else
         Call VerifyNTMachine
         Select Case Target
@@ -563,11 +563,11 @@ Public Function GetEnvironmentVariables(Optional ByVal Target As EnvironmentVari
         
         Dim i As Long
         For i = 0 To UBound(Names)
-            Call ret.Add(Names(i), rk.GetValue(Names(i)))
+            Call Ret.Add(Names(i), rk.GetValue(Names(i)))
         Next i
     End If
     
-    Set GetEnvironmentVariables = ret
+    Set GetEnvironmentVariables = Ret
 End Function
 
 ''
@@ -604,19 +604,19 @@ End Function
 ' region will set the values in the registry.
 ' <p>by setting the value to an empty string, the variable will be deleted.</p>
 '
-Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal value As String, Optional ByVal Target As EnvironmentVariableTarget = Process)
+Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal Value As String, Optional ByVal Target As EnvironmentVariableTarget = Process)
     If Len(Variable) = 0 Then _
         Throw Cor.NewArgumentException("Variable name cannot be an empty string.", "Variable")
     If InStr(Variable, "=") > 0 Then _
         Throw Cor.NewArgumentException("Variable name cannot contain an equal '=' sign.", "Variable")
     If Len(Variable) > 255 Then _
         Throw Cor.NewArgumentException("Variable name cannot exceed 255 characters.", "Variable")
-    If Len(value) > 32767 Then _
+    If Len(Value) > 32767 Then _
         Throw Cor.NewArgumentException("Value cannot exceed a length of 32767 characters including the terminating null.", "Value")
     
     Select Case Target
         Case EnvironmentVariableTarget.Process
-            If API.SetEnvironmentVariable(Variable, value) = BOOL_FALSE Then _
+            If API.SetEnvironmentVariable(Variable, Value) = BOOL_FALSE Then _
                 Throw Cor.NewArgumentException(GetErrorMessage(Err.LastDllError), "Value")
                 
         Case EnvironmentVariableTarget.Machine, EnvironmentVariableTarget.User
@@ -629,8 +629,8 @@ Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal value As Strin
                 Set rk = Registry.CurrentUser.OpenSubKey("environment", True)
             End If
             
-            If Len(value) > 0 Then
-                Call rk.SetValue(Variable, value)
+            If Len(Value) > 0 Then
+                Call rk.SetValue(Variable, Value)
             Else
                 Call rk.DeleteValue(Variable, False)
             End If
@@ -659,7 +659,7 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function GetResourceString(ByVal resId As Long, ParamArray args() As Variant) As String
+Friend Function GetResourceString(ByVal resId As Long, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
     Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16))
     GetResourceString = cString.FormatArray(LoadResString(resId), vArgs)
@@ -687,18 +687,18 @@ Private Function InternalGetEnvironmentVariables() As IDictionary
     Dim Strings() As String
     Strings() = Split(API.GetEnvironmentStrings, vbNullChar)
     
-    Dim ret As New Hashtable
+    Dim Ret As New Hashtable
     Dim i   As Long
     For i = 0 To UBound(Strings)
         If Asc(Strings(i)) <> vbEqual Then
             Dim Parts() As String
             Parts = Split(Strings(i), "=")
             
-            Call ret.Add(Trim$(Parts(0)), Trim$(Parts(1)))
+            Call Ret.Add(Trim$(Parts(0)), Trim$(Parts(1)))
         End If
     Next i
     
-    Set InternalGetEnvironmentVariables = ret
+    Set InternalGetEnvironmentVariables = Ret
 End Function
 
 

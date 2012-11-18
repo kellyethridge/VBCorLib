@@ -18,31 +18,31 @@ Option Explicit
 
 Public Sub TestNonWeakKey()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    b = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     Assert.IsFalse DES.IsWeakKey(b)
     
-    b = NewArray(ciByte, 2, 2, 2, 2, 0, 0, 0, 0)
+    b = NewArray(vbByte, 2, 2, 2, 2, 0, 0, 0, 0)
     Assert.IsFalse DES.IsWeakKey(b)
 End Sub
 
 Public Sub Test4WeakKeys()
     Dim b() As Byte
-    b = NewArray(ciByte, 0, 0, 0, 0, 0, 0, 0, 0)
+    b = NewArray(vbByte, 0, 0, 0, 0, 0, 0, 0, 0)
     Assert.IsTrue DES.IsWeakKey(b), "All zeros should be weak."
     
-    b = NewArray(ciByte, &HFE, &HFE, &HFE, &HFE, &HFE, &HFE, &HFE, &HFE)
+    b = NewArray(vbByte, &HFE, &HFE, &HFE, &HFE, &HFE, &HFE, &HFE, &HFE)
     Assert.IsTrue DES.IsWeakKey(b), "All &HFE should be weak."
 
-    b = NewArray(ciByte, &H1F, &H1F, &H1F, &H1F, &HE, &HE, &HE, &HE)
+    b = NewArray(vbByte, &H1F, &H1F, &H1F, &H1F, &HE, &HE, &HE, &HE)
     Assert.IsTrue DES.IsWeakKey(b), "1F1F1F1F0E0E0E0E should be weak."
     
-    b = NewArray(ciByte, &HE0, &HE0, &HE0, &HE0, &HF1, &HF1, &HF1, &HF1)
+    b = NewArray(vbByte, &HE0, &HE0, &HE0, &HE0, &HF1, &HF1, &HF1, &HF1)
     Assert.IsTrue DES.IsWeakKey(b), "E0E0E0E0F1F1F1F1 should be weak."
 End Sub
 
 Public Sub TestNonSemiWeakKeys()
     Dim b() As Byte
-    b = NewArray(ciByte, 123, 0, 0, 0, 0, 0, 0, 0)
+    b = NewArray(vbByte, 123, 0, 0, 0, 0, 0, 0, 0)
     Assert.IsFalse DES.IsSemiWeakKey(b), "Should not be semi-weak."
 End Sub
 

@@ -38,9 +38,9 @@ Public Sub TestTransformBlockDisposedException()
     Assert.Fail "An exception should be raised."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is ObjectDisposedException, "Wrong exception type caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is ObjectDisposedException, "Wrong exception type caught."
 End Sub
 
 Public Sub TestTransform3Zeros()
@@ -53,7 +53,7 @@ End Sub
 
 Public Sub TestTransform123()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3)
+    b = NewArray(vbByte, 1, 2, 3)
     
     Dim Output(3) As Byte
     Assert.AreEqual 4, Trans.TransformBlock(b, 0, 3, Output, 0)
@@ -62,7 +62,7 @@ End Sub
 
 Public Sub TestTransformOffset()
     Dim b() As Byte
-    b = NewArray(ciByte, 0, 0, 0, 1, 2, 3, 0, 0, 0)
+    b = NewArray(vbByte, 0, 0, 0, 1, 2, 3, 0, 0, 0)
     
     Dim Output(10) As Byte
     Assert.AreEqual 4, Trans.TransformBlock(b, 3, 3, Output, 4)
@@ -98,7 +98,7 @@ End Sub
 
 Public Sub TestTransformFinal123()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3)
+    b = NewArray(vbByte, 1, 2, 3)
     
     Dim Output() As Byte
     Output = Trans.TransformFinalBlock(b, 0, 3)
@@ -108,7 +108,7 @@ End Sub
 
 Public Sub TestTransformFinal12()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2)
+    b = NewArray(vbByte, 1, 2)
     
     Dim Output() As Byte
     Output = Trans.TransformFinalBlock(b, 0, 2)
@@ -118,7 +118,7 @@ End Sub
 
 Public Sub TestTransformFinal1()
     Dim b() As Byte
-    b = NewArray(ciByte, 1)
+    b = NewArray(vbByte, 1)
     
     Dim Output() As Byte
     Output = Trans.TransformFinalBlock(b, 0, 1)
@@ -128,7 +128,7 @@ End Sub
 
 Public Sub TestTransformFinalEmptyArray()
     Dim b() As Byte
-    b = NewArray(ciByte, 1)
+    b = NewArray(vbByte, 1)
     
     Dim Output() As Byte
     Output = Trans.TransformFinalBlock(b, 0, 0)
@@ -139,7 +139,7 @@ End Sub
 
 Public Sub TestTransformFinalOffset()
     Dim b() As Byte
-    b = NewArray(ciByte, 0, 0, 0, 1, 2, 3, 0, 0, 0)
+    b = NewArray(vbByte, 0, 0, 0, 1, 2, 3, 0, 0, 0)
     
     Dim Output() As Byte
     Output = Trans.TransformFinalBlock(b, 3, 3)

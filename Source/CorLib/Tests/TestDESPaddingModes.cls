@@ -58,7 +58,7 @@ Public Sub EncryptPartialBlockUsingISO10126()
     b2 = GetPartialBlock(ISO10126)
     
     Assert.AreEqual 8, cArray.GetLength(b1)
-    Assert.That b1, Iz.Not.equalTo(b2)
+    Assert.That b1, Iz.Not.EqualTo(b2)
 End Sub
 
 Public Sub EncryptPartialBlockUsingNone()
@@ -133,7 +133,7 @@ Public Sub EncryptFullBlockUsingISO10126()
         Assert.AreEqual b1(i), b2(i)
     Next i
     
-    Assert.That b1, Iz.Not.equalTo(b2)
+    Assert.That b1, Iz.Not.EqualTo(b2)
 End Sub
 
 Public Sub DecryptPartialBlockUsingPKCS7()
@@ -143,7 +143,7 @@ End Sub
 
 Private Function GetPartialDecryptedBlock(ByRef Data() As Byte, ByVal P As PaddingMode) As Byte()
     Dim csp As New DESCryptoServiceProvider
-    csp.Key = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    csp.Key = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     csp.IV = csp.Key
     csp.Mode = CBC
     csp.Padding = P
@@ -156,13 +156,13 @@ End Function
 
 Private Function GetFullBlock(ByVal P As PaddingMode) As Byte()
     Dim csp As New DESCryptoServiceProvider
-    csp.Key = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    csp.Key = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     csp.IV = csp.Key
     csp.Mode = CBC
     csp.Padding = P
     
     Dim Data() As Byte
-    Data = NewArray(ciByte, 65, 66, 67, 68, 69, 70, 71, 72)
+    Data = NewArray(vbByte, 65, 66, 67, 68, 69, 70, 71, 72)
     
     Dim t As CryptoAPITransform
     Set t = csp.CreateEncryptor
@@ -172,13 +172,13 @@ End Function
 
 Private Function GetPartialBlock(ByVal P As PaddingMode) As Byte()
     Dim csp As New DESCryptoServiceProvider
-    csp.Key = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    csp.Key = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     csp.IV = csp.Key
     csp.Mode = CBC
     csp.Padding = P
     
     Dim Data() As Byte
-    Data = NewArray(ciByte, 65, 66)
+    Data = NewArray(vbByte, 65, 66)
     
     Dim t As CryptoAPITransform
     Set t = csp.CreateEncryptor

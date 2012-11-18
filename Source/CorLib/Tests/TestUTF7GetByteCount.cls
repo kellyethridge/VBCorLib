@@ -45,13 +45,13 @@ End Sub
 
 Public Sub TestSimpleCombo2()
     Dim ch() As Integer
-    ch = cArray.NewArray(ciInteger, &H48, &H69, &H20, &H4D, &H6F, &H6D, &H20, &H2D, &H263A, &H2D, &H21)
+    ch = NewIntegers(&H48, &H69, &H20, &H4D, &H6F, &H6D, &H20, &H2D, &H263A, &H2D, &H21)
     Assert.AreEqual 19, e.GetByteCount(ch)
 End Sub
 
 Public Sub TestJapaneseWord_nihongo()
     Dim ch() As Integer
-    ch = cArray.NewArray(ciInteger, &H65E5, &H672C, &H8A9E)
+    ch = NewIntegers(&H65E5, &H672C, &H8A9E)
     Assert.AreEqual 10, e.GetByteCount(ch)
 End Sub
 

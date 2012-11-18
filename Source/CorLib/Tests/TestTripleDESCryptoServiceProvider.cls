@@ -41,7 +41,7 @@ Public Sub SetKeyToNull()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentNullException, "Wrong exception type caught."
 End Sub
 
@@ -56,14 +56,14 @@ Public Sub SetKeyToInvalidSize()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
 End Sub
 
 Public Sub SetKeyTo128Bits()
     Dim csp As New TripleDESCryptoServiceProvider
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6)
+    b = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6)
     
     csp.Key = b
     Assert.AreEqual 128, csp.KeySize, "KeySize should change to 128."

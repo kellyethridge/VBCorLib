@@ -198,7 +198,7 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     Dim Ret() As Byte
-    Ret = cArray.CreateInstance(ciByte, ElemCount * CHAR_SIZE)
+    Ret = cArray.CreateInstance(vbByte, ElemCount * CHAR_SIZE)
     Call InternalGetBytes(ElemIndex, ElemCount, Ret, 0)
     
     GetBytes = Ret
@@ -271,7 +271,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     Dim Ret() As Integer
-    Ret = cArray.CreateInstance(ciInteger, ElemCount \ CHAR_SIZE)
+    Ret = cArray.CreateInstance(vbInteger, ElemCount \ CHAR_SIZE)
     Call InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0)
     
     GetChars = Ret

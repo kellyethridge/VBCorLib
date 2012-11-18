@@ -27,21 +27,21 @@ End Sub
 Public Sub TestPlus()
     ReDim ch(10)
     
-    b = cArray.NewArray(ciByte, 43)
+    b = NewBytes(43)
     Assert.AreEqual 0, en.GetCharsEx(b, 0, 1, ch, 0)
     Assert.AreEqual 0, ch(0)
 End Sub
 
 Public Sub TestOneNonDirect()
     ReDim ch(100)
-    b = cArray.NewArray(ciByte, 33)
+    b = NewBytes(33)
     Assert.AreEqual 1, en.GetCharsEx(b, 0, 1, ch, 0)
     Assert.AreEqual 33, ch(0)
 End Sub
 
 Public Sub TestPlusMinus()
     ReDim ch(100)
-    b = cArray.NewArray(ciByte, 43, 45)
+    b = NewBytes(43, 45)
     Assert.AreEqual 1, en.GetCharsEx(b, 0, 2, ch, 0)
     Assert.AreEqual 43, ch(0)
     Assert.AreEqual 0, ch(1)
@@ -57,7 +57,7 @@ End Sub
 
 Public Sub TestJapaneseWord_nihongo()
     Dim ch() As Integer
-    ch = cArray.NewArray(ciInteger, &H65E5, &H672C, &H8A9E)
+    ch = NewIntegers(&H65E5, &H672C, &H8A9E)
     b = en.GetBytes(ch)
     ReDim ch(100)
     Assert.AreEqual 3, en.GetCharsEx(b, 0, UBound(b) + 1, ch, 0)
@@ -91,7 +91,7 @@ Public Sub TestDecoder()
 End Sub
 
 Public Sub TestDecoderWith1001CharsFromFile()
-    Dim ff As Long
+    Dim FF As Long
     Dim b() As Byte
     Dim ch() As Integer
     Dim i As Long
@@ -99,11 +99,11 @@ Public Sub TestDecoderWith1001CharsFromFile()
     Dim c As Decoder
     Dim Char As Long
     
-    ff = FreeFile
-    Open App.Path & "\UTF7_Chars_0to1000.txt" For Binary As #ff
-    ReDim b(0 To LOF(ff) - 1)
-    Get #ff, , b
-    Close #ff
+    FF = FreeFile
+    Open App.Path & "\UTF7_Chars_0to1000.txt" For Binary As #FF
+    ReDim b(0 To LOF(FF) - 1)
+    Get #FF, , b
+    Close #FF
     
     Set en = New UTF7Encoding
     Set c = en.GetDecoder
@@ -118,17 +118,17 @@ Public Sub TestDecoderWith1001CharsFromFile()
 End Sub
 
 Public Sub TestGet1001CharsFromfile()
-    Dim ff As Long
+    Dim FF As Long
     Dim b() As Byte
     Dim ch() As Integer
     Dim i As Long
     Dim en As UTF7Encoding
     
-    ff = FreeFile
-    Open App.Path & "\UTF7_Chars_0to1000.txt" For Binary As #ff
-    ReDim b(0 To LOF(ff) - 1)
-    Get #ff, , b
-    Close #ff
+    FF = FreeFile
+    Open App.Path & "\UTF7_Chars_0to1000.txt" For Binary As #FF
+    ReDim b(0 To LOF(FF) - 1)
+    Get #FF, , b
+    Close #FF
     
     Set en = New UTF7Encoding
     
@@ -147,7 +147,7 @@ Public Sub TestEmptyArray()
     Dim b() As Byte
     Dim ch() As Integer
     
-    b = cArray.CreateInstance(ciByte)
+    b = cArray.CreateInstance(vbByte)
     ch = en.GetChars(b)
     Assert.IsFalse cArray.IsNull(ch)
     Assert.AreEqual 0, cArray.GetLength(ch)

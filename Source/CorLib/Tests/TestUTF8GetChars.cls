@@ -24,14 +24,14 @@ Public Sub Setup()
     Set e = NewUTF8Encoding(False)
 End Sub
 
-Public Sub Teardown()
+Public Sub TearDown()
     Erase b
     Erase ch
 End Sub
 
 Public Sub TestFrom1ByteAnsii()
     Dim ch() As Integer
-    ch = e.GetChars(cArray.NewArray(ciByte, 65))
+    ch = e.GetChars(NewBytes(65))
     Assert.AreEqual 1, cArray.GetLength(ch)
     Assert.AreEqual 65, ch(0)
 End Sub
@@ -49,7 +49,7 @@ Public Sub TestFrom10BytesAnsii()
 End Sub
 
 Public Sub TestSurrogatePair()
-    b = e.GetBytes(cArray.NewArray(ciInteger, &HDBFF, &HDC00))
+    b = e.GetBytes(NewIntegers(&HDBFF, &HDC00))
     ch = e.GetChars(b)
     Assert.AreEqual 2, cArray.GetLength(ch)
     Assert.AreEqual &HDBFF, ch(0)
@@ -116,9 +116,9 @@ Public Sub TestCharBufferTooSmall()
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is ArgumentException, "Incorrect exception type."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is ArgumentException, "Incorrect exception type."
 End Sub
 
 Public Sub TestShortestFrom()
@@ -138,17 +138,17 @@ Public Sub TestLongBuffer()
 End Sub
 
 Public Sub TestGet1001CharsFromfile()
-    Dim ff As Long
+    Dim FF As Long
     Dim b() As Byte
     Dim ch() As Integer
     Dim i As Long
     Dim en As UTF8Encoding
     
-    ff = FreeFile
-    Open App.Path & "\UTF8_Chars_0to1000.txt" For Binary As #ff
-    ReDim b(0 To LOF(ff) - 1)
-    Get #ff, , b
-    Close #ff
+    FF = FreeFile
+    Open App.Path & "\UTF8_Chars_0to1000.txt" For Binary As #FF
+    ReDim b(0 To LOF(FF) - 1)
+    Get #FF, , b
+    Close #FF
     
     Set en = New UTF8Encoding
     ch = en.GetChars(b)
@@ -171,7 +171,7 @@ End Sub
 Public Sub TestZeroLengthArray()
     Dim ch() As Integer
     
-    b = cArray.CreateInstance(ciByte)
+    b = cArray.CreateInstance(vbByte)
     ch = e.GetChars(b)
     Assert.IsFalse cArray.IsNull(ch), "Array should not be null."
     Assert.AreEqual 0, cArray.GetLength(ch)

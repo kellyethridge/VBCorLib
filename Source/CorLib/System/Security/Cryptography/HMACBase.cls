@@ -104,7 +104,7 @@ Public Sub SetKey(ByRef Key() As Byte)
     If cArray.IsNull(Key) Then _
         Throw Cor.NewArgumentNullException("Invalid HMAC Key.", "Key")
     
-    mKey = cArray.CreateInstance(ciByte, cArray.GetLength(Key))
+    mKey = cArray.CreateInstance(vbByte, cArray.GetLength(Key))
     Call Buffer.BlockCopy(Key, 0, mKey, 0, cArray.GetLength(Key))
     Call Initialize
 End Sub

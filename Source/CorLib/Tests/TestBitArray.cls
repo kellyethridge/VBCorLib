@@ -44,9 +44,9 @@ Public Sub TestOutOfRange()
     On Error GoTo 0
     Assert.Fail "Error should be raised."
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "Exception should be caught."
-    Assert.IsTrue TypeOf ex Is ArgumentOutOfRangeException, "Wrong exception caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "Exception should be caught."
+    Assert.IsTrue TypeOf Ex Is ArgumentOutOfRangeException, "Wrong exception caught."
 End Sub
 
 Public Sub TestAnd()
@@ -122,7 +122,7 @@ End Sub
 
 Public Sub TestFromLongs()
     Dim l() As Long
-    l = cArray.NewArray(ciLong, &H55555555, &H55555555)
+    l = NewLongs(&H55555555, &H55555555)
     
     Set list = bitarray.FromLongs(l)
     Assert.AreEqual 64, list.Count, "Count should be 64."
@@ -131,7 +131,7 @@ End Sub
 
 Public Sub TestFromBytes()
     Dim b() As Byte
-    b = cArray.NewArray(ciByte, &H55, &H55, &H55)
+    b = NewBytes(&H55, &H55, &H55)
     
     Set list = bitarray.FromBytes(b)
     Assert.AreEqual 24, list.Count, "Count should be 24."
@@ -196,9 +196,9 @@ Public Sub TestCopyToWrongType()
     On Error GoTo 0
     Assert.Fail "Error should have been raised."
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "Exception should have been caught."
-    Assert.IsTrue TypeOf ex Is ArrayTypeMismatchException, "Wrong exception type."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "Exception should have been caught."
+    Assert.IsTrue TypeOf Ex Is ArrayTypeMismatchException, "Wrong exception type."
 End Sub
 
 

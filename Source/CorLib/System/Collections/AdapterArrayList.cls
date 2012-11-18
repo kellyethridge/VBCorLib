@@ -438,7 +438,7 @@ Private Sub ArrayList_Sort(Optional ByRef startIndex As Variant, Optional ByRef 
     Call QuickSortList(ElemIndex, ElemIndex + ElemCount - 1)
 End Sub
 
-Private Function ArrayList_ToArray(Optional ByVal ArrayType As ciArrayTypes = 12&) As Variant
+Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
     Dim Ret As Variant
     Ret = cArray.CreateInstance(ArrayType, mList.Count)
     Call mList.CopyTo(Ret, 0)

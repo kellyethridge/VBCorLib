@@ -189,14 +189,14 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As Object
     Call VerifyVersion
     
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mCount, startIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
     
     
     Dim Ret As New ArrayListEnumerator
@@ -219,14 +219,14 @@ Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As
     Set ArrayList_GetRange = Ret
 End Function
 
-Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Call VerifyVersion
     
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mCount, startIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
     
     Dim Index As Long
     Index = mList.IndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
@@ -294,13 +294,13 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
     Helper.MoveVariant ArrayList_Item, mList(mIndex + Index)
 End Property
 
-Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Call VerifyVersion
     
     Dim ElemIndex As Long
     Dim ElemCount As Long
-    If GetOptionalLongPair(StartIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(StartIndex), "StartIndex", "Count"))
+    If GetOptionalLongPair(startIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(startIndex), "StartIndex", "Count"))
     If ElemIndex >= mCount Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_UBound), "StartIndex", ElemIndex)
     If ElemCount < 0 Then _
@@ -381,19 +381,19 @@ Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
     mVersion = mVersion + 1
 End Sub
 
-Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+Private Sub ArrayList_Sort(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Call VerifyVersion
     
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mCount, startIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
 
     Call mList.Sort(mIndex + ElemIndex, ElemCount, Comparer)
 End Sub
 
-Private Function ArrayList_ToArray(Optional ByVal ArrayType As ciArrayTypes = 12&) As Variant
+Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
     Call VerifyVersion
     
     Dim Ret As Variant

@@ -415,7 +415,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mTwoDigitYearMax = DEF_TWODIGITYEARMAX
-    mMonthDays = cArray.NewArray(ciLong, 0, 30, 59, 89, 118, 148, 177, 207, 236, 266, 295, 325, 355)
+    mMonthDays = Cor.NewLongs(0, 30, 59, 89, 118, 148, 177, 207, 236, 266, 295, 325, 355)
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)

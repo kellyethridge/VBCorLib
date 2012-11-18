@@ -238,11 +238,11 @@ Public Function GetCurrentDirectory() As String
     Dim Ret As String
     Ret = String$(Path.MaxPathLength, 0)
     
-    Dim Size As Long
-    Size = API.GetCurrentDirectory(Len(Ret), Ret)
-    If Size = 0 Then IOError Err.LastDllError
+    Dim size As Long
+    size = API.GetCurrentDirectory(Len(Ret), Ret)
+    If size = 0 Then IOError Err.LastDllError
     
-    GetCurrentDirectory = Left$(Ret, Size)
+    GetCurrentDirectory = Left$(Ret, size)
 End Function
 
 ''
@@ -496,7 +496,7 @@ Private Function InternalGetFiles(ByRef sPath As String, ByRef SearchPattern As 
     Dim FileHandle  As Long
     FileHandle = API.FindFirstFile(Path.Combine(sPath, SearchPattern), Data)
     
-    Dim List As New ArrayList
+    Dim list As New ArrayList
     
     Dim include As Boolean
     If FileHandle <> INVALID_HANDLE Then
@@ -510,7 +510,7 @@ Private Function InternalGetFiles(ByRef sPath As String, ByRef SearchPattern As 
             If include Then
                 Dim s As String
                 s = GetFileNameFromFindData(Data)
-                If Len(s) > 0 Then Call List.Add(Path.Combine(sPath, s))
+                If Len(s) > 0 Then Call list.Add(Path.Combine(sPath, s))
             End If
         Loop While API.FindNextFile(FileHandle, Data) <> BOOL_FALSE
     End If
@@ -525,7 +525,7 @@ Private Function InternalGetFiles(ByRef sPath As String, ByRef SearchPattern As 
         Case Else: IOError e, sPath
     End Select
 
-    InternalGetFiles = List.ToArray(ciString)
+    InternalGetFiles = list.ToArray(vbString)
 End Function
 
 Private Sub InternalSetFileTime(ByRef sPath As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)

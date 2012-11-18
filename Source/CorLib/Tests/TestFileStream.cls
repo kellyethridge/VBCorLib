@@ -19,10 +19,10 @@ Option Explicit
 Private fs As FileStream
 
 Public Sub Setup()
-    Set fs = newfilestream(App.Path & "\hello.txt", FileMode.OpenExisting)
+    Set fs = NewFileStream(App.Path & "\hello.txt", FileMode.OpenExisting)
 End Sub
 
-Public Sub Teardown()
+Public Sub TearDown()
     fs.CloseStream
 End Sub
 
@@ -77,9 +77,9 @@ Public Sub TestSeekBeforeFile()
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is ArgumentException, "Wrong exception type caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
 End Sub
 
 Public Sub TestReadOneByteAtATime()
@@ -102,7 +102,7 @@ Public Sub TestWriteSeekReadRead()
     fs.CloseStream
     f = App.Path & "\WriteSeekReadRead.txt"
     
-    Set fs = newfilestream(f, FileMode.OpenOrCreate)
+    Set fs = NewFileStream(f, FileMode.OpenOrCreate)
     fs.SeekPosition 0, FromBeginning
     For i = 48 To 57
         fs.WriteByte i
@@ -119,17 +119,17 @@ Public Sub TestFileNotFound()
     Dim NotFound As FileStream
     
     On Error GoTo errTrap
-    Set NotFound = Cor.newfilestream(App.Path & "\Cannot exist.txt", OpenExisting)
+    Set NotFound = Cor.NewFileStream(App.Path & "\Cannot exist.txt", OpenExisting)
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim ex As Exception
-    Assert.IsTrue Catch(ex), "An exception should be caught."
-    Assert.IsTrue TypeOf ex Is FileNotFoundException, "Wrong exception type caught."
+    Dim Ex As Exception
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
+    Assert.IsTrue TypeOf Ex Is FileNotFoundException, "Wrong exception type caught."
     
     Dim fex As FileNotFoundException
-    Set fex = ex
+    Set fex = Ex
     Assert.AreEqual App.Path & "\Cannot exist.txt", fex.FileName
 End Sub
 
@@ -139,10 +139,10 @@ Public Sub TestWriteSeekReadWrite()
     Dim f As String
     f = App.Path & "\WriteSeekReadWrite.txt"
     
-    Set fs = newfilestream(f, Create)
+    Set fs = NewFileStream(f, Create)
     
     Dim b() As Byte
-    b = cArray.NewArray(ciByte, 65, 65, 65, 65, 65)
+    b = NewBytes(65, 65, 65, 65, 65)
     
     fs.WriteBlock b, 0, 5
     

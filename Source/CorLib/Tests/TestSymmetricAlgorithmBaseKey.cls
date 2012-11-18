@@ -54,7 +54,7 @@ End Sub
 
 Public Sub SetKey()
     Dim Key() As Byte
-    Key = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8)
+    Key = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
     base.SetKey Key
     Assert.AreEqual Key, base.GetKey
     Assert.IsTrue mWeaknessTested
@@ -78,7 +78,7 @@ End Sub
 
 Public Sub SetInvalidKeyLength()
     Dim Key() As Byte
-    Key = NewArray(ciByte, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    Key = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8, 9)
     
     On Error GoTo errTrap
     base.SetKey Key

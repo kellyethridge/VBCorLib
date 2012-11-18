@@ -91,7 +91,7 @@ Public Function GetObject(ByRef ResourceName As Variant, ByRef ResourceType As V
         ' specific value doesn't exist in this one, because
         ' the culture was actually specificed.
         Call Helper.MoveVariant(GetObject, rs.GetObject(ResourceName, ResourceType))
-    ElseIf ResourceType = ResourceTypes.stringresource Then
+    ElseIf ResourceType = ResourceTypes.StringResource Then
         GetObject = GetFallbackString(ResourceName)
     Else
         ' If we aren't looking for a string, then we will
@@ -121,7 +121,7 @@ End Function
 '
 Public Function GetString(ByRef ResourceName As Variant, Optional ByRef CultureID As Variant) As String
     On Error Resume Next
-    GetString = GetObject(ResourceName, stringresource, CultureID)
+    GetString = GetObject(ResourceName, StringResource, CultureID)
 End Function
 
 ''
@@ -199,7 +199,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub InitFromFile(ByVal FileName As String)
-    mFiles = cArray.NewArray(ciString, FileName)
+    mFiles = Cor.NewStrings(FileName)
 End Sub
 
 Friend Sub InitFromFolder(ByVal SearchPattern As String, ByVal ResourceDir As String)
@@ -298,7 +298,7 @@ Private Function GetFallbackString(ByRef ResourceName As Variant) As Variant
             ' Ask the resource set for the string value.
             ' We use the GetObject method because if the
             ' value does not exist, then Empty is returned.
-            GetFallbackString = rs.GetObject(ResourceName, ResourceTypes.stringresource)
+            GetFallbackString = rs.GetObject(ResourceName, ResourceTypes.StringResource)
             
             ' If the value is not Empty, then we have found
             ' a resource set with the ID we requested. Now
@@ -318,7 +318,7 @@ Private Function GetFallbackString(ByRef ResourceName As Variant) As Variant
     
     ' Use our fallback resource set to find the value.
     ' If the value does not exist, then Empty is returned.
-    GetFallbackString = mFallbackResourceSet.GetObject(ResourceName, ResourceTypes.stringresource)
+    GetFallbackString = mFallbackResourceSet.GetObject(ResourceName, ResourceTypes.StringResource)
 End Function
 
 

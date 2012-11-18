@@ -154,7 +154,7 @@ End Sub
 ' in the value to be written. Indexes are indicate by enclosing the
 ' specific index in curly braces {}. The indexes start at 0.
 '
-Public Sub WriteValue(ByRef Value As Variant, ParamArray args() As Variant)
+Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
     Call InternalWriteValue(Value, a)
@@ -258,14 +258,14 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub InternalWrite(ByVal Value As String, ByRef args() As Variant, ByVal NewLine As Boolean)
+Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
     Dim CharCount As Long
     Dim CharPtr As Long
     Dim CharsToCopy As Long
     
     Call VerifyIsOpen
     
-    If UBound(args) >= 0 Then Value = cString.FormatArray(Value, args)
+    If UBound(Args) >= 0 Then Value = cString.FormatArray(Value, Args)
     If NewLine Then Value = Value & mNewLine
     
     CharCount = Len(Value)
@@ -298,14 +298,14 @@ End Sub
 
 ' WriteLine has only a ParamArray argument. This allows for nothing
 ' to be passed in and only write a newline to the stream.
-Private Sub InternalWriteLine(ByRef args() As Variant)
+Private Sub InternalWriteLine(ByRef Args() As Variant)
     Dim ub As Long
     Dim Value As String
     
-    ub = UBound(args)
+    ub = UBound(Args)
     
     ' The first argument is the line to be written, so convert it to a string.
-    If ub >= 0 Then Value = Convert.ToString(args(0))
+    If ub >= 0 Then Value = Convert.ToString(Args(0))
     
     ' If there are additional arguments, then those arguments need
     ' to be shifted down to fill the space of the first argument, which
@@ -313,20 +313,20 @@ Private Sub InternalWriteLine(ByRef args() As Variant)
     If ub > 0 Then
         Dim i As Long
         For i = 1 To ub
-            Call Helper.MoveVariant(args(i - 1), args(i))
+            Call Helper.MoveVariant(Args(i - 1), Args(i))
         Next i
-        ReDim Preserve args(ub - 1)
+        ReDim Preserve Args(ub - 1)
     ElseIf ub = 0 Then
         ' The first element is now the Value and we just
         ' want an empty zero-length array now.
-        args = cArray.CreateInstance(ciVariant)
+        Args = cArray.CreateInstance(vbVariant)
     End If
     
-    Call InternalWrite(Value, args, True)
+    Call InternalWrite(Value, Args, True)
 End Sub
 
-Private Sub InternalWriteValue(ByRef Value As Variant, ByRef args() As Variant)
-    Call InternalWrite(Convert.ToString(Value), args, False)
+Private Sub InternalWriteValue(ByRef Value As Variant, ByRef Args() As Variant)
+    Call InternalWrite(Convert.ToString(Value), Args, False)
 End Sub
 
 Private Sub VerifyIsOpen()
@@ -344,11 +344,11 @@ Private Sub WritePreamble()
 End Sub
 
 Private Sub InternalFlush(ByVal FlushStream As Boolean, ByVal FlushEncoder As Boolean)
-    Dim Size As Long
+    Dim size As Long
     
     If mPosition > 0 Then
-        Size = mEncoder.GetBytes(mCharBuffer, 0, mPosition, mByteBuffer, 0, FlushEncoder)
-        Call mStream.WriteBlock(mByteBuffer, 0, Size)
+        size = mEncoder.GetBytes(mCharBuffer, 0, mPosition, mByteBuffer, 0, FlushEncoder)
+        Call mStream.WriteBlock(mByteBuffer, 0, size)
         mPosition = 0
     End If
     
@@ -425,7 +425,7 @@ Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
     Call InternalWriteLine(a)
 End Sub
 
-Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray args() As Variant)
+Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
     Call InternalWriteValue(Value, a)

@@ -28,7 +28,7 @@ End Sub
 
 Public Sub TestWriteOneBlock()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3)
+    b = NewArray(vbByte, 1, 2, 3)
     cs.WriteBlock b, 0, 3
     Assert.AreEqual 4, ms.Length
     b = ms.ToArray
@@ -41,7 +41,7 @@ End Sub
 
 Public Sub TestOneByteAtATime()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3)
+    b = NewArray(vbByte, 1, 2, 3)
     cs.WriteBlock b, 0, 1
     Assert.AreEqual 0, ms.Length
     cs.WriteBlock b, 1, 1
@@ -86,7 +86,7 @@ End Sub
 
 Public Sub WriteFourByteBuffer()
     Dim b() As Byte
-    b = NewArray(ciByte, 1, 2, 3, 4)
+    b = NewArray(vbByte, 1, 2, 3, 4)
     cs.WriteBlock b, 0, 4
     Assert.AreEqual 4, ms.Length
     b = ms.ToArray

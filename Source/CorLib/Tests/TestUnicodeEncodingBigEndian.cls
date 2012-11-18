@@ -39,7 +39,7 @@ End Sub
 Public Sub TestGetCharCount()
     Dim b() As Byte
     
-    b = cArray.CreateInstance(ciByte, 100)
+    b = cArray.CreateInstance(vbByte, 100)
     Assert.AreEqual 50, en.GetCharCount(b)
 End Sub
 

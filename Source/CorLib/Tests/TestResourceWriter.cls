@@ -26,7 +26,7 @@ End Sub
 
 Public Sub TestWrite1ByteEntry()
     Dim Data() As Byte
-    Data = cArray.NewArray(ciByte, 25)
+    Data = NewBytes(25)
     
     mWriter.AddResource Data, 101, "Custom"
     mWriter.Generate

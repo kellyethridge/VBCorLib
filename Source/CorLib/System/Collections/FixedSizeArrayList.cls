@@ -45,8 +45,8 @@ Private mList As ArrayList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal List As ArrayList)
-    Set mList = List
+Friend Sub Init(ByVal list As ArrayList)
+    Set mList = list
 End Sub
 
 
@@ -61,8 +61,8 @@ Private Sub ArrayList_AddRange(c As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_FixedSizeCollection))
 End Sub
 
-Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_BinarySearch = mList.BinarySearch(Value, StartIndex, Count, Comparer)
+Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+    ArrayList_BinarySearch = mList.BinarySearch(Value, startIndex, Count, Comparer)
 End Function
 
 Private Property Let ArrayList_Capacity(ByVal RHS As Long)
@@ -103,12 +103,12 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As Object
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mList.Count, startIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
     
     Dim Ret As New ArrayListEnumerator
     Call Ret.Init(Me, ElemIndex, ElemCount)
@@ -130,8 +130,8 @@ Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As
     Set ArrayList_GetRange = Ret
 End Function
 
-Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_IndexOf = mList.IndexOf(Value, StartIndex, Count, Comparer)
+Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+    ArrayList_IndexOf = mList.IndexOf(Value, startIndex, Count, Comparer)
 End Function
 
 Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)
@@ -162,8 +162,8 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
     Call Helper.MoveVariant(ArrayList_Item, mList(Index))
 End Property
 
-Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_LastIndexOf = mList.LastIndexOf(Value, StartIndex, Count, Comparer)
+Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+    ArrayList_LastIndexOf = mList.LastIndexOf(Value, startIndex, Count, Comparer)
 End Function
 
 Private Function ArrayList_NewEnum() As stdole.IUnknown
@@ -190,11 +190,11 @@ Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
     Call mList.SetRange(Index, c)
 End Sub
 
-Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
-    Call mList.Sort(StartIndex, Count, Comparer)
+Private Sub ArrayList_Sort(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+    Call mList.Sort(startIndex, Count, Comparer)
 End Sub
 
-Private Function ArrayList_ToArray(Optional ByVal ArrayType As ciArrayTypes = 12&) As Variant
+Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
     ArrayList_ToArray = mList.ToArray(ArrayType)
 End Function
 
