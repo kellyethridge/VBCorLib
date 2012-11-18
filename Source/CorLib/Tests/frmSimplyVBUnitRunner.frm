@@ -303,7 +303,7 @@ Private Sub Form_Load()
     cArrayTests.Add New TestMixNumBinarySearch
     cArrayTests.Add New cArraySortTests
     cArrayTests.Add New TestArrayBinarySearch
-    cArrayTests.Add New TestArrayReverse
+    cArrayTests.Add New cArrayReverseTests
     cArrayTests.Add New cArrayIndexOfTests
     cArrayTests.Add New cArrayLastIndexOfTests
     cArrayTests.Add New TestArrayCreation

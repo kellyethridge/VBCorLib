@@ -6,81 +6,104 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestArrayReverse"
+Attribute VB_Name = "cArrayReverseTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ITestCaseSource
 
-Public Sub TestAllLongs()
-    Dim a(100) As Long
-    Dim i As Long
-    
-    For i = 0 To 100
-        a(i) = i
-    Next i
-    cArray.Reverse a
-    For i = 0 To 100
-        Assert.AreEqual 100 - i, a(i)
-    Next i
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "Reverse_WithValues_ReversesOrder"
+            Test.Use NewBytes(4, 3, 2, 1)
+            Test.Use NewIntegers(4, 3, 2, 1)
+            Test.Use NewLongs(4, 3, 2, 1)
+            Test.Use NewStrings("4", "3", "2", "1")
+            Test.Use NewDoubles(4, 3, 2, 1)
+            Test.Use NewVariants(4, 3, 2, 1)
+            
+    End Select
 End Sub
 
-Public Sub TestAllStrings()
-    Dim a(100) As String
-    Dim i As Long
+Public Sub Reverse_WithValues_ReversesOrder(ByRef Arr As Variant)
+    cArray.Reverse Arr
     
-    For i = 0 To 100
-        a(i) = i
-    Next i
-    cArray.Reverse a
-    For i = 0 To 100
-        Assert.AreEqual CStr(100 - i), a(i)
-    Next i
+    Assert.That Arr, Iz.Ordered
 End Sub
 
-Public Sub TestSubArrayLongs()
-    Dim a(100) As Long
-    Dim i As Long
+Public Sub Reverse_WithNullArray_Throws()
+    Dim Arr() As Long
     
-    For i = 0 To 100
-        a(i) = i
-    Next i
-    cArray.Reverse a, 26, 24
-    For i = 0 To 100
-        If i <= 25 Or i >= 50 Then
-            Assert.AreEqual i, a(i), "Reversed outside subarray."
-        Else
-            Assert.AreEqual 100 - i - 25, a(i), "Subarray not reversed."
-        End If
-    Next i
+    On Error GoTo ErrTrap
+    cArray.Reverse Arr
+    
+ErrTrap:
+    AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Sub TestLengthTooLong()
-    Dim a(100)
+Public Sub Reverse_WithMultiDimensionArray_Throws()
+    Dim Arr(0, 0) As Long
     
-    On Error GoTo errTrap
-    cArray.Reverse a, 0, 102
-    On Error GoTo 0
-    Assert.Fail "An exception should have been thrown."
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should have been caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
+    On Error GoTo ErrTrap
+    cArray.Reverse Arr
+    
+ErrTrap:
+    AssertRankException Err
 End Sub
 
-Public Sub TestUDTs()
-    Dim a(10) As VBGUID
-    Dim i As Long
+Public Sub Reverse_WithIndexLessThanLBound_Throws()
+    Dim Arr(0) As Long
     
-    For i = 0 To 10
-        a(i).Data1 = i
-    Next i
+    On Error GoTo ErrTrap
+    cArray.Reverse Arr, -1
     
-    cArray.Reverse a
-    
-    For i = 0 To 10
-        Assert.AreEqual 10 - i, a(i).Data1
-    Next i
-    
+ErrTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
 End Sub
+
+Public Sub Reverse_WithIndexGreaterThanUBound_Throws()
+    Dim Arr(0) As Long
+    
+    On Error GoTo ErrTrap
+    cArray.Reverse Arr, 1
+    
+ErrTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub Reverse_WithIndexAndCountGreaterThanUBound_Throws()
+    Dim Arr(0) As Long
+    
+    On Error GoTo ErrTrap
+    cArray.Reverse Arr, 0, 2
+    
+ErrTrap:
+    AssertArgumentException Err
+End Sub
+
+Public Sub Reverse_WithIndexAndCount_ReverseSubArray()
+    Dim Arr() As Long
+    Arr = NewLongs(1, 1, 1, 4, 3, 2, 0, 0, 0)
+    
+    cArray.Reverse Arr, 3, 3
+    
+    Assert.That Arr, Iz.EqualTo(NewLongs(1, 1, 1, 2, 3, 4, 0, 0, 0))
+End Sub
+
+Public Sub Reverse_WithUDTs_ReversesOrder()
+    Dim Arr(3) As VBGUID
+    Arr(0).Data1 = 0
+    Arr(1).Data1 = 1
+    Arr(2).Data1 = 2
+    Arr(3).Data1 = 3
+    
+    cArray.Reverse Arr
+    
+    Assert.That Arr(0).Data1, Iz.EqualTo(3)
+    Assert.That Arr(1).Data1, Iz.EqualTo(2)
+    Assert.That Arr(2).Data1, Iz.EqualTo(1)
+    Assert.That Arr(3).Data1, Iz.EqualTo(0)
+End Sub
+
