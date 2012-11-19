@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: cString
+' Module: cString
 '
 
 ''
@@ -156,12 +159,12 @@ End Function
 ' @param length The number of characters to convert to chars.
 ' @return An array containing the converted characters from the string.
 '
-Public Function ToCharArray(ByRef s As String, Optional ByRef startIndex As Variant, Optional ByRef Length As Variant) As Integer()
+Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(Len(s), startIndex, ElemIndex, Length, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex))
+    Result = GetOptionalListRange(Len(s), StartIndex, ElemIndex, Length, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(StartIndex))
     
     Dim Ret() As Integer
     If ElemCount > 0 Then
@@ -224,28 +227,28 @@ End Function
 '
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     Dim Chars() As Integer
-    Dim startIndex As Long
+    Dim StartIndex As Long
     
     Select Case VarType(TrimChars)
         Case vbString
             mTrimChars.SA.pvData = StrPtr(TrimChars)
             mTrimChars.SA.cElements = Len(TrimChars)
-            startIndex = TrimStartIndex(s, mTrimChars.Data)
+            StartIndex = TrimStartIndex(s, mTrimChars.Data)
             
         Case vbIntegerArray
             SAPtr(Chars) = GetArrayPointer(TrimChars, True)
-            startIndex = TrimStartIndex(s, Chars)
+            StartIndex = TrimStartIndex(s, Chars)
             SAPtr(Chars) = 0
         
         Case vbError
-            startIndex = SzTrimStartIndex(s)
+            StartIndex = SzTrimStartIndex(s)
         
         Case Else
             Throw Cor.NewArgumentException("Invalid character set.")
     End Select
     
-    If startIndex = 0 Then Exit Function
-    TrimStart = Mid$(s, startIndex)
+    If StartIndex = 0 Then Exit Function
+    TrimStart = Mid$(s, StartIndex)
 End Function
 
 ''
@@ -298,32 +301,32 @@ End Function
 '
 Public Function Trim(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     Dim Chars() As Integer
-    Dim startIndex As Long
+    Dim StartIndex As Long
     Dim EndIndex As Long
     
     Select Case VarType(TrimChars)
         Case vbString
             mTrimChars.SA.pvData = StrPtr(TrimChars)
             mTrimChars.SA.cElements = Len(TrimChars)
-            startIndex = TrimStartIndex(s, mTrimChars.Data)
+            StartIndex = TrimStartIndex(s, mTrimChars.Data)
             EndIndex = TrimEndIndex(s, mTrimChars.Data)
             
         Case vbIntegerArray
             SAPtr(Chars) = GetArrayPointer(TrimChars, True)
-            startIndex = TrimStartIndex(s, Chars)
+            StartIndex = TrimStartIndex(s, Chars)
             EndIndex = TrimEndIndex(s, Chars)
             SAPtr(Chars) = 0
             
         Case vbError    ' assume missing
-            startIndex = SzTrimStartIndex(s)
+            StartIndex = SzTrimStartIndex(s)
             EndIndex = SzTrimEndIndex(s)
         
         Case Else
             Throw Cor.NewArgumentException("Invalid character set.")
     End Select
     
-    If startIndex = 0 Or EndIndex = 0 Then Exit Function
-    Trim = Mid$(s, startIndex, EndIndex - startIndex + 1)
+    If StartIndex = 0 Or EndIndex = 0 Then Exit Function
+    Trim = Mid$(s, StartIndex, EndIndex - StartIndex + 1)
 End Function
 
 ''
@@ -378,18 +381,18 @@ End Function
 ' @param Count The number of characters to be removed.
 ' @return A new string with the substring removed.
 '
-Public Function Remove(ByRef s As String, ByVal startIndex As Long, ByVal Count As Long) As String
+Public Function Remove(ByRef s As String, ByVal StartIndex As Long, ByVal Count As Long) As String
     Dim CharCount As Long
     CharCount = Len(s)
     
     Dim Result As Long
-    Result = VerifyListRange(CharCount, startIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, startIndex, "StartIndex", Count, "Count")
+    Result = VerifyListRange(CharCount, StartIndex, Count)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, StartIndex, "StartIndex", Count, "Count")
     
     Dim sp As Long
     sp = StrPtr(s)
     Remove = SysAllocStringLen(sp, CharCount - Count)
-    Call CopyMemory(ByVal StrPtr(Remove) + startIndex * 2, ByVal sp + (startIndex + Count) * 2, (CharCount - (startIndex + Count)) * 2)
+    Call CopyMemory(ByVal StrPtr(Remove) + StartIndex * 2, ByVal sp + (StartIndex + Count) * 2, (CharCount - (StartIndex + Count)) * 2)
 End Function
 
 ''
@@ -515,7 +518,7 @@ Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, B
     SAPtr(Chars) = 0
 End Function
 
-Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal startIndex As Long, ByVal EndIndex As Long, ByVal Direction As Long) As Long
+Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Direction As Long) As Long
     Dim lb As Long
     lb = LBound(Chars)
     
@@ -523,7 +526,7 @@ Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal startIndex As Lo
     ub = UBound(Chars)
     
     Dim i As Long
-    For i = startIndex To EndIndex Step Direction
+    For i = StartIndex To EndIndex Step Direction
         Dim j As Long
         For j = lb To ub
             If mString.Data(i) = Chars(j) Then
