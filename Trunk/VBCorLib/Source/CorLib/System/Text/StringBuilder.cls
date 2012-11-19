@@ -83,8 +83,8 @@ Private mChars      As WordBuffer
 ' <b>Convert.ToString</b> method. This will allow for objects that impelement
 ' <b>IObject</b> or <b>IFormattable</b> to be converted to a string value.
 '
-Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
-    Set Append = AppendString(Convert.ToString(Value), StartIndex, Count)
+Public Function Append(ByRef Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
+    Set Append = AppendString(Convert.ToString(Value), startIndex, Count)
 End Function
 
 ''
@@ -124,17 +124,25 @@ End Function
 ' Appends an array of characters to the end of the string value.
 '
 ' @param Chars The array of characters to be appended.
-' @param startindex The index from Chars to start appending.
-' @param count The number of characters to append.
+' @param Startindex The index from Chars to start appending.
+' @param CharCount The number of characters to append.
 ' @return This instance of StringBuilder.
 '
-Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    Dim Result      As Long
+Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef startIndex As Variant, Optional ByRef CharCount As Variant) As StringBuilder
+    If SAPtr(Chars) = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Chars")
+    If SafeArrayGetDim(SAPtr(Chars)) > 1 Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        
+    Dim ElemCount As Long
+    Dim ElemIndex As Long
+    ElemIndex = GetOptionalLong(startIndex, LBound(Chars))
+    ElemCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
     
-    Result = GetOptionalArrayRange(SAPtr(Chars), StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    If ElemIndex < LBound(Chars) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "StartIndex")
+    If ElemIndex + ElemCount - 1 > UBound(Chars) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
     
     If ElemCount = 0 Then
         Set AppendChars = Me
@@ -165,10 +173,10 @@ End Function
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 ' @include "..\..\Includes\StringBuilder.AppendFormat.txt"
-Public Function AppendFormat(ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
+Public Function AppendFormat(ByRef format As String, ParamArray Args() As Variant) As StringBuilder
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16)
-    InternalAppendFormat Nothing, Format, vArgs
+    InternalAppendFormat Nothing, format, vArgs
     Set AppendFormat = Me
 End Function
 
@@ -191,10 +199,10 @@ End Function
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 '
-Public Function AppendFormatEx(ByVal Provider As IFormatProvider, ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
+Public Function AppendFormatEx(ByVal Provider As IFormatProvider, ByRef format As String, ParamArray Args() As Variant) As StringBuilder
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(20)
-    InternalAppendFormat Provider, Format, vArgs
+    InternalAppendFormat Provider, format, vArgs
     Set AppendFormatEx = Me
 End Function
 
@@ -210,11 +218,11 @@ End Function
 ' <p>This function does not return a reference to the instance of StringBuilder
 ' in order to keep the overhead cost down on the function call.</p>
 '
-Public Function AppendString(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
+Public Function AppendString(ByRef s As String, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     Dim ElemIndex As Long
     Dim ElemCount As Long
     
-    ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemIndex = GetOptionalLong(startIndex, 0)
     ElemCount = GetOptionalLong(Count, Len(s) - ElemIndex)
     
     If ElemIndex < 0 Then _
@@ -452,14 +460,14 @@ End Function
 ' @param count The number of characters to be inserted.
 ' @return This instance of StringBuilder.
 '
-Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
+Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
     
-    Result = GetOptionalArrayRange(SAPtr(Chars), StartIndex, ElemIndex, Count, ElemCount)
+    Result = GetOptionalArrayRange(SAPtr(Chars), startIndex, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Chars", ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex)
+        ThrowArrayRangeException Result, "Chars", ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex)
     If Index < 0 Or Index > mLength Then _
         Throw Cor.NewArgumentOutOfRangeException("Index must be between 0 and then length of the current instance.", "Index", Index)
     
@@ -503,13 +511,13 @@ End Property
 ' @return This instance of StringBuilder.
 ' @remarks startindex is zero-based.
 '
-Public Function Remove(ByVal StartIndex As Long, ByVal Count As Long) As StringBuilder
+Public Function Remove(ByVal startIndex As Long, ByVal Count As Long) As StringBuilder
     Dim Result As Long
-    Result = VerifyListRange(mLength, StartIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, StartIndex, "StartIndex", Count, "Count")
+    Result = VerifyListRange(mLength, startIndex, Count)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, startIndex, "StartIndex", Count, "Count")
     
     If Count > 0 Then
-        Call CopyMemory(ByVal mStringPtr + StartIndex * 2, ByVal mStringPtr + (StartIndex + Count) * 2, (mLength - (StartIndex + Count)) * 2)
+        Call CopyMemory(ByVal mStringPtr + startIndex * 2, ByVal mStringPtr + (startIndex + Count) * 2, (mLength - (startIndex + Count)) * 2)
         mLength = mLength - Count
     End If
     Set Remove = Me
@@ -525,7 +533,7 @@ End Function
 ' @return This instance of StringBuilder.
 ' @remarks Use index and count to replace the old value with a substring of the new value. index is zero-based.
 '
-Public Function Replace(ByVal OldValue As String, ByVal NewValue As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
+Public Function Replace(ByVal OldValue As String, ByVal NewValue As String, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     OldStrSA.pvData = StrPtr(OldValue)
     OldStrSA.cElements = Len(OldValue)
 
@@ -536,7 +544,7 @@ Public Function Replace(ByVal OldValue As String, ByVal NewValue As String, Opti
 
     Dim MatchCount      As Long
     Dim MatchIndexes()  As Long
-    MatchCount = FindMatches(MatchIndexes, StartIndex, Count)
+    MatchCount = FindMatches(MatchIndexes, startIndex, Count)
 
     ' If we have matches then we need to replace them.
     If MatchCount > 0 Then
@@ -563,12 +571,12 @@ End Function
 ' @return A string or substring representing the internal string of the builder.
 ' @remarks startindex is zero-based.
 '
-Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As String
+Public Function ToString(Optional ByRef startIndex As Variant, Optional ByRef Length As Variant) As String
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mLength, StartIndex, ElemIndex, Length, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(StartIndex))
+    Result = GetOptionalListRange(mLength, startIndex, ElemIndex, Length, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex))
     
     If mLength = 0 Then
         ToString = ""
@@ -581,18 +589,18 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Count As Variant, ByVal Capacity As Long)
+Friend Sub Init(ByRef s As String, ByRef startIndex As Variant, ByRef Count As Variant, ByVal Capacity As Long)
     Call CoTaskMemFree(mStringPtr)
     
     Dim ElemCount As Long
     ElemCount = GetOptionalLong(Count, Len(s))
     
     Dim ElemIndex As Long
-    ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemIndex = GetOptionalLong(startIndex, 0)
     
     Dim Result As Long
     Result = VerifyListRange(Len(s), ElemIndex, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
     
     If ElemCount > Capacity Then Capacity = ElemCount
     If Capacity < DEF_CAPACITY Then Capacity = DEF_CAPACITY
@@ -688,7 +696,7 @@ End Function
 '
 ' "http://www.codeproject.com/csharp/custstrformat.asp"
 '
-Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
+Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef format As String, ByRef Args() As Variant)
     Dim CustomFormatter     As ICustomFormatter
     Dim HasCustomFormatter  As Boolean
     Dim Index               As Long
@@ -701,8 +709,8 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
         HasCustomFormatter = Not (CustomFormatter Is Nothing)
     End If
     
-    Max = Len(Format)
-    mChars.SA.pvData = StrPtr(Format)
+    Max = Len(format)
+    mChars.SA.pvData = StrPtr(format)
     mChars.SA.cElements = Max
     
     ' Parse normal substring.
@@ -747,7 +755,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     
                     ' Give a custom formatter first shot at formatting.
                     If HasCustomFormatter Then
-                        s = CustomFormatter.Format(ArgFormatting, Args(ArgIndex), Provider)
+                        s = CustomFormatter.format(ArgFormatting, Args(ArgIndex), Provider)
                     End If
                     
                     ' We distinguish between a null string and an empty string.
@@ -837,16 +845,16 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
         
         ' Check if formatting is being specified.
         If .Data(Index) = vbColon Then
-            Dim StartIndex As Long
+            Dim startIndex As Long
             
             ' everything from here to the "}" is part of the argument formatting.
             Index = Index + 1
-            StartIndex = Index
+            startIndex = Index
             Do
                 ' can never reach the end until after a "}".
                 If Index = Max Then FormatError
                 If .Data(Index) = CLOSE_BRACE Then
-                    ArgFormat = SysAllocStringLen(VarPtr(.Data(StartIndex)), Index - StartIndex)
+                    ArgFormat = SysAllocStringLen(VarPtr(.Data(startIndex)), Index - startIndex)
                     Exit Do
                 End If
                 Index = Index + 1
@@ -930,11 +938,11 @@ End Function
 ' and storing the index for each match found.
 '
 ' Returns the number of matches found.
-Private Function FindMatches(ByRef MatchIndexes() As Long, ByRef StartIndex As Variant, ByRef Count As Variant) As Long
+Private Function FindMatches(ByRef MatchIndexes() As Long, ByRef startIndex As Variant, ByRef Count As Variant) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalLongPair(StartIndex, 0, ElemIndex, Count, mLength, ElemCount)
+    Result = GetOptionalLongPair(startIndex, 0, ElemIndex, Count, mLength, ElemCount)
     If Result <> NO_ERROR Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Result))
     
