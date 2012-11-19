@@ -51,13 +51,11 @@ Private Type SIMPLEBLOB512
     EncryptedKey(0 To 63)   As Byte
 End Type
 
-
 Private mRSAProviderName    As String
 Private mDSAProviderName    As String
 Private mHasHighEncryption  As Boolean
 Private mDefaultProvider    As Long
 Private mExponentOfOneKey   As Long
-
 
 
 ''
@@ -133,7 +131,7 @@ Friend Sub ReleaseContext(ByVal Provider As Long, Optional ByVal DeleteKeySet As
     If CryptReleaseContext(Provider, 0) = BOOL_FALSE Then Call CryptoError
     
     If DeleteKeySet Then
-        Call CryptAcquireContext(Provider, ContainerName, ProviderName, ProviderType, CRYPT_DELETEKEYSET)
+        CryptAcquireContext Provider, ContainerName, ProviderName, ProviderType, CRYPT_DELETEKEYSET
     End If
 End Sub
 
@@ -174,15 +172,15 @@ End Function
 ' Returns a string parameter from the specified provider.
 '
 Friend Function GetProvParamString(ByVal Provider As Long, ByVal Param As Long, Optional ByVal Flags As Long) As String
-    Dim Size As Long
-    If CryptGetProvParam(Provider, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then Call CryptoError
+    Dim size As Long
+    If CryptGetProvParam(Provider, Param, ByVal 0&, size, Flags) = BOOL_FALSE Then Call CryptoError
     
     Dim Bytes() As Byte
-    ReDim Bytes(0 To Size - 1)
+    ReDim Bytes(0 To size - 1)
     
-    If CryptGetProvParam(Provider, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetProvParam(Provider, Param, Bytes(0), size, Flags) = BOOL_FALSE Then Call CryptoError
         
-    GetProvParamString = Left$(StrConv(Bytes, vbUnicode), Size - 1)
+    GetProvParamString = Left$(StrConv(Bytes, vbUnicode), size - 1)
 End Function
 
 ''
@@ -196,15 +194,15 @@ End Function
 ' Returns a string parameter from the specified key.
 '
 Friend Function GetKeyParamString(ByVal Key As Long, ByVal Param As Long, Optional ByVal Flags As Long) As String
-    Dim Size As Long
-    If CryptGetKeyParam(Key, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then Call CryptoError
+    Dim size As Long
+    If CryptGetKeyParam(Key, Param, ByVal 0&, size, Flags) = BOOL_FALSE Then Call CryptoError
     
     Dim Bytes() As Byte
-    ReDim Bytes(0 To Size - 1)
+    ReDim Bytes(0 To size - 1)
     
-    If CryptGetKeyParam(Key, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetKeyParam(Key, Param, Bytes(0), size, Flags) = BOOL_FALSE Then Call CryptoError
     
-    GetKeyParamString = Left$(StrConv(Bytes, vbUnicode), Size - 1)
+    GetKeyParamString = Left$(StrConv(Bytes, vbUnicode), size - 1)
 End Function
 
 Friend Sub SetKeyParam(ByVal Key As Long, ByVal Param As Long, ByRef Value As Variant, Optional ByVal Flags As Long)
@@ -252,15 +250,15 @@ End Sub
 Private Sub DetermineProviderSupport()
     Dim Index   As Long
     Dim Name    As String
-    Dim Size    As Long
+    Dim size    As Long
     
-    Size = 512
-    Name = String$(Size, 0)
+    size = 512
+    Name = String$(size, 0)
     
-    Do While CryptEnumProvidersA(Index, 0, 0, 0&, Name, Size) <> 0
+    Do While CryptEnumProvidersA(Index, 0, 0, 0&, Name, size) <> 0
         
         ' We search for both the best RSA and DSS (DSA) providers.
-        Select Case Left$(Name, Size - 1)
+        Select Case Left$(Name, size - 1)
             Case MS_DEF_PROV
                 ' We set the base provider if none has been set.
                 If Len(mRSAProviderName) = 0 Then
@@ -293,7 +291,7 @@ Private Sub DetermineProviderSupport()
                 
         End Select
         
-        Size = 512
+        size = 512
         Index = Index + 1
     Loop
 End Sub
@@ -313,9 +311,9 @@ Private Sub CreateExponentOfOneKey()
     Set Params = Csp.ExportParameters(True)
     
     Dim One() As Byte
-    ReDim One(0 To UBound(Params.Exponent))
+    ReDim One(0 To UBound(Params.exponent))
     One(UBound(One)) = 1
-    Params.Exponent = One
+    Params.exponent = One
     
     ReDim One(0 To UBound(Params.DP))
     One(UBound(One)) = 1

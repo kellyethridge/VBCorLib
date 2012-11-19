@@ -84,9 +84,6 @@ Private Const MILLISECONDS_TO_16011231  As Currency = DAYS_TO_16011231 * MILLISE
 
 Private Const FILETIME_MINIMUM          As Currency = 50491123200000@
 
-
-
-
 ' Currency works perfectly as the 64bit Integer in .NET. Even though the
 ' time is represented in milliseconds here, the fractional portion is exactly
 ' 10000 ticks, or .0001 is exactly 100 nanoseconds, just as in .NET. We get
@@ -300,17 +297,17 @@ End Function
 ' @param value The number of milliseconds to add.
 ' @return The new date containing the new calculated time.
 '
-Public Function AddMilliseconds(ByVal value As Double) As cDateTime
-    If value < 0# Then
-        value = Fix(value - 0.5)
+Public Function AddMilliseconds(ByVal Value As Double) As cDateTime
+    If Value < 0# Then
+        Value = Fix(Value - 0.5)
     Else
-        value = Fix(value + 0.5)
+        Value = Fix(Value + 0.5)
     End If
     
-    If value < -MAX_MILLISECONDS Or value > MAX_MILLISECONDS Then _
+    If Value < -MAX_MILLISECONDS Or Value > MAX_MILLISECONDS Then _
         Throw New ArgumentOutOfRangeException
     
-    Set AddMilliseconds = cDateTime.FromMilliseconds(mMilliseconds + CCur(value), mKind)
+    Set AddMilliseconds = cDateTime.FromMilliseconds(mMilliseconds + CCur(Value), mKind)
 End Function
 
 ''
@@ -320,8 +317,8 @@ End Function
 ' @param value The number of days to add.
 ' @return The new cDateTime containing the calculated value.
 '
-Public Function AddDays(ByVal value As Double) As cDateTime
-    Set AddDays = AddMilliseconds(value * MILLISECONDS_PER_DAY)
+Public Function AddDays(ByVal Value As Double) As cDateTime
+    Set AddDays = AddMilliseconds(Value * MILLISECONDS_PER_DAY)
 End Function
 
 ''
@@ -331,8 +328,8 @@ End Function
 ' @param value The number of hours to add.
 ' @return The new cDateTime instance containing the calculated value.
 '
-Public Function AddHours(ByVal value As Double) As cDateTime
-    Set AddHours = AddMilliseconds(value * MILLISECONDS_PER_HOUR)
+Public Function AddHours(ByVal Value As Double) As cDateTime
+    Set AddHours = AddMilliseconds(Value * MILLISECONDS_PER_HOUR)
 End Function
 
 ''
@@ -342,8 +339,8 @@ End Function
 ' @param value The number of minutes to add.
 ' @return The new cDateTime instance containing the calculated value.
 '
-Public Function AddMinutes(ByVal value As Double) As cDateTime
-    Set AddMinutes = AddMilliseconds(value * MILLISECONDS_PER_MINUTE)
+Public Function AddMinutes(ByVal Value As Double) As cDateTime
+    Set AddMinutes = AddMilliseconds(Value * MILLISECONDS_PER_MINUTE)
 End Function
 
 ''
@@ -399,8 +396,8 @@ End Function
 ' @param value The number of seconds to be added.
 ' @return The new cDateTime instance containing the calculated value.
 '
-Public Function AddSeconds(ByVal value As Double) As cDateTime
-    Set AddSeconds = AddMilliseconds(value * MILLISECONDS_PER_SECOND)
+Public Function AddSeconds(ByVal Value As Double) As cDateTime
+    Set AddSeconds = AddMilliseconds(Value * MILLISECONDS_PER_SECOND)
 End Function
 
 ''
@@ -410,9 +407,9 @@ End Function
 ' @param value The number of ticks to be added.
 ' @return the new cDateTime instance containing the calcuated value.
 '
-Public Function AddTicks(ByRef value As Variant) As cDateTime
+Public Function AddTicks(ByRef Value As Variant) As cDateTime
     Dim DecimalValue As Variant
-    DecimalValue = CDec(value)
+    DecimalValue = CDec(Value)
     
     If DecimalValue < CDec(0) Or DecimalValue > CDec(MAX_MILLISECONDS) * 10000 Then _
         Throw Cor.NewArgumentOutOfRangeException("Ticks is outside the valid range of values", "value", DecimalValue)
@@ -427,8 +424,8 @@ End Function
 ' @param value The number of years to be added.
 ' @return The new cDateTime instance containing the calculated value.
 '
-Public Function AddYears(ByVal value As Long) As cDateTime
-    Set AddYears = AddMonths(value * MONTHS_PER_YEAR)
+Public Function AddYears(ByVal Value As Long) As cDateTime
+    Set AddYears = AddMonths(Value * MONTHS_PER_YEAR)
 End Function
 
 ''
@@ -440,17 +437,17 @@ End Function
 ' values are equal, and positive indicates this value is greater than the
 ' argument.
 '
-Public Function CompareTo(ByRef value As Variant) As Long
+Public Function CompareTo(ByRef Value As Variant) As Long
     Dim ms As Currency
     
-    Select Case VariantType(value) And &HFF
+    Select Case VariantType(Value) And &HFF
         Case vbObject
-            If value Is Nothing Then
+            If Value Is Nothing Then
                 CompareTo = 1
             Else
                 Dim dt As cDateTime
                 On Error GoTo errTrap
-                Set dt = value
+                Set dt = Value
                 ms = dt.TotalMilliseconds
                 If mMilliseconds < ms Then
                     CompareTo = -1
@@ -459,7 +456,7 @@ Public Function CompareTo(ByRef value As Variant) As Long
                 End If
             End If
         Case vbDate
-            ms = cDateTime.AscDateTime(value).TotalMilliseconds
+            ms = cDateTime.AscDateTime(Value).TotalMilliseconds
             If mMilliseconds < ms Then
                 CompareTo = -1
             ElseIf mMilliseconds > ms Then
@@ -596,17 +593,17 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 '
-Public Function Equals(ByRef value As Variant) As Boolean
-    Select Case VarType(value)
+Public Function Equals(ByRef Value As Variant) As Boolean
+    Select Case VarType(Value)
         Case vbObject
-            If value Is Nothing Then Exit Function
-            If TypeOf value Is cDateTime Then
+            If Value Is Nothing Then Exit Function
+            If TypeOf Value Is cDateTime Then
                 Dim dt As cDateTime
-                Set dt = value
+                Set dt = Value
                 Equals = (mMilliseconds = dt.TotalMilliseconds)
             End If
         Case vbDate
-            Equals = (mMilliseconds = cDateTime.AscDateTime(value).TotalMilliseconds)
+            Equals = (mMilliseconds = cDateTime.AscDateTime(Value).TotalMilliseconds)
     End Select
 End Function
 
@@ -620,22 +617,22 @@ End Function
 ' a TimeSpan object from this instance, then a new cDateTime with a difference
 ' of the TimeSpan obect from this instance is returned.
 '
-Public Function Subtract(ByRef value As Variant) As Object
-    Select Case VariantType(value) And &HFF
+Public Function Subtract(ByRef Value As Variant) As Object
+    Select Case VariantType(Value) And &HFF
         Case vbObject
-            If TypeOf value Is TimeSpan Then
+            If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan
-                Set ts = value
+                Set ts = Value
                 Set Subtract = cDateTime.FromMilliseconds(mMilliseconds - ts.TotalMilliseconds, mKind)
-            ElseIf TypeOf value Is cDateTime Then
+            ElseIf TypeOf Value Is cDateTime Then
                 Dim dt As cDateTime
-                Set dt = value
+                Set dt = Value
                 Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - dt.TotalMilliseconds)
             Else
                 Throw Cor.NewArgumentException("Date, cDateTime or TimeSpan object is required.", "value")
             End If
         Case vbDate
-            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - cDateTime.AscDateTime(value).TotalMilliseconds)
+            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - cDateTime.AscDateTime(Value).TotalMilliseconds)
         Case Else
             Throw Cor.NewArgumentException("Date, cDateTime or TimeSpan object is required.", "value")
     End Select
@@ -776,8 +773,8 @@ Friend Sub InitFromFileTime(ByVal Time As Currency, ByVal Kind As DateTimeKind)
     mKind = Kind
 End Sub
 
-Friend Sub InitFromBinary(ByVal value As Currency)
-    mMilliseconds = value
+Friend Sub InitFromBinary(ByVal Value As Currency)
+    mMilliseconds = Value
 
     ' Get the address of the 8th byte in the 64-bit value.
     Dim PtrToHighByte As Long
@@ -897,8 +894,8 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IObject_Equals(value As Variant) As Boolean
-    IObject_Equals = Equals(value)
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
 End Function
 
 Private Function IObject_GetHashcode() As Long
@@ -909,8 +906,8 @@ Private Function IObject_ToString() As String
     IObject_ToString = ToString
 End Function
 
-Private Function IComparable_CompareTo(value As Variant) As Long
-    IComparable_CompareTo = CompareTo(value)
+Private Function IComparable_CompareTo(Value As Variant) As Long
+    IComparable_CompareTo = CompareTo(Value)
 End Function
 
 

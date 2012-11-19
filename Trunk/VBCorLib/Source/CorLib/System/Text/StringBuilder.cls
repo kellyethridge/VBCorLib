@@ -173,10 +173,10 @@ End Function
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 ' @include "..\..\Includes\StringBuilder.AppendFormat.txt"
-Public Function AppendFormat(ByRef format As String, ParamArray Args() As Variant) As StringBuilder
+Public Function AppendFormat(ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16)
-    InternalAppendFormat Nothing, format, vArgs
+    InternalAppendFormat Nothing, Format, vArgs
     Set AppendFormat = Me
 End Function
 
@@ -199,10 +199,10 @@ End Function
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 '
-Public Function AppendFormatEx(ByVal Provider As IFormatProvider, ByRef format As String, ParamArray Args() As Variant) As StringBuilder
+Public Function AppendFormatEx(ByVal Provider As IFormatProvider, ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(20)
-    InternalAppendFormat Provider, format, vArgs
+    InternalAppendFormat Provider, Format, vArgs
     Set AppendFormatEx = Me
 End Function
 
@@ -696,7 +696,7 @@ End Function
 '
 ' "http://www.codeproject.com/csharp/custstrformat.asp"
 '
-Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef format As String, ByRef Args() As Variant)
+Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
     Dim CustomFormatter     As ICustomFormatter
     Dim HasCustomFormatter  As Boolean
     Dim Index               As Long
@@ -709,8 +709,8 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef format 
         HasCustomFormatter = Not (CustomFormatter Is Nothing)
     End If
     
-    Max = Len(format)
-    mChars.SA.pvData = StrPtr(format)
+    Max = Len(Format)
+    mChars.SA.pvData = StrPtr(Format)
     mChars.SA.cElements = Max
     
     ' Parse normal substring.
@@ -755,7 +755,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef format 
                     
                     ' Give a custom formatter first shot at formatting.
                     If HasCustomFormatter Then
-                        s = CustomFormatter.format(ArgFormatting, Args(ArgIndex), Provider)
+                        s = CustomFormatter.Format(ArgFormatting, Args(ArgIndex), Provider)
                     End If
                     
                     ' We distinguish between a null string and an empty string.
@@ -1085,6 +1085,6 @@ Private Sub ReplaceMatches(ByVal lpSourceBuffer As Long, ByVal lpDestBuffer As L
     Next i
     
     If OriginalIndex < mLength Then
-        Call CopyMemory(ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * 2), (mLength - OriginalIndex) * 2)
+        CopyMemory ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * 2), (mLength - OriginalIndex) * 2
     End If
 End Sub

@@ -208,8 +208,8 @@ End Property
 ' @return Boolean indicating equality.
 ' @see IObject
 '
-Public Function Equals(ByRef value As Variant) As Boolean
-    Equals = Object.Equals(Me, value)
+Public Function Equals(ByRef Value As Variant) As Boolean
+    Equals = Object.Equals(Me, Value)
 End Function
 
 ''
@@ -287,10 +287,10 @@ Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
         ' We still need the Y parameter from the blob, but
         ' we have to retrieve it manually.
         ReDim mY(0 To ByteLen - 1)
-        Dim index As Long
-        index = cArray.GetLength(PublicBlob) - (24 + ByteLen)
-        Call Buffer.BlockCopy(PublicBlob, index, mY, 0, ByteLen)
-        Call cArray.Reverse(mY)
+        Dim Index As Long
+        Index = cArray.GetLength(PublicBlob) - (24 + ByteLen)
+        Buffer.BlockCopy PublicBlob, Index, mY, 0, ByteLen
+        cArray.Reverse mY
     End If
     
     ' Read DSSSEED structure
@@ -453,8 +453,8 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IObject_Equals(value As Variant) As Boolean
-    IObject_Equals = Equals(value)
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
 End Function
 
 Private Function IObject_GetHashcode() As Long

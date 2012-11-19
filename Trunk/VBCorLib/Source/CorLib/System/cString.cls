@@ -53,7 +53,6 @@ Private mJoinSA         As SafeArray1d
 Private mJoinArray()    As String
 
 
-
 ''
 ' Returns if the string is null.
 '
@@ -102,7 +101,7 @@ End Function
 ' @include "..\Includes\cString.Format.txt"
 Public Function Format(ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16))
+    Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16)
     Format = FormatArrayEx(Nothing, FormatText, vArgs)
 End Function
 
@@ -159,12 +158,12 @@ End Function
 ' @param length The number of characters to convert to chars.
 ' @return An array containing the converted characters from the string.
 '
-Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
+Public Function ToCharArray(ByRef s As String, Optional ByRef startIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(Len(s), StartIndex, ElemIndex, Length, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(StartIndex))
+    Result = GetOptionalListRange(Len(s), startIndex, ElemIndex, Length, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex))
     
     Dim Ret() As Integer
     If ElemCount > 0 Then
@@ -227,28 +226,28 @@ End Function
 '
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     Dim Chars() As Integer
-    Dim StartIndex As Long
+    Dim startIndex As Long
     
     Select Case VarType(TrimChars)
         Case vbString
             mTrimChars.SA.pvData = StrPtr(TrimChars)
             mTrimChars.SA.cElements = Len(TrimChars)
-            StartIndex = TrimStartIndex(s, mTrimChars.Data)
+            startIndex = TrimStartIndex(s, mTrimChars.Data)
             
         Case vbIntegerArray
             SAPtr(Chars) = GetArrayPointer(TrimChars, True)
-            StartIndex = TrimStartIndex(s, Chars)
+            startIndex = TrimStartIndex(s, Chars)
             SAPtr(Chars) = 0
         
         Case vbError
-            StartIndex = SzTrimStartIndex(s)
+            startIndex = SzTrimStartIndex(s)
         
         Case Else
             Throw Cor.NewArgumentException("Invalid character set.")
     End Select
     
-    If StartIndex = 0 Then Exit Function
-    TrimStart = Mid$(s, StartIndex)
+    If startIndex = 0 Then Exit Function
+    TrimStart = Mid$(s, startIndex)
 End Function
 
 ''
@@ -301,32 +300,32 @@ End Function
 '
 Public Function Trim(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     Dim Chars() As Integer
-    Dim StartIndex As Long
+    Dim startIndex As Long
     Dim EndIndex As Long
     
     Select Case VarType(TrimChars)
         Case vbString
             mTrimChars.SA.pvData = StrPtr(TrimChars)
             mTrimChars.SA.cElements = Len(TrimChars)
-            StartIndex = TrimStartIndex(s, mTrimChars.Data)
+            startIndex = TrimStartIndex(s, mTrimChars.Data)
             EndIndex = TrimEndIndex(s, mTrimChars.Data)
             
         Case vbIntegerArray
             SAPtr(Chars) = GetArrayPointer(TrimChars, True)
-            StartIndex = TrimStartIndex(s, Chars)
+            startIndex = TrimStartIndex(s, Chars)
             EndIndex = TrimEndIndex(s, Chars)
             SAPtr(Chars) = 0
             
         Case vbError    ' assume missing
-            StartIndex = SzTrimStartIndex(s)
+            startIndex = SzTrimStartIndex(s)
             EndIndex = SzTrimEndIndex(s)
         
         Case Else
             Throw Cor.NewArgumentException("Invalid character set.")
     End Select
     
-    If StartIndex = 0 Or EndIndex = 0 Then Exit Function
-    Trim = Mid$(s, StartIndex, EndIndex - StartIndex + 1)
+    If startIndex = 0 Or EndIndex = 0 Then Exit Function
+    Trim = Mid$(s, startIndex, EndIndex - startIndex + 1)
 End Function
 
 ''
@@ -381,18 +380,18 @@ End Function
 ' @param Count The number of characters to be removed.
 ' @return A new string with the substring removed.
 '
-Public Function Remove(ByRef s As String, ByVal StartIndex As Long, ByVal Count As Long) As String
+Public Function Remove(ByRef s As String, ByVal startIndex As Long, ByVal Count As Long) As String
     Dim CharCount As Long
     CharCount = Len(s)
     
     Dim Result As Long
-    Result = VerifyListRange(CharCount, StartIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, StartIndex, "StartIndex", Count, "Count")
+    Result = VerifyListRange(CharCount, startIndex, Count)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, startIndex, "StartIndex", Count, "Count")
     
     Dim sp As Long
     sp = StrPtr(s)
     Remove = SysAllocStringLen(sp, CharCount - Count)
-    Call CopyMemory(ByVal StrPtr(Remove) + StartIndex * 2, ByVal sp + (StartIndex + Count) * 2, (CharCount - (StartIndex + Count)) * 2)
+    Call CopyMemory(ByVal StrPtr(Remove) + startIndex * 2, ByVal sp + (startIndex + Count) * 2, (CharCount - (startIndex + Count)) * 2)
 End Function
 
 ''
@@ -518,7 +517,7 @@ Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, B
     SAPtr(Chars) = 0
 End Function
 
-Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Direction As Long) As Long
+Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal startIndex As Long, ByVal EndIndex As Long, ByVal Direction As Long) As Long
     Dim lb As Long
     lb = LBound(Chars)
     
@@ -526,7 +525,7 @@ Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal StartIndex As Lo
     ub = UBound(Chars)
     
     Dim i As Long
-    For i = StartIndex To EndIndex Step Direction
+    For i = startIndex To EndIndex Step Direction
         Dim j As Long
         For j = lb To ub
             If mString.Data(i) = Chars(j) Then
