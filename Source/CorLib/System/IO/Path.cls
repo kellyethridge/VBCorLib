@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Path
+' Module: Path
 '
 
 ''
@@ -419,13 +422,13 @@ Public Function GetFullPath(ByVal Path As String) As String
     Dim Ret As String
     Ret = String$(Me.MaxPathLength, 0)
     
-    Dim Size As Long
-    Size = API.GetFullPathName(Path, Len(Ret), Ret, 0)
+    Dim size As Long
+    size = API.GetFullPathName(Path, Len(Ret), Ret, 0)
     
-    If Size = 0 Then _
+    If size = 0 Then _
         Throw Cor.NewPathTooLongException("The qualified path is longer than the maximum of 260 characters.")
     
-    GetFullPath = Left$(Ret, Size)
+    GetFullPath = Left$(Ret, size)
 End Function
 
 ''
@@ -498,13 +501,13 @@ End Function
 '
 Public Function GetTempPath() As String
     Dim PathName As String
-    Dim Size As Long
+    Dim size As Long
     
     PathName = String$(Me.MaxPathLength, 0)
-    Size = API.GetTempPath(Len(PathName), PathName)
-    If Size = 0 Or Size > Me.MaxPathLength Then Call IOError(Err.LastDllError)
+    size = API.GetTempPath(Len(PathName), PathName)
+    If size = 0 Or size > Me.MaxPathLength Then Call IOError(Err.LastDllError)
 
-    GetTempPath = GetLongPathName(Left$(PathName, Size))
+    GetTempPath = GetLongPathName(Left$(PathName, size))
 End Function
 
 ''
@@ -631,13 +634,13 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
     Dim foundShare      As Boolean
     Dim foundSeparator  As Boolean
 
-    Dim Ch As Integer
+    Dim ch As Integer
 
     mBuffer.SA.pvData = StrPtr(Path)
     pos = 2
-    Ch = mBuffer.Data(pos)
-    Do While Ch <> 0
-        Select Case Ch
+    ch = mBuffer.Data(pos)
+    Do While ch <> 0
+        Select Case ch
             Case vbBackSlash, vbForwardSlash
                 foundSeparator = True
             Case Else
@@ -649,7 +652,7 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
                 End If
         End Select
         pos = pos + 1
-        Ch = mBuffer.Data(pos)
+        ch = mBuffer.Data(pos)
     Loop
 
     If (Not foundServer) Or (Not foundShare) Then _
@@ -707,15 +710,15 @@ End Function
 
 Private Function GetLongPathName(ByRef ShortPath As String) As String
     Dim LongPath    As String
-    Dim Size        As Long
+    Dim size        As Long
     
-    Size = 1024
+    size = 1024
     Do
-        LongPath = String$(Size, 0)
-        Size = API.GetLongPathName(ShortPath, LongPath, Size)
-    Loop While Size > Len(LongPath)
+        LongPath = String$(size, 0)
+        size = API.GetLongPathName(ShortPath, LongPath, size)
+    Loop While size > Len(LongPath)
     
-    GetLongPathName = Left$(LongPath, Size)
+    GetLongPathName = Left$(LongPath, size)
 End Function
 
 

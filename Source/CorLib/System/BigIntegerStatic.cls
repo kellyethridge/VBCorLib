@@ -49,7 +49,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-
 Private mChars()    As Integer
 Private mCharsSA    As SafeArray1d
 Private mZero       As BigInteger
@@ -120,27 +119,27 @@ Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
     Dim xNumber As Number: Call x.AttachNumber(xNumber)
     Dim yNumber As Number: Call y.AttachNumber(yNumber)
     
-    Dim result As Long
-    result = xNumber.Sign - yNumber.Sign
+    Dim Result As Long
+    Result = xNumber.Sign - yNumber.Sign
     
-    If result = 0 Then
-        result = xNumber.Precision - yNumber.Precision
+    If Result = 0 Then
+        Result = xNumber.Precision - yNumber.Precision
         
-        If result = 0 Then
+        If Result = 0 Then
             Dim i As Long
             For i = xNumber.Precision - 1 To 0 Step -1
-                result = (xNumber.Digits(i) And &HFFFF&) - (yNumber.Digits(i) And &HFFFF&)
-                If result <> 0 Then Exit For
+                Result = (xNumber.Digits(i) And &HFFFF&) - (yNumber.Digits(i) And &HFFFF&)
+                If Result <> 0 Then Exit For
             Next i
         Else
-            result = xNumber.Sign * result
+            Result = xNumber.Sign * Result
         End If
     End If
     
     Call x.DetachNumber(xNumber)
     Call y.DetachNumber(yNumber)
     
-    Compare = Sgn(result)
+    Compare = Sgn(Result)
 End Function
 
 ''
@@ -252,9 +251,9 @@ End Function
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
-Public Function ToString(ByVal x As BigInteger, Optional ByVal format As String) As String
+Public Function ToString(ByVal x As BigInteger, Optional ByVal Format As String) As String
     If x Is Nothing Then Set x = mZero
-    ToString = x.ToString(format)
+    ToString = x.ToString(Format)
 End Function
 
 ''
@@ -995,15 +994,15 @@ Public Function Factorial(ByVal x As BigInteger) As BigInteger
     
     End Select
     
-    Dim result As BigInteger
-    Set result = mOne
+    Dim Result As BigInteger
+    Set Result = mOne
     
     Do While Not (x.Sign = Sign.Zero)
-        Set result = result.Multiply(x)
+        Set Result = Result.Multiply(x)
         Set x = x.Subtract(mOne)
     Loop
     
-    Set Factorial = result
+    Set Factorial = Result
 End Function
 
 

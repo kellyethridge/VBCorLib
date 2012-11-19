@@ -46,5 +46,5 @@ Option Explicit
 ' @param provider A provider that may have formatting capabilities.
 ' @return A formatted value.
 '
-Public Function Format(ByVal fmt As String, ByRef arg As Variant, ByVal provider As IFormatProvider) As String: End Function
+Public Function Format(ByVal FormatText As String, ByRef Arg As Variant, ByVal Provider As IFormatProvider) As String: End Function
 

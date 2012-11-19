@@ -71,11 +71,10 @@ Private Const MAX_HEBREWYEAR            As Long = 6000
 Private mTwoDigitYearMax As Long
 
 
-
 Public Property Get Eras() As Long()
-    Dim ret(0) As Long
-    ret(0) = HebrewCalendar.HebrewEra
-    Eras = ret
+    Dim Ret(0) As Long
+    Ret(0) = HebrewCalendar.HebrewEra
+    Eras = Ret
 End Property
 
 Public Property Get TwoDigitYearMax() As Long
@@ -83,7 +82,7 @@ Public Property Get TwoDigitYearMax() As Long
 End Property
 
 Public Property Let TwoDigitYearMax(ByVal RHS As Long)
-    Call VerifyYear(RHS)
+    VerifyYear RHS
     mTwoDigitYearMax = RHS
 End Property
 
@@ -493,14 +492,14 @@ End Function
 
 Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long
     Dim i As Long
-    Dim ret As Long
+    Dim Ret As Long
     Dim Max As Long
     
-    ret = EPOCH - 1 + GetDaysToHebrewYear(Year) + GetYearStartOffset(Year)
+    Ret = EPOCH - 1 + GetDaysToHebrewYear(Year) + GetYearStartOffset(Year)
     
     If Month < 7 Then
         For i = 1 To Month - 1
-            ret = ret + GetDaysInHebrewMonth(Year, i)
+            Ret = Ret + GetDaysInHebrewMonth(Year, i)
         Next i
         Max = GetMonthsInYear(Year)
     Else
@@ -508,10 +507,10 @@ Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, 
     End If
     
     For i = 7 To Max
-        ret = ret + GetDaysInHebrewMonth(Year, i)
+        Ret = Ret + GetDaysInHebrewMonth(Year, i)
     Next i
     
-    GetFixedDaysFromParts = ret + Day
+    GetFixedDaysFromParts = Ret + Day
 End Function
 
 

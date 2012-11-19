@@ -46,12 +46,10 @@ Implements IObject
 Implements IComparable
 Implements IFormattable
 
-
 Private Const REGDB_E_CLASSNOTREG   As Long = &H80040154
 Private Const REGDB_E_READREGDB     As Long = &H80040150
 
 Private mGuid As VBGUID
-
 
 
 ''
@@ -135,11 +133,11 @@ End Function
 '
 Public Function ToString(Optional ByVal Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim Buf As String
-    Dim Size As Long
+    Dim size As Long
     
     Buf = String$(45, 0)
-    Size = StringFromGUID2(mGuid, Buf, Len(Buf))
-    ToString = Left$(Buf, Size - 1)
+    size = StringFromGUID2(mGuid, Buf, Len(Buf))
+    ToString = Left$(Buf, size - 1)
     
     Select Case UCase$(Format)
         Case "D"

@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: NumberFormatInfo
+' Module: NumberFormatInfo
 '
 
 ''
@@ -299,7 +302,7 @@ End Property
 ' @remarks The <b>IsReadOnly</b> is passed to the clone, aswell.
 Public Function Clone() As NumberFormatInfo
     Set Clone = New NumberFormatInfo
-    Call Clone.CloneHelper(mProps)
+    Clone.CloneHelper mProps
 End Function
 
 ''
@@ -941,7 +944,7 @@ End Property
 ' @param fmt The formatting to perform on the value.
 ' @return The formatted value as a string.
 '
-Public Function format(ByRef Value As Variant, Optional ByRef fmt As String) As String
+Public Function Format(ByRef Value As Variant, Optional ByRef fmt As String) As String
     Call VerifyLoaded
     
     Dim vt As Long
@@ -951,13 +954,13 @@ Public Function format(ByRef Value As Variant, Optional ByRef fmt As String) As 
     End If
     Select Case vt
         Case vbLong, vbInteger, vbByte
-            format = FormatInt32(Value, fmt)
+            Format = FormatInt32(Value, fmt)
         Case vbDouble
-            format = FormatDouble(Value, fmt)
+            Format = FormatDouble(Value, fmt)
         Case vbSingle
-            format = FormatSingle(Value, fmt)
+            Format = FormatSingle(Value, fmt)
         Case Else
-            format = Value
+            Format = Value
     End Select
 End Function
 
@@ -1100,11 +1103,11 @@ Private Function ParseGroupSizes(ByRef src As String) As Long()
     ParseGroupSizes = Ret
 End Function
 
-Private Function FormatSingle(ByVal Value As Single, ByRef format As String) As String
+Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As String
     Dim Precision   As Long
     Dim FormatType  As Long
     
-    Call GetFormatSpecifierParts(format, FormatType, Precision)
+    Call GetFormatSpecifierParts(Format, FormatType, Precision)
 
     If ((FormatType And &HFFDF) <> GeneralFormat) And (FormatType <> CustomFormat) Then
         Call DoubleToNumber(Value, SINGLE_PRECISION)
@@ -1136,9 +1139,9 @@ Private Function FormatSingle(ByVal Value As Single, ByRef format As String) As 
 
         Case Else
             If Value < 0 Then
-                FormatSingle = mProps.NegativeSign & VBA.format$(Abs(Value), format)
+                FormatSingle = mProps.NegativeSign & VBA.Format$(Abs(Value), Format)
             Else
-                FormatSingle = VBA.format$(Value, format)
+                FormatSingle = VBA.Format$(Value, Format)
             End If
             Exit Function
     End Select
@@ -1149,11 +1152,11 @@ Private Function FormatSingle(ByVal Value As Single, ByRef format As String) As 
     End If
 End Function
 
-Private Function FormatDouble(ByVal Value As Double, ByRef format As String) As String
+Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As String
     Dim Precision   As Long
     Dim FormatType  As Long
     
-    Call GetFormatSpecifierParts(format, FormatType, Precision)
+    Call GetFormatSpecifierParts(Format, FormatType, Precision)
     
     If ((FormatType And &HFFDF) <> GeneralFormat) And (FormatType <> CustomFormat) Then
         Call DoubleToNumber(Value, DOUBLE_PRECISION)
@@ -1184,9 +1187,9 @@ Private Function FormatDouble(ByVal Value As Double, ByRef format As String) As 
         
         Case Else
             If Value < 0# Then
-                FormatDouble = mProps.NegativeSign & VBA.format$(Abs(Value), format)
+                FormatDouble = mProps.NegativeSign & VBA.Format$(Abs(Value), Format)
             Else
-                FormatDouble = VBA.format$(Value, format)
+                FormatDouble = VBA.Format$(Value, Format)
             End If
             Exit Function
     End Select
@@ -1197,11 +1200,11 @@ Private Function FormatDouble(ByVal Value As Double, ByRef format As String) As 
     End If
 End Function
 
-Private Function FormatInt32(ByRef Value As Variant, ByRef format As String) As String
+Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As String
     Dim Digits      As Long
     Dim FormatType  As Long
 
-    Call GetFormatSpecifierParts(format, FormatType, Digits)
+    Call GetFormatSpecifierParts(Format, FormatType, Digits)
     
     If ((FormatType And &HFFDF) <> HexFormat) And (FormatType <> CustomFormat) Then
         Call Int32ToNumber(Value)
@@ -1237,9 +1240,9 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef format As String) As 
         
         Case Else
             If Value < 0 Then
-                FormatInt32 = mProps.NegativeSign & VBA.format$(Abs(Value), format)
+                FormatInt32 = mProps.NegativeSign & VBA.Format$(Abs(Value), Format)
             Else
-                FormatInt32 = VBA.format$(Value, format)
+                FormatInt32 = VBA.Format$(Value, Format)
             End If
             Exit Function
     End Select

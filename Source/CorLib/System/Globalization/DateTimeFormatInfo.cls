@@ -75,8 +75,6 @@ Private Const C_RFC1123Pattern                      As String = "ddd, dd MMM yyy
 Private Const C_SORTABLEDATETIMEPATTERN             As String = "yyyy'-'MM'-'dd'T'HH':'mm':'ss"
 Private Const C_UNIVERSALSORTABLEDATETIMEPATTERN    As String = "yyyy'-'MM'-'dd HH':'mm':'ss'Z'"
 
-
-
 Private Type PropsType
     AbbreviatedDayNames()   As String
     AbbreviatedMonthNames() As String
@@ -110,14 +108,13 @@ Private mLoaded     As Boolean
 Private mPattern    As WordBuffer
 
 
-
 ''
 ' Returns the definition of the first week of the calendar year.
 '
 ' @return A <b>CalendarWeekRule</b> value.
 '
 Public Property Get CalendarWeekRule() As CalendarWeekRule
-    Call VerifyLoaded
+    VerifyLoaded
     CalendarWeekRule = mProps.CalendarWeekRule
 End Property
 
@@ -127,8 +124,8 @@ End Property
 ' @param RHS A <b>CalendarWeekRule</b> value.
 '
 Public Property Let CalendarWeekRule(ByVal RHS As CalendarWeekRule)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.CalendarWeekRule = RHS
 End Property
 
@@ -149,7 +146,7 @@ End Property
 ' @param RHS The calendar to associate with this object.
 '
 Public Property Set Calendar(ByVal RHS As Calendar)
-    Call VerifyWritable
+    VerifyWritable
     If RHS Is Nothing Then _
         Throw Cor.NewArgumentNullException("Calendar cannot be Nothing.", "Calendar")
     
@@ -162,7 +159,7 @@ End Property
 ' @return A string array containing the abbreviated weekday names.
 '
 Public Property Get AbbreviatedDayNames() As String()
-    Call VerifyLoaded
+    VerifyLoaded
     AbbreviatedDayNames = mProps.AbbreviatedDayNames
 End Property
 
@@ -174,7 +171,7 @@ End Property
 ' is ReadOnly then an exception will be thrown.
 '
 Public Property Let AbbreviatedDayNames(ByRef RHS() As String)
-    Call AssignDayNames(RHS, mProps.AbbreviatedDayNames)
+    AssignDayNames RHS, mProps.AbbreviatedDayNames
 End Property
 
 ''
@@ -183,7 +180,7 @@ End Property
 ' @return The array of names for all of the months.
 '
 Public Property Get AbbreviatedMonthNames() As String()
-    Call VerifyLoaded
+    VerifyLoaded
     AbbreviatedMonthNames = mProps.AbbreviatedMonthNames
 End Property
 
@@ -196,7 +193,7 @@ End Property
 ' If the formatter is ReadOnly, an exception will be thrown.
 '
 Public Property Let AbbreviatedMonthNames(ByRef RHS() As String)
-    Call AssignMonthNames(RHS, mProps.AbbreviatedMonthNames)
+    AssignMonthNames RHS, mProps.AbbreviatedMonthNames
 End Property
 
 ''
@@ -205,7 +202,7 @@ End Property
 ' @return The AM designator. Generally 'AM' is used.
 '
 Public Property Get AMDesignator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     AMDesignator = mProps.AMDesignator
 End Property
 
@@ -216,8 +213,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception will be thrown.
 '
 Public Property Let AMDesignator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.AMDesignator = RHS
 End Property
 
@@ -228,7 +225,7 @@ End Property
 ' @return The date separator string. Generally this is '/'.
 '
 Public Property Get DateSeparator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     DateSeparator = mProps.DateSeparator
 End Property
 
@@ -240,8 +237,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception will be thrown.
 '
 Public Property Let DateSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.DateSeparator = RHS
 End Property
 
@@ -251,7 +248,7 @@ End Property
 ' @return An array containing the full names of the weekdays.
 '
 Public Property Get DayNames() As String()
-    Call VerifyLoaded
+    VerifyLoaded
     DayNames = mProps.DayNames
 End Property
 
@@ -263,9 +260,9 @@ End Property
 ' ReadOnly, an exception will be thrown.
 '
 Public Property Let DayNames(ByRef RHS() As String)
-    Call VerifyWritable
-    Call VerifyLoaded
-    Call AssignDayNames(RHS, mProps.DayNames)
+    VerifyWritable
+    VerifyLoaded
+    AssignDayNames RHS, mProps.DayNames
 End Property
 
 ''
@@ -275,7 +272,7 @@ End Property
 ' @remarks This DayOfWeek is 0 based, unlike VB's vbDayOfWeek which is 1 based.
 '
 Public Property Get FirstDayOfWeek() As DayOfWeek
-    Call VerifyLoaded
+    VerifyLoaded
     FirstDayOfWeek = mProps.FirstDayOfWeek
 End Property
 
@@ -286,8 +283,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let FirstDayOfWeek(ByVal RHS As DayOfWeek)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.FirstDayOfWeek = RHS
 End Property
 
@@ -298,7 +295,7 @@ End Property
 ' @return The full date and time pattern.
 '
 Public Property Get FullDateTimePattern() As String
-    Call VerifyLoaded
+    VerifyLoaded
     If IsEmpty(mProps.FullDateTimePattern) Then
         mProps.FullDateTimePattern = mProps.LongDatePattern & " " & mProps.LongTimePattern
     End If
@@ -313,8 +310,8 @@ End Property
 ' @remark If this formatter is ReadOnly, an exception will be thrown.
 '
 Public Property Let FullDateTimePattern(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.FullDateTimePattern = RHS
 End Property
 
@@ -339,7 +336,7 @@ End Property
 ' @return A date-only formatting.
 '
 Public Property Get LongDatePattern() As String
-    Call VerifyLoaded
+    VerifyLoaded
     LongDatePattern = mProps.LongDatePattern
 End Property
 
@@ -351,8 +348,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let LongDatePattern(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.LongDatePattern = RHS
     mProps.FullDateTimePattern = Empty
 End Property
@@ -364,7 +361,7 @@ End Property
 ' @return The time-only formatting pattern.
 '
 Public Property Get LongTimePattern() As String
-    Call VerifyLoaded
+    VerifyLoaded
     LongTimePattern = mProps.LongTimePattern
 End Property
 
@@ -376,8 +373,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let LongTimePattern(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.LongTimePattern = RHS
     mProps.FullDateTimePattern = Empty
 End Property
@@ -389,7 +386,7 @@ End Property
 ' @return The MonthDay formatting pattern.
 '
 Public Property Get MonthDayPattern() As String
-    Call VerifyLoaded
+    VerifyLoaded
     MonthDayPattern = mProps.MonthDayPattern
 End Property
 
@@ -401,8 +398,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let MonthDayPattern(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.MonthDayPattern = RHS
 End Property
 
@@ -412,7 +409,7 @@ End Property
 ' @return An array containing the full month names.
 '
 Public Property Get MonthNames() As String()
-    Call VerifyLoaded
+    VerifyLoaded
     MonthNames = mProps.MonthNames
 End Property
 
@@ -425,7 +422,7 @@ End Property
 ' If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let MonthNames(ByRef RHS() As String)
-    Call AssignMonthNames(RHS, mProps.MonthNames)
+    AssignMonthNames RHS, mProps.MonthNames
 End Property
 
 ''
@@ -434,7 +431,7 @@ End Property
 ' @return The current PM designator. Generally this is 'PM'.
 '
 Public Property Get PMDesignator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     PMDesignator = mProps.PMDesignator
 End Property
 
@@ -445,8 +442,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let PMDesignator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PMDesignator = RHS
 End Property
 
@@ -466,7 +463,7 @@ End Property
 ' @return The formatting pattern for a short date.
 '
 Public Property Get ShortDatePattern() As String
-    Call VerifyLoaded
+    VerifyLoaded
     ShortDatePattern = mProps.ShortDatePattern
 End Property
 
@@ -477,8 +474,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let ShortDatePattern(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.ShortDatePattern = RHS
 End Property
 
@@ -488,7 +485,7 @@ End Property
 ' @return The short time formatting pattern.
 '
 Public Property Get ShortTimePattern() As String
-    Call VerifyLoaded
+    VerifyLoaded
     ShortTimePattern = mProps.ShortTimePattern
 End Property
 
@@ -499,8 +496,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let ShortTimePattern(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.ShortDatePattern = RHS
 End Property
 
@@ -522,7 +519,7 @@ End Property
 ' @return The time component separator.
 '
 Public Property Get TimeSeparator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     TimeSeparator = mProps.TimeSeparator
 End Property
 
@@ -533,8 +530,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let TimeSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.TimeSeparator = RHS
 End Property
 
@@ -558,7 +555,7 @@ End Property
 ' @return The YearMonth formatting pattern.
 '
 Public Property Get YearMonthPattern() As String
-    Call VerifyLoaded
+    VerifyLoaded
     YearMonthPattern = mProps.YearMonthPattern
 End Property
 
@@ -570,8 +567,8 @@ End Property
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
 Public Property Let YearMonthPattern(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.YearMonthPattern = RHS
 End Property
 
@@ -583,7 +580,7 @@ End Property
 '
 Public Function Clone() As DateTimeFormatInfo
     Set Clone = New DateTimeFormatInfo
-    Call Clone.CloneHelper(mProps)
+    Clone.CloneHelper mProps
 End Function
 
 ''
@@ -595,7 +592,7 @@ End Function
 ' which is 1 based.
 '
 Public Function GetAbbreviatedDayName(ByVal dow As DayOfWeek) As String
-    Call VerifyLoaded
+    VerifyLoaded
     GetAbbreviatedDayName = mProps.AbbreviatedDayNames(dow)
 End Function
 
@@ -610,7 +607,7 @@ End Function
 ' regardless of the culture.</p>
 '
 Public Function GetAbbreviatedEraName(ByVal Era As Long) As String
-    Call VerifyLoaded
+    VerifyLoaded
     Era = "AD"
 End Function
 
@@ -621,7 +618,7 @@ End Function
 ' @return The name of the specified month.
 '
 Public Function GetAbbreviatedMonthName(ByVal Month As Long) As String
-    Call VerifyLoaded
+    VerifyLoaded
     
     If Month < 1 Or Month > 13 Then _
         Throw Cor.NewArgumentOutOfRangeException("Month must be between 1 and 13.", "Month", Month)
@@ -636,13 +633,13 @@ End Function
 ' @param Format The formatting command to retrieve all the patterns for.
 ' @return An array of all the requested formatting patterns.
 '
-Public Function GetAllDateTimePatterns(Optional ByRef format As Variant) As String()
-    Call VerifyLoaded
-    If IsMissing(format) Then
+Public Function GetAllDateTimePatterns(Optional ByRef Format As Variant) As String()
+    VerifyLoaded
+    If IsMissing(Format) Then
         GetAllDateTimePatterns = CombineAllDateTimePatterns
     Else
-        If VarType(format) = vbString Then format = Asc(format)
-        GetAllDateTimePatterns = GetSpecificDateTimePattern(format)
+        If VarType(Format) = vbString Then Format = Asc(Format)
+        GetAllDateTimePatterns = GetSpecificDateTimePattern(Format)
     End If
 End Function
 
@@ -653,7 +650,7 @@ End Function
 ' @return The name for the day of the week.
 '
 Public Function GetDayName(ByVal dow As DayOfWeek) As String
-    Call VerifyLoaded
+    VerifyLoaded
     GetDayName = mProps.DayNames(dow)
 End Function
 
@@ -666,7 +663,7 @@ End Function
 ' for all era names and cultures.
 '
 Public Function GetEra(ByRef eraName As String) As Long
-    Call VerifyLoaded
+    VerifyLoaded
     ' need to update the culture table to handle multiple eras.
     GetEra = 1
 End Function
@@ -680,7 +677,7 @@ End Function
 ' 'A.D.' for all numbers and cultures.
 '
 Public Function GetEraName(ByVal Era As Long) As String
-    Call VerifyLoaded
+    VerifyLoaded
     ' need to update the culture table to handle multiple eras.
     GetEraName = "A.D." ' mProps.Era
 End Function
@@ -705,7 +702,7 @@ End Function
 ' @remarks The valid range is 1 to 13.
 '
 Public Function GetMonthName(ByVal Month As Long) As String
-    Call VerifyLoaded
+    VerifyLoaded
     
     If Month < 1 Or Month > 13 Then _
         Throw Cor.NewArgumentOutOfRangeException("Month must be between 1 and 13.", "Month", Month)
@@ -738,9 +735,9 @@ End Function
 ' u - UniversalSortableDateTimePattern<br>
 ' y,Y - YearMonthPattern<br>
 '
-Public Function format(ByRef Value As Variant, Optional ByVal fmt As String) As String
-    Call VerifyLoaded
-    format = CustomFormat(cDateTime.GetcDateTime(Value), GetPattern(fmt))
+Public Function Format(ByRef Value As Variant, Optional ByVal fmt As String) As String
+    VerifyLoaded
+    Format = CustomFormat(cDateTime.GetcDateTime(Value), GetPattern(fmt))
 End Function
 
 ''
@@ -782,12 +779,12 @@ Friend Sub Load(ByVal LCID As Long, ByVal UseUserOverride As Boolean, Optional B
         Throw Cor.NewNotSupportedException("Cannot load DateTimeFormatInfo without culture table.")
     
     Set mProps.Calendar = Calendar
-    Call LoadCommon(LCID)
+    LoadCommon LCID
     
     If UseUserOverride Then
-        Call LoadUserOverride(LCID)
+        LoadUserOverride LCID
     Else
-        Call LoadFromCultureTable(LCID)
+        LoadFromCultureTable LCID
     End If
     mLoaded = True
 End Sub
@@ -907,24 +904,24 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
                             Case 1:         Call sb.Append(YearMod100)
                             Case 2:
                                 If YearMod100 < 10 Then Call sb.AppendChar(vbZero)
-                                Call sb.Append(YearMod100)
+                                sb.Append YearMod100
                             Case Else
-                                Call sb.AppendFormat("{0:d" & cnt & "}", Year)
+                                sb.AppendFormat "{0:d" & cnt & "}", Year
                         End Select
                         
                     Case vbLowerT
                         If cnt = 1 Then
-                            Call sb.AppendString(Designator, 0, 1)
+                            sb.AppendString Designator, 0, 1
                         Else
-                            Call sb.AppendString(Designator)
+                            sb.AppendString Designator
                         End If
                     
                     Case vbLowerZ
                         If ZoneOffset Is Nothing Then Set ZoneOffset = TimeZone.CurrentTimeZone.GetUtcOffset(dt)
                         Select Case cnt
-                            Case 1:         Call sb.AppendString(VBA.format$(ZoneOffset.Hours, "0;-0"))
-                            Case 2:         Call sb.AppendString(VBA.format$(ZoneOffset.Hours, "00;-00"))
-                            Case Else:      Call sb.AppendString(VBA.format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.format$(ZoneOffset.Minutes, "00"))
+                            Case 1:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "0;-0"))
+                            Case 2:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00"))
+                            Case Else:      Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.Format$(ZoneOffset.Minutes, "00"))
                         End Select
                     
                     Case vbPercent

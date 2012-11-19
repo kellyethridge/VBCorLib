@@ -95,7 +95,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-
 Private mChars As WordBuffer
 
 
@@ -127,7 +126,7 @@ Public Function ToBase64String(ByRef Bytes() As Byte, Optional ByRef Index As Va
     ToBase64String = SysAllocStringLen(0, size)
     mChars.SA.pvData = StrPtr(ToBase64String)
     mChars.SA.cElements = Len(ToBase64String)
-    Call ToBase64CharArray(Bytes, ElemIndex, ElemCount, mChars.Data, 0, InsertLineBreaks)
+    ToBase64CharArray Bytes, ElemIndex, ElemCount, mChars.Data, 0, InsertLineBreaks
 End Function
 
 ''
@@ -309,7 +308,7 @@ End Function
 ' @param Provider A formatting provider to help custom formatting.
 ' @return A string representation of the value.
 '
-Public Function ToString(ByRef Value As Variant, Optional ByVal format As String, Optional ByVal Provider As IFormatProvider) As String
+Public Function ToString(ByRef Value As Variant, Optional ByVal Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim vt As Long
     vt = VarType(Value)
     If vt = vbVariant Then
@@ -321,19 +320,19 @@ Public Function ToString(ByRef Value As Variant, Optional ByVal format As String
             Dim nf As NumberFormatInfo
             If Not Provider Is Nothing Then Set nf = Provider.GetFormat("numberformatinfo")
             If nf Is Nothing Then Set nf = NumberFormatInfo.CurrentInfo
-            ToString = nf.format(Value, format)
+            ToString = nf.Format(Value, Format)
         Case vbDate
             Dim df As DateTimeFormatInfo
             If Not Provider Is Nothing Then Set df = Provider.GetFormat("datetimeformatinfo")
             If df Is Nothing Then Set df = DateTimeFormatInfo.CurrentInfo
-            ToString = df.format(Value, format)
+            ToString = df.Format(Value, Format)
         Case vbObject
             If Value Is Nothing Then
                 ToString = "Nothing"
             ElseIf TypeOf Value Is IFormattable Then
                 Dim f As IFormattable
                 Set f = Value
-                ToString = f.ToString(format, Provider)
+                ToString = f.ToString(Format, Provider)
             ElseIf TypeOf Value Is IObject Then
                 Dim o As IObject
                 Set o = Value
@@ -357,5 +356,5 @@ End Function
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call InitWordBuffer(mChars, 0, &H7FFFFFFF)
+    InitWordBuffer mChars, 0, &H7FFFFFFF
 End Sub
