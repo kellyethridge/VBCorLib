@@ -176,6 +176,84 @@ Public Sub Chars_WithSet_ReplacesCharacter()
     Assert.That Actual, Iz.EqualTo("1101")
 End Sub
 
+Public Sub AppendChars_WithEmptyArray_DoesNotAppend()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    Chars = NewIntegers()
+    
+    sb.AppendChars Chars
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub AppendChars_WithNullArray_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    
+    On Error Resume Next
+    sb.AppendChars Chars
+    
+    AssertArgumentNullException Err, "Chars"
+End Sub
+
+Public Sub AppendChars_WithCharacters_Appends()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    Chars = NewIntegers(49, 50, 51)
+    
+    sb.AppendChars Chars
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("123")
+End Sub
+
+Public Sub AppendChars_WithStartIndexLessThanLBound_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    Chars = NewIntegers(49)
+    
+    On Error Resume Next
+    sb.AppendChars Chars, -1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub AppendChars_WithStartIndexAndCharCountLongerThanChars_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    Chars = NewIntegers(49, 50, 51)
+    
+    On Error Resume Next
+    sb.AppendChars Chars, 0, 4
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub AppendChars_WithMultiDimensionArray_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars(0, 0) As Integer
+    
+    On Error Resume Next
+    sb.AppendChars Chars
+    
+    AssertRankException Err
+End Sub
+
+Public Sub AppendChars_WithStartIndexAndCharCount_AppendsSubArray()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    Chars = NewIntegers(65, 66, 67, 68, 69)
+    
+    sb.AppendChars Chars, 1, 3
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("BCD")
+End Sub
+
 Public Sub TestSetLengthPastCapacity()
     sb.Capacity = 10
     sb.Append "12345"
@@ -196,27 +274,7 @@ Public Sub TestAppendSubString()
     Assert.AreEqual "llo", sb.ToString
 End Sub
 
-Public Sub TestAppendChars()
-    Dim Chars(9) As Integer
-    Dim i As Long
-    For i = 0 To 9
-        Chars(i) = 48 + i
-    Next i
-    
-    sb.AppendChars Chars
-    Assert.AreEqual "0123456789", sb.ToString
-End Sub
 
-Public Sub TestAppendSubChars()
-    Dim Chars(9) As Integer
-    Dim i As Long
-    For i = 0 To 9
-        Chars(i) = 48 + i
-    Next i
-    
-    sb.AppendChars Chars, 2, 3
-    Assert.AreEqual "234", sb.ToString
-End Sub
 
 Public Sub TestInsertString()
     sb.Append "1234567890"
