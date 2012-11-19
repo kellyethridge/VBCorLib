@@ -77,7 +77,10 @@ Private mData               As Hashtable
 ' classes to allow user-defined information to be included with the exception.
 '
 Public Property Get Data() As IDictionary
-    If mData Is Nothing Then Set mData = New Hashtable
+    If mData Is Nothing Then
+        Set mData = New Hashtable
+    End If
+    
     Set Data = mData
 End Property
 
@@ -105,7 +108,7 @@ End Sub
 '
 Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant) As Variant
     ' Steal the returned value from the Hashtable.
-    Call Helper.MoveVariant(GetValue, Values(Name))
+    Helper.MoveVariant GetValue, Values(Name)
     
     ' An empty value is the default return value for a key
     ' that does not exist in a Hashtable. It is also a valid
@@ -115,7 +118,9 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
     ' having to call into the Hashtable twice unless the
     ' returned value is Empty.
     If IsEmpty(GetValue) Then
-        If Not Values.Contains(Name) Then Call VariantCopyInd(GetValue, Default)
+        If Not Values.Contains(Name) Then
+            VariantCopyInd GetValue, Default
+        End If
     End If
 End Function
 
@@ -284,7 +289,7 @@ End Function
 ' VBCorLib.SystemException: An Error has occurred.
 ' <p>A listing of all inner exceptions will be included in the return value.</p>
 '
-Public Function ToString(Optional ByVal FormattedMessage As String)
+Public Function ToString(Optional ByRef FormattedMessage As String)
     If Len(mSubclassName) > 0 Then ToString = mSubclassName & ": "
     
     If cString.IsNull(FormattedMessage) Then
@@ -293,7 +298,9 @@ Public Function ToString(Optional ByVal FormattedMessage As String)
         ToString = ToString & FormattedMessage
     End If
     
-    If Not mInnerException Is Nothing Then ToString = ToString & vbCrLf & "---> " & mInnerException.ToString
+    If Not mInnerException Is Nothing Then
+        ToString = ToString & vbCrLf & "---> " & mInnerException.ToString
+    End If
 End Function
 
 ''
@@ -319,7 +326,7 @@ End Function
 ' hashcode as the Subclass object.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(Subclass)
+    GetHashCode = mSubclass
 End Function
 
 
@@ -395,7 +402,7 @@ End Property
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Call LoadDefaults
+    LoadDefaults
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
@@ -416,20 +423,20 @@ End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_MESSAGE, mMessage)
-        Call .WriteProperty(PROP_ISNULLMESSAGE, cString.IsNull(mMessage))
-        Call .WriteProperty(PROP_HRESULT, mHResult)
-        Call .WriteProperty(PROP_SOURCE, mSource)
-        Call .WriteProperty(PROP_HELPLINK, mHelpLink)
-        Call .WriteProperty(PROP_INNEREXCEPTION, mInnerException)
+        .WriteProperty PROP_MESSAGE, mMessage
+        .WriteProperty PROP_ISNULLMESSAGE, cString.IsNull(mMessage)
+        .WriteProperty PROP_HRESULT, mHResult
+        .WriteProperty PROP_SOURCE, mSource
+        .WriteProperty PROP_HELPLINK, mHelpLink
+        .WriteProperty PROP_INNEREXCEPTION, mInnerException
         
         ' Save the Hashtable only if it has been used.
         If Not mValues Is Nothing Then
-            Call .WriteProperty(PROP_VALUES, mValues)
+            .WriteProperty PROP_VALUES, mValues
         End If
         
         If Not mData Is Nothing Then
-            Call .WriteProperty(PROP_DATA, mData)
+            .WriteProperty PROP_DATA, mData
         End If
     End With
 End Sub

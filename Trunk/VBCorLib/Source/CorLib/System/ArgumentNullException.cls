@@ -56,12 +56,12 @@ Implements Exception
 Implements SystemException
 Implements ArgumentException
 
-Private Const PROP_PARAMNAME         As String = "ParamName"
 Private Const PROP_BASE              As String = "Base"
 Private Const DEF_HRESULT            As Long = E_POINTER
 
 ' This can do it all.
-Private mBase As ExceptionBase
+Private mBase       As ExceptionBase
+Private mParamName  As String
 
 
 
@@ -83,7 +83,7 @@ End Property
 ' @see Exception
 '
 Public Property Get ParamName() As String
-    ParamName = mBase.GetValue(PROP_PARAMNAME, "")
+    ParamName = mParamName
 End Property
 
 ''
@@ -171,7 +171,9 @@ Public Property Get Message() As String
     
     Dim ParamName As String
     ParamName = Me.ParamName
-    If Len(ParamName) > 0 Then Message = Message & vbCrLf & vbCrLf & "Parameter Name: " & ParamName
+    If Len(ParamName) > 0 Then
+        Message = Message & vbCrLf & vbCrLf & "Parameter Name: " & ParamName
+    End If
 End Property
 
 ''
@@ -241,15 +243,13 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Message As String, ByRef ParamName As String, ByRef InnerException As Exception)
+Friend Sub Init(ByVal Message As String, ByRef ParamName As String, ByVal InnerException As Exception)
     If Len(Message) = 0 Then
         Message = Resources.GetString(ArgumentNull_Generic)
     End If
     
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
-    If Len(ParamName) > 0 Then
-        mBase.SetValue PROP_PARAMNAME, ParamName
-    End If
+    mParamName = ParamName
 End Sub
 
 

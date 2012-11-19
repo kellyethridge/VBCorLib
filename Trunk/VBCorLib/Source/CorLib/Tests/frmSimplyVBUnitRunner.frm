@@ -278,7 +278,7 @@ Private Sub Form_Load()
 
     Dim ExceptionTests As TestSuite
     Set ExceptionTests = Sim.NewTestSuite("Exception Tests")
-    ExceptionTests.Add New TestException
+    ExceptionTests.Add New ExceptionTests
     ExceptionTests.Add New TestDefaultException
     ExceptionTests.Add New TestSystemException
     ExceptionTests.Add New TestDefaultSystemEx
