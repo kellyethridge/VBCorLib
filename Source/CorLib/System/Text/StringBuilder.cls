@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: StringBuilder
+' Module: StringBuilder
 '
 
 ''
@@ -69,7 +72,6 @@ Private BufStrSA    As SafeArray1d
 Private mChars      As WordBuffer
 
 
-
 ''
 ' Appends a string to the current string value.
 '
@@ -103,14 +105,16 @@ Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1)
     
     If Char > &H7FFF& Then Char = Char - &H10000
     
-    If mLength + Count > mCapacity Then Call EnsureCapacity(mLength + Count)
+    If mLength + Count > mCapacity Then
+        EnsureCapacity mLength + Count
+    End If
     
     ' appending 1 character at a time happens 99%
     ' of the time, so optimize for it.
     If Count = 1 Then
         mString(mLength) = Char
     Else
-        Call Fill(mLength, Char, Count)
+        Fill mLength, Char, Count
     End If
     mLength = mLength + Count
     Set AppendChar = Me
@@ -137,8 +141,11 @@ Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef StartIndex 
         Exit Function
     End If
     
-    If mLength + ElemCount > mCapacity Then Call EnsureCapacity(mLength + ElemCount)
-    Call CopyMemory(mString(mLength), Chars(ElemIndex), ElemCount * 2)
+    If mLength + ElemCount > mCapacity Then
+        EnsureCapacity mLength + ElemCount
+    End If
+    
+    CopyMemory mString(mLength), Chars(ElemIndex), ElemCount * 2
     mLength = mLength + ElemCount
     Set AppendChars = Me
 End Function
@@ -158,10 +165,10 @@ End Function
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 ' @include "..\..\Includes\StringBuilder.AppendFormat.txt"
-Public Function AppendFormat(ByRef format As String, ParamArray Args() As Variant) As StringBuilder
+Public Function AppendFormat(ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim vArgs() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16))
-    Call InternalAppendFormat(Nothing, format, vArgs)
+    Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16)
+    InternalAppendFormat Nothing, Format, vArgs
     Set AppendFormat = Me
 End Function
 
@@ -184,10 +191,10 @@ End Function
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 '
-Public Function AppendFormatEx(ByVal Provider As IFormatProvider, ByRef format As String, ParamArray Args() As Variant) As StringBuilder
+Public Function AppendFormatEx(ByVal Provider As IFormatProvider, ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim vArgs() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(20))
-    Call InternalAppendFormat(Provider, format, vArgs)
+    Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(20)
+    InternalAppendFormat Provider, Format, vArgs
     Set AppendFormatEx = Me
 End Function
 
@@ -204,15 +211,26 @@ End Function
 ' in order to keep the overhead cost down on the function call.</p>
 '
 Public Function AppendString(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(Len(s), StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
-
-    If mLength + ElemCount > mCapacity Then Call EnsureCapacity(mLength + ElemCount)
-    Call CopyMemory(ByVal mStringPtr + mLength * 2, ByVal StrPtr(s) + ElemIndex * 2, ElemCount * 2)
+    Dim ElemIndex As Long
+    Dim ElemCount As Long
+    
+    ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemCount = GetOptionalLong(Count, Len(s) - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "StartIndex")
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
+    If ElemIndex + ElemCount > Len(s) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+        
+    If mLength + ElemCount > mCapacity Then
+        EnsureCapacity mLength + ElemCount
+    End If
+    
+    CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s) + ElemIndex * 2, ElemCount * 2
     mLength = mLength + ElemCount
+    
     Set AppendString = Me
 End Function
 
@@ -223,7 +241,8 @@ End Function
 ' @return A reference to this instance of StringBuilder.
 '
 Public Function AppendLine(Optional ByVal s As String) As StringBuilder
-    Call AppendQuick(s & vbCrLf)
+    AppendQuick s
+    AppendQuick vbCrLf
     Set AppendLine = Me
 End Function
 
@@ -237,10 +256,15 @@ End Function
 Public Sub AppendQuick(ByRef s As String)
     Dim ElemCount As Long
     ElemCount = Len(s)
-    If ElemCount = 0 Then Exit Sub
-    If mLength + ElemCount > mCapacity Then Call EnsureCapacity(mLength + ElemCount)
-    Call CopyMemory(ByVal mStringPtr + mLength * 2, ByVal StrPtr(s), ElemCount * 2)
-    mLength = mLength + ElemCount
+    
+    If ElemCount > 0 Then
+        If mLength + ElemCount > mCapacity Then
+            EnsureCapacity mLength + ElemCount
+        End If
+        
+        CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s), ElemCount * 2
+        mLength = mLength + ElemCount
+    End If
 End Sub
 
 ''
@@ -283,9 +307,11 @@ Public Property Let Capacity(ByVal RHS As Long)
     
     Dim Ptr As Long
     Ptr = CoTaskMemAlloc(RHS * 2)
-    If Ptr = vbNullPtr Then Throw New OutOfMemoryException
-    Call CopyMemory(ByVal Ptr, ByVal mStringPtr, mLength * 2)
-    Call CoTaskMemFree(mStringPtr)
+    If Ptr = vbNullPtr Then _
+        Throw New OutOfMemoryException
+        
+    CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * 2
+    CoTaskMemFree mStringPtr
     mStringPtr = Ptr
     mStringSA.pvData = Ptr
     mCapacity = RHS
@@ -334,7 +360,9 @@ Public Function EnsureCapacity(ByVal RequiredCapacity As Long) As Long
     
     Dim NewCapacity As Long
     NewCapacity = mCapacity * 2
-    If RequiredCapacity > NewCapacity Then NewCapacity = RequiredCapacity
+    If RequiredCapacity > NewCapacity Then
+        NewCapacity = RequiredCapacity
+    End If
     Capacity = NewCapacity
     EnsureCapacity = NewCapacity
 End Function
@@ -660,7 +688,7 @@ End Function
 '
 ' "http://www.codeproject.com/csharp/custstrformat.asp"
 '
-Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef format As String, ByRef Args() As Variant)
+Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
     Dim CustomFormatter     As ICustomFormatter
     Dim HasCustomFormatter  As Boolean
     Dim Index               As Long
@@ -673,8 +701,8 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef format 
         HasCustomFormatter = Not (CustomFormatter Is Nothing)
     End If
     
-    Max = Len(format)
-    mChars.SA.pvData = StrPtr(format)
+    Max = Len(Format)
+    mChars.SA.pvData = StrPtr(Format)
     mChars.SA.cElements = Max
     
     ' Parse normal substring.
@@ -719,7 +747,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef format 
                     
                     ' Give a custom formatter first shot at formatting.
                     If HasCustomFormatter Then
-                        s = CustomFormatter.format(ArgFormatting, Args(ArgIndex), Provider)
+                        s = CustomFormatter.Format(ArgFormatting, Args(ArgIndex), Provider)
                     End If
                     
                     ' We distinguish between a null string and an empty string.

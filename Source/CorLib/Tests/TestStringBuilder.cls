@@ -6,46 +6,174 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestStringBuilder"
+Attribute VB_Name = "StringBuilderTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ITestCaseSource
+
+Private Const CHARACTER_ZERO As Long = 48
 
 Private sb As StringBuilder
+
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "Append_WithValues_Appends"
+            Test.Use "a", "a"
+            Test.Use 1, "1"
+            Test.Use 1.2, "1.2"
+            Test.Use True, "True"
+            Test.Use String$(10000, "a"), String$(10000, "a")
+            Test.Use "", ""
+            Test.Use MakeInt32(5), "5"
+            
+    End Select
+End Sub
 
 Public Sub Setup()
     Set sb = New StringBuilder
 End Sub
 
-Public Sub TestAppend()
-    Assert.AreEqual "HelloBye", sb.Append("Hello").Append("Bye").ToString
-End Sub
-
-Public Sub TestAppendString()
-    sb.Append "Hello"
-    sb.Append "Bye"
-    Assert.AreEqual "HelloBye", sb.ToString
-End Sub
-
-Public Sub TestAppend50Chars()
-    sb.AppendChar 48, 50
-    Assert.AreEqual String$(50, "0"), sb.ToString
-End Sub
-
-Public Sub TestAppendOneChar()
-    sb.AppendChar 48
-    Assert.AreEqual "0", sb.ToString
-End Sub
-
-Public Sub TestChars()
-    sb.Append "1111111111"
-    sb(2) = 50
-    sb(3) = 50
+Public Sub Append_WithValues_Appends(ByRef Value As Variant, ByVal Expected As String)
+    Dim sb As New StringBuilder
     
-    Assert.AreEqual 49, sb(1)
-    Assert.AreEqual "1122111111", sb.ToString
+    sb.Append Value
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Append_WithMultipleCalls_Appends()
+    Dim sb As New StringBuilder
+    sb.Append "a"
+    
+    sb.Append "b"
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("ab")
+End Sub
+
+Public Sub Append_WithHugeMultipleCalls_Appends()
+    Dim sb As New StringBuilder
+    sb.Append Space$(10000)
+    
+    sb.Append Space$(10000)
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo(Space$(20000))
+End Sub
+
+Public Sub Append_WithStartIndex_AppendSubString()
+    Dim sb As New StringBuilder
+    
+    sb.Append "123456", 3
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("456")
+End Sub
+
+Public Sub Append_WithStartIndexAndCount_AppendsSubString()
+    Dim sb As New StringBuilder
+    
+    sb.Append "123456", 2, 2
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("34")
+End Sub
+
+Public Sub Append_WithStartIndexLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.Append "abc", -1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub Append_WithCountLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.Append "abc", , -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Append_WithStartIndexAndCountPassedLengthOfValue_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.Append "abc", 0, 4
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub AppendChar_WhenCalled_Appends()
+    Dim sb As New StringBuilder
+    
+    sb.AppendChar CHARACTER_ZERO, 50
+    
+    Assert.AreEqual String$(50, "0"), sb.ToString
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo(String$(50, "0"))
+End Sub
+
+Public Sub AppendChar_WithDefaultCount_AppendsOneCharacter()
+    Dim sb As New StringBuilder
+    
+    sb.AppendChar CHARACTER_ZERO
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("0")
+End Sub
+
+Public Sub AppendChar_WithCountOfZero_DoesNotAppend()
+    Dim sb As New StringBuilder
+    
+    sb.AppendChar CHARACTER_ZERO, 0
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub AppendChar_WithCountLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.AppendChar CHARACTER_ZERO, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Chars_WithGet_ReturnsCharacter()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    Dim Actual As Long
+    Actual = sb(1)
+    
+    Assert.That Actual, Iz.EqualTo(Asc("b"))
+End Sub
+
+Public Sub Chars_WithSet_ReplacesCharacter()
+    sb.Append "1111"
+    
+    sb(2) = CHARACTER_ZERO
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("1101")
 End Sub
 
 Public Sub TestSetLengthPastCapacity()
@@ -69,24 +197,24 @@ Public Sub TestAppendSubString()
 End Sub
 
 Public Sub TestAppendChars()
-    Dim chars(9) As Integer
+    Dim Chars(9) As Integer
     Dim i As Long
     For i = 0 To 9
-        chars(i) = 48 + i
+        Chars(i) = 48 + i
     Next i
     
-    sb.AppendChars chars
+    sb.AppendChars Chars
     Assert.AreEqual "0123456789", sb.ToString
 End Sub
 
 Public Sub TestAppendSubChars()
-    Dim chars(9) As Integer
+    Dim Chars(9) As Integer
     Dim i As Long
     For i = 0 To 9
-        chars(i) = 48 + i
+        Chars(i) = 48 + i
     Next i
     
-    sb.AppendChars chars, 2, 3
+    sb.AppendChars Chars, 2, 3
     Assert.AreEqual "234", sb.ToString
 End Sub
 
@@ -115,25 +243,25 @@ End Sub
 
 Public Sub TestInsertChars()
     sb.Append "1234567890"
-    Dim chars() As Integer
-    chars = NewIntegers(97, 97, 97)
-    sb.Insertchars 2, chars
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
+    sb.Insertchars 2, Chars
     Assert.AreEqual "12aaa34567890", sb.ToString
 End Sub
 
 Public Sub TestInsertCharsAtEnd()
     sb.Append "Hello"
-    Dim chars() As Integer
-    chars = NewIntegers(97, 97, 97)
-    sb.Insertchars 5, chars
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
+    sb.Insertchars 5, Chars
     Assert.AreEqual "Helloaaa", sb.ToString
 End Sub
 
 Public Sub TestInsertSubChars()
     sb.Append "1234567890"
-    Dim chars() As Integer
-    chars = NewIntegers(97, 98, 99, 100)
-    sb.Insertchars 2, chars, 1, 3
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 98, 99, 100)
+    sb.Insertchars 2, Chars, 1, 3
     Assert.AreEqual "12bcd34567890", sb.ToString
 End Sub
 

@@ -273,7 +273,7 @@ Private Sub Form_Load()
     AddTest ArrayListTests
     
     AddTest New TestcString
-    AddTest New TestStringBuilder
+    AddTest New StringBuilderTests
     AddTest New TestDefaultComparer
 
     Dim ExceptionTests As TestSuite
