@@ -264,7 +264,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Call Init(vbNullString, Nothing)
+    Init vbNullString, Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
@@ -272,7 +272,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty(PROP_BASE, mBase)
+    PropBag.WriteProperty PROP_BASE, mBase
 End Sub
 
 

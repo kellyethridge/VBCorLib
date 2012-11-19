@@ -22,8 +22,8 @@ Public Sub Setup()
     Set Ex = New ArgumentNullException
 End Sub
 
-Public Sub TestMessage()
-    Assert.AreEqual EXPECTED_MESSAGE, Ex.Message, "Incorrect Message was returned."
+Public Sub Message_WhenDefault_IsNotEmpty()
+    Assert.That Ex.Message, Iz.Not.Empty
 End Sub
 
 Public Sub TestNullInnerException()
