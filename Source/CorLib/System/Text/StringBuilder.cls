@@ -49,10 +49,12 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const DEF_FILLCHAR          As Integer = vbSpace
-Private Const DEF_CAPACITY          As Long = 512
-Private Const OPEN_BRACE            As Long = 123
-Private Const CLOSE_BRACE           As Long = 125
+Private Const DefaultFillChar   As Integer = vbSpace
+Private Const DefaultCapacity   As Long = 512
+Private Const OpenBraceChar     As Long = 123
+Private Const CloseBraceChar    As Long = 125
+Private Const BytesPerChar      As Long = 2
+
 
 ' module wide scope
 Private mStringPtr  As Long
@@ -144,17 +146,15 @@ Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef startIndex 
     If ElemIndex + ElemCount - 1 > UBound(Chars) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
     
-    If ElemCount = 0 Then
-        Set AppendChars = Me
-        Exit Function
+    If ElemCount > 0 Then
+        If mLength + ElemCount > mCapacity Then
+            EnsureCapacity mLength + ElemCount
+        End If
+        
+        CopyMemory mString(mLength), Chars(ElemIndex), ElemCount * BytesPerChar
+        mLength = mLength + ElemCount
     End If
     
-    If mLength + ElemCount > mCapacity Then
-        EnsureCapacity mLength + ElemCount
-    End If
-    
-    CopyMemory mString(mLength), Chars(ElemIndex), ElemCount * 2
-    mLength = mLength + ElemCount
     Set AppendChars = Me
 End Function
 
@@ -236,7 +236,7 @@ Public Function AppendString(ByRef s As String, Optional ByRef startIndex As Var
         EnsureCapacity mLength + ElemCount
     End If
     
-    CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s) + ElemIndex * 2, ElemCount * 2
+    CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
     mLength = mLength + ElemCount
     
     Set AppendString = Me
@@ -270,7 +270,7 @@ Public Sub AppendQuick(ByRef s As String)
             EnsureCapacity mLength + ElemCount
         End If
         
-        CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s), ElemCount * 2
+        CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s), ElemCount * BytesPerChar
         mLength = mLength + ElemCount
     End If
 End Sub
@@ -290,9 +290,12 @@ Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByV
         ThrowArrayRangeException Result, "Destination", DestinationIndex, "DestinationIndex", Count, "Count"
     
     Result = VerifyListRange(mLength, SourceIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, SourceIndex, "SourceIndex", Count, "Count")
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, SourceIndex, "SourceIndex", Count, "Count"
     
-    If Count > 0 Then Call CopyMemory(Destination(DestinationIndex), ByVal mStringPtr + SourceIndex * 2, Count * 2)
+    If Count > 0 Then
+        CopyMemory Destination(DestinationIndex), ByVal mStringPtr + SourceIndex * BytesPerChar, Count * BytesPerChar
+    End If
 End Sub
 
 ''
@@ -314,11 +317,11 @@ Public Property Let Capacity(ByVal RHS As Long)
         Throw Cor.NewArgumentOutOfRangeException("Cannot set capacity less than the length of the current instance.", "Capacity", RHS)
     
     Dim Ptr As Long
-    Ptr = CoTaskMemAlloc(RHS * 2)
+    Ptr = CoTaskMemAlloc(RHS * BytesPerChar)
     If Ptr = vbNullPtr Then _
         Throw New OutOfMemoryException
         
-    CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * 2
+    CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
     CoTaskMemFree mStringPtr
     mStringPtr = Ptr
     mStringSA.pvData = Ptr
@@ -349,7 +352,7 @@ End Property
 '
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "Index", Index)
     
     mString(Index) = Char
 End Property
@@ -432,18 +435,18 @@ End Function
 '
 Public Function Insert(ByVal Index As Long, ByVal Value As String, Optional ByVal Count As Long = 1) As StringBuilder
     If Index < 0 Or Index > mLength Then _
-        Throw Cor.NewIndexOutOfRangeException("index must be non-negative and less than or equal to the length.")
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index", Index)
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
         
     Dim l As Long
     l = Len(Value)
     If l > 0 And Count > 0 Then
         mLength = InsertSpace(Index, l * Count)
-        l = l * 2
-        Index = Index * 2
+        l = l * BytesPerChar
+        Index = Index * BytesPerChar
         Do While Count > 0
-            Call CopyMemory(ByVal mStringPtr + Index, ByVal StrPtr(Value), l)
+            CopyMemory ByVal mStringPtr + Index, ByVal StrPtr(Value), l
             Index = Index + l
             Count = Count - 1
         Loop
@@ -472,7 +475,7 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
         Throw Cor.NewArgumentOutOfRangeException("Index must be between 0 and then length of the current instance.", "Index", Index)
     
     mLength = InsertSpace(Index, ElemCount)
-    Call CopyMemory(mString(Index), Chars(ElemIndex), ElemCount * 2)
+    CopyMemory mString(Index), Chars(ElemIndex), ElemCount * BytesPerChar
     Set InsertChars = Me
 End Function
 
@@ -494,11 +497,13 @@ End Property
 '
 Public Property Let Length(ByVal RHS As Long)
     If RHS < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length cannot be set less than 0.", "Length", Length)
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length", Length)
     
     If RHS > mLength Then
-        If RHS > mCapacity Then Call EnsureCapacity(RHS)
-        Call Fill(mLength, mFillChar, mCapacity - mLength)
+        If RHS > mCapacity Then
+            EnsureCapacity RHS
+        End If
+        Fill mLength, mFillChar, mCapacity - mLength
     End If
     mLength = RHS
 End Property
@@ -514,10 +519,11 @@ End Property
 Public Function Remove(ByVal startIndex As Long, ByVal Count As Long) As StringBuilder
     Dim Result As Long
     Result = VerifyListRange(mLength, startIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, startIndex, "StartIndex", Count, "Count")
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, startIndex, "StartIndex", Count, "Count"
     
     If Count > 0 Then
-        Call CopyMemory(ByVal mStringPtr + startIndex * 2, ByVal mStringPtr + (startIndex + Count) * 2, (mLength - (startIndex + Count)) * 2)
+        CopyMemory ByVal mStringPtr + startIndex * 2, ByVal mStringPtr + (startIndex + Count) * BytesPerChar, (mLength - (startIndex + Count)) * BytesPerChar
         mLength = mLength - Count
     End If
     Set Remove = Me
@@ -552,9 +558,9 @@ Public Function Replace(ByVal OldValue As String, ByVal NewValue As String, Opti
         NewLength = mLength - ((Len(OldValue) - Len(NewValue)) * MatchCount)
 
         Select Case NewLength
-            Case mLength:       Call ReplaceEqualLength(NewValue, MatchIndexes, MatchCount)
-            Case Is < mLength:  Call ReplaceSmallerLength(NewValue, MatchIndexes, MatchCount, Len(OldValue))
-            Case Else:          Call ReplaceLargerLength(NewValue, MatchIndexes, MatchCount, Len(OldValue), NewLength)
+            Case mLength:       ReplaceEqualLength NewValue, MatchIndexes, MatchCount
+            Case Is < mLength:  ReplaceSmallerLength NewValue, MatchIndexes, MatchCount, Len(OldValue)
+            Case Else:          ReplaceLargerLength NewValue, MatchIndexes, MatchCount, Len(OldValue), NewLength
         End Select
 
         mLength = NewLength
@@ -576,12 +582,13 @@ Public Function ToString(Optional ByRef startIndex As Variant, Optional ByRef Le
     Dim ElemIndex   As Long
     Dim Result      As Long
     Result = GetOptionalListRange(mLength, startIndex, ElemIndex, Length, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex))
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex)
     
     If mLength = 0 Then
         ToString = ""
     Else
-        ToString = SysAllocStringLen(mStringPtr + ElemIndex * 2, ElemCount)
+        ToString = SysAllocStringLen(mStringPtr + ElemIndex * BytesPerChar, ElemCount)
     End If
 End Function
 
@@ -590,7 +597,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef s As String, ByRef startIndex As Variant, ByRef Count As Variant, ByVal Capacity As Long)
-    Call CoTaskMemFree(mStringPtr)
+    CoTaskMemFree mStringPtr
     
     Dim ElemCount As Long
     ElemCount = GetOptionalLong(Count, Len(s))
@@ -600,15 +607,18 @@ Friend Sub Init(ByRef s As String, ByRef startIndex As Variant, ByRef Count As V
     
     Dim Result As Long
     Result = VerifyListRange(Len(s), ElemIndex, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex)
     
     If ElemCount > Capacity Then Capacity = ElemCount
-    If Capacity < DEF_CAPACITY Then Capacity = DEF_CAPACITY
+    If Capacity < DefaultCapacity Then Capacity = DefaultCapacity
     
     mStringPtr = CoTaskMemAlloc(Capacity * 2)
     mCapacity = Capacity
     mLength = ElemCount
-    If ElemCount > 0 Then Call CopyMemory(ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * 2, ElemCount * 2)
+    If ElemCount > 0 Then
+        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
+    End If
 End Sub
 
 
@@ -616,13 +626,13 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    mFillChar = DEF_FILLCHAR
-    mStringPtr = CoTaskMemAlloc(DEF_CAPACITY * 2)
+    mFillChar = DefaultFillChar
+    mStringPtr = CoTaskMemAlloc(DefaultCapacity * BytesPerChar)
     If mStringPtr = vbNullPtr Then Throw New OutOfMemoryException
-    mCapacity = DEF_CAPACITY
+    mCapacity = DefaultCapacity
     
     With OldStrSA
-        .cbElements = 2
+        .cbElements = BytesPerChar
         .cDims = 1
         .cElements = &H7FFFFFFF
     End With
@@ -633,11 +643,11 @@ Private Sub Class_Initialize()
     SAPtr(mString) = VarPtr(mStringSA)
     mStringSA.pvData = mStringPtr
     
-    Call InitWordBuffer(mChars, 0, &H7FFFFFFF)
+    InitWordBuffer mChars, 0, &H7FFFFFFF
 End Sub
 
 Private Sub Class_Terminate()
-    Call CoTaskMemFree(mStringPtr)
+    CoTaskMemFree mStringPtr
     SAPtr(OldStr) = 0
     SAPtr(BufStr) = 0
     SAPtr(mString) = 0
@@ -680,7 +690,7 @@ Private Function InsertSpace(ByVal Index As Long, ByVal size As Long) As Long
     If InsertSpace > mCapacity Then Call EnsureCapacity(InsertSpace)
     If Index < mLength Then
         ' Create space in the string. The new space is uninitialized.
-        Call CopyMemory(ByVal mStringPtr + (Index + size) * 2, ByVal mStringPtr + Index * 2, (mLength - Index) * 2)
+        Call CopyMemory(ByVal mStringPtr + (Index + size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar)
     End If
 End Function
 
@@ -716,7 +726,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
     ' Parse normal substring.
     Do While Index < Max
         Select Case mChars.Data(Index)
-            Case OPEN_BRACE
+            Case OpenBraceChar
                 ' potential escape or format info.
                 
                 If Index > SubStringStart Then
@@ -733,7 +743,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                 If Index = Max Then Call FormatError
                 
                 ' We have enough characters to test for possible escape.
-                If mChars.Data(Index) = OPEN_BRACE Then
+                If mChars.Data(Index) = OpenBraceChar Then
                     ' escape it by setting the start of the substring to the second one.
                     SubStringStart = Index
                 Else
@@ -780,7 +790,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     SubStringStart = Index + 1
                     
                 End If
-            Case CLOSE_BRACE
+            Case CloseBraceChar
                 ' must be escaped or else it is a format error.
                 
                 Index = Index + 1
@@ -788,7 +798,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                 ' Need enough characters to test for escape.
                 If Index = Max Then Call FormatError
                 
-                If mChars.Data(Index) = CLOSE_BRACE Then
+                If mChars.Data(Index) = CloseBraceChar Then
                     ' escape it and add the substring to this point.
                     ' The substring ends one character back because we
                     ' don't want to include both "}}" in the substring.
@@ -853,7 +863,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
             Do
                 ' can never reach the end until after a "}".
                 If Index = Max Then FormatError
-                If .Data(Index) = CLOSE_BRACE Then
+                If .Data(Index) = CloseBraceChar Then
                     ArgFormat = SysAllocStringLen(VarPtr(.Data(startIndex)), Index - startIndex)
                     Exit Do
                 End If
@@ -865,7 +875,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
         End If
         
         ' if we get here we should have reached the closing "}".
-        If .Data(Index) <> CLOSE_BRACE Then FormatError
+        If .Data(Index) <> CloseBraceChar Then FormatError
     End With
     ParseArgumentFormatting = Index
 End Function
@@ -1016,7 +1026,7 @@ Private Sub ReplaceEqualLength(ByRef NewValue As String, ByRef MatchIndexes() As
     
     Dim i As Long
     For i = 0 To MatchCount - 1
-        Call CopyMemory(mString(MatchIndexes(i)), ByVal NewValuePtr, AmountToCopy)
+        CopyMemory mString(MatchIndexes(i)), ByVal NewValuePtr, AmountToCopy
     Next i
 End Sub
 
@@ -1027,7 +1037,7 @@ End Sub
 ' any original text that needs to end up in the final string.
 '
 Private Sub ReplaceSmallerLength(ByRef NewValue As String, ByRef MatchIndexes() As Long, ByVal MatchCount As Long, ByVal OldValueLength As Long)
-    Call ReplaceMatches(mStringPtr, mStringPtr, NewValue, MatchIndexes, MatchCount, OldValueLength)
+    ReplaceMatches mStringPtr, mStringPtr, NewValue, MatchIndexes, MatchCount, OldValueLength
 End Sub
 
 ''
@@ -1043,12 +1053,12 @@ Private Sub ReplaceLargerLength(ByRef NewValue As String, ByRef MatchIndexes() A
     NewCapacity = MathExt.Max(NewLength, mCapacity)
     
     Dim NewBuffer As Long
-    NewBuffer = CoTaskMemAlloc(NewCapacity * 2)
+    NewBuffer = CoTaskMemAlloc(NewCapacity * BytesPerChar)
     If NewBuffer = vbNullPtr Then Throw New OutOfMemoryException
     
-    Call ReplaceMatches(mStringPtr, NewBuffer, NewValue, MatchIndexes, MatchCount, OldValueLength)
+    ReplaceMatches mStringPtr, NewBuffer, NewValue, MatchIndexes, MatchCount, OldValueLength
     
-    Call CoTaskMemFree(mStringPtr)
+    CoTaskMemFree mStringPtr
     mStringPtr = NewBuffer
     mStringSA.pvData = NewBuffer
     mCapacity = NewCapacity
@@ -1072,12 +1082,12 @@ Private Sub ReplaceMatches(ByVal lpSourceBuffer As Long, ByVal lpDestBuffer As L
         AmountToCopy = MatchIndexes(i) - OriginalIndex
         
         If AmountToCopy > 0 Then
-            Call CopyMemory(ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * 2), AmountToCopy * 2)
+            CopyMemory ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * BytesPerChar), AmountToCopy * BytesPerChar
             lpDestBuffer = lpDestBuffer + AmountToCopy * 2
         End If
         
         If NewValueLen > 0 Then
-            Call CopyMemory(ByVal lpDestBuffer, ByVal NewValuePtr, NewValueLen)
+            CopyMemory ByVal lpDestBuffer, ByVal NewValuePtr, NewValueLen
             lpDestBuffer = lpDestBuffer + NewValueLen
         End If
         
@@ -1085,6 +1095,6 @@ Private Sub ReplaceMatches(ByVal lpSourceBuffer As Long, ByVal lpDestBuffer As L
     Next i
     
     If OriginalIndex < mLength Then
-        CopyMemory ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * 2), (mLength - OriginalIndex) * 2
+        CopyMemory ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * BytesPerChar), (mLength - OriginalIndex) * BytesPerChar
     End If
 End Sub
