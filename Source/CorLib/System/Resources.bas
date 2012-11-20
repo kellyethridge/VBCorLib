@@ -36,6 +36,7 @@ Public Enum ResourceStringId
     FileNotFound_Exception = 500
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
+    Format_InvalidString = 602
     ArgumentOutOfRange_MustBeNonNegNum = 700
     ArgumentOutOfRange_SmallCapacity = 701
     ArgumentOutOfRange_NeedNonNegNum = 702

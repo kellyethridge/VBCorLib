@@ -136,23 +136,23 @@ Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef startIndex 
     If SafeArrayGetDim(SAPtr(Chars)) > 1 Then _
         Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
         
-    Dim ElemCount As Long
+    Dim LocalCharCount As Long
     Dim ElemIndex As Long
     ElemIndex = GetOptionalLong(startIndex, LBound(Chars))
-    ElemCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
+    LocalCharCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
     
     If ElemIndex < LBound(Chars) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "StartIndex")
-    If ElemIndex + ElemCount - 1 > UBound(Chars) Then _
+    If ElemIndex + LocalCharCount - 1 > UBound(Chars) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
     
-    If ElemCount > 0 Then
-        If mLength + ElemCount > mCapacity Then
-            EnsureCapacity mLength + ElemCount
+    If LocalCharCount > 0 Then
+        If mLength + LocalCharCount > mCapacity Then
+            EnsureCapacity mLength + LocalCharCount
         End If
         
-        CopyMemory mString(mLength), Chars(ElemIndex), ElemCount * BytesPerChar
-        mLength = mLength + ElemCount
+        CopyMemory mString(mLength), Chars(ElemIndex), LocalCharCount * BytesPerChar
+        mLength = mLength + LocalCharCount
     End If
     
     Set AppendChars = Me
@@ -220,24 +220,24 @@ End Function
 '
 Public Function AppendString(ByRef s As String, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     Dim ElemIndex As Long
-    Dim ElemCount As Long
+    Dim CharCount As Long
     
     ElemIndex = GetOptionalLong(startIndex, 0)
-    ElemCount = GetOptionalLong(Count, Len(s) - ElemIndex)
+    CharCount = GetOptionalLong(Count, Len(s) - ElemIndex)
     
     If ElemIndex < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "StartIndex")
-    If ElemCount < 0 Then _
+    If CharCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
-    If ElemIndex + ElemCount > Len(s) Then _
+    If ElemIndex + CharCount > Len(s) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
         
-    If mLength + ElemCount > mCapacity Then
-        EnsureCapacity mLength + ElemCount
+    If mLength + CharCount > mCapacity Then
+        EnsureCapacity mLength + CharCount
     End If
     
-    CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
-    mLength = mLength + ElemCount
+    CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s) + ElemIndex * BytesPerChar, CharCount * BytesPerChar
+    mLength = mLength + CharCount
     
     Set AppendString = Me
 End Function
@@ -262,16 +262,16 @@ End Function
 ' StringBuilder. There is no return reference to the StringBuilder.
 '
 Public Sub AppendQuick(ByRef s As String)
-    Dim ElemCount As Long
-    ElemCount = Len(s)
+    Dim CharCount As Long
+    CharCount = Len(s)
     
-    If ElemCount > 0 Then
-        If mLength + ElemCount > mCapacity Then
-            EnsureCapacity mLength + ElemCount
+    If CharCount > 0 Then
+        If mLength + CharCount > mCapacity Then
+            EnsureCapacity mLength + CharCount
         End If
         
-        CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s), ElemCount * BytesPerChar
-        mLength = mLength + ElemCount
+        CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s), CharCount * BytesPerChar
+        mLength = mLength + CharCount
     End If
 End Sub
 
@@ -364,18 +364,17 @@ End Property
 ' @return The capacity after the call is complete.
 '
 Public Function EnsureCapacity(ByVal RequiredCapacity As Long) As Long
-    If RequiredCapacity <= mCapacity Then
-        EnsureCapacity = mCapacity
-        Exit Function
+    If RequiredCapacity > mCapacity Then
+        Dim NewCapacity As Long
+        NewCapacity = mCapacity * 2
+        If NewCapacity >= RequiredCapacity Then
+            Capacity = NewCapacity
+        Else
+            Capacity = RequiredCapacity
+        End If
     End If
     
-    Dim NewCapacity As Long
-    NewCapacity = mCapacity * 2
-    If RequiredCapacity > NewCapacity Then
-        NewCapacity = RequiredCapacity
-    End If
-    Capacity = NewCapacity
-    EnsureCapacity = NewCapacity
+    EnsureCapacity = mCapacity
 End Function
 
 ''
@@ -464,18 +463,18 @@ End Function
 ' @return This instance of StringBuilder.
 '
 Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
-    Dim ElemCount   As Long
+    Dim CharCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
     
-    Result = GetOptionalArrayRange(SAPtr(Chars), startIndex, ElemIndex, Count, ElemCount)
+    Result = GetOptionalArrayRange(SAPtr(Chars), startIndex, ElemIndex, Count, CharCount)
     If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Chars", ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex)
+        ThrowArrayRangeException Result, "Chars", ElemIndex, "StartIndex", CharCount, "Count", IsMissing(startIndex)
     If Index < 0 Or Index > mLength Then _
         Throw Cor.NewArgumentOutOfRangeException("Index must be between 0 and then length of the current instance.", "Index", Index)
     
-    mLength = InsertSpace(Index, ElemCount)
-    CopyMemory mString(Index), Chars(ElemIndex), ElemCount * BytesPerChar
+    mLength = InsertSpace(Index, CharCount)
+    CopyMemory mString(Index), Chars(ElemIndex), CharCount * BytesPerChar
     Set InsertChars = Me
 End Function
 
@@ -578,17 +577,17 @@ End Function
 ' @remarks startindex is zero-based.
 '
 Public Function ToString(Optional ByRef startIndex As Variant, Optional ByRef Length As Variant) As String
-    Dim ElemCount   As Long
+    Dim CharCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mLength, startIndex, ElemIndex, Length, ElemCount)
+    Result = GetOptionalListRange(mLength, startIndex, ElemIndex, Length, CharCount)
     If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(startIndex)
+        ThrowListRangeException Result, ElemIndex, "StartIndex", CharCount, "Length", IsMissing(startIndex)
     
     If mLength = 0 Then
         ToString = ""
     Else
-        ToString = SysAllocStringLen(mStringPtr + ElemIndex * BytesPerChar, ElemCount)
+        ToString = SysAllocStringLen(mStringPtr + ElemIndex * BytesPerChar, CharCount)
     End If
 End Function
 
@@ -599,25 +598,25 @@ End Function
 Friend Sub Init(ByRef s As String, ByRef startIndex As Variant, ByRef Count As Variant, ByVal Capacity As Long)
     CoTaskMemFree mStringPtr
     
-    Dim ElemCount As Long
-    ElemCount = GetOptionalLong(Count, Len(s))
+    Dim CharCount As Long
+    CharCount = GetOptionalLong(Count, Len(s))
     
     Dim ElemIndex As Long
     ElemIndex = GetOptionalLong(startIndex, 0)
     
     Dim Result As Long
-    Result = VerifyListRange(Len(s), ElemIndex, ElemCount)
+    Result = VerifyListRange(Len(s), ElemIndex, CharCount)
     If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex)
+        ThrowListRangeException Result, ElemIndex, "StartIndex", CharCount, "Count", IsMissing(startIndex)
     
-    If ElemCount > Capacity Then Capacity = ElemCount
+    If CharCount > Capacity Then Capacity = CharCount
     If Capacity < DefaultCapacity Then Capacity = DefaultCapacity
     
     mStringPtr = CoTaskMemAlloc(Capacity * 2)
     mCapacity = Capacity
-    mLength = ElemCount
-    If ElemCount > 0 Then
-        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
+    mLength = CharCount
+    If CharCount > 0 Then
+        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, CharCount * BytesPerChar
     End If
 End Sub
 
@@ -682,15 +681,16 @@ Private Sub Fill(ByVal Index As Long, ByVal Char As Integer, ByVal Count As Long
 End Sub
 
 Private Sub FormatError()
-    Throw Cor.NewFormatException("Invalid format specified.")
+    Throw Cor.NewFormatException(Resources.GetString(Format_InvalidString))
 End Sub
 
 Private Function InsertSpace(ByVal Index As Long, ByVal size As Long) As Long
     InsertSpace = mLength + size
-    If InsertSpace > mCapacity Then Call EnsureCapacity(InsertSpace)
+    EnsureCapacity InsertSpace
+    
     If Index < mLength Then
         ' Create space in the string. The new space is uninitialized.
-        Call CopyMemory(ByVal mStringPtr + (Index + size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar)
+        CopyMemory ByVal mStringPtr + (Index + size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar
     End If
 End Function
 
@@ -949,14 +949,14 @@ End Function
 '
 ' Returns the number of matches found.
 Private Function FindMatches(ByRef MatchIndexes() As Long, ByRef startIndex As Variant, ByRef Count As Variant) As Long
-    Dim ElemCount   As Long
+    Dim CharCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalLongPair(startIndex, 0, ElemIndex, Count, mLength, ElemCount)
+    Result = GetOptionalLongPair(startIndex, 0, ElemIndex, Count, mLength, CharCount)
     If Result <> NO_ERROR Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Result))
     
-    Result = VerifyListRange(mLength, ElemIndex, ElemCount)
+    Result = VerifyListRange(mLength, ElemIndex, CharCount)
     If Result <> NO_ERROR Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Result))
 
@@ -967,7 +967,7 @@ Private Function FindMatches(ByRef MatchIndexes() As Long, ByRef startIndex As V
     ' Don't need to search at the end if the old value
     ' can't fit. If the end matches the old value, then
     ' the inner loop will finish out the matching.
-    ElemCount = ElemCount - OldStrSA.cElements + 1
+    CharCount = CharCount - OldStrSA.cElements + 1
     
     Dim MatchCount As Long
     ReDim MatchIndexes(0 To mLength)
@@ -976,7 +976,7 @@ Private Function FindMatches(ByRef MatchIndexes() As Long, ByRef startIndex As V
     ' all the matches against the old value to be replaced. If a
     ' match is found, then the index to that match is stored for
     ' future usage when replacing the matched old values with the new.
-    Do While ElemCount > 0
+    Do While CharCount > 0
         ' Found the start of a possible match.
         If mString(ElemIndex) = FirstOldValueChar Then
             ' We'll be opitmistic and assume a match.
@@ -1000,12 +1000,12 @@ Private Function FindMatches(ByRef MatchIndexes() As Long, ByRef startIndex As V
             If Matched Then
                 MatchCount = MatchCount + 1
                 ElemIndex = ElemIndex + OldStrSA.cElements - 1
-                ElemCount = ElemCount - OldStrSA.cElements + 1
+                CharCount = CharCount - OldStrSA.cElements + 1
             End If
         End If
         
         ElemIndex = ElemIndex + 1
-        ElemCount = ElemCount - 1
+        CharCount = CharCount - 1
     Loop
 
     FindMatches = MatchCount
