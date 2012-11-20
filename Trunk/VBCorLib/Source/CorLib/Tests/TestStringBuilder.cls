@@ -121,7 +121,6 @@ Public Sub AppendChar_WhenCalled_Appends()
     
     sb.AppendChar CHARACTER_ZERO, 50
     
-    Assert.AreEqual String$(50, "0"), sb.ToString
     Dim Actual As String
     Actual = sb.ToString
     Assert.That Actual, Iz.EqualTo(String$(50, "0"))
@@ -254,49 +253,115 @@ Public Sub AppendChars_WithStartIndexAndCharCount_AppendsSubArray()
     Assert.That Actual, Iz.EqualTo("BCD")
 End Sub
 
-Public Sub TestSetLengthPastCapacity()
-    sb.Capacity = 10
+Public Sub Length_WhenSetLongerThanInstance_AppendsSpaces()
+    Dim sb As New StringBuilder
     sb.Append "12345"
-    sb.Length = 20
     
-    Assert.AreEqual "12345               ", sb.ToString
+    sb.Length = 10
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Const Expected As String = "12345     "
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestLength()
+Public Sub Length_WhenSetShortThanInstance_Truncates()
+    Dim sb As New StringBuilder
     sb.Append "1234567890"
+    
     sb.Length = 5
-    sb.Append "abcde"
-    Assert.AreEqual "12345abcde", sb.ToString
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Const Expected As String = "12345"
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestAppendSubString()
-    sb.AppendString "Hello", 2, 3
-    Assert.AreEqual "llo", sb.ToString
+Public Sub Length_WhenLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.Length = -1
+    
+    AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-
-
-Public Sub TestInsertString()
-    sb.Append "1234567890"
-    sb.Insert 2, "aaa"
-    Assert.AreEqual "12aaa34567890", sb.ToString
+Public Sub Insert_WithZeroIndex_InsertsAtBeginning()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
+    
+    sb.Insert 0, "abc"
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Const Expected = "abc1234"
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestInsertBeginning()
-    sb.Insert 0, Space$(10), 10
-    Assert.AreEqual Space$(100), sb.ToString
+Public Sub Insert_WithNonZeroIndex_InsertsBetweenCharacters()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
+    
+    sb.Insert 2, "abc"
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Const Expected = "12abc34"
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestInsertAtEnd()
-    sb.Append "Hello"
-    sb.Insert 5, "Bye"
-    Assert.AreEqual "HelloBye", sb.ToString
+Public Sub Insert_WithIndexAtEnd_AppendsToInstance()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
+    
+    sb.Insert 4, "abc"
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Const Expected = "1234abc"
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestInsertStringCount()
-    sb.Append "1234567890"
-    sb.Insert 2, "aaa", 2
-    Assert.AreEqual "12aaaaaa34567890", sb.ToString
+Public Sub Insert_WithIndexLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.Insert -1, "abc"
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub Insert_WithCountLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.Insert 0, "abc", -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Insert_WithCountOfZero_DoesNotInsert()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    sb.Insert 0, "abc", 0
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Const Expected As String = "abc"
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Insert_WithMultipleCounts_InsertsMultipleTimes()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
+    
+    sb.Insert 2, "abc", 2
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Const Expected As String = "12abcabc34"
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestInsertChars()
