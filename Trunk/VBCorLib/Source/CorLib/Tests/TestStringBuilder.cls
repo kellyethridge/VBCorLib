@@ -364,29 +364,123 @@ Public Sub Insert_WithMultipleCounts_InsertsMultipleTimes()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestInsertChars()
-    sb.Append "1234567890"
+Public Sub InsertChars_WithNullArray_Throws()
+    Dim sb As New StringBuilder
     Dim Chars() As Integer
-    Chars = NewIntegers(97, 97, 97)
-    sb.Insertchars 2, Chars
-    Assert.AreEqual "12aaa34567890", sb.ToString
+    
+    On Error Resume Next
+    sb.InsertChars 0, Chars
+    
+    AssertArgumentNullException Err, "Chars"
 End Sub
 
-Public Sub TestInsertCharsAtEnd()
-    sb.Append "Hello"
+Public Sub InsertChars_WithEmptyArray_InsertsNothing()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
     Dim Chars() As Integer
-    Chars = NewIntegers(97, 97, 97)
-    sb.Insertchars 5, Chars
-    Assert.AreEqual "Helloaaa", sb.ToString
+    Chars = NewIntegers
+    
+    sb.InsertChars 2, Chars
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("1234")
 End Sub
 
-Public Sub TestInsertSubChars()
-    sb.Append "1234567890"
+Public Sub InsertChars_WithIndexTo3rdPosition_InsertsInBetween()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
+    
+    sb.InsertChars 2, Chars
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("12aaa34")
+End Sub
+
+Public Sub InsertChars_WithIndexOfZero_InsertsAtBeginning()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
+    
+    sb.InsertChars 0, Chars
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("aaa1234")
+End Sub
+
+Public Sub InsertChars_WithIndexOfLengthOfInstance_InsertsAtEnd()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
+    
+    sb.InsertChars 4, Chars
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("1234aaa")
+End Sub
+
+Public Sub InsertChars_WithSubArray_InsertsPortion()
+    Dim sb As New StringBuilder
+    sb.Append "1234"
     Dim Chars() As Integer
     Chars = NewIntegers(97, 98, 99, 100)
-    sb.Insertchars 2, Chars, 1, 3
-    Assert.AreEqual "12bcd34567890", sb.ToString
+    
+    sb.InsertChars 2, Chars, 1, 2
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("12bc34")
 End Sub
+
+Public Sub InsertChars_WithIndexLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    ReDim Chars(1 To 1)
+    
+    On Error Resume Next
+    sb.InsertChars -1, Chars
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub InsertChars_WithStartIndexLessThanLBound_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars() As Integer
+    ReDim Chars(1 To 1)
+    
+    On Error Resume Next
+    sb.InsertChars 0, Chars, 0
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub InsertChars_WithNegativeCount_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars(0) As Integer
+    
+    On Error Resume Next
+    sb.InsertChars 0, Chars, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "CharCount"
+End Sub
+
+Public Sub InsertChars_WithStartIndexAndCountExtendingPassedUBound_Throws()
+    Dim sb As New StringBuilder
+    Dim Chars(1 To 3) As Integer
+    
+    On Error Resume Next
+    sb.InsertChars 0, Chars, 1, 4
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
 
 Public Sub TestRemoveFromStart()
     sb.Append "1234567890"

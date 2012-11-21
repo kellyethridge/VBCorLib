@@ -1,10 +1,10 @@
 Type=Exe
 Reference=*\AVBCorLib.vbp
-Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
+Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{CDFFA366-1D4F-43F9-B4BF-5438BC7C7D29}#1.1#0#..\VBCorLib\Type Libraries\VBVM6Lib.tlb#Visual Basic 6 Virtual Machine Type Library 1.1 by Michel Rutten - Declarations and aliases for (undocumented) functions in the VB6 runtime library.
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\VBCorType.tlb#VB.EXT: VBCorLib 3.0 Type Library
-Reference=*\G{923925AC-1013-4D27-9FB1-4FF0B3B47BA2}#4.0#0#..\..\..\..\..\..\..\..\Windows\SysWow64\SimplyVBUnitType.tlb#SimplyVBUnit Type Library 4.0
-Object={7983BD3B-752A-43EA-9BFF-444BBA1FC293}#3.1#0; SimplyVBUnit.Component.ocx
+Reference=*\G{923925AC-1013-4D27-9FB1-4FF0B3B47BA2}#4.0#0#..\..\..\..\..\..\..\Windows\SysWow64\SimplyVBUnitType.tlb#SimplyVBUnit Type Library 4.0
+Object={7983BD3B-752A-43EA-9BFF-444BBA1FC293}#3.2#0; SimplyVBUnit.Component.ocx
 Class=TestTripleDESEncryption128bit; Tests\TestTripleDESEncryption128bit.cls
 Class=TestTripleDESWeakKeys; Tests\TestTripleDESWeakKeys.cls
 Class=TestUnicodeEncoding; Tests\TestUnicodeEncoding.cls

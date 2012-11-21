@@ -308,7 +308,7 @@ End Function
 ' @param Provider A formatting provider to help custom formatting.
 ' @return A string representation of the value.
 '
-Public Function ToString(ByRef Value As Variant, Optional ByVal Format As String, Optional ByVal Provider As IFormatProvider) As String
+Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByRef Provider As IFormatProvider) As String
     Dim vt As Long
     vt = VarType(Value)
     If vt = vbVariant Then
