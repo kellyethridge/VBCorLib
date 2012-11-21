@@ -432,20 +432,22 @@ End Function
 ' @param count The number of times to insert the string.
 ' @return This instance of StringBuilder
 '
-Public Function Insert(ByVal Index As Long, ByVal Value As String, Optional ByVal Count As Long = 1) As StringBuilder
+Public Function Insert(ByVal Index As Long, ByRef Value As Variant, Optional ByVal Count As Long = 1) As StringBuilder
     If Index < 0 Or Index > mLength Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index", Index)
     If Count < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
-        
+    
+    Dim s As String
+    s = Convert.ToString(Value)
     Dim l As Long
-    l = Len(Value)
+    l = Len(s)
     If l > 0 And Count > 0 Then
-        mLength = InsertSpace(Index, l * Count)
+        InsertSpace Index, l * Count
         l = l * BytesPerChar
         Index = Index * BytesPerChar
         Do While Count > 0
-            CopyMemory ByVal mStringPtr + Index, ByVal StrPtr(Value), l
+            CopyMemory ByVal mStringPtr + Index, ByVal StrPtr(s), l
             Index = Index + l
             Count = Count - 1
         Loop
@@ -456,25 +458,34 @@ End Function
 ''
 ' Inserts an array of characters into the string value.
 '
-' @param index The index in the string value to start inserting.
+' @param Index The index in the string value to start inserting.
 ' @param Chars The characters to be inserted.
-' @param startindex The index in the Characters to start inserting from.
-' @param count The number of characters to be inserted.
+' @param Startindex The index in the Characters to start inserting from.
+' @param CharCount The number of characters to be inserted.
 ' @return This instance of StringBuilder.
 '
-Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
-    Dim CharCount   As Long
-    Dim ElemIndex   As Long
-    Dim Result      As Long
-    
-    Result = GetOptionalArrayRange(SAPtr(Chars), startIndex, ElemIndex, Count, CharCount)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Chars", ElemIndex, "StartIndex", CharCount, "Count", IsMissing(startIndex)
+Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef startIndex As Variant, Optional ByRef CharCount As Variant) As StringBuilder
     If Index < 0 Or Index > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index must be between 0 and then length of the current instance.", "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index")
+    If SAPtr(Chars) = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Chars")
     
-    mLength = InsertSpace(Index, CharCount)
-    CopyMemory mString(Index), Chars(ElemIndex), CharCount * BytesPerChar
+    Dim ElemIndex   As Long
+    Dim ElemCount   As Long
+    ElemIndex = GetOptionalLong(startIndex, LBound(Chars))
+    ElemCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
+    
+    If ElemIndex < LBound(Chars) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "StartIndex")
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "CharCount")
+    If ElemIndex + ElemCount - 1 > UBound(Chars) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "StartIndex")
+        
+    If ElemCount > 0 Then
+        InsertSpace Index, ElemCount
+        CopyMemory mString(Index), Chars(ElemIndex), ElemCount * BytesPerChar
+    End If
     Set InsertChars = Me
 End Function
 
@@ -684,15 +695,19 @@ Private Sub FormatError()
     Throw Cor.NewFormatException(Resources.GetString(Format_InvalidString))
 End Sub
 
-Private Function InsertSpace(ByVal Index As Long, ByVal size As Long) As Long
-    InsertSpace = mLength + size
-    EnsureCapacity InsertSpace
+Private Sub InsertSpace(ByVal Index As Long, ByVal size As Long)
+    Dim NewLength As Long
+    NewLength = mLength + size
+    
+    EnsureCapacity NewLength
     
     If Index < mLength Then
         ' Create space in the string. The new space is uninitialized.
         CopyMemory ByVal mStringPtr + (Index + size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar
     End If
-End Function
+    
+    mLength = NewLength
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
