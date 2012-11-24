@@ -16,8 +16,6 @@ Implements ITestCaseSource
 
 Private Const CHARACTER_ZERO As Long = 48
 
-Private sb As StringBuilder
-
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
@@ -47,10 +45,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah", "blahblah", "ha", "hahahahahahahahahaha"
             Test.Use "abcabcabc", "abcf", "", "abcabcabc"
     End Select
-End Sub
-
-Public Sub Setup()
-    Set sb = New StringBuilder
 End Sub
 
 Public Sub Append_WithValues_Appends(ByRef Value As Variant, ByVal Expected As String)
@@ -182,6 +176,7 @@ Public Sub Chars_WithGet_ReturnsCharacter()
 End Sub
 
 Public Sub Chars_WithSet_ReplacesCharacter()
+    Dim sb As New StringBuilder
     sb.Append "1111"
     
     sb(2) = CHARACTER_ZERO
@@ -193,10 +188,10 @@ End Sub
 
 Public Sub AppendChars_WithEmptyArray_DoesNotAppend()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
-    chars = NewIntegers()
+    Dim Chars() As Integer
+    Chars = NewIntegers()
     
-    sb.AppendChars chars
+    sb.AppendChars Chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -205,20 +200,20 @@ End Sub
 
 Public Sub AppendChars_WithNullArray_Throws()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
+    Dim Chars() As Integer
     
     On Error Resume Next
-    sb.AppendChars chars
+    sb.AppendChars Chars
     
     AssertArgumentNullException Err, "Chars"
 End Sub
 
 Public Sub AppendChars_WithCharacters_Appends()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
-    chars = NewIntegers(49, 50, 51)
+    Dim Chars() As Integer
+    Chars = NewIntegers(49, 50, 51)
     
-    sb.AppendChars chars
+    sb.AppendChars Chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -227,42 +222,42 @@ End Sub
 
 Public Sub AppendChars_WithStartIndexLessThanLBound_Throws()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
-    chars = NewIntegers(49)
+    Dim Chars() As Integer
+    Chars = NewIntegers(49)
     
     On Error Resume Next
-    sb.AppendChars chars, -1
+    sb.AppendChars Chars, -1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub AppendChars_WithStartIndexAndCharCountLongerThanChars_Throws()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
-    chars = NewIntegers(49, 50, 51)
+    Dim Chars() As Integer
+    Chars = NewIntegers(49, 50, 51)
     
     On Error Resume Next
-    sb.AppendChars chars, 0, 4
+    sb.AppendChars Chars, 0, 4
     
     AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub AppendChars_WithMultiDimensionArray_Throws()
     Dim sb As New StringBuilder
-    Dim chars(0, 0) As Integer
+    Dim Chars(0, 0) As Integer
     
     On Error Resume Next
-    sb.AppendChars chars
+    sb.AppendChars Chars
     
     AssertRankException Err
 End Sub
 
 Public Sub AppendChars_WithStartIndexAndCharCount_AppendsSubArray()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
-    chars = NewIntegers(65, 66, 67, 68, 69)
+    Dim Chars() As Integer
+    Chars = NewIntegers(65, 66, 67, 68, 69)
     
-    sb.AppendChars chars, 1, 3
+    sb.AppendChars Chars, 1, 3
     
     Dim Actual As String
     Actual = sb.ToString
@@ -382,10 +377,10 @@ End Sub
 
 Public Sub InsertChars_WithNullArray_Throws()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
+    Dim Chars() As Integer
     
     On Error Resume Next
-    sb.InsertChars 0, chars
+    sb.InsertChars 0, Chars
     
     AssertArgumentNullException Err, "Chars"
 End Sub
@@ -393,10 +388,10 @@ End Sub
 Public Sub InsertChars_WithEmptyArray_InsertsNothing()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim chars() As Integer
-    chars = NewIntegers
+    Dim Chars() As Integer
+    Chars = NewIntegers
     
-    sb.InsertChars 2, chars
+    sb.InsertChars 2, Chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -406,10 +401,10 @@ End Sub
 Public Sub InsertChars_WithIndexTo3rdPosition_InsertsInBetween()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim chars() As Integer
-    chars = NewIntegers(97, 97, 97)
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
     
-    sb.InsertChars 2, chars
+    sb.InsertChars 2, Chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -419,10 +414,10 @@ End Sub
 Public Sub InsertChars_WithIndexOfZero_InsertsAtBeginning()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim chars() As Integer
-    chars = NewIntegers(97, 97, 97)
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
     
-    sb.InsertChars 0, chars
+    sb.InsertChars 0, Chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -432,10 +427,10 @@ End Sub
 Public Sub InsertChars_WithIndexOfLengthOfInstance_InsertsAtEnd()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim chars() As Integer
-    chars = NewIntegers(97, 97, 97)
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 97, 97)
     
-    sb.InsertChars 4, chars
+    sb.InsertChars 4, Chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -445,10 +440,10 @@ End Sub
 Public Sub InsertChars_WithSubArray_InsertsPortion()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim chars() As Integer
-    chars = NewIntegers(97, 98, 99, 100)
+    Dim Chars() As Integer
+    Chars = NewIntegers(97, 98, 99, 100)
     
-    sb.InsertChars 2, chars, 1, 2
+    sb.InsertChars 2, Chars, 1, 2
     
     Dim Actual As String
     Actual = sb.ToString
@@ -457,42 +452,42 @@ End Sub
 
 Public Sub InsertChars_WithIndexLessThanZero_Throws()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
-    ReDim chars(1 To 1)
+    Dim Chars() As Integer
+    ReDim Chars(1 To 1)
     
     On Error Resume Next
-    sb.InsertChars -1, chars
+    sb.InsertChars -1, Chars
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub InsertChars_WithStartIndexLessThanLBound_Throws()
     Dim sb As New StringBuilder
-    Dim chars() As Integer
-    ReDim chars(1 To 1)
+    Dim Chars() As Integer
+    ReDim Chars(1 To 1)
     
     On Error Resume Next
-    sb.InsertChars 0, chars, 0
+    sb.InsertChars 0, Chars, 0
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub InsertChars_WithNegativeCount_Throws()
     Dim sb As New StringBuilder
-    Dim chars(0) As Integer
+    Dim Chars(0) As Integer
     
     On Error Resume Next
-    sb.InsertChars 0, chars, 0, -1
+    sb.InsertChars 0, Chars, 0, -1
     
     AssertArgumentOutOfRangeException Err, "CharCount"
 End Sub
 
 Public Sub InsertChars_WithStartIndexAndCountExtendingPassedUBound_Throws()
     Dim sb As New StringBuilder
-    Dim chars(1 To 3) As Integer
+    Dim Chars(1 To 3) As Integer
     
     On Error Resume Next
-    sb.InsertChars 0, chars, 1, 4
+    sb.InsertChars 0, Chars, 1, 4
     
     AssertArgumentOutOfRangeException Err
 End Sub
@@ -623,143 +618,343 @@ Public Sub Replace_WithSubstringStartingInMiddleOfMatch_DoesNotReplacePartialMat
 End Sub
 
 Public Sub Replace_UsingXBeatTest()
-    sb.Insert 0, "xx" & Space$(10000) & "xx", 10
-    sb.Replace "x", Space$(10000)
-    Assert.AreEqual Space$(500000), sb.ToString
+    Dim sb As New StringBuilder
+    sb.Insert 0, "xx" & Space$(100) & "xx", 10
+    
+    sb.Replace "x", Space$(100)
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo(Space$(5000))
 End Sub
 
-Public Sub TestAppendFormat()
+Public Sub AppendFormat_WithPlaceHolder_InsertsValue()
+    Dim sb As New StringBuilder
+    
     sb.AppendFormat "Hello {0}", "World"
-    Assert.AreEqual "Hello World", sb.ToString
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("Hello World")
 End Sub
 
-Public Sub TestAppendFormatLeftAdjust()
-    sb.AppendFormat "Hello {0, -5 }", "1"
-    Assert.AreEqual "Hello 1    ", sb.ToString
+Public Sub AppendFormat_WithLengthInfo_IncludeLengthInfo()
+    Dim sb As New StringBuilder
+    
+    sb.AppendFormat "Hello {0, -5}", 1
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("Hello 1    ")
 End Sub
 
-Public Sub TestAppendFormatRightAdjust()
-    sb.AppendFormat "Hello {0, 10 } world!", "kelly"
-    Assert.AreEqual "Hello      kelly world!", sb.ToString
+Public Sub AppendFormat_WithFormatInfo_IncludeFormatInfo()
+    Dim sb As New StringBuilder
+    
+    sb.AppendFormat "{0:X2}", 10
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("0A")
 End Sub
 
-Public Sub TestAppendFormatMultiArgs()
-    sb.AppendFormat "1={0}, 2={1}, 1={0}, Name={2}", 1, 2, "Kelly"
-    Assert.AreEqual "1=1, 2=2, 1=1, Name=Kelly", sb.ToString
+Public Sub AppendFormat_WithAlignmentAndFormatInfo_IncludesBoth()
+    Dim sb As New StringBuilder
+    
+    sb.AppendFormat "{0,5:X2}", 10
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("   0A")
 End Sub
 
-Public Sub TestAppendFormatFormattable()
-    Dim i1 As New Int32Formattable
-    Dim i2 As New Int32Formattable
-    i1.mValue = 10
-    i2.mValue = 20
-    sb.AppendFormat "10={0}, 20={1}", i1, i2
-    Assert.AreEqual "10=10, 20=20", sb.ToString
+Public Sub AppendFormat_WithMultiplePlaceHolders_FormatsEach()
+    Dim sb As New StringBuilder
+    
+    sb.AppendFormat "{0} {1}", "a", "b"
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("a b")
 End Sub
 
-Public Sub TestIObjectBased()
-    Dim i1 As New Int32
-    Dim i2 As New Int32
-    i1.mValue = 10
-    i2.mValue = 20
-    sb.AppendFormat "10={0}, 20={1}", i1, i2
-    Assert.AreEqual "10=10, 20=20", sb.ToString
+Public Sub AppendFormat_WithRepeatedPlaceHolder_RepeatsFormat()
+    Dim sb As New StringBuilder
+    
+    sb.AppendFormat "{0} {0}", "a"
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("a a")
 End Sub
 
-Public Sub TestFormatInfo()
+Public Sub AppendFormat_WithUnpairedOpenBrace_Throws()
+    Dim sb As New StringBuilder
+    
     On Error Resume Next
-    Dim i1 As New Int32Formattable
-    i1.mValue = 1
-    sb.AppendFormat "{0:9}", i1
-    Assert.AreEqual "000000001", sb.ToString
-End Sub
-
-Public Sub TestAppendFormatNoArgs()
-    sb.AppendFormat "Hello"
-    Assert.AreEqual "Hello", sb.ToString
-End Sub
-
-Public Sub TestAppendFormatInt32()
-    sb.AppendFormat "Hello {0:G3}", 1235
-    Assert.AreEqual "Hello 1.24E+03", sb.ToString
-End Sub
-
-Public Sub TestAppendFormatHex()
-    sb.AppendFormat "{0:x}", &HFFFF
-    Assert.AreEqual "ffff", sb.ToString
+    sb.AppendFormat "{0", "a"
     
-    sb.Length = 0
-    sb.AppendFormat "{0:x}", CByte(255)
-    Assert.AreEqual "ff", sb.ToString
+    AssertFormatException Err
 End Sub
 
-Public Sub TestAppendFormatDate()
-    Dim dt As cDateTime
-    Dim s As String
+Public Sub AppendFormat_WithUnpairedOpenBrace_Throws2()
+    Dim sb As New StringBuilder
     
-    Set dt = cDateTime.FromOADate(#1/1/2004 8:30:40 AM#)
-    sb.AppendFormat "{0:dddd, dd MMMM yyyy HH':'mm':'ss}", dt
-    s = sb.ToString
-    Assert.AreEqual "Thursday, 01 January 2004 08:30:40", s
-End Sub
-
-Public Sub TestReturnZeroLengthString()
-    Dim s As String
+    On Error Resume Next
+    sb.AppendFormat " {0 ", "a"
     
-    sb.Length = 0
-    s = sb.ToString
-    Assert.IsFalse cString.IsNull(s), "StringBuilder should return an empty string, not a null string."
+    AssertFormatException Err
 End Sub
 
-Public Sub TestCopyTo()
-    Dim ch() As Integer
+Public Sub AppendFormat_WithUnpairedClosingBrace_Throws()
+    Dim sb As New StringBuilder
     
-    ReDim ch(6)
-    sb.Append "hello, how are you?"
-    sb.CopyTo 5, ch, 0, 7
+    On Error Resume Next
+    sb.AppendFormat "0}", "a"
     
-    Assert.AreEqual ", how a", cString.FromCharArray(ch)
+    AssertFormatException Err
 End Sub
 
-Public Sub TestEscapeBraces()
-    sb.AppendFormat "10 = {{0 }}  {0}", "hi"
-    Assert.AreEqual "10 = {0 }  hi", sb.ToString
-End Sub
-
-Public Sub TestFailedCloseEscape()
-    On Error GoTo errTrap
-    sb.AppendFormat "10 = {0}} hi"
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
+Public Sub AppendFormat_WithUnpairedClosingBrace_Throws2()
+    Dim sb As New StringBuilder
     
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception caught."
-End Sub
-
-Public Sub TestFailedOpenEscape()
-    On Error GoTo errTrap
-    sb.AppendFormat "10 = {{0}  hi"
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
+    On Error Resume Next
+    sb.AppendFormat " 0} ", "a"
     
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception caught."
+    AssertFormatException Err
 End Sub
 
-Public Sub TestMissingIndex()
-    On Error GoTo errTrap
-    sb.AppendFormat "10 = {}"
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
+Public Sub AppendFormat_WithNegativePlaceHolder_Throws()
+    Dim sb As New StringBuilder
     
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception caught."
+    On Error Resume Next
+    sb.AppendFormat "{-1}", "a"
+    
+    AssertFormatException Err
 End Sub
 
+Public Sub AppendFormat_WithMorePlaceHoldersThanValues_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.AppendFormat "{0} {1}", "a"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub AppendFormat_WithReplicatedBrace_EscapesBrace()
+    Dim sb As New StringBuilder
+    
+    sb.AppendFormat "{{0}}"
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("{0}")
+End Sub
+
+Public Sub AppendFormat_WithEscapedOpeningBraceAndNonEscapedClosingBrace_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.AppendFormat " {{0} ", "hi"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub AppendFormat_WithNonEscapedOpeningBraceAndEscapedClosingBrace_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.AppendFormat " {0}} ", "hi"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub AppendFormat_PlaceHolderWithMissingIndex_Throws()
+    Dim sb As New StringBuilder
+    
+    On Error Resume Next
+    sb.AppendFormat "{ }", "hi"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub AppendFormatEx_WithCustomFormatter_RequestsCorrectProvider()
+    Dim sb As New StringBuilder
+    Dim f As New FakeCustomFormatter
+    f.Disable = True
+    
+    sb.AppendFormatEx f, "{0}", "a"
+    
+    Assert.That f.FormatType, Iz.EqualTo("ICustomFormatter").IgnoreCase
+End Sub
+
+Public Sub AppendFormatEx_WithNonCustomFormatter_DefaultFormats()
+    Dim sb As New StringBuilder
+    Dim f As New FakeCustomFormatter
+    f.Disable = True
+    
+    sb.AppendFormatEx f, "{0:X2}", 10
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("0A")
+End Sub
+
+Public Sub AppendFormatEx_WithFormatter_ReturnsFormatted()
+    Dim sb As New StringBuilder
+    Dim f As New FakeCustomFormatter
+    f.FormatResult = "abc"
+    
+    sb.AppendFormatEx f, "{0:X2}", 10
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("abc")
+    Assert.That f.FormatArg, Iz.EqualTo(10)
+    Assert.That f.FormatText, Iz.EqualTo("X2")
+End Sub
+
+Public Sub AppendFormatEx_WithNullReturn_PerformsDefaultFormatting()
+    Dim sb As New StringBuilder
+    Dim f As New FakeCustomFormatter
+    f.ReturnNull = True
+    
+    sb.AppendFormatEx f, "{0:X2}", 10
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("0A")
+End Sub
+
+Public Sub AppendFormatEx_WithEmptyReturn_FormatsAsEmpty()
+    Dim sb As New StringBuilder
+    Dim f As New FakeCustomFormatter
+    f.FormatResult = ""
+    
+    sb.AppendFormatEx f, "{0:x2}", 10
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub CopyTo_WhenCalled_CopiesStringToArray()
+    Dim sb As New StringBuilder
+    sb.Append "0123456789"
+    Dim Chars() As Integer
+    ReDim Chars(2)
+    
+    sb.CopyTo 2, Chars, 0, 3
+    
+    Dim Expected() As Integer
+    Expected = NewIntegers(50, 51, 52)
+    Assert.That Chars, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CopyTo_WithNullDestination_Throw()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    Dim Chars() As Integer
+    
+    On Error Resume Next
+    sb.CopyTo 0, Chars, 0, 3
+    
+    AssertArgumentNullException Err, "Destination"
+End Sub
+
+Public Sub CopyTo_WithNegativeSourceIndex_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    Dim Chars(0) As Integer
+    
+    On Error Resume Next
+    sb.CopyTo -1, Chars, 0, 1
+    
+    AssertArgumentOutOfRangeException Err, "SourceIndex"
+End Sub
+
+Public Sub CopyTo_WithSourceIndexLongerThanInstance_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    Dim Chars(0) As Integer
+    
+    On Error Resume Next
+    sb.CopyTo 4, Chars, 0, 1
+    
+    AssertArgumentOutOfRangeException Err, "SourceIndex"
+End Sub
+
+Public Sub CopyTo_WithDestinationIndexLessThanLBound_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    Dim Chars(5 To 6) As Integer
+    
+    On Error Resume Next
+    sb.CopyTo 0, Chars, 4, 2
+    
+    AssertArgumentOutOfRangeException Err, "DestinationIndex"
+End Sub
+
+Public Sub CopyTo_WithSourceIndexAndCountGreaterThanTheInstance_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    Dim Chars(0 To 6) As Integer
+    
+    On Error Resume Next
+    sb.CopyTo 0, Chars, 0, 4
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub CopyTo_WithDestinationIndexAndCountGreaterThanUBound_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    Dim Chars(0 To 6) As Integer
+    
+    On Error Resume Next
+    sb.CopyTo 0, Chars, 5, 3
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub ToString_WithNegativeStartIndex_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    On Error Resume Next
+    sb.ToString -1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub ToString_WithNegativeLength_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    On Error Resume Next
+    sb.ToString 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Length"
+End Sub
+
+Public Sub ToString_WithStartIndexAndLengthGreaterThanInstance_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    On Error Resume Next
+    sb.ToString 0, 4
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub ToString_WithSubString_ReturnsSubPortion()
+    Dim sb As New StringBuilder
+    sb.Append "abcd"
+    
+    Dim Actual As String
+    Actual = sb.ToString(2, 2)
+    
+    Assert.That Actual, Iz.EqualTo("cd")
+End Sub
 

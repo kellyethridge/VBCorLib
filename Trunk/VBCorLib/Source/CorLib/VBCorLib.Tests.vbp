@@ -213,6 +213,7 @@ Class=ComparableComparer; Tests\ComparableComparer.cls
 Class=VBGuidComparer; Tests\VBGuidComparer.cls
 Module=cArrayCallbacks; Tests\cArrayCallbacks.bas
 ResFile32="VBCorLib.Tests.RES"
+Class=FakeCustomFormatter; Tests\FakeCustomFormatter.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

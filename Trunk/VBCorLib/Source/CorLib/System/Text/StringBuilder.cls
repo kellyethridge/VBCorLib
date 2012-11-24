@@ -270,14 +270,18 @@ End Sub
 ' @param Count The number of characters to copy.
 '
 Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByVal DestinationIndex As Long, ByVal Count As Long)
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Destination), DestinationIndex, Count)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Destination", DestinationIndex, "DestinationIndex", Count, "Count"
-    
-    Result = VerifyListRange(mLength, SourceIndex, Count)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, SourceIndex, "SourceIndex", Count, "Count"
+    If SourceIndex < 0 Or SourceIndex > mLength Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "SourceIndex")
+    If SAPtr(Destination) = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Destination")
+    If DestinationIndex < LBound(Destination) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "DestinationIndex")
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
+    If SourceIndex + Count > mLength Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Arg_LongerThanSrcString))
+    If DestinationIndex + Count - 1 > UBound(Destination) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_OffsetOut))
     
     If Count > 0 Then
         CopyMemory Destination(DestinationIndex), ByVal mStringPtr + SourceIndex * BytesPerChar, Count * BytesPerChar
@@ -583,17 +587,22 @@ End Function
 ' @remarks startindex is zero-based.
 '
 Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As String
-    Dim CharCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mLength, StartIndex, ElemIndex, Length, CharCount)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "StartIndex", CharCount, "Length", IsMissing(StartIndex)
+    Dim ElemCount   As Long
+    ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemCount = GetOptionalLong(Length, mLength)
     
-    If mLength = 0 Then
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_StartIndex), "StartIndex")
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+    If ElemIndex + ElemCount > mLength Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+    
+    If ElemCount = 0 Then
         ToString = ""
     Else
-        ToString = SysAllocStringLen(mStringPtr + ElemIndex * BytesPerChar, CharCount)
+        ToString = SysAllocStringLen(mStringPtr + ElemIndex * BytesPerChar, ElemCount)
     End If
 End Function
 
@@ -742,7 +751,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                 If Index > SubStringStart Then
                     ' If we have some characters, just append them now
                     ' even if the "{" may be escaped. Most times it won't be.
-                    Call AppendChars(mChars.Data, SubStringStart, Index - SubStringStart)
+                    AppendChars mChars.Data, SubStringStart, Index - SubStringStart
                 End If
                 
                 Index = Index + 1
@@ -750,7 +759,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                 ' We test for escape by checking the next character for a "{".
                 ' But if we're out of characters, then we ended with a "{",
                 ' and that is an invalid format.
-                If Index = Max Then Call FormatError
+                If Index = Max Then FormatError
                 
                 ' We have enough characters to test for possible escape.
                 If mChars.Data(Index) = OpenBraceChar Then
@@ -786,15 +795,15 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     
                     ' Add leading padding.
                     If ArgWidth > Len(s) Then
-                        Call AppendChar(vbSpace, ArgWidth - Len(s))
+                        AppendChar vbSpace, ArgWidth - Len(s)
                     End If
                     
                     ' Finally append the formatted value to the string.
-                    Call AppendQuick(s)
+                    AppendQuick s
                     
                     ' Add trailing padding.
                     If -ArgWidth > Len(s) Then
-                        Call AppendChar(vbSpace, (-ArgWidth) - Len(s))
+                        AppendChar vbSpace, (-ArgWidth) - Len(s)
                     End If
                     
                     SubStringStart = Index + 1
@@ -806,7 +815,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                 Index = Index + 1
                 
                 ' Need enough characters to test for escape.
-                If Index = Max Then Call FormatError
+                If Index = Max Then FormatError
                 
                 If mChars.Data(Index) = CloseBraceChar Then
                     ' escape it and add the substring to this point.
@@ -814,12 +823,12 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     ' don't want to include both "}}" in the substring.
                     If Index - 1 > SubStringStart Then
                         ' Append the current substring.
-                        Call AppendChars(mChars.Data, SubStringStart, Index - SubStringStart - 1)
+                        AppendChars mChars.Data, SubStringStart, Index - SubStringStart - 1
                     End If
                     SubStringStart = Index
                 Else
                     ' we failed to escape it, so there was no matching "{".
-                    Call FormatError
+                    FormatError
                 End If
         End Select
         Index = Index + 1
@@ -827,7 +836,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
     
     If Index > SubStringStart Then
         ' If we have some characters, just append them now.
-        Call AppendChars(mChars.Data, SubStringStart, Index - SubStringStart)
+        AppendChars mChars.Data, SubStringStart, Index - SubStringStart
     End If
 End Sub
 
@@ -903,7 +912,7 @@ Private Function ConsumeSpaces(ByVal Index As Long) As Long
     
     Do
         ' Can never hit the end consuming spaces.
-        If Index = Max Then Call FormatError
+        If Index = Max Then FormatError
         If mChars.Data(Index) <> vbSpace Then Exit Do
         Index = Index + 1
     Loop
@@ -928,10 +937,11 @@ Private Function ParseNumber(ByRef Index As Long) As Long
     Dim FirstCharIndex As Long
     FirstCharIndex = Index
     
-    Dim Number As Long
+    Dim Number      As Long
+    Dim NumberFound As Boolean
     Do
         ' We can never hit the end parsing a number.
-        If Index = Max Then Call FormatError
+        If Index = Max Then FormatError
         
         Dim ch As Integer
         ch = mChars.Data(Index)
@@ -939,9 +949,10 @@ Private Function ParseNumber(ByRef Index As Long) As Long
             Case vbZero To vbNine
                 ' Keep adding digits to the number
                 Number = Number * 10 + ch - vbZero
+                NumberFound = True
             Case vbMinus
                 ' The "-" can only be the first character.
-                If Index <> FirstCharIndex Then Call FormatError
+                If Index <> FirstCharIndex Then FormatError
                 Sign = -1
             Case Else
                 ' we have reached the end of the number, so exit.
@@ -949,6 +960,8 @@ Private Function ParseNumber(ByRef Index As Long) As Long
         End Select
         Index = Index + 1
     Loop
+    
+    If Not NumberFound Then FormatError
     
     ParseNumber = Number * Sign
 End Function

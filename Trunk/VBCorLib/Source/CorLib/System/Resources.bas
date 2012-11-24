@@ -58,6 +58,7 @@ Public Enum ResourceStringId
     ArgumentOutOfRange_Count = 718
     ArgumentOutOfRange_NegativeLength = 719
     ArgumentOutOfRange_StartIndex = 720
+    ArgumentOutOfRange_OffsetOut = 721
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802
@@ -84,6 +85,7 @@ Public Enum ResourceStringId
     Argument_InvalidComparer = 823
     Arg_MustBeVbVarType = 824
     Argument_EmptyName = 825
+    Arg_LongerThanSrcString = 826
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902
