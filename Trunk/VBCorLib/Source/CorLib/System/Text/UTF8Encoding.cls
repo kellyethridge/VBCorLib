@@ -468,13 +468,13 @@ Friend Property Get EmitUTF8Identifier() As Boolean
 End Property
 
 Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF8Encoder) As Long
-    Const HIGH_OFFSET As Long = &HD800&
-    Const LOW_OFFSET As Long = &HDC00&
+    Const HIGH_OFFSET   As Long = &HD800&
+    Const LOW_OFFSET    As Long = &HDC00&
     
     Dim uch                 As Long
     Dim maxindex            As Long
     Dim MaxByteIndex        As Long
-    Dim startIndex          As Long
+    Dim StartIndex          As Long
     Dim HighSurrogateChar   As Long
     
     If cArray.IsNull(Bytes) Then _
@@ -483,7 +483,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
     
     If Not Encoder Is Nothing Then HighSurrogateChar = Encoder.HighSurrogateChar
-    startIndex = ByteIndex
+    StartIndex = ByteIndex
     MaxByteIndex = UBound(Bytes) + 1
     maxindex = CharIndex + CharCount
     Do While CharIndex < maxindex
@@ -558,7 +558,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
         ByteIndex = EncodeSurrogate(HighSurrogateChar, Bytes, ByteIndex)
     End If
     
-    InternalGetBytes = ByteIndex - startIndex
+    InternalGetBytes = ByteIndex - StartIndex
 End Function
 
 Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF8Decoder) As Long

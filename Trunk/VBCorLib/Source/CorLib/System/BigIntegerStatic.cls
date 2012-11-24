@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2007 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of BigNumber.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    BigNumber is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    BigNumber is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: BigIntegerStatic
+' Module: BigIntegerStatic
 '
 
 ''
@@ -179,18 +182,18 @@ Public Function TryParse(ByVal s As String, ByRef b As BigInteger) As Boolean
     s = Trim$(s)
     If Len(s) = 0 Then Exit Function
     
-    Dim startIndex As Long
+    Dim StartIndex As Long
     Dim n As Number
     
     If Left$(s, 1) = "-" Then
-        startIndex = 1
+        StartIndex = 1
         n.Sign = Negative
     End If
 
-    Select Case Mid$(s, startIndex + 1, 2)
-        Case "&h", "&H", "0X", "0x":    TryParse = TryParseHex(s, startIndex, n)
-        Case "0b", "0B":                TryParse = TryParseBinary(s, startIndex, n)
-        Case Else:                      TryParse = TryParseDecimal(s, startIndex, n)
+    Select Case Mid$(s, StartIndex + 1, 2)
+        Case "&h", "&H", "0X", "0x":    TryParse = TryParseHex(s, StartIndex, n)
+        Case "0b", "0B":                TryParse = TryParseBinary(s, StartIndex, n)
+        Case Else:                      TryParse = TryParseDecimal(s, StartIndex, n)
     End Select
     
     If TryParse Then
@@ -1009,15 +1012,15 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function TryParseDecimal(ByRef s As String, ByVal startIndex As Long, ByRef n As Number) As Boolean
-    If Len(s) - startIndex < 1 Then Exit Function
+Private Function TryParseDecimal(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
+    If Len(s) - StartIndex < 1 Then Exit Function
     
     Call HookString(s)
     Dim ub As Long: ub = Len(s) \ 4 + 1
     ReDim n.Digits(0 To ub)
     
     Dim i As Long
-    For i = startIndex To mCharsSA.cElements - 1
+    For i = StartIndex To mCharsSA.cElements - 1
         Select Case mChars(i)
             Case 48 To 57
                 Call SingleInPlaceMultiply(n, 10)
@@ -1033,8 +1036,8 @@ Private Function TryParseDecimal(ByRef s As String, ByVal startIndex As Long, By
     TryParseDecimal = True
 End Function
 
-Private Function TryParseHex(ByRef s As String, ByVal startIndex As Long, ByRef n As Number) As Boolean
-    If Len(s) - startIndex < 3 Then Exit Function
+Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
+    If Len(s) - StartIndex < 3 Then Exit Function
     
     Call HookString(s)
     Dim ub As Long: ub = (Len(s) - 2) \ 4 + 1
@@ -1044,7 +1047,7 @@ Private Function TryParseHex(ByRef s As String, ByVal startIndex As Long, ByRef 
     Dim i As Long
     Dim j As Long: j = 1
     Dim k As Long
-    For i = Len(s) - 1 To 2 + startIndex Step -1
+    For i = Len(s) - 1 To 2 + StartIndex Step -1
         Dim ch As Long
         Select Case mChars(i)
             Case 48 To 57:  ch = mChars(i) - 48
@@ -1076,8 +1079,8 @@ Private Function TryParseHex(ByRef s As String, ByVal startIndex As Long, ByRef 
     TryParseHex = True
 End Function
 
-Private Function TryParseBinary(ByRef s As String, ByVal startIndex As Long, ByRef n As Number) As Boolean
-    If Len(s) - startIndex < 3 Then Exit Function
+Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
+    If Len(s) - StartIndex < 3 Then Exit Function
     
     Call HookString(s)
     
@@ -1089,7 +1092,7 @@ Private Function TryParseBinary(ByRef s As String, ByVal startIndex As Long, ByR
     Dim i As Long
     Dim j As Long: j = 1
     Dim k As Long
-    For i = Len(s) - 1 To 2 + startIndex Step -1
+    For i = Len(s) - 1 To 2 + StartIndex Step -1
         Dim ch As Long
         Select Case mChars(i)
             Case 48, 49: ch = mChars(i) - 48

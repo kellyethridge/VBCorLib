@@ -695,7 +695,7 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
                     Set DstUDT = SafeArrayGetRecordInfo(pDestinationSafeArray)
                     
                     If SrcUDT.IsMatchingType(DstUDT) = BOOL_FALSE Then _
-                        Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
+                        Throw Cor.NewArrayTypeMismatchException(Resources.GetString(ArrayTypeMismatch_Incompatible))
                         
                     CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
                     
@@ -706,7 +706,7 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
             Dim Assigner As Long
             Assigner = GetAssigningFunction(SourceArrayType, DestinationArrayType)
             If Assigner = vbNullPtr Then _
-                Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
+                Throw Cor.NewArrayTypeMismatchException(Resources.GetString(ArrayTypeMismatch_Incompatible))
             
             CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, Assigner
         End If
@@ -796,7 +796,7 @@ Private Function InternalGetLength(ByVal pSafeArray As Long, ByVal Dimension As 
     Dim Rank As Long
     Rank = SafeArrayGetDim(pSafeArray)
     If Dimension > Rank Then _
-        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(IndexOutOfRange_Dimension))
+        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(IndexOutOfRange_Dimension))
         
     pSafeArray = pSafeArray + SIZEOF_SAFEARRAY
     If Dimension < 1 Then
@@ -883,7 +883,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     IndexOf = LBound(Arr) - 1
     Exit Function
 errTrap:
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
+    Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
 ''
@@ -946,7 +946,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     LastIndexOf = LBound(Arr) - 1
     Exit Function
 errTrap:
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
+    Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
 ''
@@ -1397,7 +1397,7 @@ Private Sub CopyObjectTypesCast(ByVal srcpSA As Long, ByVal SourceIndex As Long,
             If SrcObj.QueryInterface(ByVal pDstGuid, pObj) = E_NOINTERFACE Then
                 ObjectPtr(SrcObj) = vbNullPtr
                 ObjectPtr(DstObj) = vbNullPtr
-                Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
+                Throw Cor.NewArrayTypeMismatchException(Resources.GetString(ArrayTypeMismatch_Incompatible))
             End If
         End If
         
