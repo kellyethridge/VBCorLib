@@ -24,7 +24,7 @@ Private CT() As Byte
 Public Sub Setup()
     Set csp = New RijndaelManaged
     FF = FreeFile
-    Open App.Path & "\Cryptography Files\Rijndael_CFB_Entries.txt" For Input As #FF
+    Open App.Path & "\Tests\Cryptography Files\Rijndael_CFB_Entries.txt" For Input As #FF
 End Sub
 
 Public Sub TearDown()

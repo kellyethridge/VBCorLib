@@ -124,7 +124,7 @@ End Sub
 
 Public Sub HashLargeFileStream()
     Dim fs As FileStream
-    Set fs = Cor.NewFileStream(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting)
+    Set fs = Cor.NewFileStream(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting)
     
     Dim hash() As Byte
     hash = Cor.NewBytes(&H37, &HEB, &H94, &HAB, &H1A, &H4C, &HC7, &HC4, &H50, &H3A, &H4D, &H70, &HF5, &HC2, &HA3, &H41, &H4D, &HB2, &H97, &H4A)

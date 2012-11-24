@@ -27,7 +27,7 @@ Public Sub Setup()
     Set csp = New HMACRIPEMD160
     
     FF = FreeFile
-    Open App.Path & "\Cryptography Files\HMACRIPEMD160_Hashes.txt" For Input As #FF
+    Open App.Path & "\Tests\Cryptography Files\HMACRIPEMD160_Hashes.txt" For Input As #FF
 End Sub
 
 Public Sub TearDown()
@@ -87,7 +87,7 @@ Public Sub TestTransformFinalBlock()
         Dim b() As Byte
         b = csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
         Assert.AreEqual PT, b
-        Assert.AreEqual ht, csp.Hash
+        Assert.AreEqual ht, csp.hash
     Loop
 End Sub
 
@@ -108,7 +108,7 @@ Public Sub TestTransformBlock1ByteAtATime()
             Assert.AreEqual PT(i), b(0), "TransformBlock Entry: " & c
         Next i
         csp.TransformFinalBlock PT, UBound(PT) + 1, 0
-        Assert.AreEqual ht, csp.Hash, "TransformFinalBlock Entry: " & c
+        Assert.AreEqual ht, csp.hash, "TransformFinalBlock Entry: " & c
     Loop
 End Sub
 
@@ -135,17 +135,17 @@ Public Sub TestTransformBlock5BytesAtATime()
             i = i + 5
         Loop
         csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
-        Assert.AreEqual ht, csp.Hash, "Hash: Entry " & c
+        Assert.AreEqual ht, csp.hash, "Hash: Entry " & c
     Loop
 End Sub
 
 Public Sub HashLargeFileStream()
-    Dim Hash() As Byte
-    Hash = Cor.NewBytes(&H39, &HCA, &H8A, &H2D, &H93, &HF9, &H5, &H6C, &HE1, &H22, &H63, &H0, &H2F, &HED, &HC, &H33, &H93, &H1E, &H3B, &H24)
+    Dim hash() As Byte
+    hash = Cor.NewBytes(&H39, &HCA, &H8A, &H2D, &H93, &HF9, &H5, &H6C, &HE1, &H22, &H63, &H0, &H2F, &HED, &HC, &H33, &H93, &H1E, &H3B, &H24)
     
     csp.Key = Cor.NewBytes(&H5A, &H41, &HDC, &HDA, &H95, &H50, &HEA, &H8E, &H7A, &HFF, &HF2, &H34, &H5, &H0, &H94, &H95, &H27, &HCD, &H1E, &H89, &H36, &H26, &H4F, &H84, &HB9, &HB1, &HBC, &H94, &HC5, &H59, &HB3, &H82, &HD2, &H94, &H87, &H3, &HE9, &H2F, &HA0, &H57, &H47, &HCD, &H69, &HE9, &HAF, &H6A, &H71, &HA9, &HD6, &H7F, &H90, &HBF, &HA2, &H87, &H25, &H87, &H89, &HC8, &H24, &H5F, &HA6, &H98, &HA7, &H21)
     
-    Assert.AreEqual Hash, csp.ComputeHash(File.OpenFile(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting))
+    Assert.AreEqual hash, csp.ComputeHash(File.OpenFile(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting))
 End Sub
 
 

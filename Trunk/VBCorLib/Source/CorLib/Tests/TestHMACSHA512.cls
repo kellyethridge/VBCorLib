@@ -26,7 +26,7 @@ Public Sub Setup()
     Set csp = New HMACSHA512
     
     FF = FreeFile
-    Open App.Path & "\Cryptography Files\HMACSHA512_Hashes.txt" For Input As #FF
+    Open App.Path & "\Tests\Cryptography Files\HMACSHA512_Hashes.txt" For Input As #FF
 End Sub
 
 Public Sub TearDown()
@@ -144,7 +144,7 @@ Public Sub HashLargeFileStream()
     
     csp.Key = Cor.NewBytes(&H57, &H69, &H94, &H2C, &HA2, &H9C, &H8F, &H3D, &H16, &H2B, &H93, &H4E, &H59, &HA9, &H61, &HB0, &H83, &HBD, &HCE, &HBA, &HA2, &HF8, &H83, &HF1, &H46, &H9B, &HBC, &H22, &HAD, &H70, &H54, &HC6, &H72, &H6A, &HD7, &H3D, &H1B, &H77, &HCB, &H65, &H95, &HDA, &H6C, &H5F, &HAB, &H18, &HC0, &H2E, &H49, &HB6, &HDC, &HE7, &H69, &H12, &HEE, &HA8, &H1, &H47, &H54, &HF2, &HC, &HC2, &HD0, &H5)
     
-    Assert.AreEqual hash, csp.ComputeHash(File.OpenFile(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting))
+    Assert.AreEqual hash, csp.ComputeHash(File.OpenFile(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting))
 End Sub
 
 
