@@ -8,9 +8,9 @@ BEGIN
 END
 Attribute VB_Name = "StringUtils"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 ' By Chris Lucas, cdl1051@earthlink.net, 20011204/20020607
 ' Thanks to Olaf for the class implementation concept
 
