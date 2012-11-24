@@ -59,6 +59,7 @@ Public Enum ResourceStringId
     ArgumentOutOfRange_NegativeLength = 719
     ArgumentOutOfRange_StartIndex = 720
     ArgumentOutOfRange_OffsetOut = 721
+    ArgumentOutOfRange_IndexLength = 722
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802

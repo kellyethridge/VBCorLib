@@ -306,16 +306,18 @@ Public Property Let Capacity(ByVal RHS As Long)
     If RHS < mLength Then _
         Throw Cor.NewArgumentOutOfRangeException("Cannot set capacity less than the length of the current instance.", "Capacity", RHS)
     
-    Dim Ptr As Long
-    Ptr = CoTaskMemAlloc(RHS * BytesPerChar)
-    If Ptr = vbNullPtr Then _
-        Throw New OutOfMemoryException
-        
-    CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
-    CoTaskMemFree mStringPtr
-    mStringPtr = Ptr
-    mStringSA.pvData = Ptr
-    mCapacity = RHS
+    If RHS <> mCapacity Then
+        Dim Ptr As Long
+        Ptr = CoTaskMemAlloc(RHS * BytesPerChar)
+        If Ptr = vbNullPtr Then _
+            Throw New OutOfMemoryException
+            
+        CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
+        CoTaskMemFree mStringPtr
+        mStringPtr = Ptr
+        mStringSA.pvData = Ptr
+        mCapacity = RHS
+    End If
 End Property
 
 ''
@@ -610,28 +612,39 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Count As Variant, ByVal Capacity As Long)
-    CoTaskMemFree mStringPtr
-    
-    Dim CharCount As Long
-    CharCount = GetOptionalLong(Count, Len(s))
-    
+Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Length As Variant, ByVal Capacity As Long)
     Dim ElemIndex As Long
+    Dim ElemCount As Long
     ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemCount = GetOptionalLong(Length, Len(s) - ElemIndex)
+        
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_StartIndex), "StartIndex")
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Length")
+    If ElemIndex + ElemCount > Len(s) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength))
+    If Capacity < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Capacity")
+        
+    If Capacity = 0 Then
+        Capacity = DefaultCapacity
+    End If
     
-    Dim Result As Long
-    Result = VerifyListRange(Len(s), ElemIndex, CharCount)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "StartIndex", CharCount, "Count", IsMissing(StartIndex)
+    If ElemCount > Capacity Then
+        Capacity = ElemCount
+    End If
     
-    If CharCount > Capacity Then Capacity = CharCount
-    If Capacity < DefaultCapacity Then Capacity = DefaultCapacity
+    If Capacity <> mCapacity Then
+        CoTaskMemFree mStringPtr
+        mStringPtr = CoTaskMemAlloc(Capacity * BytesPerChar)
+        mCapacity = Capacity
+    End If
     
-    mStringPtr = CoTaskMemAlloc(Capacity * 2)
-    mCapacity = Capacity
-    mLength = CharCount
-    If CharCount > 0 Then
-        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, CharCount * BytesPerChar
+    
+    If ElemCount > 0 Then
+        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
+        mLength = ElemCount
     End If
 End Sub
 
@@ -642,7 +655,8 @@ End Sub
 Private Sub Class_Initialize()
     mFillChar = DefaultFillChar
     mStringPtr = CoTaskMemAlloc(DefaultCapacity * BytesPerChar)
-    If mStringPtr = vbNullPtr Then Throw New OutOfMemoryException
+    If mStringPtr = vbNullPtr Then _
+        Throw New OutOfMemoryException
     mCapacity = DefaultCapacity
     
     With OldStrSA
