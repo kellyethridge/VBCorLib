@@ -279,13 +279,12 @@ End Function
 ' @param FormatType The type of format provider that is requested.
 ' @return The format provider, or Nothing if a provider was not found.
 '
-Public Function GetFormat(ByVal FormatType As String) As Object
-    Select Case LCase$(FormatType)
-        Case "numberformatinfo"
-            Set GetFormat = NumberFormat
-        Case "datetimeformatinfo"
-            Set GetFormat = DateTimeFormat
-    End Select
+Public Function GetFormat(ByRef FormatType As String) As Object
+    If StringUtils.EqualText(FormatType, "numberformatinfo") Then
+        Set GetFormat = NumberFormat
+    ElseIf StringUtils.EqualText(FormatType, "datetimeformatinfo") Then
+        Set GetFormat = DateTimeFormat
+    End If
 End Function
 
 ''
@@ -571,6 +570,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IFormatProvider Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IFormatProvider_GetFormat(ByVal FormatType As String) As Object
+Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     Set IFormatProvider_GetFormat = GetFormat(FormatType)
 End Function

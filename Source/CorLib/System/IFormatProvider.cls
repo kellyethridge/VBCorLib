@@ -45,5 +45,5 @@ Option Explicit
 ' @remarks Calling this function should not raise an exception. If the
 ' requested <i>FormatType</i> is not supported then <b>Nothing</b> should be returned.
 '
-Public Function GetFormat(ByVal FormatType As String) As Object: End Function
+Public Function GetFormat(ByRef FormatType As String) As Object: End Function
 

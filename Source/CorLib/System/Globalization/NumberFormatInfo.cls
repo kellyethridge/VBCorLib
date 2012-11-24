@@ -970,8 +970,10 @@ End Function
 ' @param FormatType The name of the format provider.
 ' @return The requested format provider, or Nothing if no format provider was found.
 '
-Public Function GetFormat(ByVal FormatType As String) As Object
-    If LCase$(FormatType) = "numberformatinfo" Then Set GetFormat = Me
+Public Function GetFormat(ByRef FormatType As String) As Object
+    If StringUtils.EqualText(FormatType, "numberformatinfo") Then
+        Set GetFormat = Me
+    End If
 End Function
 
 ''
@@ -2182,6 +2184,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IFormatProvider Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IFormatProvider_GetFormat(ByVal FormatType As String) As Object
+Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     Set IFormatProvider_GetFormat = GetFormat(FormatType)
 End Function

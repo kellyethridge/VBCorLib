@@ -34,7 +34,7 @@ Private Function ICustomFormatter_Format(ByVal FormatText As String, Arg As Vari
     End If
 End Function
 
-Private Function IFormatProvider_GetFormat(ByVal FormatType As String) As Object
+Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     Me.FormatType = FormatType
     If Not Me.Disable And LCase$(FormatType) = "icustomformatter" Then
         Set IFormatProvider_GetFormat = Me

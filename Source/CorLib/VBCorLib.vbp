@@ -319,6 +319,7 @@ Module=modFileStream; System\IO\modFileStream.bas
 Class=TimeSpanParser; System\TimeSpanParser.cls
 Module=Resources; System\Resources.bas
 ResFile32="VBCorLib.RES"
+Class=StringUtils; System\StringUtils.cls
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"
