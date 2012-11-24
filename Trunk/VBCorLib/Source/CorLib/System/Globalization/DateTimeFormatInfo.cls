@@ -689,7 +689,7 @@ End Function
 ' @return The formatting provider, or Nothing is none is available.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If LCase$(FormatType) = "datetimeformatinfo" Then
+    If StringUtils.EqualText(FormatType, "datetimeformatinfo") Then
         Set GetFormat = Me
     End If
 End Function
@@ -1272,6 +1272,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IFormatProvider Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IFormatProvider_GetFormat(ByVal FormatType As String) As Object
+Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     Set IFormatProvider_GetFormat = GetFormat(FormatType)
 End Function

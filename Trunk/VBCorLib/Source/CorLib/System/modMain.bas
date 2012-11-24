@@ -21,6 +21,8 @@ Attribute VB_Name = "modMain"
 '
 Option Explicit
 
+Public StringUtils As New StringUtils
+
 Private mInIDE        As Boolean
 Private mInDebugger   As Boolean
 

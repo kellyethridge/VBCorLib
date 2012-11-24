@@ -29,15 +29,15 @@ End Sub
 
 
 ' format a value when requested, or return nothing if we didn't format it.
-Private Function ICustomFormatter_Format(ByVal fmt As String, arg As Variant, ByVal provider As VBCorLib.IFormatProvider) As String
+Private Function ICustomFormatter_Format(ByVal fmt As String, Arg As Variant, ByVal Provider As VBCorLib.IFormatProvider) As String
     ' we only format strings.
-    If VarType(arg) = vbString Then
+    If VarType(Arg) = vbString Then
         ' we simply reverse a string value.
-        ICustomFormatter_Format = StrReverse(arg)
+        ICustomFormatter_Format = StrReverse(Arg)
     End If
 End Function
 
 ' we only support ICustomFormatter types with this class.
-Private Function IFormatProvider_GetFormat(ByVal FormatType As String) As Object
+Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     If LCase$(FormatType) = "icustomformatter" Then Set IFormatProvider_GetFormat = Me
 End Function
