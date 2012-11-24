@@ -221,7 +221,7 @@ End Function
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 '
-Public Function AppendFormatEx(ByVal Provider As IFormatProvider, ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
+Public Function AppendFormatEx(ByRef Provider As IFormatProvider, ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(20)
     InternalAppendFormat Provider, Format, vArgs
@@ -234,7 +234,7 @@ End Function
 ' @param s The string to append to the builder, followed by a Carraige-Return/Linefeed.
 ' @return A reference to this instance of StringBuilder.
 '
-Public Function AppendLine(Optional ByVal s As String) As StringBuilder
+Public Function AppendLine(Optional ByRef s As String) As StringBuilder
     AppendQuick s
     AppendQuick vbCrLf
     Set AppendLine = Me
@@ -739,7 +739,7 @@ End Sub
 '
 ' "http://www.codeproject.com/csharp/custstrformat.asp"
 '
-Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
+Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
     Dim CustomFormatter     As ICustomFormatter
     Dim HasCustomFormatter  As Boolean
     Dim Index               As Long
