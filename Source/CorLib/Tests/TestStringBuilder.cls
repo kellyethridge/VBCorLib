@@ -30,6 +30,22 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "", ""
             Test.Use MakeInt32(5), "5"
             
+        Case "Replace_WithValues_Replaces"
+            Test.Use "abcd", "bc", "45", "a45d"
+            Test.Use "abcd", "ab", "45", "45cd"
+            Test.Use "abcd", "cd", "45", "ab45"
+            Test.Use "abcd", "a", "aa", "aabcd"
+            Test.Use "abcd", "d", "aa", "abcaa"
+            Test.Use "abcd", "b", "aa", "aaacd"
+            Test.Use "abcd", "bc", "a", "aad"
+            Test.Use "abcd", "bc", "", "ad"
+            Test.Use "1111", "1", "aa", "aaaaaaaa"
+            Test.Use "1212", "1", "aa", "aa2aa2"
+            Test.Use "1111", "11", "a", "aa"
+            Test.Use "abbbbc", "bd", "def", "abbbbc"
+            Test.Use "hahahahahahahahahaha", "ha", "blahblah", "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah"
+            Test.Use "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah", "blahblah", "ha", "hahahahahahahahahaha"
+            Test.Use "abcabcabc", "abcf", "", "abcabcabc"
     End Select
 End Sub
 
@@ -177,10 +193,10 @@ End Sub
 
 Public Sub AppendChars_WithEmptyArray_DoesNotAppend()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
-    Chars = NewIntegers()
+    Dim chars() As Integer
+    chars = NewIntegers()
     
-    sb.AppendChars Chars
+    sb.AppendChars chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -189,20 +205,20 @@ End Sub
 
 Public Sub AppendChars_WithNullArray_Throws()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
+    Dim chars() As Integer
     
     On Error Resume Next
-    sb.AppendChars Chars
+    sb.AppendChars chars
     
     AssertArgumentNullException Err, "Chars"
 End Sub
 
 Public Sub AppendChars_WithCharacters_Appends()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
-    Chars = NewIntegers(49, 50, 51)
+    Dim chars() As Integer
+    chars = NewIntegers(49, 50, 51)
     
-    sb.AppendChars Chars
+    sb.AppendChars chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -211,42 +227,42 @@ End Sub
 
 Public Sub AppendChars_WithStartIndexLessThanLBound_Throws()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
-    Chars = NewIntegers(49)
+    Dim chars() As Integer
+    chars = NewIntegers(49)
     
     On Error Resume Next
-    sb.AppendChars Chars, -1
+    sb.AppendChars chars, -1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub AppendChars_WithStartIndexAndCharCountLongerThanChars_Throws()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
-    Chars = NewIntegers(49, 50, 51)
+    Dim chars() As Integer
+    chars = NewIntegers(49, 50, 51)
     
     On Error Resume Next
-    sb.AppendChars Chars, 0, 4
+    sb.AppendChars chars, 0, 4
     
     AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub AppendChars_WithMultiDimensionArray_Throws()
     Dim sb As New StringBuilder
-    Dim Chars(0, 0) As Integer
+    Dim chars(0, 0) As Integer
     
     On Error Resume Next
-    sb.AppendChars Chars
+    sb.AppendChars chars
     
     AssertRankException Err
 End Sub
 
 Public Sub AppendChars_WithStartIndexAndCharCount_AppendsSubArray()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
-    Chars = NewIntegers(65, 66, 67, 68, 69)
+    Dim chars() As Integer
+    chars = NewIntegers(65, 66, 67, 68, 69)
     
-    sb.AppendChars Chars, 1, 3
+    sb.AppendChars chars, 1, 3
     
     Dim Actual As String
     Actual = sb.ToString
@@ -366,10 +382,10 @@ End Sub
 
 Public Sub InsertChars_WithNullArray_Throws()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
+    Dim chars() As Integer
     
     On Error Resume Next
-    sb.InsertChars 0, Chars
+    sb.InsertChars 0, chars
     
     AssertArgumentNullException Err, "Chars"
 End Sub
@@ -377,10 +393,10 @@ End Sub
 Public Sub InsertChars_WithEmptyArray_InsertsNothing()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim Chars() As Integer
-    Chars = NewIntegers
+    Dim chars() As Integer
+    chars = NewIntegers
     
-    sb.InsertChars 2, Chars
+    sb.InsertChars 2, chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -390,10 +406,10 @@ End Sub
 Public Sub InsertChars_WithIndexTo3rdPosition_InsertsInBetween()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim Chars() As Integer
-    Chars = NewIntegers(97, 97, 97)
+    Dim chars() As Integer
+    chars = NewIntegers(97, 97, 97)
     
-    sb.InsertChars 2, Chars
+    sb.InsertChars 2, chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -403,10 +419,10 @@ End Sub
 Public Sub InsertChars_WithIndexOfZero_InsertsAtBeginning()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim Chars() As Integer
-    Chars = NewIntegers(97, 97, 97)
+    Dim chars() As Integer
+    chars = NewIntegers(97, 97, 97)
     
-    sb.InsertChars 0, Chars
+    sb.InsertChars 0, chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -416,10 +432,10 @@ End Sub
 Public Sub InsertChars_WithIndexOfLengthOfInstance_InsertsAtEnd()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim Chars() As Integer
-    Chars = NewIntegers(97, 97, 97)
+    Dim chars() As Integer
+    chars = NewIntegers(97, 97, 97)
     
-    sb.InsertChars 4, Chars
+    sb.InsertChars 4, chars
     
     Dim Actual As String
     Actual = sb.ToString
@@ -429,10 +445,10 @@ End Sub
 Public Sub InsertChars_WithSubArray_InsertsPortion()
     Dim sb As New StringBuilder
     sb.Append "1234"
-    Dim Chars() As Integer
-    Chars = NewIntegers(97, 98, 99, 100)
+    Dim chars() As Integer
+    chars = NewIntegers(97, 98, 99, 100)
     
-    sb.InsertChars 2, Chars, 1, 2
+    sb.InsertChars 2, chars, 1, 2
     
     Dim Actual As String
     Actual = sb.ToString
@@ -441,153 +457,175 @@ End Sub
 
 Public Sub InsertChars_WithIndexLessThanZero_Throws()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
-    ReDim Chars(1 To 1)
+    Dim chars() As Integer
+    ReDim chars(1 To 1)
     
     On Error Resume Next
-    sb.InsertChars -1, Chars
+    sb.InsertChars -1, chars
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub InsertChars_WithStartIndexLessThanLBound_Throws()
     Dim sb As New StringBuilder
-    Dim Chars() As Integer
-    ReDim Chars(1 To 1)
+    Dim chars() As Integer
+    ReDim chars(1 To 1)
     
     On Error Resume Next
-    sb.InsertChars 0, Chars, 0
+    sb.InsertChars 0, chars, 0
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub InsertChars_WithNegativeCount_Throws()
     Dim sb As New StringBuilder
-    Dim Chars(0) As Integer
+    Dim chars(0) As Integer
     
     On Error Resume Next
-    sb.InsertChars 0, Chars, 0, -1
+    sb.InsertChars 0, chars, 0, -1
     
     AssertArgumentOutOfRangeException Err, "CharCount"
 End Sub
 
 Public Sub InsertChars_WithStartIndexAndCountExtendingPassedUBound_Throws()
     Dim sb As New StringBuilder
-    Dim Chars(1 To 3) As Integer
+    Dim chars(1 To 3) As Integer
     
     On Error Resume Next
-    sb.InsertChars 0, Chars, 1, 4
+    sb.InsertChars 0, chars, 1, 4
     
     AssertArgumentOutOfRangeException Err
 End Sub
 
+Public Sub Remove_WithStartIndexLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "a"
+    
+    On Error Resume Next
+    sb.Remove -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
 
-Public Sub TestRemoveFromStart()
+Public Sub Remove_WithCountLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "a"
+    
+    On Error Resume Next
+    sb.Remove 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Length"
+End Sub
+
+Public Sub Remove_WithStartIndexAndCountGreaterThanInstanceLength_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    On Error Resume Next
+    sb.Remove 0, 4
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub Remove_WithStartIndexZero_RemovesFromBeginning()
+    Dim sb As New StringBuilder
     sb.Append "1234567890"
+    
     sb.Remove 0, 5
-    Assert.AreEqual "67890", sb.ToString
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("67890")
 End Sub
 
-Public Sub TestRemoveFromEnd()
+Public Sub Remove_WithStartIndexAndLengthCoverEnd_RemovesFromEnd()
+    Dim sb As New StringBuilder
     sb.Append "1234567890"
+    
     sb.Remove 5, 5
-    Assert.AreEqual "12345", sb.ToString
-End Sub
-
-Public Sub TestReplace()
-    sb.Append "1234567890"
-    sb.Replace "45", ""
-    Assert.AreEqual 8, sb.Length
-    Assert.AreEqual "12367890", sb.ToString
-End Sub
-
-Public Sub TestReplaceMultiple()
-    sb.Insert 0, "Hello", 2
-    sb.Replace "ll", "mmmm"
     
-    Dim s As String
-    Dim i As Long
-    For i = 1 To 2
-        s = s & "Hemmmmo"
-    Next i
-    Assert.AreEqual 14, sb.Length
-    Assert.AreEqual s, sb.ToString
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("12345")
 End Sub
 
-Public Sub TestReplaceWithinSubString()
-    sb.Append "\\\\server\\share\\"
-    sb.Replace "\\", "\", 2, sb.Length - 2
+Public Sub Replace_WithEmptyNewValue_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
     
-    Assert.AreEqual 16, sb.Length
-    Assert.AreEqual "\\\server\share\", sb.ToString
-End Sub
-
-Public Sub TestReduce()
-    sb.Append "c:\....\abc\"
+    On Error Resume Next
+    sb.Replace "", "a"
     
-    Dim i As Long
-    Do
-        i = sb.Length
-        Call sb.Replace("...\", "..\")
-    Loop While i > sb.Length
+    AssertArgumentException Err, "OldValue"
+End Sub
+
+Public Sub Replace_WithStartIndexLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
     
-    Assert.AreEqual "c:\..\abc\", sb.ToString
-End Sub
-
-Public Sub TestUnwindReplaceOnPartialMatch()
-    sb.Append "abbbbc"
-    sb.Replace "bd", ""
-    Assert.AreEqual "abbbbc", sb.ToString
-End Sub
-
-Public Sub XBeatTest()
-    Dim rep As String
-    Dim find As String
-    Dim src As String
+    On Error Resume Next
+    sb.Replace "a", "b", -1
     
-    find = "ha"
-    rep = "blahblah"
-    src = "hahahahahahahahahaha"
-    sb.Append src
-    sb.Replace find, rep
-    Assert.AreEqual Replace$(src, find, rep), sb.ToString
+    AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub XBeatTest2()
+Public Sub Replace_WithCountLessThanZero_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    On Error Resume Next
+    sb.Replace "a", "b", 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Replace_WithStartIndexAndCountGreaterThanInstanceLength_Throws()
+    Dim sb As New StringBuilder
+    sb.Append "abc"
+    
+    On Error Resume Next
+    sb.Replace "a", "b", 0, 4
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub Replace_WithValues_Replaces(ByVal Initial As String, ByVal OldValue As String, ByVal NewValue As String, ByVal Expected As String)
+    Dim sb As New StringBuilder
+    sb.Append Initial
+    
+    sb.Replace OldValue, NewValue
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Replace_WithinSubstring_ReplacesSubInstancesOnly()
+    Dim sb As New StringBuilder
+    sb.Append "111111"
+    
+    sb.Replace "11", "a", 2, 2
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("11a11")
+End Sub
+
+Public Sub Replace_WithSubstringStartingInMiddleOfMatch_DoesNotReplacePartialMatch()
+    Dim sb As New StringBuilder
+    sb.Append "blahblahblahblahblahblahblahblah"
+    
+    sb.Replace "blah", "ha", 2
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo("blahhahahahahahaha")
+End Sub
+
+Public Sub Replace_UsingXBeatTest()
     sb.Insert 0, "xx" & Space$(10000) & "xx", 10
     sb.Replace "x", Space$(10000)
     Assert.AreEqual Space$(500000), sb.ToString
-End Sub
-
-Public Sub TestReplaceLastChar()
-    sb.Insert 0, "abc", 10
-    sb.Append "d"
-    sb.Replace "cd", "1234"
-    Assert.AreEqual "abcabcabcabcabcabcabcabcabcab1234", sb.ToString
-End Sub
-
-Public Sub TestReplaceAtEnd()
-    sb.AppendQuick "MyStuff"
-    sb.Replace "Stuff", "Junk"
-    Assert.AreEqual "MyJunk", sb.ToString
-End Sub
-
-Public Sub TestReplaceInsufficientMatch()
-    sb.AppendQuick "MyStuf"
-    sb.Replace "Stuff", "Junk"
-    Assert.AreEqual "MyStuf", sb.ToString
-End Sub
-
-Public Sub TestPartialWordAtEnd()
-    sb.AppendQuick "MyStuff"
-    sb.Replace "Stuffy", "Junky"
-    Assert.AreEqual "MyStuff", sb.ToString
-End Sub
-
-Public Sub TestReplaceOfSameSize()
-    sb.AppendChar Asc("A"), 10
-    sb.Replace "A", "B"
-    Assert.AreEqual String$(10, "B"), sb.ToString
 End Sub
 
 Public Sub TestAppendFormat()

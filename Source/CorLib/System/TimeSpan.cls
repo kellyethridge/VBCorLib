@@ -274,11 +274,11 @@ Public Function ToString() As String
         Call sb.Append(Days)
         Call sb.AppendChar(vbPeriod)
     End If
-    Call sb.AppendString(FormatNumber(Int(ms / MILLISECONDS_PER_HOUR) Mod 24))
+    Call sb.AppendQuick(FormatNumber(Int(ms / MILLISECONDS_PER_HOUR) Mod 24))
     Call sb.AppendChar(vbColon)
-    Call sb.AppendString(FormatNumber(Int(ms / MILLISECONDS_PER_MINUTE) Mod 60))
+    Call sb.AppendQuick(FormatNumber(Int(ms / MILLISECONDS_PER_MINUTE) Mod 60))
     Call sb.AppendChar(vbColon)
-    Call sb.AppendString(FormatNumber(Int(ms / MILLISECONDS_PER_SECOND) Mod 60))
+    Call sb.AppendQuick(FormatNumber(Int(ms / MILLISECONDS_PER_SECOND) Mod 60))
     
     Dim Frac As Long
     Frac = Modulus(ms, MILLISECONDS_PER_SECOND)
@@ -287,7 +287,7 @@ Public Function ToString() As String
         Dim strt As String
         strt = Frac * 10000
         Call sb.AppendChar(vbZero, 7 - Len(strt))
-        Call sb.AppendString(strt)
+        Call sb.AppendQuick(strt)
     End If
     ToString = sb.ToString
 End Function

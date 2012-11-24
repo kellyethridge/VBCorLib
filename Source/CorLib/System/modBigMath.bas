@@ -1,23 +1,26 @@
 Attribute VB_Name = "modBigMath"
-'    CopyRight (c) 2007 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of BigNumberTests.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    BigNumberTests is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    BigNumberTests is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: modBigMath
+' Module: modBigMath
 '
 
 ''
@@ -375,24 +378,24 @@ End Sub
 ' The number buffer is modified by this routine. It is assumed the buffer
 ' is large enough to handle the larger result.
 '
-Public Sub SingleInPlaceMultiply(ByRef n As Number, ByVal value As Long)
+Public Sub SingleInPlaceMultiply(ByRef n As Number, ByVal Value As Long)
     If InIDE Then
-        Call SingleInPlaceMultiplyIDE(n, value)
+        Call SingleInPlaceMultiplyIDE(n, Value)
         Exit Sub
     End If
 
-    Dim result  As Long
+    Dim Result  As Long
     Dim i       As Long
 
     For i = 0 To n.Precision - 1
-        result = result + value * (n.Digits(i) And &HFFFF&)
-        n.Digits(i) = result And &HFFFF&
-        result = ((result And &HFFFF0000) \ &H10000) And &HFFFF&
+        Result = Result + Value * (n.Digits(i) And &HFFFF&)
+        n.Digits(i) = Result And &HFFFF&
+        Result = ((Result And &HFFFF0000) \ &H10000) And &HFFFF&
     Next i
 
-    If result > 0 Then
+    If Result > 0 Then
         n.Precision = n.Precision + 1
-        n.Digits(i) = result And &HFFFF&
+        n.Digits(i) = Result And &HFFFF&
     End If
 End Sub
 
@@ -401,19 +404,19 @@ End Sub
 '
 ' The number buffer must be largest enough to handle any overflow.
 '
-Public Sub SingleInPlaceAdd(ByRef n As Number, ByVal value As Long)
+Public Sub SingleInPlaceAdd(ByRef n As Number, ByVal Value As Long)
     If InIDE Then
-        Call SingleInPlaceAddIDE(n, value)
+        Call SingleInPlaceAddIDE(n, Value)
         Exit Sub
     End If
 
     Dim i As Long
-    Do While value > 0
+    Do While Value > 0
         If i >= n.Precision Then n.Precision = n.Precision + 1
         
-        value = value + (n.Digits(i) And &HFFFF&)
-        n.Digits(i) = value And &HFFFF&
-        value = ((value And &HFFFF0000) \ &H10000) And &HFFFF&
+        Value = Value + (n.Digits(i) And &HFFFF&)
+        n.Digits(i) = Value And &HFFFF&
+        Value = ((Value And &HFFFF0000) \ &H10000) And &HFFFF&
         i = i + 1
     Loop
 End Sub
@@ -446,34 +449,34 @@ End Sub
 ''
 ' This is a support routine for division.
 '
-Private Function MultiInPlaceSubtract(ByRef u() As Integer, ByVal startIndex As Long, ByRef v() As Integer) As Boolean
+Private Function MultiInPlaceSubtract(ByRef u() As Integer, ByVal StartIndex As Long, ByRef v() As Integer) As Boolean
     If InIDE Then
-        MultiInPlaceSubtract = MultiInPlaceSubtractIDE(u, startIndex, v)
+        MultiInPlaceSubtract = MultiInPlaceSubtractIDE(u, StartIndex, v)
         Exit Function
     End If
     
     Dim k       As Long
-    Dim result  As Long
+    Dim Result  As Long
     Dim d       As Long
     Dim i       As Long
     Dim j       As Long
     Dim ubv     As Long
     ubv = UBound(v)
     
-    For i = startIndex To UBound(u)
+    For i = StartIndex To UBound(u)
         If j <= ubv Then d = v(j) And &HFFFF& Else d = 0
         
-        result = result + ((u(i) And &HFFFF&) - d) + k
+        Result = Result + ((u(i) And &HFFFF&) - d) + k
         
-        If result < 0 Then
-            result = result + &H10000
+        If Result < 0 Then
+            Result = Result + &H10000
             k = -1
         Else
             k = 0
         End If
         
-        u(i) = result And &HFFFF&
-        result = ((result And &HFFFF0000) \ &H10000) And &HFFFF&
+        u(i) = Result And &HFFFF&
+        Result = ((Result And &HFFFF0000) \ &H10000) And &HFFFF&
         j = j + 1
     Next i
     
@@ -483,25 +486,25 @@ End Function
 ''
 ' Performs an addition between two arrays, placing the result in the first array.
 '
-Private Sub MultiInPlaceAdd(ByRef u() As Integer, ByVal startIndex As Long, ByRef v() As Integer)
+Private Sub MultiInPlaceAdd(ByRef u() As Integer, ByVal StartIndex As Long, ByRef v() As Integer)
     If InIDE Then
-        Call MultiInPlaceAddIDE(u, startIndex, v)
+        Call MultiInPlaceAddIDE(u, StartIndex, v)
         Exit Sub
     End If
 
-    Dim result  As Long
+    Dim Result  As Long
     Dim i       As Long
     Dim j       As Long
     Dim d       As Long
     Dim ubv     As Long
     ubv = UBound(v)
     
-    For i = startIndex To UBound(u)
+    For i = StartIndex To UBound(u)
         If j <= ubv Then d = v(j) And &HFFFF& Else d = 0
         
-        result = result + (u(i) And &HFFFF&) + d
-        u(i) = result And &HFFFF&
-        result = ((result And &HFFFF0000) \ &H10000) And &HFFFF&
+        Result = Result + (u(i) And &HFFFF&) + d
+        u(i) = Result And &HFFFF&
+        Result = ((Result And &HFFFF0000) \ &H10000) And &HFFFF&
         j = j + 1
     Next i
 End Sub
@@ -607,12 +610,12 @@ Private Function GradeSchoolMultiplyIDE(ByRef u As Number, ByRef v As Number) As
     GradeSchoolMultiplyIDE = product
 End Function
 
-Private Sub SingleInPlaceMultiplyIDE(ByRef n As Number, ByVal value As Long)
+Private Sub SingleInPlaceMultiplyIDE(ByRef n As Number, ByVal Value As Long)
     Dim k As Long
     Dim i As Long
     
     For i = 0 To n.Precision - 1
-        k = UInt16x16To32(n.Digits(i), value) + k
+        k = UInt16x16To32(n.Digits(i), Value) + k
         n.Digits(i) = GetInt(k)
         k = RightShift16(k)
     Next i
@@ -623,10 +626,10 @@ Private Sub SingleInPlaceMultiplyIDE(ByRef n As Number, ByVal value As Long)
     End If
 End Sub
 
-Private Sub SingleInPlaceAddIDE(ByRef n As Number, ByVal value As Integer)
+Private Sub SingleInPlaceAddIDE(ByRef n As Number, ByVal Value As Integer)
     Dim i As Long
     Dim k As Long
-    k = GetLong(value)
+    k = GetLong(Value)
     
     Do While k > 0
         If i >= n.Precision Then n.Precision = n.Precision + 1
@@ -844,49 +847,49 @@ Private Sub SinglePlaceMultiplyIDE(ByRef u() As Integer, ByVal Length As Long, B
     w(Length) = GetInt(k)
 End Sub
 
-Private Function MultiInPlaceSubtractIDE(ByRef u() As Integer, ByVal startIndex As Long, ByRef v() As Integer) As Boolean
+Private Function MultiInPlaceSubtractIDE(ByRef u() As Integer, ByVal StartIndex As Long, ByRef v() As Integer) As Boolean
     Dim k As Long
-    Dim result As Long
+    Dim Result As Long
     Dim d As Long
     Dim i As Long
     Dim j As Long
     Dim ubv As Long
     ubv = UBound(v)
     
-    For i = startIndex To UBound(u)
+    For i = StartIndex To UBound(u)
         If j <= ubv Then d = GetLong(v(j)) Else d = 0
         
-        result = result + (GetLong(u(i)) - d) + k
+        Result = Result + (GetLong(u(i)) - d) + k
         
-        If result < 0 Then
-            result = result + &H10000
+        If Result < 0 Then
+            Result = Result + &H10000
             k = -1
         Else
             k = 0
         End If
         
-        u(i) = GetInt(result)
-        result = RightShift16(result)
+        u(i) = GetInt(Result)
+        Result = RightShift16(Result)
         j = j + 1
     Next i
     
     MultiInPlaceSubtractIDE = k
 End Function
 
-Private Sub MultiInPlaceAddIDE(ByRef u() As Integer, ByVal startIndex As Long, ByRef v() As Integer)
-    Dim result  As Long
+Private Sub MultiInPlaceAddIDE(ByRef u() As Integer, ByVal StartIndex As Long, ByRef v() As Integer)
+    Dim Result  As Long
     Dim i       As Long
     Dim j As Long
     Dim d As Long
     Dim ubv As Long
     ubv = UBound(v)
     
-    For i = startIndex To UBound(u)
+    For i = StartIndex To UBound(u)
         If j <= ubv Then d = GetLong(v(j)) Else d = 0
         
-        result = result + GetLong(u(i)) + d
-        u(i) = GetInt(result)
-        result = RightShift16(result)
+        Result = Result + GetLong(u(i)) + d
+        u(i) = GetInt(Result)
+        Result = RightShift16(Result)
         j = j + 1
     Next i
 End Sub

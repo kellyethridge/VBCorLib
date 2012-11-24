@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2008 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: AdapterArrayList
+' Module: AdapterArrayList
 '
 
 Option Explicit
@@ -121,12 +124,12 @@ Private Sub ArrayList_AddRange(c As Variant)
     Next v
 End Sub
 
-Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, startIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "startIndex", ElemCount, "Count", IsMissing(startIndex))
+    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "startIndex", ElemCount, "Count", IsMissing(StartIndex))
     
     Dim MiddleIndex As Long
     Dim LowIndex    As Long
@@ -213,12 +216,12 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, startIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
+    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
     
     Dim Ret As New ArrayListEnumerator
     Call Ret.Init(Me, ElemIndex, ElemCount)
@@ -240,12 +243,12 @@ Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As
     Set ArrayList_GetRange = Ret
 End Function
 
-Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, startIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(startIndex))
+    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
@@ -307,12 +310,12 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
     Call Helper.MoveVariant(ArrayList_Item, mList(Index))
 End Property
 
-Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRangeReverse(mList.Count, startIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(startIndex))
+    Result = GetOptionalListRangeReverse(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex))
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
@@ -422,12 +425,12 @@ Private Sub SetRange(ByVal Index As Long, ByRef c As Variant)
     Next v
 End Sub
 
-Private Sub ArrayList_Sort(Optional ByRef startIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, startIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(startIndex))
+    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
+    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex))
         
     If Comparer Is Nothing Then
         Set mComparer = VBCorLib.Comparer.Default
