@@ -25,7 +25,7 @@ Public Sub Setup()
     Set csp = New SHA256Managed
     
     FF = FreeFile
-    Open App.Path & "\Cryptography Files\SHA256_Hashes.txt" For Input As #FF
+    Open App.Path & "\Tests\Cryptography Files\SHA256_Hashes.txt" For Input As #FF
 End Sub
 
 Public Sub TearDown()
@@ -132,13 +132,13 @@ Public Sub GetHashBeforeFinishedShouldFail()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is InvalidOperationException, "Wrong exception type."
 End Sub
 
 Public Sub HashLargeFileStream()
     Dim fs As FileStream
-    Set fs = Cor.NewFileStream(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting)
+    Set fs = Cor.NewFileStream(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting)
     
     Dim hash() As Byte
     hash = Cor.NewBytes(&H44, &H41, &HB3, &H7B, &HE4, &HE, &HF3, &H8C, &HA3, &H7B, &H8F, &H24, &HC4, &HB5, &H9A, &HDF, &H5B, &HCE, &H4, &H37, &HB4, &H3B, &HEE, &H2D, &H7A, &H3, &H8E, &H4E, &H1C, &H2A, &H41, &HEC)

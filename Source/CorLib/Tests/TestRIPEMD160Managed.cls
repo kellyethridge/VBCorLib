@@ -24,7 +24,7 @@ Public Sub Setup()
     Set csp = New RIPEMD160Managed
     
     FF = FreeFile
-    Open App.Path & "\Cryptography Files\RIPEMD160_Hashes.txt" For Input As #FF
+    Open App.Path & "\Tests\Cryptography Files\RIPEMD160_Hashes.txt" For Input As #FF
 End Sub
 
 Public Sub TearDown()
@@ -79,7 +79,7 @@ Public Sub TestTransformFinalBlock()
         
         b = csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
         Assert.AreEqual PT, b
-        Assert.AreEqual ht, csp.Hash, "Entry " & c
+        Assert.AreEqual ht, csp.hash, "Entry " & c
     Loop
 End Sub
 
@@ -98,7 +98,7 @@ Public Sub TestTransformBlock1ByteAtATime()
             Assert.AreEqual PT(i), b(0), "Entry: " & c
         Next i
         csp.TransformFinalBlock PT, UBound(PT) + 1, 0
-        Assert.AreEqual ht, csp.Hash, "Entry: " & c
+        Assert.AreEqual ht, csp.hash, "Entry: " & c
     Loop
 End Sub
 
@@ -123,14 +123,14 @@ Public Sub TestTransformBlock5BytesAtATime()
             i = i + 5
         Loop
         csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
-        Assert.AreEqual ht, csp.Hash, "Hash: Entry " & c
+        Assert.AreEqual ht, csp.hash, "Hash: Entry " & c
     Loop
 End Sub
 
 Public Sub GetHashBeforeFinishedShouldFail()
     On Error GoTo errTrap
     Dim b() As Byte
-    b = csp.Hash
+    b = csp.hash
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
@@ -142,12 +142,12 @@ End Sub
 
 Public Sub HashLargeFileStream()
     Dim fs As FileStream
-    Set fs = Cor.NewFileStream(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting)
+    Set fs = Cor.NewFileStream(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting)
     
-    Dim Hash() As Byte
-    Hash = Cor.NewBytes(&HC0, &H63, &H27, &HD3, &HC8, &H54, &HC7, &H2A, &HF4, &HF7, &HD6, &HB8, &HC5, &H0, &H60, &HB1, &H7, &HAD, &H9A, &H39)
+    Dim hash() As Byte
+    hash = Cor.NewBytes(&HC0, &H63, &H27, &HD3, &HC8, &H54, &HC7, &H2A, &HF4, &HF7, &HD6, &HB8, &HC5, &H0, &H60, &HB1, &H7, &HAD, &H9A, &H39)
     
-    Assert.AreEqual Hash, csp.ComputeHash(fs)
+    Assert.AreEqual hash, csp.ComputeHash(fs)
 End Sub
 
 

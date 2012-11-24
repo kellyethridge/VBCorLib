@@ -19,7 +19,7 @@ Option Explicit
 Private csp As HMAC
 Private FF As Long
 Private PT() As Byte
-Private HT() As Byte
+Private ht() As Byte
 Private KY() As Byte
 
 
@@ -27,7 +27,7 @@ Public Sub Setup()
     Set csp = New HMACSHA1
     
     FF = FreeFile
-    Open App.Path & "\Cryptography Files\HMACSHA1_Hashes.txt" For Input As #FF
+    Open App.Path & "\Tests\Cryptography Files\HMACSHA1_Hashes.txt" For Input As #FF
 End Sub
 
 Public Sub TearDown()
@@ -50,7 +50,7 @@ Public Sub CannotUseNullKeyInConstructor()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentNullException, "Wrong exception type caught."
 End Sub
 
@@ -76,7 +76,7 @@ Public Sub TestComputeHash()
     Do While GetNextEntry
         csp.Key = KY
         
-        Assert.AreEqual HT, csp.ComputeHash(PT)
+        Assert.AreEqual ht, csp.ComputeHash(PT)
     Loop
 End Sub
 
@@ -87,7 +87,7 @@ Public Sub TestTransformFinalBlock()
         Dim b() As Byte
         b = csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
         Assert.AreEqual PT, b
-        Assert.AreEqual HT, csp.Hash
+        Assert.AreEqual ht, csp.hash
     Loop
 End Sub
 
@@ -108,7 +108,7 @@ Public Sub TestTransformBlock1ByteAtATime()
             Assert.AreEqual PT(i), b(0), "TransformBlock Entry: " & c
         Next i
         csp.TransformFinalBlock PT, UBound(PT) + 1, 0
-        Assert.AreEqual HT, csp.Hash, "TransformFinalBlock Entry: " & c
+        Assert.AreEqual ht, csp.hash, "TransformFinalBlock Entry: " & c
     Loop
 End Sub
 
@@ -135,24 +135,24 @@ Public Sub TestTransformBlock5BytesAtATime()
             i = i + 5
         Loop
         csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
-        Assert.AreEqual HT, csp.Hash, "Hash: Entry " & c
+        Assert.AreEqual ht, csp.hash, "Hash: Entry " & c
     Loop
 End Sub
 
 Public Sub HashLargeFileStream()
-    Dim Hash() As Byte
-    Hash = Cor.NewBytes(&H7, &HD2, &H6B, &H83, &H22, &HC6, &H6E, &HBC, &H3, &HF8, &HCA, &H55, &H34, &HB5, &H9D, &HA1, &H89, &HF6, &HD0, &H9A)
+    Dim hash() As Byte
+    hash = Cor.NewBytes(&H7, &HD2, &H6B, &H83, &H22, &HC6, &H6E, &HBC, &H3, &HF8, &HCA, &H55, &H34, &HB5, &H9D, &HA1, &H89, &HF6, &HD0, &H9A)
     
     csp.Key = Cor.NewBytes(&H85, &HC1, &H5E, &H35, &H78, &H7C, &HA3, &HBE, &HE9, &H1E, &H99, &H14, &H6F, &HBE, &H78, &HCC, &HAF, &HD1, &H22, &HD3, &H29, &H8F, &HDC, &HEF, &H68, &HBC, &H5A, &HB8, &H5A, &HD8, &HCB, &HB3, &HD6, &HCC, &HD3, &HCD, &H7, &HDF, &H9D, &HD9, &H3D, &H8C, &H64, &HDD, &H7B, &H29, &H2A, &H4, &H3D, &HA4, &H36, &HA8, &H31, &HAC, &HCC, &HD8, &H68, &H43, &HB4, &H9D, &HDE, &HB1, &HA9, &HE5)
     
-    Assert.AreEqual Hash, csp.ComputeHash(File.OpenFile(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting))
+    Assert.AreEqual hash, csp.ComputeHash(File.OpenFile(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting))
 End Sub
 
 Public Sub HashWithZeroLengthKey()
     csp.Key = Cor.NewBytes()
-    Dim Hash() As Byte
-    Hash = csp.ComputeHash(Cor.NewBytes(1, 2))
-    Assert.AreEqual Cor.NewBytes(&H5D, &H10, &H44, &HA8, &H2D, &H63, &H55, &HB0, &H8B, &H5, &HFC, &HEE, &H39, &H91, &HF5, &HD2, &H19, &HBF, &HE7, &HC0), Hash
+    Dim hash() As Byte
+    hash = csp.ComputeHash(Cor.NewBytes(1, 2))
+    Assert.AreEqual Cor.NewBytes(&H5D, &H10, &H44, &HA8, &H2D, &H63, &H55, &HB0, &H8B, &H5, &HFC, &HEE, &H39, &H91, &HF5, &HD2, &H19, &HBF, &HE7, &HC0), hash
 End Sub
 
 
@@ -168,7 +168,7 @@ Private Function GetNextEntry() As Boolean
         Parts = Split(line, "=")
         Select Case LCase$(Trim$(Parts(0)))
             Case "pt": PT = ConvertHexToBytes(Trim$(Parts(1)))
-            Case "ht": HT = ConvertHexToBytes(Trim$(Parts(1)))
+            Case "ht": ht = ConvertHexToBytes(Trim$(Parts(1)))
             Case "ky": KY = ConvertHexToBytes(Trim$(Parts(1)))
         End Select
         
