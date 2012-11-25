@@ -61,7 +61,6 @@ Public Enum CultureTypes
     AllCultures = 7
 End Enum
 
-Private mCurrentCulture     As CultureInfo
 Private mInvariantCulture   As CultureInfo
 Private mCurrentUICulture   As CultureInfo
 Private mInstalledUICulture As CultureInfo
@@ -99,11 +98,7 @@ End Function
 ' @return A ReadOnly version of CultureInfo specific for this machine.
 '
 Public Property Get CurrentCulture() As CultureInfo
-    If mCurrentCulture Is Nothing Then
-        Set mCurrentCulture = Cor.NewCultureInfo(GetSystemDefaultLCID)
-        mCurrentCulture.IsReadOnly = True
-    End If
-    Set CurrentCulture = mCurrentCulture
+    Set CurrentCulture = Thread.CurrentThread.CurrentCulture
 End Property
 
 ''

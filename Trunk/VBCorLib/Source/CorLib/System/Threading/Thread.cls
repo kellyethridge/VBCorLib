@@ -1,4 +1,16 @@
-Attribute VB_Name = "modMain"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "Thread"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = True
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -20,57 +32,22 @@ Attribute VB_Name = "modMain"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modMain
+' Module: Thread
 '
 Option Explicit
 
-Public StringUtils As New StringUtils
+Private mCurrentCulture As CultureInfo
 
-Private mInIDE        As Boolean
-Private mInDebugger   As Boolean
 
-Public Property Get InIDE() As Boolean
-    InIDE = mInIDE
+Public Property Get CurrentCulture() As CultureInfo
+    If mCurrentCulture Is Nothing Then
+        Set mCurrentCulture = Cor.NewCultureInfo(GetSystemDefaultLCID)
+        mCurrentCulture.IsReadOnly = True
+    End If
+
+    Set CurrentCulture = mCurrentCulture
 End Property
 
-Public Property Get InDebugger() As Boolean
-    InDebugger = mInDebugger
+Public Property Set CurrentCulture(ByVal RHS As CultureInfo)
+    Set mCurrentCulture = RHS
 End Property
-
-Private Sub Main()
-    SetInIDE
-    SetInDebugger
-    InitHelper
-    InitWin32Api
-    InitPublicFunctions
-    InitcDateTimeHelpers
-    InitEncodingHelpers
-End Sub
-
-''
-' This is to determine if the compiled dll is being used in the
-' VB6 IDE by another project. This is primarily so that the console
-' class can disable the exit button if we are running in an IDE.
-'
-Private Sub SetInDebugger()
-    Dim Result As String
-    Result = String$(1024, 0)
-    
-    GetModuleFileName vbNullPtr, Result, Len(Result)
-    
-    Dim i As Long
-    i = InStr(Result, vbNullChar)
-    
-    Result = Left$(Result, i - 1)
-    
-    mInDebugger = (UCase$(Right$(Result, 8)) = "\VB6.EXE")
-End Sub
-
-Private Sub SetInIDE()
-    On Error GoTo errTrap
-    Debug.Assert 1 \ 0
-    Exit Sub
-    
-errTrap:
-    mInIDE = True
-End Sub
