@@ -55,6 +55,30 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "Zm9vYg==", "foob"
             Test.Use "Zm9vYmE=", "fooba"
             Test.Use "Zm9vYmFy", "foobar"
+            
+        Case "ToString_WithValues_ReturnsExpected"
+            Test.Use "", ""
+            Test.Use "a", "a"
+            Test.Use CByte(1), "1"
+            Test.Use 1, "1"
+            Test.Use -1, "-1"
+            Test.Use 1&, "1"
+            Test.Use 1#, "1"
+            Test.Use 1!, "1"
+            Test.Use 1@, "1"
+            Test.Use CDec(1), "1"
+            Test.Use 1.1, "1.1"
+            Test.Use 1.1!, "1.1"
+            Test.Use CDec(1.1), "1.1"
+            Test.Use -1.2345, "-1.2345"
+            Test.Use 1.2345, "1.2345"
+            Test.Use 0.000012345, "1.2345E-05"
+            Test.Use 1.2345E+15, "1.2345E+15"
+            Test.Use -1.2345!, "-1.2345"
+            Test.Use 1.2345!, "1.2345"
+            Test.Use 1.2345E-05!, "1.2345E-05"
+            Test.Use 1.2345E+15!, "1.2345E+15"
+            
     End Select
 End Sub
 
@@ -280,7 +304,13 @@ Public Sub FromBase64String_WithInvalidCharater_Throws()
     AssertFormatException Err
 End Sub
 
-
+Public Sub ToString_WithValues_ReturnsExpected(ByRef Value As Variant, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Convert.ToString(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 

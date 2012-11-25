@@ -85,4 +85,4 @@ Public SecurityElement          As New SecurityElementStatic
 Public CryptoAPI                As New CryptoAPI
 Public CryptoHelper             As New CryptoHelper
 Public BigInteger               As New BigIntegerStatic
-
+Public Thread                   As New ThreadStatic

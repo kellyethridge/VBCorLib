@@ -50,7 +50,7 @@ Option Explicit
 ' Returns the NumberFormatInfo object of the threads current culture.
 '
 Public Property Get CurrentInfo() As NumberFormatInfo
-    Set CurrentInfo = CultureInfo.CurrentCulture.NumberFormat
+    Set CurrentInfo = Thread.CurrentThread.CurrentCulture.NumberFormat
 End Property
 
 ''

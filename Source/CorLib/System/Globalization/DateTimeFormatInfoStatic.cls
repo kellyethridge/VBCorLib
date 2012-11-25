@@ -65,7 +65,7 @@ End Property
 ' @return The DateTimeFormatInfo for the current CultureInfo of this thread.
 '
 Public Property Get CurrentInfo() As DateTimeFormatInfo
-    Set CurrentInfo = CultureInfo.CurrentCulture.DateTimeFormat
+    Set CurrentInfo = Thread.CurrentThread.CurrentCulture.DateTimeFormat
 End Property
 
 ''

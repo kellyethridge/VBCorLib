@@ -609,3 +609,6 @@ Public Function BigInteger() As BigIntegerStatic
     Set BigInteger = modStaticClasses.BigInteger
 End Function
 
+Public Function Thread() As ThreadStatic
+    Set Thread = modStaticClasses.Thread
+End Function
