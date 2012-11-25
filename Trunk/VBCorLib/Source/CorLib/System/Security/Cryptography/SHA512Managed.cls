@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: SHA512Managed
+' Module: SHA512Managed
 '
 
 ''
@@ -308,7 +311,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Dim Ah As Long, Al As Long
     Dim Bh As Long, Bl As Long
-    Dim Ch As Long, Cl As Long
+    Dim ch As Long, Cl As Long
     Dim Dh As Long, Dl As Long
     Dim Eh As Long, El As Long
     Dim Fh As Long, Fl As Long
@@ -317,7 +320,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Ah = mStateH(0): Al = mStateL(0)
     Bh = mStateH(1): Bl = mStateL(1)
-    Ch = mStateH(2): Cl = mStateL(2)
+    ch = mStateH(2): Cl = mStateL(2)
     Dh = mStateH(3): Dl = mStateL(3)
     Eh = mStateH(4): El = mStateL(4)
     Fh = mStateH(5): Fl = mStateL(5)
@@ -332,15 +335,15 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
         Call UAdd64(T1h, T1l, mWh(i), mWl(i))
 
         T2h = BigSIG0Hi(Ah, Al): T2l = BigSIG0Lo(Ah, Al)
-        Call UAdd64(T2h, T2l, Maj(Ah, Bh, Ch), Maj(Al, Bl, Cl))
+        Call UAdd64(T2h, T2l, Maj(Ah, Bh, ch), Maj(Al, Bl, Cl))
 
         Hh = Gh: Hl = Gl
         Gh = Fh: Gl = Fl
         Fh = Eh: Fl = El
         Eh = Dh: El = Dl
         Call UAdd64(Eh, El, T1h, T1l)
-        Dh = Ch: Dl = Cl
-        Ch = Bh: Cl = Bl
+        Dh = ch: Dl = Cl
+        ch = Bh: Cl = Bl
         Bh = Ah: Bl = Al
         Ah = T1h: Al = T1l
         Call UAdd64(Ah, Al, T2h, T2l)
@@ -348,7 +351,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Call UAdd64(mStateH(0), mStateL(0), Ah, Al)
     Call UAdd64(mStateH(1), mStateL(1), Bh, Bl)
-    Call UAdd64(mStateH(2), mStateL(2), Ch, Cl)
+    Call UAdd64(mStateH(2), mStateL(2), ch, Cl)
     Call UAdd64(mStateH(3), mStateL(3), Dh, Dl)
     Call UAdd64(mStateH(4), mStateL(4), Eh, El)
     Call UAdd64(mStateH(5), mStateL(5), Fh, Fl)
@@ -492,7 +495,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Dim Ah As Long, Al As Long
     Dim Bh As Long, Bl As Long
-    Dim Ch As Long, Cl As Long
+    Dim ch As Long, Cl As Long
     Dim Dh As Long, Dl As Long
     Dim Eh As Long, El As Long
     Dim Fh As Long, Fl As Long
@@ -501,7 +504,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Ah = mStateH(0): Al = mStateL(0)
     Bh = mStateH(1): Bl = mStateL(1)
-    Ch = mStateH(2): Cl = mStateL(2)
+    ch = mStateH(2): Cl = mStateL(2)
     Dh = mStateH(3): Dl = mStateL(3)
     Eh = mStateH(4): El = mStateL(4)
     Fh = mStateH(5): Fl = mStateL(5)
@@ -571,7 +574,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
         '
         ' T2 = T2 + Maj(A,B,C)
         '
-        T2h = T2h + ((Ah And Bh) Xor (Ah And Ch) Xor (Bh And Ch))
+        T2h = T2h + ((Ah And Bh) Xor (Ah And ch) Xor (Bh And ch))
         Lo = (Al And Bl) Xor (Al And Cl) Xor (Bl And Cl)
         T2l = T2l + Lo
         If (T2l - &H80000000) < (Lo - &H80000000) Then T2h = T2h + 1
@@ -583,8 +586,8 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
         El = Dl + T1l
         If (El - &H80000000) < (T1l - &H80000000) Then Eh = Eh + 1
         
-        Dh = Ch: Dl = Cl
-        Ch = Bh: Cl = Bl
+        Dh = ch: Dl = Cl
+        ch = Bh: Cl = Bl
         Bh = Ah: Bl = Al
         Ah = T1h + T2h
         Al = T1l + T2l
@@ -593,7 +596,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     
     mStateH(0) = mStateH(0) + Ah: mStateL(0) = mStateL(0) + Al: If (mStateL(0) - &H80000000) < (Al - &H80000000) Then mStateH(0) = mStateH(0) + 1
     mStateH(1) = mStateH(1) + Bh: mStateL(1) = mStateL(1) + Bl: If (mStateL(1) - &H80000000) < (Bl - &H80000000) Then mStateH(1) = mStateH(1) + 1
-    mStateH(2) = mStateH(2) + Ch: mStateL(2) = mStateL(2) + Cl: If (mStateL(2) - &H80000000) < (Cl - &H80000000) Then mStateH(2) = mStateH(2) + 1
+    mStateH(2) = mStateH(2) + ch: mStateL(2) = mStateL(2) + Cl: If (mStateL(2) - &H80000000) < (Cl - &H80000000) Then mStateH(2) = mStateH(2) + 1
     mStateH(3) = mStateH(3) + Dh: mStateL(3) = mStateL(3) + Dl: If (mStateL(3) - &H80000000) < (Dl - &H80000000) Then mStateH(3) = mStateH(3) + 1
     mStateH(4) = mStateH(4) + Eh: mStateL(4) = mStateL(4) + El: If (mStateL(4) - &H80000000) < (El - &H80000000) Then mStateH(4) = mStateH(4) + 1
     mStateH(5) = mStateH(5) + Fh: mStateL(5) = mStateL(5) + Fl: If (mStateL(5) - &H80000000) < (Fl - &H80000000) Then mStateH(5) = mStateH(5) + 1

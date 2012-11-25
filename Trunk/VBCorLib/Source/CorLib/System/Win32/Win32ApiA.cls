@@ -11,27 +11,29 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Win32ApiA
+' Module: Win32ApiA
 '
-
 Option Explicit
 Implements IWin32API
 
@@ -83,13 +85,13 @@ End Function
 Private Function IWin32API_FindFirstFile(FileName As String, FindFileData As VBCorType.WIN32_FIND_DATA) As Long
     Dim Data As WIN32_FIND_DATAA
     IWin32API_FindFirstFile = FindFirstFileA(FileName, Data)
-    Call FindDataAToFindData(Data, FindFileData)
+    FindDataAToFindData Data, FindFileData
 End Function
 
 Private Function IWin32API_FindNextFile(ByVal hFindFile As Long, FindFileData As VBCorType.WIN32_FIND_DATA) As Long
     Dim Data As WIN32_FIND_DATAA
     IWin32API_FindNextFile = FindNextFileA(hFindFile, Data)
-    Call FindDataAToFindData(Data, FindFileData)
+    FindDataAToFindData Data, FindFileData
 End Function
 
 Private Function IWin32API_GetComputerName(Buffer As String, Size As Long) As Long
@@ -109,13 +111,15 @@ Private Function IWin32API_GetEnvironmentStrings() As String
     
     Dim i As Long
     i = lpStrings
-    Do While MemWord(i) <> 0: i = i + 1: Loop
+    Do While MemWord(i) <> vbNullPtr
+        i = i + 1
+    Loop
     
     Dim b() As Byte
     ReDim b(0 To i - lpStrings - 1)
-    Call CopyMemory(b(0), ByVal lpStrings, i - lpStrings)
+    CopyMemory b(0), ByVal lpStrings, i - lpStrings
     
-    Call FreeEnvironmentStringsA(lpStrings)
+    FreeEnvironmentStringsA lpStrings
     IWin32API_GetEnvironmentStrings = StrConv(b, vbUnicode)
 End Function
 
@@ -206,7 +210,9 @@ Private Function IWin32API_RegQueryValueExStr(ByVal hKey As Long, ValueName As S
     Dim Result As Long
     Result = RegQueryValueExA(hKey, ValueName, 0, ValueType, ByVal VarPtr(Bytes(0)), Len(Data))
     
-    If Result = ERROR_SUCCESS Then Data = StrConv(Bytes, vbUnicode)
+    If Result = ERROR_SUCCESS Then
+        Data = StrConv(Bytes, vbUnicode)
+    End If
     IWin32API_RegQueryValueExStr = Result
 End Function
 

@@ -307,15 +307,15 @@ Public Property Let Capacity(ByVal RHS As Long)
         Throw Cor.NewArgumentOutOfRangeException("Cannot set capacity less than the length of the current instance.", "Capacity", RHS)
     
     If RHS <> mCapacity Then
-        Dim Ptr As Long
-        Ptr = CoTaskMemAlloc(RHS * BytesPerChar)
-        If Ptr = vbNullPtr Then _
+        Dim ptr As Long
+        ptr = CoTaskMemAlloc(RHS * BytesPerChar)
+        If ptr = vbNullPtr Then _
             Throw New OutOfMemoryException
             
-        CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
+        CopyMemory ByVal ptr, ByVal mStringPtr, mLength * BytesPerChar
         CoTaskMemFree mStringPtr
-        mStringPtr = Ptr
-        mStringSA.pvData = Ptr
+        mStringPtr = ptr
+        mStringSA.pvData = ptr
         mCapacity = RHS
     End If
 End Property
@@ -330,7 +330,7 @@ End Property
 Public Property Get Chars(ByVal Index As Long) As Integer
 Attribute Chars.VB_UserMemId = 0
     If Index < 0 Or Index >= mLength Then _
-        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
     
     Chars = mString(Index)
 End Property
@@ -344,7 +344,7 @@ End Property
 '
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index", Index)
     
     mString(Index) = Char
 End Property
@@ -713,15 +713,15 @@ Private Sub FormatError()
     Throw Cor.NewFormatException(Resources.GetString(Format_InvalidString))
 End Sub
 
-Private Sub InsertSpace(ByVal Index As Long, ByVal size As Long)
+Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
     Dim NewLength As Long
-    NewLength = mLength + size
+    NewLength = mLength + Size
     
     EnsureCapacity NewLength
     
     If Index < mLength Then
         ' Create space in the string. The new space is uninitialized.
-        CopyMemory ByVal mStringPtr + (Index + size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar
+        CopyMemory ByVal mStringPtr + (Index + Size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar
     End If
     
     mLength = NewLength

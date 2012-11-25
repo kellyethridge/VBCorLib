@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#3.1#0"; "SimplyVBUnit.Component.ocx"
+Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#3.2#0"; "SimplyVBUnit.Component.ocx"
 Begin VB.Form frmSimplyVBUnitRunner 
    Caption         =   "Simply VB Unit"
    ClientHeight    =   7080
@@ -149,7 +149,7 @@ Private Sub Form_Load()
     AddTest New TestResourceSet
     AddTest New TestCaseInsensitiveHCP
     AddTest New TestResourceReader
-    AddTest New TestConvert
+    AddTest New ConvertTests
     AddTest New TestMathExt
     AddTest New TestGuid
     AddTest New TestASCIIEncoding

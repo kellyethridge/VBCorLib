@@ -85,7 +85,7 @@ Private mComparer   As IComparer
 ' @include "..\..\Includes\ArrayListAdd.txt"
 Public Function Add(ByRef Value As Variant) As Long
     Add = mCount
-    Call Insert(mCount, Value)
+    Insert mCount, Value
 End Function
 
 ''
@@ -700,17 +700,17 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     mCapacity = NewCapacity
 End Sub
 
-Private Sub InsertSpace(ByVal Index As Long, ByVal size As Long)
+Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
     If Index < mCount Then
-        Call CopyMemory(mItems(Index + size), mItems(Index), (mCount - Index) * 16)
-        Call ZeroMemory(mItems(Index), size * 16)
+        Call CopyMemory(mItems(Index + Size), mItems(Index), (mCount - Index) * 16)
+        Call ZeroMemory(mItems(Index), Size * 16)
     End If
 End Sub
 
-Private Sub RemoveSpace(ByVal Index As Long, ByVal size As Long)
+Private Sub RemoveSpace(ByVal Index As Long, ByVal Size As Long)
     If Index < mCount - 1 Then
-        Call CopyMemory(mItems(Index), mItems(Index + size), (mCount - Index - size) * 16)
-        Call ZeroMemory(mItems(mCount - size), size * 16)
+        Call CopyMemory(mItems(Index), mItems(Index + Size), (mCount - Index - Size) * 16)
+        Call ZeroMemory(mItems(mCount - Size), Size * 16)
     End If
 End Sub
 

@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: UTF7Encoding
+' Module: UTF7Encoding
 '
 
 ''
@@ -452,10 +455,10 @@ End Property
 
 Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF7Encoder) As Long
     Dim Bits As Long
-    Dim BitCount As Long
+    Dim bitCount As Long
     Dim maxCharIndex As Long
     Dim MaxByteIndex As Long
-    Dim Ch As Long
+    Dim ch As Long
     Dim ByteStartIndex As Long
     Dim directlyEncodable As Boolean
     
@@ -467,24 +470,24 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
     If Not Encoder Is Nothing Then
         With Encoder
             Bits = .Bits
-            BitCount = .BitCount
+            bitCount = .bitCount
         End With
     Else
-        BitCount = -1
+        bitCount = -1
     End If
     
     ByteStartIndex = ByteIndex
     maxCharIndex = Index + Count - 1
     MaxByteIndex = UBound(Bytes)
     Do While Index <= maxCharIndex
-        AsWord(Ch) = Chars(Index)
+        AsWord(ch) = Chars(Index)
         directlyEncodable = False
-        If Ch < &H80 Then
-            If mDirectlyEncodable(Ch) Then
-                If BitCount >= 0 Then
-                    If BitCount > 0 Then
+        If ch < &H80 Then
+            If mDirectlyEncodable(ch) Then
+                If bitCount >= 0 Then
+                    If bitCount > 0 Then
                         If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
-                        Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - BitCount) And &H3F)
+                        Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - bitCount) And &H3F)
                         ByteIndex = ByteIndex + 1
                     End If
                     If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
@@ -492,34 +495,34 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                     ByteIndex = ByteIndex + 1
                 End If
                 If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
-                Bytes(ByteIndex) = Ch
+                Bytes(ByteIndex) = ch
                 ByteIndex = ByteIndex + 1
-                BitCount = -1
+                bitCount = -1
                 directlyEncodable = True
             End If
         End If
         If Not directlyEncodable Then
-            If Ch = vbPlus And BitCount < 0 Then
+            If ch = vbPlus And bitCount < 0 Then
                 If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
                 Bytes(ByteIndex) = vbPlus
                 Bytes(ByteIndex + 1) = vbMinus
                 ByteIndex = ByteIndex + 2
             Else
-                If BitCount < 0 Then
+                If bitCount < 0 Then
                     If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
                     Bytes(ByteIndex) = vbPlus
                     ByteIndex = ByteIndex + 1
-                    BitCount = 0
+                    bitCount = 0
                 End If
-                Bits = (Bits * &H10000) Or Ch
-                BitCount = BitCount + 16
-                Do While BitCount >= 6
-                    BitCount = BitCount - 6
+                Bits = (Bits * &H10000) Or ch
+                bitCount = bitCount + 16
+                Do While bitCount >= 6
+                    bitCount = bitCount - 6
                     If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
-                    Bytes(ByteIndex) = Base64Bytes(Helper.ShiftRight(Bits, BitCount) And &H3F)
+                    Bytes(ByteIndex) = Base64Bytes(Helper.ShiftRight(Bits, bitCount) And &H3F)
                     ByteIndex = ByteIndex + 1
                 Loop
-                Bits = Bits And (Powers(BitCount) - 1)
+                Bits = Bits And (Powers(bitCount) - 1)
             End If
         End If
         Index = Index + 1
@@ -532,12 +535,12 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         Flush = Encoder.Flush
     End If
     
-    If Flush And (BitCount >= 0) Then
-        If BitCount > 0 Then
+    If Flush And (bitCount >= 0) Then
+        If bitCount > 0 Then
             If ByteIndex > MaxByteIndex Then _
                 Throw Cor.NewArgumentException("Bytes conversion buffer is too small.", "Bytes")
             
-            Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - BitCount) And &H3F)
+            Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - bitCount) And &H3F)
             ByteIndex = ByteIndex + 1
         End If
         If ByteIndex > MaxByteIndex Then _
@@ -545,13 +548,13 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         
         Bytes(ByteIndex) = vbMinus
         ByteIndex = ByteIndex + 1
-        BitCount = -1
+        bitCount = -1
     End If
     
     If Not Encoder Is Nothing Then
         With Encoder
             .Bits = Bits
-            .BitCount = BitCount
+            .bitCount = bitCount
         End With
     End If
     
@@ -559,44 +562,44 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
 End Function
 
 Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Encoder As UTF7Encoder) As Long
-    Dim BitCount As Long
+    Dim bitCount As Long
     Dim maxCharIndex As Long
-    Dim Ch As Long
+    Dim ch As Long
     Dim directlyEncodable As Boolean
     Dim ByteIndex As Long
     
     If Not Encoder Is Nothing Then
-        BitCount = Encoder.BitCount
+        bitCount = Encoder.bitCount
     Else
-        BitCount = -1
+        bitCount = -1
     End If
     
     maxCharIndex = Index + Count - 1
     Do While Index <= maxCharIndex
-        AsWord(Ch) = Chars(Index)
+        AsWord(ch) = Chars(Index)
         directlyEncodable = False
-        If Ch < &H80 Then
-            If mDirectlyEncodable(Ch) Then
-                If BitCount >= 0 Then
-                    If BitCount > 0 Then ByteIndex = ByteIndex + 1
+        If ch < &H80 Then
+            If mDirectlyEncodable(ch) Then
+                If bitCount >= 0 Then
+                    If bitCount > 0 Then ByteIndex = ByteIndex + 1
                     ByteIndex = ByteIndex + 1
                 End If
                 ByteIndex = ByteIndex + 1
-                BitCount = -1
+                bitCount = -1
                 directlyEncodable = True
             End If
         End If
         If Not directlyEncodable Then
-            If Ch = vbPlus And BitCount < 0 Then
+            If ch = vbPlus And bitCount < 0 Then
                 ByteIndex = ByteIndex + 2
             Else
-                If BitCount < 0 Then
+                If bitCount < 0 Then
                     ByteIndex = ByteIndex + 1
-                    BitCount = 0
+                    bitCount = 0
                 End If
-                BitCount = BitCount + 16
-                Do While BitCount >= 6
-                    BitCount = BitCount - 6
+                bitCount = bitCount + 16
+                Do While bitCount >= 6
+                    bitCount = bitCount - 6
                     ByteIndex = ByteIndex + 1
                 Loop
             End If
@@ -611,12 +614,12 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
         Flush = Encoder.Flush
     End If
     
-    If Flush And (BitCount >= 0) Then
-        If BitCount > 0 Then
+    If Flush And (bitCount >= 0) Then
+        If bitCount > 0 Then
             ByteIndex = ByteIndex + 1
         End If
         ByteIndex = ByteIndex + 1
-        BitCount = -1
+        bitCount = -1
     End If
     
     InternalGetByteCount = ByteIndex
@@ -654,7 +657,7 @@ End Function
 
 Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF7Decoder) As Long
     Dim Bits As Long
-    Dim BitCount As Long
+    Dim bitCount As Long
     Dim b As Byte
     Dim InBase64 As Boolean
     Dim HasPlus As Boolean
@@ -670,7 +673,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     If Not Decoder Is Nothing Then
         With Decoder
             Bits = .Bits
-            BitCount = .BitCount
+            bitCount = .bitCount
             InBase64 = .InBase64
             HasPlus = .HasPlus
         End With
@@ -689,7 +692,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                     Chars(CharIndex) = vbPlus
                     CharIndex = CharIndex + 1
                 ElseIf InBase64 Then
-                    BitCount = 0
+                    bitCount = 0
                     Bits = 0
                     InBase64 = False
                 Else
@@ -701,11 +704,11 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
             Case vbPlus
                 If InBase64 Then
                     Bits = (Bits * &H40) Or Base64CharToBits(b)
-                    BitCount = BitCount + 6
+                    bitCount = bitCount + 6
                     HasPlus = False
                 Else
                     Bits = 0
-                    BitCount = 0
+                    bitCount = 0
                     InBase64 = True
                     HasPlus = True
                 End If
@@ -713,12 +716,12 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 If InBase64 Then
                     If Base64CharToBits(b) >= 0 Then
                         Bits = (Bits * &H40) Or Base64CharToBits(b)
-                        BitCount = BitCount + 6
+                        bitCount = bitCount + 6
                     Else
                         If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
                         Chars(CharIndex) = b
                         CharIndex = CharIndex + 1
-                        BitCount = 0
+                        bitCount = 0
                         Bits = 0
                         InBase64 = False
                     End If
@@ -732,16 +735,16 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
-                BitCount = 0
+                bitCount = 0
                 Bits = 0
                 InBase64 = False
                 HasPlus = False
         End Select
-        If BitCount >= 16 Then
+        If bitCount >= 16 Then
             If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
-            Chars(CharIndex) = AsWord(Helper.ShiftRight(Bits, BitCount - 16) And &HFFFF&)
+            Chars(CharIndex) = AsWord(Helper.ShiftRight(Bits, bitCount - 16) And &HFFFF&)
             CharIndex = CharIndex + 1
-            BitCount = BitCount - 16
+            bitCount = bitCount - 16
         End If
         ByteIndex = ByteIndex + 1
         Bits = Bits And &HFFFFFF
@@ -749,7 +752,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     
     If Not Decoder Is Nothing Then
         With Decoder
-            .BitCount = BitCount
+            .bitCount = bitCount
             .Bits = Bits
             .HasPlus = HasPlus
             .InBase64 = InBase64

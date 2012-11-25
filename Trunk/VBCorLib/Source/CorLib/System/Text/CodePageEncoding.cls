@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: CodePageEncoding
+' Module: CodePageEncoding
 '
 
 ''
@@ -145,16 +148,16 @@ Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, 
     Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim size As Long
-    size = Encoding_GetMaxByteCount(ElemCount)
+    Dim Size As Long
+    Size = Encoding_GetMaxByteCount(ElemCount)
     
     Dim Ret() As Byte
-    If size > 0 Then
-        ReDim Ret(0 To size - 1)
+    If Size > 0 Then
+        ReDim Ret(0 To Size - 1)
         
         Dim ByteCount As Long
-        ByteCount = WideCharToMultiByte(mCodePage, 0, mChars(ElemIndex), ElemCount, Ret(0), size, vbNullString, 0)
-        If ByteCount <> size Then ReDim Preserve Ret(0 To ByteCount - 1)
+        ByteCount = WideCharToMultiByte(mCodePage, 0, mChars(ElemIndex), ElemCount, Ret(0), Size, vbNullString, 0)
+        If ByteCount <> Size Then ReDim Preserve Ret(0 To ByteCount - 1)
     Else
         Ret = Cor.NewBytes()
     End If
@@ -205,14 +208,14 @@ Private Function Encoding_GetChars(Bytes() As Byte, Optional Index As Variant, O
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim size As Long
-    size = Encoding_GetMaxCharCount(ElemCount)
+    Dim Size As Long
+    Size = Encoding_GetMaxCharCount(ElemCount)
     
     Dim Ret() As Integer
-    If size > 0 Then
-        ReDim Ret(0 To size - 1)
-        size = Encoding_GetCharsEx(Bytes, Index, Count, Ret, 0)
-        ReDim Preserve Ret(0 To size - 1)
+    If Size > 0 Then
+        ReDim Ret(0 To Size - 1)
+        Size = Encoding_GetCharsEx(Bytes, Index, Count, Ret, 0)
+        ReDim Preserve Ret(0 To Size - 1)
     Else
         Ret = Cor.NewIntegers()
     End If
@@ -283,15 +286,15 @@ Private Function Encoding_GetString(Bytes() As Byte, Optional Index As Variant, 
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim size As Long
-    size = Encoding_GetMaxCharCount(Count)
+    Dim Size As Long
+    Size = Encoding_GetMaxCharCount(Count)
     
     Dim Ret As String
-    Ret = SysAllocStringLen(0, size)
+    Ret = SysAllocStringLen(0, Size)
     Call AttachChars(Ret, mChars, mCharsSA)
-    size = Encoding_GetCharsEx(Bytes, ElemIndex, ElemCount, mChars, 0)
+    Size = Encoding_GetCharsEx(Bytes, ElemIndex, ElemCount, mChars, 0)
     SAPtr(mChars) = 0
-    Encoding_GetString = Left$(Ret, size)
+    Encoding_GetString = Left$(Ret, Size)
 End Function
 
 Private Property Get Encoding_HeaderName() As String

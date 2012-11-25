@@ -1,23 +1,26 @@
 Attribute VB_Name = "modPublicFunctions"
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: modPublicFunctions
+' Module: modPublicFunctions
 '
 
 ''
@@ -81,8 +84,8 @@ End Function
 ' value in it, because no matter what is passed in, it will be a
 ' ByRef value because of the declare type.
 '
-Public Function CObj(ByRef value As Variant) As Object
-    Set CObj = value
+Public Function CObj(ByRef Value As Variant) As Object
+    Set CObj = Value
 End Function
 
 Public Function CUnk(ByVal Obj As IUnknown) As IUnknown
@@ -120,20 +123,20 @@ End Function
 '
 Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As String
     Dim Buf As String
-    Dim size As Long
+    Dim Size As Long
     Dim er As Long
     
-    size = 128
+    Size = 128
     Do
-        Buf = String$(size, vbNullChar)
-        size = API.GetLocaleInfo(LCID, LCType, Buf, size)
-        If size > 0 Then Exit Do
+        Buf = String$(Size, vbNullChar)
+        Size = API.GetLocaleInfo(LCID, LCType, Buf, Size)
+        If Size > 0 Then Exit Do
         er = Err.LastDllError
         If er <> ERROR_INSUFFICIENT_BUFFER Then IOError er
-        size = API.GetLocaleInfo(LCID, LCType, vbNullString, 0)
+        Size = API.GetLocaleInfo(LCID, LCType, vbNullString, 0)
     Loop
     
-    GetLocaleString = Left$(Buf, size - 1)
+    GetLocaleString = Left$(Buf, Size - 1)
 End Function
 
 ''
@@ -181,10 +184,10 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
             Set GetStream = Cor.NewFileStreamFromHandle(Source, Access)
             
         Case vbByteArray
-            Dim bytes() As Byte
-            SAPtr(bytes) = GetArrayPointer(Source, True)
-            Set GetStream = Cor.NewMemoryStream(bytes, Writable:=False)
-            SAPtr(bytes) = 0
+            Dim Bytes() As Byte
+            SAPtr(Bytes) = GetArrayPointer(Source, True)
+            Set GetStream = Cor.NewMemoryStream(Bytes, Writable:=False)
+            SAPtr(Bytes) = 0
             
         Case vbObject, vbDataObject
             If Source Is Nothing Then _
@@ -240,41 +243,41 @@ End Function
 ' @param Value The value to determine if is an integer datatype.
 ' @return Returns True if the value is an integer datatype, False otherwise.
 '
-Public Function IsInteger(ByRef value As Variant) As Boolean
-    Select Case VarType(value)
+Public Function IsInteger(ByRef Value As Variant) As Boolean
+    Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte: IsInteger = True
     End Select
 End Function
 
-Public Function SwapEndian(ByVal value As Long) As Long
-    SwapEndian = (((value And &HFF000000) \ &H1000000) And &HFF&) Or _
-                 ((value And &HFF0000) \ &H100&) Or _
-                 ((value And &HFF00&) * &H100&) Or _
-                 ((value And &H7F&) * &H1000000)
-    If (value And &H80&) Then SwapEndian = SwapEndian Or &H80000000
+Public Function SwapEndian(ByVal Value As Long) As Long
+    SwapEndian = (((Value And &HFF000000) \ &H1000000) And &HFF&) Or _
+                 ((Value And &HFF0000) \ &H100&) Or _
+                 ((Value And &HFF00&) * &H100&) Or _
+                 ((Value And &H7F&) * &H1000000)
+    If (Value And &H80&) Then SwapEndian = SwapEndian Or &H80000000
 End Function
 
-Public Function RRotate(ByVal value As Long, ByVal count As Long) As Long
-    RRotate = Helper.ShiftRight(value, count) Or Helper.ShiftLeft(value, 32 - count)
+Public Function RRotate(ByVal Value As Long, ByVal Count As Long) As Long
+    RRotate = Helper.ShiftRight(Value, Count) Or Helper.ShiftLeft(Value, 32 - Count)
 End Function
 
-Public Function LRotate(ByVal value As Long, ByVal count As Long) As Long
-    LRotate = Helper.ShiftLeft(value, count) Or Helper.ShiftRight(value, 32 - count)
+Public Function LRotate(ByVal Value As Long, ByVal Count As Long) As Long
+    LRotate = Helper.ShiftLeft(Value, Count) Or Helper.ShiftRight(Value, 32 - Count)
 End Function
 
-Public Function ReverseByteCopy(ByRef bytes() As Byte) As Byte()
+Public Function ReverseByteCopy(ByRef Bytes() As Byte) As Byte()
     Dim ub As Long
-    ub = UBound(bytes)
+    ub = UBound(Bytes)
     
-    Dim ret() As Byte
-    ReDim ret(0 To ub)
+    Dim Ret() As Byte
+    ReDim Ret(0 To ub)
     
     Dim i As Long
     For i = 0 To ub
-        ret(i) = bytes(ub - i)
+        Ret(i) = Bytes(ub - i)
     Next i
     
-    ReverseByteCopy = ret
+    ReverseByteCopy = Ret
 End Function
 
 

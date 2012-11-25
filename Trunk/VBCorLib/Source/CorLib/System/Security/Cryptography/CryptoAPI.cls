@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: CryptoAPI
+' Module: CryptoAPI
 '
 
 ''
@@ -172,15 +175,15 @@ End Function
 ' Returns a string parameter from the specified provider.
 '
 Friend Function GetProvParamString(ByVal Provider As Long, ByVal Param As Long, Optional ByVal Flags As Long) As String
-    Dim size As Long
-    If CryptGetProvParam(Provider, Param, ByVal 0&, size, Flags) = BOOL_FALSE Then Call CryptoError
+    Dim Size As Long
+    If CryptGetProvParam(Provider, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then Call CryptoError
     
     Dim Bytes() As Byte
-    ReDim Bytes(0 To size - 1)
+    ReDim Bytes(0 To Size - 1)
     
-    If CryptGetProvParam(Provider, Param, Bytes(0), size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetProvParam(Provider, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then Call CryptoError
         
-    GetProvParamString = Left$(StrConv(Bytes, vbUnicode), size - 1)
+    GetProvParamString = Left$(StrConv(Bytes, vbUnicode), Size - 1)
 End Function
 
 ''
@@ -194,15 +197,15 @@ End Function
 ' Returns a string parameter from the specified key.
 '
 Friend Function GetKeyParamString(ByVal Key As Long, ByVal Param As Long, Optional ByVal Flags As Long) As String
-    Dim size As Long
-    If CryptGetKeyParam(Key, Param, ByVal 0&, size, Flags) = BOOL_FALSE Then Call CryptoError
+    Dim Size As Long
+    If CryptGetKeyParam(Key, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then Call CryptoError
     
     Dim Bytes() As Byte
-    ReDim Bytes(0 To size - 1)
+    ReDim Bytes(0 To Size - 1)
     
-    If CryptGetKeyParam(Key, Param, Bytes(0), size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetKeyParam(Key, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then Call CryptoError
     
-    GetKeyParamString = Left$(StrConv(Bytes, vbUnicode), size - 1)
+    GetKeyParamString = Left$(StrConv(Bytes, vbUnicode), Size - 1)
 End Function
 
 Friend Sub SetKeyParam(ByVal Key As Long, ByVal Param As Long, ByRef Value As Variant, Optional ByVal Flags As Long)
@@ -250,15 +253,15 @@ End Sub
 Private Sub DetermineProviderSupport()
     Dim Index   As Long
     Dim Name    As String
-    Dim size    As Long
+    Dim Size    As Long
     
-    size = 512
-    Name = String$(size, 0)
+    Size = 512
+    Name = String$(Size, 0)
     
-    Do While CryptEnumProvidersA(Index, 0, 0, 0&, Name, size) <> 0
+    Do While CryptEnumProvidersA(Index, 0, 0, 0&, Name, Size) <> 0
         
         ' We search for both the best RSA and DSS (DSA) providers.
-        Select Case Left$(Name, size - 1)
+        Select Case Left$(Name, Size - 1)
             Case MS_DEF_PROV
                 ' We set the base provider if none has been set.
                 If Len(mRSAProviderName) = 0 Then
@@ -291,7 +294,7 @@ Private Sub DetermineProviderSupport()
                 
         End Select
         
-        size = 512
+        Size = 512
         Index = Index + 1
     Loop
 End Sub

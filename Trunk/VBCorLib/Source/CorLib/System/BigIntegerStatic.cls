@@ -139,8 +139,8 @@ Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
         End If
     End If
     
-    Call x.DetachNumber(xNumber)
-    Call y.DetachNumber(yNumber)
+    x.DetachNumber xNumber
+    y.DetachNumber yNumber
     
     Compare = Sgn(Result)
 End Function
@@ -891,16 +891,16 @@ End Sub
 ' @param isNegative Indicates if a negative random number should be generated.
 ' @return A new BigInteger of a random value.
 '
-Public Function Rnd(ByVal size As Long, Optional ByVal isNegative As Boolean = False) As BigInteger
-    If size < 0 Then Call Err.Raise(5, , "size cannot be negative")
+Public Function Rnd(ByVal Size As Long, Optional ByVal isNegative As Boolean = False) As BigInteger
+    If Size < 0 Then Call Err.Raise(5, , "size cannot be negative")
     
-    If size = 0 Then
+    If Size = 0 Then
         Set Rnd = mZero
         Exit Function
     End If
     
     Dim wordCount As Long
-    wordCount = size \ 2
+    wordCount = Size \ 2
     
     Dim ints() As Integer
     ReDim ints(0 To wordCount)
@@ -910,7 +910,7 @@ Public Function Rnd(ByVal size As Long, Optional ByVal isNegative As Boolean = F
         ints(i) = Int(VBA.Rnd * 65536) - 32768
     Next i
     
-    If size And 1 Then
+    If Size And 1 Then
         ints(wordCount) = VBA.Rnd * &H100
     End If
     

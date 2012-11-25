@@ -11,26 +11,30 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: FileStream
+' Module: FileStream
 '
+
 ''
 ' Represents a file as a Stream.
 '
@@ -319,8 +323,8 @@ Public Property Get Length() As Currency
     
     If mCanWrite Then Call Flush
     
-    Dim size As DLong
-    With size
+    Dim Size As DLong
+    With Size
         .LoDWord = GetFileSize(mHandle, .HiDWord)
         ' in order to catch an error we check the return value against
         ' INVALID_FILE_SIZE (&HFFFFFFFF). Even though it is a value
@@ -332,7 +336,7 @@ Public Property Get Length() As Currency
             If Err.LastDllError <> NO_ERROR Then IOError Err.LastDllError
         End If
     End With
-    Length = 10000@ * AsCurr(size)
+    Length = 10000@ * AsCurr(Size)
 End Property
 
 ''
@@ -367,17 +371,17 @@ End Property
 ' @param Origin The reference point to begin moving the file pointer from.
 ' @return The new position in the file stream.
 '
-Public Function SeekPosition(ByVal offset As Currency, ByVal Origin As SeekOrigin) As Currency
+Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
     Call VerifyCanSeek
     Call VerifyIsOpen
     
-    offset = Int(offset)
+    Offset = Int(Offset)
     
     Dim NewPosition As Currency
     Select Case Origin
-        Case FromBeginning:     NewPosition = offset
-        Case FromCurrent:       NewPosition = mFilePosition + offset
-        Case FromEnd:           NewPosition = Length + offset
+        Case FromBeginning:     NewPosition = Offset
+        Case FromCurrent:       NewPosition = mFilePosition + Offset
+        Case FromEnd:           NewPosition = Length + Offset
     End Select
     
     If NewPosition < mMinPosition Then
@@ -395,7 +399,7 @@ Public Function SeekPosition(ByVal offset As Currency, ByVal Origin As SeekOrigi
             mReadPosition = NewPosition - mBufferOffset
             mFilePosition = NewPosition
         Case Else
-            mFilePosition = InternalSeek(offset, Origin)
+            mFilePosition = InternalSeek(Offset, Origin)
             mBufferOffset = mFilePosition
             mBytesBuffered = 0
     End Select
@@ -464,13 +468,13 @@ End Function
 ' @param Count The number of bytes to be read from the stream.
 ' @return The number of byte actually read from the stream.
 '
-Public Function ReadBlock(ByRef Bytes() As Byte, ByVal offset As Long, ByVal Count As Long) As Long
+Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     Call VerifyCanRead
     Call VerifyIsOpen
     
     Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), offset, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", offset, "Offset", Count, "Count")
+    Result = VerifyArrayRange(SAPtr(Bytes), Offset, Count)
+    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", Offset, "Offset", Count, "Count")
     
     If mCanWrite Then Call Flush
     If Count = 0 Then Exit Function
@@ -486,10 +490,10 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal offset As Long, ByVal Cou
     Available = mBytesBuffered - mReadPosition
     
     If Count > Available Then
-        Call CopyMemory(Bytes(offset), mBuffer(mReadPosition), Available)
+        Call CopyMemory(Bytes(Offset), mBuffer(mReadPosition), Available)
         
         ' Read the rest of the requested amount of data from the file.
-        If ReadFile(mHandle, Bytes(offset + Available), Count - Available, Count, ByVal 0&) = BOOL_FALSE Then
+        If ReadFile(mHandle, Bytes(Offset + Available), Count - Available, Count, ByVal 0&) = BOOL_FALSE Then
             If mHandle <> ERROR_BROKEN_PIPE Then IOError Err.LastDllError
         End If
         
@@ -497,7 +501,7 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal offset As Long, ByVal Cou
         mBytesBuffered = 0
     Else
         ' All of the data was already cached in the buffer.
-        Call CopyMemory(Bytes(offset), mBuffer(mReadPosition), Count)
+        Call CopyMemory(Bytes(Offset), mBuffer(mReadPosition), Count)
     End If
     mReadPosition = mReadPosition + Count
     mFilePosition = mFilePosition + Count
@@ -515,10 +519,10 @@ End Function
 ' @return An IAsyncResult object used to identify the corrisponding Endread and report
 ' information about the buffer read.
 '
-Public Function BeginRead(ByRef Buffer() As Byte, ByVal offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
 #If False Then
     If Me.IsAsync And Environment.IsNT Then
-        Set BeginRead = BeginReadAsync(Buffer, offset, Count, Callback, State)
+        Set BeginRead = BeginReadAsync(Buffer, Offset, Count, Callback, State)
         Exit Function
     End If
 #End If
@@ -528,7 +532,7 @@ Public Function BeginRead(ByRef Buffer() As Byte, ByVal offset As Long, ByVal Co
     
     On Error GoTo errTrap
     With Ret
-        .BytesRead = ReadBlock(Buffer, offset, Count)
+        .BytesRead = ReadBlock(Buffer, Offset, Count)
         .IsCompleted = True
         .IsReadType = True
     End With
@@ -542,7 +546,7 @@ errTrap:
 End Function
 
 #If False Then
-Private Function BeginReadAsync(ByRef Buffer() As Byte, ByVal offset As Long, ByVal Count As Long, ByVal Callback As AsyncCallback, ByRef State As Variant) As IAsyncResult
+Private Function BeginReadAsync(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, ByVal Callback As AsyncCallback, ByRef State As Variant) As IAsyncResult
     Dim over As NativeOverlapped
     With AsDLong(CCur(0.0001@ * Me.Position))
         over.OffsetLow = .LoDWord
@@ -563,7 +567,7 @@ Private Function BeginReadAsync(ByRef Buffer() As Byte, ByVal offset As Long, By
     memOver = CoTaskMemAlloc(Len(over))
     Call CopyMemory(ByVal memOver, over, Len(over))
     
-    If ReadFileEx(mHandle, Buffer(offset), Count, ByVal memOver, AddressOf ReadFileIOCompletion) <> BOOL_FALSE Then
+    If ReadFileEx(mHandle, Buffer(Offset), Count, ByVal memOver, AddressOf ReadFileIOCompletion) <> BOOL_FALSE Then
         Set BeginReadAsync = Result
         ObjectPtr(Result) = vbNullPtr
     Else
@@ -625,13 +629,13 @@ End Sub
 ' @remarks The data to be written is buffered if there is enough room, otherwise,
 ' any data in the buffer is written to the stream, followed by the data in <i>Buffer</i>.
 '
-Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal offset As Long, ByVal Count As Long)
+Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long)
     Call VerifyCanWrite
     Call VerifyIsOpen
     
     Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), offset, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", offset, "Offset", Count, "Count")
+    Result = VerifyArrayRange(SAPtr(Bytes), Offset, Count)
+    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", Offset, "Offset", Count, "Count")
     
     If Count = 0 Then Exit Sub
     If cArray.IsNull(mBuffer) Then ReDim mBuffer(0 To mBufferSize - 1)
@@ -646,12 +650,12 @@ Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal offset As Long, ByVal Count A
     ' in the buffer, then just write it all out to the file.
     If Count > mBufferSize Then
         Dim BytesWritten As Long
-        If WriteFile(mHandle, Bytes(offset), Count, BytesWritten, ByVal 0&) = BOOL_FALSE Then IOError Err.LastDllError
+        If WriteFile(mHandle, Bytes(Offset), Count, BytesWritten, ByVal 0&) = BOOL_FALSE Then IOError Err.LastDllError
         Count = BytesWritten
         mWritePosition = 0
     Else
         ' Cache it to the local buffer.
-        Call CopyMemory(mBuffer(mWritePosition), Bytes(offset), Count)
+        Call CopyMemory(mBuffer(mWritePosition), Bytes(Offset), Count)
         mWritePosition = mWritePosition + Count
     End If
     mFilePosition = mFilePosition + Count
@@ -669,7 +673,7 @@ End Sub
 ' @return An IAsyncResult object used to identify the corrisponding EndBread and report
 ' information about the buffer read.
 '
-Public Function BeginWrite(ByRef Buffer() As Byte, ByVal offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
     Dim Ret As StreamAsyncResult
     
     Set Ret = Cor.NewStreamAsyncResult(State)
@@ -678,7 +682,7 @@ Public Function BeginWrite(ByRef Buffer() As Byte, ByVal offset As Long, ByVal C
         .CompletedSynchronously = True
         .IsCompleted = True
     End With
-    Call WriteBlock(Buffer, offset, Count)
+    Call WriteBlock(Buffer, Offset, Count)
     
     If Not Callback Is Nothing Then Call Callback.Execute(Ret)
     
@@ -873,8 +877,8 @@ Private Sub FillBuffer()
     End If
 End Sub
 
-Private Function InternalSeek(ByVal offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    With AsDLong(0.0001@ * offset)
+Private Function InternalSeek(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
+    With AsDLong(0.0001@ * Offset)
         .LoDWord = SetFilePointer(mHandle, .LoDWord, .HiDWord, Origin)
         ' in order to catch an error we check the return value against
         ' INVALID_SET_FILE_POINTER (&HFFFFFFFF). Even though it is a value
@@ -919,12 +923,12 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Stream Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Stream_BeginRead(Buffer() As Byte, ByVal offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Set Stream_BeginRead = BeginRead(Buffer, offset, Count, Callback, State)
+Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+    Set Stream_BeginRead = BeginRead(Buffer, Offset, Count, Callback, State)
 End Function
 
-Private Function Stream_BeginWrite(Buffer() As Byte, ByVal offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Set Stream_BeginWrite = BeginWrite(Buffer, offset, Count, Callback, State)
+Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+    Set Stream_BeginWrite = BeginWrite(Buffer, Offset, Count, Callback, State)
 End Function
 
 Private Property Get Stream_CanRead() As Boolean
@@ -979,8 +983,8 @@ Private Property Get Stream_Position() As Currency
     Stream_Position = Position
 End Property
 
-Private Function Stream_ReadBlock(Buffer() As Byte, ByVal offset As Long, ByVal Count As Long) As Long
-    Stream_ReadBlock = ReadBlock(Buffer, offset, Count)
+Private Function Stream_ReadBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
+    Stream_ReadBlock = ReadBlock(Buffer, Offset, Count)
 End Function
 
 Private Function Stream_ReadByte() As Long
@@ -995,8 +999,8 @@ Private Property Get Stream_ReadTimeout() As Long
     Stream_ReadTimeout = ReadTimeout
 End Property
 
-Private Function Stream_SeekPosition(ByVal offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    Stream_SeekPosition = SeekPosition(offset, Origin)
+Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
+    Stream_SeekPosition = SeekPosition(Offset, Origin)
 End Function
 
 Private Sub Stream_SetLength(ByVal Value As Currency)
@@ -1007,8 +1011,8 @@ Private Function Stream_ToString() As String
     Stream_ToString = ToString
 End Function
 
-Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal offset As Long, ByVal Count As Long)
-    Call WriteBlock(Buffer, offset, Count)
+Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
+    Call WriteBlock(Buffer, Offset, Count)
 End Sub
 
 Private Sub Stream_WriteByte(ByVal Value As Byte)

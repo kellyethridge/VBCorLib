@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Environment
+' Module: Environment
 '
 
 ''
@@ -170,15 +173,15 @@ End Property
 ' @return The name of the local computer.
 '
 Public Property Get MachineName() As String
-    Dim size As Long
-    size = MAX_COMPUTERNAME_LENGTH + 1
+    Dim Size As Long
+    Size = MAX_COMPUTERNAME_LENGTH + 1
     
     Dim Ret As String
-    Ret = String$(size, 0)
-    If API.GetComputerName(Ret, size) = BOOL_FALSE Then _
+    Ret = String$(Size, 0)
+    If API.GetComputerName(Ret, Size) = BOOL_FALSE Then _
         Throw Cor.NewInvalidOperationException(GetErrorMessage(Err.LastDllError))
     
-    MachineName = Left$(Ret, size)
+    MachineName = Left$(Ret, Size)
 End Property
 
 ''
@@ -210,9 +213,9 @@ Public Property Get SystemDirectory() As String
     Dim Ret As String
     Ret = String$(MAX_PATH + 1, 0)
     
-    Dim size As Long
-    size = API.GetSystemDirectory(Ret, Len(Ret))
-    If size > 0 Then SystemDirectory = Left$(Ret, size)
+    Dim Size As Long
+    Size = API.GetSystemDirectory(Ret, Len(Ret))
+    If Size > 0 Then SystemDirectory = Left$(Ret, Size)
 End Property
 
 ''
@@ -239,16 +242,16 @@ End Property
 Public Property Get UserDomainName() As String
     Call VerifyNTMachine
     
-    Dim size As Long
-    size = 1024
+    Dim Size As Long
+    Size = 1024
     
     Dim Sid As String
-    Sid = String$(size, 0)
+    Sid = String$(Size, 0)
     
     Dim Buf As String
-    Buf = String$(size, 0)
+    Buf = String$(Size, 0)
     
-    If GetUserNameEx(modWin32Api.NameSamCompatible, Buf, size) <> BOOL_FALSE Then
+    If GetUserNameEx(modWin32Api.NameSamCompatible, Buf, Size) <> BOOL_FALSE Then
         Dim i As Long
         i = InStr(Buf, "\")
 
@@ -258,11 +261,11 @@ Public Property Get UserDomainName() As String
         End If
     End If
     
-    If LookupAccountName(0, StrPtr(UserName), StrPtr(Sid), Len(Sid), StrPtr(Buf), size, 0&) = BOOL_FALSE Then
+    If LookupAccountName(0, StrPtr(UserName), StrPtr(Sid), Len(Sid), StrPtr(Buf), Size, 0&) = BOOL_FALSE Then
         IOError Err.LastDllError
     End If
     
-    UserDomainName = Left$(Buf, size)
+    UserDomainName = Left$(Buf, Size)
 End Property
 
 ''
@@ -292,12 +295,12 @@ End Property
 ' @return The currently logged in user's name.
 '
 Public Property Get UserName() As String
-    Dim size As Long
-    size = UNLEN + 1
+    Dim Size As Long
+    Size = UNLEN + 1
     
     Dim Ret As String
-    Ret = String$(size, 0)
-    If GetUserNameA(Ret, size) <> BOOL_FALSE Then UserName = Left$(Ret, size - 1)
+    Ret = String$(Size, 0)
+    If GetUserNameA(Ret, Size) <> BOOL_FALSE Then UserName = Left$(Ret, Size - 1)
 End Property
 
 ''
@@ -335,15 +338,15 @@ Public Function ExpandEnvironmentVariables(ByVal Name As String) As String
     Dim Buf As String
     Buf = SysAllocStringLen(0, DEF_SIZE)
     
-    Dim size As Long
-    size = API.ExpandEnvironmentStrings(Name, Buf, DEF_SIZE)
+    Dim Size As Long
+    Size = API.ExpandEnvironmentStrings(Name, Buf, DEF_SIZE)
     
-    If size > DEF_SIZE Then
-        Buf = SysAllocStringLen(0, size)
-        size = API.ExpandEnvironmentStrings(Name, Buf, size)
+    If Size > DEF_SIZE Then
+        Buf = SysAllocStringLen(0, Size)
+        Size = API.ExpandEnvironmentStrings(Name, Buf, Size)
     End If
     
-    ExpandEnvironmentVariables = Left$(Buf, size - 1)
+    ExpandEnvironmentVariables = Left$(Buf, Size - 1)
 End Function
 
 ''
@@ -502,20 +505,20 @@ Public Function GetEnvironmentVariable(ByVal Name As String, Optional ByVal Targ
             ' use the GetEnvironmentVariable api to allow for realtime
             ' updating of the environment variables for the current
             ' process. VB's Environ does not reflect variable changes.
-            Dim size As Long
-            size = 128
+            Dim Size As Long
+            Size = 128
             Do
                 Dim Buf As String
-                Buf = String$(size, 0)
-                size = API.GetEnvironmentVariable(Name, Buf, Len(Buf))
-                If size = 0 Then
+                Buf = String$(Size, 0)
+                Size = API.GetEnvironmentVariable(Name, Buf, Len(Buf))
+                If Size = 0 Then
                     Dim Result As Long
                     Result = Err.LastDllError
                     If Result = ERROR_ENVVAR_NOT_FOUND Or (Result = 0) Then Exit Function
                     IOError Result, "Name"
                 End If
-            Loop While size > Len(Buf)
-            GetEnvironmentVariable = Left$(Buf, size)
+            Loop While Size > Len(Buf)
+            GetEnvironmentVariable = Left$(Buf, Size)
             
         Case EnvironmentVariableTarget.Machine
             Call VerifyNTMachine

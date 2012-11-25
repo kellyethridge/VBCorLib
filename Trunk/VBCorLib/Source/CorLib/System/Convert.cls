@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Convert
+' Module: Convert
 '
 
 ''
@@ -110,23 +113,25 @@ Private mChars As WordBuffer
 ' conform with MIME line formatting.
 ' @return A string containg the byte array encoded as base-64 characters.
 '
-Public Function ToBase64String(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
+Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
+    If SAPtr(InArray) = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "InArray")
+    
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim Result      As Long
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    ElemIndex = GetOptionalLong(Index, LBound(InArray))
+    ElemCount = GetOptionalLong(Length, (UBound(InArray) - LBound(InArray) + 1) - ElemIndex)
+    If ElemIndex < LBound(InArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "Index")
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+    If ElemIndex + ElemCount - 1 > UBound(InArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength))
     
-    Dim size As Long
-    size = ElemCount + ElemCount \ 3
-    If (size Mod 4) <> 0 Then size = size + (4 - (size Mod 4))
-    
-    If InsertLineBreaks Then size = size + ((size - 1) \ 76) * 2
-    
-    ToBase64String = SysAllocStringLen(0, size)
+    ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(ElemCount, InsertLineBreaks))
     mChars.SA.pvData = StrPtr(ToBase64String)
     mChars.SA.cElements = Len(ToBase64String)
-    ToBase64CharArray Bytes, ElemIndex, ElemCount, mChars.Data, 0, InsertLineBreaks
+    InternalToBase64CharArray InArray, ElemIndex, ElemCount, mChars.Data, 0, InsertLineBreaks
 End Function
 
 ''
@@ -144,76 +149,27 @@ End Function
 ' @return The number of base-64 characters created.
 ' @remarks Added .NET 2.0 ability to insert linebreaks every 76 characters for MIME formatting.
 '
-Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal OffsetIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal OffsetOut As Long, Optional ByVal InsertLineBreaks As Boolean = False) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InArray), OffsetIn, Length)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InArray", OffsetIn, "OffsetIn", Length, "Length")
-    
-    Result = VerifyArrayRange(SAPtr(OutArray), OffsetOut, Length)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "OutArray", OffsetOut, "OffsetOut", Length, "Length")
-    
-    Dim size As Long
-    size = OffsetIn + (Length - (Length Mod 3))
-    
-    Dim CharCapacity As Long
-    CharCapacity = Length + Length \ 3
-    
-    If (CharCapacity Mod 4) <> 0 Then
-        CharCapacity = CharCapacity + (4 - (CharCapacity Mod 4))
-    End If
-    
-    If InsertLineBreaks Then CharCapacity = CharCapacity + ((CharCapacity - 1) \ 76) * 2
-    
-    If OffsetOut + CharCapacity - 1 > UBound(OutArray) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "OutArray")
-    
-    
-    Dim i           As Long
-    Dim CharCount   As Long
-    For i = OffsetIn To size - 1 Step 3
-        If InsertLineBreaks And (CharCount = 76) Then
-            OutArray(OffsetOut) = vbReturn
-            OutArray(OffsetOut + 1) = vbLineFeed
-            OffsetOut = OffsetOut + 2
-            CharCount = 0
-        End If
+Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, Optional ByVal InsertLineBreaks As Boolean = False) As Long
+    If SAPtr(InArray) = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "InArray")
+    If SAPtr(OutArray) = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "OutArray")
+    If IndexIn < LBound(InArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexIn")
+    If Length < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+    If IndexIn + Length - 1 > UBound(InArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength), "IndexIn")
+    If IndexOut < LBound(OutArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexOut")
         
-        OutArray(OffsetOut) = Base64Bytes((InArray(i) And &HFC) \ 4)
-        OutArray(OffsetOut + 1) = Base64Bytes(((InArray(i) And &H3) * &H10) Or ((InArray(i + 1) And &HF0) \ &H10))
-        OutArray(OffsetOut + 2) = Base64Bytes(((InArray(i + 1) And &HF) * 4) Or ((InArray(i + 2) And &HC0) \ &H40))
-        OutArray(OffsetOut + 3) = Base64Bytes(InArray(i + 2) And &H3F)
-        OffsetOut = OffsetOut + 4
-        If InsertLineBreaks Then CharCount = CharCount + 4
-    Next i
+    Dim Size As Long
+    Size = CalculateOutputLength(Length, InsertLineBreaks)
     
-    If InsertLineBreaks Then
-        Select Case Length Mod 3
-            Case 1, 2
-                If CharCount = 76 Then
-                    OutArray(OffsetOut) = vbReturn
-                    OutArray(OffsetOut + 1) = vbLineFeed
-                    OffsetOut = OffsetOut + 2
-                End If
-        End Select
-    End If
+    If IndexOut + Size - 1 > UBound(OutArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_OffsetOut), "IndexOut")
     
-    ' we need to pad the end of the string with "=" to fill out
-    ' the current unfilled buffer.
-    Select Case Length Mod 3
-        Case 1
-            OutArray(OffsetOut) = Base64Bytes((InArray(size) And &HFC) \ 4)
-            OutArray(OffsetOut + 1) = Base64Bytes((InArray(size) And &H3) * &H10)
-            OutArray(OffsetOut + 2) = vbEqual
-            OutArray(OffsetOut + 3) = vbEqual
-            OffsetOut = OffsetOut + 4
-        Case 2
-            OutArray(OffsetOut) = Base64Bytes((InArray(size) And &HFC) \ 4)
-            OutArray(OffsetOut + 1) = Base64Bytes(((InArray(size) And &H3) * &H10) Or ((InArray(size + 1) And &HF0) \ &H10))
-            OutArray(OffsetOut + 2) = Base64Bytes((InArray(size + 1) And &HF) * 4)
-            OutArray(OffsetOut + 3) = vbEqual
-            OffsetOut = OffsetOut + 4
-    End Select
-    ToBase64CharArray = OffsetOut
+    ToBase64CharArray = InternalToBase64CharArray(InArray, IndexIn, Length, OutArray, IndexOut, InsertLineBreaks)
 End Function
 
 ''
@@ -225,13 +181,18 @@ End Function
 ' @param Length The number of characters to be decoded into the byte array.
 ' @return A byte array that has been decoded from a base-64 character array.
 '
-Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As Long, ByVal Length As Long) As Byte()
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InArray), Offset, Length)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InArray", Offset, "Offset", Length, "Length")
+Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As Long, ByVal Length As Long) As Byte()
+    If SAPtr(InArray) = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "InArray")
+    If IndexIn < LBound(InArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexIn")
+    If Length < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+    If IndexIn + Length - 1 > UBound(InArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength), "IndexIn")
     
     Dim Ret() As Byte
-    Ret = cArray.CreateInstance(vbByte, Length) ' use length because 1 char equals 6 bits, so we will have extra room.
+    SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, Length)
 
     Dim i           As Long
     Dim j           As Long
@@ -240,7 +201,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
     Dim ch          As Integer
     Dim CharCount   As Long
     Dim TermCount   As Long
-    For i = Offset To Offset + Length - 1
+    For i = IndexIn To IndexIn + Length - 1
         ch = InArray(i)
         Select Case ch
             Case vbEqual
@@ -249,11 +210,11 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
                 
             Case &H20, &H9, &HA, &HB, &HC, &HD, &H85, &HA0
                 If TermCount > 0 Then _
-                    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                    Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
                     
             Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ, vbZero To vbNine, vbPlus, vbForwardSlash
                 If TermCount > 0 Then _
-                    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                    Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
                 
                 Bits = (Bits * &H40) Or Base64CharToBits(InArray(i))
                 bitCount = bitCount + 6
@@ -266,14 +227,14 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
                 CharCount = CharCount + 1
             
             Case Else
-                Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
         End Select
         If TermCount > 2 Then _
-            Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+            Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
     Next i
     
     If (CharCount Mod 4) <> 0 Then _
-        Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidNumberOfCharacters))
+        Throw Cor.NewFormatException(Resources.GetString(Format_InvalidNumberOfCharacters))
     
     Do While bitCount >= 8
         Ret(j) = Helper.ShiftRight(Bits, bitCount - 8) And &HFF
@@ -349,6 +310,76 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
         Case Else
             ToString = Value
     End Select
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Private Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function InternalToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, ByVal InsertLineBreaks As Boolean) As Long
+    Dim MaxIndex As Long
+    MaxIndex = IndexIn + (Length - (Length Mod 3))
+    
+    Dim i           As Long
+    Dim CharCount   As Long
+    For i = IndexIn To MaxIndex - 1 Step 3
+        If InsertLineBreaks And (CharCount = 76) Then
+            OutArray(IndexOut) = vbReturn
+            OutArray(IndexOut + 1) = vbLineFeed
+            IndexOut = IndexOut + 2
+            CharCount = 0
+        End If
+        
+        OutArray(IndexOut) = Base64Bytes((InArray(i) And &HFC) \ 4)
+        OutArray(IndexOut + 1) = Base64Bytes(((InArray(i) And &H3) * &H10) Or ((InArray(i + 1) And &HF0) \ &H10))
+        OutArray(IndexOut + 2) = Base64Bytes(((InArray(i + 1) And &HF) * 4) Or ((InArray(i + 2) And &HC0) \ &H40))
+        OutArray(IndexOut + 3) = Base64Bytes(InArray(i + 2) And &H3F)
+        IndexOut = IndexOut + 4
+        If InsertLineBreaks Then CharCount = CharCount + 4
+    Next i
+    
+    If InsertLineBreaks Then
+        Select Case Length Mod 3
+            Case 1, 2
+                If CharCount = 76 Then
+                    OutArray(IndexOut) = vbReturn
+                    OutArray(IndexOut + 1) = vbLineFeed
+                    IndexOut = IndexOut + 2
+                End If
+        End Select
+    End If
+    
+    ' we need to pad the end of the string with "=" to fill out
+    ' the current unfilled buffer.
+    Select Case Length Mod 3
+        Case 1
+            OutArray(IndexOut) = Base64Bytes((InArray(MaxIndex) And &HFC) \ 4)
+            OutArray(IndexOut + 1) = Base64Bytes((InArray(MaxIndex) And &H3) * &H10)
+            OutArray(IndexOut + 2) = vbEqual
+            OutArray(IndexOut + 3) = vbEqual
+            IndexOut = IndexOut + 4
+        Case 2
+            OutArray(IndexOut) = Base64Bytes((InArray(MaxIndex) And &HFC) \ 4)
+            OutArray(IndexOut + 1) = Base64Bytes(((InArray(MaxIndex) And &H3) * &H10) Or ((InArray(MaxIndex + 1) And &HF0) \ &H10))
+            OutArray(IndexOut + 2) = Base64Bytes((InArray(MaxIndex + 1) And &HF) * 4)
+            OutArray(IndexOut + 3) = vbEqual
+            IndexOut = IndexOut + 4
+    End Select
+    InternalToBase64CharArray = IndexOut
+End Function
+
+Private Function CalculateOutputLength(ByVal Length As Long, ByVal InsertLineBreaks As Boolean) As Long
+    Dim Size As Long
+    Size = Length + Length \ 3
+    If (Size Mod 4) <> 0 Then
+        Size = Size + (4 - (Size Mod 4))
+    End If
+    
+    If InsertLineBreaks Then
+        Size = Size + ((Size - 1) \ 76) * 2
+    End If
+    
+    CalculateOutputLength = Size
 End Function
 
 

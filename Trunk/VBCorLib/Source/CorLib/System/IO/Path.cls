@@ -163,7 +163,7 @@ End Property
 Public Function ChangeExtension(ByVal Path As String, ByVal Extension As String) As String
     If Len(Path) = 0 Then Exit Function
     
-    Call VerifyPath(Path)
+    VerifyPath Path
     
     If Not cString.IsNull(Extension) Then
         ' replace or append extension.
@@ -377,15 +377,15 @@ Public Function GetFullPath(ByVal Path As String) As String
     
     Call FixupPath(Path)
     
-    Dim Ptr As Long
-    Ptr = StrPtr(Path)
+    Dim ptr As Long
+    ptr = StrPtr(Path)
     
     ' quickly check the first two charcters for possible UNC path.
     ' convert first two characters into a long.
-    If MemLong(Ptr) = vbBackSlashBackSlash Then Call VerifyUNCPathFormat(Path)
+    If MemLong(ptr) = vbBackSlashBackSlash Then Call VerifyUNCPathFormat(Path)
     
     ' convert first two characters into two integers.
-    With MemDWord(Ptr)
+    With MemDWord(ptr)
         ' check first character being ':'
         If .LoWord = vbColon Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
@@ -422,13 +422,13 @@ Public Function GetFullPath(ByVal Path As String) As String
     Dim Ret As String
     Ret = String$(Me.MaxPathLength, 0)
     
-    Dim size As Long
-    size = API.GetFullPathName(Path, Len(Ret), Ret, 0)
+    Dim Size As Long
+    Size = API.GetFullPathName(Path, Len(Ret), Ret, 0)
     
-    If size = 0 Then _
+    If Size = 0 Then _
         Throw Cor.NewPathTooLongException("The qualified path is longer than the maximum of 260 characters.")
     
-    GetFullPath = Left$(Ret, size)
+    GetFullPath = Left$(Ret, Size)
 End Function
 
 ''
@@ -501,13 +501,13 @@ End Function
 '
 Public Function GetTempPath() As String
     Dim PathName As String
-    Dim size As Long
+    Dim Size As Long
     
     PathName = String$(Me.MaxPathLength, 0)
-    size = API.GetTempPath(Len(PathName), PathName)
-    If size = 0 Or size > Me.MaxPathLength Then Call IOError(Err.LastDllError)
+    Size = API.GetTempPath(Len(PathName), PathName)
+    If Size = 0 Or Size > Me.MaxPathLength Then Call IOError(Err.LastDllError)
 
-    GetTempPath = GetLongPathName(Left$(PathName, size))
+    GetTempPath = GetLongPathName(Left$(PathName, Size))
 End Function
 
 ''
@@ -710,15 +710,15 @@ End Function
 
 Private Function GetLongPathName(ByRef ShortPath As String) As String
     Dim LongPath    As String
-    Dim size        As Long
+    Dim Size        As Long
     
-    size = 1024
+    Size = 1024
     Do
-        LongPath = String$(size, 0)
-        size = API.GetLongPathName(ShortPath, LongPath, size)
-    Loop While size > Len(LongPath)
+        LongPath = String$(Size, 0)
+        Size = API.GetLongPathName(ShortPath, LongPath, Size)
+    Loop While Size > Len(LongPath)
     
-    GetLongPathName = Left$(LongPath, size)
+    GetLongPathName = Left$(LongPath, Size)
 End Function
 
 
