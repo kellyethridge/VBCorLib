@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: DSACryptoServiceProvider
+' Module: DSACryptoServiceProvider
 '
 
 ''
@@ -197,14 +200,14 @@ Public Function ExportCspBlob(ByVal IncludePrivateParameters As Boolean) As Byte
     Dim BlobType As Long
     BlobType = IIf(IncludePrivateParameters, PRIVATEKEYBLOB, PUBLICKEYBLOB)
     
-    Dim size As Long
-    If CryptExportKey(mKey, 0, BlobType, 0, ByVal 0&, size) = BOOL_FALSE Then _
+    Dim Size As Long
+    If CryptExportKey(mKey, 0, BlobType, 0, ByVal 0&, Size) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
     
     Dim Blob() As Byte
-    ReDim Blob(0 To size - 1)
+    ReDim Blob(0 To Size - 1)
     
-    If CryptExportKey(mKey, 0, BlobType, 0, Blob(0), size) = BOOL_FALSE Then _
+    If CryptExportKey(mKey, 0, BlobType, 0, Blob(0), Size) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
     
     ExportCspBlob = Blob
@@ -277,9 +280,9 @@ End Sub
 ' @param Count The number of bytes to be processed. This is only applied to a Byte array.
 ' @return A byte array representing the signature for the data.
 '
-Public Function SignData(ByRef InputStreamOrBuffer As Variant, Optional ByRef offset As Variant, Optional ByRef Count As Variant) As Byte()
+Public Function SignData(ByRef InputStreamOrBuffer As Variant, Optional ByRef Offset As Variant, Optional ByRef Count As Variant) As Byte()
     Dim HashObj As New SHA1CryptoServiceProvider
-    SignData = SignHash(HashObj.ComputeHash(InputStreamOrBuffer, offset, Count), "sha1")
+    SignData = SignHash(HashObj.ComputeHash(InputStreamOrBuffer, Offset, Count), "sha1")
 End Function
 
 ''
@@ -294,14 +297,14 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByVal Str As String) As Byte()
     Dim Hash As Long
     Hash = SetHash(RgbHash, Str)
 
-    Dim size As Long
-    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, ByVal 0&, size) = BOOL_FALSE Then _
+    Dim Size As Long
+    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, ByVal 0&, Size) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
 
     Dim Signature() As Byte
-    ReDim Signature(0 To size - 1)
+    ReDim Signature(0 To Size - 1)
     
-    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, Signature(0), size) = BOOL_FALSE Then _
+    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
     
     Call CryptDestroyHash(Hash)

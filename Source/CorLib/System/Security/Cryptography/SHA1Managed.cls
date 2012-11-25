@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: SHA1Managed
+' Module: SHA1Managed
 '
 
 ''
@@ -277,7 +280,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     Dim d As Long
     Dim e As Long
     Dim f As Long
-    Dim K As Long
+    Dim k As Long
     Dim t As Long
 
     a = mState(0)
@@ -290,19 +293,19 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
         Select Case i
             Case Is < 20
                 f = d Xor (b And (c Xor d))
-                K = &H5A827999
+                k = &H5A827999
             Case Is < 40
                 f = b Xor c Xor d
-                K = &H6ED9EBA1
+                k = &H6ED9EBA1
             Case Is < 60
                 f = (b And c) Or (d And (b Or c))
-                K = &H8F1BBCDC
+                k = &H8F1BBCDC
             Case Else
                 f = b Xor c Xor d
-                K = &HCA62C1D6
+                k = &HCA62C1D6
         End Select
         
-        t = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(LRotate(a, 5), f), e), mW(i)), K)
+        t = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(LRotate(a, 5), f), e), mW(i)), k)
         e = d
         d = c
         c = LRotate(b, 30)

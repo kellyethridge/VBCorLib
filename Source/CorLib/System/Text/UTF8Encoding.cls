@@ -171,7 +171,7 @@ End Property
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    AttachChars Chars, mChars, mCharsSA
     
     Dim ElemIndex As Long
     Dim ElemCount As Long
@@ -275,14 +275,14 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim size As Long
-    size = GetMaxCharCount(ElemCount)
+    Dim Size As Long
+    Size = GetMaxCharCount(ElemCount)
     
     Dim Ret() As Integer
     If ElemCount > 0 Then
-        ReDim Ret(0 To size - 1)
-        size = InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0, Nothing)
-        ReDim Preserve Ret(0 To size - 1)
+        ReDim Ret(0 To Size - 1)
+        Size = InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0, Nothing)
+        ReDim Preserve Ret(0 To Size - 1)
     Else
         Ret = Cor.NewIntegers()
     End If
@@ -327,19 +327,19 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    Dim size As Long
-    size = GetMaxCharCount(ElemCount)
+    Dim Size As Long
+    Size = GetMaxCharCount(ElemCount)
     
     Dim Ret As String
-    Ret = SysAllocStringLen(0, size)
+    Ret = SysAllocStringLen(0, Size)
     With mCharsSA
         .pvData = StrPtr(Ret)
         .lLbound = 0
-        .cElements = size
+        .cElements = Size
     End With
     SAPtr(mChars) = VarPtr(mCharsSA)
-    size = InternalGetChars(Bytes, ElemIndex, ElemCount, mChars, 0, Nothing)
-    GetString = Left$(Ret, size)
+    Size = InternalGetChars(Bytes, ElemIndex, ElemCount, mChars, 0, Nothing)
+    GetString = Left$(Ret, Size)
 End Function
 
 ''

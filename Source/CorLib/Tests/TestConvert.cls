@@ -6,183 +6,281 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestConvert"
+Attribute VB_Name = "ConvertTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestConvert
+' ConvertTests
 '
 Option Explicit
+Implements ITestCaseSource
 
-Public Sub TestToBase64StringOneChar()
-    Dim b(0) As Byte
-    Dim s As String
-    
-    b(0) = 22
-    s = Convert.ToBase64String(b)
-    Assert.AreEqual "Fg==", s
-End Sub
+Private Const AllByteValuesAsBase64 As String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
+Private AllByteValuesAsBase64WithLineBreaks As String
 
-Public Sub TestToBase64String3Bytes()
-    Dim b() As Byte
-    Dim s As String
-    
-    b = NewBytes(22, 250, 42)
-    s = Convert.ToBase64String(b)
-    Assert.AreEqual "Fvoq", s
-End Sub
+Private AllByteValues() As Byte
 
-Public Sub TestToBase64String3BytesOffset()
-    Dim b() As Byte
-    Dim s As String
-    
-    b = NewBytes(22, 250, 42)
-    s = Convert.ToBase64String(b, 1, 2)
-    Assert.AreEqual "+io=", s
-End Sub
-
-Public Sub TestToBase64String255Bytes()
-    Dim b(255) As Byte
-    Dim s As String
+Public Sub FixtureSetup()
+    ReDim AllByteValues(0 To 255)
     Dim i As Long
-    
     For i = 0 To 255
-        b(i) = i
-    Next i
-    s = Convert.ToBase64String(b)
-    Assert.AreEqual "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w==", s
+        AllByteValues(i) = i
+    Next
+    
+    AllByteValuesAsBase64WithLineBreaks = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4" & vbCrLf & _
+                                          "OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3Bx" & vbCrLf & _
+                                          "cnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmq" & vbCrLf & _
+                                          "q6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj" & vbCrLf & _
+                                          "5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
 End Sub
 
-Public Sub TestToBase64CharArraySmallBuffer()
-    Dim b(0) As Byte
-    Dim s As String
-    Dim ch(2) As Integer
-    
-    b(0) = 22
-    On Error GoTo errTrap
-    s = Convert.ToBase64CharArray(b, 0, 1, ch, 0)
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
-    
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "ToBase64String_WithValues_ReturnsExpected"
+            Test.Use "", ""
+            Test.Use "f", "Zg=="
+            Test.Use "fo", "Zm8="
+            Test.Use "foo", "Zm9v"
+            Test.Use "foob", "Zm9vYg=="
+            Test.Use "fooba", "Zm9vYmE="
+            Test.Use "foobar", "Zm9vYmFy"
+            
+        Case "FromBase64String_WithValues_ReturnsExpected"
+            Test.Use "", ""
+            Test.Use "Zg==", "f"
+            Test.Use "Zm8=", "fo"
+            Test.Use "Zm9v", "foo"
+            Test.Use "Zm9vYg==", "foob"
+            Test.Use "Zm9vYmE=", "fooba"
+            Test.Use "Zm9vYmFy", "foobar"
+    End Select
 End Sub
 
-Public Sub TestFromBase64CharArray()
-    Dim ch() As Integer
-    Dim b() As Byte
+Public Sub ToBase64String_WithValues_ReturnsExpected(ByVal Source As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Bytes() As Byte
+    Bytes = StrConv(Source, vbFromUnicode)
     
-    ch = cString.ToCharArray("Fg==")
-    b = Convert.FromBase64CharArray(ch, 0, 4)
-    Assert.AreEqual 1, cArray.GetLength(b)
-    Assert.AreEqual 22, b(0)
+    Actual = Convert.ToBase64String(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestFromBase64CharArray4Chars()
-    Dim ch() As Integer
-    Dim b() As Byte
+Public Sub FromBase64String_WithValues_ReturnsExpected(ByVal Source As String, ByVal Expected As String)
+    Dim Actual() As Byte
     
-    ch = cString.ToCharArray("Fvoq")
-    b = Convert.FromBase64CharArray(ch, 0, 4)
-    Assert.AreEqual 3, cArray.GetLength(b)
-    Assert.AreEqual 22, b(0)
-    Assert.AreEqual 250, b(1)
-    Assert.AreEqual 42, b(2)
+    Actual = Convert.FromBase64String(Source)
+    
+    Dim Bytes() As Byte
+    Bytes = StrConv(Expected, vbFromUnicode)
+    Assert.That Actual, Iz.EqualTo(Bytes)
 End Sub
 
-Public Sub TestFromBase64CharArrayLots()
-    Dim ch() As Integer
-    Dim b() As Byte
-    Dim i As Long
+Public Sub ToBase64String_WithAllByteValues_ReturnsAllByteValuesAsBase64()
+    Dim Actual As String
     
-    ch = cString.ToCharArray("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w==")
-    b = Convert.FromBase64CharArray(ch, 0, cArray.GetLength(ch))
+    Actual = Convert.ToBase64String(AllByteValues)
     
-    Assert.AreEqual 256, cArray.GetLength(b)
-    
-    For i = 0 To 255
-        Assert.AreEqual i, b(i)
-    Next i
+    Assert.That Actual, Iz.EqualTo(AllByteValuesAsBase64)
 End Sub
 
-Public Sub TestFromBase64String()
-    Dim b() As Byte
-    Dim i As Long
+Public Sub FromBase64String_WithAllByteValuesAsBase64_ReturnsAllByteValues()
+    Dim Actual() As Byte
     
-    b = Convert.FromBase64String("AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w==")
+    Actual = Convert.FromBase64String(AllByteValuesAsBase64)
     
-    Assert.AreEqual 256, cArray.GetLength(b)
-    
-    For i = 0 To 255
-        Assert.AreEqual i, b(i)
-    Next i
+    Assert.That Actual, Iz.EqualTo(AllByteValues)
 End Sub
 
-Public Sub TestToFromBase64StringRange0to300()
-    Dim b() As Byte
-    Dim b2() As Byte
-    Dim i As Long
-    Dim j As Long
-    Dim s As String
+Public Sub ToBase64String_WithAllByteValuesAndInsertLineBreaks_ReturnsAllByteValuesAsBase64WithLineBreaks()
+    Dim Actual As String
     
-    For i = 0 To 300
-        ReDim b(i)
-        For j = UBound(b) To LBound(b) Step -1
-            b(j) = j And &HFF
-        Next j
-        s = Convert.ToBase64String(b)
-        b2 = Convert.FromBase64String(s)
-        Assert.AreEqual cArray.GetLength(b), cArray.GetLength(b2)
-        For j = UBound(b) To LBound(b) Step -1
-            Assert.AreEqual b(j), b2(j)
-        Next j
-    Next i
+    Actual = Convert.ToBase64String(AllByteValues, InsertLineBreaks:=True)
+    
+    Assert.That Actual, Iz.EqualTo(AllByteValuesAsBase64WithLineBreaks)
 End Sub
 
-Public Sub TestToBase64StringLineBreaks()
-    Dim i As Long
-    Dim s As String
-    Dim b() As Byte
+Public Sub FromBase64String_WithAllByteValuesAsBase64WithLineBreaks_ReturnsAllByteValues()
+    Dim Actual() As Byte
     
-    ReDim b(255)
-    For i = 0 To 255
-        b(i) = i
-    Next i
+    Actual = Convert.FromBase64String(AllByteValuesAsBase64WithLineBreaks)
     
-    s = Convert.ToBase64String(b, , , True)
-    Assert.AreEqual 352, Len(s)
-    
-    i = InStr(s, vbCrLf)
-    Assert.AreEqual 77, i
-    i = InStr(i + 2, s, vbCrLf)
-    Assert.AreEqual 78 + 77, i
-    i = InStr(i + 2, s, vbCrLf)
-    Assert.AreEqual 78 * 2 + 77, i
-    i = InStr(i + 2, s, vbCrLf)
-    Assert.AreEqual 78 * 3 + 77, i
-    Assert.AreEqual 351, InStr(s, "==")
+    Assert.That Actual, Iz.EqualTo(AllByteValues)
 End Sub
 
-Public Sub TestFromBase64StringLineBreaks()
-    Dim i As Long
-    Dim s As String
-    Dim b() As Byte
+Public Sub ToBase64String_WithNullArray_Throws()
+    Dim Bytes() As Byte
     
-    ReDim b(255)
-    For i = 0 To 255
-        b(i) = i
-    Next i
+    On Error Resume Next
+    Convert.ToBase64String Bytes
     
-    s = Convert.ToBase64String(b, , , True)
-        
-    b = Convert.FromBase64String(s)
-    
-    Assert.AreEqual 256, cArray.GetLength(b)
-    For i = 0 To 255
-        Assert.AreEqual i, b(i)
-    Next i
+    AssertArgumentNullException Err, "InArray"
 End Sub
+
+Public Sub ToBase64String_WithIndexLessThanLBound_Throws()
+    Dim Bytes(1 To 2) As Byte
+    
+    On Error Resume Next
+    Convert.ToBase64String Bytes, 0, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub ToBase64String_WithLengthLessThanZero_Throws()
+    Dim Bytes(0) As Byte
+    
+    On Error Resume Next
+    Convert.ToBase64String Bytes, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Length"
+End Sub
+
+Public Sub ToBase64String_WithIndexAndLengthGreaterThanUBound_Throws()
+    Dim Bytes(0 To 2) As Byte
+    
+    On Error Resume Next
+    Convert.ToBase64String Bytes, 0, 4
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub ToBase64CharArray_WithNullInArray_Throws()
+    Dim InArray() As Byte
+    Dim OutArray(0) As Integer
+    
+    On Error Resume Next
+    Convert.ToBase64CharArray InArray, 0, 0, OutArray, 0
+    
+    AssertArgumentNullException Err, "InArray"
+End Sub
+
+Public Sub ToBase64CharArray_WithNullOutArray_Throws()
+    Dim InArray(0) As Byte
+    Dim OutArray() As Integer
+    
+    On Error Resume Next
+    Convert.ToBase64CharArray InArray, 0, 0, OutArray, 0
+    
+    AssertArgumentNullException Err, "OutArray"
+End Sub
+
+Public Sub ToBase64CharArray_WithIndexInLessThanLBound_Throws()
+    Dim InArray(1 To 2) As Byte
+    Dim OutArray(0) As Integer
+    
+    On Error Resume Next
+    Convert.ToBase64CharArray InArray, 0, 0, OutArray, 0
+    
+    AssertArgumentOutOfRangeException Err, "IndexIn"
+End Sub
+
+Public Sub ToBase64CharArray_WithIndexOutLessThanLBound_Throws()
+    Dim InArray(2) As Byte
+    Dim OutArray(1 To 5) As Integer
+    
+    On Error Resume Next
+    
+    Convert.ToBase64CharArray InArray, 0, 1, OutArray, 0
+    
+    AssertArgumentOutOfRangeException Err, "IndexOut"
+End Sub
+
+Public Sub ToBase64CharArray_WithLengthLessThanZero_Throws()
+    Dim InArray(1) As Byte
+    Dim OutArray(1) As Integer
+    
+    On Error Resume Next
+    Convert.ToBase64CharArray InArray, 0, -1, OutArray, 0
+    
+    AssertArgumentOutOfRangeException Err, "Length"
+End Sub
+
+Public Sub ToBase64CharArray_WithIndexInAndLengthGreaterThanUBound_Throws()
+    Dim InArray(1) As Byte
+    Dim OutArray(2) As Integer
+    
+    On Error Resume Next
+    Convert.ToBase64CharArray InArray, 0, 3, OutArray, 0
+    
+    AssertArgumentOutOfRangeException Err, "IndexIn"
+End Sub
+
+Public Sub ToBase64CharArray_WithIndexOutAndLengthGreaterThanUBound_Throws()
+    Dim InArray(2) As Byte
+    Dim OutArray(1) As Integer
+    
+    On Error Resume Next
+    Convert.ToBase64CharArray InArray, 0, 3, OutArray, 0
+    
+    AssertArgumentOutOfRangeException Err, "IndexOut"
+End Sub
+
+Public Sub FromBase64CharArray_WithNullArray_Throws()
+    Dim InArray() As Integer
+    
+    On Error Resume Next
+    Convert.FromBase64CharArray InArray, 0, 0
+    
+    AssertArgumentNullException Err, "InArray"
+End Sub
+
+Public Sub FromBase64CharArray_WithIndexInLessThanLBound_Throws()
+    Dim InArray(1 To 2) As Integer
+    
+    On Error Resume Next
+    Convert.FromBase64CharArray InArray, 0, 0
+    
+    AssertArgumentOutOfRangeException Err, "IndexIn"
+End Sub
+
+Public Sub FromBase64CharArray_WithLengthLessThanZero_Throws()
+    Dim InArray(0) As Integer
+    
+    On Error Resume Next
+    Convert.FromBase64CharArray InArray, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Length"
+End Sub
+
+Public Sub FromBase64CharArray_WithIndexInAndLengthGreaterThanUBound_Throws()
+    Dim InArray(2) As Integer
+    
+    On Error Resume Next
+    Convert.FromBase64CharArray InArray, 0, 4
+    
+    AssertArgumentOutOfRangeException Err, "IndexIn"
+End Sub
+
+Public Sub FromBase64String_WithMalformedString_Throws()
+    Const Malformed As String = "Zm9vYg=" ' correct form: Zm9vYg==
+    
+    On Error Resume Next
+    Convert.FromBase64String Malformed
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub FromBase64String_WithTooMuchPadding_Throws()
+    Const Malformed As String = "Zm9vYg===" ' correct form: Zm9vYg==
+    
+    On Error Resume Next
+    Convert.FromBase64String Malformed
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub FromBase64String_WithInvalidCharater_Throws()
+    Const Malformed As String = "Zm9vY.==" ' correct form: Zm9vYg==
+    
+    On Error Resume Next
+    Convert.FromBase64String Malformed
+    
+    AssertFormatException Err
+End Sub
+
+
+
+
+

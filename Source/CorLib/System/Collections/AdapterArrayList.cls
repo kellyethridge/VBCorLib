@@ -120,7 +120,7 @@ Private Sub ArrayList_AddRange(c As Variant)
     Dim v As Variant
     
     For Each v In c
-        Call mList.Add(v)
+        mList.Add v
     Next v
 End Sub
 

@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2007 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of BigNumber.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    BigNumber is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    BigNumber is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: BigInteger
+' Module: BigInteger
 '
 
 ''
@@ -738,12 +741,12 @@ Private Function ToDecimalString(ByVal Count As Long) As String
     Dim dividend As Number
     dividend = mNumber
     
-    Dim size As Long
-    size = mNumber.Precision * DIGITS_PER_INTEGER
-    If Count > size Then size = Count
+    Dim Size As Long
+    Size = mNumber.Precision * DIGITS_PER_INTEGER
+    If Count > Size Then Size = Count
     
     Dim Result As String
-    Result = String$(size + 1, 48)
+    Result = String$(Size + 1, 48)
     
     If mNumber.Sign = Negative Then Call modBigMath.Negate(dividend)
     
@@ -757,7 +760,7 @@ Private Function ToDecimalString(ByVal Count As Long) As String
         i = i - 1
     Loop
     
-    If size - i < Count Then i = size - Count + 1
+    If Size - i < Count Then i = Size - Count + 1
     
     If mNumber.Sign = Negative Then
         Mid$(Result, i, 1) = "-"
@@ -770,12 +773,12 @@ End Function
 Private Function ToHexString(ByVal Count As Long, Offset As Long) As String
     Const DIGITS_PER_INTEGER As Long = 4
     
-    Dim size As Long
-    size = mNumber.Precision * DIGITS_PER_INTEGER
-    If Count > size Then size = Count
+    Dim Size As Long
+    Size = mNumber.Precision * DIGITS_PER_INTEGER
+    If Count > Size Then Size = Count
     
     Dim Result As String
-    Result = String$(size, 48)
+    Result = String$(Size, 48)
     
     Dim c As Long
     Dim k As Long
@@ -791,12 +794,12 @@ Private Function ToHexString(ByVal Count As Long, Offset As Long) As String
         Loop
     Next i
     
-    If size - c < Count Then
+    If Size - c < Count Then
         If mNumber.Sign = Negative Then
-            Mid$(Result, Count - size + 1) = String$(Count - (size - c), Mid$(HEX_CHARS, &HF + Offset, 1))
+            Mid$(Result, Count - Size + 1) = String$(Count - (Size - c), Mid$(HEX_CHARS, &HF + Offset, 1))
         End If
         
-        c = size - Count
+        c = Size - Count
     End If
     
     ToHexString = Mid$(Result, c + 1)
@@ -805,12 +808,12 @@ End Function
 Private Function ToBinaryString(ByVal Count As Long) As String
     Const DIGITS_PER_INTEGER As Long = 16
     
-    Dim size As Long
-    size = mNumber.Precision * DIGITS_PER_INTEGER + 1
-    If Count > size Then size = Count
+    Dim Size As Long
+    Size = mNumber.Precision * DIGITS_PER_INTEGER + 1
+    If Count > Size Then Size = Count
     
     Dim Result As String
-    Result = String$(size, 48)
+    Result = String$(Size, 48)
     
     Dim c As Long
     Dim k As Long
@@ -826,12 +829,12 @@ Private Function ToBinaryString(ByVal Count As Long) As String
         Loop
     Next i
     
-    If size - c < Count Then
+    If Size - c < Count Then
         If mNumber.Sign = Negative Then
-            Mid$(Result, Count - size + 1) = String$(Count - (size - c), 49)
+            Mid$(Result, Count - Size + 1) = String$(Count - (Size - c), 49)
         End If
         
-        c = size - Count
+        c = Size - Count
     End If
     
     ToBinaryString = Mid$(Result, c + 1)

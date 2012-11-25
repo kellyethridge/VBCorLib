@@ -335,7 +335,7 @@ End Property
 ' @remarks Positive infinity is achieved by dividing a positive
 ' number by zero. The default is "Infinity".
 Public Property Get PositiveInfinitySymbol() As String
-    Call VerifyLoaded
+    VerifyLoaded
     PositiveInfinitySymbol = mProps.PositiveInfinitySymbol
 End Property
 
@@ -1357,7 +1357,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
     Dim ch As Integer
     Dim remainingdigits As Long
     Dim DigitCount As Long
-    Dim size As Long
+    Dim Size As Long
     
     With mNumber
         If .Scale > 0 Then
@@ -1368,12 +1368,12 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             remainingdigits = .Scale - j
             If remainingdigits < 0 Then remainingdigits = .Scale
             
-            If UBound(GroupSizes) >= 0 Then size = GroupSizes(UBound(GroupSizes))
-            If remainingdigits = size Then
+            If UBound(GroupSizes) >= 0 Then Size = GroupSizes(UBound(GroupSizes))
+            If remainingdigits = Size Then
                 DigitCount = -1
-            ElseIf size > 0 Then
-                DigitCount = remainingdigits Mod size
-                If DigitCount = 0 Then DigitCount = size
+            ElseIf Size > 0 Then
+                DigitCount = remainingdigits Mod Size
+                If DigitCount = 0 Then DigitCount = Size
             Else
                 DigitCount = remainingdigits
             End If
@@ -1382,7 +1382,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             Do While remainingdigits > 0
                 If DigitCount = 0 Then
                     Call AppendString(GroupSeparator)
-                    DigitCount = size
+                    DigitCount = Size
                 End If
                 If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
@@ -1401,16 +1401,16 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
         End If
         
         If (i = 0 Or ch <> 0) Or (i < .Scale And ch = 0) Then
-            size = UBound(GroupSizes)
+            Size = UBound(GroupSizes)
             DigitCount = 0
             'digitcount = GroupSizes(size)
             ch = .Digits(i)
             For j = i To .Scale - 1
                 If DigitCount = 0 Then
                     Call AppendString(GroupSeparator)
-                    size = size - 1
-                    If size < 0 Then size = 0
-                    DigitCount = GroupSizes(size)
+                    Size = Size - 1
+                    If Size < 0 Then Size = 0
+                    DigitCount = GroupSizes(Size)
                 End If
                 If ch = 0 Then
                     mOutput(mOutputPos) = vbZero

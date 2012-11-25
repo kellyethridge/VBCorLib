@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: SHA256Managed
+' Module: SHA256Managed
 '
 
 ''
@@ -284,10 +287,10 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     Dim f As Long
     Dim g As Long
     Dim h As Long
-    Dim T1 As Long
+    Dim t1 As Long
     Dim Maj As Long
-    Dim T2 As Long
-    Dim Ch As Long
+    Dim t2 As Long
+    Dim ch As Long
     
     a = mState(0)
     b = mState(1)
@@ -301,19 +304,19 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     For i = 0 To 63
         s0 = RRotate(a, 2) Xor RRotate(a, 13) Xor RRotate(a, 22)
         Maj = ((a And b) Xor (a And c) Xor (b And c))
-        T2 = Helper.UAdd(s0, Maj)
+        t2 = Helper.UAdd(s0, Maj)
         s1 = RRotate(e, 6) Xor RRotate(e, 11) Xor RRotate(e, 25)
-        Ch = (e And f) Xor ((Not e) And g)
-        T1 = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(h, s1), Ch), mK(i)), mW(i))
+        ch = (e And f) Xor ((Not e) And g)
+        t1 = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(h, s1), ch), mK(i)), mW(i))
         
         h = g
         g = f
         f = e
-        e = Helper.UAdd(d, T1)
+        e = Helper.UAdd(d, t1)
         d = c
         c = b
         b = a
-        a = Helper.UAdd(T1, T2)
+        a = Helper.UAdd(t1, t2)
     Next i
     
     mState(0) = Helper.UAdd(mState(0), a)
@@ -337,18 +340,18 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
         Index = Index + 4
     Next i
     
-    Dim T1 As Long
-    Dim T2 As Long
+    Dim t1 As Long
+    Dim t2 As Long
     For i = 16 To 63
-        T1 = mW(i - 15)
-        T2 = mW(i - 2)
+        t1 = mW(i - 15)
+        t2 = mW(i - 2)
         mW(i) = (mW(i - 16) + mW(i - 7)) + _
-                (((((T1 And &HFFFFFF80) \ &H80&) And &H1FFFFFF) Or (T1 * &H2000000)) Xor _
-                ((((T1 And &HFFFC0000) \ &H40000) And &H3FFF&) Or (T1 * &H4000&)) Xor _
-                ((((T1 And &HFFFFFFF8) \ &H8&) And &H1FFFFFFF))) + _
-                (((((T2 And &HFFFE0000) \ &H20000) And &H7FFF&) Or (T2 * &H8000&)) Xor _
-                ((((T2 And &HFFF80000) \ &H80000) And &H1FFF&) Or (T2 * &H2000&)) Xor _
-                ((((T2 And &HFFFFFC00) \ &H400&) And &H3FFFFF)))
+                (((((t1 And &HFFFFFF80) \ &H80&) And &H1FFFFFF) Or (t1 * &H2000000)) Xor _
+                ((((t1 And &HFFFC0000) \ &H40000) And &H3FFF&) Or (t1 * &H4000&)) Xor _
+                ((((t1 And &HFFFFFFF8) \ &H8&) And &H1FFFFFFF))) + _
+                (((((t2 And &HFFFE0000) \ &H20000) And &H7FFF&) Or (t2 * &H8000&)) Xor _
+                ((((t2 And &HFFF80000) \ &H80000) And &H1FFF&) Or (t2 * &H2000&)) Xor _
+                ((((t2 And &HFFFFFC00) \ &H400&) And &H3FFFFF)))
     Next i
     
     Dim a As Long
@@ -370,13 +373,13 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     h = mState(7)
     
     For i = 0 To 63
-        T1 = ((a And b) Xor (a And c) Xor (b And c)) + _
+        t1 = ((a And b) Xor (a And c) Xor (b And c)) + _
              (((((a And &HFFFFFFFC) \ &H4&) And &H3FFFFFFF) Or (a * &H40000000)) Xor _
              ((((a And &HFFFFE000) \ &H2000&) And &H7FFFF) Or (a * &H80000)) Xor _
              ((((a And &HFFC00000) \ &H400000) And &H3FF) Or (a * &H400&)))
         
         
-        T2 = (h + mK(i) + mW(i)) + _
+        t2 = (h + mK(i) + mW(i)) + _
              (((((e And &HFFFFFFC0) \ &H40&) And &H3FFFFFF) Or (e * &H4000000)) Xor _
              ((((e And &HFFFFF800) \ &H800&) And &H1FFFFF) Or (e * &H200000)) Xor _
              ((((e And &HFE000000) \ &H2000000) And &H7F) Or (e * &H80&))) + _
@@ -385,11 +388,11 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
         h = g
         g = f
         f = e
-        e = d + T2
+        e = d + t2
         d = c
         c = b
         b = a
-        a = T1 + T2
+        a = t1 + t2
     Next i
     
     mState(0) = mState(0) + a

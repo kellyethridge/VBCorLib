@@ -63,7 +63,7 @@ End Sub
 Public Sub TestUserName()
     WriteLine ""
     WriteLine "--- VISUAL INSPECTION ---"
-    WriteLine "UserName: " & Environment.userName
+    WriteLine "UserName: " & Environment.UserName
 End Sub
 
 Public Sub TestUserDomainName()
@@ -116,18 +116,18 @@ Public Sub TestGetEnvironmentVariable()
 End Sub
 
 Public Sub TestGetEnvironmentVariables()
-    Dim HT As Hashtable
+    Dim ht As Hashtable
     Dim i As Long
     
     WriteLine ""
     WriteLine "--- VISUAL INSPECTION ---"
     WriteLine "--- TestGetEnvironmentVariables ---"
     
-    Set HT = Environment.GetEnvironmentVariables
-    WriteLine "Count: " & HT.Count
+    Set ht = Environment.GetEnvironmentVariables
+    WriteLine "Count: " & ht.Count
     
     Dim de As DictionaryEntry
-    For Each de In HT
+    For Each de In ht
         i = i + 1
         WriteLine "Variable(" & i & "): " & de.Key & " = " & de.Value
     Next de
@@ -157,36 +157,36 @@ Public Sub TestGetLogicalDrives()
 End Sub
 
 Public Sub TestUserGetEnvironmentVariables()
-    Dim HT As Hashtable
+    Dim ht As Hashtable
     Dim i As Long
     
     WriteLine ""
     WriteLine "--- VISUAL INSPECTION ---"
     WriteLine "--- TestUserGetEnvironmentVariables ---"
     
-    Set HT = Environment.GetEnvironmentVariables(User)
-    WriteLine "Count: " & HT.Count
+    Set ht = Environment.GetEnvironmentVariables(User)
+    WriteLine "Count: " & ht.Count
     
     Dim de As DictionaryEntry
-    For Each de In HT
+    For Each de In ht
         i = i + 1
         WriteLine "Variable(" & i & "): " & de.Key & " = " & de.Value
     Next de
 End Sub
 
 Public Sub TestMachineGetEnvironmentVariables()
-    Dim HT As Hashtable
+    Dim ht As Hashtable
     Dim i As Long
     
     WriteLine ""
     WriteLine "--- VISUAL INSPECTION ---"
     WriteLine "--- TestMachineGetEnvironmentVariables ---"
     
-    Set HT = Environment.GetEnvironmentVariables(Machine)
-    WriteLine "Count: " & HT.Count
+    Set ht = Environment.GetEnvironmentVariables(Machine)
+    WriteLine "Count: " & ht.Count
     
     Dim de As DictionaryEntry
-    For Each de In HT
+    For Each de In ht
         i = i + 1
         WriteLine "Variable(" & i & "): " & de.Key & " = " & de.Value
     Next de

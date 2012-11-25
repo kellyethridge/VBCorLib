@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2012 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Console
+' Module: Console
 '
 
 ''
@@ -348,10 +351,10 @@ End Function
 Public Function ReadKey(Optional ByVal Intercept As Boolean = False) As ConsoleKeyInfo
     If Not InternalReadKey(ReadKey) Then
         Do
-            Dim result  As Long
+            Dim Result  As Long
             Dim NumRead As Long
-            result = ReadConsoleInput(mInputHandle, mKeyPressHistory, 1, NumRead)
-            If result = 0 Or NumRead = 0 Then _
+            Result = ReadConsoleInput(mInputHandle, mKeyPressHistory, 1, NumRead)
+            If Result = 0 Or NumRead = 0 Then _
                 Throw Cor.NewInvalidOperationException("Could not read from the console window.")
             
             Dim ReRead As Boolean
@@ -461,10 +464,10 @@ End Sub
 ' @remarks Values are converted to their string representation for text output.
 ' A formatted output can be created similar to <b>cString.Format</b>.
 ' @include "..\Includes\ConsoleWriteValue.txt"
-Public Sub WriteValue(ByRef value As Variant, ParamArray args() As Variant)
+Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
-    Call InternalWriteValue(value, a)
+    Call InternalWriteValue(Value, a)
 End Sub
 
 ''
@@ -755,15 +758,15 @@ End Property
 '
 Public Property Get Title() As String
     Dim Buf As String
-    Dim size As Long
+    Dim Size As Long
     
     Buf = String$(MAX_TITLE_LENGTH, 0)
     If Environment.IsNT Then
-        size = GetConsoleTitleW(StrPtr(Buf), MAX_TITLE_LENGTH)
+        Size = GetConsoleTitleW(StrPtr(Buf), MAX_TITLE_LENGTH)
     Else
-        size = GetConsoleTitleA(Buf, MAX_TITLE_LENGTH)
+        Size = GetConsoleTitleA(Buf, MAX_TITLE_LENGTH)
     End If
-    Select Case size
+    Select Case Size
         Case 0
             Dim e As Long
             e = Err.LastDllError
@@ -771,7 +774,7 @@ Public Property Get Title() As String
         Case Is > MAX_TITLE_LENGTH
             Throw Cor.NewInvalidOperationException("Cannot retrieve title longer that 24500 characters.")
     End Select
-    Title = Left$(Buf, size)
+    Title = Left$(Buf, Size)
 End Property
 
 ''
@@ -1222,40 +1225,40 @@ End Property
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetConsoleStream(ByVal Handle As Long, ByVal Access As FileAccess) As Stream
-    Dim ret As New ConsoleStream
-    Call ret.Init(Handle, Access)
-    Set GetConsoleStream = ret
+    Dim Ret As New ConsoleStream
+    Call Ret.Init(Handle, Access)
+    Set GetConsoleStream = Ret
 End Function
 
-Private Sub InternalWrite(ByVal value As String, ByRef args() As Variant, ByVal NewLine As Boolean)
-    If Not cArray.IsNull(args) Then
-        If UBound(args) >= 0 Then value = cString.FormatArray(value, args)
+Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
+    If Not cArray.IsNull(Args) Then
+        If UBound(Args) >= 0 Then Value = cString.FormatArray(Value, Args)
     End If
-    If NewLine Then value = value & Out.NewLine
-    Call Out.WriteValue(value)
+    If NewLine Then Value = Value & Out.NewLine
+    Call Out.WriteValue(Value)
 End Sub
 
-Private Sub InternalWriteLine(ByRef args() As Variant)
+Private Sub InternalWriteLine(ByRef Args() As Variant)
     Dim ub  As Long
     Dim s   As String
     
-    ub = UBound(args)
+    ub = UBound(Args)
     
-    If ub >= 0 Then s = Convert.ToString(args(0))
+    If ub >= 0 Then s = Convert.ToString(Args(0))
     If ub > 0 Then
         Dim i As Long
         For i = 1 To ub
-            Call Helper.MoveVariant(args(i - 1), args(i))
+            Call Helper.MoveVariant(Args(i - 1), Args(i))
         Next i
     Else
-        Erase args
+        Erase Args
     End If
     
-    Call InternalWrite(s, args, True)
+    Call InternalWrite(s, Args, True)
 End Sub
 
-Private Sub InternalWriteValue(ByRef value As Variant, ByRef args() As Variant)
-    InternalWrite Convert.ToString(value), args, False
+Private Sub InternalWriteValue(ByRef Value As Variant, ByRef Args() As Variant)
+    InternalWrite Convert.ToString(Value), Args, False
 End Sub
 
 Private Sub Init()
