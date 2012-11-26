@@ -21,9 +21,10 @@ Private Const AllByteValuesAsBase64 As String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRY
 Private AllByteValuesAsBase64WithLineBreaks As String
 
 Private AllByteValues() As Byte
-Private mCulture As CultureInfo
 
 Public Sub FixtureSetup()
+    Set Thread.CurrentThread.CurrentCulture = Cor.NewCultureInfo("en-US", False)
+    
     ReDim AllByteValues(0 To 255)
     Dim i As Long
     For i = 0 To 255
@@ -58,7 +59,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "Zm9vYmFy", "foobar"
             
         Case "ToString_WithValuesUsingDefaultFormatting_ReturnsExpected"
-            Set mCulture = Cor.NewCultureInfo("en-US", False)
             ' String
             Test.Use "", ""
             Test.Use "a", "a"
@@ -145,6 +145,21 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             ' VBA
             Test.Use Empty, "Empty"
             Test.Use Null, "Null"
+            
+        Case "ToString_WithValuesUsingFormatting_ReturnsExpected"
+            Test.Use 10, "g", "10"
+            Test.Use 10, "g0", 10
+            Test.Use -1, "g", "-1"
+            Test.Use 1, "g1", "1"
+            Test.Use 1, "g2", "1"
+            Test.Use 10, "g2", "10"
+            Test.Use 10, "g1", "1e+01"
+            Test.Use 10, "G1", "1E+01"
+            Test.Use 1, "g99", "1"
+            Test.Use 1, "00", "01"
+            Test.Use 1, "ab000", "ab001"
+            Test.Use 12, "ab0000", "ab0012"
+            Test.Use -12, "g1", "-1e+01"
             
     End Select
 End Sub
@@ -372,7 +387,6 @@ Public Sub FromBase64String_WithInvalidCharater_Throws()
 End Sub
 
 Public Sub ToString_WithValuesUsingDefaultFormatting_ReturnsExpected(ByRef Value As Variant, ByVal Expected As String)
-    Set Thread.CurrentThread.CurrentCulture = mCulture
     Dim Actual As String
     
     Actual = Convert.ToString(Value)
@@ -407,6 +421,14 @@ Public Sub ToString_WithMissingValue_ReturnsEmptyString()
     Actual = Convert.ToString(Missing)
     
     Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub ToString_WithValuesUsingFormatting_ReturnsExpected(ByRef Value As Variant, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Convert.ToString(Value, Format)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Private Function MakeImaginary(ByVal Value As Double) As Double
