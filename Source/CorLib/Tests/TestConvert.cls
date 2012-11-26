@@ -160,6 +160,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, "ab000", "ab001"
             Test.Use 12, "ab0000", "ab0012"
             Test.Use -12, "g1", "-1e+01"
+            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
+            Test.Use 12345#, "g4", "1.235e+04"
+            Test.Use 1.2345E+25!, "g26", "12345000400000000000000000"
+            Test.Use 12345!, "g4", "1.235e+04"
             
     End Select
 End Sub
