@@ -21,6 +21,7 @@ Private Const AllByteValuesAsBase64 As String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRY
 Private AllByteValuesAsBase64WithLineBreaks As String
 
 Private AllByteValues() As Byte
+Private mCulture As CultureInfo
 
 Public Sub FixtureSetup()
     ReDim AllByteValues(0 To 255)
@@ -56,29 +57,82 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "Zm9vYmE=", "fooba"
             Test.Use "Zm9vYmFy", "foobar"
             
-        Case "ToString_WithValues_ReturnsExpected"
+        Case "ToString_WithValuesUsingDefaultFormatting_ReturnsExpected"
+            Set mCulture = Cor.NewCultureInfo("en-US", False)
+            ' String
             Test.Use "", ""
             Test.Use "a", "a"
-            Test.Use CByte(1), "1"
-            Test.Use 1, "1"
-            Test.Use -1, "-1"
-            Test.Use 1&, "1"
-            Test.Use 1#, "1"
-            Test.Use 1!, "1"
-            Test.Use 1@, "1"
-            Test.Use CDec(1), "1"
-            Test.Use 1.1, "1.1"
-            Test.Use 1.1!, "1.1"
-            Test.Use CDec(1.1), "1.1"
-            Test.Use -1.2345, "-1.2345"
-            Test.Use 1.2345, "1.2345"
-            Test.Use 0.000012345, "1.2345E-05"
-            Test.Use 1.2345E+15, "1.2345E+15"
-            Test.Use -1.2345!, "-1.2345"
-            Test.Use 1.2345!, "1.2345"
-            Test.Use 1.2345E-05!, "1.2345E-05"
-            Test.Use 1.2345E+15!, "1.2345E+15"
             
+            ' Byte
+            Test.Use CByte(0), "0"
+            Test.Use CByte(1), "1"
+            Test.Use CByte(255), "255"
+            
+            ' Integer
+            Test.Use 0, "0"
+            Test.Use 1, "1"
+            Test.Use CInt(32767), "32767"
+            Test.Use -1, "-1"
+            Test.Use CInt(-32768), "-32768"
+            
+            ' Long
+            Test.Use 0&, "0"
+            Test.Use 1&, "1"
+            Test.Use -1&, "-1"
+            Test.Use &H7FFFFFFF, "2147483647"
+            Test.Use &H80000000, "-2147483648"
+            
+            ' Double
+            Test.Use 0#, "0"
+            Test.Use 1#, "1"
+            Test.Use 0.1, "0.1"
+            Test.Use 123456789012345#, "123456789012345"
+            Test.Use -123456789012345#, "-123456789012345"
+            Test.Use 1.79769313486231E+308, "1.79769313486231E+308"
+            Test.Use 4.94065645841247E-324, "4.94065645841247E-324"
+            Test.Use -1.79769313486231E+308, "-1.79769313486231E+308"
+            Test.Use -4.94065645841247E-324, "-4.94065645841247E-324"
+            Test.Use MakeImaginary(0), "NaN"
+            Test.Use MakeImaginary(1), "Infinity"
+            Test.Use MakeImaginary(-1), "-Infinity"
+            
+            ' Single
+            Test.Use 0!, "0"
+            Test.Use 0.1!, "0.1"
+            Test.Use 1!, "1"
+            Test.Use 1234567!, "1234567"
+            Test.Use -1234567!, "-1234567"
+            Test.Use 1.401298E-45, "1.401298E-45"
+            Test.Use 3.402823E+38, "3.402823E+38"
+            Test.Use -1.401298E-45, "-1.401298E-45"
+            Test.Use -3.402823E+38, "-3.402823E+38"
+            
+            ' Currency
+            Test.Use 0@, "0"
+            Test.Use 0.1@, "0.1"
+            Test.Use -0.1@, "-0.1"
+            Test.Use 922337203685477.5807@, "922337203685477.5807"
+            Test.Use -922337203685477.5807@ - 0.0001@, "-922337203685477.5808"
+            
+            ' Decimal
+            Test.Use CDec(0), "0"
+            Test.Use CDec(0.1), "0.1"
+            Test.Use CDec("79228162514264337593543950335"), "79228162514264337593543950335"
+            Test.Use CDec("-79228162514264337593543950335"), "-79228162514264337593543950335"
+            Test.Use CDec("7.9228162514264337593543950335"), "7.9228162514264337593543950335"
+            Test.Use CDec("-7.9228162514264337593543950335"), "-7.9228162514264337593543950335"
+            Test.Use CDec("0.0000000000000000000000000001"), "0.0000000000000000000000000001"
+            Test.Use CDec("-0.0000000000000000000000000001"), "-0.0000000000000000000000000001"
+            
+            ' Date
+            Test.Use #12:00:00 AM#, "12/30/1899 12:00:00 AM"
+            Test.Use #1/1/100#, "1/1/0100 12:00:00 AM"
+            Test.Use #12/31/9999 11:59:59 PM#, "12/31/9999 11:59:59 PM"
+            
+            ' Boolean
+            Test.Use True, "True"
+            Test.Use False, "False"
+                        
     End Select
 End Sub
 
@@ -304,7 +358,8 @@ Public Sub FromBase64String_WithInvalidCharater_Throws()
     AssertFormatException Err
 End Sub
 
-Public Sub ToString_WithValues_ReturnsExpected(ByRef Value As Variant, ByVal Expected As String)
+Public Sub ToString_WithValuesUsingDefaultFormatting_ReturnsExpected(ByRef Value As Variant, ByVal Expected As String)
+    Set Thread.CurrentThread.CurrentCulture = mCulture
     Dim Actual As String
     
     Actual = Convert.ToString(Value)
@@ -312,5 +367,9 @@ Public Sub ToString_WithValues_ReturnsExpected(ByRef Value As Variant, ByVal Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-
+Private Function MakeImaginary(ByVal Value As Double) As Double
+    On Error Resume Next
+    MakeImaginary = Value / 0#
+    On Error GoTo 0
+End Function
 

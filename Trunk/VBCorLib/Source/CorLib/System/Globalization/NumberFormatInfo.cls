@@ -1744,7 +1744,7 @@ Private Sub Int32ToNumber(ByVal Value As Long)
             .Digits(DigitIndex) = (Value - (OneTenth * 10)) + vbZero
             Value = OneTenth
         Loop
-        If IsMaxNeg Then .Digits(.Precision) = 56    ' set the last digit back to 8.
+        If IsMaxNeg Then .Digits(.Precision - 1) = 56  ' set the last digit back to 8.
     End With
 End Sub
 
@@ -1814,7 +1814,7 @@ Private Sub FormatGeneralDouble(ByVal Digits As Long, ByVal ExpChar As Integer)
         If Digits < DP Or DP < -3 Then
             hasexponent = True
             DP = 1
-        ElseIf DP < 0 Then
+        ElseIf DP <= 0 Then
             mOutput(mOutputPos) = vbZero
             mOutputPos = mOutputPos + 1
             DP = 0
@@ -2072,14 +2072,14 @@ Private Sub Class_Initialize()
     With mNumber.DigitsSA
         .cbElements = 1
         .cDims = 1
-        .cElements = &H7FFFFFFF
+        .cElements = 128
     End With
     mPtrNumberBuffer = CoTaskMemAlloc(40)
     If mPtrNumberBuffer = 0 Then Throw New OutOfMemoryException
     SAPtr(mNumber.Digits) = VarPtr(mNumber.DigitsSA)
     
-    Call InitWordBuffer(mAppendStringBuffer, 0, &H7FFFFFFF)
-    Call InitWordBuffer(mFormatSpecifier, 0, &H7FFFFFFF)
+    Call InitWordBuffer(mAppendStringBuffer, 0, 128)
+    Call InitWordBuffer(mFormatSpecifier, 0, 128)
 End Sub
 
 Private Sub Class_InitProperties()
