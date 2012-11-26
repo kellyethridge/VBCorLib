@@ -132,7 +132,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             ' Boolean
             Test.Use True, "True"
             Test.Use False, "False"
-                        
+            
+            ' Object
+            Dim Formattable As New MockFormattable
+            Formattable.Result = "abc"
+            Test.Use Formattable, "abc"
+            Dim Object As New MockObject
+            Object.ToStringResult = "123"
+            Test.Use Object, "123"
+            Test.Use Nothing, ""
+            
+            ' VBA
+            Test.Use Empty, "Empty"
+            Test.Use Null, "Null"
+            
     End Select
 End Sub
 
@@ -365,6 +378,35 @@ Public Sub ToString_WithValuesUsingDefaultFormatting_ReturnsExpected(ByRef Value
     Actual = Convert.ToString(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithFormattable_SuppliesFormatInformation()
+    Dim Mock As New MockFormattable
+    
+    Convert.ToString Mock, "ab"
+    
+    Dim Actual As String
+    Actual = Mock.Format
+    Assert.That Actual, Iz.EqualTo("ab")
+End Sub
+
+Public Sub ToString_WithFormattable_SuppliesProvider()
+    Dim Mock As New MockFormattable
+    Dim Provider As New NumberFormatInfo
+    
+    Convert.ToString Mock, , Provider
+    
+    Dim Actual As IFormatProvider
+    Set Actual = Mock.Provider
+    Assert.That Actual, Iz.SameAs(Provider)
+End Sub
+
+Public Sub ToString_WithMissingValue_ReturnsEmptyString()
+    Dim Actual As String
+    
+    Actual = Convert.ToString(Missing)
+    
+    Assert.That Actual, Iz.Empty
 End Sub
 
 Private Function MakeImaginary(ByVal Value As Double) As Double

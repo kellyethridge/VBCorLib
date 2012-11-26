@@ -12,6 +12,9 @@ version 3.0 (BREAKING CHANGES)
 	* Updated cArray.CreateInstance to support multi-dimension arrays with selected 0 lengths.
 	* Removed ciArrayTypes. Replaced with VbVarType. *BREAKING*
 	* Removed cArray.NewArray. *BREAKING*
+	* Fixed missing floating point leading zero before decimal.
+	* Fixed max negative Long not displaying correct number.
+	* Changed Convert.ToString(Nothing) returns "" instead of "Nothing".
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
