@@ -342,7 +342,12 @@ Private Sub Form_Initialize()
     Me.UIRunner1.Init App
 End Sub
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
-    If KeyCode = vbKeyEscape Then Unload Me
+    Select Case KeyCode
+        Case vbKeyEscape
+            Unload Me
+        Case vbKeyF5
+            UIRunner1.Run
+    End Select
 End Sub
 
 
