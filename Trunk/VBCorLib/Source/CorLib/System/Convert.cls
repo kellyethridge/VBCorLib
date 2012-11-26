@@ -289,7 +289,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
             ToString = df.Format(Value, Format)
         Case vbObject
             If Value Is Nothing Then
-                ToString = "Nothing"
+                ToString = ""
             ElseIf TypeOf Value Is IFormattable Then
                 Dim f As IFormattable
                 Set f = Value
