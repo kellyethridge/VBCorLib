@@ -944,21 +944,22 @@ End Property
 ' @param fmt The formatting to perform on the value.
 ' @return The formatted value as a string.
 '
-Public Function Format(ByRef Value As Variant, Optional ByRef fmt As String) As String
-    Call VerifyLoaded
+Public Function Format(ByRef Value As Variant, Optional ByRef FormatText As String) As String
+    VerifyLoaded
     
     Dim vt As Long
     vt = VarType(Value)
     If vt = vbVariant Then
         vt = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
     End If
+    
     Select Case vt
         Case vbLong, vbInteger, vbByte
-            Format = FormatInt32(Value, fmt)
+            Format = FormatInt32(Value, FormatText)
         Case vbDouble
-            Format = FormatDouble(Value, fmt)
+            Format = FormatDouble(Value, FormatText)
         Case vbSingle
-            Format = FormatSingle(Value, fmt)
+            Format = FormatSingle(Value, FormatText)
         Case Else
             Format = Value
     End Select

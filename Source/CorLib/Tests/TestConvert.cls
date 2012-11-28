@@ -146,24 +146,64 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Empty, "Empty"
             Test.Use Null, "Null"
             
-        Case "ToString_WithValuesUsingFormatting_ReturnsExpected"
-            Test.Use 10, "g", "10"
-            Test.Use 10, "g0", 10
+        Case "ToString_WithLongsUsingFormatting_ReturnsExpected"
+            ' General Format
+            Test.Use 0, "", "0"
+            Test.Use 1, "", "1"
+            Test.Use -1, "", "-1"
+            Test.Use &H7FFFFFFF, "", "2147483647"
+            Test.Use &H80000000, "", "-2147483648"
+            Test.Use 0, "g", "0"
+            Test.Use 1, "g", "1"
             Test.Use -1, "g", "-1"
+            Test.Use &H7FFFFFFF, "g", "2147483647"
+            Test.Use &H80000000, "g", "-2147483648"
+            Test.Use 0, "g0", "0"
+            Test.Use 1, "g0", "1"
+            Test.Use -1, "g0", "-1"
+            Test.Use &H7FFFFFFF, "g0", "2147483647"
+            Test.Use &H80000000, "g0", "-2147483648"
+            Test.Use 0, "g1", "0"
             Test.Use 1, "g1", "1"
-            Test.Use 1, "g2", "1"
-            Test.Use 10, "g2", "10"
-            Test.Use 10, "g1", "1e+01"
-            Test.Use 10, "G1", "1E+01"
-            Test.Use 1, "g99", "1"
-            Test.Use 1, "00", "01"
-            Test.Use 1, "ab000", "ab001"
-            Test.Use 12, "ab0000", "ab0012"
-            Test.Use -12, "g1", "-1e+01"
-            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
-            Test.Use 12345#, "g4", "1.235e+04"
-            Test.Use 1.2345E+25!, "g26", "12345000400000000000000000"
-            Test.Use 12345!, "g4", "1.235e+04"
+            Test.Use -1, "g1", "-1"
+            Test.Use &H7FFFFFFF, "g1", "2e+09"
+            Test.Use &H80000000, "g1", "-2e+09"
+            Test.Use 0, "g5", "0"
+            Test.Use 1, "g5", "1"
+            Test.Use -1, "g5", "-1"
+            Test.Use &H7FFFFFFF, "g5", "2.1475e+09"
+            Test.Use &H80000000, "g5", "-2.1475e+09"
+                       
+            ' Currency Format
+            Test.Use 1, "c", "$1.00"
+            Test.Use 1, "c0", "$1"
+            Test.Use 1, "c1", "$1.0"
+            Test.Use 1, "c3", "$1.000"
+            Test.Use -1, "c", "($1.00)"
+            Test.Use 12345, "c", "$12,345.00"
+            
+            ' Decimal Format
+            Test.Use 1, "d", "1"
+            Test.Use 1, "d1", "1"
+            Test.Use 1, "d2", "01"
+            Test.Use -1, "d2", "-01"
+
+            ' Exponent Format
+            Test.Use 1, "e", "1.000000e+000"
+            Test.Use 1, "e0", "1e+000"
+            Test.Use 1, "e1", "1.0e+000"
+            Test.Use 10, "e", "1.000000e+001"
+            Test.Use 10, "e0", "1e+001"
+            Test.Use 10, "e1", "1.0e+001"
+            Test.Use -1, "e", "-1.000000e+000"
+            Test.Use 19, "e0", "2e+001"
+            
+            
+            
+'            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
+'            Test.Use 12345#, "g4", "1.235e+04"
+'            Test.Use 1.2345E+25!, "g26", "12345000400000000000000000"
+'            Test.Use 12345!, "g4", "1.235e+04"
             
     End Select
 End Sub
@@ -427,7 +467,7 @@ Public Sub ToString_WithMissingValue_ReturnsEmptyString()
     Assert.That Actual, Iz.Empty
 End Sub
 
-Public Sub ToString_WithValuesUsingFormatting_ReturnsExpected(ByRef Value As Variant, ByVal Format As String, ByVal Expected As String)
+Public Sub ToString_WithLongsUsingFormatting_ReturnsExpected(ByVal Value As Long, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
     Actual = Convert.ToString(Value, Format)
