@@ -1204,27 +1204,27 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
 End Function
 
 Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As String
-    Dim Digits      As Long
-    Dim FormatType  As Long
+    Dim FormatPrecision As Long
+    Dim FormatType      As Long
 
-    Call GetFormatSpecifierParts(Format, FormatType, Digits)
+    Call GetFormatSpecifierParts(Format, FormatType, FormatPrecision)
     
     If ((FormatType And &HFFDF) <> HexFormat) And (FormatType <> CustomFormat) Then
         Call Int32ToNumber(Value)
     End If
     
     Select Case FormatType And &HFFDF
-        Case GeneralFormat:     Call FormatGeneralInt32(Digits, FormatType - 2)
-        Case FixedFormat:       Call FormatFixedInt32(Digits)
-        Case DecimalFormat:     Call FormatDecimal(Digits)
-        Case NumberFormat:      Call FormatNumber(Digits)
-        Case CurrencyFormat:    Call FormatCurrency(Digits)
-        Case ExponentFormat:    Call FormatScientific(Digits, FormatType)
+        Case GeneralFormat:     Call FormatGeneralInt32(FormatPrecision, FormatType - 2)
+        Case FixedFormat:       Call FormatFixedInt32(FormatPrecision)
+        Case DecimalFormat:     Call FormatDecimal(FormatPrecision)
+        Case NumberFormat:      Call FormatNumber(FormatPrecision)
+        Case CurrencyFormat:    Call FormatCurrency(FormatPrecision)
+        Case ExponentFormat:    Call FormatScientific(FormatPrecision, FormatType)
         
         Case PercentFormat
             If mNumber.Scale > 0 Then mNumber.[Scale] = mNumber.Scale + 2
-            If Digits < 0 Then Digits = mProps.PercentDecimalDigits
-            Call FormatPercent(Digits)
+            If FormatPrecision < 0 Then FormatPrecision = mProps.PercentDecimalDigits
+            Call FormatPercent(FormatPrecision)
 
         Case HexFormat
             ' This is to allow negative vbInteger values to
@@ -1237,7 +1237,7 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
                 HexValue = Value
             End If
             
-            Call FormatHex(HexValue, Digits, FormatType - 33)
+            Call FormatHex(HexValue, FormatPrecision, FormatType - 33)
             FormatInt32 = SysAllocStringLen(VarPtr(mOutput(mOutputPos)), BUFFER_SIZE - mOutputPos)
             Exit Function
         
@@ -1288,7 +1288,7 @@ End Sub
 
 Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
     If DecimalPlaces = DEFAULT_PRECISION Then DecimalPlaces = mProps.CurrencyDecimalDigits
-    Call RoundNumber(DecimalPlaces + mNumber.Scale)
+    Call RoundNumber(DecimalPlaces)
     
     Dim Pattern As String
     If mNumber.isNegative Then
@@ -1361,12 +1361,12 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
     Dim Size As Long
     
     With mNumber
-        If .Scale > 0 Then
+        If .Scale < .Precision Then
             For i = LBound(GroupSizes) To UBound(GroupSizes) - 1
                 j = j + GroupSizes(i)
             Next i
             
-            remainingdigits = .Scale - j
+            remainingdigits = (.Precision - .Scale) - j
             If remainingdigits < 0 Then remainingdigits = .Scale
             
             If UBound(GroupSizes) >= 0 Then Size = GroupSizes(UBound(GroupSizes))
@@ -1572,7 +1572,7 @@ End Sub
 ' digits, we can simply check each digit directly for rounding.
 '
 Private Sub RoundNumber(ByVal Digits As Long)
-    If Digits <= 0 Then Exit Sub
+    If Digits >= mNumber.Scale Then Exit Sub
     With mNumber
         ' are we rounding up or down?
         If .Digits(Digits) >= vbFive Then
@@ -1729,7 +1729,7 @@ Private Sub Int32ToNumber(ByVal Value As Long)
         
         
         .Precision = DigitIndex     ' Precision is the number of digits represented.
-        .Scale = DigitIndex         ' Scale is the placement of the decimal point.
+        .Scale = 0         ' Scale is the placement of the decimal point.
                                     ' Zero would be before the first digit.
                                     
         .Digits(DigitIndex) = vbNullPtr  ' terminating character in the buffer.
@@ -1770,6 +1770,7 @@ Private Sub DoubleToNumber(ByVal Value As Double, ByVal Precision As Long)
             End If
         Else
             mNumber.DigitsSA.pvData = Helper.Ecvt(Value, Precision, mNumber.Scale, mNumber.isNegative)
+            mNumber.[Scale] = mNumber.Precision - mNumber.Scale
             If Value = 0# Then Precision = 0
         End If
     End With
@@ -1787,8 +1788,8 @@ Private Sub FormatGeneralInt32(ByVal Precision As Long, ByVal ExpChar As Long)
         Dim hasexponent As Boolean
         If Precision < .Precision Then
             ' round the number to the requested number of digits.
+            .Scale = .Precision - 1
             Call RoundNumber(Precision)
-            .Scale = 1
             hasexponent = True
         Else
             Precision = .Precision
@@ -1796,7 +1797,7 @@ Private Sub FormatGeneralInt32(ByVal Precision As Long, ByVal ExpChar As Long)
         
         Dim i As Long
         For i = 0 To Precision - 1
-            If i = .Scale Then Call AppendString(mProps.NumberDecimalSeparator)
+            If .Precision - i = .Scale Then Call AppendString(mProps.NumberDecimalSeparator)
             mOutput(mOutputPos) = .Digits(i)
             mOutputPos = mOutputPos + 1
         Next i
