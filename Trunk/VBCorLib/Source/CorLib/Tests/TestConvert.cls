@@ -173,7 +173,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, "g5", "-1"
             Test.Use &H7FFFFFFF, "g5", "2.1475e+09"
             Test.Use &H80000000, "g5", "-2.1475e+09"
-                       
+            
             ' Currency Format
             Test.Use 1, "c", "$1.00"
             Test.Use 1, "c0", "$1"
@@ -198,6 +198,27 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, "e", "-1.000000e+000"
             Test.Use 19, "e0", "2e+001"
             
+            ' Fixed Format
+            Test.Use 0, "f", "0.00"
+            Test.Use 1, "f", "1.00"
+            Test.Use 1234, "f", "1234.00"
+            Test.Use -1234, "f", "-1234.00"
+            Test.Use 1234, "f4", "1234.0000"
+            Test.Use 1234, "f0", "1234"
+            
+            ' Number Format
+            Test.Use 0, "n", "0.00"
+            Test.Use 1, "n", "1.00"
+            Test.Use 1234, "n", "1,234.00"
+            Test.Use 1234, "n0", "1,234"
+            Test.Use -1234, "n", "-1,234.00"
+            Test.Use 1234, "n4", "1,234.0000"
+            Test.Use 123, "n", "123.00"
+            
+            ' Percentage Format
+            Test.Use 0, "p", "0.00 %"
+            Test.Use 1, "p", "100.00 %"
+            Test.Use 156, "p", "15,600.00 %"
             
             
 '            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
@@ -474,6 +495,18 @@ Public Sub ToString_WithLongsUsingFormatting_ReturnsExpected(ByVal Value As Long
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected()
+    Dim Actual As String
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.CurrencyGroupSizes = NewLongs(1, 2, 3)
+    
+    Actual = Convert.ToString(12345678, "c", info)
+    
+    Assert.That Actual, Iz.EqualTo("$12,345,67,8.00")
+End Sub
+
 
 Private Function MakeImaginary(ByVal Value As Double) As Double
     On Error Resume Next

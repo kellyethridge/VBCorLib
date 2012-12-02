@@ -1219,10 +1219,14 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
         Case DecimalFormat:     Call FormatDecimal(FormatPrecision)
         Case NumberFormat:      Call FormatNumber(FormatPrecision)
         Case CurrencyFormat:    Call FormatCurrency(FormatPrecision)
-        Case ExponentFormat:    Call FormatScientific(FormatPrecision, FormatType)
+        Case ExponentFormat
+            mNumber.[Scale] = mNumber.Precision - 1
+            Call FormatScientific(FormatPrecision, FormatType)
         
         Case PercentFormat
-            If mNumber.Scale > 0 Then mNumber.[Scale] = mNumber.Scale + 2
+            If mNumber.Precision > 0 Then
+                mNumber.[Scale] = mNumber.Scale + 2
+            End If
             If FormatPrecision < 0 Then FormatPrecision = mProps.PercentDecimalDigits
             Call FormatPercent(FormatPrecision)
 
@@ -1259,7 +1263,7 @@ End Function
 
 Private Sub FormatNumber(ByVal DecimalPlaces As Long)
     If DecimalPlaces = DEFAULT_PRECISION Then DecimalPlaces = mProps.NumberDecimalDigits
-    Call RoundNumber(DecimalPlaces + mNumber.Scale)
+    Call RoundNumber(mNumber.Precision - mNumber.Scale + DecimalPlaces)
     
     Dim Pattern As String
     If mNumber.isNegative Then
@@ -1288,7 +1292,7 @@ End Sub
 
 Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
     If DecimalPlaces = DEFAULT_PRECISION Then DecimalPlaces = mProps.CurrencyDecimalDigits
-    Call RoundNumber(DecimalPlaces)
+    Call RoundNumber(mNumber.Precision - mNumber.Scale + DecimalPlaces)
     
     Dim Pattern As String
     If mNumber.isNegative Then
@@ -1317,6 +1321,8 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
 End Sub
 
 Private Sub FormatPercent(ByVal DecimalPlaces As Long)
+    RoundNumber mNumber.Precision - mNumber.Scale + DecimalPlaces
+    
     Dim Pattern As String
     If mNumber.isNegative Then
         Pattern = mPercentNegativePatterns(mProps.PercentNegativePattern)
@@ -1353,12 +1359,12 @@ End Sub
 ' @param DecimalSeparator The separator character used to separate the whole part from the fractional part.
 '
 Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long, ByRef GroupSeparator As String, ByRef DecimalSeparator As String)
-    Dim i As Long
-    Dim j As Long
-    Dim ch As Integer
-    Dim remainingdigits As Long
-    Dim DigitCount As Long
-    Dim Size As Long
+    Dim i               As Long
+    Dim j               As Long
+    Dim ch              As Integer
+    Dim RemainingDigits As Long
+    Dim DigitCount      As Long
+    Dim Size            As Long
     
     With mNumber
         If .Scale < .Precision Then
@@ -1366,21 +1372,21 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
                 j = j + GroupSizes(i)
             Next i
             
-            remainingdigits = (.Precision - .Scale) - j
-            If remainingdigits < 0 Then remainingdigits = .Scale
+            RemainingDigits = (.Precision - .Scale) - j
+            If RemainingDigits < 0 Then RemainingDigits = .Scale
             
             If UBound(GroupSizes) >= 0 Then Size = GroupSizes(UBound(GroupSizes))
-            If remainingdigits = Size Then
+            If RemainingDigits = Size Then
                 DigitCount = -1
             ElseIf Size > 0 Then
-                DigitCount = remainingdigits Mod Size
+                DigitCount = RemainingDigits Mod Size
                 If DigitCount = 0 Then DigitCount = Size
             Else
-                DigitCount = remainingdigits
+                DigitCount = RemainingDigits
             End If
             i = 0
             ch = .Digits(i)
-            Do While remainingdigits > 0
+            Do While RemainingDigits > 0
                 If DigitCount = 0 Then
                     Call AppendString(GroupSeparator)
                     DigitCount = Size
@@ -1394,19 +1400,19 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
                 i = i + 1
                 mOutputPos = mOutputPos + 1
                 DigitCount = DigitCount - 1
-                remainingdigits = remainingdigits - 1
+                RemainingDigits = RemainingDigits - 1
             Loop
         Else
             mOutput(mOutputPos) = vbZero
             mOutputPos = mOutputPos + 1
         End If
         
-        If (i = 0 Or ch <> 0) Or (i < .Scale And ch = 0) Then
+        If (i = 0 Or ch <> 0) Or (i < .Precision And ch = 0) Then
             Size = UBound(GroupSizes)
             DigitCount = 0
             'digitcount = GroupSizes(size)
             ch = .Digits(i)
-            For j = i To .Scale - 1
+            For j = i To .Precision - .Scale - 1
                 If DigitCount = 0 Then
                     Call AppendString(GroupSeparator)
                     Size = Size - 1
@@ -1497,21 +1503,21 @@ End Sub
 ' @param digits The number of digits to be displayed, filling the
 ' number with leading zeros if necessary.
 '
-Private Sub FormatDecimal(ByVal Digits As Long)
+Private Sub FormatDecimal(ByVal TotalDigits As Long)
     With mNumber
         ' Add the negative sign if necessary.
         If .isNegative Then Call AppendString(mProps.NegativeSign)
         
         ' Insert the leading zeros until we reach the first digit.
-        Do While Digits > .Scale
+        Do While TotalDigits > .Precision
             mOutput(mOutputPos) = vbZero
             mOutputPos = mOutputPos + 1
-            Digits = Digits - 1
+            TotalDigits = TotalDigits - 1
         Loop
         
         ' Fill the rest of the buffer with the digits.
         Dim i As Long
-        For i = 0 To .Scale - 1
+        For i = 0 To .Precision - 1
             mOutput(mOutputPos) = .Digits(i)
             mOutputPos = mOutputPos + 1
         Next i
@@ -1560,19 +1566,19 @@ Private Sub FormatScientific(ByVal Digits As Long, ByVal ExpChar As Integer)
             mOutputPos = mOutputPos + 1
             Digits = Digits - 1
         Loop
-        Call FormatExponent(.Scale - 1, ExpChar, 3)
+        Call FormatExponent(.Scale, ExpChar, 3)
     End With
 End Sub
 
 ''
 ' Rounds a number by hand to avoid banker's rounding.
 '
-' @param digits The number to digits to round to.
+' @param digits The number of digits to round to.
 ' @remarks Since we already have the number in the common buffer of
 ' digits, we can simply check each digit directly for rounding.
 '
 Private Sub RoundNumber(ByVal Digits As Long)
-    If Digits >= mNumber.Scale Then Exit Sub
+    If Digits >= mNumber.Precision Then Exit Sub
     With mNumber
         ' are we rounding up or down?
         If .Digits(Digits) >= vbFive Then
@@ -1863,7 +1869,7 @@ Private Sub FormatFixedInt32(ByVal Precision As Long)
             mOutput(mOutputPos) = vbZero
             mOutputPos = mOutputPos + 1
         Else
-            For i = 0 To .Scale - 1
+            For i = 0 To .Precision - 1
                 mOutput(mOutputPos) = .Digits(i)
                 mOutputPos = mOutputPos + 1
             Next i
