@@ -1241,6 +1241,10 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
                 HexValue = Value
             End If
             
+            If FormatPrecision = DEFAULT_PRECISION Then
+                FormatPrecision = 1
+            End If
+            
             Call FormatHex(HexValue, FormatPrecision, FormatType - 33)
             FormatInt32 = SysAllocStringLen(VarPtr(mOutput(mOutputPos)), BUFFER_SIZE - mOutputPos)
             Exit Function

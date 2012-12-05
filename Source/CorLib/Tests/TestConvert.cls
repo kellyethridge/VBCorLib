@@ -220,6 +220,17 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, "p", "100.00 %"
             Test.Use 156, "p", "15,600.00 %"
             
+            ' Hex Format
+            Test.Use 0, "X", "0"
+            Test.Use 0, "x2", "00"
+            Test.Use 1, "x", "1"
+            Test.Use 1, "x2", "01"
+            Test.Use 255, "x", "ff"
+            Test.Use 255, "X", "FF"
+            Test.Use 255, "X4", "00FF"
+            Test.Use -1, "x", "ffffffff"
+
+            
             
 '            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
 '            Test.Use 12345#, "g4", "1.235e+04"
