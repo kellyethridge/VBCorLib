@@ -1225,7 +1225,7 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
         
         Case PercentFormat
             If mNumber.Precision > 0 Then
-                mNumber.[Scale] = mNumber.Scale + 2
+                mNumber.[Scale] = -2
             End If
             If FormatPrecision < 0 Then FormatPrecision = mProps.PercentDecimalDigits
             Call FormatPercent(FormatPrecision)
@@ -1321,8 +1321,6 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
 End Sub
 
 Private Sub FormatPercent(ByVal DecimalPlaces As Long)
-    RoundNumber mNumber.Precision - mNumber.Scale + DecimalPlaces
-    
     Dim Pattern As String
     If mNumber.isNegative Then
         Pattern = mPercentNegativePatterns(mProps.PercentNegativePattern)
