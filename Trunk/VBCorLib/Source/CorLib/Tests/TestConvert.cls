@@ -518,6 +518,17 @@ Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo("$12,345,67,8.00")
 End Sub
 
+Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
+    Dim Actual As String
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.NumberGroupSizes = NewLongs(2, 3)
+    
+    Actual = Convert.ToString(1, "n", info)
+    
+    Assert.That Actual, Iz.EqualTo("1.00")
+End Sub
+
 
 Private Function MakeImaginary(ByVal Value As Double) As Double
     On Error Resume Next

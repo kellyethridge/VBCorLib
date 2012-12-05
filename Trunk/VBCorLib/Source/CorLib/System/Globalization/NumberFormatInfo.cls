@@ -1375,7 +1375,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             Next i
             
             RemainingDigits = (.Precision - .Scale) - j
-            If RemainingDigits < 0 Then RemainingDigits = .Scale
+            If RemainingDigits < 0 Then RemainingDigits = .Precision
             
             If UBound(GroupSizes) >= 0 Then Size = GroupSizes(UBound(GroupSizes))
             If RemainingDigits = Size Then
