@@ -1127,11 +1127,16 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
         
         Case GeneralFormat
             If Precision < 0 Then Precision = SINGLE_PRECISION
-            Call DoubleToNumber(Value, Precision)
+            Call DoubleToNumber(Value, Precision + 1)
             If Not IsValidNumber(FormatSingle) Then Exit Function
+            
+            If mNumber.Digits(0) = vbZero Then
+                FormatSingle = "0"
+                Exit Function
+            End If
+            
             If Precision > 7 Then Precision = 9
             Call RoundNumber(Precision)
-            If Value = 0! Then mNumber.Precision = 0
             Call FormatGeneralDouble(mNumber.Precision, FormatType - 2)
         
         Case PercentFormat
@@ -1176,9 +1181,14 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
         
         Case GeneralFormat
             If Precision = DEFAULT_PRECISION Then Precision = DOUBLE_PRECISION
-            Call DoubleToNumber(Value, Precision)
+            Call DoubleToNumber(Value, Precision + 1)
             If Not IsValidNumber(FormatDouble) Then Exit Function
-            If Value = 0# Then mNumber.Precision = 0
+            
+            If mNumber.Digits(0) = 48 Then
+                FormatDouble = "0"
+                Exit Function
+            End If
+            
             Call RoundNumber(Precision)
             Call FormatGeneralDouble(Precision, FormatType - 2)
         
@@ -1778,8 +1788,6 @@ Private Sub DoubleToNumber(ByVal Value As Double, ByVal Precision As Long)
             End If
         Else
             mNumber.DigitsSA.pvData = Helper.Ecvt(Value, Precision, mNumber.Scale, mNumber.isNegative)
-            mNumber.[Scale] = mNumber.Precision - mNumber.Scale
-            If Value = 0# Then Precision = 0
         End If
     End With
 End Sub
