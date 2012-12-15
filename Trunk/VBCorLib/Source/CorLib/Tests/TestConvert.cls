@@ -18,7 +18,11 @@ Option Explicit
 Implements ITestCaseSource
 
 Private Const AllByteValuesAsBase64 As String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
-Private AllByteValuesAsBase64WithLineBreaks As String
+Private Const AllByteValuesAsBase64WithLineBreaks As String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4" & vbCrLf & _
+                                                              "OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3Bx" & vbCrLf & _
+                                                              "cnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmq" & vbCrLf & _
+                                                              "q6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj" & vbCrLf & _
+                                                              "5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
 
 Private AllByteValues() As Byte
 
@@ -30,12 +34,6 @@ Public Sub FixtureSetup()
     For i = 0 To 255
         AllByteValues(i) = i
     Next
-    
-    AllByteValuesAsBase64WithLineBreaks = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4" & vbCrLf & _
-                                          "OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3Bx" & vbCrLf & _
-                                          "cnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmq" & vbCrLf & _
-                                          "q6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj" & vbCrLf & _
-                                          "5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
 End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
@@ -239,6 +237,60 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 255, "X4", "00FF"
             Test.Use -1, "x", "ffffffff"
 
+        Case "ToString_WithDoublesUsingFormatting_ReturnsExpected"
+            ' General Format
+            Test.Use 0, "g", "0"
+            Test.Use 0, "g1", "0"
+            Test.Use 0, "g5", "0"
+            Test.Use 1, "g", "1"
+            Test.Use 1, "g0", "1"
+            Test.Use 1, "g1", "1"
+            Test.Use 1, "g2", "1"
+            Test.Use 0.1, "g", "0.1"
+            Test.Use 0.1, "g0", "0.1"
+            Test.Use 0.1, "g1", "0.1"
+            Test.Use 0.1, "g2", "0.1"
+            Test.Use 10, "g", "10"
+            Test.Use 10, "g0", "10"
+            Test.Use 10, "g1", "1e+01"
+            Test.Use 10, "g2", "10"
+            Test.Use 123, "g", "123"
+            Test.Use 123, "g0", "123"
+            Test.Use 123, "g1", "1e+02"
+            Test.Use 123, "g2", "1.2e+02"
+            Test.Use 123, "g3", "123"
+            Test.Use 123000, "g", "123000"
+            Test.Use 123000, "g0", "123000"
+            Test.Use 123000, "g1", "1e+05"
+            Test.Use 123000, "g2", "1.2e+05"
+            Test.Use 123000, "g3", "1.23e+05"
+            Test.Use 123000, "g4", "1.23e+05"
+            Test.Use 0.000123, "g", "0.000123"
+            Test.Use 0.000123, "g0", "0.000123"
+            Test.Use 0.000123, "g1", "0.0001"
+            Test.Use 0.000123, "g2", "0.00012"
+            Test.Use 0.000123, "g3", "0.000123"
+            Test.Use 0.000123, "g4", "0.000123"
+            Test.Use 100.001, "g", "100.001"
+            Test.Use 100.001, "g0", "100.001"
+            Test.Use 100.001, "g1", "1e+02"
+            Test.Use 100.001, "g2", "1e+02"
+            Test.Use 100.001, "g3", "100"
+            Test.Use 100.001, "g4", "100"
+            Test.Use 100.001, "g5", "100"
+            Test.Use 100.001, "g6", "100.001"
+            
+            ' Currency Format
+            Test.Use 0, "c", "$0.00"
+            Test.Use 0, "c0", "$0"
+            Test.Use 0, "c1", "$0.0"
+            Test.Use 0, "c2", "$0.00"
+            Test.Use 0, "c3", "$0.000"
+            Test.Use 1000, "c", "$1,000.00"
+            Test.Use 1000, "c0", "$1,000"
+            Test.Use 1000, "c1", "$1,000.0"
+            Test.Use 1000, "c2", "$1,000.00"
+            Test.Use 1000, "c3", "$1,000.000"
             
             
 '            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
@@ -536,6 +588,14 @@ Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
     Actual = Convert.ToString(1, "n", info)
     
     Assert.That Actual, Iz.EqualTo("1.00")
+End Sub
+
+Public Sub ToString_WithDoublesUsingFormatting_ReturnsExpected(ByVal Value As Double, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Convert.ToString(Value, Format)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 
