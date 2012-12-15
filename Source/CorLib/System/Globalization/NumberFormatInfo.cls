@@ -1180,7 +1180,7 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
         Case CurrencyFormat:            Call FormatCurrency(Precision)
         
         Case GeneralFormat
-            If Precision = DEFAULT_PRECISION Then Precision = DOUBLE_PRECISION
+            If Precision = DEFAULT_PRECISION Or Precision = 0 Then Precision = DOUBLE_PRECISION
             Call DoubleToNumber(Value, Precision + 1)
             If Not IsValidNumber(FormatDouble) Then Exit Function
             
