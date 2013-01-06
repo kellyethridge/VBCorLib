@@ -1777,9 +1777,9 @@ Private Sub DoubleToNumber(ByVal Value As Double, ByVal Precision As Long)
     If Precision < 0 Then Exit Sub
     
     mOutputPos = 0
-    mNumber.Precision = Precision
     With AsDLong(Value)
         If (.HiDWord And &H7FF00000) = &H7FF00000 Then
+            mNumber.Precision = Precision
             If (.HiDWord And &HFFFFF) Or (.LoDWord) Then
                 mNumber.[Scale] = SCALE_NAN
             Else
@@ -1788,6 +1788,11 @@ Private Sub DoubleToNumber(ByVal Value As Double, ByVal Precision As Long)
             End If
         Else
             mNumber.DigitsSA.pvData = Helper.Ecvt(Value, Precision, mNumber.Scale, mNumber.isNegative)
+            Do While Precision > 0 And mNumber.Digits(Precision - 1) <> vbZero
+                Precision = Precision - 1
+            Loop
+            mNumber.Digits(Precision) = vbNullPtr
+            mNumber.Precision = Precision
         End If
     End With
 End Sub
