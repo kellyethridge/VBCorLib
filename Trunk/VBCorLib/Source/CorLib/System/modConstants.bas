@@ -26,6 +26,7 @@ Public Const PAGE_EXECUTE_READWRITE As Long = &H40
 Public Const PICTYPE_ICON   As Long = 3
 Public Const PICTYPE_BITMAP As Long = 1
 
+Public Const vbOptional     As Long = vbError
 
 ' Ascii constants
 Public Const vbUpperA           As Long = &H41
