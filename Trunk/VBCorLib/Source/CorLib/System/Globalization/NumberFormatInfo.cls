@@ -1378,111 +1378,118 @@ End Sub
 ' @param DecimalSeparator The separator character used to separate the whole part from the fractional part.
 '
 Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long, ByRef GroupSeparator As String, ByRef DecimalSeparator As String)
-    Dim i               As Long
-    Dim j               As Long
-    Dim ch              As Integer
-    Dim RemainingDigits As Long
-    Dim DigitCount      As Long
-    Dim Size            As Long
+    Dim DigitIndex                  As Long
+    Dim NonrepeatingGroupSizeSum    As Long
+    Dim ch                          As Integer
+    Dim RepeatingGroupDigitCount    As Long
+    Dim DigitCount                  As Long
+    Dim GroupSize                   As Long
+    Dim i                           As Long
     
     With mNumber
         If .DecimalPosition > 0 Then
             For i = LBound(GroupSizes) To UBound(GroupSizes) - 1
-                j = j + GroupSizes(i)
+                NonrepeatingGroupSizeSum = NonrepeatingGroupSizeSum + GroupSizes(i)
             Next i
             
-            RemainingDigits = .DecimalPosition - j
-            If RemainingDigits < 0 Then
-                RemainingDigits = 0
+            RepeatingGroupDigitCount = .DecimalPosition - NonrepeatingGroupSizeSum
+            If RepeatingGroupDigitCount < 0 Then
+                RepeatingGroupDigitCount = 0
             End If
             
-            If UBound(GroupSizes) >= 0 Then
-                Size = GroupSizes(UBound(GroupSizes))
+            If UBound(GroupSizes) >= UBound(GroupSizes) Then
+                GroupSize = GroupSizes(UBound(GroupSizes))
             End If
             
-            If RemainingDigits = Size Then
+            If RepeatingGroupDigitCount = GroupSize Then
                 DigitCount = -1
-            ElseIf Size > 0 Then
-                DigitCount = RemainingDigits Mod Size
-                If DigitCount = 0 Then DigitCount = Size
+            ElseIf GroupSize > 0 Then
+                DigitCount = RepeatingGroupDigitCount Mod GroupSize
+                If DigitCount = 0 Then DigitCount = GroupSize
             Else
-                DigitCount = RemainingDigits
+                DigitCount = RepeatingGroupDigitCount
             End If
             
-            i = 0
-            ch = .Digits(i)
-            Do While RemainingDigits > 0
+            DigitIndex = 0
+            ch = .Digits(DigitIndex)
+            Do While RepeatingGroupDigitCount > 0
                 If DigitCount = 0 Then
                     AppendString GroupSeparator
-                    DigitCount = Size
+                    DigitCount = GroupSize
                 End If
-                If ch = 0 Then
+                If ch = vbTerminator Then
                     mOutput(mOutputPos) = vbZero
                 Else
                     mOutput(mOutputPos) = ch
-                    ch = .Digits(i + 1)
+                    ch = .Digits(DigitIndex + 1)
                 End If
-                i = i + 1
+                DigitIndex = DigitIndex + 1
                 mOutputPos = mOutputPos + 1
                 DigitCount = DigitCount - 1
-                RemainingDigits = RemainingDigits - 1
+                RepeatingGroupDigitCount = RepeatingGroupDigitCount - 1
             Loop
         Else
             mOutput(mOutputPos) = vbZero
             mOutputPos = mOutputPos + 1
         End If
         
-        If (i = 0 Or ch <> 0) Or (i < .Precision And ch = 0) Then
-            Size = UBound(GroupSizes)
+        If (DigitIndex = 0 Or ch <> vbTerminator) Or (DigitIndex < .Precision And ch = vbTerminator) Then
+            Dim GroupSizeIndex As Long
+            GroupSizeIndex = UBound(GroupSizes)
             DigitCount = 0
-            'digitcount = GroupSizes(size)
+            'digitcount = GroupSizes(GroupSize)
             ch = .Digits(i)
-            For j = i To .Precision - .DecimalPosition - 1
+            For i = DigitIndex To .DecimalPosition - 1
                 If DigitCount = 0 Then
-                    Call AppendString(GroupSeparator)
-                    Size = Size - 1
-                    If Size < 0 Then Size = 0
-                    DigitCount = GroupSizes(Size)
+                    AppendString GroupSeparator
+                    GroupSize = GroupSize - 1
+                    If GroupSize < 0 Then GroupSize = 0
+                    DigitCount = GroupSizes(GroupSizeIndex)
                 End If
                 If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
                 Else
                     mOutput(mOutputPos) = ch
-                    ch = .Digits(i + 1)
+                    ch = .Digits(DigitIndex + 1)
                 End If
-                i = i + 1
+                DigitIndex = DigitIndex + 1
                 mOutputPos = mOutputPos + 1
                 DigitCount = DigitCount - 1
-            Next j
+            Next
         End If
         
         ' Append any digits that need to appear after a decimal point
         If DecimalPlaces > 0 Then
-            Call AppendString(DecimalSeparator)
-            i = .DecimalPosition
+            AppendString DecimalSeparator
+            DigitIndex = .DecimalPosition
             
             ' negative scale represents numbers such as 0.000000123,
             ' so we need to insert the zeros before the digits.
-            Do While i < 0
+            Do While DigitIndex < 0
                 mOutput(mOutputPos) = vbZero
                 mOutputPos = mOutputPos + 1
-                i = i + 1
+                DigitIndex = DigitIndex + 1
                 DecimalPlaces = DecimalPlaces - 1
             Loop
-            If ch <> 0 Then ch = .Digits(i)
+            If ch <> vbTerminator Then ch = .Digits(i)
             Do While DecimalPlaces > 0
                 If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
                 Else
                     mOutput(mOutputPos) = ch
-                    i = i + 1
-                    ch = .Digits(i)
+                    DigitIndex = DigitIndex + 1
+                    ch = .Digits(DigitIndex)
                 End If
                 mOutputPos = mOutputPos + 1
                 DecimalPlaces = DecimalPlaces - 1
             Loop
         End If
     End With
+End Sub
+
+Private Sub FormatGroups2(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long, ByRef GroupSeparator As String, ByRef DecimalSeparator As String)
+    
+    
 End Sub
 
 ''

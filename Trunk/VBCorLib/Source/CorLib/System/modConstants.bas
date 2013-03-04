@@ -29,6 +29,7 @@ Public Const PICTYPE_BITMAP As Long = 1
 Public Const vbOptional     As Long = vbError
 
 ' Ascii constants
+Public Const vbTerminator       As Long = 0
 Public Const vbUpperA           As Long = &H41
 Public Const vbLowerA           As Long = &H61
 Public Const vbLowerD           As Long = &H64
