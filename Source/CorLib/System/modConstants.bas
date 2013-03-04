@@ -55,6 +55,7 @@ Public Const vbLowerZ           As Long = &H7A
 Public Const vbZero             As Long = &H30
 Public Const vbOne              As Long = &H31
 Public Const vbFive             As Long = &H35
+Public Const vbEight            As Long = &H38
 Public Const vbNine             As Long = &H39
 Public Const vbPlus             As Long = &H2B
 Public Const vbMinus            As Long = &H2D

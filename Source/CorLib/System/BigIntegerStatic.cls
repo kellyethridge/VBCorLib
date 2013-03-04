@@ -888,10 +888,10 @@ End Sub
 ' Generates a random BigInteger number of the specified size.
 '
 ' @param size The size of the number in bytes.
-' @param isNegative Indicates if a negative random number should be generated.
+' @param IsNegative Indicates if a negative random number should be generated.
 ' @return A new BigInteger of a random value.
 '
-Public Function Rnd(ByVal Size As Long, Optional ByVal isNegative As Boolean = False) As BigInteger
+Public Function Rnd(ByVal Size As Long, Optional ByVal IsNegative As Boolean = False) As BigInteger
     If Size < 0 Then Call Err.Raise(5, , "size cannot be negative")
     
     If Size = 0 Then
@@ -914,7 +914,7 @@ Public Function Rnd(ByVal Size As Long, Optional ByVal isNegative As Boolean = F
         ints(wordCount) = VBA.Rnd * &H100
     End If
     
-    If isNegative Then Call ApplyTwosComplement(ints)
+    If IsNegative Then Call ApplyTwosComplement(ints)
     
     Set Rnd = New BigInteger
     Call Rnd.InternalInit(ints)
