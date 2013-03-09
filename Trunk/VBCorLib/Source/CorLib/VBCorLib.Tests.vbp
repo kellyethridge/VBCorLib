@@ -117,7 +117,6 @@ Class=TestMappedFile; Tests\TestMappedFile.cls
 Class=TestMathExt; Tests\TestMathExt.cls
 Class=TestMD5CryptoServiceProvider; Tests\TestMD5CryptoServiceProvider.cls
 Class=TestMemoryStream; Tests\TestMemoryStream.cls
-Class=TestNumberFormatInfo; Tests\TestNumberFormatInfo.cls
 Class=TestNumberFormatInfoFlt; Tests\TestNumberFormatInfoFlt.cls
 Class=TestNumberFormatInfoSng; Tests\TestNumberFormatInfoSng.cls
 Class=TestPath; Tests\TestPath.cls
