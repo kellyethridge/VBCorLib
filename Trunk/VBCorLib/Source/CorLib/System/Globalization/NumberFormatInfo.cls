@@ -1403,16 +1403,16 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             For i = LBound(GroupSizes) To UBound(GroupSizes) - 1
                 NonrepeatingGroupSizeSum = NonrepeatingGroupSizeSum + GroupSizes(i)
             Next i
-            
+
             RepeatingGroupDigitCount = .DecimalPosition - NonrepeatingGroupSizeSum
             If RepeatingGroupDigitCount < 0 Then
                 RepeatingGroupDigitCount = 0
             End If
-            
+
             If UBound(GroupSizes) >= UBound(GroupSizes) Then
                 GroupSize = GroupSizes(UBound(GroupSizes))
             End If
-            
+
             If RepeatingGroupDigitCount = GroupSize Then
                 DigitCount = -1
             ElseIf GroupSize > 0 Then
@@ -1421,7 +1421,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             Else
                 DigitCount = RepeatingGroupDigitCount
             End If
-            
+
             DigitIndex = 0
             ch = .Digits(DigitIndex)
             Do While RepeatingGroupDigitCount > 0
@@ -1444,19 +1444,28 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             mOutput(mOutputPos) = vbZero
             mOutputPos = mOutputPos + 1
         End If
-        
+
         If (DigitIndex = 0 Or ch <> vbTerminator) Or (DigitIndex < .Precision And ch = vbTerminator) Then
             Dim GroupSizeIndex As Long
-            GroupSizeIndex = UBound(GroupSizes)
-            DigitCount = 0
-            'digitcount = GroupSizes(GroupSize)
-            ch = .Digits(i)
+            GroupSizeIndex = UBound(GroupSizes) - 1
+            If GroupSizeIndex < 0 Then
+                GroupSizeIndex = 0
+            End If
+            GroupSize = NonrepeatingGroupSizeSum - GroupSizes(GroupSizeIndex)
+            DigitCount = .DecimalPosition - DigitIndex
+
+            ch = .Digits(DigitIndex)
+
             For i = DigitIndex To .DecimalPosition - 1
-                If DigitCount = 0 Then
+                If DigitCount = NonrepeatingGroupSizeSum Then
                     AppendString GroupSeparator
-                    GroupSize = GroupSize - 1
-                    If GroupSize < 0 Then GroupSize = 0
-                    DigitCount = GroupSizes(GroupSizeIndex)
+                ElseIf DigitCount = GroupSize Then
+                    AppendString GroupSeparator
+                    GroupSizeIndex = GroupSizeIndex - 1
+                    If GroupSizeIndex < 0 Then
+                        GroupSizeIndex = 0
+                    End If
+                    GroupSize = GroupSize - GroupSizes(GroupSizeIndex)
                 End If
                 If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
@@ -1497,11 +1506,6 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             Loop
         End If
     End With
-End Sub
-
-Private Sub FormatGroups2(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long, ByRef GroupSeparator As String, ByRef DecimalSeparator As String)
-    
-    
 End Sub
 
 ''
@@ -1876,7 +1880,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
         DP = .DecimalPosition
         
         Dim HasExponent As Boolean
-        If FormatPrecision < .DecimalPosition Then
+        If FormatPrecision < .DecimalPosition Or Abs(.DecimalPosition) > DefaultDoublePrecision Then
             HasExponent = True
             DP = 1
         ElseIf DP <= 0 Then

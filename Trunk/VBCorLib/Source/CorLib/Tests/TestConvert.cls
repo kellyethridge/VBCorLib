@@ -291,13 +291,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1000, "c1", "$1,000.0"
             Test.Use 1000, "c2", "$1,000.00"
             Test.Use 1000, "c3", "$1,000.000"
-            
-            
-'            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
-'            Test.Use 12345#, "g4", "1.235e+04"
-'            Test.Use 1.2345E+25!, "g26", "12345000400000000000000000"
-'            Test.Use 12345!, "g4", "1.235e+04"
-            
     End Select
 End Sub
 
