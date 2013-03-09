@@ -247,7 +247,6 @@ Private Sub Form_Load()
     
     Dim NumberFormatInfoTests As TestSuite
     Set NumberFormatInfoTests = Sim.NewTestSuite("NumberFormatInfo Tests")
-    NumberFormatInfoTests.Add New TestNumberFormatInfoInt
     NumberFormatInfoTests.Add New TestNumberFormatInfoFlt
     NumberFormatInfoTests.Add New TestNumberFormatInfoSng
     AddTest NumberFormatInfoTests

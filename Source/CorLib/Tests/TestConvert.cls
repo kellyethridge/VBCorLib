@@ -178,6 +178,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, "g5", "-1"
             Test.Use &H7FFFFFFF, "g5", "2.1475e+09"
             Test.Use &H80000000, "g5", "-2.1475e+09"
+            Test.Use 12345, "ggg", "ggg"
             
             ' Currency Format
             Test.Use 1, "c", "$1.00"
@@ -202,6 +203,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 10, "e1", "1.0e+001"
             Test.Use -1, "e", "-1.000000e+000"
             Test.Use 19, "e0", "2e+001"
+            Test.Use 12345, "e", "1.234500e+004"
+            Test.Use -12345, "e4", "-1.2345e+004"
+            Test.Use 12345, "e3", "1.235e+004"
+            Test.Use 12345, "E1", "1.2E+004"
+            Test.Use 0, "e", "0.000000e+000"
             
             ' Fixed Format
             Test.Use 0, "f", "0.00"
@@ -291,6 +297,51 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1000, "c1", "$1,000.0"
             Test.Use 1000, "c2", "$1,000.00"
             Test.Use 1000, "c3", "$1,000.000"
+            
+        Case "ToString_WithNumberNegativePattern_ReturnsExpected"
+            Test.Use -1, NumberNegativePatterns.[- n], "- 1.00"
+            Test.Use -1, NumberNegativePatterns.[(n)], "(1.00)"
+            Test.Use -1, NumberNegativePatterns.[-n], "-1.00"
+            Test.Use -1, NumberNegativePatterns.[n-], "1.00-"
+            Test.Use -1, NumberNegativePatterns.[n -], "1.00 -"
+            
+        Case "ToString_WithCurrencyNegativePattern_ReturnsExpected"
+            Test.Use -1, CurrencyNegativePatterns.[-$ n], "-$ 1.00"
+            Test.Use -1, CurrencyNegativePatterns.[$ -n], "$ -1.00"
+            Test.Use -1, CurrencyNegativePatterns.[$ n-], "$ 1.00-"
+            Test.Use -1, CurrencyNegativePatterns.[-$n], "-$1.00"
+            Test.Use -1, CurrencyNegativePatterns.[$-n], "$-1.00"
+            Test.Use -1, CurrencyNegativePatterns.[$n-], "$1.00-"
+            Test.Use -1, CurrencyNegativePatterns.[($ n)], "($ 1.00)"
+            Test.Use -1, CurrencyNegativePatterns.[($n)], "($1.00)"
+            Test.Use -1, CurrencyNegativePatterns.[(n $)], "(1.00 $)"
+            Test.Use -1, CurrencyNegativePatterns.[(n$)], "(1.00$)"
+            Test.Use -1, CurrencyNegativePatterns.[-n $], "-1.00 $"
+            Test.Use -1, CurrencyNegativePatterns.[n- $], "1.00- $"
+            Test.Use -1, CurrencyNegativePatterns.[n $-], "1.00 $-"
+            Test.Use -1, CurrencyNegativePatterns.[-n$], "-1.00$"
+            Test.Use -1, CurrencyNegativePatterns.[n-$], "1.00-$"
+            Test.Use -1, CurrencyNegativePatterns.[n$-], "1.00$-"
+            
+        Case "ToString_WithCurrencyPositivePattern_ReturnsExpected"
+            Test.Use 1, CurrencyPositivePatterns.[$ n], "$ 1.00"
+            Test.Use 1, CurrencyPositivePatterns.[$n], "$1.00"
+            Test.Use 1, CurrencyPositivePatterns.[n $], "1.00 $"
+            Test.Use 1, CurrencyPositivePatterns.[n$], "1.00$"
+            
+        Case "ToString_WithPercentNegativePattern_ReturnsExpected"
+            Test.Use -1, PercentNegativePatterns.[-# %], "-100.00 %"
+            Test.Use -1, PercentNegativePatterns.[-#%], "-100.00%"
+            Test.Use -1, PercentNegativePatterns.[-% n], "-% 100.00"
+            Test.Use -1, PercentNegativePatterns.[% -n], "% -100.00"
+            Test.Use -1, PercentNegativePatterns.[% n-], "% 100.00-"
+            Test.Use -1, PercentNegativePatterns.[-%#], "-%100.00"
+            Test.Use -1, PercentNegativePatterns.[%-n], "%-100.00"
+            Test.Use -1, PercentNegativePatterns.[%n-], "%100.00-"
+            Test.Use -1, PercentNegativePatterns.[n- %], "100.00- %"
+            Test.Use -1, PercentNegativePatterns.[n %-], "100.00 %-"
+            Test.Use -1, PercentNegativePatterns.[n-%], "100.00-%"
+            Test.Use -1, PercentNegativePatterns.[n%-], "100.00%-"
     End Select
 End Sub
 
@@ -591,6 +642,49 @@ Public Sub ToString_WithDoublesUsingFormatting_ReturnsExpected(ByVal Value As Do
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub ToString_WithNumberNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As NumberNegativePatterns, ByVal Expected As String)
+    Dim Actual As String
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.NumberNegativePattern = Pattern
+    
+    Actual = Convert.ToString(Value, "n", info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithCurrencyNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyNegativePatterns, ByVal Expected As String)
+    Dim Actual As String
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.CurrencyNegativePattern = Pattern
+    
+    Actual = Convert.ToString(Value, "c", info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithCurrencyPositivePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyPositivePatterns, ByVal Expected As String)
+    Dim Actual As String
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.CurrencyPositivePattern = Pattern
+    
+    Actual = Convert.ToString(Value, "c", info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithPercentNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As PercentNegativePatterns, ByVal Expected As String)
+    Dim Actual As String
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.PercentNegativePattern = Pattern
+    
+    Actual = Convert.ToString(Value, "p", info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 Private Function MakeImaginary(ByVal Value As Double) As Double
     On Error Resume Next

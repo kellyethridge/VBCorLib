@@ -177,26 +177,46 @@ End Enum
 ''
 ' Output patterns for positive percentage values. The <b>#</b> is the number and the <b>%</b> is the percentage symbol.
 '
-' @param [# %]
-' @param [#%]
-' @param [%#]
+' @param [n %]
+' @param [n%]
+' @param [%n]
+' @param [% n]
 Public Enum PercentPositivePatterns
     [# %] = 0
     [#%] = 1
     [%#] = 2
+    [% #] = 3
 End Enum
 
 ''
 ' Output patterns for negative percentage values. The <b>-</b> is the negative symbol,
 ' <b>#</b> is the number and the <b>%</b> is the percentage symbol.
 '
-' @param [-# %]
-' @param [-#%]
-' @param [-%#]
+' @param [-n %]
+' @param [-n%]
+' @param [-%n]
+' @param [%-n]
+' @param [%n-]
+' @param [n-%]
+' @param [n%-]
+' @param [-% n]
+' @param [n %-]
+' @param [% n-]
+' @param [% -n]
+' @param [n- %]
 Public Enum PercentNegativePatterns
     [-# %] = 0
     [-#%] = 1
     [-%#] = 2
+    [%-n] = 3
+    [%n-] = 4
+    [n-%] = 5
+    [n%-] = 6
+    [-% n] = 7
+    [n %-] = 8
+    [% n-] = 9
+    [% -n] = 10
+    [n- %] = 11
 End Enum
 
 ' These are the format types supported by this
@@ -2134,8 +2154,8 @@ Private Sub InitPatterns()
     mNumberNegativePatterns = Cor.NewStrings("(#)", "-#", "- #", "#-", "# -")
     mCurrencyNegativePatterns = Cor.NewStrings("($#)", "-$#", "$-#", "$#-", "(#$)", "-#$", "#-$", "#$-", "-# $", "-$ #", "# $-", "$ #-", "$ -#", "#- $", "($ #)", "(# $)")
     mCurrencyPositivePatterns = Cor.NewStrings("$#", "#$", "$ #", "# $")
-    mPercentNegativePatterns = Cor.NewStrings("-# %", "-#%", "-%#")
-    mPercentPositivePatterns = Cor.NewStrings("# %", "#%", "%#")
+    mPercentNegativePatterns = Cor.NewStrings("-# %", "-#%", "-%#", "%-#", "%#-", "#-%", "#%-", "-% #", "# %-", "% #-", "% -#", "#- %")
+    mPercentPositivePatterns = Cor.NewStrings("# %", "#%", "%#", "% n")
 End Sub
 
 
