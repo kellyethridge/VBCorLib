@@ -299,6 +299,25 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1000, "c2", "$1,000.00"
             Test.Use 1000, "c3", "$1,000.000"
             
+            ' Scientific Format
+            Test.Use 12345#, "e", "1.234500e+004"
+            Test.Use -12345#, "e4", "-1.2345e+004"
+            Test.Use 12345#, "e3", "1.235e+004"
+            Test.Use 12345#, "e0", "1e+004"
+            Test.Use 12345#, "E1", "1.2E+004"
+            Test.Use 1234500#, "e", "1.234500e+006"
+            Test.Use 1234500#, "e3", "1.235e+006"
+            Test.Use 0.0012345, "e3", "1.235e-003"
+            Test.Use 0.0012345, "e", "1.234500e-003"
+            Test.Use 1.2345E-200, "e7", "1.2345000e-200"
+            Test.Use 1#, "e", "1.000000e+000"
+            Test.Use 1#, "e1", "1.0e+000"
+            Test.Use 0#, "e", "0.000000e+000"
+            Test.Use 0.1234, "e3", "1.234e-001"
+            
+            ' Percent Format
+            Test.Use 0#, "p", "0.00 %"
+
         Case "ToString_WithNumberNegativePattern_ReturnsExpected"
             Test.Use -1, NumberNegativePatterns.[- n], "- 1.00"
             Test.Use -1, NumberNegativePatterns.[(n)], "(1.00)"
@@ -615,22 +634,22 @@ End Sub
 
 Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected()
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.CurrencyGroupSizes = NewLongs(1, 2, 3)
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.CurrencyGroupSizes = NewLongs(1, 2, 3)
     
-    Actual = Convert.ToString(12345678, "c", info)
+    Actual = Convert.ToString(12345678, "c", Info)
     
     Assert.That Actual, Iz.EqualTo("$12,345,67,8.00")
 End Sub
 
 Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.NumberGroupSizes = NewLongs(2, 3)
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.NumberGroupSizes = NewLongs(2, 3)
     
-    Actual = Convert.ToString(1, "n", info)
+    Actual = Convert.ToString(1, "n", Info)
     
     Assert.That Actual, Iz.EqualTo("1.00")
 End Sub
@@ -645,46 +664,56 @@ End Sub
 
 Public Sub ToString_WithNumberNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As NumberNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.NumberNegativePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.NumberNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "n", info)
+    Actual = Convert.ToString(Value, "n", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCurrencyNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.CurrencyNegativePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.CurrencyNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "c", info)
+    Actual = Convert.ToString(Value, "c", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCurrencyPositivePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyPositivePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.CurrencyPositivePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.CurrencyPositivePattern = Pattern
     
-    Actual = Convert.ToString(Value, "c", info)
+    Actual = Convert.ToString(Value, "c", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithPercentNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As PercentNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.PercentNegativePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.PercentNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "p", info)
+    Actual = Convert.ToString(Value, "p", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithNoCurrencyGroupSizes_ReturnsNonDelimetedCurrency()
+    Dim Info As New NumberFormatInfo
+    Info.CurrencyGroupSizes = NewLongs()
+    Dim Actual As String
+    
+    Actual = Convert.ToString(1234567890#, "c0", Info)
+    
+    Assert.That Actual, Iz.EqualTo("¤1234567890")
 End Sub
 
 Private Function MakeImaginary(ByVal Value As Double) As Double
