@@ -665,8 +665,8 @@ End Property
 ' <p>If a 0 is specified for a group size, it can only be the last size in the array.
 ' A 0 as the last group size will prevent the remaining digits from being separated.</p>
 '
-Public Property Get CurrencyGroupsSizes() As Variant
-    Call VerifyLoaded
+Public Property Get CurrencyGroupsSizes() As Long()
+    VerifyLoaded
     CurrencyGroupSizes = mProps.CurrencyGroupSizes
 End Property
 
@@ -682,14 +682,15 @@ End Property
 ' <p>If a 0 is specified for a group size, it can only be the last size in the array.
 ' A 0 as the last group size will prevent the remaining digits from being separated.</p>
 '
-Public Property Let CurrencyGroupSizes(ByRef RHS As Variant)
-    Call VerifyWritable
-    Call VerifyLoaded
+Public Property Let CurrencyGroupSizes(ByRef RHS() As Long)
+    VerifyWritable
+    VerifyLoaded
     If cArray.IsNull(RHS) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "CurrencyGroupSizes")
+        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "CurrencyGroupSizes")
     
-    Call VerifyGroupSizes(RHS)
-    mProps.CurrencyGroupSizes = RHS
+'    VerifyGroupSizes RHS
+'    mProps.CurrencyGroupSizes = RHS
+    VerifyAndSetGroupSizes RHS, mProps.CurrencyGroupSizes
 End Property
 
 ''
@@ -1223,10 +1224,16 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
             FormatGeneralDouble FormatPrecision, FormatType - 2
         
         Case PercentFormat
-            If FormatPrecision = UnknownPrecision Then FormatPrecision = mProps.PercentDecimalDigits
-            mNumber.DecimalPosition = mNumber.DecimalPosition + 2
-            Call RoundNumber(FormatPrecision + mNumber.DecimalPosition)
-            Call FormatPercent(FormatPrecision)
+            If FormatPrecision = UnknownPrecision Then
+                FormatPrecision = mProps.PercentDecimalDigits
+            End If
+            
+            If mNumber.Precision > 0 Then
+                mNumber.DecimalPosition = mNumber.DecimalPosition + 2
+            End If
+            
+            RoundNumber FormatPrecision + mNumber.DecimalPosition
+            FormatPercent FormatPrecision
         
         Case Else
             If Value < 0# Then
@@ -1417,6 +1424,9 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
     Dim DigitCount                  As Long
     Dim GroupSize                   As Long
     Dim i                           As Long
+    Dim HasGroups                   As Boolean
+    
+    HasGroups = UBound(GroupSizes) >= LBound(GroupSizes)
     
     With mNumber
         If .DecimalPosition > 0 Then
@@ -1429,7 +1439,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
                 RepeatingGroupDigitCount = 0
             End If
 
-            If UBound(GroupSizes) >= UBound(GroupSizes) Then
+            If HasGroups Then
                 GroupSize = GroupSizes(UBound(GroupSizes))
             End If
 
@@ -1445,7 +1455,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             DigitIndex = 0
             ch = .Digits(DigitIndex)
             Do While RepeatingGroupDigitCount > 0
-                If DigitCount = 0 Then
+                If DigitCount = 0 And HasGroups Then
                     AppendString GroupSeparator
                     DigitCount = GroupSize
                 End If
@@ -1467,25 +1477,30 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
 
         If (DigitIndex = 0 Or ch <> vbTerminator) Or (DigitIndex < .Precision And ch = vbTerminator) Then
             Dim GroupSizeIndex As Long
-            GroupSizeIndex = UBound(GroupSizes) - 1
-            If GroupSizeIndex < 0 Then
-                GroupSizeIndex = 0
+            
+            If HasGroups Then
+                GroupSizeIndex = UBound(GroupSizes) - 1
+                If GroupSizeIndex < 0 Then
+                    GroupSizeIndex = 0
+                End If
+                GroupSize = NonrepeatingGroupSizeSum - GroupSizes(GroupSizeIndex)
             End If
-            GroupSize = NonrepeatingGroupSizeSum - GroupSizes(GroupSizeIndex)
+            
             DigitCount = .DecimalPosition - DigitIndex
-
             ch = .Digits(DigitIndex)
 
             For i = DigitIndex To .DecimalPosition - 1
-                If DigitCount = NonrepeatingGroupSizeSum Then
-                    AppendString GroupSeparator
-                ElseIf DigitCount = GroupSize Then
-                    AppendString GroupSeparator
-                    GroupSizeIndex = GroupSizeIndex - 1
-                    If GroupSizeIndex < 0 Then
-                        GroupSizeIndex = 0
+                If HasGroups Then
+                    If DigitCount = NonrepeatingGroupSizeSum Then
+                        AppendString GroupSeparator
+                    ElseIf DigitCount = GroupSize Then
+                        AppendString GroupSeparator
+                        GroupSizeIndex = GroupSizeIndex - 1
+                        If GroupSizeIndex < 0 Then
+                            GroupSizeIndex = 0
+                        End If
+                        GroupSize = GroupSize - GroupSizes(GroupSizeIndex)
                     End If
-                    GroupSize = GroupSize - GroupSizes(GroupSizeIndex)
                 End If
                 If ch = 0 Then
                     mOutput(mOutputPos) = vbZero
@@ -1602,26 +1617,34 @@ End Sub
 ' common output buffer in scientific notation.
 '
 Private Sub FormatScientific(ByVal Digits As Long, ByVal ExpChar As Integer)
-    If Digits = UnknownPrecision Then Digits = DefaultExponentPrecision
-    Call RoundNumber(Digits + 1)
+    If Digits = UnknownPrecision Then
+        Digits = DefaultExponentPrecision
+    End If
+    
+    RoundNumber Digits + 1
     
     With mNumber
-        ' Simply add the negative sign first.
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .IsNegative Then
+            AppendString mProps.NegativeSign
+        End If
         
         ' We need to represent "digits" number of digits in the precision.
         ' After the first digit is ouptput we put the decimal separator, since
         ' all scientific notation has a leading digit-period-digits format.
-        Dim i As Long
-        Dim ch As Integer
+        Dim i           As Long
+        Dim ch          As Integer
         Dim OutOfDigits As Boolean
+        
         Do While Digits >= 0
             If i = 1 Then
-                Call AppendString(mProps.NumberDecimalSeparator)
+                AppendString mProps.NumberDecimalSeparator
             End If
-            If Not OutOfDigits Then ch = .Digits(i)
             
-            ' Simply copy the digit to the output buffer, or place
+            If Not OutOfDigits Then
+                ch = .Digits(i)
+            End If
+            
+            ' Simply copy the digit to the output buffer or place
             ' a 0 in the output buffer if we have run out of digits
             ' but required more digits to be displayed.
             If ch = 0 Then
@@ -1630,11 +1653,12 @@ Private Sub FormatScientific(ByVal Digits As Long, ByVal ExpChar As Integer)
             Else
                 mOutput(mOutputPos) = ch
             End If
+            
             i = i + 1
             mOutputPos = mOutputPos + 1
             Digits = Digits - 1
         Loop
-        Call FormatExponent(.DecimalPosition, ExpChar, 3)
+        FormatExponent .DecimalPosition - 1, ExpChar, 3
     End With
 End Sub
 
@@ -1900,7 +1924,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
         DP = .DecimalPosition
         
         Dim HasExponent As Boolean
-        If FormatPrecision < .DecimalPosition Then
+        If FormatPrecision < .DecimalPosition Or .DecimalPosition < -3 Then
             HasExponent = True
             DP = 1
         ElseIf DP <= 0 Then
@@ -2058,9 +2082,9 @@ Private Sub FormatExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal
     
     If Places < 0 Then
         Places = -Places
-        Call AppendString(mProps.NegativeSign)
+        AppendString mProps.NegativeSign
     Else
-        Call AppendString(mProps.PositiveSign)
+        AppendString mProps.PositiveSign
     End If
     
     ' Determine how many characters is in Places.
@@ -2103,6 +2127,21 @@ Private Sub VerifyWritable()
     If mProps.IsReadOnly Then
         Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_ReadOnly))
     End If
+End Sub
+
+Private Sub VerifyAndSetGroupSizes(ByRef Source() As Long, ByRef Target() As Long)
+    VerifyGroupSizes Source
+    
+    Dim Length As Long
+    Length = cArray.GetLength(Source)
+    
+    If Length > 0 Then
+        ReDim Target(0 To Length - 1)
+    Else
+        Target = Cor.NewLongs()
+    End If
+    
+    cArray.Copy Source, Target, Length
 End Sub
 
 Private Sub VerifyGroupSizes(ByRef Arr As Variant)
