@@ -1900,7 +1900,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
         DP = .DecimalPosition
         
         Dim HasExponent As Boolean
-        If FormatPrecision < .DecimalPosition Or Abs(.DecimalPosition) > DefaultDoublePrecision Then
+        If FormatPrecision < .DecimalPosition Then
             HasExponent = True
             DP = 1
         ElseIf DP <= 0 Then
