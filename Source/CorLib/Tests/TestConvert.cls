@@ -285,6 +285,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 100.001, "g4", "100"
             Test.Use 100.001, "g5", "100"
             Test.Use 100.001, "g6", "100.001"
+            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
             
             ' Currency Format
             Test.Use 0, "c", "$0.00"
