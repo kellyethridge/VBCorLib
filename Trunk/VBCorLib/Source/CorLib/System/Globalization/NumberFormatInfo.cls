@@ -241,10 +241,10 @@ End Enum
 '
 Private Type NumberType
     DecimalPosition As Long
-    Precision   As Long
-    IsNegative  As BOOL
-    Digits()    As Byte
-    DigitsSA    As SafeArray1d
+    Precision       As Long
+    IsNegative      As BOOL
+    Digits()        As Byte
+    DigitsSA        As SafeArray1d
 End Type
 
 Private Type PropsType
@@ -1267,8 +1267,23 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
         Case NumberFormat:      Call FormatNumber(FormatPrecision)
         Case CurrencyFormat:    Call FormatCurrency(FormatPrecision)
         Case ExponentFormat
-            mNumber.DecimalPosition = mNumber.Precision - 1
-            FormatScientific FormatPrecision, FormatType
+'            mNumber.DecimalPosition = 1 'mNumber.Precision - 1
+'            FormatScientific FormatPrecision, FormatType
+            Dim Places As Long
+            Places = mNumber.DecimalPosition - 1
+            mNumber.DecimalPosition = 1
+            
+            If FormatPrecision = UnknownPrecision Then
+                FormatPrecision = 6
+            End If
+            
+            If mNumber.Precision > 0 Then
+                FormatFixedDouble FormatPrecision
+            Else
+                FormatFixedInt32 FormatPrecision
+            End If
+            
+            FormatExponent Places, FormatType, 3
         
         Case PercentFormat
             If mNumber.Precision > 0 Then
