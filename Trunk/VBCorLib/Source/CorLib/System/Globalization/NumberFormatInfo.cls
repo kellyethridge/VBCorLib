@@ -1261,29 +1261,12 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
     End If
     
     Select Case FormatType And &HFFDF
-        Case GeneralFormat:     Call FormatGeneralInt32(FormatPrecision, FormatType - 2)
-        Case FixedFormat:       Call FormatFixedInt32(FormatPrecision)
-        Case DecimalFormat:     Call FormatDecimal(FormatPrecision)
-        Case NumberFormat:      Call FormatNumber(FormatPrecision)
-        Case CurrencyFormat:    Call FormatCurrency(FormatPrecision)
-        Case ExponentFormat
-'            mNumber.DecimalPosition = 1 'mNumber.Precision - 1
-'            FormatScientific FormatPrecision, FormatType
-            Dim Places As Long
-            Places = mNumber.DecimalPosition - 1
-            mNumber.DecimalPosition = 1
-            
-            If FormatPrecision = UnknownPrecision Then
-                FormatPrecision = 6
-            End If
-            
-            If mNumber.Precision > 0 Then
-                FormatFixedDouble FormatPrecision
-            Else
-                FormatFixedInt32 FormatPrecision
-            End If
-            
-            FormatExponent Places, FormatType, 3
+        Case GeneralFormat:     FormatGeneralInt32 FormatPrecision, FormatType - 2
+        Case FixedFormat:       FormatFixedDouble FormatPrecision
+        Case DecimalFormat:     FormatDecimal FormatPrecision
+        Case NumberFormat:      FormatNumber FormatPrecision
+        Case CurrencyFormat:    FormatCurrency FormatPrecision
+        Case ExponentFormat:    FormatExponentInt32 FormatPrecision, FormatType
         
         Case PercentFormat
             If mNumber.Precision > 0 Then
@@ -1329,6 +1312,19 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
         FormatInt32 = SysAllocStringLen(VarPtr(mOutput(0)), mOutputPos)
     End If
 End Function
+
+Private Sub FormatExponentInt32(ByVal FormatPrecision As Long, ByVal FormatType As Long)
+    If FormatPrecision = UnknownPrecision Then
+        FormatPrecision = 6
+    End If
+    
+    Dim Places As Long
+    Places = mNumber.DecimalPosition - 1
+    mNumber.DecimalPosition = 1
+    
+    FormatFixedDouble FormatPrecision
+    AppendExponent Places, FormatType, 3
+End Sub
 
 Private Sub FormatNumber(ByVal FormatPrecision As Long)
     If FormatPrecision = UnknownPrecision Then
@@ -1673,7 +1669,7 @@ Private Sub FormatScientific(ByVal Digits As Long, ByVal ExpChar As Integer)
             mOutputPos = mOutputPos + 1
             Digits = Digits - 1
         Loop
-        FormatExponent .DecimalPosition - 1, ExpChar, 3
+        AppendExponent .DecimalPosition - 1, ExpChar, 3
     End With
 End Sub
 
@@ -1863,17 +1859,10 @@ Private Sub Int32ToNumber(ByVal Value As Long)
     End With
 End Sub
 
-''
-' Converts a Double to the component parts using the C-Runtime Ecvt function.
-'
-' @param value The value to break apart.
-' @param Precision The number of digits to convert the value to.
-'
 Private Sub DoubleToNumber(ByVal Value As Double, ByVal FormatPrecision As Long)
     mOutputPos = 0
     With AsDLong(Value)
         If (.HiDWord And &H7FF00000) = &H7FF00000 Then
-'            mNumber.Precision = Precision
             If (.HiDWord And &HFFFFF) Or (.LoDWord) Then
                 mNumber.DecimalPosition = SCALE_NAN
             Else
@@ -1882,10 +1871,6 @@ Private Sub DoubleToNumber(ByVal Value As Double, ByVal FormatPrecision As Long)
             End If
         Else
             mNumber.DigitsSA.pvData = Helper.Ecvt(Value, FormatPrecision, mNumber.DecimalPosition, mNumber.IsNegative)
-'            Do While FormatPrecision > 0 And mNumber.Digits(FormatPrecision - 1) <> vbZero
-'                FormatPrecision = FormatPrecision - 1
-'            Loop
-'            mNumber.Digits(FormatPrecision) = vbNullPtr
             mNumber.Precision = FormatPrecision
         End If
     End With
@@ -1924,7 +1909,7 @@ Private Sub FormatGeneralInt32(ByVal FormatPrecision As Long, ByVal ExpChar As L
         Next i
         
         If HasExponent Then
-            FormatExponent .Precision - 1, ExpChar, 2
+            AppendExponent .Precision - 1, ExpChar, 2
         End If
     End With
 End Sub
@@ -1970,7 +1955,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
             ch = .Digits(i)
         Loop
         If HasExponent Then
-            FormatExponent .DecimalPosition - 1, ExpChar, 2
+            AppendExponent .DecimalPosition - 1, ExpChar, 2
         Else
             For i = i To .DecimalPosition - 1
                 mOutput(mOutputPos) = vbZero
@@ -2012,16 +1997,21 @@ Private Sub FormatFixedInt32(ByVal FormatPrecision As Long)
     End With
 End Sub
 
-Private Sub FormatFixedDouble(ByVal Precision As Long)
-    If Precision = UnknownPrecision Then Precision = 2
-    Call RoundNumber(Precision + mNumber.DecimalPosition)
+Private Sub FormatFixedDouble(ByVal FormatPrecision As Long)
+    If FormatPrecision = UnknownPrecision Then
+        FormatPrecision = mProps.NumberDecimalDigits
+    End If
+    
+    RoundNumber FormatPrecision + mNumber.DecimalPosition
     
     Dim i As Long
     Dim ch As Integer
     With mNumber
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .IsNegative Then
+            AppendString mProps.NegativeSign
+        End If
         
-        If .DecimalPosition > 0 Then
+        If .Precision > 0 And .DecimalPosition > 0 Then
             For i = 0 To .DecimalPosition - 1
                 mOutput(mOutputPos) = .Digits(i)
                 mOutputPos = mOutputPos + 1
@@ -2031,19 +2021,26 @@ Private Sub FormatFixedDouble(ByVal Precision As Long)
             mOutputPos = mOutputPos + 1
             i = .DecimalPosition
         End If
-        If Precision > 0 Then
-            Call AppendString(mProps.NumberDecimalSeparator)
-            Do While Precision > 0
-                If i >= 0 Then ch = .Digits(i)
-                If ch = 0 Then
+        
+        If FormatPrecision > 0 Then
+            AppendString mProps.NumberDecimalSeparator
+            
+            Do While FormatPrecision > 0
+                If i >= 0 Then
+                    ch = .Digits(i)
+                End If
+                
+                If .Precision = 0 Or ch = 0 Then
                     mOutput(mOutputPos) = vbZero
-                    If i < 0 Then i = i + 1
+                    If i < 0 Then
+                        i = i + 1
+                    End If
                 Else
                     mOutput(mOutputPos) = ch
                     i = i + 1
                 End If
                 mOutputPos = mOutputPos + 1
-                Precision = Precision - 1
+                FormatPrecision = FormatPrecision - 1
             Loop
         End If
     End With
@@ -2089,7 +2086,7 @@ End Function
 ''
 ' This adds the 'e+000' portion of a scientific formatted output.
 '
-Private Sub FormatExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal MinDigits As Long)
+Private Sub AppendExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal MinDigits As Long)
     mOutput(mOutputPos) = ExpChar
     mOutputPos = mOutputPos + 1
     
