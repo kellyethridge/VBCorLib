@@ -208,6 +208,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 12345, "e3", "1.235e+004"
             Test.Use 12345, "E1", "1.2E+004"
             Test.Use 0, "e", "0.000000e+000"
+            Test.Use 123456789, "e4", "1.2346e+008"
             
             ' Fixed Format
             Test.Use 0, "f", "0.00"
@@ -286,6 +287,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 100.001, "g5", "100"
             Test.Use 100.001, "g6", "100.001"
             Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
+            Test.Use 12345, "g4", "1.235e+04"
             
             ' Currency Format
             Test.Use 0, "c", "$0.00"
@@ -317,6 +319,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
             ' Percent Format
             Test.Use 0#, "p", "0.00 %"
+
+        Case "ToString_WithSingleUsingFormatting_ReturnsExpected"
+            ' General Format
+'            Test.Use 12345, "g4", "1.235e+004"
 
         Case "ToString_WithNumberNegativePattern_ReturnsExpected"
             Test.Use -1, NumberNegativePatterns.[- n], "- 1.00"
@@ -655,6 +661,14 @@ Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
 End Sub
 
 Public Sub ToString_WithDoublesUsingFormatting_ReturnsExpected(ByVal Value As Double, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Convert.ToString(Value, Format)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithSingleUsingFormatting_ReturnsExpected(ByVal Value As Single, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
     Actual = Convert.ToString(Value, Format)
