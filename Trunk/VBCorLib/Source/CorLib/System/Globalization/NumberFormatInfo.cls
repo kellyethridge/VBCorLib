@@ -1113,18 +1113,19 @@ Private Sub LoadCommon(ByVal LCID As Long)
     End With
 End Sub
 
-Private Function ParseGroupSizes(ByRef src As String) As Long()
-    Dim i           As Long
-    Dim groups()    As String
-    Dim Ret()       As Long
+Private Function ParseGroupSizes(ByRef Source As String) As Long()
+    Dim SourceSizes() As String
+    SourceSizes = Split(Source, ";")
     
-    groups = Split(src, ";")
-    ReDim Ret(0 To UBound(groups) - 1)
+    Dim Result() As Long
+    ReDim Result(0 To UBound(SourceSizes) - 1) ' we don't use the last element.
     
-    For i = 0 To UBound(groups) - 1 ' we don't use the last element.
-        Ret(i) = CLng(groups(i))
+    Dim i As Long
+    For i = 0 To UBound(Result)
+        Result(i) = CLng(SourceSizes(i))
     Next i
-    ParseGroupSizes = Ret
+    
+    ParseGroupSizes = Result
 End Function
 
 Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As String
