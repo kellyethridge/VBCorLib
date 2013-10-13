@@ -322,6 +322,7 @@ Class=StringUtils; System\StringUtils.cls
 Class=Thread; System\Threading\Thread.cls
 Class=ThreadStatic; System\Threading\ThreadStatic.cls
 ResFile32="VBCorLib.RES"
+Module=NumericConvert; System\Globalization\NumericConvert.bas
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"
