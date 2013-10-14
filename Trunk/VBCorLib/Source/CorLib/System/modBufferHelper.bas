@@ -30,6 +30,12 @@ Attribute VB_Name = "modBufferHelper"
 '
 Option Explicit
 
+Public Type CharacterArray
+    Chars()             As Integer
+    Length              As Long
+    CharacterSafeArray  As SafeArray1d
+End Type
+
 Public Type WordBuffer
     pVTable     As Long
     This        As IUnknown
@@ -38,6 +44,7 @@ Public Type WordBuffer
     SA          As SafeArray1d
 End Type
 
+Private mAttachment As SafeArray1d
 Private mpRelease As Long
 
 ''
@@ -76,3 +83,23 @@ Private Function WordBuffer_Release(ByRef This As WordBuffer) As Long
     This.SA.pvData = vbNullPtr
 End Function
 
+Public Sub AttachCharsQuick(ByRef StringToAttach As String, ByRef Chars() As Integer)
+    If mAttachment.cLocks <> 0 Then _
+        Throw Cor.NewInvalidOperationException("Cannot attach characters while already attached.")
+    If SAPtr(Chars) <> vbNullPtr Then _
+        Throw Cor.NewArgumentException("Cannot attach to array that is already initialized.", "Chars")
+    
+    mAttachment.cbElements = 2
+    mAttachment.cDims = 1
+    mAttachment.cElements = Len(StringToAttach)
+    mAttachment.cLocks = 1
+    mAttachment.pvData = StrPtr(StringToAttach)
+    SAPtr(Chars) = VarPtr(mAttachment)
+End Sub
+
+Public Sub DetachCharsQuick(ByRef Chars() As Integer)
+    If SAPtr(Chars) <> VarPtr(mAttachment) Then _
+        Throw Cor.NewArgumentException("Cannot detach unattached array.", "Chars")
+    
+    SAPtr(Chars) = vbNullPtr
+End Sub
