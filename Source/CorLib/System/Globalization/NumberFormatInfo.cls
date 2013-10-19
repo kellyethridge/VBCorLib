@@ -235,6 +235,31 @@ Private Enum FormatType
     PercentFormat = 80      ' P
 End Enum
 
+Private Enum FormatSpecifier
+    CustomSpecifier = -1
+    GeneralUpperSpecifier = 71      ' G
+    GeneralLowerSpecifier = 103     ' g
+    DecimalUpperSpecifier = 68      ' D
+    DecimalLowerSpecifier = 100     ' d
+    NumberUpperSpecifier = 78       ' N
+    NumberLowerSpecifier = 110      ' n
+    HexUpperSpecifier = 88          ' X
+    HexLowerSpecifier = 120         ' x
+    ExponentUpperSpecifier = 69     ' E
+    ExponentLowerSpecifier = 101    ' e
+    FixedUpperSpecifier = 70        ' F
+    FixedLowerSpecifier = 102       ' f
+    CurrencyUpperSpecifier = 67     ' C
+    CurrencyLowerSpecifier = 99     ' c
+    PercentUpperSpecifier = 80      ' P
+    PercentLowerSpecifier = 112     ' p
+End Enum
+
+Private Type Specifiers
+    Format      As FormatSpecifier
+    Precision   As Long
+End Type
+
 ' This structure is derived from using the ECVT function.
 ' The ECVT function converts an IEEE Double to its 3 components
 ' of digits, precision, and sign.
@@ -1252,49 +1277,54 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
 End Function
 
 Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As String
-    Dim FormatPrecision As Long
-    Dim FormatType      As Long
-
-    GetFormatSpecifierParts Format, FormatType, FormatPrecision
+    Dim Specifiers As Specifiers
     
-    If ((FormatType And &HFFDF) <> HexFormat) And (FormatType <> CustomFormat) Then
+    Specifiers = ParseSpecifiers(Format)
+    
+    If Specifiers.Format <> CustomSpecifier And _
+        Specifiers.Format <> HexUpperSpecifier And _
+        Specifiers.Format <> HexLowerSpecifier Then
         Int32ToNumber Value
     End If
     
-    Select Case FormatType And &HFFDF
-        Case GeneralFormat:     FormatGeneralInt32 FormatPrecision, FormatType - 2
-        Case FixedFormat:       FormatFixedDouble FormatPrecision
-        Case DecimalFormat:     FormatDecimal FormatPrecision
-        Case NumberFormat:      FormatNumber FormatPrecision
-        Case CurrencyFormat:    FormatCurrency FormatPrecision
-        Case ExponentFormat:    FormatExponentInt32 FormatPrecision, FormatType
+    Select Case Specifiers.Format
+        Case FormatSpecifier.GeneralLowerSpecifier
+            FormatGeneralInt32 Specifiers.Precision, vbLowerE
+            
+        Case FormatSpecifier.GeneralUpperSpecifier
+            FormatGeneralInt32 Specifiers.Precision, vbUpperE
+            
+        Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
+            FormatFixedDouble Specifiers.Precision
+            
+        Case FormatSpecifier.DecimalUpperSpecifier, FormatSpecifier.DecimalLowerSpecifier
+            FormatDecimal Specifiers.Precision
+            
+        Case FormatSpecifier.NumberUpperSpecifier, FormatSpecifier.NumberLowerSpecifier
+            FormatNumber Specifiers.Precision
+            
+        Case FormatSpecifier.CurrencyUpperSpecifier, FormatSpecifier.CurrencyLowerSpecifier
+            FormatCurrency Specifiers.Precision
+            
+        Case FormatSpecifier.ExponentLowerSpecifier
+            FormatExponentInt32 Specifiers.Precision, vbLowerE
+            
+        Case FormatSpecifier.ExponentUpperSpecifier
+            FormatExponentInt32 Specifiers.Precision, vbUpperE
         
-        Case PercentFormat
+        Case FormatSpecifier.PercentUpperSpecifier, FormatSpecifier.PercentLowerSpecifier
             If mNumber.Precision > 0 Then
                 mNumber.DecimalPosition = mNumber.DecimalPosition + 2
             End If
-            If FormatPrecision < 0 Then
-                FormatPrecision = mProps.PercentDecimalDigits
-            End If
             
-            FormatPercent FormatPrecision
-
-        Case HexFormat
-            ' This is to allow negative vbInteger values to
-            ' remain at 4 hex characters instead of being
-            ' stretched out to 8 characters like vbLong.
-            Dim HexValue As Long
-            If VarType(Value) = vbInteger Then
-                HexValue = CLng(Value) And &HFFFF&
+            If Specifiers.Precision = UnknownPrecision Then
+                FormatPercent mProps.PercentDecimalDigits
             Else
-                HexValue = Value
+                FormatPercent Specifiers.Precision
             End If
-            
-            If FormatPrecision = UnknownPrecision Then
-                FormatPrecision = 1
-            End If
-            
-            Call FormatHex(HexValue, FormatPrecision, FormatType - 33)
+
+        Case FormatSpecifier.HexLowerSpecifier, FormatSpecifier.HexUpperSpecifier
+            FormatHex Value, Specifiers
             FormatInt32 = SysAllocStringLen(VarPtr(mOutput(mOutputPos)), BUFFER_SIZE - mOutputPos)
             Exit Function
         
@@ -1564,22 +1594,43 @@ End Sub
 ' @param CaseOffset This is the alpha offset to upper or lower case
 ' alpha characters that are in the output string.
 '
-Private Sub FormatHex(ByVal Value As Long, ByVal Digits As Long, ByVal CaseOffset As Long)
+Private Sub FormatHex(ByRef Value As Variant, ByRef Specifiers As Specifiers)
+    Dim Digits As Long
+    Dim CaseOffset As Long
+    
     Dim ch As Integer
+    Dim HexValue As Long
+    
+    ' This is to allow negative vbInteger values to
+    ' remain at 4 hex characters instead of being
+    ' stretched out to 8 characters like vbLong.
+    If VarType(Value) = vbInteger Then
+        HexValue = CLng(Value) And &HFFFF&
+    Else
+        HexValue = Value
+    End If
+
+    If Specifiers.Precision = UnknownPrecision Then
+        Digits = 1
+    Else
+        Digits = Specifiers.Precision
+    End If
+    
+    CaseOffset = Specifiers.Format - 33
     
     mOutputPos = BUFFER_SIZE - 1
-    Do While Value <> 0
-        ch = Value And &HF
+    Do While HexValue <> 0
+        ch = HexValue And &HF
         If ch > 9 Then
             mOutput(mOutputPos) = ch + CaseOffset  ' add the offset to upper or lower 'a-f' or 'A-F'.
         Else
             mOutput(mOutputPos) = vbZero + ch
         End If
         mOutputPos = mOutputPos - 1
-        If Value < 0 Then
-            Value = Helper.ShiftRight(Value, 4)
+        If HexValue < 0 Then
+            HexValue = Helper.ShiftRight(HexValue, 4)
         Else
-            Value = Value \ &H10
+            HexValue = HexValue \ &H10
         End If
     Loop
     
@@ -1727,18 +1778,18 @@ End Sub
 ''
 ' This will parse the format type and optional numerical value.
 '
-' @param FormatSpecifier The string format to be parsed (ie. "D99").
+' @param Format The string format to be parsed (ie. "D99").
 ' @param FormatType The type of formatting parsed from the string.
 ' @param Precision The number of digits parsed out.
 ' @remarks A format of "D99" will return DecimalFormat in FormatType and
 ' 99 in Precision. We indicate no digits were supplied by using -1.
 '
-Private Sub GetFormatSpecifierParts(ByRef FormatSpecifier As String, ByRef FormatType As FormatType, ByRef FormatPrecision As Long)
-    Dim FormatSpecifierLength As Long
-    FormatSpecifierLength = Len(FormatSpecifier)
+Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As FormatType, ByRef FormatPrecision As Long)
+    Dim FormatLength As Long
+    FormatLength = Len(Format)
     
     ' A valid format specifier is 1 to 3 characters long.
-    Select Case FormatSpecifierLength
+    Select Case FormatLength
         Case 0
             FormatType = GeneralFormat
             FormatPrecision = UnknownPrecision
@@ -1750,14 +1801,14 @@ Private Sub GetFormatSpecifierParts(ByRef FormatSpecifier As String, ByRef Forma
         Case Else
             With mFormatSpecifier
                 ' Hook up the string to access it as an Integer array.
-                .SA.pvData = StrPtr(FormatSpecifier)
+                .SA.pvData = StrPtr(Format)
         
                 FormatType = .Data(0)
                 
                 Select Case FormatType
                     Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
                         ' We've got a format letter, so attempt to get any precision digits.
-                        If FormatSpecifierLength = 1 Then
+                        If FormatLength = 1 Then
                             FormatPrecision = UnknownPrecision
                             Exit Sub
                         End If
@@ -1766,7 +1817,7 @@ Private Sub GetFormatSpecifierParts(ByRef FormatSpecifier As String, ByRef Forma
                         
                         Dim ch As Long
                         Dim i As Long
-                        For i = 1 To FormatSpecifierLength - 1
+                        For i = 1 To FormatLength - 1
                             ch = .Data(i)
                             
                             Select Case ch
@@ -1787,6 +1838,58 @@ Private Sub GetFormatSpecifierParts(ByRef FormatSpecifier As String, ByRef Forma
             End With
     End Select
 End Sub
+
+Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
+    Dim FormatLength As Long
+    FormatLength = Len(Format)
+    
+    Select Case FormatLength
+        Case 0
+            ParseSpecifiers.Format = GeneralUpperSpecifier
+            ParseSpecifiers.Precision = UnknownPrecision
+            
+        Case Is > 3
+            ParseSpecifiers.Format = CustomSpecifier
+            ParseSpecifiers.Precision = UnknownPrecision
+            
+        Case Else
+            With mFormatSpecifier
+                ' Hook up the string to access it as an Integer array.
+                .SA.pvData = StrPtr(Format)
+        
+                Select Case .Data(0)
+                    Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
+                        ParseSpecifiers.Format = .Data(0)
+                        
+                        If FormatLength = 1 Then
+                            ParseSpecifiers.Precision = UnknownPrecision
+                            Exit Function
+                        End If
+                        
+                        Dim Precision As Long
+                        Dim ch As Long
+                        Dim i As Long
+                        For i = 1 To FormatLength - 1
+                            ch = .Data(i)
+                            
+                            Select Case ch
+                                Case vbZero To vbNine
+                                    Precision = Precision * 10 + ch - vbZero
+                                Case Else
+                                    ParseSpecifiers.Format = CustomSpecifier
+                                    ParseSpecifiers.Precision = UnknownPrecision
+                                    Exit Function
+                            End Select
+                        Next i
+                        
+                        ParseSpecifiers.Precision = Precision
+                    Case Else
+                        ParseSpecifiers.Format = CustomSpecifier
+                        ParseSpecifiers.Precision = UnknownPrecision
+                End Select
+            End With
+    End Select
+End Function
 
 ''
 ' Takes an integer value and makes a character string.
