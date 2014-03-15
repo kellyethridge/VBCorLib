@@ -1154,8 +1154,8 @@ Private Function ParseGroupSizes(ByRef Source As String) As Long()
 End Function
 
 Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As String
-    Dim FormatPrecision   As Long
-    Dim FormatType  As Long
+    Dim FormatPrecision As Long
+    Dim FormatType      As Long
     
     GetFormatSpecifierParts Format, FormatType, FormatPrecision
 
@@ -1174,7 +1174,9 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
         
         Case GeneralFormat
             If FormatPrecision < 0 Then FormatPrecision = DefaultSinglePrecision
-            Call DoubleToNumber(Value, FormatPrecision + 1)
+            
+            DoubleToNumber Value, FormatPrecision
+            
             If Not IsValidNumber(FormatSingle) Then Exit Function
             
             If mNumber.Digits(0) = vbZero Then
@@ -1182,9 +1184,12 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
                 Exit Function
             End If
             
-            If FormatPrecision > 7 Then FormatPrecision = 9
-            Call RoundNumber(FormatPrecision)
-            Call FormatGeneralDouble(mNumber.Precision, FormatType - 2)
+            If FormatPrecision > 7 Then
+                FormatPrecision = 9
+            End If
+            
+            RoundNumber FormatPrecision
+            FormatGeneralDouble mNumber.Precision, FormatType - 2
         
         Case PercentFormat
             If FormatPrecision < 0 Then FormatPrecision = mProps.PercentDecimalDigits
@@ -1208,8 +1213,8 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
 End Function
 
 Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As String
-    Dim FormatPrecision   As Long
-    Dim FormatType  As Long
+    Dim FormatPrecision As Long
+    Dim FormatType      As Long
     
     GetFormatSpecifierParts Format, FormatType, FormatPrecision
     
