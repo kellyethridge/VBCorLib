@@ -244,7 +244,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 255, "X4", "00FF"
             Test.Use -1, "x", "ffffffff"
 
-        Case "ToString_WithDoublesUsingFormatting_ReturnsExpected"
+        Case "ToString_WithDoubleUsingFormatting_ReturnsExpected"
             ' General Format
             Test.Use 0, "g", "0"
             Test.Use 0, "g1", "0"
@@ -322,7 +322,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 
         Case "ToString_WithSingleUsingFormatting_ReturnsExpected"
             ' General Format
-'            Test.Use 12345, "g4", "1.235e+004"
+            Test.Use 12345!, "", "12345"
+            Test.Use 12345!, "g", "12345"
+            Test.Use -12345!, "g", "-12345"
+            Test.Use 1.2345!, "g", "1.2345"
+            Test.Use 0.012345!, "g", "0.012345"
+            Test.Use 1234.568!, "g", "1234.568"
+            Test.Use 1.2345E+25!, "g26", "12345000400000000000000000"
+            Test.Use 1.2345E-05!, "", "1.2345E-05"
+            Test.Use 1.2345E+15!, "", "1.2345E+15"
+            Test.Use 1.2345E-05!, "G", "1.2345E-05"
+            Test.Use 1.2345E+15!, "G", "1.2345E+15"
+            Test.Use 12345!, "g4", "1.235e+04"
 
         Case "ToString_WithNumberNegativePattern_ReturnsExpected"
             Test.Use -1, NumberNegativePatterns.[- n], "- 1.00"
@@ -660,7 +671,7 @@ Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
     Assert.That Actual, Iz.EqualTo("1.00")
 End Sub
 
-Public Sub ToString_WithDoublesUsingFormatting_ReturnsExpected(ByVal Value As Double, ByVal Format As String, ByVal Expected As String)
+Public Sub ToString_WithDoubleUsingFormatting_ReturnsExpected(ByVal Value As Double, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
     Actual = Convert.ToString(Value, Format)
