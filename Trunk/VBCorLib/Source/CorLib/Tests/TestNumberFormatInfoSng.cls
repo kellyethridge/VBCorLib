@@ -26,17 +26,17 @@ Public Sub TestZero()
     Assert.AreEqual "0", Info.Format(0!)
 End Sub
 
-Public Sub TestGeneral()
-    Assert.AreEqual "12345", Info.Format(12345!)
-    Assert.AreEqual "-12345", Info.Format(-12345!)
-    Assert.AreEqual "1.2345", Info.Format(1.2345!)
-    Assert.AreEqual "0.012345", Info.Format(0.012345!)
-    Assert.AreEqual "1234.568", Info.Format(1234.568!)
-    Assert.AreEqual "12345000400000000000000000", Info.Format(1.2345E+25!, "g26")
-    Assert.AreEqual "1.2345E-05", Info.Format(1.2345E-05!)
-    Assert.AreEqual "1.2345E+15", Info.Format(1.2345E+15!)
-    Assert.AreEqual "1.235e+04", Info.Format(12345!, "g4")
-End Sub
+'Public Sub TestGeneral()
+'    Assert.AreEqual "12345", Info.Format(12345!)
+'    Assert.AreEqual "-12345", Info.Format(-12345!)
+'    Assert.AreEqual "1.2345", Info.Format(1.2345!)
+'    Assert.AreEqual "0.012345", Info.Format(0.012345!)
+'    Assert.AreEqual "1234.568", Info.Format(1234.568!)
+'    Assert.AreEqual "12345000400000000000000000", Info.Format(1.2345E+25!, "g26")
+'    Assert.AreEqual "1.2345E-05", Info.Format(1.2345E-05!)
+'    Assert.AreEqual "1.2345E+15", Info.Format(1.2345E+15!)
+'    Assert.AreEqual "1.235e+04", Info.Format(12345!, "g4")
+'End Sub
 
 Public Sub TestFixed()
     Assert.AreEqual "12345.00", Info.Format(12345!, "f")
