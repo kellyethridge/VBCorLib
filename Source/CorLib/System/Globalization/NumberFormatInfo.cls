@@ -521,7 +521,7 @@ End Property
 ' cause a number 1234567890 to be formatted as 1,2,3,4,5,67,890. Once the last
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
-Public Property Get PercentGroupsSizes() As Variant
+Public Property Get PercentGroupSizes() As Variant
     Call VerifyLoaded
     PercentGroupSizes = mProps.PercentGroupSizes
 End Property
@@ -690,7 +690,7 @@ End Property
 ' <p>If a 0 is specified for a group size, it can only be the last size in the array.
 ' A 0 as the last group size will prevent the remaining digits from being separated.</p>
 '
-Public Property Get CurrencyGroupsSizes() As Long()
+Public Property Get CurrencyGroupSizes() As Long()
     VerifyLoaded
     CurrencyGroupSizes = mProps.CurrencyGroupSizes
 End Property
@@ -1092,7 +1092,6 @@ Private Sub LoadUserOverride(ByVal LCID As Long)
         .PercentDecimalDigits = .NumberDecimalDigits
         .PercentGroupSeparator = .NumberGroupSeparator
         .PercentGroupSizes = .NumberGroupSizes
-        .PercentNegativePattern = .NumberNegativePattern
         .CurrencyDecimalSeparator = GetLocaleString(LCID, LOCALE_SMONDECIMALSEP)
         .CurrencyDecimalDigits = GetLocaleLong(LCID, LOCALE_ICURRDIGITS)
         .CurrencyGroupSeparator = GetLocaleString(LCID, LOCALE_SMONTHOUSANDSEP)
@@ -1133,6 +1132,7 @@ Private Sub LoadCommon(ByVal LCID As Long)
         .PositiveInfinitySymbol = CultureTable.GetString(LCID, SPOSITIVEINFINITYSYMBOL)
         .NegativeInfinitySymbol = CultureTable.GetString(LCID, SNEGATIVEINFINITYSYMBOL)
         .PercentPositivePattern = CultureTable.GetNumber(LCID, IPERCENTPOSITIVEPATTERN)
+        .PercentNegativePattern = CultureTable.GetNumber(LCID, IPERCENTNEGATIVEPATTERN)
         .PercentSymbol = CultureTable.GetString(LCID, SPERCENTSYMBOL)
         .PositiveSign = CultureTable.GetString(LCID, SPOSITIVESIGN)
     End With
