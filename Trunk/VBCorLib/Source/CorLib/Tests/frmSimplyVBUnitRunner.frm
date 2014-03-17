@@ -149,7 +149,15 @@ Private Sub Form_Load()
     AddTest New TestResourceSet
     AddTest New TestCaseInsensitiveHCP
     AddTest New TestResourceReader
-    AddTest New ConvertTests
+'    AddTest New ConvertTests
+    Dim ConvertTests As TestSuite
+    Set ConvertTests = Sim.NewTestSuite("Convert Tests")
+    ConvertTests.Add New ToBase64Tests
+    ConvertTests.Add New FromBase64Tests
+    ConvertTests.Add New GeneralFormatTests
+    ConvertTests.Add New ConvertTests
+    AddTest ConvertTests
+    
     AddTest New TestMathExt
     AddTest New TestGuid
     AddTest New TestASCIIEncoding

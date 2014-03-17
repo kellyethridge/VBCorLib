@@ -38,24 +38,6 @@ End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
-        Case "ToBase64String_WithValues_ReturnsExpected"
-            Test.Use "", ""
-            Test.Use "f", "Zg=="
-            Test.Use "fo", "Zm8="
-            Test.Use "foo", "Zm9v"
-            Test.Use "foob", "Zm9vYg=="
-            Test.Use "fooba", "Zm9vYmE="
-            Test.Use "foobar", "Zm9vYmFy"
-            
-        Case "FromBase64String_WithValues_ReturnsExpected"
-            Test.Use "", ""
-            Test.Use "Zg==", "f"
-            Test.Use "Zm8=", "fo"
-            Test.Use "Zm9v", "foo"
-            Test.Use "Zm9vYg==", "foob"
-            Test.Use "Zm9vYmE=", "fooba"
-            Test.Use "Zm9vYmFy", "foobar"
-            
         Case "ToString_WithValuesUsingDefaultFormatting_ReturnsExpected"
             ' String
             Test.Use "", ""
@@ -158,27 +140,27 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 100, "", "100"
             Test.Use &H7FFFFFFF, "", "2147483647"
             Test.Use &H80000000, "", "-2147483648"
-            Test.Use 0, "g", "0"
-            Test.Use 1, "g", "1"
-            Test.Use -1, "g", "-1"
-            Test.Use &H7FFFFFFF, "g", "2147483647"
-            Test.Use &H80000000, "g", "-2147483648"
-            Test.Use 0, "g0", "0"
-            Test.Use 1, "g0", "1"
-            Test.Use -1, "g0", "-1"
-            Test.Use &H7FFFFFFF, "g0", "2147483647"
-            Test.Use &H80000000, "g0", "-2147483648"
-            Test.Use 0, "g1", "0"
-            Test.Use 1, "g1", "1"
-            Test.Use -1, "g1", "-1"
-            Test.Use &H7FFFFFFF, "g1", "2e+09"
-            Test.Use &H80000000, "g1", "-2e+09"
-            Test.Use 0, "g5", "0"
-            Test.Use 1, "g5", "1"
-            Test.Use -1, "g5", "-1"
-            Test.Use &H7FFFFFFF, "g5", "2.1475e+09"
-            Test.Use &H80000000, "g5", "-2.1475e+09"
-            Test.Use 12345, "ggg", "ggg"
+'            Test.Use 0, "g", "0"
+'            Test.Use 1, "g", "1"
+'            Test.Use -1, "g", "-1"
+'            Test.Use &H7FFFFFFF, "g", "2147483647"
+'            Test.Use &H80000000, "g", "-2147483648"
+'            Test.Use 0, "g0", "0"
+'            Test.Use 1, "g0", "1"
+'            Test.Use -1, "g0", "-1"
+'            Test.Use &H7FFFFFFF, "g0", "2147483647"
+'            Test.Use &H80000000, "g0", "-2147483648"
+'            Test.Use 0, "g1", "0"
+'            Test.Use 1, "g1", "1"
+'            Test.Use -1, "g1", "-1"
+'            Test.Use &H7FFFFFFF, "g1", "2e+09"
+'            Test.Use &H80000000, "g1", "-2e+09"
+'            Test.Use 0, "g5", "0"
+'            Test.Use 1, "g5", "1"
+'            Test.Use -1, "g5", "-1"
+'            Test.Use &H7FFFFFFF, "g5", "2.1475e+09"
+'            Test.Use &H80000000, "g5", "-2.1475e+09"
+'            Test.Use 12345, "ggg", "ggg"
             
             ' Currency Format
             Test.Use 1, "c", "$1.00"
@@ -246,48 +228,48 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 
         Case "ToString_WithDoubleUsingFormatting_ReturnsExpected"
             ' General Format
-            Test.Use 0, "g", "0"
-            Test.Use 0, "g1", "0"
-            Test.Use 0, "g5", "0"
-            Test.Use 1, "g", "1"
-            Test.Use 1, "g0", "1"
-            Test.Use 1, "g1", "1"
-            Test.Use 1, "g2", "1"
-            Test.Use 0.1, "g", "0.1"
-            Test.Use 0.1, "g0", "0.1"
-            Test.Use 0.1, "g1", "0.1"
-            Test.Use 0.1, "g2", "0.1"
-            Test.Use 10, "g", "10"
-            Test.Use 10, "g0", "10"
-            Test.Use 10, "g1", "1e+01"
-            Test.Use 10, "g2", "10"
-            Test.Use 123, "g", "123"
-            Test.Use 123, "g0", "123"
-            Test.Use 123, "g1", "1e+02"
-            Test.Use 123, "g2", "1.2e+02"
-            Test.Use 123, "g3", "123"
-            Test.Use 123000, "g", "123000"
-            Test.Use 123000, "g0", "123000"
-            Test.Use 123000, "g1", "1e+05"
-            Test.Use 123000, "g2", "1.2e+05"
-            Test.Use 123000, "g3", "1.23e+05"
-            Test.Use 123000, "g4", "1.23e+05"
-            Test.Use 0.000123, "g", "0.000123"
-            Test.Use 0.000123, "g0", "0.000123"
-            Test.Use 0.000123, "g1", "0.0001"
-            Test.Use 0.000123, "g2", "0.00012"
-            Test.Use 0.000123, "g3", "0.000123"
-            Test.Use 0.000123, "g4", "0.000123"
-            Test.Use 100.001, "g", "100.001"
-            Test.Use 100.001, "g0", "100.001"
-            Test.Use 100.001, "g1", "1e+02"
-            Test.Use 100.001, "g2", "1e+02"
-            Test.Use 100.001, "g3", "100"
-            Test.Use 100.001, "g4", "100"
-            Test.Use 100.001, "g5", "100"
-            Test.Use 100.001, "g6", "100.001"
-            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
-            Test.Use 12345, "g4", "1.235e+04"
+'            Test.Use 0, "g", "0"
+'            Test.Use 0, "g1", "0"
+'            Test.Use 0, "g5", "0"
+'            Test.Use 1, "g", "1"
+'            Test.Use 1, "g0", "1"
+'            Test.Use 1, "g1", "1"
+'            Test.Use 1, "g2", "1"
+'            Test.Use 0.1, "g", "0.1"
+'            Test.Use 0.1, "g0", "0.1"
+'            Test.Use 0.1, "g1", "0.1"
+'            Test.Use 0.1, "g2", "0.1"
+'            Test.Use 10, "g", "10"
+'            Test.Use 10, "g0", "10"
+'            Test.Use 10, "g1", "1e+01"
+'            Test.Use 10, "g2", "10"
+'            Test.Use 123, "g", "123"
+'            Test.Use 123, "g0", "123"
+'            Test.Use 123, "g1", "1e+02"
+'            Test.Use 123, "g2", "1.2e+02"
+'            Test.Use 123, "g3", "123"
+'            Test.Use 123000, "g", "123000"
+'            Test.Use 123000, "g0", "123000"
+'            Test.Use 123000, "g1", "1e+05"
+'            Test.Use 123000, "g2", "1.2e+05"
+'            Test.Use 123000, "g3", "1.23e+05"
+'            Test.Use 123000, "g4", "1.23e+05"
+'            Test.Use 0.000123, "g", "0.000123"
+'            Test.Use 0.000123, "g0", "0.000123"
+'            Test.Use 0.000123, "g1", "0.0001"
+'            Test.Use 0.000123, "g2", "0.00012"
+'            Test.Use 0.000123, "g3", "0.000123"
+'            Test.Use 0.000123, "g4", "0.000123"
+'            Test.Use 100.001, "g", "100.001"
+'            Test.Use 100.001, "g0", "100.001"
+'            Test.Use 100.001, "g1", "1e+02"
+'            Test.Use 100.001, "g2", "1e+02"
+'            Test.Use 100.001, "g3", "100"
+'            Test.Use 100.001, "g4", "100"
+'            Test.Use 100.001, "g5", "100"
+'            Test.Use 100.001, "g6", "100.001"
+'            Test.Use 1.2345E+27, "g28", "1234500000000000000000000000"
+'            Test.Use 12345, "g4", "1.235e+04"
             
             ' Currency Format
             Test.Use 0, "c", "$0.00"
@@ -374,17 +356,17 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             ' General Format
             Test.Use 0!, "", "0"
             Test.Use 12345!, "", "12345"
-            Test.Use 12345!, "g", "12345"
-            Test.Use -12345!, "g", "-12345"
-            Test.Use 1.2345!, "g", "1.2345"
-            Test.Use 0.012345!, "g", "0.012345"
-            Test.Use 1234.568!, "g", "1234.568"
-            Test.Use 1.2345E+25!, "g26", "12345000400000000000000000"
+'            Test.Use 12345!, "g", "12345"
+'            Test.Use -12345!, "g", "-12345"
+'            Test.Use 1.2345!, "g", "1.2345"
+'            Test.Use 0.012345!, "g", "0.012345"
+'            Test.Use 1234.568!, "g", "1234.568"
+'            Test.Use 1.2345E+25!, "g26", "12345000400000000000000000"
             Test.Use 1.2345E-05!, "", "1.2345E-05"
             Test.Use 1.2345E+15!, "", "1.2345E+15"
-            Test.Use 1.2345E-05!, "G", "1.2345E-05"
-            Test.Use 1.2345E+15!, "G", "1.2345E+15"
-            Test.Use 12345!, "g4", "1.235e+04"
+'            Test.Use 1.2345E-05!, "G", "1.2345E-05"
+'            Test.Use 1.2345E+15!, "G", "1.2345E+15"
+'            Test.Use 12345!, "g4", "1.235e+04"
             
             ' Fixed Format
             Test.Use 12345!, "f", "12345.00"
@@ -514,228 +496,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Sub ToBase64String_WithValues_ReturnsExpected(ByVal Source As String, ByVal Expected As String)
-    Dim Actual As String
-    Dim Bytes() As Byte
-    Bytes = StrConv(Source, vbFromUnicode)
-    
-    Actual = Convert.ToBase64String(Bytes)
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub FromBase64String_WithValues_ReturnsExpected(ByVal Source As String, ByVal Expected As String)
-    Dim Actual() As Byte
-    
-    Actual = Convert.FromBase64String(Source)
-    
-    Dim Bytes() As Byte
-    Bytes = StrConv(Expected, vbFromUnicode)
-    Assert.That Actual, Iz.EqualTo(Bytes)
-End Sub
-
-Public Sub ToBase64String_WithAllByteValues_ReturnsAllByteValuesAsBase64()
-    Dim Actual As String
-    
-    Actual = Convert.ToBase64String(AllByteValues)
-    
-    Assert.That Actual, Iz.EqualTo(AllByteValuesAsBase64)
-End Sub
-
-Public Sub FromBase64String_WithAllByteValuesAsBase64_ReturnsAllByteValues()
-    Dim Actual() As Byte
-    
-    Actual = Convert.FromBase64String(AllByteValuesAsBase64)
-    
-    Assert.That Actual, Iz.EqualTo(AllByteValues)
-End Sub
-
-Public Sub ToBase64String_WithAllByteValuesAndInsertLineBreaks_ReturnsAllByteValuesAsBase64WithLineBreaks()
-    Dim Actual As String
-    
-    Actual = Convert.ToBase64String(AllByteValues, InsertLineBreaks:=True)
-    
-    Assert.That Actual, Iz.EqualTo(AllByteValuesAsBase64WithLineBreaks)
-End Sub
-
-Public Sub FromBase64String_WithAllByteValuesAsBase64WithLineBreaks_ReturnsAllByteValues()
-    Dim Actual() As Byte
-    
-    Actual = Convert.FromBase64String(AllByteValuesAsBase64WithLineBreaks)
-    
-    Assert.That Actual, Iz.EqualTo(AllByteValues)
-End Sub
-
-Public Sub ToBase64String_WithNullArray_Throws()
-    Dim Bytes() As Byte
-    
-    On Error Resume Next
-    Convert.ToBase64String Bytes
-    
-    AssertArgumentNullException Err, "InArray"
-End Sub
-
-Public Sub ToBase64String_WithIndexLessThanLBound_Throws()
-    Dim Bytes(1 To 2) As Byte
-    
-    On Error Resume Next
-    Convert.ToBase64String Bytes, 0, 1
-    
-    AssertArgumentOutOfRangeException Err, "Index"
-End Sub
-
-Public Sub ToBase64String_WithLengthLessThanZero_Throws()
-    Dim Bytes(0) As Byte
-    
-    On Error Resume Next
-    Convert.ToBase64String Bytes, 0, -1
-    
-    AssertArgumentOutOfRangeException Err, "Length"
-End Sub
-
-Public Sub ToBase64String_WithIndexAndLengthGreaterThanUBound_Throws()
-    Dim Bytes(0 To 2) As Byte
-    
-    On Error Resume Next
-    Convert.ToBase64String Bytes, 0, 4
-    
-    AssertArgumentOutOfRangeException Err
-End Sub
-
-Public Sub ToBase64CharArray_WithNullInArray_Throws()
-    Dim InArray() As Byte
-    Dim OutArray(0) As Integer
-    
-    On Error Resume Next
-    Convert.ToBase64CharArray InArray, 0, 0, OutArray, 0
-    
-    AssertArgumentNullException Err, "InArray"
-End Sub
-
-Public Sub ToBase64CharArray_WithNullOutArray_Throws()
-    Dim InArray(0) As Byte
-    Dim OutArray() As Integer
-    
-    On Error Resume Next
-    Convert.ToBase64CharArray InArray, 0, 0, OutArray, 0
-    
-    AssertArgumentNullException Err, "OutArray"
-End Sub
-
-Public Sub ToBase64CharArray_WithIndexInLessThanLBound_Throws()
-    Dim InArray(1 To 2) As Byte
-    Dim OutArray(0) As Integer
-    
-    On Error Resume Next
-    Convert.ToBase64CharArray InArray, 0, 0, OutArray, 0
-    
-    AssertArgumentOutOfRangeException Err, "IndexIn"
-End Sub
-
-Public Sub ToBase64CharArray_WithIndexOutLessThanLBound_Throws()
-    Dim InArray(2) As Byte
-    Dim OutArray(1 To 5) As Integer
-    
-    On Error Resume Next
-    
-    Convert.ToBase64CharArray InArray, 0, 1, OutArray, 0
-    
-    AssertArgumentOutOfRangeException Err, "IndexOut"
-End Sub
-
-Public Sub ToBase64CharArray_WithLengthLessThanZero_Throws()
-    Dim InArray(1) As Byte
-    Dim OutArray(1) As Integer
-    
-    On Error Resume Next
-    Convert.ToBase64CharArray InArray, 0, -1, OutArray, 0
-    
-    AssertArgumentOutOfRangeException Err, "Length"
-End Sub
-
-Public Sub ToBase64CharArray_WithIndexInAndLengthGreaterThanUBound_Throws()
-    Dim InArray(1) As Byte
-    Dim OutArray(2) As Integer
-    
-    On Error Resume Next
-    Convert.ToBase64CharArray InArray, 0, 3, OutArray, 0
-    
-    AssertArgumentOutOfRangeException Err, "IndexIn"
-End Sub
-
-Public Sub ToBase64CharArray_WithIndexOutAndLengthGreaterThanUBound_Throws()
-    Dim InArray(2) As Byte
-    Dim OutArray(1) As Integer
-    
-    On Error Resume Next
-    Convert.ToBase64CharArray InArray, 0, 3, OutArray, 0
-    
-    AssertArgumentOutOfRangeException Err, "IndexOut"
-End Sub
-
-Public Sub FromBase64CharArray_WithNullArray_Throws()
-    Dim InArray() As Integer
-    
-    On Error Resume Next
-    Convert.FromBase64CharArray InArray, 0, 0
-    
-    AssertArgumentNullException Err, "InArray"
-End Sub
-
-Public Sub FromBase64CharArray_WithIndexInLessThanLBound_Throws()
-    Dim InArray(1 To 2) As Integer
-    
-    On Error Resume Next
-    Convert.FromBase64CharArray InArray, 0, 0
-    
-    AssertArgumentOutOfRangeException Err, "IndexIn"
-End Sub
-
-Public Sub FromBase64CharArray_WithLengthLessThanZero_Throws()
-    Dim InArray(0) As Integer
-    
-    On Error Resume Next
-    Convert.FromBase64CharArray InArray, 0, -1
-    
-    AssertArgumentOutOfRangeException Err, "Length"
-End Sub
-
-Public Sub FromBase64CharArray_WithIndexInAndLengthGreaterThanUBound_Throws()
-    Dim InArray(2) As Integer
-    
-    On Error Resume Next
-    Convert.FromBase64CharArray InArray, 0, 4
-    
-    AssertArgumentOutOfRangeException Err, "IndexIn"
-End Sub
-
-Public Sub FromBase64String_WithMalformedString_Throws()
-    Const Malformed As String = "Zm9vYg=" ' correct form: Zm9vYg==
-    
-    On Error Resume Next
-    Convert.FromBase64String Malformed
-    
-    AssertFormatException Err
-End Sub
-
-Public Sub FromBase64String_WithTooMuchPadding_Throws()
-    Const Malformed As String = "Zm9vYg===" ' correct form: Zm9vYg==
-    
-    On Error Resume Next
-    Convert.FromBase64String Malformed
-    
-    AssertFormatException Err
-End Sub
-
-Public Sub FromBase64String_WithInvalidCharater_Throws()
-    Const Malformed As String = "Zm9vY.==" ' correct form: Zm9vYg==
-    
-    On Error Resume Next
-    Convert.FromBase64String Malformed
-    
-    AssertFormatException Err
-End Sub
-
 Public Sub ToString_WithValuesUsingDefaultFormatting_ReturnsExpected(ByRef Value As Variant, ByVal Expected As String)
     Dim Actual As String
     
@@ -783,22 +543,22 @@ End Sub
 
 Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected()
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    Info.CurrencyGroupSizes = NewLongs(1, 2, 3)
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.CurrencyGroupSizes = NewLongs(1, 2, 3)
     
-    Actual = Convert.ToString(12345678, "c", Info)
+    Actual = Convert.ToString(12345678, "c", info)
     
     Assert.That Actual, Iz.EqualTo("$12,345,67,8.00")
 End Sub
 
 Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    Info.NumberGroupSizes = NewLongs(2, 3)
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.NumberGroupSizes = NewLongs(2, 3)
     
-    Actual = Convert.ToString(1, "n", Info)
+    Actual = Convert.ToString(1, "n", info)
     
     Assert.That Actual, Iz.EqualTo("1.00")
 End Sub
@@ -821,83 +581,83 @@ End Sub
 
 Public Sub ToString_WithNumberNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As NumberNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    Info.NumberNegativePattern = Pattern
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.NumberNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "n", Info)
+    Actual = Convert.ToString(Value, "n", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCurrencyNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    Info.CurrencyNegativePattern = Pattern
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.CurrencyNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "c", Info)
+    Actual = Convert.ToString(Value, "c", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCurrencyPositivePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyPositivePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    Info.CurrencyPositivePattern = Pattern
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.CurrencyPositivePattern = Pattern
     
-    Actual = Convert.ToString(Value, "c", Info)
+    Actual = Convert.ToString(Value, "c", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithPercentNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As PercentNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    Info.PercentNegativePattern = Pattern
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    info.PercentNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "p", Info)
+    Actual = Convert.ToString(Value, "p", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCustomCurrencyGroupSizes_ReturnsCustomGrouping(ByVal Value As Double, ByRef GroupSizes As Variant, ByVal Expected As String)
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     Dim Groups() As Long
     Groups = GroupSizes
-    Info.CurrencyGroupSizes = Groups
+    info.CurrencyGroupSizes = Groups
     
-    Actual = Convert.ToString(Value, "c", Info)
+    Actual = Convert.ToString(Value, "c", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCustomNumberGroupSizes_ReturnsCustomGrouping(ByVal Value As Double, ByRef GroupSizes As Variant, ByVal Expected As String)
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     Dim Groups() As Long
     Groups = GroupSizes
-    Info.NumberGroupSizes = Groups
+    info.NumberGroupSizes = Groups
     
-    Actual = Convert.ToString(Value, "n", Info)
+    Actual = Convert.ToString(Value, "n", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping(ByVal Value As Variant, ByRef GroupSizes As Variant, ByVal Expected As String)
     Dim Actual As String
-    Dim Info As NumberFormatInfo
-    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Dim info As NumberFormatInfo
+    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     Dim Groups() As Long
     Groups = GroupSizes
-    Info.PercentGroupSizes = Groups
+    info.PercentGroupSizes = Groups
     
-    Actual = Convert.ToString(Value, "p", Info)
+    Actual = Convert.ToString(Value, "p", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
