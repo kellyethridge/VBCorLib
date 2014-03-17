@@ -372,6 +372,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 
         Case "ToString_WithSingleUsingFormatting_ReturnsExpected"
             ' General Format
+            Test.Use 0!, "", "0"
             Test.Use 12345!, "", "12345"
             Test.Use 12345!, "g", "12345"
             Test.Use -12345!, "g", "-12345"
@@ -396,6 +397,58 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1.2345E-04!, "f3", "0.000"
             Test.Use 1.2345E-04!, "f7", "0.0001235"
             Test.Use 1.2345E-04!, "f20", "0.00012345000000000000"
+            
+            ' Scientific Format
+            Test.Use 12345!, "e", "1.234500e+004"
+            Test.Use -12345!, "e4", "-1.2345e+004"
+            Test.Use 12345!, "e3", "1.235e+004"
+            Test.Use 12345!, "e0", "1e+004"
+            Test.Use 12345!, "E1", "1.2E+004"
+            Test.Use 1234500!, "e", "1.234500e+006"
+            Test.Use 1234500!, "e3", "1.235e+006"
+            Test.Use 0.0012345!, "e", "1.234500e-003"
+            Test.Use 0.0012345!, "e3", "1.235e-003"
+            Test.Use 1.2345E-20!, "e7", "1.2345000e-020"
+            
+            ' Number Format
+            Test.Use 1.23!, "n", "1.23"
+            Test.Use 1234.56!, "n", "1,234.56"
+            Test.Use 1234568!, "n", "1,234,568.00"
+            Test.Use 1.234568E+07!, "n", "12,345,680.00"
+            Test.Use 123.45!, "n0", "123"
+            Test.Use 123.4568!, "n8", "123.45680000"
+            Test.Use -123.45!, "n0", "-123"
+            Test.Use 0.00123!, "n", "0.00"
+            Test.Use 0.001235!, "n5", "0.00124"
+            Test.Use 123!, "n", "123.00"
+            Test.Use 1.231231E+20!, "n5", "123,123,100,000,000,000,000.00000"
+            
+            ' Currency Format
+            Test.Use 1.23!, "c", "$1.23"
+            Test.Use 1234.56!, "c", "$1,234.56"
+            Test.Use 1234568!, "c", "$1,234,568.00"
+            Test.Use 1.234568E+07!, "c", "$12,345,680.00"
+            Test.Use 123.45!, "c0", "$123"
+            Test.Use 123.4568!, "c8", "$123.45680000"
+            Test.Use -123.45!, "c0", "($123)"
+            Test.Use 0.00123!, "c", "$0.00"
+            Test.Use 0.001235!, "c5", "$0.00124"
+            Test.Use 123!, "c", "$123.00"
+            Test.Use 1.231231E+20!, "c5", "$123,123,100,000,000,000,000.00000"
+            
+            ' Percentage Format
+            Test.Use 0!, "p", "0.00 %"
+            Test.Use 1.23!, "p", "123.00 %"
+            Test.Use 1234.56!, "p", "123,456.00 %"
+            Test.Use 1234568!, "p", "123,456,800.00 %"
+            Test.Use 1.234568E+07!, "p", "1,234,568,000.00 %"
+            Test.Use 123.45!, "p0", "12,345 %"
+            Test.Use 123.4568!, "p8", "12,345.68000000 %"
+            Test.Use -123.45!, "p0", "-12,345 %"
+            Test.Use 0.00123!, "p", "0.12 %"
+            Test.Use 0.001235!, "p3", "0.124 %"
+            Test.Use 123!, "p", "12,300.00 %"
+            Test.Use 1.231231E+20!, "p5", "12,312,310,000,000,000,000,000.00000 %"
 
         Case "ToString_WithNumberNegativePattern_ReturnsExpected"
             Test.Use -1, NumberNegativePatterns.[- n], "- 1.00"
@@ -453,17 +506,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1234567890#, NewLongs(), "1234567890.00"
             
         Case "ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping"
-'    Info.PercentGroupSizes = NewLongs(1, 2, 3)
-'    Assert.AreEqual "1,234,567,89,1.00 %", Info.Format(12345678.91, "p")
-'
-'    Info.PercentGroupSizes = NewLongs(1, 2, 1, 0)
-'    Assert.AreEqual "1234567,8,91,2.00 %", Info.Format(123456789.12, "p")
-'
-'    Info.PercentGroupSizes = cArray.CreateInstance(vbLong)
-'    Assert.AreEqual "123456789000 %", Info.Format(1234567890#, "p0")
             Test.Use 12345678.91, NewLongs(1, 2, 3), "1,234,567,89,1.00 %"
             Test.Use 123456789.12, NewLongs(1, 2, 1, 0), "1234567,8,91,2.00 %"
             Test.Use 1234567890#, NewLongs(), "123456789000.00 %"
+            Test.Use 1.234568E+07!, NewLongs(1, 2, 3), "1,234,568,00,0.00 %"
+            
     End Select
 End Sub
 
@@ -842,7 +889,7 @@ Public Sub ToString_WithCustomNumberGroupSizes_ReturnsCustomGrouping(ByVal Value
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping(ByVal Value As Double, ByRef GroupSizes As Variant, ByVal Expected As String)
+Public Sub ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping(ByVal Value As Variant, ByRef GroupSizes As Variant, ByVal Expected As String)
     Dim Actual As String
     Dim Info As NumberFormatInfo
     Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
@@ -855,7 +902,7 @@ Public Sub ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping(ByVal V
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub ToString_WithNotANumber_ReturnsNAN()
+Public Sub ToString_WithDoubleNotANumber_ReturnsNaN()
     Dim d As Double
     On Error Resume Next
     d = 0# / 0#
@@ -867,7 +914,7 @@ Public Sub ToString_WithNotANumber_ReturnsNAN()
     Assert.That Actual, Iz.EqualTo("NaN")
 End Sub
 
-Public Sub ToString_WithPositiveInfinity_ReturnsInfinity()
+Public Sub ToString_WithDoublePositiveInfinity_ReturnsInfinity()
     Dim d As Double
     On Error Resume Next
     d = 1# / 0#
@@ -879,7 +926,7 @@ Public Sub ToString_WithPositiveInfinity_ReturnsInfinity()
     Assert.That Actual, Iz.EqualTo("Infinity")
 End Sub
 
-Public Sub ToString_WithNegativeInfinity_ReturnMinusInfinity()
+Public Sub ToString_WithDoubleNegativeInfinity_ReturnNegativeInfinity()
     Dim d As Double
     On Error Resume Next
     d = -1# / 0#
@@ -903,6 +950,43 @@ errTrap:
     Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception type caught."
 End Sub
+
+Public Sub ToString_WithSingleNotANumber_ReturnsNaN()
+    Dim d As Single
+    On Error Resume Next
+    d = 0! / 0!
+    On Error GoTo 0
+    
+    Dim Actual As String
+    Actual = Convert.ToString(d)
+    
+    Assert.That Actual, Iz.EqualTo("NaN")
+End Sub
+
+Public Sub ToString_WithSingleAsPositiveInfinity_ReturnsInfinity()
+    Dim d As Single
+    On Error Resume Next
+    d = 1! / 0!
+    On Error GoTo 0
+    
+    Dim Actual As String
+    Actual = Convert.ToString(d)
+    
+    Assert.That Actual, Iz.EqualTo("Infinity")
+End Sub
+
+Public Sub ToString_WithSingleAsNegativeInfinity_ReturnsNegativeInfinity()
+    Dim d As Single
+    On Error Resume Next
+    d = -1! / 0!
+    On Error GoTo 0
+    
+    Dim Actual As String
+    Actual = Convert.ToString(d)
+    
+    Assert.That Actual, Iz.EqualTo("-Infinity")
+End Sub
+
 
 
 Private Function MakeImaginary(ByVal Value As Double) As Double
