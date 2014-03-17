@@ -245,11 +245,6 @@ Private Sub Form_Load()
     AddTest New TestRandom
     AddTest New TestBitConverter
     
-    Dim NumberFormatInfoTests As TestSuite
-    Set NumberFormatInfoTests = Sim.NewTestSuite("NumberFormatInfo Tests")
-    NumberFormatInfoTests.Add New TestNumberFormatInfoSng
-    AddTest NumberFormatInfoTests
-    
     'AddTest New TestWeakReference
     AddTest New TestHashTable
     AddTest New TestBuffer

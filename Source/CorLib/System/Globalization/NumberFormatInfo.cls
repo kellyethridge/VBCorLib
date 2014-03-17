@@ -1192,10 +1192,16 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
             FormatGeneralDouble mNumber.Precision, FormatType - 2
         
         Case PercentFormat
-            If FormatPrecision < 0 Then FormatPrecision = mProps.PercentDecimalDigits
-            mNumber.DecimalPosition = mNumber.DecimalPosition + 2
-            Call RoundNumber(FormatPrecision + mNumber.DecimalPosition)
-            Call FormatPercent(FormatPrecision)
+            If FormatPrecision = UnknownPrecision Then
+                FormatPrecision = mProps.PercentDecimalDigits
+            End If
+            
+            If mNumber.Precision > 0 Then
+                mNumber.DecimalPosition = mNumber.DecimalPosition + 2
+            End If
+            
+            RoundNumber FormatPrecision + mNumber.DecimalPosition
+            FormatPercent FormatPrecision
 
         Case Else
             If Value < 0 Then
@@ -1522,7 +1528,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             mOutputPos = mOutputPos + 1
         End If
 
-        If (DigitIndex = 0 Or ch <> vbTerminator) Or (DigitIndex < .Precision And ch = vbTerminator) Then
+        If (DigitIndex = 0 Or ch <> vbTerminator) Or (DigitIndex < .DecimalPosition And ch = vbTerminator) Then
             Dim GroupSizeIndex As Long
             
             If HasGroups Then
