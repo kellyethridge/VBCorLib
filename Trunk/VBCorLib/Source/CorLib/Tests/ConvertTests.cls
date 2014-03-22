@@ -17,25 +17,6 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
 
-Private Const AllByteValuesAsBase64 As String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmqq6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
-Private Const AllByteValuesAsBase64WithLineBreaks As String = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUmJygpKissLS4vMDEyMzQ1Njc4" & vbCrLf & _
-                                                              "OTo7PD0+P0BBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZWltcXV5fYGFiY2RlZmdoaWprbG1ub3Bx" & vbCrLf & _
-                                                              "cnN0dXZ3eHl6e3x9fn+AgYKDhIWGh4iJiouMjY6PkJGSk5SVlpeYmZqbnJ2en6ChoqOkpaanqKmq" & vbCrLf & _
-                                                              "q6ytrq+wsbKztLW2t7i5uru8vb6/wMHCw8TFxsfIycrLzM3Oz9DR0tPU1dbX2Nna29zd3t/g4eLj" & vbCrLf & _
-                                                              "5OXm5+jp6uvs7e7v8PHy8/T19vf4+fr7/P3+/w=="
-
-Private AllByteValues() As Byte
-
-Public Sub FixtureSetup()
-    Set Thread.CurrentThread.CurrentCulture = Cor.NewCultureInfo("en-US", False)
-    
-    ReDim AllByteValues(0 To 255)
-    Dim i As Long
-    For i = 0 To 255
-        AllByteValues(i) = i
-    Next
-End Sub
-
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "ToString_WithValuesUsingDefaultFormatting_ReturnsExpected"
@@ -93,6 +74,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             ' VBA
             Test.Use Empty, "Empty"
             Test.Use Null, "Null"
+            
+        Case "ToString_WithIntegerUsingFormat_ReturnsExpected"
+            Test.Use -1, "x", "ffff"
+            Test.Use -1, "X", "FFFF"
+            Test.Use &H8000, "x", "8000"
             
         Case "ToString_WithNumberNegativePattern_ReturnsExpected"
             Test.Use -1, NumberNegativePatterns.[- n], "- 1.00"
@@ -274,6 +260,14 @@ Public Sub ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping(ByVal V
     info.PercentGroupSizes = Groups
     
     Actual = Convert.ToString(Value, "p", info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithIntegerUsingFormat_ReturnsExpected(ByVal Value As Integer, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Convert.ToString(Value, Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
