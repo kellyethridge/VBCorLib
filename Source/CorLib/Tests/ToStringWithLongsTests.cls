@@ -111,6 +111,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 255, "X", "FF"
             Test.Use 255, "X4", "00FF"
             Test.Use -1, "x", "ffffffff"
+            Test.Use &H8000, "x", "ffff8000"
             
         Case "ToString_WithLongsUsingDefaultFormat_ReturnsExpected"
             Test.Use 0&, "0"
