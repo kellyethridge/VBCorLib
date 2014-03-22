@@ -157,7 +157,7 @@ Private Sub Form_Load()
     ConvertTests.Add New FromBase64Tests
     ConvertTests.Add New ToStringWithLongsTests
     ConvertTests.Add New ToStringWithDoublesTests
-    
+    ConvertTests.Add New ToStringWithSinglesTests
 
     ConvertTests.Add New ConvertTests
     AddTest ConvertTests
