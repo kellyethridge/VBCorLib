@@ -43,13 +43,12 @@ Option Explicit
 '
 Public Function GetOptionalLong(ByRef OptionalValue As Variant, ByVal DefaultValue As Long) As Long
     Select Case VarType(OptionalValue)
-        ' A missing value will be a vbError inside of the Variant.
-        Case vbError:                   GetOptionalLong = DefaultValue
+        Case vbMissing
+            GetOptionalLong = DefaultValue
         
-        ' We only allow optional values to be integer datatypes.
-        Case vbLong, vbInteger, vbByte: GetOptionalLong = OptionalValue
+        Case vbLong, vbInteger, vbByte
+            GetOptionalLong = OptionalValue
         
-        ' Throw an exception for an unsupported datatype.
         Case Else
             Throw Cor.NewArgumentException("The Optional value must be an integer type.")
     End Select
