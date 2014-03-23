@@ -305,7 +305,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
             ToString = "Empty"
         Case vbNull
             ToString = "Null"
-        Case vbOptional
+        Case vbMissing
             Exit Function
         Case Else
             ToString = Value
