@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "ConvertTests"
+Attribute VB_Name = "ToStringWithValuesTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -147,7 +147,7 @@ End Sub
 Public Sub ToString_WithValuesUsingDefaultFormatting_ReturnsExpected(ByRef Value As Variant, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = Convert.ToString(Value)
+    Actual = ToString(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -155,7 +155,7 @@ End Sub
 Public Sub ToString_WithFormattable_SuppliesFormatInformation()
     Dim Mock As New MockFormattable
     
-    Convert.ToString Mock, "ab"
+    ToString Mock, "ab"
     
     Dim Actual As String
     Actual = Mock.Format
@@ -166,7 +166,7 @@ Public Sub ToString_WithFormattable_SuppliesProvider()
     Dim Mock As New MockFormattable
     Dim Provider As New NumberFormatInfo
     
-    Convert.ToString Mock, , Provider
+    ToString Mock, , Provider
     
     Dim Actual As IFormatProvider
     Set Actual = Mock.Provider
@@ -176,7 +176,7 @@ End Sub
 Public Sub ToString_WithMissingValue_ReturnsEmptyString()
     Dim Actual As String
     
-    Actual = Convert.ToString(Missing)
+    Actual = ToString(Missing)
     
     Assert.That Actual, Iz.Empty
 End Sub
@@ -187,7 +187,7 @@ Public Sub ToString_WithNumberNegativePattern_ReturnsExpected(ByVal Value As Var
     Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     info.NumberNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "n", info)
+    Actual = ToString(Value, "n", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -198,7 +198,7 @@ Public Sub ToString_WithCurrencyNegativePattern_ReturnsExpected(ByVal Value As V
     Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     info.CurrencyNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "c", info)
+    Actual = ToString(Value, "c", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -209,7 +209,7 @@ Public Sub ToString_WithCurrencyPositivePattern_ReturnsExpected(ByVal Value As V
     Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     info.CurrencyPositivePattern = Pattern
     
-    Actual = Convert.ToString(Value, "c", info)
+    Actual = ToString(Value, "c", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -220,7 +220,7 @@ Public Sub ToString_WithPercentNegativePattern_ReturnsExpected(ByVal Value As Va
     Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     info.PercentNegativePattern = Pattern
     
-    Actual = Convert.ToString(Value, "p", info)
+    Actual = ToString(Value, "p", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -233,7 +233,7 @@ Public Sub ToString_WithCustomCurrencyGroupSizes_ReturnsCustomGrouping(ByVal Val
     Groups = GroupSizes
     info.CurrencyGroupSizes = Groups
     
-    Actual = Convert.ToString(Value, "c", info)
+    Actual = ToString(Value, "c", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -246,7 +246,7 @@ Public Sub ToString_WithCustomNumberGroupSizes_ReturnsCustomGrouping(ByVal Value
     Groups = GroupSizes
     info.NumberGroupSizes = Groups
     
-    Actual = Convert.ToString(Value, "n", info)
+    Actual = ToString(Value, "n", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -259,7 +259,7 @@ Public Sub ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping(ByVal V
     Groups = GroupSizes
     info.PercentGroupSizes = Groups
     
-    Actual = Convert.ToString(Value, "p", info)
+    Actual = ToString(Value, "p", info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -267,7 +267,7 @@ End Sub
 Public Sub ToString_WithIntegerUsingFormat_ReturnsExpected(ByVal Value As Integer, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = Convert.ToString(Value, Format)
+    Actual = ToString(Value, Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

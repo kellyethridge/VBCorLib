@@ -152,15 +152,18 @@ Private Sub Form_Load()
     
 '    AddTest New ConvertTests
     Dim ConvertTests As TestSuite
-    Set ConvertTests = Sim.NewTestSuite("Convert Tests")
+    Set ConvertTests = Sim.NewTestSuite("Converter Tests")
     ConvertTests.Add New ToBase64Tests
     ConvertTests.Add New FromBase64Tests
-    ConvertTests.Add New ToStringWithLongsTests
-    ConvertTests.Add New ToStringWithDoublesTests
-    ConvertTests.Add New ToStringWithSinglesTests
-
-    ConvertTests.Add New ConvertTests
     AddTest ConvertTests
+    
+    Dim FormattingTests As TestSuite
+    Set FormattingTests = Sim.NewTestSuite("Formatting Tests")
+    FormattingTests.Add New ToStringWithLongsTests
+    FormattingTests.Add New ToStringWithDoublesTests
+    FormattingTests.Add New ToStringWithSinglesTests
+    FormattingTests.Add New ToStringWithValuesTests
+    AddTest FormattingTests
     
     AddTest New TestMathExt
     AddTest New TestGuid
