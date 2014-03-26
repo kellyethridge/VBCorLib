@@ -116,7 +116,7 @@ End Sub
 Public Sub ToString_WithSinglesUsingFormat_ReturnsExpected(ByVal Value As Single, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = Convert.ToString(Value, Format)
+    Actual = ToString(Value, Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -124,7 +124,7 @@ End Sub
 Public Sub ToString_WithSinglesUsingDefaultFormat_ReturnsExpected(ByVal Value As Single, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = Convert.ToString(Value)
+    Actual = ToString(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -136,7 +136,7 @@ Public Sub ToString_WithSingleNotANumber_ReturnsNaN()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = Convert.ToString(d)
+    Actual = ToString(d)
     
     Assert.That Actual, Iz.EqualTo("NaN")
 End Sub
@@ -148,7 +148,7 @@ Public Sub ToString_WithSingleAsPositiveInfinity_ReturnsInfinity()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = Convert.ToString(d)
+    Actual = ToString(d)
     
     Assert.That Actual, Iz.EqualTo("Infinity")
 End Sub
@@ -160,7 +160,7 @@ Public Sub ToString_WithSingleAsNegativeInfinity_ReturnsNegativeInfinity()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = Convert.ToString(d)
+    Actual = ToString(d)
     
     Assert.That Actual, Iz.EqualTo("-Infinity")
 End Sub
