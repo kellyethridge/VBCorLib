@@ -269,47 +269,8 @@ End Function
 ' @param Provider A formatting provider to help custom formatting.
 ' @return A string representation of the value.
 '
-Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByRef Provider As IFormatProvider) As String
-    Dim vt As Long
-    vt = VarType(Value)
-    If vt = vbVariant Then
-        vt = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
-    End If
-    
-    Select Case vt
-        Case vbLong, vbInteger, vbByte, vbDouble, vbSingle
-            Dim nf As NumberFormatInfo
-            If Not Provider Is Nothing Then Set nf = Provider.GetFormat("numberformatinfo")
-            If nf Is Nothing Then Set nf = NumberFormatInfo.CurrentInfo
-            ToString = nf.Format(Value, Format)
-        Case vbDate
-            Dim df As DateTimeFormatInfo
-            If Not Provider Is Nothing Then Set df = Provider.GetFormat("datetimeformatinfo")
-            If df Is Nothing Then Set df = DateTimeFormatInfo.CurrentInfo
-            ToString = df.Format(Value, Format)
-        Case vbObject
-            If Value Is Nothing Then
-                ToString = ""
-            ElseIf TypeOf Value Is IFormattable Then
-                Dim f As IFormattable
-                Set f = Value
-                ToString = f.ToString(Format, Provider)
-            ElseIf TypeOf Value Is IObject Then
-                Dim o As IObject
-                Set o = Value
-                ToString = o.ToString
-            Else
-                ToString = TypeName(Value)
-            End If
-        Case vbEmpty
-            ToString = "Empty"
-        Case vbNull
-            ToString = "Null"
-        Case vbMissing
-            Exit Function
-        Case Else
-            ToString = Value
-    End Select
+Public Function ToString(ByRef Value As Variant, Optional ByRef Provider As IFormatProvider) As String
+    ToString = modFormattable.ToString(Value, , Provider)
 End Function
 
 
