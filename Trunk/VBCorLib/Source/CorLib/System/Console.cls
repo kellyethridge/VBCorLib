@@ -1244,7 +1244,7 @@ Private Sub InternalWriteLine(ByRef Args() As Variant)
     
     ub = UBound(Args)
     
-    If ub >= 0 Then s = Convert.ToString(Args(0))
+    If ub >= 0 Then s = ToString(Args(0))
     If ub > 0 Then
         Dim i As Long
         For i = 1 To ub

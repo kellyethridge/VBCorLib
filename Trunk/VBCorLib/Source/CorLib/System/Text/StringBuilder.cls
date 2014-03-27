@@ -804,7 +804,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                     ' We distinguish between a null string and an empty string.
                     ' Null string indicates that the value was not formatted.
                     If StrPtr(s) = vbNullPtr Then
-                        s = Convert.ToString(Args(ArgIndex), ArgFormatting, Provider)
+                        s = modFormattable.ToString(Args(ArgIndex), ArgFormatting, Provider)
                     End If
                     
                     ' Add leading padding.

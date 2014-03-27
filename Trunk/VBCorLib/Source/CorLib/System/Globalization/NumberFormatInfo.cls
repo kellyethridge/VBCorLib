@@ -357,7 +357,7 @@ End Function
 ' @remarks Negative infinity is achieved by dividing a negative
 ' number by zero. The default is "-Infinity".
 Public Property Get NegativeInfinitySymbol() As String
-    Call VerifyLoaded
+    VerifyLoaded
     NegativeInfinitySymbol = mProps.NegativeInfinitySymbol
 End Property
 
@@ -368,8 +368,8 @@ End Property
 ' @remarks Negative infinity is achieved by dividing a negative
 ' number by zero. The default is "-Infinity".
 Public Property Let NegativeInfinitySymbol(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.NegativeInfinitySymbol = RHS
 End Property
 
@@ -391,8 +391,8 @@ End Property
 ' @remarks Positive infinity is achieved by dividing a positive
 ' number by zero. The default is "Infinity".
 Public Property Let PositiveInfinitySymbol(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PositiveInfinitySymbol = RHS
 End Property
 
@@ -407,7 +407,7 @@ End Property
 ' For example, if an investment grows from a number P=13.00 to a number A=22.50,
 ' then A is 22.50/13.00=1.7308 times as much as P, or 1730.8‰.
 Public Property Get PerMilleSymbol() As String
-    Call VerifyLoaded
+    VerifyLoaded
     PerMilleSymbol = mProps.PerMilleSymbol
 End Property
 
@@ -422,8 +422,8 @@ End Property
 ' For example, if an investment grows from a number P=13.00 to a number A=22.50,
 ' then A is 22.50/13.00=1.7308 times as much as P, or 1730.8‰.
 Public Property Let PerMilleSymbol(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PerMilleSymbol = RHS
 End Property
 
@@ -434,7 +434,7 @@ End Property
 ' @remarks Not-A-Number is achieved by dividing zero by zero. The default
 ' NaN symbol is "NaN".
 Public Property Get NaNSymbol() As String
-    Call VerifyLoaded
+    VerifyLoaded
     NaNSymbol = mProps.NaNSymbol
 End Property
 
@@ -445,8 +445,8 @@ End Property
 ' @remarks Not-A-Number is achieved by dividing zero by zero. The default
 ' NaN symbol is "NaN".
 Public Property Let NaNSymbol(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.NaNSymbol = RHS
 End Property
 
@@ -463,8 +463,8 @@ End Property
 '
 ' @param RHS The new decimal symbol.
 Public Property Let PercentDecimalSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PercentDecimalSeparator = RHS
 End Property
 
@@ -483,7 +483,7 @@ End Property
 ' value, then the formatted value will be padded with zeros.</p>
 ' <p>The default number of digits is 2.</p>
 Public Property Get PercentDecimalDigits() As Long
-    Call VerifyLoaded
+    VerifyLoaded
     PercentDecimalDigits = mProps.PercentDecimalDigits
 End Property
 
@@ -501,8 +501,8 @@ End Property
 ' value, then the formatted value will be padded with zeros.</p>
 ' <p>The default number of digits is 2.</p>
 Public Property Let PercentDecimalDigits(ByVal RHS As Long)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     If RHS < 0 Or RHS > 99 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99), "PercentDecimalDigits", RHS)
         
@@ -522,7 +522,7 @@ End Property
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
 Public Property Get PercentGroupSizes() As Variant
-    Call VerifyLoaded
+    VerifyLoaded
     PercentGroupSizes = mProps.PercentGroupSizes
 End Property
 
@@ -539,12 +539,12 @@ End Property
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
 Public Property Let PercentGroupSizes(ByRef RHS As Variant)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     If cArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "PercentGroupSizes")
     
-    Call VerifyGroupSizes(RHS)
+    VerifyGroupSizes RHS
     mProps.PercentGroupSizes = RHS
 End Property
 
@@ -554,7 +554,7 @@ End Property
 ' @return Then negative number pattern to be used in formating negative numbers.
 '
 Public Property Get PercentNegativePattern() As PercentNegativePatterns
-    Call VerifyLoaded
+    VerifyLoaded
     PercentNegativePattern = mProps.PercentNegativePattern
 End Property
 
@@ -564,8 +564,8 @@ End Property
 ' @param RHS The pattern to be used.
 '
 Public Property Let PercentNegativePattern(ByVal RHS As PercentNegativePatterns)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PercentNegativePattern = RHS
 End Property
 
@@ -577,7 +577,7 @@ End Property
 ' different cultures may use different symbols.
 '
 Public Property Get PercentGroupSeparator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     PercentGroupSeparator = mProps.PercentGroupSeparator
 End Property
 
@@ -587,8 +587,8 @@ End Property
 ' @param RHS The symbol used as a group separator defined by the group sizes.
 '
 Public Property Let PercentGroupSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PercentGroupSeparator = RHS
 End Property
 
@@ -598,7 +598,7 @@ End Property
 ' @return The percent symbole, usually '%'.
 '
 Public Property Get PercentSymbol() As String
-    Call VerifyLoaded
+    VerifyLoaded
     PercentSymbol = mProps.PercentSymbol
 End Property
 
@@ -608,8 +608,8 @@ End Property
 ' @param RHS The symbol to be used in percent formatted numbers.
 '
 Public Property Let PercentSymbol(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PercentSymbol = RHS
 End Property
 
@@ -619,7 +619,7 @@ End Property
 ' @return The pattern used in formatting positive percent numbers.
 '
 Public Property Get PercentPositivePattern() As PercentPositivePatterns
-    Call VerifyLoaded
+    VerifyLoaded
     PercentPositivePattern = mProps.PercentPositivePattern
 End Property
 
@@ -629,8 +629,8 @@ End Property
 ' @param RHS The pattern to be used.
 '
 Public Property Let PercentPositivePattern(ByVal RHS As PercentPositivePatterns)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PercentPositivePattern = RHS
 End Property
 
@@ -640,7 +640,7 @@ End Property
 ' @return The decimal separator character.
 '
 Public Property Get CurrencyDecimalSeparator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     CurrencyDecimalSeparator = mProps.CurrencyDecimalSeparator
 End Property
 
@@ -650,8 +650,8 @@ End Property
 ' @param RHS The decimal separator to be used in formatting.
 '
 Public Property Let CurrencyDecimalSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.CurrencyDecimalSeparator = RHS
 End Property
 
@@ -661,7 +661,7 @@ End Property
 ' @return The default number of digits after the decimal separator.
 '
 Public Property Get CurrencyDecimalDigits() As Long
-    Call VerifyLoaded
+    VerifyLoaded
     CurrencyDecimalDigits = mProps.CurrencyDecimalDigits
 End Property
 
@@ -671,8 +671,8 @@ End Property
 ' @param RHS The default number of digits to be shown after the decimal separator.
 '
 Public Property Let CurrencyDecimalDigits(ByVal RHS As Long)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     If RHS < 0 Or RHS > 99 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99), "CurrencyDecimalDigits", RHS)
     mProps.CurrencyDecimalDigits = RHS
@@ -713,8 +713,6 @@ Public Property Let CurrencyGroupSizes(ByRef RHS() As Long)
     If cArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "CurrencyGroupSizes")
     
-'    VerifyGroupSizes RHS
-'    mProps.CurrencyGroupSizes = RHS
     VerifyAndSetGroupSizes RHS, mProps.CurrencyGroupSizes
 End Property
 
@@ -724,7 +722,7 @@ End Property
 ' @return The negative pattern used.
 '
 Public Property Get CurrencyNegativePattern() As CurrencyNegativePatterns
-    Call VerifyLoaded
+    VerifyLoaded
     CurrencyNegativePattern = mProps.CurrencyNegativePattern
 End Property
 
@@ -734,8 +732,8 @@ End Property
 ' @param RHS The pattern to be used when formatting.
 '
 Public Property Let CurrencyNegativePattern(ByVal RHS As CurrencyNegativePatterns)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.CurrencyNegativePattern = RHS
 End Property
 
@@ -747,7 +745,7 @@ End Property
 ' parts of the world, a comma is not used.
 '
 Public Property Get CurrencyGroupSeparator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     CurrencyGroupSeparator = mProps.CurrencyGroupSeparator
 End Property
 
@@ -759,8 +757,8 @@ End Property
 ' parts of the world, a comma is not used.
 '
 Public Property Let CurrencyGroupSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.CurrencyGroupSeparator = RHS
 End Property
 
@@ -772,7 +770,7 @@ End Property
 ' of the world, other symbols are used.
 '
 Public Property Get CurrencySymbol() As String
-    Call VerifyLoaded
+    VerifyLoaded
     CurrencySymbol = mProps.CurrencySymbol
 End Property
 
@@ -784,8 +782,8 @@ End Property
 ' of the world, other symbols are used.
 '
 Public Property Let CurrencySymbol(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.CurrencySymbol = RHS
 End Property
 
@@ -795,7 +793,7 @@ End Property
 ' @return The formatting pattern for positive currency values.
 '
 Public Property Get CurrencyPositivePattern() As CurrencyPositivePatterns
-    Call VerifyLoaded
+    VerifyLoaded
     CurrencyPositivePattern = mProps.CurrencyPositivePattern
 End Property
 
@@ -805,8 +803,8 @@ End Property
 ' @param RHS The formatting pattern to be used with positive currency values.
 '
 Public Property Let CurrencyPositivePattern(ByVal RHS As CurrencyPositivePatterns)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.CurrencyPositivePattern = RHS
 End Property
 
@@ -817,7 +815,7 @@ End Property
 ' This is typically a comma.
 '
 Public Property Get NumberGroupSeparator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     NumberGroupSeparator = mProps.NumberGroupSeparator
 End Property
 
@@ -828,8 +826,8 @@ End Property
 ' This is typically a comma.
 '
 Public Property Let NumberGroupSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.NumberGroupSeparator = RHS
 End Property
 
@@ -839,7 +837,7 @@ End Property
 ' @return The pattern to be used.
 '
 Public Property Get NumberNegativePattern() As NumberNegativePatterns
-    Call VerifyLoaded
+    VerifyLoaded
     NumberNegativePattern = mProps.NumberNegativePattern
 End Property
 
@@ -849,8 +847,8 @@ End Property
 ' @param RHS The new pattern to be used.
 '
 Public Property Let NumberNegativePattern(ByVal RHS As NumberNegativePatterns)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     If RHS < 0 Or RHS > 4 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "NumberNegativePattern", RHS)
     mProps.NumberNegativePattern = RHS
@@ -869,7 +867,7 @@ End Property
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
 Public Property Get NumberGroupSizes() As Variant
-    Call VerifyLoaded
+    VerifyLoaded
     NumberGroupSizes = mProps.NumberGroupSizes
 End Property
 
@@ -886,12 +884,12 @@ End Property
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
 Public Property Let NumberGroupSizes(ByRef RHS As Variant)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     If cArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "NumberGroupSizes")
     
-    Call VerifyGroupSizes(RHS)
+    VerifyGroupSizes RHS
     mProps.NumberGroupSizes = RHS
 End Property
 
@@ -901,7 +899,7 @@ End Property
 ' @return The number of digits to be appended after the decimal point if one is used.
 '
 Public Property Get NumberDecimalDigits() As Long
-    Call VerifyLoaded
+    VerifyLoaded
     NumberDecimalDigits = mProps.NumberDecimalDigits
 End Property
 
@@ -911,8 +909,8 @@ End Property
 ' @param RHS The number of digits to be appended after the decimal point.
 '
 Public Property Let NumberDecimalDigits(ByVal RHS As Long)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     If RHS < 0 Or RHS > 99 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99), "NumberDecimalDigits", RHS)
     mProps.NumberDecimalDigits = RHS
@@ -924,7 +922,7 @@ End Property
 ' @return The decimal point character.
 '
 Public Property Get NumberDecimalSeparator() As String
-    Call VerifyLoaded
+    VerifyLoaded
     NumberDecimalSeparator = mProps.NumberDecimalSeparator
 End Property
 
@@ -934,8 +932,8 @@ End Property
 ' @param RHS The new character to be used as the decimal point.
 '
 Public Property Let NumberDecimalSeparator(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.NumberDecimalSeparator = RHS
 End Property
 
@@ -945,7 +943,7 @@ End Property
 ' @return The current negative symbol.
 '
 Public Property Get NegativeSign() As String
-    Call VerifyLoaded
+    VerifyLoaded
     NegativeSign = mProps.NegativeSign
 End Property
 
@@ -955,8 +953,8 @@ End Property
 ' @param RHS The new negative symbol.
 '
 Public Property Let NegativeSign(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.NegativeSign = RHS
 End Property
 
@@ -966,7 +964,7 @@ End Property
 ' @return The current positive symbol.
 '
 Public Property Get PositiveSign() As String
-    Call VerifyLoaded
+    VerifyLoaded
     PositiveSign = mProps.PositiveSign
 End Property
 
@@ -976,40 +974,10 @@ End Property
 ' @param RHS The new positive symbol.
 '
 Public Property Let PositiveSign(ByRef RHS As String)
-    Call VerifyWritable
-    Call VerifyLoaded
+    VerifyWritable
+    VerifyLoaded
     mProps.PositiveSign = RHS
 End Property
-
-''
-' Format a numeric value with the proper formatting applied to the
-' value type. Bytes, Integer, and Longs are formatted as Longs. singles and
-' Doubles are formatted individually.
-'
-' @param value The numeric value to be formatte to the string representation.
-' @param fmt The formatting to perform on the value.
-' @return The formatted value as a string.
-'
-Public Function Format(ByRef Value As Variant, Optional ByRef FormatText As String) As String
-    VerifyLoaded
-    
-    Dim vt As Long
-    vt = VarType(Value)
-    If vt = vbVariant Then
-        vt = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
-    End If
-    
-    Select Case vt
-        Case vbLong, vbInteger, vbByte
-            Format = FormatInt32(Value, FormatText)
-        Case vbDouble
-            Format = FormatDouble(Value, FormatText)
-        Case vbSingle
-            Format = FormatSingle(Value, FormatText)
-        Case Else
-            Format = Value
-    End Select
-End Function
 
 ''
 ' Returns a format provider of the requested type.
@@ -1053,6 +1021,27 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function Format(ByRef Value As Variant, Optional ByRef FormatText As String) As String
+    VerifyLoaded
+    
+    Dim vt As Long
+    vt = VarType(Value)
+    If vt = vbVariant Then
+        vt = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
+    End If
+    
+    Select Case vt
+        Case vbLong, vbInteger, vbByte
+            Format = FormatInt32(Value, FormatText)
+        Case vbDouble
+            Format = FormatDouble(Value, FormatText)
+        Case vbSingle
+            Format = FormatSingle(Value, FormatText)
+        Case Else
+            Format = Value
+    End Select
+End Function
+
 Friend Sub CloneHelper(ByRef props As PropsType)
     mProps = props
     mLoaded = True
@@ -1062,19 +1051,19 @@ Friend Sub Load(ByVal LCID As Long, ByVal UseUserOverride As Boolean)
     If Not CultureTable.IsLoaded Then _
         Throw Cor.NewNotSupportedException("Cannot load NumberFormatInfo without culture table.")
     
-    Call LoadCommon(LCID)
+    LoadCommon LCID
     
     If UseUserOverride Then
-        Call LoadUserOverride(LCID)
+        LoadUserOverride LCID
     Else
-        Call LoadFromCultureTable(LCID)
+        LoadFromCultureTable LCID
     End If
     mLoaded = True
 End Sub
 
 Private Sub VerifyLoaded()
     If mLoaded Then Exit Sub
-    Call Load(INVARIANT_LCID, False)
+    Load INVARIANT_LCID, False
 End Sub
 
 
@@ -1160,24 +1149,27 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
     GetFormatSpecifierParts Format, FormatType, FormatPrecision
 
     If ((FormatType And &HFFDF) <> GeneralFormat) And (FormatType <> CustomFormat) Then
-        Call DoubleToNumber(Value, DefaultSinglePrecision)
+        DoubleToNumber Value, DefaultSinglePrecision
         If Not IsValidNumber(FormatSingle) Then Exit Function
         If Value = 0! Then mNumber.Precision = 0
     End If
 
     Select Case FormatType And &HFFDF
-        Case FixedFormat:               Call FormatFixedDouble(FormatPrecision)
-        Case ExponentFormat:            Call FormatScientific(FormatPrecision, FormatType)
-        Case DecimalFormat, HexFormat:  Call Throw(Cor.NewFormatException("Invalid format specifier."))
-        Case NumberFormat:              Call FormatNumber(FormatPrecision)
-        Case CurrencyFormat:            Call FormatCurrency(FormatPrecision)
+        Case FixedFormat:               FormatFixedDouble FormatPrecision
+        Case ExponentFormat:            FormatScientific FormatPrecision, FormatType
+        Case DecimalFormat, HexFormat:  Throw Cor.NewFormatException("Invalid format specifier.")
+        Case NumberFormat:              FormatNumber FormatPrecision
+        Case CurrencyFormat:            FormatCurrency FormatPrecision
         
         Case GeneralFormat
-            If FormatPrecision < 0 Then FormatPrecision = DefaultSinglePrecision
+            If FormatPrecision < 0 Then
+                FormatPrecision = DefaultSinglePrecision
+            End If
             
             DoubleToNumber Value, FormatPrecision
             
-            If Not IsValidNumber(FormatSingle) Then Exit Function
+            If Not IsValidNumber(FormatSingle) Then _
+                Exit Function
             
             If mNumber.Digits(0) = vbZero Then
                 FormatSingle = "0"
@@ -1237,11 +1229,11 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
     End If
     
     Select Case FormatType And &HFFDF
-        Case FixedFormat:               Call FormatFixedDouble(FormatPrecision)
-        Case ExponentFormat:            Call FormatScientific(FormatPrecision, FormatType)
-        Case DecimalFormat, HexFormat:  Call Throw(Cor.NewFormatException("Invalid format specifier."))
-        Case NumberFormat:              Call FormatNumber(FormatPrecision)
-        Case CurrencyFormat:            Call FormatCurrency(FormatPrecision)
+        Case FixedFormat:               FormatFixedDouble FormatPrecision
+        Case ExponentFormat:            FormatScientific FormatPrecision, FormatType
+        Case DecimalFormat, HexFormat:  Throw Cor.NewFormatException("Invalid format specifier.")
+        Case NumberFormat:              FormatNumber FormatPrecision
+        Case CurrencyFormat:            FormatCurrency FormatPrecision
         
         Case GeneralFormat
             If FormatPrecision = UnknownPrecision Or FormatPrecision = 0 Then
@@ -1384,8 +1376,8 @@ Private Sub FormatNumber(ByVal FormatPrecision As Long)
     
     mFormatSpecifier.SA.pvData = StrPtr(Pattern)
     
-    Dim i As Long
-    Dim ch As Integer
+    Dim i   As Long
+    Dim ch  As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
             ch = mFormatSpecifier.Data(i)
@@ -1416,8 +1408,8 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
     
     mFormatSpecifier.SA.pvData = StrPtr(Pattern)
     
-    Dim i As Long
-    Dim ch As Integer
+    Dim i   As Long
+    Dim ch  As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
             ch = mFormatSpecifier.Data(i)
@@ -1443,8 +1435,8 @@ Private Sub FormatPercent(ByVal DecimalPlaces As Long)
     
     mFormatSpecifier.SA.pvData = StrPtr(Pattern)
     
-    Dim i As Long
-    Dim ch As Integer
+    Dim i   As Long
+    Dim ch  As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
             ch = mFormatSpecifier.Data(i)
@@ -1606,11 +1598,10 @@ End Sub
 ' alpha characters that are in the output string.
 '
 Private Sub FormatHex(ByRef Value As Variant, ByRef Specifiers As Specifiers)
-    Dim Digits As Long
-    Dim CaseOffset As Long
-    
-    Dim ch As Integer
-    Dim HexValue As Long
+    Dim Digits      As Long
+    Dim CaseOffset  As Long
+    Dim ch          As Integer
+    Dim HexValue    As Long
     
     ' This is to allow negative vbInteger values to
     ' remain at 4 hex characters instead of being
@@ -1663,7 +1654,9 @@ End Sub
 Private Sub FormatDecimal(ByVal TotalDigits As Long)
     With mNumber
         ' Add the negative sign if necessary.
-        If .IsNegative Then Call AppendString(mProps.NegativeSign)
+        If .IsNegative Then
+            AppendString mProps.NegativeSign
+        End If
         
         ' Insert the leading zeros until we reach the first digit.
         Do While TotalDigits > .Precision
@@ -1826,8 +1819,8 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
                         
                         FormatPrecision = 0   ' we need to reset this because it's a ByRef variable.
                         
-                        Dim ch As Long
-                        Dim i As Long
+                        Dim ch  As Long
+                        Dim i   As Long
                         For i = 1 To FormatLength - 1
                             ch = .Data(i)
                             
@@ -1877,9 +1870,9 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                             Exit Function
                         End If
                         
-                        Dim Precision As Long
-                        Dim ch As Long
-                        Dim i As Long
+                        Dim Precision   As Long
+                        Dim ch          As Long
+                        Dim i           As Long
                         For i = 1 To FormatLength - 1
                             ch = .Data(i)
                             
@@ -1970,7 +1963,9 @@ Private Sub Int32ToNumber(ByVal Value As Long)
             .Digits(DigitIndex) = (Value - (OneTenth * 10)) + vbZero
             Value = OneTenth
         Loop
-        If IsMaxNeg Then .Digits(.Precision - 1) = vbEight
+        If IsMaxNeg Then
+            .Digits(.Precision - 1) = vbEight
+        End If
     End With
 End Sub
 
@@ -2119,8 +2114,8 @@ Private Sub FormatFixedDouble(ByVal FormatPrecision As Long)
     
     RoundNumber FormatPrecision + mNumber.DecimalPosition
     
-    Dim i As Long
-    Dim ch As Integer
+    Dim i   As Long
+    Dim ch  As Integer
     With mNumber
         If .IsNegative Then
             AppendString mProps.NegativeSign
@@ -2177,7 +2172,7 @@ Private Sub AppendString(ByRef StringToAppend As String)
             Next i
         End With
     Else
-        Call CopyMemory(mOutput(mOutputPos), ByVal StrPtr(StringToAppend), StringToAppendLength * 2)
+        CopyMemory mOutput(mOutputPos), ByVal StrPtr(StringToAppend), StringToAppendLength * 2
     End If
     
     mOutputPos = mOutputPos + StringToAppendLength
@@ -2281,8 +2276,11 @@ Private Sub VerifyGroupSizes(ByRef Arr As Variant)
     ub = UBound(Arr)
     For i = 0 To ub
         Select Case Arr(i)
-            Case Is < 0, Is > 9:    Throw Cor.NewArgumentException("Group sizes must be between 0 and 9.")
-            Case 0:                 If i < ub Then Throw Cor.NewArgumentException("Only last group size can be 0.")
+            Case Is < 0, Is > 9
+                Throw Cor.NewArgumentException("Group sizes must be between 0 and 9.")
+            Case 0
+                If i < ub Then _
+                    Throw Cor.NewArgumentException("Only last group size can be 0.")
         End Select
     Next i
 End Sub
@@ -2307,11 +2305,11 @@ End Sub
 
 Private Sub WriteLongArray(ByRef a() As Long, ByVal Name As String, ByVal bag As PropertyBag)
     With bag
-        Call .WriteProperty(Name & "_Count", UBound(a) + 1)
+        .WriteProperty Name & "_Count", UBound(a) + 1
         
         Dim i As Long
         For i = 0 To UBound(a)
-            Call .WriteProperty(Name & "_" & i, a(i))
+            .WriteProperty Name & "_" & i, a(i)
         Next i
     End With
 End Sub
@@ -2329,19 +2327,22 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call InitPatterns
+    InitPatterns
     
     With mNumber.DigitsSA
         .cbElements = 1
         .cDims = 1
         .cElements = 128
     End With
+    
     mPtrNumberBuffer = CoTaskMemAlloc(40)
-    If mPtrNumberBuffer = 0 Then Throw New OutOfMemoryException
+    If mPtrNumberBuffer = vbNullPtr Then _
+        Throw New OutOfMemoryException
+    
     SAPtr(mNumber.Digits) = VarPtr(mNumber.DigitsSA)
     
-    Call InitWordBuffer(mAppendStringBuffer, 0, 128)
-    Call InitWordBuffer(mFormatSpecifier, 0, 128)
+    InitWordBuffer mAppendStringBuffer, 0, 128
+    InitWordBuffer mFormatSpecifier, 0, 128
 End Sub
 
 Private Sub Class_InitProperties()
@@ -2383,37 +2384,37 @@ End Sub
 
 Private Sub Class_Terminate()
     SAPtr(mNumber.Digits) = 0
-    Call CoTaskMemFree(mPtrNumberBuffer)
+    CoTaskMemFree mPtrNumberBuffer
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With mProps
-        Call PropBag.WriteProperty(PROP_CURRENCYDECIMALDIGITS, .CurrencyDecimalDigits)
-        Call PropBag.WriteProperty(PROP_CURRENCYDECIMALSEPARATOR, .CurrencyDecimalSeparator)
-        Call PropBag.WriteProperty(PROP_CURRENcYGROUPSEPARATOR, .CurrencyGroupSeparator)
-        Call WriteLongArray(.CurrencyGroupSizes, PROP_CURRENCYGROUPSIZES, PropBag)
-        Call PropBag.WriteProperty(PROP_CURRENCYNEGATIVEPATTERN, .CurrencyNegativePattern)
-        Call PropBag.WriteProperty(PROP_CURRENCYPOSITIVEPATTERN, .CurrencyPositivePattern)
-        Call PropBag.WriteProperty(PROP_CURRENCYSYMBOL, .CurrencySymbol)
-        Call PropBag.WriteProperty(PROP_NANSYMBOL, .NaNSymbol)
-        Call PropBag.WriteProperty(PROP_NEGATIVEINFINITYSYMBOL, .NegativeInfinitySymbol)
-        Call PropBag.WriteProperty(PROP_NEGATIVESIGN, .NegativeSign)
-        Call PropBag.WriteProperty(PROP_NUMBERDECIMALDIGITS, .NumberDecimalDigits)
-        Call PropBag.WriteProperty(PROP_NUMBERDECIMALSEPARATOR, .NumberDecimalSeparator)
-        Call PropBag.WriteProperty(PROP_NUMBERGROUPSEPARATOR, .NumberGroupSeparator)
-        Call WriteLongArray(.NumberGroupSizes, PROP_NUMBERGROUPSIZES, PropBag)
-        Call PropBag.WriteProperty(PROP_NUMBERNEGATIVEPATTERN, .NumberNegativePattern)
-        Call PropBag.WriteProperty(PROP_PERCENTDECIMALDIGITS, .PercentDecimalDigits)
-        Call PropBag.WriteProperty(PROP_PERCENTDECIMALSEPARATOR, .PercentDecimalSeparator)
-        Call PropBag.WriteProperty(PROP_PERCENTGROUPSEPARATOR, .PercentGroupSeparator)
-        Call WriteLongArray(.PercentGroupSizes, PROP_PERCENTGROUPSIZES, PropBag)
-        Call PropBag.WriteProperty(PROP_PERCENTNEGATIVEPATTERN, .PercentNegativePattern)
-        Call PropBag.WriteProperty(PROP_PERCENTPOSITIVEPATTERN, .PercentPositivePattern)
-        Call PropBag.WriteProperty(PROP_PERCENTSYMBOL, .PercentSymbol)
-        Call PropBag.WriteProperty(PROP_PERMILLESYMBOL, .PerMilleSymbol)
-        Call PropBag.WriteProperty(PROP_POSITIVEINFINITYSYMBOL, .PositiveInfinitySymbol)
-        Call PropBag.WriteProperty(PROP_POSITIVESIGN, .PositiveSign)
-        Call PropBag.WriteProperty(PROP_ISREADONLY, .IsReadOnly)
+        PropBag.WriteProperty PROP_CURRENCYDECIMALDIGITS, .CurrencyDecimalDigits
+        PropBag.WriteProperty PROP_CURRENCYDECIMALSEPARATOR, .CurrencyDecimalSeparator
+        PropBag.WriteProperty PROP_CURRENcYGROUPSEPARATOR, .CurrencyGroupSeparator
+        WriteLongArray .CurrencyGroupSizes, PROP_CURRENCYGROUPSIZES, PropBag
+        PropBag.WriteProperty PROP_CURRENCYNEGATIVEPATTERN, .CurrencyNegativePattern
+        PropBag.WriteProperty PROP_CURRENCYPOSITIVEPATTERN, .CurrencyPositivePattern
+        PropBag.WriteProperty PROP_CURRENCYSYMBOL, .CurrencySymbol
+        PropBag.WriteProperty PROP_NANSYMBOL, .NaNSymbol
+        PropBag.WriteProperty PROP_NEGATIVEINFINITYSYMBOL, .NegativeInfinitySymbol
+        PropBag.WriteProperty PROP_NEGATIVESIGN, .NegativeSign
+        PropBag.WriteProperty PROP_NUMBERDECIMALDIGITS, .NumberDecimalDigits
+        PropBag.WriteProperty PROP_NUMBERDECIMALSEPARATOR, .NumberDecimalSeparator
+        PropBag.WriteProperty PROP_NUMBERGROUPSEPARATOR, .NumberGroupSeparator
+        WriteLongArray .NumberGroupSizes, PROP_NUMBERGROUPSIZES, PropBag
+        PropBag.WriteProperty PROP_NUMBERNEGATIVEPATTERN, .NumberNegativePattern
+        PropBag.WriteProperty PROP_PERCENTDECIMALDIGITS, .PercentDecimalDigits
+        PropBag.WriteProperty PROP_PERCENTDECIMALSEPARATOR, .PercentDecimalSeparator
+        PropBag.WriteProperty PROP_PERCENTGROUPSEPARATOR, .PercentGroupSeparator
+        WriteLongArray .PercentGroupSizes, PROP_PERCENTGROUPSIZES, PropBag
+        PropBag.WriteProperty PROP_PERCENTNEGATIVEPATTERN, .PercentNegativePattern
+        PropBag.WriteProperty PROP_PERCENTPOSITIVEPATTERN, .PercentPositivePattern
+        PropBag.WriteProperty PROP_PERCENTSYMBOL, .PercentSymbol
+        PropBag.WriteProperty PROP_PERMILLESYMBOL, .PerMilleSymbol
+        PropBag.WriteProperty PROP_POSITIVEINFINITYSYMBOL, .PositiveInfinitySymbol
+        PropBag.WriteProperty PROP_POSITIVESIGN, .PositiveSign
+        PropBag.WriteProperty PROP_ISREADONLY, .IsReadOnly
     End With
 End Sub
 
