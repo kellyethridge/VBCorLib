@@ -1,4 +1,4 @@
-Attribute VB_Name = "modTickerHelper"
+Attribute VB_Name = "modTicker"
 '    CopyRight (c) 2005 Kelly Ethridge
 '
 '    This file is part of VBCorLib.
@@ -27,20 +27,36 @@ Option Explicit
 
 Private Const WM_TIMER As Long = &H113
 
-''
-' Holds object pointers to all the running Ticker objects.
-' This is so the RaiseElapsed function can be called on the
-' Ticker object associated with the idEvent.
-' The TimerID (idEvent) is used as the key.
-Public Tickers As New Hashtable
+Private mTickers As New Hashtable
+
+
+Public Function StartTicker(ByVal Source As Ticker) As Long
+    Dim NewId As Long
+    
+    NewId = SetTimer(vbNullPtr, vbNullPtr, Source.Interval, AddressOf TickerCallback)
+    
+    If NewId = 0 Then _
+        IOError Err.LastDllError
+    
+    mTickers(NewId) = ObjPtr(CUnk(Source))
+    StartTicker = NewId
+End Function
+
+Public Sub StopTicker(ByVal TimerId As Long)
+    If KillTimer(vbNullPtr, TimerId) = BOOL_FALSE Then
+        IOError Err.LastDllError
+    End If
+        
+    mTickers.Remove TimerId
+End Sub
 
 ''
 ' Callback procedure used by the SetTimer method.
 '
-Public Sub TickerCallback(ByVal hwnd As Long, ByVal uMsg As Long, ByVal idEvent As Long, ByVal dwTime As Long)
+Private Sub TickerCallback(ByVal hwnd As Long, ByVal uMsg As Long, ByVal idEvent As Long, ByVal dwTime As Long)
     If uMsg = WM_TIMER Then
         Dim ObjectPointer As Variant
-        ObjectPointer = Tickers(idEvent)
+        ObjectPointer = mTickers(idEvent)
         
         If Not IsEmpty(ObjectPointer) Then
             ' We do the weak reference this way so that
@@ -62,11 +78,11 @@ Public Sub TickerCallback(ByVal hwnd As Long, ByVal uMsg As Long, ByVal idEvent 
             ' it to be set to Nothing and attempt to decrement the ref count.
             ObjectPtr(Unk) = vbNullPtr
             
-            Call Ticker.RaiseElapsed
+            Ticker.OnElapsed
         Else
             ' If we get here, then a timer is still running
             ' but we aren't tracking it, so kill it now.
-            Call KillTimer(vbNullPtr, idEvent)
+            KillTimer vbNullPtr, idEvent
         End If
     End If
 End Sub

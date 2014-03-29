@@ -78,14 +78,12 @@ Implements IObject
 '
 Public Event Elapsed(ByRef Data As Variant)
 
-
 Private mInterval   As Long
 Private mAutoReset  As Boolean
-Private mTimerID    As Long
+Private mTimerId    As Long
 Private mData       As Variant
 Private mDelegator  As FunctionDelegator
 Private mCallback   As ITwoArgReturnVoid
-
 
 
 ''
@@ -96,7 +94,7 @@ Private mCallback   As ITwoArgReturnVoid
 ' a developer to associate values to the Ticker if needed.
 '
 Public Property Get Data() As Variant
-    Call VariantCopy(Data, mData)
+    VariantCopy Data, mData
 End Property
 
 ''
@@ -106,8 +104,8 @@ End Property
 ' @remarks The data is not used by the Ticker. It is to allow
 ' a developer to associate values to the Ticker if needed.
 '
-Public Property Let Data(ByVal RHS As Variant)
-    mData = RHS
+Public Property Let Data(ByVal Value As Variant)
+    mData = Value
 End Property
 
 ''
@@ -117,8 +115,8 @@ End Property
 ' @remarks The data is not used by the Ticker. It is to allow
 ' a developer to associate values to the Ticker if needed.
 '
-Public Property Set Data(ByVal RHS As Variant)
-    Set mData = RHS
+Public Property Set Data(ByVal Value As Variant)
+    Set mData = Value
 End Property
 
 ''
@@ -153,10 +151,9 @@ End Property
 ' </pre>
 ' The two parameters must be declared as ByRef.
 '
-Public Property Let Callback(ByVal RHS As Long)
-    mDelegator.pfn = RHS
+Public Property Let Callback(ByVal Value As Long)
+    mDelegator.pfn = Value
 End Property
-
 
 ''
 ' Returns if the Ticker event will be recurring.
@@ -180,8 +177,8 @@ End Property
 ' for another event to occur.
 ' <p>The default is True.</p>
 '
-Public Property Let AutoReset(ByVal RHS As Boolean)
-    mAutoReset = RHS
+Public Property Let AutoReset(ByVal Value As Boolean)
+    mAutoReset = Value
 End Property
 
 ''
@@ -202,12 +199,14 @@ End Property
 ' @remarks If the Ticker is already running, it will be reset
 ' and begin a new duration with the new interval.
 '
-Public Property Let Interval(ByVal RHS As Long)
-    If RHS < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Interval", RHS)
+Public Property Let Interval(ByVal Value As Long)
+    If Value < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Interval", Value)
         
-    mInterval = RHS
-    If Enabled Then Call StartTicker
+    mInterval = Value
+    If Enabled Then
+        StartTicker
+    End If
 End Property
 
 ''
@@ -216,7 +215,7 @@ End Property
 ' @return If the Ticker is running.
 '
 Public Property Get Enabled() As Boolean
-    Enabled = (mTimerID <> 0)
+    Enabled = (mTimerId <> 0)
 End Property
 
 ''
@@ -226,11 +225,11 @@ End Property
 ' @remarks If setting Enabled to True and the Ticker is already
 ' running, then the Ticker will be stopped and restarted.
 '
-Public Property Let Enabled(ByVal RHS As Boolean)
-    If RHS = True Then
-        Call StartTicker
+Public Property Let Enabled(ByVal Value As Boolean)
+    If Value Then
+        StartTicker
     Else
-        Call StopTicker
+        StopTicker
     End If
 End Property
 
@@ -241,15 +240,10 @@ End Property
 ' A new full interval will be elapsed before the next event occurs.
 '
 Public Sub StartTicker()
-    Call StopTicker
+    StopTicker
     
     If mInterval > 0 Then
-        mTimerID = SetTimer(vbNullPtr, vbNullPtr, mInterval, AddressOf TickerCallback)
-        If mTimerID = 0 Then IOError Err.LastDllError
-        
-        ' Set a weak callback reference that the timer event can use
-        ' to call the RaiseElapsed function from the callback method.
-        Tickers(mTimerID) = ObjPtr(CUnk(Me))
+        mTimerId = modTicker.StartTicker(Me)
     End If
 End Sub
 
@@ -257,13 +251,9 @@ End Sub
 ' Stops the Ticker if it is running.
 '
 Public Sub StopTicker()
-    If Not Enabled Then Exit Sub
-    
-    Dim t As Long
-    t = mTimerID
-    mTimerID = 0
-    If KillTimer(vbNullPtr, t) = BOOL_FALSE Then IOError Err.LastDllError
-    Call Tickers.Remove(t)
+    If Enabled Then
+        modTicker.StopTicker mTimerId
+    End If
 End Sub
 
 ''
@@ -299,16 +289,22 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interfacek
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub RaiseElapsed()
-    If Not mAutoReset Then StopTicker
+Friend Sub OnElapsed()
+    If Not mAutoReset Then
+        StopTicker
+    End If
+    
     RaiseEvent Elapsed(mData)
-    If mDelegator.pfn <> vbNullPtr Then Call mCallback.Call(VarPtr(Me), VarPtr(mData))
+    
+    If mDelegator.pfn <> vbNullPtr Then
+        mCallback.Call VarPtr(Me), VarPtr(mData)
+    End If
 End Sub
 
 Friend Sub Init(ByVal Interval As Long, ByVal Data As Variant, ByVal AutoReset As Long, ByVal AddressOfCallback As Long)
     Me.Interval = Interval
     Me.AutoReset = AutoReset
-    Call Helper.MoveVariant(mData, Data)
+    Helper.MoveVariant mData, Data
     Me.Callback = AddressOfCallback
 End Sub
 
@@ -322,7 +318,7 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
-    Call StopTicker
+    StopTicker
 End Sub
 
 
