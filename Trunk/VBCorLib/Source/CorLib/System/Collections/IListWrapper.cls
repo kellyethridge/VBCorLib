@@ -50,8 +50,8 @@ Private mComparer   As IComparer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal list As IList)
-    Set mList = list
+Friend Sub Init(ByVal List As IList)
+    Set mList = List
 End Sub
 
 
@@ -59,19 +59,31 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub QuickSortList(ByVal Left As Long, ByVal Right As Long)
-    Dim i As Long, j As Long, x As Variant
+    Dim i As Long
+    Dim j As Long
+    Dim x As Variant
+    
     Do While Left < Right
-        i = Left: j = Right: Call Helper.MoveVariant(x, mList((i + j) \ 2))
+        i = Left
+        j = Right
+        Helper.MoveVariant x, mList((i + j) \ 2)
+        
         Do
-            Do While mComparer.Compare(mList(i), x) < 0: i = i + 1: Loop
-            Do While mComparer.Compare(mList(j), x) > 0: j = j - 1: Loop
+            Do While mComparer.Compare(mList(i), x) < 0
+                i = i + 1
+            Loop
+            Do While mComparer.Compare(mList(j), x) > 0
+                j = j - 1
+            Loop
+            
             If i > j Then Exit Do
+            
             If i < j Then
                 Dim t1 As Variant
                 Dim t2 As Variant
                 
-                Call Helper.MoveVariant(t1, mList(i))
-                Call Helper.MoveVariant(t2, mList(j))
+                Helper.MoveVariant t1, mList(i)
+                Helper.MoveVariant t2, mList(j)
                 
                 If IsObject(t1) Then
                     Set mList(j) = t1
@@ -86,25 +98,30 @@ Private Sub QuickSortList(ByVal Left As Long, ByVal Right As Long)
                 End If
             End If
                 
-            i = i + 1: j = j - 1
+            i = i + 1
+            j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call QuickSortList(Left, j)
+            If Left < j Then
+                QuickSortList Left, j
+            End If
             Left = i
         Else
-            If i < Right Then Call QuickSortList(i, Right)
+            If i < Right Then
+                QuickSortList i, Right
+            End If
             Right = j
         End If
     Loop
 End Sub
 
-Private Sub InsertItems(ByVal Index As Long, c As Variant)
-    Dim v As Variant
+Private Sub InsertItems(ByVal Index As Long, Items As Variant)
+    Dim Item As Variant
     
-    For Each v In c
-        Call mList.Insert(Index, v)
+    For Each Item In Items
+        mList.Insert Index, Item
         Index = Index + 1
-    Next v
+    Next
 End Sub
 
 
@@ -184,22 +201,23 @@ End Function
 Private Sub ArrayList_CopyTo(DstArray As Variant, Optional ArrayIndex As Variant)
     Dim Index As Long
     Index = GetOptionalLong(ArrayIndex, 0)
-    
-    Call mList.CopyTo(DstArray, Index)
+    mList.CopyTo DstArray, Index
 End Sub
 
 Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
     Dim Result As Long
     Result = VerifyListRange(mList.Count, Index, Count)
-    If Result Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    If Result Then _
+        ThrowListRangeException Result, Index, "Index", Count, "Count"
     Result = VerifyArrayRange(GetArrayPointer(DstArray, False), ArrayIndex, Count)
-    If Result Then Call ThrowArrayRangeException(Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count")
+    If Result Then _
+        ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
     
     Dim v As Variant
     Dim i As Long
     
     For i = 0 To Count - 1
-        Call Helper.MoveVariant(v, mList(Index + i))
+        Helper.MoveVariant v, mList(Index + i)
         If IsObject(v) Then
             Set DstArray(ArrayIndex + i) = v
         Else
@@ -221,10 +239,11 @@ Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, O
     Dim ElemIndex   As Long
     Dim Result      As Long
     Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex)
     
     Dim Ret As New ArrayListEnumerator
-    Call Ret.Init(Me, ElemIndex, ElemCount)
+    Ret.Init Me, ElemIndex, ElemCount
     Set ArrayList_GetEnumerator = Ret
 End Function
 
@@ -235,11 +254,12 @@ End Function
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
     Dim Result As Long
     Result = VerifyListRange(mList.Count, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, Index, "Index", Count, "Count"
     
     Dim Ret As RangedArrayList
     Set Ret = New RangedArrayList
-    Call Ret.Init(Me, Index, Count)
+    Ret.Init Me, Index, Count
     Set ArrayList_GetRange = Ret
 End Function
 
@@ -248,7 +268,8 @@ Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex A
     Dim ElemIndex   As Long
     Dim Result      As Long
     Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex)
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
@@ -266,22 +287,22 @@ Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex A
 End Function
 
 Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)
-    Call mList.Insert(Index, Value)
+    mList.Insert Index, Value
 End Sub
 
 Private Sub ArrayList_InsertRange(ByVal Index As Long, c As Variant)
     If IsArray(c) Then
-        Call InsertItems(Index, c)
+        InsertItems Index, c
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
             Throw New ArgumentNullException
             
         If TypeOf c Is ICollection Then
-            Call InsertItems(Index, c)
+            InsertItems Index, c
         ElseIf TypeOf c Is IEnumerable Then
-            Call InsertItems(Index, c)
+            InsertItems Index, c
         ElseIf TypeOf c Is Collection Then
-            Call InsertItems(Index, c)
+            InsertItems Index, c
         Else
             Throw Cor.NewArgumentException("Only arrays, ICollection, Collection, and IEnumerable objects are supported.")
         End If
@@ -307,7 +328,7 @@ Private Property Let ArrayList_Item(ByVal Index As Long, RHS As Variant)
 End Property
 
 Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(ArrayList_Item, mList(Index))
+    Helper.MoveVariant ArrayList_Item, mList(Index)
 End Property
 
 Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
@@ -315,7 +336,8 @@ Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartInd
     Dim ElemIndex   As Long
     Dim Result      As Long
     Result = GetOptionalListRangeReverse(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex))
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex)
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
@@ -337,21 +359,22 @@ Private Function ArrayList_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub ArrayList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    Call mList.Remove(Value, Comparer)
+    mList.Remove Value, Comparer
 End Sub
 
 Private Sub ArrayList_RemoveAt(ByVal Index As Long)
-    Call mList.RemoveAt(Index)
+    mList.RemoveAt Index
 End Sub
 
 Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
     Dim Result As Long
     Result = VerifyListRange(mList.Count, Index, Count)
-    If Result Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    If Result Then _
+        ThrowListRangeException Result, Index, "Index", Count, "Count"
     
     Dim i As Long
     For i = 1 To Count
-        Call mList.RemoveAt(Index)
+        mList.RemoveAt Index
     Next i
 End Sub
 
@@ -360,7 +383,8 @@ Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Co
     Dim ElemIndex   As Long
     Dim Result      As Long
     Result = GetOptionalListRange(mList.Count, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
 
     Dim t1 As Variant
     Dim t2 As Variant
@@ -371,8 +395,8 @@ Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Co
     j = ElemIndex + ElemCount - 1
     
     Do While i < j
-        Call Helper.MoveVariant(t1, mList(i))
-        Call Helper.MoveVariant(t2, mList(j))
+        Helper.MoveVariant t1, mList(i)
+        Helper.MoveVariant t2, mList(j)
         
         If IsObject(t1) Then
             Set mList(j) = t1
@@ -393,17 +417,17 @@ End Sub
 
 Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
     If IsArray(c) Then
-        Call SetRange(Index, c)
+        SetRange Index, c
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
             Throw New ArgumentNullException
             
         If TypeOf c Is ICollection Then
-            Call SetRange(Index, c)
+            SetRange Index, c
         ElseIf TypeOf c Is IEnumerable Then
-            Call SetRange(Index, c)
+            SetRange Index, c
         ElseIf TypeOf c Is Collection Then
-            Call SetRange(Index, c)
+            SetRange Index, c
         Else
             Throw Cor.NewArgumentException("Only arrays, ICollection, Collection, and IEnumerable objects are supported.")
         End If
@@ -430,7 +454,8 @@ Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef 
     Dim ElemIndex   As Long
     Dim Result      As Long
     Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex))
+    If Result <> NO_ERROR Then _
+        ThrowListRangeException Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex)
         
     If Comparer Is Nothing Then
         Set mComparer = VBCorLib.Comparer.Default
@@ -438,15 +463,12 @@ Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef 
         Set mComparer = Comparer
     End If
     
-    Call QuickSortList(ElemIndex, ElemIndex + ElemCount - 1)
+    QuickSortList ElemIndex, ElemIndex + ElemCount - 1
 End Sub
 
 Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
-    Dim Ret As Variant
-    Ret = cArray.CreateInstance(ArrayType, mList.Count)
-    Call mList.CopyTo(Ret, 0)
-    
-    ArrayList_ToArray = Ret
+    ArrayList_ToArray = cArray.CreateInstance(ArrayType, mList.Count)
+    Call mList.CopyTo(ArrayList_ToArray, 0)
 End Function
 
 Private Function ArrayList_ToString() As String
@@ -490,7 +512,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call ArrayList_CopyTo(Arr, Index)
+    ArrayList_CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
@@ -526,7 +548,7 @@ Private Function IList_Add(Value As Variant) As Long
 End Function
 
 Private Sub IList_Clear()
-    Call ArrayList_Clear
+    ArrayList_Clear
 End Sub
 
 Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
@@ -534,7 +556,7 @@ Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As ICo
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call ArrayList_CopyTo(Arr, Index)
+    ArrayList_CopyTo Arr, Index
 End Sub
 
 Private Property Get IList_Count() As Long
@@ -550,7 +572,7 @@ Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As ICom
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
-    Call ArrayList_Insert(Index, Value)
+    ArrayList_Insert Index, Value
 End Sub
 
 Private Property Get IList_IsFixedSize() As Boolean
@@ -570,7 +592,7 @@ Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(IList_Item, ArrayList_Item(Index))
+    Helper.MoveVariant IList_Item, ArrayList_Item(Index)
 End Property
 
 Private Function IList_NewEnum() As stdole.IUnknown
@@ -578,11 +600,11 @@ Private Function IList_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    Call ArrayList_Remove(Value, Comparer)
+    ArrayList_Remove Value, Comparer
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)
-    Call ArrayList_RemoveAt(Index)
+    ArrayList_RemoveAt Index
 End Sub
 
 

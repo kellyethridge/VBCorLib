@@ -57,9 +57,9 @@ Private mCount      As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal list As ArrayList, ByVal Index As Long, ByVal Count As Long)
-    Set mList = list
-    mVersion = list.Version
+Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
+    Set mList = List
+    mVersion = List.Version
     mIndex = Index
     mCount = Count
 End Sub
