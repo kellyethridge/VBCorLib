@@ -202,9 +202,9 @@ End Function
 '
 ' @see ArgumentNullException
 '
-Public Function NewArgumentNullException(ByVal Message As String, Optional ByVal ParamName As String, Optional ByVal InnerException As Exception) As ArgumentNullException
+Public Function NewArgumentNullException(Optional ByVal ParamName As String, Optional ByVal Message As String, Optional ByVal InnerException As Exception) As ArgumentNullException
     Set NewArgumentNullException = New ArgumentNullException
-    Call NewArgumentNullException.Init(Message, ParamName, InnerException)
+    NewArgumentNullException.Init Message, ParamName, InnerException
 End Function
 
 ''
@@ -362,9 +362,9 @@ End Function
 ' @param capacity An initial list size.
 ' @return A new SortedList object with the specific initializations.
 '
-Public Function NewSortedList(Optional ByVal list As IDictionary, Optional ByVal Comparer As IComparer, Optional ByVal Capacity As Long = 16) As SortedList
+Public Function NewSortedList(Optional ByVal List As IDictionary, Optional ByVal Comparer As IComparer, Optional ByVal Capacity As Long = 16) As SortedList
     Set NewSortedList = New SortedList
-    Call NewSortedList.Init(list, Comparer, Capacity)
+    Call NewSortedList.Init(List, Comparer, Capacity)
 End Function
 
 ''
@@ -1007,9 +1007,9 @@ End Function
 ' @param Control Whether the control key was pressed.
 ' @return A new ConsoleKeyInfo object.
 '
-Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As ConsoleKey, ByVal Shift As Boolean, ByVal Alt As Boolean, ByVal Control As Boolean) As ConsoleKeyInfo
+Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As ConsoleKey, ByVal Shift As Boolean, ByVal alt As Boolean, ByVal Control As Boolean) As ConsoleKeyInfo
     Set NewConsoleKeyInfo = New ConsoleKeyInfo
-    Call NewConsoleKeyInfo.Init(KeyChar, Key, Shift, Alt, Control)
+    Call NewConsoleKeyInfo.Init(KeyChar, Key, Shift, alt, Control)
 End Function
 
 ''
