@@ -12,7 +12,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 'The MIT License (MIT)
-'Copyright (c) 2012 Kelly Ethridge
+'Copyright (c) 2014 Kelly Ethridge
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: AdapterArrayList
+' Module: IListWrapper
 '
 
 Option Explicit
