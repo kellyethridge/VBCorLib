@@ -291,7 +291,7 @@ Private Sub Form_Load()
     ExceptionTests.Add New ArgumentExceptionTests
     ExceptionTests.Add New TestDefaultArgumentEx
     ExceptionTests.Add New TestDefaultArgumentNull
-    ExceptionTests.Add New TestArgumentNullException
+    ExceptionTests.Add New ArgumentNullExceptionTests
     ExceptionTests.Add New TestArgumentOutOfRange
     ExceptionTests.Add New TestDefArgumentOutOfRange
     ExceptionTests.Add New TestExceptionMethods

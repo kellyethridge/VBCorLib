@@ -1,0 +1,7 @@
+Version 3.0
+
+** Marked lines indicate breaking changes.
+
+Removed 'Format' parameter from Convert.ToString to align with .NET. **
+	Use global function ToString instead.
+Reordered 'Message' and 'ParamName' argument to more align with .NET. **

@@ -56,8 +56,9 @@ Implements Exception
 Implements SystemException
 Implements ArgumentException
 
-Private Const PROP_BASE              As String = "Base"
-Private Const DEF_HRESULT            As Long = E_POINTER
+Private Const BaseProperty      As String = "Base"
+Private Const ParamNameProperty As String = "ParamName"
+Private Const DEF_HRESULT       As Long = E_POINTER
 
 ' This can do it all.
 Private mBase       As ExceptionBase
@@ -172,7 +173,7 @@ Public Property Get Message() As String
     Dim ParamName As String
     ParamName = Me.ParamName
     If Len(ParamName) > 0 Then
-        Message = Message & vbCrLf & vbCrLf & "Parameter Name: " & ParamName
+        Message = Message & vbCrLf & "Parameter name: " & ParamName
     End If
 End Property
 
@@ -261,11 +262,13 @@ Private Sub Class_InitProperties()
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE, Nothing)
+    Set mBase = PropBag.ReadProperty(BaseProperty, Nothing)
+    mParamName = PropBag.ReadProperty(ParamNameProperty, "")
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty BaseProperty, mBase
+    PropBag.WriteProperty ParamNameProperty, mParamName
 End Sub
 
 

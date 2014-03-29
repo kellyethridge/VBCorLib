@@ -63,9 +63,7 @@ Private Const PROP_BASE              As String = "Base"
 Private Const DEF_PARAMNAME          As String = vbNullString
 Private Const DEF_HRESULT            As Long = COR_E_ARGUMENT
 
-' This can do it all.
 Private mBase As ExceptionBase
-
 
 
 ''
@@ -248,7 +246,9 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByRef InnerException As Exception)
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
-    If Len(ParamName) > 0 Then Call mBase.SetValue(PROP_PARAMNAME, ParamName)
+    If Len(ParamName) > 0 Then
+        mBase.SetValue PROP_PARAMNAME, ParamName
+    End If
 End Sub
 
 
@@ -256,7 +256,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Call Init(Environment.GetResourceString(Argument_Exception), DEF_PARAMNAME, Nothing)
+    Init Environment.GetResourceString(Argument_Exception), DEF_PARAMNAME, Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
@@ -264,7 +264,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty(PROP_BASE, mBase)
+    PropBag.WriteProperty PROP_BASE, mBase
 End Sub
 
 
