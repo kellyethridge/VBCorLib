@@ -276,7 +276,6 @@ Private Sub Form_Load()
     ArrayListTests.Add New TestArrayList10Items
     ArrayListTests.Add New TestArrayList
     ArrayListTests.Add New ArrayListAdapterTests
-    ArrayListTests.Add New TestAdapterBinarySearch
     AddTest ArrayListTests
     
     AddTest New TestcString

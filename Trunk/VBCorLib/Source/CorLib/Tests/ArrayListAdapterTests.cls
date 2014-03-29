@@ -12,14 +12,27 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestAdapterArrayList
+' ArrayListAdapterTests
 '
 Option Explicit
+Implements ITestCaseSource
 
-Private List As ArrayList
-
-Public Sub Setup()
-    Set List = ArrayList.Adapter(New ArrayList)
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "BinarySearch_WithValues_ReturnsExpected"
+            Test.Use Array(1, 2, 3, 4, 5), 4, 3
+            Test.Use Array(1, 2, 3, 4, 5), 1, 0
+            Test.Use Array(1, 2, 3, 4, 5), 5, 4
+            Test.Use Array(1, 2, 3, 4, 5), 6, -6
+            Test.Use Array(1, 2, 4, 5), 3, -3
+            Test.Use Array(1, 2, 3, 4, 5), 0, -1
+            
+        Case "BinarySearch_WithSubsetValues_ReturnsExpected"
+            Test.Use Array(1, 2, 3, 4, 5, 6, 7, 8), 4, 2, 6, 3
+            Test.Use Array(1, 2, 3, 4, 5, 6, 7, 8), 4, 4, 4, -5
+            Test.Use Array(1, 2, 3, 4, 5, 6, 7, 8), 7, 1, 5, -7
+            Test.Use Array(1, 2, 3, 5, 6, 7, 8), 4, 2, 5, -4
+    End Select
 End Sub
 
 Public Sub Count_WithEmptyList_ReturnsZero()
@@ -195,7 +208,7 @@ Public Sub Insert_WithArray_InsertsValues()
     Dim Adapter As ArrayList
     Set Adapter = ArrayList.Adapter(List)
     
-    Adapter.InsertRange 0, NewStrings("Item1", "Item2", "Item3")
+    Adapter.Insertrange 0, NewStrings("Item1", "Item2", "Item3")
     
     Assert.That List, Iz.EqualTo(Array("Item1", "Item2", "Item3", 1, 2, 3, 4))
 End Sub
@@ -210,7 +223,7 @@ Public Sub InsertRange_WithCollection_InsertsValues()
     col.Add "Item2"
     col.Add "Item3"
     
-    Adapter.InsertRange 2, col
+    Adapter.Insertrange 2, col
     
     Assert.That List, Iz.EqualTo(Array(1, 2, "Item1", "Item2", "Item3", 3, 4))
 End Sub
@@ -371,55 +384,59 @@ Public Sub Insert_WhenCalledWithLastIndex_InsertsAtEnd()
     Assert.That Adapter, Iz.EqualTo(Array(1, 2, 3, 4, 1, 2, 3, 4, 5))
 End Sub
 
+Public Sub BinarySearch_WithValues_ReturnsExpected(ByRef Elements As Variant, ByRef ValueToFind As Variant, ByVal Expected As Long)
+    Dim List As New ArrayList
+    List.AddRange Elements
+    Dim Adapter As ArrayList
+    Set Adapter = ArrayList.Adapter(List)
+    
+    Dim Actual As Long
+    Actual = Adapter.BinarySearch(ValueToFind)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub BinarySearch_WithSubsetValues_ReturnsExpected(ByRef Elements As Variant, ByVal ValueToFind As Integer, ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As Long)
+    Dim List As New ArrayList
+    List.AddRange Elements
+    Dim Adapter As ArrayList
+    Set Adapter = ArrayList.Adapter(List)
+    
+    Dim Actual As Long
+    Actual = Adapter.BinarySearch(ValueToFind, StartIndex, Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub BinarySearch_WithCountTooHigh_Throws()
+    Dim List As New ArrayList
+    List.Capacity = 10
+    Dim Adapter As ArrayList
+    Set Adapter = ArrayList.Adapter(List)
 
+    On Error Resume Next
+    Adapter.BinarySearch 1, 0, 11
+    
+    AssertArgumentException Err, "Count"
+End Sub
 
+Public Sub Sort_WhenCalled_SortsElements()
+    Dim Adapter As ArrayList
+    Set Adapter = MakeFilledAdapter
+    
+    Adapter.Sort
+    
+    Assert.That Adapter, Iz.Ordered
+End Sub
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Public Sub Sort_WithSubset_SortsSubset()
+    Dim Adapter As ArrayList
+    Set Adapter = MakeFilledAdapter
+    
+    Adapter.Sort 2, 4
+    
+    Assert.That Adapter, Iz.EqualTo(Array(1, 2, 1, 2, 3, 4, 3, 4))
+End Sub
 
 Private Function MakeFilledAdapter() As ArrayList
     Dim List As New ArrayList
