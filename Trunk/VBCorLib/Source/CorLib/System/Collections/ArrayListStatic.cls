@@ -108,7 +108,7 @@ Public Function Adapter(ByVal list As IList) As ArrayList
     If list Is Nothing Then _
         Throw Cor.NewArgumentNullException("Cannot have a null list.", "list")
 
-    Dim Ret As New AdapterArrayList
-    Call Ret.Init(list)
-    Set Adapter = Ret
+    Dim Wrapper As New IListWrapper
+    Wrapper.Init list
+    Set Adapter = Wrapper
 End Function
