@@ -764,15 +764,8 @@ Public Function CreateInstance(ByVal ElementType As vbVarType, Optional ByVal Le
         End If
     End If
         
-    Dim Ret As Variant
-    VariantType(Ret) = ElementType Or vbArray
-    MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreate(ElementType, Rank, Bounds(0))
-    
-    ' Elements of a size that are a multiple of 4 will not create a new array
-    ' when being returned. All other datatype sizes will cause a new array
-    ' to be created. The array must also be assigned at the end of the code
-    ' so VB can optimize returning the Variant datatype and not copy it when possible.
-    CreateInstance = Ret
+    VariantType(CreateInstance) = ElementType Or vbArray
+    MemLong(VarPtr(CreateInstance) + VARIANTDATA_OFFSET) = SafeArrayCreate(ElementType, Rank, Bounds(0))
 End Function
 
 ''
