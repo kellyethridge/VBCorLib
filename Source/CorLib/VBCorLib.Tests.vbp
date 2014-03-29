@@ -25,7 +25,6 @@ Class=TestWinResourceReader; Tests\TestWinResourceReader.cls
 Class=WeakRef; Tests\WeakRef.cls
 Class=StrongRef; Tests\StrongRef.cls
 Class=ArrayListAdapterTests; Tests\ArrayListAdapterTests.cls
-Class=TestAdapterBinarySearch; Tests\TestAdapterBinarySearch.cls
 Class=TestArgumentException; Tests\TestArgumentException.cls
 Class=TestArgumentNullException; Tests\TestArgumentNullException.cls
 Class=TestArgumentOutOfRange; Tests\TestArgumentOutOfRangeException.cls
