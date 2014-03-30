@@ -13,13 +13,31 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Sub Constructor_WhenCalled_StoresDefaultMessage()
+Public Sub Message_WithDefaultConstructor_ReturnsDefaultMessage()
     Dim Ex As New ArgumentOutOfRangeException
     
     Dim Actual As String
     Actual = Ex.Message
     
     Assert.That Actual, Iz.EqualTo("Specified argument was out of the range of valid values.")
+End Sub
+
+Public Sub ParamName_WithDefaultConstructor_ReturnsEmpty()
+    Dim Ex As New ArgumentOutOfRangeException
+    
+    Dim Actual As String
+    Actual = Ex.ParamName
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub ActualValue_WithDefaultConstructor_ReturnsMissing()
+    Dim Ex As New ArgumentOutOfRangeException
+    
+    Dim Actual As Variant
+    Actual = Ex.ActualValue
+    
+    Assert.That Actual, Iz.Missing
 End Sub
 
 Public Sub Constructor_WithMessage_StoresMessage()
@@ -43,7 +61,17 @@ Public Sub Constructor_WithParamName_AppendsToMessage()
     Assert.That Actual, Iz.EqualTo("Message" & vbCrLf & "Parameter name: Param")
 End Sub
 
-Public Sub InnerException_WhenSupplied_ReturnsInnerException()
+Public Sub Constructor_WithActualValue_AppendsToMessage()
+    Dim Ex As ArgumentOutOfRangeException
+    Set Ex = Cor.NewArgumentOutOfRangeException("Message", ActualValue:=1)
+    
+    Dim Actual As String
+    Actual = Ex.Message
+    
+    Assert.That Actual, Iz.EqualTo("Message" & vbCrLf & "Actual value was 1.")
+End Sub
+
+Public Sub Constructor_WithInnerException_StoresInnerException()
     Dim Inner   As New Exception
     Dim Ex      As ArgumentOutOfRangeException
     Set Ex = Cor.NewArgumentOutOfRangeException("", , , Inner)
@@ -76,21 +104,20 @@ Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException(
     Assert.That Actual, Iz.SameAs(Inner1)
 End Sub
 
+Public Sub TestPersitence()
+    Const Message As String = "User Error."
+    Dim Inner   As New Exception
+    Dim Ex      As ArgumentOutOfRangeException
+    Set Ex = Cor.NewArgumentOutOfRangeException(Message, "Param", 1, Inner)
 
+    Dim Bag As New PropertyBag
+    Bag.WriteProperty "ex", Ex
+    Dim Actual As ArgumentOutOfRangeException
+    Set Actual = Bag.ReadProperty("ex")
 
-'Public Sub TestPersitence()
-'    Const Message As String = "User Error."
-'    Dim Inner   As New Exception
-'    Dim Ex      As ArgumentException
-'    Set Ex = Cor.NewArgumentException(Message, "Param", Inner)
-'
-'    Dim Bag As New PropertyBag
-'    Bag.WriteProperty "ex", Ex
-'    Dim Actual As ArgumentException
-'    Set Actual = Bag.ReadProperty("ex")
-'
-'    Assert.That Actual, Iz.Not.SameAs(Ex)
-'    Assert.That Actual.Message, Iz.EqualTo(Message & vbCrLf & "Parameter name: Param")
-'    Assert.That Actual.ParamName, Iz.EqualTo("Param")
-'    Assert.That Actual.InnerException, Iz.Not.Nothing
-'End Sub
+    Assert.That Actual, Iz.Not.SameAs(Ex)
+    Assert.That Actual.ParamName, Iz.EqualTo("Param")
+    Assert.That Actual.ActualValue, Iz.EqualTo(1)
+    Assert.That Actual.InnerException, Iz.Not.Nothing
+    Assert.That Actual.Message, Iz.EqualTo(Message & vbCrLf & "Parameter name: Param" & vbCrLf & "Actual value was 1.")
+End Sub

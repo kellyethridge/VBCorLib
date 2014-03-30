@@ -62,8 +62,6 @@ Private Const DEF_HRESULT       As Long = E_POINTER
 
 ' This can do it all.
 Private mBase       As ExceptionBase
-Private mParamName  As String
-
 
 
 ''
@@ -84,7 +82,7 @@ End Property
 ' @see Exception
 '
 Public Property Get ParamName() As String
-    ParamName = mParamName
+    ParamName = mBase.GetValue(ParamNameProperty, "")
 End Property
 
 ''
@@ -250,7 +248,9 @@ Friend Sub Init(ByVal Message As String, ByRef ParamName As String, ByVal InnerE
     End If
     
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
-    mParamName = ParamName
+    If Len(ParamName) > 0 Then
+        mBase.SetValue ParamNameProperty, ParamName
+    End If
 End Sub
 
 
@@ -263,12 +263,10 @@ End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     Set mBase = PropBag.ReadProperty(BaseProperty, Nothing)
-    mParamName = PropBag.ReadProperty(ParamNameProperty, "")
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     PropBag.WriteProperty BaseProperty, mBase
-    PropBag.WriteProperty ParamNameProperty, mParamName
 End Sub
 
 

@@ -13,7 +13,7 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Sub Constructor_WhenCalled_StoresDefaultMessage()
+Public Sub Message_WithDefaultConstructor_ReturnsDefaultMessage()
     Dim Ex As New Exception
     
     Dim Actual As String
