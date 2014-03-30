@@ -337,8 +337,8 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Subclass As Object, ByVal AppTitle As String, ByVal Message As String, ByVal InnerException As Exception, ByVal HResult As Long, ByVal Source As String, ByVal HelpLink As String)
-    Call SetClassName(AppTitle, TypeName(Subclass))
-    mSubclass = ObjPtr(CUnk(Subclass))
+    SetClassName AppTitle, TypeName(Subclass)
+    mSubclass = WeakPtr(Subclass)
     mMessage = Message
     Set mInnerException = InnerException
     mHResult = HResult

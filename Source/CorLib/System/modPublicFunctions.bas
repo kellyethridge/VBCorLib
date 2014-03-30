@@ -92,6 +92,10 @@ Public Function CUnk(ByVal Obj As IUnknown) As IUnknown
     Set CUnk = Obj
 End Function
 
+Public Function WeakPtr(ByVal Source As Object) As Long
+    WeakPtr = ObjPtr(CUnk(Source))
+End Function
+
 ''
 ' Modulus method used for large values held within currency datatypes.
 '

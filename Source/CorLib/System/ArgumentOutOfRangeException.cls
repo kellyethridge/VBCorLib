@@ -54,15 +54,16 @@ Implements Exception
 Implements SystemException
 Implements ArgumentException
 
-Private Const PROP_PARAMNAME    As String = "ParamName"
-Private Const PROP_ACTUALVALUE  As String = "ActualValue"
-Private Const PROP_BASE         As String = "Base"
-Private Const DEF_PARAMNAME     As String = vbNullString
-Private Const DEF_ACTUALVALUE   As Variant = Empty
-Private Const DEF_HRESULT       As Long = COR_E_ARGUMENTOUTOFRANGE
+Private Const ParamNameProperty     As String = "ParamName"
+Private Const ActualValueProperty   As String = "ActualValue"
+Private Const BaseProperty          As String = "Base"
+Private Const DefaultParamName      As String = vbNullString
+Private Const DEF_HRESULT           As Long = COR_E_ARGUMENTOUTOFRANGE
 
 ' This can do it all.
-Private mBase As ExceptionBase
+Private mBase           As ExceptionBase
+Private mParamName      As String
+Private mActualValue    As Variant
 
 
 ''
@@ -80,9 +81,8 @@ End Property
 ' @return A value of the parameter that caused the exception.
 '
 Public Property Get ActualValue() As Variant
-    Call Helper.MoveVariant(ActualValue, mBase.GetValue(PROP_ACTUALVALUE, MissingVariant))
+    Helper.MoveVariant ActualValue, mBase.GetValue(ActualValueProperty, MissingVariant)
 End Property
-
 
 ''
 ' Returns the parameter name that caused the exception.
@@ -93,7 +93,7 @@ End Property
 ' @see Exception
 '
 Public Property Get ParamName() As String
-    ParamName = mBase.GetValue(PROP_PARAMNAME, DEF_PARAMNAME)
+    ParamName = mBase.GetValue(ParamNameProperty, DefaultParamName)
 End Property
 
 ''
@@ -179,21 +179,16 @@ End Property
 Public Property Get Message() As String
     Message = mBase.Message
     
-    ' If there is a parameter name, add it to the message
-    ' on a new line for everyone to see.
-    Dim ParamName As String
-    ParamName = Me.ParamName
-    If Len(ParamName) > 0 Then Message = Message & vbCrLf & "Parameter name: " & ParamName
+    If Len(ParamName) > 0 Then
+        Message = Message & vbCrLf & "Parameter name: " & ParamName
+    End If
     
-    ' Get a string representation of the actual value.
-    Dim ActualValue As String
-    ActualValue = Convert.ToString(Me.ActualValue)
-    
-    ' If we have an actual value, we want to append it to the
-    ' end of the message on it's own line, if the message is not empty.
-    If Not cString.IsNull(ActualValue) Then
-        If Len(Message) > 0 Then Message = Message & vbCrLf
-        Message = Message & "Actual Value: " & ActualValue
+    If Not IsMissing(ActualValue) Then
+        If Len(Message) > 0 Then
+            Message = Message & vbCrLf
+        End If
+        
+        Message = Message & "Actual value was " & Convert.ToString(ActualValue) & "."
     End If
 End Property
 
@@ -266,8 +261,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByRef ActualValue As Variant, ByRef InnerException As Exception)
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
-    If Not IsMissing(ActualValue) Then Call mBase.SetValue(PROP_ACTUALVALUE, ActualValue)
-    If Len(ParamName) > 0 Then Call mBase.SetValue(PROP_PARAMNAME, ParamName)
+    
+    If Len(ParamName) > 0 Then
+        mBase.SetValue ParamNameProperty, ParamName
+    End If
+    
+    If Not IsMissing(ActualValue) Then
+        mBase.SetValue ActualValueProperty, ActualValue
+    End If
 End Sub
 
 
@@ -275,15 +276,15 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Call Init(Environment.GetResourceString(ArgumentOutOfRange_Exception), DEF_PARAMNAME, MissingVariant, Nothing)
+    Init Environment.GetResourceString(ArgumentOutOfRange_Exception), DefaultParamName, MissingVariant, Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE, Nothing)
+    Set mBase = PropBag.ReadProperty(BaseProperty, Nothing)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty BaseProperty, mBase
 End Sub
 
 

@@ -58,10 +58,10 @@ Implements IObject
 Implements Exception
 Implements SystemException
 
-Private Const PROP_PARAMNAME         As String = "ParamName"
-Private Const PROP_BASE              As String = "Base"
-Private Const DEF_PARAMNAME          As String = vbNullString
-Private Const DEF_HRESULT            As Long = COR_E_ARGUMENT
+Private Const ParamNameProperty As String = "ParamName"
+Private Const BaseProperty      As String = "Base"
+Private Const DefaultParamName  As String = vbNullString
+Private Const DEF_HRESULT       As Long = COR_E_ARGUMENT
 
 Private mBase As ExceptionBase
 
@@ -84,7 +84,7 @@ End Property
 ' @see Exception
 '
 Public Property Get ParamName() As String
-    ParamName = mBase.GetValue(PROP_PARAMNAME, DEF_PARAMNAME)
+    ParamName = mBase.GetValue(ParamNameProperty, DefaultParamName)
 End Property
 
 ''
@@ -247,7 +247,7 @@ End Function
 Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByRef InnerException As Exception)
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
     If Len(ParamName) > 0 Then
-        mBase.SetValue PROP_PARAMNAME, ParamName
+        mBase.SetValue ParamNameProperty, ParamName
     End If
 End Sub
 
@@ -256,15 +256,15 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init Environment.GetResourceString(Argument_Exception), DEF_PARAMNAME, Nothing
+    Init Environment.GetResourceString(Argument_Exception), DefaultParamName, Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE, Nothing)
+    Set mBase = PropBag.ReadProperty(BaseProperty, Nothing)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty BaseProperty, mBase
 End Sub
 
 

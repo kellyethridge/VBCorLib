@@ -13,13 +13,22 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Sub Constructor_WhenCalled_StoresDefaultMessage()
+Public Sub Message_WithDefaultConstructor_ReturnsDefaultMessage()
     Dim Ex As New ArgumentNullException
     
     Dim Actual As String
     Actual = Ex.Message
     
     Assert.That Actual, Iz.EqualTo("Value cannot be Nothing.")
+End Sub
+
+Public Sub ParamName_WithDefaultConstructor_ReturnsEmpty()
+    Dim Ex As New ArgumentNullException
+    
+    Dim Actual As String
+    Actual = Ex.ParamName
+    
+    Assert.That Actual, Iz.Empty
 End Sub
 
 Public Sub Constructor_WithMessage_StoresMessage()
@@ -43,7 +52,7 @@ Public Sub Constructor_WithParamName_AppendsToMessage()
     Assert.That Actual, Iz.EqualTo("Value cannot be Nothing." & vbCrLf & "Parameter name: Param")
 End Sub
 
-Public Sub InnerException_WhenSupplied_ReturnsInnerException()
+Public Sub Constructor_WithInnerException_StoresInnerException()
     Dim Inner   As New Exception
     Dim Ex      As ArgumentNullException
     Set Ex = Cor.NewArgumentNullException("", , Inner)
