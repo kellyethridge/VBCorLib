@@ -154,7 +154,7 @@ End Function
 '
 Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef CharCount As Variant) As StringBuilder
     If SAPtr(Chars) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Chars")
+        Throw Cor.NewArgumentNullException("Chars", Resources.GetString(ArgumentNull_Array))
     If SafeArrayGetDim(SAPtr(Chars)) > 1 Then _
         Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
         
@@ -273,7 +273,7 @@ Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByV
     If SourceIndex < 0 Or SourceIndex > mLength Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "SourceIndex")
     If SAPtr(Destination) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Destination")
+        Throw Cor.NewArgumentNullException("Destination", Resources.GetString(ArgumentNull_Array))
     If DestinationIndex < LBound(Destination) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "DestinationIndex")
     If Count < 0 Then _
@@ -460,7 +460,7 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
     If Index < 0 Or Index > mLength Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index")
     If SAPtr(Chars) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "Chars")
+        Throw Cor.NewArgumentNullException("Chars", Resources.GetString(ArgumentNull_Array))
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long

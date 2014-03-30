@@ -379,7 +379,7 @@ End Function
 '
 Public Sub SetOut(ByVal NewOut As TextWriter)
     If NewOut Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot set output to Nothing.", "NewOut")
+        Throw Cor.NewArgumentNullException("NewOut", "Cannot set output to Nothing.")
     
     Set mOutput = NewOut
     mOriginalOut = False
@@ -392,7 +392,7 @@ End Sub
 '
 Public Sub SetIn(ByVal NewIn As TextReader)
     If NewIn Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot set input to Nothing.", "NewIn")
+        Throw Cor.NewArgumentNullException("NewIn", "Cannot set input to Nothing.")
         
     Set mInput = NewIn
 End Sub
@@ -404,7 +404,7 @@ End Sub
 '
 Public Sub SetError(ByVal NewError As TextWriter)
     If NewError Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot set error output to Nothing.", "NewError")
+        Throw Cor.NewArgumentNullException("NewError", "Cannot set error output to Nothing.")
         
     Set mError = NewError
     mOriginalError = False
@@ -1101,7 +1101,7 @@ End Property
 '
 Public Property Set OutputEncoding(ByVal RHS As Encoding)
     If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot set output encoding to Nothing.", "OutputEncoding")
+        Throw Cor.NewArgumentNullException("OutputEncoding", "Cannot set output encoding to Nothing.")
         
     Call Environment.VerifyNTMachine
     
@@ -1134,7 +1134,7 @@ End Property
 '
 Public Property Set InputEncoding(ByVal RHS As Encoding)
     If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot set input encoding to Nothing.", "InputEncoding")
+        Throw Cor.NewArgumentNullException("InputEncoding", "Cannot set input encoding to Nothing.")
         
     Call Environment.VerifyNTMachine
     

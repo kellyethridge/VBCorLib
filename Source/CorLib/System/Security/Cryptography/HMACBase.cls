@@ -102,7 +102,7 @@ Public Sub SetKey(ByRef Key() As Byte)
     If mHashStarted Then _
         Throw Cor.NewCryptographicException("Cannot change key after hash has started.")
     If cArray.IsNull(Key) Then _
-        Throw Cor.NewArgumentNullException("Invalid HMAC Key.", "Key")
+        Throw Cor.NewArgumentNullException("Key")
     
     mKey = cArray.CreateInstance(vbByte, cArray.GetLength(Key))
     Call Buffer.BlockCopy(Key, 0, mKey, 0, cArray.GetLength(Key))
@@ -204,7 +204,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByVal HashName As String, ByRef Key As Variant)
     If HashAlgorithm Is Nothing Then _
-        Throw Cor.NewArgumentNullException("HashAlgorithm cannot be Nothing.", "HashAlgorithm")
+        Throw Cor.NewArgumentNullException("HashAlgorithm")
     
     Set mHashAlgorithm = HashAlgorithm
     mKeySize = KeySize
@@ -215,7 +215,7 @@ Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByV
     ElseIf VarType(Key) <> vbByteArray Then
         Throw Cor.NewArgumentException("Key must be a Byte array.", "Key")
     ElseIf cArray.IsNull(Key) Then
-        Throw Cor.NewArgumentNullException("Key cannot be Null.", "Key")
+        Throw Cor.NewArgumentNullException("Key")
     Else
         mKey = Key
     End If

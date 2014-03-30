@@ -191,7 +191,7 @@ End Function
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
     If cArray.IsNull(InputBuffer) Then _
-        Throw Cor.NewArgumentNullException("InputBuffer cannot be null", "InputBuffer")
+        Throw Cor.NewArgumentNullException("InputBuffer")
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "InputOffset", InputOffset)
     If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _

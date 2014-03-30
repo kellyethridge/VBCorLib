@@ -219,7 +219,7 @@ Friend Sub Init(ByVal Source As Variant, ByVal Encoding As Encoding, ByVal Buffe
     Select Case VarType(Source)
         Case vbObject
             If Source Is Nothing Then _
-                Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Stream))
+                Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Stream))
             If Not TypeOf Source Is Stream Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamRequired), "Source")
                 

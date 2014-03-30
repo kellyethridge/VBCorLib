@@ -57,7 +57,7 @@ Option Explicit
 '
 Public Function ReadOnly(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot have a null list.", "list")
+        Throw Cor.NewArgumentNullException("List")
         
     Dim Ret As New ReadOnlyArrayList
     Call Ret.Init(List)
@@ -75,7 +75,7 @@ End Function
 '
 Public Function FixedSize(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot have a null list.", "list")
+        Throw Cor.NewArgumentNullException("List")
     
     Dim Ret As New FixedSizeArrayList
     Call Ret.Init(List)
@@ -109,7 +109,7 @@ End Function
 '
 Public Function Adapter(ByVal List As IList) As ArrayList
     If List Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot have a null list.", "list")
+        Throw Cor.NewArgumentNullException("List")
 
     Dim Wrapper As New IListWrapper
     Wrapper.Init List

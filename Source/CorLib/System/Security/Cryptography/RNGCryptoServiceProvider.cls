@@ -53,7 +53,7 @@ Public Sub GetBytes(ByRef Data() As Byte)
     Call VerifyProvider
     
     If cArray.IsNull(Data) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Data")
+        Throw Cor.NewArgumentNullException("Date", Environment.GetResourceString(ArgumentNull_Array))
     
     If CryptGenRandom(mProvider, cArray.GetLength(Data), Data(LBound(Data))) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
@@ -131,7 +131,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal CspParams As CspParameters)
     If CspParams Is Nothing Then _
-        Throw Cor.NewArgumentNullException("CspParams cannot be Nothing.", "CspParams")
+        Throw Cor.NewArgumentNullException("CspParams")
     
     With CspParams
         mProvider = CryptoAPI.AcquireContext(.KeyContainerName, .ProviderName, .ProviderType, .Flags)

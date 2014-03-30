@@ -166,18 +166,18 @@ Public Function ReadBytes(ByVal Count As Long) As Byte()
     If Count < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
     
-    Dim ret() As Byte
+    Dim Ret() As Byte
     If Count > 0 Then
-        ReDim ret(0 To Count - 1)
+        ReDim Ret(0 To Count - 1)
         
         Dim num As Long
-        num = mStream.ReadBlock(ret, 0, Count)
+        num = mStream.ReadBlock(Ret, 0, Count)
         If num = 0 Then Exit Function
-        If num <> Count Then ReDim Preserve ret(0 To num - 1)
+        If num <> Count Then ReDim Preserve Ret(0 To num - 1)
     Else
-        ret = Cor.NewBytes()
+        Ret = Cor.NewBytes()
     End If
-    ReadBytes = ret
+    ReadBytes = Ret
 End Function
 
 ''
@@ -195,18 +195,18 @@ Public Function ReadChars(ByVal Count As Long) As Integer()
     If Count < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
     
-    Dim ret() As Integer
+    Dim Ret() As Integer
     If Count > 0 Then
-        ReDim ret(0 To Count - 1)
+        ReDim Ret(0 To Count - 1)
         
         Dim CharsRead As Long
-        CharsRead = ReadCharBytes(ret, 0, Count)
+        CharsRead = ReadCharBytes(Ret, 0, Count)
         If CharsRead = 0 Then Throw New EndOfStreamException
-        If Count <> CharsRead Then ReDim Preserve ret(0 To CharsRead - 1)
+        If Count <> CharsRead Then ReDim Preserve Ret(0 To CharsRead - 1)
     Else
-        ret = Cor.NewIntegers()
+        Ret = Cor.NewIntegers()
     End If
-    ReadChars = ret
+    ReadChars = Ret
 End Function
 
 ''
@@ -394,7 +394,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Stream), "Stream")
+        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
     If Not Stream.CanRead Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ReadableStreamRequired), "Stream")
     
@@ -433,20 +433,20 @@ Private Sub FillBuffer(ByVal Count As Long)
 End Sub
 
 Private Function ReadStringLength() As Long
-    Dim ret         As Long
+    Dim Ret         As Long
     Dim num         As Long
     Dim shiftCount  As Long
     
     num = mStream.ReadByte
     Do While num >= &H80
-        ret = ret + Helper.ShiftLeft(num And &H7F, shiftCount)
+        Ret = Ret + Helper.ShiftLeft(num And &H7F, shiftCount)
         num = mStream.ReadByte
         shiftCount = shiftCount + 7
     Loop
     If num > 0 Then
-        ReadStringLength = ret + Helper.ShiftLeft(num, shiftCount)
+        ReadStringLength = Ret + Helper.ShiftLeft(num, shiftCount)
     Else
-        ReadStringLength = ret
+        ReadStringLength = Ret
     End If
 End Function
 
@@ -509,8 +509,8 @@ errTrap:
     SAPtr(Bytes) = 0
     SAPtr(Chars) = 0
 
-    Dim ex As Exception
-    If Catch(ex) Then Throw ex
+    Dim Ex As Exception
+    If Catch(Ex) Then Throw Ex
 End Function
 
 Private Function ReadOneChar() As Long

@@ -285,7 +285,7 @@ End Property
 '
 Public Function Add(ByRef ts As TimeSpan) As cDateTime
     If ts Is Nothing Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_TimeSpan, "ts"), "ts")
+        Throw Cor.NewArgumentNullException("ts", Environment.GetResourceString(ArgumentNull_TimeSpan, "ts"))
     
     Set Add = cDateTime.FromMilliseconds(mMilliseconds + ts.TotalMilliseconds, mKind)
 End Function

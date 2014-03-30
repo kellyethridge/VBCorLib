@@ -56,9 +56,9 @@ Private mGroup  As ResPictureGroup
 '
 Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     If Key Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Key cannot be Nothing.", "Key")
+        Throw Cor.NewArgumentNullException("Key")
     If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If Key.ResourceType <> ResourceTypes.GroupCursor Then _
         Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
 

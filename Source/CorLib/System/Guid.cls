@@ -272,7 +272,7 @@ End Sub
 
 Friend Sub FromByteArray(ByRef b() As Byte)
     If cArray.IsNull(b) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If cArray.GetLength(b) <> 16 Then _
         Throw Cor.NewArgumentException("Array must be 16 bytes in length.", "Bytes")
     
@@ -286,7 +286,7 @@ Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, By
         .Data3 = c
         
         If cArray.IsNull(d) Then _
-            Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+            Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
         If cArray.GetLength(d) <> 8 Then _
             Throw Cor.NewArgumentException("Array must be 8 bytes in length.", "Bytes")
         

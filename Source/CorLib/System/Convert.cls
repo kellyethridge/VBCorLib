@@ -115,7 +115,7 @@ Private mChars As WordBuffer
 '
 Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
     If SAPtr(InArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "InArray")
+        Throw Cor.NewArgumentNullException("InArray", Resources.GetString(ArgumentNull_Array))
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -151,9 +151,9 @@ End Function
 '
 Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, Optional ByVal InsertLineBreaks As Boolean = False) As Long
     If SAPtr(InArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "InArray")
+        Throw Cor.NewArgumentNullException("InArray", Resources.GetString(ArgumentNull_Array))
     If SAPtr(OutArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "OutArray")
+        Throw Cor.NewArgumentNullException("OutArray", Resources.GetString(ArgumentNull_Array))
     If IndexIn < LBound(InArray) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexIn")
     If Length < 0 Then _
@@ -183,7 +183,7 @@ End Function
 '
 Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As Long, ByVal Length As Long) As Byte()
     If SAPtr(InArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "InArray")
+        Throw Cor.NewArgumentNullException("InArray", Resources.GetString(ArgumentNull_Array))
     If IndexIn < LBound(InArray) Then _
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexIn")
     If Length < 0 Then _

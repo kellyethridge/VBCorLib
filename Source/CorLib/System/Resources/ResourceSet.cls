@@ -85,10 +85,10 @@ End Function
 ' @return A resource string, or an empty string if not found.
 '
 Public Function GetString(ByRef ResourceName As Variant) As String
-    Dim ret As Variant
-    Call Helper.MoveVariant(ret, GetObject(ResourceName, ResourceTypes.stringresource))
-    If IsEmpty(ret) Then Exit Function
-    GetString = ret
+    Dim Ret As Variant
+    Call Helper.MoveVariant(Ret, GetObject(ResourceName, ResourceTypes.StringResource))
+    If IsEmpty(Ret) Then Exit Function
+    GetString = Ret
 End Function
 
 ''
@@ -223,7 +223,7 @@ End Sub
 Private Function GetReader(ByRef Source As Variant) As IResourceReader
     If IsObject(Source) Then
         If Source Is Nothing Then _
-            Throw Cor.NewArgumentNullException("Source cannot be Nothing.", "Source")
+            Throw Cor.NewArgumentNullException("Source")
             
         If TypeOf Source Is IResourceReader Then
             Set GetReader = Source

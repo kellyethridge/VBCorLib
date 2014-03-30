@@ -160,7 +160,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     Call VerifyNotDisposed
     
     If cArray.IsNull(InputBuffer) Then _
-        Throw Cor.NewArgumentNullException("InputBuffer cannot be null", "InputBuffer")
+        Throw Cor.NewArgumentNullException("InputBuffer")
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "InputOffset", InputOffset)
     If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
@@ -284,7 +284,7 @@ End Sub
 
 Private Sub ComputeHashOnStream(ByRef Source As Variant)
     If Source Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Source cannot be Nothing.", "Source")
+        Throw Cor.NewArgumentNullException("Source")
     If Not TypeOf Source Is Stream Then _
         Throw Cor.NewArgumentException("Source must implement the Stream interface.", "Source")
     
@@ -310,14 +310,14 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     Result = GetOptionalArrayRange(pSA, Index, ElemIndex, Count, ElemCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Source", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     Call ClearException
     
     Dim Bytes() As Byte
     SAPtr(Bytes) = pSA
     Call HashCore(Bytes, ElemIndex, ElemCount)
 
-ErrTrap:
+errTrap:
     SAPtr(Bytes) = vbNullPtr
     
     Dim Ex As Exception

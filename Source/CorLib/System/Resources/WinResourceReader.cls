@@ -73,7 +73,7 @@ Private mFileHandle As Long
 '
 Public Sub AddDecoder(ByVal DecoderToAdd As IResourceDecoder)
     If DecoderToAdd Is Nothing Then _
-        Throw Cor.NewArgumentNullException("DecoderToAdd cannot be Nothing.", "DecoderToAdd")
+        Throw Cor.NewArgumentNullException("DecoderToAdd")
     
     ' This will replace any existing decoder of the same decode type.
     Dim DecodeType As Variant

@@ -585,7 +585,7 @@ End Function
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult object is required.", "AsyncResult")
+        Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     
@@ -699,7 +699,7 @@ End Function
 '
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult object is required.", "AsyncResult")
+        Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     

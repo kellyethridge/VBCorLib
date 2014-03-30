@@ -183,7 +183,7 @@ Public Property Get Message() As String
     ' on a new line for everyone to see.
     Dim ParamName As String
     ParamName = Me.ParamName
-    If Len(ParamName) > 0 Then Message = Message & vbCrLf & vbCrLf & "Parameter Name: " & ParamName
+    If Len(ParamName) > 0 Then Message = Message & vbCrLf & "Parameter name: " & ParamName
     
     ' Get a string representation of the actual value.
     Dim ActualValue As String

@@ -463,7 +463,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
     Dim directlyEncodable As Boolean
     
     If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If ByteIndex < LBound(Bytes) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
     
@@ -627,13 +627,13 @@ End Function
 
 Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
     Dim InBase64 As Boolean
-    Dim maxindex As Long
+    Dim MaxIndex As Long
     Dim CharCount As Long
     Dim b As Byte
     Dim Bits As Currency
     
-    maxindex = Index + Count
-    Do While Index < maxindex
+    MaxIndex = Index + Count
+    Do While Index < MaxIndex
         b = Bytes(Index)
         If Not InBase64 Then
             If b = vbPlus Then
@@ -666,7 +666,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     Dim MaxByteIndex As Long
     
     If cArray.IsNull(Chars) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Chars")
+        Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "CharIndex", CharIndex)
     

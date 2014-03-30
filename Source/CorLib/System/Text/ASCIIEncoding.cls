@@ -457,20 +457,20 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If ByteIndex < LBound(Bytes) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
     If ByteIndex + Count - 1 > UBound(Bytes) Then Call SmallBufferError("Bytes")
     
     Dim i   As Long
-    Dim Ch  As Long
+    Dim ch  As Long
     For i = 0 To Count - 1
-        Ch = Chars(Index + i)
-        Select Case Ch
+        ch = Chars(Index + i)
+        Select Case ch
             ' we need to have a range because by using Integers to
             ' represent unicode characters, we could end up with
             ' negative numbers.
-            Case 0 To 127:  Bytes(ByteIndex + i) = Ch
+            Case 0 To 127:  Bytes(ByteIndex + i) = ch
             Case Else:      Bytes(ByteIndex + i) = BYTE_QUESTION_MARK
         End Select
     Next i
@@ -483,7 +483,7 @@ End Sub
 
 Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     If cArray.IsNull(Chars) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Chars")
+        Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
     If CharIndex + ByteCount - 1 > UBound(Chars) Then Call SmallBufferError("Chars")

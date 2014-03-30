@@ -76,13 +76,13 @@ End Sub
 Private Function GetCollectionSize(ByRef c As Variant) As Long
     If IsArray(c) Then
         If cArray.IsNull(c) Then _
-            Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "c")
+            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
         
         GetCollectionSize = UBound(c) - LBound(c) + 1
     
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Collection), "c")
+            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
             Dim Col As Collection

@@ -198,7 +198,7 @@ Public Function Decrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Call VerifyLoaded
     
     If cArray.IsNull(Rgb) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Rgb")
+        Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Flags As Long
     If fOAEP Then Flags = CRYPT_OAEP
@@ -242,7 +242,7 @@ Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Call VerifyLoaded
     
     If cArray.IsNull(Rgb) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Rgb")
+        Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Flags As Long
     If fOAEP Then Flags = CRYPT_OAEP
@@ -331,7 +331,7 @@ End Sub
 '
 Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     If cArray.IsNull(KeyBlob) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "KeyBlob")
+        Throw Cor.NewArgumentNullException("KeyBlob", Environment.GetResourceString(ArgumentNull_Array))
     
     Call VerifyLoaded(False)
     Call DeleteKey
@@ -349,7 +349,7 @@ End Sub
 '
 Public Sub ImportParameters(ByVal Parameters As RSAParameters)
     If Parameters Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Parameters cannot be Nothing.", "Parameters")
+        Throw Cor.NewArgumentNullException("Parameters")
     
     Call Me.ImportCspBlob(Parameters.ToCspBlob(mKeyNumber))
 End Sub
@@ -440,7 +440,7 @@ End Function
 '
 Public Function VerifyData(ByRef Buffer() As Byte, ByRef hAlg As Variant, ByRef Signature() As Byte) As Boolean
     If cArray.IsNull(Buffer) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Buffer")
+        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
                   
     Dim HashObj As HashAlgorithm
     Set HashObj = GetHash(hAlg)
@@ -461,7 +461,7 @@ End Function
 '
 Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef Signature() As Byte) As Boolean
     If cArray.IsNull(Signature) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Signature")
+        Throw Cor.NewArgumentNullException("Signature", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Hash As Long
     Hash = SetHash(RgbHash, Str)
@@ -600,7 +600,7 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     Call VerifyLoaded
     
     If cArray.IsNull(RgbHash) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "RgbHash")
+        Throw Cor.NewArgumentNullException("RgbHash", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim HashAlg As Long
     Dim HashLen As Long
@@ -658,7 +658,7 @@ Private Function GetHash(ByRef hAlg As Variant) As HashAlgorithm
             
         Case vbObject
             If hAlg Is Nothing Then _
-                Throw Cor.NewArgumentNullException("Hash object cannot be Nothing.", "hAlg")
+                Throw Cor.NewArgumentNullException("hAlg")
             
             If (TypeOf hAlg Is SHA1) Or (TypeOf hAlg Is MD5) Then
                 Set HashObj = hAlg

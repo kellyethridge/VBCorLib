@@ -502,7 +502,7 @@ End Sub
 '
 Public Sub WriteAllbytes(ByVal Path As String, ByRef Bytes() As Byte)
     If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim fs As FileStream
     Set fs = Cor.NewFileStream(Path, FileMode.Create)
@@ -521,7 +521,7 @@ End Sub
 '
 Public Sub WriteAllLines(ByVal Path As String, ByRef Contents() As String, Optional ByVal Encoding As Encoding)
     If cArray.IsNull(Contents) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Contents")
+        Throw Cor.NewArgumentNullException("Contents", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim sw As StreamWriter
     Set sw = Cor.NewStreamWriter(Path, Encoding)

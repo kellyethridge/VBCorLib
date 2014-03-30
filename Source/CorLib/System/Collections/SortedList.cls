@@ -183,7 +183,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     Dim i As Long
     
     If cArray.IsNull(DstArray) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "dstArray")
+        Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(DstArray) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "index", Index)
     If cArray.GetRank(DstArray) <> 1 Then _
@@ -685,15 +685,15 @@ Friend Sub CopyValuesTo(ByRef DstArray As Variant, ByVal Index As Long)
     Call cArray.CopyEx(mValues, 0, DstArray, Index, mCount)
 End Sub
 
-Friend Sub Init(ByVal list As IDictionary, ByVal Comparer As IComparer, ByVal Capacity As Long)
+Friend Sub Init(ByVal List As IDictionary, ByVal Comparer As IComparer, ByVal Capacity As Long)
     Set mComparer = Comparer
-    If list Is Nothing Then
+    If List Is Nothing Then
         Me.Capacity = Capacity
     Else
-        mCount = list.Count
+        mCount = List.Count
         Me.Capacity = mCount
-        Call list.Keys.CopyTo(mKeys, 0)
-        Call list.Values.CopyTo(mValues, 0)
+        Call List.Keys.CopyTo(mKeys, 0)
+        Call List.Values.CopyTo(mValues, 0)
         Call cArray.SortKeyEx(mKeys, mValues, 0, mCount, Comparer)
     End If
 End Sub
