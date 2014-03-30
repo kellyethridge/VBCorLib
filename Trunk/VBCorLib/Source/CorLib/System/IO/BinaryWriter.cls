@@ -219,7 +219,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Stream), "Stream")
+        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
     If Not Stream.CanWrite Then _
         Throw Cor.NewArgumentException("Cannot write to a stream that does not support writing.", "Stream")
     
@@ -271,7 +271,7 @@ End Sub
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
     If cArray.IsNull(Value) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Value")
+        Throw Cor.NewArgumentNullException("Value", Environment.GetResourceString(ArgumentNull_Array))
         
     Select Case VarType(Value)
         Case vbByteArray

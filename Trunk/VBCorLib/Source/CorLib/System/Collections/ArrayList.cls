@@ -230,7 +230,7 @@ End Function
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef DstArray As Variant, Optional ByRef ArrayIndex As Variant)
     If cArray.IsNull(DstArray) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "dstArray")
+        Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
     
     Call cArray.CopyEx(mItems, 0, DstArray, GetOptionalLong(ArrayIndex, LBound(DstArray)), mCount)
 End Sub
@@ -719,7 +719,7 @@ Private Sub WriteRange(ByVal Index As Long, ByRef c As Variant, ByVal Insert As 
         Call WriteArray(Index, c, Insert)
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Collection), "c")
+            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
             Call WriteVBCollection(Index, c, Insert)
@@ -735,7 +735,7 @@ End Sub
 
 Private Sub WriteArray(ByVal Index As Long, ByRef Arr As Variant, ByVal Insert As Boolean)
     If cArray.IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "c")
+        Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
     
     ' Get the number of elements in the array
     Dim SizeOfArray As Long

@@ -79,7 +79,7 @@ Private mVersion    As Long
 '
 Public Function AndBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "bits")
+        Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
         Throw Cor.NewArgumentException("Both arrays must have the same length.", "bits")
     
@@ -111,7 +111,7 @@ End Function
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If cArray.IsNull(DstArray) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "dstArray")
+        Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(DstArray) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "index", Index)
     If cArray.GetRank(DstArray) <> 1 Then _
@@ -303,7 +303,7 @@ End Function
 '
 Public Function OrBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "bits")
+        Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
         Throw Cor.NewArgumentException("Both arrays must have the same length.", "bits")
     
@@ -346,7 +346,7 @@ End Function
 '
 Public Function XorBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "bits")
+        Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
         Throw Cor.NewArgumentException("Both arrays must have the same length.", "bits")
 
@@ -392,7 +392,7 @@ End Sub
 
 Friend Sub InitFromBooleans(ByRef Values() As Boolean)
     If cArray.IsNull(Values) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "values")
+        Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
 
     Dim i   As Long
     Dim lb  As Long
@@ -405,7 +405,7 @@ End Sub
 
 Friend Sub InitFromBytes(ByRef Values() As Byte)
     If cArray.IsNull(Values) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "values")
+        Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Size As Long
     Size = cArray.GetLength(Values, 1)
@@ -415,7 +415,7 @@ End Sub
 
 Friend Sub InitFromLongs(ByRef Values() As Long)
     If cArray.IsNull(Values) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "values")
+        Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
     
     mBits = Values
     mUBound = UBound(Values)

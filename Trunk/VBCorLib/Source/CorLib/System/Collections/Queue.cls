@@ -319,7 +319,7 @@ Private Sub WriteRange(ByRef c As Variant)
         Call WriteArray(c)
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Collection), "c")
+            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
             Call WriteVBCollection(c)
@@ -336,7 +336,7 @@ End Sub
 
 Private Sub WriteArray(ByRef Arr As Variant)
     If cArray.IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "c")
+        Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
     
     ' Get the number of elements in the array
     Dim SizeOfArray As Long

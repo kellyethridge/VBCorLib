@@ -128,7 +128,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputOffset", InputCount, "InputCount", False)
     
     If SAPtr(OutputBuffer) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "OutputBuffer")
+        Throw Cor.NewArgumentNullException("OutputBuffer", Environment.GetResourceString(ArgumentNull_Array))
     If OutputOffset < LBound(OutputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "OutputOffset")
     
@@ -272,8 +272,8 @@ Private Sub SmallBufferError(ByVal ParamName As String)
     Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), ParamName)
 End Sub
 
-Private Function CanProcessChar(ByVal Ch As Long) As Boolean
-    If IsWhiteSpace(Ch) Then
+Private Function CanProcessChar(ByVal ch As Long) As Boolean
+    If IsWhiteSpace(ch) Then
         If Not mIgnoreWhiteSpaces Then
             Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
         End If
@@ -282,8 +282,8 @@ Private Function CanProcessChar(ByVal Ch As Long) As Boolean
     End If
 End Function
 
-Private Function IsWhiteSpace(ByVal Ch As Long) As Boolean
-    Select Case Ch
+Private Function IsWhiteSpace(ByVal ch As Long) As Boolean
+    Select Case ch
         Case &H20, &H9, &HA, &HB, &HC, &HD, &H85, &HA0: IsWhiteSpace = True
     End Select
 End Function

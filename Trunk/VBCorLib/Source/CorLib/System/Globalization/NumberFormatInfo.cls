@@ -542,7 +542,7 @@ Public Property Let PercentGroupSizes(ByRef RHS As Variant)
     VerifyWritable
     VerifyLoaded
     If cArray.IsNull(RHS) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "PercentGroupSizes")
+        Throw Cor.NewArgumentNullException("PercentGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
     VerifyGroupSizes RHS
     mProps.PercentGroupSizes = RHS
@@ -711,7 +711,7 @@ Public Property Let CurrencyGroupSizes(ByRef RHS() As Long)
     VerifyWritable
     VerifyLoaded
     If cArray.IsNull(RHS) Then _
-        Throw Cor.NewArgumentNullException(Resources.GetString(ArgumentNull_Array), "CurrencyGroupSizes")
+        Throw Cor.NewArgumentNullException("CurrencyGroupSizes", Resources.GetString(ArgumentNull_Array))
     
     VerifyAndSetGroupSizes RHS, mProps.CurrencyGroupSizes
 End Property
@@ -887,7 +887,7 @@ Public Property Let NumberGroupSizes(ByRef RHS As Variant)
     VerifyWritable
     VerifyLoaded
     If cArray.IsNull(RHS) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "NumberGroupSizes")
+        Throw Cor.NewArgumentNullException("NumberGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
     VerifyGroupSizes RHS
     mProps.NumberGroupSizes = RHS

@@ -61,9 +61,9 @@ Private mBitmap As StdPicture
 '
 Public Function Decode(ByVal Key As ResourceKey, Bytes() As Byte) As Long
     If Key Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Resource key cannot be Nothing.", "Key")
+        Throw Cor.NewArgumentNullException("Key")
     If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If Key.ResourceType <> RESTYPE_BITMAP Then _
         Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
     
@@ -148,9 +148,9 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
         ' If ColorsUsed is 0 then the maximum number
         ' of colors is used based on the bits-per-pixel.
         If ColorsUsed = 0 Then
-            Dim BitCount As Long
-            BitCount = AsWord(Bytes(BITCOUNT_OFFSET))
-            ColorsUsed = Powers(BitCount)
+            Dim bitCount As Long
+            bitCount = AsWord(Bytes(BITCOUNT_OFFSET))
+            ColorsUsed = Powers(bitCount)
         End If
         
         ' Add the RGBQUAD structure offset.

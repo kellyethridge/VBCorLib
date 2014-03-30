@@ -62,7 +62,7 @@ Public Sub AddEncoder(ByVal EncoderToAdd As IResourceEncoder)
     Call VerifyOpen
     
     If EncoderToAdd Is Nothing Then _
-        Throw Cor.NewArgumentNullException("IResourceEncoder cannot be Nothing.", "EncoderToAdd")
+        Throw Cor.NewArgumentNullException("EncoderToAdd")
     
     Call EncoderToAdd.Reset
     

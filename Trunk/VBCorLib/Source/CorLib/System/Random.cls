@@ -73,7 +73,7 @@ End Function
 ' @param bytes The array to be filled.
 Public Sub NextBytes(ByRef Bytes() As Byte)
     If SAPtr(Bytes) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
         
     Dim i As Long
     For i = LBound(Bytes) To UBound(Bytes)

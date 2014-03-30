@@ -191,7 +191,7 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
             
         Case vbObject, vbDataObject
             If Source Is Nothing Then _
-                Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Stream))
+                Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Stream))
             If Not TypeOf Source Is Stream Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamRequired), "Source")
             

@@ -58,10 +58,10 @@ Private mStringBuilder  As New StringBuilder
 '
 Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     If Key Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Key cannot be Nothing.", "Key")
+        Throw Cor.NewArgumentNullException("Key")
     If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Bytes")
-    If Key.ResourceType <> ResourceTypes.stringresource Then _
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
+    If Key.ResourceType <> ResourceTypes.StringResource Then _
         Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
         
     Set mKey = Key
@@ -97,7 +97,7 @@ Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
                 ByteIndex = ByteIndex + 2
             Next i
             mStrings(mIndex) = mStringBuilder.ToString
-            Set mKeys(mIndex) = Cor.NewResourceKey(StringID, ResourceTypes.stringresource, mKey.LanguageID)
+            Set mKeys(mIndex) = Cor.NewResourceKey(StringID, ResourceTypes.StringResource, mKey.LanguageID)
             Count = Count + 1
         Else
             mStrings(mIndex) = vbNullString
@@ -117,7 +117,7 @@ End Function
 ' @see ResourceTypes
 '
 Public Function GetDecodeType() As Variant
-    GetDecodeType = ResourceTypes.stringresource
+    GetDecodeType = ResourceTypes.StringResource
 End Function
 
 

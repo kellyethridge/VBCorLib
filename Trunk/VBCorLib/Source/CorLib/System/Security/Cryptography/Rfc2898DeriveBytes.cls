@@ -100,7 +100,7 @@ End Property
 '
 Public Property Let Salt(ByRef RHS() As Byte)
     If cArray.IsNull(RHS) Then _
-        Throw Cor.NewArgumentNullException("Cannot set Salt to a null array.", "Salt")
+        Throw Cor.NewArgumentNullException("Salt")
     
     Dim Size As Long
     Size = cArray.GetLength(RHS)

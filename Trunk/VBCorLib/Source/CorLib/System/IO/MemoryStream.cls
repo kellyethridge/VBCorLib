@@ -219,7 +219,7 @@ Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     Dim Result As StreamAsyncResult
     
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult object is required.", "AsyncResult")
+        Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     Set Result = AsyncResult
@@ -248,7 +248,7 @@ Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     Dim Result As StreamAsyncResult
     
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult object is required.", "AsyncResult")
+        Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     Set Result = AsyncResult

@@ -354,7 +354,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal oEncoding As Encoding, ByVal dete
             ' We expect an open Stream object here.
             
             If Source Is Nothing Then _
-                Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Stream))
+                Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Stream))
             If Not TypeOf Source Is Stream Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamRequired), "Source")
         

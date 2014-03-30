@@ -472,21 +472,21 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
     Const LOW_OFFSET    As Long = &HDC00&
     
     Dim uch                 As Long
-    Dim maxindex            As Long
+    Dim MaxIndex            As Long
     Dim MaxByteIndex        As Long
     Dim StartIndex          As Long
     Dim HighSurrogateChar   As Long
     
     If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Byte")
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If ByteIndex < LBound(Bytes) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
     
     If Not Encoder Is Nothing Then HighSurrogateChar = Encoder.HighSurrogateChar
     StartIndex = ByteIndex
     MaxByteIndex = UBound(Bytes) + 1
-    maxindex = CharIndex + CharCount
-    Do While CharIndex < maxindex
+    MaxIndex = CharIndex + CharCount
+    Do While CharIndex < MaxIndex
         AsWord(uch) = Chars(CharIndex)
         
         'If CharIndex = UBound(Chars) Then Stop
@@ -568,7 +568,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     Dim CharCount       As Long
     Dim BytesLeft       As Long
     Dim putChars        As Boolean
-    Dim maxindex        As Long
+    Dim MaxIndex        As Long
     Dim maxCharIndex    As Long
     
     putChars = Not cArray.IsNull(Chars)
@@ -585,9 +585,9 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         BytesInSequence = Decoder.BytesInSequence
     End If
     
-    maxindex = ByteIndex + ByteCount
+    MaxIndex = ByteIndex + ByteCount
 
-    Do While ByteIndex < maxindex
+    Do While ByteIndex < MaxIndex
         b = Bytes(ByteIndex)
         ' only ascii an character will be 1 byte.   0xxxxxxx format
         If b < &H80 Then

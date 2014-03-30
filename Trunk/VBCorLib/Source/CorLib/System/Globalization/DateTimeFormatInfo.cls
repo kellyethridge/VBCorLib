@@ -145,12 +145,12 @@ End Property
 '
 ' @param RHS The calendar to associate with this object.
 '
-Public Property Set Calendar(ByVal RHS As Calendar)
+Public Property Set Calendar(ByVal Value As Calendar)
     VerifyWritable
-    If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Calendar cannot be Nothing.", "Calendar")
+    If Value Is Nothing Then _
+        Throw Cor.NewArgumentNullException("Value")
     
-    Set mProps.Calendar = RHS
+    Set mProps.Calendar = Value
 End Property
 
 ''
@@ -1041,17 +1041,17 @@ Private Function CombineAllDateTimePatterns() As String()
     Const FORMATS As String = "dDfFgGmMrRstTUuYy"
     mPattern.SA.pvData = StrPtr(FORMATS)
     
-    Dim list As ArrayList
-    Set list = New ArrayList
+    Dim List As ArrayList
+    Set List = New ArrayList
     
     Dim i As Long
     For i = 0 To Len(FORMATS) - 1
-        Call list.AddRange(GetSpecificDateTimePattern(mPattern.Data(i)))
+        Call List.AddRange(GetSpecificDateTimePattern(mPattern.Data(i)))
     Next i
     
     Dim Ret() As String
-    ReDim Ret(list.Count - 1)
-    Call list.CopyTo(Ret)
+    ReDim Ret(List.Count - 1)
+    Call List.CopyTo(Ret)
     CombineAllDateTimePatterns = Ret
 End Function
 

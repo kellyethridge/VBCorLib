@@ -260,7 +260,7 @@ Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
     If Not CanRead Then _
         Throw Cor.NewNotSupportedException("The Stream does not support reading.")
     If cArray.IsNull(Buffer) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Buffer")
+        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
     If Offset < LBound(Buffer) Then _
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "Offset", Offset)
     If Count < 0 Then _
@@ -350,7 +350,7 @@ End Function
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult object is required.", "AsyncResult")
+        Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     
@@ -446,7 +446,7 @@ End Function
 '
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult object is required.", "AsyncResult")
+        Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     
@@ -502,9 +502,9 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByVal Mode As CryptoStreamMode)
     If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Stream), "Stream")
+        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
     If Transform Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Transform cannot be nothing.", "Transform")
+        Throw Cor.NewArgumentNullException("Transform")
     
     Select Case Mode
         Case CryptoStreamMode.ReadMode

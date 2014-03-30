@@ -324,8 +324,8 @@ Public Sub ThrowArrayRangeException(ByVal ErrorCode As Long, ByRef ArrayName As 
     Dim Message As String
     Message = Environment.GetResourceString(ErrorCode)
     Select Case ErrorCode
-        Case ArgumentNull_Array:                Throw Cor.NewArgumentNullException(Message, ArrayName)
-        Case Rank_MultiDimNotSupported:               Throw Cor.NewRankException(Message)
+        Case ArgumentNull_Array:                Throw Cor.NewArgumentNullException(ArrayName, Message)
+        Case Rank_MultiDimNotSupported:         Throw Cor.NewRankException(Message)
         Case Argument_ParamRequired:            Throw Cor.NewArgumentException(Message, IIf(IsIndexMissing, IndexName, CountName))
         Case ArgumentOutOfRange_LBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
         Case ArgumentOutOfRange_UBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)

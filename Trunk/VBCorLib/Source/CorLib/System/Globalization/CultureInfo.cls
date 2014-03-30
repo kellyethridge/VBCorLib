@@ -313,7 +313,7 @@ End Property
 Public Property Set NumberFormat(ByVal RHS As NumberFormatInfo)
     Call VerifyWritable
     If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot set NumberFormat to Nothing.", "NumberFormat")
+        Throw Cor.NewArgumentNullException("NumberFormat")
     If IsNeutralCulture Then _
         Throw Cor.NewNotSupportedException("Neutral cultures cannot provide formatting.")
         
@@ -346,7 +346,7 @@ End Property
 Public Property Set DateTimeFormat(ByVal RHS As DateTimeFormatInfo)
     Call VerifyWritable
     If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot set DateTimeFormat to Nothing.", "DateTimeFormat")
+        Throw Cor.NewArgumentNullException("DateTimeFormat")
     If IsNeutralCulture Then _
         Throw Cor.NewNotSupportedException("Neutral cultures cannot provide formatting.")
     

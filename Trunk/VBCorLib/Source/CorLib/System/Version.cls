@@ -228,14 +228,14 @@ End Function
 
 Public Function LessThan(ByRef Value As Version) As Boolean
     If Value Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot compare a Version to Nothing.", "Value")
+        Throw Cor.NewArgumentNullException("Value")
     
     LessThan = (CompareTo(Value) < 0)
 End Function
 
 Public Function LessThanOrEqualTo(ByRef Value As Version) As Boolean
     If Value Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Cannot compare a Version to Nothing.", "Value")
+        Throw Cor.NewArgumentNullException("Value")
     
     LessThanOrEqualTo = (CompareTo(Value) <= 0)
 End Function

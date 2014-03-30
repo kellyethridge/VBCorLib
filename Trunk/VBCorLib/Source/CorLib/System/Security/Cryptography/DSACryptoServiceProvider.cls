@@ -249,7 +249,7 @@ End Sub
 '
 Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     If cArray.IsNull(KeyBlob) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "KeyBlob")
+        Throw Cor.NewArgumentNullException("KeyBlob", Environment.GetResourceString(ArgumentNull_Array))
     
     Call VerifyLoaded(False)
     Call DeleteKey
@@ -267,7 +267,7 @@ End Sub
 '
 Public Sub ImportParameters(ByVal Parameters As DSAParameters)
     If Parameters Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Parameters cannot be Nothing.", "Parameters")
+        Throw Cor.NewArgumentNullException("Parameters")
     
     Call ImportCspBlob(Parameters.ToCspBlob)
 End Sub
@@ -342,7 +342,7 @@ End Function
 '
 Public Function VerifyData(ByRef RgbData() As Byte, ByRef Signature() As Byte) As Boolean
     If cArray.IsNull(RgbData) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Buffer")
+        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim HashObj As New SHA1CryptoServiceProvider
     VerifyData = VerifyHash(HashObj.ComputeHash(RgbData), "SHA1", Signature)
@@ -359,7 +359,7 @@ End Function
 '
 Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef Signature() As Byte) As Boolean
     If cArray.IsNull(Signature) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "Signature")
+        Throw Cor.NewArgumentNullException("Signature", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Hash As Long
     Hash = SetHash(RgbHash, Str)
@@ -526,7 +526,7 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     Call VerifyLoaded
     
     If cArray.IsNull(RgbHash) Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(ArgumentNull_Array), "RgbHash")
+        Throw Cor.NewArgumentNullException("RgbHash", Environment.GetResourceString(ArgumentNull_Array))
     
     Select Case LCase$(Str)
         Case "1.3.14.3.2.26", "sha", "sha1"
@@ -577,7 +577,7 @@ Private Function GetHash(ByRef hAlg As Variant) As HashAlgorithm
             
         Case vbObject
             If hAlg Is Nothing Then _
-                Throw Cor.NewArgumentNullException("Hash object cannot be Nothing.", "hAlg")
+                Throw Cor.NewArgumentNullException("hAlg")
             
             If TypeOf hAlg Is SHA1 Then
                 Set HashObj = hAlg

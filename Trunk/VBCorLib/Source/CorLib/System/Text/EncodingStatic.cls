@@ -133,13 +133,13 @@ End Property
 '
 Public Function Convert(ByVal srcEncoding As Encoding, ByVal dstEncoding As Encoding, ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     If srcEncoding Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Source Encoding cannot be Nothing.", "srcEncoding")
+        Throw Cor.NewArgumentNullException("srcEncoding")
     If dstEncoding Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Destination Encoding cannot be Nothing.", "dstEncoding")
+        Throw Cor.NewArgumentNullException("dstEncoding")
     
-    Dim Ch() As Integer
-    Ch = srcEncoding.GetChars(Bytes, Index, Count)
-    Convert = dstEncoding.GetBytes(Ch)
+    Dim ch() As Integer
+    ch = srcEncoding.GetChars(Bytes, Index, Count)
+    Convert = dstEncoding.GetBytes(ch)
 End Function
 
 ''
