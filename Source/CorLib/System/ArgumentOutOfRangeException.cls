@@ -58,12 +58,9 @@ Private Const ParamNameProperty     As String = "ParamName"
 Private Const ActualValueProperty   As String = "ActualValue"
 Private Const BaseProperty          As String = "Base"
 Private Const DefaultParamName      As String = vbNullString
-Private Const DEF_HRESULT           As Long = COR_E_ARGUMENTOUTOFRANGE
+Private Const DefaultHResult        As Long = COR_E_ARGUMENTOUTOFRANGE
 
-' This can do it all.
-Private mBase           As ExceptionBase
-Private mParamName      As String
-Private mActualValue    As Variant
+Private mBase As ExceptionBase
 
 
 ''
@@ -259,8 +256,8 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByRef ActualValue As Variant, ByRef InnerException As Exception)
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
+Friend Sub Init(ByRef ParamName As String, ByRef ActualValue As Variant, ByRef Message As String, ByRef InnerException As Exception)
+    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DefaultHResult)
     
     If Len(ParamName) > 0 Then
         mBase.SetValue ParamNameProperty, ParamName
@@ -276,7 +273,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init Environment.GetResourceString(ArgumentOutOfRange_Exception), DefaultParamName, MissingVariant, Nothing
+    Init DefaultParamName, MissingVariant, Environment.GetResourceString(ArgumentOutOfRange_Exception), Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)

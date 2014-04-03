@@ -43,7 +43,7 @@ End Sub
 Public Sub Constructor_WithMessage_StoresMessage()
     Const Expected As String = "User Error."
     Dim Ex As ArgumentOutOfRangeException
-    Set Ex = Cor.NewArgumentOutOfRangeException(Expected)
+    Set Ex = Cor.NewArgumentOutOfRangeException(Message:=Expected)
 
     Dim Actual As String
     Actual = Ex.Message
@@ -53,7 +53,7 @@ End Sub
 
 Public Sub Constructor_WithParamName_AppendsToMessage()
     Dim Ex As ArgumentOutOfRangeException
-    Set Ex = Cor.NewArgumentOutOfRangeException("Message", "Param")
+    Set Ex = Cor.NewArgumentOutOfRangeException("Param", Message:="Message")
 
     Dim Actual As String
     Actual = Ex.Message
@@ -63,7 +63,7 @@ End Sub
 
 Public Sub Constructor_WithActualValue_AppendsToMessage()
     Dim Ex As ArgumentOutOfRangeException
-    Set Ex = Cor.NewArgumentOutOfRangeException("Message", ActualValue:=1)
+    Set Ex = Cor.NewArgumentOutOfRangeException(ActualValue:=1, Message:="Message")
     
     Dim Actual As String
     Actual = Ex.Message
@@ -74,7 +74,7 @@ End Sub
 Public Sub Constructor_WithInnerException_StoresInnerException()
     Dim Inner   As New Exception
     Dim Ex      As ArgumentOutOfRangeException
-    Set Ex = Cor.NewArgumentOutOfRangeException("", , , Inner)
+    Set Ex = Cor.NewArgumentOutOfRangeException(InnerException:=Inner)
 
     Dim Actual As Exception
     Set Actual = Ex.InnerException
@@ -96,7 +96,7 @@ Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException(
     Dim Inner2 As Exception
     Set Inner2 = Cor.NewException("", Inner1)
     Dim Ex As ArgumentOutOfRangeException
-    Set Ex = Cor.NewArgumentOutOfRangeException("", , , Inner2)
+    Set Ex = Cor.NewArgumentOutOfRangeException(InnerException:=Inner2)
 
     Dim Actual As Exception
     Set Actual = Ex.GetBaseException
@@ -108,7 +108,7 @@ Public Sub TestPersitence()
     Const Message As String = "User Error."
     Dim Inner   As New Exception
     Dim Ex      As ArgumentOutOfRangeException
-    Set Ex = Cor.NewArgumentOutOfRangeException(Message, "Param", 1, Inner)
+    Set Ex = Cor.NewArgumentOutOfRangeException("Param", 1, Message, Inner)
 
     Dim Bag As New PropertyBag
     Bag.WriteProperty "ex", Ex

@@ -242,7 +242,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Message As String, ByRef ParamName As String, ByVal InnerException As Exception)
+Friend Sub Init(ByRef ParamName As String, ByVal Message As String, ByVal InnerException As Exception)
     If Len(Message) = 0 Then
         Message = Resources.GetString(ArgumentNull_Generic)
     End If
