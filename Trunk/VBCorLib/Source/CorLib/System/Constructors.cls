@@ -171,7 +171,7 @@ End Function
 '
 Public Function NewArgumentException(ByVal Message As String, Optional ByVal ParamName As String, Optional ByVal InnerException As Exception) As ArgumentException
     Set NewArgumentException = New ArgumentException
-    Call NewArgumentException.Init(Message, ParamName, InnerException)
+    NewArgumentException.Init Message, ParamName, InnerException
 End Function
 
 ''
@@ -204,7 +204,7 @@ End Function
 '
 Public Function NewArgumentNullException(Optional ByVal ParamName As String, Optional ByVal Message As String, Optional ByVal InnerException As Exception) As ArgumentNullException
     Set NewArgumentNullException = New ArgumentNullException
-    NewArgumentNullException.Init Message, ParamName, InnerException
+    NewArgumentNullException.Init ParamName, Message, InnerException
 End Function
 
 ''
@@ -217,9 +217,9 @@ End Function
 ' @return A fully created AgrumentOutOfRangeException object.
 ' @see ArgumentOutOfRangeException
 '
-Public Function NewArgumentOutOfRangeException(Optional ByVal Message As String, Optional ByVal ParamName As String, Optional ByVal ActualValue As Variant, Optional ByVal InnerException As Exception) As ArgumentOutOfRangeException
+Public Function NewArgumentOutOfRangeException(Optional ByVal ParamName As String, Optional ByVal ActualValue As Variant, Optional ByVal Message As String, Optional ByVal InnerException As Exception) As ArgumentOutOfRangeException
     Set NewArgumentOutOfRangeException = New ArgumentOutOfRangeException
-    Call NewArgumentOutOfRangeException.Init(Message, ParamName, ActualValue, InnerException)
+    NewArgumentOutOfRangeException.Init ParamName, ActualValue, Message, InnerException
 End Function
 
 ''
