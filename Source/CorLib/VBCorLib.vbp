@@ -325,6 +325,7 @@ Module=ConvertNumeric; System\Globalization\ConvertNumeric.bas
 Module=modFormattable; System\modFormattable.bas
 Class=Formattable; System\Formattable.cls
 ResFile32="VBCorLib.RES"
+RelatedDoc=ChangeLog.txt
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"

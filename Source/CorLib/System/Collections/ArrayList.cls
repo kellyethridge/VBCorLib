@@ -165,7 +165,7 @@ End Property
 ' @include "..\..\Includes\ArrayListCapacity.txt"
 Public Property Let Capacity(ByVal RHS As Long)
     If RHS < mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity), "Capacity", Capacity)
+        Throw Cor.NewArgumentOutOfRangeException("Capacity", Capacity, Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity))
     
     If RHS = 0 Then RHS = DEF_CAPACITY
     If RHS = mCapacity Then Exit Property
@@ -358,7 +358,7 @@ End Function
 '
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_ArrayListInsert), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_ArrayListInsert))
     
     If mCount = mCapacity Then Call EnsureCapacity(mCount + 1)
     Call InsertSpace(Index, 1)
@@ -382,7 +382,7 @@ End Sub
 '
 Public Sub InsertRange(ByVal Index As Long, ByRef c As Variant)
     If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_ArrayListInsert), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_ArrayListInsert))
     
     Call WriteRange(Index, c, True)
     mVersion = mVersion + 1
@@ -423,7 +423,7 @@ End Property
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Call VariantCopy(Item, mItems(Index))
 End Property
@@ -440,7 +440,7 @@ End Property
 '
 Public Property Let Item(ByVal Index As Long, ByRef RHS As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     mItems(Index) = RHS
     mVersion = mVersion + 1
@@ -458,7 +458,7 @@ End Property
 '
 Public Property Set Item(ByVal Index As Long, ByRef RHS As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Set mItems(Index) = RHS
     mVersion = mVersion + 1
@@ -482,9 +482,9 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
     If GetOptionalLongPair(StartIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(StartIndex), "StartIndex", "Count"))
     If ElemIndex >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection), "StartIndex", ElemIndex)
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", ElemCount)
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex - ElemCount + 1 < 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
     
@@ -536,7 +536,7 @@ End Sub
 '
 Public Sub RemoveAt(ByVal Index As Long)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     mItems(Index) = Empty
     Call RemoveSpace(Index, 1)

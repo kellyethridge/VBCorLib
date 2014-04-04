@@ -177,8 +177,8 @@ End Function
 ''
 ' Creates a new ArgumentNullException object.
 '
-' @param Message A human-readable message explaining the exception.
 ' @param ParamName The parameter that caused the exception.
+' @param Message A human-readable message explaining the exception.
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created ArgumentNullException object.
 ' @remarks
@@ -190,11 +190,11 @@ End Function
 ' Throw New ArgumentNullException
 '
 ' '' Throws an ArgumentNullException with a custom message and parameter name
-' Throw Cor.NewArgumentNullException("A valid object is required.", "MyParam")
+' Throw Cor.NewArgumentNullException("MyParam", "A valid object is required.")
 '
 ' '' Throws an ArgumentNullException with a custom message and error code and parameter name
 ' Dim ex As ArgumentNullException
-' Set ex = Cor.NewArgumentNullException("A valid object is required.", "MyParam")
+' Set ex = Cor.NewArgumentNullException("MyParam", "A valid object is required.")
 ' ex.HResult = 123
 ' Throw ex
 ' </pre></p>
@@ -210,9 +210,9 @@ End Function
 ''
 ' Creates a new ArgumentOutOfRangeException object.
 '
-' @param Message A human-readable message explaining the exception.
 ' @param ParamName The parameter that caused the exception.
 ' @param ActualValue The value of the parameter that caused the exception.
+' @param Message A human-readable message explaining the exception.
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created AgrumentOutOfRangeException object.
 ' @see ArgumentOutOfRangeException
