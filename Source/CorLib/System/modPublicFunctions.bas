@@ -152,7 +152,7 @@ Public Sub VerifyFileAccess(ByVal Access As FileAccess)
     Select Case Access
         Case FileAccess.ReadAccess, FileAccess.ReadWriteAccess, FileAccess.WriteAccess
         Case Else
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Enum), "Access", Access)
+            Throw Cor.NewArgumentOutOfRangeException("Access", Access, Environment.GetResourceString(ArgumentOutOfRange_Enum))
     End Select
 End Sub
 
@@ -165,7 +165,7 @@ Public Sub VerifyFileShare(ByVal Share As FileShare)
     Select Case Share
         Case FileShare.None, FileShare.ReadShare, FileShare.ReadWriteShare, FileShare.WriteShare
         Case Else
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Enum), "Share", Share)
+            Throw Cor.NewArgumentOutOfRangeException("Share", Share, Environment.GetResourceString(ArgumentOutOfRange_Enum))
     End Select
 End Sub
 

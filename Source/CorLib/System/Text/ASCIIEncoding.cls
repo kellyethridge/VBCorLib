@@ -331,7 +331,7 @@ End Function
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     If ByteCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "ByteCount", ByteCount)
+        Throw Cor.NewArgumentOutOfRangeException("ByteCount", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
         
     GetMaxCharCount = ByteCount
 End Function
@@ -345,7 +345,7 @@ End Function
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "CharCount", CharCount)
+        Throw Cor.NewArgumentOutOfRangeException("CharCount", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     GetMaxByteCount = CharCount
 End Function
@@ -459,7 +459,7 @@ Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long,
     If cArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If ByteIndex < LBound(Bytes) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
+        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If ByteIndex + Count - 1 > UBound(Bytes) Then Call SmallBufferError("Bytes")
     
     Dim i   As Long
@@ -485,7 +485,7 @@ Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long
     If cArray.IsNull(Chars) Then _
         Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
+        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If CharIndex + ByteCount - 1 > UBound(Chars) Then Call SmallBufferError("Chars")
     
     Dim i As Long

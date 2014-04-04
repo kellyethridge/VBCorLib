@@ -164,7 +164,7 @@ Public Function ReadBytes(ByVal Count As Long) As Byte()
     Call VerifyIsOpen
     
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim Ret() As Byte
     If Count > 0 Then
@@ -193,7 +193,7 @@ Public Function ReadChars(ByVal Count As Long) As Integer()
     Call VerifyIsOpen
     
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim Ret() As Integer
     If Count > 0 Then

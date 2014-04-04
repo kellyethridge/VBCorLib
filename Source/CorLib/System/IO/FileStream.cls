@@ -269,15 +269,15 @@ End Property
 ' @remarks Onces a section of the file is locked, read access is still allowed to other processes.
 '
 Public Sub LockStream(ByVal Position As Currency, ByVal Length As Currency)
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Position", Position)
+        Throw Cor.NewArgumentOutOfRangeException("Position", Position, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Length", Length)
+        Throw Cor.NewArgumentOutOfRangeException("Length", Length, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
@@ -297,11 +297,11 @@ Public Sub UnlockStream(ByVal Position As Currency, ByVal Length As Currency)
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Position", Position)
+        Throw Cor.NewArgumentOutOfRangeException("Position", Position, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Length", Length)
+        Throw Cor.NewArgumentOutOfRangeException("Length", Length, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
@@ -423,7 +423,7 @@ Public Sub SetLength(ByVal Value As Currency)
     Value = Int(Value)
     If Value < mMinPosition Then
         If mMinPosition = 0@ Then
-            Throw Cor.NewArgumentOutOfRangeException("Cannot set the length to a negative value.", "Value", Value)
+            Throw Cor.NewArgumentOutOfRangeException("Value", Value, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
         Else
             Throw Cor.NewIOException("Setting the length to a position prior to the append-start postion is not permitted.")
         End If
@@ -779,7 +779,7 @@ Friend Sub Init(ByVal sPath As String, ByVal Mode As FileMode, ByVal Access As F
     If Len(sPath) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
     If BufferSize <= 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum), "BufferSize", BufferSize)
+        Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
         
     Dim AppendMode As Boolean
     If Mode = FileMode.Append Then
@@ -827,7 +827,7 @@ Friend Sub InitFromHandle(ByVal Handle As Long, ByVal Access As FileAccess, ByVa
     If Handle = INVALID_HANDLE Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidHandle))
     If BufferSize < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum), "BufferSize", BufferSize)
+        Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
     
     mOwnsHandle = OwnsHandle
     mHandle = Handle

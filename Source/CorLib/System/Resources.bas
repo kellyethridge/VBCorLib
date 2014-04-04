@@ -60,6 +60,17 @@ Public Enum ResourceStringId
     ArgumentOutOfRange_StartIndex = 720
     ArgumentOutOfRange_OffsetOut = 721
     ArgumentOutOfRange_IndexLength = 722
+    ArgumentOutOfRange_InvalidFileTime = 723
+    ArgumentOutOfRange_Month = 724
+    ArgumentOutOfRange_Year = 725
+    ArgumentOutOfRange_BeepFrequency = 726
+    ArgumentOutOfRange_ConsoleBufferSize = 727
+    ArgumentOutOfRange_ConsoleWindowSize_Size = 728
+    ArgumentOutOfRange_ConsoleWindowPos = 729
+    ArgumentOutOfRange_ConsoleBufferLessThanWindowSize = 730
+    ArgumentOutOfRange_ConsoleTitleTooLong = 731
+    ArgumentOutOfRange_ConsoleColor = 732
+    ArgumentOutOfRange_CursorSize = 733
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802

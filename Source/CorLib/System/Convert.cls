@@ -122,11 +122,11 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As 
     ElemIndex = GetOptionalLong(Index, LBound(InArray))
     ElemCount = GetOptionalLong(Length, (UBound(InArray) - LBound(InArray) + 1) - ElemIndex)
     If ElemIndex < LBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "Index")
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NegativeLength))
     If ElemIndex + ElemCount - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength))
+        Throw Cor.NewArgumentException(Resources.GetString(ArgumentOutOfRange_IndexLength))
     
     ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(ElemCount, InsertLineBreaks))
     mChars.SA.pvData = StrPtr(ToBase64String)
@@ -155,19 +155,19 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long
     If SAPtr(OutArray) = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("OutArray", Resources.GetString(ArgumentNull_Array))
     If IndexIn < LBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexIn")
+        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NegativeLength))
     If IndexIn + Length - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength), "IndexIn")
+        Throw Cor.NewArgumentOutOfRangeException("IndexLength", Message:=Resources.GetString(ArgumentOutOfRange_IndexLength))
     If IndexOut < LBound(OutArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexOut")
+        Throw Cor.NewArgumentOutOfRangeException("IndexOut", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
         
     Dim Size As Long
     Size = CalculateOutputLength(Length, InsertLineBreaks)
     
     If IndexOut + Size - 1 > UBound(OutArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_OffsetOut), "IndexOut")
+        Throw Cor.NewArgumentException(Resources.GetString(ArgumentOutOfRange_OffsetOut))
     
     ToBase64CharArray = InternalToBase64CharArray(InArray, IndexIn, Length, OutArray, IndexOut, InsertLineBreaks)
 End Function
@@ -185,11 +185,11 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
     If SAPtr(InArray) = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("InArray", Resources.GetString(ArgumentNull_Array))
     If IndexIn < LBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "IndexIn")
+        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NegativeLength))
     If IndexIn + Length - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength), "IndexIn")
+        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Resources.GetString(ArgumentOutOfRange_IndexLength))
     
     Dim Ret() As Byte
     SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, Length)

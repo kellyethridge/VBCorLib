@@ -49,7 +49,7 @@ Implements IObject
 ' maxValue. The number will never equal maxValue.
 Public Function NextLong(Optional ByVal MaxValue As Long = &H7FFFFFFF) As Long
     If MaxValue < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "MaxValue", MaxValue)
+        Throw Cor.NewArgumentOutOfRangeException("MaxValue", MaxValue, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     NextLong = NextNumber(0, MaxValue)
 End Function
 
@@ -63,7 +63,7 @@ End Function
 ' The number will never equal maxValue.
 Public Function NextRange(ByVal MinValue As Long, ByVal MaxValue As Long) As Long
     If MaxValue < MinValue Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_MinMax), "maxValue", MaxValue)
+        Throw Cor.NewArgumentOutOfRangeException("MaxValue", MaxValue, Environment.GetResourceString(ArgumentOutOfRange_MinMax))
     NextRange = NextNumber(MinValue, MaxValue)
 End Function
 

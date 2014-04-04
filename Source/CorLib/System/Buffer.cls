@@ -105,7 +105,7 @@ Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
     Dim pSA As Long
     pSA = GetArrayPointer(Arr, True)
     If Index < 0 Or Index >= (UBound(Arr) - LBound(Arr) + 1) * SafeArrayGetElemsize(pSA) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
     GetByte = MemByte(MemLong(pSA + PVDATA_OFFSET) + Index)
 End Function
@@ -125,7 +125,7 @@ Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byt
     Dim pSA As Long
     pSA = GetArrayPointer(Arr, True)
     If Index < 0 Or Index >= (UBound(Arr) - LBound(Arr) + 1) * SafeArrayGetElemsize(pSA) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
     MemByte(MemLong(pSA + PVDATA_OFFSET) + Index) = Value
 End Sub

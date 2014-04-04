@@ -204,7 +204,7 @@ End Property
 '
 Public Property Let Interval(ByVal Value As Long)
     If Value < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Interval", Value)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
         
     mInterval = Value
     If Enabled Then

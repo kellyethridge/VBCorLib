@@ -318,7 +318,7 @@ Public Property Let Capacity(ByVal RHS As Long)
     If mIsUserArray Then _
         Throw Cor.NewNotSupportedException("The capacity cannot be modified when using a user supplied byte array.")
     If RHS < mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Capacity cannot be set less than then length of the stream.", "Capacity", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:="Capacity cannot be set less than then length of the stream.")
     
     If RHS = mLength Then Exit Property
     mCapacity = RHS - 1
@@ -365,7 +365,7 @@ Public Property Let Position(ByVal RHS As Currency)
     Call VerifyOpen
     
     If RHS < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Position", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     mPosition = Int(RHS)
 End Property
 
@@ -530,7 +530,7 @@ Public Sub SetLength(ByVal Value As Currency)
         Case Is > mCapacity
             Capacity = Value
         Case Is < 0@
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Value", Value)
+            Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     End Select
     mLength = Value
 End Sub

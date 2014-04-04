@@ -132,7 +132,7 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
     If cArray.IsNull(Chars) Then _
         Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "CharIndex", CharIndex)
+        Throw Cor.NewArgumentOutOfRangeException("CharIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     
     If ByteCount = 0 Then Exit Function
     

@@ -176,7 +176,7 @@ End Function
 
 Private Property Let ArrayList_Capacity(ByVal RHS As Long)
     If RHS < mList.Count Then
-        Throw Cor.NewArgumentOutOfRangeException("Capacity cannot be set less than the size of the list.")
+        Throw Cor.NewArgumentOutOfRangeException(Message:="Capacity cannot be set less than the size of the list.")
     End If
 End Property
 

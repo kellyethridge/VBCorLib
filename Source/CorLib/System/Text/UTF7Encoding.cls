@@ -340,7 +340,7 @@ End Function
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     If ByteCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "ByteCount", ByteCount)
+        Throw Cor.NewArgumentOutOfRangeException("ByteCount", ByteCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
         
     GetMaxCharCount = ByteCount
 End Function
@@ -353,7 +353,7 @@ End Function
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "CharCount", CharCount)
+        Throw Cor.NewArgumentOutOfRangeException("CharCount", CharCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     GetMaxByteCount = 2 + (-(Int(-((CharCount * 16) / 6))))
 End Function
@@ -465,7 +465,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
     If cArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If ByteIndex < LBound(Bytes) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "ByteIndex", ByteIndex)
+        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", ByteIndex, Environment.GetResourceString(ArgumentOutOfRange_LBound))
     
     If Not Encoder Is Nothing Then
         With Encoder
@@ -668,7 +668,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     If cArray.IsNull(Chars) Then _
         Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "CharIndex", CharIndex)
+        Throw Cor.NewArgumentOutOfRangeException("CharIndex", CharIndex, Environment.GetResourceString(ArgumentOutOfRange_LBound))
     
     If Not Decoder Is Nothing Then
         With Decoder

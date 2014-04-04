@@ -355,7 +355,7 @@ End Function
 '
 Public Function AddMonths(ByVal Months As Long) As cDateTime
     If Months < -120000 Or Months > 120000 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Months must be between -120000 and 120000 inclusively.", "Months", Months)
+        Throw Cor.NewArgumentOutOfRangeException("Months", Months, "Months must be between -120000 and 120000 inclusively.")
     
     If Months = 0 Then
         Set AddMonths = Me
@@ -412,7 +412,7 @@ Public Function AddTicks(ByRef Value As Variant) As cDateTime
     DecimalValue = CDec(Value)
     
     If DecimalValue < CDec(0) Or DecimalValue > CDec(MAX_MILLISECONDS) * 10000 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Ticks is outside the valid range of values", "value", DecimalValue)
+        Throw Cor.NewArgumentOutOfRangeException("Value", DecimalValue, "Ticks is outside the valid range of values")
     
     Set AddTicks = cDateTime.FromMilliseconds(mMilliseconds + DecimalValue / 10000, mKind)
 End Function
@@ -483,7 +483,7 @@ Public Function ToFileTime() As Currency
     Dim ms As Currency
     ms = TimeZone.CurrentTimeZone.ToUniversalTime(Me).TotalMilliseconds
     If ms < FILETIME_MINIMUM Then _
-        Throw Cor.NewArgumentOutOfRangeException("Cannot convert times less than 1/1/1601 12:00AM to filetime.", "ToFileTime", ToString)
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_InvalidFileTime))
     ToFileTime = ms - MILLISECONDS_TO_16011231
 End Function
 
@@ -495,7 +495,7 @@ End Function
 '
 Public Function ToFileTimeUtc() As Currency
     If mMilliseconds < FILETIME_MINIMUM Then _
-        Throw Cor.NewArgumentOutOfRangeException("Cannot convert times less than 1/1/1601 12:00AM to filetime.", "ToFileTimeUtc", ToString)
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_InvalidFileTime))
     ToFileTimeUtc = mMilliseconds - MILLISECONDS_TO_16011231
 End Function
 
@@ -746,7 +746,7 @@ End Sub
 
 Friend Sub InitFromMilliseconds(ByVal ms As Currency, ByVal Kind As DateTimeKind)
     If ms < 0@ Or ms > MAX_MILLISECONDS Then _
-        Throw Cor.NewArgumentOutOfRangeException("Milliseconds must be between 0 and " & MAX_MILLISECONDS & " inclusively.", "ms", ms)
+        Throw Cor.NewArgumentOutOfRangeException("ms", ms, "Milliseconds must be between 0 and " & MAX_MILLISECONDS & " inclusively.")
         
     mMilliseconds = ms
     mKind = Kind
@@ -767,7 +767,7 @@ End Sub
 
 Friend Sub InitFromFileTime(ByVal Time As Currency, ByVal Kind As DateTimeKind)
     If Time < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Time", Time)
+        Throw Cor.NewArgumentOutOfRangeException("Time", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     mMilliseconds = Time + MILLISECONDS_TO_16011231
     mKind = Kind
@@ -851,11 +851,11 @@ End Function
 Private Function GetTotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long
     If Year = 0 And Month = 0 And Day = 0 Then Exit Function
     If Year < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_ValidValues), "Year", Year)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
     If Month < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_ValidValues), "Month", Month)
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
     If Day < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_ValidValues), "Day", Day)
+        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
     
     Dim Days As Long
     If cDateTime.IsLeapYear(Year) Then

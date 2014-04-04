@@ -96,9 +96,9 @@ End Property
 ' array will have one element containing the value 1.
 '
 Public Property Get Eras() As Long()
-    Dim ret(0) As Long
-    ret(0) = 1
-    Eras = ret
+    Dim Ret(0) As Long
+    Ret(0) = 1
+    Eras = Ret
 End Property
 
 ''
@@ -126,8 +126,11 @@ End Property
 ' The years 29 would become 2029 and 30 would become 1930.
 '
 Public Property Let TwoDigitYearMax(ByVal RHS As Long)
-    If RHS < 100 Or RHS > 9999 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year must be between 100 and 9999 inclusively.", "TwoDigitYearMax", RHS)
+    Const MinTwoDigitYear As Long = 100
+    Const MaxTwoDigitYear As Long = 9999
+    
+    If RHS < MinTwoDigitYear Or RHS > MaxTwoDigitYear Then _
+        Throw Cor.NewArgumentOutOfRangeException("Year", Message:=Resources.GetString(ArgumentOutOfRange_Range, MinTwoDigitYear, MaxTwoDigitYear))
     
     mTwoDigitYearMax = RHS
 End Property
@@ -404,7 +407,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     Call VerifyYear(Year)
     Call VerifyMonth(Month)
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)), "Day", Day)
+        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
     
     If Month = 2 Then
         IsLeapDay = (Day = 29)
@@ -479,7 +482,7 @@ End Function
 '
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     If Year < 0 Or Year > 9999 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999), "Year", Year)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
 
     If Year < 100 Then
         Dim y As Long
@@ -540,11 +543,11 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < 1 Or Year > 9999 Then Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999), "Year", Year)
+    If Year < 1 Or Year > 9999 Then Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999))
 End Sub
 
 Private Sub VerifyMonth(ByVal Month As Long)
-    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12), "Month", Month)
+    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
 End Sub
 
 

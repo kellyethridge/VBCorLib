@@ -106,7 +106,7 @@ End Property
 '
 Public Property Let Capacity(ByVal RHS As Long)
     If RHS < mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity), "Capacity", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity))
     If RHS = mCapacity Then Exit Property
     If RHS = 0 Then RHS = DEF_CAPACITY
     mCapacity = RHS
@@ -185,7 +185,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If cArray.IsNull(DstArray) Then _
         Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(DstArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If cArray.GetRank(DstArray) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If Index + mCount - 1 > UBound(DstArray) Then _
@@ -226,7 +226,7 @@ End Function
 '
 Public Function GetByIndex(ByVal Index As Long) As Variant
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     Call VariantCopy(GetByIndex, mValues(Index))
 End Function
 
@@ -260,7 +260,7 @@ End Function
 '
 Public Function GetKey(ByVal Index As Long) As Variant
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     Call VariantCopy(GetKey, mKeys(Index))
 End Function
 
@@ -425,7 +425,7 @@ End Sub
 '
 Public Sub RemoveAt(ByVal Index As Long)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     mKeys(Index) = Empty
     mValues(Index) = Empty
@@ -448,7 +448,7 @@ End Sub
 '
 Public Sub SetByIndex(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     Call VariantCopyInd(mValues(Index), Value)
     mVersion = mVersion + 1
 End Sub
