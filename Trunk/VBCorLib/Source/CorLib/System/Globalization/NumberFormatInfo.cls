@@ -504,7 +504,7 @@ Public Property Let PercentDecimalDigits(ByVal RHS As Long)
     VerifyWritable
     VerifyLoaded
     If RHS < 0 Or RHS > 99 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99), "PercentDecimalDigits", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99))
         
     mProps.PercentDecimalDigits = RHS
 End Property
@@ -674,7 +674,7 @@ Public Property Let CurrencyDecimalDigits(ByVal RHS As Long)
     VerifyWritable
     VerifyLoaded
     If RHS < 0 Or RHS > 99 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99), "CurrencyDecimalDigits", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99))
     mProps.CurrencyDecimalDigits = RHS
 End Property
 
@@ -850,7 +850,7 @@ Public Property Let NumberNegativePattern(ByVal RHS As NumberNegativePatterns)
     VerifyWritable
     VerifyLoaded
     If RHS < 0 Or RHS > 4 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "NumberNegativePattern", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     mProps.NumberNegativePattern = RHS
 End Property
 
@@ -912,7 +912,7 @@ Public Property Let NumberDecimalDigits(ByVal RHS As Long)
     VerifyWritable
     VerifyLoaded
     If RHS < 0 Or RHS > 99 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99), "NumberDecimalDigits", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99))
     mProps.NumberDecimalDigits = RHS
 End Property
 

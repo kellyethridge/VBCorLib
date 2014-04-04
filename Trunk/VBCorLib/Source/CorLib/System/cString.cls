@@ -427,14 +427,14 @@ End Function
 ' Inserts a string into an existing string, returning the result.
 '
 ' @param s The string to insert to.
-' @param Index The starting position to insert the string.
+' @param StartIndex The starting position to insert the string.
 ' @param Value The string to be inserted.
 ' @return A string containing the new string created from the insertion.
 ' @remarks Index is zero-based.
 '
-Public Function Insert(ByRef s As String, ByVal Index As Long, ByRef Value As String) As String
-    If Index < 0 Or Index > Len(s) Then _
-        Throw Cor.NewArgumentOutOfRangeException(cString.Format("Index must be between 0 and {0}.", Len(s)), "Index", Index)
+Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
+    If StartIndex < 0 Or StartIndex > Len(s) Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex")
     
     Dim ValueLength As Long
     ValueLength = Len(Value)
@@ -449,14 +449,14 @@ Public Function Insert(ByRef s As String, ByVal Index As Long, ByRef Value As St
     
     Insert = Space$(ValueLength + Len(s))
     
-    Dim ptrInsert As Long
-    ptrInsert = StrPtr(Insert)
+    Dim PtrInsert As Long
+    PtrInsert = StrPtr(Insert)
     
     ValueLength = ValueLength * 2
-    Index = Index * 2
-    Call CopyMemory(ByVal ptrInsert, ByVal PtrS, Index)
-    Call CopyMemory(ByVal ptrInsert + Index, ByVal StrPtr(Value), ValueLength)
-    Call CopyMemory(ByVal ptrInsert + Index + ValueLength, ByVal PtrS + Index, LenB(Insert) - (Index + ValueLength))
+    StartIndex = StartIndex * 2
+    CopyMemory ByVal PtrInsert, ByVal PtrS, StartIndex
+    CopyMemory ByVal PtrInsert + StartIndex, ByVal StrPtr(Value), ValueLength
+    CopyMemory ByVal PtrInsert + StartIndex + ValueLength, ByVal PtrS + StartIndex, LenB(Insert) - (StartIndex + ValueLength)
 End Function
 
 Public Function CharCount(ByRef s As String, ByVal Char As Variant) As Long

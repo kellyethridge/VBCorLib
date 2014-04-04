@@ -89,7 +89,7 @@ End Property
 
 Public Property Let HijriAdjustment(ByVal RHS As Long)
     If RHS < -2 Or RHS > 2 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, -2, 2), "HijriAdjustment", HijriAdjustment)
+        Throw Cor.NewArgumentOutOfRangeException("HijriAdjustment", HijriAdjustment, Environment.GetResourceString(ArgumentOutOfRange_Range, -2, 2))
         
     mHijriAdjustment = RHS
 End Property
@@ -106,7 +106,7 @@ End Property
 
 Public Property Let TwoDigitYearMax(ByVal RHS As Long)
     If RHS < 100 Or RHS > MAX_YEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year must be between 100 and 9999 inclusively.", "TwoDigitYearMax", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Message:="Year must be between 100 and 9999 inclusively.")
     
     mTwoDigitYearMax = RHS
 End Property
@@ -129,7 +129,7 @@ End Function
 
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateTime
     If Months < -120000 Or Months > 120000 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, -120000, 120000), "Months", Months)
+        Throw Cor.NewArgumentOutOfRangeException("Months", Months, Environment.GetResourceString(ArgumentOutOfRange_Range, -120000, 120000))
     
     If Months = 0 Then
         Set AddMonths = cDateTime.GetcDateTime(Time)
@@ -253,7 +253,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     
     MaxDays = Me.GetDaysInMonth(Year, Month)
     If Day < 1 Or Day > MaxDays Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MaxDays), "Day", Day)
+        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MaxDays))
         
     If Day = 30 And Month = 12 Then IsLeapDay = IsLeapYear(Year, Era)
 End Function
@@ -284,7 +284,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     If ms >= 0 Then
         Set ToDateTime = cDateTime.FromMilliseconds(ms + Hour * MILLISECONDS_PER_HOUR + Minute * MILLISECONDS_PER_MINUTE + Second * MILLISECONDS_PER_SECOND + Millisecond)
     Else
-        Throw Cor.NewArgumentOutOfRangeException("Invalid Year, Month, or Day for this calendar")
+        Throw Cor.NewArgumentOutOfRangeException(Message:="Invalid Year, Month, or Day for this calendar")
     End If
 End Function
 
@@ -292,7 +292,7 @@ Public Function ToFourDigitYear(ByVal Year As Long) As Long
     Dim y As Long
     
     If Year < 0 Or Year > MAX_YEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999), "Year", Year)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
 
     If Year < 100 Then
         y = Year Mod 100
@@ -344,7 +344,7 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < 1 Or Year > MAX_YEAR Then Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9666), "Year", Year)
+    If Year < 1 Or Year > MAX_YEAR Then Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9666))
 End Sub
 
 Private Sub VerifyYearMonth(ByVal Year As Long, ByVal Month As Long)
@@ -352,7 +352,7 @@ Private Sub VerifyYearMonth(ByVal Year As Long, ByVal Month As Long)
     If (Month < 1) Or _
        (Month > MONTHS_PER_YEAR) Or _
        (Year = MAX_YEAR And Month > MAX_SHORTMONTH) Then
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, IIf(Year = 9666, 4, 12)), "Month", Month)
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, IIf(Year = 9666, 4, 12)))
     End If
 End Sub
 
@@ -361,10 +361,10 @@ Private Sub VerifyYearMonthDay(ByVal Year As Long, ByVal Month As Long, ByVal Da
     If Year = MAX_YEAR Then
         If Month = MAX_SHORTMONTH Then
             If Day > MAX_SHORTDAY Then
-                Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MAX_SHORTDAY), "Day", Day)
+                Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MAX_SHORTDAY))
             End If
         ElseIf Day > mMonthDays(Month - 1) Then
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, mMonthDays(Month - 1)), "Day", Day)
+            Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, mMonthDays(Month - 1)))
         End If
     End If
 End Sub
@@ -375,7 +375,7 @@ Private Function GetFixedDays(ByRef Time As Variant) As Long
     GetFixedDays = Int(dt.TotalMilliseconds / MILLISECONDS_PER_DAY) + mHijriAdjustment
     
     If GetFixedDays < 1 Or GetFixedDays > MAX_FIXED_DAYS Then _
-        Throw Cor.NewArgumentOutOfRangeException("Hijri calendary only represents dates from 1/1/0001 to 4/3/9666.", "Time", Time)
+        Throw Cor.NewArgumentOutOfRangeException("Time", Time, "Hijri calendary only represents dates from 1/1/0001 to 4/3/9666.")
 End Function
 
 Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long

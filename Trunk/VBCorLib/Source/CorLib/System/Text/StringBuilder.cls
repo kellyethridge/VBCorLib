@@ -95,11 +95,11 @@ Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Vari
     CharCount = GetOptionalLong(Count, Len(s) - ElemIndex)
     
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_Index))
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + CharCount > Len(s) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_Index))
         
     If mLength + CharCount > mCapacity Then
         EnsureCapacity mLength + CharCount
@@ -123,9 +123,9 @@ End Function
 '
 Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1) As StringBuilder
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count cannot be negative.", "Count", Count)
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If Char < -&H7FFF& Or Char > &HFFFF& Then _
-        Throw Cor.NewArgumentOutOfRangeException("Char must be between -32767 and 65535 inclusively.", "Char", Char)
+        Throw Cor.NewArgumentOutOfRangeException("Char", Char, "Char must be between -32767 and 65535 inclusively.")
     
     If Char > &H7FFF& Then Char = Char - &H10000
     
@@ -164,9 +164,9 @@ Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef StartIndex 
     LocalCharCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
     
     If ElemIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
     If ElemIndex + LocalCharCount - 1 > UBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_Index))
     
     If LocalCharCount > 0 Then
         If mLength + LocalCharCount > mCapacity Then
@@ -271,17 +271,17 @@ End Sub
 '
 Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByVal DestinationIndex As Long, ByVal Count As Long)
     If SourceIndex < 0 Or SourceIndex > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "SourceIndex")
+        Throw Cor.NewArgumentOutOfRangeException("SourceIndex", Message:=Resources.GetString(ArgumentOutOfRange_Index))
     If SAPtr(Destination) = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Destination", Resources.GetString(ArgumentNull_Array))
     If DestinationIndex < LBound(Destination) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "DestinationIndex")
+        Throw Cor.NewArgumentOutOfRangeException("DestinationIndex", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If SourceIndex + Count > mLength Then _
         Throw Cor.NewArgumentException(Resources.GetString(Arg_LongerThanSrcString))
     If DestinationIndex + Count - 1 > UBound(Destination) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_OffsetOut))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_OffsetOut))
     
     If Count > 0 Then
         CopyMemory Destination(DestinationIndex), ByVal mStringPtr + SourceIndex * BytesPerChar, Count * BytesPerChar
@@ -304,7 +304,7 @@ End Property
 '
 Public Property Let Capacity(ByVal RHS As Long)
     If RHS < mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Cannot set capacity less than the length of the current instance.", "Capacity", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:="Cannot set capacity less than the length of the current instance.")
     
     If RHS <> mCapacity Then
         Dim ptr As Long
@@ -344,7 +344,7 @@ End Property
 '
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_Index))
     
     mString(Index) = Char
 End Property
@@ -426,9 +426,9 @@ End Function
 '
 Public Function Insert(ByVal Index As Long, ByRef Value As Variant, Optional ByVal Count As Long = 1) As StringBuilder
     If Index < 0 Or Index > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_Index))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count", Count)
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim s As String
     s = Convert.ToString(Value)
@@ -458,7 +458,7 @@ End Function
 '
 Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef CharCount As Variant) As StringBuilder
     If Index < 0 Or Index > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "Index")
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
     If SAPtr(Chars) = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Chars", Resources.GetString(ArgumentNull_Array))
     
@@ -468,11 +468,11 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
     ElemCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
     
     If ElemIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_LBound), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "CharCount")
+        Throw Cor.NewArgumentOutOfRangeException("CharCount", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount - 1 > UBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_Index))
         
     If ElemCount > 0 Then
         InsertSpace Index, ElemCount
@@ -499,7 +499,7 @@ End Property
 '
 Public Property Let Length(ByVal RHS As Long)
     If RHS < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length", Length)
+        Throw Cor.NewArgumentOutOfRangeException("Length", Length, Resources.GetString(ArgumentOutOfRange_NegativeLength))
     
     If RHS > mLength Then
         If RHS > mCapacity Then
@@ -520,11 +520,11 @@ End Property
 '
 Public Function Remove(ByVal StartIndex As Long, ByVal Length As Long) As StringBuilder
     If StartIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_StartIndex), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_StartIndex))
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NegativeLength))
     If StartIndex + Length > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_Index))
         
     If Length > 0 Then
         CopyMemory ByVal mStringPtr + StartIndex * 2, ByVal mStringPtr + (StartIndex + Length) * BytesPerChar, (mLength - (StartIndex + Length)) * BytesPerChar
@@ -553,11 +553,11 @@ Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Opti
     ElemCount = GetOptionalLong(Count, mLength - ElemStart)
     
     If ElemStart < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_StartIndex), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_StartIndex))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Count")
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemStart + ElemCount > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_Index))
     
     Dim MatchCount      As Long
     Dim MatchIndexes()  As Long
@@ -595,11 +595,11 @@ Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Le
     ElemCount = GetOptionalLong(Length, mLength)
     
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_StartIndex), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_StartIndex))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NegativeLength), "Length")
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NegativeLength))
     If ElemIndex + ElemCount > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_Index))
     
     If ElemCount = 0 Then
         ToString = ""
@@ -619,13 +619,13 @@ Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Length As 
     ElemCount = GetOptionalLong(Length, Len(s) - ElemIndex)
         
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_StartIndex), "StartIndex")
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_StartIndex))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Length")
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > Len(s) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_IndexLength))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_IndexLength))
     If Capacity < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum), "Capacity")
+        Throw Cor.NewArgumentOutOfRangeException("Capacity", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
         
     If Capacity = 0 Then
         Capacity = DefaultCapacity

@@ -73,7 +73,7 @@ Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Op
         ' The resource type must be the number 6, not a String "6".
         If Not IsInteger(ResourceType) Then Exit Function
         ' Check if it is a 6.
-        If ResourceType <> ResourceTypes.stringresource Then Exit Function
+        If ResourceType <> ResourceTypes.StringResource Then Exit Function
     End If
     
     ' String resources require a numeric ID.
@@ -83,7 +83,7 @@ Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Op
     ' the .RES file. This is not the same as the StringID.
     ' However, the entry ID is derived from the String ID.
     Dim Key As ResourceKey
-    Set Key = Cor.NewResourceKey(GetResourceEntryID(ResourceName), ResourceTypes.stringresource, GetLanguageID(LanguageID))
+    Set Key = Cor.NewResourceKey(GetResourceEntryID(ResourceName), ResourceTypes.StringResource, GetLanguageID(LanguageID))
     
     Dim ResourceEntry As ResStringResource
     Set ResourceEntry = GetResourceEntry(Key)
@@ -146,7 +146,7 @@ End Sub
 ' into the 16 strings of the specific resource entry.
 Private Function GetResourceEntryID(ByVal StringID As Long)
     If StringID < 1 Or StringID > 65535 Then _
-        Throw Cor.NewArgumentOutOfRangeException("String ID's can only be 1 to 65535.", "ResourceName", StringID)
+        Throw Cor.NewArgumentOutOfRangeException("ResourceName", StringID, "String ID's can only be 1 to 65535.")
     
     ' shift the upper 12 bits right and add 1
     ' because we can never have a 0 ID. The 1

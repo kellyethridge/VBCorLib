@@ -266,7 +266,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     d = GetDaysInMonth(Year, Month)
     
     If Day > d Then _
-        Throw Cor.NewArgumentOutOfRangeException(cString.Format("Day must be between 1 and {0} for month {1}.", d, Month))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Message:=cString.Format("Day must be between 1 and {0} for month {1}.", d, Month))
     
     Dim Days As Long
     Days = GetFixedDaysFromParts(Year, ToHebrewMonth(Year, Month), Day) - 1
@@ -276,7 +276,7 @@ End Function
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     Select Case Year
         Case Is < 0
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Year", Year)
+            Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
             
         Case Is < 100
             Dim y As Long
@@ -285,7 +285,7 @@ Public Function ToFourDigitYear(ByVal Year As Long) As Long
             If y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
             
         Case Is < MIN_HEBREWYEAR, Is > MAX_HEBREWYEAR
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_HEBREWYEAR, MAX_HEBREWYEAR), "Year", Year)
+            Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_HEBREWYEAR, MAX_HEBREWYEAR))
             
         Case Else
             ToFourDigitYear = Year
@@ -333,7 +333,7 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < MIN_HEBREWYEAR Or Year > MAX_HEBREWYEAR Then Throw Cor.NewArgumentOutOfRangeException("Hebrew year must be between 5343 and 6000.", "Year", Year)
+    If Year < MIN_HEBREWYEAR Or Year > MAX_HEBREWYEAR Then Throw Cor.NewArgumentOutOfRangeException("Year", Year, "Hebrew year must be between 5343 and 6000.")
 End Sub
 
 Private Sub VerifyMonthYear(ByVal Month As Long, ByVal Year As Long)
@@ -346,7 +346,7 @@ Private Sub VerifyMonthYear(ByVal Month As Long, ByVal Year As Long)
     End If
     
     If Month < 1 Or Month > Max Then _
-        Throw Cor.NewArgumentOutOfRangeException(cString.Format("Month must be between 1 and {0} for year {1}.", Max, Year), "Month", Month)
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, cString.Format("Month must be between 1 and {0} for year {1}.", Max, Year))
 End Sub
 
 ' this is based on the algorithm found at "http://www.funaba.org/en/calendar.html"
@@ -456,7 +456,7 @@ Private Sub GetDateParts(ByVal ms As Currency, ByVal DatePart As DatePartPrecisi
     Dim FixedDays As Long
     
     If ms < MIN_MILLISECONDS Or ms > MAX_MILLISECONDS Then _
-        Throw Cor.NewArgumentOutOfRangeException("The Hebrew calendar only supports the years 5343 to 6000 (1582 to 2240 in Gregorian).")
+        Throw Cor.NewArgumentOutOfRangeException(ms, Message:="The Hebrew calendar only supports the years 5343 to 6000 (1582 to 2240 in Gregorian).")
     
     FixedDays = Int(ms / MILLISECONDS_PER_DAY) + 1
     

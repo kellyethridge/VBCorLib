@@ -120,9 +120,9 @@ End Function
 '
 Public Function DaysInMonth(ByVal Year As Long, ByVal Month As Long) As Long
     If Year < 1 Or Year > 9999 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year must be between 1 and 9999.")
+        Throw Cor.NewArgumentOutOfRangeException("Year", Message:=Resources.GetString(ArgumentOutOfRange_Year))
     If Month < 1 Or Month > 12 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month must be between 1 and 12.")
+        Throw Cor.NewArgumentOutOfRangeException("Month", Message:=Resources.GetString(ArgumentOutOfRange_Month))
     If Month = 2 Then
         If IsLeapYear(Year) Then
             DaysInMonth = 29

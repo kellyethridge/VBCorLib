@@ -75,6 +75,9 @@ Private Const C_RFC1123Pattern                      As String = "ddd, dd MMM yyy
 Private Const C_SORTABLEDATETIMEPATTERN             As String = "yyyy'-'MM'-'dd'T'HH':'mm':'ss"
 Private Const C_UNIVERSALSORTABLEDATETIMEPATTERN    As String = "yyyy'-'MM'-'dd HH':'mm':'ss'Z'"
 
+Private Const MinMonth As Long = 1
+Private Const MaxMonth As Long = 13
+
 Private Type PropsType
     AbbreviatedDayNames()   As String
     AbbreviatedMonthNames() As String
@@ -620,8 +623,8 @@ End Function
 Public Function GetAbbreviatedMonthName(ByVal Month As Long) As String
     VerifyLoaded
     
-    If Month < 1 Or Month > 13 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month must be between 1 and 13.", "Month", Month)
+    If Month < MinMonth Or Month > MaxMonth Then _
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Resources.GetString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
     
     GetAbbreviatedMonthName = mProps.AbbreviatedMonthNames(Month - 1)
 End Function
@@ -704,8 +707,8 @@ End Function
 Public Function GetMonthName(ByVal Month As Long) As String
     VerifyLoaded
     
-    If Month < 1 Or Month > 13 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month must be between 1 and 13.", "Month", Month)
+    If Month < MinMonth Or Month > MaxMonth Then _
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Resources.GetString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
     
     GetMonthName = mProps.MonthNames(Month - 1)
 End Function

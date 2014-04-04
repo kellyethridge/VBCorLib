@@ -61,7 +61,7 @@ Private mStrings(15) As String
 '
 Friend Sub AddString(ByVal ID As Long, ByRef Value As Variant)
     If Len(Value) > 65535 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Strings cannot exceed 65535 characters.")
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:="Strings cannot exceed 65535 characters.")
     
     mStrings(ID And &HF) = Value
 End Sub
@@ -70,16 +70,16 @@ End Sub
 ' Returns a byte representation of the string array.
 '
 Friend Function GetEncodedResource() As Byte()
-    Dim ret() As Byte
-    ReDim ret(0 To CalculateSize - 1)
+    Dim Ret() As Byte
+    ReDim Ret(0 To CalculateSize - 1)
     
     Dim i As Long
     Dim Index As Long
     For i = 0 To 15
-        Index = WriteString(mStrings(i), Index, ret)
+        Index = WriteString(mStrings(i), Index, Ret)
     Next i
     
-    GetEncodedResource = ret
+    GetEncodedResource = Ret
 End Function
 
 

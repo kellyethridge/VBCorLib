@@ -70,7 +70,7 @@ End Property
 
 Public Property Let TwoDigitYearMax(ByVal RHS As Long)
     If RHS < 100 Or RHS > 9999 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year must be between 100 and 9999 inclusively.", "TwoDigitYearMax", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Message:="Year must be between 100 and 9999 inclusively.")
     
     mTwoDigitYearMax = RHS
 End Property
@@ -191,7 +191,7 @@ End Function
 
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
     If Month < 1 Or Month > 12 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month must be between 1 and 12.", "Month", Month)
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, "Month must be between 1 and 12.")
     
     If Month = 2 Then
         IsLeapMonth = IsLeapYear(Year, Era)
@@ -200,7 +200,7 @@ End Function
 
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
     If Day < 1 Or Day > Me.GetDaysInMonth(Year, Month, Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day must be between 1 and " & GetDaysInMonth(Year, Month, Era) & " for the specified month.")
+        Throw Cor.NewArgumentOutOfRangeException("Day", Day, "Day must be between 1 and " & GetDaysInMonth(Year, Month, Era) & " for the specified month.")
     
     If Day = 29 Then IsLeapDay = IsLeapMonth(Year, Month, Era)
 End Function
@@ -221,7 +221,7 @@ End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     If Year < 1 Or Year > 8011 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 8011), "Year", Year)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 8011))
         
     ToFourDigitYear = Year
 End Function
@@ -265,21 +265,21 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyDate(ByRef dt As cDateTime)
-    If dt.TotalMilliseconds < ERA_MEIJI Then Throw Cor.NewArgumentOutOfRangeException("The Japanese calendar only supports dates from 9/8/1868 to 12/31/9999 12:59:59pm.", "Time", dt.ToString)
+    If dt.TotalMilliseconds < ERA_MEIJI Then Throw Cor.NewArgumentOutOfRangeException(Message:="The Japanese calendar only supports dates from 9/8/1868 to 12/31/9999 12:59:59pm.")
 End Sub
 
 Private Function GetGregorianYear(ByVal Year As Long, ByVal Era As Long) As Long
     If Year < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Year", Year)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Era = Era - 1
     If Era < 0 Or Era > UBound(mEraLengths) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, UBound(mEraLengths) + 1), "Era", Era)
+        Throw Cor.NewArgumentOutOfRangeException("Era", Era, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, UBound(mEraLengths) + 1))
     
     Dim ms As Currency
     ms = mEraStart(Era)
     If Year > mEraLengths(Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 0, mEraLengths(Era)), "Year", Year)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, mEraLengths(Era)))
     
     GetGregorianYear = cDateTime.FromMilliseconds(ms).Year + Year - 1
 End Function
@@ -290,7 +290,7 @@ Private Function GetCurrentEra(ByVal Era As Variant) As Long
     Else
         If Era = 0 Then Era = UBound(mEras) + 1
         If Era < 1 Or Era > UBound(mEras) + 1 Then _
-            Throw Cor.NewArgumentOutOfRangeException("Japanese eras range from 1 to 4.", "Era", Era)
+            Throw Cor.NewArgumentOutOfRangeException("Era", Era, "Japanese eras range from 1 to 4.")
         GetCurrentEra = Era
     End If
 End Function

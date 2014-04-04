@@ -327,9 +327,9 @@ Public Sub ThrowArrayRangeException(ByVal ErrorCode As Long, ByRef ArrayName As 
         Case ArgumentNull_Array:                Throw Cor.NewArgumentNullException(ArrayName, Message)
         Case Rank_MultiDimNotSupported:         Throw Cor.NewRankException(Message)
         Case Argument_ParamRequired:            Throw Cor.NewArgumentException(Message, IIf(IsIndexMissing, IndexName, CountName))
-        Case ArgumentOutOfRange_LBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
-        Case ArgumentOutOfRange_UBound:         Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
-        Case ArgumentOutOfRange_NeedNonNegNum:  Throw Cor.NewArgumentOutOfRangeException(Message, CountName, Count)
+        Case ArgumentOutOfRange_LBound:         Throw Cor.NewArgumentOutOfRangeException(IndexName, Index, Message)
+        Case ArgumentOutOfRange_UBound:         Throw Cor.NewArgumentOutOfRangeException(IndexName, Index, Message)
+        Case ArgumentOutOfRange_NeedNonNegNum:  Throw Cor.NewArgumentOutOfRangeException(CountName, Count, Message)
         Case Argument_InvalidOffLen:       Throw Cor.NewArgumentException(Message, CountName)
         Case Else:                              Throw Cor.NewArgumentException(Message)
     End Select
@@ -384,8 +384,8 @@ Public Sub ThrowListRangeException(ByVal ErrorCode As Long, ByVal Index As Long,
     
     Select Case ErrorCode
         Case Argument_ParamRequired:                Throw Cor.NewArgumentException(Message, IIf(IsIndexMissing, IndexName, CountName))
-        Case ArgumentOutOfRange_LBound:             Throw Cor.NewArgumentOutOfRangeException(Message, IndexName, Index)
-        Case ArgumentOutOfRange_NeedNonNegNum:      Throw Cor.NewArgumentOutOfRangeException(Message, CountName, Count)
+        Case ArgumentOutOfRange_LBound:             Throw Cor.NewArgumentOutOfRangeException(IndexName, Index, Message)
+        Case ArgumentOutOfRange_NeedNonNegNum:      Throw Cor.NewArgumentOutOfRangeException(CountName, Count, Message)
         Case Argument_InvalidOffLen:           Throw Cor.NewArgumentException("The index plus the count extends past the end of the list or string", "Count")
     End Select
 End Sub

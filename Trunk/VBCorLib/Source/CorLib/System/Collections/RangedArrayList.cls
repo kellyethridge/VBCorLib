@@ -241,7 +241,7 @@ Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)
     Call VerifyVersion
     
     If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Call mList.Insert(mIndex + Index, Value)
     mCount = mCount + 1
@@ -252,7 +252,7 @@ Private Sub ArrayList_InsertRange(ByVal Index As Long, c As Variant)
     Call VerifyVersion
     
     If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Dim TotalElements As Long
     TotalElements = GetCollectionSize(c)
@@ -272,7 +272,7 @@ End Property
 Private Property Set ArrayList_Item(ByVal Index As Long, RHS As Variant)
     Call VerifyVersion
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Set mList(mIndex + Index) = RHS
     mVersion = mVersion + 1
@@ -282,7 +282,7 @@ Private Property Let ArrayList_Item(ByVal Index As Long, RHS As Variant)
     Call VerifyVersion
     
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     mList(mIndex + Index) = RHS
     mVersion = mVersion + 1
@@ -292,7 +292,7 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
     Call VerifyVersion
     
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Helper.MoveVariant ArrayList_Item, mList(mIndex + Index)
 End Property
@@ -305,9 +305,9 @@ Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartInd
     If GetOptionalLongPair(StartIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(StartIndex), "StartIndex", "Count"))
     If ElemIndex >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_UBound), "StartIndex", ElemIndex)
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_UBound))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Count", ElemCount)
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex - ElemCount + 1 < 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
 
@@ -337,7 +337,7 @@ End Sub
 Private Sub ArrayList_RemoveAt(ByVal Index As Long)
     Call VerifyVersion
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Call mList.RemoveAt(mIndex + Index)
     mCount = mCount - 1
@@ -348,7 +348,7 @@ Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
     Call VerifyVersion
     
     If Index < 0 Or Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), IIf(Index < 0, "index", "count"), IIf(Index < 0, Index, Count))
+        Throw Cor.NewArgumentOutOfRangeException(IIf(Index < 0, "Index", "Count"), Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Count > mCount Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "count")
     
@@ -373,12 +373,12 @@ End Sub
 Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
     Call VerifyVersion
     If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Iindex", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim TotalElements As Long
     TotalElements = GetCollectionSize(c)
     If Index + TotalElements > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection), "index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection))
     
     Call mList.SetRange(mIndex + Index, c)
     mVersion = mVersion + 1

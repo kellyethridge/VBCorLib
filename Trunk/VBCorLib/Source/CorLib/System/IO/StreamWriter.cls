@@ -214,7 +214,7 @@ Friend Sub Init(ByVal Source As Variant, ByVal Encoding As Encoding, ByVal Buffe
     Dim emit As Boolean
     
     If BufferSize < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "BufferSize", BufferSize)
+        Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Select Case VarType(Source)
         Case vbObject

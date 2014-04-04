@@ -130,7 +130,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
     If SAPtr(OutputBuffer) = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("OutputBuffer", Environment.GetResourceString(ArgumentNull_Array))
     If OutputOffset < LBound(OutputBuffer) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_LBound), "OutputOffset")
+        Throw Cor.NewArgumentOutOfRangeException("OutputOffset", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     
     Dim StartingOffset As Long
     StartingOffset = OutputOffset

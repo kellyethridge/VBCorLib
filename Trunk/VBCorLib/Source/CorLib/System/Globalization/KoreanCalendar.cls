@@ -52,9 +52,9 @@ Private mTwoDigitYearMax As Long
 
 
 Public Property Get Eras() As Long()
-    Dim ret(0) As Long
-    ret(0) = 1
-    Eras = ret
+    Dim Ret(0) As Long
+    Ret(0) = 1
+    Eras = Ret
 End Property
 
 Public Property Get TwoDigitYearMax() As Long
@@ -63,7 +63,7 @@ End Property
 
 Public Property Let TwoDigitYearMax(ByVal RHS As Long)
     If RHS < 100 Or RHS > MAX_KOREANYEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 100, MAX_KOREANYEAR), "TwoDigitYearMax", RHS)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 100, MAX_KOREANYEAR))
     
     mTwoDigitYearMax = RHS
 End Property
@@ -168,7 +168,7 @@ End Function
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
     Call VerifyMonth(Month)
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)), "Day", Day)
+        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
     
     If Month = 2 And Day = 29 Then
         IsLeapDay = IsLeapYear(Year, Era)
@@ -194,7 +194,7 @@ End Function
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     Select Case Year
         Case Is < 0
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Year", Year)
+            Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
             
         Case Is < 100
             Dim y As Long
@@ -203,7 +203,7 @@ Public Function ToFourDigitYear(ByVal Year As Long) As Long
             If y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
             
         Case Is < MIN_KOREANYEAR, Is > MAX_KOREANYEAR
-            Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_KOREANYEAR, MAX_KOREANYEAR), "Year", Year)
+            Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_KOREANYEAR, MAX_KOREANYEAR))
             
         Case Else
             ToFourDigitYear = Year
@@ -253,13 +253,13 @@ End Sub
 Private Function GetGregorianYear(ByVal Year As Long, ByRef Era As Variant) As Long
     Call VerifyEra(Era)
     If Year < MIN_KOREANYEAR Or Year > MAX_KOREANYEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_KOREANYEAR, MAX_KOREANYEAR), "Year", Year)
+        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_KOREANYEAR, MAX_KOREANYEAR))
     
     GetGregorianYear = Year - YEAR_OFFSET
 End Function
 
 Private Sub VerifyMonth(ByVal Month As Long)
-    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12), "Month", Month)
+    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
 End Sub
 
 

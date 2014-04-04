@@ -170,22 +170,23 @@ End Function
 '
 Public Function ToString(Optional ByRef vFieldCount As Variant) As String
     Dim Ret As String
-    Dim fieldcount As Long
+    Dim FieldCount As Long
     Dim maxfield As Long
     
     If IsMissing(vFieldCount) Then
-        fieldcount = -1
+        FieldCount = -1
     Else
-        fieldcount = vFieldCount
+        FieldCount = vFieldCount
         maxfield = GetMaxFieldCount
-        If fieldcount < 0 Or fieldcount > maxfield Then Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_VersionFieldCount, maxfield), "vFieldCount", fieldcount)
+        If FieldCount < 0 Or FieldCount > maxfield Then _
+            Throw Cor.NewArgumentOutOfRangeException("FieldCount", FieldCount, Environment.GetResourceString(ArgumentOutOfRange_VersionFieldCount, maxfield))
     End If
     
-    If fieldcount <> 0 Then Ret = mMajor
-    If fieldcount < 0 Or fieldcount > 1 Then Ret = Ret & "." & mMinor
-    If mBuild >= 0 And (fieldcount < 0 Or fieldcount > 2) Then
+    If FieldCount <> 0 Then Ret = mMajor
+    If FieldCount < 0 Or FieldCount > 1 Then Ret = Ret & "." & mMinor
+    If mBuild >= 0 And (FieldCount < 0 Or FieldCount > 2) Then
         Ret = Ret & "." & mBuild
-        If mRevision >= 0 And (fieldcount < 0 Or fieldcount > 3) Then Ret = Ret & "." & mRevision
+        If mRevision >= 0 And (FieldCount < 0 Or FieldCount > 3) Then Ret = Ret & "." & mRevision
     End If
     ToString = Ret
 End Function
@@ -258,16 +259,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Major As Long, ByVal Minor As Long, ByRef vBuild As Variant, ByRef vRevision As Variant)
     If Major < 0 Or Minor < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Version's parameters must be equal to or greater than zero.")
+        Throw Cor.NewArgumentOutOfRangeException(IIf(Major < 0, "Major", "Minor"), Message:="Version's parameters must be equal to or greater than zero.")
     
     If Not IsMissing(vBuild) Then
         mBuild = vBuild
-        If mBuild < 0 Then Throw Cor.NewArgumentOutOfRangeException("Version's parameters must be equal to or greater than zero.")
+        If mBuild < 0 Then Throw Cor.NewArgumentOutOfRangeException("Build", Message:="Version's parameters must be equal to or greater than zero.")
     End If
     If Not IsMissing(vRevision) Then
         If mBuild < 0 Then Throw Cor.NewArgumentException("Cannot include a revision without a build value.", "Revision")
         mRevision = vRevision
-        If mRevision < 0 Then Throw Cor.NewArgumentOutOfRangeException("Version's parameters must be equal to or greater than zero.")
+        If mRevision < 0 Then Throw Cor.NewArgumentOutOfRangeException("Revision", Message:="Version's parameters must be equal to or greater than zero.")
     End If
     
     mMajor = Major
@@ -292,14 +293,14 @@ Friend Sub Parse(ByRef s As String)
     mMajor = Parts(0)
     mMinor = Parts(1)
     If mMajor < 0 Or mMinor < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Version's parameters must be equal to or greater than zero.")
+        Throw Cor.NewArgumentOutOfRangeException(IIf(mMajor < 0, "Major", "Minor"), Message:="Version's parameters must be equal to or greater than zero.")
     
     If ub > 1 Then
         mBuild = Parts(2)
-        If mBuild < 0 Then Throw Cor.NewArgumentOutOfRangeException("Version's parameters must be equal to or greater than zero.")
+        If mBuild < 0 Then Throw Cor.NewArgumentOutOfRangeException("Build", Message:="Version's parameters must be equal to or greater than zero.")
         If ub > 2 Then
             mRevision = Parts(3)
-            If mRevision < 0 Then Throw Cor.NewArgumentOutOfRangeException("Version's parameters must be equal to or greater than zero.")
+            If mRevision < 0 Then Throw Cor.NewArgumentOutOfRangeException("Revisiont", Message:="Version's parameters must be equal to or greater than zero.")
         End If
     End If
 End Sub

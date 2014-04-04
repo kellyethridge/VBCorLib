@@ -754,7 +754,7 @@ End Sub
 
 Private Sub WriteCollection(ByRef Index As Long, ByVal SizeOfCollection As Long, ByRef CollectionToWrite As Variant, ByVal Insert As Boolean)
     If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum), "Index", Index)
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
         
     If Insert Then
         ' Make sure the array can handle more elements.
@@ -765,7 +765,7 @@ Private Sub WriteCollection(ByRef Index As Long, ByVal SizeOfCollection As Long,
     End If
         
     If Index + SizeOfCollection > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index), "Index")
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Dim Value As Variant
     For Each Value In CollectionToWrite
