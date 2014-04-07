@@ -12,6 +12,15 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ITestCaseSource
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "LastIndexOf_WithValue_ReturnsExpected"
+            Test.Use 1, 5
+            Test.Use 5, 9
+    End Select
+End Sub
 
 Public Sub Constructor_WhenCalled_CreatesEmptyList()
     Dim List As ArrayList
@@ -134,18 +143,18 @@ End Sub
 Public Sub Enumerator_WhenCalled_ReturnsExpected()
     Dim List As New ArrayList
     List.AddRange NewStrings("Item1", "Item2", "Item3")
-    Dim En As IEnumerator
+    Dim en As IEnumerator
     
-    Set En = List.GetEnumerator
+    Set en = List.GetEnumerator
     
-    Assert.That En, Iz.Not.Nothing
-    Assert.That En.MoveNext, Iz.True
-    Assert.That En.Current, Iz.EqualTo("Item1")
-    Assert.That En.MoveNext, Iz.True
-    Assert.That En.Current, Iz.EqualTo("Item2")
-    Assert.That En.MoveNext, Iz.True
-    Assert.That En.Current, Iz.EqualTo("Item3")
-    Assert.That En.MoveNext, Iz.False
+    Assert.That en, Iz.Not.Nothing
+    Assert.That en.MoveNext, Iz.True
+    Assert.That en.Current, Iz.EqualTo("Item1")
+    Assert.That en.MoveNext, Iz.True
+    Assert.That en.Current, Iz.EqualTo("Item2")
+    Assert.That en.MoveNext, Iz.True
+    Assert.That en.Current, Iz.EqualTo("Item3")
+    Assert.That en.MoveNext, Iz.False
 End Sub
 
 Public Sub InsertRange_WhenArray_InsertsItems()
@@ -197,3 +206,19 @@ Public Sub ToArray_WithEmptyList_ReturnsEmptyArray()
     
     Assert.That l, Iz.Empty
 End Sub
+
+Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    Dim Actual As Long
+    Actual = List.LastIndexOf(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Private Function MakeFilledList() As ArrayList
+    Set MakeFilledList = New ArrayList
+    MakeFilledList.AddRange NewLongs(1, 2, 3, 4, 5, 1, 2, 3, 4, 5)
+End Function
+
