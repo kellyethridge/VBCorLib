@@ -521,9 +521,15 @@ End Function
 '
 Public Sub Remove(ByRef Value As Variant, Optional ByVal Comparer As IComparer)
     Dim Index As Long
-    If Comparer Is Nothing Then Set Comparer = mComparer
-    Index = IndexOf(Value, , , Comparer)
-    If Index >= 0 Then Call RemoveAt(Index)
+    If Comparer Is Nothing Then
+        Set Comparer = mComparer
+    End If
+    
+    Index = IndexOf(Value, Comparer:=Comparer)
+    
+    If Index >= 0 Then
+        RemoveAt Index
+    End If
 End Sub
 
 ''
@@ -539,7 +545,7 @@ Public Sub RemoveAt(ByVal Index As Long)
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     mItems(Index) = Empty
-    Call RemoveSpace(Index, 1)
+    RemoveSpace Index, 1
     mCount = mCount - 1
     mVersion = mVersion + 1
 End Sub
@@ -552,12 +558,19 @@ End Sub
 ' @remarks The index is zero-based.
 '
 Public Sub RemoveRange(ByVal Index As Long, ByVal Count As Long)
-    Dim Result As Long
-    Result = VerifyListRange(mCount, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    If Index < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Count > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
-    Call cArray.Clear(mItems, Index, Count)
-    Call RemoveSpace(Index, Count)
+    Dim i As Long
+    For i = Index To Index + Count - 1
+        mItems(i) = Empty
+    Next
+    
+    RemoveSpace Index, Count
     mCount = mCount - Count
     mVersion = mVersion + 1
 End Sub
@@ -709,8 +722,8 @@ End Sub
 
 Private Sub RemoveSpace(ByVal Index As Long, ByVal Size As Long)
     If Index < mCount - 1 Then
-        Call CopyMemory(mItems(Index), mItems(Index + Size), (mCount - Index - Size) * 16)
-        Call ZeroMemory(mItems(mCount - Size), Size * 16)
+        CopyMemory mItems(Index), mItems(Index + Size), (mCount - Index - Size) * 16
+        ZeroMemory mItems(mCount - Size), Size * 16
     End If
 End Sub
 
