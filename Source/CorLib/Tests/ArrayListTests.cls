@@ -19,6 +19,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "LastIndexOf_WithValue_ReturnsExpected"
             Test.Use 1, 5
             Test.Use 5, 9
+            
+        Case "RemoveAt_WithValues_RemovesExpectedItem"
+            Test.Use 0, NewLongs(2, 3, 4, 5, 1, 2, 3, 4, 5)
+            Test.Use 9, NewLongs(1, 2, 3, 4, 5, 1, 2, 3, 4)
+            Test.Use 5, NewLongs(1, 2, 3, 4, 5, 2, 3, 4, 5)
     End Select
 End Sub
 
@@ -216,6 +221,105 @@ Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expe
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+Public Sub RemoveAt_WithValues_RemovesExpectedItem(ByVal Index As Long, ByRef Expected As Variant)
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.RemoveAt Index
+    
+    Assert.That List, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub RemoveAt_WithInvalidIndex_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.RemoveAt -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub Remove_WithValue_RemovesExpected()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.Remove 3&
+    
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 4, 5, 1, 2, 3, 4, 5))
+End Sub
+
+Public Sub RemoveRange_WithValidRange_RemovesItems()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.RemoveRange 1, 3
+    
+    Assert.That List, Iz.EqualTo(NewLongs(1, 5, 1, 2, 3, 4, 5))
+End Sub
+
+Public Sub RemoveRange_WithNegativeIndex_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.RemoveRange -1, 3
+
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub RemoveRange_WithNegativeCount_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.RemoveRange 3, -1
+
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub RemoveRange_WithRangeExtendingPassedEnd_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.RemoveRange 9, 2
+
+    AssertArgumentException Err
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Private Function MakeFilledList() As ArrayList
     Set MakeFilledList = New ArrayList
