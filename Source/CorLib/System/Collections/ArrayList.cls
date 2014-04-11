@@ -584,13 +584,20 @@ End Sub
 ' entire list will be reversed.
 '
 Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, Index, ElemIndex, Count, ElemCount)
-    If Result <> 0 Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Dim ReverseIndex As Long
+    Dim ReverseCount As Long
     
-    Call cArray.Reverse(mItems, ElemIndex, ElemCount)
+    If GetOptionalLongPair(Index, 0, ReverseIndex, Count, mCount, ReverseCount) = Argument_ParamRequired Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
+    If ReverseIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ReverseIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ReverseCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ReverseCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ReverseIndex + ReverseCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        
+    cArray.Reverse mItems, ReverseIndex, ReverseCount
+    
     mVersion = mVersion + 1
 End Sub
 
@@ -605,7 +612,7 @@ End Sub
 ' existing items.
 '
 Public Sub SetRange(ByVal Index As Long, ByRef c As Variant)
-    Call WriteRange(Index, c, False)
+    WriteRange Index, c, False
     mVersion = mVersion + 1
 End Sub
 
@@ -722,22 +729,22 @@ End Sub
 
 Private Sub RemoveSpace(ByVal Index As Long, ByVal Size As Long)
     If Index < mCount - 1 Then
-        CopyMemory mItems(Index), mItems(Index + Size), (mCount - Index - Size) * 16
-        ZeroMemory mItems(mCount - Size), Size * 16
+        CopyMemory mItems(Index), mItems(Index + Size), (mCount - Index - Size) * SIZEOF_VARIANT
+        ZeroMemory mItems(mCount - Size), Size * SIZEOF_VARIANT
     End If
 End Sub
 
 Private Sub WriteRange(ByVal Index As Long, ByRef c As Variant, ByVal Insert As Boolean)
     If IsArray(c) Then
-        Call WriteArray(Index, c, Insert)
+        WriteArray Index, c, Insert
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
             Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
-            Call WriteVBCollection(Index, c, Insert)
+            WriteVBCollection Index, c, Insert
         ElseIf TypeOf c Is ICollection Then
-            Call WriteICollection(Index, c, Insert)
+            WriteICollection Index, c, Insert
         Else
             Throw Cor.NewInvalidCastException("An ICollection or VBA.Collection object is required.")
         End If
@@ -754,7 +761,7 @@ Private Sub WriteArray(ByVal Index As Long, ByRef Arr As Variant, ByVal Insert A
     Dim SizeOfArray As Long
     SizeOfArray = UBound(Arr) - LBound(Arr) + 1
     
-    Call WriteCollection(Index, SizeOfArray, Arr, Insert)
+    WriteCollection Index, SizeOfArray, Arr, Insert
 End Sub
 
 Private Sub WriteVBCollection(ByVal Index As Long, ByVal CollectionToInsert As Collection, ByVal Insert As Boolean)
