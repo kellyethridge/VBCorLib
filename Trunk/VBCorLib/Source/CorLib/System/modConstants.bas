@@ -113,6 +113,7 @@ Public Const CELEMENTS_OFFSET               As Long = 16
 ' Variant descriptions and offsets into the layout.
 Public Const VARIANTDATA_OFFSET             As Long = 8
 Public Const VT_BYREF                       As Long = &H4000
+Public Const SIZEOF_VARIANT                 As Long = 16
 
 Public Const MAX_PATH                   As Long = 260
 Public Const MAX_DIRECTORY_PATH         As Long = 260

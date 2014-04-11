@@ -289,11 +289,72 @@ Public Sub RemoveRange_WithRangeExtendingPassedEnd_Throws()
     AssertArgumentException Err
 End Sub
 
+Public Sub Reverse_WhenCalled_ReversesItems()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.Reverse
+    
+    Assert.That List, Iz.EqualTo(NewLongs(5, 4, 3, 2, 1, 5, 4, 3, 2, 1))
+End Sub
 
+Public Sub Reverse_WithRangeSpecified_ReversesItemsInRange()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.Reverse 2, 3
+    
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 5, 4, 3, 1, 2, 3, 4, 5))
+End Sub
 
+Public Sub Reverse_WithNegativeIndex_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
+Public Sub Reverse_WithNegativeCount_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
 
+Public Sub Reverse_WithIndexAndCountExceedLength_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse 5, 6
+    
+    AssertArgumentException Err
+End Sub
 
+Public Sub ToArray_WhenCalled_ReturnsArrayOfItems()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    Dim Arr() As Long
+    
+    Arr = List.ToArray(vbLong)
+    
+    Assert.That Arr, Iz.EqualTo(NewLongs(1, 2, 3, 4, 5, 1, 2, 3, 4, 5))
+End Sub
+
+Public Sub SetRange_WhenCalled_SetsRangeOfItems()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.SetRange 2, NewStrings("Item1", "Item2")
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, "Item1", "Item2", 5, 1, 2, 3, 4, 5))
+End Sub
 
 
 

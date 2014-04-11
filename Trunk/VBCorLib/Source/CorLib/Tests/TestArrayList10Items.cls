@@ -63,20 +63,20 @@ End Sub
 '    Next i
 'End Sub
 
-Public Sub TestReverse()
-    List.Reverse
-    For i = 0 To 9
-        Assert.AreEqual 10 - i, List(i), "list should return " & 10 - i
-    Next i
-End Sub
+'Public Sub TestReverse()
+'    List.Reverse
+'    For i = 0 To 9
+'        Assert.AreEqual 10 - i, List(i), "list should return " & 10 - i
+'    Next i
+'End Sub
 
-Public Sub TestToArray()
-    Dim a() As Long
-    a = List.ToArray(vbLong)
-    For i = 0 To 9
-        Assert.AreEqual i + 1, a(i)
-    Next i
-End Sub
+'Public Sub TestToArray()
+'    Dim a() As Long
+'    a = List.ToArray(vbLong)
+'    For i = 0 To 9
+'        Assert.AreEqual i + 1, a(i)
+'    Next i
+'End Sub
 
 Public Sub TestSetRange()
     List.SetRange 2, NewStrings("Item 3", "Item 4", "Item 5")
