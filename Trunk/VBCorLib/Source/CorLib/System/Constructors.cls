@@ -303,7 +303,7 @@ End Function
 '
 Public Function NewArrayList(Optional ByVal Comparer As IComparer, Optional ByRef c As Variant) As ArrayList
     Set NewArrayList = New ArrayList
-    Call NewArrayList.Init(Comparer, c)
+    NewArrayList.Init Comparer, c
 End Function
 
 ''

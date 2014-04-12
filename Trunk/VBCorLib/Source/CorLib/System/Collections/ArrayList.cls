@@ -103,7 +103,7 @@ End Function
 ' @see ICollection
 ' @include "..\..\Includes\ArrayListAddRange.txt"
 Public Sub AddRange(ByRef c As Variant)
-    Call InsertRange(mCount, c)
+    InsertRange mCount, c
 End Sub
 
 ''
@@ -132,16 +132,26 @@ End Sub
 Public Function BinarySearch(ByRef Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
 
     If mCount = 0 Then
         BinarySearch = -1
         Exit Function
     End If
     
-    If Comparer Is Nothing Then Set Comparer = mComparer
+    If Comparer Is Nothing Then
+        Set Comparer = mComparer
+    End If
+    
     BinarySearch = cArray.BinarySearchEx(mItems, Value, ElemIndex, ElemCount, Comparer)
 End Function
 
@@ -159,18 +169,22 @@ End Property
 ''
 ' Sets the number of allocated elements in the array.
 '
-' @param RHS The number of elements to set the array to.
+' @param Value The number of elements to set the array to.
 ' @remarks The capacity cannot be set less than the number of items in the list.
 ' If the capacity is set to zero, then it is set to the default capacity (16).
 ' @include "..\..\Includes\ArrayListCapacity.txt"
-Public Property Let Capacity(ByVal RHS As Long)
-    If RHS < mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Capacity", Capacity, Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity))
+Public Property Let Capacity(ByVal Value As Long)
+    If Value < mCount Then _
+        Throw Cor.NewArgumentOutOfRangeException("Value", Value, Resources.GetString(ArgumentOutOfRange_SmallCapacity))
     
-    If RHS = 0 Then RHS = DEF_CAPACITY
-    If RHS = mCapacity Then Exit Property
-    mCapacity = RHS
-    ReDim Preserve mItems(0 To mCapacity - 1)
+    If Value = 0 Then
+        Value = DEF_CAPACITY
+    End If
+    
+    If Value <> mCapacity Then
+        mCapacity = Value
+        ReDim Preserve mItems(0 To mCapacity - 1)
+    End If
 End Property
 
 ''
@@ -197,7 +211,7 @@ End Sub
 '
 Public Function Clone() As ArrayList
     Set Clone = New ArrayList
-    Call Clone.CloneHelper(mItems, mCount)
+    Clone.InitClone mItems, mCount, mComparer
 End Function
 
 ''
@@ -230,9 +244,9 @@ End Function
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef DstArray As Variant, Optional ByRef ArrayIndex As Variant)
     If cArray.IsNull(DstArray) Then _
-        Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("DstArray", Resources.GetString(ArgumentNull_Array))
     
-    Call cArray.CopyEx(mItems, 0, DstArray, GetOptionalLong(ArrayIndex, LBound(DstArray)), mCount)
+    cArray.CopyEx mItems, 0, DstArray, GetOptionalLong(ArrayIndex, LBound(DstArray)), mCount
 End Sub
 
 ''
@@ -245,7 +259,7 @@ End Sub
 ' @remarks The destination array must be large enough to hold the number of elements being copied.
 '
 Public Sub CopyToEx(ByVal Index As Long, ByRef DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    Call cArray.CopyEx(mItems, Index, DstArray, ArrayIndex, Count)
+    cArray.CopyEx mItems, Index, DstArray, ArrayIndex, Count
 End Sub
 
 ''
@@ -272,22 +286,30 @@ End Function
 ''
 ' Returns an enumerator for an ArrayList.
 '
-' @param startindex  The index in the list to being enumeration.
+' @param Index  The index in the list to being enumeration.
 ' @param Count  The number of items in the list to enumerate over.
 ' @return An ArrayList enumerator
 ' @remarks This enumerator can be used in For..Each loops. To access the optional
 ' parameters, the GetEnumerator must be called instead of simply passing the object
 ' to the For..Each. This allows for a portion of the list to be enumerated.
 ' @include "..\..\Includes\ArrayListGetEnumerator.txt"
-Public Function GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
+Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim Ret As New ArrayListEnumerator
-    Call Ret.Init(Me, ElemIndex, ElemCount)
+    Ret.Init Me, ElemIndex, ElemCount
     Set GetEnumerator = Ret
 End Function
 
@@ -304,21 +326,24 @@ End Function
 ''
 ' Returns an ArrayList object that is a windowed view into the original ArrayList.
 '
-' @param index The index in the original list to start the new view.
-' @param count The number of elements in the original list to show in the view.
+' @param Index The index in the original list to start the new view.
+' @param Count The number of elements in the original list to show in the view.
 ' @return An ArrayList that represents a subset view of the original list.
 ' @remarks  This windowed view is the only way to then modify the original
 ' ArrayList. If the original list is modified some other way, then an exception
 ' is thrown the next time the ranged view is accessed.
 '
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    Dim Result As Long
-    Result = VerifyListRange(mCount, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    If Index < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Count > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
-    Dim Ret As New RangedArrayList
-    Call Ret.Init(Me, Index, Count)
-    Set GetRange = Ret
+    Dim Ranged As New RangedArrayList
+    Ranged.Init Me, Index, Count
+    Set GetRange = Ranged
 End Function
 
 ''
@@ -335,16 +360,28 @@ End Function
 Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> 0 Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    
+    ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex >= mCount Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
     
     If mCount = 0 Then
         IndexOf = -1
         Exit Function
     End If
     
-    If Comparer Is Nothing Then Set Comparer = mComparer
+    If Comparer Is Nothing Then
+        Set Comparer = mComparer
+    End If
+    
     IndexOf = cArray.IndexOf(mItems, Value, ElemIndex, ElemCount, Comparer)
 End Function
 
@@ -358,11 +395,14 @@ End Function
 '
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_ArrayListInsert))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_ArrayListInsert))
     
-    If mCount = mCapacity Then Call EnsureCapacity(mCount + 1)
-    Call InsertSpace(Index, 1)
-    Call VariantCopyInd(mItems(Index), Value)
+    If mCount = mCapacity Then
+        EnsureCapacity mCount + 1
+    End If
+    
+    InsertSpace Index, 1
+    VariantCopyInd mItems(Index), Value
     mCount = mCount + 1
     mVersion = mVersion + 1
 End Sub
@@ -382,9 +422,9 @@ End Sub
 '
 Public Sub InsertRange(ByVal Index As Long, ByRef c As Variant)
     If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_ArrayListInsert))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_ArrayListInsert))
     
-    Call WriteRange(Index, c, True)
+    WriteRange Index, c, True
     mVersion = mVersion + 1
 End Sub
 
@@ -423,9 +463,9 @@ End Property
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
     
-    Call VariantCopy(Item, mItems(Index))
+    VariantCopy Item, mItems(Index)
 End Property
 
 ''
@@ -438,11 +478,11 @@ End Property
 ' list(index) = value<br><br>
 ' The index is zero-based.
 '
-Public Property Let Item(ByVal Index As Long, ByRef RHS As Variant)
+Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
     
-    mItems(Index) = RHS
+    mItems(Index) = Value
     mVersion = mVersion + 1
 End Property
 
@@ -456,11 +496,11 @@ End Property
 ' Set list(index) = value<br><br>
 ' The index is zero-based.
 '
-Public Property Set Item(ByVal Index As Long, ByRef RHS As Variant)
+Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
     
-    Set mItems(Index) = RHS
+    Set mItems(Index) = Value
     mVersion = mVersion + 1
 End Property
 
@@ -479,21 +519,27 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
     Dim ElemIndex As Long
     Dim ElemCount As Long
     
-    If GetOptionalLongPair(StartIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(StartIndex), "StartIndex", "Count"))
+    ElemIndex = GetOptionalLong(StartIndex, mCount - 1)
+    ElemCount = GetOptionalLong(Count, ElemIndex + 1)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection))
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex - ElemCount + 1 < 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
     
     If mCount = 0 Then
         LastIndexOf = -1
         Exit Function
     End If
     
-    If Comparer Is Nothing Then Set Comparer = mComparer
+    If Comparer Is Nothing Then
+        Set Comparer = mComparer
+    End If
+    
     LastIndexOf = cArray.LastIndexOf(mItems, Value, ElemIndex, ElemCount, Comparer)
 End Function
 
@@ -542,7 +588,7 @@ End Sub
 '
 Public Sub RemoveAt(ByVal Index As Long)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_Index))
     
     mItems(Index) = Empty
     RemoveSpace Index, 1
@@ -584,19 +630,19 @@ End Sub
 ' entire list will be reversed.
 '
 Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Dim ReverseIndex As Long
-    Dim ReverseCount As Long
+    Dim ElemIndex As Long
+    Dim ElemCount As Long
     
-    If GetOptionalLongPair(Index, 0, ReverseIndex, Count, mCount, ReverseCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
-    If ReverseIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ReverseIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ReverseCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ReverseCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ReverseIndex + ReverseCount > mCount Then _
+    If GetOptionalLongPair(Index, 0, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
         Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
         
-    cArray.Reverse mItems, ReverseIndex, ReverseCount
+    cArray.Reverse mItems, ElemIndex, ElemCount
     
     mVersion = mVersion + 1
 End Sub
@@ -619,21 +665,31 @@ End Sub
 ''
 ' Sorts the items in the list.
 '
-' @param startindex The index to start sorting the items.
+' @param Index The index to start sorting the items.
 ' @param Count The number of items to include in the sort.
-' @param comparer A custom comparer used to compare items in the list.
+' @param Comparer A custom comparer used to compare items in the list.
 ' @remarks The list is sorted in ascending order by default. By providing
 ' a custom comaprer, the list can be sorted in special ways, such as descending order.
 '
-Public Sub Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> 0 Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
 
-    If Comparer Is Nothing Then Set Comparer = mComparer
-    Call cArray.SortEx(mItems, ElemIndex, ElemCount, Comparer)
+    If Comparer Is Nothing Then
+        Set Comparer = mComparer
+    End If
+    
+    cArray.SortEx mItems, ElemIndex, ElemCount, Comparer
     mVersion = mVersion + 1
 End Sub
 
@@ -651,7 +707,11 @@ End Sub
 Public Function ToArray(Optional ByVal ArrayType As vbVarType = vbVariant) As Variant
     Dim Ret As Variant
     Ret = cArray.CreateInstance(ArrayType, mCount)
-    If mCount > 0 Then Call cArray.CopyEx(mItems, 0, Ret, 0, mCount)
+    
+    If mCount > 0 Then
+        cArray.CopyEx mItems, 0, Ret, 0, mCount
+    End If
+    
     ToArray = Ret
 End Function
 
@@ -695,15 +755,18 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub CloneHelper(ByRef Arr() As Variant, ByVal Count As Long)
+Friend Sub InitClone(ByRef Arr() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
     mItems = Arr
     mCount = Count
     mCapacity = UBound(Arr) + 1
+    Set mComparer = Comparer
 End Sub
 
 Friend Sub Init(ByRef Comparer As IComparer, ByRef c As Variant)
     Set mComparer = Comparer
-    If Not IsMissing(c) Then Call AddRange(c)
+    If Not IsMissing(c) Then
+        AddRange c
+    End If
 End Sub
 
 
@@ -715,15 +778,19 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     
     Dim NewCapacity As Long
     NewCapacity = mCapacity * 2
-    If RequiredCapacity > NewCapacity Then NewCapacity = RequiredCapacity
+    
+    If RequiredCapacity > NewCapacity Then
+        NewCapacity = RequiredCapacity
+    End If
+    
     ReDim Preserve mItems(0 To NewCapacity - 1)
     mCapacity = NewCapacity
 End Sub
 
 Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
     If Index < mCount Then
-        Call CopyMemory(mItems(Index + Size), mItems(Index), (mCount - Index) * 16)
-        Call ZeroMemory(mItems(Index), Size * 16)
+        CopyMemory mItems(Index + Size), mItems(Index), (mCount - Index) * SIZEOF_VARIANT
+        ZeroMemory mItems(Index), Size * SIZEOF_VARIANT
     End If
 End Sub
 
@@ -739,7 +806,7 @@ Private Sub WriteRange(ByVal Index As Long, ByRef c As Variant, ByVal Insert As 
         WriteArray Index, c, Insert
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
+            Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
             WriteVBCollection Index, c, Insert
@@ -755,9 +822,8 @@ End Sub
 
 Private Sub WriteArray(ByVal Index As Long, ByRef Arr As Variant, ByVal Insert As Boolean)
     If cArray.IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Array))
     
-    ' Get the number of elements in the array
     Dim SizeOfArray As Long
     SizeOfArray = UBound(Arr) - LBound(Arr) + 1
     
@@ -765,34 +831,31 @@ Private Sub WriteArray(ByVal Index As Long, ByRef Arr As Variant, ByVal Insert A
 End Sub
 
 Private Sub WriteVBCollection(ByVal Index As Long, ByVal CollectionToInsert As Collection, ByVal Insert As Boolean)
-    Call WriteCollection(Index, CollectionToInsert.Count, CollectionToInsert, Insert)
+    WriteCollection Index, CollectionToInsert.Count, CollectionToInsert, Insert
 End Sub
 
 Private Sub WriteICollection(ByVal Index As Long, ByVal CollectionToInsert As ICollection, ByVal Insert As Boolean)
-    Call WriteCollection(Index, CollectionToInsert.Count, CollectionToInsert, True)
+    WriteCollection Index, CollectionToInsert.Count, CollectionToInsert, Insert
 End Sub
 
-Private Sub WriteCollection(ByRef Index As Long, ByVal SizeOfCollection As Long, ByRef CollectionToWrite As Variant, ByVal Insert As Boolean)
+Private Sub WriteCollection(ByVal Index As Long, ByVal SizeOfCollection As Long, ByRef CollectionToWrite As Variant, ByVal Insert As Boolean)
     If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
         
     If Insert Then
-        ' Make sure the array can handle more elements.
-        Call EnsureCapacity(mCount + SizeOfCollection)
-        ' Move the elements out so we can insert in the middle.
-        Call InsertSpace(Index, SizeOfCollection)
+        EnsureCapacity mCount + SizeOfCollection
+        InsertSpace Index, SizeOfCollection
         mCount = mCount + SizeOfCollection
     End If
         
     If Index + SizeOfCollection > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
     
     Dim Value As Variant
     For Each Value In CollectionToWrite
-        Call Helper.MoveVariant(mItems(Index), Value)
+        Helper.MoveVariant mItems(Index), Value
         Index = Index + 1
     Next Value
-    
 End Sub
 
 
@@ -808,7 +871,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
     On Error GoTo errTrap
     With PropBag
         mCount = .ReadProperty(PROP_COUNT, 0)
-        Call EnsureCapacity(.ReadProperty(PROP_CAPACITY, DEF_CAPACITY))
+        EnsureCapacity .ReadProperty(PROP_CAPACITY, DEF_CAPACITY)
         
         Dim i As Long
         For i = 0 To mCount - 1
@@ -819,7 +882,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
             ' with each value to determine the correct value.
             Select Case .ReadProperty(PROP_SUBTYPE & i, SUBTYPE_NORMAL)
                 Case SUBTYPE_NORMAL
-                    Call Helper.MoveVariant(mItems(i), .ReadProperty(PROP_ITEMPREFIX & i))
+                    Helper.MoveVariant mItems(i), .ReadProperty(PROP_ITEMPREFIX & i)
                 
                 Case SUBTYPE_EMPTY
                     mItems(i) = Empty
@@ -853,27 +916,27 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
             ' with each value to determine the correct value.
             Select Case VarType(mItems(i))
                 Case vbEmpty
-                    Call PropBag.WriteProperty(PROP_SUBTYPE & i, SUBTYPE_EMPTY)
+                    PropBag.WriteProperty PROP_SUBTYPE & i, SUBTYPE_EMPTY
                 
                 Case vbObject
                     If mItems(i) Is Nothing Then
-                        Call PropBag.WriteProperty(PROP_SUBTYPE & i, SUBTYPE_NOTHING)
+                        PropBag.WriteProperty PROP_SUBTYPE & i, SUBTYPE_NOTHING
                     Else
-                        Call PropBag.WriteProperty(PROP_ITEMPREFIX & i, mItems(i))
+                        PropBag.WriteProperty PROP_ITEMPREFIX & i, mItems(i)
                     End If
                 
                 Case Else
-                    Call PropBag.WriteProperty(PROP_ITEMPREFIX & i, mItems(i))
+                    PropBag.WriteProperty PROP_ITEMPREFIX & i, mItems(i)
             
             End Select
         Next i
         
-        Call .WriteProperty(PROP_COUNT, mCount)
-        Call .WriteProperty(PROP_CAPACITY, mCapacity)
+        .WriteProperty PROP_COUNT, mCount
+        .WriteProperty PROP_CAPACITY, mCapacity
         If mComparer Is Comparer.Default Then
-            Call .WriteProperty(PROP_DEFAULTCOMPARER, True)
+            .WriteProperty PROP_DEFAULTCOMPARER, True
         Else
-            Call .WriteProperty(PROP_COMPARER, mComparer, Nothing)
+            .WriteProperty PROP_COMPARER, mComparer, Nothing
         End If
     End With
     Exit Sub
@@ -911,7 +974,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
@@ -947,7 +1010,7 @@ Private Function IList_Add(Value As Variant) As Long
 End Function
 
 Private Sub IList_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
@@ -955,7 +1018,7 @@ Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As ICo
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get IList_Count() As Long
@@ -971,7 +1034,7 @@ Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As ICom
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
-    Call Insert(Index, Value)
+    Insert Index, Value
 End Sub
 
 Private Property Get IList_IsFixedSize() As Boolean
@@ -991,7 +1054,7 @@ Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(IList_Item, Item(Index))
+    Helper.MoveVariant IList_Item, Item(Index)
 End Property
 
 Private Function IList_NewEnum() As stdole.IUnknown
@@ -999,9 +1062,9 @@ Private Function IList_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    Call Remove(Value, Comparer)
+    Remove Value, Comparer
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)
-    Call RemoveAt(Index)
+    RemoveAt Index
 End Sub
