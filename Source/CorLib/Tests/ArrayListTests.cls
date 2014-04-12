@@ -16,14 +16,48 @@ Implements ITestCaseSource
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
+        Case "IndexOf_WithValue_ReturnsExpected"
+            Test.Use 1, 0
+            Test.Use 5, 4
+            Test.Use 6, -1
+            
+        Case "IndexOf_WithSubsetSearch_ReturnsExpected"
+            Test.Use 1, 5
+            Test.Use 5, 4
+            Test.Use 2, -1
+    
         Case "LastIndexOf_WithValue_ReturnsExpected"
             Test.Use 1, 5
             Test.Use 5, 9
+            Test.Use 8, -1
+            
+        Case "LastIndexOf_WithSubsetSearch_ReturnsExpected"
+            Test.Use 4, 3
+            Test.Use 5, 4
+            Test.Use 3, -1
             
         Case "RemoveAt_WithValues_RemovesExpectedItem"
             Test.Use 0, NewLongs(2, 3, 4, 5, 1, 2, 3, 4, 5)
             Test.Use 9, NewLongs(1, 2, 3, 4, 5, 1, 2, 3, 4)
             Test.Use 5, NewLongs(1, 2, 3, 4, 5, 2, 3, 4, 5)
+            
+        Case "Insert_WithValue_InsertsIntoList"
+            Test.Use 0, "a", Array("a", 1, 2, 3, 4, 5, 1, 2, 3, 4, 5)
+            Test.Use 10, "a", Array(1, 2, 3, 4, 5, 1, 2, 3, 4, 5, "a")
+            Test.Use 5, "a", Array(1, 2, 3, 4, 5, "a", 1, 2, 3, 4, 5)
+            
+        Case "SetRange_WhenItems_SetsRangeOfItems"
+            Test.Use NewStrings("Item1", "Item2")
+            Test.Use Array("Item1", "Item2")
+            Dim CollectionSource As New Collection
+            CollectionSource.Add "Item1"
+            CollectionSource.Add "Item2"
+            Test.Use CollectionSource
+            Dim ICollectionSource As New ArrayList
+            ICollectionSource.Add "Item1"
+            ICollectionSource.Add "Item2"
+            Test.Use ICollectionSource
+            
     End Select
 End Sub
 
@@ -55,10 +89,10 @@ Public Sub Add_WithMultipleValues_AppendsToList()
     Dim List As New ArrayList
     
     List.Add 1
-    List.Add 2
+    List.Add "Item2"
     
     Assert.That List(0), Iz.EqualTo(1)
-    Assert.That List(1), Iz.EqualTo(2)
+    Assert.That List(1), Iz.EqualTo("Item2")
 End Sub
 
 Public Sub AddRange_WithCollection_AppendsToList()
@@ -212,6 +246,76 @@ Public Sub ToArray_WithEmptyList_ReturnsEmptyArray()
     Assert.That l, Iz.Empty
 End Sub
 
+Public Sub IndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    Dim Actual As Long
+    Actual = List.IndexOf(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IndexOf_WithSubsetSearch_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    Dim Actual As Long
+    Actual = List.IndexOf(Value, 2, 4)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IndexOf_WithNegativeStartIndex_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.IndexOf 1, -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub IndexOf_WithStartIndexEqualToCount_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.IndexOf 1, 10
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub IndexOf_WithNegativeCount_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.IndexOf 1, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub IndexOf_WithInvalidRange_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.IndexOf 1, 0, 11
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub IndexOf_WithStartIndex_ReturnsExpected()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    Dim Actual As Long
+    Actual = List.IndexOf(1&, 1)
+    
+    Assert.That Actual, Iz.EqualTo(5)
+End Sub
+
 Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
     Dim List As ArrayList
     Set List = MakeFilledList
@@ -220,6 +324,66 @@ Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expe
     Actual = List.LastIndexOf(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub LastIndexOf_WithSubsetSearch_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    Dim Actual As Long
+    Actual = List.LastIndexOf(Value, 6, 4)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub LastIndexOf_WithNegativeStartIndex_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.LastIndexOf 1, -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub LastIndexOf_WithStartIndexEqualToCount_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.LastIndexOf 1, 10, 1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub LastIndexOf_WithNegativeCount_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.LastIndexOf 1, 2, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub LastIndexOf_WithInvalidRange_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.LastIndexOf 1, 2, 4
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub LastIndexOf_WithStartIndex_ReturnsExpected()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    Dim Actual As Long
+    Actual = List.LastIndexOf(5&, 8)
+    
+    Assert.That Actual, Iz.EqualTo(4)
 End Sub
 
 Public Sub RemoveAt_WithValues_RemovesExpectedItem(ByVal Index As Long, ByRef Expected As Variant)
@@ -347,21 +511,86 @@ Public Sub ToArray_WhenCalled_ReturnsArrayOfItems()
     Assert.That Arr, Iz.EqualTo(NewLongs(1, 2, 3, 4, 5, 1, 2, 3, 4, 5))
 End Sub
 
-Public Sub SetRange_WhenCalled_SetsRangeOfItems()
+Public Sub SetRange_WhenItems_SetsRangeOfItems(ByRef Items As Variant)
     Dim List As ArrayList
     Set List = MakeFilledList
     
-    List.SetRange 2, NewStrings("Item1", "Item2")
+    List.SetRange 2, Items
     
     Assert.That List, Iz.EqualTo(Array(1, 2, "Item1", "Item2", 5, 1, 2, 3, 4, 5))
 End Sub
 
+Public Sub SetRange_WithNullCollection_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.SetRange 0, Nothing
+    
+    AssertArgumentNullException Err, "c"
+End Sub
 
+Public Sub Enumeration_WithSubset_EnumeratesSubset()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    Dim Actual As Object
+    Set Actual = List.GetEnumerator(2, 4)
+    
+    Assert.That Actual, Iz.EqualTo(Array(3, 4, 5, 1))
+End Sub
 
+Public Sub Insert_WithValue_InsertsIntoList(ByVal Index As Long, ByVal Value As Variant, ByRef Expected As Variant)
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.Insert Index, Value
+    
+    Assert.That List, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub Insert_WithEmptyList_InsertsValue()
+    Dim List As New ArrayList
+    
+    List.Insert 0, "a"
+    
+    Assert.That List, Iz.EqualTo(Array("a"))
+End Sub
 
+Public Sub Insert_WithNegativeIndex_Throws()
+    Dim List As New ArrayList
+    
+    On Error Resume Next
+    List.Insert -1, "a"
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
+Public Sub Insert_WithIndexLargerThanListSize_Throws()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Insert 11, "a"
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
+Public Sub TestSerialization()
+    Dim SourceList As ArrayList
+    Set SourceList = MakeFilledList
+    Dim SourceBag As New PropertyBag
+    
+    SourceBag.WriteProperty "List", SourceList
+    
+    Dim TargetList As ArrayList
+    Dim TargetBag As New PropertyBag
+    
+    TargetBag.Contents = SourceBag.Contents
+    Set TargetList = TargetBag.ReadProperty("List", Nothing)
+    
+    Assert.That TargetList, Iz.EqualTo(Array(1, 2, 3, 4, 5, 1, 2, 3, 4, 5))
+End Sub
 
 
 

@@ -6,3 +6,4 @@ Removed 'Format' parameter from Convert.ToString to align with .NET. **
 	Use global function ToString instead.
 Reordered 'Message' and 'ParamName' arguments in ArgumentException to more align with .NET. **
 Reordered 'Message', 'ParamName', and 'ActualValue' arguments in ArgumentOutOfRangeException to more align with .NET. **
+Fixed ArrayList.SetRange when using ICollection source would insert instead of overwriting.

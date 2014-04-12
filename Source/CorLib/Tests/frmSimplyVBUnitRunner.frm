@@ -271,9 +271,7 @@ Private Sub Form_Load()
     
     Dim ArrayListTests As TestSuite
     Set ArrayListTests = Sim.NewTestSuite("ArrayList Tests")
-    ArrayListTests.Add New TestArrayListExceptions
     ArrayListTests.Add New TestArrayListRange
-    ArrayListTests.Add New TestArrayList10Items
     ArrayListTests.Add New ArrayListTests
     ArrayListTests.Add New ArrayListAdapterTests
     AddTest ArrayListTests

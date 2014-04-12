@@ -65,28 +65,23 @@ End Function
 ' @param ReturnValue2 The return parameter of the second value.
 ' @return If the function is successful, then NO_ERROR is returned,
 ' otherwise, an exception error number is returned.
+' @remarks Checks that both optional arguments are either both supplied or both are missing. Cannot supply only one argument.
 '
 Public Function GetOptionalLongPair(ByRef OptionalValue1 As Variant, ByVal DefaultValue1 As Long, ByRef ReturnValue1 As Long, _
                                     ByRef OptionalValue2 As Variant, ByVal DefaultValue2 As Long, ByRef ReturnValue2 As Long) As Long
-    Dim im1 As Boolean
+    Dim FirstIsMissing As Boolean
     
-    im1 = IsMissing(OptionalValue1)
-    ' Checks that both optional arguments are either both supplied
-    ' or both are missing. Cannot supply only one argument.
-    If im1 = IsMissing(OptionalValue2) Then
-        ' Sinces 99.99% of the calls will have missing optional
-        ' arguments, we optimize for it and return the defaults.
-        If im1 Then
+    FirstIsMissing = IsMissing(OptionalValue1)
+    
+    If FirstIsMissing = IsMissing(OptionalValue2) Then
+        If FirstIsMissing Then
             ReturnValue1 = DefaultValue1
             ReturnValue2 = DefaultValue2
         Else
-            ' If arguments are supplied, then fallback to the normal
-            ' optional argument checking and assignment functions.
             ReturnValue1 = GetOptionalLong(OptionalValue1, DefaultValue1)
             ReturnValue2 = GetOptionalLong(OptionalValue2, DefaultValue2)
         End If
     Else
-        ' Only one argument from the pair was supplied.
         GetOptionalLongPair = Argument_ParamRequired
     End If
 End Function
@@ -113,13 +108,11 @@ Public Function GetOptionalArrayRange(ByVal pSafeArray As Long, _
     ' common sections with other helper rountine in
     ' order to cut down on total function calls.
     
-    ' Check if the array is a null array.
     If pSafeArray = vbNullPtr Then
         GetOptionalArrayRange = ArgumentNull_Array
         Exit Function
     End If
     
-    ' Ensure we only have a 1-Dimension array.
     If SafeArrayGetDim(pSafeArray) <> 1 Then
         GetOptionalArrayRange = Rank_MultiDimNotSupported
         Exit Function
@@ -128,7 +121,6 @@ Public Function GetOptionalArrayRange(ByVal pSafeArray As Long, _
     LowerBound = SafeArrayGetLBound(pSafeArray, 1)
     UpperBound = SafeArrayGetUBound(pSafeArray, 1)
     
-    ' Get our optional values.
     Dim Result As Long
     Result = GetOptionalLongPair(OptionalIndex, LowerBound, ReturnIndex, OptionalCount, UpperBound - LowerBound + 1, ReturnCount)
     If Result <> NO_ERROR Then
@@ -136,19 +128,16 @@ Public Function GetOptionalArrayRange(ByVal pSafeArray As Long, _
         Exit Function
     End If
     
-    ' Can't have an index before the beginning of the array.
     If ReturnIndex < LowerBound Then
         GetOptionalArrayRange = ArgumentOutOfRange_LBound
         Exit Function
     End If
     
-    ' Can't have a negative count.
     If ReturnCount < 0 Then
         GetOptionalArrayRange = ArgumentOutOfRange_NeedNonNegNum
         Exit Function
     End If
     
-    ' Can't have the range extend past the end of the array.
     If ReturnIndex + ReturnCount - 1 > UpperBound Then
         GetOptionalArrayRange = Argument_InvalidOffLen
     End If
@@ -177,13 +166,11 @@ Public Function GetOptionalArrayRangeReverse(ByVal pSafeArray As Long, _
     ' common sections with other helper rountine in
     ' order to cut down on total function calls.
     
-    ' Check if the array is a null array.
     If pSafeArray = vbNullPtr Then
         GetOptionalArrayRangeReverse = ArgumentNull_Array
         Exit Function
     End If
     
-    ' Ensure we only have a 1-Dimension array.
     If SafeArrayGetDim(pSafeArray) <> 1 Then
         GetOptionalArrayRangeReverse = Rank_MultiDimNotSupported
         Exit Function
@@ -192,7 +179,6 @@ Public Function GetOptionalArrayRangeReverse(ByVal pSafeArray As Long, _
     LowerBound = SafeArrayGetLBound(pSafeArray, 1)
     UpperBound = SafeArrayGetUBound(pSafeArray, 1)
     
-    ' Get our optional values.
     Dim Result As Long
     Result = GetOptionalLongPair(OptionalIndex, UpperBound, ReturnIndex, OptionalCount, UpperBound - LowerBound + 1, ReturnCount)
     If Result <> NO_ERROR Then
@@ -200,19 +186,16 @@ Public Function GetOptionalArrayRangeReverse(ByVal pSafeArray As Long, _
         Exit Function
     End If
     
-    ' Can't have an index after the end of the array.
     If ReturnIndex > UpperBound Then
         GetOptionalArrayRangeReverse = ArgumentOutOfRange_UBound
         Exit Function
     End If
     
-    ' Can't have a negative count.
     If ReturnCount < 0 Then
         GetOptionalArrayRangeReverse = ArgumentOutOfRange_NeedNonNegNum
         Exit Function
     End If
     
-    ' Can't have the range extend past the beginning of the array.
     If ReturnIndex - ReturnCount + 1 < LowerBound Then
         GetOptionalArrayRangeReverse = Argument_InvalidOffLen
     End If
