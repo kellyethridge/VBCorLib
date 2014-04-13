@@ -58,6 +58,19 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             ICollectionSource.Add "Item2"
             Test.Use ICollectionSource
             
+        Case "BinarySearch_WithValue_ReturnsExpected"
+            Test.Use 1, 0
+            Test.Use 7, 5
+            Test.Use 4, -4
+            Test.Use 0, -1
+            Test.Use 8, -7
+            
+        Case "BinarySearch_WithRangedValue_ReturnsExpected"
+            Test.Use 1, -2
+            Test.Use 7, -6
+            Test.Use 4, -4
+            Test.Use 0, -2
+            Test.Use 8, -6
     End Select
 End Sub
 
@@ -592,11 +605,73 @@ Public Sub TestSerialization()
     Assert.That TargetList, Iz.EqualTo(Array(1, 2, 3, 4, 5, 1, 2, 3, 4, 5))
 End Sub
 
+Public Sub BinarySearch_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+    Dim List As ArrayList
+    Set List = MakeOrderedList
+    
+    Dim Actual As Long
+    Actual = List.BinarySearch(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub BinarySearch_WithRangedValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+    Dim List As ArrayList
+    Set List = MakeOrderedList
+    
+    Dim Actual As Long
+    Actual = List.BinarySearch(Value, 1, 4)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub BinarySearch_WithNegativeIndex_Throws()
+    Dim List As ArrayList
+    Set List = MakeOrderedList
+    
+    On Error Resume Next
+    List.BinarySearch 4, -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
+Public Sub BinarySearch_WithNegativeCount_Throws()
+    Dim List As ArrayList
+    Set List = MakeOrderedList
+    
+    On Error Resume Next
+    List.BinarySearch 4, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
 
+Public Sub BinarySearch_WithInvalidRange_Throws()
+    Dim List As ArrayList
+    Set List = MakeOrderedList
+    
+    On Error Resume Next
+    List.BinarySearch 4, 1, 6
+    
+    AssertArgumentException Err
+End Sub
 
+Public Sub Sort_WhenCalled_OrdersItems()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.Sort
+    
+    Assert.That List, Iz.Ordered
+End Sub
+
+Public Sub Sort_WithSortRange_OrdersItemsInRange()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    List.Sort 2, 5
+    
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 1, 2, 3, 4, 5, 3, 4, 5))
+End Sub
 
 
 
@@ -616,3 +691,7 @@ Private Function MakeFilledList() As ArrayList
     MakeFilledList.AddRange NewLongs(1, 2, 3, 4, 5, 1, 2, 3, 4, 5)
 End Function
 
+Private Function MakeOrderedList() As ArrayList
+    Set MakeOrderedList = New ArrayList
+    MakeOrderedList.AddRange NewLongs(1, 2, 3, 5, 6, 7)
+End Function
