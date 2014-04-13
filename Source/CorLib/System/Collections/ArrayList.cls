@@ -152,7 +152,7 @@ Public Function BinarySearch(ByRef Value As Variant, Optional ByRef Index As Var
         Set Comparer = mComparer
     End If
     
-    BinarySearch = cArray.BinarySearchEx(mItems, Value, ElemIndex, ElemCount, Comparer)
+    BinarySearch = cArray.BinarySearchEx(mItems, ElemIndex, ElemCount, Value, Comparer)
 End Function
 
 ''
