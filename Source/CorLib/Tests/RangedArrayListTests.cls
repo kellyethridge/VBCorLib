@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestArrayListRange"
+Attribute VB_Name = "RangedArrayListTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -25,7 +25,8 @@ Public Sub Setup()
     Set list = original.GetRange(4, 0)
 End Sub
 
-Public Sub TestEmptyList()
+Public Sub GetRange_WithCountOfZero_ReturnsEmptyList()
+    dim
     Assert.AreEqual 0, list.Count
     AssertOriginalList
 End Sub
