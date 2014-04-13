@@ -13,27 +13,36 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Private original As ArrayList
+Private Original As ArrayList
 Private List As ArrayList
 
 Public Sub Setup()
-    Set original = New ArrayList
+    Set Original = New ArrayList
     Dim i As Long
     For i = 1 To 20
-        original.Add i
+        Original.Add i
     Next i
-    Set List = original.GetRange(4, 0)
+    Set List = Original.GetRange(4, 0)
 End Sub
 
 Public Sub GetRange_WithCountOfZero_ReturnsEmptyList()
-    Assert.AreEqual 0, List.Count
-    AssertOriginalList
+    Dim List As New ArrayList
+    Dim Ranged As ArrayList
+    
+    Set Ranged = List.GetRange(0, 0)
+    
+    Assert.That Ranged, Iz.Empty
 End Sub
 
-Public Sub TestAfterAddingOne()
-    List.Add 1
-    Assert.AreEqual 1, List.Count
-    AssertOriginalList
+Public Sub Add_WhenCalled_AddsToUnderlyingList()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.Add 1
+    
+    Assert.That Ranged, Iz.EqualTo(NewLongs(3, 4, 1, 2, 3, 1))
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 3, 4, 1, 2, 3, 1, 4))
 End Sub
 
 Public Sub TestAfterAddingTwo()
@@ -303,7 +312,11 @@ Public Sub TestSetRange()
 End Sub
 
 
-
+Private Function MakeFilledRanged(ByRef List As ArrayList) As ArrayList
+    Set List = New ArrayList
+    List.AddRange (NewLongs(1, 2, 3, 4, 1, 2, 3, 4))
+    Set MakeFilledRanged = List.GetRange(2, 5)
+End Function
 
 Private Sub AssertInsert()
     Assert.AreEqual 7, List.Count, "Count should return 7."
@@ -318,14 +331,14 @@ End Sub
 
 
 Private Sub AssertOriginalList()
-    Assert.AreEqual 20 + List.Count, original.Count, "Original count should be " & 20 + List.Count
+    Assert.AreEqual 20 + List.Count, Original.Count, "Original count should be " & 20 + List.Count
     
     Dim i As Long
     For i = 0 To 3
-        Assert.AreEqual i + 1, original(i), "original should return '" & i & "'."
+        Assert.AreEqual i + 1, Original(i), "original should return '" & i & "'."
     Next i
     For i = 4 + List.Count To 19 + List.Count
-        Assert.AreEqual i - List.Count + 1, original(i), "original should return '" & i - List.Count + 1 & "'."
+        Assert.AreEqual i - List.Count + 1, Original(i), "original should return '" & i - List.Count + 1 & "'."
     Next i
 End Sub
 
