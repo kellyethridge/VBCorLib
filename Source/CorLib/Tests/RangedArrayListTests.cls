@@ -13,16 +13,16 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Private Original As ArrayList
+Private original As ArrayList
 Private List As ArrayList
 
 Public Sub Setup()
-    Set Original = New ArrayList
+    Set original = New ArrayList
     Dim i As Long
     For i = 1 To 20
-        Original.Add i
+        original.Add i
     Next i
-    Set List = Original.GetRange(4, 0)
+    Set List = original.GetRange(4, 0)
 End Sub
 
 Public Sub GetRange_WithCountOfZero_ReturnsEmptyList()
@@ -45,31 +45,29 @@ Public Sub Add_WhenCalled_AddsToUnderlyingList()
     Assert.That List, Iz.EqualTo(NewLongs(1, 2, 3, 4, 1, 2, 3, 1, 4))
 End Sub
 
-Public Sub TestAfterAddingTwo()
-    List.Add 1
-    List.Add 2
-    Assert.AreEqual 2, List.Count
-    AssertOriginalList
-End Sub
-
-Public Sub TestRetrieveAfterAdding()
-    List.Add 1
-    Assert.AreEqual 1, List(0)
-    AssertOriginalList
-End Sub
-
-Public Sub TestAddRangeFromCollection()
-    Dim col As New Collection
-    col.Add 1
-    col.Add 2
-    col.Add 3
+Public Sub Item_WhenCalled_ReturnsItemAtIndex()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
     
-    List.AddRange col
-    Assert.AreEqual 3, List.Count
-    Assert.AreEqual 1, List(0)
-    Assert.AreEqual 2, List(1)
-    Assert.AreEqual 3, List(2)
-    AssertOriginalList
+    Assert.That Ranged(0), Iz.EqualTo(3)
+    Assert.That Ranged(2), Iz.EqualTo(1)
+    Assert.That Ranged(4), Iz.EqualTo(3)
+End Sub
+
+Public Sub AddRange_WithCollection_AppendsItems()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    Dim Source As New Collection
+    Source.Add 1
+    Source.Add 2
+    Source.Add 3
+    
+    Ranged.AddRange Source
+    
+    Assert.That Ranged, Iz.EqualTo(NewLongs(3, 4, 1, 2, 3, 1, 2, 3))
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 4))
 End Sub
 
 Public Sub TestAddRangeFromArray()
@@ -331,14 +329,14 @@ End Sub
 
 
 Private Sub AssertOriginalList()
-    Assert.AreEqual 20 + List.Count, Original.Count, "Original count should be " & 20 + List.Count
+    Assert.AreEqual 20 + List.Count, original.Count, "Original count should be " & 20 + List.Count
     
     Dim i As Long
     For i = 0 To 3
-        Assert.AreEqual i + 1, Original(i), "original should return '" & i & "'."
+        Assert.AreEqual i + 1, original(i), "original should return '" & i & "'."
     Next i
     For i = 4 + List.Count To 19 + List.Count
-        Assert.AreEqual i - List.Count + 1, Original(i), "original should return '" & i - List.Count + 1 & "'."
+        Assert.AreEqual i - List.Count + 1, original(i), "original should return '" & i - List.Count + 1 & "'."
     Next i
 End Sub
 
