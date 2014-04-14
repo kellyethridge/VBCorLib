@@ -12,9 +12,19 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ITestCaseSource
 
 Private original As ArrayList
 Private List As ArrayList
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "Insert_WithValues_InsertsIntoUnderlyingList"
+            Test.Use 0, "a", Array(1, 2, "a", 3, 4, 1, 2, 3, 4)
+            Test.Use 5, "a", Array(1, 2, 3, 4, 1, 2, 3, "a", 4)
+            
+    End Select
+End Sub
 
 Public Sub Setup()
     Set original = New ArrayList
@@ -70,142 +80,164 @@ Public Sub AddRange_WithCollection_AppendsItems()
     Assert.That List, Iz.EqualTo(NewLongs(1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 4))
 End Sub
 
-Public Sub TestAddRangeFromArray()
-    Dim a() As Long
-    a = NewLongs(1, 2, 3)
+Public Sub AddRange_WithArray_AppendsItems()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    Dim Source() As Long
+    Source = NewLongs(1, 2, 3)
     
-    List.AddRange a
-    Assert.AreEqual 3, List.Count
-    Assert.AreEqual 1, List(0)
-    Assert.AreEqual 2, List(1)
-    Assert.AreEqual 3, List(2)
-    AssertOriginalList
-End Sub
-
-Public Sub TestSetItem()
-    List.AddRange NewLongs(1, 2, 3, 4, 5)
-    List(2) = "Hello"
-    Assert.AreEqual 5, List.Count
-    Assert.AreEqual 1, List(0)
-    Assert.AreEqual 2, List(1)
-    Assert.AreEqual "Hello", List(2)
-    Assert.AreEqual 4, List(3)
-    Assert.AreEqual 5, List(4)
-    AssertOriginalList
-End Sub
-
-Public Sub TestClear()
-    List.Add 1
-    List.Clear
-    Assert.AreEqual 0, List.Count
-    AssertOriginalList
-End Sub
-
-Public Sub TestCopyTo()
-    Dim a(2) As String
-    List.Add "Item1"
-    List.Add "Item2"
-    List.Add "Item3"
-    List.CopyTo a
-    Assert.AreEqual "Item1", a(0)
-    Assert.AreEqual "Item2", a(1)
-    Assert.AreEqual "Item3", a(2)
-End Sub
-
-Public Sub TestCopyToIndexOffset()
-    Dim a(5) As String
-    List.Add "Item1"
-    List.Add "Item2"
-    List.Add "Item3"
-    List.CopyTo a, 2
-    Assert.AreEqual "Item1", a(2)
-    Assert.AreEqual "Item2", a(3)
-    Assert.AreEqual "Item3", a(4)
-End Sub
-
-Public Sub TestEnumerator()
-    List.AddRange NewStrings("Item1", "Item2", "Item3")
+    Ranged.AddRange Source
     
-    Dim v As Variant
-    For Each v In List
-        Assert.AreEqual "Item", Left$(v, 4)
-    Next v
+    Assert.That Ranged, Iz.EqualTo(NewLongs(3, 4, 1, 2, 3, 1, 2, 3))
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 3, 4, 1, 2, 3, 1, 2, 3, 4))
 End Sub
 
-Public Sub TestEnumeratorIndex()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add i
-    Next i
+Public Sub Item_WhenSet_SetsValueInUnderlyingList()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
     
-    Dim v As Variant
-    i = 3
-    For Each v In List.GetEnumerator(2, 5)
-        Assert.AreEqual i, v
-        i = i + 1
-    Next v
-End Sub
-
-Public Sub TestIndexOf()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
-    Assert.AreEqual 8, List.IndexOf("Item 9")
-End Sub
-
-Public Sub TestInsertAtBeginning()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
-    List.Insert 0, 1
-    Assert.AreEqual 11, List.Count
-    Assert.AreEqual 1, List(0)
-    For i = 1 To 10
-        Assert.AreEqual "Item " & i, List(i)
-    Next i
-    AssertOriginalList
-End Sub
-
-Public Sub TestInsertAtEnd()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
-    List.Insert 10, 1
-    Assert.AreEqual 1, List(10)
-    For i = 1 To 10
-        Assert.AreEqual "Item " & i, List(i - 1)
-    Next i
-    AssertOriginalList
-End Sub
-
-Public Sub TestInsertRangeArray()
-    List.AddRange NewLongs(1, 2, 3, 4)
-    List.Insertrange 2, NewStrings("Item1", "Item2", "Item3")
-    AssertInsert
-    AssertOriginalList
-End Sub
-
-Public Sub TestInsertRangecollection()
-    List.AddRange NewLongs(1, 2, 3, 4)
-    Dim col As New Collection
-    col.Add "Item1"
-    col.Add "Item2"
-    col.Add "Item3"
-    List.Insertrange 2, col
-    AssertInsert
-    AssertOriginalList
-End Sub
-
-Public Sub TestLastIndexOf()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
+    Ranged(2) = "Hello"
     
-    Assert.AreEqual 3, List.LastIndexOf("Item 4"), "LastIndexOf should return 3."
+    Assert.That Ranged, Iz.EqualTo(Array(3, 4, "Hello", 2, 3))
+    Assert.That List, Iz.EqualTo(Array(1, 2, 3, 4, "Hello", 2, 3, 4))
+End Sub
+
+Public Sub Clear_WhenCalled_RemovesRangedItemsFromList()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.Clear
+    
+    Assert.That Ranged, Iz.Empty
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 4))
+End Sub
+
+Public Sub CopyTo_WhenCalled_CopiesRangedItems()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    Dim Target(0 To 4) As String
+    
+    Ranged.CopyTo Target
+    
+    Assert.That Target, Iz.EqualTo(Array("3", "4", "1", "2", "3"))
+End Sub
+
+Public Sub CopyTo_WithArrayIndex_CopiesRangedItems()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    Dim Target(0 To 5) As String
+    
+    Ranged.CopyTo Target, 1
+    
+    Assert.That Target, Iz.EqualTo(Array("", "3", "4", "1", "2", "3"))
+End Sub
+
+Public Sub GetEnumerator_WhenCalled_EnumeratesItems()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Dim Actual As Object
+    Set Actual = Ranged.GetEnumerator
+    
+    Assert.That Actual, Iz.EqualTo(Array(3, 4, 1, 2, 3))
+End Sub
+
+Public Sub GetEnumerator_WithSubset_EnumeratesSubset()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+
+    Dim Actual As Object
+    Set Actual = Ranged.GetEnumerator(1, 3)
+    
+    Assert.That Actual, Iz.EqualTo(Array(4, 1, 2))
+End Sub
+
+Public Sub IndexOf_WhenCalled_ReturnsExpected()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Dim Actual As Long
+    Actual = Ranged.IndexOf(4&)
+    
+    Assert.That Actual, Iz.EqualTo(1)
+End Sub
+
+Public Sub IndexOf_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    On Error Resume Next
+    Ranged.IndexOf 4&, -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub IndexOf_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    On Error Resume Next
+    Ranged.IndexOf 4&, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub IndexOf_WithInvalidRange_ThrowsArgumentException()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    On Error Resume Next
+    Ranged.IndexOf 4&, 0, 6
+    
+    AssertArgumentException Err, ""
+End Sub
+
+Public Sub Insert_WithValues_InsertsIntoUnderlyingList(ByVal Index As Long, ByVal Value As Variant, ByVal Expected As Variant)
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+
+    Ranged.Insert Index, Value
+    
+    Assert.That List, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub InsertRange_WithArray_InsertsItems()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.Insertrange 2, NewStrings("Item1", "Item2", "Item3")
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, 3, 4, "Item1", "Item2", "Item3", 1, 2, 3, 4))
+End Sub
+
+Public Sub InsertRange_WithCollection_InsertsItems()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.Insertrange 2, NewCollection("Item1", "Item2", "Item3")
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, 3, 4, "Item1", "Item2", "Item3", 1, 2, 3, 4))
+End Sub
+
+Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+
 End Sub
 
 Public Sub TestRemoveAtBeginning()

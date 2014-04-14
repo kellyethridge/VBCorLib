@@ -52,8 +52,8 @@ Private mList As ArrayList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal list As ArrayList)
-    Set mList = list
+Friend Sub Init(ByVal List As ArrayList)
+    Set mList = List
 End Sub
 
 

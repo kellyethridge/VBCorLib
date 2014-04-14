@@ -223,18 +223,28 @@ Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As
 End Function
 
 Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    Call VerifyVersion
+    VerifyVersion
     
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
     
-    Dim Index As Long
-    Index = mList.IndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
-    If Index >= 0 Then Index = Index - mIndex
-    ArrayList_IndexOf = Index
+    ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemCount = GetOptionalLong(Count, mCount)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+           
+    Dim Result As Long
+    Result = mList.IndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
+    If Result >= 0 Then
+        Result = Result - mIndex
+    End If
+    
+    ArrayList_IndexOf = Result
 End Function
 
 Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)

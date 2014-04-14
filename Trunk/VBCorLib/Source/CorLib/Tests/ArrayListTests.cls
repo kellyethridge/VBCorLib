@@ -192,7 +192,7 @@ Public Sub CopyTo_WithIndexOffset_CopiesItems()
 End Sub
 
 
-Public Sub Enumerator_WhenCalled_ReturnsExpected()
+Public Sub GetEnumerator_WhenCalled_ReturnsEnumeration()
     Dim List As New ArrayList
     List.AddRange NewStrings("Item1", "Item2", "Item3")
     Dim en As IEnumerator
@@ -543,7 +543,7 @@ Public Sub SetRange_WithNullCollection_Throws()
     AssertArgumentNullException Err, "c"
 End Sub
 
-Public Sub Enumeration_WithSubset_EnumeratesSubset()
+Public Sub GetEnumerator_WithSubset_EnumeratesSubset()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -570,7 +570,7 @@ Public Sub Insert_WithEmptyList_InsertsValue()
     Assert.That List, Iz.EqualTo(Array("a"))
 End Sub
 
-Public Sub Insert_WithNegativeIndex_Throws()
+Public Sub Insert_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
     Dim List As New ArrayList
     
     On Error Resume Next
@@ -579,7 +579,7 @@ Public Sub Insert_WithNegativeIndex_Throws()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub Insert_WithIndexLargerThanListSize_Throws()
+Public Sub Insert_WithIndexLargerThanListSize_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
