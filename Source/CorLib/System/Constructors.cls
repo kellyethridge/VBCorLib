@@ -1749,3 +1749,16 @@ Public Function BInt(ByRef Value As Variant) As BigInteger
     End Select
 End Function
 
+''
+' Initializes a new instance of a Collection with items.
+'
+' @param Values The values to initialize the collection with.
+' @return A new initialized collection.
+'
+Public Function NewCollection(ParamArray Values() As Variant) As Collection
+    Set NewCollection = New Collection
+    Dim Value As Variant
+    For Each Value In Values
+        NewCollection.Add Value
+    Next
+End Function
