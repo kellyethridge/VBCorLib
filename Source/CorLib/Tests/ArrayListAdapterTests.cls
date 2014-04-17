@@ -168,6 +168,21 @@ Public Sub CopyTo_WithIndexOffset_CopiesToOffsetOutput()
     Assert.That Target, Iz.EqualTo(Array("", "", "Item1", "Item2", "Item3", ""))
 End Sub
 
+Public Sub CopyTo_WithArrayIndexLessThanLowerBound_ThrowsArgumentOutOfRangeException()
+    Dim Target(1 To 6) As String
+    Dim List As New ArrayList
+    List.Add "Item1"
+    List.Add "Item2"
+    List.Add "Item3"
+    Dim Adapter As ArrayList
+    Set Adapter = ArrayList.Adapter(List)
+    
+    On Error Resume Next
+    Adapter.CopyTo Target, 0
+
+    AssertArgumentOutOfRangeException Err, "ArrayIndex"
+End Sub
+
 Public Sub GetEnumerator_WhenCalled_ReturnsEnumerableSequence()
     Dim List As New ArrayList
     Dim Adapter As ArrayList
@@ -408,7 +423,7 @@ Public Sub BinarySearch_WithSubsetValues_ReturnsExpected(ByRef Elements As Varia
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub BinarySearch_WithCountTooHigh_Throws()
+Public Sub BinarySearch_WithCountTooHigh_ThrowsArgumentException()
     Dim List As New ArrayList
     List.Capacity = 10
     Dim Adapter As ArrayList
@@ -417,7 +432,31 @@ Public Sub BinarySearch_WithCountTooHigh_Throws()
     On Error Resume Next
     Adapter.BinarySearch 1, 0, 11
     
-    AssertArgumentException Err, "Count"
+    AssertArgumentException Err
+End Sub
+
+Public Sub BinarySearch_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    List.Capacity = 10
+    Dim Adapter As ArrayList
+    Set Adapter = ArrayList.Adapter(List)
+
+    On Error Resume Next
+    Adapter.BinarySearch 1, -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub BinarySearch_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    List.Capacity = 10
+    Dim Adapter As ArrayList
+    Set Adapter = ArrayList.Adapter(List)
+
+    On Error Resume Next
+    Adapter.BinarySearch 1, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub Sort_WhenCalled_SortsElements()

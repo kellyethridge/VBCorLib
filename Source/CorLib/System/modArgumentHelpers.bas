@@ -313,7 +313,7 @@ Public Sub ThrowArrayRangeException(ByVal ErrorCode As Long, ByRef ArrayName As 
         Case ArgumentOutOfRange_LBound:         Throw Cor.NewArgumentOutOfRangeException(IndexName, Index, Message)
         Case ArgumentOutOfRange_UBound:         Throw Cor.NewArgumentOutOfRangeException(IndexName, Index, Message)
         Case ArgumentOutOfRange_NeedNonNegNum:  Throw Cor.NewArgumentOutOfRangeException(CountName, Count, Message)
-        Case Argument_InvalidOffLen:       Throw Cor.NewArgumentException(Message, CountName)
+        Case Argument_InvalidOffLen:            Throw Cor.NewArgumentException(Message, CountName)
         Case Else:                              Throw Cor.NewArgumentException(Message)
     End Select
 End Sub

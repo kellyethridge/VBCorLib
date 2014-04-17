@@ -134,19 +134,26 @@ Private Function ArrayList_Add(Value As Variant) As Long
 End Function
 
 Private Sub ArrayList_AddRange(c As Variant)
-    Dim v As Variant
+    Dim Value As Variant
     
-    For Each v In c
-        mList.Add v
-    Next v
+    For Each Value In c
+        mList.Add Value
+    Next
 End Sub
 
-Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "startIndex", ElemCount, "Count", IsMissing(StartIndex))
+    
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mList.Count - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mList.Count Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim MiddleIndex As Long
     Dim LowIndex    As Long
@@ -174,9 +181,9 @@ Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef StartIn
     ArrayList_BinarySearch = Not LowIndex
 End Function
 
-Private Property Let ArrayList_Capacity(ByVal RHS As Long)
-    If RHS < mList.Count Then
-        Throw Cor.NewArgumentOutOfRangeException(Message:="Capacity cannot be set less than the size of the list.")
+Private Property Let ArrayList_Capacity(ByVal Value As Long)
+    If Value < mList.Count Then
+        Throw Cor.NewArgumentOutOfRangeException("Value", Value, Resources.GetString(ArgumentOutOfRange_SmallCapacity))
     End If
 End Property
 
@@ -200,16 +207,22 @@ End Function
 
 Private Sub ArrayList_CopyTo(DstArray As Variant, Optional ArrayIndex As Variant)
     Dim Index As Long
-    Index = GetOptionalLong(ArrayIndex, 0)
+    Index = GetOptionalLong(ArrayIndex, LBound(DstArray))
+    
+    If Index < LBound(DstArray) Then _
+        Throw Cor.NewArgumentOutOfRangeException("ArrayIndex", ArrayIndex, Resources.GetString(ArgumentOutOfRange_LBound))
+    
     mList.CopyTo DstArray, Index
 End Sub
 
 Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
+    If Index < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Count > mList.Count Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+    
     Dim Result As Long
-    Result = VerifyListRange(mList.Count, Index, Count)
-    If Result Then _
-        ThrowListRangeException Result, Index, "Index", Count, "Count"
-    Result = VerifyArrayRange(GetArrayPointer(DstArray, False), ArrayIndex, Count)
+    Result = VerifyArrayRange(GetArrayPointer(DstArray), ArrayIndex, Count)
     If Result Then _
         ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
     
@@ -234,13 +247,19 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex)
+    
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mList.Count - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mList.Count Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, ElemIndex, ElemCount
@@ -252,10 +271,12 @@ Private Function ArrayList_GetHashCode() As Long
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    Dim Result As Long
-    Result = VerifyListRange(mList.Count, Index, Count)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, Index, "Index", Count, "Count"
+    If Index < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Count > mList.Count Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim Ret As RangedArrayList
     Set Ret = New RangedArrayList
@@ -266,10 +287,18 @@ End Function
 Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex)
+    
+    ElemIndex = GetOptionalLong(StartIndex, 0)
+    ElemCount = GetOptionalLong(Count, mList.Count - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex >= mList.Count Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mList.Count Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
@@ -334,10 +363,18 @@ End Property
 Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRangeReverse(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex)
+    
+    ElemIndex = GetOptionalLong(StartIndex, mList.Count - 1)
+    ElemCount = GetOptionalLong(Count, ElemIndex + 1)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex >= mList.Count Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex - ElemCount + 1 < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
@@ -367,10 +404,12 @@ Private Sub ArrayList_RemoveAt(ByVal Index As Long)
 End Sub
 
 Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
-    Dim Result As Long
-    Result = VerifyListRange(mList.Count, Index, Count)
-    If Result Then _
-        ThrowListRangeException Result, Index, "Index", Count, "Count"
+    If Index < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Count > mList.Count Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim i As Long
     For i = 1 To Count
@@ -381,10 +420,15 @@ End Sub
 Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    
+    If GetOptionalLongPair(Index, 0, ElemIndex, Count, mList.Count, ElemCount) = Argument_ParamRequired Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mList.Count Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
 
     Dim t1 As Variant
     Dim t2 As Variant
@@ -449,13 +493,19 @@ Private Sub SetRange(ByVal Index As Long, ByRef c As Variant)
     Next v
 End Sub
 
-Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then _
-        ThrowListRangeException Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex)
+    
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mList.Count - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mList.Count Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
         
     If Comparer Is Nothing Then
         Set mComparer = VBCorLib.Comparer.Default
@@ -468,7 +518,7 @@ End Sub
 
 Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
     ArrayList_ToArray = cArray.CreateInstance(ArrayType, mList.Count)
-    Call mList.CopyTo(ArrayList_ToArray, 0)
+    mList.CopyTo ArrayList_ToArray, 0
 End Function
 
 Private Function ArrayList_ToString() As String
