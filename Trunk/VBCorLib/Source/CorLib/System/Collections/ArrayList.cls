@@ -296,7 +296,6 @@ End Function
 Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
     
     ElemIndex = GetOptionalLong(Index, 0)
     ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
