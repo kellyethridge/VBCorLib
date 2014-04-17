@@ -408,7 +408,7 @@ Public Sub RemoveAt_WithValues_RemovesExpectedItem(ByVal Index As Long, ByRef Ex
     Assert.That List, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub RemoveAt_WithInvalidIndex_Throws()
+Public Sub RemoveAt_WithInvalidIndex_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     

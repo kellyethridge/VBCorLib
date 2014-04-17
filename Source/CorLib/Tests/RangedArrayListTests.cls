@@ -22,7 +22,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Insert_WithValues_InsertsIntoUnderlyingList"
             Test.Use 0, "a", Array(1, 2, "a", 3, 4, 1, 2, 3, 4)
             Test.Use 5, "a", Array(1, 2, 3, 4, 1, 2, 3, "a", 4)
-            
+        
+        Case "LastIndexOf_WithValue_ReturnsExpected"
+            Test.Use 4, 1
+            Test.Use 3, 4
     End Select
 End Sub
 
@@ -237,108 +240,73 @@ Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expe
     Dim List As ArrayList
     Dim Ranged As ArrayList
     Set Ranged = MakeFilledRanged(List)
-
-End Sub
-
-Public Sub TestRemoveAtBeginning()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
-        
-    List.RemoveAt 0
-    Assert.AreEqual 9, List.Count, "count should return 9."
-    For i = 0 To 8
-        Assert.AreEqual "Item " & i + 2, List(i), "list should return 'Item " & i + 2 & "'."
-    Next i
-    AssertOriginalList
-End Sub
-
-Public Sub TestRemoveAtEnd()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
     
-    List.RemoveAt 9
-    Assert.AreEqual 9, List.Count, "Count should return 9."
-    For i = 0 To 8
-        Assert.AreEqual "Item " & i + 1, List(i), "list should return 'Item " & i + 1 & "'."
-    Next i
-    AssertOriginalList
-End Sub
-
-Public Sub TestRemove()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
+    Dim Actual As Long
+    Actual = Ranged.LastIndexOf(Value)
     
-    List.Remove "Item 3"
-    Assert.AreEqual 9, List.Count, "Count should return 9."
-    Assert.AreEqual "Item 1", List(0), "list should return 'Item 1'."
-    Assert.AreEqual "Item 2", List(1), "list should return 'Item 2'."
-    For i = 2 To 8
-        Assert.AreEqual "Item " & i + 2, List(i), "list should return 'Item " & i + 2 & "'."
-    Next i
-    AssertOriginalList
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestRemoveRange()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add "Item " & i
-    Next i
-
-    List.RemoveRange 2, 4
-    Assert.AreEqual 6, List.Count, "Count should return 6."
-    Assert.AreEqual "Item 1", List(0), "list should return 'Item 1'."
-    Assert.AreEqual "Item 2", List(1), "list should return 'Item 2'."
-    For i = 2 To 5
-        Assert.AreEqual "Item " & i + 5, List(i), "list should return 'Item " & i + 5 & "'."
-    Next i
-    AssertOriginalList
+Public Sub RemoveAt_WithIndexZero_RemovesFirstElement()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.RemoveAt 0
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, 4, 1, 2, 3, 4))
 End Sub
 
-Public Sub TestReverse()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add i
-    Next i
-    List.Reverse
-    For i = 0 To 9
-        Assert.AreEqual 10 - i, List(i), "list should return " & 10 - i
-    Next i
-    AssertOriginalList
+Public Sub Remove_WithExistingValue_RemovesFirstInstance()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.Remove 3&
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, 4, 1, 2, 3, 4))
 End Sub
 
-Public Sub TestToArray()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add i
-    Next i
-    Dim a() As Long
-    a = List.ToArray(vbLong)
-    For i = 0 To 9
-        Assert.AreEqual i + 1, a(i)
-    Next i
+Public Sub RemoveRange_WhenCalled_RemovesElements()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.RemoveRange 1, 2
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, 3, 2, 3, 4))
 End Sub
 
-Public Sub TestSetRange()
-    Dim i As Long
-    For i = 1 To 10
-        List.Add i
-    Next i
-    List.SetRange 2, NewStrings("Item 3", "Item 4", "Item 5")
-    Assert.AreEqual 10, List.Count, "Count should return 10."
-    For i = 0 To 9
-        If i >= 2 And i <= 4 Then
-            Assert.AreEqual "Item " & i + 1, List(i), "list should return 'Item " & i - 1 & "'."
-        Else
-            Assert.AreEqual i + 1, List(i)
-        End If
-    Next i
-    AssertOriginalList
+Public Sub Reverse_WhenCalled_ReversedElements()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    Ranged.Reverse
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, 3, 2, 1, 4, 3, 4))
+End Sub
+
+Public Sub ToArray_WhenCalled_CopiesRangeToArray()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+    
+    
+    Dim Actual() As Long
+    Actual = Ranged.ToArray(vbLong)
+    
+    Assert.That Actual, Iz.EqualTo(Array(3, 4, 1, 2, 3))
+End Sub
+
+Public Sub SetRanged_WhenCalled_OverritesValuesInRange()
+    Dim List As ArrayList
+    Dim Ranged As ArrayList
+    Set Ranged = MakeFilledRanged(List)
+
+    Ranged.SetRange 0, Array("a", "b")
+    
+    Assert.That List, Iz.EqualTo(Array(1, 2, "a", "b", 1, 2, 3, 4))
 End Sub
 
 
@@ -347,29 +315,4 @@ Private Function MakeFilledRanged(ByRef List As ArrayList) As ArrayList
     List.AddRange (NewLongs(1, 2, 3, 4, 1, 2, 3, 4))
     Set MakeFilledRanged = List.GetRange(2, 5)
 End Function
-
-Private Sub AssertInsert()
-    Assert.AreEqual 7, List.Count, "Count should return 7."
-    Assert.AreEqual 1, List(0), "list should return '1'."
-    Assert.AreEqual 2, List(1), "list should return '2'."
-    Assert.AreEqual "Item1", List(2), "list should return 'Item1'."
-    Assert.AreEqual "Item2", List(3), "list should return 'Item2'."
-    Assert.AreEqual "Item3", List(4), "list should return 'Item3'."
-    Assert.AreEqual 3, List(5), "list should return '3'."
-    Assert.AreEqual 4, List(6), "list should return '4'."
-End Sub
-
-
-Private Sub AssertOriginalList()
-    Assert.AreEqual 20 + List.Count, original.Count, "Original count should be " & 20 + List.Count
-    
-    Dim i As Long
-    For i = 0 To 3
-        Assert.AreEqual i + 1, original(i), "original should return '" & i & "'."
-    Next i
-    For i = 4 + List.Count To 19 + List.Count
-        Assert.AreEqual i - List.Count + 1, original(i), "original should return '" & i - List.Count + 1 & "'."
-    Next i
-End Sub
-
 

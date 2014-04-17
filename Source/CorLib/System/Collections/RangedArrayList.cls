@@ -69,20 +69,21 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyVersion()
-    If mVersion <> mList.Version Then _
+    If mVersion <> mList.Version Then
         Throw Cor.NewInvalidOperationException("The base ArrayList has been modified outside of the Ranged list.")
+    End If
 End Sub
 
 Private Function GetCollectionSize(ByRef c As Variant) As Long
     If IsArray(c) Then
         If cArray.IsNull(c) Then _
-            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
+            Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Array))
         
         GetCollectionSize = UBound(c) - LBound(c) + 1
     
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
+            Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
             Dim Col As Collection
@@ -105,28 +106,34 @@ End Function
 '   ArrayList Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ArrayList_Add(Value As Variant) As Long
-    Call VerifyVersion
-    Call mList.Insert(mIndex + mCount, Value)
+    VerifyVersion
+    mList.Insert mIndex + mCount, Value
     ArrayList_Add = mCount
     mCount = mCount + 1
     mVersion = mVersion + 1
 End Function
 
 Private Sub ArrayList_AddRange(c As Variant)
-    Call VerifyVersion
-    Call mList.InsertRange(mIndex + mCount, c)
+    VerifyVersion
+    mList.InsertRange mIndex + mCount, c
     mCount = mCount + GetCollectionSize(c)
     mVersion = mVersion + 1
 End Sub
 
 Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    Call VerifyVersion
+    VerifyVersion
     
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim i As Long
     i = mList.BinarySearch(Value, mIndex + ElemIndex, ElemCount, Comparer)
@@ -135,56 +142,69 @@ Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef Index A
 End Function
 
 Private Property Let ArrayList_Capacity(ByVal RHS As Long)
-    Call VerifyVersion
+    VerifyVersion
     mList.Capacity = RHS
     mVersion = mVersion + 1
 End Property
 
 Private Property Get ArrayList_Capacity() As Long
-    Call VerifyVersion
+    VerifyVersion
     ArrayList_Capacity = mList.Capacity
 End Property
 
 Private Sub ArrayList_Clear()
-    Call VerifyVersion
-    If mCount = 0 Then Exit Sub
-    Call mList.RemoveRange(mIndex, mCount)
-    mCount = 0
-    mVersion = mVersion + 1
+    VerifyVersion
+    If mCount > 0 Then
+        mList.RemoveRange mIndex, mCount
+        mCount = 0
+        mVersion = mVersion + 1
+    End If
 End Sub
 
 Private Function ArrayList_Clone() As ArrayList
-    Call VerifyVersion
+    VerifyVersion
     Dim Ret As New RangedArrayList
-    Call Ret.Init(mList.Clone, mIndex, mCount)
+    Ret.Init mList.Clone, mIndex, mCount
     Set ArrayList_Clone = Ret
 End Function
 
 Private Function ArrayList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    Call VerifyVersion
+    VerifyVersion
     ArrayList_Contains = (mList.IndexOf(Value, mIndex, mCount, Comparer) >= 0)
 End Function
 
 Private Sub ArrayList_CopyTo(DstArray As Variant, Optional ArrayIndex As Variant)
-    Call VerifyVersion
+    VerifyVersion
     
     Dim Index As Long
-    If IsMissing(ArrayIndex) Then Index = LBound(DstArray) Else Index = ArrayIndex
-    Call mList.CopyToEx(mIndex, DstArray, Index, mCount)
+    If IsMissing(ArrayIndex) Then
+        Index = LBound(DstArray)
+    Else
+        Index = ArrayIndex
+    End If
+    
+    mList.CopyToEx mIndex, DstArray, Index, mCount
 End Sub
 
 Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    Call VerifyVersion
+    VerifyVersion
     
     Dim Result As Long
-    Result = VerifyListRange(mCount, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    Result = VerifyArrayRange(GetArrayPointer(DstArray), ArrayIndex, Count)
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
+    If Index < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Count > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
-    Call mList.CopyToEx(mIndex + Index, DstArray, ArrayIndex, Count)
+    mList.CopyToEx mIndex + Index, DstArray, ArrayIndex, Count
 End Sub
 
 Private Property Get ArrayList_Count() As Long
-    Call VerifyVersion
+    VerifyVersion
     ArrayList_Count = mCount
 End Property
 
@@ -192,18 +212,24 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
-    Call VerifyVersion
+Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
+    VerifyVersion
     
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
     
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim Ret As New ArrayListEnumerator
-    Call Ret.Init(Me, ElemIndex, ElemCount)
+    Ret.Init Me, ElemIndex, ElemCount
     Set ArrayList_GetEnumerator = Ret
 End Function
 
@@ -212,13 +238,16 @@ Private Function ArrayList_GetHashCode() As Long
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    Dim Result As Long
-    Result = VerifyListRange(mCount, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    If Index < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Index + Count > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
     Dim Ret As RangedArrayList
     Set Ret = New RangedArrayList
-    Call Ret.Init(Me, Index, Count)
+    Ret.Init Me, Index, Count
     Set ArrayList_GetRange = Ret
 End Function
 
@@ -248,25 +277,25 @@ Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex A
 End Function
 
 Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)
-    Call VerifyVersion
+    VerifyVersion
     
     If Index < 0 Or Index > mCount Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
-    Call mList.Insert(mIndex + Index, Value)
+    mList.Insert mIndex + Index, Value
     mCount = mCount + 1
     mVersion = mVersion + 1
 End Sub
 
 Private Sub ArrayList_InsertRange(ByVal Index As Long, c As Variant)
-    Call VerifyVersion
+    VerifyVersion
     
     If Index < 0 Or Index > mCount Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
     Dim TotalElements As Long
     TotalElements = GetCollectionSize(c)
-    Call mList.InsertRange(mIndex + Index, c)
+    mList.InsertRange mIndex + Index, c
     mCount = mCount + TotalElements
     mVersion = mVersion + 1
 End Sub
@@ -280,7 +309,7 @@ Private Property Get ArrayList_IsReadOnly() As Boolean
 End Property
 
 Private Property Set ArrayList_Item(ByVal Index As Long, RHS As Variant)
-    Call VerifyVersion
+    VerifyVersion
     If Index < 0 Or Index >= mCount Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
@@ -289,7 +318,7 @@ Private Property Set ArrayList_Item(ByVal Index As Long, RHS As Variant)
 End Property
 
 Private Property Let ArrayList_Item(ByVal Index As Long, RHS As Variant)
-    Call VerifyVersion
+    VerifyVersion
     
     If Index < 0 Or Index >= mCount Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
@@ -299,7 +328,7 @@ Private Property Let ArrayList_Item(ByVal Index As Long, RHS As Variant)
 End Property
 
 Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
-    Call VerifyVersion
+    VerifyVersion
     
     If Index < 0 Or Index >= mCount Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
@@ -308,7 +337,7 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
 End Property
 
 Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    Call VerifyVersion
+    VerifyVersion
     
     Dim ElemIndex As Long
     Dim ElemCount As Long
@@ -323,65 +352,74 @@ Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartInd
 
     Dim Index As Long
     Index = mList.LastIndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
-    If Index >= 0 Then Index = Index - mIndex
+    If Index >= 0 Then
+        Index = Index - mIndex
+    End If
+    
     ArrayList_LastIndexOf = Index
 End Function
 
 Private Function ArrayList_NewEnum() As stdole.IUnknown
-    Call VerifyVersion
+    VerifyVersion
     Set ArrayList_NewEnum = CreateEnumerator(ArrayList_GetEnumerator)
 End Function
 
 Private Sub ArrayList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    Call VerifyVersion
+    VerifyVersion
     
     Dim Index As Long
     Index = mList.IndexOf(Value, mIndex, mCount, Comparer)
     If Index >= 0 Then
-        Call mList.RemoveAt(Index)
+        mList.RemoveAt Index
         mCount = mCount - 1
         mVersion = mVersion + 1
     End If
 End Sub
 
 Private Sub ArrayList_RemoveAt(ByVal Index As Long)
-    Call VerifyVersion
+    VerifyVersion
     If Index < 0 Or Index >= mCount Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
     
-    Call mList.RemoveAt(mIndex + Index)
+    mList.RemoveAt mIndex + Index
     mCount = mCount - 1
     mVersion = mVersion + 1
 End Sub
 
 Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
-    Call VerifyVersion
+    VerifyVersion
     
     If Index < 0 Or Count < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException(IIf(Index < 0, "Index", "Count"), Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Count > mCount Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "count")
     
-    Call mList.RemoveRange(mIndex + Index, Count)
+    mList.RemoveRange mIndex + Index, Count
     mCount = mCount - Count
     mVersion = mVersion + 1
 End Sub
 
 Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Call VerifyVersion
+    VerifyVersion
     
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Dim ElemCount As Long
+    Dim ElemIndex As Long
     
-    Call mList.Reverse(mIndex + ElemIndex, ElemCount)
+    If GetOptionalLongPair(Index, 0, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+    
+    mList.Reverse mIndex + ElemIndex, ElemCount
     mVersion = mVersion + 1
 End Sub
 
 Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
-    Call VerifyVersion
+    VerifyVersion
     If Index < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
@@ -390,29 +428,35 @@ Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
     If Index + TotalElements > mCount Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection))
     
-    Call mList.SetRange(mIndex + Index, c)
+    mList.SetRange mIndex + Index, c
     mVersion = mVersion + 1
 End Sub
 
-Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
-    Call VerifyVersion
+Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+    VerifyVersion
     
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mCount, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Dim ElemCount As Long
+    Dim ElemIndex As Long
+    ElemIndex = GetOptionalLong(Index, 0)
+    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    
+    If ElemIndex < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemCount < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If ElemIndex + ElemCount > mCount Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
 
-    Call mList.Sort(mIndex + ElemIndex, ElemCount, Comparer)
+    mList.Sort mIndex + ElemIndex, ElemCount, Comparer
 End Sub
 
 Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
-    Call VerifyVersion
+    VerifyVersion
     
-    Dim Ret As Variant
-    Ret = cArray.CreateInstance(ArrayType, mCount)
-    If mCount > 0 Then Call mList.CopyToEx(mIndex, Ret, 0, mCount)
-    ArrayList_ToArray = Ret
+    ArrayList_ToArray = cArray.CreateInstance(ArrayType, mCount)
+    If mCount > 0 Then
+        mList.CopyToEx mIndex, ArrayList_ToArray, 0, mCount
+    End If
 End Function
 
 Private Function ArrayList_ToString() As String
@@ -420,7 +464,7 @@ Private Function ArrayList_ToString() As String
 End Function
 
 Private Sub ArrayList_TrimToSize()
-    Call VerifyVersion
+    VerifyVersion
     mList.TrimToSize
     mVersion = mVersion + 1
 End Sub
@@ -458,7 +502,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call ArrayList_CopyTo(Arr, Index)
+    ArrayList_CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
@@ -502,7 +546,7 @@ Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As ICo
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call ArrayList_CopyTo(Arr, Index)
+    ArrayList_CopyTo Arr, Index
 End Sub
 
 Private Property Get IList_Count() As Long
@@ -518,7 +562,7 @@ Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As ICom
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
-    Call ArrayList_Insert(Index, Value)
+    ArrayList_Insert Index, Value
 End Sub
 
 Private Property Get IList_IsFixedSize() As Boolean
@@ -538,7 +582,7 @@ Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(IList_Item, ArrayList_Item(Index))
+    Helper.MoveVariant IList_Item, ArrayList_Item(Index)
 End Property
 
 Private Function IList_NewEnum() As stdole.IUnknown
@@ -546,11 +590,11 @@ Private Function IList_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    Call ArrayList_Remove(Value, Comparer)
+    ArrayList_Remove Value, Comparer
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)
-    Call ArrayList_RemoveAt(Index)
+    ArrayList_RemoveAt Index
 End Sub
 
 
