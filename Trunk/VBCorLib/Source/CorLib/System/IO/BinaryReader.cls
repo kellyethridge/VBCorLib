@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2014 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: BinaryReader
+' Module: BinaryReader
 '
 
 ''
@@ -83,7 +86,7 @@ End Property
 ' Closes the reader and underlying Stream.
 '
 Public Sub CloseReader()
-    Call mStream.CloseStream
+    mStream.CloseStream
 End Sub
 
 ''
@@ -118,13 +121,13 @@ End Function
 ' then -1 will always be returned.
 '
 Public Function PeekChar() As Long
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     If mStream.CanSeek Then
-        Dim pos As Long
-        pos = mStream.Position
+        Dim OldPosition As Long
+        OldPosition = mStream.Position
         PeekChar = Read
-        mStream.Position = pos
+        mStream.Position = OldPosition
     Else
         PeekChar = -1
     End If
@@ -135,7 +138,7 @@ End Function
 '
 ' @return The next byte in the stream.
 Public Function ReadByte() As Byte
-    Call FillBuffer(1)
+    FillBuffer 1
     ReadByte = mBuffer(0)
 End Function
 
@@ -148,7 +151,8 @@ End Function
 '
 Public Function ReadChar() As Long
     ReadChar = Read
-    If ReadChar = -1 Then Throw New EndOfStreamException
+    If ReadChar = -1 Then _
+        Throw New EndOfStreamException
 End Function
 
 ''
@@ -161,22 +165,27 @@ End Function
 ' empty array is returned, not a null array.
 '
 Public Function ReadBytes(ByVal Count As Long) As Byte()
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim Ret() As Byte
     If Count > 0 Then
         ReDim Ret(0 To Count - 1)
         
-        Dim num As Long
-        num = mStream.ReadBlock(Ret, 0, Count)
-        If num = 0 Then Exit Function
-        If num <> Count Then ReDim Preserve Ret(0 To num - 1)
+        Dim BytesRead As Long
+        BytesRead = mStream.ReadBlock(Ret, 0, Count)
+        
+        If BytesRead = 0 Then Exit Function
+        
+        If BytesRead < Count Then
+            ReDim Preserve Ret(0 To BytesRead - 1)
+        End If
     Else
         Ret = Cor.NewBytes()
     End If
+    
     ReadBytes = Ret
 End Function
 
@@ -190,10 +199,10 @@ End Function
 ' could be decoded, then an empty array is returned, not a null array.
 '
 Public Function ReadChars(ByVal Count As Long) As Integer()
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim Ret() As Integer
     If Count > 0 Then
@@ -201,11 +210,16 @@ Public Function ReadChars(ByVal Count As Long) As Integer()
         
         Dim CharsRead As Long
         CharsRead = ReadCharBytes(Ret, 0, Count)
-        If CharsRead = 0 Then Throw New EndOfStreamException
-        If Count <> CharsRead Then ReDim Preserve Ret(0 To CharsRead - 1)
+        If CharsRead = 0 Then _
+            Throw New EndOfStreamException
+        
+        If Count < CharsRead Then
+            ReDim Preserve Ret(0 To CharsRead - 1)
+        End If
     Else
         Ret = Cor.NewIntegers()
     End If
+    
     ReadChars = Ret
 End Function
 
@@ -217,7 +231,7 @@ End Function
 ' is non-zero, then True is returned, otherwise False.
 '
 Public Function ReadBoolean() As Boolean
-    Call VerifyIsOpen
+    VerifyIsOpen
     ReadBoolean = (ReadByte <> 0)
 End Function
 
@@ -227,7 +241,7 @@ End Function
 ' @return A Long datatype read from the stream.
 '
 Public Function ReadLong() As Long
-    Call FillBuffer(4)
+    FillBuffer 4
     ReadLong = MemLong(mPtrBuffer)
 End Function
 
@@ -237,7 +251,7 @@ End Function
 ' @return An Integer datatype read from the stream.
 '
 Public Function ReadInteger() As Integer
-    Call FillBuffer(2)
+    FillBuffer 2
     ReadInteger = MemWord(mPtrBuffer)
 End Function
 
@@ -247,7 +261,7 @@ End Function
 ' @return A Double datatype read from the stream.
 '
 Public Function ReadDouble() As Double
-    Call FillBuffer(8)
+    FillBuffer 8
     ReadDouble = AsDouble(ByVal mPtrBuffer)
 End Function
 
@@ -260,9 +274,11 @@ End Function
 '
 Public Function ReadDate() As Date
     Dim PotentialDate As Double
-    
     PotentialDate = ReadDouble
-    If PotentialDate < MIN_DATE Or PotentialDate > MAX_DATE Then Throw New OverflowException
+    
+    If PotentialDate < MIN_DATE Or PotentialDate > MAX_DATE Then _
+        Throw New OverflowException
+        
     ReadDate = PotentialDate
 End Function
 
@@ -272,7 +288,7 @@ End Function
 ' @return A Currency datatype.
 '
 Public Function ReadCurrency() As Currency
-    Call FillBuffer(8)
+    FillBuffer 8
     ReadCurrency = AsCurr(ByVal mPtrBuffer)
 End Function
 
@@ -282,7 +298,7 @@ End Function
 ' @return A Single datatype.
 '
 Public Function ReadSingle() As Single
-    Call FillBuffer(4)
+    FillBuffer 4
     ReadSingle = AsSingle(ByVal mPtrBuffer)
 End Function
 
@@ -310,7 +326,7 @@ End Function
 ' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
 '
 Public Function ReadDecimal() As Variant
-    Call FillBuffer(16)
+    FillBuffer 16
     ReadDecimal = BitConverter.ToDecimal(mBuffer, 0)
 End Function
 
@@ -340,7 +356,7 @@ End Function
 ' to the string using the current Encoding system.</p>
 '
 Public Function ReadString() As String
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     Dim EncodedStringLength As Long
     EncodedStringLength = ReadStringLength
@@ -351,7 +367,10 @@ Public Function ReadString() As String
         
         Dim BytesRead As Long
         BytesRead = mStream.ReadBlock(EncodedBytes, 0, EncodedStringLength)
-        If BytesRead < EncodedStringLength Then Throw New EndOfStreamException
+        
+        If BytesRead < EncodedStringLength Then _
+            Throw New EndOfStreamException
+            
         ReadString = mEncoding.GetString(EncodedBytes)
     End If
 End Function
@@ -394,9 +413,9 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
+        Throw Cor.NewArgumentNullException("Stream", Resources.GetString(ArgumentNull_Stream))
     If Not Stream.CanRead Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ReadableStreamRequired), "Stream")
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_ReadableStreamRequired), "Stream")
     
     Set mStream = Stream
     If Encoding Is Nothing Then
@@ -416,7 +435,7 @@ Private Sub VerifyIsOpen()
 End Sub
 
 Private Sub FillBuffer(ByVal Count As Long)
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     ' optimize for reading a single byte
     Dim num As Long
@@ -429,7 +448,9 @@ Private Sub FillBuffer(ByVal Count As Long)
     Else
         num = mStream.ReadBlock(mBuffer, 0, Count)
     End If
-    If num < Count Then Throw New EndOfStreamException
+    
+    If num < Count Then _
+        Throw New EndOfStreamException
 End Sub
 
 Private Function ReadStringLength() As Long
@@ -454,29 +475,34 @@ Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, By
     Dim Result As Long
     
     Result = VerifyArrayRange(SAPtr(Chars), Index, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", Index, "Index", Count, "Count"
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Chars", Index, "Index", Count, "Count"
     
-    Call EnsureCapacity(mEncoding.GetMaxByteCount(Count))
+    EnsureCapacity mEncoding.GetMaxByteCount(Count)
     
-    Dim b       As Long
-    Dim pos     As Long
-    Dim NumRead As Long
+    Dim ByteRead    As Long
+    Dim Pos         As Long
+    Dim NumRead     As Long
     Do While NumRead < Count
-        b = mStream.ReadByte
-        If b < 0 Then Exit Do
-        mBuffer(pos) = b
-        pos = pos + 1
-        NumRead = NumRead + mEncoding.GetCharsEx(mBuffer, 0, pos, Chars, Index)
+        ByteRead = mStream.ReadByte
+        If ByteRead < 0 Then Exit Do
+        mBuffer(Pos) = ByteRead
+        Pos = Pos + 1
+        NumRead = NumRead + mEncoding.GetCharsEx(mBuffer, 0, Pos, Chars, Index)
     Loop
-    ReadCharBytes = pos
+    ReadCharBytes = Pos
 End Function
 
 Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
-    Dim NewCapacity As Long
+    If RequiredCapacity <= mCapacity Then _
+        Exit Sub
     
-    If RequiredCapacity <= mCapacity Then Exit Sub
+    Dim NewCapacity As Long
     NewCapacity = mCapacity * 2
-    If NewCapacity < RequiredCapacity Then NewCapacity = RequiredCapacity
+    If NewCapacity < RequiredCapacity Then
+        NewCapacity = RequiredCapacity
+    End If
+    
     ReDim Preserve mBuffer(0 To NewCapacity - 1)
     mCapacity = NewCapacity
     mPtrBuffer = VarPtr(mBuffer(0))
@@ -484,9 +510,9 @@ End Sub
 
 Private Function ReadBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
     Dim ElemIndex As Long
-    ElemIndex = GetOptionalLong(Index, 0)
-    
     Dim ElemCount As Long
+    
+    ElemIndex = GetOptionalLong(Index, 0)
     ElemCount = GetOptionalLong(Count, 0)
     
     Dim Bytes() As Byte
@@ -508,13 +534,11 @@ Private Function ReadBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByR
 errTrap:
     SAPtr(Bytes) = 0
     SAPtr(Chars) = 0
-
-    Dim Ex As Exception
-    If Catch(Ex) Then Throw Ex
+    Throw
 End Function
 
 Private Function ReadOneChar() As Long
-    Call VerifyIsOpen
+    VerifyIsOpen
     If ReadCharBytes(mOneChar, 0, 1) = 0 Then
         ReadOneChar = -1
     Else
@@ -527,7 +551,7 @@ End Function
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call EnsureCapacity(DEF_CAPACITY)
+    EnsureCapacity DEF_CAPACITY
 End Sub
 
 

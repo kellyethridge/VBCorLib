@@ -84,6 +84,14 @@ Public Sub AssertFormatException(ByVal Err As ErrObject)
     End If
 End Sub
 
+Public Sub AssertEndOfStreamException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is EndOfStreamException Then
+        WrongException "EndOfStreamException", Ex
+    End If
+End Sub
+
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
     If Not Catch(AssertExceptionThrown, Err) Then
         Assert.Fail "An exception should be thrown."

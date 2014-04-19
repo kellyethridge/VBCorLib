@@ -191,7 +191,7 @@ Private Sub Form_Load()
     AddTest New TestCharEnumerator
     AddTest New TestGregorianCalendar
     AddTest New TestDetermineEncoding
-    AddTest New TestBinaryReader
+    AddTest New BinaryReaderTests
     AddTest New TestBinaryWriter
     AddTest New TestFileInfo
     AddTest New TestFile
