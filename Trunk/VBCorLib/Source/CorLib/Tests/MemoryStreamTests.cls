@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestMemoryStream"
+Attribute VB_Name = "MemoryStreamTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -26,13 +26,42 @@ Public Sub Setup()
     mAsyncCallback = False
 End Sub
 
-Public Sub TestInitialPostion()
-    Assert.AreEqual 0@, ms.Position
+Public Sub Position_WhenNew_EqualsZero()
+    Dim Stream As New MemoryStream
+    
+    Dim Actual As Long
+    Actual = Stream.Position
+    
+    Assert.That Actual, Iz.EqualTo(0)
 End Sub
 
-Public Sub TestPositionAfterWriting1byte()
-    ms.WriteByte 55
-    Assert.AreEqual 1@, ms.Position
+Public Sub Length_WhenNew_EqualsZero()
+    Dim Stream As New MemoryStream
+    
+    Dim Actual As Long
+    Actual = Stream.Length
+    
+    Assert.That Actual, Iz.EqualTo(0)
+End Sub
+
+Public Sub CanWrite_WhenNew_ReturnsTrue()
+    Dim Stream As New MemoryStream
+    
+    Dim Actual As Boolean
+    Actual = Stream.CanWrite
+    
+    Assert.That Actual, Iz.True
+End Sub
+
+Public Sub WriteByte_WhenCalled_AddsToStream()
+    Dim StreamData(10) As Byte
+    Dim Stream As MemoryStream
+    Set Stream = Cor.NewMemoryStream(StreamData)
+    
+    Stream.WriteByte 1
+    
+    Assert.That Stream.Position, Iz.EqualTo(1)
+    Assert.That StreamData(0), Iz.EqualTo(1)
 End Sub
 
 Public Sub TestChangePosition()
