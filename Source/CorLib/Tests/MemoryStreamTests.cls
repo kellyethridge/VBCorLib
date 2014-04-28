@@ -178,6 +178,9 @@ Public Sub SeekPosition_WithInvalidSeekOrigin_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+
+
+
 'Implements AsyncCallback
 '
 'Private ms As MemoryStream
