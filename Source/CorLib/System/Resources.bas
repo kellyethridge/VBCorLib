@@ -98,6 +98,7 @@ Public Enum ResourceStringId
     Arg_MustBeVbVarType = 824
     Argument_EmptyName = 825
     Arg_LongerThanSrcString = 826
+    Argument_InvalidSeekOrigin = 827
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902

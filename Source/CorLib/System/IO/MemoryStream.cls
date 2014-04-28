@@ -501,7 +501,9 @@ Public Function SeekPosition(ByVal Offset As Currency, ByVal Loc As SeekOrigin) 
         Case FromCurrent
             Position = mPosition + Offset
         Case FromEnd
-            Position = (mLength - 1) + Offset
+            Position = mLength + Offset
+        Case Else
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidSeekOrigin))
     End Select
     SeekPosition = mPosition
 End Function
@@ -604,11 +606,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-''
-' Initializes the MemoryStream to a user-supplied byte array.
-' This method should never be called directly. Only the constructors
-' found in Constructors.cls should call this method.
 Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As Variant, ByVal Writable As Boolean)
     Dim Result As Long
     Result = GetOptionalArrayRange(SAPtr(Buffer), Index, mIndex, Count, mCapacity)
