@@ -35,32 +35,32 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 4, 4
             Test.Use 5, 5
             
-        Case "ReadByte_WithSeekFromBeginning_ReturnsExpected"
-            Test.Use 0, 1
-            Test.Use 4, 5
-            Test.Use 5, -1
-            
         Case "SeekPosition_WhenFromCurrent_SetsPosition"
             Test.Use 0, 2
             Test.Use -2, 0
             Test.Use 2, 4
             Test.Use 3, 5
             
-        Case "ReadByte_WithSeekFromCurrent_ReturnsExpected"
-            Test.Use 0, 3
-            Test.Use -2, 1
-            Test.Use 2, 5
-            Test.Use 3, -1
-            
         Case "SeekPosition_WhenFromEnd_SetsPosition"
             Test.Use 0, 5
             Test.Use -1, 4
             Test.Use -5, 0
             
-        Case "ReadByte_WithSeekFromEnd_ReturnsExpected"
-            Test.Use 0, -1
-            Test.Use -1, 5
-            Test.Use -5, 1
+        Case "SeekPosition_WhenFromBeginningInSubset_SetsPosition"
+            Test.Use 0, 0
+            Test.Use 2, 2
+            Test.Use 3, 3
+            
+        Case "SeekPosition_WhenFromCurrentInSubset_SetsPosition"
+            Test.Use 0, 1
+            Test.Use -1, 0
+            Test.Use 1, 2
+            Test.Use 2, 3
+        
+        Case "SeekPosition_WhenFromEndInSubset_SetsPosition"
+            Test.Use 0, 3
+            Test.Use -1, 2
+            Test.Use -3, 0
             
     End Select
 End Sub
@@ -103,19 +103,6 @@ Public Sub SeekPosition_WhenFromBeginning_SetsPosition(ByVal Offset As Long, ByV
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub ReadByte_WithSeekFromBeginning_ReturnsExpected(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
-    Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source)
-    ms.SeekPosition Offset, SeekOrigin.FromBeginning
-    
-    Dim Actual As Long
-    Actual = ms.ReadByte
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
 Public Sub SeekPosition_WhenFromCurrent_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
     Dim Source() As Byte
     Source = NewBytes(1, 2, 3, 4, 5)
@@ -129,26 +116,11 @@ Public Sub SeekPosition_WhenFromCurrent_SetsPosition(ByVal Offset As Long, ByVal
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub ReadByte_WithSeekFromCurrent_ReturnsExpected(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
-    Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source)
-    ms.Position = 2
-    ms.SeekPosition Offset, SeekOrigin.FromCurrent
-    
-    Dim Actual As Long
-    Actual = ms.ReadByte
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
 Public Sub SeekPosition_WhenFromEnd_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
     Dim Source() As Byte
     Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
     Set ms = Cor.NewMemoryStream(Source)
-    ms.Position = 2
     
     Dim Actual As Long
     Actual = ms.SeekPosition(Offset, SeekOrigin.FromEnd)
@@ -156,29 +128,52 @@ Public Sub SeekPosition_WhenFromEnd_SetsPosition(ByVal Offset As Long, ByVal Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub ReadByte_WithSeekFromEnd_ReturnsExpected(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
-    Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source)
-    ms.SeekPosition Offset, SeekOrigin.FromEnd
-    
-    Dim Actual As Long
-    Actual = ms.ReadByte
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
 Public Sub SeekPosition_WithInvalidSeekOrigin_ThrowsArgumentException()
+    Const InvalidOrigin As Long = 5
     Dim ms As New MemoryStream
     
     On Error Resume Next
-    ms.SeekPosition 0, 5
+    ms.SeekPosition 0, InvalidOrigin
     
     AssertArgumentException Err
 End Sub
 
+Public Sub SeekPosition_WhenFromBeginningInSubset_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source, 1, 3)
+    
+    Dim Actual As Long
+    Actual = ms.SeekPosition(Offset, SeekOrigin.FromBeginning)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub SeekPosition_WhenFromCurrentInSubset_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source, 1, 3)
+    ms.Position = 1
+    
+    Dim Actual As Long
+    Actual = ms.SeekPosition(Offset, SeekOrigin.FromCurrent)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SeekPosition_WhenFromEndInSubset_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source, 1, 3)
+    
+    Dim Actual As Long
+    Actual = ms.SeekPosition(Offset, SeekOrigin.FromEnd)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 'Implements AsyncCallback
