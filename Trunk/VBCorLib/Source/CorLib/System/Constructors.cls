@@ -621,9 +621,9 @@ End Function
 ' does not release the byte Buffer. The user still must maintain a reference to the
 ' array and keep it alive for the duration of the MemoryStream's life.
 '
-Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByVal Index As Variant, Optional ByVal Count As Variant, Optional ByVal Writable As Boolean = True) As MemoryStream
+Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByVal Index As Variant, Optional ByVal Count As Variant, Optional ByVal Writable As Boolean = True, Optional ByVal Mode As BufferMode = ShareMode) As MemoryStream
     Set NewMemoryStream = New MemoryStream
-    Call NewMemoryStream.Init(Buffer, Index, Count, Writable)
+    NewMemoryStream.Init Buffer, Index, Count, Writable, Mode
 End Function
 
 ''

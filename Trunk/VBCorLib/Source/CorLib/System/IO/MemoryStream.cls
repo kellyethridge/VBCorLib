@@ -64,8 +64,15 @@ Option Explicit
 Implements IObject
 Implements Stream
 
+Public Enum BufferMode
+    ShareMode
+    CopyMode
+    AcquireMode
+End Enum
+
 Private Const DEF_CAPACITY As Long = 4096
 
+Private mMode           As BufferMode
 Private mBufferSet      As Boolean
 Private mBuffer()       As Byte
 Private mCanWrite       As Boolean
@@ -378,10 +385,11 @@ End Property
 Public Sub CloseStream()
     If mIsClosed Then Exit Sub
     
-    If mIsUserArray Then
-        Call UnlockArray
-        SAPtr(mBuffer) = 0
+    If mIsUserArray And (mMode = ShareMode) Then
+        UnlockArray
+        SAPtr(mBuffer) = vbNullPtr
     End If
+    
     mIsClosed = True
 End Sub
 
@@ -606,17 +614,29 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As Variant, ByVal Writable As Boolean)
+Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As Variant, ByVal Writable As Boolean, ByVal Mode As BufferMode)
     Dim Result As Long
     Result = GetOptionalArrayRange(SAPtr(Buffer), Index, mIndex, Count, mCapacity)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Buffer", mIndex, "Index", mCapacity, "Count", IsMissing(Index))
     
     mCanWrite = Writable
+    mMode = Mode
     mIsUserArray = True
     mLength = mCapacity
-        
-    SAPtr(mBuffer) = SAPtr(Buffer)
-    Call LockArray
+    
+    Select Case Mode
+        Case BufferMode.ShareMode
+            SAPtr(mBuffer) = SAPtr(Buffer)
+            LockArray
+        Case BufferMode.CopyMode
+            mBuffer = Buffer
+        Case BufferMode.AcquireMode
+            SAPtr(mBuffer) = SAPtr(Buffer)
+            SAPtr(Buffer) = vbNullPtr
+        Case Else
+            Throw Cor.NewArgumentException("Invalid buffer mode.")
+    End Select
+    
     mBufferSet = True
 End Sub
 
