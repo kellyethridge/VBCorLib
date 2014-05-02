@@ -29,6 +29,15 @@ Attribute VB_Name = "modArgumentHelpers"
 '
 Option Explicit
 
+
+Public Function IsNullByteArray(ByRef Bytes() As Byte) As Boolean
+    IsNullByteArray = (SAPtr(Bytes) = vbNullPtr)
+End Function
+
+Public Function IsMultiDimensionByteArray(ByRef Bytes() As Byte) As Boolean
+    IsMultiDimensionByteArray = (SafeArrayGetDim(SAPtr(Bytes)) > 1)
+End Function
+
 ''
 ' Returns an optional value or a default value if the optional value is missing.
 '

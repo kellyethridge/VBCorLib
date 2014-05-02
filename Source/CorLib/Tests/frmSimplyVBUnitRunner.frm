@@ -218,11 +218,7 @@ Private Sub Form_Load()
     FileStreamTests.Add New TestFileStream
     AddTest FileStreamTests
     
-    Dim MemoryStreamTests As TestSuite
-    Set MemoryStreamTests = Sim.NewTestSuite("MemoryStream Tests")
-    MemoryStreamTests.Add New TestUserMemoryStream
-    MemoryStreamTests.Add New MemoryStreamTests
-    AddTest MemoryStreamTests
+    AddTest New MemoryStreamTests
     
     Dim UTF7EncodingTests As TestSuite
     Set UTF7EncodingTests = Sim.NewTestSuite("UTF7Encoding Tests")

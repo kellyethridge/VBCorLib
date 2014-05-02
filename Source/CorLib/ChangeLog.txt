@@ -8,3 +8,4 @@ Reordered 'Message' and 'ParamName' arguments in ArgumentException to more align
 Reordered 'Message', 'ParamName', and 'ActualValue' arguments in ArgumentOutOfRangeException to more align with .NET. **
 Fixed ArrayList.SetRange when using ICollection source would insert instead of overwriting.
 Fixed MemoryStream SeekPosition when using FromEnd. Was off by 1.
+Fixed MemoryStream ReadBlock not honoring lower-bound of output buffer.

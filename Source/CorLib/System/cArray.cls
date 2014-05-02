@@ -361,7 +361,7 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     If ElemCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_LBound))
         
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -777,39 +777,50 @@ End Function
 ' @return The number of elements in the specified dimension or the entire array.
 '
 Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long = 0) As Long
-    Dim pSafeArray  As Long
-    pSafeArray = GetArrayPointer(Arr)
-    If pSafeArray = vbNullPtr Then _
+    Dim SafeArrayPtr  As Long
+    SafeArrayPtr = GetArrayPointer(Arr)
+    If SafeArrayPtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
     
-    GetLength = InternalGetLength(pSafeArray, Dimension)
+    GetLength = InternalGetLength(SafeArrayPtr, Dimension)
 End Function
 
-Private Function InternalGetLength(ByVal pSafeArray As Long, ByVal Dimension As Long) As Long
+Private Function InternalGetLength(ByVal SafeArrayPtr As Long, ByVal Dimension As Long) As Long
     Dim Rank As Long
-    Rank = SafeArrayGetDim(pSafeArray)
+    Rank = SafeArrayGetDim(SafeArrayPtr)
     If Dimension > Rank Then _
         Throw Cor.NewIndexOutOfRangeException(Resources.GetString(IndexOutOfRange_Dimension))
-        
-    pSafeArray = pSafeArray + SIZEOF_SAFEARRAY
+    
+    Dim ArrayBoundPtr As Long
+    ArrayBoundPtr = SafeArrayPtr + SIZEOF_SAFEARRAY
+    
     If Dimension < 1 Then
         ' optimize for 99% of calls
         If Rank = 1 Then
-            InternalGetLength = MemLong(pSafeArray)
-            Exit Function
+            InternalGetLength = MemLong(ArrayBoundPtr)
+        Else
+            InternalGetLength = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
         End If
-        
-        ' calculate the product of all the dimension sizes.
-        InternalGetLength = 1
-        Dim i As Long
-        For i = pSafeArray To pSafeArray + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
-            InternalGetLength = InternalGetLength * MemLong(i)
-        Next i
     Else
-        ' get the size of a specific dimension.
-        pSafeArray = pSafeArray + (Rank - Dimension) * SIZEOF_SAFEARRAYBOUND
-        InternalGetLength = MemLong(pSafeArray)
+        InternalGetLength = GetDimensionSize(ArrayBoundPtr, Rank, Dimension)
     End If
+End Function
+
+Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal Rank As Long) As Long
+    Dim Result As Long
+    
+    Result = 1
+    Dim Ptr As Long
+    For Ptr = ArrayBoundPtr To ArrayBoundPtr + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
+        Result = Result * MemLong(Ptr)
+    Next
+
+    CalculateProductOfDimensions = Result
+End Function
+
+Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Long, ByVal Dimension As Long) As Long
+    ArrayBoundPtr = ArrayBoundPtr + (Rank - Dimension) * SIZEOF_SAFEARRAYBOUND
+    GetDimensionSize = MemLong(ArrayBoundPtr)
 End Function
 
 ''
@@ -837,12 +848,12 @@ End Function
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
 Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    Dim pSafeArray As Long
-    pSafeArray = GetArrayPointer(Arr)
+    Dim ArrayPointer As Long
+    ArrayPointer = GetArrayPointer(Arr)
     
-    If pSafeArray = vbNullPtr Then _
+    If ArrayPointer = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
-    If SafeArrayGetDim(pSafeArray) > 1 Then _
+    If SafeArrayGetDim(ArrayPointer) > 1 Then _
         Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
     
     Dim ElemIndex As Long
@@ -852,19 +863,16 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
 
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
         Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayBounds))
-    If ElemCount < 0 Then _
+    If ElemCount < 0 Or ElemIndex + ElemCount - 1 > UBound(Arr) Then _
         Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_Count))
-    If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(ArgumentOutOfRange_UBound))
     
     On Error GoTo errTrap
     If Comparer Is Nothing Then
         ' if no comparer was supplied, then try some optimized routines.
-        If TrySZIndexOf(pSafeArray, Value, ElemIndex, ElemCount, IndexOf) Then Exit Function
+        If TrySZIndexOf(ArrayPointer, Value, ElemIndex, ElemCount, IndexOf) Then Exit Function
         Set Comparer = VBCorLib.Comparer.Default
     End If
     
-    ' perform a search using comparer.
     Do While ElemCount > 0
         If Comparer.Compare(Arr(ElemIndex), Value) = 0 Then
             IndexOf = ElemIndex
@@ -873,8 +881,10 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         ElemIndex = ElemIndex + 1
         ElemCount = ElemCount - 1
     Loop
+    
     IndexOf = LBound(Arr) - 1
     Exit Function
+    
 errTrap:
     Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
@@ -918,7 +928,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     If ElemCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_Count))
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_LBound))
     
     On Error GoTo errTrap
     If Comparer Is Nothing Then

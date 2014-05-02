@@ -82,7 +82,7 @@ Public Sub ToBase64String_WithNullArray_Throws()
     AssertArgumentNullException Err, "InArray"
 End Sub
 
-Public Sub ToBase64String_WithIndexLessThanLBound_Throws()
+Public Sub ToBase64String_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim Bytes(1 To 2) As Byte
     
     On Error Resume Next
@@ -91,7 +91,7 @@ Public Sub ToBase64String_WithIndexLessThanLBound_Throws()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub ToBase64String_WithLengthLessThanZero_Throws()
+Public Sub ToBase64String_WithLengthLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Bytes(0) As Byte
     
     On Error Resume Next
@@ -100,7 +100,7 @@ Public Sub ToBase64String_WithLengthLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub ToBase64String_WithIndexAndLengthGreaterThanUBound_Throws()
+Public Sub ToBase64String_WithIndexAndLengthGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim Bytes(0 To 2) As Byte
     
     On Error Resume Next
@@ -109,7 +109,7 @@ Public Sub ToBase64String_WithIndexAndLengthGreaterThanUBound_Throws()
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub ToBase64CharArray_WithNullInArray_Throws()
+Public Sub ToBase64CharArray_WithNullInArray_ThrowsArgumentNullException()
     Dim InArray() As Byte
     Dim OutArray(0) As Integer
     
@@ -119,7 +119,7 @@ Public Sub ToBase64CharArray_WithNullInArray_Throws()
     AssertArgumentNullException Err, "InArray"
 End Sub
 
-Public Sub ToBase64CharArray_WithNullOutArray_Throws()
+Public Sub ToBase64CharArray_WithNullOutArray_ThrowsArgumentNullException()
     Dim InArray(0) As Byte
     Dim OutArray() As Integer
     
@@ -129,7 +129,7 @@ Public Sub ToBase64CharArray_WithNullOutArray_Throws()
     AssertArgumentNullException Err, "OutArray"
 End Sub
 
-Public Sub ToBase64CharArray_WithIndexInLessThanLBound_Throws()
+Public Sub ToBase64CharArray_WithIndexInLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim InArray(1 To 2) As Byte
     Dim OutArray(0) As Integer
     
@@ -139,7 +139,7 @@ Public Sub ToBase64CharArray_WithIndexInLessThanLBound_Throws()
     AssertArgumentOutOfRangeException Err, "IndexIn"
 End Sub
 
-Public Sub ToBase64CharArray_WithIndexOutLessThanLBound_Throws()
+Public Sub ToBase64CharArray_WithIndexOutLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim InArray(2) As Byte
     Dim OutArray(1 To 5) As Integer
     
@@ -150,7 +150,7 @@ Public Sub ToBase64CharArray_WithIndexOutLessThanLBound_Throws()
     AssertArgumentOutOfRangeException Err, "IndexOut"
 End Sub
 
-Public Sub ToBase64CharArray_WithLengthLessThanZero_Throws()
+Public Sub ToBase64CharArray_WithLengthLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim InArray(1) As Byte
     Dim OutArray(1) As Integer
     
@@ -160,22 +160,22 @@ Public Sub ToBase64CharArray_WithLengthLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub ToBase64CharArray_WithIndexInAndLengthGreaterThanUBound_Throws()
+Public Sub ToBase64CharArray_WithIndexInAndLengthGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim InArray(1) As Byte
     Dim OutArray(2) As Integer
     
     On Error Resume Next
     Convert.ToBase64CharArray InArray, 0, 3, OutArray, 0
     
-    AssertArgumentOutOfRangeException Err, "IndexIn"
+    AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub ToBase64CharArray_WithIndexOutAndLengthGreaterThanUBound_Throws()
+Public Sub ToBase64CharArray_WithIndexOutAndLengthGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim InArray(2) As Byte
     Dim OutArray(1) As Integer
     
     On Error Resume Next
     Convert.ToBase64CharArray InArray, 0, 3, OutArray, 0
     
-    AssertArgumentOutOfRangeException Err, "IndexOut"
+    AssertArgumentOutOfRangeException Err
 End Sub
