@@ -66,10 +66,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub ReadByte_WithGivenPosition_ReturnsExpected(ByVal Position As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source)
+    Set ms = MakeMemoryStream
     ms.Position = Position
     
     Dim Actual As Long
@@ -78,24 +76,62 @@ Public Sub ReadByte_WithGivenPosition_ReturnsExpected(ByVal Position As Long, By
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub ReadByte_WhenCalled_AdvancesPosition()
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    
+    ms.ReadByte
+    
+    Assert.That ms.Position, Iz.EqualTo(1)
+End Sub
+
 Public Sub ReadByte_WithGivenPositionInSubset_ReturnsExpected(ByVal Position As Long, ByVal Expected As Long)
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStreamSubset
+    ms.Position = Position
+    
+    Dim Actual As Long
+    Actual = ms.ReadByte
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub WriteByte_WhenCalled_WritesToBuffer()
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source)
+    
+    ms.WriteByte 10
+    
+    Assert.That Source, Iz.EqualTo(NewBytes(10, 2, 3, 4, 5))
+End Sub
+
+Public Sub WriteByte_WhenCalled_AdvancesPosition()
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source)
+    
+    ms.WriteByte 10
+
+    Assert.That ms.Position, Iz.EqualTo(1)
+End Sub
+
+Public Sub WriteByte_WithSubset_WritesToBuffer()
     Dim Source() As Byte
     Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
     Set ms = Cor.NewMemoryStream(Source, 1, 3)
-    ms.Position = Position
     
-    Dim Actual As Long
-    Actual = ms.ReadByte
+    ms.WriteByte 10
     
-    Assert.That Actual, Iz.EqualTo(Expected)
+    Assert.That Source, Iz.EqualTo(NewBytes(1, 10, 3, 4, 5))
 End Sub
 
 Public Sub SeekPosition_WhenFromBeginning_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source)
+    Set ms = MakeMemoryStream
     
     Dim Actual As Long
     Actual = ms.SeekPosition(Offset, SeekOrigin.FromBeginning)
@@ -104,10 +140,8 @@ Public Sub SeekPosition_WhenFromBeginning_SetsPosition(ByVal Offset As Long, ByV
 End Sub
 
 Public Sub SeekPosition_WhenFromCurrent_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source)
+    Set ms = MakeMemoryStream
     ms.Position = 2
     
     Dim Actual As Long
@@ -117,10 +151,8 @@ Public Sub SeekPosition_WhenFromCurrent_SetsPosition(ByVal Offset As Long, ByVal
 End Sub
 
 Public Sub SeekPosition_WhenFromEnd_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source)
+    Set ms = MakeMemoryStream
     
     Dim Actual As Long
     Actual = ms.SeekPosition(Offset, SeekOrigin.FromEnd)
@@ -139,10 +171,8 @@ Public Sub SeekPosition_WithInvalidSeekOrigin_ThrowsArgumentException()
 End Sub
 
 Public Sub SeekPosition_WhenFromBeginningInSubset_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source, 1, 3)
+    Set ms = MakeMemoryStreamSubset
     
     Dim Actual As Long
     Actual = ms.SeekPosition(Offset, SeekOrigin.FromBeginning)
@@ -151,10 +181,8 @@ Public Sub SeekPosition_WhenFromBeginningInSubset_SetsPosition(ByVal Offset As L
 End Sub
 
 Public Sub SeekPosition_WhenFromCurrentInSubset_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source, 1, 3)
+    Set ms = MakeMemoryStreamSubset
     ms.Position = 1
     
     Dim Actual As Long
@@ -164,10 +192,8 @@ Public Sub SeekPosition_WhenFromCurrentInSubset_SetsPosition(ByVal Offset As Lon
 End Sub
 
 Public Sub SeekPosition_WhenFromEndInSubset_SetsPosition(ByVal Offset As Long, ByVal Expected As Long)
-    Dim Source() As Byte
-    Source = NewBytes(1, 2, 3, 4, 5)
     Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(Source, 1, 3)
+    Set ms = MakeMemoryStreamSubset
     
     Dim Actual As Long
     Actual = ms.SeekPosition(Offset, SeekOrigin.FromEnd)
@@ -175,171 +201,423 @@ Public Sub SeekPosition_WhenFromEndInSubset_SetsPosition(ByVal Offset As Long, B
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub Constructor_WithSharedMode_SharesBuffer()
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    
+    Set ms = Cor.NewMemoryStream(Source, Mode:=ShareMode)
+    
+    Source(0) = 10
+    Assert.That ms.ReadByte, Iz.EqualTo(10)
+End Sub
 
-'Implements AsyncCallback
-'
-'Private ms As MemoryStream
-'Private mAsyncCallback As Boolean
-'Private b() As Byte
-'
-'Public Sub Setup()
-'    Set ms = New MemoryStream
-'    mAsyncCallback = False
-'End Sub
-'
-'Public Sub Position_WhenNew_EqualsZero()
-'    Dim Stream As New MemoryStream
-'
-'    Dim Actual As Long
-'    Actual = Stream.Position
-'
-'    Assert.That Actual, Iz.EqualTo(0)
-'End Sub
-'
-'Public Sub Length_WhenNew_EqualsZero()
-'    Dim Stream As New MemoryStream
-'
-'    Dim Actual As Long
-'    Actual = Stream.Length
-'
-'    Assert.That Actual, Iz.EqualTo(0)
-'End Sub
-'
-'Public Sub CanWrite_WhenNew_ReturnsTrue()
-'    Dim Stream As New MemoryStream
-'
-'    Dim Actual As Boolean
-'    Actual = Stream.CanWrite
-'
-'    Assert.That Actual, Iz.True
-'End Sub
-'
-'Public Sub WriteByte_WhenCalled_AddsToStream()
-'    Dim StreamData(10) As Byte
-'    Dim Stream As MemoryStream
-'    Set Stream = Cor.NewMemoryStream(StreamData)
-'
-'    Stream.WriteByte 1
-'
-'    Assert.That Stream.Position, Iz.EqualTo(1)
-'    Assert.That StreamData(0), Iz.EqualTo(1)
-'End Sub
-'
-'Public Sub ReadByte_WhenPositionSet_ReturnsExpected()
-'    Dim Source() As Byte
-'    Source = NewBytes(1, 2, 3, 4, 5)
-'    Dim ms As MemoryStream
-'    Set ms = Cor.NewMemoryStream(Source)
-'    ms.Position = 2
-'
-'    Dim Actual As Byte
-'    Actual = ms.ReadByte
-'
-'    Assert.That Actual, Iz.EqualTo(3)
-'End Sub
-'
-'Public Sub TestReadPreviousByte()
-'    ms.WriteByte 55
-'    ms.Position = 0
-'    Assert.AreEqual 55, ms.ReadByte
-'End Sub
-'
-'Public Sub TestReadByteAtEndOfStream()
-'    Assert.AreEqual -1, ms.ReadByte
-'End Sub
-'
-'Public Sub TestWriteBlock()
-'    Dim i As Long
-'
-'    ReDim b(9)
-'    For i = 0 To 9
-'        b(i) = i + 1
-'    Next i
-'    ms.WriteBlock b, 0, 10
-'    Assert.AreEqual 10@, ms.Position
-'End Sub
-'
-'Public Sub TestReadBlock()
-'    Dim i As Long
-'
-'    ReDim b(10)
-'    For i = 0 To 9
-'        b(i) = i + 1
-'    Next i
-'    b(10) = 13
-'    For i = 1 To 1000
-'        ms.WriteBlock b, 0, 11
-'    Next i
-'    ms.Position = 0
-'
-'    Dim b2(10) As Byte
-'    Dim j As Long
-'
-'    For j = 1 To 1000
-'        Assert.AreEqual ms.ReadBlock(b2, 0, 11), 11
-'        For i = 0 To 9
-'            Assert.AreEqual i + 1, b2(i)
-'        Next i
-'        Assert.AreEqual 13, b2(10)
-'    Next j
-'End Sub
-'
-'Public Sub TestBeginWrite()
-'    Dim i As Long
-'    Dim ar As IAsyncResult
-'
-'    ReDim b(9)
-'    For i = 0 To 9
-'        b(i) = i + 1
-'    Next i
-'
-'    Set ar = ms.BeginWrite(b, 0, 10, Me)
-'    Assert.IsNotNothing ar, "ar should not be Nothing."
-'    Assert.IsTrue mAsyncCallback, "AsyncCallback should be executed."
-'    ms.EndWrite ar
-'    Assert.AreEqual 10@, ms.Length
-'End Sub
-'
-'Public Sub TestBeginRead()
-'    Dim i As Long
-'    Dim ar As IAsyncResult
-'
-'    ReDim b(9)
-'    For i = 0 To 9
-'        b(i) = i + 1
-'    Next i
-'    ms.WriteBlock b, 0, 10
-'
-'    ReDim b(9)
-'    ms.SeekPosition 0, FromBeginning
-'    Set ar = ms.BeginRead(b, 0, 10, Me)
-'    Assert.IsNotNothing ar, "ar should not be Nothing."
-'    Assert.IsTrue mAsyncCallback, "AsyncCallback should be executed."
-'    Assert.AreEqual 10, ms.EndRead(ar)
-'    For i = 0 To 9
-'        Assert.AreEqual i + 1, b(i)
-'    Next i
-'End Sub
-'
-'Public Sub TestReadToOneBytePassedEnd()
-'    Dim i As Long
-'    Dim b(10) As Byte
-'
-'    For i = 1 To 10
-'        ms.WriteByte i
-'    Next i
-'
-'    ms.Position = 8
-'    Assert.AreEqual 9, ms.ReadByte
-'    ms.Position = 8
-'    Assert.AreEqual 2, ms.ReadBlock(b, 0, 3)
-'    Assert.AreEqual 9, b(0)
-'    Assert.AreEqual 10, b(1)
-'End Sub
-'
-'
-'
-'Private Sub AsyncCallback_Execute(ByVal ar As VBCorLib.IAsyncResult)
-'    mAsyncCallback = True
-'End Sub
+Public Sub Constructor_WithCopyMode_CopiesBuffer()
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    
+    Set ms = Cor.NewMemoryStream(Source, Mode:=CopyMode)
+    
+    Source(0) = 10
+    Assert.That ms.ReadByte, Iz.EqualTo(1)
+End Sub
 
+Public Sub Constructor_WithCopyMode_DoesNotChangeSourceBuffer()
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    
+    Set ms = Cor.NewMemoryStream(Source, Mode:=CopyMode)
+        
+    Assert.That Source, Iz.EqualTo(NewBytes(1, 2, 3, 4, 5))
+End Sub
+
+Public Sub Constructor_WithAcquireMode_AcquiredBuffer()
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    
+    Set ms = Cor.NewMemoryStream(Source, Mode:=AcquireMode)
+    
+    Assert.That ms.ReadByte, Iz.EqualTo(1)
+End Sub
+
+Public Sub Constructor_WithAcquireMode_NullsSourceBuffer()
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Dim ms As MemoryStream
+    
+    Set ms = Cor.NewMemoryStream(Source, Mode:=AcquireMode)
+    
+    Assert.That cArray.IsNull(Source), Iz.True
+End Sub
+
+Public Sub ReadBlock_WhenCalled_ReturnsAmountRead()
+    Dim OutputBuffer(0 To 2) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    Dim Actual As Long
+    Actual = ms.ReadBlock(OutputBuffer, 0, 3)
+    
+    Assert.That Actual, Iz.EqualTo(3)
+End Sub
+
+Public Sub ReadBlock_WithOffsetOfZero_FillsStartOfOutputBuffer()
+    Dim OutputBuffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    ms.ReadBlock OutputBuffer, 0, 3
+
+    Assert.That OutputBuffer, Iz.EqualTo(NewBytes(1, 2, 3, 0, 0))
+End Sub
+
+Public Sub ReadBlock_WithOffsetOfTwo_FillsEndOfOutputBuffer()
+    Dim OutputBuffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    ms.ReadBlock OutputBuffer, 2, 3
+
+    Assert.That OutputBuffer, Iz.EqualTo(NewBytes(0, 0, 1, 2, 3))
+End Sub
+
+Public Sub ReadBlock_WithOffsetAndNonZeroLowerBoundArray_FillsEndOfOutputBuffer()
+    Dim OutputBuffer(2 To 6) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    ms.ReadBlock OutputBuffer, 2, 3
+
+    Assert.That OutputBuffer, Iz.EqualTo(NewBytes(0, 0, 1, 2, 3)).AsCollection
+End Sub
+
+Public Sub ReadBlock_WithNegativeOffset_ThrowsArgumentOutOfRangeException()
+    Dim OutputBuffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    On Error Resume Next
+    ms.ReadBlock OutputBuffer, -1, 3
+    
+    AssertArgumentOutOfRangeException Err, "Offset"
+End Sub
+
+Public Sub ReadBlock_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim OutputBuffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    On Error Resume Next
+    ms.ReadBlock OutputBuffer, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub ReadBlock_WithNullOutputBuffer_ThrowsArgumentNullException()
+    Dim OutputBuffer() As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    On Error Resume Next
+    ms.ReadBlock OutputBuffer, 0, 3
+    
+    AssertArgumentNullException Err, "Bytes"
+End Sub
+
+Public Sub ReadBlock_WithMultipleDimensionOutputBuffer_ThrowsRankException()
+    Dim OutputBuffer(0 To 3, 0 To 3) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+        
+    On Error Resume Next
+    ms.ReadBlock OutputBuffer, 0, 3
+    
+    AssertRankException Err
+End Sub
+
+Public Sub WriteBlock_WhenCalled_StoresInBuffer()
+    Dim Buffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Buffer)
+    
+    ms.WriteBlock NewBytes(7, 8, 9), 0, 3
+    
+    Assert.That Buffer, Iz.EqualTo(NewBytes(7, 8, 9, 0, 0))
+End Sub
+
+Public Sub WriteBlock_WithOffsetOfTwo_StoresEndOfSourceToBuffer()
+    Dim Buffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Buffer)
+    
+    ms.WriteBlock NewBytes(7, 8, 9, 10, 11), 2, 3
+    
+    Assert.That Buffer, Iz.EqualTo(NewBytes(9, 10, 11, 0, 0))
+End Sub
+
+Public Sub WriteBlock_WithNegativeOffset_ThrowsArgumentOutOfRangeException()
+    Dim Buffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Buffer)
+    
+    On Error Resume Next
+    ms.WriteBlock NewBytes(7, 8, 9, 10, 11), -1, 3
+    
+    AssertArgumentOutOfRangeException Err, "Offset"
+End Sub
+
+Public Sub WriteBlock_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim Buffer(0 To 4) As Byte
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Buffer)
+    
+    On Error Resume Next
+    ms.WriteBlock NewBytes(7, 8, 9, 10, 11), 2, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub WriteBlock_WithNullArray_ThrowsArgumentNullException()
+    Dim ms As New MemoryStream
+    
+    On Error Resume Next
+    Dim NullSource() As Byte
+    ms.WriteBlock NullSource, 2, 3
+
+    AssertArgumentNullException Err, "Buffer"
+End Sub
+
+Public Sub WriteBlock_WithMultiDimensionArray_ThrowsRankException()
+    Dim ms As New MemoryStream
+    
+    On Error Resume Next
+    Dim MultiDimArray(0 To 2, 0 To 2) As Byte
+    ms.WriteBlock MultiDimArray, 2, 3
+
+    AssertRankException Err
+End Sub
+
+Public Sub WriteBlock_WithInvalidRange_ThrowsArgumentException()
+    Dim ms As New MemoryStream
+    
+    On Error Resume Next
+    ms.WriteBlock NewBytes(1, 2, 3), 1, 3
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub ToArray_WithNoWrittenContent_ReturnsEmptyArray()
+    Dim ms As New MemoryStream
+    
+    Dim Actual() As Byte
+    Actual = ms.ToArray
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub ToArray_WithContentWritten_ReturnsArrayOfContent()
+    Dim ms As New MemoryStream
+    ms.WriteBlock NewBytes(1, 2, 3), 0, 3
+    
+    Dim Actual() As Byte
+    Actual = ms.ToArray
+    
+    Assert.That Actual, Iz.EqualTo(NewBytes(1, 2, 3))
+End Sub
+
+Public Sub Capacity_WithNegativeValue_ThrowsArgumentOutOfRangeException()
+    Dim ms As New MemoryStream
+    
+    On Error Resume Next
+    ms.Capacity = -1
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub Capacity_WhenSetLessThanStreamLength_ThrowsArgumentOutOfRangeException()
+    Dim ms As New MemoryStream
+    ms.WriteBlock NewBytes(1, 2, 3, 4, 5), 0, 5
+    
+    On Error Resume Next
+    ms.Capacity = 4
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub Capacity_WithSharedBuffer_ThrowsNotSupportedException()
+    Dim Source(0 To 10) As Byte
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source, Mode:=ShareMode)
+    
+    On Error Resume Next
+    ms.Capacity = ms.Capacity + 1
+    
+    AssertNotSupportedException Err
+End Sub
+
+Public Sub Capacity_WithInternalBuffer_ExpandsStream()
+    Dim ms As New MemoryStream
+    
+    ms.Capacity = ms.Capacity + 1
+End Sub
+
+Public Sub Capacity_WithCopiedBuffer_ExpandsStream()
+    Dim Source(0 To 10) As Byte
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source, Mode:=CopyMode)
+    
+    ms.Capacity = ms.Capacity + 1
+End Sub
+
+Public Sub Capacity_WithAcquiredBuffer_ExpandsStream()
+    Dim Source() As Byte
+    ReDim Source(0 To 10)
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source, Mode:=AcquireMode)
+    
+    ms.Capacity = ms.Capacity + 1
+End Sub
+
+Public Sub WriteByte_WithUnwritableStream_ThrowsNotSupportedException()
+    Dim Source(0 To 10) As Byte
+    Dim ms As MemoryStream
+    Set ms = Cor.NewMemoryStream(Source, Writable:=False)
+    
+    On Error Resume Next
+    ms.WriteByte 1
+    
+    AssertNotSupportedException Err
+End Sub
+
+Public Sub WriteByte_WithClosedStream_ThrowsObjectDisposedException()
+    Dim ms As New MemoryStream
+    ms.CloseStream
+    
+    On Error Resume Next
+    ms.WriteByte 1
+    
+    AssertObjectDisposedException Err
+End Sub
+
+Public Sub WriteTo_WithNothing_ThrowsArgumentNullException()
+    Dim ms As New MemoryStream
+    
+    On Error Resume Next
+    ms.WriteTo Nothing
+    
+    AssertArgumentNullException Err, "Stream"
+End Sub
+
+Public Sub WriteTo_WhenCalled_WritesContentsToTargetStream()
+    Dim ms As New MemoryStream
+    ms.WriteBlock NewBytes(1, 2, 3), 0, 3
+    
+    Dim Target As New MemoryStream
+    ms.WriteTo Target
+    
+    Assert.That Target.ToArray, Iz.EqualTo(NewBytes(1, 2, 3))
+End Sub
+
+Public Sub BeginRead_WhenCalled_ReturnsAsyncResult()
+    Dim Buffer(0 To 9) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    
+    Dim Result As IAsyncResult
+    Set Result = ms.BeginRead(Buffer, 0, 5)
+    
+    Assert.That Result, Iz.Not.Nothing
+    Assert.That Result.IsCompleted, Iz.True
+    Assert.That Buffer, Iz.EqualTo(NewBytes(1, 2, 3, 4, 5, 0, 0, 0, 0, 0))
+End Sub
+
+Public Sub EndRead_WhenCalled_ReturnsCountRead()
+    Dim Buffer(0 To 9) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    Dim Result As IAsyncResult
+    Set Result = ms.BeginRead(Buffer, 0, 5)
+    
+    Dim Actual As Long
+    Actual = ms.EndRead(Result)
+    
+    Assert.That Actual, Iz.EqualTo(5)
+End Sub
+
+Public Sub BeginRead_WithAsyncCallback_ExecutesCallback()
+    Dim Buffer(0 To 9) As Byte
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    Dim Callback As New FakeAsyncCallback
+    
+    Dim Result As IAsyncResult
+    Set Result = ms.BeginRead(Buffer, 0, 5, Callback)
+
+    Assert.That Callback.Called, Iz.True
+End Sub
+
+Public Sub SetLength_WhenLessThanCurrentLength_TruncatesStream()
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    
+    ms.SetLength 3
+    
+    Assert.That ms.ToArray, Iz.EqualTo(NewBytes(1, 2, 3))
+End Sub
+
+Public Sub SetLength_WhenGreaterThanCurrentLength_FillsWithZeros()
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    
+    ms.SetLength 8
+    
+    Assert.That ms.ToArray, Iz.EqualTo(NewBytes(1, 2, 3, 4, 5, 0, 0, 0))
+End Sub
+
+Public Sub SetLength_WithTrucateThenExpand_OverwritesContentsWithZeros()
+    Dim ms As MemoryStream
+    Set ms = MakeMemoryStream
+    
+    ms.SetLength 2
+    ms.SetLength 5
+    
+    Assert.That ms.ToArray, Iz.EqualTo(NewBytes(1, 2, 0, 0, 0))
+End Sub
+
+
+
+Private Function MakeMemoryStream() As MemoryStream
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Set MakeMemoryStream = Cor.NewMemoryStream(Source, Mode:=AcquireMode)
+End Function
+
+Private Function MakeMemoryStreamSubset() As MemoryStream
+    Dim Source() As Byte
+    Source = NewBytes(1, 2, 3, 4, 5)
+    Set MakeMemoryStreamSubset = Cor.NewMemoryStream(Source, 1, 3, Mode:=AcquireMode)
+End Function
+
+Public Sub BeginWrite_WhenCalled_ReturnsAsyncResult()
+    Dim ms As New MemoryStream
+    
+    Dim Result As IAsyncResult
+    Set Result = ms.BeginWrite(NewBytes(1, 2, 3), 0, 3)
+    
+    Assert.That Result, Iz.Not.Nothing
+    Assert.That Result.IsCompleted, Iz.True
+    Assert.That ms.ToArray, Iz.EqualTo(NewBytes(1, 2, 3))
+End Sub
+
+Public Sub EndWrite_WithAsyncCallback_ExecutesCallback()
+    Dim ms As New MemoryStream
+    Dim Callback As New FakeAsyncCallback
+    
+    Dim Result As IAsyncResult
+    Set Result = ms.BeginWrite(NewBytes(1, 2, 3), 0, 3, Callback)
+
+    Assert.That Callback.Called, Iz.True
+End Sub

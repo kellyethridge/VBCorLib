@@ -126,7 +126,7 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As 
     If ElemCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NegativeLength))
     If ElemIndex + ElemCount - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(ArgumentOutOfRange_IndexLength))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_IndexLength))
     
     ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(ElemCount, InsertLineBreaks))
     mChars.SA.pvData = StrPtr(ToBase64String)
@@ -140,10 +140,10 @@ End Function
 ' the subsets as offsets of the input and output arrays and the number of elements in the input array.
 '
 ' @param InArray The bytes to be converted to a base-64 character array.
-' @param OffsetIn Offset within <i>InArray</i> to begin encoding to base-64 characters.
+' @param IndexIn Offset within <i>InArray</i> to begin encoding to base-64 characters.
 ' @param Length The number of bytes to encode.
 ' @param OutArray The output character array containing the base-64 characters.
-' @param OffsetOut The starting index in <i>OutArray</i> to place base-64 characters.
+' @param IndexOut The starting index in <i>OutArray</i> to place base-64 characters.
 ' @param InsertLineBreaks Indicates if a vbCrLf should be inserted every 76 characters to
 ' conform with MIME line formatting.
 ' @return The number of base-64 characters created.
@@ -159,7 +159,7 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long
     If Length < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NegativeLength))
     If IndexIn + Length - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("IndexLength", Message:=Resources.GetString(ArgumentOutOfRange_IndexLength))
+        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Resources.GetString(ArgumentOutOfRange_IndexLength))
     If IndexOut < LBound(OutArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("IndexOut", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
         
@@ -167,7 +167,7 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long
     Size = CalculateOutputLength(Length, InsertLineBreaks)
     
     If IndexOut + Size - 1 > UBound(OutArray) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(ArgumentOutOfRange_OffsetOut))
+        Throw Cor.NewArgumentOutOfRangeException("IndexOut", Message:=Resources.GetString(ArgumentOutOfRange_OffsetOut))
     
     ToBase64CharArray = InternalToBase64CharArray(InArray, IndexIn, Length, OutArray, IndexOut, InsertLineBreaks)
 End Function

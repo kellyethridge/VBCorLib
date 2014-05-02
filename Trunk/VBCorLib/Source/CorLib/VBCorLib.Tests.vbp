@@ -10,7 +10,6 @@ Class=TestTripleDESEncryption128bit; Tests\TestTripleDESEncryption128bit.cls
 Class=TestTripleDESWeakKeys; Tests\TestTripleDESWeakKeys.cls
 Class=TestUnicodeEncoding; Tests\TestUnicodeEncoding.cls
 Class=TestUnicodeEncodingBig; Tests\TestUnicodeEncodingBigEndian.cls
-Class=TestUserMemoryStream; Tests\TestUserMemoryStream.cls
 Class=TestUTF7GetByteCount; Tests\TestUTF7GetByteCount.cls
 Class=TestUTF7GetBytes; Tests\TestUTF7GetBytes.cls
 Class=TestUTF7GetCharCount; Tests\TestUTF7GetCharCount.cls

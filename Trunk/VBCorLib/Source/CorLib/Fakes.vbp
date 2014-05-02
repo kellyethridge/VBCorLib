@@ -7,6 +7,7 @@ Class=Int32; Fakes\Int32.cls
 Class=Int32Formattable; Fakes\Int32Formattable.cls
 Class=MockFormattable; Fakes\MockFormattable.cls
 Class=MockObject; Fakes\MockObject.cls
+Class=FakeAsyncCallback; Fakes\FakeAsyncCallback.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"

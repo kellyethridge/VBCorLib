@@ -67,62 +67,62 @@ Public Sub IndexOf_WithDefaultComparer_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IndexOf_WithNullArray_Throws()
+Public Sub IndexOf_WithNullArray_ThrowsArgumentNullException()
     Dim Arr() As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.IndexOf Arr, 1
     
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Sub IndexOf_WithMuliDimensionArray_Throws()
+Public Sub IndexOf_WithMuliDimensionArray_ThrowsRankException()
     Dim Arr(0, 0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.IndexOf Arr, 0
     
-ErrTrap:
+errTrap:
     AssertRankException Err
 End Sub
 
-Public Sub IndexOf_WithStartIndexLessThanLBound_Throws()
+Public Sub IndexOf_WithStartIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.IndexOf Arr, 0, -1
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub IndexOf_WithStartIndexGreaterThanUBound_Throws()
+Public Sub IndexOf_WithStartIndexGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.IndexOf Arr, 0, 1
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub IndexOf_WithCountLessThanZero_Throws()
+Public Sub IndexOf_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.IndexOf Arr, 0, 0, -1
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub IndexOf_WithStartIndexAndCountGreaterThanUBound_Throws()
+Public Sub IndexOf_WithStartIndexAndCountGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.IndexOf Arr, 0, 0, 2
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err
 End Sub

@@ -70,7 +70,7 @@ Public Enum BufferMode
     AcquireMode
 End Enum
 
-Private Const DEF_CAPACITY As Long = 4096
+Private Const DefaultCapacity As Long = 256
 
 Private mMode           As BufferMode
 Private mBufferSet      As Boolean
@@ -80,7 +80,7 @@ Private mPosition       As Long
 Private mCapacity       As Long
 Private mLength         As Long
 Private mIsClosed       As Boolean
-Private mIsUserArray    As Boolean
+Private mExpandable     As Boolean
 Private mIndex          As Long
 
 
@@ -154,22 +154,25 @@ End Property
 ' EndRead is executed.
 '
 Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Dim Ret As StreamAsyncResult
+    Dim Result As StreamAsyncResult
+    Set Result = Cor.NewStreamAsyncResult(State)
     
-    Set Ret = Cor.NewStreamAsyncResult(State)
     On Error GoTo errTrap
-    With Ret
-        .BytesRead = ReadBlock(Buffer, Offset, Count)
-        .IsCompleted = True
-        .IsReadType = True
-    End With
+    Result.BytesRead = ReadBlock(Buffer, Offset, Count)
+    Result.IsCompleted = True
+    Result.IsReadType = True
     
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
+    If Not Callback Is Nothing Then
+        Callback.Execute Result
+    End If
 
 errTrap:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
-    Set BeginRead = Ret
+    If Catch(Ex, Err) Then
+        Set Result.Exception = Ex
+    End If
+    
+    Set BeginRead = Result
 End Function
 
 ''
@@ -192,22 +195,25 @@ End Function
 ' EndRead is executed.
 '
 Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Dim Ret As StreamAsyncResult
+    Dim Result As StreamAsyncResult
+    Set Result = Cor.NewStreamAsyncResult(State)
     
-    Set Ret = Cor.NewStreamAsyncResult(State)
     On Error GoTo errTrap:
-    With Ret
-        .CompletedSynchronously = True
-        .IsCompleted = True
-    End With
-    Call WriteBlock(Buffer, Offset, Count)
+    Result.CompletedSynchronously = True
+    Result.IsCompleted = True
+    WriteBlock Buffer, Offset, Count
     
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
+    If Not Callback Is Nothing Then
+        Callback.Execute Result
+    End If
     
 errTrap:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
-    Set BeginWrite = Ret
+    If Catch(Ex, Err) Then
+        Set Result.Exception = Ex
+    End If
+    
+    Set BeginWrite = Result
 End Function
 
 ''
@@ -264,7 +270,8 @@ Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If Result.EndCalled Then _
         Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
 
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    If Not Result.Exception Is Nothing Then _
+        Throw Result.Exception
 End Sub
 
 ''
@@ -320,19 +327,19 @@ End Property
 ' exception will be thrown if the capacity is modified.
 '
 Public Property Let Capacity(ByVal RHS As Long)
-    Call VerifyOpen
-    
-    If mIsUserArray Then _
-        Throw Cor.NewNotSupportedException("The capacity cannot be modified when using a user supplied byte array.")
+    If Not mExpandable Then _
+        Throw Cor.NewNotSupportedException(Resources.GetString(NotSupported_MemoryStreamNotExpandable))
     If RHS < mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:="Capacity cannot be set less than then length of the stream.")
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Resources.GetString(ArgumentOutOfRange_SmallCapacity))
+    
+    EnsureOpen
     
     If RHS = mLength Then Exit Property
     mCapacity = RHS - 1
     If mBufferSet Then
         ReDim Preserve mBuffer(0 To mCapacity - 1)
     Else
-        Call VerifyBuffer
+        EnsureBuffer
     End If
 End Property
 
@@ -369,10 +376,10 @@ End Property
 ' array is not.
 '
 Public Property Let Position(ByVal RHS As Currency)
-    Call VerifyOpen
-    
     If RHS < 0@ Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+    
+    EnsureOpen
     mPosition = Int(RHS)
 End Property
 
@@ -385,8 +392,8 @@ End Property
 Public Sub CloseStream()
     If mIsClosed Then Exit Sub
     
-    If mIsUserArray And (mMode = ShareMode) Then
-        UnlockArray
+    If Not mExpandable And (mMode = ShareMode) Then
+        SafeArrayUnlock SAPtr(mBuffer)
         SAPtr(mBuffer) = vbNullPtr
     End If
     
@@ -396,7 +403,7 @@ End Sub
 ''
 ' Writes an array of bytes to the underlying stream.
 '
-' @param Bytes The bytes to be written to the stream.
+' @param Buffer The bytes to be written to the stream.
 ' @param Offset The startind index in <i>Buffer</i> to begin writing from.
 ' @param Count The number of bytes to be written to the stream.
 ' @remarks <p>If the position in the stream is closer to the end than Count bytes, then
@@ -404,20 +411,31 @@ End Sub
 ' byte array, then an exception will occur if the capacity is reached.</p>
 ' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
 '
-Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    Call VerifyWritable
-    Call VerifyOpen
-    Call VerifyBuffer
-    
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), Offset, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", Offset, "Offset", Count, "Count")
+Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
+    If IsNullByteArray(Buffer) Then _
+        Throw Cor.NewArgumentNullException("Buffer", Resources.GetString(ArgumentNull_Array))
+    If IsMultiDimensionByteArray(Buffer) Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+    If Offset < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        
+    EnsureWritable
+    EnsureOpen
+    EnsureBuffer
     
     If Count = 0 Then Exit Sub
-    Call EnsureCapacity(mPosition + Count)
-    Call CopyMemory(mBuffer(mIndex + mPosition), Bytes(Offset), Count)
+    
+    EnsureCapacity mPosition + Count
+    CopyMemory mBuffer(mIndex + mPosition), Buffer(Offset), Count
     mPosition = mPosition + Count
-    If mPosition > mLength Then mLength = mPosition
+    
+    If mPosition > mLength Then
+        mLength = mPosition
+    End If
 End Sub
 
 ''
@@ -431,20 +449,23 @@ End Sub
 ' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
 '
 Public Sub WriteByte(ByVal Value As Byte)
-    Call VerifyWritable
-    Call VerifyOpen
-    Call VerifyBuffer
+    EnsureWritable
+    EnsureOpen
+    EnsureBuffer
     
     mBuffer(mPosition + mIndex) = Value
     mPosition = mPosition + 1
-    If mPosition > mLength Then mLength = mPosition
+    
+    If mPosition > mLength Then
+        mLength = mPosition
+    End If
 End Sub
 
 ''
 ' Reads a specifiec number of bytes from the stream.
 '
-' @param Bytes The destination for the bytes to be read from the stream.
-' @param Offset The startind index in <i>buffer</i> to begin storing the bytes read from the stream.
+' @param Buffer The destination to store the bytes being read from the stream.
+' @param Offset The startind index in <i>Buffer</i> to begin storing the bytes read from the stream.
 ' @param Count The maximum number of bytes to be read from the stream.
 ' @return The total number of bytes read from the stream.
 ' @remarks <p>If Offset plus Count exceeds the end of <i>Buffer</i> then an exception will be thrown.
@@ -453,18 +474,27 @@ End Sub
 ' <p>The stream must be open to read from it, otherwise an exception will be thrown.</p>
 ' <p>After reading from the stream, the current position will advance the number of byte as returend.</p>
 '
-Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
-    Call VerifyOpen
-    Call VerifyBuffer
+Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
+    If IsNullByteArray(Buffer) Then _
+        Throw Cor.NewArgumentNullException("Bytes", Resources.GetString(ArgumentNull_Array))
+    If IsMultiDimensionByteArray(Buffer) Then _
+        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+    If Offset < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), Offset, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", Offset, "Offset", Count, "Count")
+    EnsureOpen
+    EnsureBuffer
     
     If mPosition >= mLength Then Exit Function
-    If mPosition + Count > mLength Then Count = mLength - mPosition
+    If mPosition + Count > mLength Then
+        Count = mLength - mPosition
+    End If
     
-    Call CopyMemory(Bytes(Offset), mBuffer(mPosition + mIndex), Count)
+    CopyMemory Buffer(LBound(Buffer) + Offset), mBuffer(mPosition + mIndex), Count
     mPosition = mPosition + Count
     ReadBlock = Count
 End Function
@@ -528,7 +558,7 @@ End Function
 ' is thrown.</p>
 '
 Public Sub SetLength(ByVal Value As Currency)
-    Call VerifyWritable
+    EnsureWritable
     
     Value = Int(Value)
     Select Case Value
@@ -542,6 +572,7 @@ Public Sub SetLength(ByVal Value As Currency)
         Case Is < 0@
             Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     End Select
+    
     mLength = Value
 End Sub
 
@@ -554,12 +585,16 @@ End Sub
 ' the entire array.
 '
 Public Function ToArray() As Byte()
-    Call VerifyBuffer
+    EnsureBuffer
     
-    Dim Ret() As Byte
-    ReDim Ret(0 To mLength - 1)
-    Call CopyMemory(Ret(0), mBuffer(mIndex), mLength)
-    ToArray = Ret
+    If mLength > 0 Then
+        Dim Ret() As Byte
+        ReDim Ret(0 To mLength - 1)
+        CopyMemory Ret(0), mBuffer(mIndex), mLength
+        ToArray = Ret
+    Else
+        ToArray = cArray.CreateInstance(vbByte)
+    End If
 End Function
 
 ''
@@ -575,12 +610,12 @@ End Sub
 ' @param Stream The stream to write the underlying stream to.
 '
 Public Sub WriteTo(ByVal Stream As Stream)
-    Call VerifyBuffer
-    Call VerifyOpen
-    
     If Stream Is Nothing Then _
-        Throw New ArgumentNullException
-    Call Stream.WriteBlock(mBuffer, mIndex, mLength)
+        Throw Cor.NewArgumentNullException("Stream", Resources.GetString(ArgumentNull_Stream))
+    EnsureBuffer
+    EnsureOpen
+    
+    Stream.WriteBlock mBuffer, mIndex, mLength
 End Sub
 
 
@@ -617,17 +652,18 @@ End Function
 Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As Variant, ByVal Writable As Boolean, ByVal Mode As BufferMode)
     Dim Result As Long
     Result = GetOptionalArrayRange(SAPtr(Buffer), Index, mIndex, Count, mCapacity)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Buffer", mIndex, "Index", mCapacity, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then _
+        ThrowArrayRangeException Result, "Buffer", mIndex, "Index", mCapacity, "Count", IsMissing(Index)
     
     mCanWrite = Writable
     mMode = Mode
-    mIsUserArray = True
     mLength = mCapacity
     
     Select Case Mode
         Case BufferMode.ShareMode
             SAPtr(mBuffer) = SAPtr(Buffer)
-            LockArray
+            SafeArrayLock SAPtr(mBuffer)
+            mExpandable = False
         Case BufferMode.CopyMode
             mBuffer = Buffer
         Case BufferMode.AcquireMode
@@ -644,42 +680,39 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub LockArray()
-    Call SafeArrayLock(GetArrayPointer(mBuffer, True))
-End Sub
-
-Private Sub UnlockArray()
-    Call SafeArrayUnlock(GetArrayPointer(mBuffer, True))
-End Sub
-
-' verifies that the internal buffer has been allocated.
-Private Sub VerifyBuffer()
+Private Sub EnsureBuffer()
     If Not mBufferSet Then
         ReDim mBuffer(0 To mCapacity - 1)
         mCanWrite = True
         mBufferSet = True
     End If
     
-    ' We never try to change capacity of a user array.
-    If Not mIsUserArray Then Call EnsureCapacity(mPosition + 1)
+    If mExpandable Then
+        EnsureCapacity mPosition + 1
+    End If
 End Sub
 
-Private Sub VerifyOpen()
-    If mIsClosed Then Throw Cor.NewObjectDisposedException("MemoryStream", "Cannot perform action on a closed stream.")
+Private Sub EnsureOpen()
+    If mIsClosed Then
+        Throw Cor.NewObjectDisposedException("MemoryStream", Resources.GetString(ObjectDisposed_StreamClosed))
+    End If
 End Sub
 
-Private Sub VerifyWritable()
-    If Not mCanWrite Then Throw Cor.NewNotSupportedException("Stream is ReadOnly.")
+Private Sub EnsureWritable()
+    If Not mCanWrite Then
+        Throw Cor.NewNotSupportedException(Resources.GetString(NotSupported_UnwritableStream))
+    End If
 End Sub
 
-' Ensures that the required capacity is met. If the capacity needs to
-' be increased, an exception may be thrown by the Capacity property when set.
 Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     Dim NewCapacity As Long
     
     If RequiredCapacity <= mCapacity Then Exit Sub
     NewCapacity = mCapacity * 2
-    If NewCapacity < RequiredCapacity Then NewCapacity = RequiredCapacity + DEF_CAPACITY
+    If NewCapacity < RequiredCapacity Then
+        NewCapacity = RequiredCapacity + DefaultCapacity
+    End If
+    
     Capacity = NewCapacity
 End Sub
 
@@ -688,7 +721,8 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    mCapacity = DEF_CAPACITY
+    mExpandable = True
+    mCapacity = DefaultCapacity
     mCanWrite = True
 End Sub
 
@@ -705,18 +739,18 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
 End Sub
 
 Private Sub Class_Terminate()
-    Call CloseStream
+    CloseStream
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("Buffer", mBuffer)
-        Call .WriteProperty("CanWrite", mCanWrite)
-        Call .WriteProperty("Position", mPosition)
-        Call .WriteProperty("Capacity", mCapacity)
-        Call .WriteProperty("Length", mLength)
-        Call .WriteProperty("IsClosed", mIsClosed)
-        Call .WriteProperty("Index", mIndex)
+        .WriteProperty "Buffer", mBuffer
+        .WriteProperty "CanWrite", mCanWrite
+        .WriteProperty "Position", mPosition
+        .WriteProperty "Capacity", mCapacity
+        .WriteProperty "Length", mLength
+        .WriteProperty "IsClosed", mIsClosed
+        .WriteProperty "Index", mIndex
     End With
 End Sub
 
@@ -765,7 +799,7 @@ Private Property Get Stream_CanWrite() As Boolean
 End Property
 
 Private Sub Stream_CloseStream()
-    Call CloseStream
+    CloseStream
 End Sub
 
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
@@ -773,7 +807,7 @@ Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
 End Function
 
 Private Sub Stream_EndWrite(ByVal AsyncResult As IAsyncResult)
-    Call EndWrite(AsyncResult)
+    EndWrite AsyncResult
 End Sub
 
 Private Function Stream_Equals(Value As Variant) As Boolean
@@ -781,7 +815,7 @@ Private Function Stream_Equals(Value As Variant) As Boolean
 End Function
 
 Private Sub Stream_Flush()
-    Call Flush
+    Flush
 End Sub
 
 Private Function Stream_GetHashCode() As Long
@@ -821,7 +855,7 @@ Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As S
 End Function
 
 Private Sub Stream_SetLength(ByVal Value As Currency)
-    Call SetLength(Value)
+    SetLength Value
 End Sub
 
 Private Function Stream_ToString() As String
@@ -829,7 +863,7 @@ Private Function Stream_ToString() As String
 End Function
 
 Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    Call WriteBlock(Buffer, Offset, Count)
+    WriteBlock Buffer, Offset, Count
 End Sub
 
 Private Sub Stream_WriteByte(ByVal Value As Byte)

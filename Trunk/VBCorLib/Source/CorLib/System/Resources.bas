@@ -107,6 +107,8 @@ Public Enum ResourceStringId
     ArgumentNull_Generic = 905
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
+    NotSupported_MemoryStreamNotExpandable = 1002
+    NotSupported_UnwritableStream = 1003
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101
     InvalidOperation_EnumFinished = 1102
@@ -115,6 +117,7 @@ Public Enum ResourceStringId
     InvalidOperation_Comparer_Arg = 1105
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
+    ObjectDisposed_StreamClosed = 1200
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
