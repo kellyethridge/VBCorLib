@@ -114,8 +114,8 @@ End Function
 ''
 ' Returns a the byte value at the given byte index within an array.
 '
-' @param arr The array to retrieve the byte value from.
-' @param index The byte index to read the byte at.
+' @param Arr The array to retrieve the byte value from.
+' @param Index The byte index to read the byte at.
 ' @return The byte value from within the array.
 ' @remarks The index is based on bytes, not the size of the actual array
 ' elements. For example: if getting the byte from a Long array at index
@@ -123,12 +123,15 @@ End Function
 ' <p>The lowerbound of the array is ignored. Index begins at 0.</p>
 '
 Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
-    Dim pSA As Long
-    pSA = GetArrayPointer(Arr, True)
-    If Index < 0 Or Index >= (UBound(Arr) - LBound(Arr) + 1) * SafeArrayGetElemsize(pSA) Then _
+    Dim ArrayPtr As Long
+    ArrayPtr = GetArrayPointer(Arr)
+    
+    If ArrayPtr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+    If Index < 0 Or Index >= cArray.GetLength(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
-    GetByte = MemByte(MemLong(pSA + PVDATA_OFFSET) + Index)
+    GetByte = MemByte(MemLong(ArrayPtr + PVDATA_OFFSET) + Index)
 End Function
 
 ''
@@ -143,11 +146,14 @@ End Function
 ' <p>The lowerbound of the array is ignored. Index begins at 0.</p>
 '
 Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byte)
-    Dim pSA As Long
-    pSA = GetArrayPointer(Arr, True)
-    If Index < 0 Or Index >= (UBound(Arr) - LBound(Arr) + 1) * SafeArrayGetElemsize(pSA) Then _
+    Dim ArrayPtr As Long
+    ArrayPtr = GetArrayPointer(Arr)
+    
+    If ArrayPtr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+    If Index < 0 Or Index >= cArray.GetLength(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
-    MemByte(MemLong(pSA + PVDATA_OFFSET) + Index) = Value
+    MemByte(MemLong(ArrayPtr + PVDATA_OFFSET) + Index) = Value
 End Sub
 
