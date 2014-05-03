@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2014 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: BinaryWriter
+' Module: BinaryWriter
 '
 
 ''
@@ -62,7 +65,7 @@ Private mBytes()    As Byte
 ' @remarks The stream is flushed before it is returned.
 '
 Public Property Get BaseStream() As Stream
-    Call Flush
+    Flush
     Set BaseStream = mStream
 End Property
 
@@ -71,8 +74,8 @@ End Property
 '
 Public Sub CloseWriter()
     If mIsOpen Then
-        Call Flush
-        Call mStream.CloseStream
+        Flush
+        mStream.CloseStream
         mIsOpen = False
     End If
 End Sub
@@ -81,7 +84,7 @@ End Sub
 ' Tells the underlying stream to store its data to its repository.
 '
 Public Sub Flush()
-    Call mStream.Flush
+    mStream.Flush
 End Sub
 
 ''
@@ -92,7 +95,7 @@ End Sub
 ' @return The final position in the stream.
 '
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    Call mStream.SeekPosition(Offset, Origin)
+    mStream.SeekPosition Offset, Origin
 End Function
 
 ''
@@ -154,9 +157,9 @@ Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, O
         Throw Cor.NewObjectDisposedException("BinaryWriter", "Cannot write to a closed BinaryWriter.")
     
     If IsArray(Value) Then
-        Call WriteArray(Value, Index, Count)
+        WriteArray Value, Index, Count
     Else
-        Call WriteIntrinsic(Value, Index, Count)
+        WriteIntrinsic Value, Index, Count
     End If
 End Sub
 
@@ -178,7 +181,7 @@ Public Sub WriteChar(ByRef Value As Variant)
             Throw Cor.NewArgumentException("Value must be a String or Integer value.", "Value")
     End Select
     
-    Call WriteValue(mEncoding.GetBytes(ch))
+    WriteValue mEncoding.GetBytes(ch)
 End Sub
 
 ''
@@ -221,7 +224,7 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Stream Is Nothing Then _
         Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
     If Not Stream.CanWrite Then _
-        Throw Cor.NewArgumentException("Cannot write to a stream that does not support writing.", "Stream")
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_StreamNotWritable))
     
     Set mStream = Stream
     If Encoding Is Nothing Then
@@ -238,34 +241,37 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub WriteStringLength(ByVal Value As Long)
     Do While Value > &H80
-        Call WriteValue(CByte((Value And &H7F) Or &H80))
+        WriteValue CByte((Value And &H7F) Or &H80)
         Value = (Value And &HFFFFFF80) \ &H80
     Loop
-    Call WriteValue(CByte(Value))
+    WriteValue CByte(Value)
 End Sub
 
 Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
     Dim num As Long
 
     Select Case VarType(Value)
-        Case vbBoolean:                     Call mStream.WriteByte(IIf(Value, 1, 0))
-        Case vbByte:                        Call mStream.WriteByte(Value)
+        Case vbBoolean:                     mStream.WriteByte IIf(Value, 1, 0)
+        Case vbByte:                        mStream.WriteByte Value
         Case vbLong, vbSingle:              num = 4
         Case vbInteger:                     num = 2
         Case vbDouble, vbDate, vbCurrency:  num = 8
         Case vbString
-            Call WriteStringLength(mEncoding.GetByteCount(Value, Index, Count))
-            Call WriteValue(mEncoding.GetBytes(Value, Index, Count))
+            WriteStringLength mEncoding.GetByteCount(Value, Index, Count)
+            WriteValue mEncoding.GetBytes(Value, Index, Count)
         Case vbDecimal
-            Call mStream.WriteBlock(BitConverter.GetBytes(Value), 0, 16)
+            mStream.WriteBlock BitConverter.GetBytes(Value), 0, 16
         Case Else
             Throw Cor.NewArgumentException("Can only write intrinsice datatypes to the stream.", "Value")
     End Select
     
     If num > 0 Then
-        mBufferSA.pvData = VarPtr(Value) + 8
-        If VariantType(Value) And VT_BYREF Then mBufferSA.pvData = MemLong(mBufferSA.pvData)
-        Call mStream.WriteBlock(mBuffer, 0, num)
+        mBufferSA.pvData = VarPtr(Value) + VARIANTDATA_OFFSET
+        If VariantType(Value) And VT_BYREF Then
+            mBufferSA.pvData = MemLong(mBufferSA.pvData)
+        End If
+        
+        mStream.WriteBlock mBuffer, 0, num
     End If
 End Sub
 
@@ -283,11 +289,9 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
             Result = GetOptionalArrayRange(SAPtr(mBytes), Index, ElemIndex, Count, ElemCount)
             If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Array", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
             
-            Call mStream.WriteBlock(mBytes, ElemIndex, ElemCount)
+            mStream.WriteBlock mBytes, ElemIndex, ElemCount
         Case vbIntegerArray
-            ' we call back into WriteValue passing a byte array of the
-            ' encoded integer values instead.
-            Call WriteValue(mEncoding.GetBytes(Value, Index, Count))
+            WriteValue mEncoding.GetBytes(Value, Index, Count)
         Case Else
             Throw Cor.NewArgumentException("Can only write Byte and Integer arrays to the stream.", "Value")
     End Select
@@ -298,8 +302,6 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    ' Create a private SafeArray so we can easily point to
-    ' Strings and Integer arrays as our own Integer array.
     With mBufferSA
         .cbElements = 1
         .cDims = 1
