@@ -105,6 +105,7 @@ Public Enum ResourceStringId
     ArgumentNull_Collection = 903
     ArgumentNull_TimeSpan = 904
     ArgumentNull_Generic = 905
+    ArgumentNull_Buffer = 906
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
     NotSupported_MemoryStreamNotExpandable = 1002
