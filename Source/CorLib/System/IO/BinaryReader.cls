@@ -59,9 +59,9 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const DEF_CAPACITY  As Long = 16
-Private Const MIN_DATE      As Double = -657434#
-Private Const MAX_DATE      As Double = 2958465.99998843
+Private Const DefaultCapacity  As Long = 16
+Private Const MinDateAsDouble  As Double = -657434#
+Private Const MaxDateAsDouble  As Double = 2958465.99998843
 
 
 Private mStream         As Stream
@@ -283,7 +283,7 @@ Public Function ReadDate() As Date
     Dim PotentialDate As Double
     PotentialDate = ReadDouble
     
-    If PotentialDate < MIN_DATE Or PotentialDate > MAX_DATE Then _
+    If PotentialDate < MinDateAsDouble Or PotentialDate > MaxDateAsDouble Then _
         Throw New OverflowException
         
     ReadDate = PotentialDate
@@ -564,7 +564,7 @@ End Function
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    EnsureCapacity DEF_CAPACITY
+    EnsureCapacity DefaultCapacity
 End Sub
 
 
