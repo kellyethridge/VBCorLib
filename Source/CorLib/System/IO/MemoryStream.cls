@@ -84,7 +84,6 @@ Private mExpandable     As Boolean
 Private mIndex          As Long
 
 
-
 ''
 ' Returns if the MemoryStream object supports timeout events.
 '
@@ -229,12 +228,12 @@ End Function
 ' during the call to EndRead.</p>
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
-    Dim Result As StreamAsyncResult
-    
     If AsyncResult Is Nothing Then _
         Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+    
+    Dim Result As StreamAsyncResult
     Set Result = AsyncResult
     If Not Result.IsReadType Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
@@ -258,12 +257,12 @@ End Function
 ' during the call to EndRead.</p>
 '
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
-    Dim Result As StreamAsyncResult
-    
     If AsyncResult Is Nothing Then _
         Throw Cor.NewArgumentNullException("AsyncResult")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+    
+    Dim Result As StreamAsyncResult
     Set Result = AsyncResult
     If Result.IsReadType Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")

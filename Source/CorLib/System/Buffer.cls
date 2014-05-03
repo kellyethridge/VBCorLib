@@ -51,9 +51,9 @@ Option Explicit
 ''
 ' Copies the bytes from the source array to the destination array.
 '
-' @param SrcArray The array to copy bytes from.
-' @param SourceIndex The starting byte position to begin copying.
-' @param DstArray The array to receive the bytes.
+' @param Source The array to copy bytes from.
+' @param SourceOffset The starting byte position to begin copying.
+' @param Destination The array to receive the bytes.
 ' @param DestinationIndex The starting byte position to begin setting bytes.
 ' @param Count The number of bytes to be copied.
 ' @remarks <p>The arrays are treated as byte arrays, so no datatype conversion
@@ -61,33 +61,54 @@ Option Explicit
 ' array.</p>
 ' <p>The lowerbound of the arrays is ignored. The first byte is at index 0.</p>
 '
-Public Sub BlockCopy(ByRef SrcArray As Variant, ByVal SourceIndex As Long, ByRef DstArray As Variant, ByVal DestinationIndex As Long, ByVal Count As Long)
-    Dim srcpSA As Long
-    srcpSA = GetArrayPointer(SrcArray, True)
+Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef Destination As Variant, ByVal DestinationOffset As Long, ByVal Count As Long)
+    Dim SourcePtr As Long
+    Dim DestinationPtr As Long
     
-    Dim dstpSA As Long
-    dstpSA = GetArrayPointer(DstArray, True)
+    SourcePtr = GetArrayPointer(Source)
+    DestinationPtr = GetArrayPointer(Destination)
     
-    Dim Result As Long
-    Result = VerifyListRange((UBound(SrcArray) - LBound(SrcArray) + 1) * SafeArrayGetElemsize(srcpSA), SourceIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, SourceIndex, "SourceIndex", Count, "Count")
+    If SourcePtr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException("Source", Resources.GetString(ArgumentNull_Array))
+    If DestinationPtr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException("Destination", Resources.GetString(ArgumentNull_Array))
+    If SourceOffset < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("SourceOffset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If DestinationOffset < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("DestinationOffset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+    If Count < 0 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     
-    Result = VerifyListRange((UBound(DstArray) - LBound(DstArray) + 1) * SafeArrayGetElemsize(dstpSA), DestinationIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, DestinationIndex, "DestinationIndex", Count, "Count")
+    Dim SourceLength        As Long
+    Dim DestinationLength   As Long
     
-    Call CopyMemory(ByVal MemLong(dstpSA + PVDATA_OFFSET) + DestinationIndex, ByVal MemLong(srcpSA + PVDATA_OFFSET) + SourceIndex, Count)
+    SourceLength = cArray.GetLength(Source) * SafeArrayGetElemsize(SourcePtr)
+    DestinationLength = cArray.GetLength(Destination) * SafeArrayGetElemsize(DestinationPtr)
+    
+    If SourceOffset + Count > SourceLength Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+    If DestinationOffset + Count > DestinationLength Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+    
+    CopyMemory ByVal MemLong(DestinationPtr + PVDATA_OFFSET) + DestinationOffset, ByVal MemLong(SourcePtr + PVDATA_OFFSET) + SourceOffset, Count
 End Sub
 
 ''
 ' Returns the length of the array in bytes.
 '
-' @param arr The array to retrieve the size in bytes from.
+' @param Arr The array to retrieve the size in bytes from.
 ' @return The size of the array in bytes.
 ' @remarks The size is calculated by taking the number of elements
 ' in the array and multiply it by the number of bytes each element
 ' is in length.
 Public Function ByteLength(ByRef Arr As Variant) As Long
-    ByteLength = SafeArrayGetElemsize(GetArrayPointer(Arr, True)) * cArray.GetLength(Arr)
+    Dim ArrayPtr As Long
+    ArrayPtr = GetArrayPointer(Arr)
+    
+    If ArrayPtr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+    
+    ByteLength = SafeArrayGetElemsize(ArrayPtr) * cArray.GetLength(Arr)
 End Function
 
 ''
