@@ -207,6 +207,17 @@ Public Sub Read_WhenNoMoreCharacters_ReturnsMinusOne()
     Assert.That Actual, Iz.EqualTo(-1)
 End Sub
 
+Public Sub Read_WithNullArray_ThrowsArgumentNullException()
+    Dim NullArray() As Byte
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(&HE2, &H80, &HB0))
+    
+    On Error Resume Next
+    Reader.Read NullArray, 0, 1
+    
+    AssertArgumentNullException Err, "Buffer"
+End Sub
+
 Private Function MakeReader(ByRef Data() As Byte) As BinaryReader
     Dim Source As New MemoryStream
     Source.WriteBlock Data, 0, UBound(Data) + 1

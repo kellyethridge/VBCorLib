@@ -105,11 +105,18 @@ End Sub
 ' <p>All parameters must either be missing or supplied or an exception is thrown.</p>
 '
 Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Select Case CLng(IsMissing(Buffer)) + CLng(IsMissing(Index)) + CLng(IsMissing(Count))
-        Case -3:    Read = ReadOneChar
-        Case 0:     Read = ReadBuffer(Buffer, Index, Count)
-        Case Else:  Throw Cor.NewInvalidOperationException("All parameters must be supplied or missing.")
-    End Select
+    Dim BufferIsMissing As Boolean
+    BufferIsMissing = IsMissing(Buffer)
+    
+    If (BufferIsMissing = IsMissing(Index)) And (BufferIsMissing = IsMissing(Count)) Then
+        If BufferIsMissing Then
+            Read = ReadOneChar
+        Else
+            Read = ReadBuffer(Buffer, Index, Count)
+        End If
+    Else
+        Throw Cor.NewInvalidOperationException("All parameters must be supplied or missing.")
+    End If
 End Function
 
 ''
@@ -509,9 +516,13 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
 End Sub
 
 Private Function ReadBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
+    Dim BufferPtr As Long
+    BufferPtr = GetArrayPointer(Buffer)
+    If BufferPtr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException("Buffer", Resources.GetString(ArgumentNull_Buffer))
+        
     Dim ElemIndex As Long
     Dim ElemCount As Long
-    
     ElemIndex = GetOptionalLong(Index, 0)
     ElemCount = GetOptionalLong(Count, 0)
     
@@ -521,19 +532,21 @@ Private Function ReadBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByR
     On Error GoTo errTrap
     Select Case VarType(Buffer)
         Case vbByteArray
-            SAPtr(Bytes) = GetArrayPointer(Buffer, True)
+            SAPtr(Bytes) = BufferPtr
             ReadBuffer = mStream.ReadBlock(Bytes, ElemIndex, ElemCount)
+            SAPtr(Bytes) = vbNullPtr
         Case vbIntegerArray
-            SAPtr(Chars) = GetArrayPointer(Buffer, True)
+            SAPtr(Chars) = BufferPtr
             ReadBuffer = ReadCharBytes(Chars, ElemIndex, ElemCount)
+            SAPtr(Chars) = vbNullPtr
         Case Else
             On Error GoTo 0
             Throw Cor.NewArgumentException("A Byte or Integer array is required.", "Buffer")
     End Select
 
 errTrap:
-    SAPtr(Bytes) = 0
-    SAPtr(Chars) = 0
+    SAPtr(Bytes) = vbNullPtr
+    SAPtr(Chars) = vbNullPtr
     Throw
 End Function
 
