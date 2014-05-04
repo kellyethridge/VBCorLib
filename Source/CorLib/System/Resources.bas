@@ -99,6 +99,8 @@ Public Enum ResourceStringId
     Argument_EmptyName = 825
     Arg_LongerThanSrcString = 826
     Argument_InvalidSeekOrigin = 827
+    Argument_UnsupportedArray = 828
+    Argument_NeedIntrinsicType = 829
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902

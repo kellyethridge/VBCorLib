@@ -31,6 +31,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/1/2001 8:30:00 AM#, NewBytes(&H55, &H55, &H55, &H55, &H8B, &H3, &HE2, &H40)
             Test.Use True, NewBytes(1)
             Test.Use False, NewBytes(0)
+            Test.Use NewBytes(1, 2, 3), NewBytes(1, 2, 3)
+            Test.Use NewIntegers(Asc("a"), &H2030, Asc("c")), NewBytes(&H61, &HE2, &H80, &HB0, &H63)
             
         Case "WriteChar_WithValues_WritesExpected"
             Test.Use ChrW(&H2030), NewBytes(&HE2, &H80, &HB0)
@@ -84,4 +86,26 @@ Public Sub WriteValue_WithByteArray_WritesArray()
     Writer.WriteValue NewBytes(1, 2, 3), 0, 3
     
     Assert.That ms.ToArray, Iz.EqualTo(NewBytes(1, 2, 3))
+End Sub
+
+Public Sub WriteValue_WithNullArray_ThrowsArgumentNullException()
+    Dim NullArray() As Byte
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(New MemoryStream)
+    
+    On Error Resume Next
+    Writer.WriteValue NullArray
+    
+    AssertArgumentNullException Err, "Value"
+End Sub
+
+Public Sub WriteValue_WithUnsupportArrayType_ThrowsArgumentException()
+    Dim UnsupportedArray(0) As Long
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(New MemoryStream)
+    
+    On Error Resume Next
+    Writer.WriteValue UnsupportedArray
+
+    AssertArgumentException Err
 End Sub
