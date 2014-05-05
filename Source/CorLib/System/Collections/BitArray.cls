@@ -1,14 +1,14 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-  Persistable = 1  'Persistable
+  Persistable = 0  'NotPersistable
   DataBindingBehavior = 0  'vbNone
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
 Attribute VB_Name = "BitArray"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'The MIT License (MIT)
@@ -101,8 +101,8 @@ End Function
 ''
 ' Copies the internal bit-array to a compatible array.
 '
-' @param dstArray The array to copy the values to.
-' @param index The starting position in the array to
+' @param DstArray The array to copy the values to.
+' @param Index The starting position in the array to
 ' begin copying to.
 ' @remarks CopyTo supports the copying to three array types: Long, Byte
 ' and Boolean. When copying to Long or Byte type arrays, the bits in the

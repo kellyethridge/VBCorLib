@@ -64,16 +64,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal list As ArrayList, ByVal Index As Long, ByVal Count As Long)
-    Set mList = list
-    mVersion = list.Version
+Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
+    Set mList = List
+    mVersion = List.Version
     mStartIndex = Index
     mEndIndex = Index + Count - 1
     mIndex = Index - 1
 End Sub
 
-Friend Sub CloneHelper(ByVal list As ArrayList, ByVal StartIndex As Long, ByVal Index As Long)
-    Call Init(list, StartIndex, list.Count)
+Friend Sub CloneHelper(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Index As Long)
+    Init List, StartIndex, List.Count
     mIndex = Index
 End Sub
 
@@ -83,7 +83,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New ArrayListEnumerator
-    Call Ret.CloneHelper(mList, mStartIndex, mIndex)
+    Ret.CloneHelper mList, mStartIndex, mIndex
     Set ICloneable_Clone = Ret
 End Function
 
@@ -99,7 +99,7 @@ Private Property Get IEnumerator_Current() As Variant
     If mIndex > mEndIndex Then _
         Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
         
-    Call Helper.MoveVariant(IEnumerator_Current, mList(mIndex))
+    Helper.MoveVariant IEnumerator_Current, mList(mIndex)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean

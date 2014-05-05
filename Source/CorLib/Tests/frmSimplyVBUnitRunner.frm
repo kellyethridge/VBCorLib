@@ -259,7 +259,7 @@ Private Sub Form_Load()
     'AddTest New TestWeakReference
     AddTest New TestHashTable
     AddTest New BufferTests
-    AddTest New TestBitArray
+    AddTest New BitArrayTests
     AddTest New TestSortedList
     AddTest New TestDictionaryEntry
     AddTest New TestQueue
