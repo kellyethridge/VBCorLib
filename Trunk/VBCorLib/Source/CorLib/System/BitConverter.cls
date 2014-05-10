@@ -115,24 +115,33 @@ Public Function GetBytes(ByRef Value As Variant) As Byte()
         Case vbLong
             SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 4)
             AsLong(Ret(0)) = CLng(Value)
+            
         Case vbBoolean
             SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 1)
-            If Value Then Ret(0) = 1
+            If Value Then
+                Ret(0) = 1
+            End If
+            
         Case vbInteger
             SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 2)
             AsWord(Ret(0)) = CInt(Value)
+            
         Case vbByte
             SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 1)
             Ret(0) = CByte(Value)
+            
         Case vbDouble, vbDate
             SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 8)
             AsDouble(Ret(0)) = CDbl(Value)
+            
         Case vbCurrency
             SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 8)
             AsCurr(Ret(0)) = CCur(Value)
+            
         Case vbSingle
             SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 4)
             AsSingle(Ret(0)) = CSng(Value)
+            
         Case vbDecimal
             Dim ptrDec As Long
             Dim ptrRet As Long
@@ -331,25 +340,25 @@ Public Function ToString(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     
     Dim i       As Long
     Dim b       As Long
-    Dim pos     As Long
+    Dim Pos     As Long
     Dim nibble  As Long
     Dim Offset  As Long
     
     Offset = 1
     Do While i < ElemCount
-        If i > 0 Then mBuffer.Data(pos) = vbMinus: pos = pos + 1
+        If i > 0 Then mBuffer.Data(Pos) = vbMinus: Pos = Pos + 1
         b = Bytes(ElemIndex + i)
         Do
             nibble = b And &HF
             If nibble > 9 Then
-                mBuffer.Data(pos + Offset) = nibble + ALPHA_OFFSET
+                mBuffer.Data(Pos + Offset) = nibble + ALPHA_OFFSET
             Else
-                mBuffer.Data(pos + Offset) = nibble + vbZero
+                mBuffer.Data(Pos + Offset) = nibble + vbZero
             End If
             b = (b And &HF0&) \ &H10&
             Offset = 1 - Offset
         Loop While Offset = 0
-        pos = pos + 2
+        Pos = Pos + 2
         i = i + 1
     Loop
     
