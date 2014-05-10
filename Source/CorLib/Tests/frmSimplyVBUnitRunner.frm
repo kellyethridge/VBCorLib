@@ -254,7 +254,7 @@ Private Sub Form_Load()
     
     AddTest New TestVersion
     AddTest New TestRandom
-    AddTest New TestBitConverter
+    AddTest New BitConverterTests
     
     'AddTest New TestWeakReference
     AddTest New TestHashTable
