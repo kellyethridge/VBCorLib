@@ -182,95 +182,95 @@ End Function
 ''
 ' Converts an array of bytes to a Boolean value.
 '
-' @param bytes The array of bytes to create a boolean from.
-' @param startindex The byte in the array to create the boolean from.
+' @param Value The array of bytes to create a boolean from.
+' @param StartIndex The byte in the array to create the boolean from.
 ' @return Boolean representation of the byte used in the array.
 ' @remarks The boolean value is created from one byte. If the byte is
 ' a non-zero value, True is returned, otherwise, False is returned.
 '
-Public Function ToBoolean(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Boolean
-    Call VerifyArray(Bytes, StartIndex, 1)
-    ToBoolean = (Bytes(StartIndex) > 0)
+Public Function ToBoolean(ByRef Value() As Byte, ByVal StartIndex As Long) As Boolean
+    ValidateArrayArguments Value, StartIndex, 1
+    ToBoolean = (Value(StartIndex) > 0)
 End Function
 
 ''
 ' Converts an array of bytes to a Double value.
 '
-' @param bytes The array of bytes to create a double from.
-' @param startindex The starting byte in the array to create a double from.
+' @param Value The array of bytes to create a double from.
+' @param StartIndex The starting byte in the array to create a double from.
 ' @return Double datatype representation of the 8 bytes used in the array.
 '
-Public Function ToDouble(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Double
-    Call VerifyArray(Bytes, StartIndex, 8)
-    ToDouble = AsDouble(Bytes(StartIndex))
+Public Function ToDouble(ByRef Value() As Byte, ByVal StartIndex As Long) As Double
+    ValidateArrayArguments Value, StartIndex, 8
+    ToDouble = AsDouble(Value(StartIndex))
 End Function
 
 ''
 ' Converts an array of bytes to a Date value.
 '
-' @param bytes The array of bytes to create a date from.
-' @param startindex The starting byte in the array to create a date from.
+' @param Value The array of bytes to create a date from.
+' @param StartIndex The starting byte in the array to create a date from.
 ' @return Date datatype representation of the 8 bytes used in the array.
 ' @remarks Even though a Date is represented using a Double, it may still
 ' raise an error due to the 8 bytes used represent an invalid date range.
 '
-Public Function ToDate(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Date
-    Call VerifyArray(Bytes, StartIndex, 8)
-    ToDate = AsDouble(Bytes(StartIndex))
+Public Function ToDate(ByRef Value() As Byte, ByVal StartIndex As Long) As Date
+    ValidateArrayArguments Value, StartIndex, 8
+    ToDate = AsDouble(Value(StartIndex))
 End Function
 
 ''
 ' Converts an array of bytes to an Integer value.
 '
-' @param bytes The array of bytes used to create an integer from.
-' @param startindex The starting byte in the array to create an integer from.
+' @param Value The array of bytes used to create an integer from.
+' @param StartIndex The starting byte in the array to create an integer from.
 ' @return Integer datatype representation of the 2 bytes used in the array.
 '
-Public Function ToInteger(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Integer
-    Call VerifyArray(Bytes, StartIndex, 2)
-    ToInteger = AsWord(Bytes(StartIndex))
+Public Function ToInteger(ByRef Value() As Byte, ByVal StartIndex As Long) As Integer
+    ValidateArrayArguments Value, StartIndex, 2
+    ToInteger = AsWord(Value(StartIndex))
 End Function
 
 ''
 ' Converts an array of bytes to a Long value.
 '
-' @param bytes The array of bytes used to create a Long from.
-' @param startindex The starting byte in the array to create a Long from.
+' @param Value The array of bytes used to create a Long from.
+' @param StartIndex The starting byte in the array to create a Long from.
 ' @return Long datatype representation of the 4 bytes used in the array.
 '
-Public Function ToLong(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Long
-    Call VerifyArray(Bytes, StartIndex, 4)
-    ToLong = AsLong(Bytes(StartIndex))
+Public Function ToLong(ByRef Value() As Byte, ByVal StartIndex As Long) As Long
+    ValidateArrayArguments Value, StartIndex, 4
+    ToLong = AsLong(Value(StartIndex))
 End Function
 
 ''
 ' Converts an array of bytes to a Single value.
 '
-' @param Bytes The array of bytes used to create a Single from.
+' @param Value The array of bytes used to create a Single from.
 ' @param StartIndex The starting byte in the array to create a Single from.
 ' @return Single datatype representation of the 4 bytes used in the array.
 '
-Public Function ToSingle(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Single
-    Call VerifyArray(Bytes, StartIndex, 4)
-    ToSingle = AsSingle(Bytes(StartIndex))
+Public Function ToSingle(ByRef Value() As Byte, ByVal StartIndex As Long) As Single
+    ValidateArrayArguments Value, StartIndex, 4
+    ToSingle = AsSingle(Value(StartIndex))
 End Function
 
 ''
 ' Converts an array of bytes to a Currency value.
 '
-' @param bytes The array of bytes used to create a Currency from.
-' @param startindex The starting byte in the array to create a Currency from.
+' @param Value The array of bytes used to create a Currency from.
+' @param StartIndex The starting byte in the array to create a Currency from.
 ' @return Currency datatype representation of the 8 bytes used in the array.
 '
-Public Function ToCurrency(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Currency
-    Call VerifyArray(Bytes, StartIndex, 8)
-    ToCurrency = AsCurr(Bytes(StartIndex))
+Public Function ToCurrency(ByRef Value() As Byte, ByVal StartIndex As Long) As Currency
+    ValidateArrayArguments Value, StartIndex, 8
+    ToCurrency = AsCurr(Value(StartIndex))
 End Function
 
 ''
 ' Converts an array of bytes do a Variant Decimal value.
 '
-' @param Bytes The array of bytes used to create a Decimal value. Must be atleast 16 bytes in length.
+' @param Value The array of bytes used to create a Decimal value. Must be atleast 16 bytes in length.
 ' @param StartIndex The starting index within the array to be converting to a Decimal value.
 ' @return The converted Decimal value.
 ' @remarks <p>The Decimal datatype is created from 16 bytes with the same
@@ -292,29 +292,29 @@ End Function
 ' bytes 15: sign (&h80 is negative)<br><br>
 ' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
 '
-Public Function ToDecimal(ByRef Bytes() As Byte, ByVal StartIndex As Long) As Variant
-    Call VerifyArray(Bytes, StartIndex, 16)
+Public Function ToDecimal(ByRef Value() As Byte, ByVal StartIndex As Long) As Variant
+    ValidateArrayArguments Value, StartIndex, 16
     VariantType(ToDecimal) = vbDecimal
     
     ' check precision
-    If Bytes(StartIndex + 14) > 28 Then _
+    If Value(StartIndex + 14) > 28 Then _
         Throw Cor.NewOverflowException("Decimal precision must be from 0 to 28 places.")
     
     Dim ptr As Long
     ptr = VarPtr(ToDecimal)
     
-    If Bytes(StartIndex + 15) <> 0 Then MemByte(ptr + 3) = &H80  ' set sign
+    If Value(StartIndex + 15) <> 0 Then MemByte(ptr + 3) = &H80  ' set sign
     
-    MemByte(ptr + 2) = Bytes(StartIndex + 14)            ' set precision
-    MemLong(ptr + 4) = AsLong(Bytes(StartIndex + 8))     ' set highest 32 bits
-    MemCurr(ptr + 8) = AsCurr(Bytes(StartIndex + 0))     ' set lowest and middle 32bits
+    MemByte(ptr + 2) = Value(StartIndex + 14)            ' set precision
+    MemLong(ptr + 4) = AsLong(Value(StartIndex + 8))     ' set highest 32 bits
+    MemCurr(ptr + 8) = AsCurr(Value(StartIndex + 0))     ' set lowest and middle 32bits
 End Function
 
 ''
 ' Converts an array of bytes to a string of hexidecimal notations.
 '
-' @param Bytes The array of bytes used to create a string of hexidecimal values.
-' @param Index The starting byte to begin creating hexidecimal values from in the array.
+' @param Value The array of bytes used to create a string of hexidecimal values.
+' @param StartIndex The starting byte to begin creating hexidecimal values from in the array.
 ' @param Count The number of bytes to be converted to a hexidecimal notation.
 ' @return String containing hexidecimal notations for each byte, separated by hyphens.
 ' @remarks Each byte to be converted to string is converted into a hexidecimal representation.
@@ -322,17 +322,17 @@ End Function
 ' by a hyphen when more than one byte is being converted. An example is a Long of &hABCDEF01 would
 ' become '01-EF-CD-AB'.
 '
-Public Function ToString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
+Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
+    If cArray.IsNull(Value) Then _
+        Throw Cor.NewArgumentNullException("Value", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim ElemIndex As Long
-    ElemIndex = GetOptionalLong(Index, LBound(Bytes))
+    ElemIndex = GetOptionalLong(StartIndex, LBound(Value))
     
     Dim ElemCount As Long
-    ElemCount = GetOptionalLong(Count, UBound(Bytes) - ElemIndex + 1)
+    ElemCount = GetOptionalLong(Count, UBound(Value) - ElemIndex + 1)
     
-    Call VerifyArray(Bytes, ElemIndex, ElemCount)
+    Call ValidateArrayArguments(Value, ElemIndex, ElemCount)
     
     Dim Ret As String
     Ret = SysAllocStringLen(0, ElemCount * 3 - 1)
@@ -347,7 +347,7 @@ Public Function ToString(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     Offset = 1
     Do While i < ElemCount
         If i > 0 Then mBuffer.Data(Pos) = vbMinus: Pos = Pos + 1
-        b = Bytes(ElemIndex + i)
+        b = Value(ElemIndex + i)
         Do
             nibble = b And &HF
             If nibble > 9 Then
@@ -369,10 +369,13 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifyArray(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", Index, "Index", Count, "Index")
+Private Sub ValidateArrayArguments(ByRef Value() As Byte, ByVal StartIndex As Long, ByVal Count As Long)
+    If IsNullByteArray(Value) Then _
+        Throw Cor.NewArgumentNullException("Value")
+    If StartIndex < LBound(Value) Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayLB))
+    If StartIndex > UBound(Value) - Count + 1 Then _
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_Index))
 End Sub
 
 

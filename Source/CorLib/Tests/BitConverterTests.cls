@@ -41,6 +41,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use CDec("12345.678911"), NewBytes(&H3F, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H6, &H0)
             Test.Use CDec("-12345.678911"), NewBytes(&H3F, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H6, &H80)
             
+        Case "ToBoolean_WithValue_ReturnsExpected"
+            Test.Use NewBytes(0), 0, False
+            Test.Use NewBytes(1), 0, True
+            Test.Use NewBytes(2), 0, True
+            Test.Use NewBytes(0, 1), 1, True
+            
+        Case "ToBoolean_WithInvalidStartIndex_ThrowsArgumentOutOfRangeException"
+            Test.Use 0
+            Test.Use 2
     End Select
 End Sub
 
@@ -52,34 +61,65 @@ Public Sub GetBytes_WithValue_ReturnsExpected(ByVal Value As Variant, ByVal Expe
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-'Public Sub TestToBoolean()
-'    ReDim b(1)
-'    b(1) = 1
-'
-'    Assert.IsFalse bitconverter.ToBoolean(b, 0)
-'    Assert.IsTrue bitconverter.ToBoolean(b, 1)
-'End Sub
-'
-'Public Sub TestToDouble()
-'    b = bitconverter.GetBytes(123.45)
-'    Assert.AreEqual 123.45, bitconverter.ToDouble(b, 0), "ToDouble should return 123.45"
-'End Sub
-'
-'Public Sub TestToDate()
-'    b = bitconverter.GetBytes(#1/1/2004 8:59:00 AM#)
-'    Assert.AreEqual #1/1/2004 8:59:00 AM#, bitconverter.ToDate(b, 0), "ToDate should return #1/1/2004 8:59:00 AM#."
-'End Sub
-'
-'Public Sub TestToInteger()
-'    b = bitconverter.GetBytes(&H5555)
-'    Assert.AreEqual &H5555, bitconverter.ToInteger(b, 0), "ToInteger should return &H5555."
-'End Sub
-'
-'Public Sub TestToLong()
-'    b = bitconverter.GetBytes(&H80808080)
-'    Assert.AreEqual &H80808080, bitconverter.ToLong(b, 0), "ToLong should return &H80808080."
-'End Sub
-'
+Public Sub ToBoolean_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal StartIndex As Long, ByVal Expected As Boolean)
+    Dim Bytes() As Byte
+    Bytes = Value
+    
+    Dim Actual As Boolean
+    Actual = BitConverter.ToBoolean(Bytes, StartIndex)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToBoolean_WithInvalidStartIndex_ThrowsArgumentOutOfRangeException(ByVal StartIndex As Long)
+    Dim Bytes(1 To 1) As Byte
+    
+    On Error Resume Next
+    BitConverter.ToBoolean Bytes, StartIndex
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub ToDouble_WhenCalled_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&HCD, &HCC, &HCC, &HCC, &HCC, &HDC, &H5E, &H40)
+    
+    Dim Actual As Double
+    Actual = BitConverter.ToDouble(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(123.45)
+End Sub
+
+Public Sub ToDate_WhenCalled_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&HCD, &HCC, &HCC, &HCC, &HCC, &HDC, &H5E, &H40)
+
+    Dim Actual As Date
+    Actual = BitConverter.ToDate(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(#5/2/1900 10:48:00 AM#)
+End Sub
+
+Public Sub ToInteger_WhenCalled_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H55, &H66)
+    
+    Dim Actual As Integer
+    Actual = BitConverter.ToInteger(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(&H6655)
+End Sub
+
+Public Sub ToLong_WhenCalled_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H55, &H66, &H77, &H88)
+    
+    Dim Actual As Long
+    Actual = BitConverter.ToLong(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(&H88776655)
+End Sub
+
 'Public Sub TestToSingle()
 '    b = bitconverter.GetBytes(123.45!)
 '    Assert.AreEqual 123.45!, bitconverter.ToSingle(b, 0), "ToSingle should return 123.45."
