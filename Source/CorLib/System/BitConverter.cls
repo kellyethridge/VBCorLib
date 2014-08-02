@@ -332,7 +332,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
     Dim ElemCount As Long
     ElemCount = GetOptionalLong(Count, UBound(Value) - ElemIndex + 1)
     
-    Call ValidateArrayArguments(Value, ElemIndex, ElemCount)
+    ValidateArrayArguments Value, ElemIndex, ElemCount
     
     Dim Ret As String
     Ret = SysAllocStringLen(0, ElemCount * 3 - 1)
@@ -383,6 +383,6 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call InitWordBuffer(mBuffer, 0, &H7FFFFFFF)
+    InitWordBuffer mBuffer, 0, &H7FFFFFFF
 End Sub
 

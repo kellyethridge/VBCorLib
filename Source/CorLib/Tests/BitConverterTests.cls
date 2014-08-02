@@ -80,7 +80,7 @@ Public Sub ToBoolean_WithInvalidStartIndex_ThrowsArgumentOutOfRangeException(ByV
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub ToDouble_WhenCalled_ReturnsExpected()
+Public Sub ToDouble_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&HCD, &HCC, &HCC, &HCC, &HCC, &HDC, &H5E, &H40)
     
@@ -90,7 +90,7 @@ Public Sub ToDouble_WhenCalled_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(123.45)
 End Sub
 
-Public Sub ToDate_WhenCalled_ReturnsExpected()
+Public Sub ToDate_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&HCD, &HCC, &HCC, &HCC, &HCC, &HDC, &H5E, &H40)
 
@@ -100,7 +100,7 @@ Public Sub ToDate_WhenCalled_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(#5/2/1900 10:48:00 AM#)
 End Sub
 
-Public Sub ToInteger_WhenCalled_ReturnsExpected()
+Public Sub ToInteger_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&H55, &H66)
     
@@ -110,7 +110,7 @@ Public Sub ToInteger_WhenCalled_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(&H6655)
 End Sub
 
-Public Sub ToLong_WhenCalled_ReturnsExpected()
+Public Sub ToLong_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&H55, &H66, &H77, &H88)
     
@@ -120,41 +120,73 @@ Public Sub ToLong_WhenCalled_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(&H88776655)
 End Sub
 
-'Public Sub TestToSingle()
-'    b = bitconverter.GetBytes(123.45!)
-'    Assert.AreEqual 123.45!, bitconverter.ToSingle(b, 0), "ToSingle should return 123.45."
-'End Sub
-'
-'Public Sub TestToCurrency()
-'    b = bitconverter.GetBytes(1234.432@)
-'    Assert.AreEqual 1234.432@, bitconverter.ToCurrency(b, 0), "ToCurrency should return 1234.432"
-'End Sub
-'
-'Public Sub TestToString()
-'    b = bitconverter.GetBytes(&HABCDEF01)
-'    Assert.AreEqual "01-EF-CD-AB", bitconverter.ToString(b), "ToString should return 01-EF-CD-AB."
-'End Sub
-'
-'Public Sub TestToStringWithStartIndex()
-'    b = bitconverter.GetBytes(&HABCDEF01)
-'    Assert.AreEqual "CD-AB", bitconverter.ToString(b, 2), "ToString should return CD-AB."
-'End Sub
-'
-'Public Sub TestToStringWithLength()
-'    b = bitconverter.GetBytes(&HABCDEF01)
-'    Assert.AreEqual "EF-CD", bitconverter.ToString(b, 1, 2), "ToString should return EF-CD."
-'End Sub
-'
-'Public Sub TestToStringWithOneByte()
-'    ReDim b(0)
-'    b(0) = &H55
-'    Assert.AreEqual "55", bitconverter.ToString(b), "ToString should return 55."
-'End Sub
-'
-'Public Sub TestToDecimal()
-'    Dim d As Variant
-'
-'    d = CDec("-1234567890.123456789")
-'    b = bitconverter.GetBytes(d)
-'    Assert.AreEqual d, bitconverter.ToDecimal(b, 0)
-'End Sub
+Public Sub ToSingle_WithValue_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H66, &HE6, &HF6, &H42)
+    
+    Dim Actual As Single
+    Actual = BitConverter.ToSingle(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(123.45!)
+End Sub
+
+Public Sub ToCurrency_WithValue_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H3E, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0)
+    
+    Dim Actual As Currency
+    Actual = BitConverter.ToCurrency(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(1234567.891@)
+End Sub
+
+Public Sub ToString_WithValue_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H1, &HEF, &HCD, &HAB)
+    
+    Dim Actual As String
+    Actual = BitConverter.ToString(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo("01-EF-CD-AB")
+End Sub
+
+Public Sub ToString_WithStartIndex_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H1, &HEF, &HCD, &HAB)
+    
+    Dim Actual As String
+    Actual = BitConverter.ToString(Bytes, 2)
+    
+    Assert.That Actual, Iz.EqualTo("CD-AB")
+End Sub
+
+Public Sub ToString_WithStartIndexAndLength_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H1, &HEF, &HCD, &HAB)
+    
+    Dim Actual As String
+    Actual = BitConverter.ToString(Bytes, 1, 2)
+    
+    Assert.That Actual, Iz.EqualTo("EF-CD")
+End Sub
+
+Public Sub ToString_WithSingleByte_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H55)
+    
+    Dim Actual As String
+    Actual = BitConverter.ToString(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo("55")
+End Sub
+
+Public Sub ToDecimal_WithValue_ReturnsExpected()
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&H3F, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H6, &H0)
+    
+    Dim Actual As Variant
+    Actual = BitConverter.ToDecimal(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(CDec("12345.678911"))
+End Sub
+
