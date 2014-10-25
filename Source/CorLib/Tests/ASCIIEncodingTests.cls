@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestASCIIEncoding"
+Attribute VB_Name = "ASCIIEncodingTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -15,19 +15,30 @@ Attribute VB_Exposed = False
 ' TestASCIIEncoding
 '
 Option Explicit
+Implements ITestCaseSource
 
 Private en As Encoding
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "GetBytes_WithCharacters_ReturnsExpected"
+            Test.Use Chr$(0), NewBytes(0)
+            
+    
+    End Select
+End Sub
 
 Public Sub Setup()
     Set en = Encoding.ASCII
 End Sub
 
-Public Sub TestGetBytes()
-    Dim b() As Byte
+Public Sub GetBytes_WithCharacters_ReturnsExpected(ByVal StringToEncode As String, ByRef Expected() As Byte)
+    Dim Encoding As New ASCIIEncoding
     
-    b = en.GetBytes("hello")
-    Assert.AreEqual 4, UBound(b)
+    Dim Actual() As Byte
+    Actual = Encoding.GetBytes(StringToEncode)
     
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestGetBytesFromInvalidChars()
@@ -105,3 +116,5 @@ Public Sub TestGetStringFromPartOfArray()
     
     Assert.AreEqual "Now is t", en.GetString(b, 0, 8)
 End Sub
+
+
