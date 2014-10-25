@@ -21,10 +21,21 @@ Private en As Encoding
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
-        Case "GetBytes_WithCharacters_ReturnsExpected"
-            Test.Use Chr$(0), NewBytes(0)
+        Case "GetBytes_WithChars_ReturnsExpected"
+            Test.Use vbNullChar, NewBytes(0)
+            Test.Use vbTab, NewBytes(9)
+            Test.Use Chr$(127), NewBytes(127)
+            Test.Use Chr$(128), NewBytes(63)
+            Test.Use ChrW$(&HFFFF), NewBytes(63)
+            Test.Use "ABC", NewBytes(65, 66, 67)
+            Test.Use NewIntegers(96, 97, 98), NewBytes(96, 97, 98)
+            Test.Use "", NewBytes()
+            Test.Use NewIntegers(), NewBytes()
             
-    
+        Case "GetBytes_WithIndexAndCount_ReturnsExpectedSubset"
+            Test.Use "abcd", NewBytes(98, 99)
+            Test.Use NewIntegers(97, 98, 99, 100), NewBytes(98, 99)
+            
     End Select
 End Sub
 
@@ -32,13 +43,63 @@ Public Sub Setup()
     Set en = Encoding.ASCII
 End Sub
 
-Public Sub GetBytes_WithCharacters_ReturnsExpected(ByVal StringToEncode As String, ByRef Expected() As Byte)
+Public Sub GetBytes_WithChars_ReturnsExpected(ByRef Chars As Variant, ByRef Expected() As Byte)
     Dim Encoding As New ASCIIEncoding
     
     Dim Actual() As Byte
-    Actual = Encoding.GetBytes(StringToEncode)
+    Actual = Encoding.GetBytes(Chars)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetBytes_WithIndexAndCount_ReturnsExpectedSubset(ByRef Chars As Variant, ByRef Expected() As Byte)
+    Dim Encoding As New ASCIIEncoding
+    
+    Dim Actual() As Byte
+    Actual = Encoding.GetBytes(Chars, 1, 2)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetBytes_WithNullArray_ThrowsArgumentNullException()
+    Dim Encoding As New ASCIIEncoding
+    Dim NullChars() As Integer
+    
+    On Error GoTo errTrap:
+    Encoding.GetBytes NullChars
+    
+errTrap:
+    AssertArgumentNullException Err, "Chars"
+End Sub
+
+Public Sub GetBytes_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    
+    On Error GoTo errTrap:
+    Encoding.GetBytes "abc", -1, 0
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub GetBytes_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    
+    On Error GoTo errTrap:
+    Encoding.GetBytes "abc", 0, -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub GetBytes_WithIndexPlusCountExtendBeyondChars_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    
+    On Error GoTo errTrap:
+    Encoding.GetBytes "abc", 1, 3
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Chars"
 End Sub
 
 Public Sub TestGetBytesFromInvalidChars()

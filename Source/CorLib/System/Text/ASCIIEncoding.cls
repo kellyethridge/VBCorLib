@@ -205,24 +205,22 @@ End Function
 ' @see Encoding
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Call AttachChars(Chars, mChars, mCharsSA)
-    
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim Result      As Long
     
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If GetOptionalLongPair(Index, 0, ElemIndex, Count, AttachChars(Chars, mChars, mCharsSA), ElemCount) Then _
+        ThrowMissing Index, Param_Index, Param_Count
+    CheckCharRange mChars, ElemIndex, ElemCount
     
-    Dim Ret() As Byte
+    Dim Result() As Byte
     If ElemCount > 0 Then
-        ReDim Ret(0 To GetByteCount(Chars, ElemIndex, ElemCount) - 1)
-        Call InternalGetBytes(mChars, ElemIndex, ElemCount, Ret, 0)
-    Else
-        Ret = Cor.NewBytes()
+        ReDim Result(0 To GetByteCount(Chars, ElemIndex, ElemCount) - 1)
+        InternalGetBytes mChars, ElemIndex, ElemCount, Result, 0
+        GetBytes = Result
+        Exit Function
     End If
-    
-    GetBytes = Ret
+        
+    GetBytes = Cor.NewBytes()
 End Function
 
 ''
@@ -506,7 +504,7 @@ End Function
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
-    SAPtr(mChars) = 0
+    SAPtr(mChars) = vbNullPtr
 End Sub
 
 
