@@ -62,7 +62,7 @@ End Sub
 ' @param Chars The array that will be used to access the elements in Source.
 ' @param CharsSA The SafeArray structure used to represent Chars.
 '
-Public Sub AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, ByRef CharsSA As SafeArray1d)
+Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, ByRef CharsSA As SafeArray1d) As Long
     Select Case VarType(Source)
         Case vbString
             CharsSA.cElements = Len(Source)
@@ -73,9 +73,12 @@ Public Sub AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, ByRef 
         
         Case vbIntegerArray
             SAPtr(Chars) = GetArrayPointer(Source)
-        
+            CheckChars Chars
+            
         Case Else
-            Throw Cor.NewArgumentException("Chars must be a String or Integer array.", "Chars")
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_CharArrayRequired), Resources.GetString(Param_Chars))
     End Select
-End Sub
+    
+    AttachChars = UBound(Chars) - LBound(Chars) + 1
+End Function
 

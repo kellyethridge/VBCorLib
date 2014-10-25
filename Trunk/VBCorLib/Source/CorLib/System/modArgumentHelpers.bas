@@ -382,6 +382,10 @@ Public Sub ThrowListRangeException(ByVal ErrorCode As Long, ByVal Index As Long,
     End Select
 End Sub
 
+Public Sub ThrowMissing(ByRef ParameterToCheck As Variant, ByVal FirstParameter As ParameterResourceId, ByVal SecondParameter As ParameterResourceId)
+    Throw Cor.NewArgumentException(Resources.GetString(Argument_ParamRequired), IIf(IsMissing(ParameterToCheck), Resources.GetString(FirstParameter), Resources.GetString(SecondParameter)))
+End Sub
+
 ''
 ' Assigns values to the missing Index and Count pair, returning any error codes.
 '
