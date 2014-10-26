@@ -23,8 +23,8 @@ Attribute VB_Name = "Contract"
 '
 Option Explicit
 
-Public Sub CheckNull(ByVal ObjectToCheck As Object, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
-    If ObjectToCheck Is Nothing Then
+Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
+    If ValueToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
     End If
 End Sub
@@ -52,8 +52,13 @@ Public Sub CheckChars(ByRef Chars() As Integer)
     End If
 End Sub
 
-Public Sub CheckCharRange(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count)
-    CheckRange Index >= LBound(Chars), IndexParameter, ArgumentOutOfRange_NeedNonNegNum
+Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count)
+    CheckRange Index >= LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
     CheckRange Count >= 0, CountParameter, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Index + Count <= (UBound(Chars) - LBound(Chars) + 1), Param_Chars, ArgumentOutOfRange_IndexLength
+    CheckRange Index + Count <= (UBound(ArrayToCheck) - LBound(ArrayToCheck) + 1), Param_Chars, ArgumentOutOfRange_IndexLength
+End Sub
+
+Public Sub CheckArrayIndex(ByRef ArrayToCheck As Variant, ByVal Index As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index)
+    CheckRange Index >= LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
+    CheckRange Index <= UBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_UBound
 End Sub

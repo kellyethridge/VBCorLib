@@ -21,6 +21,8 @@ Attribute VB_Name = "modArrayHelpers"
 '
 Option Explicit
 
+Private Declare Function vbaVarRefAry Lib "MSVBVM60.DLL" Alias "__vbaRefVarAry" (ByRef ArrayToDeref As Variant) As Long
+
 Public Type SortItems
     SA      As SafeArray1d
     Buffer  As Long
@@ -38,30 +40,10 @@ Public SortComparer     As IComparer
 ' @return A pointer to a SafeArray structure or 0 if the array is null.
 '
 Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull As Boolean = False) As Long
-    Const BYREF_ARRAY As Long = VT_BYREF Or vbArray
+    If Not IsArray(Arr) Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_ArrayRequired), "Arr")
     
-    Dim vt As Long
-    
-    vt = VariantType(Arr)
-    Select Case vt And BYREF_ARRAY
-        ' we have to double deref the original array pointer because
-        ' the variant held a pointer to the original array variable.
-        Case BYREF_ARRAY
-            GetArrayPointer = MemLong(MemLong(VarPtr(Arr) + VARIANTDATA_OFFSET))
-            
-        ' we won't need to deref again if the original array was dimensioned
-        ' as a variant ie:
-        '    Dim arr As Variant
-        '    ReDim arr(1 To 10) As Long
-        '
-        ' The passed in variant will be the array variable, not a ByRef
-        ' pointer to the array variable.
-        Case vbArray
-            GetArrayPointer = MemLong(VarPtr(Arr) + VARIANTDATA_OFFSET)
-        
-        Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_ArrayRequired), "Arr")
-    End Select
+    GetArrayPointer = MemLong(vbaVarRefAry(Arr))
     
     ' HACK HACK HACK
     '
@@ -73,7 +55,7 @@ Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull
     ' allocated was Null to begin with. That means whenever an Object or UDT
     ' array is passed to any cArray method, it will technically never
     ' be uninitialized, just zero-length.
-    Select Case vt And &HFF
+    Select Case VariantType(Arr) And &HFF
         Case vbObject, vbUserDefinedType
             If UBound(Arr) < LBound(Arr) Then
                 GetArrayPointer = vbNullPtr

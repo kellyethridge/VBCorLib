@@ -72,8 +72,14 @@ Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, B
             SAPtr(Chars) = VarPtr(CharsSA)
         
         Case vbIntegerArray
-            SAPtr(Chars) = GetArrayPointer(Source)
-            CheckChars Chars
+            Dim CharPtr As Long
+            CharPtr = GetArrayPointer(Source)
+            If CharPtr = vbNullPtr Then _
+                Throw Cor.NewArgumentNullException(Resources.GetString(Param_Chars), Resources.GetString(ArgumentNull_Array))
+            If SafeArrayGetDim(CharPtr) > 1 Then _
+                Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+            
+            SAPtr(Chars) = CharPtr
             
         Case Else
             Throw Cor.NewArgumentException(Resources.GetString(Argument_CharArrayRequired), Resources.GetString(Param_Chars))
