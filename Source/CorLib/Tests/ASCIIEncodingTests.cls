@@ -47,6 +47,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(1, 2, 3, 4, 5), 5
             Test.Use NewBytes(), 0
         
+        Case "GetString_WithBytes_ReturnsExpected"
+            Test.Use NewBytes(48, 49, 50), "012"
+            Test.Use NewBytes(), ""
+            
     End Select
 End Sub
 
@@ -371,6 +375,15 @@ Public Sub GetCharCount_WithMissingCount_ThrowsArgumentException()
     
 errTrap:
     AssertArgumentException Err, "Count"
+End Sub
+
+Public Sub GetString_WithBytes_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As String)
+    Dim Encoding As New ASCIIEncoding
+    
+    Dim Actual As String
+    Actual = Encoding.GetString(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestGetString()
