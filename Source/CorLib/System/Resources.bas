@@ -129,12 +129,19 @@ Public Enum ParameterResourceId
     Param_Count = 2001
     Param_StartIndex = 2002
     Param_Chars = 2003
+    Param_CharIndex = 2004
+    Param_CharCount = 2005
+    Param_ByteIndex = 2006
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
     GetString = cString.FormatArray(LoadResString(ResourceId), vArgs)
+End Function
+
+Public Function GetParameter(ByVal ParameterId As ParameterResourceId) As String
+    GetParameter = LoadResString(ParameterId)
 End Function
 
 Public Function ModuleEBPOffset(ByVal Offset As Long) As Long

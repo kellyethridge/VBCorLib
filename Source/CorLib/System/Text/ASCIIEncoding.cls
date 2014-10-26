@@ -183,7 +183,7 @@ End Property
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    CheckCharRange mChars, Range.Index, Range.Count
+    CheckArrayRange mChars, Range.Index, Range.Count
     
     GetByteCount = Range.Count
 End Function
@@ -203,7 +203,7 @@ End Function
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    CheckCharRange mChars, Range.Index, Range.Count
+    CheckArrayRange mChars, Range.Index, Range.Count
     
     Dim Result() As Byte
     If Range.Count > 0 Then
@@ -234,11 +234,9 @@ End Function
 ' @see Encoding
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
-    
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(mChars), CharIndex, CharCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount")
+    AttachChars Chars, mChars, mCharsSA
+    CheckArrayRange mChars, CharIndex, CharCount, Param_CharIndex, Param_CharCount
+    CheckArrayIndex Bytes, ByteIndex, Param_ByteIndex
     
     GetBytesEx = InternalGetBytes(mChars, CharIndex, CharCount, Bytes, ByteIndex)
 End Function
@@ -447,11 +445,11 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    If cArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-    If ByteIndex < LBound(Bytes) Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If ByteIndex + Count - 1 > UBound(Bytes) Then Call SmallBufferError("Bytes")
+'    If cArray.IsNull(Bytes) Then _
+'        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
+'    If ByteIndex < LBound(Bytes) Then _
+'        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+'    If ByteIndex + Count - 1 > UBound(Bytes) Then Call SmallBufferError("Bytes")
     
     Dim i   As Long
     Dim ch  As Long

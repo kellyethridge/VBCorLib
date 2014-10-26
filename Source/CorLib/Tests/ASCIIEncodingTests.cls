@@ -189,11 +189,71 @@ End Sub
 Public Sub GetByteCount_WithIndexPlusCountExtendBeyondChars_ThrowsArgumentOutOfRangeException()
     Dim Encoding As New ASCIIEncoding
     
-    On Error GoTo errTrap:
+    On Error GoTo errTrap
     Encoding.GetByteCount "abc", 1, 3
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Chars"
+End Sub
+
+Public Sub GetBytesEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Chars(-2 To 0) As Integer
+    Dim Bytes(0 To 2) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetBytesEx Chars, -3, 1, Bytes, 0
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "CharIndex"
+End Sub
+
+Public Sub GetBytesEx_WithCharCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Chars(0) As Integer
+    Dim Bytes(0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetBytesEx Chars, 0, -1, Bytes, 0
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "CharCount"
+End Sub
+
+Public Sub GetBytesEx_WithCharIndexPlusCharCountBeyondChars_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Chars(0) As Integer
+    Dim Bytes(0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetBytesEx Chars, 0, 2, Bytes, 0
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Chars"
+End Sub
+
+Public Sub GetBytesEx_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Chars(0) As Integer
+    Dim Bytes(-1 To 0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetBytesEx Chars, 0, 1, Bytes, -2
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteIndex"
+End Sub
+
+Public Sub GetBytesEx_WithByteIndexGreaterThanUBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Chars(0) As Integer
+    Dim Bytes(-1 To 0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetBytesEx Chars, 0, 1, Bytes, 1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteIndex"
 End Sub
 
 Public Sub TestEmptyString()
