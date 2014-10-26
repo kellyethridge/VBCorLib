@@ -41,13 +41,14 @@ Public Sub CheckEmpty(ByRef StringToCheck As String, ByVal Parameter As Paramete
     End If
 End Sub
 
-Public Sub CheckChars(ByRef Chars() As Integer)
-    Dim CharPtr As Long
-    CharPtr = SAPtr(Chars)
-    If CharPtr = vbNullPtr Then
-        Throw Cor.NewArgumentNullException(Resources.GetString(Param_Chars), Resources.GetString(ArgumentNull_Array))
+Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As ParameterResourceId = Param_Chars)
+    Dim Ptr As Long
+    Ptr = GetArrayPointer(ArrayToCheck)
+    
+    If Ptr = vbNullPtr Then
+        Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(ArgumentNull_Array))
     End If
-    If SafeArrayGetDim(CharPtr) > 1 Then
+    If SafeArrayGetDim(Ptr) > 1 Then
         Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
     End If
 End Sub

@@ -237,6 +237,7 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     AttachChars Chars, mChars, mCharsSA
     CheckArrayRange mChars, CharIndex, CharCount, Param_CharIndex, Param_CharCount
     CheckArrayIndex Bytes, ByteIndex, Param_ByteIndex
+    CheckBuffer Bytes, ByteIndex, CharCount
     
     GetBytesEx = InternalGetBytes(mChars, CharIndex, CharCount, Bytes, ByteIndex)
 End Function
@@ -251,14 +252,13 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
+    Dim Range As ListRange
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    CheckArray Bytes, Param_Bytes
+    Range = GetOptionalRange(Index, Count, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1)
+    CheckArrayRange Bytes, Range.Index, Range.Count
     
-    GetCharCount = ElemCount
+    GetCharCount = Range.Count
 End Function
 
 ''
@@ -445,12 +445,6 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-'    If cArray.IsNull(Bytes) Then _
-'        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-'    If ByteIndex < LBound(Bytes) Then _
-'        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-'    If ByteIndex + Count - 1 > UBound(Bytes) Then Call SmallBufferError("Bytes")
-    
     Dim i   As Long
     Dim ch  As Long
     For i = 0 To Count - 1
@@ -466,8 +460,14 @@ Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long,
     InternalGetBytes = Count
 End Function
 
-Private Sub SmallBufferError(ByVal ParamName As String)
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), ParamName)
+Private Sub CheckBuffer(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Count As Long)
+    If ByteIndex + Count - 1 > UBound(Bytes) Then
+        SmallBufferError Param_Bytes
+    End If
+End Sub
+
+Private Sub SmallBufferError(ByVal ArrayParameter As ParameterResourceId)
+    Throw Cor.NewArgumentException(Resources.GetString(Argument_SmallConversionBuffer), Resources.GetParameter(ArrayParameter))
 End Sub
 
 Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
