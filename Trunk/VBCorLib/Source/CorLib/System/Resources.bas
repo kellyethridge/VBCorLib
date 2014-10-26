@@ -126,12 +126,13 @@ End Enum
 
 Public Enum ParameterResourceId
     Param_Index = 2000
-    Param_Count = 2001
-    Param_StartIndex = 2002
-    Param_Chars = 2003
-    Param_CharIndex = 2004
-    Param_CharCount = 2005
-    Param_ByteIndex = 2006
+    Param_Count
+    Param_StartIndex
+    Param_Chars
+    Param_CharIndex
+    Param_CharCount
+    Param_ByteIndex
+    Param_Bytes
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
