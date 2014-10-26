@@ -181,15 +181,11 @@ End Property
 ' @see Encoding
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim Range As ListRange
+    Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
+    CheckCharRange mChars, Range.Index, Range.Count
     
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
-    
-    GetByteCount = ElemCount
+    GetByteCount = Range.Count
 End Function
 
 ''
@@ -205,17 +201,14 @@ End Function
 ' @see Encoding
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    
-    If GetOptionalLongPair(Index, 0, ElemIndex, Count, AttachChars(Chars, mChars, mCharsSA), ElemCount) Then _
-        ThrowMissing Index, Param_Index, Param_Count
-    CheckCharRange mChars, ElemIndex, ElemCount
+    Dim Range As ListRange
+    Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
+    CheckCharRange mChars, Range.Index, Range.Count
     
     Dim Result() As Byte
-    If ElemCount > 0 Then
-        ReDim Result(0 To GetByteCount(Chars, ElemIndex, ElemCount) - 1)
-        InternalGetBytes mChars, ElemIndex, ElemCount, Result, 0
+    If Range.Count > 0 Then
+        ReDim Result(0 To GetByteCount(Chars, Range.Index, Range.Count) - 1)
+        InternalGetBytes mChars, Range.Index, Range.Count, Result, 0
         GetBytes = Result
         Exit Function
     End If

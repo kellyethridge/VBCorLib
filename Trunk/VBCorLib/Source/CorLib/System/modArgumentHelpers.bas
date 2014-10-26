@@ -29,6 +29,10 @@ Attribute VB_Name = "modArgumentHelpers"
 '
 Option Explicit
 
+Public Type ListRange
+    Index As Long
+    Count As Long
+End Type
 
 Public Function IsNullByteArray(ByRef Bytes() As Byte) As Boolean
     IsNullByteArray = (SAPtr(Bytes) = vbNullPtr)
@@ -94,6 +98,25 @@ Public Function GetOptionalLongPair(ByRef OptionalValue1 As Variant, ByVal Defau
         GetOptionalLongPair = Argument_ParamRequired
     End If
 End Function
+
+Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count) As ListRange
+    Dim FirstIsMissing As Boolean
+    
+    FirstIsMissing = IsMissing(Index)
+    
+    If FirstIsMissing = IsMissing(Count) Then
+        If FirstIsMissing Then
+            GetOptionalRange.Index = DefaultIndex
+            GetOptionalRange.Count = DefaultCount
+        Else
+            GetOptionalRange.Index = GetOptionalLong(Index, DefaultIndex)
+            GetOptionalRange.Count = GetOptionalLong(Count, DefaultCount)
+        End If
+    Else
+        ThrowMissing Index, IndexParameter, CountParameter
+    End If
+End Function
+
 
 ''
 ' Assigns given values or default values, returning any error codes.
