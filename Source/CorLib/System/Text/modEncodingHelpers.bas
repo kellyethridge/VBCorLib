@@ -70,7 +70,8 @@ Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, B
             CharsSA.cbElements = 2
             CharsSA.cDims = 1
             SAPtr(Chars) = VarPtr(CharsSA)
-        
+            AttachChars = Len(Source)
+            
         Case vbIntegerArray
             Dim CharPtr As Long
             CharPtr = GetArrayPointer(Source)
@@ -80,11 +81,10 @@ Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, B
                 Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
             
             SAPtr(Chars) = CharPtr
+            AttachChars = UBound(Chars) - LBound(Chars) + 1
             
         Case Else
             Throw Cor.NewArgumentException(Resources.GetString(Argument_CharArrayRequired), Resources.GetString(Param_Chars))
     End Select
-    
-    AttachChars = UBound(Chars) - LBound(Chars) + 1
 End Function
 

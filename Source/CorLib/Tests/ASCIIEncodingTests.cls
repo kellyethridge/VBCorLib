@@ -50,6 +50,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "GetString_WithBytes_ReturnsExpected"
             Test.Use NewBytes(48, 49, 50), "012"
             Test.Use NewBytes(), ""
+            Test.Use NewBytes(255, 65, 128, 0), "?A?" & vbNullChar
             
     End Select
 End Sub
@@ -386,32 +387,65 @@ Public Sub GetString_WithBytes_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expe
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetString()
-    Dim b(10) As Byte
-    Dim i As Long
+Public Sub GetString_WithSubsetSpecified_ReturnsSubset()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    Bytes = NewBytes(255, 255, 48, 49, 50, 255, 255)
     
-    For i = 0 To 9
-        b(i) = 48 + i
-    Next i
-    b(10) = 237
+    Dim Actual As String
+    Actual = Encoding.GetString(Bytes, 2, 3)
     
-    Assert.AreEqual "0123456789?", en.GetString(b)
+    Assert.That Actual, Iz.EqualTo("012")
 End Sub
 
-Public Sub TestGetStringWords()
-    Dim b() As Byte
-    b = Cor.NewBytes(&H48, &H65, &H6C, &H6C, &H6F, &H20, &H74, &H68, &H65, &H72, &H65)
+Public Sub GetString_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(5 To 10) As Byte
     
-    Dim s As String
-    s = en.GetString(b)
-    Assert.AreEqual "Hello there", s
+    On Error GoTo errTrap
+    Encoding.GetString Bytes, 4, 1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteIndex"
 End Sub
 
-Public Sub TestGetStringFromPartOfArray()
-    Dim b() As Byte
-    b = StrConv("Now is the time for", vbFromUnicode)
+Public Sub GetString_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(5 To 10) As Byte
     
-    Assert.AreEqual "Now is t", en.GetString(b, 0, 8)
+    On Error GoTo errTrap
+    Encoding.GetString Bytes, 5, -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteCount"
 End Sub
+
+Public Sub GetString_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0 To 4) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetString Bytes, 0, 6
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Bytes"
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
