@@ -52,6 +52,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(), ""
             Test.Use NewBytes(255, 65, 128, 0), "?A?" & vbNullChar
             
+        Case "GetChars_WithBytes_ReturnsExpected"
+            Test.Use NewBytes(48, 49, 50), NewIntegers(48, 49, 50)
+            Test.Use NewBytes(), NewIntegers()
+            Test.Use NewBytes(255, 65, 128, 0), NewIntegers(63, 65, 63, 0)
+        
     End Select
 End Sub
 
@@ -431,13 +436,237 @@ errTrap:
     AssertArgumentOutOfRangeException Err, "Bytes"
 End Sub
 
+Public Sub GetString_WithMissingByteIndex_ThrowsArgumentException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetString Bytes, , 1
+    
+errTrap:
+    AssertArgumentException Err, "ByteIndex"
+End Sub
 
+Public Sub GetString_WithNullBytes_ThrowsArgumentNullException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetString Bytes
+    
+errTrap:
+    AssertArgumentNullException Err, "Bytes"
+End Sub
 
+Public Sub GetString_WithMissingByteCount_ThrowsArgumentException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetString Bytes, 0
+    
+errTrap:
+    AssertArgumentException Err, "ByteCount"
+End Sub
 
+Public Sub GetChars_WithBytes_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
+    Dim Encoding As New ASCIIEncoding
+    
+    Dim Actual() As Integer
+    Actual = Encoding.GetChars(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetChars_WithSubsetSpecified_ReturnsSubset()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    Bytes = NewBytes(255, 255, 48, 49, 50, 255, 255)
+    
+    Dim Actual() As Integer
+    Actual = Encoding.GetChars(Bytes, 2, 3)
+    
+    Assert.That Actual, Iz.EqualTo(NewIntegers(48, 49, 50))
+End Sub
 
+Public Sub GetChars_WithNullBytes_ThrowsArgumentNullException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    
+    On Error GoTo errTrap:
+    Encoding.GetChars Bytes
+    
+errTrap:
+    AssertArgumentNullException Err, "Bytes"
+End Sub
 
+Public Sub GetChars_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(5 To 10) As Byte
+        
+    On Error GoTo errTrap
+    Encoding.GetChars Bytes, 4, 1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteIndex"
+End Sub
 
+Public Sub GetChars_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(5 To 10) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetChars Bytes, 5, -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteCount"
+End Sub
+
+Public Sub GetChars_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0 To 5) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetChars Bytes, 4, 3
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Bytes"
+End Sub
+
+Public Sub GetChars_WithMissingByteIndex_ThrowsArgumentException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetChars Bytes, , 1
+    
+errTrap:
+    AssertArgumentException Err, "ByteIndex"
+End Sub
+
+Public Sub GetChars_WithMissingByteCount_ThrowsArgumentException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0) As Byte
+    
+    On Error GoTo errTrap
+    Encoding.GetChars Bytes, 0
+    
+errTrap:
+    AssertArgumentException Err, "ByteCount"
+End Sub
+
+Public Sub GetCharsEx_WithBytes_ReturnsExpected()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    Bytes = NewBytes(48, 49, 50)
+    
+    
+    Dim ActualChars(0 To 5) As Integer
+    Dim ActualCount As Long
+    ActualCount = Encoding.GetCharsEx(Bytes, 0, 3, ActualChars, 0)
+    
+    Assert.That ActualCount, Iz.EqualTo(3)
+    Assert.That ActualChars, Iz.EqualTo(NewIntegers(48, 49, 50, 0, 0, 0))
+End Sub
+
+Public Sub GetCharsEx_WithSubsetSpecified_ReturnsSubset()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    Bytes = NewBytes(48, 49, 50, 51, 52)
+    
+    
+    Dim ActualChars(0 To 5) As Integer
+    Dim ActualCount As Long
+    ActualCount = Encoding.GetCharsEx(Bytes, 2, 2, ActualChars, 1)
+    
+    Assert.That ActualCount, Iz.EqualTo(2)
+    Assert.That ActualChars, Iz.EqualTo(NewIntegers(0, 50, 51, 0, 0, 0))
+End Sub
+
+Public Sub GetCharsEx_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0 To 5) As Byte
+    
+    On Error GoTo errTrap
+    Dim Chars(10) As Integer
+    Encoding.GetCharsEx Bytes, -1, 1, Chars, 0
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteIndex"
+End Sub
+
+Public Sub GetCharsEx_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0 To 5) As Byte
+    
+    On Error GoTo errTrap
+    Dim Chars(10) As Integer
+    Encoding.GetCharsEx Bytes, 0, -1, Chars, 0
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "ByteCount"
+End Sub
+
+Public Sub GetCharsEx_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(0 To 5) As Byte
+    
+    On Error GoTo errTrap
+    Dim Chars(10) As Integer
+    Encoding.GetCharsEx Bytes, 4, 3, Chars, 0
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Bytes"
+End Sub
+
+Public Sub GetCharsEx_WithNullBytes_ThrowsArgumentNullException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    
+    On Error GoTo errTrap
+    Dim Chars(10) As Integer
+    Encoding.GetCharsEx Bytes, 0, 0, Chars, 0
+    
+errTrap:
+    AssertArgumentNullException Err, "Bytes"
+End Sub
+
+Public Sub GetCharsEx_WithNullChars_ThrowsArgumentNullException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(10) As Byte
+    
+    On Error GoTo errTrap
+    Dim Chars() As Integer
+    Encoding.GetCharsEx Bytes, 0, 1, Chars, 0
+    
+errTrap:
+    AssertArgumentNullException Err, "Chars"
+End Sub
+
+Public Sub GetCharEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes(10) As Byte
+    
+    On Error GoTo errTrap
+    Dim Chars(10) As Integer
+    Encoding.GetCharsEx Bytes, 0, 1, Chars, -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "CharIndex"
+End Sub
+
+Public Sub GetCharsEx_WithNotEnoughCapacity_ThrowsArgumentException()
+    Dim Encoding As New ASCIIEncoding
+    Dim Bytes() As Byte
+    ReDim Bytes(0 To 3)
+    
+    On Error GoTo errTrap
+    Dim Chars(0 To 2) As Integer
+    Encoding.GetCharsEx Bytes, 0, 4, Chars, 0
+    
+errTrap:
+    AssertArgumentException Err, "Chars"
+End Sub
 
 
 

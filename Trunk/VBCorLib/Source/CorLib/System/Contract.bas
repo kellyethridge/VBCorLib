@@ -41,7 +41,7 @@ Public Sub CheckEmpty(ByRef StringToCheck As String, ByVal Parameter As Paramete
     End If
 End Sub
 
-Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As ParameterResourceId = Param_Chars)
+Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As ParameterResourceId = Param_Bytes)
     Dim Ptr As Long
     Ptr = GetArrayPointer(ArrayToCheck)
     
@@ -53,7 +53,7 @@ Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As Param
     End If
 End Sub
 
-Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count, Optional ByVal ArrayParameter As ParameterResourceId = Param_Chars)
+Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count, Optional ByVal ArrayParameter As ParameterResourceId = Param_Bytes)
     CheckRange Index >= LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
     CheckRange Count >= 0, CountParameter, ArgumentOutOfRange_NeedNonNegNum
     CheckRange Index + Count <= (UBound(ArrayToCheck) - LBound(ArrayToCheck) + 1), ArrayParameter, ArgumentOutOfRange_IndexLength
