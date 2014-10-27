@@ -204,6 +204,7 @@ Class=ToStringWithDoublesTests; Tests\ToStringWithDoublesTests.cls
 Class=ToStringWithSinglesTests; Tests\ToStringWithSinglesTests.cls
 Class=VBGuidComparer; Tests\VBGuidComparer.cls
 ResFile32="VBCorLib.Tests.RES"
+Class=EncodingArgumentTests; Tests\Text\EncodingArgumentTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""
