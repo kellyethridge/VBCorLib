@@ -183,7 +183,7 @@ End Property
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    CheckArrayRange mChars, Range.Index, Range.Count
+    CheckArrayRange mChars, Range.Index, Range.Count, ArrayParameter:=Param_Chars
     
     GetByteCount = Range.Count
 End Function
@@ -203,7 +203,7 @@ End Function
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    CheckArrayRange mChars, Range.Index, Range.Count
+    CheckArrayRange mChars, Range.Index, Range.Count, ArrayParameter:=Param_Chars
     
     Dim Result() As Byte
     If Range.Count > 0 Then
@@ -235,7 +235,7 @@ End Function
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     AttachChars Chars, mChars, mCharsSA
-    CheckArrayRange mChars, CharIndex, CharCount, Param_CharIndex, Param_CharCount
+    CheckArrayRange mChars, CharIndex, CharCount, Param_CharIndex, Param_CharCount, Param_Chars
     CheckArrayIndex Bytes, ByteIndex, Param_ByteIndex
     CheckBuffer Bytes, ByteIndex, CharCount
     
@@ -254,7 +254,7 @@ End Function
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    CheckArray Bytes, Param_Bytes
+    CheckArray Bytes
     Range = GetOptionalRange(Index, Count, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1)
     CheckArrayRange Bytes, Range.Index, Range.Count
     
@@ -265,28 +265,27 @@ End Function
 ' Decodes a set of bytes into a set of characters.
 '
 ' @param Bytes The set of bytes to be decoded into characters.
-' @param Index The index of the first byte to be used in decoding.
-' @param Count The number of bytes to be used in decoding.
+' @param ByteIndex The index of the first byte to be used in decoding.
+' @param ByteCount The number of bytes to be used in decoding.
 ' @return An array of characters decoded from the set of bytes.
 ' @see Encoding
 '
-Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
+Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
+    Dim Range As ListRange
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    CheckArray Bytes
+    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Param_ByteIndex, Param_ByteCount)
+    CheckArrayRange Bytes, Range.Index, Range.Count, Param_ByteIndex, Param_ByteCount
     
-    Dim Ret() As Integer
-    If ElemCount > 0 Then
-        ReDim Ret(0 To GetCharCount(Bytes, ElemIndex, ElemCount) - 1)
-        Call InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0)
+    Dim Chars() As Integer
+    If Range.Count > 0 Then
+        ReDim Chars(0 To GetCharCount(Bytes, Range.Index, Range.Count) - 1)
+        InternalGetChars Bytes, Range.Index, Range.Count, Chars, 0
     Else
-        Ret = Cor.NewIntegers()
+        Chars = Cor.NewIntegers()
     End If
     
-    GetChars = Ret
+    GetChars = Chars
 End Function
 
 ''
@@ -304,9 +303,11 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount")
+    CheckArray Bytes
+    CheckArrayRange Bytes, ByteIndex, ByteCount, Param_ByteIndex, Param_ByteCount
+    CheckArray Chars, Param_Chars
+    CheckArrayIndex Chars, CharIndex, Param_CharIndex
+    CheckBuffer Chars, CharIndex, ByteCount, Param_Chars
     
     GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
 End Function
@@ -398,9 +399,9 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
     Dim Range As ListRange
     
-    CheckArray Bytes, Param_Bytes
+    CheckArray Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Param_ByteIndex, Param_ByteCount)
-    CheckArrayRange Bytes, Range.Index, Range.Count, Param_ByteIndex, Param_ByteCount, Param_Bytes
+    CheckArrayRange Bytes, Range.Index, Range.Count, Param_ByteIndex, Param_ByteCount
     
     GetString = SysAllocStringLen(0, Range.Count)
     AttachChars GetString, mChars, mCharsSA
@@ -460,9 +461,9 @@ Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long,
     InternalGetBytes = Count
 End Function
 
-Private Sub CheckBuffer(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Count As Long)
-    If ByteIndex + Count - 1 > UBound(Bytes) Then
-        SmallBufferError Param_Bytes
+Private Sub CheckBuffer(ByRef BufferToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal ArrayParameter As ParameterResourceId = Param_Bytes)
+    If Index + Count - 1 > UBound(BufferToCheck) Then
+        SmallBufferError ArrayParameter
     End If
 End Sub
 
@@ -471,11 +472,11 @@ Private Sub SmallBufferError(ByVal ArrayParameter As ParameterResourceId)
 End Sub
 
 Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    If cArray.IsNull(Chars) Then _
-        Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
-    If CharIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If CharIndex + ByteCount - 1 > UBound(Chars) Then Call SmallBufferError("Chars")
+'    If cArray.IsNull(Chars) Then _
+'        Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
+'    If CharIndex < LBound(Chars) Then _
+'        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+'    If CharIndex + ByteCount - 1 > UBound(Chars) Then Call SmallBufferError("Chars")
     
     Dim i As Long
     Dim b As Byte
