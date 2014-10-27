@@ -53,10 +53,10 @@ Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As Param
     End If
 End Sub
 
-Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count)
+Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count, Optional ByVal ArrayParameter As ParameterResourceId = Param_Chars)
     CheckRange Index >= LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
     CheckRange Count >= 0, CountParameter, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Index + Count <= (UBound(ArrayToCheck) - LBound(ArrayToCheck) + 1), Param_Chars, ArgumentOutOfRange_IndexLength
+    CheckRange Index + Count <= (UBound(ArrayToCheck) - LBound(ArrayToCheck) + 1), ArrayParameter, ArgumentOutOfRange_IndexLength
 End Sub
 
 Public Sub CheckArrayIndex(ByRef ArrayToCheck As Variant, ByVal Index As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index)

@@ -395,17 +395,17 @@ End Function
 ' @return A string containing the decoded set of bytes.
 ' @see Encoding
 '
-Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
+Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
+    Dim Range As ListRange
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    CheckArray Bytes, Param_Bytes
+    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Param_ByteIndex, Param_ByteCount)
+    CheckArrayRange Bytes, Range.Index, Range.Count, Param_ByteIndex, Param_ByteCount, Param_Bytes
     
-    GetString = SysAllocStringLen(0, ElemCount)
-    Call AttachChars(GetString, mChars, mCharsSA)
-    Call InternalGetChars(Bytes, ElemIndex, ElemCount, mChars, 0)
+    GetString = SysAllocStringLen(0, Range.Count)
+    AttachChars GetString, mChars, mCharsSA
+    InternalGetChars Bytes, Range.Index, Range.Count, mChars, 0
+    SAPtr(mChars) = vbNullPtr
 End Function
 
 ''
