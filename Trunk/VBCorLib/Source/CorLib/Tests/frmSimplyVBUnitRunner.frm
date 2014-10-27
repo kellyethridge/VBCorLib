@@ -165,9 +165,10 @@ Private Sub Form_Load()
     FormattingTests.Add New ToStringWithValuesTests
     AddTest FormattingTests
     
-    Dim EncodingTests As TestSuite
-    Set EncodingTests = Sim.NewTestSuite("Encoding Tests")
-    EncodingTests.Add New ASCIIEncodingTests
+    Dim Text As TestSuite
+    Set Text = Sim.NewTestSuite("Text")
+    Text.Add New EncodingArgumentTests
+    Text.Add New ASCIIEncodingTests
     
     Dim UTF7EncodingTests As TestSuite
     Set UTF7EncodingTests = Sim.NewTestSuite("UTF7Encoding Tests")
@@ -175,7 +176,7 @@ Private Sub Form_Load()
     UTF7EncodingTests.Add New TestUTF7GetCharCount
     UTF7EncodingTests.Add New TestUTF7GetBytes
     UTF7EncodingTests.Add New TestUTF7GetByteCount
-    EncodingTests.Add UTF7EncodingTests
+    Text.Add UTF7EncodingTests
     
     Dim UTF8EncodingTests As TestSuite
     Set UTF8EncodingTests = Sim.NewTestSuite("UTF8Encoding Tests")
@@ -183,14 +184,14 @@ Private Sub Form_Load()
     UTF8EncodingTests.Add New TestUTF8GetCharCount
     UTF8EncodingTests.Add New TestUTF8Encoding
     UTF8EncodingTests.Add New TestUTF8GetByteCount
-    EncodingTests.Add UTF8EncodingTests
+    Text.Add UTF8EncodingTests
     
-    EncodingTests.Add New TestUnicodeEncodingBig
-    EncodingTests.Add New TestUnicodeEncoding
-    EncodingTests.Add New TestDetermineEncoding
-    EncodingTests.Add New TestEncoding437
+    Text.Add New TestUnicodeEncodingBig
+    Text.Add New TestUnicodeEncoding
+    Text.Add New TestDetermineEncoding
+    Text.Add New TestEncoding437
     
-    AddTest EncodingTests
+    AddTest Text
     
     AddTest New TestMathExt
     AddTest New TestGuid
