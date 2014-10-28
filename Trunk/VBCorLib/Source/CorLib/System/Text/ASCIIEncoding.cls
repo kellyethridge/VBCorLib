@@ -335,7 +335,7 @@ End Function
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("CharCount", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetParameter(Param_CharCount), Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     GetMaxByteCount = CharCount
 End Function
@@ -350,9 +350,9 @@ End Function
 ' @see Encoding
 '
 Public Function GetEncoder() As Encoder
-    Dim Ret As New DefaultEncoder
-    Call Ret.Init(Me)
-    Set GetEncoder = Ret
+    Dim Encoder As New DefaultEncoder
+    Encoder.Init Me
+    Set GetEncoder = Encoder
 End Function
 
 ''
@@ -368,9 +368,9 @@ End Function
 ' @see Encoding
 '
 Public Function GetDecoder() As Decoder
-    Dim Ret As New DefaultDecoder
-    Call Ret.Init(Me)
-    Set GetDecoder = Ret
+    Dim Decoder As New DefaultDecoder
+    Decoder.Init Me
+    Set GetDecoder = Decoder
 End Function
 
 ''
@@ -472,12 +472,6 @@ Private Sub SmallBufferError(ByVal ArrayParameter As ParameterResourceId)
 End Sub
 
 Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-'    If cArray.IsNull(Chars) Then _
-'        Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
-'    If CharIndex < LBound(Chars) Then _
-'        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-'    If CharIndex + ByteCount - 1 > UBound(Chars) Then Call SmallBufferError("Chars")
-    
     Dim i As Long
     Dim b As Byte
     For i = 0 To ByteCount - 1
