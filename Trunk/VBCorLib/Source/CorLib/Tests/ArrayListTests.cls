@@ -615,42 +615,42 @@ Public Sub BinarySearch_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub BinarySearch_WithRangedValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
+Public Sub BinarySearchEx_WithRangedValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
     Dim list As ArrayList
     Set list = MakeOrderedList
     
     Dim Actual As Long
-    Actual = list.BinarySearchEx(Value, 1, 4)
+    Actual = list.BinarySearchEx(1, 4, Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub BinarySearch_WithNegativeIndex_Throws()
+Public Sub BinarySearchEx_WithNegativeIndex_Throws()
     Dim list As ArrayList
     Set list = MakeOrderedList
     
     On Error Resume Next
-    list.BinarySearchEx 4, -1, 1
+    list.BinarySearchEx -1, 1, 4
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub BinarySearch_WithNegativeCount_Throws()
+Public Sub BinarySearchEx_WithNegativeCount_Throws()
     Dim list As ArrayList
     Set list = MakeOrderedList
     
     On Error Resume Next
-    list.BinarySearchEx 4, 0, -1
+    list.BinarySearchEx 0, -1, 4
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub BinarySearch_WithInvalidRange_Throws()
+Public Sub BinarySearchEx_WithInvalidRange_Throws()
     Dim list As ArrayList
     Set list = MakeOrderedList
     
     On Error Resume Next
-    list.BinarySearchEx 4, 1, 6
+    list.BinarySearchEx 1, 6, 4
     
     AssertArgumentException Err
 End Sub

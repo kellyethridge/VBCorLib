@@ -411,50 +411,50 @@ Public Sub BinarySearch_WithValues_ReturnsExpected(ByRef Elements As Variant, By
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub BinarySearch_WithSubsetValues_ReturnsExpected(ByRef Elements As Variant, ByVal ValueToFind As Integer, ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As Long)
+Public Sub BinarySearchEx_WithSubsetValues_ReturnsExpected(ByRef Elements As Variant, ByVal ValueToFind As Integer, ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As Long)
     Dim list As New ArrayList
     list.AddRange Elements
     Dim Adapter As ArrayList
     Set Adapter = ArrayList.Adapter(list)
     
     Dim Actual As Long
-    Actual = Adapter.BinarySearchEx(ValueToFind, StartIndex, Count)
+    Actual = Adapter.BinarySearchEx(StartIndex, Count, ValueToFind)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub BinarySearch_WithCountTooHigh_ThrowsArgumentException()
+Public Sub BinarySearchEx_WithCountTooHigh_ThrowsArgumentException()
     Dim list As New ArrayList
     list.Capacity = 10
     Dim Adapter As ArrayList
     Set Adapter = ArrayList.Adapter(list)
 
     On Error Resume Next
-    Adapter.BinarySearchEx 1, 0, 11
+    Adapter.BinarySearchEx 0, 11, 1
     
     AssertArgumentException Err
 End Sub
 
-Public Sub BinarySearch_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
+Public Sub BinarySearchEx_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
     Dim list As New ArrayList
     list.Capacity = 10
     Dim Adapter As ArrayList
     Set Adapter = ArrayList.Adapter(list)
 
     On Error Resume Next
-    Adapter.BinarySearchEx 1, -1, 1
+    Adapter.BinarySearchEx -1, 1, 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub BinarySearch_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+Public Sub BinarySearchEx_WithNegativeCount_ThrowsArgumentOutOfRangeException()
     Dim list As New ArrayList
     list.Capacity = 10
     Dim Adapter As ArrayList
     Set Adapter = ArrayList.Adapter(list)
 
     On Error Resume Next
-    Adapter.BinarySearchEx 1, 0, -1
+    Adapter.BinarySearchEx 0, -1, 1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub

@@ -122,17 +122,17 @@ End Sub
 
 Private Function ArrayList_BinarySearch(Value As Variant, Optional ByVal Comparer As IComparer) As Long
     VerifyVersion
-    ArrayList_BinarySearch = ArrayList_BinarySearchEx(Value, 0, mCount, Comparer)
+    ArrayList_BinarySearch = ArrayList_BinarySearchEx(0, mCount, Value, Comparer)
 End Function
 
-Private Function ArrayList_BinarySearchEx(Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Long, Value As Variant, Optional ByVal Comparer As IComparer) As Long
     VerifyVersion
     CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
     CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
     CheckArgument Index + Count > mCount, Argument_InvalidOffLen
     
     Dim ItemIndex As Long
-    ItemIndex = mList.BinarySearchEx(Value, mIndex + Index, Count, Comparer)
+    ItemIndex = mList.BinarySearchEx(mIndex + Index, Count, Value, Comparer)
     If ItemIndex >= 0 Then
         ItemIndex = ItemIndex - mIndex
     End If

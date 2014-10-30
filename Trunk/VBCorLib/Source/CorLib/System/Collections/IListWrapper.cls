@@ -142,10 +142,10 @@ Private Sub ArrayList_AddRange(c As Variant)
 End Sub
 
 Private Function ArrayList_BinarySearch(Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_BinarySearch = ArrayList_BinarySearchEx(Value, 0, mList.Count, Comparer)
+    ArrayList_BinarySearch = ArrayList_BinarySearchEx(0, mList.Count, Value, Comparer)
 End Function
 
-Private Function ArrayList_BinarySearchEx(Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Long, Value As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim MiddleIndex As Long
     Dim LowIndex    As Long
     Dim HighIndex   As Long

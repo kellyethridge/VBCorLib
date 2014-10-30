@@ -128,15 +128,15 @@ End Sub
 ' @see IComparable
 ' @include "..\..\Includes\ArrayListBinarySearch.txt"
 Public Function BinarySearch(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    BinarySearch = BinarySearchEx(Value, 0, mCount, Comparer)
+    BinarySearch = BinarySearchEx(0, mCount, Value, Comparer)
 End Function
 
 ''
 ' Performs a binary search for the value in the internal list.
 '
-' @param Value The value to search for.
 ' @param Index  The starting index to begin the search.
 ' @param Count The number of elements to search in from the startindex.
+' @param Value The value to search for.
 ' @param Comparer A comparer to perform user-defined comparison logic.
 ' @return The index at which the value was found, or a negative value indicating
 ' the value was not found.
@@ -154,7 +154,7 @@ End Function
 ' @see IComparer
 ' @see IComparable
 ' @include "..\..\Includes\ArrayListBinarySearch.txt"
-Public Function BinarySearchEx(ByRef Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
+Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
     CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
     CheckArgument Index + Count > mCount, Argument_InvalidOffLen
