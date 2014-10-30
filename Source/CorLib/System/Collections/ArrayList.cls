@@ -109,10 +109,8 @@ End Sub
 ''
 ' Performs a binary search for the value in the internal list.
 '
-' @param value The value to search for.
-' @param Index  The starting index to begin the search.
-' @param count The number of elements to search in from the startindex.
-' @param comparer A comparer to perform user-defined comparison logic.
+' @param Value The value to search for.
+' @param Comparer A comparer to perform user-defined comparison logic.
 ' @return The index at which the value was found, or a negative value indicating
 ' the value was not found.
 ' @remarks The search assumes the <b>ArrayList</b> is sorted.
@@ -129,22 +127,40 @@ End Sub
 ' @see IComparer
 ' @see IComparable
 ' @include "..\..\Includes\ArrayListBinarySearch.txt"
-Public Function BinarySearch(ByRef Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    
-    ElemIndex = GetOptionalLong(Index, 0)
-    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
-    
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+Public Function BinarySearch(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
+    BinarySearch = BinarySearchEx(Value, 0, mCount, Comparer)
+End Function
+
+''
+' Performs a binary search for the value in the internal list.
+'
+' @param Value The value to search for.
+' @param Index  The starting index to begin the search.
+' @param Count The number of elements to search in from the startindex.
+' @param Comparer A comparer to perform user-defined comparison logic.
+' @return The index at which the value was found, or a negative value indicating
+' the value was not found.
+' @remarks The search assumes the <b>ArrayList</b> is sorted.
+' <p>The default comparison method requires the values to be of the same
+' intrinsic Visual Basic datatype. A vbLong will fail to compare against a vbInteger,
+' for instance. Objects must implement the <b>IComparable</b> interface or
+' an exception will be thrown.</p>
+' <p>The comparison behaviour can be overridden by supplying a custom <b>IComparer</b>
+' compatible object.</P>
+' <p>The search can be limited to a specific range within the list instead
+' of over the entire list.</p>
+' <p>If the return value is negative, then the value was not found in the list. To
+' determine where the value should have been found, negate (Not) the return value.</p>
+' @see IComparer
+' @see IComparable
+' @include "..\..\Includes\ArrayListBinarySearch.txt"
+Public Function BinarySearchEx(ByRef Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
+    CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckArgument Index + Count > mCount, Argument_InvalidOffLen
 
     If mCount = 0 Then
-        BinarySearch = -1
+        BinarySearchEx = -1
         Exit Function
     End If
     
@@ -152,7 +168,7 @@ Public Function BinarySearch(ByRef Value As Variant, Optional ByRef Index As Var
         Set Comparer = mComparer
     End If
     
-    BinarySearch = cArray.BinarySearchEx(mItems, ElemIndex, ElemCount, Value, Comparer)
+    BinarySearchEx = cArray.BinarySearchEx(mItems, Index, Count, Value, Comparer)
 End Function
 
 ''

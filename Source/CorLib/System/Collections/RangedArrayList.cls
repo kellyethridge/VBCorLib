@@ -120,25 +120,24 @@ Private Sub ArrayList_AddRange(c As Variant)
     mVersion = mVersion + 1
 End Sub
 
-Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_BinarySearch(Value As Variant, Optional ByVal Comparer As IComparer) As Long
     VerifyVersion
+    ArrayList_BinarySearch = ArrayList_BinarySearchEx(Value, 0, mCount, Comparer)
+End Function
+
+Private Function ArrayList_BinarySearchEx(Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
+    VerifyVersion
+    CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckArgument Index + Count > mCount, Argument_InvalidOffLen
     
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    ElemIndex = GetOptionalLong(Index, 0)
-    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    Dim ItemIndex As Long
+    ItemIndex = mList.BinarySearchEx(Value, mIndex + Index, Count, Comparer)
+    If ItemIndex >= 0 Then
+        ItemIndex = ItemIndex - mIndex
+    End If
     
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
-    
-    Dim i As Long
-    i = mList.BinarySearch(Value, mIndex + ElemIndex, ElemCount, Comparer)
-    If i >= 0 Then i = i - mIndex
-    ArrayList_BinarySearch = i
+    ArrayList_BinarySearchEx = ItemIndex
 End Function
 
 Private Property Let ArrayList_Capacity(ByVal RHS As Long)

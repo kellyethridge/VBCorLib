@@ -141,35 +141,30 @@ Private Sub ArrayList_AddRange(c As Variant)
     Next
 End Sub
 
-Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    
-    ElemIndex = GetOptionalLong(Index, 0)
-    ElemCount = GetOptionalLong(Count, mList.Count - ElemIndex)
-    
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + ElemCount > mList.Count Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
-    
+Private Function ArrayList_BinarySearch(Value As Variant, Optional ByVal Comparer As IComparer) As Long
+    ArrayList_BinarySearch = ArrayList_BinarySearchEx(Value, 0, mList.Count, Comparer)
+End Function
+
+Private Function ArrayList_BinarySearchEx(Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
     Dim MiddleIndex As Long
     Dim LowIndex    As Long
     Dim HighIndex   As Long
+    
+    CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckArgument Index + Count > mList.Count, Argument_InvalidOffLen
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
     End If
     
-    LowIndex = ElemIndex
-    HighIndex = LowIndex + ElemCount - 1
+    LowIndex = Index
+    HighIndex = LowIndex + Count - 1
     Do While LowIndex <= HighIndex
         MiddleIndex = (LowIndex + HighIndex) \ 2
         Select Case Comparer.Compare(mList(MiddleIndex), Value)
             Case 0
-                ArrayList_BinarySearch = MiddleIndex
+                ArrayList_BinarySearchEx = MiddleIndex
                 Exit Function
             Case Is > 0
                 HighIndex = MiddleIndex - 1
@@ -178,7 +173,7 @@ Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef Index A
         End Select
     Loop
     
-    ArrayList_BinarySearch = Not LowIndex
+    ArrayList_BinarySearchEx = Not LowIndex
 End Function
 
 Private Property Let ArrayList_Capacity(ByVal Value As Long)

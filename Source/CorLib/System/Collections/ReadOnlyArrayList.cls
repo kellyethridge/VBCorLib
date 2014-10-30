@@ -68,8 +68,12 @@ Private Sub ArrayList_AddRange(c As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 
-Private Function ArrayList_BinarySearch(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_BinarySearch = mList.BinarySearch(Value, StartIndex, Count, Comparer)
+Private Function ArrayList_BinarySearch(Value As Variant, Optional ByVal Comparer As IComparer) As Long
+    ArrayList_BinarySearch = mList.BinarySearch(Value, Comparer)
+End Function
+
+Private Function ArrayList_BinarySearchEx(Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
+    ArrayList_BinarySearchEx = mList.BinarySearchEx(Value, Index, Count, Comparer)
 End Function
 
 Private Property Let ArrayList_Capacity(ByVal RHS As Long)
