@@ -320,9 +320,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
-    If ByteCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteCount", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-        
+    CheckRange ByteCount < 0, Param_ByteCount, ArgumentOutOfRange_NeedNonNegNum
     GetMaxCharCount = ByteCount
 End Function
 
@@ -334,9 +332,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
-    If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetParameter(Param_CharCount), Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    
+    CheckRange CharCount < 0, Param_CharCount, ArgumentOutOfRange_NeedNonNegNum
     GetMaxByteCount = CharCount
 End Function
 
