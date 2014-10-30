@@ -68,8 +68,8 @@ Private Function ArrayList_BinarySearch(Value As Variant, Optional ByVal Compare
     ArrayList_BinarySearch = mList.BinarySearch(Value, Comparer)
 End Function
 
-Private Function ArrayList_BinarySearchEx(Value As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_BinarySearchEx = mList.BinarySearchEx(Value, Index, Count, Comparer)
+Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Long, Value As Variant, Optional ByVal Comparer As IComparer) As Long
+    ArrayList_BinarySearchEx = mList.BinarySearchEx(Index, Count, Value, Comparer)
 End Function
 
 Private Property Let ArrayList_Capacity(ByVal RHS As Long)
