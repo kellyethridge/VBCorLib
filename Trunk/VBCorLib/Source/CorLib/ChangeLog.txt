@@ -9,3 +9,4 @@ Reordered 'Message', 'ParamName', and 'ActualValue' arguments in ArgumentOutOfRa
 Fixed ArrayList.SetRange when using ICollection source would insert instead of overwriting.
 Fixed MemoryStream SeekPosition when using FromEnd. Was off by 1.
 Fixed MemoryStream ReadBlock not honoring lower-bound of output buffer.
+Refactored ArrayList binary search method into BinarySearch and BinarySearchEx to require the index and count in a separate call. **

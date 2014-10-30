@@ -23,14 +23,25 @@ Attribute VB_Name = "Contract"
 '
 Option Explicit
 
+Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As ResourceStringId, Optional ByVal Parameter As ParameterResourceId = Param_None)
+    If FailingCondition Then
+        Dim ParameterName As String
+        If Parameter <> Param_None Then
+            ParameterName = Resources.GetParameter(Parameter)
+        End If
+        
+        Throw Cor.NewArgumentException(Resources.GetString(Message), ParameterName)
+    End If
+End Sub
+
 Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
     If ValueToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
     End If
 End Sub
 
-Public Sub CheckRange(ByVal Condition As Boolean, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
-    If Not Condition Then
+Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
+    If FailingCondition Then
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(Parameter), Message:=Resources.GetString(Message))
     End If
 End Sub

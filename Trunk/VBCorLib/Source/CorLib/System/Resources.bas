@@ -125,6 +125,7 @@ Public Enum ResourceStringId
 End Enum
 
 Public Enum ParameterResourceId
+    Param_None = 0
     Param_Index = 2000
     Param_Count
     Param_StartIndex

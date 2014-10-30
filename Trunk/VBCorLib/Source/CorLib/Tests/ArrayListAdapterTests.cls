@@ -46,10 +46,10 @@ Public Sub Count_WithEmptyList_ReturnsZero()
 End Sub
 
 Public Sub Count_WithListOfOneItem_ReturnsOne()
-    Dim List As New ArrayList
-    List.Add "one"
+    Dim list As New ArrayList
+    list.Add "one"
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     
     Dim Actual As Long
     Actual = Adapted.Count
@@ -58,20 +58,20 @@ Public Sub Count_WithListOfOneItem_ReturnsOne()
 End Sub
 
 Public Sub Add_WhenCalled_AddsToList()
-    Dim List As New ArrayList
+    Dim list As New ArrayList
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     
     Adapted.Add 1
     
-    Assert.That List.Count, Iz.EqualTo(1)
-    Assert.That List(0), Iz.EqualTo(1)
+    Assert.That list.Count, Iz.EqualTo(1)
+    Assert.That list(0), Iz.EqualTo(1)
 End Sub
 
 Public Sub AddRange_WithCollection_AddsToList()
-    Dim List As New ArrayList
+    Dim list As New ArrayList
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     Dim Source As New Collection
     Source.Add 1
     Source.Add 2
@@ -79,38 +79,38 @@ Public Sub AddRange_WithCollection_AddsToList()
     
     Adapted.AddRange Source
     
-    Assert.That List, Iz.EqualTo(Source)
+    Assert.That list, Iz.EqualTo(Source)
 End Sub
 
 Public Sub AddRange_WithArray_AddsToList()
-    Dim List As New ArrayList
+    Dim list As New ArrayList
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     Dim Source() As Long
     Source = NewLongs(1, 2, 3)
     
     Adapted.AddRange Source
     
-    Assert.That List, Iz.EqualTo(Source)
+    Assert.That list, Iz.EqualTo(Source)
 End Sub
 
 Public Sub AddRange_WithICollection_AddsToList()
-    Dim List As New ArrayList
+    Dim list As New ArrayList
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     Dim Source As New ArrayList
     Source.AddRange NewLongs(1, 2, 3)
     
     Adapted.AddRange Source
     
-    Assert.That List, Iz.EqualTo(Source)
+    Assert.That list, Iz.EqualTo(Source)
 End Sub
 
 Public Sub Item_WhenReading_ReturnsUnderlyingItem()
-    Dim List As New ArrayList
-    List.Add "one"
+    Dim list As New ArrayList
+    list.Add "one"
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     
     Dim Actual As String
     Actual = Adapted(0)
@@ -119,49 +119,49 @@ Public Sub Item_WhenReading_ReturnsUnderlyingItem()
 End Sub
 
 Public Sub Item_WhenSetting_SetsUnderlyingItem()
-    Dim List As New ArrayList
-    List.Add 1
+    Dim list As New ArrayList
+    list.Add 1
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     
     Adapted(0) = 2
     
-    Assert.That List(0), Iz.EqualTo(2)
+    Assert.That list(0), Iz.EqualTo(2)
 End Sub
 
 Public Sub Clear_WhenCalled_ClearsList()
-    Dim List As New ArrayList
-    List.Add 1
+    Dim list As New ArrayList
+    list.Add 1
     Dim Adapted As ArrayList
-    Set Adapted = ArrayList.Adapter(List)
+    Set Adapted = ArrayList.Adapter(list)
     
     Adapted.Clear
     
-    Assert.That List, Iz.Empty
+    Assert.That list, Iz.Empty
 End Sub
 
 Public Sub CopyTo_WhenCalled_CopiesToOutput()
     Dim Target(2) As String
-    Dim List As New ArrayList
-    List.Add "Item1"
-    List.Add "Item2"
-    List.Add "Item3"
+    Dim list As New ArrayList
+    list.Add "Item1"
+    list.Add "Item2"
+    list.Add "Item3"
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     
     Adapter.CopyTo Target
     
-    Assert.That Target, Iz.EqualTo(List)
+    Assert.That Target, Iz.EqualTo(list)
 End Sub
 
 Public Sub CopyTo_WithIndexOffset_CopiesToOffsetOutput()
     Dim Target(5) As String
-    Dim List As New ArrayList
-    List.Add "Item1"
-    List.Add "Item2"
-    List.Add "Item3"
+    Dim list As New ArrayList
+    list.Add "Item1"
+    list.Add "Item2"
+    list.Add "Item3"
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     
     Adapter.CopyTo Target, 2
     
@@ -170,12 +170,12 @@ End Sub
 
 Public Sub CopyTo_WithArrayIndexLessThanLowerBound_ThrowsArgumentOutOfRangeException()
     Dim Target(1 To 6) As String
-    Dim List As New ArrayList
-    List.Add "Item1"
-    List.Add "Item2"
-    List.Add "Item3"
+    Dim list As New ArrayList
+    list.Add "Item1"
+    list.Add "Item2"
+    list.Add "Item3"
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     
     On Error Resume Next
     Adapter.CopyTo Target, 0
@@ -184,9 +184,9 @@ Public Sub CopyTo_WithArrayIndexLessThanLowerBound_ThrowsArgumentOutOfRangeExcep
 End Sub
 
 Public Sub GetEnumerator_WhenCalled_ReturnsEnumerableSequence()
-    Dim List As New ArrayList
+    Dim list As New ArrayList
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     Adapter.AddRange Array("Item1", "Item2", "Item3")
     
     Dim Actual As IEnumerator
@@ -218,21 +218,21 @@ Public Sub GetEnumerater_WithSubset_REturnsEnumerableSubset()
 End Sub
 
 Public Sub Insert_WithArray_InsertsValues()
-    Dim List As New ArrayList
-    List.AddRange NewLongs(1, 2, 3, 4)
+    Dim list As New ArrayList
+    list.AddRange NewLongs(1, 2, 3, 4)
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     
     Adapter.Insertrange 0, NewStrings("Item1", "Item2", "Item3")
     
-    Assert.That List, Iz.EqualTo(Array("Item1", "Item2", "Item3", 1, 2, 3, 4))
+    Assert.That list, Iz.EqualTo(Array("Item1", "Item2", "Item3", 1, 2, 3, 4))
 End Sub
 
 Public Sub InsertRange_WithCollection_InsertsValues()
-    Dim List As New ArrayList
-    List.AddRange NewLongs(1, 2, 3, 4)
+    Dim list As New ArrayList
+    list.AddRange NewLongs(1, 2, 3, 4)
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     Dim col As New Collection
     col.Add "Item1"
     col.Add "Item2"
@@ -240,14 +240,14 @@ Public Sub InsertRange_WithCollection_InsertsValues()
     
     Adapter.Insertrange 2, col
     
-    Assert.That List, Iz.EqualTo(Array(1, 2, "Item1", "Item2", "Item3", 3, 4))
+    Assert.That list, Iz.EqualTo(Array(1, 2, "Item1", "Item2", "Item3", 3, 4))
 End Sub
 
 Public Sub Contains_WithExistingValue_ReturnsTrue()
-    Dim List As New ArrayList
-    List.AddRange NewLongs(1, 2, 3, 4)
+    Dim list As New ArrayList
+    list.AddRange NewLongs(1, 2, 3, 4)
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
 
     Dim Actual As Boolean
     Actual = Adapter.Contains(1&)
@@ -256,10 +256,10 @@ Public Sub Contains_WithExistingValue_ReturnsTrue()
 End Sub
 
 Public Sub Contains_WithNonExistingValue_ReturnsFalse()
-    Dim List As New ArrayList
-    List.AddRange NewLongs(1, 2, 3, 4)
+    Dim list As New ArrayList
+    list.AddRange NewLongs(1, 2, 3, 4)
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
 
     Dim Actual As Boolean
     Actual = Adapter.Contains(5)
@@ -400,10 +400,10 @@ Public Sub Insert_WhenCalledWithLastIndex_InsertsAtEnd()
 End Sub
 
 Public Sub BinarySearch_WithValues_ReturnsExpected(ByRef Elements As Variant, ByRef ValueToFind As Variant, ByVal Expected As Long)
-    Dim List As New ArrayList
-    List.AddRange Elements
+    Dim list As New ArrayList
+    list.AddRange Elements
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     
     Dim Actual As Long
     Actual = Adapter.BinarySearch(ValueToFind)
@@ -412,49 +412,49 @@ Public Sub BinarySearch_WithValues_ReturnsExpected(ByRef Elements As Variant, By
 End Sub
 
 Public Sub BinarySearch_WithSubsetValues_ReturnsExpected(ByRef Elements As Variant, ByVal ValueToFind As Integer, ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As Long)
-    Dim List As New ArrayList
-    List.AddRange Elements
+    Dim list As New ArrayList
+    list.AddRange Elements
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
     
     Dim Actual As Long
-    Actual = Adapter.BinarySearch(ValueToFind, StartIndex, Count)
+    Actual = Adapter.BinarySearchEx(ValueToFind, StartIndex, Count)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub BinarySearch_WithCountTooHigh_ThrowsArgumentException()
-    Dim List As New ArrayList
-    List.Capacity = 10
+    Dim list As New ArrayList
+    list.Capacity = 10
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
 
     On Error Resume Next
-    Adapter.BinarySearch 1, 0, 11
+    Adapter.BinarySearchEx 1, 0, 11
     
     AssertArgumentException Err
 End Sub
 
 Public Sub BinarySearch_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
-    Dim List As New ArrayList
-    List.Capacity = 10
+    Dim list As New ArrayList
+    list.Capacity = 10
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
 
     On Error Resume Next
-    Adapter.BinarySearch 1, -1, 1
+    Adapter.BinarySearchEx 1, -1, 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub BinarySearch_WithNegativeCount_ThrowsArgumentOutOfRangeException()
-    Dim List As New ArrayList
-    List.Capacity = 10
+    Dim list As New ArrayList
+    list.Capacity = 10
     Dim Adapter As ArrayList
-    Set Adapter = ArrayList.Adapter(List)
+    Set Adapter = ArrayList.Adapter(list)
 
     On Error Resume Next
-    Adapter.BinarySearch 1, 0, -1
+    Adapter.BinarySearchEx 1, 0, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
@@ -478,7 +478,7 @@ Public Sub Sort_WithSubset_SortsSubset()
 End Sub
 
 Private Function MakeFilledAdapter() As ArrayList
-    Dim List As New ArrayList
-    List.AddRange Array(1, 2, 3, 4, 1, 2, 3, 4)
-    Set MakeFilledAdapter = ArrayList.Adapter(List)
+    Dim list As New ArrayList
+    list.AddRange Array(1, 2, 3, 4, 1, 2, 3, 4)
+    Set MakeFilledAdapter = ArrayList.Adapter(list)
 End Function
