@@ -23,10 +23,10 @@ Attribute VB_Name = "Contract"
 '
 Option Explicit
 
-Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As ResourceStringId, Optional ByVal Parameter As ParameterResourceId = Param_None)
+Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As ResourceStringId, Optional ByVal Parameter As Param = Param.None)
     If FailingCondition Then
         Dim ParameterName As String
-        If Parameter <> Param_None Then
+        If Parameter <> Param.None Then
             ParameterName = Resources.GetParameter(Parameter)
         End If
         
@@ -34,25 +34,25 @@ Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As Res
     End If
 End Sub
 
-Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As ParameterResourceId, Optional ByVal Message As ResourceStringId = ArgumentNull_Generic)
+Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ResourceStringId = ArgumentNull_Generic)
     If ValueToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
     End If
 End Sub
 
-Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
+Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As Param, ByVal Message As ResourceStringId)
     If FailingCondition Then
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(Parameter), Message:=Resources.GetString(Message))
     End If
 End Sub
 
-Public Sub CheckEmpty(ByRef StringToCheck As String, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
+Public Sub CheckEmpty(ByRef StringToCheck As String, ByVal Parameter As Param, ByVal Message As ResourceStringId)
     If LenB(StringToCheck) = 0 Then
         Throw Cor.NewArgumentException(Resources.GetString(Message), Resources.GetString(Parameter))
     End If
 End Sub
 
-Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As ParameterResourceId = Param_Bytes)
+Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As Param = Param.Bytes)
     Dim Ptr As Long
     Ptr = GetArrayPointer(ArrayToCheck)
     
@@ -64,13 +64,13 @@ Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As Param
     End If
 End Sub
 
-Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index, Optional ByVal CountParameter As ParameterResourceId = Param_Count, Optional ByVal ArrayParameter As ParameterResourceId = Param_Bytes)
-    CheckRange Index >= LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
-    CheckRange Count >= 0, CountParameter, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Index + Count <= (UBound(ArrayToCheck) - LBound(ArrayToCheck) + 1), ArrayParameter, ArgumentOutOfRange_IndexLength
+Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As Param = Param.Index, Optional ByVal CountParameter As Param = Param.Count, Optional ByVal ArrayParameter As Param = Param.Bytes)
+    CheckRange Index < LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
+    CheckRange Count < 0, CountParameter, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Index + Count > UBound(ArrayToCheck) + 1, ArrayParameter, ArgumentOutOfRange_IndexLength
 End Sub
 
-Public Sub CheckArrayIndex(ByRef ArrayToCheck As Variant, ByVal Index As Long, Optional ByVal IndexParameter As ParameterResourceId = Param_Index)
-    CheckRange Index >= LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
-    CheckRange Index <= UBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_UBound
+Public Sub CheckArrayIndex(ByRef ArrayToCheck As Variant, ByVal Index As Long, Optional ByVal IndexParameter As Param = Param.Index)
+    CheckRange Index < LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
+    CheckRange Index > UBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_UBound
 End Sub
