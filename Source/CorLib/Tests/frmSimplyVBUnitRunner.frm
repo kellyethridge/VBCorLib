@@ -53,6 +53,7 @@ Option Explicit
 '   5. Add public subs of the tests you want run. No parameters.
 
 Private Sub Form_Load()
+    Dim Suite As TestSuite
     
     ' Add test cases here.
     '
@@ -107,20 +108,27 @@ Private Sub Form_Load()
     AddTest System
     
     Dim Collections As TestSuite
-    Set Collections = Sim.NewTestSuite("System.Collections")
-    Collections.Add New BitArrayTests
-    Collections.Add New TestSortedList
-    Collections.Add New TestQueue
-    Collections.Add New TestStack
-    Collections.Add New TestDefaultComparer
-    Collections.Add New TestCaseInsensitiveHCP
-
-'    Collections.Add NewSuite("ArrayList", New ArrayListTests, New ArrayListAdapterTests, New RangedArrayListTests)
-    Collections.Add CreateArrayListTestSuite
-    Collections.Add NewSuite("Hashtable", New TestHashTable, New TestHashTableHCP, New TestDictionaryEntry)
-    
-    AddTest Collections
+    With Sim.NewTestSuite("System.Collections")
+        .Add New BitArrayTests
+        .Add New TestSortedList
+        .Add New TestQueue
+        .Add New TestStack
+        .Add New TestDefaultComparer
+        .Add New TestCaseInsensitiveHCP
         
+        With Sim.NewTestSuite("ArrayList")
+            .Add New ArrayListTests
+            .Add New ArrayListAdapterTests
+            .Add New ArrayListRangedTests
+            .Add New ArrayListRepeatTests
+            Set Suite = .This
+        End With
+        .Add Suite
+        .Add NewSuite("Hashtable", New TestHashTable, New TestHashTableHCP, New TestDictionaryEntry)
+    
+        AddTest .This
+    End With
+    
     Dim Cyrptography As TestSuite
     Set Cyrptography = Sim.NewTestSuite("System.Security.Cryptography")
     Set Cyrptography.Categories = Sim.NewCategorization(CATEGORY_CRYPTOGRAPHY, True)
@@ -324,18 +332,6 @@ Private Function NewSuite(ByVal Name As String, ParamArray Fixtures() As Variant
     
     Set NewSuite = Suite
 End Function
-
-Private Function CreateArrayListTestSuite() As TestSuite
-    With Sim.NewTestSuite("ArrayList")
-        .Add New ArrayListTests
-        .Add New ArrayListAdapterTests
-        .Add New RangedArrayListTests
-        .Add New ArrayListRepeatTests
-        
-        Set CreateArrayListTestSuite = .This
-    End With
-End Function
-
 
 Private Sub Form_Initialize()
     Me.UIRunner1.Init App
