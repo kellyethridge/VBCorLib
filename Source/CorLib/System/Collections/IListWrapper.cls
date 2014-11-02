@@ -150,8 +150,8 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
     Dim LowIndex    As Long
     Dim HighIndex   As Long
     
-    CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Index < 0, Param.Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
     CheckArgument Index + Count > mList.Count, Argument_InvalidOffLen
     
     If Comparer Is Nothing Then

@@ -90,7 +90,7 @@ End Function
 ' @return A new ArrayList.
 '
 Public Function Repeat(ByRef Value As Variant, ByVal Count As Long) As ArrayList
-    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
     
     Set Repeat = New ArrayList
     Repeat.Capacity = Count
@@ -110,7 +110,7 @@ End Function
 ' ArrayList instance would be used instead.
 '
 Public Function Adapter(ByVal List As IList) As ArrayList
-    CheckNull List, Param_List
+    CheckNull List, Param.List
     
     Dim Wrapper As New IListWrapper
     Wrapper.Init List

@@ -155,8 +155,8 @@ End Function
 ' @see IComparable
 ' @include "..\..\Includes\ArrayListBinarySearch.txt"
 Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Index < 0, Param.Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
     CheckArgument Index + Count > mCount, Argument_InvalidOffLen
 
     If mCount = 0 Then
@@ -190,7 +190,7 @@ End Property
 ' If the capacity is set to zero, then it is set to the default capacity (16).
 ' @include "..\..\Includes\ArrayListCapacity.txt"
 Public Property Let Capacity(ByVal Value As Long)
-    CheckRange Value < mCount, Param_Value, ArgumentOutOfRange_SmallCapacity
+    CheckRange Value < mCount, Param.Value, ArgumentOutOfRange_SmallCapacity
     
     If Value = 0 Then
         Value = DEF_CAPACITY
@@ -258,7 +258,7 @@ End Function
 ' the items from that index on.
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
-    CheckArray Arr, Param_Arr
+    CheckArray Arr, Param.Arr
     cArray.CopyEx mItems, 0, Arr, GetOptionalLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
 
@@ -309,8 +309,8 @@ End Function
 Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, 0, mCount)
-    CheckRange Range.Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Range.Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Range.Index < 0, Param.Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Range.Count < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
     CheckArgument Range.Index + Range.Count > mCount, Argument_InvalidOffLen
     
     Dim Ret As New ArrayListEnumerator
@@ -339,8 +339,8 @@ End Function
 ' is thrown the next time the ranged view is accessed.
 '
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Index < 0, Param.Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
     CheckArgument Index + Count > mCount, Argument_InvalidOffLen
     
     Dim Ranged As New RangedArrayList

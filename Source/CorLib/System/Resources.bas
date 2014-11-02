@@ -124,20 +124,20 @@ Public Enum ResourceStringId
     ObjectDisposed_StreamClosed = 1200
 End Enum
 
-Public Enum ParameterResourceId
-    Param_None = 0
-    Param_Index = 2000
-    Param_Count = 2001
-    Param_StartIndex = 2002
-    Param_Chars = 2003
-    Param_CharIndex = 2004
-    Param_CharCount = 2005
-    Param_ByteIndex = 2006
-    Param_Bytes = 2007
-    Param_ByteCount = 2008
-    Param_Value = 2009
-    Param_Arr = 2010
-    Param_List = 2011
+Public Enum Param
+    None = 0
+    Index = 2000
+    Count = 2001
+    StartIndex = 2002
+    Chars = 2003
+    CharIndex = 2004
+    CharCount = 2005
+    ByteIndex = 2006
+    Bytes = 2007
+    ByteCount = 2008
+    Value = 2009
+    Arr = 2010
+    List = 2011
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
@@ -146,7 +146,7 @@ Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args(
     GetString = cString.FormatArray(LoadResString(ResourceId), vArgs)
 End Function
 
-Public Function GetParameter(ByVal ParameterId As ParameterResourceId) As String
+Public Function GetParameter(ByVal ParameterId As Param) As String
     GetParameter = LoadResString(ParameterId)
 End Function
 
