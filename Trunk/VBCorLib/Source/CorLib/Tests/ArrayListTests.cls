@@ -136,6 +136,50 @@ Public Sub Add_WithMultipleValues_AppendsToList()
     Assert.That List(1), Iz.EqualTo("Item2")
 End Sub
 
+Public Sub ItemGet_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    On Error GoTo errTrap
+    
+    Dim Value As Variant
+    Value = List(-1)
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub ItemGet_WithIndexGreaterThanOrEqualToCount_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    List.Add 1
+    On Error GoTo errTrap
+    
+    Dim Value As Variant
+    Value = List(1)
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub ItemSet_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    On Error GoTo errTrap
+    
+    List(-1) = 1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub ItemSet_WithIndexGreaterThanOrEqualToCount_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    List.Add 1
+    On Error GoTo errTrap
+    
+    List(1) = 2
+
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
 Public Sub AddRange_WithCollection_AppendsToList()
     Dim Source As New Collection
     Source.Add 1
@@ -252,7 +296,7 @@ Public Sub InsertRange_WhenArray_InsertsItems()
     Dim List As New ArrayList
     List.AddRange NewLongs(1, 2, 3, 4)
     
-    List.Insertrange 2, NewStrings("Item1", "Item2")
+    List.InsertRange 2, NewStrings("Item1", "Item2")
     
     Assert.That List, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
 End Sub
@@ -264,9 +308,30 @@ Public Sub InsertRange_WithCollection_InsertsItems()
     col.Add "Item1"
     col.Add "Item2"
     
-    List.Insertrange 2, col
+    List.InsertRange 2, col
     
     Assert.That List, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
+End Sub
+
+Public Sub InsertRange_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    On Error GoTo errTrap
+    
+    List.InsertRange -1, NewLongs(1, 2)
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub InsertRange_WithIndexMoreThanCount_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    List.Add 1
+    On Error GoTo errTrap
+    
+    List.InsertRange 2, NewLongs(1, 2)
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Contains_WithExistingValue_ReturnsTrue()
@@ -318,7 +383,7 @@ Public Sub IndexOf_WithSubsetSearch_ReturnsExpected(ByVal Value As Long, ByVal E
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IndexOf_WithNegativeStartIndex_Throws()
+Public Sub IndexOf_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -328,7 +393,7 @@ Public Sub IndexOf_WithNegativeStartIndex_Throws()
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub IndexOf_WithStartIndexEqualToCount_Throws()
+Public Sub IndexOf_WithStartIndexEqualToCount_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -338,7 +403,7 @@ Public Sub IndexOf_WithStartIndexEqualToCount_Throws()
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub IndexOf_WithNegativeCount_Throws()
+Public Sub IndexOf_WithNegativeCount_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -348,7 +413,7 @@ Public Sub IndexOf_WithNegativeCount_Throws()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub IndexOf_WithInvalidRange_Throws()
+Public Sub IndexOf_WithInvalidRange_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -388,7 +453,7 @@ Public Sub LastIndexOf_WithSubsetSearch_ReturnsExpected(ByVal Value As Long, ByV
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub LastIndexOf_WithNegativeStartIndex_Throws()
+Public Sub LastIndexOf_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -398,7 +463,7 @@ Public Sub LastIndexOf_WithNegativeStartIndex_Throws()
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub LastIndexOf_WithStartIndexEqualToCount_Throws()
+Public Sub LastIndexOf_WithStartIndexEqualToCount_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -408,7 +473,7 @@ Public Sub LastIndexOf_WithStartIndexEqualToCount_Throws()
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub LastIndexOf_WithNegativeCount_Throws()
+Public Sub LastIndexOf_WithNegativeCount_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -418,7 +483,7 @@ Public Sub LastIndexOf_WithNegativeCount_Throws()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub LastIndexOf_WithInvalidRange_Throws()
+Public Sub LastIndexOf_WithInvalidRange_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -485,7 +550,7 @@ Public Sub RemoveRange_WithNegativeIndex_Throws()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub RemoveRange_WithNegativeCount_Throws()
+Public Sub RemoveRange_WithNegativeCount_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -495,7 +560,7 @@ Public Sub RemoveRange_WithNegativeCount_Throws()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub RemoveRange_WithRangeExtendingPassedEnd_Throws()
+Public Sub RemoveRange_WithRangeExtendingPassedEnd_ThrowsArgumentException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
