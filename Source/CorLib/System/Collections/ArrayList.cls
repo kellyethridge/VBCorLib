@@ -190,8 +190,7 @@ End Property
 ' If the capacity is set to zero, then it is set to the default capacity (16).
 ' @include "..\..\Includes\ArrayListCapacity.txt"
 Public Property Let Capacity(ByVal Value As Long)
-    If Value < mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Value, Resources.GetString(ArgumentOutOfRange_SmallCapacity))
+    CheckRange Value < mCount, Param_Value, ArgumentOutOfRange_SmallCapacity
     
     If Value = 0 Then
         Value = DEF_CAPACITY
@@ -252,30 +251,28 @@ End Function
 ''
 ' Copies all of the items to an array.
 '
-' @param dstArray The array to copy the items to.
-' @param arrayindex  The index to start copying items to in the destination array.
+' @param Arr The array to copy the items to.
+' @param ArrayIndex  The index to start copying items to in the destination array.
 ' @remarks The destination array must be large enough to hold all of the items. If an
 ' arrayindex is specified, then the destination array must be large enough to hold all of
 ' the items from that index on.
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
-Public Sub CopyTo(ByRef DstArray As Variant, Optional ByRef ArrayIndex As Variant)
-    If cArray.IsNull(DstArray) Then _
-        Throw Cor.NewArgumentNullException("DstArray", Resources.GetString(ArgumentNull_Array))
-    
-    cArray.CopyEx mItems, 0, DstArray, GetOptionalLong(ArrayIndex, LBound(DstArray)), mCount
+Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
+    CheckArray Arr, Param_Arr
+    cArray.CopyEx mItems, 0, Arr, GetOptionalLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
 
 ''
 ' Copies a specified number of the items to an Array.
 '
-' @param index The starting index in the list to start copying from.
-' @param dstArray The array to copy the items to.
-' @param arrayindex The index in the destination array to start copying items to.
-' @param count The number of items to copy.
+' @param Index The starting index in the list to start copying from.
+' @param Arr The array to copy the items to.
+' @param ArrayIndex The index in the destination array to start copying items to.
+' @param Count The number of items to copy.
 ' @remarks The destination array must be large enough to hold the number of elements being copied.
 '
-Public Sub CopyToEx(ByVal Index As Long, ByRef DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    cArray.CopyEx mItems, Index, DstArray, ArrayIndex, Count
+Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
+    cArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
 End Sub
 
 ''
