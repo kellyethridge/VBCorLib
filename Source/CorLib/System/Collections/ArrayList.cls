@@ -362,18 +362,12 @@ End Function
 Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    
     ElemIndex = GetOptionalLong(StartIndex, 0)
     ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
-    
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
+    CheckRange ElemIndex < 0, Param.StartIndex, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange ElemIndex >= mCount, Param.StartIndex, ArgumentOutOfRange_LargerThanCollection
+    CheckRange ElemCount < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange ElemIndex + ElemCount > mCount, Param.Count, ArgumentOutOfRange_LargerThanCollection
     
     If mCount = 0 Then
         IndexOf = -1
@@ -396,13 +390,8 @@ End Function
 ' are moved out by one space. If capacity is reached, the list will be reallocated.
 '
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
-    If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_ArrayListInsert))
-    
-    If mCount = mCapacity Then
-        EnsureCapacity mCount + 1
-    End If
-    
+    CheckRange Index < 0 Or Index > mCount, Param.Index, ArgumentOutOfRange_ArrayListInsert
+    EnsureCapacity mCount + 1
     InsertSpace Index, 1
     VariantCopyInd mItems(Index), Value
     mCount = mCount + 1
@@ -423,9 +412,7 @@ End Sub
 ' or an <b>Array</b>.
 '
 Public Sub InsertRange(ByVal Index As Long, ByRef c As Variant)
-    If Index < 0 Or Index > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_ArrayListInsert))
-    
+    CheckRange Index < 0 Or Index > mCount, Param.Index, ArgumentOutOfRange_ArrayListInsert
     WriteRange Index, c, True
     mVersion = mVersion + 1
 End Sub
@@ -464,9 +451,7 @@ End Property
 '
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
-    If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
-    
+    CheckRange Index < 0 Or Index >= mCount, Param.Index, ArgumentOutOfRange_Index
     VariantCopy Item, mItems(Index)
 End Property
 
@@ -481,9 +466,7 @@ End Property
 ' The index is zero-based.
 '
 Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
-    If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
-    
+    CheckRange Index < 0 Or Index >= mCount, Param.Index, ArgumentOutOfRange_Index
     mItems(Index) = Value
     mVersion = mVersion + 1
 End Property
@@ -499,9 +482,7 @@ End Property
 ' The index is zero-based.
 '
 Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
-    If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
-    
+    CheckRange Index < 0 Or Index >= mCount, Param.Index, ArgumentOutOfRange_Index
     Set mItems(Index) = Value
     mVersion = mVersion + 1
 End Property
@@ -520,18 +501,12 @@ End Property
 Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
     Dim ElemIndex As Long
     Dim ElemCount As Long
-    
     ElemIndex = GetOptionalLong(StartIndex, mCount - 1)
     ElemCount = GetOptionalLong(Count, ElemIndex + 1)
-    
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex - ElemCount + 1 < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_LargerThanCollection))
+    CheckRange ElemIndex < 0, Param.StartIndex, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange ElemIndex >= mCount, Param.StartIndex, ArgumentOutOfRange_LargerThanCollection
+    CheckRange ElemCount < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange ElemIndex - ElemCount + 1 < 0, Param.Count, ArgumentOutOfRange_LargerThanCollection
     
     If mCount = 0 Then
         LastIndexOf = -1
@@ -589,8 +564,7 @@ End Sub
 ' relative to the other items.
 '
 Public Sub RemoveAt(ByVal Index As Long)
-    If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_Index))
+    CheckRange Index < 0 Or Index >= mCount, Param.Index, ArgumentOutOfRange_Index
     
     mItems(Index) = Empty
     RemoveSpace Index, 1
@@ -841,18 +815,12 @@ Private Sub WriteICollection(ByVal Index As Long, ByVal CollectionToInsert As IC
 End Sub
 
 Private Sub WriteCollection(ByVal Index As Long, ByVal SizeOfCollection As Long, ByRef CollectionToWrite As Variant, ByVal Insert As Boolean)
-    If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-        
     If Insert Then
         EnsureCapacity mCount + SizeOfCollection
         InsertSpace Index, SizeOfCollection
         mCount = mCount + SizeOfCollection
     End If
         
-    If Index + SizeOfCollection > mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_Index))
-    
     Dim Value As Variant
     For Each Value In CollectionToWrite
         Helper.MoveVariant mItems(Index), Value
