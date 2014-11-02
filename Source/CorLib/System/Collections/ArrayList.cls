@@ -307,21 +307,14 @@ End Function
 ' to the For..Each. This allows for a portion of the list to be enumerated.
 ' @include "..\..\Includes\ArrayListGetEnumerator.txt"
 Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    
-    ElemIndex = GetOptionalLong(Index, 0)
-    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
-    
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+    Dim Range As ListRange
+    Range = GetOptionalRange(Index, Count, 0, mCount)
+    CheckRange Range.Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Range.Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckArgument Range.Index + Range.Count > mCount, Argument_InvalidOffLen
     
     Dim Ret As New ArrayListEnumerator
-    Ret.Init Me, ElemIndex, ElemCount
+    Ret.Init Me, Range.Index, Range.Count
     Set GetEnumerator = Ret
 End Function
 
@@ -346,12 +339,9 @@ End Function
 ' is thrown the next time the ranged view is accessed.
 '
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
-    If Index + Count > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+    CheckRange Index < 0, Param_Index, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param_Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckArgument Index + Count > mCount, Argument_InvalidOffLen
     
     Dim Ranged As New RangedArrayList
     Ranged.Init Me, Index, Count
@@ -875,8 +865,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    ReDim mItems(0 To DEF_CAPACITY - 1)
-    mCapacity = DEF_CAPACITY
+    Capacity = DEF_CAPACITY
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)

@@ -75,37 +75,65 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Constructor_WhenCalled_CreatesEmptyList()
-    Dim list As ArrayList
+    Dim List As ArrayList
     
-    Set list = New ArrayList
+    Set List = New ArrayList
     
-    Assert.That list.Count, Iz.EqualTo(0)
+    Assert.That List.Count, Iz.EqualTo(0)
+End Sub
+
+Public Sub Constructor_WhenCalled_SetsDefaultCapacity()
+    Dim List As New ArrayList
+    
+    Dim Actual As Long
+    Actual = List.Capacity
+    
+    Assert.That Actual, Iz.EqualTo(16)
+End Sub
+
+Public Sub Capacity_WhenSetLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    On Error GoTo errTrap
+    
+    List.Capacity = -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub Capacity_WhenSetToZero_SetsToDefault()
+    Dim List As New ArrayList
+    List.Capacity = 1
+    
+    List.Capacity = 0
+    
+    Assert.That List.Capacity, Iz.EqualTo(16)
 End Sub
 
 Public Sub Add_WithValue_IncreasesCount()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
-    list.Add 1
+    List.Add 1
     
-    Assert.That list.Count, Iz.EqualTo(1)
+    Assert.That List.Count, Iz.EqualTo(1)
 End Sub
 
 Public Sub Add_WithValue_AppendsToList()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
-    list.Add 1
+    List.Add 1
     
-    Assert.That list.Item(0), Iz.EqualTo(1)
+    Assert.That List.Item(0), Iz.EqualTo(1)
 End Sub
 
 Public Sub Add_WithMultipleValues_AppendsToList()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
-    list.Add 1
-    list.Add "Item2"
+    List.Add 1
+    List.Add "Item2"
     
-    Assert.That list(0), Iz.EqualTo(1)
-    Assert.That list(1), Iz.EqualTo("Item2")
+    Assert.That List(0), Iz.EqualTo(1)
+    Assert.That List(1), Iz.EqualTo("Item2")
 End Sub
 
 Public Sub AddRange_WithCollection_AppendsToList()
@@ -113,91 +141,102 @@ Public Sub AddRange_WithCollection_AppendsToList()
     Source.Add 1
     Source.Add 2
     Source.Add 3
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
-    list.AddRange Source
+    List.AddRange Source
     
-    Assert.That list.Count, Iz.EqualTo(3)
-    Assert.That list(0), Iz.EqualTo(1)
-    Assert.That list(1), Iz.EqualTo(2)
-    Assert.That list(2), Iz.EqualTo(3)
+    Assert.That List.Count, Iz.EqualTo(3)
+    Assert.That List(0), Iz.EqualTo(1)
+    Assert.That List(1), Iz.EqualTo(2)
+    Assert.That List(2), Iz.EqualTo(3)
 End Sub
 
 Public Sub AddRange_WithArray_AppendsToList()
     Dim Source() As Long
     Source = NewLongs(1, 2, 3)
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
-    list.AddRange Source
+    List.AddRange Source
     
-    Assert.That list.Count, Iz.EqualTo(3)
-    Assert.That list(0), Iz.EqualTo(1)
-    Assert.That list(1), Iz.EqualTo(2)
-    Assert.That list(2), Iz.EqualTo(3)
+    Assert.That List.Count, Iz.EqualTo(3)
+    Assert.That List(0), Iz.EqualTo(1)
+    Assert.That List(1), Iz.EqualTo(2)
+    Assert.That List(2), Iz.EqualTo(3)
 End Sub
 
 Public Sub AddRange_WithICollection_AppendsToList()
     Dim Source As New ArrayList
     Source.AddRange NewLongs(1, 2, 3)
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
-    list.AddRange Source
+    List.AddRange Source
     
-    Assert.That list.Count, Iz.EqualTo(3)
-    Assert.That list(0), Iz.EqualTo(1)
-    Assert.That list(1), Iz.EqualTo(2)
-    Assert.That list(2), Iz.EqualTo(3)
+    Assert.That List.Count, Iz.EqualTo(3)
+    Assert.That List(0), Iz.EqualTo(1)
+    Assert.That List(1), Iz.EqualTo(2)
+    Assert.That List(2), Iz.EqualTo(3)
 End Sub
 
 Public Sub Set_WithExistingItem_ReplacesItem()
-    Dim list As New ArrayList
-    list.AddRange NewLongs(1, 2, 3)
+    Dim List As New ArrayList
+    List.AddRange NewLongs(1, 2, 3)
     
-    list(2) = "Hello"
+    List(2) = "Hello"
     
-    Assert.That list, Iz.EqualTo(Array(1&, 2&, "Hello"))
+    Assert.That List, Iz.EqualTo(Array(1&, 2&, "Hello"))
 End Sub
 
 Public Sub Clear_WhenCalled_RemovedItemsFromList()
-    Dim list As New ArrayList
-    list.Add 1
+    Dim List As New ArrayList
+    List.Add 1
     
-    list.Clear
+    List.Clear
     
-    Assert.That list, Iz.Empty
+    Assert.That List, Iz.Empty
+End Sub
+
+Public Sub CopyTo_WithNullArray_ThrowsArgumentNullException()
+    On Error GoTo errTrap
+    Dim List As New ArrayList
+    
+    Dim NullTarget() As Variant
+    List.CopyTo NullTarget
+    
+errTrap:
+    AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub CopyTo_WhenCalled_CopiesItems()
-    Dim list As New ArrayList
-    list.Add "Item1"
-    list.Add "Item2"
-    list.Add "Item3"
+    Dim List As New ArrayList
+    List.Add "Item1"
+    List.Add "Item2"
+    List.Add "Item3"
     Dim Target(2) As String
     
-    list.CopyTo Target
+    List.CopyTo Target
     
     Assert.That Target, Iz.EqualTo(NewStrings("Item1", "Item2", "Item3"))
 End Sub
 
 Public Sub CopyTo_WithIndexOffset_CopiesItems()
-    Dim list As New ArrayList
-    list.Add "Item1"
-    list.Add "Item2"
-    list.Add "Item3"
+    Dim List As New ArrayList
+    List.Add "Item1"
+    List.Add "Item2"
+    List.Add "Item3"
     Dim Target(5) As String
     
-    list.CopyTo Target, 2
+    List.CopyTo Target, 2
     
     Assert.That Target, Iz.EqualTo(NewStrings(vbNullString, vbNullString, "Item1", "Item2", "Item3", vbNullString))
 End Sub
 
 
 Public Sub GetEnumerator_WhenCalled_ReturnsEnumeration()
-    Dim list As New ArrayList
-    list.AddRange NewStrings("Item1", "Item2", "Item3")
+    Dim List As New ArrayList
+    List.AddRange NewStrings("Item1", "Item2", "Item3")
     Dim en As IEnumerator
     
-    Set en = list.GetEnumerator
+    Set en = List.GetEnumerator
     
     Assert.That en, Iz.Not.Nothing
     Assert.That en.MoveNext, Iz.True
@@ -210,381 +249,414 @@ Public Sub GetEnumerator_WhenCalled_ReturnsEnumeration()
 End Sub
 
 Public Sub InsertRange_WhenArray_InsertsItems()
-    Dim list As New ArrayList
-    list.AddRange NewLongs(1, 2, 3, 4)
+    Dim List As New ArrayList
+    List.AddRange NewLongs(1, 2, 3, 4)
     
-    list.Insertrange 2, NewStrings("Item1", "Item2")
+    List.Insertrange 2, NewStrings("Item1", "Item2")
     
-    Assert.That list, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
+    Assert.That List, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
 End Sub
 
 Public Sub InsertRange_WithCollection_InsertsItems()
-    Dim list As New ArrayList
-    list.AddRange NewLongs(1, 2, 3, 4)
+    Dim List As New ArrayList
+    List.AddRange NewLongs(1, 2, 3, 4)
     Dim col As New Collection
     col.Add "Item1"
     col.Add "Item2"
     
-    list.Insertrange 2, col
+    List.Insertrange 2, col
     
-    Assert.That list, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
+    Assert.That List, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
 End Sub
 
 Public Sub Contains_WithExistingValue_ReturnsTrue()
-    Dim list As New ArrayList
-    list.AddRange NewLongs(1, 2, 3)
+    Dim List As New ArrayList
+    List.AddRange NewLongs(1, 2, 3)
     
     Dim Actual As Boolean
-    Actual = list.Contains(1&)
+    Actual = List.Contains(1&)
     
     Assert.That Actual, Iz.True
 End Sub
 
 Public Sub Contains_WithNonExistingValue_ReturnsFalse()
-    Dim list As New ArrayList
-    list.AddRange NewLongs(1, 2, 3)
+    Dim List As New ArrayList
+    List.AddRange NewLongs(1, 2, 3)
     
     Dim Actual As Boolean
-    Actual = list.Contains(4&)
+    Actual = List.Contains(4&)
     
     Assert.That Actual, Iz.False
 End Sub
 
 Public Sub ToArray_WithEmptyList_ReturnsEmptyArray()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     Dim l() As Long
     
-    l = list.ToArray(vbLong)
+    l = List.ToArray(vbLong)
     
     Assert.That l, Iz.Empty
 End Sub
 
 Public Sub IndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     Dim Actual As Long
-    Actual = list.IndexOf(Value)
+    Actual = List.IndexOf(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub IndexOf_WithSubsetSearch_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     Dim Actual As Long
-    Actual = list.IndexOf(Value, 2, 4)
+    Actual = List.IndexOf(Value, 2, 4)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub IndexOf_WithNegativeStartIndex_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.IndexOf 1, -1, 1
+    List.IndexOf 1, -1, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub IndexOf_WithStartIndexEqualToCount_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.IndexOf 1, 10
+    List.IndexOf 1, 10
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub IndexOf_WithNegativeCount_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.IndexOf 1, 0, -1
+    List.IndexOf 1, 0, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub IndexOf_WithInvalidRange_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.IndexOf 1, 0, 11
+    List.IndexOf 1, 0, 11
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub IndexOf_WithStartIndex_ReturnsExpected()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     Dim Actual As Long
-    Actual = list.IndexOf(1&, 1)
+    Actual = List.IndexOf(1&, 1)
     
     Assert.That Actual, Iz.EqualTo(5)
 End Sub
 
 Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     Dim Actual As Long
-    Actual = list.LastIndexOf(Value)
+    Actual = List.LastIndexOf(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub LastIndexOf_WithSubsetSearch_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     Dim Actual As Long
-    Actual = list.LastIndexOf(Value, 6, 4)
+    Actual = List.LastIndexOf(Value, 6, 4)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub LastIndexOf_WithNegativeStartIndex_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.LastIndexOf 1, -1, 1
+    List.LastIndexOf 1, -1, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub LastIndexOf_WithStartIndexEqualToCount_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.LastIndexOf 1, 10, 1
+    List.LastIndexOf 1, 10, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub LastIndexOf_WithNegativeCount_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.LastIndexOf 1, 2, -1
+    List.LastIndexOf 1, 2, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub LastIndexOf_WithInvalidRange_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.LastIndexOf 1, 2, 4
+    List.LastIndexOf 1, 2, 4
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub LastIndexOf_WithStartIndex_ReturnsExpected()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     Dim Actual As Long
-    Actual = list.LastIndexOf(5&, 8)
+    Actual = List.LastIndexOf(5&, 8)
     
     Assert.That Actual, Iz.EqualTo(4)
 End Sub
 
 Public Sub RemoveAt_WithValues_RemovesExpectedItem(ByVal Index As Long, ByRef Expected As Variant)
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.RemoveAt Index
+    List.RemoveAt Index
     
-    Assert.That list, Iz.EqualTo(Expected)
+    Assert.That List, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub RemoveAt_WithInvalidIndex_ThrowsArgumentOutOfRangeException()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.RemoveAt -1
+    List.RemoveAt -1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Remove_WithValue_RemovesExpected()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.Remove 3&
+    List.Remove 3&
     
-    Assert.That list, Iz.EqualTo(NewLongs(1, 2, 4, 5, 1, 2, 3, 4, 5))
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 4, 5, 1, 2, 3, 4, 5))
 End Sub
 
 Public Sub RemoveRange_WithValidRange_RemovesItems()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.RemoveRange 1, 3
+    List.RemoveRange 1, 3
     
-    Assert.That list, Iz.EqualTo(NewLongs(1, 5, 1, 2, 3, 4, 5))
+    Assert.That List, Iz.EqualTo(NewLongs(1, 5, 1, 2, 3, 4, 5))
 End Sub
 
 Public Sub RemoveRange_WithNegativeIndex_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.RemoveRange -1, 3
+    List.RemoveRange -1, 3
 
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub RemoveRange_WithNegativeCount_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.RemoveRange 3, -1
+    List.RemoveRange 3, -1
 
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub RemoveRange_WithRangeExtendingPassedEnd_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.RemoveRange 9, 2
+    List.RemoveRange 9, 2
 
     AssertArgumentException Err
 End Sub
 
 Public Sub Reverse_WhenCalled_ReversesItems()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.Reverse
+    List.Reverse
     
-    Assert.That list, Iz.EqualTo(NewLongs(5, 4, 3, 2, 1, 5, 4, 3, 2, 1))
+    Assert.That List, Iz.EqualTo(NewLongs(5, 4, 3, 2, 1, 5, 4, 3, 2, 1))
 End Sub
 
 Public Sub Reverse_WithRangeSpecified_ReversesItemsInRange()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.Reverse 2, 3
+    List.Reverse 2, 3
     
-    Assert.That list, Iz.EqualTo(NewLongs(1, 2, 5, 4, 3, 1, 2, 3, 4, 5))
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 5, 4, 3, 1, 2, 3, 4, 5))
 End Sub
 
 Public Sub Reverse_WithNegativeIndex_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.Reverse -1, 1
+    List.Reverse -1, 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Reverse_WithNegativeCount_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.Reverse 0, -1
+    List.Reverse 0, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub Reverse_WithIndexAndCountExceedLength_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.Reverse 5, 6
+    List.Reverse 5, 6
     
     AssertArgumentException Err
 End Sub
 
 Public Sub ToArray_WhenCalled_ReturnsArrayOfItems()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     Dim Arr() As Long
     
-    Arr = list.ToArray(vbLong)
+    Arr = List.ToArray(vbLong)
     
     Assert.That Arr, Iz.EqualTo(NewLongs(1, 2, 3, 4, 5, 1, 2, 3, 4, 5))
 End Sub
 
 Public Sub SetRange_WhenItems_SetsRangeOfItems(ByRef Items As Variant)
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.SetRange 2, Items
+    List.SetRange 2, Items
     
-    Assert.That list, Iz.EqualTo(Array(1, 2, "Item1", "Item2", 5, 1, 2, 3, 4, 5))
+    Assert.That List, Iz.EqualTo(Array(1, 2, "Item1", "Item2", 5, 1, 2, 3, 4, 5))
 End Sub
 
 Public Sub SetRange_WithNullCollection_Throws()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.SetRange 0, Nothing
+    List.SetRange 0, Nothing
     
     AssertArgumentNullException Err, "c"
 End Sub
 
 Public Sub GetEnumerator_WithSubset_EnumeratesSubset()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     Dim Actual As Object
-    Set Actual = list.GetEnumerator(2, 4)
+    Set Actual = List.GetEnumerator(2, 4)
     
     Assert.That Actual, Iz.EqualTo(Array(3, 4, 5, 1))
 End Sub
 
+Public Sub GetEnumerator_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    On Error GoTo errTrap
+    
+    List.GetEnumerator -1, 1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub GetEnumerator_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    On Error GoTo errTrap
+    
+    List.GetEnumerator 0, -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub GetEnumerator_WithIndexPlusCountGreaterThanCount_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    On Error GoTo errTrap
+    
+    List.GetEnumerator 1, 10
+    
+errTrap:
+    AssertArgumentException Err
+End Sub
+
 Public Sub Insert_WithValue_InsertsIntoList(ByVal Index As Long, ByVal Value As Variant, ByRef Expected As Variant)
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.Insert Index, Value
+    List.Insert Index, Value
     
-    Assert.That list, Iz.EqualTo(Expected)
+    Assert.That List, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Insert_WithEmptyList_InsertsValue()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
-    list.Insert 0, "a"
+    List.Insert 0, "a"
     
-    Assert.That list, Iz.EqualTo(Array("a"))
+    Assert.That List, Iz.EqualTo(Array("a"))
 End Sub
 
 Public Sub Insert_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
     On Error Resume Next
-    list.Insert -1, "a"
+    List.Insert -1, "a"
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Insert_WithIndexLargerThanListSize_ThrowsArgumentOutOfRangeException()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
     On Error Resume Next
-    list.Insert 11, "a"
+    List.Insert 11, "a"
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
@@ -606,71 +678,71 @@ Public Sub TestSerialization()
 End Sub
 
 Public Sub BinarySearch_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
-    Dim list As ArrayList
-    Set list = MakeOrderedList
+    Dim List As ArrayList
+    Set List = MakeOrderedList
     
     Dim Actual As Long
-    Actual = list.BinarySearch(Value)
+    Actual = List.BinarySearch(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub BinarySearchEx_WithRangedValue_ReturnsExpected(ByVal Value As Long, ByVal Expected As Long)
-    Dim list As ArrayList
-    Set list = MakeOrderedList
+    Dim List As ArrayList
+    Set List = MakeOrderedList
     
     Dim Actual As Long
-    Actual = list.BinarySearchEx(1, 4, Value)
+    Actual = List.BinarySearchEx(1, 4, Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub BinarySearchEx_WithNegativeIndex_Throws()
-    Dim list As ArrayList
-    Set list = MakeOrderedList
+    Dim List As ArrayList
+    Set List = MakeOrderedList
     
     On Error Resume Next
-    list.BinarySearchEx -1, 1, 4
+    List.BinarySearchEx -1, 1, 4
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub BinarySearchEx_WithNegativeCount_Throws()
-    Dim list As ArrayList
-    Set list = MakeOrderedList
+Public Sub BinarySearchEx_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeOrderedList
     
     On Error Resume Next
-    list.BinarySearchEx 0, -1, 4
+    List.BinarySearchEx 0, -1, 4
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub BinarySearchEx_WithInvalidRange_Throws()
-    Dim list As ArrayList
-    Set list = MakeOrderedList
+Public Sub BinarySearchEx_WithInvalidRange_ThrowsThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeOrderedList
     
     On Error Resume Next
-    list.BinarySearchEx 1, 6, 4
+    List.BinarySearchEx 1, 6, 4
     
     AssertArgumentException Err
 End Sub
 
 Public Sub Sort_WhenCalled_OrdersItems()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.Sort
+    List.Sort
     
-    Assert.That list, Iz.Ordered
+    Assert.That List, Iz.Ordered
 End Sub
 
 Public Sub Sort_WithSortRange_OrdersItemsInRange()
-    Dim list As ArrayList
-    Set list = MakeFilledList
+    Dim List As ArrayList
+    Set List = MakeFilledList
     
-    list.Sort 2, 5
+    List.Sort 2, 5
     
-    Assert.That list, Iz.EqualTo(NewLongs(1, 2, 1, 2, 3, 4, 5, 3, 4, 5))
+    Assert.That List, Iz.EqualTo(NewLongs(1, 2, 1, 2, 3, 4, 5, 3, 4, 5))
 End Sub
 
 
