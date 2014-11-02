@@ -115,7 +115,8 @@ Private Sub Form_Load()
     Collections.Add New TestDefaultComparer
     Collections.Add New TestCaseInsensitiveHCP
 
-    Collections.Add NewSuite("ArrayList", New ArrayListTests, New ArrayListAdapterTests, New RangedArrayListTests)
+'    Collections.Add NewSuite("ArrayList", New ArrayListTests, New ArrayListAdapterTests, New RangedArrayListTests)
+    Collections.Add CreateArrayListTestSuite
     Collections.Add NewSuite("Hashtable", New TestHashTable, New TestHashTableHCP, New TestDictionaryEntry)
     
     AddTest Collections
@@ -322,6 +323,17 @@ Private Function NewSuite(ByVal Name As String, ParamArray Fixtures() As Variant
     Next
     
     Set NewSuite = Suite
+End Function
+
+Private Function CreateArrayListTestSuite() As TestSuite
+    With Sim.NewTestSuite("ArrayList")
+        .Add New ArrayListTests
+        .Add New ArrayListAdapterTests
+        .Add New RangedArrayListTests
+        .Add New ArrayListRepeatTests
+        
+        Set CreateArrayListTestSuite = .This
+    End With
 End Function
 
 

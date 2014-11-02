@@ -137,6 +137,7 @@ Public Enum ParameterResourceId
     Param_ByteCount = 2008
     Param_Value = 2009
     Param_Arr = 2010
+    Param_List = 2011
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String

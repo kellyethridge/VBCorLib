@@ -34,7 +34,7 @@ Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As Res
     End If
 End Sub
 
-Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As ParameterResourceId, ByVal Message As ResourceStringId)
+Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As ParameterResourceId, Optional ByVal Message As ResourceStringId = ArgumentNull_Generic)
     If ValueToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
     End If

@@ -35,6 +35,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
+Public Sub Adapter_WithNothing_ThrowsArgumentNullException()
+    On Error GoTo errTrap
+    
+    ArrayList.Adapter Nothing
+    
+errTrap:
+    AssertArgumentNullException Err, "List"
+End Sub
+
 Public Sub Count_WithEmptyList_ReturnsZero()
     Dim Adapted As ArrayList
     Set Adapted = ArrayList.Adapter(New ArrayList)
