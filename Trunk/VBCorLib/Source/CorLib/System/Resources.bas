@@ -26,6 +26,7 @@ Option Explicit
 
 Private Const ParamBase                 As Long = 2000
 Private Const ArgumentOutOfRangeBase    As Long = 700
+Private Const ArgumentBase              As Long = 800
 
 Public Enum ResourceStringId
     Exception_WasThrown = 101
@@ -178,6 +179,30 @@ Public Enum ArgumentOutOfRange
     ConsoleTitleTooLong
     ConsoleColor
     CursorSize
+End Enum
+
+Public Enum Argument
+    InvalidOffLen = ArgumentBase
+    ArrayPlusOffTooSmall
+    Exception
+    ArrayRequired
+    MatchingBounds
+    IndexPlusTypeSize
+    VersionRequired
+    TimeSpanRequired
+    DateRequired
+    InvalidHandle
+    EmptyPath
+    SmallConversionBuffer
+    EmptyFileName
+    ReadableStreamRequired
+    InvalidEraValue
+    ParamRequired
+    StreamRequired
+    InvalidPathFormat
+    StreamNotReadable
+    StreamNotWritable
+    StreamNotSeekable
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
