@@ -90,7 +90,7 @@ End Function
 ' @return A new ArrayList.
 '
 Public Function Repeat(ByRef Value As Variant, ByVal Count As Long) As ArrayList
-    CheckRange Count < 0, Param.Count, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange Count < 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
     
     Set Repeat = New ArrayList
     Repeat.Capacity = Count

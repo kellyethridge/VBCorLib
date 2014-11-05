@@ -320,7 +320,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
-    CheckRange ByteCount < 0, Param.ByteCount, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange ByteCount < 0, Param.ByteCount, ArgumentOutOfRange.NeedNonNegNum
     GetMaxCharCount = ByteCount
 End Function
 
@@ -332,7 +332,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
-    CheckRange CharCount < 0, Param.CharCount, ArgumentOutOfRange_NeedNonNegNum
+    CheckRange CharCount < 0, Param.CharCount, ArgumentOutOfRange.NeedNonNegNum
     GetMaxByteCount = CharCount
 End Function
 
