@@ -157,7 +157,7 @@ End Function
 Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     CheckRange Index < 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
     CheckRange Count < 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    CheckArgument Index + Count > mCount, Argument_InvalidOffLen
+    CheckArgument Index + Count > mCount, Argument.InvalidOffLen
 
     If mCount = 0 Then
         BinarySearchEx = -1
@@ -311,7 +311,7 @@ Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Co
     Range = GetOptionalRange(Index, Count, 0, mCount)
     CheckRange Range.Index < 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
     CheckRange Range.Count < 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    CheckArgument Range.Index + Range.Count > mCount, Argument_InvalidOffLen
+    CheckArgument Range.Index + Range.Count > mCount, Argument.InvalidOffLen
     
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, Range.Index, Range.Count
@@ -341,7 +341,7 @@ End Function
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
     CheckRange Index < 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
     CheckRange Count < 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    CheckArgument Index + Count > mCount, Argument_InvalidOffLen
+    CheckArgument Index + Count > mCount, Argument.InvalidOffLen
     
     Dim Ranged As New RangedArrayList
     Ranged.Init Me, Index, Count

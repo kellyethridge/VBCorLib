@@ -23,7 +23,7 @@ Attribute VB_Name = "Contract"
 '
 Option Explicit
 
-Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As ResourceStringId, Optional ByVal Parameter As Param = Param.None)
+Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As Argument, Optional ByVal Parameter As Param = Param.None)
     If FailingCondition Then
         Dim ParameterName As String
         If Parameter <> Param.None Then
@@ -40,7 +40,7 @@ Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As Param, Opt
     End If
 End Sub
 
-Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As Param, ByVal Message As ArgumentOutOfRangeMessage)
+Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As Param, ByVal Message As ArgumentOutOfRange)
     If FailingCondition Then
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(Parameter), Message:=Resources.GetString(Message))
     End If
