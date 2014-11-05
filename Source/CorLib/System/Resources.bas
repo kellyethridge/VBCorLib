@@ -24,6 +24,9 @@ Attribute VB_Name = "Resources"
 '
 Option Explicit
 
+Private Const ParamBase                 As Long = 2000
+Private Const ArgumentOutOfRangeBase    As Long = 700
+
 Public Enum ResourceStringId
     Exception_WasThrown = 101
     ArrayTypeMismatch_Incompatible = 102
@@ -126,18 +129,55 @@ End Enum
 
 Public Enum Param
     None = 0
-    Index = 2000
-    Count = 2001
-    StartIndex = 2002
-    Chars = 2003
-    CharIndex = 2004
-    CharCount = 2005
-    ByteIndex = 2006
+    Index = ParamBase
+    Count
+    StartIndex
+    Chars
+    CharIndex
+    CharCount
+    ByteIndex
     Bytes = 2007
-    ByteCount = 2008
-    Value = 2009
-    Arr = 2010
-    List = 2011
+    ByteCount
+    Value
+    Arr
+    List
+End Enum
+
+Public Enum ArgumentOutOfRange
+    MustBeNonNegNum = ArgumentOutOfRangeBase
+    SmallCapacity
+    NeedNonNegNum
+    ArrayListInsert
+    Index
+    LargerThanCollection
+    LowerBound
+    Exception
+    Range
+    UpperBound
+    MinMax
+    VersionFieldCount
+    ValidValues
+    NeedPosNum
+    OutsideConsoleBoundry
+    EnumType
+    ArrayLB
+    ArrayBounds
+    Count
+    NegativeLength
+    StartIndex
+    OffsetOut
+    IndexLength
+    InvalidFileTime
+    Month
+    Year
+    BeepFrequency
+    ConsoleBufferSize
+    ConsoleWindowSize_Size
+    ConsoleWindowPos
+    ConsoleBufferLessThanWindowSize
+    ConsoleTitleTooLong
+    ConsoleColor
+    CursorSize
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String

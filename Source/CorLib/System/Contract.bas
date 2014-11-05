@@ -40,7 +40,7 @@ Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As Param, Opt
     End If
 End Sub
 
-Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As Param, ByVal Message As ResourceStringId)
+Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As Param, ByVal Message As ArgumentOutOfRangeMessage)
     If FailingCondition Then
         Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(Parameter), Message:=Resources.GetString(Message))
     End If
@@ -65,12 +65,12 @@ Public Sub CheckArray(ByRef ArrayToCheck As Variant, Optional Parameter As Param
 End Sub
 
 Public Sub CheckArrayRange(ByRef ArrayToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal IndexParameter As Param = Param.Index, Optional ByVal CountParameter As Param = Param.Count, Optional ByVal ArrayParameter As Param = Param.Bytes)
-    CheckRange Index < LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
-    CheckRange Count < 0, CountParameter, ArgumentOutOfRange_NeedNonNegNum
-    CheckRange Index + Count > UBound(ArrayToCheck) + 1, ArrayParameter, ArgumentOutOfRange_IndexLength
+    CheckRange Index < LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange.LowerBound
+    CheckRange Count < 0, CountParameter, ArgumentOutOfRange.NeedNonNegNum
+    CheckRange Index + Count > UBound(ArrayToCheck) + 1, ArrayParameter, ArgumentOutOfRange.IndexLength
 End Sub
 
 Public Sub CheckArrayIndex(ByRef ArrayToCheck As Variant, ByVal Index As Long, Optional ByVal IndexParameter As Param = Param.Index)
-    CheckRange Index < LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_LBound
-    CheckRange Index > UBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange_UBound
+    CheckRange Index < LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange.LowerBound
+    CheckRange Index > UBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange.UpperBound
 End Sub
