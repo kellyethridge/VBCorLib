@@ -283,11 +283,11 @@ End Property
 ' @param ts The amount of time to add.
 ' @return The new date object containing the new calculated time.
 '
-Public Function Add(ByRef ts As TimeSpan) As cDateTime
-    If ts Is Nothing Then _
-        Throw Cor.NewArgumentNullException("ts", Environment.GetResourceString(ArgumentNull_TimeSpan, "ts"))
-    
-    Set Add = cDateTime.FromMilliseconds(mMilliseconds + ts.TotalMilliseconds, mKind)
+Public Function Add(ByRef Value As TimeSpan) As cDateTime
+    If Value Is Nothing Then _
+        Throw Cor.NewArgumentNullException(GetParameter(Param.Value), GetString(ArgumentNull_Generic))
+
+    Set Add = cDateTime.FromMilliseconds(mMilliseconds + Value.TotalMilliseconds, mKind)
 End Function
 
 ''
