@@ -17,6 +17,14 @@ Attribute VB_Exposed = False
 Option Explicit
 Private ts As TimeSpan
 
+Public Sub Constructor_WhenCalled_InitsToZero()
+    Dim Span As TimeSpan
+    
+    Set Span = New TimeSpan
+    
+    Assert.That Span.TotalMilliseconds, Iz.EqualTo(0)
+End Sub
+
 Public Sub TestZero()
     Set ts = TimeSpan.Zero
     Assert.AreEqual 0@, ts.TotalMilliseconds, "TotalMilliseconds should return 0."
