@@ -15,7 +15,20 @@ Attribute VB_Exposed = False
 ' TestTimeSpan
 '
 Option Explicit
+Implements ITestCaseSource
+
 Private ts As TimeSpan
+
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "FromMilliseconds_WithValues_ReturnsTimeSpanOfMilliseconds"
+            Test.Use 0
+            Test.Use 922337203685477.5807@
+            Test.Use -922337203685477.5807@
+            
+    End Select
+End Sub
 
 Public Sub Constructor_WhenCalled_InitsToZero()
     Dim Span As TimeSpan
@@ -25,9 +38,20 @@ Public Sub Constructor_WhenCalled_InitsToZero()
     Assert.That Span.TotalMilliseconds, Iz.EqualTo(0)
 End Sub
 
-Public Sub TestZero()
-    Set ts = TimeSpan.Zero
-    Assert.AreEqual 0@, ts.TotalMilliseconds, "TotalMilliseconds should return 0."
+Public Sub Zero_WhenCalled_ReturnsTimeSpanOfZero()
+    Dim Span As TimeSpan
+    
+    Set Span = TimeSpan.Zero
+    
+    Assert.That Span.TotalMilliseconds, Iz.EqualTo(0)
+End Sub
+
+Public Sub FromMilliseconds_WithValues_ReturnsTimeSpanOfMilliseconds(ByVal Milliseconds As Currency)
+    Dim Span As TimeSpan
+    
+    Set Span = TimeSpan.FromMilliseconds(Milliseconds)
+    
+    Assert.That Span.TotalMilliseconds, Iz.EqualTo(Milliseconds)
 End Sub
 
 Public Sub TestEquals()
@@ -115,4 +139,3 @@ Public Sub TestNotEqualTo()
     Set ts2 = TimeSpan.FromDays(2)
     Assert.IsTrue ts1.NotEqualTo(ts2), "ts1 should not be equal to ts2."
 End Sub
-

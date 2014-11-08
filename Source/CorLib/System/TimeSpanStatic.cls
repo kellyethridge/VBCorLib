@@ -47,12 +47,12 @@ Private Const MILLISECONDS_PER_MINUTE       As Long = MILLISECONDS_PER_SECOND * 
 Private Const MILLISECONDS_PER_HOUR         As Long = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
 Private Const MILLISECONDS_PER_DAY          As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
 
-Private mZero           As TimeSpan
+Private mZero           As New TimeSpan
+Private mStringBuilder  As New StringBuilder
+Private mParser         As New TimeSpanParser
 Private mMaxValue       As TimeSpan
 Private mMinValue       As TimeSpan
-Private mStringBuilder  As StringBuilder
 Private mMSPlaces()     As Currency
-Private mParser         As New TimeSpanParser
 
 
 ''
@@ -178,44 +178,6 @@ Public Function TryParse(ByVal s As String, ByRef RetVal As TimeSpan) As Boolean
     TryParse = mParser.TryParse(s, RetVal)
 End Function
 
-Private Function GetSign(ByRef Buf As WordBuffer, ByRef Pos As Long, ByRef RetVal As Currency) As Boolean
-    If Pos < Buf.SA.cElements Then
-        If Buf.Data(0) = vbMinus Then
-            RetVal = -1@
-            Pos = Pos + 1
-        Else
-            RetVal = 1@
-        End If
-        
-        GetSign = True
-    End If
-End Function
-
-Private Function GetNumber(ByRef Buf As WordBuffer, ByRef Pos As Long, ByRef RetVal As Long, ByVal MaxDigits As Long) As Boolean
-    Dim Result  As Long
-    Dim Index   As Long
-    Index = Pos
-    
-    Do While Index < Buf.SA.cElements
-        Select Case Buf.Data(Index)
-            Case vbZero To vbNine
-                Result = Result * 10 + (Buf.Data(Index) - vbZero)
-                
-            Case Else
-                Exit Do
-        
-        End Select
-        
-        Index = Index + 1
-    Loop
-    
-    If Index > Pos Then
-        Pos = Index
-        RetVal = Result
-        GetNumber = True
-    End If
-End Function
-
 ''
 ' Returns a TimeSpan object representing the time of day of the date.
 '
@@ -247,87 +209,10 @@ End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function NextIsColonOrEnd(ByRef Buf As WordBuffer, ByVal Pos As Long) As Boolean
-    Dim Result As Boolean
-    
-    If Pos >= Buf.SA.cElements Then
-        Result = True
-    Else
-        Result = (Buf.Data(Pos) = vbColon)
-    End If
-    
-    NextIsColonOrEnd = Result
-End Function
-
-Private Function GetFraction(ByRef Buf As WordBuffer, ByVal Pos As Long, ByRef Result As Currency) As Long
-    Dim ch      As Integer
-    Dim Ret     As Currency
-    Dim place   As Long
-    Dim Index   As Long
-    
-    If Pos >= Buf.SA.cElements Then Exit Function
-    
-    Index = Pos
-    ch = Buf.Data(Index)
-    
-    Do While ch <> 0 And place < 7
-        Select Case ch
-            Case vbZero To vbNine
-                Ret = Ret + mMSPlaces(place) * (ch - vbZero)
-                place = place + 1
-                
-            Case Else
-                Exit Function
-                
-        End Select
-        
-        Index = Index + 1
-        ch = Buf.Data(Index)
-    Loop
-    
-    Result = Ret
-    GetFraction = Index - Pos
-End Function
-
-Private Function GetComponent(ByRef Buf As WordBuffer, ByVal Pos As Long, ByRef Result As Long) As Long
-    Dim ch      As Integer
-    Dim Ret     As Long
-    Dim Index   As Long
-    
-    If Pos >= Buf.SA.cElements Then Exit Function
-    
-    Index = Pos
-    ch = Buf.Data(Index)
-    
-    Do
-        Select Case ch
-            Case vbZero To vbNine
-                Ret = Ret * 10 + ch - vbZero
-            
-            Case vbNullPtr, vbPeriod, vbColon
-                Result = Ret
-                GetComponent = Index - Pos
-                Exit Function
-                
-            Case Else
-                Exit Function
-        End Select
-        
-        Index = Index + 1
-        ch = Buf.Data(Index)
-    Loop
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mZero = New TimeSpan
     Set mMaxValue = FromMilliseconds(922337203685477.5807@)
     Set mMinValue = FromMilliseconds(-922337203685477.5807@ - 0.0001@)
-    Set mStringBuilder = New StringBuilder
     mMSPlaces = Cor.NewCurrencys(100@, 10@, 1@, 0.1@, 0.01@, 0.001@, 0.0001@)
 End Sub
