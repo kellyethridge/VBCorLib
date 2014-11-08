@@ -56,7 +56,8 @@ Private Const SECONDS_PER_MINUTE        As Long = 60
 Private Const MINUTES_PER_HOUR          As Long = 60
 Private Const HOURS_PER_DAY             As Long = 24
 
-Private Const TICKS_PER_MILLISECOND     As Currency = 0.0001@
+Private Const TICKS_PER_MILLISECOND     As Currency = 10000
+Private Const MILLISECONDS_PER_TICK     As Currency = 0.0001@
 Private Const MILLISECONDS_PER_SECOND   As Currency = 1000@
 Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
 Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
@@ -73,7 +74,11 @@ Private mMilliseconds As Currency
 ' @param ts TimeSpan to be added.
 ' @return A TimeSpan that represents the sum of the two timespans.
 Public Function Add(ByRef ts As TimeSpan) As TimeSpan
-    Set Add = TimeSpan.FromMilliseconds(mMilliseconds + ts.TotalMilliseconds)
+    If ts Is Nothing Then
+        Set Add = Me
+    Else
+        Set Add = TimeSpan.FromMilliseconds(mMilliseconds + ts.TotalMilliseconds)
+    End If
 End Function
 
 ''
@@ -82,7 +87,11 @@ End Function
 ' @param ts TimeSpan to be subtracted.
 ' @return TimeSpan with the subtracted value.
 Public Function Subtract(ByRef ts As TimeSpan) As TimeSpan
-    Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - ts.TotalMilliseconds)
+    If ts Is Nothing Then
+        Set Subtract = Me
+    Else
+        Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - ts.TotalMilliseconds)
+    End If
 End Function
 
 ''
@@ -152,7 +161,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Milliseconds() As Long
-    Milliseconds = AsLong(mMilliseconds * TICKS_PER_MILLISECOND) Mod 1000
+    Milliseconds = AsLong(mMilliseconds * MILLISECONDS_PER_TICK) Mod 1000
 End Property
 
 ''
@@ -201,7 +210,7 @@ End Property
 ' @return The duration in ticks
 ' @remarks A tick is defined as 100 nanoseconds, or 1/10000 of a millisecond.
 Public Property Get Ticks() As Variant
-    Ticks = CDec(mMilliseconds) * 10000
+    Ticks = CDec(mMilliseconds) * TICKS_PER_MILLISECOND
 End Property
 
 ''
@@ -299,13 +308,21 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        If TypeOf Value Is TimeSpan Then
-            Dim ts As TimeSpan
-            Set ts = Value
-            Equals = (mMilliseconds = ts.TotalMilliseconds)
-        End If
+    If Not IsObject(Value) Then
+        Exit Function
     End If
+    
+    If Value Is Nothing Then
+        Exit Function
+    End If
+    
+    If Not TypeOf Value Is TimeSpan Then
+        Exit Function
+    End If
+    
+    Dim Span As TimeSpan
+    Set Span = Value
+    Equals = (mMilliseconds = Span.TotalMilliseconds)
 End Function
 
 ''

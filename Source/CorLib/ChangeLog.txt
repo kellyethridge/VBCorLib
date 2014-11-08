@@ -10,3 +10,4 @@ Fixed ArrayList.SetRange when using ICollection source would insert instead of o
 Fixed MemoryStream SeekPosition when using FromEnd. Was off by 1.
 Fixed MemoryStream ReadBlock not honoring lower-bound of output buffer.
 Refactored ArrayList binary search method into BinarySearch and BinarySearchEx to require the index and count in a separate call. **
+TimeSpan.Add and TimeSpan.Subtract now support argument of Nothing as equating to zero.
