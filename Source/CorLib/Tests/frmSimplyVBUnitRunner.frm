@@ -78,7 +78,7 @@ Private Sub Form_Load()
     System.Add New TestMathExt
     System.Add New TestGuid
     System.Add New BitConverterTests
-    System.Add New TestcDateTime
+    System.Add New CDateTimeTests
     System.Add New TestEnvironment
     System.Add New TestTimeZone
 
@@ -100,7 +100,7 @@ Private Sub Form_Load()
     
     Dim TimeSpanTests As TestSuite
     Set TimeSpanTests = Sim.NewTestSuite("TimeSpan")
-    TimeSpanTests.Add New TestTimeSpan
+    TimeSpanTests.Add New TimeSpanTests
     TimeSpanTests.Add New TestTimeSpan994394150ms
     TimeSpanTests.Add New TestTimeSpanCreation
     System.Add TimeSpanTests
