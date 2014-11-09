@@ -225,29 +225,17 @@ End Property
 ' -1 = This instance is less than the passed in timespan.<br>
 ' <br><br>
 ' If <b>Nothing</b> is passed in 1 is returned.
-Public Function CompareTo(ByRef Value As Variant) As Long
-    Select Case VarType(Value)
-        Case vbObject
-            On Error GoTo errTrap
-            Dim ts As TimeSpan
-            Set ts = Value
-            If Not ts Is Nothing Then
-                Dim ms As Currency
-                ms = ts.TotalMilliseconds
-                If mMilliseconds > ms Then CompareTo = 1: Exit Function
-                If mMilliseconds < ms Then CompareTo = -1
-            Else
-                CompareTo = 1
-            End If
-        Case vbNull, vbEmpty, vbError
-            CompareTo = 1
-        Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_TimeSpanRequired))
-    End Select
-    Exit Function
+Public Function CompareTo(ByRef Value As TimeSpan) As Long
+    Dim OtherMilliseconds As Currency
+    If Not Value Is Nothing Then
+        OtherMilliseconds = Value.TotalMilliseconds
+    End If
     
-errTrap:
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_TimeSpanRequired))
+    If mMilliseconds < OtherMilliseconds Then
+        CompareTo = -1
+    ElseIf mMilliseconds > OtherMilliseconds Then
+        CompareTo = 1
+    End If
 End Function
 
 ''
@@ -297,6 +285,17 @@ Public Function ToString() As String
         strt = Frac * 10000
         Call sb.AppendChar(vbZero, 7 - Len(strt))
         Call sb.AppendQuick(strt)
+    Else
+        Dim TicksComponent As Long
+        TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TICKS_PER_MILLISECOND
+        If TicksComponent <> 0 Then
+            sb.AppendChar vbPeriod
+            
+            Dim TicksString As String
+            TicksString = TicksComponent
+            sb.AppendChar vbZero, 7 - Len(TicksString)
+            sb.AppendQuick TicksString
+        End If
     End If
     ToString = sb.ToString
 End Function
@@ -305,18 +304,10 @@ End Function
 ' Returns a boolean indicating if the value and this TimeSpan
 ' instance are the same value.
 '
-' @param value The value to compare equality to.
+' @param Value The value to compare equality to.
 ' @return Boolean indicating equality.
-Public Function Equals(ByRef Value As Variant) As Boolean
-    If Not IsObject(Value) Then
-        Exit Function
-    End If
-    
+Public Function Equals(ByRef Value As TimeSpan) As Boolean
     If Value Is Nothing Then
-        Exit Function
-    End If
-    
-    If Not TypeOf Value Is TimeSpan Then
         Exit Function
     End If
     
@@ -398,7 +389,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Days As Long, ByVal Hours As Long, ByVal Minutes As Long, ByVal Seconds As Long, ByVal Milliseconds As Long)
-    Call InitFromMilliseconds((Days * MILLISECONDS_PER_DAY) + (Hours * MILLISECONDS_PER_HOUR) + (Minutes * MILLISECONDS_PER_MINUTE) + (Seconds * MILLISECONDS_PER_SECOND) + Milliseconds)
+    InitFromMilliseconds (Days * MILLISECONDS_PER_DAY) + (Hours * MILLISECONDS_PER_HOUR) + (Minutes * MILLISECONDS_PER_MINUTE) + (Seconds * MILLISECONDS_PER_SECOND) + Milliseconds
 End Sub
 
 Friend Sub InitFromMilliseconds(ByVal Value As Currency)
@@ -414,7 +405,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty(PROP_MILLISECONDS, mMilliseconds)
+    PropBag.WriteProperty PROP_MILLISECONDS, mMilliseconds
 End Sub
 
 
@@ -422,7 +413,13 @@ End Sub
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Equals(Value)
+    On Error GoTo errTrap
+    
+    Dim Other As TimeSpan
+    Set Other = Value
+    IObject_Equals = Equals(Other)
+    
+errTrap:
 End Function
 
 Private Function IObject_GetHashcode() As Long
@@ -437,5 +434,13 @@ End Function
 '   IComparable_CompareTo
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparable_CompareTo(Value As Variant) As Long
-    IComparable_CompareTo = CompareTo(Value)
+    On Error GoTo errTrap
+    
+    Dim Other As TimeSpan
+    Set Other = Value
+    IComparable_CompareTo = CompareTo(Other)
+    Exit Function
+    
+errTrap:
+    Throw Cor.NewArgumentException(Resources.GetString(Argument_TimeSpanRequired), Resources.GetParameter(Param.Value))
 End Function
