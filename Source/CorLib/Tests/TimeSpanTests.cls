@@ -66,6 +66,21 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use TimeSpan.FromHours(-1), TimeSpan.FromHours(1)
             Test.Use TimeSpan.FromHours(1), TimeSpan.FromHours(-1)
             
+        Case "CompareTo_WithValues_ReturnsExpected"
+            Test.Use TimeSpan.FromHours(5), 0
+            Test.Use TimeSpan.FromHours(4), 1
+            Test.Use TimeSpan.FromHours(6), -1
+            Test.Use Nothing, 1
+            
+        Case "ToString_WhenCalled_ReturnsExpected"
+            Test.Use TimeSpan.Zero, "00:00:00"
+            Test.Use TimeSpan.FromDays(1), "1.00:00:00"
+            Test.Use TimeSpan.FromHours(1), "01:00:00"
+            Test.Use TimeSpan.FromMinutes(1), "00:01:00"
+            Test.Use TimeSpan.FromSeconds(1), "00:00:01"
+            Test.Use TimeSpan.FromMilliseconds(1), "00:00:00.0010000"
+            Test.Use TimeSpan.FromTicks(1), "00:00:00.0000001"
+            
     End Select
 End Sub
 
@@ -196,7 +211,8 @@ Public Sub Equals_WithValues_ReturnsExpected(ByVal LeftHours As Double, ByVal Ri
 End Sub
 
 Public Sub Equals_WithNonTimeSpanValue_ReturnsFalse(ByVal Value As Variant)
-    Dim Span As New TimeSpan
+    Dim Span As IObject
+    Set Span = New TimeSpan
     
     Dim Actual As Boolean
     Actual = Span.Equals(Value)
@@ -236,14 +252,43 @@ Public Sub Negate_WithValues_ReturnsExpected(ByVal Span As TimeSpan, ByVal Expec
     Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestCompareTo()
-    Set ts = TimeSpan.FromHours(1)
+Public Sub CompareTo_WithValues_ReturnsExpected(ByVal Value As TimeSpan, ByVal Expected As Long)
+    Dim Span As TimeSpan
+    Set Span = TimeSpan.FromHours(5)
     
-    Assert.AreEqual -1, ts.CompareTo(TimeSpan.FromMinutes(61)), "CompareTo should return -1."
-    Assert.AreEqual 0, ts.CompareTo(TimeSpan.FromMinutes(60)), "CompareTo should return 0."
-    Assert.AreEqual 1, ts.CompareTo(TimeSpan.FromMilliseconds(59)), "CompareTo should return 1."
-    Assert.AreEqual 1, ts.CompareTo(Nothing), "CompareTo should return 1."
-    Assert.AreEqual 1, ts.CompareTo(Null), "CompareTo should return 1."
+    Dim Actual As Long
+    Actual = Span.CompareTo(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareTo_WithNonTimeSpanValue_ThrowsArgumentException()
+    Dim Span As IComparable
+    Set Span = New TimeSpan
+    
+    On Error GoTo errTrap
+    Span.CompareTo 1
+    
+errTrap:
+    AssertArgumentException Err, "Value"
+End Sub
+
+Public Sub CompareTo_WhenSpanIsZeroAndValueIsNothing_Returns0()
+    Dim Span As IComparable
+    Set Span = TimeSpan.Zero
+    
+    Dim Actual As Long
+    Actual = Span.CompareTo(Nothing)
+    
+    Assert.That Actual, Iz.EqualTo(0)
+End Sub
+
+Public Sub ToString_WhenCalled_ReturnsExpected(ByVal Span As TimeSpan, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Span.ToString
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestToString()
