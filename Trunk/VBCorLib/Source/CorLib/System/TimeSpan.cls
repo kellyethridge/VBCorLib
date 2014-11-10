@@ -255,50 +255,53 @@ End Function
 ' included in the string their value is not zero, or the TimeSpan is negative.
 Public Function ToString() As String
     ' use a cached version to lower overhead. The length is set to zero.
-    Dim sb As StringBuilder
-    Set sb = TimeSpan.StringBuilder
+    Dim Output As StringBuilder
+    Set Output = TimeSpan.StringBuilder
     
     Dim ms As Currency
     ms = mMilliseconds
     If ms < 0 Then
-        Call sb.AppendChar(vbMinus)
+        Output.AppendChar vbMinus
         ms = -ms
     End If
     
     Dim Days As Long
     Days = Int(ms / MILLISECONDS_PER_DAY)
     If Days <> 0 Then
-        Call sb.Append(Days)
-        Call sb.AppendChar(vbPeriod)
+        Output.Append Days
+        Output.AppendChar vbPeriod
     End If
-    Call sb.AppendQuick(FormatNumber(Int(ms / MILLISECONDS_PER_HOUR) Mod 24))
-    Call sb.AppendChar(vbColon)
-    Call sb.AppendQuick(FormatNumber(Int(ms / MILLISECONDS_PER_MINUTE) Mod 60))
-    Call sb.AppendChar(vbColon)
-    Call sb.AppendQuick(FormatNumber(Int(ms / MILLISECONDS_PER_SECOND) Mod 60))
+
+    AppendComponent Output, Int(ms / MILLISECONDS_PER_HOUR) Mod 24, 2
+    Output.AppendChar vbColon
+    AppendComponent Output, Int(ms / MILLISECONDS_PER_MINUTE) Mod 60, 2
+    Output.AppendChar vbColon
+    AppendComponent Output, Int(ms / MILLISECONDS_PER_SECOND) Mod 60, 2
     
-    Dim Frac As Long
-    Frac = Modulus(ms, MILLISECONDS_PER_SECOND)
-    If Frac <> 0 Then
-        Call sb.AppendChar(vbPeriod)
-        Dim strt As String
-        strt = Frac * 10000
-        Call sb.AppendChar(vbZero, 7 - Len(strt))
-        Call sb.AppendQuick(strt)
-    Else
-        Dim TicksComponent As Long
-        TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TICKS_PER_MILLISECOND
-        If TicksComponent <> 0 Then
-            sb.AppendChar vbPeriod
-            
-            Dim TicksString As String
-            TicksString = TicksComponent
-            sb.AppendChar vbZero, 7 - Len(TicksString)
-            sb.AppendQuick TicksString
-        End If
+    Dim MillisecondComponent    As Long
+    Dim TicksComponent          As Long
+    MillisecondComponent = Modulus(ms, MILLISECONDS_PER_SECOND)
+    TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TICKS_PER_MILLISECOND
+    
+    If MillisecondComponent <> 0 Then
+        Output.AppendChar vbPeriod
+        AppendComponent Output, MillisecondComponent, 3
+        AppendComponent Output, TicksComponent, 4
+    ElseIf TicksComponent <> 0 Then
+        Output.AppendChar vbPeriod
+        AppendComponent Output, TicksComponent, 7
     End If
-    ToString = sb.ToString
+    
+    ToString = Output.ToString
 End Function
+
+Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Long, ByVal Width As Long)
+    Dim ComponentString As String
+    ComponentString = Component
+    
+    Output.AppendChar vbZero, Width - Len(ComponentString)
+    Output.AppendString ComponentString
+End Sub
 
 ''
 ' Returns a boolean indicating if the value and this TimeSpan
@@ -372,19 +375,6 @@ Public Function NotEqualTo(ByRef ts As TimeSpan) As Boolean
 End Function
 
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function FormatNumber(ByVal n As Long) As String
-    If n < 10 Then
-        FormatNumber = "0" & n
-    Else
-        FormatNumber = n
-    End If
-End Function
-
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -415,9 +405,9 @@ End Sub
 Private Function IObject_Equals(Value As Variant) As Boolean
     On Error GoTo errTrap
     
-    Dim Other As TimeSpan
-    Set Other = Value
-    IObject_Equals = Equals(Other)
+    Dim other As TimeSpan
+    Set other = Value
+    IObject_Equals = Equals(other)
     
 errTrap:
 End Function
@@ -436,9 +426,9 @@ End Function
 Private Function IComparable_CompareTo(Value As Variant) As Long
     On Error GoTo errTrap
     
-    Dim Other As TimeSpan
-    Set Other = Value
-    IComparable_CompareTo = CompareTo(Other)
+    Dim other As TimeSpan
+    Set other = Value
+    IComparable_CompareTo = CompareTo(other)
     Exit Function
     
 errTrap:

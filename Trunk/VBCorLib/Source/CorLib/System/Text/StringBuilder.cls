@@ -235,8 +235,8 @@ End Function
 ' @return A reference to this instance of StringBuilder.
 '
 Public Function AppendLine(Optional ByRef s As String) As StringBuilder
-    AppendQuick s
-    AppendQuick vbCrLf
+    AppendString s
+    AppendString vbCrLf
     Set AppendLine = Me
 End Function
 
@@ -247,7 +247,7 @@ End Function
 ' @remarks This method appends the entire string to the end of the
 ' StringBuilder. There is no return reference to the StringBuilder.
 '
-Public Sub AppendQuick(ByRef s As String)
+Public Sub AppendString(ByRef s As String)
     Dim CharCount As Long
     CharCount = Len(s)
     
@@ -307,15 +307,15 @@ Public Property Let Capacity(ByVal RHS As Long)
         Throw Cor.NewArgumentOutOfRangeException("Value", Message:="Cannot set capacity less than the length of the current instance.")
     
     If RHS <> mCapacity Then
-        Dim ptr As Long
-        ptr = CoTaskMemAlloc(RHS * BytesPerChar)
-        If ptr = vbNullPtr Then _
+        Dim Ptr As Long
+        Ptr = CoTaskMemAlloc(RHS * BytesPerChar)
+        If Ptr = vbNullPtr Then _
             Throw New OutOfMemoryException
             
-        CopyMemory ByVal ptr, ByVal mStringPtr, mLength * BytesPerChar
+        CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
         CoTaskMemFree mStringPtr
-        mStringPtr = ptr
-        mStringSA.pvData = ptr
+        mStringPtr = Ptr
+        mStringSA.pvData = Ptr
         mCapacity = RHS
     End If
 End Property
@@ -813,7 +813,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                     End If
                     
                     ' Finally append the formatted value to the string.
-                    AppendQuick s
+                    AppendString s
                     
                     ' Add trailing padding.
                     If -ArgWidth > Len(s) Then

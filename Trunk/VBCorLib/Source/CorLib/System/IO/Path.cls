@@ -377,15 +377,15 @@ Public Function GetFullPath(ByVal Path As String) As String
     
     Call FixupPath(Path)
     
-    Dim ptr As Long
-    ptr = StrPtr(Path)
+    Dim Ptr As Long
+    Ptr = StrPtr(Path)
     
     ' quickly check the first two charcters for possible UNC path.
     ' convert first two characters into a long.
-    If MemLong(ptr) = vbBackSlashBackSlash Then Call VerifyUNCPathFormat(Path)
+    If MemLong(Ptr) = vbBackSlashBackSlash Then Call VerifyUNCPathFormat(Path)
     
     ' convert first two characters into two integers.
-    With MemDWord(ptr)
+    With MemDWord(Ptr)
         ' check first character being ':'
         If .LoWord = vbColon Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
@@ -552,7 +552,7 @@ Friend Sub FixupPath(ByRef Path As String)
     Call VerifyPath(Path, True)
     
     mPath.Length = 0
-    Call mPath.AppendQuick(Path)
+    Call mPath.AppendString(Path)
     
     Dim i As Long
     Do
@@ -603,18 +603,18 @@ End Function
 Private Function GetUNCPathRoot(ByRef Path As String) As String
     mBuffer.SA.pvData = StrPtr(Path)
     
-    Dim pos As Long
-    pos = 2 ' skip the first 2 slashes.
+    Dim Pos As Long
+    Pos = 2 ' skip the first 2 slashes.
     
     ' Skip backslashes after the first two
     ' until we get a character or the end.
     ' We don't need to check for a valid index
     ' because we'll hit the null terminator.
-    Do While mBuffer.Data(pos) = vbBackSlash: pos = pos + 1: Loop
+    Do While mBuffer.Data(Pos) = vbBackSlash: Pos = Pos + 1: Loop
     
     Dim SlashCount As Long
     Dim SlashIndex As Long
-    SlashIndex = pos
+    SlashIndex = Pos
     Do While (SlashCount < 2) And (mBuffer.Data(SlashIndex) <> 0)
         If mBuffer.Data(SlashIndex) = vbBackSlash Then
             SlashCount = SlashCount + 1
@@ -625,11 +625,11 @@ Private Function GetUNCPathRoot(ByRef Path As String) As String
     
     If SlashCount = 2 Then SlashIndex = SlashIndex - 1 ' we don't want to include the 2nd slash.
     
-    GetUNCPathRoot = "\\" & Mid$(Path, pos + 1, SlashIndex - pos)
+    GetUNCPathRoot = "\\" & Mid$(Path, Pos + 1, SlashIndex - Pos)
 End Function
 
 Private Sub VerifyUNCPathFormat(ByRef Path As String)
-    Dim pos             As Long
+    Dim Pos             As Long
     Dim foundServer     As Boolean
     Dim foundShare      As Boolean
     Dim foundSeparator  As Boolean
@@ -637,8 +637,8 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
     Dim ch As Integer
 
     mBuffer.SA.pvData = StrPtr(Path)
-    pos = 2
-    ch = mBuffer.Data(pos)
+    Pos = 2
+    ch = mBuffer.Data(Pos)
     Do While ch <> 0
         Select Case ch
             Case vbBackSlash, vbForwardSlash
@@ -651,8 +651,8 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
                     Exit Do
                 End If
         End Select
-        pos = pos + 1
-        ch = mBuffer.Data(pos)
+        Pos = Pos + 1
+        ch = mBuffer.Data(Pos)
     Loop
 
     If (Not foundServer) Or (Not foundShare) Then _

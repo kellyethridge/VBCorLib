@@ -843,7 +843,7 @@ End Sub
 
 Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As String
     Dim cnt         As Long
-    Dim pos         As Long
+    Dim Pos         As Long
     Dim sb          As StringBuilder
     Dim Day         As Long
     Dim Month       As Long
@@ -876,9 +876,9 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
     Second = dt.Second
     Designator = IIf(Hour < 12, mProps.AMDesignator, mProps.PMDesignator)
     
-    Do While pos < mPattern.SA.cElements
-        ch = mPattern.Data(pos)
-        cnt = GetRepeatCount(pos)
+    Do While Pos < mPattern.SA.cElements
+        ch = mPattern.Data(Pos)
+        cnt = GetRepeatCount(Pos)
         
         If Not Escaped Then
             If Quote <> 0 Then
@@ -897,8 +897,8 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
                     Case vbUpperH:          Call Append1or2DigitNumber(sb, cnt, Hour)
                     Case vbLowerM:          Call Append1or2DigitNumber(sb, cnt, Minute)
                     Case vbLowerS:          Call Append1or2DigitNumber(sb, cnt, Second)
-                    Case vbColon:           Call sb.AppendQuick(mProps.TimeSeparator)
-                    Case vbForwardSlash:    Call sb.AppendQuick(mProps.DateSeparator)
+                    Case vbColon:           Call sb.AppendString(mProps.TimeSeparator)
+                    Case vbForwardSlash:    Call sb.AppendString(mProps.DateSeparator)
                     Case vbDoubleQuote:     Quote = vbDoubleQuote
                     Case vbSingleQuote:     Quote = vbSingleQuote
                     
@@ -916,15 +916,15 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
                         If cnt = 1 Then
                             sb.Append Designator, 0, 1
                         Else
-                            sb.AppendQuick Designator
+                            sb.AppendString Designator
                         End If
                     
                     Case vbLowerZ
                         If ZoneOffset Is Nothing Then Set ZoneOffset = TimeZone.CurrentTimeZone.GetUtcOffset(dt)
                         Select Case cnt
-                            Case 1:         Call sb.AppendQuick(VBA.Format$(ZoneOffset.Hours, "0;-0"))
-                            Case 2:         Call sb.AppendQuick(VBA.Format$(ZoneOffset.Hours, "00;-00"))
-                            Case Else:      Call sb.AppendQuick(VBA.Format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.Format$(ZoneOffset.Minutes, "00"))
+                            Case 1:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "0;-0"))
+                            Case 2:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00"))
+                            Case Else:      Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.Format$(ZoneOffset.Minutes, "00"))
                         End Select
                     
                     Case vbPercent
@@ -951,7 +951,7 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
             cnt = 1
         End If
         Percented = (ch = vbPercent)
-        pos = pos + cnt
+        Pos = Pos + cnt
     Loop
     
     If Quote <> 0 Then _
@@ -977,9 +977,9 @@ Private Sub Append1to4CountValue(ByRef sb As StringBuilder, ByVal cnt As Long, B
             If Value < 10 Then Call sb.AppendChar(vbZero)
             Call sb.Append(Value)
         Case 3
-            Call sb.AppendQuick(ThreeCountValue)
+            Call sb.AppendString(ThreeCountValue)
         Case Else
-            Call sb.AppendQuick(FourCountValue)
+            Call sb.AppendString(FourCountValue)
     End Select
 End Sub
 
