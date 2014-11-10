@@ -70,7 +70,7 @@ Private mIndex              As Long
 Public Function Escape(ByVal Text As String) As String
     mEscapeFormatter.Length = 0
     
-    Call mEscapeFormatter.AppendQuick(Text)
+    Call mEscapeFormatter.AppendString(Text)
     Call mEscapeFormatter.Replace("&", "&amp;")
     Call mEscapeFormatter.Replace("<", "&lt;")
     Call mEscapeFormatter.Replace(">", "&gt;")
@@ -139,7 +139,7 @@ End Function
 '
 Public Function FromString(ByVal Xml As String) As SecurityElement
     mXml.Length = 0
-    Call mXml.AppendQuick(Xml)
+    Call mXml.AppendString(Xml)
     mIndex = 0
     
     Set FromString = StartElement
@@ -282,7 +282,7 @@ Private Function GetText() As String
     Text = cString.TrimEnd(Text, vbCrLf)
     
     mTextFormatter.Length = 0
-    Call mTextFormatter.AppendQuick(Text)
+    Call mTextFormatter.AppendString(Text)
     Call mTextFormatter.Replace(vbCr, vbLf)
     
     Dim PreviousLength As Long

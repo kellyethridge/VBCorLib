@@ -48,13 +48,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         
         Case "Add_WithValues_ReturnsExpected"
             Test.Use TimeSpan.FromHours(4), TimeSpan.FromHours(5), TimeSpan.FromHours(9)
-            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), NewTimeSpan(Minutes:=30, Seconds:=15)
+            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), newtimespan(Minutes:=30, Seconds:=15)
             Test.Use TimeSpan.FromHours(4), TimeSpan.FromHours(-5), TimeSpan.FromHours(-1)
             Test.Use TimeSpan.FromHours(4), Nothing, TimeSpan.FromHours(4)
             
         Case "Subtract_WithValues_ReturnsExpected"
             Test.Use TimeSpan.FromHours(5), TimeSpan.FromHours(4), TimeSpan.FromHours(1)
-            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), NewTimeSpan(Minutes:=29, Seconds:=45)
+            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), newtimespan(Minutes:=29, Seconds:=45)
             Test.Use TimeSpan.FromHours(-1), TimeSpan.FromHours(-4), TimeSpan.FromHours(3)
             Test.Use TimeSpan.FromHours(1), Nothing, TimeSpan.FromHours(1)
             
@@ -80,6 +80,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use TimeSpan.FromSeconds(1), "00:00:01"
             Test.Use TimeSpan.FromMilliseconds(1), "00:00:00.0010000"
             Test.Use TimeSpan.FromTicks(1), "00:00:00.0000001"
+            Test.Use TimeSpan.FromTicks(10001), "00:00:00.0010001"
             
     End Select
 End Sub
@@ -292,7 +293,7 @@ Public Sub ToString_WhenCalled_ReturnsExpected(ByVal Span As TimeSpan, ByVal Exp
 End Sub
 
 Public Sub TestToString()
-    Set ts = NewTimeSpan(102, 3, 4, 5, 10)
+    Set ts = newtimespan(102, 3, 4, 5, 10)
     Assert.AreEqual "102.03:04:05.0100000", ts.ToString
 End Sub
 
@@ -300,16 +301,16 @@ Public Sub TestGetHashCode()
     Dim ts2 As TimeSpan
     Dim ts3 As TimeSpan
     
-    Set ts = NewTimeSpan(1, 2, 3, 4, 5)
-    Set ts2 = NewTimeSpan(1, 2, 3, 4, 5)
-    Set ts3 = NewTimeSpan(1, 2, 3, 4, 6)
+    Set ts = newtimespan(1, 2, 3, 4, 5)
+    Set ts2 = newtimespan(1, 2, 3, 4, 5)
+    Set ts3 = newtimespan(1, 2, 3, 4, 6)
     
     Assert.IsTrue ts.GetHashCode = ts2.GetHashCode, "Hashcodes should be same."
     Assert.IsFalse ts.GetHashCode = ts3.GetHashCode, "Hashcode should be different."
 End Sub
 
 Public Sub TestNegToString()
-    Set ts = NewTimeSpan(-2, -3, -4, -5, -10)
+    Set ts = newtimespan(-2, -3, -4, -5, -10)
     Assert.AreEqual "-2.03:04:05.0100000", ts.ToString
 End Sub
 

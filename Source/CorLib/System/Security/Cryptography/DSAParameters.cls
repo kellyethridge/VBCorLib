@@ -354,7 +354,7 @@ End Function
 
 Friend Function ToXmlString()
     Dim sb As New StringBuilder
-    Call sb.AppendQuick("<DSAKeyValue>")
+    Call sb.AppendString("<DSAKeyValue>")
     Call AddElement(sb, "P", mP)
     Call AddElement(sb, "Q", mQ)
     Call AddElement(sb, "G", mG)
@@ -381,7 +381,7 @@ Friend Function ToXmlString()
         Call AddElement(sb, "X", mX)
     End If
     
-    Call sb.AppendQuick("</DSAKeyValue>")
+    Call sb.AppendString("</DSAKeyValue>")
     
     ToXmlString = sb.ToString
 End Function

@@ -121,8 +121,8 @@ End Property
 '
 ' @return A byte array of the public exponent.
 '
-Public Property Get Exponent() As Byte()
-    Exponent = mExponent()
+Public Property Get exponent() As Byte()
+    exponent = mExponent()
 End Property
 
 ''
@@ -130,7 +130,7 @@ End Property
 '
 ' @param RHS The new exponent value.
 '
-Public Property Let Exponent(ByRef RHS() As Byte)
+Public Property Let exponent(ByRef RHS() As Byte)
     mExponent = RHS
 End Property
 
@@ -256,7 +256,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function ToXmlString() As String
     Dim sb As New StringBuilder
-    Call sb.AppendQuick("<RSAKeyValue>")
+    Call sb.AppendString("<RSAKeyValue>")
     Call AddElement(sb, "Modulus", mModulus)
     Call AddElement(sb, "Exponent", mExponent)
     
@@ -269,7 +269,7 @@ Friend Function ToXmlString() As String
         Call AddElement(sb, "D", md)
     End If
     
-    Call sb.AppendQuick("</RSAKeyValue>")
+    Call sb.AppendString("</RSAKeyValue>")
     
     ToXmlString = sb.ToString
 End Function
