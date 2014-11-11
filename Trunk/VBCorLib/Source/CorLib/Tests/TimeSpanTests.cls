@@ -112,6 +112,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "00:aa", False
             Test.Use "0:00.aa", False
             
+        Case "Parse_WithOverflowValues_ThrowsOverflowException"
+            Test.Use "1:100"
+            Test.Use "1:60"
+            Test.Use "24:00"
+            Test.Use "1:00:60"
+            Test.Use "1:00:100"
+            Test.Use "10675200.1:00:00"
+            
     End Select
 End Sub
 
@@ -373,6 +381,14 @@ errTrap:
     AssertFormatException Err
 End Sub
 
+Public Sub Parse_WithOverflowValues_ThrowsOverflowException(ByVal s As String)
+    On Error GoTo errTrap
+    
+    TimeSpan.Parse s
+    
+errTrap:
+    AssertOverflowException Err
+End Sub
 
 
 
