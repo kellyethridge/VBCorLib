@@ -46,7 +46,7 @@ Private mDayLightName           As String
 Private mStandardName           As String
 Private mUtcOffsetNoDLS         As TimeSpan
 Private mUtcOffsetWithDLS       As TimeSpan
-Private mTimeZoneInfo           As Time_Zone_Information
+Private mTimeZoneInfo           As TIME_ZONE_INFORMATION
 Private mNotUsedDayLightTimes   As DayLightTime
 
 
@@ -101,7 +101,7 @@ Public Function IsDayLightSavingTime(ByRef Time As Variant, Optional ByVal dayLi
     If dayLightTimes Is Nothing Then Set dayLightTimes = GetDayLightTimes(dt.Year)
     
     With dayLightTimes
-        If .Delta.EqualTo(TimeSpan.Zero) Then Exit Function
+        If .Delta.Equals(TimeSpan.Zero) Then Exit Function
         If .StartTime.LessThan(.EndTime) Then
             ' northern hemisphere
             If dt.LessThan(.StartTime) Then Exit Function
@@ -200,31 +200,31 @@ Private Function GetDayLightTimes(ByVal Year As Long) As DayLightTime
     End If
 End Function
 
-Private Function GetCrossOverPoint(ByVal Year As Long, ByRef Time As SystemTime) As cDateTime
-    Dim ret As cDateTime
+Private Function GetCrossOverPoint(ByVal Year As Long, ByRef Time As SYSTEMTIME) As cDateTime
+    Dim Ret As cDateTime
     Dim mydow As DayOfWeek
     Dim targetdow As DayOfWeek
     
     If Time.wDay = FIND_LAST Then
         ' find last dayofweek in month
-        Set ret = Cor.NewcDateTime(Year, Time.wMonth + 1, 1, Time.wHour)
-        mydow = ret.DayOfWeek
+        Set Ret = Cor.NewcDateTime(Year, Time.wMonth + 1, 1, Time.wHour)
+        mydow = Ret.DayOfWeek
         targetdow = mydow - Time.wDayOfWeek
         If targetdow < 0 Then targetdow = targetdow + 7
-        Set ret = ret.AddDays(-targetdow)
+        Set Ret = Ret.AddDays(-targetdow)
     Else
         ' find nth dayofweek of month
-        Set ret = Cor.NewcDateTime(Year, Time.wMonth, 1, Time.wHour)
-        mydow = ret.DayOfWeek
+        Set Ret = Cor.NewcDateTime(Year, Time.wMonth, 1, Time.wHour)
+        mydow = Ret.DayOfWeek
         targetdow = Time.wDayOfWeek
         If targetdow < mydow Then targetdow = targetdow + 7
-        Set ret = ret.AddDays(targetdow - mydow)
+        Set Ret = Ret.AddDays(targetdow - mydow)
         If Time.wDay > 1 Then
-            Set ret = ret.AddDays((Time.wDay - 1) * 7)
+            Set Ret = Ret.AddDays((Time.wDay - 1) * 7)
         End If
     End If
     
-    Set GetCrossOverPoint = ret
+    Set GetCrossOverPoint = Ret
 End Function
 
 
