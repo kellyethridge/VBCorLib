@@ -106,6 +106,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1.2", False
             Test.Use "a", False
             Test.Use "0:00", True
+            Test.Use "a0", False
+            Test.Use "0a", False
+            Test.Use "aa:bb", False
+            Test.Use "00:aa", False
+            Test.Use "0:00.aa", False
             
     End Select
 End Sub
@@ -345,3 +350,35 @@ Public Sub TryParse_WithValues_ReturnsExpected2(ByVal TextToParse As String, ByV
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+Public Sub Parse_WithValidSource_ReturnsTimeSpan()
+    Const Source As String = "1:00"
+    
+    Dim Actual As TimeSpan
+    Set Actual = TimeSpan.Parse(Source)
+    
+    Dim Expected As TimeSpan
+    Set Expected = TimeSpan.FromHours(1)
+    Assert.That Actual, Equals(Expected)
+End Sub
+
+Public Sub Parse_WithInvalidSource_ThrowsFormatError()
+    Const InvalidSource As String = "a"
+    
+    On Error GoTo errTrap
+    TimeSpan.Parse InvalidSource
+    
+errTrap:
+    WriteLine Err.Description
+    AssertFormatException Err
+End Sub
+
+
+
+
+
+
+
+
+
+
