@@ -78,26 +78,27 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
     Dim Result As Currency
     Select Case NextNonDigit()
         Case vbColon
-            If Not ParseTime(Result) Then
+            If Not TryParseTime(Result) Then
                 Exit Function
             End If
     
         Case vbZero To vbNine, vbPeriod, vbNullPtr
-            Dim TempInt As Long
-            If Not ParseNumber(10675199, TempInt) Then
+            Const MaxDays As Long = 10675199
+            Dim DaysParsed As Long
+            If Not TryParseNumber(MaxDays, DaysParsed) Then
                 Exit Function
             End If
-            Result = Result + (TempInt * MILLISECONDS_PER_DAY)
+            Result = Result + DaysParsed * MILLISECONDS_PER_DAY
             
             If Char = vbPeriod Then
                 NextChar
                 
-                Dim TempCur As Currency
-                If Not ParseTime(TempCur) Then
+                Dim TimeParsed As Currency
+                If Not TryParseTime(TimeParsed) Then
                     Exit Function
                 End If
                 
-                Result = Result + TempCur
+                Result = Result + TimeParsed
             End If
             
         Case Else
@@ -164,15 +165,16 @@ Private Function NextNonDigit() As Integer
     Next i
 End Function
 
-Private Function ParseTime(ByRef RetVal As Currency) As Boolean
-    Dim Result  As Currency
-    Dim i       As Long
+Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
+    Dim Result As Currency
     
-    If Not ParseNumber(23, i) Then
+    Const MaxHours As Long = 23
+    Dim HoursParsed As Long
+    If Not TryParseNumber(MaxHours, HoursParsed) Then
         Exit Function
     End If
     
-    Result = MILLISECONDS_PER_HOUR * i
+    Result = HoursParsed * MILLISECONDS_PER_HOUR
     
     ' when parsing time we require at least hours and minutes.
     If Char <> vbColon Then
@@ -182,11 +184,13 @@ Private Function ParseTime(ByRef RetVal As Currency) As Boolean
     
     NextChar
     
-    If Not ParseNumber(59, i) Then
+    Const MaxMinutes As Long = 59
+    Dim MinutesParsed As Long
+    If Not TryParseNumber(MaxMinutes, MinutesParsed) Then
         Exit Function
     End If
     
-    Result = Result + MILLISECONDS_PER_MINUTE * i
+    Result = Result + MinutesParsed * MILLISECONDS_PER_MINUTE
     
     ' check for possible seconds
     If Char = vbColon Then
@@ -196,42 +200,45 @@ Private Function ParseTime(ByRef RetVal As Currency) As Boolean
         ' 00:00:.1234
         If Char <> vbPeriod Then
             ' fraction not defined immediately, so seconds must be.
-            If Not ParseNumber(59, i) Then
+            Const MaxSeconds As Long = 59
+            Dim SecondsParsed As Long
+            If Not TryParseNumber(MaxSeconds, SecondsParsed) Then
                 Exit Function
             End If
             
-            Result = Result + MILLISECONDS_PER_SECOND * i
+            Result = Result + SecondsParsed * MILLISECONDS_PER_SECOND
         End If
         
         If Char = vbPeriod Then
             NextChar
             
-            If Not ParseNumber(10000000, i) Then
+            Dim FractionParsed As Long
+            If Not TryParseNumber(10000000, FractionParsed) Then
                 Exit Function
             End If
             
-            Do While i < 10000000
-                i = i * 10
+            Do While FractionParsed < 10000000
+                FractionParsed = FractionParsed * 10
             Loop
-            i = i \ 10
+            FractionParsed = FractionParsed \ 10
             
-            Result = Result + (CCur(i) * 0.0001@)
+            Result = Result + (CCur(FractionParsed) * 0.0001@)
         End If
     End If
     
-    RetVal = Result
-    ParseTime = True
+    Milliseconds = Result
+    TryParseTime = True
 End Function
 
-Private Function ParseNumber(ByVal MaxValue As Long, ByRef RetVal As Long) As Boolean
-    Dim Result  As Long
-    Dim Index   As Long
+Private Function TryParseNumber(ByVal MaxValue As Long, ByRef Result As Long) As Boolean
+    Dim Number          As Long
+    Dim OriginalIndex   As Long
     
-    Index = mIndex
+    OriginalIndex = mIndex
     Do
         Select Case Char
             Case vbZero To vbNine
-                Result = Result * 10 + (Char - vbZero)
+                Number = Number * 10 + (Char - vbZero)
                 
             Case Else
                 Exit Do
@@ -241,10 +248,10 @@ Private Function ParseNumber(ByVal MaxValue As Long, ByRef RetVal As Long) As Bo
         NextChar
     Loop
     
-    If Result <= MaxValue Then
-        RetVal = Result
-        ParseNumber = True
-    ElseIf Index = mIndex Then
+    If Number <= MaxValue Then
+        Result = Number
+        TryParseNumber = True
+    ElseIf mIndex = OriginalIndex Then
         mError = ParseError.FormatError
     Else
         mError = ParseError.OverflowError

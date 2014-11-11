@@ -127,6 +127,7 @@ Public Enum ResourceStringId
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
     ObjectDisposed_StreamClosed = 1200
+    Overflow_TimeSpan = 1300
 End Enum
 
 Public Enum Param

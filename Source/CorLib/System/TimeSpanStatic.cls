@@ -157,7 +157,7 @@ Public Function Parse(ByVal s As String) As TimeSpan
                 Throw Cor.NewFormatException(Resources.GetString(Format_InvalidTimeSpan))
                 
             Case ParseError.OverflowError
-                Throw New OverflowException
+                Throw Cor.NewOverflowException(Resources.GetString(Overflow_TimeSpan))
                 
             Case Else
                 Throw New ArgumentException
