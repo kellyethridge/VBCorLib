@@ -63,43 +63,49 @@ Friend Property Get Error() As ParseError
 End Property
 
 Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
-    Call Init(s)
-    Call NextChar
-    Call SkipBlanks
+    Init s
+    NextChar
+    SkipBlanks
     
     Dim Sign As Currency
     If Char = vbMinus Then
         Sign = -1@
-        Call NextChar
+        NextChar
     Else
         Sign = 1@
     End If
     
     Dim Result As Currency
-    If NextNonDigit() = vbColon Then
-        If Not ParseTime(Result) Then
-            Exit Function
-        End If
-    Else
-        Dim TempInt As Long
-        If Not ParseNumber(10675199, TempInt) Then
-            Exit Function
-        End If
-        Result = Result + (TempInt * MILLISECONDS_PER_DAY)
-        
-        If Char = vbPeriod Then
-            Call NextChar
-            
-            Dim TempCur As Currency
-            If Not ParseTime(TempCur) Then
+    Select Case NextNonDigit()
+        Case vbColon
+            If Not ParseTime(Result) Then
                 Exit Function
             End If
-            
-            Result = Result + TempCur
-        End If
-    End If
     
-    Call SkipBlanks
+        Case vbZero To vbNine, vbPeriod, vbNullPtr
+            Dim TempInt As Long
+            If Not ParseNumber(10675199, TempInt) Then
+                Exit Function
+            End If
+            Result = Result + (TempInt * MILLISECONDS_PER_DAY)
+            
+            If Char = vbPeriod Then
+                NextChar
+                
+                Dim TempCur As Currency
+                If Not ParseTime(TempCur) Then
+                    Exit Function
+                End If
+                
+                Result = Result + TempCur
+            End If
+            
+        Case Else
+            mError = FormatError
+            Exit Function
+    End Select
+    
+    SkipBlanks
     
     If mIndex < mBuffer.SA.cElements - 1 Then
         If mError = ParseError.None Then
@@ -119,7 +125,7 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Init(ByRef s As String)
-    Call InitWordBuffer(mBuffer, StrPtr(s), Len(s))
+    InitWordBuffer mBuffer, StrPtr(s), Len(s)
     mIndex = -1
     mError = ParseError.None
     mChar = 0
@@ -142,7 +148,7 @@ End Sub
 
 Private Sub SkipBlanks()
     Do While Char = vbSpace
-        Call NextChar
+        NextChar
     Loop
 End Sub
 
@@ -174,7 +180,7 @@ Private Function ParseTime(ByRef RetVal As Currency) As Boolean
         Exit Function
     End If
     
-    Call NextChar
+    NextChar
     
     If Not ParseNumber(59, i) Then
         Exit Function
@@ -184,7 +190,7 @@ Private Function ParseTime(ByRef RetVal As Currency) As Boolean
     
     ' check for possible seconds
     If Char = vbColon Then
-        Call NextChar
+        NextChar
         
         ' defined fraction immediately after seconds colon instead
         ' 00:00:.1234
@@ -198,7 +204,7 @@ Private Function ParseTime(ByRef RetVal As Currency) As Boolean
         End If
         
         If Char = vbPeriod Then
-            Call NextChar
+            NextChar
             
             If Not ParseNumber(10000000, i) Then
                 Exit Function
@@ -232,7 +238,7 @@ Private Function ParseNumber(ByVal MaxValue As Long, ByRef RetVal As Long) As Bo
                 
         End Select
         
-        Call NextChar
+        NextChar
     Loop
     
     If Result <= MaxValue Then
