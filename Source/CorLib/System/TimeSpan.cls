@@ -335,44 +335,44 @@ End Function
 ' @param ts The TimeSpan object to compare this instance against.
 ' @return Returns True if this is greater that, False otherwise.
 '
-Public Function GreaterThan(ByRef ts As TimeSpan) As Boolean
-    If ts Is Nothing Then
-        GreaterThan = True
-    Else
-        GreaterThan = (mMilliseconds > ts.TotalMilliseconds)
-    End If
-End Function
-
-Public Function LessThan(ByRef ts As TimeSpan) As Boolean
-    If ts Is Nothing Then Exit Function
-    LessThan = (mMilliseconds < ts.TotalMilliseconds)
-End Function
-
-Public Function GreaterThanOrEqualTo(ByRef ts As TimeSpan) As Boolean
-    If ts Is Nothing Then
-        GreaterThanOrEqualTo = True
-    Else
-        GreaterThanOrEqualTo = (mMilliseconds >= ts.TotalMilliseconds)
-    End If
-End Function
-
-Public Function LessThanOrEqualTo(ByRef ts As TimeSpan) As Boolean
-    If ts Is Nothing Then Exit Function
-    LessThanOrEqualTo = (mMilliseconds <= ts.TotalMilliseconds)
-End Function
-
-Public Function EqualTo(ByRef ts As TimeSpan) As Boolean
-    If ts Is Nothing Then Exit Function
-    EqualTo = (mMilliseconds = ts.TotalMilliseconds)
-End Function
-
-Public Function NotEqualTo(ByRef ts As TimeSpan) As Boolean
-    If ts Is Nothing Then
-        NotEqualTo = True
-    Else
-        NotEqualTo = (mMilliseconds <> ts.TotalMilliseconds)
-    End If
-End Function
+'Public Function GreaterThan(ByRef ts As TimeSpan) As Boolean
+'    If ts Is Nothing Then
+'        GreaterThan = True
+'    Else
+'        GreaterThan = (mMilliseconds > ts.TotalMilliseconds)
+'    End If
+'End Function
+'
+'Public Function LessThan(ByRef ts As TimeSpan) As Boolean
+'    If ts Is Nothing Then Exit Function
+'    LessThan = (mMilliseconds < ts.TotalMilliseconds)
+'End Function
+'
+'Public Function GreaterThanOrEqualTo(ByRef ts As TimeSpan) As Boolean
+'    If ts Is Nothing Then
+'        GreaterThanOrEqualTo = True
+'    Else
+'        GreaterThanOrEqualTo = (mMilliseconds >= ts.TotalMilliseconds)
+'    End If
+'End Function
+'
+'Public Function LessThanOrEqualTo(ByRef ts As TimeSpan) As Boolean
+'    If ts Is Nothing Then Exit Function
+'    LessThanOrEqualTo = (mMilliseconds <= ts.TotalMilliseconds)
+'End Function
+'
+'Public Function EqualTo(ByRef ts As TimeSpan) As Boolean
+'    If ts Is Nothing Then Exit Function
+'    EqualTo = (mMilliseconds = ts.TotalMilliseconds)
+'End Function
+'
+'Public Function NotEqualTo(ByRef ts As TimeSpan) As Boolean
+'    If ts Is Nothing Then
+'        NotEqualTo = True
+'    Else
+'        NotEqualTo = (mMilliseconds <> ts.TotalMilliseconds)
+'    End If
+'End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

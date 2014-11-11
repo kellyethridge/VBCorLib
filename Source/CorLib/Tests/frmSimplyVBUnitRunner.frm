@@ -101,7 +101,6 @@ Private Sub Form_Load()
     Dim TimeSpanTests As TestSuite
     Set TimeSpanTests = Sim.NewTestSuite("TimeSpan")
     TimeSpanTests.Add New TimeSpanTests
-    TimeSpanTests.Add New TestTimeSpan994394150ms
     TimeSpanTests.Add New TestTimeSpanCreation
     System.Add TimeSpanTests
 

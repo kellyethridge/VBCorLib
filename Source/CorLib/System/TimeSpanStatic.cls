@@ -52,7 +52,6 @@ Private mStringBuilder  As New StringBuilder
 Private mParser         As New TimeSpanParser
 Private mMaxValue       As TimeSpan
 Private mMinValue       As TimeSpan
-Private mMSPlaces()     As Currency
 
 
 ''
@@ -90,7 +89,7 @@ End Property
 '
 Public Function FromMilliseconds(ByVal Value As Currency) As TimeSpan
     Set FromMilliseconds = New TimeSpan
-    Call FromMilliseconds.InitFromMilliseconds(Value)
+    FromMilliseconds.InitFromMilliseconds Value
 End Function
 
 ''
@@ -214,5 +213,4 @@ End Property
 Private Sub Class_Initialize()
     Set mMaxValue = FromMilliseconds(922337203685477.5807@)
     Set mMinValue = FromMilliseconds(-922337203685477.5807@ - 0.0001@)
-    mMSPlaces = Cor.NewCurrencys(100@, 10@, 1@, 0.1@, 0.01@, 0.001@, 0.0001@)
 End Sub

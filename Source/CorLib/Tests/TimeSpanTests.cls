@@ -48,13 +48,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         
         Case "Add_WithValues_ReturnsExpected"
             Test.Use TimeSpan.FromHours(4), TimeSpan.FromHours(5), TimeSpan.FromHours(9)
-            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), newtimespan(Minutes:=30, Seconds:=15)
+            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), NewTimeSpan(Minutes:=30, Seconds:=15)
             Test.Use TimeSpan.FromHours(4), TimeSpan.FromHours(-5), TimeSpan.FromHours(-1)
             Test.Use TimeSpan.FromHours(4), Nothing, TimeSpan.FromHours(4)
             
         Case "Subtract_WithValues_ReturnsExpected"
             Test.Use TimeSpan.FromHours(5), TimeSpan.FromHours(4), TimeSpan.FromHours(1)
-            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), newtimespan(Minutes:=29, Seconds:=45)
+            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), NewTimeSpan(Minutes:=29, Seconds:=45)
             Test.Use TimeSpan.FromHours(-1), TimeSpan.FromHours(-4), TimeSpan.FromHours(3)
             Test.Use TimeSpan.FromHours(1), Nothing, TimeSpan.FromHours(1)
             
@@ -81,6 +81,31 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use TimeSpan.FromMilliseconds(1), "00:00:00.0010000"
             Test.Use TimeSpan.FromTicks(1), "00:00:00.0000001"
             Test.Use TimeSpan.FromTicks(10001), "00:00:00.0010001"
+            Test.Use NewTimeSpan(102, 3, 4, 5, 10), "102.03:04:05.0100000"
+            Test.Use NewTimeSpan(-2, -3, -4, -5, -10), "-2.03:04:05.0100000"
+        
+        Case "GetHashCode_WithValues_ReturnsExpected"
+            Test.Use 0, 0, True
+            Test.Use 1, 1, True
+            Test.Use 0, 1, False
+            Test.Use 100000, 100000, True
+            Test.Use 100001, 100000, False
+            
+        Case "TryParse_WithValues_ReturnsExpected"
+            Test.Use "0", TimeSpan.Zero
+            Test.Use "   1:06:07  ", NewTimeSpan(Hours:=1, Minutes:=6, Seconds:=7)
+            Test.Use "22:14:14", NewTimeSpan(Hours:=22, Minutes:=14, Seconds:=14)
+            Test.Use "1.04:24:34", NewTimeSpan(1, 4, 24, 34)
+            Test.Use "5:06:07.1", NewTimeSpan(Hours:=5, Minutes:=6, Seconds:=7, Milliseconds:=100)
+            Test.Use "-7.15:35:41.7777777", TimeSpan.FromTicks(-6609417777777#)
+            Test.Use "10", TimeSpan.FromDays(10)
+            Test.Use "2:3", NewTimeSpan(Hours:=2, Minutes:=3)
+            
+        Case "TryParse_WithValues_ReturnsExpected2"
+            Test.Use "0", True
+            Test.Use "1.2", False
+            Test.Use "a", False
+            Test.Use "0:00", True
             
     End Select
 End Sub
@@ -292,33 +317,31 @@ Public Sub ToString_WhenCalled_ReturnsExpected(ByVal Span As TimeSpan, ByVal Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestToString()
-    Set ts = newtimespan(102, 3, 4, 5, 10)
-    Assert.AreEqual "102.03:04:05.0100000", ts.ToString
+Public Sub GetHashCode_WithValues_ReturnsExpected(ByVal Milliseconds1 As Currency, ByVal Milliseconds2 As Currency, ByVal Expected As Boolean)
+    Dim Span1 As TimeSpan
+    Dim Span2 As TimeSpan
+    Set Span1 = TimeSpan.FromMilliseconds(Milliseconds1)
+    Set Span2 = TimeSpan.FromMilliseconds(Milliseconds2)
+    
+    Dim Actual As Boolean
+    Actual = Span1.GetHashCode = Span2.GetHashCode
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetHashCode()
-    Dim ts2 As TimeSpan
-    Dim ts3 As TimeSpan
+Public Sub TryParse_WithValues_ReturnsExpected(ByVal TextToParse As String, ByVal Expected As TimeSpan)
+    Dim Span As TimeSpan
     
-    Set ts = newtimespan(1, 2, 3, 4, 5)
-    Set ts2 = newtimespan(1, 2, 3, 4, 5)
-    Set ts3 = newtimespan(1, 2, 3, 4, 6)
+    TimeSpan.TryParse TextToParse, Span
     
-    Assert.IsTrue ts.GetHashCode = ts2.GetHashCode, "Hashcodes should be same."
-    Assert.IsFalse ts.GetHashCode = ts3.GetHashCode, "Hashcode should be different."
+    Assert.That Span, Equals(Expected)
 End Sub
 
-Public Sub TestNegToString()
-    Set ts = newtimespan(-2, -3, -4, -5, -10)
-    Assert.AreEqual "-2.03:04:05.0100000", ts.ToString
-End Sub
-
-Public Sub TestNotEqualTo()
-    Dim ts1 As TimeSpan
-    Dim ts2 As TimeSpan
+Public Sub TryParse_WithValues_ReturnsExpected2(ByVal TextToParse As String, ByVal Expected As Boolean)
+    Dim Span As TimeSpan
     
-    Set ts1 = TimeSpan.FromHours(1)
-    Set ts2 = TimeSpan.FromDays(2)
-    Assert.IsTrue ts1.NotEqualTo(ts2), "ts1 should not be equal to ts2."
+    Dim Actual As Boolean
+    Actual = TimeSpan.TryParse(TextToParse, Span)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
