@@ -41,6 +41,7 @@ Public Enum ResourceStringId
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
     Format_InvalidString = 602
+    Format_InvalidTimeSpan = 603
     ArgumentOutOfRange_MustBeNonNegNum = 700
     ArgumentOutOfRange_SmallCapacity = 701
     ArgumentOutOfRange_NeedNonNegNum = 702
