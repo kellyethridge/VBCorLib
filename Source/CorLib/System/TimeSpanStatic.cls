@@ -165,6 +165,32 @@ Public Function Parse(ByVal s As String) As TimeSpan
     End If
 End Function
 
+Public Function Equals(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
+    If Left Is Nothing Then
+        If Right Is Nothing Then
+            Equals = True
+        Else
+            Equals = Right.Equals(Nothing)
+        End If
+    Else
+        Equals = Left.Equals(Right)
+    End If
+End Function
+
+Public Function LessThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
+    Dim LeftMilliseconds As Currency
+    Dim RightMilliseconds As Currency
+    
+    If Not Left Is Nothing Then
+        LeftMilliseconds = Left.TotalMilliseconds
+    End If
+    If Not Right Is Nothing Then
+        RightMilliseconds = Right.TotalMilliseconds
+    End If
+    
+    LessThan = LeftMilliseconds < RightMilliseconds
+End Function
+
 ''
 ' Attempts to parse the string into a TimeSpan object.
 '
@@ -188,8 +214,6 @@ Public Function FromDate(ByRef Value As Variant) As TimeSpan
     Set dt = cDateTime.GetcDateTime(Value)
     Set FromDate = dt.TimeOfDay
 End Function
-
-
 
 ' This is to prevent a TimeSpan from having to create and
 ' destroy an object. A TimeSpan may live very short lives when
