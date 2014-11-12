@@ -63,8 +63,6 @@ Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * 
 Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
 Private Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
 
-
-
 Private mMilliseconds As Currency
 
 
@@ -295,14 +293,6 @@ Public Function ToString() As String
     ToString = Output.ToString
 End Function
 
-Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Long, ByVal Width As Long)
-    Dim ComponentString As String
-    ComponentString = Component
-    
-    Output.AppendChar vbZero, Width - Len(ComponentString)
-    Output.AppendString ComponentString
-End Sub
-
 ''
 ' Returns a boolean indicating if the value and this TimeSpan
 ' instance are the same value.
@@ -311,12 +301,10 @@ End Sub
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As TimeSpan) As Boolean
     If Value Is Nothing Then
-        Exit Function
+        Equals = mMilliseconds = 0@
+    Else
+        Equals = (mMilliseconds = Value.TotalMilliseconds)
     End If
-    
-    Dim Span As TimeSpan
-    Set Span = Value
-    Equals = (mMilliseconds = Span.TotalMilliseconds)
 End Function
 
 ''
@@ -339,6 +327,18 @@ End Sub
 
 Friend Sub InitFromMilliseconds(ByVal Value As Currency)
     mMilliseconds = Value
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Private Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Long, ByVal Width As Long)
+    Dim ComponentString As String
+    ComponentString = Component
+    
+    Output.AppendChar vbZero, Width - Len(ComponentString)
+    Output.AppendString ComponentString
 End Sub
 
 
