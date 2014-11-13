@@ -72,11 +72,7 @@ Private mMilliseconds As Currency
 ' @param ts TimeSpan to be added.
 ' @return A TimeSpan that represents the sum of the two timespans.
 Public Function Add(ByRef ts As TimeSpan) As TimeSpan
-    If ts Is Nothing Then
-        Set Add = Me
-    Else
-        Set Add = TimeSpan.FromMilliseconds(mMilliseconds + ts.TotalMilliseconds)
-    End If
+    Set Add = TimeSpan.Add(Me, ts)
 End Function
 
 ''
@@ -85,11 +81,7 @@ End Function
 ' @param ts TimeSpan to be subtracted.
 ' @return TimeSpan with the subtracted value.
 Public Function Subtract(ByRef ts As TimeSpan) As TimeSpan
-    If ts Is Nothing Then
-        Set Subtract = Me
-    Else
-        Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - ts.TotalMilliseconds)
-    End If
+    Set Subtract = TimeSpan.Subtract(Me, ts)
 End Function
 
 ''
@@ -224,16 +216,7 @@ End Property
 ' <br><br>
 ' If <b>Nothing</b> is passed in 1 is returned.
 Public Function CompareTo(ByRef Value As TimeSpan) As Long
-    Dim OtherMilliseconds As Currency
-    If Not Value Is Nothing Then
-        OtherMilliseconds = Value.TotalMilliseconds
-    End If
-    
-    If mMilliseconds < OtherMilliseconds Then
-        CompareTo = -1
-    ElseIf mMilliseconds > OtherMilliseconds Then
-        CompareTo = 1
-    End If
+    CompareTo = TimeSpan.CompareTo(Me, Value)
 End Function
 
 ''
