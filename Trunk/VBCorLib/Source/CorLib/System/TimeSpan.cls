@@ -300,11 +300,7 @@ End Function
 ' @param Value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As TimeSpan) As Boolean
-    If Value Is Nothing Then
-        Equals = mMilliseconds = 0@
-    Else
-        Equals = (mMilliseconds = Value.TotalMilliseconds)
-    End If
+    Equals = TimeSpan.Equals(Me, Value)
 End Function
 
 ''
@@ -315,6 +311,14 @@ Public Function GetHashCode() As Long
     With AsDLong(mMilliseconds)
         GetHashCode = .LoDWord Xor .HiDWord
     End With
+End Function
+
+Public Function LessThan(ByRef Other As TimeSpan) As Boolean
+    LessThan = TimeSpan.LessThan(Me, Other)
+End Function
+
+Public Function GreaterThan(ByRef Other As TimeSpan) As Boolean
+    GreaterThan = TimeSpan.GreaterThan(Me, Other)
 End Function
 
 
@@ -360,9 +364,9 @@ End Sub
 Private Function IObject_Equals(Value As Variant) As Boolean
     On Error GoTo errTrap
     
-    Dim other As TimeSpan
-    Set other = Value
-    IObject_Equals = Equals(other)
+    Dim Other As TimeSpan
+    Set Other = Value
+    IObject_Equals = Equals(Other)
     
 errTrap:
 End Function
@@ -381,9 +385,9 @@ End Function
 Private Function IComparable_CompareTo(Value As Variant) As Long
     On Error GoTo errTrap
     
-    Dim other As TimeSpan
-    Set other = Value
-    IComparable_CompareTo = CompareTo(other)
+    Dim Other As TimeSpan
+    Set Other = Value
+    IComparable_CompareTo = CompareTo(Other)
     Exit Function
     
 errTrap:

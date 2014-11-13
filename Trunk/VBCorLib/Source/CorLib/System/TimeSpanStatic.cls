@@ -166,20 +166,22 @@ Public Function Parse(ByVal s As String) As TimeSpan
 End Function
 
 Public Function Equals(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    If Left Is Nothing Then
-        If Right Is Nothing Then
-            Equals = True
-        Else
-            Equals = Right.Equals(Nothing)
-        End If
-    Else
-        Equals = Left.Equals(Right)
+    Dim LeftMilliseconds    As Currency
+    Dim RightMilliseconds   As Currency
+    
+    If Not Left Is Nothing Then
+        LeftMilliseconds = Left.TotalMilliseconds
     End If
+    If Not Right Is Nothing Then
+        RightMilliseconds = Right.TotalMilliseconds
+    End If
+    
+    Equals = LeftMilliseconds = RightMilliseconds
 End Function
 
 Public Function LessThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    Dim LeftMilliseconds As Currency
-    Dim RightMilliseconds As Currency
+    Dim LeftMilliseconds    As Currency
+    Dim RightMilliseconds   As Currency
     
     If Not Left Is Nothing Then
         LeftMilliseconds = Left.TotalMilliseconds
@@ -189,6 +191,20 @@ Public Function LessThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boo
     End If
     
     LessThan = LeftMilliseconds < RightMilliseconds
+End Function
+
+Public Function GreaterThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
+    Dim LeftMilliseconds    As Currency
+    Dim RightMilliseconds   As Currency
+    
+    If Not Left Is Nothing Then
+        LeftMilliseconds = Left.TotalMilliseconds
+    End If
+    If Not Right Is Nothing Then
+        RightMilliseconds = Right.TotalMilliseconds
+    End If
+    
+    GreaterThan = LeftMilliseconds > RightMilliseconds
 End Function
 
 ''

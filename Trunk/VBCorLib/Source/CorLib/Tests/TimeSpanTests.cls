@@ -139,6 +139,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Nothing, TimeSpan.FromHours(1), True
             Test.Use TimeSpan.FromHours(1), Nothing, False
             
+        Case "GreaterThan_WithValues_ReturnsExpected"
+            Test.Use TimeSpan.Zero, TimeSpan.Zero, False
+            Test.Use TimeSpan.Zero, TimeSpan.FromHours(1), False
+            Test.Use TimeSpan.FromHours(1), TimeSpan.Zero, True
+            Test.Use TimeSpan.FromHours(1), Nothing, True
+            Test.Use Nothing, TimeSpan.FromHours(1), False
+            Test.Use Nothing, TimeSpan.Zero, False
+            Test.Use TimeSpan.Zero, Nothing, False
+            
     End Select
 End Sub
 
@@ -425,6 +434,13 @@ Public Sub LessThan_WithValues_ReturnsExpected(ByVal Left As TimeSpan, ByVal Rig
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GreaterThan_WithValues_ReturnsExpected(ByVal Left As TimeSpan, ByVal Right As TimeSpan, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = TimeSpan.GreaterThan(Left, Right)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 
