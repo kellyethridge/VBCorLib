@@ -53,6 +53,10 @@ Private mParser         As New TimeSpanParser
 Private mMaxValue       As TimeSpan
 Private mMinValue       As TimeSpan
 
+Private Type OperandMilliseconds
+    Left    As Currency
+    Right   As Currency
+End Type
 
 ''
 ' Returns a TimeSpan with a value of zero.
@@ -165,46 +169,44 @@ Public Function Parse(ByVal s As String) As TimeSpan
     End If
 End Function
 
+Public Function Add(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As TimeSpan
+    With GetMilliseconds(Left, Right)
+        Set Add = FromMilliseconds(.Left + .Right)
+    End With
+End Function
+
+Public Function Subtract(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As TimeSpan
+    With GetMilliseconds(Left, Right)
+        Set Subtract = FromMilliseconds(.Left - .Right)
+    End With
+End Function
+
+Public Function CompareTo(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Long
+    With GetMilliseconds(Left, Right)
+        If .Left < .Right Then
+            CompareTo = -1
+        ElseIf .Left > .Right Then
+            CompareTo = 1
+        End If
+    End With
+End Function
+
 Public Function Equals(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    Dim LeftMilliseconds    As Currency
-    Dim RightMilliseconds   As Currency
-    
-    If Not Left Is Nothing Then
-        LeftMilliseconds = Left.TotalMilliseconds
-    End If
-    If Not Right Is Nothing Then
-        RightMilliseconds = Right.TotalMilliseconds
-    End If
-    
-    Equals = LeftMilliseconds = RightMilliseconds
+    With GetMilliseconds(Left, Right)
+        Equals = .Left = .Right
+    End With
 End Function
 
 Public Function LessThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    Dim LeftMilliseconds    As Currency
-    Dim RightMilliseconds   As Currency
-    
-    If Not Left Is Nothing Then
-        LeftMilliseconds = Left.TotalMilliseconds
-    End If
-    If Not Right Is Nothing Then
-        RightMilliseconds = Right.TotalMilliseconds
-    End If
-    
-    LessThan = LeftMilliseconds < RightMilliseconds
+    With GetMilliseconds(Left, Right)
+        LessThan = .Left < .Right
+    End With
 End Function
 
 Public Function GreaterThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    Dim LeftMilliseconds    As Currency
-    Dim RightMilliseconds   As Currency
-    
-    If Not Left Is Nothing Then
-        LeftMilliseconds = Left.TotalMilliseconds
-    End If
-    If Not Right Is Nothing Then
-        RightMilliseconds = Right.TotalMilliseconds
-    End If
-    
-    GreaterThan = LeftMilliseconds > RightMilliseconds
+    With GetMilliseconds(Left, Right)
+        GreaterThan = .Left > .Right
+    End With
 End Function
 
 ''
@@ -254,3 +256,13 @@ Private Sub Class_Initialize()
     Set mMaxValue = FromMilliseconds(922337203685477.5807@)
     Set mMinValue = FromMilliseconds(-922337203685477.5807@ - 0.0001@)
 End Sub
+
+Private Function GetMilliseconds(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As OperandMilliseconds
+    If Not Left Is Nothing Then
+        GetMilliseconds.Left = Left.TotalMilliseconds
+    End If
+    
+    If Not Right Is Nothing Then
+        GetMilliseconds.Right = Right.TotalMilliseconds
+    End If
+End Function
