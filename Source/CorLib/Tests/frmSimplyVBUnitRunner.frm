@@ -97,13 +97,8 @@ Private Sub Form_Load()
     cArrayTests.Add New cArrayCreateInstanceTests
     cArrayTests.Add New cArrayFindTests
     System.Add cArrayTests
+    System.Add New TimeSpanTests
     
-    Dim TimeSpanTests As TestSuite
-    Set TimeSpanTests = Sim.NewTestSuite("TimeSpan")
-    TimeSpanTests.Add New TimeSpanTests
-    TimeSpanTests.Add New TestTimeSpanCreation
-    System.Add TimeSpanTests
-
     AddTest System
     
     Dim Collections As TestSuite

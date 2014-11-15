@@ -444,26 +444,7 @@ Public Function NewTimeSpan(Optional ByVal Days As Long, Optional ByVal Hours As
 End Function
 
 ''
-' Creates a new cDateTime object set to the specified date.
-'
-' @param Year The year of the date.
-' @param Month The month of the date.
-' @param Day The day of the date.
-' @param Hour The hour of the time portion of the date.
-' @param Minute The minute of the time portion of the date.
-' @param Second The second of the time portion of the date.
-' @param Millisecond The millisecond of the time portion of the date.
-' @param Calendar The calendar to use to create a cDateTime for a specific culture.
-' @param Kind Specifies whether the cDateTime is a UTC, Local, or unspecified time type.
-' @return A new cDateTime object initialized to the specified date and time.
-'
-Public Function NewcDateTime(Optional ByVal Year As Long, Optional ByVal Month As Long, Optional ByVal Day As Long, Optional ByVal Hour As Long, Optional ByVal Minute As Long, Optional ByVal Second As Long, Optional ByVal Millisecond As Long, Optional ByVal Calendar As Calendar, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
-    Set NewcDateTime = New cDateTime
-    Call NewcDateTime.Init(Year, Month, Day, Hour, Minute, Second, Millisecond, Calendar, Kind)
-End Function
-
-''
-' Creates a new cDateTime object set to the specified date.
+' Creates a new DateTime object set to the specified date.
 '
 ' @param Year The year of the date.
 ' @param Month The month of the date.

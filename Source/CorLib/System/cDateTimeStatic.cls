@@ -198,7 +198,7 @@ End Function
 Public Function Now() As cDateTime
     Call GetLocalTime(mSystemTime)
     With mSystemTime
-        Set Now = Cor.NewcDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds)
+        Set Now = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds)
     End With
 End Function
 
@@ -212,7 +212,7 @@ End Function
 Public Function UtcNow() As cDateTime
     Call GetSystemTime(mSystemTime)
     With mSystemTime
-        Set UtcNow = Cor.NewcDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds)
+        Set UtcNow = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds)
     End With
 End Function
 
@@ -234,7 +234,7 @@ End Function
 ' @remarks The minimum cDateTime is 1/1/0001 12:00:00 AM.
 '
 Public Property Get MinValue() As cDateTime
-    If mMinValue Is Nothing Then Set mMinValue = Cor.NewcDateTime(1, 1, 1)
+    If mMinValue Is Nothing Then Set mMinValue = Cor.NewDateTime(1, 1, 1)
     Set MinValue = mMinValue
 End Property
 
@@ -245,7 +245,7 @@ End Property
 ' @remarks The maximum cDateTime is "12/31/9999 11:59:59 PM".
 '
 Public Property Get MaxValue() As cDateTime
-    If mMaxValue Is Nothing Then Set mMaxValue = Cor.NewcDateTime(9999, 12, 31, 23, 59, 59, 999)
+    If mMaxValue Is Nothing Then Set mMaxValue = Cor.NewDateTime(9999, 12, 31, 23, 59, 59, 999)
     Set MaxValue = mMaxValue
 End Property
 

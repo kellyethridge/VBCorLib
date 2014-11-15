@@ -99,7 +99,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub ToOADate_WithDefaultDate_ReturnsMidnight()
-    Dim Source As New CDateTime
+    Dim Source As New cDateTime
     
     Dim Actual As Date
     Actual = Source.ToOADate
@@ -108,8 +108,8 @@ Public Sub ToOADate_WithDefaultDate_ReturnsMidnight()
 End Sub
 
 Public Sub ToOADate_WithValues_ReturnsExpected(ByVal Expected As Date)
-    Dim Source As CDateTime
-    Set Source = NewcDateTime(Year(Expected), Month(Expected), Day(Expected), Hour(Expected), Minute(Expected), Second(Expected))
+    Dim Source As cDateTime
+    Set Source = NewDateTime(Year(Expected), Month(Expected), Day(Expected), Hour(Expected), Minute(Expected), Second(Expected))
     
     Dim Actual As Date
     Actual = Source.ToOADate
@@ -118,9 +118,9 @@ Public Sub ToOADate_WithValues_ReturnsExpected(ByVal Expected As Date)
 End Sub
 
 Public Sub FromOADate_WithValues_ReturnscDateTime(ByVal Expected As Date)
-    Dim dt As CDateTime
+    Dim dt As cDateTime
         
-    Set dt = CDateTime.FromOADate(Expected)
+    Set dt = cDateTime.FromOADate(Expected)
     
     Dim Actual As Date
     Actual = dt.ToOADate
@@ -128,8 +128,8 @@ Public Sub FromOADate_WithValues_ReturnscDateTime(ByVal Expected As Date)
 End Sub
 
 Public Sub Equals_WithValues_ReturnsExpected(ByVal Other As Variant, ByVal Expected As Boolean)
-    Dim dt As CDateTime
-    Set dt = NewcDateTime(2004, 1, 2, 3, 4, 5)
+    Dim dt As cDateTime
+    Set dt = NewDateTime(2004, 1, 2, 3, 4, 5)
     
     Dim Actual As Boolean
     Actual = dt.Equals(Other)
@@ -138,8 +138,8 @@ Public Sub Equals_WithValues_ReturnsExpected(ByVal Other As Variant, ByVal Expec
 End Sub
 
 Public Sub Year_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As Long
     Actual = dt.Year
@@ -148,8 +148,8 @@ Public Sub Year_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Lon
 End Sub
 
 Public Sub Month_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As Long
     Actual = dt.Month
@@ -158,8 +158,8 @@ Public Sub Month_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Lo
 End Sub
 
 Public Sub Day_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As Long
     Actual = dt.Day
@@ -168,8 +168,8 @@ Public Sub Day_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long
 End Sub
 
 Public Sub Hour_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As Long
     Actual = dt.Hour
@@ -178,8 +178,8 @@ Public Sub Hour_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Lon
 End Sub
 
 Public Sub Minute_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As Long
     Actual = dt.Minute
@@ -188,8 +188,8 @@ Public Sub Minute_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As L
 End Sub
 
 Public Sub Second_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As Long
     Actual = dt.Second
@@ -198,7 +198,7 @@ Public Sub Second_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As L
 End Sub
 
 Public Sub Millisecond_WhenCalled_ReturnsMillisecondComponent()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Set dt = NewDateTime(1, 1, 1, 1, 1, 1, 37)
     
     Dim Actual As Long
@@ -210,22 +210,22 @@ End Sub
 Public Sub IsLeapYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = CDateTime.IsLeapYear(Year)
+    Actual = cDateTime.IsLeapYear(Year)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Constructor_WithTimeComponentsOnly_SetsToOADate()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = NewcDateTime(Hour:=18, Minute:=39, Second:=52)
+    Set dt = NewDateTime(Hour:=18, Minute:=39, Second:=52)
     
     Assert.That dt.ToOADate, Iz.EqualTo(#6:39:52 PM#)
 End Sub
 
 Public Sub DayOfYear_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As Long
     Actual = dt.DayOfYear
@@ -234,8 +234,8 @@ Public Sub DayOfYear_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected A
 End Sub
 
 Public Sub DayOfWeek_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As DayOfWeek)
-    Dim dt As CDateTime
-    Set dt = CDateTime.FromOADate(d)
+    Dim dt As cDateTime
+    Set dt = cDateTime.FromOADate(d)
     
     Dim Actual As DayOfWeek
     Actual = dt.DayOfWeek
@@ -244,8 +244,8 @@ Public Sub DayOfWeek_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected A
 End Sub
 
 Public Sub TotalMilliseconds_WhenCalled_ReturnsExpected()
-    Dim dt As CDateTime
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Dim dt As cDateTime
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     
     Dim Actual As Currency
     Actual = dt.TotalMilliseconds
@@ -255,8 +255,8 @@ Public Sub TotalMilliseconds_WhenCalled_ReturnsExpected()
 End Sub
 
 Public Sub TestTicks()
-    Dim dt As CDateTime
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Dim dt As cDateTime
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     
     Dim Actual As Variant
     Actual = dt.Ticks
@@ -265,8 +265,8 @@ Public Sub TestTicks()
 End Sub
 
 Public Sub DateOnly_WhenCalled_ReturnsDateTimeWithDatePartOnly()
-    Dim dt As CDateTime
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Dim dt As cDateTime
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     
     Set dt = dt.DateOnly
     
@@ -276,10 +276,10 @@ Public Sub DateOnly_WhenCalled_ReturnsDateTimeWithDatePartOnly()
 End Sub
 
 Public Sub TestTimeOfDay()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim tod As TimeSpan
     
-    Set dt = NewcDateTime(2004, 1, 1, 6, 10, 15, 100)
+    Set dt = NewDateTime(2004, 1, 1, 6, 10, 15, 100)
     Set tod = dt.TimeOfDay
     Assert.AreEqual 6, tod.Hours
     Assert.AreEqual 10, tod.Minutes
@@ -288,12 +288,12 @@ Public Sub TestTimeOfDay()
 End Sub
 
 Public Sub TestAdd()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim ts As TimeSpan
     Dim i As Long
     
     Set ts = newtimespan(1, 1, 1, 1, 1)
-    Set dt = New CDateTime
+    Set dt = New cDateTime
     For i = 1 To 100
         Set dt = dt.Add(ts)
     Next i
@@ -307,10 +307,10 @@ Public Sub TestAdd()
 End Sub
 
 Public Sub TestAddMilliseconds()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim i As Long
     
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     For i = 1 To 100
         Set dt = dt.AddMilliseconds(i)
     Next i
@@ -324,10 +324,10 @@ Public Sub TestAddMilliseconds()
 End Sub
 
 Public Sub TestAddDays()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim i As Long
     
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     For i = 1 To 100
         Set dt = dt.AddDays(i)
     Next i
@@ -341,10 +341,10 @@ Public Sub TestAddDays()
 End Sub
 
 Public Sub TestAddHours()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim i As Long
     
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     For i = 1 To 100
         Set dt = dt.AddHours(i)
     Next i
@@ -358,10 +358,10 @@ Public Sub TestAddHours()
 End Sub
 
 Public Sub TestAddMinutes()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim i As Long
     
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     For i = 1 To 100
         Set dt = dt.AddMinutes(i)
     Next i
@@ -375,10 +375,10 @@ Public Sub TestAddMinutes()
 End Sub
 
 Public Sub TestAddMonths()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim i As Long
     
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     For i = 1 To 100
         Set dt = dt.AddMonths(i)
     Next i
@@ -395,20 +395,20 @@ Public Sub TestDaysInMonth()
     Dim i As Long
     
     For i = 1 To 12
-        Assert.AreEqual Day(DateAdd("d", -1, DateSerial(1999, i + 1, 1))), CDateTime.DaysInMonth(1999, i)
+        Assert.AreEqual Day(DateAdd("d", -1, DateSerial(1999, i + 1, 1))), cDateTime.DaysInMonth(1999, i)
     Next i
     
     ' leap year
     For i = 1 To 12
-        Assert.AreEqual Day(DateAdd("d", -1, DateSerial(2000, i + 1, 1))), CDateTime.DaysInMonth(2000, i)
+        Assert.AreEqual Day(DateAdd("d", -1, DateSerial(2000, i + 1, 1))), cDateTime.DaysInMonth(2000, i)
     Next i
 End Sub
 
 Public Sub TestAddSeconds()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim i As Long
     
-    Set dt = NewcDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
     For i = 1 To 100
         Set dt = dt.AddSeconds(i)
     Next i
@@ -422,9 +422,9 @@ Public Sub TestAddSeconds()
 End Sub
 
 Public Sub TestAddYear()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = NewcDateTime(2004, 5, 16)
+    Set dt = NewDateTime(2004, 5, 16)
     Set dt = dt.AddYears(5)
     Assert.AreEqual 2009, dt.Year
     Assert.AreEqual 5, dt.Month
@@ -432,15 +432,15 @@ Public Sub TestAddYear()
 End Sub
 
 Public Sub TestCompareTo()
-    Dim dt As CDateTime
-    Dim LessThan As CDateTime
-    Dim GreaterThan As CDateTime
-    Dim EqualTo As CDateTime
+    Dim dt As cDateTime
+    Dim LessThan As cDateTime
+    Dim GreaterThan As cDateTime
+    Dim EqualTo As cDateTime
     
-    Set dt = NewcDateTime(2004, 5, 5, 5, 5, 5)
-    Set LessThan = NewcDateTime(2004, 5, 5, 5, 5, 4)
-    Set GreaterThan = NewcDateTime(2004, 5, 5, 5, 5, 6)
-    Set EqualTo = NewcDateTime(2004, 5, 5, 5, 5, 5)
+    Set dt = NewDateTime(2004, 5, 5, 5, 5, 5)
+    Set LessThan = NewDateTime(2004, 5, 5, 5, 5, 4)
+    Set GreaterThan = NewDateTime(2004, 5, 5, 5, 5, 6)
+    Set EqualTo = NewDateTime(2004, 5, 5, 5, 5, 5)
     
     Assert.IsTrue dt.CompareTo(LessThan) > 0
     Assert.IsTrue dt.CompareTo(GreaterThan) < 0
@@ -453,9 +453,9 @@ Public Sub TestCompareTo()
 End Sub
 
 Public Sub TestSubtractTimeSpan()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
      
-    Set dt = NewcDateTime(2004, 6, 6, 6, 6, 6, 6)
+    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
     Set dt = dt.Subtract(newtimespan(6, 6, 6, 6, 6))
     Assert.AreEqual 2004, dt.Year
     Assert.AreEqual 5, dt.Month
@@ -467,11 +467,11 @@ Public Sub TestSubtractTimeSpan()
 End Sub
 
 Public Sub TestSubtractcDateTime()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim ts As TimeSpan
     
-    Set dt = NewcDateTime(2004, 6, 6, 6, 6, 6, 6)
-    Set ts = dt.Subtract(NewcDateTime(2004, 6, 6))
+    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
+    Set ts = dt.Subtract(NewDateTime(2004, 6, 6))
     Assert.AreEqual 0, ts.Days
     Assert.AreEqual 6, ts.Hours
     Assert.AreEqual 6, ts.Minutes
@@ -480,10 +480,10 @@ Public Sub TestSubtractcDateTime()
 End Sub
 
 Public Sub TestSubtractDate()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim ts As TimeSpan
     
-    Set dt = NewcDateTime(2004, 6, 6, 6, 6, 6, 6)
+    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
     Set ts = dt.Subtract(#6/6/2004#)
     Assert.AreEqual 0, ts.Days
     Assert.AreEqual 6, ts.Hours
@@ -495,33 +495,33 @@ End Sub
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestToFileTime()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
 
-    Set dt = NewcDateTime(2004, 6, 6, 6, 6, 6, 6)
+    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
     Assert.AreEqual 12731000766006@, dt.ToFileTime
     
-    Set dt = NewcDateTime(2004, 1, 6, 6, 6, 6, 6)
+    Set dt = NewDateTime(2004, 1, 6, 6, 6, 6, 6)
     Assert.AreEqual 12717871566006@, dt.ToFileTime
 End Sub
 
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestToFileTimeUtc()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = NewcDateTime(2004, 6, 6, 6, 6, 6, 6)
+    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
     Assert.AreEqual 12730975566006@, dt.ToFileTimeUtc
     
-    Set dt = NewcDateTime(2004, 1, 6, 6, 6, 6, 6)
+    Set dt = NewDateTime(2004, 1, 6, 6, 6, 6, 6)
     Assert.AreEqual 12717842766006@, dt.ToFileTimeUtc
 End Sub
 
 Public Sub TestNow()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim d As Date
     Dim i As Long
     
-    Set dt = CDateTime.Now
+    Set dt = cDateTime.Now
     Set dt = dt.AddMilliseconds(-dt.Millisecond)
     Do While dt.CompareTo(d) <> 0 And i = 0
         d = Now
@@ -531,14 +531,14 @@ Public Sub TestNow()
 End Sub
 
 Public Sub TestUtcNow()
-    Dim dt As CDateTime
-    Dim d As CDateTime
+    Dim dt As cDateTime
+    Dim d As cDateTime
     Dim i As Long
     
-    Set dt = CDateTime.UtcNow
+    Set dt = cDateTime.UtcNow
     Set dt = dt.AddMilliseconds(-dt.Millisecond)
     Do While dt.CompareTo(d) <> 0 And i = 0
-        Set d = CDateTime.FromOADate(Now)
+        Set d = cDateTime.FromOADate(Now)
         Set d = d.ToUniversalTime
         i = i + 1
     Loop
@@ -546,49 +546,49 @@ Public Sub TestUtcNow()
 End Sub
 
 Public Sub TestToday()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     Dim d As Date
     
     d = Date
-    Set dt = CDateTime.Today
+    Set dt = cDateTime.Today
     Assert.AreEqual 0, dt.CompareTo(d)
 End Sub
 
 Public Sub TestParse()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = CDateTime.Parse("1/1/2004 8:30:30am")
+    Set dt = cDateTime.Parse("1/1/2004 8:30:30am")
     Assert.AreEqual 0, dt.CompareTo(#1/1/2004 8:30:30 AM#)
 End Sub
 
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestFromFileTime()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = CDateTime.FromFileTime(1000000000@)
+    Set dt = cDateTime.FromFileTime(1000000000@)
     Assert.IsTrue dt.Equals(#1/12/1601 5:46:40 AM#), "FromFileTime should return 1/12/1601 5:46:40am."
 End Sub
 
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestFromFileTimeUtc()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = CDateTime.FromFileTimeUtc(1000000000@)
+    Set dt = cDateTime.FromFileTimeUtc(1000000000@)
     Assert.IsTrue dt.Equals(#1/12/1601 1:46:40 PM#), "FromFileTime should return 1/12/1601 1:46:40 PM."
 End Sub
 
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestToLocalTime()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = CDateTime.FromOADate(#1/1/2004 12:00:00 PM#)
+    Set dt = cDateTime.FromOADate(#1/1/2004 12:00:00 PM#)
     Set dt = dt.ToLocalTime
     Assert.IsTrue dt.Equals(#1/1/2004 4:00:00 AM#), "ToLocalTime should return 1/1/2004 4AM."
     
-    Set dt = CDateTime.FromOADate(#6/1/2004 12:00:00 PM#)
+    Set dt = cDateTime.FromOADate(#6/1/2004 12:00:00 PM#)
     Set dt = dt.ToLocalTime
     Assert.IsTrue dt.Equals(#6/1/2004 5:00:00 AM#), "ToLocalTime should return 6/1/2004 5AM."
 End Sub
@@ -596,28 +596,28 @@ End Sub
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestToUniversalTime()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = CDateTime.FromOADate(#1/1/2004 12:00:00 PM#)
+    Set dt = cDateTime.FromOADate(#1/1/2004 12:00:00 PM#)
     Set dt = dt.ToUniversalTime
     Assert.IsTrue dt.Equals(#1/1/2004 8:00:00 PM#), "ToUniversalTime should return 1/1/2004 8PM."
     
-    Set dt = CDateTime.FromOADate(#6/1/2004 12:00:00 PM#)
+    Set dt = cDateTime.FromOADate(#6/1/2004 12:00:00 PM#)
     Set dt = dt.ToUniversalTime
     Assert.IsTrue dt.Equals(#6/1/2004 7:00:00 PM#), "ToUniversalTime should return 6/1/2004 7PM."
 End Sub
 
 Public Sub TestQuotedFormatting()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = CDateTime.FromOADate(#1/5/2005#)
+    Set dt = cDateTime.FromOADate(#1/5/2005#)
     Assert.AreEqual "5 tt 05", dt.ToString("d 'tt' 05")
 End Sub
 
 Public Sub TestFromBinary()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
-    Set dt = CDateTime.FromBinary(-915885960650477.5808@)
+    Set dt = cDateTime.FromBinary(-915885960650477.5808@)
     Assert.AreEqual DateTimeKind.LocalKind, dt.Kind
     Assert.AreEqual 205, dt.Year
     Assert.AreEqual 6, dt.Month
@@ -629,14 +629,14 @@ End Sub
 '205, 6, 7, 20, 57, 15
 
 Public Sub TestToBinary()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
     Set dt = NewDate(#6/7/205 8:57:15 PM#, LocalKind)
     Assert.AreEqual -915885960650477.5808@, dt.ToBinary
 End Sub
 
 Public Sub TestMaxDateToString()
-    Dim dt As CDateTime
+    Dim dt As cDateTime
     
     Set dt = NewDate(#12/31/9999 11:59:59 PM#)
     Assert.AreEqual "12/31/9999 11:59:59 PM", dt.ToString("MM/dd/yyyy hh:mm:ss tt")
