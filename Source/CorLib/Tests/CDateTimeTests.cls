@@ -95,6 +95,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/7/100#, DayOfWeek.Thursday
             Test.Use #1/8/100#, DayOfWeek.Friday
             
+        Case "AddMonths_WithValues_ReturnsExpected"
+            Test.Use 1, NewDateTime(2001, 2, 1)
+            Test.Use 2, NewDateTime(2001, 3, 1)
+            Test.Use 3, NewDateTime(2001, 4, 1)
+            Test.Use 4, NewDateTime(2001, 5, 1)
+            Test.Use 5, NewDateTime(2001, 6, 1)
+            Test.Use 6, NewDateTime(2001, 7, 1)
+            Test.Use 7, NewDateTime(2001, 8, 1)
+            Test.Use 8, NewDateTime(2001, 9, 1)
+            Test.Use 9, NewDateTime(2001, 10, 1)
+            Test.Use 10, NewDateTime(2001, 11, 1)
+            Test.Use 11, NewDateTime(2001, 12, 1)
+            Test.Use 12, NewDateTime(2002, 1, 1)
+            
     End Select
 End Sub
 
@@ -275,120 +289,88 @@ Public Sub DateOnly_WhenCalled_ReturnsDateTimeWithDatePartOnly()
     Assert.That Actual, Iz.True
 End Sub
 
-Public Sub TestTimeOfDay()
+Public Sub TimeOfDay_WhenCalled_ReturnsExpected()
     Dim dt As cDateTime
-    Dim tod As TimeSpan
-    
     Set dt = NewDateTime(2004, 1, 1, 6, 10, 15, 100)
-    Set tod = dt.TimeOfDay
-    Assert.AreEqual 6, tod.Hours
-    Assert.AreEqual 10, tod.Minutes
-    Assert.AreEqual 15, tod.Seconds
-    Assert.AreEqual 100, tod.Milliseconds
+    
+    Dim Actual As TimeSpan
+    Set Actual = dt.TimeOfDay
+    
+    Dim Expected As TimeSpan
+    Set Expected = NewTimeSpan(Hours:=6, Minutes:=10, Seconds:=15, milliseconds:=100)
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestAdd()
+Public Sub Add_WithOneHour_ReturnsDateTimePlus1Hour()
     Dim dt As cDateTime
+    Set dt = NewDateTime(2000, 1, 1)
     Dim ts As TimeSpan
-    Dim i As Long
+    Set ts = TimeSpan.FromHours(1)
     
-    Set ts = newtimespan(1, 1, 1, 1, 1)
-    Set dt = New cDateTime
-    For i = 1 To 100
-        Set dt = dt.Add(ts)
-    Next i
-    Assert.AreEqual 1, dt.Year
-    Assert.AreEqual 4, dt.Month
-    Assert.AreEqual 15, dt.Day
-    Assert.AreEqual 5, dt.Hour
-    Assert.AreEqual 41, dt.Minute
-    Assert.AreEqual 40, dt.Second
-    Assert.AreEqual 100, dt.Millisecond
+    Dim Actual As cDateTime
+    Set Actual = dt.Add(ts)
+    
+    Dim Expected As cDateTime
+    Set Expected = NewDateTime(2000, 1, 1, 1)
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestAddMilliseconds()
+Public Sub AddMilliseconds_With100_ReturnsDateTimePlus100Milliseconds()
     Dim dt As cDateTime
-    Dim i As Long
+    Set dt = NewDateTime(2000, 1, 1)
     
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
-    For i = 1 To 100
-        Set dt = dt.AddMilliseconds(i)
-    Next i
-    Assert.AreEqual 1, dt.Month
-    Assert.AreEqual 1, dt.Day
-    Assert.AreEqual 2004, dt.Year
-    Assert.AreEqual 1, dt.Hour
-    Assert.AreEqual 1, dt.Minute
-    Assert.AreEqual 6, dt.Second
-    Assert.AreEqual 51, dt.Millisecond
+    Dim Actual As cDateTime
+    Set Actual = dt.AddMilliseconds(100)
+    
+    Dim Expected As cDateTime
+    Set Expected = NewDateTime(2000, 1, 1, Millisecond:=100)
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestAddDays()
+Public Sub AddDays_With5_ReturnsDateTimePlus5Days()
     Dim dt As cDateTime
-    Dim i As Long
+    Set dt = NewDateTime(2000, 1, 1)
     
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
-    For i = 1 To 100
-        Set dt = dt.AddDays(i)
-    Next i
-    Assert.AreEqual 10, dt.Month
-    Assert.AreEqual 29, dt.Day
-    Assert.AreEqual 2017, dt.Year
-    Assert.AreEqual 1, dt.Hour
-    Assert.AreEqual 1, dt.Minute
-    Assert.AreEqual 1, dt.Second
-    Assert.AreEqual 1, dt.Millisecond
+    Dim Actual As cDateTime
+    Set Actual = dt.AddDays(5)
+    
+    Dim Expected As cDateTime
+    Set Expected = NewDateTime(2000, 1, 6)
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestAddHours()
+Public Sub AddHours_With5_ReturnsDateTimePlus5Hours()
     Dim dt As cDateTime
-    Dim i As Long
+    Set dt = NewDateTime(2000, 1, 1)
     
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
-    For i = 1 To 100
-        Set dt = dt.AddHours(i)
-    Next i
-    Assert.AreEqual 7, dt.Month
-    Assert.AreEqual 29, dt.Day
-    Assert.AreEqual 2004, dt.Year
-    Assert.AreEqual 11, dt.Hour
-    Assert.AreEqual 1, dt.Minute
-    Assert.AreEqual 1, dt.Second
-    Assert.AreEqual 1, dt.Millisecond
+    Dim Actual As cDateTime
+    Set Actual = dt.AddHours(5)
+    
+    Dim Expected As cDateTime
+    Set Expected = NewDateTime(2000, 1, 1, 5)
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestAddMinutes()
+Public Sub AddMinutes_With5_ReturnsDateTimePlus5Minutes()
     Dim dt As cDateTime
-    Dim i As Long
+    Set dt = NewDateTime(2000, 1, 1)
     
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
-    For i = 1 To 100
-        Set dt = dt.AddMinutes(i)
-    Next i
-    Assert.AreEqual 1, dt.Month
-    Assert.AreEqual 4, dt.Day
-    Assert.AreEqual 2004, dt.Year
-    Assert.AreEqual 13, dt.Hour
-    Assert.AreEqual 11, dt.Minute
-    Assert.AreEqual 1, dt.Second
-    Assert.AreEqual 1, dt.Millisecond
+    Dim Actual As cDateTime
+    Set Actual = dt.AddMinutes(5)
+    
+    Dim Expected As cDateTime
+    Set Expected = NewDateTime(2000, 1, 1, Minute:=5)
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestAddMonths()
+Public Sub AddMonths_WithValues_ReturnsExpected(ByVal Months As Long, ByVal Expected As cDateTime)
     Dim dt As cDateTime
-    Dim i As Long
+    Set dt = NewDateTime(2001, 1, 1)
     
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
-    For i = 1 To 100
-        Set dt = dt.AddMonths(i)
-    Next i
-    Assert.AreEqual 11, dt.Month
-    Assert.AreEqual 1, dt.Day
-    Assert.AreEqual 2424, dt.Year
-    Assert.AreEqual 1, dt.Hour
-    Assert.AreEqual 1, dt.Minute
-    Assert.AreEqual 1, dt.Second
-    Assert.AreEqual 1, dt.Millisecond
+    Dim Actual As cDateTime
+    Set Actual = dt.AddMonths(Months)
+    
+    Assert.That Actual, Equals(Expected)
 End Sub
 
 Public Sub TestDaysInMonth()
@@ -456,7 +438,7 @@ Public Sub TestSubtractTimeSpan()
     Dim dt As cDateTime
      
     Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
-    Set dt = dt.Subtract(newtimespan(6, 6, 6, 6, 6))
+    Set dt = dt.Subtract(NewTimeSpan(6, 6, 6, 6, 6))
     Assert.AreEqual 2004, dt.Year
     Assert.AreEqual 5, dt.Month
     Assert.AreEqual 31, dt.Day
@@ -476,7 +458,7 @@ Public Sub TestSubtractcDateTime()
     Assert.AreEqual 6, ts.Hours
     Assert.AreEqual 6, ts.Minutes
     Assert.AreEqual 6, ts.Seconds
-    Assert.AreEqual 6, ts.Milliseconds
+    Assert.AreEqual 6, ts.milliseconds
 End Sub
 
 Public Sub TestSubtractDate()
@@ -489,7 +471,7 @@ Public Sub TestSubtractDate()
     Assert.AreEqual 6, ts.Hours
     Assert.AreEqual 6, ts.Minutes
     Assert.AreEqual 6, ts.Seconds
-    Assert.AreEqual 6, ts.Milliseconds
+    Assert.AreEqual 6, ts.milliseconds
 End Sub
 
 ' This test is subject to the current timezone. Modify this test
