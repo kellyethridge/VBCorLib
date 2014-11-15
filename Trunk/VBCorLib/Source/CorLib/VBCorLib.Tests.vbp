@@ -159,7 +159,6 @@ Class=TestTaiwanCalendar; Tests\TestTaiwanCalendar.cls
 Class=TestThaiBuddhistCalendar; Tests\TestThaiBuddhistCalendar.cls
 Class=TestTicker; Tests\TestTicker.cls
 Class=TimeSpanTests; Tests\TimeSpanTests.cls
-Class=TestTimeSpanCreation; Tests\TestTimeSpanCreation.cls
 Class=TestTimeZone; Tests\TestTimeZone.cls
 Class=TestToBase64Transform; Tests\TestToBase64Transform.cls
 Class=TestTripleDESCryptoServiceProvider; Tests\TestTripleDESCryptoServiceProvider.cls

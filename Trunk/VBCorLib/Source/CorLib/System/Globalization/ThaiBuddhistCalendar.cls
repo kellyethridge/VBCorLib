@@ -194,7 +194,7 @@ End Function
 
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As cDateTime
     Year = GetGregorianYear(Year, Era)
-    Set ToDateTime = Cor.NewcDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond)
+    Set ToDateTime = Cor.NewDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond)
 End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long

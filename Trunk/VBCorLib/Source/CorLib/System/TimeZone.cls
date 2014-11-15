@@ -207,14 +207,14 @@ Private Function GetCrossOverPoint(ByVal Year As Long, ByRef Time As SYSTEMTIME)
     
     If Time.wDay = FIND_LAST Then
         ' find last dayofweek in month
-        Set Ret = Cor.NewcDateTime(Year, Time.wMonth + 1, 1, Time.wHour)
+        Set Ret = Cor.NewDateTime(Year, Time.wMonth + 1, 1, Time.wHour)
         mydow = Ret.DayOfWeek
         targetdow = mydow - Time.wDayOfWeek
         If targetdow < 0 Then targetdow = targetdow + 7
         Set Ret = Ret.AddDays(-targetdow)
     Else
         ' find nth dayofweek of month
-        Set Ret = Cor.NewcDateTime(Year, Time.wMonth, 1, Time.wHour)
+        Set Ret = Cor.NewDateTime(Year, Time.wMonth, 1, Time.wHour)
         mydow = Ret.DayOfWeek
         targetdow = Time.wDayOfWeek
         If targetdow < mydow Then targetdow = targetdow + 7

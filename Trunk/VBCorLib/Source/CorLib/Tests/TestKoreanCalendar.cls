@@ -38,7 +38,7 @@ End Sub
 
 Public Sub TestToDateTime()
     Dim dt As cDateTime
-    Set dt = Cor.NewcDateTime(2001, 1, 1, 1, 1, 1, 1)
+    Set dt = Cor.NewDateTime(2001, 1, 1, 1, 1, 1, 1)
     Assert.IsTrue dt.Equals(cal.ToDateTime(4334, 1, 1, 1, 1, 1, 1))
 End Sub
 
