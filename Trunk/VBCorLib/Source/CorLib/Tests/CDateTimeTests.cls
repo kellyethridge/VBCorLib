@@ -124,6 +124,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2014, 12, 31
             Test.Use 2016, 2, 29
             
+        Case "CompareTo_WithValues_ReturnsExpected"
+            Test.Use 5, 10, -1
+            Test.Use 10, 5, 1
+            Test.Use 10, 10, 0
+            
+        Case "Subtract_WithTimeSpans_ReturnsExpected"
+            Test.Use TimeSpan.Zero, NewDateTime(2001, 1, 1)
+            Test.Use TimeSpan.FromHours(-1), NewDate(#1/1/2001 1:00:00 AM#)
+            Test.Use TimeSpan.FromHours(1), NewDate(#12/31/2000 11:00:00 PM#)
+            
+        Case "Subtract_WithDates_ReturnsExpected"
+            Test.Use #12/31/2000#, TimeSpan.FromDays(1)
+            Test.Use NewDateTime(2000, 12, 31), TimeSpan.FromDays(1)
+            
     End Select
 End Sub
 
@@ -420,72 +434,66 @@ Public Sub DaysInMonth_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Mont
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestCompareTo()
-    Dim dt As cDateTime
-    Dim LessThan As cDateTime
-    Dim GreaterThan As cDateTime
-    Dim EqualTo As cDateTime
+Public Sub CompareTo_WithValues_ReturnsExpected(ByVal LeftHours As Double, ByVal RightHours As Double, ByVal Expected As Long)
+    Dim Left As cDateTime
+    Dim Right As cDateTime
+    Set Left = cDateTime.MinValue.AddHours(LeftHours)
+    Set Right = cDateTime.MinValue.AddHours(RightHours)
     
-    Set dt = NewDateTime(2004, 5, 5, 5, 5, 5)
-    Set LessThan = NewDateTime(2004, 5, 5, 5, 5, 4)
-    Set GreaterThan = NewDateTime(2004, 5, 5, 5, 5, 6)
-    Set EqualTo = NewDateTime(2004, 5, 5, 5, 5, 5)
+    Dim Actual As Long
+    Actual = Left.CompareTo(Right)
     
-    Assert.IsTrue dt.CompareTo(LessThan) > 0
-    Assert.IsTrue dt.CompareTo(GreaterThan) < 0
-    Assert.IsTrue dt.CompareTo(EqualTo) = 0
-    Assert.IsTrue dt.CompareTo(Nothing) > 0
-    Assert.IsTrue dt.CompareTo(Null) > 0
-    Assert.IsTrue dt.CompareTo(#1/1/2004#) > 0
-    Assert.IsTrue dt.CompareTo(#1/1/2005#) < 0
-    Assert.IsTrue dt.CompareTo(#5/5/2004 5:05:05 AM#) = 0
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestSubtractTimeSpan()
+Public Sub Subtract_WithTimeSpans_ReturnsExpected(ByVal TimeSpanToSubtract As TimeSpan, ByVal Expected As cDateTime)
     Dim dt As cDateTime
-     
-    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
-    Set dt = dt.Subtract(newtimespan(6, 6, 6, 6, 6))
-    Assert.AreEqual 2004, dt.Year
-    Assert.AreEqual 5, dt.Month
-    Assert.AreEqual 31, dt.Day
-    Assert.AreEqual 0, dt.Hour
-    Assert.AreEqual 0, dt.Minute
-    Assert.AreEqual 0, dt.Second
-    Assert.AreEqual 0, dt.Millisecond
+    Set dt = NewDateTime(2001, 1, 1)
+    
+    Dim Actual As cDateTime
+    Set Actual = dt.Subtract(TimeSpanToSubtract)
+    
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestSubtractcDateTime()
+Public Sub Subtract_WithDates_ReturnsExpected(ByVal DateToSubtract As Variant, ByVal Expected As TimeSpan)
     Dim dt As cDateTime
-    Dim ts As TimeSpan
+    Set dt = NewDate(#1/1/2001#)
     
-    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
-    Set ts = dt.Subtract(NewDateTime(2004, 6, 6))
-    Assert.AreEqual 0, ts.Days
-    Assert.AreEqual 6, ts.Hours
-    Assert.AreEqual 6, ts.Minutes
-    Assert.AreEqual 6, ts.Seconds
-    Assert.AreEqual 6, ts.Milliseconds
+    Dim Actual As TimeSpan
+    Set Actual = dt.Subtract(DateToSubtract)
+    
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestSubtractDate()
+Public Sub Subtract_WithNothing_ThrowsArgumentNullException()
+    On Error GoTo errTrap
     Dim dt As cDateTime
-    Dim ts As TimeSpan
+    Set dt = NewDate(#1/1/2001#)
     
-    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
-    Set ts = dt.Subtract(#6/6/2004#)
-    Assert.AreEqual 0, ts.Days
-    Assert.AreEqual 6, ts.Hours
-    Assert.AreEqual 6, ts.Minutes
-    Assert.AreEqual 6, ts.Seconds
-    Assert.AreEqual 6, ts.Milliseconds
+    dt.Subtract Nothing
+    
+errTrap:
+    AssertArgumentNullException Err, "Value"
+End Sub
+
+Public Sub Subtract_WithNonsupportedObject_ThrowsArgumentException()
+    On Error GoTo errTrap
+    Dim dt As cDateTime
+    Set dt = NewDate(#1/1/2001#)
+    
+    Dim Value As New Collection
+    dt.Subtract Value
+    
+errTrap:
+    AssertArgumentException Err, "Value"
 End Sub
 
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestToFileTime()
     Dim dt As cDateTime
-
+    
     Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
     Assert.AreEqual 12731000766006@, dt.ToFileTime
     

@@ -48,7 +48,7 @@ Public Sub CheckNotInRange(ByVal FailingCondition As Boolean, ByVal Parameter As
     CheckInRange Not FailingCondition, Parameter, Message
 End Sub
 
-Public Sub CheckIsNotNull(ByVal ObjectToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ResourceStringId = ArgumentNull_Generic)
+Public Sub CheckNotNull(ByVal ObjectToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ResourceStringId = ArgumentNull_Generic)
     If ObjectToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
     End If
