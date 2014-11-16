@@ -91,7 +91,6 @@ Private mDaysInMonth()      As Long
 Private mDateAscDateTime    As cDateTime
 Private mMinValue           As cDateTime
 Private mMaxValue           As cDateTime
-Private mSystemTime         As SYSTEMTIME
 
 
 ''
@@ -119,10 +118,9 @@ End Function
 ' @return The number of days in the specified month.
 '
 Public Function DaysInMonth(ByVal Year As Long, ByVal Month As Long) As Long
-    If Year < 1 Or Year > 9999 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Message:=Resources.GetString(ArgumentOutOfRange_Year))
-    If Month < 1 Or Month > 12 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Message:=Resources.GetString(ArgumentOutOfRange_Month))
+    CheckInRange Year > 0 And Year < 10000, Param.Year, ArgumentOutOfRange.Year
+    CheckInRange Month > 0 And Month < 13, Param.Month, ArgumentOutOfRange.Month
+        
     If Month = 2 Then
         If IsLeapYear(Year) Then
             DaysInMonth = 29
@@ -141,7 +139,7 @@ End Function
 '
 Public Function FromOADate(ByVal d As Date, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
     Set FromOADate = New cDateTime
-    Call FromOADate.InitFromDate(d, Kind)
+    FromOADate.InitFromDate d, Kind
 End Function
 
 ''
@@ -170,7 +168,7 @@ End Function
 '
 Public Function FromFileTimeUtc(ByVal Time As Currency) As cDateTime
     Set FromFileTimeUtc = New cDateTime
-    Call FromFileTimeUtc.InitFromFileTime(Time, UtcKind)
+    FromFileTimeUtc.InitFromFileTime Time, UtcKind
 End Function
 
 ''
@@ -184,7 +182,7 @@ End Function
 '
 Public Function FromMilliseconds(ByVal ms As Currency, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
     Set FromMilliseconds = New cDateTime
-    Call FromMilliseconds.InitFromMilliseconds(ms, Kind)
+    FromMilliseconds.InitFromMilliseconds ms, Kind
 End Function
 
 ''
@@ -196,9 +194,10 @@ End Function
 ' must be subtracted for the instance, or use cDateTime.FromOADate(Now).
 '
 Public Function Now() As cDateTime
-    Call GetLocalTime(mSystemTime)
-    With mSystemTime
-        Set Now = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds)
+    Dim LocalTime As SYSTEMTIME
+    GetLocalTime LocalTime
+    With LocalTime
+        Set Now = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds, Kind:=LocalKind)
     End With
 End Function
 
@@ -210,9 +209,10 @@ End Function
 ' milliseconds. There is no direct VB equivalent.
 '
 Public Function UtcNow() As cDateTime
-    Call GetSystemTime(mSystemTime)
-    With mSystemTime
-        Set UtcNow = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds)
+    Dim UtcTime As SYSTEMTIME
+    GetSystemTime UtcTime
+    With UtcTime
+        Set UtcNow = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds, Kind:=UtcKind)
     End With
 End Function
 
@@ -224,7 +224,11 @@ End Function
 ' @remarks The time is still there, just is only 12:00AM.
 '
 Public Function Today() As cDateTime
-    Set Today = FromOADate(Date)
+    Dim LocalTime As SYSTEMTIME
+    GetLocalTime LocalTime
+    With LocalTime
+        Set Today = Cor.NewDateTime(.wYear, .wMonth, .wDay, Kind:=LocalKind)
+    End With
 End Function
 
 ''
@@ -234,7 +238,10 @@ End Function
 ' @remarks The minimum cDateTime is 1/1/0001 12:00:00 AM.
 '
 Public Property Get MinValue() As cDateTime
-    If mMinValue Is Nothing Then Set mMinValue = Cor.NewDateTime(1, 1, 1)
+    If mMinValue Is Nothing Then
+        Set mMinValue = Cor.NewDateTime(1, 1, 1)
+    End If
+    
     Set MinValue = mMinValue
 End Property
 
@@ -245,7 +252,10 @@ End Property
 ' @remarks The maximum cDateTime is "12/31/9999 11:59:59 PM".
 '
 Public Property Get MaxValue() As cDateTime
-    If mMaxValue Is Nothing Then Set mMaxValue = Cor.NewDateTime(9999, 12, 31, 23, 59, 59, 999)
+    If mMaxValue Is Nothing Then
+        Set mMaxValue = Cor.NewDateTime(9999, 12, 31, 23, 59, 59, 999)
+    End If
+    
     Set MaxValue = mMaxValue
 End Property
 
@@ -287,7 +297,7 @@ End Function
 '
 Public Function FromBinary(ByVal Value As Currency) As cDateTime
     Set FromBinary = New cDateTime
-    Call FromBinary.InitFromBinary(Value)
+    FromBinary.InitFromBinary Value
 End Function
 
 ''
@@ -299,7 +309,7 @@ End Function
 '
 Public Function SpecifyKind(ByVal Value As cDateTime, ByVal Kind As DateTimeKind) As cDateTime
     Set SpecifyKind = New cDateTime
-    Call SpecifyKind.InitFromMilliseconds(Value.TotalMilliseconds, Kind)
+    SpecifyKind.InitFromMilliseconds Value.TotalMilliseconds, Kind
 End Function
 
 
@@ -308,7 +318,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function AscDateTime(ByVal d As Date) As cDateTime
     Set AscDateTime = mDateAscDateTime
-    Call AscDateTime.InitFromDate(d, UnspecifiedKind)
+    AscDateTime.InitFromDate d, UnspecifiedKind
 End Function
 
 ''
@@ -325,12 +335,12 @@ Friend Function GetcDateTime(ByRef d As Variant) As cDateTime
             If TypeOf d Is cDateTime Then
                 Set GetcDateTime = d
             Else
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired))
+                Throw Cor.NewArgumentException(Resources.GetString(Argument_DateRequired))
             End If
         Case vbDate
             Set GetcDateTime = FromOADate(d)
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired))
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_DateRequired))
     End Select
 End Function
 
