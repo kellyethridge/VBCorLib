@@ -145,6 +145,8 @@ Public Enum Param
     Value
     Arr
     List
+    Year
+    Month
 End Enum
 
 Public Enum ArgumentOutOfRange
