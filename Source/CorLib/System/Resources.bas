@@ -107,6 +107,7 @@ Public Enum ResourceStringId
     Argument_UnsupportedArray = 828
     Argument_NeedIntrinsicType = 829
     Argument_CharArrayRequired = 830
+    Argument_InvalidDateSubtraction = 831
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902

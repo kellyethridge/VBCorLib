@@ -29,7 +29,7 @@ Attribute VB_Exposed = True
 '    along with Foobar; if not, write to the Free Software
 '    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: cDateTime
+'    Module: CDateTime
 '
 
 ''
@@ -618,8 +618,11 @@ End Function
 ' of the TimeSpan obect from this instance is returned.
 '
 Public Function Subtract(ByRef Value As Variant) As Object
-    Select Case VariantType(Value) And &HFF
+    Select Case VarType(Value)
         Case vbObject
+            If Value Is Nothing Then _
+                Throw Cor.NewArgumentNullException(Resources.GetParameter(Param.Value))
+            
             If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan
                 Set ts = Value
@@ -629,12 +632,12 @@ Public Function Subtract(ByRef Value As Variant) As Object
                 Set dt = Value
                 Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - dt.TotalMilliseconds)
             Else
-                Throw Cor.NewArgumentException("Date, cDateTime or TimeSpan object is required.", "value")
+                Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidDateSubtraction), Resources.GetParameter(Param.Value))
             End If
         Case vbDate
             Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - cDateTime.AscDateTime(Value).TotalMilliseconds)
         Case Else
-            Throw Cor.NewArgumentException("Date, cDateTime or TimeSpan object is required.", "value")
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidDateSubtraction), Resources.GetParameter(Param.Value))
     End Select
 End Function
 
