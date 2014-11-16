@@ -165,7 +165,7 @@ Private Sub Form_Load()
     Cyrptography.Add HMACTests
     Cyrptography.Add New TestMACTripleDES
     Cyrptography.Add New TestRfc2898DeriveBytes
-    Cyrptography.Add New TestCryptoConfig
+    Cyrptography.Add New CryptoConfigTests
     Dim RSATests As TestSuite
     Set RSATests = Sim.NewTestSuite("RSACryptoServiceProvider")
     RSATests.Add New TestCspParameters

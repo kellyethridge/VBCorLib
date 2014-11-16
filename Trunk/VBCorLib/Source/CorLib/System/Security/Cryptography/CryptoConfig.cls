@@ -37,11 +37,6 @@ Attribute VB_Exposed = True
 
 Option Explicit
 
-Private Const X680_OBJECT_IDENTIFIER_TYPE_TAG As Long = 6
-
-Private mEncodingStream As New MemoryStream
-
-
 ''
 ' Creates a cryptography object based on the name.
 '
@@ -113,36 +108,34 @@ End Function
 ' @return An encoded version of the object identifier as described in the X.690 standard.
 '
 Public Function EncodeOID(ByVal Str As String) As Byte()
-    Dim Octets() As String
+    Const X680_OBJECT_IDENTIFIER_TYPE_TAG As Long = 6
+    
+    Dim EncodingStream  As New MemoryStream
+    Dim Octets()        As String
     Octets = Split(Str, ".")
     
     If UBound(Octets) = 0 Then _
         Throw Cor.NewCryptographicException("Invalid OID.")
     
-    ' reset the shared stream.
-    mEncodingStream.Position = 0
-    Call mEncodingStream.SetLength(0)
-    
     On Error GoTo errTrap
     
-    Call mEncodingStream.WriteByte(X680_OBJECT_IDENTIFIER_TYPE_TAG)
-    Call mEncodingStream.WriteByte(0) ' place holder for the length.
+    EncodingStream.WriteByte X680_OBJECT_IDENTIFIER_TYPE_TAG
+    EncodingStream.WriteByte 0 ' place holder for the length.
     
     Dim Bytes() As Byte
-    Bytes = EncodeNumber(EncodeFirstTwoIdentifiers(Octets(0), Octets(1)))
-    
-    Call mEncodingStream.WriteBlock(Bytes, 0, cArray.GetLength(Bytes))
+    Dim Count   As Long
+    Count = EncodeNumber(EncodeFirstTwoIdentifiers(Octets(0), Octets(1)), Bytes)
+    EncodingStream.WriteBlock Bytes, 0, Count
     
     Dim i As Long
     For i = 2 To UBound(Octets)
-        Bytes = EncodeNumber(Octets(i))
-        
-        Call mEncodingStream.WriteBlock(Bytes, 0, cArray.GetLength(Bytes))
+        Count = EncodeNumber(Octets(i), Bytes)
+        EncodingStream.WriteBlock Bytes, 0, Count
     Next i
     
     Dim Ret() As Byte
-    Ret = mEncodingStream.ToArray
-    Ret(1) = mEncodingStream.Length - 2 ' we don't count this byte or the tag byte.
+    Ret = EncodingStream.ToArray
+    Ret(1) = EncodingStream.Length - 2 ' we don't count this byte or the tag byte.
     
     EncodeOID = Ret
     Exit Function
@@ -167,6 +160,8 @@ Public Function MapNameToOID(ByVal Name As String) As String
         Case "sha512":      Ret = "2.16.840.1.101.3.4.2.3"
         Case "md5":         Ret = "1.2.840.113549.2.5"
         Case "ripemd160":   Ret = "1.3.36.3.2.1"
+        Case Else
+            Ret = "1.2.840.113549.1.9.9"
     End Select
 
     MapNameToOID = Ret
@@ -179,7 +174,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ' X.690 8.19.2
-Private Function EncodeNumber(ByVal Value As Long) As Byte()
+Private Function EncodeNumber(ByVal Value As Long, ByRef Result() As Byte) As Long
     Dim Buf() As Byte
     ReDim Buf(15)
     
@@ -195,7 +190,8 @@ Private Function EncodeNumber(ByVal Value As Long) As Byte()
     
     ReDim Preserve Buf(0 To i)
     
-    EncodeNumber = ReverseByteCopy(Buf)
+    Result = ReverseByteCopy(Buf)
+    EncodeNumber = i + 1
 End Function
 
 ' X.690 8.19.4
