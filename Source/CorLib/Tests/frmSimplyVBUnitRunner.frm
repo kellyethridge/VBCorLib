@@ -279,7 +279,7 @@ Private Sub Form_Load()
     Globalization.Add New CharEnumeratorTests
     Globalization.Add New TestGregorianCalendar
     Globalization.Add New TestHijriCalendar
-    Globalization.Add New TestCultureInfo
+    Globalization.Add New CultureInfoTests
     Globalization.Add New TestDateTimeFormatInfoInv
 
     AddTest Globalization
