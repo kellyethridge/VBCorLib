@@ -412,8 +412,11 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
         Case Else
             Throw Cor.NewArgumentException("Invalid Culture Identifier.", "NameOrLCID")
     End Select
-    If UseUserOverride Then mProps.UseUserOverride = (GetUserDefaultLCID = ID)
-    Call Load(ID)
+    
+    mProps.UseUserOverride = UseUserOverride
+    
+    CheckRange ID < 0, Param.LCID, ArgumentOutOfRange.NeedNonNegNum
+    Load ID
 End Sub
 
 Friend Sub CloneHelper(ByRef props As PropsType, ByVal dtInfo As DateTimeFormatInfo, ByVal nInfo As NumberFormatInfo, ByVal calInfo As Calendar)
