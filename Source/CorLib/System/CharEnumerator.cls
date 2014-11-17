@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2014 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: CharEnumerator
+' Module: CharEnumerator
 '
 
 ''
@@ -118,9 +121,9 @@ End Function
 '
 Public Property Get Current() As Integer
     If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
+        Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_EnumNotStarted))
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_EnumFinished))
 
     Current = mString.Data(mIndex)
 End Property
@@ -134,7 +137,7 @@ End Property
 '
 Public Function MoveNext() As Boolean
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_EnumFinished))
 
     If mIndex = mEndIndex Then
         mIndex = mEndIndex + 1
@@ -194,7 +197,7 @@ Friend Sub Init(ByRef s As String, ByVal CopyString As Boolean)
         Ptr = StrPtr(s)
     End If
     mEndIndex = Len(s) - 1
-    Call InitWordBuffer(mString, Ptr, mEndIndex + 1)
+    InitWordBuffer mString, Ptr, mEndIndex + 1
     Reset
 End Sub
 
@@ -207,15 +210,15 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
         mIndex = .ReadProperty("Index")
         mEndIndex = .ReadProperty("EndIndex")
         mStringCopy = .ReadProperty("String")
-        Call InitWordBuffer(mString, StrPtr(mStringCopy), mEndIndex + 1)
+        InitWordBuffer mString, StrPtr(mStringCopy), mEndIndex + 1
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("Index", mIndex)
-        Call .WriteProperty("EndIndex", mEndIndex)
-        Call .WriteProperty("String", mStringCopy)
+        .WriteProperty "Index", mIndex
+        .WriteProperty "EndIndex", mEndIndex
+        .WriteProperty "String", mStringCopy
     End With
 End Sub
 
@@ -248,7 +251,7 @@ Private Function IEnumerator_MoveNext() As Boolean
 End Function
 
 Private Sub IEnumerator_Reset()
-    Call Reset
+    Reset
 End Sub
 
 

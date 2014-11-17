@@ -276,7 +276,7 @@ Private Sub Form_Load()
     Globalization.Add New TestHebrewCalendar
     Globalization.Add New TestJulianCalendar
     Globalization.Add New TestCodePageDecoder
-    Globalization.Add New TestCharEnumerator
+    Globalization.Add New CharEnumeratorTests
     Globalization.Add New TestGregorianCalendar
     Globalization.Add New TestHijriCalendar
     Globalization.Add New TestCultureInfo
