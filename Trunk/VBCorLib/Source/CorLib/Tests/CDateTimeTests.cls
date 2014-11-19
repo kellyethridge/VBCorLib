@@ -22,10 +22,10 @@ Private Declare Function GetTimeZoneInformation Lib "kernel32" (lpTimeZoneInform
 Private Type TIME_ZONE_INFORMATION
     Bias             As Long
     StandardName(63) As Byte
-    StandardDate     As SYSTEMTIME
+    StandardDate     As SystemTime
     StandardBias     As Long
     DaylightName(63) As Byte
-    DaylightDate     As SYSTEMTIME
+    DaylightDate     As SystemTime
     DaylightBias     As Long
 End Type
 
@@ -546,6 +546,16 @@ Public Sub Now_WhenCalled_ReturnsLocalTime()
     Set dt = CDateTime.Now
     
     Assert.That dt.Kind, Iz.EqualTo(DateTimeKind.LocalKind)
+End Sub
+
+Public Sub Now_WhenCalled_ReturnsCurrentDateTime()
+    Dim Actual As Long
+    
+    Actual = CDateTime.Now.Subtract(NewDateTime(1970, 1, 1)).TotalSeconds
+    
+    Dim Diff As Long
+    Diff = DateDiff("s", #1/1/1970#, Now) - Actual
+    Assert.That Diff, Iz.GreaterThanOrEqualTo(-5).AndAlso.LessThanOrEqualTo(5)
 End Sub
 
 Public Sub UtcNow_WhenCalled_ReturnsUtcTime()
