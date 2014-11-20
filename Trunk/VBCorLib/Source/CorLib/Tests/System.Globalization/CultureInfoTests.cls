@@ -32,19 +32,19 @@ Public Sub Setup()
     Set mOldCulture = Thread.CurrentThread.CurrentCulture
 End Sub
 
-Public Sub Teardown()
+Public Sub TearDown()
     Set Thread.CurrentThread.CurrentCulture = mOldCulture
 End Sub
 
 Public Sub Constructor_WithIdentifier2067_ReturnsCultureInfo()
-    Dim Info As CultureInfo
+    Dim info As CultureInfo
     
-    Set Info = Cor.NewCultureInfo(2067)
+    Set info = Cor.NewCultureInfo(2067)
     
-    Assert.That Info.IsReadOnly, Iz.False, "Should be read-only."
-    Assert.That Info.LCID, Iz.EqualTo(2067)
-    Assert.That Info.Name, Iz.EqualTo("nl-BE")
-    Assert.That Info.UseUserOverride, Iz.True, "Should be user override."
+    Assert.That info.IsReadOnly, Iz.False, "Should be read-only."
+    Assert.That info.LCID, Iz.EqualTo(2067)
+    Assert.That info.Name, Iz.EqualTo("nl-BE")
+    Assert.That info.UseUserOverride, Iz.True, "Should be user override."
 End Sub
 
 Public Sub Constructor_WithNegativeIdentifier_ThrowsArgumentOutOfRangeException()
@@ -57,25 +57,25 @@ errTrap:
 End Sub
 
 Public Sub Constructor_WithCultureName_ReturnsCultureInfo()
-    Dim Info As CultureInfo
+    Dim info As CultureInfo
     
-    Set Info = Cor.NewCultureInfo("nl-BE")
+    Set info = Cor.NewCultureInfo("nl-BE")
     
-    Assert.That Info.IsReadOnly, Iz.False
-    Assert.That Info.LCID, Iz.EqualTo(2067)
-    Assert.That Info.Name, Iz.EqualTo("nl-BE")
-    Assert.That Info.UseUserOverride, Iz.True
+    Assert.That info.IsReadOnly, Iz.False
+    Assert.That info.LCID, Iz.EqualTo(2067)
+    Assert.That info.Name, Iz.EqualTo("nl-BE")
+    Assert.That info.UseUserOverride, Iz.True
 End Sub
 
 Public Sub Constructor_WithUseUserOverride_ReturnsExpected(ByVal UseUserOverride As Boolean)
-    Dim Info As CultureInfo
+    Dim info As CultureInfo
     
-    Set Info = Cor.NewCultureInfo(2067, UseUserOverride)
+    Set info = Cor.NewCultureInfo(2067, UseUserOverride)
     
-    Assert.That Info.IsReadOnly, Iz.False
-    Assert.That Info.LCID, Iz.EqualTo(2067)
-    Assert.That Info.Name, Iz.EqualTo("nl-BE")
-    Assert.That Info.UseUserOverride, Iz.EqualTo(UseUserOverride)
+    Assert.That info.IsReadOnly, Iz.False
+    Assert.That info.LCID, Iz.EqualTo(2067)
+    Assert.That info.Name, Iz.EqualTo("nl-BE")
+    Assert.That info.UseUserOverride, Iz.EqualTo(UseUserOverride)
 End Sub
 
 Public Sub DateTimeFormat_WithNeutralCulture_ThrowsNotSupportedExeption()
@@ -98,6 +98,28 @@ Public Sub GetAllInvariantCultures_WhenCalled_ContainsInvariantCulture()
     Set Invariant = CultureInfo.InvariantCulture
     
     Assert.That Cultures, Has.Some.EqualTo(Invariant).Using(New ObjectComparer)
+End Sub
+
+Public Sub OptionalCalendars_WhenCalled_DoesNotReturnNull()
+    Dim Item As Variant
+    For Each Item In CultureInfo.GetCultures(AllCultures)
+        Dim Culture As CultureInfo
+        Set Culture = Item
+        
+        Dim Actual() As Calendar
+        Actual = Culture.OptionalCalendars
+        Assert.That cArray.IsNull(Actual), Iz.False, Culture.LCID & " " & Culture.Name
+    Next
+End Sub
+
+Public Sub Clone_WithNeutralCulture_ReturnsCopy()
+    Dim Neutral As CultureInfo
+    Set Neutral = Cor.NewCultureInfo("en")
+    Dim NeutralClone As CultureInfo
+    
+    Set NeutralClone = Neutral.Clone
+    
+    Assert.That Neutral, Equals(NeutralClone)
 End Sub
 
 'Public Sub TestInvariant()
