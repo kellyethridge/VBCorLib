@@ -77,18 +77,17 @@ Private Const CAL_JULIAN                    As Long = 13        ' Julian calenda
 
 
 Private Type PropsType
-    LCID As Long
-    ParentLCID As Long
-    Name As String
-    EnglishName As String
-    DisplayName As String
-    NativeName As String
-    ThreeLetterISOLanguageName As String
-    ThreeLetterWindowLanguageName As String
-    TwoLetterISOLanguageName As String
-    UseUserOverride As Boolean
-    
-    IsReadOnly As Boolean
+    LCID                            As Long
+    ParentLCID                      As Long
+    Name                            As String
+    EnglishName                     As String
+    DisplayName                     As String
+    NativeName                      As String
+    ThreeLetterISOLanguageName      As String
+    ThreeLetterWindowLanguageName   As String
+    TwoLetterISOLanguageName        As String
+    UseUserOverride                 As Boolean
+    IsReadOnly                      As Boolean
 End Type
 
 Private mProps                  As PropsType
@@ -199,6 +198,12 @@ End Property
 '
 Public Property Get IsReadOnly() As Boolean
     IsReadOnly = mProps.IsReadOnly
+End Property
+
+Friend Property Let IsReadOnly(ByVal RHS As Boolean)
+    mProps.IsReadOnly = RHS
+    If Not mDateTimeFormat Is Nothing Then mDateTimeFormat.IsReadOnly = RHS
+    If Not mNumberFormat Is Nothing Then mNumberFormat.IsReadOnly = RHS
 End Property
 
 ''
@@ -408,12 +413,18 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
         Case vbLong, vbInteger, vbByte
             ID = NameOrLCID
         Case vbString
-            If CultureTable.IsLoaded Then ID = CultureTable.GetCultureID(NameOrLCID)
+            If CultureTable.IsLoaded Then
+                ID = CultureTable.GetCultureID(NameOrLCID)
+            End If
         Case Else
             Throw Cor.NewArgumentException("Invalid Culture Identifier.", "NameOrLCID")
     End Select
     
-    mProps.UseUserOverride = UseUserOverride
+    If ID <> INVARIANT_LCID Then
+        mProps.UseUserOverride = UseUserOverride
+    Else
+        mProps.UseUserOverride = False
+    End If
     
     CheckRange ID < 0, Param.LCID, ArgumentOutOfRange.NeedNonNegNum
     Load ID
@@ -426,11 +437,7 @@ Friend Sub CloneHelper(ByRef props As PropsType, ByVal dtInfo As DateTimeFormatI
     Set mCalendar = calInfo
 End Sub
 
-Friend Property Let IsReadOnly(ByVal RHS As Boolean)
-    mProps.IsReadOnly = RHS
-    If Not mDateTimeFormat Is Nothing Then mDateTimeFormat.IsReadOnly = RHS
-    If Not mNumberFormat Is Nothing Then mNumberFormat.IsReadOnly = RHS
-End Property
+
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
