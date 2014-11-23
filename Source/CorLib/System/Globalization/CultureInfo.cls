@@ -104,7 +104,10 @@ Private mOptionalCalendars()    As Calendar
 ' @return The calendar associated with the current culture.
 '
 Public Property Get Calendar() As Calendar
-    If mCalendar Is Nothing Then Set mCalendar = GetCalendar(CultureTable.GetNumber(mProps.LCID, ICALENDARTYPE))
+    If mCalendar Is Nothing Then
+        Set mCalendar = GetCalendar(CultureTable.GetNumber(mProps.LCID, ICALENDARTYPE))
+    End If
+    
     Set Calendar = mCalendar
 End Property
 
@@ -141,7 +144,7 @@ End Property
 '           +--------------------------------- Reserved (12 bits)
 '
 Public Property Get LCID() As Long
-    Call VerifyLoaded
+    VerifyLoaded
     LCID = mProps.LCID
 End Property
 
@@ -154,7 +157,7 @@ End Property
 ' en-US = English (United States)
 '
 Public Property Get Name() As String
-    Call VerifyLoaded
+    VerifyLoaded
     Name = mProps.Name
 End Property
 
@@ -164,7 +167,7 @@ End Property
 ' @return The name in the english language.
 '
 Public Property Get EnglishName() As String
-    Call VerifyLoaded
+    VerifyLoaded
     EnglishName = mProps.EnglishName
 End Property
 
@@ -174,7 +177,7 @@ End Property
 ' @return The name as it should be displayed.
 '
 Public Property Get DisplayName() As String
-    Call VerifyLoaded
+    VerifyLoaded
     DisplayName = mProps.DisplayName
 End Property
 
@@ -186,9 +189,10 @@ End Property
 ' en is a neutral culture, where as en-US is not.
 '
 Public Property Get IsNeutralCulture() As Boolean
-    Call VerifyLoaded
-    If mProps.LCID = INVARIANT_LCID Then Exit Property
-    IsNeutralCulture = CultureTable.IsNeutral(mProps.LCID)
+    VerifyLoaded
+    If mProps.LCID <> INVARIANT_LCID Then
+        IsNeutralCulture = CultureTable.IsNeutral(mProps.LCID)
+    End If
 End Property
 
 ''
@@ -202,8 +206,14 @@ End Property
 
 Friend Property Let IsReadOnly(ByVal RHS As Boolean)
     mProps.IsReadOnly = RHS
-    If Not mDateTimeFormat Is Nothing Then mDateTimeFormat.IsReadOnly = RHS
-    If Not mNumberFormat Is Nothing Then mNumberFormat.IsReadOnly = RHS
+    
+    If Not mDateTimeFormat Is Nothing Then
+        mDateTimeFormat.IsReadOnly = RHS
+    End If
+    
+    If Not mNumberFormat Is Nothing Then
+        mNumberFormat.IsReadOnly = RHS
+    End If
 End Property
 
 ''
@@ -212,7 +222,7 @@ End Property
 ' @return The name using native characters to spell the culture name.
 '
 Public Property Get NativeName() As String
-    Call VerifyLoaded
+    VerifyLoaded
     NativeName = mProps.NativeName
 End Property
 
@@ -222,7 +232,7 @@ End Property
 ' @return The name of the culture in three letters.
 '
 Public Property Get ThreeLetterISOLanguageName() As String
-    Call VerifyLoaded
+    VerifyLoaded
     ThreeLetterISOLanguageName = mProps.ThreeLetterISOLanguageName
 End Property
 
@@ -232,7 +242,7 @@ End Property
 ' @return The name of the culture found in windows.
 '
 Public Property Get ThreeLetterWindowsLanguageName() As String
-    Call VerifyLoaded
+    VerifyLoaded
     ThreeLetterWindowsLanguageName = mProps.ThreeLetterWindowLanguageName
 End Property
 
@@ -242,7 +252,7 @@ End Property
 ' @return The name of the culture in 2 letters.
 '
 Public Property Get TwoLetterISOLanguageName() As String
-    Call VerifyLoaded
+    VerifyLoaded
     TwoLetterISOLanguageName = mProps.TwoLetterISOLanguageName
 End Property
 
@@ -263,19 +273,23 @@ End Property
 '
 Public Function Clone() As CultureInfo
     Dim dtInfo As DateTimeFormatInfo
-    If Not mDateTimeFormat Is Nothing Then Set dtInfo = mDateTimeFormat.Clone
+    If Not mDateTimeFormat Is Nothing Then
+        Set dtInfo = mDateTimeFormat.Clone
+    End If
     
     Dim nInfo As NumberFormatInfo
-    If Not mNumberFormat Is Nothing Then Set nInfo = mNumberFormat.Clone
+    If Not mNumberFormat Is Nothing Then
+        Set nInfo = mNumberFormat.Clone
+    End If
         
     Dim pb As New PropertyBag
-    Call pb.WriteProperty("Calendar", mCalendar)
+    pb.WriteProperty "Calendar", mCalendar
     
     Dim calInfo As Calendar
     Set calInfo = pb.ReadProperty("Calendar", Nothing)
     
     Set Clone = New CultureInfo
-    Call Clone.CloneHelper(mProps, dtInfo, nInfo, calInfo)
+    Clone.CloneHelper mProps, dtInfo, nInfo, calInfo
 End Function
 
 ''
@@ -304,7 +318,7 @@ Public Property Get NumberFormat() As NumberFormatInfo
     
     If mNumberFormat Is Nothing Then
         Set mNumberFormat = New NumberFormatInfo
-        Call mNumberFormat.Load(mProps.LCID, mProps.UseUserOverride)
+        mNumberFormat.Load mProps.LCID, mProps.UseUserOverride
         mNumberFormat.IsReadOnly = mProps.IsReadOnly
     End If
     Set NumberFormat = mNumberFormat
@@ -316,7 +330,7 @@ End Property
 ' @param RHS The NumberFormatInfo to associate with this object instance.
 '
 Public Property Set NumberFormat(ByVal RHS As NumberFormatInfo)
-    Call VerifyWritable
+    VerifyWritable
     If RHS Is Nothing Then _
         Throw Cor.NewArgumentNullException("NumberFormat")
     If IsNeutralCulture Then _
@@ -337,7 +351,7 @@ Public Property Get DateTimeFormat() As DateTimeFormatInfo
         
     If mDateTimeFormat Is Nothing Then
         Set mDateTimeFormat = New DateTimeFormatInfo
-        Call mDateTimeFormat.Load(mProps.LCID, mProps.UseUserOverride, Me.Calendar)
+        mDateTimeFormat.Load mProps.LCID, mProps.UseUserOverride, Me.Calendar
         mDateTimeFormat.IsReadOnly = mProps.IsReadOnly
     End If
     Set DateTimeFormat = mDateTimeFormat
@@ -349,7 +363,7 @@ End Property
 ' @param RHS The DateTimeFormatInfo object to associate with this object instance.
 '
 Public Property Set DateTimeFormat(ByVal RHS As DateTimeFormatInfo)
-    Call VerifyWritable
+    VerifyWritable
     If RHS Is Nothing Then _
         Throw Cor.NewArgumentNullException("DateTimeFormat")
     If IsNeutralCulture Then _
@@ -438,8 +452,6 @@ Friend Sub CloneHelper(ByRef props As PropsType, ByVal dtInfo As DateTimeFormatI
 End Sub
 
 
-
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -448,7 +460,9 @@ Private Sub VerifyWritable()
 End Sub
 
 Private Sub VerifyLoaded()
-    If Not mLoaded Then Call Load(INVARIANT_LCID)
+    If Not mLoaded Then
+        Load INVARIANT_LCID
+    End If
 End Sub
 
 Private Sub Load(ByVal LCID As Long)
@@ -465,7 +479,7 @@ Private Sub Load(ByVal LCID As Long)
             .TwoLetterISOLanguageName = CultureTable.GetString(LCID, STWOLETTERISOLANGUAGENAME)
         End With
     Else
-        Call LoadDefault
+        LoadDefault
     End If
     
     mLoaded = True
@@ -510,7 +524,6 @@ Private Function GetCalendar(ByVal CalendarType As Long) As Calendar
 End Function
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -535,20 +548,20 @@ End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_LCID, mProps.LCID)
-        Call .WriteProperty(PROP_PARENTLCID, mProps.ParentLCID)
-        Call .WriteProperty(PROP_NAME, mProps.Name)
-        Call .WriteProperty(PROP_ENGLISHNAME, mProps.EnglishName)
-        Call .WriteProperty(PROP_DISPLAYNAME, mProps.DisplayName)
-        Call .WriteProperty(PROP_NATIVENAME, mProps.NativeName)
-        Call .WriteProperty(PROP_THREELETTERISOLANGUAGENAME, mProps.ThreeLetterISOLanguageName)
-        Call .WriteProperty(PROP_THREELETTERWINDOWSLANGUAGENAME, mProps.ThreeLetterWindowLanguageName)
-        Call .WriteProperty(PROP_TWOLETTERISOLANGUAGENAME, mProps.TwoLetterISOLanguageName)
-        Call .WriteProperty(PROP_USEUSEROVERRIDE, mProps.UseUserOverride)
-        Call .WriteProperty(PROP_ISREADONLY, mProps.IsReadOnly)
-        Call .WriteProperty(PROP_DATETIMEFORMAT, mDateTimeFormat)
-        Call .WriteProperty(PROP_NUMBERFORMAT, mNumberFormat)
-        Call .WriteProperty(PROP_CALENDAR, mCalendar)
+        .WriteProperty PROP_LCID, mProps.LCID
+        .WriteProperty PROP_PARENTLCID, mProps.ParentLCID
+        .WriteProperty PROP_NAME, mProps.Name
+        .WriteProperty PROP_ENGLISHNAME, mProps.EnglishName
+        .WriteProperty PROP_DISPLAYNAME, mProps.DisplayName
+        .WriteProperty PROP_NATIVENAME, mProps.NativeName
+        .WriteProperty PROP_THREELETTERISOLANGUAGENAME, mProps.ThreeLetterISOLanguageName
+        .WriteProperty PROP_THREELETTERWINDOWSLANGUAGENAME, mProps.ThreeLetterWindowLanguageName
+        .WriteProperty PROP_TWOLETTERISOLANGUAGENAME, mProps.TwoLetterISOLanguageName
+        .WriteProperty PROP_USEUSEROVERRIDE, mProps.UseUserOverride
+        .WriteProperty PROP_ISREADONLY, mProps.IsReadOnly
+        .WriteProperty PROP_DATETIMEFORMAT, mDateTimeFormat
+        .WriteProperty PROP_NUMBERFORMAT, mNumberFormat
+        .WriteProperty PROP_CALENDAR, mCalendar
     End With
 End Sub
 
