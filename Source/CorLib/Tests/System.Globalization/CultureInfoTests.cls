@@ -11,9 +11,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'
-' TestCultureInfo
-'
 Option Explicit
 Implements ITestCaseSource
 
@@ -24,6 +21,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Constructor_WithUseUserOverride_ReturnsExpected"
             Test.Use True
             Test.Use False
+            
+        Case "Contstructor_WithEmptyString_ReturnsInvariant"
+            Test.Use ""
+            Test.Use CultureInfo.InvariantCulture.LCID
             
     End Select
 End Sub
@@ -122,125 +123,54 @@ Public Sub Clone_WithNeutralCulture_ReturnsCopy()
     Assert.That Neutral, Equals(NeutralClone)
 End Sub
 
-'Public Sub TestInvariant()
-'    Dim c As CultureInfo
-'
-'    Set c = Cor.NewCultureInfo("")
-'    Assert.AreEqual &H7F, c.LCID
-'    Assert.AreEqual "", c.Name
-'    Assert.AreEqual "Invariant Language (Invariant Country)", c.EnglishName
-'    Assert.AreEqual "Invariant Language (Invariant Country)", c.DisplayName
-'    Assert.IsFalse c.IsNeutralCulture, "Culture should not be neutral."
-'    Assert.AreEqual "Invariant Language (Invariant Country)", c.NativeName
-'    Assert.AreEqual "IVL", c.ThreeLetterISOLanguageName
-'    Assert.AreEqual "IVL", c.ThreeLetterWindowsLanguageName
-'    Assert.AreEqual "iv", c.TwoLetterISOLanguageName
-'    Assert.IsFalse c.UseUserOverride, "UseUserOverride should return false."
-'
-'    Dim dt As DateTimeFormatInfo
-'    Dim i As Long
-'    Dim s() As String
-'
-'    Set dt = c.DateTimeFormat
-'    s = dt.AbbreviatedDayNames
-'    Assert.AreEqual 7, cArray.GetLength(s), "AbbreviatedDayNames should return 7 elements."
-'    For i = 0 To 6
-'        Assert.AreEqual Choose(i + 1, "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"), s(i)
-'    Next i
-'
-'    Assert.AreEqual "dddd, dd MMMM yyyy", dt.LongDatePattern, "Incorrect LongDatePattern."
-'    Assert.AreEqual "HH:mm:ss", dt.LongTimePattern, "Incorrect LongTimePattern."
-'
-'    Dim nm As NumberFormatInfo
-'    Dim n() As Long
-'
-'    Set nm = c.NumberFormat
-'    Assert.AreEqual ChrW$(&H2030), nm.PerMilleSymbol
-'
-'    n = nm.NumberGroupSizes
-'    Assert.AreEqual 1, cArray.GetLength(n)
-'    Assert.AreEqual 3, n(0)
-'End Sub
-'
-'Public Sub TestEnglishUS()
-'    Dim c As CultureInfo
-'
-'    Set c = Cor.NewCultureInfo("en-US")
-'    Assert.AreEqual 1033, c.LCID
-'    Assert.AreEqual "en-US", c.Name
-'    Assert.AreEqual "English (United States)", c.EnglishName
-'    Assert.AreEqual "English (United States)", c.DisplayName
-'    Assert.IsFalse c.IsNeutralCulture, "Culture should not be neutral."
-'    Assert.AreEqual "English (United States)", c.NativeName
-'    Assert.AreEqual "eng", c.ThreeLetterISOLanguageName
-'    Assert.AreEqual "ENU", c.ThreeLetterWindowsLanguageName
-'    Assert.AreEqual "en", c.TwoLetterISOLanguageName
-'
-'    Dim dt As DateTimeFormatInfo
-'    Dim i As Long
-'    Dim s() As String
-'
-'    Set dt = c.DateTimeFormat
-'    s = dt.DayNames
-'    Assert.AreEqual 7, cArray.GetLength(s), "AbbreviatedDayNames should return 7 elements."
-'    For i = 0 To 6
-'        Assert.AreEqual Choose(i + 1, "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"), s(i)
-'    Next i
-'
-'    Assert.AreEqual "dddd, MMMM dd, yyyy", dt.LongDatePattern, "Incorrect LongDatePattern."
-'    Assert.AreEqual "h:mm:ss tt", dt.LongTimePattern, "Incorrect LongTimePattern."
-'
-'End Sub
-'
-'Public Sub TestDefaultCalendar()
-'    Dim cal As Calendar
-'    Dim cul As CultureInfo
-'
-'    Set cul = Cor.NewCultureInfo("ar-AE")
-'    Assert.IsNotNothing cul
-'
-'    Set cal = cul.Calendar
-'    Assert.IsTrue TypeOf cal Is GregorianCalendar, "Should return a gregorian calendar."
-'End Sub
-'
-'Public Sub TestOptionalCalendars()
-'    Dim cals() As Calendar
-'    Dim cul As CultureInfo
-'
-'    Set cul = Cor.NewCultureInfo("ar-AE")
-'    cals = cul.OptionalCalendars
-'
-'    Assert.AreEqual 6, cArray.GetLength(cals)
-'
-'    Assert.IsTrue ContainsCalendar(cals, 1)
-'    Assert.IsTrue ContainsCalendar(cals, 2)
-'    Assert.IsTrue ContainsCalendar(cals, 6)
-'    Assert.IsTrue ContainsCalendar(cals, 9)
-'    Assert.IsTrue ContainsCalendar(cals, 12)
-'    Assert.IsTrue ContainsCalendar(cals, 10)
-'
-'End Sub
-'
-'
-'
-'Private Function ContainsCalendar(ByRef Calendars() As Calendar, ByVal ID As Long) As Boolean
-'    Dim i As Long
-'    Dim g As GregorianCalendar
-'
-'    For i = LBound(Calendars) To UBound(Calendars)
-'        Select Case LCase$(TypeName(Calendars(i)))
-'            Case "gregoriancalendar"
-'                Set g = Calendars(i)
-'                If g.CalendarType = ID Then
-'                    ContainsCalendar = True
-'                    Exit Function
-'                End If
-'            Case "hijricalendar"
-'                If ID = 6 Then
-'                    ContainsCalendar = True
-'                    Exit Function
-'                End If
-'        End Select
-'    Next i
-'End Function
+Public Sub Contstructor_WithEmptyString_ReturnsInvariant(ByVal NameOrLCID As Variant)
+    Dim c As CultureInfo
+
+    Set c = Cor.NewCultureInfo(NameOrLCID)
+    
+    Assert.That c.LCID, Iz.EqualTo(&H7F)
+    Assert.That c.Name, Iz.Empty
+    Assert.That c.EnglishName, Iz.EqualTo("Invariant Language (Invariant Country)")
+    Assert.That c.DisplayName, Iz.EqualTo("Invariant Language (Invariant Country)")
+    Assert.That c.IsNeutralCulture, Iz.False, "Culture should not be neutral."
+    Assert.That c.NativeName, Iz.EqualTo("Invariant Language (Invariant Country)")
+    Assert.That c.ThreeLetterISOLanguageName, Iz.EqualTo("IVL")
+    Assert.That c.ThreeLetterWindowsLanguageName, Iz.EqualTo("IVL")
+    Assert.That c.TwoLetterISOLanguageName, Iz.EqualTo("iv")
+    Assert.That c.UseUserOverride, Iz.False, "UseUserOverride should return false."
+    Assert.That c.DateTimeFormat.AbbreviatedDayNames, Iz.EqualTo(Array("Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"))
+    Assert.That c.DateTimeFormat.LongDatePattern, Iz.EqualTo("dddd, dd MMMM yyyy")
+    Assert.That c.DateTimeFormat.LongTimePattern, Iz.EqualTo("HH:mm:ss")
+    Assert.That c.NumberFormat.PerMilleSymbol, Iz.EqualTo(ChrW$(&H2030))
+    Assert.That c.NumberFormat.NumberGroupSizes, Iz.EqualTo(Array(3))
+End Sub
+
+Public Sub Constructor_WithenUS_ReturnsUsEnglish()
+    Dim c As CultureInfo
+
+    Set c = Cor.NewCultureInfo("en-US")
+    
+    Assert.That c.LCID, Iz.EqualTo(1033)
+    Assert.That c.Name, Iz.EqualTo("en-US")
+    Assert.That c.EnglishName, Iz.EqualTo("English (United States)")
+    Assert.That c.DisplayName, Iz.EqualTo("English (United States)")
+    Assert.That c.IsNeutralCulture, Iz.False, "Culture should not be neutral."
+    Assert.That c.NativeName, Iz.EqualTo("English (United States)")
+    Assert.That c.ThreeLetterISOLanguageName, Iz.EqualTo("eng")
+    Assert.That c.ThreeLetterWindowsLanguageName, Iz.EqualTo("ENU")
+    Assert.That c.TwoLetterISOLanguageName, Iz.EqualTo("en")
+    Assert.That c.DateTimeFormat.DayNames, Iz.EqualTo(Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+    Assert.That c.DateTimeFormat.LongDatePattern, Iz.EqualTo("dddd, MMMM d, yyyy")
+    Assert.That c.DateTimeFormat.LongTimePattern, Iz.EqualTo("h:mm:ss tt")
+End Sub
+
+Public Sub Calendary_WithenUsCulture_ReturnsGegorian()
+    Dim c As CultureInfo
+    Set c = Cor.NewCultureInfo("en-US")
+    
+    Dim Actual As Calendar
+    Set Actual = c.Calendar
+    
+    Assert.That TypeOf Actual Is GregorianCalendar, Iz.True
+End Sub
 
