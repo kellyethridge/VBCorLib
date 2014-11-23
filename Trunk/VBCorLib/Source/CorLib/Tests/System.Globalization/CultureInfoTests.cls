@@ -26,6 +26,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use ""
             Test.Use CultureInfo.InvariantCulture.LCID
             
+        Case "IsNeutralCulture_WithValues_ReturnsExpected"
+            Test.Use "en", True
+            Test.Use "en-US", False
+            
     End Select
 End Sub
 
@@ -198,4 +202,36 @@ Public Sub IsReadOnly_WithCurrentCulture_ReturnsTrue()
     Assert.That c.IsReadOnly, Iz.True
     Assert.That c.DateTimeFormat.IsReadOnly, Iz.True
     Assert.That c.NumberFormat.IsReadOnly, Iz.True
+End Sub
+
+Public Sub IsNeutralCulture_WithValues_ReturnsExpected(ByVal NameOrLCID As Variant, ByVal Expected As Boolean)
+    Dim ci As CultureInfo
+    
+    Set ci = Cor.NewCultureInfo(NameOrLCID)
+    
+    Assert.That ci.IsNeutralCulture, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetFormat_WithDateTimeFormatInfo_ReturnsCorrectType()
+    Dim Actual As Object
+    
+    Set Actual = CultureInfo.CurrentCulture.GetFormat("DateTimeFormatInfo")
+    
+    Assert.That TypeOf Actual Is DateTimeFormatInfo, Iz.True
+End Sub
+
+Public Sub GetFormat_WithNumberFormatInfo_ReturnsCorrectType()
+    Dim Actual As Object
+    
+    Set Actual = CultureInfo.CurrentCulture.GetFormat("NumberFormatInfo")
+    
+    Assert.That TypeOf Actual Is NumberFormatInfo, Iz.True
+End Sub
+
+Public Sub GetFormat_WithUnsupportedType_ReturnsNothing()
+    Dim Actual As Object
+    
+    Set Actual = CultureInfo.CurrentCulture.GetFormat("abc")
+    
+    Assert.That Actual, Iz.Nothing
 End Sub
