@@ -174,3 +174,28 @@ Public Sub Calendary_WithenUsCulture_ReturnsGegorian()
     Assert.That TypeOf Actual Is GregorianCalendar, Iz.True
 End Sub
 
+Public Sub IsReadOnly_WhenCreatingNewInstance_ReturnsFalse()
+    Dim c As CultureInfo
+    
+    Set c = Cor.NewCultureInfo("en-US")
+    
+    Assert.That c.IsReadOnly, Iz.False
+    Assert.That c.DateTimeFormat.IsReadOnly, Iz.False
+    Assert.That c.NumberFormat.IsReadOnly, Iz.False
+    c.NumberFormat.NumberGroupSeparator = ","
+    Set c.NumberFormat = New NumberFormatInfo
+    c.DateTimeFormat.DateSeparator = "/"
+    Set c.DateTimeFormat = New DateTimeFormatInfo
+    Assert.That c.DateTimeFormat.IsReadOnly, Iz.False
+    Assert.That c.NumberFormat.IsReadOnly, Iz.False
+End Sub
+
+Public Sub IsReadOnly_WithCurrentCulture_ReturnsTrue()
+    Dim c As CultureInfo
+    
+    Set c = CultureInfo.CurrentCulture
+    
+    Assert.That c.IsReadOnly, Iz.True
+    Assert.That c.DateTimeFormat.IsReadOnly, Iz.True
+    Assert.That c.NumberFormat.IsReadOnly, Iz.True
+End Sub
