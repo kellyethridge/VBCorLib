@@ -590,9 +590,7 @@ Public Sub Parse_WithDate_ReturnsParsedDateTime()
     Assert.That Actual, Equals(NewDate(#1/1/2004 8:30:30 AM#))
 End Sub
 
-' This test is subject to the current timezone. Modify this test
-' as necessary to your timezone.
-Public Sub TestFromFileTime()
+Public Sub FromFileTimeUtc_WhenCalled_ReturnsExpected()
     Dim Actual As cDateTime
     
     Set Actual = cDateTime.FromFileTimeUtc(12.3456)
@@ -601,13 +599,13 @@ Public Sub TestFromFileTime()
     Assert.That Actual.Ticks, Iz.EqualTo(CDec("504911232000123456"))
 End Sub
 
-' This test is subject to the current timezone. Modify this test
-' as necessary to your timezone.
-Public Sub TestFromFileTimeUtc()
-    Dim dt As cDateTime
+Public Sub FromFileTimeUtc_WithNegativeValue_ThrowsArgumentOutOfRangeException()
+    On Error GoTo errTrap
     
-    Set dt = cDateTime.FromFileTimeUtc(1000000000@)
-    Assert.IsTrue dt.Equals(#1/12/1601 1:46:40 PM#), "FromFileTime should return 1/12/1601 1:46:40 PM."
+    cDateTime.FromFileTimeUtc -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Time"
 End Sub
 
 ' This test is subject to the current timezone. Modify this test

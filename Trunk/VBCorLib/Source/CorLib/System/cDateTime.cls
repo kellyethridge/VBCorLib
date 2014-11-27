@@ -772,9 +772,6 @@ Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
 End Sub
 
 Friend Sub InitFromFileTime(ByVal Time As Currency, ByVal Kind As DateTimeKind)
-    If Time < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException("Time", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    
     mMilliseconds = Time + MILLISECONDS_TO_16011231
     mKind = Kind
 End Sub
