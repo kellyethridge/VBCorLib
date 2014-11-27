@@ -148,6 +148,7 @@ Public Enum Param
     Year
     Month
     LCID
+    Time
 End Enum
 
 Public Enum ArgumentOutOfRange

@@ -170,6 +170,8 @@ End Function
 ' @return The cDateTime of the file time in UTC time.
 '
 Public Function FromFileTimeUtc(ByVal Time As Currency) As cDateTime
+    CheckInRange Time >= 0, Param.Time, NeedNonNegNum
+    
     Set FromFileTimeUtc = New cDateTime
     FromFileTimeUtc.InitFromFileTime Time, UtcKind
 End Function
