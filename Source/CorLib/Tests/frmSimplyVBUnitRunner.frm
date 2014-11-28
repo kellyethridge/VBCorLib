@@ -208,7 +208,7 @@ Private Sub Form_Load()
     IO.Add New TestDirectory
     IO.Add New TestDirectoryInfo
     IO.Add New MemoryStreamTests
-    IO.Add New TestPath
+    IO.Add New PathTests
 
     Dim StreamWriterTests As TestSuite
     Set StreamWriterTests = Sim.NewTestSuite("StreamWriter")

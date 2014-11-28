@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestPath"
+Attribute VB_Name = "PathTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -15,23 +15,43 @@ Attribute VB_Exposed = False
 ' TestPath
 '
 Option Explicit
+Implements ITestCaseSource
+
 Private Declare Function GetLongPathNameA Lib "kernel32.dll" (ByVal lpszShortPath As String, ByVal lpszLongPath As String, ByVal cchBuffer As Long) As Long
 
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "ChangeExtension_WithValue_ReturnsExpected"
+            Test.Use "Filename.txt", "rec", "Filename.rec"
+            Test.Use "c.:hello", "", "c.:hello."
+            Test.Use "hello.txt", "", "hello."
+            Test.Use "hello", "d.d", "hello.d.d"
+            Test.Use "h.ello", "d.d", "h.d.d"
+            Test.Use "hello", ".txt", "hello.txt"
+            Test.Use "hello", "txt", "hello.txt"
+            Test.Use "", "", ""
+            Test.Use "hello.", ".txt", "hello.txt"
+            Test.Use "hello\", "txt", "hello\.txt"
+            Test.Use "c:\hello", "txt", "c:\hello.txt"
+            Test.Use ".txt", "def", ".def"
+            
+    End Select
+End Sub
 
-Public Sub TestChangeExtension()
-    Assert.AreEqual "Filename.rec", Path.ChangeExtension("Filename.txt", "rec")
-    Assert.AreEqual "c.:hello.", Path.ChangeExtension("c.:hello", "")
-    Assert.AreEqual "hello", Path.ChangeExtension("hello.txt", vbNullString)
-    Assert.AreEqual "hello.d.d", Path.ChangeExtension("hello", "d.d")
-    Assert.AreEqual "h.d.d", Path.ChangeExtension("h.ello", "d.d")
-    Assert.AreEqual "h", Path.ChangeExtension("h.ello", vbNullString)
-    Assert.AreEqual "hello.txt", Path.ChangeExtension("hello", ".txt")
-    Assert.AreEqual "hello.txt", Path.ChangeExtension("hello", "txt")
-    Assert.AreEqual "", Path.ChangeExtension("", "")
-    Assert.AreEqual "hello.txt", Path.ChangeExtension("hello.", ".txt")
-    Assert.AreEqual "hello\.txt", Path.ChangeExtension("hello\", "txt")
-    Assert.AreEqual "c:\hello.txt", Path.ChangeExtension("c:\hello", "txt")
-    Assert.AreEqual ".def", Path.ChangeExtension(".txt", "def")
+Public Sub ChangeExtension_WithValue_ReturnsExpected(ByVal PathToChange As String, ByVal NewExtension As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Path.ChangeExtension(PathToChange, NewExtension)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ChangeExtension_WithNullString_RemovesExtension()
+    Dim Actual As String
+    
+    Actual = Path.ChangeExtension("hello.txt", vbNullString)
+    
+    Assert.That Actual, Iz.EqualTo("hello")
 End Sub
 
 Public Sub TestRootedPaths()
@@ -147,7 +167,7 @@ Public Sub TestGetFullPathInvalidUNCShareWithoutSlash()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
 End Sub
 
@@ -159,7 +179,7 @@ Public Sub TestGetFullPathInvalidUNCShareWithSlash()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
 End Sub
 
@@ -171,7 +191,7 @@ Public Sub TestGetFullPathOfEmptyPath()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
 End Sub
 
@@ -183,7 +203,7 @@ Public Sub TestGetFullPathOfSpaces()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
 End Sub
 
@@ -195,7 +215,7 @@ Public Sub TestGetFullPathMultipleColons()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is NotSupportedException, "Wrong exception type."
 End Sub
 
@@ -248,4 +268,5 @@ Private Function GetLongPathName(ByVal s As String) As String
     i = GetLongPathNameA(s, ret, Len(ret))
     GetLongPathName = Left$(ret, i)
 End Function
+
 
