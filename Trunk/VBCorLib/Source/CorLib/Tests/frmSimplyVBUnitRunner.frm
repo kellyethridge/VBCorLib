@@ -80,7 +80,7 @@ Private Sub Form_Load()
     System.Add New BitConverterTests
     System.Add New CDateTimeTests
     System.Add New TestEnvironment
-    System.Add New TestTimeZone
+    System.Add New TimeZoneTests
 
     System.Add NewSuite("Convert", New ToBase64Tests, New FromBase64Tests)
     System.Add NewSuite("IFormattable", New ToStringWithLongsTests, New ToStringWithDoublesTests, New ToStringWithSinglesTests, New ToStringWithValuesTests)
