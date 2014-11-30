@@ -35,6 +35,29 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "c:\hello", "txt", "c:\hello.txt"
             Test.Use ".txt", "def", ".def"
             
+        Case "IsPathRooted_WithValue_ReturnsExpected"
+            Test.Use "c:\", True
+            Test.Use "\folder", True
+            Test.Use "\\share", True
+            Test.Use "//share", True
+            Test.Use "Abc\file", False
+            Test.Use ":\folder", False
+            Test.Use "", False
+            
+        Case "HasExtension_WithValue_ReturnsExpected"
+'    Assert.IsTrue Path.HasExtension("file.txt"), "'file.txt' should have an extension."
+'    Assert.IsTrue Path.HasExtension(".a"), "'.a' should have an extension."
+'    Assert.IsFalse Path.HasExtension("."), "'.' should not have an extension."
+'    Assert.IsFalse Path.HasExtension(".\file"), "'.\file' should not have an extension."
+'    Assert.IsFalse Path.HasExtension("file."), "'file.' should not have an extension."
+'    Assert.IsFalse Path.HasExtension("file"), "'file' should not have an extension."
+            Test.Use "file.txt", True
+            Test.Use ".a", True
+            Test.Use ".", False
+            Test.Use ".\file", False
+            Test.Use "file.", False
+            Test.Use "file", False
+            
     End Select
 End Sub
 
@@ -54,26 +77,20 @@ Public Sub ChangeExtension_WithNullString_RemovesExtension()
     Assert.That Actual, Iz.EqualTo("hello")
 End Sub
 
-Public Sub TestRootedPaths()
-    Assert.IsTrue Path.IsPathRooted("c:\"), "'c:\' should be rooted."
-    Assert.IsTrue Path.IsPathRooted("\folder"), "'\folder' should be rooted."
-    Assert.IsTrue Path.IsPathRooted("\\share"), "'\\share' should be rooted."
-    Assert.IsTrue Path.IsPathRooted("//share"), "'//share' should be rooted."
+Public Sub IsPathRooted_WithValue_ReturnsExpected(ByVal PathToCheck As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Path.IsPathRooted(PathToCheck)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestNotRootedPaths()
-    Assert.IsFalse Path.IsPathRooted("Abc\file"), "'Abc\file' should not be rooted."
-    Assert.IsFalse Path.IsPathRooted(":\folder"), "':\folder' should not be rooted."
-    Assert.IsFalse Path.IsPathRooted(""), "empty path should not be rooted."
-End Sub
-
-Public Sub TestHasExtension()
-    Assert.IsTrue Path.HasExtension("file.txt"), "'file.txt' should have an extension."
-    Assert.IsTrue Path.HasExtension(".a"), "'.a' should have an extension."
-    Assert.IsFalse Path.HasExtension("."), "'.' should not have an extension."
-    Assert.IsFalse Path.HasExtension(".\file"), "'.\file' should not have an extension."
-    Assert.IsFalse Path.HasExtension("file."), "'file.' should not have an extension."
-    Assert.IsFalse Path.HasExtension("file"), "'file' should not have an extension."
+Public Sub HasExtension_WithValue_ReturnsExpected(ByVal PathToCheck As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Path.HasExtension(PathToCheck)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestCombine()
