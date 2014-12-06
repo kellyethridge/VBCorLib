@@ -45,12 +45,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "", False
             
         Case "HasExtension_WithValue_ReturnsExpected"
-'    Assert.IsTrue Path.HasExtension("file.txt"), "'file.txt' should have an extension."
-'    Assert.IsTrue Path.HasExtension(".a"), "'.a' should have an extension."
-'    Assert.IsFalse Path.HasExtension("."), "'.' should not have an extension."
-'    Assert.IsFalse Path.HasExtension(".\file"), "'.\file' should not have an extension."
-'    Assert.IsFalse Path.HasExtension("file."), "'file.' should not have an extension."
-'    Assert.IsFalse Path.HasExtension("file"), "'file' should not have an extension."
             Test.Use "file.txt", True
             Test.Use ".a", True
             Test.Use ".", False
@@ -58,6 +52,60 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "file.", False
             Test.Use "file", False
             
+        Case "Combine_WithValues_ReturnsExpected"
+            Test.Use "a", "\b", "\b"
+            Test.Use "a/", "b", "a/b"
+            Test.Use "a", "b", "a\b"
+            Test.Use "a:", "b", "a:b"
+            Test.Use "c:\", "*.txt", "c:\*.txt"
+            Test.Use "", "*.txt", "*.txt"
+            Test.Use "", "", ""
+            Test.Use "a", "", "a"
+            Test.Use "", "b", "b"
+            
+        Case "GetDirectoryName_WithValue_ReturnsExpected"
+            Test.Use "c:\abc", "c:\"
+            Test.Use "c:\abc\", "c:\abc"
+            Test.Use "c:\", ""
+            Test.Use "abc", ""
+            Test.Use "abc\", "abc"
+            Test.Use "\\server\share", ""
+            Test.Use "\\server\share\", "\\server\share"
+            Test.Use "\\\\server\\share\\", "\\server\share"
+            Test.Use "C:\Documents and Settings\Kelly\Local Settings\Temp\tmpC24.tmp", "C:\Documents and Settings\Kelly\Local Settings\Temp"
+            Test.Use "c:\....\abc", "c:\.."
+            Test.Use "c:\....\abc\", "c:\..\abc"
+            
+        Case "GetExtension_WithValue_ReturnsExpected"
+            Test.Use "file.txt", ".txt"
+            Test.Use "file", ""
+            Test.Use ".", ""
+            Test.Use "..", ""
+            Test.Use "c.:txt", ""
+            Test.Use "", ""
+            Test.Use "c:\abc.txt\ab", ""
+            
+        Case "GetFileName_WithValue_ReturnsExpected"
+            Test.Use "file.txt", "file.txt"
+            Test.Use "c:\file.txt", "file.txt"
+            Test.Use "c:\", ""
+            Test.Use ":file.txt", "file.txt"
+            Test.Use ".txt", ".txt"
+            
+        Case "GetFileNameWithoutExtension_WithValue_ReturnsExpected"
+            Test.Use "file.txt", "file"
+            Test.Use "c:\file.txt", "file"
+            Test.Use "c:\", ""
+            Test.Use "c:file.txt", "file"
+            Test.Use "file", "file"
+            Test.Use "c:file", "file"
+            Test.Use "c:.file", ""
+            Test.Use "", ""
+            Test.Use "c:\file.txt.txt", "file.txt"
+            Test.Use "file.txt.txt", "file.txt"
+            Test.Use "file.txt\", ""
+            Test.Use ".txt", ""
+
     End Select
 End Sub
 
@@ -93,65 +141,44 @@ Public Sub HasExtension_WithValue_ReturnsExpected(ByVal PathToCheck As String, B
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestCombine()
-    Assert.AreEqual "a\b", Path.Combine("a", "b")
-    Assert.AreEqual "\b", Path.Combine("a", "\b")
-    Assert.AreEqual "a/b", Path.Combine("a/", "b")
-    Assert.AreEqual "a:b", Path.Combine("a:", "b")
-    Assert.AreEqual "c:\*.txt", Path.Combine("c:\", "*.txt")
-    Assert.AreEqual "*.txt", Path.Combine("", "*.txt")
-    Assert.AreEqual "", Path.Combine("", "")
-    Assert.AreEqual "a", Path.Combine("a", "")
-    Assert.AreEqual "b", Path.Combine("", "b")
+Public Sub Combine_WithValues_ReturnsExpected(ByVal Path1 As String, ByVal Path2 As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Path.Combine(Path1, Path2)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetDirectoryNameWithLegalPaths()
-    Assert.AreEqual "c:\", Path.GetDirectoryName("c:\abc")
-    Assert.AreEqual "c:\abc", Path.GetDirectoryName("c:\abc\")
-    Assert.AreEqual "", Path.GetDirectoryName("c:\")
-    Assert.AreEqual "", Path.GetDirectoryName("abc")
-    Assert.AreEqual "abc", Path.GetDirectoryName("abc\")
-    Assert.AreEqual "", Path.GetDirectoryName("abc")
-    Assert.AreEqual "", Path.GetDirectoryName("\\server\share")
-    Assert.AreEqual "\\server\share", Path.GetDirectoryName("\\server\share\")
-    Assert.AreEqual "\\server\share", Path.GetDirectoryName("\\\\server\\share\\")
-    Assert.AreEqual "C:\Documents and Settings\Kelly\Local Settings\Temp", Path.GetDirectoryName("C:\Documents and Settings\Kelly\Local Settings\Temp\tmpC24.tmp")
-    Assert.AreEqual "c:\..", Path.GetDirectoryName("c:\....\abc")
-    Assert.AreEqual "c:\..\abc", Path.GetDirectoryName("c:\....\abc\")
+Public Sub GetDirectoryName_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Path.GetDirectoryName(PathToUse)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetExtension()
-    Assert.AreEqual ".txt", Path.GetExtension("file.txt")
-    Assert.AreEqual "", Path.GetExtension("file")
-    Assert.AreEqual ".file", Path.GetExtension(".file")
-    Assert.AreEqual "", Path.GetExtension(".")
-    Assert.AreEqual "", Path.GetExtension("..")
-    Assert.AreEqual "", Path.GetExtension("c.:txt")
-    Assert.AreEqual "", Path.GetExtension("")
-    Assert.AreEqual "", Path.GetExtension("c:\abc.txt\ab")
+Public Sub GetExtension_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Path.GetExtension(PathToUse)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetFileName()
-    Assert.AreEqual "file.txt", Path.GetFileName("file.txt")
-    Assert.AreEqual "file.txt", Path.GetFileName("c:\file.txt")
-    Assert.AreEqual "", Path.GetFileName("c:\")
-    Assert.AreEqual "file.txt", Path.GetFileName(":file.txt")
-    Assert.AreEqual ".txt", Path.GetFileName(".txt")
+Public Sub GetFileName_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Path.GetFileName(PathToUse)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetFileNameWithoutExtension()
-    Assert.AreEqual "file", Path.GetFileNameWithoutExtension("file.txt")
-    Assert.AreEqual "file", Path.GetFileNameWithoutExtension("c:\file.txt")
-    Assert.AreEqual "", Path.GetFileNameWithoutExtension("c:\")
-    Assert.AreEqual "file", Path.GetFileNameWithoutExtension("c:file.txt")
-    Assert.AreEqual "file", Path.GetFileNameWithoutExtension("file")
-    Assert.AreEqual "file", Path.GetFileNameWithoutExtension("c:file")
-    Assert.AreEqual "", Path.GetFileNameWithoutExtension("c:.file")
-    Assert.AreEqual "", Path.GetFileNameWithoutExtension("")
-    Assert.AreEqual "file.txt", Path.GetFileNameWithoutExtension("c:\file.txt.txt")
-    Assert.AreEqual "file.txt", Path.GetFileNameWithoutExtension("file.txt.txt")
-    Assert.AreEqual "", Path.GetFileNameWithoutExtension("file.txt\")
-    Assert.AreEqual "", Path.GetFileNameWithoutExtension(".txt")
+Public Sub GetFileNameWithoutExtension_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Path.GetFileNameWithoutExtension(PathToUse)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestGetFullPathOfLegalPaths()
