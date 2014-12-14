@@ -19,6 +19,8 @@ Implements ITestCaseSource
 
 Private Declare Function GetLongPathNameA Lib "kernel32.dll" (ByVal lpszShortPath As String, ByVal lpszLongPath As String, ByVal cchBuffer As Long) As Long
 
+Private mOriginalDir As String
+
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "ChangeExtension_WithValue_ReturnsExpected"
@@ -106,7 +108,32 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "file.txt\", ""
             Test.Use ".txt", ""
 
+        Case "GetFullPath_WithValue_ReturnsExpected"
+            Test.Use "file.txt", "c:\windows\file.txt"
+            Test.Use "\file.txt", "c:\file.txt"
+            Test.Use "\\server\share", "\\server\share"
+            Test.Use "\\server\share\", "\\server\share\"
+            Test.Use "c:\abc.txt", "c:\abc.txt"
+            Test.Use "c\abc.txt", "c:\windows\c\abc.txt"
+            Test.Use "a\b...\a", "c:\windows\a\b\a"
+            Test.Use "a\...b\a", "c:\windows\a\...b\a"
+            Test.Use "c:\", "c:\"
+            Test.Use "c:\\\", "c:\"
+            Test.Use "\\\\server\\\share", "\\server\share"
+            Test.Use "\\\\server\\\share\\\", "\\server\share\"
+            Test.Use "c:\abc\def\ghi\..\..\jkl", "c:\abc\jkl"
+            Test.Use "..\jkl", "c:\jkl"
+            
     End Select
+End Sub
+
+Public Sub Setup()
+    mOriginalDir = CurDir
+    ChDir "c:\windows"
+End Sub
+
+Public Sub Teardown()
+    ChDir mOriginalDir
 End Sub
 
 Public Sub ChangeExtension_WithValue_ReturnsExpected(ByVal PathToChange As String, ByVal NewExtension As String, ByVal Expected As String)
@@ -181,22 +208,12 @@ Public Sub GetFileNameWithoutExtension_WithValue_ReturnsExpected(ByVal PathToUse
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetFullPathOfLegalPaths()
-    Assert.AreEqual CurDir & "\file.txt", Path.GetFullPath("file.txt")
-    Assert.AreEqual Path.GetPathRoot(CurDir) & "file.txt", Path.GetFullPath("\file.txt")
-    Assert.AreEqual "\\server\share", Path.GetFullPath("\\server\share")
-    Assert.AreEqual "\\server\share\", Path.GetFullPath("\\server\share\")
-    Assert.AreEqual "c:\abc.txt", Path.GetFullPath("c:\abc.txt")
-    Assert.AreEqual CurDir & "\c\abc.txt", Path.GetFullPath("c\abc.txt")
-    Assert.AreEqual CurDir & "\a\b\a", Path.GetFullPath("a\b...\a")
-    Assert.AreEqual CurDir & "\a\...b\a", Path.GetFullPath("a\...b\a")
-    Assert.AreEqual "c:\", Path.GetFullPath("c:\")
-    Assert.AreEqual "c:\", Path.GetFullPath("c:\\\")
-    Assert.AreEqual "\\server\share", Path.GetFullPath("\\\\server\\\share")
-    Assert.AreEqual "\\server\share\", Path.GetFullPath("\\\\server\\\share\\\")
-    Assert.AreEqual "c:\abc\jkl", Path.GetFullPath("c:\abc\def\ghi\..\..\jkl")
-    Assert.AreEqual "c:\jkl", Path.GetFullPath("c:\abc\def\ghi\..\..\..\..\..\jkl")
-    Assert.AreEqual Left$(CurDir, InStrRev(CurDir, "\")) & "jkl", Path.GetFullPath("..\jkl")
+Public Sub GetFullPath_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = Path.GetFullPath(PathToUse)
+    
+    Assert.That Actual, Iz.EqualTo(Expected).IgnoreCase
 End Sub
 
 Public Sub TestGetFullPathFixSlashes()
