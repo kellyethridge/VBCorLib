@@ -123,6 +123,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "\\\\server\\\share\\\", "\\server\share\"
             Test.Use "c:\abc\def\ghi\..\..\jkl", "c:\abc\jkl"
             Test.Use "..\jkl", "c:\jkl"
+            Test.Use "//server/share/file.txt", "\\server\share\file.txt"
+            
+        Case "GetFullPath_WithInvalidPath_ThrowsArgumentException"
+            Test.Use "\\server"
+            Test.Use "\\server\"
+            Test.Use ""
+            Test.Use " "
             
     End Select
 End Sub
@@ -132,7 +139,7 @@ Public Sub Setup()
     ChDir "c:\windows"
 End Sub
 
-Public Sub Teardown()
+Public Sub TearDown()
     ChDir mOriginalDir
 End Sub
 
@@ -216,68 +223,22 @@ Public Sub GetFullPath_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVa
     Assert.That Actual, Iz.EqualTo(Expected).IgnoreCase
 End Sub
 
-Public Sub TestGetFullPathFixSlashes()
-    Assert.AreEqual "\\server\share\file.txt", Path.GetFullPath("//server/share/file.txt")
-End Sub
-
-Public Sub TestGetFullPathInvalidUNCShareWithoutSlash()
+Public Sub GetFullPath_WithInvalidPath_ThrowsArgumentException(ByVal InvalidPath As String)
     On Error GoTo errTrap
-    Call Path.GetFullPath("\\share")
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
+    
+    Path.GetFullPath InvalidPath
     
 errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
+    AssertArgumentException Err
 End Sub
 
-Public Sub TestGetFullPathInvalidUNCShareWithSlash()
+Public Sub GetFullPath_WithMultipleColons_ThrowsNotSupportedException()
     On Error GoTo errTrap
-    Call Path.GetFullPath("\\share\")
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
     
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
-End Sub
-
-Public Sub TestGetFullPathOfEmptyPath()
-    On Error GoTo errTrap
-    Call Path.GetFullPath("")
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
-    
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
-End Sub
-
-Public Sub TestGetFullPathOfSpaces()
-    On Error GoTo errTrap
-    Call Path.GetFullPath("  ")
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
-    
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
-End Sub
-
-Public Sub TestGetFullPathMultipleColons()
-    On Error GoTo errTrap
     Path.GetFullPath "c:\a:"
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is NotSupportedException, "Wrong exception type."
+    AssertNotSupportedException Err
 End Sub
 
 Public Sub TestGetPathRoot()
