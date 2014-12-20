@@ -131,6 +131,19 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use ""
             Test.Use " "
             
+        Case "GetPathRoot_WithValue_ReturnsExpected"
+            Test.Use "\mydir\", "\"
+            Test.Use "c:", "c:"
+            Test.Use "file.txt", ""
+            Test.Use "c:\file.txt", "c:\"
+            Test.Use "\\server", "\\server"
+            Test.Use "\\server\", "\\server\"
+            Test.Use "\\server\share", "\\server\share"
+            Test.Use "\\server\share\dir", "\\server\share"
+            Test.Use "\\", "\\"
+            Test.Use "\\\", "\\"
+            Test.Use "\\.\", "\\.\"
+            Test.Use "\\\a", "\\a"
     End Select
 End Sub
 
@@ -241,54 +254,42 @@ errTrap:
     AssertNotSupportedException Err
 End Sub
 
-Public Sub TestGetPathRoot()
-    Assert.AreEqual "\", Path.GetPathRoot("\mydir\")
-    Assert.AreEqual "c:", Path.GetPathRoot("c:")
-    Assert.AreEqual "", Path.GetPathRoot("file.txt")
-    Assert.AreEqual "\\server", Path.GetPathRoot("\\server")
-    Assert.AreEqual "\\server\", Path.GetPathRoot("\\server\")
-    Assert.AreEqual "\\server\share", Path.GetPathRoot("\\server\share")
-    Assert.AreEqual "\\server\share", Path.GetPathRoot("\\server\share\dir")
-    Assert.AreEqual "\\", Path.GetPathRoot("\\")
-    Assert.AreEqual "\\", Path.GetPathRoot("\\\")
-    Assert.AreEqual "\\.\", Path.GetPathRoot("\\.\")
-    Assert.AreEqual "\\a", Path.GetPathRoot("\\\a")
-End Sub
-
-Public Sub TestGetTempFileName()
-    Dim s As String
-    s = Path.GetTempFileName
-    Assert.That "", Iz.Not.EqualTo(s)
-    Assert.AreEqual 0, FileLen(s)
-    Kill s
+Public Sub GetPathRoot_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
+    Dim Actual As String
     
-    Assert.AreEqual GetTempFolder, Path.GetDirectoryName(s)
+    Actual = Path.GetPathRoot(PathToUse)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-    ' the output is user specific, so visual inspection is suggested.
-Public Sub TestGetTempPath()
-    Assert.AreEqual GetTempFolder & "\", Path.GetTempPath
+Public Sub GetTempFileName_WhenCalled_ReturnsNewlyCreatedTempFile()
+    On Error GoTo errTrap
+    Dim TempFileName As String
+    
+    TempFileName = Path.GetTempFileName
+    
+    Assert.That TempFileName, Iz.Not.Empty
+    Assert.That FileLen(TempFileName), Iz.EqualTo(0)
+    
+errTrap:
+    If Len(Dir(TempFileName)) > 0 Then
+        Kill TempFileName
+    End If
+    
+    If Err.Number <> 0 Then
+        Err.Raise Err.Number, , Err.Description
+    End If
 End Sub
 
+Public Sub GetTempPath_WhenCalled_NewTempPath()
+    Dim TempPath As String
+    
+    TempPath = Path.GetTempPath
+    
+    Assert.That TempPath, Iz.Not.Empty
+    Assert.That Path.IsPathRooted(TempPath), Iz.True
+    Assert.That Right$(TempPath, 1), Iz.EqualTo(Path.DirectorySeparatorString)
+End Sub
 
-
-Private Function GetTempFolder() As String
-    Dim Tmp As String
-    Tmp = Environ$("Tmp")
-    If Len(Tmp) = 0 Then Tmp = Environ$("Temp")
-    If Len(Tmp) = 0 Then Tmp = Environ$("UserProfile")
-    If Len(Tmp) = 0 Then Tmp = Environ$("WinDir")
-    Tmp = GetLongPathName(Tmp)
-
-    GetTempFolder = Tmp
-End Function
-
-Private Function GetLongPathName(ByVal s As String) As String
-    Dim ret As String
-    ret = String$(1024, 0)
-    Dim i As Long
-    i = GetLongPathNameA(s, ret, Len(ret))
-    GetLongPathName = Left$(ret, i)
-End Function
 
 
