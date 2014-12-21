@@ -322,7 +322,7 @@ Public Function GetLogicalDrives() As String()
     mask = VBCorType.GetLogicalDrives
     
     Dim letter As Long
-    letter = vbUpperA
+    letter = vbUpperAChar
     
     Dim i As Long
     Do While mask <> 0
@@ -499,7 +499,7 @@ Private Function InternalGetFiles(ByRef sPath As String, ByRef SearchPattern As 
     Dim FileHandle  As Long
     FileHandle = API.FindFirstFile(Path.Combine(sPath, SearchPattern), Data)
     
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
     Dim include As Boolean
     If FileHandle <> INVALID_HANDLE Then
@@ -513,7 +513,7 @@ Private Function InternalGetFiles(ByRef sPath As String, ByRef SearchPattern As 
             If include Then
                 Dim s As String
                 s = GetFileNameFromFindData(Data)
-                If Len(s) > 0 Then Call list.Add(Path.Combine(sPath, s))
+                If Len(s) > 0 Then Call List.Add(Path.Combine(sPath, s))
             End If
         Loop While API.FindNextFile(FileHandle, Data) <> BOOL_FALSE
     End If
@@ -528,7 +528,7 @@ Private Function InternalGetFiles(ByRef sPath As String, ByRef SearchPattern As 
         Case Else: IOError e, sPath
     End Select
 
-    InternalGetFiles = list.ToArray(vbString)
+    InternalGetFiles = List.ToArray(vbString)
 End Function
 
 Private Sub InternalSetFileTime(ByRef sPath As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)

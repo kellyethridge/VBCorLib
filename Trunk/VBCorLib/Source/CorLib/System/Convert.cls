@@ -212,7 +212,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
                 If TermCount > 0 Then _
                     Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
                     
-            Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ, vbZero To vbNine, vbPlus, vbForwardSlash
+            Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ, vbZero To vbNine, vbPlus, vbForwardSlash
                 If TermCount > 0 Then _
                     Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
                 

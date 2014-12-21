@@ -891,7 +891,7 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
             
             Else
                 Select Case ch
-                    Case vbLowerD:          Call Append1to4CountValue(sb, cnt, Day, mProps.AbbreviatedDayNames(dt.DayOfWeek), mProps.DayNames(dt.DayOfWeek))
+                    Case vbLowerDChar:          Call Append1to4CountValue(sb, cnt, Day, mProps.AbbreviatedDayNames(dt.DayOfWeek), mProps.DayNames(dt.DayOfWeek))
                     Case vbUpperM:          Call Append1to4CountValue(sb, cnt, Month, mProps.AbbreviatedMonthNames(Month - 1), mProps.MonthNames(Month - 1))
                     Case vbLowerH:          Call Append1or2DigitNumber(sb, cnt, HourMod12)
                     Case vbUpperH:          Call Append1or2DigitNumber(sb, cnt, Hour)
@@ -935,7 +935,7 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
                         Escaped = True
                         cnt = 1
                     
-                    Case vbLowerF
+                    Case vbLowerFChar
                         Dim secfrac As Long
                         If cnt > 7 Then Call FormatError
                         secfrac = GetSecondsFraction(dt.Ticks)
@@ -1016,13 +1016,13 @@ Private Function GetPattern(ByVal fmt As String) As String
     If Len(fmt) = 0 Then fmt = "G"
     If Len(fmt) = 1 Then
         Select Case Asc(fmt)
-            Case vbLowerD:               GetPattern = mProps.ShortDatePattern
-            Case vbUpperD:               GetPattern = mProps.LongDatePattern
+            Case vbLowerDChar:               GetPattern = mProps.ShortDatePattern
+            Case vbUpperDChar:               GetPattern = mProps.LongDatePattern
             Case vbLowerT:               GetPattern = mProps.ShortTimePattern
             Case vbUpperT:               GetPattern = mProps.LongTimePattern
-            Case vbLowerF:               GetPattern = mProps.LongDatePattern & " " & mProps.ShortTimePattern
-            Case vbUpperF:               GetPattern = Me.FullDateTimePattern
-            Case vbLowerG:               GetPattern = mProps.ShortDatePattern & " " & mProps.ShortTimePattern
+            Case vbLowerFChar:               GetPattern = mProps.LongDatePattern & " " & mProps.ShortTimePattern
+            Case vbUpperFChar:               GetPattern = Me.FullDateTimePattern
+            Case vbLowerGChar:               GetPattern = mProps.ShortDatePattern & " " & mProps.ShortTimePattern
             Case vbUpperG:               GetPattern = mProps.ShortDatePattern & " " & mProps.LongTimePattern
             Case vbLowerM, vbUpperM:     GetPattern = mProps.MonthDayPattern
             Case vbLowerR, vbUpperR:     GetPattern = C_RFC1123Pattern
@@ -1072,19 +1072,19 @@ Private Function GetSpecificDateTimePattern(ByVal Pattern As Long) As String()
     ' It will be rare that a multi-pattern is requested.
     ReDim Ret(0)
     Select Case Pattern
-        Case vbLowerD
+        Case vbLowerDChar
             Ret(0) = mProps.ShortDatePattern
-        Case vbUpperD
+        Case vbUpperDChar
             Ret(0) = mProps.LongDatePattern
         Case vbLowerT
             Ret = mProps.AllShortTimePatterns
         Case vbUpperT
             Ret(0) = mProps.LongTimePattern
-        Case vbUpperF, vbUpperU
+        Case vbUpperFChar, vbUpperU
             Ret(0) = Me.FullDateTimePattern
-        Case vbLowerF
+        Case vbLowerFChar
             Ret = CreateDateTimePatterns(mProps.AllLongDatePatterns, mProps.AllShortTimePatterns)
-        Case vbLowerG
+        Case vbLowerGChar
             Ret = CreateDateTimePatterns(mProps.AllShortDatePatterns, mProps.AllShortTimePatterns)
         Case vbUpperG
             Ret = CreateDateTimePatterns(mProps.AllShortDatePatterns, mProps.AllLongTimePatterns)
