@@ -1292,10 +1292,10 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
     
     Select Case Specifiers.Format
         Case FormatSpecifier.GeneralLowerSpecifier
-            FormatGeneralInt32 Specifiers.Precision, vbLowerE
+            FormatGeneralInt32 Specifiers.Precision, vbLowerEChar
             
         Case FormatSpecifier.GeneralUpperSpecifier
-            FormatGeneralInt32 Specifiers.Precision, vbUpperE
+            FormatGeneralInt32 Specifiers.Precision, vbUpperEChar
             
         Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
             FormatFixedDouble Specifiers.Precision
@@ -1310,10 +1310,10 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
             FormatCurrency Specifiers.Precision
             
         Case FormatSpecifier.ExponentLowerSpecifier
-            FormatExponentInt32 Specifiers.Precision, vbLowerE
+            FormatExponentInt32 Specifiers.Precision, vbLowerEChar
             
         Case FormatSpecifier.ExponentUpperSpecifier
-            FormatExponentInt32 Specifiers.Precision, vbUpperE
+            FormatExponentInt32 Specifiers.Precision, vbUpperEChar
         
         Case FormatSpecifier.PercentUpperSpecifier, FormatSpecifier.PercentLowerSpecifier
             If mNumber.Precision > 0 Then
@@ -1810,7 +1810,7 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
                 FormatType = .Data(0)
                 
                 Select Case FormatType
-                    Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
+                    Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
                         ' We've got a format letter, so attempt to get any precision digits.
                         If FormatLength = 1 Then
                             FormatPrecision = UnknownPrecision
@@ -1862,7 +1862,7 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                 .SA.pvData = StrPtr(Format)
         
                 Select Case .Data(0)
-                    Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
+                    Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
                         ParseSpecifiers.Format = .Data(0)
                         
                         If FormatLength = 1 Then
@@ -2234,14 +2234,14 @@ Private Sub AppendExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal
     ' them in reverse order, starting from the rightside and
     ' moving back towards the left. This is the easiest way
     ' mathematically without having to reverse the characters.
-    Dim pos As Long
-    pos = mOutputPos - 1
+    Dim Pos As Long
+    Pos = mOutputPos - 1
     Do While Places > 0
         Dim OneTenth As Long
         OneTenth = Places \ 10
-        mOutput(pos) = (Places - (OneTenth * 10)) + vbZero
+        mOutput(Pos) = (Places - (OneTenth * 10)) + vbZero
         Places = OneTenth
-        pos = pos - 1
+        Pos = Pos - 1
     Loop
 End Sub
 

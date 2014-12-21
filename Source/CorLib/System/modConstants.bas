@@ -30,15 +30,15 @@ Public Const vbMissing      As Long = vbError
 
 ' Ascii constants
 Public Const vbTerminator       As Long = 0
-Public Const vbUpperA           As Long = &H41
-Public Const vbLowerA           As Long = &H61
-Public Const vbLowerD           As Long = &H64
-Public Const vbUpperD           As Long = &H44
-Public Const vbLowerE           As Long = &H65
-Public Const vbUpperE           As Long = &H45
-Public Const vbLowerF           As Long = &H66
-Public Const vbUpperF           As Long = &H46
-Public Const vbLowerG           As Long = &H67
+Public Const vbUpperAChar           As Long = &H41
+Public Const vbLowerAChar           As Long = &H61
+Public Const vbLowerDChar           As Long = &H64
+Public Const vbUpperDChar           As Long = &H44
+Public Const vbLowerEChar           As Long = &H65
+Public Const vbUpperEChar           As Long = &H45
+Public Const vbLowerFChar           As Long = &H66
+Public Const vbUpperFChar           As Long = &H46
+Public Const vbLowerGChar           As Long = &H67
 Public Const vbUpperG           As Long = &H47
 Public Const vbLowerH           As Long = &H68
 Public Const vbUpperH           As Long = &H48

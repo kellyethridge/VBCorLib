@@ -290,7 +290,7 @@ Public Function GetDirectoryName(ByVal Path As String) As String
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
             
             Select Case Asc(Path)
-                Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
+                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
                     If Len(Path) > 3 Then MinSlashes = 1
                 
                 Case Else: Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
@@ -393,7 +393,7 @@ Public Function GetFullPath(ByVal Path As String) As String
         ' check if absolute path ( a:, b:, ...) is being specified.
         If .HiWord = vbColon Then
             Select Case .LoWord
-                Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
+                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
                 Case Else
                     Throw Cor.NewArgumentException("Incorrect absolute path information.", "Path")
             End Select
@@ -463,7 +463,7 @@ Public Function GetPathRoot(ByVal Path As String) As String
         
         If .HiWord = vbColon Then
             Select Case .LoWord
-                Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
+                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
                     GetPathRoot = Left$(Path, 2)
                     
                     If Len(Path) > 2 Then

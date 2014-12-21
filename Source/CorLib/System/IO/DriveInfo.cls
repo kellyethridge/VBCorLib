@@ -209,14 +209,14 @@ Private Sub SetName(ByVal Name As String)
     
     If Len(Name) = 1 Then Name = Name & ":\"
     
-    Dim Root As String
-    Select Case GetPathRootAndType(Name, Root)
+    Dim root As String
+    Select Case GetPathRootAndType(Name, root)
         Case PATHTYPE_SHARE
-            mName = Root & "\"
+            mName = root & "\"
         Case PATHTYPE_VOLUME
-            Select Case Asc(Root)
-                Case vbLowerA To vbLowerZ, vbUpperA To vbUpperZ
-                    mName = Root
+            Select Case Asc(root)
+                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                    mName = root
                 Case Else
                     Throw Cor.NewArgumentException("Drive letters can only be letters a to z, or A to Z.", "Name")
             End Select
@@ -225,10 +225,10 @@ Private Sub SetName(ByVal Name As String)
     End Select
 End Sub
 
-Private Function GetPathRootAndType(ByRef sPath As String, ByRef Root As String) As Long
-    Root = Path.GetPathRoot(sPath)
-    If Len(Root) < 2 Then Exit Function
-    If Left$(Root, 2) = "\\" Then
+Private Function GetPathRootAndType(ByRef sPath As String, ByRef root As String) As Long
+    root = Path.GetPathRoot(sPath)
+    If Len(root) < 2 Then Exit Function
+    If Left$(root, 2) = "\\" Then
         GetPathRootAndType = PATHTYPE_SHARE
     Else
         GetPathRootAndType = PATHTYPE_VOLUME
