@@ -353,7 +353,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
             If nibble > 9 Then
                 mBuffer.Data(Pos + Offset) = nibble + ALPHA_OFFSET
             Else
-                mBuffer.Data(Pos + Offset) = nibble + vbZero
+                mBuffer.Data(Pos + Offset) = nibble + vbZeroChar
             End If
             b = (b And &HF0&) \ &H10&
             Offset = 1 - Offset

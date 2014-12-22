@@ -87,8 +87,8 @@ Private Sub ParseFormat(ByRef Format As String, ByRef FormatSpecifier As Long, B
                         ch = Chars(i)
                         
                         Select Case ch
-                            Case vbZero To vbNineChar
-                                PrecisionSpecifier = PrecisionSpecifier * 10 + ch - vbZero
+                            Case vbZeroChar To vbNineChar
+                                PrecisionSpecifier = PrecisionSpecifier * 10 + ch - vbZeroChar
                             Case Else
                                 FormatSpecifier = CustomSpecifier
                                 PrecisionSpecifier = UnknownPrecision

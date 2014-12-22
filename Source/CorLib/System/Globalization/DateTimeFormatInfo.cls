@@ -906,7 +906,7 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
                         Select Case cnt
                             Case 1:         Call sb.Append(YearMod100)
                             Case 2:
-                                If YearMod100 < 10 Then Call sb.AppendChar(vbZero)
+                                If YearMod100 < 10 Then Call sb.AppendChar(vbZeroChar)
                                 sb.Append YearMod100
                             Case Else
                                 sb.AppendFormat "{0:d" & cnt & "}", Year
@@ -974,7 +974,7 @@ Private Sub Append1to4CountValue(ByRef sb As StringBuilder, ByVal cnt As Long, B
         Case 1
             Call sb.Append(Value)
         Case 2
-            If Value < 10 Then Call sb.AppendChar(vbZero)
+            If Value < 10 Then Call sb.AppendChar(vbZeroChar)
             Call sb.Append(Value)
         Case 3
             Call sb.AppendString(ThreeCountValue)
@@ -987,7 +987,7 @@ Private Sub Append1or2DigitNumber(ByRef sb As StringBuilder, ByVal cnt As Long, 
     If cnt = 1 Then
         Call sb.Append(Value)
     Else
-        If Value < 10 Then Call sb.AppendChar(vbZero)
+        If Value < 10 Then Call sb.AppendChar(vbZeroChar)
         Call sb.Append(Value)
     End If
 End Sub

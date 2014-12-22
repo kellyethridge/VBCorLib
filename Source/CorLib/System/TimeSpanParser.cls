@@ -82,7 +82,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
                 Exit Function
             End If
     
-        Case vbZero To vbNineChar, vbPeriodChar, vbNullPtr
+        Case vbZeroChar To vbNineChar, vbPeriodChar, vbNullPtr
             Const MaxDays As Long = 10675199
             Dim DaysParsed As Long
             If Not TryParseNumber(MaxDays, DaysParsed) Then
@@ -157,7 +157,7 @@ Private Function NextNonDigit() As Integer
     Dim i As Long
     For i = mIndex To mBuffer.SA.cElements - 1
         Select Case mBuffer.Data(i)
-            Case vbZero To vbNineChar
+            Case vbZeroChar To vbNineChar
             Case Else
                 NextNonDigit = mBuffer.Data(i)
                 Exit Function
@@ -237,8 +237,8 @@ Private Function TryParseNumber(ByVal MaxValue As Long, ByRef Result As Long) As
     OriginalIndex = mIndex
     Do
         Select Case Char
-            Case vbZero To vbNineChar
-                Number = Number * 10 + (Char - vbZero)
+            Case vbZeroChar To vbNineChar
+                Number = Number * 10 + (Char - vbZeroChar)
                 
             Case Else
                 Exit Do
