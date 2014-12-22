@@ -215,7 +215,7 @@ Private Sub SetName(ByVal Name As String)
             mName = root & "\"
         Case PATHTYPE_VOLUME
             Select Case Asc(root)
-                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                     mName = root
                 Case Else
                     Throw Cor.NewArgumentException("Drive letters can only be letters a to z, or A to Z.", "Name")

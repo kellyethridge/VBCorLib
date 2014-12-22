@@ -49,7 +49,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const DefaultFillChar   As Integer = vbSpace
+Private Const DefaultFillChar   As Integer = vbSpaceChar
 Private Const DefaultCapacity   As Long = 512
 Private Const OpenBraceChar     As Long = 123
 Private Const CloseBraceChar    As Long = 125
@@ -809,7 +809,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                     
                     ' Add leading padding.
                     If ArgWidth > Len(s) Then
-                        AppendChar vbSpace, ArgWidth - Len(s)
+                        AppendChar vbSpaceChar, ArgWidth - Len(s)
                     End If
                     
                     ' Finally append the formatted value to the string.
@@ -817,7 +817,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                     
                     ' Add trailing padding.
                     If -ArgWidth > Len(s) Then
-                        AppendChar vbSpace, (-ArgWidth) - Len(s)
+                        AppendChar vbSpaceChar, (-ArgWidth) - Len(s)
                     End If
                     
                     SubStringStart = Index + 1
@@ -873,7 +873,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
     
     With mChars
         ' Check if a column size is being defined.
-        If .Data(Index) = vbComma Then
+        If .Data(Index) = vbCommaChar Then
             Index = ConsumeSpaces(Index + 1)
             
             ' Get the column width and aligment. Remember
@@ -887,7 +887,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
         End If
         
         ' Check if formatting is being specified.
-        If .Data(Index) = vbColon Then
+        If .Data(Index) = vbColonChar Then
             Dim StartIndex As Long
             
             ' everything from here to the "}" is part of the argument formatting.
@@ -927,7 +927,7 @@ Private Function ConsumeSpaces(ByVal Index As Long) As Long
     Do
         ' Can never hit the end consuming spaces.
         If Index = Max Then FormatError
-        If mChars.Data(Index) <> vbSpace Then Exit Do
+        If mChars.Data(Index) <> vbSpaceChar Then Exit Do
         Index = Index + 1
     Loop
     
@@ -960,11 +960,11 @@ Private Function ParseNumber(ByRef Index As Long) As Long
         Dim ch As Integer
         ch = mChars.Data(Index)
         Select Case ch
-            Case vbZero To vbNine
+            Case vbZero To vbNineChar
                 ' Keep adding digits to the number
                 Number = Number * 10 + ch - vbZero
                 NumberFound = True
-            Case vbMinus
+            Case vbMinusChar
                 ' The "-" can only be the first character.
                 If Index <> FirstCharIndex Then FormatError
                 Sign = -1

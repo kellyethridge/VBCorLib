@@ -229,7 +229,7 @@ Public Function ReadLine() As String
         
         ' Check for either a return or linefeed as new line separators.
         Select Case mCharBuffer(mCharIndex)
-            Case vbReturn, vbLineFeed
+            Case vbReturnChar, vbLineFeedChar
                 TermChar = mCharBuffer(mCharIndex)
                 
                 ' If we aren't using the builder and we found a new line separator
@@ -270,18 +270,18 @@ Public Function ReadLine() As String
     ' We terminate a line with either a Return, LineFeed, or Return-LineFeed.
     ' So check if we had a Return, and if so, determine if the next character
     ' is a LineFeed. Remove them both if possible.
-    If TermChar = vbReturn Then
+    If TermChar = vbReturnChar Then
         ' We still have characters in the buffer, so check if
         ' the next character is a linefeed and remove it if so.
         If mCharIndex < mCharLength Then
-            If mCharBuffer(mCharIndex) = vbLineFeed Then mCharIndex = mCharIndex + 1
+            If mCharBuffer(mCharIndex) = vbLineFeedChar Then mCharIndex = mCharIndex + 1
         Else
             ' The return was the last character in the buffer,
             ' so fill the buffer with the next set of character.
             ' If atleast 1 character was read, then check for
             ' a linefeed and remove it, if so.
             If ReadBuffer > 0 Then
-                If mCharBuffer(0) = vbLineFeed Then mCharIndex = mCharIndex + 1
+                If mCharBuffer(0) = vbLineFeedChar Then mCharIndex = mCharIndex + 1
             End If
         End If
     End If

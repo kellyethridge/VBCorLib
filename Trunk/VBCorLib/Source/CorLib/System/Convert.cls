@@ -204,7 +204,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
     For i = IndexIn To IndexIn + Length - 1
         ch = InArray(i)
         Select Case ch
-            Case vbEqual
+            Case vbEqualChar
                 CharCount = CharCount + 1
                 TermCount = TermCount + 1
                 
@@ -212,7 +212,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
                 If TermCount > 0 Then _
                     Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
                     
-            Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ, vbZero To vbNine, vbPlus, vbForwardSlash
+            Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar, vbZero To vbNineChar, vbPlusChar, vbForwardSlashChar
                 If TermCount > 0 Then _
                     Throw Cor.NewFormatException(Resources.GetString(Format_InvalidBase64Character))
                 
@@ -285,8 +285,8 @@ Private Function InternalToBase64CharArray(ByRef InArray() As Byte, ByVal IndexI
     Dim CharCount   As Long
     For i = IndexIn To MaxIndex - 1 Step 3
         If InsertLineBreaks And (CharCount = 76) Then
-            OutArray(IndexOut) = vbReturn
-            OutArray(IndexOut + 1) = vbLineFeed
+            OutArray(IndexOut) = vbReturnChar
+            OutArray(IndexOut + 1) = vbLineFeedChar
             IndexOut = IndexOut + 2
             CharCount = 0
         End If
@@ -303,8 +303,8 @@ Private Function InternalToBase64CharArray(ByRef InArray() As Byte, ByVal IndexI
         Select Case Length Mod 3
             Case 1, 2
                 If CharCount = 76 Then
-                    OutArray(IndexOut) = vbReturn
-                    OutArray(IndexOut + 1) = vbLineFeed
+                    OutArray(IndexOut) = vbReturnChar
+                    OutArray(IndexOut + 1) = vbLineFeedChar
                     IndexOut = IndexOut + 2
                 End If
         End Select
@@ -316,14 +316,14 @@ Private Function InternalToBase64CharArray(ByRef InArray() As Byte, ByVal IndexI
         Case 1
             OutArray(IndexOut) = Base64Bytes((InArray(MaxIndex) And &HFC) \ 4)
             OutArray(IndexOut + 1) = Base64Bytes((InArray(MaxIndex) And &H3) * &H10)
-            OutArray(IndexOut + 2) = vbEqual
-            OutArray(IndexOut + 3) = vbEqual
+            OutArray(IndexOut + 2) = vbEqualChar
+            OutArray(IndexOut + 3) = vbEqualChar
             IndexOut = IndexOut + 4
         Case 2
             OutArray(IndexOut) = Base64Bytes((InArray(MaxIndex) And &HFC) \ 4)
             OutArray(IndexOut + 1) = Base64Bytes(((InArray(MaxIndex) And &H3) * &H10) Or ((InArray(MaxIndex + 1) And &HF0) \ &H10))
             OutArray(IndexOut + 2) = Base64Bytes((InArray(MaxIndex + 1) And &HF) * 4)
-            OutArray(IndexOut + 3) = vbEqual
+            OutArray(IndexOut + 3) = vbEqualChar
             IndexOut = IndexOut + 4
     End Select
     InternalToBase64CharArray = IndexOut
