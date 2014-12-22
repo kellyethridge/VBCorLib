@@ -960,9 +960,9 @@ Private Function ParseNumber(ByRef Index As Long) As Long
         Dim ch As Integer
         ch = mChars.Data(Index)
         Select Case ch
-            Case vbZero To vbNineChar
+            Case vbZeroChar To vbNineChar
                 ' Keep adding digits to the number
-                Number = Number * 10 + ch - vbZero
+                Number = Number * 10 + ch - vbZeroChar
                 NumberFound = True
             Case vbMinusChar
                 ' The "-" can only be the first character.

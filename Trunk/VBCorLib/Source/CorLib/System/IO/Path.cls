@@ -50,8 +50,6 @@ Option Explicit
 Private Const NOT_FOUND             As Long = &H0
 Private Const vbBackSlashBackSlash  As Long = &H5C005C
 
-
-
 Private mInvalidPathChars()     As Integer
 Private mInvalidFileNameChars() As Integer
 Private mBuffer                 As WordBuffer
@@ -196,7 +194,7 @@ End Function
 Public Function IsPathRooted(ByVal Path As String) As Boolean
     If Len(Path) = 0 Then Exit Function
     
-    Call FixupPath(Path)
+    FixupPath Path
     
     With MemDWord(StrPtr(Path))
         If .LoWord = vbBackslashChar Then
@@ -218,7 +216,7 @@ End Function
 ' filename is considered not to have an extension.
 '
 Public Function HasExtension(ByVal Path As String) As Boolean
-    Call VerifyPath(Path)
+    VerifyPath Path
     
     Select Case GetExtensionCharIndex(Path)
         Case Len(Path): Exit Function
@@ -240,9 +238,8 @@ End Function
 ' <p>This function does not verify that the paths exist.</p>
 '
 Public Function Combine(ByVal Path1 As String, ByVal Path2 As String) As String
-    Call VerifyPath(Path1)
+    VerifyPath Path1
     
-    ' This will verify Path2 as well.
     If IsPathRooted(Path2) Then
         Combine = Path2
         Exit Function
@@ -274,17 +271,14 @@ End Function
 '
 Public Function GetDirectoryName(ByVal Path As String) As String
     Path = cString.Trim(Path)
+    CheckArgument Len(Path) = 0, InvalidPathFormat, PathParam
     
-    If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
-        
-    Call FixupPath(Path)
+    FixupPath Path
     
     Dim MinSlashes As Long
     With MemDWord(StrPtr(Path))
         If (.LoWord = vbBackslashChar) And (.HiWord = vbBackslashChar) Then
             MinSlashes = 4
-            
         ElseIf .HiWord = vbColonChar Then
             If (.LoWord = vbColonChar) Or (InStr(3, Path, ":") > 0) Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
@@ -338,7 +332,7 @@ End Function
 ' @remarks This function does not verify that the file exists.
 '
 Public Function GetFileName(ByVal Path As String) As String
-    Call VerifyPath(Path)
+    VerifyPath Path
     
     GetFileName = Mid$(Path, GetDirectoryCharIndex(Path) + 1)
 End Function
@@ -372,8 +366,7 @@ End Function
 '
 Public Function GetFullPath(ByVal Path As String) As String
     Path = cString.Trim(Path)
-    If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
+    CheckArgument Len(Path) = 0, InvalidPathFormat, PathParam
     
     Call FixupPath(Path)
     
@@ -440,10 +433,9 @@ End Function
 ' derived from what information is in <i>Path</i>.
 '
 Public Function GetPathRoot(ByVal Path As String) As String
-    If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
+    CheckArgument Len(Path) = 0, InvalidPathFormat, PathParam
     
-    Call FixupPath(Path)
+    FixupPath Path
     
     With MemDWord(StrPtr(Path))
         If .LoWord = vbBackslashChar Then
@@ -472,7 +464,7 @@ Public Function GetPathRoot(ByVal Path As String) As String
                     Exit Function
                     
                 Case Else
-                    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
+                    Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidPathFormat), "Path")
             End Select
         End If
     End With
@@ -549,19 +541,19 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
 End Sub
 
 Friend Sub FixupPath(ByRef Path As String)
-    Call VerifyPath(Path, True)
+    VerifyPath Path, True
     
     mPath.Length = 0
-    Call mPath.AppendString(Path)
+    mPath.AppendString Path
     
     Dim i As Long
     Do
         i = mPath.Length
-        Call mPath.Replace("\\", "\", 1, i - 1)
+        mPath.Replace "\\", "\", 1, i - 1
     Loop While i > mPath.Length
     Do
         i = mPath.Length
-        Call mPath.Replace("...\", "..\")
+        mPath.Replace "...\", "..\"
     Loop While i > mPath.Length
     
     Dim Parts() As String
@@ -577,7 +569,7 @@ Friend Sub FixupPath(ByRef Path As String)
 End Sub
 
 Friend Function InternalGetFullPath(ByVal Path As String) As String
-    Call VerifyPath(Path)
+    VerifyPath Path
     
     If Len(Path) = 0 Then
         InternalGetFullPath = Directory.GetCurrentDirectory
@@ -610,7 +602,9 @@ Private Function GetUNCPathRoot(ByRef Path As String) As String
     ' until we get a character or the end.
     ' We don't need to check for a valid index
     ' because we'll hit the null terminator.
-    Do While mBuffer.Data(Pos) = vbBackslashChar: Pos = Pos + 1: Loop
+    Do While mBuffer.Data(Pos) = vbBackslashChar
+        Pos = Pos + 1
+    Loop
     
     Dim SlashCount As Long
     Dim SlashIndex As Long
@@ -674,7 +668,8 @@ Private Function GetExtensionCharIndex(ByRef Path As String) As Long
     
     Do While Index >= 0
         Select Case mBuffer.Data(Index)
-            Case vbPeriodChar: Exit Do
+            Case vbPeriodChar
+                Exit Do
             Case vbForwardSlashChar, vbBackslashChar, vbColonChar
                 GetExtensionCharIndex = NOT_FOUND
                 Exit Function
@@ -730,5 +725,5 @@ Private Sub Class_Initialize()
     mInvalidPathChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F)
     mInvalidFileNameChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F, &H3A, &H2A, &H3F, &H5C, &H2F)
     
-    Call InitWordBuffer(mBuffer, 0, &H7FFFFFFF)
+    InitWordBuffer mBuffer, 0, &H7FFFFFFF
 End Sub

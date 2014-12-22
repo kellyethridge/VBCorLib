@@ -327,7 +327,7 @@ Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Lo
     Dim ComponentString As String
     ComponentString = Component
     
-    Output.AppendChar vbZero, Width - Len(ComponentString)
+    Output.AppendChar vbZeroChar, Width - Len(ComponentString)
     Output.AppendString ComponentString
 End Sub
 
