@@ -75,7 +75,7 @@ End Property
 ' @remarks The alternate character is usually found on systems such as Unix.
 '
 Public Property Get AltDirectorySeparatorChar() As Integer
-    AltDirectorySeparatorChar = vbForwardSlash
+    AltDirectorySeparatorChar = vbForwardSlashChar
 End Property
 
 ''
@@ -85,7 +85,7 @@ End Property
 ' @remarks The alternate string is usually found on systems such as Unix.
 '
 Public Property Get AltDirectorySeparatorString() As String
-    AltDirectorySeparatorString = vbForwardSlashS
+    AltDirectorySeparatorString = vbForwardSlashString
 End Property
 
 ''
@@ -94,7 +94,7 @@ End Property
 ' @return The directory separator character for Windows (92).
 '
 Public Property Get DirectorySeparatorChar() As Integer
-    DirectorySeparatorChar = vbBackSlash
+    DirectorySeparatorChar = vbBackslashChar
 End Property
 
 ''
@@ -103,7 +103,7 @@ End Property
 ' @return The directory separator string for windows "\".
 '
 Public Property Get DirectorySeparatorString() As String
-    DirectorySeparatorString = vbBackSlashS
+    DirectorySeparatorString = vbBackslashString
 End Property
 
 ''
@@ -130,7 +130,7 @@ End Property
 ' @return The environment variable string separator ";".
 '
 Public Property Get PathSeparatorString() As String
-    PathSeparatorString = vbSemiColonS
+    PathSeparatorString = vbSemicolonString
 End Property
 
 ''
@@ -139,7 +139,7 @@ End Property
 ' @return The character code for the volume separator (58).
 '
 Public Property Get VolumeSeparatorChar() As Integer
-    VolumeSeparatorChar = vbColon
+    VolumeSeparatorChar = vbColonChar
 End Property
 
 ''
@@ -148,7 +148,7 @@ End Property
 ' @return The string version of the volume separator ":".
 '
 Public Property Get VolumeSeparatorString() As String
-    VolumeSeparatorString = vbColonS
+    VolumeSeparatorString = vbColonString
 End Property
 
 ''
@@ -168,9 +168,9 @@ Public Function ChangeExtension(ByVal Path As String, ByVal Extension As String)
     If Not cString.IsNull(Extension) Then
         ' replace or append extension.
         If Len(Extension) = 0 Then
-            Extension = vbPeriodS
-        ElseIf Asc(Extension) <> vbPeriod Then
-            Extension = vbPeriodS & Extension
+            Extension = vbPeriodString
+        ElseIf Asc(Extension) <> vbPeriodChar Then
+            Extension = vbPeriodString & Extension
         End If
     End If
     
@@ -199,9 +199,9 @@ Public Function IsPathRooted(ByVal Path As String) As Boolean
     Call FixupPath(Path)
     
     With MemDWord(StrPtr(Path))
-        If .LoWord = vbBackSlash Then
+        If .LoWord = vbBackslashChar Then
             IsPathRooted = True
-        ElseIf .HiWord = vbColon Then
+        ElseIf .HiWord = vbColonChar Then
             IsPathRooted = True
         End If
     End With
@@ -258,10 +258,10 @@ Public Function Combine(ByVal Path1 As String, ByVal Path2 As String) As String
     
     mBuffer.SA.pvData = StrPtr(Path1)
     Select Case mBuffer.Data(Len(Path1) - 1)
-        Case vbBackSlash, vbForwardSlash, vbColon
+        Case vbBackslashChar, vbForwardSlashChar, vbColonChar
             Combine = Path1 & Path2
         Case Else
-            Combine = Path1 & vbBackSlashS & Path2
+            Combine = Path1 & vbBackslashString & Path2
     End Select
 End Function
 
@@ -282,15 +282,15 @@ Public Function GetDirectoryName(ByVal Path As String) As String
     
     Dim MinSlashes As Long
     With MemDWord(StrPtr(Path))
-        If (.LoWord = vbBackSlash) And (.HiWord = vbBackSlash) Then
+        If (.LoWord = vbBackslashChar) And (.HiWord = vbBackslashChar) Then
             MinSlashes = 4
             
-        ElseIf .HiWord = vbColon Then
-            If (.LoWord = vbColon) Or (InStr(3, Path, ":") > 0) Then _
+        ElseIf .HiWord = vbColonChar Then
+            If (.LoWord = vbColonChar) Or (InStr(3, Path, ":") > 0) Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
             
             Select Case Asc(Path)
-                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                     If Len(Path) > 3 Then MinSlashes = 1
                 
                 Case Else: Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
@@ -302,8 +302,8 @@ Public Function GetDirectoryName(ByVal Path As String) As String
     End With
     
     Dim PathLength As Long
-    If (MinSlashes > 0) And (cString.CharCount(Path, vbBackSlash) >= MinSlashes) Then
-        PathLength = InStrRev(Path, vbBackSlashS)
+    If (MinSlashes > 0) And (cString.CharCount(Path, vbBackslashChar) >= MinSlashes) Then
+        PathLength = InStrRev(Path, vbBackslashString)
         If PathLength = 3 Then
             If Mid$(Path, 2, 1) <> ":" Then
                 PathLength = PathLength - 1
@@ -326,7 +326,7 @@ Public Function GetExtension(ByVal Path As String) As String
     Path = GetFileName(Path)
     
     Dim Index As Long
-    Index = InStrRev(Path, vbPeriodS)
+    Index = InStrRev(Path, vbPeriodString)
     If (Index > 0) And (Index < Len(Path)) Then GetExtension = Mid$(Path, Index)
 End Function
 
@@ -354,7 +354,7 @@ Public Function GetFileNameWithoutExtension(ByVal Path As String) As String
     Path = GetFileName(Path)
     
     Dim Index As Long
-    Index = InStrRev(Path, vbPeriodS)
+    Index = InStrRev(Path, vbPeriodString)
     If Index > 0 Then Path = Left$(Path, Index - 1)
     
     GetFileNameWithoutExtension = Path
@@ -387,13 +387,13 @@ Public Function GetFullPath(ByVal Path As String) As String
     ' convert first two characters into two integers.
     With MemDWord(Ptr)
         ' check first character being ':'
-        If .LoWord = vbColon Then _
+        If .LoWord = vbColonChar Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
 
         ' check if absolute path ( a:, b:, ...) is being specified.
-        If .HiWord = vbColon Then
+        If .HiWord = vbColonChar Then
             Select Case .LoWord
-                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                 Case Else
                     Throw Cor.NewArgumentException("Incorrect absolute path information.", "Path")
             End Select
@@ -405,7 +405,7 @@ Public Function GetFullPath(ByVal Path As String) As String
         Throw Cor.NewNotSupportedException("Path format is not supported.")
     
     Dim PathParts() As String
-    PathParts = Split(Path, vbBackSlashS)
+    PathParts = Split(Path, vbBackslashString)
     
     Dim i As Long
     For i = 0 To UBound(PathParts)
@@ -413,11 +413,11 @@ Public Function GetFullPath(ByVal Path As String) As String
             Case "..", "."
                 ' do nothing
             Case Else
-                PathParts(i) = cString.TrimEnd(PathParts(i), vbPeriodS)
+                PathParts(i) = cString.TrimEnd(PathParts(i), vbPeriodString)
         End Select
     Next i
     
-    Path = Join(PathParts, vbBackSlashS)
+    Path = Join(PathParts, vbBackslashString)
     
     Dim Ret As String
     Ret = String$(Me.MaxPathLength, 0)
@@ -446,28 +446,28 @@ Public Function GetPathRoot(ByVal Path As String) As String
     Call FixupPath(Path)
     
     With MemDWord(StrPtr(Path))
-        If .LoWord = vbBackSlash Then
+        If .LoWord = vbBackslashChar Then
             Select Case .HiWord
-                Case vbBackSlash
+                Case vbBackslashChar
                     GetPathRoot = GetUNCPathRoot(Path)
                     Exit Function
                 
-                Case vbColon
+                Case vbColonChar
                     Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
                 
                 Case Else
-                    GetPathRoot = vbBackSlashS
+                    GetPathRoot = vbBackslashString
                     Exit Function
             End Select
         End If
         
-        If .HiWord = vbColon Then
+        If .HiWord = vbColonChar Then
             Select Case .LoWord
-                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                     GetPathRoot = Left$(Path, 2)
                     
                     If Len(Path) > 2 Then
-                        GetPathRoot = GetPathRoot + vbBackSlashS
+                        GetPathRoot = GetPathRoot + vbBackslashString
                     End If
                     Exit Function
                     
@@ -542,8 +542,8 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
         Select Case mBuffer.Data(i)
             Case &H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F
                 Throw Cor.NewArgumentException("Invalid characters in path.", "Path")
-            Case vbForwardSlash
-                If FixSlashes Then mBuffer.Data(i) = vbBackSlash
+            Case vbForwardSlashChar
+                If FixSlashes Then mBuffer.Data(i) = vbBackslashChar
         End Select
     Next i
 End Sub
@@ -573,7 +573,7 @@ Friend Sub FixupPath(ByRef Path As String)
         End If
     Next i
     
-    Path = Join(Parts, vbBackSlashS)
+    Path = Join(Parts, vbBackslashString)
 End Sub
 
 Friend Function InternalGetFullPath(ByVal Path As String) As String
@@ -582,9 +582,9 @@ Friend Function InternalGetFullPath(ByVal Path As String) As String
     If Len(Path) = 0 Then
         InternalGetFullPath = Directory.GetCurrentDirectory
     Else
-        InternalGetFullPath = Replace$(Path, vbForwardSlashS, vbBackSlashS)
-        If Asc(Right$(InternalGetFullPath, 1)) <> vbBackSlash Then
-            InternalGetFullPath = InternalGetFullPath & vbBackSlashS
+        InternalGetFullPath = Replace$(Path, vbForwardSlashString, vbBackslashString)
+        If Asc(Right$(InternalGetFullPath, 1)) <> vbBackslashChar Then
+            InternalGetFullPath = InternalGetFullPath & vbBackslashString
         End If
     End If
 End Function
@@ -610,13 +610,13 @@ Private Function GetUNCPathRoot(ByRef Path As String) As String
     ' until we get a character or the end.
     ' We don't need to check for a valid index
     ' because we'll hit the null terminator.
-    Do While mBuffer.Data(Pos) = vbBackSlash: Pos = Pos + 1: Loop
+    Do While mBuffer.Data(Pos) = vbBackslashChar: Pos = Pos + 1: Loop
     
     Dim SlashCount As Long
     Dim SlashIndex As Long
     SlashIndex = Pos
     Do While (SlashCount < 2) And (mBuffer.Data(SlashIndex) <> 0)
-        If mBuffer.Data(SlashIndex) = vbBackSlash Then
+        If mBuffer.Data(SlashIndex) = vbBackslashChar Then
             SlashCount = SlashCount + 1
         End If
         
@@ -641,7 +641,7 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
     ch = mBuffer.Data(Pos)
     Do While ch <> 0
         Select Case ch
-            Case vbBackSlash, vbForwardSlash
+            Case vbBackslashChar, vbForwardSlashChar
                 foundSeparator = True
             Case Else
                 If Not foundServer Then
@@ -674,8 +674,8 @@ Private Function GetExtensionCharIndex(ByRef Path As String) As Long
     
     Do While Index >= 0
         Select Case mBuffer.Data(Index)
-            Case vbPeriod: Exit Do
-            Case vbForwardSlash, vbBackSlash, vbColon
+            Case vbPeriodChar: Exit Do
+            Case vbForwardSlashChar, vbBackslashChar, vbColonChar
                 GetExtensionCharIndex = NOT_FOUND
                 Exit Function
         End Select
@@ -699,7 +699,7 @@ Private Function GetDirectoryCharIndex(ByRef Path As String) As Long
     Index = Len(Path) - 1
     Do While Index >= 0
         Select Case mBuffer.Data(Index)
-            Case vbBackSlash, vbForwardSlash, vbColon
+            Case vbBackslashChar, vbForwardSlashChar, vbColonChar
                 Exit Do
         End Select
         Index = Index - 1

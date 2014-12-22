@@ -1382,8 +1382,8 @@ Private Sub FormatNumber(ByVal FormatPrecision As Long)
         For i = 0 To Len(Pattern) - 1
             ch = mFormatSpecifier.Data(i)
             Select Case ch
-                Case vbPound:    FormatGroups FormatPrecision, .NumberGroupSizes, .NumberGroupSeparator, .NumberDecimalSeparator
-                Case vbMinus:    AppendString .NegativeSign
+                Case vbPoundChar:    FormatGroups FormatPrecision, .NumberGroupSizes, .NumberGroupSeparator, .NumberDecimalSeparator
+                Case vbMinusChar:    AppendString .NegativeSign
                 Case Else
                     mOutput(mOutputPos) = ch
                     mOutputPos = mOutputPos + 1
@@ -1414,9 +1414,9 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
         For i = 0 To Len(Pattern) - 1
             ch = mFormatSpecifier.Data(i)
             Select Case ch
-                Case vbPound:    FormatGroups DecimalPlaces, .CurrencyGroupSizes, .CurrencyGroupSeparator, .CurrencyDecimalSeparator
-                Case vbMinus:    AppendString .NegativeSign
-                Case vbDollar:   AppendString .CurrencySymbol
+                Case vbPoundChar:    FormatGroups DecimalPlaces, .CurrencyGroupSizes, .CurrencyGroupSeparator, .CurrencyDecimalSeparator
+                Case vbMinusChar:    AppendString .NegativeSign
+                Case vbDollarChar:   AppendString .CurrencySymbol
                 Case Else
                     mOutput(mOutputPos) = ch
                     mOutputPos = mOutputPos + 1
@@ -1441,9 +1441,9 @@ Private Sub FormatPercent(ByVal DecimalPlaces As Long)
         For i = 0 To Len(Pattern) - 1
             ch = mFormatSpecifier.Data(i)
             Select Case ch
-                Case vbPound:    FormatGroups DecimalPlaces, .PercentGroupSizes, .PercentGroupSeparator, .PercentDecimalSeparator
-                Case vbMinus:    AppendString .NegativeSign
-                Case vbPercent:  AppendString .PercentSymbol
+                Case vbPoundChar:    FormatGroups DecimalPlaces, .PercentGroupSizes, .PercentGroupSeparator, .PercentDecimalSeparator
+                Case vbMinusChar:    AppendString .NegativeSign
+                Case vbPercentChar:  AppendString .PercentSymbol
                 Case Else
                     mOutput(mOutputPos) = ch
                     mOutputPos = mOutputPos + 1
@@ -1741,14 +1741,14 @@ Private Sub RoundNumber(ByVal Digits As Long)
     
     With mNumber
         ' are we rounding up or down?
-        If .Digits(Digits) >= vbFive Then
+        If .Digits(Digits) >= vbFiveChar Then
             ' We don't round 9's directly, since they would just
             ' carry over, so we keep skipping them until there
             ' are no more. Then we'll round up the first non-nine digit.
             ' This will also lower the precision, since we had
             ' to keep dealing with the carry.
             Do While Digits > 0
-                If .Digits(Digits - 1) <> vbNine Then Exit Do
+                If .Digits(Digits - 1) <> vbNineChar Then Exit Do
                 Digits = Digits - 1
             Loop
             
@@ -1760,7 +1760,7 @@ Private Sub RoundNumber(ByVal Digits As Long)
                 ' otherwise we ran out of digits, so we have to
                 ' scale up by 1 and add a 1. ie. 9999 -> 10000
                 .DecimalPosition = .DecimalPosition + 1
-                .Digits(Digits) = vbOne
+                .Digits(Digits) = vbOneChar
                 Digits = 1
             End If
         Else
@@ -1810,7 +1810,7 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
                 FormatType = .Data(0)
                 
                 Select Case FormatType
-                    Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                    Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                         ' We've got a format letter, so attempt to get any precision digits.
                         If FormatLength = 1 Then
                             FormatPrecision = UnknownPrecision
@@ -1825,7 +1825,7 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
                             ch = .Data(i)
                             
                             Select Case ch
-                                Case vbZero To vbNine
+                                Case vbZero To vbNineChar
                                     FormatPrecision = FormatPrecision * 10 + ch - vbZero
                                 Case Else
                                     FormatType = CustomFormat
@@ -1862,7 +1862,7 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                 .SA.pvData = StrPtr(Format)
         
                 Select Case .Data(0)
-                    Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                    Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                         ParseSpecifiers.Format = .Data(0)
                         
                         If FormatLength = 1 Then
@@ -1877,7 +1877,7 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                             ch = .Data(i)
                             
                             Select Case ch
-                                Case vbZero To vbNine
+                                Case vbZero To vbNineChar
                                     Precision = Precision * 10 + ch - vbZero
                                 Case Else
                                     ParseSpecifiers.Format = CustomSpecifier
@@ -1964,7 +1964,7 @@ Private Sub Int32ToNumber(ByVal Value As Long)
             Value = OneTenth
         Loop
         If IsMaxNeg Then
-            .Digits(.Precision - 1) = vbEight
+            .Digits(.Precision - 1) = vbEightChar
         End If
     End With
 End Sub

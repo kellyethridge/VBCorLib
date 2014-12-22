@@ -300,14 +300,14 @@ Public Function ToDecimal(ByRef Value() As Byte, ByVal StartIndex As Long) As Va
     If Value(StartIndex + 14) > 28 Then _
         Throw Cor.NewOverflowException("Decimal precision must be from 0 to 28 places.")
     
-    Dim ptr As Long
-    ptr = VarPtr(ToDecimal)
+    Dim Ptr As Long
+    Ptr = VarPtr(ToDecimal)
     
-    If Value(StartIndex + 15) <> 0 Then MemByte(ptr + 3) = &H80  ' set sign
+    If Value(StartIndex + 15) <> 0 Then MemByte(Ptr + 3) = &H80  ' set sign
     
-    MemByte(ptr + 2) = Value(StartIndex + 14)            ' set precision
-    MemLong(ptr + 4) = AsLong(Value(StartIndex + 8))     ' set highest 32 bits
-    MemCurr(ptr + 8) = AsCurr(Value(StartIndex + 0))     ' set lowest and middle 32bits
+    MemByte(Ptr + 2) = Value(StartIndex + 14)            ' set precision
+    MemLong(Ptr + 4) = AsLong(Value(StartIndex + 8))     ' set highest 32 bits
+    MemCurr(Ptr + 8) = AsCurr(Value(StartIndex + 0))     ' set lowest and middle 32bits
 End Function
 
 ''
@@ -346,7 +346,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
     
     Offset = 1
     Do While i < ElemCount
-        If i > 0 Then mBuffer.Data(Pos) = vbMinus: Pos = Pos + 1
+        If i > 0 Then mBuffer.Data(Pos) = vbMinusChar: Pos = Pos + 1
         b = Value(ElemIndex + i)
         Do
             nibble = b And &HF

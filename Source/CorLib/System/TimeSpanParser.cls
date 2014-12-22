@@ -68,7 +68,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
     SkipBlanks
     
     Dim Sign As Currency
-    If Char = vbMinus Then
+    If Char = vbMinusChar Then
         Sign = -1@
         NextChar
     Else
@@ -77,12 +77,12 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
     
     Dim Result As Currency
     Select Case NextNonDigit()
-        Case vbColon
+        Case vbColonChar
             If Not TryParseTime(Result) Then
                 Exit Function
             End If
     
-        Case vbZero To vbNine, vbPeriod, vbNullPtr
+        Case vbZero To vbNineChar, vbPeriodChar, vbNullPtr
             Const MaxDays As Long = 10675199
             Dim DaysParsed As Long
             If Not TryParseNumber(MaxDays, DaysParsed) Then
@@ -90,7 +90,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
             End If
             Result = Result + DaysParsed * MILLISECONDS_PER_DAY
             
-            If Char = vbPeriod Then
+            If Char = vbPeriodChar Then
                 NextChar
                 
                 Dim TimeParsed As Currency
@@ -148,7 +148,7 @@ Private Sub NextChar()
 End Sub
 
 Private Sub SkipBlanks()
-    Do While Char = vbSpace
+    Do While Char = vbSpaceChar
         NextChar
     Loop
 End Sub
@@ -157,7 +157,7 @@ Private Function NextNonDigit() As Integer
     Dim i As Long
     For i = mIndex To mBuffer.SA.cElements - 1
         Select Case mBuffer.Data(i)
-            Case vbZero To vbNine
+            Case vbZero To vbNineChar
             Case Else
                 NextNonDigit = mBuffer.Data(i)
                 Exit Function
@@ -177,7 +177,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
     Result = HoursParsed * MILLISECONDS_PER_HOUR
     
     ' when parsing time we require at least hours and minutes.
-    If Char <> vbColon Then
+    If Char <> vbColonChar Then
         mError = ParseError.FormatError
         Exit Function
     End If
@@ -193,12 +193,12 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
     Result = Result + MinutesParsed * MILLISECONDS_PER_MINUTE
     
     ' check for possible seconds
-    If Char = vbColon Then
+    If Char = vbColonChar Then
         NextChar
         
         ' defined fraction immediately after seconds colon instead
         ' 00:00:.1234
-        If Char <> vbPeriod Then
+        If Char <> vbPeriodChar Then
             ' fraction not defined immediately, so seconds must be.
             Const MaxSeconds As Long = 59
             Dim SecondsParsed As Long
@@ -209,7 +209,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
             Result = Result + SecondsParsed * MILLISECONDS_PER_SECOND
         End If
         
-        If Char = vbPeriod Then
+        If Char = vbPeriodChar Then
             NextChar
             
             Dim FractionParsed As Long
@@ -237,7 +237,7 @@ Private Function TryParseNumber(ByVal MaxValue As Long, ByRef Result As Long) As
     OriginalIndex = mIndex
     Do
         Select Case Char
-            Case vbZero To vbNine
+            Case vbZero To vbNineChar
                 Number = Number * 10 + (Char - vbZero)
                 
             Case Else

@@ -315,7 +315,7 @@ Private Sub AddAttributes(ByVal sb As StringBuilder)
     
     Dim de As DictionaryEntry
     For Each de In mAttributes
-        Call sb.AppendFormat(" {0}={2}{1}{2}", de.Key, de.Value, Chr$(vbDoubleQuote))
+        Call sb.AppendFormat(" {0}={2}{1}{2}", de.Key, de.Value, Chr$(vbQuoteChar))
     Next de
 End Sub
 

@@ -245,7 +245,7 @@ Public Function ToString() As String
     Dim ms As Currency
     ms = mMilliseconds
     If ms < 0 Then
-        Output.AppendChar vbMinus
+        Output.AppendChar vbMinusChar
         ms = -ms
     End If
     
@@ -253,13 +253,13 @@ Public Function ToString() As String
     Days = Int(ms / MILLISECONDS_PER_DAY)
     If Days <> 0 Then
         Output.Append Days
-        Output.AppendChar vbPeriod
+        Output.AppendChar vbPeriodChar
     End If
 
     AppendComponent Output, Int(ms / MILLISECONDS_PER_HOUR) Mod 24, 2
-    Output.AppendChar vbColon
+    Output.AppendChar vbColonChar
     AppendComponent Output, Int(ms / MILLISECONDS_PER_MINUTE) Mod 60, 2
-    Output.AppendChar vbColon
+    Output.AppendChar vbColonChar
     AppendComponent Output, Int(ms / MILLISECONDS_PER_SECOND) Mod 60, 2
     
     Dim MillisecondComponent    As Long
@@ -268,11 +268,11 @@ Public Function ToString() As String
     TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TICKS_PER_MILLISECOND
     
     If MillisecondComponent <> 0 Then
-        Output.AppendChar vbPeriod
+        Output.AppendChar vbPeriodChar
         AppendComponent Output, MillisecondComponent, 3
         AppendComponent Output, TicksComponent, 4
     ElseIf TicksComponent <> 0 Then
-        Output.AppendChar vbPeriod
+        Output.AppendChar vbPeriodChar
         AppendComponent Output, TicksComponent, 7
     End If
     

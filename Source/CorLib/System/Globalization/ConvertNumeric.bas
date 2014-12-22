@@ -72,7 +72,7 @@ Private Sub ParseFormat(ByRef Format As String, ByRef FormatSpecifier As Long, B
             FormatSpecifier = Chars(0)
             
             Select Case FormatSpecifier
-                Case vbLowerAChar To vbLowerZ, vbUpperAChar To vbUpperZ
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                     If FormatLength = 1 Then
                         PrecisionSpecifier = UnknownPrecision
                         DetachCharsQuick Chars
@@ -87,7 +87,7 @@ Private Sub ParseFormat(ByRef Format As String, ByRef FormatSpecifier As Long, B
                         ch = Chars(i)
                         
                         Select Case ch
-                            Case vbZero To vbNine
+                            Case vbZero To vbNineChar
                                 PrecisionSpecifier = PrecisionSpecifier * 10 + ch - vbZero
                             Case Else
                                 FormatSpecifier = CustomSpecifier

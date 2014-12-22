@@ -491,7 +491,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                         ByteIndex = ByteIndex + 1
                     End If
                     If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
-                    Bytes(ByteIndex) = vbMinus
+                    Bytes(ByteIndex) = vbMinusChar
                     ByteIndex = ByteIndex + 1
                 End If
                 If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
@@ -502,15 +502,15 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
             End If
         End If
         If Not directlyEncodable Then
-            If ch = vbPlus And bitCount < 0 Then
+            If ch = vbPlusChar And bitCount < 0 Then
                 If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
-                Bytes(ByteIndex) = vbPlus
-                Bytes(ByteIndex + 1) = vbMinus
+                Bytes(ByteIndex) = vbPlusChar
+                Bytes(ByteIndex + 1) = vbMinusChar
                 ByteIndex = ByteIndex + 2
             Else
                 If bitCount < 0 Then
                     If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
-                    Bytes(ByteIndex) = vbPlus
+                    Bytes(ByteIndex) = vbPlusChar
                     ByteIndex = ByteIndex + 1
                     bitCount = 0
                 End If
@@ -546,7 +546,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         If ByteIndex > MaxByteIndex Then _
             Throw Cor.NewArgumentException("Bytes conversion buffer is too small.", "Bytes")
         
-        Bytes(ByteIndex) = vbMinus
+        Bytes(ByteIndex) = vbMinusChar
         ByteIndex = ByteIndex + 1
         bitCount = -1
     End If
@@ -590,7 +590,7 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
             End If
         End If
         If Not directlyEncodable Then
-            If ch = vbPlus And bitCount < 0 Then
+            If ch = vbPlusChar And bitCount < 0 Then
                 ByteIndex = ByteIndex + 2
             Else
                 If bitCount < 0 Then
@@ -636,13 +636,13 @@ Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long,
     Do While Index < MaxIndex
         b = Bytes(Index)
         If Not InBase64 Then
-            If b = vbPlus Then
+            If b = vbPlusChar Then
                 InBase64 = True
             Else
                 CharCount = CharCount + 1
             End If
-        ElseIf b = vbMinus Then
-            If Bytes(Index - 1) = vbPlus Then CharCount = CharCount + 1
+        ElseIf b = vbMinusChar Then
+            If Bytes(Index - 1) = vbPlusChar Then CharCount = CharCount + 1
             CharCount = CharCount + Int(Bits / 16@)
             Bits = 0@
             InBase64 = False
@@ -686,10 +686,10 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         b = Bytes(ByteIndex)
         'Debug.Assert b <> 44
         Select Case b
-            Case vbMinus
+            Case vbMinusChar
                 If HasPlus Then
                     If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
-                    Chars(CharIndex) = vbPlus
+                    Chars(CharIndex) = vbPlusChar
                     CharIndex = CharIndex + 1
                 ElseIf InBase64 Then
                     bitCount = 0
@@ -697,11 +697,11 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                     InBase64 = False
                 Else
                     If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
-                    Chars(CharIndex) = vbMinus
+                    Chars(CharIndex) = vbMinusChar
                     CharIndex = CharIndex + 1
                 End If
                 HasPlus = False
-            Case vbPlus
+            Case vbPlusChar
                 If InBase64 Then
                     Bits = (Bits * &H40) Or Base64CharToBits(b)
                     bitCount = bitCount + 6

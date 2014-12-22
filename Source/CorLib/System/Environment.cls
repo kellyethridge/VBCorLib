@@ -391,13 +391,13 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
     Dim Index       As Long
     Do While Index < Length
         Select Case Chars(Index)
-            Case vbBackSlash
+            Case vbBackslashChar
                 If Escaped Then
                     ' We have two back slashes in a row,
                     ' so we actually need to include them
                     ' as part of the argument.
-                    ArgBuffer(ArgIndex) = vbBackSlash
-                    ArgBuffer(ArgIndex + 1) = vbBackSlash
+                    ArgBuffer(ArgIndex) = vbBackslashChar
+                    ArgBuffer(ArgIndex + 1) = vbBackslashChar
                     ArgIndex = ArgIndex + 2
                     Escaped = False
                 Else
@@ -406,12 +406,12 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     Escaped = True
                 End If
             
-            Case vbDoubleQuote
+            Case vbQuoteChar
                 If Escaped Then
                     ' We are escaping a quote, so it is to
                     ' be included in the argument, but not
                     ' the backslash.
-                    ArgBuffer(ArgIndex) = vbDoubleQuote
+                    ArgBuffer(ArgIndex) = vbQuoteChar
                     ArgIndex = ArgIndex + 1
                     Escaped = False
                     
@@ -428,9 +428,9 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     ' Do we have enough character left?
                     If Index + 1 < Length Then
                         ' We have enough, so check for 2nd quote.
-                        If Chars(Index + 1) = vbDoubleQuote Then
+                        If Chars(Index + 1) = vbQuoteChar Then
                             ' We have two quotes, so escape it.
-                            ArgBuffer(ArgIndex) = vbDoubleQuote
+                            ArgBuffer(ArgIndex) = vbQuoteChar
                             ArgIndex = ArgIndex + 1
                         End If
                     End If
@@ -441,16 +441,16 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     Quoted = True
                 End If
                 
-            Case vbSpace
+            Case vbSpaceChar
                 If Escaped Then
-                    ArgBuffer(ArgIndex) = vbBackSlash
+                    ArgBuffer(ArgIndex) = vbBackslashChar
                     ArgIndex = ArgIndex + 1
                     Escaped = False
                 End If
                 
                 If Quoted Then
                     ' Being quoted, so include spaces in the argument.
-                    ArgBuffer(ArgIndex) = vbSpace
+                    ArgBuffer(ArgIndex) = vbSpaceChar
                     ArgIndex = ArgIndex + 1
                 Else
                     ' Done with the argument, so add it to the list.
@@ -462,7 +462,7 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                 ' If we were escaped, but didn't make use of it
                 ' then we need to include that backslash in the ouput.
                 If Escaped Then
-                    ArgBuffer(ArgIndex) = vbBackSlash
+                    ArgBuffer(ArgIndex) = vbBackslashChar
                     ArgIndex = ArgIndex + 1
                     Escaped = False
                 End If
@@ -478,7 +478,7 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
     ' it was escaped, but now we need to include it since there
     ' are no more characters.
     If Escaped Then
-        ArgBuffer(ArgIndex) = vbBackSlash
+        ArgBuffer(ArgIndex) = vbBackslashChar
         ArgIndex = ArgIndex + 1
     End If
                 
@@ -693,7 +693,7 @@ Private Function InternalGetEnvironmentVariables() As IDictionary
     Dim Ret As New Hashtable
     Dim i   As Long
     For i = 0 To UBound(Strings)
-        If Asc(Strings(i)) <> vbEqual Then
+        If Asc(Strings(i)) <> vbEqualChar Then
             Dim Parts() As String
             Parts = Split(Strings(i), "=")
             

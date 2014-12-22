@@ -43,7 +43,7 @@ Implements IObject
 Implements ICryptoTransform
 
 Private Const DEF_IGNOREWHITESPACES             As Boolean = True
-Private Const vbBase64TerminatorChar            As Long = vbEqual
+Private Const vbBase64TerminatorChar            As Long = vbEqualChar
 
 
 ''

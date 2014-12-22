@@ -562,7 +562,7 @@ Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATA) As Strin
     
     If (Data.dwFileAttributes And FileAttributes.DirectoryAttr) = FileAttributes.DirectoryAttr Then
         Select Case Len(Ret)
-            Case 1: If Asc(Ret) = vbPeriod Then Exit Function
+            Case 1: If Asc(Ret) = vbPeriodChar Then Exit Function
             Case 2: If AsLong(ByVal StrPtr(Ret)) = DOUBLE_PERIOD Then Exit Function
         End Select
     End If
