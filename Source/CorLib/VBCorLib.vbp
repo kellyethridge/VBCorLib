@@ -327,6 +327,7 @@ Class=Formattable; System\Formattable.cls
 RelatedDoc=ChangeLog.txt
 Module=Contract; System\Contract.bas
 ResFile32="VBCorLib.RES"
+Class=StringBuilderCache; System\StringBuilderCache.cls
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"

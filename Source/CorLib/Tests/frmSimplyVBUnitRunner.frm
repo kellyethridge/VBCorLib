@@ -76,7 +76,7 @@ Private Sub Form_Load()
     System.Add New TestVersion
     System.Add New TestRandom
     System.Add New TestMathExt
-    System.Add New TestGuid
+    System.Add New GuidTests
     System.Add New BitConverterTests
     System.Add New CDateTimeTests
     System.Add New TestEnvironment
