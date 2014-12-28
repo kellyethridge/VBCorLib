@@ -135,6 +135,20 @@ End Function
 ' <b>B</b> is the default format.
 '
 Public Function ToString(Optional ByVal Format As String, Optional ByVal Provider As IFormatProvider) As String
+    If Format = "X" Then
+        Dim sb As StringBuilder
+        Set sb = StringBuilders.GetBuilder
+        sb.AppendString "{"
+        sb.AppendFormat "0x{0:x8},0x{1:x4},0x{2:x4},", mGuid.Data1, mGuid.Data2, mGuid.Data3
+        sb.AppendString "{"
+        sb.AppendFormat "0x{0:x2},0x{1:x2},0x{2:x2},0x{3:x2},0x{4:x2},0x{5:x2},0x{6:x2},0x{7:x2}", mGuid.Data4(0), mGuid.Data4(1), mGuid.Data4(2), mGuid.Data4(3), mGuid.Data4(4), mGuid.Data4(5), mGuid.Data4(6), mGuid.Data4(7)
+        sb.AppendString "}}"
+        
+        ToString = sb.ToString
+        StringBuilders.PutBuilder sb
+        Exit Function
+    End If
+    
     Dim Buf As String
     Dim Size As Long
     

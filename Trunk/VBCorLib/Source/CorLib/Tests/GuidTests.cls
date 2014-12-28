@@ -6,33 +6,42 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestGuid"
+Attribute VB_Name = "GuidTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestGuid
+' GuidTests
 '
 Option Explicit
+Implements ITestCaseSource
 
 Private Const TEST_GUID As String = "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
 Private Const TEST_GUID_LOWER As String = "{C200E360-38C5-11CE-AE62-08002B2B79EE}"
 Private Const TEST_GUID_UPPER As String = "{C200E360-38C5-11CE-AE62-08002B2B79FF}"
 
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "ToString_WithFormats_ReturnsExpected"
+            Test.Use "", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "B", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "P", "(C200E360-38C5-11CE-AE62-08002B2B79EF)"
+            Test.Use "D", "C200E360-38C5-11CE-AE62-08002B2B79EF"
+            Test.Use "N", "C200E36038C511CEAE6208002B2B79EF"
+            Test.Use "X", "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}"
+            
+    End Select
+End Sub
 
-Public Sub TestToString()
-    Dim s As String
-    Dim g As VBCorLib.Guid
+Public Sub ToString_WithFormats_ReturnsExpected(ByVal GuidFormat As String, ByVal Expected As String)
+    Dim GuidToUse As Guid
+    Set GuidToUse = Guid.Parse(TEST_GUID)
     
-    Set g = Guid.Parse(TEST_GUID)
+    Dim Actual As String
+    Actual = GuidToUse.ToString(GuidFormat)
     
-    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", g.ToString
-    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", g.ToString("B")
-    Assert.AreEqual "(C200E360-38C5-11CE-AE62-08002B2B79EF)", g.ToString("P")
-    Assert.AreEqual "C200E360-38C5-11CE-AE62-08002B2B79EF", g.ToString("D")
-    Assert.AreEqual "C200E36038C511CEAE6208002B2B79EF", g.ToString("N")
-    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestParse()
@@ -162,3 +171,5 @@ End Sub
 Public Sub TestEmpty()
     Assert.AreEqual "{00000000-0000-0000-0000-000000000000}", Guid.EmptyGuid.ToString
 End Sub
+
+
