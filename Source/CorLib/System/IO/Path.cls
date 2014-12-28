@@ -368,14 +368,16 @@ Public Function GetFullPath(ByVal Path As String) As String
     Path = cString.Trim(Path)
     CheckArgument Len(Path) = 0, InvalidPathFormat, PathParam
     
-    Call FixupPath(Path)
+    FixupPath Path
     
     Dim Ptr As Long
     Ptr = StrPtr(Path)
     
     ' quickly check the first two charcters for possible UNC path.
     ' convert first two characters into a long.
-    If MemLong(Ptr) = vbBackSlashBackSlash Then Call VerifyUNCPathFormat(Path)
+    If MemLong(Ptr) = vbBackSlashBackSlash Then
+        VerifyUNCPathFormat Path
+    End If
     
     ' convert first two characters into two integers.
     With MemDWord(Ptr)
@@ -412,16 +414,16 @@ Public Function GetFullPath(ByVal Path As String) As String
     
     Path = Join(PathParts, vbBackslashString)
     
-    Dim Ret As String
-    Ret = String$(Me.MaxPathLength, 0)
+    Dim OutputBuffer As String
+    OutputBuffer = String$(Me.MaxPathLength, 0)
     
     Dim Size As Long
-    Size = API.GetFullPathName(Path, Len(Ret), Ret, 0)
+    Size = API.GetFullPathName(Path, Len(OutputBuffer), OutputBuffer, 0)
     
     If Size = 0 Then _
         Throw Cor.NewPathTooLongException("The qualified path is longer than the maximum of 260 characters.")
     
-    GetFullPath = Left$(Ret, Size)
+    GetFullPath = Left$(OutputBuffer, Size)
 End Function
 
 ''
@@ -497,7 +499,9 @@ Public Function GetTempPath() As String
     
     PathName = String$(Me.MaxPathLength, 0)
     Size = API.GetTempPath(Len(PathName), PathName)
-    If Size = 0 Or Size > Me.MaxPathLength Then Call IOError(Err.LastDllError)
+    If Size = 0 Or Size > Me.MaxPathLength Then
+        IOError Err.LastDllError
+    End If
 
     GetTempPath = GetLongPathName(Left$(PathName, Size))
 End Function
