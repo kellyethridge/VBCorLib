@@ -6,140 +6,140 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestcString"
+Attribute VB_Name = "CStringTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ITestCaseSource
 
-Public Sub TestFormat()
-    Assert.AreEqual "hel1234lo", cString.Format("hel{0}lo", 1234)
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "ToCharArray_WithString_ReturnsArrayOfCharacters"
+            Test.Use "Hello", NewIntegers(Asc("H"), Asc("e"), Asc("l"), Asc("l"), Asc("o"))
+            Test.Use "", NewIntegers()
+            
+        Case "FromCharArray_WithArrayOfCharacters_ReturnsExpected"
+            Test.Use NewIntegers(Asc("H"), Asc("e"), Asc("l"), Asc("l"), Asc("o")), "Hello"
+            Test.Use NewIntegers(), ""
+            
+    End Select
 End Sub
 
-Public Sub TestToCharArray()
-    Dim s As String
-    Dim ch() As Integer
+Public Sub Format_WithOnePlaceHolder_ReturnsPlaceHolderReplacedWithParameter()
+    Dim Actual As String
     
-    s = "Hello"
-    ch = cString.ToCharArray(s)
-    Assert.AreEqual 5, cArray.GetLength(ch, 1), "Array length should be 5."
-    Assert.AreEqual Asc("H"), ch(0)
-    Assert.AreEqual Asc("e"), ch(1)
-    Assert.AreEqual Asc("l"), ch(2)
-    Assert.AreEqual Asc("l"), ch(3)
-    Assert.AreEqual Asc("o"), ch(4)
+    Actual = CString.Format("hel{0}o", "l")
+    
+    Assert.That Actual, Iz.EqualTo("hello")
 End Sub
 
-Public Sub TestFromCharArray()
-    Dim chars() As Integer
-    ReDim chars(25)
-    Dim i As Long
-    For i = 0 To 25
-        chars(i) = i + 65
-    Next i
+Public Sub Format_WithOneDuplicatePlaceHolder_ReplacesBothPlaceHoldersWithParameter()
+    Dim Actual As String
     
-    Dim s As String
-    s = cString.FromCharArray(chars)
-    Assert.AreEqual "ABCDEFGHIJKLMNOPQRSTUVWXYZ", s
+    Actual = CString.Format("he{0}{0}o", "l")
+    
+    Assert.That Actual, Iz.EqualTo("hello")
 End Sub
 
-Public Sub TestFromEmptyCharArray()
-    Dim chars() As Integer
-    chars = Cor.NewIntegers()
+Public Sub ToCharArray_WithString_ReturnsArrayOfCharacters(ByVal StringToConvert As String, ByRef Expected() As Integer)
+    Dim Actual() As Integer
     
-    Assert.AreEqual "", cString.FromCharArray(chars)
+    Actual = CString.ToCharArray(StringToConvert)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestEmptyToCharArray()
-    Dim s As String
-    Dim ch() As Integer
+Public Sub FromCharArray_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersToConvert() As Integer, ByVal Expected As String)
+    Dim Actual As String
     
-    ch = cString.ToCharArray(s)
-    Assert.AreEqual 0, cArray.GetLength(ch), "Array should be empty."
+    Actual = CString.FromCharArray(CharactersToConvert)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TestPadLeft()
-    Assert.AreEqual "   abc", cString.PadLeft("abc", 6)
+    Assert.AreEqual "   abc", CString.PadLeft("abc", 6)
 End Sub
 
 Public Sub TestPadLeftWithCharCode()
-    Assert.AreEqual "000abc", cString.PadLeft("abc", 6, 48)
+    Assert.AreEqual "000abc", CString.PadLeft("abc", 6, 48)
 End Sub
 
 Public Sub TestPadLeftTooShort()
-    Assert.AreEqual "abc", cString.PadLeft("abc", 2)
+    Assert.AreEqual "abc", CString.PadLeft("abc", 2)
 End Sub
 
 Public Sub TestPadRight()
-    Assert.AreEqual "abc   ", cString.PadRight("abc", 6)
+    Assert.AreEqual "abc   ", CString.PadRight("abc", 6)
 End Sub
 
 Public Sub TestPadRightWithCharCode()
-    Assert.AreEqual "abc000", cString.PadRight("abc", 6, 48)
+    Assert.AreEqual "abc000", CString.PadRight("abc", 6, 48)
 End Sub
 
 Public Sub TestPadRightTooShort()
-    Assert.AreEqual "abc", cString.PadRight("abc", 2)
+    Assert.AreEqual "abc", CString.PadRight("abc", 2)
 End Sub
 
 Public Sub TestTrimStart()
-    Dim chars() As Integer
+    Dim Chars() As Integer
     Dim s As String
     
-    chars = cString.ToCharArray("abc")
+    Chars = CString.ToCharArray("abc")
     s = "cabhi"
-    s = cString.TrimStart(s, chars)
+    s = CString.TrimStart(s, Chars)
     Assert.AreEqual "hi", s
 End Sub
 
 Public Sub TestTrimStartNoTrim()
-    Dim chars(0) As Integer
+    Dim Chars(0) As Integer
     Dim s As String
     
-    chars(0) = 48
+    Chars(0) = 48
     s = "hello"
-    s = cString.TrimStart(s, chars)
+    s = CString.TrimStart(s, Chars)
     Assert.AreEqual "hello", s
 End Sub
 
 Public Sub TestTrimStartAllTrimmed()
-    Dim chars(0) As Integer
+    Dim Chars(0) As Integer
     Dim s As String
     
-    chars(0) = 48
+    Chars(0) = 48
     s = "00000"
-    s = cString.TrimStart(s, chars)
+    s = CString.TrimStart(s, Chars)
     Assert.AreEqual "", s
 End Sub
 
 Public Sub TestTrimEnd()
-    Dim chars() As Integer
+    Dim Chars() As Integer
     Dim s As String
     
-    chars = cString.ToCharArray("abc")
+    Chars = CString.ToCharArray("abc")
     s = "hicab"
-    s = cString.TrimEnd(s, chars)
+    s = CString.TrimEnd(s, Chars)
     Assert.AreEqual "hi", s
 End Sub
 
 Public Sub TestTrimEndNoTrim()
-    Dim chars(0) As Integer
+    Dim Chars(0) As Integer
     Dim s As String
     
-    chars(0) = 48
+    Chars(0) = 48
     s = "hello"
-    s = cString.TrimEnd(s, chars)
+    s = CString.TrimEnd(s, Chars)
     Assert.AreEqual "hello", s
 End Sub
 
 Public Sub TestTrimEndAllTrimmed()
-    Dim chars(0) As Integer
+    Dim Chars(0) As Integer
     Dim s As String
     
-    chars(0) = 48
+    Chars(0) = 48
     s = "00000"
-    s = cString.TrimEnd(s, chars)
+    s = CString.TrimEnd(s, Chars)
     Assert.AreEqual "", s
 End Sub
 
@@ -147,7 +147,7 @@ Public Sub TestTrim()
     Dim s As String
     
     s = "*;|@123***456@|;*"
-    s = cString.Trim(s, "*;|@")
+    s = CString.Trim(s, "*;|@")
     Assert.AreEqual "123***456", s
 End Sub
 
@@ -155,7 +155,7 @@ Public Sub TestTrimWhiteSpace()
     Dim s As String
     
     s = vbCr & vbCr & " hi " & vbLf & vbLf
-    s = cString.Trim(s)
+    s = CString.Trim(s)
     Assert.AreEqual "hi", s
 End Sub
 
@@ -163,13 +163,13 @@ Public Sub TestTrimSpaces()
     Dim s As String
     
     s = "     "
-    s = cString.Trim(s)
+    s = CString.Trim(s)
     Assert.AreEqual "", s
 End Sub
 
 Public Sub TestTrimEmptyString()
     Dim s As String
-    s = cString.Trim(s)
+    s = CString.Trim(s)
     Assert.AreEqual "", s
 End Sub
 
@@ -208,69 +208,69 @@ Public Sub TestJoinVariants()
     v(1) = "bye"
     v(2) = "again"
     
-    Assert.AreEqual "bye,again", cString.Join(v, ",", 1)
+    Assert.AreEqual "bye,again", CString.Join(v, ",", 1)
 End Sub
 
 Public Sub TestRemove()
     Dim s As String
     
     s = "1234567890"
-    Assert.AreEqual "1234890", cString.Remove(s, 4, 3)
+    Assert.AreEqual "1234890", CString.Remove(s, 4, 3)
 End Sub
 
 Public Sub TestRemoveBeginning()
     Dim s As String
     
     s = "1234567890"
-    Assert.AreEqual "890", cString.Remove(s, 0, 7)
+    Assert.AreEqual "890", CString.Remove(s, 0, 7)
 End Sub
 
 Public Sub TestRemoveEnd()
     Dim s As String
     
     s = "1234567890"
-    Assert.AreEqual "123", cString.Remove(s, 3, 7)
+    Assert.AreEqual "123", CString.Remove(s, 3, 7)
 End Sub
 
 Public Sub TestIndexOfAnyString()
-    Assert.AreEqual 1, cString.IndexOfAny("abc", "b")
+    Assert.AreEqual 1, CString.IndexOfAny("abc", "b")
 End Sub
 
 Public Sub TestIndexOfAnyChars()
-    Assert.AreEqual 0, cString.IndexOfAny("abc", NewArray(vbInteger, 98, 97))
+    Assert.AreEqual 0, CString.IndexOfAny("abc", NewArray(vbInteger, 98, 97))
 End Sub
 
 Public Sub TestIndexOfAnyNotFound()
-    Assert.AreEqual -1, cString.IndexOfAny("abc", "123")
+    Assert.AreEqual -1, CString.IndexOfAny("abc", "123")
 End Sub
 
 Public Sub TestIndexOfAnySubString()
-    Assert.AreEqual 1, cString.IndexOfAny("abc", "b", 1, 1)
+    Assert.AreEqual 1, CString.IndexOfAny("abc", "b", 1, 1)
 End Sub
 
 Public Sub TestLastIndexOfAnyString()
-    Assert.AreEqual 2, cString.LastIndexOfAny("abc", "bc")
+    Assert.AreEqual 2, CString.LastIndexOfAny("abc", "bc")
 End Sub
 
 Public Sub TestLastIndexOfAnyNone()
-    Assert.AreEqual -1, cString.LastIndexOfAny("abc", "123")
+    Assert.AreEqual -1, CString.LastIndexOfAny("abc", "123")
 End Sub
 
 Public Sub TestInsertInMiddle()
-    Assert.AreEqual "abc123def", cString.Insert("abcdef", 3, "123")
+    Assert.AreEqual "abc123def", CString.Insert("abcdef", 3, "123")
 End Sub
 
 Public Sub TestInsertAtBeginning()
-    Assert.AreEqual "123abcdef", cString.Insert("abcdef", 0, "123")
+    Assert.AreEqual "123abcdef", CString.Insert("abcdef", 0, "123")
 End Sub
 
 Public Sub TestInsertAtEnd()
-    Assert.AreEqual "abcdef123", cString.Insert("abcdef", 6, "123")
+    Assert.AreEqual "abcdef123", CString.Insert("abcdef", 6, "123")
 End Sub
 
 Public Sub TestInsertInvalidIndexBefore()
     On Error GoTo errTrap
-    Call cString.Insert("abc", -1, "123")
+    Call CString.Insert("abc", -1, "123")
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
@@ -282,7 +282,7 @@ End Sub
 
 Public Sub TestInsertInvalidIndexAfter()
     On Error GoTo errTrap
-    Call cString.Insert("abc", 4, "123")
+    Call CString.Insert("abc", 4, "123")
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
@@ -304,6 +304,7 @@ Private Sub AssertJoin(ByVal expectedvalue As String, Optional ByVal Delimiter A
     s(0) = "two"
     s(1) = "three"
     
-    Assert.AreEqual expectedvalue, cString.Join(s, Delimiter, Index, Count)
+    Assert.AreEqual expectedvalue, CString.Join(s, Delimiter, Index, Count)
 End Sub
+
 
