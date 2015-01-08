@@ -184,11 +184,11 @@ End Function
 ' @return The padded string.
 ' @remarks The paddingChar parameter can accept either a number or chr$ value.
 '
-Public Function PadLeft(ByRef s As String, ByVal totalWidth As Long, Optional ByRef paddingChar As Variant = 32) As String
+Public Function PadLeft(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim l As Long
     l = Len(s)
-    If totalWidth > l Then
-        PadLeft = String$(totalWidth - l, paddingChar) & s
+    If TotalWidth > l Then
+        PadLeft = String$(TotalWidth - l, PaddingChar) & s
     Else
         PadLeft = s
     End If
@@ -203,11 +203,11 @@ End Function
 ' @return The padded string.
 ' @remarks The paddingChar parameter can accept either a number or chr$ value.
 '
-Public Function PadRight(ByRef s As String, ByVal totalWidth As Long, Optional ByRef paddingChar As Variant = 32) As String
+Public Function PadRight(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
     Dim l As Long
     l = Len(s)
-    If totalWidth > l Then
-        PadRight = s & String$(totalWidth - l, paddingChar)
+    If TotalWidth > l Then
+        PadRight = s & String$(TotalWidth - l, PaddingChar)
     Else
         PadRight = s
     End If
@@ -543,7 +543,7 @@ Private Function TrimStartIndex(ByRef s As String, ByRef TrimChars() As Integer)
     Dim lb  As Long
     Dim ub  As Long
     Dim ch  As Integer
-    Dim pos As Long
+    Dim Pos As Long
     Dim l   As Long
     
     lb = LBound(TrimChars)
@@ -552,16 +552,16 @@ Private Function TrimStartIndex(ByRef s As String, ByRef TrimChars() As Integer)
     With mString
         .SA.pvData = StrPtr(s)
         .SA.cElements = Len(s)
-        Do While pos < l
-            ch = .Data(pos)
+        Do While Pos < l
+            ch = .Data(Pos)
             For i = lb To ub
                 If ch = TrimChars(i) Then Exit For
             Next i
             If i > ub Then Exit Do
-            pos = pos + 1
+            Pos = Pos + 1
         Loop
-        If pos = l Then Exit Function
-        TrimStartIndex = pos + 1
+        If Pos = l Then Exit Function
+        TrimStartIndex = Pos + 1
     End With
 End Function
 
@@ -588,7 +588,7 @@ Private Function TrimEndIndex(ByRef s As String, ByRef TrimChars() As Integer) A
     Dim lb  As Long
     Dim ub  As Long
     Dim ch  As Integer
-    Dim pos As Long
+    Dim Pos As Long
     
     lb = LBound(TrimChars)
     ub = UBound(TrimChars)
@@ -596,17 +596,17 @@ Private Function TrimEndIndex(ByRef s As String, ByRef TrimChars() As Integer) A
         .SA.pvData = StrPtr(s)
         .SA.cElements = Len(s)
         
-        pos = .SA.cElements - 1
-        Do While pos >= 0
-            ch = .Data(pos)
+        Pos = .SA.cElements - 1
+        Do While Pos >= 0
+            ch = .Data(Pos)
             For i = lb To ub
                 If ch = TrimChars(i) Then Exit For
             Next i
             If i > ub Then Exit Do
-            pos = pos - 1
+            Pos = Pos - 1
         Loop
-        If pos < 0 Then Exit Function
-        TrimEndIndex = pos + 1
+        If Pos < 0 Then Exit Function
+        TrimEndIndex = Pos + 1
     End With
 End Function
 

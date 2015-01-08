@@ -59,28 +59,53 @@ Public Sub FromCharArray_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersT
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestPadLeft()
-    Assert.AreEqual "   abc", CString.PadLeft("abc", 6)
+Public Sub PadLeft_UsingDefaultPaddingChar_ReturnsStringPaddedWithSpaces()
+    Dim Actual As String
+    
+    Actual = CString.PadLeft("abc", 6)
+    
+    Assert.That Actual, Iz.EqualTo("   abc")
 End Sub
 
-Public Sub TestPadLeftWithCharCode()
-    Assert.AreEqual "000abc", CString.PadLeft("abc", 6, 48)
+Public Sub PadLeft_UsingPeriodPaddingChar_ReturnsStringPaddedWithPeriods()
+    Dim Actual As String
+    
+    Actual = CString.PadLeft("abc", 6, ".")
+    
+    
+    Assert.That Actual, Iz.EqualTo("...abc")
 End Sub
 
-Public Sub TestPadLeftTooShort()
-    Assert.AreEqual "abc", CString.PadLeft("abc", 2)
+Public Sub PadLeft_WithTotalWidthLessThanLengthStringToPad_ReturnsOriginalString()
+    Dim Actual As String
+    
+    Actual = CString.PadLeft("abc", 2)
+    
+    Assert.That Actual, Iz.EqualTo("abc")
 End Sub
 
-Public Sub TestPadRight()
-    Assert.AreEqual "abc   ", CString.PadRight("abc", 6)
+Public Sub PadRight_UsingDefaultPaddingChar_ReturnsStringPaddedWithSpaces()
+    Dim Actual As String
+    
+    Actual = CString.PadRight("abc", 6)
+    
+    Assert.That Actual, Iz.EqualTo("abc   ")
 End Sub
 
-Public Sub TestPadRightWithCharCode()
-    Assert.AreEqual "abc000", CString.PadRight("abc", 6, 48)
+Public Sub PadRight_UsingPeriodPaddingChar_ReturnsStringPaddedWithPeriods()
+    Dim Actual As String
+    
+    Actual = CString.PadRight("abc", 6, ".")
+    
+    Assert.That Actual, Iz.EqualTo("abc...")
 End Sub
 
-Public Sub TestPadRightTooShort()
-    Assert.AreEqual "abc", CString.PadRight("abc", 2)
+Public Sub PadRight_WithTotalWidthLessThanLengthOfStringToPad_ReturnsOriginalString()
+    Dim Actual As String
+    
+    Actual = CString.PadRight("abc", 2)
+    
+    Assert.That Actual, Iz.EqualTo("abc")
 End Sub
 
 Public Sub TestTrimStart()
