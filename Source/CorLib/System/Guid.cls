@@ -103,14 +103,14 @@ End Function
 ' @return A Long
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Dim g As Guid
+    Dim Other As Guid
     
     On Error GoTo errTrap
-    Set g = Value
-    If g Is Nothing Then
+    Set Other = Value
+    If Other Is Nothing Then
         CompareTo = 1
     Else
-        CompareTo = -g.InternalCompare(mGuid)
+        CompareTo = -Other.InternalCompare(mGuid)
     End If
     
     Exit Function
@@ -198,6 +198,10 @@ End Function
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
     If IsObject(Value) Then
+        If Value Is Nothing Then
+            Exit Function
+        End If
+        
         If TypeOf Value Is Guid Then
             Dim g As Guid
             Set g = Value
@@ -220,6 +224,21 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByRef Value As Variant)
+    Select Case VariantType(Value)
+        Case vbByteArray
+            FromByteArray Value
+        
+        Case vbString
+            Parse Value
+            
+        Case Else
+            If IsArray(Value) Then _
+                Throw Cor.NewArgumentNullException(Resources.GetParameter(Param.Value), Resources.GetString(ArgumentNull_Array))
+                
+    End Select
+End Sub
+
 Friend Function InternalEquals(ByRef g As VBGUID) As Boolean
     InternalEquals = IsEqualGUID(g, mGuid)
 End Function
@@ -284,13 +303,16 @@ Private Sub FormatError()
     Throw Cor.NewFormatException("Invalid Guid string format.")
 End Sub
 
-Friend Sub FromByteArray(ByRef b() As Byte)
-    If cArray.IsNull(b) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-    If cArray.GetLength(b) <> 16 Then _
-        Throw Cor.NewArgumentException("Array must be 16 bytes in length.", "Bytes")
+Friend Sub FromByteArray(ByRef b As Variant)
+    Dim Ptr As Long
+    Ptr = GetArrayPointer(b)
+    If Ptr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Resources.GetParameter(Value), Resources.GetString(ArgumentNull_Array))
     
-    Call CopyMemory(mGuid, b(LBound(b)), 16)
+    Dim Bytes() As Byte
+    SAPtr(Bytes) = Ptr
+    CopyMemory mGuid, Bytes(LBound(Bytes)), 16
+    SAPtr(Bytes) = vbNullPtr
 End Sub
 
 Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByRef d() As Byte)
