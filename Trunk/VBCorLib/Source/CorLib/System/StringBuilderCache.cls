@@ -40,7 +40,8 @@ Private mStringBuilders As New Stack
 
 Public Function GetBuilder() As StringBuilder
     If mStringBuilders.Count = 0 Then
-        mStringBuilders.Push New StringBuilder
+        Set GetBuilder = New StringBuilder
+        Exit Function
     End If
     
     Set GetBuilder = mStringBuilders.Pop

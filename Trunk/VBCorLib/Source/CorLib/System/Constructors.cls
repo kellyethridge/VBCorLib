@@ -1762,3 +1762,8 @@ Public Function NewCollection(ParamArray Values() As Variant) As Collection
         NewCollection.Add Value
     Next
 End Function
+
+Public Function NewGuid(ByRef Value As Variant) As Guid
+    Set NewGuid = New Guid
+    NewGuid.Init Value
+End Function

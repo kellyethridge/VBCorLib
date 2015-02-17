@@ -31,6 +31,35 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "N", "C200E36038C511CEAE6208002B2B79EF"
             Test.Use "X", "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}"
             
+        Case "Parse_WithValues_ReturnsExpected"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            
+        Case "Equals_WithValues_ReturnsExpected"
+            Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "{C200E360-38C5-11CE-AE62-08002B2B79EE}", False
+            Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}", True
+            
+        Case "Equals_WithNonGuidValues_ReturnsFalse"
+            Test.Use ""
+            Test.Use "abc"
+            Test.Use Nothing
+            Test.Use Me
+            
+        Case "CompareTo_WithValues_ReturnsExpected"
+            Test.Use("{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79EE}").Expect 0
+            Test.Use("{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}").Expect Iz.Negative
+            Test.Use("{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79ED}").Expect Iz.Positive
+            
+        Case "GetHashCode_WhenCalled_ReturnsExpected"
+            Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79EE}", True
+            Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79Ef}", False
+            
+        Case "NewGuid_WithValue_ReturnsExpected"
+            Test.Use NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF), "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            
     End Select
 End Sub
 
@@ -44,112 +73,89 @@ Public Sub ToString_WithFormats_ReturnsExpected(ByVal GuidFormat As String, ByVa
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestParse()
-    Dim g As VBCorLib.Guid
+Public Sub Parse_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As String)
+    Dim Actual As VBCorLib.Guid
     
-    Set g = Guid.Parse("{C200E360-38C5-11CE-AE62-08002B2B79EF}")
-    Assert.AreEqual TEST_GUID, g.ToString
+    Set Actual = Guid.Parse(s)
     
-    Set g = Guid.Parse("(C200E360-38C5-11CE-AE62-08002B2B79EF)")
-    Assert.AreEqual TEST_GUID, g.ToString
-    
-    Set g = Guid.Parse("C200E360-38C5-11CE-AE62-08002B2B79EF")
-    Assert.AreEqual TEST_GUID, g.ToString
-    
-    Set g = Guid.Parse("C200E36038C511CEAE6208002B2B79EF")
-    Assert.AreEqual TEST_GUID, g.ToString
-
+    Assert.That Actual.ToString, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestEquals()
-    Dim G1 As VBCorLib.Guid
-    Dim G2 As VBCorLib.Guid
+Public Sub Equals_WithValues_ReturnsExpected(ByVal Left As String, ByVal Right As String, ByVal Expected As Boolean)
+    Dim LeftGuid    As Guid
+    Dim RightGuid   As Guid
+    Set LeftGuid = Guid.Parse(Left)
+    Set RightGuid = Guid.Parse(Right)
     
-    Set G1 = Guid.Parse(TEST_GUID)
-    Set G2 = Guid.Parse(TEST_GUID)
+    Dim Actual As Boolean
+    Actual = LeftGuid.Equals(RightGuid)
     
-    Assert.IsTrue G1.Equals(G2)
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestNotEquals()
-    Dim G1 As VBCorLib.Guid
-    Dim G2 As VBCorLib.Guid
+Public Sub Equals_WithNonGuidValues_ReturnsFalse(ByVal Other As Variant)
+    Dim GuidToCompareTo As New Guid
     
-    Set G1 = Guid.NewGuid
-    Set G2 = Guid.Parse(TEST_GUID)
+    Dim Actual As Boolean
+    Actual = GuidToCompareTo.Equals(Other)
     
-    Assert.IsFalse G1.Equals(G2)
+    Assert.That Actual, Iz.False
 End Sub
 
-Public Sub TestCompareToEqual()
-    Dim G1 As VBCorLib.Guid
-    Dim G2 As VBCorLib.Guid
+Public Function CompareTo_WithValues_ReturnsExpected(ByVal Left As String, ByVal Right As String) As Long
+    Dim LeftGuid As Guid
+    Dim RightGuid As Guid
+    Set LeftGuid = Guid.Parse(Left)
+    Set RightGuid = Guid.Parse(Right)
     
-    Set G1 = Guid.Parse(TEST_GUID)
-    Set G2 = Guid.Parse(TEST_GUID)
+    Dim Actual As Long
+    Actual = LeftGuid.CompareTo(RightGuid)
     
-    Assert.AreEqual 0, G1.CompareTo(G2)
-    Assert.AreEqual 0, G2.CompareTo(G1)
+    CompareTo_WithValues_ReturnsExpected = Actual
+End Function
+
+Public Sub GetHashCode_WhenCalled_ReturnsExpected(ByVal Guid1 As String, ByVal Guid2 As String, ByVal Expected As Boolean)
+    Dim Guid1Guid As Guid
+    Dim Guid2Guid As Guid
+    Set Guid1Guid = Guid.Parse(Guid1)
+    Set Guid2Guid = Guid.Parse(Guid2)
+    
+    Dim Actual As Boolean
+    Actual = (Guid1Guid.GetHashCode = Guid2Guid.GetHashCode)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestCompareTo()
-    Dim lo As VBCorLib.Guid
-    Dim hi As VBCorLib.Guid
+Public Sub ToByteArray_WhenCalled_ReturnsExpected()
+    Dim GuidValue As VBCorLib.Guid
+    Set GuidValue = Guid.Parse("{C200E360-38C5-11CE-AE62-08002B2B79EF}")
     
-    Set lo = Guid.Parse(TEST_GUID_LOWER)
-    Set hi = Guid.Parse(TEST_GUID_UPPER)
+    Dim Actual() As Byte
+    Actual = GuidValue.ToByteArray
     
-    Assert.IsTrue lo.CompareTo(hi) < 0
-    Assert.IsTrue hi.CompareTo(lo) > 0
+    Dim Expected() As Byte
+    Expected = NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF)
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestGetHashCode()
-    Dim G1 As VBCorLib.Guid
-    Set G1 = Guid.Parse(TEST_GUID)
+Public Sub NewGuid_WithValue_ReturnsExpected(ByVal Value As Variant, ByVal Expected As String)
+    Dim Actual As Guid
     
-    Dim G2 As VBCorLib.Guid
-    Set G2 = Guid.Parse(TEST_GUID)
+    Set Actual = Cor.NewGuid(Value)
     
-    Dim G3 As VBCorLib.Guid
-    Set G3 = Guid.NewGuid
-    
-    Assert.AreEqual G1.GetHashCode, G2.GetHashCode
-    Assert.That G1.GetHashCode, Iz.Not.EqualTo(G3.GetHashCode)
+    Dim ExpectedGuid As Guid
+    Set ExpectedGuid = Guid.Parse(Expected)
+    Assert.That Actual, Equals(ExpectedGuid)
 End Sub
 
-Public Sub TestToByteArray()
-    Dim g As VBCorLib.Guid
-    Dim b() As Byte
+Public Sub NewGuid_WithNullArray_ThrowsArgumentNullException()
+    Dim NullArray() As Byte
     
-    Set g = Guid.Parse(TEST_GUID)
-    b = g.ToByteArray
-    Assert.AreEqual &H60, b(0)
-    Assert.AreEqual &HE3, b(1)
-    Assert.AreEqual 0, b(2)
-    Assert.AreEqual &HC2, b(3)
-    Assert.AreEqual &HC5, b(4)
-    Assert.AreEqual &H38, b(5)
-    Assert.AreEqual &HCE, b(6)
-    Assert.AreEqual &H11, b(7)
-    Assert.AreEqual &HAE, b(8)
-    Assert.AreEqual &H62, b(9)
-    Assert.AreEqual &H8, b(10)
-    Assert.AreEqual &H0, b(11)
-    Assert.AreEqual &H2B, b(12)
-    Assert.AreEqual &H2B, b(13)
-    Assert.AreEqual &H79, b(14)
-    Assert.AreEqual &HEF, b(15)
-End Sub
-
-Public Sub TestFromByteArray()
-    Dim g As VBCorLib.Guid
-    Dim b() As Byte
+    On Error GoTo errTrap
+    NewGuid NullArray
     
-    b = NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF)
-    
-    Set g = Guid.FromByteArray(b)
-    
-    Assert.AreEqual "{C200E360-38C5-11CE-AE62-08002B2B79EF}", g.ToString
+errTrap:
+    AssertArgumentNullException Err, "Value"
 End Sub
 
 Public Sub TestPersistence()
@@ -168,7 +174,7 @@ Public Sub TestPersistence()
     
 End Sub
 
-Public Sub TestEmpty()
+Public Sub EmptyGuid_WhenCalled_ReturnsGuidWithZeroValue()
     Assert.AreEqual "{00000000-0000-0000-0000-000000000000}", Guid.EmptyGuid.ToString
 End Sub
 
