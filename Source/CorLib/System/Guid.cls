@@ -49,6 +49,8 @@ Implements IObject
 Implements IComparable
 Implements IFormattable
 
+Private Const GuidSize As Long = 16
+
 Private Const REGDB_E_CLASSNOTREG   As Long = &H80040154
 Private Const REGDB_E_READREGDB     As Long = &H80040150
 
@@ -90,10 +92,10 @@ End Property
 ' @return An array of bytes representing the guid.
 '
 Public Function ToByteArray() As Byte()
-    Dim Ret(15) As Byte
+    Dim Result(0 To GuidSize - 1) As Byte
     
-    Call CopyMemory(Ret(0), mGuid, 16)
-    ToByteArray = Ret
+    CopyMemory Result(0), mGuid, GuidSize
+    ToByteArray = Result
 End Function
 
 ''
@@ -187,7 +189,7 @@ Public Function ToProgramID() As String
     End Select
     
     ToProgramID = SysAllocString(lpszProgID)
-    Call CoTaskMemFree(lpszProgID)
+    CoTaskMemFree lpszProgID
 End Function
 
 ''
@@ -266,8 +268,8 @@ Friend Sub Parse(ByVal s As String)
         '{C200E360-38C5-11CE-AE62-08002B2B79EF} or
         '(C200E360-38C5-11CE-AE62-08002B2B79EF)
         Select Case Asc(s)
-            Case 123:   If Asc(Right$(s, 1)) <> 125 Then Call FormatError
-            Case 40:    If Asc(Right$(s, 1)) <> 41 Then Call FormatError
+            Case 123:   If Asc(Right$(s, 1)) <> 125 Then FormatError
+            Case 40:    If Asc(Right$(s, 1)) <> 41 Then FormatError
             Case Else:  FormatError
         End Select
         s = Mid$(s, 2, 36)
@@ -276,19 +278,19 @@ Friend Sub Parse(ByVal s As String)
     Select Case Len(s)
         Case 36
             'C200E360-38C5-11CE-AE62-08002B2B79EF
-            If s Like "*[!0-9a-fA-F,-]*" Then Call FormatError
-            If Asc(Mid$(s, 9, 1)) <> 45 Then Call FormatError
-            If Asc(Mid$(s, 14, 1)) <> 45 Then Call FormatError
-            If Asc(Mid$(s, 19, 1)) <> 45 Then Call FormatError
-            If Asc(Mid$(s, 24, 1)) <> 45 Then Call FormatError
+            If s Like "*[!0-9a-fA-F,-]*" Then FormatError
+            If Asc(Mid$(s, 9, 1)) <> 45 Then FormatError
+            If Asc(Mid$(s, 14, 1)) <> 45 Then FormatError
+            If Asc(Mid$(s, 19, 1)) <> 45 Then FormatError
+            If Asc(Mid$(s, 24, 1)) <> 45 Then FormatError
             s = "{" & s & "}"
         Case 32
             'C200E36038C511CEAE6208002B2B79EF
-            If s Like "*[!0-9a-fA-F]*" Then Call FormatError
+            If s Like "*[!0-9a-fA-F]*" Then FormatError
             s = "{" & Left$(s, 8) & "-" & Mid$(s, 9, 4) & "-" & Mid$(s, 13, 4) & "-" & Mid$(s, 17, 4) & "-" & Mid$(s, 21) & "}"
         
         Case Else
-            Call FormatError
+            FormatError
     End Select
     
     On Error GoTo errTrap
@@ -326,7 +328,7 @@ Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, By
         If cArray.GetLength(d) <> 8 Then _
             Throw Cor.NewArgumentException("Array must be 8 bytes in length.", "Bytes")
         
-        Call CopyMemory(.Data4(0), d(LBound(d)), 8)
+        CopyMemory .Data4(0), d(LBound(d)), 8
     End With
 End Sub
 
@@ -343,13 +345,13 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function EqualFields(ByVal MyField As Long, ByVal TheirField As Long, ByRef RetVal As Long) As Boolean
+Private Function EqualFields(ByVal MyField As Long, ByVal TheirField As Long, ByRef Result As Long) As Boolean
     If MyField < TheirField Then
-        RetVal = -1
+        Result = -1
     ElseIf MyField > TheirField Then
-        RetVal = 1
+        Result = 1
     Else
-        RetVal = 0
+        Result = 0
         EqualFields = True
     End If
 End Function
@@ -366,16 +368,16 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
         
         Dim b() As Byte
         b = .ReadProperty("Data4")
-        Call CopyMemory(mGuid.Data4(0), b(0), 8)
+        CopyMemory mGuid.Data4(0), b(0), 8
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("Data1", mGuid.Data1)
-        Call .WriteProperty("Data2", mGuid.Data2)
-        Call .WriteProperty("Data3", mGuid.Data3)
-        Call .WriteProperty("Data4", mGuid.Data4)
+        .WriteProperty "Data1", mGuid.Data1
+        .WriteProperty "Data2", mGuid.Data2
+        .WriteProperty "Data3", mGuid.Data3
+        .WriteProperty "Data4", mGuid.Data4
     End With
 End Sub
 
