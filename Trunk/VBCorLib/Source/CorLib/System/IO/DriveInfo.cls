@@ -244,7 +244,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty(PROP_NAME, mName)
+    PropBag.WriteProperty PROP_NAME, mName
 End Sub
 
 

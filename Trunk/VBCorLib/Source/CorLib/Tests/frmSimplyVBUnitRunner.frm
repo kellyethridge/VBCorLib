@@ -202,7 +202,7 @@ Private Sub Form_Load()
     IO.Add New TestMappedFile
     IO.Add New TestFileNotFoundException
     IO.Add New TestINIFile
-    IO.Add New TestDriveInfo
+    IO.Add New DriveInfoTests
     IO.Add New TestStringReader
     IO.Add New TestStringWriter
     IO.Add New TestDirectory
