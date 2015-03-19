@@ -205,8 +205,8 @@ Private Sub Form_Load()
     IO.Add New DriveInfoTests
     IO.Add New TestStringReader
     IO.Add New TestStringWriter
-    IO.Add New TestDirectory
-    IO.Add New TestDirectoryInfo
+    IO.Add New DirectoryTests
+    IO.Add New DirectoryInfoTests
     IO.Add New MemoryStreamTests
     IO.Add New PathTests
 
