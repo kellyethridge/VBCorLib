@@ -95,6 +95,15 @@ errTrap:
     Helper.DeleteFolder FolderToCreate
 End Sub
 
+Public Sub CreateDirectory_WithEmptyPath_ThrowsArgumentException()
+    On Error GoTo errTrap
+    
+    Directory.CreateDirectory ""
+    
+errTrap:
+    AssertArgumentException Err, "Path"
+End Sub
+
 Public Sub Delete_WhenCalled_DeletesDirectory()
     Directory.Delete mTempFolder
     

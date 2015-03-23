@@ -65,11 +65,11 @@ Private mPath As Path
 ' @remarks The path to be created can be a relative or absolute path.
 '
 Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
+    If Len(Path) = 0 Then _
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_EmptyPath), "Path")
+    
     Path = Trim$(Path)
     Call mPath.FixupPath(Path)
-    
-    If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
     
     Path = cString.TrimEnd(Path, mPath.DirectorySeparatorString)
     
