@@ -17,22 +17,14 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
 
-Private Const TempSubFolder As String = "VBCorlib.Directory.Tests"
-
-Private mTempFolder As String
+Private mBuilder As DirectoryBuilder
 
 Public Sub Setup()
-    mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
-    
-    If Not Directory.Exists(mTempFolder) Then
-        Directory.CreateDirectory mTempFolder
-    End If
+    Set mBuilder = New DirectoryBuilder
 End Sub
 
 Public Sub TearDown()
-    If Directory.Exists(mTempFolder) Then
-        Directory.Delete mTempFolder, True
-    End If
+    Set mBuilder = Nothing
 End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
@@ -61,14 +53,14 @@ End Sub
 Public Sub Exists_WithExistingDirectory_ReturnsTrue()
     Dim Actual As Boolean
     
-    Actual = Directory.Exists(mTempFolder)
+    Actual = Directory.Exists(mBuilder.TempFolder)
     
     Assert.That Actual, Iz.True
 End Sub
 
 Public Sub Exists_WithNonExistingDirectory_ReturnsFalse()
     Dim NonExistingDirectory As String
-    NonExistingDirectory = Path.Combine(mTempFolder, "NonExisting")
+    NonExistingDirectory = Path.Combine(mBuilder.TempFolder, "NonExisting")
     Dim Actual As Boolean
     
     Actual = Directory.Exists(NonExistingDirectory)
@@ -135,47 +127,47 @@ errTrap:
 End Sub
 
 Public Sub Delete_WhenCalled_DeletesDirectory()
-    Directory.Delete mTempFolder
+    Directory.Delete mBuilder.TempFolder
     
-    Assert.That Helper.FolderExists(mTempFolder), Iz.False
+    Assert.That Helper.FolderExists(mBuilder.TempFolder), Iz.False
 End Sub
 
 Public Sub Delete_WithRecursive_DeletesSubfoldersAndFiles()
-    CreateFolder
-    CreateFile
+    mBuilder.CreateFolder
+    mBuilder.CreateFile
     
-    Directory.Delete mTempFolder, True
+    Directory.Delete mBuilder.TempFolder, True
     
-    Assert.That Helper.FolderExists(mTempFolder), Iz.False
+    Assert.That Helper.FolderExists(mBuilder.TempFolder), Iz.False
 End Sub
 
 Public Sub Delete_WithRecursiveAndMultipleLevels_DeletesFolder()
-    CreateFolder
-    CreateFolder "SubFolder\SubSubFolder"
-    CreateFile "SubFolder\SubSubFolder\File.txt"
+    mBuilder.CreateFolder
+    mBuilder.CreateFolder "SubFolder\SubSubFolder"
+    mBuilder.CreateFile "SubFolder\SubSubFolder\File.txt"
     
-    Directory.Delete mTempFolder, True
+    Directory.Delete mBuilder.TempFolder, True
     
-    Assert.That FolderExists(mTempFolder), Iz.False
+    Assert.That FolderExists(mBuilder.TempFolder), Iz.False
 End Sub
 
 Public Sub GetDirectories_WhenCalled_ReturnsDirectories()
     Dim Expected As String
-    Expected = CreateFolder
+    Expected = mBuilder.CreateFolder
     
     Dim Actual() As String
-    Actual = Directory.GetDirectories(mTempFolder)
+    Actual = Directory.GetDirectories(mBuilder.TempFolder)
     
     Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
 
 Public Sub GetDirectories_WithSearchPattern_ReturnsSelectDirectories()
     Dim Expected As String
-    CreateFolder "SubFolder1"
-    Expected = CreateFolder("SubFolder2")
+    mBuilder.CreateFolder "SubFolder1"
+    Expected = mBuilder.CreateFolder("SubFolder2")
     
     Dim Actual() As String
-    Actual = Directory.GetDirectories(mTempFolder, "*2")
+    Actual = Directory.GetDirectories(mBuilder.TempFolder, "*2")
     
     Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
@@ -190,73 +182,73 @@ End Sub
 
 Public Sub GetFiles_WhenCalled_ReturnsFiles()
     Dim Expected As String
-    Expected = CreateFile
+    Expected = mBuilder.CreateFile
     
     Dim Actual() As String
-    Actual = Directory.GetFiles(mTempFolder)
+    Actual = Directory.GetFiles(mBuilder.TempFolder)
     
     Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
 
 Public Sub GetFiles_WithSearchPattern_ReturnsSelectFiles()
     Dim Expected As String
-    CreateFile "File1.txt"
-    Expected = CreateFile("File2.txt")
+    mBuilder.CreateFile "File1.txt"
+    Expected = mBuilder.CreateFile("File2.txt")
     
     Dim Actual() As String
-    Actual = Directory.GetFiles(mTempFolder, "*2.txt")
+    Actual = Directory.GetFiles(mBuilder.TempFolder, "*2.txt")
     
     Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
 
 Public Sub GetFiles_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOption, ByRef Expected As Variant)
-    CreateFile "Top.txt"
-    CreateFolder
-    CreateFile "SubFolder\Sub.txt"
+    mBuilder.CreateFile "Top.txt"
+    mBuilder.CreateFolder
+    mBuilder.CreateFile "SubFolder\Sub.txt"
     
     Dim Actual() As String
-    Actual = Directory.GetFiles(mTempFolder, SearchOpt:=Opt)
+    Actual = Directory.GetFiles(mBuilder.TempFolder, SearchOpt:=Opt)
     
     Assert.That Actual, Iz.EqualTo(CreateFullPaths(Expected))
 End Sub
 
 Public Sub GetDirectories_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOption, ByRef Expected As Variant)
-    CreateFolder
-    CreateFolder "SubFolder\SubSubFolder"
+    mBuilder.CreateFolder
+    mBuilder.CreateFolder "SubFolder\SubSubFolder"
     
     Dim Actual() As String
-    Actual = Directory.GetDirectories(mTempFolder, SearchOpt:=Opt)
+    Actual = Directory.GetDirectories(mBuilder.TempFolder, SearchOpt:=Opt)
     
     Assert.That Actual, Iz.EqualTo(CreateFullPaths(Expected))
 End Sub
 
 Public Sub GetFileSystemEntries_WithFilesAndFolders_ReturnsBothTypes()
     Dim Expected As New Collection
-    Expected.Add CreateFolder
-    Expected.Add CreateFile
+    Expected.Add mBuilder.CreateFolder
+    Expected.Add mBuilder.CreateFile
     
     Dim Actual() As String
-    Actual = Directory.GetFileSystemEntries(mTempFolder)
+    Actual = Directory.GetFileSystemEntries(mBuilder.TempFolder)
     
     Assert.That Actual, Iz.EquivalentTo(Expected)
 End Sub
 
 Public Sub GetFileSystemEntries_WithSubFoldersAndFiles_ReturnsAll()
     Dim Expected As New Collection
-    Expected.Add CreateFolder
-    Expected.Add CreateFile
-    Expected.Add CreateFolder("SubFolder\SubSubFolder")
-    Expected.Add CreateFile("SubFolder\File.txt")
+    Expected.Add mBuilder.CreateFolder
+    Expected.Add mBuilder.CreateFile
+    Expected.Add mBuilder.CreateFolder("SubFolder\SubSubFolder")
+    Expected.Add mBuilder.CreateFile("SubFolder\File.txt")
     
     Dim Actual() As String
-    Actual = Directory.GetFileSystemEntries(mTempFolder, SearchOpt:=SearchOption.AllDirectories)
+    Actual = Directory.GetFileSystemEntries(mBuilder.TempFolder, SearchOpt:=SearchOption.AllDirectories)
     
     Assert.That Actual, Iz.EquivalentTo(Expected)
 End Sub
 
 Public Sub CreationTime_WhenCalled_IsSetAndRead()
     Dim FileName As String
-    FileName = CreateFile
+    FileName = mBuilder.CreateFile
     
     Directory.SetCreationTime FileName, #2/2/2015 8:40:00 AM#
     Dim Actual As Date
@@ -267,7 +259,7 @@ End Sub
 
 Public Sub LastAccessTime_WhenCalled_IsSetAndRead()
     Dim FileName As String
-    FileName = CreateFile
+    FileName = mBuilder.CreateFile
     
     Directory.SetLastAccessTime FileName, #2/2/2015 8:40:00 AM#
     Dim Actual As Date
@@ -278,7 +270,7 @@ End Sub
 
 Public Sub LastWriteTime_WhenCalled_IsSetAndRead()
     Dim FileName As String
-    FileName = CreateFile
+    FileName = mBuilder.CreateFile
     
     Directory.SetLastWriteTime FileName, #2/2/2015 8:40:00 AM#
     Dim Actual As Date
@@ -289,22 +281,22 @@ End Sub
 
 Public Sub GetParent_WithFile_ReturnsParentDirectory()
     Dim FileName As String
-    FileName = CreateFile
+    FileName = mBuilder.CreateFile
     
     Dim Actual As DirectoryInfo
     Set Actual = Directory.GetParent(FileName)
     
-    Assert.That Actual.FullName, Iz.EqualTo(mTempFolder)
+    Assert.That Actual.FullName, Iz.EqualTo(mBuilder.TempFolder)
 End Sub
 
 Public Sub GetParent_WithSubFolder_ReturnsParentDirectory()
     Dim SubFolder As String
-    SubFolder = CreateFolder
+    SubFolder = mBuilder.CreateFolder
     
     Dim Actual As DirectoryInfo
     Set Actual = Directory.GetParent(SubFolder)
     
-    Assert.That Actual.FullName, Iz.EqualTo(mTempFolder)
+    Assert.That Actual.FullName, Iz.EqualTo(mBuilder.TempFolder)
 End Sub
 
 Public Sub GetParent_WithEmptyPath_ThrowsArgumentException()
@@ -326,10 +318,10 @@ End Sub
 
 Public Sub Move_WhenCalled_MovesContents()
     Dim SourceFolder As String
-    SourceFolder = CreateFolder("Source")
-    CreateFile "Source\File.txt"
+    SourceFolder = mBuilder.CreateFolder("Source")
+    mBuilder.CreateFile "Source\File.txt"
     Dim TargetFolder As String
-    TargetFolder = Path.Combine(mTempFolder, "Target")
+    TargetFolder = Path.Combine(mBuilder.TempFolder, "Target")
     
     Directory.Move SourceFolder, TargetFolder
     
@@ -342,7 +334,7 @@ Public Sub CurrentDirectory_WhenCalled_IsSetAndRead()
     Dim OriginalCurrentDirectory As String
     OriginalCurrentDirectory = CurDir$
     Dim NewFolder As String
-    NewFolder = CreateFolder
+    NewFolder = mBuilder.CreateFolder
     
     On Error GoTo errTrap
     Directory.SetCurrentDirectory NewFolder
@@ -355,22 +347,12 @@ errTrap:
     ChDir OriginalCurrentDirectory
 End Sub
 
-Private Function CreateFile(Optional ByVal FileName As String = "File.txt") As String
-    CreateFile = Path.Combine(mTempFolder, FileName)
-    Helper.CreateFile CreateFile
-End Function
-
-Private Function CreateFolder(Optional ByVal SubFolder As String = "SubFolder") As String
-    CreateFolder = Path.Combine(mTempFolder, SubFolder)
-    Helper.CreateFolder CreateFolder
-End Function
-
 Private Function CreateFullPaths(ByVal Source As Variant) As Collection
     Set CreateFullPaths = New Collection
     
     Dim Item As Variant
     For Each Item In Source
-        CreateFullPaths.Add Path.Combine(mTempFolder, Item)
+        CreateFullPaths.Add Path.Combine(mBuilder.TempFolder, Item)
     Next
 End Function
 

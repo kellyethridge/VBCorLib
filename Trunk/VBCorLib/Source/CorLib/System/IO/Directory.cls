@@ -149,9 +149,8 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
                 Loop While API.FindNextFile(.This, Data) = BOOL_TRUE
                 
                 Dim Result As Long
-                Result = Err.LastDllError    ' get this before FindClose can change it.
+                Result = Err.LastDllError
                 
-'                FindClose FileHandle
                 If Result <> ERROR_NO_MORE_FILES Then IOError Result, FullPath
             End If
         End With
@@ -525,14 +524,12 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
                 End If
             Loop While API.FindNextFile(.This, Entry) <> BOOL_FALSE
         End If
+        
         Dim Error As Long
-        Error = Err.LastDllError    ' cache the error before FindClose changes it.
+        Error = Err.LastDllError
+    
+        If IsIOError(Error) Then IOError Error, InitialPath
     End With
-    
-'    FindClose FileHandle
-    
-    If IsIOError(Error) Then _
-        IOError Error, InitialPath
     
     Dim SubFolder As Variant
     For Each SubFolder In SubFolders
