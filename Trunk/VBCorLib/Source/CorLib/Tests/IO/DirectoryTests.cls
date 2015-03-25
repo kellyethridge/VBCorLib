@@ -142,8 +142,8 @@ Public Sub Delete_WhenCalled_DeletesDirectory()
 End Sub
 
 Public Sub Delete_WithRecursive_DeletesSubfoldersAndFiles()
-    Helper.CreateFolder Path.Combine(mTempFolder, "SubFolder")
-    Helper.CreateFile Path.Combine(mTempFolder, "File.txt")
+    CreateFolder
+    CreateFile
     
     Directory.Delete mTempFolder, True
     
@@ -151,26 +151,24 @@ Public Sub Delete_WithRecursive_DeletesSubfoldersAndFiles()
 End Sub
 
 Public Sub GetDirectories_WhenCalled_ReturnsDirectories()
-    Dim SubFolder As String
-    SubFolder = Path.Combine(mTempFolder, "GetDirectories")
-    Helper.CreateFolder SubFolder
+    Dim Expected As String
+    Expected = CreateFolder
     
-    Dim Folders() As String
-    Folders = Directory.GetDirectories(mTempFolder)
+    Dim Actual() As String
+    Actual = Directory.GetDirectories(mTempFolder)
     
-    Assert.That Folders, Iz.EqualTo(Array(SubFolder))
+    Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
 
 Public Sub GetDirectories_WithSearchPattern_ReturnsSelectDirectories()
-    Dim SubFolder1 As String: SubFolder1 = Path.Combine(mTempFolder, "GetDirectories1")
-    Dim SubFolder2 As String: SubFolder2 = Path.Combine(mTempFolder, "GetDirectories2")
-    Helper.CreateFolder SubFolder1
-    Helper.CreateFolder SubFolder2
+    Dim Expected As String
+    CreateFolder "SubFolder1"
+    Expected = CreateFolder("SubFolder2")
     
-    Dim Folders() As String
-    Folders = Directory.GetDirectories(mTempFolder, "*2")
+    Dim Actual() As String
+    Actual = Directory.GetDirectories(mTempFolder, "*2")
     
-    Assert.That Folders, Iz.EqualTo(Array(SubFolder2))
+    Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
 
 Public Sub GetDirectoryRoot_WithDirectories_ReturnsExpected(ByVal DirectoryToUse As String, ByVal Expected As String)
@@ -182,76 +180,172 @@ Public Sub GetDirectoryRoot_WithDirectories_ReturnsExpected(ByVal DirectoryToUse
 End Sub
 
 Public Sub GetFiles_WhenCalled_ReturnsFiles()
-    Dim FilePath As String
-    FilePath = Path.Combine(mTempFolder, "AFile.txt")
-    Helper.CreateFile FilePath
+    Dim Expected As String
+    Expected = CreateFile
     
     Dim Actual() As String
     Actual = Directory.GetFiles(mTempFolder)
     
-    Assert.That Actual, Iz.EqualTo(Array(FilePath))
+    Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
 
 Public Sub GetFiles_WithSearchPattern_ReturnsSelectFiles()
-    Dim FilePath1 As String: FilePath1 = Path.Combine(mTempFolder, "GetFiles1.txt")
-    Dim FilePath2 As String: FilePath2 = Path.Combine(mTempFolder, "GetFiles2.txt")
-    Helper.CreateFile FilePath1
-    Helper.CreateFile FilePath2
+    Dim Expected As String
+    CreateFile "File1.txt"
+    Expected = CreateFile("File2.txt")
     
     Dim Actual() As String
     Actual = Directory.GetFiles(mTempFolder, "*2.txt")
     
-    Assert.That Actual, Iz.EqualTo(Array(FilePath2))
+    Assert.That Actual, Iz.EqualTo(Array(Expected))
 End Sub
 
 Public Sub GetFiles_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOption, ByRef Expected As Variant)
-    Helper.CreateFile Path.Combine(mTempFolder, "Top.txt")
-    Helper.CreateFolder Path.Combine(mTempFolder, "SubFolder")
-    Helper.CreateFile Path.Combine(mTempFolder, "SubFolder\Sub.txt")
+    CreateFile "Top.txt"
+    CreateFolder
+    CreateFile "SubFolder\Sub.txt"
     
     Dim Actual() As String
     Actual = Directory.GetFiles(mTempFolder, SearchOpt:=Opt)
     
-    Dim i As Long
-    For i = 0 To UBound(Expected)
-        Expected(i) = Path.Combine(mTempFolder, Expected(i))
-    Next
-    Assert.That Actual, Iz.EqualTo(Expected)
+    Assert.That Actual, Iz.EqualTo(CreateFullPaths(Expected))
 End Sub
 
 Public Sub GetDirectories_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOption, ByRef Expected As Variant)
-    Helper.CreateFolder Path.Combine(mTempFolder, "SubFolder")
-    Helper.CreateFolder Path.Combine(mTempFolder, "SubFolder\SubSubFolder")
+    CreateFolder
+    CreateFolder "SubFolder\SubSubFolder"
     
     Dim Actual() As String
     Actual = Directory.GetDirectories(mTempFolder, SearchOpt:=Opt)
     
-    Dim i As Long
-    For i = 0 To UBound(Expected)
-        Expected(i) = Path.Combine(mTempFolder, Expected(i))
-    Next
-    Assert.That Actual, Iz.EqualTo(Expected)
+    Assert.That Actual, Iz.EqualTo(CreateFullPaths(Expected))
 End Sub
 
-'Public Sub TestGetFileSystemEntries()
-'    Dim col As New Collection
-'    Dim s As String
-'    s = Dir$(App.Path & "\*", vbDirectory)
-'    Do While Len(s) > 0
-'        If s <> "." And s <> ".." Then
-'            col.Add App.Path & "\" & s
-'        End If
-'        s = Dir$
-'    Loop
-'
-'    Dim files() As String
-'    Dim i As Long
-'
-'    files = Directory.GetFileSystemEntries(App.Path)
-'    Assert.AreEqual col.Count, cArray.GetLength(files)
-'
-'    For i = 0 To UBound(files)
-''        Assert.Contains files(i), col
-'        Assert.That col, Has.Member(files(i))
-'    Next i
-'End Sub
+Public Sub GetFileSystemEntries_WithFilesAndFolders_ReturnsBothTypes()
+    Dim Expected As New Collection
+    Expected.Add CreateFolder
+    Expected.Add CreateFile
+    
+    Dim Actual() As String
+    Actual = Directory.GetFileSystemEntries(mTempFolder)
+    
+    Assert.That Actual, Iz.EquivalentTo(Expected)
+End Sub
+
+Public Sub GetFileSystemEntries_WithSubFoldersAndFiles_ReturnsAll()
+    Dim Expected As New Collection
+    Expected.Add CreateFolder
+    Expected.Add CreateFile
+    Expected.Add CreateFolder("SubFolder\SubSubFolder")
+    Expected.Add CreateFile("SubFolder\File.txt")
+    
+    Dim Actual() As String
+    Actual = Directory.GetFileSystemEntries(mTempFolder, SearchOpt:=SearchOption.AllDirectories)
+    
+    Assert.That Actual, Iz.EquivalentTo(Expected)
+End Sub
+
+Public Sub CreationTime_WhenCalled_IsSetAndRead()
+    Dim FileName As String
+    FileName = CreateFile
+    
+    Directory.SetCreationTime FileName, #2/2/2015 8:40:00 AM#
+    Dim Actual As Date
+    Actual = Directory.GetCreationTime(FileName).ToOADate
+    
+    Assert.That Actual, Iz.EqualTo(#2/2/2015 8:40:00 AM#)
+End Sub
+
+Public Sub LastAccessTime_WhenCalled_IsSetAndRead()
+    Dim FileName As String
+    FileName = CreateFile
+    
+    Directory.SetLastAccessTime FileName, #2/2/2015 8:40:00 AM#
+    Dim Actual As Date
+    Actual = Directory.GetLastAccessTime(FileName).ToOADate
+    
+    Assert.That Actual, Iz.EqualTo(#2/2/2015 8:40:00 AM#)
+End Sub
+
+Public Sub LastWriteTime_WhenCalled_IsSetAndRead()
+    Dim FileName As String
+    FileName = CreateFile
+    
+    Directory.SetLastWriteTime FileName, #2/2/2015 8:40:00 AM#
+    Dim Actual As Date
+    Actual = Directory.GetLastWriteTime(FileName).ToOADate
+    
+    Assert.That Actual, Iz.EqualTo(#2/2/2015 8:40:00 AM#)
+End Sub
+
+Public Sub GetParent_WithFile_ReturnsParentDirectory()
+    Dim FileName As String
+    FileName = CreateFile
+    
+    Dim Actual As DirectoryInfo
+    Set Actual = Directory.GetParent(FileName)
+    
+    Assert.That Actual.FullName, Iz.EqualTo(mTempFolder)
+End Sub
+
+Public Sub GetParent_WithSubFolder_ReturnsParentDirectory()
+    Dim SubFolder As String
+    SubFolder = CreateFolder
+    
+    Dim Actual As DirectoryInfo
+    Set Actual = Directory.GetParent(SubFolder)
+    
+    Assert.That Actual.FullName, Iz.EqualTo(mTempFolder)
+End Sub
+
+Public Sub GetParent_WithEmptyPath_ThrowsArgumentException()
+    On Error GoTo errTrap
+    
+    Directory.GetParent ""
+    
+errTrap:
+    AssertArgumentException Err, "Path"
+End Sub
+
+Public Sub GetParent_WithRootPath_ReturnsNothing()
+    Dim Actual As DirectoryInfo
+    
+    Set Actual = Directory.GetParent("c:\")
+    
+    Assert.That Actual, Iz.Nothing
+End Sub
+
+Public Sub Move_WhenCalled_MovesContents()
+    Dim SourceFolder As String
+    SourceFolder = CreateFolder("Source")
+    CreateFile "Source\File.txt"
+    Dim TargetFolder As String
+    TargetFolder = Path.Combine(mTempFolder, "Target")
+    
+    Directory.Move SourceFolder, TargetFolder
+    
+    Assert.That FolderExists(SourceFolder), Iz.False
+    Assert.That FolderExists(TargetFolder), Iz.True
+    Assert.That FileExists(Path.Combine(TargetFolder, "File.txt")), Iz.True
+End Sub
+
+Private Function CreateFile(Optional ByVal FileName As String = "File.txt") As String
+    CreateFile = Path.Combine(mTempFolder, FileName)
+    Helper.CreateFile CreateFile
+End Function
+
+Private Function CreateFolder(Optional ByVal SubFolder As String = "SubFolder") As String
+    CreateFolder = Path.Combine(mTempFolder, SubFolder)
+    Helper.CreateFolder CreateFolder
+End Function
+
+Private Function CreateFullPaths(ByVal Source As Variant) As Collection
+    Set CreateFullPaths = New Collection
+    
+    Dim Item As Variant
+    For Each Item In Source
+        CreateFullPaths.Add Path.Combine(mTempFolder, Item)
+    Next
+End Function
+
+
