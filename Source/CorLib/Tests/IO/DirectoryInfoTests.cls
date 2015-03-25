@@ -16,25 +16,19 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Private Const TempSubFolder As String = "VBCorlib.Directory.Tests"
-
-Private mTempFolder As String
+Private mBuilder As DirectoryBuilder
 
 Public Sub Setup()
-    mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
-    
-    If Not Helper.FolderExists(mTempFolder) Then
-        MkDir mTempFolder
-    End If
+    Set mBuilder = New DirectoryBuilder
 End Sub
 
-Public Sub Teardown()
-    Helper.DeleteFolder mTempFolder
+Public Sub TearDown()
+    Set mBuilder = Nothing
 End Sub
 
 Public Sub Exists_WithExistingDirectory_ReturnsTrue()
     Dim Info As DirectoryInfo
-    Set Info = Cor.NewDirectoryInfo(mTempFolder)
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
     
     Dim Actual As Boolean
     Actual = Info.Exists
@@ -44,7 +38,7 @@ End Sub
 
 Public Sub Exists_WithNonExistingDirectory_ReturnsFalse()
     Dim NonExistingDirectory As String
-    NonExistingDirectory = Path.Combine(mTempFolder, "NonExisting")
+    NonExistingDirectory = Path.Combine(mBuilder.TempFolder, "NonExisting")
     Dim Info As DirectoryInfo
     Set Info = Cor.NewDirectoryInfo(NonExistingDirectory)
     
@@ -55,22 +49,59 @@ Public Sub Exists_WithNonExistingDirectory_ReturnsFalse()
 End Sub
 
 Public Sub Create_WhenCalled_CreatesFolder()
-    Const SubFolder As String = "VBCorLib.DirectoryInfo.Create.Test"
-    On Error GoTo errTrap
     Dim FolderToCreate As String
-    FolderToCreate = Path.Combine(Path.GetTempPath, SubFolder)
+    FolderToCreate = Path.Combine(Path.GetTempPath, "SubFolder")
     Dim Info As DirectoryInfo
     Set Info = Cor.NewDirectoryInfo(FolderToCreate)
     
     Info.Create
 
-    Assert.That Helper.FolderExists(FolderToCreate), Iz.True
+    Assert.That FolderExists(FolderToCreate), Iz.True
     Assert.That Info.Exists, Iz.True
-    Assert.That Info.Name, Iz.EqualTo(SubFolder)
-    Assert.That Info.FullName, Iz.EqualTo(FolderToCreate)
+End Sub
 
-errTrap:
-    Helper.DeleteFolder FolderToCreate
+Public Sub Name_WhenCalled_ReturnsTheLastDirectoryName()
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual As String
+    Actual = Info.Name
+    
+    Assert.That Actual, Iz.EqualTo(mBuilder.TempSubFolder)
+End Sub
+
+Public Sub FullName_WhenCalled_ReturnsEntirePath()
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual As String
+    Actual = Info.FullName
+    
+    Assert.That Actual, Iz.EqualTo(mBuilder.TempFolder)
+End Sub
+
+Public Sub Attributes_WhenRead_ReadsIt()
+    Dim Folder As String
+    Folder = mBuilder.CreateFolder
+    SetAttr Folder, vbHidden
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(Folder)
+    
+    Dim Actual As FileAttributes
+    Actual = Info.Attributes And Hidden
+    
+    Assert.That Actual, Iz.EqualTo(FileAttributes.Hidden)
+End Sub
+
+Public Sub Attributes_WhenSet_SetsIt()
+    Dim Folder As String
+    Folder = mBuilder.CreateFolder
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(Folder)
+    
+    Info.Attributes = FileAttributes.Hidden
+    
+    Assert.That GetAttr(Folder), Iz.EqualTo(vbDirectory Or vbHidden)
 End Sub
 
 
@@ -109,10 +140,6 @@ End Sub
 '    WriteLine cString.Format("Offset: {0}", Offset)
 '
 '    Assert.AreEqual Offset.TotalHours, loc.Subtract(utc).TotalHours
-'End Sub
-'
-'Public Sub TestName()
-'    Assert.AreEqual "Tests", info.Name
 'End Sub
 '
 'Public Sub TestParentName()

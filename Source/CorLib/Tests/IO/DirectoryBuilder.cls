@@ -1,0 +1,63 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "DirectoryBuilder"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
+Option Explicit
+
+Private mTempFolder As String
+
+Public Property Get TempFolder() As String
+    TempFolder = mTempFolder
+End Property
+
+Public Property Get TempSubFolder() As String
+      TempSubFolder = "VBCorlib.IO.Tests"
+End Property
+
+Public Function CreateFile(Optional ByVal FileName As String = "File.txt") As String
+    CreateFile = Path.Combine(mTempFolder, FileName)
+    If Not FileExists(CreateFile) Then
+        Dim FileNumber As Long
+        FileNumber = FreeFile
+        Open CreateFile For Output As #FileNumber
+        Close FileNumber
+    End If
+End Function
+
+Public Function CreateFolder(Optional ByVal SubFolder As String = "SubFolder") As String
+    CreateFolder = Path.Combine(mTempFolder, SubFolder)
+    If Not FolderExists(CreateFolder) Then
+        MkDir CreateFolder
+    End If
+End Function
+
+Private Sub Setup()
+    mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
+    
+    If Not Directory.Exists(mTempFolder) Then
+        Directory.CreateDirectory mTempFolder
+    End If
+End Sub
+
+Private Sub TearDown()
+    If Directory.Exists(mTempFolder) Then
+        Directory.Delete mTempFolder, True
+    End If
+End Sub
+
+Private Sub Class_Initialize()
+    Setup
+End Sub
+
+Private Sub Class_Terminate()
+    TearDown
+End Sub
