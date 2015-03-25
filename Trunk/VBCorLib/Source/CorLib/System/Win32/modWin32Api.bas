@@ -71,8 +71,6 @@ End Type
 
 Public Declare Function GetProcessMemoryInfo Lib "psapi.dll" (ByVal Process As Long, ByRef ppsmemCounters As PROCESS_MEMORY_COUNTERS, ByVal cb As Long) As Long
 
-
-
 Public Sub InitWin32Api()
     Dim Info As OSVERSIONINFOA
     Info.dwOSVersionInfoSize = Len(Info)
@@ -86,3 +84,8 @@ Public Sub InitWin32Api()
         Set API = New Win32ApiA
     End If
 End Sub
+
+Public Function NewFindFileHandle(ByVal FileHandle As Long) As FindFileHandle
+    Set NewFindFileHandle = New FindFileHandle
+    NewFindFileHandle.Init FileHandle
+End Function

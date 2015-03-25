@@ -18,7 +18,17 @@ Public Sub CreateFolder(ByRef Folder As String)
 End Sub
 
 Public Function FileExists(ByRef FileName As String) As Boolean
-    FileExists = Len(Dir$(FileName, vbNormal)) > 0
+    On Error GoTo FileNotFoundError
+    
+    ' We check for a file this way because using Dir$ places a lock on the file
+    ' causing some of the Teardowns to fail.
+    Dim FileNumber As Long
+    FileNumber = FreeFile
+    Open FileName For Input As #FileNumber
+    Close FileNumber
+    
+    FileExists = True
+FileNotFoundError:
 End Function
 
 Public Sub CreateFile(ByRef FileName As String)

@@ -553,16 +553,18 @@ End Function
 Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
     Dim FileData As WIN32_FIND_DATA
     
-    If API.FindFirstFile(Path, FileData) = INVALID_HANDLE_VALUE Then
-        GetFileDataFallback = Err.LastDllError
-    Else
-        Data.dwFileAttributes = FileData.dwFileAttributes
-        Data.ftCreationTime = FileData.ftCreationTime
-        Data.ftLastAccessTime = FileData.ftLastAccessTime
-        Data.ftLastWriteTime = FileData.ftLastWriteTime
-        Data.nFileSizeHigh = FileData.nFileSizeHigh
-        Data.nFileSizeLow = FileData.nFileSizeLow
-    End If
+    With API.FindFirstFile(Path, FileData)
+        If .IsValid Then
+            Data.dwFileAttributes = FileData.dwFileAttributes
+            Data.ftCreationTime = FileData.ftCreationTime
+            Data.ftLastAccessTime = FileData.ftLastAccessTime
+            Data.ftLastWriteTime = FileData.ftLastWriteTime
+            Data.nFileSizeHigh = FileData.nFileSizeHigh
+            Data.nFileSizeLow = FileData.nFileSizeLow
+        Else
+            GetFileDataFallback = Err.LastDllError
+        End If
+    End With
 End Function
 
 Private Sub InternalSetFileTime(ByRef sPath As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)

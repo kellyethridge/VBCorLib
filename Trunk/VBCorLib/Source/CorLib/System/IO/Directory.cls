@@ -126,35 +126,35 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
     Path = cString.TrimEnd(modStaticClasses.Path.InternalGetFullPath(Path), "/\")
     
     If Recursive Then
-        Dim FileHandle  As Long
         Dim Data        As WIN32_FIND_DATA
         
-        FileHandle = API.FindFirstFile(Path & "\*", Data)
-        If FileHandle <> INVALID_HANDLE Then
-            ' Simply loop through any files or directories
-            ' within this directory and delete them.
-            Do
-                Dim FileName As String
-                FileName = GetFileNameFromFindData(Data)
-                
-                If Len(FileName) > 0 Then
-                    Dim FullPath As String
-                    FullPath = modStaticClasses.Path.Combine(Path, FileName)
+        With API.FindFirstFile(Path & "\*", Data)
+            If .IsValid Then
+                ' Simply loop through any files or directories
+                ' within this directory and delete them.
+                Do
+                    Dim FileName As String
+                    FileName = GetFileNameFromFindData(Data)
                     
-                    If Data.dwFileAttributes And FileAttributes.DirectoryAttr Then
-                        Delete FullPath, True
-                    Else
-                        If API.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
+                    If Len(FileName) > 0 Then
+                        Dim FullPath As String
+                        FullPath = modStaticClasses.Path.Combine(Path, FileName)
+                        
+                        If CBool(Data.dwFileAttributes And FileAttributes.DirectoryAttr) Then
+                            Delete FullPath, True
+                        Else
+                            If API.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
+                        End If
                     End If
-                End If
-            Loop While API.FindNextFile(FileHandle, Data)
-            
-            Dim Result As Long
-            Result = Err.LastDllError    ' get this before FindClose can change it.
-            
-            FindClose FileHandle
-            If Result <> ERROR_NO_MORE_FILES Then IOError Result, FullPath
-        End If
+                Loop While API.FindNextFile(.This, Data) = BOOL_TRUE
+                
+                Dim Result As Long
+                Result = Err.LastDllError    ' get this before FindClose can change it.
+                
+'                FindClose FileHandle
+                If Result <> ERROR_NO_MORE_FILES Then IOError Result, FullPath
+            End If
+        End With
     End If
     
     If API.RemoveDirectory(Path) = BOOL_FALSE Then
@@ -499,37 +499,37 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
     Dim SubFolders  As New ArrayList
     Dim FileHandle  As Long
     
-    FileHandle = API.FindFirstFile(Path.Combine(FullPath, SearchPattern), Entry)
-    If FileHandle <> INVALID_HANDLE Then
-        Do
-            Dim EntryName As String
-            EntryName = GetFileNameFromFindData(Entry)
-            
-            If Len(EntryName) > 0 Then
-                Dim NewPath As String
-                NewPath = Path.Combine(FullPath, EntryName)
+    With API.FindFirstFile(Path.Combine(FullPath, SearchPattern), Entry)
+        If .IsValid Then
+            Do
+                Dim EntryName As String
+                EntryName = GetFileNameFromFindData(Entry)
                 
-                If EntryIsDirectory(Entry) Then
-                    If CBool(EntriesToInclude And DirectoryEntry) Then
-                        Entries.Add NewPath
-                    End If
+                If Len(EntryName) > 0 Then
+                    Dim NewPath As String
+                    NewPath = Path.Combine(FullPath, EntryName)
                     
-                    If SearchOpt = AllDirectories Then
-                        SubFolders.Add NewPath
-                    End If
-                Else
-                    If CBool(EntriesToInclude And FileEntry) Then
-                        Entries.Add NewPath
+                    If EntryIsDirectory(Entry) Then
+                        If CBool(EntriesToInclude And DirectoryEntry) Then
+                            Entries.Add NewPath
+                        End If
+                        
+                        If SearchOpt = AllDirectories Then
+                            SubFolders.Add NewPath
+                        End If
+                    Else
+                        If CBool(EntriesToInclude And FileEntry) Then
+                            Entries.Add NewPath
+                        End If
                     End If
                 End If
-            End If
-        Loop While API.FindNextFile(FileHandle, Entry) <> BOOL_FALSE
-    End If
+            Loop While API.FindNextFile(.This, Entry) <> BOOL_FALSE
+        End If
+        Dim Error As Long
+        Error = Err.LastDllError    ' cache the error before FindClose changes it.
+    End With
     
-    Dim Error As Long
-    Error = Err.LastDllError    ' cache the error before FindClose changes it.
-    
-    FindClose FileHandle
+'    FindClose FileHandle
     
     If IsIOError(Error) Then _
         IOError Error, InitialPath

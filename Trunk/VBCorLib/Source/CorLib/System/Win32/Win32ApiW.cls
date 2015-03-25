@@ -97,15 +97,15 @@ Private Function IWin32API_ExpandEnvironmentStrings(lpSrc As String, lpDst As St
     IWin32API_ExpandEnvironmentStrings = ExpandEnvironmentStringsW(lpSrc, lpDst, nSize)
 End Function
 
-Private Function IWin32API_FindFirstFile(FileName As String, FindFileData As VBCorType.WIN32_FIND_DATA) As Long
+Private Function IWin32API_FindFirstFile(FileName As String, FindFileData As VBCorType.WIN32_FIND_DATA) As ISafeHandle
     Dim Data As WIN32_FIND_DATAW
-    IWin32API_FindFirstFile = FindFirstFileW(MakeWide(FileName), Data)
+    Set IWin32API_FindFirstFile = NewFindFileHandle(FindFirstFileW(MakeWide(FileName), Data))
     FindDataWToFindData Data, FindFileData
 End Function
 
-Private Function IWin32API_FindNextFile(ByVal hFindFile As Long, FindFileData As VBCorType.WIN32_FIND_DATA) As Long
+Private Function IWin32API_FindNextFile(ByVal SafeHandle As ISafeHandle, FindFileData As VBCorType.WIN32_FIND_DATA) As Long
     Dim Data As WIN32_FIND_DATAW
-    IWin32API_FindNextFile = FindNextFileW(hFindFile, Data)
+    IWin32API_FindNextFile = FindNextFileW(SafeHandle, Data)
     FindDataWToFindData Data, FindFileData
 End Function
 
