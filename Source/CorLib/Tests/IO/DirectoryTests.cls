@@ -21,7 +21,6 @@ Private Const TempSubFolder As String = "VBCorlib.Directory.Tests"
 
 Private mTempFolder As String
 
-
 Public Sub Setup()
     mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
     
@@ -148,6 +147,16 @@ Public Sub Delete_WithRecursive_DeletesSubfoldersAndFiles()
     Directory.Delete mTempFolder, True
     
     Assert.That Helper.FolderExists(mTempFolder), Iz.False
+End Sub
+
+Public Sub Delete_WithRecursiveAndMultipleLevels_DeletesFolder()
+    CreateFolder
+    CreateFolder "SubFolder\SubSubFolder"
+    CreateFile "SubFolder\SubSubFolder\File.txt"
+    
+    Directory.Delete mTempFolder, True
+    
+    Assert.That FolderExists(mTempFolder), Iz.False
 End Sub
 
 Public Sub GetDirectories_WhenCalled_ReturnsDirectories()
@@ -327,6 +336,23 @@ Public Sub Move_WhenCalled_MovesContents()
     Assert.That FolderExists(SourceFolder), Iz.False
     Assert.That FolderExists(TargetFolder), Iz.True
     Assert.That FileExists(Path.Combine(TargetFolder, "File.txt")), Iz.True
+End Sub
+
+Public Sub CurrentDirectory_WhenCalled_IsSetAndRead()
+    Dim OriginalCurrentDirectory As String
+    OriginalCurrentDirectory = CurDir$
+    Dim NewFolder As String
+    NewFolder = CreateFolder
+    
+    On Error GoTo errTrap
+    Directory.SetCurrentDirectory NewFolder
+    Dim Actual As String
+    Actual = Directory.GetCurrentDirectory
+    On Error GoTo 0
+    
+    Assert.That Actual, Iz.EqualTo(NewFolder)
+errTrap:
+    ChDir OriginalCurrentDirectory
 End Sub
 
 Private Function CreateFile(Optional ByVal FileName As String = "File.txt") As String
