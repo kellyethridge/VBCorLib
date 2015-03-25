@@ -30,7 +30,7 @@ Public Sub Setup()
     End If
 End Sub
 
-Public Sub Teardown()
+Public Sub TearDown()
     If Directory.Exists(mTempFolder) Then
         Directory.Delete mTempFolder, True
     End If
@@ -43,6 +43,19 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "\\server\share\somefolder\", "\\server\share"
             Test.Use "folder\subfolder", "c:\"
         
+        Case "CreateDirectory_WithIllegalCharacters_ThrowsArgumentException"
+            Test.Use "c:\a<b"
+            Test.Use "c:\a>b"
+            Test.Use "c:\a" & Chr$(31) & "b"
+            
+        Case "GetFiles_WithSearchOption_ReturnsExpected"
+            Test.Use SearchOption.TopDirectoryOnly, Array("Top.txt")
+            Test.Use SearchOption.AllDirectories, Array("Top.txt", "SubFolder\Sub.txt")
+            
+        Case "GetDirectories_WithSearchOption_ReturnsExpected"
+            Test.Use SearchOption.TopDirectoryOnly, Array("SubFolder")
+            Test.Use SearchOption.AllDirectories, Array("SubFolder", "SubFolder\SubSubFolder")
+            
     End Select
 End Sub
 
@@ -102,6 +115,24 @@ Public Sub CreateDirectory_WithEmptyPath_ThrowsArgumentException()
     
 errTrap:
     AssertArgumentException Err, "Path"
+End Sub
+
+Public Sub CreateDirectory_WithIllegalCharacters_ThrowsArgumentException(ByVal IllegalPath As String)
+    On Error GoTo errTrap
+    
+    Directory.CreateDirectory IllegalPath
+    
+errTrap:
+    AssertArgumentException Err, "Path"
+End Sub
+
+Public Sub CreateDirectory_WithColonAfterRoot_ThrowsNotSupportedException()
+    On Error GoTo errTrap
+    
+    Directory.CreateDirectory "c:\abc:d"
+    
+errTrap:
+    AssertNotSupportedException Err
 End Sub
 
 Public Sub Delete_WhenCalled_DeletesDirectory()
@@ -171,6 +202,35 @@ Public Sub GetFiles_WithSearchPattern_ReturnsSelectFiles()
     Actual = Directory.GetFiles(mTempFolder, "*2.txt")
     
     Assert.That Actual, Iz.EqualTo(Array(FilePath2))
+End Sub
+
+Public Sub GetFiles_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOption, ByRef Expected As Variant)
+    Helper.CreateFile Path.Combine(mTempFolder, "Top.txt")
+    Helper.CreateFolder Path.Combine(mTempFolder, "SubFolder")
+    Helper.CreateFile Path.Combine(mTempFolder, "SubFolder\Sub.txt")
+    
+    Dim Actual() As String
+    Actual = Directory.GetFiles(mTempFolder, SearchOpt:=Opt)
+    
+    Dim i As Long
+    For i = 0 To UBound(Expected)
+        Expected(i) = Path.Combine(mTempFolder, Expected(i))
+    Next
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetDirectories_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOption, ByRef Expected As Variant)
+    Helper.CreateFolder Path.Combine(mTempFolder, "SubFolder")
+    Helper.CreateFolder Path.Combine(mTempFolder, "SubFolder\SubSubFolder")
+    
+    Dim Actual() As String
+    Actual = Directory.GetDirectories(mTempFolder, SearchOpt:=Opt)
+    
+    Dim i As Long
+    For i = 0 To UBound(Expected)
+        Expected(i) = Path.Combine(mTempFolder, Expected(i))
+    Next
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 'Public Sub TestGetFileSystemEntries()

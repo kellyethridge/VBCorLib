@@ -532,14 +532,13 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
     
     Dim i As Long
     For i = 0 To Len(Path) - 1
-        ' We check for invalid path characters with hardcoded values instead
-        ' of looping through both the path to check and the list of invalid
-        ' characters which would be much slower.
         Select Case mBuffer.Data(i)
             Case &H22, &H3C, &H3E, &H7C, Is < 32
-                Throw Cor.NewArgumentException("Invalid characters in path.", "Path")
+                Throw Cor.NewArgumentException(GetMessage(Argument.InvalidPathChars), GetParameter(Param.PathParam))
             Case vbForwardSlashChar
-                If FixSlashes Then mBuffer.Data(i) = vbBackslashChar
+                If FixSlashes Then
+                    mBuffer.Data(i) = vbBackslashChar
+                End If
         End Select
     Next i
 End Sub

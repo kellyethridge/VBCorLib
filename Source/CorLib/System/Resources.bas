@@ -108,6 +108,7 @@ Public Enum ResourceStringId
     Argument_NeedIntrinsicType = 829
     Argument_CharArrayRequired = 830
     Argument_InvalidDateSubtraction = 831
+    Argument_InvalidCharsInPath = 832
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902
@@ -211,6 +212,7 @@ Public Enum Argument
     StreamNotReadable
     StreamNotWritable
     StreamNotSeekable
+    InvalidPathChars = 832
 End Enum
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
@@ -221,6 +223,12 @@ End Function
 
 Public Function GetParameter(ByVal ParameterId As Param) As String
     GetParameter = LoadResString(ParameterId)
+End Function
+
+Public Function GetMessage(ByVal Argument As Argument, ParamArray Args() As Variant) As String
+    Dim vArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
+    GetMessage = cString.FormatArray(LoadResString(Argument), vArgs)
 End Function
 
 Public Function ModuleEBPOffset(ByVal Offset As Long) As Long

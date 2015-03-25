@@ -50,6 +50,11 @@ Private Enum SystemEntryTypes
     DirectoryEntry = 2
 End Enum
 
+Public Enum SearchOption
+    AllDirectories
+    TopDirectoryOnly
+End Enum
+
 ' We want to use the variable name Path in the arguments like DotNet,
 ' so we will keep a reference to the one Path object for each access
 ' without having to type out the mStaticClasses portion.
@@ -67,10 +72,8 @@ Private mPath As Path
 Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Resources.GetString(Argument_EmptyPath), "Path")
-    
-    Path = Trim$(Path)
-    Call mPath.FixupPath(Path)
-    
+        
+    mPath.FixupPath Path
     Path = cString.TrimEnd(Path, mPath.DirectorySeparatorString)
     
     If Len(Path) > mPath.MaxPathLength Then _
@@ -89,7 +92,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
         If Directory.Exists(TestDirectory) Then Exit Do
         i = i - 1
     Loop While i > 0
-    
+
     Do While i <= UBound(DirectoryNames)
         i = i + 1
         Dim NewDirectory As String
@@ -146,7 +149,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
                     FullPath = mPath.Combine(Path, FileName)
                     
                     If Data.dwFileAttributes And FileAttributes.DirectoryAttr Then
-                        Call Delete(FullPath, True)
+                        Delete FullPath, True
                     Else
                         If API.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
                     End If
@@ -156,7 +159,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
             Dim Result As Long
             Result = Err.LastDllError    ' get this before FindClose can change it.
             
-            Call FindClose(FileHandle)
+            FindClose FileHandle
             If Result <> ERROR_NO_MORE_FILES Then IOError Result, FullPath
         End If
     End If
@@ -238,14 +241,14 @@ End Function
 ' @return The current set directory.
 '
 Public Function GetCurrentDirectory() As String
-    Dim Ret As String
-    Ret = String$(Path.MaxPathLength, 0)
+    Dim Result As String
+    Result = String$(Path.MaxPathLength, 0)
     
     Dim Size As Long
-    Size = API.GetCurrentDirectory(Len(Ret), Ret)
+    Size = API.GetCurrentDirectory(Len(Result), Result)
     If Size = 0 Then IOError Err.LastDllError
     
-    GetCurrentDirectory = Left$(Ret, Size)
+    GetCurrentDirectory = Left$(Result, Size)
 End Function
 
 ''
@@ -259,8 +262,8 @@ End Function
 ' an empty zero-length array.
 ' @remarks The path can be absolute or relative.
 '
-Public Function GetDirectories(ByVal Path As String, Optional ByVal SearchPattern As String = "*") As String()
-    GetDirectories = InternalGetFiles(Path, SearchPattern, DirectoryEntry)
+Public Function GetDirectories(ByVal Path As String, Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
+    GetDirectories = InternalGetFiles(Path, SearchPattern, DirectoryEntry, SearchOpt)
 End Function
 
 ''
@@ -273,7 +276,7 @@ End Function
 '
 Public Function GetDirectoryRoot(ByVal Path As String) As String
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
+        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), GetParameter(Param.PathParam))
     
     If Not mPath.IsPathRooted(Path) Then
         Path = mPath.GetFullPath(Path)
@@ -292,8 +295,8 @@ End Function
 ' @remarks The path can be absolute or relative. The path is not included in the
 ' filename result.
 '
-Public Function GetFiles(ByVal Path As String, Optional ByVal SearchPattern As String = "*") As String()
-    GetFiles = InternalGetFiles(Path, SearchPattern, FileEntry)
+Public Function GetFiles(ByVal Path As String, Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
+    GetFiles = InternalGetFiles(Path, SearchPattern, FileEntry, SearchOpt)
 End Function
 
 ''
@@ -306,7 +309,7 @@ End Function
 ' @remarks The path can be absolute or relative.
 '
 Public Function GetFileSystemEntries(ByVal Path As String, Optional ByVal SearchPattern As String = "*") As String()
-    GetFileSystemEntries = InternalGetFiles(Path, SearchPattern, DirectoryEntry Or FileEntry)
+    GetFileSystemEntries = InternalGetFiles(Path, SearchPattern, DirectoryEntry Or FileEntry, TopDirectoryOnly)
 End Function
 
 ''
@@ -315,27 +318,27 @@ End Function
 ' @return The list of logical drives on this machine.
 '
 Public Function GetLogicalDrives() As String()
-    Dim Ret() As String
-    ReDim Ret(25) As String ' just allocate the maximum letters possible.
+    Dim Drives() As String
+    ReDim Drives(25) As String ' just allocate the maximum letters possible.
     
-    Dim mask As Long
-    mask = VBCorType.GetLogicalDrives
+    Dim Mask As Long
+    Mask = VBCorType.GetLogicalDrives
     
-    Dim letter As Long
-    letter = vbUpperAChar
+    Dim Letter As Long
+    Letter = vbUpperAChar
     
     Dim i As Long
-    Do While mask <> 0
-        If mask And 1 Then
-            Ret(i) = Chr$(letter) & ":\"
+    Do While Mask <> 0
+        If Mask And 1 Then
+            Drives(i) = Chr$(Letter) & ":\"
             i = i + 1
         End If
-        letter = letter + 1
-        mask = mask \ 2
+        Letter = Letter + 1
+        Mask = Mask \ 2
     Loop
     
-    ReDim Preserve Ret(0 To i - 1)
-    GetLogicalDrives = Ret
+    ReDim Preserve Drives(0 To i - 1)
+    GetLogicalDrives = Drives
 End Function
 
 ''
@@ -347,9 +350,9 @@ End Function
 '
 Public Function GetParent(ByVal Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
+        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), GetParameter(Param.PathParam))
 
-    Call mPath.VerifyPath(Path)
+    mPath.VerifyPath Path
     Path = mPath.GetFullPath(Path)
     
     Dim DirName As String
@@ -368,9 +371,9 @@ End Function
 '
 Public Sub Move(ByVal SourceDirectory As String, ByVal DestinationDirectory As String)
     If Len(SourceDirectory) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "SourceDirectory")
+        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), "SourceDirectory")
     If Len(DestinationDirectory) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "DestinationDirectory")
+        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), "DestinationDirectory")
     
     SourceDirectory = LCase$(Path.InternalGetFullRootedPath(SourceDirectory))
     DestinationDirectory = LCase$(Path.InternalGetFullRootedPath(DestinationDirectory))
@@ -399,9 +402,9 @@ End Sub
 '
 Public Sub SetCurrentDirectory(ByVal Path As String)
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
+        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), GetParameter(Param.PathParam))
     
-    Call mPath.VerifyPath(Path)
+    mPath.VerifyPath Path
     If Not Exists(Path) Then _
         Throw New DirectoryNotFoundException
     
@@ -417,7 +420,7 @@ End Sub
 ' the directory to it. When the time is read, it will be in local time to the timezone.
 '
 Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    Call InternalSetFileTime(Path, cDateTime.GetcDateTime(CreationTime).ToFileTime)
+    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTime
 End Sub
 
 ''
@@ -428,7 +431,7 @@ End Sub
 ' @remarks The directory is set to the actual time passed in.
 '
 Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    Call InternalSetFileTime(Path, cDateTime.GetcDateTime(CreationTime).ToFileTimeUtc)
+    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -439,7 +442,7 @@ End Sub
 ' @remarks The UTC offset is removed from the time before setting the directory.
 '
 Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    Call InternalSetFileTime(Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTime)
+    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTime
 End Sub
 
 ''
@@ -450,7 +453,7 @@ End Sub
 ' @remarks The directory is set to the actual time passed in.
 '
 Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    Call InternalSetFileTime(Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc)
+    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -460,7 +463,7 @@ End Sub
 ' @param LastWriteTime A Date or cDateTime object of the new time.
 '
 Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
-    Call InternalSetFileTime(Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTime)
+    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTime
 End Sub
 
 ''
@@ -470,7 +473,7 @@ End Sub
 ' @param LastWriteTime A Date or cDateTime object of the new time.
 '
 Public Sub SetLastWriteTimeUtc(ByVal Path As String, ByVal LastWriteTime As Variant)
-    Call InternalSetFileTime(Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc)
+    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
 End Sub
 
 
@@ -481,7 +484,9 @@ Private Sub VerifySearchPattern(ByRef s As String)
     Dim i As Long
     i = InStr(s, "..")
     If i > 0 Then
-        If i = Len(s) - 1 Then Throw Cor.NewArgumentException("Cannot end search pattern with '..'")
+        If i = Len(s) - 1 Then _
+            Throw Cor.NewArgumentException("Cannot end search pattern with '..'")
+            
         Select Case Asc(Mid$(s, i + 2, 1))
             Case DIRECTORY_SEPARATOR_CHAR, ALT_DIRECTORY_SEPARATOR_CHAR
                 Throw Cor.NewArgumentException("'..' cannot be followed immediately by a directory separator.")
@@ -489,70 +494,85 @@ Private Sub VerifySearchPattern(ByRef s As String)
     End If
 End Sub
 
-Private Function InternalGetFiles(ByRef sPath As String, ByRef SearchPattern As String, ByVal EntryTypes As SystemEntryTypes) As String()
+Private Function InternalGetFiles(ByRef InitialPath As String, ByRef SearchPattern As String, ByVal EntryTypes As SystemEntryTypes, ByVal SearchOpt As SearchOption) As String()
     Dim FullPath As String
-    FullPath = Path.InternalGetFullPath(sPath)
+    FullPath = Path.InternalGetFullPath(InitialPath)
     
-    Call VerifySearchPattern(SearchPattern)
+    VerifySearchPattern SearchPattern
     
-    Dim Data        As WIN32_FIND_DATA
+    Dim EntryData   As WIN32_FIND_DATA
+    Dim Entries     As New ArrayList
+    Dim SubFolders  As New ArrayList
     Dim FileHandle  As Long
-    FileHandle = API.FindFirstFile(Path.Combine(sPath, SearchPattern), Data)
     
-    Dim List As New ArrayList
-    
-    Dim include As Boolean
+    FileHandle = API.FindFirstFile(Path.Combine(FullPath, SearchPattern), EntryData)
     If FileHandle <> INVALID_HANDLE Then
         Do
-            If Data.dwFileAttributes And FileAttributes.DirectoryAttr Then
-                include = (EntryTypes And SystemEntryTypes.DirectoryEntry)
-            Else
-                include = (EntryTypes And SystemEntryTypes.FileEntry)
-            End If
+            Dim EntryName As String
+            EntryName = GetFileNameFromFindData(EntryData)
             
-            If include Then
-                Dim s As String
-                s = GetFileNameFromFindData(Data)
-                If Len(s) > 0 Then Call List.Add(Path.Combine(sPath, s))
+            If Len(EntryName) > 0 Then
+                Dim NewPath As String
+                NewPath = Path.Combine(FullPath, EntryName)
+                
+                If CBool(EntryData.dwFileAttributes And FileAttributes.DirectoryAttr) Then
+                    If EntryTypes = DirectoryEntry Then
+                        Entries.Add NewPath
+                    End If
+                    
+                    If SearchOpt = AllDirectories Then
+                        SubFolders.Add NewPath
+                    End If
+                ElseIf EntryTypes = SystemEntryTypes.FileEntry Then
+                    Entries.Add NewPath
+                End If
             End If
-        Loop While API.FindNextFile(FileHandle, Data) <> BOOL_FALSE
+        Loop While API.FindNextFile(FileHandle, EntryData) <> BOOL_FALSE
     End If
     
     Dim e As Long
     e = Err.LastDllError    ' cache the error before FindClose changes it.
     
-    Call FindClose(FileHandle)
+    FindClose FileHandle
     
     Select Case e
         Case 0, ERROR_NO_MORE_FILES, ERROR_FILE_NOT_FOUND   ' ignore these errors.
-        Case Else: IOError e, sPath
+        Case Else: IOError e, InitialPath
     End Select
+    
+    Dim SubFolder As Variant
+    For Each SubFolder In SubFolders
+        Entries.AddRange InternalGetFiles(CStr(SubFolder), SearchPattern, EntryTypes, SearchOpt)
+    Next
 
-    InternalGetFiles = List.ToArray(vbString)
+    InternalGetFiles = Entries.ToArray(vbString)
 End Function
 
-Private Sub InternalSetFileTime(ByRef sPath As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)
-    Dim cnt As Long
-    Dim lat As Long
-    Dim lwt As Long
+Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)
+    Dim CreationTimePtr     As Long
+    Dim LastAccessTimePtr   As Long
+    Dim LastWriteTimePtr    As Long
     
-    If Not IsMissing(CreationTime) Then cnt = VarPtr(CreationTime) + VARIANTDATA_OFFSET
-    If Not IsMissing(LastAccessTime) Then lat = VarPtr(LastAccessTime) + VARIANTDATA_OFFSET
-    If Not IsMissing(LastWriteTime) Then lwt = VarPtr(LastWriteTime) + VARIANTDATA_OFFSET
+    If Not IsMissing(CreationTime) Then CreationTimePtr = VarPtr(CreationTime) + VARIANTDATA_OFFSET
+    If Not IsMissing(LastAccessTime) Then LastAccessTimePtr = VarPtr(LastAccessTime) + VARIANTDATA_OFFSET
+    If Not IsMissing(LastWriteTime) Then LastWriteTimePtr = VarPtr(LastWriteTime) + VARIANTDATA_OFFSET
     
-    If Len(sPath) = 0 Then _
+    If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
     
-    Call Path.VerifyPath(sPath)
+    mPath.VerifyPath Path
     
     Dim DirHandle As Long
-    DirHandle = API.CreateFile(sPath, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_FLAG_BACKUP_SEMANTICS, 0)
-    If DirHandle = INVALID_HANDLE Then IOError Err.LastDllError, sPath
-    If SetFileTime(DirHandle, ByVal cnt, ByVal lat, ByVal lwt) = BOOL_FALSE Then
-        Close CloseHandle(DirHandle)
-        IOError Err.LastDllError, sPath
+    DirHandle = API.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_FLAG_BACKUP_SEMANTICS, 0)
+    If DirHandle = INVALID_HANDLE Then
+        IOError Err.LastDllError, Path
     End If
-    Call CloseHandle(DirHandle)
+    
+    If SetFileTime(DirHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr) = BOOL_FALSE Then
+        Close CloseHandle(DirHandle)
+        IOError Err.LastDllError, Path
+    End If
+    CloseHandle DirHandle
 End Sub
 
 Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATA) As String
