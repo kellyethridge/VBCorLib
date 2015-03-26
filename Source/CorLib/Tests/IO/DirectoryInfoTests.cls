@@ -80,6 +80,28 @@ Public Sub FullName_WhenCalled_ReturnsEntirePath()
     Assert.That Actual, Iz.EqualTo(mBuilder.TempFolder)
 End Sub
 
+Public Sub Parent_WhenCalled_ReturnsParentInfo()
+    Dim SubFolder As DirectoryInfo
+    Set SubFolder = Cor.NewDirectoryInfo(mBuilder.CreateFolder)
+    Dim ParentFolder As DirectoryInfo
+    Set ParentFolder = SubFolder.Parent
+    
+    Dim Actual As String
+    Actual = ParentFolder.FullName
+    
+    Assert.That Actual, Iz.EqualTo(mBuilder.TempFolder)
+End Sub
+
+Public Sub Parent_WithRootFolder_ReturnsNothing()
+    Dim RootFolder As DirectoryInfo
+    Set RootFolder = Cor.NewDirectoryInfo("c:\")
+    
+    Dim Actual As DirectoryInfo
+    Set Actual = RootFolder.Parent
+    
+    Assert.That Actual, Iz.Nothing
+End Sub
+
 Public Sub Attributes_WhenRead_ReadsIt()
     Dim Folder As String
     Folder = mBuilder.CreateFolder
@@ -104,6 +126,119 @@ Public Sub Attributes_WhenSet_SetsIt()
     Assert.That GetAttr(Folder), Iz.EqualTo(vbDirectory Or vbHidden)
 End Sub
 
+Public Sub CreationTime_WhenCalled_IsSetAndRead()
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.CreateFile)
+    
+    Info.CreationTime = #2/2/2015 8:40:00 AM#
+    Dim Actual As Date
+    Actual = Info.CreationTime.ToOADate
+    
+    Assert.That Actual, Iz.EqualTo(#2/2/2015 8:40:00 AM#)
+End Sub
+
+Public Sub LastAccessTime_WhenCalled_IsSetAndRead()
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.CreateFile)
+    
+    Info.LastAccessTime = #2/2/2015 8:40:00 AM#
+    Dim Actual As Date
+    Actual = Info.LastAccessTime.ToOADate
+    
+    Assert.That Actual, Iz.EqualTo(#2/2/2015 8:40:00 AM#)
+End Sub
+
+Public Sub LastWriteTime_WhenCalled_IsSetAndRead()
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.CreateFile)
+    
+    Info.LastWriteTime = #2/2/2015 8:40:00 AM#
+    Dim Actual As Date
+    Actual = Info.LastWriteTime.ToOADate
+    
+    Assert.That Actual, Iz.EqualTo(#2/2/2015 8:40:00 AM#)
+End Sub
+
+Public Sub Root_WhenCalled_ReturnsFolderRoot()
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual As DirectoryInfo
+    Set Actual = Info.Root
+    
+    Assert.That Actual.FullName, Iz.EqualTo("c:\").IgnoreCase
+End Sub
+
+Public Sub GetDirectories_WhenCalled_ReturnsTopDirectories()
+    Dim Expected As New Collection
+    Expected.Add mBuilder.CreateFolder("SubFolder1")
+    Expected.Add mBuilder.CreateFolder("SubFolder2")
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual As Collection
+    Set Actual = GetPathNames(Info.GetDirectories)
+    
+    Assert.That Actual, Iz.EquivalentTo(Expected)
+End Sub
+
+Public Sub GetDirectories_WithSearchPattern_ReturnsMatching()
+    Dim Expected As New Collection
+    mBuilder.CreateFolder "SubFolder1"
+    Expected.Add mBuilder.CreateFolder("SubFolder2")
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual As Collection
+    Set Actual = GetPathNames(Info.GetDirectories("*2"))
+    
+    Assert.That Actual, Iz.EquivalentTo(Expected)
+End Sub
+
+Public Sub GetDirectories_WithTopDirectoriesSearchOption_ReturnsOnlyTopDirectory()
+    Dim Expected As New Collection
+    Expected.Add mBuilder.CreateFolder
+    mBuilder.CreateFolder "SubFolder\SubSubFolder"
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual As Collection
+    Set Actual = GetPathNames(Info.GetDirectories(SearchOpt:=SearchOption.TopDirectoryOnly))
+    
+    Assert.That Actual, Iz.EquivalentTo(Expected)
+End Sub
+
+Public Sub GetDirectories_WithAllDirectoriesSearchOption_ReturnsAllFolders()
+    Dim Expected As New Collection
+    Expected.Add mBuilder.CreateFolder
+    Expected.Add mBuilder.CreateFolder("SubFolder\SubSubFolder")
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual As Collection
+    Set Actual = GetPathNames(Info.GetDirectories(SearchOpt:=SearchOption.AllDirectories))
+    
+    Assert.That Actual, Iz.EquivalentTo(Expected)
+End Sub
+
+Public Sub GetDirectories_WithNoDirectories_ReturnsEmptyArray()
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual() As DirectoryInfo
+    Actual = Info.GetDirectories
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Private Function GetPathNames(ByRef Infos() As DirectoryInfo) As Collection
+    Set GetPathNames = New Collection
+    
+    Dim Info As Variant
+    For Each Info In Infos
+        GetPathNames.Add Info.FullName
+    Next
+End Function
 
 'Private info As DirectoryInfo
 '
@@ -114,16 +249,6 @@ End Sub
 '
 'Public Sub Setup()
 '    Set info = NewDirectoryInfo(App.Path)
-'End Sub
-'
-'Public Sub TestAttributes()
-'    Assert.AreEqual 16, info.Attributes And FileAttributes.DirectoryAttr
-'End Sub
-'
-'Public Sub TestCreationTime()
-'    WriteLine ""
-'    WriteLine "--- VISUAL INSPECTION ---"
-'    WriteLine "CreationTime: " & info.CreationTime.ToString
 'End Sub
 '
 'Public Sub TestCreationTimeLocalVsUTC()
@@ -140,22 +265,6 @@ End Sub
 '    WriteLine cString.Format("Offset: {0}", Offset)
 '
 '    Assert.AreEqual Offset.TotalHours, loc.Subtract(utc).TotalHours
-'End Sub
-'
-'Public Sub TestParentName()
-'    Dim P As DirectoryInfo
-'
-'    Set P = info.Parent
-'    Assert.IsNotNothing P
-'    Assert.AreEqual "VBCorLibGroup", P.Name
-'End Sub
-'
-'Public Sub TestRoot()
-'    Dim r As DirectoryInfo
-'
-'    Set r = info.Root
-'    Assert.IsNotNothing r, "No root information in path."
-'    Assert.AreEqual "c:\", LCase$(r.Name)
 'End Sub
 '
 'Public Sub TestGetDirectories()
