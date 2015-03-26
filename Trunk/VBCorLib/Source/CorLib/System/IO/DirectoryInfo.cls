@@ -60,7 +60,9 @@ Private mLastWriteTime  As cDateTime
 '
 Public Property Get Name() As String
     Name = Path.GetFileName(mPath)
-    If Len(Name) = 0 Then Name = mPath
+    If Len(Name) = 0 Then
+        Name = mPath
+    End If
 End Property
 
 ''
@@ -80,7 +82,9 @@ End Property
 ' last checked, then Refresh must be called to retrieve the current settings.
 '
 Public Property Get Attributes() As FileAttributes
-    If mIsDirty Then Call Refresh
+    If mIsDirty Then
+        Refresh
+    End If
     Attributes = mFileAttributes
 End Property
 
@@ -93,8 +97,8 @@ End Property
 ' be preserved.
 '
 Public Property Let Attributes(ByVal RHS As FileAttributes)
-    Call File.SetAttributes(mPath, RHS)
-    Call MarkDirty
+    File.SetAttributes mPath, RHS
+    MarkDirty
 End Property
 
 ''
@@ -105,7 +109,9 @@ End Property
 ' For Pacific Coast, a -8 hours is added to the time before returning.
 '
 Public Property Get CreationTime() As Variant
-    If mIsDirty Then Refresh
+    If mIsDirty Then
+        Refresh
+    End If
     Set CreationTime = mCreationTime
 End Property
 
@@ -117,7 +123,7 @@ End Property
 ' being written to the directory.
 '
 Public Property Let CreationTime(ByVal RHS As Variant)
-    Set Me.CreationTime = cDateTime.GetcDateTime(RHS)
+    Set CreationTime = cDateTime.GetcDateTime(RHS)
 End Property
 
 ''
@@ -129,10 +135,10 @@ End Property
 '
 Public Property Set CreationTime(ByVal RHS As Variant)
     If Not TypeOf RHS Is cDateTime Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
-
-    Call Directory.SetCreationTime(mPath, mCreationTime)
-    Call MarkDirty
+        Throw Cor.NewArgumentException(GetMessage(Argument.DateRequired), "CreationTime")
+    
+    Directory.SetCreationTime mPath, RHS
+    MarkDirty
 End Property
 
 ''
@@ -143,7 +149,9 @@ End Property
 ' any offsets being applied.
 '
 Public Property Get CreationTimeUtc() As Variant
-    If mIsDirty Then Refresh
+    If mIsDirty Then
+        Refresh
+    End If
     Set CreationTimeUtc = mCreationTime.ToUniversalTime
 End Property
 
@@ -169,8 +177,8 @@ Public Property Set CreationTimeUtc(ByVal RHS As Variant)
     If Not TypeOf RHS Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
 
-    Call Directory.SetCreationTimeUtc(mPath, RHS)
-    Call MarkDirty
+    Directory.SetCreationTimeUtc mPath, RHS
+    MarkDirty
 End Property
 
 ''
@@ -180,7 +188,9 @@ End Property
 ' @remarks The returned time is the UTC time with the UTC timezone offset applied.
 '
 Public Property Get LastAccessTime() As Variant
-    If mIsDirty Then Refresh
+    If mIsDirty Then
+        Refresh
+    End If
     Set LastAccessTime = mLastAccessTime
 End Property
 
@@ -201,9 +211,9 @@ End Property
 Public Property Set LastAccessTime(ByVal RHS As Variant)
     If Not TypeOf RHS Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
-        
-    Call Directory.SetLastAccessTime(mPath, mLastAccessTime)
-    Call MarkDirty
+    
+    Directory.SetLastAccessTime mPath, RHS
+    MarkDirty
 End Property
 
 ''
@@ -212,7 +222,9 @@ End Property
 ' @return a cDateTime object of the time.
 '
 Public Property Get LastAccessTimeUtc() As Variant
-    If mIsDirty Then Refresh
+    If mIsDirty Then
+        Refresh
+    End If
     Set LastAccessTimeUtc = mLastAccessTime.ToUniversalTime
 End Property
 
@@ -234,8 +246,8 @@ Public Property Set LastAccessTimeUtc(ByVal RHS As Variant)
     If Not TypeOf RHS Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
-    Call Directory.SetLastAccessTimeUtc(mPath, RHS)
-    Call MarkDirty
+    Directory.SetLastAccessTimeUtc mPath, RHS
+    MarkDirty
 End Property
 
 ''
@@ -244,7 +256,9 @@ End Property
 ' @return A cDateTime object of the time.
 '
 Public Property Get LastWriteTime() As Variant
-    If mIsDirty Then Refresh
+    If mIsDirty Then
+        Refresh
+    End If
     Set LastWriteTime = mLastWriteTime
 End Property
 
@@ -254,7 +268,7 @@ End Property
 ' @param RHS A Date or cDateTime object of the new time.
 '
 Public Property Let LastWriteTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = cDateTime.GetcDateTime(RHS)
+    Set LastWriteTime = cDateTime.GetcDateTime(RHS)
 End Property
 
 ''
@@ -266,8 +280,8 @@ Public Property Set LastWriteTime(ByVal RHS As Variant)
     If Not TypeOf RHS Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastWriteTime")
     
-    Call Directory.SetLastWriteTime(mPath, mLastWriteTime)
-    Call MarkDirty
+    Directory.SetLastWriteTime mPath, RHS
+    MarkDirty
 End Property
 
 ''
@@ -276,7 +290,9 @@ End Property
 ' @return A cDateTime object of the time.
 '
 Public Property Get LastWriteTimeUtc() As Variant
-    If mIsDirty Then Refresh
+    If mIsDirty Then
+        Refresh
+    End If
     Set LastWriteTimeUtc = mLastWriteTime.ToUniversalTime
 End Property
 
@@ -286,7 +302,7 @@ End Property
 ' @param RHS A Date or cDateTime object of the new time.
 '
 Public Property Let LastWriteTimeUtc(ByVal RHS As Variant)
-    Set Me.LastWriteTimeUtc = cDateTime.GetcDateTime(RHS)
+    Set LastWriteTimeUtc = cDateTime.GetcDateTime(RHS)
 End Property
 
 ''
@@ -298,8 +314,8 @@ Public Property Set LastWriteTimeUtc(ByVal RHS As Variant)
     If Not TypeOf RHS Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
-    Call Directory.SetLastWriteTimeUtc(mPath, RHS)
-    Call MarkDirty
+    Directory.SetLastWriteTimeUtc mPath, RHS
+    MarkDirty
 End Property
 
 ''
@@ -385,7 +401,7 @@ End Function
 ' @param Recursive Indicates if all entries in the directory should be deleted.
 '
 Public Sub Delete(Optional ByVal Recursive As Boolean)
-    Call Directory.Delete(mPath, Recursive)
+    Directory.Delete mPath, Recursive
 End Sub
 
 ''
@@ -395,26 +411,25 @@ End Sub
 ' @return A list of all matching directories.
 ' @remarks If no matching directories were found, then an empty array is returned.
 '
-Public Function GetDirectories(Optional ByVal SearchPattern As String = "*") As DirectoryInfo()
-    Dim Ret() As DirectoryInfo
-    
+Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As DirectoryInfo()
+    Dim Ret()   As DirectoryInfo
     Dim Paths() As String
-    Paths = Directory.GetDirectories(mPath, SearchPattern)
+    
+    Paths = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
     
     Dim NumPaths As Long
     NumPaths = cArray.GetLength(Paths)
     If NumPaths > 0 Then
         Dim i As Long
         ReDim Ret(0 To NumPaths - 1)
+        
         For i = 0 To NumPaths - 1
             Set Ret(i) = Cor.NewDirectoryInfo(Path.Combine(mPath, Paths(i)))
         Next i
     Else
-        ' No subdirectories were found.
-        ' LAME SPEC: .NET actually returns a zero-length array, where the
-        ' MSDN says it returns the root directory.
         Ret = cArray.CreateInstance(vbObject)
     End If
+    
     GetDirectories = Ret
 End Function
 
@@ -424,7 +439,7 @@ End Function
 ' @param DestDirName The new path and name of the directory.
 '
 Public Sub MoveTo(ByVal DestDirName As String)
-    Call Directory.Move(mPath, DestDirName)
+    Directory.Move mPath, DestDirName
     mPath = Path.GetFullPath(DestDirName)
     mOriginalPath = Path.GetDirectoryName(mPath)
 End Sub
@@ -436,11 +451,10 @@ End Sub
 ' @return A list of files that matched the pattern.
 ' @remarks If no files matched the pattern, a zero-length array is returned.
 '
-Public Function GetFiles(Optional ByVal SearchPattern As String = "*") As FileInfo()
-    Dim Ret() As FileInfo
-    
+Public Function GetFiles(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As FileInfo()
+    Dim Ret()   As FileInfo
     Dim Files() As String
-    Files = Directory.GetFiles(mPath, SearchPattern)
+    Files = Directory.GetFiles(mPath, SearchPattern, SearchOpt)
     
     Dim NumFiles As Long
     NumFiles = cArray.GetLength(Files)
@@ -453,6 +467,7 @@ Public Function GetFiles(Optional ByVal SearchPattern As String = "*") As FileIn
     Else
         Ret = cArray.CreateInstance(vbObject)
     End If
+    
     GetFiles = Ret
 End Function
 
@@ -463,12 +478,12 @@ End Function
 ' @return A list of all entries that matched the pattern.
 ' @remarks If no entries matched the pattern, a zero-length array is returned.
 '
-Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*") As FileSystemInfo()
+Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As FileSystemInfo()
     Dim Files() As String
-    Files = Directory.GetFiles(mPath, SearchPattern)
+    Files = Directory.GetFiles(mPath, SearchPattern, SearchOpt)
     
     Dim Folders() As String
-    Folders = Directory.GetDirectories(mPath, SearchPattern)
+    Folders = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
     
     Dim InfoCount As Long
     InfoCount = cArray.GetLength(Files) + cArray.GetLength(Folders)
