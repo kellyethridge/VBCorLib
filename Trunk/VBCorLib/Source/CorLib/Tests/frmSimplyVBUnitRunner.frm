@@ -177,7 +177,7 @@ Private Sub Form_Load()
     AddTest Cyrptography
     
     AddTest NewSuite("System.Security", New TestSecurityElement)
-    AddTest NewSuite("System.Diagnostics", New TestStopWatch)
+    AddTest NewSuite("System.Diagnostics", New StopWatchTests)
     
     Dim Resources As TestSuite
     Set Resources = Sim.NewTestSuite("System.Resources")
