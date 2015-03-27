@@ -109,6 +109,14 @@ Public Sub Reset()
 End Sub
 
 ''
+' Restarts the StopWatch from zero.
+'
+Public Sub Restart()
+    Reset
+    StartCount
+End Sub
+
+''
 ' Returns the elapsed time as a TimeSpan object.
 '
 ' @return A TimeSpan object.

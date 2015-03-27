@@ -50,3 +50,13 @@ Public Sub Ellapsed_AfterRunning_ReturnsNonZero()
     
     Assert.That Actual.Ticks, Iz.GreaterThan(0)
 End Sub
+
+Public Sub Reset_WhenCalled_StopsCount()
+    Dim sw As New StopWatch
+    sw.StartCount
+    
+    sw.Reset
+    
+    Assert.That sw.IsRunning, Iz.False
+End Sub
+
