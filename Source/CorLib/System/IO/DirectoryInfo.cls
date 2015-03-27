@@ -91,13 +91,13 @@ End Property
 ''
 ' Sets the attributes for the directory.
 '
-' @param RHS The attributes to set for the directory.
+' @param Value The attributes to set for the directory.
 ' @remarks Setting just one attribute will clear all the other attributes. To
 ' preserve any attributes, then OR must be used with the attributes to
 ' be preserved.
 '
-Public Property Let Attributes(ByVal RHS As FileAttributes)
-    File.SetAttributes mPath, RHS
+Public Property Let Attributes(ByVal Value As FileAttributes)
+    File.SetAttributes mPath, Value
     MarkDirty
 End Property
 
@@ -118,26 +118,26 @@ End Property
 ''
 ' Sets the creation time for the directory in local time.
 '
-' @param RHS A Date of the new time.
+' @param Value A Date of the new time.
 ' @remarks The time has the UTC timezone offset applied to it before
 ' being written to the directory.
 '
-Public Property Let CreationTime(ByVal RHS As Variant)
-    Set CreationTime = cDateTime.GetcDateTime(RHS)
+Public Property Let CreationTime(ByVal Value As Variant)
+    Set CreationTime = cDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the creation time for the directory in local time.
 '
-' @param RHS A cDateTime object of the new time.
+' @param Value A cDateTime object of the new time.
 ' @remarks The time has the UTC timezone offset applied to it before
 ' being written to the directory.
 '
-Public Property Set CreationTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+Public Property Set CreationTime(ByVal Value As Variant)
+    If Not TypeOf Value Is cDateTime Then _
         Throw Cor.NewArgumentException(GetMessage(Argument.DateRequired), "CreationTime")
     
-    Directory.SetCreationTime mPath, RHS
+    Directory.SetCreationTime mPath, Value
     MarkDirty
 End Property
 
@@ -158,26 +158,26 @@ End Property
 ''
 ' Sets the creation time as UTC time.
 '
-' @param RHS A Date value as the new time.
+' @param Value A Date value as the new time.
 ' @remarks The time has the UTC timezone offset removed from it before
 ' being written to the directory.
 '
-Public Property Let CreationTimeUtc(ByVal RHS As Variant)
-    Set Me.CreationTimeUtc = cDateTime.GetcDateTime(RHS)
+Public Property Let CreationTimeUtc(ByVal Value As Variant)
+    Set Me.CreationTimeUtc = cDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the creation time as UTC time.
 '
-' @param RHS A cDateTime object of the new time.
+' @param Value A cDateTime object of the new time.
 ' @remarks The time has the UTC timezone offset removed from it before
 ' being written to the directory.
 '
-Public Property Set CreationTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+Public Property Set CreationTimeUtc(ByVal Value As Variant)
+    If Not TypeOf Value Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
 
-    Directory.SetCreationTimeUtc mPath, RHS
+    Directory.SetCreationTimeUtc mPath, Value
     MarkDirty
 End Property
 
@@ -197,22 +197,22 @@ End Property
 ''
 ' Sets the time the directory was last accessed in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Let LastAccessTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = cDateTime.GetcDateTime(RHS)
+Public Property Let LastAccessTime(ByVal Value As Variant)
+    Set Me.LastAccessTime = cDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the time the directory was last accessed in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Set LastAccessTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+Public Property Set LastAccessTime(ByVal Value As Variant)
+    If Not TypeOf Value Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
-    Directory.SetLastAccessTime mPath, RHS
+    Directory.SetLastAccessTime mPath, Value
     MarkDirty
 End Property
 
@@ -231,22 +231,22 @@ End Property
 ''
 ' Sets the last time the directory was accessed in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Let LastAccessTimeUtc(ByVal RHS As Variant)
-    Set Me.LastAccessTimeUtc = cDateTime.GetcDateTime(RHS)
+Public Property Let LastAccessTimeUtc(ByVal Value As Variant)
+    Set Me.LastAccessTimeUtc = cDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the last time the directory was accessed in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Set LastAccessTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+Public Property Set LastAccessTimeUtc(ByVal Value As Variant)
+    If Not TypeOf Value Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
-    Directory.SetLastAccessTimeUtc mPath, RHS
+    Directory.SetLastAccessTimeUtc mPath, Value
     MarkDirty
 End Property
 
@@ -265,22 +265,22 @@ End Property
 ''
 ' Sets the last time the directory was written to in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Let LastWriteTime(ByVal RHS As Variant)
-    Set LastWriteTime = cDateTime.GetcDateTime(RHS)
+Public Property Let LastWriteTime(ByVal Value As Variant)
+    Set LastWriteTime = cDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the last time the directory was written to in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Set LastWriteTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+Public Property Set LastWriteTime(ByVal Value As Variant)
+    If Not TypeOf Value Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastWriteTime")
     
-    Directory.SetLastWriteTime mPath, RHS
+    Directory.SetLastWriteTime mPath, Value
     MarkDirty
 End Property
 
@@ -299,22 +299,22 @@ End Property
 ''
 ' Sets the last time the directory was written to in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Let LastWriteTimeUtc(ByVal RHS As Variant)
-    Set LastWriteTimeUtc = cDateTime.GetcDateTime(RHS)
+Public Property Let LastWriteTimeUtc(ByVal Value As Variant)
+    Set LastWriteTimeUtc = cDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the last time the directory was written to in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param Value A Date or cDateTime object of the new time.
 '
-Public Property Set LastWriteTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+Public Property Set LastWriteTimeUtc(ByVal Value As Variant)
+    If Not TypeOf Value Is cDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
-    Directory.SetLastWriteTimeUtc mPath, RHS
+    Directory.SetLastWriteTimeUtc mPath, Value
     MarkDirty
 End Property
 
@@ -323,10 +323,12 @@ End Property
 '
 Public Sub Refresh()
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
-    Dim e As Long
+    Dim Result As Long
     
-    e = File.GetFileData(mPath, Data)
-    If e <> NO_ERROR Then IOError e, mPath
+    Result = File.GetFileData(mPath, Data)
+    If Result <> NO_ERROR Then
+        IOError Result, mPath
+    End If
     
     With Data
         mFileAttributes = .dwFileAttributes
@@ -362,10 +364,12 @@ End Property
 ' @return A DirectroyInfo object of the parent directory, or Nothing if
 ' the original directory is a root, such as 'c:\'
 Public Property Get Parent() As DirectoryInfo
-    Dim p As String
+    Dim ParentDirectoryName As String
     
-    p = Path.GetDirectoryName(mPath)
-    If Len(p) > 0 Then Set Parent = Cor.NewDirectoryInfo(p)
+    ParentDirectoryName = Path.GetDirectoryName(mPath)
+    If Len(ParentDirectoryName) > 0 Then
+        Set Parent = Cor.NewDirectoryInfo(ParentDirectoryName)
+    End If
 End Property
 
 ''
@@ -373,15 +377,15 @@ End Property
 '
 ' @return A DirectoryInfo object of the root.
 '
-Public Property Get root() As DirectoryInfo
-    Set root = Cor.NewDirectoryInfo(Path.GetPathRoot(mPath))
+Public Property Get Root() As DirectoryInfo
+    Set Root = Cor.NewDirectoryInfo(Path.GetPathRoot(mPath))
 End Property
 
 ''
 ' Creates the path represented by this instance.
 '
 Public Sub Create()
-    Call Directory.CreateDirectory(mPath)
+    Directory.CreateDirectory mPath
 End Sub
 
 ''
@@ -412,8 +416,8 @@ End Sub
 ' @remarks If no matching directories were found, then an empty array is returned.
 '
 Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As DirectoryInfo()
-    Dim Ret()   As DirectoryInfo
-    Dim Paths() As String
+    Dim Directories()   As DirectoryInfo
+    Dim Paths()         As String
     
     Paths = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
     
@@ -421,16 +425,16 @@ Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Opt
     NumPaths = cArray.GetLength(Paths)
     If NumPaths > 0 Then
         Dim i As Long
-        ReDim Ret(0 To NumPaths - 1)
+        ReDim Directories(0 To NumPaths - 1)
         
         For i = 0 To NumPaths - 1
-            Set Ret(i) = Cor.NewDirectoryInfo(Path.Combine(mPath, Paths(i)))
+            Set Directories(i) = Cor.NewDirectoryInfo(Path.Combine(mPath, Paths(i)))
         Next i
     Else
-        Ret = cArray.CreateInstance(vbObject)
+        Directories = cArray.CreateInstance(vbObject)
     End If
     
-    GetDirectories = Ret
+    GetDirectories = Directories
 End Function
 
 ''
@@ -540,7 +544,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal sPath As String)
-    Call Path.VerifyPath(sPath)
+    Path.VerifyPath sPath
     mOriginalPath = sPath
     If Not Path.IsPathRooted(sPath) Then
         mPath = Path.GetFullPath(sPath)
@@ -562,15 +566,15 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call MarkDirty
+    MarkDirty
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Call Init(PropBag.ReadProperty("Path"))
+    Init PropBag.ReadProperty("Path")
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty("Path", mOriginalPath)
+    PropBag.WriteProperty "Path", mOriginalPath
 End Sub
 
 
@@ -597,28 +601,28 @@ Private Property Get FileSystemInfo_Attributes() As FileAttributes
     FileSystemInfo_Attributes = Attributes
 End Property
 
-Private Property Let FileSystemInfo_Attributes(ByVal RHS As FileAttributes)
-    Attributes = RHS
+Private Property Let FileSystemInfo_Attributes(ByVal Value As FileAttributes)
+    Attributes = Value
 End Property
 
-Private Property Set FileSystemInfo_CreationTime(ByVal RHS As Variant)
-    Set CreationTime = RHS
+Private Property Set FileSystemInfo_CreationTime(ByVal Value As Variant)
+    Set CreationTime = Value
 End Property
 
-Private Property Let FileSystemInfo_CreationTime(ByVal RHS As Variant)
-    CreationTime = RHS
+Private Property Let FileSystemInfo_CreationTime(ByVal Value As Variant)
+    CreationTime = Value
 End Property
 
 Private Property Get FileSystemInfo_CreationTime() As Variant
     Set FileSystemInfo_CreationTime = CreationTime
 End Property
 
-Private Property Set FileSystemInfo_CreationTimeUtc(ByVal RHS As Variant)
-    Set CreationTimeUtc = RHS
+Private Property Set FileSystemInfo_CreationTimeUtc(ByVal Value As Variant)
+    Set CreationTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_CreationTimeUtc(ByVal RHS As Variant)
-    CreationTimeUtc = RHS
+Private Property Let FileSystemInfo_CreationTimeUtc(ByVal Value As Variant)
+    CreationTimeUtc = Value
 End Property
 
 Private Property Get FileSystemInfo_CreationTimeUtc() As Variant
@@ -626,7 +630,7 @@ Private Property Get FileSystemInfo_CreationTimeUtc() As Variant
 End Property
 
 Private Sub FileSystemInfo_Delete()
-    Call Delete
+    Delete
 End Sub
 
 Private Function FileSystemInfo_Equals(Value As Variant) As Boolean
@@ -649,48 +653,48 @@ Private Function FileSystemInfo_GetHashCode() As Long
     FileSystemInfo_GetHashCode = GetHashCode
 End Function
 
-Private Property Set FileSystemInfo_LastAccessTime(ByVal RHS As Variant)
-    Set LastAccessTime = RHS
+Private Property Set FileSystemInfo_LastAccessTime(ByVal Value As Variant)
+    Set LastAccessTime = Value
 End Property
 
 Private Property Get FileSystemInfo_LastAccessTime() As Variant
     Set FileSystemInfo_LastAccessTime = LastAccessTime
 End Property
 
-Private Property Let FileSystemInfo_LastAccessTime(ByVal RHS As Variant)
-    LastAccessTime = RHS
+Private Property Let FileSystemInfo_LastAccessTime(ByVal Value As Variant)
+    LastAccessTime = Value
 End Property
 
-Private Property Set FileSystemInfo_LastAccessTimeUtc(ByVal RHS As Variant)
-    Set LastAccessTimeUtc = RHS
+Private Property Set FileSystemInfo_LastAccessTimeUtc(ByVal Value As Variant)
+    Set LastAccessTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_LastAccessTimeUtc(ByVal RHS As Variant)
-    LastAccessTimeUtc = RHS
+Private Property Let FileSystemInfo_LastAccessTimeUtc(ByVal Value As Variant)
+    LastAccessTimeUtc = Value
 End Property
 
 Private Property Get FileSystemInfo_LastAccessTimeUtc() As Variant
     Set FileSystemInfo_LastAccessTimeUtc = LastAccessTimeUtc
 End Property
 
-Private Property Set FileSystemInfo_LastWriteTime(ByVal RHS As Variant)
-    Set LastWriteTime = RHS
+Private Property Set FileSystemInfo_LastWriteTime(ByVal Value As Variant)
+    Set LastWriteTime = Value
 End Property
 
-Private Property Let FileSystemInfo_LastWriteTime(ByVal RHS As Variant)
-    LastWriteTime = RHS
+Private Property Let FileSystemInfo_LastWriteTime(ByVal Value As Variant)
+    LastWriteTime = Value
 End Property
 
 Private Property Get FileSystemInfo_LastWriteTime() As Variant
     Set FileSystemInfo_LastWriteTime = LastWriteTime
 End Property
 
-Private Property Set FileSystemInfo_LastWriteTimeUtc(ByVal RHS As Variant)
-    Set LastWriteTimeUtc = RHS
+Private Property Set FileSystemInfo_LastWriteTimeUtc(ByVal Value As Variant)
+    Set LastWriteTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_LastWriteTimeUtc(ByVal RHS As Variant)
-    LastWriteTimeUtc = RHS
+Private Property Let FileSystemInfo_LastWriteTimeUtc(ByVal Value As Variant)
+    LastWriteTimeUtc = Value
 End Property
 
 Private Property Get FileSystemInfo_LastWriteTimeUtc() As Variant
@@ -702,7 +706,7 @@ Private Property Get FileSystemInfo_Name() As String
 End Property
 
 Private Sub FileSystemInfo_Refresh()
-    Call Refresh
+    Refresh
 End Sub
 
 Private Function FileSystemInfo_ToString() As String

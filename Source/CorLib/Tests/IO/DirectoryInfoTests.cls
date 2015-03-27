@@ -195,6 +195,17 @@ Public Sub GetDirectories_WithSearchPattern_ReturnsMatching()
     Assert.That Actual, Iz.EquivalentTo(Expected)
 End Sub
 
+Public Sub GetDirectories_WithNoMatchingSearchPattern_ReturnsEmpty()
+    mBuilder.CreateFolder
+    Dim Info As DirectoryInfo
+    Set Info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
+    
+    Dim Actual() As DirectoryInfo
+    Actual = Info.GetDirectories("NoMatch")
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
 Public Sub GetDirectories_WithTopDirectoriesSearchOption_ReturnsOnlyTopDirectory()
     Dim Expected As New Collection
     Expected.Add mBuilder.CreateFolder
@@ -239,82 +250,3 @@ Private Function GetPathNames(ByRef Infos() As DirectoryInfo) As Collection
         GetPathNames.Add Info.FullName
     Next
 End Function
-
-'Private info As DirectoryInfo
-'
-'Public Sub TestFixtureSetup()
-'    WriteLine ""
-'    WriteLine "***** DIRECTORYINFO *****"
-'End Sub
-'
-'Public Sub Setup()
-'    Set info = NewDirectoryInfo(App.Path)
-'End Sub
-'
-'Public Sub TestCreationTimeLocalVsUTC()
-'    Dim loc As cDateTime
-'    Dim utc As cDateTime
-'    Dim Offset As TimeSpan
-'
-'    Set loc = info.CreationTime
-'    Set utc = info.CreationTimeUtc
-'    Set Offset = TimeZone.CurrentTimeZone.GetUtcOffset(loc)
-'
-'    WriteLine cString.Format("Local: {0}", loc)
-'    WriteLine cString.Format("UTC: {0}", utc)
-'    WriteLine cString.Format("Offset: {0}", Offset)
-'
-'    Assert.AreEqual Offset.TotalHours, loc.Subtract(utc).TotalHours
-'End Sub
-'
-'Public Sub TestGetDirectories()
-'    Dim di() As DirectoryInfo
-'    Dim i As Long
-'
-'    di = info.GetDirectories
-'    Assert.IsFalse cArray.IsNull(di), "Should not be a null array."
-'
-'    WriteLine ""
-'    WriteLine "--- VISUAL INSPECTION ---"
-'    WriteLine "GetDirectories"
-'    WriteLine "Count: " & cArray.GetLength(di)
-'    For i = 0 To UBound(di)
-'        WriteLine di(i).Name
-'    Next i
-'End Sub
-'
-'Public Sub TestEmptyFolder()
-'    Dim di() As DirectoryInfo
-'    Dim EmptyFolder As DirectoryInfo
-'
-'    Set EmptyFolder = Cor.NewDirectoryInfo(Path.Combine(info.FullName, "Folder"))
-'
-'    di = EmptyFolder.GetDirectories
-'
-'    Assert.IsFalse cArray.IsNull(di)
-'    Assert.AreEqual 0, cArray.GetLength(di)
-'End Sub
-'
-'Public Sub TestNoParent()
-'    Set info = Cor.NewDirectoryInfo("c:\")
-'    Assert.IsNothing info.Parent, "'c:\' should have no parent."
-'
-'    Set info = Cor.NewDirectoryInfo("\\server\share")
-'    Assert.IsNothing info.Parent, "'\\server\share' should have no parent."
-'End Sub
-'
-'Public Sub TestGetDirectoriesNoMatch()
-'    Dim di() As DirectoryInfo
-'
-'    di = info.GetDirectories("abc123")
-'    Assert.IsFalse cArray.IsNull(di)
-'    Assert.AreEqual 0, cArray.GetLength(di)
-'End Sub
-'
-'Public Sub TestGetFilesNoMatch()
-'    Dim fi() As FileInfo
-'
-'    fi = info.GetFiles("abc123")
-'    Assert.IsFalse cArray.IsNull(fi)
-'    Assert.AreEqual 0, cArray.GetLength(fi)
-'End Sub
