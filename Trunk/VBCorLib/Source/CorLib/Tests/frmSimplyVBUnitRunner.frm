@@ -106,7 +106,7 @@ Private Sub Form_Load()
         .Add New BitArrayTests
         .Add New TestSortedList
         .Add New TestQueue
-        .Add New TestStack
+        .Add New StackTests
         .Add New TestDefaultComparer
         .Add New TestCaseInsensitiveHCP
         
