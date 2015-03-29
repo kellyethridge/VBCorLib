@@ -21,7 +21,7 @@ Attribute VB_Name = "modArrayHelpers"
 '
 Option Explicit
 
-Private Declare Function vbaVarRefAry Lib "MSVBVM60.DLL" Alias "__vbaRefVarAry" (ByRef ArrayToDeref As Variant) As Long
+Private Declare Function vbaVarRefAry Lib "msvbvm60.dll" Alias "__vbaRefVarAry" (ByRef ArrayToDeref As Variant) As Long
 
 Public Type SortItems
     SA      As SafeArray1d
@@ -32,6 +32,11 @@ Private mSortItems      As SortItems
 Private mHasSortItems   As Boolean
 Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
+
+Public Function NewArrayValidator(ByRef Source As Variant) As ArrayValidator
+    Set NewArrayValidator = New ArrayValidator
+    NewArrayValidator.Init Source
+End Function
 
 ''
 ' Retrieves the pointer to an array's SafeArray structure.

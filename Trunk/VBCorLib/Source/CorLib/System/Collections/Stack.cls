@@ -99,6 +99,7 @@ End Function
 ' @param index The starting position in dstArray to start placing the values.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
+    
     Call cArray.CopyEx(mItems, 0, DstArray, Index, mCount)
     Call cArray.Reverse(DstArray, Index, mCount)
 End Sub

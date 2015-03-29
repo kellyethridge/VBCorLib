@@ -151,6 +151,7 @@ Public Enum Param
     LCID
     Time
     PathParam
+    DstArray
 End Enum
 
 Public Enum ArgumentOutOfRange
@@ -191,6 +192,7 @@ Public Enum ArgumentOutOfRange
 End Enum
 
 Public Enum Argument
+    MultiDimensionNotSupported = 200
     InvalidOffLen = ArgumentBase
     ArrayPlusOffTooSmall
     Exception
