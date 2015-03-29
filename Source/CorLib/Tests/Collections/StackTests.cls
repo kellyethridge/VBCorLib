@@ -88,6 +88,16 @@ Public Sub Peek_WhenCalled_ReturnsNextItemToPop()
     Assert.That sut.Count, Iz.EqualTo(2)
 End Sub
 
+Public Sub Peek_WithEmptyStack_ThrowsInvalidOperationException()
+    Dim sut As New Stack
+    
+    On Error GoTo errTrap
+    sut.Peek
+    
+errTrap:
+    AssertInvalidOperationException Err
+End Sub
+
 Public Sub ToArray_WhenCalled_ReturnsArrayOfElementsInOrderOfPop()
     Dim sut As New Stack
     sut.Push 1
@@ -133,6 +143,41 @@ Public Sub Enumeration_WhenCalled_ReturnsElementsInOrderOfPop()
     Next
     
     Assert.That Actual, Iz.EqualTo(Array(3, 2, 1))
+End Sub
+
+Public Sub CopyTo_WhenCalled_CopiesItemsToArrayInOrderOfPop()
+    Dim sut As New Stack
+    sut.Push 1
+    sut.Push 2
+    
+    Dim Actual(0 To 1) As Variant
+    sut.CopyTo Actual, 0
+    
+    Assert.That Actual, Iz.EqualTo(Array(2, 1))
+End Sub
+
+Public Sub CopyTo_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim sut As New Stack
+    sut.Push 1
+    
+    On Error GoTo errTrap
+    Dim Actual(0 To 1) As Variant
+    sut.CopyTo Actual, -1
+    
+errTrap:
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CopyTo_WithMultiDimensionalArray_ThrowsArgumentException()
+    Dim sut As New Stack
+    sut.Push 1
+    
+    On Error GoTo errTrap
+    Dim Actual(0 To 1, 0 To 1) As Variant
+    sut.CopyTo Actual, 0
+    
+errTrap:
+    AssertArgumentException Err, "DstArray"
 End Sub
 
 'Public Sub TestCopyTo()
