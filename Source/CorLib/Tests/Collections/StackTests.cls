@@ -20,7 +20,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, True
             Test.Use 2, True
             Test.Use 3, False
-            Test.Use "a", False
+            Test.Use "a", True
+            Test.Use "b", False
+            Test.Use #1/1/2002#, False
+            Test.Use #1/1/2001#, True
             
     End Select
 End Sub
@@ -50,10 +53,22 @@ Public Sub Pop_WhenCalled_ReturnsValuesInOppositeOrderOfPush()
     Assert.That sut.Pop, Iz.EqualTo(1)
 End Sub
 
+Public Sub Pop_WhenStackIsEmpty_ThrowsInvalidOperationException()
+    Dim sut As New Stack
+    
+    On Error GoTo errTrap
+    sut.Pop
+    
+errTrap:
+    AssertInvalidOperationException Err
+End Sub
+
 Public Sub Contains_WithValue_ReturnsExpected(ByVal Value As Variant, ByVal Expected As Boolean)
     Dim sut As New Stack
     sut.Push 1
     sut.Push 2
+    sut.Push "a"
+    sut.Push #1/1/2001#
     
     Dim Actual As Boolean
     Actual = sut.Contains(Value)
@@ -73,23 +88,52 @@ Public Sub Peek_WhenCalled_ReturnsNextItemToPop()
     Assert.That sut.Count, Iz.EqualTo(2)
 End Sub
 
+Public Sub ToArray_WhenCalled_ReturnsArrayOfElementsInOrderOfPop()
+    Dim sut As New Stack
+    sut.Push 1
+    sut.Push 2
+    sut.Push "a"
+    
+    Dim Actual() As Variant
+    Actual = sut.ToArray
+    
+    Assert.That Actual, Iz.EqualTo(Array("a", 2, 1))
+End Sub
 
-'Public Sub TestCountAfterPoppingOne()
-'    st.Push 1
-'    st.Push 2
-'    st.Push 3
-'    Assert.AreEqual 3, st.Count, "Count should return 3."
-'    st.Pop
-'    Assert.AreEqual 2, st.Count, "Count should return 2 after popping one."
-'End Sub
-'
-'Public Sub TestContents()
-'    st.Push 1
-'    st.Push 2
-'
-'    Assert.AreEqual 2, st.Pop, "Pop should return 2."
-'    Assert.AreEqual 1, st.Pop, "Pop should return 1."
-'End Sub
+Public Sub ToArray_WithEmptyStack_ReturnsEmptyArray()
+    Dim sut As New Stack
+    
+    Dim Actual() As Variant
+    Actual = sut.ToArray
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub Clear_WhenCalled_EmptiesStack()
+    Dim sut As New Stack
+    sut.Push 1
+    
+    sut.Clear
+    
+    Assert.That sut, Iz.Empty
+End Sub
+
+Public Sub Enumeration_WhenCalled_ReturnsElementsInOrderOfPop()
+    Dim sut As New Stack
+    sut.Push 1
+    sut.Push 2
+    sut.Push 3
+    
+    Dim Actual(0 To 2) As Variant
+    Dim Index As Long
+    Dim Item As Variant
+    For Each Item In sut
+        Actual(Index) = Item
+        Index = Index + 1
+    Next
+    
+    Assert.That Actual, Iz.EqualTo(Array(3, 2, 1))
+End Sub
 
 'Public Sub TestCopyTo()
 '    Dim i As Long
@@ -104,33 +148,6 @@ End Sub
 '    Next i
 'End Sub
 
-'Public Sub TestToArray()
-'    st.Push 1
-'    st.Push 2
-'    st.Push 3
-'
-'    Dim a() As Variant
-'    a = st.ToArray
-'    Assert.AreEqual 3, cArray.GetLength(a), "Length should be 3."
-'    Assert.AreEqual 3, a(0)
-'    Assert.AreEqual 2, a(1)
-'    Assert.AreEqual 1, a(2)
-'End Sub
-'
-'Public Sub TestEnumerator()
-'    Dim i As Long
-'    For i = 1 To 10
-'        st.Push i
-'    Next i
-'
-'    Dim v As Variant
-'    i = 10
-'    For Each v In st
-'        Assert.AreEqual i, v
-'        i = i - 1
-'    Next v
-'End Sub
-'
 'Public Sub TestPersitence()
 '    Dim i As Long
 '    For i = 1 To 10
