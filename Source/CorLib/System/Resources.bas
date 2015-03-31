@@ -25,8 +25,6 @@ Attribute VB_Name = "Resources"
 Option Explicit
 
 Private Const ParamBase                 As Long = 2000
-Private Const ArgumentOutOfRangeBase    As Long = 700
-Private Const ArgumentBase              As Long = 800
 
 Public Enum ResourceStringId
     Exception_WasThrown = 101
@@ -134,88 +132,116 @@ End Enum
 
 Public Enum Param
     None = 0
-    Index = ParamBase
-    Count
-    StartIndex
-    Chars
-    CharIndex
-    CharCount
-    ByteIndex
+    Index = 2000
+    Count = 2001
+    StartIndex = 2002
+    Chars = 2003
+    CharIndex = 2004
+    CharCount = 2005
+    ByteIndex = 2006
     Bytes = 2007
-    ByteCount
-    Value
-    Arr
-    List
-    Year
-    Month
-    LCID
-    Time
-    PathParam
-    DstArray
+    ByteCount = 2008
+    Value = 2009
+    Arr = 2010
+    List = 2011
+    Year = 2012
+    Month = 2013
+    LCID = 2014
+    Time = 2015
+    PathParam = 2016
+    DstArray = 2017
 End Enum
 
 Public Enum ArgumentOutOfRange
-    MustBeNonNegNum = ArgumentOutOfRangeBase
-    SmallCapacity
-    NeedNonNegNum
-    ArrayListInsert
-    Index
-    LargerThanCollection
-    LowerBound
-    Exception
-    Range
-    UpperBound
-    MinMax
-    VersionFieldCount
-    ValidValues
-    NeedPosNum
-    OutsideConsoleBoundry
-    EnumType
-    ArrayLB
-    ArrayBounds
-    Count
-    NegativeLength
-    StartIndex
-    OffsetOut
-    IndexLength
-    InvalidFileTime
-    Month
-    Year
-    BeepFrequency
-    ConsoleBufferSize
-    ConsoleWindowSize_Size
-    ConsoleWindowPos
-    ConsoleBufferLessThanWindowSize
-    ConsoleTitleTooLong
-    ConsoleColor
-    CursorSize
+    None = 0
+    MustBeNonNegNum = 700
+    SmallCapacity = 701
+    NeedNonNegNum = 702
+    ArrayListInsert = 703
+    Index = 704
+    LargerThanCollection = 705
+    LowerBound = 706
+    Exception = 707
+    Range = 708
+    UpperBound = 709
+    MinMax = 710
+    VersionFieldCount = 711
+    ValidValues = 712
+    NeedPosNum = 713
+    OutsideConsoleBoundry = 714
+    EnumType = 715
+    ArrayLB = 716
+    ArrayBounds = 717
+    Count = 718
+    NegativeLength = 719
+    StartIndex = 720
+    OffsetOut = 721
+    IndexLength = 722
+    InvalidFileTime = 723
+    Month = 724
+    Year = 725
+    BeepFrequency = 726
+    ConsoleBufferSize = 727
+    ConsoleWindowSize_Size = 728
+    ConsoleWindowPos = 729
+    ConsoleBufferLessThanWindowSize = 730
+    ConsoleTitleTooLong = 731
+    ConsoleColor = 732
+    CursorSize = 733
+End Enum
+
+Public Enum ArgumentNull
+    None = 0
+    NullArray = 900
+    NullException = 901
+    NullStream = 902
+    NullCollection = 903
+    NullTimeSpan = 904
+    NullGeneric = 905
+    NullBuffer = 906
 End Enum
 
 Public Enum Argument
+    None = 0
     MultiDimensionNotSupported = 200
-    InvalidOffLen = ArgumentBase
-    ArrayPlusOffTooSmall
-    Exception
-    ArrayRequired
-    MatchingBounds
-    IndexPlusTypeSize
-    VersionRequired
-    TimeSpanRequired
-    DateRequired
-    InvalidHandle
-    EmptyPath
-    SmallConversionBuffer
-    EmptyFileName
-    ReadableStreamRequired
-    InvalidEraValue
-    ParamRequired
-    StreamRequired
-    InvalidPathFormat
-    StreamNotReadable
-    StreamNotWritable
-    StreamNotSeekable
+    InvalidOffLen = 800
+    ArrayPlusOffTooSmall = 801
+    Exception = 802
+    ArrayRequired = 803
+    MatchingBounds = 804
+    IndexPlusTypeSize = 805
+    VersionRequired = 806
+    TimeSpanRequired = 807
+    DateRequired = 808
+    InvalidHandle = 809
+    EmptyPath = 810
+    SmallConversionBuffer = 811
+    EmptyFileName = 812
+    ReadableStreamRequired = 813
+    InvalidEraValue = 814
+    ParamRequired = 815
+    StreamRequired = 816
+    InvalidPathFormat = 817
+    StreamNotReadable = 818
+    StreamNotWritable = 819
+    StreamNotSeekable = 820
+    InvalidComparer = 823
+    EmptyName = 825
+    InvalidSeekOrigin = 827
+    UnsupportedArray = 828
+    NeedIntrinsicType = 829
+    CharArrayRequired = 830
+    InvalidDateSubtraction = 831
     InvalidPathChars = 832
 End Enum
+
+Public Enum ArgumentFormat
+    LongerThanSrcArray = 821
+    LongerThanDestArray = 822
+    MustBeVbVarType = 824
+    LongerThanSrcString = 826
+End Enum
+
 
 Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
@@ -227,10 +253,14 @@ Public Function GetParameter(ByVal ParameterId As Param) As String
     GetParameter = LoadResString(ParameterId)
 End Function
 
-Public Function GetMessage(ByVal Argument As Argument, ParamArray Args() As Variant) As String
+Public Function GetMessage(ByVal MessageId As Long) As String
+    GetMessage = LoadResString(MessageId)
+End Function
+
+Public Function GetMessageFormat(ByVal MessageId As Long, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
-    GetMessage = cString.FormatArray(LoadResString(Argument), vArgs)
+    GetMessageFormat = cString.FormatArray(LoadResString(MessageId), vArgs)
 End Function
 
 Public Function ModuleEBPOffset(ByVal Offset As Long) As Long

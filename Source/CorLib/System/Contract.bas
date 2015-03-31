@@ -105,3 +105,35 @@ Public Sub CheckArrayIndex(ByRef ArrayToCheck As Variant, ByVal Index As Long, O
     CheckRange Index < LBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange.LowerBound
     CheckRange Index > UBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange.UpperBound
 End Sub
+
+Public Sub Requires(ByVal Condition As Boolean, ByVal Message As Argument, Optional ByVal Parameter As Param = Param.None)
+    If Not Condition Then
+        Throw Cor.NewArgumentException(Resources.GetString(Message), Resources.GetParameter(Parameter))
+    End If
+End Sub
+
+Public Sub RequiresObjectNotNull(ByVal ObjectToCheck As Object, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentNull = ArgumentNull.NullGeneric)
+    If ObjectToCheck Is Nothing Then
+        Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetMessage(Message))
+    End If
+End Sub
+
+Public Sub RequiresRange(ByVal Condition As Boolean, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentNull = ArgumentNull.None)
+    If Not Condition Then
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetParameter(Parameter), Message:=Resources.GetMessage(Message))
+    End If
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
