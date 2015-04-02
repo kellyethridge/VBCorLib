@@ -152,6 +152,10 @@ Public Enum Param
     DstArray = 2017
 End Enum
 
+Public Enum Rank
+    MultiDimensionNotSupported = 200
+End Enum
+
 Public Enum ArgumentOutOfRange
     None = 0
     MustBeNonNegNum = 700

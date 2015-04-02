@@ -99,7 +99,7 @@ End Function
 
 Private Function IWin32API_FindFirstFile(FileName As String, FindFileData As VBCorType.WIN32_FIND_DATA) As ISafeHandle
     Dim Data As WIN32_FIND_DATAW
-    Set IWin32API_FindFirstFile = NewFindFileHandle(FindFirstFileW(MakeWide(FileName), Data))
+    Set IWin32API_FindFirstFile = NewSafeFindFileHandle(FindFirstFileW(MakeWide(FileName), Data))
     FindDataWToFindData Data, FindFileData
 End Function
 

@@ -172,10 +172,8 @@ End Function
 ' empty array is returned, not a null array.
 '
 Public Function ReadBytes(ByVal Count As Long) As Byte()
+    Require.ThatArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
     VerifyIsOpen
-    
-    If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim Ret() As Byte
     If Count > 0 Then
@@ -206,10 +204,8 @@ End Function
 ' could be decoded, then an empty array is returned, not a null array.
 '
 Public Function ReadChars(ByVal Count As Long) As Integer()
+    Require.ThatArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
     VerifyIsOpen
-    
-    If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim Ret() As Integer
     If Count > 0 Then
@@ -438,7 +434,9 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyIsOpen()
-    If Not mIsOpen Then Throw Cor.NewObjectDisposedException("BinaryReader", "Cannot read from a closed BinaryReader.")
+    If Not mIsOpen Then
+        Throw Cor.NewObjectDisposedException("BinaryReader", "Cannot read from a closed BinaryReader.")
+    End If
 End Sub
 
 Private Sub FillBuffer(ByVal Count As Long)
