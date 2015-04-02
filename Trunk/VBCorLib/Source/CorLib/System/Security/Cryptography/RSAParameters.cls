@@ -308,11 +308,11 @@ Friend Sub FromCspBlob(ByRef Blob() As Byte)
     ms.Position = 8
     
     ' read the magic number.
-    If Reader.ReadLong <> CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352)) Then _
+    If Reader.ReadInt32 <> CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352)) Then _
         Throw Cor.NewCryptographicException("Invalid blob")
         
     Dim BitLen As Long
-    BitLen = Reader.ReadLong
+    BitLen = Reader.ReadInt32
     
     mExponent = Reader.ReadBytes(4)
     

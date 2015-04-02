@@ -69,7 +69,6 @@ Public Enum Sign
 End Enum
 
 
-
 ''
 ' Returns a object containing all of the parameterized constructors
 ' available within the VBCorLib library.

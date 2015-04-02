@@ -30,7 +30,7 @@ Public Sub That(ByVal Condition As Boolean, ByVal Message As Argument, Optional 
     End If
 End Sub
 
-Public Sub ObjectNotNull(ByVal ObjectToCheck As Object, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentNull = ArgumentNull.NullGeneric)
+Public Sub ObjectNotNothing(ByVal ObjectToCheck As Object, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentNull = ArgumentNull.NullGeneric)
     If ObjectToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetMessage(Message))
     End If
@@ -43,20 +43,22 @@ Public Sub ArrayNotNull(ByRef Arr As Variant, Optional ByVal Parameter As Param 
     VerifyArrayNotNull ArrayPtr, Parameter, Message
 End Sub
 
-Public Sub ArrayIs1Dimension(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr)
+Public Sub ArrayIsOneDimension(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr)
     Dim ArrayPtr As Long
     ArrayPtr = GetArrayPointer(Arr)
      
-    VerifyArray1Dimension ArrayPtr, Parameter
+    VerifyArrayOneDimension ArrayPtr, Parameter
 End Sub
 
-Public Sub NotNull1DimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr, Optional ByVal Message As ArgumentNull = ArgumentNull.NullArray)
+Public Function ValidOneDimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr, Optional ByVal Message As ArgumentNull = ArgumentNull.NullArray) As Long
     Dim ArrayPtr As Long
     ArrayPtr = GetArrayPointer(Arr)
     
     VerifyArrayNotNull ArrayPtr, Parameter, Message
-    VerifyArray1Dimension ArrayPtr, Parameter
-End Sub
+    VerifyArrayOneDimension ArrayPtr, Parameter
+    
+    ValidOneDimensionArray = ArrayPtr
+End Function
 
 Public Sub ThatArgument(ByVal Condition As Boolean, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentOutOfRange = ArgumentOutOfRange.Exception)
     If Not Condition Then
@@ -70,7 +72,7 @@ Private Sub VerifyArrayNotNull(ByVal ArrayPtr As Long, ByVal Parameter As Param,
     End If
 End Sub
 
-Private Sub VerifyArray1Dimension(ByVal ArrayPtr As Long, ByVal Parameter)
+Private Sub VerifyArrayOneDimension(ByVal ArrayPtr As Long, ByVal Parameter)
     If SafeArrayGetDim(ArrayPtr) > 1 Then
         Throw Cor.NewRankException(Resources.GetMessage(Rank.MultiDimensionNotSupported))
     End If

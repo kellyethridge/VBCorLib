@@ -1,5 +1,5 @@
 Type=OleDll
-Reference=*\AVBCorLib.vbp
+Reference=*\G{4F47A5F1-8F8A-4227-A0BC-7264AD32DF0E}#1.0#0#..\..\Binaries\VBCorLib3.dll#VB.EXT: VBCorLib 3.0
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\VBCorType.tlb#VB.EXT: VBCorLib Type Library 3.0
 Class=FakeCustomFormatter; Fakes\FakeCustomFormatter.cls

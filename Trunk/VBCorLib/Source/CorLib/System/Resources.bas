@@ -150,6 +150,8 @@ Public Enum Param
     Time = 2015
     PathParam = 2016
     DstArray = 2017
+    StreamParam = 2018
+    BufferParam = 2019
 End Enum
 
 Public Enum Rank

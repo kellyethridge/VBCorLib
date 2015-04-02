@@ -259,16 +259,16 @@ Private Sub VerifyResourceFile()
     If mReader.BaseStream.Length < 32 Then Call ResourceError
     
     ' DataSize should be 0.
-    If mReader.ReadLong <> 0 Then Call ResourceError
+    If mReader.ReadInt32 <> 0 Then Call ResourceError
     
     ' HeaderSize should be 32.
-    If mReader.ReadLong <> 32 Then Call ResourceError
+    If mReader.ReadInt32 <> 32 Then Call ResourceError
     
     ' ResourceType should be &H0000FFFF
-    If mReader.ReadLong <> &HFFFF& Then Call ResourceError
+    If mReader.ReadInt32 <> &HFFFF& Then Call ResourceError
     
     ' ResourceName should be &H0000FFFF
-    If mReader.ReadLong <> &HFFFF& Then Call ResourceError
+    If mReader.ReadInt32 <> &HFFFF& Then Call ResourceError
     
     ' We are pretty sure this is a valid .RES file, so
     ' move to the beginning of the next entry, which
@@ -289,12 +289,12 @@ Private Function GetOrdinalOrName() As Variant
     
     ' Get the first 2 bytes.
     Dim ch As Integer
-    ch = mReader.ReadInteger
+    ch = mReader.ReadInt16
     
     ' If the first 2 bytes equal &HFFFF then we have a number.
     If ch = -1 Then
         ' So the next 2 bytes represent a 16bit number.
-        GetOrdinalOrName = CLng(mReader.ReadInteger)
+        GetOrdinalOrName = CLng(mReader.ReadInt16)
     Else
         ' The first 2 bytes represent a character,
         ' we need to append characters until we hit a null.
@@ -312,7 +312,7 @@ Private Function GetOrdinalOrName() As Variant
             Call NameBuilder.AppendChar(ch)
             
             ' And get the next character.
-            ch = mReader.ReadInteger
+            ch = mReader.ReadInt16
         Loop
         
         ' Return the name.
@@ -332,8 +332,8 @@ End Sub
 Private Sub GetNextResourceHeader(ByRef Header As ResourceHeader)
     With Header
         DWordAlignStreamPosition
-        .DataSize = mReader.ReadLong
-        .HeaderSize = mReader.ReadLong
+        .DataSize = mReader.ReadInt32
+        .HeaderSize = mReader.ReadInt32
         
         ' We don't DWord align between these two because the
         ' resource compiler only aligns once both of them are written.
@@ -344,11 +344,11 @@ Private Sub GetNextResourceHeader(ByRef Header As ResourceHeader)
         ' name of the resource may have left us out of alignment.
         Call DWordAlignStreamPosition
         
-        .DataVersion = mReader.ReadLong
-        .MemoryFlags = mReader.ReadInteger
-        .LanguageID = mReader.ReadInteger
-        .Version = mReader.ReadLong
-        .Characteristics = mReader.ReadLong
+        .DataVersion = mReader.ReadInt32
+        .MemoryFlags = mReader.ReadInt16
+        .LanguageID = mReader.ReadInt16
+        .Version = mReader.ReadInt32
+        .Characteristics = mReader.ReadInt32
     End With
     
     ' The Stream should be positioned on the first byte
