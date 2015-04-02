@@ -263,11 +263,11 @@ Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
     ms.Position = 8
     
     ' Verify type of algorithm
-    If Reader.ReadLong <> MagicNumber Then _
+    If Reader.ReadInt32 <> MagicNumber Then _
         Throw Cor.NewCryptographicException("Invalid blob.")
     
     Dim ByteLen As Long
-    ByteLen = Reader.ReadLong \ 8
+    ByteLen = Reader.ReadInt32 \ 8
     
     Dim pBytes() As Byte
     Dim qBytes() As Byte
@@ -294,7 +294,7 @@ Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
     End If
     
     ' Read DSSSEED structure
-    mCounter = Reader.ReadLong
+    mCounter = Reader.ReadInt32
     mSeed = ReverseByteCopy(Reader.ReadBytes(20))
     
     Call Reader.CloseReader

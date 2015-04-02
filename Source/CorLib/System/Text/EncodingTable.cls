@@ -145,7 +145,7 @@ Private Sub LoadData()
     Set Reader = Cor.NewBinaryReader(ms)
     
     Dim NumEncodings As Long
-    NumEncodings = Reader.ReadLong
+    NumEncodings = Reader.ReadInt32
     ReDim mEncodingData(0 To NumEncodings - 1)
     
     Set mIndexByCodePage = New Hashtable
@@ -167,7 +167,7 @@ End Sub
 Private Sub FillData(ByVal Reader As BinaryReader, ByRef Data As DataItem)
     With Data
         .BodyName = Reader.ReadString
-        .CodePage = Reader.ReadLong
+        .CodePage = Reader.ReadInt32
         .EncodingName = Reader.ReadString
         .HeaderName = Reader.ReadString
         .IsBrowserDisplay = Reader.ReadBoolean
@@ -175,7 +175,7 @@ Private Sub FillData(ByVal Reader As BinaryReader, ByRef Data As DataItem)
         .IsMailNewsDisplay = Reader.ReadBoolean
         .IsMailNewsSave = Reader.ReadBoolean
         .WebName = Reader.ReadString
-        .WindowsCodePage = Reader.ReadLong
+        .WindowsCodePage = Reader.ReadInt32
     End With
 End Sub
 

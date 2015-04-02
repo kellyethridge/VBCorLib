@@ -13,6 +13,14 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
+Public Sub NewBinaryReader_WithNothingStream_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    Cor.NewBinaryReader Nothing
+    
+    AssertArgumentNullException Err, "Stream"
+End Sub
+
 Public Sub ReadByte_WhenCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(129))
@@ -54,22 +62,32 @@ Public Sub ReadBytes_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub ReadLong_WhenCalled_ReturnsExpected()
+Public Sub ReadInt32_WhenCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&HFF, &H0, &H80, &H80))
     
     Dim Actual As Long
-    Actual = Reader.ReadLong
+    Actual = Reader.ReadInt32
     
     Assert.That Actual, Iz.EqualTo(&H808000FF)
 End Sub
 
-Public Sub ReadInteger_WhenCalled_ReturnsExpected()
+Public Sub ReadInt32_WhenNotEnoughData_ThrowsEndOfStreamException()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(&H1, &H2))
+    
+    On Error Resume Next
+    Reader.ReadInt32
+    
+    AssertEndOfStreamException Err
+End Sub
+
+Public Sub ReadInt16_WhenCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&H98, &H3A))
     
     Dim Actual As Integer
-    Actual = Reader.ReadInteger
+    Actual = Reader.ReadInt16
     
     Assert.That Actual, Iz.EqualTo(15000)
 End Sub
@@ -138,7 +156,7 @@ Public Sub ReadXxx_WithMultipleCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&H44, &H0, &H0, &H0, &H8, &H68, &H65, &H6C, &H6C, &H6F, &HE2, &H80, &HB0, &HCD, &HCC, &HCC, &HCC, &HCC, &H1C, &H51, &H40))
     
-    Assert.That Reader.ReadLong, Iz.EqualTo(68)
+    Assert.That Reader.ReadInt32, Iz.EqualTo(68)
     Assert.That Reader.ReadString, Iz.EqualTo("hello" & ChrW$(&H2030))
     Assert.That Reader.ReadDouble, Iz.EqualTo(68.45)
 End Sub
@@ -171,6 +189,26 @@ Public Sub ReadChars_WhenCalled_ReturnsArrayOfChars()
     Actual = Reader.ReadChars(2)
     
     Assert.That Actual, Iz.EqualTo(NewIntegers(&H2030, &H65))
+End Sub
+
+Public Sub ReadChars_WhenMoreCharsRequestedThanAvailable_ReturnsAvailableChars()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(&HE2, &H80, &HB0, &H65))
+
+    Dim Actual() As Integer
+    Actual = Reader.ReadChars(3)
+    
+    Assert.That Actual, Iz.EqualTo(NewIntegers(&H2030, &H65))
+End Sub
+
+Public Sub ReadChars_WithNoCharsRemaining_ThrowsEndOfStreamException()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes)
+    
+    On Error Resume Next
+    Reader.ReadChars 1
+    
+    AssertEndOfStreamException Err
 End Sub
 
 Public Sub PeekChar_WhenCalled_ReturnsNextChar()
@@ -246,6 +284,29 @@ Public Sub Read_WithNullArray_ThrowsArgumentNullException()
     Reader.Read NullArray, 0, 1
     
     AssertArgumentNullException Err, "Buffer"
+End Sub
+
+Public Sub Read_WithMultiDimensionArray_ThrowsRankException()
+    Dim MultiDim(2, 2) As Byte
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(&HE2, &H80, &HB0))
+    
+    On Error Resume Next
+    Reader.Read MultiDim, 0, 1
+    
+    AssertRankException Err
+End Sub
+
+Public Sub Read_WithMissingCount_UsesWholeBuffer()
+    Dim Target(0 To 3) As Byte
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(1, 2, 3, 4, 5))
+    
+    Dim Actual As Long
+    Actual = Reader.Read(Target, 0)
+    
+    Assert.That Actual, Iz.EqualTo(4)
+    Assert.That Target, Iz.EqualTo(NewBytes(1, 2, 3, 4))
 End Sub
 
 Private Function MakeReader(ByRef Data() As Byte) As BinaryReader
