@@ -38,6 +38,10 @@ Public Function ArrayLength(ByRef Arr As Variant) As Long
     ArrayLength = UBound(Arr) - LBound(Arr) + 1
 End Function
 
+Public Function ByteArrayLength(ByRef Buffer() As Byte) As Long
+    ByteArrayLength = UBound(Buffer) - LBound(Buffer) + 1
+End Function
+
 ''
 ' Retrieves the pointer to an array's SafeArray structure.
 '

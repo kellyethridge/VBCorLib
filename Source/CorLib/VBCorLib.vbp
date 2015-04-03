@@ -333,6 +333,7 @@ Module=Require; System\Require.bas
 Module=Comparisons; System\Comparisons.bas
 Module=Casts; System\Casts.bas
 ResFile32="VBCorLib.RES"
+Module=ThrowHelper; System\ThrowHelper.bas
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"
