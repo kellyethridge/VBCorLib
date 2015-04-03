@@ -44,15 +44,12 @@ Public Sub ArrayNotNull(ByRef Arr As Variant, Optional ByVal Parameter As Param 
 End Sub
 
 Public Sub ArrayIsOneDimension(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr)
-    Dim ArrayPtr As Long
-    ArrayPtr = GetArrayPointer(Arr)
-     
-    VerifyArrayOneDimension ArrayPtr, Parameter
+    VerifyArrayOneDimension ArrayPointer(Arr), Parameter
 End Sub
 
 Public Function ValidOneDimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr, Optional ByVal Message As ArgumentNull = ArgumentNull.NullArray) As Long
     Dim ArrayPtr As Long
-    ArrayPtr = GetArrayPointer(Arr)
+    ArrayPtr = ArrayPointer(Arr)
     
     VerifyArrayNotNull ArrayPtr, Parameter, Message
     VerifyArrayOneDimension ArrayPtr, Parameter

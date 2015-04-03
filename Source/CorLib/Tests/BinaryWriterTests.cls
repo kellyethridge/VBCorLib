@@ -51,12 +51,35 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 0, 5, NewBytes(1, 2, 3, 4, 5)
             Test.Use 5, 5, NewBytes(6, 7, 8, 9, 10)
             
+        Case "WriteChars_WithIndexAndCount_WritesExpected"
+            Test.Use 0, 7, NewBytes(65, 66, 67, 68, 69, 70, 71)
+            Test.Use 0, 2, NewBytes(65, 66)
+            Test.Use 4, 3, NewBytes(69, 70, 71)
+            
     End Select
 End Sub
 
 Public Sub Setup()
     Set mOutStream = New MemoryStream
     Set mWriter = NewBinaryWriter(mOutStream)
+End Sub
+
+Public Sub NewBinaryWriter_WithNullStream_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    Cor.NewBinaryWriter Nothing
+    
+    AssertArgumentNullException Err, "Output"
+End Sub
+
+Public Sub NewBinaryWriter_WithNonWritableStream_ThrowsArgumentException()
+    Dim NonWritable As New FakeStream
+    NonWritable.CanWrite = False
+    
+    On Error Resume Next
+    Cor.NewBinaryWriter NonWritable
+    
+    AssertArgumentException Err
 End Sub
 
 Public Sub WriteValue_WithValues_WritesExpected(ByRef Value As Variant, ByVal Expected As Variant)
@@ -185,6 +208,15 @@ Public Sub WriteData_WithValue_WritesExpected()
     Assert.That mOutStream.ToArray, Iz.EqualTo(NewBytes(&H55, &H55, &H55, &H55, &H8B, &H3, &HE2, &H40))
 End Sub
 
+Public Sub WriteBytes_WithNullArray_ThrowsArgumentNullException()
+    Dim Buffer() As Byte
+    
+    On Error Resume Next
+    mWriter.WriteBytes Buffer
+    
+    AssertArgumentNullException Err, "Buffer"
+End Sub
+
 Public Sub WriteBytes_WithValue_WritesExpected()
     Dim Expected() As Byte
     Expected = NewBytes(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
@@ -223,10 +255,65 @@ End Sub
 
 Public Sub WriteBytes_WithIndexCountExtendingPassedUBound_ThrowsArgumentException()
     Dim Buffer(0 To 9) As Byte
-    Set mWriter = NewBinaryWriter(New EmptyStream)
     
     On Error Resume Next
     mWriter.WriteBytes Buffer, 0, 11
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub WriteChars_WithNullArray_ThrowsArgumentNullException()
+    Dim Chars() As Integer
+    
+    On Error Resume Next
+    mWriter.WriteChars Chars
+    
+    AssertArgumentNullException Err, "Chars"
+End Sub
+
+Public Sub WriteChars_WithValue_WritesExpected()
+    Dim Chars() As Integer
+    Chars = NewIntegers(Asc("a"), &H2030, Asc("c"))
+
+    mWriter.WriteChars Chars
+
+    Dim Expected() As Byte
+    Expected = NewBytes(&H61, &HE2, &H80, &HB0, &H63)
+    Assert.That mOutStream.ToArray, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub WriteChars_WithIndexAndCount_WritesExpected(ByVal Index As Long, ByVal Count As Long, ByVal Expected As Variant)
+    Dim Chars() As Integer
+    Chars = NewIntegers(65, 66, 67, 68, 69, 70, 71)
+    
+    mWriter.WriteChars Chars, Index, Count
+    
+    Assert.That mOutStream.ToArray, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub WriteChars_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Chars(5 To 10) As Integer
+    
+    On Error Resume Next
+    mWriter.WriteChars Chars, 4, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub WriteChars_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Chars(0) As Integer
+    
+    On Error Resume Next
+    mWriter.WriteChars Chars, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub WriteChars_WithIndexAndCountExtendingPassedUBount_ThrowsArgumentException()
+    Dim Chars(0 To 9) As Integer
+    
+    On Error Resume Next
+    mWriter.WriteChars Chars, 0, 11
     
     AssertArgumentException Err
 End Sub

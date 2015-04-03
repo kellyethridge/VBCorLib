@@ -6,13 +6,24 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "EmptyStream"
+Attribute VB_Name = "FakeStream"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 Option Explicit
 Implements Stream
+
+Public CanWrite As Boolean
+Public CanRead  As Boolean
+Public CanSeek As Boolean
+
+
+Private Sub Class_Initialize()
+    CanWrite = True
+    CanRead = True
+    CanSeek = True
+End Sub
 
 Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As VBCorLib.AsyncCallback, Optional ByVal State As Variant) As VBCorLib.IAsyncResult
 
@@ -23,11 +34,11 @@ Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal
 End Function
 
 Private Property Get Stream_CanRead() As Boolean
-    Stream_CanRead = True
+    Stream_CanRead = CanRead
 End Property
 
 Private Property Get Stream_CanSeek() As Boolean
-    Stream_CanSeek = True
+    Stream_CanSeek = CanSeek
 End Property
 
 Private Property Get Stream_CanTimeout() As Boolean
@@ -35,7 +46,7 @@ Private Property Get Stream_CanTimeout() As Boolean
 End Property
 
 Private Property Get Stream_CanWrite() As Boolean
-    Stream_CanWrite = True
+    Stream_CanWrite = CanWrite
 End Property
 
 Private Sub Stream_CloseStream()
