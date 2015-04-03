@@ -38,8 +38,8 @@ Public Function ArrayLength(ByRef Arr As Variant) As Long
     ArrayLength = UBound(Arr) - LBound(Arr) + 1
 End Function
 
-Public Function ByteArrayLength(ByRef Buffer() As Byte) As Long
-    ByteArrayLength = UBound(Buffer) - LBound(Buffer) + 1
+Public Function ArrayPointer(ByRef Arr As Variant) As Long
+    ArrayPointer = MemLong(vbaVarRefAry(Arr))
 End Function
 
 ''

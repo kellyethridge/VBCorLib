@@ -56,6 +56,7 @@ Private mIsOpen     As Boolean
 Private mBuffer()   As Byte
 Private mBufferSA   As SafeArray1d
 Private mBytes()    As Byte
+Private mOneChar(0) As Integer
 
 
 ''
@@ -169,17 +170,16 @@ End Sub
 ' @remarks The character is encoded and the byte array is written to the Stream.
 '
 Public Sub WriteChar(ByRef Value As Variant)
-    VerifyIsOpen
-        
-    Dim ch As String
     Select Case VarType(Value)
-        Case vbString:                  ch = Left$(Value, 1)
-        Case vbLong, vbInteger, vbByte: ch = ChrW$(Value)
+        Case vbString
+            mOneChar(0) = AscW(CStr(Value))
+        Case vbLong, vbInteger, vbByte
+            mOneChar(0) = CInt(Value)
         Case Else
             Throw Cor.NewArgumentException("Value must be a String or Integer value.", "Value")
     End Select
     
-    WriteValue mEncoding.GetBytes(ch)
+    WriteChars mOneChar
 End Sub
 
 Public Sub WriteBoolean(ByVal Value As Boolean)
@@ -239,18 +239,23 @@ Private Sub WriteString(ByRef Value As String)
 End Sub
 
 Public Sub WriteBytes(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    VerifyIsOpen
+    Dim Range As ListRange
     
-    With GetOptionalRange(Index, Count, LBound(Buffer), ByteArrayLength(Buffer))
-        If .Index < LBound(Buffer) Then _
-            ThrowHelper.CannotBeLessThanLBound
-        If .Count < 0 Then _
-            ThrowHelper.CannotBeNegative
-        If .Index + .Count - 1 > UBound(Buffer) Then _
-            ThrowHelper.PositionNotValidForCollection
-            
-        mOutStream.WriteBlock Buffer, .Index, .Count
-    End With
+    VerifyIsOpen
+    Require.ValidOneDimensionArray Buffer, Param.BufferParam
+    Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
+    ValidateArrayRange Buffer, Range
+    
+    mOutStream.WriteBlock Buffer, Range.Index, Range.Count
+End Sub
+
+Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    VerifyIsOpen
+    Require.ValidOneDimensionArray Chars, Param.Chars
+    
+    Dim Bytes() As Byte
+    Bytes = mEncoding.GetBytes(Chars, Index, Count)
+    mOutStream.WriteBlock Bytes, 0, ArrayLength(Bytes)
 End Sub
 
 ''
@@ -289,13 +294,11 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
-    If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
-    If Not Stream.CanWrite Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_StreamNotWritable))
+Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
+    Require.ObjectNotNothing Output, Param.Output
+    Require.That Output.CanWrite, Argument.StreamNotWritable
     
-    Set mOutStream = Stream
+    Set mOutStream = Output
     If Encoding Is Nothing Then
         Set mEncoding = Cor.NewUTF8Encoding(False, True)
     Else

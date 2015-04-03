@@ -152,6 +152,7 @@ Public Enum Param
     DstArray = 2017
     StreamParam = 2018
     BufferParam = 2019
+    Output = 2020
 End Enum
 
 Public Enum Rank
@@ -256,7 +257,9 @@ Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args(
 End Function
 
 Public Function GetParameter(ByVal ParameterId As Param) As String
-    GetParameter = LoadResString(ParameterId)
+    If ParameterId <> Param.None Then
+        GetParameter = LoadResString(ParameterId)
+    End If
 End Function
 
 Public Function GetMessage(ByVal MessageId As Long) As String
