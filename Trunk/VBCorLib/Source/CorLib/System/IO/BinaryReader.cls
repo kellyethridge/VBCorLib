@@ -110,7 +110,7 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
     Else
         Dim BufferPtr As Long: BufferPtr = Require.ValidOneDimensionArray(Buffer, Param.BufferParam, ArgumentNull.NullBuffer)
         Dim BufferIndex As Long: BufferIndex = GetOptionalLong(Index, LBound(Buffer))
-        Dim BufferCount As Long: BufferCount = GetOptionalLong(Count, UBound(Buffer) - LBound(Buffer) + 1)
+        Dim BufferCount As Long: BufferCount = GetOptionalLong(Count, ArrayLength(Buffer))
         
         Require.ThatArgument BufferIndex >= LBound(Buffer), Param.Index, ArgumentOutOfRange.ArrayLB
         Require.ThatArgument BufferCount >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
