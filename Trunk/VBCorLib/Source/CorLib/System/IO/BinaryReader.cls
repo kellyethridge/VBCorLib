@@ -504,12 +504,6 @@ Private Function ReadStringLength() As Long
 End Function
 
 Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
-'    Dim Result As Long
-'
-'    Result = VerifyArrayRange(SAPtr(Chars), Index, Count)
-'    If Result <> NO_ERROR Then _
-'        ThrowArrayRangeException Result, "Chars", Index, "Index", Count, "Count"
-    
     Dim ByteRead    As Long
     Dim BufferPos   As Long
     Dim NumRead     As Long
