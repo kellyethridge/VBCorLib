@@ -50,7 +50,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private mStream     As Stream
+Private mOutStream  As Stream
 Private mEncoding   As Encoding
 Private mIsOpen     As Boolean
 Private mBuffer()   As Byte
@@ -66,7 +66,7 @@ Private mBytes()    As Byte
 '
 Public Property Get BaseStream() As Stream
     Flush
-    Set BaseStream = mStream
+    Set BaseStream = mOutStream
 End Property
 
 ''
@@ -75,7 +75,7 @@ End Property
 Public Sub CloseWriter()
     If mIsOpen Then
         Flush
-        mStream.CloseStream
+        mOutStream.CloseStream
         mIsOpen = False
     End If
 End Sub
@@ -84,7 +84,7 @@ End Sub
 ' Tells the underlying stream to store its data to its repository.
 '
 Public Sub Flush()
-    mStream.Flush
+    mOutStream.Flush
 End Sub
 
 ''
@@ -95,7 +95,7 @@ End Sub
 ' @return The final position in the stream.
 '
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    mStream.SeekPosition Offset, Origin
+    mOutStream.SeekPosition Offset, Origin
 End Function
 
 ''
@@ -153,8 +153,7 @@ End Function
 ' bytes 15: sign (&h80 is negative)<br>
 '
 Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    If Not mIsOpen Then _
-        Throw Cor.NewObjectDisposedException("BinaryWriter", "Cannot write to a closed BinaryWriter.")
+    VerifyIsOpen
     
     If IsArray(Value) Then
         WriteArray Value, Index, Count
@@ -170,8 +169,7 @@ End Sub
 ' @remarks The character is encoded and the byte array is written to the Stream.
 '
 Public Sub WriteChar(ByRef Value As Variant)
-    If Not mIsOpen Then _
-        Throw Cor.NewObjectDisposedException("BinaryWriter", "Cannot write to a closed BinaryWriter.")
+    VerifyIsOpen
         
     Dim ch As String
     Select Case VarType(Value)
@@ -182,6 +180,77 @@ Public Sub WriteChar(ByRef Value As Variant)
     End Select
     
     WriteValue mEncoding.GetBytes(ch)
+End Sub
+
+Public Sub WriteBoolean(ByVal Value As Boolean)
+    VerifyIsOpen
+    
+    If Value Then
+        mOutStream.WriteByte 1
+    Else
+        mOutStream.WriteByte 0
+    End If
+End Sub
+
+Public Sub WriteByte(ByVal Value As Byte)
+    VerifyIsOpen
+    mOutStream.WriteByte Value
+End Sub
+
+Public Sub WriteInt32(ByVal Value As Long)
+    VerifyIsOpen
+    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, 4
+End Sub
+
+Public Sub WriteInt16(ByVal Value As Integer)
+    VerifyIsOpen
+    mOutStream.WriteBlock AsDByteArr(Value).Bytes, 0, 2
+End Sub
+
+Public Sub WriteSingle(ByVal Value As Single)
+    VerifyIsOpen
+    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, 4
+End Sub
+
+Public Sub WriteDouble(ByVal Value As Double)
+    VerifyIsOpen
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, 8
+End Sub
+
+Public Sub WriteDate(ByVal Value As Date)
+    VerifyIsOpen
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, 8
+End Sub
+
+Public Sub WriteCurrency(ByVal Value As Currency)
+    VerifyIsOpen
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, 8
+End Sub
+
+Public Sub WriteDecimal(ByRef Value As Variant)
+    VerifyIsOpen
+    mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, 16
+End Sub
+
+Private Sub WriteString(ByRef Value As String)
+    VerifyIsOpen
+    WriteStringLength mEncoding.GetByteCount(Value)
+    WriteValue mEncoding.GetBytes(Value)
+End Sub
+
+Public Sub WriteBytes(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    VerifyIsOpen
+    
+    With GetOptionalRange(Index, Count, LBound(Buffer), ByteArrayLength(Buffer))
+        If .Index < LBound(Buffer) Then _
+            ThrowHelper.CannotBeLessThanLBound
+        If .Count < 0 Then _
+            ThrowHelper.CannotBeNegative
+        If .Index + .Count - 1 > UBound(Buffer) Then _
+            ThrowHelper.PositionNotValidForCollection
+            
+        mOutStream.WriteBlock Buffer, .Index, .Count
+    End With
 End Sub
 
 ''
@@ -226,7 +295,7 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Not Stream.CanWrite Then _
         Throw Cor.NewArgumentException(Resources.GetString(Argument_StreamNotWritable))
     
-    Set mStream = Stream
+    Set mOutStream = Stream
     If Encoding Is Nothing Then
         Set mEncoding = Cor.NewUTF8Encoding(False, True)
     Else
@@ -239,6 +308,12 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub VerifyIsOpen()
+    If Not mIsOpen Then
+        Throw Cor.NewObjectDisposedException("BinaryWriter", "Cannot write to a closed BinaryWriter.")
+    End If
+End Sub
+
 Private Sub WriteStringLength(ByVal Value As Long)
     Do While Value > &H80
         WriteValue CByte((Value And &H7F) Or &H80)
@@ -251,16 +326,17 @@ Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef
     Dim num As Long
 
     Select Case VarType(Value)
-        Case vbBoolean:                     mStream.WriteByte IIf(Value, 1, 0)
-        Case vbByte:                        mStream.WriteByte Value
-        Case vbLong, vbSingle:              num = 4
-        Case vbInteger:                     num = 2
-        Case vbDouble, vbDate, vbCurrency:  num = 8
-        Case vbString
-            WriteStringLength mEncoding.GetByteCount(Value, Index, Count)
-            WriteValue mEncoding.GetBytes(Value, Index, Count)
+        Case vbBoolean:                     WriteBoolean CBool(Value)
+        Case vbByte:                        WriteByte CByte(Value)
+        Case vbLong:                        WriteInt32 CLng(Value)
+        Case vbSingle:                      WriteSingle CSng(Value)
+        Case vbInteger:                     WriteInt16 CInt(Value)
+        Case vbDouble:                      WriteDouble CDbl(Value)
+        Case vbDate:                        WriteDate CDate(Value)
+        Case vbCurrency:                    WriteCurrency CCur(Value)
+        Case vbString:                      WriteString CStr(Value)
         Case vbDecimal
-            mStream.WriteBlock BitConverter.GetBytes(Value), 0, 16
+            mOutStream.WriteBlock BitConverter.GetBytes(Value), 0, 16
         Case Else
             Throw Cor.NewArgumentException(Resources.GetString(Argument_NeedIntrinsicType), "Value")
     End Select
@@ -271,9 +347,10 @@ Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef
             mBufferSA.pvData = MemLong(mBufferSA.pvData)
         End If
         
-        mStream.WriteBlock mBuffer, 0, num
+        mOutStream.WriteBlock mBuffer, 0, num
     End If
 End Sub
+
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
     If cArray.IsNull(Value) Then _
@@ -287,9 +364,10 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
             Dim ElemCount As Long
             Dim Result As Long
             Result = GetOptionalArrayRange(SAPtr(mBytes), Index, ElemIndex, Count, ElemCount)
-            If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Array", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+            If Result <> NO_ERROR Then _
+                ThrowArrayRangeException Result, "Array", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
             
-            mStream.WriteBlock mBytes, ElemIndex, ElemCount
+            mOutStream.WriteBlock mBytes, ElemIndex, ElemCount
         Case vbIntegerArray
             WriteValue mEncoding.GetBytes(Value, Index, Count)
         Case Else
