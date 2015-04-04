@@ -155,7 +155,7 @@ End Function
 '
 Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
-    
+
     If IsArray(Value) Then
         WriteArray Value, Index, Count
     Else
@@ -182,6 +182,12 @@ Public Sub WriteChar(ByRef Value As Variant)
     WriteChars mOneChar
 End Sub
 
+''
+' Writes a boolean to the stream as a one-byte value and advances the stream position one byte.
+'
+' @param Value The boolean value to be written to the stream.
+' @remarks When writting boolean values to the stream, a 1 is written for True and 0 for false.
+'
 Public Sub WriteBoolean(ByVal Value As Boolean)
     VerifyIsOpen
     
@@ -192,69 +198,175 @@ Public Sub WriteBoolean(ByVal Value As Boolean)
     End If
 End Sub
 
+''
+' Writes a one-byte unsigned integer value to the stream and advances the stream position one byte.
+'
+' @param Value The one-byte unsigned integer to write.
+'
 Public Sub WriteByte(ByVal Value As Byte)
     VerifyIsOpen
     mOutStream.WriteByte Value
 End Sub
 
+''
+' Writes a four-byte integer to the stream and advances the stream position four bytes.
+'
+' @param Value The four-byte integer to write.
+' @remarks The four byte value is written in Little Endian format.
+'
 Public Sub WriteInt32(ByVal Value As Long)
     VerifyIsOpen
     mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, 4
 End Sub
 
+''
+' Writes a two-byte integer value to the stream and advances the stream position two bytes.
+'
+' @param Value The two-byte integer to write.
+' @remarks The two-byte value is written in Little Endian format.
+'
 Public Sub WriteInt16(ByVal Value As Integer)
     VerifyIsOpen
     mOutStream.WriteBlock AsDByteArr(Value).Bytes, 0, 2
 End Sub
 
+''
+' Writes a four-byte floating point value to the stream and advances the stream position by four bytes.
+'
+' @param Value The four-byte floating point value to write.
+' @remarks The four-byte value is written in Little Endian format.
+'
 Public Sub WriteSingle(ByVal Value As Single)
     VerifyIsOpen
     mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, 4
 End Sub
 
+''
+' Writes an eight-byte floating point value to the stream and advances the stream position by eight bytes.
+'
+' @param Value The eight-byte floating point value to write.
+' @remarks The eight-byte value is written in Little Endian format.
+'
 Public Sub WriteDouble(ByVal Value As Double)
     VerifyIsOpen
     mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, 8
 End Sub
 
+''
+' Writes a Date value to the stream and advances the stream position by eight bytes.
+'
+' @param Value The eight-byte VBA Date value to write.
+' @remarks The eight-byte value is written in the same manner as a Double.
+'
 Public Sub WriteDate(ByVal Value As Date)
     VerifyIsOpen
     mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, 8
 End Sub
 
+''
+' Writes a Currency value to the stream and advances the stream position by sixteen bytes.
+'
+' @param Value The currency value to write.
+' @remarks The binary representation of the value is written in Little Endian.
+'
 Public Sub WriteCurrency(ByVal Value As Currency)
     VerifyIsOpen
     mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, 8
 End Sub
 
+''
+' Writes a decimal value to the stream and andvances the stream position by sixteen bytes.
+'
+' @param Value The decimal value to write.
+' @remarks <p>The decimal datatype is converted to sixteen bytes with the same
+' layout as used in .NET. The layout is different than that of VB.<br><br>
+' VB Decimal layout<br>
+' bytes 0-1: Variant datatype information<br>
+' bytes 2: precision<br>
+' bytes 3: sign (&h80 is negative)<br>
+' bytes 4-7: the 32 highest bits in the 96bit value<br>
+' bytes 8-11: the 32 lowest bits in the 96bit value<br>
+' bytes 12-15: the 32 middle bits in the 96bit value<br>
+' <br>
+' .NET Decimal layout<br>
+' bytes 0-3: the 32 lowest bits in the 96bit value<br>
+' bytes 4-7: the 32 middle bits in the 96bit value<br>
+' bytes 8-11: the 32 highest bits in the 96bit value<br>
+' bytes 12-13: unused (zero)<br>
+' bytes 14: precision<br>
+' bytes 15: sign (&h80 is negative)<br>
+'
 Public Sub WriteDecimal(ByRef Value As Variant)
     VerifyIsOpen
     mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, 16
 End Sub
 
+''
+' Writes a length-prefixed string to the stream using the encoding in the BinaryWriter and advances the stream position
+' in accordance to the number of characters the encoding produces.
+'
+' @param Value The string to encode and write.
+' @remarks The number of bytes from an encoded string and the encoded bytes are written,
+' however, the length is not written as the individual bytes, like the other datatypes.
+' The length of the string is written as a series of 7bit values. Each byte
+' for the length is calculated by starting out with the actual value, then ANDing it with &h7F
+' to take the first 7 bits. The value is ORed with &h80 to signify there are more bytes to
+' follow for the length. Once that byte is written, the original value is shifted right
+' 7 bits and the process starts over until the value reaches less than &h80. The final byte
+' value is not ORed with &h80, it is written as is without the high bit set. When reading
+' the bytes back, the byte without the high bit set will signal the last byte in the value.</p><br>
+' <pre>
+'    Do While LengthRemaining > &H80
+'        WriteByte (LengthRemaining And &H7F) Or &H80
+'        LengthRemaining = (LengthRemaining And &HFFFFFF80) \ &H80
+'    Loop
+'    WriteByte LengthRemaining
+' </pre><br>
+' The characters of the string are written as the encoded bytes generated by the current Encoding.
+'
 Private Sub WriteString(ByRef Value As String)
     VerifyIsOpen
     WriteStringLength mEncoding.GetByteCount(Value)
-    WriteValue mEncoding.GetBytes(Value)
+    WriteBytes mEncoding.GetBytes(Value)
 End Sub
 
+''
+' Writes a section of a byte array to the stream and advances the stream position by the number of bytes written.
+'
+' @param Buffer The array of bytes to write.
+' @param Index The starting index within the buffer to begin writing.
+' @param Count The number of bytes to write.
+' @remarks If the index and count are not specified, the lowerbound and length of the array will be used.
+'
 Public Sub WriteBytes(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Dim Range As ListRange
-    
     VerifyIsOpen
     Require.ValidOneDimensionArray Buffer, Param.BufferParam
+    
+    Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
     ValidateArrayRange Buffer, Range
-    
     mOutStream.WriteBlock Buffer, Range.Index, Range.Count
 End Sub
 
+''
+' Writes a section of a character array using the encoding in the BinaryWriter and advances the stream position
+' in accordance to the number of characters the encoding produces.
+'
+' @param Chars The characters to encode and write.
+' @param Index The starting index within the characters to begin writing.
+' @param Count The number of characters to write.
+' @remarks If the index and count are not specified, the lowerbound and length of the array will be used.
+'
 Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
     Require.ValidOneDimensionArray Chars, Param.Chars
     
+    Dim Range As ListRange
+    Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))
+    ValidateArrayRange Chars, Range
+    
     Dim Bytes() As Byte
-    Bytes = mEncoding.GetBytes(Chars, Index, Count)
+    Bytes = mEncoding.GetBytes(Chars, Range.Index, Range.Count)
     mOutStream.WriteBlock Bytes, 0, ArrayLength(Bytes)
 End Sub
 
@@ -317,12 +429,15 @@ Private Sub VerifyIsOpen()
     End If
 End Sub
 
-Private Sub WriteStringLength(ByVal Value As Long)
-    Do While Value > &H80
-        WriteValue CByte((Value And &H7F) Or &H80)
-        Value = (Value And &HFFFFFF80) \ &H80
+Private Sub WriteStringLength(ByVal Length As Long)
+    Dim LengthRemaining As Long
+    LengthRemaining = Length
+    
+    Do While LengthRemaining > &H80
+        WriteByte (LengthRemaining And &H7F) Or &H80
+        LengthRemaining = (LengthRemaining And &HFFFFFF80) \ &H80
     Loop
-    WriteValue CByte(Value)
+    WriteByte LengthRemaining
 End Sub
 
 Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
@@ -372,7 +487,7 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
             
             mOutStream.WriteBlock mBytes, ElemIndex, ElemCount
         Case vbIntegerArray
-            WriteValue mEncoding.GetBytes(Value, Index, Count)
+            WriteBytes mEncoding.GetBytes(Value, Index, Count)
         Case Else
             Throw Cor.NewArgumentException(Resources.GetString(Argument_UnsupportedArray), "Value")
     End Select
