@@ -1,4 +1,4 @@
-Attribute VB_Name = "Validation"
+Attribute VB_Name = "Validate"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -25,7 +25,7 @@ Attribute VB_Name = "Validation"
 Option Explicit
 
 
-Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, _
+Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, _
                               Optional ByVal IndexParameter As Param = Param.Index, _
                               Optional ByVal CountParameter As Param = Param.Count)
     If Range.Index < LBound(Arr) Then
