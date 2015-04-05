@@ -486,7 +486,7 @@ Public Sub Beep(Optional ByVal Frequency As Long = 800, Optional ByVal Duration 
     If Duration < MinDuration Then _
         Throw Cor.NewArgumentOutOfRangeException("Duration", Message:=Resources.GetString(ArgumentOutOfRange_NeedPosNum))
     
-    If BeepAPI(Frequency, Duration) = BOOL_FALSE Then Throw Cor.NewSystemException(GetErrorMessage(Err.LastDllError))
+    If BeepAPI(Frequency, Duration) = BOOL_FALSE Then Throw Cor.NewSystemException(GetSystemMessage(Err.LastDllError))
 End Sub
 
 ''

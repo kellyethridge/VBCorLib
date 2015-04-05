@@ -26,7 +26,7 @@ Option Explicit
 
 Private Const ParamBase                 As Long = 2000
 
-Public Enum ResourceStringId
+Public Enum ErrorMessage
     Exception_WasThrown = 101
     ArrayTypeMismatch_Incompatible = 102
     ArrayTypeMismatch_Exception = 103
@@ -95,12 +95,12 @@ Public Enum ResourceStringId
     Argument_StreamNotReadable = 818
     Argument_StreamNotWritable = 819
     Argument_StreamNotSeekable = 820
-    Arg_LongerThanSrcArray = 821
-    Arg_LongerThanDestArray = 822
+    Argument_LongerThanSrcArray = 821
+    Argument_LongerThanDestArray = 822
     Argument_InvalidComparer = 823
-    Arg_MustBeVbVarType = 824
+    Argument_MustBeVbVarType = 824
     Argument_EmptyName = 825
-    Arg_LongerThanSrcString = 826
+    Argument_LongerThanSrcString = 826
     Argument_InvalidSeekOrigin = 827
     Argument_UnsupportedArray = 828
     Argument_NeedIntrinsicType = 829
@@ -128,6 +128,31 @@ Public Enum ResourceStringId
     InvalidOperation_Timeouts = 1107
     ObjectDisposed_StreamClosed = 1200
     Overflow_TimeSpan = 1300
+End Enum
+
+Public Enum ParameterName
+    Parameter_None = 0
+    Parameter_Index = 2000
+    Parameter_Count = 2001
+    Parameter_StartIndex = 2002
+    Parameter_Chars = 2003
+    Parameter_CharIndex = 2004
+    Parameter_CharCount = 2005
+    Parameter_ByteIndex = 2006
+    Parameter_Bytes = 2007
+    Parameter_ByteCount = 2008
+    Parameter_Value = 2009
+    Parameter_Arr = 2010
+    Parameter_List = 2011
+    Parameter_Year = 2012
+    Parameter_Month = 2013
+    Parameter_LCID = 2014
+    Parameter_Time = 2015
+    Parameter_Path = 2016
+    Parameter_DstArray = 2017
+    Parameter_Stream = 2018
+    Parameter_Buffer = 2019
+    Parameter_Output = 2020
 End Enum
 
 Public Enum Param
@@ -250,7 +275,7 @@ Public Enum ArgumentFormat
 End Enum
 
 
-Public Function GetString(ByVal ResourceId As ResourceStringId, ParamArray Args() As Variant) As String
+Public Function GetString(ByVal ResourceId As ErrorMessage, ParamArray Args() As Variant) As String
     Dim vArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
     GetString = cString.FormatArray(LoadResString(ResourceId), vArgs)
@@ -262,17 +287,23 @@ Public Function GetParameter(ByVal ParameterId As Param) As String
     End If
 End Function
 
-Public Function GetMessage(ByVal MessageId As Long) As String
-    GetMessage = LoadResString(MessageId)
+Public Function GetParameterName(ByVal Name As ParameterName)
+    If Name <> Parameter_None Then
+        GetParameterName = LoadResString(Name)
+    End If
 End Function
 
-Public Function GetMessageFormat(ByVal MessageId As Long, ParamArray Args() As Variant) As String
-    Dim vArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
-    GetMessageFormat = cString.FormatArray(LoadResString(MessageId), vArgs)
+Public Function GetErrorMessage(ByVal Message As ErrorMessage) As String
+    GetErrorMessage = LoadResString(Message)
 End Function
 
-Public Function ModuleEBPOffset(ByVal Offset As Long) As Long
+Public Function GetErrorMessageFormat(ByVal Message As ErrorMessage, ParamArray Args() As Variant) As String
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
+    GetErrorMessageFormat = cString.FormatArray(LoadResString(Message), SwappedArgs)
+End Function
+
+Private Function ModuleEBPOffset(ByVal Offset As Long) As Long
     On Error GoTo InIDE
     Debug.Assert 1 \ 0
     ModuleEBPOffset = Offset + 8

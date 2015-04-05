@@ -155,9 +155,9 @@ End Function
 ' @see IComparable
 ' @include "..\..\Includes\ArrayListBinarySearch.txt"
 Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    Contract.RequiresArgument Index >= 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
-    Contract.RequiresArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    Contract.Requires Index + Count <= mCount, Argument.InvalidOffLen
+    Require.Range Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    Require.That Index + Count <= mCount, Argument_InvalidOffLen
     
     If mCount = 0 Then
         BinarySearchEx = -1
@@ -312,7 +312,7 @@ Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Co
     Range = GetOptionalRange(Index, Count, 0, mCount)
     Contract.RequiresArgument Range.Index >= 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
     Contract.RequiresArgument Range.Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    Contract.Requires Range.Index + Range.Count <= mCount, Argument.InvalidOffLen
+    Contract.Requires Range.Index + Range.Count <= mCount, Argument_InvalidOffLen
         
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, Range.Index, Range.Count
@@ -342,7 +342,7 @@ End Function
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
     Contract.RequiresArgument Index >= 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
     Contract.RequiresArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    Contract.Requires Index + Count <= mCount, Argument.InvalidOffLen
+    Contract.Requires Index + Count <= mCount, Argument_InvalidOffLen
     
     Dim Ranged As New RangedArrayList
     Ranged.Init Me, Index, Count

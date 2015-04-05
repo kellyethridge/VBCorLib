@@ -114,7 +114,7 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
         
         Contract.Requires BufferIndex >= LBound(Buffer), Param.Index, ArgumentOutOfRange.ArrayLB
         Contract.Requires BufferCount >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-        Contract.Requires BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument.InvalidOffLen
+        Contract.Requires BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument_InvalidOffLen
         
         Select Case VarType(Buffer)
             Case vbByteArray
@@ -446,7 +446,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     Contract.RequiresNotNothing Stream, Param.StreamParam, ArgumentNull.NullStream
-    Contract.Requires Stream.CanRead, Argument.ReadableStreamRequired, Param.StreamParam
+    Contract.Requires Stream.CanRead, Argument_ReadableStreamRequired, Param.StreamParam
     
     Set mStream = Stream
     If Encoding Is Nothing Then

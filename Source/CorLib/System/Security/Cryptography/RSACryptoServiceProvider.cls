@@ -213,7 +213,7 @@ Public Function Decrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Ret = ReverseByteCopy(Rgb)
     
     If CryptDecrypt(mKey, 0, True, Flags, Ret(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     ReDim Preserve Ret(0 To Size - 1)
     Decrypt = Ret
@@ -257,7 +257,7 @@ Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Call Buffer.BlockCopy(Rgb, 0, Ret, 0, Size)
     
     If CryptEncrypt(mKey, 0, True, Flags, Ret(0), Size, mKeySize \ 8) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     ' This is to remain compatible with .NET's big-endian form.
     Encrypt = ReverseByteCopy(Ret)
@@ -290,13 +290,13 @@ Public Function ExportCspBlob(ByVal IncludePrivateParameters As Boolean) As Byte
     
     Dim Size As Long
     If CryptExportKey(mKey, 0, BlobType, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     Dim Blob() As Byte
     ReDim Blob(0 To Size - 1)
     
     If CryptExportKey(mKey, 0, BlobType, 0, Blob(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     ExportCspBlob = Blob
 End Function
@@ -337,7 +337,7 @@ Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     Call DeleteKey
     
     If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), cArray.GetLength(KeyBlob), 0, CRYPT_EXPORTABLE, mKey) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
 End Sub
@@ -394,13 +394,13 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByVal Str As String) As Byte()
 
     Dim Size As Long
     If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
 
     Dim Signature() As Byte
     ReDim Signature(0 To Size - 1)
     
     If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     Call CryptDestroyHash(Hash)
     
@@ -569,7 +569,7 @@ Private Sub GenerateKey()
         ' Something went wrong. If it's something other than
         ' not finding the key, then it's bad, so fail.
         If Err.LastDllError <> NTE_NO_KEY Then _
-            Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+            Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
             
         ' We didn't find an existing key, so continue and create a new one.
     End If
@@ -588,7 +588,7 @@ Private Sub GenerateKey()
     
     ' Let'er rip! This can take a bit with large key sizes.
     If CryptGenKey(mProvider, mKeyNumber, Flags, mKey) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
 End Sub
 
 Private Sub DeleteKey()
@@ -618,10 +618,10 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     
     Dim Hash As Long
     If CryptCreateHash(mProvider, HashAlg, 0, 0, Hash) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
 
     If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = 0 Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
 
     SetHash = Hash
     Exit Function

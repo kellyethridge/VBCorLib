@@ -179,7 +179,7 @@ Public Property Get MachineName() As String
     Dim Ret As String
     Ret = String$(Size, 0)
     If API.GetComputerName(Ret, Size) = BOOL_FALSE Then _
-        Throw Cor.NewInvalidOperationException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewInvalidOperationException(GetSystemMessage(Err.LastDllError))
     
     MachineName = Left$(Ret, Size)
 End Property
@@ -620,7 +620,7 @@ Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal Value As Strin
     Select Case Target
         Case EnvironmentVariableTarget.Process
             If API.SetEnvironmentVariable(Variable, Value) = BOOL_FALSE Then _
-                Throw Cor.NewArgumentException(GetErrorMessage(Err.LastDllError), "Value")
+                Throw Cor.NewArgumentException(GetSystemMessage(Err.LastDllError), "Value")
                 
         Case EnvironmentVariableTarget.Machine, EnvironmentVariableTarget.User
             Call VerifyNTMachine

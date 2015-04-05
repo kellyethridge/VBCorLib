@@ -232,7 +232,7 @@ Private Sub VerifyLoaded()
     
     Dim Key As Long
     If CryptGetUserKey(prov, mKeyNumber, Key) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     Dim Permissions As Long
     Permissions = CryptoAPI.GetKeyParamLong(Key, KP_PERMISSIONS)

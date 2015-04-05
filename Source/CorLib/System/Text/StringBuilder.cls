@@ -279,7 +279,7 @@ Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByV
     If Count < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If SourceIndex + Count > mLength Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Arg_LongerThanSrcString))
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_LongerThanSrcString))
     If DestinationIndex + Count - 1 > UBound(Destination) Then _
         Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_OffsetOut))
     

@@ -534,7 +534,7 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
     For i = 0 To Len(Path) - 1
         Select Case mBuffer.Data(i)
             Case &H22, &H3C, &H3E, &H7C, Is < 32
-                Throw Cor.NewArgumentException(GetMessage(Argument.InvalidPathChars), GetParameter(Param.PathParam))
+                Throw Cor.NewArgumentException(GetErrorMessage(Argument_InvalidCharsInPath), GetParameter(Param.PathParam))
             Case vbForwardSlashChar
                 If FixSlashes Then
                     mBuffer.Data(i) = vbBackslashChar
@@ -598,20 +598,20 @@ End Function
 Private Function GetUNCPathRoot(ByRef Path As String) As String
     mBuffer.SA.pvData = StrPtr(Path)
     
-    Dim Pos As Long
-    Pos = 2 ' skip the first 2 slashes.
+    Dim pos As Long
+    pos = 2 ' skip the first 2 slashes.
     
     ' Skip backslashes after the first two
     ' until we get a character or the end.
     ' We don't need to check for a valid index
     ' because we'll hit the null terminator.
-    Do While mBuffer.Data(Pos) = vbBackslashChar
-        Pos = Pos + 1
+    Do While mBuffer.Data(pos) = vbBackslashChar
+        pos = pos + 1
     Loop
     
     Dim SlashCount As Long
     Dim SlashIndex As Long
-    SlashIndex = Pos
+    SlashIndex = pos
     Do While (SlashCount < 2) And (mBuffer.Data(SlashIndex) <> 0)
         If mBuffer.Data(SlashIndex) = vbBackslashChar Then
             SlashCount = SlashCount + 1
@@ -622,11 +622,11 @@ Private Function GetUNCPathRoot(ByRef Path As String) As String
     
     If SlashCount = 2 Then SlashIndex = SlashIndex - 1 ' we don't want to include the 2nd slash.
     
-    GetUNCPathRoot = "\\" & Mid$(Path, Pos + 1, SlashIndex - Pos)
+    GetUNCPathRoot = "\\" & Mid$(Path, pos + 1, SlashIndex - pos)
 End Function
 
 Private Sub VerifyUNCPathFormat(ByRef Path As String)
-    Dim Pos             As Long
+    Dim pos             As Long
     Dim foundServer     As Boolean
     Dim foundShare      As Boolean
     Dim foundSeparator  As Boolean
@@ -634,8 +634,8 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
     Dim ch As Integer
 
     mBuffer.SA.pvData = StrPtr(Path)
-    Pos = 2
-    ch = mBuffer.Data(Pos)
+    pos = 2
+    ch = mBuffer.Data(pos)
     Do While ch <> 0
         Select Case ch
             Case vbBackslashChar, vbForwardSlashChar
@@ -648,8 +648,8 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
                     Exit Do
                 End If
         End Select
-        Pos = Pos + 1
-        ch = mBuffer.Data(Pos)
+        pos = pos + 1
+        ch = mBuffer.Data(pos)
     Loop
 
     If (Not foundServer) Or (Not foundShare) Then _

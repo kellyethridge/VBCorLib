@@ -268,7 +268,7 @@ End Function
 '
 Public Function GetDirectoryRoot(ByVal Path As String) As String
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), GetParameter(Param.PathParam))
+        Throw Cor.NewArgumentException(GetErrorMessage(Argument_EmptyPath), GetParameter(Param.PathParam))
     
     If Not modStaticClasses.Path.IsPathRooted(Path) Then
         Path = modStaticClasses.Path.GetFullPath(Path)
@@ -342,7 +342,7 @@ End Function
 '
 Public Function GetParent(ByVal Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), GetParameter(Param.PathParam))
+        Throw Cor.NewArgumentException(GetErrorMessage(Argument_EmptyPath), GetParameter(Param.PathParam))
 
     modStaticClasses.Path.VerifyPath Path
     Path = modStaticClasses.Path.GetFullPath(Path)
@@ -364,9 +364,9 @@ End Function
 '
 Public Sub Move(ByVal SourceDirectory As String, ByVal DestinationDirectory As String)
     If Len(SourceDirectory) = 0 Then _
-        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), "SourceDirectory")
+        Throw Cor.NewArgumentException(GetErrorMessage(Argument_EmptyPath), "SourceDirectory")
     If Len(DestinationDirectory) = 0 Then _
-        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), "DestinationDirectory")
+        Throw Cor.NewArgumentException(GetErrorMessage(Argument_EmptyPath), "DestinationDirectory")
     
     SourceDirectory = Path.InternalGetFullRootedPath(SourceDirectory)
     DestinationDirectory = Path.InternalGetFullRootedPath(DestinationDirectory)
@@ -395,7 +395,7 @@ End Sub
 '
 Public Sub SetCurrentDirectory(ByVal Path As String)
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(GetMessage(Argument.EmptyPath), GetParameter(Param.PathParam))
+        Throw Cor.NewArgumentException(GetErrorMessage(Argument_EmptyPath), GetParameter(Param.PathParam))
     
     modStaticClasses.Path.VerifyPath Path
     If Not Exists(Path) Then _

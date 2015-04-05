@@ -25,20 +25,20 @@ Attribute VB_Name = "modIOError"
 '
 Option Explicit
 
-Public Sub IOError(ByVal E As Long, Optional ByVal src As String)
-    Dim ex As IOException
+Public Sub IOError(ByVal e As Long, Optional ByVal src As String)
+    Dim Ex As IOException
     
-    Select Case E
+    Select Case e
         Case ERROR_PATH_NOT_FOUND
-            Set ex = Cor.NewDirectoryNotFoundException("The directory '" & src & "' could not be found.")
+            Set Ex = Cor.NewDirectoryNotFoundException("The directory '" & src & "' could not be found.")
         Case ERROR_FILE_NOT_FOUND
-            Set ex = Cor.NewFileNotFoundException(src)
+            Set Ex = Cor.NewFileNotFoundException(src)
         Case ERROR_ACCESS_DENIED
-            Set ex = Cor.NewInvalidOperationException("Permission to the specified file is denied.")
+            Set Ex = Cor.NewInvalidOperationException("Permission to the specified file is denied.")
         Case Else
-            Set ex = Cor.NewIOException(GetErrorMessage(E))
+            Set Ex = Cor.NewIOException(GetSystemMessage(e))
     End Select
-    ex.HResult = E
-    ex.Source = src
-    Throw ex
+    Ex.HResult = e
+    Ex.Source = src
+    Throw Ex
 End Sub

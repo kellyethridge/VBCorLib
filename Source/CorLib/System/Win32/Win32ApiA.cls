@@ -107,7 +107,7 @@ Private Function IWin32API_GetEnvironmentStrings() As String
     lpStrings = GetEnvironmentStringsA
     
     If lpStrings = vbNullPtr Then _
-        Throw Cor.NewInvalidOperationException(GetErrorMessage(Err.LastDllError))
+        Throw Cor.NewInvalidOperationException(GetSystemMessage(Err.LastDllError))
     
     Dim i As Long
     i = lpStrings
