@@ -108,13 +108,13 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
     If IsMissing(Buffer) Then
         Read = ReadOneChar
     Else
-        Dim BufferPtr As Long: BufferPtr = Require.ValidOneDimensionArray(Buffer, Param.BufferParam, ArgumentNull.NullBuffer)
+        Dim BufferPtr As Long: BufferPtr = Contract.RequiresValidOneDimensionArray(Buffer, Param.BufferParam, ArgumentNull.NullBuffer)
         Dim BufferIndex As Long: BufferIndex = GetOptionalLong(Index, LBound(Buffer))
         Dim BufferCount As Long: BufferCount = GetOptionalLong(Count, ArrayLength(Buffer))
         
-        Require.ThatArgument BufferIndex >= LBound(Buffer), Param.Index, ArgumentOutOfRange.ArrayLB
-        Require.ThatArgument BufferCount >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-        Require.That BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument.InvalidOffLen
+        Contract.Requires BufferIndex >= LBound(Buffer), Param.Index, ArgumentOutOfRange.ArrayLB
+        Contract.Requires BufferCount >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
+        Contract.Requires BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument.InvalidOffLen
         
         Select Case VarType(Buffer)
             Case vbByteArray
@@ -202,26 +202,26 @@ End Function
 ' empty array is returned, not a null array.
 '
 Public Function ReadBytes(ByVal Count As Long) As Byte()
-    Require.ThatArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
+    Contract.RequiresArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
     VerifyIsOpen
     
-    Dim Ret() As Byte
+    Dim Bytes() As Byte
     If Count > 0 Then
-        ReDim Ret(0 To Count - 1)
+        ReDim Bytes(0 To Count - 1)
         
-        Dim BytesRead As Long
-        BytesRead = mStream.ReadBlock(Ret, 0, Count)
+        Dim NumberOfBytesRead As Long
+        NumberOfBytesRead = mStream.ReadBlock(Bytes, 0, Count)
         
-        If BytesRead = 0 Then Exit Function
+        If NumberOfBytesRead = 0 Then Exit Function
         
-        If BytesRead < Count Then
-            ReDim Preserve Ret(0 To BytesRead - 1)
+        If NumberOfBytesRead < Count Then
+            ReDim Preserve Bytes(0 To NumberOfBytesRead - 1)
         End If
     Else
-        Ret = Cor.NewBytes()
+        Bytes = Cor.NewBytes()
     End If
     
-    ReadBytes = Ret
+    ReadBytes = Bytes
 End Function
 
 ''
@@ -234,26 +234,26 @@ End Function
 ' could be decoded, then an empty array is returned, not a null array.
 '
 Public Function ReadChars(ByVal Count As Long) As Integer()
-    Require.ThatArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
+    Contract.RequiresArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
     VerifyIsOpen
     
-    Dim Result() As Integer
+    Dim Chars() As Integer
     If Count > 0 Then
-        ReDim Result(0 To Count - 1)
+        ReDim Chars(0 To Count - 1)
         
-        Dim CharsRead As Long
-        CharsRead = ReadCharBytes(Result, 0, Count)
-        If CharsRead = 0 Then _
+        Dim NumberOfCharsRead As Long
+        NumberOfCharsRead = ReadCharBytes(Chars, 0, Count)
+        If NumberOfCharsRead = 0 Then _
             Throw New EndOfStreamException
         
-        If CharsRead < Count Then
-            ReDim Preserve Result(0 To CharsRead - 1)
+        If NumberOfCharsRead < Count Then
+            ReDim Preserve Chars(0 To NumberOfCharsRead - 1)
         End If
     Else
-        Result = Cor.NewIntegers()
+        Chars = Cor.NewIntegers()
     End If
     
-    ReadChars = Result
+    ReadChars = Chars
 End Function
 
 ''
@@ -398,10 +398,10 @@ Public Function ReadString() As String
         Dim EncodedBytes() As Byte
         ReDim EncodedBytes(0 To EncodedStringLength - 1)
         
-        Dim BytesRead As Long
-        BytesRead = mStream.ReadBlock(EncodedBytes, 0, EncodedStringLength)
+        Dim NumberOfBytesRead As Long
+        NumberOfBytesRead = mStream.ReadBlock(EncodedBytes, 0, EncodedStringLength)
         
-        If BytesRead < EncodedStringLength Then _
+        If NumberOfBytesRead < EncodedStringLength Then _
             Throw New EndOfStreamException
             
         ReadString = mEncoding.GetString(EncodedBytes)
@@ -445,8 +445,8 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
-    Require.ObjectNotNothing Stream, Param.StreamParam, ArgumentNull.NullStream
-    Require.That Stream.CanRead, Argument.ReadableStreamRequired, Param.StreamParam
+    Contract.RequiresNotNothing Stream, Param.StreamParam, ArgumentNull.NullStream
+    Contract.Requires Stream.CanRead, Argument.ReadableStreamRequired, Param.StreamParam
     
     Set mStream = Stream
     If Encoding Is Nothing Then
@@ -470,62 +470,66 @@ End Sub
 Private Sub FillBuffer(ByVal Count As Long)
     VerifyIsOpen
     
-    ' optimize for reading a single byte
-    Dim ByteRead As Long
+    ' Optimize for reading a single byte
     If Count = 1 Then
-        ByteRead = mStream.ReadByte
-        If ByteRead < 0 Then _
+        Dim SingleByte As Long
+        SingleByte = mStream.ReadByte
+        If SingleByte < 0 Then _
             Throw New EndOfStreamException
         
-        mBuffer(0) = ByteRead
-        Exit Sub
+        mBuffer(0) = SingleByte
+    Else
+        If mStream.ReadBlock(mBuffer, 0, Count) < Count Then Throw New EndOfStreamException
     End If
-    
-    If mStream.ReadBlock(mBuffer, 0, Count) < Count Then _
-        Throw New EndOfStreamException
 End Sub
 
 Private Function ReadStringLength() As Long
-    Dim Result      As Long
-    Dim ByteRead    As Long
-    Dim ShiftCount  As Long
+    Dim StringLength    As Long
+    Dim SingleByte      As Long
+    Dim ShiftCount      As Long
     
-    ByteRead = mStream.ReadByte
-    Do While ByteRead >= &H80
-        Result = Result + Helper.ShiftLeft(ByteRead And &H7F, ShiftCount)
-        ByteRead = mStream.ReadByte
+    SingleByte = mStream.ReadByte
+    
+    Do While SingleByte >= &H80
+        StringLength = StringLength + Helper.ShiftLeft(SingleByte And &H7F, ShiftCount)
+        SingleByte = mStream.ReadByte
         ShiftCount = ShiftCount + 7
     Loop
-    If ByteRead > 0 Then
-        ReadStringLength = Result + Helper.ShiftLeft(ByteRead, ShiftCount)
+    
+    If SingleByte > 0 Then
+        ReadStringLength = StringLength + Helper.ShiftLeft(SingleByte, ShiftCount)
     Else
-        ReadStringLength = Result
+        ReadStringLength = StringLength
     End If
 End Function
 
 Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim ByteRead    As Long
-    Dim BufferPos   As Long
-    Dim NumRead     As Long
-    Dim CharsRead   As Long
+    Dim SingleByte          As Long
+    Dim BufferPos           As Long
+    Dim TotalCharsRead      As Long
+    Dim NumberOfCharsRead   As Long
     
-    Do While NumRead < Count
-        ByteRead = mStream.ReadByte
-        If ByteRead < 0 Then Exit Do
-        mBuffer(BufferPos) = ByteRead
+    Do While TotalCharsRead < Count
+        SingleByte = mStream.ReadByte
+        
+        If SingleByte < 0 Then
+            Exit Do
+        End If
+        
+        mBuffer(BufferPos) = SingleByte
         BufferPos = BufferPos + 1
         
-        CharsRead = mEncoding.GetCharsEx(mBuffer, 0, BufferPos, Chars, Index)
+        NumberOfCharsRead = mEncoding.GetCharsEx(mBuffer, 0, BufferPos, Chars, Index)
         
-        If CharsRead > 0 Then
-            NumRead = NumRead + CharsRead
-            Index = Index + CharsRead
+        If NumberOfCharsRead > 0 Then
+            TotalCharsRead = TotalCharsRead + NumberOfCharsRead
+            Index = Index + NumberOfCharsRead
             BufferPos = 0
-            CharsRead = 0
+            NumberOfCharsRead = 0
         End If
     Loop
     
-    ReadCharBytes = NumRead
+    ReadCharBytes = TotalCharsRead
 End Function
 
 Private Function ReadOneChar() As Long

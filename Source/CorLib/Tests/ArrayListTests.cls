@@ -296,7 +296,7 @@ Public Sub InsertRange_WhenArray_InsertsItems()
     Dim List As New ArrayList
     List.AddRange NewLongs(1, 2, 3, 4)
     
-    List.InsertRange 2, NewStrings("Item1", "Item2")
+    List.Insertrange 2, NewStrings("Item1", "Item2")
     
     Assert.That List, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
 End Sub
@@ -308,7 +308,7 @@ Public Sub InsertRange_WithCollection_InsertsItems()
     col.Add "Item1"
     col.Add "Item2"
     
-    List.InsertRange 2, col
+    List.Insertrange 2, col
     
     Assert.That List, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
 End Sub
@@ -317,7 +317,7 @@ Public Sub InsertRange_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim List As New ArrayList
     On Error GoTo errTrap
     
-    List.InsertRange -1, NewLongs(1, 2)
+    List.Insertrange -1, NewLongs(1, 2)
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
@@ -328,7 +328,7 @@ Public Sub InsertRange_WithIndexMoreThanCount_ThrowsArgumentOutOfRangeException(
     List.Add 1
     On Error GoTo errTrap
     
-    List.InsertRange 2, NewLongs(1, 2)
+    List.Insertrange 2, NewLongs(1, 2)
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
@@ -772,16 +772,6 @@ Public Sub BinarySearchEx_WithNegativeIndex_Throws()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub BinarySearchEx_WithNegativeCount_ThrowsArgumentOutOfRangeException()
-    Dim List As ArrayList
-    Set List = MakeOrderedList
-    
-    On Error Resume Next
-    List.BinarySearchEx 0, -1, 4
-    
-    AssertArgumentOutOfRangeException Err, "Count"
-End Sub
-
 Public Sub BinarySearchEx_WithInvalidRange_ThrowsThrowsArgumentException()
     Dim List As ArrayList
     Set List = MakeOrderedList
@@ -790,6 +780,24 @@ Public Sub BinarySearchEx_WithInvalidRange_ThrowsThrowsArgumentException()
     List.BinarySearchEx 1, 6, 4
     
     AssertArgumentException Err
+End Sub
+
+Public Sub BinarySearchEx_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    
+    On Error Resume Next
+    List.BinarySearchEx -1, 0, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub BinarySearchEx_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim List As New ArrayList
+    
+    On Error Resume Next
+    List.BinarySearchEx 0, -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub Sort_WhenCalled_OrdersItems()
@@ -809,19 +817,6 @@ Public Sub Sort_WithSortRange_OrdersItemsInRange()
     
     Assert.That List, Iz.EqualTo(NewLongs(1, 2, 1, 2, 3, 4, 5, 3, 4, 5))
 End Sub
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 Private Function MakeFilledList() As ArrayList
     Set MakeFilledList = New ArrayList
