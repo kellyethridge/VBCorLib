@@ -108,13 +108,17 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
     If IsMissing(Buffer) Then
         Read = ReadOneChar
     Else
-        Dim BufferPtr As Long: BufferPtr = Contract.RequiresValidOneDimensionArray(Buffer, Param.BufferParam, ArgumentNull.NullBuffer)
-        Dim BufferIndex As Long: BufferIndex = GetOptionalLong(Index, LBound(Buffer))
-        Dim BufferCount As Long: BufferCount = GetOptionalLong(Count, ArrayLength(Buffer))
+        Dim BufferPtr As Long
+        Dim BufferIndex As Long
+        Dim BufferCount As Long
         
-        Contract.Requires BufferIndex >= LBound(Buffer), Param.Index, ArgumentOutOfRange.ArrayLB
-        Contract.Requires BufferCount >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-        Contract.Requires BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument_InvalidOffLen
+        BufferPtr = ValidArrayPointer(Buffer, Parameter_Buffer, ArgumentNull_Buffer)
+        BufferIndex = GetOptionalLong(Index, LBound(Buffer))
+        BufferCount = GetOptionalLong(Count, ArrayLength(Buffer))
+        
+        Require.Range BufferIndex >= LBound(Buffer), Parameter_Index, ArgumentOutOfRange_ArrayLB
+        Require.Range BufferCount >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+        Require.That BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument_InvalidOffLen
         
         Select Case VarType(Buffer)
             Case vbByteArray
@@ -202,8 +206,8 @@ End Function
 ' empty array is returned, not a null array.
 '
 Public Function ReadBytes(ByVal Count As Long) As Byte()
-    Contract.RequiresArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
     VerifyIsOpen
+    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
     
     Dim Bytes() As Byte
     If Count > 0 Then
@@ -234,8 +238,8 @@ End Function
 ' could be decoded, then an empty array is returned, not a null array.
 '
 Public Function ReadChars(ByVal Count As Long) As Integer()
-    Contract.RequiresArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
     VerifyIsOpen
+    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
     
     Dim Chars() As Integer
     If Count > 0 Then
@@ -445,8 +449,8 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
-    Contract.RequiresNotNothing Stream, Param.StreamParam, ArgumentNull.NullStream
-    Contract.Requires Stream.CanRead, Argument_ReadableStreamRequired, Param.StreamParam
+    Require.NotNothing Stream, Parameter_Stream, ArgumentNull_Stream
+    Require.That Stream.CanRead, Argument_ReadableStreamRequired, Parameter_Stream
     
     Set mStream = Stream
     If Encoding Is Nothing Then

@@ -190,7 +190,7 @@ End Property
 ' If the capacity is set to zero, then it is set to the default capacity (16).
 ' @include "..\..\Includes\ArrayListCapacity.txt"
 Public Property Let Capacity(ByVal Value As Long)
-    Contract.RequiresArgument Value >= mCount, Param.Value, ArgumentOutOfRange.SmallCapacity
+    Require.Range Value > mCount, Parameter_Value, ArgumentOutOfRange_SmallCapacity
     
     If Value = 0 Then
         Value = DEF_CAPACITY
@@ -258,7 +258,7 @@ End Function
 ' the items from that index on.
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
-    Contract.RequiresValidOneDimensionArray Arr
+    Require.NotNullOneDimensionArray Arr
     cArray.CopyEx mItems, 0, Arr, GetOptionalLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
 
@@ -272,7 +272,7 @@ End Sub
 ' @remarks The destination array must be large enough to hold the number of elements being copied.
 '
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    Contract.RequiresValidOneDimensionArray Arr
+    Require.NotNullOneDimensionArray Arr
     cArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
 End Sub
 
@@ -310,10 +310,10 @@ End Function
 Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, 0, mCount)
-    Contract.RequiresArgument Range.Index >= 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
-    Contract.RequiresArgument Range.Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    Contract.Requires Range.Index + Range.Count <= mCount, Argument_InvalidOffLen
-        
+    Require.Range Range.Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range Range.Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    Require.That Range.Index + Range.Count <= mCount, Argument_InvalidOffLen
+    
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, Range.Index, Range.Count
     Set GetEnumerator = Ret
@@ -340,9 +340,9 @@ End Function
 ' is thrown the next time the ranged view is accessed.
 '
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    Contract.RequiresArgument Index >= 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
-    Contract.RequiresArgument Count >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    Contract.Requires Index + Count <= mCount, Argument_InvalidOffLen
+    Require.Range Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    Require.That Index + Count <= mCount, Argument_InvalidOffLen
     
     Dim Ranged As New RangedArrayList
     Ranged.Init Me, Index, Count
@@ -367,11 +367,11 @@ Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Var
     ElemIndex = GetOptionalLong(StartIndex, 0)
     ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
     
-    Contract.RequiresArgument ElemIndex >= 0, Param.StartIndex, ArgumentOutOfRange.NeedNonNegNum
-    Contract.RequiresArgument ElemIndex < mCount, Param.StartIndex, LargerThanCollection
-    Contract.RequiresArgument ElemCount >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    Contract.RequiresArgument ElemIndex + ElemCount - 1 < mCount, Param.Count, ArgumentOutOfRange.LargerThanCollection
-    
+    Require.Range ElemIndex >= 0, Parameter_StartIndex, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range ElemIndex < mCount, Parameter_StartIndex, ArgumentOutOfRange_LargerThanCollection
+    Require.Range ElemCount >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range ElemIndex + ElemCount - 1 < mCount, Parameter_Count, ArgumentOutOfRange_LargerThanCollection
+        
     If mCount = 0 Then
         IndexOf = -1
         Exit Function
@@ -393,7 +393,7 @@ End Function
 ' are moved out by one space. If capacity is reached, the list will be reallocated.
 '
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
-    Contract.RequiresArgument Index >= 0 And Index <= mCount, Param.Index, ArgumentOutOfRange.ArrayListInsert
+    Require.Range Index >= 0 And Index <= mCount, Parameter_Index, ArgumentOutOfRange_ArrayListInsert
     
     EnsureCapacity mCount + 1
     InsertSpace Index, 1
@@ -416,7 +416,7 @@ End Sub
 ' or an <b>Array</b>.
 '
 Public Sub InsertRange(ByVal Index As Long, ByRef c As Variant)
-    Contract.RequiresArgument Index >= 0 And Index <= mCount, Param.Index, ArgumentOutOfRange.ArrayListInsert
+    Require.Range Index >= 0 And Index <= mCount, Parameter_Index, ArgumentOutOfRange_ArrayListInsert
     
     WriteRange Index, c, True
     mVersion = mVersion + 1
@@ -456,7 +456,7 @@ End Property
 '
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
-    Contract.RequiresArgument Index >= 0 And Index < mCount, Param.Index, ArgumentOutOfRange.Index
+    Require.Range Index >= 0 And Index < mCount, Parameter_Index, ArgumentOutOfRange_Index
     
     VariantCopy Item, mItems(Index)
 End Property
@@ -472,7 +472,7 @@ End Property
 ' The index is zero-based.
 '
 Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
-    Contract.RequiresArgument Index >= 0 And Index < mCount, Param.Index, ArgumentOutOfRange.Index
+    Require.Range Index >= 0 And Index < mCount, Parameter_Index, ArgumentOutOfRange_Index
     
     mItems(Index) = Value
     mVersion = mVersion + 1
@@ -489,7 +489,7 @@ End Property
 ' The index is zero-based.
 '
 Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
-    Contract.RequiresArgument Index >= 0 And Index < mCount, Param.Index, ArgumentOutOfRange.Index
+    Require.Range Index >= 0 And Index < mCount, Parameter_Index, ArgumentOutOfRange_Index
     
     Set mItems(Index) = Value
     mVersion = mVersion + 1
@@ -513,10 +513,10 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
     ElemIndex = GetOptionalLong(StartIndex, mCount - 1)
     ElemCount = GetOptionalLong(Count, ElemIndex + 1)
     
-    Contract.RequiresArgument ElemIndex >= 0, Param.StartIndex, ArgumentOutOfRange.NeedNonNegNum
-    Contract.RequiresArgument ElemIndex < mCount, Param.StartIndex, ArgumentOutOfRange.LargerThanCollection
-    Contract.RequiresArgument ElemCount >= 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    Contract.RequiresArgument ElemIndex - ElemCount + 1 >= 0, Param.Count, ArgumentOutOfRange.LargerThanCollection
+    Require.Range ElemIndex >= 0, Parameter_StartIndex, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range ElemIndex < mCount, Parameter_StartIndex, ArgumentOutOfRange_LargerThanCollection
+    Require.Range ElemCount >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range ElemIndex - ElemCount + 1 >= 0, Parameter_Count, ArgumentOutOfRange_LargerThanCollection
     
     If mCount = 0 Then
         LastIndexOf = -1
@@ -574,7 +574,7 @@ End Sub
 ' relative to the other items.
 '
 Public Sub RemoveAt(ByVal Index As Long)
-    Contract.RequiresArgument Index >= 0 And Index < mCount, Param.Index, ArgumentOutOfRange.Index
+    Require.Range Index >= 0 And Index < mCount, Parameter_Index, ArgumentOutOfRange_Index
     
     mItems(Index) = Empty
     RemoveSpace Index, 1
