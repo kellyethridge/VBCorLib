@@ -340,7 +340,7 @@ End Sub
 '
 Public Sub WriteBytes(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
-    Contract.RequiresValidOneDimensionArray Buffer, Param.BufferParam
+    Require.NotNullOneDimensionArray Buffer, Parameter_Buffer
     
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
@@ -359,7 +359,7 @@ End Sub
 '
 Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
-    Contract.RequiresValidOneDimensionArray Chars, Param.Chars
+    Require.NotNullOneDimensionArray Chars, Parameter_Chars
     
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))
@@ -407,8 +407,8 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
-    Contract.RequiresNotNothing Output, Param.Output
-    Contract.Requires Output.CanWrite, Argument_StreamNotWritable
+    Require.NotNothing Output, Parameter_Output
+    Require.That Output.CanWrite, Argument_StreamNotWritable
     
     Set mOutStream = Output
     If Encoding Is Nothing Then

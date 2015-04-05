@@ -106,45 +106,6 @@ Public Sub CheckArrayIndex(ByRef ArrayToCheck As Variant, ByVal Index As Long, O
     CheckRange Index > UBound(ArrayToCheck), IndexParameter, ArgumentOutOfRange.UpperBound
 End Sub
 
-Public Sub Requires(ByVal Condition As Boolean, ByVal Message As Argument, Optional ByVal Parameter As Param = Param.None)
-    If Not Condition Then
-        Throw Cor.NewArgumentException(Resources.GetString(Message), Resources.GetParameter(Parameter))
-    End If
-End Sub
-
-Public Sub RequiresNotNothing(ByVal Object As Object, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentNull = ArgumentNull.NullGeneric)
-    If Object Is Nothing Then
-        Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetErrorMessage(Message))
-    End If
-End Sub
-
-Public Sub RequiresArgument(ByVal Condition As Boolean, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentOutOfRange = ArgumentOutOfRange.Exception)
-    If Not Condition Then
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetParameter(Parameter), Message:=Resources.GetErrorMessage(Message))
-    End If
-End Sub
-
-Public Sub RequiresNotNull(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr, Optional ByVal Message As ArgumentNull = ArgumentNull.NullArray)
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Arr)
-    
-    VerifyArrayNotNull ArrayPtr, Parameter, Message
-End Sub
-
-Public Sub RequiresArrayIsOneDimension(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr)
-    VerifyArrayOneDimension ArrayPointer(Arr), Parameter
-End Sub
-
-Public Function RequiresValidOneDimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As Param = Param.Arr, Optional ByVal Message As ArgumentNull = ArgumentNull.NullArray) As Long
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Arr)
-    
-    VerifyArrayNotNull ArrayPtr, Parameter, Message
-    VerifyArrayOneDimension ArrayPtr, Parameter
-    
-    RequiresValidOneDimensionArray = ArrayPtr
-End Function
-
 Private Sub VerifyArrayNotNull(ByVal ArrayPtr As Long, ByVal Parameter As Param, ByVal Message As ArgumentNull)
     If ArrayPtr = vbNullPtr Then
         Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetErrorMessage(Message))

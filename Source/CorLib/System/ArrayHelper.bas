@@ -33,13 +33,30 @@ Private mHasSortItems   As Boolean
 Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
+Public Function NewListRange(ByVal Index As Long, ByVal Count As Long) As ListRange
+    NewListRange.Index = Index
+    NewListRange.Count = Count
+End Function
 
 Public Function ArrayLength(ByRef Arr As Variant) As Long
     ArrayLength = UBound(Arr) - LBound(Arr) + 1
 End Function
 
 Public Function ArrayPointer(ByRef Arr As Variant) As Long
+    If Not IsArray(Arr) Then _
+        Throw Cor.NewArgumentException(GetErrorMessage(Argument_ArrayRequired))
+    
     ArrayPointer = MemLong(vbaVarRefAry(Arr))
+End Function
+
+Public Function ValidArrayPointer(ByRef Arr As Variant, Optional ByVal Parameter As ParameterName = Parameter_Arr, Optional ByVal NullMessage As ErrorMessage = ArgumentNull_Array) As Long
+    Dim ArrayPtr As Long
+    
+    ArrayPtr = ArrayPointer(Arr)
+    Require.NotNullPtr ArrayPtr, Parameter, NullMessage
+    Require.OneDimensionArrayPtr ArrayPtr, Parameter
+    
+    ValidArrayPointer = ArrayPtr
 End Function
 
 ''

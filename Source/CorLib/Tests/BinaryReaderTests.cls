@@ -309,6 +309,39 @@ Public Sub Read_WithMissingCount_UsesWholeBuffer()
     Assert.That Target, Iz.EqualTo(NewBytes(1, 2, 3, 4))
 End Sub
 
+Public Sub Read_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Target(1 To 3) As Byte
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(1, 2, 3))
+    
+    On Error Resume Next
+    Reader.Read Target, 0, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub Read_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Target(1 To 3) As Byte
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(1, 2, 3))
+    
+    On Error Resume Next
+    Reader.Read Target, 1, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Read_WithIndexAndCountNotValidPosition_ThrowsArgumentException()
+    Dim Target(1 To 3) As Byte
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(1, 2, 3))
+    
+    On Error Resume Next
+    Reader.Read Target, 1, 4
+    
+    AssertArgumentException Err
+End Sub
+
 Private Function MakeReader(ByRef Data() As Byte) As BinaryReader
     Dim Source As New MemoryStream
     Source.WriteBlock Data, 0, UBound(Data) + 1
