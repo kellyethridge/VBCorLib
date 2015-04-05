@@ -408,7 +408,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
     Contract.RequiresNotNothing Output, Param.Output
-    Contract.Requires Output.CanWrite, Argument.StreamNotWritable
+    Contract.Requires Output.CanWrite, Argument_StreamNotWritable
     
     Set mOutStream = Output
     If Encoding Is Nothing Then

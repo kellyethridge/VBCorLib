@@ -243,7 +243,7 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub CryptoError()
-    Throw Cor.NewCryptographicException(GetErrorMessage(Err.LastDllError))
+    Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
 End Sub
 
 ''

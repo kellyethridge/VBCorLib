@@ -135,7 +135,7 @@ End Property
 '
 Public Property Set CreationTime(ByVal Value As Variant)
     If Not TypeOf Value Is cDateTime Then _
-        Throw Cor.NewArgumentException(GetMessage(Argument.DateRequired), "CreationTime")
+        Throw Cor.NewArgumentException(GetErrorMessage(Argument_DateRequired), "CreationTime")
     
     Directory.SetCreationTime mPath, Value
     MarkDirty
@@ -377,8 +377,8 @@ End Property
 '
 ' @return A DirectoryInfo object of the root.
 '
-Public Property Get Root() As DirectoryInfo
-    Set Root = Cor.NewDirectoryInfo(Path.GetPathRoot(mPath))
+Public Property Get root() As DirectoryInfo
+    Set root = Cor.NewDirectoryInfo(Path.GetPathRoot(mPath))
 End Property
 
 ''

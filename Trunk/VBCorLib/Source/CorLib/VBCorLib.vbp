@@ -334,6 +334,7 @@ Module=Casts; System\Casts.bas
 Module=ThrowHelper; System\ThrowHelper.bas
 Module=Validate; System\Validation.bas
 ResFile32="VBCorLib.RES"
+Module=Require; System\Diagnostics\Contracts\Require.bas
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"

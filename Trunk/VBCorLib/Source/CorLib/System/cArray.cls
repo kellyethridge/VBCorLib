@@ -660,9 +660,9 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     If Length < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
     If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Arg_LongerThanSrcArray))
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_LongerThanSrcArray))
     If Length + DestinationIndex - LBound(DestinationArray) > DestinationLength Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Arg_LongerThanDestArray))
+        Throw Cor.NewArgumentException(Resources.GetString(Argument_LongerThanDestArray))
     If SourceIndex < LBound(SourceArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("SourceIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayLB))
     If DestinationIndex < LBound(DestinationArray) Then _
@@ -739,7 +739,7 @@ Public Function CreateInstance(ByVal ElementType As vbVarType, Optional ByVal Le
     Select Case ElementType
         Case vbByte, vbInteger, vbLong, vbDouble, vbSingle, vbBoolean, vbCurrency, vbDate, vbString, vbObject, vbVariant
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Arg_MustBeVbVarType), "ElementType")
+            Throw Cor.NewArgumentException(Resources.GetString(Argument_MustBeVbVarType), "ElementType")
     End Select
     
     If Length1 < 0 Then _

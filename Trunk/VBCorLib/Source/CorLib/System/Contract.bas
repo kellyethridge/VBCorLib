@@ -48,7 +48,7 @@ Public Sub CheckNotInRange(ByVal FailingCondition As Boolean, ByVal Parameter As
     CheckInRange Not FailingCondition, Parameter, Message
 End Sub
 
-Public Sub CheckNotNull(ByVal ObjectToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ResourceStringId = ArgumentNull_Generic)
+Public Sub CheckNotNull(ByVal ObjectToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ErrorMessage = ArgumentNull_Generic)
     If ObjectToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
     End If
@@ -65,7 +65,7 @@ Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As Arg
     End If
 End Sub
 
-Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ResourceStringId = ArgumentNull_Generic)
+Public Sub CheckNull(ByVal ValueToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ErrorMessage = ArgumentNull_Generic)
     If ValueToCheck Is Nothing Then
         Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
     End If
@@ -77,7 +77,7 @@ Public Sub CheckRange(ByVal FailingCondition As Boolean, ByVal Parameter As Para
     End If
 End Sub
 
-Public Sub CheckEmpty(ByRef StringToCheck As String, ByVal Parameter As Param, ByVal Message As ResourceStringId)
+Public Sub CheckEmpty(ByRef StringToCheck As String, ByVal Parameter As Param, ByVal Message As ErrorMessage)
     If LenB(StringToCheck) = 0 Then
         Throw Cor.NewArgumentException(Resources.GetString(Message), Resources.GetString(Parameter))
     End If
@@ -114,13 +114,13 @@ End Sub
 
 Public Sub RequiresNotNothing(ByVal Object As Object, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentNull = ArgumentNull.NullGeneric)
     If Object Is Nothing Then
-        Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetMessage(Message))
+        Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetErrorMessage(Message))
     End If
 End Sub
 
 Public Sub RequiresArgument(ByVal Condition As Boolean, Optional ByVal Parameter As Param = Param.None, Optional ByVal Message As ArgumentOutOfRange = ArgumentOutOfRange.Exception)
     If Not Condition Then
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetParameter(Parameter), Message:=Resources.GetMessage(Message))
+        Throw Cor.NewArgumentOutOfRangeException(Resources.GetParameter(Parameter), Message:=Resources.GetErrorMessage(Message))
     End If
 End Sub
 
@@ -147,13 +147,13 @@ End Function
 
 Private Sub VerifyArrayNotNull(ByVal ArrayPtr As Long, ByVal Parameter As Param, ByVal Message As ArgumentNull)
     If ArrayPtr = vbNullPtr Then
-        Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetMessage(Message))
+        Throw Cor.NewArgumentNullException(Resources.GetParameter(Parameter), Resources.GetErrorMessage(Message))
     End If
 End Sub
 
 Private Sub VerifyArrayOneDimension(ByVal ArrayPtr As Long, ByVal Parameter As Param)
     If SafeArrayGetDim(ArrayPtr) > 1 Then
-        Throw Cor.NewArgumentException(Resources.GetMessage(Argument.MultiDimensionNotSupported), Resources.GetParameter(Parameter))
+        Throw Cor.NewArgumentException(Resources.GetErrorMessage(Rank_MultiDimNotSupported), Resources.GetParameter(Parameter))
     End If
 End Sub
 

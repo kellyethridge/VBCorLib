@@ -25,13 +25,13 @@ Attribute VB_Name = "ThrowHelper"
 Option Explicit
 
 Public Sub CannotBeLessThanLBound(Optional ByVal Parameter As Param = Param.Index)
-    Throw Cor.NewArgumentOutOfRangeException(GetParameter(Parameter), Message:=GetMessage(ArgumentOutOfRange.LowerBound))
+    Throw Cor.NewArgumentOutOfRangeException(GetParameter(Parameter), Message:=GetErrorMessage(ArgumentOutOfRange.LowerBound))
 End Sub
 
 Public Sub CannotBeNegative(Optional ByVal Parameter As Param = Param.Count)
-    Throw Cor.NewArgumentOutOfRangeException(GetParameter(Parameter), Message:=GetMessage(ArgumentOutOfRange.NeedNonNegNum))
+    Throw Cor.NewArgumentOutOfRangeException(GetParameter(Parameter), Message:=GetErrorMessage(ArgumentOutOfRange.NeedNonNegNum))
 End Sub
 
 Public Sub PositionNotValidForCollection()
-    Throw Cor.NewArgumentException(GetMessage(Argument.InvalidOffLen))
+    Throw Cor.NewArgumentException(GetErrorMessage(Argument_InvalidOffLen))
 End Sub

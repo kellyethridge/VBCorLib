@@ -98,15 +98,15 @@ End Sub
 ' @param MessageID The error code to retrieve the message for.
 ' @return A system message representing the code, or "Unknown Error." if the code was not found.
 '
-Public Function GetErrorMessage(ByVal MessageID As Long) As String
+Public Function GetSystemMessage(ByVal MessageId As Long) As String
     Dim Buf As String
     Dim Size As Long
     
     Buf = String$(1024, vbNullChar)
-    Size = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, ByVal 0&, MessageID, 0, Buf, Len(Buf), ByVal 0&)
+    Size = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, ByVal 0&, MessageId, 0, Buf, Len(Buf), ByVal 0&)
     If Size > 0 Then
-        GetErrorMessage = Left$(Buf, Size - 2)
+        GetSystemMessage = Left$(Buf, Size - 2)
     Else
-        GetErrorMessage = "Unknown Error."
+        GetSystemMessage = "Unknown Error."
     End If
 End Function
