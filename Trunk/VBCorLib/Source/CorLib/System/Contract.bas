@@ -23,36 +23,7 @@ Attribute VB_Name = "Contract"
 '
 Option Explicit
 
-Public Sub Check(ByVal SuccessfulCondition As Boolean, ByVal Message As Argument, Optional ByVal Parameter As Param = Param.None)
-    If Not SuccessfulCondition Then
-        Dim ParameterName As String
-        If Parameter <> Param.None Then
-            ParameterName = Resources.GetParameter(Parameter)
-        End If
-        
-        Throw Cor.NewArgumentException(Resources.GetString(Message), ParameterName)
-    End If
-End Sub
 
-Public Sub CheckNot(ByVal FailingCondition As Boolean, ByVal Message As Argument, Optional ByVal Parameter As Param = Param.None)
-    Check Not FailingCondition, Message, Parameter
-End Sub
-
-Public Sub CheckInRange(ByVal SuccessfulCondition As Boolean, ByVal Parameter As Param, ByVal Message As ArgumentOutOfRange)
-    If Not SuccessfulCondition Then
-        Throw Cor.NewArgumentOutOfRangeException(Resources.GetString(Parameter), Message:=Resources.GetString(Message))
-    End If
-End Sub
-
-Public Sub CheckNotInRange(ByVal FailingCondition As Boolean, ByVal Parameter As Param, ByVal Message As ArgumentOutOfRange)
-    CheckInRange Not FailingCondition, Parameter, Message
-End Sub
-
-Public Sub CheckNotNull(ByVal ObjectToCheck As Object, ByVal Parameter As Param, Optional ByVal Message As ErrorMessage = ArgumentNull_Generic)
-    If ObjectToCheck Is Nothing Then
-        Throw Cor.NewArgumentNullException(Resources.GetString(Parameter), Resources.GetString(Message))
-    End If
-End Sub
 
 Public Sub CheckArgument(ByVal FailingCondition As Boolean, ByVal Message As Argument, Optional ByVal Parameter As Param = Param.None)
     If FailingCondition Then
