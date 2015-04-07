@@ -187,7 +187,7 @@ End Property
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    CheckArrayRange mChars, Range.Index, Range.Count, ArrayParameter:=Param.Chars
+    Require.ArrayRange mChars, Range, Parameter_Index, Parameter_Count, Parameter_Chars
     
     GetByteCount = Range.Count
 End Function
@@ -207,7 +207,7 @@ End Function
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    CheckArrayRange mChars, Range.Index, Range.Count, ArrayParameter:=Param.Chars
+    Require.ArrayRange mChars, Range, Parameter_Index, Parameter_Count, Parameter_Chars
     
     Dim Result() As Byte
     If Range.Count > 0 Then
@@ -238,9 +238,14 @@ End Function
 ' @see Encoding
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
+    Dim Range As ListRange
+    Range.Index = CharIndex
+    Range.Count = CharCount
+    
     AttachChars Chars, mChars, mCharsSA
-    CheckArrayRange mChars, CharIndex, CharCount, Param.CharIndex, Param.CharCount, Param.Chars
-    CheckArrayIndex Bytes, ByteIndex, Param.ByteIndex
+    Require.ArrayRange mChars, Range, Parameter_CharIndex, Parameter_CharCount, Parameter_Chars
+    Require.Range ByteIndex >= LBound(Bytes) And ByteIndex <= UBound(Bytes), Parameter_ByteIndex, ArgumentOutOfRange_ArrayBounds
+    
     CheckBuffer Bytes, ByteIndex, CharCount
     
     GetBytesEx = InternalGetBytes(mChars, CharIndex, CharCount, Bytes, ByteIndex)
@@ -258,9 +263,9 @@ End Function
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    CheckArray Bytes
+    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(Index, Count, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1)
-    CheckArrayRange Bytes, Range.Index, Range.Count
+    Require.ArrayRange Bytes, Range, Parameter_Index, Parameter_Count, Parameter_Bytes
     
     GetCharCount = Range.Count
 End Function
@@ -277,9 +282,9 @@ End Function
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
     Dim Range As ListRange
     
-    CheckArray Bytes
+    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Param.ByteIndex, Param.ByteCount)
-    CheckArrayRange Bytes, Range.Index, Range.Count, Param.ByteIndex, Param.ByteCount
+    Require.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount, Parameter_Bytes
     
     Dim Chars() As Integer
     If Range.Count > 0 Then
@@ -307,10 +312,10 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    CheckArray Bytes
-    CheckArrayRange Bytes, ByteIndex, ByteCount, Param.ByteIndex, Param.ByteCount
-    CheckArray Chars, Param.Chars
-    CheckArrayIndex Chars, CharIndex, Param.CharIndex
+    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
+    Require.ArrayRange Bytes, NewListRange(ByteIndex, ByteCount), Parameter_ByteIndex, Parameter_ByteCount, Parameter_Bytes
+    Require.NotNullOneDimensionArray Chars, Parameter_Chars
+    Require.Range CharIndex >= LBound(Chars) And CharIndex <= UBound(Chars), Parameter_CharIndex, ArgumentOutOfRange_ArrayBounds
     CheckBuffer Chars, CharIndex, ByteCount, Param.Chars
     
     GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
@@ -324,7 +329,8 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
-    CheckRange ByteCount < 0, Param.ByteCount, ArgumentOutOfRange.NeedNonNegNum
+    Require.Range ByteCount >= 0, Parameter_ByteCount, ArgumentOutOfRange_NeedNonNegNum
+    
     GetMaxCharCount = ByteCount
 End Function
 
@@ -336,7 +342,8 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
-    CheckRange CharCount < 0, Param.CharCount, ArgumentOutOfRange.NeedNonNegNum
+    Require.Range CharCount >= 0, Parameter_CharCount, ArgumentOutOfRange_NeedNonNegNum
+    
     GetMaxByteCount = CharCount
 End Function
 
@@ -399,9 +406,9 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
     Dim Range As ListRange
     
-    CheckArray Bytes
+    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Param.ByteIndex, Param.ByteCount)
-    CheckArrayRange Bytes, Range.Index, Range.Count, Param.ByteIndex, Param.ByteCount
+    Require.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount, Parameter_Bytes
     
     GetString = SysAllocStringLen(0, Range.Count)
     AttachChars GetString, mChars, mCharsSA

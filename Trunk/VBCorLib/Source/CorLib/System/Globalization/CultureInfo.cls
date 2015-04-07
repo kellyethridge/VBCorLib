@@ -440,7 +440,7 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
         mProps.UseUserOverride = False
     End If
     
-    CheckRange ID < 0, Param.LCID, ArgumentOutOfRange.NeedNonNegNum
+    Require.Range ID >= 0, Parameter_LCID, ArgumentOutOfRange_NeedNonNegNum
     Load ID
 End Sub
 

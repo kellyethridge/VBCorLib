@@ -127,9 +127,9 @@ End Function
 
 Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Long, Value As Variant, Optional ByVal Comparer As IComparer) As Long
     VerifyVersion
-    CheckRange Index < 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
-    CheckRange Count < 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    CheckArgument Index + Count > mCount, Argument_InvalidOffLen
+    Require.Range Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
+    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    Require.That Index + Count <= mCount, Argument_InvalidOffLen
     
     Dim ItemIndex As Long
     ItemIndex = mList.BinarySearchEx(mIndex + Index, Count, Value, Comparer)

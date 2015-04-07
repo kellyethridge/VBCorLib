@@ -40,10 +40,10 @@ Public Sub Range(ByVal Assertion As Boolean, Optional ByVal Parameter As Paramet
     End If
 End Sub
 
-Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, Optional ByVal IndexParameter As ParameterName = Parameter_Index, Optional ByVal CountParameter As ParameterName = Parameter_Count)
+Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, Optional ByVal IndexParameter As ParameterName = Parameter_Index, Optional ByVal CountParameter As ParameterName = Parameter_Count, Optional ByVal ArrayParameter As ParameterName = Parameter_Arr)
     Require.Range Range.Index >= LBound(Arr), IndexParameter, ArgumentOutOfRange_ArrayLB
     Require.Range Range.Count >= 0, CountParameter, ArgumentOutOfRange_NeedNonNegNum
-    Require.Range Range.Index + Range.Count - 1 <= UBound(Arr), Message:=Argument_InvalidOffLen
+    Require.Range Range.Index + Range.Count - 1 <= UBound(Arr), ArrayParameter, Argument_InvalidOffLen
 End Sub
 
 Public Sub NotNothing(ByVal Object As Object, Optional ByVal Parameter As ParameterName = Parameter_None, Optional ByVal Message As ErrorMessage = ArgumentNull_Exception)
