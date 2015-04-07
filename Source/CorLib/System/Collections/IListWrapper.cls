@@ -150,9 +150,9 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
     Dim LowIndex    As Long
     Dim HighIndex   As Long
     
-    CheckRange Index < 0, Param.Index, ArgumentOutOfRange.NeedNonNegNum
-    CheckRange Count < 0, Param.Count, ArgumentOutOfRange.NeedNonNegNum
-    CheckArgument Index + Count > mList.Count, Argument_InvalidOffLen
+    Require.Range Index >= 0, Parameter_Index, ArgumentOutOfRange.NeedNonNegNum
+    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange.NeedNonNegNum
+    Require.That Index + Count <= mList.Count, Argument_InvalidOffLen
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default

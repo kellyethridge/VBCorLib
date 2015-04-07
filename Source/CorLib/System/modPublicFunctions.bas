@@ -284,6 +284,12 @@ Public Function ReverseByteCopy(ByRef Bytes() As Byte) As Byte()
     ReverseByteCopy = Ret
 End Function
 
+'Public Function NewListRange(ByVal Index As Long, ByVal Count As Long) As ListRange
+'    NewListRange.Index = Index
+'    NewListRange.Count = Count
+'End Function
+
+
 
 ''
 ' Initializes an array for quick powers of 2 lookup.

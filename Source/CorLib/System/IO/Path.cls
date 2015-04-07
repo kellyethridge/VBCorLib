@@ -271,7 +271,7 @@ End Function
 '
 Public Function GetDirectoryName(ByVal Path As String) As String
     Path = cString.Trim(Path)
-    CheckArgument Len(Path) = 0, InvalidPathFormat, PathParam
+    Require.That Len(Path) >= 0, Argument_EmptyPath, Parameter_Path
     
     FixupPath Path
     
@@ -366,21 +366,21 @@ End Function
 '
 Public Function GetFullPath(ByVal Path As String) As String
     Path = cString.Trim(Path)
-    CheckArgument Len(Path) = 0, InvalidPathFormat, PathParam
+    Require.That Len(Path) > 0, Argument_EmptyPath, Parameter_Path
     
     FixupPath Path
     
-    Dim Ptr As Long
-    Ptr = StrPtr(Path)
+    Dim ptr As Long
+    ptr = StrPtr(Path)
     
     ' quickly check the first two charcters for possible UNC path.
     ' convert first two characters into a long.
-    If MemLong(Ptr) = vbBackSlashBackSlash Then
+    If MemLong(ptr) = vbBackSlashBackSlash Then
         VerifyUNCPathFormat Path
     End If
     
     ' convert first two characters into two integers.
-    With MemDWord(Ptr)
+    With MemDWord(ptr)
         ' check first character being ':'
         If .LoWord = vbColonChar Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
@@ -435,7 +435,7 @@ End Function
 ' derived from what information is in <i>Path</i>.
 '
 Public Function GetPathRoot(ByVal Path As String) As String
-    CheckArgument Len(Path) = 0, InvalidPathFormat, PathParam
+    Require.That Len(Path) > 0, Argument_EmptyPath, Parameter_Path
     
     FixupPath Path
     

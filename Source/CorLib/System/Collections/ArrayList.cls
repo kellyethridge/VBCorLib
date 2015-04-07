@@ -190,7 +190,7 @@ End Property
 ' If the capacity is set to zero, then it is set to the default capacity (16).
 ' @include "..\..\Includes\ArrayListCapacity.txt"
 Public Property Let Capacity(ByVal Value As Long)
-    Require.Range Value > mCount, Parameter_Value, ArgumentOutOfRange_SmallCapacity
+    Require.Range Value >= mCount, Parameter_Value, ArgumentOutOfRange_SmallCapacity
     
     If Value = 0 Then
         Value = DEF_CAPACITY
