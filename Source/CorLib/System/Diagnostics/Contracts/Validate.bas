@@ -20,14 +20,12 @@ Attribute VB_Name = "Validate"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: Validation
+' Module: Validate
 '
 Option Explicit
 
 
-Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, _
-                              Optional ByVal IndexParameter As Param = Param.Index, _
-                              Optional ByVal CountParameter As Param = Param.Count)
+Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, Optional ByVal IndexParameter As ParameterName = Parameter_Index, Optional ByVal CountParameter As ParameterName = Parameter_Count)
     If Range.Index < LBound(Arr) Then
         ThrowHelper.CannotBeLessThanLBound IndexParameter
     End If
