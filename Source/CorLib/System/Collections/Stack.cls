@@ -76,7 +76,7 @@ End Sub
 '
 Public Function Clone() As Stack
     Set Clone = New Stack
-    Call Clone.CloneHelper(mItems, mCount)
+    Clone.CloneHelper mItems, mCount
 End Function
 
 ''
@@ -99,9 +99,11 @@ End Function
 ' @param index The starting position in dstArray to start placing the values.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
+    Require.NotNullOneDimensionArray DstArray, Parameter_DstArray
+    Require.Range Index >= LBound(DstArray), Parameter_Index, ArgumentOutOfRange_ArrayLB
     
-    Call cArray.CopyEx(mItems, 0, DstArray, Index, mCount)
-    Call cArray.Reverse(DstArray, Index, mCount)
+    cArray.CopyEx mItems, 0, DstArray, Index, mCount
+    cArray.Reverse DstArray, Index, mCount
 End Sub
 
 ''
@@ -130,7 +132,7 @@ End Function
 '
 Public Function GetEnumerator() As IEnumerator
     Dim Ret As New StackEnumerator
-    Call Ret.Init(Me, SAPtr(mItems))
+    Ret.Init Me, SAPtr(mItems)
     Set GetEnumerator = Ret
 End Function
 
@@ -161,9 +163,9 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyStack))
+        Throw Cor.NewInvalidOperationException(GetErrorMessage(InvalidOperation_EmptyStack))
     
-    Call VariantCopy(Peek, mItems(mCount - 1))
+    VariantCopy Peek, mItems(mCount - 1)
 End Function
 
 ''
@@ -173,10 +175,10 @@ End Function
 '
 Public Function Pop() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyStack))
+        Throw Cor.NewInvalidOperationException(GetErrorMessage(InvalidOperation_EmptyStack))
     
     mCount = mCount - 1
-    Call Helper.MoveVariant(Pop, mItems(mCount))
+    Helper.MoveVariant Pop, mItems(mCount)
     mVersion = mVersion + 1
 End Function
 
@@ -187,8 +189,8 @@ End Function
 ' @param value The value to add to the collection
 '
 Public Sub Push(ByRef Value As Variant)
-    Call EnsureCapacity(mCount + 1)
-    Call VariantCopyInd(mItems(mCount), Value)
+    EnsureCapacity mCount + 1
+    VariantCopyInd mItems(mCount), Value
     mCount = mCount + 1
     mVersion = mVersion + 1
 End Sub
@@ -201,14 +203,15 @@ End Sub
 ' the next value to be Popped off the stack.
 '
 Public Function ToArray() As Variant()
-    Dim Ret() As Variant
-    Ret = cArray.CreateInstance(vbVariant, mCount)
+    Dim Result() As Variant
+    Result = cArray.CreateInstance(vbVariant, mCount)
     
     Dim i As Long
     For i = 0 To mCount - 1
-        Call VariantCopy(Ret(i), mItems(mCount - i - 1))
+        VariantCopy Result(i), mItems(mCount - i - 1)
     Next i
-    ToArray = Ret
+    
+    ToArray = Result
 End Function
 
 ''
@@ -229,8 +232,8 @@ Friend Sub CloneHelper(ByRef Items() As Variant, ByVal Count As Long)
     mCapacity = UBound(Items) + 1
 End Sub
 
-Friend Sub Init(ByRef c As Variant)
-    Call WriteRange(c)
+Friend Sub Init(ByRef Source As Variant)
+    WriteRange Source
 End Sub
 
 Friend Property Get Version() As Long
@@ -241,17 +244,17 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub WriteRange(ByRef c As Variant)
-    If IsArray(c) Then
-        Call WriteArray(c)
-    ElseIf IsObject(c) Then
-        If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
+Private Sub WriteRange(ByRef Source As Variant)
+    If IsArray(Source) Then
+        Require.NotNullOneDimensionArray Source
+        WriteArray Source
+    ElseIf IsObject(Source) Then
+        Require.NotNothing Source, Parameter_Source, ArgumentNull_Collection
         
-        If TypeOf c Is Collection Then
-            Call WriteVBCollection(c)
-        ElseIf TypeOf c Is ICollection Then
-            Call WriteICollection(c)
+        If TypeOf Source Is Collection Then
+            WriteCollection Source
+        ElseIf TypeOf Source Is ICollection Then
+            WriteICollection Source
         Else
             Throw Cor.NewInvalidCastException("An ICollection or VBA.Collection object is required.")
         End If
@@ -261,39 +264,43 @@ Private Sub WriteRange(ByRef c As Variant)
 
 End Sub
 
-Private Sub WriteArray(ByRef Arr As Variant)
-    If cArray.IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
-    
-    Call WriteCollection(cArray.GetLength(Arr), Arr)
+Private Sub WriteArray(ByRef Source As Variant)
+    FillStack Source, ArrayLength(Source)
 End Sub
 
-Private Sub WriteVBCollection(ByVal CollectionToInsert As Collection)
-    Call WriteCollection(CollectionToInsert.Count, CollectionToInsert)
+Private Sub WriteCollection(ByVal Source As Collection)
+    FillStack Source, Source.Count
 End Sub
 
-Private Sub WriteICollection(ByVal CollectionToInsert As ICollection)
-    Call WriteCollection(CollectionToInsert.Count, CollectionToInsert)
+Private Sub WriteICollection(ByVal Source As ICollection)
+    FillStack Source, Source.Count
 End Sub
 
-Private Sub WriteCollection(ByVal SizeOfCollection As Long, ByRef CollectionToWrite As Variant)
-    Call EnsureCapacity(SizeOfCollection)
+Private Sub FillStack(ByRef Source As Variant, ByVal SourceSize As Long)
+    EnsureCapacity SourceSize
         
     Dim Value As Variant
     Dim Index As Long
-    For Each Value In CollectionToWrite
-        Call Helper.MoveVariant(mItems(Index), Value)
+    For Each Value In Source
+        Helper.MoveVariant mItems(Index), Value
         Index = Index + 1
-    Next Value
-    mCount = SizeOfCollection
+    Next
+    
+    mCount = SourceSize
 End Sub
 
 Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
-    Dim NewCapacity As Long
+    If RequiredCapacity <= mCapacity Then
+        Exit Sub
+    End If
     
-    If RequiredCapacity <= mCapacity Then Exit Sub
+    Dim NewCapacity As Long
     NewCapacity = mCapacity * 2
-    If RequiredCapacity > NewCapacity Then NewCapacity = RequiredCapacity
+    
+    If RequiredCapacity > NewCapacity Then
+        NewCapacity = RequiredCapacity
+    End If
+    
     ReDim Preserve mItems(0 To NewCapacity - 1)
     mCapacity = NewCapacity
 End Sub
@@ -309,24 +316,24 @@ End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        Call EnsureCapacity(.ReadProperty(PROP_CAPACITY, DEF_CAPACITY))
+        EnsureCapacity .ReadProperty(PROP_CAPACITY, DEF_CAPACITY)
         mCount = .ReadProperty(PROP_COUNT, 0)
         
         Dim i As Long
         For i = 0 To mCount - 1
-            Call Helper.MoveVariant(mItems(i), .ReadProperty(PROP_ITEMPREFIX & i, Empty))
+            Helper.MoveVariant mItems(i), .ReadProperty(PROP_ITEMPREFIX & i, Empty)
         Next i
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_CAPACITY, mCapacity)
-        Call .WriteProperty(PROP_COUNT, mCount)
+        .WriteProperty PROP_CAPACITY, mCapacity
+        .WriteProperty PROP_COUNT, mCount
         
         Dim i As Long
         For i = 0 To mCount - 1
-            Call .WriteProperty(PROP_ITEMPREFIX & i, mItems(i))
+            .WriteProperty PROP_ITEMPREFIX & i, mItems(i)
         Next i
     End With
 End Sub
@@ -360,7 +367,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
