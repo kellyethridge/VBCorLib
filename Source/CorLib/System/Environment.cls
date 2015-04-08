@@ -663,7 +663,7 @@ End Property
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetResourceString(ByVal Key As ResourceString, ParamArray Values() As Variant) As String
-    If Key = Blank Then
+    If Key = ResourceString.None Then
         Exit Function
     End If
     

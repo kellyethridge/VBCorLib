@@ -25,7 +25,7 @@ Attribute VB_Name = "Resources"
 Option Explicit
 
 Public Enum ResourceString
-    Blank = 0
+    None = 0
     Exception_WasThrown = 101
     ArrayTypeMismatch_Incompatible = 102
     ArrayTypeMismatch_Exception = 103
@@ -128,7 +128,7 @@ Public Enum ResourceString
     ObjectDisposed_StreamClosed = 1200
     Overflow_TimeSpan = 1300
     
-    Parameter_None = Blank
+    Parameter_None = 0
     Parameter_Index = 2000
     Parameter_Count = 2001
     Parameter_StartIndex = 2002

@@ -27,12 +27,12 @@ Option Explicit
 
 Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, Optional ByVal IndexParameter As ResourceString = Parameter_Index, Optional ByVal CountParameter As ResourceString = Parameter_Count)
     If Range.Index < LBound(Arr) Then
-        ThrowArgumentOutOfRangeException IndexParameter, ArgumentOutOfRange_ArrayLB
+        ThrowHelper.ArgumentOutOfRange IndexParameter, ArgumentOutOfRange_ArrayLB
     End If
     If Range.Count < 0 Then
-        ThrowArgumentOutOfRangeException CountParameter, ArgumentOutOfRange_NeedNonNegNum
+        ThrowHelper.ArgumentOutOfRange CountParameter, ArgumentOutOfRange_NeedNonNegNum
     End If
     If Range.Index + Range.Count - 1 > UBound(Arr) Then
-'        ThrowHelper.PositionNotValidForCollection
+        ThrowHelper.PositionNotValidForCollection
     End If
 End Sub
