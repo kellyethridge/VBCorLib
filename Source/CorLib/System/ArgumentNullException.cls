@@ -247,7 +247,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef ParamName As String, ByVal Message As String, ByVal InnerException As Exception)
     If Len(Message) = 0 Then
-        Message = Resources.GetString(ArgumentNull_Generic)
+        Message = Environment.GetResourceString(ArgumentNull_Generic)
     End If
     
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)

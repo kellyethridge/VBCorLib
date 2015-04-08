@@ -283,7 +283,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Vari
     Dim Range As ListRange
     
     Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
-    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Param.ByteIndex, Param.ByteCount)
+    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
     Validate.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount
     
     Dim Chars() As Integer
@@ -316,7 +316,7 @@ Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal
     Validate.ArrayRange Bytes, NewListRange(ByteIndex, ByteCount), Parameter_ByteIndex, Parameter_ByteCount
     Require.NotNullOneDimensionArray Chars, Parameter_Chars
     Require.Range CharIndex >= LBound(Chars) And CharIndex <= UBound(Chars), Parameter_CharIndex, ArgumentOutOfRange_ArrayBounds
-    CheckBuffer Chars, CharIndex, ByteCount, Param.Chars
+    CheckBuffer Chars, CharIndex, ByteCount, Parameter_Chars
     
     GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
 End Function
@@ -407,7 +407,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Var
     Dim Range As ListRange
     
     Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
-    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Param.ByteIndex, Param.ByteCount)
+    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
     Validate.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount
     
     GetString = SysAllocStringLen(0, Range.Count)
@@ -468,14 +468,14 @@ Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long,
     InternalGetBytes = Count
 End Function
 
-Private Sub CheckBuffer(ByRef BufferToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal ArrayParameter As Param = Param.Bytes)
+Private Sub CheckBuffer(ByRef BufferToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal ArrayParameter As ResourceString)
     If Index + Count - 1 > UBound(BufferToCheck) Then
         SmallBufferError ArrayParameter
     End If
 End Sub
 
-Private Sub SmallBufferError(ByVal ArrayParameter As Param)
-    Throw Cor.NewArgumentException(Resources.GetString(Argument_SmallConversionBuffer), Resources.GetParameter(ArrayParameter))
+Private Sub SmallBufferError(ByVal ArrayParameter As ResourceString)
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), Environment.GetResourceString(ArrayParameter))
 End Sub
 
 Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long

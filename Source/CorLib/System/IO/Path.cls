@@ -466,7 +466,7 @@ Public Function GetPathRoot(ByVal Path As String) As String
                     Exit Function
                     
                 Case Else
-                    Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidPathFormat), "Path")
+                    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
             End Select
         End If
     End With
@@ -534,7 +534,7 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
     For i = 0 To Len(Path) - 1
         Select Case mBuffer.Data(i)
             Case &H22, &H3C, &H3E, &H7C, Is < 32
-                Throw Cor.NewArgumentException(GetErrorMessage(Argument_InvalidCharsInPath), GetParameter(Param.PathParam))
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidCharsInPath), Environment.GetResourceString(Parameter_Path))
             Case vbForwardSlashChar
                 If FixSlashes Then
                     mBuffer.Data(i) = vbBackslashChar

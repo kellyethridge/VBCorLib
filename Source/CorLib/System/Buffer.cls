@@ -69,15 +69,15 @@ Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef 
     DestinationPtr = GetArrayPointer(Destination)
     
     If SourcePtr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Source", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Array))
     If DestinationPtr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Destination", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Destination", Environment.GetResourceString(ArgumentNull_Array))
     If SourceOffset < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("SourceOffset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("SourceOffset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If DestinationOffset < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("DestinationOffset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("DestinationOffset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim SourceLength        As Long
     Dim DestinationLength   As Long
@@ -86,9 +86,9 @@ Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef 
     DestinationLength = cArray.GetLength(Destination) * SafeArrayGetElemsize(DestinationPtr)
     
     If SourceOffset + Count > SourceLength Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     If DestinationOffset + Count > DestinationLength Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     CopyMemory ByVal MemLong(DestinationPtr + PVDATA_OFFSET) + DestinationOffset, ByVal MemLong(SourcePtr + PVDATA_OFFSET) + SourceOffset, Count
 End Sub
@@ -106,7 +106,7 @@ Public Function ByteLength(ByRef Arr As Variant) As Long
     ArrayPtr = GetArrayPointer(Arr)
     
     If ArrayPtr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     
     ByteLength = SafeArrayGetElemsize(ArrayPtr) * cArray.GetLength(Arr)
 End Function
@@ -127,7 +127,7 @@ Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
     ArrayPtr = GetArrayPointer(Arr)
     
     If ArrayPtr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If Index < 0 Or Index >= cArray.GetLength(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
@@ -150,7 +150,7 @@ Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byt
     ArrayPtr = GetArrayPointer(Arr)
     
     If ArrayPtr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If Index < 0 Or Index >= cArray.GetLength(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 

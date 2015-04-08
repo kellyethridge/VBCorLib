@@ -377,5 +377,5 @@ Private Function IComparable_CompareTo(Value As Variant) As Long
     Exit Function
     
 errTrap:
-    Throw Cor.NewArgumentException(Resources.GetString(Argument_TimeSpanRequired), Resources.GetParameter(Param.Value))
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_TimeSpanRequired), Environment.GetResourceString(Parameter_Value))
 End Function

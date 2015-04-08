@@ -1,4 +1,16 @@
-Attribute VB_Name = "Validate"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "StackEnumeratorTests"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = True
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -20,19 +32,20 @@ Attribute VB_Name = "Validate"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: Validate
+' Module: StackEnumeratorTests
 '
 Option Explicit
 
-
-Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, Optional ByVal IndexParameter As ResourceString = Parameter_Index, Optional ByVal CountParameter As ResourceString = Parameter_Count)
-    If Range.Index < LBound(Arr) Then
-        ThrowArgumentOutOfRangeException IndexParameter, ArgumentOutOfRange_ArrayLB
-    End If
-    If Range.Count < 0 Then
-        ThrowArgumentOutOfRangeException CountParameter, ArgumentOutOfRange_NeedNonNegNum
-    End If
-    If Range.Index + Range.Count - 1 > UBound(Arr) Then
-'        ThrowHelper.PositionNotValidForCollection
-    End If
+Public Sub MoveNext_WhenStackHasBeenChanged_ThrowsInvalidOperationException()
+    Dim Stack As New Stack
+    Stack.Push 1
+    Dim SUT As IEnumerator
+    Set SUT = Stack.GetEnumerator
+    
+    Stack.Push 2
+    
+    On Error Resume Next
+    SUT.MoveNext
+    
+    AssertInvalidOperationException Err
 End Sub

@@ -158,10 +158,10 @@ Public Function Parse(ByVal s As String) As TimeSpan
     If Not mParser.TryParse(s, Parse) Then
         Select Case mParser.Error
             Case ParseError.FormatError
-                Throw Cor.NewFormatException(Resources.GetString(Format_InvalidTimeSpan))
+                Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidTimeSpan))
                 
             Case ParseError.OverflowError
-                Throw Cor.NewOverflowException(Resources.GetString(Overflow_TimeSpan))
+                Throw Cor.NewOverflowException(Environment.GetResourceString(Overflow_TimeSpan))
                 
             Case Else
                 Throw New ArgumentException

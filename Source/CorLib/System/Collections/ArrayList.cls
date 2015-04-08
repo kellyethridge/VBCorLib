@@ -591,11 +591,11 @@ End Sub
 '
 Public Sub RemoveRange(ByVal Index As Long, ByVal Count As Long)
     If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Count > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim i As Long
     For i = Index To Index + Count - 1
@@ -620,13 +620,13 @@ Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Vari
     Dim ElemCount As Long
     
     If GetOptionalLongPair(Index, 0, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
         
     cArray.Reverse mItems, ElemIndex, ElemCount
     
@@ -665,11 +665,11 @@ Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant
     ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
     
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
 
     If Comparer Is Nothing Then
         Set Comparer = mComparer
@@ -792,7 +792,7 @@ Private Sub WriteRange(ByVal Index As Long, ByRef c As Variant, ByVal Insert As 
         WriteArray Index, c, Insert
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Collection))
+            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
             WriteVBCollection Index, c, Insert
@@ -808,7 +808,7 @@ End Sub
 
 Private Sub WriteArray(ByVal Index As Long, ByRef Arr As Variant, ByVal Insert As Boolean)
     If cArray.IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim SizeOfArray As Long
     SizeOfArray = UBound(Arr) - LBound(Arr) + 1

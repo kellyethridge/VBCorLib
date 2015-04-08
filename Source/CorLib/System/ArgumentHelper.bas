@@ -99,7 +99,7 @@ Public Function GetOptionalLongPair(ByRef OptionalValue1 As Variant, ByVal Defau
     End If
 End Function
 
-Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As Param = Param.Index, Optional ByVal CountParameter As Param = Param.Count) As ListRange
+Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ResourceString = Parameter_Index, Optional ByVal CountParameter As ResourceString = Parameter_Count) As ListRange
     Dim FirstIsMissing As Boolean
     
     FirstIsMissing = IsMissing(Index)
@@ -405,8 +405,8 @@ Public Sub ThrowListRangeException(ByVal ErrorCode As Long, ByVal Index As Long,
     End Select
 End Sub
 
-Public Sub ThrowMissing(ByRef ParameterToCheck As Variant, ByVal FirstParameter As Param, ByVal SecondParameter As Param)
-    Throw Cor.NewArgumentException(Resources.GetString(Argument_ParamRequired), IIf(IsMissing(ParameterToCheck), Resources.GetString(FirstParameter), Resources.GetString(SecondParameter)))
+Public Sub ThrowMissing(ByRef ParameterToCheck As Variant, ByVal FirstParameter As ResourceString, ByVal SecondParameter As ResourceString)
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(ParameterToCheck), Environment.GetResourceString(FirstParameter), Environment.GetResourceString(SecondParameter)))
 End Sub
 
 ''

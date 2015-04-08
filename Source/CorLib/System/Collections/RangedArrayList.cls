@@ -77,13 +77,13 @@ End Sub
 Private Function GetCollectionSize(ByRef c As Variant) As Long
     If IsArray(c) Then
         If cArray.IsNull(c) Then _
-            Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Array))
+            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
         
         GetCollectionSize = UBound(c) - LBound(c) + 1
     
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException("c", Resources.GetString(ArgumentNull_Collection))
+            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
             Dim Col As Collection
@@ -193,11 +193,11 @@ Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal A
     If Result <> NO_ERROR Then _
         ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
     If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Count > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     mList.CopyToEx mIndex + Index, DstArray, ArrayIndex, Count
 End Sub
@@ -221,11 +221,11 @@ Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Option
     ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
     
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, ElemIndex, ElemCount
@@ -238,11 +238,11 @@ End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
     If Index < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Count > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim Ret As RangedArrayList
     Set Ret = New RangedArrayList
@@ -260,11 +260,11 @@ Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex A
     ElemCount = GetOptionalLong(Count, mCount)
     
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
            
     Dim Result As Long
     Result = mList.IndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
@@ -405,13 +405,13 @@ Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Co
     Dim ElemIndex As Long
     
     If GetOptionalLongPair(Index, 0, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     mList.Reverse mIndex + ElemIndex, ElemCount
     mVersion = mVersion + 1
@@ -440,11 +440,11 @@ Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count
     ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
     
     If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", ElemCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
 
     mList.Sort mIndex + ElemIndex, ElemCount, Comparer
 End Sub

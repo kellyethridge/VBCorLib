@@ -624,7 +624,7 @@ Public Function GetAbbreviatedMonthName(ByVal Month As Long) As String
     VerifyLoaded
     
     If Month < MinMonth Or Month > MaxMonth Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Resources.GetString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
     
     GetAbbreviatedMonthName = mProps.AbbreviatedMonthNames(Month - 1)
 End Function
@@ -708,7 +708,7 @@ Public Function GetMonthName(ByVal Month As Long) As String
     VerifyLoaded
     
     If Month < MinMonth Or Month > MaxMonth Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Resources.GetString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
     
     GetMonthName = mProps.MonthNames(Month - 1)
 End Function
@@ -843,7 +843,7 @@ End Sub
 
 Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As String
     Dim cnt         As Long
-    Dim Pos         As Long
+    Dim pos         As Long
     Dim sb          As StringBuilder
     Dim Day         As Long
     Dim Month       As Long
@@ -876,9 +876,9 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
     Second = dt.Second
     Designator = IIf(Hour < 12, mProps.AMDesignator, mProps.PMDesignator)
     
-    Do While Pos < mPattern.SA.cElements
-        ch = mPattern.Data(Pos)
-        cnt = GetRepeatCount(Pos)
+    Do While pos < mPattern.SA.cElements
+        ch = mPattern.Data(pos)
+        cnt = GetRepeatCount(pos)
         
         If Not Escaped Then
             If Quote <> 0 Then
@@ -951,7 +951,7 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
             cnt = 1
         End If
         Percented = (ch = vbPercentChar)
-        Pos = Pos + cnt
+        pos = pos + cnt
     Loop
     
     If Quote <> 0 Then _

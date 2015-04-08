@@ -76,15 +76,15 @@ Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, B
             Dim CharPtr As Long
             CharPtr = GetArrayPointer(Source)
             If CharPtr = vbNullPtr Then _
-                Throw Cor.NewArgumentNullException(Resources.GetString(Param.Chars), Resources.GetString(ArgumentNull_Array))
+                Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Chars), Environment.GetResourceString(ArgumentNull_Array))
             If SafeArrayGetDim(CharPtr) > 1 Then _
-                Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+                Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
             
             SAPtr(Chars) = CharPtr
             AttachChars = UBound(Chars) - LBound(Chars) + 1
             
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_CharArrayRequired), Resources.GetString(Param.Chars))
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_CharArrayRequired), Environment.GetResourceString(Parameter_Chars))
     End Select
 End Function
 

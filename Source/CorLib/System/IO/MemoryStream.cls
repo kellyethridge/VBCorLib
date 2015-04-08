@@ -327,9 +327,9 @@ End Property
 '
 Public Property Let Capacity(ByVal RHS As Long)
     If Not mExpandable Then _
-        Throw Cor.NewNotSupportedException(Resources.GetString(NotSupported_MemoryStreamNotExpandable))
+        Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_MemoryStreamNotExpandable))
     If RHS < mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Resources.GetString(ArgumentOutOfRange_SmallCapacity))
+        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity))
     
     EnsureOpen
     
@@ -412,15 +412,15 @@ End Sub
 '
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
     If IsNullByteArray(Buffer) Then _
-        Throw Cor.NewArgumentNullException("Buffer", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
     If IsMultiDimensionByteArray(Buffer) Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If Offset < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
         
     EnsureWritable
     EnsureOpen
@@ -475,15 +475,15 @@ End Sub
 '
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     If IsNullByteArray(Buffer) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If IsMultiDimensionByteArray(Buffer) Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If Offset < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     EnsureOpen
     EnsureBuffer
@@ -540,7 +540,7 @@ Public Function SeekPosition(ByVal Offset As Currency, ByVal Loc As SeekOrigin) 
         Case FromEnd
             Position = mLength + Offset
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidSeekOrigin))
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidSeekOrigin))
     End Select
     SeekPosition = mPosition
 End Function
@@ -610,7 +610,7 @@ End Sub
 '
 Public Sub WriteTo(ByVal Stream As Stream)
     If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Stream", Resources.GetString(ArgumentNull_Stream))
+        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
     EnsureBuffer
     EnsureOpen
     
@@ -693,13 +693,13 @@ End Sub
 
 Private Sub EnsureOpen()
     If mIsClosed Then
-        Throw Cor.NewObjectDisposedException("MemoryStream", Resources.GetString(ObjectDisposed_StreamClosed))
+        Throw Cor.NewObjectDisposedException("MemoryStream", Environment.GetResourceString(ObjectDisposed_StreamClosed))
     End If
 End Sub
 
 Private Sub EnsureWritable()
     If Not mCanWrite Then
-        Throw Cor.NewNotSupportedException(Resources.GetString(NotSupported_UnwritableStream))
+        Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_UnwritableStream))
     End If
 End Sub
 

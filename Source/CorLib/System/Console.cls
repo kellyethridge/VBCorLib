@@ -482,9 +482,9 @@ Public Sub Beep(Optional ByVal Frequency As Long = 800, Optional ByVal Duration 
     Const MinDuration   As Long = 1
     
     If Frequency < MinFrequency Or Frequency > MaxFrequency Then _
-        Throw Cor.NewArgumentOutOfRangeException("Frequency", Frequency, Resources.GetString(ArgumentOutOfRange_BeepFrequency, MinFrequency, MaxFrequency))
+        Throw Cor.NewArgumentOutOfRangeException("Frequency", Frequency, Environment.GetResourceString(ArgumentOutOfRange_BeepFrequency, MinFrequency, MaxFrequency))
     If Duration < MinDuration Then _
-        Throw Cor.NewArgumentOutOfRangeException("Duration", Message:=Resources.GetString(ArgumentOutOfRange_NeedPosNum))
+        Throw Cor.NewArgumentOutOfRangeException("Duration", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
     
     If BeepAPI(Frequency, Duration) = BOOL_FALSE Then Throw Cor.NewSystemException(GetSystemMessage(Err.LastDllError))
 End Sub
@@ -503,9 +503,9 @@ End Sub
 '
 Public Sub SetWindowSize(ByVal Width As Long, ByVal Height As Long)
     If Width <= 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Width", Width, Resources.GetString(ArgumentOutOfRange_NeedPosNum))
+        Throw Cor.NewArgumentOutOfRangeException("Width", Width, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
     If Height <= 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Height", Height, Resources.GetString(ArgumentOutOfRange_NeedPosNum))
+        Throw Cor.NewArgumentOutOfRangeException("Height", Height, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
     
     With GetBufferInfo
         Dim ExpandBuffer    As Boolean
@@ -514,7 +514,7 @@ Public Sub SetWindowSize(ByVal Width As Long, ByVal Height As Long)
         NewBufferSize = .dwSize
         Select Case .srWindow.Left + Width
             Case Is > MaxWindowSize
-                Throw Cor.NewArgumentOutOfRangeException("Width", Width, Resources.GetString(ArgumentOutOfRange_ConsoleBufferSize))
+                Throw Cor.NewArgumentOutOfRangeException("Width", Width, Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferSize))
                 
             Case Is > .dwSize.x
                 NewBufferSize.x = .srWindow.Left + Width
@@ -522,7 +522,7 @@ Public Sub SetWindowSize(ByVal Width As Long, ByVal Height As Long)
         End Select
         Select Case .srWindow.Top + Height
             Case Is > MaxWindowSize
-                Throw Cor.NewArgumentOutOfRangeException("Height", Height, Resources.GetString(ArgumentOutOfRange_ConsoleBufferSize))
+                Throw Cor.NewArgumentOutOfRangeException("Height", Height, Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferSize))
                 
             Case Is > .dwSize.y
                 NewBufferSize.y = .srWindow.Top + Height
@@ -549,9 +549,9 @@ Public Sub SetWindowSize(ByVal Width As Long, ByVal Height As Long)
             Dim WindowSize As COORD
             WindowSize = GetLargestConsoleWindowSize(mOutputHandle)
             If Width > WindowSize.x Then _
-                Throw Cor.NewArgumentOutOfRangeException("Width", WindowSize.x, Resources.GetString(ArgumentOutOfRange_ConsoleWindowSize_Size, WindowSize.x))
+                Throw Cor.NewArgumentOutOfRangeException("Width", WindowSize.x, Environment.GetResourceString(ArgumentOutOfRange_ConsoleWindowSize_Size, WindowSize.x))
             If Height > WindowSize.y Then _
-                Throw Cor.NewArgumentOutOfRangeException("Height", WindowSize.y, Resources.GetString(ArgumentOutOfRange_ConsoleWindowSize_Size, WindowSize.y))
+                Throw Cor.NewArgumentOutOfRangeException("Height", WindowSize.y, Environment.GetResourceString(ArgumentOutOfRange_ConsoleWindowSize_Size, WindowSize.y))
             
             IOError e
         End If
@@ -574,9 +574,9 @@ Public Sub SetWindowPosition(ByVal Left As Long, ByVal Top As Long)
     
     With GetBufferInfo
         If Left + (.srWindow.Right - .srWindow.Left + 1) > .dwSize.x Then _
-            Throw Cor.NewArgumentOutOfRangeException("Left", Left, Resources.GetString(ArgumentOutOfRange_ConsoleWindowPos))
+            Throw Cor.NewArgumentOutOfRangeException("Left", Left, Environment.GetResourceString(ArgumentOutOfRange_ConsoleWindowPos))
         If Top + (.srWindow.Bottom - .srWindow.Top + 1) > .dwSize.y Then _
-            Throw Cor.NewArgumentOutOfRangeException("Top", Top, Resources.GetString(ArgumentOutOfRange_ConsoleWindowPos))
+            Throw Cor.NewArgumentOutOfRangeException("Top", Top, Environment.GetResourceString(ArgumentOutOfRange_ConsoleWindowPos))
         
         Dim NewPosition As SMALL_RECT
         NewPosition.Left = Left
@@ -603,9 +603,9 @@ Public Sub SetBufferSize(ByVal Width As Long, ByVal Height As Long)
     
     With GetBufferInfo.srWindow
         If Width < .Right - .Left + 1 Then _
-            Throw Cor.NewArgumentOutOfRangeException("Width", Width, Resources.GetString(ArgumentOutOfRange_ConsoleBufferLessThanWindowSize))
+            Throw Cor.NewArgumentOutOfRangeException("Width", Width, Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferLessThanWindowSize))
         If Height < .Bottom - .Top + 1 Then _
-            Throw Cor.NewArgumentOutOfRangeException("Height", Height, Resources.GetString(ArgumentOutOfRange_ConsoleBufferLessThanWindowSize))
+            Throw Cor.NewArgumentOutOfRangeException("Height", Height, Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferLessThanWindowSize))
     End With
     
     Dim NewSize As COORD
@@ -789,7 +789,7 @@ End Property
 '
 Public Property Let Title(ByVal RHS As String)
     If Len(RHS) > MaxTitleLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Title", RHS, Resources.GetString(ArgumentOutOfRange_ConsoleTitleTooLong))
+        Throw Cor.NewArgumentOutOfRangeException("Title", RHS, Environment.GetResourceString(ArgumentOutOfRange_ConsoleTitleTooLong))
     
     If cString.IsNull(RHS) Then RHS = ""
     
@@ -821,7 +821,7 @@ End Property
 '
 Public Property Let BackgroundColor(ByVal RHS As ConsoleColor)
     If RHS < 0 Or RHS > 15 Then _
-        Throw Cor.NewArgumentOutOfRangeException("BackgroundColor", RHS, Resources.GetString(ArgumentOutOfRange_ConsoleColor))
+        Throw Cor.NewArgumentOutOfRangeException("BackgroundColor", RHS, Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
     
     If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFF0F) Or (RHS * &H10)) = BOOL_FALSE Then IOError Err.LastDllError
 End Property
@@ -846,7 +846,7 @@ End Property
 '
 Public Property Let ForegroundColor(ByVal RHS As ConsoleColor)
     If RHS < 0 Or RHS > 15 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ForegroundColor", RHS, Resources.GetString(ArgumentOutOfRange_ConsoleColor))
+        Throw Cor.NewArgumentOutOfRangeException("ForegroundColor", RHS, Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
     
     If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFFF0) Or RHS) = BOOL_FALSE Then IOError Err.LastDllError
 End Property
@@ -861,9 +861,9 @@ End Property
 Public Sub SetCursorPosition(ByVal Left As Long, ByVal Top As Long)
     With GetBufferInfo.dwSize
         If Left < 0 Or Left >= .x Then _
-            Throw Cor.NewArgumentOutOfRangeException("Left", Left, Resources.GetString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Throw Cor.NewArgumentOutOfRangeException("Left", Left, Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
         If Top < 0 Or Top >= .y Then _
-            Throw Cor.NewArgumentOutOfRangeException("Top", Top, Resources.GetString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Throw Cor.NewArgumentOutOfRangeException("Top", Top, Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
     End With
     
     Dim NewPosition As COORD
@@ -930,7 +930,7 @@ End Property
 '
 Public Property Let CursorSize(ByVal RHS As Long)
     If RHS < 1 Or RHS > 100 Then _
-        Throw Cor.NewArgumentOutOfRangeException("CursorSize", RHS, Resources.GetString(ArgumentOutOfRange_CursorSize))
+        Throw Cor.NewArgumentOutOfRangeException("CursorSize", RHS, Environment.GetResourceString(ArgumentOutOfRange_CursorSize))
     
     Dim Info As CONSOLE_CURSOR_INFO
     With Info
@@ -1336,13 +1336,13 @@ Private Sub InternalFillArea(ByVal Left As Long, ByVal Top As Long, ByVal Width 
     Select Case Forecolor
         Case ConsoleColor.CurrentColor: Forecolor = ForegroundColor
         Case Is < 0, Is > 15
-            Throw Cor.NewArgumentOutOfRangeException("ForeColor", Forecolor, Resources.GetString(ArgumentOutOfRange_ConsoleColor))
+            Throw Cor.NewArgumentOutOfRangeException("ForeColor", Forecolor, Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
     End Select
 
     Select Case BackColor
         Case ConsoleColor.CurrentColor: BackColor = BackgroundColor
         Case Is < 0, Is > 15
-            Throw Cor.NewArgumentOutOfRangeException("BackColor", BackColor, Resources.GetString(ArgumentOutOfRange_ConsoleColor))
+            Throw Cor.NewArgumentOutOfRangeException("BackColor", BackColor, Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
     End Select
     
     If Width = 0 Or Height = 0 Then Exit Sub

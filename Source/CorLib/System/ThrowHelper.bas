@@ -24,14 +24,22 @@ Attribute VB_Name = "ThrowHelper"
 '
 Option Explicit
 
-Public Sub CannotBeLessThanLBound(Optional ByVal Parameter As Param = Param.Index)
-    Throw Cor.NewArgumentOutOfRangeException(GetParameter(Parameter), Message:=GetErrorMessage(ArgumentOutOfRange.LowerBound))
+Public Sub ThrowArgumentException(Optional ByVal Message As ResourceString = Argument_Exception, Optional ByVal ParameterName As ResourceString = Parameter_None)
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Message), Environment.GetResourceString(ParameterName))
 End Sub
 
-Public Sub CannotBeNegative(Optional ByVal Parameter As Param = Param.Count)
-    Throw Cor.NewArgumentOutOfRangeException(GetParameter(Parameter), Message:=GetErrorMessage(ArgumentOutOfRange.NeedNonNegNum))
+Public Sub ThrowArgumentOutOfRangeException(Optional ByVal ParameterName As ResourceString = Parameter_None, Optional ByVal Message As ResourceString = ArgumentOutOfRange_Exception)
+    Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ParameterName), Message:=Environment.GetResourceString(Message))
 End Sub
 
-Public Sub PositionNotValidForCollection()
-    Throw Cor.NewArgumentException(GetErrorMessage(Argument_InvalidOffLen))
-End Sub
+'Public Sub CannotBeLessThanLBound(Optional ByVal Parameter As Param = Param.Index)
+'    Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(Parameter), Message:=Environment.GetResourceString(ArgumentOutOfRange.LowerBound))
+'End Sub
+'
+'Public Sub CannotBeNegative(Optional ByVal Parameter As Param = Param.Count)
+'    Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(Parameter), Message:=Environment.GetResourceString(ArgumentOutOfRange.NeedNonNegNum))
+'End Sub
+'
+'Public Sub PositionNotValidForCollection()
+'    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
+'End Sub

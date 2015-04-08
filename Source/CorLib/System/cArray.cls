@@ -156,20 +156,20 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
     ElemIndex = GetOptionalLong(Index, LBound(Arr))
     ElemCount = GetOptionalLong(Count, UBound(Arr) - ElemIndex + 1)
     If ElemIndex < LBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_Count))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_Count))
     If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_UBound))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_UBound))
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -211,9 +211,9 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
         
     Dim LowerBound As Long
     LowerBound = LBound(Arr)
@@ -348,20 +348,20 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
 
     Dim ElemIndex As Long
     Dim ElemCount As Long
     ElemIndex = GetOptionalLong(Index, UBound(Arr))
     ElemCount = GetOptionalLong(Count, ElemIndex + 1)
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_ArrayBounds))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayBounds))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
         
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -403,9 +403,9 @@ Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Lon
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
         
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -443,9 +443,9 @@ Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
 
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -478,7 +478,7 @@ End Sub
 ' @include "..\Includes\cArray_BinarySearch.txt"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
         
     BinarySearch = BinarySearchEx(Arr, LBound(Arr), UBound(Arr) - LBound(Arr) + 1, Value, Comparer)
 End Function
@@ -505,13 +505,13 @@ Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal 
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Length - 1 > UBound(Arr) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
         
     On Error GoTo errTrap
     If Comparer Is Nothing Then
@@ -542,7 +542,7 @@ Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal 
     BinarySearchEx = (Not (LowIndex - LBound(Arr))) + LBound(Arr)
     Exit Function
 errTrap:
-    Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_Comparer_Arg, Err.Description))
+    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
 ''
@@ -556,13 +556,13 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long
     Dim pSafeArray  As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(Arr) Then _
-        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(ArgumentOutOfRange_Index))
+        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_Index))
     If Length < 0 Then _
-        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Length - 1 > UBound(Arr) Then _
-        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     If Length = 0 Then Exit Sub
     
@@ -617,9 +617,9 @@ End Sub
 ' </pre>
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long, Optional ByVal AddressOfCopier As Long)
     If IsNull(SourceArray) Then _
-        Throw Cor.NewArgumentNullException("SourceArray", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("SourceArray", Environment.GetResourceString(ArgumentNull_Array))
     If IsNull(DestinationArray) Then _
-        Throw Cor.NewArgumentNullException("DestinationArray", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("DestinationArray", Environment.GetResourceString(ArgumentNull_Array))
     
     CopyEx SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length, AddressOfCopier
 End Sub
@@ -654,19 +654,19 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     DestinationLength = InternalGetLength(pDestinationSafeArray, 0)
     
     If pSourceSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("SourceArray", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("SourceArray", Environment.GetResourceString(ArgumentNull_Array))
     If pDestinationSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("DestinationArray", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("DestinationArray", Environment.GetResourceString(ArgumentNull_Array))
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_LongerThanSrcArray))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_LongerThanSrcArray))
     If Length + DestinationIndex - LBound(DestinationArray) > DestinationLength Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_LongerThanDestArray))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_LongerThanDestArray))
     If SourceIndex < LBound(SourceArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("SourceIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayLB))
+        Throw Cor.NewArgumentOutOfRangeException("SourceIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayLB))
     If DestinationIndex < LBound(DestinationArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("DestinationIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayLB))
+        Throw Cor.NewArgumentOutOfRangeException("DestinationIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayLB))
     
     Dim SourceArrayType As vbVarType
     SourceArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
@@ -695,7 +695,7 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
                     Set DstUDT = SafeArrayGetRecordInfo(pDestinationSafeArray)
                     
                     If SrcUDT.IsMatchingType(DstUDT) = BOOL_FALSE Then _
-                        Throw Cor.NewArrayTypeMismatchException(Resources.GetString(ArrayTypeMismatch_Incompatible))
+                        Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
                         
                     CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
                     
@@ -706,7 +706,7 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
             Dim Assigner As Long
             Assigner = GetAssigningFunction(SourceArrayType, DestinationArrayType)
             If Assigner = vbNullPtr Then _
-                Throw Cor.NewArrayTypeMismatchException(Resources.GetString(ArrayTypeMismatch_Incompatible))
+                Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             
             CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, Assigner
         End If
@@ -739,25 +739,25 @@ Public Function CreateInstance(ByVal ElementType As vbVarType, Optional ByVal Le
     Select Case ElementType
         Case vbByte, vbInteger, vbLong, vbDouble, vbSingle, vbBoolean, vbCurrency, vbDate, vbString, vbObject, vbVariant
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_MustBeVbVarType), "ElementType")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_MustBeVbVarType), "ElementType")
     End Select
     
     If Length1 < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length1", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Length1", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Rank = 1
     Bounds(0).cElements = Length1
     
     If Not IsMissing(Length2) Then
         If CLng(Length2) < 0 Then _
-            Throw Cor.NewArgumentOutOfRangeException("Length2", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+            Throw Cor.NewArgumentOutOfRangeException("Length2", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
         
         Rank = 2
         Bounds(1).cElements = Length2
     
         If Not IsMissing(Length3) Then
             If CLng(Length3) < 0 Then _
-                Throw Cor.NewArgumentOutOfRangeException("Length3", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+                Throw Cor.NewArgumentOutOfRangeException("Length3", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
             
             Rank = 3
             Bounds(2).cElements = Length3
@@ -780,7 +780,7 @@ Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long
     Dim SafeArrayPtr  As Long
     SafeArrayPtr = GetArrayPointer(Arr)
     If SafeArrayPtr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     
     GetLength = InternalGetLength(SafeArrayPtr, Dimension)
 End Function
@@ -789,7 +789,7 @@ Private Function InternalGetLength(ByVal SafeArrayPtr As Long, ByVal Dimension A
     Dim Rank As Long
     Rank = SafeArrayGetDim(SafeArrayPtr)
     If Dimension > Rank Then _
-        Throw Cor.NewIndexOutOfRangeException(Resources.GetString(IndexOutOfRange_Dimension))
+        Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(IndexOutOfRange_Dimension))
     
     Dim ArrayBoundPtr As Long
     ArrayBoundPtr = SafeArrayPtr + SIZEOF_SAFEARRAY
@@ -810,9 +810,9 @@ Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal
     Dim Result As Long
     
     Result = 1
-    Dim Ptr As Long
-    For Ptr = ArrayBoundPtr To ArrayBoundPtr + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
-        Result = Result * MemLong(Ptr)
+    Dim ptr As Long
+    For ptr = ArrayBoundPtr To ArrayBoundPtr + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
+        Result = Result * MemLong(ptr)
     Next
 
     CalculateProductOfDimensions = Result
@@ -832,7 +832,7 @@ Public Function GetRank(ByRef Arr As Variant) As Long
     Dim pSafeArray  As Long
     pSafeArray = GetArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
         
     GetRank = SafeArrayGetDim(pSafeArray)
 End Function
@@ -852,9 +852,9 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     ArrayPointer = GetArrayPointer(Arr)
     
     If ArrayPointer = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(ArrayPointer) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     
     Dim ElemIndex As Long
     Dim ElemCount As Long
@@ -862,9 +862,9 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     ElemCount = GetOptionalLong(Count, UBound(Arr) - ElemIndex + 1)
 
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayBounds))
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayBounds))
     If ElemCount < 0 Or ElemIndex + ElemCount - 1 > UBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_Count))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_Count))
     
     On Error GoTo errTrap
     If Comparer Is Nothing Then
@@ -886,7 +886,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Exit Function
     
 errTrap:
-    Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_Comparer_Arg, Err.Description))
+    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
 ''
@@ -914,9 +914,9 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     pSafeArray = GetArrayPointer(Arr)
     
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -924,11 +924,11 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     ElemCount = GetOptionalLong(Count, ElemIndex - LBound(Arr) + 1)
     
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayBounds))
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayBounds))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_Count))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_Count))
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     
     On Error GoTo errTrap
     If Comparer Is Nothing Then
@@ -949,7 +949,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     LastIndexOf = LBound(Arr) - 1
     Exit Function
 errTrap:
-    Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_Comparer_Arg, Err.Description))
+    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
 ''
@@ -964,9 +964,9 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     pSafeArray = GetArrayPointer(Arr)
     
     If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -974,11 +974,11 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     ElemCount = GetOptionalLong(Count, UBound(Arr) - ElemIndex + 1)
     
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -1041,7 +1041,7 @@ End Sub
 ' @include "..\Includes\cArray_Sort.txt"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
         
     Dim Length As Long
     Length = UBound(Arr) - LBound(Arr) + 1
@@ -1073,7 +1073,7 @@ End Sub
 '
 Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
         
     SortKeyEx Arr, Empty, Index, Length, Comparer
 End Sub
@@ -1102,7 +1102,7 @@ End Sub
 ' @include "..\Includes\cArray.SortKey.txt"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Keys) Then _
-        Throw Cor.NewArgumentNullException("Keys", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Keys", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Length As Long
     Length = UBound(Keys) - LBound(Keys) + 1
@@ -1139,30 +1139,30 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     
     pKeysSafeArray = GetArrayPointer(Keys)
     If pKeysSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Keys", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("Keys", Environment.GetResourceString(ArgumentNull_Array))
     If SafeArrayGetDim(pKeysSafeArray) > 1 Then _
-        Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If Index < LBound(Keys) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Resources.GetString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Length - 1 > UBound(Keys) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidOffLen))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     If Not IsEmpty(Items) Then
         If Not IsArray(Items) Then _
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_ArrayRequired), "Items")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayRequired), "Items")
             
         pItemsSafeArray = GetArrayPointer(Items)
         If pItemsSafeArray = vbNullPtr Then _
-            Throw Cor.NewArgumentNullException("Items", Resources.GetString(ArgumentNull_Array))
+            Throw Cor.NewArgumentNullException("Items", Environment.GetResourceString(ArgumentNull_Array))
         If SafeArrayGetDim(pItemsSafeArray) > 1 Then _
-            Throw Cor.NewRankException(Resources.GetString(Rank_MultiDimNotSupported))
+            Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
             
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_MatchingBounds))
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_MatchingBounds))
         
         SetSortItems pItemsSafeArray
     End If
@@ -1200,7 +1200,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
                 QuickSortGeneral Keys, Index, Index + Length - 1
             End If
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidComparer), "Comparer")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidComparer), "Comparer")
     End Select
     
     CleanUpSortRoutine
@@ -1400,7 +1400,7 @@ Private Sub CopyObjectTypesCast(ByVal srcpSA As Long, ByVal SourceIndex As Long,
             If SrcObj.QueryInterface(ByVal pDstGuid, pObj) = E_NOINTERFACE Then
                 ObjectPtr(SrcObj) = vbNullPtr
                 ObjectPtr(DstObj) = vbNullPtr
-                Throw Cor.NewArrayTypeMismatchException(Resources.GetString(ArrayTypeMismatch_Incompatible))
+                Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             End If
         End If
         

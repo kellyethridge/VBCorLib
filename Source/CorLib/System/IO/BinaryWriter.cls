@@ -456,7 +456,7 @@ Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef
         Case vbDecimal
             mOutStream.WriteBlock BitConverter.GetBytes(Value), 0, 16
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_NeedIntrinsicType), "Value")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_NeedIntrinsicType), "Value")
     End Select
     
     If num > 0 Then
@@ -489,7 +489,7 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
         Case vbIntegerArray
             WriteBytes mEncoding.GetBytes(Value, Index, Count)
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_UnsupportedArray), "Value")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_UnsupportedArray), "Value")
     End Select
 End Sub
 

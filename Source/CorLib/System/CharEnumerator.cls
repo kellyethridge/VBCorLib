@@ -121,9 +121,9 @@ End Function
 '
 Public Property Get Current() As Integer
     If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_EnumNotStarted))
+        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_EnumFinished))
+        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
 
     Current = mString.Data(mIndex)
 End Property
@@ -137,7 +137,7 @@ End Property
 '
 Public Function MoveNext() As Boolean
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Resources.GetString(InvalidOperation_EnumFinished))
+        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
 
     If mIndex = mEndIndex Then
         mIndex = mEndIndex + 1
@@ -188,16 +188,16 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef s As String, ByVal CopyString As Boolean)
-    Dim Ptr As Long
+    Dim ptr As Long
     
     If CopyString Then
         mStringCopy = s
-        Ptr = StrPtr(mStringCopy)
+        ptr = StrPtr(mStringCopy)
     Else
-        Ptr = StrPtr(s)
+        ptr = StrPtr(s)
     End If
     mEndIndex = Len(s) - 1
-    InitWordBuffer mString, Ptr, mEndIndex + 1
+    InitWordBuffer mString, ptr, mEndIndex + 1
     Reset
 End Sub
 

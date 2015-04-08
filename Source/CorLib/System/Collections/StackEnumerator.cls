@@ -99,9 +99,9 @@ End Function
 '   ICloneable Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
-    Dim ret As New StackEnumerator
-    Call ret.CloneHelper(mStack, SAPtr(mItems), mIndex)
-    Set ICloneable_Clone = ret
+    Dim Ret As New StackEnumerator
+    Ret.CloneHelper mStack, SAPtr(mItems), mIndex
+    Set ICloneable_Clone = Ret
 End Function
 
 

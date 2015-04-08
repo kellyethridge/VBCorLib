@@ -163,7 +163,7 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(GetErrorMessage(InvalidOperation_EmptyStack))
+        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyStack))
     
     VariantCopy Peek, mItems(mCount - 1)
 End Function
@@ -175,7 +175,7 @@ End Function
 '
 Public Function Pop() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(GetErrorMessage(InvalidOperation_EmptyStack))
+        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyStack))
     
     mCount = mCount - 1
     Helper.MoveVariant Pop, mItems(mCount)

@@ -126,7 +126,7 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
             Case vbIntegerArray
                 Read = ReadToCharBuffer(BufferPtr, BufferIndex, BufferCount)
             Case Else
-                Throw Cor.NewArgumentException("A Byte or Integer array is required.", GetParameter(Param.BufferParam))
+                Throw Cor.NewArgumentException("A Byte or Integer array is required.", Environment.GetResourceString(Parameter_Buffer))
         End Select
     End If
 End Function
