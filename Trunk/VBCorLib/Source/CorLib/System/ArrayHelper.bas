@@ -44,12 +44,12 @@ End Function
 
 Public Function ArrayPointer(ByRef Arr As Variant) As Long
     If Not IsArray(Arr) Then _
-        Throw Cor.NewArgumentException(GetErrorMessage(Argument_ArrayRequired))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayRequired))
     
     ArrayPointer = MemLong(vbaVarRefAry(Arr))
 End Function
 
-Public Function ValidArrayPointer(ByRef Arr As Variant, Optional ByVal Parameter As ParameterName = Parameter_Arr, Optional ByVal NullMessage As ErrorMessage = ArgumentNull_Array) As Long
+Public Function ValidArrayPointer(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal NullMessage As ResourceString = ArgumentNull_Array) As Long
     Dim ArrayPtr As Long
     
     ArrayPtr = ArrayPointer(Arr)
@@ -67,7 +67,7 @@ End Function
 '
 Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull As Boolean = False) As Long
     If Not IsArray(Arr) Then _
-        Throw Cor.NewArgumentException(Resources.GetString(Argument_ArrayRequired), "Arr")
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayRequired), "Arr")
     
     GetArrayPointer = MemLong(vbaVarRefAry(Arr))
     
@@ -90,7 +90,7 @@ Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull
     
     If ThrowOnNull Then
         If GetArrayPointer = vbNullPtr Then
-            Throw Cor.NewArgumentNullException("Arr", Resources.GetString(ArgumentNull_Array))
+            Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
         End If
     End If
 End Function

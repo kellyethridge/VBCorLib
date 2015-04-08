@@ -208,6 +208,7 @@ Module=modConstraints; Tests\modConstraints.bas
 Module=Helper; Tests\Helper.bas
 Class=DirectoryBuilder; Tests\IO\DirectoryBuilder.cls
 ResFile32="VBCorLib.Tests.RES"
+Class=StackEnumeratorTests; Tests\Collections\StackEnumeratorTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

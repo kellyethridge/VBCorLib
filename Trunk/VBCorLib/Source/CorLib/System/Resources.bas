@@ -24,9 +24,8 @@ Attribute VB_Name = "Resources"
 '
 Option Explicit
 
-Private Const ParamBase                 As Long = 2000
-
-Public Enum ErrorMessage
+Public Enum ResourceString
+    Blank = 0
     Exception_WasThrown = 101
     ArrayTypeMismatch_Incompatible = 102
     ArrayTypeMismatch_Exception = 103
@@ -128,10 +127,8 @@ Public Enum ErrorMessage
     InvalidOperation_Timeouts = 1107
     ObjectDisposed_StreamClosed = 1200
     Overflow_TimeSpan = 1300
-End Enum
-
-Public Enum ParameterName
-    Parameter_None = 0
+    
+    Parameter_None = Blank
     Parameter_Index = 2000
     Parameter_Count = 2001
     Parameter_StartIndex = 2002
@@ -155,161 +152,3 @@ Public Enum ParameterName
     Parameter_Output = 2020
     Parameter_Source = 2021
 End Enum
-
-Public Enum Param
-    None = 0
-    Index = 2000
-    Count = 2001
-    StartIndex = 2002
-    Chars = 2003
-    CharIndex = 2004
-    CharCount = 2005
-    ByteIndex = 2006
-    Bytes = 2007
-    ByteCount = 2008
-    Value = 2009
-    Arr = 2010
-    List = 2011
-    Year = 2012
-    Month = 2013
-    LCID = 2014
-    Time = 2015
-    PathParam = 2016
-    DstArray = 2017
-    StreamParam = 2018
-    BufferParam = 2019
-    Output = 2020
-End Enum
-
-Public Enum Rank
-    MultiDimensionNotSupported = 200
-End Enum
-
-Public Enum ArgumentOutOfRange
-    None = 0
-    MustBeNonNegNum = 700
-    SmallCapacity = 701
-    NeedNonNegNum = 702
-    ArrayListInsert = 703
-    Index = 704
-    LargerThanCollection = 705
-    LowerBound = 706
-    Exception = 707
-    Range = 708
-    UpperBound = 709
-    MinMax = 710
-    VersionFieldCount = 711
-    ValidValues = 712
-    NeedPosNum = 713
-    OutsideConsoleBoundry = 714
-    EnumType = 715
-    ArrayLB = 716
-    ArrayBounds = 717
-    Count = 718
-    NegativeLength = 719
-    StartIndex = 720
-    OffsetOut = 721
-    IndexLength = 722
-    InvalidFileTime = 723
-    Month = 724
-    Year = 725
-    BeepFrequency = 726
-    ConsoleBufferSize = 727
-    ConsoleWindowSize_Size = 728
-    ConsoleWindowPos = 729
-    ConsoleBufferLessThanWindowSize = 730
-    ConsoleTitleTooLong = 731
-    ConsoleColor = 732
-    CursorSize = 733
-End Enum
-
-Public Enum ArgumentNull
-    None = 0
-    NullArray = 900
-    NullException = 901
-    NullStream = 902
-    NullCollection = 903
-    NullTimeSpan = 904
-    NullGeneric = 905
-    NullBuffer = 906
-End Enum
-
-Public Enum Argument
-    None = 0
-    MultiDimensionNotSupported = 200
-    InvalidOffLen = 800
-    ArrayPlusOffTooSmall = 801
-    Exception = 802
-    ArrayRequired = 803
-    MatchingBounds = 804
-    IndexPlusTypeSize = 805
-    VersionRequired = 806
-    TimeSpanRequired = 807
-    DateRequired = 808
-    InvalidHandle = 809
-    EmptyPath = 810
-    SmallConversionBuffer = 811
-    EmptyFileName = 812
-    ReadableStreamRequired = 813
-    InvalidEraValue = 814
-    ParamRequired = 815
-    StreamRequired = 816
-    InvalidPathFormat = 817
-    StreamNotReadable = 818
-    StreamNotWritable = 819
-    StreamNotSeekable = 820
-    InvalidComparer = 823
-    EmptyName = 825
-    InvalidSeekOrigin = 827
-    UnsupportedArray = 828
-    NeedIntrinsicType = 829
-    CharArrayRequired = 830
-    InvalidDateSubtraction = 831
-    InvalidPathChars = 832
-End Enum
-
-Public Enum ArgumentFormat
-    LongerThanSrcArray = 821
-    LongerThanDestArray = 822
-    MustBeVbVarType = 824
-    LongerThanSrcString = 826
-End Enum
-
-
-Public Function GetString(ByVal ResourceId As ErrorMessage, ParamArray Args() As Variant) As String
-    Dim vArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
-    GetString = cString.FormatArray(LoadResString(ResourceId), vArgs)
-End Function
-
-Public Function GetParameter(ByVal ParameterId As Param) As String
-    If ParameterId <> Param.None Then
-        GetParameter = LoadResString(ParameterId)
-    End If
-End Function
-
-Public Function GetParameterName(ByVal Name As ParameterName)
-    If Name <> Parameter_None Then
-        GetParameterName = LoadResString(Name)
-    End If
-End Function
-
-Public Function GetErrorMessage(ByVal Message As ErrorMessage) As String
-    GetErrorMessage = LoadResString(Message)
-End Function
-
-Public Function GetErrorMessageFormat(ByVal Message As ErrorMessage, ParamArray Args() As Variant) As String
-    Dim SwappedArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(ModuleEBPOffset(4))
-    GetErrorMessageFormat = cString.FormatArray(LoadResString(Message), SwappedArgs)
-End Function
-
-Private Function ModuleEBPOffset(ByVal Offset As Long) As Long
-    On Error GoTo InIDE
-    Debug.Assert 1 \ 0
-    ModuleEBPOffset = Offset + 8
-    Exit Function
-    
-InIDE:
-    ModuleEBPOffset = Offset + 12
-End Function

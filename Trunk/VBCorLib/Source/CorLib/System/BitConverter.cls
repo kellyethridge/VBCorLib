@@ -300,14 +300,14 @@ Public Function ToDecimal(ByRef Value() As Byte, ByVal StartIndex As Long) As Va
     If Value(StartIndex + 14) > 28 Then _
         Throw Cor.NewOverflowException("Decimal precision must be from 0 to 28 places.")
     
-    Dim Ptr As Long
-    Ptr = VarPtr(ToDecimal)
+    Dim ptr As Long
+    ptr = VarPtr(ToDecimal)
     
-    If Value(StartIndex + 15) <> 0 Then MemByte(Ptr + 3) = &H80  ' set sign
+    If Value(StartIndex + 15) <> 0 Then MemByte(ptr + 3) = &H80  ' set sign
     
-    MemByte(Ptr + 2) = Value(StartIndex + 14)            ' set precision
-    MemLong(Ptr + 4) = AsLong(Value(StartIndex + 8))     ' set highest 32 bits
-    MemCurr(Ptr + 8) = AsCurr(Value(StartIndex + 0))     ' set lowest and middle 32bits
+    MemByte(ptr + 2) = Value(StartIndex + 14)            ' set precision
+    MemLong(ptr + 4) = AsLong(Value(StartIndex + 8))     ' set highest 32 bits
+    MemCurr(ptr + 8) = AsCurr(Value(StartIndex + 0))     ' set lowest and middle 32bits
 End Function
 
 ''
@@ -340,25 +340,25 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
     
     Dim i       As Long
     Dim b       As Long
-    Dim Pos     As Long
+    Dim pos     As Long
     Dim nibble  As Long
     Dim Offset  As Long
     
     Offset = 1
     Do While i < ElemCount
-        If i > 0 Then mBuffer.Data(Pos) = vbMinusChar: Pos = Pos + 1
+        If i > 0 Then mBuffer.Data(pos) = vbMinusChar: pos = pos + 1
         b = Value(ElemIndex + i)
         Do
             nibble = b And &HF
             If nibble > 9 Then
-                mBuffer.Data(Pos + Offset) = nibble + ALPHA_OFFSET
+                mBuffer.Data(pos + Offset) = nibble + ALPHA_OFFSET
             Else
-                mBuffer.Data(Pos + Offset) = nibble + vbZeroChar
+                mBuffer.Data(pos + Offset) = nibble + vbZeroChar
             End If
             b = (b And &HF0&) \ &H10&
             Offset = 1 - Offset
         Loop While Offset = 0
-        Pos = Pos + 2
+        pos = pos + 2
         i = i + 1
     Loop
     
@@ -373,9 +373,9 @@ Private Sub ValidateArrayArguments(ByRef Value() As Byte, ByVal StartIndex As Lo
     If IsNullByteArray(Value) Then _
         Throw Cor.NewArgumentNullException("Value")
     If StartIndex < LBound(Value) Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_ArrayLB))
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayLB))
     If StartIndex > UBound(Value) - Count + 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Resources.GetString(ArgumentOutOfRange_Index))
+        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 End Sub
 
 

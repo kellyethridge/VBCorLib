@@ -135,7 +135,7 @@ End Property
 '
 Public Property Set CreationTime(ByVal Value As Variant)
     If Not TypeOf Value Is cDateTime Then _
-        Throw Cor.NewArgumentException(GetErrorMessage(Argument_DateRequired), "CreationTime")
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
     
     Directory.SetCreationTime mPath, Value
     MarkDirty

@@ -107,6 +107,7 @@ Private Sub Form_Load()
         .Add New TestSortedList
         .Add New TestQueue
         .Add New StackTests
+        .Add New StackEnumeratorTests
         .Add New TestDefaultComparer
         .Add New TestCaseInsensitiveHCP
         

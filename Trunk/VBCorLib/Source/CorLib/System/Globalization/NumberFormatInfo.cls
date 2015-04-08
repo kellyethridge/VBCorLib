@@ -711,7 +711,7 @@ Public Property Let CurrencyGroupSizes(ByRef RHS() As Long)
     VerifyWritable
     VerifyLoaded
     If cArray.IsNull(RHS) Then _
-        Throw Cor.NewArgumentNullException("CurrencyGroupSizes", Resources.GetString(ArgumentNull_Array))
+        Throw Cor.NewArgumentNullException("CurrencyGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
     VerifyAndSetGroupSizes RHS, mProps.CurrencyGroupSizes
 End Property
@@ -2234,14 +2234,14 @@ Private Sub AppendExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal
     ' them in reverse order, starting from the rightside and
     ' moving back towards the left. This is the easiest way
     ' mathematically without having to reverse the characters.
-    Dim Pos As Long
-    Pos = mOutputPos - 1
+    Dim pos As Long
+    pos = mOutputPos - 1
     Do While Places > 0
         Dim OneTenth As Long
         OneTenth = Places \ 10
-        mOutput(Pos) = (Places - (OneTenth * 10)) + vbZeroChar
+        mOutput(pos) = (Places - (OneTenth * 10)) + vbZeroChar
         Places = OneTenth
-        Pos = Pos - 1
+        pos = pos - 1
     Loop
 End Sub
 

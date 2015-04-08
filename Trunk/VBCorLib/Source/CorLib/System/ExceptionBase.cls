@@ -165,7 +165,7 @@ End Property
 '
 Public Property Get Message() As String
     If cString.IsNull(mMessage) Then
-        Message = Resources.GetString(Exception_WasThrown, mSubclassName)
+        Message = Environment.GetResourceString(Exception_WasThrown, mSubclassName)
     Else
         Message = mMessage
     End If
@@ -175,7 +175,7 @@ End Property
 ' Sets the error message associated with the Subclass exception.
 '
 ' @param NewMessage The message to set the base to. Setting this to
-' vbNullString will cause GetErrorMessage to return the default message.
+' vbNullString will cause Environment.GetResourceString to return the default message.
 ' @remarks Generally this property is set to a meaningful message that
 ' is related to the exception that is being thrown. The message should
 ' be human readable.
@@ -283,7 +283,7 @@ End Function
 '
 ' @param FormattedMessage This allows the Subclass to pass in a formatted version of the
 ' original message to be used in creating the resulting string. If the message is not
-' passed in, then the internal <b>GetErrorMessage</b> method will be used.
+' passed in, then the internal <b>Environment.GetResourceString</b> method will be used.
 ' @param AppTitle The name of the EXE, DLL or OCX that contains the exception Subclass.
 ' @param Subclass The parent Subclass object to derived the name from.
 ' @return A formatted message containing both the name of the parent subclass and

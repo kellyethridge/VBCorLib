@@ -130,7 +130,7 @@ Public Property Let TwoDigitYearMax(ByVal RHS As Long)
     Const MaxTwoDigitYear As Long = 9999
     
     If RHS < MinTwoDigitYear Or RHS > MaxTwoDigitYear Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Message:=Resources.GetString(ArgumentOutOfRange_Range, MinTwoDigitYear, MaxTwoDigitYear))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, MinTwoDigitYear, MaxTwoDigitYear))
     
     mTwoDigitYearMax = RHS
 End Property

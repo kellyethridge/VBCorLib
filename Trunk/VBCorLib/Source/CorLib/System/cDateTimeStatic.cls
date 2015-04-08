@@ -340,12 +340,12 @@ Friend Function GetcDateTime(ByRef d As Variant) As cDateTime
             If TypeOf d Is cDateTime Then
                 Set GetcDateTime = d
             Else
-                Throw Cor.NewArgumentException(Resources.GetString(Argument_DateRequired))
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired))
             End If
         Case vbDate
             Set GetcDateTime = FromOADate(d)
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_DateRequired))
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired))
     End Select
 End Function
 

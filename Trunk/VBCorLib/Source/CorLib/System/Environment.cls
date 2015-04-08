@@ -662,10 +662,21 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function GetResourceString(ByVal resId As Long, ParamArray Args() As Variant) As String
-    Dim vArgs() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16))
-    GetResourceString = cString.FormatArray(LoadResString(resId), vArgs)
+Friend Function GetResourceString(ByVal Key As ResourceString, ParamArray Values() As Variant) As String
+    If Key = Blank Then
+        Exit Function
+    End If
+    
+    Dim Text As String
+    Text = LoadResString(Key)
+
+    If UBound(Values) >= 0 Then
+        Dim SwappedValues() As Variant
+        Helper.Swap4 ByVal ArrPtr(SwappedValues), ByVal Helper.DerefEBP(16)
+        GetResourceString = cString.FormatArray(Text, SwappedValues)
+    Else
+        GetResourceString = Text
+    End If
 End Function
 
 Friend Sub VerifyNTMachine()

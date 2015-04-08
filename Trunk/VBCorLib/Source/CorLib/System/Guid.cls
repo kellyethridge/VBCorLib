@@ -105,14 +105,14 @@ End Function
 ' @return A Long
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Dim Other As Guid
+    Dim other As Guid
     
     On Error GoTo errTrap
-    Set Other = Value
-    If Other Is Nothing Then
+    Set other = Value
+    If other Is Nothing Then
         CompareTo = 1
     Else
-        CompareTo = -Other.InternalCompare(mGuid)
+        CompareTo = -other.InternalCompare(mGuid)
     End If
     
     Exit Function
@@ -236,7 +236,7 @@ Friend Sub Init(ByRef Value As Variant)
             
         Case Else
             If IsArray(Value) Then _
-                Throw Cor.NewArgumentNullException(Resources.GetParameter(Param.Value), Resources.GetString(ArgumentNull_Array))
+                Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Array))
                 
     End Select
 End Sub
@@ -306,13 +306,13 @@ Private Sub FormatError()
 End Sub
 
 Friend Sub FromByteArray(ByRef b As Variant)
-    Dim Ptr As Long
-    Ptr = GetArrayPointer(b)
-    If Ptr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Resources.GetParameter(Value), Resources.GetString(ArgumentNull_Array))
+    Dim ptr As Long
+    ptr = GetArrayPointer(b)
+    If ptr = vbNullPtr Then _
+        Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Bytes() As Byte
-    SAPtr(Bytes) = Ptr
+    SAPtr(Bytes) = ptr
     CopyMemory mGuid, Bytes(LBound(Bytes)), 16
     SAPtr(Bytes) = vbNullPtr
 End Sub

@@ -276,7 +276,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init DefaultParamName, MissingVariant, Resources.GetErrorMessage(ArgumentOutOfRange.Exception), Nothing
+    Init DefaultParamName, MissingVariant, Environment.GetResourceString(ArgumentOutOfRange_Exception), Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)

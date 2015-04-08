@@ -423,7 +423,7 @@ Public Sub SetLength(ByVal Value As Currency)
     Value = Int(Value)
     If Value < mMinPosition Then
         If mMinPosition = 0@ Then
-            Throw Cor.NewArgumentOutOfRangeException("Value", Value, Resources.GetString(ArgumentOutOfRange_NeedNonNegNum))
+            Throw Cor.NewArgumentOutOfRangeException("Value", Value, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
         Else
             Throw Cor.NewIOException("Setting the length to a position prior to the append-start postion is not permitted.")
         End If

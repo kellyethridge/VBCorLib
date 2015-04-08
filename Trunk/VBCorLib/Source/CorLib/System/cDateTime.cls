@@ -288,7 +288,7 @@ End Property
 '
 Public Function Add(ByRef Value As TimeSpan) As cDateTime
     If Value Is Nothing Then _
-        Throw Cor.NewArgumentNullException(GetParameter(Param.Value), GetString(ArgumentNull_Generic))
+        Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Generic))
 
     Set Add = cDateTime.FromMilliseconds(mMilliseconds + Value.TotalMilliseconds, mKind)
 End Function
@@ -486,7 +486,7 @@ Public Function ToFileTime() As Currency
     Dim ms As Currency
     ms = TimeZone.CurrentTimeZone.ToUniversalTime(Me).TotalMilliseconds
     If ms < FILETIME_MINIMUM Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_InvalidFileTime))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
     ToFileTime = ms - MILLISECONDS_TO_16011231
 End Function
 
@@ -498,7 +498,7 @@ End Function
 '
 Public Function ToFileTimeUtc() As Currency
     If mMilliseconds < FILETIME_MINIMUM Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Resources.GetString(ArgumentOutOfRange_InvalidFileTime))
+        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
     ToFileTimeUtc = mMilliseconds - MILLISECONDS_TO_16011231
 End Function
 
@@ -624,7 +624,7 @@ Public Function Subtract(ByRef Value As Variant) As Object
     Select Case VarType(Value)
         Case vbObject
             If Value Is Nothing Then _
-                Throw Cor.NewArgumentNullException(Resources.GetParameter(Param.Value))
+                Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value))
             
             If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan
@@ -635,12 +635,12 @@ Public Function Subtract(ByRef Value As Variant) As Object
                 Set dt = Value
                 Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - dt.TotalMilliseconds)
             Else
-                Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidDateSubtraction), Resources.GetParameter(Param.Value))
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidDateSubtraction), Environment.GetResourceString(Parameter_Value))
             End If
         Case vbDate
             Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - cDateTime.AscDateTime(Value).TotalMilliseconds)
         Case Else
-            Throw Cor.NewArgumentException(Resources.GetString(Argument_InvalidDateSubtraction), Resources.GetParameter(Param.Value))
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidDateSubtraction), Environment.GetResourceString(Parameter_Value))
     End Select
 End Function
 
