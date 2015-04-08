@@ -25,119 +25,129 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/1/2002#, False
             Test.Use #1/1/2001#, True
             
+        Case "NewStack_WithElements_PushesElementsOnStack"
+            Test.Use Array(1, 2, 3)
+            Test.Use NewArrayList(c:=Array(1, 2, 3))
+            
+            Dim Col As New Collection
+            Col.Add 1
+            Col.Add 2
+            Col.Add 3
+            Test.Use Col
+            
     End Select
 End Sub
 
 Public Sub Ctor_WhenCalled_IsEmpty()
-    Dim sut As New Stack
+    Dim Sut As New Stack
     
-    Assert.That sut, Iz.Empty
+    Assert.That Sut, Iz.Empty
 End Sub
 
 Public Sub Push_WhenCalled_AddsOneToStack()
-    Dim sut As New Stack
+    Dim Sut As New Stack
     
-    sut.Push 1
+    Sut.Push 1
     
-    Assert.That sut, Iz.EqualTo(Array(1))
+    Assert.That Sut, Iz.EqualTo(Array(1))
 End Sub
 
 Public Sub Pop_WhenCalled_ReturnsValuesInOppositeOrderOfPush()
-    Dim sut As New Stack
+    Dim Sut As New Stack
     
-    sut.Push 1
-    sut.Push 2
+    Sut.Push 1
+    Sut.Push 2
     
-    Assert.That sut.Count, Iz.EqualTo(2)
-    Assert.That sut.Pop, Iz.EqualTo(2)
-    Assert.That sut.Pop, Iz.EqualTo(1)
+    Assert.That Sut.Count, Iz.EqualTo(2)
+    Assert.That Sut.Pop, Iz.EqualTo(2)
+    Assert.That Sut.Pop, Iz.EqualTo(1)
 End Sub
 
 Public Sub Pop_WhenStackIsEmpty_ThrowsInvalidOperationException()
-    Dim sut As New Stack
+    Dim Sut As New Stack
     
     On Error GoTo errTrap
-    sut.Pop
+    Sut.Pop
     
 errTrap:
     AssertInvalidOperationException Err
 End Sub
 
 Public Sub Contains_WithValue_ReturnsExpected(ByVal Value As Variant, ByVal Expected As Boolean)
-    Dim sut As New Stack
-    sut.Push 1
-    sut.Push 2
-    sut.Push "a"
-    sut.Push #1/1/2001#
+    Dim Sut As New Stack
+    Sut.Push 1
+    Sut.Push 2
+    Sut.Push "a"
+    Sut.Push #1/1/2001#
     
     Dim Actual As Boolean
-    Actual = sut.Contains(Value)
+    Actual = Sut.Contains(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Peek_WhenCalled_ReturnsNextItemToPop()
-    Dim sut As New Stack
-    sut.Push 1
-    sut.Push 2
+    Dim Sut As New Stack
+    Sut.Push 1
+    Sut.Push 2
     
     Dim Actual As Variant
-    Actual = sut.Peek
+    Actual = Sut.Peek
     
     Assert.That Actual, Iz.EqualTo(2)
-    Assert.That sut.Count, Iz.EqualTo(2)
+    Assert.That Sut.Count, Iz.EqualTo(2)
 End Sub
 
 Public Sub Peek_WithEmptyStack_ThrowsInvalidOperationException()
-    Dim sut As New Stack
+    Dim Sut As New Stack
     
     On Error GoTo errTrap
-    sut.Peek
+    Sut.Peek
     
 errTrap:
     AssertInvalidOperationException Err
 End Sub
 
 Public Sub ToArray_WhenCalled_ReturnsArrayOfElementsInOrderOfPop()
-    Dim sut As New Stack
-    sut.Push 1
-    sut.Push 2
-    sut.Push "a"
+    Dim Sut As New Stack
+    Sut.Push 1
+    Sut.Push 2
+    Sut.Push "a"
     
     Dim Actual() As Variant
-    Actual = sut.ToArray
+    Actual = Sut.ToArray
     
     Assert.That Actual, Iz.EqualTo(Array("a", 2, 1))
 End Sub
 
 Public Sub ToArray_WithEmptyStack_ReturnsEmptyArray()
-    Dim sut As New Stack
+    Dim Sut As New Stack
     
     Dim Actual() As Variant
-    Actual = sut.ToArray
+    Actual = Sut.ToArray
     
     Assert.That Actual, Iz.Empty
 End Sub
 
 Public Sub Clear_WhenCalled_EmptiesStack()
-    Dim sut As New Stack
-    sut.Push 1
+    Dim Sut As New Stack
+    Sut.Push 1
     
-    sut.Clear
+    Sut.Clear
     
-    Assert.That sut, Iz.Empty
+    Assert.That Sut, Iz.Empty
 End Sub
 
 Public Sub Enumeration_WhenCalled_ReturnsElementsInOrderOfPop()
-    Dim sut As New Stack
-    sut.Push 1
-    sut.Push 2
-    sut.Push 3
+    Dim Sut As New Stack
+    Sut.Push 1
+    Sut.Push 2
+    Sut.Push 3
     
     Dim Actual(0 To 2) As Variant
     Dim Index As Long
     Dim Item As Variant
-    For Each Item In sut
+    For Each Item In Sut
         Actual(Index) = Item
         Index = Index + 1
     Next
@@ -146,92 +156,90 @@ Public Sub Enumeration_WhenCalled_ReturnsElementsInOrderOfPop()
 End Sub
 
 Public Sub CopyTo_WhenCalled_CopiesItemsToArrayInOrderOfPop()
-    Dim sut As New Stack
-    sut.Push 1
-    sut.Push 2
+    Dim Sut As New Stack
+    Sut.Push 1
+    Sut.Push 2
     
     Dim Actual(0 To 1) As Variant
-    sut.CopyTo Actual, 0
+    Sut.CopyTo Actual, 0
     
     Assert.That Actual, Iz.EqualTo(Array(2, 1))
 End Sub
 
 Public Sub CopyTo_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
-    Dim sut As New Stack
-    sut.Push 1
+    Dim Sut As New Stack
+    Sut.Push 1
     
-    On Error GoTo errTrap
-    Dim Actual(0 To 1) As Variant
-    sut.CopyTo Actual, -1
+    On Error Resume Next
+    Dim Target(0 To 1) As Variant
+    Sut.CopyTo Target, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub CopyTo_WithMultiDimensionalArray_ThrowsArgumentException()
-    Dim sut As New Stack
-    sut.Push 1
+    Dim Sut As New Stack
+    Sut.Push 1
     
-    On Error GoTo errTrap
-    Dim Actual(0 To 1, 0 To 1) As Variant
-    sut.CopyTo Actual, 0
+    On Error Resume Next
+    Dim Target(0 To 1, 0 To 1) As Variant
+    Sut.CopyTo Target, 0
     
-errTrap:
     AssertArgumentException Err, "DstArray"
 End Sub
 
-'Public Sub TestCopyTo()
-'    Dim i As Long
-'    For i = 1 To 10
-'        st.Push i
-'    Next i
-'
-'    Dim a(0 To 9) As Long
-'    st.CopyTo a, 0
-'    For i = 0 To 9
-'        Assert.AreEqual 10 - i, a(i)
-'    Next i
-'End Sub
+Public Sub CopyTo_WithNotEnoughRoomToCopyStack_ThrowsArgumentException()
+    Dim Sut As New Stack
+    Sut.Push 1
+    Sut.Push 2
+    Sut.Push 3
+    
+    On Error Resume Next
+    Dim Target(0 To 2)
+    Sut.CopyTo Target, 1
+    
+    AssertArgumentException Err
+End Sub
 
-'Public Sub TestPersitence()
-'    Dim i As Long
-'    For i = 1 To 10
-'        st.Push i
-'    Next i
-'
-'    Dim Copy As Stack
-'    Dim pp1 As New PropertyBag
-'    Dim pp2 As New PropertyBag
-'    pp1.WriteProperty "stack", st
-'    pp2.Contents = pp1.Contents
-'
-'    Set Copy = pp2.ReadProperty("stack", Nothing)
-'    For i = 1 To 10
-'        Assert.AreEqual st.Pop, Copy.Pop
-'    Next i
-'End Sub
-'
-'Public Sub TestBigStack()
-'    Dim i As Long
-'    For i = 1 To 100
-'        st.Push i
-'    Next i
-'
-'    For i = 100 To 1 Step -1
-'        Assert.AreEqual i, st.Pop
-'    Next i
-'End Sub
-'
-'Public Sub TestInitWithElements()
-'    Dim a() As Long
-'    a = NewArray(vbLong, 1, 2, 3, 4, 5)
-'
-'    Set st = NewStack(a)
-'    Assert.AreEqual 5, st.Count
-'
-'    Dim i As Long
-'    For i = 1 To 5
-'        Assert.AreEqual 6 - i, st.Pop
-'    Next i
-'
-'End Sub
+Public Sub TestPersitence()
+    Dim Sut As New Stack
+    Sut.Push 1
+    
+    Dim Bag As New PropertyBag
+    Bag.WriteProperty "Stack", Sut
+    
+    Dim Actual As Stack
+    Set Actual = Bag.ReadProperty("Stack")
+    Assert.That Actual.Pop, Iz.EqualTo(1)
+End Sub
+
+Public Sub Push_WithLargeAmountOfData_StoresOnStack()
+    Dim Sut As New Stack
+    Dim i As Long
+    
+    For i = 1 To 100
+        Sut.Push i
+    Next
+    
+    For i = 100 To 1 Step -1
+        Assert.That Sut.Pop, Iz.EqualTo(i)
+    Next
+End Sub
+
+Public Sub NewStack_WithElements_PushesElementsOnStack(ByVal Source As Variant)
+    Dim Sut As Stack
+    
+    Set Sut = NewStack(Source)
+    
+    Assert.That Sut.ToArray, Iz.EqualTo(Array(3, 2, 1))
+End Sub
+
+Public Sub NewStack_WithAnArray_DoesNotAlterArray()
+    Dim Sut As Stack
+    Dim Source As Variant
+    Source = Array(1, 2, 3)
+    
+    NewStack Source
+    
+    Assert.That Source, Iz.EqualTo(Array(1, 2, 3))
+End Sub

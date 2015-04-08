@@ -321,13 +321,13 @@ End Function
 ''
 ' Creates a new Stack object initialized with data in <i>col</i>.
 '
-' @param col A collection of items to initalize the Stack object with.
+' @param Source A collection of items to initalize the Stack object with.
 ' @return A new Stack object containing the collection of values.
 ' @remarks <i>col</i> can be a VBA.Collection, an object implementing ICollection, or an Array.
 '
-Public Function NewStack(ByRef Col As Variant) As Stack
+Public Function NewStack(ByRef Source As Variant) As Stack
     Set NewStack = New Stack
-    Call NewStack.Init(Col)
+    NewStack.Init Source
 End Function
 
 ''
