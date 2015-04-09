@@ -36,14 +36,14 @@ Public Sub TestMax()
 End Sub
 
 Public Sub TestMaxObject()
-    Dim x As New Int32
-    Dim y As New Int32
+    Dim X As New Int32
+    Dim Y As New Int32
     
-    x.mValue = 2
-    y.mValue = 5
+    X.Value = 2
+    Y.Value = 5
     
-    Assert.AreEqual y, Max(x, y)
-    Assert.AreEqual y, Max(y, x)
+    Assert.AreEqual Y, Max(X, Y)
+    Assert.AreEqual Y, Max(Y, X)
 End Sub
 
 Public Sub TestMin()
@@ -52,53 +52,53 @@ Public Sub TestMin()
 End Sub
 
 Public Sub TestMinObject()
-    Dim x As New Int32
-    Dim y As New Int32
+    Dim X As New Int32
+    Dim Y As New Int32
     
-    x.mValue = 2
-    y.mValue = 5
+    X.Value = 2
+    Y.Value = 5
     
-    Assert.AreEqual x, Min(x, y)
-    Assert.AreEqual x, Min(y, x)
+    Assert.AreEqual X, Min(X, Y)
+    Assert.AreEqual X, Min(Y, X)
 End Sub
 
 Public Sub TestDivRem()
-    Dim q As Long
+    Dim Q As Long
     Dim r As Long
     
-    q = DivRem(11, 4, r)
+    Q = DivRem(11, 4, r)
     
-    Assert.AreEqual 2, q
+    Assert.AreEqual 2, Q
     Assert.AreEqual 3, r
 End Sub
 
 Public Sub TestDivRemNegNum()
-    Dim q As Long
+    Dim Q As Long
     Dim r As Long
     
-    q = DivRem(-11, 4, r)
+    Q = DivRem(-11, 4, r)
     
-    Assert.AreEqual -2, q
+    Assert.AreEqual -2, Q
     Assert.AreEqual -3, r
 End Sub
 
 Public Sub TestDivRemNegNumAndDenom()
-    Dim q As Long
+    Dim Q As Long
     Dim r As Long
     
-    q = DivRem(-11, -4, r)
+    Q = DivRem(-11, -4, r)
     
-    Assert.AreEqual 2, q
+    Assert.AreEqual 2, Q
     Assert.AreEqual -3, r
 End Sub
 
 Public Sub TestDivRemNegDenom()
-    Dim q As Long
+    Dim Q As Long
     Dim r As Long
     
-    q = DivRem(11, -4, r)
+    Q = DivRem(11, -4, r)
     
-    Assert.AreEqual -2, q
+    Assert.AreEqual -2, Q
     Assert.AreEqual 3, r
 End Sub
 

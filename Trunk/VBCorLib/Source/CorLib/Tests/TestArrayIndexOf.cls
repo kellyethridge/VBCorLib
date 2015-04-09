@@ -57,9 +57,9 @@ Public Sub IndexOf_WithDefaultComparer_ReturnsExpected()
     Set Arr(0) = New Int32
     Set Arr(1) = New Int32
     Set Arr(2) = New Int32
-    Arr(1).mValue = 10
+    Arr(1).Value = 10
     Dim Value As New Int32
-    Value.mValue = 10
+    Value.Value = 10
     
     Actual = cArray.IndexOf(Arr, Value, Comparer:=Comparer.Default)
     

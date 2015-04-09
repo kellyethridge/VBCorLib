@@ -11,21 +11,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'
-'   Int32
-'
-'   This is a simple class to represent an object version of a 32bit number.
-'
 Option Explicit
 Implements IComparable
 Implements IObject
 
-Public mValue As Long
-
-
-Private Sub Class_Terminate()
-    'Debug.Print "Terminated"
-End Sub
+Public Value As Long
 
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = object.Equals(Me, Value)
@@ -36,20 +26,23 @@ Private Function IObject_GetHashCode() As Long
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = mValue
+    IObject_ToString = Value
 End Function
 
 Private Function IComparable_CompareTo(Value As Variant) As Long
-    Dim l As Long
+    Dim OtherValue As Long
     If IsObject(Value) Then
-        Dim o As Int32
-        Set o = Value
-        l = o.mValue
+        Dim OtherInt32 As Int32
+        Set OtherInt32 = Value
+        OtherValue = OtherInt32.Value
     Else
-        l = Value
+        OtherValue = Value
     End If
     
-    If mValue < l Then IComparable_CompareTo = -1: Exit Function
-    If mValue > l Then IComparable_CompareTo = 1
+    If Me.Value < OtherValue Then
+        IComparable_CompareTo = -1
+    ElseIf Me.Value > OtherValue Then
+        IComparable_CompareTo = 1
+    End If
 End Function
 

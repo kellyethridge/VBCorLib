@@ -108,7 +108,7 @@ Private Sub Form_Load()
         .Add New QueueTests
         .Add New StackTests
         .Add New StackEnumeratorTests
-        .Add New TestDefaultComparer
+        .Add New ComparerTests
         .Add New TestCaseInsensitiveHCP
         
         With Sim.NewTestSuite("ArrayList")

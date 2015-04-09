@@ -10,7 +10,7 @@ Public FindCallbackValue As Variant
 
 Public Function MakeInt32(ByVal Value As Long) As Int32
     Set MakeInt32 = New Int32
-    MakeInt32.mValue = Value
+    MakeInt32.Value = Value
 End Function
 
 Public Function FindByteCallback(ByRef Value As Byte) As Boolean
@@ -50,6 +50,6 @@ Public Function FindVBGuidCallback(ByRef Value As VBCorType.VBGUID) As Boolean
 End Function
 
 Public Function FindInt32Callback(ByRef Value As Int32) As Boolean
-    FindInt32Callback = Value.mValue = CLng(FindCallbackValue)
+    FindInt32Callback = Value.Value = CLng(FindCallbackValue)
 End Function
 

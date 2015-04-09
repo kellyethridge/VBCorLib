@@ -28,7 +28,7 @@ Private Function IComparable_CompareTo(Value As Variant) As Long
     If IsObject(Value) Then
         Dim o As Int32
         Set o = Value
-        l = o.mValue
+        l = o.Value
     Else
         l = Value
     End If

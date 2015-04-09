@@ -88,49 +88,59 @@ Public Function CompareIComparable(ByRef x As Object, ByRef y As Variant) As Lon
     Set comparableX = x
     CompareIComparable = comparableX.CompareTo(y)
 End Function
+
 Public Function CompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
     Dim Comparable As IComparable
     
+    If VarType(x) <> VarType(y) Then _
+        Throw Cor.NewArgumentException("A value of type " & TypeName(x) & " is required.")
+    
     Select Case VarType(x)
         Case vbNull
-            If Not IsNull(y) Then
-                CompareVariants = -1
-            End If
             Exit Function
-        Case vbEmpty
-            If Not IsEmpty(y) Then
-                CompareVariants = -1
-            End If
-            Exit Function
+            
+'        Case vbNull, vbEmpty
+'        Case vbNull
+'            If Not IsNull(y) Then
+'                CompareVariants = -1
+'            End If
+'
+'        Case vbEmpty
+'            If IsNull(y) Then
+'                CompareVariants = 1
+'            ElseIf Not IsEmpty(y) Then
+'                CompareVariants = -1
+'            End If
+
         Case vbObject, vbDataObject
             If TypeOf x Is IComparable Then
                 Set Comparable = x
                 CompareVariants = Comparable.CompareTo(y)
-                Exit Function
             End If
+
         Case VarType(y)
             If x < y Then
                 CompareVariants = -1
             ElseIf x > y Then
                 CompareVariants = 1
             End If
-            Exit Function
+
     End Select
     
-    Select Case VarType(y)
-        Case vbNull, vbEmpty
-            CompareVariants = 1
-        Case vbObject, vbDataObject
-            If TypeOf y Is IComparable Then
-                Set Comparable = y
-                CompareVariants = -Comparable.CompareTo(x)
-                Exit Function
-            Else
-                Throw Cor.NewArgumentException("Object must implement IComparable interface.")
-            End If
-        Case Else
-            Throw Cor.NewInvalidOperationException("Specified IComparer failed.")
-    End Select
+'    Select Case VarType(y)
+'        Case vbNull, vbEmpty
+'            CompareVariants = 1
+'        Case vbObject, vbDataObject
+'            If TypeOf y Is IComparable Then
+'                Set Comparable = y
+'                CompareVariants = -Comparable.CompareTo(x)
+'                Exit Function
+'            Else
+'                Throw Cor.NewArgumentException("Object must implement IComparable interface.")
+'            End If
+'        Case Else
+'            Throw Cor.NewInvalidOperationException("Specified IComparer failed.")
+'    End Select
 End Function
 
 ' This is a set of equality routines used by function delegation calls.

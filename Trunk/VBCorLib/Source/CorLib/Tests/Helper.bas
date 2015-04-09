@@ -46,3 +46,7 @@ Public Sub DeleteFile(ByRef FileName As String)
     End If
 End Sub
 
+Public Function NewInt32(ByVal Value As Long) As Int32
+    Set NewInt32 = New Int32
+    NewInt32.Value = Value
+End Function
