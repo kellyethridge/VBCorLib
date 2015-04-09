@@ -69,14 +69,68 @@ Implements IComparer
 ' x is greater than y returns a positive value (1).<br>
 ' x is less than y returns a negative value (-1).
 '
-Public Function Compare(ByRef x As Variant, ByRef y As Variant) As Long
-    Compare = SZCompareVariants(x, y)
+Public Function Compare(ByRef X As Variant, ByRef Y As Variant) As Long
+    Dim Comparable As IComparable
+    Dim XVarType As VbVarType
+    Dim YVarType As VbVarType
+    
+    XVarType = VarType(X)
+    YVarType = VarType(Y)
+    
+    Select Case XVarType
+        Case vbNull
+            If YVarType <> vbNull Then
+                Compare = -1
+            End If
+            Exit Function
+
+        Case vbEmpty
+            If YVarType = vbNull Then
+                Compare = 1
+            ElseIf YVarType <> vbEmpty Then
+                Compare = -1
+            End If
+            Exit Function
+            
+        Case vbObject, vbDataObject
+            If Not X Is Nothing Then
+                If TypeOf X Is IComparable Then
+                    Set Comparable = X
+                    Compare = Comparable.CompareTo(Y)
+                    Exit Function
+                End If
+            End If
+            
+        Case YVarType
+            If X < Y Then
+                Compare = -1
+            ElseIf X > Y Then
+                Compare = 1
+            End If
+            Exit Function
+    End Select
+
+    Select Case YVarType
+        Case vbNull, vbEmpty
+            Compare = 1
+            
+        Case vbObject, vbDataObject
+            If TypeOf Y Is IComparable Then
+                Set Comparable = Y
+                Compare = -Comparable.CompareTo(X)
+            Else
+                Throw Cor.NewArgumentException("Object must implement IComparable interface.")
+            End If
+            
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, TypeName(X)))
+    End Select
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IComparer Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IComparer_Compare(x As Variant, y As Variant) As Long
-    IComparer_Compare = SZCompareVariants(x, y)
+Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
+    IComparer_Compare = Compare(X, Y)
 End Function

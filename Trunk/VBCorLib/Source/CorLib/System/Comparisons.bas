@@ -27,79 +27,79 @@ Option Explicit
 ' This is a set of comparison routines used by function delegation calls.
 ' They allow a virtual comparison routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
-Public Function SZCompareLongs(ByRef x As Long, ByRef y As Long) As Long
-    If x > y Then
-        SZCompareLongs = 1
-    ElseIf x < y Then
-        SZCompareLongs = -1
-    End If
-End Function
-
-Public Function SZCompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
-    If x > y Then
-        SZCompareIntegers = 1
-    ElseIf x < y Then
-        SZCompareIntegers = -1
-    End If
-End Function
-
-Public Function SZCompareStrings(ByRef x As String, ByRef y As String) As Long
-    If x > y Then
-        SZCompareStrings = 1
-    ElseIf x < y Then
-        SZCompareStrings = -1
-    End If
-End Function
-
-Public Function SZCompareDoubles(ByRef x As Double, ByRef y As Double) As Long
-    If x > y Then
-        SZCompareDoubles = 1
-    ElseIf x < y Then
-        SZCompareDoubles = -1
-    End If
-End Function
-
-Public Function SZCompareSingles(ByRef x As Single, ByRef y As Single) As Long
-    If x > y Then
-        SZCompareSingles = 1
-    ElseIf x < y Then
-        SZCompareSingles = -1
-    End If
-End Function
-
-Public Function SZCompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
-    If x > y Then
-        SZCompareBytes = 1
-    ElseIf x < y Then
-        SZCompareBytes = -1
-    End If
-End Function
-
-Public Function SZCompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
-    If x > y Then
-        SZCompareBooleans = 1
-    ElseIf x < y Then
-        SZCompareBooleans = -1
-    End If
-End Function
-
-Public Function SZCompareDates(ByRef x As Date, ByRef y As Date) As Long
-    SZCompareDates = DateDiff("s", y, x)
-End Function
-
-Public Function SZCompareCurrencies(ByRef x As Currency, ByRef y As Currency) As Long
-    If x > y Then
-        SZCompareCurrencies = 1
-    ElseIf x < y Then
-        SZCompareCurrencies = -1
-    End If
-End Function
-
-Public Function SZCompareComparables(ByRef x As Object, ByRef y As Variant) As Long
-    Dim XComparable As IComparable
-    Set XComparable = x
-    SZCompareComparables = XComparable.CompareTo(y)
-End Function
+'Public Function SZCompareLongs(ByRef x As Long, ByRef y As Long) As Long
+'    If x > y Then
+'        SZCompareLongs = 1
+'    ElseIf x < y Then
+'        SZCompareLongs = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
+'    If x > y Then
+'        SZCompareIntegers = 1
+'    ElseIf x < y Then
+'        SZCompareIntegers = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareStrings(ByRef x As String, ByRef y As String) As Long
+'    If x > y Then
+'        SZCompareStrings = 1
+'    ElseIf x < y Then
+'        SZCompareStrings = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareDoubles(ByRef x As Double, ByRef y As Double) As Long
+'    If x > y Then
+'        SZCompareDoubles = 1
+'    ElseIf x < y Then
+'        SZCompareDoubles = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareSingles(ByRef x As Single, ByRef y As Single) As Long
+'    If x > y Then
+'        SZCompareSingles = 1
+'    ElseIf x < y Then
+'        SZCompareSingles = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
+'    If x > y Then
+'        SZCompareBytes = 1
+'    ElseIf x < y Then
+'        SZCompareBytes = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
+'    If x > y Then
+'        SZCompareBooleans = 1
+'    ElseIf x < y Then
+'        SZCompareBooleans = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareDates(ByRef x As Date, ByRef y As Date) As Long
+'    SZCompareDates = DateDiff("s", y, x)
+'End Function
+'
+'Public Function SZCompareCurrencies(ByRef x As Currency, ByRef y As Currency) As Long
+'    If x > y Then
+'        SZCompareCurrencies = 1
+'    ElseIf x < y Then
+'        SZCompareCurrencies = -1
+'    End If
+'End Function
+'
+'Public Function SZCompareComparables(ByRef x As Object, ByRef y As Variant) As Long
+'    Dim XComparable As IComparable
+'    Set XComparable = x
+'    SZCompareComparables = XComparable.CompareTo(y)
+'End Function
 
 Public Function SZCompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
     Dim Comparable As IComparable

@@ -36,7 +36,7 @@ Public Sub Sort_WithPrimitives_SortsAscending(ByRef Arr As Variant)
     Assert.That Arr, Iz.Ordered
 End Sub
 
-Public Sub Sort_WithNullArray_Throws()
+Public Sub Sort_WithNullArray_ThrowsArgumentNullException()
     On Error GoTo errTrap
     Dim Arr() As Long
     
@@ -46,7 +46,7 @@ errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Sub Sort_WithMultiDimensionArray_Throws()
+Public Sub Sort_WithMultiDimensionArray_ThrowsRankException()
     On Error GoTo errTrap
     Dim Arr() As Long
     ReDim Arr(1, 1)
@@ -57,7 +57,7 @@ errTrap:
     AssertRankException Err
 End Sub
 
-Public Sub Sort_WithNonComparableValues_Throws()
+Public Sub Sort_WithNonComparableValues_ThrowsInvalidOperationException()
     On Error GoTo errTrap
     Dim Arr As Variant
     Arr = Array(3, 2, "4", 1)
@@ -68,7 +68,7 @@ errTrap:
     AssertInvalidOperationException Err
 End Sub
 
-Public Sub Sort_WithInvalidComparer_Throws()
+Public Sub Sort_WithInvalidComparer_ThrowsArgumentException()
     On Error GoTo errTrap
     Dim Arr(0) As Long
     

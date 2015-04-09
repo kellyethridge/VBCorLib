@@ -515,7 +515,10 @@ Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal 
         
     On Error GoTo errTrap
     If Comparer Is Nothing Then
-        If TrySZBinarySearch(pSafeArray, Value, Index, Length, BinarySearchEx) Then Exit Function
+        If TrySZBinarySearch(pSafeArray, Value, Index, Length, BinarySearchEx) Then
+            Exit Function
+        End If
+        
         Set Comparer = VBCorLib.Comparer.Default
     End If
     
@@ -668,10 +671,10 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     If DestinationIndex < LBound(DestinationArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("DestinationIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayLB))
     
-    Dim SourceArrayType As vbVarType
+    Dim SourceArrayType As VbVarType
     SourceArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
     
-    Dim DestinationArrayType As vbVarType
+    Dim DestinationArrayType As VbVarType
     DestinationArrayType = VarType(DestinationArray) And &HFF   ' knock off the vbArray bit.
     
     If AddressOfCopier = 0 Then
@@ -732,7 +735,7 @@ End Sub
 ' to be created. The array must also be assigned at the end of the code
 ' so VB can optimize returning the Variant datatype and not copy it when possible.</p>
 '
-Public Function CreateInstance(ByVal ElementType As vbVarType, Optional ByVal Length1 As Long = 0, Optional ByRef Length2 As Variant, Optional ByRef Length3 As Variant) As Variant
+Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Length1 As Long = 0, Optional ByRef Length2 As Variant, Optional ByRef Length3 As Variant) As Variant
     Dim Bounds(2)   As SafeArrayBound
     Dim Rank        As Long
     
@@ -1423,7 +1426,7 @@ End Sub
 ' datatype to another datatype. If the datatypes are not
 ' compatible then 0 is returned.
 '
-Private Function GetAssigningFunction(ByVal srcType As vbVarType, ByVal dstType As vbVarType) As Long
+Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType As VbVarType) As Long
     Dim Ret As Long
     Select Case srcType
         Case vbLong
@@ -1587,25 +1590,25 @@ Private Function SZLastIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal In
     SZLastIndexOf = SafeArrayGetLBound(pSA, 1) - 1
 End Function
 
-''
-' Attempt to use a specialized search for a specific data type.
-Private Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
-    Select Case SafeArrayGetVartype(pSA)
-        Case vbLong:                    RetVal = SZBinarySearch(pSA, VarPtr(CLng(Value)), StartIndex, Length, AddressOf SZCompareLongs)
-        Case vbString:                  RetVal = SZBinarySearch(pSA, VarPtr(StrPtr(Value)), StartIndex, Length, AddressOf SZCompareStrings)
-        Case vbDouble:                  RetVal = SZBinarySearch(pSA, VarPtr(CDbl(Value)), StartIndex, Length, AddressOf SZCompareDoubles)
-        Case vbObject, vbDataObject:    RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf SZCompareComparables)
-        Case vbVariant:                 RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf SZCompareVariants)
-        Case vbInteger:                 RetVal = SZBinarySearch(pSA, VarPtr(CInt(Value)), StartIndex, Length, AddressOf SZCompareIntegers)
-        Case vbSingle:                  RetVal = SZBinarySearch(pSA, VarPtr(CSng(Value)), StartIndex, Length, AddressOf SZCompareSingles)
-        Case vbCurrency:                RetVal = SZBinarySearch(pSA, VarPtr(CCur(Value)), StartIndex, Length, AddressOf SZCompareCurrencies)
-        Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), StartIndex, Length, AddressOf SZCompareDates)
-        Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), StartIndex, Length, AddressOf SZCompareBooleans)
-        Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), StartIndex, Length, AddressOf SZCompareBytes)
-        Case Else: Exit Function
-    End Select
-    TrySZBinarySearch = True
-End Function
+'''
+'' Attempt to use a specialized search for a specific data type.
+'Private Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
+'    Select Case SafeArrayGetVartype(pSA)
+'        Case vbLong:                    RetVal = SZBinarySearch(pSA, VarPtr(CLng(Value)), StartIndex, Length, AddressOf SZCompareLongs)
+'        Case vbString:                  RetVal = SZBinarySearch(pSA, VarPtr(StrPtr(Value)), StartIndex, Length, AddressOf SZCompareStrings)
+'        Case vbDouble:                  RetVal = SZBinarySearch(pSA, VarPtr(CDbl(Value)), StartIndex, Length, AddressOf SZCompareDoubles)
+'        Case vbObject, vbDataObject:    RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf SZCompareComparables)
+''        Case vbVariant:                 RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf SZCompareVariants)
+'        Case vbInteger:                 RetVal = SZBinarySearch(pSA, VarPtr(CInt(Value)), StartIndex, Length, AddressOf SZCompareIntegers)
+'        Case vbSingle:                  RetVal = SZBinarySearch(pSA, VarPtr(CSng(Value)), StartIndex, Length, AddressOf SZCompareSingles)
+'        Case vbCurrency:                RetVal = SZBinarySearch(pSA, VarPtr(CCur(Value)), StartIndex, Length, AddressOf SZCompareCurrencies)
+'        Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), StartIndex, Length, AddressOf SZCompareDates)
+'        Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), StartIndex, Length, AddressOf SZCompareBooleans)
+'        Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), StartIndex, Length, AddressOf SZCompareBytes)
+'        Case Else: Exit Function
+'    End Select
+'    TrySZBinarySearch = True
+'End Function
 
 Private Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA) And &HFF

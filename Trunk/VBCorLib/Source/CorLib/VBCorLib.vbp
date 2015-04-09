@@ -334,6 +334,7 @@ Module=ThrowHelper; System\ThrowHelper.bas
 Module=Validate; System\Diagnostics\Contracts\Validate.bas
 Module=Require; System\Diagnostics\Contracts\Require.bas
 ResFile32="VBCorLib.RES"
+Module=ArraySearch; System\ArraySearch.bas
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"
