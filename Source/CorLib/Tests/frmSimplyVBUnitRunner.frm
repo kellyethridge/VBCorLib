@@ -105,7 +105,7 @@ Private Sub Form_Load()
     With Sim.NewTestSuite("System.Collections")
         .Add New BitArrayTests
         .Add New TestSortedList
-        .Add New TestQueue
+        .Add New QueueTests
         .Add New StackTests
         .Add New StackEnumeratorTests
         .Add New TestDefaultComparer
