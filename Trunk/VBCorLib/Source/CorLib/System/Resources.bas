@@ -106,6 +106,7 @@ Public Enum ResourceString
     Argument_CharArrayRequired = 830
     Argument_InvalidDateSubtraction = 831
     Argument_InvalidCharsInPath = 832
+    Argument_InvalidValueType = 833
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902
