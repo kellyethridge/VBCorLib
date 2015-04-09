@@ -56,9 +56,6 @@ Private Type GuidSafeArray1d
     SA      As SafeArray1d
 End Type
 
-Private mBinarySearchDelegator  As FunctionDelegator
-Private mBinarySearchComparer   As ITwoArgReturnLong
-
 Private mIndexOfDelegator       As FunctionDelegator
 Private mIndexOfComparer        As ITwoArgReturnBool 'ITwoRefReturnBool
 
@@ -477,9 +474,7 @@ End Sub
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\cArray_BinarySearch.txt"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    If IsNull(Arr) Then _
-        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
-        
+    Require.NotNullArray Arr
     BinarySearch = BinarySearchEx(Arr, LBound(Arr), UBound(Arr) - LBound(Arr) + 1, Value, Comparer)
 End Function
 
@@ -502,20 +497,14 @@ End Function
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\cArray_BinarySearch.txt"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    Dim pSafeArray As Long
-    pSafeArray = GetArrayPointer(Arr)
-    If pSafeArray = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
-    If Index < LBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If Index + Length - 1 > UBound(Arr) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
-        
+    Require.NotNullSingleRankArray Arr
+    Require.Range Index >= LBound(Arr), Parameter_Index, ArgumentOutOfRange_LBound
+    Require.Range Length >= 0, Parameter_Length, ArgumentOutOfRange_NeedNonNegNum
+    Require.That Index + Length - 1 <= UBound(Arr), Argument_InvalidOffLen
+    
     On Error GoTo errTrap
     If Comparer Is Nothing Then
-        If TrySZBinarySearch(pSafeArray, Value, Index, Length, BinarySearchEx) Then
+        If ArraySearch.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, BinarySearchEx) Then
             Exit Function
         End If
         
@@ -1225,7 +1214,6 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mBinarySearchComparer = InitDelegator(mBinarySearchDelegator)
     Set mIndexOfComparer = InitDelegator(mIndexOfDelegator)
     Set mAssigner = InitDelegator(mAssignDelegator)
     Set mSorter = InitDelegator(mSortDelegator)
@@ -1511,41 +1499,6 @@ Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Lon
     End With
 End Sub
 
-''
-' This is an optimized search routine that uses a function pointer
-' to call a specific comparison routine.
-Private Function SZBinarySearch(ByVal pSA As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal pfn As Long) As Long
-    mBinarySearchDelegator.pfn = pfn
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSA)
-    
-    Dim pvData As Long
-    pvData = MemLong(pSA + PVDATA_OFFSET)
-    
-    Dim pLowElem As Long
-    pLowElem = Index - SafeArrayGetLBound(pSA, 1)
-    
-    Dim pHighElem As Long
-    pHighElem = pLowElem + Count - 1
-    
-    Dim pMiddleElem As Long
-    Do While pLowElem <= pHighElem
-        pMiddleElem = (pLowElem + pHighElem) \ 2
-        Select Case mBinarySearchComparer.Call(pvData + pMiddleElem * ElemSize, pValue)
-            Case 0
-                SZBinarySearch = pMiddleElem + SafeArrayGetLBound(pSA, 1)
-                Exit Function
-            Case Is > 0
-                pHighElem = pMiddleElem - 1
-            Case Else
-                pLowElem = pMiddleElem + 1
-        End Select
-    Loop
-    
-    SZBinarySearch = (Not pLowElem) + SafeArrayGetLBound(pSA, 1)
-End Function
-
 Private Function SZIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal pfn As Long) As Long
     mIndexOfDelegator.pfn = pfn
     
@@ -1589,26 +1542,6 @@ Private Function SZLastIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal In
 
     SZLastIndexOf = SafeArrayGetLBound(pSA, 1) - 1
 End Function
-
-'''
-'' Attempt to use a specialized search for a specific data type.
-'Private Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
-'    Select Case SafeArrayGetVartype(pSA)
-'        Case vbLong:                    RetVal = SZBinarySearch(pSA, VarPtr(CLng(Value)), StartIndex, Length, AddressOf SZCompareLongs)
-'        Case vbString:                  RetVal = SZBinarySearch(pSA, VarPtr(StrPtr(Value)), StartIndex, Length, AddressOf SZCompareStrings)
-'        Case vbDouble:                  RetVal = SZBinarySearch(pSA, VarPtr(CDbl(Value)), StartIndex, Length, AddressOf SZCompareDoubles)
-'        Case vbObject, vbDataObject:    RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf SZCompareComparables)
-''        Case vbVariant:                 RetVal = SZBinarySearch(pSA, VarPtr(Value), StartIndex, Length, AddressOf SZCompareVariants)
-'        Case vbInteger:                 RetVal = SZBinarySearch(pSA, VarPtr(CInt(Value)), StartIndex, Length, AddressOf SZCompareIntegers)
-'        Case vbSingle:                  RetVal = SZBinarySearch(pSA, VarPtr(CSng(Value)), StartIndex, Length, AddressOf SZCompareSingles)
-'        Case vbCurrency:                RetVal = SZBinarySearch(pSA, VarPtr(CCur(Value)), StartIndex, Length, AddressOf SZCompareCurrencies)
-'        Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), StartIndex, Length, AddressOf SZCompareDates)
-'        Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), StartIndex, Length, AddressOf SZCompareBooleans)
-'        Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), StartIndex, Length, AddressOf SZCompareBytes)
-'        Case Else: Exit Function
-'    End Select
-'    TrySZBinarySearch = True
-'End Function
 
 Private Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA) And &HFF

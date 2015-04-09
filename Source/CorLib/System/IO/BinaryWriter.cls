@@ -340,7 +340,7 @@ End Sub
 '
 Public Sub WriteBytes(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
-    Require.NotNullOneDimensionArray Buffer, Parameter_Buffer
+    Require.NotNullSingleDimensionArray Buffer, Parameter_Buffer
     
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
@@ -359,7 +359,7 @@ End Sub
 '
 Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
-    Require.NotNullOneDimensionArray Chars, Parameter_Chars
+    Require.NotNullSingleDimensionArray Chars, Parameter_Chars
     
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))

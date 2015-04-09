@@ -258,7 +258,7 @@ End Function
 ' the items from that index on.
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
-    Require.NotNullOneDimensionArray Arr
+    Require.NotNullSingleDimensionArray Arr
     cArray.CopyEx mItems, 0, Arr, GetOptionalLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
 
@@ -272,7 +272,7 @@ End Sub
 ' @remarks The destination array must be large enough to hold the number of elements being copied.
 '
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    Require.NotNullOneDimensionArray Arr
+    Require.NotNullSingleDimensionArray Arr
     cArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
 End Sub
 
@@ -690,7 +690,7 @@ End Sub
 ' <p>No items will be narrowed in the conversion. For example, a Double will
 ' not be converted to a Long. An exception will be thrown.</p>
 '
-Public Function ToArray(Optional ByVal ArrayType As vbVarType = vbVariant) As Variant
+Public Function ToArray(Optional ByVal ArrayType As VbVarType = vbVariant) As Variant
     Dim Ret As Variant
     Ret = cArray.CreateInstance(ArrayType, mCount)
     

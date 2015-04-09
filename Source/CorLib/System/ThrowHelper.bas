@@ -47,3 +47,7 @@ End Sub
 Public Sub PositionNotValidForCollection()
     Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
 End Sub
+
+Public Sub MultiDimensionNotSupported()
+    Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
+End Sub
