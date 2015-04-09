@@ -58,10 +58,10 @@ Public Sub LastIndexOf_WithDefaultComparer_ReturnsExpected()
     Set Arr(0) = New Int32
     Set Arr(1) = New Int32
     Set Arr(2) = New Int32
-    Arr(1).mValue = 10
-    Arr(0).mValue = 10
+    Arr(1).Value = 10
+    Arr(0).Value = 10
     Dim Value As New Int32
-    Value.mValue = 10
+    Value.Value = 10
     
     Actual = cArray.LastIndexOf(Arr, Value, Comparer:=Comparer.Default)
     
@@ -72,60 +72,60 @@ End Sub
 Public Sub LastIndexOf_WithNullArray_Throws()
     Dim Arr() As Long
 
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.LastIndexOf Arr, 1
 
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub LastIndexOf_WithMuliDimensionArray_Throws()
     Dim Arr(0, 0) As Long
 
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.LastIndexOf Arr, 0
 
-ErrTrap:
+errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub LastIndexOf_WithStartIndexLessThanLBound_Throws()
     Dim Arr(0) As Long
 
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.LastIndexOf Arr, 0, -1
 
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub LastIndexOf_WithStartIndexGreaterThanUBound_Throws()
     Dim Arr(0) As Long
 
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.LastIndexOf Arr, 0, 1
 
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub LastIndexOf_WithCountLessThanZero_Throws()
     Dim Arr(0) As Long
 
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.LastIndexOf Arr, 0, 0, -1
 
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub LastIndexOf_WithStartIndexAndCountGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.LastIndexOf Arr, 0, 0, 2
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err
 End Sub
 

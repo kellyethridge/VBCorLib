@@ -11,7 +11,7 @@ Public Function FindHelloString(ByRef s As String) As Boolean
 End Function
 
 Public Function FindInt32(ByRef o As Int32) As Boolean
-    FindInt32 = (o.mValue = 32)
+    FindInt32 = (o.Value = 32)
 End Function
 
 Public Function FindVBGuid(ByRef g As VBGUID) As Boolean
