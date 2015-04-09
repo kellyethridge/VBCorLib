@@ -26,16 +26,29 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2#, 1#, False
             Test.Use Empty, Empty, False
             Test.Use Null, Null, False
+            Test.Use Null, 1, True
+            Test.Use 1, Null, False
+            Test.Use Empty, 1, True
+            Test.Use 1, Empty, False
+            Test.Use Null, Empty, True
+            Test.Use Empty, Null, False
             Test.Use NewInt32(1), NewInt32(2), True
             Test.Use NewInt32(2), NewInt32(1), False
             Test.Use NewInt32(2), NewInt32(2), False
+            
             
         Case "GreaterThan_WithValues_ReturnsExpected"
             Test.Use 1, 2, False
             Test.Use 2, 1, True
             Test.Use 2, 2, False
             Test.Use Null, Null, False
+            Test.Use Null, 1, False
+            Test.Use 1, Null, True
             Test.Use Empty, Empty, False
+            Test.Use Empty, 1, False
+            Test.Use 1, Empty, True
+            Test.Use Null, Empty, False
+            Test.Use Empty, Null, True
             Test.Use 1.1, 2.2, False
             Test.Use 2#, 1#, True
             Test.Use NewInt32(1), NewInt32(2), False
@@ -48,6 +61,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2, 2, True
             Test.Use Null, Null, True
             Test.Use Empty, Empty, True
+            Test.Use Null, 1, False
+            Test.Use 1, Null, False
+            Test.Use Empty, 1, False
+            Test.Use 1, Empty, False
+            Test.Use Null, Empty, False
+            Test.Use Empty, Null, False
             Test.Use 1.1, 2.2, False
             Test.Use 2#, 1#, False
             Test.Use 2#, 2#, True
@@ -63,7 +82,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Setup()
-    Set mComparer = Comparer.Default
+    Set mComparer = comparer.Default
 End Sub
 
 Public Sub LessThan_WithValues_ReturnsExpected(ByRef X As Variant, ByRef Y As Variant, ByVal Expected As Boolean)
@@ -94,37 +113,7 @@ Public Sub Compare_WithDifferentDataTypes_ThrowsArgumentException(ByRef X As Var
     On Error Resume Next
     
     mComparer.Compare X, Y
-    
+
     AssertArgumentException Err
 End Sub
-
-'Private Comparer As IComparer
-'
-'Public Sub Setup()
-'    Set Comparer = VBCorLib.Comparer.Default
-'End Sub
-'
-'Public Sub TestCompareNumbers()
-'    Assert.AreEqual 0, Comparer.Compare(1, 1), "Should return 0."
-'    Assert.IsTrue Comparer.Compare(1, 2) < 0, "Should return negative number."
-'    Assert.IsTrue Comparer.Compare(2, 1) > 0, "Should return positive number."
-'End Sub
-'
-'Public Sub TestCompareFloats()
-'    Assert.AreEqual 0, Comparer.Compare(2.5, 2.5), "Should return 0."
-'    Assert.IsTrue Comparer.Compare(1.25, 2.5) < 0, "Should return negative number."
-'    Assert.IsTrue Comparer.Compare(2.5, 1.25) > 0, "Should return positive number."
-'End Sub
-'
-'Public Sub TestCompareNulls()
-'    Assert.IsTrue Comparer.Compare(Null, 0) < 0, "Should return negative number."
-'    Assert.IsTrue Comparer.Compare(0, Null) > 0, "Should return positive number."
-'    Assert.AreEqual 0, Comparer.Compare(Null, Null), "Should return 0."
-'End Sub
-'
-'Public Sub TestCompareEmpty()
-'    Assert.AreEqual 0, Comparer.Compare(Empty, Empty), "Should return 0."
-'    Assert.IsTrue Comparer.Compare(Empty, 0) < 0, "Should return negative number."
-'    Assert.IsTrue Comparer.Compare(0, Empty) > 0, "Should return positive number."
-'End Sub
 

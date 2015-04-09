@@ -345,8 +345,8 @@ Public Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal R
     Do While Left < Right
         i = Left: j = Right: VariantCopyInd x, Keys((i + j) \ 2)
         Do
-            Do While CompareVariants(Keys(i), x) < 0: i = i + 1: Loop
-            Do While CompareVariants(Keys(j), x) > 0: j = j - 1: Loop
+            Do While SZCompareVariants(Keys(i), x) < 0: i = i + 1: Loop
+            Do While SZCompareVariants(Keys(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then Helper.Swap16 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1

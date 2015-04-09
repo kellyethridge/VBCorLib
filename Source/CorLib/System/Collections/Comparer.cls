@@ -70,7 +70,7 @@ Implements IComparer
 ' x is less than y returns a negative value (-1).
 '
 Public Function Compare(ByRef x As Variant, ByRef y As Variant) As Long
-    Compare = CompareVariants(x, y)
+    Compare = SZCompareVariants(x, y)
 End Function
 
 
@@ -78,5 +78,5 @@ End Function
 '   IComparer Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparer_Compare(x As Variant, y As Variant) As Long
-    IComparer_Compare = CompareVariants(x, y)
+    IComparer_Compare = SZCompareVariants(x, y)
 End Function

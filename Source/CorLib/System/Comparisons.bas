@@ -27,120 +27,136 @@ Option Explicit
 ' This is a set of comparison routines used by function delegation calls.
 ' They allow a virtual comparison routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
-Public Function CompareLongs(ByRef x As Long, ByRef y As Long) As Long
+Public Function SZCompareLongs(ByRef x As Long, ByRef y As Long) As Long
     If x > y Then
-        CompareLongs = 1
+        SZCompareLongs = 1
     ElseIf x < y Then
-        CompareLongs = -1
+        SZCompareLongs = -1
     End If
-End Function
-Public Function CompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
-    If x > y Then
-        CompareIntegers = 1
-    ElseIf x < y Then
-        CompareIntegers = -1
-    End If
-End Function
-Public Function CompareStrings(ByRef x As String, ByRef y As String) As Long
-    If x > y Then
-        CompareStrings = 1
-    ElseIf x < y Then
-        CompareStrings = -1
-    End If
-End Function
-Public Function CompareDoubles(ByRef x As Double, ByRef y As Double) As Long
-    If x > y Then
-        CompareDoubles = 1
-    ElseIf x < y Then
-        CompareDoubles = -1
-    End If
-End Function
-Public Function CompareSingles(ByRef x As Single, ByRef y As Single) As Long
-    If x > y Then
-        CompareSingles = 1
-    ElseIf x < y Then
-        CompareSingles = -1
-    End If
-End Function
-Public Function CompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
-    If x > y Then
-        CompareBytes = 1
-    ElseIf x < y Then
-        CompareBytes = -1
-    End If
-End Function
-Public Function CompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
-    If x > y Then
-        CompareBooleans = 1
-    ElseIf x < y Then
-        CompareBooleans = -1
-    End If
-End Function
-Public Function CompareDates(ByRef x As Date, ByRef y As Date) As Long
-    CompareDates = DateDiff("s", y, x)
-End Function
-Public Function CompareCurrencies(ByRef x As Currency, ByRef y As Currency) As Long
-    If x > y Then CompareCurrencies = 1: Exit Function
-    If x < y Then CompareCurrencies = -1
-End Function
-Public Function CompareIComparable(ByRef x As Object, ByRef y As Variant) As Long
-    Dim comparableX As IComparable
-    Set comparableX = x
-    CompareIComparable = comparableX.CompareTo(y)
 End Function
 
-Public Function CompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
+Public Function SZCompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
+    If x > y Then
+        SZCompareIntegers = 1
+    ElseIf x < y Then
+        SZCompareIntegers = -1
+    End If
+End Function
+
+Public Function SZCompareStrings(ByRef x As String, ByRef y As String) As Long
+    If x > y Then
+        SZCompareStrings = 1
+    ElseIf x < y Then
+        SZCompareStrings = -1
+    End If
+End Function
+
+Public Function SZCompareDoubles(ByRef x As Double, ByRef y As Double) As Long
+    If x > y Then
+        SZCompareDoubles = 1
+    ElseIf x < y Then
+        SZCompareDoubles = -1
+    End If
+End Function
+
+Public Function SZCompareSingles(ByRef x As Single, ByRef y As Single) As Long
+    If x > y Then
+        SZCompareSingles = 1
+    ElseIf x < y Then
+        SZCompareSingles = -1
+    End If
+End Function
+
+Public Function SZCompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
+    If x > y Then
+        SZCompareBytes = 1
+    ElseIf x < y Then
+        SZCompareBytes = -1
+    End If
+End Function
+
+Public Function SZCompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
+    If x > y Then
+        SZCompareBooleans = 1
+    ElseIf x < y Then
+        SZCompareBooleans = -1
+    End If
+End Function
+
+Public Function SZCompareDates(ByRef x As Date, ByRef y As Date) As Long
+    SZCompareDates = DateDiff("s", y, x)
+End Function
+
+Public Function SZCompareCurrencies(ByRef x As Currency, ByRef y As Currency) As Long
+    If x > y Then
+        SZCompareCurrencies = 1
+    ElseIf x < y Then
+        SZCompareCurrencies = -1
+    End If
+End Function
+
+Public Function SZCompareComparables(ByRef x As Object, ByRef y As Variant) As Long
+    Dim XComparable As IComparable
+    Set XComparable = x
+    SZCompareComparables = XComparable.CompareTo(y)
+End Function
+
+Public Function SZCompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
     Dim Comparable As IComparable
+    Dim XVarType As VbVarType
+    Dim YVarType As VbVarType
     
-    If VarType(x) <> VarType(y) Then _
-        Throw Cor.NewArgumentException("A value of type " & TypeName(x) & " is required.")
+    XVarType = VarType(x)
+    YVarType = VarType(y)
     
-    Select Case VarType(x)
+    Select Case XVarType
         Case vbNull
+            If YVarType <> vbNull Then
+                SZCompareVariants = -1
+            End If
+            Exit Function
+
+        Case vbEmpty
+            If YVarType = vbNull Then
+                SZCompareVariants = 1
+            ElseIf YVarType <> vbEmpty Then
+                SZCompareVariants = -1
+            End If
             Exit Function
             
-'        Case vbNull, vbEmpty
-'        Case vbNull
-'            If Not IsNull(y) Then
-'                CompareVariants = -1
-'            End If
-'
-'        Case vbEmpty
-'            If IsNull(y) Then
-'                CompareVariants = 1
-'            ElseIf Not IsEmpty(y) Then
-'                CompareVariants = -1
-'            End If
-
         Case vbObject, vbDataObject
-            If TypeOf x Is IComparable Then
-                Set Comparable = x
-                CompareVariants = Comparable.CompareTo(y)
+            If Not x Is Nothing Then
+                If TypeOf x Is IComparable Then
+                    Set Comparable = x
+                    SZCompareVariants = Comparable.CompareTo(y)
+                    Exit Function
+                End If
             End If
-
-        Case VarType(y)
+            
+        Case YVarType
             If x < y Then
-                CompareVariants = -1
+                SZCompareVariants = -1
             ElseIf x > y Then
-                CompareVariants = 1
+                SZCompareVariants = 1
             End If
-
+            Exit Function
     End Select
-    
-'    Select Case VarType(y)
-'        Case vbNull, vbEmpty
-'            CompareVariants = 1
-'        Case vbObject, vbDataObject
-'            If TypeOf y Is IComparable Then
-'                Set Comparable = y
-'                CompareVariants = -Comparable.CompareTo(x)
-'                Exit Function
-'            Else
-'                Throw Cor.NewArgumentException("Object must implement IComparable interface.")
-'            End If
-'        Case Else
-'            Throw Cor.NewInvalidOperationException("Specified IComparer failed.")
-'    End Select
+
+    Select Case YVarType
+        Case vbNull, vbEmpty
+            SZCompareVariants = 1
+            
+        Case vbObject, vbDataObject
+            If TypeOf y Is IComparable Then
+                Set Comparable = y
+                SZCompareVariants = -Comparable.CompareTo(x)
+            Else
+                Throw Cor.NewArgumentException("Object must implement IComparable interface.")
+            End If
+            
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, TypeName(x)))
+    End Select
 End Function
 
 ' This is a set of equality routines used by function delegation calls.
