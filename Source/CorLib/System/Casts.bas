@@ -126,7 +126,7 @@ Public Sub WidenDateToVariant(ByRef x As Variant, ByRef y As Date)
 End Sub
 
 Public Sub WidenObjectToVariant(ByRef x As Variant, ByRef y As Object)
-    x = y
+    Set x = y
 End Sub
 
 Public Sub WidenCurrencyToString(ByRef x As String, ByRef y As Currency)
@@ -190,5 +190,5 @@ Public Sub NarrowVariantToCurrency(ByRef x As Currency, ByRef y As Variant)
 End Sub
 
 Public Sub NarrowVariantToObject(ByRef x As Object, ByRef y As Variant)
-    x = y
+    Set x = y
 End Sub
