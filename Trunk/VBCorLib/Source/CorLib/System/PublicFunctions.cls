@@ -102,3 +102,7 @@ End Sub
 Public Function CUnk(ByVal Obj As IUnknown) As IUnknown
     Set CUnk = Obj
 End Function
+
+Public Function CObj(ByVal Obj As Object) As Object
+    Set CObj = Obj
+End Function
