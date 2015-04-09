@@ -152,4 +152,5 @@ Public Enum ResourceString
     Parameter_Buffer = 2019
     Parameter_Output = 2020
     Parameter_Source = 2021
+    Parameter_Length = 2022
 End Enum

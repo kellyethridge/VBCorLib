@@ -263,7 +263,7 @@ End Function
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
+    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(Index, Count, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1)
     Validate.ArrayRange Bytes, Range
     
@@ -282,7 +282,7 @@ End Function
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
     Dim Range As ListRange
     
-    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
+    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
     Validate.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount
     
@@ -312,9 +312,9 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
+    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Validate.ArrayRange Bytes, NewListRange(ByteIndex, ByteCount), Parameter_ByteIndex, Parameter_ByteCount
-    Require.NotNullOneDimensionArray Chars, Parameter_Chars
+    Require.NotNullSingleDimensionArray Chars, Parameter_Chars
     Require.Range CharIndex >= LBound(Chars) And CharIndex <= UBound(Chars), Parameter_CharIndex, ArgumentOutOfRange_ArrayBounds
     CheckBuffer Chars, CharIndex, ByteCount, Parameter_Chars
     
@@ -406,7 +406,7 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
     Dim Range As ListRange
     
-    Require.NotNullOneDimensionArray Bytes, Parameter_Bytes
+    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
     Validate.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount
     

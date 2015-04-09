@@ -46,31 +46,50 @@ Public Sub NotNothing(ByVal Object As Object, Optional ByVal Parameter As Resour
     End If
 End Sub
 
-Public Sub NotNull(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
-    Require.NotNullPtr ArrayPointer(Arr), Parameter, Message
+Public Sub NotNullArray(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
+    Require.NotNullArrayPtr ArrayPointer(Arr), Parameter, Message
 End Sub
 
-Public Sub OneDimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr)
-    Require.OneDimensionArrayPtr ArrayPointer(Arr), Parameter
-End Sub
-
-Public Sub NotNullOneDimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Arr)
-    
-    Require.NotNullPtr ArrayPtr, Parameter, Message
-    Require.OneDimensionArrayPtr ArrayPtr, Parameter
-End Sub
-
-Public Sub NotNullPtr(ByVal ArrayPtr As Long, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
+Public Sub NotNullArrayPtr(ByVal ArrayPtr As Long, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
     If ArrayPtr = vbNullPtr Then
         ThrowHelper.ArgumentNull Parameter, Message
     End If
 End Sub
 
-Public Sub OneDimensionArrayPtr(ByVal ArrayPtr As Long, Optional ByVal Parameter As ResourceString = Parameter_Arr)
+Public Sub SingleDimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr)
+    Require.SingleDimensionArrayPtr ArrayPointer(Arr), Parameter
+End Sub
+
+Public Sub SingleDimensionArrayPtr(ByVal ArrayPtr As Long, Optional ByVal Parameter As ResourceString = Parameter_Arr)
     If SafeArrayGetDim(ArrayPtr) > 1 Then
-        ThrowHelper.Argument Rank_MultiDimNotSupported, Parameter
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     End If
 End Sub
 
+Public Sub NotNullSingleDimensionArray(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
+    NotNullSingleDimensionArrayPtr ArrayPointer(Arr), Parameter, Message
+End Sub
+
+Public Sub NotNullSingleDimensionArrayPtr(ByVal ArrayPtr As Long, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
+    Require.NotNullArrayPtr ArrayPtr, Parameter, Message
+    Require.SingleDimensionArrayPtr ArrayPtr, Parameter
+End Sub
+
+Public Sub SingleRankArray(ByRef Arr As Variant)
+    SingleRankArrayPtr ArrayPointer(Arr)
+End Sub
+
+Public Sub SingleRankArrayPtr(ByVal ArrayPtr As Long)
+    If SafeArrayGetDim(ArrayPtr) > 1 Then
+        ThrowHelper.MultiDimensionNotSupported
+    End If
+End Sub
+
+Public Sub NotNullSingleRankArray(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
+    NotNullSingleRankArrayPtr ArrayPointer(Arr), Parameter, Message
+End Sub
+
+Public Sub NotNullSingleRankArrayPtr(ByVal ArrayPtr As Long, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal Message As ResourceString = ArgumentNull_Array)
+    Require.NotNullArrayPtr ArrayPtr, Parameter, Message
+    Require.SingleRankArrayPtr ArrayPtr
+End Sub

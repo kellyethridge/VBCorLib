@@ -286,17 +286,6 @@ Public Sub Read_WithNullArray_ThrowsArgumentNullException()
     AssertArgumentNullException Err, "Buffer"
 End Sub
 
-Public Sub Read_WithMultiDimensionArray_ThrowsArgumentException()
-    Dim MultiDim(2, 2) As Byte
-    Dim Reader As BinaryReader
-    Set Reader = MakeReader(NewBytes(&HE2, &H80, &HB0))
-    
-    On Error Resume Next
-    Reader.Read MultiDim, 0, 1
-    
-    AssertArgumentException Err, "Buffer"
-End Sub
-
 Public Sub Read_WithMissingCount_UsesWholeBuffer()
     Dim Target(0 To 3) As Byte
     Dim Reader As BinaryReader
