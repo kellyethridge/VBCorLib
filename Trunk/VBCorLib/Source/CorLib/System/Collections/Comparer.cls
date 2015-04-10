@@ -98,6 +98,9 @@ Public Function Compare(ByRef X As Variant, ByRef Y As Variant) As Long
                     Set Comparable = X
                     Compare = Comparable.CompareTo(Y)
                     Exit Function
+                ElseIf X Is Y Then
+                    Compare = 0
+                    Exit Function
                 End If
             End If
             

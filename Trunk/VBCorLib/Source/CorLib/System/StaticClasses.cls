@@ -36,22 +36,22 @@ Attribute VB_Exposed = True
 ' Provides direct access to static class methods.
 '
 ' @remarks VB6 does not support static class methods. To replicate the syntax of
-' accessing static methods, a function of the same name as the class that is
+' accessing static methods, a Property Get of the same name as the class that is
 ' supposed to contain the static methods is defined in this class. This class
 ' has instancing of <i>GlobalMultiUse</i>. This means that just the name of these
-' functions can be typed directly without having to instantiate the <b>PublicFunctions</b>
-' class. By just typing in any of these function names, the underlying class which
+' Property Gets can be typed directly without having to instantiate the <b>PublicProperty Gets</b>
+' class. By just typing in any of these Property Get names, the underlying class which
 ' contains the static methods is returned, and those methods are then available
 ' for calling. This gives the illusion of static methods being called on a class.
-' <p>When typing in one of these function names, it should be followed immediately
+' <p>When typing in one of these Property Get names, it should be followed immediately
 ' by a period to allow access to the static methods of that class.</p>
 ' <pre>
 ' '' Print the name of the current user
 ' Debug.Print Environment.UserName
 ' </pre>
-' This small example simply refers to the <i>Environment</i> function in this
+' This small example simply refers to the <i>Environment</i> Property Get in this
 ' class, then directly calls a method on the returned object from the
-' <i>Environment</i> function.
+' <i>Environment</i> Property Get.
 '
 Option Explicit
 
@@ -76,54 +76,54 @@ End Enum
 ' @return A object containing all of the constructors in VBCorLib.
 ' @see constructors
 '
-Public Function Cor() As Constructors
+Public Property Get Cor() As Constructors
     Set Cor = modStaticClasses.Cor
-End Function
+End Property
 
 ''
 ' Returns an object used to access the <b>cArray</b> methods
 ' without instantiating the <b>cArray</b> class.
 '
 ' @return A reference to the <b>cArray</b> object used to
-' perform functions on arrays.
+' perform Property Gets on arrays.
 ' @see cArray
 '
-Public Function cArray() As cArray
+Public Property Get cArray() As cArray
     Set cArray = modStaticClasses.cArray
-End Function
+End Property
 
 ''
 ' Returns an object used to access the <b>cString</b> methods
 ' without instantiating the <b>cString</b> class.
 '
 ' @return A reference to the <b>cString</b> object used to
-' perform functions on Strings.
+' perform Property Gets on Strings.
 ' @see cString
 '
-Public Function cString() As cString
+Public Property Get cString() As cString
     Set cString = modStaticClasses.cString
-End Function
+End Property
 
 ''
-' Returns an object used to access the <b>Comparer</b> static functions.
+' Returns an object used to access the <b>Comparer</b> static Property Gets.
 '
-' @return A reference to the object used to access the <b>Comparer</b> static functions.
+' @return A reference to the object used to access the <b>Comparer</b> static Property Gets.
 ' @see Comparer
 ' @see ComparerStatic
 '
-Public Function Comparer() As ComparerStatic
+Public Property Get Comparer() As ComparerStatic
     Set Comparer = modStaticClasses.Comparer
-End Function
+End Property
 
 ''
-' Returns a reference used to access the methods of the <b>Environment</b> functions.
+' Returns a reference used to access the methods of the <b>Environment</b> Property Gets.
 '
 ' @return A reference that can be used to access methods of the <b>Environment</b> class.
 ' @see Environment
 '
-Public Function Environment() As Environment
+Public Property Get Environment() As Environment
     Set Environment = modStaticClasses.Environment
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>BitArray</b> class.
@@ -131,9 +131,9 @@ End Function
 ' @return A reference that can be used to access static methods of the <b>BitArray</b> class.
 ' @see BitArray
 ' @see BitArrayStatic
-Public Function BitArray() As BitArrayStatic
+Public Property Get BitArray() As BitArrayStatic
     Set BitArray = modStaticClasses.BitArray
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Buffer</b> class.
@@ -141,9 +141,9 @@ End Function
 ' @return A reference that can be used to access static methods of the <b>Buffer</b> class.
 ' @see Buffer
 '
-Public Function Buffer() As Buffer
+Public Property Get Buffer() As Buffer
     Set Buffer = modStaticClasses.Buffer
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>NumberFormatInfo</b> class.
@@ -152,9 +152,9 @@ End Function
 ' @see NumberFormatInfo
 ' @see NumberFormatInfoStatic
 '
-Public Function NumberFormatInfo() As NumberFormatInfoStatic
+Public Property Get NumberFormatInfo() As NumberFormatInfoStatic
     Set NumberFormatInfo = modStaticClasses.NumberFormatInfo
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>BitConverter</b> class.
@@ -162,9 +162,9 @@ End Function
 ' @return A reference that can be used to access static methods of the <b>BitConverter</b> class.
 ' @see BitConverter
 '
-Public Function BitConverter() As BitConverter
+Public Property Get BitConverter() As BitConverter
     Set BitConverter = modStaticClasses.BitConverter
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Version</b> class.
@@ -173,9 +173,9 @@ End Function
 ' @see Version
 ' @see VersionStatic
 '
-Public Function Version() As VersionStatic
+Public Property Get Version() As VersionStatic
     Set Version = modStaticClasses.Version
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>TimeSpan</b> class.
@@ -184,9 +184,9 @@ End Function
 ' @see TimeSpan
 ' @see TimeSpanStatic
 '
-Public Function TimeSpan() As TimeSpanStatic
+Public Property Get TimeSpan() As TimeSpanStatic
     Set TimeSpan = modStaticClasses.TimeSpan
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>cDateTime</b> class.
@@ -195,9 +195,9 @@ End Function
 ' @see cDateTime
 ' @see cDateTimeStatic
 '
-Public Function cDateTime() As cDateTimeStatic
+Public Property Get cDateTime() As cDateTimeStatic
     Set cDateTime = modStaticClasses.cDateTime
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>DateTimeFormatInfo</b> class.
@@ -206,9 +206,9 @@ End Function
 ' @see DateTimeFormatInfo
 ' @see DateTimeFormatInfoStatic
 '
-Public Function DateTimeFormatInfo() As DateTimeFormatInfoStatic
+Public Property Get DateTimeFormatInfo() As DateTimeFormatInfoStatic
     Set DateTimeFormatInfo = modStaticClasses.DateTimeFormatInfo
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>CultureInfo</b> class.
@@ -217,9 +217,9 @@ End Function
 ' @see CultureInfo
 ' @see CultureInfoStatic
 '
-Public Function CultureInfo() As CultureInfoStatic
+Public Property Get CultureInfo() As CultureInfoStatic
     Set CultureInfo = modStaticClasses.CultureInfo
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>TimeZone</b> class.
@@ -228,9 +228,9 @@ End Function
 ' @see TimeZone
 ' @see TimeZoneStatic
 '
-Public Function TimeZone() As TimeZoneStatic
+Public Property Get TimeZone() As TimeZoneStatic
     Set TimeZone = modStaticClasses.TimeZone
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Path</b> class.
@@ -238,9 +238,9 @@ End Function
 ' @return A reference that can be used to access static methods of the <b>Path</b> class.
 ' @see Path
 '
-Public Function Path() As Path
+Public Property Get Path() As Path
     Set Path = modStaticClasses.Path
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Encoding</b> class.
@@ -249,9 +249,9 @@ End Function
 ' @see Encoding
 ' @see EncodingStatic
 '
-Public Function Encoding() As EncodingStatic
+Public Property Get Encoding() As EncodingStatic
     Set Encoding = modStaticClasses.Encoding
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>TextReader</b> class.
@@ -261,9 +261,9 @@ End Function
 ' @see TextReaderStatic
 ' @see StreamReader
 '
-Public Function TextReader() As TextReaderStatic
+Public Property Get TextReader() As TextReaderStatic
     Set TextReader = modStaticClasses.TextReader
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Directory</b> class.
@@ -276,9 +276,9 @@ End Function
 ' @see DriveInfo
 ' @see DriveInfoStatic
 '
-Public Function Directory() As Directory
+Public Property Get Directory() As Directory
     Set Directory = modStaticClasses.Directory
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>File</b> class.
@@ -291,9 +291,9 @@ End Function
 ' @see DriveInfo
 ' @see DriveInfoStatic
 '
-Public Function File() As File
+Public Property Get File() As File
     Set File = modStaticClasses.File
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Stream</b> class.
@@ -302,9 +302,9 @@ End Function
 ' @see Stream
 ' @see StreamStatic
 '
-Public Function Stream() As StreamStatic
+Public Property Get Stream() As StreamStatic
     Set Stream = modStaticClasses.Stream
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>GregorianCalendar</b> class.
@@ -313,9 +313,9 @@ End Function
 ' @see GregorianCalendar
 ' @see GregorianCalendarStatic
 '
-Public Function GregorianCalendar() As GregorianCalendarStatic
+Public Property Get GregorianCalendar() As GregorianCalendarStatic
     Set GregorianCalendar = modStaticClasses.GregorianCalendar
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>JulianCalendar</b> class.
@@ -324,9 +324,9 @@ End Function
 ' @see JulianCalendar
 ' @see JulianCalendarStatic
 '
-Public Function JulianCalendar() As JulianCalendarStatic
+Public Property Get JulianCalendar() As JulianCalendarStatic
     Set JulianCalendar = modStaticClasses.JulianCalendar
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>HebrewCalendar</b> class.
@@ -335,9 +335,9 @@ End Function
 ' @see HebrewCalendar
 ' @see HebrewCalendarStatic
 '
-Public Function HebrewCalendar() As HebrewCalendarStatic
+Public Property Get HebrewCalendar() As HebrewCalendarStatic
     Set HebrewCalendar = modStaticClasses.HebrewCalendar
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>KoreanCalendar</b> class.
@@ -346,9 +346,9 @@ End Function
 ' @see KoreanCalendar
 ' @see KoreanCalendarStatic
 '
-Public Function KoreanCalendar() As KoreanCalendarStatic
+Public Property Get KoreanCalendar() As KoreanCalendarStatic
     Set KoreanCalendar = modStaticClasses.KoreanCalendar
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>HijriCalendar</b> class.
@@ -357,9 +357,9 @@ End Function
 ' @see HijriCalendar
 ' @see HijriCalendarStatic
 '
-Public Function HijriCalendar() As HijriCalendarStatic
+Public Property Get HijriCalendar() As HijriCalendarStatic
     Set HijriCalendar = modStaticClasses.HijriCalendar
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Calendar</b> class.
@@ -368,9 +368,9 @@ End Function
 ' @see Calendar
 ' @see CalendarStatic
 '
-Public Function Calendar() As CalendarStatic
+Public Property Get Calendar() As CalendarStatic
     Set Calendar = modStaticClasses.Calendar
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Console</b> class.
@@ -378,9 +378,9 @@ End Function
 ' @return A reference that can be used to access static methods of the <b>Console</b> class.
 ' @see Console
 '
-Public Function Console() As Console
+Public Property Get Console() As Console
     Set Console = modStaticClasses.Console
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>ArrayList</b> class.
@@ -389,9 +389,9 @@ End Function
 ' @see ArrayList
 ' @see ArrayListStatic
 '
-Public Function ArrayList() As ArrayListStatic
+Public Property Get ArrayList() As ArrayListStatic
     Set ArrayList = modStaticClasses.ArrayList
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>Registry</b> class.
@@ -400,9 +400,9 @@ End Function
 ' @see Registry
 ' @see RegistryKey
 '
-Public Function Registry() As Registry
+Public Property Get Registry() As Registry
     Set Registry = modStaticClasses.Registry
-End Function
+End Property
 
 ''
 ' Returns a reference used to access static methods of the <b>RegistryKey</b> class.
@@ -412,9 +412,9 @@ End Function
 ' @see RegistryKeyStatic
 ' @see Registry
 '
-Public Function RegistryKey() As RegistryKeyStatic
+Public Property Get RegistryKey() As RegistryKeyStatic
     Set RegistryKey = modStaticClasses.RegistryKey
-End Function
+End Property
 
 ''
 ' Provides static methods for creating new <b>Guid</b> objects.
@@ -423,9 +423,9 @@ End Function
 ' @see GuidStatic
 ' @see Guid
 '
-Public Function Guid() As GuidStatic
+Public Property Get Guid() As GuidStatic
     Set Guid = modStaticClasses.Guid
-End Function
+End Property
 
 ''
 ' Provides methods for converting values.
@@ -433,9 +433,9 @@ End Function
 ' @return A reference to the method provider.
 ' @see Convert
 '
-Public Function Convert() As Convert
+Public Property Get Convert() As Convert
     Set Convert = modStaticClasses.Convert
-End Function
+End Property
 
 ''
 ' Provides methods for creating custom resoure managers.
@@ -446,9 +446,9 @@ End Function
 ' @see ResourceSet
 ' @see ResourceReader
 '
-Public Function ResourceManager() As ResourceManagerStatic
+Public Property Get ResourceManager() As ResourceManagerStatic
     Set ResourceManager = modStaticClasses.ResourceManager
-End Function
+End Property
 
 ''
 ' Provides methods for retrieve information about all drives on the local machine.
@@ -460,154 +460,158 @@ End Function
 ' @see FileInfo
 ' @see File
 '
-Public Function DriveInfo() As DriveInfoStatic
+Public Property Get DriveInfo() As DriveInfoStatic
     Set DriveInfo = modStaticClasses.DriveInfo
-End Function
+End Property
 
 ''
 ' Provides default methods for classes that implement the IObject interface.
 '
 ' @return A reference to default implementations of the IObject interface.
 '
-Public Function Object() As ObjectStatic
+Public Property Get Object() As ObjectStatic
     Set Object = modStaticClasses.Object
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the DES static methods.
 '
 ' @return A reference to the single DESStatic instance.
 '
-Public Function DES() As DESStatic
+Public Property Get DES() As DESStatic
     Set DES = modStaticClasses.DES
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the TripleDES static methods.
 '
 ' @return A reference to the single TripleDESStatic instance.
 '
-Public Function TripleDES() As TripleDESStatic
+Public Property Get TripleDES() As TripleDESStatic
     Set TripleDES = modStaticClasses.TripleDES
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the RC2 static methods.
 '
 ' @return A reference to the single RC2Static instance.
 '
-Public Function RC2() As RC2Static
+Public Property Get RC2() As RC2Static
     Set RC2 = modStaticClasses.RC2
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the Rijndael static methods.
 '
 ' @return A reference to the single RijndaelStatic instance.
 '
-Public Function Rijndael() As RijndaelStatic
+Public Property Get Rijndael() As RijndaelStatic
     Set Rijndael = modStaticClasses.Rijndael
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the CryptoConfig static methods.
 '
 ' @return A reference to the single CryptoConfig instance.
 '
-Public Function CryptoConfig() As CryptoConfig
+Public Property Get CryptoConfig() As CryptoConfig
     Set CryptoConfig = modStaticClasses.CryptoConfig
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the SHA1 static methods.
 '
 ' @return A reference to the single SHA1Static instance.
 '
-Public Function SHA1() As SHA1Static
+Public Property Get SHA1() As SHA1Static
     Set SHA1 = modStaticClasses.SHA1
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the StopWatch static methods.
 '
 ' @return A reference to the single StopWatchStatic instance.
 '
-Public Function StopWatch() As StopWatchStatic
+Public Property Get StopWatch() As StopWatchStatic
     Set StopWatch = modStaticClasses.StopWatch
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the SHA256 static methods.
 '
 ' @return A reference to the single SHA256Static instance.
 '
-Public Function SHA256() As SHA256Static
+Public Property Get SHA256() As SHA256Static
     Set SHA256 = modStaticClasses.SHA256
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the SHA512 static methods.
 '
 ' @return A reference to the single SHA512Static instance.
 '
-Public Function SHA512() As SHA512Static
+Public Property Get SHA512() As SHA512Static
     Set SHA512 = modStaticClasses.SHA512
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the SHA384 static methods.
 '
 ' @return A reference to the single SHA384Static instance.
 '
-Public Function SHA384() As SHA384Static
+Public Property Get SHA384() As SHA384Static
     Set SHA384 = modStaticClasses.SHA384
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the MACTripleDES static methods.
 '
 ' @return A reference to the single MACTripleDESStatic instance.
 '
-Public Function MACTripleDES() As MACTripleDESStatic
+Public Property Get MACTripleDES() As MACTripleDESStatic
     Set MACTripleDES = modStaticClasses.MACTripleDES
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the HMAC static methods.
 '
 ' @return A reference to the single HMACStatic instance.
 '
-Public Function HMAC() As HMACStatic
+Public Property Get HMAC() As HMACStatic
     Set HMAC = modStaticClasses.HMAC
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the RSA static methods.
 '
 ' @return A reference to the single RSAStatic instance.
 '
-Public Function RSA() As RSAStatic
+Public Property Get RSA() As RSAStatic
     Set RSA = modStaticClasses.RSA
-End Function
+End Property
 
 ''
 ' Returns a reference used to access the SecurityElement static methods.
 '
 ' @return A reference to the single SecurityElementStatic instance.
 '
-Public Function SecurityElement() As SecurityElementStatic
+Public Property Get SecurityElement() As SecurityElementStatic
     Set SecurityElement = modStaticClasses.SecurityElement
-End Function
+End Property
 
 ''
 ' Provides a method to access the BigInteger static methods.
 '
 ' @return The BigInteger static methods.
 '
-Public Function BigInteger() As BigIntegerStatic
+Public Property Get BigInteger() As BigIntegerStatic
     Set BigInteger = modStaticClasses.BigInteger
-End Function
+End Property
 
-Public Function Thread() As ThreadStatic
+Public Property Get Thread() As ThreadStatic
     Set Thread = modStaticClasses.Thread
-End Function
+End Property
+
+Public Property Get EqualityComparer() As IEqualityComparer
+    Set EqualityComparer = modStaticClasses.EqualityComparer
+End Property

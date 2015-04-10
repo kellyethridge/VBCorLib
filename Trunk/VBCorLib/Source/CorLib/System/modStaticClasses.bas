@@ -87,4 +87,5 @@ Public CryptoHelper             As New CryptoHelper
 Public BigInteger               As New BigIntegerStatic
 Public Thread                   As New ThreadStatic
 Public StringBuilders           As New StringBuilderCache
+Public EqualityComparer         As New EqualityComparerStatic
 
