@@ -17,6 +17,8 @@ Implements ITestCaseSource
 Private mComparer As IComparer
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Dim Col As New Collection
+    
     Select Case Test.MethodName
         Case "LessThan_WithValues_ReturnsExpected"
             Test.Use 1, 2, True
@@ -35,7 +37,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewInt32(1), NewInt32(2), True
             Test.Use NewInt32(2), NewInt32(1), False
             Test.Use NewInt32(2), NewInt32(2), False
-            
+            Test.Use Col, Col, False
             
         Case "GreaterThan_WithValues_ReturnsExpected"
             Test.Use 1, 2, False
@@ -54,7 +56,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewInt32(1), NewInt32(2), False
             Test.Use NewInt32(2), NewInt32(1), True
             Test.Use NewInt32(2), NewInt32(2), False
-        
+            Test.Use Col, Col, False
+            
         Case "Equal_WithValues_ReturnsExpected"
             Test.Use 1, 2, False
             Test.Use 2, 1, False
@@ -73,7 +76,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewInt32(1), NewInt32(2), False
             Test.Use NewInt32(2), NewInt32(1), False
             Test.Use NewInt32(2), NewInt32(2), True
-        
+            Test.Use Col, Col, True
+            
         Case "Compare_WithDifferentDataTypes_ThrowsArgumentException"
             Test.Use CLng(1), CInt(1)
             Test.Use CLng(1), CByte(1)
