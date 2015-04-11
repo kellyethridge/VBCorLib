@@ -39,40 +39,23 @@ Public Enum ResourceString
     Format_InvalidNumberOfCharacters = 601
     Format_InvalidString = 602
     Format_InvalidTimeSpan = 603
-    ArgumentOutOfRange_MustBeNonNegNum = 700
-    ArgumentOutOfRange_SmallCapacity = 701
-    ArgumentOutOfRange_NeedNonNegNum = 702
-    ArgumentOutOfRange_ArrayListInsert = 703
-    ArgumentOutOfRange_Index = 704
-    ArgumentOutOfRange_LargerThanCollection = 705
-    ArgumentOutOfRange_LBound = 706
-    ArgumentOutOfRange_Exception = 707
-    ArgumentOutOfRange_Range = 708
-    ArgumentOutOfRange_UBound = 709
-    ArgumentOutOfRange_MinMax = 710
-    ArgumentOutOfRange_VersionFieldCount = 711
-    ArgumentOutOfRange_ValidValues = 712
-    ArgumentOutOfRange_NeedPosNum = 713
-    ArgumentOutOfRange_OutsideConsoleBoundry = 714
-    ArgumentOutOfRange_Enum = 715
-    ArgumentOutOfRange_ArrayLB = 716
-    ArgumentOutOfRange_ArrayBounds = 717
-    ArgumentOutOfRange_Count = 718
-    ArgumentOutOfRange_NegativeLength = 719
-    ArgumentOutOfRange_StartIndex = 720
-    ArgumentOutOfRange_OffsetOut = 721
-    ArgumentOutOfRange_IndexLength = 722
-    ArgumentOutOfRange_InvalidFileTime = 723
-    ArgumentOutOfRange_Month = 724
-    ArgumentOutOfRange_Year = 725
-    ArgumentOutOfRange_BeepFrequency = 726
-    ArgumentOutOfRange_ConsoleBufferSize = 727
-    ArgumentOutOfRange_ConsoleWindowSize_Size = 728
-    ArgumentOutOfRange_ConsoleWindowPos = 729
-    ArgumentOutOfRange_ConsoleBufferLessThanWindowSize = 730
-    ArgumentOutOfRange_ConsoleTitleTooLong = 731
-    ArgumentOutOfRange_ConsoleColor = 732
-    ArgumentOutOfRange_CursorSize = 733
+    NotSupported_ReadOnlyCollection = 1000
+    NotSupported_FixedSizeCollection = 1001
+    NotSupported_MemoryStreamNotExpandable = 1002
+    NotSupported_UnwritableStream = 1003
+    InvalidOperation_EmptyStack = 1100
+    InvalidOperation_EnumNotStarted = 1101
+    InvalidOperation_EnumFinished = 1102
+    InvalidOperation_VersionError = 1103
+    InvalidOperation_EmptyQueue = 1104
+    InvalidOperation_Comparer_Arg = 1105
+    InvalidOperation_ReadOnly = 1106
+    InvalidOperation_Timeouts = 1107
+    ObjectDisposed_StreamClosed = 1200
+    Overflow_TimeSpan = 1300
+End Enum
+
+Public Enum ArgumentString
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802
@@ -107,6 +90,9 @@ Public Enum ResourceString
     Argument_InvalidDateSubtraction = 831
     Argument_InvalidCharsInPath = 832
     Argument_InvalidValueType = 833
+End Enum
+
+Public Enum ArgumentNullString
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902
@@ -114,21 +100,46 @@ Public Enum ResourceString
     ArgumentNull_TimeSpan = 904
     ArgumentNull_Generic = 905
     ArgumentNull_Buffer = 906
-    NotSupported_ReadOnlyCollection = 1000
-    NotSupported_FixedSizeCollection = 1001
-    NotSupported_MemoryStreamNotExpandable = 1002
-    NotSupported_UnwritableStream = 1003
-    InvalidOperation_EmptyStack = 1100
-    InvalidOperation_EnumNotStarted = 1101
-    InvalidOperation_EnumFinished = 1102
-    InvalidOperation_VersionError = 1103
-    InvalidOperation_EmptyQueue = 1104
-    InvalidOperation_Comparer_Arg = 1105
-    InvalidOperation_ReadOnly = 1106
-    InvalidOperation_Timeouts = 1107
-    ObjectDisposed_StreamClosed = 1200
-    Overflow_TimeSpan = 1300
-    
+End Enum
+
+Public Enum ArgumentOutOfRangeString
+    ArgumentOutOfRange_MustBeNonNegNum = 700
+    ArgumentOutOfRange_SmallCapacity = 701
+    ArgumentOutOfRange_NeedNonNegNum = 702
+    ArgumentOutOfRange_ArrayListInsert = 703
+    ArgumentOutOfRange_Index = 704
+    ArgumentOutOfRange_LargerThanCollection = 705
+    ArgumentOutOfRange_LBound = 706
+    ArgumentOutOfRange_Exception = 707
+    ArgumentOutOfRange_Range = 708
+    ArgumentOutOfRange_UBound = 709
+    ArgumentOutOfRange_MinMax = 710
+    ArgumentOutOfRange_VersionFieldCount = 711
+    ArgumentOutOfRange_ValidValues = 712
+    ArgumentOutOfRange_NeedPosNum = 713
+    ArgumentOutOfRange_OutsideConsoleBoundry = 714
+    ArgumentOutOfRange_Enum = 715
+    ArgumentOutOfRange_ArrayLB = 716
+    ArgumentOutOfRange_ArrayBounds = 717
+    ArgumentOutOfRange_Count = 718
+    ArgumentOutOfRange_NegativeLength = 719
+    ArgumentOutOfRange_StartIndex = 720
+    ArgumentOutOfRange_OffsetOut = 721
+    ArgumentOutOfRange_IndexLength = 722
+    ArgumentOutOfRange_InvalidFileTime = 723
+    ArgumentOutOfRange_Month = 724
+    ArgumentOutOfRange_Year = 725
+    ArgumentOutOfRange_BeepFrequency = 726
+    ArgumentOutOfRange_ConsoleBufferSize = 727
+    ArgumentOutOfRange_ConsoleWindowSize_Size = 728
+    ArgumentOutOfRange_ConsoleWindowPos = 729
+    ArgumentOutOfRange_ConsoleBufferLessThanWindowSize = 730
+    ArgumentOutOfRange_ConsoleTitleTooLong = 731
+    ArgumentOutOfRange_ConsoleColor = 732
+    ArgumentOutOfRange_CursorSize = 733
+End Enum
+
+Public Enum ParameterString
     Parameter_None = 0
     Parameter_Index = 2000
     Parameter_Count = 2001

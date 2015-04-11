@@ -187,7 +187,7 @@ End Property
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    Validate.ArrayRange mChars, Range
+    ValidateArrayRange Range, mChars
     
     GetByteCount = Range.Count
 End Function
@@ -207,7 +207,7 @@ End Function
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    Validate.ArrayRange mChars, Range
+    ValidateArrayRange Range, mChars
     
     Dim Result() As Byte
     If Range.Count > 0 Then
@@ -243,7 +243,7 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     Range.Count = CharCount
     
     AttachChars Chars, mChars, mCharsSA
-    Validate.ArrayRange mChars, Range, Parameter_CharIndex, Parameter_CharCount
+    ValidateArrayRange Range, mChars, Parameter_CharIndex, Parameter_CharCount
     Require.Range ByteIndex >= LBound(Bytes) And ByteIndex <= UBound(Bytes), Parameter_ByteIndex, ArgumentOutOfRange_ArrayBounds
     
     CheckBuffer Bytes, ByteIndex, CharCount
@@ -265,7 +265,7 @@ Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Vari
     
     Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(Index, Count, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1)
-    Validate.ArrayRange Bytes, Range
+    ValidateArrayRange Range, Bytes
     
     GetCharCount = Range.Count
 End Function
@@ -284,7 +284,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Vari
     
     Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
-    Validate.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount
+    ValidateArrayRange Range, Bytes, Parameter_ByteIndex, Parameter_ByteCount
     
     Dim Chars() As Integer
     If Range.Count > 0 Then
@@ -313,7 +313,7 @@ End Function
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
-    Validate.ArrayRange Bytes, NewListRange(ByteIndex, ByteCount), Parameter_ByteIndex, Parameter_ByteCount
+    ValidateArrayRange NewListRange(ByteIndex, ByteCount), Bytes, Parameter_ByteIndex, Parameter_ByteCount
     Require.NotNullSingleDimensionArray Chars, Parameter_Chars
     Require.Range CharIndex >= LBound(Chars) And CharIndex <= UBound(Chars), Parameter_CharIndex, ArgumentOutOfRange_ArrayBounds
     CheckBuffer Chars, CharIndex, ByteCount, Parameter_Chars
@@ -408,7 +408,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Var
     
     Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
-    Validate.ArrayRange Bytes, Range, Parameter_ByteIndex, Parameter_ByteCount
+    ValidateArrayRange Range, Bytes, Parameter_ByteIndex, Parameter_ByteCount
     
     GetString = SysAllocStringLen(0, Range.Count)
     AttachChars GetString, mChars, mCharsSA

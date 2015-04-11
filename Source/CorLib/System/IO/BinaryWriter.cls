@@ -326,7 +326,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Range   As ListRange
     
     Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
-    Validate.ArrayRange Buffer, Range
+    ValidateArrayRange Range, Buffer
     
     On Error GoTo CleanExit
     SAPtr(Bytes) = ArrayPointer(Buffer)

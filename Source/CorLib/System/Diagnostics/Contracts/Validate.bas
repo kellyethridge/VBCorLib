@@ -1,4 +1,4 @@
-Attribute VB_Name = "Validate"
+Attribute VB_Name = "Validation"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -25,14 +25,39 @@ Attribute VB_Name = "Validate"
 Option Explicit
 
 
-Public Sub ArrayRange(ByRef Arr As Variant, ByRef Range As ListRange, Optional ByVal IndexParameter As ResourceString = Parameter_Index, Optional ByVal CountParameter As ResourceString = Parameter_Count)
-    If Range.Index < LBound(Arr) Then
-        ThrowHelper.ArgumentOutOfRange IndexParameter, ArgumentOutOfRange_ArrayLB
+Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal Parameter As ParameterString = Parameter_Arr)
+    Dim ArrayPtr As Long
+    ArrayPtr = ArrayPointer(Arr)
+    
+    If ArrayPtr = vbNullPtr Then
+        Throw Error.ArgumentNull(Parameter, ArgumentNull_Array)
     End If
-    If Range.Count < 0 Then
-        ThrowHelper.ArgumentOutOfRange CountParameter, ArgumentOutOfRange_NeedNonNegNum
-    End If
-    If Range.Index + Range.Count - 1 > UBound(Arr) Then
-        ThrowHelper.PositionNotValidForCollection
+    If SafeArrayGetDim(ArrayPtr) > 1 Then
+        Throw Error.Rank
     End If
 End Sub
+
+Public Sub ValidateArrayRange(ByRef Range As ListRange, ByRef Arr As Variant, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count)
+    If Range.Index < LBound(Arr) Then
+        Throw Error.ArgumentOutOfRange(IndexParameter, ArgumentOutOfRange_LBound)
+    End If
+    If Range.Count < 0 Then
+        Throw Error.ArgumentOutOfRange(CountParameter, ArgumentOutOfRange_NeedNonNegNum)
+    End If
+    If Range.Index + Range.Count - 1 > UBound(Arr) Then
+        Throw Error.Argument(Argument_InvalidOffLen)
+    End If
+End Sub
+
+Public Sub ValidateListRange(ByRef Range As ListRange, ByVal ListCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count)
+    If Range.Index < 0 Then
+        Throw Error.ArgumentOutOfRange(IndexParameter, ArgumentOutOfRange_NeedNonNegNum)
+    End If
+    If Range.Count < 0 Then
+        Throw Error.ArgumentOutOfRange(CountParameter, ArgumentOutOfRange_NeedNonNegNum)
+    End If
+    If Range.Index + Range.Count > ListCount Then
+        Throw Error.Argument(Argument_InvalidOffLen)
+    End If
+End Sub
+

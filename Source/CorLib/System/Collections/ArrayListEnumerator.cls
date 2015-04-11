@@ -50,6 +50,22 @@ Private mIndex          As Long
 Private mVersion        As Long
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
+    Set mList = List
+    mVersion = List.Version
+    mStartIndex = Index
+    mEndIndex = Index + Count - 1
+    mIndex = Index - 1
+End Sub
+
+Friend Sub InitClone(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Index As Long)
+    Init List, StartIndex, List.Count
+    mIndex = Index
+End Sub
+
 
 ' This is to allow code such as the following to function properly.
 '
@@ -62,28 +78,11 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
-    Set mList = List
-    mVersion = List.Version
-    mStartIndex = Index
-    mEndIndex = Index + Count - 1
-    mIndex = Index - 1
-End Sub
-
-Friend Sub CloneHelper(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Index As Long)
-    Init List, StartIndex, List.Count
-    mIndex = Index
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   ICloneable Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New ArrayListEnumerator
-    Ret.CloneHelper mList, mStartIndex, mIndex
+    Ret.InitClone mList, mStartIndex, mIndex
     Set ICloneable_Clone = Ret
 End Function
 

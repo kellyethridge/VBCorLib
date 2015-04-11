@@ -662,7 +662,7 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function GetResourceString(ByVal Key As ResourceString, ParamArray Values() As Variant) As String
+Friend Function GetResourceString(ByVal Key As Long, ParamArray Values() As Variant) As String
     If Key = ResourceString.None Then
         Exit Function
     End If
