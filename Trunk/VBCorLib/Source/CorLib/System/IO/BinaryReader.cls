@@ -59,19 +59,38 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const DefaultCapacity  As Long = 16
-Private Const MinDateAsDouble  As Double = -657434#
-Private Const MaxDateAsDouble  As Double = 2958465.99998843
-
+Private Const DefaultCapacity   As Long = 16
+Private Const MinDateAsDouble   As Double = -657434#
+Private Const MaxDateAsDouble   As Double = 2958465.99998843
+Private Const NoChars           As Long = -1
 
 Private mStream         As Stream
 Private mEncoding       As Encoding
-Private mIsOpen         As Boolean
 Private mBuffer()       As Byte
 Private mCapacity       As Long
 Private mPtrBuffer      As Long
 Private mOneChar(0)     As Integer
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
+    Require.NotNothing Stream, Parameter_Stream, ArgumentNull_Stream
+    Require.That Stream.CanRead, Argument_ReadableStreamRequired, Parameter_Stream
+    
+    Set mStream = Stream
+    If Encoding Is Nothing Then
+        Set mEncoding = New UTF8Encoding
+    Else
+        Set mEncoding = Encoding
+    End If
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   API
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Returns the underlying Stream being read by the Reader.
@@ -86,7 +105,10 @@ End Property
 ' Closes the reader and underlying Stream.
 '
 Public Sub CloseReader()
-    mStream.CloseStream
+    If Not mStream Is Nothing Then
+        mStream.CloseStream
+        Set mStream = Nothing
+    End If
 End Sub
 
 ''
@@ -108,49 +130,8 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
     If IsMissing(Buffer) Then
         Read = ReadOneChar
     Else
-        Dim BufferPtr As Long
-        Dim BufferIndex As Long
-        Dim BufferCount As Long
-        
-        BufferPtr = ValidArrayPointer(Buffer, Parameter_Buffer, ArgumentNull_Buffer)
-        BufferIndex = GetOptionalLong(Index, LBound(Buffer))
-        BufferCount = GetOptionalLong(Count, ArrayLength(Buffer))
-        
-        Require.Range BufferIndex >= LBound(Buffer), Parameter_Index, ArgumentOutOfRange_ArrayLB
-        Require.Range BufferCount >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-        Require.That BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument_InvalidOffLen
-        
-        Select Case VarType(Buffer)
-            Case vbByteArray
-                Read = ReadToByteBuffer(BufferPtr, BufferIndex, BufferCount)
-            Case vbIntegerArray
-                Read = ReadToCharBuffer(BufferPtr, BufferIndex, BufferCount)
-            Case Else
-                Throw Cor.NewArgumentException("A Byte or Integer array is required.", Environment.GetResourceString(Parameter_Buffer))
-        End Select
+        Read = ReadToBuffer(Buffer, Index, Count)
     End If
-End Function
-
-Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim Buffer() As Byte
-    
-    On Error GoTo errTrap
-    SAPtr(Buffer) = BufferPtr
-    ReadToByteBuffer = mStream.ReadBlock(Buffer, Index, Count)
-    
-errTrap:
-    SAPtr(Buffer) = vbNullPtr
-End Function
-
-Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim Buffer() As Integer
-    
-    On Error GoTo errTrap
-    SAPtr(Buffer) = BufferPtr
-    ReadToCharBuffer = ReadCharBytes(Buffer, Index, Count)
-    
-errTrap:
-    SAPtr(Buffer) = vbNullPtr
 End Function
 
 ''
@@ -170,7 +151,7 @@ Public Function PeekChar() As Long
         PeekChar = Read
         mStream.Position = OldPosition
     Else
-        PeekChar = -1
+        PeekChar = NoChars
     End If
 End Function
 
@@ -179,7 +160,7 @@ End Function
 '
 ' @return The next byte in the stream.
 Public Function ReadByte() As Byte
-    FillBuffer 1
+    FillBuffer SizeOfByte
     ReadByte = mBuffer(0)
 End Function
 
@@ -192,7 +173,7 @@ End Function
 '
 Public Function ReadChar() As Long
     ReadChar = Read
-    If ReadChar = -1 Then _
+    If ReadChar = NoChars Then _
         Throw New EndOfStreamException
 End Function
 
@@ -278,7 +259,7 @@ End Function
 ' @return A Long datatype read from the stream.
 '
 Public Function ReadInt32() As Long
-    FillBuffer 4
+    FillBuffer SizeOfLong
     ReadInt32 = AsLong(mBuffer(0))
 End Function
 
@@ -288,7 +269,7 @@ End Function
 ' @return An Integer datatype read from the stream.
 '
 Public Function ReadInt16() As Integer
-    FillBuffer 2
+    FillBuffer SizeOfInteger
     ReadInt16 = AsWord(mBuffer(0))
 End Function
 
@@ -298,7 +279,7 @@ End Function
 ' @return A Double datatype read from the stream.
 '
 Public Function ReadDouble() As Double
-    FillBuffer 8
+    FillBuffer SizeOfDouble
     ReadDouble = AsDouble(mBuffer(0))
 End Function
 
@@ -325,7 +306,7 @@ End Function
 ' @return A Currency datatype.
 '
 Public Function ReadCurrency() As Currency
-    FillBuffer 8
+    FillBuffer SizeOfCurrency
     ReadCurrency = AsCurr(mBuffer(0))
 End Function
 
@@ -335,7 +316,7 @@ End Function
 ' @return A Single datatype.
 '
 Public Function ReadSingle() As Single
-    FillBuffer 4
+    FillBuffer SizeOfSingle
     ReadSingle = AsSingle(mBuffer(0))
 End Function
 
@@ -363,7 +344,7 @@ End Function
 ' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
 '
 Public Function ReadDecimal() As Variant
-    FillBuffer 16
+    FillBuffer SizeOfDecimal
     ReadDecimal = BitConverter.ToDecimal(mBuffer, 0)
 End Function
 
@@ -399,16 +380,7 @@ Public Function ReadString() As String
     EncodedStringLength = ReadStringLength
     
     If EncodedStringLength > 0 Then
-        Dim EncodedBytes() As Byte
-        ReDim EncodedBytes(0 To EncodedStringLength - 1)
-        
-        Dim NumberOfBytesRead As Long
-        NumberOfBytesRead = mStream.ReadBlock(EncodedBytes, 0, EncodedStringLength)
-        
-        If NumberOfBytesRead < EncodedStringLength Then _
-            Throw New EndOfStreamException
-            
-        ReadString = mEncoding.GetString(EncodedBytes)
+        ReadString = ReadEncodedString(EncodedStringLength)
     End If
 End Function
 
@@ -446,35 +418,11 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
-    Require.NotNothing Stream, Parameter_Stream, ArgumentNull_Stream
-    Require.That Stream.CanRead, Argument_ReadableStreamRequired, Parameter_Stream
-    
-    Set mStream = Stream
-    If Encoding Is Nothing Then
-        Set mEncoding = New UTF8Encoding
-    Else
-        Set mEncoding = Encoding
-    End If
-    mIsOpen = True
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifyIsOpen()
-    If Not mIsOpen Then
-        Throw Cor.NewObjectDisposedException("BinaryReader", "Cannot read from a closed BinaryReader.")
-    End If
-End Sub
-
 Private Sub FillBuffer(ByVal Count As Long)
     VerifyIsOpen
     
-    ' Optimize for reading a single byte
     If Count = 1 Then
         Dim SingleByte As Long
         SingleByte = mStream.ReadByte
@@ -483,28 +431,70 @@ Private Sub FillBuffer(ByVal Count As Long)
         
         mBuffer(0) = SingleByte
     Else
-        If mStream.ReadBlock(mBuffer, 0, Count) < Count Then Throw New EndOfStreamException
+        If mStream.ReadBlock(mBuffer, 0, Count) < Count Then
+            Throw New EndOfStreamException
+        End If
     End If
 End Sub
 
-Private Function ReadStringLength() As Long
-    Dim StringLength    As Long
-    Dim SingleByte      As Long
-    Dim ShiftCount      As Long
-    
-    SingleByte = mStream.ReadByte
-    
-    Do While SingleByte >= &H80
-        StringLength = StringLength + Helper.ShiftLeft(SingleByte And &H7F, ShiftCount)
-        SingleByte = mStream.ReadByte
-        ShiftCount = ShiftCount + 7
-    Loop
-    
-    If SingleByte > 0 Then
-        ReadStringLength = StringLength + Helper.ShiftLeft(SingleByte, ShiftCount)
-    Else
-        ReadStringLength = StringLength
+Private Sub VerifyIsOpen()
+    If mStream Is Nothing Then
+        Throw Cor.NewObjectDisposedException("BinaryReader", "Cannot read from a closed BinaryReader.")
     End If
+End Sub
+
+Private Function ReadOneChar() As Long
+    VerifyIsOpen
+    If ReadCharBytes(mOneChar, 0, 1) = 0 Then
+        ReadOneChar = NoChars
+    Else
+        AsWord(ReadOneChar) = mOneChar(0)
+    End If
+End Function
+
+Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
+    Dim BufferPtr As Long
+    Dim BufferIndex As Long
+    Dim BufferCount As Long
+    
+    BufferPtr = ValidArrayPointer(Buffer, Parameter_Buffer, ArgumentNull_Buffer)
+    BufferIndex = GetOptionalLong(Index, LBound(Buffer))
+    BufferCount = GetOptionalLong(Count, ArrayLength(Buffer))
+    
+    Require.Range BufferIndex >= LBound(Buffer), Parameter_Index, ArgumentOutOfRange_ArrayLB
+    Require.Range BufferCount >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    Require.That BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument_InvalidOffLen
+    
+    Select Case VarType(Buffer)
+        Case vbByteArray
+            ReadToBuffer = ReadToByteBuffer(BufferPtr, BufferIndex, BufferCount)
+        Case vbIntegerArray
+            ReadToBuffer = ReadToCharBuffer(BufferPtr, BufferIndex, BufferCount)
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_UnsupportedArray), Environment.GetResourceString(Parameter_Buffer))
+    End Select
+End Function
+
+Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByVal Index As Long, ByVal Count As Long) As Long
+    Dim Buffer() As Byte
+    
+    On Error GoTo errTrap
+    SAPtr(Buffer) = BufferPtr
+    ReadToByteBuffer = mStream.ReadBlock(Buffer, Index, Count)
+    
+errTrap:
+    SAPtr(Buffer) = vbNullPtr
+End Function
+
+Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByVal Index As Long, ByVal Count As Long) As Long
+    Dim Buffer() As Integer
+    
+    On Error GoTo errTrap
+    SAPtr(Buffer) = BufferPtr
+    ReadToCharBuffer = ReadCharBytes(Buffer, Index, Count)
+    
+errTrap:
+    SAPtr(Buffer) = vbNullPtr
 End Function
 
 Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
@@ -536,13 +526,40 @@ Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, By
     ReadCharBytes = TotalCharsRead
 End Function
 
-Private Function ReadOneChar() As Long
-    VerifyIsOpen
-    If ReadCharBytes(mOneChar, 0, 1) = 0 Then
-        ReadOneChar = -1
-    Else
-        AsWord(ReadOneChar) = mOneChar(0)
+Private Function ReadStringLength() As Long
+    Const BitsShiftedAtATime    As Long = 7
+    Const BitsToShiftMask       As Long = &H7F
+    
+    Dim StringLength    As Long
+    Dim SingleByte      As Long
+    Dim ShiftCount      As Long
+    
+    SingleByte = mStream.ReadByte
+    
+    Do While SingleByte >= &H80
+        StringLength = StringLength + Helper.ShiftLeft(SingleByte And BitsToShiftMask, ShiftCount)
+        SingleByte = mStream.ReadByte
+        ShiftCount = ShiftCount + BitsShiftedAtATime
+    Loop
+    
+    If SingleByte > 0 Then
+        StringLength = StringLength + Helper.ShiftLeft(SingleByte, ShiftCount)
     End If
+    
+    ReadStringLength = StringLength
+End Function
+
+Private Function ReadEncodedString(ByVal StringLength As Long) As String
+    Dim EncodedBytes() As Byte
+    ReDim EncodedBytes(0 To StringLength - 1)
+    
+    Dim NumberOfBytesRead As Long
+    NumberOfBytesRead = mStream.ReadBlock(EncodedBytes, 0, StringLength)
+    
+    If NumberOfBytesRead < StringLength Then _
+        Throw New EndOfStreamException
+        
+    ReadEncodedString = mEncoding.GetString(EncodedBytes)
 End Function
 
 

@@ -93,25 +93,7 @@ Public Const vbForwardSlashString   As String = "/"
 Public Const vbPeriodString         As String = "."
 
 
-' SafeArray Constants
-Public Const SIZEOF_SAFEARRAY               As Long = 16
-Public Const SIZEOF_SAFEARRAYBOUND          As Long = 8
-Public Const SIZEOF_SAFEARRAY1D             As Long = SIZEOF_SAFEARRAY + SIZEOF_SAFEARRAYBOUND
-Public Const SIZEOF_GUID                    As Long = 16
-Public Const SIZEOF_GUIDSAFEARRAY1D         As Long = SIZEOF_SAFEARRAY1D + SIZEOF_GUID
 
-' Byte offsets into the SafeArray structure.
-Public Const FFEATURES_OFFSET               As Long = 2
-Public Const CBELEMENTS_OFFSET              As Long = 4
-Public Const PVDATA_OFFSET                  As Long = 12
-Public Const LBOUND_OFFSET                  As Long = 20
-Public Const CLOCKS_OFFSET                  As Long = 8
-Public Const CELEMENTS_OFFSET               As Long = 16
-
-' Variant descriptions and offsets into the layout.
-Public Const VARIANTDATA_OFFSET             As Long = 8
-Public Const VT_BYREF                       As Long = &H4000
-Public Const SIZEOF_VARIANT                 As Long = 16
 
 Public Const MAX_PATH                   As Long = 260
 Public Const MAX_DIRECTORY_PATH         As Long = 260
