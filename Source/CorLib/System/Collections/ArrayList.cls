@@ -365,12 +365,7 @@ End Function
 ' is thrown the next time the ranged view is accessed.
 '
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    If Index < 0 Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_NeedNonNegNum)
-    If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Count, ArgumentOutOfRange_NeedNonNegNum)
-    If Index + Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+    ValidateListRange NewListRange(Index, Count), mCount
     
     Dim Ranged As New RangedArrayList
     Ranged.Init Me, Index, Count
@@ -647,9 +642,7 @@ End Sub
 Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, 0, mCount)
-    Require.Range Range.Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
-    Require.Range Range.Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-    Require.That Range.Index + Range.Count <= mCount, Argument_InvalidOffLen
+    ValidateListRange Range, mCount
     
     cArray.Reverse mItems, Range.Index, Range.Count
     mVersion = mVersion + 1
@@ -682,9 +675,7 @@ End Sub
 Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, 0, mCount)
-    Require.Range Range.Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
-    Require.Range Range.Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-    Require.That Range.Index + Range.Count <= mCount, Argument_InvalidOffLen
+    ValidateListRange Range, mCount
 
     If Comparer Is Nothing Then
         Set Comparer = mComparer
@@ -786,12 +777,12 @@ End Sub
 
 Private Sub WriteRange(ByVal Index As Long, ByRef Source As Variant, ByVal Insert As Boolean)
     If IsArray(Source) Then
-        Require.NotNullSingleDimensionArray Source, Parameter_Source
-        
+        ValidateArray Source, Parameter_Source
         WriteArray Index, Source, Insert
     ElseIf IsObject(Source) Then
-        Require.NotNothing Source, Parameter_Source, ArgumentNull_Collection
-        
+        If Source Is Nothing Then _
+            Throw Error.ArgumentNull(Parameter_Source, ArgumentNull_Collection)
+            
         If TypeOf Source Is Collection Then
             WriteVBCollection Index, Source, Insert
         ElseIf TypeOf Source Is ICollection Then
