@@ -14,9 +14,10 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements Stream
 
-Public CanWrite As Boolean
-Public CanRead  As Boolean
-Public CanSeek As Boolean
+Public CanWrite     As Boolean
+Public CanRead      As Boolean
+Public CanSeek      As Boolean
+Public FlushCalled  As Boolean
 
 
 Private Sub Class_Initialize()
@@ -66,7 +67,7 @@ Private Function Stream_Equals(Value As Variant) As Boolean
 End Function
 
 Private Sub Stream_Flush()
-
+    FlushCalled = True
 End Sub
 
 Private Function Stream_GetHashCode() As Long

@@ -67,9 +67,7 @@ Private Const NoChars           As Long = -1
 Private mStream         As Stream
 Private mEncoding       As Encoding
 Private mBuffer()       As Byte
-Private mCapacity       As Long
-Private mPtrBuffer      As Long
-Private mOneChar(0)     As Integer
+Private mSingleChar(0)  As Integer
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -249,7 +247,6 @@ End Function
 ' is non-zero, then True is returned, otherwise False.
 '
 Public Function ReadBoolean() As Boolean
-    VerifyIsOpen
     ReadBoolean = (ReadByte <> 0)
 End Function
 
@@ -445,10 +442,10 @@ End Sub
 
 Private Function ReadOneChar() As Long
     VerifyIsOpen
-    If ReadCharBytes(mOneChar, 0, 1) = 0 Then
+    If ReadCharBytes(mSingleChar, 0, 1) = 0 Then
         ReadOneChar = NoChars
     Else
-        AsWord(ReadOneChar) = mOneChar(0)
+        AsWord(ReadOneChar) = mSingleChar(0)
     End If
 End Function
 
