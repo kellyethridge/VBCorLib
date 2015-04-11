@@ -74,9 +74,11 @@ Private mSingleChar(0)  As Integer
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
-    Require.NotNothing Stream, Parameter_Stream, ArgumentNull_Stream
-    Require.That Stream.CanRead, Argument_ReadableStreamRequired, Parameter_Stream
-    
+    If Stream Is Nothing Then _
+        Error.ArgumentNull Parameter_Stream, ArgumentNull_Stream
+    If Not Stream.CanRead Then _
+        Error.Argument Argument_ReadableStreamRequired, Parameter_Stream
+        
     Set mStream = Stream
     If Encoding Is Nothing Then
         Set mEncoding = New UTF8Encoding
@@ -186,8 +188,9 @@ End Function
 '
 Public Function ReadBytes(ByVal Count As Long) As Byte()
     VerifyIsOpen
-    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-    
+    If Count < 0 Then _
+        Error.NegativeNumber Parameter_Count
+        
     Dim Bytes() As Byte
     If Count > 0 Then
         ReDim Bytes(0 To Count - 1)
@@ -218,8 +221,9 @@ End Function
 '
 Public Function ReadChars(ByVal Count As Long) As Integer()
     VerifyIsOpen
-    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-    
+    If Count < 0 Then _
+        Error.NegativeNumber Parameter_Count
+        
     Dim Chars() As Integer
     If Count > 0 Then
         ReDim Chars(0 To Count - 1)
@@ -436,7 +440,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If mStream Is Nothing Then
-        Throw Cor.NewObjectDisposedException("BinaryReader", "Cannot read from a closed BinaryReader.")
+        Error.ObjectDisposed ObjectDisposed_FileNotOpen
     End If
 End Sub
 
@@ -450,45 +454,40 @@ Private Function ReadOneChar() As Long
 End Function
 
 Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
-    Dim BufferPtr As Long
-    Dim BufferIndex As Long
-    Dim BufferCount As Long
+    Dim BufferPtr   As Long
+    Dim BufferRange As ListRange
     
     BufferPtr = ValidArrayPointer(Buffer, Parameter_Buffer, ArgumentNull_Buffer)
-    BufferIndex = GetOptionalLong(Index, LBound(Buffer))
-    BufferCount = GetOptionalLong(Count, ArrayLength(Buffer))
-    
-    Require.Range BufferIndex >= LBound(Buffer), Parameter_Index, ArgumentOutOfRange_ArrayLB
-    Require.Range BufferCount >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-    Require.That BufferIndex + BufferCount - 1 <= UBound(Buffer), Argument_InvalidOffLen
+    BufferRange = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
+    ValidateArrayRange BufferRange, Buffer
     
     Select Case VarType(Buffer)
         Case vbByteArray
-            ReadToBuffer = ReadToByteBuffer(BufferPtr, BufferIndex, BufferCount)
+            ReadToBuffer = ReadToByteBuffer(BufferPtr, BufferRange)
         Case vbIntegerArray
-            ReadToBuffer = ReadToCharBuffer(BufferPtr, BufferIndex, BufferCount)
+            ReadToBuffer = ReadToCharBuffer(BufferPtr, BufferRange)
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_UnsupportedArray), Environment.GetResourceString(Parameter_Buffer))
+            Error.Argument Argument_UnsupportedArray, Parameter_Buffer
     End Select
 End Function
 
-Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByVal Index As Long, ByVal Count As Long) As Long
+Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByRef BufferRange As ListRange) As Long
     Dim Buffer() As Byte
     
     On Error GoTo errTrap
     SAPtr(Buffer) = BufferPtr
-    ReadToByteBuffer = mStream.ReadBlock(Buffer, Index, Count)
+    ReadToByteBuffer = mStream.ReadBlock(Buffer, BufferRange.Index, BufferRange.Count)
     
 errTrap:
     SAPtr(Buffer) = vbNullPtr
 End Function
 
-Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByVal Index As Long, ByVal Count As Long) As Long
+Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As ListRange) As Long
     Dim Buffer() As Integer
     
     On Error GoTo errTrap
     SAPtr(Buffer) = BufferPtr
-    ReadToCharBuffer = ReadCharBytes(Buffer, Index, Count)
+    ReadToCharBuffer = ReadCharBytes(Buffer, BufferRange.Index, BufferRange.Count)
     
 errTrap:
     SAPtr(Buffer) = vbNullPtr

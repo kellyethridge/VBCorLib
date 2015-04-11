@@ -59,8 +59,10 @@ Private mSingleChar(0)  As Integer
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
-    Require.NotNothing Output, Parameter_Output
-    Require.That Output.CanWrite, Argument_StreamNotWritable
+    If Output Is Nothing Then _
+        Error.ArgumentNull Parameter_Output
+    If Not Output.CanWrite Then _
+        Error.Argument Argument_StreamNotWritable
     
     Set mOutStream = Output
     If Encoding Is Nothing Then
@@ -74,6 +76,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   API
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
 ''
 ' Returns the underlying stream this writer is writing to.
 '
@@ -243,8 +246,6 @@ Private Sub WriteStringLength(ByVal Length As Long)
 End Sub
 
 Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    Dim num As Long
-
     Select Case VarType(Value)
         Case vbBoolean:     WriteBoolean Value
         Case vbByte:        WriteByte Value
@@ -257,7 +258,7 @@ Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef
         Case vbString:      WriteString CStr(Value)
         Case vbDecimal:     WriteDecimal Value
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_NeedIntrinsicType), "Value")
+            Error.Argument Argument_NeedIntrinsicType, Parameter_Value
     End Select
 End Sub
 
