@@ -775,15 +775,15 @@ End Sub
 
 Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
     If Index < mCount Then
-        CopyMemory mItems(Index + Size), mItems(Index), (mCount - Index) * SIZEOF_VARIANT
-        ZeroMemory mItems(Index), Size * SIZEOF_VARIANT
+        CopyMemory mItems(Index + Size), mItems(Index), (mCount - Index) * SizeOfVariant
+        ZeroMemory mItems(Index), Size * SizeOfVariant
     End If
 End Sub
 
 Private Sub RemoveSpace(ByVal Index As Long, ByVal Size As Long)
     If Index < mCount - 1 Then
-        CopyMemory mItems(Index), mItems(Index + Size), (mCount - Index - Size) * SIZEOF_VARIANT
-        ZeroMemory mItems(mCount - Size), Size * SIZEOF_VARIANT
+        CopyMemory mItems(Index), mItems(Index + Size), (mCount - Index - Size) * SizeOfVariant
+        ZeroMemory mItems(mCount - Size), Size * SizeOfVariant
     End If
 End Sub
 

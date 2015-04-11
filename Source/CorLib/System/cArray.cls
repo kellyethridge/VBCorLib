@@ -255,7 +255,7 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
             ' as an array of objects, we create a new array using the
             ' same Guid value as that of the original array.
             VariantType(Ret) = vbObject Or vbArray
-            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, pSafeArray - SIZEOF_GUID)
+            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, pSafeArray - SizeOfGuid)
             'If MatchCount > 0 Then ReDim ret(0 To MatchCount - 1)
             
             For i = 0 To MatchCount - 1
@@ -561,7 +561,7 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long
     Dim IIDOffset As Long
     Select Case VarType(Arr) And &HFF   ' knock off the vbArray bit
         Case vbObject
-            IIDOffset = SIZEOF_GUID
+            IIDOffset = SizeOfGuid
             
         Case vbString, vbUserDefinedType
             IIDOffset = 4
@@ -670,7 +670,7 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
         If SourceArrayType = DestinationArrayType Then
             Select Case SourceArrayType
                 Case vbObject, vbDataObject
-                    If IsEqualGUID(ByVal pSourceSafeArray - SIZEOF_GUID, ByVal pDestinationSafeArray - SIZEOF_GUID) <> BOOL_FALSE Then
+                    If IsEqualGUID(ByVal pSourceSafeArray - SizeOfGuid, ByVal pDestinationSafeArray - SizeOfGuid) <> BOOL_FALSE Then
                         CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
                     Else
                         CopyObjectTypesCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
@@ -784,7 +784,7 @@ Private Function InternalGetLength(ByVal SafeArrayPtr As Long, ByVal Dimension A
         Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(IndexOutOfRange_Dimension))
     
     Dim ArrayBoundPtr As Long
-    ArrayBoundPtr = SafeArrayPtr + SIZEOF_SAFEARRAY
+    ArrayBoundPtr = SafeArrayPtr + SizeOfSafeArray
     
     If Dimension < 1 Then
         ' optimize for 99% of calls
@@ -803,7 +803,7 @@ Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal
     
     Result = 1
     Dim ptr As Long
-    For ptr = ArrayBoundPtr To ArrayBoundPtr + (SIZEOF_SAFEARRAYBOUND * (Rank - 1)) Step SIZEOF_SAFEARRAYBOUND
+    For ptr = ArrayBoundPtr To ArrayBoundPtr + (SizeOfSafeArrayBound * (Rank - 1)) Step SizeOfSafeArrayBound
         Result = Result * MemLong(ptr)
     Next
 
@@ -811,7 +811,7 @@ Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal
 End Function
 
 Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Long, ByVal Dimension As Long) As Long
-    ArrayBoundPtr = ArrayBoundPtr + (Rank - Dimension) * SIZEOF_SAFEARRAYBOUND
+    ArrayBoundPtr = ArrayBoundPtr + (Rank - Dimension) * SizeOfSafeArrayBound
     GetDimensionSize = MemLong(ArrayBoundPtr)
 End Function
 
@@ -1288,7 +1288,7 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
     Dim IIDOffset   As Long
     
     Select Case SafeArrayGetVartype(srcpSA)
-        Case vbObject:              IIDOffset = SIZEOF_GUID
+        Case vbObject:              IIDOffset = SizeOfGuid
         Case vbUserDefinedType:     IIDOffset = 4
     End Select
     
@@ -1379,7 +1379,7 @@ Private Sub CopyObjectTypesCast(ByVal srcpSA As Long, ByVal SourceIndex As Long,
     pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - DstLowerBound) * SizeOfPointer
     
     Dim pDstGuid As Long
-    pDstGuid = dstpSA - SIZEOF_GUID
+    pDstGuid = dstpSA - SizeOfGuid
     
     Dim pObj    As Long
     Dim SrcObj  As IVBUnknown

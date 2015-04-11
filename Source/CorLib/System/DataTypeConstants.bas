@@ -24,22 +24,28 @@ Attribute VB_Name = "DataTypeConstants"
 '
 Option Explicit
 
-Public Const SizeOfByte     As Long = 1
-Public Const SizeOfInteger  As Long = 2
-Public Const SizeOfLong     As Long = 4
-Public Const SizeOfSingle   As Long = 4
-Public Const SizeOfDouble   As Long = 8
-Public Const SizeOfCurrency As Long = 8
-Public Const SizeOfDecimal  As Long = 16
-Public Const SizeOfBoolean  As Long = 1
-Public Const SizeOfDate     As Long = 8
+Public Const vbIntegerArray         As Long = vbInteger Or vbArray
+Public Const vbByteArray            As Long = vbByte Or vbArray
+Public Const vbLongArray            As Long = vbLong Or vbArray
+Public Const vbBooleanArray         As Long = vbBoolean Or vbArray
+Public Const vbStringArray          As Long = vbString Or vbArray
+Public Const vbVariantArray         As Long = vbVariant Or vbArray
 
-' SafeArray Constants
-Public Const SIZEOF_SAFEARRAY               As Long = 16
-Public Const SIZEOF_SAFEARRAYBOUND          As Long = 8
-Public Const SIZEOF_SAFEARRAY1D             As Long = SIZEOF_SAFEARRAY + SIZEOF_SAFEARRAYBOUND
-Public Const SIZEOF_GUID                    As Long = 16
-Public Const SIZEOF_GUIDSAFEARRAY1D         As Long = SIZEOF_SAFEARRAY1D + SIZEOF_GUID
+Public Const SizeOfByte             As Long = 1
+Public Const SizeOfInteger          As Long = 2
+Public Const SizeOfLong             As Long = 4
+Public Const SizeOfSingle           As Long = 4
+Public Const SizeOfDouble           As Long = 8
+Public Const SizeOfCurrency         As Long = 8
+Public Const SizeOfDecimal          As Long = 16
+Public Const SizeOfBoolean          As Long = 1
+Public Const SizeOfDate             As Long = 8
+Public Const SizeOfSafeArray        As Long = 16
+Public Const SizeOfSafeArrayBound   As Long = 8
+Public Const SizeOfSafeArray1d      As Long = SizeOfSafeArray + SizeOfSafeArrayBound
+Public Const SizeOfGuid             As Long = 16
+Public Const SizeOfGuidSafeArray1d  As Long = SizeOfSafeArray1d + SizeOfGuid
+Public Const SizeOfVariant          As Long = 16
 
 ' Byte offsets into the SafeArray structure.
 Public Const FFEATURES_OFFSET               As Long = 2
@@ -52,4 +58,3 @@ Public Const CELEMENTS_OFFSET               As Long = 16
 ' Variant descriptions and offsets into the layout.
 Public Const VARIANTDATA_OFFSET             As Long = 8
 Public Const VT_BYREF                       As Long = &H4000
-Public Const SIZEOF_VARIANT                 As Long = 16

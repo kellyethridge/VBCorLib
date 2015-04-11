@@ -132,7 +132,7 @@ End Function
 ' @param LockGuid Locks the guids handle.
 ' @return A new guid initialized to the values and bytes specified.
 '
-Public Function FromValues(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByVal d As Byte, ByVal e As Byte, ByVal f As Byte, ByVal g As Byte, ByVal h As Byte, ByVal i As Byte, ByVal j As Byte, ByVal K As Byte) As Guid
+Public Function FromValues(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByVal d As Byte, ByVal e As Byte, ByVal f As Byte, ByVal g As Byte, ByVal h As Byte, ByVal i As Byte, ByVal j As Byte, ByVal k As Byte) As Guid
     Dim Bytes(7) As Byte
     Bytes(0) = d
     Bytes(1) = e
@@ -141,7 +141,7 @@ Public Function FromValues(ByVal a As Long, ByVal b As Integer, ByVal c As Integ
     Bytes(4) = h
     Bytes(5) = i
     Bytes(6) = j
-    Bytes(7) = K
+    Bytes(7) = k
     
     Set FromValues = FromParts(a, b, c, Bytes)
 End Function
@@ -154,7 +154,7 @@ End Function
 '
 Public Function FromMemory(ByVal lpGuid As Long) As Guid
     Dim b(15) As Byte
-    Call CopyMemory(b(0), ByVal lpGuid, SIZEOF_GUID)
+    Call CopyMemory(b(0), ByVal lpGuid, SizeOfGuid)
     Set FromMemory = FromByteArray(b)
 End Function
 
