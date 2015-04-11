@@ -221,6 +221,34 @@ Public Sub AddRange_WithICollection_AppendsToList()
     Assert.That List(2), Iz.EqualTo(3)
 End Sub
 
+Public Sub AddRange_WithNothing_ThrowsArgumentNullException()
+    Dim List As New ArrayList
+    
+    On Error Resume Next
+    List.AddRange Nothing
+    
+    AssertArgumentNullException Err, "Source"
+End Sub
+
+Public Sub AddRange_WithNullArray_ThrowsArgumentNullException()
+    Dim NullArray() As Long
+    Dim List        As New ArrayList
+    
+    On Error Resume Next
+    List.AddRange NullArray
+    
+    AssertArgumentNullException Err, "Source"
+End Sub
+
+Public Sub AddRange_WithUnsupportedCollection_ThrowsInvalidCastException()
+    Dim List As New ArrayList
+    
+    On Error Resume Next
+    List.AddRange 1
+    
+    AssertInvalidCastException Err
+End Sub
+
 Public Sub Set_WithExistingItem_ReplacesItem()
     Dim List As New ArrayList
     List.AddRange NewLongs(1, 2, 3)
