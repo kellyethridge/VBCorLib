@@ -50,8 +50,9 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private mOutStream  As Stream
-Private mEncoding   As Encoding
+Private mOutStream      As Stream
+Private mEncoding       As Encoding
+Private mSingleChar(0)  As Integer
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -178,21 +179,19 @@ End Sub
 ' @remarks The character is encoded and the byte array is written to the Stream.
 '
 Public Sub WriteChar(ByRef Value As Variant)
-    Dim OneChar(0) As Integer
-    
     Select Case VarType(Value)
         Case vbString
-            OneChar(0) = AscW(CStr(Value))
+            mSingleChar(0) = AscW(CStr(Value))
             
         Case vbLong, vbInteger, vbByte
-            OneChar(0) = CInt(Value)
+            mSingleChar(0) = CInt(Value)
             
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), Environment.GetResourceString(Parameter_Value))
     End Select
     
     Dim Bytes() As Byte
-    Bytes = mEncoding.GetBytes(OneChar, 0, 1)
+    Bytes = mEncoding.GetBytes(mSingleChar, 0, 1)
     mOutStream.WriteBlock Bytes, 0, ArrayLength(Bytes)
 End Sub
 
