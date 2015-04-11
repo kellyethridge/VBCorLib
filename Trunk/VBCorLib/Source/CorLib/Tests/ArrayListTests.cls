@@ -65,7 +65,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 0, -1
             Test.Use 8, -7
             
-        Case "BinarySearch_WithRangedValue_ReturnsExpected"
+        Case "BinarySearchEx_WithRangedValue_ReturnsExpected"
             Test.Use 1, -2
             Test.Use 7, -6
             Test.Use 4, -4
@@ -304,11 +304,11 @@ End Sub
 Public Sub InsertRange_WithCollection_InsertsItems()
     Dim List As New ArrayList
     List.AddRange NewLongs(1, 2, 3, 4)
-    Dim col As New Collection
-    col.Add "Item1"
-    col.Add "Item2"
+    Dim Col As New Collection
+    Col.Add "Item1"
+    Col.Add "Item2"
     
-    List.Insertrange 2, col
+    List.Insertrange 2, Col
     
     Assert.That List, Iz.EqualTo(Array(1&, 2&, "Item1", "Item2", 3&, 4&))
 End Sub
@@ -393,14 +393,14 @@ Public Sub IndexOf_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub IndexOf_WithStartIndexEqualToCount_ThrowsArgumentOutOfRangeException()
+Public Sub IndexOf_WithStartIndexEqualToCount_ReturnsMinusOne()
     Dim List As ArrayList
     Set List = MakeFilledList
     
-    On Error Resume Next
-    List.IndexOf 1, 10
+    Dim Actual As Long
+    Actual = List.IndexOf(1, 10)
     
-    AssertArgumentOutOfRangeException Err, "StartIndex"
+    Assert.That Actual, Iz.EqualTo(-1)
 End Sub
 
 Public Sub IndexOf_WithNegativeCount_ThrowsArgumentOutOfRangeException()
@@ -540,7 +540,7 @@ Public Sub RemoveRange_WithValidRange_RemovesItems()
     Assert.That List, Iz.EqualTo(NewLongs(1, 5, 1, 2, 3, 4, 5))
 End Sub
 
-Public Sub RemoveRange_WithNegativeIndex_Throws()
+Public Sub RemoveRange_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -588,7 +588,7 @@ Public Sub Reverse_WithRangeSpecified_ReversesItemsInRange()
     Assert.That List, Iz.EqualTo(NewLongs(1, 2, 5, 4, 3, 1, 2, 3, 4, 5))
 End Sub
 
-Public Sub Reverse_WithNegativeIndex_Throws()
+Public Sub Reverse_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -598,7 +598,7 @@ Public Sub Reverse_WithNegativeIndex_Throws()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub Reverse_WithNegativeCount_Throws()
+Public Sub Reverse_WithNegativeCount_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -608,7 +608,7 @@ Public Sub Reverse_WithNegativeCount_Throws()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub Reverse_WithIndexAndCountExceedLength_Throws()
+Public Sub Reverse_WithIndexAndCountExceedLength_ThrowsArgumentException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
@@ -637,14 +637,14 @@ Public Sub SetRange_WhenItems_SetsRangeOfItems(ByRef Items As Variant)
     Assert.That List, Iz.EqualTo(Array(1, 2, "Item1", "Item2", 5, 1, 2, 3, 4, 5))
 End Sub
 
-Public Sub SetRange_WithNullCollection_Throws()
+Public Sub SetRange_WithNullCollection_ThrowsArgumentNullException()
     Dim List As ArrayList
     Set List = MakeFilledList
     
     On Error Resume Next
     List.SetRange 0, Nothing
     
-    AssertArgumentNullException Err, "c"
+    AssertArgumentNullException Err, "Source"
 End Sub
 
 Public Sub GetEnumerator_WithSubset_EnumeratesSubset()
@@ -762,7 +762,7 @@ Public Sub BinarySearchEx_WithRangedValue_ReturnsExpected(ByVal Value As Long, B
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub BinarySearchEx_WithNegativeIndex_Throws()
+Public Sub BinarySearchEx_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
     Dim List As ArrayList
     Set List = MakeOrderedList
     

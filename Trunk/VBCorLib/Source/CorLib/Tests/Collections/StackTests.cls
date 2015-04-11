@@ -27,7 +27,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "NewStack_WithElements_PushesElementsOnStack"
             Test.Use Array(1, 2, 3)
-            Test.Use NewArrayList(c:=Array(1, 2, 3))
+            Test.Use NewArrayList(Source:=Array(1, 2, 3))
             
             Dim Col As New Collection
             Col.Add 1

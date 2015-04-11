@@ -273,8 +273,8 @@ End Function
 ''
 ' Creates a new ArrayList object with the specified settings.
 '
-' @param comparer A comparer to be used for searching and sorting items in the list.
-' @param c A collection to initialize the list with. Count will reflect the number of items added.
+' @param Comparer A comparer to be used for searching and sorting items in the list.
+' @param Source A collection to initialize the list with. Count will reflect the number of items added.
 ' @return A new ArrayList object.
 ' @remarks Sometimes the comparison of two items in the list cannot be accomplished
 ' by the default comparer that <b>ArrayList</b> uses. Cases like this may be when using
@@ -301,9 +301,9 @@ End Function
 ' @see ArrayList
 ' @see IComparer
 '
-Public Function NewArrayList(Optional ByVal Comparer As IComparer, Optional ByRef c As Variant) As ArrayList
+Public Function NewArrayList(Optional ByVal Comparer As IComparer, Optional ByRef Source As Variant) As ArrayList
     Set NewArrayList = New ArrayList
-    NewArrayList.Init Comparer, c
+    NewArrayList.Init Comparer, Source
 End Function
 
 ''
@@ -1071,7 +1071,7 @@ End Function
 ' when being returned. All other datatype sizes will cause a new array
 ' to be created.</p>
 '
-Public Function NewArray(ByVal ElementType As vbVarType, ParamArray ArrayElements() As Variant) As Variant
+Public Function NewArray(ByVal ElementType As VbVarType, ParamArray ArrayElements() As Variant) As Variant
     Dim Args() As Variant
     Helper.Swap4 ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16)
     
