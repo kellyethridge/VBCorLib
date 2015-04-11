@@ -52,7 +52,6 @@ Implements IObject
 
 Private mOutStream  As Stream
 Private mEncoding   As Encoding
-Private mOneChar(0) As Integer
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -89,11 +88,7 @@ End Property
 ' Closes the writer, flushing any data.
 '
 Public Sub CloseWriter()
-    If Not mOutStream Is Nothing Then
-        Flush
-        mOutStream.CloseStream
-        Set mOutStream = Nothing
-    End If
+    mOutStream.CloseStream
 End Sub
 
 ''
@@ -169,8 +164,6 @@ End Function
 ' bytes 15: sign (&h80 is negative)<br>
 '
 Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    VerifyIsOpen
-
     If IsArray(Value) Then
         WriteArray Value, Index, Count
     Else
@@ -185,38 +178,21 @@ End Sub
 ' @remarks The character is encoded and the byte array is written to the Stream.
 '
 Public Sub WriteChar(ByRef Value As Variant)
+    Dim OneChar(0) As Integer
+    
     Select Case VarType(Value)
         Case vbString
-            mOneChar(0) = AscW(CStr(Value))
+            OneChar(0) = AscW(CStr(Value))
+            
         Case vbLong, vbInteger, vbByte
-            mOneChar(0) = CInt(Value)
+            OneChar(0) = CInt(Value)
+            
         Case Else
-            Throw Cor.NewArgumentException("Value must be a String or Integer value.", "Value")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), Environment.GetResourceString(Parameter_Value))
     End Select
     
-    WriteChars mOneChar
-End Sub
-
-
-''
-' Writes a section of a character array using the encoding in the BinaryWriter and advances the stream position
-' in accordance to the number of characters the encoding produces.
-'
-' @param Chars The characters to encode and write.
-' @param Index The starting index within the characters to begin writing.
-' @param Count The number of characters to write.
-' @remarks If the index and count are not specified, the lowerbound and length of the array will be used.
-'
-Private Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    VerifyIsOpen
-    Require.NotNullSingleDimensionArray Chars, Parameter_Chars
-    
-    Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))
-    Validate.ArrayRange Chars, Range
-    
     Dim Bytes() As Byte
-    Bytes = mEncoding.GetBytes(Chars, Range.Index, Range.Count)
+    Bytes = mEncoding.GetBytes(OneChar, 0, 1)
     mOutStream.WriteBlock Bytes, 0, ArrayLength(Bytes)
 End Sub
 
@@ -256,12 +232,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifyIsOpen()
-    If mOutStream Is Nothing Then
-        Throw Cor.NewObjectDisposedException("BinaryWriter", "Cannot write to a closed BinaryWriter.")
-    End If
-End Sub
-
 Private Sub WriteStringLength(ByVal Length As Long)
     Dim LengthRemaining As Long
     LengthRemaining = Length
@@ -290,39 +260,6 @@ Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_NeedIntrinsicType), "Value")
     End Select
-End Sub
-
-Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    Require.NotNullSingleDimensionArray Value, Parameter_Value
-    
-    Select Case VarType(Value)
-        Case vbByteArray
-            WriteBytes Value, Index, Count
-        
-        Case vbIntegerArray
-            WriteBytes mEncoding.GetBytes(Value, Index, Count)
-            
-        Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_UnsupportedArray), Environment.GetResourceString(Parameter_Value))
-    End Select
-End Sub
-
-Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Dim Bytes() As Byte
-    Dim Range   As ListRange
-    
-    Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
-    Validate.ArrayRange Buffer, Range
-    
-    On Error GoTo CleanExit
-    SAPtr(Bytes) = ArrayPointer(Buffer)
-    mOutStream.WriteBlock Bytes, Range.Index, Range.Count
-    SAPtr(Bytes) = vbNullPtr
-    Exit Sub
-    
-CleanExit:
-    SAPtr(Bytes) = vbNullPtr
-    Throw Err
 End Sub
 
 Private Sub WriteBoolean(ByVal Value As Boolean)
@@ -368,6 +305,39 @@ End Sub
 Private Sub WriteString(ByRef Value As String)
     WriteStringLength mEncoding.GetByteCount(Value)
     WriteBytes mEncoding.GetBytes(Value)
+End Sub
+
+Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
+    Require.NotNullSingleDimensionArray Value, Parameter_Value
+    
+    Select Case VarType(Value)
+        Case vbByteArray
+            WriteBytes Value, Index, Count
+        
+        Case vbIntegerArray
+            WriteBytes mEncoding.GetBytes(Value, Index, Count)
+            
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_UnsupportedArray), Environment.GetResourceString(Parameter_Value))
+    End Select
+End Sub
+
+Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    Dim Bytes() As Byte
+    Dim Range   As ListRange
+    
+    Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
+    Validate.ArrayRange Buffer, Range
+    
+    On Error GoTo CleanExit
+    SAPtr(Bytes) = ArrayPointer(Buffer)
+    mOutStream.WriteBlock Bytes, Range.Index, Range.Count
+    SAPtr(Bytes) = vbNullPtr
+    Exit Sub
+    
+CleanExit:
+    SAPtr(Bytes) = vbNullPtr
+    Throw Err
 End Sub
 
 

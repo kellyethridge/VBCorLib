@@ -100,7 +100,7 @@ End Function
 '   all-purpose sort routine, but it would be too slow.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Sub SetSortKeys(ByVal pSA As Long)
-    CopyMemory mSortKeys.SA, ByVal pSA, SIZEOF_SAFEARRAY1D
+    CopyMemory mSortKeys.SA, ByVal pSA, SizeOfSafeArray1d
     Select Case mSortKeys.SA.cbElements
         Case 1, 2, 4, 8, 16
         Case Else: mSortKeys.Buffer = CoTaskMemAlloc(mSortKeys.SA.cbElements)
@@ -115,7 +115,7 @@ Public Sub ClearSortKeys()
 End Sub
 
 Public Sub SetSortItems(ByVal pSA As Long)
-    CopyMemory mSortItems.SA, ByVal pSA, SIZEOF_SAFEARRAY1D
+    CopyMemory mSortItems.SA, ByVal pSA, SizeOfSafeArray1d
     Select Case mSortItems.SA.cbElements
         Case 1, 2, 4, 8, 16
         Case Else
