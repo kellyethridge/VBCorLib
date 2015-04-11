@@ -24,6 +24,7 @@ Attribute VB_Name = "DataTypeConstants"
 '
 Option Explicit
 
+Public Const vbMissing              As Long = vbError
 Public Const vbIntegerArray         As Long = vbInteger Or vbArray
 Public Const vbByteArray            As Long = vbByte Or vbArray
 Public Const vbLongArray            As Long = vbLong Or vbArray

@@ -24,6 +24,20 @@ Attribute VB_Name = "GlobalizationConstants"
 '
 Option Explicit
 
+' Locale Specifier
+Public Const LOCALE_USER_DEFAULT = &H400
+
+' GetCalendarInfo Constants
+Public Const CAL_ITWODIGITYEARMAX   As Long = &H30
+Public Const CAL_GREGORIAN          As Long = 1
+Public Const CAL_HEBREW             As Long = 8
+Public Const CAL_HIJRI              As Long = 6
+Public Const CAL_JAPAN              As Long = 3
+Public Const CAL_KOREA              As Long = 5
+Public Const CAL_THAI               As Long = 7
+Public Const CAL_TAIWAN             As Long = 4
+Public Const CAL_RETURN_NUMBER      As Long = &H20000000
+
 Public Const LCID_INSTALLED                 As Long = &H1
 Public Const LCID_SUPPORTED                 As Long = &H2
 Public Const INVARIANT_LCID                 As Long = 127
