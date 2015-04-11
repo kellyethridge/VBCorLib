@@ -286,6 +286,17 @@ Public Sub Read_WithNullArray_ThrowsArgumentNullException()
     AssertArgumentNullException Err, "Buffer"
 End Sub
 
+Public Sub Read_WithUnsupportedArray_ThrowsArgumentException()
+    Dim Longs(0) As Long
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(0))
+    
+    On Error Resume Next
+    Reader.Read Longs, 0, 1
+    
+    AssertArgumentException Err, "Buffer"
+End Sub
+
 Public Sub Read_WithMissingCount_UsesWholeBuffer()
     Dim Target(0 To 3) As Byte
     Dim Reader As BinaryReader
