@@ -21,6 +21,16 @@ Public Sub NewBinaryReader_WithNothingStream_ThrowsArgumentNullException()
     AssertArgumentNullException Err, "Stream"
 End Sub
 
+Public Sub NewBinaryReader_WithNonReadableStream_ThrowsArgumentException()
+    Dim Nonreadable As New FakeStream
+    Nonreadable.CanRead = False
+    
+    On Error Resume Next
+    Cor.NewBinaryReader Nonreadable
+    
+    AssertArgumentException Err, "Stream"
+End Sub
+
 Public Sub ReadByte_WhenCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(129))
@@ -297,16 +307,15 @@ Public Sub Read_WithUnsupportedArray_ThrowsArgumentException()
     AssertArgumentException Err, "Buffer"
 End Sub
 
-Public Sub Read_WithMissingCount_UsesWholeBuffer()
-    Dim Target(0 To 3) As Byte
+Public Sub Read_WithMissingCount_ThrowsArgumentException()
+    Dim Target(0) As Byte
     Dim Reader As BinaryReader
-    Set Reader = MakeReader(NewBytes(1, 2, 3, 4, 5))
+    Set Reader = MakeReader(NewBytes(1))
     
-    Dim Actual As Long
-    Actual = Reader.Read(Target, 0)
+    On Error Resume Next
+    Reader.Read Target, 0
     
-    Assert.That Actual, Iz.EqualTo(4)
-    Assert.That Target, Iz.EqualTo(NewBytes(1, 2, 3, 4))
+    AssertArgumentException Err, "Count"
 End Sub
 
 Public Sub Read_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
@@ -340,6 +349,17 @@ Public Sub Read_WithIndexAndCountNotValidPosition_ThrowsArgumentException()
     Reader.Read Target, 1, 4
     
     AssertArgumentException Err
+End Sub
+
+Public Sub ReadChar_WithClosedReader_ThrowsObjectDisposedException()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(1))
+    Reader.CloseReader
+    
+    On Error Resume Next
+    Reader.ReadChar
+    
+    AssertObjectDisposedException Err
 End Sub
 
 Private Function MakeReader(ByRef Data() As Byte) As BinaryReader

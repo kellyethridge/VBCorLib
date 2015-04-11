@@ -100,7 +100,7 @@ Public Function GetOptionalLongPair(ByRef OptionalValue1 As Variant, ByVal Defau
     End If
 End Function
 
-Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ResourceString = Parameter_Index, Optional ByVal CountParameter As ResourceString = Parameter_Count) As ListRange
+Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
     Dim FirstIsMissing As Boolean
     
     FirstIsMissing = IsMissing(Index)

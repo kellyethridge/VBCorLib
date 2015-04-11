@@ -24,18 +24,30 @@ Attribute VB_Name = "Error"
 '
 Option Explicit
 
-Public Function Argument(ByVal Message As ArgumentString, Optional ByVal Parameter As ParameterString = Parameter_None) As ArgumentException
-    Set Argument = Cor.NewArgumentException(Environment.GetResourceString(Message), Environment.GetResourceString(Parameter))
-End Function
+Public Sub Argument(ByVal Message As ArgumentString, Optional ByVal Parameter As ParameterString = Parameter_None)
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Message), Environment.GetResourceString(Parameter))
+End Sub
 
-Public Function ArgumentNull(ByVal Parameter As ParameterString, Optional ByVal Message As ArgumentNullString = ArgumentNull_Exception) As ArgumentNullException
-    Set ArgumentNull = Cor.NewArgumentNullException(Environment.GetResourceString(Parameter), Environment.GetResourceString(Message))
-End Function
+Public Sub ArgumentNull(ByVal Parameter As ParameterString, Optional ByVal Message As ArgumentNullString = ArgumentNull_Exception)
+    Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter), Environment.GetResourceString(Message))
+End Sub
 
-Public Function ArgumentOutOfRange(ByVal Parameter As ParameterString, Optional ByVal Message As ArgumentOutOfRangeString = ArgumentOutOfRange_Exception) As ArgumentOutOfRangeException
-    Set ArgumentOutOfRange = Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(Parameter), Environment.GetResourceString(Message))
-End Function
+Public Sub ArgumentOutOfRange(ByVal Parameter As ParameterString, Optional ByVal Message As ArgumentOutOfRangeString = ArgumentOutOfRange_Exception)
+    Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(Parameter), Environment.GetResourceString(Message))
+End Sub
 
-Public Function Rank(Optional ByVal Message As ResourceString = Rank_MultiDimNotSupported) As RankException
-    Set Rank = Cor.NewRankException(Environment.GetResourceString(Message))
-End Function
+Public Sub Rank(Optional ByVal Message As ResourceString = Rank_MultiDimNotSupported)
+    Throw Cor.NewRankException(Environment.GetResourceString(Message))
+End Sub
+
+Public Sub ObjectDisposed(Optional ByVal Message As ObjectDisposedString = ObjectDisposed_Generic)
+    Throw Cor.NewObjectDisposedException("", Environment.GetResourceString(Message))
+End Sub
+
+Public Sub NegativeNumber(ByVal Parameter As ParameterString)
+    ArgumentOutOfRange Parameter, ArgumentOutOfRange_NeedNonNegNum
+End Sub
+
+Public Sub InvalidOffsetLength()
+    Argument Argument_InvalidOffLen
+End Sub

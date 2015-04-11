@@ -179,11 +179,11 @@ End Function
 ' @include "..\..\Includes\ArrayListBinarySearch.txt"
 Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If Index < 0 Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_NeedNonNegNum)
+        Error.NegativeNumber Parameter_Index
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Count, ArgumentOutOfRange_NeedNonNegNum)
+        Error.NegativeNumber Parameter_Count
     If Index + Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.InvalidOffsetLength
     
     If mCount = 0 Then
         BinarySearchEx = -1
@@ -217,7 +217,7 @@ End Property
 ' @include "..\..\Includes\ArrayListCapacity.txt"
 Public Property Let Capacity(ByVal Value As Long)
     If Value < mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Value, ArgumentOutOfRange_SmallCapacity)
+        Error.ArgumentOutOfRange Parameter_Value, ArgumentOutOfRange_SmallCapacity
     
     If Value = 0 Then
         Value = DEF_CAPACITY
@@ -389,9 +389,9 @@ Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Var
     Range.Count = GetOptionalLong(Count, mCount - Range.Index)
     
     If Range.Index > mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_StartIndex, ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange Parameter_StartIndex, ArgumentOutOfRange_Index
     If Range.Count < 0 Or Range.Index + Range.Count > mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Count, ArgumentOutOfRange_Count)
+        Error.ArgumentOutOfRange Parameter_Count, ArgumentOutOfRange_Count
     
     If mCount = 0 Then
         IndexOf = -1
@@ -415,7 +415,7 @@ End Function
 '
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index > mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_ArrayListInsert)
+        Error.ArgumentOutOfRange Parameter_Index, ArgumentOutOfRange_ArrayListInsert
     
     EnsureCapacity mCount + 1
     InsertSpace Index, 1
@@ -439,7 +439,7 @@ End Sub
 '
 Public Sub InsertRange(ByVal Index As Long, ByRef Source As Variant)
     If Index < 0 Or Index > mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_ArrayListInsert)
+        Error.ArgumentOutOfRange Parameter_Index, ArgumentOutOfRange_ArrayListInsert
     
     WriteRange Index, Source, True
     mVersion = mVersion + 1
@@ -480,7 +480,7 @@ End Property
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange Parameter_Index, ArgumentOutOfRange_Index
     
     VariantCopy Item, mItems(Index)
 End Property
@@ -497,7 +497,7 @@ End Property
 '
 Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange Parameter_Index, ArgumentOutOfRange_Index
     
     mItems(Index) = Value
     mVersion = mVersion + 1
@@ -515,7 +515,7 @@ End Property
 '
 Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange Parameter_Index, ArgumentOutOfRange_Index
     
     Set mItems(Index) = Value
     mVersion = mVersion + 1
@@ -538,13 +538,13 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
     Range.Count = GetOptionalLong(Count, Range.Index + 1)
     
     If Range.Index < 0 Then _
-        Throw Error.ArgumentOutOfRange(Parameter_StartIndex, ArgumentOutOfRange_NeedNonNegNum)
+        Error.NegativeNumber Parameter_StartIndex
     If Range.Count < 0 Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Count, ArgumentOutOfRange_NeedNonNegNum)
+        Error.NegativeNumber Parameter_Count
     If Range.Index >= mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_StartIndex, ArgumentOutOfRange_LargerThanCollection)
+        Error.ArgumentOutOfRange Parameter_StartIndex, ArgumentOutOfRange_LargerThanCollection
     If Range.Index - Range.Count + 1 < 0 Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Count, ArgumentOutOfRange_LargerThanCollection)
+        Error.ArgumentOutOfRange Parameter_Count, ArgumentOutOfRange_LargerThanCollection
     
     If mCount = 0 Then
         LastIndexOf = -1
@@ -603,7 +603,7 @@ End Sub
 '
 Public Sub RemoveAt(ByVal Index As Long)
     If Index < 0 Or Index >= mCount Then _
-        Throw Error.ArgumentOutOfRange(Parameter_Index, ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange Parameter_Index, ArgumentOutOfRange_Index
     
     mItems(Index) = Empty
     RemoveSpace Index, 1
@@ -748,7 +748,9 @@ End Property
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
-    If RequiredCapacity <= mCapacity Then Exit Sub
+    If RequiredCapacity <= mCapacity Then
+        Exit Sub
+    End If
     
     Dim NewCapacity As Long
     NewCapacity = mCapacity * 2
@@ -781,7 +783,7 @@ Private Sub WriteRange(ByVal Index As Long, ByRef Source As Variant, ByVal Inser
         WriteArray Index, Source, Insert
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Throw Error.ArgumentNull(Parameter_Source, ArgumentNull_Collection)
+            Error.ArgumentNull Parameter_Source, ArgumentNull_Collection
             
         If TypeOf Source Is Collection Then
             WriteVBCollection Index, Source, Insert

@@ -30,34 +30,34 @@ Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal Parameter As Param
     ArrayPtr = ArrayPointer(Arr)
     
     If ArrayPtr = vbNullPtr Then
-        Throw Error.ArgumentNull(Parameter, ArgumentNull_Array)
+        Error.ArgumentNull Parameter, ArgumentNull_Array
     End If
     If SafeArrayGetDim(ArrayPtr) > 1 Then
-        Throw Error.Rank
+        Error.Rank
     End If
 End Sub
 
 Public Sub ValidateArrayRange(ByRef Range As ListRange, ByRef Arr As Variant, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count)
     If Range.Index < LBound(Arr) Then
-        Throw Error.ArgumentOutOfRange(IndexParameter, ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange IndexParameter, ArgumentOutOfRange_LBound
     End If
     If Range.Count < 0 Then
-        Throw Error.ArgumentOutOfRange(CountParameter, ArgumentOutOfRange_NeedNonNegNum)
+        Error.NegativeNumber CountParameter
     End If
     If Range.Index + Range.Count - 1 > UBound(Arr) Then
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.InvalidOffsetLength
     End If
 End Sub
 
 Public Sub ValidateListRange(ByRef Range As ListRange, ByVal ListCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count)
     If Range.Index < 0 Then
-        Throw Error.ArgumentOutOfRange(IndexParameter, ArgumentOutOfRange_NeedNonNegNum)
+        Error.NegativeNumber IndexParameter
     End If
     If Range.Count < 0 Then
-        Throw Error.ArgumentOutOfRange(CountParameter, ArgumentOutOfRange_NeedNonNegNum)
+        Error.NegativeNumber CountParameter
     End If
     If Range.Index + Range.Count > ListCount Then
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.InvalidOffsetLength
     End If
 End Sub
 

@@ -51,8 +51,13 @@ Public Enum ResourceString
     InvalidOperation_Comparer_Arg = 1105
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
-    ObjectDisposed_StreamClosed = 1200
     Overflow_TimeSpan = 1300
+End Enum
+
+Public Enum ObjectDisposedString
+    ObjectDisposed_StreamClosed = 1200
+    ObjectDisposed_FileNotOpen = 1201
+    ObjectDisposed_Generic = 1202
 End Enum
 
 Public Enum ArgumentString
