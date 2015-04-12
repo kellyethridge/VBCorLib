@@ -60,7 +60,7 @@ Public Const vbMinusChar            As Long = &H2D
 Public Const vbBackslashChar        As Long = &H5C
 Public Const vbForwardSlashChar     As Long = &H2F
 Public Const vbColonChar            As Long = &H3A
-Public Const vbSemiColon            As Long = &H3B
+Public Const vbSemiColonChar        As Long = &H3B
 Public Const vbEqualChar            As Long = &H3D
 Public Const vbReturnChar           As Long = &HD
 Public Const vbLineFeedChar         As Long = &HA
@@ -74,9 +74,6 @@ Public Const vbCommaChar            As Long = &H2C
 Public Const vbPeriodChar           As Long = &H2E
 Public Const vbInvalidChar          As Long = &HFFFFFFFF
 
-Public Const vbColonString          As String = ":"
-Public Const vbSemicolonString      As String = ";"
 Public Const vbBackslashString      As String = "\"
 Public Const vbForwardSlashString   As String = "/"
-Public Const vbPeriodString         As String = "."
 
