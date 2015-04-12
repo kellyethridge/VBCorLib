@@ -459,23 +459,6 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
     CopyMemory ByVal PtrInsert + StartIndex + ValueLength, ByVal PtrS + StartIndex, LenB(Insert) - (StartIndex + ValueLength)
 End Function
 
-Public Function CharCount(ByRef s As String, ByVal Char As Variant) As Long
-    Dim ch As Integer
-    Select Case VarType(Char)
-        Case vbLong, vbInteger, vbByte: ch = Char
-        Case vbString:                  ch = AscW(Char)
-        Case Else:                      Throw Cor.NewArgumentException("Invalid Char type.", "Char")
-    End Select
-    
-    mString.SA.pvData = StrPtr(s)
-    mString.SA.cElements = Len(s)
-    
-    Dim i As Long
-    For i = 0 To Len(s) - 1
-        If mString.Data(i) = ch Then CharCount = CharCount + 1
-    Next i
-End Function
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
@@ -543,7 +526,7 @@ Private Function TrimStartIndex(ByRef s As String, ByRef TrimChars() As Integer)
     Dim lb  As Long
     Dim ub  As Long
     Dim ch  As Integer
-    Dim Pos As Long
+    Dim pos As Long
     Dim l   As Long
     
     lb = LBound(TrimChars)
@@ -552,16 +535,16 @@ Private Function TrimStartIndex(ByRef s As String, ByRef TrimChars() As Integer)
     With mString
         .SA.pvData = StrPtr(s)
         .SA.cElements = Len(s)
-        Do While Pos < l
-            ch = .Data(Pos)
+        Do While pos < l
+            ch = .Data(pos)
             For i = lb To ub
                 If ch = TrimChars(i) Then Exit For
             Next i
             If i > ub Then Exit Do
-            Pos = Pos + 1
+            pos = pos + 1
         Loop
-        If Pos = l Then Exit Function
-        TrimStartIndex = Pos + 1
+        If pos = l Then Exit Function
+        TrimStartIndex = pos + 1
     End With
 End Function
 
@@ -588,7 +571,7 @@ Private Function TrimEndIndex(ByRef s As String, ByRef TrimChars() As Integer) A
     Dim lb  As Long
     Dim ub  As Long
     Dim ch  As Integer
-    Dim Pos As Long
+    Dim pos As Long
     
     lb = LBound(TrimChars)
     ub = UBound(TrimChars)
@@ -596,17 +579,17 @@ Private Function TrimEndIndex(ByRef s As String, ByRef TrimChars() As Integer) A
         .SA.pvData = StrPtr(s)
         .SA.cElements = Len(s)
         
-        Pos = .SA.cElements - 1
-        Do While Pos >= 0
-            ch = .Data(Pos)
+        pos = .SA.cElements - 1
+        Do While pos >= 0
+            ch = .Data(pos)
             For i = lb To ub
                 If ch = TrimChars(i) Then Exit For
             Next i
             If i > ub Then Exit Do
-            Pos = Pos - 1
+            pos = pos - 1
         Loop
-        If Pos < 0 Then Exit Function
-        TrimEndIndex = Pos + 1
+        If pos < 0 Then Exit Function
+        TrimEndIndex = pos + 1
     End With
 End Function
 
