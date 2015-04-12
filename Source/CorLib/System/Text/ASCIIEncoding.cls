@@ -185,18 +185,37 @@ End Property
 ' @see Encoding
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-'    ValidateArrayRange Range, mChars
+    Select Case VarType(Chars)
+        Case vbString
+            GetByteCount = GetByteCountString(Chars)
+        Case vbIntegerArray
+            GetByteCount = GetByteCountChars(Chars, Index, Count)
+        Case Else
+            Error.Argument Argument_ArrayRequired, "Chars"
+    End Select
+End Function
 
-    If Range.Index < LBound(mChars) Then _
+Private Function GetByteCountString(ByRef Chars As Variant) As Long
+    GetByteCountString = Len(Chars)
+End Function
+
+Private Function GetByteCountChars(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
+    If IsNullArray(Chars) Then _
+        Error.ArgumentNull "Chars", ArgumentNull_Array
+    If IsMultiDimArray(Chars) Then _
+        Error.Rank
+        
+    Dim Range As ListRange
+    Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))
+
+    If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _
         Error.NegativeNumber "Count"
-    If Range.Index + Range.Count - 1 > UBound(mChars) Then _
+    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
         Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
 
-    GetByteCount = Range.Count
+    GetByteCountChars = Range.Count
 End Function
 
 ''
@@ -277,17 +296,20 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim Range As ListRange
+    If IsNullArray(Bytes) Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    If IsMultiDimArray(Bytes) Then _
+        Error.Rank
     
-    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
-    Range = GetOptionalRange(Index, Count, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1)
+    Dim Range As ListRange
+    Range = GetOptionalRange(Index, Count, LBound(Bytes), ArrayLength(Bytes))
 
     If Range.Index < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _
         Error.NegativeNumber "Count"
     If Range.Index + Range.Count - 1 > UBound(Bytes) Then _
-        Error.InvalidOffsetLength
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
     GetCharCount = Range.Count
 End Function
