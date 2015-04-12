@@ -28,7 +28,7 @@ Public Sub NewBinaryReader_WithNonReadableStream_ThrowsArgumentException()
     On Error Resume Next
     Cor.NewBinaryReader Nonreadable
     
-    AssertArgumentException Err, "Stream"
+    AssertArgumentException Err
 End Sub
 
 Public Sub ReadByte_WhenCalled_ReturnsExpected()

@@ -42,6 +42,13 @@ Public Function IsMultiDimensionByteArray(ByRef Bytes() As Byte) As Boolean
     IsMultiDimensionByteArray = (SafeArrayGetDim(SAPtr(Bytes)) > 1)
 End Function
 
+Public Function IfLong(ByRef Value As Variant, ByVal Default As Long) As Long
+    If IsMissing(Value) Then
+        IfLong = Default
+    Else
+        IfLong = Value
+    End If
+End Function
 
 ''
 ' Returns an optional value or a default value if the optional value is missing.

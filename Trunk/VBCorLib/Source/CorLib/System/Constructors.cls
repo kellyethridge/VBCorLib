@@ -169,7 +169,7 @@ End Function
 '
 ' @see ArgumentException
 '
-Public Function NewArgumentException(ByVal Message As String, Optional ByVal ParamName As String, Optional ByVal InnerException As Exception) As ArgumentException
+Public Function NewArgumentException(ByRef Message As String, Optional ByRef ParamName As String, Optional ByVal InnerException As Exception) As ArgumentException
     Set NewArgumentException = New ArgumentException
     NewArgumentException.Init Message, ParamName, InnerException
 End Function

@@ -31,7 +31,6 @@ Public Enum ResourceString
     ArrayTypeMismatch_Exception = 103
     ArrayTypeMismatch_Compare = 104
     Rank_MultiDimNotSupported = 200
-    IndexOutOfRange_Dimension = 300
     IOException_Exception = 400
     IOException_DirectoryExists = 401
     FileNotFound_Exception = 500
@@ -52,6 +51,11 @@ Public Enum ResourceString
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
     Overflow_TimeSpan = 1300
+End Enum
+
+Public Enum IndexOutOfRangeString
+    IndexOutOfRange_Dimension = 300
+    IndexOutOfRange_ArrayBounds = 301
 End Enum
 
 Public Enum ObjectDisposedString
@@ -142,6 +146,8 @@ Public Enum ArgumentOutOfRangeString
     ArgumentOutOfRange_ConsoleTitleTooLong = 731
     ArgumentOutOfRange_ConsoleColor = 732
     ArgumentOutOfRange_CursorSize = 733
+    ArgumentOutOfRange_IndexCountBuffer = 734
+    ArgumentOutOfRange_IndexCount = 735
 End Enum
 
 Public Enum ParameterString
@@ -169,4 +175,8 @@ Public Enum ParameterString
     Parameter_Output = 2020
     Parameter_Source = 2021
     Parameter_Length = 2022
+    Parameter_SourceArray = 2023
+    Parameter_DestinationArray = 2024
+    Parameter_SourceIndex = 2025
+    Parameter_DestinationIndex = 2026
 End Enum

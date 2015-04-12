@@ -19,11 +19,11 @@ Implements ICategorizable
 Implements ITestCaseSource
 
 
-Private Sub ICategorizable_Categorize(ByVal Cat As simplyvbcomp.CategoryCollector)
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "Array Tests", "Array Copy Tests"
 End Sub
 
-Private Sub ITestCaseSource_GetTestCases(ByVal Test As simplyvbcomp.TestCaseCollector)
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Dim Objects(0 To 2) As Int32
     Set Objects(0) = New Int32
     Set Objects(1) = New Int32
@@ -79,7 +79,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As simplyvbcomp.TestCaseColl
             Dim Comparables(0 To 2) As IComparable
             Test.Use Objects, Comparables, Array(Nothing, Objects(0), Objects(1))
             
-        Case "Copy_WithIncompatibleTypes_Throws"
+        Case "Copy_WithIncompatibleTypes_ThrowsArrayTypeMismatchException"
             Test.Use NewLongs(0), NewIntegers(0)
             Test.Use NewDoubles(0), NewLongs(0)
             
@@ -91,13 +91,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As simplyvbcomp.TestCaseColl
     End Select
 End Sub
 
-Public Sub Copy_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef expected As Variant)
+Public Sub Copy_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef Expected As Variant)
     cArray.Copy Source, Destination, 3
     
-    Assert.That Destination, Iz.EqualTo(expected).Strict
+    Assert.That Destination, Iz.EqualTo(Expected).Strict
 End Sub
 
-Public Sub Copy_WithIncompatibleTypes_Throws(ByRef Source As Variant, ByRef Destination As Variant)
+Public Sub Copy_WithIncompatibleTypes_ThrowsArrayTypeMismatchException(ByRef Source As Variant, ByRef Destination As Variant)
     On Error GoTo errTrap
     
     cArray.Copy Source, Destination, 1
@@ -106,10 +106,10 @@ errTrap:
     AssertArrayTypeMismatchException Err
 End Sub
 
-Public Sub CopyEx_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef expected As Variant)
+Public Sub CopyEx_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef Expected As Variant)
     cArray.CopyEx Source, 0, Destination, 1, 2
     
-    Assert.That Destination, Iz.EqualTo(expected).Strict
+    Assert.That Destination, Iz.EqualTo(Expected).Strict
 End Sub
 
 Public Sub Copy_WithUDT_CopiesElements()
@@ -136,7 +136,7 @@ errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub Copy_WithLengthGreaterThanSourceLength_Throws()
+Public Sub Copy_WithLengthGreaterThanSourceLength_ThrowsArgumentException()
     On Error GoTo errTrap
     Dim Arr1(0) As Long
     Dim Arr2(2) As Long
@@ -147,7 +147,7 @@ errTrap:
     AssertArgumentException Err
 End Sub
 
-Public Sub Copy_WithLengthGreaterThanDestinationLength_Throws()
+Public Sub Copy_WithLengthGreaterThanDestinationLength_ThrowsArgumentException()
     On Error GoTo errTrap
     Dim Arr1(0) As Long
     Dim Arr2(2) As Long
@@ -158,7 +158,7 @@ errTrap:
     AssertArgumentException Err
 End Sub
 
-Public Sub CopyEx_WithLengthPlusStartIndexGreaterThanSourceLength_Throws()
+Public Sub CopyEx_WithLengthPlusStartIndexGreaterThanSourceLength_ThrowsArgumentException()
     On Error GoTo errTrap
     Dim Arr1(1) As Long
     Dim Arr2(2) As Long
@@ -169,7 +169,7 @@ errTrap:
     AssertArgumentException Err
 End Sub
 
-Public Sub CopyEx_WithLengthPlusDestinationIndexGreaterThanDestinationLength_Throws()
+Public Sub CopyEx_WithLengthPlusDestinationIndexGreaterThanDestinationLength_ThrowsArgumentException()
     On Error GoTo errTrap
     Dim Arr1(1) As Long
     Dim Arr2(2) As Long
@@ -180,7 +180,7 @@ errTrap:
     AssertArgumentException Err
 End Sub
 
-Public Sub CopyEx_WithSourceIndexLessThanLBound_Throws()
+Public Sub CopyEx_WithSourceIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     On Error GoTo errTrap
     Dim Arr1(1 To 1) As Long
     Dim Arr2(1 To 1) As Long
@@ -191,7 +191,7 @@ errTrap:
     AssertArgumentOutOfRangeException Err, "SourceIndex"
 End Sub
 
-Public Sub CopyEx_WithDestinationIndexLessThanLBound_Throws()
+Public Sub CopyEx_WithDestinationIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     On Error GoTo errTrap
     Dim Arr1(1 To 1) As Long
     Dim Arr2(1 To 1) As Long
@@ -202,7 +202,7 @@ errTrap:
     AssertArgumentOutOfRangeException Err, "DestinationIndex"
 End Sub
 
-Public Sub Copy_WithNullSource_Throws()
+Public Sub Copy_WithNullSource_ThrowsArgumentNull()
     On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
@@ -213,7 +213,7 @@ errTrap:
     AssertArgumentNullException Err, "SourceArray"
 End Sub
 
-Public Sub Copy_WithNullDestination_Throws()
+Public Sub Copy_WithNullDestination_ThrowsArgumentNullException()
     On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
@@ -224,7 +224,7 @@ errTrap:
     AssertArgumentNullException Err, "DestinationArray"
 End Sub
 
-Public Sub CopyEx_WithNegativeLength_Throws()
+Public Sub CopyEx_WithNegativeLength_ThrowsArgumentOutOfRangeException()
     On Error GoTo errTrap
     Dim Arr(0) As Long
     
@@ -234,7 +234,7 @@ errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub CopyEx_WithNullSource_Throws()
+Public Sub CopyEx_WithNullSource_ThrowsArgumentNullException()
     On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
@@ -245,7 +245,7 @@ errTrap:
     AssertArgumentNullException Err, "SourceArray"
 End Sub
 
-Public Sub CopyEx_WithNullDestination_Throws()
+Public Sub CopyEx_WithNullDestination_ThrowsArgumentNullException()
     On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
@@ -286,9 +286,9 @@ Public Sub Copy_WithCountLessThanArrayLength_CopiesSpecifiedNumberOfElements()
     
     cArray.Copy Source, Target, 3
     
-    Dim expected() As Long
-    expected = NewLongs(1, 2, 3, 0, 0)
-    Assert.That Target, Iz.EqualTo(expected)
+    Dim Expected() As Long
+    Expected = NewLongs(1, 2, 3, 0, 0)
+    Assert.That Target, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Copy_WithUnalignedLBounds_CopiesElements()
@@ -299,13 +299,13 @@ Public Sub Copy_WithUnalignedLBounds_CopiesElements()
     
     cArray.Copy Source, Target, 5
     
-    Dim expected(5 To 9) As Long
-    expected(5) = 1
-    expected(6) = 2
-    expected(7) = 3
-    expected(8) = 4
-    expected(9) = 5
-    Assert.That Target, Iz.EqualTo(expected)
+    Dim Expected(5 To 9) As Long
+    Expected(5) = 1
+    Expected(6) = 2
+    Expected(7) = 3
+    Expected(8) = 4
+    Expected(9) = 5
+    Assert.That Target, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Copy_WithCallback_CopiesElementsUsingCallback()
@@ -316,9 +316,9 @@ Public Sub Copy_WithCallback_CopiesElementsUsingCallback()
     
     cArray.Copy Source, Target, 3, AddressOf modTestCallbacks.FirstLetterCopier
     
-    Dim expected() As String
-    expected = NewStrings("1", "2", "3")
-    Assert.That Target, Iz.EqualTo(expected)
+    Dim Expected() As String
+    Expected = NewStrings("1", "2", "3")
+    Assert.That Target, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Copy_ToSelfUsingCallback_CopiesElementsUsingCallback()
@@ -327,9 +327,9 @@ Public Sub Copy_ToSelfUsingCallback_CopiesElementsUsingCallback()
     
     cArray.Copy Source, Source, 3, AddressOf modTestCallbacks.FirstLetterCopier
     
-    Dim expected() As String
-    expected = NewStrings("1", "2", "3")
-    Assert.That Source, Iz.EqualTo(expected)
+    Dim Expected() As String
+    Expected = NewStrings("1", "2", "3")
+    Assert.That Source, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Copy_WithMultiDimensionalArrays_CopiesElements()
@@ -352,9 +352,9 @@ Public Sub CopyEx_WithLongsSubSet_CopiesSubSet()
     
     cArray.CopyEx Source, 2, Target, 0, 4
     
-    Dim expected() As Long
-    expected = NewLongs(3, 4, 5, 6, 0, 0, 0, 0)
-    Assert.That Target, Iz.EqualTo(expected)
+    Dim Expected() As Long
+    Expected = NewLongs(3, 4, 5, 6, 0, 0, 0, 0)
+    Assert.That Target, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Copy_WithObjects_CopiesElements()
@@ -384,20 +384,20 @@ Public Sub CopyEx_WithObjectsToSameArray_CopiesElements()
     Dim Item1 As New Int32
     Dim Item2 As New Int32
     Dim Item3 As New Int32
-    Dim actual(0 To 3) As Int32
-    Set actual(0) = Item1
-    Set actual(1) = Item2
-    Set actual(2) = Item3
-    Set actual(3) = New Int32
+    Dim Actual(0 To 3) As Int32
+    Set Actual(0) = Item1
+    Set Actual(1) = Item2
+    Set Actual(2) = Item3
+    Set Actual(3) = New Int32
     
-    cArray.CopyEx actual, 0, actual, 1, 3
+    cArray.CopyEx Actual, 0, Actual, 1, 3
     
-    Dim expected(0 To 3) As Int32
-    Set expected(0) = Item1
-    Set expected(1) = Item1
-    Set expected(2) = Item2
-    Set expected(3) = Item3
-    Assert.That actual, Iz.EqualTo(expected)
+    Dim Expected(0 To 3) As Int32
+    Set Expected(0) = Item1
+    Set Expected(1) = Item1
+    Set Expected(2) = Item2
+    Set Expected(3) = Item3
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Copy_WithLongsToStrings_ConvertsElements()
@@ -408,9 +408,9 @@ Public Sub Copy_WithLongsToStrings_ConvertsElements()
     
     cArray.Copy Source, Target, 3
     
-    Dim expected() As String
-    expected = NewStrings("1", "2", "3")
-    Assert.That Target, Iz.EqualTo(expected)
+    Dim Expected() As String
+    Expected = NewStrings("1", "2", "3")
+    Assert.That Target, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Copy_WithVariantsToObjects_ConvertsElements()

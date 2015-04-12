@@ -187,8 +187,15 @@ End Property
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    ValidateArrayRange Range, mChars
-    
+'    ValidateArrayRange Range, mChars
+
+    If Range.Index < LBound(mChars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(mChars) Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+
     GetByteCount = Range.Count
 End Function
 
@@ -207,8 +214,14 @@ End Function
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
-    ValidateArrayRange Range, mChars
-    
+
+    If Range.Index < LBound(mChars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(mChars) Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCount
+
     Dim Result() As Byte
     If Range.Count > 0 Then
         ReDim Result(0 To GetByteCount(Chars, Range.Index, Range.Count) - 1)
@@ -238,15 +251,18 @@ End Function
 ' @see Encoding
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    Dim Range As ListRange
-    Range.Index = CharIndex
-    Range.Count = CharCount
-    
     AttachChars Chars, mChars, mCharsSA
-    ValidateArrayRange Range, mChars, Parameter_CharIndex, Parameter_CharCount
-    Require.Range ByteIndex >= LBound(Bytes) And ByteIndex <= UBound(Bytes), Parameter_ByteIndex, ArgumentOutOfRange_ArrayBounds
-    
-    CheckBuffer Bytes, ByteIndex, CharCount
+
+    If CharIndex < LBound(mChars) Then _
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_LBound
+    If CharCount < 0 Then _
+        Error.NegativeNumber "CharCount"
+    If CharIndex + CharCount - 1 > UBound(mChars) Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+    If ByteIndex < LBound(Bytes) Or ByteIndex > UBound(Bytes) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_Index
+    If ByteIndex + CharCount - 1 > UBound(Bytes) Then _
+        Error.Argument Argument_SmallConversionBuffer, "Bytes"
     
     GetBytesEx = InternalGetBytes(mChars, CharIndex, CharCount, Bytes, ByteIndex)
 End Function
@@ -265,7 +281,13 @@ Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Vari
     
     Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(Index, Count, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1)
-    ValidateArrayRange Range, Bytes
+
+    If Range.Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(Bytes) Then _
+        Error.InvalidOffsetLength
     
     GetCharCount = Range.Count
 End Function
@@ -284,7 +306,13 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Vari
     
     Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
-    ValidateArrayRange Range, Bytes, Parameter_ByteIndex, Parameter_ByteCount
+
+    If Range.Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "ByteCount"
+    If Range.Index + Range.Count - 1 > UBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
     Dim Chars() As Integer
     If Range.Count > 0 Then
@@ -312,12 +340,21 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
-    ValidateArrayRange NewListRange(ByteIndex, ByteCount), Bytes, Parameter_ByteIndex, Parameter_ByteCount
-    Require.NotNullSingleDimensionArray Chars, Parameter_Chars
-    Require.Range CharIndex >= LBound(Chars) And CharIndex <= UBound(Chars), Parameter_CharIndex, ArgumentOutOfRange_ArrayBounds
-    CheckBuffer Chars, CharIndex, ByteCount, Parameter_Chars
-    
+    If IsNullArray(Bytes) Or IsNullArray(Chars) Then _
+        Error.ArgumentNull IIf(IsNullArray(Bytes), "Bytes", "Chars"), ArgumentNull_Array
+    If IsMultiDimArray(Bytes) Or IsMultiDimArray(Chars) Then _
+        Error.Rank
+    If ByteIndex < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
+    If ByteCount < 0 Then _
+        Error.NegativeNumber "ByteCount"
+    If ByteIndex + ByteCount - 1 > UBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    If CharIndex < LBound(Chars) Then _
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_LBound
+    If CharIndex + ByteCount - 1 > UBound(Chars) Then _
+        Error.Argument Argument_SmallConversionBuffer, "Chars"
+        
     GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
 End Function
 
@@ -406,10 +443,20 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
     Dim Range As ListRange
     
-    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
+    If IsNullArray(Bytes) Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    If IsMultiDimArray(Bytes) Then _
+        Error.Rank
+
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
-    ValidateArrayRange Range, Bytes, Parameter_ByteIndex, Parameter_ByteCount
-    
+
+    If Range.Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "ByteCount"
+    If Range.Index + Range.Count - 1 > UBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+
     GetString = SysAllocStringLen(0, Range.Count)
     AttachChars GetString, mChars, mCharsSA
     InternalGetChars Bytes, Range.Index, Range.Count, mChars, 0
@@ -467,16 +514,6 @@ Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long,
     Next i
     InternalGetBytes = Count
 End Function
-
-Private Sub CheckBuffer(ByRef BufferToCheck As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal ArrayParameter As ResourceString)
-    If Index + Count - 1 > UBound(BufferToCheck) Then
-        SmallBufferError ArrayParameter
-    End If
-End Sub
-
-Private Sub SmallBufferError(ByVal ArrayParameter As ResourceString)
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), Environment.GetResourceString(ArrayParameter))
-End Sub
 
 Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     Dim i As Long

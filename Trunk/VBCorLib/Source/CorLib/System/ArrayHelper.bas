@@ -44,16 +44,50 @@ End Function
 
 Public Function ArrayPointer(ByRef Arr As Variant) As Long
     If Not IsArray(Arr) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayRequired))
+        Error.Argument Argument_ArrayRequired
     
     ArrayPointer = MemLong(vbaVarRefAry(Arr))
+    
+    ' HACK HACK HACK
+    '
+    ' When an uninitialized array of objects or UDTs is passed into a
+    ' function as a ByRef Variant, the array is initialized with just the
+    ' SafeArrayDescriptor, at which point, it is a valid array and can
+    ' be used by UBound and LBound after the call. So, now we're just
+    ' going to assume that any object or UDT array that has just the descriptor
+    ' allocated was Null to begin with. That means whenever an Object or UDT
+    ' array is passed to any cArray method, it will technically never
+    ' be uninitialized, just zero-length.
+    Select Case VariantType(Arr) And &HFF
+        Case vbObject, vbUserDefinedType
+            If UBound(Arr) < LBound(Arr) Then
+                ArrayPointer = vbNullPtr
+            End If
+    End Select
 End Function
 
-Public Function ValidArrayPointer(ByRef Arr As Variant, Optional ByVal Parameter As ResourceString = Parameter_Arr, Optional ByVal NullMessage As ResourceString = ArgumentNull_Array) As Long
+Public Function IsNullArray(ByRef Arr As Variant) As Boolean
+    IsNullArray = ArrayPointer(Arr) = vbNullPtr
+End Function
+
+Public Function IsMultiDimArray(ByRef Arr As Variant) As Boolean
+    IsMultiDimArray = SafeArrayGetDim(ArrayPointer(Arr)) > 1
+End Function
+
+Public Function IsNullArrayPtr(ByVal ArrayPtr As Long) As Boolean
+    IsNullArrayPtr = ArrayPtr = vbNullPtr
+End Function
+
+Public Function IsMultiDimArrayPtr(ByVal ArrayPtr As Long) As Boolean
+    IsMultiDimArrayPtr = SafeArrayGetDim(ArrayPtr) > 1
+End Function
+
+Public Function ValidArrayPointer(ByRef Arr As Variant, Optional ByRef Parameter As String = "Arr", Optional ByVal Message As ArgumentNullString = ArgumentNull_Array) As Long
     Dim ArrayPtr As Long
     
     ArrayPtr = ArrayPointer(Arr)
-    Require.NotNullArrayPtr ArrayPtr, Parameter, NullMessage
+    If ArrayPtr = vbNullPtr Then _
+        Error.ArgumentNull Parameter, Message
     
     ValidArrayPointer = ArrayPtr
 End Function

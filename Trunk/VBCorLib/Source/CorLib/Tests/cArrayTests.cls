@@ -80,7 +80,7 @@ Public Sub GetLength_WithNonArray_Throws()
     On Error Resume Next
     cArray.GetLength NotAnArray
 
-    AssertArgumentException Err, "Arr"
+    AssertArgumentException Err
 End Sub
 
 Public Sub GetLength_WithUninitializedArray_Throws()
@@ -127,7 +127,7 @@ Public Sub Clear_WithNullArray_Throws()
     AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Sub Clear_WithIndexLessThanLBound_Throws()
+Public Sub Clear_WithIndexLessThanLBound_ThrowsIndexOutOfRangeExceptions()
     Dim Arr(0) As Long
     
     On Error Resume Next
@@ -136,7 +136,7 @@ Public Sub Clear_WithIndexLessThanLBound_Throws()
     AssertIndexOutOfRangeException Err
 End Sub
 
-Public Sub Clear_WithLengthLessThanZero_Throws()
+Public Sub Clear_WithLengthLessThanZero_ThrowsIndexOutOfRangeException()
     Dim Arr(0) As Long
     
     On Error Resume Next
@@ -145,7 +145,7 @@ Public Sub Clear_WithLengthLessThanZero_Throws()
     AssertIndexOutOfRangeException Err
 End Sub
 
-Public Sub Clear_WithIndexAndLengthGreaterThanUBound_Throws()
+Public Sub Clear_WithIndexAndLengthGreaterThanUBound_ThrowsIndexOutOfRangeException()
     Dim Arr(0) As Long
     
     On Error Resume Next
