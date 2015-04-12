@@ -114,6 +114,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "GetCharCount_WithCountLessThanZero_ThrowsArgumentOutOfRangeException"
             Test.Use New ASCIIEncoding
             
+        Case "GetCharCount_WithIndexPlusCountIsNotInValidRange_ThrowsArgumentOutOfRangeException"
+            Test.Use New ASCIIEncoding
+            
         Case "GetCharCount_WithMissingIndex_ThrowsArgumentException"
             Test.Use New ASCIIEncoding
             
@@ -236,19 +239,19 @@ errTrap:
     AssertArgumentException Err, "Index"
 End Sub
 
-Public Sub GetByteCount_WithMissingCount_ThrowsArgumentException(ByVal Encoding As Encoding)
+Public Sub GetByteCount_WithMissingIndex_ThrowsArgumentException(ByVal Encoding As Encoding)
     On Error GoTo errTrap
     
-    Encoding.GetByteCount "abc", Count:=2
+    Encoding.GetByteCount NewIntegers(1, 2), Count:=2
     
 errTrap:
     AssertArgumentException Err, "Index"
 End Sub
 
-Public Sub GetByteCount_WithMissingIndex_ThrowsArgumentException(ByVal Encoding As Encoding)
+Public Sub GetByteCount_WithMissingCount_ThrowsArgumentException(ByVal Encoding As Encoding)
     On Error GoTo errTrap
     
-    Encoding.GetByteCount "abc", 0
+    Encoding.GetByteCount NewIntegers(1, 2), 0
     
 errTrap:
     AssertArgumentException Err, "Count"
@@ -257,7 +260,7 @@ End Sub
 Public Sub GetByteCount_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
     On Error GoTo errTrap
     
-    Encoding.GetByteCount "abc", -1, 1
+    Encoding.GetByteCount NewIntegers(1, 2), -1, 1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
@@ -266,16 +269,17 @@ End Sub
 Public Sub GetByteCount_WithCountLessThanZero_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
     On Error GoTo errTrap
     
-    Encoding.GetByteCount "abc", 0, -1
+    Encoding.GetByteCount NewIntegers(0), 0, -1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub GetByteCount_WithIndexPlusCountExtendBeyondChars_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+    Dim Chars(1 To 2) As Integer
     On Error GoTo errTrap
     
-    Encoding.GetByteCount "abc", 1, 3
+    Encoding.GetByteCount Chars, 1, 3
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Chars"
@@ -366,6 +370,15 @@ Public Sub GetCharCount_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeExceptio
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub GetCharCount_WithIndexPlusCountIsNotInValidRange_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+    Dim Bytes(0 To 5) As Byte
+    On Error Resume Next
+    
+    Encoding.GetCharCount Bytes, 5, 2
+    
+    AssertArgumentOutOfRangeException Err, "Bytes"
 End Sub
 
 Public Sub GetCharCount_WithCountLessThanZero_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
