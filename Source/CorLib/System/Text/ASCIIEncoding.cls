@@ -180,8 +180,8 @@ End Property
 ' @param Index The starting index of the first character to be used.
 ' @param Count The number of characters to include in the calculation.
 ' @return The number of bytes that would be produced by encoding the set of characters.
-' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
+' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array.
+' <p>If a string is passed in, then the Index and Count parameters are ignored.</p>
 ' @see Encoding
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
@@ -326,7 +326,11 @@ End Function
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
     Dim Range As ListRange
     
-    Require.NotNullSingleDimensionArray Bytes, Parameter_Bytes
+    If IsNullArray(Bytes) Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    If IsMultiDimArray(Bytes) Then _
+        Error.Rank
+
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
 
     If Range.Index < LBound(Bytes) Then _
@@ -388,8 +392,9 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
-    Require.Range ByteCount >= 0, Parameter_ByteCount, ArgumentOutOfRange_NeedNonNegNum
-    
+    If ByteCount < 0 Then _
+        Error.NegativeNumber "ByteCount"
+        
     GetMaxCharCount = ByteCount
 End Function
 
@@ -401,8 +406,9 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
-    Require.Range CharCount >= 0, Parameter_CharCount, ArgumentOutOfRange_NeedNonNegNum
-    
+    If CharCount < 0 Then _
+        Error.NegativeNumber "CharCount"
+        
     GetMaxByteCount = CharCount
 End Function
 

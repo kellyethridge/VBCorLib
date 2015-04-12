@@ -61,18 +61,18 @@ End Sub
 Private Sub QuickSortList(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long
     Dim j As Long
-    Dim x As Variant
+    Dim X As Variant
     
     Do While Left < Right
         i = Left
         j = Right
-        Helper.MoveVariant x, mList((i + j) \ 2)
+        Helper.MoveVariant X, mList((i + j) \ 2)
         
         Do
-            Do While mComparer.Compare(mList(i), x) < 0
+            Do While mComparer.Compare(mList(i), X) < 0
                 i = i + 1
             Loop
-            Do While mComparer.Compare(mList(j), x) > 0
+            Do While mComparer.Compare(mList(j), X) > 0
                 j = j - 1
             Loop
             
@@ -150,9 +150,12 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
     Dim LowIndex    As Long
     Dim HighIndex   As Long
     
-    Require.Range Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
-    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-    Require.That Index + Count <= mList.Count, Argument_InvalidOffLen
+    If Index < 0 Then _
+        Error.NegativeNumber "Index"
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Index + Count > mList.Count Then _
+        Error.InvalidOffsetLength
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default
@@ -511,7 +514,7 @@ Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count
     QuickSortList ElemIndex, ElemIndex + ElemCount - 1
 End Sub
 
-Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
+Private Function ArrayList_ToArray(Optional ByVal ArrayType As VbVarType = 12&) As Variant
     ArrayList_ToArray = cArray.CreateInstance(ArrayType, mList.Count)
     mList.CopyTo ArrayList_ToArray, 0
 End Function

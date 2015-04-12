@@ -90,7 +90,8 @@ End Function
 ' @return A new ArrayList.
 '
 Public Function Repeat(ByRef Value As Variant, ByVal Count As Long) As ArrayList
-    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
     
     Set Repeat = New ArrayList
     Repeat.Capacity = Count
