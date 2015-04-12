@@ -42,6 +42,10 @@ Public Enum ResourceString
     NotSupported_FixedSizeCollection = 1001
     NotSupported_MemoryStreamNotExpandable = 1002
     NotSupported_UnwritableStream = 1003
+    Overflow_TimeSpan = 1300
+End Enum
+
+Public Enum InvalidOperationString
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101
     InvalidOperation_EnumFinished = 1102
@@ -50,7 +54,6 @@ Public Enum ResourceString
     InvalidOperation_Comparer_Arg = 1105
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
-    Overflow_TimeSpan = 1300
 End Enum
 
 Public Enum IndexOutOfRangeString

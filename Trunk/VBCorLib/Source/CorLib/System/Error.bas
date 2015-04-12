@@ -55,3 +55,7 @@ End Sub
 Public Sub InvalidOffsetLength()
     Argument Argument_InvalidOffLen
 End Sub
+
+Public Sub InvalidOperation(ByVal Message As InvalidOperationString)
+    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(Message))
+End Sub

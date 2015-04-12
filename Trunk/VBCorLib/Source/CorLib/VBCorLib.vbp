@@ -331,7 +331,6 @@ Class=SafeFindFileHandle; System\Win32\SafeFindFileHandle.cls
 Module=Comparisons; System\Comparisons.bas
 Module=Casting; System\Casts.bas
 Module=ThrowHelper; System\ThrowHelper.bas
-Module=Require; System\Diagnostics\Contracts\Require.bas
 Module=ArraySearch; System\ArraySearch.bas
 Class=IEqualityComparer; System\Collections\IEqualityComparer.cls
 Class=EqualityComparer; System\Collections\EqualityComparer.cls
