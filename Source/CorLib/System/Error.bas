@@ -24,16 +24,16 @@ Attribute VB_Name = "Error"
 '
 Option Explicit
 
-Public Sub Argument(ByVal Message As ArgumentString, Optional ByVal Parameter As ParameterString = Parameter_None)
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Message), Environment.GetResourceString(Parameter))
+Public Sub Argument(ByVal Message As ArgumentString, Optional ByRef ParamName As String)
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Message), ParamName)
 End Sub
 
-Public Sub ArgumentNull(ByVal Parameter As ParameterString, Optional ByVal Message As ArgumentNullString = ArgumentNull_Exception)
-    Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter), Environment.GetResourceString(Message))
+Public Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Message As ArgumentNullString = ArgumentNull_Exception)
+    Throw Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Message))
 End Sub
 
-Public Sub ArgumentOutOfRange(ByVal Parameter As ParameterString, Optional ByVal Message As ArgumentOutOfRangeString = ArgumentOutOfRange_Exception)
-    Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(Parameter), Environment.GetResourceString(Message))
+Public Sub ArgumentOutOfRange(ByRef ParamName As String, Optional ByVal Message As ArgumentOutOfRangeString = ArgumentOutOfRange_Exception)
+    Throw Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(Message))
 End Sub
 
 Public Sub Rank(Optional ByVal Message As ResourceString = Rank_MultiDimNotSupported)
@@ -44,8 +44,12 @@ Public Sub ObjectDisposed(Optional ByVal Message As ObjectDisposedString = Objec
     Throw Cor.NewObjectDisposedException("", Environment.GetResourceString(Message))
 End Sub
 
-Public Sub NegativeNumber(ByVal Parameter As ParameterString)
-    ArgumentOutOfRange Parameter, ArgumentOutOfRange_NeedNonNegNum
+Public Sub IndexOutOfRange(ByVal Message As IndexOutOfRangeString)
+    Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(Message))
+End Sub
+
+Public Sub NegativeNumber(ByVal ParamName As String)
+    ArgumentOutOfRange ParamName, ArgumentOutOfRange_NeedNonNegNum
 End Sub
 
 Public Sub InvalidOffsetLength()

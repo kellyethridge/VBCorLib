@@ -60,7 +60,7 @@ Private mSingleChar(0)  As Integer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
     If Output Is Nothing Then _
-        Error.ArgumentNull Parameter_Output
+        Error.ArgumentNull "Output", ArgumentNull_Stream
     If Not Output.CanWrite Then _
         Error.Argument Argument_StreamNotWritable
     
@@ -190,7 +190,7 @@ Public Sub WriteChar(ByRef Value As Variant)
             mSingleChar(0) = CInt(Value)
             
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), Environment.GetResourceString(Parameter_Value))
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), "Value")
     End Select
     
     Dim Bytes() As Byte
@@ -258,7 +258,7 @@ Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef
         Case vbString:      WriteString CStr(Value)
         Case vbDecimal:     WriteDecimal Value
         Case Else
-            Error.Argument Argument_NeedIntrinsicType, Parameter_Value
+            Error.Argument Argument_NeedIntrinsicType, "Value"
     End Select
 End Sub
 
@@ -308,7 +308,10 @@ Private Sub WriteString(ByRef Value As String)
 End Sub
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    Require.NotNullSingleDimensionArray Value, Parameter_Value
+    If IsNullArray(Value) Then _
+        Error.ArgumentNull "Value", ArgumentNull_Array
+    If IsMultiDimArray(Value) Then _
+        Error.Rank
     
     Select Case VarType(Value)
         Case vbByteArray
@@ -318,7 +321,7 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
             WriteBytes mEncoding.GetBytes(Value, Index, Count)
             
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_UnsupportedArray), Environment.GetResourceString(Parameter_Value))
+            Error.Argument Argument_UnsupportedArray, "Value"
     End Select
 End Sub
 
@@ -327,8 +330,14 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Range   As ListRange
     
     Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
-    ValidateArrayRange Range, Buffer
-    
+
+    If Range.Index < LBound(Buffer) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
+        Error.InvalidOffsetLength
+
     On Error GoTo CleanExit
     SAPtr(Bytes) = ArrayPointer(Buffer)
     mOutStream.WriteBlock Bytes, Range.Index, Range.Count
