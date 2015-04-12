@@ -270,8 +270,8 @@ End Function
 ' @remarks The function does not verify that the directory exists.
 '
 Public Function GetDirectoryName(ByVal Path As String) As String
-    Path = cString.Trim(Path)
-    Require.That Len(Path) >= 0, Argument_EmptyPath, Parameter_Path
+    If Len(Path) = 0 Then _
+        Error.Argument Argument_EmptyPath, "Path"
     
     FixupPath Path
     
@@ -366,8 +366,9 @@ End Function
 '
 Public Function GetFullPath(ByVal Path As String) As String
     Path = cString.Trim(Path)
-    Require.That Len(Path) > 0, Argument_EmptyPath, Parameter_Path
-    
+    If Len(Path) = 0 Then _
+        Error.Argument Argument_EmptyPath, "Path"
+        
     FixupPath Path
     
     Dim ptr As Long
@@ -435,7 +436,8 @@ End Function
 ' derived from what information is in <i>Path</i>.
 '
 Public Function GetPathRoot(ByVal Path As String) As String
-    Require.That Len(Path) > 0, Argument_EmptyPath, Parameter_Path
+    If Len(Path) = 0 Then _
+        Error.Argument Argument_EmptyPath, "Path"
     
     FixupPath Path
     

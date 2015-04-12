@@ -121,9 +121,11 @@ End Function
 ' @return The number of days in the specified month.
 '
 Public Function DaysInMonth(ByVal Year As Long, ByVal Month As Long) As Long
-    Require.Range Year > 0 And Year < 10000, Parameter_Year, ArgumentOutOfRange_Year
-    Require.Range Month > 0 And Month < 13, Parameter_Month, ArgumentOutOfRange_Month
-        
+    If Year < 1 Or Year > 9999 Then _
+        Error.ArgumentOutOfRange "Year", ArgumentOutOfRange_Year
+    If Month < 1 Or Month > 12 Then _
+        Error.ArgumentOutOfRange "Month", ArgumentOutOfRange_Month
+    
     If Month = 2 Then
         If IsLeapYear(Year) Then
             DaysInMonth = 29
@@ -170,7 +172,8 @@ End Function
 ' @return The cDateTime of the file time in UTC time.
 '
 Public Function FromFileTimeUtc(ByVal Time As Currency) As cDateTime
-    Require.Range Time >= 0, Parameter_Time, ArgumentOutOfRange_NeedNonNegNum
+    If Time < 0 Then _
+        Error.NegativeNumber "Time"
     
     Set FromFileTimeUtc = New cDateTime
     FromFileTimeUtc.InitFromFileTime Time, UtcKind

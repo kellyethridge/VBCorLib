@@ -127,9 +127,13 @@ End Function
 
 Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Long, Value As Variant, Optional ByVal Comparer As IComparer) As Long
     VerifyVersion
-    Require.Range Index >= 0, Parameter_Index, ArgumentOutOfRange_NeedNonNegNum
-    Require.Range Count >= 0, Parameter_Count, ArgumentOutOfRange_NeedNonNegNum
-    Require.That Index + Count <= mCount, Argument_InvalidOffLen
+    
+    If Index < 0 Then _
+        Error.NegativeNumber "Index"
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Index + Count > mCount Then _
+        Error.InvalidOffsetLength
     
     Dim ItemIndex As Long
     ItemIndex = mList.BinarySearchEx(mIndex + Index, Count, Value, Comparer)
@@ -449,7 +453,7 @@ Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count
     mList.Sort mIndex + ElemIndex, ElemCount, Comparer
 End Sub
 
-Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
+Private Function ArrayList_ToArray(Optional ByVal ArrayType As VbVarType = 12&) As Variant
     VerifyVersion
     
     ArrayList_ToArray = cArray.CreateInstance(ArrayType, mCount)

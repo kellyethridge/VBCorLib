@@ -102,9 +102,12 @@ End Function
 ' @param index The starting position in dstArray to start placing the values.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Require.NotNullArray DstArray, Parameter_DstArray
-    Require.That cArray.GetRank(DstArray) = 1, Rank_MultiDimNotSupported, Parameter_DstArray
-    Require.Range Index >= LBound(DstArray), Parameter_Index, ArgumentOutOfRange_ArrayLB
+    If IsNullArray(DstArray) Then _
+        Error.ArgumentNull "DstArray", ArgumentNull_Array
+    If IsMultiDimArray(DstArray) Then _
+        Error.Argument ResourceString.Rank_MultiDimNotSupported, "DstArray"
+    If Index < LBound(DstArray) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
     
     cArray.CopyEx mItems, 0, DstArray, Index, mCount
     cArray.Reverse DstArray, Index, mCount
@@ -250,10 +253,15 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub WriteRange(ByRef Source As Variant)
     If IsArray(Source) Then
-        Require.NotNullSingleDimensionArray Source
+        If IsNullArray(Source) Then _
+            Error.ArgumentNull "Source", ArgumentNull_Array
+        If IsMultiDimArray(Source) Then _
+            Error.Rank
+        
         WriteArray Source
     ElseIf IsObject(Source) Then
-        Require.NotNothing Source, Parameter_Source, ArgumentNull_Collection
+        If Source Is Nothing Then _
+            Error.ArgumentNull "Source", ArgumentNull_Collection
         
         If TypeOf Source Is Collection Then
             WriteCollection Source
