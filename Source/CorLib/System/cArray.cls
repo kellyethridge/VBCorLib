@@ -1260,7 +1260,7 @@ Private Sub AssignDefaultElementValue(ByRef Arr As Variant, ByRef RetVal As Vari
             MemLong(VarPtr(RetVal) + VARIANTDATA_OFFSET + 4) = ObjectPtr(rec)
             ' Kill our reference to the IRecordInfo without decrementing
             ' the reference count, since we assigned it without adding a reference.
-            ObjectPtr(rec) = 0
+            ObjectPtr(rec) = vbNullPtr
     End Select
 End Sub
 

@@ -111,7 +111,8 @@ End Function
 ' ArrayList instance would be used instead.
 '
 Public Function Adapter(ByVal List As IList) As ArrayList
-    Require.NotNothing List, Parameter_List
+    If List Is Nothing Then _
+        Error.ArgumentNull "List"
     
     Dim Wrapper As New IListWrapper
     Wrapper.Init List

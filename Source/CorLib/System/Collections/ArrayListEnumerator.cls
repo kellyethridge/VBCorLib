@@ -92,20 +92,20 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
     If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex < mStartIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
+        Error.InvalidOperation InvalidOperation_EnumNotStarted
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
         
     Helper.MoveVariant IEnumerator_Current, mList(mIndex)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
     If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
     
     If mIndex = mEndIndex Then
         mIndex = mEndIndex + 1
