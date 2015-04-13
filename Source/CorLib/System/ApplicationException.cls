@@ -53,9 +53,9 @@ Option Explicit
 Implements IObject
 Implements Exception
 
-Private Const DEF_MESSAGE   As String = "An application error has occurred."
-Private Const PROP_BASE     As String = "Base"
-Private Const DEF_HRESULT   As Long = COR_E_APPLICATION
+Private Const DefaultMessage   As String = "An application error has occurred."
+Private Const BaseProperty     As String = "Base"
+Private Const DefaultHResult   As Long = COR_E_APPLICATION
 
 Private mBase As ExceptionBase
 
@@ -223,7 +223,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Message As String, ByRef InnerException As Exception)
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
+    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DefaultHResult)
 End Sub
 
 
@@ -231,15 +231,15 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init DEF_MESSAGE, Nothing
+    Init DefaultMessage, Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE, Nothing)
+    Set mBase = PropBag.ReadProperty(BaseProperty, Nothing)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty BaseProperty, mBase
 End Sub
 
 

@@ -61,7 +61,7 @@ Implements SystemException
 Private Const ParamNameProperty As String = "ParamName"
 Private Const BaseProperty      As String = "Base"
 Private Const DefaultParamName  As String = vbNullString
-Private Const DEF_HRESULT       As Long = COR_E_ARGUMENT
+Private Const DefaultHResult    As Long = COR_E_ARGUMENT
 
 Private mBase As ExceptionBase
 
@@ -245,7 +245,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByRef InnerException As Exception)
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
+    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DefaultHResult)
     If Len(ParamName) > 0 Then
         mBase.SetValue ParamNameProperty, ParamName
     End If
