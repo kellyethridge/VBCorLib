@@ -39,8 +39,7 @@ Attribute VB_Exposed = True
 ' Provides a set of static methods for manipulating and retrieving directory information.
 '
 Option Explicit
-Private Const ALT_DIRECTORY_SEPARATOR_CHAR      As Integer = 47
-Private Const DIRECTORY_SEPARATOR_CHAR          As Integer = 92
+
 Private Const FILE_FLAG_BACKUP_SEMANTICS        As Long = &H2000000
 Private Const ERROR_NO_MORE_FILES               As Long = 18&
 Private Const DOUBLE_PERIOD                     As Long = &H2E002E
@@ -54,6 +53,23 @@ Public Enum SearchOption
     AllDirectories
     TopDirectoryOnly
 End Enum
+
+Private mDirectorySeparatorChar      As Integer
+Private mAltDirectorySeparatorChar   As Integer
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mDirectorySeparatorChar = Path.DirectorySeparatorChar
+    mAltDirectorySeparatorChar = Path.AltDirectorySeparatorChar
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   API
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Creates a directory and any subdirectories in the specified path.
@@ -473,15 +489,15 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifySearchPattern(ByRef s As String)
+Private Sub VerifySearchPattern(ByRef Pattern As String)
     Dim i As Long
-    i = InStr(s, "..")
+    i = InStr(Pattern, "..")
     If i > 0 Then
-        If i = Len(s) - 1 Then _
+        If i = Len(Pattern) - 1 Then _
             Throw Cor.NewArgumentException("Cannot end search pattern with '..'")
             
-        Select Case Asc(Mid$(s, i + 2, 1))
-            Case DIRECTORY_SEPARATOR_CHAR, ALT_DIRECTORY_SEPARATOR_CHAR
+        Select Case Char(Pattern, i + 2)
+            Case mDirectorySeparatorChar, mAltDirectorySeparatorChar
                 Throw Cor.NewArgumentException("'..' cannot be followed immediately by a directory separator.")
         End Select
     End If

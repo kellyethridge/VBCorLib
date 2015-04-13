@@ -57,10 +57,10 @@ Option Explicit
 '
 Public Function ReadOnly(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
-        Throw Cor.NewArgumentNullException("List")
+        Error.ArgumentNull "List"
         
     Dim Ret As New ReadOnlyArrayList
-    Call Ret.Init(List)
+    Ret.Init List
     Set ReadOnly = Ret
 End Function
 

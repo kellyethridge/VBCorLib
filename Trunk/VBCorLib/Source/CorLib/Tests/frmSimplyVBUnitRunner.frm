@@ -117,6 +117,7 @@ Private Sub Form_Load()
             .Add New ArrayListRangedTests
             .Add New ArrayListRepeatTests
             .Add New ArrayListEnumerationTests
+            .Add New ArrayListReadOnlyTests
             Set Suite = .This
         End With
         .Add Suite

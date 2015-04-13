@@ -74,6 +74,3 @@ Public Const vbCommaChar            As Long = &H2C
 Public Const vbPeriodChar           As Long = &H2E
 Public Const vbInvalidChar          As Long = &HFFFFFFFF
 
-Public Const vbBackslashString      As String = "\"
-Public Const vbForwardSlashString   As String = "/"
-

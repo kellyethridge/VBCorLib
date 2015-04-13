@@ -61,7 +61,7 @@ Implements ArgumentException
 
 Private Const BaseProperty      As String = "Base"
 Private Const ParamNameProperty As String = "ParamName"
-Private Const DEF_HRESULT       As Long = E_POINTER
+Private Const DefaultHResult    As Long = E_POINTER
 
 ' This can do it all.
 Private mBase       As ExceptionBase
@@ -250,7 +250,7 @@ Friend Sub Init(ByRef ParamName As String, ByVal Message As String, ByVal InnerE
         Message = Environment.GetResourceString(ArgumentNull_Generic)
     End If
     
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
+    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DefaultHResult)
     If Len(ParamName) > 0 Then
         mBase.SetValue ParamNameProperty, ParamName
     End If
