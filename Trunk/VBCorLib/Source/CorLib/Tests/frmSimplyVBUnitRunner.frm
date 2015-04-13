@@ -200,7 +200,7 @@ Private Sub Form_Load()
     IO.Add New BinaryReaderTests
     IO.Add New BinaryWriterTests
     IO.Add New TestFileInfo
-    IO.Add New TestFile
+    IO.Add New FileTests
     IO.Add New TestStreamReader
     IO.Add New TestMappedFile
     IO.Add New TestFileNotFoundException

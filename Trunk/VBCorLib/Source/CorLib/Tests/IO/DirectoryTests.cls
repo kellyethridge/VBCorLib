@@ -12,7 +12,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestDirectory
+' DirectoryTests
 '
 Option Explicit
 Implements ITestCaseSource
@@ -23,7 +23,7 @@ Public Sub Setup()
     Set mBuilder = New DirectoryBuilder
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Set mBuilder = Nothing
 End Sub
 
