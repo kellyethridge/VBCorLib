@@ -13,7 +13,8 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Private mTempFolder As String
+Private mCurrentDirectory   As String
+Private mTempFolder         As String
 
 Public Property Get TempFolder() As String
     TempFolder = mTempFolder
@@ -41,6 +42,7 @@ Public Function CreateFolder(Optional ByVal SubFolder As String = "SubFolder") A
 End Function
 
 Private Sub Setup()
+    mCurrentDirectory = Directory.GetCurrentDirectory
     mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
     
     If Not Directory.Exists(mTempFolder) Then
@@ -48,7 +50,9 @@ Private Sub Setup()
     End If
 End Sub
 
-Private Sub TearDown()
+Private Sub Teardown()
+    Directory.SetCurrentDirectory mCurrentDirectory
+    
     If Directory.Exists(mTempFolder) Then
         Directory.Delete mTempFolder, True
     End If
@@ -59,5 +63,5 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
-    TearDown
+    Teardown
 End Sub
