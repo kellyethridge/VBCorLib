@@ -211,6 +211,7 @@ Class=StackEnumeratorTests; Tests\Collections\StackEnumeratorTests.cls
 Class=ArrayListEnumerationTests; Tests\Collections\ArrayListEnumerationTests.cls
 Class=ArrayListReadOnlyTests; Tests\Collections\ArrayListReadOnlyTests.cls
 ResFile32="VBCorLib.Tests.RES"
+RelatedDoc=README.TXT
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

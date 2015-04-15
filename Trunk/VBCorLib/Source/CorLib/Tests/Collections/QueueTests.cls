@@ -117,46 +117,85 @@ Public Sub Contains_WithValues_ReturnsExpected(ByVal Value As Variant, ByVal Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-'Public Sub TestContainsWithComparer()
-'    Dim i As Long
-'    For i = 1 To 100
-'        Q.Enqueue i
-'    Next i
-'
-'    Assert.IsTrue Q.Contains(99&, Comparer.Default), "q should contain 99."
-'End Sub
-'
-'Public Sub TestCopyTo()
-'    Dim i As Long
-'    For i = 1 To 100
-'        Q.Enqueue i
-'    Next i
-'
-'    Dim a(99) As Long
-'    Q.CopyTo a, 0
-'    For i = 1 To 100
-'        Assert.AreEqual i, a(i - 1)
-'    Next i
-'End Sub
-'
-'Public Sub TestCopyToWrapping()
-'    ' required INDEBUG=1 VBCorLib compiler constant.
-'    Dim i As Long
-'    For i = 1 To 8
-'        Q.Enqueue i
-'        Q.Dequeue
-'    Next i
-'    For i = 1 To 14
-'        Q.Enqueue i
-'    Next i
-'
-'    Dim a(-5 To 8) As Long
-'    Q.CopyTo a, -5
-'    For i = -5 To 8
-'        Assert.AreEqual i + 6, a(i)
-'    Next i
-'End Sub
-'
+Public Sub CopyTo_WithNullArray_ThrowsArgumentNullException()
+    Dim SUT As New Queue
+    SUT.Enqueue 1
+    Dim NullArray() As Long
+    
+    On Error Resume Next
+    SUT.CopyTo NullArray, 0
+    
+    AssertArgumentNullException Err, "DstArray"
+End Sub
+
+Public Sub CopyTo_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim SUT As New Queue
+    SUT.Equals 1
+    Dim DstArray(1 To 5) As Long
+    
+    On Error Resume Next
+    SUT.CopyTo DstArray, 0
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CopyTo_WithMultiDimDstArray_ThrowsArgumentException()
+    Dim SUT As New Queue
+    Dim DstArray(0 To 2, 0 To 2) As Long
+    
+    On Error Resume Next
+    SUT.CopyTo DstArray, 0
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub CopyTo_WhenItemsWontFit_ThrowsArgumentException()
+    Dim SUT As New Queue
+    SUT.Enqueue 1
+    SUT.Enqueue 2
+    SUT.Enqueue 3
+    SUT.Enqueue 4
+    Dim DstArray(1 To 4) As Long
+    
+    On Error Resume Next
+    SUT.CopyTo DstArray, 2
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub CopyTo_WhenCalled_CopiesItemsToArray()
+    Dim SUT As New Queue
+    SUT.Enqueue 1
+    SUT.Enqueue 2
+    SUT.Enqueue 3
+    SUT.Enqueue 4
+    Dim Actual(1 To 4) As Long
+    
+    SUT.CopyTo Actual, 1
+    
+    Assert.That Actual, Iz.EqualTo(NewLongs(1, 2, 3, 4)).AsCollection
+End Sub
+
+Public Sub CopyTo_WithCircleQueueWrapped_CopiesItemsToArray()
+    ' this test requires knowledge of the implementation unfortunately.
+    Dim i As Long
+    Dim SUT As New Queue
+    For i = 1 To 16
+        SUT.Enqueue i
+    Next
+    For i = 1 To 8
+        SUT.Dequeue
+        SUT.Enqueue i
+    Next
+    Dim Actual(0 To 15) As Long
+    
+    SUT.CopyTo Actual, 0
+    
+    Dim Expected() As Long
+    Expected = NewLongs(9, 10, 11, 12, 13, 14, 15, 16, 1, 2, 3, 4, 5, 6, 7, 8)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 'Public Sub TestEnumerator()
 '    Dim i As Long
 '    For i = 1 To 100
@@ -169,38 +208,49 @@ End Sub
 '        i = i + 1
 '    Next v
 'End Sub
-'
-'Public Sub TestPeek()
-'    Q.Enqueue 1
-'    Assert.AreEqual 1, Q.Peek, "Peek should return 1."
-'    Assert.AreEqual 1, Q.Count, "Count should not change."
-'End Sub
-'
-'Public Sub TestToArray()
-'    Dim i As Long
-'    For i = 1 To 10
-'        Q.Enqueue 1
-'        Q.Dequeue
-'    Next i
-'    For i = 11 To 20
-'        Q.Enqueue i
-'    Next i
-'    Dim a() As Variant
-'    a = Q.ToArray
-'    Assert.AreEqual Q.Count, cArray.GetLength(a), "Wrong array length."
-'
-'    For i = 11 To 20
-'        Assert.AreEqual i, a(i - 11)
-'    Next i
-'End Sub
-'
-'Public Sub TestEmptyToArray()
-'    Dim a() As Variant
-'    a = Q.ToArray
-'    Assert.IsFalse cArray.IsNull(a), "Array should not be null."
-'    Assert.AreEqual 0, cArray.GetLength(a), "Array should be zero length."
-'End Sub
-'
+
+Public Sub Peek_WithEmptyQueue_ThrowsInvalidOperationException()
+    Dim SUT As New Queue
+    
+    On Error Resume Next
+    SUT.Peek
+    
+    AssertInvalidOperationException Err
+End Sub
+
+Public Sub Peek_WhenCalled_ReturnsNextValueWithoutAlteringQueue()
+    Dim SUT As New Queue
+    SUT.Enqueue 1
+    SUT.Enqueue 2
+    
+    Dim Actual As Variant
+    Actual = SUT.Peek
+    
+    Assert.That Actual, Iz.EqualTo(1)
+    Assert.That SUT.Count, Iz.EqualTo(2)
+End Sub
+
+Public Sub ToArray_WithEmptyQueue_ReturnsEmptyArray()
+    Dim SUT As New Queue
+    
+    Dim Actual() As Variant
+    Actual = SUT.ToArray
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub ToArray_WhenCalled_ReturnsArrayOfItemsInOrderOfEnqueue()
+    Dim SUT As New Queue
+    SUT.Enqueue 1
+    SUT.Enqueue 3
+    SUT.Enqueue 2
+    
+    Dim Actual() As Variant
+    Actual = SUT.ToArray
+    
+    Assert.That Actual, Iz.EqualTo(Array(1, 3, 2))
+End Sub
+
 'Public Sub TestTrimToSize()
 '    ' requires INDEBUG=1 VBCorLib compiler constant.
 '    Dim i As Long

@@ -47,7 +47,12 @@ Implements ICloneable
 Implements ICollection
 Implements IEnumerable
 
-Private Const DEF_CAPACITY As Long = 16
+Private Const DefaultCapacity       As Long = 16
+Private Const ItemPropertyFormat    As String = "Item{0}"
+Private Const HeadProperty          As String = "Head"
+Private Const TailProperty          As String = "Tail"
+Private Const CountProperty         As String = "Count"
+Private Const CapacityProperty      As String = "Capacity"
 
 Private mItems()    As Variant
 Private mHead       As Long
@@ -78,7 +83,7 @@ End Sub
 '
 Public Function Clone() As Queue
     Set Clone = New Queue
-    Call Clone.CloneHelper(mItems, mCount, mHead, mTail)
+    Clone.CloneHelper mItems, mCount, mHead, mTail
 End Function
 
 ''
@@ -90,28 +95,18 @@ End Function
 ' @remarks If more than one instance of the same value exists in the
 ' queue, this will stop once it finds the first instance.
 '
-Public Function Contains(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
+Public Function Contains(ByRef Value As Variant) As Boolean
     Dim i As Long
     Dim j As Long
     
     j = mHead
-    If Comparer Is Nothing Then
-        For i = 1 To mCount
-            If EqualsVariants(mItems(j), Value) Then
-                Contains = True
-                Exit Function
-            End If
-            j = (j + 1) Mod mCapacity
-        Next i
-    Else
-        For i = 1 To mCount
-            If Comparer.Compare(mItems(j), Value) = 0 Then
-                Contains = True
-                Exit Function
-            End If
-            j = (j + 1) Mod mCapacity
-        Next i
-    End If
+    For i = 1 To mCount
+        If EqualsVariants(mItems(j), Value) Then
+            Contains = True
+            Exit Function
+        End If
+        j = (j + 1) Mod mCapacity
+    Next i
 End Function
 
 ''
@@ -122,11 +117,20 @@ End Function
 ' @remarks The values in the queue will be cast to the array datatype if possible.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
+    If IsNullArray(DstArray) Then _
+        Error.ArgumentNull "DstArray", ArgumentNull_Array
+    If IsMultiDimArray(DstArray) Then _
+        Error.Argument Argument_MultiDimNotSupported
+    If Index < LBound(DstArray) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Index + mCount - 1 > UBound(DstArray) Then _
+        Error.Argument Argument_InvalidOffLen
+        
     If mHead < mTail Then
-        Call cArray.CopyEx(mItems, mHead, DstArray, Index, mCount)
+        cArray.CopyEx mItems, mHead, DstArray, Index, mCount
     Else
-        Call cArray.CopyEx(mItems, mHead, DstArray, Index, mCapacity - mHead)
-        Call cArray.CopyEx(mItems, 0, DstArray, (mCapacity - mHead) + Index, mTail)
+        cArray.CopyEx mItems, mHead, DstArray, Index, mCapacity - mHead
+        cArray.CopyEx mItems, 0, DstArray, (mCapacity - mHead) + Index, mTail
     End If
 End Sub
 
@@ -148,7 +152,7 @@ Public Function Dequeue() As Variant
     If mCount = 0 Then _
         Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyQueue))
     
-    Call Helper.MoveVariant(Dequeue, mItems(mHead))
+    Helper.MoveVariant Dequeue, mItems(mHead)
     mHead = (mHead + 1) Mod mCapacity
     mCount = mCount - 1
     mVersion = mVersion + 1
@@ -160,8 +164,8 @@ End Function
 ' @param value The item to be placed at the tail of the queue.
 '
 Public Sub Enqueue(ByRef Value As Variant)
-    Call EnsureCapacity(mCount + 1)
-    Call VariantCopyInd(mItems(mTail), Value)
+    EnsureCapacity mCount + 1
+    VariantCopyInd mItems(mTail), Value
     mTail = (mTail + 1) Mod mCapacity
     mCount = mCount + 1
     mVersion = mVersion + 1
@@ -185,7 +189,7 @@ End Function
 '
 Public Function GetEnumerator() As IEnumerator
     Dim Ret As New QueueEnumerator
-    Call Ret.Init(Me, mHead, SAPtr(mItems))
+    Ret.Init Me, mHead, SAPtr(mItems)
     Set GetEnumerator = Ret
 End Function
 
@@ -217,9 +221,9 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyQueue))
+        Error.InvalidOperation InvalidOperation_EmptyQueue
     
-    Call VariantCopy(Peek, mItems(mHead))
+    VariantCopy Peek, mItems(mHead)
 End Function
 
 ''
@@ -228,10 +232,14 @@ End Function
 ' @return An array of variants containing the queue contents.
 '
 Public Function ToArray() As Variant()
-    Dim Ret() As Variant
-    Ret = cArray.CreateInstance(vbVariant, mCount)
-    If mCount > 0 Then Call CopyTo(Ret, 0)
-    ToArray = Ret
+    Dim Result() As Variant
+    
+    Result = cArray.CreateInstance(vbVariant, mCount)
+    If mCount > 0 Then
+        CopyTo Result, 0
+    End If
+    
+    ToArray = Result
 End Function
 
 ''
@@ -248,10 +256,10 @@ End Function
 '
 Public Sub TrimToSize()
     If mCount = 0 Then
-        ReDim mItems(0 To DEF_CAPACITY - 1)
-        mCapacity = DEF_CAPACITY
+        ReDim mItems(0 To DefaultCapacity - 1)
+        mCapacity = DefaultCapacity
     Else
-        Call NormalizeArray(mCount)
+        NormalizeArray mCount
         mCapacity = mCount
     End If
     mVersion = mVersion + 1
@@ -274,7 +282,7 @@ Friend Property Get Version() As Long
 End Property
 
 Friend Sub Init(ByRef c As Variant)
-    Call WriteRange(c)
+    WriteRange c
 End Sub
 
 
@@ -291,14 +299,14 @@ Private Sub NormalizeArray(ByVal NewCapacity As Long)
     Else
         ReDim NewItems(0 To NewCapacity - 1)
         If mHead < mTail Then
-            Call CopyMemory(NewItems(0), mItems(mHead), (mTail - mHead) * 16)
+            CopyMemory NewItems(0), mItems(mHead), (mTail - mHead) * SizeOfVariant
         Else
-            Call CopyMemory(NewItems(0), mItems(mHead), (mCapacity - mHead) * 16)
-            Call CopyMemory(NewItems(mCapacity - mHead), mItems(0), mHead * 16)
+            CopyMemory NewItems(0), mItems(mHead), (mCapacity - mHead) * SizeOfVariant
+            CopyMemory NewItems(mCapacity - mHead), mItems(0), mHead * SizeOfVariant
         End If
         
-        Call ZeroMemory(mItems(0), mCapacity * 16)
-        Call Helper.Swap4(ByVal ArrPtr(mItems), ByVal ArrPtr(NewItems))
+        ZeroMemory mItems(0), mCapacity * SizeOfVariant
+        Helper.Swap4 ByVal ArrPtr(mItems), ByVal ArrPtr(NewItems)
     End If
     mTail = mCount
     mHead = 0
@@ -307,59 +315,64 @@ End Sub
 Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     Dim NewCapacity As Long
     
-    If RequiredCapacity <= mCapacity Then Exit Sub
+    If RequiredCapacity <= mCapacity Then
+        Exit Sub
+    End If
     NewCapacity = mCapacity * 2
-    If RequiredCapacity > NewCapacity Then NewCapacity = RequiredCapacity
-    Call NormalizeArray(NewCapacity)
+    
+    If RequiredCapacity > NewCapacity Then
+        NewCapacity = RequiredCapacity
+    End If
+    
+    NormalizeArray NewCapacity
     mCapacity = NewCapacity
 End Sub
 
 Private Sub WriteRange(ByRef c As Variant)
     If IsArray(c) Then
-        Call WriteArray(c)
+        WriteArray c
     ElseIf IsObject(c) Then
         If c Is Nothing Then _
             Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
         
         If TypeOf c Is Collection Then
-            Call WriteVBCollection(c)
+            WriteVBCollection c
         ElseIf TypeOf c Is ICollection Then
-            Call WriteICollection(c)
+            WriteICollection c
         Else
             Throw Cor.NewInvalidCastException("An ICollection or VBA.Collection object is required.")
         End If
     Else
         Throw Cor.NewInvalidCastException("An Array, ICollection, or VBA.Collection object is required.")
     End If
-
 End Sub
 
 Private Sub WriteArray(ByRef Arr As Variant)
-    If cArray.IsNull(Arr) Then _
+    If IsNullArray(Arr) Then _
         Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
     
     ' Get the number of elements in the array
     Dim SizeOfArray As Long
     SizeOfArray = UBound(Arr) - LBound(Arr) + 1
     
-    Call WriteCollection(SizeOfArray, Arr)
+    WriteCollection SizeOfArray, Arr
 End Sub
 
 Private Sub WriteVBCollection(ByVal CollectionToInsert As Collection)
-    Call WriteCollection(CollectionToInsert.Count, CollectionToInsert)
+    WriteCollection CollectionToInsert.Count, CollectionToInsert
 End Sub
 
 Private Sub WriteICollection(ByVal CollectionToInsert As ICollection)
-    Call WriteCollection(CollectionToInsert.Count, CollectionToInsert)
+    WriteCollection CollectionToInsert.Count, CollectionToInsert
 End Sub
 
 Private Sub WriteCollection(ByVal SizeOfCollection As Long, ByRef CollectionToWrite As Variant)
-    Call EnsureCapacity(SizeOfCollection)
+    EnsureCapacity SizeOfCollection
         
     Dim Value As Variant
     Dim Index As Long
     For Each Value In CollectionToWrite
-        Call Helper.MoveVariant(mItems(Index), Value)
+        Helper.MoveVariant mItems(Index), Value
         Index = Index + 1
     Next Value
     mCount = SizeOfCollection
@@ -370,40 +383,44 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    ReDim mItems(0 To DEF_CAPACITY - 1)
-    mCapacity = DEF_CAPACITY
+    ReDim mItems(0 To DefaultCapacity - 1)
+    mCapacity = DefaultCapacity
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mCount = .ReadProperty("Count", 0)
-        mHead = .ReadProperty("Head", 0)
-        mTail = .ReadProperty("Tail", 0)
-        Call EnsureCapacity(.ReadProperty("Capacity", DEF_CAPACITY))
+        mCount = .ReadProperty(CountProperty, 0)
+        mHead = .ReadProperty(HeadProperty, 0)
+        mTail = .ReadProperty(TailProperty, 0)
+        EnsureCapacity .ReadProperty(CapacityProperty, DefaultCapacity)
         ReDim mItems(0 To mCapacity - 1)
         
         Dim i As Long
         For i = 0 To mCount - 1
-            Call Helper.MoveVariant(mItems(i), .ReadProperty("Item" & i, Empty))
+            Helper.MoveVariant mItems(i), .ReadProperty(MakeItemProperty(i), Empty)
         Next i
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("Count", mCount)
-        Call .WriteProperty("Head", mHead)
-        Call .WriteProperty("Tail", mTail)
-        Call .WriteProperty("Capacity", mCapacity)
+        .WriteProperty CountProperty, mCount
+        .WriteProperty HeadProperty, mHead
+        .WriteProperty TailProperty, mTail
+        .WriteProperty CapacityProperty, mCapacity
         
-        Call NormalizeArray(mCapacity)
+        NormalizeArray mCapacity
         
         Dim i As Long
         For i = 0 To mCount - 1
-            Call .WriteProperty("Item" & i, mItems(i))
+            .WriteProperty MakeItemProperty(i), mItems(i)
         Next i
     End With
 End Sub
+
+Private Function MakeItemProperty(ByVal Number As Long) As String
+    MakeItemProperty = cString.Format(ItemPropertyFormat, Number)
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
