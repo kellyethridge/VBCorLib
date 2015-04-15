@@ -55,7 +55,7 @@ Private mVersion        As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
     Set mList = List
-    mVersion = List.Version
+    mVersion = GetVersion(List)
     mStartIndex = Index
     mEndIndex = Index + Count - 1
     mIndex = Index - 1
@@ -91,7 +91,7 @@ End Function
 '   IEnumerator Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If mList.Version <> mVersion Then _
+    If GetVersion(mList) <> mVersion Then _
         Error.InvalidOperation InvalidOperation_VersionError
     If mIndex < mStartIndex Then _
         Error.InvalidOperation InvalidOperation_EnumNotStarted
@@ -102,7 +102,7 @@ Private Property Get IEnumerator_Current() As Variant
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If mList.Version <> mVersion Then _
+    If GetVersion(mList) <> mVersion Then _
         Error.InvalidOperation InvalidOperation_VersionError
     If mIndex > mEndIndex Then _
         Error.InvalidOperation InvalidOperation_EnumFinished

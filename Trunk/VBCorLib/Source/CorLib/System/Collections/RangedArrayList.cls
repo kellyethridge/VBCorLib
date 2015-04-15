@@ -59,7 +59,7 @@ Private mCount      As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
     Set mList = List
-    mVersion = List.Version
+    mVersion = GetVersion(List)
     mIndex = Index
     mCount = Count
 End Sub
@@ -69,7 +69,7 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyVersion()
-    If mVersion <> mList.Version Then
+    If mVersion <> GetVersion(mList) Then
         Throw Cor.NewInvalidOperationException("The base ArrayList has been modified outside of the Ranged list.")
     End If
 End Sub

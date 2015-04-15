@@ -205,7 +205,7 @@ Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef 
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 
-Private Function ArrayList_ToArray(Optional ByVal ArrayType As vbVarType = 12&) As Variant
+Private Function ArrayList_ToArray(Optional ByVal ArrayType As VbVarType = 12&) As Variant
     ArrayList_ToArray = mList.ToArray(ArrayType)
 End Function
 
@@ -216,10 +216,6 @@ End Function
 Private Sub ArrayList_TrimToSize()
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
-
-Private Property Get ArrayList_Version() As Long
-    ArrayList_Version = mList.Version
-End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
