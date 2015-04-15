@@ -251,66 +251,23 @@ Public Sub ToArray_WhenCalled_ReturnsArrayOfItemsInOrderOfEnqueue()
     Assert.That Actual, Iz.EqualTo(Array(1, 3, 2))
 End Sub
 
-'Public Sub TestTrimToSize()
-'    ' requires INDEBUG=1 VBCorLib compiler constant.
-'    Dim i As Long
-'    For i = 1 To 8
-'        Q.Enqueue i
-'    Next i
-'    Q.Dequeue
-'    Q.TrimToSize
-'
-'    For i = 2 To 8
-'        Assert.AreEqual i, Q.Dequeue, "Queue contents should not change."
-'    Next i
-'End Sub
-'
-'Public Sub TestTrimToSize2()
-'    Dim i As Long
-'    For i = 1 To 16
-'        Q.Enqueue i
-'    Next i
-'    For i = 1 To 5
-'        Q.Dequeue
-'    Next i
-'    For i = 17 To 21
-'        Q.Enqueue i
-'    Next i
-'
-'    Q.TrimToSize
-'
-'    For i = 6 To 21
-'        Assert.AreEqual i, Q.Dequeue
-'    Next i
-'End Sub
-'
-'Public Sub TestPersistence()
-'    Dim i As Long
-'    For i = 1 To 100
-'        Q.Enqueue i
-'    Next i
-'    Dim pp1 As New PropertyBag
-'    Dim pp2 As New PropertyBag
-'    Dim q2 As Queue
-'
-'    pp1.WriteProperty "q", Q
-'    pp2.Contents = pp1.Contents
-'    Set q2 = pp2.ReadProperty("q")
-'
-'    For i = 1 To 100
-'        Assert.AreEqual i, q2.Dequeue
-'    Next i
-'End Sub
-'
-'Public Sub TestInitWithElements()
-'    Dim a() As Long
-'    a = NewArray(vbLong, 1, 2, 3, 4, 5)
-'
-'    Set Q = NewQueue(a)
-'    Assert.AreEqual 5, Q.Count
-'
-'    Dim i As Long
-'    For i = 1 To 5
-'        Assert.AreEqual i, Q.Dequeue
-'    Next i
-'End Sub
+Public Sub QueueShouldBePersistable()
+    Dim SUT As New Queue
+    SUT.Enqueue 1
+    SUT.Enqueue "hi"
+    
+    Dim Actual As Queue
+    Set Actual = Persist(SUT)
+    
+    Assert.That Actual, Iz.EqualTo(Array(1, "hi"))
+End Sub
+
+Public Sub TestInitWithElements()
+    Dim SUT As Queue
+    Dim Expected As Variant
+    Expected = Array(1, 2, 3, 4, 5)
+
+    Set SUT = NewQueue(Expected)
+    
+    Assert.That SUT, Iz.EqualTo(Expected)
+End Sub

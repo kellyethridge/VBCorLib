@@ -69,7 +69,7 @@ Friend Sub Init(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long)
     SAPtr(mItems) = ItemsSAPtr
     mCapacity = UBound(mItems) + 1
     mEndIndex = q.Count - 1
-    mVersion = q.Version
+    mVersion = GetVersion(q)
     mIndex = -1
 End Sub
 
@@ -106,9 +106,9 @@ End Function
 '   ICloneable Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
-    Dim ret As New QueueEnumerator
-    Call ret.CloneHelper(mQueue, mHead, SAPtr(mItems), mIndex)
-    Set ICloneable_Clone = ret
+    Dim Ret As New QueueEnumerator
+    Call Ret.CloneHelper(mQueue, mHead, SAPtr(mItems), mIndex)
+    Set ICloneable_Clone = Ret
 End Function
 
 
@@ -116,7 +116,7 @@ End Function
 '   IEnumerator Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If mQueue.Version <> mVersion Then _
+    If GetVersion(mQueue) <> mVersion Then _
         Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
     If mIndex < 0 Then _
         Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
@@ -127,7 +127,7 @@ Private Property Get IEnumerator_Current() As Variant
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If mQueue.Version <> mVersion Then _
+    If GetVersion(mQueue) <> mVersion Then _
         Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
     If mIndex > mEndIndex Then _
         Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))

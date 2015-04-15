@@ -46,6 +46,7 @@ Implements IObject
 Implements ICloneable
 Implements ICollection
 Implements IEnumerable
+Implements IVersionable
 
 Private Const DefaultCapacity       As Long = 16
 Private Const ItemPropertyFormat    As String = "Item{0}"
@@ -61,6 +62,26 @@ Private mCapacity   As Long
 Private mCount      As Long
 Private mVersion    As Long
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal Head As Long, ByVal Tail As Long)
+    mItems = Items
+    mCount = Count
+    mHead = Head
+    mTail = Tail
+    mCapacity = UBound(Items) + 1
+End Sub
+
+Friend Sub Init(ByRef Source As Variant)
+    WriteRange Source
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   API
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Clears the contents of the queue
@@ -83,7 +104,7 @@ End Sub
 '
 Public Function Clone() As Queue
     Set Clone = New Queue
-    Clone.CloneHelper mItems, mCount, mHead, mTail
+    Clone.InitClone mItems, mCount, mHead, mTail
 End Function
 
 ''
@@ -267,26 +288,6 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub CloneHelper(ByRef Items() As Variant, ByVal Count As Long, ByVal head As Long, ByVal tail As Long)
-    mItems = Items
-    mCount = Count
-    mHead = head
-    mTail = tail
-    mCapacity = UBound(Items) + 1
-End Sub
-
-Friend Property Get Version() As Long
-    Version = mVersion
-End Property
-
-Friend Sub Init(ByRef c As Variant)
-    WriteRange c
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub NormalizeArray(ByVal NewCapacity As Long)
@@ -328,17 +329,17 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     mCapacity = NewCapacity
 End Sub
 
-Private Sub WriteRange(ByRef c As Variant)
-    If IsArray(c) Then
-        WriteArray c
-    ElseIf IsObject(c) Then
-        If c Is Nothing Then _
-            Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Collection))
+Private Sub WriteRange(ByRef Source As Variant)
+    If IsArray(Source) Then
+        WriteArray Source
+    ElseIf IsObject(Source) Then
+        If Source Is Nothing Then _
+            Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Collection))
         
-        If TypeOf c Is Collection Then
-            WriteVBCollection c
-        ElseIf TypeOf c Is ICollection Then
-            WriteICollection c
+        If TypeOf Source Is Collection Then
+            WriteVBCollection Source
+        ElseIf TypeOf Source Is ICollection Then
+            WriteICollection Source
         Else
             Throw Cor.NewInvalidCastException("An ICollection or VBA.Collection object is required.")
         End If
@@ -347,34 +348,36 @@ Private Sub WriteRange(ByRef c As Variant)
     End If
 End Sub
 
-Private Sub WriteArray(ByRef Arr As Variant)
-    If IsNullArray(Arr) Then _
+Private Sub WriteArray(ByRef Source As Variant)
+    If IsNullArray(Source) Then _
         Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
     
     ' Get the number of elements in the array
     Dim SizeOfArray As Long
-    SizeOfArray = UBound(Arr) - LBound(Arr) + 1
+    SizeOfArray = UBound(Source) - LBound(Source) + 1
     
-    WriteCollection SizeOfArray, Arr
+    WriteCollection SizeOfArray, Source
 End Sub
 
-Private Sub WriteVBCollection(ByVal CollectionToInsert As Collection)
-    WriteCollection CollectionToInsert.Count, CollectionToInsert
+Private Sub WriteVBCollection(ByVal Source As Collection)
+    WriteCollection Source.Count, Source
 End Sub
 
-Private Sub WriteICollection(ByVal CollectionToInsert As ICollection)
-    WriteCollection CollectionToInsert.Count, CollectionToInsert
+Private Sub WriteICollection(ByVal Source As ICollection)
+    WriteCollection Source.Count, Source
 End Sub
 
-Private Sub WriteCollection(ByVal SizeOfCollection As Long, ByRef CollectionToWrite As Variant)
+Private Sub WriteCollection(ByVal SizeOfCollection As Long, ByRef Source As Variant)
     EnsureCapacity SizeOfCollection
         
     Dim Value As Variant
     Dim Index As Long
-    For Each Value In CollectionToWrite
+    For Each Value In Source
         Helper.MoveVariant mItems(Index), Value
         Index = Index + 1
-    Next Value
+    Next
+    
+    mTail = SizeOfCollection
     mCount = SizeOfCollection
 End Sub
 
@@ -477,3 +480,11 @@ End Function
 Private Function IEnumerable_NewEnum() As stdole.IUnknown
     Set IEnumerable_NewEnum = NewEnum
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionable Interface
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
+End Property
