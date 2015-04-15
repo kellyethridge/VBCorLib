@@ -55,6 +55,7 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
+Implements IVersionable
 
 Private Const PROP_COUNT            As String = "Count"
 Private Const PROP_CAPACITY         As String = "Capacity"
@@ -776,9 +777,9 @@ End Function
 ' interface and need to be enumerated using the same ArrayListEnumerator,
 ' the enumerator can't access a Friend method of ArrayList.
 '
-Public Property Get Version() As Long
-    Version = mVersion
-End Property
+'Public Property Get Version() As Long
+'    Version = mVersion
+'End Property
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1076,3 +1077,11 @@ End Sub
 Private Sub IList_RemoveAt(ByVal Index As Long)
     RemoveAt Index
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionable Interface
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
+End Property
