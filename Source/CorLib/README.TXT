@@ -16,6 +16,7 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed max negative Long not displaying correct number.
 	* Changed Convert.ToString(Nothing) returns "" instead of "Nothing".
 	* Removed cString.CharCount method. *BREAKING*
+	* Removed Comparer parameter from Queue.Contains method to align more with .NET.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

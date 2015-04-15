@@ -68,6 +68,7 @@ Public Enum ObjectDisposedString
 End Enum
 
 Public Enum ArgumentString
+    Argument_MultiDimNotSupported = ResourceString.Rank_MultiDimNotSupported
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802
