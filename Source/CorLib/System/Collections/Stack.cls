@@ -48,6 +48,7 @@ Implements IObject
 Implements ICloneable
 Implements IEnumerable
 Implements ICollection
+Implements IVersionable
 
 Private Const PROP_COUNT            As String = "Count"
 Private Const PROP_CAPACITY         As String = "Capacity"
@@ -60,6 +61,24 @@ Private mCount      As Long
 Private mVersion    As Long
 Private mCapacity   As Long
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub InitClone(ByRef OtherItems() As Variant, ByVal OtherCount As Long)
+    mCount = OtherCount
+    mItems = OtherItems
+    mCapacity = UBound(mItems) + 1
+End Sub
+
+Friend Sub Init(ByRef Source As Variant)
+    WriteRange Source
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   API
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Removes all values from the collection.
@@ -231,25 +250,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub InitClone(ByRef OtherItems() As Variant, ByVal OtherCount As Long)
-    mCount = OtherCount
-    mItems = OtherItems
-    mCapacity = UBound(mItems) + 1
-End Sub
-
-Friend Sub Init(ByRef Source As Variant)
-    WriteRange Source
-End Sub
-
-Friend Property Get Version() As Long
-    Version = mVersion
-End Property
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub WriteRange(ByRef Source As Variant)
     If IsArray(Source) Then
@@ -405,3 +406,10 @@ Private Function IEnumerable_NewEnum() As stdole.IUnknown
     Set IEnumerable_NewEnum = NewEnum
 End Function
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionable Interface
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
+End Property
