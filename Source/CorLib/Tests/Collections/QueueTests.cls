@@ -262,7 +262,7 @@ Public Sub QueueShouldBePersistable()
     Assert.That Actual, Iz.EqualTo(Array(1, "hi"))
 End Sub
 
-Public Sub TestInitWithElements()
+Public Sub NewQueue_WithElements_AddsToQueue()
     Dim SUT As Queue
     Dim Expected As Variant
     Expected = Array(1, 2, 3, 4, 5)
@@ -270,4 +270,29 @@ Public Sub TestInitWithElements()
     Set SUT = NewQueue(Expected)
     
     Assert.That SUT, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub NewQueue_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    Cor.NewQueue Nothing
+    
+    AssertArgumentNullException Err, "Source"
+End Sub
+
+Public Sub NewQueue_WithNullArray_ThrowsArgumentNullException()
+    Dim NullArray() As Long
+    On Error Resume Next
+    
+    Cor.NewQueue NullArray
+    
+    AssertArgumentNullException Err, "Source"
+End Sub
+
+Public Sub NewQueue_WithIncompatibleType_ThrowsArgumentException()
+    On Error Resume Next
+    
+    Cor.NewQueue 1
+    
+    AssertInvalidCastException Err
 End Sub
