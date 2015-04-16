@@ -215,6 +215,7 @@ Module=PersistenceHelper; Tests\PersistenceHelper.bas
 Class=QueueEnumeratorTests; Tests\Collections\QueueEnumerationTests.cls
 Module=CollectionsTests; Tests\Collections\CollectionsTests.bas
 ResFile32="VBCorLib.Tests.RES"
+Class=ObjectTests; Tests\ObjectTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""
