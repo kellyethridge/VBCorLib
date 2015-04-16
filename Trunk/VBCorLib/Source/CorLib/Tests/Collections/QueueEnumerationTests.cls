@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "StackEnumeratorTests"
+Attribute VB_Name = "QueueEnumeratorTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -72,12 +72,12 @@ Public Sub MoveNext_AfterHavingPassedEnd_ThrowsInvalidOperationException()
 End Sub
 
 Public Sub Current_WhenListHasChanged_ThrowsInvalidOperationException()
-    Dim List As New Stack
-    List.Push 1
+    Dim List As New Queue
+    List.Enqueue 1
     Dim En As IEnumerator
     Set En = List.GetEnumerator
     En.MoveNext
-    List.Push 2
+    List.Enqueue 2
     
     On Error Resume Next
     Dim Actual As Variant
@@ -100,12 +100,9 @@ Public Sub Reset_WhenCalled_RestartsEnumeration()
     Assert.That Actual, Iz.EqualTo(1)
 End Sub
 
-
-
 Private Function MakeEnumerator() As IEnumerator
-    Dim List As New Stack
-    List.Push 1
+    Dim List As New Queue
+    List.Enqueue 1
     
     Set MakeEnumerator = List.GetEnumerator
 End Function
-

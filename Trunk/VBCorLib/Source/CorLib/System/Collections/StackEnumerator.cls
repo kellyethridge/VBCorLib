@@ -55,18 +55,18 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal st As Stack, ByVal ItemsSAPtr As Long)
-    Set mStack = st
+Friend Sub Init(ByVal Stack As Stack, ByVal ItemsSAPtr As Long)
+    Set mStack = Stack
     SAPtr(mItems) = ItemsSAPtr
-    mResetPoint = st.Count
-    mVersion = st.Version
+    mResetPoint = Stack.Count
+    mVersion = GetVersion(Stack)
     mIndex = mResetPoint
 End Sub
 
-Friend Sub CloneHelper(ByVal st As Stack, ByVal ItemsSAPtr As Long, ByVal Index As Long)
-    Call Init(st, ItemsSAPtr)
+Friend Sub InitClone(ByVal Stack As Stack, ByVal ItemsSAPtr As Long, ByVal Index As Long)
+    Init Stack, ItemsSAPtr
     mIndex = Index
 End Sub
 
@@ -75,7 +75,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
-    SAPtr(mItems) = 0
+    SAPtr(mItems) = vbNullPtr
 End Sub
 
 
@@ -100,7 +100,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New StackEnumerator
-    Ret.CloneHelper mStack, SAPtr(mItems), mIndex
+    Ret.InitClone mStack, SAPtr(mItems), mIndex
     Set ICloneable_Clone = Ret
 End Function
 
@@ -109,21 +109,21 @@ End Function
 '   IEnumerator Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If mStack.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+    If GetVersion(mStack) <> mVersion Then _
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex = mResetPoint Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
+        Error.InvalidOperation InvalidOperation_EnumNotStarted
     If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
         
-    Call VariantCopy(IEnumerator_Current, mItems(mIndex))
+    VariantCopy IEnumerator_Current, mItems(mIndex)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If mStack.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+    If GetVersion(mStack) <> mVersion Then _
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
         
     If mIndex = 0 Then
         mIndex = -1

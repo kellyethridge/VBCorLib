@@ -101,30 +101,7 @@ Private Sub Form_Load()
     
     AddTest System
     
-    Dim Collections As TestSuite
-    With Sim.NewTestSuite("System.Collections")
-        .Add New BitArrayTests
-        .Add New TestSortedList
-        .Add New QueueTests
-        .Add New StackTests
-        .Add New StackEnumeratorTests
-        .Add New ComparerTests
-        .Add New TestCaseInsensitiveHCP
-        
-        With Sim.NewTestSuite("ArrayList")
-            .Add New ArrayListTests
-            .Add New ArrayListAdapterTests
-            .Add New ArrayListRangedTests
-            .Add New ArrayListRepeatTests
-            .Add New ArrayListEnumerationTests
-            .Add New ArrayListReadOnlyTests
-            Set Suite = .This
-        End With
-        .Add Suite
-        .Add NewSuite("Hashtable", New TestHashTable, New TestHashTableHCP, New TestDictionaryEntry)
-    
-        AddTest .This
-    End With
+    AddTest CreateCollectionsTests
     
     Dim Cyrptography As TestSuite
     Set Cyrptography = Sim.NewTestSuite("System.Security.Cryptography")
@@ -333,6 +310,7 @@ End Function
 Private Sub Form_Initialize()
     Me.UIRunner1.Init App
 End Sub
+
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)
     Select Case KeyCode
         Case vbKeyEscape

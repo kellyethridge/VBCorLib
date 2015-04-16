@@ -50,18 +50,8 @@ Private mEndIndex   As Long
 Private mVersion    As Long
 
 
-''
-' To allow this object to be used with For..Each.
-'
-Public Function NewEnum() As IUnknown
-Attribute NewEnum.VB_UserMemId = -4
-Attribute NewEnum.VB_MemberFlags = "40"
-    Set NewEnum = CreateEnumerator(Me)
-End Function
-
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long)
     Set mQueue = q
@@ -73,10 +63,20 @@ Friend Sub Init(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long)
     mIndex = -1
 End Sub
 
-Friend Sub CloneHelper(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long, ByVal Index As Long)
-    Call Init(q, head, ItemsSAPtr)
+Friend Sub InitClone(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long, ByVal Index As Long)
+    Init q, head, ItemsSAPtr
     mIndex = Index
 End Sub
+
+
+''
+' To allow this object to be used with For..Each.
+'
+Public Function NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+Attribute NewEnum.VB_MemberFlags = "40"
+    Set NewEnum = CreateEnumerator(Me)
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -107,7 +107,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New QueueEnumerator
-    Call Ret.CloneHelper(mQueue, mHead, SAPtr(mItems), mIndex)
+    Ret.InitClone mQueue, mHead, SAPtr(mItems), mIndex
     Set ICloneable_Clone = Ret
 End Function
 
@@ -117,20 +117,20 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
     If GetVersion(mQueue) <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
+        Error.InvalidOperation InvalidOperation_EnumNotStarted
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
-    
-    Call VariantCopy(IEnumerator_Current, mItems((mHead + mIndex) Mod mCapacity))
+        Error.InvalidOperation InvalidOperation_EnumFinished
+        
+    VariantCopy IEnumerator_Current, mItems((mHead + mIndex) Mod mCapacity)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
     If GetVersion(mQueue) <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
     
     If mIndex = mEndIndex Then
         mIndex = mEndIndex + 1
