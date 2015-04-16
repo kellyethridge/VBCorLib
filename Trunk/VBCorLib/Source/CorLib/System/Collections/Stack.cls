@@ -105,12 +105,11 @@ End Function
 ' Returns whether the collection contains a value.
 '
 ' @param value The value to search for.
-' @param comparer A user supplied comparer for the values.
 ' @return Boolean indicating if the value was found in the collection.
 ' @remarks The user can use a custom IComparer object for special comparison
 ' rules, such as finding user-defined types.
 '
-Public Function Contains(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
+Public Function Contains(ByRef Value As Variant) As Boolean
     Contains = (cArray.IndexOf(mItems, Value, 0, mCount, Comparer) >= 0)
 End Function
 

@@ -22,6 +22,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     Select Case Test.MethodName
         Case "Contains_WithValues_ReturnsExpected"
             Test.Use 1, True
+            Test.Use CLng(1), False
             Test.Use "1", False
             Test.Use "a", True
             Test.Use CObj(Me), True
