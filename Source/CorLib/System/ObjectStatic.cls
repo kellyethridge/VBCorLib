@@ -61,33 +61,37 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             
         Case vbString
             GetHashCode = HashString(Value)
-            
-        Case vbDouble, vbDate, vbCurrency
-            Dim Ptr As Long
-            If VariantType(Value) And VT_BYREF Then
-                Ptr = MemLong(VarPtr(Value) + 8)
-            Else
-                Ptr = VarPtr(Value) + 8
-            End If
-            With AsDLong(ByVal Ptr)
+        
+        Case vbDouble
+            With AsDLong(CDbl(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
             
         Case vbSingle
             GetHashCode = AsLong(CSng(Value))
             
+        Case vbDate
+            With AsDLong(CDate(Value))
+                GetHashCode = .LoDWord Xor .HiDWord
+            End With
+            
+        Case vbCurrency
+            With AsDLong(CCur(Value))
+                GetHashCode = .LoDWord Xor .HiDWord
+            End With
+            
         Case vbObject, vbDataObject
-            If Value Is Nothing Then Exit Function
+            If Value Is Nothing Then
+                Exit Function
+            End If
+            
             If TypeOf Value Is IObject Then
-                Dim o As IObject
-                Set o = Value
-                GetHashCode = o.GetHashCode
+                Dim Obj As IObject
+                Set Obj = Value
+                Print appGetHashCode = Obj.GetHashCode
             Else
                 GetHashCode = ObjPtr(CUnk(Value))
             End If
-            
-        Case Else
-            Throw Cor.NewArgumentException("Cannot create a hashcode from the specific value type.", "Value")
     End Select
 End Function
 
