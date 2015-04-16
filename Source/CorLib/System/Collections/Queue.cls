@@ -111,7 +111,6 @@ End Function
 ' Determines if the queue contains a specific value.
 '
 ' @param value The value to search for in the queue.
-' @param comparer A user supplied comparer for custom comparisons.
 ' @return Value indicating if the value was found.
 ' @remarks If more than one instance of the same value exists in the
 ' queue, this will stop once it finds the first instance.
