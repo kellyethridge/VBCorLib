@@ -1122,9 +1122,9 @@ End Function
 ' @return A Queue object with the elements placed in it.
 ' @remarks The <i>Col</i> parameter can be a VBA.Collection, ICollection object or an Array.
 '
-Public Function NewQueue(ByRef Col As Variant) As Queue
+Public Function NewQueue(ByRef Source As Variant) As Queue
     Set NewQueue = New Queue
-    Call NewQueue.Init(Col)
+    Call NewQueue.Init(Source)
 End Function
 
 ''

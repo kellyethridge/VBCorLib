@@ -66,10 +66,10 @@ Private mVersion    As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal Head As Long, ByVal Tail As Long)
+Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal head As Long, ByVal Tail As Long)
     mItems = Items
     mCount = Count
-    mHead = Head
+    mHead = head
     mTail = Tail
     mCapacity = UBound(Items) + 1
 End Sub
@@ -350,13 +350,9 @@ End Sub
 
 Private Sub WriteArray(ByRef Source As Variant)
     If IsNullArray(Source) Then _
-        Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Source", ArgumentNull_Array
     
-    ' Get the number of elements in the array
-    Dim SizeOfArray As Long
-    SizeOfArray = UBound(Source) - LBound(Source) + 1
-    
-    WriteCollection SizeOfArray, Source
+    WriteCollection ArrayLength(Source), Source
 End Sub
 
 Private Sub WriteVBCollection(ByVal Source As Collection)
