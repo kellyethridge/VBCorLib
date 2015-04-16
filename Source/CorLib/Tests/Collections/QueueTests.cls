@@ -14,10 +14,6 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
 
-Private Const DEF_CAPACITY As Long = 16
-
-Private Q As Queue
-
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "Contains_WithValues_ReturnsExpected"
@@ -29,11 +25,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2, False
         
     End Select
-End Sub
-
-
-Public Sub Setup()
-    Set Q = New Queue
 End Sub
 
 Public Sub Ctor_WhenCalled_CreatesEmptyQueue()
@@ -66,9 +57,10 @@ Public Sub Enqueue_WhenCalled_AddsValueFifoOrder()
 End Sub
 
 Public Sub Enqueue_WithMoreThanDefaultCapacity_ExtendsCapacity()
-    Const NumberAdded   As Long = DEF_CAPACITY * 2
-    Dim SUT             As New Queue
-    Dim i               As Long
+    Const DefaultCapacity   As Long = 16
+    Const NumberAdded       As Long = DefaultCapacity * 2
+    Dim SUT                 As New Queue
+    Dim i                   As Long
         
     For i = 1 To NumberAdded
         SUT.Enqueue i
