@@ -25,7 +25,7 @@ Public Function FileExists(ByRef FileName As String) As Boolean
     Dim FileNumber As Long
     FileNumber = FreeFile
     Open FileName For Input As #FileNumber
-    Close FileNumber
+    Close #FileNumber
     
     FileExists = True
 FileNotFoundError:
@@ -36,7 +36,7 @@ Public Sub CreateFile(ByRef FileName As String)
         Dim FileNumber As Long
         FileNumber = FreeFile
         Open FileName For Output As #FileNumber
-        Close FileNumber
+        Close #FileNumber
     End If
 End Sub
 
@@ -50,3 +50,12 @@ Public Function NewInt32(ByVal Value As Long) As Int32
     Set NewInt32 = New Int32
     NewInt32.Value = Value
 End Function
+
+Public Function ReadFile(ByVal FileName As String) As String
+    Dim FileNumber As Long
+    FileNumber = FreeFile
+    Open FileName For Input As #FileNumber
+    Line Input #FileNumber, ReadFile
+    Close #FileNumber
+End Function
+
