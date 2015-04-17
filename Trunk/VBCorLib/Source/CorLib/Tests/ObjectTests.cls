@@ -28,12 +28,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 0
             Test.Use cDateTime.MinValue
             Test.Use TimeSpan.Zero
+            Test.Use CDec(0)
             
         Case "GetHashCode_WithSameValueTwice_ReturnsSameValue"
             Test.Use 1
             Test.Use 1#
             Test.Use #1/1/2001#
             Test.Use 1234.1234@
+            Test.Use CDec("123421346876234143.2343243")
             
     End Select
 End Sub
