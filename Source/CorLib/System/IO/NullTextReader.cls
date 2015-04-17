@@ -46,17 +46,15 @@ Implements TextReader
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    If IsObject(Value) Then
-        IObject_Equals = Value Is Me
-    End If
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -72,7 +70,7 @@ Private Function TextReader_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function TextReader_GetHashCode() As Long
-    TextReader_GetHashCode = IObject_GetHashcode
+    TextReader_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function TextReader_Peek() As Long

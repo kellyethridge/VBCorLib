@@ -289,15 +289,15 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
 End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
-    Dim y As Long
+    Dim Y As Long
     
     If Year < 0 Or Year > MAX_YEAR Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
 
     If Year < 100 Then
-        y = Year Mod 100
-        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + y
-        If y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
+        Y = Year Mod 100
+        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + Y
+        If Y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
     Else
         ToFourDigitYear = Year
     End If
@@ -308,7 +308,7 @@ End Function
 '
 ' @return String representing this instance.
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
@@ -318,7 +318,7 @@ End Function
 ' @param value The value to compare equalit to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -326,7 +326,7 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
@@ -440,8 +440,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -81,15 +81,15 @@ End Property
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 Private Function IObject_Equals(ByRef Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
@@ -105,15 +105,15 @@ Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVa
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim result As Long
-    result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If result <> NO_ERROR Then Call ThrowArrayRangeException(result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount")
+    Dim Result As Long
+    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
+    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount")
     
     Decoder_GetChars = mEncoding.InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
 
 Private Function Decoder_GetHashCode() As Long
-    Decoder_GetHashCode = IObject_GetHashcode
+    Decoder_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function Decoder_ToString() As String

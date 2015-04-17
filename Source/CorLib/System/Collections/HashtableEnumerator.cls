@@ -56,13 +56,13 @@ Attribute NewEnum.VB_MemberFlags = "40"
     Set NewEnum = CreateEnumerator(Me)
 End Function
 
-Friend Sub Init(ByVal list As Hashtable, ByVal BucketsSAPtr As Long, ByVal HTEnumType As IDictionaryEnumType)
-    Set mList = list
+Friend Sub Init(ByVal List As Hashtable, ByVal BucketsSAPtr As Long, ByVal HTEnumType As IDictionaryEnumType)
+    Set mList = List
     SAPtr(mBuckets) = BucketsSAPtr
     mEnumType = HTEnumType
     mIndex = -1
-    mVersion = list.Version
-    mCount = list.Count
+    mVersion = List.Version
+    mCount = List.Count
     mCapacity = UBound(mBuckets) + 1
 End Sub
 
@@ -92,15 +92,15 @@ End Sub
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 

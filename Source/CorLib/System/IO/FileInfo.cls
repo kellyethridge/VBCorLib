@@ -369,10 +369,10 @@ Public Sub Refresh()
     
     ' The nFileSizeLow and hFileSizeHigh are in reverse order in
     ' WIN32_FIND_DATA, so we need to manually reverse the 4 byte sections.
-    Dim Ptr As Long
-    Ptr = VarPtr(mFileSize)
-    MemLong(Ptr) = Data.nFileSizeLow
-    MemLong(Ptr + 4) = Data.nFileSizeHigh
+    Dim ptr As Long
+    ptr = VarPtr(mFileSize)
+    MemLong(ptr) = Data.nFileSizeLow
+    MemLong(ptr + 4) = Data.nFileSizeHigh
     mFileSize = 10000@ * mFileSize
     
     mIsDirty = False
@@ -490,7 +490,7 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -498,7 +498,7 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
@@ -542,8 +542,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
