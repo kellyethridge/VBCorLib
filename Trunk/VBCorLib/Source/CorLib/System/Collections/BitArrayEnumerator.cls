@@ -50,15 +50,15 @@ Private mVersion    As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal list As BitArray)
-    Set mList = list
-    mVersion = list.Version
+Friend Sub Init(ByVal List As BitArray)
+    Set mList = List
+    mVersion = List.Version
     mIndex = -1
-    mEndIndex = list.Count - 1
+    mEndIndex = List.Count - 1
 End Sub
 
-Friend Sub CloneHelper(ByVal list As BitArray, ByVal Index As Long)
-    Call Init(list)
+Friend Sub CloneHelper(ByVal List As BitArray, ByVal Index As Long)
+    Call Init(List)
     mIndex = Index
 End Sub
 
@@ -67,15 +67,15 @@ End Sub
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
 Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -83,9 +83,9 @@ End Function
 '   ICloneable Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
-    Dim ret As New BitArrayEnumerator
-    Call ret.CloneHelper(mList, mIndex)
-    Set ICloneable_Clone = ret
+    Dim Ret As New BitArrayEnumerator
+    Call Ret.CloneHelper(mList, mIndex)
+    Set ICloneable_Clone = Ret
 End Function
 
 

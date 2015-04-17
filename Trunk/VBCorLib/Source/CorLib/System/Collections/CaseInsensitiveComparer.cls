@@ -52,8 +52,8 @@ Private mDefault As IComparer
 ' x is greater than y returns a positive value (1).<br>
 ' x is less than y returns a negative value (-1).
 '
-Public Function Compare(ByRef x As Variant, ByRef y As Variant) As Long
-    Compare = IComparer_Compare(x, y)
+Public Function Compare(ByRef X As Variant, ByRef Y As Variant) As Long
+    Compare = IComparer_Compare(X, Y)
 End Function
 
 ''
@@ -62,7 +62,7 @@ End Function
 ' @return String representing this instance.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
@@ -73,7 +73,7 @@ End Function
 ' @return Boolean indicating equality.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -82,7 +82,7 @@ End Function
 ' @return Pseudo-unique number identifying this instance.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
@@ -115,12 +115,12 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' We put the main logic here since 99.99% of the time this object
 ' will be called through the IComparer interface.
-Private Function IComparer_Compare(x As Variant, y As Variant) As Long
-    If VarType(x) = vbString Then
-        If VarType(y) = vbString Then
-            IComparer_Compare = StrComp(x, y, vbTextCompare)
+Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
+    If VarType(X) = vbString Then
+        If VarType(Y) = vbString Then
+            IComparer_Compare = StrComp(X, Y, vbTextCompare)
             Exit Function
         End If
     End If
-    IComparer_Compare = mDefault.Compare(x, y)
+    IComparer_Compare = mDefault.Compare(X, Y)
 End Function

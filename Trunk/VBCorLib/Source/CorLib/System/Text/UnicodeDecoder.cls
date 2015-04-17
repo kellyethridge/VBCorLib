@@ -72,15 +72,15 @@ End Sub
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 Private Function IObject_Equals(ByRef Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
@@ -150,7 +150,7 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
 End Function
 
 Private Function Decoder_GetHashCode() As Long
-    Decoder_GetHashCode = IObject_GetHashcode
+    Decoder_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function Decoder_ToString() As String

@@ -98,14 +98,14 @@ End Property
 ' used to obtain information about the picture. The actual picture
 ' resource needs to be added to the <b>ResourceWriter</b> independently.
 '
-Public Sub Add(ByVal ResourceID As Long, ByVal Pic As IPicture)
+Public Sub Add(ByVal ResourceId As Long, ByVal Pic As IPicture)
     If Pic Is Nothing Then _
         Throw New ArgumentNullException
     If Pic.Type <> PICTYPE_ICON Then _
         Throw Cor.NewArgumentException("Only Icons and Cursors are supported.", "Pic")
     
     Dim Info As New ResPictureGroupInfo
-    Call Info.Init(ResourceID, Pic, mGroupType)
+    Call Info.Init(ResourceId, Pic, mGroupType)
     Call mItems.Add(Info)
 End Sub
 
@@ -118,7 +118,7 @@ End Sub
 ' @return Returns True if the value equals this instance, False otherwise.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -130,7 +130,7 @@ End Function
 ' @return Returns a hashcode value.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 ''
@@ -141,7 +141,7 @@ End Function
 ' @return A string representation of this instance.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -179,8 +179,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

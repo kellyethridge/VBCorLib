@@ -56,7 +56,21 @@ Attribute VB_Exposed = True
 ' @see ComparerStatic
 '
 Option Explicit
+Implements IObject
 Implements IComparer
+
+
+Public Function Equals(ByRef Value As Variant) As Boolean
+    Equals = MyBase.Equals(Me, Value)
+End Function
+
+Public Function GetHashCode() As Long
+    GetHashCode = MyBase.GetHashCode(Me)
+End Function
+
+Public Function ToString() As String
+    ToString = MyBase.ToString(Me, App)
+End Function
 
 ''
 ' Returns the comparison between to values.
@@ -136,4 +150,20 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
     IComparer_Compare = Compare(X, Y)
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject Interface
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
+End Function
+
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
+End Function
+
+Private Function IObject_ToString() As String
+    IObject_ToString = ToString
 End Function

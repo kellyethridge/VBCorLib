@@ -68,10 +68,10 @@ Public Property Get Target() As Object
     If Not IsAlive Then _
         Throw Cor.NewInvalidOperationException("Object reference has already been terminated.")
     
-    Dim ret As IUnknown
-    ObjectPtr(ret) = MemLong(mPtrWeak + 20)
-    Set Target = ret
-    ObjectPtr(ret) = 0
+    Dim Ret As IUnknown
+    ObjectPtr(Ret) = MemLong(mPtrWeak + 20)
+    Set Target = Ret
+    ObjectPtr(Ret) = 0
 End Property
 
 ''
@@ -103,7 +103,7 @@ End Property
 ' @return String representing this instance.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
@@ -114,7 +114,7 @@ End Function
 ' @return Boolean indicating equality.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -123,7 +123,7 @@ End Function
 ' @return Pseudo-unique number identifying this instance.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 ''
@@ -229,8 +229,8 @@ Friend Sub Init(ByVal Target As Object)
     mPtrWeak = InitWeakReference(Me, Target)
 End Sub
 
-Friend Sub InitChild(ByVal Ptr As Long)
-    mPtrWeak = Ptr
+Friend Sub InitChild(ByVal ptr As Long)
+    mPtrWeak = ptr
     mIsChild = True
 End Sub
 
@@ -250,8 +250,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -221,7 +221,7 @@ End Property
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -243,7 +243,7 @@ End Function
 ' @return Pseudo-unique number identifying this instance.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 ''
@@ -359,7 +359,7 @@ Public Sub Remove(ByRef Key As Variant)
     i = GetKeyIndex(Key)
     If i >= 0 Then
         With mBuckets(i)
-            .HashCode = 0
+            .hashcode = 0
             .Key = Empty
             .State = bsDeleted
             .Value = Empty
@@ -385,7 +385,7 @@ End Sub
 ' @return String representing this instance.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
@@ -484,11 +484,11 @@ End Sub
 Private Function GetKeyIndex(ByRef Key As Variant) As Long
     Dim Step                As Long
     Dim Index               As Long
-    Dim HashCode            As Long
+    Dim hashcode            As Long
     Dim FirstIndex          As Long
     Dim ComparerIsNothing   As Boolean
     
-    HashCode = InitHashCode(Key, Step, Index)
+    hashcode = InitHashCode(Key, Step, Index)
     FirstIndex = Index
     ComparerIsNothing = mComparer Is Nothing
     
@@ -498,7 +498,7 @@ Private Function GetKeyIndex(ByRef Key As Variant) As Long
                 GetKeyIndex = -1
                 Exit Function
             Case bsOccupied
-                If mBuckets(Index).HashCode = HashCode Then
+                If mBuckets(Index).hashcode = hashcode Then
                     If ComparerIsNothing Then
                         If EqualsVariants(Key, mBuckets(Index).Key) Then
                             GetKeyIndex = Index
@@ -530,13 +530,13 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
     Dim Step                As Long
     Dim Index               As Long
     Dim FirstEmpty          As Long
-    Dim HashCode            As Long
+    Dim hashcode            As Long
     Dim UseDefaultCompare   As Boolean
     Dim FirstIndex          As Long
     
     If mCount > mLoadThreshold Then Call ExpandTable
     
-    HashCode = InitHashCode(Key, Step, Index)
+    hashcode = InitHashCode(Key, Step, Index)
     FirstIndex = Index
     FirstEmpty = -1
     UseDefaultCompare = mComparer Is Nothing
@@ -553,7 +553,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                 Exit Do
                 
             Case bsOccupied
-                If mBuckets(Index).HashCode = HashCode Then
+                If mBuckets(Index).hashcode = hashcode Then
                     If UseDefaultCompare Then
                         If EqualsVariants(Key, mBuckets(Index).Key) Then
                             If Adding Then _
@@ -607,7 +607,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
             Call VariantCopyInd(.Value, Value)
         End If
         .State = bsOccupied
-        .HashCode = HashCode
+        .hashcode = hashcode
     End With
     mCount = mCount + 1
     mVersion = mVersion + 1
@@ -756,8 +756,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

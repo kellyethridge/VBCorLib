@@ -1,16 +1,16 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-  Persistable = 1  'Persistable
+  Persistable = 0  'NotPersistable
   DataBindingBehavior = 0  'vbNone
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
 Attribute VB_Name = "NullStream"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 '    CopyRight (c) 2005 Kelly Ethridge
 '
 '    This file is part of VBCorLib.
@@ -47,15 +47,15 @@ Implements Stream
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -150,7 +150,7 @@ Private Sub Stream_Flush()
 End Sub
 
 Private Function Stream_GetHashCode() As Long
-    Stream_GetHashCode = IObject_GetHashcode
+    Stream_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Property Get Stream_Length() As Currency

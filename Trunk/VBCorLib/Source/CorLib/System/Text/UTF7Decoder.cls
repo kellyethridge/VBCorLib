@@ -58,19 +58,19 @@ Friend Property Let InBase64(ByVal RHS As Boolean)
     mInBase64 = RHS
 End Property
 
-Friend Property Get bits() As Currency
-    bits = mBits
+Friend Property Get Bits() As Currency
+    Bits = mBits
 End Property
 
-Friend Property Let bits(ByVal RHS As Currency)
+Friend Property Let Bits(ByVal RHS As Currency)
     mBits = RHS
 End Property
 
-Friend Property Get BitCount() As Long
-    BitCount = mBitCount
+Friend Property Get bitCount() As Long
+    bitCount = mBitCount
 End Property
 
-Friend Property Let BitCount(ByVal RHS As Long)
+Friend Property Let bitCount(ByVal RHS As Long)
     mBitCount = RHS
 End Property
 
@@ -87,15 +87,15 @@ End Property
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 Private Function IObject_Equals(ByRef Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
@@ -107,23 +107,23 @@ Private Function Decoder_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim result As Long
-    result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
-    If result <> NO_ERROR Then ThrowArrayRangeException result, "Bytes", Index, "Index", Count, "Count"
+    Dim Result As Long
+    Result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", Index, "Index", Count, "Count"
     
     Decoder_GetCharCount = mEncoding.InternalGetCharCount(Bytes, Index, Count)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim result As Long
-    result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If result <> NO_ERROR Then ThrowArrayRangeException result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
+    Dim Result As Long
+    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
     
     Decoder_GetChars = mEncoding.InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
 
 Private Function Decoder_GetHashCode() As Long
-    Decoder_GetHashCode = IObject_GetHashcode
+    Decoder_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function Decoder_ToString() As String

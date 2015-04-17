@@ -186,7 +186,7 @@ End Function
 ' @return Returns True if the values are the same.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -198,7 +198,7 @@ End Function
 ' @return Returns a number identifing this instance.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 ''
@@ -209,7 +209,7 @@ End Function
 ' @return Returns a string representation of this instance.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -1287,82 +1287,82 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     mState(0) = ddd
 End Sub
 
-Private Function fnF(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    fnF = x Xor y Xor z
+Private Function fnF(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    fnF = X Xor Y Xor z
 End Function
 
-Private Function fnG(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    fnG = (x And y) Or ((Not x) And z)
+Private Function fnG(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    fnG = (X And Y) Or ((Not X) And z)
 End Function
 
-Private Function fnH(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    fnH = (x Or (Not y)) Xor z
+Private Function fnH(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    fnH = (X Or (Not Y)) Xor z
 End Function
 
-Private Function fnI(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    fnI = (x And z) Or (y And (Not z))
+Private Function fnI(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    fnI = (X And z) Or (Y And (Not z))
 End Function
 
-Private Function fnJ(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    fnJ = x Xor (y Or (Not z))
+Private Function fnJ(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    fnJ = X Xor (Y Or (Not z))
 End Function
 
-Private Sub fnFF(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(a, fnF(b, c, d)), x)
+Private Sub fnFF(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(a, fnF(b, c, d)), X)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnGG(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnG(b, c, d)), x), &H5A827999)
+Private Sub fnGG(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnG(b, c, d)), X), &H5A827999)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnHH(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnH(b, c, d)), x), &H6ED9EBA1)
+Private Sub fnHH(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnH(b, c, d)), X), &H6ED9EBA1)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnII(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnI(b, c, d)), x), &H8F1BBCDC)
+Private Sub fnII(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnI(b, c, d)), X), &H8F1BBCDC)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnJJ(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnJ(b, c, d)), x), &HA953FD4E)
+Private Sub fnJJ(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnJ(b, c, d)), X), &HA953FD4E)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnFFF(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(a, fnF(b, c, d)), x)
+Private Sub fnFFF(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(a, fnF(b, c, d)), X)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnGGG(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnG(b, c, d)), x), &H7A6D76E9)
+Private Sub fnGGG(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnG(b, c, d)), X), &H7A6D76E9)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnHHH(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnH(b, c, d)), x), &H6D703EF3)
+Private Sub fnHHH(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnH(b, c, d)), X), &H6D703EF3)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnIII(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnI(b, c, d)), x), &H5C4DD124)
+Private Sub fnIII(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnI(b, c, d)), X), &H5C4DD124)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
 
-Private Sub fnJJJ(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal x As Long, ByVal s As Long)
-    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnJ(b, c, d)), x), &H50A28BE6)
+Private Sub fnJJJ(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As Long, ByVal e As Long, ByVal X As Long, ByVal s As Long)
+    a = Helper.UAdd(Helper.UAdd(Helper.UAdd(a, fnJ(b, c, d)), X), &H50A28BE6)
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
@@ -1488,8 +1488,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

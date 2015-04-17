@@ -49,8 +49,8 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal list As SortedList)
-    Set mList = list
+Friend Sub Init(ByVal List As SortedList)
+    Set mList = List
 End Sub
 
 
@@ -58,15 +58,15 @@ End Sub
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -112,8 +112,8 @@ Private Sub IList_Clear()
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 
-Private Function IList_Contains(Value As Variant, Optional ByVal comparer As IComparer) As Boolean
-    IList_Contains = mList.ContainsValue(Value, comparer)
+Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
+    IList_Contains = mList.ContainsValue(Value, Comparer)
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
@@ -128,8 +128,8 @@ Private Function IList_GetEnumerator() As IEnumerator
     Set IList_GetEnumerator = mList.GetValueEnumerator
 End Function
 
-Private Function IList_IndexOf(Value As Variant, Optional ByVal comparer As IComparer) As Long
-    IList_IndexOf = mList.IndexOfValue(Value, comparer)
+Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As IComparer) As Long
+    IList_IndexOf = mList.IndexOfValue(Value, Comparer)
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
@@ -160,7 +160,7 @@ Private Function IList_NewEnum() As stdole.IUnknown
     Set IList_NewEnum = NewEnum
 End Function
 
-Private Sub IList_Remove(Value As Variant, Optional ByVal comparer As IComparer)
+Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 

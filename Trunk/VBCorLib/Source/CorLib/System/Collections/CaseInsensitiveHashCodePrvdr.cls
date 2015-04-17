@@ -48,7 +48,7 @@ Private mStringHashChars As WordBuffer
 ' @return String representing this instance.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
@@ -59,7 +59,7 @@ End Function
 ' @return Boolean indicating equality.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -72,7 +72,7 @@ Public Function GetHashCode(Optional ByRef Value As Variant) As Long
     If Not IsMissing(Value) Then
         GetHashCode = IHashcodeProvider_GetHashCode(Value)
     Else
-        GetHashCode = ObjPtr(CUnk(Me))
+        GetHashCode = MyBase.GetHashCode(Me)
     End If
 End Function
 
@@ -90,10 +90,10 @@ Private Function HashString(ByRef Key As Variant) As Long
     End With
 
     Dim i   As Long
-    Dim Ch  As Long
+    Dim ch  As Long
     For i = 0 To StringLength - 1
-        Ch = CharLower(mStringHashChars.Data(i))
-        HashString = ((HashString * 16) + Ch) And &H3FFFFFF
+        ch = CharLower(mStringHashChars.Data(i))
+        HashString = ((HashString * 16) + ch) And &H3FFFFFF
     Next i
 End Function
 
@@ -105,8 +105,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

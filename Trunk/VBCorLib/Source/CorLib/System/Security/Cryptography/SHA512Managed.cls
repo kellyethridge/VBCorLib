@@ -193,7 +193,7 @@ End Function
 ' @return Returns True if the values are the same.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -205,7 +205,7 @@ End Function
 ' @return Returns a number identifing this instance.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 ''
@@ -216,7 +216,7 @@ End Function
 ' @return Returns a string representation of this instance.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 
@@ -391,12 +391,12 @@ Private Function RRotateLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Lo
     End If
 End Function
 
-Private Function Choice(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    Choice = (x And y) Xor ((Not x) And z)
+Private Function Choice(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    Choice = (X And Y) Xor ((Not X) And z)
 End Function
 
-Private Function Maj(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
-    Maj = (x And y) Xor (x And z) Xor (y And z)
+Private Function Maj(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    Maj = (X And Y) Xor (X And z) Xor (Y And z)
 End Function
 
 Private Function BigSIG0Hi(ByVal xh As Long, ByVal xl As Long) As Long
@@ -731,8 +731,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

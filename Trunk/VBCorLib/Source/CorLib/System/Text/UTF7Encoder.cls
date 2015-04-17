@@ -51,19 +51,19 @@ Friend Property Get Flush() As Boolean
     Flush = mFlush
 End Property
 
-Friend Property Get bits() As Long
-    bits = mBits
+Friend Property Get Bits() As Long
+    Bits = mBits
 End Property
 
-Friend Property Let bits(ByVal RHS As Long)
+Friend Property Let Bits(ByVal RHS As Long)
     mBits = RHS
 End Property
 
-Friend Property Get BitCount() As Long
-    BitCount = mBitCount
+Friend Property Get bitCount() As Long
+    bitCount = mBitCount
 End Property
 
-Friend Property Let BitCount(ByVal RHS As Long)
+Friend Property Let bitCount(ByVal RHS As Long)
     mBitCount = RHS
 End Property
 
@@ -80,15 +80,15 @@ End Sub
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_ToString() As String
-    IObject_ToString = Object.ToString(Me, App)
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 Private Function IObject_Equals(ByRef Value As Variant) As Boolean
-    IObject_Equals = Object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
@@ -102,9 +102,9 @@ End Function
 Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Flush As Boolean) As Long
     mFlush = Flush
     
-    Dim result As Long
-    result = VerifyArrayRange(SAPtr(Chars), Index, Count)
-    If result <> NO_ERROR Then ThrowArrayRangeException result, "Chars", Index, "Index", Count, "Count"
+    Dim Result As Long
+    Result = VerifyArrayRange(SAPtr(Chars), Index, Count)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", Index, "Index", Count, "Count"
     
     Encoder_GetByteCount = mEncoding.InternalGetByteCount(Chars, Index, Count, Me)
 End Function
@@ -112,15 +112,15 @@ End Function
 Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long
     mFlush = Flush
     
-    Dim result As Long
-    result = VerifyArrayRange(SAPtr(Chars), CharIndex, CharCount)
-    If result <> NO_ERROR Then ThrowArrayRangeException result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount"
+    Dim Result As Long
+    Result = VerifyArrayRange(SAPtr(Chars), CharIndex, CharCount)
+    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount"
     
     Encoder_GetBytes = mEncoding.InternalGetBytes(Chars, CharIndex, CharCount, Bytes, ByteIndex, Me)
 End Function
 
 Private Function Encoder_GetHashCode() As Long
-    Encoder_GetHashCode = IObject_GetHashcode
+    Encoder_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function Encoder_ToString() As String

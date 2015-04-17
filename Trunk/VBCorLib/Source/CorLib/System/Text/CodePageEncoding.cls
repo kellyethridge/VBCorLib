@@ -99,7 +99,7 @@ Private Function IObject_GetHashcode() As Long
 End Function
 
 Private Function IObject_ToString() As String
-    IObject_ToString = "VBCorLib.Encoding"
+    IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
 
