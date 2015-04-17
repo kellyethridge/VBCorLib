@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "ToStringWithDoublesTests"
+Attribute VB_Name = "ObjectToStringWithDoublesTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -175,7 +175,7 @@ End Sub
 Public Sub ToString_WithDoubleUsingFormat_ReturnsExpected(ByVal Value As Double, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = ToString(Value, Format)
+    Actual = Object.ToString(Value, Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -183,7 +183,7 @@ End Sub
 Public Sub ToString_WithDoublesDefaultFormat_ReturnsExpected(ByVal Value As Double, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = ToString(Value)
+    Actual = Object.ToString(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -195,7 +195,7 @@ Public Sub ToString_WithDoubleNotANumber_ReturnsNaN()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = ToString(d)
+    Actual = Object.ToString(d)
     
     Assert.That Actual, Iz.EqualTo("NaN")
 End Sub
@@ -207,7 +207,7 @@ Public Sub ToString_WithDoublePositiveInfinity_ReturnsInfinity()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = ToString(d)
+    Actual = Object.ToString(d)
     
     Assert.That Actual, Iz.EqualTo("Infinity")
 End Sub
@@ -219,7 +219,7 @@ Public Sub ToString_WithDoubleNegativeInfinity_ReturnNegativeInfinity()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = ToString(d)
+    Actual = Object.ToString(d)
     
     Assert.That Actual, Iz.EqualTo("-Infinity")
 End Sub
@@ -227,7 +227,7 @@ End Sub
 Public Sub ToString_WithDoubleAndFormattingOfDecimal_Throws()
     On Error GoTo errTrap
     
-    ToString 1#, "d"
+    Object.ToString 1#, "d"
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     

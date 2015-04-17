@@ -142,7 +142,8 @@ Public Function EqualsObject(ByRef X As Object, ByRef Y As Object) As Boolean
 End Function
 
 Public Function EqualsVariants(ByRef X As Variant, ByRef Y As Variant) As Boolean
-    Dim o As IObject
+    Dim Obj As IObject
+    
     Select Case VarType(X)
         Case vbObject
             If X Is Nothing Then
@@ -150,19 +151,24 @@ Public Function EqualsVariants(ByRef X As Variant, ByRef Y As Variant) As Boolea
                     EqualsVariants = (Y Is Nothing)
                 End If
             ElseIf TypeOf X Is IObject Then
-                Set o = X
-                EqualsVariants = o.Equals(Y)
+                Set Obj = X
+                EqualsVariants = Obj.Equals(Y)
             ElseIf IsObject(Y) Then
-                If Y Is Nothing Then Exit Function
+                If Y Is Nothing Then
+                    Exit Function
+                End If
+                
                 If TypeOf Y Is IObject Then
-                    Set o = Y
-                    EqualsVariants = o.Equals(X)
+                    Set Obj = Y
+                    EqualsVariants = Obj.Equals(X)
                 Else
                     EqualsVariants = (X Is Y)
                 End If
             End If
         Case vbNull
             EqualsVariants = IsNull(Y)
+        Case vbEmpty
+            EqualsVariants = IsEmpty(Y)
         Case VarType(Y)
             EqualsVariants = (X = Y)
     End Select

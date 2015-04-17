@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "ToStringWithLongsTests"
+Attribute VB_Name = "ObjectToStringWithLongsTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -125,7 +125,7 @@ End Sub
 Public Sub ToString_WithLongsUsingFormat_ReturnsExpected(ByVal Value As Long, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = ToString(Value, Format)
+    Actual = Object.ToString(Value, Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -133,7 +133,7 @@ End Sub
 Public Sub ToString_WithLongsUsingDefaultFormat_ReturnsExpected(ByVal Value As Long, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = ToString(Value)
+    Actual = Object.ToString(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -144,7 +144,7 @@ Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected()
     Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     info.CurrencyGroupSizes = NewLongs(1, 2, 3)
     
-    Actual = ToString(12345678, "c", info)
+    Actual = Object.ToString(12345678, "c", info)
     
     Assert.That Actual, Iz.EqualTo("$12,345,67,8.00")
 End Sub
@@ -155,7 +155,7 @@ Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
     Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
     info.NumberGroupSizes = NewLongs(2, 3)
     
-    Actual = ToString(1, "n", info)
+    Actual = Object.ToString(1, "n", info)
     
     Assert.That Actual, Iz.EqualTo("1.00")
 End Sub
