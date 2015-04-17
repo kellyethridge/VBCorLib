@@ -17,10 +17,10 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
 
-Private mBuilder As DirectoryBuilder
+Private mBuilder As IOHelper
 
 Public Sub Setup()
-    Set mBuilder = New DirectoryBuilder
+    Set mBuilder = New IOHelper
 End Sub
 
 Public Sub Teardown()

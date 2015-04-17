@@ -124,6 +124,22 @@ Public Sub AssertInvalidCastException(ByVal Err As ErrObject)
     End If
 End Sub
 
+Public Sub AssertFileNotFoundException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is FileNotFoundException Then
+        WrongException "FileNotFoundException", Ex
+    End If
+End Sub
+
+Public Sub AssertIOException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is IOException Then
+        WrongException "IOException", Ex
+    End If
+End Sub
+
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
     If Not Catch(AssertExceptionThrown, Err) Then
         Assert.Fail "An exception should be thrown."

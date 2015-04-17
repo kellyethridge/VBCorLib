@@ -17,10 +17,10 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
 
-Private mBuilder As DirectoryBuilder
+Private mBuilder As IOHelper
 
 Public Sub Setup()
-    Set mBuilder = New DirectoryBuilder
+    Set mBuilder = New IOHelper
 End Sub
 
 Public Sub Teardown()
@@ -68,30 +68,54 @@ Public Sub Exists_WithParentNavigation_ReturnsExpected(ByVal FileName As String,
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-'Public Sub TestCopySourceNotFound()
-'    On Error GoTo errTrap
-'    File.Copy App.Path & "\dummy test files\notfound.txt", "\dummy test files\cannotbe.txt"
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is FileNotFoundException, "Wrong exception type caught."
-'End Sub
-'
-'Public Sub TestCopyNoOverwrite()
-'    On Error GoTo errTrap
-'    File.Copy App.Path & "\dummy test files\source.txt", App.Path & "\dummy test files\Exists.txt"
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is IOException, "Wrong exception type caught."
-'End Sub
-'
+Public Sub Copy_WithMissingFile_ThrowsFileNotFoundException()
+    Dim MissingFileName As String
+    MissingFileName = Path.Combine(mBuilder.TempFolder, "MissingFile.txt")
+    mBuilder.CreateFile
+    
+    On Error Resume Next
+    File.Copy MissingFileName, "NoFile2.txt"
+    
+    AssertFileNotFoundException Err
+End Sub
+
+Public Sub Copy_WithExistingFile_CopiesFile()
+    Dim SourceFileName  As String
+    Dim NewFileName     As String
+    SourceFileName = mBuilder.CreateFile
+    NewFileName = Path.Combine(mBuilder.TempFolder, "File (Copy).txt")
+    
+    File.Copy SourceFileName, NewFileName
+    
+    Assert.That File.Exists(NewFileName), Iz.True
+    Assert.That File.Exists(SourceFileName), Iz.True
+End Sub
+
+Public Sub Copy_WithExistingDestinationFile_ThrowsIOException()
+    Dim SourceFileName As String
+    Dim DestinationFileName As String
+    SourceFileName = mBuilder.CreateFile
+    DestinationFileName = mBuilder.CreateFile("Existing.txt")
+    
+    On Error Resume Next
+    File.Copy SourceFileName, DestinationFileName
+    
+    AssertIOException Err
+End Sub
+
+Public Sub Copy_WhenOverridingExisting_CopiesFile()
+    Dim SourceFileName  As String
+    Dim NewFileName     As String
+    SourceFileName = mBuilder.CreateFile(Data:="Copied")
+    NewFileName = mBuilder.CreateFile("Existing.txt")
+    
+    File.Copy SourceFileName, NewFileName, True
+
+    Dim Actual As String
+    Actual = Helper.ReadFile(NewFileName)
+    Assert.That Actual, Iz.EqualTo("Copied")
+End Sub
+
 'Public Sub TestCopyOverExisting()
 '    TestExists
 '
