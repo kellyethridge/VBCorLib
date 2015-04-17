@@ -78,9 +78,9 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                 Set Formattable = Value
                 ToString = Formattable.ToString(Format, Provider)
             ElseIf TypeOf Value Is IObject Then
-                Dim o As IObject
-                Set o = Value
-                ToString = o.ToString
+                Dim Obj As IObject
+                Set Obj = Value
+                ToString = Obj.ToString
             Else
                 ToString = TypeName(Value)
             End If

@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "ToStringWithSinglesTests"
+Attribute VB_Name = "ObjectToStringWithSinglesTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -116,7 +116,7 @@ End Sub
 Public Sub ToString_WithSinglesUsingFormat_ReturnsExpected(ByVal Value As Single, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = ToString(Value, Format)
+    Actual = Object.ToString(Value, Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -124,7 +124,7 @@ End Sub
 Public Sub ToString_WithSinglesUsingDefaultFormat_ReturnsExpected(ByVal Value As Single, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = ToString(Value)
+    Actual = Object.ToString(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -136,7 +136,7 @@ Public Sub ToString_WithSingleNotANumber_ReturnsNaN()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = ToString(d)
+    Actual = Object.ToString(d)
     
     Assert.That Actual, Iz.EqualTo("NaN")
 End Sub
@@ -148,7 +148,7 @@ Public Sub ToString_WithSingleAsPositiveInfinity_ReturnsInfinity()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = ToString(d)
+    Actual = Object.ToString(d)
     
     Assert.That Actual, Iz.EqualTo("Infinity")
 End Sub
@@ -160,7 +160,7 @@ Public Sub ToString_WithSingleAsNegativeInfinity_ReturnsNegativeInfinity()
     On Error GoTo 0
     
     Dim Actual As String
-    Actual = ToString(d)
+    Actual = Object.ToString(d)
     
     Assert.That Actual, Iz.EqualTo("-Infinity")
 End Sub

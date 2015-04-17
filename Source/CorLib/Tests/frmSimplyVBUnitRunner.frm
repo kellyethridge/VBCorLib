@@ -62,8 +62,18 @@ Private Sub Form_Load()
     
     Dim System As TestSuite
     Set System = Sim.NewTestSuite("System")
-    System.Add New ObjectTests
-    System.Add New ObjectBaseTests
+    
+    With Sim.NewTestSuite("Object")
+        .Add New ObjectBaseTests
+        .Add New ObjectTests
+        .Add New ObjectToStringWithDoublesTests
+        .Add New ObjectToStringWithLongsTests
+        .Add New ObjectToStringWithSinglesTests
+        .Add New ObjectToStringWithValuesTests
+        
+        System.Add .This
+    End With
+    
     System.Add New ExceptionTests
     System.Add New TestSystemException
     System.Add New TestDefaultSystemEx
@@ -85,7 +95,6 @@ Private Sub Form_Load()
     System.Add New TimeZoneTests
 
     System.Add NewSuite("Convert", New ToBase64Tests, New FromBase64Tests)
-    System.Add NewSuite("IFormattable", New ToStringWithLongsTests, New ToStringWithDoublesTests, New ToStringWithSinglesTests, New ToStringWithValuesTests)
     
     Dim cArrayTests As TestSuite
     Set cArrayTests = Sim.NewTestSuite("Array")

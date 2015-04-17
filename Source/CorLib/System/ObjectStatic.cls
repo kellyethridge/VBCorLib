@@ -96,16 +96,14 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
 End Function
 
 ''
-' Determines if the value and the object are the same instance.
+' Checks the equality of the two values.
 '
-' @param YourObject The object to compare the value against.
-' @param Value The value to compare against the object.
+' @param ObjA The object to compare the value against.
+' @param ObjB The value to compare against the object.
 ' @return Returns True if the value and the object are the same instance, False otherwise.
 '
-Public Function Equals(ByVal YourObject As Object, ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        Equals = (Value Is YourObject)
-    End If
+Public Function Equals(ByRef ObjA As Object, ByRef ObjB As Variant) As Boolean
+    Equals = EqualsVariants(ObjA, ObjB)
 End Function
 
 ''
@@ -115,15 +113,62 @@ End Function
 ' @param YourApp the App object from the calling function.
 ' @return A string representation of the object.
 '
-Public Function ToString(ByVal YourObject As Object, ByVal YourApp As Object) As String
-    If YourObject Is Nothing Then Exit Function
+Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
+    Dim ValueType As Long
+    ValueType = VarType(Value)
     
-    ToString = TypeName(YourObject)
-    If Not YourApp Is Nothing Then
-        Dim AppObject As App
-        Set AppObject = YourApp
-        ToString = AppObject.Title & "." & ToString
+    If ValueType = vbVariant Then
+        ValueType = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
     End If
+    
+    Select Case ValueType
+        Case vbLong, vbInteger, vbByte, vbDouble, vbSingle
+            Dim NumberFormatter As NumberFormatInfo
+            If Not Provider Is Nothing Then
+                Set NumberFormatter = Provider.GetFormat("numberformatinfo")
+            End If
+            
+            If NumberFormatter Is Nothing Then
+                Set NumberFormatter = NumberFormatInfo.CurrentInfo
+            End If
+            
+            ToString = NumberFormatter.Format(Value, Format)
+            
+        Case vbDate
+            Dim DateFormatter As DateTimeFormatInfo
+            If Not Provider Is Nothing Then
+                Set DateFormatter = Provider.GetFormat("datetimeformatinfo")
+            End If
+            
+            If DateFormatter Is Nothing Then
+                Set DateFormatter = DateTimeFormatInfo.CurrentInfo
+            End If
+            
+            ToString = DateFormatter.Format(Value, Format)
+            
+        Case vbObject
+            If Value Is Nothing Then
+                ToString = ""
+            ElseIf TypeOf Value Is IFormattable Then
+                Dim Formattable As IFormattable
+                Set Formattable = Value
+                ToString = Formattable.ToString(Format, Provider)
+            ElseIf TypeOf Value Is IObject Then
+                Dim Obj As IObject
+                Set Obj = Value
+                ToString = Obj.ToString
+            Else
+                ToString = TypeName(Value)
+            End If
+        Case vbEmpty
+            ToString = "Empty"
+        Case vbNull
+            ToString = "Null"
+        Case vbMissing
+            Exit Function
+        Case Else
+            ToString = Value
+    End Select
 End Function
 
 

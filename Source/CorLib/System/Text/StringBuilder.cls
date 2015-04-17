@@ -689,8 +689,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -804,7 +804,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                     ' We distinguish between a null string and an empty string.
                     ' Null string indicates that the value was not formatted.
                     If StrPtr(s) = vbNullPtr Then
-                        s = modFormattable.ToString(Args(ArgIndex), ArgFormatting, Provider)
+                        s = Object.ToString(Args(ArgIndex), ArgFormatting, Provider)
                     End If
                     
                     ' Add leading padding.

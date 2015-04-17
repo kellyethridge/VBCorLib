@@ -270,7 +270,7 @@ End Function
 ' @return A string representation of the value.
 '
 Public Function ToString(ByRef Value As Variant, Optional ByRef Provider As IFormatProvider) As String
-    ToString = modFormattable.ToString(Value, , Provider)
+    ToString = Object.ToString(Value, , Provider)
 End Function
 
 
