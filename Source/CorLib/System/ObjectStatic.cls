@@ -92,6 +92,14 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             Else
                 GetHashCode = ObjPtr(CUnk(Value))
             End If
+            
+        Case vbDecimal
+            With AsDWord(Value)
+                GetHashCode = .HiWord
+            End With
+            With MemDLong(VarPtr(Value) + 8)
+                GetHashCode = GetHashCode Xor .LoDWord Xor .HiDWord
+            End With
     End Select
 End Function
 
