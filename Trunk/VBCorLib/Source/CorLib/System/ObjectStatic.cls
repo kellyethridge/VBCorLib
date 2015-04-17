@@ -88,7 +88,7 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             If TypeOf Value Is IObject Then
                 Dim Obj As IObject
                 Set Obj = Value
-                Print appGetHashCode = Obj.GetHashCode
+                GetHashCode = Obj.GetHashCode
             Else
                 GetHashCode = ObjPtr(CUnk(Value))
             End If

@@ -615,3 +615,7 @@ End Property
 Public Property Get EqualityComparer() As IEqualityComparer
     Set EqualityComparer = modStaticClasses.EqualityComparer
 End Property
+
+Public Property Get MyBase() As ObjectBase
+    Set MyBase = modStaticClasses.MyBase
+End Property

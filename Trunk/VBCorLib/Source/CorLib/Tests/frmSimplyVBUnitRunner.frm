@@ -63,6 +63,7 @@ Private Sub Form_Load()
     Dim System As TestSuite
     Set System = Sim.NewTestSuite("System")
     System.Add New ObjectTests
+    System.Add New ObjectBaseTests
     System.Add New ExceptionTests
     System.Add New TestSystemException
     System.Add New TestDefaultSystemEx
