@@ -65,6 +65,13 @@ Public Function IsNull(ByRef s As String) As Boolean
     IsNull = (StrPtr(s) = vbNullPtr)
 End Function
 
+Public Function IsNullOrWhiteSpace(ByRef s As String) As Boolean
+    If Len(s) = 0 Then
+        IsNullOrWhiteSpace = True
+        Exit Function
+    End If
+End Function
+
 ''
 ' Returns a string from the characters in an integer array.
 '
@@ -525,7 +532,7 @@ Private Function TrimStartIndex(ByRef s As String, ByRef TrimChars() As Integer)
     Dim i   As Long
     Dim lb  As Long
     Dim ub  As Long
-    Dim ch  As Integer
+    Dim Ch  As Integer
     Dim pos As Long
     Dim l   As Long
     
@@ -536,9 +543,9 @@ Private Function TrimStartIndex(ByRef s As String, ByRef TrimChars() As Integer)
         .SA.pvData = StrPtr(s)
         .SA.cElements = Len(s)
         Do While pos < l
-            ch = .Data(pos)
+            Ch = .Data(pos)
             For i = lb To ub
-                If ch = TrimChars(i) Then Exit For
+                If Ch = TrimChars(i) Then Exit For
             Next i
             If i > ub Then Exit Do
             pos = pos + 1
@@ -556,12 +563,16 @@ Private Function SzTrimStartIndex(ByRef s As String) As Long
         .SA.pvData = StrPtr(s)
         .SA.cElements = Len(s)
         For i = 0 To .SA.cElements - 1
-            Select Case .Data(i)
-                Case &H20, &HD, &H9, &HA, &HB, &HC, &HA0, &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, &H200B, &H3000, &HFEFF
-                Case Else
-                    SzTrimStartIndex = i + 1
-                    Exit Function
-            End Select
+            If Not CharHelper.IsWhiteSpace(.Data(i)) Then
+                SzTrimStartIndex = i + 1
+                Exit Function
+            End If
+'            Select Case .Data(i)
+'                Case &H20, &HD, &H9, &HA, &HB, &HC, &HA0, &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, &H200B, &H3000, &HFEFF
+'                Case Else
+'                    SzTrimStartIndex = i + 1
+'                    Exit Function
+'            End Select
         Next i
     End With
 End Function
@@ -570,7 +581,7 @@ Private Function TrimEndIndex(ByRef s As String, ByRef TrimChars() As Integer) A
     Dim i   As Long
     Dim lb  As Long
     Dim ub  As Long
-    Dim ch  As Integer
+    Dim Ch  As Integer
     Dim pos As Long
     
     lb = LBound(TrimChars)
@@ -581,9 +592,9 @@ Private Function TrimEndIndex(ByRef s As String, ByRef TrimChars() As Integer) A
         
         pos = .SA.cElements - 1
         Do While pos >= 0
-            ch = .Data(pos)
+            Ch = .Data(pos)
             For i = lb To ub
-                If ch = TrimChars(i) Then Exit For
+                If Ch = TrimChars(i) Then Exit For
             Next i
             If i > ub Then Exit Do
             pos = pos - 1

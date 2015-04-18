@@ -26,9 +26,10 @@ Option Explicit
 
 Private mAttachedChars As SafeArray1d
 
-Public Function Char(ByRef Source As String, ByVal Index As Long) As Integer
+
+Public Function CharAt(ByRef Source As String, ByVal Index As Long) As Integer
     If LenB(Source) > 0 And Index >= 0 Then
-        Char = MemWord(StrPtr(Source) + Index * 2)
+        CharAt = MemWord(StrPtr(Source) + Index * 2)
     End If
 End Function
 

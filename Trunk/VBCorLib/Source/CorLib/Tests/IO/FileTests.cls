@@ -39,6 +39,19 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Exists_WithParentNavigation_ReturnsExpected"
             Test.Use "File.txt", False
             Test.Use "..\File.txt", True
+        
+        Case "Delete_WithInvalidPath_ThrowsArgumentException"
+            Test.Use ""
+            Test.Use "       "
+            Test.Use "c:\<\File.txt"
+            
+        Case "Copy_WithInvalidFileName_ThrowsArgumentException"
+            Test.Use "c:\file.txt", "", "DestinationFileName"
+            Test.Use "", "c:\file.txt", "SourceFileName"
+            Test.Use "    ", "c:\file.txt", "SourceFileName"
+            Test.Use "c:\file.txt", "    ", "DestinationFileName"
+            Test.Use "c:\>\file.txt", "c:\file2.txt", "SourceFileName"
+            Test.Use "c:\file.txt", "c:\<file.txt", "DestinationFileName"
             
     End Select
 End Sub
@@ -66,6 +79,14 @@ Public Sub Exists_WithParentNavigation_ReturnsExpected(ByVal FileName As String,
     Actual = File.Exists(FileName)
 
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Copy_WithInvalidFileName_ThrowsArgumentException(ByVal SourceFileName As String, ByVal DestinationFileName As String, ByVal ParamName As String)
+    On Error Resume Next
+    
+    File.Copy SourceFileName, DestinationFileName
+    
+    AssertArgumentException Err, ParamName
 End Sub
 
 Public Sub Copy_WithMissingFile_ThrowsFileNotFoundException()
@@ -116,80 +137,68 @@ Public Sub Copy_WhenOverridingExisting_CopiesFile()
     Assert.That Actual, Iz.EqualTo("Copied")
 End Sub
 
-'Public Sub TestCopyOverExisting()
-'    TestExists
-'
-'    On Error GoTo errTrap
-'    File.Copy App.Path & "\dummy test files\Source.txt", App.Path & "\dummy test files\Exists.txt", True
-'    Exit Sub
-'
-'errTrap:
-'    Assert.Fail "No exception should be thrown."
-'End Sub
-'
-'Public Sub TestCopyOverFolderNoOverwrite()
-'    On Error GoTo errTrap
-'    File.Copy App.Path & "\dummy test files\Source.txt", "c:\ATI"
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is IOException, "Wrong exception type caught."
-'End Sub
-'
-'Public Sub TestGetCreationTime()
-'    WriteLine vbCrLf & "--- VISUAL INSPECTION ---"
-'    WriteLine "TestGetCreationTime: " & File.GetCreationTime(App.Path & "\dummy test files\source.txt").ToString
-'End Sub
-'
-'Public Sub TestSetGetFileTime()
-'    Dim d As Date
-'    Dim f As String
-'
-'    f = App.Path & "\dummy test files\source.txt"
-'    d = Now
-'
-'    File.SetCreationTime f, d
-'    File.SetLastAccessTime f, d
-'    File.SetLastWriteTime f, d
-'
-'    Assert.AreEqual d, File.GetCreationTime(f).ToOADate, "Wrong Creation time."
-'    Assert.AreEqual d, File.GetLastAccessTime(f).ToOADate, "Wrong LastAccess time."
-'    Assert.AreEqual d, File.GetLastWriteTime(f).ToOADate, "Wrong LastWrite time."
-'End Sub
-'
-'Public Sub TestSetFileTimeUtc()
-'    Dim d As Date
-'    Dim f As String
-'
-'    f = App.Path & "\dummy test files\source.txt"
-'    d = Now
-'
-'    File.SetCreationTimeutc f, d
-'    File.SetLastAccessTimeutc f, d
-'    File.SetLastWriteTimeutc f, d
-'
-'    Assert.AreEqual d, File.GetCreationTimeutc(f).ToOADate, "Wrong Creation time."
-'    Assert.AreEqual d, File.GetLastAccessTimeutc(f).ToOADate, "Wrong LastAccess time."
-'    Assert.AreEqual d, File.GetLastWriteTimeutc(f).ToOADate, "Wrong LastWrite time."
-'End Sub
-'
-'Public Sub TestDelete()
-'    Dim f As String
-'
-'    f = App.Path & "\dummy test files\deleteme.txt"
-'    If Not File.Exists(f) Then
-'        Open f For Binary As #1
-'        Close #1
-'    End If
-'
-'    Assert.IsTrue File.Exists(f), "The deletable file does not exist."
-'    File.Delete f
-'    Assert.IsFalse File.Exists(f), "The deletable file should be deleted."
-'End Sub
-'
+Public Sub Copy_WithDestinationNameAsFolder_ThrowsIOException()
+    Dim SourceFileName As String
+    Dim TargetFolder As String
+    SourceFileName = mBuilder.CreateFile
+    TargetFolder = mBuilder.CreateFolder
+    
+    On Error Resume Next
+    File.Copy SourceFileName, TargetFolder
+    
+    AssertIOException Err
+End Sub
+
+Public Sub CreationTime_WhenCalled_SetsAndReturnsNewTime()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile
+    
+    File.SetCreationTime FileName, #1/1/2001 5:00:00 AM#
+    Dim Actual As Date
+    Actual = File.GetCreationTime(FileName).ToOADate
+
+    Assert.That Actual, Iz.EqualTo(#1/1/2001 5:00:00 AM#)
+End Sub
+
+Public Sub LastAccessTime_WhenCalled_SetsAndReturnsNewTime()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile
+    
+    File.SetLastAccessTime FileName, #1/1/2001 5:00:00 AM#
+    Dim Actual As Date
+    Actual = File.GetLastAccessTime(FileName).ToOADate
+
+    Assert.That Actual, Iz.EqualTo(#1/1/2001 5:00:00 AM#)
+End Sub
+
+Public Sub LastWriteTime_WhenCalled_SetsAndReturnsNewTime()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile
+    
+    File.SetLastWriteTime FileName, #1/1/2001 5:00:00 AM#
+    Dim Actual As Date
+    Actual = File.GetLastWriteTime(FileName).ToOADate
+
+    Assert.That Actual, Iz.EqualTo(#1/1/2001 5:00:00 AM#)
+End Sub
+
+Public Sub Delete_WithExistingFiled_DeletesFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile
+    
+    File.Delete FileName
+    
+    Assert.That Helper.FileExists(FileName), Iz.False
+End Sub
+
+Public Sub Delete_WithInvalidPath_ThrowsArgumentException(ByVal InvalidPath As String)
+    On Error Resume Next
+    
+    File.Delete InvalidPath
+    
+    AssertArgumentException Err, "Path"
+End Sub
+
 'Public Sub TestReadAllLines()
 '    Dim s() As String
 '

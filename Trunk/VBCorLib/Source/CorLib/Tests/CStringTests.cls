@@ -23,9 +23,23 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "FromCharArray_WithArrayOfCharacters_ReturnsExpected"
             Test.Use NewIntegers(Asc("H"), Asc("e"), Asc("l"), Asc("l"), Asc("o")), "Hello"
             Test.Use NewIntegers(), ""
+        
+        Case "IsEmptyOrWhitespace_WithValues_ReturnsExpected"
+            Test.Use "", True
+            Test.Use "a", False
+            Test.Use " ", True
+            Test.Use " a ", False
             
     End Select
 End Sub
+
+'Public Sub IsEmptyOrWhitespace_WithValues_ReturnsExpected(ByVal S As String, ByVal Expected As Boolean)
+'    Dim Actual As Boolean
+'
+'    Actual = CString.IsNullOrWhiteSpace(S)
+'
+'    Assert.That Actual, Iz.EqualTo(Expected)
+'End Sub
 
 Public Sub Format_WithOnePlaceHolder_ReturnsPlaceHolderReplacedWithParameter()
     Dim Actual As String
@@ -110,92 +124,92 @@ End Sub
 
 Public Sub TestTrimStart()
     Dim Chars() As Integer
-    Dim s As String
+    Dim S As String
     
     Chars = CString.ToCharArray("abc")
-    s = "cabhi"
-    s = CString.TrimStart(s, Chars)
-    Assert.AreEqual "hi", s
+    S = "cabhi"
+    S = CString.TrimStart(S, Chars)
+    Assert.AreEqual "hi", S
 End Sub
 
 Public Sub TestTrimStartNoTrim()
     Dim Chars(0) As Integer
-    Dim s As String
+    Dim S As String
     
     Chars(0) = 48
-    s = "hello"
-    s = CString.TrimStart(s, Chars)
-    Assert.AreEqual "hello", s
+    S = "hello"
+    S = CString.TrimStart(S, Chars)
+    Assert.AreEqual "hello", S
 End Sub
 
 Public Sub TestTrimStartAllTrimmed()
     Dim Chars(0) As Integer
-    Dim s As String
+    Dim S As String
     
     Chars(0) = 48
-    s = "00000"
-    s = CString.TrimStart(s, Chars)
-    Assert.AreEqual "", s
+    S = "00000"
+    S = CString.TrimStart(S, Chars)
+    Assert.AreEqual "", S
 End Sub
 
 Public Sub TestTrimEnd()
     Dim Chars() As Integer
-    Dim s As String
+    Dim S As String
     
     Chars = CString.ToCharArray("abc")
-    s = "hicab"
-    s = CString.TrimEnd(s, Chars)
-    Assert.AreEqual "hi", s
+    S = "hicab"
+    S = CString.TrimEnd(S, Chars)
+    Assert.AreEqual "hi", S
 End Sub
 
 Public Sub TestTrimEndNoTrim()
     Dim Chars(0) As Integer
-    Dim s As String
+    Dim S As String
     
     Chars(0) = 48
-    s = "hello"
-    s = CString.TrimEnd(s, Chars)
-    Assert.AreEqual "hello", s
+    S = "hello"
+    S = CString.TrimEnd(S, Chars)
+    Assert.AreEqual "hello", S
 End Sub
 
 Public Sub TestTrimEndAllTrimmed()
     Dim Chars(0) As Integer
-    Dim s As String
+    Dim S As String
     
     Chars(0) = 48
-    s = "00000"
-    s = CString.TrimEnd(s, Chars)
-    Assert.AreEqual "", s
+    S = "00000"
+    S = CString.TrimEnd(S, Chars)
+    Assert.AreEqual "", S
 End Sub
 
 Public Sub TestTrim()
-    Dim s As String
+    Dim S As String
     
-    s = "*;|@123***456@|;*"
-    s = CString.Trim(s, "*;|@")
-    Assert.AreEqual "123***456", s
+    S = "*;|@123***456@|;*"
+    S = CString.Trim(S, "*;|@")
+    Assert.AreEqual "123***456", S
 End Sub
 
 Public Sub TestTrimWhiteSpace()
-    Dim s As String
+    Dim S As String
     
-    s = vbCr & vbCr & " hi " & vbLf & vbLf
-    s = CString.Trim(s)
-    Assert.AreEqual "hi", s
+    S = vbCr & vbCr & " hi " & vbLf & vbLf
+    S = CString.Trim(S)
+    Assert.AreEqual "hi", S
 End Sub
 
 Public Sub TestTrimSpaces()
-    Dim s As String
+    Dim S As String
     
-    s = "     "
-    s = CString.Trim(s)
-    Assert.AreEqual "", s
+    S = "     "
+    S = CString.Trim(S)
+    Assert.AreEqual "", S
 End Sub
 
 Public Sub TestTrimEmptyString()
-    Dim s As String
-    s = CString.Trim(s)
-    Assert.AreEqual "", s
+    Dim S As String
+    S = CString.Trim(S)
+    Assert.AreEqual "", S
 End Sub
 
 Public Sub TestJoinAll()
@@ -237,24 +251,24 @@ Public Sub TestJoinVariants()
 End Sub
 
 Public Sub TestRemove()
-    Dim s As String
+    Dim S As String
     
-    s = "1234567890"
-    Assert.AreEqual "1234890", CString.Remove(s, 4, 3)
+    S = "1234567890"
+    Assert.AreEqual "1234890", CString.Remove(S, 4, 3)
 End Sub
 
 Public Sub TestRemoveBeginning()
-    Dim s As String
+    Dim S As String
     
-    s = "1234567890"
-    Assert.AreEqual "890", CString.Remove(s, 0, 7)
+    S = "1234567890"
+    Assert.AreEqual "890", CString.Remove(S, 0, 7)
 End Sub
 
 Public Sub TestRemoveEnd()
-    Dim s As String
+    Dim S As String
     
-    s = "1234567890"
-    Assert.AreEqual "123", CString.Remove(s, 3, 7)
+    S = "1234567890"
+    Assert.AreEqual "123", CString.Remove(S, 3, 7)
 End Sub
 
 Public Sub TestIndexOfAnyString()
@@ -323,13 +337,13 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AssertJoin(ByVal expectedvalue As String, Optional ByVal Delimiter As Variant, Optional ByVal Index As Variant, Optional ByVal Count As Variant)
-    Dim s(-1 To 1) As String
+    Dim S(-1 To 1) As String
     
-    s(-1) = "one"
-    s(0) = "two"
-    s(1) = "three"
+    S(-1) = "one"
+    S(0) = "two"
+    S(1) = "three"
     
-    Assert.AreEqual expectedvalue, CString.Join(s, Delimiter, Index, Count)
+    Assert.AreEqual expectedvalue, CString.Join(S, Delimiter, Index, Count)
 End Sub
 
 
