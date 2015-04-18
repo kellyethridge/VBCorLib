@@ -62,6 +62,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use ""
             Test.Use """"
             Test.Use "  "
+            
+        Case "WriteAllLines_WithLines_WritesToFile"
+            Test.Use NewStrings()
+            Test.Use NewStrings("a", "1", "2", "b")
+            Test.Use NewArrayList(Source:=Array("1", "2", "3", "a", "b", "c"))
+            Test.Use NewCollection("1", "2")
+            
     End Select
 End Sub
 
@@ -256,6 +263,14 @@ Public Sub ReadAllBytes_WithDataInFile_ReturnsBytes()
     Assert.That Actual, Iz.EqualTo(NewBytes(49, 13, 10, 50, 13, 10, 51))
 End Sub
 
+Public Sub ReadAllBytes_WithEmptyPath_ThrowsArgumentException()
+    On Error Resume Next
+    
+    File.ReadAllBytes ""
+    
+    AssertArgumentException Err
+End Sub
+
 Public Sub ReadAllText_WithEmptyFile_ReturnsEmptyString()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="")
@@ -267,8 +282,8 @@ Public Sub ReadAllText_WithEmptyFile_ReturnsEmptyString()
 End Sub
 
 Public Sub ReadAllText_WithDataInFile_ReturnsDataInString()
-    Const Data As String = "1" & vbCrLf & "2" & vbCrLf & "3"
-    Dim FileName As String
+    Const Data      As String = "1" & vbCrLf & "2" & vbCrLf & "3"
+    Dim FileName    As String
     FileName = mBuilder.CreateFile(Data:=Data)
     
     Dim Actual As String
@@ -276,3 +291,69 @@ Public Sub ReadAllText_WithDataInFile_ReturnsDataInString()
     
     Assert.That Actual, Iz.EqualTo(Data)
 End Sub
+
+Public Sub WriteAllBytes_WithEmptyData_CreatesEmptyFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="")
+    
+    File.WriteAllbytes FileName, NewBytes()
+    
+    Dim Actual() As Byte
+    Actual = File.ReadAllBytes(FileName)
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub WriteAllBytes_WithData_WritesToFile()
+    Dim FileName    As String
+    Dim Data()      As Byte
+    Data = NewBytes(1, 2, 3, 4, 5)
+    FileName = mBuilder.CreateFile(Data:="Overwrite me")
+    
+    File.WriteAllbytes FileName, Data
+    
+    Dim Actual() As Byte
+    Actual = File.ReadAllBytes(FileName)
+    Assert.That Actual, Iz.EqualTo(Data)
+End Sub
+
+Public Sub WriteAllLines_WithLines_WritesToFile(ByVal Contents As Variant)
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="")
+    
+    File.WriteAllLines FileName, Contents
+    
+    Dim Actual() As String
+    Actual = File.ReadAllLines(FileName)
+    Assert.That Actual, Iz.EqualTo(Contents).AsCollection
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -353,7 +353,7 @@ End Sub
 ' @param CreationTime A Date or cDateTime object of the new time.
 '
 Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    Call InternalSetFileTime(Path, cDateTime.GetcDateTime(CreationTime).ToFileTime)
+    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTime
 End Sub
 
 ''
@@ -363,7 +363,7 @@ End Sub
 ' @param CreationTime A Date or cDateTime object of the new time.
 '
 Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    Call InternalSetFileTime(Path, cDateTime.GetcDateTime(CreationTime).ToFileTimeUtc)
+    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -373,7 +373,7 @@ End Sub
 ' @param LastAccessTime A Date or cDateTime object of the new time.
 '
 Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    Call InternalSetFileTime(Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTime)
+    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTime
 End Sub
 
 ''
@@ -383,7 +383,7 @@ End Sub
 ' @param LastAccessTime A Date or cDateTime object of the new time.
 '
 Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    Call InternalSetFileTime(Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc)
+    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -392,8 +392,8 @@ End Sub
 ' @param sPath The file to set the last written time for.
 ' @param LastWriteTime A Date or cDateTime object of the new time.
 '
-Public Sub SetLastWriteTime(ByVal sPath As String, ByVal LastWriteTime As Variant)
-    Call InternalSetFileTime(sPath, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTime)
+Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
+    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTime
 End Sub
 
 ''
@@ -402,8 +402,8 @@ End Sub
 ' @param sPath The file to set the last written time for.
 ' @param LastWriteTime A Date or cDateTime object of the new time.
 '
-Public Sub SetLastWriteTimeUtc(ByVal sPath As String, ByVal LastWriteTime As Variant)
-    Call InternalSetFileTime(sPath, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc)
+Public Sub SetLastWriteTimeUtc(ByVal Path As String, ByVal LastWriteTime As Variant)
+    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -414,11 +414,9 @@ End Sub
 ' @return A string containing the contents of the file.
 '
 Public Function ReadAllText(ByVal Path As String, Optional ByVal Encoding As Encoding) As String
-    Dim sr As StreamReader
-    
-    Set sr = Cor.NewStreamReader(Path, Encoding)
-    ReadAllText = sr.ReadToEnd
-    Call sr.CloseReader
+    With Cor.NewStreamReader(Path, Encoding)
+        ReadAllText = .ReadToEnd
+    End With
 End Function
 
 ''
@@ -427,22 +425,25 @@ End Function
 ' @param Path The path and filename to read into the byte array.
 ' @return A byte array containing the contents of the file.
 '
-Public Function ReadAllBytes(ByVal Path As String) As Byte()
-    Dim fs      As FileStream
-    Dim Ret()   As Byte
+Public Function ReadAllBytes(ByRef Path As String) As Byte()
+    Const MaxLength As Long = &H7FFFFFFF
+    Dim Bytes() As Byte
+    Dim Length  As Long
+        
+    With Cor.NewFileStream(Path, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadWriteShare)
+        Length = .Length
+        If Length > MaxLength Then _
+            Throw Cor.NewIOException(Environment.GetResourceString(ResourceString.IOException_FileTooLong2GB))
+            
+        If Length > 0 Then
+            ReDim Bytes(0 To Length - 1)
+            .ReadBlock Bytes, 0, Length
+        Else
+            Bytes = Cor.NewBytes()
+        End If
+    End With
     
-    Set fs = Cor.NewFileStream(Path, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadWriteShare)
-    
-    Dim Length As Long
-    Length = fs.Length
-    If Length > 0 Then
-        ReDim Ret(0 To Length - 1)
-        Call fs.ReadBlock(Ret, 0, Length)
-    Else
-        Ret = Cor.NewBytes()
-    End If
-    Call fs.CloseStream
-    ReadAllBytes = Ret
+    ReadAllBytes = Bytes
 End Function
 
 ''
@@ -455,24 +456,35 @@ End Function
 ' or a Return-LineFeed combination have been encountered.
 '
 Public Function ReadAllLines(ByVal Path As String, Optional ByVal Encoding As Encoding) As String()
-    Dim Lines   As New ArrayList
-    Dim Line    As String
+    Dim Lines() As String
+    Dim Index   As Long
     
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
+    ReDim Lines(0 To 15)
     With Cor.NewStreamReader(Path, Encoding)
         Do
-            Line = .ReadLine
-            If StrPtr(Line) = vbNullPtr Then
+            If Index > UBound(Lines) Then
+                ReDim Preserve Lines(0 To Index * 2)
+            End If
+            
+            Lines(Index) = .ReadLine
+            If StrPtr(Lines(Index)) = vbNullPtr Then
                 Exit Do
             End If
             
-            Lines.Add Line
+            Index = Index + 1
         Loop
     End With
     
-    ReadAllLines = Lines.ToArray(vbString)
+    If Index > 0 Then
+        ReDim Preserve Lines(0 To Index - 1)
+    Else
+        Lines = Cor.NewStrings()
+    End If
+    
+    ReadAllLines = Lines
 End Function
 
 ''
@@ -519,18 +531,26 @@ End Sub
 ' @remarks If the file doesn't exist it will be created. If the file already
 ' exists, it will be overwritten.
 '
-Public Sub WriteAllLines(ByVal Path As String, ByRef Contents() As String, Optional ByVal Encoding As Encoding)
-    If cArray.IsNull(Contents) Then _
-        Throw Cor.NewArgumentNullException("Contents", Environment.GetResourceString(ArgumentNull_Array))
+Public Sub WriteAllLines(ByVal Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
+'    If cArray.IsNull(Contents) Then _
+'        Throw Cor.NewArgumentNullException("Contents", Environment.GetResourceString(ArgumentNull_Array))
     
-    Dim sw As StreamWriter
-    Set sw = Cor.NewStreamWriter(Path, Encoding)
     
-    Dim i As Long
-    For i = LBound(Contents) To UBound(Contents)
-        Call sw.WriteLine(Contents(i))
-    Next i
-    Call sw.CloseWriter
+'    Dim sw As StreamWriter
+'    Set sw = Cor.NewStreamWriter(Path, Encoding)
+'
+'    Dim i As Long
+'    For i = LBound(Contents) To UBound(Contents)
+'        Call sw.WriteLine(Contents(i))
+'    Next i
+'    Call sw.CloseWriter
+    With Cor.NewStreamWriter(Path, Encoding)
+        Dim Line As Variant
+        
+        For Each Line In Contents
+            .WriteLine Line
+        Next
+    End With
 End Sub
 
 
@@ -567,29 +587,41 @@ Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_F
     End With
 End Function
 
-Private Sub InternalSetFileTime(ByRef sPath As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)
-    Dim cnt As Long
-    Dim lat As Long
-    Dim lwt As Long
+Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)
+    Dim CreationTimePtr As Long
+    Dim LastAccessTimePtr As Long
+    Dim LastWriteTimePtr As Long
     
-    If Not IsMissing(CreationTime) Then cnt = VarPtr(CreationTime) + 8
-    If Not IsMissing(LastAccessTime) Then lat = VarPtr(LastAccessTime) + 8
-    If Not IsMissing(LastWriteTime) Then lwt = VarPtr(LastWriteTime) + 8
+    If Not IsMissing(CreationTime) Then
+        CreationTimePtr = VarPtr(CreationTime) + 8
+    End If
     
-    If Len(sPath) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
-    Call Path.VerifyPath(sPath)
+    If Not IsMissing(LastAccessTime) Then
+        LastAccessTimePtr = VarPtr(LastAccessTime) + 8
+    End If
+    
+    If Not IsMissing(LastWriteTime) Then
+        LastWriteTimePtr = VarPtr(LastWriteTime) + 8
+    End If
+    
+    If Len(Path) = 0 Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
+        
+    VBCorLib.Path.CheckValidPath Path
     
     Dim FileHandle As Long
-    FileHandle = API.CreateFile(sPath, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_ATTRIBUTE_NORMAL, 0)
-    If FileHandle = INVALID_HANDLE Then IOError Err.LastDllError, sPath
-    If SetFileTime(FileHandle, ByVal cnt, ByVal lat, ByVal lwt) = BOOL_FALSE Then
+    FileHandle = API.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_ATTRIBUTE_NORMAL, 0)
+    If FileHandle = INVALID_HANDLE Then _
+        IOError Err.LastDllError, Path
+        
+    If SetFileTime(FileHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr) = BOOL_FALSE Then
         Dim e As Long
         e = Err.LastDllError
-        Call CloseHandle(FileHandle)
-        IOError e, sPath
+        CloseHandle FileHandle
+        IOError e, Path
     End If
-    Call CloseHandle(FileHandle)
+    
+    CloseHandle FileHandle
 End Sub
 
 Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA)

@@ -779,7 +779,7 @@ End Function
 '
 Public Function NewStreamReader(ByVal Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal determineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 4096) As StreamReader
     Set NewStreamReader = New StreamReader
-    Call NewStreamReader.Init(Source, Encoding, determineEncodingFromByteOrderMarks, BufferSize)
+    NewStreamReader.Init Source, Encoding, determineEncodingFromByteOrderMarks, BufferSize
 End Function
 
 ''
@@ -1767,3 +1767,14 @@ Public Function NewGuid(ByRef Value As Variant) As Guid
     Set NewGuid = New Guid
     NewGuid.Init Value
 End Function
+
+Friend Function NewSafeFindFileHandle(ByVal FileHandle As Long) As SafeFindFileHandle
+    Set NewSafeFindFileHandle = New SafeFindFileHandle
+    NewSafeFindFileHandle.Init FileHandle
+End Function
+
+Friend Function NewSafeFileHandle(ByVal FileHandle As Long) As SafeFileHandle
+    Set NewSafeFileHandle = New SafeFileHandle
+    NewSafeFileHandle.Init FileHandle
+End Function
+
