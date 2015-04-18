@@ -217,6 +217,7 @@ Module=CollectionsTests; Tests\Collections\CollectionsTests.bas
 Class=ObjectBaseTests; Tests\ObjectBaseTests.cls
 Class=ObjectTests; Tests\ObjectTests.cls
 ResFile32="VBCorLib.Tests.RES"
+Class=CharTests; Tests\CharTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

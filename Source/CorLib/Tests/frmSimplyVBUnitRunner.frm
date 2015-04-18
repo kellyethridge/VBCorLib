@@ -84,6 +84,7 @@ Private Sub Form_Load()
     System.Add New TestInvalidCastException
     System.Add New TestDefInvalidCast
     System.Add New CStringTests
+    System.Add New CharTests
     System.Add New BufferTests
     System.Add New TestVersion
     System.Add New TestRandom

@@ -148,13 +148,16 @@ End Function
 '
 Public Sub Delete(ByVal Path As String)
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
-    Call VBCorLib.Path.VerifyPath(Path)
+    VBCorLib.Path.VerifyPath Path
+    
     If API.DeleteFile(Path) = BOOL_FALSE Then
         Dim Result As Long
         Result = Err.LastDllError
-        If Result <> ERROR_FILE_NOT_FOUND Then IOError Result, Path
+        If Result <> ERROR_FILE_NOT_FOUND Then
+            IOError Result, Path
+        End If
     End If
 End Sub
 
@@ -202,7 +205,7 @@ End Function
 '
 Public Function GetCreationTime(ByVal Path As String) As cDateTime
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
-    Call FillFileData(Path, Data)
+    FillFileData Path, Data
     Set GetCreationTime = cDateTime.FromFileTime(Data.ftCreationTime)
 End Function
 
@@ -594,7 +597,7 @@ End Sub
 
 Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA)
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
+        Error.Argument Argument_EmptyPath, "Path"
     
     Dim e As Long
     e = GetFileData(Path, Data)

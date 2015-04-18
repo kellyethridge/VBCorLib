@@ -89,4 +89,6 @@ Public Thread                   As New ThreadStatic
 Public StringBuilders           As New StringBuilderCache
 Public EqualityComparer         As New EqualityComparerStatic
 Public MyBase                   As New ObjectBase
+Public Char                     As New Char
+
 

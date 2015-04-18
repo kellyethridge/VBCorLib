@@ -496,7 +496,7 @@ Private Sub VerifySearchPattern(ByRef Pattern As String)
         If i = Len(Pattern) - 1 Then _
             Throw Cor.NewArgumentException("Cannot end search pattern with '..'")
             
-        Select Case Char(Pattern, i + 2)
+        Select Case CharAt(Pattern, i + 2)
             Case mDirectorySeparatorChar, mAltDirectorySeparatorChar
                 Throw Cor.NewArgumentException("'..' cannot be followed immediately by a directory separator.")
         End Select

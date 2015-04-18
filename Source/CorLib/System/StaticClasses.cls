@@ -619,3 +619,7 @@ End Property
 Public Property Get MyBase() As ObjectBase
     Set MyBase = modStaticClasses.MyBase
 End Property
+
+Public Property Get Char() As Char
+    Set Char = modStaticClasses.Char
+End Property
