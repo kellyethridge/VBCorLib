@@ -152,8 +152,18 @@ Public Sub Setup()
     ChDir "c:\windows"
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     ChDir mOriginalDir
+End Sub
+
+Public Sub GetInvalidPathChars_WhenCalled_ReturnsArrayOfChars()
+    Dim Actual() As Integer
+    
+    Actual = Path.GetInvalidPathChars
+    
+    Dim Expected() As Integer
+    Expected = NewIntegers(34, Asc("<"), Asc(">"), Asc("|"), 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31)
+    Assert.That Actual, Iz.EquivalentTo(Expected)
 End Sub
 
 Public Sub ChangeExtension_WithValue_ReturnsExpected(ByVal PathToChange As String, ByVal NewExtension As String, ByVal Expected As String)

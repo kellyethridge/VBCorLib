@@ -470,6 +470,10 @@ Private Sub Class_Initialize()
     Set mDecoder = mEncoding.GetDecoder
 End Sub
 
+Private Sub Class_Terminate()
+    CloseReader
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IObject Interface
@@ -478,8 +482,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

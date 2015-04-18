@@ -53,6 +53,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "c:\>\file.txt", "c:\file2.txt", "SourceFileName"
             Test.Use "c:\file.txt", "c:\<file.txt", "DestinationFileName"
             
+        Case "ReadAllLines_WithLinesContainingDifferentLineSeparators_ReturnsArrayOfLines"
+            Test.Use "1" & vbCrLf & "2" & vbCrLf & "3"
+            Test.Use "1" & vbCr & "2" & vbCr & "3"
+            Test.Use "1" & vbLf & "2" & vbLf & "3"
+            
+        Case "ReadAllLines_WithInvalidPath_ThrowsArgumentException"
+            Test.Use ""
+            Test.Use """"
+            Test.Use "  "
     End Select
 End Sub
 
@@ -199,34 +208,71 @@ Public Sub Delete_WithInvalidPath_ThrowsArgumentException(ByVal InvalidPath As S
     AssertArgumentException Err, "Path"
 End Sub
 
-'Public Sub TestReadAllLines()
-'    Dim s() As String
-'
-'    s = File.ReadAllLines(Path.Combine(App.Path, "Dummy Test Files\HebrewCalendar_IsLeapYear.txt"))
-'    Assert.AreEqual 100, cArray.GetLength(s), "Should contain 100 lines."
-'    Assert.AreEqual "False", s(UBound(s))
-'End Sub
-'
-'Public Sub TestReadAllBytes()
-'    Dim b() As Byte
-'
-'    b = File.ReadAllBytes(Path.Combine(App.Path, "Dummy Test Files\100bytes.txt"))
-'    Assert.AreEqual 100, cArray.GetLength(b), "Should contain 100 bytes."
-'    Assert.AreEqual 48, b(99), "Last byte should be 48 '0'."
-'End Sub
-'
-'Public Sub TestWriteAllLines()
-'    Dim s() As String
-'
-'    s = NewStrings("One", "Two", "Three", "Four", "", "Six", "")
-'    File.WriteAllLines Path.Combine(App.Path, "Dummy Test Files\TestWriteAllLines.txt"), s
-'
-'    Erase s
-'    s = File.ReadAllLines(Path.Combine(App.Path, "Dummy Test Files\TestWriteAllLines.txt"))
-'    Assert.AreEqual 7, cArray.GetLength(s)
-'    Assert.AreEqual "Four", s(3)
-'    Assert.AreEqual "", s(4)
-'    Assert.AreEqual "Six", s(5)
-'    Assert.AreEqual "", s(6)
-'End Sub
+Public Sub ReadAllLines_WithInvalidPath_ThrowsArgumentException(ByVal Path As String)
+    On Error Resume Next
+    
+    File.ReadAllLines Path
+    
+    AssertArgumentException Err
+End Sub
 
+Public Sub ReadAllLines_WithEmptyFile_ReturnsEmptyArray()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="")
+    
+    Dim Actual() As String
+    Actual = File.ReadAllLines(FileName)
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub ReadAllLines_WithLinesContainingDifferentLineSeparators_ReturnsArrayOfLines(ByVal Lines As String)
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:=Lines)
+    
+    Dim Actual() As String
+    Actual = File.ReadAllLines(FileName)
+    
+    Assert.That Actual, Iz.EqualTo(Array("1", "2", "3"))
+End Sub
+
+Public Sub ReadAllBytes_WithEmptyFile_ReturnsEmptyArray()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="")
+    
+    Dim Actual() As Byte
+    Actual = File.ReadAllBytes(FileName)
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub ReadAllBytes_WithDataInFile_ReturnsBytes()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="1" & vbCrLf & "2" & vbCrLf & "3")
+    
+    Dim Actual() As Byte
+    Actual = File.ReadAllBytes(FileName)
+    
+    Assert.That Actual, Iz.EqualTo(NewBytes(49, 13, 10, 50, 13, 10, 51))
+End Sub
+
+Public Sub ReadAllText_WithEmptyFile_ReturnsEmptyString()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="")
+    
+    Dim Actual As String
+    Actual = File.ReadAllText(FileName)
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub ReadAllText_WithDataInFile_ReturnsDataInString()
+    Const Data As String = "1" & vbCrLf & "2" & vbCrLf & "3"
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:=Data)
+    
+    Dim Actual As String
+    Actual = File.ReadAllText(FileName)
+    
+    Assert.That Actual, Iz.EqualTo(Data)
+End Sub
