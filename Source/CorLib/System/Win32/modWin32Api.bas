@@ -85,7 +85,3 @@ Public Sub InitWin32Api()
     End If
 End Sub
 
-Public Function NewSafeFindFileHandle(ByVal FileHandle As Long) As SafeFindFileHandle
-    Set NewSafeFindFileHandle = New SafeFindFileHandle
-    NewSafeFindFileHandle.Init FileHandle
-End Function

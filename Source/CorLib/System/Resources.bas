@@ -33,6 +33,7 @@ Public Enum ResourceString
     Rank_MultiDimNotSupported = 200
     IOException_Exception = 400
     IOException_DirectoryExists = 401
+    IOException_FileTooLong2GB = 402
     FileNotFound_Exception = 500
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601

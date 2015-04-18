@@ -27,8 +27,11 @@ Option Explicit
 Public Function IsWhiteSpace(ByVal Character As Integer) As Boolean
     Select Case Character
         Case &H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, _
-             &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, &H2028, &H2029, &H202F, &H205F, _
+             &H2000 To &H200A, _
+             &H2028, &H2029, &H202F, &H205F, _
              &H3000
             IsWhiteSpace = True
     End Select
 End Function
+
+

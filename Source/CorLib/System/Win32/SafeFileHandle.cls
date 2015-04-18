@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "SafeFindFileHandle"
+Attribute VB_Name = "SafeFileHandle"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -32,7 +32,7 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: SafeFindFileHandle
+' Module: SafeFileHandle
 '
 Option Explicit
 Implements ISafeHandle
@@ -51,7 +51,7 @@ End Property
 
 Public Sub CloseHandle()
     If Not mIsClosed Then
-        FindClose mFileHandle
+        VBCorType.CloseHandle mFileHandle
         mIsClosed = True
     End If
 End Sub
@@ -99,3 +99,4 @@ End Property
 Private Property Get ISafeHandle_This() As VBCorType.ISafeHandle
     Set ISafeHandle_This = Me
 End Property
+

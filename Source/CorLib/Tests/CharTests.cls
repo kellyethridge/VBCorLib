@@ -75,7 +75,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use ChrW$(&H85), True
             Test.Use ChrW$(&HA0), True
             Test.Use ChrW$(65), False
-            Test.Use "", False
             
         Case "IsWhiteSpace_WithStringIndex_ReturnsExpected"
             Test.Use 0, True
@@ -87,21 +86,43 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Sub IsWhiteSpace_WithValue_ReturnsExpected(ByRef Ch As Variant, ByVal Expected As Boolean)
+Public Sub IsWhiteSpace_WithValue_ReturnsExpected(ByRef ch As Variant, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsWhiteSpace(Ch)
+    Actual = Char.IsWhiteSpace(ch)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub IsWhiteSpace_WithStringIndex_ReturnsExpected(ByVal Index As Long, ByVal Expected As Boolean)
-    Const S As String = " a b "
+    Const s As String = " a b "
     Dim Actual As Boolean
     
-    Actual = Char.IsWhiteSpace(S, Index)
+    Actual = Char.IsWhiteSpace(s, Index)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub IsWhiteSpace_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.IsWhiteSpace "a", -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
 
+Public Sub IsWhiteSpace_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
+    On Error Resume Next
+    
+    Char.IsWhiteSpace "a", 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub IsWhiteSpace_WithNonStringOrChar_ThrowsArgumentException()
+    On Error Resume Next
+    
+    Char.IsWhiteSpace CLng(1)
+    
+    AssertArgumentException Err
+End Sub

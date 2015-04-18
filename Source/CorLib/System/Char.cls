@@ -44,27 +44,27 @@ Option Explicit
 ' This parameter is ignored if a non-string character is passed in.
 ' @return If the character is considered white space then True is returned, otherwise False is returned.
 '
-Public Function IsWhiteSpace(ByRef Character As Variant, Optional ByVal Index As Variant) As Boolean
-    Select Case VarType(Character)
+Public Function IsWhiteSpace(ByRef CharOrString As Variant, Optional ByVal Index As Variant) As Boolean
+    Select Case VarType(CharOrString)
         Case vbInteger
-            IsWhiteSpace = CharHelper.IsWhiteSpace(Character)
+            IsWhiteSpace = CharHelper.IsWhiteSpace(CharOrString)
         Case vbString
-            IsWhiteSpace = IsWhiteSpaceString(Character, Index)
+            IsWhiteSpace = IsWhiteSpaceString(CharOrString, Index)
+        Case Else
+            Error.Argument Argument_InvalidValueType, "String or Integer"
     End Select
 End Function
 
-Private Function IsWhiteSpaceString(ByRef Source As Variant, ByRef Index As Variant) As Boolean
+Private Function IsWhiteSpaceString(ByRef s As Variant, ByRef Index As Variant) As Boolean
     Dim CharIndex As Long
     CharIndex = GetOptionalLong(Index, 0)
     
-    If CharIndex < 0 Then _
-        Error.NegativeNumber "Index"
+    If CharIndex < 0 Or CharIndex >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
     
-    If LenB(Source) > 0 Then
-        Dim Ptr As Long
-        Ptr = StrPtr(Source) + CharIndex * 2
-        IsWhiteSpaceString = CharHelper.IsWhiteSpace(MemWord(Ptr))
-    End If
+    Dim Ptr As Long
+    Ptr = StrPtr(s) + CharIndex * 2
+    IsWhiteSpaceString = CharHelper.IsWhiteSpace(MemWord(Ptr))
 End Function
 
 
