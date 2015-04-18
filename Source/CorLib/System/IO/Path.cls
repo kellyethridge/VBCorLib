@@ -112,15 +112,6 @@ Public Property Get DirectorySeparatorString() As String
 End Property
 
 ''
-' Returns an array of characters that are invalid in a Windows path string.
-'
-' @return An Integer array representing the character code of the the invalid characters.
-'
-Public Property Get InvalidPathChars() As Integer()
-    InvalidPathChars = mInvalidPathChars
-End Property
-
-''
 ' The character code used to separate strings in an environment variable.
 '
 ' @return The environment variable string separator character code (59).
@@ -386,17 +377,17 @@ Public Function GetFullPath(ByVal Path As String) As String
         
     FixupPath Path
     
-    Dim ptr As Long
-    ptr = StrPtr(Path)
+    Dim Ptr As Long
+    Ptr = StrPtr(Path)
     
     ' quickly check the first two charcters for possible UNC path.
     ' convert first two characters into a long.
-    If MemLong(ptr) = DoubleBackSlash Then
+    If MemLong(Ptr) = DoubleBackSlash Then
         VerifyUNCPathFormat Path
     End If
     
     ' convert first two characters into two integers.
-    With MemDWord(ptr)
+    With MemDWord(Ptr)
         If .LoWord = vbVolumeSeparatorChar Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
 
@@ -538,7 +529,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Friend
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean = False)
     If Len(Path) > MAX_PATH Then _
@@ -549,7 +540,7 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
     Dim i As Long
     For i = 0 To Len(Path) - 1
         Select Case mBuffer.Data(i)
-            Case &H22, &H3C, &H3E, &H7C, Is < 32
+            Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
                 Error.Argument Argument_InvalidCharsInPath, "Path"
                 
             Case vbAltDirectorySeparatorChar
@@ -557,8 +548,29 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
                     mBuffer.Data(i) = vbDirectorySeparatorChar
                 End If
         End Select
-    Next i
+    Next
 End Sub
+
+Friend Sub CheckValidPath(ByRef Path As String)
+    If HasIllegalCharacters(Path) Then
+        Error.Argument Argument_InvalidCharsInPath
+    End If
+End Sub
+
+Friend Function HasIllegalCharacters(ByRef Path As String) As Boolean
+    mBuffer.SA.pvData = StrPtr(Path)
+    
+    Dim i As Long
+    For i = 0 To Len(Path) - 1
+        Select Case mBuffer.Data(i)
+            Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
+                HasIllegalCharacters = True
+                Exit For
+        End Select
+    Next
+    
+    mBuffer.SA.pvData = vbNullPtr
+End Function
 
 Friend Sub FixupPath(ByRef Path As String)
     VerifyPath Path, True
@@ -648,13 +660,13 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
     Dim foundShare      As Boolean
     Dim foundSeparator  As Boolean
 
-    Dim ch As Integer
+    Dim Ch As Integer
 
     mBuffer.SA.pvData = StrPtr(Path)
     pos = 2
-    ch = mBuffer.Data(pos)
-    Do While ch <> 0
-        Select Case ch
+    Ch = mBuffer.Data(pos)
+    Do While Ch <> 0
+        Select Case Ch
             Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar
                 foundSeparator = True
             Case Else
@@ -666,7 +678,7 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
                 End If
         End Select
         pos = pos + 1
-        ch = mBuffer.Data(pos)
+        Ch = mBuffer.Data(pos)
     Loop
 
     If (Not foundServer) Or (Not foundShare) Then _

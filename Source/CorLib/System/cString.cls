@@ -65,11 +65,13 @@ Public Function IsNull(ByRef s As String) As Boolean
     IsNull = (StrPtr(s) = vbNullPtr)
 End Function
 
-Public Function IsNullOrWhiteSpace(ByRef s As String) As Boolean
+Public Function IsEmptyOrWhiteSpace(ByRef s As String) As Boolean
     If Len(s) = 0 Then
-        IsNullOrWhiteSpace = True
+        IsEmptyOrWhiteSpace = True
         Exit Function
     End If
+    
+    
 End Function
 
 ''

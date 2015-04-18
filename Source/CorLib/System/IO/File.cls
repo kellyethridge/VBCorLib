@@ -91,13 +91,14 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
     DestinationFileName = cString.Trim(DestinationFileName)
     
     If Len(SourceFileName) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyFileName), "SourceFileName")
+        Error.Argument Argument_EmptyFileName, "SourceFileName"
     If Len(DestinationFileName) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyFileName), "DestinationFileName")
-    
-    Call Path.VerifyPath(SourceFileName)
-    Call Path.VerifyPath(DestinationFileName)
-    
+        Error.Argument Argument_EmptyFileName, "DestinationFileName"
+    If Path.HasIllegalCharacters(SourceFileName) Then _
+        Error.Argument Argument_InvalidCharsInPath, "SourceFileName"
+    If Path.HasIllegalCharacters(DestinationFileName) Then _
+        Error.Argument Argument_InvalidCharsInPath, "DestinationFileName"
+        
     SourceFileName = Path.GetFullPath(cString.TrimEnd(SourceFileName, mDirectorySeparators))
     DestinationFileName = Path.GetFullPath(cString.TrimEnd(DestinationFileName, mDirectorySeparators))
     
@@ -150,7 +151,7 @@ Public Sub Delete(ByVal Path As String)
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
-    VBCorLib.Path.VerifyPath Path
+    VBCorLib.Path.VerifyPath Path, True
     
     If API.DeleteFile(Path) = BOOL_FALSE Then
         Dim Result As Long
@@ -454,28 +455,24 @@ End Function
 ' or a Return-LineFeed combination have been encountered.
 '
 Public Function ReadAllLines(ByVal Path As String, Optional ByVal Encoding As Encoding) As String()
-    Dim sr As StreamReader
-    Set sr = Cor.NewStreamReader(Path, Encoding)
+    Dim Lines   As New ArrayList
+    Dim Line    As String
     
-    Dim Ret() As String
-    ReDim Ret(31)
-
-    Dim i As Long
-    Do
-        Ret(i) = sr.ReadLine
-        If cString.IsNull(Ret(i)) Then Exit Do
-        i = i + 1
-        If i > UBound(Ret) Then ReDim Preserve Ret(0 To i * 2 - 1)
-    Loop
-    Call sr.CloseReader
-
-    If i > 0 Then
-        ReDim Preserve Ret(0 To i - 1)
-    Else
-        Ret = Cor.NewStrings
-    End If
-
-    ReadAllLines = Ret
+    If Len(Path) = 0 Then _
+        Error.Argument Argument_EmptyPath, "Path"
+    
+    With Cor.NewStreamReader(Path, Encoding)
+        Do
+            Line = .ReadLine
+            If StrPtr(Line) = vbNullPtr Then
+                Exit Do
+            End If
+            
+            Lines.Add Line
+        Loop
+    End With
+    
+    ReadAllLines = Lines.ToArray(vbString)
 End Function
 
 ''

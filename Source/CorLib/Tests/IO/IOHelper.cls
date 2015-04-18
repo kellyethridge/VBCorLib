@@ -30,7 +30,11 @@ Public Function CreateFile(Optional ByVal FileName As String = "File.txt", Optio
         Dim FileNumber As Long
         FileNumber = FreeFile
         Open CreateFile For Output As #FileNumber
-        Print #FileNumber, Data
+        
+        If Len(Data) > 0 Then
+            Print #FileNumber, Data;
+        End If
+        
         Close #FileNumber
     End If
 End Function
