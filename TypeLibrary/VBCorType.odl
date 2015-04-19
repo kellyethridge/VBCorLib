@@ -277,22 +277,7 @@ library VBCorType {
 		long AddRef();
 		long Release();
 	}
-	
-	[uuid(CCB93CA3-944B-44E2-9A78-B1C343953A4B), odl]
-	interface ISafeHandle : IDispatch
-	{
-		[propget, helpstring("Returns if the handle is valid.")]
-		HRESULT IsValid([out, retval] boolean * RetVal);
-		[propget, id(0), helpstring("Returns the inner handle.")]
-		HRESULT DangerousHandle([out, retval] long * RetVal);
-		[helpstring("Closes the handle.")]
-		HRESULT Close();
-		[propget, helpstring("Returns if the handle is closed.")]
-		HRESULT IsClosed([out, retval] boolean * RetVal);
-		[propget, hidden]
-		HRESULT This([out, retval] ISafeHandle ** RetVal);
-	}
-	
+
 	[
 		uuid(55A2F2D0-8919-11D0-818F-00A0C90FFFC3), odl
 	]
@@ -425,8 +410,8 @@ library VBCorType {
 		HRESULT CreateFileMapping([in] long hFile, [in] long lpSecurityAttributes, [in] long flProtect, [in] long MaximumSizeHigh, [in] long MaximumSizeLow, [in] BSTR * Name, [out, retval] long * RetVal);
 		HRESULT DeleteFile([in] BSTR * FileName, [out, retval] long * RetVal);
 		HRESULT ExpandEnvironmentStrings([in] BSTR * lpSrc, [in] BSTR * lpDst, [in] long nSize, [out, retval] long * RetVal);
-		HRESULT FindFirstFile([in] BSTR * FileName, [in] WIN32_FIND_DATA * FindFileData, [out, retval] ISafeHandle ** RetVal);
-		HRESULT FindNextFile([in] ISafeHandle * SafeHandle, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
+		HRESULT FindFirstFile([in] BSTR * FileName, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
+		HRESULT FindNextFile([in] long Handle, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
 		HRESULT GetCurrentDirectory([in] long BufferLength, [in] BSTR * Buffer, [out, retval] long * RetVal);
 		HRESULT GetComputerName([in] BSTR * Buffer, [in] long * Size, [out, retval] long * RetVal);
 		HRESULT GetEnvironmentStrings([out, retval] BSTR * RetVal);

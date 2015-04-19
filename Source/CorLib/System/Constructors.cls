@@ -655,7 +655,7 @@ End Function
 '
 Public Function NewFileStream(ByVal Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = -1, Optional ByVal Share As FileShare = FileShare.ReadShare, Optional ByVal BufferSize As Long = 4096, Optional ByVal UseAsync As Boolean = False) As FileStream
     Set NewFileStream = New FileStream
-    Call NewFileStream.Init(Path, Mode, Access, Share, BufferSize, UseAsync)
+    NewFileStream.Init Path, Mode, Access, Share, BufferSize, UseAsync
 End Function
 
 ''
@@ -1768,9 +1768,9 @@ Public Function NewGuid(ByRef Value As Variant) As Guid
     NewGuid.Init Value
 End Function
 
-Friend Function NewSafeFindFileHandle(ByVal FileHandle As Long) As SafeFindFileHandle
-    Set NewSafeFindFileHandle = New SafeFindFileHandle
-    NewSafeFindFileHandle.Init FileHandle
+Friend Function NewSafeFindHandle(ByVal FileHandle As Long) As SafeFindHandle
+    Set NewSafeFindHandle = New SafeFindHandle
+    NewSafeFindHandle.Init FileHandle
 End Function
 
 Friend Function NewSafeFileHandle(ByVal FileHandle As Long) As SafeFileHandle
@@ -1778,3 +1778,7 @@ Friend Function NewSafeFileHandle(ByVal FileHandle As Long) As SafeFileHandle
     NewSafeFileHandle.Init FileHandle
 End Function
 
+Public Function NewSafeHandle(ByVal Handle As Long, ByVal OwnsHandle As Boolean) As SafeHandle
+    Set NewSafeHandle = New SafeHandle
+    NewSafeHandle.Init Handle, OwnsHandle
+End Function
