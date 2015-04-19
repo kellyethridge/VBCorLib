@@ -131,7 +131,8 @@ Public Enum FileShare
 End Enum
 
 Private mName           As String
-Private mHandle         As Handle
+'Private mHandle         As Handle
+Private mHandle         As SafeFileHandle
 Private mCanRead        As Boolean
 Private mCanWrite       As Boolean
 Private mCanSeek        As Boolean
@@ -737,10 +738,19 @@ End Sub
 ' the stream will be closed, leaving the handle in its original state.
 '
 Public Sub CloseStream()
-    If mIsOpen Then
-        If mCanWrite Then Call Flush
-        If mOwnsHandle Then Call CloseHandle(mHandle)
-        mIsOpen = False
+'    If mIsOpen Then
+'        If mCanWrite Then Call Flush
+'        If mOwnsHandle Then Call CloseHandle(mHandle)
+'        mIsOpen = False
+'    End If
+'    Debug.Print "Handle is Nothing: " & (mHandle Is Nothing)
+    If mHandle Is Nothing Then Exit Sub
+    
+    If Not mHandle.IsClosed Then
+        If mCanWrite Then
+            Flush
+        End If
+        mHandle.CloseHandle
     End If
 End Sub
 
@@ -795,16 +805,21 @@ Friend Sub Init(ByVal sPath As String, ByVal Mode As FileMode, ByVal Access As F
     
     Call Path.VerifyPath(sPath)
     
-    Dim Atts As Long
-    Atts = FILE_ATTRIBUTE_NORMAL
+'    Dim Atts As Long
+'    Atts = FILE_ATTRIBUTE_NORMAL
+'
+'    If UseAsync And Environment.IsNT Then
+'        Atts = Atts Or FILE_FLAG_OVERLAPPED
+'        mIsAsync = True
+'    End If
+'
+'    mHandle = API.CreateFile(sPath, Access, Share, 0, Mode, Atts, 0)
+'    If mHandle = INVALID_HANDLE Then IOError Err.LastDllError, sPath
     
-    If UseAsync And Environment.IsNT Then
-        Atts = Atts Or FILE_FLAG_OVERLAPPED
-        mIsAsync = True
+    Set mHandle = SafeCreateFile(sPath, Access, Share, Mode)
+    If mHandle.IsInvalid Then
+        IOError Err.LastDllError, sPath
     End If
-    
-    mHandle = API.CreateFile(sPath, Access, Share, 0, Mode, Atts, 0)
-    If mHandle = INVALID_HANDLE Then IOError Err.LastDllError, sPath
     
     mName = Path.GetFileName(sPath)
     mCanWrite = (Access And FileAccess.WriteAccess) <> 0
@@ -830,7 +845,7 @@ Friend Sub InitFromHandle(ByVal Handle As Long, ByVal Access As FileAccess, ByVa
         Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
     
     mOwnsHandle = OwnsHandle
-    mHandle = Handle
+'    mHandle = Handle
     mBufferSize = BufferSize
     mCanSeek = (GetFileType(Handle) = FILE_TYPE_DISK)
     mCanWrite = (Access And WriteAccess) <> 0
@@ -911,8 +926,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

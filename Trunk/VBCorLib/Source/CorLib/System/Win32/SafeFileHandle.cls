@@ -46,6 +46,7 @@ Public Property Get IsInvalid() As Boolean
 End Property
 
 Public Function DangerousGetHandle() As Long
+Attribute DangerousGetHandle.VB_UserMemId = 0
     DangerousGetHandle = mBase.DangerousGetHandle
 End Function
 

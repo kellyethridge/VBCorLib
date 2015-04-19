@@ -85,5 +85,32 @@ Public Sub InitWin32Api()
     End If
 End Sub
 
+'        [entry("CreateFileA"), usesgetlasterror] long CreateFileA([in] LPSTR FileName, [in] long DesiredAccess, [in] long ShareMode, [in] void * SecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile);
+
+Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode) As SafeFileHandle
+    Dim FileHandle As Long
+    FileHandle = CreateFileA(FileName, DesiredAccess, ShareMode, ByVal 0&, CreationDisposition, FILE_ATTRIBUTE_NORMAL, 0)
+    Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle)
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

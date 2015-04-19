@@ -60,6 +60,7 @@ End Sub
 ' Returns the wrapped handle.
 '
 Public Function DangerousGetHandle() As Long
+Attribute DangerousGetHandle.VB_UserMemId = 0
     DangerousGetHandle = mHandle
 End Function
 
