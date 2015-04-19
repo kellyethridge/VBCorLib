@@ -251,7 +251,7 @@ Public Property Get UserDomainName() As String
     Dim Buf As String
     Buf = String$(Size, 0)
     
-    If GetUserNameEx(modWin32Api.NameSamCompatible, Buf, Size) <> BOOL_FALSE Then
+    If GetUserNameEx(Win32Native.NameSamCompatible, Buf, Size) <> BOOL_FALSE Then
         Dim i As Long
         i = InStr(Buf, "\")
 

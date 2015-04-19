@@ -9,6 +9,7 @@ Class=MockFormattable; Fakes\MockFormattable.cls
 Class=MockObject; Fakes\MockObject.cls
 Class=FakeAsyncCallback; Fakes\FakeAsyncCallback.cls
 Class=FakeStream; Fakes\FakeStream.cls
+Class=FakeSafeHandle; Fakes\FakeSafeHandle.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"

@@ -6,11 +6,11 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "SafeFindFileHandle"
+Attribute VB_Name = "SafeHandle"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -32,70 +32,64 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: SafeFindFileHandle
+' Module: SafeHandle
 '
 Option Explicit
-Implements ISafeHandle
 
-Private mFileHandle As Long
+Private mHandle     As Long
 Private mIsClosed   As Boolean
+Private mOwnsHandle As Boolean
+
+Public Event ReleaseHandle()
 
 
-Public Property Get IsValid() As Boolean
-    IsValid = (mFileHandle <> INVALID_HANDLE)
-End Property
-
-Public Property Get DangerousHandle() As Long
-    DangerousHandle = mFileHandle
-End Property
-
-Public Sub CloseHandle()
-    If Not mIsClosed Then
-        FindClose mFileHandle
-        mIsClosed = True
-    End If
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Handle As Long, ByVal OwnsHandle As Boolean)
+    mHandle = Handle
+    mOwnsHandle = OwnsHandle
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   API
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+''
+' Returns the wrapped handle.
+'
+Public Function DangerousGetHandle() As Long
+    DangerousGetHandle = mHandle
+End Function
+
+''
+' Indicates if the SafeHandle is considered closed.
+'
 Public Property Get IsClosed() As Boolean
     IsClosed = mIsClosed
 End Property
 
+''
+' Indicates if the wrapped handle is considered invalid.
+'
+' @return Returns true if the handle is invalide, false otherwise.
+' @remarks An invalid handle is equal to the value -1.
+'
+Public Property Get IsInvalid() As Boolean
+    IsInvalid = mHandle = INVALID_HANDLE
+End Property
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Initialization
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal FileHandle As Long)
-    mFileHandle = FileHandle
+''
+' Attempts to close the handle by raising the ReleaseHandle event.
+'
+' @remarks An event is raise indicating the handle should be closed by
+' a subclass. The reference to this class must use WithEvents to correctly
+' conduct the closing of the handle.
+'
+Public Sub CloseHandle()
+    If mOwnsHandle And Not mIsClosed Then
+        RaiseEvent ReleaseHandle
+        mIsClosed = True
+    End If
 End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    CloseHandle
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ISafeHandle Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub ISafeHandle_Close()
-    CloseHandle
-End Sub
-
-Private Property Get ISafeHandle_DangerousHandle() As Long
-    ISafeHandle_DangerousHandle = DangerousHandle
-End Property
-
-Private Property Get ISafeHandle_IsClosed() As Boolean
-    ISafeHandle_IsClosed = IsClosed
-End Property
-
-Private Property Get ISafeHandle_IsValid() As Boolean
-    ISafeHandle_IsValid = IsValid
-End Property
-
-Private Property Get ISafeHandle_This() As VBCorType.ISafeHandle
-    Set ISafeHandle_This = Me
-End Property

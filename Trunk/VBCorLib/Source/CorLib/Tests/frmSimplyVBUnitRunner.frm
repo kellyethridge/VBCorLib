@@ -211,9 +211,9 @@ Private Sub Form_Load()
 
     Dim FileStreamTests As TestSuite
     Set FileStreamTests = Sim.NewTestSuite("FileStream")
-    FileStreamTests.Add New TestFileStreamWrite
-    FileStreamTests.Add New TestFileStreamSmallBuffer
-    FileStreamTests.Add New TestFileStream
+'    FileStreamTests.Add New TestFileStreamWrite
+'    FileStreamTests.Add New TestFileStreamSmallBuffer
+    FileStreamTests.Add New FileStreamTests
     IO.Add FileStreamTests
 
     AddTest IO
@@ -257,6 +257,7 @@ Private Sub Form_Load()
     RegistryKeyTests.Add New TestRegistryKey
     RegistryKeyTests.Add New TestRegistrySetValues
     Win32.Add RegistryKeyTests
+    Win32.Add New SafeHandleTests
     AddTest Win32
     
     Dim Globalization As TestSuite

@@ -1,4 +1,4 @@
-Attribute VB_Name = "modWin32Api"
+Attribute VB_Name = "Win32Native"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -84,4 +84,6 @@ Public Sub InitWin32Api()
         Set API = New Win32ApiA
     End If
 End Sub
+
+
 

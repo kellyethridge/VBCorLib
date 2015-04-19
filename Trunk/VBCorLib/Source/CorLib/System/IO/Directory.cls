@@ -144,8 +144,8 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
     If Recursive Then
         Dim Data        As WIN32_FIND_DATA
         
-        With API.FindFirstFile(Path & "\*", Data)
-            If .IsValid Then
+        With Cor.NewSafeFindHandle(API.FindFirstFile(Path & "\*", Data))
+            If Not .IsInvalid Then
                 ' Simply loop through any files or directories
                 ' within this directory and delete them.
                 Do
@@ -162,7 +162,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
                             If API.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
                         End If
                     End If
-                Loop While API.FindNextFile(.This, Data) = BOOL_TRUE
+                Loop While API.FindNextFile(.DangerousGetHandle, Data) = BOOL_TRUE
                 
                 Dim Result As Long
                 Result = Err.LastDllError
@@ -514,8 +514,8 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
     Dim SubFolders  As New ArrayList
     Dim FileHandle  As Long
     
-    With API.FindFirstFile(Path.Combine(FullPath, SearchPattern), Entry)
-        If .IsValid Then
+    With Cor.NewSafeFindHandle(API.FindFirstFile(Path.Combine(FullPath, SearchPattern), Entry))
+        If Not .IsInvalid Then
             Do
                 Dim EntryName As String
                 EntryName = GetFileNameFromFindData(Entry)
@@ -538,7 +538,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
                         End If
                     End If
                 End If
-            Loop While API.FindNextFile(.This, Entry) <> BOOL_FALSE
+            Loop While API.FindNextFile(.DangerousGetHandle, Entry) <> BOOL_FALSE
         End If
         
         Dim Error As Long

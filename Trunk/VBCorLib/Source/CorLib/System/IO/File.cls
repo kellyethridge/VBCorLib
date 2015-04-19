@@ -573,8 +573,8 @@ End Function
 Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
     Dim FileData As WIN32_FIND_DATA
     
-    With API.FindFirstFile(Path, FileData)
-        If .IsValid Then
+    With Cor.NewSafeFileHandle(API.FindFirstFile(Path, FileData))
+        If Not .IsInvalid Then
             Data.dwFileAttributes = FileData.dwFileAttributes
             Data.ftCreationTime = FileData.ftCreationTime
             Data.ftLastAccessTime = FileData.ftLastAccessTime

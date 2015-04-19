@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "SafeFileHandle"
+Attribute VB_Name = "SafeFindHandle"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -32,7 +32,7 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: SafeFileHandle
+' Module: SafeFindHandle
 '
 Option Explicit
 Implements SafeHandle
@@ -78,7 +78,7 @@ End Sub
 '   SafeHandle Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub mBase_ReleaseHandle()
-    VBCorType.CloseHandle DangerousGetHandle
+    FindClose DangerousGetHandle
 End Sub
 
 Private Sub SafeHandle_CloseHandle()
@@ -96,4 +96,3 @@ End Property
 Private Property Get SafeHandle_IsInvalid() As Boolean
     SafeHandle_IsInvalid = IsInvalid
 End Property
-
