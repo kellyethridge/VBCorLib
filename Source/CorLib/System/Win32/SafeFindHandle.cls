@@ -62,8 +62,8 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Initialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal FileHandle As Long)
-    Set mBase = Cor.NewSafeHandle(FileHandle, True)
+Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
+    Set mBase = Cor.NewSafeHandle(PreexistingHandle, OwnsHandle)
 End Sub
 
 

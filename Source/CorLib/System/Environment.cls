@@ -276,7 +276,7 @@ End Property
 ' be used to supress message dialogs and user entry when not allowed.
 '
 Public Property Get UserInteractive() As Boolean
-    Dim hObj As Handle
+    Dim hObj As Long
     Dim Info As USEROBJECTFLAGS
     
     If OSVersion.Platform = Win32NT Then
@@ -313,7 +313,7 @@ End Property
 Public Property Get WorkingSet() As Long
     If OSVersion.Platform <> Win32NT Then Exit Property
     
-    Dim h As Handle
+    Dim h As Long
     h = GetCurrentProcess
     
     Dim Info As PROCESS_MEMORY_COUNTERS

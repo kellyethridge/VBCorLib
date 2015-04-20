@@ -8,8 +8,6 @@ library VBCorType {
 	importlib("stdole2.tlb");
 	importlib("msvbvm60.dll");
 
-	typedef [public] long HANDLE;
-
 	// This is just for internal use.
 	typedef unsigned char byte;
 	typedef long  DWORD;

@@ -1768,17 +1768,17 @@ Public Function NewGuid(ByRef Value As Variant) As Guid
     NewGuid.Init Value
 End Function
 
-Friend Function NewSafeFindHandle(ByVal FileHandle As Long) As SafeFindHandle
+Friend Function NewSafeFindHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFindHandle
     Set NewSafeFindHandle = New SafeFindHandle
-    NewSafeFindHandle.Init FileHandle
+    NewSafeFindHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
-Friend Function NewSafeFileHandle(ByVal FileHandle As Long) As SafeFileHandle
+Public Function NewSafeFileHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFileHandle
     Set NewSafeFileHandle = New SafeFileHandle
-    NewSafeFileHandle.Init FileHandle
+    NewSafeFileHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
-Public Function NewSafeHandle(ByVal Handle As Long, ByVal OwnsHandle As Boolean) As SafeHandle
+Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeHandle
     Set NewSafeHandle = New SafeHandle
-    NewSafeHandle.Init Handle, OwnsHandle
+    NewSafeHandle.Init PreexistingHandle, OwnsHandle
 End Function

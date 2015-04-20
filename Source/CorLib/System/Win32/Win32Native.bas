@@ -90,10 +90,14 @@ End Sub
 Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode) As SafeFileHandle
     Dim FileHandle As Long
     FileHandle = CreateFileA(FileName, DesiredAccess, ShareMode, ByVal 0&, CreationDisposition, FILE_ATTRIBUTE_NORMAL, 0)
-    Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle)
+    Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle, True)
 End Function
 
-
+Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData As WIN32_FIND_DATAA) As SafeFindHandle
+    Dim FileHandle As Long
+    FileHandle = FindFirstFileA(FileName, FindFileData)
+    Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
+End Function
 
 
 

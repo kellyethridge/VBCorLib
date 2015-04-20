@@ -142,9 +142,9 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
     Path = cString.TrimEnd(modStaticClasses.Path.InternalGetFullPath(Path), "/\")
     
     If Recursive Then
-        Dim Data        As WIN32_FIND_DATA
+        Dim Data As WIN32_FIND_DATAA
         
-        With Cor.NewSafeFindHandle(API.FindFirstFile(Path & "\*", Data))
+        With Win32Native.SafeFindFirstFile(Path & "\*", Data)
             If Not .IsInvalid Then
                 ' Simply loop through any files or directories
                 ' within this directory and delete them.
@@ -162,7 +162,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
                             If API.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
                         End If
                     End If
-                Loop While API.FindNextFile(.DangerousGetHandle, Data) = BOOL_TRUE
+                Loop While FindNextFileA(.DangerousGetHandle, Data) = BOOL_TRUE
                 
                 Dim Result As Long
                 Result = Err.LastDllError
@@ -509,12 +509,12 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
     
     VerifySearchPattern SearchPattern
     
-    Dim Entry       As WIN32_FIND_DATA
+    Dim Entry       As WIN32_FIND_DATAA
     Dim Entries     As New ArrayList
     Dim SubFolders  As New ArrayList
     Dim FileHandle  As Long
     
-    With Cor.NewSafeFindHandle(API.FindFirstFile(Path.Combine(FullPath, SearchPattern), Entry))
+    With SafeFindFirstFile(Path.Combine(FullPath, SearchPattern), Entry)
         If Not .IsInvalid Then
             Do
                 Dim EntryName As String
@@ -538,7 +538,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
                         End If
                     End If
                 End If
-            Loop While API.FindNextFile(.DangerousGetHandle, Entry) <> BOOL_FALSE
+            Loop While FindNextFileA(.DangerousGetHandle, Entry) <> BOOL_FALSE
         End If
         
         Dim Error As Long
@@ -555,7 +555,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
     InternalGetFileSystemEntries = Entries.ToArray(vbString)
 End Function
 
-Private Function EntryIsDirectory(ByRef Entry As WIN32_FIND_DATA) As Boolean
+Private Function EntryIsDirectory(ByRef Entry As WIN32_FIND_DATAA) As Boolean
     EntryIsDirectory = CBool(Entry.dwFileAttributes And FileAttributes.DirectoryAttr)
 End Function
 
@@ -594,10 +594,12 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     CloseHandle DirHandle
 End Sub
 
-Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATA) As String
+Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATAA) As String
     Dim Ret As String
-    Ret = Data.cFileName
-    If Len(Ret) = 0 Then Ret = Data.cAlternateFileName
+    Ret = SysAllocString(Data.cFileName(0))
+    If Len(Ret) = 0 Then
+        Ret = SysAllocString(Data.cAlternateFileName(0))
+    End If
     
     If (Data.dwFileAttributes And FileAttributes.DirectoryAttr) = FileAttributes.DirectoryAttr Then
         Select Case Len(Ret)
