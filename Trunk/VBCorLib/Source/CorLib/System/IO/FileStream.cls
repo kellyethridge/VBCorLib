@@ -255,11 +255,13 @@ End Property
 ' @remarks If there is any information in the buffers, they are flushed
 ' back to the underlying stream before the handle is returned.
 '
-Public Property Get Handle() As Long
-    If mCanWrite Then Call Flush
+Public Property Get SafeFileHandle() As SafeFileHandle
+    If mCanWrite Then
+        Flush
+    End If
     mReadPosition = 0
     mBytesBuffered = 0
-    Handle = mHandle
+    Set SafeFileHandle = mHandle
 End Property
 
 ''

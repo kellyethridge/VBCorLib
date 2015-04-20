@@ -46,8 +46,8 @@ Public Event ReleaseHandle()
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Handle As Long, ByVal OwnsHandle As Boolean)
-    mHandle = Handle
+Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
+    mHandle = PreexistingHandle
     mOwnsHandle = OwnsHandle
 End Sub
 
@@ -91,6 +91,7 @@ End Property
 Public Sub CloseHandle()
     If mOwnsHandle And Not mIsClosed Then
         RaiseEvent ReleaseHandle
+        mHandle = INVALID_HANDLE
         mIsClosed = True
     End If
 End Sub

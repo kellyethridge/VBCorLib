@@ -10,7 +10,7 @@ Attribute VB_Name = "SafeFileHandle"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -62,8 +62,8 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Initialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal FileHandle As Long)
-    Set mBase = Cor.NewSafeHandle(FileHandle, True)
+Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
+    Set mBase = Cor.NewSafeHandle(PreexistingHandle, OwnsHandle)
 End Sub
 
 
