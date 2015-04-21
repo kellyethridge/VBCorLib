@@ -20,7 +20,7 @@ Attribute VB_Name = "Win32Native"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modWin32Api
+' Module: Win32Native
 '
 
 ' These are here because these are not supported on Win9x.
@@ -28,24 +28,6 @@ Option Explicit
 
 Public Api As IWin32Api
 
-
-'
-' kernel32.dll
-'
-Public Declare Function GetUserDefaultUILanguage Lib "kernel32.dll" () As Long
-Public Declare Function GetSystemDefaultUILanguage Lib "kernel32.dll" () As Long
-Public Declare Function GetModuleFileName Lib "kernel32.dll" Alias "GetModuleFileNameA" (ByVal hModule As Long, ByVal lpFileName As String, ByVal nSize As Long) As Long
-Public Declare Function GetCurrentProcessId Lib "kernel32.dll" () As Long
-Public Declare Function VirtualProtect Lib "kernel32.dll" (ByRef lpAddress As Any, ByVal dwSize As Long, ByVal flNewProtect As Long, ByRef lpflOldProtect As Long) As Long
-
-' secur32.dd
-'
-Public Const NameSamCompatible As Long = 2
-Public Declare Function GetUserNameEx Lib "secur32.dll" Alias "GetUserNameExA" (ByVal NameFormat As Long, ByVal lpNameBuffer As String, ByRef nSize As Long) As Long
-
-' advapi32.dll
-'
-Public Declare Function LookupAccountName Lib "advapi32.dll" Alias "LookupAccountNameW" (ByVal lpSystemName As Long, ByVal lpAccountName As Long, ByVal Sid As Long, ByRef cbSid As Long, ByVal ReferencedDomainName As Long, ByRef cbReferencedDomainName As Long, ByRef peUse As Long) As Long
 
 ' user32.dll
 '
@@ -75,9 +57,6 @@ Public Sub InitWin32Api()
     Dim Info As OSVERSIONINFOA
     Info.dwOSVersionInfoSize = Len(Info)
 
-    Dim a As IWin32Api
-    
-
     If GetVersionExA(Info) = BOOL_FALSE Then _
         Throw Cor.NewInvalidOperationException("Could not load operating system information.")
 
@@ -100,9 +79,17 @@ Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData A
     Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
 End Function
 
+Public Function GetModuleFileName(ByVal hModule As Long, ByRef lpFileName As String, ByRef nSize As Long) As Long
+    GetModuleFileName = GetModuleFileNameW(hModule, lpFileName, nSize)
+End Function
 
+Public Function GetUserNameEx(ByVal NameFormat As Long, ByRef lpNameBuffer As String, ByRef nSize As Long) As Long
+    GetUserNameEx = GetUserNameExW(NameFormat, lpNameBuffer, nSize)
+End Function
 
-
+Public Function LookupAccountName(ByVal lpSystemName As String, ByVal lpAccountName As String, ByRef Sid As String, ByRef cbSid As Long, ByRef ReferencedDomainName As String, ByRef cbReferencedDomainName As Long, ByRef peUse As Long) As Long
+    LookupAccountName = LookupAccountNameW(lpSystemName, lpAccountName, StrPtr(Sid), cbSid, ReferencedDomainName, cbReferencedDomainName, peUse)
+End Function
 
 
 
