@@ -1,4 +1,4 @@
-Attribute VB_Name = "Windows"
+Attribute VB_Name = "Win32Native"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -26,7 +26,7 @@ Attribute VB_Name = "Windows"
 ' These are here because these are not supported on Win9x.
 Option Explicit
 
-Public API As IWin32Api
+Public Api As IWin32Api
 
 
 '
@@ -75,28 +75,28 @@ Public Sub InitWin32Api()
     Dim Info As OSVERSIONINFOA
     Info.dwOSVersionInfoSize = Len(Info)
 
-    Dim A As IWin32Api
+    Dim a As IWin32Api
     
 
     If GetVersionExA(Info) = BOOL_FALSE Then _
         Throw Cor.NewInvalidOperationException("Could not load operating system information.")
 
     If Info.dwPlatformId = PlatformID.Win32NT Then
-        Set API = New Win32ApiW
+        Set Api = New Win32ApiW
     Else
-        Set API = New Win32ApiA
+        Set Api = New Win32ApiA
     End If
 End Sub
 
 Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode) As SafeFileHandle
     Dim FileHandle As Long
-    FileHandle = API.CreateFile(FileName, DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FILE_ATTRIBUTE_NORMAL, 0)
+    FileHandle = Api.CreateFile(FileName, DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FILE_ATTRIBUTE_NORMAL, 0)
     Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle, True)
 End Function
 
 Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData As WIN32_FIND_DATA) As SafeFindHandle
     Dim FileHandle As Long
-    FileHandle = API.FindFirstFile(FileName, FindFileData)
+    FileHandle = Api.FindFirstFile(FileName, FindFileData)
     Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
 End Function
 
