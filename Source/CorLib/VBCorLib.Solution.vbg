@@ -1,4 +1,0 @@
-VBGROUP 5.0
-StartupProject=VBCorLib.Tests.vbp
-Project=VBCorLib.vbp
-Project=Fakes.vbp
