@@ -532,18 +532,6 @@ End Sub
 ' exists, it will be overwritten.
 '
 Public Sub WriteAllLines(ByVal Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
-'    If cArray.IsNull(Contents) Then _
-'        Throw Cor.NewArgumentNullException("Contents", Environment.GetResourceString(ArgumentNull_Array))
-    
-    
-'    Dim sw As StreamWriter
-'    Set sw = Cor.NewStreamWriter(Path, Encoding)
-'
-'    Dim i As Long
-'    For i = LBound(Contents) To UBound(Contents)
-'        Call sw.WriteLine(Contents(i))
-'    Next i
-'    Call sw.CloseWriter
     With Cor.NewStreamWriter(Path, Encoding)
         Dim Line As Variant
         
@@ -571,9 +559,9 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
-    Dim FileData As WIN32_FIND_DATAA
+    Dim FileData As WIN32_FIND_DATA
     
-    With Win32Native.SafeFindFirstFile(Path, FileData)
+    With SafeFindFirstFile(Path, FileData)
         If Not .IsInvalid Then
             Data.dwFileAttributes = FileData.dwFileAttributes
             Data.ftCreationTime = FileData.ftCreationTime
