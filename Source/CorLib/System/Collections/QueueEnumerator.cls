@@ -59,7 +59,7 @@ Friend Sub Init(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long)
     SAPtr(mItems) = ItemsSAPtr
     mCapacity = UBound(mItems) + 1
     mEndIndex = q.Count - 1
-    mVersion = GetVersion(q)
+    mVersion = GetCollectionVersion(q)
     mIndex = -1
 End Sub
 
@@ -94,8 +94,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -116,7 +116,7 @@ End Function
 '   IEnumerator Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If GetVersion(mQueue) <> mVersion Then _
+    If GetCollectionVersion(mQueue) <> mVersion Then _
         Error.InvalidOperation InvalidOperation_VersionError
     If mIndex < 0 Then _
         Error.InvalidOperation InvalidOperation_EnumNotStarted
@@ -127,7 +127,7 @@ Private Property Get IEnumerator_Current() As Variant
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If GetVersion(mQueue) <> mVersion Then _
+    If GetCollectionVersion(mQueue) <> mVersion Then _
         Error.InvalidOperation InvalidOperation_VersionError
     If mIndex > mEndIndex Then _
         Error.InvalidOperation InvalidOperation_EnumFinished

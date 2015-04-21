@@ -24,19 +24,4 @@ Attribute VB_Name = "VersionableHelper"
 '
 Option Explicit
 
-Public Function AsIVersionable(ByVal Source As Object) As IVersionable
-    On Error GoTo TypeMismatch
-    
-    Set AsIVersionable = Source
-    
-TypeMismatch:
-End Function
 
-Public Function GetVersion(ByVal Source As Object) As Long
-    Dim VersionSource As IVersionable
-    
-    Set VersionSource = AsIVersionable(Source)
-    If Not VersionSource Is Nothing Then
-        GetVersion = VersionSource.Version
-    End If
-End Function

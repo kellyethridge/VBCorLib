@@ -1,4 +1,4 @@
-Attribute VB_Name = "modIEnumerator"
+Attribute VB_Name = "Enumeration"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -52,9 +52,19 @@ Private mInitialized        As Boolean
 Public Function CreateEnumerator(ByVal Enumerator As IEnumerator) As IUnknown
     Dim Wrapper As EnumeratorWrapper
     
-    Call Initialize
-    Call InitVTable(Wrapper)
+    Initialize
+    InitVTable Wrapper
     Set CreateEnumerator = AllocateObject(Wrapper, Enumerator)
+End Function
+
+Public Function GetCollectionVersion(ByVal Obj As Object) As Long
+    On Error GoTo TypeMismatch
+    
+    Dim Versioned As IVersionableCollection
+    Set Versioned = Obj
+    GetCollectionVersion = Versioned.CurrentVersion
+    
+TypeMismatch:
 End Function
 
 

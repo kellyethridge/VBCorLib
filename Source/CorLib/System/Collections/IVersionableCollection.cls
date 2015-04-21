@@ -32,17 +32,22 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: IVersionable
+' Module: IVersionableCollection
 '
 
 ''
-' Use this interface to
+' Use this interface to indicate the current version of a collection.
+'
+' The primary purpose of this interface is to allow implementors of the collection
+' classes to indicate the version of the collection while the collection is being
+' enumerated. If a collection changes during enumeration then an exception should be thrown.
+'
 Option Explicit
 
 ''
 ' Returns the current version of the instance.
 '
-' @return Version count.
-' @remarks This is used to track if a collection has been modified.
+' @return CurrentVersion Returns an numeric value indicating the current version.
+' @remarks Implementors should change the current version as the collection changes.
 '
-Public Property Get Version() As Long: End Property
+Public Property Get CurrentVersion() As Long: End Property

@@ -98,11 +98,22 @@ End Sub
 '
 ' @param Obj The object get the controlling interface of.
 ' @return The controlling IUnknown interface.
-' @remarks
+'
 Public Function CUnk(ByVal Obj As IUnknown) As IUnknown
     Set CUnk = Obj
 End Function
 
+''
+' Returns the instance as type Object.
+'
+' @param Obj The instance to convert.
+' @return Returns the instance as type Object.
+'
 Public Function CObj(ByVal Obj As Object) As Object
     Set CObj = Obj
+End Function
+
+
+Public Function GetCollectionVersion(ByVal Obj As Object) As Long
+    GetCollectionVersion = Enumeration.GetCollectionVersion(Obj)
 End Function
