@@ -61,7 +61,7 @@ Friend Sub Init(ByVal Stack As Stack, ByVal ItemsSAPtr As Long)
     Set mStack = Stack
     SAPtr(mItems) = ItemsSAPtr
     mResetPoint = Stack.Count
-    mVersion = GetVersion(Stack)
+    mVersion = GetCollectionVersion(Stack)
     mIndex = mResetPoint
 End Sub
 
@@ -86,8 +86,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -109,7 +109,7 @@ End Function
 '   IEnumerator Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If GetVersion(mStack) <> mVersion Then _
+    If GetCollectionVersion(mStack) <> mVersion Then _
         Error.InvalidOperation InvalidOperation_VersionError
     If mIndex = mResetPoint Then _
         Error.InvalidOperation InvalidOperation_EnumNotStarted
@@ -120,7 +120,7 @@ Private Property Get IEnumerator_Current() As Variant
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If GetVersion(mStack) <> mVersion Then _
+    If GetCollectionVersion(mStack) <> mVersion Then _
         Error.InvalidOperation InvalidOperation_VersionError
     If mIndex < 0 Then _
         Error.InvalidOperation InvalidOperation_EnumFinished

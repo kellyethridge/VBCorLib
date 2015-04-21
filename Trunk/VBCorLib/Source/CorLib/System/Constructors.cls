@@ -87,7 +87,7 @@ Option Explicit
 ' @see IEnumerator
 '
 Public Function CreateEnumerator(ByVal Obj As IEnumerator) As IUnknown
-    Set CreateEnumerator = modIEnumerator.CreateEnumerator(Obj)
+    Set CreateEnumerator = Enumeration.CreateEnumerator(Obj)
 End Function
 
 ''

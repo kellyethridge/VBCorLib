@@ -48,7 +48,7 @@ Implements IObject
 Implements ICloneable
 Implements IEnumerable
 Implements ICollection
-Implements IVersionable
+Implements IVersionableCollection
 
 Private Const PROP_COUNT            As String = "Count"
 Private Const PROP_CAPACITY         As String = "Capacity"
@@ -357,8 +357,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -407,8 +407,8 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IVersionable Interface
+'   IVersionableCollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionable_Version() As Long
-    IVersionable_Version = mVersion
+Private Property Get IVersionableCollection_CurrentVersion() As Long
+    IVersionableCollection_CurrentVersion = mVersion
 End Property

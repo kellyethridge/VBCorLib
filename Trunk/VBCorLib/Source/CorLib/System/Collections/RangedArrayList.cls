@@ -59,7 +59,7 @@ Private mCount      As Long
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
     Set mList = List
-    mVersion = GetVersion(List)
+    mVersion = GetCollectionVersion(List)
     mIndex = Index
     mCount = Count
 End Sub
@@ -69,7 +69,7 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyVersion()
-    If mVersion <> GetVersion(mList) Then
+    If mVersion <> GetCollectionVersion(mList) Then
         Throw Cor.NewInvalidOperationException("The base ArrayList has been modified outside of the Ranged list.")
     End If
 End Sub
@@ -237,7 +237,7 @@ Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Option
 End Function
 
 Private Function ArrayList_GetHashCode() As Long
-    ArrayList_GetHashCode = IObject_GetHashCode
+    ArrayList_GetHashCode = IObject_GetHashcode
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
@@ -492,8 +492,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String

@@ -55,7 +55,7 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
-Implements IVersionable
+Implements IVersionableCollection
 
 Private Const PROP_COUNT            As String = "Count"
 Private Const PROP_CAPACITY         As String = "Capacity"
@@ -74,24 +74,6 @@ Private mCount      As Long
 Private mCapacity   As Long
 Private mVersion    As Long
 Private mComparer   As IComparer
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub InitClone(ByRef Arr() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
-    mItems = Arr
-    mCount = Count
-    mCapacity = UBound(Arr) + 1
-    Set mComparer = Comparer
-End Sub
-
-Friend Sub Init(ByVal Comparer As IComparer, ByRef Source As Variant)
-    Set mComparer = Comparer
-    If Not IsMissing(Source) Then
-        AddRange Source
-    End If
-End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -765,21 +747,27 @@ Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
 
-''
-' Returns the current version of the instance.
-'
-' @return Version count.
-' @remarks This is used to track if the list has been modified. Wrappers
-' for an ArrayList may need to keep in sync with the list. An example would
-' be the ArrayListEnumerator. If the list is modified during enumeration, then
-' the enumerator throws an error by checking to see if the version has changed
-' since the enumeration began. Since other objects implement the ArrayList
-' interface and need to be enumerated using the same ArrayListEnumerator,
-' the enumerator can't access a Friend method of ArrayList.
-'
 'Public Property Get Version() As Long
 '    Version = mVersion
 'End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub InitClone(ByRef Arr() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
+    mItems = Arr
+    mCount = Count
+    mCapacity = UBound(Arr) + 1
+    Set mComparer = Comparer
+End Sub
+
+Friend Sub Init(ByVal Comparer As IComparer, ByRef Source As Variant)
+    Set mComparer = Comparer
+    If Not IsMissing(Source) Then
+        AddRange Source
+    End If
+End Sub
 
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -1080,8 +1068,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IVersionable Interface
+'   IVersionableCollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionable_Version() As Long
-    IVersionable_Version = mVersion
+Private Property Get IVersionableCollection_CurrentVersion() As Long
+    IVersionableCollection_CurrentVersion = mVersion
 End Property
