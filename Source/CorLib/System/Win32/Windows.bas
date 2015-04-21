@@ -1,4 +1,4 @@
-Attribute VB_Name = "Win32Native"
+Attribute VB_Name = "Windows"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -26,7 +26,7 @@ Attribute VB_Name = "Win32Native"
 ' These are here because these are not supported on Win9x.
 Option Explicit
 
-Public API As IWin32API
+Public API As IWin32Api
 
 
 '
@@ -74,6 +74,9 @@ Public Declare Function GetProcessMemoryInfo Lib "psapi.dll" (ByVal Process As L
 Public Sub InitWin32Api()
     Dim Info As OSVERSIONINFOA
     Info.dwOSVersionInfoSize = Len(Info)
+
+    Dim A As IWin32Api
+    
 
     If GetVersionExA(Info) = BOOL_FALSE Then _
         Throw Cor.NewInvalidOperationException("Could not load operating system information.")

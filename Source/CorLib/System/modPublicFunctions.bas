@@ -103,8 +103,8 @@ End Function
 ' @param y The value used to divide.
 ' @return The remainder of the division.
 '
-Public Function Modulus(ByVal x As Currency, ByVal y As Currency) As Currency
-  Modulus = x - (y * Fix(x / y))
+Public Function Modulus(ByVal X As Currency, ByVal Y As Currency) As Currency
+  Modulus = X - (Y * Fix(X / Y))
 End Function
 
 ''

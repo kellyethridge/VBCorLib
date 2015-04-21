@@ -398,6 +398,7 @@ library VBCorType {
 		boolean Call([in] long x, [in] long y);
 	}
 
+	/*
 	[
 		uuid(FCE19D3D-99F1-435d-8184-8119B95EB47C), odl
 	]
@@ -444,6 +445,7 @@ library VBCorType {
 		HRESULT GetPrivateProfileString([in] BSTR * AppName, [in] BSTR * KeyName, [in] BSTR * Default, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
 		HRESULT GetPrivateProfileSection([in] BSTR * AppName, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
 	}
+	*/
 
 
 	//
