@@ -398,56 +398,6 @@ library VBCorType {
 		boolean Call([in] long x, [in] long y);
 	}
 
-	/*
-	[
-		uuid(FCE19D3D-99F1-435d-8184-8119B95EB47C), odl
-	]
-	interface IWin32API : IDispatch
-	{
-		HRESULT CopyFile([in] BSTR * ExistingFileName, [in] BSTR * NewFileName, [in] boolean FailIfExists, [out, retval] long * RetVal);
-		HRESULT CreateDirectory([in] BSTR * PathName, [in, defaultvalue(0)] long lpSecurityAttributes, [out, retval] long * RetVal);
-		HRESULT CreateFileMapping([in] long hFile, [in] long lpSecurityAttributes, [in] long flProtect, [in] long MaximumSizeHigh, [in] long MaximumSizeLow, [in] BSTR * Name, [out, retval] long * RetVal);
-		HRESULT DeleteFile([in] BSTR * FileName, [out, retval] long * RetVal);
-		HRESULT ExpandEnvironmentStrings([in] BSTR * lpSrc, [in] BSTR * lpDst, [in] long nSize, [out, retval] long * RetVal);
-		HRESULT FindFirstFile([in] BSTR * FileName, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
-		HRESULT FindNextFile([in] long Handle, [in] WIN32_FIND_DATA * FindFileData, [out, retval] long * RetVal);
-		HRESULT GetCurrentDirectory([in] long BufferLength, [in] BSTR * Buffer, [out, retval] long * RetVal);
-		HRESULT GetComputerName([in] BSTR * Buffer, [in] long * Size, [out, retval] long * RetVal);
-		HRESULT GetEnvironmentStrings([out, retval] BSTR * RetVal);
-		HRESULT GetEnvironmentVariable([in] BSTR * Name, [in] BSTR * Buffer, [in] long Size, [out, retval] long * RetVal);
-		HRESULT GetFileAttributes([in] BSTR * FileName, [out, retval] long * RetVal);
-		HRESULT GetFileAttributesEx([in] BSTR * FileName, [in] long fInfoLevelId, [in] WIN32_FILE_ATTRIBUTE_DATA * lpFileInformation, [out, retval] long * RetVal);
-		HRESULT GetFullPathName([in] BSTR * FileName,[in] long BufferLength, [in] BSTR * Buffer, [in] long lpFilePart, [out, retval] long * RetVal);
-		HRESULT GetLocaleInfo([in] long Locale, [in] long LCType, [in] BSTR * lpLCData, [in] long cchData, [out, retval] long * RetVal);
-		HRESULT GetSystemDirectory([in] BSTR * Buffer, [in] long Size, [out, retval] long * RetVal);
-		HRESULT GetTempFileName([in] BSTR * PathName, [in] BSTR * PrefixString, [in] long Unique, [in] BSTR * TempFileName, [out, retval] long * RetVal);
-		HRESULT GetTempPath([in] long BufferLength, [in] BSTR * Buffer, [out, retval] long * RetVal);
-		HRESULT MoveFile([in] BSTR * ExistingFileName, [in] BSTR * NewFileName, [out, retval] long * RetVal);
-		HRESULT RegOpenKeyEx([in] long hKey, [in] BSTR * SubKey, [in] long Options, [in] long Desired, [in] long * Result, [out, retval] long * RetVal);
-		HRESULT RegQueryInfoKey([in] long hKey, [in] BSTR * lpClass, [in] long lpcClass, [in] long lpReserve, [in] long lpcSubKeys, [in] long lpcMaxSubKeyLen, [in] long lpcMaxClassLen, [in] long lpcValues, [in] long lpMaxValueNameLen, [in] long lpMaxValueLen, [in] long lpSecurityDescriptor, [in] long lpLastWriteTime, [out, retval] long * RetVal);
-		HRESULT RegCreateKeyEx([in] long hKey, [in] BSTR * lpSubKey, [in] long Reserved, [in] BSTR * lpClass, [in] long dwOptions, [in] long samDesired, [in] long lpSecurityAttributes, [in] long * phkResult, [in] long * lpdwDisposition, [out, retval] long * RetVal);
-		HRESULT RegDeleteKey([in] long hKey, [in] BSTR * lpSubKey, [out, retval] long * RetVal);
-		HRESULT RegEnumKeyEx([in] long hKey, [in] long dwIndex, [in] BSTR * lpName, [in] long * lpcName, [in] long lpReserved, [in] BSTR * lpClass, [in] long * lpcClass, [in] CURRENCY * lpftLastWriteTime, [out, retval] long * RetVal);
-		HRESULT RegEnumValue([in] long hKey, [in] long dwIndex, [in] BSTR * lpValueName, [in] long * lpcValueName, [in] long lpReserved, [in] long lpType, [in] long lpData, [in] long lpcbData, [out, retval] long * RetVal);
-		HRESULT RegSetValueEx([in] long hKey, [in] BSTR * ValueName, [in] long ValueType, [in] long lpData, [in] long cbData, [out, retval] long * RetVal);
-		HRESULT RegSetValueExStr([in] long hKey, [in] BSTR * ValueName, [in] long ValueType, [in] BSTR * Data, [out, retval] long * RetVal);
-		HRESULT RegQueryValueEx([in] long hKey, [in] BSTR * ValueName, [in] long * ValueType, [in] long lpData, [in] long * lpcbData, [out, retval] long * RetVal);
-		HRESULT RegQueryValueExStr([in] long hKey, [in] BSTR * ValueName, [in] long * ValueType, [in] BSTR * Data, [out, retval] long * RetVal);
-		HRESULT RegDeleteValue([in] long hKey, [in] BSTR * lpValueName, [out, retval] long * RetVal);
-		HRESULT RemoveDirectory([in] BSTR * PathName, [out, retval] long * RetVal);
-		HRESULT SetCurrentDirectory([in] BSTR * PathName, [out, retval] long * RetVal);
-		HRESULT SetEnvironmentVariable([in] BSTR * Name, [in] BSTR * Value, [out, retval] long * RetVal);
-		HRESULT SetFileAttributes([in] BSTR * FileName, [in] long dwFileAttributes, [out, retval] long * RetVal);
-		HRESULT CreateFile([in] BSTR * FileName, [in] long DesiredAccess, [in] long ShareMode, [in] long lpSecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile, [out, retval] long * RetVal);
-		HRESULT GetLongPathName([in] BSTR * ShortPath, [in] BSTR * LongPath, [in] long LongPathBufferSize, [out, retval] long * RetVal);
-		HRESULT WritePrivateProfileString([in] BSTR * AppName, [in] BSTR * KeyName, [in] BSTR * Value, [in] BSTR * FileName, [out, retval] long * RetVal);
-		HRESULT WritePrivateProfileSection([in] BSTR * AppName, [in] BSTR * Value, [in] BSTR * FileName, [out, retval] long * RetVal);
-		HRESULT GetPrivateProfileString([in] BSTR * AppName, [in] BSTR * KeyName, [in] BSTR * Default, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
-		HRESULT GetPrivateProfileSection([in] BSTR * AppName, [in] BSTR * ReturnedString, [in] long Size, [in] BSTR * FileName, [out, retval] long * RetVal);
-	}
-	*/
-
-
 	//
 	// Modules
 	//
@@ -477,10 +427,7 @@ library VBCorType {
 		const long S_OK 			= 0x00000000;
 	}
 
-	[
-		dllname("kernel32.dll"),
-		helpstring("Access to API functions within the Kernel32.dll system file.")
-	]
+	[dllname("kernel32.dll"), helpstring("Access to API functions within the Kernel32.dll system file.")]
 	module Kernel32 {
 		[entry("CloseHandle"), usesgetlasterror] long CloseHandle([in] long hObject);
 		[entry("CopyFileA"), usesgetlasterror] long CopyFileA([in] LPSTR Source, [in] LPSTR Destination, [in] BOOL FailIfExists);
@@ -594,12 +541,14 @@ library VBCorType {
 		[entry("GetLongPathNameW"), usesgetlasterror] long GetLongPathNameW([in] LPWSTR lpszShortPath, [in] LPWSTR lpszLongPath, [in] long cchBuffer);
 		[entry("RtlFillMemory")] void FillMemory([in] void * Destination, [in] long Length, [in] byte Fill);
 		[entry("GetSystemInfo")] void GetSystemInfo([in] SYSTEM_INFO * lpSystemInfo);
+		[entry("GetUserDefaultUILanguage")] long GetUserDefaultUILanguage();
+		[entry("GetSystemDefaultUILanguage")] long GetSystemDefaultUILanguage();
+		[entry("GetModuleFileNameW"), usesgetlasterror] long GetModuleFileNameW([in] long hModule, [in] LPWSTR lpFileName, [in] long nSize);
+		[entry("GetCurrentProcessId")] long GetCurrentProcessId();
+		[entry("VirtualProtect"), usesgetlasterror] long VirtualProtect([in] void * lpAddress, [in] long dwSize, [in] long flNewProtect, [in] long * lpflOldProtect);
 	}
 
-	[
-		dllname("oleaut32.dll"),
-		helpstring("Access to API functions within the Oleaut32.dll system file.")
-	]
+	[dllname("oleaut32.dll"), helpstring("Access to API functions within the Oleaut32.dll system file.")]
 	module OleAut32 {
 		[entry("OleLoadPicture")] HRESULT OleLoadPicture([in] IStream * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
 		[entry("SafeArrayCopyData")] HRESULT SafeArrayCopyData([in] long psaSource, [in] long psaTarget);
@@ -622,10 +571,7 @@ library VBCorType {
 		[entry("OleCreatePictureIndirect")] long OleCreatePictureIndirect([in] void * lpPictDesc, [in] VBGUID * riid, [in] long fOwn, [in] void * lplpvObj);
 	}
 
-	[
-		dllname("ole32.dll"),
-		helpstring("Access to API functions within the Ole32.dll system file.")
-	]
+	[dllname("ole32.dll"), helpstring("Access to API functions within the Ole32.dll system file.")]
 	module Ole32 {
 		[entry("CLSIDFromProgID")] HRESULT CLSIDFromProgID([in] LPWSTR ProgID, [out, retval] VBGUID * RetVal);
 		[entry("CLSIDFromString")] HRESULT CLSIDFromString([in] LPWSTR lpSz, [out, retval] VBGUID * RetVal);
@@ -639,10 +585,7 @@ library VBCorType {
 		[entry("ProgIDFromCLSID")] long ProgIDFromCLSID([in] VBGUID * CLSID, [in] long * lplpszProgID);
 	}
 
-	[
-	    dllname("advapi32.dll"),
-	    helpstring("Access to API functions within the Advapi32.dll system file.")
-	]
+	[dllname("advapi32.dll"), helpstring("Access to API functions within the Advapi32.dll system file.")]
 	module Advapi32 {
 		[entry("GetUserNameA"), usesgetlasterror] long GetUserNameA([in] LPSTR lpBuffer, [in] long * nSize);
 		[entry("CryptAcquireContextA"), usesgetlasterror] long CryptAcquireContext([in] long * hProv, [in] LPSTR pszContainer, [in] LPSTR pszProvider, [in] long dwProvType, [in] long dwFlags);
@@ -687,20 +630,15 @@ library VBCorType {
 		[entry("RegDeleteValueA")] long RegDeleteValueA([in] long hKey, [in] LPSTR lpValueName);
 		[entry("RegDeleteValueW")] long RegDeleteValueW([in] long hKey, [in] LPWSTR lpValueName);
 		[entry("RegConnectRegistryA")] long RegConnectRegistry([in] LPSTR lpMachineName, [in] long hKey, [in] long * phkResult);
+		[entry("LookupAccountNameW"), usesgetlasterror] long LookupAccountNameW([in] LPWSTR lpSystemName, [in] LPWSTR lpAccountName, [in] long Sid, [in] long * cbSid, [in] LPWSTR ReferenceDomainName, [in] long * cbReferenceDomainName, [in] long * peUse);
 	}
 
-	[
-		dllname("winmm.dll"),
-		helpstring("Access to API functions within the winmm.dll system file.")
-	]
+	[dllname("winmm.dll"), helpstring("Access to API functions within the winmm.dll system file.")]
 	module winmm {
 		[entry("timeGetTime")] long timeGetTime();
 	}
 
-	[
-		dllname("user32.dll"),
-		helpstring("Access to API functions within the User32.dll system file.")
-	]
+	[dllname("user32.dll"),	helpstring("Access to API functions within the User32.dll system file.")]
 	module User32 {
 		[entry("SendMessageTimeoutA"), usesgetlasterror] long  SendMessageTimeout([in] long hWnd, [in] long Msg, [in] long wParam, [in] long lParam, [in] long fuFlags, [in] long uTimeout, [in] long * lpdwResult);
 		[entry("GetKeyState")] short GetKeyState([in] long nVirtKey);
@@ -711,11 +649,18 @@ library VBCorType {
 		[entry("GetIconInfo"), usesgetlasterror] long  GetIconInfo([in] long hIcon, [in] ICONINFO * pIconInfo);
 	}
 
-	[
-		dllname("shfolder.dll"),
-		helpstring("Access to API functions in the Shfolder.dll system file.")
-	]
+	[dllname("shfolder.dll"), helpstring("Access to API functions in the Shfolder.dll system file.")]
 	module Shfolder {
 		[entry("SHGetFolderPathA")] HRESULT SHGetFolderPath([in] long Hwnd, [in] long nFolder, [in] long hToken, [in] long dwFlags, [in] LPSTR pszPath);
 	}
+
+	[dllname("secur32.dll")]
+	module Secur32 {
+		[entry("GetUserNameExW"), usesgetlasterror] long GetUserNameExW([in] long NameFormat, [in] LPWSTR lpNameBuffer, [in] long * nSize);
+	}
 }
+
+/*
+Public Declare Function LookupAccountName Lib "advapi32.dll" Alias "LookupAccountNameW" (ByVal lpSystemName As Long, ByVal lpAccountName As Long, ByVal Sid As Long, ByRef cbSid As Long, ByVal ReferencedDomainName As Long, ByRef cbReferencedDomainName As Long, ByRef peUse As Long) As Long
+*/
+

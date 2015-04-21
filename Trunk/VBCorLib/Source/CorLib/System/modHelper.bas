@@ -232,7 +232,9 @@ Private Sub InitAsm()
     mAsm(90) = &HC2010183
     mAsm(91) = &HCCCC0014
 
-    Call VirtualProtect(mAsm(0), UBound(mAsm) * 4, PAGE_EXECUTE_READWRITE, 0&)
+    If VirtualProtect(mAsm(0), UBound(mAsm) * 4, PAGE_EXECUTE_READWRITE, 0&) = BOOL_FALSE Then
+        Err.Raise 51, "VBCorLib", "Could not initialize helper methods."
+    End If
 End Sub
 
 

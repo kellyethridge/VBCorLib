@@ -178,7 +178,7 @@ Public Property Get MachineName() As String
     
     Dim Ret As String
     Ret = String$(Size, 0)
-    If API.GetComputerName(Ret, Size) = BOOL_FALSE Then _
+    If Api.GetComputerName(Ret, Size) = BOOL_FALSE Then _
         Throw Cor.NewInvalidOperationException(GetSystemMessage(Err.LastDllError))
     
     MachineName = Left$(Ret, Size)
@@ -214,7 +214,7 @@ Public Property Get SystemDirectory() As String
     Ret = String$(MAX_PATH + 1, 0)
     
     Dim Size As Long
-    Size = API.GetSystemDirectory(Ret, Len(Ret))
+    Size = Api.GetSystemDirectory(Ret, Len(Ret))
     If Size > 0 Then SystemDirectory = Left$(Ret, Size)
 End Property
 
@@ -240,32 +240,33 @@ End Property
 ' and will throw a <b>PlatformNotSupportedException</b> exception.
 '
 Public Property Get UserDomainName() As String
-    Call VerifyNTMachine
+    Const NameSamCompatible As Long = 2
+    Dim Size        As Long
+    Dim DomainName  As String
+    Dim Sid         As String
     
-    Dim Size As Long
+    VerifyNTMachine
     Size = 1024
+    DomainName = String$(Size, 0)
     
-    Dim Sid As String
-    Sid = String$(Size, 0)
-    
-    Dim Buf As String
-    Buf = String$(Size, 0)
-    
-    If GetUserNameEx(NameSamCompatible, Buf, Size) <> BOOL_FALSE Then
+    If Win32Native.GetUserNameEx(NameSamCompatible, DomainName, Size) <> BOOL_FALSE Then
         Dim i As Long
-        i = InStr(Buf, "\")
+        i = InStr(DomainName, "\")
 
         If i > 0 Then
-            UserDomainName = Left$(Buf, i - 1)
+            UserDomainName = Left$(DomainName, i - 1)
             Exit Property
         End If
     End If
     
-    If LookupAccountName(0, StrPtr(UserName), StrPtr(Sid), Len(Sid), StrPtr(Buf), Size, 0&) = BOOL_FALSE Then
+    Size = 1024
+    Sid = String$(Size, 0)
+    
+    If Win32Native.LookupAccountName(vbNullString, UserName, Sid, Size, DomainName, Size, 0) = BOOL_FALSE Then
         IOError Err.LastDllError
     End If
     
-    UserDomainName = Left$(Buf, Size)
+    UserDomainName = Left$(DomainName, Size)
 End Property
 
 ''
@@ -339,11 +340,11 @@ Public Function ExpandEnvironmentVariables(ByVal Name As String) As String
     Buf = SysAllocStringLen(0, DEF_SIZE)
     
     Dim Size As Long
-    Size = API.ExpandEnvironmentStrings(Name, Buf, DEF_SIZE)
+    Size = Api.ExpandEnvironmentStrings(Name, Buf, DEF_SIZE)
     
     If Size > DEF_SIZE Then
         Buf = SysAllocStringLen(0, Size)
-        Size = API.ExpandEnvironmentStrings(Name, Buf, Size)
+        Size = Api.ExpandEnvironmentStrings(Name, Buf, Size)
     End If
     
     ExpandEnvironmentVariables = Left$(Buf, Size - 1)
@@ -510,7 +511,7 @@ Public Function GetEnvironmentVariable(ByVal Name As String, Optional ByVal Targ
             Do
                 Dim Buf As String
                 Buf = String$(Size, 0)
-                Size = API.GetEnvironmentVariable(Name, Buf, Len(Buf))
+                Size = Api.GetEnvironmentVariable(Name, Buf, Len(Buf))
                 If Size = 0 Then
                     Dim Result As Long
                     Result = Err.LastDllError
@@ -619,7 +620,7 @@ Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal Value As Strin
     
     Select Case Target
         Case EnvironmentVariableTarget.Process
-            If API.SetEnvironmentVariable(Variable, Value) = BOOL_FALSE Then _
+            If Api.SetEnvironmentVariable(Variable, Value) = BOOL_FALSE Then _
                 Throw Cor.NewArgumentException(GetSystemMessage(Err.LastDllError), "Value")
                 
         Case EnvironmentVariableTarget.Machine, EnvironmentVariableTarget.User
@@ -699,7 +700,7 @@ End Function
 ' does not reflect changes to the variables after the application starts.
 Private Function InternalGetEnvironmentVariables() As IDictionary
     Dim Strings() As String
-    Strings() = Split(API.GetEnvironmentStrings, vbNullChar)
+    Strings() = Split(Api.GetEnvironmentStrings, vbNullChar)
     
     Dim Ret As New Hashtable
     Dim i   As Long
