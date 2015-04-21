@@ -144,7 +144,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
     If Recursive Then
         Dim Data As WIN32_FIND_DATA
         
-        With Win32Native.SafeFindFirstFile(Path & "\*", Data)
+        With SafeFindFirstFile(Path & "\*", Data)
             If Not .IsInvalid Then
                 ' Simply loop through any files or directories
                 ' within this directory and delete them.
