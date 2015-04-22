@@ -647,7 +647,19 @@ library VBCorType {
 		[entry("KillTimer"), usesgetlasterror] long  KillTimer([in] long hwnd, [in] long nIDEvent);
 		[entry("CreateIconFromResource"), usesgetlasterror] long  CreateIconFromResource([in] byte * PresBits, [in] long dwResSize, [in] long fIcon, [in] long dwVer);
 		[entry("GetIconInfo"), usesgetlasterror] long  GetIconInfo([in] long hIcon, [in] ICONINFO * pIconInfo);
+		[entry("GetProcessWindowStation"), usesgetlasterror] long GetProcessWindowStation();
+		[entry("GetUserObjectInformationW"), usesgetlasterror] long GetUserObjectInformationW([in] long hObj, [in] long nIndex, [in] LPVOID pvInfo, [in] long nLength, [in] long * lpnLengthNeeded);
+		[entry("GetSystemMenu")] long GetSystemMenu([in] long hWnd, [in] BOOL bRevert);
+		[entry("RemoveMenu"), usesgetlasterror] long RemoveMenu([in] long hMenu, [in] long nPosition, [in] long wFlags);
 	}
+
+/*
+Public Declare Function GetProcessWindowStation Lib "user32.dll" () As Long
+Public Declare Function GetUserObjectInformation Lib "user32.dll" Alias "GetUserObjectInformationA" (ByVal hObj As Long, ByVal nIndex As Long, ByRef pvInfo As Any, ByVal nLength As Long, ByRef lpnLengthNeeded As Long) As Long
+Public Declare Function GetSystemMenu Lib "user32.dll" (ByVal hwnd As Long, ByVal bRevert As Long) As Long
+Public Declare Function RemoveMenu Lib "user32.dll" (ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
+*/
+
 
 	[dllname("shfolder.dll"), helpstring("Access to API functions in the Shfolder.dll system file.")]
 	module Shfolder {

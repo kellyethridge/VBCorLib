@@ -28,15 +28,6 @@ Option Explicit
 
 Public Api As IWin32Api
 
-
-' user32.dll
-'
-Public Declare Function GetProcessWindowStation Lib "user32.dll" () As Long
-Public Declare Function GetUserObjectInformation Lib "user32.dll" Alias "GetUserObjectInformationA" (ByVal hObj As Long, ByVal nIndex As Long, ByRef pvInfo As Any, ByVal nLength As Long, ByRef lpnLengthNeeded As Long) As Long
-Public Declare Function GetSystemMenu Lib "user32.dll" (ByVal hwnd As Long, ByVal bRevert As Long) As Long
-Public Declare Function RemoveMenu Lib "user32.dll" (ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
-
-
 ' psapi.dll
 Public Type PROCESS_MEMORY_COUNTERS
     cb As Long
@@ -54,17 +45,7 @@ End Type
 Public Declare Function GetProcessMemoryInfo Lib "psapi.dll" (ByVal Process As Long, ByRef ppsmemCounters As PROCESS_MEMORY_COUNTERS, ByVal cb As Long) As Long
 
 Public Sub InitWin32Api()
-    Dim Info As OSVERSIONINFOA
-    Info.dwOSVersionInfoSize = Len(Info)
-
-    If GetVersionExA(Info) = BOOL_FALSE Then _
-        Throw Cor.NewInvalidOperationException("Could not load operating system information.")
-
-    If Info.dwPlatformId = PlatformID.Win32NT Then
-        Set Api = New Win32ApiW
-    Else
-        Set Api = New Win32ApiA
-    End If
+    Set Api = New Win32ApiW
 End Sub
 
 Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode) As SafeFileHandle
@@ -91,9 +72,23 @@ Public Function LookupAccountName(ByVal lpSystemName As String, ByVal lpAccountN
     LookupAccountName = LookupAccountNameW(lpSystemName, lpAccountName, StrPtr(Sid), cbSid, ReferencedDomainName, cbReferencedDomainName, peUse)
 End Function
 
+Public Function GetProcessWindowStation() As Long
+    GetProcessWindowStation = VBCorType.GetProcessWindowStation
+End Function
 
+Public Function GetUserObjectInformation(ByVal hObj As Long, ByVal nIndex As Long, ByVal pvInfo As Long, ByVal nLength As Long, ByRef lpnLengthNeeded As Long) As Long
+    GetUserObjectInformation = GetUserObjectInformationW(hObj, nIndex, pvInfo, nLength, lpnLengthNeeded)
+End Function
 
+Public Function GetSystemMenu(ByVal hWnd As Long, ByVal bRevert As Boolean) As Long
+    Dim boolRevert As BOOL
+    boolRevert = IIf(bRevert, BOOL_TRUE, BOOL_FALSE)
+    GetSystemMenu = VBCorType.GetSystemMenu(hWnd, boolRevert)
+End Function
 
+Public Function RemoveMenu(ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
+    RemoveMenu = VBCorType.RemoveMenu(hMenu, nPosition, wFlags)
+End Function
 
 
 
