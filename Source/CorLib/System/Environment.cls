@@ -311,15 +311,12 @@ End Property
 ' @remarks This method only works for NT installations. 95, 98, and ME will
 ' receive a 0 when this method is called.
 '
-Public Property Get WorkingSet() As Long
-    If OSVersion.Platform <> Win32NT Then Exit Property
+Public Property Get WorkingSet() As Currency
+    Dim Counters As PROCESS_MEMORY_COUNTERS
     
-    Dim h As Long
-    h = GetCurrentProcess
-    
-    Dim Info As PROCESS_MEMORY_COUNTERS
-    If GetProcessMemoryInfo(h, Info, LenB(Info)) Then
-        WorkingSet = Info.WorkingSetSize
+    Counters.cb = LenB(Counters)
+    If GetProcessMemoryInfo(GetCurrentProcess, Counters, Counters.cb) Then
+        WorkingSet = Counters.WorkingSetSize
     End If
 End Property
 
