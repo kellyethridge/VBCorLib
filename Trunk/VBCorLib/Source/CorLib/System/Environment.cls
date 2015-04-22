@@ -282,7 +282,7 @@ Public Property Get UserInteractive() As Boolean
     
     If OSVersion.Platform = Win32NT Then
         hObj = GetProcessWindowStation
-        If GetUserObjectInformation(hObj, UOI_FLAGS, Info, LenB(Info), 0&) Then
+        If Win32Native.GetUserObjectInformation(hObj, UOI_FLAGS, VarPtr(Info), LenB(Info), 0&) Then
             UserInteractive = (Info.dwFlags And WSF_VISIBLE)
         End If
     Else
