@@ -166,6 +166,20 @@ library VBCorType {
 		byte wReserved;
 	} OSVERSIONINFOEXW;
 
+	typedef struct PROCESS_MEMORY_COUNTERS {
+		long cb;
+		long PageFaultCount;
+		long PeakWorkingSetSize;
+		long WorkingSetSize;
+		long QuotaPeakPagedPoolUsage;
+		long QuotaPagedPoolUsage;
+		long QuotaPeakNonPagedPoolUsage;
+		long QuotaNonPagedPoolUsage;
+		long PagedfileUsage;
+		long PeakPagefileUsage;
+	} PROCESS_MEMORY_COUNTERS;
+
+
 	typedef [uuid(B87B4912-6B3D-4914-B7AA-950CA2E61482)]
 	struct VBGUID {
 		long Data1;
@@ -653,14 +667,6 @@ library VBCorType {
 		[entry("RemoveMenu"), usesgetlasterror] long RemoveMenu([in] long hMenu, [in] long nPosition, [in] long wFlags);
 	}
 
-/*
-Public Declare Function GetProcessWindowStation Lib "user32.dll" () As Long
-Public Declare Function GetUserObjectInformation Lib "user32.dll" Alias "GetUserObjectInformationA" (ByVal hObj As Long, ByVal nIndex As Long, ByRef pvInfo As Any, ByVal nLength As Long, ByRef lpnLengthNeeded As Long) As Long
-Public Declare Function GetSystemMenu Lib "user32.dll" (ByVal hwnd As Long, ByVal bRevert As Long) As Long
-Public Declare Function RemoveMenu Lib "user32.dll" (ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
-*/
-
-
 	[dllname("shfolder.dll"), helpstring("Access to API functions in the Shfolder.dll system file.")]
 	module Shfolder {
 		[entry("SHGetFolderPathA")] HRESULT SHGetFolderPath([in] long Hwnd, [in] long nFolder, [in] long hToken, [in] long dwFlags, [in] LPSTR pszPath);
@@ -670,9 +676,10 @@ Public Declare Function RemoveMenu Lib "user32.dll" (ByVal hMenu As Long, ByVal 
 	module Secur32 {
 		[entry("GetUserNameExW"), usesgetlasterror] long GetUserNameExW([in] long NameFormat, [in] LPWSTR lpNameBuffer, [in] long * nSize);
 	}
-}
 
-/*
-Public Declare Function LookupAccountName Lib "advapi32.dll" Alias "LookupAccountNameW" (ByVal lpSystemName As Long, ByVal lpAccountName As Long, ByVal Sid As Long, ByRef cbSid As Long, ByVal ReferencedDomainName As Long, ByRef cbReferencedDomainName As Long, ByRef peUse As Long) As Long
-*/
+	[dllname("psapi.dll")]
+	module psapi {
+		[entry("GetProcessMemoryInfo"), usesgetlasterror] long GetProcessMemoryInfo([in] long Process, [in] PROCESS_MEMORY_COUNTERS * ppsmemCounters, [in] long cb);
+	}
+}
 

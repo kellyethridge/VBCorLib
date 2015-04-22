@@ -28,21 +28,6 @@ Option Explicit
 
 Public Api As IWin32Api
 
-' psapi.dll
-Public Type PROCESS_MEMORY_COUNTERS
-    cb As Long
-    PageFaultCount As Long
-    PeakWorkingSetSize As Long
-    WorkingSetSize As Long
-    QuotaPeakPagedPoolUsage As Long
-    QuotaPagedPoolUsage As Long
-    QuotaPeakNonPagedPoolUsage As Long
-    QuotaNonPagedPoolUsage As Long
-    PagefileUsage As Long
-    PeakPagefileUsage As Long
-End Type
-
-Public Declare Function GetProcessMemoryInfo Lib "psapi.dll" (ByVal Process As Long, ByRef ppsmemCounters As PROCESS_MEMORY_COUNTERS, ByVal cb As Long) As Long
 
 Public Sub InitWin32Api()
     Set Api = New Win32ApiW
@@ -50,13 +35,16 @@ End Sub
 
 Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode) As SafeFileHandle
     Dim FileHandle As Long
-    FileHandle = Api.CreateFile(FileName, DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FILE_ATTRIBUTE_NORMAL, 0)
+    FileHandle = CreateFileW(MakeWide(FileName), DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FILE_ATTRIBUTE_NORMAL, 0)
     Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle, True)
 End Function
 
 Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData As WIN32_FIND_DATA) As SafeFindHandle
-    Dim FileHandle As Long
-    FileHandle = Api.FindFirstFile(FileName, FindFileData)
+    Dim WideData    As WIN32_FIND_DATAW
+    Dim FileHandle  As Long
+    
+    FileHandle = FindFirstFileW(MakeWide(FileName), WideData)
+    FindDataWToFindData WideData, FindFileData
     Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
 End Function
 
@@ -80,10 +68,10 @@ Public Function GetUserObjectInformation(ByVal hObj As Long, ByVal nIndex As Lon
     GetUserObjectInformation = GetUserObjectInformationW(hObj, nIndex, pvInfo, nLength, lpnLengthNeeded)
 End Function
 
-Public Function GetSystemMenu(ByVal hWnd As Long, ByVal bRevert As Boolean) As Long
+Public Function GetSystemMenu(ByVal hwnd As Long, ByVal bRevert As Boolean) As Long
     Dim boolRevert As BOOL
     boolRevert = IIf(bRevert, BOOL_TRUE, BOOL_FALSE)
-    GetSystemMenu = VBCorType.GetSystemMenu(hWnd, boolRevert)
+    GetSystemMenu = VBCorType.GetSystemMenu(hwnd, boolRevert)
 End Function
 
 Public Function RemoveMenu(ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
@@ -91,8 +79,37 @@ Public Function RemoveMenu(ByVal hMenu As Long, ByVal nPosition As Long, ByVal w
 End Function
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function MakeWide(ByRef PartialPath As String) As String
+    Dim Root        As String
+    Dim FullPath    As String
+    FullPath = Path.GetFullPath(PartialPath)
+    
+    ' Check if we have a UNC path.
+    If Left$(FullPath, 2) = "\\" Then
+        ' MSDN says the format is \\?\UNC\Server\Share\... ,
+        ' so we need to trim off the first backslash from the path
+        FullPath = Mid$(FullPath, 2)
+        Root = "UNC"
+    End If
+    
+    MakeWide = "\\?\" & Root & FullPath
+End Function
 
-
+Private Sub FindDataWToFindData(ByRef Source As WIN32_FIND_DATAW, ByRef Dest As WIN32_FIND_DATA)
+    With Dest
+        .cAlternateFileName = SysAllocString(VarPtr(Source.cAlternateFileName(0)))
+        .cFileName = SysAllocString(VarPtr(Source.cFileName(0)))
+        .dwFileAttributes = Source.dwFileAttributes
+        .ftCreationTime = Source.ftCreationTime
+        .ftLastAccessTime = Source.ftLastAccessTime
+        .ftLastWriteTime = Source.ftLastWriteTime
+        .nFileSizeHigh = Source.nFileSizeHigh
+        .nFileSizeLow = Source.nFileSizeLow
+    End With
+End Sub
 
 
 
