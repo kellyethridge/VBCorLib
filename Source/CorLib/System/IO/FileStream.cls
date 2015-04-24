@@ -64,7 +64,6 @@ Implements Stream
 Private Const FILE_ATTRIBUTE_NORMAL     As Long = &H80
 Private Const FILE_TYPE_DISK            As Long = 1
 Private Const MIN_BUFFERSIZE            As Long = 8
-Private Const CONSIDERED_MISSING        As Long = -1
 Private Const NO_ERROR                  As Long = 0
 Private Const INVALID_SET_FILE_POINTER  As Long = -1
 Private Const INVALID_FILE_SIZE         As Long = -1
@@ -110,6 +109,7 @@ End Enum
 ' @param ReadWriteAccess Grants both read and write permissions to the FileStream.
 '
 Public Enum FileAccess
+    DefaultAccess = 0
     ReadAccess = &H80000000
     WriteAccess = &H40000000
     ReadWriteAccess = &HC0000000
@@ -740,13 +740,9 @@ End Sub
 ' the stream will be closed, leaving the handle in its original state.
 '
 Public Sub CloseStream()
-'    If mIsOpen Then
-'        If mCanWrite Then Call Flush
-'        If mOwnsHandle Then Call CloseHandle(mHandle)
-'        mIsOpen = False
-'    End If
-'    Debug.Print "Handle is Nothing: " & (mHandle Is Nothing)
-    If mHandle Is Nothing Then Exit Sub
+    If mHandle Is Nothing Then
+        Exit Sub
+    End If
     
     If Not mHandle.IsClosed Then
         If mCanWrite Then
@@ -786,16 +782,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal sPath As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
-    sPath = cString.Trim(sPath)
-    If Len(sPath) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
+Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
+    Path = cString.Trim(Path)
+    If Len(Path) = 0 Then _
+        Error.Argument Argument_EmptyPath, "Path"
     If BufferSize <= 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
+        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
         
     Dim AppendMode As Boolean
     If Mode = FileMode.Append Then
-        If Access = CONSIDERED_MISSING Then
+        If Access = DefaultAccess Then
             Access = WriteAccess
         ElseIf Access And ReadAccess Then
             Throw Cor.NewArgumentException("Append mode cannot be used in combination with read access.")
@@ -803,27 +799,20 @@ Friend Sub Init(ByVal sPath As String, ByVal Mode As FileMode, ByVal Access As F
         AppendMode = True
         Mode = FileMode.OpenOrCreate
     End If
-    If Access = CONSIDERED_MISSING Then Access = ReadWriteAccess
     
-    Call Path.VerifyPath(sPath)
-    
-'    Dim Atts As Long
-'    Atts = FILE_ATTRIBUTE_NORMAL
-'
-'    If UseAsync And Environment.IsNT Then
-'        Atts = Atts Or FILE_FLAG_OVERLAPPED
-'        mIsAsync = True
-'    End If
-'
-'    mHandle = API.CreateFile(sPath, Access, Share, 0, Mode, Atts, 0)
-'    If mHandle = INVALID_HANDLE Then IOError Err.LastDllError, sPath
-    
-    Set mHandle = SafeCreateFile(sPath, Access, Share, Mode)
-    If mHandle.IsInvalid Then
-        IOError Err.LastDllError, sPath
+    If Access = DefaultAccess Then
+        Access = ReadWriteAccess
     End If
     
-    mName = Path.GetFileName(sPath)
+    VBCorLib.Path.CheckValidPath Path
+    VBCorLib.Path.InplaceFixSlashes Path
+    
+    Set mHandle = SafeCreateFile(Path, Access, Share, Mode)
+    If mHandle.IsInvalid Then
+        IOError Err.LastDllError, Path
+    End If
+    
+    mName = VBCorLib.Path.GetFileName(Path)
     mCanWrite = (Access And FileAccess.WriteAccess) <> 0
     mCanRead = ((Access And FileAccess.ReadAccess) <> 0) And (Mode <> Truncate)
     mCanSeek = (GetFileType(mHandle) = FILE_TYPE_DISK)
@@ -836,7 +825,10 @@ Friend Sub Init(ByVal sPath As String, ByVal Mode As FileMode, ByVal Access As F
         mBufferOffset = mMinPosition
     End If
     
-    If BufferSize < MIN_BUFFERSIZE Then BufferSize = MIN_BUFFERSIZE
+    If BufferSize < MIN_BUFFERSIZE Then
+        BufferSize = MIN_BUFFERSIZE
+    End If
+    
     mBufferSize = BufferSize
 End Sub
 
@@ -847,7 +839,6 @@ Friend Sub InitFromHandle(ByVal Handle As Long, ByVal Access As FileAccess, ByVa
         Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
     
     mOwnsHandle = OwnsHandle
-'    mHandle = Handle
     mBufferSize = BufferSize
     mCanSeek = (GetFileType(Handle) = FILE_TYPE_DISK)
     mCanWrite = (Access And WriteAccess) <> 0

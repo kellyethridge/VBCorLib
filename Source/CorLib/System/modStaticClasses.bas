@@ -1,4 +1,4 @@
-Attribute VB_Name = "modStaticClasses"
+Attribute VB_Name = "Statics"
 '    CopyRight (c) 2005 Kelly Ethridge
 '
 '    This file is part of VBCorLib.

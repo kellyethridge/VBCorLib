@@ -424,7 +424,7 @@ Public Function GetFullPath(ByVal Path As String) As String
     OutputBuffer = String$(Me.MaxPathLength, 0)
     
     Dim Size As Long
-    Size = API.GetFullPathName(Path, Len(OutputBuffer), OutputBuffer, 0)
+    Size = Api.GetFullPathName(Path, Len(OutputBuffer), OutputBuffer, 0)
     
     If Size = 0 Then _
         Throw Cor.NewPathTooLongException("The qualified path is longer than the maximum of 260 characters.")
@@ -490,7 +490,7 @@ Public Function GetTempFileName() As String
     Dim FileName As String
     FileName = String$(Me.MaxPathLength, 0)
     
-    If API.GetTempFileName(GetTempPath, "tmp", 0, FileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.GetTempFileName(GetTempPath, "tmp", 0, FileName) = BOOL_FALSE Then IOError Err.LastDllError
     
     GetTempFileName = SysAllocString(StrPtr(FileName))
 End Function
@@ -505,7 +505,7 @@ Public Function GetTempPath() As String
     Dim Size As Long
     
     PathName = String$(Me.MaxPathLength, 0)
-    Size = API.GetTempPath(Len(PathName), PathName)
+    Size = Api.GetTempPath(Len(PathName), PathName)
     If Size = 0 Or Size > Me.MaxPathLength Then
         IOError Err.LastDllError
     End If
@@ -549,6 +549,8 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
                 End If
         End Select
     Next
+
+    mBuffer.SA.pvData = vbNullPtr
 End Sub
 
 Friend Sub CheckValidPath(ByRef Path As String)
@@ -571,6 +573,19 @@ Friend Function HasIllegalCharacters(ByRef Path As String) As Boolean
     
     mBuffer.SA.pvData = vbNullPtr
 End Function
+
+Friend Sub InplaceFixSlashes(ByRef Path As String)
+    mBuffer.SA.pvData = StrPtr(Path)
+    
+    Dim i As Long
+    For i = 0 To Len(Path) - 1
+        If mBuffer.Data(i) = vbAltDirectorySeparatorChar Then
+            mBuffer.Data(i) = vbDirectorySeparatorChar
+        End If
+    Next
+    
+    mBuffer.SA.pvData = vbNullPtr
+End Sub
 
 Friend Sub FixupPath(ByRef Path As String)
     VerifyPath Path, True
@@ -742,7 +757,7 @@ Private Function GetLongPathName(ByRef ShortPath As String) As String
     Size = 1024
     Do
         LongPath = String$(Size, 0)
-        Size = API.GetLongPathName(ShortPath, LongPath, Size)
+        Size = Api.GetLongPathName(ShortPath, LongPath, Size)
     Loop While Size > Len(LongPath)
     
     GetLongPathName = Left$(LongPath, Size)
