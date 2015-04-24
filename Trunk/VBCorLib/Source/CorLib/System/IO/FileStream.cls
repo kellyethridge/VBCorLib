@@ -804,19 +804,17 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
         Access = ReadWriteAccess
     End If
     
-    VBCorLib.Path.CheckValidPath Path
-    VBCorLib.Path.InplaceFixSlashes Path
+    Statics.Path.CheckValidPathAndFixSlashes Path
     
     Set mHandle = SafeCreateFile(Path, Access, Share, Mode)
     If mHandle.IsInvalid Then
         IOError Err.LastDllError, Path
     End If
     
-    mName = VBCorLib.Path.GetFileName(Path)
-    mCanWrite = (Access And FileAccess.WriteAccess) <> 0
-    mCanRead = ((Access And FileAccess.ReadAccess) <> 0) And (Mode <> Truncate)
+    mName = Statics.Path.GetFileName(Path)
+    mCanWrite = CBool(Access And FileAccess.WriteAccess)
+    mCanRead = CBool(Access And FileAccess.ReadAccess) And (Mode <> Truncate)
     mCanSeek = (GetFileType(mHandle) = FILE_TYPE_DISK)
-    mOwnsHandle = True
     mIsOpen = True
     
     If AppendMode And mCanSeek Then
