@@ -15,8 +15,22 @@ Attribute VB_Exposed = False
 ' FileStreamTests
 '
 Option Explicit
+Implements ITestCaseSource
 
 Private mBuilder As IOHelper
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "ReadBlock_WhenCalled_ReadsData"
+            Test.Use 0, 0, NewBytes()
+            Test.Use 1, 1, NewBytes(49)
+            Test.Use 2, 2, NewBytes(49, 50)
+            Test.Use 3, 3, NewBytes(49, 50, 51)
+            Test.Use 4, 4, NewBytes(49, 50, 51, 52)
+            Test.Use 5, 5, NewBytes(49, 50, 51, 52, 53)
+            
+    End Select
+End Sub
 
 Public Sub Setup()
     Set mBuilder = New IOHelper
@@ -73,7 +87,7 @@ Public Sub NewFileStream_WithBufferSizeLessThanOne_ThrowsArgumentOutOfRangeExcep
     FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
     
     On Error Resume Next
-    With NewFileStream(FileName, Create, buffersize:=0)
+    With NewFileStream(FileName, Create, BufferSize:=0)
     End With
     
     AssertArgumentOutOfRangeException Err, "BufferSize"
@@ -102,47 +116,64 @@ Public Sub NewFileStream_WithAppendFileModeAndReadFileAccess_ThrowsArgumentExcep
     AssertArgumentException Err
 End Sub
 
-'Private fs As FileStream
-'
-'Public Sub Setup()
-'    Set fs = NewFileStream(App.Path & "\hello.txt", FileMode.OpenExisting)
-'End Sub
-'
-'Public Sub Teardown()
-'    fs.CloseStream
-'End Sub
-'
-'Public Sub TestLength()
-'    Assert.AreEqual 5@, fs.Length
-'    fs.CloseStream
-'End Sub
-'
-'Public Sub TestReadByte()
-'    Dim b As Byte
-'
-'    b = fs.ReadByte
-'    Assert.AreEqual Asc("h"), b
-'    Assert.AreEqual 1@, fs.Position
-'End Sub
-'
-'Public Sub TestReadBytePassedEnd()
-'    Dim i As Long
-'
-'    For i = 1 To 5
-'        fs.ReadByte
-'    Next i
-'    Assert.AreEqual 5@, fs.Position
-'    Assert.AreEqual -1, fs.ReadByte
-'    Assert.AreEqual 5@, fs.Position
-'End Sub
-'
-'Public Sub TestReadBlockPassedEnd()
-'    Dim b(0) As Byte
-'
-'    fs.SeekPosition 0, FromEnd
-'    Assert.AreEqual 0, fs.ReadBlock(b, 0, 1)
-'End Sub
-'
+Public Sub Length_WhenCalled_ReturnsFileLength()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345678")
+    
+    Dim Actual As Long
+    With NewFileStream(FileName, OpenExisting)
+        Actual = .Length
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(8)
+End Sub
+
+Public Sub ReadBlock_WhenCalled_ReadsData(ByVal CountToRead As Long, ByVal ExpectedCount As Long, ByRef ExpectedBytes() As Byte)
+    Dim ActualBytes()   As Byte
+    Dim ActualCount     As Long
+    Dim FileName        As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+        
+    ActualBytes = cArray.CreateInstance(vbByte, CountToRead)
+    With NewFileStream(FileName, OpenExisting)
+        ActualCount = .ReadBlock(ActualBytes, 0, CountToRead)
+    End With
+    
+    Assert.That ActualCount, Iz.EqualTo(ExpectedCount)
+    Assert.That ActualBytes, Iz.EqualTo(ExpectedBytes)
+End Sub
+
+Public Sub ReadBlock_WithCountPassedEnd_ReadsToEnd()
+    Dim ActualBytes()   As Byte
+    Dim ActualCount     As Long
+    Dim FileName        As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+    
+    ReDim ActualBytes(0 To 5)
+    With NewFileStream(FileName, OpenExisting)
+        ActualCount = .ReadBlock(ActualBytes, 0, 6)
+    End With
+    
+    Assert.That ActualCount, Iz.EqualTo(5)
+    Assert.That ActualBytes, Iz.EqualTo(NewBytes(49, 50, 51, 52, 53, 0))
+End Sub
+
+Public Sub ReadBlock_WithLargerThanBuffer_ReadsData()
+    Dim Data As String
+    Data = GenerateString(2000)
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:=Data)
+    
+    Dim ActualBytes(0 To 1999) As Byte
+    Dim ActualCount As Long
+    With NewFileStream(FileName, OpenExisting, BufferSize:=512)
+        ActualCount = .ReadBlock(ActualBytes, 0, 2000)
+    End With
+    
+    Assert.That ActualCount, Iz.EqualTo(2000)
+    Assert.That StrConv(ActualBytes, vbUnicode), Iz.EqualTo(Data)
+End Sub
+
 'Public Sub TestRead()
 '    Dim b() As Byte
 '    Dim i As Long
