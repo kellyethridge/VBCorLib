@@ -16,6 +16,69 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
+Private mBuilder As IOHelper
+
+Public Sub Setup()
+    Set mBuilder = New IOHelper
+End Sub
+
+Public Sub Teardown()
+    Set mBuilder = Nothing
+End Sub
+
+Public Sub NewFileStream_WithEmptyPath_ThrowsArgumentException()
+    On Error Resume Next
+    
+    NewFileStream "", Create
+    
+    AssertArgumentException Err, "Path"
+End Sub
+
+Public Sub CanRead_WithFileModeAppend_ReturnsFalse()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile("Test.txt", "Hello")
+    
+    With NewFileStream(FileName, FileMode.Append)
+        Assert.That .CanRead, Iz.False
+        Assert.That .CanWrite, Iz.True
+        Assert.That .CanSeek, Iz.True
+    End With
+End Sub
+
+Public Sub CanRead_WithFileModeCreate_ReturnsTrue()
+    Dim FileName As String
+    FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
+    
+    With NewFileStream(FileName, FileMode.Create)
+        Assert.That .CanRead, Iz.True
+        Assert.That .CanWrite, Iz.True
+        Assert.That .CanSeek, Iz.True
+    End With
+End Sub
+
+Public Sub CanWrite_WithFileModeCreate_ReturnsTrue()
+    Dim FileName As String
+    FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
+    
+    Dim Actual As Boolean
+    With NewFileStream(FileName, FileMode.Create)
+        Actual = .CanWrite
+    End With
+    
+    Assert.That Actual, Iz.True
+End Sub
+
+Public Sub NewFileStream_WithBufferSizeLessThanOne_ThrowsArgumentOutOfRangeException()
+    Dim FileName As String
+    FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
+    
+    On Error Resume Next
+    With NewFileStream(FileName, Create, BufferSize:=0)
+    End With
+    
+    AssertArgumentOutOfRangeException Err, "BufferSize"
+End Sub
+
 'Private fs As FileStream
 '
 'Public Sub Setup()
