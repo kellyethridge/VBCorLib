@@ -72,3 +72,16 @@ Public Function ReadFile(ByVal FileName As String) As String
     Close #FileNumber
 End Function
 
+Public Function GenerateString(ByVal Size As Long) As String
+    Dim Ran As New Random
+    Dim sb As New StringBuilder
+    Dim i As Long
+    
+    For i = 1 To Size
+        Dim Ch As Long
+        Ch = Ran.NextRange(32, Asc("z"))
+        sb.AppendChar Ch
+    Next
+    
+    GenerateString = sb.ToString
+End Function
