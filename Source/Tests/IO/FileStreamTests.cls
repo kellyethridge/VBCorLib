@@ -90,6 +90,18 @@ Public Sub ReadByte_WhenCalled_ReturnsBytes()
     End With
 End Sub
 
+Public Sub NewFileStream_WithAppendFileModeAndReadFileAccess_ThrowsArgumentException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile
+    
+    On Error Resume Next
+    With NewFileStream(FileName, FileMode.Append, FileAccess.ReadAccess)
+    End With
+    
+    Debug.Print Err.Description
+    AssertArgumentException Err
+End Sub
+
 'Private fs As FileStream
 '
 'Public Sub Setup()
