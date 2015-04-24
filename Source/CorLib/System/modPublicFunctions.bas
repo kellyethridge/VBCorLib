@@ -133,11 +133,11 @@ Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As Str
     Size = 128
     Do
         Buf = String$(Size, vbNullChar)
-        Size = API.GetLocaleInfo(LCID, LCType, Buf, Size)
+        Size = Api.GetLocaleInfo(LCID, LCType, Buf, Size)
         If Size > 0 Then Exit Do
         er = Err.LastDllError
         If er <> ERROR_INSUFFICIENT_BUFFER Then IOError er
-        Size = API.GetLocaleInfo(LCID, LCType, vbNullString, 0)
+        Size = Api.GetLocaleInfo(LCID, LCType, vbNullString, 0)
     Loop
     
     GetLocaleString = Left$(Buf, Size - 1)
@@ -177,7 +177,7 @@ End Sub
 ' vbLong:       Attempts to open a FileStream from a file handle.
 ' vbObject:     Attempts to convert the object to a Stream object.
 '
-Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = -1, Optional ByVal Share As FileShare = ReadShare) As Stream
+Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = DefaultAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As Stream
     Select Case VarType(Source)
         Case vbString
             ' We have a filename.

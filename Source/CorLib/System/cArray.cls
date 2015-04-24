@@ -764,9 +764,9 @@ Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal
     Dim Result As Long
     
     Result = 1
-    Dim ptr As Long
-    For ptr = ArrayBoundPtr To ArrayBoundPtr + (SizeOfSafeArrayBound * (Rank - 1)) Step SizeOfSafeArrayBound
-        Result = Result * MemLong(ptr)
+    Dim Ptr As Long
+    For Ptr = ArrayBoundPtr To ArrayBoundPtr + (SizeOfSafeArrayBound * (Rank - 1)) Step SizeOfSafeArrayBound
+        Result = Result * MemLong(Ptr)
     Next
 
     CalculateProductOfDimensions = Result
