@@ -82,22 +82,22 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
         
-    modStaticClasses.Path.FixupPath Path
-    Path = cString.TrimEnd(Path, modStaticClasses.Path.DirectorySeparatorString)
+    Statics.Path.FixupPath Path
+    Path = cString.TrimEnd(Path, Statics.Path.DirectorySeparatorString)
     
-    If Len(Path) > modStaticClasses.Path.MaxPathLength Then _
+    If Len(Path) > Statics.Path.MaxPathLength Then _
         Throw New PathTooLongException
-    If InStr(3, Path, modStaticClasses.Path.VolumeSeparatorString) > 0 Then _
+    If InStr(3, Path, Statics.Path.VolumeSeparatorString) > 0 Then _
         Throw New NotSupportedException
     
     Dim DirectoryNames() As String
-    DirectoryNames = Split(Path, modStaticClasses.Path.DirectorySeparatorString)
+    DirectoryNames = Split(Path, Statics.Path.DirectorySeparatorString)
     
     Dim i As Long
     i = cArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
-        TestDirectory = cString.Join(DirectoryNames, modStaticClasses.Path.DirectorySeparatorString, 0, i)
+        TestDirectory = cString.Join(DirectoryNames, Statics.Path.DirectorySeparatorString, 0, i)
         If Directory.Exists(TestDirectory) Then Exit Do
         i = i - 1
     Loop While i > 0
@@ -105,8 +105,8 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     Do While i <= UBound(DirectoryNames)
         i = i + 1
         Dim NewDirectory As String
-        NewDirectory = cString.Join(DirectoryNames, modStaticClasses.Path.DirectorySeparatorString, 0, i)
-        If API.CreateDirectory(NewDirectory) = BOOL_FALSE Then IOError Err.LastDllError
+        NewDirectory = cString.Join(DirectoryNames, Statics.Path.DirectorySeparatorString, 0, i)
+        If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then IOError Err.LastDllError
     Loop
     
     Set CreateDirectory = Cor.NewDirectoryInfo(Path)
@@ -139,7 +139,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath))
     
-    Path = cString.TrimEnd(modStaticClasses.Path.InternalGetFullPath(Path), "/\")
+    Path = cString.TrimEnd(Statics.Path.InternalGetFullPath(Path), "/\")
     
     If Recursive Then
         Dim Data As WIN32_FIND_DATA
@@ -154,15 +154,15 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
                     
                     If Len(FileName) > 0 Then
                         Dim FullPath As String
-                        FullPath = modStaticClasses.Path.Combine(Path, FileName)
+                        FullPath = Statics.Path.Combine(Path, FileName)
                         
                         If CBool(Data.dwFileAttributes And FileAttributes.DirectoryAttr) Then
                             Delete FullPath, True
                         Else
-                            If API.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
+                            If Api.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
                         End If
                     End If
-                Loop While API.FindNextFile(.DangerousGetHandle, Data) = BOOL_TRUE
+                Loop While Api.FindNextFile(.DangerousGetHandle, Data) = BOOL_TRUE
                 
                 Dim Result As Long
                 Result = Err.LastDllError
@@ -172,7 +172,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
         End With
     End If
     
-    If API.RemoveDirectory(Path) = BOOL_FALSE Then
+    If Api.RemoveDirectory(Path) = BOOL_FALSE Then
         If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then IOError Err.LastDllError, Path
     End If
 End Sub
@@ -253,7 +253,7 @@ Public Function GetCurrentDirectory() As String
     Result = String$(Path.MaxPathLength, 0)
     
     Dim Size As Long
-    Size = API.GetCurrentDirectory(Len(Result), Result)
+    Size = Api.GetCurrentDirectory(Len(Result), Result)
     If Size = 0 Then IOError Err.LastDllError
     
     GetCurrentDirectory = Left$(Result, Size)
@@ -286,11 +286,11 @@ Public Function GetDirectoryRoot(ByVal Path As String) As String
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), Environment.GetResourceString(Parameter_Path))
     
-    If Not modStaticClasses.Path.IsPathRooted(Path) Then
-        Path = modStaticClasses.Path.GetFullPath(Path)
+    If Not Statics.Path.IsPathRooted(Path) Then
+        Path = Statics.Path.GetFullPath(Path)
     End If
     
-    GetDirectoryRoot = modStaticClasses.Path.GetPathRoot(Path)
+    GetDirectoryRoot = Statics.Path.GetPathRoot(Path)
 End Function
 
 ''
@@ -360,11 +360,11 @@ Public Function GetParent(ByVal Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), Environment.GetResourceString(Parameter_Path))
 
-    modStaticClasses.Path.VerifyPath Path
-    Path = modStaticClasses.Path.GetFullPath(Path)
+    Statics.Path.VerifyPath Path
+    Path = Statics.Path.GetFullPath(Path)
     
     Dim DirName As String
-    DirName = modStaticClasses.Path.GetDirectoryName(Path)
+    DirName = Statics.Path.GetDirectoryName(Path)
     If Len(DirName) > 0 Then
         Set GetParent = Cor.NewDirectoryInfo(DirName)
     End If
@@ -392,7 +392,7 @@ Public Sub Move(ByVal SourceDirectory As String, ByVal DestinationDirectory As S
     If Path.GetPathRoot(SourceDirectory) <> Path.GetPathRoot(DestinationDirectory) Then _
         Throw Cor.NewIOException("Source and Destination directories must be on the same root drive.")
         
-    If API.MoveFile(SourceDirectory, DestinationDirectory) = BOOL_FALSE Then
+    If Api.MoveFile(SourceDirectory, DestinationDirectory) = BOOL_FALSE Then
         Dim Result  As Long
         Result = Err.LastDllError
         If Result = ERROR_FILE_NOT_FOUND Then
@@ -413,11 +413,11 @@ Public Sub SetCurrentDirectory(ByVal Path As String)
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), Environment.GetResourceString(Parameter_Path))
     
-    modStaticClasses.Path.VerifyPath Path
+    Statics.Path.VerifyPath Path
     If Not Exists(Path) Then _
         Throw New DirectoryNotFoundException
     
-    If API.SetCurrentDirectory(Path) = BOOL_FALSE Then IOError Err.LastDllError, Path
+    If Api.SetCurrentDirectory(Path) = BOOL_FALSE Then IOError Err.LastDllError, Path
 End Sub
 
 ''
@@ -538,7 +538,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
                         End If
                     End If
                 End If
-            Loop While API.FindNextFile(.DangerousGetHandle, Entry) <> BOOL_FALSE
+            Loop While Api.FindNextFile(.DangerousGetHandle, Entry) <> BOOL_FALSE
         End If
         
         Dim Error As Long
@@ -579,10 +579,10 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
     
-    modStaticClasses.Path.VerifyPath Path
+    Statics.Path.VerifyPath Path
     
     Dim DirHandle As Long
-    DirHandle = API.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_FLAG_BACKUP_SEMANTICS, 0)
+    DirHandle = Api.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_FLAG_BACKUP_SEMANTICS, 0)
     If DirHandle = INVALID_HANDLE Then
         IOError Err.LastDllError, Path
     End If

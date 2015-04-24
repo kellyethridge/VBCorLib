@@ -69,7 +69,7 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Table() As EncodingTable
-    Set Table = modStaticClasses.Encoding.EncodingTable
+    Set Table = Statics.Encoding.EncodingTable
 End Property
 
 
