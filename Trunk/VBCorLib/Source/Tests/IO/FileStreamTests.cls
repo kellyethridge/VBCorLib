@@ -16,6 +16,7 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
 
 Private Const OneChar   As Long = 49
 Private Const TwoChar   As Long = 50
@@ -24,6 +25,10 @@ Private Const FourChar  As Long = 52
 Private Const FiveChar  As Long = 53
 
 Private mBuilder As IOHelper
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
@@ -300,45 +305,22 @@ Public Sub Position_ToBeforeStartOfStream_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+Public Sub WriteBlock_WithData_WritesToFile()
+    Dim FileName As String
+    FileName = Path.Combine(mBuilder.TempFolder, "File.txt")
+    
+    Dim Data() As Byte
+    Data = NewBytes(1, 2, 3, 4, 5, 6)
+    With NewFileStream(FileName, CreateNew)
+        .WriteBlock Data, 0, 6
+    End With
+    
+    Dim Actual() As Byte
+    Actual = mBuilder.ReadFileBytes(FileName)
+    Assert.That Actual, Iz.EqualTo(Data)
+End Sub
 
-'Public Sub TestRead()
-'    Dim b() As Byte
-'    Dim i As Long
-'
-'    ReDim b(400)
-'    Assert.AreEqual 0@, fs.Position
-'    Assert.AreEqual 5, fs.ReadBlock(b, 0, 50)
-'    For i = 0 To 4
-'        Assert.AreEqual Choose(i + 1, 104, 101, 108, 108, 111), b(i)
-'    Next i
-'    Assert.AreEqual 5@, fs.Position
-'End Sub
-'
-'Public Sub TestSeekBeforeFile()
-'    On Error GoTo errTrap
-'    fs.SeekPosition -1, FromBeginning
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
-'End Sub
-'
-'Public Sub TestReadOneByteAtATime()
-'    Dim b As Long
-'    Dim s As String
-'
-'    b = fs.ReadByte
-'    Do While b >= 0
-'        s = s & Chr$(b)
-'        b = fs.ReadByte
-'    Loop
-'
-'    Assert.AreEqual "hello", s
-'End Sub
-'
+
 'Public Sub TestWriteSeekReadRead()
 '    Dim f As String
 '    Dim i As Long
