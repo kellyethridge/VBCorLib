@@ -17,6 +17,12 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
 
+Private Const OneChar   As Long = 49
+Private Const TwoChar   As Long = 50
+Private Const ThreeChar As Long = 51
+Private Const FourChar  As Long = 52
+Private Const FiveChar  As Long = 53
+
 Private mBuilder As IOHelper
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
@@ -28,6 +34,21 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 3, 3, NewBytes(49, 50, 51)
             Test.Use 4, 4, NewBytes(49, 50, 51, 52)
             Test.Use 5, 5, NewBytes(49, 50, 51, 52, 53)
+            
+        Case "SeekPosition_WithValues_MovesToFilePosition"
+            Test.Use 0, SeekOrigin.FromBeginning, OneChar
+            Test.Use 4, SeekOrigin.FromBeginning, FiveChar
+            Test.Use 2, SeekOrigin.FromBeginning, ThreeChar
+            Test.Use 0, SeekOrigin.FromEnd, -1
+            Test.Use -1, SeekOrigin.FromEnd, FiveChar
+            Test.Use -4, SeekOrigin.FromEnd, TwoChar
+            Test.Use -5, SeekOrigin.FromEnd, OneChar
+            
+        Case "Position_WhenSet_MovesToFilePosition"
+            Test.Use 0, OneChar
+            Test.Use 3, FourChar
+            Test.Use 4, FiveChar
+            Test.Use 5, -1
             
     End Select
 End Sub
@@ -87,7 +108,7 @@ Public Sub NewFileStream_WithBufferSizeLessThanOne_ThrowsArgumentOutOfRangeExcep
     FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
     
     On Error Resume Next
-    With NewFileStream(FileName, Create, BufferSize:=0)
+    With NewFileStream(FileName, Create, buffersize:=0)
     End With
     
     AssertArgumentOutOfRangeException Err, "BufferSize"
@@ -112,7 +133,7 @@ Public Sub NewFileStream_WithAppendFileModeAndReadFileAccess_ThrowsArgumentExcep
     With NewFileStream(FileName, FileMode.Append, FileAccess.ReadAccess)
     End With
     
-    Debug.Print Err.Description
+    WriteLine Err.Description
     AssertArgumentException Err
 End Sub
 
@@ -128,12 +149,64 @@ Public Sub Length_WhenCalled_ReturnsFileLength()
     Assert.That Actual, Iz.EqualTo(8)
 End Sub
 
+Public Sub ReadBlock_WithNullBytes_ThrowsArgumentNullException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+    
+    On Error Resume Next
+    Dim NullBytes() As Byte
+    With NewFileStream(FileName, OpenExisting)
+        .ReadBlock NullBytes, 0, 1
+    End With
+    
+    AssertArgumentNullException Err, "Bytes"
+End Sub
+
+Public Sub ReadBlock_WithOffsetLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+    
+    On Error Resume Next
+    Dim Bytes(1 To 5) As Byte
+    With NewFileStream(FileName, OpenExisting)
+        .ReadBlock Bytes, 0, 1
+    End With
+
+    AssertArgumentOutOfRangeException Err, "Offset"
+End Sub
+
+Public Sub ReadBlock_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+    
+    On Error Resume Next
+    Dim Bytes(0 To 3) As Byte
+    With NewFileStream(FileName, OpenExisting)
+        .ReadBlock Bytes, 1, -1
+    End With
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub ReadBlock_WithOffsetAndCountExtendingPassedEndOfBytes_ThrowsArgumentException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+    
+    On Error Resume Next
+    Dim Bytes(0 To 3) As Byte
+    With NewFileStream(FileName, OpenExisting)
+        .ReadBlock Bytes, 1, 4
+    End With
+
+    AssertArgumentException Err
+End Sub
+
 Public Sub ReadBlock_WhenCalled_ReadsData(ByVal CountToRead As Long, ByVal ExpectedCount As Long, ByRef ExpectedBytes() As Byte)
     Dim ActualBytes()   As Byte
     Dim ActualCount     As Long
     Dim FileName        As String
     FileName = mBuilder.CreateFile(Data:="12345")
-        
+    
     ActualBytes = cArray.CreateInstance(vbByte, CountToRead)
     With NewFileStream(FileName, OpenExisting)
         ActualCount = .ReadBlock(ActualBytes, 0, CountToRead)
@@ -166,13 +239,67 @@ Public Sub ReadBlock_WithLargerThanBuffer_ReadsData()
     
     Dim ActualBytes(0 To 1999) As Byte
     Dim ActualCount As Long
-    With NewFileStream(FileName, OpenExisting, BufferSize:=512)
+    With NewFileStream(FileName, OpenExisting, buffersize:=512)
         ActualCount = .ReadBlock(ActualBytes, 0, 2000)
     End With
     
     Assert.That ActualCount, Iz.EqualTo(2000)
     Assert.That StrConv(ActualBytes, vbUnicode), Iz.EqualTo(Data)
 End Sub
+
+Public Sub SeekPosition_WithValues_MovesToFilePosition(ByVal Offset As Long, ByVal Origin As SeekOrigin, ByVal Expected As Long)
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+    
+    Dim Actual As Long
+    With NewFileStream(FileName, OpenExisting, ReadAccess)
+        .ReadByte   ' cause buffer to be filled to test seeking within current buffer.
+        .SeekPosition Offset, Origin
+        Actual = .ReadByte
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub SeekPosition_ToBeforeStartOfStream_ThrowsArgumentException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+        
+    On Error Resume Next
+    With NewFileStream(FileName, OpenExisting)
+        .SeekPosition -1, FromBeginning
+    End With
+    
+    WriteLine Err.Description
+    AssertArgumentException Err
+End Sub
+
+Public Sub Position_WhenSet_MovesToFilePosition(ByVal NewPosition As Long, ByVal Expected As Long)
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+    
+    Dim Actual As Long
+    With NewFileStream(FileName, OpenExisting)
+        .Position = NewPosition
+        Actual = .ReadByte
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Position_ToBeforeStartOfStream_ThrowsArgumentException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12345")
+        
+    On Error Resume Next
+    With NewFileStream(FileName, OpenExisting)
+        .Position = -1
+    End With
+    
+    WriteLine Err.Description
+    AssertArgumentException Err
+End Sub
+
 
 'Public Sub TestRead()
 '    Dim b() As Byte

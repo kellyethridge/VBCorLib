@@ -22,24 +22,24 @@ Attribute VB_Name = "modFileStream"
 
 Option Explicit
 
-Public Declare Function ReadFileEx Lib "kernel32.dll" (ByVal hFile As Long, ByRef lpBuffer As Any, ByVal nNumberOfBytesToRead As Long, ByRef lpOverlapped As Any, ByVal lpCompletionRoutine As Long) As Long
-Public Declare Function WriteFileEx Lib "kernel32.dll" (ByVal hFile As Long, ByRef lpBuffer As Any, ByVal nNumberOfBytesToWrite As Long, ByRef lpOverlapped As NativeOverlapped, ByVal lpCompletionRoutine As Long) As Long
-
-
-Public Sub ReadFileIOCompletion(ByVal dwErrorCode As Long, ByVal dwNumberOfBytesTransfered As Long, ByVal lpOverlapped As Long)
-    Dim over As NativeOverlapped
-    Call CopyMemory(over, ByVal lpOverlapped, Len(over))
-    Call CoTaskMemFree(lpOverlapped)
-    
-    Dim Callback As AsyncCallback
-    ObjectPtr(Callback) = over.CallbackHandle
-    
-    Dim async As StreamAsyncResult
-    ObjectPtr(async) = over.EventHandle
-    async.BytesRead = dwNumberOfBytesTransfered
-    async.IsCompleted = True
-    
-    If Not Callback Is Nothing Then
-        Call Callback.Execute(async)
-    End If
-End Sub
+'Public Declare Function ReadFileEx Lib "kernel32.dll" (ByVal hFile As Long, ByRef lpBuffer As Any, ByVal nNumberOfBytesToRead As Long, ByRef lpOverlapped As Any, ByVal lpCompletionRoutine As Long) As Long
+'Public Declare Function WriteFileEx Lib "kernel32.dll" (ByVal hFile As Long, ByRef lpBuffer As Any, ByVal nNumberOfBytesToWrite As Long, ByRef lpOverlapped As NativeOverlapped, ByVal lpCompletionRoutine As Long) As Long
+'
+'
+'Public Sub ReadFileIOCompletion(ByVal dwErrorCode As Long, ByVal dwNumberOfBytesTransfered As Long, ByVal lpOverlapped As Long)
+'    Dim over As NativeOverlapped
+'    Call CopyMemory(over, ByVal lpOverlapped, Len(over))
+'    Call CoTaskMemFree(lpOverlapped)
+'
+'    Dim Callback As AsyncCallback
+'    ObjectPtr(Callback) = over.CallbackHandle
+'
+'    Dim async As StreamAsyncResult
+'    ObjectPtr(async) = over.EventHandle
+'    async.BytesRead = dwNumberOfBytesTransfered
+'    async.IsCompleted = True
+'
+'    If Not Callback Is Nothing Then
+'        Call Callback.Execute(async)
+'    End If
+'End Sub

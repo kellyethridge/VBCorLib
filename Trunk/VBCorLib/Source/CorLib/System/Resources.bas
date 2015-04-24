@@ -110,6 +110,7 @@ Public Enum ArgumentString
     Argument_InvalidCharsInPath = 832
     Argument_InvalidValueType = 833
     Argument_InvalidFileModeAndAccessCombo = 834
+    Argument_InvalidSeekOffset = 835
 End Enum
 
 Public Enum ArgumentNullString

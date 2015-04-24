@@ -69,14 +69,14 @@ Private Const INVALID_SET_FILE_POINTER  As Long = -1
 Private Const INVALID_FILE_SIZE         As Long = -1
 Private Const ERROR_BROKEN_PIPE         As Long = 109
 
-Public Type NativeOverlapped
-    InternalLow     As Long
-    InternalHigh    As Long
-    OffsetLow       As Long
-    OffsetHigh      As Long
-    EventHandle     As Long
-    CallbackHandle  As Long
-End Type
+'Public Type NativeOverlapped
+'    InternalLow     As Long
+'    InternalHigh    As Long
+'    OffsetLow       As Long
+'    OffsetHigh      As Long
+'    EventHandle     As Long
+'    CallbackHandle  As Long
+'End Type
 
 
 
@@ -131,7 +131,6 @@ Public Enum FileShare
 End Enum
 
 Private mName           As String
-'Private mHandle         As Handle
 Private mHandle         As SafeFileHandle
 Private mCanRead        As Boolean
 Private mCanWrite       As Boolean
@@ -375,8 +374,8 @@ End Property
 ' @return The new position in the file stream.
 '
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    Call VerifyCanSeek
-    Call VerifyIsOpen
+    VerifyCanSeek
+    VerifyIsOpen
     
     Offset = Int(Offset)
     
@@ -385,27 +384,37 @@ Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigi
         Case FromBeginning:     NewPosition = Offset
         Case FromCurrent:       NewPosition = mFilePosition + Offset
         Case FromEnd:           NewPosition = Length + Offset
+        Case Else
+            Error.Argument Argument_InvalidSeekOrigin
     End Select
     
     If NewPosition < mMinPosition Then
         If mMinPosition = 0@ Then
-            Throw Cor.NewArgumentException("Cannot seek before beginning of file", "Offset")
+            Error.Argument Argument_InvalidSeekOffset
         Else
             Throw Cor.NewIOException("Seeking to a position prior to append-start position may cause data to be overwritten.")
         End If
     End If
     
-    If mCanWrite Then Call Flush
+    If mCanWrite Then
+        Flush
+    End If
+    
     Select Case NewPosition
         Case mBufferOffset To mBufferOffset + mBytesBuffered - 1
+            Debug.Print "SeekPosition: Seeking within current buffer."
+            
             ' in same buffer works only for reading
             mReadPosition = NewPosition - mBufferOffset
             mFilePosition = NewPosition
         Case Else
+            Debug.Print "SeekPosition: Seeking outside current buffer."
+            
             mFilePosition = InternalSeek(Offset, Origin)
             mBufferOffset = mFilePosition
             mBytesBuffered = 0
     End Select
+    
     SeekPosition = mFilePosition
 End Function
 
@@ -471,33 +480,50 @@ End Function
 ' Reads a specified number of bytes into the given array.
 '
 ' @param Bytes The array to store the bytes that are read from the stream.
-' @param Offset The index in <i>Buffer</i> to begin storing bytes.
+' @param Offset The index in <i>Buffer</i> to begin storing bytes. Offset starts at LBound of Bytes.
 ' @param Count The number of bytes to be read from the stream.
 ' @return The number of byte actually read from the stream.
 '
 Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
-    Call VerifyCanRead
-    Call VerifyIsOpen
+    VerifyCanRead
+    VerifyIsOpen
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), Offset, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", Offset, "Offset", Count, "Count")
+    If IsNullByteArray(Bytes) Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    If IsMultiDimensionByteArray(Bytes) Then _
+        Error.Rank
+    If Offset < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Offset + Count - 1 > UBound(Bytes) Then _
+        Error.Argument Argument_InvalidOffLen
     
-    If mCanWrite Then Call Flush
-    If Count = 0 Then Exit Function
-    
-    If mCanSeek Then
-        If mFilePosition > Length Then Exit Function
+    If mCanWrite Then
+        Flush
+    End If
+    If Count = 0 Then
+        Exit Function
     End If
     
-    If (mBytesBuffered = 0) Or (mReadPosition = mBytesBuffered) Then Call FillBuffer
-    If mBytesBuffered = 0 Then Exit Function
+    If mCanSeek Then
+        If mFilePosition > Length Then
+            Exit Function
+        End If
+    End If
+    
+    If (mBytesBuffered = 0) Or (mReadPosition = mBytesBuffered) Then
+        FillBuffer
+    End If
+    If mBytesBuffered = 0 Then
+        Exit Function
+    End If
     
     Dim Available As Long
     Available = mBytesBuffered - mReadPosition
     
     If Count > Available Then
-        Call CopyMemory(Bytes(Offset), mBuffer(mReadPosition), Available)
+        CopyMemory Bytes(Offset), mBuffer(mReadPosition), Available
         
         ' Read the rest of the requested amount of data from the file.
         If ReadFile(mHandle, Bytes(Offset + Available), Count - Available, Count, ByVal 0&) = BOOL_FALSE Then
@@ -508,8 +534,9 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
         mBytesBuffered = 0
     Else
         ' All of the data was already cached in the buffer.
-        Call CopyMemory(Bytes(Offset), mBuffer(mReadPosition), Count)
+        CopyMemory Bytes(Offset), mBuffer(mReadPosition), Count
     End If
+    
     mReadPosition = mReadPosition + Count
     mFilePosition = mFilePosition + Count
     ReadBlock = Count
@@ -527,62 +554,31 @@ End Function
 ' information about the buffer read.
 '
 Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-#If False Then
-    If Me.IsAsync And Environment.IsNT Then
-        Set BeginRead = BeginReadAsync(Buffer, Offset, Count, Callback, State)
-        Exit Function
-    End If
-#End If
-    
     Dim Ret As StreamAsyncResult
     Set Ret = Cor.NewStreamAsyncResult(State)
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     With Ret
         .BytesRead = ReadBlock(Buffer, Offset, Count)
         .IsCompleted = True
         .IsReadType = True
     End With
 
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
-
-errTrap:
+    If Not Callback Is Nothing Then
+        Callback.Execute Ret
+    End If
+    
+    GoTo Finally
+    
+Catch:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
+    If Catch(Ex, Err) Then
+        Set Ret.Exception = Ex
+    End If
+    
+Finally:
     Set BeginRead = Ret
 End Function
-
-#If False Then
-Private Function BeginReadAsync(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, ByVal Callback As AsyncCallback, ByRef State As Variant) As IAsyncResult
-    Dim over As NativeOverlapped
-    With AsDLong(CCur(0.0001@ * Me.Position))
-        over.OffsetLow = .LoDWord
-        over.OffsetHigh = .HiDWord
-    End With
-    
-    Dim Result As StreamAsyncResult
-    Set Result = Cor.NewStreamAsyncResult(State)
-    over.EventHandle = ObjectPtr(Result)
-    
-    Result.CompletedSynchronously = False
-    Result.IsReadType = True
-    
-    over.CallbackHandle = ObjectPtr(Callback)
-    ObjectPtr(Callback) = vbNullPtr
-        
-    Dim memOver As Long
-    memOver = CoTaskMemAlloc(Len(over))
-    Call CopyMemory(ByVal memOver, over, Len(over))
-    
-    If ReadFileEx(mHandle, Buffer(Offset), Count, ByVal memOver, AddressOf ReadFileIOCompletion) <> BOOL_FALSE Then
-        Set BeginReadAsync = Result
-        ObjectPtr(Result) = vbNullPtr
-    Else
-        ObjectPtr(Callback) = over.CallbackHandle
-    End If
-End Function
-#End If
-
 
 ''
 ' Signifies the end of an asynchronous read from the stream.
@@ -724,8 +720,8 @@ End Sub
 ' Writes any data that may be in the write buffer to the underlying stream.
 '
 Public Sub Flush()
-    Call VerifyCanWrite
-    Call VerifyIsOpen
+    VerifyCanWrite
+    VerifyIsOpen
     
     Dim BytesWritten As Long
     If mWritePosition > 0 Then
@@ -955,11 +951,13 @@ Private Sub FillBuffer()
         ReDim mBuffer(0 To mBufferSize - 1)
     End If
     
+    Debug.Print "FileStream: Filling buffer (" & mBufferSize & ")"
     If ReadFile(mHandle, mBuffer(0), mBufferSize, mBytesBuffered, ByVal 0&) = BOOL_FALSE Then
         If mHandle <> ERROR_BROKEN_PIPE Then
             IOError Err.LastDllError
         End If
     End If
+    Debug.Print "FileStream: Buffered (" & mBytesBuffered & ") bytes"
 End Sub
 
 Private Function InternalSeek(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
