@@ -73,10 +73,21 @@ Public Sub NewFileStream_WithBufferSizeLessThanOne_ThrowsArgumentOutOfRangeExcep
     FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
     
     On Error Resume Next
-    With NewFileStream(FileName, Create, BufferSize:=0)
+    With NewFileStream(FileName, Create, buffersize:=0)
     End With
     
     AssertArgumentOutOfRangeException Err, "BufferSize"
+End Sub
+
+Public Sub ReadByte_WhenCalled_ReturnsBytes()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="12")
+    
+    With NewFileStream(FileName, FileMode.OpenExisting)
+        Assert.That .ReadByte, Iz.EqualTo(Asc("1"))
+        Assert.That .ReadByte, Iz.EqualTo(Asc("2"))
+        Assert.That .ReadByte, Iz.EqualTo(-1)
+    End With
 End Sub
 
 'Private fs As FileStream

@@ -225,7 +225,7 @@ End Sub
 
 Public Sub ReadAllLines_WithEmptyFile_ReturnsEmptyArray()
     Dim FileName As String
-    FileName = mBuilder.CreateFile(Data:="")
+    FileName = mBuilder.CreateFile()
     
     Dim Actual() As String
     Actual = File.ReadAllLines(FileName)
@@ -245,7 +245,7 @@ End Sub
 
 Public Sub ReadAllBytes_WithEmptyFile_ReturnsEmptyArray()
     Dim FileName As String
-    FileName = mBuilder.CreateFile(Data:="")
+    FileName = mBuilder.CreateFile()
     
     Dim Actual() As Byte
     Actual = File.ReadAllBytes(FileName)
@@ -273,7 +273,7 @@ End Sub
 
 Public Sub ReadAllText_WithEmptyFile_ReturnsEmptyString()
     Dim FileName As String
-    FileName = mBuilder.CreateFile(Data:="")
+    FileName = mBuilder.CreateFile()
     
     Dim Actual As String
     Actual = File.ReadAllText(FileName)
@@ -294,7 +294,7 @@ End Sub
 
 Public Sub WriteAllBytes_WithEmptyData_CreatesEmptyFile()
     Dim FileName As String
-    FileName = mBuilder.CreateFile(Data:="")
+    FileName = mBuilder.CreateFile()
     
     File.WriteAllbytes FileName, NewBytes()
     
@@ -318,7 +318,7 @@ End Sub
 
 Public Sub WriteAllLines_WithLines_WritesToFile(ByVal Contents As Variant)
     Dim FileName As String
-    FileName = mBuilder.CreateFile(Data:="")
+    FileName = mBuilder.CreateFile()
     
     File.WriteAllLines FileName, Contents
     

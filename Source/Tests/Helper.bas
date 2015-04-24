@@ -2,7 +2,20 @@ Attribute VB_Name = "Helper"
 Option Explicit
 
 Public Function FolderExists(ByRef Folder As String) As Boolean
-    FolderExists = Len(Dir$(Folder, vbDirectory)) > 0
+    On Error GoTo Finally
+    
+    Dim FileName As String
+    FileName = Folder & "\_dummyfile.txt"
+    
+    Dim FileNumber As Long
+    FileNumber = FreeFile
+    Open FileName For Output As FileNumber
+    Close #FileNumber
+    
+    Kill FileName
+    
+    FolderExists = True
+Finally:
 End Function
 
 Public Sub DeleteFolder(ByRef Folder As String)

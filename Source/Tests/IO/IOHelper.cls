@@ -24,7 +24,7 @@ Public Property Get TempSubFolder() As String
       TempSubFolder = "VBCorlib.IO.Tests"
 End Property
 
-Public Function CreateFile(Optional ByVal FileName As String = "File.txt", Optional ByVal Data As String = "Hello, world!") As String
+Public Function CreateFile(Optional ByVal FileName As String = "File.txt", Optional ByVal Data As String) As String
     CreateFile = Path.Combine(mTempFolder, FileName)
     If Not FileExists(CreateFile) Then
         Dim FileNumber As Long

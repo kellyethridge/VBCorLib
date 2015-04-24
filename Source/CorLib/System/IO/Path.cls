@@ -587,6 +587,24 @@ Friend Sub InplaceFixSlashes(ByRef Path As String)
     mBuffer.SA.pvData = vbNullPtr
 End Sub
 
+Friend Sub CheckValidPathAndFixSlashes(ByRef Path As String)
+    mBuffer.SA.pvData = StrPtr(Path)
+    
+    Dim i As Long
+    For i = 0 To Len(Path) - 1
+        Select Case mBuffer.Data(i)
+            Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
+                Error.Argument Argument_InvalidCharsInPath, "Path"
+                
+            Case vbAltDirectorySeparatorChar
+                mBuffer.Data(i) = vbDirectorySeparatorChar
+        End Select
+    Next
+    
+    mBuffer.SA.pvData = vbNullPtr
+End Sub
+
+
 Friend Sub FixupPath(ByRef Path As String)
     VerifyPath Path, True
     
