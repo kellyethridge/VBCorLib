@@ -77,7 +77,7 @@ End Enum
 ' @see constructors
 '
 Public Property Get Cor() As Constructors
-    Set Cor = modStaticClasses.Cor
+    Set Cor = Statics.Cor
 End Property
 
 ''
@@ -89,7 +89,7 @@ End Property
 ' @see cArray
 '
 Public Property Get cArray() As cArray
-    Set cArray = modStaticClasses.cArray
+    Set cArray = Statics.cArray
 End Property
 
 ''
@@ -101,7 +101,7 @@ End Property
 ' @see cString
 '
 Public Property Get cString() As cString
-    Set cString = modStaticClasses.cString
+    Set cString = Statics.cString
 End Property
 
 ''
@@ -112,7 +112,7 @@ End Property
 ' @see ComparerStatic
 '
 Public Property Get Comparer() As ComparerStatic
-    Set Comparer = modStaticClasses.Comparer
+    Set Comparer = Statics.Comparer
 End Property
 
 ''
@@ -122,7 +122,7 @@ End Property
 ' @see Environment
 '
 Public Property Get Environment() As Environment
-    Set Environment = modStaticClasses.Environment
+    Set Environment = Statics.Environment
 End Property
 
 ''
@@ -132,7 +132,7 @@ End Property
 ' @see BitArray
 ' @see BitArrayStatic
 Public Property Get BitArray() As BitArrayStatic
-    Set BitArray = modStaticClasses.BitArray
+    Set BitArray = Statics.BitArray
 End Property
 
 ''
@@ -142,7 +142,7 @@ End Property
 ' @see Buffer
 '
 Public Property Get Buffer() As Buffer
-    Set Buffer = modStaticClasses.Buffer
+    Set Buffer = Statics.Buffer
 End Property
 
 ''
@@ -153,7 +153,7 @@ End Property
 ' @see NumberFormatInfoStatic
 '
 Public Property Get NumberFormatInfo() As NumberFormatInfoStatic
-    Set NumberFormatInfo = modStaticClasses.NumberFormatInfo
+    Set NumberFormatInfo = Statics.NumberFormatInfo
 End Property
 
 ''
@@ -163,7 +163,7 @@ End Property
 ' @see BitConverter
 '
 Public Property Get BitConverter() As BitConverter
-    Set BitConverter = modStaticClasses.BitConverter
+    Set BitConverter = Statics.BitConverter
 End Property
 
 ''
@@ -174,7 +174,7 @@ End Property
 ' @see VersionStatic
 '
 Public Property Get Version() As VersionStatic
-    Set Version = modStaticClasses.Version
+    Set Version = Statics.Version
 End Property
 
 ''
@@ -185,7 +185,7 @@ End Property
 ' @see TimeSpanStatic
 '
 Public Property Get TimeSpan() As TimeSpanStatic
-    Set TimeSpan = modStaticClasses.TimeSpan
+    Set TimeSpan = Statics.TimeSpan
 End Property
 
 ''
@@ -196,7 +196,7 @@ End Property
 ' @see cDateTimeStatic
 '
 Public Property Get cDateTime() As cDateTimeStatic
-    Set cDateTime = modStaticClasses.cDateTime
+    Set cDateTime = Statics.cDateTime
 End Property
 
 ''
@@ -207,7 +207,7 @@ End Property
 ' @see DateTimeFormatInfoStatic
 '
 Public Property Get DateTimeFormatInfo() As DateTimeFormatInfoStatic
-    Set DateTimeFormatInfo = modStaticClasses.DateTimeFormatInfo
+    Set DateTimeFormatInfo = Statics.DateTimeFormatInfo
 End Property
 
 ''
@@ -218,7 +218,7 @@ End Property
 ' @see CultureInfoStatic
 '
 Public Property Get CultureInfo() As CultureInfoStatic
-    Set CultureInfo = modStaticClasses.CultureInfo
+    Set CultureInfo = Statics.CultureInfo
 End Property
 
 ''
@@ -229,7 +229,7 @@ End Property
 ' @see TimeZoneStatic
 '
 Public Property Get TimeZone() As TimeZoneStatic
-    Set TimeZone = modStaticClasses.TimeZone
+    Set TimeZone = Statics.TimeZone
 End Property
 
 ''
@@ -239,7 +239,7 @@ End Property
 ' @see Path
 '
 Public Property Get Path() As Path
-    Set Path = modStaticClasses.Path
+    Set Path = Statics.Path
 End Property
 
 ''
@@ -250,7 +250,7 @@ End Property
 ' @see EncodingStatic
 '
 Public Property Get Encoding() As EncodingStatic
-    Set Encoding = modStaticClasses.Encoding
+    Set Encoding = Statics.Encoding
 End Property
 
 ''
@@ -262,7 +262,7 @@ End Property
 ' @see StreamReader
 '
 Public Property Get TextReader() As TextReaderStatic
-    Set TextReader = modStaticClasses.TextReader
+    Set TextReader = Statics.TextReader
 End Property
 
 ''
@@ -277,7 +277,7 @@ End Property
 ' @see DriveInfoStatic
 '
 Public Property Get Directory() As Directory
-    Set Directory = modStaticClasses.Directory
+    Set Directory = Statics.Directory
 End Property
 
 ''
@@ -292,7 +292,7 @@ End Property
 ' @see DriveInfoStatic
 '
 Public Property Get File() As File
-    Set File = modStaticClasses.File
+    Set File = Statics.File
 End Property
 
 ''
@@ -303,7 +303,7 @@ End Property
 ' @see StreamStatic
 '
 Public Property Get Stream() As StreamStatic
-    Set Stream = modStaticClasses.Stream
+    Set Stream = Statics.Stream
 End Property
 
 ''
@@ -314,7 +314,7 @@ End Property
 ' @see GregorianCalendarStatic
 '
 Public Property Get GregorianCalendar() As GregorianCalendarStatic
-    Set GregorianCalendar = modStaticClasses.GregorianCalendar
+    Set GregorianCalendar = Statics.GregorianCalendar
 End Property
 
 ''
@@ -325,7 +325,7 @@ End Property
 ' @see JulianCalendarStatic
 '
 Public Property Get JulianCalendar() As JulianCalendarStatic
-    Set JulianCalendar = modStaticClasses.JulianCalendar
+    Set JulianCalendar = Statics.JulianCalendar
 End Property
 
 ''
@@ -336,7 +336,7 @@ End Property
 ' @see HebrewCalendarStatic
 '
 Public Property Get HebrewCalendar() As HebrewCalendarStatic
-    Set HebrewCalendar = modStaticClasses.HebrewCalendar
+    Set HebrewCalendar = Statics.HebrewCalendar
 End Property
 
 ''
@@ -347,7 +347,7 @@ End Property
 ' @see KoreanCalendarStatic
 '
 Public Property Get KoreanCalendar() As KoreanCalendarStatic
-    Set KoreanCalendar = modStaticClasses.KoreanCalendar
+    Set KoreanCalendar = Statics.KoreanCalendar
 End Property
 
 ''
@@ -358,7 +358,7 @@ End Property
 ' @see HijriCalendarStatic
 '
 Public Property Get HijriCalendar() As HijriCalendarStatic
-    Set HijriCalendar = modStaticClasses.HijriCalendar
+    Set HijriCalendar = Statics.HijriCalendar
 End Property
 
 ''
@@ -369,7 +369,7 @@ End Property
 ' @see CalendarStatic
 '
 Public Property Get Calendar() As CalendarStatic
-    Set Calendar = modStaticClasses.Calendar
+    Set Calendar = Statics.Calendar
 End Property
 
 ''
@@ -379,7 +379,7 @@ End Property
 ' @see Console
 '
 Public Property Get Console() As Console
-    Set Console = modStaticClasses.Console
+    Set Console = Statics.Console
 End Property
 
 ''
@@ -390,7 +390,7 @@ End Property
 ' @see ArrayListStatic
 '
 Public Property Get ArrayList() As ArrayListStatic
-    Set ArrayList = modStaticClasses.ArrayList
+    Set ArrayList = Statics.ArrayList
 End Property
 
 ''
@@ -401,7 +401,7 @@ End Property
 ' @see RegistryKey
 '
 Public Property Get Registry() As Registry
-    Set Registry = modStaticClasses.Registry
+    Set Registry = Statics.Registry
 End Property
 
 ''
@@ -413,7 +413,7 @@ End Property
 ' @see Registry
 '
 Public Property Get RegistryKey() As RegistryKeyStatic
-    Set RegistryKey = modStaticClasses.RegistryKey
+    Set RegistryKey = Statics.RegistryKey
 End Property
 
 ''
@@ -424,7 +424,7 @@ End Property
 ' @see Guid
 '
 Public Property Get Guid() As GuidStatic
-    Set Guid = modStaticClasses.Guid
+    Set Guid = Statics.Guid
 End Property
 
 ''
@@ -434,7 +434,7 @@ End Property
 ' @see Convert
 '
 Public Property Get Convert() As Convert
-    Set Convert = modStaticClasses.Convert
+    Set Convert = Statics.Convert
 End Property
 
 ''
@@ -447,7 +447,7 @@ End Property
 ' @see ResourceReader
 '
 Public Property Get ResourceManager() As ResourceManagerStatic
-    Set ResourceManager = modStaticClasses.ResourceManager
+    Set ResourceManager = Statics.ResourceManager
 End Property
 
 ''
@@ -461,7 +461,7 @@ End Property
 ' @see File
 '
 Public Property Get DriveInfo() As DriveInfoStatic
-    Set DriveInfo = modStaticClasses.DriveInfo
+    Set DriveInfo = Statics.DriveInfo
 End Property
 
 ''
@@ -470,7 +470,7 @@ End Property
 ' @return A reference to default implementations of the IObject interface.
 '
 Public Property Get Object() As ObjectStatic
-    Set Object = modStaticClasses.Object
+    Set Object = Statics.Object
 End Property
 
 ''
@@ -479,7 +479,7 @@ End Property
 ' @return A reference to the single DESStatic instance.
 '
 Public Property Get DES() As DESStatic
-    Set DES = modStaticClasses.DES
+    Set DES = Statics.DES
 End Property
 
 ''
@@ -488,7 +488,7 @@ End Property
 ' @return A reference to the single TripleDESStatic instance.
 '
 Public Property Get TripleDES() As TripleDESStatic
-    Set TripleDES = modStaticClasses.TripleDES
+    Set TripleDES = Statics.TripleDES
 End Property
 
 ''
@@ -497,7 +497,7 @@ End Property
 ' @return A reference to the single RC2Static instance.
 '
 Public Property Get RC2() As RC2Static
-    Set RC2 = modStaticClasses.RC2
+    Set RC2 = Statics.RC2
 End Property
 
 ''
@@ -506,7 +506,7 @@ End Property
 ' @return A reference to the single RijndaelStatic instance.
 '
 Public Property Get Rijndael() As RijndaelStatic
-    Set Rijndael = modStaticClasses.Rijndael
+    Set Rijndael = Statics.Rijndael
 End Property
 
 ''
@@ -515,7 +515,7 @@ End Property
 ' @return A reference to the single CryptoConfig instance.
 '
 Public Property Get CryptoConfig() As CryptoConfig
-    Set CryptoConfig = modStaticClasses.CryptoConfig
+    Set CryptoConfig = Statics.CryptoConfig
 End Property
 
 ''
@@ -524,7 +524,7 @@ End Property
 ' @return A reference to the single SHA1Static instance.
 '
 Public Property Get SHA1() As SHA1Static
-    Set SHA1 = modStaticClasses.SHA1
+    Set SHA1 = Statics.SHA1
 End Property
 
 ''
@@ -533,7 +533,7 @@ End Property
 ' @return A reference to the single StopWatchStatic instance.
 '
 Public Property Get StopWatch() As StopWatchStatic
-    Set StopWatch = modStaticClasses.StopWatch
+    Set StopWatch = Statics.StopWatch
 End Property
 
 ''
@@ -542,7 +542,7 @@ End Property
 ' @return A reference to the single SHA256Static instance.
 '
 Public Property Get SHA256() As SHA256Static
-    Set SHA256 = modStaticClasses.SHA256
+    Set SHA256 = Statics.SHA256
 End Property
 
 ''
@@ -551,7 +551,7 @@ End Property
 ' @return A reference to the single SHA512Static instance.
 '
 Public Property Get SHA512() As SHA512Static
-    Set SHA512 = modStaticClasses.SHA512
+    Set SHA512 = Statics.SHA512
 End Property
 
 ''
@@ -560,7 +560,7 @@ End Property
 ' @return A reference to the single SHA384Static instance.
 '
 Public Property Get SHA384() As SHA384Static
-    Set SHA384 = modStaticClasses.SHA384
+    Set SHA384 = Statics.SHA384
 End Property
 
 ''
@@ -569,7 +569,7 @@ End Property
 ' @return A reference to the single MACTripleDESStatic instance.
 '
 Public Property Get MACTripleDES() As MACTripleDESStatic
-    Set MACTripleDES = modStaticClasses.MACTripleDES
+    Set MACTripleDES = Statics.MACTripleDES
 End Property
 
 ''
@@ -578,7 +578,7 @@ End Property
 ' @return A reference to the single HMACStatic instance.
 '
 Public Property Get HMAC() As HMACStatic
-    Set HMAC = modStaticClasses.HMAC
+    Set HMAC = Statics.HMAC
 End Property
 
 ''
@@ -587,7 +587,7 @@ End Property
 ' @return A reference to the single RSAStatic instance.
 '
 Public Property Get RSA() As RSAStatic
-    Set RSA = modStaticClasses.RSA
+    Set RSA = Statics.RSA
 End Property
 
 ''
@@ -596,7 +596,7 @@ End Property
 ' @return A reference to the single SecurityElementStatic instance.
 '
 Public Property Get SecurityElement() As SecurityElementStatic
-    Set SecurityElement = modStaticClasses.SecurityElement
+    Set SecurityElement = Statics.SecurityElement
 End Property
 
 ''
@@ -605,21 +605,21 @@ End Property
 ' @return The BigInteger static methods.
 '
 Public Property Get BigInteger() As BigIntegerStatic
-    Set BigInteger = modStaticClasses.BigInteger
+    Set BigInteger = Statics.BigInteger
 End Property
 
 Public Property Get Thread() As ThreadStatic
-    Set Thread = modStaticClasses.Thread
+    Set Thread = Statics.Thread
 End Property
 
 Public Property Get EqualityComparer() As IEqualityComparer
-    Set EqualityComparer = modStaticClasses.EqualityComparer
+    Set EqualityComparer = Statics.EqualityComparer
 End Property
 
 Public Property Get MyBase() As ObjectBase
-    Set MyBase = modStaticClasses.MyBase
+    Set MyBase = Statics.MyBase
 End Property
 
 Public Property Get Char() As Char
-    Set Char = modStaticClasses.Char
+    Set Char = Statics.Char
 End Property

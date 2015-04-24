@@ -290,7 +290,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     Dim t1 As Long
     Dim Maj As Long
     Dim t2 As Long
-    Dim ch As Long
+    Dim Ch As Long
     
     a = mState(0)
     b = mState(1)
@@ -306,8 +306,8 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
         Maj = ((a And b) Xor (a And c) Xor (b And c))
         t2 = Helper.UAdd(s0, Maj)
         s1 = RRotate(e, 6) Xor RRotate(e, 11) Xor RRotate(e, 25)
-        ch = (e And f) Xor ((Not e) And g)
-        t1 = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(h, s1), ch), mK(i)), mW(i))
+        Ch = (e And f) Xor ((Not e) And g)
+        t1 = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(h, s1), Ch), mK(i)), mW(i))
         
         h = g
         g = f
@@ -410,7 +410,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call CopyMemory(mK(0), ByVal modStaticClasses.SHA256.KPtr, 256)
+    Call CopyMemory(mK(0), ByVal Statics.SHA256.KPtr, 256)
     Set mBase = Cor.NewHashAlgorithmBase(Me, True, True, 64)
     Call Initialize
 End Sub
@@ -527,8 +527,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

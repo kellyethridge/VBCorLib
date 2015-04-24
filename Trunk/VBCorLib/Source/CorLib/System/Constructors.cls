@@ -931,7 +931,7 @@ End Function
 ' @return A cDateTime object.
 '
 Public Function NewDate(ByVal Value As Date, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
-    Set NewDate = modStaticClasses.cDateTime.FromOADate(Value, Kind)
+    Set NewDate = Statics.cDateTime.FromOADate(Value, Kind)
 End Function
 
 ''

@@ -311,7 +311,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Dim Ah As Long, Al As Long
     Dim Bh As Long, Bl As Long
-    Dim ch As Long, Cl As Long
+    Dim Ch As Long, Cl As Long
     Dim Dh As Long, Dl As Long
     Dim Eh As Long, El As Long
     Dim Fh As Long, Fl As Long
@@ -320,7 +320,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Ah = mStateH(0): Al = mStateL(0)
     Bh = mStateH(1): Bl = mStateL(1)
-    ch = mStateH(2): Cl = mStateL(2)
+    Ch = mStateH(2): Cl = mStateL(2)
     Dh = mStateH(3): Dl = mStateL(3)
     Eh = mStateH(4): El = mStateL(4)
     Fh = mStateH(5): Fl = mStateL(5)
@@ -335,15 +335,15 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
         Call UAdd64(T1h, T1l, mWh(i), mWl(i))
 
         T2h = BigSIG0Hi(Ah, Al): T2l = BigSIG0Lo(Ah, Al)
-        Call UAdd64(T2h, T2l, Maj(Ah, Bh, ch), Maj(Al, Bl, Cl))
+        Call UAdd64(T2h, T2l, Maj(Ah, Bh, Ch), Maj(Al, Bl, Cl))
 
         Hh = Gh: Hl = Gl
         Gh = Fh: Gl = Fl
         Fh = Eh: Fl = El
         Eh = Dh: El = Dl
         Call UAdd64(Eh, El, T1h, T1l)
-        Dh = ch: Dl = Cl
-        ch = Bh: Cl = Bl
+        Dh = Ch: Dl = Cl
+        Ch = Bh: Cl = Bl
         Bh = Ah: Bl = Al
         Ah = T1h: Al = T1l
         Call UAdd64(Ah, Al, T2h, T2l)
@@ -351,7 +351,7 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Call UAdd64(mStateH(0), mStateL(0), Ah, Al)
     Call UAdd64(mStateH(1), mStateL(1), Bh, Bl)
-    Call UAdd64(mStateH(2), mStateL(2), ch, Cl)
+    Call UAdd64(mStateH(2), mStateL(2), Ch, Cl)
     Call UAdd64(mStateH(3), mStateL(3), Dh, Dl)
     Call UAdd64(mStateH(4), mStateL(4), Eh, El)
     Call UAdd64(mStateH(5), mStateL(5), Fh, Fl)
@@ -495,7 +495,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Dim Ah As Long, Al As Long
     Dim Bh As Long, Bl As Long
-    Dim ch As Long, Cl As Long
+    Dim Ch As Long, Cl As Long
     Dim Dh As Long, Dl As Long
     Dim Eh As Long, El As Long
     Dim Fh As Long, Fl As Long
@@ -504,7 +504,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     
     Ah = mStateH(0): Al = mStateL(0)
     Bh = mStateH(1): Bl = mStateL(1)
-    ch = mStateH(2): Cl = mStateL(2)
+    Ch = mStateH(2): Cl = mStateL(2)
     Dh = mStateH(3): Dl = mStateL(3)
     Eh = mStateH(4): El = mStateL(4)
     Fh = mStateH(5): Fl = mStateL(5)
@@ -574,7 +574,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
         '
         ' T2 = T2 + Maj(A,B,C)
         '
-        T2h = T2h + ((Ah And Bh) Xor (Ah And ch) Xor (Bh And ch))
+        T2h = T2h + ((Ah And Bh) Xor (Ah And Ch) Xor (Bh And Ch))
         Lo = (Al And Bl) Xor (Al And Cl) Xor (Bl And Cl)
         T2l = T2l + Lo
         If (T2l - &H80000000) < (Lo - &H80000000) Then T2h = T2h + 1
@@ -586,8 +586,8 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
         El = Dl + T1l
         If (El - &H80000000) < (T1l - &H80000000) Then Eh = Eh + 1
         
-        Dh = ch: Dl = Cl
-        ch = Bh: Cl = Bl
+        Dh = Ch: Dl = Cl
+        Ch = Bh: Cl = Bl
         Bh = Ah: Bl = Al
         Ah = T1h + T2h
         Al = T1l + T2l
@@ -596,7 +596,7 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     
     mStateH(0) = mStateH(0) + Ah: mStateL(0) = mStateL(0) + Al: If (mStateL(0) - &H80000000) < (Al - &H80000000) Then mStateH(0) = mStateH(0) + 1
     mStateH(1) = mStateH(1) + Bh: mStateL(1) = mStateL(1) + Bl: If (mStateL(1) - &H80000000) < (Bl - &H80000000) Then mStateH(1) = mStateH(1) + 1
-    mStateH(2) = mStateH(2) + ch: mStateL(2) = mStateL(2) + Cl: If (mStateL(2) - &H80000000) < (Cl - &H80000000) Then mStateH(2) = mStateH(2) + 1
+    mStateH(2) = mStateH(2) + Ch: mStateL(2) = mStateL(2) + Cl: If (mStateL(2) - &H80000000) < (Cl - &H80000000) Then mStateH(2) = mStateH(2) + 1
     mStateH(3) = mStateH(3) + Dh: mStateL(3) = mStateL(3) + Dl: If (mStateL(3) - &H80000000) < (Dl - &H80000000) Then mStateH(3) = mStateH(3) + 1
     mStateH(4) = mStateH(4) + Eh: mStateL(4) = mStateL(4) + El: If (mStateL(4) - &H80000000) < (El - &H80000000) Then mStateH(4) = mStateH(4) + 1
     mStateH(5) = mStateH(5) + Fh: mStateL(5) = mStateL(5) + Fl: If (mStateL(5) - &H80000000) < (Fl - &H80000000) Then mStateH(5) = mStateH(5) + 1
@@ -609,7 +609,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    With modStaticClasses.SHA512
+    With Statics.SHA512
         Call CopyMemory(mKh(0), ByVal .KPtr.HiDWord, 320)
         Call CopyMemory(mKl(0), ByVal .KPtr.LoDWord, 320)
         mStatePtr = .StatePtr
@@ -731,8 +731,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

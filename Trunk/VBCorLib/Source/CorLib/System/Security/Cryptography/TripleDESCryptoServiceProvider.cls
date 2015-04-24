@@ -360,8 +360,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -373,7 +373,7 @@ End Function
 '   mBase Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub mBase_CheckForWeakKey(RgbKey() As Byte, Ex As Exception)
-    If modStaticClasses.TripleDES.IsWeakKey(RgbKey) Then
+    If Statics.TripleDES.IsWeakKey(RgbKey) Then
         Set Ex = Cor.NewCryptographicException("Key cannot be weak.")
     End If
 End Sub
