@@ -446,17 +446,21 @@ End Sub
 ' @remarks If the file position is passed the end of the stream, then -1 is returned.
 '
 Public Function ReadByte() As Long
-    Call VerifyCanRead
-    Call VerifyIsOpen
+    VerifyCanRead
+    VerifyIsOpen
 
-    If mCanWrite Then Call Flush
-
+    If mCanWrite Then
+        Flush
+    End If
+    
     If Position >= Length Then
         ReadByte = -1
         Exit Function
     End If
 
-    If (mBytesBuffered = 0) Or (mReadPosition = mBytesBuffered) Then Call FillBuffer
+    If (mBytesBuffered = 0) Or (mReadPosition = mBytesBuffered) Then
+        FillBuffer
+    End If
     
     ReadByte = mBuffer(mReadPosition)
     mReadPosition = mReadPosition + 1
@@ -788,13 +792,17 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
         Error.Argument Argument_EmptyPath, "Path"
     If BufferSize <= 0 Then _
         Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
-        
+    
+    ValidateFileMode Mode
+    ValidateFileAccess Access
+    ValidateFileShare Share
+    
     Dim AppendMode As Boolean
     If Mode = FileMode.Append Then
         If Access = DefaultAccess Then
             Access = WriteAccess
         ElseIf Access And ReadAccess Then
-            Throw Cor.NewArgumentException("Append mode cannot be used in combination with read access.")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidFileModeAndAccessCombo, GetFileModeDisplayName(Mode), GetFileAccessDisplayName(Access)))
         End If
         AppendMode = True
         Mode = FileMode.OpenOrCreate
@@ -806,7 +814,7 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
     
     Statics.Path.CheckValidPathAndFixSlashes Path
     
-    Set mHandle = SafeCreateFile(Path, Access, Share, Mode)
+    Set mHandle = Win32Native.SafeCreateFile(Path, Access, Share, Mode)
     If mHandle.IsInvalid Then
         IOError Err.LastDllError, Path
     End If
@@ -839,8 +847,8 @@ Friend Sub InitFromHandle(ByVal Handle As Long, ByVal Access As FileAccess, ByVa
     mOwnsHandle = OwnsHandle
     mBufferSize = BufferSize
     mCanSeek = (GetFileType(Handle) = FILE_TYPE_DISK)
-    mCanWrite = (Access And WriteAccess) <> 0
-    mCanRead = (Access And ReadAccess) <> 0
+    mCanWrite = CBool(Access And WriteAccess)
+    mCanRead = CBool(Access And ReadAccess)
     mIsOpen = True
     
     If mCanSeek Then
@@ -853,22 +861,89 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub ValidateFileMode(ByVal Mode As FileMode)
+    Select Case Mode
+        Case FileMode.Append, FileMode.Create, FileMode.CreateNew, FileMode.OpenExisting, FileMode.OpenOrCreate, FileMode.Truncate
+            Exit Sub
+    End Select
+    
+    Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
+End Sub
+
+Private Sub ValidateFileAccess(ByVal Access As FileAccess)
+    Select Case Access
+        Case FileAccess.DefaultAccess, FileAccess.ReadAccess, FileAccess.ReadWriteAccess, FileAccess.WriteAccess
+            Exit Sub
+    End Select
+
+    Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
+End Sub
+
+Private Sub ValidateFileShare(ByVal Share As FileShare)
+    Select Case Share
+        Case FileShare.None, FileShare.ReadShare, FileShare.ReadWriteShare, FileShare.WriteShare
+            Exit Sub
+    End Select
+    
+    Error.ArgumentOutOfRange "Share", ArgumentOutOfRange_Enum
+End Sub
+
+Private Function GetFileModeDisplayName(ByVal Mode As FileMode) As String
+    Dim Result As String
+    
+    Select Case Mode
+        Case Append:        Result = "Append"
+        Case Create:        Result = "Create"
+        Case CreateNew:     Result = "CreateNew"
+        Case OpenExisting:  Result = "OpenExisting"
+        Case OpenOrCreate:  Result = "OpenOrCreate"
+        Case Truncate:      Result = "Truncate"
+        Case Else
+            Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
+    End Select
+    
+    GetFileModeDisplayName = Result
+End Function
+
+Private Function GetFileAccessDisplayName(ByVal Access As FileAccess) As String
+    Dim Result As String
+    
+    Select Case Access
+        Case DefaultAccess:     Result = "DefaultAccess"
+        Case ReadAccess:        Result = "ReadAccess"
+        Case WriteAccess:       Result = "WriteAccess"
+        Case ReadWriteAccess:   Result = "ReadWriteAccess"
+        Case Else
+            Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
+    End Select
+    
+    GetFileAccessDisplayName = Result
+End Function
+
 Private Sub VerifyCanSeek()
-    If Not mCanSeek Then Throw Cor.NewNotSupportedException("The file stream does not support seek methods.")
+    If Not mCanSeek Then
+        Error.NotSupported NotSupported_UnseekableStream
+    End If
 End Sub
 
 Private Sub VerifyIsOpen()
-    If Not mIsOpen Then Throw Cor.NewObjectDisposedException("FileStream", "The file stream is closed.")
+    If Not mIsOpen Then
+        Throw Cor.NewObjectDisposedException("Stream", Environment.GetResourceString(ObjectDisposedString.ObjectDisposed_StreamClosed))
+    End If
 End Sub
 
 Private Sub VerifyCanWrite()
-    If Not mCanWrite Then Throw Cor.NewNotSupportedException("The file stream does not support writing.")
+    If Not mCanWrite Then
+        Error.NotSupported NotSupported_UnwritableStream
+    End If
 End Sub
 
 Private Sub VerifyCanRead()
-    If Not mCanRead Then Throw Cor.NewNotSupportedException("The file stream does not support reading.")
+    If Not mCanRead Then
+        Error.NotSupported NotSupported_UnreadableStream
+    End If
 End Sub
 
 Private Sub FillBuffer()
@@ -876,10 +951,14 @@ Private Sub FillBuffer()
     mReadPosition = 0
     mWritePosition = 0
     
-    If SAPtr(mBuffer) = vbNullPtr Then ReDim mBuffer(0 To mBufferSize - 1)
+    If SAPtr(mBuffer) = vbNullPtr Then
+        ReDim mBuffer(0 To mBufferSize - 1)
+    End If
     
     If ReadFile(mHandle, mBuffer(0), mBufferSize, mBytesBuffered, ByVal 0&) = BOOL_FALSE Then
-        If mHandle <> ERROR_BROKEN_PIPE Then IOError Err.LastDllError
+        If mHandle <> ERROR_BROKEN_PIPE Then
+            IOError Err.LastDllError
+        End If
     End If
 End Sub
 
@@ -893,9 +972,11 @@ Private Function InternalSeek(ByVal Offset As Currency, ByVal Origin As SeekOrig
         ' 64bit positioning. So, if we get the -1, we need to check for
         ' an actual error using Err.LastDllError.
         If .LoDWord = INVALID_SET_FILE_POINTER Then
-            Dim e As Long
-            e = Err.LastDllError
-            If e <> NO_ERROR Then IOError e
+            Dim DllError As Long
+            DllError = Err.LastDllError
+            If DllError <> NO_ERROR Then
+                IOError DllError
+            End If
         End If
         InternalSeek = 10000@ * AsCurr(.LoDWord)
     End With
@@ -906,7 +987,7 @@ End Function
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
-    Call CloseStream
+    CloseStream
 End Sub
 
 

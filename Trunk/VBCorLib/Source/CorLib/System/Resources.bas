@@ -39,11 +39,16 @@ Public Enum ResourceString
     Format_InvalidNumberOfCharacters = 601
     Format_InvalidString = 602
     Format_InvalidTimeSpan = 603
+    Overflow_TimeSpan = 1300
+End Enum
+
+Public Enum NotSupportedString
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
     NotSupported_MemoryStreamNotExpandable = 1002
     NotSupported_UnwritableStream = 1003
-    Overflow_TimeSpan = 1300
+    NotSupported_UnreadableStream = 1004
+    NotSupported_UnseekableStream = 1005
 End Enum
 
 Public Enum InvalidOperationString
@@ -104,6 +109,7 @@ Public Enum ArgumentString
     Argument_InvalidDateSubtraction = 831
     Argument_InvalidCharsInPath = 832
     Argument_InvalidValueType = 833
+    Argument_InvalidFileModeAndAccessCombo = 834
 End Enum
 
 Public Enum ArgumentNullString

@@ -59,3 +59,7 @@ End Sub
 Public Sub InvalidOperation(ByVal Message As InvalidOperationString)
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(Message))
 End Sub
+
+Public Sub NotSupported(ByVal Message As NotSupportedString)
+    Throw Cor.NewNotSupportedException(Environment.GetResourceString(Message))
+End Sub
