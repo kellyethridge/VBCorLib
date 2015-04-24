@@ -46,6 +46,22 @@ Public Function CreateFolder(Optional ByVal SubFolder As String = "SubFolder") A
     End If
 End Function
 
+Public Function ReadFile(ByVal FileName As String) As String
+    Dim FileNumber As Long
+    FileNumber = FreeFile
+    Open FileName For Input As #FileNumber
+    ReadFile = Input(LOF(FileNumber), FileNumber)
+    Close #FileNumber
+End Function
+
+Public Function ReadFileBytes(ByVal FileName As String) As Byte()
+    Dim FileNumber As Long
+    FileNumber = FreeFile
+    Open FileName For Binary As #FileNumber
+    ReadFileBytes = InputB(LOF(FileNumber), FileNumber)
+    Close #FileNumber
+End Function
+
 Private Sub Setup()
     mCurrentDirectory = Directory.GetCurrentDirectory
     mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
