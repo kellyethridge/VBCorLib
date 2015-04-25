@@ -124,11 +124,17 @@ Public Sub AssertInvalidCastException(ByVal Err As ErrObject)
     End If
 End Sub
 
-Public Sub AssertFileNotFoundException(ByVal Err As ErrObject)
+Public Sub AssertFileNotFoundException(ByVal Err As ErrObject, Optional ByVal FileName As String)
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is FileNotFoundException Then
         WrongException "FileNotFoundException", Ex
+    End If
+    
+    If Len(FileName) > 0 Then
+        Dim Fex As FileNotFoundException
+        Set Fex = Ex
+        Assert.That Fex.FileName, Iz.EqualTo(FileName)
     End If
 End Sub
 
