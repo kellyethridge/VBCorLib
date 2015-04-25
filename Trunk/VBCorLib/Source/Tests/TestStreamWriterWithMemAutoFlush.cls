@@ -15,9 +15,14 @@ Attribute VB_Exposed = False
 ' TestStreamWriterWithMemAutoFlush
 '
 Option Explicit
+Implements ICategorizable
 
 Private sw As StreamWriter
 Private ms As MemoryStream
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub Setup()
     Set ms = New MemoryStream

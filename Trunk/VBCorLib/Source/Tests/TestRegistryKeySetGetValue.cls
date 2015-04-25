@@ -15,14 +15,19 @@ Attribute VB_Exposed = False
 ' TestRegistryKeySetGetValue
 '
 Option Explicit
+Implements ICategorizable
 
 Private Key As RegistryKey
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Microsoft.Win32"
+End Sub
 
 Public Sub Setup()
     Set Key = Registry.CurrentUser.CreateSubKey("software\vb and vba program settings\VBCorLibTests\Tests")
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Key.CloseKey
     Registry.CurrentUser.DeleteSubKeyTree "software\vb and vba program settings\VBCorLibTests"
 End Sub

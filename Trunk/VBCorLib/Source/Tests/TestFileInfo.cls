@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 '   TestFileInfo
 '
 Option Explicit
+Implements ICategorizable
 
 Private info As FileInfo
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub Setup()
     Set info = Cor.NewFileInfo(App.Path & "\TestFileInfo.cls")

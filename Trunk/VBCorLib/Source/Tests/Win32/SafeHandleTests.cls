@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' SafeHandleTests
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Microsoft.Win32.SafeHandles"
+End Sub
 
 Public Sub NewSafeHandle_WhenCalled_CreatesAnOpenHandle()
     Dim SUT As SafeHandle

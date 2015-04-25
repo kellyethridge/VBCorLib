@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' TestUTF8GetByteCount
 '
 Option Explicit
+Implements ICategorizable
 
 Private e As UTF8Encoding
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 Public Sub Setup()
     Set e = NewUTF8Encoding(False, True)
@@ -54,7 +59,7 @@ Public Sub TestFromChars()
 End Sub
 
 Public Sub TestMalformedSurrogate()
-    Dim ex As Exception
+    Dim Ex As Exception
     
     On Error GoTo errTrap
     e.GetByteCount ChrW$(&HD800) & Chr$(0)
@@ -62,11 +67,11 @@ Public Sub TestMalformedSurrogate()
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Assert.IsTrue Catch(ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
 End Sub
 
 Public Sub TestMissingLastSurrogateWithError()
-    Dim ex As Exception
+    Dim Ex As Exception
     
     On Error GoTo errTrap
     e.GetByteCount ChrW$(&HD800)
@@ -74,7 +79,7 @@ Public Sub TestMissingLastSurrogateWithError()
     Assert.Fail "An exception should be thrown."
     
 errTrap:
-    Assert.IsTrue Catch(ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
 End Sub
 
 Public Sub TestMissingLastSurrogate()

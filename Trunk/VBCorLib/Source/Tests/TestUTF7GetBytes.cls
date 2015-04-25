@@ -15,10 +15,15 @@ Attribute VB_Exposed = False
 ' TestUTF7GetBytes
 '
 Option Explicit
+Implements ICategorizable
 
 Private e As UTF7Encoding
 Private b() As Byte
 Private ch() As Integer
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 Public Sub Setup()
     Set e = New UTF7Encoding

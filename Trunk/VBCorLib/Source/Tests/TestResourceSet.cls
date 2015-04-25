@@ -15,15 +15,19 @@ Attribute VB_Exposed = False
 ' TestResourceSet
 '
 Option Explicit
+Implements ICategorizable
 
 Private mResourceSet As ResourceSet
 
-
-Public Sub Setup()
-    Set mResourceSet = cor.NewResourceSet(cor.NewCultureInfo("en-US"), Path.Combine(App.Path, "VBCorLibTests.res"))
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Resources"
 End Sub
 
-Public Sub TearDown()
+Public Sub Setup()
+    Set mResourceSet = Cor.NewResourceSet(Cor.NewCultureInfo("en-US"), Path.Combine(App.Path, "VBCorLibTests.res"))
+End Sub
+
+Public Sub Teardown()
     mResourceSet.CloseResourceSet
 End Sub
 

@@ -16,6 +16,11 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Dim Arr(-1 To 1) As Long
@@ -82,7 +87,7 @@ Public Sub Find_WithValues_ReturnsExpected(ByRef Arr As Variant, ByVal AddressOf
     Dim Actual As Variant
     cArrayCallbacks.FindCallbackValue = ValueToFind
     
-    MoveVariant Actual, cArray.find(Arr, AddressOfPredicate)
+    MoveVariant Actual, cArray.Find(Arr, AddressOfPredicate)
     
     Assert.That Actual, Iz.EqualTo(Expected).Strict
 End Sub
@@ -121,7 +126,7 @@ Public Sub Find_WithUDT_ReturnsFoundUDT()
     Dim Actual As VBGUID
     cArrayCallbacks.FindCallbackValue = 2
     
-    Actual = cArray.find(Arr, AddressOf FindVBGuidCallback)
+    Actual = cArray.Find(Arr, AddressOf FindVBGuidCallback)
     
     Assert.That Actual.Data1, Iz.EqualTo(2)
 End Sub
@@ -133,7 +138,7 @@ Public Sub Find_WithUDT_ReturnsDefaultUDT()
     Dim Actual As VBGUID
     cArrayCallbacks.FindCallbackValue = 3
     
-    Actual = cArray.find(Arr, AddressOf FindVBGuidCallback)
+    Actual = cArray.Find(Arr, AddressOf FindVBGuidCallback)
     
     Assert.That Actual.Data1, Iz.EqualTo(0)
 End Sub

@@ -13,8 +13,13 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
 
 Private mOldCulture As CultureInfo
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Globalization"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
@@ -37,7 +42,7 @@ Public Sub Setup()
     Set mOldCulture = Thread.CurrentThread.CurrentCulture
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Set Thread.CurrentThread.CurrentCulture = mOldCulture
 End Sub
 

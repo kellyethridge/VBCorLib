@@ -15,9 +15,13 @@ Attribute VB_Exposed = False
 ' TestCaseInsensitiveHCP
 '
 Option Explicit
+Implements ICategorizable
 
 Private mHcp As CaseInsensitiveHashCodePrvdr
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Collections"
+End Sub
 
 Public Sub Setup()
     Set mHcp = New CaseInsensitiveHashCodePrvdr
@@ -39,4 +43,3 @@ Public Sub TestObjects()
     
     Assert.AreEqual o.GetHashCode, mHcp.GetHashCode(o)
 End Sub
-

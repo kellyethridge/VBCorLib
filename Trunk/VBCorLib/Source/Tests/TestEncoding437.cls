@@ -15,15 +15,20 @@ Attribute VB_Exposed = False
 ' TestEncoding437
 '
 Option Explicit
+Implements ICategorizable
 
-Private en As Encoding
+Private En As Encoding
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 Public Sub Setup()
-    Set en = Encoding.GetEncoding(437)
+    Set En = Encoding.GetEncoding(437)
 End Sub
 
 Public Sub TestGetByteCount()
-    Assert.AreEqual 65536, en.GetByteCount(GetChars), "ByteCount should return 65535."
+    Assert.AreEqual 65536, En.GetByteCount(GetChars), "ByteCount should return 65535."
 End Sub
 
 Public Sub TestGetBytes()
@@ -33,7 +38,7 @@ Public Sub TestGetBytes()
     
     Expected = GetEncodedBytes
     
-    Actual = en.GetBytes(GetChars)
+    Actual = En.GetBytes(GetChars)
     
     For i = 0 To UBound(Actual)
         Assert.AreEqual Expected(i), Actual(i)
@@ -44,13 +49,13 @@ Public Sub TestGetCharCount()
     Dim Expected() As Byte
     
     Expected = GetEncodedBytes
-    Assert.AreEqual 65536, en.GetCharCount(Expected)
+    Assert.AreEqual 65536, En.GetCharCount(Expected)
 End Sub
 
 Public Sub TestGetBytesFromString()
     Dim b() As Byte
     
-    b = en.GetBytes("Hello")
+    b = En.GetBytes("Hello")
     Assert.AreEqual 4, UBound(b), "Upper bound should be 4."
 End Sub
 
@@ -85,12 +90,12 @@ End Function
 Public Sub TestEncodeEmptyString()
     Dim b() As Byte
     
-    b = en.GetBytes("")
+    b = En.GetBytes("")
     Assert.IsFalse cArray.IsNull(b)
     Assert.AreEqual 0, cArray.GetLength(b)
     
     ReDim b(10)
-    Assert.AreEqual 0, en.GetBytesEx("", 0, 0, b, 0)
+    Assert.AreEqual 0, En.GetBytesEx("", 0, 0, b, 0)
 End Sub
 
 Public Sub TestDecodeEmptyArray()
@@ -98,11 +103,11 @@ Public Sub TestDecodeEmptyArray()
     Dim ch() As Integer
     
     b = cArray.CreateInstance(vbByte)
-    ch = en.GetChars(b)
+    ch = En.GetChars(b)
     Assert.IsFalse cArray.IsNull(ch), "Array should not be null."
     Assert.AreEqual 0, cArray.GetLength(ch)
     
     ReDim ch(10)
-    Assert.AreEqual 0, en.GetCharsEx(b, 0, 0, ch, 0)
+    Assert.AreEqual 0, En.GetCharsEx(b, 0, 0, ch, 0)
 
 End Sub

@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestCryptoStreamMultiBlock
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Write100Bytes()
     Dim csp As New DESCryptoServiceProvider

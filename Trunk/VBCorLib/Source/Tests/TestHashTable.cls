@@ -15,7 +15,13 @@ Attribute VB_Exposed = False
 ' TestHashTable
 '
 Option Explicit
+Implements ICategorizable
+
 Private t As Hashtable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Collections"
+End Sub
 
 Public Sub Setup()
     Set t = New Hashtable
@@ -114,33 +120,33 @@ End Sub
 Public Sub TestEnumerator()
     Add1000Longs
     Dim de As DictionaryEntry
-    Dim col As New Collection
+    Dim Col As New Collection
     For Each de In t.GetEnumerator
-        col.Add de.value, CStr(de.Key)
+        Col.Add de.Value, CStr(de.Key)
     Next de
-    Assert.AreEqual 1000, col.Count
+    Assert.AreEqual 1000, Col.Count
 End Sub
 
 Public Sub TestKeysCollection()
     Add1000Longs
     Assert.AreEqual 1000, t.Keys.Count
     Dim v As Variant
-    Dim col As New Collection
+    Dim Col As New Collection
     For Each v In t.Keys
-        col.Add v, CStr(v)
+        Col.Add v, CStr(v)
     Next v
-    Assert.AreEqual 1000, col.Count
+    Assert.AreEqual 1000, Col.Count
 End Sub
 
 Public Sub TestValuesCollection()
     Add1000Longs
     Assert.AreEqual 1000, t.Values.Count
     Dim v As Variant
-    Dim col As New Collection
+    Dim Col As New Collection
     For Each v In t.Values
-        col.Add v, CStr(v)
+        Col.Add v, CStr(v)
     Next v
-    Assert.AreEqual 1000, col.Count
+    Assert.AreEqual 1000, Col.Count
 End Sub
 
 Public Sub TestClear()

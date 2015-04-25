@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' MACTripleDES
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As MACTripleDes
 Private PT() As Byte
 Private ht() As Byte
 Private FF As Long
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New MACTripleDes
@@ -28,7 +33,7 @@ Public Sub Setup()
     Open App.Path & "\Cryptography Files\MACTripleDES_Hashes.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
 End Sub
 
@@ -68,7 +73,7 @@ Public Sub TestTransformFinalBlock()
         Dim b() As Byte
         b = csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
         Assert.AreEqual PT, b
-        Assert.AreEqual ht, csp.Hash
+        Assert.AreEqual ht, csp.hash
     Loop
 End Sub
 
@@ -87,7 +92,7 @@ Public Sub TestTransformBlock1ByteAtATime()
             Assert.AreEqual PT(i), b(0), "Entry: " & c
         Next i
         csp.TransformFinalBlock PT, UBound(PT) + 1, 0
-        Assert.AreEqual ht, csp.Hash, "Entry: " & c
+        Assert.AreEqual ht, csp.hash, "Entry: " & c
     Loop
 End Sub
 
@@ -112,7 +117,7 @@ Public Sub TestTransformBlock5BytesAtATime()
             i = i + 5
         Loop
         csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
-        Assert.AreEqual ht, csp.Hash, "Hash: Entry " & c
+        Assert.AreEqual ht, csp.hash, "Hash: Entry " & c
     Loop
 End Sub
 
@@ -120,12 +125,12 @@ Public Sub HashLargeFileStream()
     Dim fs As FileStream
     Set fs = Cor.NewFileStream(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting)
     
-    Dim Hash() As Byte
-    Hash = Cor.NewBytes(&H2B, &H6F, &H35, &HC8, &H18, &H3E, &H37, &H1D)
+    Dim hash() As Byte
+    hash = Cor.NewBytes(&H2B, &H6F, &H35, &HC8, &H18, &H3E, &H37, &H1D)
     
     csp.Key = Cor.NewBytes(&H4B, &H60, &H72, &HD3, &HD8, &H76, &HAD, &H6C, &H33, &HC1, &H9D, &H53, &HDD, &HEA, &H31, &HD9, &H25, &HC0, &HFE, &H9C, &HCB, &H4D, &H43, &H1D)
     
-    Assert.AreEqual Hash, csp.ComputeHash(fs)
+    Assert.AreEqual hash, csp.ComputeHash(fs)
 End Sub
 
 

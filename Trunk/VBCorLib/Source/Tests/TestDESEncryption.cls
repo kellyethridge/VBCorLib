@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestDESEncryption
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As DESCryptoServiceProvider
 Private FF As Long
 Private PT() As Byte
 Private CT() As Byte
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New DESCryptoServiceProvider
@@ -27,7 +32,7 @@ Public Sub Setup()
     Open App.Path & "\Cryptography Files\DES_Entries.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
     Erase PT
     Erase CT
@@ -49,7 +54,7 @@ Public Sub TestTransformFinalBlock()
             ' For padding mode ISO10126, the best we can do without decrypting
             ' the text is to make sure the same encrypted text has a different output.
             
-            Assert.That t.TransformFinalBlock(PT, 0, cArray.GetLength(PT)), Iz.Not.equalTo(NewCT), "Entry " & c
+            Assert.That t.TransformFinalBlock(PT, 0, cArray.GetLength(PT)), Iz.Not.EqualTo(NewCT), "Entry " & c
         Else
             Assert.AreEqual CT, NewCT, "Entry " & c & " failed."
         End If

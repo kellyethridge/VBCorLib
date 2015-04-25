@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' TestDESCryptoServiceProvider
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As DESCryptoServiceProvider
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New DESCryptoServiceProvider
@@ -44,7 +49,7 @@ Public Sub SetKeyToNull()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentNullException, "Wrong exception type caught."
 End Sub
 
@@ -58,7 +63,7 @@ Public Sub SetKeyToInvalidSize()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type."
 End Sub
 
@@ -86,7 +91,7 @@ Public Sub SetKeySizeToNonLegalSize()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type caught."
 End Sub
 
@@ -101,6 +106,6 @@ Public Sub SetIVToInvalidSize()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type caught."
 End Sub

@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestRNGCryptoServiceProvider
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub TestGetBytes()
     Const Size As Long = 1000
@@ -33,7 +38,7 @@ Public Sub TestGetBytes()
 '        End If
 '    Next i
     
-    Assert.That b1, Iz.Not.equalTo(b2), "b1 and b2 should contain random data."
+    Assert.That b1, Iz.Not.EqualTo(b2), "b1 and b2 should contain random data."
 End Sub
 
 Public Sub TestGetNonZeroBytes()
@@ -45,9 +50,9 @@ Public Sub TestGetNonZeroBytes()
     rng.GetNonZeroBytes b1
     rng.GetNonZeroBytes b2
     
-    Assert.That b1, Has.None.equalTo(0), "b1 should not contain zeros."
-    Assert.That b2, Has.None.equalTo(0), "b2 should not contain zeros."
-    Assert.That b1, Iz.Not.equalTo(b2), "b1 and b2 should contain random data."
+    Assert.That b1, Has.None.EqualTo(0), "b1 should not contain zeros."
+    Assert.That b2, Has.None.EqualTo(0), "b2 should not contain zeros."
+    Assert.That b1, Iz.Not.EqualTo(b2), "b1 and b2 should contain random data."
     
 '    Dim eq As Long
 '    Dim i As Long

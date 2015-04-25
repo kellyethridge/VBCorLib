@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestSecurityElement
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security"
+End Sub
 
 Public Sub TestEmptyTag()
     Dim se As New SecurityElement

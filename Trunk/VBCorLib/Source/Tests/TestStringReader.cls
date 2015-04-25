@@ -15,10 +15,13 @@ Attribute VB_Exposed = False
 '   TestStringReader
 '
 Option Explicit
+Implements ICategorizable
 
 Private sr As StringReader
 
-
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub TestRead()
     Dim ch As Long

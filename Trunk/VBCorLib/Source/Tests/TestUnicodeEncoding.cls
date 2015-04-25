@@ -15,39 +15,44 @@ Attribute VB_Exposed = False
 ' TestUnicodeEncoding
 '
 Option Explicit
+Implements ICategorizable
 
-Private en As UnicodeEncoding
+Private En As UnicodeEncoding
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 
 Public Sub Setup()
-    Set en = NewUnicodeEncoding(False, True)
+    Set En = NewUnicodeEncoding(False, True)
 End Sub
 
 Public Sub TestByteOrderMark()
     Dim b() As Byte
     
-    b = en.GetPreamble
+    b = En.GetPreamble
     Assert.AreEqual 2, cArray.GetLength(b)
     Assert.AreEqual &HFF, b(0)
     Assert.AreEqual &HFE, b(1)
 End Sub
 
 Public Sub TestGetByteCount()
-    Assert.AreEqual 100, en.GetByteCount(String$(50, " "))
+    Assert.AreEqual 100, En.GetByteCount(String$(50, " "))
 End Sub
 
 Public Sub TestGetCharCount()
     Dim b() As Byte
     
     b = cArray.CreateInstance(vbByte, 100)
-    Assert.AreEqual 50, en.GetCharCount(b)
+    Assert.AreEqual 50, En.GetCharCount(b)
 End Sub
 
 Public Sub TestGetBytes()
     Dim b() As Byte
     Dim i As Long
     
-    b = en.GetBytes(String$(50, " "))
+    b = En.GetBytes(String$(50, " "))
     Assert.AreEqual 100, cArray.GetLength(b)
     
     For i = 0 To UBound(b)
@@ -64,8 +69,8 @@ Public Sub TestGetChars()
     Dim b() As Byte
     Dim i As Long
     
-    b = en.GetBytes(String$(50, " "))
-    ch = en.GetChars(b)
+    b = En.GetBytes(String$(50, " "))
+    ch = En.GetChars(b)
     Assert.AreEqual 50, cArray.GetLength(ch)
     
     For i = 0 To UBound(ch)
@@ -85,7 +90,7 @@ Public Sub TestDecoderWithEvenBytes()
         End If
     Next i
     
-    Set c = en.GetDecoder
+    Set c = En.GetDecoder
     Assert.AreEqual 50, c.GetCharCount(b, 0, 100)
     Assert.AreEqual 50, c.GetChars(b, 0, 100, ch, 0)
     
@@ -106,7 +111,7 @@ Public Sub TestDecoderWithOddBytes()
         End If
     Next i
     
-    Set c = en.GetDecoder
+    Set c = En.GetDecoder
     Assert.AreEqual 18, c.GetCharCount(b, 0, 37)
     Assert.AreEqual 18, c.GetChars(b, 0, 37, ch, 0)
     
@@ -123,17 +128,17 @@ End Sub
 Public Sub TestGetString()
     Dim b() As Byte
     
-    b = en.GetBytes("Hello, World!")
-    Assert.AreEqual "Hello, World!", en.GetString(b)
+    b = En.GetBytes("Hello, World!")
+    Assert.AreEqual "Hello, World!", En.GetString(b)
 End Sub
 
 Public Sub TestEncodeEmptyString()
     Dim b() As Byte
     
-    b = en.GetBytes("")
+    b = En.GetBytes("")
     Assert.IsFalse cArray.IsNull(b), "Array should not be null."
     Assert.AreEqual 0, cArray.GetLength(b)
     
     ReDim b(10)
-    Assert.AreEqual 0, en.GetBytesEx("", 0, 0, b, 0)
+    Assert.AreEqual 0, En.GetBytesEx("", 0, 0, b, 0)
 End Sub

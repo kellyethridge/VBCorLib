@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestMD5CryptoServiceProvider
 '
 Option Explicit
+Implements ICategorizable
 
 Private PT() As Byte
 Private ht() As Byte
 Private csp As MD5
 Private FF As Long
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New MD5CryptoServiceProvider
@@ -28,7 +33,7 @@ Public Sub Setup()
     Open GetCryptoPath("MD5_Hashes.txt") For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
 End Sub
 

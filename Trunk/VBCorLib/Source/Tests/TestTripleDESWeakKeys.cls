@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestTripleDESWeakKeys
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub TestWeakKey128()
     Dim b() As Byte

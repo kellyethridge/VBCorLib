@@ -15,14 +15,19 @@ Attribute VB_Exposed = False
 ' TestFileNotFoundException
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub TestMessage()
-    Dim ex As New FileNotFoundException
-    Assert.IsTrue Len(ex.Message) > 0
+    Dim Ex As New FileNotFoundException
+    Assert.IsTrue Len(Ex.Message) > 0
 End Sub
 
 Public Sub TestWithFileName()
-    Dim ex As FileNotFoundException
-    Set ex = Cor.NewFileNotFoundException("SomeFile")
-    Assert.AreEqual "SomeFile", ex.FileName
+    Dim Ex As FileNotFoundException
+    Set Ex = Cor.NewFileNotFoundException("SomeFile")
+    Assert.AreEqual "SomeFile", Ex.FileName
 End Sub

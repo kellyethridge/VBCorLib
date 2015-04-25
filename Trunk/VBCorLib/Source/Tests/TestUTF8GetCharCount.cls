@@ -15,9 +15,14 @@ Attribute VB_Exposed = False
 '   TestUTF8GetCharCount
 '
 Option Explicit
+Implements ICategorizable
 
 Private e As UTF8Encoding
 Private b() As Byte
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 Public Sub Setup()
     Set e = NewUTF8Encoding(False, True)

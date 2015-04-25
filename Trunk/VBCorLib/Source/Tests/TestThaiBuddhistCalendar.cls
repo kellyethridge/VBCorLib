@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' TestThaiBuddhistCalendar
 '
 Option Explicit
+Implements ICategorizable
 
 Private cal As ThaiBuddhistCalendar
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Globalization"
+End Sub
 
 Public Sub Setup()
     Set cal = New ThaiBuddhistCalendar

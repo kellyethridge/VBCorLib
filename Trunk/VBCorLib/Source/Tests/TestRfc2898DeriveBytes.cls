@@ -15,41 +15,46 @@ Attribute VB_Exposed = False
 ' Test2898DeriveBytes
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub SetSaltValue()
     Dim db As Rfc2898DeriveBytes
-    Set db = cor.NewRfc2898DeriveBytes("hello", cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8))
-    Assert.AreEqual cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8), db.Salt
+    Set db = Cor.NewRfc2898DeriveBytes("hello", Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8))
+    Assert.AreEqual Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8), db.Salt
     
-    db.Salt = cor.NewBytes(8, 7, 6, 5, 4, 3, 2, 1)
-    Assert.AreEqual cor.NewBytes(8, 7, 6, 5, 4, 3, 2, 1), db.Salt
+    db.Salt = Cor.NewBytes(8, 7, 6, 5, 4, 3, 2, 1)
+    Assert.AreEqual Cor.NewBytes(8, 7, 6, 5, 4, 3, 2, 1), db.Salt
 End Sub
 
 Public Sub Get8BytesUsingBytePassword()
     Dim pwd() As Byte
-    pwd = cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
+    pwd = Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
     
     Dim Salt() As Byte
     Salt = pwd
     
     Dim db As Rfc2898DeriveBytes
-    Set db = cor.NewRfc2898DeriveBytes(pwd, Salt)
+    Set db = Cor.NewRfc2898DeriveBytes(pwd, Salt)
     
-    Dim expected() As Byte
-    expected = cor.NewBytes(&H6D, &H29, &HE5, &HD8, &H7B, &H96, &H5E, &H99)
+    Dim Expected() As Byte
+    Expected = Cor.NewBytes(&H6D, &H29, &HE5, &HD8, &H7B, &H96, &H5E, &H99)
     
-    Assert.AreEqual expected, db.GetBytes(8)
+    Assert.AreEqual Expected, db.GetBytes(8)
 End Sub
 
 Public Sub Get8BytesTwiceAreDifferent()
     Dim pwd() As Byte
-    pwd = cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
+    pwd = Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
     
     Dim Salt() As Byte
     Salt = pwd
     
     Dim db As Rfc2898DeriveBytes
-    Set db = cor.NewRfc2898DeriveBytes(pwd, Salt)
+    Set db = Cor.NewRfc2898DeriveBytes(pwd, Salt)
     
     Dim b1() As Byte
     Dim b2() As Byte
@@ -61,13 +66,13 @@ End Sub
 
 Public Sub Get8BytesTwiceWithResetAreSame()
     Dim pwd() As Byte
-    pwd = cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
+    pwd = Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
     
     Dim Salt() As Byte
     Salt = pwd
     
     Dim db As Rfc2898DeriveBytes
-    Set db = cor.NewRfc2898DeriveBytes(pwd, Salt)
+    Set db = Cor.NewRfc2898DeriveBytes(pwd, Salt)
     
     Dim b1() As Byte
     Dim b2() As Byte
@@ -80,13 +85,13 @@ End Sub
 
 Public Sub Get10BytesTwiceSameAs20BytesOnce()
     Dim pwd() As Byte
-    pwd = cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
+    pwd = Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
     
     Dim Salt() As Byte
     Salt = pwd
     
     Dim db As Rfc2898DeriveBytes
-    Set db = cor.NewRfc2898DeriveBytes(pwd, Salt)
+    Set db = Cor.NewRfc2898DeriveBytes(pwd, Salt)
     
     Dim b1() As Byte
     Dim b2() As Byte
@@ -109,15 +114,15 @@ Public Sub Get20BytesUsingStringPassword()
     pwd = String$(10, ChrW$(&H2030))
     
     Dim Salt() As Byte
-    Salt = cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
+    Salt = Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
     
     Dim db As Rfc2898DeriveBytes
-    Set db = cor.NewRfc2898DeriveBytes(pwd, Salt)
+    Set db = Cor.NewRfc2898DeriveBytes(pwd, Salt)
     
-    Dim expected() As Byte
-    expected = cor.NewBytes(&H46, &HE8, &HDD, &H5F, &H9F, &H18, &H66, &HB3, &H82, &HC3, &HA8, &HE0, &H39, &HB8, &H7B, &HB, &HF7, &H2, &H21, &H2E)
+    Dim Expected() As Byte
+    Expected = Cor.NewBytes(&H46, &HE8, &HDD, &H5F, &H9F, &H18, &H66, &HB3, &H82, &HC3, &HA8, &HE0, &H39, &HB8, &H7B, &HB, &HF7, &H2, &H21, &H2E)
     
-    Assert.AreEqual expected, db.GetBytes(20)
+    Assert.AreEqual Expected, db.GetBytes(20)
 End Sub
 
 

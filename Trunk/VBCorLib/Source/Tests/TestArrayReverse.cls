@@ -13,6 +13,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
@@ -36,50 +41,50 @@ End Sub
 Public Sub Reverse_WithNullArray_Throws()
     Dim Arr() As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.Reverse Arr
     
-ErrTrap:
+errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub Reverse_WithMultiDimensionArray_Throws()
     Dim Arr(0, 0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.Reverse Arr
     
-ErrTrap:
+errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub Reverse_WithIndexLessThanLBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.Reverse Arr, -1
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Reverse_WithIndexGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.Reverse Arr, 1
     
-ErrTrap:
+errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Reverse_WithIndexAndCountGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo ErrTrap
+    On Error GoTo errTrap
     cArray.Reverse Arr, 0, 2
     
-ErrTrap:
+errTrap:
     AssertArgumentException Err
 End Sub
 

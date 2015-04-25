@@ -17,7 +17,11 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements IFormatProvider
 Implements ICustomFormatter
+Implements ICategorizable
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 Public Sub TestFormat()
     Dim s As String

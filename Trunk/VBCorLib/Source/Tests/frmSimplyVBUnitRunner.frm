@@ -53,253 +53,324 @@ Option Explicit
 '   5. Add public subs of the tests you want run. No parameters.
 
 Private Sub Form_Load()
-    Dim Suite As TestSuite
-    
-    ' Add test cases here.
-    '
-    'AddTest New MyTestCase
-    Const CATEGORY_CRYPTOGRAPHY As String = "Cryptography Tests"
-    
-    Dim System As TestSuite
-    Set System = Sim.NewTestSuite("System")
-    
-    With Sim.NewTestSuite("Object")
-        .Add New ObjectBaseTests
-        .Add New ObjectTests
-        .Add New ObjectToStringWithDoublesTests
-        .Add New ObjectToStringWithLongsTests
-        .Add New ObjectToStringWithSinglesTests
-        .Add New ObjectToStringWithValuesTests
+    AddMicrosoftWin32
+    AddSystem
+    AddSystemCollections
+    AddSystemSecurityCryptography
+    AddSystemResources
+    AddSystemIO
+    AddSystemText
+    AddSystemGlobalization
+    AddSystemNumerics
+    AddSystemSecurity
+    AddSystemDiagnostics
+    AddSystemThreading
+End Sub
+
+Private Sub AddSystemSecurity()
+    With Sim.NewTestSuite("System.Security")
+        .Add New TestSecurityElement
         
-        System.Add .This
+        AddTest .This
     End With
-    
-    System.Add New ExceptionTests
-    System.Add New TestSystemException
-    System.Add New TestDefaultSystemEx
-    System.Add New ArgumentExceptionTests
-    System.Add New ArgumentNullExceptionTests
-    System.Add New ArgumentOutOfRangeTests
-    System.Add New TestExceptionMethods
-    System.Add New TestInvalidCastException
-    System.Add New TestDefInvalidCast
-    System.Add New CStringTests
-    System.Add New CharTests
-    System.Add New BufferTests
-    System.Add New TestVersion
-    System.Add New TestRandom
-    System.Add New TestMathExt
-    System.Add New GuidTests
-    System.Add New BitConverterTests
-    System.Add New CDateTimeTests
-    System.Add New TestEnvironment
-    System.Add New TimeZoneTests
+End Sub
 
-    System.Add NewSuite("Convert", New ToBase64Tests, New FromBase64Tests)
-    
-    Dim cArrayTests As TestSuite
-    Set cArrayTests = Sim.NewTestSuite("Array")
-    cArrayTests.Add New cArrayTests
-    cArrayTests.Add New cArrayCopyTests
-    cArrayTests.Add New cArraySortTests
-    cArrayTests.Add New cArrayBinarySearchTests
-    cArrayTests.Add New cArrayReverseTests
-    cArrayTests.Add New cArrayIndexOfTests
-    cArrayTests.Add New cArrayLastIndexOfTests
-    cArrayTests.Add New cArrayCreateInstanceTests
-    cArrayTests.Add New cArrayFindTests
-    System.Add cArrayTests
-    System.Add New TimeSpanTests
-    
-    AddTest System
-    
-    AddTest CreateCollectionsTests
-    
-    Dim Cyrptography As TestSuite
-    Set Cyrptography = Sim.NewTestSuite("System.Security.Cryptography")
-    Set Cyrptography.Categories = Sim.NewCategorization(CATEGORY_CRYPTOGRAPHY, True)
-    Cyrptography.Categories.Add CATEGORY_CRYPTOGRAPHY
-    Cyrptography.Add New TestRNGCryptoServiceProvider
-    Cyrptography.Add New TestToBase64Transform
-    Cyrptography.Add New TestFromBase64Transform
-    Cyrptography.Add NewSuite("CryptoStream", New TestCryptoStream, New TestCryptoStreamReadBase64, New TestCryptoStreamWriteBase64, New TestCryptoStreamFullBase64, New TestCryptoStreamMultiBlock)
-    Cyrptography.Add NewSuite("DESCryptoServiceProvider", New TestDESWeakKeys, New TestDESCryptoServiceProvider, New TestDESEncryption, New TestDESPaddingModes, New TestDESDecryption)
-    Cyrptography.Add NewSuite("TripleDESCryptoServiceProvider", New TestTripleDESWeakKeys, New TestTripleDESCryptoServiceProvider, New TestTripleDESEncryption, New TestTripleDESDecryption)
-    Cyrptography.Add NewSuite("SymmetricalAlgorithm", New TestSymmetricAlgorithmBase, New TestSymmetricAlgorithmBaseKey)
-    Cyrptography.Add NewSuite("RC2CryptoServiceProvider", New TestRC2Encryption, New TestRC2Decryption)
-    Cyrptography.Add NewSuite("RijndaelManaged", _
-                              New TestRijndaelManaged128, _
-                              New TestRijndaelEncryptionECB, _
-                              New TestRijndaelEncryptionCBC, _
-                              New TestRijndaelEncryptionCFB, _
-                              New TestRijndaelDecryptionECB, _
-                              New TestRijndaelDecryptionCBC, _
-                              New TestRijndaelDecryptionCFB)
-    Dim HashTests As TestSuite
-    Set HashTests = Sim.NewTestSuite("Hash Tests")
-    HashTests.Add New TestSHA1CryptoServiceProvider
-    HashTests.Add New TestSHA1Managed
-    HashTests.Add New TestSHA256Managed
-    HashTests.Add New TestSHA512Managed
-    HashTests.Add New TestSHA384Managed
-    HashTests.Add New TestMD5CryptoServiceProvider
-    HashTests.Add New TestRIPEMD160Managed
-    Cyrptography.Add HashTests
-    Dim HMACTests As TestSuite
-    Set HMACTests = Sim.NewTestSuite("HMAC Tests")
-    HMACTests.Add New TestHMACSHA1
-    HMACTests.Add New TestHMACSHA1Managed
-    HMACTests.Add New TestHMACSHA256
-    HMACTests.Add New TestHMACSHA384
-    HMACTests.Add New TestHMACSHA512
-    HMACTests.Add New TestHMACMD5
-    HMACTests.Add New TestHMACRIPEMD160
-    Cyrptography.Add HMACTests
-    Cyrptography.Add New TestMACTripleDES
-    Cyrptography.Add New TestRfc2898DeriveBytes
-    Cyrptography.Add New CryptoConfigTests
-    Dim RSATests As TestSuite
-    Set RSATests = Sim.NewTestSuite("RSACryptoServiceProvider")
-    RSATests.Add New TestCspParameters
-    RSATests.Add New TestCspKeyContainerInfo
-    RSATests.Add New TestRSACryptoServiceProvider
-    RSATests.Add New TestRSASignAndVerify
-    Cyrptography.Add RSATests
-    Cyrptography.Add New TestDSACryptoServiceProvider
-    AddTest Cyrptography
-    
-    AddTest NewSuite("System.Security", New TestSecurityElement)
-    AddTest NewSuite("System.Diagnostics", New StopWatchTests)
-    
-    Dim Resources As TestSuite
-    Set Resources = Sim.NewTestSuite("System.Resources")
-    Resources.Add New TestResourceKey
-    Resources.Add New TestResourceWriter
-    Resources.Add New TestResourceManager
-    Resources.Add New TestResourceSet
-    Resources.Add New TestResourceReader
-    'AddTest New TestWinResourceReader
-    
-    AddTest Resources
-    
-    AddTest NewSuite("System.Threading", New TestTicker)
-    
-    Dim IO As TestSuite
-    Set IO = Sim.NewTestSuite("System.IO")
-    IO.Add New BinaryReaderTests
-    IO.Add New BinaryWriterTests
-    IO.Add New TestFileInfo
-    IO.Add New FileTests
-    IO.Add New TestStreamReader
-    IO.Add New TestMappedFile
-    IO.Add New TestFileNotFoundException
-    IO.Add New TestINIFile
-    IO.Add New DriveInfoTests
-    IO.Add New TestStringReader
-    IO.Add New TestStringWriter
-    IO.Add New DirectoryTests
-    IO.Add New DirectoryInfoTests
-    IO.Add New MemoryStreamTests
-    IO.Add New PathTests
-
-    Dim StreamWriterTests As TestSuite
-    Set StreamWriterTests = Sim.NewTestSuite("StreamWriter")
-    StreamWriterTests.Add New TestStreamWriter
-    StreamWriterTests.Add New TestStreamWriterWithMem
-    StreamWriterTests.Add New TestSWWithMemAutoFlush
-    IO.Add StreamWriterTests
-    IO.Add New FileStreamTests
-
-    AddTest IO
-    
-    Dim Text As TestSuite
-    Set Text = Sim.NewTestSuite("System.Text")
-    Text.Add New EncodingArgumentTests
-    Text.Add New ASCIIEncodingTests
-    Text.Add New TestUnicodeEncodingBig
-    Text.Add New TestUnicodeEncoding
-    Text.Add New TestDetermineEncoding
-    Text.Add New TestEncoding437
-    Text.Add New StringBuilderTests
-    Text.Add New TestCustomFormatter
-
-    Dim UTF7EncodingTests As TestSuite
-    Set UTF7EncodingTests = Sim.NewTestSuite("UTF7Encoding")
-    UTF7EncodingTests.Add New TestUTF7GetChars
-    UTF7EncodingTests.Add New TestUTF7GetCharCount
-    UTF7EncodingTests.Add New TestUTF7GetBytes
-    UTF7EncodingTests.Add New TestUTF7GetByteCount
-    Text.Add UTF7EncodingTests
-    
-    Dim UTF8EncodingTests As TestSuite
-    Set UTF8EncodingTests = Sim.NewTestSuite("UTF8Encoding")
-    UTF8EncodingTests.Add New TestUTF8GetChars
-    UTF8EncodingTests.Add New TestUTF8GetCharCount
-    UTF8EncodingTests.Add New TestUTF8Encoding
-    UTF8EncodingTests.Add New TestUTF8GetByteCount
-    Text.Add UTF8EncodingTests
-    
-    AddTest Text
-    
-    Dim Win32 As TestSuite
-    Set Win32 = Sim.NewTestSuite("Microsoft.Win32")
-    Dim RegistryKeyTests As TestSuite
-    Set RegistryKeyTests = Sim.NewTestSuite("RegistryKey")
-    RegistryKeyTests.Add New TestRegistryDeleteValue
-    RegistryKeyTests.Add New TestRegistryKeySetGetValue
-    RegistryKeyTests.Add New TestRegistryRootKeys
-    RegistryKeyTests.Add New TestRegistryKey
-    RegistryKeyTests.Add New TestRegistrySetValues
-    Win32.Add RegistryKeyTests
-    Win32.Add New SafeHandleTests
-    AddTest Win32
-    
-    Dim Globalization As TestSuite
-    Set Globalization = Sim.NewTestSuite("System.Globalization")
-    Globalization.Add New TestThaiBuddhistCalendar
-    Globalization.Add New TestTaiwanCalendar
-    Globalization.Add New TestKoreanCalendar
-    Globalization.Add New TestJapaneseCalendar
-    Globalization.Add New TestHebrewCalendar
-    Globalization.Add New TestJulianCalendar
-    Globalization.Add New TestCodePageDecoder
-    Globalization.Add New CharEnumeratorTests
-    Globalization.Add New TestGregorianCalendar
-    Globalization.Add New TestHijriCalendar
-    Globalization.Add New CultureInfoTests
-    Globalization.Add New TestDateTimeFormatInfoInv
-
-    AddTest Globalization
+Private Sub AddSystemDiagnostics()
+    With Sim.NewTestSuite("System.Diagnostics")
+        .Add New StopWatchTests
         
-    'AddTest New TestWeakReference
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemThreading()
+    With Sim.NewTestSuite("System.Threading")
+        .Add New TestTicker
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystem()
+    With Sim.NewTestSuite("System")
+        .Add New ExceptionTests
+        .Add New TestSystemException
+        .Add New TestDefaultSystemEx
+        .Add New ArgumentExceptionTests
+        .Add New ArgumentNullExceptionTests
+        .Add New ArgumentOutOfRangeTests
+        .Add New TestExceptionMethods
+        .Add New TestInvalidCastException
+        .Add New TestDefInvalidCast
+        .Add New CStringTests
+        .Add New CharTests
+        .Add New BufferTests
+        .Add New TestVersion
+        .Add New TestRandom
+        .Add New TestMathExt
+        .Add New GuidTests
+        .Add New BitConverterTests
+        .Add New CDateTimeTests
+        .Add New TestEnvironment
+        .Add New TimeZoneTests
+        .Add New TimeSpanTests
     
-    Dim Numerics As TestSuite
-    Set Numerics = Sim.NewTestSuite("System.Numerics")
-    Dim BigIntegerTests As TestSuite
-    Set BigIntegerTests = Sim.NewTestSuite("BigInteger")
-    BigIntegerTests.Add New VBAdditionTests
-    BigIntegerTests.Add New VBBitTests
-    BigIntegerTests.Add New VBComparisonTests
-    BigIntegerTests.Add New VBCreateFromArraysTests
-    BigIntegerTests.Add New VBCreateFromNumbersTests
-    BigIntegerTests.Add New VBDivisionTests
-    BigIntegerTests.Add New VBFactorialTests
-    BigIntegerTests.Add New VBMultiplyTests
-    BigIntegerTests.Add New VBParseBinaryTests
-    BigIntegerTests.Add New VBParseDecimalTests
-    BigIntegerTests.Add New VBParseHexTests
-    BigIntegerTests.Add New VBPowTests
-    BigIntegerTests.Add New VBRightShiftTests
-    BigIntegerTests.Add New VBRndTests
-    BigIntegerTests.Add New VBShiftLeftTests
-    BigIntegerTests.Add New VBSquareRootTests
-    BigIntegerTests.Add New VBSubtractionTests
-    BigIntegerTests.Add New VBToBinaryStringTests
-    BigIntegerTests.Add New VBToStringDecimalTests
-    BigIntegerTests.Add New VBToStringHexTests
-    BigIntegerTests.Add New VBUnaryTests
-    Numerics.Add BigIntegerTests
-    AddTest Numerics
+        .Add NewSuite("Object", _
+            New ObjectBaseTests, _
+            New ObjectTests, _
+            New ObjectToStringWithDoublesTests, _
+            New ObjectToStringWithLongsTests, _
+            New ObjectToStringWithSinglesTests, _
+            New ObjectToStringWithValuesTests)
+        
+        .Add NewSuite("Convert", _
+            New ToBase64Tests, _
+            New FromBase64Tests)
+    
+        .Add NewSuite("Array", _
+            New cArrayTests, _
+            New cArrayCopyTests, _
+            New cArraySortTests, _
+            New cArrayBinarySearchTests, _
+            New cArrayReverseTests, _
+            New cArrayIndexOfTests, _
+            New cArrayLastIndexOfTests, _
+            New cArrayCreateInstanceTests, _
+            New cArrayFindTests)
+    
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemCollections()
+    With Sim.NewTestSuite("System.Collections")
+        .Add New BitArrayTests
+        .Add New TestSortedList
+        .Add New ComparerTests
+        .Add New TestCaseInsensitiveHCP
+
+        .Add NewSuite("ArrayList", _
+            New ArrayListTests, _
+            New ArrayListAdapterTests, _
+            New ArrayListRangedTests, _
+            New ArrayListRepeatTests, _
+            New ArrayListEnumeratorTests, _
+            New ArrayListReadOnlyTests)
+        
+        .Add NewSuite("Queue", _
+            New QueueTests, _
+            New QueueEnumeratorTests)
+                
+        .Add NewSuite("Stack", _
+            New StackTests, _
+            New StackEnumeratorTests)
+        
+        .Add NewSuite("HashTable", _
+            New TestHashTable, _
+            New TestHashTableHCP, _
+            New TestDictionaryEntry)
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemSecurityCryptography()
+    With Sim.NewTestSuite("System.Security.Cryptography")
+        .Add New TestRNGCryptoServiceProvider
+        .Add New TestToBase64Transform
+        .Add New TestFromBase64Transform
+        .Add New TestSHA1CryptoServiceProvider
+        .Add New TestSHA1Managed
+        .Add New TestSHA256Managed
+        .Add New TestSHA512Managed
+        .Add New TestSHA384Managed
+        .Add New TestMD5CryptoServiceProvider
+        .Add New TestRIPEMD160Managed
+        .Add New TestHMACSHA1
+        .Add New TestHMACSHA1Managed
+        .Add New TestHMACSHA256
+        .Add New TestHMACSHA384
+        .Add New TestHMACSHA512
+        .Add New TestHMACMD5
+        .Add New TestHMACRIPEMD160
+        .Add New TestMACTripleDES
+        .Add New TestRfc2898DeriveBytes
+        .Add New CryptoConfigTests
+        .Add New TestCspParameters
+        .Add New TestCspKeyContainerInfo
+        .Add New TestRSACryptoServiceProvider
+        .Add New TestRSASignAndVerify
+        .Add New TestDSACryptoServiceProvider
+        
+        .Add NewSuite("CryptoStream", _
+            New TestCryptoStream, _
+            New TestCryptoStreamReadBase64, _
+            New TestCryptoStreamWriteBase64, _
+            New TestCryptoStreamFullBase64, _
+            New TestCryptoStreamMultiBlock)
+            
+        .Add NewSuite("DESCryptoServiceProvider", _
+            New TestDESWeakKeys, _
+            New TestDESCryptoServiceProvider, _
+            New TestDESEncryption, _
+            New TestDESPaddingModes, _
+            New TestDESDecryption)
+        
+        .Add NewSuite("TripleDESCryptoServiceProvider", _
+            New TestTripleDESWeakKeys, _
+            New TestTripleDESCryptoServiceProvider, _
+            New TestTripleDESEncryption, _
+            New TestTripleDESDecryption)
+        
+        .Add NewSuite("SymmetricalAlgorithm", _
+            New TestSymmetricAlgorithmBase, _
+            New TestSymmetricAlgorithmBaseKey)
+        
+        .Add NewSuite("RC2CryptoServiceProvider", _
+            New TestRC2Encryption, _
+            New TestRC2Decryption)
+        
+        .Add NewSuite("RijndaelManaged", _
+            New TestRijndaelManaged128, _
+            New TestRijndaelEncryptionECB, _
+            New TestRijndaelEncryptionCBC, _
+            New TestRijndaelEncryptionCFB, _
+            New TestRijndaelDecryptionECB, _
+            New TestRijndaelDecryptionCBC, _
+            New TestRijndaelDecryptionCFB)
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemResources()
+    With Sim.NewTestSuite("System.Resources")
+        .Add New TestResourceKey
+        .Add New TestResourceWriter
+        .Add New TestResourceManager
+        .Add New TestResourceSet
+        .Add New TestResourceReader
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemIO()
+    With Sim.NewTestSuite("System.IO")
+        .Add New BinaryReaderTests
+        .Add New BinaryWriterTests
+        .Add New TestFileInfo
+        .Add New FileTests
+        .Add New TestStreamReader
+        .Add New TestMappedFile
+        .Add New TestFileNotFoundException
+        .Add New TestINIFile
+        .Add New DriveInfoTests
+        .Add New TestStringReader
+        .Add New TestStringWriter
+        .Add New DirectoryTests
+        .Add New DirectoryInfoTests
+        .Add New MemoryStreamTests
+        .Add New PathTests
+        .Add New FileStreamTests
+                
+        .Add NewSuite("StreamWriter", _
+            New TestStreamWriter, _
+            New TestStreamWriterWithMem, _
+            New TestSWWithMemAutoFlush)
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemText()
+    With Sim.NewTestSuite("System.Text")
+        .Add New EncodingArgumentTests
+        .Add New ASCIIEncodingTests
+        .Add New TestUnicodeEncodingBig
+        .Add New TestUnicodeEncoding
+        .Add New TestDetermineEncoding
+        .Add New TestEncoding437
+        .Add New StringBuilderTests
+        .Add New TestCustomFormatter
+        
+        .Add NewSuite("UTF7Encoding", _
+            New TestUTF7GetChars, _
+            New TestUTF7GetCharCount, _
+            New TestUTF7GetBytes, _
+            New TestUTF7GetByteCount)
+        
+        .Add NewSuite("UTF8Encoding", _
+            New TestUTF8GetChars, _
+            New TestUTF8GetCharCount, _
+            New TestUTF8Encoding, _
+            New TestUTF8GetByteCount)
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddMicrosoftWin32()
+    With Sim.NewTestSuite("Microsoft.Win32")
+        .Add New SafeHandleTests
+        
+        .Add NewSuite("RegistryKey", _
+            New TestRegistryDeleteValue, _
+            New TestRegistryKeySetGetValue, _
+            New TestRegistryRootKeys, _
+            New TestRegistryKey, _
+            New TestRegistrySetValues)
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemGlobalization()
+    With Sim.NewTestSuite("System.Globalization")
+        .Add New TestThaiBuddhistCalendar
+        .Add New TestTaiwanCalendar
+        .Add New TestKoreanCalendar
+        .Add New TestJapaneseCalendar
+        .Add New TestHebrewCalendar
+        .Add New TestJulianCalendar
+        .Add New TestCodePageDecoder
+        .Add New CharEnumeratorTests
+        .Add New TestGregorianCalendar
+        .Add New TestHijriCalendar
+        .Add New CultureInfoTests
+        .Add New TestDateTimeFormatInfoInv
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemNumerics()
+    With Sim.NewTestSuite("System.Numerics")
+        .Add NewSuite("BigInteger", _
+            New VBAdditionTests, _
+            New VBBitTests, _
+            New VBComparisonTests, _
+            New VBCreateFromArraysTests, _
+            New VBCreateFromNumbersTests, _
+            New VBDivisionTests, _
+            New VBFactorialTests, _
+            New VBMultiplyTests, _
+            New VBParseBinaryTests, _
+            New VBParseDecimalTests, _
+            New VBParseHexTests, _
+            New VBPowTests, _
+            New VBRightShiftTests, _
+            New VBRndTests, _
+            New VBShiftLeftTests, _
+            New VBSquareRootTests, _
+            New VBSubtractionTests, _
+            New VBToBinaryStringTests, _
+            New VBToStringDecimalTests, _
+            New VBToStringHexTests, _
+            New VBUnaryTests)
+        
+        AddTest .This
+    End With
 End Sub
 
 Private Function NewSuite(ByVal Name As String, ParamArray Fixtures() As Variant) As TestSuite

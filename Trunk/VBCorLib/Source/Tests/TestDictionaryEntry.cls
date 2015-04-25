@@ -15,19 +15,24 @@ Attribute VB_Exposed = False
 ' TestDictionaryEntry
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Collections"
+End Sub
 
 Public Sub TestEntry()
     Dim de As DictionaryEntry
     Set de = newdictionaryentry("key", "value")
     Assert.AreEqual "key", de.Key
-    Assert.AreEqual "value", de.value
+    Assert.AreEqual "value", de.Value
 End Sub
 
 Public Sub TestSet()
     Dim de As DictionaryEntry
     Set de = New DictionaryEntry
     de.Key = "key"
-    de.value = "value"
+    de.Value = "value"
     Assert.AreEqual "key", de.Key
-    Assert.AreEqual "value", de.value
+    Assert.AreEqual "value", de.Value
 End Sub

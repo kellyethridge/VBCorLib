@@ -15,10 +15,15 @@ Attribute VB_Exposed = False
 ' TestUTF8Encoding
 '
 Option Explicit
+Implements ICategorizable
 
 Private e As UTF8Encoding
 Private s As String
 Private b() As Byte
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 Public Sub Setup()
     Set e = NewUTF8Encoding(True)
@@ -153,16 +158,16 @@ errTrap:
 End Sub
 
 Public Sub TestEncoder()
-    Dim en As Encoder
+    Dim En As Encoder
     ReDim b(3)
     Dim ch(0) As Integer
     
-    Set en = e.GetEncoder
+    Set En = e.GetEncoder
     
     ch(0) = &HD801
-    Assert.AreEqual 0, en.GetBytes(ch, 0, 1, b, 0, False)
+    Assert.AreEqual 0, En.GetBytes(ch, 0, 1, b, 0, False)
     ch(0) = &HDC02
-    Assert.AreEqual 4, en.GetBytes(ch, 0, 1, b, 0, False)
+    Assert.AreEqual 4, En.GetBytes(ch, 0, 1, b, 0, False)
     Assert.AreEqual 240, b(0)
     Assert.AreEqual 144, b(1)
     Assert.AreEqual 144, b(2)
