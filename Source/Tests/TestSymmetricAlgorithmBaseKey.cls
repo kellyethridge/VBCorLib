@@ -15,12 +15,16 @@ Attribute VB_Exposed = False
 ' TestSymmetricAlgorithmBaseKey
 '
 Option Explicit
+Implements ICategorizable
 
 Private WithEvents base As SymmetricAlgorithmBase
 Attribute base.VB_VarHelpID = -1
 Private mEx As Exception
 Private mWeaknessTested As Boolean
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 
 Public Sub Setup()

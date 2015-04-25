@@ -104,6 +104,7 @@ Private Sub AddSystem()
         .Add New TestDefInvalidCast
         .Add New CStringTests
         .Add New CharTests
+        .Add New CharEnumeratorTests
         .Add New BufferTests
         .Add New TestVersion
         .Add New TestRandom
@@ -114,7 +115,7 @@ Private Sub AddSystem()
         .Add New TestEnvironment
         .Add New TimeZoneTests
         .Add New TimeSpanTests
-    
+
         .Add NewSuite("Object", _
             New ObjectBaseTests, _
             New ObjectTests, _
@@ -334,7 +335,6 @@ Private Sub AddSystemGlobalization()
         .Add New TestHebrewCalendar
         .Add New TestJulianCalendar
         .Add New TestCodePageDecoder
-        .Add New CharEnumeratorTests
         .Add New TestGregorianCalendar
         .Add New TestHijriCalendar
         .Add New CultureInfoTests
