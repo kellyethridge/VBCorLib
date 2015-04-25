@@ -16,10 +16,15 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
 
 Private Const TEST_GUID As String = "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
 Private Const TEST_GUID_LOWER As String = "{C200E360-38C5-11CE-AE62-08002B2B79EE}"
 Private Const TEST_GUID_UPPER As String = "{C200E360-38C5-11CE-AE62-08002B2B79FF}"
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName

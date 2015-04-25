@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' ObjectBase Tests
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Equals_WithNothingAndNothing_ReturnsTrue()
     Dim Actual As Boolean

@@ -16,18 +16,11 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
 
-Private Declare Function GetTimeZoneInformation Lib "kernel32" (lpTimeZoneInformation As TIME_ZONE_INFORMATION) As Long
-
-Private Type TIME_ZONE_INFORMATION
-    Bias             As Long
-    StandardName(63) As Byte
-    StandardDate     As SYSTEMTIME
-    StandardBias     As Long
-    DaylightName(63) As Byte
-    DaylightDate     As SYSTEMTIME
-    DaylightBias     As Long
-End Type
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName

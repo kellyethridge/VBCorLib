@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestVersion
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub TestZeroVersion()
     Dim v As New Version

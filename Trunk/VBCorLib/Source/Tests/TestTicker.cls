@@ -16,18 +16,17 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Private WithEvents mTicker As Ticker
-Attribute mTicker.VB_VarHelpID = -1
-
-
-Public Sub Setup()
-    Set mTicker = NewTicker(1000, Now, , AddressOf TickerEvent)
-End Sub
-
-Public Sub TestEnabled()
-    mTicker.Enabled = True
-End Sub
-
-Private Sub mTicker_Elapsed(ByRef Data As Variant)
-    Debug.Print "Event: " & Data
-End Sub
+'Private WithEvents mTicker As Ticker
+'
+'
+'Public Sub Setup()
+'    Set mTicker = NewTicker(1000, Now, , AddressOf TickerEvent)
+'End Sub
+'
+'Public Sub TestEnabled()
+'    mTicker.Enabled = True
+'End Sub
+'
+'Private Sub mTicker_Elapsed(ByRef Data As Variant)
+'    Debug.Print "Event: " & Data
+'End Sub

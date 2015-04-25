@@ -15,7 +15,11 @@ Attribute VB_Exposed = False
 ' VBRndTests
 '
 Option Explicit
+Implements ICategorizable
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub TwoDifferentNumbers()
     Dim b1 As BigInteger

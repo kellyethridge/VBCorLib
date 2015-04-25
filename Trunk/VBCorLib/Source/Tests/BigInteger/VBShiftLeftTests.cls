@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' VBShiftLeftTests
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Shift0()
     Dim b As BigInteger
