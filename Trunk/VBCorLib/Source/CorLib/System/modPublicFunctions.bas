@@ -143,49 +143,19 @@ Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As Str
     GetLocaleString = Left$(Buf, Size - 1)
 End Function
 
-''
-' Verifies that the FileAccess flags are within a valid range of values.
-'
-' @param Access The flags to verify.
-'
-Public Sub VerifyFileAccess(ByVal Access As FileAccess)
-    Select Case Access
-        Case FileAccess.ReadAccess, FileAccess.ReadWriteAccess, FileAccess.WriteAccess
-        Case Else
-            Throw Cor.NewArgumentOutOfRangeException("Access", Access, Environment.GetResourceString(ArgumentOutOfRange_Enum))
-    End Select
-End Sub
 
-''
-' Verifies that the FileShare flags are within a valid range of values.
-'
-' @param Share The flags to verify.
-'
-Public Sub VerifyFileShare(ByVal Share As FileShare)
-    Select Case Share
-        Case FileShare.None, FileShare.ReadShare, FileShare.ReadWriteShare, FileShare.WriteShare
-        Case Else
-            Throw Cor.NewArgumentOutOfRangeException("Share", Share, Environment.GetResourceString(ArgumentOutOfRange_Enum))
-    End Select
-End Sub
 
 ''
 ' Attempts to create a Stream object based on the source.
 '
 ' vbString:     Attempts to open a FileStream.
 ' vbByte Array: Attempts to create a MemoryStream.
-' vbLong:       Attempts to open a FileStream from a file handle.
 ' vbObject:     Attempts to convert the object to a Stream object.
 '
 Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = DefaultAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As Stream
     Select Case VarType(Source)
         Case vbString
-            ' We have a filename.
             Set GetStream = Cor.NewFileStream(Source, Mode, Access, Share)
-            
-        Case vbLong, vbInteger, vbByte
-            ' We have a handle.
-            Set GetStream = Cor.NewFileStreamFromHandle(Source, Access)
             
         Case vbByteArray
             Dim Bytes() As Byte
@@ -193,16 +163,19 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
             Set GetStream = Cor.NewMemoryStream(Bytes, Writable:=False)
             SAPtr(Bytes) = 0
             
-        Case vbObject, vbDataObject
+        Case vbObject
             If Source Is Nothing Then _
-                Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Stream))
-            If Not TypeOf Source Is Stream Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamRequired), "Source")
-            
-            Set GetStream = Source
-        
+                Error.ArgumentNull "Source", ArgumentNull_Stream
+            If TypeOf Source Is Stream Then
+                Set GetStream = Source
+            ElseIf TypeOf Source Is SafeFileHandle Then
+                Set GetStream = Cor.NewFileStreamWithHandle(Source, Access)
+            Else
+                Error.Argument Argument_StreamRequired
+            End If
+                
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamRequired), "Source")
+            Error.Argument Argument_StreamRequired
     End Select
 End Function
 

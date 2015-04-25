@@ -650,7 +650,7 @@ End Function
 ' @param Access The access allowed to the file for this FileStream.
 ' @param Share The access allowed to the file for other processes.
 ' @param BufferSize The number of bytes used to cache reads and writes from the physical file.
-' @param UseAsync Flag used to open the file in asyncronous mode.
+' @param UseAsync Flag used to open the file in asyncronous mode (currently not supported).
 ' @return The new FileStream opened to the specified file.
 '
 Public Function NewFileStream(ByVal Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = DefaultAccess, Optional ByVal Share As FileShare = FileShare.ReadShare, Optional ByVal BufferSize As Long = 4096, Optional ByVal UseAsync As Boolean = False) As FileStream
@@ -661,15 +661,14 @@ End Function
 ''
 ' Returns a new FileStream to access a file other than that on disk, such as pipes.
 '
-' @param Handle The handle to the already opened filed.
+' @param Handle A SafeFileHandle to the already opened filed.
 ' @param Access The access allowed to the file for this FileStream.
-' @param OwnsHandle Determines if the FileStream object is responsible for closing the file passed in.
 ' @param BufferSize The number of bytes used to cache reads and writes from the physical file.
 ' @return The new FileStream opened to the specified file.
 '
-Public Function NewFileStreamFromHandle(ByVal Handle As Long, ByVal Access As FileAccess, Optional ByVal OwnsHandle As Boolean = True, Optional ByVal BufferSize As Long = 4096) As FileStream
-    Set NewFileStreamFromHandle = New FileStream
-    Call NewFileStreamFromHandle.InitFromHandle(Handle, Access, OwnsHandle, BufferSize)
+Public Function NewFileStreamWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAccess, Optional ByVal BufferSize As Long = 4096) As FileStream
+    Set NewFileStreamWithHandle = New FileStream
+    NewFileStreamWithHandle.InitWithHandle Handle, Access, BufferSize
 End Function
 
 ''

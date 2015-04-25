@@ -209,8 +209,8 @@ Friend Sub Init(ByVal FileName As String, ByVal Access As FileAccess, ByVal Shar
     If FileLen(FileName) = 0 Then _
         Throw Cor.NewArgumentException("Cannot map to a zero-length file.", "FileName")
     
-    Call VerifyFileAccess(Access)
-    Call VerifyFileShare(Share)
+    ValidateFileAccess Access
+    ValidateFileShare Share
     
     Dim PageAccess As Long
     Dim MapAccess As Long
@@ -227,10 +227,10 @@ Friend Sub Init(ByVal FileName As String, ByVal Access As FileAccess, ByVal Shar
     mFileName = FileName
     mFileLength = FileLen(mFileName)
 
-    mFileHandle = API.CreateFile(FileName, Access, Share, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
+    mFileHandle = Api.CreateFile(FileName, Access, Share, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
     If mFileHandle = INVALID_HANDLE Then IOError Err.LastDllError, FileName
     
-    mMapHandle = API.CreateFileMapping(mFileHandle, 0, PageAccess, 0, 0, vbNullString)
+    mMapHandle = Api.CreateFileMapping(mFileHandle, 0, PageAccess, 0, 0, vbNullString)
     If mMapHandle = vbNullPtr Then IOError Err.LastDllError, FileName
     
     mViewHandle = MapViewOfFile(mMapHandle, MapAccess, 0, 0, 0)

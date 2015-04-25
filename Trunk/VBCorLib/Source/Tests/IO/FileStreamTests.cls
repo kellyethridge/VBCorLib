@@ -332,6 +332,50 @@ Public Sub WriteBlock_WithData_WritesToFile()
     Assert.That Actual, Iz.EqualTo(Data)
 End Sub
 
+Public Sub WriteBlock_WithNullArray_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    Dim NullBytes() As Byte
+    With NewFileStream(mBuilder.TempFileName, Create)
+        .WriteBlock NullBytes, 0, 1
+    End With
+    
+    AssertArgumentNullException Err, "Bytes"
+End Sub
+
+Public Sub WriteBlock_WithOffsetLessThanLBound_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Dim Bytes(5 To 10) As Byte
+    With NewFileStream(mBuilder.TempFileName, Create)
+        .WriteBlock Bytes, 4, 1
+    End With
+    
+    AssertArgumentOutOfRangeException Err, "Offset"
+End Sub
+
+Public Sub WriteBlock_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Dim Bytes(5 To 10) As Byte
+    With NewFileStream(mBuilder.TempFileName, Create)
+        .WriteBlock Bytes, 5, -1
+    End With
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub WriteBlock_WithOffsetAndCountNotAValidPositionInArray_ThrowsArgumentException()
+    On Error Resume Next
+    
+    Dim Bytes(0 To 4) As Byte
+    With NewFileStream(mBuilder.TempFileName, Create)
+        .WriteBlock Bytes, 1, 5
+    End With
+    
+    AssertArgumentException Err
+End Sub
+
 Public Sub WriteByte_WhenCalled_WritesToStream()
     Dim FileName As String
     FileName = mBuilder.CreateBinaryFile(Data:=NewBytes(1, 2, 3))

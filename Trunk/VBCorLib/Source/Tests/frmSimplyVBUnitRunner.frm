@@ -208,13 +208,7 @@ Private Sub Form_Load()
     StreamWriterTests.Add New TestStreamWriterWithMem
     StreamWriterTests.Add New TestSWWithMemAutoFlush
     IO.Add StreamWriterTests
-
-    Dim FileStreamTests As TestSuite
-    Set FileStreamTests = Sim.NewTestSuite("FileStream")
-'    FileStreamTests.Add New TestFileStreamWrite
-'    FileStreamTests.Add New TestFileStreamSmallBuffer
-    FileStreamTests.Add New FileStreamTests
-    IO.Add FileStreamTests
+    IO.Add New FileStreamTests
 
     AddTest IO
     

@@ -349,6 +349,7 @@ Class=SafeFileHandle; System\Win32\SafeHandles\SafeFileHandle.cls
 Class=SafeHandle; System\Win32\SafeHandles\SafeHandle.cls
 Class=IWin32Api; System\Win32\IWin32Api.cls
 ResFile32="VBCorLib.RES"
+Module=FileFlagHelper; System\IO\FileFlagHelper.bas
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"
