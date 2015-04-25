@@ -12,6 +12,11 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Message_WithDefaultConstructor_ReturnsDefaultMessage()
     Dim Ex As New ArgumentNullException

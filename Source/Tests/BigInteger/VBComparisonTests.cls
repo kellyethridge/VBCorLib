@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' ComparisonTests
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub ZeroEqualsZero()
     Assert.AreEqual 0, BigInteger.Compare(Nothing, Nothing)
@@ -33,16 +38,16 @@ Public Sub MinusOneAndOne()
 End Sub
 
 Public Sub MinusTenAndMinusOne()
-    Assert.AreEqual 1, BigInteger.Compare(BigInteger.MinusOne, cor.NewBigInteger(-10))
-    Assert.AreEqual -1, BigInteger.Compare(cor.NewBigInteger(-10), BigInteger.MinusOne)
+    Assert.AreEqual 1, BigInteger.Compare(BigInteger.MinusOne, Cor.NewBigInteger(-10))
+    Assert.AreEqual -1, BigInteger.Compare(Cor.NewBigInteger(-10), BigInteger.MinusOne)
 End Sub
 
 Public Sub Minus128AndMinus129()
     Dim Neg128 As BigInteger
     Dim Neg129 As BigInteger
     
-    Set Neg128 = cor.NewBigInteger(-128)
-    Set Neg129 = cor.NewBigInteger(-129)
+    Set Neg128 = Cor.NewBigInteger(-128)
+    Set Neg129 = Cor.NewBigInteger(-129)
     
     Assert.AreEqual 1, BigInteger.Compare(Neg128, Neg129)
 End Sub
@@ -59,10 +64,10 @@ End Sub
 
 Public Sub CompareEquals()
     Dim b1 As BigInteger
-    Set b1 = cor.NewBigInteger(12345)
+    Set b1 = Cor.NewBigInteger(12345)
 
     Dim b2 As BigInteger
-    Set b2 = cor.NewBigInteger(12345)
+    Set b2 = Cor.NewBigInteger(12345)
 
     Assert.AreEqual 0, b1.CompareTo(b2)
     Assert.AreEqual 0, b2.CompareTo(b1)
@@ -70,10 +75,10 @@ End Sub
 
 Public Sub CompareNotEquals()
     Dim b1 As BigInteger
-    Set b1 = cor.NewBigInteger(12345)
+    Set b1 = Cor.NewBigInteger(12345)
 
     Dim b2 As BigInteger
-    Set b2 = cor.NewBigInteger(54321)
+    Set b2 = Cor.NewBigInteger(54321)
 
     Assert.AreEqual -1, b1.CompareTo(b2)
     Assert.AreEqual 1, b2.CompareTo(b1)
@@ -83,10 +88,10 @@ End Sub
 
 Public Sub CompareNegatives()
     Dim b1 As BigInteger
-    Set b1 = cor.NewBigInteger(-1)
+    Set b1 = Cor.NewBigInteger(-1)
 
     Dim b2 As BigInteger
-    Set b2 = cor.NewBigInteger(&H80000000)
+    Set b2 = Cor.NewBigInteger(&H80000000)
 
     Assert.AreEqual -1, b2.CompareTo(b1)
     Assert.AreEqual 1, b1.CompareTo(b2)
@@ -94,10 +99,10 @@ End Sub
 
 Public Sub CompareMixed()
     Dim b1 As BigInteger
-    Set b1 = cor.NewBigInteger(-1)
+    Set b1 = Cor.NewBigInteger(-1)
 
     Dim b2 As BigInteger
-    Set b2 = cor.NewBigInteger(2)
+    Set b2 = Cor.NewBigInteger(2)
 
     Assert.AreEqual -1, b1.CompareTo(b2)
     Assert.AreEqual 1, b2.CompareTo(b1)
@@ -105,10 +110,10 @@ End Sub
 
 Public Sub CompareTest1()
     Dim b1 As BigInteger
-    Set b1 = cor.NewBigInteger(-65535)
+    Set b1 = Cor.NewBigInteger(-65535)
     
     Dim b2 As BigInteger
-    Set b2 = cor.NewBigInteger(-65536)
+    Set b2 = Cor.NewBigInteger(-65536)
     
     Assert.AreEqual 1, b1.CompareTo(b2)
     Assert.AreEqual -1, b2.CompareTo(b1)
@@ -116,10 +121,10 @@ End Sub
 
 Public Sub CompareTest2()
     Dim b1 As BigInteger
-    Set b1 = cor.NewBigInteger(-65535)
+    Set b1 = Cor.NewBigInteger(-65535)
     
     Dim b2 As BigInteger
-    Set b2 = cor.NewBigInteger(-128)
+    Set b2 = Cor.NewBigInteger(-128)
     
     Assert.AreEqual -1, b1.CompareTo(b2)
     Assert.AreEqual 1, b2.CompareTo(b1)

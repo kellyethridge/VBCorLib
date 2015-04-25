@@ -12,6 +12,11 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Message_WithDefaultConstructor_ReturnsDefaultMessage()
     Dim Ex As New ArgumentException
@@ -101,3 +106,4 @@ Public Sub TestPersitence()
     Assert.That Actual.ParamName, Iz.EqualTo("Param")
     Assert.That Actual.InnerException, Iz.Not.Nothing
 End Sub
+

@@ -18,11 +18,11 @@ Implements IObject
 Public Value As Long
 
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = object.Equals(Me, Value)
+    IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
 Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = ObjPtr(Me)
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String

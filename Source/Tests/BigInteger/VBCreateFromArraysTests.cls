@@ -15,14 +15,17 @@ Attribute VB_Exposed = False
 ' VBCreateFromArraysTests
 '
 Option Explicit
+Implements ICategorizable
 
 Private b As BigInteger
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Setup()
     Set b = Nothing
 End Sub
-
-
 
 Public Sub NullArray()
     Dim v() As Byte

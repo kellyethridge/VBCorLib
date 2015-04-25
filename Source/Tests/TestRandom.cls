@@ -15,7 +15,13 @@ Attribute VB_Exposed = False
 ' TestRandom
 '
 Option Explicit
+Implements ICategorizable
+
 Private r As Random
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Setup()
     Set r = New Random
@@ -49,7 +55,7 @@ Public Sub TestInvalidMaxValue()
     Assert.Fail "An error should be raised."
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentOutOfRangeException, "Wrong exception type caught."
 End Sub
 
@@ -70,7 +76,7 @@ Public Sub TestInvalidNextRangeArguments()
     Assert.Fail "An error should be raised."
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentOutOfRangeException, "Wrong exception type caught."
 End Sub
 

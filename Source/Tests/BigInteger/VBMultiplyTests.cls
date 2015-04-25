@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' VBMultiplyTests
 '
 Option Explicit
+Implements ICategorizable
 
 Private b As BigInteger
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub MultiplyZeros()
     Set b = BigInteger.Multiply(Nothing, Nothing)

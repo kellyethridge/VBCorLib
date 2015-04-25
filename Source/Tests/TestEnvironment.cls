@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestEnvironment
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 ' These don't really test the Environment class since the results
 ' will vary from machine to machine. Instead they simply display

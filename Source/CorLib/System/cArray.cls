@@ -1137,7 +1137,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
             QuickSortGeneral Keys, Index, Index + Length - 1
             
         ' Use a callback method to sort with.
-        ' This allows a user to supply a highspeed comarison
+        ' This allows a user to supply a highspeed comparison
         ' routine to compare two elements of the array.
         Case vbLong
             CallbackSorter.Sort pKeysSafeArray, pItemsSafeArray, Index, Index + Length - 1, Comparer

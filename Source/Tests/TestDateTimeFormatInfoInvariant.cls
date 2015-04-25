@@ -197,7 +197,7 @@ Public Sub TestPersistence()
     info.DateSeparator = "^"
     
     Dim Days() As String
-    Days = cor.NewStrings("M", "T", "W", "Th", "F", "S", "S")
+    Days = Cor.NewStrings("M", "T", "W", "Th", "F", "S", "S")
     
     info.AbbreviatedDayNames = Days
     

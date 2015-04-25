@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestMathExt
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub TestCeiling()
     Assert.AreEqual 3#, Ceiling(2.9)

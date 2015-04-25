@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' VBSquareRootTests
 '
 Option Explicit
+Implements ICategorizable
 
 Private b As BigInteger
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Setup()
     Set b = Nothing
@@ -62,11 +67,11 @@ Public Sub TestLarge()
     AssertSqrt "123456789012345678901234567", "11111111061111"
 End Sub
 
-Private Sub AssertSqrt(ByVal value As Variant, ByVal expected As String)
-    Set b = BInt(value)
+Private Sub AssertSqrt(ByVal Value As Variant, ByVal Expected As String)
+    Set b = BInt(Value)
     Set b = BigInteger.SquareRoot(b)
     
     Assert.IsNotNothing b, "Should not be Nothing"
     Assert.AreEqual 1, b.Sign, "Wrong sign"
-    Assert.AreEqual expected, b.ToString
+    Assert.AreEqual Expected, b.ToString
 End Sub
