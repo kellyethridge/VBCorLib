@@ -85,11 +85,11 @@ Public Property Get ReadTimeout() As Long: End Property
 ''
 ' Sets the duration allowed before a timeout will occur.
 '
-' @param RHS The timeout period in milliseconds.
+' @param Value The timeout period in milliseconds.
 ' @remarks <b>Note to Implementor</b>: If the class does not support timeout
 ' capabilities, then this method should return a InvalidOperationException.
 '
-Public Property Let ReadTimeout(ByVal RHS As Long): End Property
+Public Property Let ReadTimeout(ByVal Value As Long): End Property
 
 ''
 ' Returns the duration allowed before a timeout will occur.
@@ -103,11 +103,11 @@ Public Property Get WriteTimeout() As Long: End Property
 ''
 ' Sets the duration allowed before a timeout will occur.
 '
-' @param RHS the timeout period in milliseconds.
+' @param Value the timeout period in milliseconds.
 ' @remarks <b>Note to Implementor</b>: If the class does not support timeout
 ' capabilities, then this method should return a InvalidOperationException.
 '
-Public Property Let WriteTimeout(ByVal RHS As Long): End Property
+Public Property Let WriteTimeout(ByVal Value As Long): End Property
 
 ''
 ' Returns if the stream supports reading.
@@ -152,11 +152,11 @@ Public Property Get Position() As Currency: End Property
 ''
 ' Sets the position in the stream where the next read or write will take place.
 '
-' @param RHS The position within the stream offset from the beginning of the stream.
+' @param Value The position within the stream offset from the beginning of the stream.
 ' @remarks A currency datatype is used to support stream greater than 2gig.<br>
 ' The stream generally needs to support seeking to be able to return the length.
 '
-Public Property Let Position(ByVal RHS As Currency): End Property
+Public Property Let Position(ByVal Value As Currency): End Property
 
 ''
 ' Begins an Asynchronous reading process.

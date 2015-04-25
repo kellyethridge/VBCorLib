@@ -136,8 +136,6 @@ Private mCanRead        As Boolean
 Private mCanWrite       As Boolean
 Private mCanSeek        As Boolean
 Private mMinPosition    As Currency
-Private mOwnsHandle     As Boolean
-Private mIsOpen         As Boolean
 Private mFilePosition   As Currency
 Private mWritePosition  As Long
 Private mReadPosition   As Long
@@ -146,7 +144,7 @@ Private mBufferSize     As Long
 Private mBufferOffset   As Currency
 Private mBytesBuffered  As Long
 Private mIsAsync        As Boolean
-
+Private mActiveAsyncResult As IAsyncResult
 
 
 ''
@@ -165,7 +163,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Get ReadTimeout() As Long
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -174,8 +172,8 @@ End Property
 ' @param RHS The timeout duration in milliseconds.
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
-Public Property Let ReadTimeout(ByVal RHS As Long)
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+Public Property Let ReadTimeout(ByVal Value As Long)
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -185,7 +183,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Get WriteTimeout() As Long
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -194,8 +192,8 @@ End Property
 ' @param RHS The timeout duration in milliseconds.
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
-Public Property Let WriteTimeout(ByVal RHS As Long)
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+Public Property Let WriteTimeout(ByVal Value As Long)
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -226,7 +224,7 @@ End Property
 ' @return An indication for being able to read from the file stream.
 '
 Public Property Get CanRead() As Boolean
-    CanRead = (mCanRead And mIsOpen)
+    CanRead = (mCanRead And Not mHandle.IsClosed)
 End Property
 
 ''
@@ -235,7 +233,7 @@ End Property
 ' @return An indication for being able to write to the file stream.
 
 Public Property Get CanWrite() As Boolean
-    CanWrite = (mCanWrite And mIsOpen)
+    CanWrite = (mCanWrite And Not mHandle.IsClosed)
 End Property
 
 ''
@@ -244,7 +242,7 @@ End Property
 ' @return An indication for being able to seek within the file stream.
 '
 Public Property Get CanSeek() As Boolean
-    CanSeek = (mCanSeek And mIsOpen)
+    CanSeek = (mCanSeek And Not mHandle.IsClosed)
 End Property
 
 ''
@@ -275,16 +273,18 @@ Public Sub LockStream(ByVal Position As Currency, ByVal Length As Currency)
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException("Position", Position, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Position"
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Length, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Length"
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
     With AsDLong(CCur(0.0001@ * Length))
-        If LockFile(mHandle, pos.LoDWord, pos.HiDWord, .LoDWord, .HiDWord) = BOOL_FALSE Then IOError Err.LastDllError
+        If LockFile(mHandle, pos.LoDWord, pos.HiDWord, .LoDWord, .HiDWord) = BOOL_FALSE Then
+            IOError Err.LastDllError
+        End If
     End With
 End Sub
 
@@ -299,11 +299,11 @@ Public Sub UnlockStream(ByVal Position As Currency, ByVal Length As Currency)
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException("Position", Position, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Position"
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Length, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Length"
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
@@ -538,7 +538,9 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
         
         ' Read the rest of the requested amount of data from the file.
         If ReadFile(mHandle, Bytes(Offset + Available), Count - Available, Count, ByVal 0&) = BOOL_FALSE Then
-            If mHandle <> ERROR_BROKEN_PIPE Then IOError Err.LastDllError
+            If mHandle <> ERROR_BROKEN_PIPE Then
+                IOError Err.LastDllError
+            End If
         End If
         
         Count = Count + Available
@@ -599,18 +601,22 @@ End Function
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult")
-    If Not TypeOf AsyncResult Is StreamAsyncResult Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.ArgumentNull "AsyncResult"
+    If mActiveAsyncResult Is Nothing Then _
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
+    If Not AsyncResult Is mActiveAsyncResult Then _
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     
     Dim Result As StreamAsyncResult
     Set Result = AsyncResult
     If Not Result.IsReadType Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
     If Result.EndCalled Then _
-        Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
+    If Not Result.Exception Is Nothing Then _
+        Throw Result.Exception
     
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    Set mActiveAsyncResult = Nothing
     
     EndRead = Result.BytesRead
 End Function
@@ -651,34 +657,51 @@ End Sub
 ' any data in the buffer is written to the stream, followed by the data in <i>Buffer</i>.
 '
 Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    Call VerifyCanWrite
-    Call VerifyIsOpen
+    VerifyCanWrite
+    VerifyIsOpen
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), Offset, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", Offset, "Offset", Count, "Count")
+    If IsNullByteArray(Bytes) Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    If Offset < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Offset + Count - 1 > UBound(Bytes) Then _
+        Error.InvalidOffsetLength
     
-    If Count = 0 Then Exit Sub
-    If cArray.IsNull(mBuffer) Then ReDim mBuffer(0 To mBufferSize - 1)
+    If Count = 0 Then
+        Exit Sub
+    End If
+    If IsNullByteArray(mBuffer) Then
+        ReDim mBuffer(0 To mBufferSize - 1)
+    End If
     
-    If mBytesBuffered > 0 Then Call InternalSeek(mFilePosition, FromBeginning)
+    If mBytesBuffered > 0 Then
+        InternalSeek mFilePosition, FromBeginning
+    End If
     
     ' If we can't fit the data in the remaining available
     ' space in the buffer, then flush the buffer.
-    If Count > mBufferSize - mWritePosition Then Call Flush
+    If Count > mBufferSize - mWritePosition Then
+        Flush
+    End If
     
     ' If more bytes are to be written than can be held
     ' in the buffer, then just write it all out to the file.
     If Count > mBufferSize Then
         Dim BytesWritten As Long
-        If WriteFile(mHandle, Bytes(Offset), Count, BytesWritten, ByVal 0&) = BOOL_FALSE Then IOError Err.LastDllError
+        If WriteFile(mHandle, Bytes(Offset), Count, BytesWritten, ByVal 0&) = BOOL_FALSE Then
+            IOError Err.LastDllError
+        End If
+        
         Count = BytesWritten
         mWritePosition = 0
     Else
         ' Cache it to the local buffer.
-        Call CopyMemory(mBuffer(mWritePosition), Bytes(Offset), Count)
+        CopyMemory mBuffer(mWritePosition), Bytes(Offset), Count
         mWritePosition = mWritePosition + Count
     End If
+    
     mFilePosition = mFilePosition + Count
 End Sub
 
@@ -696,20 +719,29 @@ End Sub
 '
 Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
     Dim Ret As StreamAsyncResult
-    
     Set Ret = Cor.NewStreamAsyncResult(State)
-    On Error GoTo errTrap:
+    
+    On Error GoTo Catch
     With Ret
         .CompletedSynchronously = True
         .IsCompleted = True
     End With
-    Call WriteBlock(Buffer, Offset, Count)
     
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
+    WriteBlock Buffer, Offset, Count
     
-errTrap:
+    If Not Callback Is Nothing Then
+        Callback.Execute Ret
+    End If
+    
+    GoTo Finally
+    
+Catch:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
+    If Catch(Ex, Err) Then
+        Set Ret.Exception = Ex
+    End If
+    
+Finally:
     Set BeginWrite = Ret
 End Function
 
@@ -743,7 +775,10 @@ Public Sub Flush()
     
     Dim BytesWritten As Long
     If mWritePosition > 0 Then
-        If WriteFile(mHandle, mBuffer(0), mWritePosition, BytesWritten, ByVal 0&) = BOOL_FALSE Then IOError Err.LastDllError
+        If WriteFile(mHandle, mBuffer(0), mWritePosition, BytesWritten, ByVal 0&) = BOOL_FALSE Then
+            IOError Err.LastDllError
+        End If
+        
         mWritePosition = 0
         mBytesBuffered = 0
         mBufferOffset = mBufferOffset + BytesWritten
@@ -800,7 +835,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
+Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
     Path = cString.Trim(Path)
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
@@ -837,7 +872,6 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
     mCanWrite = CBool(Access And FileAccess.WriteAccess)
     mCanRead = CBool(Access And FileAccess.ReadAccess) And (Mode <> Truncate)
     mCanSeek = (GetFileType(mHandle) = FILE_TYPE_DISK)
-    mIsOpen = True
     
     If AppendMode And mCanSeek Then
         mMinPosition = InternalSeek(0@, FromEnd)
@@ -852,18 +886,17 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
     mBufferSize = BufferSize
 End Sub
 
-Friend Sub InitFromHandle(ByVal Handle As Long, ByVal Access As FileAccess, ByVal OwnsHandle As Boolean, ByVal BufferSize As Long)
-    If Handle = INVALID_HANDLE Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidHandle))
+Friend Sub InitWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAccess, ByVal BufferSize As Long)
+    If Handle.IsInvalid Then _
+        Error.Argument Argument_InvalidHandle
     If BufferSize < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
+        Error.NegativeNumber "BufferSize"
     
-    mOwnsHandle = OwnsHandle
+    Set mHandle = Handle
     mBufferSize = BufferSize
     mCanSeek = (GetFileType(Handle) = FILE_TYPE_DISK)
     mCanWrite = CBool(Access And WriteAccess)
     mCanRead = CBool(Access And ReadAccess)
-    mIsOpen = True
     
     If mCanSeek Then
         mFilePosition = InternalSeek(0@, FromCurrent)
@@ -877,65 +910,6 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub ValidateFileMode(ByVal Mode As FileMode)
-    Select Case Mode
-        Case FileMode.Append, FileMode.Create, FileMode.CreateNew, FileMode.OpenExisting, FileMode.OpenOrCreate, FileMode.Truncate
-            Exit Sub
-    End Select
-    
-    Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
-End Sub
-
-Private Sub ValidateFileAccess(ByVal Access As FileAccess)
-    Select Case Access
-        Case FileAccess.DefaultAccess, FileAccess.ReadAccess, FileAccess.ReadWriteAccess, FileAccess.WriteAccess
-            Exit Sub
-    End Select
-
-    Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
-End Sub
-
-Private Sub ValidateFileShare(ByVal Share As FileShare)
-    Select Case Share
-        Case FileShare.None, FileShare.ReadShare, FileShare.ReadWriteShare, FileShare.WriteShare
-            Exit Sub
-    End Select
-    
-    Error.ArgumentOutOfRange "Share", ArgumentOutOfRange_Enum
-End Sub
-
-Private Function GetFileModeDisplayName(ByVal Mode As FileMode) As String
-    Dim Result As String
-    
-    Select Case Mode
-        Case Append:        Result = "Append"
-        Case Create:        Result = "Create"
-        Case CreateNew:     Result = "CreateNew"
-        Case OpenExisting:  Result = "OpenExisting"
-        Case OpenOrCreate:  Result = "OpenOrCreate"
-        Case Truncate:      Result = "Truncate"
-        Case Else
-            Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
-    End Select
-    
-    GetFileModeDisplayName = Result
-End Function
-
-Private Function GetFileAccessDisplayName(ByVal Access As FileAccess) As String
-    Dim Result As String
-    
-    Select Case Access
-        Case DefaultAccess:     Result = "DefaultAccess"
-        Case ReadAccess:        Result = "ReadAccess"
-        Case WriteAccess:       Result = "WriteAccess"
-        Case ReadWriteAccess:   Result = "ReadWriteAccess"
-        Case Else
-            Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
-    End Select
-    
-    GetFileAccessDisplayName = Result
-End Function
-
 Private Sub VerifyCanSeek()
     If Not mCanSeek Then
         Error.NotSupported NotSupported_UnseekableStream
@@ -943,7 +917,7 @@ Private Sub VerifyCanSeek()
 End Sub
 
 Private Sub VerifyIsOpen()
-    If Not mIsOpen Then
+    If mHandle.IsClosed Then
         Throw Cor.NewObjectDisposedException("Stream", Environment.GetResourceString(ObjectDisposedString.ObjectDisposed_StreamClosed))
     End If
 End Sub
@@ -965,7 +939,7 @@ Private Sub FillBuffer()
     mReadPosition = 0
     mWritePosition = 0
     
-    If SAPtr(mBuffer) = vbNullPtr Then
+    If IsNullByteArray(mBuffer) Then
         ReDim mBuffer(0 To mBufferSize - 1)
     End If
     
@@ -1051,7 +1025,7 @@ Private Property Get Stream_CanWrite() As Boolean
 End Property
 
 Private Sub Stream_CloseStream()
-    Call CloseStream
+    CloseStream
 End Sub
 
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
@@ -1059,7 +1033,7 @@ Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
 End Function
 
 Private Sub Stream_EndWrite(ByVal AsyncResult As IAsyncResult)
-    Call EndWrite(AsyncResult)
+    EndWrite AsyncResult
 End Sub
 
 Private Function Stream_Equals(Value As Variant) As Boolean
@@ -1067,7 +1041,7 @@ Private Function Stream_Equals(Value As Variant) As Boolean
 End Function
 
 Private Sub Stream_Flush()
-    Call Flush
+    Flush
 End Sub
 
 Private Function Stream_GetHashCode() As Long
@@ -1078,8 +1052,8 @@ Private Property Get Stream_Length() As Currency
     Stream_Length = Length
 End Property
 
-Private Property Let Stream_Position(ByVal RHS As Currency)
-    Position = RHS
+Private Property Let Stream_Position(ByVal Value As Currency)
+    Position = Value
 End Property
 
 Private Property Get Stream_Position() As Currency
@@ -1094,8 +1068,8 @@ Private Function Stream_ReadByte() As Long
     Stream_ReadByte = ReadByte
 End Function
 
-Private Property Let Stream_ReadTimeout(ByVal RHS As Long)
-    ReadTimeout = RHS
+Private Property Let Stream_ReadTimeout(ByVal Value As Long)
+    ReadTimeout = Value
 End Property
 
 Private Property Get Stream_ReadTimeout() As Long
@@ -1107,7 +1081,7 @@ Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As S
 End Function
 
 Private Sub Stream_SetLength(ByVal Value As Currency)
-    Call SetLength(Value)
+    SetLength Value
 End Sub
 
 Private Function Stream_ToString() As String
@@ -1115,15 +1089,15 @@ Private Function Stream_ToString() As String
 End Function
 
 Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    Call WriteBlock(Buffer, Offset, Count)
+    WriteBlock Buffer, Offset, Count
 End Sub
 
 Private Sub Stream_WriteByte(ByVal Value As Byte)
-    Call WriteByte(Value)
+    WriteByte Value
 End Sub
 
-Private Property Let Stream_WriteTimeout(ByVal RHS As Long)
-    WriteTimeout = RHS
+Private Property Let Stream_WriteTimeout(ByVal Value As Long)
+    WriteTimeout = Value
 End Property
 
 Private Property Get Stream_WriteTimeout() As Long

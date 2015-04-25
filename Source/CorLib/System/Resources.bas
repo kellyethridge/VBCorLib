@@ -60,6 +60,7 @@ Public Enum InvalidOperationString
     InvalidOperation_Comparer_Arg = 1105
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
+    InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
 End Enum
 
 Public Enum IndexOutOfRangeString
