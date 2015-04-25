@@ -12,10 +12,15 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ICategorizable
 
 Private Const EXPECTED_MESSAGE As String = "The specified cast is not valid."
 
 Private Ex As InvalidCastException
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Public Sub Setup()
     Set Ex = New InvalidCastException
@@ -58,6 +63,4 @@ Public Sub TestGetHashCode()
     Dim ex2 As New Exception
     Assert.That ex2.GetHashCode, Iz.Not.EqualTo(Ex.GetHashCode), "GetHashCode should return different values."
 End Sub
-
-
 

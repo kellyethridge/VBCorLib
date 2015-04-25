@@ -21,7 +21,7 @@ Private b As BigInteger
 Private r As BigInteger
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
-    Cat.ForFixture "System"
+    Cat.ForFixture "System.Numerics"
 End Sub
 
 Public Sub Setup()

@@ -15,10 +15,15 @@ Attribute VB_Exposed = False
 ' TestDateTimeFormatInfoInvariant
 '
 Option Explicit
+Implements ICategorizable
 
 Private info As DateTimeFormatInfo
 Private i As Long
 Private s() As String
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Globalization"
+End Sub
 
 Public Sub Setup()
     Set info = New DateTimeFormatInfo
@@ -213,3 +218,4 @@ Public Sub TestPersistence()
     Assert.AreEqual "^", NewInfo.DateSeparator
     Assert.AreEqual Days, NewInfo.AbbreviatedDayNames
 End Sub
+
