@@ -295,7 +295,7 @@ End Sub
 ' @param Length The number of bytes to be unlocked.
 '
 Public Sub UnlockStream(ByVal Position As Currency, ByVal Length As Currency)
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     Position = Int(Position)
     If Position < 0@ Then _
@@ -320,10 +320,12 @@ End Sub
 ' flushed out to the file to allow for an accurate reading.
 '
 Public Property Get Length() As Currency
-    Call VerifyCanSeek
-    Call VerifyIsOpen
+    VerifyCanSeek
+    VerifyIsOpen
     
-    If mCanWrite Then Call Flush
+    If mCanWrite Then
+        Flush
+    End If
     
     Dim Size As DLong
     With Size
@@ -335,7 +337,11 @@ Public Property Get Length() As Currency
         ' 64bit file lengths. So, if we get the -1, we need to check for
         ' an actual error using Err.LastDllError.
         If .LoDWord = INVALID_FILE_SIZE Then
-            If Err.LastDllError <> NO_ERROR Then IOError Err.LastDllError
+            Dim DllError As Long
+            DllError = Err.LastDllError
+            If DllError <> NO_ERROR Then
+                IOError DllError
+            End If
         End If
     End With
     Length = 10000@ * AsCurr(Size)
@@ -356,14 +362,17 @@ End Property
 ''
 ' Sets the current position within the stream to be read from or written to.
 '
-' @param RHS The new position in the stream.
+' @param Value The new position in the stream.
 ' @remarks The position is an absolute byte position from the beginning of
 ' the file. If the new position is negative an exception is thrown. If the
 ' FileStream is opened in Append mode, then the position cannot be set to
 ' data within the original file.
 '
-Public Property Let Position(ByVal RHS As Currency)
-    Call SeekPosition(RHS, SeekOrigin.FromBeginning)
+Public Property Let Position(ByVal Value As Currency)
+    If Value < 0@ Then _
+        Error.NegativeNumber "Value"
+        
+    SeekPosition Value, SeekOrigin.FromBeginning
 End Property
 
 ''
@@ -428,24 +437,26 @@ End Function
 ' <p>The stream must have Seek and Write support</p>
 '
 Public Sub SetLength(ByVal Value As Currency)
-    Call VerifyCanSeek
-    Call VerifyCanWrite
-    Call VerifyIsOpen
+    VerifyCanSeek
+    VerifyCanWrite
+    VerifyIsOpen
     
     Value = Int(Value)
     If Value < mMinPosition Then
         If mMinPosition = 0@ Then
-            Throw Cor.NewArgumentOutOfRangeException("Value", Value, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+            Error.NegativeNumber "Value"
         Else
             Throw Cor.NewIOException("Setting the length to a position prior to the append-start postion is not permitted.")
         End If
     End If
 
-    Call Flush
+    Flush
     mBytesBuffered = 0
     
-    Call InternalSeek(Value, FromBeginning)
-    If SetEndOfFile(mHandle) = BOOL_FALSE Then IOError Err.LastDllError
+    InternalSeek Value, FromBeginning
+    If SetEndOfFile(mHandle) = BOOL_FALSE Then
+        IOError Err.LastDllError
+    End If
 End Sub
 
 ''
@@ -612,12 +623,19 @@ End Function
 ' then flushed to the underlying stream and emptied to be reused.
 '
 Public Sub WriteByte(ByVal Value As Byte)
-    Call VerifyCanWrite
-    Call VerifyIsOpen
+    VerifyCanWrite
+    VerifyIsOpen
     
-    If mBytesBuffered > 0 Then Call InternalSeek(mFilePosition, FromBeginning)
-    If mWritePosition = mBufferSize Then Call Flush
-    If cArray.IsNull(mBuffer) Then ReDim mBuffer(0 To mBufferSize - 1)
+    If mBytesBuffered > 0 Then
+        InternalSeek mFilePosition, FromBeginning
+    End If
+    If mWritePosition = mBufferSize Then
+        Flush
+    End If
+    If IsNullByteArray(mBuffer) Then
+        ReDim mBuffer(0 To mBufferSize - 1)
+    End If
+    
     mBuffer(mWritePosition) = Value
     mWritePosition = mWritePosition + 1
     mFilePosition = mFilePosition + 1

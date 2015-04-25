@@ -24,15 +24,38 @@ Public Property Get TempSubFolder() As String
       TempSubFolder = "VBCorlib.IO.Tests"
 End Property
 
+Public Property Get TempFileName() As String
+    TempFileName = TempFolder & "\File.txt"
+End Property
+
 Public Function CreateFile(Optional ByVal FileName As String = "File.txt", Optional ByVal Data As String) As String
     CreateFile = Path.Combine(mTempFolder, FileName)
     If Not FileExists(CreateFile) Then
         Dim FileNumber As Long
         FileNumber = FreeFile
+                
         Open CreateFile For Output As #FileNumber
         
         If Len(Data) > 0 Then
             Print #FileNumber, Data;
+        End If
+        
+        Close #FileNumber
+    End If
+End Function
+
+Public Function CreateBinaryFile(Optional ByVal FileName As String = "File.txt", Optional ByRef Data As Variant) As String
+    CreateBinaryFile = Path.Combine(mTempFolder, FileName)
+    If Not FileExists(CreateBinaryFile) Then
+        Dim FileNumber As Long
+        FileNumber = FreeFile
+                
+        Open CreateBinaryFile For Binary As #FileNumber
+        
+        If Not IsMissing(Data) Then
+            Dim Bytes() As Byte
+            Bytes = Data
+            Put #FileNumber, , Bytes
         End If
         
         Close #FileNumber
@@ -54,12 +77,17 @@ Public Function ReadFile(ByVal FileName As String) As String
     Close #FileNumber
 End Function
 
-Public Function ReadFileBytes(ByVal FileName As String) As Byte()
+Public Function ReadBinaryFile(ByVal FileName As String) As Byte()
     Dim FileNumber As Long
     FileNumber = FreeFile
-    Open FileName For Binary As #FileNumber
-    ReadFileBytes = InputB(LOF(FileNumber), FileNumber)
+    Open FileName For Binary Access Read As #FileNumber
+    
+    Dim Bytes() As Byte
+    ReDim Bytes(0 To LOF(FileNumber) - 1)
+    Get #FileNumber, , Bytes
     Close #FileNumber
+    
+    ReadBinaryFile = Bytes
 End Function
 
 Private Sub Setup()

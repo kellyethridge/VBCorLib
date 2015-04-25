@@ -305,6 +305,18 @@ Public Sub Position_ToBeforeStartOfStream_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+Public Sub Position_WhenSetBeforeStartOfAppendPoint_ThrowsIOException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="abcdef")
+    
+    On Error Resume Next
+    With NewFileStream(FileName, Append)
+        .Position = 0
+    End With
+    
+    AssertIOException Err
+End Sub
+
 Public Sub WriteBlock_WithData_WritesToFile()
     Dim FileName As String
     FileName = Path.Combine(mBuilder.TempFolder, "File.txt")
@@ -316,70 +328,79 @@ Public Sub WriteBlock_WithData_WritesToFile()
     End With
     
     Dim Actual() As Byte
-    Actual = mBuilder.ReadFileBytes(FileName)
+    Actual = mBuilder.ReadBinaryFile(FileName)
     Assert.That Actual, Iz.EqualTo(Data)
 End Sub
 
+Public Sub WriteByte_WhenCalled_WritesToStream()
+    Dim FileName As String
+    FileName = mBuilder.CreateBinaryFile(Data:=NewBytes(1, 2, 3))
+    
+    With NewFileStream(FileName, Append)
+        .WriteByte 4
+    End With
+    
+    Dim Actual() As Byte
+    Actual = mBuilder.ReadBinaryFile(FileName)
+    Assert.That Actual, Iz.EqualTo(NewBytes(1, 2, 3, 4))
+End Sub
 
-'Public Sub TestWriteSeekReadRead()
-'    Dim f As String
-'    Dim i As Long
-'
-'    fs.CloseStream
-'    f = App.Path & "\WriteSeekReadRead.txt"
-'
-'    Set fs = NewFileStream(f, FileMode.OpenOrCreate)
-'    fs.SeekPosition 0, FromBeginning
-'    For i = 48 To 57
-'        fs.WriteByte i
-'    Next i
-'    fs.SeekPosition -5, FromCurrent
-'    Assert.AreEqual 53, fs.ReadByte
-'    fs.SeekPosition 2, FromCurrent
-'    Assert.AreEqual 8@, fs.Position, "Position should be 8."
-'    Assert.AreEqual 56, fs.ReadByte
-'
-'End Sub
-'
-'Public Sub TestFileNotFound()
-'    Dim NotFound As FileStream
-'
-'    On Error GoTo errTrap
-'    Set NotFound = Cor.NewFileStream(App.Path & "\Cannot exist.txt", OpenExisting)
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is FileNotFoundException, "Wrong exception type caught."
-'
-'    Dim fex As FileNotFoundException
-'    Set fex = Ex
-'    Assert.AreEqual App.Path & "\Cannot exist.txt", fex.FileName
-'End Sub
-'
-'Public Sub TestWriteSeekReadWrite()
-'    fs.CloseStream
-'
-'    Dim f As String
-'    f = App.Path & "\WriteSeekReadWrite.txt"
-'
-'    Set fs = NewFileStream(f, Create)
-'
-'    Dim b() As Byte
-'    b = NewBytes(65, 65, 65, 65, 65)
-'
-'    fs.WriteBlock b, 0, 5
-'
-'    fs.Position = 0
-'
-'    Assert.AreEqual 65, fs.ReadByte
-'
-'    fs.WriteByte 66
-'
-'    fs.CloseStream
-'
-'    Assert.AreEqual 5, FileLen(f)
-'
-'End Sub
+Public Sub SetLength_WithNegativeValue_ThrowsArgumentOutOfException()
+    On Error Resume Next
+    
+    With NewFileStream(mBuilder.TempFileName, Create)
+        .SetLength -1
+    End With
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub SetLength_WithValueLessThanFileSize_TruncatesFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="1234567890")
+    
+    With NewFileStream(FileName, OpenExisting)
+        .SetLength 5
+    End With
+    
+    Dim Actual As String
+    Actual = mBuilder.ReadFile(FileName)
+    Assert.That Actual, Iz.EqualTo("12345")
+End Sub
+
+Public Sub SetLength_WithValueGreaterThanFileSize_ExtendsFileWithNulls()
+    Dim FileName As String
+    FileName = mBuilder.CreateBinaryFile(Data:=NewBytes(1, 2, 3, 4))
+    
+    With NewFileStream(FileName, OpenExisting)
+        .SetLength 9
+    End With
+    
+    Dim Actual() As Byte
+    Actual = mBuilder.ReadBinaryFile(FileName)
+    Assert.That Actual, Iz.EqualTo(NewBytes(1, 2, 3, 4, 0, 0, 0, 0, 0))
+End Sub
+
+Public Sub SetLength_BeforeBeginningOfAppendStart_ThrowsIOException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="1234567890")
+    
+    On Error Resume Next
+    With NewFileStream(FileName, Append)
+        .SetLength 9
+    End With
+    
+    AssertIOException Err
+End Sub
+
+Public Sub NewFileStream_WithNonExistingFile_ThrowsFileNotFoundException()
+    Dim FileName As String
+    FileName = Path.Combine(mBuilder.TempFolder, "NonExisting.txt")
+    
+    On Error Resume Next
+    With NewFileStream(FileName, OpenExisting)
+    End With
+    
+    AssertFileNotFoundException Err, FileName
+End Sub
+
