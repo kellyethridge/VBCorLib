@@ -15,19 +15,24 @@ Attribute VB_Exposed = False
 ' TestINIFile
 '
 Option Explicit
+Implements ICategorizable
 
 Private ini As INIFile
-Private p As String
+Private P As String
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub Setup()
-    p = App.Path & "\TestINI.ini"
-    File.Delete p
+    P = App.Path & "\TestINI.ini"
+    File.Delete P
     
-    Set ini = NewINIFile(p)
+    Set ini = NewINIFile(P)
 End Sub
 
 Public Sub Teardown()
-    File.Delete p
+    File.Delete P
 End Sub
 
 Public Sub TestSetGetString()

@@ -15,15 +15,20 @@ Attribute VB_Exposed = False
 '   TestStringWriter
 '
 Option Explicit
+Implements ICategorizable
 
 Private sw As StringWriter
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub Setup()
     Dim c As CultureInfo
     
     ' the tests expect the formatting to be in usa formats.
     Set c = NewCultureInfo("en-US")
-    Set sw = NewStringWriter(provider:=c)
+    Set sw = NewStringWriter(Provider:=c)
 End Sub
 
 Public Sub TestWriteLongs()

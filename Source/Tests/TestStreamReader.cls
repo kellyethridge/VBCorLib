@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestStreamReader
 '
 Option Explicit
+Implements ICategorizable
 
 Private ms As MemoryStream
 Private sr As StreamReader
     
 Const Q As Long = 10000
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub Setup()
     Dim i As Long

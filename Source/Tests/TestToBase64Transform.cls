@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' TestToBase64Transform
 '
 Option Explicit
+Implements ICategorizable
 
 Private Trans As ToBase64Transform
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set Trans = New ToBase64Transform

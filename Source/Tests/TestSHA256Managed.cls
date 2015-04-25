@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestSHA256Managed
 '
 Option Explicit
+Implements ICategorizable
 
 Private PT() As Byte
 Private ht() As Byte
 Private csp As SHA256Managed
 Private FF As Long
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New SHA256Managed
@@ -28,7 +33,7 @@ Public Sub Setup()
     Open App.Path & "\Tests\Cryptography Files\SHA256_Hashes.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
 End Sub
 

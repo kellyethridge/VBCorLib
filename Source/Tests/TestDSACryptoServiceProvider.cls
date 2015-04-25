@@ -15,20 +15,25 @@ Attribute VB_Exposed = False
 ' TestDSACryptoServiceProvider
 '
 Option Explicit
+Implements ICategorizable
 
 Private FF As Long
 Private PT() As Byte
-Private HT() As Byte
+Private ht() As Byte
 Private Sig() As Byte
 Private HA As String
 Private csp As DSACryptoServiceProvider
-Private G() As Byte
+Private g() As Byte
 Private P() As Byte
 Private Q() As Byte
 Private X() As Byte
 Private Y() As Byte
 Private Seed() As Byte
 Private Counter As Long
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 
 
@@ -40,7 +45,7 @@ Public Sub Setup()
     Open App.Path & "\Cryptography Files\DSA_Default_VerifyHash.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
 End Sub
 
@@ -50,10 +55,10 @@ Public Sub VerifySignedHashes()
     Dim HashObj As HashAlgorithm
     
     Do While GetNextEntry
-        Assert.IsTrue csp.VerifyHash(HT, "SHA1", Sig)
+        Assert.IsTrue csp.VerifyHash(ht, "SHA1", Sig)
         
-        HT(0) = (HT(0) + 1) Mod 256
-        Assert.IsFalse csp.VerifyHash(HT, "SHA1", Sig)
+        ht(0) = (ht(0) + 1) Mod 256
+        Assert.IsFalse csp.VerifyHash(ht, "SHA1", Sig)
     Loop
 End Sub
 
@@ -62,11 +67,11 @@ Public Sub SignHashes()
 
     Do While GetNextEntry
         Dim Signature() As Byte
-        Signature = csp.SignHash(HT, "sha1")
-        Assert.IsTrue csp.VerifyHash(HT, "sha1", Signature)
+        Signature = csp.SignHash(ht, "sha1")
+        Assert.IsTrue csp.VerifyHash(ht, "sha1", Signature)
 
-        HT(0) = (HT(0) + 1) Mod 256
-        Assert.IsFalse csp.VerifyHash(HT, "sha1", Signature)
+        ht(0) = (ht(0) + 1) Mod 256
+        Assert.IsFalse csp.VerifyHash(ht, "sha1", Signature)
     Loop
 End Sub
 
@@ -81,10 +86,10 @@ End Sub
 
 Public Sub VerifySignature()
     Do While GetNextEntry
-        Assert.IsTrue csp.VerifySignature(HT, Sig)
+        Assert.IsTrue csp.VerifySignature(ht, Sig)
         
-        HT(0) = (HT(0) + 1) Mod 256
-        Assert.IsFalse csp.VerifySignature(HT, Sig)
+        ht(0) = (ht(0) + 1) Mod 256
+        Assert.IsFalse csp.VerifySignature(ht, Sig)
     Loop
 End Sub
 
@@ -102,11 +107,11 @@ End Sub
 Public Sub CreateSignature()
     Do While GetNextEntry
         Dim Signature() As Byte
-        Signature = csp.CreateSignature(HT)
-        Assert.IsTrue csp.VerifySignature(HT, Signature)
+        Signature = csp.CreateSignature(ht)
+        Assert.IsTrue csp.VerifySignature(ht, Signature)
 
-        HT(0) = (HT(0) + 1) Mod 256
-        Assert.IsFalse csp.VerifySignature(HT, Signature)
+        ht(0) = (ht(0) + 1) Mod 256
+        Assert.IsFalse csp.VerifySignature(ht, Signature)
     Loop
 End Sub
 
@@ -199,7 +204,7 @@ Public Sub CreateDsaParameters()
         Dim Parts() As String
         Parts = Split(line, "=")
         Select Case LCase$(Trim$(Parts(0)))
-            Case "g": G = ConvertHexToBytes(Trim$(Parts(1)))
+            Case "g": g = ConvertHexToBytes(Trim$(Parts(1)))
             Case "p": P = ConvertHexToBytes(Trim$(Parts(1)))
             Case "q": Q = ConvertHexToBytes(Trim$(Parts(1)))
             Case "y": Y = ConvertHexToBytes(Trim$(Parts(1)))
@@ -218,7 +223,7 @@ Public Sub CreateDsaParameters()
     Dim Params As DSAParameters
     Set Params = csp.ExportParameters(True)
     
-    Assert.AreEqual G, Params.G, "G"
+    Assert.AreEqual g, Params.g, "G"
     Assert.AreEqual P, Params.P, "P"
     Assert.AreEqual Q, Params.Q, "Q"
     Assert.AreEqual Y, Params.Y, "Y"
@@ -252,7 +257,7 @@ Private Function GetNextEntry() As Boolean
         Parts = Split(line, "=")
         Select Case LCase$(Trim$(Parts(0)))
             Case "pt": PT = ConvertHexToBytes(Trim$(Parts(1)))
-            Case "ht": HT = ConvertHexToBytes(Trim$(Parts(1)))
+            Case "ht": ht = ConvertHexToBytes(Trim$(Parts(1)))
             Case "ha": HA = Trim$(Parts(1))
             Case "sig": Sig = ConvertHexToBytes(Trim$(Parts(1)))
         End Select

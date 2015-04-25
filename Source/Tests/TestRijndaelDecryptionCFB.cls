@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestRijndaelDecryptionCFB
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As RijndaelManaged
 Private FF As Long
 Private PT() As Byte
 Private CT() As Byte
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 
 Public Sub Setup()
@@ -28,7 +33,7 @@ Public Sub Setup()
     Open App.Path & "\Tests\Cryptography Files\Rijndael_CFB_Entries.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
     Erase PT
     Erase CT
@@ -55,10 +60,10 @@ Public Sub TestTransformFinalBlock()
     Exit Sub
     
 errTrap:
-    Dim en As Long
+    Dim En As Long
     Dim ed As String
     Dim es As String
-    en = Err.Number
+    En = Err.Number
     ed = Err.Description
     es = Err.Source
     Debug.Print ed
@@ -66,7 +71,7 @@ errTrap:
     Debug.Print "PT = " & ConvertBytesToHex(PT)
     Debug.Print "CT = " & ConvertBytesToHex(CT)
     Debug.Print "NewPT = " & ConvertBytesToHex(NewPT)
-    Err.Raise en, es, ed
+    Err.Raise En, es, ed
 End Sub
 
 Public Sub TestTransformBlock()
@@ -109,10 +114,10 @@ Public Sub TestTransformBlock()
     Exit Sub
     
 errTrap:
-    Dim en As Long
+    Dim En As Long
     Dim ed As String
     Dim es As String
-    en = Err.Number
+    En = Err.Number
     ed = Err.Description
     es = Err.Source
     
@@ -120,7 +125,7 @@ errTrap:
     Debug.Print "PT = " & ConvertBytesToHex(PT)
     Debug.Print "CT = " & ConvertBytesToHex(CT)
     Debug.Print "NewPT = " & ConvertBytesToHex(NewPT)
-    Err.Raise en, es, ed
+    Err.Raise En, es, ed
 End Sub
 
 Public Sub LongTransformBlockMultipleCalls()

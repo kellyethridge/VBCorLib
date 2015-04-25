@@ -15,9 +15,13 @@ Attribute VB_Exposed = False
 ' TestRegistryDeleteValue
 '
 Option Explicit
+Implements ICategorizable
 
 Private Key As RegistryKey
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Microsoft.Win32"
+End Sub
 
 Public Sub Setup()
     Set Key = Registry.CurrentUser.CreateSubKey("software\vb and vba program settings\VBCorLib_DeleteValue")
@@ -25,7 +29,7 @@ Public Sub Setup()
     Key.SetValue "Age", 36
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Key.CloseKey
     DeleteSetting "VBCorLib_DeleteValue"
 End Sub
@@ -57,7 +61,7 @@ Public Sub TestDeleteMissingThrowable()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
 End Sub
 
@@ -66,3 +70,4 @@ Public Sub TestDeleteKeyDefault()
     Key.DeleteValue ""
     Assert.IsTrue IsEmpty(Key.GetValue("")), "Default value should be empty.)"
 End Sub
+

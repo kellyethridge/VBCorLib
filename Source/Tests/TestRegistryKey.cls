@@ -15,6 +15,7 @@ Attribute VB_Exposed = False
 ' TestRegistryKey
 '
 Option Explicit
+Implements ICategorizable
 
 Private Const REG_OPTION_NON_VOLATILE As Long = 0
 Private Const REG_DWORD As Long = 4
@@ -24,12 +25,16 @@ Private Declare Function RegQueryValueExStr Lib "advapi32.dll" Alias "RegQueryVa
 Private rk As RegistryKey
 Private hKey As Long
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Microsoft.Win32"
+End Sub
+
 Public Sub Setup()
     Set rk = Registry.CurrentUser.CreateSubKey("software\vb and vba program settings\VBCorLibTests\TestRegistryKey")
     RegOpenKeyExA &H80000001, "software\vb and vba program settings\VBCorLibTests\TestRegistryKey", 0, 983103, hKey
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     RegCloseKey hKey
     rk.CloseKey
     Registry.CurrentUser.DeleteSubKeyTree "software\vb and vba program settings\VBCorLibTests"
@@ -100,7 +105,7 @@ Public Sub TestCreateSubKeyNonWritable()
 
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is UnauthorizedAccessException, "Wrone exception type caught."
 End Sub
 
@@ -127,7 +132,7 @@ Public Sub TestDeleteMissingSubKeyThrowable()
 
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
 End Sub
 
@@ -143,7 +148,7 @@ Public Sub TestDeleteSubKeyWithSubKeysThrowable()
 
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "an exception should be caught."
+    Assert.IsTrue Catch(Ex), "an exception should be caught."
     Assert.IsTrue TypeOf Ex Is InvalidOperationException, "Wrong exception type caught."
 End Sub
 '
@@ -206,64 +211,64 @@ Public Sub TestEnumerateSubKeys()
         RegCloseKey j
     Next i
 
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
     Dim NewKey As RegistryKey
     
 End Sub
 
 Public Sub TestEnumerateValueNames()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     Dim i As Long
     For i = 1 To 10
         RegSetValueExA hKey, "Value " & i, 0, REG_DWORD, VarPtr(i), 4
-        list.Add "Value " & i
+        List.Add "Value " & i
     Next i
 
     Dim Name As Variant
     For Each Name In rk.GetEnumerator(detValues)
-        Assert.IsTrue list.Contains(Name)
-        list.Remove Name
+        Assert.IsTrue List.Contains(Name)
+        List.Remove Name
     Next Name
     
-    Assert.AreEqual 0, list.Count, "Should be no items remaining."
+    Assert.AreEqual 0, List.Count, "Should be no items remaining."
 End Sub
 
 Public Sub TestEnumerateValueEntries()
-    Dim list As New Hashtable
+    Dim List As New Hashtable
     Dim i As Long
     For i = 1 To 10
         RegSetValueExA hKey, "Value " & i, 0, REG_DWORD, VarPtr(i), 4
-        list.Add "Value " & i, i
+        List.Add "Value " & i, i
     Next i
 
     Dim Entry As DictionaryEntry
     For Each Entry In rk.GetEnumerator
-        Assert.IsTrue list.Contains(Entry.Key)
-        Assert.AreEqual list(Entry.Key), Entry.value
-        list.Remove Entry.Key
+        Assert.IsTrue List.Contains(Entry.Key)
+        Assert.AreEqual List(Entry.Key), Entry.Value
+        List.Remove Entry.Key
     Next Entry
 
-    Assert.AreEqual 0, list.Count, "Should be no items remaining."
+    Assert.AreEqual 0, List.Count, "Should be no items remaining."
 End Sub
 
 Public Sub TestEnumerateKeyNames()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     Dim i As Long
     For i = 1 To 10
         Dim j As Long
         RegCreateKeyExA hKey, "SubKey " & i, 0, vbNullString, REG_OPTION_NON_VOLATILE, &HF003F, 0, j, 0
         RegCloseKey j
-        list.Add "SubKey " & i
+        List.Add "SubKey " & i
     Next i
 
     Dim Name As Variant
     For Each Name In rk.GetEnumerator(detKeys)
-        Assert.IsTrue list.Contains(Name)
-        list.Remove Name
+        Assert.IsTrue List.Contains(Name)
+        List.Remove Name
     Next Name
     
-    Assert.AreEqual 0, list.Count, "Should be no items remaining."
+    Assert.AreEqual 0, List.Count, "Should be no items remaining."
 End Sub
 
 

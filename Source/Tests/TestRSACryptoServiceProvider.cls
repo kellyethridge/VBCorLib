@@ -15,6 +15,7 @@ Attribute VB_Exposed = False
 ' TestRSACryptoServiceProvider
 '
 Option Explicit
+Implements ICategorizable
 
 Private FF As Long
 Private PT() As Byte
@@ -30,6 +31,10 @@ Private InverseQ() As Byte
 Private Sig() As Byte
 Private HA As String
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
+
 
 
 Public Sub Setup()
@@ -37,7 +42,7 @@ Public Sub Setup()
     Open App.Path & "\Cryptography Files\RSA_Default_Entries.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
 End Sub
 
@@ -205,7 +210,7 @@ End Sub
 
 Public Sub ExportTheImportRsaParameters()
     Dim Data() As Byte
-    Data = cor.NewBytes(5, 4, 3, 2, 1)
+    Data = Cor.NewBytes(5, 4, 3, 2, 1)
     
     Dim Bytes() As Byte
     
@@ -225,11 +230,11 @@ End Sub
 
 Public Sub CreateUsingInvalidCspParametersShouldFail()
     Dim P As CspParameters
-    Set P = cor.NewCspParameters(13, "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider")
+    Set P = Cor.NewCspParameters(13, "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider")
     P.KeyNumber = 2
     
     Dim csp As RSACryptoServiceProvider
-    Set csp = cor.NewRSACryptoServiceProvider(, P)
+    Set csp = Cor.NewRSACryptoServiceProvider(, P)
     
     On Error GoTo errTrap
     Debug.Print csp.CspKeyContainerInfo.ProviderName
@@ -238,36 +243,36 @@ Public Sub CreateUsingInvalidCspParametersShouldFail()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type caught."
 End Sub
 
 Public Sub InvalidKeyGeneration()
     ' Key generation does not occur until it is needed.
     Dim csp As RSACryptoServiceProvider
-    Set csp = cor.NewRSACryptoServiceProvider(16332)
+    Set csp = Cor.NewRSACryptoServiceProvider(16332)
     
     On Error GoTo errTrap
     ' This will cause the key to be generated.
-    Call csp.Encrypt(cor.NewBytes(0), False)
+    Call csp.Encrypt(Cor.NewBytes(0), False)
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type caught."
 End Sub
 
 Public Sub UseAnExistingKey()
     Dim csp1 As New RSACryptoServiceProvider
     Dim PT() As Byte
-    PT = cor.NewBytes(5, 4, 3, 2, 1)
+    PT = Cor.NewBytes(5, 4, 3, 2, 1)
     Dim CT() As Byte
     CT = csp1.Encrypt(PT, False)
     
     Dim CspParams As CspParameters
-    Set CspParams = cor.NewCspParameters(1, csp1.CspKeyContainerInfo.ProviderName, csp1.CspKeyContainerInfo.KeyContainerName)
+    Set CspParams = Cor.NewCspParameters(1, csp1.CspKeyContainerInfo.ProviderName, csp1.CspKeyContainerInfo.KeyContainerName)
     CspParams.Flags = UseExistingKey
     CspParams.KeyNumber = 1
     
@@ -275,7 +280,7 @@ Public Sub UseAnExistingKey()
     Set csp1 = Nothing
     
     Dim csp2 As RSACryptoServiceProvider
-    Set csp2 = cor.NewRSACryptoServiceProvider(, CspParams)
+    Set csp2 = Cor.NewRSACryptoServiceProvider(, CspParams)
     csp2.PersistKeyInCsp = False
     
     Assert.AreEqual PT, csp2.Decrypt(CT, False)

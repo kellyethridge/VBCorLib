@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestStreamWriter
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub TestWriteChars0to64000()
     Dim sw As StreamWriter
@@ -30,18 +35,18 @@ Public Sub TestWriteChars0to64000()
     Next i
     sw.CloseWriter
     
-    Dim en As Encoding
+    Dim En As Encoding
     Dim b() As Byte
-    Dim ff As Integer
+    Dim FF As Integer
     Dim ch() As Integer
     
-    Set en = sw.Encoding
+    Set En = sw.Encoding
     
-    ff = FreeFile
-    Open f For Binary As #ff
-    ReDim b(0 To LOF(ff) - 1)
-    Get #ff, , b
-    Close #ff
+    FF = FreeFile
+    Open f For Binary As #FF
+    ReDim b(0 To LOF(FF) - 1)
+    Get #FF, , b
+    Close #FF
     Kill f
     
     Assert.AreEqual 189828, cArray.GetLength(b)
@@ -50,7 +55,7 @@ Public Sub TestWriteChars0to64000()
     Assert.AreEqual &HBB, b(1)
     Assert.AreEqual &HBF, b(2)
     
-    ch = en.GetChars(b, 3, cArray.GetLength(b) - 3)
+    ch = En.GetChars(b, 3, cArray.GetLength(b) - 3)
     Assert.AreEqual 64001, cArray.GetLength(ch)
     
     Dim j As Long
@@ -65,8 +70,8 @@ Public Sub TestWriteHugeStringAtOnce()
     Dim sw As StreamWriter
     Dim s As String
     Dim f As String
-    Dim en As Encoding
-    Dim ff As Integer
+    Dim En As Encoding
+    Dim FF As Integer
     Dim b() As Byte
     Dim i As Long
     
@@ -78,13 +83,13 @@ Public Sub TestWriteHugeStringAtOnce()
     s = String$(100000, "1")
     sw.WriteValue s
     sw.CloseWriter
-    Set en = sw.Encoding
+    Set En = sw.Encoding
     
-    ff = FreeFile
-    Open f For Binary As #ff
-    ReDim b(0 To LOF(ff) - 1)
-    Get #ff, , b
-    Close #ff
+    FF = FreeFile
+    Open f For Binary As #FF
+    ReDim b(0 To LOF(FF) - 1)
+    Get #FF, , b
+    Close #FF
     Kill f
     Assert.AreEqual 100003, cArray.GetLength(b), "File length should be 100003 (includes Byte Order Mark)."
     

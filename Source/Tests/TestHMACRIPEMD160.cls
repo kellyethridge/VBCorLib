@@ -15,12 +15,17 @@ Attribute VB_Exposed = False
 ' TestHMACRIPEMD160
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As HMAC
 Private FF As Long
 Private PT() As Byte
 Private ht() As Byte
 Private KY() As Byte
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 
 Public Sub Setup()
@@ -30,7 +35,7 @@ Public Sub Setup()
     Open App.Path & "\Tests\Cryptography Files\HMACRIPEMD160_Hashes.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
 End Sub
 

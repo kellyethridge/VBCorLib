@@ -15,16 +15,21 @@ Attribute VB_Exposed = False
 ' TestUTF8GetChars
 '
 Option Explicit
+Implements ICategorizable
 
 Private e As UTF8Encoding
 Private b() As Byte
 Private ch() As Integer
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
+
 Public Sub Setup()
     Set e = NewUTF8Encoding(False)
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Erase b
     Erase ch
 End Sub
@@ -142,7 +147,7 @@ Public Sub TestGet1001CharsFromfile()
     Dim b() As Byte
     Dim ch() As Integer
     Dim i As Long
-    Dim en As UTF8Encoding
+    Dim En As UTF8Encoding
     
     FF = FreeFile
     Open App.Path & "\UTF8_Chars_0to1000.txt" For Binary As #FF
@@ -150,8 +155,8 @@ Public Sub TestGet1001CharsFromfile()
     Get #FF, , b
     Close #FF
     
-    Set en = New UTF8Encoding
-    ch = en.GetChars(b)
+    Set En = New UTF8Encoding
+    ch = En.GetChars(b)
     Assert.AreEqual 1001, cArray.GetLength(ch)
     
     For i = 0 To 1000

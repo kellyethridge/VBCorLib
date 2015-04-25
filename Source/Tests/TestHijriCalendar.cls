@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' TestHijriCalendar
 '
 Option Explicit
+Implements ICategorizable
 
 Private cal As HijriCalendar
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Globalization"
+End Sub
 
 Public Sub Setup()
     Set cal = New HijriCalendar

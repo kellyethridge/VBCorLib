@@ -16,6 +16,11 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
@@ -36,69 +41,69 @@ Public Sub GetDrives_WhenCalled_ReturnsNonEmptyList()
 End Sub
 
 Public Sub NewDriveInfo_WithDrive_ConvertsToRoot(ByVal Drive As String, ByVal Expected As String)
-    Dim Info As DriveInfo
+    Dim info As DriveInfo
     
-    Set Info = NewDriveInfo(Drive)
+    Set info = NewDriveInfo(Drive)
     
-    Assert.That Info.Name, Iz.EqualTo(Expected).IgnoreCase
+    Assert.That info.Name, Iz.EqualTo(Expected).IgnoreCase
 End Sub
 
 Public Sub DriveFormat_WhenCalled_ReturnsNTFS()
-    Dim Info As DriveInfo
-    Set Info = NewDriveInfo("c")
+    Dim info As DriveInfo
+    Set info = NewDriveInfo("c")
     Dim Actual As String
     
-    Actual = Info.DriveFormat
+    Actual = info.DriveFormat
     
     Assert.That Actual, Iz.EqualTo("NTFS")
 End Sub
 
 Public Sub DriveType_WhenCalled_ReturnsFixed()
-    Dim Info As DriveInfo
-    Set Info = NewDriveInfo("c")
+    Dim info As DriveInfo
+    Set info = NewDriveInfo("c")
     Dim Actual As DriveType
     
-    Actual = Info.DriveType
+    Actual = info.DriveType
     
     Assert.That Actual, Iz.EqualTo(DriveType.Fixed)
 End Sub
 
 Public Sub IsReady_WhenCalled_ReturnsTrue()
-    Dim Info As DriveInfo
-    Set Info = NewDriveInfo("c")
+    Dim info As DriveInfo
+    Set info = NewDriveInfo("c")
     Dim Actual As Boolean
     
-    Actual = Info.IsReady
+    Actual = info.IsReady
     
     Assert.That Actual, Iz.True
 End Sub
 
 Public Sub AvailableFreeSpace_WhenCalled_ReturnsGreaterThanZero()
-    Dim Info As DriveInfo
-    Set Info = NewDriveInfo("c")
+    Dim info As DriveInfo
+    Set info = NewDriveInfo("c")
     Dim Actual As Currency
     
-    Actual = Info.AvailableFreeSpace
+    Actual = info.AvailableFreeSpace
     
     Assert.That Actual, Iz.GreaterThan(0)
 End Sub
 
 Public Sub TotalFreeSpace_WhenCalled_ReturnsGreaterThanZero()
-    Dim Info As DriveInfo
-    Set Info = NewDriveInfo("c")
+    Dim info As DriveInfo
+    Set info = NewDriveInfo("c")
     Dim Actual As Currency
     
-    Actual = Info.TotalFreeSpace
+    Actual = info.TotalFreeSpace
     
     Assert.That Actual, Iz.GreaterThan(0)
 End Sub
 
 Public Sub TotalSize_WhenCalled_ReturnsGreaterThanZero()
-    Dim Info As DriveInfo
-    Set Info = NewDriveInfo("c")
+    Dim info As DriveInfo
+    Set info = NewDriveInfo("c")
     Dim Actual As Currency
     
-    Actual = Info.TotalSize
+    Actual = info.TotalSize
     
     Assert.That Actual, Iz.GreaterThan(0)
 End Sub

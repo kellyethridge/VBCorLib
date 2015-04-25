@@ -13,6 +13,11 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System"
+End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
@@ -61,7 +66,7 @@ Public Sub IndexOf_WithDefaultComparer_ReturnsExpected()
     Dim Value As New Int32
     Value.Value = 10
     
-    Actual = cArray.IndexOf(Arr, Value, Comparer:=Comparer.Default)
+    Actual = cArray.IndexOf(Arr, Value, comparer:=comparer.Default)
     
     Const Expected As Long = 1
     Assert.That Actual, Iz.EqualTo(Expected)

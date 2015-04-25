@@ -15,17 +15,22 @@ Attribute VB_Exposed = False
 ' TestCryptoStreamRead
 '
 Option Explicit
-
+Implements ICategorizable
 
 Private cs As CryptoStream
 Private ms As MemoryStream
 Private buf() As Byte
 Private org() As Byte
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
+
+
 Public Sub Setup()
     org = Encoding.ASCII.GetBytes("Hello, world!")
     buf = Encoding.ASCII.GetBytes(Convert.ToBase64String(org))
-    Set ms = Cor.newmemorystream(buf, 0, cArray.GetLength(buf), False)
+    Set ms = Cor.NewMemoryStream(buf, 0, cArray.GetLength(buf), False)
     Set cs = Cor.NewCryptoStream(ms, New FromBase64Transform, ReadMode)
 End Sub
 

@@ -15,20 +15,23 @@ Attribute VB_Exposed = False
 ' TestSetRegistryValues
 '
 Option Explicit
-'Private Declare Function RegOpenKeyEx Lib "advapi32.dll" Alias "RegOpenKeyExA" (ByVal hKey As Long, ByVal lpSubKey As String, ByVal ulOptions As Long, ByVal samDesired As Long, ByRef phkResult As Long) As Long
-'Private Declare Function RegCloseKey Lib "advapi32.dll" (ByVal hKey As Long) As Long
-'Private Declare Function RegQueryValueEx Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, ByRef lpType As Long, ByRef lpData As Any, ByRef lpcbData As Long) As Long
+Implements ICategorizable
+
 Private Declare Function RegQueryValueExStr Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, ByRef lpType As Long, ByVal lpData As String, ByRef lpcbData As Long) As Long
 
 Private Key As RegistryKey
 Private hKey As Long
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Microsoft.Win32"
+End Sub
 
 Public Sub Setup()
     Set Key = Registry.CurrentUser.CreateSubKey("software\vb and vba program settings\VBCorLibTests\Tests")
     RegOpenKeyExA &H80000001, "software\vb and vba program settings\VBCorLibTests\Tests", 0, 983103, hKey
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     RegCloseKey hKey
     Key.CloseKey
     Registry.CurrentUser.DeleteSubKeyTree "software\vb and vba program settings\VBCorLibTests"
@@ -56,7 +59,7 @@ Public Sub TestString()
 End Sub
 
 Public Sub TestEmptyMultiString()
-    Key.SetValue "Empty", cor.NewStrings()
+    Key.SetValue "Empty", Cor.NewStrings()
     
     AssertKindAndSize "Empty", MultiStringKind, 1
     
@@ -75,15 +78,15 @@ Public Sub TestDWord()
     AssertKindAndSize "Integer", DWordKind, 4
     AssertKindAndSize "Byte", DWordKind, 4
     
-    Dim value As Long
-    RegQueryValueExA hKey, "Long", 0, 0, value, 4
-    Assert.AreEqual &H7FFFFFFF, value
+    Dim Value As Long
+    RegQueryValueExA hKey, "Long", 0, 0, Value, 4
+    Assert.AreEqual &H7FFFFFFF, Value
     
-    RegQueryValueExA hKey, "Integer", 0, 0, value, 4
-    Assert.AreEqual &H7FFF, value
+    RegQueryValueExA hKey, "Integer", 0, 0, Value, 4
+    Assert.AreEqual &H7FFF, Value
     
-    RegQueryValueExA hKey, "Byte", 0, 0, value, 4
-    Assert.AreEqual &HFF, value
+    RegQueryValueExA hKey, "Byte", 0, 0, Value, 4
+    Assert.AreEqual &HFF, Value
 End Sub
 
 Public Sub TestQWord()
@@ -98,7 +101,7 @@ End Sub
 
 Public Sub TestBinary()
     Dim Bytes() As Byte
-    Bytes = cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
+    Bytes = Cor.NewBytes(1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
     Key.SetValue "Value", Bytes
     
     AssertKindAndSize "Value", BinaryKind, 20
@@ -114,10 +117,10 @@ Public Sub TestStringAsDWord()
 
     AssertKindAndSize "Value", DWordKind, 4
     
-    Dim value As Long
-    RegQueryValueExA hKey, "Value", 0, 0&, value, 4&
+    Dim Value As Long
+    RegQueryValueExA hKey, "Value", 0, 0&, Value, 4&
     
-    Assert.AreEqual 1234, value
+    Assert.AreEqual 1234, Value
 End Sub
 
 Public Sub TestDWordAsString()
@@ -125,10 +128,10 @@ Public Sub TestDWordAsString()
 
     AssertKindAndSize "Value", StringKind, 6
     
-    Dim value As String
-    value = String$(6, 0)
-    RegQueryValueExStr hKey, "Value", 0, 0, value, 6
-    Assert.AreEqual "12345" & vbNullChar, value
+    Dim Value As String
+    Value = String$(6, 0)
+    RegQueryValueExStr hKey, "Value", 0, 0, Value, 6
+    Assert.AreEqual "12345" & vbNullChar, Value
 End Sub
 
 Public Sub TestDoubleAsString()
@@ -136,10 +139,10 @@ Public Sub TestDoubleAsString()
     
     AssertKindAndSize "Value", StringKind, 9
     
-    Dim value As String
-    value = String$(9, 0)
-    RegQueryValueExStr hKey, "Value", 0, 0, value, 9
-    Assert.AreEqual "1234.567" & vbNullChar, value
+    Dim Value As String
+    Value = String$(9, 0)
+    RegQueryValueExStr hKey, "Value", 0, 0, Value, 9
+    Assert.AreEqual "1234.567" & vbNullChar, Value
 End Sub
 
 Public Sub TestDWordAsQWord()
@@ -185,7 +188,7 @@ End Sub
 
 Public Sub TestEmptyBinary()
     Dim Bytes() As Byte
-    Bytes = cor.NewBytes
+    Bytes = Cor.NewBytes
     
     Key.SetValue "Value", Bytes
     
@@ -193,7 +196,7 @@ Public Sub TestEmptyBinary()
 End Sub
 
 Public Sub TestMultiSZ()
-    Key.SetValue "Value", cor.NewStrings("one", "two", "three")
+    Key.SetValue "Value", Cor.NewStrings("one", "two", "three")
     AssertKindAndSize "Value", MultiStringKind, 15
     
     Dim s As String
@@ -245,7 +248,7 @@ Public Sub TestNameTooLong()
     
 errTrap:
     Dim Ex As Exception
-    Assert.IsTrue catch(Ex), "An exception should be caught."
+    Assert.IsTrue Catch(Ex), "An exception should be caught."
     Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
 End Sub
 
@@ -253,7 +256,7 @@ Public Sub TestValueKind()
     Key.SetValue "DWORD", 1
     Key.SetValue "SZ", "hi"
     Key.SetValue "QWORD", 1@
-    Key.SetValue "BINARY", cor.NewBytes(0)
+    Key.SetValue "BINARY", Cor.NewBytes(0)
     Key.SetValue "EXPAND", "hi", ExpandStringKind
     Key.SetValue "MULTI", Array("hi", "bye")
     

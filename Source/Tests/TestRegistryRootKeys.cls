@@ -15,12 +15,17 @@ Attribute VB_Exposed = False
 ' TestRegistryRootKeys
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Microsoft.Win32"
+End Sub
 
 Public Sub Setup()
     DeleteTestValues
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     DeleteTestValues
 End Sub
 

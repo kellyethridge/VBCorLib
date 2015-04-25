@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' TestJulianCalendar
 '
 Option Explicit
+Implements ICategorizable
 
 Private jc As JulianCalendar
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Globalization"
+End Sub
 
 Public Sub Setup()
     Set jc = New JulianCalendar
@@ -31,7 +36,7 @@ Public Sub TestAddDays()
     Set gcdt = cDateTime.MinValue
     
     For i = 1 To 2000
-        Assert.IsTrue jcdt.equalTo(gcdt), cString.Format("JC {0} <> GC {1}", jcdt, gcdt)
+        Assert.IsTrue jcdt.EqualTo(gcdt), cString.Format("JC {0} <> GC {1}", jcdt, gcdt)
         Set jcdt = jc.AddDays(jcdt, 1)
         Set gcdt = gcdt.AddDays(1)
     Next i

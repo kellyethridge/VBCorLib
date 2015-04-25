@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' StopWatchTests
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Diagnostics"
+End Sub
 
 Public Sub IsRunning_WhenStopped_ReturnsFalse()
     Dim sw As New StopWatch

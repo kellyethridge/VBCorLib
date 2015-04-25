@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestRijndaelDecryptionCBC
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As RijndaelManaged
 Private FF As Long
 Private PT() As Byte
 Private CT() As Byte
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 
 Public Sub Setup()
@@ -28,7 +33,7 @@ Public Sub Setup()
     Open App.Path & "\Tests\Cryptography Files\Rijndael_CBC_Entries.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
     Erase PT
     Erase CT

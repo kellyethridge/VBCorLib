@@ -15,6 +15,11 @@ Attribute VB_Exposed = False
 ' TestResourceKey
 '
 Option Explicit
+Implements ICategorizable
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "Microsoft.Win32"
+End Sub
 
 Public Sub TestSameKey()
     Dim Key As ResourceKey

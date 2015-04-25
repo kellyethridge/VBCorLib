@@ -15,42 +15,47 @@ Attribute VB_Exposed = False
 ' TestUTF7GetChars
 '
 Option Explicit
+Implements ICategorizable
 
-Private en As UTF7Encoding
+Private En As UTF7Encoding
 Private b() As Byte
 Private ch() As Integer
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
+
 Public Sub Setup()
-    Set en = New UTF7Encoding
+    Set En = New UTF7Encoding
 End Sub
 
 Public Sub TestPlus()
     ReDim ch(10)
     
     b = NewBytes(43)
-    Assert.AreEqual 0, en.GetCharsEx(b, 0, 1, ch, 0)
+    Assert.AreEqual 0, En.GetCharsEx(b, 0, 1, ch, 0)
     Assert.AreEqual 0, ch(0)
 End Sub
 
 Public Sub TestOneNonDirect()
     ReDim ch(100)
     b = NewBytes(33)
-    Assert.AreEqual 1, en.GetCharsEx(b, 0, 1, ch, 0)
+    Assert.AreEqual 1, En.GetCharsEx(b, 0, 1, ch, 0)
     Assert.AreEqual 33, ch(0)
 End Sub
 
 Public Sub TestPlusMinus()
     ReDim ch(100)
     b = NewBytes(43, 45)
-    Assert.AreEqual 1, en.GetCharsEx(b, 0, 2, ch, 0)
+    Assert.AreEqual 1, En.GetCharsEx(b, 0, 2, ch, 0)
     Assert.AreEqual 43, ch(0)
     Assert.AreEqual 0, ch(1)
 End Sub
 
 Public Sub TestSimple()
     ReDim ch(100)
-    b = en.GetBytes("hello")
-    Assert.AreEqual 5, en.GetCharsEx(b, 0, UBound(b) + 1, ch, 0)
+    b = En.GetBytes("hello")
+    Assert.AreEqual 5, En.GetCharsEx(b, 0, UBound(b) + 1, ch, 0)
     Assert.AreEqual "hello", cString.FromCharArray(ch, 0, 5)
     Assert.AreEqual 0, ch(5)
 End Sub
@@ -58,9 +63,9 @@ End Sub
 Public Sub TestJapaneseWord_nihongo()
     Dim ch() As Integer
     ch = NewIntegers(&H65E5, &H672C, &H8A9E)
-    b = en.GetBytes(ch)
+    b = En.GetBytes(ch)
     ReDim ch(100)
-    Assert.AreEqual 3, en.GetCharsEx(b, 0, UBound(b) + 1, ch, 0)
+    Assert.AreEqual 3, En.GetCharsEx(b, 0, UBound(b) + 1, ch, 0)
     Assert.AreEqual &H65E5, ch(0)
     Assert.AreEqual &H672C, ch(1)
     Assert.AreEqual &H8A9E, ch(2)
@@ -68,23 +73,23 @@ Public Sub TestJapaneseWord_nihongo()
 End Sub
 
 Public Sub TestGetString()
-    b = en.GetBytes("Hello there.")
-    Assert.AreEqual "Hello there.", en.GetString(b)
+    b = En.GetBytes("Hello there.")
+    Assert.AreEqual "Hello there.", En.GetString(b)
 End Sub
 
 Public Sub TestDecoder()
     Dim c As Decoder
     Dim i As Long
     
-    b = en.GetBytes("a" & ChrW$(&H65E5) & "a")
+    b = En.GetBytes("a" & ChrW$(&H65E5) & "a")
     ReDim ch(10)
     
-    Set c = en.GetDecoder
+    Set c = En.GetDecoder
     For i = 0 To 6
         Assert.AreEqual Choose(i + 1, 1, 0, 0, 0, 1, 0, 1), c.GetChars(b, i, 1, ch, 0), "Failed on index " & i & "."
     Next i
     
-    Set c = en.GetDecoder
+    Set c = En.GetDecoder
     For i = 0 To 6
         Assert.AreEqual Choose(i + 1, 1, 1, 1, 1, 2, 2, 3), c.GetChars(b, 0, i + 1, ch, 0), "Failed on index " & i & "."
     Next i
@@ -95,7 +100,7 @@ Public Sub TestDecoderWith1001CharsFromFile()
     Dim b() As Byte
     Dim ch() As Integer
     Dim i As Long
-    Dim en As UTF7Encoding
+    Dim En As UTF7Encoding
     Dim c As Decoder
     Dim Char As Long
     
@@ -105,8 +110,8 @@ Public Sub TestDecoderWith1001CharsFromFile()
     Get #FF, , b
     Close #FF
     
-    Set en = New UTF7Encoding
-    Set c = en.GetDecoder
+    Set En = New UTF7Encoding
+    Set c = En.GetDecoder
     
     ReDim ch(0)
     For i = 0 To UBound(b)
@@ -122,7 +127,7 @@ Public Sub TestGet1001CharsFromfile()
     Dim b() As Byte
     Dim ch() As Integer
     Dim i As Long
-    Dim en As UTF7Encoding
+    Dim En As UTF7Encoding
     
     FF = FreeFile
     Open App.Path & "\UTF7_Chars_0to1000.txt" For Binary As #FF
@@ -130,11 +135,11 @@ Public Sub TestGet1001CharsFromfile()
     Get #FF, , b
     Close #FF
     
-    Set en = New UTF7Encoding
+    Set En = New UTF7Encoding
     
-    Assert.AreEqual 1001, en.GetCharCount(b), "GetCharCount should return 1001."
+    Assert.AreEqual 1001, En.GetCharCount(b), "GetCharCount should return 1001."
     
-    ch = en.GetChars(b)
+    ch = En.GetChars(b)
     Assert.AreEqual 1001, cArray.GetLength(ch), "Length should be 1001."
     
     For i = 0 To 1000
@@ -148,10 +153,10 @@ Public Sub TestEmptyArray()
     Dim ch() As Integer
     
     b = cArray.CreateInstance(vbByte)
-    ch = en.GetChars(b)
+    ch = En.GetChars(b)
     Assert.IsFalse cArray.IsNull(ch)
     Assert.AreEqual 0, cArray.GetLength(ch)
     
     ReDim ch(10)
-    Assert.AreEqual 0, en.GetCharsEx(b, 0, 0, ch, 0)
+    Assert.AreEqual 0, En.GetCharsEx(b, 0, 0, ch, 0)
 End Sub

@@ -15,9 +15,14 @@ Attribute VB_Exposed = False
 ' TestCryptoStreamWrite
 '
 Option Explicit
+Implements ICategorizable
 
 Private cs As CryptoStream
 Private ms As MemoryStream
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 
 Public Sub Setup()

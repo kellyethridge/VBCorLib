@@ -15,9 +15,14 @@ Attribute VB_Exposed = False
 ' TestResourceWriter
 '
 Option Explicit
+Implements ICategorizable
 
 Private mWriter As ResourceWriter
 Private mStream As Stream
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Resources"
+End Sub
 
 Public Sub Setup()
     Set mStream = New MemoryStream

@@ -15,8 +15,13 @@ Attribute VB_Exposed = False
 ' TestRijndaelManaged128
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As RijndaelManaged
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New RijndaelManaged

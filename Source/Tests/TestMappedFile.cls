@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestMappedFile
 '
 Option Explicit
+Implements ICategorizable
 
 Private Const CHAR_A As Byte = 65
 Private Const CHAR_B As Byte = 66
 
 Private File As MemoryMappedFile
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub Setup()
     Set File = NewMemoryMappedFile(App.Path & "\mappedfile.txt", ReadWriteAccess)

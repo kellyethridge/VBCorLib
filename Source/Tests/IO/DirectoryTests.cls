@@ -16,8 +16,13 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ITestCaseSource
+Implements ICategorizable
 
 Private mBuilder As IOHelper
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
 
 Public Sub Setup()
     Set mBuilder = New IOHelper

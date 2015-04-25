@@ -15,9 +15,13 @@ Attribute VB_Exposed = False
 ' TestHashtableHCP
 '
 Option Explicit
+Implements ICategorizable
 
 Private mHt As Hashtable
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Collections"
+End Sub
 
 Public Sub Setup()
     Set mHt = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, comparer:=New CaseInsensitiveComparer)

@@ -15,8 +15,11 @@ Attribute VB_Exposed = False
 ' TestStreamReaderDetermineEncoding
 '
 Option Explicit
+Implements ICategorizable
 
-
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Text"
+End Sub
 
 Public Sub TestUTF8Encoding()
     TestEncoding Cor.NewUTF8Encoding(True, False)
@@ -32,15 +35,15 @@ End Sub
 
 
 
-Private Sub TestEncoding(ByVal en As Encoding)
+Private Sub TestEncoding(ByVal En As Encoding)
     Dim ms As MemoryStream
     Dim sr As StreamReader
     Dim b() As Byte
     Dim currEn As Encoding
     
     Set ms = New MemoryStream
-    ms.WriteBlock en.GetPreamble, 0, cArray.GetLength(en.GetPreamble)
-    b = en.GetBytes(ChrW$(55))
+    ms.WriteBlock En.GetPreamble, 0, cArray.GetLength(En.GetPreamble)
+    b = En.GetBytes(ChrW$(55))
     ms.WriteBlock b, 0, cArray.GetLength(b)
     ms.Position = 0
     
@@ -49,5 +52,5 @@ Private Sub TestEncoding(ByVal en As Encoding)
     
     Assert.AreEqual 55, sr.Read
     Assert.IsFalse sr.CurrentEncoding Is currEn
-    Assert.AreEqual TypeName(en), TypeName(sr.CurrentEncoding)
+    Assert.AreEqual TypeName(En), TypeName(sr.CurrentEncoding)
 End Sub

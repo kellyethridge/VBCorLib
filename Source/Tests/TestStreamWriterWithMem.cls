@@ -15,13 +15,18 @@ Attribute VB_Exposed = False
 ' TestStreamWriterWithMem
 '
 Option Explicit
+Implements ICategorizable
 
 Private sw As StreamWriter
 Private ms As MemoryStream
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.IO"
+End Sub
+
 Public Sub Setup()
     Set ms = New MemoryStream
-    Set sw = cor.newstreamwriter(ms)
+    Set sw = Cor.newstreamwriter(ms)
 End Sub
 
 Public Sub TestWriteLetter()

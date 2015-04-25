@@ -15,11 +15,16 @@ Attribute VB_Exposed = False
 ' TestTripleDESEncryption
 '
 Option Explicit
+Implements ICategorizable
 
 Private csp As TripleDESCryptoServiceProvider
 Private FF As Long
 Private PT() As Byte
 Private CT() As Byte
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New TripleDESCryptoServiceProvider
@@ -27,7 +32,7 @@ Public Sub Setup()
     Open App.Path & "\Cryptography Files\TripleDES_Entries.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
     Erase PT
     Erase CT

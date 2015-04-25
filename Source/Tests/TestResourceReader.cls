@@ -15,9 +15,13 @@ Attribute VB_Exposed = False
 ' TestResourceReader
 '
 Option Explicit
+Implements ICategorizable
 
 Private mReader As ResourceReader
 
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Resources"
+End Sub
 
 Public Sub Setup()
     Set mReader = Cor.NewResourceReader(Path.Combine(App.Path, "VBCorLibTests.res"))
@@ -40,7 +44,7 @@ Public Sub TestEnumStrings()
         Debug.Print "{" & Key.ToString & "} = ";
         Select Case Key.ResourceType
             Case 6
-                Debug.Print de.value
+                Debug.Print de.Value
             Case 2
                 Debug.Print "Bitmap"
             Case 14

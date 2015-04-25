@@ -15,10 +15,16 @@ Attribute VB_Exposed = False
 ' TestRIPEMD160Managed
 '
 Option Explicit
+Implements ICategorizable
+
 Private PT() As Byte
 Private ht() As Byte
 Private csp As RIPEMD160
 Private FF As Long
+
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Security.Cryptography"
+End Sub
 
 Public Sub Setup()
     Set csp = New RIPEMD160Managed
@@ -27,7 +33,7 @@ Public Sub Setup()
     Open App.Path & "\Tests\Cryptography Files\RIPEMD160_Hashes.txt" For Input As #FF
 End Sub
 
-Public Sub TearDown()
+Public Sub Teardown()
     Close #FF
 End Sub
 

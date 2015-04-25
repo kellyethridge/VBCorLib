@@ -211,7 +211,6 @@ Class=ArrayListReadOnlyTests; Collections\ArrayListReadOnlyTests.cls
 RelatedDoc=README.TXT
 Module=PersistenceHelper; PersistenceHelper.bas
 Class=QueueEnumeratorTests; Collections\QueueEnumerationTests.cls
-Module=CollectionsTests; Collections\CollectionsTests.bas
 Class=ObjectBaseTests; ObjectBaseTests.cls
 Class=ObjectTests; ObjectTests.cls
 Class=CharTests; CharTests.cls

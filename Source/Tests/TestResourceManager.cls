@@ -15,10 +15,13 @@ Attribute VB_Exposed = False
 ' TestResourceManager
 '
 Option Explicit
+Implements ICategorizable
 
 Private mRm As ResourceManager
 
-
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Resources"
+End Sub
 
 Public Sub Setup()
     Set mRm = Cor.NewResourceManager(Path.Combine(App.Path, "VBCorLibTests.res"))

@@ -16,7 +16,7 @@ Implements ICategorizable
 Implements ITestCaseSource
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
-    Cat.ForFixture "Array Tests"
+    Cat.ForFixture "System"
 End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)

@@ -12,8 +12,11 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
+Implements ICategorizable
 
-
+Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
+    Cat.ForFixture "System.Globalization"
+End Sub
 
 Public Sub TestMaxTwoDigitYear()
     Dim i As Long
