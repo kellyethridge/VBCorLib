@@ -262,7 +262,7 @@ Private Sub AddSystemIO()
         .Add New BinaryWriterTests
         .Add New TestFileInfo
         .Add New FileTests
-        .Add New TestStreamReader
+        .Add New StreamReaderTests
         .Add New TestMappedFile
         .Add New TestFileNotFoundException
         .Add New TestINIFile

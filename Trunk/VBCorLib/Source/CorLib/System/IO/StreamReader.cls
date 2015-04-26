@@ -95,7 +95,7 @@ End Property
 Public Sub CloseReader()
     If mIsOpen Then
         mIsOpen = False
-        Call mStream.CloseStream
+        mStream.CloseStream
     End If
 End Sub
 
