@@ -83,11 +83,11 @@ Public Sub ReadLine_WhenCalledWithEmptyStream_ReturnsNullString()
 End Sub
 
 Public Sub ReadLine_WhenCalledWithEmptyLine_ReturnsEmptyLine()
-    Dim Line As String
+    Dim line As String
     With Cor.NewStreamReader(CreateStream(vbCrLf))
-        Line = .ReadLine
-        Assert.That cString.IsNull(Line), Iz.False
-        Assert.That Line, Iz.Empty
+        line = .ReadLine
+        Assert.That cString.IsNull(line), Iz.False
+        Assert.That line, Iz.Empty
         Assert.That cString.IsNull(.ReadLine), Iz.True
     End With
 End Sub
@@ -231,84 +231,92 @@ Public Sub ReadToEnd_WithLargeData_ReadsAllData()
     
     Dim Actual As String
     With Cor.NewStreamReader(CreateStream(Expected))
-        Actual = .ReadLine
+        Actual = .ReadToEnd
     End With
     
     Assert.That Len(Actual), Iz.EqualTo(20002)
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-'Public Sub TestReadToEnd()
-'    Dim s As String
-'    Dim st As Stream
-'    Dim sr As StreamReader
-'    Dim sw As StreamWriter
-'    Dim sb As New StringBuilder
-'    Dim i As Long
-'
-'    Set st = New MemoryStream
-'
-'    For i = 0 To 10000
-'        sb.Append ChrW$(i And &HFFF)
-'    Next i
-'    s = sb.ToString
-'
-'    Set sw = newstreamwriter(st)
-'    sw.WriteValue s
-'    sw.Flush
-'
-'    st.Position = 0
-'    Set sr = NewStreamReader(st)
-'
-'    Assert.AreEqual s, sr.ReadToEnd
-'End Sub
-'
-'Public Sub TestReadLineThenReadToEnd()
-'    Dim st As New MemoryStream
-'    Dim sw As StreamWriter
-'    Dim sr As StreamReader
-'    Dim s As String
-'    Dim strW As New StringWriter
-'
-'    strW.WriteLine String$(1000, ChrW$(&H2030))
-'    strW.WriteValue String$(9000, ChrW$(&HA0))
-'
-'    Set sw = newstreamwriter(ms)
-'    sw.WriteValue strW.ToString
-'    sw.Flush
-'
-'    ms.Position = 0
-'    Set sr = NewStreamReader(ms)
-'
-'    Assert.AreEqual String$(1000, ChrW$(&H2030)), sr.ReadLine
-'    Assert.AreEqual String$(9000, ChrW$(&HA0)), sr.ReadToEnd
-'
-'    sr.CloseReader
-'    sw.CloseWriter
-'End Sub
-'
-'Public Sub TestReadEmptyLines()
-'    Dim ms As New MemoryStream
-'    Dim i As Long
-'    For i = 1 To 100
-'        ms.WriteByte 13
-'    Next i
-'    ms.Position = 0
-'
-'    Dim sr As StreamReader
-'    Set sr = Cor.NewStreamReader(ms)
-'
-'    i = 0
-'    Dim s As String
-'    Do
-'        s = sr.ReadLine
-'        If cString.IsNull(s) Then Exit Do
-'        Assert.AreEqual "", s
-'        i = i + 1
-'    Loop
-'
-'    Assert.AreEqual 100, i
-'End Sub
+Public Sub ReadToEnd_WhenCalledAfterReadLine_ReadsRemainingData()
+    Const Expected As String = "12345"
+    
+    Dim Actual As String
+    With Cor.NewStreamReader(CreateStream("abcd" & vbCrLf & Expected))
+        .ReadLine
+        Actual = .ReadToEnd
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub NewStreamReader_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    NewStreamReader Nothing
+    
+    AssertArgumentNullException Err, "Source"
+End Sub
+
+Public Sub NewStreamReader_WithBufferSizeOfZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    NewStreamReader CreateStream("123"), BufferSize:=0
+    
+    AssertArgumentOutOfRangeException Err, "BufferSize"
+End Sub
+
+Public Sub ReadLine_WithGivenEncoding_ReturnsDecodedData()
+    Const Expected As String = "a?b?c"
+    
+    Dim Actual As String
+    With NewStreamReader(CreateStream("a" & Chr$(128) & "b" & Chr$(129) & "c"), Encoding.ASCII)
+        Actual = .ReadLine
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CloseReader_WithLeaveStreamOpen_DoesNotCloseStream()
+    Dim Stream As New FakeStream
+    
+    With NewStreamReader(Stream, LeaveOpen:=True)
+        .CloseReader
+    End With
+    
+    Assert.That Stream.IsClosed, Iz.False
+End Sub
+
+Public Sub EndOfStream_WithEmptyStream_ReturnsTrue()
+    Dim Actual As Boolean
+    
+    With Cor.NewStreamReader(CreateStream)
+        Actual = .EndOfStream
+    End With
+    
+    Assert.That Actual, Iz.True
+End Sub
+
+Public Sub EndOfStream_WithUnreadData_ReturnsFalse()
+    Dim Actual As Boolean
+    
+    With Cor.NewStreamReader(CreateStream("1245"))
+        Actual = .EndOfStream
+    End With
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub EndOfStream_WithAllDataRead_ReturnsTrue()
+    Dim Actual As Boolean
+    
+    With Cor.NewStreamReader(CreateStream("12345"))
+        .ReadToEnd
+        Actual = .EndOfStream
+    End With
+    
+    Assert.That Actual, Iz.True
+End Sub
 
 Private Function CreateStream(Optional ByVal Data As String) As Stream
     Dim Stream As New MemoryStream

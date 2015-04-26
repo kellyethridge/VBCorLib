@@ -18,6 +18,7 @@ Public CanWrite     As Boolean
 Public CanRead      As Boolean
 Public CanSeek      As Boolean
 Public FlushCalled  As Boolean
+Public IsClosed     As Boolean
 
 
 Private Sub Class_Initialize()
@@ -51,7 +52,7 @@ Private Property Get Stream_CanWrite() As Boolean
 End Property
 
 Private Sub Stream_CloseStream()
-
+    IsClosed = True
 End Sub
 
 Private Function Stream_EndRead(ByVal AsyncResult As VBCorLib.IAsyncResult) As Long

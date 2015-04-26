@@ -112,6 +112,7 @@ Public Enum ArgumentString
     Argument_InvalidValueType = 833
     Argument_InvalidFileModeAndAccessCombo = 834
     Argument_InvalidSeekOffset = 835
+    Argument_InvalidStreamSource = 836
 End Enum
 
 Public Enum ArgumentNullString
