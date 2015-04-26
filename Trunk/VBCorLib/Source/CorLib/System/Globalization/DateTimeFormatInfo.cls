@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: DateTimeFormatInfo
+' Module: DateTimeFormatInfo
 '
 
 ''
@@ -854,7 +857,7 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
     Dim Minute      As Long
     Dim Second      As Long
     Dim Designator  As String
-    Dim ch          As Integer
+    Dim Ch          As Integer
     Dim Escaped     As Boolean
     Dim ZoneOffset  As TimeSpan
     Dim Percented   As Boolean
@@ -877,20 +880,20 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
     Designator = IIf(Hour < 12, mProps.AMDesignator, mProps.PMDesignator)
     
     Do While pos < mPattern.SA.cElements
-        ch = mPattern.Data(pos)
+        Ch = mPattern.Data(pos)
         cnt = GetRepeatCount(pos)
         
         If Not Escaped Then
             If Quote <> 0 Then
-                Select Case ch
+                Select Case Ch
                     Case vbBackslashChar:   Escaped = True
                     Case Quote:         Quote = 0
-                    Case Else:          Call sb.AppendChar(ch)
+                    Case Else:          Call sb.AppendChar(Ch)
                 End Select
                 cnt = 1
             
             Else
-                Select Case ch
+                Select Case Ch
                     Case vbLowerDChar:          Call Append1to4CountValue(sb, cnt, Day, mProps.AbbreviatedDayNames(dt.DayOfWeek), mProps.DayNames(dt.DayOfWeek))
                     Case vbUpperMChar:          Call Append1to4CountValue(sb, cnt, Month, mProps.AbbreviatedMonthNames(Month - 1), mProps.MonthNames(Month - 1))
                     Case vbLowerHChar:          Call Append1or2DigitNumber(sb, cnt, HourMod12)
@@ -942,15 +945,15 @@ Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As
                         secfrac = (secfrac \ CLng(10 ^ (7 - cnt)))
                         Call sb.AppendFormat("{0:g" & cnt & "}", secfrac)
                         
-                    Case Else:              Call sb.AppendChar(ch)
+                    Case Else:              Call sb.AppendChar(Ch)
                 End Select
             End If
         Else
-            Call sb.AppendChar(ch)
+            Call sb.AppendChar(Ch)
             Escaped = False
             cnt = 1
         End If
-        Percented = (ch = vbPercentChar)
+        Percented = (Ch = vbPercentChar)
         pos = pos + cnt
     Loop
     
@@ -1001,12 +1004,12 @@ End Sub
 '
 Private Function GetRepeatCount(ByVal Index As Long) As Long
     Dim i As Long
-    Dim ch As Integer
+    Dim Ch As Integer
     
-    ch = mPattern.Data(Index)
+    Ch = mPattern.Data(Index)
     i = Index + 1
     Do While i < mPattern.SA.cElements
-        If mPattern.Data(i) <> ch Then Exit Do
+        If mPattern.Data(i) <> Ch Then Exit Do
         i = i + 1
     Loop
     GetRepeatCount = i - Index
@@ -1255,8 +1258,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -351,7 +351,7 @@ End Function
 '
 Public Function NewDictionaryEntry(ByRef Key As Variant, ByRef Value As Variant) As DictionaryEntry
     Set NewDictionaryEntry = New DictionaryEntry
-    Call NewDictionaryEntry.Init(Key, Value)
+    NewDictionaryEntry.Init Key, Value
 End Function
 
 ''
