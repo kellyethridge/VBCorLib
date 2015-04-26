@@ -18,6 +18,10 @@ version 3.0 (BREAKING CHANGES)
 	* Removed cString.CharCount method. *BREAKING*
 	* Removed Comparer parameter from Queue.Contains method to align more with .NET.
 	* Removed Comparer parameter from Stack.Contains method to align more with .NET.
+	* Added LeaveOpen constructor parameter to StreamReader.
+	* Added EndOfStream property to StreamReader.
+	* Added SafeFileHandle type.
+	* Added MyBase methods to separate IObject implementations from standard Object.* calls.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
