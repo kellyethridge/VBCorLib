@@ -510,9 +510,6 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
     If Offset + Count - 1 > UBound(Bytes) Then _
         Error.Argument Argument_InvalidOffLen
     
-    If mCanWrite Then
-        Flush
-    End If
     If Count = 0 Then
         Exit Function
     End If
@@ -524,8 +521,13 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
     End If
     
     If (mBytesBuffered = 0) Or (mReadPosition = mBytesBuffered) Then
+        If mCanWrite And mWritePosition > 0 Then
+            Flush
+        End If
+        
         FillBuffer
     End If
+    
     If mBytesBuffered = 0 Then
         Exit Function
     End If
