@@ -776,9 +776,9 @@ End Function
 ' &HEF, &HBB, &HBF - UTF8Encoding<br>
 ' If no encoding is identified, then Encoding.UTF8 is used.
 '
-Public Function NewStreamReader(ByVal Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal determineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 4096) As StreamReader
+Public Function NewStreamReader(ByVal Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal determineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 1024, Optional ByVal LeaveOpen As Boolean) As StreamReader
     Set NewStreamReader = New StreamReader
-    NewStreamReader.Init Source, Encoding, determineEncodingFromByteOrderMarks, BufferSize
+    NewStreamReader.Init Source, Encoding, determineEncodingFromByteOrderMarks, BufferSize, LeaveOpen
 End Function
 
 ''

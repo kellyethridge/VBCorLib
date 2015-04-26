@@ -53,8 +53,7 @@ Option Explicit
 Implements IObject
 Implements TextReader
 
-Private Const MIN_BUFFERSIZE As Long = 128
-
+Private Const MinimumBufferSize As Long = 128
 
 Private mStream             As Stream
 Private mEncoding           As Encoding
@@ -69,6 +68,7 @@ Private mBufferSize         As Long
 Private mDetermineEncoding  As Boolean
 Private mIsOpen             As Boolean
 Private mLineBuilder        As New StringBuilder
+Private mLeaveOpen          As Boolean
 
 
 ''
@@ -89,13 +89,25 @@ Public Property Get CurrentEncoding() As Encoding
     Set CurrentEncoding = mEncoding
 End Property
 
+
+Public Property Get EndOfStream() As Boolean
+    VerifyIsOpen
+    
+    If mCharIndex = mCharLength Then
+        EndOfStream = (ReadBuffer = 0)
+    End If
+End Property
+
 ''
 ' Closes the reader.
 '
 Public Sub CloseReader()
     If mIsOpen Then
         mIsOpen = False
-        mStream.CloseStream
+        
+        If Not mLeaveOpen Then
+            mStream.CloseStream
+        End If
     End If
 End Sub
 
@@ -126,7 +138,7 @@ End Sub
 ' Any characters above &H7FFF will be returned as a positive value.
 '
 Public Function Peek() As Long
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     If HaveChars Then
         AsWord(Peek) = mCharBuffer(mCharIndex)
@@ -143,7 +155,9 @@ End Function
 '
 Public Function Read() As Long
     Read = Peek
-    If Read <> -1 Then mCharIndex = mCharIndex + 1
+    If Read <> -1 Then
+        mCharIndex = mCharIndex + 1
+    End If
 End Function
 
 ''
@@ -155,28 +169,36 @@ End Function
 ' @return The actual number of characters read.
 '
 Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
-    Call VerifyIsOpen
+    VerifyIsOpen
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Buffer), Index, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Buffer", Index, "Index", Count, "Count"
+    If SAPtr(Buffer) = vbNullPtr Then _
+        Error.ArgumentNull "Buffer", ArgumentNull_Array
+    If Index < LBound(Buffer) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Index + Count - 1 > UBound(Buffer) Then _
+        Error.InvalidOffsetLength
     
     Dim AvailableChars As Long
     ' We will loop until we have read the
     ' requested number of characters, if possible.
     Do While Count > 0
         ' If we have no more characters to read then get out.
-        If Not HaveChars Then Exit Function
+        If Not HaveChars Then _
+            Exit Function
         
         ' Calculate how many characters are available in the local buffer.
         AvailableChars = mCharLength - mCharIndex
         
         ' If there are more characters available than we actaully need,
         ' then trim back the number of characters to what we need.
-        If AvailableChars > Count Then AvailableChars = Count
+        If AvailableChars > Count Then
+            AvailableChars = Count
+        End If
         
         ' Copy the characters we need from the local buffer to the destination buffer.
-        Call CopyMemory(Buffer(Index), mCharBuffer(mCharIndex), AvailableChars * 2)
+        CopyMemory Buffer(Index), mCharBuffer(mCharIndex), AvailableChars * 2
         
         ' Move the destination index out by the number of characters we copied.
         Index = Index + AvailableChars
@@ -205,9 +227,10 @@ Public Function ReadLine() As String
     Dim StartIndex  As Long
     Dim TermChar    As Integer
     
-    Call VerifyIsOpen
+    VerifyIsOpen
     
-    If Not HaveChars Then Exit Function
+    If Not HaveChars Then _
+        Exit Function
     
     Dim UsingBuilder As Boolean
     StartIndex = mCharIndex
@@ -222,9 +245,11 @@ Public Function ReadLine() As String
                 UsingBuilder = True
             End If
             ' place the buffer into the builder and start over with a new full buffer.
-            Call mLineBuilder.AppendChars(mCharBuffer, StartIndex, mCharIndex - StartIndex)
+            mLineBuilder.AppendChars mCharBuffer, StartIndex, mCharIndex - StartIndex
             StartIndex = 0
-            If ReadBuffer = 0 Then Exit Do  ' there was nothing left to fill the buffer, so return what we have.
+            If ReadBuffer = 0 Then  ' there was nothing left to fill the buffer, so return what we have.
+                Exit Do
+            End If
         End If
         
         ' Check for either a return or linefeed as new line separators.
@@ -242,7 +267,7 @@ Public Function ReadLine() As String
                     ' we've been using the builder because we have reached the end of
                     ' atleast one buffer of characters. So add the subset of characters
                     ' from the current buffer to the builder for returning.
-                    Call mLineBuilder.AppendChars(mCharBuffer, StartIndex, mCharIndex - StartIndex)
+                    mLineBuilder.AppendChars mCharBuffer, StartIndex, mCharIndex - StartIndex
                     mCharIndex = mCharIndex + 1
                     Exit Do
                 End If
@@ -256,11 +281,10 @@ Public Function ReadLine() As String
         ' or, might have been the end of Stream , so return a vbNullString.
         ' Use either cString.IsNull or StrPtr to determine this is
         ' what happened.
-        If Len(Line) = 0 And mCharLength = 0 Then
+        If Len(Line) = 0 And mCharLength = 0 Then _
             Exit Function
-        Else
-            ReadLine = Line
-        End If
+        
+        ReadLine = Line
     Else
         ' We've been putting string fragments into a StringBuilder,
         ' so just return the contents.
@@ -274,14 +298,18 @@ Public Function ReadLine() As String
         ' We still have characters in the buffer, so check if
         ' the next character is a linefeed and remove it if so.
         If mCharIndex < mCharLength Then
-            If mCharBuffer(mCharIndex) = vbLineFeedChar Then mCharIndex = mCharIndex + 1
+            If mCharBuffer(mCharIndex) = vbLineFeedChar Then
+                mCharIndex = mCharIndex + 1
+            End If
         Else
             ' The return was the last character in the buffer,
             ' so fill the buffer with the next set of character.
             ' If atleast 1 character was read, then check for
             ' a linefeed and remove it, if so.
             If ReadBuffer > 0 Then
-                If mCharBuffer(0) = vbLineFeedChar Then mCharIndex = mCharIndex + 1
+                If mCharBuffer(0) = vbLineFeedChar Then
+                    mCharIndex = mCharIndex + 1
+                End If
             End If
         End If
     End If
@@ -293,21 +321,22 @@ End Function
 ' @return A string containing the remaining characters.
 '
 Public Function ReadToEnd() As String
-    Call VerifyIsOpen
+    VerifyIsOpen
     
-    If Not HaveChars Then Exit Function
+    If Not HaveChars Then _
+        Exit Function
     
     ' The byte buffer wasn't completey full, meaning there is no more to
     ' be read from the stream. So the last of the characters have been
     ' read, so just take them and make a string.
     If mByteLength < mBufferSize Then
-        ReadToEnd = cString.FromCharArray(mCharBuffer, mCharIndex, mCharLength)
+        ReadToEnd = cString.FromCharArray(mCharBuffer, mCharIndex, mCharLength - mCharIndex)
     Else
         ' Keep reading from the stream and placing the characters into the
         ' builder. Keep refilling the buffer until the end of the stream is reached.
         mLineBuilder.Length = 0
         Do
-            Call mLineBuilder.AppendChars(mCharBuffer, mCharIndex, mCharLength - mCharIndex)
+            mLineBuilder.AppendChars mCharBuffer, mCharIndex, mCharLength - mCharIndex
         Loop While ReadBuffer > 0
         ReadToEnd = mLineBuilder.ToString
     End If
@@ -344,42 +373,42 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Source As Variant, ByVal oEncoding As Encoding, ByVal determineEncodingFromByteOrderMarks As Boolean, ByVal BufferSize As Long)
-    If BufferSize < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal determineEncodingFromByteOrderMarks As Boolean, ByVal BufferSize As Long, ByVal LeaveOpen As Boolean)
+    If BufferSize <= 0 Then _
+        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
     
-    ' Get the source from the correct place.
     Select Case VarType(Source)
         Case vbObject
-            ' We expect an open Stream object here.
-            
             If Source Is Nothing Then _
-                Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Stream))
+                Error.ArgumentNull "Source", ArgumentNull_Stream
             If Not TypeOf Source Is Stream Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamRequired), "Source")
+                Error.Argument Argument_StreamRequired, "Source"
         
             Set mStream = Source
         
         Case vbString
-            ' We expect a filename here.
             Set mStream = Cor.NewFileStream(Source, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare)
         
         Case Else
-            Throw Cor.NewArgumentException("A file path or Stream object is required.", "Source")
+            Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
     
-    ' Set up the encoding scheme.
     mDetermineEncoding = determineEncodingFromByteOrderMarks
-    If Not oEncoding Is Nothing Then
-        Set mEncoding = oEncoding
-        Set mDecoder = mEncoding.GetDecoder
+    If Encoding Is Nothing Then
+        Set mEncoding = Statics.Encoding.UTF8
+    Else
+        Set mEncoding = Encoding
+    End If
+    Set mDecoder = mEncoding.GetDecoder
+    
+    If BufferSize < MinimumBufferSize Then
+        BufferSize = MinimumBufferSize
     End If
     
-    ' Set up the read buffer.
-    If BufferSize < MIN_BUFFERSIZE Then BufferSize = MIN_BUFFERSIZE
     mBufferSize = BufferSize
     ReDim mByteBuffer(0 To mBufferSize - 1)
     
+    mLeaveOpen = LeaveOpen
     mIsOpen = True
 End Sub
 
@@ -407,12 +436,16 @@ Private Function ReadBuffer() As Long
     ' If bytes have been read in then fill the character buffer.
     If mByteLength > 0 Then
         ' We may still need to determine encoding from the stream.
-        If mDetermineEncoding Then DetermineEncoding
+        If mDetermineEncoding Then
+            DetermineEncoding
+        End If
         
         ' We couldn't ReDim the character buffer earlier because we
         ' had no idea the type of encoding we'd end up with, causing
         ' a different number of characters to be generated.
-        If SAPtr(mCharBuffer) = vbNullPtr Then ReDim mCharBuffer(0 To mEncoding.GetMaxCharCount(mBufferSize) - 1)
+        If SAPtr(mCharBuffer) = vbNullPtr Then
+            ReDim mCharBuffer(0 To mEncoding.GetMaxCharCount(mBufferSize) - 1)
+        End If
         
         ' Fill the character buffer using a Decoder to maintain
         ' state between buffer readings for multi-byte characters.
@@ -465,11 +498,6 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mEncoding = Encoding.UTF8
-    Set mDecoder = mEncoding.GetDecoder
-End Sub
-
 Private Sub Class_Terminate()
     CloseReader
 End Sub
@@ -495,7 +523,7 @@ End Function
 '   TextReader Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub TextReader_CloseReader()
-    Call CloseReader
+    CloseReader
 End Sub
 
 Private Function TextReader_Equals(Value As Variant) As Boolean
