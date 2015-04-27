@@ -752,9 +752,9 @@ End Function
 ' FileMode.Create or FileMode.Append depending on Append, FileAccess.WriteAccess, FileShare.ReadShare.</p>
 ' <p>If Encoding is not supplied, then an encoding of Cor.NewUTF8Encoding(False, True) is used.</p>
 '
-Public Function NewStreamWriter(ByVal Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal BufferSize As Long = 4096, Optional ByVal Append As Boolean = False) As StreamWriter
+Public Function NewStreamWriter(ByRef Source As Variant, Optional ByVal Append As Boolean = False, Optional ByVal Encoding As Encoding, Optional ByVal BufferSize As Long = 4096) As StreamWriter
     Set NewStreamWriter = New StreamWriter
-    Call NewStreamWriter.Init(Source, Encoding, BufferSize, Append)
+    NewStreamWriter.Init Source, Append, Encoding, BufferSize
 End Function
 
 ''

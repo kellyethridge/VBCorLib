@@ -274,9 +274,9 @@ Private Sub AddSystemIO()
         .Add New MemoryStreamTests
         .Add New PathTests
         .Add New FileStreamTests
-                
+        
         .Add NewSuite("StreamWriter", _
-            New TestStreamWriter, _
+            New StreamWriterTests, _
             New TestStreamWriterWithMem, _
             New TestSWWithMemAutoFlush)
         

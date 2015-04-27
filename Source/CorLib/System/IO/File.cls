@@ -74,7 +74,7 @@ End Function
 Public Sub AppendAllText(ByVal Path As String, ByVal Contents As String, Optional ByVal Encoding As Encoding)
     Dim sw As StreamWriter
     
-    Set sw = Cor.NewStreamWriter(Path, Encoding, Append:=True)
+    Set sw = Cor.NewStreamWriter(Path, True, Encoding)
     Call sw.WriteValue(Contents)
     Call sw.CloseWriter
 End Sub
@@ -103,7 +103,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
     DestinationFileName = Path.GetFullPath(cString.TrimEnd(DestinationFileName, mDirectorySeparators))
     
     If StrComp(SourceFileName, DestinationFileName, vbTextCompare) = 0 Then Exit Sub
-    If API.CopyFile(SourceFileName, DestinationFileName, Not OverWrite) = BOOL_FALSE Then
+    If Api.CopyFile(SourceFileName, DestinationFileName, Not OverWrite) = BOOL_FALSE Then
         Dim e As Long
         e = Err.LastDllError
         If e <> ERROR_FILE_EXISTS Then
@@ -153,7 +153,7 @@ Public Sub Delete(ByVal Path As String)
     
     VBCorLib.Path.VerifyPath Path, True
     
-    If API.DeleteFile(Path) = BOOL_FALSE Then
+    If Api.DeleteFile(Path) = BOOL_FALSE Then
         Dim Result As Long
         Result = Err.LastDllError
         If Result <> ERROR_FILE_NOT_FOUND Then
@@ -194,7 +194,7 @@ Public Function GetAttributes(ByVal Path As String) As FileAttributes
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
     
-    GetAttributes = API.GetFileAttributes(Path)
+    GetAttributes = Api.GetFileAttributes(Path)
     If GetAttributes = INVALID_FILE_ATTRIBUTES Then IOError Err.LastDllError, Path
 End Function
 
@@ -280,7 +280,7 @@ Public Sub Move(ByVal SourceFileName As String, ByVal DestinationFileName As Str
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "DestinationFileName")
     
     If Not File.Exists(SourceFileName) Then IOError ERROR_FILE_NOT_FOUND, SourceFileName
-    If API.MoveFile(SourceFileName, DestinationFileName) = BOOL_FALSE Then IOError Err.LastDllError, DestinationFileName
+    If Api.MoveFile(SourceFileName, DestinationFileName) = BOOL_FALSE Then IOError Err.LastDllError, DestinationFileName
 End Sub
 
 ''
@@ -343,7 +343,7 @@ Public Sub SetAttributes(ByVal sPath As String, ByVal Attributes As FileAttribut
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
     
     Call Path.VerifyPath(sPath)
-    If API.SetFileAttributes(sPath, Attributes) = BOOL_FALSE Then IOError Err.LastDllError, sPath
+    If Api.SetFileAttributes(sPath, Attributes) = BOOL_FALSE Then IOError Err.LastDllError, sPath
 End Sub
 
 ''
@@ -549,7 +549,7 @@ Friend Function GetFileData(ByVal p As String, ByRef Data As WIN32_FILE_ATTRIBUT
     p = cString.TrimEnd(p, mDirectorySeparators)
     
     Call Path.VerifyPath(p, True)
-    If API.GetFileAttributesEx(p, 0, Data) = BOOL_FALSE Then
+    If Api.GetFileAttributesEx(p, 0, Data) = BOOL_FALSE Then
         GetFileData = GetFileDataFallback(p, Data)
     End If
 End Function
@@ -598,7 +598,7 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     VBCorLib.Path.CheckValidPath Path
     
     Dim FileHandle As Long
-    FileHandle = API.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_ATTRIBUTE_NORMAL, 0)
+    FileHandle = Api.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_ATTRIBUTE_NORMAL, 0)
     If FileHandle = INVALID_HANDLE Then _
         IOError Err.LastDllError, Path
         
