@@ -163,6 +163,16 @@ Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     InternalWriteValue Value, SwappedArgs
 End Sub
 
+Public Sub WriteChars(ByRef Chars() As Integer)
+    If SAPtr(Chars) = vbNullPtr Then _
+        Error.ArgumentNull "Chars", ArgumentNull_Array
+        
+    Dim Output As String
+    Output = cString.FromCharArray(Chars)
+    InternalWrite Output
+End Sub
+
+
 ''
 ' Writes the value, then appends the new-line string.
 '
