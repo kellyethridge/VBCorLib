@@ -80,8 +80,8 @@ End Property
 '
 ' @param RHS The new value.
 '
-Public Property Let AutoFlush(ByVal RHS As Boolean)
-    mAutoFlush = RHS
+Public Property Let AutoFlush(ByVal Value As Boolean)
+    mAutoFlush = Value
 End Property
 
 ''
@@ -125,8 +125,8 @@ End Property
 '
 ' @param RHS The new new-line value.
 '
-Public Property Let NewLine(ByVal RHS As String)
-    mNewLine = RHS
+Public Property Let NewLine(ByVal Value As String)
+    mNewLine = Value
 End Property
 
 ''
@@ -134,9 +134,9 @@ End Property
 '
 Public Sub CloseWriter()
     If mIsOpen Then
-        Call Flush
+        Flush
+        mStream.CloseStream
         mIsOpen = False
-        Call mStream.CloseStream
     End If
 End Sub
 
@@ -144,8 +144,8 @@ End Sub
 ' Flushes the buffers to the underlying stream.
 '
 Public Sub Flush()
-    Call VerifyIsOpen
-    Call InternalFlush(True, True)
+    VerifyIsOpen
+    InternalFlush True, True
 End Sub
 
 ''
@@ -158,9 +158,9 @@ End Sub
 ' specific index in curly braces {}. The indexes start at 0.
 '
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
-    Call InternalWriteValue(Value, a)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+    InternalWriteValue Value, SwappedArgs
 End Sub
 
 ''
@@ -174,9 +174,9 @@ End Sub
 ' indexes start at 0.
 '
 Public Sub WriteLine(ParamArray Value() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(12))
-    Call InternalWriteLine(a)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
+    InternalWriteLine SwappedArgs
 End Sub
 
 ''
@@ -184,7 +184,7 @@ End Sub
 '
 ' @return String representing this instance.
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 ''
@@ -194,7 +194,7 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -202,26 +202,26 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Source As Variant, ByVal Encoding As Encoding, ByVal BufferSize As Long, ByVal Append As Boolean)
+Friend Sub Init(ByVal Source As Variant, ByVal Append As Boolean, ByVal Encoding As Encoding, ByVal BufferSize As Long)
     Dim Mode As FileMode
-    Dim emit As Boolean
+    Dim EmitBOM As Boolean
     
     If BufferSize < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("BufferSize", BufferSize, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "BufferSize"
     
     Select Case VarType(Source)
         Case vbObject
             If Source Is Nothing Then _
-                Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Stream))
+                Error.ArgumentNull "Source", ArgumentNull_Stream
             If Not TypeOf Source Is Stream Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamRequired), "Source")
+                Error.Argument Argument_StreamRequired, "Source"
                 
             Set mStream = Source
         
@@ -230,31 +230,37 @@ Friend Sub Init(ByVal Source As Variant, ByVal Encoding As Encoding, ByVal Buffe
                 Mode = FileMode.Append
             Else
                 Mode = FileMode.Create
-                emit = True
+                EmitBOM = True
             End If
+            
             Set mStream = Cor.NewFileStream(Source, Mode, FileAccess.WriteAccess, FileShare.ReadShare)
         
         Case Else
-            Throw Cor.NewArgumentException("A file path or Stream object is required.", "Source")
+            Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
-    
-    ' Set up encoding scheme.
-    If Encoding Is Nothing Then Set Encoding = Cor.NewUTF8Encoding(False, True)
-    Set mEncoding = Encoding
+        
+    If Encoding Is Nothing Then
+        Set mEncoding = Cor.NewUTF8Encoding(False, True)
+    Else
+        Set mEncoding = Encoding
+    End If
     Set mEncoder = mEncoding.GetEncoder
     
-    ' Allows any kind of characters as a newline.
     mNewLine = Environment.NewLine
     mIsOpen = True
     
-    ' Set up the write buffers.
-    If BufferSize < MIN_BUFFERSIZE Then BufferSize = MIN_BUFFERSIZE
-    ReDim mCharBuffer(0 To BufferSize - 1)
-    ReDim mByteBuffer(0 To mEncoding.GetMaxByteCount(BufferSize) - 1)
-    mBufferSize = BufferSize
+    If BufferSize < MIN_BUFFERSIZE Then
+        mBufferSize = MIN_BUFFERSIZE
+    Else
+        mBufferSize = BufferSize
+    End If
     
-    ' Write the BOM.
-    If emit Then Call WritePreamble
+    ReDim mCharBuffer(0 To mBufferSize - 1)
+    ReDim mByteBuffer(0 To mEncoding.GetMaxByteCount(mBufferSize) - 1)
+    
+    If EmitBOM Then
+        WritePreamble
+    End If
 End Sub
 
 

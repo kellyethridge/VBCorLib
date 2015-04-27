@@ -491,7 +491,9 @@ Private Sub DetermineEncoding()
 End Sub
 
 Private Sub VerifyIsOpen()
-    If Not mIsOpen Then Throw Cor.NewObjectDisposedException("StreamReader", "Cannot read from a closed StreamReader.")
+    If Not mIsOpen Then
+        Error.ObjectDisposed ObjectDisposed_StreamClosed
+    End If
 End Sub
 
 

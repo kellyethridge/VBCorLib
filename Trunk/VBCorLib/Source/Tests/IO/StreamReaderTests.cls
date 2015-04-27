@@ -19,11 +19,6 @@ Implements ICategorizable
 
 Private mIO As IOHelper
 
-'Private ms As MemoryStream
-'Private sr As StreamReader
-'
-'Const Q As Long = 10000
-
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.IO"
 End Sub
@@ -35,23 +30,6 @@ End Sub
 Public Sub Teardown()
     Set mIO = Nothing
 End Sub
-
-'Public Sub Setup()
-'    Dim i As Long
-'    Dim b() As Byte
-'
-'
-'    ReDim b(Q - 1)
-'    Set ms = New MemoryStream
-'    For i = 0 To UBound(b)
-'        b(i) = (i Mod 10) + 48
-'    Next i
-'    ms.WriteBlock b, 0, Q
-'    ms.Position = 0
-'    Set sr = Cor.NewStreamReader(ms)
-'End Sub
-'
-'
 
 Public Sub Read_WhenCalledWithEmptyStream_ReturnsMinusOne()
     Dim Actual As Long
@@ -264,6 +242,16 @@ Public Sub NewStreamReader_WithBufferSizeOfZero_ThrowsArgumentOutOfRangeExceptio
     NewStreamReader CreateStream("123"), BufferSize:=0
     
     AssertArgumentOutOfRangeException Err, "BufferSize"
+End Sub
+
+Public Sub NewStreamReader_WhenWithoutEncoding_DefaultsToUTF8Encoding()
+    Dim Actual As Encoding
+    
+    With Cor.NewStreamReader(CreateStream)
+        Set Actual = .CurrentEncoding
+    End With
+    
+    Assert.That TypeOf Actual Is UTF8Encoding, Iz.True
 End Sub
 
 Public Sub ReadLine_WithGivenEncoding_ReturnsDecodedData()
