@@ -158,18 +158,26 @@ End Sub
 ' specific index in curly braces {}. The indexes start at 0.
 '
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
-    Dim SwappedArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
-    InternalWriteValue Value, SwappedArgs
+    VerifyIsOpen
+
+    If UBound(Args) >= 0 Then
+        Dim SwappedArgs() As Variant
+        Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+        WriteFormatToStream Value, SwappedArgs, False
+    Else
+        WriteValueToStream Value, False
+    End If
 End Sub
 
-Public Sub WriteChars(ByRef Chars() As Integer)
+Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    VerifyIsOpen
+    
     If SAPtr(Chars) = vbNullPtr Then _
         Error.ArgumentNull "Chars", ArgumentNull_Array
         
     Dim Output As String
-    Output = cString.FromCharArray(Chars)
-    InternalWrite Output
+    Output = cString.FromCharArray(Chars, Index, Count)
+    WriteValueToStream Output, False
 End Sub
 
 
@@ -184,9 +192,11 @@ End Sub
 ' indexes start at 0.
 '
 Public Sub WriteLine(ParamArray Value() As Variant)
+    VerifyIsOpen
+    
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
-    InternalWriteLine SwappedArgs
+    WriteFormatLine SwappedArgs
 End Sub
 
 ''
@@ -220,7 +230,6 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Source As Variant, ByVal Append As Boolean, ByVal Encoding As Encoding, ByVal BufferSize As Long)
-    Dim Mode As FileMode
     Dim EmitBOM As Boolean
     
     If BufferSize < 0 Then _
@@ -236,6 +245,8 @@ Friend Sub Init(ByVal Source As Variant, ByVal Append As Boolean, ByVal Encoding
             Set mStream = Source
         
         Case vbString
+            Dim Mode As FileMode
+            
             If Append Then
                 Mode = FileMode.Append
             Else
@@ -275,17 +286,58 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
-    Dim CharCount As Long
-    Dim CharPtr As Long
+Private Sub WriteFormatLine(ByRef Args() As Variant)
+    Dim ArgsUBound As Long
+    ArgsUBound = UBound(Args)
+    
+    Select Case ArgsUBound
+        Case -1
+            WriteToStream "", True
+            
+        Case 0
+            WriteValueToStream Args(0), True
+            
+        Case Else
+            Dim Value As Variant
+            Helper.MoveVariant Value, Args(0)
+            CopyMemory Args(0), Args(1), (ArgsUBound + 1) * SizeOfVariant
+            ZeroMemory Args(ArgsUBound), SizeOfVariant
+            Args(ArgsUBound) = Empty
+            WriteFormatToStream Value, Args, True
+            
+    End Select
+End Sub
+
+Private Sub WriteFormatToStream(ByRef Format As Variant, ByRef Args() As Variant, ByVal AppendNewLine As Boolean)
+    Dim Output As String
+    Output = cString.FormatArray(Convert.ToString(Format), Args)
+    WriteToStream Output, AppendNewLine
+End Sub
+
+Private Sub WriteValueToStream(ByRef Value As Variant, ByVal AppendNewLine As Boolean)
+    Dim Output As String
+    Output = Convert.ToString(Value)
+    WriteToStream Output, AppendNewLine
+End Sub
+
+Private Sub WriteToStream(ByRef Value As String, ByVal AppendNewLine As Boolean)
+    WriteCore Value
+    
+    If AppendNewLine Then
+        WriteCore mNewLine
+    End If
+    
+    If mAutoFlush Then
+        InternalFlush True, False
+    End If
+End Sub
+
+Private Sub WriteCore(ByRef Value As String)
+    Dim CharCount   As Long
+    Dim CharPtr     As Long
     Dim CharsToCopy As Long
-    
-    Call VerifyIsOpen
-    
-    If UBound(Args) >= 0 Then Value = cString.FormatArray(Value, Args)
-    If NewLine Then Value = Value & mNewLine
     
     CharCount = Len(Value)
     CharPtr = StrPtr(Value)
@@ -293,7 +345,9 @@ Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal 
     Do While CharCount > 0
         ' If we will write past the end of the buffer, then
         ' empty the buffer in hopes we can fit inside it.
-        If mPosition + CharCount >= mBufferSize Then Call InternalFlush(False, False)
+        If mPosition + CharCount >= mBufferSize Then
+            InternalFlush False, False
+        End If
         
         ' Determine just how many characters we can write to the buffer.
         If CharCount > mBufferSize Then
@@ -305,61 +359,31 @@ Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal 
         End If
         
         ' Copy the characters to the buffer
-        Call CopyMemory(mCharBuffer(mPosition), ByVal CharPtr, CharsToCopy * 2)
+        CopyMemory mCharBuffer(mPosition), ByVal CharPtr, CharsToCopy * 2
         
         ' Calculate the remaining characters to write.
         CharCount = CharCount - CharsToCopy
         CharPtr = CharPtr + CharsToCopy * 2
         mPosition = mPosition + CharsToCopy
     Loop
-    If mAutoFlush Then Call InternalFlush(True, False)
-End Sub
-
-' WriteLine has only a ParamArray argument. This allows for nothing
-' to be passed in and only write a newline to the stream.
-Private Sub InternalWriteLine(ByRef Args() As Variant)
-    Dim ub As Long
-    Dim Value As String
-    
-    ub = UBound(Args)
-    
-    ' The first argument is the line to be written, so convert it to a string.
-    If ub >= 0 Then Value = Convert.ToString(Args(0))
-    
-    ' If there are additional arguments, then those arguments need
-    ' to be shifted down to fill the space of the first argument, which
-    ' is now a separate value.
-    If ub > 0 Then
-        Dim i As Long
-        For i = 1 To ub
-            Call Helper.MoveVariant(Args(i - 1), Args(i))
-        Next i
-        ReDim Preserve Args(ub - 1)
-    ElseIf ub = 0 Then
-        ' The first element is now the Value and we just
-        ' want an empty zero-length array now.
-        Args = cArray.CreateInstance(vbVariant)
-    End If
-    
-    Call InternalWrite(Value, Args, True)
-End Sub
-
-Private Sub InternalWriteValue(ByRef Value As Variant, ByRef Args() As Variant)
-    Call InternalWrite(Convert.ToString(Value), Args, False)
 End Sub
 
 Private Sub VerifyIsOpen()
-    If Not mIsOpen Then Throw Cor.NewObjectDisposedException("StreamWriter", "Cannot write to a close writer.")
+    If Not mIsOpen Then
+        Error.ObjectDisposed ObjectDisposed_StreamClosed
+    End If
 End Sub
 
 Private Sub WritePreamble()
-    Dim b() As Byte
+    Dim Bytes() As Byte
     
-    If Not mStream.CanSeek Then Exit Sub
-    If mStream.Length > 0 Then Exit Sub
+    If Not mStream.CanSeek Then _
+        Exit Sub
+    If mStream.Length > 0 Then _
+        Exit Sub
     
-    b = mEncoding.GetPreamble
-    Call mStream.WriteBlock(b, 0, cArray.GetLength(b))
+    Bytes = mEncoding.GetPreamble
+    mStream.WriteBlock Bytes, 0, ArrayLength(Bytes)
 End Sub
 
 Private Sub InternalFlush(ByVal FlushStream As Boolean, ByVal FlushEncoder As Boolean)
@@ -367,11 +391,13 @@ Private Sub InternalFlush(ByVal FlushStream As Boolean, ByVal FlushEncoder As Bo
     
     If mPosition > 0 Then
         Size = mEncoder.GetBytes(mCharBuffer, 0, mPosition, mByteBuffer, 0, FlushEncoder)
-        Call mStream.WriteBlock(mByteBuffer, 0, Size)
+        mStream.WriteBlock mByteBuffer, 0, Size
         mPosition = 0
     End If
     
-    If FlushStream Then Call mStream.Flush
+    If FlushStream Then
+        mStream.Flush
+    End If
 End Sub
 
 
@@ -403,7 +429,7 @@ End Function
 '   TextWriter Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub TextWriter_CloseWriter()
-    Call CloseWriter
+    CloseWriter
 End Sub
 
 Private Property Get TextWriter_Encoding() As Encoding
@@ -415,7 +441,7 @@ Private Function TextWriter_Equals(Value As Variant) As Boolean
 End Function
 
 Private Sub TextWriter_Flush()
-    Call Flush
+    Flush
 End Sub
 
 Private Property Get TextWriter_FormatProvider() As IFormatProvider
@@ -426,8 +452,8 @@ Private Function TextWriter_GetHashCode() As Long
     TextWriter_GetHashCode = GetHashCode
 End Function
 
-Private Property Let TextWriter_NewLine(ByVal RHS As String)
-    NewLine = RHS
+Private Property Let TextWriter_NewLine(ByVal Value As String)
+    NewLine = Value
 End Property
 
 Private Property Get TextWriter_NewLine() As String
@@ -439,14 +465,22 @@ Private Function TextWriter_ToString() As String
 End Function
 
 Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(12))
-    Call InternalWriteLine(a)
+    VerifyIsOpen
+    
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
+    WriteFormatLine SwappedArgs
 End Sub
 
 Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
-    Call InternalWriteValue(Value, a)
+    VerifyIsOpen
+
+    If UBound(Args) >= 0 Then
+        Dim SwappedArgs() As Variant
+        Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+        WriteFormatToStream Value, SwappedArgs, False
+    Else
+        WriteValueToStream Value, False
+    End If
 End Sub
 
