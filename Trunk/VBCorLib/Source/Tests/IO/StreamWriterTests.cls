@@ -32,7 +32,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use CLng(12345678), NewBytes(49, 50, 51, 52, 53, 54, 55, 56)
             Test.Use 1#, NewBytes(49)
             Test.Use 1.1, NewBytes(49, 46, 49)
+            Test.Use CDec(1.1), NewBytes(49, 46, 49)
             Test.Use "Hello", NewBytes(72, 101, 108, 108, 111)
+            
+            Dim Obj As New Int32
+            Obj.Value = 10
+            Test.Use Obj, NewBytes(49, 48)
             
     End Select
 End Sub
@@ -81,6 +86,29 @@ Public Sub WriteValue_WithValues_WritesExpected(ByRef Value As Variant, ByRef Ex
     Dim Actual() As Byte
     Actual = Store.ToArray
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub WriteChars_WithNullChars_ThrowsArgumentNullException()
+    Dim NullChars() As Integer
+    On Error Resume Next
+    
+    With Cor.NewStreamWriter(New MemoryStream)
+        .WriteChars NullChars
+    End With
+    
+    AssertArgumentNullException Err, "Chars"
+End Sub
+
+Public Sub WriteChars_WithChars_WritesToStream()
+    Dim Store   As New MemoryStream
+    Dim Chars() As Integer
+    Chars = NewIntegers(48, 49, 50)
+    
+    With Cor.NewStreamWriter(Store)
+        .WriteChars Chars
+    End With
+    
+    Assert.That Store.ToArray, Iz.EqualTo(NewBytes(48, 49, 50))
 End Sub
 
 'Public Sub TestWriteChars0to64000()
