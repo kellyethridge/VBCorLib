@@ -16,7 +16,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private Declare Function ArrPtr& Lib "msvbvm60.dll" Alias "VarPtr" (ptr() As Any)
+Private Declare Function ArrPtr& Lib "msvbvm60.dll" Alias "VarPtr" (Ptr() As Any)
 Private Declare Sub RtlMoveMemory Lib "kernel32" (dst As Any, src As Any, ByVal nBytes&)
 
 Private Header1(5) As Long
@@ -52,7 +52,7 @@ Private Sub Class_Terminate()
 End Sub
 
 
-Friend Function EqualText(String1 As String, String2 As String, Optional Compare As VbCompareMethod = vbTextCompare) As Boolean
+Friend Function EqualStrings(String1 As String, String2 As String, Optional Compare As VbCompareMethod = vbTextCompare) As Boolean
 ' By Chris Lucas, cdl1051@earthlink.net, 20011204
     Dim i&, SLen&, tmp1&, tmp2&, tmp3&, tmp4&, alt&
     
@@ -178,7 +178,7 @@ Friend Function EqualText(String1 As String, String2 As String, Optional Compare
             End If
         End If
     
-        EqualText = True
+        EqualStrings = True
     Else
         For i = 0 To SLen \ 4 - 1
             If SafeArray1(i) <> SafeArray2(i) Then Exit Function
@@ -188,57 +188,57 @@ Friend Function EqualText(String1 As String, String2 As String, Optional Compare
             If (SafeArray1(i) And &HFFFF&) <> (SafeArray2(i) And &HFFFF&) Then Exit Function
         End If
 
-        EqualText = True
+        EqualStrings = True
     End If
 End Function
 
 
-Friend Function EqualStrings(String1 As String, String2 As String) As Boolean
-' By Chris Lucas, cdl1051@earthlink.net, 20020607
-    
-    Dim i&, Len1&, Len2&, tmp&
-    
-    ' Grab the string lengths
-    Len1 = LenB(String1) \ 2: Len2 = LenB(String2) \ 2
-    
-    ' Make an informed decision as to whether we should continue
-    If Len1 <> Len2 Then GoTo BailOut
-    
-    ' Compare the strings
-    Header1(3) = StrPtr(String1): Header2(3) = StrPtr(String2)
-    tmp = Len1 \ 2
-    ' The first two characters come cheap
-    If SafeArray1(i) <> SafeArray2(i) Then GoTo BailOut Else i = i + 1
-   
-DoLoop:
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
-        If i <= tmp Then GoTo DoLoop
-    
-NotEqual:
-    ' some characters don't match, but we need to check to
-    ' see if it happened after the end of the string, a
-    ' nasty side-effect of cascading ifs
-    If i > tmp Then EqualStrings = True
-    
-BailOut:
-    ' Lengths don't match, let's do absolutely nothing
-End Function
+'Friend Function EqualStrings(String1 As String, String2 As String) As Boolean
+'' By Chris Lucas, cdl1051@earthlink.net, 20020607
+'
+'    Dim i&, Len1&, Len2&, tmp&
+'
+'    ' Grab the string lengths
+'    Len1 = LenB(String1) \ 2: Len2 = LenB(String2) \ 2
+'
+'    ' Make an informed decision as to whether we should continue
+'    If Len1 <> Len2 Then GoTo BailOut
+'
+'    ' Compare the strings
+'    Header1(3) = StrPtr(String1): Header2(3) = StrPtr(String2)
+'    tmp = Len1 \ 2
+'    ' The first two characters come cheap
+'    If SafeArray1(i) <> SafeArray2(i) Then GoTo BailOut Else i = i + 1
+'
+'DoLoop:
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If SafeArray1(i) <> SafeArray2(i) Then GoTo NotEqual Else i = i + 1
+'        If i <= tmp Then GoTo DoLoop
+'
+'NotEqual:
+'    ' some characters don't match, but we need to check to
+'    ' see if it happened after the end of the string, a
+'    ' nasty side-effect of cascading ifs
+'    If i > tmp Then EqualStrings = True
+'
+'BailOut:
+'    ' Lengths don't match, let's do absolutely nothing
+'End Function

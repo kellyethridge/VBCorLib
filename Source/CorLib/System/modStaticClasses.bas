@@ -31,10 +31,11 @@ Attribute VB_Name = "Statics"
 Option Explicit
 
 ' these are defined As New so they will only be created when first used.
+
 Public Cor                      As New Constructors
 Public Object                   As New ObjectStatic
 Public cArray                   As New cArray
-Public cString                  As New cString
+Public CString                  As New CString
 Public Comparer                 As New ComparerStatic
 Public Environment              As New Environment
 Public Buffer                   As New Buffer

@@ -47,11 +47,21 @@ Option Explicit
 Public Function IsWhiteSpace(ByRef CharOrString As Variant, Optional ByVal Index As Variant) As Boolean
     Select Case VarType(CharOrString)
         Case vbInteger
-            IsWhiteSpace = CharHelper.IsWhiteSpace(CharOrString)
+            IsWhiteSpace = IsWhiteSpaceChar(CharOrString)
         Case vbString
             IsWhiteSpace = IsWhiteSpaceString(CharOrString, Index)
         Case Else
             Error.Argument Argument_InvalidValueType, "String or Integer"
+    End Select
+End Function
+
+Friend Function IsWhiteSpaceChar(ByVal Character As Integer) As Boolean
+    Select Case Character
+        Case &H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, _
+             &H2000 To &H200A, _
+             &H2028, &H2029, &H202F, &H205F, _
+             &H3000
+            IsWhiteSpaceChar = True
     End Select
 End Function
 
@@ -64,7 +74,7 @@ Private Function IsWhiteSpaceString(ByRef s As Variant, ByRef Index As Variant) 
     
     Dim Ptr As Long
     Ptr = StrPtr(s) + CharIndex * 2
-    IsWhiteSpaceString = CharHelper.IsWhiteSpace(MemWord(Ptr))
+    IsWhiteSpaceString = IsWhiteSpaceChar(MemWord(Ptr))
 End Function
 
 
