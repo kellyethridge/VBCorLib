@@ -24,6 +24,10 @@ Attribute VB_Name = "GlobalizationConstants"
 '
 Option Explicit
 
+Public Const NumberFormatInfoTypeName   As String = "NumberFormatInfo"
+Public Const DateTimeFormatInfoTypeName As String = "DateTimeFormatInfo"
+
+
 ' Locale Specifier
 Public Const LOCALE_USER_DEFAULT = &H400
 

@@ -102,7 +102,7 @@ End Sub
 Public Sub IsWhiteSpace_WithStringIndex_ReturnsExpected(ByVal Index As Long, ByVal Expected As Boolean)
     Const s As String = " a b "
     Dim Actual As Boolean
-    
+     
     Actual = Char.IsWhiteSpace(s, Index)
     
     Assert.That Actual, Iz.EqualTo(Expected)

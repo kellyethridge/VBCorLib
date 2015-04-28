@@ -161,7 +161,7 @@ Public Function ChangeExtension(ByVal Path As String, ByVal Extension As String)
     
     VerifyPath Path
     
-    If Not cString.IsNull(Extension) Then
+    If Not CString.IsNull(Extension) Then
         If Len(Extension) = 0 Then
             Extension = "."
         ElseIf Asc(Extension) <> vbPeriodChar Then
@@ -300,7 +300,7 @@ Public Function GetDirectoryName(ByVal Path As String) As String
     End With
     
     Dim PathLength As Long
-    If (MinSlashes > 0) And (CharCount(Path, vbDirectorySeparatorChar) >= MinSlashes) Then
+    If (MinSlashes > 0) And (CString.CharCount(Path, vbDirectorySeparatorChar) >= MinSlashes) Then
         PathLength = InStrRev(Path, vbDirectorySeparatorString)
         If PathLength = 3 Then
             If Mid$(Path, 2, 1) <> vbVolumeSeparatorString Then
@@ -325,7 +325,9 @@ Public Function GetExtension(ByVal Path As String) As String
     
     Dim Index As Long
     Index = InStrRev(Path, ".")
-    If (Index > 0) And (Index < Len(Path)) Then GetExtension = Mid$(Path, Index)
+    If (Index > 0) And (Index < Len(Path)) Then
+        GetExtension = Mid$(Path, Index)
+    End If
 End Function
 
 ''
@@ -371,7 +373,7 @@ End Function
 Public Function GetFullPath(ByVal Path As String) As String
     Const DoubleBackSlash As Long = &H5C005C
     
-    Path = cString.Trim(Path)
+    Path = CString.Trim(Path)
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
         
@@ -414,7 +416,7 @@ Public Function GetFullPath(ByVal Path As String) As String
             Case "..", "."
                 ' do nothing
             Case Else
-                PathParts(i) = cString.TrimEnd(PathParts(i), ".")
+                PathParts(i) = CString.TrimEnd(PathParts(i), ".")
         End Select
     Next i
     
@@ -626,7 +628,7 @@ Friend Sub FixupPath(ByRef Path As String)
     
     For i = 0 To UBound(Parts)
         If Len(Parts(i)) > 2 Then
-            Parts(i) = cString.TrimEnd(Parts(i), ".")
+            Parts(i) = CString.TrimEnd(Parts(i), ".")
         End If
     Next i
     

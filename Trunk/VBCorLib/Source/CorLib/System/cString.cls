@@ -46,11 +46,13 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mStringUtils    As New StringUtils
 Private mBuilder        As StringBuilder
 Private mString         As WordBuffer
 Private mTrimChars      As WordBuffer
 Private mJoinSA         As SafeArray1d
 Private mJoinArray()    As String
+Private mAttachedChars  As SafeArray1d
 
 
 ''
@@ -65,11 +67,11 @@ Public Function IsNull(ByRef s As String) As Boolean
     IsNull = (StrPtr(s) = vbNullPtr)
 End Function
 
-Public Function IsEmptyOrWhiteSpace(ByRef s As String) As Boolean
+Public Function IsNullOrWhiteSpace(ByRef s As String) As Boolean
     If LenB(s) = 0 Then
-        IsEmptyOrWhiteSpace = True
+        IsNullOrWhiteSpace = True
     Else
-        IsEmptyOrWhiteSpace = Not ContainsNonWhiteSpace(s)
+        IsNullOrWhiteSpace = ContainsOnlyWhiteSpace(s)
     End If
 End Function
 
@@ -475,7 +477,15 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Friends
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function EqualsIgnoreCase(ByRef String1 As String, ByRef String2 As String) As Boolean
+    EqualsIgnoreCase = mStringUtils.EqualStrings(String1, String2, vbTextCompare)
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, ByRef Index As Variant, ByRef Count As Variant, ByVal ForwardSearch As Boolean) As Long
     mString.SA.pvData = StrPtr(s)
@@ -570,16 +580,10 @@ Private Function SzTrimStartIndex(ByRef s As String) As Long
         .SA.pvData = StrPtr(s)
         .SA.cElements = Len(s)
         For i = 0 To .SA.cElements - 1
-            If Not CharHelper.IsWhiteSpace(.Data(i)) Then
+            If Not Char.IsWhiteSpaceChar(.Data(i)) Then
                 SzTrimStartIndex = i + 1
                 Exit Function
             End If
-'            Select Case .Data(i)
-'                Case &H20, &HD, &H9, &HA, &HB, &HC, &HA0, &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, &H200B, &H3000, &HFEFF
-'                Case Else
-'                    SzTrimStartIndex = i + 1
-'                    Exit Function
-'            End Select
         Next i
     End With
 End Function
@@ -628,6 +632,58 @@ Private Function SzTrimEndIndex(ByRef s As String) As Long
         Next i
     End With
 End Function
+
+Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
+    ContainsOnlyWhiteSpace = True
+    
+    Dim Chars() As Integer
+    Chars = AttachChars(s)
+    
+    Dim i As Long
+    For i = 0 To UBound(Chars)
+        If Not Char.IsWhiteSpaceChar(Chars(i)) Then
+            ContainsOnlyWhiteSpace = False
+            Exit For
+        End If
+    Next
+        
+    DetachChars Chars
+End Function
+
+Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
+    If LenB(s) > 0 Then
+        Dim Chars() As Integer
+        Chars = AttachChars(s)
+
+        Dim i As Long
+        For i = 0 To UBound(Chars)
+            If Chars(i) = Char Then
+                CharCount = CharCount + 1
+            End If
+        Next
+
+        DetachChars Chars
+    End If
+End Function
+
+
+Private Function AttachChars(ByRef Target As String) As Integer()
+    Debug.Assert mAttachedChars.cLocks = 0
+    
+    mAttachedChars.cbElements = 2
+    mAttachedChars.cDims = 1
+    mAttachedChars.cElements = Len(Target)
+    mAttachedChars.cLocks = 1
+    mAttachedChars.pvData = StrPtr(Target)
+    SAPtr(AttachChars) = VarPtr(mAttachedChars)
+End Function
+
+Private Sub DetachChars(ByRef Chars() As Integer)
+    Debug.Assert SAPtr(Chars) = VarPtr(mAttachedChars)
+    
+    mAttachedChars.cLocks = 0
+    SAPtr(Chars) = vbNullPtr
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
