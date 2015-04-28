@@ -163,9 +163,13 @@ Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     If UBound(Args) >= 0 Then
         Dim SwappedArgs() As Variant
         Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
-        WriteFormatToStream Value, SwappedArgs, False
+        WriteFormatToStream Value, SwappedArgs
     Else
-        WriteValueToStream Value, False
+        WriteValueToStream Value
+    End If
+    
+    If mAutoFlush Then
+        InternalFlush True, False
     End If
 End Sub
 
@@ -177,7 +181,11 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
         
     Dim Output As String
     Output = cString.FromCharArray(Chars, Index, Count)
-    WriteValueToStream Output, False
+    WriteValueToStream Output
+    
+    If mAutoFlush Then
+        InternalFlush True, False
+    End If
 End Sub
 
 
@@ -194,9 +202,28 @@ End Sub
 Public Sub WriteLine(ParamArray Value() As Variant)
     VerifyIsOpen
     
-    Dim SwappedArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
-    WriteFormatLine SwappedArgs
+    If UBound(Value) >= 0 Then
+        Dim SwappedArgs() As Variant
+        Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
+        WriteFormatLine SwappedArgs
+    Else
+        WriteCore mNewLine
+    End If
+    
+    If mAutoFlush Then
+        InternalFlush True, False
+    End If
+End Sub
+
+Public Sub WriteCharsLine(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    VerifyIsOpen
+    
+    WriteCore cString.FromCharArray(Chars, Index, Count)
+    WriteCore mNewLine
+    
+    If mAutoFlush Then
+        InternalFlush True, False
+    End If
 End Sub
 
 ''
@@ -293,45 +320,32 @@ Private Sub WriteFormatLine(ByRef Args() As Variant)
     ArgsUBound = UBound(Args)
     
     Select Case ArgsUBound
-        Case -1
-            WriteToStream "", True
-            
         Case 0
-            WriteValueToStream Args(0), True
+            WriteCore Convert.ToString(Args(0))
             
-        Case Else
+        Case Is > 0
             Dim Value As Variant
             Helper.MoveVariant Value, Args(0)
             CopyMemory Args(0), Args(1), (ArgsUBound + 1) * SizeOfVariant
             ZeroMemory Args(ArgsUBound), SizeOfVariant
             Args(ArgsUBound) = Empty
-            WriteFormatToStream Value, Args, True
-            
+            WriteFormatToStream Value, Args
+    
     End Select
+
+    WriteCore mNewLine
 End Sub
 
-Private Sub WriteFormatToStream(ByRef Format As Variant, ByRef Args() As Variant, ByVal AppendNewLine As Boolean)
+Private Sub WriteFormatToStream(ByRef Format As Variant, ByRef Args() As Variant)
     Dim Output As String
     Output = cString.FormatArray(Convert.ToString(Format), Args)
-    WriteToStream Output, AppendNewLine
+    WriteCore Output
 End Sub
 
-Private Sub WriteValueToStream(ByRef Value As Variant, ByVal AppendNewLine As Boolean)
+Private Sub WriteValueToStream(ByRef Value As Variant)
     Dim Output As String
     Output = Convert.ToString(Value)
-    WriteToStream Output, AppendNewLine
-End Sub
-
-Private Sub WriteToStream(ByRef Value As String, ByVal AppendNewLine As Boolean)
-    WriteCore Value
-    
-    If AppendNewLine Then
-        WriteCore mNewLine
-    End If
-    
-    If mAutoFlush Then
-        InternalFlush True, False
-    End If
+    WriteCore Output
 End Sub
 
 Private Sub WriteCore(ByRef Value As String)
@@ -383,7 +397,7 @@ Private Sub WritePreamble()
         Exit Sub
     
     Bytes = mEncoding.GetPreamble
-    mStream.WriteBlock Bytes, 0, ArrayLength(Bytes)
+    mStream.WriteBlock Bytes, LBound(Bytes), ArrayLength(Bytes)
 End Sub
 
 Private Sub InternalFlush(ByVal FlushStream As Boolean, ByVal FlushEncoder As Boolean)
@@ -405,7 +419,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
-    Call CloseWriter
+    CloseWriter
 End Sub
 
 
@@ -464,12 +478,28 @@ Private Function TextWriter_ToString() As String
     TextWriter_ToString = ToString
 End Function
 
+Private Sub TextWriter_WriteChars(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
+    WriteChars Chars, Index, Count
+End Sub
+
+Private Sub TextWriter_WriteCharsLine(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
+    WriteCharsLine Chars, Index, Count
+End Sub
+
 Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
     VerifyIsOpen
     
-    Dim SwappedArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
-    WriteFormatLine SwappedArgs
+    If UBound(Value) >= 0 Then
+        Dim SwappedArgs() As Variant
+        Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
+        WriteFormatLine SwappedArgs
+    Else
+        WriteCore mNewLine
+    End If
+    
+    If mAutoFlush Then
+        InternalFlush True, False
+    End If
 End Sub
 
 Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
@@ -478,9 +508,13 @@ Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As V
     If UBound(Args) >= 0 Then
         Dim SwappedArgs() As Variant
         Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
-        WriteFormatToStream Value, SwappedArgs, False
+        WriteFormatToStream Value, SwappedArgs
     Else
-        WriteValueToStream Value, False
+        WriteValueToStream Value
+    End If
+    
+    If mAutoFlush Then
+        InternalFlush True, False
     End If
 End Sub
 
