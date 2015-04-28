@@ -501,7 +501,7 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
     
     If IsNullByteArray(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If IsMultiDimensionByteArray(Bytes) Then _
+    If IsMultiDimByteArray(Bytes) Then _
         Error.Rank
     If Offset < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound

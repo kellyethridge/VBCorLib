@@ -38,8 +38,16 @@ Public Function IsNullByteArray(ByRef Bytes() As Byte) As Boolean
     IsNullByteArray = (SAPtr(Bytes) = vbNullPtr)
 End Function
 
-Public Function IsMultiDimensionByteArray(ByRef Bytes() As Byte) As Boolean
-    IsMultiDimensionByteArray = (SafeArrayGetDim(SAPtr(Bytes)) > 1)
+Public Function IsMultiDimByteArray(ByRef Bytes() As Byte) As Boolean
+    IsMultiDimByteArray = (SafeArrayGetDim(SAPtr(Bytes)) > 1)
+End Function
+
+Public Function IsNullCharArray(ByRef Chars() As Integer) As Boolean
+    IsNullCharArray = (SAPtr(Chars) = vbNullPtr)
+End Function
+
+Public Function IsMultiDimCharArray(ByRef Chars() As Integer) As Boolean
+    IsMultiDimCharArray = (SafeArrayGetDim(SAPtr(Chars)) > 1)
 End Function
 
 Public Function IfLong(ByRef Value As Variant, ByVal Default As Long) As Long

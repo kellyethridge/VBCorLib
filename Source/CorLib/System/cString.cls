@@ -66,12 +66,11 @@ Public Function IsNull(ByRef s As String) As Boolean
 End Function
 
 Public Function IsEmptyOrWhiteSpace(ByRef s As String) As Boolean
-    If Len(s) = 0 Then
+    If LenB(s) = 0 Then
         IsEmptyOrWhiteSpace = True
-        Exit Function
+    Else
+        IsEmptyOrWhiteSpace = Not ContainsNonWhiteSpace(s)
     End If
-    
-    
 End Function
 
 ''
@@ -83,20 +82,26 @@ End Function
 ' @return A string created from the chars in an integer array.
 '
 Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
+    If IsNullCharArray(Chars) Then _
+        Error.ArgumentNull "Chars", ArgumentNull_Array
+    If IsMultiDimCharArray(Chars) Then _
+        Error.Rank
+
+    Dim Range As ListRange
+    Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))
     
-    Result = GetOptionalArrayRange(SAPtr(Chars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Range.Index < LBound(Chars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
+        Error.InvalidOffsetLength
     
-    If ElemCount = 0 Then
-        ' We don't want a Null string returned.
+    If Range.Count = 0 Then
         FromCharArray = ""
-        Exit Function
+    Else
+        FromCharArray = SysAllocStringLen(VarPtr(Chars(Range.Index)), Range.Count)
     End If
-    
-    FromCharArray = SysAllocStringLen(VarPtr(Chars(ElemIndex)), ElemCount)
 End Function
 
 ''
