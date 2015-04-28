@@ -67,6 +67,12 @@ Public Function IsNull(ByRef s As String) As Boolean
     IsNull = (StrPtr(s) = vbNullPtr)
 End Function
 
+''
+' Returns if the string is empty or contains only white-space.
+'
+' @param s The string to be tested for white-space.
+' @return If the string has a length of zero or contains only white-space then True is returned, othersize False.
+'
 Public Function IsNullOrWhiteSpace(ByRef s As String) As Boolean
     If LenB(s) = 0 Then
         IsNullOrWhiteSpace = True
@@ -116,9 +122,9 @@ End Function
 ' @see DateTimeFormatInfo
 ' @include "..\Includes\cString.Format.txt"
 Public Function Format(ByRef FormatText As String, ParamArray Args() As Variant) As String
-    Dim vArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(16)
-    Format = FormatArrayEx(Nothing, FormatText, vArgs)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+    Format = FormatCore(Nothing, FormatText, SwappedArgs)
 End Function
 
 ''
@@ -132,9 +138,9 @@ End Function
 ' @see DateTimeFormatInfo
 '
 Public Function FormatEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ParamArray Args() As Variant) As String
-    Dim vArgs() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(vArgs), ByVal Helper.DerefEBP(20))
-    FormatEx = FormatArrayEx(Provider, FormatText, vArgs)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+    FormatEx = FormatCore(Provider, FormatText, SwappedArgs)
 End Function
 
 ''
@@ -147,7 +153,7 @@ End Function
 ' @see DateTimeFormatInfo
 '
 Public Function FormatArray(ByRef FormatText As String, ByRef Args() As Variant) As String
-    FormatArray = FormatArrayEx(Nothing, FormatText, Args)
+    FormatArray = FormatCore(Nothing, FormatText, Args)
 End Function
 
 ''
@@ -161,9 +167,7 @@ End Function
 ' @see DateTimeFormatInfo
 '
 Public Function FormatArrayEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ByRef Args() As Variant) As String
-    mBuilder.Length = 0
-    Call mBuilder.InternalAppendFormat(Provider, FormatText, Args)
-    FormatArrayEx = mBuilder.ToString
+    FormatArrayEx = FormatCore(Provider, FormatText, Args)
 End Function
 
 ''
@@ -255,7 +259,7 @@ Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant
             StartIndex = TrimStartIndex(s, Chars)
             SAPtr(Chars) = 0
         
-        Case vbError
+        Case vbMissing
             StartIndex = SzTrimStartIndex(s)
         
         Case Else
@@ -487,6 +491,12 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
+    mBuilder.Length = 0
+    mBuilder.InternalAppendFormat Provider, Format, Args
+    FormatCore = mBuilder.ToString
+End Function
+
 Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, ByRef Index As Variant, ByRef Count As Variant, ByVal ForwardSearch As Boolean) As Long
     mString.SA.pvData = StrPtr(s)
     mString.SA.cElements = Len(s)
