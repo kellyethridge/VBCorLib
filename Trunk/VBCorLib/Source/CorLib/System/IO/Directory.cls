@@ -491,12 +491,17 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifySearchPattern(ByRef Pattern As String)
     Dim i As Long
+    
     i = InStr(Pattern, "..")
+    
     If i > 0 Then
         If i = Len(Pattern) - 1 Then _
             Throw Cor.NewArgumentException("Cannot end search pattern with '..'")
             
-        Select Case CharAt(Pattern, i + 2)
+        Dim Ch As Integer
+        Ch = MemWord(StrPtr(Pattern) + (i + 2) * 2)
+        
+        Select Case Ch
             Case mDirectorySeparatorChar, mAltDirectorySeparatorChar
                 Throw Cor.NewArgumentException("'..' cannot be followed immediately by a directory separator.")
         End Select

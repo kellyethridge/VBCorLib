@@ -27,50 +27,35 @@ Option Explicit
 Private mAttachedChars As SafeArray1d
 
 
-Public Function CharAt(ByRef Source As String, ByVal Index As Long) As Integer
-    If LenB(Source) > 0 And Index >= 0 Then
-        CharAt = MemWord(StrPtr(Source) + Index * 2)
-    End If
-End Function
-
-Public Function LastChar(ByRef Source As String) As Integer
-    Dim Length As Long
-    Length = Len(Source)
-    
-    If Length > 0 Then
-        Dim LastCharIndex As Long
-        LastCharIndex = Length - 1
-        LastChar = MemWord(StrPtr(Source) + LastCharIndex * 2)
-    End If
-End Function
-
-Public Function FirstChar(ByRef Source As String) As Integer
-    If LenB(Source) > 0 Then
-        FirstChar = MemWord(StrPtr(Source))
-    End If
-End Function
-
-Public Function FirstTwoChars(ByRef Source As String) As DWord
-    If LenB(Source) > 0 Then
-        FirstTwoChars = MemDWord(StrPtr(Source))
-    End If
-End Function
-
-Public Function CharCount(ByRef Source As String, ByVal Char As Integer) As Long
-    Dim Chars() As Integer
-    Dim Length As Long
-    
-    Length = Len(Source)
-    If Length > 0 Then
-        Chars = AttachChars(Source)
+Public Function ContainsNonWhiteSpace(ByRef s As String) As Boolean
+    If LenB(s) > 0 Then
+        Dim Chars() As Integer
+        Chars = AttachChars(s)
         
         Dim i As Long
-        For i = 0 To Length - 1
+        For i = 0 To UBound(Chars)
+            If Not IsWhiteSpace(Chars(i)) Then
+                ContainsNonWhiteSpace = True
+                Exit For
+            End If
+        Next
+            
+        DetachChars Chars
+    End If
+End Function
+
+Public Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
+    If LenB(s) > 0 Then
+        Dim Chars() As Integer
+        Chars = AttachChars(s)
+
+        Dim i As Long
+        For i = 0 To UBound(Chars)
             If Chars(i) = Char Then
                 CharCount = CharCount + 1
             End If
         Next
-        
+
         DetachChars Chars
     End If
 End Function

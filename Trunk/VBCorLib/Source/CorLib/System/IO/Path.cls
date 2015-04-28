@@ -781,6 +781,22 @@ Private Function GetLongPathName(ByRef ShortPath As String) As String
     GetLongPathName = Left$(LongPath, Size)
 End Function
 
+Private Function FirstTwoChars(ByRef s As String) As DWord
+    If LenB(s) > 0 Then
+        FirstTwoChars = MemDWord(StrPtr(s))
+    End If
+End Function
+
+Private Function LastChar(ByRef s As String) As Integer
+    Dim Length As Long
+    Length = Len(s)
+    
+    If Length > 0 Then
+        Dim LastCharIndex As Long
+        LastCharIndex = Length - 1
+        LastChar = MemWord(StrPtr(s) + LastCharIndex * 2)
+    End If
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
