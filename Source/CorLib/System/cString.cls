@@ -179,20 +179,25 @@ End Function
 ' @return An array containing the converted characters from the string.
 '
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(Len(s), StartIndex, ElemIndex, Length, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Length", IsMissing(StartIndex))
+    Dim Range As ListRange
+    Range = GetOptionalRange(StartIndex, Length, 0, Len(s), Parameter_StartIndex, Parameter_Length)
     
-    Dim Ret() As Integer
-    If ElemCount > 0 Then
-        ReDim Ret(0 To ElemCount - 1)
-        Call CopyMemory(Ret(0), ByVal StrPtr(s) + ElemIndex * 2, ElemCount * 2)
+    If Range.Index < 0 Then _
+        Error.NegativeNumber "StartIndex"
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Length"
+    If Range.Index + Range.Count > Len(s) Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_IndexCount
+    
+    Dim Chars() As Integer
+    If Range.Count > 0 Then
+        ReDim Chars(0 To Range.Count - 1)
+        CopyMemory Chars(0), ByVal StrPtr(s) + Range.Index * 2, Range.Count * 2
     Else
-        Ret = Cor.NewIntegers()
+        Chars = Cor.NewIntegers()
     End If
-    ToCharArray = Ret
+    
+    ToCharArray = Chars
 End Function
 
 ''
@@ -205,10 +210,10 @@ End Function
 ' @remarks The paddingChar parameter can accept either a number or chr$ value.
 '
 Public Function PadLeft(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
-    Dim l As Long
-    l = Len(s)
-    If TotalWidth > l Then
-        PadLeft = String$(TotalWidth - l, PaddingChar) & s
+    Dim Length As Long
+    Length = Len(s)
+    If TotalWidth > Length Then
+        PadLeft = String$(TotalWidth - Length, PaddingChar) & s
     Else
         PadLeft = s
     End If
@@ -224,10 +229,10 @@ End Function
 ' @remarks The paddingChar parameter can accept either a number or chr$ value.
 '
 Public Function PadRight(ByRef s As String, ByVal TotalWidth As Long, Optional ByRef PaddingChar As Variant = 32) As String
-    Dim l As Long
-    l = Len(s)
-    If TotalWidth > l Then
-        PadRight = s & String$(TotalWidth - l, PaddingChar)
+    Dim Length As Long
+    Length = Len(s)
+    If TotalWidth > Length Then
+        PadRight = s & String$(TotalWidth - Length, PaddingChar)
     Else
         PadRight = s
     End If
@@ -245,19 +250,19 @@ End Function
 ' of characters that will be trimmed from the beginning.</p>
 '
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
-    Dim Chars() As Integer
-    Dim StartIndex As Long
+    Dim Chars()     As Integer
+    Dim StartIndex  As Long
     
     Select Case VarType(TrimChars)
         Case vbString
-            mTrimChars.SA.pvData = StrPtr(TrimChars)
-            mTrimChars.SA.cElements = Len(TrimChars)
-            StartIndex = TrimStartIndex(s, mTrimChars.Data)
+            Chars = AttachToVariantString(TrimChars)
+            StartIndex = TrimStartIndex(s, Chars)
+            DetachChars Chars
             
         Case vbIntegerArray
-            SAPtr(Chars) = GetArrayPointer(TrimChars, True)
+            SAPtr(Chars) = ArrayPointer(TrimChars)
             StartIndex = TrimStartIndex(s, Chars)
-            SAPtr(Chars) = 0
+            SAPtr(Chars) = vbNullPtr
         
         Case vbMissing
             StartIndex = SzTrimStartIndex(s)
@@ -266,8 +271,9 @@ Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant
             Throw Cor.NewArgumentException("Invalid character set.")
     End Select
     
-    If StartIndex = 0 Then Exit Function
-    TrimStart = Mid$(s, StartIndex)
+    If StartIndex > 0 Then
+        TrimStart = Mid$(s, StartIndex)
+    End If
 End Function
 
 ''
@@ -647,7 +653,7 @@ Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
     ContainsOnlyWhiteSpace = True
     
     Dim Chars() As Integer
-    Chars = AttachChars(s)
+    Chars = AttachToString(s)
     
     Dim i As Long
     For i = 0 To UBound(Chars)
@@ -663,7 +669,7 @@ End Function
 Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
     If LenB(s) > 0 Then
         Dim Chars() As Integer
-        Chars = AttachChars(s)
+        Chars = AttachToString(s)
 
         Dim i As Long
         For i = 0 To UBound(Chars)
@@ -677,16 +683,25 @@ Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
 End Function
 
 
-Private Function AttachChars(ByRef Target As String) As Integer()
+Private Function AttachToString(ByRef Target As String) As Integer()
+    InitAttachment StrPtr(Target), Len(Target)
+    SAPtr(AttachToString) = VarPtr(mAttachedChars)
+End Function
+
+Private Function AttachToVariantString(ByRef Target As Variant) As Integer()
+    InitAttachment StrPtr(Target), Len(Target)
+    SAPtr(AttachToVariantString) = VarPtr(mAttachedChars)
+End Function
+
+Private Sub InitAttachment(ByVal Ptr As Long, ByVal Length As Long)
     Debug.Assert mAttachedChars.cLocks = 0
     
     mAttachedChars.cbElements = 2
     mAttachedChars.cDims = 1
-    mAttachedChars.cElements = Len(Target)
+    mAttachedChars.cElements = Length
     mAttachedChars.cLocks = 1
-    mAttachedChars.pvData = StrPtr(Target)
-    SAPtr(AttachChars) = VarPtr(mAttachedChars)
-End Function
+    mAttachedChars.pvData = Ptr
+End Sub
 
 Private Sub DetachChars(ByRef Chars() As Integer)
     Debug.Assert SAPtr(Chars) = VarPtr(mAttachedChars)

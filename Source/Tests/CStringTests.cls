@@ -34,7 +34,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "a", False
             Test.Use " ", True
             Test.Use " a ", False
-            Test.Use WhiteSpaceString, True
+            Test.Use WhiteSpaces, True
             
         Case "TrimStart_WithValues_ReturnsExpected"
             Test.Use WhiteSpaces & "hello" & WhiteSpaces, WhiteSpaces, "hello" & WhiteSpaces
@@ -78,6 +78,38 @@ Public Sub ToCharArray_WithString_ReturnsArrayOfCharacters(ByVal StringToConvert
     Actual = CString.ToCharArray(StringToConvert)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToCharArray_WithSubstringSpecified_ReturnsSubPortion()
+    Dim Actual() As Integer
+    
+    Actual = CString.ToCharArray("hello", 1, 3)
+    
+    Assert.That Actual, Iz.EqualTo(NewIntegers(101, 108, 108))
+End Sub
+
+Public Sub ToCharArray_WithStartIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.ToCharArray "hello", -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub ToCharArray_WithLengthLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.ToCharArray "hello", 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Length"
+End Sub
+
+Public Sub ToCharArray_WithStartIndexAndLengthGreaterThanTheSizeOfCharsArray_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.ToCharArray "hello", 1, 5
+    
+    AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub FromCharArray_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersToConvert() As Integer, ByVal Expected As String)
@@ -184,9 +216,9 @@ End Sub
 Public Sub TrimStart_WithDefaultWhiteSpace_TrimsWhiteSpaceFromBeginning()
     Dim Actual As String
     
-    Actual = CString.TrimStart(WhiteSpaceString & "hello" & WhiteSpaceString)
+    Actual = CString.TrimStart(WhiteSpaces & "hello" & WhiteSpaces)
     
-    Assert.That Actual, Iz.EqualTo("hello" & WhiteSpaceString)
+    Assert.That Actual, Iz.EqualTo("hello" & WhiteSpaces)
 End Sub
 
 Public Sub TrimStart_WithValues_ReturnsExpected(ByVal s As String, ByRef TrimChars As Variant, ByVal Expected As String)
