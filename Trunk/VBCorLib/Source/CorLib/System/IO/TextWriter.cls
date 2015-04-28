@@ -110,7 +110,9 @@ Public Function ToString() As String: End Function
 ' @param Value The value to be written.
 ' @param args Formatting arguments used in formating the Value.
 '
-Public Sub WriteValue(ByRef Value As Variant, ParamArray args() As Variant): End Sub
+Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant): End Sub
+
+Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant): End Sub
 
 ''
 ' Writes the string representation of the value followed by a NewLine
@@ -121,3 +123,4 @@ Public Sub WriteValue(ByRef Value As Variant, ParamArray args() As Variant): End
 '
 Public Sub WriteLine(ParamArray Value() As Variant): End Sub
 
+Public Sub WriteCharsLine(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant): End Sub

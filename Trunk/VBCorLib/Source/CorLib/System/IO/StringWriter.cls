@@ -251,8 +251,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -298,6 +298,14 @@ End Property
 Private Function TextWriter_ToString() As String
     TextWriter_ToString = ToString
 End Function
+
+Private Sub TextWriter_WriteChars(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
+
+End Sub
+
+Private Sub TextWriter_WriteCharsLine(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
+
+End Sub
 
 Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
     Dim a() As Variant

@@ -177,12 +177,69 @@ Public Sub NewStreamWriter_WhenAppending_AppendsToStream()
     Assert.That Actual, Iz.EqualTo("1234")
 End Sub
 
+Public Sub Flush_WhenCalled_WritesToStream()
+    Dim Store As New MemoryStream
+    Dim Actual() As Byte
+    
+    With Cor.NewStreamWriter(Store)
+        .WriteValue "Hi"
+        .Flush
+        Actual = Store.ToArray
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(NewBytes(Asc("H"), Asc("i")))
+End Sub
 
+Public Sub WriteValue_WithAutoFluseEnabled_WritesToStream()
+    Dim Store As New MemoryStream
+    Dim Actual() As Byte
+    
+    With Cor.NewStreamWriter(Store)
+        .AutoFlush = True
+        .WriteValue "12"
+        Actual = Store.ToArray
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(NewBytes(49, 50))
+End Sub
 
+Public Sub WriteChars_WithAutoFlushEnabled_WritesToStream()
+    Dim Store As New MemoryStream
+    Dim Actual() As Byte
+    
+    With Cor.NewStreamWriter(Store)
+        .AutoFlush = True
+        .WriteChars NewIntegers(49, 50)
+        Actual = Store.ToArray
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(NewBytes(49, 50))
+End Sub
 
+Public Sub WriteLine_WithAutoFlushEnabled_WritesToStream()
+    Dim Store As New MemoryStream
+    Dim Actual() As Byte
+    
+    With Cor.NewStreamWriter(Store)
+        .AutoFlush = True
+        .WriteLine
+        Actual = Store.ToArray
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(NewBytes(13, 10))
+End Sub
 
-
-
+Public Sub WriteCharsLine_WhenCalled_WritesCharsAndNewLine()
+    Dim Store As New MemoryStream
+    Dim Actual() As Byte
+    
+    With Cor.NewStreamWriter(Store)
+        .WriteCharsLine NewIntegers(48, 49)
+    End With
+    
+    Actual = Store.ToArray
+    Assert.That Actual, Iz.EqualTo(NewBytes(48, 49, 13, 10))
+End Sub
 
 
 

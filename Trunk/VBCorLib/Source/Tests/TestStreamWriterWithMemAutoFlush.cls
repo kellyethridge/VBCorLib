@@ -24,16 +24,16 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
     Cat.ForFixture "System.IO"
 End Sub
 
-Public Sub Setup()
-    Set ms = New MemoryStream
-    Set sw = newstreamwriter(ms)
-    sw.AutoFlush = True
-End Sub
-
-Public Sub TestWriteLetter()
-    sw.WriteValue "a"
-    Assert.AreEqual 1@, ms.Length
-    ms.Position = 0
-    Assert.AreEqual 97, ms.ReadByte
-End Sub
-
+'Public Sub Setup()
+'    Set ms = New MemoryStream
+'    Set sw = NewStreamWriter(ms)
+'    sw.AutoFlush = True
+'End Sub
+'
+'Public Sub TestWriteLetter()
+'    sw.WriteValue "a"
+'    Assert.AreEqual 1@, ms.Length
+'    ms.Position = 0
+'    Assert.AreEqual 97, ms.ReadByte
+'End Sub
+'
