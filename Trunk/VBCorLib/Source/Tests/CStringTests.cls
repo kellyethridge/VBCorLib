@@ -34,17 +34,27 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "a", False
             Test.Use " ", True
             Test.Use " a ", False
+            Test.Use WhiteSpaceString, True
+            
+        Case "TrimStart_WithValues_ReturnsExpected"
+            Test.Use WhiteSpaces & "hello" & WhiteSpaces, WhiteSpaces, "hello" & WhiteSpaces
+            Test.Use "hello" & WhiteSpaces, "helo", WhiteSpaces
+            Test.Use "hello" & WhiteSpaces, NewIntegers(104, 101, 108, 111), WhiteSpaces
+            Test.Use "hello", "helo", ""
+            Test.Use "hello", NewIntegers(104, 101, 108, 111), ""
+            Test.Use "hello", WhiteSpaces, "hello"
+            Test.Use WhiteSpaces & "hello", "", WhiteSpaces & "hello"
             
     End Select
 End Sub
 
-'Public Sub IsEmptyOrWhitespace_WithValues_ReturnsExpected(ByVal S As String, ByVal Expected As Boolean)
-'    Dim Actual As Boolean
-'
-'    Actual = CString.IsNullOrWhiteSpace(S)
-'
-'    Assert.That Actual, Iz.EqualTo(Expected)
-'End Sub
+Public Sub IsEmptyOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+
+    Actual = CString.IsNullOrWhiteSpace(s)
+
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 Public Sub Format_WithOnePlaceHolder_ReturnsPlaceHolderReplacedWithParameter()
     Dim Actual As String
@@ -171,36 +181,22 @@ Public Sub PadRight_WithTotalWidthLessThanLengthOfStringToPad_ReturnsOriginalStr
     Assert.That Actual, Iz.EqualTo("abc")
 End Sub
 
-'Public Sub TestTrimStart()
-'    Dim Chars() As Integer
-'    Dim s As String
-'
-'    Chars = cString.ToCharArray("abc")
-'    s = "cabhi"
-'    s = cString.TrimStart(s, Chars)
-'    Assert.AreEqual "hi", s
-'End Sub
-'
-'Public Sub TestTrimStartNoTrim()
-'    Dim Chars(0) As Integer
-'    Dim s As String
-'
-'    Chars(0) = 48
-'    s = "hello"
-'    s = cString.TrimStart(s, Chars)
-'    Assert.AreEqual "hello", s
-'End Sub
-'
-'Public Sub TestTrimStartAllTrimmed()
-'    Dim Chars(0) As Integer
-'    Dim s As String
-'
-'    Chars(0) = 48
-'    s = "00000"
-'    s = cString.TrimStart(s, Chars)
-'    Assert.AreEqual "", s
-'End Sub
-'
+Public Sub TrimStart_WithDefaultWhiteSpace_TrimsWhiteSpaceFromBeginning()
+    Dim Actual As String
+    
+    Actual = CString.TrimStart(WhiteSpaceString & "hello" & WhiteSpaceString)
+    
+    Assert.That Actual, Iz.EqualTo("hello" & WhiteSpaceString)
+End Sub
+
+Public Sub TrimStart_WithValues_ReturnsExpected(ByVal s As String, ByRef TrimChars As Variant, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = CString.TrimStart(s, TrimChars)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 'Public Sub TestTrimEnd()
 '    Dim Chars() As Integer
 '    Dim s As String
@@ -394,5 +390,18 @@ End Sub
 '
 '    Assert.AreEqual expectedvalue, cString.Join(s, Delimiter, Index, Count)
 'End Sub
+
+
+Private Property Get WhiteSpaces() As String
+    WhiteSpaces = ChrW$(&H20) & ChrW$(&HD) & ChrW$(&H9) & ChrW$(&HA) & ChrW$(&HB) & ChrW$(&HC) & ChrW$(&H85) & ChrW$(&HA0) & ChrW$(&H1680) & ChrW$(&H180E) & _
+        ChrW$(&H2000) & ChrW$(&H2001) & ChrW$(&H2002) & ChrW$(&H2003) & ChrW$(&H2004) & ChrW$(&H2005) & ChrW$(&H2006) & ChrW$(&H2007) & ChrW$(&H2008) & ChrW$(&H2009) & ChrW$(&H200A) & _
+        ChrW$(&H2028) & ChrW$(&H2029) & ChrW$(&H202F) & ChrW$(&H205F) & _
+        ChrW$(&H3000)
+End Property
+
+Private Property Get WhiteSpaceChars() As Integer()
+    WhiteSpaceChars = NewIntegers(&H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, &H2028, &H2029, &H202F, &H205F, &H3000)
+End Property
+
 
 
