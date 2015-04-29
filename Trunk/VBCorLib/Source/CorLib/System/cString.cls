@@ -52,7 +52,8 @@ Private mString         As WordBuffer
 Private mTrimChars      As WordBuffer
 Private mJoinSA         As SafeArray1d
 Private mJoinArray()    As String
-Private mAttachedChars  As SafeArray1d
+Private mStringChars    As SafeArray1d
+Private mVariantChars   As SafeArray1d
 
 
 ''
@@ -252,8 +253,6 @@ End Function
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
     TrimStart = TrimCore(s, TrimChars, True, False)
 End Function
-
-
 
 ''
 ' Trims the end of the string.
@@ -498,9 +497,9 @@ Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal T
     
     Select Case VarType(TrimChars)
         Case vbString
-            Chars = AttachToVariantString(TrimChars)
+            Chars = AttachToVariant(TrimChars)
             TrimCore = TrimGeneral(s, Chars, TrimHead, TrimTail)
-            DetachChars Chars
+            DetachVariantChars Chars
             
         Case vbIntegerArray
             SAPtr(Chars) = ArrayPointer(TrimChars)
@@ -511,7 +510,7 @@ Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal T
             TrimCore = TrimWhiteSpace(s, TrimHead, TrimTail)
             
         Case Else
-            Error.Argument Argument_CharArrayRequired
+            Error.Argument Argument_CharArrayRequired, "TrimChars"
     End Select
 End Function
 
@@ -523,48 +522,48 @@ Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, By
     Dim Length      As Long
     Dim StartIndex  As Long
     Dim EndIndex    As Long
+    Dim Chars()     As Integer
     
+    Chars = AttachToString(s)
     TrimCharsLB = LBound(TrimChars)
     TrimCharsUB = UBound(TrimChars)
     Length = Len(s)
     
-    With mString
-        .SA.pvData = StrPtr(s)
-        .SA.cElements = Length
+    If TrimHead Then
+        Do While StartIndex < Length
+            Ch = Chars(StartIndex)
+            For i = TrimCharsLB To TrimCharsUB
+                If Ch = TrimChars(i) Then Exit For
+            Next i
+            If i > TrimCharsUB Then Exit Do
+            StartIndex = StartIndex + 1
+        Loop
         
-        If TrimHead Then
-            Do While StartIndex < Length
-                Ch = .Data(StartIndex)
-                For i = TrimCharsLB To TrimCharsUB
-                    If Ch = TrimChars(i) Then Exit For
-                Next i
-                If i > TrimCharsUB Then Exit Do
-                StartIndex = StartIndex + 1
-            Loop
-            
-            If StartIndex = Length Then
-                Exit Function
-            End If
+        If StartIndex = Length Then
+            GoTo Finally
         End If
-        
-        EndIndex = Length - 1
-        If TrimTail Then
-            Do While EndIndex >= StartIndex
-                Ch = .Data(EndIndex)
-                For i = TrimCharsLB To TrimCharsUB
-                    If Ch = TrimChars(i) Then Exit For
-                Next i
-                If i > TrimCharsUB Then Exit Do
-                EndIndex = EndIndex - 1
-            Loop
-            
-            If EndIndex < 0 Then
-                Exit Function
-            End If
-        End If
-    End With
+    End If
     
+    EndIndex = Length - 1
+    If TrimTail Then
+        Do While EndIndex >= StartIndex
+            Ch = Chars(EndIndex)
+            For i = TrimCharsLB To TrimCharsUB
+                If Ch = TrimChars(i) Then Exit For
+            Next i
+            If i > TrimCharsUB Then Exit Do
+            EndIndex = EndIndex - 1
+        Loop
+        
+        If EndIndex < 0 Then
+            GoTo Finally
+        End If
+    End If
+        
     TrimGeneral = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
+    
+Finally:
+    DetachStringChars Chars
 End Function
 
 Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
@@ -604,7 +603,7 @@ Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, By
     TrimWhiteSpace = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
     
 Finally:
-    DetachChars Chars
+    DetachStringChars Chars
 End Function
 
 Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
@@ -621,7 +620,7 @@ Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
         End If
     Next
         
-    DetachChars Chars
+    DetachStringChars Chars
 End Function
 
 Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
@@ -636,36 +635,44 @@ Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
             End If
         Next
 
-        DetachChars Chars
+        DetachStringChars Chars
     End If
 End Function
 
-Private Function AttachToString(ByRef Target As String) As Integer()
-    InitAttachment StrPtr(Target), Len(Target)
-    SAPtr(AttachToString) = VarPtr(mAttachedChars)
+Private Function AttachToString(ByRef s As String) As Integer()
+    InitAttachment StrPtr(s), Len(s), mStringChars
+    SAPtr(AttachToString) = VarPtr(mStringChars)
 End Function
 
-Private Function AttachToVariantString(ByRef Target As Variant) As Integer()
-    InitAttachment StrPtr(Target), Len(Target)
-    SAPtr(AttachToVariantString) = VarPtr(mAttachedChars)
-End Function
-
-Private Sub InitAttachment(ByVal Ptr As Long, ByVal Length As Long)
-    Debug.Assert mAttachedChars.cLocks = 0
+Private Sub DetachStringChars(ByRef Chars() As Integer)
+    Debug.Assert SAPtr(Chars) = VarPtr(mStringChars)
     
-    mAttachedChars.cbElements = 2
-    mAttachedChars.cDims = 1
-    mAttachedChars.cElements = Length
-    mAttachedChars.cLocks = 1
-    mAttachedChars.pvData = Ptr
-End Sub
-
-Private Sub DetachChars(ByRef Chars() As Integer)
-    Debug.Assert SAPtr(Chars) = VarPtr(mAttachedChars)
-    
-    mAttachedChars.cLocks = 0
+    mStringChars.cLocks = 0
     SAPtr(Chars) = vbNullPtr
 End Sub
+
+Private Function AttachToVariant(ByRef v As Variant) As Integer()
+    InitAttachment StrPtr(v), Len(v), mVariantChars
+    SAPtr(AttachToVariant) = VarPtr(mVariantChars)
+End Function
+
+Private Sub DetachVariantChars(ByRef Chars() As Integer)
+    Debug.Assert SAPtr(Chars) = VarPtr(mVariantChars)
+    
+    mVariantChars.cLocks = 0
+    SAPtr(Chars) = vbNullPtr
+End Sub
+
+Private Sub InitAttachment(ByVal Ptr As Long, ByVal Length As Long, ByRef Attachment As SafeArray1d)
+    Debug.Assert Attachment.cLocks = 0
+    
+    Attachment.cbElements = 2
+    Attachment.cDims = 1
+    Attachment.cElements = Length
+    Attachment.cLocks = 1
+    Attachment.pvData = Ptr
+End Sub
+
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
