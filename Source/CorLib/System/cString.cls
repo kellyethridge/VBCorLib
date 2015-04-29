@@ -250,31 +250,10 @@ End Function
 ' of characters that will be trimmed from the beginning.</p>
 '
 Public Function TrimStart(ByRef s As String, Optional ByRef TrimChars As Variant) As String
-    Dim Chars()     As Integer
-    Dim StartIndex  As Long
-    
-    Select Case VarType(TrimChars)
-        Case vbString
-            Chars = AttachToVariantString(TrimChars)
-            StartIndex = TrimStartIndex(s, Chars)
-            DetachChars Chars
-            
-        Case vbIntegerArray
-            SAPtr(Chars) = ArrayPointer(TrimChars)
-            StartIndex = TrimStartIndex(s, Chars)
-            SAPtr(Chars) = vbNullPtr
-        
-        Case vbMissing
-            StartIndex = SzTrimStartIndex(s)
-        
-        Case Else
-            Throw Cor.NewArgumentException("Invalid character set.")
-    End Select
-    
-    If StartIndex > 0 Then
-        TrimStart = Mid$(s, StartIndex)
-    End If
+    TrimStart = TrimCore(s, TrimChars, True, False)
 End Function
+
+
 
 ''
 ' Trims the end of the string.
@@ -288,29 +267,7 @@ End Function
 ' of characters that will be trimmed from the end.</p>
 '
 Public Function TrimEnd(ByRef s As String, Optional ByRef TrimChars As Variant) As String
-    Dim Chars()     As Integer
-    Dim EndIndex    As Long
-    
-    Select Case VarType(TrimChars)
-        Case vbString
-            mTrimChars.SA.pvData = StrPtr(TrimChars)
-            mTrimChars.SA.cElements = Len(TrimChars)
-            EndIndex = TrimEndIndex(s, mTrimChars.Data)
-            
-        Case vbIntegerArray
-            SAPtr(Chars) = GetArrayPointer(TrimChars, True)
-            EndIndex = TrimEndIndex(s, Chars)
-            SAPtr(Chars) = 0
-        
-        Case vbError
-            EndIndex = SzTrimEndIndex(s)
-        
-        Case Else
-            Throw Cor.NewArgumentException("Invalid character set.")
-    End Select
-    
-    If EndIndex = 0 Then Exit Function
-    TrimEnd = Left$(s, EndIndex)
+    TrimEnd = TrimCore(s, TrimChars, False, True)
 End Function
 
 ''
@@ -325,33 +282,7 @@ End Function
 ' of characters that will be trimmed from both ends.</p>
 '
 Public Function Trim(ByRef s As String, Optional ByRef TrimChars As Variant) As String
-    Dim Chars() As Integer
-    Dim StartIndex As Long
-    Dim EndIndex As Long
-    
-    Select Case VarType(TrimChars)
-        Case vbString
-            mTrimChars.SA.pvData = StrPtr(TrimChars)
-            mTrimChars.SA.cElements = Len(TrimChars)
-            StartIndex = TrimStartIndex(s, mTrimChars.Data)
-            EndIndex = TrimEndIndex(s, mTrimChars.Data)
-            
-        Case vbIntegerArray
-            SAPtr(Chars) = GetArrayPointer(TrimChars, True)
-            StartIndex = TrimStartIndex(s, Chars)
-            EndIndex = TrimEndIndex(s, Chars)
-            SAPtr(Chars) = 0
-            
-        Case vbError    ' assume missing
-            StartIndex = SzTrimStartIndex(s)
-            EndIndex = SzTrimEndIndex(s)
-        
-        Case Else
-            Throw Cor.NewArgumentException("Invalid character set.")
-    End Select
-    
-    If StartIndex = 0 Or EndIndex = 0 Then Exit Function
-    Trim = Mid$(s, StartIndex, EndIndex - StartIndex + 1)
+    Trim = TrimCore(s, TrimChars, True, True)
 End Function
 
 ''
@@ -561,92 +492,119 @@ Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal StartIndex As Lo
     FindIndexOfAny = -1
 End Function
 
-Private Function TrimStartIndex(ByRef s As String, ByRef TrimChars() As Integer) As Long
-    Dim i   As Long
-    Dim lb  As Long
-    Dim ub  As Long
-    Dim Ch  As Integer
-    Dim pos As Long
-    Dim l   As Long
+Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
+    Dim Chars()     As Integer
+    Dim StartIndex  As Long
     
-    lb = LBound(TrimChars)
-    ub = UBound(TrimChars)
-    l = Len(s)
-    With mString
-        .SA.pvData = StrPtr(s)
-        .SA.cElements = Len(s)
-        Do While pos < l
-            Ch = .Data(pos)
-            For i = lb To ub
-                If Ch = TrimChars(i) Then Exit For
-            Next i
-            If i > ub Then Exit Do
-            pos = pos + 1
-        Loop
-        If pos = l Then Exit Function
-        TrimStartIndex = pos + 1
-    End With
+    Select Case VarType(TrimChars)
+        Case vbString
+            Chars = AttachToVariantString(TrimChars)
+            TrimCore = TrimGeneral(s, Chars, TrimHead, TrimTail)
+            DetachChars Chars
+            
+        Case vbIntegerArray
+            SAPtr(Chars) = ArrayPointer(TrimChars)
+            TrimCore = TrimGeneral(s, Chars, TrimHead, TrimTail)
+            SAPtr(Chars) = vbNullPtr
+        
+        Case vbMissing
+            TrimCore = TrimWhiteSpace(s, TrimHead, TrimTail)
+            
+        Case Else
+            Error.Argument Argument_CharArrayRequired
+    End Select
 End Function
 
-' This method is optimized for the default set of whitespace.
-Private Function SzTrimStartIndex(ByRef s As String) As Long
-    Dim i As Long
+Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
+    Dim i           As Long
+    Dim TrimCharsLB As Long
+    Dim TrimCharsUB As Long
+    Dim Ch          As Integer
+    Dim Length      As Long
+    Dim StartIndex  As Long
+    Dim EndIndex    As Long
+    
+    TrimCharsLB = LBound(TrimChars)
+    TrimCharsUB = UBound(TrimChars)
+    Length = Len(s)
     
     With mString
         .SA.pvData = StrPtr(s)
-        .SA.cElements = Len(s)
-        For i = 0 To .SA.cElements - 1
-            If Not Char.IsWhiteSpaceChar(.Data(i)) Then
-                SzTrimStartIndex = i + 1
+        .SA.cElements = Length
+        
+        If TrimHead Then
+            Do While StartIndex < Length
+                Ch = .Data(StartIndex)
+                For i = TrimCharsLB To TrimCharsUB
+                    If Ch = TrimChars(i) Then Exit For
+                Next i
+                If i > TrimCharsUB Then Exit Do
+                StartIndex = StartIndex + 1
+            Loop
+            
+            If StartIndex = Length Then
                 Exit Function
             End If
-        Next i
-    End With
-End Function
-
-Private Function TrimEndIndex(ByRef s As String, ByRef TrimChars() As Integer) As Long
-    Dim i   As Long
-    Dim lb  As Long
-    Dim ub  As Long
-    Dim Ch  As Integer
-    Dim pos As Long
-    
-    lb = LBound(TrimChars)
-    ub = UBound(TrimChars)
-    With mString
-        .SA.pvData = StrPtr(s)
-        .SA.cElements = Len(s)
+        End If
         
-        pos = .SA.cElements - 1
-        Do While pos >= 0
-            Ch = .Data(pos)
-            For i = lb To ub
-                If Ch = TrimChars(i) Then Exit For
-            Next i
-            If i > ub Then Exit Do
-            pos = pos - 1
-        Loop
-        If pos < 0 Then Exit Function
-        TrimEndIndex = pos + 1
+        EndIndex = Length - 1
+        If TrimTail Then
+            Do While EndIndex >= StartIndex
+                Ch = .Data(EndIndex)
+                For i = TrimCharsLB To TrimCharsUB
+                    If Ch = TrimChars(i) Then Exit For
+                Next i
+                If i > TrimCharsUB Then Exit Do
+                EndIndex = EndIndex - 1
+            Loop
+            
+            If EndIndex < 0 Then
+                Exit Function
+            End If
+        End If
     End With
+    
+    TrimGeneral = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
 End Function
 
-' This method is optimized for the default set of whitespace.
-Private Function SzTrimEndIndex(ByRef s As String) As Long
-    Dim i As Long
+Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
+    Dim StartIndex  As Long
+    Dim EndIndex    As Long
+    Dim i           As Long
+    Dim Chars()     As Integer
     
-    With mString
-        .SA.pvData = StrPtr(s)
-        .SA.cElements = Len(s)
-        For i = .SA.cElements - 1 To 0 Step -1
-            Select Case .Data(i)
-                Case &H20, &HD, &H9, &HA, &HB, &HC, &HA0, &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, &H200B, &H3000, &HFEFF
-                Case Else
-                    SzTrimEndIndex = i + 1
-                    Exit Function
-            End Select
-        Next i
-    End With
+    Chars = AttachToString(s)
+    If TrimHead Then
+        For i = 0 To UBound(Chars)
+            If Not Char.IsWhiteSpaceChar(Chars(i)) Then
+                StartIndex = i
+                Exit For
+            End If
+        Next
+        
+        If i > UBound(Chars) Then
+            GoTo Finally
+        End If
+    End If
+    
+    EndIndex = Len(s) - 1
+    If TrimTail Then
+        For i = UBound(Chars) To StartIndex Step -1
+            If Not Char.IsWhiteSpaceChar(Chars(i)) Then
+                EndIndex = i
+                Exit For
+            End If
+        Next
+        
+        If i < 0 Then
+            GoTo Finally
+        End If
+    End If
+        
+    TrimWhiteSpace = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
+    
+Finally:
+    DetachChars Chars
 End Function
 
 Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
@@ -681,7 +639,6 @@ Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
         DetachChars Chars
     End If
 End Function
-
 
 Private Function AttachToString(ByRef Target As String) As Integer()
     InitAttachment StrPtr(Target), Len(Target)
