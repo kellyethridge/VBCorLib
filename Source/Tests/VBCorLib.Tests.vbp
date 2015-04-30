@@ -216,6 +216,7 @@ Class=ObjectTests; ObjectTests.cls
 Class=CharTests; CharTests.cls
 Class=SafeHandleTests; Win32\SafeHandleTests.cls
 ResFile32="VBCorLib.Tests.RES"
+Class=ArrayConstructorTests; ArrayConstructorTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

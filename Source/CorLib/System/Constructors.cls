@@ -1319,6 +1319,24 @@ Public Function NewIntegers(ParamArray Values() As Variant) As Integer()
 End Function
 
 ''
+' Returns an array of Integers representing the ASCII values of the strings passed in.
+'
+' @param Values A series of string values to be converted to ASCII values.
+' @remarks The values must be strings.
+'
+Public Function NewChars(ParamArray Values() As Variant) As Integer()
+    Dim Result() As Integer
+    SAPtr(Result) = SafeArrayCreateVector(vbInteger, 0, UBound(Values) + 1)
+    
+    Dim i As Long
+    For i = 0 To UBound(Values)
+        Result(i) = AscW(Values(i))
+    Next
+    
+    NewChars = Result
+End Function
+
+''
 ' Returns an array of Strings generated from the values passed in.
 '
 ' @param Values The values to create the array from.
