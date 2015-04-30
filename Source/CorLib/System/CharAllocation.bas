@@ -1,4 +1,4 @@
-Attribute VB_Name = "CharBuffer"
+Attribute VB_Name = "CharAllocation"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "CharBuffer"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: CharBuffer
+' Module: CharAllocation
 '
 
 ''
@@ -28,7 +28,7 @@ Attribute VB_Name = "CharBuffer"
 '
 ' @remarks <p>A proxy char buffer is used with the backing of the string value
 ' passed in. Once the buffer access is no longer needed then the FreeChars
-' method is called, passing in the Integer array returns during allocation.</p>
+' method is called, passing in the Integer array returned during allocation.</p>
 ' <p>A Variant that contains either a String or Integer array can also be accessed
 ' as an array by calling AsChars. If the Variant contains a String type then the
 ' process works the same as calling AllocChars. If the Variant contains an Integer
@@ -88,14 +88,21 @@ End Function
 ' any references to the original string value.</p>
 '
 Public Function AsChars(ByRef v As Variant) As Integer()
+    If Not mInited Then
+        InitBuffers
+        mInited = True
+    End If
+    
     Select Case VarType(v)
         Case vbString
+            ' Directly assigning a string pointer prevents a string from being copied.
             Dim LocalString As String
             StringPtr(LocalString) = StrPtr(v)
             AsChars = AllocChars(LocalString)
             StringPtr(LocalString) = vbNullPtr
             
         Case vbIntegerArray
+            ' Directly assigning an array pointer prevents the source array from being copied.
             SAPtr(AsChars) = ArrayPointer(v)
             
         Case Else
@@ -171,5 +178,6 @@ End Function
 
 Private Function BucketRelease(ByRef This As Bucket) As Long
     This.Buffer.pvData = vbNullPtr
+    This.Buffer.cbElements = 0
     This.Buffer.cLocks = 0
 End Function
