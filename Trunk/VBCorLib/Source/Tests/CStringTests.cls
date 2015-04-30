@@ -89,7 +89,7 @@ End Sub
 Public Sub IsEmptyOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
 
-    Actual = cString.IsNullOrWhiteSpace(s)
+    Actual = CString.IsNullOrWhiteSpace(s)
 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -97,7 +97,7 @@ End Sub
 Public Sub Format_WithOnePlaceHolder_ReturnsPlaceHolderReplacedWithParameter()
     Dim Actual As String
     
-    Actual = cString.Format("hel{0}o", "l")
+    Actual = CString.Format("hel{0}o", "l")
     
     Assert.That Actual, Iz.EqualTo("hello")
 End Sub
@@ -105,7 +105,7 @@ End Sub
 Public Sub Format_WithOneDuplicatePlaceHolder_ReplacesBothPlaceHoldersWithParameter()
     Dim Actual As String
     
-    Actual = cString.Format("he{0}{0}o", "l")
+    Actual = CString.Format("he{0}{0}o", "l")
     
     Assert.That Actual, Iz.EqualTo("hello")
 End Sub
@@ -113,7 +113,7 @@ End Sub
 Public Sub ToCharArray_WithString_ReturnsArrayOfCharacters(ByVal StringToConvert As String, ByRef Expected() As Integer)
     Dim Actual() As Integer
     
-    Actual = cString.ToCharArray(StringToConvert)
+    Actual = CString.ToCharArray(StringToConvert)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -121,7 +121,7 @@ End Sub
 Public Sub ToCharArray_WithSubstringSpecified_ReturnsSubPortion()
     Dim Actual() As Integer
     
-    Actual = cString.ToCharArray("hello", 1, 3)
+    Actual = CString.ToCharArray("hello", 1, 3)
     
     Assert.That Actual, Iz.EqualTo(NewIntegers(101, 108, 108))
 End Sub
@@ -129,7 +129,7 @@ End Sub
 Public Sub ToCharArray_WithStartIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    cString.ToCharArray "hello", -1, 1
+    CString.ToCharArray "hello", -1, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
@@ -137,7 +137,7 @@ End Sub
 Public Sub ToCharArray_WithLengthLessThanZero_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    cString.ToCharArray "hello", 0, -1
+    CString.ToCharArray "hello", 0, -1
     
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
@@ -145,7 +145,7 @@ End Sub
 Public Sub ToCharArray_WithStartIndexAndLengthGreaterThanTheSizeOfCharsArray_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    cString.ToCharArray "hello", 1, 5
+    CString.ToCharArray "hello", 1, 5
     
     AssertArgumentOutOfRangeException Err
 End Sub
@@ -153,7 +153,7 @@ End Sub
 Public Sub FromCharArray_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersToConvert() As Integer, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = cString.FromCharArray(CharactersToConvert)
+    Actual = CString.FromCharArray(CharactersToConvert)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -162,7 +162,7 @@ Public Sub FromCharArray_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeExcepti
     Dim Chars(1 To 10) As Integer
     
     On Error Resume Next
-    cString.FromCharArray Chars, 0, 1
+    CString.FromCharArray Chars, 0, 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
@@ -171,7 +171,7 @@ Public Sub FromCharArray_WithCountLessThanZero_ThrowsArgumentOutOfRangeException
     Dim Chars(0) As Integer
     
     On Error Resume Next
-    cString.FromCharArray Chars, 0, -1
+    CString.FromCharArray Chars, 0, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
@@ -180,7 +180,7 @@ Public Sub FromCharArray_WithIndexAndCountBeyondUBound_ThrowsArgumentExceptin()
     Dim Chars(0 To 5) As Integer
     
     On Error Resume Next
-    cString.FromCharArray Chars, 1, 6
+    CString.FromCharArray Chars, 1, 6
     
     AssertArgumentException Err
 End Sub
@@ -189,7 +189,7 @@ Public Sub FromCharArray_WithNullArray_ThrowsArgumentNullException()
     Dim NullChars() As Integer
     
     On Error Resume Next
-    cString.FromCharArray NullChars
+    CString.FromCharArray NullChars
     
     AssertArgumentNullException Err, "Chars"
 End Sub
@@ -198,7 +198,7 @@ Public Sub FromCharArray_WithMultiDimArray_ThrowsRankException()
     Dim MultiDim(0, 0) As Integer
     
     On Error Resume Next
-    cString.FromCharArray MultiDim
+    CString.FromCharArray MultiDim
     
     AssertRankException Err
 End Sub
@@ -206,7 +206,7 @@ End Sub
 Public Sub PadLeft_UsingDefaultPaddingChar_ReturnsStringPaddedWithSpaces()
     Dim Actual As String
     
-    Actual = cString.PadLeft("abc", 6)
+    Actual = CString.PadLeft("abc", 6)
     
     Assert.That Actual, Iz.EqualTo("   abc")
 End Sub
@@ -214,7 +214,7 @@ End Sub
 Public Sub PadLeft_UsingPeriodPaddingChar_ReturnsStringPaddedWithPeriods()
     Dim Actual As String
     
-    Actual = cString.PadLeft("abc", 6, ".")
+    Actual = CString.PadLeft("abc", 6, ".")
         
     Assert.That Actual, Iz.EqualTo("...abc")
 End Sub
@@ -222,7 +222,7 @@ End Sub
 Public Sub PadLeft_WithTotalWidthLessThanLengthStringToPad_ReturnsOriginalString()
     Dim Actual As String
     
-    Actual = cString.PadLeft("abc", 2)
+    Actual = CString.PadLeft("abc", 2)
     
     Assert.That Actual, Iz.EqualTo("abc")
 End Sub
@@ -230,7 +230,7 @@ End Sub
 Public Sub PadRight_UsingDefaultPaddingChar_ReturnsStringPaddedWithSpaces()
     Dim Actual As String
     
-    Actual = cString.PadRight("abc", 6)
+    Actual = CString.PadRight("abc", 6)
     
     Assert.That Actual, Iz.EqualTo("abc   ")
 End Sub
@@ -238,7 +238,7 @@ End Sub
 Public Sub PadRight_UsingPeriodPaddingChar_ReturnsStringPaddedWithPeriods()
     Dim Actual As String
     
-    Actual = cString.PadRight("abc", 6, ".")
+    Actual = CString.PadRight("abc", 6, ".")
     
     Assert.That Actual, Iz.EqualTo("abc...")
 End Sub
@@ -246,7 +246,7 @@ End Sub
 Public Sub PadRight_WithTotalWidthLessThanLengthOfStringToPad_ReturnsOriginalString()
     Dim Actual As String
     
-    Actual = cString.PadRight("abc", 2)
+    Actual = CString.PadRight("abc", 2)
     
     Assert.That Actual, Iz.EqualTo("abc")
 End Sub
@@ -254,7 +254,7 @@ End Sub
 Public Sub TrimStart_WithDefaultWhiteSpace_TrimsWhiteSpaceFromStart(ByVal s As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = cString.TrimStart(s)
+    Actual = CString.TrimStart(s)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -262,7 +262,7 @@ End Sub
 Public Sub TrimStart_WithValues_ReturnsExpected(ByVal s As String, ByRef TrimChars As Variant, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = cString.TrimStart(s, TrimChars)
+    Actual = CString.TrimStart(s, TrimChars)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -270,7 +270,7 @@ End Sub
 Public Sub TrimEnd_WithDefaultWhiteSpace_TrimsWhiteSpaceFromEnd(ByVal s As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = cString.TrimEnd(s)
+    Actual = CString.TrimEnd(s)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -278,7 +278,7 @@ End Sub
 Public Sub TrimEnd_WithValues_ReturnsExpected(ByVal s As String, ByRef TrimChars As Variant, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = cString.TrimEnd(s, TrimChars)
+    Actual = CString.TrimEnd(s, TrimChars)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -286,7 +286,7 @@ End Sub
 Public Sub Trim_WithDefaultWhiteSpace_TrimsWhiteSpace(ByVal s As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = cString.Trim(s)
+    Actual = CString.Trim(s)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -294,9 +294,19 @@ End Sub
 Public Sub Trim_WithValues_ReturnsExpected(ByVal s As String, ByRef TrimChars As Variant, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = cString.Trim(s, TrimChars)
+    Actual = CString.Trim(s, TrimChars)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Join_WhenCalled_ReturnsDelimitedString()
+    Dim Value() As String
+    Value = NewStrings("a", "b", "c")
+    
+    Dim Actual As String
+    Actual = CString.Join(",", Value)
+    
+    Assert.That Actual, Iz.EqualTo("a,b,c")
 End Sub
 
 'Public Sub TestJoinAll()

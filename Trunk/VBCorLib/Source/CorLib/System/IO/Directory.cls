@@ -97,7 +97,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     i = cArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
-        TestDirectory = cString.Join(DirectoryNames, Statics.Path.DirectorySeparatorString, 0, i)
+        TestDirectory = cString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
         If Directory.Exists(TestDirectory) Then Exit Do
         i = i - 1
     Loop While i > 0
@@ -105,7 +105,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     Do While i <= UBound(DirectoryNames)
         i = i + 1
         Dim NewDirectory As String
-        NewDirectory = cString.Join(DirectoryNames, Statics.Path.DirectorySeparatorString, 0, i)
+        NewDirectory = cString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
         If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then IOError Err.LastDllError
     Loop
     

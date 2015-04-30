@@ -286,13 +286,13 @@ End Function
 ''
 ' Joins an array or subarray of strings into a single string, separated by the <i>Delimiter</i>.
 '
+' @param Separator A string inserted between each element when joining into a string.
 ' @param Arr An array of strings or variants to join together.
-' @param Delimiter A string inserted between each element when joining into a string.
 ' @param Index The starting element in <i>Arr</i> to begin joining from.
 ' @param Count The number of strings elements to join together.
 ' @return A string containing elements joined from the array separated by the delimiter.
 '
-Public Function Join(ByRef Arr As Variant, Optional ByRef Delimiter As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
+Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
     Dim pSA         As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -300,30 +300,30 @@ Public Function Join(ByRef Arr As Variant, Optional ByRef Delimiter As Variant, 
     Dim ub          As Long
     Dim ElemSize    As Long
     
-    Select Case VarType(Arr)
+    Select Case VarType(Value)
         Case vbStringArray:      ElemSize = 4
         Case vbVariantArray:     ElemSize = 16
         Case Else
             Throw Cor.NewArgumentException("A String or Variant array is required.", "Arr")
     End Select
     
-    pSA = GetArrayPointer(Arr, True)
-    lb = LBound(Arr)
-    ub = UBound(Arr)
+    pSA = GetArrayPointer(Value, True)
+    lb = LBound(Value)
+    ub = UBound(Value)
     
-    ElemIndex = GetOptionalLong(Index, lb)
+    ElemIndex = GetOptionalLong(StartIndex, lb)
     ElemCount = GetOptionalLong(Count, ub - ElemIndex + 1)
     
     Dim Result As Long
     Result = VerifyArrayRange(pSA, ElemIndex, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex))
     
     With mJoinSA
         .cElements = ElemCount
         .fFeatures = MemWord(pSA + FFEATURES_OFFSET)
         .pvData = MemLong(pSA + PVDATA_OFFSET) + (ElemIndex - lb) * ElemSize
     End With
-    Join = VBA.Join(mJoinArray, Delimiter)
+    Join = VBA.Join(mJoinArray, Separator)
 End Function
 
 ''
