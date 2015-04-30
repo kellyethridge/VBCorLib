@@ -30,11 +30,7 @@ Attribute VB_Name = "modBufferHelper"
 '
 Option Explicit
 
-Public Type CharacterArray
-    Chars()             As Integer
-    Length              As Long
-    CharacterSafeArray  As SafeArray1d
-End Type
+
 
 Public Type WordBuffer
     pVTable     As Long

@@ -47,7 +47,6 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private mStringUtils    As New StringUtils
-Private mBuilder        As StringBuilder
 Private mString         As WordBuffer
 Private mTrimChars      As WordBuffer
 Private mJoinSA         As SafeArray1d
@@ -428,9 +427,10 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
-    mBuilder.Length = 0
-    mBuilder.InternalAppendFormat Provider, Format, Args
-    FormatCore = mBuilder.ToString
+    Dim Output As StringBuilder
+    Set Output = StringBuilders.GetBuilder
+    Output.InternalAppendFormat Provider, Format, Args
+    FormatCore = StringBuilders.Release(Output)
 End Function
 
 Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, ByRef Index As Variant, ByRef Count As Variant, ByVal ForwardSearch As Boolean) As Long
@@ -492,20 +492,13 @@ Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal StartIndex As Lo
 End Function
 
 Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
-    Dim Chars()     As Integer
-    Dim StartIndex  As Long
-    
     Select Case VarType(TrimChars)
-        Case vbString
-            Chars = AttachToVariant(TrimChars)
+        Case vbString, vbIntegerArray
+            Dim Chars() As Integer
+            Chars = AsChars(TrimChars)
             TrimCore = TrimGeneral(s, Chars, TrimHead, TrimTail)
-            DetachVariantChars Chars
+            FreeChars Chars
             
-        Case vbIntegerArray
-            SAPtr(Chars) = ArrayPointer(TrimChars)
-            TrimCore = TrimGeneral(s, Chars, TrimHead, TrimTail)
-            SAPtr(Chars) = vbNullPtr
-        
         Case vbMissing
             TrimCore = TrimWhiteSpace(s, TrimHead, TrimTail)
             
@@ -524,7 +517,7 @@ Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, By
     Dim EndIndex    As Long
     Dim Chars()     As Integer
     
-    Chars = AttachToString(s)
+    Chars = AllocChars(s)
     TrimCharsLB = LBound(TrimChars)
     TrimCharsUB = UBound(TrimChars)
     Length = Len(s)
@@ -563,7 +556,7 @@ Private Function TrimGeneral(ByRef s As String, ByRef TrimChars() As Integer, By
     TrimGeneral = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
     
 Finally:
-    DetachStringChars Chars
+    FreeChars Chars
 End Function
 
 Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
@@ -572,7 +565,7 @@ Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, By
     Dim i           As Long
     Dim Chars()     As Integer
     
-    Chars = AttachToString(s)
+    Chars = AllocChars(s)
     If TrimHead Then
         For i = 0 To UBound(Chars)
             If Not Char.IsWhiteSpaceChar(Chars(i)) Then
@@ -603,14 +596,14 @@ Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, By
     TrimWhiteSpace = Mid$(s, StartIndex + 1, EndIndex - StartIndex + 1)
     
 Finally:
-    DetachStringChars Chars
+    FreeChars Chars
 End Function
 
 Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
     ContainsOnlyWhiteSpace = True
     
     Dim Chars() As Integer
-    Chars = AttachToString(s)
+    Chars = AllocChars(s)
     
     Dim i As Long
     For i = 0 To UBound(Chars)
@@ -620,7 +613,7 @@ Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
         End If
     Next
         
-    DetachStringChars Chars
+    FreeChars Chars
 End Function
 
 Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
@@ -679,7 +672,6 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mBuilder = New StringBuilder
     InitWordBuffer mString, 0, 0
     InitWordBuffer mTrimChars, 0, 0
     

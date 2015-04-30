@@ -38,6 +38,7 @@ Option Explicit
 
 Private mStringBuilders As New Stack
 
+
 Public Function GetBuilder() As StringBuilder
     If mStringBuilders.Count = 0 Then
         Set GetBuilder = New StringBuilder
@@ -48,9 +49,26 @@ Public Function GetBuilder() As StringBuilder
     GetBuilder.Length = 0
 End Function
 
-Public Sub PutBuilder(ByVal Builder As StringBuilder)
-    If Builder Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Builder")
+Public Function Release(ByRef Builder As StringBuilder) As String
+    Debug.Assert Not Builder Is Nothing
+    
+    If Builder.Length > 0 Then
+        Release = Builder.ToString
+    End If
     
     mStringBuilders.Push Builder
+End Function
+
+Public Sub PutBuilder(ByRef Builder As StringBuilder)
+    Debug.Assert Not Builder Is Nothing
+    
+    mStringBuilders.Push Builder
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Class Events
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    PutBuilder New StringBuilder
 End Sub

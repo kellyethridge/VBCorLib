@@ -115,7 +115,8 @@ Private Sub AddSystem()
         .Add New TestEnvironment
         .Add New TimeZoneTests
         .Add New TimeSpanTests
-
+        .Add New ArrayConstructorTests
+        
         .Add NewSuite("Object", _
             New ObjectBaseTests, _
             New ObjectTests, _
