@@ -96,6 +96,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 9, "123456789"
             Test.Use 10, "1234567890"
             
+        Case "Join_WihtLongsSubset_ReturnsJoined"
+            Test.Use 0, 10, "1,2,3,4,5,6,7,8,9,0"
+            Test.Use 1, 9, "2,3,4,5,6,7,8,9,0"
+            Test.Use 0, 9, "1,2,3,4,5,6,7,8,9"
+            Test.Use 1, 8, "2,3,4,5,6,7,8,9"
+            
+        Case "Join_WithEnumerableObject_ReturnsJoinedElements"
+            Test.Use NewCollection(1, "hi", 2), "1,hi,2"
+            Test.Use NewArrayList(Source:=Array(1, "hi", 2)), "1,hi,2"
+            
     End Select
 End Sub
 
@@ -375,11 +385,46 @@ Public Sub Join_WithIObjects_ReturnsJoined()
     Assert.That Actual, Iz.EqualTo("32,1")
 End Sub
 
-Public Sub Join_WithInvalidArrayType_ThrowsArgumentException()
-    Dim Longs(0) As Long
+Public Sub Join_WithLongArray_ReturnsJoined()
+    Dim Longs() As Long
+    Longs = NewLongs(1, 2, 3, 4)
     
+    Dim Actual As String
+    Actual = CString.Join(",", Longs)
+    
+    Assert.That Actual, Iz.EqualTo("1,2,3,4")
+End Sub
+
+Public Sub Join_WihtLongsSubset_ReturnsJoined(ByVal StartIndex As Long, ByVal Count As Long, ByVal Expected As String)
+    Dim Longs() As Long
+    Longs = NewLongs(1, 2, 3, 4, 5, 6, 7, 8, 9, 0)
+    
+    Dim Actual As String
+    Actual = CString.Join(",", Longs, StartIndex, Count)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Join_WithEnumerableObject_ReturnsJoinedElements(ByVal Value As Variant, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = CString.Join(",", Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Join_WithNothing_ThrowsArgumentNullException()
     On Error Resume Next
-    CString.Join ",", Longs
+    
+    CString.Join ",", Nothing
+    
+    AssertArgumentNullException Err, "Value"
+End Sub
+
+Public Sub Join_WithNonEnumerableObject_ThrowsArgumentException()
+    On Error Resume Next
+    
+    CString.Join ",", Me
     
     AssertArgumentException Err, "Value"
 End Sub
@@ -423,6 +468,8 @@ Public Sub Remove_WithStartIndex_ReturnsExpected(ByVal StartIndex As Long, ByVal
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+
 
 'Public Sub TestIndexOfAnyString()
 '    Assert.AreEqual 1, cString.IndexOfAny("abc", "b")

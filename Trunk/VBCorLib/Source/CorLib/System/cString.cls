@@ -290,6 +290,11 @@ End Function
 ' @return A string containing elements joined from the array separated by the delimiter.
 '
 Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
+    If IsObject(Value) Then
+        Join = JoinCollection(Separator, Value)
+        Exit Function
+    End If
+    
     If IsNullArray(Value) Then _
         Error.ArgumentNull "Value", ArgumentNull_Array
     If IsMultiDimArray(Value) Then _
@@ -311,10 +316,9 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
         Case vbVariantArray
             Join = JoinVariants(Separator, Value, Range)
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String() or Variant()"), "Value")
+            Join = JoinArray(Separator, Value, Range)
     End Select
 End Function
-
 
 ''
 ' Removes a substring from the string, returning a new string with the gap filled
@@ -423,9 +427,9 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
     Dim Output As StringBuilder
-    Set Output = StringBuilders.GetBuilder
+    Set Output = StringBuilderCache.Acquire
     Output.InternalAppendFormat Provider, Format, Args
-    FormatCore = StringBuilders.Release(Output)
+    FormatCore = StringBuilderCache.GetStringAndRelease(Output)
 End Function
 
 Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, ByRef Index As Variant, ByRef Count As Variant, ByVal ForwardSearch As Boolean) As Long
@@ -658,6 +662,59 @@ Private Function JoinVariants(ByRef Separator As String, ByRef Value As Variant,
     
     SAPtr(Variants) = vbNullPtr
     JoinVariants = VBA.Join(SubStrings, Separator)
+End Function
+
+Private Function JoinArray(ByRef Separator As String, ByRef Value As Variant, ByRef Range As ListRange) As String
+    Dim Strings()   As String
+    Dim Item        As Variant
+    Dim Index       As Long
+    Dim StopIndex   As Long
+    
+    Index = LBound(Value)
+    StopIndex = Range.Index + Range.Count - 1
+    ReDim Strings(Range.Index To StopIndex)
+    
+    For Each Item In Value
+        If Index >= Range.Index Then
+            Strings(Index) = Object.ToString(Item)
+        End If
+        
+        Index = Index + 1
+        
+        If Index > StopIndex Then
+            Exit For
+        End If
+    Next
+    
+    JoinArray = VBA.Join(Strings, Separator)
+End Function
+
+Private Function JoinCollection(ByRef Separator As String, ByVal Value As Object) As String
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Dim AppendSeparator As Boolean
+    Dim Item            As Variant
+    Dim ResultBuilder   As StringBuilder
+    Set ResultBuilder = StringBuilderCache.Acquire
+    
+    On Error GoTo NonEnumerable
+    For Each Item In Value
+        If AppendSeparator Then
+            ResultBuilder.AppendString Separator
+        Else
+            AppendSeparator = True
+        End If
+        
+        ResultBuilder.AppendString Object.ToString(Item)
+    Next
+    
+    JoinCollection = StringBuilderCache.GetStringAndRelease(ResultBuilder)
+    Exit Function
+    
+NonEnumerable:
+    StringBuilderCache.Release ResultBuilder
+    Error.Argument Argument_NotEnumerable, "Value"
 End Function
 
 
