@@ -106,6 +106,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewCollection(1, "hi", 2), "1,hi,2"
             Test.Use NewArrayList(Source:=Array(1, "hi", 2)), "1,hi,2"
             
+        Case "Insert_WithValueAndIndex_ReturnsExpected"
+            Test.Use 0, "ab", "ab1234567890"
+            Test.Use 1, "ab", "1ab234567890"
+            Test.Use 9, "ab", "123456789ab0"
+            Test.Use 10, "ab", "1234567890ab"
+            
     End Select
 End Sub
 
@@ -469,7 +475,29 @@ Public Sub Remove_WithStartIndex_ReturnsExpected(ByVal StartIndex As Long, ByVal
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub Insert_WithValueAndIndex_ReturnsExpected(ByVal StartIndex As Long, ByVal Value As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = CString.Insert("1234567890", StartIndex, Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub Insert_WithStartIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.Insert "ab", -1, "a"
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub Insert_WithStartIndexAfterLengthOfString_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.Insert "ab", 3, "a"
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
 
 'Public Sub TestIndexOfAnyString()
 '    Assert.AreEqual 1, cString.IndexOfAny("abc", "b")
@@ -495,56 +523,8 @@ End Sub
 '    Assert.AreEqual -1, cString.LastIndexOfAny("abc", "123")
 'End Sub
 '
-'Public Sub TestInsertInMiddle()
-'    Assert.AreEqual "abc123def", cString.Insert("abcdef", 3, "123")
-'End Sub
-'
-'Public Sub TestInsertAtBeginning()
-'    Assert.AreEqual "123abcdef", cString.Insert("abcdef", 0, "123")
-'End Sub
-'
-'Public Sub TestInsertAtEnd()
-'    Assert.AreEqual "abcdef123", cString.Insert("abcdef", 6, "123")
-'End Sub
-'
-'Public Sub TestInsertInvalidIndexBefore()
-'    On Error GoTo errTrap
-'    Call cString.Insert("abc", -1, "123")
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is ArgumentOutOfRangeException, "Wrong exception type caught."
-'End Sub
-'
-'Public Sub TestInsertInvalidIndexAfter()
-'    On Error GoTo errTrap
-'    Call cString.Insert("abc", 4, "123")
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is ArgumentOutOfRangeException, "Wrong exception type caught."
-'End Sub
-'
-'
-'
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-''   Private Helpers
-''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'Private Sub AssertJoin(ByVal expectedvalue As String, Optional ByVal Delimiter As Variant, Optional ByVal Index As Variant, Optional ByVal Count As Variant)
-'    Dim s(-1 To 1) As String
-'
-'    s(-1) = "one"
-'    s(0) = "two"
-'    s(1) = "three"
-'
-'    Assert.AreEqual expectedvalue, cString.Join(s, Delimiter, Index, Count)
-'End Sub
+
+
 
 
 Private Property Get WhiteSpaces() As String
@@ -555,7 +535,10 @@ Private Property Get WhiteSpaces() As String
 End Property
 
 Private Property Get WhiteSpaceChars() As Integer()
-    WhiteSpaceChars = NewIntegers(&H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, &H2028, &H2029, &H202F, &H205F, &H3000)
+    WhiteSpaceChars = NewIntegers(&H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, _
+        &H2000, &H2001, &H2002, &H2003, &H2004, &H2005, &H2006, &H2007, &H2008, &H2009, &H200A, _
+        &H2028, &H2029, &H202F, &H205F, _
+        &H3000)
 End Property
 
 
