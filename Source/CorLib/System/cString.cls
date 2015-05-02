@@ -290,11 +290,9 @@ End Function
 ' @return A string containing elements joined from the array separated by the delimiter.
 '
 Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Value)
-    If IsNullArrayPtr(ArrayPtr) Then _
+    If IsNullArray(Value) Then _
         Error.ArgumentNull "Value", ArgumentNull_Array
-    If IsMultiDimArrayPtr(ArrayPtr) Then _
+    If IsMultiDimArray(Value) Then _
         Error.Rank
     
     Dim Range As ListRange
@@ -309,9 +307,9 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
     
     Select Case VarType(Value)
         Case vbStringArray
-            Join = JoinStrings(Separator, ArrayPtr, Range)
+            Join = JoinStrings(Separator, Value, Range)
         Case vbVariantArray
-            Join = JoinVariants(Separator, ArrayPtr, Range)
+            Join = JoinVariants(Separator, Value, Range)
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String() or Variant()"), "Value")
     End Select
@@ -331,14 +329,17 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, ByVal Count 
     Dim CharCount As Long
     CharCount = Len(s)
     
-    Dim Result As Long
-    Result = VerifyListRange(CharCount, StartIndex, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, StartIndex, "StartIndex", Count, "Count")
+    If StartIndex < 0 Then _
+        Error.NegativeNumber "StartIndex"
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If StartIndex + Count > Len(s) Then _
+        Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
     
     Dim sp As Long
     sp = StrPtr(s)
     Remove = SysAllocStringLen(sp, CharCount - Count)
-    Call CopyMemory(ByVal StrPtr(Remove) + StartIndex * 2, ByVal sp + (StartIndex + Count) * 2, (CharCount - (StartIndex + Count)) * 2)
+    CopyMemory ByVal StrPtr(Remove) + StartIndex * 2, ByVal sp + (StartIndex + Count) * 2, (CharCount - (StartIndex + Count)) * 2
 End Function
 
 ''
@@ -624,7 +625,7 @@ Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
     End If
 End Function
 
-Private Function JoinStrings(ByRef Separator As String, ByVal ArrayPtr As Long, ByRef Range As ListRange) As String
+Private Function JoinStrings(ByRef Separator As String, ByRef Value As Variant, ByRef Range As ListRange) As String
     Dim SubStrings()    As String
     Dim ArrayStruct     As SafeArray1d
     
@@ -633,7 +634,7 @@ Private Function JoinStrings(ByRef Separator As String, ByVal ArrayPtr As Long, 
         .cDims = 1
         .cElements = Range.Count
         .fFeatures = &H100
-        .pvData = MemLong(ArrayPtr + PVDATA_OFFSET) + (Range.Index - SafeArrayGetLBound(ArrayPtr, 1)) * 4
+        .pvData = MemLong(ArrayPointer(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * 4
     End With
     
     SAPtr(SubStrings) = VarPtr(ArrayStruct)
@@ -641,12 +642,12 @@ Private Function JoinStrings(ByRef Separator As String, ByVal ArrayPtr As Long, 
     SAPtr(SubStrings) = vbNullPtr
 End Function
 
-Private Function JoinVariants(ByRef Separator As String, ByVal ArrayPtr As Long, ByRef Range As ListRange) As String
+Private Function JoinVariants(ByRef Separator As String, ByRef Value As Variant, ByRef Range As ListRange) As String
     Dim SubStrings() As String
     ReDim SubStrings(0 To Range.Count - 1)
     
     Dim Variants() As Variant
-    SAPtr(Variants) = ArrayPtr
+    SAPtr(Variants) = ArrayPointer(Value)
     
     Dim i As Long
     For i = 0 To Range.Count - 1
