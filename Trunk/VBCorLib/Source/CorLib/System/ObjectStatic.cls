@@ -111,7 +111,7 @@ End Function
 ' @return Returns True if the value and the object are the same instance, False otherwise.
 '
 Public Function Equals(ByRef ObjA As Object, ByRef ObjB As Variant) As Boolean
-    Equals = EqualsVariants(ObjA, ObjB)
+    Equals = EqualVariants(ObjA, ObjB)
 End Function
 
 ''

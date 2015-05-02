@@ -121,7 +121,7 @@ Public Function Contains(ByRef Value As Variant) As Boolean
     
     j = mHead
     For i = 1 To mCount
-        If EqualsVariants(mItems(j), Value) Then
+        If EqualVariants(mItems(j), Value) Then
             Contains = True
             Exit Function
         End If

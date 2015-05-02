@@ -420,6 +420,10 @@ Friend Function EqualsIgnoreCase(ByRef String1 As String, ByRef String2 As Strin
     EqualsIgnoreCase = mStringUtils.EqualStrings(String1, String2, vbTextCompare)
 End Function
 
+Friend Function Equals(ByRef String1 As String, ByRef String2 As String) As Boolean
+    Equals = mStringUtils.EqualStrings(String1, String2, vbBinaryCompare)
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
