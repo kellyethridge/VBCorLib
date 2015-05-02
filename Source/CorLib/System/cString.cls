@@ -325,21 +325,23 @@ End Function
 ' @param Count The number of characters to be removed.
 ' @return A new string with the substring removed.
 '
-Public Function Remove(ByRef s As String, ByVal StartIndex As Long, ByVal Count As Long) As String
-    Dim CharCount As Long
+Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByRef Count As Variant) As String
+    Dim CharCount       As Long
+    Dim RemovalCount    As Long
     CharCount = Len(s)
+    RemovalCount = GetOptionalLong(Count, CharCount - StartIndex)
     
     If StartIndex < 0 Then _
         Error.NegativeNumber "StartIndex"
-    If Count < 0 Then _
+    If RemovalCount < 0 Then _
         Error.NegativeNumber "Count"
-    If StartIndex + Count > Len(s) Then _
+    If StartIndex + RemovalCount > Len(s) Then _
         Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
     
     Dim sp As Long
     sp = StrPtr(s)
-    Remove = SysAllocStringLen(sp, CharCount - Count)
-    CopyMemory ByVal StrPtr(Remove) + StartIndex * 2, ByVal sp + (StartIndex + Count) * 2, (CharCount - (StartIndex + Count)) * 2
+    Remove = SysAllocStringLen(sp, CharCount - RemovalCount)
+    CopyMemory ByVal StrPtr(Remove) + StartIndex * 2, ByVal sp + (StartIndex + RemovalCount) * 2, (CharCount - (StartIndex + RemovalCount)) * 2
 End Function
 
 ''
