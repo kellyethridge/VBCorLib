@@ -388,7 +388,7 @@ End Function
 '
 Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
     If StartIndex < 0 Or StartIndex > Len(s) Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex")
+        Error.ArgumentOutOfRange "StartIndex"
     
     Dim ValueLength As Long
     ValueLength = Len(Value)
@@ -398,19 +398,18 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
         Exit Function
     End If
     
-    Dim PtrS As Long
-    PtrS = StrPtr(s)
+    Dim SourcePtr As Long
+    Dim TargetPtr As Long
     
-    Insert = Space$(ValueLength + Len(s))
-    
-    Dim PtrInsert As Long
-    PtrInsert = StrPtr(Insert)
+    SourcePtr = StrPtr(s)
+    Insert = SysAllocStringLen(ByVal 0&, ValueLength + Len(s))
+    TargetPtr = StrPtr(Insert)
     
     ValueLength = ValueLength * 2
     StartIndex = StartIndex * 2
-    CopyMemory ByVal PtrInsert, ByVal PtrS, StartIndex
-    CopyMemory ByVal PtrInsert + StartIndex, ByVal StrPtr(Value), ValueLength
-    CopyMemory ByVal PtrInsert + StartIndex + ValueLength, ByVal PtrS + StartIndex, LenB(Insert) - (StartIndex + ValueLength)
+    CopyMemory ByVal TargetPtr, ByVal SourcePtr, StartIndex
+    CopyMemory ByVal TargetPtr + StartIndex, ByVal StrPtr(Value), ValueLength
+    CopyMemory ByVal TargetPtr + StartIndex + ValueLength, ByVal SourcePtr + StartIndex, LenB(Insert) - (StartIndex + ValueLength)
 End Function
 
 
