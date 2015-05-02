@@ -183,7 +183,7 @@ Friend Function EqualStrings(String1 As String, String2 As String, Optional Comp
         For i = 0 To SLen \ 4 - 1
             If SafeArray1(i) <> SafeArray2(i) Then Exit Function
         Next i
-    
+
         If (LenB(String1) \ 2 And 1) Then
             If (SafeArray1(i) And &HFFFF&) <> (SafeArray2(i) And &HFFFF&) Then Exit Function
         End If
@@ -193,7 +193,7 @@ Friend Function EqualStrings(String1 As String, String2 As String, Optional Comp
 End Function
 
 
-'Friend Function EqualStrings(String1 As String, String2 As String) As Boolean
+'Private Function EqualStringsBinaryCompare(String1 As String, String2 As String) As Boolean
 '' By Chris Lucas, cdl1051@earthlink.net, 20020607
 '
 '    Dim i&, Len1&, Len2&, tmp&
@@ -237,7 +237,7 @@ End Function
 '    ' some characters don't match, but we need to check to
 '    ' see if it happened after the end of the string, a
 '    ' nasty side-effect of cascading ifs
-'    If i > tmp Then EqualStrings = True
+'    If i > tmp Then EqualStringsBinaryCompare = True
 '
 'BailOut:
 '    ' Lengths don't match, let's do absolutely nothing

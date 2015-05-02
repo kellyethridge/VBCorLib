@@ -185,7 +185,7 @@ Public Function ContainsValue(ByRef Value As Variant) As Boolean
     
     For i = 0 To mCapacity - 1
         If mBuckets(i).State = bsOccupied Then
-            If EqualsVariants(mBuckets(i).Value, Value) Then
+            If EqualVariants(mBuckets(i).Value, Value) Then
                 ContainsValue = True
                 Exit Function
             End If
@@ -500,7 +500,7 @@ Private Function GetKeyIndex(ByRef Key As Variant) As Long
             Case bsOccupied
                 If mBuckets(Index).hashcode = hashcode Then
                     If ComparerIsNothing Then
-                        If EqualsVariants(Key, mBuckets(Index).Key) Then
+                        If EqualVariants(Key, mBuckets(Index).Key) Then
                             GetKeyIndex = Index
                             Exit Function
                         End If
@@ -555,7 +555,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
             Case bsOccupied
                 If mBuckets(Index).hashcode = hashcode Then
                     If UseDefaultCompare Then
-                        If EqualsVariants(Key, mBuckets(Index).Key) Then
+                        If EqualVariants(Key, mBuckets(Index).Key) Then
                             If Adding Then _
                                 Throw Cor.NewArgumentException("An element with the same key already exists in the collection.", "key")
                             
@@ -756,8 +756,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

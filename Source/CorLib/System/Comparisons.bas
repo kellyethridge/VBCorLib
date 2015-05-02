@@ -24,6 +24,7 @@ Attribute VB_Name = "Comparisons"
 '
 Option Explicit
 
+
 ' This is a set of comparison routines used by function delegation calls.
 ' They allow a virtual comparison routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
@@ -91,68 +92,68 @@ End Function
 ' They allow a virtual equality routine to be selected and called without
 ' needing to modify code. Only the address of the specific routine is needed.
 '
-Public Function EqualsLong(ByRef X As Long, ByRef Y As Long) As Boolean
-    EqualsLong = (X = Y)
+Public Function EqualLongs(ByRef X As Long, ByRef Y As Long) As Boolean
+    EqualLongs = (X = Y)
 End Function
 
-Public Function EqualsString(ByRef X As String, ByRef Y As String) As Boolean
-    EqualsString = (X = Y)
+Public Function EqualStrings(ByRef X As String, ByRef Y As String) As Boolean
+    EqualStrings = cString.Equals(X, Y)
 End Function
 
-Public Function EqualsDouble(ByRef X As Double, ByRef Y As Double) As Boolean
-    EqualsDouble = (X = Y)
+Public Function EqualDoubles(ByRef X As Double, ByRef Y As Double) As Boolean
+    EqualDoubles = (X = Y)
 End Function
 
-Public Function EqualsInteger(ByRef X As Integer, ByRef Y As Integer) As Boolean
-    EqualsInteger = (X = Y)
+Public Function EqualIntegers(ByRef X As Integer, ByRef Y As Integer) As Boolean
+    EqualIntegers = (X = Y)
 End Function
 
-Public Function EqualsSingle(ByRef X As Single, ByRef Y As Single) As Boolean
-    EqualsSingle = (X = Y)
+Public Function EqualSingles(ByRef X As Single, ByRef Y As Single) As Boolean
+    EqualSingles = (X = Y)
 End Function
 
-Public Function EqualsDate(ByRef X As Date, ByRef Y As Date) As Boolean
-    EqualsDate = (DateDiff("s", X, Y) = 0)
+Public Function EqualDates(ByRef X As Date, ByRef Y As Date) As Boolean
+    EqualDates = (DateDiff("s", X, Y) = 0)
 End Function
 
-Public Function EqualsByte(ByRef X As Byte, ByRef Y As Byte) As Boolean
-    EqualsByte = (X = Y)
+Public Function EqualBytes(ByRef X As Byte, ByRef Y As Byte) As Boolean
+    EqualBytes = (X = Y)
 End Function
 
-Public Function EqualsBoolean(ByRef X As Boolean, ByRef Y As Boolean) As Boolean
-    EqualsBoolean = (X = Y)
+Public Function EqualBooleans(ByRef X As Boolean, ByRef Y As Boolean) As Boolean
+    EqualBooleans = (X = Y)
 End Function
 
-Public Function EqualsCurrency(ByRef X As Currency, ByRef Y As Currency) As Boolean
-    EqualsCurrency = (X = Y)
+Public Function EqualCurrencies(ByRef X As Currency, ByRef Y As Currency) As Boolean
+    EqualCurrencies = (X = Y)
 End Function
 
-Public Function EqualsObject(ByRef X As Object, ByRef Y As Object) As Boolean
+Public Function EqualObjects(ByRef X As Object, ByRef Y As Object) As Boolean
     If Not X Is Nothing Then
         If TypeOf X Is IObject Then
             Dim Obj As IObject
             Set Obj = X
-            EqualsObject = Obj.Equals(Y)
+            EqualObjects = Obj.Equals(Y)
         Else
-            EqualsObject = X Is Y
+            EqualObjects = X Is Y
         End If
     Else
-        EqualsObject = Y Is Nothing
+        EqualObjects = Y Is Nothing
     End If
 End Function
 
-Public Function EqualsVariants(ByRef X As Variant, ByRef Y As Variant) As Boolean
+Public Function EqualVariants(ByRef X As Variant, ByRef Y As Variant) As Boolean
     Dim Obj As IObject
     
     Select Case VarType(X)
         Case vbObject
             If X Is Nothing Then
                 If IsObject(Y) Then
-                    EqualsVariants = (Y Is Nothing)
+                    EqualVariants = (Y Is Nothing)
                 End If
             ElseIf TypeOf X Is IObject Then
                 Set Obj = X
-                EqualsVariants = Obj.Equals(Y)
+                EqualVariants = Obj.Equals(Y)
             ElseIf IsObject(Y) Then
                 If Y Is Nothing Then
                     Exit Function
@@ -160,16 +161,16 @@ Public Function EqualsVariants(ByRef X As Variant, ByRef Y As Variant) As Boolea
                 
                 If TypeOf Y Is IObject Then
                     Set Obj = Y
-                    EqualsVariants = Obj.Equals(X)
+                    EqualVariants = Obj.Equals(X)
                 Else
-                    EqualsVariants = (X Is Y)
+                    EqualVariants = (X Is Y)
                 End If
             End If
         Case vbNull
-            EqualsVariants = IsNull(Y)
+            EqualVariants = IsNull(Y)
         Case vbEmpty
-            EqualsVariants = IsEmpty(Y)
+            EqualVariants = IsEmpty(Y)
         Case VarType(Y)
-            EqualsVariants = (X = Y)
+            EqualVariants = (X = Y)
     End Select
 End Function
