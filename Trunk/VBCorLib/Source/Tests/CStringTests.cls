@@ -309,44 +309,59 @@ Public Sub Join_WhenCalled_ReturnsDelimitedString()
     Assert.That Actual, Iz.EqualTo("a,b,c")
 End Sub
 
-'Public Sub TestJoinAll()
-'    AssertJoin "one two three"
-'End Sub
-'
-'Public Sub TestJoinAllCommaDelimiter()
-'    AssertJoin "one,two,three", ","
-'End Sub
-'
-'Public Sub TestJoinFirst2()
-'    AssertJoin "one two", , , 2
-'End Sub
-'
-'Public Sub TestJoinLast2()
-'    AssertJoin "two,three", ",", 0, 2
-'End Sub
-'
-'Public Sub TestJoinCountTooHigh()
-'    On Error GoTo errTrap
-'    AssertJoin "", , , 4
-'    On Error GoTo 0
-'    Assert.Fail "An exception should be thrown."
-'
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "An exception should be caught."
-'    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
-'End Sub
-'
-'Public Sub TestJoinVariants()
-'    Dim v(2) As Variant
-'
-'    v(0) = "hi"
-'    v(1) = "bye"
-'    v(2) = "again"
-'
-'    Assert.AreEqual "bye,again", cString.Join(v, ",", 1)
-'End Sub
-'
+Public Sub Join_WithSubset_ReturnsDelimitedSubset()
+    Dim Value() As String
+    Value = NewStrings("a", "b", "c", "d")
+    
+    Dim Actual As String
+    Actual = CString.Join(",", Value, 1, 2)
+    
+    Assert.That Actual, Iz.EqualTo("b,c")
+End Sub
+
+Public Sub Join_WithStartIndexBelowLBound_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.Join ",", Array(1, 1), -1, 2
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub Join_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.Join ",", Array(1, 1), 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Join_WithStartIndexPlusCountIsInvalid_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.Join ",", Array(1, 2), 0, 3
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub Join_WithLongs_ReturnsLongsJoined()
+    Dim Actual As String
+    
+    Actual = CString.Join(",", NewLongs(1, 2, 3, 4))
+    
+    Assert.That Actual, Iz.EqualTo("1,2,3,4")
+End Sub
+
+Public Sub Join_WithIObjects_ReturnsJoined()
+    Dim Objs(0 To 1) As IObject
+    Set Objs(0) = NewInt32(32)
+    Set Objs(1) = NewInt32(1)
+    
+    Dim Actual As String
+    Actual = CString.Join(",", Objs)
+    
+    Assert.That Actual, Iz.EqualTo("32,1")
+End Sub
+
 'Public Sub TestRemove()
 '    Dim s As String
 '

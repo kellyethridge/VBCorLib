@@ -287,43 +287,54 @@ End Function
 ' Joins an array or subarray of strings into a single string, separated by the <i>Delimiter</i>.
 '
 ' @param Separator A string inserted between each element when joining into a string.
-' @param Arr An array of strings or variants to join together.
-' @param Index The starting element in <i>Arr</i> to begin joining from.
+' @param Value An array of strings or variants to join together.
+' @param StartIndex The starting element in <i>Arr</i> to begin joining from.
 ' @param Count The number of strings elements to join together.
 ' @return A string containing elements joined from the array separated by the delimiter.
 '
 Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
-    Dim pSA         As Long
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim lb          As Long
-    Dim ub          As Long
-    Dim ElemSize    As Long
+    Dim ArrayPtr As Long
+    ArrayPtr = ArrayPointer(Value)
+    If IsNullArrayPtr(ArrayPtr) Then _
+        Error.ArgumentNull "Value", ArgumentNull_Array
+    If IsMultiDimArrayPtr(ArrayPtr) Then _
+        Error.Rank
     
-    Select Case VarType(Value)
-        Case vbStringArray:      ElemSize = 4
-        Case vbVariantArray:     ElemSize = 16
-        Case Else
-            Throw Cor.NewArgumentException("A String or Variant array is required.", "Arr")
-    End Select
+    Dim Range As ListRange
+    Range = GetOptionalRange(StartIndex, Count, LBound(Value), ArrayLength(Value), Parameter_StartIndex)
     
-    pSA = GetArrayPointer(Value, True)
-    lb = LBound(Value)
-    ub = UBound(Value)
+    If Range.Index < LBound(Value) Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(Value) Then _
+        Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
     
-    ElemIndex = GetOptionalLong(StartIndex, lb)
-    ElemCount = GetOptionalLong(Count, ub - ElemIndex + 1)
+    Dim LocalStrings() As String
     
-    Dim Result As Long
-    Result = VerifyArrayRange(pSA, ElemIndex, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Arr", ElemIndex, "Index", ElemCount, "Count", IsMissing(StartIndex))
-    
-    With mJoinSA
-        .cElements = ElemCount
-        .fFeatures = MemWord(pSA + FFEATURES_OFFSET)
-        .pvData = MemLong(pSA + PVDATA_OFFSET) + (ElemIndex - lb) * ElemSize
-    End With
-    Join = VBA.Join(mJoinArray, Separator)
+    If VarType(Value) = vbStringArray Then
+        Dim ArrayStruct As SafeArray1d
+        With ArrayStruct
+            .cbElements = 4
+            .cDims = 1
+            .cElements = Range.Count
+            .fFeatures = &H100
+            .pvData = MemLong(ArrayPtr + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * 4
+        End With
+        
+        SAPtr(LocalStrings) = VarPtr(ArrayStruct)
+        Join = VBA.Join(LocalStrings, Separator)
+        SAPtr(LocalStrings) = vbNullPtr
+    Else
+        ReDim LocalStrings(0 To Range.Count - 1)
+        
+        Dim i As Long
+        For i = 0 To Range.Count - 1
+            LocalStrings(i) = Object.ToString(Value(Range.Index + i))
+        Next
+        
+        Join = VBA.Join(LocalStrings, Separator)
+    End If
 End Function
 
 ''
