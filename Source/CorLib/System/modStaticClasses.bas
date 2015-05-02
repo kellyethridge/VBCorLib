@@ -35,7 +35,7 @@ Option Explicit
 Public Cor                      As New Constructors
 Public Object                   As New ObjectStatic
 Public cArray                   As New cArray
-Public CString                  As New CString
+Public cString                  As New cString
 Public Comparer                 As New ComparerStatic
 Public Environment              As New Environment
 Public Buffer                   As New Buffer
@@ -90,7 +90,7 @@ Public CryptoAPI                As New CryptoAPI
 Public CryptoHelper             As New CryptoHelper
 Public BigInteger               As New BigIntegerStatic
 Public Thread                   As New ThreadStatic
-Public StringBuilders           As New StringBuilderCache
+Public StringBuilderCache       As New StringBuilderCache
 Public EqualityComparer         As New EqualityComparerStatic
 Public MyBase                   As New ObjectBase
 Public Char                     As New Char
