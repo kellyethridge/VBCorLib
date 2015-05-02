@@ -89,6 +89,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 0, 9, "0"
             Test.Use 1, 8, "10"
             Test.Use 1, 0, "1234567890"
+            
+        Case "Remove_WithStartIndex_ReturnsExpected"
+            Test.Use 0, ""
+            Test.Use 1, "1"
+            Test.Use 9, "123456789"
+            Test.Use 10, "1234567890"
+            
     End Select
 End Sub
 
@@ -407,6 +414,14 @@ Public Sub Remove_WithStartIndexAndCountInvalidPosition_ThrowsArgumentException(
     CString.Remove "a", 0, 2
     
     AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub Remove_WithStartIndex_ReturnsExpected(ByVal StartIndex As Long, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = CString.Remove("1234567890", StartIndex)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 'Public Sub TestIndexOfAnyString()
