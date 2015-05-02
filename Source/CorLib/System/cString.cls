@@ -49,10 +49,7 @@ Option Explicit
 Private mStringUtils    As New StringUtils
 Private mString         As WordBuffer
 Private mTrimChars      As WordBuffer
-Private mJoinSA         As SafeArray1d
-Private mJoinArray()    As String
-Private mStringChars    As SafeArray1d
-Private mVariantChars   As SafeArray1d
+
 
 
 ''
@@ -310,32 +307,16 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
     If Range.Index + Range.Count - 1 > UBound(Value) Then _
         Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
     
-    Dim LocalStrings() As String
-    
-    If VarType(Value) = vbStringArray Then
-        Dim ArrayStruct As SafeArray1d
-        With ArrayStruct
-            .cbElements = 4
-            .cDims = 1
-            .cElements = Range.Count
-            .fFeatures = &H100
-            .pvData = MemLong(ArrayPtr + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * 4
-        End With
-        
-        SAPtr(LocalStrings) = VarPtr(ArrayStruct)
-        Join = VBA.Join(LocalStrings, Separator)
-        SAPtr(LocalStrings) = vbNullPtr
-    Else
-        ReDim LocalStrings(0 To Range.Count - 1)
-        
-        Dim i As Long
-        For i = 0 To Range.Count - 1
-            LocalStrings(i) = Object.ToString(Value(Range.Index + i))
-        Next
-        
-        Join = VBA.Join(LocalStrings, Separator)
-    End If
+    Select Case VarType(Value)
+        Case vbStringArray
+            Join = JoinStrings(Separator, ArrayPtr, Range)
+        Case vbVariantArray
+            Join = JoinVariants(Separator, ArrayPtr, Range)
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String() or Variant()"), "Value")
+    End Select
 End Function
+
 
 ''
 ' Removes a substring from the string, returning a new string with the gap filled
@@ -630,7 +611,7 @@ End Function
 Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
     If LenB(s) > 0 Then
         Dim Chars() As Integer
-        Chars = AttachToString(s)
+        Chars = AllocChars(s)
 
         Dim i As Long
         For i = 0 To UBound(Chars)
@@ -639,44 +620,42 @@ Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
             End If
         Next
 
-        DetachStringChars Chars
+        FreeChars Chars
     End If
 End Function
 
-Private Function AttachToString(ByRef s As String) As Integer()
-    InitAttachment StrPtr(s), Len(s), mStringChars
-    SAPtr(AttachToString) = VarPtr(mStringChars)
+Private Function JoinStrings(ByRef Separator As String, ByVal ArrayPtr As Long, ByRef Range As ListRange) As String
+    Dim SubStrings()    As String
+    Dim ArrayStruct     As SafeArray1d
+    
+    With ArrayStruct
+        .cbElements = 4
+        .cDims = 1
+        .cElements = Range.Count
+        .fFeatures = &H100
+        .pvData = MemLong(ArrayPtr + PVDATA_OFFSET) + (Range.Index - SafeArrayGetLBound(ArrayPtr, 1)) * 4
+    End With
+    
+    SAPtr(SubStrings) = VarPtr(ArrayStruct)
+    JoinStrings = VBA.Join(SubStrings, Separator)
+    SAPtr(SubStrings) = vbNullPtr
 End Function
 
-Private Sub DetachStringChars(ByRef Chars() As Integer)
-    Debug.Assert SAPtr(Chars) = VarPtr(mStringChars)
+Private Function JoinVariants(ByRef Separator As String, ByVal ArrayPtr As Long, ByRef Range As ListRange) As String
+    Dim SubStrings() As String
+    ReDim SubStrings(0 To Range.Count - 1)
     
-    mStringChars.cLocks = 0
-    SAPtr(Chars) = vbNullPtr
-End Sub
-
-Private Function AttachToVariant(ByRef v As Variant) As Integer()
-    InitAttachment StrPtr(v), Len(v), mVariantChars
-    SAPtr(AttachToVariant) = VarPtr(mVariantChars)
+    Dim Variants() As Variant
+    SAPtr(Variants) = ArrayPtr
+    
+    Dim i As Long
+    For i = 0 To Range.Count - 1
+        SubStrings(i) = Object.ToString(Variants(Range.Index + i))
+    Next
+    
+    SAPtr(Variants) = vbNullPtr
+    JoinVariants = VBA.Join(SubStrings, Separator)
 End Function
-
-Private Sub DetachVariantChars(ByRef Chars() As Integer)
-    Debug.Assert SAPtr(Chars) = VarPtr(mVariantChars)
-    
-    mVariantChars.cLocks = 0
-    SAPtr(Chars) = vbNullPtr
-End Sub
-
-Private Sub InitAttachment(ByVal Ptr As Long, ByVal Length As Long, ByRef Attachment As SafeArray1d)
-    Debug.Assert Attachment.cLocks = 0
-    
-    Attachment.cbElements = 2
-    Attachment.cDims = 1
-    Attachment.cElements = Length
-    Attachment.cLocks = 1
-    Attachment.pvData = Ptr
-End Sub
-
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -685,14 +664,5 @@ End Sub
 Private Sub Class_Initialize()
     InitWordBuffer mString, 0, 0
     InitWordBuffer mTrimChars, 0, 0
-    
-    With mJoinSA
-        .cbElements = 4
-        .cDims = 1
-    End With
-    SAPtr(mJoinArray) = VarPtr(mJoinSA)
 End Sub
 
-Private Sub Class_Terminate()
-    SAPtr(mJoinArray) = 0
-End Sub

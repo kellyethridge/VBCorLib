@@ -38,7 +38,7 @@ Attribute VB_Name = "CharAllocation"
 '
 Option Explicit
 
-Private Const DefaultBufferSize As Long = 16
+Private Const BufferCapacity As Long = 16
 
 Private Type Bucket
     TablePtr    As Long
@@ -134,7 +134,7 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitBuffers()
-    ReDim mBuffers(0 To DefaultBufferSize - 1)
+    ReDim mBuffers(0 To BufferCapacity - 1)
 
     Dim i As Long
     For i = 0 To UBound(mBuffers)
@@ -178,6 +178,6 @@ End Function
 
 Private Function BucketRelease(ByRef This As Bucket) As Long
     This.Buffer.pvData = vbNullPtr
-    This.Buffer.cbElements = 0
+    This.Buffer.cElements = 0
     This.Buffer.cLocks = 0
 End Function
