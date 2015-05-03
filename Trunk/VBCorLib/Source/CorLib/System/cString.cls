@@ -46,7 +46,7 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mStringUtils    As New StringUtils
+Private mStringUtils As New StringUtils
 
 
 ''
