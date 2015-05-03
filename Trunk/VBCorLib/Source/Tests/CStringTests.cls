@@ -115,6 +115,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "IndexOfAny_WithValue_ReturnsExpected"
             Test.Use "1", 0
             Test.Use "0", 9
+            Test.Use "675", 4
             Test.Use "ab5", 4
             Test.Use "abc", -1
             Test.Use NewChars("1"), 0
@@ -127,8 +128,30 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "0", 10, 19
             
         Case "LastIndexOfAny_WithValue_ReturnsExpected"
-            Test.Use "0", 9
-            Test.Use "1", 0
+            Test.Use "5", 9
+            Test.Use "1", 5
+            Test.Use "ab1", 5
+            Test.Use "6", -1
+            Test.Use NewChars("1"), 5
+            Test.Use NewChars("5"), 9
+            Test.Use NewChars("a", "b", "1"), 5
+            
+        Case "LastIndexOfAny_WithStartIndexAndCount_ReturnsExpected"
+            Test.Use "23", 7
+            Test.Use "34", 7
+            Test.Use "24", 6
+            Test.Use "4", 3
+            Test.Use "5", 4
+            Test.Use NewChars("2", "3"), 7
+            Test.Use NewChars("3", "4"), 7
+            Test.Use NewChars("4"), 3
+            Test.Use NewChars("5"), 4
+            
+        Case "LastIndexOfAny_WithStartIndex_ReturnsExpected"
+            Test.Use "54", 6, 4
+            Test.Use "14", 6, 5
+            Test.Use "2", 6, 6
+            Test.Use "3", 6, 2
             
     End Select
 End Sub
@@ -581,15 +604,69 @@ Public Sub IndexOfAny_WithStartIndexPlusCountGreaterThanLengthOfString_ThrowsArg
     AssertArgumentOutOfRangeException Err
 End Sub
 
+Public Sub IndexOfAny_WithEmptyStringAndNegativeStartIndex_ReturnsMinusOne()
+    Dim Actual As Long
+    
+    Actual = CString.IndexOfAny("", "a", -1)
+    
+    Assert.That Actual, Iz.EqualTo(-1)
+End Sub
+
+Public Sub IndexOfAny_WithEmptyStringAndNegativeCount_ReturnsMinusOne()
+    Dim Actual As Long
+    
+    Actual = CString.IndexOfAny("", "a", 0, -1)
+    
+    Assert.That Actual, Iz.EqualTo(-1)
+End Sub
+
 Public Sub LastIndexOfAny_WithValue_ReturnsExpected(ByRef OfAny As Variant, ByVal Expected As Long)
     Dim Actual As Long
     
-    Actual = CString.LastIndexOfAny("1234567890", OfAny)
+    Actual = CString.LastIndexOfAny("1234512345", OfAny)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub LastIndexOfAny_WithStartIndexAndCount_ReturnsExpected(ByVal Value As Variant, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CString.LastIndexOfAny("1234512345", Value, 7, 5)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub LastIndexOfAny_WithStartIndex_ReturnsExpected(ByRef OfAny As Variant, ByVal StartIndex As Long, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CString.LastIndexOfAny("1234512345", OfAny, StartIndex)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub LastIndexOfAny_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.LastIndexOfAny "a", "a", -1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub LastIndexOfAny_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.LastIndexOfAny "a", "a", 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub LastIndexOfAny_WithStartIndexPlusCountIsLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CString.LastIndexOfAny "a", "a", 0, 2
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
 
 
 Private Property Get WhiteSpaces() As String

@@ -148,6 +148,20 @@ Public Function GetOptionalStepRange(ByRef Index As Variant, ByRef Count As Vari
     End If
 End Function
 
+Public Function GetOptionalStepRangeReverse(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
+    If IsMissing(Index) Then
+        GetOptionalStepRangeReverse.Index = DefaultIndex
+        
+        If IsMissing(Count) Then
+            GetOptionalStepRangeReverse.Count = DefaultCount
+        Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), Environment.GetResourceString(IndexParameter))
+        End If
+    Else
+        GetOptionalStepRangeReverse.Index = CLng(Index)
+        GetOptionalStepRangeReverse.Count = GetOptionalLong(Count, GetOptionalStepRangeReverse.Index + 1)
+    End If
+End Function
 
 ''
 ' Assigns given values or default values, returning any error codes.

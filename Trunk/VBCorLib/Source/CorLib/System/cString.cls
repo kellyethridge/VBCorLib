@@ -47,9 +47,6 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private mStringUtils    As New StringUtils
-Private mString         As WordBuffer
-Private mTrimChars      As WordBuffer
-
 
 
 ''
@@ -359,6 +356,11 @@ End Function
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
 Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    If Len(s) = 0 Then
+        IndexOfAny = -1
+        Exit Function
+    End If
+    
     Dim Range As ListRange
     Range = GetOptionalStepRange(StartIndex, Count, 0, Len(s), Parameter_StartIndex)
     
@@ -369,41 +371,9 @@ Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional B
     If Range.Count < 0 Then _
         Error.NegativeNumber "Count"
     If Range.Index + Range.Count > Len(s) Then _
-        Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
     
-    Dim OfAnyChars() As Integer
-    OfAnyChars = AsChars(OfAny)
-    If SAPtr(OfAnyChars) = vbNullPtr Then
-        FreeChars OfAnyChars
-        Error.ArgumentNull "OfAny", ArgumentNull_Array
-    End If
-    
-    Dim Chars() As Integer
-    Chars = AllocChars(s)
-        
-    Dim i       As Long
-    Dim OfAnyLB As Long
-    Dim OfAnyUB As Long
-    
-    OfAnyLB = LBound(OfAnyChars)
-    OfAnyUB = UBound(OfAnyChars)
-    For i = Range.Index To Range.Index + Range.Count - 1
-        Dim Ch As Integer
-        Ch = Chars(i)
-        Dim j As Long
-        For j = OfAnyLB To OfAnyUB
-            If Ch = OfAnyChars(j) Then
-                IndexOfAny = i
-                GoTo Finally
-            End If
-        Next
-    Next
-    
-    IndexOfAny = -1
-    
-Finally:
-    FreeChars OfAnyChars
-    FreeChars Chars
+    IndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index + Range.Count - 1, 1)
 End Function
 
 ''
@@ -418,10 +388,24 @@ End Function
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
 Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    LastIndexOfAny = InternalIndexOfAny(s, OfAny, StartIndex, Count, False)
+    If Len(s) = 0 Then
+        LastIndexOfAny = -1
+        Exit Function
+    End If
 
-
+    Dim Range As ListRange
+    Range = GetOptionalStepRangeReverse(StartIndex, Count, Len(s) - 1, Len(s), Parameter_StartIndex)
+    
+    If Range.Index < 0 Then _
+        Error.NegativeNumber "StartIndex"
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index - Range.Count + 1 < 0 Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
+    
+    LastIndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
 End Function
+
 
 ''
 ' Inserts a string into an existing string, returning the result.
@@ -481,62 +465,41 @@ Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As S
     FormatCore = StringBuilderCache.GetStringAndRelease(Output)
 End Function
 
-Private Function InternalIndexOfAny(ByRef s As String, ByRef OfAny As Variant, ByRef Index As Variant, ByRef Count As Variant, ByVal ForwardSearch As Boolean) As Long
-    mString.SA.pvData = StrPtr(s)
-    mString.SA.cElements = Len(s)
-    
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
-    If ForwardSearch Then
-        Result = GetOptionalArrayRange(VarPtr(mString.SA), Index, ElemIndex, Count, ElemCount)
-    Else
-        Result = GetOptionalArrayRangeReverse(VarPtr(mString.SA), Index, ElemIndex, Count, ElemCount)
-    End If
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "s", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
 
+Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Step As Long) As Long
+    Dim OfAnyChars() As Integer
+    OfAnyChars = AsChars(OfAny)
+    If SAPtr(OfAnyChars) = vbNullPtr Then
+        FreeChars OfAnyChars
+        Error.ArgumentNull "OfAny", ArgumentNull_Array
+    End If
+    
     Dim Chars() As Integer
-    Select Case VarType(OfAny)
-        Case vbString
-            mTrimChars.SA.pvData = StrPtr(OfAny)
-            mTrimChars.SA.cElements = Len(OfAny)
-            SAPtr(Chars) = VarPtr(mTrimChars.SA)
-            
-        Case vbIntegerArray
-            SAPtr(Chars) = GetArrayPointer(OfAny, True)
-
-        Case Else
-            Throw Cor.NewArgumentException("A String or Integer Array is required.", "OfAny")
-    End Select
-
-    If ForwardSearch Then
-        InternalIndexOfAny = FindIndexOfAny(Chars, ElemIndex, ElemIndex + ElemCount - 1, 1)
-    Else
-        InternalIndexOfAny = FindIndexOfAny(Chars, ElemIndex, ElemIndex - ElemCount + 1, -1)
-    End If
-
-    SAPtr(Chars) = 0
-End Function
-
-Private Function FindIndexOfAny(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Direction As Long) As Long
-    Dim lb As Long
-    lb = LBound(Chars)
+    Chars = AllocChars(s)
+        
+    Dim i       As Long
+    Dim OfAnyLB As Long
+    Dim OfAnyUB As Long
     
-    Dim ub As Long
-    ub = UBound(Chars)
-    
-    Dim i As Long
-    For i = StartIndex To EndIndex Step Direction
+    OfAnyLB = LBound(OfAnyChars)
+    OfAnyUB = UBound(OfAnyChars)
+    For i = StartIndex To EndIndex Step Step
+        Dim Ch As Integer
+        Ch = Chars(i)
         Dim j As Long
-        For j = lb To ub
-            If mString.Data(i) = Chars(j) Then
-                FindIndexOfAny = i
-                Exit Function
+        For j = OfAnyLB To OfAnyUB
+            If Ch = OfAnyChars(j) Then
+                IndexOfAnyCore = i
+                GoTo Finally
             End If
-        Next j
-    Next i
+        Next
+    Next
     
-    FindIndexOfAny = -1
+    IndexOfAnyCore = -1
+    
+Finally:
+    FreeChars OfAnyChars
+    FreeChars Chars
 End Function
 
 Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
@@ -766,12 +729,4 @@ NonEnumerable:
     Error.Argument Argument_NotEnumerable, "Value"
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    InitWordBuffer mString, 0, 0
-    InitWordBuffer mTrimChars, 0, 0
-End Sub
 
