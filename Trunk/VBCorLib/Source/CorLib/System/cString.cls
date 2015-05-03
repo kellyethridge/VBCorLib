@@ -353,13 +353,53 @@ End Function
 '
 ' @param s The string to be searched.
 ' @param OfAny The set of characters to search for (String or Integer() Array).
-' @param Index The starting index of <i>s</i> to begin searching.
+' @param StartIndex The starting index of <i>s</i> to begin searching.
 ' @param Count The number of characters in <i>s</i> to search.
 ' @return The index of a character from the set, or -1 if none are found.
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
-Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByVal Index As Variant, Optional ByVal Count As Variant) As Long
-    IndexOfAny = InternalIndexOfAny(s, OfAny, Index, Count, True)
+Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    Dim Range As ListRange
+    
+    Range = GetOptionalStepRange(StartIndex, Count, 0, Len(s), Parameter_StartIndex)
+    
+    If Range.Index < 0 Then _
+        Error.NegativeNumber "StartIndex"
+    If Range.Index > Len(s) Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count > Len(s) Then _
+        Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
+    
+    Dim Chars()         As Integer
+    Dim OfAnyChars()    As Integer
+    OfAnyChars = AsChars(OfAny)
+    Chars = AllocChars(s)
+        
+    Dim i As Long
+    Dim OfAnyLB As Long
+    Dim OfAnyUB As Long
+    
+    OfAnyLB = LBound(OfAnyChars)
+    OfAnyUB = UBound(OfAnyChars)
+    For i = Range.Index To Range.Index + Range.Count - 1
+        Dim Ch As Integer
+        Ch = Chars(i)
+        Dim j As Long
+        For j = OfAnyLB To OfAnyUB
+            If Ch = OfAnyChars(j) Then
+                IndexOfAny = i
+                GoTo Finally
+            End If
+        Next
+    Next
+    
+    IndexOfAny = -1
+    
+Finally:
+    FreeChars OfAnyChars
+    FreeChars Chars
 End Function
 
 ''
@@ -373,7 +413,7 @@ End Function
 ' @return The index of a character from the set, or -1 if none are found.
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
-Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByVal Index As Variant, Optional ByVal Count As Variant) As Long
+Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     LastIndexOfAny = InternalIndexOfAny(s, OfAny, Index, Count, False)
 End Function
 

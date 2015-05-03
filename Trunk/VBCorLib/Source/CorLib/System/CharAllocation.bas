@@ -106,7 +106,7 @@ Public Function AsChars(ByRef v As Variant) As Integer()
             SAPtr(AsChars) = ArrayPointer(v)
             
         Case Else
-            Debug.Assert False
+            Error.Argument Argument_CharArrayRequired
             
     End Select
 End Function
