@@ -126,6 +126,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1", 1, 10
             Test.Use "0", 10, 19
             
+        Case "LastIndexOfAny_WithValue_ReturnsExpected"
+            Test.Use "0", 9
+            Test.Use "1", 0
+            
     End Select
 End Sub
 
@@ -577,7 +581,13 @@ Public Sub IndexOfAny_WithStartIndexPlusCountGreaterThanLengthOfString_ThrowsArg
     AssertArgumentOutOfRangeException Err
 End Sub
 
-
+Public Sub LastIndexOfAny_WithValue_ReturnsExpected(ByRef OfAny As Variant, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CString.LastIndexOfAny("1234567890", OfAny)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 

@@ -360,7 +360,6 @@ End Function
 '
 Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
-    
     Range = GetOptionalStepRange(StartIndex, Count, 0, Len(s), Parameter_StartIndex)
     
     If Range.Index < 0 Then _
@@ -372,12 +371,17 @@ Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional B
     If Range.Index + Range.Count > Len(s) Then _
         Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
     
-    Dim Chars()         As Integer
-    Dim OfAnyChars()    As Integer
+    Dim OfAnyChars() As Integer
     OfAnyChars = AsChars(OfAny)
+    If SAPtr(OfAnyChars) = vbNullPtr Then
+        FreeChars OfAnyChars
+        Error.ArgumentNull "OfAny", ArgumentNull_Array
+    End If
+    
+    Dim Chars() As Integer
     Chars = AllocChars(s)
         
-    Dim i As Long
+    Dim i       As Long
     Dim OfAnyLB As Long
     Dim OfAnyUB As Long
     
@@ -408,13 +412,15 @@ End Function
 '
 ' @param s The string to be searched.
 ' @param OfAny The set of characters to search for (String or Integer() Array).
-' @param Index The starting index of <i>s</i> to begin searching.
+' @param StartIndex The starting index of <i>s</i> to begin searching.
 ' @param Count The number of characters in <i>s</i> to search.
 ' @return The index of a character from the set, or -1 if none are found.
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
-Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    LastIndexOfAny = InternalIndexOfAny(s, OfAny, Index, Count, False)
+Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    LastIndexOfAny = InternalIndexOfAny(s, OfAny, StartIndex, Count, False)
+
+
 End Function
 
 ''
