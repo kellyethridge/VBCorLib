@@ -100,11 +100,7 @@ Private Function SZCompareIntegers(ByRef X As Integer, ByRef Y As Integer) As Lo
 End Function
 
 Private Function SZCompareStrings(ByRef X As String, ByRef Y As String) As Long
-    If X > Y Then
-        SZCompareStrings = 1
-    ElseIf X < Y Then
-        SZCompareStrings = -1
-    End If
+    SZCompareStrings = StrComp(X, Y, vbBinaryCompare)
 End Function
 
 Private Function SZCompareDoubles(ByRef X As Double, ByRef Y As Double) As Long
