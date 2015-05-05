@@ -56,20 +56,8 @@ Private Type GuidSafeArray1d
     SA      As SafeArray1d
 End Type
 
-Private mIndexOfDelegator       As FunctionDelegator
-Private mIndexOfComparer        As ITwoArgReturnBool 'ITwoRefReturnBool
-
-Private mAssignDelegator        As FunctionDelegator
-Private mAssigner               As ITwoArgReturnVoid
-
 Private mSortDelegator          As FunctionDelegator
 Private mSorter                 As ISortRoutine
-
-Private mFindDelegator          As FunctionDelegator
-Private mFinder                 As IOneArgReturnBool
-
-Private mForEachDelegator       As FunctionDelegator
-Private mForEach                As IOneArgReturnVoid
 
 Private CallbackSorter          As New CallbackSorter
 
@@ -173,11 +161,12 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
     Dim ElementPtr As Long
     ElementPtr = MemLong(ArrayPtr + PVDATA_OFFSET) + (ElementIndex - LBound(Arr)) * ElementSize
     
-    mFindDelegator.pfn = AddressOfPredicate
+    Dim Checker As Func_T_Boolean
+    Set Checker = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = 1 To ElementCount
-        If mFinder.Call(ElementPtr) = True Then
+        If Checker.Invoke(ByVal ElementPtr) Then
             FindIndex = ElementIndex + i - 1
             Exit Function
         End If
@@ -220,8 +209,8 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     Dim pElem As Long
     pElem = MemLong(pSafeArray + PVDATA_OFFSET)
     
-    
-    mFindDelegator.pfn = AddressOfPredicate
+    Dim Checker As Func_T_Boolean
+    Set Checker = NewDelegate(AddressOfPredicate)
     
     ' iterate each array element, passing the memory address
     ' to the user supplied AddressOf callback. This will appear
@@ -232,7 +221,7 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     
     ReDim MatchedIndexes(0 To 31)
     For i = LowerBound To LowerBound + Count - 1
-        If mFinder.Call(pElem) = True Then
+        If Checker.Invoke(ByVal pElem) Then
             If MatchCount > UBound(MatchedIndexes) Then
                 ReDim Preserve MatchedIndexes(0 To MatchCount * 2 - 1)
             End If
@@ -356,11 +345,13 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     
     Dim pElem As Long
     pElem = MemLong(pSafeArray + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
-    mFindDelegator.pfn = AddressOfPredicate
+    
+    Dim Checker As Func_T_Boolean
+    Set Checker = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = ElemCount To 1 Step -1
-        If mFinder.Call(pElem) = True Then
+        If Checker.Invoke(ByVal pElem) Then
             FindLastIndex = LBound(Arr) + i - 1
             Exit Function
         End If
@@ -386,7 +377,8 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
-    mFindDelegator.pfn = AddressOfPredicate
+    Dim Checker As Func_T_Boolean
+    Set Checker = NewDelegate(AddressOfPredicate)
     
     Dim pSafeArray As Long
     pSafeArray = ValidArrayPointer(Arr)
@@ -399,7 +391,10 @@ Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Lon
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        If mFinder.Call(pElem) = False Then Exit Function
+        If Not Checker.Invoke(ByVal pElem) Then
+            Exit Function
+        End If
+        
         pElem = pElem + ElemSize
     Next i
     TrueForAll = True
@@ -422,7 +417,8 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
-    mForEachDelegator.pfn = AddressOfAction
+    Dim Action As Action_T
+    Set Action = NewDelegate(AddressOfAction)
     
     Dim pSafeArray As Long
     pSafeArray = ValidArrayPointer(Arr)
@@ -435,7 +431,7 @@ Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        mForEach.Call pElem
+        Action.Invoke ByVal pElem
         pElem = pElem + ElemSize
     Next i
 End Sub
@@ -1176,11 +1172,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mIndexOfComparer = InitDelegator(mIndexOfDelegator)
-    Set mAssigner = InitDelegator(mAssignDelegator)
     Set mSorter = InitDelegator(mSortDelegator)
-    Set mFinder = InitDelegator(mFindDelegator)
-    Set mForEach = InitDelegator(mForEachDelegator)
 End Sub
 
 
@@ -1351,10 +1343,11 @@ Private Sub CopyWithCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal 
     Dim dst     As Long
     dst = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - dstLb) * dstSize
     
-    mAssignDelegator.pfn = pfn
+    Dim Assigner As Action_T_T
+    Set Assigner = NewDelegate(pfn)
     
     Do While Length > 0
-        mAssigner.Call dst, src
+        Assigner.Invoke ByVal dst, ByVal src
         src = src + srcSize
         dst = dst + dstSize
         Length = Length - 1
@@ -1499,7 +1492,8 @@ Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Lon
 End Sub
 
 Private Function SZIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal pfn As Long) As Long
-    mIndexOfDelegator.pfn = pfn
+    Dim Comparer As Func_T_T_Boolean
+    Set Comparer = NewDelegate(pfn)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSA)
@@ -1509,7 +1503,7 @@ Private Function SZIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal Index 
     
     Index = Index - SafeArrayGetLBound(pSA, 1)
     Do While Count > 0
-        If mIndexOfComparer.Call(pvData + Index * ElemSize, pValue) Then
+        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
             SZIndexOf = Index + SafeArrayGetLBound(pSA, 1)
             Exit Function
         End If
@@ -1521,7 +1515,8 @@ Private Function SZIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal Index 
 End Function
 
 Private Function SZLastIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal pfn As Long) As Long
-    mIndexOfDelegator.pfn = pfn
+    Dim Comparer As Func_T_T_Boolean
+    Set Comparer = NewDelegate(pfn)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSA)
@@ -1531,7 +1526,7 @@ Private Function SZLastIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal In
     
     Index = Index - SafeArrayGetLBound(pSA, 1)
     Do While Count > 0
-        If mIndexOfComparer.Call(pvData + Index * ElemSize, pValue) Then
+        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
             SZLastIndexOf = Index + SafeArrayGetLBound(pSA, 1)
             Exit Function
         End If
