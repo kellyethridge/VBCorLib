@@ -332,12 +332,58 @@ library VBCorType {
 		void UAdd64([in] long * xh, [in] long * xl, [in] long yh, [in] long yl);
 	}
 
+	[uuid(083FA053-ADAB-46c4-83EA-C82DD8786DF1), odl]
+	interface Action_T : IUnknown
+	{
+		void Invoke([in] void * Arg);
+	}
+
+	[uuid(CE820967-75F9-42bf-88AF-FE522EA86F86), odl]
+	interface Action_T_T : IUnknown
+	{
+		void Invoke([in] void * Arg1, [in] void * Arg2);
+	}
+
+	[uuid(DCFEECAA-05A6-42fe-8EED-2496D046E138), odl]
+	interface Action_T_T_T : IUnknown
+	{
+		void Invoke([in] void * Arg1, [in] void * Arg2, [in] void * Arg3);
+	}
+
+	[uuid(AF710B54-E600-433d-AD3D-38A165A10721), odl]
+	interface Func_T_Long : IUnknown
+	{
+		long Invoke([in] void * Arg);
+	}
+
+	[uuid(3D2E19E1-FC9B-4e73-ABD2-9FC6CDFB2C25), odl]
+	interface Func_T_T_Long : IUnknown
+	{
+		long Invoke([in] void * Arg1, [in] void * Arg2);
+	}
+
+	[uuid(330EAE0B-41FF-496b-951A-B985F2BEF9DC), odl]
+	interface Func_T_Boolean : IUnknown
+	{
+		boolean Invoke([in] void * Arg);
+	}
+
+	[uuid(CF0FC6BD-E0A1-4b75-949F-5D57F5F3655E), odl]
+	interface Func_T_T_Boolean : IUnknown
+	{
+		boolean Invoke([in] void * Arg1, [in] void * Arg2);
+	}
+
+
+
+
+
 	[
 		uuid(DECA6F21-BD22-4303-BC15-E45636505044), odl
 	]
 	interface IOneArgReturnBool : IUnknown
 	{
-		boolean Call([in] long Arg);
+		boolean Call([in] long Arg);  // obsolete
 	}
 
 	[
@@ -345,7 +391,7 @@ library VBCorType {
 	]
 	interface IOneArgReturnVoid : IUnknown
 	{
-		void Call([in] long lpArg);
+		void Call([in] long lpArg); // obsolete
 	}
 
 	[
@@ -353,7 +399,7 @@ library VBCorType {
 	]
 	interface IOneRefReturnLong : IUnknown
 	{
-		long Call([in] void * Arg);
+		long Call([in] void * Arg); // obsolete
 	}
 
 	[
@@ -377,7 +423,7 @@ library VBCorType {
 	]
 	interface ITwoArgReturnLong : IUnknown
 	{
-		long Call([in] long x, [in] long y);
+		long Call([in] long x, [in] long y);    // obsolete
 	}
 
 	[
@@ -385,7 +431,7 @@ library VBCorType {
 	]
 	interface ITwoArgReturnVoid : IUnknown
 	{
-		void Call([in] long x, [in] long y);
+		void Call([in] long x, [in] long y); // Obsolete
 	}
 
 	[
@@ -393,7 +439,7 @@ library VBCorType {
 	]
 	interface ITwoRefReturnBool : IUnknown
 	{
-		boolean Call([in] void * x, [in] void * y);
+		boolean Call([in] void * x, [in] void * y);  // obsolete
 	}
 
 	[
@@ -401,7 +447,7 @@ library VBCorType {
 	]
 	interface ITwoRefReturnLong : IUnknown
 	{
-		long Call([in] void * x, [in] void * y);
+		long Call([in] void * x, [in] void * y);   // obsolete
 	}
 
 	[
@@ -409,7 +455,7 @@ library VBCorType {
 	]
 	interface ITwoArgReturnBool : IUnknown
 	{
-		boolean Call([in] long x, [in] long y);
+		boolean Call([in] long x, [in] long y);   // obsolete
 	}
 
 	//
