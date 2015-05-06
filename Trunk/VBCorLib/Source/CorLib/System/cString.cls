@@ -465,14 +465,11 @@ Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As S
     FormatCore = StringBuilderCache.GetStringAndRelease(Output)
 End Function
 
-
 Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Step As Long) As Long
     Dim OfAnyChars() As Integer
     OfAnyChars = AsChars(OfAny)
-    If SAPtr(OfAnyChars) = vbNullPtr Then
-        FreeChars OfAnyChars
+    If SAPtr(OfAnyChars) = vbNullPtr Then _
         Error.ArgumentNull "OfAny", ArgumentNull_Array
-    End If
     
     Dim Chars() As Integer
     Chars = AllocChars(s)
