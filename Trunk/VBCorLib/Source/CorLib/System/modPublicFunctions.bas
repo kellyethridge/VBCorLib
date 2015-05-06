@@ -155,7 +155,7 @@ End Function
 Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = DefaultAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As Stream
     Select Case VarType(Source)
         Case vbString
-            Set GetStream = Cor.NewFileStream(Source, Mode, Access, Share)
+            Set GetStream = Cor.NewFileStream(CStr(Source), Mode, Access, Share)
             
         Case vbByteArray
             Dim Bytes() As Byte

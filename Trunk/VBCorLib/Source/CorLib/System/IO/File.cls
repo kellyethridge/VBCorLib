@@ -102,17 +102,20 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
     SourceFileName = Path.GetFullPath(cString.TrimEnd(SourceFileName, mDirectorySeparators))
     DestinationFileName = Path.GetFullPath(cString.TrimEnd(DestinationFileName, mDirectorySeparators))
     
-    If StrComp(SourceFileName, DestinationFileName, vbTextCompare) = 0 Then Exit Sub
+    If cString.EqualsIgnoreCase(SourceFileName, DestinationFileName) Then
+        Exit Sub
+    End If
+    
     If Api.CopyFile(SourceFileName, DestinationFileName, Not OverWrite) = BOOL_FALSE Then
-        Dim e As Long
-        e = Err.LastDllError
-        If e <> ERROR_FILE_EXISTS Then
+        Dim DllError As Long
+        DllError = Err.LastDllError
+        If DllError <> ERROR_FILE_EXISTS Then
             If Not File.Exists(SourceFileName) Then _
                 IOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
                 Throw Cor.NewIOException(Environment.GetResourceString(IOException_DirectoryExists))
         End If
-        IOError e, SourceFileName
+        IOError DllError, SourceFileName
     End If
 End Sub
 
@@ -270,16 +273,18 @@ End Function
 ' @param SourceFileName The file to be moved.
 ' @param DestinationFileName The location and filename the file is to be moved to.
 '
-Public Sub Move(ByVal SourceFileName As String, ByVal DestinationFileName As String)
+Public Sub Move(ByRef SourceFileName As String, ByVal DestinationFileName As String)
+    If Len(SourceFileName) = 0 Then _
+        Error.Argument Argument_EmptyPath, "SourceFileName"
+    If Len(DestinationFileName) = 0 Then _
+        Error.Argument Argument_EmptyPath, "DestinationFileName"
+
     Call Path.VerifyPath(SourceFileName)
     Call Path.VerifyPath(DestinationFileName)
     
-    If Len(SourceFileName) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "SourceFileName")
-    If Len(DestinationFileName) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "DestinationFileName")
+    If Not File.Exists(SourceFileName) Then _
+        IOError ERROR_FILE_NOT_FOUND, SourceFileName
     
-    If Not File.Exists(SourceFileName) Then IOError ERROR_FILE_NOT_FOUND, SourceFileName
     If Api.MoveFile(SourceFileName, DestinationFileName) = BOOL_FALSE Then IOError Err.LastDllError, DestinationFileName
 End Sub
 
@@ -292,7 +297,7 @@ End Sub
 ' @param Share The access allowed for other processes.
 ' @return A FileStream object of the specified file.
 '
-Public Function OpenFile(ByVal Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = -1, Optional ByVal Share As FileShare = FileShare.None) As FileStream
+Public Function OpenFile(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = -1, Optional ByVal Share As FileShare = FileShare.None) As FileStream
     Set OpenFile = Cor.NewFileStream(Path, Mode, Access, Share)
 End Function
 
@@ -303,7 +308,7 @@ End Function
 ' @return A FileStream used to read from the file.
 ' @remarks The FileStream object is declared as Cor.NewFileStream(Path, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare).
 '
-Public Function OpenRead(ByVal Path As String) As FileStream
+Public Function OpenRead(ByRef Path As String) As FileStream
     Set OpenRead = Cor.NewFileStream(Path, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare)
 End Function
 
@@ -314,7 +319,7 @@ End Function
 ' @return A StreamReader used to read from the file with the default encoding (UTF8Encoding).
 ' @remarks The StreamReader is declared as Cor.NewStreamReader(Path).
 '
-Public Function OpenText(ByVal Path As String) As StreamReader
+Public Function OpenText(ByRef Path As String) As StreamReader
     Set OpenText = Cor.NewStreamReader(Path)
 End Function
 
@@ -325,25 +330,28 @@ End Function
 ' @return A FileStream object used to write to the specified file.
 ' @remarks The FileStream object is declared as Cor.NewFileStream(Path, FileMode.OpenOrCreate, FileAccess.WriteAccess, FileShare.None).
 '
-Public Function OpenWrite(ByVal Path As String) As FileStream
+Public Function OpenWrite(ByRef Path As String) As FileStream
     Set OpenWrite = Cor.NewFileStream(Path, FileMode.OpenOrCreate, FileAccess.WriteAccess, FileShare.None)
 End Function
 
 ''
 ' Sets the file attributes (ReadOnly, Hidden, ...)
 '
-' @param sPath The file to set the attributes of.
+' @param Path The file to set the attributes of.
 ' @param Attributes The new attributes to set the file to.
 ' @remarks In order to set a single attribute without unsetting an existing
 ' attributes, they will first need to be read from the file (GetAttributes), then
 ' bit manipulated to create the resulting set of desired attributes before setting.
 '
-Public Sub SetAttributes(ByVal sPath As String, ByVal Attributes As FileAttributes)
-    If Len(sPath) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
+Public Sub SetAttributes(ByRef Path As String, ByVal Attributes As FileAttributes)
+    If Len(Path) = 0 Then _
+        Error.Argument Argument_EmptyPath, "Path"
     
-    Call Path.VerifyPath(sPath)
-    If Api.SetFileAttributes(sPath, Attributes) = BOOL_FALSE Then IOError Err.LastDllError, sPath
+    Statics.Path.CheckValidPathAndFixSlashes Path
+    
+    If Api.SetFileAttributes(Path, Attributes) = BOOL_FALSE Then
+        IOError Err.LastDllError, Path
+    End If
 End Sub
 
 ''
@@ -496,12 +504,10 @@ End Function
 ' @Remarks If the file does not exist, it will be created. If the file already
 ' exists, it will be overwritten.
 '
-Public Sub WriteAllText(ByVal Path As String, ByVal Contents As String, Optional ByVal Encoding As Encoding)
-    Dim sw As StreamWriter
-    
-    Set sw = Cor.NewStreamWriter(Path, Encoding)
-    Call sw.WriteValue(Contents)
-    Call sw.CloseWriter
+Public Sub WriteAllText(ByRef Path As String, ByVal Contents As String, Optional ByVal Encoding As Encoding)
+    With Cor.NewStreamWriter(Path, Encoding:=Encoding)
+        .WriteValue Contents
+    End With
 End Sub
 
 ''
@@ -512,14 +518,13 @@ End Sub
 ' @remarks If the file doesn't exist it will be created. If the file already
 ' exists, it will be overwritten.
 '
-Public Sub WriteAllbytes(ByVal Path As String, ByRef Bytes() As Byte)
+Public Sub WriteAllbytes(ByRef Path As String, ByRef Bytes() As Byte)
     If cArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     
-    Dim fs As FileStream
-    Set fs = Cor.NewFileStream(Path, FileMode.Create)
-    Call fs.WriteBlock(Bytes, LBound(Bytes), cArray.GetLength(Bytes))
-    Call fs.CloseStream
+    With Cor.NewFileStream(Path, FileMode.Create)
+        .WriteBlock Bytes, LBound(Bytes), cArray.GetLength(Bytes)
+    End With
 End Sub
 
 ''
@@ -532,7 +537,7 @@ End Sub
 ' exists, it will be overwritten.
 '
 Public Sub WriteAllLines(ByVal Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
-    With Cor.NewStreamWriter(Path, Encoding)
+    With Cor.NewStreamWriter(Path, Encoding:=Encoding)
         Dim Line As Variant
         
         For Each Line In Contents

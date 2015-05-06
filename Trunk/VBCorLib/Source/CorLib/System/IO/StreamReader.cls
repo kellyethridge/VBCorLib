@@ -387,7 +387,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal deter
             Set mStream = Source
         
         Case vbString
-            Set mStream = Cor.NewFileStream(Source, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare)
+            Set mStream = Cor.NewFileStream(CStr(Source), FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare)
         
         Case Else
             Error.Argument Argument_InvalidStreamSource, "Source"

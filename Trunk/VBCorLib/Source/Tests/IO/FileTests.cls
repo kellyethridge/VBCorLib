@@ -170,6 +170,15 @@ Public Sub Copy_WithDestinationNameAsFolder_ThrowsIOException()
     AssertIOException Err
 End Sub
 
+Public Sub Copy_WithSourceAndDestinationAsSameFile_DoesNothing()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="abc")
+    
+    File.Copy FileName, FileName
+    
+    Assert.That Helper.ReadFile(FileName), Iz.EqualTo("abc")
+End Sub
+
 Public Sub CreationTime_WhenCalled_SetsAndReturnsNewTime()
     Dim FileName As String
     FileName = mBuilder.CreateFile
@@ -332,10 +341,73 @@ Public Sub WriteAllLines_WithLines_WritesToFile(ByVal Contents As Variant)
     Assert.That Actual, Iz.EqualTo(Contents).AsCollection
 End Sub
 
+Public Sub WriteAllText_WithExistingFile_OverwritesFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="abc")
+    
+    File.WriteAllText FileName, "Hello"
+    
+    Dim Actual As String
+    Actual = File.ReadAllText(FileName)
+    Assert.That Actual, Iz.EqualTo("Hello")
+End Sub
 
+Public Sub WriteAllText_WithNonExistingFile_CreatesNewFile()
+    Dim FileName As String
+    FileName = Path.Combine(mBuilder.TempFolder, "MyFile.txt")
+    
+    File.WriteAllText FileName, "Hello world"
+    
+    Dim Actual As String
+    Actual = File.ReadAllText(FileName)
+    Assert.That Actual, Iz.EqualTo("Hello world")
+End Sub
 
+Public Sub Attributes_WhenSet_AreSetToFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="abc")
+    
+    File.SetAttributes FileName, FileAttributes.Hidden
+    
+    Dim Actual As FileAttributes
+    Actual = File.GetAttributes(FileName)
+    Assert.That Actual, Iz.EqualTo(FileAttributes.Hidden)
+End Sub
 
+Public Sub Move_WithNonExistingDestination_MovesSourceToDest()
+    Dim SourceFileName As String
+    Dim DestinationFileName As String
+    SourceFileName = mBuilder.CreateFile(Data:="abc")
+    DestinationFileName = Path.Combine(mBuilder.TempFolder, "File2.txt")
+    
+    File.Move SourceFileName, DestinationFileName
+    
+    Dim Actual As String
+    Actual = File.ReadAllText(DestinationFileName)
+    Assert.That Actual, Iz.EqualTo("abc")
+    Assert.That File.Exists(SourceFileName), Iz.False
+End Sub
 
+Public Sub Move_WithSameSourceAndDestination_DoesNothing()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile(Data:="abc")
+    
+    File.Move FileName, FileName
+    
+    Assert.That File.Exists(FileName), Iz.True
+End Sub
+
+Public Sub Move_WithExistingDestination_ThrowsIOException()
+    Dim SourceFileName As String
+    Dim DestinationFileName As String
+    SourceFileName = mBuilder.CreateFile(Data:="abc")
+    DestinationFileName = mBuilder.CreateFile(FileName:="File2.txt", Data:="def")
+    
+    On Error Resume Next
+    File.Move SourceFileName, DestinationFileName
+    
+    AssertIOException Err
+End Sub
 
 
 

@@ -256,7 +256,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Source As Variant, ByVal Append As Boolean, ByVal Encoding As Encoding, ByVal BufferSize As Long)
+Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding As Encoding, ByVal BufferSize As Long)
     Dim EmitBOM As Boolean
     
     If BufferSize < 0 Then _
@@ -281,7 +281,7 @@ Friend Sub Init(ByVal Source As Variant, ByVal Append As Boolean, ByVal Encoding
                 EmitBOM = True
             End If
             
-            Set mStream = Cor.NewFileStream(Source, Mode, FileAccess.WriteAccess, FileShare.ReadShare)
+            Set mStream = Cor.NewFileStream(CStr(Source), Mode, FileAccess.WriteAccess, FileShare.ReadShare)
         
         Case Else
             Error.Argument Argument_InvalidStreamSource, "Source"
