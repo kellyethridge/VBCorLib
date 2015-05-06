@@ -845,7 +845,7 @@ End Function
 ' @param arr The array to test for initialization.
 ' @return Value indicating if the array is initialized.
 Public Function IsNull(ByRef Arr As Variant) As Boolean
-    IsNull = IsNullArray(Arr)
+    IsNull = ArrayPointer(Arr) = vbNullPtr
 End Function
 
 ''

@@ -837,7 +837,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
+Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
     Path = cString.Trim(Path)
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
