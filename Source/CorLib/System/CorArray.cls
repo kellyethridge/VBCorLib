@@ -161,12 +161,12 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
     Dim ElementPtr As Long
     ElementPtr = MemLong(ArrayPtr + PVDATA_OFFSET) + (ElementIndex - LBound(Arr)) * ElementSize
     
-    Dim Checker As Func_T_Boolean
-    Set Checker = NewDelegate(AddressOfPredicate)
+    Dim Predicate As Func_T_Boolean
+    Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = 1 To ElementCount
-        If Checker.Invoke(ByVal ElementPtr) Then
+        If Predicate.Invoke(ByVal ElementPtr) Then
             FindIndex = ElementIndex + i - 1
             Exit Function
         End If
@@ -209,8 +209,8 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     Dim pElem As Long
     pElem = MemLong(pSafeArray + PVDATA_OFFSET)
     
-    Dim Checker As Func_T_Boolean
-    Set Checker = NewDelegate(AddressOfPredicate)
+    Dim Predicate As Func_T_Boolean
+    Set Predicate = NewDelegate(AddressOfPredicate)
     
     ' iterate each array element, passing the memory address
     ' to the user supplied AddressOf callback. This will appear
@@ -221,7 +221,7 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     
     ReDim MatchedIndexes(0 To 31)
     For i = LowerBound To LowerBound + Count - 1
-        If Checker.Invoke(ByVal pElem) Then
+        If Predicate.Invoke(ByVal pElem) Then
             If MatchCount > UBound(MatchedIndexes) Then
                 ReDim Preserve MatchedIndexes(0 To MatchCount * 2 - 1)
             End If
@@ -346,12 +346,12 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     Dim pElem As Long
     pElem = MemLong(pSafeArray + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
     
-    Dim Checker As Func_T_Boolean
-    Set Checker = NewDelegate(AddressOfPredicate)
+    Dim Predicate As Func_T_Boolean
+    Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = ElemCount To 1 Step -1
-        If Checker.Invoke(ByVal pElem) Then
+        If Predicate.Invoke(ByVal pElem) Then
             FindLastIndex = LBound(Arr) + i - 1
             Exit Function
         End If
@@ -377,8 +377,8 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
-    Dim Checker As Func_T_Boolean
-    Set Checker = NewDelegate(AddressOfPredicate)
+    Dim Predicate As Func_T_Boolean
+    Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim pSafeArray As Long
     pSafeArray = ValidArrayPointer(Arr)
@@ -391,7 +391,7 @@ Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Lon
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        If Not Checker.Invoke(ByVal pElem) Then
+        If Not Predicate.Invoke(ByVal pElem) Then
             Exit Function
         End If
         
@@ -597,9 +597,9 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     Dim pDestinationSafeArray As Long
     pDestinationSafeArray = ArrayPointer(DestinationArray)
     Dim SourceLength As Long
-    SourceLength = InternalGetLength(pSourceSafeArray, 0)
+    SourceLength = LengthCore(pSourceSafeArray, 0)
     Dim DestinationLength As Long
-    DestinationLength = InternalGetLength(pDestinationSafeArray, 0)
+    DestinationLength = LengthCore(pDestinationSafeArray, 0)
     
     If pSourceSafeArray = vbNullPtr Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
@@ -720,16 +720,16 @@ End Function
 ' @param dimension (Optional) the specific dimension to get the number of elements.
 ' @return The number of elements in the specified dimension or the entire array.
 '
-Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long = 0) As Long
+Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
     Dim SafeArrayPtr  As Long
     SafeArrayPtr = ArrayPointer(Arr)
     If SafeArrayPtr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    GetLength = InternalGetLength(SafeArrayPtr, Dimension)
+    GetLength = LengthCore(SafeArrayPtr, Dimension)
 End Function
 
-Private Function InternalGetLength(ByVal SafeArrayPtr As Long, ByVal Dimension As Long) As Long
+Friend Function LengthCore(ByVal SafeArrayPtr As Long, Optional ByVal Dimension As Long) As Long
     Dim Rank As Long
     Rank = SafeArrayGetDim(SafeArrayPtr)
     If Dimension > Rank Then _
@@ -741,12 +741,12 @@ Private Function InternalGetLength(ByVal SafeArrayPtr As Long, ByVal Dimension A
     If Dimension < 1 Then
         ' optimize for 99% of calls
         If Rank = 1 Then
-            InternalGetLength = MemLong(ArrayBoundPtr)
+            LengthCore = MemLong(ArrayBoundPtr)
         Else
-            InternalGetLength = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
+            LengthCore = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
         End If
     Else
-        InternalGetLength = GetDimensionSize(ArrayBoundPtr, Rank, Dimension)
+        LengthCore = GetDimensionSize(ArrayBoundPtr, Rank, Dimension)
     End If
 End Function
 
@@ -767,8 +767,8 @@ Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Lon
     GetDimensionSize = MemLong(ArrayBoundPtr)
 End Function
 
-Friend Function OneDimLength(ByRef Arr As Variant) As Long
-    OneDimLength = UBound(Arr) - LBound(Arr) + 1
+Friend Function LengthFirstDim(ByRef Arr As Variant) As Long
+    LengthFirstDim = UBound(Arr) - LBound(Arr) + 1
 End Function
 
 ''
@@ -804,7 +804,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         Error.Rank
     
     Dim Range As ListRange
-    Range = GetOptionalStepRange(StartIndex, Count, LBound(Arr), OneDimLength(Arr), Parameter_StartIndex)
+    Range = GetOptionalStepRange(StartIndex, Count, LBound(Arr), LengthFirstDim(Arr), Parameter_StartIndex)
     
     If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds
@@ -816,12 +816,9 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         Exit Function
     End If
     
-    Dim Comparer As IComparer
-    Set Comparer = Statics.Comparer.Default
-    
     Dim i As Long
     For i = Range.Index To Range.Index + Range.Count - 1
-        If Comparer.Compare(Arr(i), Value) = 0 Then
+        If Object.Equals(Arr(i), Value) Then
             IndexOf = i
             Exit Function
         End If
@@ -1174,7 +1171,7 @@ Friend Function ArrayPointer(ByRef Arg As Variant) As Long
     If (ArgType And vbArray) = 0 Then _
         Error.Argument Argument_ArrayRequired
     
-    ArrayPointer = MemLong(vbaVarRefAry(Arg))
+    ArrayPointer = MemLong(VB6.vbaRefVarAry(Arg))
     
     ' HACK HACK HACK
     '

@@ -1,4 +1,4 @@
-Attribute VB_Name = "cArrayCallbacks"
+Attribute VB_Name = "CorArrayCallbacks"
 '
 ' CorArrayCallbacks
 '
