@@ -727,5 +727,10 @@ library VBCorType {
 	module psapi {
 		[entry("GetProcessMemoryInfo"), usesgetlasterror] long GetProcessMemoryInfo([in] long Process, [in] PROCESS_MEMORY_COUNTERS * ppsmemCounters, [in] long cb);
 	}
+	
+	[dllname("msvbvm60.dll")]
+	module VB6 {
+		[entry("__vbaRefVarAry")] long vbaRefVarAry([in] VARIANT * ArrayToDeref);
+	}
 }
 

@@ -106,11 +106,11 @@ End Function
 ''
 ' Checks the equality of the two values.
 '
-' @param ObjA The object to compare the value against.
-' @param ObjB The value to compare against the object.
+' @param ObjA The first value to compare with.
+' @param ObjB The second value to compare.
 ' @return Returns True if the value and the object are the same instance, False otherwise.
 '
-Public Function Equals(ByRef ObjA As Object, ByRef ObjB As Variant) As Boolean
+Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
     Equals = EqualVariants(ObjA, ObjB)
 End Function
 
