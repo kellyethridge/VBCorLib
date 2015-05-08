@@ -114,7 +114,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
         Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(DstArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If cArray.GetRank(DstArray) <> 1 Then _
+    If cArray.Rank(DstArray) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     
     Select Case VarType(DstArray)

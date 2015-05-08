@@ -554,8 +554,6 @@ End Sub
 ' @param SourceArray The array from which to copy the elements.
 ' @param DestinationArray The array in which to place the elements.
 ' @param Count The number of elements to copy.
-' @param AddressOfCopier A callback address to a method used to assign
-' elements from the source array to the destination array.
 ' @remarks The AddressOfCopier method signature must be two parameters
 ' of ByRef for the datatypes of each of the arrays. The destination
 ' array element is the first parameter.
@@ -565,13 +563,13 @@ End Sub
 '     dst = src.Name
 ' End Sub
 ' </pre>
-Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long, Optional ByVal AddressOfCopier As Long)
+Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
     If IsNullArray(SourceArray) Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
     If IsNullArray(DestinationArray) Then _
         Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     
-    CopyEx SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length, AddressOfCopier
+    CopyEx SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length
 End Sub
 
 ''
@@ -593,7 +591,7 @@ End Sub
 '     dst = src.Name
 ' End Sub
 ' </pre>
-Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long, Optional ByVal AddressOfCopier As Long = 0)
+Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
     Dim pSourceSafeArray As Long
     pSourceSafeArray = ArrayPointer(SourceArray)
     Dim pDestinationSafeArray As Long
@@ -624,44 +622,40 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     Dim DestinationArrayType As VbVarType
     DestinationArrayType = VarType(DestinationArray) And &HFF   ' knock off the vbArray bit.
     
-    If AddressOfCopier = 0 Then
-        If SourceArrayType = DestinationArrayType Then
-            Select Case SourceArrayType
-                Case vbObject, vbDataObject
-                    If IsEqualGUID(ByVal pSourceSafeArray - SizeOfGuid, ByVal pDestinationSafeArray - SizeOfGuid) <> BOOL_FALSE Then
-                        CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
-                    Else
-                        CopyObjectTypesCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
-                    End If
-                    
-                Case vbString, vbVariant
+    If SourceArrayType = DestinationArrayType Then
+        Select Case SourceArrayType
+            Case vbObject, vbDataObject
+                If IsEqualGUID(ByVal pSourceSafeArray - SizeOfGuid, ByVal pDestinationSafeArray - SizeOfGuid) <> BOOL_FALSE Then
                     CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
+                Else
+                    CopyObjectTypesCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
+                End If
+                
+            Case vbString, vbVariant
+                CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
+                
+            Case vbUserDefinedType
+                Dim SrcUDT As IRecordInfo
+                Dim DstUDT As IRecordInfo
+                
+                Set SrcUDT = SafeArrayGetRecordInfo(pSourceSafeArray)
+                Set DstUDT = SafeArrayGetRecordInfo(pDestinationSafeArray)
+                
+                If SrcUDT.IsMatchingType(DstUDT) = BOOL_FALSE Then _
+                    Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
                     
-                Case vbUserDefinedType
-                    Dim SrcUDT As IRecordInfo
-                    Dim DstUDT As IRecordInfo
-                    
-                    Set SrcUDT = SafeArrayGetRecordInfo(pSourceSafeArray)
-                    Set DstUDT = SafeArrayGetRecordInfo(pDestinationSafeArray)
-                    
-                    If SrcUDT.IsMatchingType(DstUDT) = BOOL_FALSE Then _
-                        Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
-                        
-                    CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
-                    
-                Case Else
-                    CopyValueTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
-            End Select
-        Else
-            Dim Assigner As Long
-            Assigner = GetAssigningFunction(SourceArrayType, DestinationArrayType)
-            If Assigner = vbNullPtr Then _
-                Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
-            
-            CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, Assigner
-        End If
+                CopyReferenceTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
+                
+            Case Else
+                CopyValueTypes pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length
+        End Select
     Else
-        CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, AddressOfCopier
+        Dim Assigner As Long
+        Assigner = GetAssigningFunction(SourceArrayType, DestinationArrayType)
+        If Assigner = vbNullPtr Then _
+            Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
+        
+        CopyWithCast pSourceSafeArray, SourceIndex, pDestinationSafeArray, DestinationIndex, Length, Assigner
     End If
 End Sub
 
@@ -773,18 +767,22 @@ Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Lon
     GetDimensionSize = MemLong(ArrayBoundPtr)
 End Function
 
+Friend Function OneDimLength(ByRef Arr As Variant) As Long
+    OneDimLength = UBound(Arr) - LBound(Arr) + 1
+End Function
+
 ''
 ' Returns the number of dimensions in the array.
 '
-' @param arr The array to retrieve the number of dimensions from.
+' @param Arr The array to retrieve the number of dimensions from.
 ' @return The number of dimension in the array.
-Public Function GetRank(ByRef Arr As Variant) As Long
-    Dim pSafeArray  As Long
-    pSafeArray = GetArrayPointer(Arr)
-    If pSafeArray = vbNullPtr Then _
+Public Function Rank(ByRef Arr As Variant) As Long
+    Dim ArrayPtr As Long
+    ArrayPtr = ArrayPointer(Arr)
+    If ArrayPtr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    GetRank = SafeArrayGetDim(pSafeArray)
+    Rank = SafeArrayGetDim(ArrayPtr)
 End Function
 
 ''
@@ -800,37 +798,34 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Dim ArrayPtr As Long
     ArrayPtr = ArrayPointer(Arr)
     
-    If IsNullArrayPtr(ArrayPtr) Then _
+    If ArrayPtr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
-    If IsMultiDimArrayPtr(ArrayPtr) Then _
+    If SafeArrayGetDim(ArrayPtr) > 1 Then _
         Error.Rank
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    ElemIndex = IfLong(StartIndex, LBound(Arr))
-    ElemCount = IfLong(Count, UBound(Arr) - ElemIndex + 1)
-
-    If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds
-    If ElemCount < 0 Or ElemIndex + ElemCount - 1 > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
+    Dim Range As ListRange
+    Range = GetOptionalStepRange(StartIndex, Count, LBound(Arr), OneDimLength(Arr), Parameter_StartIndex)
     
+    If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds
+    If Range.Count < 0 Or Range.Index + Range.Count - 1 > UBound(Arr) Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
+        
     On Error GoTo errTrap
-    If TrySZIndexOf(ArrayPtr, Value, ElemIndex, ElemCount, IndexOf) Then
+    If TrySZIndexOf(ArrayPtr, Value, Range.Index, Range.Count, IndexOf) Then
         Exit Function
     End If
     
     Dim Comparer As IComparer
     Set Comparer = Statics.Comparer.Default
     
-    Do While ElemCount > 0
-        If Comparer.Compare(Arr(ElemIndex), Value) = 0 Then
-            IndexOf = ElemIndex
+    Dim i As Long
+    For i = Range.Index To Range.Index + Range.Count - 1
+        If Comparer.Compare(Arr(i), Value) = 0 Then
+            IndexOf = i
             Exit Function
         End If
-        ElemIndex = ElemIndex + 1
-        ElemCount = ElemCount - 1
-    Loop
+    Next
     
     IndexOf = LBound(Arr) - 1
     Exit Function
@@ -859,12 +854,12 @@ End Function
 ' then one less than the lower bound of the array is returned.
 '
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    Dim pSafeArray As Long
-    pSafeArray = GetArrayPointer(Arr)
+    Dim ArrayPtr As Long
+    ArrayPtr = ArrayPointer(Arr)
     
-    If pSafeArray = vbNullPtr Then _
+    If ArrayPtr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
-    If IsMultiDimArrayPtr(pSafeArray) Then _
+    If IsMultiDimArrayPtr(ArrayPtr) Then _
         Error.Rank
     
     Dim ElemIndex   As Long
@@ -880,7 +875,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
     On Error GoTo errTrap
-    If TrySZLastIndexOf(pSafeArray, Value, ElemIndex, ElemCount, LastIndexOf) Then
+    If TrySZLastIndexOf(ArrayPtr, Value, ElemIndex, ElemCount, LastIndexOf) Then
         Exit Function
     End If
     
@@ -895,8 +890,10 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         ElemIndex = ElemIndex - 1
         ElemCount = ElemCount - 1
     Loop
+    
     LastIndexOf = LBound(Arr) - 1
     Exit Function
+    
 errTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function

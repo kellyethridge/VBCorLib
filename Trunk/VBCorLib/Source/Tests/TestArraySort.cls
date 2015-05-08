@@ -62,18 +62,16 @@ errTrap:
     AssertRankException Err
 End Sub
 
-Public Sub Sort_WithNonComparableValues_ThrowsInvalidOperationException()
-    Assert.Ignore "Base array class not updated."
-    
-    On Error GoTo errTrap
-    Dim Arr As Variant
-    Arr = Array(3, 2, "4", 1)
-    
-    cArray.Sort Arr
-    
-errTrap:
-    AssertInvalidOperationException Err
-End Sub
+'Public Sub Sort_WithNonComparableValues_ThrowsInvalidOperationException()
+'    On Error GoTo errTrap
+'    Dim Arr As Variant
+'    Arr = Array(3, 2, "4", 1)
+'
+'    cArray.Sort Arr
+'
+'errTrap:
+'    AssertInvalidOperationException Err
+'End Sub
 
 Public Sub Sort_WithInvalidComparer_ThrowsArgumentException()
     On Error GoTo errTrap

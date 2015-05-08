@@ -42,11 +42,14 @@ Public Function ArrayLength(ByRef Arr As Variant) As Long
     ArrayLength = UBound(Arr) - LBound(Arr) + 1
 End Function
 
-Public Function ArrayPointer(ByRef Arr As Variant) As Long
-    If Not IsArray(Arr) Then _
+Public Function ArrayPointer(ByRef Arg As Variant) As Long
+    Dim ArgType As Integer
+    ArgType = VariantType(Arg)
+    
+    If (ArgType And vbArray) = 0 Then _
         Error.Argument Argument_ArrayRequired
     
-    ArrayPointer = MemLong(vbaVarRefAry(Arr))
+    ArrayPointer = MemLong(vbaVarRefAry(Arg))
     
     ' HACK HACK HACK
     '
@@ -58,9 +61,9 @@ Public Function ArrayPointer(ByRef Arr As Variant) As Long
     ' allocated was Null to begin with. That means whenever an Object or UDT
     ' array is passed to any cArray method, it will technically never
     ' be uninitialized, just zero-length.
-    Select Case VariantType(Arr) And &HFF
+    Select Case ArgType And &HFF
         Case vbObject, vbUserDefinedType
-            If UBound(Arr) < LBound(Arr) Then
+            If UBound(Arg) < LBound(Arg) Then
                 ArrayPointer = vbNullPtr
             End If
     End Select

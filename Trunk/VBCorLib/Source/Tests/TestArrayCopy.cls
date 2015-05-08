@@ -307,30 +307,6 @@ Public Sub Copy_WithUnalignedLBounds_CopiesElements()
     Assert.That Target, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Copy_WithCallback_CopiesElementsUsingCallback()
-    Dim Source() As String
-    Dim Target() As String
-    Source = NewStrings("11", "22", "33")
-    ReDim Target(0 To 2)
-    
-    cArray.Copy Source, Target, 3, AddressOf modTestCallbacks.FirstLetterCopier
-    
-    Dim Expected() As String
-    Expected = NewStrings("1", "2", "3")
-    Assert.That Target, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Copy_ToSelfUsingCallback_CopiesElementsUsingCallback()
-    Dim Source() As String
-    Source = NewStrings("11", "22", "33")
-    
-    cArray.Copy Source, Source, 3, AddressOf modTestCallbacks.FirstLetterCopier
-    
-    Dim Expected() As String
-    Expected = NewStrings("1", "2", "3")
-    Assert.That Source, Iz.EqualTo(Expected)
-End Sub
-
 Public Sub Copy_WithMultiDimensionalArrays_CopiesElements()
     Dim Source(0 To 2, 0 To 2) As Long
     Dim Target(0 To 2, 0 To 2) As Long
