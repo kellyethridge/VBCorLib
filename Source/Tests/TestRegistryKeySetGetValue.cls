@@ -140,8 +140,8 @@ Public Sub TestEmptyBinary()
     
     ReDim b(10)
     b = Key.GetValue("EmptyBytes")
-    Assert.IsFalse cArray.IsNull(b), "Array should not be null."
-    Assert.AreEqual 0, cArray.GetLength(b)
+    Assert.IsFalse CorArray.IsNull(b), "Array should not be null."
+    Assert.AreEqual 0, CorArray.GetLength(b)
 End Sub
 
 Public Sub TestEmptyMultiString()
@@ -151,7 +151,7 @@ Public Sub TestEmptyMultiString()
     
     ReDim s(10)
     s = Key.GetValue("EmptyStrings")
-    Assert.IsFalse cArray.IsNull(s), "Array should not be null."
-    Assert.AreEqual 0, cArray.GetLength(s)
+    Assert.IsFalse CorArray.IsNull(s), "Array should not be null."
+    Assert.AreEqual 0, CorArray.GetLength(s)
 End Sub
 

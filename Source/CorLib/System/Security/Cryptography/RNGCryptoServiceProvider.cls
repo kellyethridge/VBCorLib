@@ -52,10 +52,10 @@ Private mProvider As Long
 Public Sub GetBytes(ByRef Data() As Byte)
     Call VerifyProvider
     
-    If cArray.IsNull(Data) Then _
+    If CorArray.IsNull(Data) Then _
         Throw Cor.NewArgumentNullException("Date", Environment.GetResourceString(ArgumentNull_Array))
     
-    If CryptGenRandom(mProvider, cArray.GetLength(Data), Data(LBound(Data))) = BOOL_FALSE Then _
+    If CryptGenRandom(mProvider, CorArray.GetLength(Data), Data(LBound(Data))) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
 End Sub
@@ -71,7 +71,7 @@ Public Sub GetNonZeroBytes(ByRef Data() As Byte)
     ' We double the size of the array and fill it with
     ' random values, banking on the odds that half of
     ' it will not be zeros.
-    ReDim BigData(cArray.GetLength(Data) * 2 - 1)
+    ReDim BigData(CorArray.GetLength(Data) * 2 - 1)
     Call GetBytes(BigData)
     
     Dim j As Long
@@ -162,8 +162,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

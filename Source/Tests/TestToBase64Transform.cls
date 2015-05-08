@@ -138,8 +138,8 @@ Public Sub TestTransformFinalEmptyArray()
     Dim Output() As Byte
     Output = Trans.TransformFinalBlock(b, 0, 0)
     
-    Assert.IsFalse cArray.IsNull(Output), "Output array should not be null."
-    Assert.AreEqual 0, cArray.GetLength(Output), "Output array should be empty."
+    Assert.IsFalse CorArray.IsNull(Output), "Output array should not be null."
+    Assert.AreEqual 0, CorArray.GetLength(Output), "Output array should be empty."
 End Sub
 
 Public Sub TestTransformFinalOffset()

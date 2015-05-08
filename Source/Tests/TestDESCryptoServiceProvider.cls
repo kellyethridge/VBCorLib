@@ -30,13 +30,13 @@ End Sub
 Public Sub AutoGenerateKeyAndIV()
     Dim b() As Byte
     b = csp.Key
-    Assert.IsFalse cArray.IsNull(b), "Key should not be null."
-    Assert.AreEqual 8, cArray.GetLength(b), "Key should be 8 bytes."
+    Assert.IsFalse CorArray.IsNull(b), "Key should not be null."
+    Assert.AreEqual 8, CorArray.GetLength(b), "Key should be 8 bytes."
     
     Erase b
     b = csp.IV
-    Assert.IsFalse cArray.IsNull(b), "IV should not be null."
-    Assert.AreEqual 8, cArray.GetLength(b), "IV should be 8 bytes."
+    Assert.IsFalse CorArray.IsNull(b), "IV should not be null."
+    Assert.AreEqual 8, CorArray.GetLength(b), "IV should be 8 bytes."
 End Sub
 
 Public Sub SetKeyToNull()

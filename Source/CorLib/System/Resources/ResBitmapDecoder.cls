@@ -62,7 +62,7 @@ Private mBitmap As StdPicture
 Public Function Decode(ByVal Key As ResourceKey, Bytes() As Byte) As Long
     If Key Is Nothing Then _
         Throw Cor.NewArgumentNullException("Key")
-    If cArray.IsNull(Bytes) Then _
+    If CorArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If Key.ResourceType <> RESTYPE_BITMAP Then _
         Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
@@ -167,7 +167,7 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
         BmpHeader(1) = 77
         
         ' Bytes 3-6 contain the size of the file in bytes.
-        AsLong(BmpHeader(2)) = cArray.GetLength(Bytes) + SIZEOF_BITMAPFILEHEADER
+        AsLong(BmpHeader(2)) = CorArray.GetLength(Bytes) + SIZEOF_BITMAPFILEHEADER
         
         ' Bytes 11-14 contain the offset to the data bytes.
         AsLong(BmpHeader(10)) = DataStartOffset
@@ -181,7 +181,7 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
     End If
     
     ' Shove the data onto the stream.
-    Call Stream.Write(VarPtr(Bytes(0)), cArray.GetLength(Bytes), 0&)
+    Call Stream.Write(VarPtr(Bytes(0)), CorArray.GetLength(Bytes), 0&)
     
     ' Move back to the start of the stream for reading.
     Call Stream.Seek(0, STREAM_SEEK_SET, 0&)
@@ -197,8 +197,8 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
     ' Load the picture from the stream, creating an IPicture object. We simply
     ' assign it to an IUnknown object for ease.
     Dim Unk As IUnknown
-    'Call OleLoadPicture(ObjPtr(Stream), cArray.GetLength(Bytes) + ByteCountOffset, True, UnkIID, Unk)
-    Call OleLoadPicture(Stream, cArray.GetLength(Bytes) + ByteCountOffset, True, UnkIID, Unk)
+    'Call OleLoadPicture(ObjPtr(Stream), CorArray.GetLength(Bytes) + ByteCountOffset, True, UnkIID, Unk)
+    Call OleLoadPicture(Stream, CorArray.GetLength(Bytes) + ByteCountOffset, True, UnkIID, Unk)
     
     ' Return it, casting to a StdPicture object.
     Set CreatePicture = Unk

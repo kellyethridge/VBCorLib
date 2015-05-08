@@ -32,8 +32,8 @@ Public Sub TestGetPreamble()
     Dim b() As Byte
     
     b = e.GetPreamble
-    Assert.IsFalse cArray.IsNull(b)
-    Assert.AreEqual 0, cArray.GetLength(b)
+    Assert.IsFalse CorArray.IsNull(b)
+    Assert.AreEqual 0, CorArray.GetLength(b)
 End Sub
 
 Public Sub TestPlus()
@@ -91,6 +91,6 @@ End Sub
 Public Sub TestEmptyArray()
     Dim b() As Byte
     
-    b = cArray.CreateInstance(vbByte)
+    b = CorArray.CreateInstance(vbByte)
     Assert.AreEqual 0, e.GetCharCount(b)
 End Sub

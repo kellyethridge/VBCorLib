@@ -19,7 +19,7 @@ Public Function FindVBGuid(ByRef g As VBGUID) As Boolean
 End Function
 
 '
-' cArray.ForEach callback
+' CorArray.ForEach callback
 '
 Public Sub SetToNumber(ByRef e As Long)
     e = 5

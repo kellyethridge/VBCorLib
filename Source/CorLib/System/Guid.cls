@@ -322,9 +322,9 @@ Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, By
         .Data2 = b
         .Data3 = c
         
-        If cArray.IsNull(d) Then _
+        If CorArray.IsNull(d) Then _
             Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-        If cArray.GetLength(d) <> 8 Then _
+        If CorArray.GetLength(d) <> 8 Then _
             Throw Cor.NewArgumentException("Array must be 8 bytes in length.", "Bytes")
         
         CopyMemory .Data4(0), d(LBound(d)), 8

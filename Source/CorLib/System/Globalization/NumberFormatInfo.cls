@@ -541,7 +541,7 @@ End Property
 Public Property Let PercentGroupSizes(ByRef RHS As Variant)
     VerifyWritable
     VerifyLoaded
-    If cArray.IsNull(RHS) Then _
+    If CorArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException("PercentGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
     VerifyGroupSizes RHS
@@ -710,7 +710,7 @@ End Property
 Public Property Let CurrencyGroupSizes(ByRef RHS() As Long)
     VerifyWritable
     VerifyLoaded
-    If cArray.IsNull(RHS) Then _
+    If CorArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException("CurrencyGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
     VerifyAndSetGroupSizes RHS, mProps.CurrencyGroupSizes
@@ -886,7 +886,7 @@ End Property
 Public Property Let NumberGroupSizes(ByRef RHS As Variant)
     VerifyWritable
     VerifyLoaded
-    If cArray.IsNull(RHS) Then _
+    If CorArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException("NumberGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
     VerifyGroupSizes RHS
@@ -2255,7 +2255,7 @@ Private Sub VerifyAndSetGroupSizes(ByRef Source() As Long, ByRef Target() As Lon
     VerifyGroupSizes Source
     
     Dim Length As Long
-    Length = cArray.GetLength(Source)
+    Length = CorArray.GetLength(Source)
     
     If Length > 0 Then
         ReDim Target(0 To Length - 1)
@@ -2263,7 +2263,7 @@ Private Sub VerifyAndSetGroupSizes(ByRef Source() As Long, ByRef Target() As Lon
         Target = Cor.NewLongs()
     End If
     
-    cArray.Copy Source, Target, Length
+    CorArray.Copy Source, Target, Length
 End Sub
 
 Private Sub VerifyGroupSizes(ByRef Arr As Variant)
@@ -2290,7 +2290,7 @@ Private Sub ReadLongArray(ByRef a() As Long, ByVal Name As String, ByVal bag As 
         Dim Count As Long
         Count = .ReadProperty(Name & "_Count", 0)
         If Count = 0 Then
-            a = cArray.CreateInstance(vbLong)
+            a = CorArray.CreateInstance(vbLong)
             Exit Sub
         End If
         

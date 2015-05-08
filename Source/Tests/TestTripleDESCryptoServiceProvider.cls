@@ -25,14 +25,14 @@ Public Sub AutoGenerateKeyAndIV()
     Dim csp As New TripleDESCryptoServiceProvider
     Dim b() As Byte
     b = csp.Key
-    Assert.IsFalse cArray.IsNull(b), "Key should not be null."
-    Assert.AreEqual 24, cArray.GetLength(b), "Key should be 24 bytes."
+    Assert.IsFalse CorArray.IsNull(b), "Key should not be null."
+    Assert.AreEqual 24, CorArray.GetLength(b), "Key should be 24 bytes."
     Assert.AreEqual 192, csp.KeySize
     
     Erase b
     b = csp.IV
-    Assert.IsFalse cArray.IsNull(b), "IV should not be null."
-    Assert.AreEqual 8, cArray.GetLength(b), "IV should be 8 bytes."
+    Assert.IsFalse CorArray.IsNull(b), "IV should not be null."
+    Assert.AreEqual 8, CorArray.GetLength(b), "IV should be 8 bytes."
 End Sub
 
 Public Sub SetKeyToNull()
@@ -77,8 +77,8 @@ End Sub
 
 Public Sub SetKeySizeTo128Bits()
     Dim csp As New TripleDESCryptoServiceProvider
-    Assert.AreEqual 24, cArray.GetLength(csp.Key)
+    Assert.AreEqual 24, CorArray.GetLength(csp.Key)
     
     csp.KeySize = 128
-    Assert.AreEqual 16, cArray.GetLength(csp.Key)
+    Assert.AreEqual 16, CorArray.GetLength(csp.Key)
 End Sub

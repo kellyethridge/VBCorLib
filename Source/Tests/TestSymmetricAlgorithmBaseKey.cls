@@ -41,7 +41,7 @@ End Sub
 Public Sub GetKeyWithoutSettingFirst()
     Dim Key() As Byte
     Key = base.GetKey
-    Assert.AreEqual 8, cArray.GetLength(Key)
+    Assert.AreEqual 8, CorArray.GetLength(Key)
     Assert.IsTrue mWeaknessTested, "Weakness not tested."
 End Sub
 

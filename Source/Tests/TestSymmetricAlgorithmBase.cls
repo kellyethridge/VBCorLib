@@ -28,7 +28,7 @@ Public Sub AddLegalBlockSizes()
     
     Dim b() As KeySizes
     b = base.LegalBlockSizes
-    Assert.AreEqual 2, cArray.GetLength(b)
+    Assert.AreEqual 2, CorArray.GetLength(b)
     Assert.AreEqual 64, b(0).MinSize
     Assert.AreEqual 64, b(0).MaxSize
     Assert.AreEqual 0, b(0).SkipSize
@@ -72,7 +72,7 @@ Public Sub AddLegalKeySizes()
     
     Dim b() As KeySizes
     b = base.LegalKeySizes
-    Assert.AreEqual 2, cArray.GetLength(b)
+    Assert.AreEqual 2, CorArray.GetLength(b)
     Assert.AreEqual 64, b(0).MinSize
     Assert.AreEqual 64, b(0).MaxSize
     Assert.AreEqual 0, b(0).SkipSize
@@ -115,7 +115,7 @@ Public Sub GetIVWithOutSettingFirst()
     
     Dim IV() As Byte
     IV = base.GetIV
-    Assert.AreEqual 8, cArray.GetLength(IV)
+    Assert.AreEqual 8, CorArray.GetLength(IV)
 End Sub
 
 Public Sub GetIVBeforeAndAfterGenerating()

@@ -183,7 +183,7 @@ Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, 
             Case Is <> NO_ERROR:                Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", 0, vbNullString)
         End Select
         
-        Encoding_GetBytesEx = WideCharToMultiByte(mCodePage, 0, mChars(CharIndex), CharCount, Bytes(ByteIndex), cArray.GetLength(Bytes), vbNullString, 0)
+        Encoding_GetBytesEx = WideCharToMultiByte(mCodePage, 0, mChars(CharIndex), CharCount, Bytes(ByteIndex), CorArray.GetLength(Bytes), vbNullString, 0)
     End If
     SAPtr(mChars) = 0
 End Function
@@ -239,7 +239,7 @@ Private Function Encoding_GetCharsEx(Bytes() As Byte, ByVal ByteIndex As Long, B
             Case Is <> NO_ERROR:                Call ThrowArrayRangeException(Result, "Chars", CharIndex, "CharIndex", 0, vbNullString)
         End Select
         
-        Encoding_GetCharsEx = MultiByteToWideChar(mCodePage, 0, Bytes(ByteIndex), ByteCount, Chars(CharIndex), cArray.GetLength(Chars))
+        Encoding_GetCharsEx = MultiByteToWideChar(mCodePage, 0, Bytes(ByteIndex), ByteCount, Chars(CharIndex), CorArray.GetLength(Chars))
     End If
     SAPtr(mChars) = 0
 End Function

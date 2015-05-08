@@ -25,7 +25,7 @@ End Sub
 Public Sub EncryptPartialBlockUsingPKCS7()
     Dim b() As Byte
     b = GetPartialBlock(PKCS7)
-    Assert.AreEqual 8, cArray.GetLength(b)
+    Assert.AreEqual 8, CorArray.GetLength(b)
     
     Dim i As Long
     For i = 0 To 7
@@ -36,7 +36,7 @@ End Sub
 Public Sub EncryptPartialBlockUsingANSIX923()
     Dim b() As Byte
     b = GetPartialBlock(ANSIX923)
-    Assert.AreEqual 8, cArray.GetLength(b)
+    Assert.AreEqual 8, CorArray.GetLength(b)
     
     Dim i As Long
     For i = 0 To 7
@@ -47,7 +47,7 @@ End Sub
 Public Sub EncryptPartialBlockUsingZeros()
     Dim b() As Byte
     b = GetPartialBlock(Zeros)
-    Assert.AreEqual 8, cArray.GetLength(b)
+    Assert.AreEqual 8, CorArray.GetLength(b)
     
     Dim i As Long
     For i = 0 To 7
@@ -62,7 +62,7 @@ Public Sub EncryptPartialBlockUsingISO10126()
     b1 = GetPartialBlock(ISO10126)
     b2 = GetPartialBlock(ISO10126)
     
-    Assert.AreEqual 8, cArray.GetLength(b1)
+    Assert.AreEqual 8, CorArray.GetLength(b1)
     Assert.That b1, Iz.Not.EqualTo(b2)
 End Sub
 
@@ -83,7 +83,7 @@ End Sub
 Public Sub EncryptFullBlockUsingPKCS7()
     Dim b() As Byte
     b = GetFullBlock(PKCS7)
-    Assert.AreEqual 16, cArray.GetLength(b)
+    Assert.AreEqual 16, CorArray.GetLength(b)
     
     Dim i As Long
     For i = 0 To 15
@@ -94,7 +94,7 @@ End Sub
 Public Sub EncryptFullBlockUsingANSIX923()
     Dim b() As Byte
     b = GetFullBlock(ANSIX923)
-    Assert.AreEqual 16, cArray.GetLength(b)
+    Assert.AreEqual 16, CorArray.GetLength(b)
     
     Dim i As Long
     For i = 0 To 15
@@ -105,7 +105,7 @@ End Sub
 Public Sub EncryptFullBlockUsingZeros()
     Dim b() As Byte
     b = GetFullBlock(Zeros)
-    Assert.AreEqual 8, cArray.GetLength(b)
+    Assert.AreEqual 8, CorArray.GetLength(b)
     
     Dim i As Long
     For i = 0 To 7
@@ -116,7 +116,7 @@ End Sub
 Public Sub EncryptFullBlockUsingNone()
     Dim b() As Byte
     b = GetFullBlock(PaddingMode.None)
-    Assert.AreEqual 8, cArray.GetLength(b)
+    Assert.AreEqual 8, CorArray.GetLength(b)
     
     Dim i As Long
     For i = 0 To 7
@@ -131,7 +131,7 @@ Public Sub EncryptFullBlockUsingISO10126()
     b1 = GetFullBlock(ISO10126)
     b2 = GetFullBlock(ISO10126)
     
-    Assert.AreEqual 16, cArray.GetLength(b1)
+    Assert.AreEqual 16, CorArray.GetLength(b1)
     
     Dim i As Long
     For i = 0 To 7

@@ -118,7 +118,7 @@ Public Sub OptionalCalendars_WhenCalled_DoesNotReturnNull()
         
         Dim Actual() As Calendar
         Actual = Culture.OptionalCalendars
-        Assert.That cArray.IsNull(Actual), Iz.False, Culture.LCID & " " & Culture.Name
+        Assert.That CorArray.IsNull(Actual), Iz.False, Culture.LCID & " " & Culture.Name
     Next
 End Sub
 

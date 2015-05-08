@@ -46,15 +46,15 @@ Public Sub TestTransformFinalBlock()
         Dim NewCT() As Byte
         Dim t As ICryptoTransform
         Set t = csp.CreateEncryptor
-        NewCT = t.TransformFinalBlock(PT, 0, cArray.GetLength(PT))
+        NewCT = t.TransformFinalBlock(PT, 0, CorArray.GetLength(PT))
                 
         ' We need atleast 2 bytes of padding for ISO10126. 1 for the number of padded bytes,
         ' and one as the random value filling the rest of the padded bytes.
-        If (csp.Padding = PaddingMode.ISO10126) And (cArray.GetLength(CT) - cArray.GetLength(PT) > 1) Then
+        If (csp.Padding = PaddingMode.ISO10126) And (CorArray.GetLength(CT) - CorArray.GetLength(PT) > 1) Then
             ' For padding mode ISO10126, the best we can do without decrypting
             ' the text is to make sure the same encrypted text has a different output.
             
-            Assert.That t.TransformFinalBlock(PT, 0, cArray.GetLength(PT)), Iz.Not.EqualTo(NewCT), "Entry " & c
+            Assert.That t.TransformFinalBlock(PT, 0, CorArray.GetLength(PT)), Iz.Not.EqualTo(NewCT), "Entry " & c
         Else
             Assert.AreEqual CT, NewCT, "Entry " & c & " failed."
         End If
@@ -79,16 +79,16 @@ Public Sub TestTransformBlock()
             ReDim NewCT(UBound(CT))
             
             Dim FullBlocks As Long
-            FullBlocks = cArray.GetLength(PT) \ t.InputBlockSize
+            FullBlocks = CorArray.GetLength(PT) \ t.InputBlockSize
             If FullBlocks > 0 Then
                 AmountTransformed = t.TransformBlock(PT, 0, FullBlocks * t.InputBlockSize, NewCT, 0)
                 Assert.AreEqual FullBlocks * t.InputBlockSize, AmountTransformed, "Entry " & c & " is wrong amount transformed."
             End If
             
             Dim FinalBlock() As Byte
-            FinalBlock = t.TransformFinalBlock(PT, FullBlocks * t.InputBlockSize, cArray.GetLength(PT) - FullBlocks * t.InputBlockSize)
+            FinalBlock = t.TransformFinalBlock(PT, FullBlocks * t.InputBlockSize, CorArray.GetLength(PT) - FullBlocks * t.InputBlockSize)
             
-            Buffer.BlockCopy FinalBlock, 0, NewCT, FullBlocks * t.OutputBlockSize, cArray.GetLength(FinalBlock)
+            Buffer.BlockCopy FinalBlock, 0, NewCT, FullBlocks * t.OutputBlockSize, CorArray.GetLength(FinalBlock)
             
             Assert.AreEqual CT, NewCT, "Entry " & c & " is wrong text."
         End If
@@ -98,7 +98,7 @@ End Sub
 Public Sub ResetForNewText()
     Do
         GetNextEntry
-    Loop While (cArray.GetLength(PT) < 16) Or (csp.Padding = ISO10126)
+    Loop While (CorArray.GetLength(PT) < 16) Or (csp.Padding = ISO10126)
     
     Dim NewCT() As Byte
     ReDim NewCT(7)

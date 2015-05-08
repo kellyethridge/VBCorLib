@@ -31,7 +31,7 @@ End Sub
 
 Public Sub TestAbbreviatedDayNames()
     s = info.AbbreviatedDayNames
-    Assert.AreEqual 7, cArray.GetLength(s), "Should return 7 days."
+    Assert.AreEqual 7, CorArray.GetLength(s), "Should return 7 days."
     For i = 0 To 6
         Assert.AreEqual Choose(i + 1, "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"), s(i)
     Next i
@@ -39,7 +39,7 @@ End Sub
 
 Public Sub TestAbbreviatedMonthsNames()
     s = info.AbbreviatedMonthNames
-    Assert.AreEqual 13, cArray.GetLength(s), "Should return 13 months."
+    Assert.AreEqual 13, CorArray.GetLength(s), "Should return 13 months."
     For i = 0 To 12
         Assert.AreEqual Choose(i + 1, "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", ""), s(i)
     Next i
@@ -55,7 +55,7 @@ End Sub
 
 Public Sub TestDayNames()
     s = info.DayNames
-    Assert.AreEqual 7, cArray.GetLength(s), "Should return 7 days."
+    Assert.AreEqual 7, CorArray.GetLength(s), "Should return 7 days."
     For i = 0 To 6
         Assert.AreEqual Choose(i + 1, "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"), s(i)
     Next i
@@ -85,25 +85,25 @@ End Sub
 
 Public Sub TestGetAllDateTimePatterns_LowerD()
     s = info.GetAllDateTimePatterns("d")
-    Assert.AreEqual 1, cArray.GetLength(s), "Should return 1 element array."
+    Assert.AreEqual 1, CorArray.GetLength(s), "Should return 1 element array."
     Assert.AreEqual "MM/dd/yyyy", s(0)
 End Sub
 
 Public Sub TestGetAllDateTimePatterns_UpperD()
     s = info.GetAllDateTimePatterns("D")
-    Assert.AreEqual 1, cArray.GetLength(s), "Should return 1 element array."
+    Assert.AreEqual 1, CorArray.GetLength(s), "Should return 1 element array."
     Assert.AreEqual "dddd, dd MMMM yyyy", s(0)
 End Sub
 
 Public Sub TestGetAllDateTimePatterns_UpperF()
     s = info.GetAllDateTimePatterns("F")
-    Assert.AreEqual 1, cArray.GetLength(s), "Should return 1 element array."
+    Assert.AreEqual 1, CorArray.GetLength(s), "Should return 1 element array."
     Assert.AreEqual "dddd, dd MMMM yyyy HH:mm:ss", s(0)
 End Sub
 
 Public Sub TestGetAllDateTimePatterns_LowerF()
     s = info.GetAllDateTimePatterns("f")
-    Assert.AreEqual 4, cArray.GetLength(s), "Should return 4 element array."
+    Assert.AreEqual 4, CorArray.GetLength(s), "Should return 4 element array."
     Assert.That s, Iz.EquivalentTo(Array("dddd, dd MMMM yyyy HH:mm", "dddd, dd MMMM yyyy hh:mm tt", "dddd, dd MMMM yyyy H:mm", "dddd, dd MMMM yyyy h:mm tt"))
     
 '    Dim i As Long
@@ -117,7 +117,7 @@ Public Sub TestGetAllPatterns_LowerG()
     Dim i As Long
     
     s = info.GetAllDateTimePatterns("g")
-    Assert.AreEqual 4, cArray.GetLength(s), "s should contain 4 elements."
+    Assert.AreEqual 4, CorArray.GetLength(s), "s should contain 4 elements."
     Assert.That s, Iz.EquivalentTo(Array("MM/dd/yyyy HH:mm", "MM/dd/yyyy hh:mm tt", "MM/dd/yyyy H:mm", "MM/dd/yyyy h:mm tt"))
     
 '    For i = 0 To 3
@@ -129,7 +129,7 @@ Public Sub TestGetAllPatterns_UpperG()
     Dim s() As String
     
     s = info.GetAllDateTimePatterns("G")
-    Assert.AreEqual 1, cArray.GetLength(s), "s should contain 1 element."
+    Assert.AreEqual 1, CorArray.GetLength(s), "s should contain 1 element."
     Assert.AreEqual "MM/dd/yyyy HH:mm:ss", s(0)
 End Sub
 
@@ -138,7 +138,7 @@ Public Sub TestGetAllPatterns()
     Dim i As Long
     
     s = info.GetAllDateTimePatterns
-    Assert.AreEqual 26, cArray.GetLength(s), "s should contain 26 elements."
+    Assert.AreEqual 26, CorArray.GetLength(s), "s should contain 26 elements."
 End Sub
 
 Public Sub TestFormatDayPart()

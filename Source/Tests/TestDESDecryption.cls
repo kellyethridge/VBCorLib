@@ -85,7 +85,7 @@ Public Sub TestTransformBlock()
         Else
             Assert.AreEqual (UBound(CT) + 1) - (csp.BlockSize \ 8), AmountTransformed, "Wrong amount transformed."
             If AmountTransformed = 0 Then
-                NewPT = cArray.CreateInstance(vbByte)
+                NewPT = CorArray.CreateInstance(vbByte)
             Else
                 ReDim Preserve NewPT(0 To AmountTransformed - 1)
             End If
@@ -133,10 +133,10 @@ Public Sub TestTransformBlockMultipleCalls()
         Dim FinalBlock() As Byte
         FinalBlock = t.TransformFinalBlock(CT, CTIndex, UBound(CT) - CTIndex + 1)
         
-        Buffer.BlockCopy FinalBlock, 0, NewPT, PTIndex, cArray.GetLength(FinalBlock)
+        Buffer.BlockCopy FinalBlock, 0, NewPT, PTIndex, CorArray.GetLength(FinalBlock)
         
         If (csp.Padding <> PaddingMode.None) And (csp.Padding <> PaddingMode.Zeros) Then
-            ReDim Preserve NewPT(0 To UBound(NewPT) - (t.OutputBlockSize - cArray.GetLength(FinalBlock)))
+            ReDim Preserve NewPT(0 To UBound(NewPT) - (t.OutputBlockSize - CorArray.GetLength(FinalBlock)))
         End If
         
         Assert.AreEqual PT, NewPT, "Plain text entry " & c & " is incorrect."
@@ -146,7 +146,7 @@ End Sub
 Public Sub ResetForNewText()
     Do
         GetNextEntry
-    Loop While cArray.GetLength(CT) < 16
+    Loop While CorArray.GetLength(CT) < 16
     
     Dim NewPT() As Byte
     ReDim NewPT(15)

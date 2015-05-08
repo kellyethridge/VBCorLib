@@ -94,7 +94,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     DirectoryNames = Split(Path, Statics.Path.DirectorySeparatorString)
     
     Dim i As Long
-    i = cArray.GetLength(DirectoryNames)
+    i = CorArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
         TestDirectory = cString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)

@@ -110,7 +110,7 @@ End Function
 ' rules, such as finding user-defined types.
 '
 Public Function Contains(ByRef Value As Variant) As Boolean
-    Contains = cArray.IndexOf(mItems, Value, 0, mCount) >= 0
+    Contains = CorArray.IndexOf(mItems, Value, 0, mCount) >= 0
 End Function
 
 ''
@@ -127,8 +127,8 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If Index < LBound(DstArray) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
     
-    cArray.CopyEx mItems, 0, DstArray, Index, mCount
-    cArray.Reverse DstArray, Index, mCount
+    CorArray.CopyEx mItems, 0, DstArray, Index, mCount
+    CorArray.Reverse DstArray, Index, mCount
 End Sub
 
 ''
@@ -229,7 +229,7 @@ End Sub
 '
 Public Function ToArray() As Variant()
     Dim Result() As Variant
-    Result = cArray.CreateInstance(vbVariant, mCount)
+    Result = CorArray.CreateInstance(vbVariant, mCount)
     
     Dim i As Long
     For i = 0 To mCount - 1

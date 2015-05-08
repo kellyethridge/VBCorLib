@@ -67,7 +67,7 @@ Private mIterator   As IDictionaryEnumerator
 '
 Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Optional ByRef ResourceType As Variant, Optional ByRef LanguageID As Variant) As Boolean
     If VarType(Value) <> vbByteArray Then Exit Function
-    If cArray.IsNull(Value) Then Exit Function
+    If CorArray.IsNull(Value) Then Exit Function
     
     Dim Key As ResourceKey
     Set Key = Cor.NewResourceKey(ResourceName, ResourceType, GetLanguageID(LanguageID))

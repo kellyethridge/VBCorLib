@@ -519,11 +519,11 @@ End Sub
 ' exists, it will be overwritten.
 '
 Public Sub WriteAllbytes(ByRef Path As String, ByRef Bytes() As Byte)
-    If cArray.IsNull(Bytes) Then _
+    If CorArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     
     With Cor.NewFileStream(Path, FileMode.Create)
-        .WriteBlock Bytes, LBound(Bytes), cArray.GetLength(Bytes)
+        .WriteBlock Bytes, LBound(Bytes), CorArray.GetLength(Bytes)
     End With
 End Sub
 

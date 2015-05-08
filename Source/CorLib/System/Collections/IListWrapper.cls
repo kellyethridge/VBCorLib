@@ -513,7 +513,7 @@ Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count
 End Sub
 
 Private Function ArrayList_ToArray(Optional ByVal ArrayType As VbVarType = 12&) As Variant
-    ArrayList_ToArray = cArray.CreateInstance(ArrayType, mList.Count)
+    ArrayList_ToArray = CorArray.CreateInstance(ArrayType, mList.Count)
     mList.CopyTo ArrayList_ToArray, 0
 End Function
 

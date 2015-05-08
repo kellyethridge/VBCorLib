@@ -1145,7 +1145,7 @@ Private Sub ReadStringArray(ByRef a() As String, ByVal Name As String, ByVal bag
     With bag
         Dim Count As Long
         Count = .ReadProperty(Name & "_Count", 0)
-        a = cArray.CreateInstance(vbString, Count)
+        a = CorArray.CreateInstance(vbString, Count)
         
         Dim i As Long
         For i = 0 To Count - 1
@@ -1173,25 +1173,25 @@ Private Sub AssignDayNames(ByRef Source() As String, ByRef DayNames() As String)
     Call VerifyWritable
     Call VerifyLoaded
 
-    If cArray.Rank(Source) <> 1 Then _
+    If CorArray.Rank(Source) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
-    If cArray.GetLength(Source) <> 7 Then _
+    If CorArray.GetLength(Source) <> 7 Then _
         Throw Cor.NewArgumentException("Array must contain exactly 7 elements.")
     
     ReDim DayNames(0 To 6)
-    Call cArray.CopyEx(Source, LBound(Source), DayNames, 0, 7)
+    Call CorArray.CopyEx(Source, LBound(Source), DayNames, 0, 7)
 End Sub
 
 Private Sub AssignMonthNames(ByRef Source() As String, ByRef MonthNames() As String)
     Call VerifyWritable
     Call VerifyLoaded
-    If cArray.Rank(Source) <> 1 Then _
+    If CorArray.Rank(Source) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
-    If cArray.GetLength(Source) <> 13 Then _
+    If CorArray.GetLength(Source) <> 13 Then _
         Throw Cor.NewArgumentException("Array must contain exactly 13 elements.")
         
     ReDim MonthNames(0 To 12)
-    Call cArray.CopyEx(Source, LBound(Source), MonthNames, 0, 13)
+    Call CorArray.CopyEx(Source, LBound(Source), MonthNames, 0, 13)
 End Sub
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

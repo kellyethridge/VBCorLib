@@ -1235,7 +1235,7 @@ Private Function GetConsoleStream(ByVal Handle As Long, ByVal Access As FileAcce
 End Function
 
 Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
-    If Not cArray.IsNull(Args) Then
+    If Not CorArray.IsNull(Args) Then
         If UBound(Args) >= 0 Then Value = cString.FormatArray(Value, Args)
     End If
     If NewLine Then Value = Value & Out.NewLine

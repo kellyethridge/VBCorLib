@@ -201,7 +201,7 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     Dim Ret() As Byte
-    Ret = cArray.CreateInstance(vbByte, ElemCount * CHAR_SIZE)
+    Ret = CorArray.CreateInstance(vbByte, ElemCount * CHAR_SIZE)
     Call InternalGetBytes(ElemIndex, ElemCount, Ret, 0)
     
     GetBytes = Ret
@@ -274,7 +274,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
     
     Dim Ret() As Integer
-    Ret = cArray.CreateInstance(vbInteger, ElemCount \ CHAR_SIZE)
+    Ret = CorArray.CreateInstance(vbInteger, ElemCount \ CHAR_SIZE)
     Call InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0)
     
     GetChars = Ret
@@ -469,11 +469,11 @@ Private Function InternalGetBytes(ByVal CharIndex As Long, ByVal CharCount As Lo
     
     If mIsBigEndian Then
         Dim i As Long
-        Dim ch As Long
+        Dim Ch As Long
         For i = 0 To CharCount - 1
-            ch = mChars(CharIndex + i)
-            Bytes(ByteIndex) = (ch \ &H100) And &HFF
-            Bytes(ByteIndex + 1) = ch And &HFF
+            Ch = mChars(CharIndex + i)
+            Bytes(ByteIndex) = (Ch \ &H100) And &HFF
+            Bytes(ByteIndex + 1) = Ch And &HFF
             ByteIndex = ByteIndex + 2
         Next i
     Else
@@ -488,11 +488,11 @@ Private Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long
     
     If mIsBigEndian Then
         Dim i As Long
-        Dim ch As Long
+        Dim Ch As Long
         For i = 0 To ByteCount - 1 Step 2
-            ch = Bytes(ByteIndex + i) * &H100
-            ch = ch Or Bytes(ByteIndex + i + 1)
-            Chars(CharIndex) = AsWord(ch)
+            Ch = Bytes(ByteIndex + i) * &H100
+            Ch = Ch Or Bytes(ByteIndex + i + 1)
+            Chars(CharIndex) = AsWord(Ch)
             CharIndex = CharIndex + 1
         Next i
     Else
@@ -543,8 +543,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

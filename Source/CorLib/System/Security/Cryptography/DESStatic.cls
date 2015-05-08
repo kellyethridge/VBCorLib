@@ -118,10 +118,10 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyKeySize(ByRef RgbKey As Variant)
-    If cArray.IsNull(RgbKey) Then _
+    If CorArray.IsNull(RgbKey) Then _
         Throw Cor.NewCryptographicException("Invalid key length.")
     
-    If cArray.GetLength(RgbKey) <> DES_KEY_LENGTH Then _
+    If CorArray.GetLength(RgbKey) <> DES_KEY_LENGTH Then _
         Throw Cor.NewCryptographicException("Invalid key length.")
 End Sub
 

@@ -52,7 +52,7 @@ End Sub
 Public Sub LastIndexOf_WithValues_ReturnsExpected(ByRef Arr As Variant, ByRef Value As Variant, ByVal Expected As Long)
     Dim Actual As Long
     
-    Actual = cArray.LastIndexOf(Arr, Value)
+    Actual = CorArray.LastIndexOf(Arr, Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -61,7 +61,7 @@ Public Sub LastIndexOf_WithNullArray_Throws()
     Dim Arr() As Long
 
     On Error GoTo errTrap
-    cArray.LastIndexOf Arr, 1
+    CorArray.LastIndexOf Arr, 1
 
 errTrap:
     AssertArgumentNullException Err, "Arr"
@@ -71,7 +71,7 @@ Public Sub LastIndexOf_WithMuliDimensionArray_Throws()
     Dim Arr(0, 0) As Long
 
     On Error GoTo errTrap
-    cArray.LastIndexOf Arr, 0
+    CorArray.LastIndexOf Arr, 0
 
 errTrap:
     AssertRankException Err
@@ -81,7 +81,7 @@ Public Sub LastIndexOf_WithStartIndexLessThanLBound_Throws()
     Dim Arr(0) As Long
 
     On Error GoTo errTrap
-    cArray.LastIndexOf Arr, 0, -1
+    CorArray.LastIndexOf Arr, 0, -1
 
 errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
@@ -91,7 +91,7 @@ Public Sub LastIndexOf_WithStartIndexGreaterThanUBound_Throws()
     Dim Arr(0) As Long
 
     On Error GoTo errTrap
-    cArray.LastIndexOf Arr, 0, 1
+    CorArray.LastIndexOf Arr, 0, 1
 
 errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
@@ -101,7 +101,7 @@ Public Sub LastIndexOf_WithCountLessThanZero_Throws()
     Dim Arr(0) As Long
 
     On Error GoTo errTrap
-    cArray.LastIndexOf Arr, 0, 0, -1
+    CorArray.LastIndexOf Arr, 0, 0, -1
 
 errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
@@ -111,7 +111,7 @@ Public Sub LastIndexOf_WithStartIndexAndCountGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.LastIndexOf Arr, 0, 0, 2
+    CorArray.LastIndexOf Arr, 0, 0, 2
     
 errTrap:
     AssertArgumentOutOfRangeException Err
@@ -126,7 +126,7 @@ End Sub
 '        a(i) = "Item " & i
 '    Next i
 '
-'    i = cArray.LastIndexOf(a, "Item 88", , , Comparer.Default)
+'    i = CorArray.LastIndexOf(a, "Item 88", , , Comparer.Default)
 '    Assert.AreEqual 88, i, "LastIndexOf should return 88."
 'End Sub
 '
@@ -139,7 +139,7 @@ End Sub
 '        a(i) = i
 '    Next i
 '
-'    i = cArray.LastIndexOf(a, 50&, 20, 20)
+'    i = CorArray.LastIndexOf(a, 50&, 20, 20)
 '    Assert.AreEqual -2, i, "LastIndexOfEx should return -1."
 'End Sub
 '
@@ -152,7 +152,7 @@ End Sub
 '        a(i) = "Item " & i
 '    Next i
 '    Set a(LBound(a)) = Nothing
-'    i = cArray.LastIndexOf(a, Nothing)
+'    i = CorArray.LastIndexOf(a, Nothing)
 '    Assert.AreEqual LBound(a), i, "LastIndexOf should return " & LBound(a)
 'End Sub
 '

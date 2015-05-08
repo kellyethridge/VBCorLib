@@ -177,7 +177,7 @@ Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef V
         Set Comparer = mComparer
     End If
     
-    BinarySearchEx = cArray.BinarySearchEx(mItems, Index, Count, Value, Comparer)
+    BinarySearchEx = CorArray.BinarySearchEx(mItems, Index, Count, Value, Comparer)
 End Function
 
 ''
@@ -269,7 +269,7 @@ Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
     If IsNullArray(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    cArray.CopyEx mItems, 0, Arr, IfLong(ArrayIndex, LBound(Arr)), mCount
+    CorArray.CopyEx mItems, 0, Arr, IfLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
 
 ''
@@ -289,7 +289,7 @@ Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex 
     If IsMultiDimArray(Arr) Then _
         Error.Rank
         
-    cArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
+    CorArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
 End Sub
 
 ''
@@ -395,7 +395,7 @@ Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Var
         Exit Function
     End If
     
-    IndexOf = cArray.IndexOf(mItems, Value, StartIndex, Count)
+    IndexOf = CorArray.IndexOf(mItems, Value, StartIndex, Count)
 End Function
 
 ''
@@ -543,7 +543,7 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
         Exit Function
     End If
     
-    LastIndexOf = cArray.LastIndexOf(mItems, Value, StartIndex, Count)
+    LastIndexOf = CorArray.LastIndexOf(mItems, Value, StartIndex, Count)
 End Function
 
 ''
@@ -639,7 +639,7 @@ Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Vari
         Error.InvalidOffsetLength
 
 
-    cArray.Reverse mItems, Range.Index, Range.Count
+    CorArray.Reverse mItems, Range.Index, Range.Count
     mVersion = mVersion + 1
 End Sub
 
@@ -683,7 +683,7 @@ Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant
         Set Comparer = mComparer
     End If
     
-    cArray.SortEx mItems, Range.Index, Range.Count, Comparer
+    CorArray.SortEx mItems, Range.Index, Range.Count, Comparer
     mVersion = mVersion + 1
 End Sub
 
@@ -700,10 +700,10 @@ End Sub
 '
 Public Function ToArray(Optional ByVal ArrayType As VbVarType = vbVariant) As Variant
     Dim Ret As Variant
-    Ret = cArray.CreateInstance(ArrayType, mCount)
+    Ret = CorArray.CreateInstance(ArrayType, mCount)
     
     If mCount > 0 Then
-        cArray.CopyEx mItems, 0, Ret, 0, mCount
+        CorArray.CopyEx mItems, 0, Ret, 0, mCount
     End If
     
     ToArray = Ret

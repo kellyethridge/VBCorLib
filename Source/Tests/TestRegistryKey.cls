@@ -163,7 +163,7 @@ Public Sub TestGetSubKeyNames()
     Dim s() As String
     s = rk.GetSubKeyNames
     
-    Assert.AreEqual 5, cArray.GetLength(s), "Should contain 3 elements."
+    Assert.AreEqual 5, CorArray.GetLength(s), "Should contain 3 elements."
     
     For i = 1 To 5
 '        Assert.Contains "SubKey " & i, s
@@ -175,8 +175,8 @@ Public Sub TestGetSubKeyNamesEmpty()
     Dim s() As String
     s = rk.GetSubKeyNames
     
-    Assert.IsFalse cArray.IsNull(s), "Should not be null."
-    Assert.AreEqual 0, cArray.GetLength(s), "Should be an empty array."
+    Assert.IsFalse CorArray.IsNull(s), "Should not be null."
+    Assert.AreEqual 0, CorArray.GetLength(s), "Should be an empty array."
 End Sub
 
 Public Sub TestDeleteSubKeyTree()

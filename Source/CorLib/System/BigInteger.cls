@@ -606,7 +606,7 @@ End Property
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitFromArray(ByRef Value As Variant)
-    If cArray.IsNull(Value) Then Exit Sub
+    If CorArray.IsNull(Value) Then Exit Sub
     
     Dim Bytes() As Byte
     Bytes = Value
@@ -890,11 +890,11 @@ Private Function ParseFormatSpecifier(ByVal Format As String, ByRef specifier As
     Dim Result  As Long
     Dim i       As Long
     For i = 2 To Len(Format)
-        Dim ch As Long
-        ch = Asc(Mid$(Format, i, 1))
-        Select Case ch
+        Dim Ch As Long
+        Ch = Asc(Mid$(Format, i, 1))
+        Select Case Ch
             Case 48 To 57
-                Result = Result * 10 + (ch - 48)
+                Result = Result * 10 + (Ch - 48)
                 If Result > 1000000 Then Exit For   ' hopefully over 1 million digits is enough.
             Case Else
                 Call Err.Raise(5, , "Invalid format specifier")

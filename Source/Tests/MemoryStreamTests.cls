@@ -255,7 +255,7 @@ Public Sub Constructor_WithAcquireMode_NullsSourceBuffer()
     
     Set ms = Cor.NewMemoryStream(Source, Mode:=AcquireMode)
     
-    Assert.That cArray.IsNull(Source), Iz.True
+    Assert.That CorArray.IsNull(Source), Iz.True
 End Sub
 
 Public Sub ReadBlock_WhenCalled_ReturnsAmountRead()

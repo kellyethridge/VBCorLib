@@ -35,7 +35,7 @@ Attribute VB_Exposed = False
 ''
 ' This class is used to sort arrays using a custom callback compare routine.
 '
-' @remarks In the sort functions of the cArray class a function address can be
+' @remarks In the sort functions of the CorArray class a function address can be
 ' passed in as a callback comparer. This class uses that call back to perform
 ' comparisons of the array elements. This is the second fastest sorting
 ' provided by VBCorLib. And it allows for complete custom array element comparison.

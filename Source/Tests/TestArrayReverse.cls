@@ -33,7 +33,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Reverse_WithValues_ReversesOrder(ByRef Arr As Variant)
-    cArray.Reverse Arr
+    CorArray.Reverse Arr
     
     Assert.That Arr, Iz.Ordered
 End Sub
@@ -42,7 +42,7 @@ Public Sub Reverse_WithNullArray_Throws()
     Dim Arr() As Long
     
     On Error GoTo errTrap
-    cArray.Reverse Arr
+    CorArray.Reverse Arr
     
 errTrap:
     AssertArgumentNullException Err, "Arr"
@@ -52,7 +52,7 @@ Public Sub Reverse_WithMultiDimensionArray_Throws()
     Dim Arr(0, 0) As Long
     
     On Error GoTo errTrap
-    cArray.Reverse Arr
+    CorArray.Reverse Arr
     
 errTrap:
     AssertRankException Err
@@ -62,7 +62,7 @@ Public Sub Reverse_WithIndexLessThanLBound_Throws()
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.Reverse Arr, -1
+    CorArray.Reverse Arr, -1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
@@ -72,7 +72,7 @@ Public Sub Reverse_WithIndexGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.Reverse Arr, 1
+    CorArray.Reverse Arr, 1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
@@ -82,7 +82,7 @@ Public Sub Reverse_WithIndexAndCountGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.Reverse Arr, 0, 2
+    CorArray.Reverse Arr, 0, 2
     
 errTrap:
     AssertArgumentException Err
@@ -92,7 +92,7 @@ Public Sub Reverse_WithIndexAndCount_ReverseSubArray()
     Dim Arr() As Long
     Arr = NewLongs(1, 1, 1, 4, 3, 2, 0, 0, 0)
     
-    cArray.Reverse Arr, 3, 3
+    CorArray.Reverse Arr, 3, 3
     
     Assert.That Arr, Iz.EqualTo(NewLongs(1, 1, 1, 2, 3, 4, 0, 0, 0))
 End Sub
@@ -104,7 +104,7 @@ Public Sub Reverse_WithUDTs_ReversesOrder()
     Arr(2).Data1 = 2
     Arr(3).Data1 = 3
     
-    cArray.Reverse Arr
+    CorArray.Reverse Arr
     
     Assert.That Arr(0).Data1, Iz.EqualTo(3)
     Assert.That Arr(1).Data1, Iz.EqualTo(2)

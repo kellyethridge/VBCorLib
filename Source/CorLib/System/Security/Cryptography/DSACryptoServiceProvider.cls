@@ -248,7 +248,7 @@ End Sub
 ' @param KeyBlob The blob key to be imported.
 '
 Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
-    If cArray.IsNull(KeyBlob) Then _
+    If CorArray.IsNull(KeyBlob) Then _
         Throw Cor.NewArgumentNullException("KeyBlob", Environment.GetResourceString(ArgumentNull_Array))
     
     Call VerifyLoaded(False)
@@ -256,7 +256,7 @@ Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     
     mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
     
-    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), cArray.GetLength(KeyBlob), 0, IIf(mPublicOnly, 0, CRYPT_EXPORTABLE), mKey) = BOOL_FALSE Then _
+    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.GetLength(KeyBlob), 0, IIf(mPublicOnly, 0, CRYPT_EXPORTABLE), mKey) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
 End Sub
 
@@ -310,8 +310,8 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByVal Str As String) As Byte()
     Call CryptDestroyHash(Hash)
     
     ' Reverse the sections to match the .NET implementation
-    Call cArray.Reverse(Signature, 0, 20)
-    Call cArray.Reverse(Signature, 20, 20)
+    Call CorArray.Reverse(Signature, 0, 20)
+    Call CorArray.Reverse(Signature, 20, 20)
     
     SignHash = Signature
     Exit Function
@@ -341,7 +341,7 @@ End Function
 ' @return Returns True if the signature if valid for the data, False otherwise.
 '
 Public Function VerifyData(ByRef RgbData() As Byte, ByRef Signature() As Byte) As Boolean
-    If cArray.IsNull(RgbData) Then _
+    If CorArray.IsNull(RgbData) Then _
         Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim HashObj As New SHA1CryptoServiceProvider
@@ -358,7 +358,7 @@ End Function
 ' @remarks Only SHA1 hash values are supported.
 '
 Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef Signature() As Byte) As Boolean
-    If cArray.IsNull(Signature) Then _
+    If CorArray.IsNull(Signature) Then _
         Throw Cor.NewArgumentNullException("Signature", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Hash As Long
@@ -367,10 +367,10 @@ Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef S
     ' We need to reverse the two sections of the signature to deal with .NET's big-endian form.
     Dim RevSig() As Byte
     RevSig = Signature
-    Call cArray.Reverse(RevSig, LBound(RevSig), 20)
-    Call cArray.Reverse(RevSig, LBound(RevSig) + 20, 20)
+    Call CorArray.Reverse(RevSig, LBound(RevSig), 20)
+    Call CorArray.Reverse(RevSig, LBound(RevSig) + 20, 20)
     
-    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), cArray.GetLength(RevSig), mKey, vbNullString, 0))
+    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.GetLength(RevSig), mKey, vbNullString, 0))
     Call CryptDestroyHash(Hash)
 End Function
 
@@ -525,7 +525,7 @@ End Sub
 Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     Call VerifyLoaded
     
-    If cArray.IsNull(RgbHash) Then _
+    If CorArray.IsNull(RgbHash) Then _
         Throw Cor.NewArgumentNullException("RgbHash", Environment.GetResourceString(ArgumentNull_Array))
     
     Select Case LCase$(Str)
@@ -534,7 +534,7 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
             Throw Cor.NewArgumentException("Hash OID not supported", "Str")
     End Select
     
-    If cArray.GetLength(RgbHash) <> 20 Then _
+    If CorArray.GetLength(RgbHash) <> 20 Then _
         Throw Cor.NewCryptographicException("Invalid hash length.")
     
     On Error GoTo errTrap
