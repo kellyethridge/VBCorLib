@@ -458,7 +458,7 @@ Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optio
     If IsMultiDimArray(Arr) Then _
         Error.Rank
         
-    BinarySearch = InternalBinarySearch(Arr, LBound(Arr), ArrayLength(Arr), Value, Comparer)
+    BinarySearch = BinarySearchCore(Arr, LBound(Arr), ArrayLength(Arr), Value, Comparer)
 End Function
 
 ''
@@ -491,7 +491,7 @@ Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal 
     If Index + Length - 1 > UBound(Arr) Then _
         Error.InvalidOffsetLength
     
-    BinarySearchEx = InternalBinarySearch(Arr, Index, Length, Value, Comparer)
+    BinarySearchEx = BinarySearchCore(Arr, Index, Length, Value, Comparer)
 End Function
 
 ''
@@ -1204,15 +1204,15 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-Private Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
+Private Function BinarySearchCore(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
     On Error GoTo errTrap
     
     If Comparer Is Nothing Then
-        If ArraySearch.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, InternalBinarySearch) Then
+        If CorArrayPartial.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, BinarySearchCore) Then
             Exit Function
         End If
         
-        Set Comparer = VBCorLib.Comparer.Default
+        Set Comparer = Statics.Comparer.Default
     End If
     
     ' perform a search using comparer.
@@ -1226,7 +1226,7 @@ Private Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long,
         MiddleIndex = (LowIndex + HighIndex) \ 2
         Select Case Comparer.Compare(Arr(MiddleIndex), Value)
             Case 0
-                InternalBinarySearch = MiddleIndex
+                BinarySearchCore = MiddleIndex
                 Exit Function
             Case Is > 0
                 HighIndex = MiddleIndex - 1
@@ -1235,7 +1235,7 @@ Private Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long,
         End Select
     Loop
     
-    InternalBinarySearch = (Not (LowIndex - LBound(Arr))) + LBound(Arr)
+    BinarySearchCore = (Not (LowIndex - LBound(Arr))) + LBound(Arr)
     Exit Function
 errTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
