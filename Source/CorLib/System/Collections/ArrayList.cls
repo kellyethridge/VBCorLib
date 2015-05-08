@@ -243,8 +243,6 @@ End Function
 ' Returns if the list contains a specific value.
 '
 ' @param value The value to search for.
-' @param comparer  A user-defined comparer to performs custom
-' compare logic on the array elements.
 ' @return A boolean value indicating the value was found in the list.
 ' @remarks This method performs a linear search of all elements in the list
 ' comparing each element with the value being searched for. If the value is
@@ -522,12 +520,11 @@ End Property
 ' @param Value The value to search for in the list.
 ' @param StartIndex The index to start searching from.
 ' @param Count The number of items to be searched.
-' @param Comparer A custom comparer to perform any special compare logic.
 ' @return The index of the last occurrence of the value, or -1 if not found.
 ' @remarks The search is performed from the end of the list towards the
 ' beginning. If a startindex
 '
-Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     Range.Index = IfLong(StartIndex, mCount - 1)
     Range.Count = IfLong(Count, Range.Index + 1)
@@ -546,11 +543,7 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
         Exit Function
     End If
     
-    If Comparer Is Nothing Then
-        Set Comparer = mComparer
-    End If
-    
-    LastIndexOf = cArray.LastIndexOf(mItems, Value, StartIndex, Count, Comparer)
+    LastIndexOf = cArray.LastIndexOf(mItems, Value, StartIndex, Count)
 End Function
 
 ''
@@ -576,10 +569,6 @@ End Function
 '
 Public Sub Remove(ByRef Value As Variant)
     Dim Index As Long
-    If Comparer Is Nothing Then
-        Set Comparer = mComparer
-    End If
-    
     Index = IndexOf(Value)
     
     If Index >= 0 Then

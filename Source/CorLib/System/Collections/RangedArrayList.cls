@@ -339,7 +339,7 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
     Helper.MoveVariant ArrayList_Item, mList(mIndex + Index)
 End Property
 
-Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     VerifyVersion
     
     Dim ElemIndex As Long
@@ -354,7 +354,7 @@ Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartInd
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
 
     Dim Index As Long
-    Index = mList.LastIndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
+    Index = mList.LastIndexOf(Value, mIndex + ElemIndex, ElemCount)
     If Index >= 0 Then
         Index = Index - mIndex
     End If

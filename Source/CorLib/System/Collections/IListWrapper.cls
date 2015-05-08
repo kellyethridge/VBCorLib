@@ -357,7 +357,7 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
     Helper.MoveVariant ArrayList_Item, mList(Index)
 End Property
 
-Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     
@@ -373,9 +373,8 @@ Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartInd
     If ElemIndex - ElemCount + 1 < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_LargerThanCollection))
     
-    If Comparer Is Nothing Then
-        Set Comparer = VBCorLib.Comparer.Default
-    End If
+    Dim Comparer As IComparer
+    Set Comparer = Statics.Comparer.Default
     
     Dim i As Long
     For i = ElemIndex To ElemIndex - ElemCount + 1 Step -1
