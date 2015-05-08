@@ -254,8 +254,8 @@ End Function
 ' <p>If there is special compare logic necessary, then a comparer
 ' object can be supplied. The compare object must implement the IComparer interface.</p>
 '
-Public Function Contains(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    Contains = (IndexOf(Value, , , Comparer) >= 0)
+Public Function Contains(ByRef Value As Variant) As Boolean
+    Contains = IndexOf(Value) >= 0
 End Function
 
 ''
@@ -379,15 +379,13 @@ End Function
 ' @param value The value to search the list for.
 ' @param startindex The index to begin the search in the list.
 ' @param count The number of items in the list to search.
-' @param comparer A custom comparer to perform any special compare logic.
 ' @return The index of the first occurrence of value, or -1 if the value was not found.
 ' @remarks If there is special compare logic necessary, then a comparer
 ' object can be supplied. The compare object must implement the IComparer interface.
 '
-Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
-    Range.Index = IfLong(StartIndex, 0)
-    Range.Count = IfLong(Count, mCount - Range.Index)
+    Range = GetOptionalStepRange(StartIndex, Count, 0, mCount, Parameter_StartIndex)
     
     If Range.Index > mCount Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
@@ -399,11 +397,7 @@ Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Var
         Exit Function
     End If
     
-    If Comparer Is Nothing Then
-        Set Comparer = mComparer
-    End If
-    
-    IndexOf = cArray.IndexOf(mItems, Value, StartIndex, Count, Comparer)
+    IndexOf = cArray.IndexOf(mItems, Value, StartIndex, Count)
 End Function
 
 ''
@@ -575,19 +569,18 @@ End Function
 ' Removes a value from the list.
 '
 ' @param value The value to be removed.
-' @param comparer A custom comparer used to find the value.
 ' @remarks If the value is an object, then it must be the same instance of
 ' the object to be removed. This behaviour can be overriden with a custom comparer.
 ' <p>When removing an item, the remaining items maintain there current order
 ' relative to the other items.</p>
 '
-Public Sub Remove(ByRef Value As Variant, Optional ByVal Comparer As IComparer)
+Public Sub Remove(ByRef Value As Variant)
     Dim Index As Long
     If Comparer Is Nothing Then
         Set Comparer = mComparer
     End If
     
-    Index = IndexOf(Value, Comparer:=Comparer)
+    Index = IndexOf(Value)
     
     If Index >= 0 Then
         RemoveAt Index
@@ -1010,8 +1003,8 @@ Private Sub IList_Clear()
     Clear
 End Sub
 
-Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    IList_Contains = Contains(Value, Comparer)
+Private Function IList_Contains(Value As Variant) As Boolean
+    IList_Contains = Contains(Value)
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
@@ -1026,8 +1019,8 @@ Private Function IList_GetEnumerator() As IEnumerator
     Set IList_GetEnumerator = GetEnumerator
 End Function
 
-Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    IList_IndexOf = IndexOf(Value, , , Comparer)
+Private Function IList_IndexOf(Value As Variant) As Long
+    IList_IndexOf = IndexOf(Value)
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
@@ -1042,12 +1035,12 @@ Private Property Get IList_IsReadOnly() As Boolean
     IList_IsReadOnly = IsReadOnly
 End Property
 
-Private Property Set IList_Item(ByVal Index As Long, RHS As Variant)
-    Set Item(Index) = RHS
+Private Property Set IList_Item(ByVal Index As Long, Value As Variant)
+    Set Item(Index) = Value
 End Property
 
-Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
-    Item(Index) = RHS
+Private Property Let IList_Item(ByVal Index As Long, Value As Variant)
+    Item(Index) = Value
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
@@ -1058,8 +1051,8 @@ Private Function IList_NewEnum() As stdole.IUnknown
     Set IList_NewEnum = NewEnum
 End Function
 
-Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    Remove Value, Comparer
+Private Sub IList_Remove(Value As Variant)
+    Remove Value
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)

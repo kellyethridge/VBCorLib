@@ -94,8 +94,8 @@ Private Function ArrayList_Clone() As ArrayList
     Set ArrayList_Clone = Ret
 End Function
 
-Private Function ArrayList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    ArrayList_Contains = mList.Contains(Value, Comparer)
+Private Function ArrayList_Contains(Value As Variant) As Boolean
+    ArrayList_Contains = mList.Contains(Value)
 End Function
 
 Private Sub ArrayList_CopyTo(DstArray As Variant, Optional ArrayIndex As Variant)
@@ -127,7 +127,7 @@ Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, O
 End Function
 
 Private Function ArrayList_GetHashCode() As Long
-    ArrayList_GetHashCode = IObject_GetHashCode
+    ArrayList_GetHashCode = IObject_GetHashcode
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
@@ -141,8 +141,8 @@ Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As
     Set ArrayList_GetRange = Ret
 End Function
 
-Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_IndexOf = mList.IndexOf(Value, StartIndex, Count, Comparer)
+Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    ArrayList_IndexOf = mList.IndexOf(Value, StartIndex, Count)
 End Function
 
 Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)
@@ -181,7 +181,7 @@ Private Function ArrayList_NewEnum() As stdole.IUnknown
     Set ArrayList_NewEnum = CreateEnumerator(ArrayList_GetEnumerator)
 End Function
 
-Private Sub ArrayList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
+Private Sub ArrayList_Remove(Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 
@@ -233,8 +233,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -285,8 +285,8 @@ Private Sub IList_Clear()
     Call ArrayList_Clear
 End Sub
 
-Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    IList_Contains = ArrayList_Contains(Value, Comparer)
+Private Function IList_Contains(Value As Variant) As Boolean
+    IList_Contains = ArrayList_Contains(Value)
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
@@ -301,8 +301,8 @@ Private Function IList_GetEnumerator() As IEnumerator
     Set IList_GetEnumerator = ArrayList_GetEnumerator
 End Function
 
-Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    IList_IndexOf = ArrayList_IndexOf(Value, , , Comparer)
+Private Function IList_IndexOf(Value As Variant) As Long
+    IList_IndexOf = ArrayList_IndexOf(Value)
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
@@ -317,12 +317,12 @@ Private Property Get IList_IsReadOnly() As Boolean
     IList_IsReadOnly = ArrayList_IsReadOnly
 End Property
 
-Private Property Set IList_Item(ByVal Index As Long, RHS As Variant)
-    Set ArrayList_Item(Index) = RHS
+Private Property Set IList_Item(ByVal Index As Long, Value As Variant)
+    Set ArrayList_Item(Index) = Value
 End Property
 
-Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
-    ArrayList_Item(Index) = RHS
+Private Property Let IList_Item(ByVal Index As Long, Value As Variant)
+    ArrayList_Item(Index) = Value
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
@@ -333,8 +333,8 @@ Private Function IList_NewEnum() As stdole.IUnknown
     Set IList_NewEnum = ArrayList_NewEnum
 End Function
 
-Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    Call ArrayList_Remove(Value, Comparer)
+Private Sub IList_Remove(Value As Variant)
+    Call ArrayList_Remove(Value)
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)

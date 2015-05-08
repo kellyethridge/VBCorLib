@@ -62,8 +62,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -111,7 +111,7 @@ Private Sub IList_Clear()
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 
-Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
+Private Function IList_Contains(Value As Variant) As Boolean
     IList_Contains = mList.Contains(Value)
 End Function
 
@@ -127,7 +127,7 @@ Private Function IList_GetEnumerator() As IEnumerator
     Set IList_GetEnumerator = mList.GetKeyEnumerator
 End Function
 
-Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function IList_IndexOf(Value As Variant) As Long
     IList_IndexOf = mList.IndexOfKey(Value)
 End Function
 
@@ -143,11 +143,11 @@ Private Property Get IList_IsReadOnly() As Boolean
     IList_IsReadOnly = True
 End Property
 
-Private Property Set IList_Item(ByVal Index As Long, RHS As Variant)
+Private Property Set IList_Item(ByVal Index As Long, Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Property
 
-Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
+Private Property Let IList_Item(ByVal Index As Long, Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Property
 
@@ -159,7 +159,7 @@ Private Function IList_NewEnum() As stdole.IUnknown
     Set IList_NewEnum = NewEnum
 End Function
 
-Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
+Private Sub IList_Remove(Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 
