@@ -110,7 +110,7 @@ End Function
 ' rules, such as finding user-defined types.
 '
 Public Function Contains(ByRef Value As Variant) As Boolean
-    Contains = (cArray.IndexOf(mItems, Value, 0, mCount, Comparer) >= 0)
+    Contains = cArray.IndexOf(mItems, Value, 0, mCount) >= 0
 End Function
 
 ''

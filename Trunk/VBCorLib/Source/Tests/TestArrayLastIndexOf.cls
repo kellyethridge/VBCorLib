@@ -57,23 +57,6 @@ Public Sub LastIndexOf_WithValues_ReturnsExpected(ByRef Arr As Variant, ByRef Va
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub LastIndexOf_WithDefaultComparer_ReturnsExpected()
-    Dim Actual As Long
-    Dim Arr(2) As Int32
-    Set Arr(0) = New Int32
-    Set Arr(1) = New Int32
-    Set Arr(2) = New Int32
-    Arr(1).Value = 10
-    Arr(0).Value = 10
-    Dim Value As New Int32
-    Value.Value = 10
-    
-    Actual = cArray.LastIndexOf(Arr, Value, comparer:=comparer.Default)
-    
-    Const Expected As Long = 1
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
 Public Sub LastIndexOf_WithNullArray_Throws()
     Dim Arr() As Long
 

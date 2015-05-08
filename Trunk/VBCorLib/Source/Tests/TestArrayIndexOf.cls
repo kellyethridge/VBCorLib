@@ -56,22 +56,6 @@ Public Sub IndexOf_WithValues_ReturnsExpected(ByRef Arr As Variant, ByRef Value 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IndexOf_WithDefaultComparer_ReturnsExpected()
-    Dim Actual As Long
-    Dim Arr(2) As Int32
-    Set Arr(0) = New Int32
-    Set Arr(1) = New Int32
-    Set Arr(2) = New Int32
-    Arr(1).Value = 10
-    Dim Value As New Int32
-    Value.Value = 10
-    
-    Actual = cArray.IndexOf(Arr, Value, comparer:=comparer.Default)
-    
-    Const Expected As Long = 1
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
 Public Sub IndexOf_WithNullArray_ThrowsArgumentNullException()
     Dim Arr() As Long
     

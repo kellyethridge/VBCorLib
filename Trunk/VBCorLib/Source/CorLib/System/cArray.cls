@@ -794,10 +794,9 @@ End Function
 ' @param Value The value to search for in the array.
 ' @param StartIndex The index to the element in the array to begin search from.
 ' @param Count The number of elements to search, starting from startindex.
-' @param Comparer An optional comparer, primarily used for User-Defined types.
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
-Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim ArrayPtr As Long
     ArrayPtr = ArrayPointer(Arr)
     
@@ -817,11 +816,12 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
     
     On Error GoTo errTrap
-    If Comparer Is Nothing Then
-        ' if no comparer was supplied, then try some optimized routines.
-        If TrySZIndexOf(ArrayPtr, Value, ElemIndex, ElemCount, IndexOf) Then Exit Function
-        Set Comparer = VBCorLib.Comparer.Default
+    If TrySZIndexOf(ArrayPtr, Value, ElemIndex, ElemCount, IndexOf) Then
+        Exit Function
     End If
+    
+    Dim Comparer As IComparer
+    Set Comparer = Statics.Comparer.Default
     
     Do While ElemCount > 0
         If Comparer.Compare(Arr(ElemIndex), Value) = 0 Then
@@ -855,11 +855,10 @@ End Function
 ' @param Value The value to search for in the array.
 ' @param StartIndex The index to the element in the array to begin search from.
 ' @param Count The number of elements to search, starting from startindex.
-' @param Comparer An optional comparer, primarily used for User-Defined types.
 ' @return Value indicating the index the value was found. If no value was found,
 ' then one less than the lower bound of the array is returned.
 '
-Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim pSafeArray As Long
     pSafeArray = GetArrayPointer(Arr)
     
@@ -881,13 +880,13 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
     On Error GoTo errTrap
-    If Comparer Is Nothing Then
-        ' if no comparer was supplied, then try some optimized routines.
-        If TrySZLastIndexOf(pSafeArray, Value, ElemIndex, ElemCount, LastIndexOf) Then Exit Function
-        Set Comparer = VBCorLib.Comparer.Default
+    If TrySZLastIndexOf(pSafeArray, Value, ElemIndex, ElemCount, LastIndexOf) Then
+        Exit Function
     End If
     
-    ' perform a search using comparer.
+    Dim Comparer As IComparer
+    Set Comparer = Statics.Comparer.Default
+    
     Do While ElemCount > 0
         If Comparer.Compare(Arr(ElemIndex), Value) = 0 Then
             LastIndexOf = ElemIndex
