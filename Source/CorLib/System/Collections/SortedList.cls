@@ -167,8 +167,8 @@ End Function
 ' @param comparer A user-supplied IComparer object to perform special comparisons as necessary.
 ' @return Indication of the value being found in the list.
 '
-Public Function ContainsValue(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    ContainsValue = (cArray.IndexOf(mValues, Value, 0, mCount, Comparer) >= 0)
+Public Function ContainsValue(ByRef Value As Variant) As Boolean
+    ContainsValue = cArray.IndexOf(mValues, Value, 0, mCount) >= 0
 End Function
 
 ''
@@ -294,7 +294,7 @@ End Function
 ' the key was not found in the list.
 '
 Public Function IndexOfKey(ByRef Key As Variant) As Long
-    IndexOfKey = cArray.IndexOf(mKeys, Key, 0, mCount, mComparer)
+    IndexOfKey = cArray.IndexOf(mKeys, Key, 0, mCount)
 End Function
 
 ''
@@ -304,8 +304,8 @@ End Function
 ' @param Comparer A user-supplied comparer for special comparison, especially for user-defined types.
 ' @return The index the value was found, or a -1 if the value was not found.
 '
-Public Function IndexOfValue(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    IndexOfValue = cArray.IndexOf(mValues, Value, 0, mCount, Comparer)
+Public Function IndexOfValue(ByRef Value As Variant) As Long
+    IndexOfValue = cArray.IndexOf(mValues, Value, 0, mCount)
 End Function
 
 ''
@@ -544,8 +544,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
