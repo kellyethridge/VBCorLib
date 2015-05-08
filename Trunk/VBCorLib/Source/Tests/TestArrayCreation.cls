@@ -74,7 +74,7 @@ End Sub
 Public Sub CreateInstance_WithOneDimension_CreatesExpected(ByVal vbType As VbVarType, ByVal Length As Long, ByRef Expected As Variant)
     Dim Actual As Variant
     
-    Actual = cArray.CreateInstance(vbType, Length)
+    Actual = CorArray.CreateInstance(vbType, Length)
     
     Assert.That Actual, Iz.EqualTo(Expected).Strict
 End Sub
@@ -90,7 +90,7 @@ End Sub
 Public Sub CreateInstance_WithInvalidVbVarType_Throws(ByVal ElementType As VbVarType)
     On Error Resume Next
     
-    cArray.CreateInstance ElementType
+    CorArray.CreateInstance ElementType
     
     AssertArgumentException Err, "ElementType"
 End Sub
@@ -98,7 +98,7 @@ End Sub
 Public Sub CreateInstance_WithTwoDimensions_CreatesExpected()
     Dim Actual() As Long
     
-    Actual = cArray.CreateInstance(vbLong, 1, 2)
+    Actual = CorArray.CreateInstance(vbLong, 1, 2)
     
     Dim Expected() As Long
     ReDim Expected(0, 1)
@@ -108,7 +108,7 @@ End Sub
 Public Sub CreateInstance_WithThreeDimensions_CreatesExpected()
     Dim Actual() As Long
     
-    Actual = cArray.CreateInstance(vbLong, 1, 2, 3)
+    Actual = CorArray.CreateInstance(vbLong, 1, 2, 3)
     
     Dim Expected() As Long
     ReDim Expected(0, 1, 2)
@@ -118,7 +118,7 @@ End Sub
 Public Sub CreateInstance_WithLength1LessThanZero_Throws()
     On Error Resume Next
     
-    cArray.CreateInstance vbLong, -1
+    CorArray.CreateInstance vbLong, -1
     
     AssertArgumentOutOfRangeException Err, "Length1"
 End Sub
@@ -126,7 +126,7 @@ End Sub
 Public Sub CreateInstance_WithZeroOneAndTwoLength_CreatesExpected()
     Dim Actual() As Long
     
-    Actual = cArray.CreateInstance(vbLong, 0, 1, 2)
+    Actual = CorArray.CreateInstance(vbLong, 0, 1, 2)
     
     Assert.That UBound(Actual, 1), Iz.EqualTo(-1)
     Assert.That UBound(Actual, 2), Iz.EqualTo(0)

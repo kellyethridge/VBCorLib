@@ -190,11 +190,11 @@ End Function
 ' @remarks Once a final block has been processed, the transform is reset to begin transforming new data.
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    If cArray.IsNull(InputBuffer) Then _
+    If CorArray.IsNull(InputBuffer) Then _
         Throw Cor.NewArgumentNullException("InputBuffer")
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException("InputOffset", InputOffset, Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
+    If (CorArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     If mIsEncrypting Then
@@ -296,7 +296,7 @@ Friend Sub Init(ByRef RgbKey() As Byte, ByRef RgbIV() As Byte, ByVal Base As Sym
     End With
     
     mNb = mBlockSizeBits \ 32
-    mNk = cArray.GetLength(RgbKey) \ 4
+    mNk = CorArray.GetLength(RgbKey) \ 4
     
     Call InitLookupTables
     Call CalculateNumberOfRounds
@@ -865,7 +865,7 @@ End Sub
 Private Sub CreateExpandedKey(ByRef RgbKey() As Byte)
     ReDim mExpKey(0 To (mNb * (mNr + 1)) - 1)
     
-    Call CopyMemory(mExpKey(0), RgbKey(0), cArray.GetLength(RgbKey))
+    Call CopyMemory(mExpKey(0), RgbKey(0), CorArray.GetLength(RgbKey))
     
     Dim w As Long
     Dim i As Long
@@ -990,8 +990,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

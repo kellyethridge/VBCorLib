@@ -110,16 +110,16 @@ End Function
 ' a Boolean array, each boolean element represents a single bit in the array.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    If cArray.IsNull(DstArray) Then _
+    If CorArray.IsNull(DstArray) Then _
         Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(DstArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If cArray.Rank(DstArray) <> 1 Then _
+    If CorArray.Rank(DstArray) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     
     Select Case VarType(DstArray)
         Case vbLongArray
-            Call cArray.CopyEx(mBits, 0, DstArray, Index, (mLength + 31) \ 32)
+            Call CorArray.CopyEx(mBits, 0, DstArray, Index, (mLength + 31) \ 32)
         
         Case vbByteArray
             If (Index + (mLength + 7) \ 8) - 1 > UBound(DstArray) Then _
@@ -128,7 +128,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
             Call Buffer.BlockCopy(mBits, 0, DstArray, Index - LBound(DstArray), (mLength + 7) \ 8)
             
         Case vbBooleanArray
-            If cArray.GetLength(DstArray) < mLength Then _
+            If CorArray.GetLength(DstArray) < mLength Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayPlusOffTooSmall), "index")
             
             Dim i As Long
@@ -391,12 +391,12 @@ Friend Sub Init(ByVal Length As Long, ByVal Value As Boolean)
 End Sub
 
 Friend Sub InitFromBooleans(ByRef Values() As Boolean)
-    If cArray.IsNull(Values) Then _
+    If CorArray.IsNull(Values) Then _
         Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
 
     Dim i   As Long
     Dim lb  As Long
-    Me.Length = cArray.GetLength(Values, 1)
+    Me.Length = CorArray.GetLength(Values, 1)
     lb = LBound(Values)
     For i = 0 To mLength - 1
         Item(i) = Values(lb + i)
@@ -404,17 +404,17 @@ Friend Sub InitFromBooleans(ByRef Values() As Boolean)
 End Sub
 
 Friend Sub InitFromBytes(ByRef Values() As Byte)
-    If cArray.IsNull(Values) Then _
+    If CorArray.IsNull(Values) Then _
         Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Size As Long
-    Size = cArray.GetLength(Values, 1)
+    Size = CorArray.GetLength(Values, 1)
     Me.Length = Size * 8
     Call CopyMemory(mBits(0), Values(0), Size)
 End Sub
 
 Friend Sub InitFromLongs(ByRef Values() As Long)
-    If cArray.IsNull(Values) Then _
+    If CorArray.IsNull(Values) Then _
         Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
     
     mBits = Values

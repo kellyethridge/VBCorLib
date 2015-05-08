@@ -1078,10 +1078,10 @@ Public Function NewArray(ByVal ElementType As VbVarType, ParamArray ArrayElement
     Length = UBound(Args) + 1
     
     Dim Ret As Variant
-    Ret = cArray.CreateInstance(ElementType, Length)
+    Ret = CorArray.CreateInstance(ElementType, Length)
     
     If Length > 0 Then
-        cArray.CopyEx Args, 0, Ret, 0, Length
+        CorArray.CopyEx Args, 0, Ret, 0, Length
     End If
     
     NewArray = Ret

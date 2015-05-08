@@ -458,11 +458,11 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
     Dim bitCount As Long
     Dim maxCharIndex As Long
     Dim MaxByteIndex As Long
-    Dim ch As Long
+    Dim Ch As Long
     Dim ByteStartIndex As Long
     Dim directlyEncodable As Boolean
     
-    If cArray.IsNull(Bytes) Then _
+    If CorArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If ByteIndex < LBound(Bytes) Then _
         Throw Cor.NewArgumentOutOfRangeException("ByteIndex", ByteIndex, Environment.GetResourceString(ArgumentOutOfRange_LBound))
@@ -480,10 +480,10 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
     maxCharIndex = Index + Count - 1
     MaxByteIndex = UBound(Bytes)
     Do While Index <= maxCharIndex
-        AsWord(ch) = Chars(Index)
+        AsWord(Ch) = Chars(Index)
         directlyEncodable = False
-        If ch < &H80 Then
-            If mDirectlyEncodable(ch) Then
+        If Ch < &H80 Then
+            If mDirectlyEncodable(Ch) Then
                 If bitCount >= 0 Then
                     If bitCount > 0 Then
                         If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
@@ -495,14 +495,14 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                     ByteIndex = ByteIndex + 1
                 End If
                 If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
-                Bytes(ByteIndex) = ch
+                Bytes(ByteIndex) = Ch
                 ByteIndex = ByteIndex + 1
                 bitCount = -1
                 directlyEncodable = True
             End If
         End If
         If Not directlyEncodable Then
-            If ch = vbPlusChar And bitCount < 0 Then
+            If Ch = vbPlusChar And bitCount < 0 Then
                 If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
                 Bytes(ByteIndex) = vbPlusChar
                 Bytes(ByteIndex + 1) = vbMinusChar
@@ -514,7 +514,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                     ByteIndex = ByteIndex + 1
                     bitCount = 0
                 End If
-                Bits = (Bits * &H10000) Or ch
+                Bits = (Bits * &H10000) Or Ch
                 bitCount = bitCount + 16
                 Do While bitCount >= 6
                     bitCount = bitCount - 6
@@ -564,7 +564,7 @@ End Function
 Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Encoder As UTF7Encoder) As Long
     Dim bitCount As Long
     Dim maxCharIndex As Long
-    Dim ch As Long
+    Dim Ch As Long
     Dim directlyEncodable As Boolean
     Dim ByteIndex As Long
     
@@ -576,10 +576,10 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
     
     maxCharIndex = Index + Count - 1
     Do While Index <= maxCharIndex
-        AsWord(ch) = Chars(Index)
+        AsWord(Ch) = Chars(Index)
         directlyEncodable = False
-        If ch < &H80 Then
-            If mDirectlyEncodable(ch) Then
+        If Ch < &H80 Then
+            If mDirectlyEncodable(Ch) Then
                 If bitCount >= 0 Then
                     If bitCount > 0 Then ByteIndex = ByteIndex + 1
                     ByteIndex = ByteIndex + 1
@@ -590,7 +590,7 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
             End If
         End If
         If Not directlyEncodable Then
-            If ch = vbPlusChar And bitCount < 0 Then
+            If Ch = vbPlusChar And bitCount < 0 Then
                 ByteIndex = ByteIndex + 2
             Else
                 If bitCount < 0 Then
@@ -665,7 +665,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     Dim maxCharIndex As Long
     Dim MaxByteIndex As Long
     
-    If cArray.IsNull(Chars) Then _
+    If CorArray.IsNull(Chars) Then _
         Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
         Throw Cor.NewArgumentOutOfRangeException("CharIndex", CharIndex, Environment.GetResourceString(ArgumentOutOfRange_LBound))
@@ -815,8 +815,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

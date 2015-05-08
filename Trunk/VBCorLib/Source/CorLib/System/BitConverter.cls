@@ -300,14 +300,14 @@ Public Function ToDecimal(ByRef Value() As Byte, ByVal StartIndex As Long) As Va
     If Value(StartIndex + 14) > 28 Then _
         Throw Cor.NewOverflowException("Decimal precision must be from 0 to 28 places.")
     
-    Dim ptr As Long
-    ptr = VarPtr(ToDecimal)
+    Dim Ptr As Long
+    Ptr = VarPtr(ToDecimal)
     
-    If Value(StartIndex + 15) <> 0 Then MemByte(ptr + 3) = &H80  ' set sign
+    If Value(StartIndex + 15) <> 0 Then MemByte(Ptr + 3) = &H80  ' set sign
     
-    MemByte(ptr + 2) = Value(StartIndex + 14)            ' set precision
-    MemLong(ptr + 4) = AsLong(Value(StartIndex + 8))     ' set highest 32 bits
-    MemCurr(ptr + 8) = AsCurr(Value(StartIndex + 0))     ' set lowest and middle 32bits
+    MemByte(Ptr + 2) = Value(StartIndex + 14)            ' set precision
+    MemLong(Ptr + 4) = AsLong(Value(StartIndex + 8))     ' set highest 32 bits
+    MemCurr(Ptr + 8) = AsCurr(Value(StartIndex + 0))     ' set lowest and middle 32bits
 End Function
 
 ''
@@ -323,7 +323,7 @@ End Function
 ' become '01-EF-CD-AB'.
 '
 Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
-    If cArray.IsNull(Value) Then _
+    If CorArray.IsNull(Value) Then _
         Throw Cor.NewArgumentNullException("Value", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim ElemIndex As Long

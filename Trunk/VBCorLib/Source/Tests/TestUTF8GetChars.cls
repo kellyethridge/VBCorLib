@@ -37,7 +37,7 @@ End Sub
 Public Sub TestFrom1ByteAnsii()
     Dim ch() As Integer
     ch = e.GetChars(NewBytes(65))
-    Assert.AreEqual 1, cArray.GetLength(ch)
+    Assert.AreEqual 1, CorArray.GetLength(ch)
     Assert.AreEqual 65, ch(0)
 End Sub
 
@@ -47,7 +47,7 @@ Public Sub TestFrom10BytesAnsii()
     
     b = e.GetBytes(String$(10, &H7F))
     ch = e.GetChars(b)
-    Assert.AreEqual 10, cArray.GetLength(ch)
+    Assert.AreEqual 10, CorArray.GetLength(ch)
     For i = 0 To 9
         Assert.AreEqual &H7F, ch(i)
     Next i
@@ -56,7 +56,7 @@ End Sub
 Public Sub TestSurrogatePair()
     b = e.GetBytes(NewIntegers(&HDBFF, &HDC00))
     ch = e.GetChars(b)
-    Assert.AreEqual 2, cArray.GetLength(ch)
+    Assert.AreEqual 2, CorArray.GetLength(ch)
     Assert.AreEqual &HDBFF, ch(0)
     Assert.AreEqual &HDC00, ch(1)
 End Sub
@@ -64,7 +64,7 @@ End Sub
 Public Sub TestNonAscii()
     b = e.GetBytes(String$(10, 167))
     ch = e.GetChars(b)
-    Assert.AreEqual 10, cArray.GetLength(ch)
+    Assert.AreEqual 10, CorArray.GetLength(ch)
     
     Assert.AreEqual String$(10, 167), cString.FromCharArray(ch)
 End Sub
@@ -85,7 +85,7 @@ Public Sub TestComboChars()
     
     b = e.GetBytes(s)
     ch = e.GetChars(b)
-    Assert.AreEqual 40, cArray.GetLength(ch)
+    Assert.AreEqual 40, CorArray.GetLength(ch)
     Assert.AreEqual s, cString.FromCharArray(ch)
 End Sub
 
@@ -130,9 +130,9 @@ Public Sub TestShortestFrom()
     Dim ch() As Integer
     
     b = e.GetBytes(ChrW$(8191))
-    Assert.AreEqual 3, cArray.GetLength(b)
+    Assert.AreEqual 3, CorArray.GetLength(b)
     ch = e.GetChars(b)
-    Assert.AreEqual 1, cArray.GetLength(ch)
+    Assert.AreEqual 1, CorArray.GetLength(ch)
     Assert.AreEqual 8191, ch(0)
 End Sub
 
@@ -157,7 +157,7 @@ Public Sub TestGet1001CharsFromfile()
     
     Set En = New UTF8Encoding
     ch = En.GetChars(b)
-    Assert.AreEqual 1001, cArray.GetLength(ch)
+    Assert.AreEqual 1001, CorArray.GetLength(ch)
     
     For i = 0 To 1000
         Assert.AreEqual i, ch(i)
@@ -176,9 +176,9 @@ End Sub
 Public Sub TestZeroLengthArray()
     Dim ch() As Integer
     
-    b = cArray.CreateInstance(vbByte)
+    b = CorArray.CreateInstance(vbByte)
     ch = e.GetChars(b)
-    Assert.IsFalse cArray.IsNull(ch), "Array should not be null."
-    Assert.AreEqual 0, cArray.GetLength(ch)
+    Assert.IsFalse CorArray.IsNull(ch), "Array should not be null."
+    Assert.AreEqual 0, CorArray.GetLength(ch)
     
 End Sub

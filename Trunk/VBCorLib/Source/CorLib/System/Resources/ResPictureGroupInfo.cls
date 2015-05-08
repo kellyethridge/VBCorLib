@@ -219,7 +219,7 @@ Friend Sub Init(ByVal ResourceId As Long, ByVal Pic As IPicture, ByVal ResourceT
         mColorCount = Powers(.biBitCount)
         mPlanes = .biPlanes
         mBitCount = .biBitCount
-        mBytesInRes = cArray.GetLength(Bytes)
+        mBytesInRes = CorArray.GetLength(Bytes)
     End With
     
     mResourceID = ResourceId
@@ -233,8 +233,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

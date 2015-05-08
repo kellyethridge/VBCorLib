@@ -107,7 +107,7 @@ Public Sub TestGetCommandLineArgs()
     WriteLine "--- VISUAL INSPECTION ---"
     WriteLine "--- GetCommandLingArgs ---"
     WriteLine "Should have no empty args unless quoted."
-    WriteLine "Count: " & cArray.GetLength(s)
+    WriteLine "Count: " & CorArray.GetLength(s)
     WriteLine "Program: " & s(0)
     For i = 1 To UBound(s)
         WriteLine "Arg(" & i & ") = " & s(i)
@@ -211,7 +211,7 @@ End Sub
 Public Sub TestParseEmptyCommandArgs()
     Dim Args() As String
     Args = Environment.ParseCommandLineArgs("")
-    Assert.IsFalse cArray.IsNull(Args), "Should not be null."
+    Assert.IsFalse CorArray.IsNull(Args), "Should not be null."
     Assert.AreEqual -1, UBound(Args)
 End Sub
 

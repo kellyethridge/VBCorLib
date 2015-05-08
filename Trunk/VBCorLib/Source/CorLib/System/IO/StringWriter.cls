@@ -225,7 +225,7 @@ Private Sub InternalWriteLine(ByRef Args() As Variant)
         Next i
         ReDim Preserve Args(UBound(Args) - 1)
     ElseIf ub = 0 Then
-        Args = cArray.CreateInstance(vbVariant)
+        Args = CorArray.CreateInstance(vbVariant)
     End If
     
     Call InternalWrite(s, Args, True)

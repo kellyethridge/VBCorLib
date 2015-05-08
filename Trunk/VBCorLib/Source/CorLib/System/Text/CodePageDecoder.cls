@@ -129,7 +129,7 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
     Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
     If Result <> NO_ERROR Then _
         ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
-    If cArray.IsNull(Chars) Then _
+    If CorArray.IsNull(Chars) Then _
         Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
         Throw Cor.NewArgumentOutOfRangeException("CharIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))

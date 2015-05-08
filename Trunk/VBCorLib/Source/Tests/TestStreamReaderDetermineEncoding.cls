@@ -42,9 +42,9 @@ Private Sub TestEncoding(ByVal En As Encoding)
     Dim currEn As Encoding
     
     Set ms = New MemoryStream
-    ms.WriteBlock En.GetPreamble, 0, cArray.GetLength(En.GetPreamble)
+    ms.WriteBlock En.GetPreamble, 0, CorArray.GetLength(En.GetPreamble)
     b = En.GetBytes(ChrW$(55))
-    ms.WriteBlock b, 0, cArray.GetLength(b)
+    ms.WriteBlock b, 0, CorArray.GetLength(b)
     ms.Position = 0
     
     Set sr = Cor.NewStreamReader(ms, , True)

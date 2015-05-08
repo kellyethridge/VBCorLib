@@ -107,6 +107,6 @@ errTrap:
 End Sub
 
 Public Sub TestZeroLengthArray()
-    b = cArray.CreateInstance(vbByte)
+    b = CorArray.CreateInstance(vbByte)
     Assert.AreEqual 0, e.GetCharCount(b)
 End Sub

@@ -147,10 +147,10 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
         Error.Argument Argument_InvalidOffLen
         
     If mHead < mTail Then
-        cArray.CopyEx mItems, mHead, DstArray, Index, mCount
+        CorArray.CopyEx mItems, mHead, DstArray, Index, mCount
     Else
-        cArray.CopyEx mItems, mHead, DstArray, Index, mCapacity - mHead
-        cArray.CopyEx mItems, 0, DstArray, (mCapacity - mHead) + Index, mTail
+        CorArray.CopyEx mItems, mHead, DstArray, Index, mCapacity - mHead
+        CorArray.CopyEx mItems, 0, DstArray, (mCapacity - mHead) + Index, mTail
     End If
 End Sub
 
@@ -254,7 +254,7 @@ End Function
 Public Function ToArray() As Variant()
     Dim Result() As Variant
     
-    Result = cArray.CreateInstance(vbVariant, mCount)
+    Result = CorArray.CreateInstance(vbVariant, mCount)
     If mCount > 0 Then
         CopyTo Result, 0
     End If

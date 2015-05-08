@@ -422,7 +422,7 @@ Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Opt
     Paths = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
     
     Dim NumPaths As Long
-    NumPaths = cArray.GetLength(Paths)
+    NumPaths = CorArray.GetLength(Paths)
     If NumPaths > 0 Then
         Dim i As Long
         ReDim Directories(0 To NumPaths - 1)
@@ -431,7 +431,7 @@ Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Opt
             Set Directories(i) = Cor.NewDirectoryInfo(Path.Combine(mPath, Paths(i)))
         Next i
     Else
-        Directories = cArray.CreateInstance(vbObject)
+        Directories = CorArray.CreateInstance(vbObject)
     End If
     
     GetDirectories = Directories
@@ -461,7 +461,7 @@ Public Function GetFiles(Optional ByVal SearchPattern As String = "*", Optional 
     Files = Directory.GetFiles(mPath, SearchPattern, SearchOpt)
     
     Dim NumFiles As Long
-    NumFiles = cArray.GetLength(Files)
+    NumFiles = CorArray.GetLength(Files)
     If NumFiles > 0 Then
         Dim i As Long
         ReDim Ret(0 To NumFiles - 1)
@@ -469,7 +469,7 @@ Public Function GetFiles(Optional ByVal SearchPattern As String = "*", Optional 
             Set Ret(i) = Cor.NewFileInfo(Path.Combine(mPath, Files(i)))
         Next i
     Else
-        Ret = cArray.CreateInstance(vbObject)
+        Ret = CorArray.CreateInstance(vbObject)
     End If
     
     GetFiles = Ret
@@ -490,7 +490,7 @@ Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*",
     Folders = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
     
     Dim InfoCount As Long
-    InfoCount = cArray.GetLength(Files) + cArray.GetLength(Folders)
+    InfoCount = CorArray.GetLength(Files) + CorArray.GetLength(Folders)
     
     Dim Ret() As FileSystemInfo
     If InfoCount > 0 Then
@@ -507,7 +507,7 @@ Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*",
         Next i
     Else
         ' None found, so return an empty array.
-        Ret = cArray.CreateInstance(vbObject)
+        Ret = CorArray.CreateInstance(vbObject)
     End If
     
     GetFileSystemInfos = Ret
@@ -585,8 +585,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

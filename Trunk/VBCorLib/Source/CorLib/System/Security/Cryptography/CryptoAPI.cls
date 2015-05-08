@@ -330,7 +330,7 @@ Private Sub CreateExponentOfOneKey()
     Dim Blob() As Byte
     Blob = Params.ToCspBlob(AT_KEYEXCHANGE)
     
-    If CryptImportKey(mDefaultProvider, Blob(0), cArray.GetLength(Blob), 0, CRYPT_EXPORTABLE, mExponentOfOneKey) = BOOL_FALSE Then Call CryptoError
+    If CryptImportKey(mDefaultProvider, Blob(0), CorArray.GetLength(Blob), 0, CRYPT_EXPORTABLE, mExponentOfOneKey) = BOOL_FALSE Then Call CryptoError
 End Sub
 
 ''

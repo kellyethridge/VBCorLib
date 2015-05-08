@@ -169,8 +169,8 @@ End Property
 '
 ' @return The X parameter.
 '
-Public Property Get x() As Byte()
-    x = mX
+Public Property Get X() As Byte()
+    X = mX
 End Property
 
 ''
@@ -178,7 +178,7 @@ End Property
 '
 ' @param RHS The new X parameter.
 '
-Public Property Let x(ByRef RHS() As Byte)
+Public Property Let X(ByRef RHS() As Byte)
     mX = RHS
 End Property
 
@@ -187,8 +187,8 @@ End Property
 '
 ' @return The Y parameter.
 '
-Public Property Get y() As Byte()
-    y = mY
+Public Property Get Y() As Byte()
+    Y = mY
 End Property
 
 ''
@@ -196,7 +196,7 @@ End Property
 '
 ' @param RHS The new Y parameter.
 '
-Public Property Let y(ByRef RHS() As Byte)
+Public Property Let Y(ByRef RHS() As Byte)
     mY = RHS
 End Property
 
@@ -244,7 +244,7 @@ Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
     Dim ms As MemoryStream
     Dim MagicNumber As Long
     
-    If cArray.IsNull(PrivateBlob) Then
+    If CorArray.IsNull(PrivateBlob) Then
         Set ms = Cor.NewMemoryStream(PublicBlob, Writable:=False)
         MagicNumber = &H31535344
     Else
@@ -279,7 +279,7 @@ Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
     mQ = ReverseByteCopy(qBytes)
     mG = ReverseByteCopy(Reader.ReadBytes(ByteLen))
     
-    If cArray.IsNull(PrivateBlob) Then
+    If CorArray.IsNull(PrivateBlob) Then
         mY = ReverseByteCopy(Reader.ReadBytes(ByteLen))
     Else
         mX = ReverseByteCopy(Reader.ReadBytes(20))
@@ -288,9 +288,9 @@ Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
         ' we have to retrieve it manually.
         ReDim mY(0 To ByteLen - 1)
         Dim Index As Long
-        Index = cArray.GetLength(PublicBlob) - (24 + ByteLen)
+        Index = CorArray.GetLength(PublicBlob) - (24 + ByteLen)
         Buffer.BlockCopy PublicBlob, Index, mY, 0, ByteLen
-        cArray.Reverse mY
+        CorArray.Reverse mY
     End If
     
     ' Read DSSSEED structure
@@ -317,9 +317,9 @@ Friend Function ToCspBlob() As Byte()
     Set writer = Cor.NewBinaryWriter(ms)
     
     Dim BlobType As Byte
-    If cArray.IsNull(mX) Then
+    If CorArray.IsNull(mX) Then
         BlobType = PUBLICKEYBLOB
-    ElseIf cArray.GetLength(mX) = 0 Then
+    ElseIf CorArray.GetLength(mX) = 0 Then
         BlobType = PUBLICKEYBLOB
     Else
         BlobType = PRIVATEKEYBLOB
@@ -333,7 +333,7 @@ Friend Function ToCspBlob() As Byte()
     
     ' Build DSSPUBKEY structure
     Call writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31535344, &H32535344)))
-    Call writer.WriteValue(CLng(cArray.GetLength(mP) * 8))
+    Call writer.WriteValue(CLng(CorArray.GetLength(mP) * 8))
 
     Call writer.WriteValue(ReverseByteCopy(mP))
     Call writer.WriteValue(ReverseByteCopy(mQ))
@@ -377,7 +377,7 @@ Friend Function ToXmlString()
     
     Call AddElement(sb, "PgenCounter", Bytes)
     
-    If Not cArray.IsNull(mX) Then
+    If Not CorArray.IsNull(mX) Then
         Call AddElement(sb, "X", mX)
     End If
     

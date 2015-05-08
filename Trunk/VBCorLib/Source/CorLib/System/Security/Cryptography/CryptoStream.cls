@@ -234,7 +234,7 @@ Public Sub FlushFinalBlock()
         Throw Cor.NewNotSupportedException("Cannot call FlushFinalBlock twice.")
     
     mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-    Call mStream.WriteBlock(mOutputBuffer, 0, cArray.GetLength(mOutputBuffer))
+    Call mStream.WriteBlock(mOutputBuffer, 0, CorArray.GetLength(mOutputBuffer))
     
     If TypeOf mStream Is CryptoStream Then
         Dim cs As CryptoStream
@@ -259,7 +259,7 @@ End Sub
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     If Not CanRead Then _
         Throw Cor.NewNotSupportedException("The Stream does not support reading.")
-    If cArray.IsNull(Buffer) Then _
+    If CorArray.IsNull(Buffer) Then _
         Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
     If Offset < LBound(Buffer) Then _
         Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
@@ -559,7 +559,7 @@ Private Function FillBuffer() As Boolean
             ' Using the TransformFinalBlock will strip away the padding from what we
             ' have left in our input buffer.
             mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-            mBytesBuffered = cArray.GetLength(mOutputBuffer)
+            mBytesBuffered = CorArray.GetLength(mOutputBuffer)
             Exit Do
         End If
     Loop While mBytesBuffered = 0
@@ -718,8 +718,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -113,7 +113,7 @@ Public Sub NewFileStream_WithBufferSizeLessThanOne_ThrowsArgumentOutOfRangeExcep
     FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
     
     On Error Resume Next
-    With NewFileStream(FileName, Create, buffersize:=0)
+    With NewFileStream(FileName, Create, BufferSize:=0)
     End With
     
     AssertArgumentOutOfRangeException Err, "BufferSize"
@@ -212,7 +212,7 @@ Public Sub ReadBlock_WhenCalled_ReadsData(ByVal CountToRead As Long, ByVal Expec
     Dim FileName        As String
     FileName = mBuilder.CreateFile(Data:="12345")
     
-    ActualBytes = cArray.CreateInstance(vbByte, CountToRead)
+    ActualBytes = CorArray.CreateInstance(vbByte, CountToRead)
     With NewFileStream(FileName, OpenExisting)
         ActualCount = .ReadBlock(ActualBytes, 0, CountToRead)
     End With
@@ -244,7 +244,7 @@ Public Sub ReadBlock_WithLargerThanBuffer_ReadsData()
     
     Dim ActualBytes(0 To 1999) As Byte
     Dim ActualCount As Long
-    With NewFileStream(FileName, OpenExisting, buffersize:=512)
+    With NewFileStream(FileName, OpenExisting, BufferSize:=512)
         ActualCount = .ReadBlock(ActualBytes, 0, 2000)
     End With
     

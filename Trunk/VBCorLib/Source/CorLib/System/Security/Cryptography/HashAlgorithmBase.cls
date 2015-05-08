@@ -126,7 +126,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
     
     Call HashCore(InputBuffer, InputOffset, InputCount)
     
-    If Not cArray.IsNull(OutputBuffer) Then
+    If Not CorArray.IsNull(OutputBuffer) Then
         ' We won't bother to copy if the OutputBuffer and offset are the same as
         ' the InputBuffer and offset since this would must be copying the same
         ' data over the top of itself.
@@ -159,11 +159,11 @@ End Function
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
     Call VerifyNotDisposed
     
-    If cArray.IsNull(InputBuffer) Then _
+    If CorArray.IsNull(InputBuffer) Then _
         Throw Cor.NewArgumentNullException("InputBuffer")
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException("InputOffset", InputOffset, Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
+    If (CorArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim Ret() As Byte

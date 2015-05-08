@@ -130,15 +130,15 @@ Private Sub AddSystem()
             New FromBase64Tests)
     
         .Add NewSuite("Array", _
-            New cArrayTests, _
-            New cArrayCopyTests, _
-            New cArraySortTests, _
-            New cArrayBinarySearchTests, _
-            New cArrayReverseTests, _
-            New cArrayIndexOfTests, _
-            New cArrayLastIndexOfTests, _
-            New cArrayCreateInstanceTests, _
-            New cArrayFindTests)
+            New CorArrayTests, _
+            New CorArrayCopyTests, _
+            New CorArraySortTests, _
+            New CorArrayBinarySearchTests, _
+            New CorArrayReverseTests, _
+            New CorArrayIndexOfTests, _
+            New CorArrayLastIndexOfTests, _
+            New CorArrayCreateInstanceTests, _
+            New CorArrayFindTests)
     
         AddTest .This
     End With

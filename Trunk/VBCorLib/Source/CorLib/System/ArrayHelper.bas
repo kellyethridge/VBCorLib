@@ -59,7 +59,7 @@ Public Function ArrayPointer(ByRef Arg As Variant) As Long
     ' be used by UBound and LBound after the call. So, now we're just
     ' going to assume that any object or UDT array that has just the descriptor
     ' allocated was Null to begin with. That means whenever an Object or UDT
-    ' array is passed to any cArray method, it will technically never
+    ' array is passed to any CorArray method, it will technically never
     ' be uninitialized, just zero-length.
     Select Case ArgType And &HFF
         Case vbObject, vbUserDefinedType
@@ -115,7 +115,7 @@ Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull
     ' be used by UBound and LBound after the call. So, now we're just
     ' going to assume that any object or UDT array that has just the descriptor
     ' allocated was Null to begin with. That means whenever an Object or UDT
-    ' array is passed to any cArray method, it will technically never
+    ' array is passed to any CorArray method, it will technically never
     ' be uninitialized, just zero-length.
     Select Case VariantType(Arr) And &HFF
         Case vbObject, vbUserDefinedType

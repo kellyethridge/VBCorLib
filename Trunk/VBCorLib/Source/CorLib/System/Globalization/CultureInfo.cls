@@ -120,7 +120,7 @@ End Property
 ' @return A list of calendars associated with the current culture.
 '
 Public Property Get OptionalCalendars() As Calendar()
-    If cArray.IsNull(mOptionalCalendars) Then
+    If CorArray.IsNull(mOptionalCalendars) Then
         Dim CalendarTypes() As Long
         Dim i As Long
         

@@ -101,11 +101,11 @@ Public Sub SetKey(ByRef Key() As Byte)
     Call VerifyNotDisposed
     If mHashStarted Then _
         Throw Cor.NewCryptographicException("Cannot change key after hash has started.")
-    If cArray.IsNull(Key) Then _
+    If CorArray.IsNull(Key) Then _
         Throw Cor.NewArgumentNullException("Key")
     
-    mKey = cArray.CreateInstance(vbByte, cArray.GetLength(Key))
-    Call Buffer.BlockCopy(Key, 0, mKey, 0, cArray.GetLength(Key))
+    mKey = CorArray.CreateInstance(vbByte, CorArray.GetLength(Key))
+    Call Buffer.BlockCopy(Key, 0, mKey, 0, CorArray.GetLength(Key))
     Call Initialize
 End Sub
 
@@ -214,7 +214,7 @@ Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByV
         mKey = CryptoHelper.GetRandomBytes(mKeySize)
     ElseIf VarType(Key) <> vbByteArray Then
         Throw Cor.NewArgumentException("Key must be a Byte array.", "Key")
-    ElseIf cArray.IsNull(Key) Then
+    ElseIf CorArray.IsNull(Key) Then
         Throw Cor.NewArgumentNullException("Key")
     Else
         mKey = Key
@@ -231,7 +231,7 @@ End Sub
 
 Private Sub EndHash(ByRef Hash() As Byte)
     Call mHashAlgorithm.TransformBlock(mKeyOpad, 0, mKeySize, mKeyOpad, 0)
-    Call mHashAlgorithm.TransformFinalBlock(Hash, 0, cArray.GetLength(Hash))
+    Call mHashAlgorithm.TransformFinalBlock(Hash, 0, CorArray.GetLength(Hash))
     
     mHashStarted = False
 End Sub
@@ -246,10 +246,10 @@ Private Sub StartHash()
 End Sub
 
 Private Sub ExpandKey()
-    If Not cArray.IsNull(mKeyIpad) Then Exit Sub
+    If Not CorArray.IsNull(mKeyIpad) Then Exit Sub
     
     Dim K0() As Byte
-    Select Case cArray.GetLength(mKey)
+    Select Case CorArray.GetLength(mKey)
         Case Is < mKeySize
             K0 = mKey
             ReDim Preserve K0(0 To mKeySize - 1)

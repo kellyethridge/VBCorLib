@@ -231,7 +231,7 @@ Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data As Variant)
         Throw Cor.NewInvalidCastException("Resource Encoder must return a Byte Array.")
     
     ' Write the number of bytes in the data portion of the resource.
-    Call mWriter.WriteValue(cArray.GetLength(Data))
+    Call mWriter.WriteValue(CorArray.GetLength(Data))
     
     ' Calculate the size of the header. Requires the
     ' length of the resource type and name.
@@ -239,7 +239,7 @@ Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data As Variant)
     EncodedName = EncodeStringOrInt(Key.ResourceName)
     
     Dim EncodedTypeAndNameSize As Long
-    EncodedTypeAndNameSize = cArray.GetLength(EncodedName) + cArray.GetLength(EncodedType)
+    EncodedTypeAndNameSize = CorArray.GetLength(EncodedName) + CorArray.GetLength(EncodedType)
     
     
     ' 24 is the size of the header without the name and type,
@@ -280,7 +280,7 @@ Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data As Variant)
     Call mWriter.WriteValue(Data)
 
     ' DWord align the end of the entry for the next entry.
-    For i = 1 To GetDWordAlignedOffset(cArray.GetLength(Data))
+    For i = 1 To GetDWordAlignedOffset(CorArray.GetLength(Data))
         Call mWriter.WriteValue(CByte(0))
     Next i
 End Sub

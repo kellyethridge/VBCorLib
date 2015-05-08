@@ -76,7 +76,7 @@ End Sub
 
 Private Function GetCollectionSize(ByRef c As Variant) As Long
     If IsArray(c) Then
-        If cArray.IsNull(c) Then _
+        If CorArray.IsNull(c) Then _
             Throw Cor.NewArgumentNullException("c", Environment.GetResourceString(ArgumentNull_Array))
         
         GetCollectionSize = UBound(c) - LBound(c) + 1
@@ -456,7 +456,7 @@ End Sub
 Private Function ArrayList_ToArray(Optional ByVal ArrayType As VbVarType = 12&) As Variant
     VerifyVersion
     
-    ArrayList_ToArray = cArray.CreateInstance(ArrayType, mCount)
+    ArrayList_ToArray = CorArray.CreateInstance(ArrayType, mCount)
     If mCount > 0 Then
         mList.CopyToEx mIndex, ArrayList_ToArray, 0, mCount
     End If

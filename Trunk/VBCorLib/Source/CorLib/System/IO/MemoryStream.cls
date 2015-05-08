@@ -592,7 +592,7 @@ Public Function ToArray() As Byte()
         CopyMemory Ret(0), mBuffer(mIndex), mLength
         ToArray = Ret
     Else
-        ToArray = cArray.CreateInstance(vbByte)
+        ToArray = CorArray.CreateInstance(vbByte)
     End If
 End Function
 

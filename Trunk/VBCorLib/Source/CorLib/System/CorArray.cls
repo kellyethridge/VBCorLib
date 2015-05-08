@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cArray"
+Attribute VB_Name = "CorArray"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -32,7 +32,7 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: cArray
+' Module: CorArray
 '
 
 ''
@@ -41,7 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks This class cannot be directly instantiated. To access the methods
 ' use the class name directly.
 ' <pre>
-' Debug.Print cArray.GetLength(MyArray)
+' Debug.Print CorArray.GetLength(MyArray)
 ' </pre>
 '
 Option Explicit
@@ -105,7 +105,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\Includes\cArray.Find.txt"
+' @include "..\Includes\CorArray.Find.txt"
 Public Function Find(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
     
@@ -136,7 +136,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\Includes\cArray.Find.txt"
+' @include "..\Includes\CorArray.Find.txt"
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim ArrayPtr As Long
     ArrayPtr = ArrayPointer(Arr)
@@ -192,7 +192,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\Includes\cArray.Find.txt"
+' @include "..\Includes\CorArray.Find.txt"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim pSafeArray As Long
     pSafeArray = ValidArrayPointer(Arr)
@@ -294,7 +294,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\Includes\cArray.Find.txt"
+' @include "..\Includes\CorArray.Find.txt"
 Public Function FindLast(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
     
@@ -324,7 +324,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\Includes\cArray.Find.txt"
+' @include "..\Includes\CorArray.Find.txt"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim pSafeArray As Long
     pSafeArray = ValidArrayPointer(Arr)
@@ -451,7 +451,7 @@ End Sub
 ' following is how to convert the return value to the array index:<br><br>
 ' Lowerbound of 0:  return = Not return<br>
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
-' @include "..\Includes\cArray_BinarySearch.txt"
+' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If IsNullArray(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -478,7 +478,7 @@ End Function
 ' following is how to convert the return value to the array index:<br><br>
 ' Lowerbound of 0:  return = Not return<br>
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
-' @include "..\Includes\cArray_BinarySearch.txt"
+' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If IsNullArray(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -608,7 +608,7 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     If Length < 0 Then _
         Error.NegativeNumber "Length"
     If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
-        Error.Argument Argument_LongerThanSrcArray
+        Error.Argument Argument_LongerThanSrCorArray
     If Length + DestinationIndex - LBound(DestinationArray) > DestinationLength Then _
         Error.Argument Argument_LongerThanDestArray
     If SourceIndex < LBound(SourceArray) Then _
@@ -984,7 +984,7 @@ End Sub
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\Includes\cArray_Sort.txt"
+' @include "..\Includes\CorArray_Sort.txt"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNullArray(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -1045,7 +1045,7 @@ End Sub
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\Includes\cArray.SortKey.txt"
+' @include "..\Includes\CorArray.SortKey.txt"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
     If IsNullArray(Keys) Then _
         Error.ArgumentNull "Keys", ArgumentNull_Array
@@ -1162,6 +1162,37 @@ Private Sub CleanUpSortRoutine()
     ClearSortItems
     Set SortComparer = Nothing
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Internal
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function ArrayPointer(ByRef Arg As Variant) As Long
+    Dim ArgType As Integer
+    ArgType = VariantType(Arg)
+    
+    If (ArgType And vbArray) = 0 Then _
+        Error.Argument Argument_ArrayRequired
+    
+    ArrayPointer = MemLong(vbaVarRefAry(Arg))
+    
+    ' HACK HACK HACK
+    '
+    ' When an uninitialized array of objects or UDTs is passed into a
+    ' function as a ByRef Variant, the array is initialized with just the
+    ' SafeArrayDescriptor, at which point, it is a valid array and can
+    ' be used by UBound and LBound after the call. So, now we're just
+    ' going to assume that any object or UDT array that has just the descriptor
+    ' allocated was Null to begin with. That means whenever an Object or UDT
+    ' array is passed to any CorArray method, it will technically never
+    ' be uninitialized, just zero-length.
+    Select Case ArgType And &HFF
+        Case vbObject, vbUserDefinedType
+            If UBound(Arg) < LBound(Arg) Then
+                ArrayPointer = vbNullPtr
+            End If
+    End Select
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

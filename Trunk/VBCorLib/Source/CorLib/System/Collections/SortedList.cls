@@ -68,7 +68,7 @@ Private mVersion    As Long
 ' @remark key must be unique.
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
     Dim i As Long
-    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
+    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i >= 0 Then _
         Throw Cor.NewArgumentException("An element with this key already exists.", "key")
     
@@ -157,7 +157,7 @@ End Function
 ' @return Indication of the key existing in the list.
 '
 Public Function ContainsKey(ByRef Key As Variant) As Boolean
-    ContainsKey = (cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer) >= 0)
+    ContainsKey = (CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer) >= 0)
 End Function
 
 ''
@@ -168,7 +168,7 @@ End Function
 ' @return Indication of the value being found in the list.
 '
 Public Function ContainsValue(ByRef Value As Variant) As Boolean
-    ContainsValue = cArray.IndexOf(mValues, Value, 0, mCount) >= 0
+    ContainsValue = CorArray.IndexOf(mValues, Value, 0, mCount) >= 0
 End Function
 
 ''
@@ -182,11 +182,11 @@ End Function
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     Dim i As Long
     
-    If cArray.IsNull(DstArray) Then _
+    If CorArray.IsNull(DstArray) Then _
         Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
     If Index < LBound(DstArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If cArray.Rank(DstArray) <> 1 Then _
+    If CorArray.Rank(DstArray) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If Index + mCount - 1 > UBound(DstArray) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayPlusOffTooSmall))
@@ -294,7 +294,7 @@ End Function
 ' the key was not found in the list.
 '
 Public Function IndexOfKey(ByRef Key As Variant) As Long
-    IndexOfKey = cArray.IndexOf(mKeys, Key, 0, mCount)
+    IndexOfKey = CorArray.IndexOf(mKeys, Key, 0, mCount)
 End Function
 
 ''
@@ -305,7 +305,7 @@ End Function
 ' @return The index the value was found, or a -1 if the value was not found.
 '
 Public Function IndexOfValue(ByRef Value As Variant) As Long
-    IndexOfValue = cArray.IndexOf(mValues, Value, 0, mCount)
+    IndexOfValue = CorArray.IndexOf(mValues, Value, 0, mCount)
 End Function
 
 ''
@@ -341,7 +341,7 @@ End Property
 Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     Dim i As Long
-    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
+    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i < 0 Then Exit Property
     Call VariantCopy(Item, mValues(i))
 End Property
@@ -357,7 +357,7 @@ End Property
 '
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim i As Long
-    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
+    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i < 0 Then
         Call Add(Key, Value)
     Else
@@ -377,7 +377,7 @@ End Property
 '
 Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim i As Long
-    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
+    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i < 0 Then
         Call Add(Key, Value)
     Else
@@ -414,7 +414,7 @@ End Function
 Public Sub Remove(ByRef Key As Variant)
     Dim i As Long
     If mCount = 0 Then Exit Sub
-    i = cArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
+    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
     If i >= 0 Then Call RemoveAt(i)
 End Sub
 
@@ -678,11 +678,11 @@ Friend Sub CloneHelper(ByRef Keys() As Variant, ByRef Values() As Variant, ByVal
 End Sub
 
 Friend Sub CopyKeysTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Call cArray.CopyEx(mKeys, 0, DstArray, Index, mCount)
+    Call CorArray.CopyEx(mKeys, 0, DstArray, Index, mCount)
 End Sub
 
 Friend Sub CopyValuesTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Call cArray.CopyEx(mValues, 0, DstArray, Index, mCount)
+    Call CorArray.CopyEx(mValues, 0, DstArray, Index, mCount)
 End Sub
 
 Friend Sub Init(ByVal List As IDictionary, ByVal Comparer As IComparer, ByVal Capacity As Long)
@@ -694,7 +694,7 @@ Friend Sub Init(ByVal List As IDictionary, ByVal Comparer As IComparer, ByVal Ca
         Me.Capacity = mCount
         Call List.Keys.CopyTo(mKeys, 0)
         Call List.Values.CopyTo(mValues, 0)
-        Call cArray.SortKeyEx(mKeys, mValues, 0, mCount, Comparer)
+        Call CorArray.SortKeyEx(mKeys, mValues, 0, mCount, Comparer)
     End If
 End Sub
 

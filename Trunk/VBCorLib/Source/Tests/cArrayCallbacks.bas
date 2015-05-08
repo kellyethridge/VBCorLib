@@ -1,8 +1,8 @@
 Attribute VB_Name = "cArrayCallbacks"
 '
-' cArrayCallbacks
+' CorArrayCallbacks
 '
-' Contains functions that are called during operations performed by cArray methods.
+' Contains functions that are called during operations performed by CorArray methods.
 '
 Option Explicit
 

@@ -85,7 +85,7 @@ Public Sub TestTransformBackTo123456IgnoringWhiteSpaces()
     b = NewArray(vbByte, 65, 13, 81, 73, 9, 68, 66, 32, 10, 65, 85, 71)
     
     Dim original(5) As Byte
-    Assert.AreEqual 6, Trans.TransformBlock(b, 0, cArray.GetLength(b), original, 0)
+    Assert.AreEqual 6, Trans.TransformBlock(b, 0, CorArray.GetLength(b), original, 0)
     Dim i As Long
     For i = 0 To 5
         Assert.AreEqual i + 1, original(i), "Byte " & i & " is wrong."
@@ -100,7 +100,7 @@ Public Sub TestTranformDoNotIgnoreWhiteSpaces()
 
     Dim original(5) As Byte
     On Error GoTo errTrap
-    Trans.TransformBlock b, 0, cArray.GetLength(b), original, 0
+    Trans.TransformBlock b, 0, CorArray.GetLength(b), original, 0
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
@@ -195,7 +195,7 @@ Public Sub TestTransformFinalBackTo123()
     
     Dim original() As Byte
     original = Trans.TransformFinalBlock(b, 0, 4)
-    Assert.AreEqual 3, cArray.GetLength(original), "Array length should be 3."
+    Assert.AreEqual 3, CorArray.GetLength(original), "Array length should be 3."
     Assert.AreEqual 1, original(0), "byte 0 is wrong."
     Assert.AreEqual 2, original(1), "byte 1 is wrong."
     Assert.AreEqual 3, original(2), "byte 2 is wrong."
@@ -210,13 +210,13 @@ Public Sub TestTransformFinalIncrementalToOne()
     For i = 0 To 3
         Dim b2() As Byte
         b2 = Trans.TransformFinalBlock(b, 0, i)
-        Assert.IsFalse cArray.IsNull(b2), "b2 should not be null."
-        Assert.AreEqual 0, cArray.GetLength(b2)
+        Assert.IsFalse CorArray.IsNull(b2), "b2 should not be null."
+        Assert.AreEqual 0, CorArray.GetLength(b2)
     Next i
     
     b2 = Trans.TransformFinalBlock(b, 0, 4)
-    Assert.IsFalse cArray.IsNull(b2), "b2 should not be null."
-    Assert.AreEqual 1, cArray.GetLength(b2), "b2 should have 1 element."
+    Assert.IsFalse CorArray.IsNull(b2), "b2 should not be null."
+    Assert.AreEqual 1, CorArray.GetLength(b2), "b2 should have 1 element."
     Assert.AreEqual 1, b2(0), "byte 0 should equal 1."
 End Sub
 
@@ -232,14 +232,14 @@ Public Sub TestTransformFinal1BytePartialIncrementalToOne()
         Trans.TransformBlock b, 0, 1, b2, 0 ' get partial transform completed
         
         b2 = Trans.TransformFinalBlock(b, 1, i)
-        Assert.IsFalse cArray.IsNull(b2)
-        Assert.AreEqual 0, cArray.GetLength(b2)
+        Assert.IsFalse CorArray.IsNull(b2)
+        Assert.AreEqual 0, CorArray.GetLength(b2)
     Next i
     
     ReDim b2(0)
     Trans.TransformBlock b, 0, 1, b2, 0 ' get partial transform completed
     b2 = Trans.TransformFinalBlock(b, 1, 3)
-    Assert.AreEqual 1, cArray.GetLength(b2)
+    Assert.AreEqual 1, CorArray.GetLength(b2)
     Assert.AreEqual 1, b2(0)
 End Sub
 
@@ -254,13 +254,13 @@ Public Sub TestTransformFinal2BytePartialIncrementalToOne()
     Trans.TransformBlock b, 0, 2, b2, 0 ' get partial transform completed
     
     b2 = Trans.TransformFinalBlock(b, 2, 1)
-    Assert.IsFalse cArray.IsNull(b2)
-    Assert.AreEqual 0, cArray.GetLength(b2)
+    Assert.IsFalse CorArray.IsNull(b2)
+    Assert.AreEqual 0, CorArray.GetLength(b2)
     
     ReDim b2(0)
     Trans.TransformBlock b, 0, 2, b2, 0 ' get partial transform completed
     b2 = Trans.TransformFinalBlock(b, 2, 2)
-    Assert.AreEqual 1, cArray.GetLength(b2)
+    Assert.AreEqual 1, CorArray.GetLength(b2)
     Assert.AreEqual 1, b2(0)
 End Sub
 
@@ -275,7 +275,7 @@ Public Sub TestTransformFinal3BytePartialIncrementalToOne()
     Trans.TransformBlock b, 0, 3, b2, 0  ' get partial transform completed
     
     b2 = Trans.TransformFinalBlock(b, 3, 1)
-    Assert.AreEqual 1, cArray.GetLength(b2)
+    Assert.AreEqual 1, CorArray.GetLength(b2)
     Assert.AreEqual 1, b2(0)
 End Sub
 

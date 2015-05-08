@@ -97,7 +97,7 @@ Public Enum ArgumentString
     Argument_StreamNotReadable = 818
     Argument_StreamNotWritable = 819
     Argument_StreamNotSeekable = 820
-    Argument_LongerThanSrcArray = 821
+    Argument_LongerThanSrCorArray = 821
     Argument_LongerThanDestArray = 822
     Argument_InvalidComparer = 823
     Argument_MustBeVbVarType = 824

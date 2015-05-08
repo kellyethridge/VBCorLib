@@ -81,15 +81,15 @@ Public Property Get Cor() As Constructors
 End Property
 
 ''
-' Returns an object used to access the <b>cArray</b> methods
-' without instantiating the <b>cArray</b> class.
+' Returns an object used to access the <b>CorArray</b> methods
+' without instantiating the <b>CorArray</b> class.
 '
-' @return A reference to the <b>cArray</b> object used to
+' @return A reference to the <b>CorArray</b> object used to
 ' perform Property Gets on arrays.
-' @see cArray
+' @see CorArray
 '
-Public Property Get cArray() As cArray
-    Set cArray = Statics.cArray
+Public Property Get CorArray() As CorArray
+    Set CorArray = Statics.CorArray
 End Property
 
 ''

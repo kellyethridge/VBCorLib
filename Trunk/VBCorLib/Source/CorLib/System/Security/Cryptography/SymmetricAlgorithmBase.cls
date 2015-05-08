@@ -243,7 +243,7 @@ End Property
 ' @remarks If no IV has been set, then a random IV will be generated.
 '
 Public Function GetIV() As Byte()
-    If cArray.IsNull(mIV) Then Call GenerateIV
+    If CorArray.IsNull(mIV) Then Call GenerateIV
     GetIV = mIV
 End Function
 
@@ -255,7 +255,7 @@ End Function
 '
 Public Sub SetIV(ByRef RgbIV() As Byte)
     Dim Size As Long
-    Size = cArray.GetLength(RgbIV)
+    Size = CorArray.GetLength(RgbIV)
     
     If (Size * 8) <> mBlockSize Then _
         Throw Cor.NewCryptographicException("Invalid IV length.")
@@ -279,7 +279,7 @@ End Sub
 ' @remarks If no key has been set, then a random key will be generated.
 '
 Public Function GetKey() As Byte()
-    If cArray.IsNull(mKey) Then Call GenerateKey
+    If CorArray.IsNull(mKey) Then Call GenerateKey
     GetKey = mKey
 End Function
 
@@ -291,7 +291,7 @@ End Function
 '
 Public Sub SetKey(ByRef RgbKey() As Byte)
     Dim Size As Long
-    Size = cArray.GetLength(RgbKey)
+    Size = CorArray.GetLength(RgbKey)
     
     If Not ValidKeySize(Size * 8) Then _
         Throw Cor.NewArgumentException("Invalid key size.", "Key")
@@ -359,11 +359,11 @@ Public Function CloneRgbKey(ByRef RgbKey As Variant) As Byte()
     
     If VarType(RgbKey) <> vbByteArray Then _
         Throw Cor.NewArgumentException("A byte array is required.", "RgbKey")
-    If cArray.IsNull(RgbKey) Then _
+    If CorArray.IsNull(RgbKey) Then _
         Throw Cor.NewCryptographicException("Invalid key size.")
         
     Dim Size As Long
-    Size = cArray.GetLength(RgbKey)
+    Size = CorArray.GetLength(RgbKey)
     If Not IsLegalSize(mLegalKeySizes, Size * 8) Then _
         Throw Cor.NewCryptographicException("Invalid key size.")
     
@@ -396,11 +396,11 @@ Public Function CloneRgbIV(ByRef RgbIV As Variant) As Byte()
         Throw Cor.NewArgumentException("A byte array is required.", "RgbIV")
     
     Dim Ret() As Byte
-    If cArray.IsNull(RgbIV) Then
+    If CorArray.IsNull(RgbIV) Then
         Ret = CryptoHelper.GetRandomBytes(mBlockSize \ 8)
     Else
         Dim Size As Long
-        Size = cArray.GetLength(RgbIV)
+        Size = CorArray.GetLength(RgbIV)
         If (Size * 8) <> mBlockSize Then _
             Throw Cor.NewCryptographicException("Invalid RgbIV length.")
         
@@ -416,7 +416,7 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IncrementKeySizeCapacity(ByRef Arr() As KeySizes)
-    If cArray.IsNull(Arr) Then
+    If CorArray.IsNull(Arr) Then
         ReDim Arr(0)
     Else
         ReDim Preserve Arr(UBound(Arr) + 1)
@@ -429,7 +429,7 @@ Private Sub AddKeySize(ByRef Arr() As KeySizes, ByVal MinSize As Long, ByVal Max
 End Sub
 
 Private Function IsLegalSize(ByRef LegalSizes() As KeySizes, ByVal BitLength As Long) As Boolean
-    If cArray.IsNull(LegalSizes) Then
+    If CorArray.IsNull(LegalSizes) Then
         IsLegalSize = True
         Exit Function
     End If

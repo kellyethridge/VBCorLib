@@ -65,7 +65,7 @@ End Sub
 Public Sub BinarySearch_WithValues_ReturnsExpected(ByRef Arr As Variant, ByRef Value As Variant, ByVal Expected As Long)
     Dim Actual As Long
     
-    Actual = cArray.BinarySearch(Arr, Value)
+    Actual = CorArray.BinarySearch(Arr, Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -75,7 +75,7 @@ Public Sub BinarySearchEx_WithIndexAndLength_SearchesSubArray()
     Arr = NewLongs(1, 2, 3, 4, 5)
     Dim Actual As Long
     
-    Actual = cArray.BinarySearchEx(Arr, 2, 3, 3)
+    Actual = CorArray.BinarySearchEx(Arr, 2, 3, 3)
     
     Const Expected As Long = 2
     Assert.That Actual, Iz.EqualTo(Expected)
@@ -86,7 +86,7 @@ Public Sub BinarySearchEx_WithIndexAndLength_DoesNotFindInSubArray()
     Arr = NewLongs(1, 2, 3, 4, 5)
     Dim Actual As Long
     
-    Actual = cArray.BinarySearchEx(Arr, 0, 3, 4)
+    Actual = CorArray.BinarySearchEx(Arr, 0, 3, 4)
     
     Const Expected As Long = -4
     Assert.That Actual, Iz.EqualTo(Expected)
@@ -96,7 +96,7 @@ Public Sub BinarySearch_WithNullArray_Throws()
     Dim Arr() As Long
     
     On Error Resume Next
-    cArray.BinarySearch Arr, 1
+    CorArray.BinarySearch Arr, 1
     
     AssertArgumentNullException Err, "Arr"
 End Sub
@@ -105,7 +105,7 @@ Public Sub BinarySearchEx_WithNullArray_Throws()
     Dim Arr() As Long
     
     On Error Resume Next
-    cArray.BinarySearchEx Arr, 0, 1, 0
+    CorArray.BinarySearchEx Arr, 0, 1, 0
     
     AssertArgumentNullException Err, "Arr"
 End Sub
@@ -114,7 +114,7 @@ Public Sub BinarySearchEx_WithIndexLessThanLBound_Throws()
     Dim Arr(0) As Long
     
     On Error Resume Next
-    cArray.BinarySearchEx Arr, -1, 1, 0
+    CorArray.BinarySearchEx Arr, -1, 1, 0
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
@@ -123,7 +123,7 @@ Public Sub BinarySearchEx_WithLengthLessThanZero_Throws()
     Dim Arr(0) As Long
     
     On Error Resume Next
-    cArray.BinarySearchEx Arr, 0, -1, 0
+    CorArray.BinarySearchEx Arr, 0, -1, 0
     
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
@@ -132,7 +132,7 @@ Public Sub TestLengthTooLong()
     Dim a(10) As Long
     
     On Error GoTo errTrap
-    cArray.BinarySearchEx a, 0, 12, 1
+    CorArray.BinarySearchEx a, 0, 12, 1
     On Error GoTo 0
     Assert.Fail "An exception should have been raised."
     

@@ -197,14 +197,14 @@ End Sub
 Public Function Decrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Call VerifyLoaded
     
-    If cArray.IsNull(Rgb) Then _
+    If CorArray.IsNull(Rgb) Then _
         Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Flags As Long
     If fOAEP Then Flags = CRYPT_OAEP
     
     Dim Size As Long
-    Size = cArray.GetLength(Rgb)
+    Size = CorArray.GetLength(Rgb)
     
     ' We need to make a copy of the original array because we dont' want
     ' to alter its contents. Also, the copy is reversed in order to deal
@@ -241,14 +241,14 @@ End Function
 Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Call VerifyLoaded
     
-    If cArray.IsNull(Rgb) Then _
+    If CorArray.IsNull(Rgb) Then _
         Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Flags As Long
     If fOAEP Then Flags = CRYPT_OAEP
     
     Dim Size As Long
-    Size = cArray.GetLength(Rgb)
+    Size = CorArray.GetLength(Rgb)
     
     ' We copy the original array so we don't alter the
     ' original array during the encryption process.
@@ -330,13 +330,13 @@ End Sub
 ' @param KeyBlob The blob key to be imported.
 '
 Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
-    If cArray.IsNull(KeyBlob) Then _
+    If CorArray.IsNull(KeyBlob) Then _
         Throw Cor.NewArgumentNullException("KeyBlob", Environment.GetResourceString(ArgumentNull_Array))
     
     Call VerifyLoaded(False)
     Call DeleteKey
     
-    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), cArray.GetLength(KeyBlob), 0, CRYPT_EXPORTABLE, mKey) = BOOL_FALSE Then _
+    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.GetLength(KeyBlob), 0, CRYPT_EXPORTABLE, mKey) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
     
     mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
@@ -439,7 +439,7 @@ End Function
 ' @see MD5CryptoServiceProvider
 '
 Public Function VerifyData(ByRef Buffer() As Byte, ByRef hAlg As Variant, ByRef Signature() As Byte) As Boolean
-    If cArray.IsNull(Buffer) Then _
+    If CorArray.IsNull(Buffer) Then _
         Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
                   
     Dim HashObj As HashAlgorithm
@@ -460,7 +460,7 @@ End Function
 ' @see CryptoConfig
 '
 Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef Signature() As Byte) As Boolean
-    If cArray.IsNull(Signature) Then _
+    If CorArray.IsNull(Signature) Then _
         Throw Cor.NewArgumentNullException("Signature", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim Hash As Long
@@ -470,7 +470,7 @@ Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef S
     Dim RevSig() As Byte
     RevSig = ReverseByteCopy(Signature)
     
-    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), cArray.GetLength(Signature), mKey, vbNullString, 0))
+    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.GetLength(Signature), mKey, vbNullString, 0))
     Call CryptDestroyHash(Hash)
 End Function
 
@@ -599,7 +599,7 @@ End Sub
 Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     Call VerifyLoaded
     
-    If cArray.IsNull(RgbHash) Then _
+    If CorArray.IsNull(RgbHash) Then _
         Throw Cor.NewArgumentNullException("RgbHash", Environment.GetResourceString(ArgumentNull_Array))
     
     Dim HashAlg As Long
@@ -611,7 +611,7 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
             Throw Cor.NewArgumentException("Only SHA1 and MD5 hash algorithms are supported.", "Str")
     End Select
     
-    If cArray.GetLength(RgbHash) <> HashLen Then _
+    If CorArray.GetLength(RgbHash) <> HashLen Then _
         Throw Cor.NewCryptographicException("Invalid hash length.")
     
     On Error GoTo errTrap
@@ -769,8 +769,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

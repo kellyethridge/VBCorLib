@@ -104,7 +104,7 @@ Public Sub TestGetSectionNames()
     
     s = ini.GetSectionNames
     
-    Assert.AreEqual 10, cArray.GetLength(s)
+    Assert.AreEqual 10, CorArray.GetLength(s)
     For i = 1 To 10
         Assert.AreEqual "Section " & i, s(i - 1)
     Next i
@@ -116,7 +116,7 @@ Public Sub TestGetSectionNamesEmpty()
     
     s = ini.GetSectionNames
     
-    Assert.AreEqual 0, cArray.GetLength(s)
+    Assert.AreEqual 0, CorArray.GetLength(s)
 End Sub
 
 Public Sub TestDeleteKey()
@@ -131,11 +131,11 @@ Public Sub TestDeleteSection()
     
     ini.SetValue "deleteme", "key", "value"
     s = ini.GetSectionNames
-    Assert.AreEqual 1, cArray.GetLength(s)
+    Assert.AreEqual 1, CorArray.GetLength(s)
     
     ini.DeleteSection "deleteme"
     s = ini.GetSectionNames
-    Assert.AreEqual 0, cArray.GetLength(s)
+    Assert.AreEqual 0, CorArray.GetLength(s)
 End Sub
 
 Public Sub TestGetValues()
@@ -188,7 +188,7 @@ Public Sub TestGetKeyNames()
     
     s = ini.GetKeyNames("test")
     
-    Assert.AreEqual 10, cArray.GetLength(s)
+    Assert.AreEqual 10, CorArray.GetLength(s)
     For i = 0 To 9
         Assert.AreEqual "Key " & i + 1, s(i)
     Next i
@@ -198,8 +198,8 @@ Public Sub TestGetKeyNamesNone()
     Dim s() As String
     
     s = ini.GetKeyNames("missing")
-    Assert.IsFalse cArray.IsNull(s)
-    Assert.AreEqual 0, cArray.GetLength(s)
+    Assert.IsFalse CorArray.IsNull(s)
+    Assert.AreEqual 0, CorArray.GetLength(s)
 End Sub
 
 Public Sub TestGetVeryLongValue()

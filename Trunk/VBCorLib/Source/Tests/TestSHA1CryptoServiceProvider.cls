@@ -60,7 +60,7 @@ Public Sub TestComputeHashesFromBytes()
     Do While GetNextEntry
         Dim b() As Byte
         b = csp.ComputeHash(PT)
-        Assert.IsFalse cArray.IsNull(b), "b should not be null."
+        Assert.IsFalse CorArray.IsNull(b), "b should not be null."
         Assert.AreEqual ht, b
     Loop
 End Sub

@@ -260,7 +260,7 @@ Friend Function ToXmlString() As String
     Call AddElement(sb, "Modulus", mModulus)
     Call AddElement(sb, "Exponent", mExponent)
     
-    If Not cArray.IsNull(md) Then
+    If Not CorArray.IsNull(md) Then
         Call AddElement(sb, "P", mP)
         Call AddElement(sb, "Q", mQ)
         Call AddElement(sb, "DP", mDP)
@@ -328,7 +328,7 @@ Friend Sub FromCspBlob(ByRef Blob() As Byte)
     End If
     
     ' make the array big-endian
-    Call cArray.Reverse(mExponent)
+    Call CorArray.Reverse(mExponent)
     
     'Call Reader.ReadByte
     
@@ -353,7 +353,7 @@ Friend Function ToCspBlob(ByVal KeyNumber As Long) As Byte()
     Set writer = Cor.NewBinaryWriter(ms)
     
     Dim BlobType As Byte
-    BlobType = IIf(cArray.IsNull(md), PUBLICKEYBLOB, PRIVATEKEYBLOB)
+    BlobType = IIf(CorArray.IsNull(md), PUBLICKEYBLOB, PRIVATEKEYBLOB)
     
     ' Build BLOBHEADER structure
     Call writer.WriteValue(BlobType)
@@ -363,11 +363,11 @@ Friend Function ToCspBlob(ByVal KeyNumber As Long) As Byte()
     
     ' Build RSAPUBKEY structure
     Call writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352)))
-    Call writer.WriteValue(CLng(cArray.GetLength(mModulus) * 8))
+    Call writer.WriteValue(CLng(CorArray.GetLength(mModulus) * 8))
     Call writer.WriteValue(ReverseByteCopy(mExponent))
     
     Dim i As Long
-    i = 4 - cArray.GetLength(mExponent)
+    i = 4 - CorArray.GetLength(mExponent)
     Do While i > 0
         Call writer.WriteValue(CByte(0))
         i = i - 1
@@ -434,8 +434,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

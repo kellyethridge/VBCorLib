@@ -72,7 +72,7 @@ End Function
 '
 Public Function IsWeakKey(ByRef RgbKey() As Byte) As Boolean
     Dim Size As Long
-    Size = cArray.GetLength(RgbKey)
+    Size = CorArray.GetLength(RgbKey)
     
     If Not IsLegalKeySize(Size * 8) Then _
         Throw Cor.NewCryptographicException("Invalid key length.")

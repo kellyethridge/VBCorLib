@@ -91,7 +91,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Copy_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef Expected As Variant)
-    cArray.Copy Source, Destination, 3
+    CorArray.Copy Source, Destination, 3
     
     Assert.That Destination, Iz.EqualTo(Expected).Strict
 End Sub
@@ -99,14 +99,14 @@ End Sub
 Public Sub Copy_WithIncompatibleTypes_ThrowsArrayTypeMismatchException(ByRef Source As Variant, ByRef Destination As Variant)
     On Error GoTo errTrap
     
-    cArray.Copy Source, Destination, 1
+    CorArray.Copy Source, Destination, 1
     
 errTrap:
     AssertArrayTypeMismatchException Err
 End Sub
 
 Public Sub CopyEx_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef Destination As Variant, ByRef Expected As Variant)
-    cArray.CopyEx Source, 0, Destination, 1, 2
+    CorArray.CopyEx Source, 0, Destination, 1, 2
     
     Assert.That Destination, Iz.EqualTo(Expected).Strict
 End Sub
@@ -118,7 +118,7 @@ Public Sub Copy_WithUDT_CopiesElements()
     SourceUDTs(2).Data1 = 3
     Dim TargetUDTs(0 To 2) As VBCorType.VBGUID
 
-    cArray.Copy SourceUDTs, TargetUDTs, 3
+    CorArray.Copy SourceUDTs, TargetUDTs, 3
     
     Assert.That TargetUDTs(0).Data1, Iz.EqualTo(1)
     Assert.That TargetUDTs(1).Data1, Iz.EqualTo(2)
@@ -129,7 +129,7 @@ Public Sub Copy_WithNegativeLength_Throws()
     On Error GoTo errTrap
     Dim Arr(0) As Long
     
-    cArray.Copy Arr, Arr, -1
+    CorArray.Copy Arr, Arr, -1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
@@ -140,7 +140,7 @@ Public Sub Copy_WithLengthGreaterThanSourceLength_ThrowsArgumentException()
     Dim Arr1(0) As Long
     Dim Arr2(2) As Long
     
-    cArray.Copy Arr1, Arr2, 2
+    CorArray.Copy Arr1, Arr2, 2
     
 errTrap:
     AssertArgumentException Err
@@ -151,7 +151,7 @@ Public Sub Copy_WithLengthGreaterThanDestinationLength_ThrowsArgumentException()
     Dim Arr1(0) As Long
     Dim Arr2(2) As Long
     
-    cArray.Copy Arr2, Arr1, 2
+    CorArray.Copy Arr2, Arr1, 2
     
 errTrap:
     AssertArgumentException Err
@@ -162,7 +162,7 @@ Public Sub CopyEx_WithLengthPlusStartIndexGreaterThanSourceLength_ThrowsArgument
     Dim Arr1(1) As Long
     Dim Arr2(2) As Long
     
-    cArray.CopyEx Arr1, 1, Arr2, 0, 2
+    CorArray.CopyEx Arr1, 1, Arr2, 0, 2
     
 errTrap:
     AssertArgumentException Err
@@ -173,7 +173,7 @@ Public Sub CopyEx_WithLengthPlusDestinationIndexGreaterThanDestinationLength_Thr
     Dim Arr1(1) As Long
     Dim Arr2(2) As Long
     
-    cArray.CopyEx Arr2, 0, Arr1, 1, 2
+    CorArray.CopyEx Arr2, 0, Arr1, 1, 2
     
 errTrap:
     AssertArgumentException Err
@@ -184,7 +184,7 @@ Public Sub CopyEx_WithSourceIndexLessThanLBound_ThrowsArgumentOutOfRangeExceptio
     Dim Arr1(1 To 1) As Long
     Dim Arr2(1 To 1) As Long
     
-    cArray.CopyEx Arr1, 0, Arr2, 1, 1
+    CorArray.CopyEx Arr1, 0, Arr2, 1, 1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "SourceIndex"
@@ -195,7 +195,7 @@ Public Sub CopyEx_WithDestinationIndexLessThanLBound_ThrowsArgumentOutOfRangeExc
     Dim Arr1(1 To 1) As Long
     Dim Arr2(1 To 1) As Long
     
-    cArray.CopyEx Arr1, 1, Arr2, 0, 1
+    CorArray.CopyEx Arr1, 1, Arr2, 0, 1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "DestinationIndex"
@@ -206,7 +206,7 @@ Public Sub Copy_WithNullSource_ThrowsArgumentNull()
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
-    cArray.Copy NullArray, NonNull, 1
+    CorArray.Copy NullArray, NonNull, 1
     
 errTrap:
     AssertArgumentNullException Err, "SourceArray"
@@ -217,7 +217,7 @@ Public Sub Copy_WithNullDestination_ThrowsArgumentNullException()
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
-    cArray.Copy NonNull, NullArray, 1
+    CorArray.Copy NonNull, NullArray, 1
     
 errTrap:
     AssertArgumentNullException Err, "DestinationArray"
@@ -227,7 +227,7 @@ Public Sub CopyEx_WithNegativeLength_ThrowsArgumentOutOfRangeException()
     On Error GoTo errTrap
     Dim Arr(0) As Long
     
-    cArray.CopyEx Arr, 0, Arr, 0, -1
+    CorArray.CopyEx Arr, 0, Arr, 0, -1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
@@ -238,7 +238,7 @@ Public Sub CopyEx_WithNullSource_ThrowsArgumentNullException()
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
-    cArray.CopyEx NullArray, 0, NonNull, 0, 1
+    CorArray.CopyEx NullArray, 0, NonNull, 0, 1
     
 errTrap:
     AssertArgumentNullException Err, "SourceArray"
@@ -249,7 +249,7 @@ Public Sub CopyEx_WithNullDestination_ThrowsArgumentNullException()
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
-    cArray.CopyEx NonNull, 0, NullArray, 0, 1
+    CorArray.CopyEx NonNull, 0, NullArray, 0, 1
     
 errTrap:
     AssertArgumentNullException Err, "DestinationArray"
@@ -261,7 +261,7 @@ Public Sub Copy_WithLongs_CopiesAllElements()
     Source = NewLongs(1, 2, 3, 4, 5)
     ReDim Target(0 To 4)
     
-    cArray.Copy Source, Target, 5
+    CorArray.Copy Source, Target, 5
     
     Assert.That Target, Iz.EqualTo(Source)
 End Sub
@@ -272,7 +272,7 @@ Public Sub Copy_WithStrings_CopiesAllElements()
     Source = NewStrings("1", "2", "3", "4", "5")
     ReDim Target(0 To 4)
     
-    cArray.Copy Source, Target, 5
+    CorArray.Copy Source, Target, 5
     
     Assert.That Target, Iz.EqualTo(Source)
 End Sub
@@ -283,7 +283,7 @@ Public Sub Copy_WithCountLessThanArrayLength_CopiesSpecifiedNumberOfElements()
     Source = NewLongs(1, 2, 3, 4, 5)
     ReDim Target(0 To 4)
     
-    cArray.Copy Source, Target, 3
+    CorArray.Copy Source, Target, 3
     
     Dim Expected() As Long
     Expected = NewLongs(1, 2, 3, 0, 0)
@@ -296,7 +296,7 @@ Public Sub Copy_WithUnalignedLBounds_CopiesElements()
     Source = NewLongs(1, 2, 3, 4, 5)
     ReDim Target(5 To 9)
     
-    cArray.Copy Source, Target, 5
+    CorArray.Copy Source, Target, 5
     
     Dim Expected(5 To 9) As Long
     Expected(5) = 1
@@ -314,7 +314,7 @@ Public Sub Copy_WithMultiDimensionalArrays_CopiesElements()
     Source(1, 1) = 2
     Source(2, 2) = 3
 
-    cArray.Copy Source, Target, 9
+    CorArray.Copy Source, Target, 9
 
     Assert.That Target, Iz.EqualTo(Source)
 End Sub
@@ -325,7 +325,7 @@ Public Sub CopyEx_WithLongsSubSet_CopiesSubSet()
     Source = NewLongs(1, 2, 3, 4, 5, 6, 7, 8)
     Target = NewLongs(0, 0, 0, 0, 0, 0, 0, 0)
     
-    cArray.CopyEx Source, 2, Target, 0, 4
+    CorArray.CopyEx Source, 2, Target, 0, 4
     
     Dim Expected() As Long
     Expected = NewLongs(3, 4, 5, 6, 0, 0, 0, 0)
@@ -338,7 +338,7 @@ Public Sub Copy_WithObjects_CopiesElements()
     Set Source(0) = New Int32
     Set Source(1) = New Int32
     
-    cArray.Copy Source, Target, 2
+    CorArray.Copy Source, Target, 2
     
     Assert.That Target, Iz.EqualTo(Source)
 End Sub
@@ -349,7 +349,7 @@ Public Sub CopyEx_WithObjects_CopiesElements()
     Set Source(0) = New Int32
     Set Source(1) = New Int32
     
-    cArray.CopyEx Source, 1, Target, 2, 1
+    CorArray.CopyEx Source, 1, Target, 2, 1
     
     Assert.That Target(1), Iz.Nothing
     Assert.That Target(2), Iz.SameAs(Source(1))
@@ -365,7 +365,7 @@ Public Sub CopyEx_WithObjectsToSameArray_CopiesElements()
     Set Actual(2) = Item3
     Set Actual(3) = New Int32
     
-    cArray.CopyEx Actual, 0, Actual, 1, 3
+    CorArray.CopyEx Actual, 0, Actual, 1, 3
     
     Dim Expected(0 To 3) As Int32
     Set Expected(0) = Item1
@@ -381,7 +381,7 @@ Public Sub Copy_WithLongsToStrings_ConvertsElements()
     Source = NewLongs(1, 2, 3)
     ReDim Target(2)
     
-    cArray.Copy Source, Target, 3
+    CorArray.Copy Source, Target, 3
     
     Dim Expected() As String
     Expected = NewStrings("1", "2", "3")
@@ -394,7 +394,7 @@ Public Sub Copy_WithVariantsToObjects_ConvertsElements()
     Source = Array(New Int32, New Int32, New Int32)
     ReDim Target(2)
     
-    cArray.Copy Source, Target, 3
+    CorArray.Copy Source, Target, 3
     
     Assert.That Target, Iz.EqualTo(Source)
 End Sub

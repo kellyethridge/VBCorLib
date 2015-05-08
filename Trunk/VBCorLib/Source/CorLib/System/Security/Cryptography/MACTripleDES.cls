@@ -252,7 +252,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
     Call VerifyNotDisposed
     Call StartHash
     
-    If Not cArray.IsNull(OutputBuffer) Then
+    If Not CorArray.IsNull(OutputBuffer) Then
         ' We won't bother to copy if the OutputBuffer and offset are the same as
         ' the InputBuffer and offset since this would be copying the same
         ' data over the top of itself.
@@ -286,11 +286,11 @@ End Function
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
     Call VerifyNotDisposed
     
-    If cArray.IsNull(InputBuffer) Then _
+    If CorArray.IsNull(InputBuffer) Then _
         Throw Cor.NewArgumentNullException("InputBuffer")
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException("InputOffset", InputOffset, Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If (cArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
+    If (CorArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
 
     Call StartHash
@@ -404,8 +404,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

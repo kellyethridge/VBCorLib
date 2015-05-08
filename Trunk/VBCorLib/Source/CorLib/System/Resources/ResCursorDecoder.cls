@@ -67,7 +67,7 @@ Private mCursor As StdPicture
 Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     If Key Is Nothing Then _
         Throw Cor.NewArgumentNullException("Key")
-    If cArray.IsNull(Bytes) Then _
+    If CorArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If Key.ResourceType <> ResourceTypes.CursorResource Then _
         Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
@@ -115,7 +115,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCursor(ByRef Bytes() As Byte) As StdPicture
     Dim hr As Long
-    hr = CreateIconFromResource(Bytes(0), cArray.GetLength(Bytes), False, &H30000)
+    hr = CreateIconFromResource(Bytes(0), CorArray.GetLength(Bytes), False, &H30000)
     If hr = 0 Then Exit Function
     
     Dim NewCursor As PictDesc

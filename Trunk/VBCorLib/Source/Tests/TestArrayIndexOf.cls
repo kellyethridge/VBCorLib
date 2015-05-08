@@ -51,7 +51,7 @@ End Sub
 Public Sub IndexOf_WithValues_ReturnsExpected(ByRef Arr As Variant, ByRef Value As Variant, ByVal Expected As Long)
     Dim Actual As Long
     
-    Actual = cArray.IndexOf(Arr, Value)
+    Actual = CorArray.IndexOf(Arr, Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -60,7 +60,7 @@ Public Sub IndexOf_WithNullArray_ThrowsArgumentNullException()
     Dim Arr() As Long
     
     On Error GoTo errTrap
-    cArray.IndexOf Arr, 1
+    CorArray.IndexOf Arr, 1
     
 errTrap:
     AssertArgumentNullException Err, "Arr"
@@ -70,7 +70,7 @@ Public Sub IndexOf_WithMuliDimensionArray_ThrowsRankException()
     Dim Arr(0, 0) As Long
     
     On Error GoTo errTrap
-    cArray.IndexOf Arr, 0
+    CorArray.IndexOf Arr, 0
     
 errTrap:
     AssertRankException Err
@@ -80,7 +80,7 @@ Public Sub IndexOf_WithStartIndexLessThanLBound_ThrowsArgumentOutOfRangeExceptio
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.IndexOf Arr, 0, -1
+    CorArray.IndexOf Arr, 0, -1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
@@ -90,7 +90,7 @@ Public Sub IndexOf_WithStartIndexGreaterThanUBound_ThrowsArgumentOutOfRangeExcep
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.IndexOf Arr, 0, 1
+    CorArray.IndexOf Arr, 0, 1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
@@ -100,7 +100,7 @@ Public Sub IndexOf_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.IndexOf Arr, 0, 0, -1
+    CorArray.IndexOf Arr, 0, 0, -1
     
 errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
@@ -110,7 +110,7 @@ Public Sub IndexOf_WithStartIndexAndCountGreaterThanUBound_ThrowsArgumentOutOfRa
     Dim Arr(0) As Long
     
     On Error GoTo errTrap
-    cArray.IndexOf Arr, 0, 0, 2
+    CorArray.IndexOf Arr, 0, 0, 2
     
 errTrap:
     AssertArgumentOutOfRangeException Err

@@ -99,11 +99,11 @@ End Property
 ' @remarks The length of the array cannot be less than 8 bytes.
 '
 Public Property Let Salt(ByRef RHS() As Byte)
-    If cArray.IsNull(RHS) Then _
+    If CorArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException("Salt")
     
     Dim Size As Long
-    Size = cArray.GetLength(RHS)
+    Size = CorArray.GetLength(RHS)
     
     If Size < 8 Then _
         Throw Cor.NewArgumentException("Cannot set Salt less than 8 bytes in length.", "Salt")
@@ -213,7 +213,7 @@ End Sub
 Private Function NextBlockBytes() As Byte()
     mBlockCount = mBlockCount + 1
     
-    Call mPRF.TransformBlock(mSalt, 0, cArray.GetLength(mSalt), mSalt, 0)
+    Call mPRF.TransformBlock(mSalt, 0, CorArray.GetLength(mSalt), mSalt, 0)
     
     Dim Result() As Byte
     Result = mPRF.ComputeHash(AsQByteArr(SwapEndian(mBlockCount)).Bytes)
@@ -250,8 +250,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
