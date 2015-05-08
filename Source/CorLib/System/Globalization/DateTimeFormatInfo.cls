@@ -1173,7 +1173,7 @@ Private Sub AssignDayNames(ByRef Source() As String, ByRef DayNames() As String)
     Call VerifyWritable
     Call VerifyLoaded
 
-    If cArray.GetRank(Source) <> 1 Then _
+    If cArray.Rank(Source) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If cArray.GetLength(Source) <> 7 Then _
         Throw Cor.NewArgumentException("Array must contain exactly 7 elements.")
@@ -1185,7 +1185,7 @@ End Sub
 Private Sub AssignMonthNames(ByRef Source() As String, ByRef MonthNames() As String)
     Call VerifyWritable
     Call VerifyLoaded
-    If cArray.GetRank(Source) <> 1 Then _
+    If cArray.Rank(Source) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If cArray.GetLength(Source) <> 13 Then _
         Throw Cor.NewArgumentException("Array must contain exactly 13 elements.")

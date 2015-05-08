@@ -49,7 +49,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
             Test.Use(Array()).Expect False
             
-        Case "GetRank_WithValues_ReturnsExpected"
+        Case "Rank_WithValues_ReturnsExpected"
             ReDim LongArray(0)
             Test.Use(LongArray).Expect 1
             
@@ -96,26 +96,26 @@ Public Function IsNull_WithValue_ReturnsExpected(ByRef Arr As Variant) As Boolea
     IsNull_WithValue_ReturnsExpected = cArray.IsNull(Arr)
 End Function
 
-Public Function GetRank_WithValues_ReturnsExpected(ByRef Arr As Variant) As Long
-    GetRank_WithValues_ReturnsExpected = cArray.GetRank(Arr)
+Public Function Rank_WithValues_ReturnsExpected(ByRef Arr As Variant) As Long
+    Rank_WithValues_ReturnsExpected = cArray.Rank(Arr)
 End Function
 
-Public Sub GetRank_WithNullArray_Throws()
+Public Sub Rank_WithNullArray_Throws()
     Dim NullArray() As Long
     
     On Error Resume Next
-    cArray.GetRank NullArray
+    cArray.Rank NullArray
     
     AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Sub GetRank_WithNonArray_Throws()
+Public Sub Rank_WithNonArray_Throws()
     Dim NotAnArray As Long
 
     On Error Resume Next
-    cArray.GetRank NotAnArray
+    cArray.Rank NotAnArray
     
-    AssertArgumentException Err, "Arr"
+    AssertArgumentException Err
 End Sub
 
 Public Sub Clear_WithNullArray_Throws()
