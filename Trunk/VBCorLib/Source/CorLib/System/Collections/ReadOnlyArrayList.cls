@@ -173,8 +173,8 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
     Call Helper.MoveVariant(ArrayList_Item, mList(Index))
 End Property
 
-Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
-    ArrayList_LastIndexOf = mList.LastIndexOf(Value, StartIndex, Count, Comparer)
+Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    ArrayList_LastIndexOf = mList.LastIndexOf(Value, StartIndex, Count)
 End Function
 
 Private Function ArrayList_NewEnum() As stdole.IUnknown
