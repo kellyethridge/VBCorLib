@@ -57,7 +57,7 @@ Public Property Get Count() As Long: End Property
 ' @param arr The array to copy the elements to.
 ' @param Index The starting index in the array to begin copying to.
 '
-Public Sub CopyTo(ByRef arr As Variant, ByVal Index As Long): End Sub
+Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long): End Sub
 
 ''
 ' Returns an enumerator used to iterate over the list.
@@ -106,24 +106,24 @@ Attribute Item.VB_UserMemId = 0
 ' Sets the item at the specified index to a new value.
 '
 ' @param Index The index of the item to set the value to.
-' @param RHS The new value to set the item to.
+' @param Value The new value to set the item to.
 '
-Public Property Let Item(ByVal Index As Long, ByRef RHS As Variant): End Property
+Public Property Let Item(ByVal Index As Long, ByRef Value As Variant): End Property
 
 ''
 ' Sets the item at the specified index to a new value.
 '
 ' @param Index The index of the item to set the value to.
-' @param RHS The new value to set the item to.
+' @param Value The new value to set the item to.
 '
-Public Property Set Item(ByVal Index As Long, ByRef RHS As Variant): End Property
+Public Property Set Item(ByVal Index As Long, ByRef Value As Variant): End Property
 
 ''
 ' Adds a new item to the list.
 '
 ' @param value The item to be added to the list.
 '
-Public Function Add(ByRef value As Variant) As Long: End Function
+Public Function Add(ByRef Value As Variant) As Long: End Function
 
 ''
 ' Clears the contents of the list.
@@ -134,21 +134,19 @@ Public Sub Clear(): End Sub
 ' Determines if the list contains a specific value.
 '
 ' @param value the value to check the list for.
-' @param comparer A custom comparer used for comparing values in the list to the value being sought.
 ' @return An indication of the value being found in the list.
 '
-Public Function Contains(ByRef value As Variant, Optional ByVal Comparer As IComparer) As Boolean: End Function
+Public Function Contains(ByRef Value As Variant) As Boolean: End Function
 
 ''
 ' Returns the index of the value within the list.
 '
 ' @param value The value to find the index of in the list.
-' @param comparer A custom comparer used for comparing values in the list to the value being sought.
 ' @return The index the value was found, or -1 if the value was not found.
 ' @remarks In general, -1 is returned for an unfound value. If the lowerbound of the underlying
 ' list is not 0, then the return value should be the lowerbound-1 for values not found.
 '
-Public Function IndexOf(ByRef value As Variant, Optional ByVal Comparer As IComparer) As Long: End Function
+Public Function IndexOf(ByRef Value As Variant) As Long: End Function
 
 ''
 ' Inserts a value into a list at the specified index.
@@ -156,17 +154,16 @@ Public Function IndexOf(ByRef value As Variant, Optional ByVal Comparer As IComp
 ' @param Index The postion in the list to insert the new value.
 ' @param value The new value to be inserted into the list.
 '
-Public Sub Insert(ByVal Index As Long, ByRef value As Variant): End Sub
+Public Sub Insert(ByVal Index As Long, ByRef Value As Variant): End Sub
 
 ''
 ' Removes a value from the list.
 '
 ' @param value The value to be removed from the list.
-' @param comparer A custom comparer used for comparing values in the list to the value being sought.
 ' @remarks This method searches the list for the first instance of the value. If one
 ' is found, it is removed from the list.
 '
-Public Sub Remove(ByRef value As Variant, Optional ByVal Comparer As IComparer): End Sub
+Public Sub Remove(ByRef Value As Variant): End Sub
 
 ''
 ' Removes a value from the list at the specified index.

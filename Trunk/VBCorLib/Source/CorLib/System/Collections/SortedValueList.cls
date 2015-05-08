@@ -61,8 +61,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -112,8 +112,8 @@ Private Sub IList_Clear()
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 
-Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    IList_Contains = mList.ContainsValue(Value, Comparer)
+Private Function IList_Contains(Value As Variant) As Boolean
+    IList_Contains = mList.ContainsValue(Value)
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
@@ -128,8 +128,8 @@ Private Function IList_GetEnumerator() As IEnumerator
     Set IList_GetEnumerator = mList.GetValueEnumerator
 End Function
 
-Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    IList_IndexOf = mList.IndexOfValue(Value, Comparer)
+Private Function IList_IndexOf(Value As Variant) As Long
+    IList_IndexOf = mList.IndexOfValue(Value)
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
@@ -144,11 +144,11 @@ Private Property Get IList_IsReadOnly() As Boolean
     IList_IsReadOnly = True
 End Property
 
-Private Property Set IList_Item(ByVal Index As Long, RHS As Variant)
+Private Property Set IList_Item(ByVal Index As Long, Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Property
 
-Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
+Private Property Let IList_Item(ByVal Index As Long, Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Property
 
@@ -160,7 +160,7 @@ Private Function IList_NewEnum() As stdole.IUnknown
     Set IList_NewEnum = NewEnum
 End Function
 
-Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
+Private Sub IList_Remove(Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
 End Sub
 

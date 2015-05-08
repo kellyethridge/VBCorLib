@@ -171,9 +171,9 @@ Private Function ArrayList_Clone() As ArrayList
     Set ArrayList_Clone = Ret
 End Function
 
-Private Function ArrayList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
+Private Function ArrayList_Contains(Value As Variant) As Boolean
     VerifyVersion
-    ArrayList_Contains = (mList.IndexOf(Value, mIndex, mCount, Comparer) >= 0)
+    ArrayList_Contains = (mList.IndexOf(Value, mIndex, mCount) >= 0)
 End Function
 
 Private Sub ArrayList_CopyTo(DstArray As Variant, Optional ArrayIndex As Variant)
@@ -254,7 +254,7 @@ Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As
     Set ArrayList_GetRange = Ret
 End Function
 
-Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer) As Long
+Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     VerifyVersion
     
     Dim ElemCount   As Long
@@ -271,7 +271,7 @@ Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex A
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
            
     Dim Result As Long
-    Result = mList.IndexOf(Value, mIndex + ElemIndex, ElemCount, Comparer)
+    Result = mList.IndexOf(Value, mIndex + ElemIndex, ElemCount)
     If Result >= 0 Then
         Result = Result - mIndex
     End If
@@ -367,11 +367,11 @@ Private Function ArrayList_NewEnum() As stdole.IUnknown
     Set ArrayList_NewEnum = CreateEnumerator(ArrayList_GetEnumerator)
 End Function
 
-Private Sub ArrayList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
+Private Sub ArrayList_Remove(Value As Variant)
     VerifyVersion
     
     Dim Index As Long
-    Index = mList.IndexOf(Value, mIndex, mCount, Comparer)
+    Index = mList.IndexOf(Value, mIndex, mCount)
     If Index >= 0 Then
         mList.RemoveAt Index
         mCount = mCount - 1
@@ -544,8 +544,8 @@ Private Sub IList_Clear()
     ArrayList_Clear
 End Sub
 
-Private Function IList_Contains(Value As Variant, Optional ByVal Comparer As IComparer) As Boolean
-    IList_Contains = ArrayList_Contains(Value, Comparer)
+Private Function IList_Contains(Value As Variant) As Boolean
+    IList_Contains = ArrayList_Contains(Value)
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
@@ -560,8 +560,8 @@ Private Function IList_GetEnumerator() As IEnumerator
     Set IList_GetEnumerator = ArrayList_GetEnumerator
 End Function
 
-Private Function IList_IndexOf(Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    IList_IndexOf = ArrayList_IndexOf(Value, , , Comparer)
+Private Function IList_IndexOf(Value As Variant) As Long
+    IList_IndexOf = ArrayList_IndexOf(Value)
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
@@ -576,12 +576,12 @@ Private Property Get IList_IsReadOnly() As Boolean
     IList_IsReadOnly = ArrayList_IsReadOnly
 End Property
 
-Private Property Set IList_Item(ByVal Index As Long, RHS As Variant)
-    Set ArrayList_Item(Index) = RHS
+Private Property Set IList_Item(ByVal Index As Long, Value As Variant)
+    Set ArrayList_Item(Index) = Value
 End Property
 
-Private Property Let IList_Item(ByVal Index As Long, RHS As Variant)
-    ArrayList_Item(Index) = RHS
+Private Property Let IList_Item(ByVal Index As Long, Value As Variant)
+    ArrayList_Item(Index) = Value
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
@@ -592,8 +592,8 @@ Private Function IList_NewEnum() As stdole.IUnknown
     Set IList_NewEnum = ArrayList_NewEnum
 End Function
 
-Private Sub IList_Remove(Value As Variant, Optional ByVal Comparer As IComparer)
-    ArrayList_Remove Value, Comparer
+Private Sub IList_Remove(Value As Variant)
+    ArrayList_Remove Value
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)
