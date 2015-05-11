@@ -33,14 +33,6 @@ Private mHasSortItems   As Boolean
 Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
-Public Function NewListRange(ByVal Index As Long, ByVal Count As Long) As ListRange
-    NewListRange.Index = Index
-    NewListRange.Count = Count
-End Function
-
-Public Function ArrayLength(ByRef Arr As Variant) As Long
-    ArrayLength = UBound(Arr) - LBound(Arr) + 1
-End Function
 
 Public Function ArrayPointer(ByRef Arg As Variant) As Long
     Dim ArgType As Integer

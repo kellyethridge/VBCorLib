@@ -84,13 +84,13 @@ End Function
 ' @return A string created from the chars in an integer array.
 '
 Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    If IsNullCharArray(Chars) Then _
+    If CorArray.IsNull(Chars) Then _
         Error.ArgumentNull "Chars", ArgumentNull_Array
-    If IsMultiDimCharArray(Chars) Then _
+    If CorArray.Rank(Chars) <> 1 Then _
         Error.Rank
 
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))
+    Range = GetOptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
     
     If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -292,13 +292,13 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
         Exit Function
     End If
     
-    If IsNullArray(Value) Then _
+    If CorArray.IsNull(Value) Then _
         Error.ArgumentNull "Value", ArgumentNull_Array
-    If IsMultiDimArray(Value) Then _
+    If CorArray.Rank(Value) <> 1 Then _
         Error.Rank
     
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, Count, LBound(Value), ArrayLength(Value), Parameter_StartIndex)
+    Range = GetOptionalRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound

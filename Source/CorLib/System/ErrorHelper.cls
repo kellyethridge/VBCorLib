@@ -1,4 +1,16 @@
-Attribute VB_Name = "Error"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
+Attribute VB_Name = "ErrorHelper"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -20,46 +32,47 @@ Attribute VB_Name = "Error"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: Error
+' Module: ErrorHelper
 '
 Option Explicit
 
-Public Sub Argument(ByVal Message As ArgumentString, Optional ByRef ParamName As String)
+Friend Sub Argument(ByVal Message As ArgumentString, Optional ByRef ParamName As String)
     Throw Cor.NewArgumentException(Environment.GetResourceString(Message), ParamName)
 End Sub
 
-Public Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Message As ArgumentNullString = ArgumentNull_Exception)
+Friend Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Message As ArgumentNullString = ArgumentNull_Exception)
     Throw Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Message))
 End Sub
 
-Public Sub ArgumentOutOfRange(ByRef ParamName As String, Optional ByVal Message As ArgumentOutOfRangeString = ArgumentOutOfRange_Exception)
+Friend Sub ArgumentOutOfRange(ByRef ParamName As String, Optional ByVal Message As ArgumentOutOfRangeString = ArgumentOutOfRange_Exception)
     Throw Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(Message))
 End Sub
 
-Public Sub Rank(Optional ByVal Message As ResourceString = Rank_MultiDimNotSupported)
+Friend Sub Rank(Optional ByVal Message As ResourceString = Rank_MultiDimNotSupported)
     Throw Cor.NewRankException(Environment.GetResourceString(Message))
 End Sub
 
-Public Sub ObjectDisposed(Optional ByVal Message As ObjectDisposedString = ObjectDisposed_Generic)
+Friend Sub ObjectDisposed(Optional ByVal Message As ObjectDisposedString = ObjectDisposed_Generic)
     Throw Cor.NewObjectDisposedException("", Environment.GetResourceString(Message))
 End Sub
 
-Public Sub IndexOutOfRange(ByVal Message As IndexOutOfRangeString)
+Friend Sub IndexOutOfRange(ByVal Message As IndexOutOfRangeString)
     Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(Message))
 End Sub
 
-Public Sub NegativeNumber(ByVal ParamName As String)
+Friend Sub NegativeNumber(ByVal ParamName As String)
     ArgumentOutOfRange ParamName, ArgumentOutOfRange_NeedNonNegNum
 End Sub
 
-Public Sub InvalidOffsetLength()
+Friend Sub InvalidOffsetLength()
     Argument Argument_InvalidOffLen
 End Sub
 
-Public Sub InvalidOperation(ByVal Message As InvalidOperationString)
+Friend Sub InvalidOperation(ByVal Message As InvalidOperationString)
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(Message))
 End Sub
 
-Public Sub NotSupported(ByVal Message As NotSupportedString)
+Friend Sub NotSupported(ByVal Message As NotSupportedString)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(Message))
 End Sub
+

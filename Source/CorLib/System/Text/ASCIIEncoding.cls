@@ -200,13 +200,13 @@ Private Function GetByteCountString(ByRef Chars As Variant) As Long
 End Function
 
 Private Function GetByteCountChars(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
-    If IsNullArray(Chars) Then _
+    If CorArray.IsNull(Chars) Then _
         Error.ArgumentNull "Chars", ArgumentNull_Array
-    If IsMultiDimArray(Chars) Then _
+    If CorArray.Rank(Chars) <> 1 Then _
         Error.Rank
         
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Chars), ArrayLength(Chars))
+    Range = GetOptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
 
     If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -231,25 +231,34 @@ End Function
 ' @see Encoding
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
+    Dim AttachedChars() As Integer
+    AttachedChars = AsChars(Chars)
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(mChars), AttachChars(Chars, mChars, mCharsSA))
+    Range = GetOptionalRange(Index, Count, LBound(AttachedChars), CorArray.LengthFirstDim(AttachedChars))
 
-    If Range.Index < LBound(mChars) Then _
+    On Error GoTo Catch
+    If Range.Index < LBound(AttachedChars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _
         Error.NegativeNumber "Count"
-    If Range.Index + Range.Count - 1 > UBound(mChars) Then _
+    If Range.Index + Range.Count - 1 > UBound(AttachedChars) Then _
         Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCount
 
     Dim Result() As Byte
     If Range.Count > 0 Then
-        ReDim Result(0 To GetByteCount(Chars, Range.Index, Range.Count) - 1)
-        InternalGetBytes mChars, Range.Index, Range.Count, Result, 0
+        ReDim Result(0 To GetByteCount(AttachedChars, Range.Index, Range.Count) - 1)
+        InternalGetBytes AttachedChars, Range.Index, Range.Count, Result, 0
         GetBytes = Result
-        Exit Function
+    Else
+        GetBytes = Cor.NewBytes()
     End If
-        
-    GetBytes = Cor.NewBytes()
+
+    FreeChars AttachedChars
+    Exit Function
+    
+Catch:
+    FreeChars AttachedChars
+    Throw
 End Function
 
 ''
@@ -296,13 +305,13 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    If IsNullArray(Bytes) Then _
+    If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If IsMultiDimArray(Bytes) Then _
+    If CorArray.Rank(Bytes) <> 1 Then _
         Error.Rank
     
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Bytes), ArrayLength(Bytes))
+    Range = GetOptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
 
     If Range.Index < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -326,7 +335,7 @@ End Function
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
     Dim Range As ListRange
     
-    If IsNullArray(Bytes) Then _
+    If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
     If IsMultiDimArray(Bytes) Then _
         Error.Rank
@@ -366,8 +375,8 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    If IsNullArray(Bytes) Or IsNullArray(Chars) Then _
-        Error.ArgumentNull IIf(IsNullArray(Bytes), "Bytes", "Chars"), ArgumentNull_Array
+    If CorArray.IsNull(Bytes) Or CorArray.IsNull(Chars) Then _
+        Error.ArgumentNull IIf(CorArray.IsNull(Bytes), "Bytes", "Chars"), ArgumentNull_Array
     If IsMultiDimArray(Bytes) Or IsMultiDimArray(Chars) Then _
         Error.Rank
     If ByteIndex < LBound(Bytes) Then _
@@ -471,7 +480,7 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
     Dim Range As ListRange
     
-    If IsNullArray(Bytes) Then _
+    If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
     If IsMultiDimArray(Bytes) Then _
         Error.Rank
@@ -529,14 +538,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     Dim i   As Long
-    Dim ch  As Long
+    Dim Ch  As Long
     For i = 0 To Count - 1
-        ch = Chars(Index + i)
-        Select Case ch
+        Ch = Chars(Index + i)
+        Select Case Ch
             ' we need to have a range because by using Integers to
             ' represent unicode characters, we could end up with
             ' negative numbers.
-            Case 0 To 127:  Bytes(ByteIndex + i) = ch
+            Case 0 To 127:  Bytes(ByteIndex + i) = Ch
             Case Else:      Bytes(ByteIndex + i) = BYTE_QUESTION_MARK
         End Select
     Next i

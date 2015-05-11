@@ -137,7 +137,7 @@ End Function
 ' @remarks The values in the queue will be cast to the array datatype if possible.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    If IsNullArray(DstArray) Then _
+    If CorArray.IsNull(DstArray) Then _
         Error.ArgumentNull "DstArray", ArgumentNull_Array
     If IsMultiDimArray(DstArray) Then _
         Error.Argument Argument_MultiDimNotSupported
@@ -348,10 +348,10 @@ Private Sub WriteRange(ByRef Source As Variant)
 End Sub
 
 Private Sub WriteArray(ByRef Source As Variant)
-    If IsNullArray(Source) Then _
+    If CorArray.IsNull(Source) Then _
         Error.ArgumentNull "Source", ArgumentNull_Array
     
-    WriteCollection ArrayLength(Source), Source
+    WriteCollection CorArray.LengthFirstDim(Source), Source
 End Sub
 
 Private Sub WriteVBCollection(ByVal Source As Collection)

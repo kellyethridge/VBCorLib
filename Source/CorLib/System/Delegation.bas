@@ -28,7 +28,7 @@ Private Const DelegationCode        As Currency = -368956918007638.6215@     ' d
 Private Const OffsetToFirstFunction As Long = 12
 Private Const SizeOfDelegate        As Long = 28
 
-Public Type Delegate
+Private Type Delegate
     pVTable     As Long
     pfn         As Long
     cRefs       As Long

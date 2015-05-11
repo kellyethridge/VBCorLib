@@ -1,4 +1,4 @@
-Attribute VB_Name = "CorArrayPartial"
+Attribute VB_Name = "CorArrayHelper"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -20,11 +20,11 @@ Attribute VB_Name = "CorArrayPartial"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: CorArrayPartial
+' Module: CorArrayHelper
 '
 
 ''
-' This partial class contains supporting code for the CorArray class.
+' This helper class contains supporting code for the CorArray class.
 '
 Option Explicit
 

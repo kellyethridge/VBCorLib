@@ -94,9 +94,18 @@ Public Sub GetByteCount_WithIndexAndCount_ReturnsExpected()
     Dim Encoding As New ASCIIEncoding
     
     Dim Actual As Long
-    Actual = Encoding.GetByteCount("abc", 1, 2)
+    Actual = Encoding.GetByteCount(NewChars("a", "b", "c"), 1, 2)
     
     Assert.That Actual, Iz.EqualTo(2)
+End Sub
+
+Public Sub GetByteCount_WithString_ReturnsLengthOfString()
+    Dim Encoding As New ASCIIEncoding
+    
+    Dim Actual As Long
+    Actual = Encoding.GetByteCount("abcd")
+    
+    Assert.That Actual, Iz.EqualTo(4)
 End Sub
 
 Public Sub GetBytesEx_WithCharsThatFitIntoOutput_EncodesAllChars()
