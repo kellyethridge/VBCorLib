@@ -615,7 +615,7 @@ End Sub
 
 Private Sub InternalCopyTo(ByRef DstArray As Variant, ByVal Index As Long, ByVal CopyType As IDictionaryEnumType)
     Dim Result As Long
-    Result = VerifyArrayRange(GetArrayPointer(DstArray), Index, mCount)
+    Result = VerifyArrayRange(CorArray.ArrayPointer(DstArray), Index, mCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "DstArray", Index, "Index", mCount, "Index")
     
     Dim i As Long

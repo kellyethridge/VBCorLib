@@ -65,8 +65,8 @@ Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef 
     Dim SourcePtr As Long
     Dim DestinationPtr As Long
     
-    SourcePtr = GetArrayPointer(Source)
-    DestinationPtr = GetArrayPointer(Destination)
+    SourcePtr = CorArray.ArrayPointer(Source)
+    DestinationPtr = CorArray.ArrayPointer(Destination)
     
     If SourcePtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Array))
@@ -103,7 +103,7 @@ End Sub
 ' is in length.
 Public Function ByteLength(ByRef Arr As Variant) As Long
     Dim ArrayPtr As Long
-    ArrayPtr = GetArrayPointer(Arr)
+    ArrayPtr = CorArray.ArrayPointer(Arr)
     
     If ArrayPtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
@@ -124,7 +124,7 @@ End Function
 '
 Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
     Dim ArrayPtr As Long
-    ArrayPtr = GetArrayPointer(Arr)
+    ArrayPtr = CorArray.ArrayPointer(Arr)
     
     If ArrayPtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
@@ -147,7 +147,7 @@ End Function
 '
 Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byte)
     Dim ArrayPtr As Long
-    ArrayPtr = GetArrayPointer(Arr)
+    ArrayPtr = CorArray.ArrayPointer(Arr)
     
     If ArrayPtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))

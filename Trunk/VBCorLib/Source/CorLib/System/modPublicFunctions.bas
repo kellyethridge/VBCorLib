@@ -159,7 +159,9 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
             
         Case vbByteArray
             Dim Bytes() As Byte
-            SAPtr(Bytes) = GetArrayPointer(Source, True)
+            SAPtr(Bytes) = CorArray.ArrayPointer(Source)
+            If CorArray.IsNull(Bytes) Then _
+                Error.ArgumentNull "Source", ArgumentNull_Array
             Set GetStream = Cor.NewMemoryStream(Bytes, Writable:=False)
             SAPtr(Bytes) = 0
             

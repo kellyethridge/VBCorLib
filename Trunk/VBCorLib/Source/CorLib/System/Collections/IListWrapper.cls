@@ -220,7 +220,7 @@ Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal A
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim Result As Long
-    Result = VerifyArrayRange(GetArrayPointer(DstArray), ArrayIndex, Count)
+    Result = VerifyArrayRange(CorArray.ArrayPointer(DstArray), ArrayIndex, Count)
     If Result Then _
         ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
     

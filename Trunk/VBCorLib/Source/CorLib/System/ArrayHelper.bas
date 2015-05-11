@@ -34,43 +34,6 @@ Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
 
-''
-' Retrieves the pointer to an array's SafeArray structure.
-'
-' @param arr The array to retrieve the pointer to.
-' @return A pointer to a SafeArray structure or 0 if the array is null.
-'
-Public Function GetArrayPointer(ByRef Arr As Variant, Optional ByVal ThrowOnNull As Boolean = False) As Long
-    If Not IsArray(Arr) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayRequired), "Arr")
-    
-    GetArrayPointer = MemLong(vbaVarRefAry(Arr))
-    
-    ' HACK HACK HACK
-    '
-    ' When an uninitialized array of objects or UDTs is passed into a
-    ' function as a ByRef Variant, the array is initialized with just the
-    ' SafeArrayDescriptor, at which point, it is a valid array and can
-    ' be used by UBound and LBound after the call. So, now we're just
-    ' going to assume that any object or UDT array that has just the descriptor
-    ' allocated was Null to begin with. That means whenever an Object or UDT
-    ' array is passed to any CorArray method, it will technically never
-    ' be uninitialized, just zero-length.
-    Select Case VariantType(Arr) And &HFF
-        Case vbObject, vbUserDefinedType
-            If UBound(Arr) < LBound(Arr) Then
-                GetArrayPointer = vbNullPtr
-            End If
-    End Select
-    
-    If ThrowOnNull Then
-        If GetArrayPointer = vbNullPtr Then
-            Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
-        End If
-    End If
-End Function
-
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Optimized sort routines. There could have been one
 '   all-purpose sort routine, but it would be too slow.
