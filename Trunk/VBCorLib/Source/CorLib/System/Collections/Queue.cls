@@ -139,7 +139,7 @@ End Function
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.IsNull(DstArray) Then _
         Error.ArgumentNull "DstArray", ArgumentNull_Array
-    If IsMultiDimArray(DstArray) Then _
+    If CorArray.Rank(DstArray) <> 1 Then _
         Error.Argument Argument_MultiDimNotSupported
     If Index < LBound(DstArray) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound

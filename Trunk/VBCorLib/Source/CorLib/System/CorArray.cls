@@ -199,7 +199,7 @@ End Function
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim pSafeArray As Long
-    pSafeArray = ValidArrayPointer(Arr)
+    pSafeArray = ArrayPointer(Arr)
         
     Dim LowerBound As Long
     LowerBound = LBound(Arr)
@@ -331,7 +331,7 @@ End Function
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim pSafeArray As Long
-    pSafeArray = ValidArrayPointer(Arr)
+    pSafeArray = ArrayPointer(Arr)
 
     Dim ElemIndex As Long
     Dim ElemCount As Long
@@ -385,7 +385,7 @@ Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Lon
     Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim pSafeArray As Long
-    pSafeArray = ValidArrayPointer(Arr)
+    pSafeArray = ArrayPointer(Arr)
         
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -425,7 +425,7 @@ Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
     Set Action = NewDelegate(AddressOfAction)
     
     Dim pSafeArray As Long
-    pSafeArray = ValidArrayPointer(Arr)
+    pSafeArray = ArrayPointer(Arr)
 
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(pSafeArray)
@@ -486,7 +486,7 @@ End Function
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
-    If IsMultiDimArray(Arr) Then _
+    If CorArray.Rank(Arr) <> 1 Then _
         Error.Rank
     If Index < LBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -785,12 +785,12 @@ End Function
 ' @param Arr The array to retrieve the number of dimensions from.
 ' @return The number of dimension in the array.
 Public Function Rank(ByRef Arr As Variant) As Long
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Arr)
-    If ArrayPtr = vbNullPtr Then _
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
+    If Ptr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    Rank = SafeArrayGetDim(ArrayPtr)
+    Rank = SafeArrayGetDim(Ptr)
 End Function
 
 ''
@@ -864,7 +864,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     
     If ArrayPtr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
-    If IsMultiDimArrayPtr(ArrayPtr) Then _
+    If SafeArrayGetDim(ArrayPtr) <> 1 Then _
         Error.Rank
     
     Dim ElemIndex   As Long
@@ -916,7 +916,7 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     
     If pSafeArray = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
-    If IsMultiDimArrayPtr(pSafeArray) Then _
+    If SafeArrayGetDim(pSafeArray) <> 1 Then _
         Error.Rank
     
     Dim ElemIndex   As Long
@@ -1091,7 +1091,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     pKeysSafeArray = ArrayPointer(Keys)
     If pKeysSafeArray = vbNullPtr Then _
         Error.ArgumentNull "Keys", ArgumentNull_Array
-    If IsMultiDimArrayPtr(pKeysSafeArray) Then _
+    If SafeArrayGetDim(pKeysSafeArray) <> 1 Then _
         Error.Rank
     If Index < LBound(Keys) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -1107,7 +1107,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
         pItemsSafeArray = GetArrayPointer(Items)
         If pItemsSafeArray = vbNullPtr Then _
             Error.ArgumentNull "Items", ArgumentNull_Array
-        If IsMultiDimArrayPtr(pItemsSafeArray) Then _
+        If SafeArrayGetDim(pItemsSafeArray) <> 1 Then _
             Error.Rank
         
         ' Items array must match the Keys array in size and bounds.
