@@ -34,59 +34,6 @@ Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
 
-Public Function ArrayPointer(ByRef Arg As Variant) As Long
-    Dim ArgType As Integer
-    ArgType = VariantType(Arg)
-    
-    If (ArgType And vbArray) = 0 Then _
-        Error.Argument Argument_ArrayRequired
-    
-    ArrayPointer = MemLong(vbaVarRefAry(Arg))
-    
-    ' HACK HACK HACK
-    '
-    ' When an uninitialized array of objects or UDTs is passed into a
-    ' function as a ByRef Variant, the array is initialized with just the
-    ' SafeArrayDescriptor, at which point, it is a valid array and can
-    ' be used by UBound and LBound after the call. So, now we're just
-    ' going to assume that any object or UDT array that has just the descriptor
-    ' allocated was Null to begin with. That means whenever an Object or UDT
-    ' array is passed to any CorArray method, it will technically never
-    ' be uninitialized, just zero-length.
-    Select Case ArgType And &HFF
-        Case vbObject, vbUserDefinedType
-            If UBound(Arg) < LBound(Arg) Then
-                ArrayPointer = vbNullPtr
-            End If
-    End Select
-End Function
-
-Public Function IsNullArray(ByRef Arr As Variant) As Boolean
-    IsNullArray = ArrayPointer(Arr) = vbNullPtr
-End Function
-
-Public Function IsMultiDimArray(ByRef Arr As Variant) As Boolean
-    IsMultiDimArray = SafeArrayGetDim(ArrayPointer(Arr)) > 1
-End Function
-
-Public Function IsNullArrayPtr(ByVal ArrayPtr As Long) As Boolean
-    IsNullArrayPtr = ArrayPtr = vbNullPtr
-End Function
-
-Public Function IsMultiDimArrayPtr(ByVal ArrayPtr As Long) As Boolean
-    IsMultiDimArrayPtr = SafeArrayGetDim(ArrayPtr) > 1
-End Function
-
-Public Function ValidArrayPointer(ByRef Arr As Variant, Optional ByRef Parameter As String = "Arr", Optional ByVal Message As ArgumentNullString = ArgumentNull_Array) As Long
-    Dim ArrayPtr As Long
-    
-    ArrayPtr = ArrayPointer(Arr)
-    If ArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull Parameter, Message
-    
-    ValidArrayPointer = ArrayPtr
-End Function
-
 ''
 ' Retrieves the pointer to an array's SafeArray structure.
 '

@@ -286,7 +286,7 @@ Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex 
         Error.InvalidOffsetLength
     If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
-    If IsMultiDimArray(Arr) Then _
+    If CorArray.Rank(Arr) <> 1 Then _
         Error.Rank
         
     CorArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
@@ -789,7 +789,7 @@ Private Sub WriteRange(ByVal Index As Long, ByRef Source As Variant, ByVal Inser
     If IsArray(Source) Then
         If CorArray.IsNull(Source) Then _
             Error.ArgumentNull "Source", ArgumentNull_Array
-        If IsMultiDimArray(Source) Then _
+        If CorArray.Rank(Source) <> 1 Then _
             Error.Rank
             
         WriteArray Index, Source, Insert

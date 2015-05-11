@@ -337,7 +337,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Vari
     
     If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If IsMultiDimArray(Bytes) Then _
+    If CorArray.RankBytes(Bytes) <> 1 Then _
         Error.Rank
 
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
@@ -377,7 +377,7 @@ End Function
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     If CorArray.IsNull(Bytes) Or CorArray.IsNull(Chars) Then _
         Error.ArgumentNull IIf(CorArray.IsNull(Bytes), "Bytes", "Chars"), ArgumentNull_Array
-    If IsMultiDimArray(Bytes) Or IsMultiDimArray(Chars) Then _
+    If CorArray.Rank(Bytes) <> 1 Or CorArray.Rank(Chars) <> 1 Then _
         Error.Rank
     If ByteIndex < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
@@ -482,7 +482,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Var
     
     If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If IsMultiDimArray(Bytes) Then _
+    If CorArray.Rank(Bytes) <> 1 Then _
         Error.Rank
 
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)

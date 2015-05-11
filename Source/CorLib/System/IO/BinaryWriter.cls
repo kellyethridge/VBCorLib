@@ -332,7 +332,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
         Error.InvalidOffsetLength
 
     On Error GoTo CleanExit
-    SAPtr(Bytes) = ArrayPointer(Buffer)
+    SAPtr(Bytes) = CorArray.ArrayPointer(Buffer)
     mOutStream.WriteBlock Bytes, Range.Index, Range.Count
     SAPtr(Bytes) = vbNullPtr
     Exit Sub

@@ -649,7 +649,7 @@ Private Function JoinStrings(ByRef Separator As String, ByRef Value As Variant, 
         .cDims = 1
         .cElements = Range.Count
         .fFeatures = &H100
-        .pvData = MemLong(ArrayPointer(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * 4
+        .pvData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * 4
     End With
     
     SAPtr(SubStrings) = VarPtr(ArrayStruct)
@@ -662,7 +662,7 @@ Private Function JoinVariants(ByRef Separator As String, ByRef Value As Variant,
     ReDim SubStrings(0 To Range.Count - 1)
     
     Dim Variants() As Variant
-    SAPtr(Variants) = ArrayPointer(Value)
+    SAPtr(Variants) = CorArray.ArrayPointer(Value)
     
     Dim i As Long
     For i = 0 To Range.Count - 1
