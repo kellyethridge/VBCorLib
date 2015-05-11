@@ -217,7 +217,7 @@ End Function
 ' @return A cDateTime object containing the time the directory was last accessed.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetLastAccessTimeUtc(ByVal Path As Stream) As cDateTime
+Public Function GetLastAccessTimeUtc(ByVal Path As String) As cDateTime
     Set GetLastAccessTimeUtc = File.GetLastAccessTimeUtc(Path)
 End Function
 
