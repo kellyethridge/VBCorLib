@@ -457,13 +457,13 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Dim BufferPtr   As Long
     Dim Range As ListRange
     
-    BufferPtr = ArrayPointer(Buffer)
-    If IsNullArrayPtr(BufferPtr) Then _
+    BufferPtr = CorArray.ArrayPointer(Buffer)
+    If BufferPtr = vbNullPtr Then _
         Error.ArgumentNull "Buffer", ArgumentNull_Array
-    If IsMultiDimArrayPtr(BufferPtr) Then _
+    If SafeArrayGetDim(BufferPtr) <> 1 Then _
         Error.Rank
     
-    Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
+    Range = GetOptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
     
     If Range.Index < LBound(Buffer) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound

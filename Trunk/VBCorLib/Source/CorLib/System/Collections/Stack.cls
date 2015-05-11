@@ -120,7 +120,7 @@ End Function
 ' @param index The starting position in dstArray to start placing the values.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    If IsNullArray(DstArray) Then _
+    If CorArray.IsNull(DstArray) Then _
         Error.ArgumentNull "DstArray", ArgumentNull_Array
     If IsMultiDimArray(DstArray) Then _
         Error.Argument ResourceString.Rank_MultiDimNotSupported, "DstArray"
@@ -253,9 +253,9 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub WriteRange(ByRef Source As Variant)
     If IsArray(Source) Then
-        If IsNullArray(Source) Then _
+        If CorArray.IsNull(Source) Then _
             Error.ArgumentNull "Source", ArgumentNull_Array
-        If IsMultiDimArray(Source) Then _
+        If CorArray.Rank(Source) <> 1 Then _
             Error.Rank
         
         WriteArray Source
@@ -277,7 +277,7 @@ Private Sub WriteRange(ByRef Source As Variant)
 End Sub
 
 Private Sub WriteArray(ByRef Source As Variant)
-    FillStack Source, ArrayLength(Source)
+    FillStack Source, CorArray.LengthFirstDim(Source)
 End Sub
 
 Private Sub WriteCollection(ByVal Source As Collection)

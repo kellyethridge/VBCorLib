@@ -62,6 +62,10 @@ Private mSorter                 As ISortRoutine
 Private CallbackSorter          As New CallbackSorter
 
 
+Private Sub Class_Initialize()
+    Set mSorter = InitDelegator(mSortDelegator)
+End Sub
+
 ''
 ' Uses a callback method to check if an element in an array exists.
 '
@@ -453,12 +457,12 @@ End Sub
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    If IsNullArray(Arr) Then _
+    If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
-    If IsMultiDimArray(Arr) Then _
+    If CorArray.Rank(Arr) <> 1 Then _
         Error.Rank
         
-    BinarySearch = BinarySearchCore(Arr, LBound(Arr), ArrayLength(Arr), Value, Comparer)
+    BinarySearch = BinarySearchCore(Arr, LBound(Arr), CorArray.LengthFirstDim(Arr), Value, Comparer)
 End Function
 
 ''
@@ -480,7 +484,7 @@ End Function
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    If IsNullArray(Arr) Then _
+    If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     If IsMultiDimArray(Arr) Then _
         Error.Rank
@@ -564,9 +568,9 @@ End Sub
 ' End Sub
 ' </pre>
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
-    If IsNullArray(SourceArray) Then _
+    If CorArray.IsNull(SourceArray) Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
-    If IsNullArray(DestinationArray) Then _
+    If CorArray.IsNull(DestinationArray) Then _
         Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     
     CopyEx SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length
@@ -594,17 +598,19 @@ End Sub
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
     Dim pSourceSafeArray As Long
     pSourceSafeArray = ArrayPointer(SourceArray)
+    If pSourceSafeArray = vbNullPtr Then _
+        Error.ArgumentNull "SourceArray", ArgumentNull_Array
+    
     Dim pDestinationSafeArray As Long
     pDestinationSafeArray = ArrayPointer(DestinationArray)
+    If pDestinationSafeArray = vbNullPtr Then _
+        Error.ArgumentNull "DestinationArray", ArgumentNull_Array
+        
     Dim SourceLength As Long
     SourceLength = LengthCore(pSourceSafeArray, 0)
     Dim DestinationLength As Long
     DestinationLength = LengthCore(pDestinationSafeArray, 0)
     
-    If pSourceSafeArray = vbNullPtr Then _
-        Error.ArgumentNull "SourceArray", ArgumentNull_Array
-    If pDestinationSafeArray = vbNullPtr Then _
-        Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     If Length < 0 Then _
         Error.NegativeNumber "Length"
     If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
@@ -730,6 +736,8 @@ Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long
 End Function
 
 Friend Function LengthCore(ByVal SafeArrayPtr As Long, Optional ByVal Dimension As Long) As Long
+    Debug.Assert SafeArrayPtr <> 0
+    
     Dim Rank As Long
     Rank = SafeArrayGetDim(SafeArrayPtr)
     If Dimension > Rank Then _
@@ -983,7 +991,7 @@ End Sub
 '
 ' @include "..\Includes\CorArray_Sort.txt"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
-    If IsNullArray(Arr) Then _
+    If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
     Dim Length As Long
@@ -1015,7 +1023,7 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
-    If IsNullArray(Arr) Then _
+    If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
     SortKeyEx Arr, Empty, Index, Length, Comparer
@@ -1044,7 +1052,7 @@ End Sub
 '
 ' @include "..\Includes\CorArray.SortKey.txt"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
-    If IsNullArray(Keys) Then _
+    If CorArray.IsNull(Keys) Then _
         Error.ArgumentNull "Keys", ArgumentNull_Array
     
     Dim Length As Long
@@ -1193,22 +1201,13 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mSorter = InitDelegator(mSortDelegator)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 Private Function BinarySearchCore(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
     On Error GoTo errTrap
     
     If Comparer Is Nothing Then
-        If CorArrayPartial.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, BinarySearchCore) Then
+        If CorArrayHelper.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, BinarySearchCore) Then
             Exit Function
         End If
         

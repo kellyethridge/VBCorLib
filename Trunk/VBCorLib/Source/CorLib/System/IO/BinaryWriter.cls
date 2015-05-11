@@ -55,9 +55,6 @@ Private mEncoding       As Encoding
 Private mSingleChar(0)  As Integer
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
     If Output Is Nothing Then _
         Error.ArgumentNull "Output", ArgumentNull_Stream
@@ -72,10 +69,6 @@ Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
     End If
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   API
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Returns the underlying stream this writer is writing to.
@@ -195,7 +188,7 @@ Public Sub WriteChar(ByRef Value As Variant)
     
     Dim Bytes() As Byte
     Bytes = mEncoding.GetBytes(mSingleChar, 0, 1)
-    mOutStream.WriteBlock Bytes, 0, ArrayLength(Bytes)
+    mOutStream.WriteBlock Bytes, 0, CorArray.LengthFirstDim(Bytes)
 End Sub
 
 ''
@@ -308,9 +301,9 @@ Private Sub WriteString(ByRef Value As String)
 End Sub
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    If IsNullArray(Value) Then _
+    If CorArray.IsNull(Value) Then _
         Error.ArgumentNull "Value", ArgumentNull_Array
-    If IsMultiDimArray(Value) Then _
+    If CorArray.Rank(Value) <> 1 Then _
         Error.Rank
     
     Select Case VarType(Value)
@@ -329,7 +322,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Bytes() As Byte
     Dim Range   As ListRange
     
-    Range = GetOptionalRange(Index, Count, LBound(Buffer), ArrayLength(Buffer))
+    Range = GetOptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
 
     If Range.Index < LBound(Buffer) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound

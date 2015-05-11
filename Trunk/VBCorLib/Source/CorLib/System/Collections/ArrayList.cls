@@ -266,7 +266,7 @@ End Function
 ' the items from that index on.
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
-    If IsNullArray(Arr) Then _
+    If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
     CorArray.CopyEx mItems, 0, Arr, IfLong(ArrayIndex, LBound(Arr)), mCount
@@ -284,7 +284,7 @@ End Sub
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
     If mCount - Index < Count Then _
         Error.InvalidOffsetLength
-    If IsNullArray(Arr) Then _
+    If CorArray.IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     If IsMultiDimArray(Arr) Then _
         Error.Rank
@@ -787,7 +787,7 @@ End Sub
 
 Private Sub WriteRange(ByVal Index As Long, ByRef Source As Variant, ByVal Insert As Boolean)
     If IsArray(Source) Then
-        If IsNullArray(Source) Then _
+        If CorArray.IsNull(Source) Then _
             Error.ArgumentNull "Source", ArgumentNull_Array
         If IsMultiDimArray(Source) Then _
             Error.Rank
