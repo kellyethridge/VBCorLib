@@ -912,7 +912,7 @@ End Function
 '
 Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     Dim pSafeArray As Long
-    pSafeArray = GetArrayPointer(Arr)
+    pSafeArray = CorArray.ArrayPointer(Arr)
     
     If pSafeArray = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -1104,7 +1104,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
         If Not IsArray(Items) Then _
             Error.Argument Argument_ArrayRequired, "Items"
         
-        pItemsSafeArray = GetArrayPointer(Items)
+        pItemsSafeArray = CorArray.ArrayPointer(Items)
         If pItemsSafeArray = vbNullPtr Then _
             Error.ArgumentNull "Items", ArgumentNull_Array
         If SafeArrayGetDim(pItemsSafeArray) <> 1 Then _
@@ -1263,7 +1263,7 @@ Private Sub AssignDefaultElementValue(ByRef Arr As Variant, ByRef RetVal As Vari
         Case vbVariant:     RetVal = Empty
         Case vbUserDefinedType
             Dim rec As IRecordInfo
-            Set rec = SafeArrayGetRecordInfo(GetArrayPointer(Arr))
+            Set rec = SafeArrayGetRecordInfo(CorArray.ArrayPointer(Arr))
             
             ' Set the datatype for the variant.
             VariantType(RetVal) = vbUserDefinedType

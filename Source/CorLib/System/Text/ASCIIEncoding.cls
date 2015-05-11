@@ -337,7 +337,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Vari
     
     If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If CorArray.RankBytes(Bytes) <> 1 Then _
+    If CorArray.Rank(Bytes) <> 1 Then _
         Error.Rank
 
     Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)

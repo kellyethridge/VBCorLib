@@ -306,7 +306,7 @@ End Sub
 
 Friend Sub FromByteArray(ByRef b As Variant)
     Dim Ptr As Long
-    Ptr = GetArrayPointer(b)
+    Ptr = CorArray.ArrayPointer(b)
     If Ptr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Array))
     

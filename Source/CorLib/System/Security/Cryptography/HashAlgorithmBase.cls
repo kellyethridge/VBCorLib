@@ -302,7 +302,7 @@ End Sub
 
 Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, ByRef Count As Variant)
     Dim pSA As Long
-    pSA = GetArrayPointer(Source)
+    pSA = CorArray.ArrayPointer(Source)
     
     Dim Result      As Long
     Dim ElemIndex   As Long
