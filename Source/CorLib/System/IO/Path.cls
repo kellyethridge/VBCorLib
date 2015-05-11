@@ -533,11 +533,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-Friend Function GetFullPathInternal(ByRef Path As String) As String
-
-End Function
-
 Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean = False)
     If Len(Path) > MAX_PATH Then _
         Throw New PathTooLongException

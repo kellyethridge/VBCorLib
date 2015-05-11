@@ -192,13 +192,14 @@ End Function
 ' End If
 ' </pre>
 '
-Public Function GetAttributes(ByVal Path As String) As FileAttributes
-    Path = cString.Trim(Path)
-    If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
+Public Function GetAttributes(ByRef Path As String) As FileAttributes
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
     
-    GetAttributes = Api.GetFileAttributes(Path)
-    If GetAttributes = INVALID_FILE_ATTRIBUTES Then IOError Err.LastDllError, Path
+    GetAttributes = Api.GetFileAttributes(FullPath)
+    If GetAttributes = INVALID_FILE_ATTRIBUTES Then
+        IOError Err.LastDllError, FullPath
+    End If
 End Function
 
 ''
@@ -207,7 +208,7 @@ End Function
 ' @param Path The file to retrieve the creation time of.
 ' @return A cDateTime object representing the creation time.
 '
-Public Function GetCreationTime(ByVal Path As String) As cDateTime
+Public Function GetCreationTime(ByRef Path As String) As cDateTime
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
     FillFileData Path, Data
     Set GetCreationTime = cDateTime.FromFileTime(Data.ftCreationTime)
@@ -216,44 +217,44 @@ End Function
 ''
 ' Returns the time the file was created in UTC time.
 '
-' @param sPath The file to retrieve the creation time of.
+' @param Path The file to retrieve the creation time of.
 ' @return A cDateTime object representing the creation time.
 '
-Public Function GetCreationTimeUtc(ByVal sPath As String) As cDateTime
-    Set GetCreationTimeUtc = GetCreationTime(sPath).ToUniversalTime
+Public Function GetCreationTimeUtc(ByRef Path As String) As cDateTime
+    Set GetCreationTimeUtc = GetCreationTime(Path).ToUniversalTime
 End Function
 
 ''
 ' Returns the time the file was accessed in local time.
 '
-' @param sPath The file to retrieve the last access time for.
+' @param Path The file to retrieve the last access time for.
 ' @return A cDateTime object that represents the last time the file was accessed.
 '
-Public Function GetLastAccessTime(ByVal sPath As String) As cDateTime
+Public Function GetLastAccessTime(ByRef Path As String) As cDateTime
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
-    Call FillFileData(sPath, Data)
+    FillFileData Path, Data
     Set GetLastAccessTime = cDateTime.FromFileTime(Data.ftLastAccessTime)
 End Function
 
 ''
 ' Returns The last time a file was accessed in UTC time.
 '
-' @param sPath The file to get the last accessed time for.
+' @param Path The file to get the last accessed time for.
 ' @return A cDateTime object representing the last time the file was accessed.
 '
-Public Function GetLastAccessTimeUtc(ByVal sPath As String) As cDateTime
-    Set GetLastAccessTimeUtc = GetLastAccessTime(sPath).ToUniversalTime
+Public Function GetLastAccessTimeUtc(ByRef Path As String) As cDateTime
+    Set GetLastAccessTimeUtc = GetLastAccessTime(Path).ToUniversalTime
 End Function
 
 ''
 ' Returns the last time the file was written to in local time.
 '
-' @param sPath The file to retrieve the last written time for.
+' @param Path The file to retrieve the last written time for.
 ' @return A cDateTime object representing the last time the file was written to.
 '
-Public Function GetLastWriteTime(ByVal sPath As String) As cDateTime
+Public Function GetLastWriteTime(ByRef Path As String) As cDateTime
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
-    Call FillFileData(sPath, Data)
+    FillFileData Path, Data
     Set GetLastWriteTime = cDateTime.FromFileTime(Data.ftLastWriteTime)
 End Function
 
@@ -621,9 +622,11 @@ Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUT
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
-    Dim e As Long
-    e = GetFileData(Path, Data)
-    If e <> NO_ERROR Then IOError e, Path
+    Dim DllError As Long
+    DllError = GetFileData(Path, Data)
+    If DllError <> NO_ERROR Then
+        IOError DllError, Path
+    End If
 End Sub
 
 
