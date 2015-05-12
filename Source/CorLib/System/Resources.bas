@@ -42,6 +42,13 @@ Public Enum ResourceString
     Overflow_TimeSpan = 1300
 End Enum
 
+Public Enum IOExceptionString
+    IOException_Exception = 400
+    IOException_DirectoryExists = 401
+    IOException_FileTooLong2GB = 402
+    IOException_PathTooLong = 403
+End Enum
+
 Public Enum NotSupportedString
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001

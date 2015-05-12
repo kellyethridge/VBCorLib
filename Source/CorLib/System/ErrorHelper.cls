@@ -76,3 +76,7 @@ Friend Sub NotSupported(ByVal Message As NotSupportedString)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(Message))
 End Sub
 
+Friend Sub IOException(ByVal Message As IOExceptionString)
+    Throw Cor.NewIOException(Environment.GetResourceString(Message))
+End Sub
+
