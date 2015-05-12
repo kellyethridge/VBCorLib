@@ -349,6 +349,7 @@ Module=ArrayHelper; System\ArrayHelper.bas
 Module=CorArrayHelper; System\CorArrayHelper.bas
 Class=ErrorHelper; System\ErrorHelper.cls
 ResFile32="VBCorLib.RES"
+Class=PathHelper; System\IO\PathHelper.cls
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"

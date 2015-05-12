@@ -409,7 +409,25 @@ Public Sub Move_WithExistingDestination_ThrowsIOException()
     AssertIOException Err
 End Sub
 
+Public Sub AppendAllText_WithNonExistingFile_CreatesNewFile()
+    Const Data As String = "ABC"
+    
+    File.AppendAllText mBuilder.TempFileName, Data
+    
+    Dim Actual As String
+    Actual = File.ReadAllText(mBuilder.TempFileName)
+    Assert.That Actual, Iz.EqualTo(Data)
+End Sub
 
+Public Sub AppendAllText_WithExistingFile_AppendToEndOfFile()
+    mBuilder.CreateFile Data:="abc"
+    
+    File.AppendAllText mBuilder.TempFileName, "def"
+    
+    Dim Actual As String
+    Actual = File.ReadAllText(mBuilder.TempFileName)
+    Assert.That Actual, Iz.EqualTo("abcdef")
+End Sub
 
 
 

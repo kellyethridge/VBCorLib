@@ -55,8 +55,8 @@ Private mDirectorySeparators() As Integer
 ' @remarks The StreamWriter uses a UTF8Encoding declared as Cor.NewUTF8Encoding(False, True).
 ' @see StreamWriter
 '
-Public Function AppendText(ByVal Path As String) As StreamWriter
-    Set AppendText = Cor.NewStreamWriter(Path, Append:=True)
+Public Function AppendText(ByRef Path As String) As StreamWriter
+    Set AppendText = Cor.NewStreamWriter(Path, True)
 End Function
 
 ''
@@ -71,12 +71,10 @@ End Function
 ' <p>If the file doesn't exist it will be created. If the file already
 ' exists, it will be overwritten.</p>
 '
-Public Sub AppendAllText(ByVal Path As String, ByVal Contents As String, Optional ByVal Encoding As Encoding)
-    Dim sw As StreamWriter
-    
-    Set sw = Cor.NewStreamWriter(Path, True, Encoding)
-    Call sw.WriteValue(Contents)
-    Call sw.CloseWriter
+Public Sub AppendAllText(ByRef Path As String, ByRef Contents As String, Optional ByVal Encoding As Encoding)
+    With Cor.NewStreamWriter(Path, True, Encoding)
+        .WriteValue Contents
+    End With
 End Sub
 
 ''
@@ -87,9 +85,6 @@ End Sub
 ' @param OverWrite Indicates if the file already exists it should be overwritten.
 '
 Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As String, Optional ByVal OverWrite As Boolean = False)
-    SourceFileName = cString.Trim(SourceFileName)
-    DestinationFileName = cString.Trim(DestinationFileName)
-    
     If Len(SourceFileName) = 0 Then _
         Error.Argument Argument_EmptyFileName, "SourceFileName"
     If Len(DestinationFileName) = 0 Then _
@@ -113,7 +108,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
             If Not File.Exists(SourceFileName) Then _
                 IOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
-                Throw Cor.NewIOException(Environment.GetResourceString(IOException_DirectoryExists))
+                Throw Cor.NewIOException(Environment.GetResourceString(ResourceString.IOException_DirectoryExists))
         End If
         IOError DllError, SourceFileName
     End If

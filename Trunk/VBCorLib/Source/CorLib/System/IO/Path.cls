@@ -47,6 +47,7 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private Const MaxLongPath           As Long = 32000
 Private Const NOT_FOUND             As Long = &H0
 
 Private Const vbPathSeparator               As Integer = vbSemiColonChar
@@ -63,14 +64,8 @@ Private mBuffer                 As WordBuffer
 Private mPath                   As New StringBuilder
 
 
-''
-' Returns the maximum length for a path.
-'
-' @return Tha maximum length allowed for a path.
-' @remarks Returns 32767 on Windows NT machines, 260 for Win9x machines.
-'
-Public Property Get MaxPathLength() As Long
-    MaxPathLength = IIf(Environment.IsNT, MAX_PATH_W, MAX_PATH_A)
+Friend Property Get MaxPath() As Long
+    MaxPath = MaxLongPath
 End Property
 
 ''
@@ -423,7 +418,7 @@ Public Function GetFullPath(ByVal Path As String) As String
     Path = Join(PathParts, vbDirectorySeparatorString)
     
     Dim OutputBuffer As String
-    OutputBuffer = String$(Me.MaxPathLength, 0)
+    OutputBuffer = String$(MaxPath, 0)
     
     Dim Size As Long
     Size = Api.GetFullPathName(Path, Len(OutputBuffer), OutputBuffer, 0)
@@ -490,7 +485,7 @@ End Function
 '
 Public Function GetTempFileName() As String
     Dim FileName As String
-    FileName = String$(Me.MaxPathLength, 0)
+    FileName = String$(MaxPath, 0)
     
     If Api.GetTempFileName(GetTempPath, "tmp", 0, FileName) = BOOL_FALSE Then IOError Err.LastDllError
     
@@ -506,9 +501,9 @@ Public Function GetTempPath() As String
     Dim PathName As String
     Dim Size As Long
     
-    PathName = String$(Me.MaxPathLength, 0)
+    PathName = String$(MaxPath, 0)
     Size = Api.GetTempPath(Len(PathName), PathName)
-    If Size = 0 Or Size > Me.MaxPathLength Then
+    If Size = 0 Or Size > MaxPath Then
         IOError Err.LastDllError
     End If
 
@@ -533,6 +528,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function NormalizePath(ByVal Path As String, ByVal FullCheck As Boolean, ByVal ExpandShortPaths As Boolean) As String
+    If FullCheck Then
+        Path = cString.Trim(Path)
+        If HasIllegalCharacters(Path) Then _
+            Error.Argument Argument_InvalidCharsInPath, "Path"
+    End If
+    
+    
+End Function
+
 Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean = False)
     If Len(Path) > MAX_PATH Then _
         Throw New PathTooLongException

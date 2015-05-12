@@ -85,7 +85,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     Statics.Path.FixupPath Path
     Path = cString.TrimEnd(Path, Statics.Path.DirectorySeparatorString)
     
-    If Len(Path) > Statics.Path.MaxPathLength Then _
+    If Len(Path) > Statics.Path.MaxPath Then _
         Throw New PathTooLongException
     If InStr(3, Path, Statics.Path.VolumeSeparatorString) > 0 Then _
         Throw New NotSupportedException
@@ -250,7 +250,7 @@ End Function
 '
 Public Function GetCurrentDirectory() As String
     Dim Result As String
-    Result = String$(Path.MaxPathLength, 0)
+    Result = String$(Path.MaxPath, 0)
     
     Dim Size As Long
     Size = Api.GetCurrentDirectory(Len(Result), Result)
