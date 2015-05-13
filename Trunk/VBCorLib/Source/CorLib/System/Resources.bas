@@ -121,6 +121,10 @@ Public Enum ArgumentString
     Argument_InvalidSeekOffset = 835
     Argument_InvalidStreamSource = 836
     Argument_NotEnumerable = 837
+    Arg_PathIllegal = 838
+    Argument_PathUriFormatNotSupported = 839
+    Arg_PathIllegalUNC = 840
+    Arg_PathGlobalRoot = 841
 End Enum
 
 Public Enum ArgumentNullString

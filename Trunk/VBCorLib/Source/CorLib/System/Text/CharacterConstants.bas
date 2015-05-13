@@ -75,5 +75,6 @@ Public Const vbQuoteChar            As Integer = &H22
 Public Const vbSecondaryQuoteChar   As Integer = &H27
 Public Const vbCommaChar            As Integer = &H2C
 Public Const vbPeriodChar           As Integer = &H2E
+Public Const vbTildaChar            As Integer = &H7E
 Public Const vbInvalidChar          As Long = &HFFFFFFFF
 
