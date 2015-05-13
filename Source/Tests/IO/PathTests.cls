@@ -18,7 +18,8 @@ Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
 
-Private mOriginalDir As String
+Private mOriginalDir    As String
+Private mBuilder        As IOHelper
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.IO"
@@ -153,10 +154,12 @@ End Sub
 Public Sub Setup()
     mOriginalDir = CurDir
     ChDir "c:\windows"
+    Set mBuilder = New IOHelper
 End Sub
 
 Public Sub Teardown()
     ChDir mOriginalDir
+    Set mBuilder = Nothing
 End Sub
 
 Public Sub GetInvalidPathChars_WhenCalled_ReturnsArrayOfChars()
@@ -303,6 +306,18 @@ Public Sub GetTempPath_WhenCalled_NewTempPath()
     Assert.That Path.IsPathRooted(TempPath), Iz.True
     Assert.That Right$(TempPath, 1), Iz.EqualTo(Path.DirectorySeparatorString)
 End Sub
+
+'Public Sub GetFullPath_WithShortFileName_ReturnsExpandedFileName()
+'    Dim Expected As String
+'    Dim ShortPath As String
+'    Expected = mBuilder.CreateFile("abcdefghij.txt")
+'    ShortPath = Path.Combine(mBuilder.TempFolder, "abcdef~1.txt")
+'
+'    Dim Actual As String
+'    Actual = Path.GetFullPath(ShortPath)
+'
+'    Assert.That Actual, Iz.EqualTo(Expected)
+'End Sub
 
 
 
