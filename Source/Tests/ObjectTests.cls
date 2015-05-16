@@ -41,8 +41,36 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/1/2001#
             Test.Use 1234.1234@
             Test.Use CDec("123421346876234143.2343243")
+            Test.Use "abc"
+        
+        Case "Equals_WithValues_ReturnsExpected"
+            Test.Use Nothing, Nothing, True
+            Test.Use Nothing, "a", False
+            Test.Use "a", Nothing, False
+            Test.Use 1, 1, True
+            Test.Use 1&, 1, False
+            Test.Use 1, 1&, False
+            Test.Use "a", "a", True
+            Test.Use "A", "a", False
+            Test.Use 1.1, 1.1, True
+            Test.Use 1.1@, 1.1@, True
+            Test.Use 1.1@, 1.1, False
+            Test.Use 1.1!, 1.1!, True
+            Test.Use 1.1!, 1.1, False
+            Test.Use #1/1/2001#, #1/1/2001#, True
+            Test.Use NewDate(#1/1/2001#), NewDate(#1/1/2001#), True
+            Test.Use NewDate(#1/1/2001#), #1/1/2001#, True
+            Test.Use #1/1/2001#, NewDate(#1/1/2001#), True
             
     End Select
+End Sub
+
+Public Sub Equals_WithValues_ReturnsExpected(ByRef ObjA As Variant, ByRef ObjB As Variant, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Object.Equals(ObjA, ObjB)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub GetHashCode_WithMinimumValues_ReturnsZero(ByRef Value As Variant)

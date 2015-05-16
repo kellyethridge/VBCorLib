@@ -198,12 +198,12 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
     Dim j           As Long
     Dim Bits        As Long
     Dim bitCount    As Long
-    Dim ch          As Integer
+    Dim Ch          As Integer
     Dim CharCount   As Long
     Dim TermCount   As Long
     For i = IndexIn To IndexIn + Length - 1
-        ch = InArray(i)
-        Select Case ch
+        Ch = InArray(i)
+        Select Case Ch
             Case vbEqualChar
                 CharCount = CharCount + 1
                 TermCount = TermCount + 1
@@ -270,7 +270,7 @@ End Function
 ' @return A string representation of the value.
 '
 Public Function ToString(ByRef Value As Variant, Optional ByRef Provider As IFormatProvider) As String
-    ToString = Object.ToString(Value, , Provider)
+    ToString = Object.ToString(Value, Provider:=Provider)
 End Function
 
 
