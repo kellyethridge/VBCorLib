@@ -597,17 +597,18 @@ End Function
 ' @return Boolean indicating equality.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Select Case VarType(Value)
-        Case vbObject
-            If Value Is Nothing Then Exit Function
-            If TypeOf Value Is cDateTime Then
-                Dim dt As cDateTime
-                Set dt = Value
-                Equals = (mMilliseconds = dt.TotalMilliseconds)
-            End If
-        Case vbDate
-            Equals = (mMilliseconds = cDateTime.AscDateTime(Value).TotalMilliseconds)
-    End Select
+    Equals = Statics.cDateTime.Equals(Me, Value)
+'    Select Case VarType(Value)
+'        Case vbObject
+'            If Value Is Nothing Then Exit Function
+'            If TypeOf Value Is cDateTime Then
+'                Dim dt As cDateTime
+'                Set dt = Value
+'                Equals = (mMilliseconds = dt.TotalMilliseconds)
+'            End If
+'        Case vbDate
+'            Equals = (mMilliseconds = cDateTime.AscDateTime(Value).TotalMilliseconds)
+'    End Select
 End Function
 
 ''
@@ -759,15 +760,7 @@ Friend Sub InitFromMilliseconds(ByVal ms As Currency, ByVal Kind As DateTimeKind
 End Sub
 
 Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
-    Dim Days As Currency
-    
-    If d < 0# Then
-        Days = Fix(d * MILLISECONDS_PER_DAY - 0.5)
-        Days = Days - Modulus(Days, MILLISECONDS_PER_DAY) * 2
-    Else
-        Days = Fix(d * MILLISECONDS_PER_DAY + 0.5)
-    End If
-    mMilliseconds = Days + MILLISECONDS_TO_18991231
+    mMilliseconds = Statics.cDateTime.GetMilliseconds(d)
     mKind = Kind
 End Sub
 

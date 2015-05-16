@@ -146,6 +146,8 @@ Public Function EqualVariants(ByRef X As Variant, ByRef Y As Variant) As Boolean
     Dim Obj As IObject
     
     Select Case VarType(X)
+        Case vbDate
+            EqualVariants = Statics.cDateTime.Equals(X, Y)
         Case vbObject
             If X Is Nothing Then
                 If IsObject(Y) Then
