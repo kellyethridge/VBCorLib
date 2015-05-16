@@ -203,6 +203,6 @@ Public Enum ParameterString
     Parameter_Length = 2022
     Parameter_SourceArray = 2023
     Parameter_DestinationArray = 2024
-    Parameter_SourceIndex = 2025
-    Parameter_DestinationIndex = 2026
+    Parameter_Keys = 2025
+    Parameter_Items = 2026
 End Enum

@@ -69,7 +69,7 @@ End Sub
 ''
 ' Uses a callback method to check if an element in an array exists.
 '
-' @param arr The array to check if an element exists according to the callback criteria.
+' @param arr The one-dimensional array to check if an element exists according to the callback criteria.
 ' @param AddressOfPredicate The AddressOf the callback method used to determine if
 ' an element matches the specified criteria.
 ' @return Indication of the element existing in the array.
@@ -95,7 +95,7 @@ End Function
 ''
 ' Uses a callback method to search an array for the first element that matches the criteria.
 '
-' @param arr The array to search.
+' @param arr The one-dimensional array to search.
 ' @param AddressOfPredicate The callback method address used to determine if an element
 ' matches the specified criteria.
 ' @return The element value if a match is found, otherwise a default for that element type.
@@ -125,7 +125,7 @@ End Function
 ' Finds the index of the first array element that matches the criteria
 ' specified by the callback function.
 '
-' @param arr The array to be searched.
+' @param arr The one-dimensional array to be searched.
 ' @param AddressOfPredicate The address of the callback function used to match the array elements.
 ' @param Index The starting element of the array to beging the matching process.
 ' @param Count The number of elements to include in the array search.
@@ -142,10 +142,10 @@ End Function
 '
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Arr)
-    If ArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
+    
+    CheckValidSingleDimArrayPtr Ptr
         
     Dim ElementIndex   As Long
     Dim ElementCount   As Long
@@ -160,10 +160,10 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_UBound
     
     Dim ElementSize As Long
-    ElementSize = SafeArrayGetElemsize(ArrayPtr)
+    ElementSize = SafeArrayGetElemsize(Ptr)
     
     Dim ElementPtr As Long
-    ElementPtr = MemLong(ArrayPtr + PVDATA_OFFSET) + (ElementIndex - LBound(Arr)) * ElementSize
+    ElementPtr = MemLong(Ptr + PVDATA_OFFSET) + (ElementIndex - LBound(Arr)) * ElementSize
     
     Dim Predicate As Func_T_Boolean
     Set Predicate = NewDelegate(AddressOfPredicate)
@@ -183,7 +183,7 @@ End Function
 ''
 ' Finds all matching elements in an array, returning an array of the matched elements.
 '
-' @param arr The array to find all matching elements.
+' @param arr The one-dimensional array to find all matching elements.
 ' @param AddressOfPredicate The callback address of the matching criteria method.
 ' @return An array of all matched elements.
 ' @remarks <p>The function signature for the callback has a specific format.
@@ -198,9 +198,11 @@ End Function
 '
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
-    Dim pSafeArray As Long
-    pSafeArray = ArrayPointer(Arr)
-        
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
+    
+    CheckValidSingleDimArrayPtr Ptr
+    
     Dim LowerBound As Long
     LowerBound = LBound(Arr)
     
@@ -208,10 +210,10 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     Count = UBound(Arr) - LowerBound + 1
     
     Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSafeArray)
+    ElemSize = SafeArrayGetElemsize(Ptr)
     
     Dim pElem As Long
-    pElem = MemLong(pSafeArray + PVDATA_OFFSET)
+    pElem = MemLong(Ptr + PVDATA_OFFSET)
     
     Dim Predicate As Func_T_Boolean
     Set Predicate = NewDelegate(AddressOfPredicate)
@@ -244,7 +246,7 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
             ' as an array of objects, we create a new array using the
             ' same Guid value as that of the original array.
             VariantType(Ret) = vbObject Or vbArray
-            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, pSafeArray - SizeOfGuid)
+            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, Ptr - SizeOfGuid)
             
             For i = 0 To MatchCount - 1
                 Set Ret(i) = Arr(MatchedIndexes(i))
@@ -252,10 +254,10 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
             
         Case vbUserDefinedType
             Dim UDT As IRecordInfo
-            Set UDT = SafeArrayGetRecordInfo(pSafeArray)    ' gets an object used to manipulate a UDT.
+            Set UDT = SafeArrayGetRecordInfo(Ptr)    ' gets an object used to manipulate a UDT.
             
             Dim pvData  As Long
-            pvData = MemLong(pSafeArray + PVDATA_OFFSET)
+            pvData = MemLong(Ptr + PVDATA_OFFSET)
             
             Dim pReturnSafeArray As Long
             pReturnSafeArray = SafeArrayCreateVectorEx(vbUserDefinedType, 0, MatchCount, ObjPtr(UDT))
@@ -313,7 +315,7 @@ End Function
 ''
 ' Finds the index of the last occurence of a matched element in the array.
 '
-' @param arr The array to search.
+' @param arr The one-dimensional array to search.
 ' @param AddressOfPredicate The callback address of the matching criteria method.
 ' @param Index The starting index in the array to begin the backward search.
 ' @param Count The number of elements to search.
@@ -330,8 +332,10 @@ End Function
 '
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim pSafeArray As Long
-    pSafeArray = ArrayPointer(Arr)
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
+    
+    CheckValidSingleDimArrayPtr Ptr
 
     Dim ElemIndex As Long
     Dim ElemCount As Long
@@ -345,10 +349,10 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
         
     Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSafeArray)
+    ElemSize = SafeArrayGetElemsize(Ptr)
     
     Dim pElem As Long
-    pElem = MemLong(pSafeArray + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
+    pElem = MemLong(Ptr + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
     
     Dim Predicate As Func_T_Boolean
     Set Predicate = NewDelegate(AddressOfPredicate)
@@ -381,17 +385,19 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
-    Dim Predicate As Func_T_Boolean
-    Set Predicate = NewDelegate(AddressOfPredicate)
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
     
-    Dim pSafeArray As Long
-    pSafeArray = ArrayPointer(Arr)
-        
+    CheckValidSingleDimArrayPtr Ptr
+    
     Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSafeArray)
+    ElemSize = SafeArrayGetElemsize(Ptr)
     
     Dim pElem As Long
-    pElem = MemLong(pSafeArray + PVDATA_OFFSET)
+    pElem = MemLong(Ptr + PVDATA_OFFSET)
+    
+    Dim Predicate As Func_T_Boolean
+    Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
@@ -407,7 +413,7 @@ End Function
 ''
 ' Iterates over an array passing in each element into an Action function to be performed on the element.
 '
-' @param Arr The array containing the elements to be processed.
+' @param Arr The one-dimensional array containing the elements to be processed.
 ' @param AddressOfAction The callback address of the function to process an array element.
 ' @remarks <p>The callback method must be a Sub with a single ByRef parameter of the same
 ' type as the array.
@@ -421,17 +427,19 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
-    Dim Action As Action_T
-    Set Action = NewDelegate(AddressOfAction)
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
     
-    Dim pSafeArray As Long
-    pSafeArray = ArrayPointer(Arr)
-
+    CheckValidSingleDimArrayPtr Ptr
+    
     Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSafeArray)
+    ElemSize = SafeArrayGetElemsize(Ptr)
     
     Dim pElem As Long
-    pElem = MemLong(pSafeArray + PVDATA_OFFSET)
+    pElem = MemLong(Ptr + PVDATA_OFFSET)
+    
+    Dim Action As Action_T
+    Set Action = NewDelegate(AddressOfAction)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
@@ -457,11 +465,7 @@ End Sub
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    If CorArray.IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    If CorArray.Rank(Arr) <> 1 Then _
-        Error.Rank
-        
+    CheckValidSingleDimArray Arr
     BinarySearch = BinarySearchCore(Arr, LBound(Arr), CorArray.LengthFirstDim(Arr), Value, Comparer)
 End Function
 
@@ -484,10 +488,7 @@ End Function
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    If CorArray.IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    If CorArray.Rank(Arr) <> 1 Then _
-        Error.Rank
+    CheckValidSingleDimArray Arr
     If Index < LBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Length < 0 Then _
@@ -568,9 +569,9 @@ End Sub
 ' End Sub
 ' </pre>
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
-    If CorArray.IsNull(SourceArray) Then _
+    If IsNull(SourceArray) Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
-    If CorArray.IsNull(DestinationArray) Then _
+    If IsNull(DestinationArray) Then _
         Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     
     CopyEx SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length
@@ -796,20 +797,17 @@ End Function
 ''
 ' Returns the index of the first occurrence of a value in a one-dimensional Array or in a portion of the Array.
 '
-' @param Arr The array to search.
+' @param Arr The one-dimensional array to search.
 ' @param Value The value to search for in the array.
 ' @param StartIndex The index to the element in the array to begin search from.
 ' @param Count The number of elements to search, starting from startindex.
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
 Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Arr)
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
     
-    If ArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    If SafeArrayGetDim(ArrayPtr) > 1 Then _
-        Error.Rank
+    CheckValidSingleDimArrayPtr Ptr
     
     Dim Range As ListRange
     Range = GetOptionalStepRange(StartIndex, Count, LBound(Arr), LengthFirstDim(Arr), Parameter_StartIndex)
@@ -820,7 +818,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
         
     On Error GoTo errTrap
-    If TrySZIndexOf(ArrayPtr, Value, Range.Index, Range.Count, IndexOf) Then
+    If TrySZIndexOf(Ptr, Value, Range.Index, Range.Count, IndexOf) Then
         Exit Function
     End If
     
@@ -859,13 +857,10 @@ End Function
 ' then one less than the lower bound of the array is returned.
 '
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    Dim ArrayPtr As Long
-    ArrayPtr = ArrayPointer(Arr)
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
     
-    If ArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    If SafeArrayGetDim(ArrayPtr) <> 1 Then _
-        Error.Rank
+    CheckValidSingleDimArrayPtr Ptr
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -880,7 +875,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
     On Error GoTo errTrap
-    If TrySZLastIndexOf(ArrayPtr, Value, ElemIndex, ElemCount, LastIndexOf) Then
+    If TrySZLastIndexOf(Ptr, Value, ElemIndex, ElemCount, LastIndexOf) Then
         Exit Function
     End If
     
@@ -911,13 +906,10 @@ End Function
 ' @param Count The number of elements to reverse in the array.
 '
 Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Dim pSafeArray As Long
-    pSafeArray = CorArray.ArrayPointer(Arr)
+    Dim Ptr As Long
+    Ptr = CorArray.ArrayPointer(Arr)
     
-    If pSafeArray = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    If SafeArrayGetDim(pSafeArray) <> 1 Then _
-        Error.Rank
+    CheckValidSingleDimArrayPtr Ptr
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -932,10 +924,10 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
         Error.InvalidOffsetLength
     
     Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSafeArray)
+    ElemSize = SafeArrayGetElemsize(Ptr)
     
     Dim pLowElem As Long
-    pLowElem = MemLong(pSafeArray + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
+    pLowElem = MemLong(Ptr + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
     
     Dim pHighElem As Long
     pHighElem = pLowElem + (ElemCount - 1) * ElemSize
@@ -991,7 +983,7 @@ End Sub
 '
 ' @include "..\Includes\CorArray_Sort.txt"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
-    If CorArray.IsNull(Arr) Then _
+    If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
     Dim Length As Long
@@ -1052,7 +1044,7 @@ End Sub
 '
 ' @include "..\Includes\CorArray.SortKey.txt"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
-    If CorArray.IsNull(Keys) Then _
+    If IsNull(Keys) Then _
         Error.ArgumentNull "Keys", ArgumentNull_Array
     
     Dim Length As Long
@@ -1085,14 +1077,12 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
-    Dim pKeysSafeArray  As Long
-    Dim pItemsSafeArray As Long
+    Dim KeysPtr  As Long
+    Dim ItemsPtr As Long
     
-    pKeysSafeArray = ArrayPointer(Keys)
-    If pKeysSafeArray = vbNullPtr Then _
-        Error.ArgumentNull "Keys", ArgumentNull_Array
-    If SafeArrayGetDim(pKeysSafeArray) <> 1 Then _
-        Error.Rank
+    KeysPtr = ArrayPointer(Keys)
+    CheckValidSingleDimArrayPtr KeysPtr, Parameter_Keys
+    
     If Index < LBound(Keys) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Length < 0 Then _
@@ -1104,18 +1094,15 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
         If Not IsArray(Items) Then _
             Error.Argument Argument_ArrayRequired, "Items"
         
-        pItemsSafeArray = CorArray.ArrayPointer(Items)
-        If pItemsSafeArray = vbNullPtr Then _
-            Error.ArgumentNull "Items", ArgumentNull_Array
-        If SafeArrayGetDim(pItemsSafeArray) <> 1 Then _
-            Error.Rank
+        ItemsPtr = ArrayPointer(Items)
+        CheckValidSingleDimArrayPtr ItemsPtr, Parameter_Items
         
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
             Error.Argument Argument_MatchingBounds
         
-        SetSortItems pItemsSafeArray
+        SetSortItems ItemsPtr
     End If
     
     On Error GoTo errTrap
@@ -1123,7 +1110,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     Select Case VarType(Comparer)
         ' use an IComparer object to sort with.
         Case vbObject
-            SetSortKeys pKeysSafeArray
+            SetSortKeys KeysPtr
             
             If Comparer Is Nothing Then
                 Set SortComparer = VBCorLib.Comparer.Default
@@ -1137,16 +1124,16 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
         ' This allows a user to supply a highspeed comparison
         ' routine to compare two elements of the array.
         Case vbLong
-            CallbackSorter.Sort pKeysSafeArray, pItemsSafeArray, Index, Index + Length - 1, Comparer
+            CallbackSorter.Sort KeysPtr, ItemsPtr, Index, Index + Length - 1, Comparer
             
         ' try optimized routines first, then fallback to the default IComparer object.
         Case vbError
-            If Not TrySZSort(pKeysSafeArray, Index, Index + Length - 1) Then
+            If Not TrySZSort(KeysPtr, Index, Index + Length - 1) Then
                 ' If we get here, then no optimized routine existed,
                 ' so we'll set our comparer to the default and loop
                 ' around again, letting this case statement fall
                 ' into the QuickSortGeneral routine.
-                SetSortKeys pKeysSafeArray
+                SetSortKeys KeysPtr
                 Set SortComparer = VBCorLib.Comparer.Default
                 QuickSortGeneral Keys, Index, Index + Length - 1
             End If
@@ -1198,6 +1185,20 @@ Friend Function ArrayPointer(ByRef Arg As Variant) As Long
             End If
     End Select
 End Function
+
+Friend Sub CheckValidSingleDimArray(ByRef Arr As Variant, Optional ByVal ParameterName As ParameterString = Parameter_Arr)
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
+    
+    CheckValidSingleDimArrayPtr Ptr, ParameterName
+End Sub
+
+Friend Sub CheckValidSingleDimArrayPtr(ByVal Ptr As Long, Optional ByVal ParameterName As ParameterString = Parameter_Arr)
+    If Ptr = vbNullPtr Then _
+        Error.ArgumentNull Environment.GetResourceString(ParameterName), ArgumentNull_Array
+    If SafeArrayGetDim(Ptr) <> 1 Then _
+        Error.Rank
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
