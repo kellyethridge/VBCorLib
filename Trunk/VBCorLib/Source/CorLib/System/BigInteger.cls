@@ -52,7 +52,7 @@ Private Const HEX_CHARS As String = "0123456789abcdef0123456789ABCDEF"
 Private Const LOWER_HEX As Long = 1
 Private Const UPPER_HEX As Long = 17
 
-Private mNumber As Number
+Private mNumber As modBigMath.Number
 
 
 ''
@@ -132,12 +132,12 @@ End Function
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
 Public Function ToString(Optional ByVal Format As String) As String
-    Dim specifier   As String
+    Dim Specifier   As String
     Dim Count       As Long
-    Count = ParseFormatSpecifier(Format, specifier)
+    Count = ParseFormatSpecifier(Format, Specifier)
     If Count = 0 Then Count = 1
     
-    Select Case specifier
+    Select Case Specifier
         Case "x":       ToString = ToHexString(Count, LOWER_HEX)
         Case "X":       ToString = ToHexString(Count, UPPER_HEX)
         Case "b", "B":  ToString = ToBinaryString(Count)
@@ -754,9 +754,9 @@ Private Function ToDecimalString(ByVal Count As Long) As String
     i = Len(Result)
     
     Do While dividend.Precision > 0
-        Dim r As Long
-        r = SingleInPlaceDivideBy10(dividend)
-        If r Then Mid$(Result, i, 1) = Chr$(48 + r)
+        Dim R As Long
+        R = SingleInPlaceDivideBy10(dividend)
+        If R Then Mid$(Result, i, 1) = Chr$(48 + R)
         i = i - 1
     Loop
     
@@ -874,15 +874,15 @@ Private Function InternalSetBit(ByVal bit As Long, ByVal Value As Boolean) As Bi
     Call InternalSetBit.InternalInit(Number)
 End Function
 
-Private Function ParseFormatSpecifier(ByVal Format As String, ByRef specifier As String) As Long
+Private Function ParseFormatSpecifier(ByVal Format As String, ByRef Specifier As String) As Long
     If Len(Format) = 0 Then
-        specifier = "d"
+        Specifier = "d"
         Exit Function
     End If
     
     Select Case Left$(Format, 1)
         Case "x", "X", "b", "B", "d", "D"
-            specifier = Left$(Format, 1)
+            Specifier = Left$(Format, 1)
         Case Else
             Call Err.Raise(5, , "Invalid format specifier")
     End Select

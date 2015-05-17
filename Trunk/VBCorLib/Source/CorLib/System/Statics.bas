@@ -93,5 +93,5 @@ Public EqualityComparer         As New EqualityComparerStatic
 Public MyBase                   As New ObjectBase
 Public Char                     As New Char
 Public Error                    As New ErrorHelper
-Public Number                   As New Number
+Public Number                   As New NumberStatic
 

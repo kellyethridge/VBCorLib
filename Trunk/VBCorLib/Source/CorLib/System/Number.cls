@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "Number"
+Attribute VB_Name = "NumberStatic"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -36,8 +36,106 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
+Private Type NumberBuffer
+    Scale       As Long
+    Precision   As Long
+    IsNegative  As Boolean
+    Digits()    As Byte
+    DigitsSA    As SafeArray1d
+End Type
+
+Private Enum FormatSpecifier
+    UserDefinedSpecifier = 0
+    GeneralUpperSpecifier = 71      ' G
+    GeneralLowerSpecifier = 103     ' g
+    DecimalUpperSpecifier = 68      ' D
+    DecimalLowerSpecifier = 100     ' d
+    NumberUpperSpecifier = 78       ' N
+    NumberLowerSpecifier = 110      ' n
+    HexUpperSpecifier = 88          ' X
+    HexLowerSpecifier = 120         ' x
+    ExponentUpperSpecifier = 69     ' E
+    ExponentLowerSpecifier = 101    ' e
+    FixedUpperSpecifier = 70        ' F
+    FixedLowerSpecifier = 102       ' f
+    CurrencyUpperSpecifier = 67     ' C
+    CurrencyLowerSpecifier = 99     ' c
+    PercentUpperSpecifier = 80      ' P
+    PercentLowerSpecifier = 112     ' p
+End Enum
+
+Private Type NumberSpecifier
+    Format      As FormatSpecifier
+    Precision   As Long
+End Type
+
 Friend Function FormatInt32(ByVal Value As Long, ByRef Format As String, ByRef Info As NumberFormatInfo) As String
     Debug.Assert Not Info Is Nothing
     
+    Dim Specifier As NumberSpecifier
+    Specifier = ParseSpecifiers(Format, GeneralUpperSpecifier, 10)
     
 End Function
+
+
+Private Function ParseSpecifiers(ByRef Format As String, ByVal DefaultFormat As FormatSpecifier, ByVal DefaultPrecision As Long) As NumberSpecifier
+    Select Case Len(Format)
+        Case 0
+            ParseSpecifiers.Format = DefaultFormat
+            ParseSpecifiers.Precision = DefaultPrecision
+            
+        Case Is > 3
+            ParseSpecifiers.Format = UserDefinedSpecifier
+            ParseSpecifiers.Precision = DefaultPrecision
+            
+        Case Else
+            Dim Chars() As Integer
+            Chars = AllocChars(Format)
+            
+            Select Case Chars(0)
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
+                    ParseSpecifiers.Format = Chars(0)
+                    
+                    Dim Precision   As Long
+                    Dim Ch          As Long
+                    Dim i           As Long
+                    For i = 1 To UBound(Chars)
+                        Ch = Chars(i)
+                        
+                        Select Case Ch
+                            Case vbZeroChar To vbNineChar
+                                Precision = Precision * 10 + Ch - vbZeroChar
+                            Case Else
+                                ParseSpecifiers.Format = UserDefinedSpecifier
+                                ParseSpecifiers.Precision = DefaultPrecision
+                                GoTo Finally
+                        End Select
+                    Next i
+                    
+                    ParseSpecifiers.Precision = Precision
+                Case Else
+                    ParseSpecifiers.Format = UserDefinedSpecifier
+                    ParseSpecifiers.Precision = DefaultPrecision
+            End Select
+            
+Finally:
+            FreeChars Chars
+    End Select
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
