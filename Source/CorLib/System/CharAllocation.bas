@@ -45,6 +45,8 @@ Private Type Bucket
     Self        As IUnknown
     ReleasePtr  As Long
     Buffer      As SafeArray1d
+    BufferPtr   As Long
+    InUse       As Boolean
 End Type
 
 Private mInited     As Boolean
@@ -66,14 +68,17 @@ Public Function AllocChars(ByRef s As String) As Integer()
     End If
     
     Dim BufferIndex As Long
-    BufferIndex = FindAvailableBuffer
+    BufferIndex = FindAvailableBufferIndex
     
-    With mBuffers(BufferIndex).Buffer
-        .cElements = Len(s)
-        .pvData = StrPtr(s)
+    With mBuffers(BufferIndex)
+        .InUse = True
+        SAPtr(AllocChars) = .BufferPtr
+        
+        With .Buffer
+            .cElements = Len(s)
+            .pvData = StrPtr(s)
+        End With
     End With
-
-    SAPtr(AllocChars) = VarPtr(mBuffers(BufferIndex).Buffer)
 End Function
 
 ''
@@ -120,10 +125,10 @@ End Function
 '
 Public Sub FreeChars(ByRef Chars() As Integer)
     Dim BufferIndex As Long
-    BufferIndex = FindAllocatedBuffer(Chars)
+    BufferIndex = FindAllocatedBufferIndex(Chars)
     
     If BufferIndex >= 0 Then
-        mBuffers(BufferIndex).Buffer.pvData = vbNullPtr
+        mBuffers(BufferIndex).InUse = False
     End If
     
     SAPtr(Chars) = vbNullPtr
@@ -137,23 +142,24 @@ Private Sub InitBuffers()
     ReDim mBuffers(0 To BufferCapacity - 1)
 
     Dim i As Long
-    For i = 0 To UBound(mBuffers)
+    For i = 0 To BufferCapacity - 1
         With mBuffers(i)
             .Buffer.cbElements = 2
             .Buffer.cDims = 1
             .Buffer.cLocks = 1
             .TablePtr = VarPtr(.TablePtr)
             ObjectPtr(.Self) = .TablePtr
-            .ReleasePtr = FuncAddr(AddressOf BucketRelease)
+            .ReleasePtr = FuncAddr(AddressOf ReleaseBucket)
+            .BufferPtr = VarPtr(.Buffer)
         End With
     Next
 End Sub
 
-Private Function FindAvailableBuffer() As Long
+Private Function FindAvailableBufferIndex() As Long
     Dim i As Long
-    For i = 0 To UBound(mBuffers)
-        If mBuffers(i).Buffer.pvData = vbNullPtr Then
-            FindAvailableBuffer = i
+    For i = 0 To BufferCapacity - 1
+        If Not mBuffers(i).InUse Then
+            FindAvailableBufferIndex = i
             Exit Function
         End If
     Next
@@ -161,22 +167,22 @@ Private Function FindAvailableBuffer() As Long
     Debug.Assert False
 End Function
 
-Private Function FindAllocatedBuffer(ByRef Chars() As Integer) As Long
+Private Function FindAllocatedBufferIndex(ByRef Chars() As Integer) As Long
     Dim Ptr As Long
     Ptr = SAPtr(Chars)
     
     Dim i As Long
-    For i = 0 To UBound(mBuffers)
-        If VarPtr(mBuffers(i).Buffer) = Ptr Then
-            FindAllocatedBuffer = i
+    For i = 0 To BufferCapacity - 1
+        If mBuffers(i).BufferPtr = Ptr Then
+            FindAllocatedBufferIndex = i
             Exit Function
         End If
     Next
     
-    FindAllocatedBuffer = -1
+    FindAllocatedBufferIndex = -1
 End Function
 
-Private Function BucketRelease(ByRef This As Bucket) As Long
+Private Function ReleaseBucket(ByRef This As Bucket) As Long
     This.Buffer.pvData = vbNullPtr
     This.Buffer.cElements = 0
     This.Buffer.cLocks = 0
