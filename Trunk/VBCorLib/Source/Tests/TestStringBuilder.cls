@@ -102,7 +102,7 @@ Public Sub Append_WithStartIndexAndCount_AppendsSubString()
     Assert.That Actual, Iz.EqualTo("34")
 End Sub
 
-Public Sub Append_WithStartIndexLessThanZero_Throws()
+Public Sub Append_WithStartIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -120,7 +120,7 @@ Public Sub Append_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub Append_WithStartIndexAndCountPassedLengthOfValue_Throws()
+Public Sub Append_WithStartIndexAndCountPassedLengthOfValue_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -159,7 +159,7 @@ Public Sub AppendChar_WithCountOfZero_DoesNotAppend()
     Assert.That Actual, Iz.Empty
 End Sub
 
-Public Sub AppendChar_WithCountLessThanZero_Throws()
+Public Sub AppendChar_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -291,7 +291,7 @@ Public Sub Length_WhenSetShortThanInstance_Truncates()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Length_WhenLessThanZero_Throws()
+Public Sub Length_WhenLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -336,7 +336,7 @@ Public Sub Insert_WithIndexAtEnd_AppendsToInstance()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Insert_WithIndexLessThanZero_Throws()
+Public Sub Insert_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -345,7 +345,7 @@ Public Sub Insert_WithIndexLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub Insert_WithCountLessThanZero_Throws()
+Public Sub Insert_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -378,7 +378,7 @@ Public Sub Insert_WithMultipleCounts_InsertsMultipleTimes()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub InsertChars_WithNullArray_Throws()
+Public Sub InsertChars_WithNullArray_ThrowsArgumentNullException()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     
@@ -453,7 +453,7 @@ Public Sub InsertChars_WithSubArray_InsertsPortion()
     Assert.That Actual, Iz.EqualTo("12bc34")
 End Sub
 
-Public Sub InsertChars_WithIndexLessThanZero_Throws()
+Public Sub InsertChars_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     ReDim Chars(1 To 1)
@@ -464,18 +464,18 @@ Public Sub InsertChars_WithIndexLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub InsertChars_WithStartIndexLessThanLBound_Throws()
+Public Sub InsertChars_WithStartIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     ReDim Chars(1 To 1)
     
     On Error Resume Next
-    sb.InsertChars 0, Chars, 0
+    sb.InsertChars 0, Chars, 0, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub InsertChars_WithNegativeCount_Throws()
+Public Sub InsertChars_WithNegativeCount_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     Dim Chars(0) As Integer
     
@@ -485,7 +485,7 @@ Public Sub InsertChars_WithNegativeCount_Throws()
     AssertArgumentOutOfRangeException Err, "CharCount"
 End Sub
 
-Public Sub InsertChars_WithStartIndexAndCountExtendingPassedUBound_Throws()
+Public Sub InsertChars_WithStartIndexAndCountExtendingPassedUBound_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     Dim Chars(1 To 3) As Integer
     
@@ -495,7 +495,7 @@ Public Sub InsertChars_WithStartIndexAndCountExtendingPassedUBound_Throws()
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub Remove_WithStartIndexLessThanZero_Throws()
+Public Sub Remove_WithStartIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "a"
     
@@ -505,7 +505,7 @@ Public Sub Remove_WithStartIndexLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub Remove_WithCountLessThanZero_Throws()
+Public Sub Remove_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "a"
     
@@ -515,7 +515,7 @@ Public Sub Remove_WithCountLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub Remove_WithStartIndexAndCountGreaterThanInstanceLength_Throws()
+Public Sub Remove_WithStartIndexAndCountGreaterThanInstanceLength_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     
@@ -547,7 +547,7 @@ Public Sub Remove_WithStartIndexAndLengthCoverEnd_RemovesFromEnd()
     Assert.That Actual, Iz.EqualTo("12345")
 End Sub
 
-Public Sub Replace_WithEmptyNewValue_Throws()
+Public Sub Replace_WithEmptyNewValue_ThrowsArgumentException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     
@@ -557,17 +557,17 @@ Public Sub Replace_WithEmptyNewValue_Throws()
     AssertArgumentException Err, "OldValue"
 End Sub
 
-Public Sub Replace_WithStartIndexLessThanZero_Throws()
+Public Sub Replace_WithStartIndexLessThanZero_ThrowsArgumentOutOfRange()
     Dim sb As New StringBuilder
     sb.Append "abc"
     
     On Error Resume Next
-    sb.Replace "a", "b", -1
+    sb.Replace "a", "b", -1, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub Replace_WithCountLessThanZero_Throws()
+Public Sub Replace_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     
@@ -577,7 +577,7 @@ Public Sub Replace_WithCountLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
-Public Sub Replace_WithStartIndexAndCountGreaterThanInstanceLength_Throws()
+Public Sub Replace_WithStartIndexAndCountGreaterThanInstanceLength_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     
@@ -613,7 +613,7 @@ Public Sub Replace_WithSubstringStartingInMiddleOfMatch_DoesNotReplacePartialMat
     Dim sb As New StringBuilder
     sb.Append "blahblahblahblahblahblahblahblah"
     
-    sb.Replace "blah", "ha", 2
+    sb.Replace "blah", "ha", 2, sb.Length - 2
     
     Dim Actual As String
     Actual = sb.ToString
@@ -691,7 +691,7 @@ Public Sub AppendFormat_WithRepeatedPlaceHolder_RepeatsFormat()
     Assert.That Actual, Iz.EqualTo("a a")
 End Sub
 
-Public Sub AppendFormat_WithUnpairedOpenBrace_Throws()
+Public Sub AppendFormat_WithUnpairedOpenBrace_ThrowsFormatException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -700,7 +700,7 @@ Public Sub AppendFormat_WithUnpairedOpenBrace_Throws()
     AssertFormatException Err
 End Sub
 
-Public Sub AppendFormat_WithUnpairedOpenBrace_Throws2()
+Public Sub AppendFormat_WithUnpairedOpenBrace_ThrowsFormatException2()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -709,7 +709,7 @@ Public Sub AppendFormat_WithUnpairedOpenBrace_Throws2()
     AssertFormatException Err
 End Sub
 
-Public Sub AppendFormat_WithUnpairedClosingBrace_Throws()
+Public Sub AppendFormat_WithUnpairedClosingBrace_ThrowsFormatException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -718,7 +718,7 @@ Public Sub AppendFormat_WithUnpairedClosingBrace_Throws()
     AssertFormatException Err
 End Sub
 
-Public Sub AppendFormat_WithUnpairedClosingBrace_Throws2()
+Public Sub AppendFormat_WithUnpairedClosingBrace_ThrowsFormatException2()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -727,7 +727,7 @@ Public Sub AppendFormat_WithUnpairedClosingBrace_Throws2()
     AssertFormatException Err
 End Sub
 
-Public Sub AppendFormat_WithNegativePlaceHolder_Throws()
+Public Sub AppendFormat_WithNegativePlaceHolder_ThrowsFormatException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -736,7 +736,7 @@ Public Sub AppendFormat_WithNegativePlaceHolder_Throws()
     AssertFormatException Err
 End Sub
 
-Public Sub AppendFormat_WithMorePlaceHoldersThanValues_Throws()
+Public Sub AppendFormat_WithMorePlaceHoldersThanValues_ThrowsFormatException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -755,7 +755,7 @@ Public Sub AppendFormat_WithReplicatedBrace_EscapesBrace()
     Assert.That Actual, Iz.EqualTo("{0}")
 End Sub
 
-Public Sub AppendFormat_WithEscapedOpeningBraceAndNonEscapedClosingBrace_Throws()
+Public Sub AppendFormat_WithEscapedOpeningBraceAndNonEscapedClosingBrace_ThrowsFormatException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -764,7 +764,7 @@ Public Sub AppendFormat_WithEscapedOpeningBraceAndNonEscapedClosingBrace_Throws(
     AssertFormatException Err
 End Sub
 
-Public Sub AppendFormat_WithNonEscapedOpeningBraceAndEscapedClosingBrace_Throws()
+Public Sub AppendFormat_WithNonEscapedOpeningBraceAndEscapedClosingBrace_ThrowsFormatException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -773,7 +773,7 @@ Public Sub AppendFormat_WithNonEscapedOpeningBraceAndEscapedClosingBrace_Throws(
     AssertFormatException Err
 End Sub
 
-Public Sub AppendFormat_PlaceHolderWithMissingIndex_Throws()
+Public Sub AppendFormat_PlaceHolderWithMissingIndex_ThrowsFormatException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
@@ -855,7 +855,7 @@ Public Sub CopyTo_WhenCalled_CopiesStringToArray()
     Assert.That Chars, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub CopyTo_WithNullDestination_Throw()
+Public Sub CopyTo_WithNullDestination_ThrowArgumentNullException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     Dim Chars() As Integer
@@ -866,7 +866,7 @@ Public Sub CopyTo_WithNullDestination_Throw()
     AssertArgumentNullException Err, "Destination"
 End Sub
 
-Public Sub CopyTo_WithNegativeSourceIndex_Throws()
+Public Sub CopyTo_WithNegativeSourceIndex_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     Dim Chars(0) As Integer
@@ -877,7 +877,7 @@ Public Sub CopyTo_WithNegativeSourceIndex_Throws()
     AssertArgumentOutOfRangeException Err, "SourceIndex"
 End Sub
 
-Public Sub CopyTo_WithSourceIndexLongerThanInstance_Throws()
+Public Sub CopyTo_WithSourceIndexLongerThanInstance_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     Dim Chars(0) As Integer
@@ -888,7 +888,7 @@ Public Sub CopyTo_WithSourceIndexLongerThanInstance_Throws()
     AssertArgumentOutOfRangeException Err, "SourceIndex"
 End Sub
 
-Public Sub CopyTo_WithDestinationIndexLessThanLBound_Throws()
+Public Sub CopyTo_WithDestinationIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     Dim Chars(5 To 6) As Integer
@@ -899,7 +899,7 @@ Public Sub CopyTo_WithDestinationIndexLessThanLBound_Throws()
     AssertArgumentOutOfRangeException Err, "DestinationIndex"
 End Sub
 
-Public Sub CopyTo_WithSourceIndexAndCountGreaterThanTheInstance_Throws()
+Public Sub CopyTo_WithSourceIndexAndCountGreaterThanTheInstance_ThrowsArgumentException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     Dim Chars(0 To 6) As Integer
@@ -910,7 +910,7 @@ Public Sub CopyTo_WithSourceIndexAndCountGreaterThanTheInstance_Throws()
     AssertArgumentException Err
 End Sub
 
-Public Sub CopyTo_WithDestinationIndexAndCountGreaterThanUBound_Throws()
+Public Sub CopyTo_WithDestinationIndexAndCountGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     Dim Chars(0 To 6) As Integer
@@ -921,17 +921,17 @@ Public Sub CopyTo_WithDestinationIndexAndCountGreaterThanUBound_Throws()
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub ToString_WithNegativeStartIndex_Throws()
+Public Sub ToString_WithNegativeStartIndex_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     
     On Error Resume Next
-    sb.ToString -1
+    sb.ToString -1, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub ToString_WithNegativeLength_Throws()
+Public Sub ToString_WithNegativeLength_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     
@@ -941,7 +941,7 @@ Public Sub ToString_WithNegativeLength_Throws()
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub ToString_WithStartIndexAndLengthGreaterThanInstance_Throws()
+Public Sub ToString_WithStartIndexAndLengthGreaterThanInstance_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     sb.Append "abc"
     

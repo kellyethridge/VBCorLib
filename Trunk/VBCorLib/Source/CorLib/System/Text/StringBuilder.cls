@@ -493,22 +493,21 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
     If SAPtr(Chars) = vbNullPtr Then _
         Error.ArgumentNull "Chars", ArgumentNull_Array
     
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    ElemIndex = GetOptionalLong(StartIndex, LBound(Chars))
-    ElemCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
+    Dim Range As ListRange
+    Range = GetOptionalRange(StartIndex, CharCount, LBound(Chars), CorArray.LengthFirstDim(Chars), Parameter_StartIndex, Parameter_CharCount)
     
-    If ElemIndex < LBound(Chars) Then _
+    If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
-    If ElemCount < 0 Then _
+    If Range.Count < 0 Then _
         Error.NegativeNumber "CharCount"
-    If ElemIndex + ElemCount - 1 > UBound(Chars) Then _
+    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
-        
-    If ElemCount > 0 Then
-        InsertSpace Index, ElemCount
-        CopyMemory mString(Index), Chars(ElemIndex), ElemCount * BytesPerChar
+    
+    If Range.Count > 0 Then
+        InsertSpace Index, Range.Count
+        CopyMemory mString(Index), Chars(Range.Index), Range.Count * BytesPerChar
     End If
+    
     Set InsertChars = Me
 End Function
 
@@ -578,23 +577,20 @@ Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Opti
     If Len(OldValue) = 0 Then _
         Error.Argument Argument_EmptyName, "OldValue"
     
-    Dim ElemStart As Long
-    Dim ElemCount As Long
-    ElemStart = GetOptionalLong(StartIndex, 0)
-    ElemCount = GetOptionalLong(Count, mLength - ElemStart)
+    Dim Range As ListRange
+    Range = GetOptionalRange(StartIndex, Count, 0, mLength, Parameter_StartIndex)
     
-    If ElemStart < 0 Then _
+    If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
-    If ElemCount < 0 Then _
+    If Range.Count < 0 Then _
         Error.NegativeNumber "Count"
-    If ElemStart + ElemCount > mLength Then _
+    If Range.Index + Range.Count > mLength Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
     
     Dim MatchCount      As Long
     Dim MatchIndexes()  As Long
-    MatchCount = FindMatches(OldValue, ElemStart, ElemCount, MatchIndexes)
+    MatchCount = FindMatches(OldValue, Range.Index, Range.Count, MatchIndexes)
 
-    ' If we have matches then we need to replace them.
     If MatchCount > 0 Then
         Dim NewLength As Long
         NewLength = mLength - ((Len(OldValue) - Len(NewValue)) * MatchCount)
@@ -620,22 +616,18 @@ End Function
 ' @remarks startindex is zero-based.
 '
 Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As String
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    ElemIndex = GetOptionalLong(StartIndex, 0)
-    ElemCount = GetOptionalLong(Length, mLength)
+    Dim Range As ListRange
+    Range = GetOptionalRange(StartIndex, Length, 0, mLength, Parameter_StartIndex, Parameter_Length)
     
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_StartIndex))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NegativeLength))
-    If ElemIndex + ElemCount > mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+    If Range.Index < 0 Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
+    If Range.Index + Range.Count > mLength Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
     
-    If ElemCount = 0 Then
-        ToString = ""
-    Else
-        ToString = SysAllocStringLen(mStringPtr + ElemIndex * BytesPerChar, ElemCount)
+    If Range.Count > 0 Then
+        ToString = SysAllocStringLen(mStringPtr + Range.Index * BytesPerChar, Range.Count)
     End If
 End Function
 
