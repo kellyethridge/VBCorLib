@@ -103,7 +103,7 @@ Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Vari
 End Function
 
 Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef CharCount As Variant)
-    CorArray.CheckValidSingleDimArray Value, Parameter_Value
+    CheckValidSingleDimArray Value, Parameter_Value
     
     Dim Chars() As Integer
     Chars = AsChars(Value)
@@ -112,6 +112,7 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
     
     Dim Range As ListRange
     Range = GetOptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
     If Range.Count < 0 Then _
@@ -151,7 +152,7 @@ End Sub
 
 Private Sub AppendCharsCore(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal CharCount As Long)
     Debug.Assert SAPtr(Chars) <> vbNullPtr
-
+    
     If CharCount > 0 Then
         Dim FirstElementPtr As Long
         FirstElementPtr = VarPtr(Chars(LBound(Chars)))
@@ -264,7 +265,7 @@ End Function
 '
 Public Function AppendLine(Optional ByRef s As String) As StringBuilder
     AppendString s
-    AppendString vbCrLf
+    AppendString Environment.NewLine
     Set AppendLine = Me
 End Function
 

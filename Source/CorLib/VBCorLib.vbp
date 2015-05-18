@@ -349,6 +349,7 @@ Class=ErrorHelper; System\ErrorHelper.cls
 Class=PathHelper; System\IO\PathHelper.cls
 Class=NumberStatic; System\Number.cls
 ResFile32="VBCorLib.RES"
+Module=Validation; System\Validation.bas
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"
