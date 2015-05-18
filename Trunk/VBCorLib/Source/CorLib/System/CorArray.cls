@@ -1186,20 +1186,6 @@ Friend Function ArrayPointer(ByRef Arg As Variant) As Long
     End Select
 End Function
 
-Friend Sub CheckValidSingleDimArray(ByRef Arr As Variant, Optional ByVal ParameterName As ParameterString = Parameter_Arr)
-    Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
-    
-    CheckValidSingleDimArrayPtr Ptr, ParameterName
-End Sub
-
-Friend Sub CheckValidSingleDimArrayPtr(ByVal Ptr As Long, Optional ByVal ParameterName As ParameterString = Parameter_Arr)
-    If Ptr = vbNullPtr Then _
-        Error.ArgumentNull Environment.GetResourceString(ParameterName), ArgumentNull_Array
-    If SafeArrayGetDim(Ptr) <> 1 Then _
-        Error.Rank
-End Sub
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
