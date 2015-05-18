@@ -86,30 +86,93 @@ Private mChars      As WordBuffer
 ' <b>IObject</b> or <b>IFormattable</b> to be converted to a string value.
 '
 Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
-    Dim ElemIndex As Long
-    Dim CharCount As Long
-    Dim s As String
-    
-    s = Convert.ToString(Value)
-    ElemIndex = GetOptionalLong(StartIndex, 0)
-    CharCount = GetOptionalLong(Count, Len(s) - ElemIndex)
-    
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
-    If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + CharCount > Len(s) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
-        
-    If mLength + CharCount > mCapacity Then
-        EnsureCapacity mLength + CharCount
-    End If
-    
-    CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s) + ElemIndex * BytesPerChar, CharCount * BytesPerChar
-    mLength = mLength + CharCount
+    Select Case VarType(Value)
+        Case vbIntegerArray
+            AppendCharsValue Value, StartIndex, Count
+            
+        Case vbString
+            AppendStringValue Value, StartIndex, Count
+            
+        Case Else
+            Dim s As String
+            s = Object.ToString(Value)
+            AppendCore StrPtr(s), 0, Len(s)
+    End Select
     
     Set Append = Me
 End Function
+
+Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef CharCount As Variant)
+    CorArray.CheckValidSingleDimArray Value, Parameter_Value
+    
+    Dim Chars() As Integer
+    Chars = AsChars(Value)
+    
+    On Error GoTo Catch
+    
+    Dim Range As ListRange
+    Range = GetOptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    If Range.Index < LBound(Value) Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index + Range.Count - 1 > UBound(Value) Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
+
+    AppendCharsCore Chars, Range.Index, Range.Count
+    
+    FreeChars Chars
+    Exit Sub
+
+Catch:
+    FreeChars Chars
+    Throw
+End Sub
+
+Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef Count As Variant)
+    Dim ValuePtr    As Long
+    Dim ValueLength As Long
+
+    ValuePtr = StrPtr(Value)
+    ValueLength = Len(Value)
+
+    Dim Range As ListRange
+    Range = GetOptionalRange(StartIndex, Count, 0, ValueLength, Parameter_StartIndex)
+
+    If Range.Index < 0 Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index + Range.Count > ValueLength Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
+
+    AppendCore ValuePtr, Range.Index, Range.Count
+End Sub
+
+Private Sub AppendCharsCore(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal CharCount As Long)
+    Debug.Assert SAPtr(Chars) <> vbNullPtr
+
+    If CharCount > 0 Then
+        Dim FirstElementPtr As Long
+        FirstElementPtr = VarPtr(Chars(LBound(Chars)))
+        
+        AppendCore FirstElementPtr, StartIndex, CharCount
+    End If
+End Sub
+
+Private Sub AppendCore(ByVal CharPtr As Long, ByVal StartIndex As Long, ByVal CharCount As Long)
+    If CharCount > 0 Then
+        Dim NewLength As Long
+        NewLength = mLength + CharCount
+
+        If NewLength > mCapacity Then
+            EnsureCapacity NewLength
+        End If
+
+        CopyMemory mString(mLength), ByVal CharPtr + StartIndex * BytesPerChar, CharCount * BytesPerChar
+        mLength = NewLength
+    End If
+End Sub
 
 ''
 ' Appends a character a specified number of times to the end of string value.
@@ -144,41 +207,6 @@ Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1)
     Set AppendChar = Me
 End Function
 
-''
-' Appends an array of characters to the end of the string value.
-'
-' @param Chars The array of characters to be appended.
-' @param Startindex The index from Chars to start appending.
-' @param CharCount The number of characters to append.
-' @return This instance of StringBuilder.
-'
-Public Function AppendChars(ByRef Chars() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef CharCount As Variant) As StringBuilder
-    If SAPtr(Chars) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
-    If SafeArrayGetDim(SAPtr(Chars)) > 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
-        
-    Dim LocalCharCount As Long
-    Dim ElemIndex As Long
-    ElemIndex = GetOptionalLong(StartIndex, LBound(Chars))
-    LocalCharCount = GetOptionalLong(CharCount, UBound(Chars) - ElemIndex + 1)
-    
-    If ElemIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If ElemIndex + LocalCharCount - 1 > UBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
-    
-    If LocalCharCount > 0 Then
-        If mLength + LocalCharCount > mCapacity Then
-            EnsureCapacity mLength + LocalCharCount
-        End If
-        
-        CopyMemory mString(mLength), Chars(ElemIndex), LocalCharCount * BytesPerChar
-        mLength = mLength + LocalCharCount
-    End If
-    
-    Set AppendChars = Me
-End Function
 
 ''
 ' Appends a string with formatted arguments.
@@ -252,12 +280,15 @@ Public Sub AppendString(ByRef s As String)
     CharCount = Len(s)
     
     If CharCount > 0 Then
-        If mLength + CharCount > mCapacity Then
-            EnsureCapacity mLength + CharCount
+        Dim NewLength As Long
+        NewLength = mLength + CharCount
+        
+        If NewLength > mCapacity Then
+            EnsureCapacity NewLength
         End If
         
-        CopyMemory ByVal mStringPtr + mLength * 2, ByVal StrPtr(s), CharCount * BytesPerChar
-        mLength = mLength + CharCount
+        CopyMemory ByVal mStringPtr + mLength * BytesPerChar, ByVal StrPtr(s), CharCount * BytesPerChar
+        mLength = NewLength
     End If
 End Sub
 
@@ -307,15 +338,15 @@ Public Property Let Capacity(ByVal RHS As Long)
         Throw Cor.NewArgumentOutOfRangeException("Value", Message:="Cannot set capacity less than the length of the current instance.")
     
     If RHS <> mCapacity Then
-        Dim ptr As Long
-        ptr = CoTaskMemAlloc(RHS * BytesPerChar)
-        If ptr = vbNullPtr Then _
+        Dim Ptr As Long
+        Ptr = CoTaskMemAlloc(RHS * BytesPerChar)
+        If Ptr = vbNullPtr Then _
             Throw New OutOfMemoryException
             
-        CopyMemory ByVal ptr, ByVal mStringPtr, mLength * BytesPerChar
+        CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
         CoTaskMemFree mStringPtr
-        mStringPtr = ptr
-        mStringSA.pvData = ptr
+        mStringPtr = Ptr
+        mStringSA.pvData = Ptr
         mCapacity = RHS
     End If
 End Property
@@ -344,7 +375,7 @@ End Property
 '
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
     mString(Index) = Char
 End Property
@@ -431,7 +462,7 @@ Public Function Insert(ByVal Index As Long, ByRef Value As Variant, Optional ByV
         Throw Cor.NewArgumentOutOfRangeException("Count", Count, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Dim s As String
-    s = Convert.ToString(Value)
+    s = Object.ToString(Value)
     Dim l As Long
     l = Len(s)
     If l > 0 And Count > 0 Then
@@ -497,17 +528,17 @@ End Property
 ' @remarks If the new value is longer than the current length, then the
 ' new space is padded with FillCharacter (default 32).
 '
-Public Property Let Length(ByVal RHS As Long)
-    If RHS < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Length, Environment.GetResourceString(ArgumentOutOfRange_NegativeLength))
+Public Property Let Length(ByVal Value As Long)
+    If Value < 0 Then _
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
     
-    If RHS > mLength Then
-        If RHS > mCapacity Then
-            EnsureCapacity RHS
+    If Value > mLength Then
+        If Value > mCapacity Then
+            EnsureCapacity Value
         End If
         Fill mLength, mFillChar, mCapacity - mLength
     End If
-    mLength = RHS
+    mLength = Value
 End Property
 
 ''
@@ -545,7 +576,7 @@ End Function
 '
 Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     If Len(OldValue) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyName), "OldValue")
+        Error.Argument Argument_EmptyName, "OldValue"
     
     Dim ElemStart As Long
     Dim ElemCount As Long
@@ -765,7 +796,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                 If Index > SubStringStart Then
                     ' If we have some characters, just append them now
                     ' even if the "{" may be escaped. Most times it won't be.
-                    AppendChars mChars.Data, SubStringStart, Index - SubStringStart
+                    AppendCharsCore mChars.Data, SubStringStart, Index - SubStringStart
                 End If
                 
                 Index = Index + 1
@@ -837,7 +868,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                     ' don't want to include both "}}" in the substring.
                     If Index - 1 > SubStringStart Then
                         ' Append the current substring.
-                        AppendChars mChars.Data, SubStringStart, Index - SubStringStart - 1
+                        AppendCharsCore mChars.Data, SubStringStart, Index - SubStringStart - 1
                     End If
                     SubStringStart = Index
                 Else
@@ -850,7 +881,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
     
     If Index > SubStringStart Then
         ' If we have some characters, just append them now.
-        AppendChars mChars.Data, SubStringStart, Index - SubStringStart
+        AppendCharsCore mChars.Data, SubStringStart, Index - SubStringStart
     End If
 End Sub
 
@@ -957,12 +988,12 @@ Private Function ParseNumber(ByRef Index As Long) As Long
         ' We can never hit the end parsing a number.
         If Index = Max Then FormatError
         
-        Dim ch As Integer
-        ch = mChars.Data(Index)
-        Select Case ch
+        Dim Ch As Integer
+        Ch = mChars.Data(Index)
+        Select Case Ch
             Case vbZeroChar To vbNineChar
                 ' Keep adding digits to the number
-                Number = Number * 10 + ch - vbZeroChar
+                Number = Number * 10 + Ch - vbZeroChar
                 NumberFound = True
             Case vbMinusChar
                 ' The "-" can only be the first character.

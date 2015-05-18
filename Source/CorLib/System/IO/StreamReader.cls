@@ -245,7 +245,7 @@ Public Function ReadLine() As String
                 UsingBuilder = True
             End If
             ' place the buffer into the builder and start over with a new full buffer.
-            mLineBuilder.AppendChars mCharBuffer, StartIndex, mCharIndex - StartIndex
+            mLineBuilder.Append mCharBuffer, StartIndex, mCharIndex - StartIndex
             StartIndex = 0
             If ReadBuffer = 0 Then  ' there was nothing left to fill the buffer, so return what we have.
                 Exit Do
@@ -267,7 +267,7 @@ Public Function ReadLine() As String
                     ' we've been using the builder because we have reached the end of
                     ' atleast one buffer of characters. So add the subset of characters
                     ' from the current buffer to the builder for returning.
-                    mLineBuilder.AppendChars mCharBuffer, StartIndex, mCharIndex - StartIndex
+                    mLineBuilder.Append mCharBuffer, StartIndex, mCharIndex - StartIndex
                     mCharIndex = mCharIndex + 1
                     Exit Do
                 End If
@@ -336,7 +336,7 @@ Public Function ReadToEnd() As String
         ' builder. Keep refilling the buffer until the end of the stream is reached.
         mLineBuilder.Length = 0
         Do
-            mLineBuilder.AppendChars mCharBuffer, mCharIndex, mCharLength - mCharIndex
+            mLineBuilder.Append mCharBuffer, mCharIndex, mCharLength - mCharIndex
         Loop While ReadBuffer > 0
         ReadToEnd = mLineBuilder.ToString
     End If

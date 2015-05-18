@@ -131,7 +131,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
         Case vbLong, vbInteger, vbByte, vbDouble, vbSingle
             Dim NumberFormatter As NumberFormatInfo
             If Not Provider Is Nothing Then
-                Set NumberFormatter = Provider.GetFormat("numberformatinfo")
+                Set NumberFormatter = Provider.GetFormat(GlobalizationConstants.NumberFormatInfoTypeName)
             End If
             
             If NumberFormatter Is Nothing Then
@@ -143,7 +143,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
         Case vbDate
             Dim DateFormatter As DateTimeFormatInfo
             If Not Provider Is Nothing Then
-                Set DateFormatter = Provider.GetFormat("datetimeformatinfo")
+                Set DateFormatter = Provider.GetFormat(GlobalizationConstants.DateTimeFormatInfoTypeName)
             End If
             
             If DateFormatter Is Nothing Then
