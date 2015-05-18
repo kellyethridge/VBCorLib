@@ -63,9 +63,11 @@ Private mCount      As Long
 Private mVersion    As Long
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_InitProperties()
+    ReDim mItems(0 To DefaultCapacity - 1)
+    mCapacity = DefaultCapacity
+End Sub
+
 Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal head As Long, ByVal Tail As Long)
     mItems = Items
     mCount = Count
@@ -78,10 +80,6 @@ Friend Sub Init(ByRef Source As Variant)
     WriteRange Source
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   API
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Clears the contents of the queue
@@ -140,7 +138,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.IsNull(DstArray) Then _
         Error.ArgumentNull "DstArray", ArgumentNull_Array
     If CorArray.Rank(DstArray) <> 1 Then _
-        Error.Argument Argument_MultiDimNotSupported
+        Error.Argument Argument_MultiDimNotSupported, "DstArray"
     If Index < LBound(DstArray) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Index + mCount - 1 > UBound(DstArray) Then _
@@ -170,7 +168,7 @@ End Property
 '
 Public Function Dequeue() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyQueue))
+        Error.InvalidOperation InvalidOperation_EmptyQueue
     
     Helper.MoveVariant Dequeue, mItems(mHead)
     mHead = (mHead + 1) Mod mCapacity
@@ -333,7 +331,7 @@ Private Sub WriteRange(ByRef Source As Variant)
         WriteArray Source
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Throw Cor.NewArgumentNullException("Source", Environment.GetResourceString(ArgumentNull_Collection))
+            Error.ArgumentNull "Source", ArgumentNull_Collection
         
         If TypeOf Source Is Collection Then
             WriteVBCollection Source
@@ -378,13 +376,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_InitProperties()
-    ReDim mItems(0 To DefaultCapacity - 1)
-    mCapacity = DefaultCapacity
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
         mCount = .ReadProperty(CountProperty, 0)

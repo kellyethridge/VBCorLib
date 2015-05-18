@@ -301,10 +301,7 @@ Private Sub WriteString(ByRef Value As String)
 End Sub
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    If CorArray.IsNull(Value) Then _
-        Error.ArgumentNull "Value", ArgumentNull_Array
-    If CorArray.Rank(Value) <> 1 Then _
-        Error.Rank
+    Validation.CheckValidSingleDimArray Value, Parameter_Value
     
     Select Case VarType(Value)
         Case vbByteArray
