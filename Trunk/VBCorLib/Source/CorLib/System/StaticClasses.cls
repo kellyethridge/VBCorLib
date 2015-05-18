@@ -98,10 +98,10 @@ End Property
 '
 ' @return A reference to the <b>cString</b> object used to
 ' perform Property Gets on Strings.
-' @see cString
+' @see CorString
 '
-Public Property Get cString() As cString
-    Set cString = Statics.cString
+Public Property Get CorString() As CorString
+    Set CorString = Statics.CorString
 End Property
 
 ''

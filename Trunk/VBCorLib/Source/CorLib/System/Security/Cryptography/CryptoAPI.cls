@@ -103,7 +103,7 @@ End Property
 Friend Function AcquireContext(Optional ByRef ContainerName As String, Optional ByRef ProviderName As String, Optional ByRef ProviderType As Long, Optional ByVal Flags As Long) As Long
     If ProviderType = 0 Then ProviderType = PROV_RSA_FULL
     If Len(ProviderName) = 0 Then ProviderName = mRSAProviderName
-    If Len(ContainerName) = 0 Then ContainerName = cString.Format("COR{0}", Guid.NewGuid)
+    If Len(ContainerName) = 0 Then ContainerName = CorString.Format("COR{0}", Guid.NewGuid)
     
     ' Try to acquire a provider with a new key container.
     If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags Or CRYPT_NEWKEYSET) = BOOL_FALSE Then
@@ -217,7 +217,7 @@ Friend Sub SetKeyParam(ByVal Key As Long, ByVal Param As Long, ByRef Value As Va
         Case vbLong, vbInteger, vbByte
             If CryptSetKeyParam(Key, Param, CLng(Value), Flags) = BOOL_FALSE Then Call CryptoError
         Case Else
-            Throw Cor.NewNotSupportedException(cString.Format("Key param type '{0}' not supported.", TypeName(Value)))
+            Throw Cor.NewNotSupportedException(CorString.Format("Key param type '{0}' not supported.", TypeName(Value)))
     End Select
 End Sub
 

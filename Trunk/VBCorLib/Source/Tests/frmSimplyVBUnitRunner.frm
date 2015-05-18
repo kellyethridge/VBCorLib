@@ -102,7 +102,7 @@ Private Sub AddSystem()
         .Add New TestExceptionMethods
         .Add New TestInvalidCastException
         .Add New TestDefInvalidCast
-        .Add New CStringTests
+        .Add New CorStringTests
         .Add New CharTests
         .Add New CharEnumeratorTests
         .Add New BufferTests

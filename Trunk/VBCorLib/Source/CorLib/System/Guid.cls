@@ -337,7 +337,7 @@ Friend Sub FromProgramID(ByVal ProgID As String)
     Exit Sub
     
 errTrap:
-    Throw Cor.NewArgumentException(cString.Format("Program ID '{0}' was not found.", ProgID), "ProgID")
+    Throw Cor.NewArgumentException(CorString.Format("Program ID '{0}' was not found.", ProgID), "ProgID")
 End Sub
 
 

@@ -26,7 +26,7 @@ End Sub
 Public Sub TestFormat()
     Dim s As String
     
-    s = cString.FormatEx(Me, "Name = {0}, Age = {1}", "Kelly", 36)
+    s = CorString.FormatEx(Me, "Name = {0}, Age = {1}", "Kelly", 36)
     Assert.AreEqual "Name = ylleK, Age = 36", s
 End Sub
 

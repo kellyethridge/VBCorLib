@@ -378,7 +378,7 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
     Dim Arguments As New ArrayList
     
     Dim Chars() As Integer
-    Chars = cString.ToCharArray(Line)
+    Chars = CorString.ToCharArray(Line)
     
     Dim ArgBuffer() As Integer
     ReDim ArgBuffer(0 To Length - 1)
@@ -671,7 +671,7 @@ Friend Function GetResourceString(ByVal Key As Long, ParamArray Values() As Vari
     If UBound(Values) >= 0 Then
         Dim SwappedValues() As Variant
         Helper.Swap4 ByVal ArrPtr(SwappedValues), ByVal Helper.DerefEBP(16)
-        GetResourceString = cString.FormatArray(Text, SwappedValues)
+        GetResourceString = CorString.FormatArray(Text, SwappedValues)
     Else
         GetResourceString = Text
     End If

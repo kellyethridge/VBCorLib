@@ -66,7 +66,7 @@ Public Sub TestNonAscii()
     ch = e.GetChars(b)
     Assert.AreEqual 10, CorArray.GetLength(ch)
     
-    Assert.AreEqual String$(10, 167), cString.FromCharArray(ch)
+    Assert.AreEqual String$(10, 167), CorString.FromCharArray(ch)
 End Sub
 
 Public Sub TestComboChars()
@@ -86,7 +86,7 @@ Public Sub TestComboChars()
     b = e.GetBytes(s)
     ch = e.GetChars(b)
     Assert.AreEqual 40, CorArray.GetLength(ch)
-    Assert.AreEqual s, cString.FromCharArray(ch)
+    Assert.AreEqual s, CorString.FromCharArray(ch)
 End Sub
 
 Public Sub TestGetStringComboChars()

@@ -236,7 +236,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     Call VerifyYear(Year)
     Call VerifyMonth(Month)
     If Day < 1 Or Day > GetDaysInMonth(Year, Month, Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, cString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month, Era)))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Day, CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month, Era)))
     
     If Month = 2 Then
         If IsLeapYear(Year, Era) Then
@@ -251,7 +251,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     Call VerifyMonth(Month)
         
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, cString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month)))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Day, CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month)))
     
     Set ToDateTime = cDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MILLISECONDS_PER_DAY + TotalTime(Hour, Minute, Second, Millisecond))
 End Function
@@ -543,8 +543,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

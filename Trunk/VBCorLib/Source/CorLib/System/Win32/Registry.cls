@@ -179,7 +179,7 @@ End Sub
 '
 Public Function GetRootKey(ByVal KeyName As String) As RegistryKey
     If Len(KeyName) = 0 Then Exit Function
-    KeyName = cString.Trim(KeyName, "\")
+    KeyName = CorString.Trim(KeyName, "\")
     
     Dim Keys() As String
     Keys = Split(KeyName, "\")

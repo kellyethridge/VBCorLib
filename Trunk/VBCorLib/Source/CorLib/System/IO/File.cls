@@ -94,10 +94,10 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
     If Path.HasIllegalCharacters(DestinationFileName) Then _
         Error.Argument Argument_InvalidCharsInPath, "DestinationFileName"
         
-    SourceFileName = Path.GetFullPath(cString.TrimEnd(SourceFileName, mDirectorySeparators))
-    DestinationFileName = Path.GetFullPath(cString.TrimEnd(DestinationFileName, mDirectorySeparators))
+    SourceFileName = Path.GetFullPath(CorString.TrimEnd(SourceFileName, mDirectorySeparators))
+    DestinationFileName = Path.GetFullPath(CorString.TrimEnd(DestinationFileName, mDirectorySeparators))
     
-    If cString.EqualsIgnoreCase(SourceFileName, DestinationFileName) Then
+    If CorString.EqualsIgnoreCase(SourceFileName, DestinationFileName) Then
         Exit Sub
     End If
     
@@ -547,7 +547,7 @@ End Sub
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetFileData(ByVal p As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
-    p = cString.TrimEnd(p, mDirectorySeparators)
+    p = CorString.TrimEnd(p, mDirectorySeparators)
     
     Call Path.VerifyPath(p, True)
     If Api.GetFileAttributesEx(p, 0, Data) = BOOL_FALSE Then

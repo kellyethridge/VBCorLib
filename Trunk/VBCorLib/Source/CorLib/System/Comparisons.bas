@@ -97,7 +97,7 @@ Public Function EqualLongs(ByRef X As Long, ByRef Y As Long) As Boolean
 End Function
 
 Public Function EqualStrings(ByRef X As String, ByRef Y As String) As Boolean
-    EqualStrings = cString.Equals(X, Y)
+    EqualStrings = CorString.Equals(X, Y)
 End Function
 
 Public Function EqualDoubles(ByRef X As Double, ByRef Y As Double) As Boolean

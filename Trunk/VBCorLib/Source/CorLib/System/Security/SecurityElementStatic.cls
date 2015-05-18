@@ -279,7 +279,7 @@ Private Function GetText() As String
     
     Dim Text As String
     Text = mXml.ToString(StartIndex, mIndex - StartIndex)
-    Text = cString.TrimEnd(Text, vbCrLf)
+    Text = CorString.TrimEnd(Text, vbCrLf)
     
     mTextFormatter.Length = 0
     Call mTextFormatter.AppendString(Text)

@@ -245,7 +245,7 @@ End Function
 ' <br><p>Some arguments may handle additional formatting commands. Please refer to their
 ' documentation for more information.</p>
 ' <br><p>The supplied provider can format specific arguments unknown to the system. It can also
-' delegate formatting of system-known arguments to another StringBuilder (usually cString.Format)
+' delegate formatting of system-known arguments to another StringBuilder (usually CorString.Format)
 ' to provide default formatting of known types and format only specific types.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo

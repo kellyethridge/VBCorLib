@@ -56,7 +56,7 @@ Public Sub TestSimple()
     ReDim ch(100)
     b = En.GetBytes("hello")
     Assert.AreEqual 5, En.GetCharsEx(b, 0, UBound(b) + 1, ch, 0)
-    Assert.AreEqual "hello", cString.FromCharArray(ch, 0, 5)
+    Assert.AreEqual "hello", CorString.FromCharArray(ch, 0, 5)
     Assert.AreEqual 0, ch(5)
 End Sub
 

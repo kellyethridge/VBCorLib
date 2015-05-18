@@ -83,7 +83,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
         
     Statics.Path.FixupPath Path
-    Path = cString.TrimEnd(Path, Statics.Path.DirectorySeparatorString)
+    Path = CorString.TrimEnd(Path, Statics.Path.DirectorySeparatorString)
     
     If Len(Path) > Statics.Path.MaxPath Then _
         Throw New PathTooLongException
@@ -97,7 +97,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     i = CorArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
-        TestDirectory = cString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
+        TestDirectory = CorString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
         If Directory.Exists(TestDirectory) Then Exit Do
         i = i - 1
     Loop While i > 0
@@ -105,7 +105,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     Do While i <= UBound(DirectoryNames)
         i = i + 1
         Dim NewDirectory As String
-        NewDirectory = cString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
+        NewDirectory = CorString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
         If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then IOError Err.LastDllError
     Loop
     
@@ -139,7 +139,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath))
     
-    Path = cString.TrimEnd(Statics.Path.InternalGetFullPath(Path), "/\")
+    Path = CorString.TrimEnd(Statics.Path.InternalGetFullPath(Path), "/\")
     
     If Recursive Then
         Dim Data As WIN32_FIND_DATA

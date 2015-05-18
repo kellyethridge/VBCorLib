@@ -92,7 +92,7 @@ End Property
 ' Flushes any cached updates to the INI file.
 '
 Public Sub Flush()
-    Call API.WritePrivateProfileString(vbNullString, vbNullString, vbNullString, vbNullString)
+    Call Api.WritePrivateProfileString(vbNullString, vbNullString, vbNullString, vbNullString)
 End Sub
 
 ''
@@ -125,9 +125,9 @@ Public Sub SetValue(ByVal Section As String, ByVal Key As String, ByRef Value As
     
     ' We don't want a null string, since that would
     ' delete the INI entry instead.
-    If cString.IsNull(s) Then s = ""
+    If CorString.IsNull(s) Then s = ""
     
-    If API.WritePrivateProfileString(Section, Key, s, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.WritePrivateProfileString(Section, Key, s, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
     If mAutoFlush Then Call Flush
 End Sub
 
@@ -147,7 +147,7 @@ Public Function GetString(ByVal Section As String, ByVal Key As String, Optional
         Throw Cor.NewArgumentException("Key cannot be an empty string.", "Key")
 
     ' MSDN says we cannot pass in a null value for the default.
-    If cString.IsNull(Default) Then Default = ""
+    If CorString.IsNull(Default) Then Default = ""
     
     Dim Size    As Long
     Dim Buf     As String
@@ -155,7 +155,7 @@ Public Function GetString(ByVal Section As String, ByVal Key As String, Optional
     Do
         Size = Size * 2
         Buf = String$(Size, vbNullChar)
-        Size = API.GetPrivateProfileString(Section, Key, Default, Buf, Size, mFileName)
+        Size = Api.GetPrivateProfileString(Section, Key, Default, Buf, Size, mFileName)
     Loop While Size = Len(Buf) - 1
     
     GetString = Left$(Buf, Size)
@@ -385,7 +385,7 @@ Public Sub DeleteKey(ByVal Section As String, ByVal Key As String)
     If Len(Key) = 0 Then _
         Throw Cor.NewArgumentException("Key cannot be an empty string.", "Key")
     
-    If API.WritePrivateProfileString(Section, Key, vbNullString, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.WritePrivateProfileString(Section, Key, vbNullString, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
     If mAutoFlush Then Call Flush
 End Sub
 
@@ -398,7 +398,7 @@ Public Sub DeleteSection(ByVal Section As String)
     If Len(Section) = 0 Then _
         Throw Cor.NewArgumentException("Section cannot be an empty string.", "Section")
     
-    If API.WritePrivateProfileString(Section, vbNullString, vbNullString, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.WritePrivateProfileString(Section, vbNullString, vbNullString, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
     If mAutoFlush Then Call Flush
 End Sub
 
@@ -420,7 +420,7 @@ Public Function GetValues(ByVal Section As String) As IDictionary
         If Not Environment.IsNT Then Size = MathExt.Min(32767, Size)
         
         Buf = String$(Size, vbNullChar)
-        Size = API.GetPrivateProfileSection(Section, Buf, Size, mFileName)
+        Size = Api.GetPrivateProfileSection(Section, Buf, Size, mFileName)
     Loop While Size = Len(Buf) - 2
     
     Dim Ret As Hashtable
@@ -524,12 +524,12 @@ Private Function GetList(ByRef Section As String, ByRef Key As String, ByVal Buf
     Do
         BufferSize = BufferSize * 2
         Buf = String$(BufferSize, vbNullChar)
-        BufferSize = API.GetPrivateProfileString(Section, Key, "", Buf, BufferSize, mFileName)
+        BufferSize = Api.GetPrivateProfileString(Section, Key, "", Buf, BufferSize, mFileName)
     Loop While BufferSize = Len(Buf) - 1
     
     Dim Ret() As String
     If BufferSize > 0 Then
-        Ret = Split(cString.TrimEnd(Left$(Buf, BufferSize - 1), vbNullChar), vbNullChar)
+        Ret = Split(CorString.TrimEnd(Left$(Buf, BufferSize - 1), vbNullChar), vbNullChar)
     Else
         Ret = Cor.NewStrings()
     End If
@@ -545,8 +545,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

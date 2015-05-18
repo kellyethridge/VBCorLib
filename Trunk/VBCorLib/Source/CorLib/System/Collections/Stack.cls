@@ -343,7 +343,7 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
 End Sub
 
 Private Function MakeItemProperty(ByVal Number As Long) As String
-    MakeItemProperty = cString.Format(ItemPropertyFormat, Number)
+    MakeItemProperty = CorString.Format(ItemPropertyFormat, Number)
 End Function
 
 
