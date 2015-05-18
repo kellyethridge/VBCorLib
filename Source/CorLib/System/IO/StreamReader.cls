@@ -260,7 +260,7 @@ Public Function ReadLine() As String
                 ' If we aren't using the builder and we found a new line separator
                 ' then we can just create the return string from the current buffer.
                 If Not UsingBuilder Then
-                    Line = cString.FromCharArray(mCharBuffer, StartIndex, mCharIndex - StartIndex)
+                    Line = CorString.FromCharArray(mCharBuffer, StartIndex, mCharIndex - StartIndex)
                     mCharIndex = mCharIndex + 1
                     Exit Do
                 Else
@@ -279,7 +279,7 @@ Public Function ReadLine() As String
     ' we can just return that line.
     If Not UsingBuilder Then
         ' or, might have been the end of Stream , so return a vbNullString.
-        ' Use either cString.IsNull or StrPtr to determine this is
+        ' Use either CorString.IsNull or StrPtr to determine this is
         ' what happened.
         If Len(Line) = 0 And mCharLength = 0 Then _
             Exit Function
@@ -330,7 +330,7 @@ Public Function ReadToEnd() As String
     ' be read from the stream. So the last of the characters have been
     ' read, so just take them and make a string.
     If mByteLength < mBufferSize Then
-        ReadToEnd = cString.FromCharArray(mCharBuffer, mCharIndex, mCharLength - mCharIndex)
+        ReadToEnd = CorString.FromCharArray(mCharBuffer, mCharIndex, mCharLength - mCharIndex)
     Else
         ' Keep reading from the stream and placing the characters into the
         ' builder. Keep refilling the buffer until the end of the stream is reached.

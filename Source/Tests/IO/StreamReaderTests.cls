@@ -57,16 +57,16 @@ Public Sub ReadLine_WhenCalledWithEmptyStream_ReturnsNullString()
         Actual = .ReadLine
     End With
     
-    Assert.That cString.IsNull(Actual), Iz.True
+    Assert.That CorString.IsNull(Actual), Iz.True
 End Sub
 
 Public Sub ReadLine_WhenCalledWithEmptyLine_ReturnsEmptyLine()
     Dim line As String
     With Cor.NewStreamReader(CreateStream(vbCrLf))
         line = .ReadLine
-        Assert.That cString.IsNull(line), Iz.False
+        Assert.That CorString.IsNull(line), Iz.False
         Assert.That line, Iz.Empty
-        Assert.That cString.IsNull(.ReadLine), Iz.True
+        Assert.That CorString.IsNull(.ReadLine), Iz.True
     End With
 End Sub
 
@@ -74,7 +74,7 @@ Public Sub ReadLine_WhenCalledWithData_ReturnsData()
     With Cor.NewStreamReader(CreateStream("1234" & vbCrLf & "6789"))
         Assert.That .ReadLine, Iz.EqualTo("1234")
         Assert.That .ReadLine, Iz.EqualTo("6789")
-        Assert.That cString.IsNull(.ReadLine), Iz.True
+        Assert.That CorString.IsNull(.ReadLine), Iz.True
     End With
 End Sub
 

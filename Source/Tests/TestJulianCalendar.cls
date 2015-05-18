@@ -36,7 +36,7 @@ Public Sub TestAddDays()
     Set gcdt = cDateTime.MinValue
     
     For i = 1 To 2000
-        Assert.IsTrue jcdt.EqualTo(gcdt), cString.Format("JC {0} <> GC {1}", jcdt, gcdt)
+        Assert.IsTrue jcdt.EqualTo(gcdt), CorString.Format("JC {0} <> GC {1}", jcdt, gcdt)
         Set jcdt = jc.AddDays(jcdt, 1)
         Set gcdt = gcdt.AddDays(1)
     Next i

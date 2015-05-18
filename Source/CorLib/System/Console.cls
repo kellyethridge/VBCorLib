@@ -791,7 +791,7 @@ Public Property Let Title(ByVal RHS As String)
     If Len(RHS) > MaxTitleLength Then _
         Throw Cor.NewArgumentOutOfRangeException("Title", RHS, Environment.GetResourceString(ArgumentOutOfRange_ConsoleTitleTooLong))
     
-    If cString.IsNull(RHS) Then RHS = ""
+    If CorString.IsNull(RHS) Then RHS = ""
     
     If Environment.IsNT Then
         If SetConsoleTitleW(StrPtr(RHS)) = BOOL_FALSE Then IOError Err.LastDllError
@@ -1236,7 +1236,7 @@ End Function
 
 Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
     If Not CorArray.IsNull(Args) Then
-        If UBound(Args) >= 0 Then Value = cString.FormatArray(Value, Args)
+        If UBound(Args) >= 0 Then Value = CorString.FormatArray(Value, Args)
     End If
     If NewLine Then Value = Value & Out.NewLine
     Call Out.WriteValue(Value)

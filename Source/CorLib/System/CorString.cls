@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cString"
+Attribute VB_Name = "CorString"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -32,7 +32,7 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: cString
+' Module: CorString
 '
 
 ''
@@ -41,7 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks This class cannot be directly instantiated. The methods are accessed
 ' through the class name itself.
 ' <pre>
-' s = cString.Trim(s, "\")
+' s = CorString.Trim(s, "\")
 ' </pre>
 '
 Option Explicit
@@ -114,7 +114,7 @@ End Function
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
-' @include "..\Includes\cString.Format.txt"
+' @include "..\Includes\CorString.Format.txt"
 Public Function Format(ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)

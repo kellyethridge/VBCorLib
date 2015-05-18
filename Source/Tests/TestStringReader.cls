@@ -70,8 +70,8 @@ Public Sub TestReadLine()
     Set sr = NewStringReader("abc" & vbCr & vbLf & "def" & vbLf & vbCr)
     Assert.AreEqual "abc", sr.ReadLine
     Assert.AreEqual "def", sr.ReadLine
-    Assert.IsFalse cString.IsNull(sr.ReadLine)
-    Assert.IsTrue cString.IsNull(sr.ReadLine)
+    Assert.IsFalse CorString.IsNull(sr.ReadLine)
+    Assert.IsTrue CorString.IsNull(sr.ReadLine)
 End Sub
 
 Public Sub TestReadToEnd()

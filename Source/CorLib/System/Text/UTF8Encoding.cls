@@ -777,7 +777,7 @@ End Function
 
 Private Sub ByteStreamError(ByVal Index As Long)
     If Not mThrowException Then Exit Sub
-    Throw Cor.NewArgumentException(cString.Format("An invalid byte was found at index {0}.", Index), "Bytes")
+    Throw Cor.NewArgumentException(CorString.Format("An invalid byte was found at index {0}.", Index), "Bytes")
 End Sub
 
 

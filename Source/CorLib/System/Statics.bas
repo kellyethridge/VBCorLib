@@ -33,7 +33,7 @@ Option Explicit
 Public Cor                      As New Constructors
 Public Object                   As New ObjectStatic
 Public CorArray                 As New CorArray
-Public cString                  As New cString
+Public CorString                As New CorString
 Public Comparer                 As New ComparerStatic
 Public Environment              As New Environment
 Public Buffer                   As New Buffer

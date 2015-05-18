@@ -164,7 +164,7 @@ End Property
 ' <p>This property can be set in the constructor <b>NewExceptionBase</b>.
 '
 Public Property Get Message() As String
-    If cString.IsNull(mMessage) Then
+    If CorString.IsNull(mMessage) Then
         Message = Environment.GetResourceString(Exception_WasThrown, mSubclassName)
     Else
         Message = mMessage
@@ -295,7 +295,7 @@ End Function
 Public Function ToString(Optional ByRef FormattedMessage As String)
     If Len(mSubclassName) > 0 Then ToString = mSubclassName & ": "
     
-    If cString.IsNull(FormattedMessage) Then
+    If CorString.IsNull(FormattedMessage) Then
         ToString = ToString & Message
     Else
         ToString = ToString & FormattedMessage
@@ -427,7 +427,7 @@ End Sub
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
         .WriteProperty PROP_MESSAGE, mMessage
-        .WriteProperty PROP_ISNULLMESSAGE, cString.IsNull(mMessage)
+        .WriteProperty PROP_ISNULLMESSAGE, CorString.IsNull(mMessage)
         .WriteProperty PROP_HRESULT, mHResult
         .WriteProperty PROP_SOURCE, mSource
         .WriteProperty PROP_HELPLINK, mHelpLink

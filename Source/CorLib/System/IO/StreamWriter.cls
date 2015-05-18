@@ -180,7 +180,7 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
         Error.ArgumentNull "Chars", ArgumentNull_Array
         
     Dim Output As String
-    Output = cString.FromCharArray(Chars, Index, Count)
+    Output = CorString.FromCharArray(Chars, Index, Count)
     WriteValueToStream Output
     
     If mAutoFlush Then
@@ -218,7 +218,7 @@ End Sub
 Public Sub WriteCharsLine(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
     
-    WriteCore cString.FromCharArray(Chars, Index, Count)
+    WriteCore CorString.FromCharArray(Chars, Index, Count)
     WriteCore mNewLine
     
     If mAutoFlush Then
@@ -338,7 +338,7 @@ End Sub
 
 Private Sub WriteFormatToStream(ByRef Format As Variant, ByRef Args() As Variant)
     Dim Output As String
-    Output = cString.FormatArray(Convert.ToString(Format), Args)
+    Output = CorString.FormatArray(Convert.ToString(Format), Args)
     WriteCore Output
 End Sub
 

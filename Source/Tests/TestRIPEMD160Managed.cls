@@ -198,7 +198,7 @@ End Function
 Private Sub PrintBytes(ByRef Bytes() As Byte)
     Dim i As Long
     For i = LBound(Bytes) To UBound(Bytes)
-        Debug.Print cString.Format("{0:X2} ", Bytes(i));
+        Debug.Print CorString.Format("{0:X2} ", Bytes(i));
     Next i
     Debug.Print
 End Sub

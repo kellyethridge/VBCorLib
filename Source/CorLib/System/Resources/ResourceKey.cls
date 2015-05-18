@@ -181,7 +181,7 @@ End Function
 ' @return A String representation of this object.
 '
 Public Function ToString() As String
-    ToString = cString.Format("Name: {0}, Type: {1}, Language: {2}", mResourceName, mResourceType, mLanguageID)
+    ToString = CorString.Format("Name: {0}, Type: {1}, Language: {2}", mResourceName, mResourceType, mLanguageID)
 End Function
 
 
@@ -211,12 +211,12 @@ Private Sub SetStringOrInt(ByRef Source As Variant, ByRef Destination As Variant
     End Select
 End Sub
 
-Private Function EqualStringOrInt(ByRef x As Variant, ByRef y As Variant) As Boolean
-    If VarType(x) <> VarType(y) Then Exit Function
-    If VarType(x) = vbString Then
-        EqualStringOrInt = (StrComp(x, y, vbTextCompare) = 0)
+Private Function EqualStringOrInt(ByRef X As Variant, ByRef Y As Variant) As Boolean
+    If VarType(X) <> VarType(Y) Then Exit Function
+    If VarType(X) = vbString Then
+        EqualStringOrInt = (StrComp(X, Y, vbTextCompare) = 0)
     Else
-        EqualStringOrInt = (x = y)
+        EqualStringOrInt = (X = Y)
     End If
 End Function
 

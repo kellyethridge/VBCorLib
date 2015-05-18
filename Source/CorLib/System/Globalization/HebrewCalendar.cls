@@ -266,7 +266,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     d = GetDaysInMonth(Year, Month)
     
     If Day > d Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Message:=cString.Format("Day must be between 1 and {0} for month {1}.", d, Month))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Message:=CorString.Format("Day must be between 1 and {0} for month {1}.", d, Month))
     
     Dim Days As Long
     Days = GetFixedDaysFromParts(Year, ToHebrewMonth(Year, Month), Day) - 1
@@ -346,7 +346,7 @@ Private Sub VerifyMonthYear(ByVal Month As Long, ByVal Year As Long)
     End If
     
     If Month < 1 Or Month > Max Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, cString.Format("Month must be between 1 and {0} for year {1}.", Max, Year))
+        Throw Cor.NewArgumentOutOfRangeException("Month", Month, CorString.Format("Month must be between 1 and {0} for year {1}.", Max, Year))
 End Sub
 
 ' this is based on the algorithm found at "http://www.funaba.org/en/calendar.html"
@@ -356,15 +356,15 @@ Private Function GetDaysToHebrewYear(ByVal Year As Long) As Long
     Dim Hours As Long
     Dim Days As Long
     Dim TotalDays As Long
-    Dim r As Long
+    Dim R As Long
     
     ' months before the specified year.
     Months = ((Year * 235 - 234) \ 19)
     
     ' get the day and parts of a day in the remaining month.
     Days = Months \ PARTS_PER_HOUR
-    r = Months - (Days * PARTS_PER_HOUR)
-    Parts = (r * 793) + 204
+    R = Months - (Days * PARTS_PER_HOUR)
+    Parts = (R * 793) + 204
     
     ' calculate the total days
     Hours = (Months * 12) + 11 + (Days * 793) + (Parts \ PARTS_PER_HOUR)
@@ -537,8 +537,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

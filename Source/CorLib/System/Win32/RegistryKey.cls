@@ -148,7 +148,7 @@ End Property
 Public Function OpenSubKey(ByVal Name As String, Optional ByVal Writable As Boolean = False) As RegistryKey
     Call VerifyHandle
     
-    Name = cString.Trim(Name, "\")
+    Name = CorString.Trim(Name, "\")
     Call VerifyKey(Name)
     
     Dim Access As Long
@@ -207,7 +207,7 @@ Public Function CreateSubKey(ByVal SubKey As String) As RegistryKey
     Call VerifyHandle
     Call VerifyWritable
     
-    SubKey = cString.Trim(SubKey, "\")
+    SubKey = CorString.Trim(SubKey, "\")
     Call VerifyKey(SubKey)
     
     Dim Result As Long
@@ -258,7 +258,7 @@ Public Sub DeleteSubKeyTree(ByVal SubKey As String)
     Call VerifyHandle
     Call VerifyWritable
     
-    SubKey = cString.Trim(SubKey, "\")
+    SubKey = CorString.Trim(SubKey, "\")
     Call VerifyKey(SubKey)
     
     Dim rk As RegistryKey
@@ -453,7 +453,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             sz = String$(ValueSize, 0)
             Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, sz)
             If Result <> ERROR_SUCCESS Then IOError Result
-            GetValue = cString.TrimEnd(sz, vbNullChar)
+            GetValue = CorString.TrimEnd(sz, vbNullChar)
             Exit Function
             
         Case DWordKind
@@ -480,7 +480,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             MultiSZ = String$(ValueSize, 0)
             Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, MultiSZ)
             If Result <> ERROR_SUCCESS Then IOError Result
-            GetValue = Split(cString.TrimEnd(MultiSZ, vbNullChar), vbNullChar)
+            GetValue = Split(CorString.TrimEnd(MultiSZ, vbNullChar), vbNullChar)
             Exit Function
             
         Case ExpandStringKind
@@ -488,7 +488,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             ExpSZ = String$(ValueSize, 0)
             Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, ExpSZ)
             If Result <> ERROR_SUCCESS Then IOError Result
-            ExpSZ = cString.TrimEnd(ExpSZ, vbNullChar)
+            ExpSZ = CorString.TrimEnd(ExpSZ, vbNullChar)
             
             If Options <> DoNotExpandEnvironmentVariables Then
                 ExpSZ = Environment.ExpandEnvironmentVariables(ExpSZ)
@@ -644,7 +644,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Key As Long, ByVal Name As String, ByVal Writable As Boolean)
     mHKey = Key
-    mName = cString.Trim(Name, "\")
+    mName = CorString.Trim(Name, "\")
     mWritable = Writable
 End Sub
 
