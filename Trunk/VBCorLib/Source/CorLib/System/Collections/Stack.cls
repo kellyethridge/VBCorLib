@@ -50,11 +50,10 @@ Implements IEnumerable
 Implements ICollection
 Implements IVersionableCollection
 
-Private Const PROP_COUNT            As String = "Count"
-Private Const PROP_CAPACITY         As String = "Capacity"
-Private Const PROP_ITEMPREFIX       As String = "Item"
-
-Private Const DEF_CAPACITY          As Long = 16
+Private Const CountProperty         As String = "Count"
+Private Const CapacityProperty      As String = "Capacity"
+Private Const ItemPropertyFormat    As String = "Item{0}"
+Private Const DefaultCapacity       As Long = 16
 
 Private mItems()    As Variant
 Private mCount      As Long
@@ -62,9 +61,10 @@ Private mVersion    As Long
 Private mCapacity   As Long
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_InitProperties()
+    EnsureCapacity DefaultCapacity
+End Sub
+
 Friend Sub InitClone(ByRef OtherItems() As Variant, ByVal OtherCount As Long)
     mCount = OtherCount
     mItems = OtherItems
@@ -75,10 +75,6 @@ Friend Sub Init(ByRef Source As Variant)
     WriteRange Source
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   API
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Removes all values from the collection.
@@ -123,7 +119,8 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.IsNull(DstArray) Then _
         Error.ArgumentNull "DstArray", ArgumentNull_Array
     If CorArray.Rank(DstArray) <> 1 Then _
-        Error.Argument ResourceString.Rank_MultiDimNotSupported, "DstArray"
+        Error.Argument Argument_MultiDimNotSupported, "DstArray"
+    
     If Index < LBound(DstArray) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
     
@@ -188,7 +185,7 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyStack))
+        Error.InvalidOperation InvalidOperation_EmptyStack
     
     VariantCopy Peek, mItems(mCount - 1)
 End Function
@@ -200,7 +197,7 @@ End Function
 '
 Public Function Pop() As Variant
     If mCount = 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EmptyStack))
+        Error.InvalidOperation InvalidOperation_EmptyStack
     
     mCount = mCount - 1
     Helper.MoveVariant Pop, mItems(mCount)
@@ -256,7 +253,7 @@ Private Sub WriteRange(ByRef Source As Variant)
         If CorArray.IsNull(Source) Then _
             Error.ArgumentNull "Source", ArgumentNull_Array
         If CorArray.Rank(Source) <> 1 Then _
-            Error.Rank
+            Error.Argument Argument_MultiDimNotSupported, "Source"
         
         WriteArray Source
     ElseIf IsObject(Source) Then
@@ -319,35 +316,35 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_InitProperties()
-    EnsureCapacity DEF_CAPACITY
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        EnsureCapacity .ReadProperty(PROP_CAPACITY, DEF_CAPACITY)
-        mCount = .ReadProperty(PROP_COUNT, 0)
+        EnsureCapacity .ReadProperty(CapacityProperty, DefaultCapacity)
+        mCount = .ReadProperty(CountProperty, 0)
         
         Dim i As Long
         For i = 0 To mCount - 1
-            Helper.MoveVariant mItems(i), .ReadProperty(PROP_ITEMPREFIX & i, Empty)
+            Helper.MoveVariant mItems(i), .ReadProperty(MakeItemProperty(i), Empty)
         Next i
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty PROP_CAPACITY, mCapacity
-        .WriteProperty PROP_COUNT, mCount
+        .WriteProperty CapacityProperty, mCapacity
+        .WriteProperty CountProperty, mCount
         
         Dim i As Long
         For i = 0 To mCount - 1
-            .WriteProperty PROP_ITEMPREFIX & i, mItems(i)
+            .WriteProperty MakeItemProperty(i), mItems(i)
         Next i
     End With
 End Sub
+
+Private Function MakeItemProperty(ByVal Number As Long) As String
+    MakeItemProperty = cString.Format(ItemPropertyFormat, Number)
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

@@ -455,14 +455,10 @@ End Function
 
 Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
     Dim BufferPtr   As Long
-    Dim Range As ListRange
-    
     BufferPtr = CorArray.ArrayPointer(Buffer)
-    If BufferPtr = vbNullPtr Then _
-        Error.ArgumentNull "Buffer", ArgumentNull_Array
-    If SafeArrayGetDim(BufferPtr) <> 1 Then _
-        Error.Rank
+    Validation.CheckValidSingleDimArrayPtr BufferPtr, Parameter_Buffer
     
+    Dim Range As ListRange
     Range = GetOptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
     
     If Range.Index < LBound(Buffer) Then _
