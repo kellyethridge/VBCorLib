@@ -83,14 +83,13 @@ Public Sub Append_WithHugeMultipleCalls_Appends()
     Assert.That Actual, Iz.EqualTo(Space$(20000))
 End Sub
 
-Public Sub Append_WithStartIndex_AppendSubString()
+Public Sub Append_WithOnlyOneOptionalArgument_ThrowsArgumentException()
     Dim sb As New StringBuilder
     
+    On Error Resume Next
     sb.Append "123456", 3
     
-    Dim Actual As String
-    Actual = sb.ToString
-    Assert.That Actual, Iz.EqualTo("456")
+    AssertArgumentException Err, "Count"
 End Sub
 
 Public Sub Append_WithStartIndexAndCount_AppendsSubString()
@@ -107,16 +106,16 @@ Public Sub Append_WithStartIndexLessThanZero_Throws()
     Dim sb As New StringBuilder
     
     On Error Resume Next
-    sb.Append "abc", -1
+    sb.Append "abc", -1, 1
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub Append_WithCountLessThanZero_Throws()
+Public Sub Append_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     
     On Error Resume Next
-    sb.Append "abc", , -1
+    sb.Append "abc", 0, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
@@ -190,78 +189,78 @@ Public Sub Chars_WithSet_ReplacesCharacter()
     Assert.That Actual, Iz.EqualTo("1101")
 End Sub
 
-Public Sub AppendChars_WithEmptyArray_DoesNotAppend()
+Public Sub Append_WithEmptyCharArray_DoesNotAppend()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     Chars = NewIntegers()
     
-    sb.AppendChars Chars
+    sb.Append Chars
     
     Dim Actual As String
     Actual = sb.ToString
     Assert.That Actual, Iz.Empty
 End Sub
 
-Public Sub AppendChars_WithNullArray_Throws()
+Public Sub Append_WithNullCharArray_ThrowsArgumentNullException()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     
     On Error Resume Next
-    sb.AppendChars Chars
+    sb.Append Chars
     
-    AssertArgumentNullException Err, "Chars"
+    AssertArgumentNullException Err, "Value"
 End Sub
 
-Public Sub AppendChars_WithCharacters_Appends()
+Public Sub Append_WithCharacters_Appends()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     Chars = NewIntegers(49, 50, 51)
     
-    sb.AppendChars Chars
+    sb.Append Chars
     
     Dim Actual As String
     Actual = sb.ToString
     Assert.That Actual, Iz.EqualTo("123")
 End Sub
 
-Public Sub AppendChars_WithStartIndexLessThanLBound_Throws()
+Public Sub Append_WithStartIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     Chars = NewIntegers(49)
     
     On Error Resume Next
-    sb.AppendChars Chars, -1
+    sb.Append Chars, -1, 0
     
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub AppendChars_WithStartIndexAndCharCountLongerThanChars_Throws()
+Public Sub Append_WithStartIndexAndCharCountLongerThanChars_ThrowsArgumentOutOfRangeException()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     Chars = NewIntegers(49, 50, 51)
     
     On Error Resume Next
-    sb.AppendChars Chars, 0, 4
+    sb.Append Chars, 0, 4
     
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub AppendChars_WithMultiDimensionArray_Throws()
+Public Sub AppendChars_WithMultiDimensionArray_ThrowsRankException()
     Dim sb As New StringBuilder
     Dim Chars(0, 0) As Integer
     
     On Error Resume Next
-    sb.AppendChars Chars
+    sb.Append Chars
     
     AssertRankException Err
 End Sub
 
-Public Sub AppendChars_WithStartIndexAndCharCount_AppendsSubArray()
+Public Sub Append_WithStartIndexAndCharCount_AppendsSubArray()
     Dim sb As New StringBuilder
     Dim Chars() As Integer
     Chars = NewIntegers(65, 66, 67, 68, 69)
     
-    sb.AppendChars Chars, 1, 3
+    sb.Append Chars, 1, 3
     
     Dim Actual As String
     Actual = sb.ToString

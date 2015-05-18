@@ -36,17 +36,20 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Private mStringBuilders As New Stack
+Private mCache As New Stack
 
+
+Private Sub Class_Initialize()
+    mCache.Push New StringBuilder
+End Sub
 
 Friend Function Acquire() As StringBuilder
-    If mStringBuilders.Count = 0 Then
+    If mCache.Count = 0 Then
         Set Acquire = New StringBuilder
-        Exit Function
+    Else
+        Set Acquire = mCache.Pop
+        Acquire.Length = 0
     End If
-    
-    Set Acquire = mStringBuilders.Pop
-    Acquire.Length = 0
 End Function
 
 Friend Function GetStringAndRelease(ByRef Builder As StringBuilder) As String
@@ -56,19 +59,13 @@ Friend Function GetStringAndRelease(ByRef Builder As StringBuilder) As String
         GetStringAndRelease = Builder.ToString
     End If
     
-    mStringBuilders.Push Builder
+    Release Builder
 End Function
 
 Friend Sub Release(ByRef Builder As StringBuilder)
     Debug.Assert Not Builder Is Nothing
     
-    mStringBuilders.Push Builder
+    mCache.Push Builder
 End Sub
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Release New StringBuilder
-End Sub

@@ -143,7 +143,7 @@ Public Sub ReadBlock_ThroughBufferSize_ReadsData()
         Dim CharsRead As Long
         Do
             CharsRead = .ReadBlock(Chars, 0, 128)
-            Actual.AppendChars Chars, 0, CharsRead
+            Actual.Append Chars, 0, CharsRead
         Loop While CharsRead > 0
     End With
     
