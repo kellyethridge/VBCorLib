@@ -46,9 +46,6 @@ Attribute VB_Exposed = True
 ' </pre>
 '
 Option Explicit
-Private Const ALPHA_OFFSET  As Long = 55
-
-Private mBuffer As WordBuffer
 
 
 ''
@@ -323,45 +320,52 @@ End Function
 ' become '01-EF-CD-AB'.
 '
 Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
-    If CorArray.IsNull(Value) Then _
-        Throw Cor.NewArgumentNullException("Value", Environment.GetResourceString(ArgumentNull_Array))
+    Const ALPHA_OFFSET As Long = 55
+
+    If SAPtr(Value) = vbNullPtr Then _
+        Error.ArgumentNull "Value", ArgumentNull_Array
     
-    Dim ElemIndex As Long
-    ElemIndex = GetOptionalLong(StartIndex, LBound(Value))
+    Dim Range As ListRange
+    Range = GetOptionalStepRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
     
-    Dim ElemCount As Long
-    ElemCount = GetOptionalLong(Count, UBound(Value) - ElemIndex + 1)
-    
-    ValidateArrayArguments Value, ElemIndex, ElemCount
+    ValidateArrayArguments Value, Range.Index, Range.Count
     
     Dim Ret As String
-    Ret = SysAllocStringLen(0, ElemCount * 3 - 1)
-    mBuffer.SA.pvData = StrPtr(Ret)
+    Ret = SysAllocStringLen(0, Range.Count * 3 - 1)
+    
+    Dim Chars() As Integer
+    Chars = AllocChars(Ret)
     
     Dim i       As Long
     Dim b       As Long
-    Dim pos     As Long
-    Dim nibble  As Long
+    Dim Pos     As Long
+    Dim Nibble  As Long
     Dim Offset  As Long
     
     Offset = 1
-    Do While i < ElemCount
-        If i > 0 Then mBuffer.Data(pos) = vbMinusChar: pos = pos + 1
-        b = Value(ElemIndex + i)
+    Do While i < Range.Count
+        If i > 0 Then
+            Chars(Pos) = vbMinusChar
+            Pos = Pos + 1
+        End If
+        
+        b = Value(Range.Index + i)
         Do
-            nibble = b And &HF
-            If nibble > 9 Then
-                mBuffer.Data(pos + Offset) = nibble + ALPHA_OFFSET
+            Nibble = b And &HF
+            If Nibble > 9 Then
+                Chars(Pos + Offset) = Nibble + ALPHA_OFFSET
             Else
-                mBuffer.Data(pos + Offset) = nibble + vbZeroChar
+                Chars(Pos + Offset) = Nibble + vbZeroChar
             End If
             b = (b And &HF0&) \ &H10&
             Offset = 1 - Offset
         Loop While Offset = 0
-        pos = pos + 2
+        
+        Pos = Pos + 2
         i = i + 1
     Loop
     
+    FreeChars Chars
     ToString = Ret
 End Function
 
@@ -370,19 +374,14 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ValidateArrayArguments(ByRef Value() As Byte, ByVal StartIndex As Long, ByVal Count As Long)
-    If IsNullByteArray(Value) Then _
-        Throw Cor.NewArgumentNullException("Value")
-    If StartIndex < LBound(Value) Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_ArrayLB))
-    If StartIndex > UBound(Value) - Count + 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    InitWordBuffer mBuffer, 0, &H7FFFFFFF
+    If SAPtr(Value) = vbNullPtr Then
+        Error.ArgumentNull "Value", ArgumentNull_Array
+    End If
+    If StartIndex < LBound(Value) Then
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayLB
+    End If
+    If StartIndex > UBound(Value) - Count + 1 Then
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+    End If
 End Sub
 
