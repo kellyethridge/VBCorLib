@@ -123,7 +123,7 @@ End Sub
 ' <p>This is recommended when a large number of items are deleted.</p>
 '
 Public Sub Clean()
-    Call ReinsertItems
+    ReinsertItems
     mVersion = mVersion + 1
 End Sub
 
@@ -134,7 +134,7 @@ End Sub
 '
 Public Function Clone() As Hashtable
     Set Clone = New Hashtable
-    Call Clone.CloneHelper(mBuckets, mCount, mLoadThreshold, mProvider, mComparer)
+    Clone.CloneHelper mBuckets, mCount, mLoadThreshold, mProvider, mComparer
 End Function
 
 ''
@@ -202,7 +202,7 @@ End Function
 ' elements. Each DictionaryEntry contains a key and value from the table.
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Call InternalCopyTo(DstArray, Index, detEntries)
+    InternalCopyTo DstArray, Index, detEntries
 End Sub
 
 ''
@@ -233,7 +233,7 @@ End Function
 '
 Public Function GetEnumerator() As Object
     Dim Ret As New HashtableEnumerator
-    Call Ret.Init(Me, SAPtr(mBuckets), detEntries)
+    Ret.Init Me, SAPtr(mBuckets), detEntries
     Set GetEnumerator = Ret
 End Function
 
@@ -284,7 +284,9 @@ Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     Dim i As Long
     i = GetKeyIndex(Key)
-    If i >= 0 Then Call VariantCopy(Item, mBuckets(i).Value)
+    If i >= 0 Then
+        VariantCopy Item, mBuckets(i).Value
+    End If
 End Property
 
 ''
@@ -304,7 +306,7 @@ End Property
 ' interface and override the GetHashCode function.</p>
 '
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
-    Call InsertItem(Key, Value, False, False)
+    InsertItem Key, Value, False, False
 End Property
 
 ''
@@ -324,7 +326,7 @@ End Property
 ' interface and override the GetHashCode function.</p>
 '
 Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
-    Call InsertItem(Key, Value, False, False)
+    InsertItem Key, Value, False, False
 End Property
 
 ''
@@ -334,7 +336,7 @@ End Property
 '
 Public Property Get Keys() As ICollection
     Dim Ret As New HTKeyCollection
-    Call Ret.Init(Me)
+    Ret.Init Me
     Set Keys = Ret
 End Property
 
@@ -395,7 +397,7 @@ End Function
 '
 Public Property Get Values() As ICollection
     Dim Ret As New HTValueCollection
-    Call Ret.Init(Me)
+    Ret.Init Me
     Set Values = Ret
 End Property
 
@@ -413,22 +415,22 @@ Friend Sub CloneHelper(ByRef buckets() As Bucket, ByVal Count As Long, LoadThres
 End Sub
 
 Friend Sub CopyKeys(ByRef DstArray As Variant, ByVal Index As Long)
-    Call InternalCopyTo(DstArray, Index, detKeys)
+    InternalCopyTo DstArray, Index, detKeys
 End Sub
 
 Friend Sub CopyValues(ByRef DstArray As Variant, ByVal Index As Long)
-    Call InternalCopyTo(DstArray, Index, detValues)
+    InternalCopyTo DstArray, Index, detValues
 End Sub
 
 Friend Function GetKeyEnumerator() As IEnumerator
     Dim Ret As New HashtableEnumerator
-    Call Ret.Init(Me, SAPtr(mBuckets), detKeys)
+    Ret.Init Me, SAPtr(mBuckets), detKeys
     Set GetKeyEnumerator = Ret
 End Function
 
 Friend Function GetValueEnumerator() As IEnumerator
     Dim Ret As New HashtableEnumerator
-    Call Ret.Init(Me, SAPtr(mBuckets), detValues)
+    Ret.Init Me, SAPtr(mBuckets), detValues
     Set GetValueEnumerator = Ret
 End Function
 
@@ -442,12 +444,12 @@ End Sub
 
 Friend Sub InitDictionary(ByVal dic As IDictionary, ByVal hcp As IHashcodeProvider, ByVal Comparer As IComparer)
     If dic Is Nothing Then
-        Call InitCapacity(DEF_CAPACITY, hcp, Comparer)
+        InitCapacity DEF_CAPACITY, hcp, Comparer
     Else
-        Call InitCapacity(dic.Count, hcp, Comparer)
+        InitCapacity dic.Count, hcp, Comparer
         Dim Entry As DictionaryEntry
         For Each Entry In dic
-            Call InsertItem(Entry.Key, Entry.Value, True, True)
+            InsertItem Entry.Key, Entry.Value, True, True
         Next Entry
     End If
 End Sub
@@ -463,20 +465,20 @@ End Property
 Private Sub ExpandTable()
     mCapacity = GetPrime(mCapacity * 2)
     mLoadThreshold = mCapacity * LOAD_FACTOR
-    Call ReinsertItems
+    ReinsertItems
 End Sub
 
 Private Sub ReinsertItems()
     Dim OldBuckets() As Bucket
     ReDim OldBuckets(0 To mCapacity - 1)
-    Call Helper.Swap4(ByVal ArrPtr(OldBuckets), ByVal ArrPtr(mBuckets))
+    Helper.Swap4 ByVal ArrPtr(OldBuckets), ByVal ArrPtr(mBuckets)
     
     mCount = 0
     
     Dim i As Long
     For i = 0 To UBound(OldBuckets)
         If OldBuckets(i).State = bsOccupied Then
-            Call InsertItem(OldBuckets(i).Key, OldBuckets(i).Value, True, True)
+            InsertItem OldBuckets(i).Key, OldBuckets(i).Value, True, True
         End If
     Next i
 End Sub
@@ -560,8 +562,8 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                                 Throw Cor.NewArgumentException("An element with the same key already exists in the collection.", "key")
                             
                             ' v2.0 - we copy the key so the same updated key stays with the updated value.
-                            Call VariantCopyInd(mBuckets(Index).Key, Key)
-                            Call VariantCopyInd(mBuckets(Index).Value, Value)
+                            VariantCopyInd mBuckets(Index).Key, Key
+                            VariantCopyInd mBuckets(Index).Value, Value
                             mVersion = mVersion + 1
                             Exit Sub
                         End If
@@ -570,8 +572,8 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                             Throw Cor.NewArgumentException("An element with the same key already exists in the collection.", "key")
                         
                         ' v2.0 - we copy the key so the same updated key stays with the updated value.
-                        Call VariantCopyInd(mBuckets(Index).Key, Key)
-                        Call VariantCopyInd(mBuckets(Index).Value, Value)
+                        VariantCopyInd mBuckets(Index).Key, Key
+                        VariantCopyInd mBuckets(Index).Value, Value
                         mVersion = mVersion + 1
                         Exit Sub
                     End If
@@ -600,11 +602,11 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
         
     With mBuckets(FirstEmpty)
         If Steal Then
-            Call Helper.MoveVariant(.Key, Key)
-            Call Helper.MoveVariant(.Value, Value)
+            Helper.MoveVariant .Key, Key
+            Helper.MoveVariant .Value, Value
         Else
-            Call VariantCopyInd(.Key, Key)
-            Call VariantCopyInd(.Value, Value)
+            VariantCopyInd .Key, Key
+            VariantCopyInd .Value, Value
         End If
         .State = bsOccupied
         .hashcode = hashcode
@@ -616,7 +618,9 @@ End Sub
 Private Sub InternalCopyTo(ByRef DstArray As Variant, ByVal Index As Long, ByVal CopyType As IDictionaryEnumType)
     Dim Result As Long
     Result = VerifyArrayRange(CorArray.ArrayPointer(DstArray), Index, mCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "DstArray", Index, "Index", mCount, "Index")
+    If Result <> NO_ERROR Then
+        ThrowArrayRangeException Result, "DstArray", Index, "Index", mCount, "Index"
+    End If
     
     Dim i As Long
     Dim j As Long
@@ -649,11 +653,11 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call InitWordBuffer(mStringHashChars, 0, 0)
+    InitWordBuffer mStringHashChars, 0, 0
 End Sub
 
 Private Sub Class_InitProperties()
-    Call InitCapacity(DEF_CAPACITY, Nothing, Nothing)
+    InitCapacity DEF_CAPACITY, Nothing, Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
@@ -667,7 +671,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
         
         Dim Count As Long
         Count = .ReadProperty(PROP_COUNT)
-        Call InitCapacity(Count, .ReadProperty(PROP_PROVIDER, Nothing), Comparer)
+        InitCapacity Count, .ReadProperty(PROP_PROVIDER, Nothing), Comparer
         
         Dim i As Long
         For i = 1 To Count
@@ -678,11 +682,11 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
             ' with each value to determine the correct value.
             Select Case .ReadProperty("ValueSubType" & i, SUBTYPE_NORMAL)
                 Case SUBTYPE_NORMAL
-                    Call Add(.ReadProperty(PROP_KEY & i, Nothing), .ReadProperty(PROP_VALUE & i))
+                    Add .ReadProperty(PROP_KEY & i, Nothing), .ReadProperty(PROP_VALUE & i)
                 Case SUBTYPE_EMPTY
-                    Call Add(.ReadProperty(PROP_KEY & i, Nothing), Empty)
+                    Add .ReadProperty(PROP_KEY & i, Nothing), Empty
                 Case SUBTYPE_NOTHING
-                    Call Add(.ReadProperty(PROP_KEY & i, Nothing), Nothing)
+                    Add .ReadProperty(PROP_KEY & i, Nothing), Nothing
             End Select
         Next i
     End With
@@ -691,23 +695,23 @@ End Sub
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
         ' Simply save the number of elements are in this Hashtable.
-        Call .WriteProperty(PROP_COUNT, mCount)
+        .WriteProperty PROP_COUNT, mCount
         
         ' The provider will either be Nothing or a user-supplied
         ' provider. If so, we hope it is persitable or an exception
         ' will be thrown.
-        Call .WriteProperty(PROP_PROVIDER, mProvider)
+        .WriteProperty PROP_PROVIDER, mProvider
         
         ' We don't want to create a duplicate of the default comparer object,
         ' so we will just set a flag that says to use the default comparer
         ' object when the Hashtable is deserialized.
         If mComparer Is Comparer.Default Then
-            Call .WriteProperty(PROP_USEDEFAULTCOMPARER, True)
+            .WriteProperty PROP_USEDEFAULTCOMPARER, True
         Else
             ' Either we aren't using a comparer at all or we are
             ' using a user-supplied comparer. If so, we hope it
             ' is persistable, or an exception will be thrown.
-            Call .WriteProperty(PROP_COMPARER, mComparer)
+            .WriteProperty PROP_COMPARER, mComparer
         End If
         
         ' Iterate through the buckets in this hashtable. If the bucket
@@ -720,7 +724,7 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
             With mBuckets(i)
                 If .State = bsOccupied Then
                     Count = Count + 1
-                    Call PropBag.WriteProperty(PROP_KEY & Count, .Key)
+                    PropBag.WriteProperty PROP_KEY & Count, .Key
                     
                     ' When persisting data within a Class_WriteProperties event, it seems that
                     ' object values of Nothing and variant values of Empty do not get persisted
@@ -729,17 +733,17 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
                     ' with each value to determine the correct value.
                     Select Case VarType(.Value)
                         Case vbEmpty
-                            Call PropBag.WriteProperty(PROP_VALUESUBTYPE & Count, SUBTYPE_EMPTY)
+                            PropBag.WriteProperty PROP_VALUESUBTYPE & Count, SUBTYPE_EMPTY
                         
                         Case vbObject
                             If .Value Is Nothing Then
-                                Call PropBag.WriteProperty(PROP_VALUESUBTYPE & Count, SUBTYPE_NOTHING)
+                                PropBag.WriteProperty PROP_VALUESUBTYPE & Count, SUBTYPE_NOTHING
                             Else
-                                Call PropBag.WriteProperty(PROP_VALUE & Count, .Value)
+                                PropBag.WriteProperty PROP_VALUE & Count, .Value
                             End If
                         
                         Case Else
-                            Call PropBag.WriteProperty(PROP_VALUE & Count, .Value)
+                            PropBag.WriteProperty PROP_VALUE & Count, .Value
                     
                     End Select
                 End If
@@ -777,7 +781,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
@@ -797,11 +801,11 @@ End Function
 '   IDictionary Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IDictionary_Add(Key As Variant, Value As Variant)
-    Call Add(Key, Value)
+    Add Key, Value
 End Sub
 
 Private Sub IDictionary_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function IDictionary_Contains(Key As Variant) As Boolean
@@ -809,7 +813,7 @@ Private Function IDictionary_Contains(Key As Variant) As Boolean
 End Function
 
 Private Sub IDictionary_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get IDictionary_Count() As Long
@@ -837,7 +841,7 @@ Private Property Let IDictionary_Item(Key As Variant, RHS As Variant)
 End Property
 
 Private Property Get IDictionary_Item(Key As Variant) As Variant
-    Call Helper.MoveVariant(IDictionary_Item, Item(Key))
+    Helper.MoveVariant IDictionary_Item, Item(Key)
 End Property
 
 Private Property Get IDictionary_Keys() As ICollection
@@ -849,7 +853,7 @@ Private Function IDictionary_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub IDictionary_Remove(Key As Variant)
-    Call Remove(Key)
+    Remove Key
 End Sub
 
 Private Property Get IDictionary_Values() As ICollection

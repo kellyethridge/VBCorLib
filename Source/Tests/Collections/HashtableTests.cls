@@ -16,11 +16,28 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ICategorizable
-
-Private t As Hashtable
+Implements ITestCaseSource
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Collections"
+End Sub
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "Add_WithItemAndKey_AddsToTable"
+            Test.Use 1, 1
+            Test.Use "a", 1
+            Test.Use "a", "A"
+        
+        Case "ContainsKey_WhenCalled_ReturnsExpected"
+            Test.Use 1, 1, True
+            Test.Use 1, 2, False
+            Test.Use CLng(1), CInt(1), False
+            Test.Use "1", 1, False
+            Test.Use "1", "1", True
+            Test.Use 1, "1", False
+            
+    End Select
 End Sub
 
 Public Sub Count_WithEmptyHashtable_ReturnsZero()
@@ -32,13 +49,13 @@ Public Sub Count_WithEmptyHashtable_ReturnsZero()
     Assert.That Actual, Iz.EqualTo(0)
 End Sub
 
-Public Sub Add_WithItemAndKey_AddsToTable()
+Public Sub Add_WithItemAndKey_AddsToTable(ByRef Key As Variant, ByRef Value As Variant)
     Dim Table As New Hashtable
     
-    Table.Add "a", "a"
+    Table.Add Key, Value
     
     Assert.That Table.Count, Iz.EqualTo(1)
-    Assert.That Table("a"), Iz.EqualTo("a")
+    Assert.That Table(Key), Iz.EqualTo(Value)
 End Sub
 
 Public Sub Add_WithManyItems_AddsManyItems()
@@ -52,165 +69,105 @@ Public Sub Add_WithManyItems_AddsManyItems()
     Assert.That Table.Count, Iz.EqualTo(1000)
 End Sub
 
-'Public Sub TestContentsAfterAddingTwo()
-'    t.Add 1, 1
-'    t.Add 2, 2
-'    Assert.AreEqual 1, t(1)
-'    Assert.AreEqual 2, t(2)
-'End Sub
-'
-'Public Sub Test1000Items()
-'    Add1000Strings
-'
-'    Dim i As Long
-'    For i = 1 To 1000
-'        Assert.AreEqual "Value " & i, t("Key " & i)
-'    Next i
-'End Sub
-'
-'Public Sub TestChangeExisting()
-'    t.Add "Key", "first"
-'    Assert.AreEqual "first", t("Key")
-'    t("Key") = "second"
-'    Assert.AreEqual "second", t("Key")
-'End Sub
-'
-'Public Sub TestSetsNew()
-'    Assert.IsVBEmpty t("Key")
-'    t("Key") = "first"
-'    Assert.AreEqual "first", t("Key")
-'End Sub
-'
-'Public Sub TestContainsKey()
-'    Assert.IsFalse t.ContainsKey("Key")
-'    t("Key") = "first"
-'    Assert.IsTrue t.ContainsKey("Key")
-'End Sub
-'
-'Public Sub TestRemove()
-'    Add1000Longs
-'
-'    Dim i As Long
-'    For i = 20 To 60
-'        t.Remove i
-'    Next i
-'
-'    For i = 1 To 1000
-'        If i >= 20 And i <= 60 Then
-'            Assert.IsVBEmpty t(i)
-'        Else
-'            Assert.AreEqual i, t(i)
-'        End If
-'    Next i
-'End Sub
-'
-'Public Sub TestContainsValue()
-'    Add1000Strings
-'
-'    Dim i As Long
-'    Dim sw As StopWatch
-'    Set sw = New StopWatch
-'    sw.Reset
-'    For i = 1 To 1000
-'        Assert.IsTrue t.ContainsValue("Value " & i)
-'    Next i
-'    Assert.IsFalse t.ContainsValue("Not here.")
-'End Sub
-'
-'Public Sub TestClone()
-'    Add1000Strings
-'
-'    Dim i As Long
-'    Dim t2 As Hashtable
-'    Set t2 = t.Clone
-'    For i = 1 To 1000
-'        Assert.AreEqual "Value " & i, t2("Key " & i)
-'    Next i
-'End Sub
-'
-'Public Sub TestEnumerator()
-'    Add1000Longs
-'    Dim de As DictionaryEntry
-'    Dim Col As New Collection
-'    For Each de In t.GetEnumerator
-'        Col.Add de.Value, CStr(de.Key)
-'    Next de
-'    Assert.AreEqual 1000, Col.Count
-'End Sub
-'
-'Public Sub TestKeysCollection()
-'    Add1000Longs
-'    Assert.AreEqual 1000, t.Keys.Count
-'    Dim v As Variant
-'    Dim Col As New Collection
-'    For Each v In t.Keys
-'        Col.Add v, CStr(v)
-'    Next v
-'    Assert.AreEqual 1000, Col.Count
-'End Sub
-'
-'Public Sub TestValuesCollection()
-'    Add1000Longs
-'    Assert.AreEqual 1000, t.Values.Count
-'    Dim v As Variant
-'    Dim Col As New Collection
-'    For Each v In t.Values
-'        Col.Add v, CStr(v)
-'    Next v
-'    Assert.AreEqual 1000, Col.Count
-'End Sub
-'
-'Public Sub TestClear()
-'    Add1000Longs
-'    t.Clear
-'    Assert.AreEqual 0, t.Count, "Count should return 0."
-'End Sub
-'
-'Public Sub TestSerialization()
-'    Dim h1 As New Hashtable
-'    h1.Add "name", "kelly"
-'    h1.Add "age", 22
-'
-'    Dim h2 As Hashtable
-'    Dim p1 As New PropertyBag
-'    Dim p2 As New PropertyBag
-'
-'    p1.WriteProperty "h", h1
-'    p2.Contents = p1.Contents
-'    Set h2 = p2.ReadProperty("h", Nothing)
-'    Assert.IsNotNothing h2
-'    Assert.AreEqual h1.Count, h2.Count
-'    Assert.AreEqual h1("name"), h2("name")
-'    Assert.AreEqual h1("age"), h2("age")
-'End Sub
-'
-'Public Sub TestPersistValueOfNothingAndEmpty()
-'    Dim h1 As New Hashtable
-'    h1.Add "object", Nothing
-'    h1.Add "variant", Empty
-'
-'    Dim h2 As Hashtable
-'    Dim p1 As New PropertyBag
-'    p1.WriteProperty "ht", h1
-'
-'    Set h2 = p1.ReadProperty("ht")
-'
-'    Assert.IsNothing h2("object")
-'    Assert.IsVBEmpty h2("variant")
-'
-'End Sub
-'
-'
-'
-'Private Sub Add1000Longs()
-'    Dim i As Long
-'    For i = 1 To 1000
-'        t.Add i, i
-'    Next i
-'End Sub
-'Private Sub Add1000Strings()
-'    Dim i As Long
-'    For i = 1 To 1000
-'        t.Add "Key " & i, "Value " & i
-'    Next i
-'End Sub
+Public Sub ContainsKey_WhenCalled_ReturnsExpected(ByRef Key As Variant, ByRef SearchKey As Variant, ByVal Expected As Boolean)
+    Dim Table As New Hashtable
+    Table.Add Key, Key
+    
+    Dim Actual As Boolean
+    Actual = Table.ContainsKey(SearchKey)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Item_WithNonExistingKey_AddsToTable()
+    Dim Table As New Hashtable
+    
+    Table("abc") = 123
+    
+    Assert.That Table.ContainsKey("abc"), Iz.True
+    Assert.That Table("abc"), Iz.EqualTo(123)
+End Sub
+
+Public Sub Item_WithExistingKey_ReplacesValue()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Table("abc") = 456
+    
+    Assert.That Table.ContainsKey("abc"), Iz.True
+    Assert.That Table("abc"), Iz.EqualTo(456)
+End Sub
+
+Public Sub Remove_WithExistingKey_RemovesItem()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Table.Remove "abc"
+    
+    Assert.That Table.ContainsKey("abc"), Iz.False
+    Assert.That Table.Count, Iz.EqualTo(0)
+End Sub
+
+Public Sub Remove_WithNonExistingKey_DoesNothing()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Table.Remove "def"
+    
+    Assert.That Table.ContainsKey("abc"), Iz.True
+End Sub
+
+Public Sub ContainsValue_WithNonExistingValue_ReturnsFalse()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Dim Actual As Boolean
+    Actual = Table.ContainsValue(456)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub ContainsValue_WithExistingValue_ReturnsTrue()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Dim Actual As Boolean
+    Actual = Table.ContainsValue(123)
+    
+    Assert.That Actual, Iz.True
+End Sub
+
+Public Sub Clone_WhenCalled_ReturnsCloneOfTable()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Dim Clone As Hashtable
+    Set Clone = Table.Clone
+    
+    Assert.That Clone("abc"), Iz.EqualTo(123)
+End Sub
+
+Public Sub Clear_WhenCalled_RemovesAllItems()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Table.Clear
+    
+    Assert.That Table.Count, Iz.EqualTo(0)
+End Sub
+
+Public Sub Serialization_WhenCalled_SerializesInstance()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    Table.Add "Nothing", Nothing
+    Table.Add "Empty", Empty
+    
+    Dim Deserialized As Hashtable
+    Set Deserialized = Persist(Table)
+    
+    Assert.That Deserialized.ContainsKey("abc"), Iz.True
+    Assert.That Deserialized("abc"), Iz.EqualTo(123)
+    Assert.That Deserialized("Nothing"), Iz.Nothing
+    Assert.That Deserialized("Empty"), Iz.vbEmpty
+End Sub
+
