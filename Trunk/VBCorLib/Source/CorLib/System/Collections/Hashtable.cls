@@ -94,7 +94,7 @@ Private mStringHashChars As WordBuffer
 ' interface and override the GetHashCode function.
 '
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
-    Call InsertItem(Key, Value, True, False)
+    InsertItem Key, Value, True, False
 End Sub
 
 ''
@@ -134,7 +134,7 @@ End Sub
 '
 Public Function Clone() As Hashtable
     Set Clone = New Hashtable
-    Clone.CloneHelper mBuckets, mCount, mLoadThreshold, mProvider, mComparer
+    Clone.InitClone mBuckets, mCount, mLoadThreshold, mProvider, mComparer
 End Function
 
 ''
@@ -184,25 +184,42 @@ Public Function ContainsValue(ByRef Value As Variant) As Boolean
     Dim i As Long
     
     For i = 0 To mCapacity - 1
-        If mBuckets(i).State = bsOccupied Then
-            If EqualVariants(mBuckets(i).Value, Value) Then
-                ContainsValue = True
-                Exit Function
+        With mBuckets(i)
+            If .State = bsOccupied Then
+                If EqualVariants(.Value, Value) Then
+                    ContainsValue = True
+                    Exit Function
+                End If
             End If
-        End If
+        End With
     Next i
 End Function
 
 ''
 ' Copies the contents of the table to an array.
 '
-' @param dstArray The array to copy the contents to.
-' @param index The starting index in dstArray to begin copying to.
+' @param Arr The array to copy the contents to.
+' @param Index The starting index in dstArray to begin copying to.
 ' @remarks The elements that are copied to the array are DictionaryEntry
 ' elements. Each DictionaryEntry contains a key and value from the table.
 '
-Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    InternalCopyTo DstArray, Index, detEntries
+Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
+    Validation.CheckValidSingleDimArray Arr
+    
+    If ArrayIndex < LBound(Arr) Then _
+        Error.ArgumentOutOfRange "ArrayIndex", ArgumentOutOfRange_LBound
+    If ArrayIndex + mCount > CorArray.LengthFirstDim(Arr) Then _
+        Error.Argument Argument_ArrayPlusOffTooSmall
+    
+    Dim i As Long
+    For i = 0 To UBound(mBuckets)
+        With mBuckets(i)
+            If .State = bsOccupied Then
+                Set Arr(ArrayIndex) = Cor.NewDictionaryEntry(.Key, .Value)
+                ArrayIndex = ArrayIndex + 1
+            End If
+        End With
+    Next
 End Sub
 
 ''
@@ -361,7 +378,7 @@ Public Sub Remove(ByRef Key As Variant)
     i = GetKeyIndex(Key)
     If i >= 0 Then
         With mBuckets(i)
-            .hashcode = 0
+            .HashCode = 0
             .Key = Empty
             .State = bsDeleted
             .Value = Empty
@@ -401,19 +418,6 @@ Public Property Get Values() As ICollection
     Set Values = Ret
 End Property
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub CloneHelper(ByRef buckets() As Bucket, ByVal Count As Long, LoadThreshold As Long, ByVal Provider As IHashcodeProvider, ByVal Comparer As IComparer)
-    mCount = Count
-    mBuckets = buckets
-    mCapacity = UBound(buckets) + 1
-    mLoadThreshold = LoadThreshold
-    Set mProvider = Provider
-    Set mComparer = Comparer
-End Sub
-
 Friend Sub CopyKeys(ByRef DstArray As Variant, ByVal Index As Long)
     InternalCopyTo DstArray, Index, detKeys
 End Sub
@@ -434,6 +438,22 @@ Friend Function GetValueEnumerator() As IEnumerator
     Set GetValueEnumerator = Ret
 End Function
 
+Friend Property Get Version() As Long
+    Version = mVersion
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitWordBuffer mStringHashChars, 0, 0
+End Sub
+
+Private Sub Class_InitProperties()
+    InitCapacity DEF_CAPACITY, Nothing, Nothing
+End Sub
+
 Friend Sub InitCapacity(ByVal Capacity As Long, ByVal hcp As IHashcodeProvider, ByVal Comparer As IComparer)
     mCapacity = GetPrime(Capacity)
     mLoadThreshold = mCapacity * LOAD_FACTOR
@@ -442,25 +462,30 @@ Friend Sub InitCapacity(ByVal Capacity As Long, ByVal hcp As IHashcodeProvider, 
     Set mComparer = Comparer
 End Sub
 
-Friend Sub InitDictionary(ByVal dic As IDictionary, ByVal hcp As IHashcodeProvider, ByVal Comparer As IComparer)
-    If dic Is Nothing Then
+Friend Sub InitDictionary(ByVal d As IDictionary, ByVal hcp As IHashcodeProvider, ByVal Comparer As IComparer)
+    If d Is Nothing Then
         InitCapacity DEF_CAPACITY, hcp, Comparer
     Else
-        InitCapacity dic.Count, hcp, Comparer
+        InitCapacity d.Count, hcp, Comparer
         Dim Entry As DictionaryEntry
-        For Each Entry In dic
+        For Each Entry In d
             InsertItem Entry.Key, Entry.Value, True, True
         Next Entry
     End If
 End Sub
 
-Friend Property Get Version() As Long
-    Version = mVersion
-End Property
+Friend Sub InitClone(ByRef Buckets() As Bucket, ByVal Count As Long, ByVal LoadThreshold As Long, ByVal Provider As IHashcodeProvider, ByVal Comparer As IComparer)
+    mCount = Count
+    mBuckets = Buckets
+    mCapacity = UBound(Buckets) + 1
+    mLoadThreshold = LoadThreshold
+    Set mProvider = Provider
+    Set mComparer = Comparer
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ExpandTable()
     mCapacity = GetPrime(mCapacity * 2)
@@ -486,11 +511,11 @@ End Sub
 Private Function GetKeyIndex(ByRef Key As Variant) As Long
     Dim Step                As Long
     Dim Index               As Long
-    Dim hashcode            As Long
+    Dim HashCode            As Long
     Dim FirstIndex          As Long
     Dim ComparerIsNothing   As Boolean
     
-    hashcode = InitHashCode(Key, Step, Index)
+    HashCode = InitHashCode(Key, Step, Index)
     FirstIndex = Index
     ComparerIsNothing = mComparer Is Nothing
     
@@ -500,7 +525,7 @@ Private Function GetKeyIndex(ByRef Key As Variant) As Long
                 GetKeyIndex = -1
                 Exit Function
             Case bsOccupied
-                If mBuckets(Index).hashcode = hashcode Then
+                If mBuckets(Index).HashCode = HashCode Then
                     If ComparerIsNothing Then
                         If EqualVariants(Key, mBuckets(Index).Key) Then
                             GetKeyIndex = Index
@@ -532,13 +557,15 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
     Dim Step                As Long
     Dim Index               As Long
     Dim FirstEmpty          As Long
-    Dim hashcode            As Long
+    Dim HashCode            As Long
     Dim UseDefaultCompare   As Boolean
     Dim FirstIndex          As Long
     
-    If mCount > mLoadThreshold Then Call ExpandTable
+    If mCount > mLoadThreshold Then
+        ExpandTable
+    End If
     
-    hashcode = InitHashCode(Key, Step, Index)
+    HashCode = InitHashCode(Key, Step, Index)
     FirstIndex = Index
     FirstEmpty = -1
     UseDefaultCompare = mComparer Is Nothing
@@ -555,7 +582,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                 Exit Do
                 
             Case bsOccupied
-                If mBuckets(Index).hashcode = hashcode Then
+                If mBuckets(Index).HashCode = HashCode Then
                     If UseDefaultCompare Then
                         If EqualVariants(Key, mBuckets(Index).Key) Then
                             If Adding Then _
@@ -609,7 +636,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
             VariantCopyInd .Value, Value
         End If
         .State = bsOccupied
-        .hashcode = hashcode
+        .HashCode = HashCode
     End With
     mCount = mCount + 1
     mVersion = mVersion + 1
@@ -650,16 +677,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    InitWordBuffer mStringHashChars, 0, 0
-End Sub
-
-Private Sub Class_InitProperties()
-    InitCapacity DEF_CAPACITY, Nothing, Nothing
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
         Dim Comparer As Object

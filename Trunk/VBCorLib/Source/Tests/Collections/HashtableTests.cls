@@ -171,3 +171,35 @@ Public Sub Serialization_WhenCalled_SerializesInstance()
     Assert.That Deserialized("Empty"), Iz.vbEmpty
 End Sub
 
+Public Sub CopyTo_WhenCalled_CopiesEntriesToArray()
+    Dim Table As New Hashtable
+    Table.Add "a", 1
+    Table.Add "b", 2
+    Dim Target(0 To 1) As Variant
+    
+    Table.CopyTo Target, 0
+    
+    Assert.That Target(0).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
+    Assert.That Target(1).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
+    Assert.That Target(0).Key, Iz.Not.EqualTo(Target(1).Key)
+    Assert.That Target(0).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
+    Assert.That Target(1).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
+    Assert.That Target(0).Value, Iz.Not.EqualTo(Target(1).Value)
+End Sub
+
+Public Sub CopyTo_WithIndex_CopiesEntriesToArrayOffset()
+    Dim Table As New Hashtable
+    Table.Add "a", 1
+    Table.Add "b", 2
+    Dim Target(0 To 2) As Variant
+    
+    Table.CopyTo Target, 1
+    
+    Assert.That Target(0), Iz.vbEmpty
+    Assert.That Target(1).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
+    Assert.That Target(2).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
+    Assert.That Target(1).Key, Iz.Not.EqualTo(Target(2).Key)
+    Assert.That Target(1).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
+    Assert.That Target(2).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
+    Assert.That Target(1).Value, Iz.Not.EqualTo(Target(2).Value)
+End Sub
