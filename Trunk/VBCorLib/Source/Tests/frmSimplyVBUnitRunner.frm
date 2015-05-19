@@ -168,8 +168,7 @@ Private Sub AddSystemCollections()
             New StackEnumeratorTests)
         
         .Add NewSuite("HashTable", _
-            New TestHashTable, _
-            New TestHashTableHCP, _
+            New HashtableTests, _
             New TestDictionaryEntry)
         
         AddTest .This
