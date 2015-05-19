@@ -161,6 +161,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "GetCharsEx_WithNotEnoughCapacity_ThrowsArgumentException"
             Test.Use New ASCIIEncoding
+        
+        Case "GetBytesEx_WithNullCharsArray_ThrowsArgumentNullException"
+            Test.Use New ASCIIEncoding
+            
+        Case "GetBytesEx_WithNullBytesArray_ThrowsArgumentNullException"
+            Test.Use New ASCIIEncoding
             
     End Select
 End Sub
@@ -334,13 +340,31 @@ errTrap:
     AssertArgumentException Err, "Bytes"
 End Sub
 
+Public Sub GetBytesEx_WithNullCharsArray_ThrowsArgumentNullException(ByVal Encoding As Encoding)
+    Dim NullChars() As Integer
+    Dim Bytes(0) As Byte
+    On Error Resume Next
+    
+    Encoding.GetBytesEx NullChars, 0, 1, Bytes, 0
+    
+    AssertArgumentNullException Err, "Chars"
+End Sub
+
+Public Sub GetBytesEx_WithNullBytesArray_ThrowsArgumentNullException(ByVal Encoding As Encoding)
+    Dim NullBytes() As Byte
+    On Error Resume Next
+    
+    Encoding.GetBytesEx "abc", 0, 1, NullBytes, 0
+    
+    AssertArgumentNullException Err, "Bytes"
+End Sub
+
 Public Sub GetCharCount_WithNullArray_ThrowsArgumentNullException(ByVal Encoding As Encoding)
     Dim Bytes() As Byte
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Encoding.GetCharCount Bytes
     
-errTrap:
     AssertArgumentNullException Err, "Bytes"
 End Sub
 
