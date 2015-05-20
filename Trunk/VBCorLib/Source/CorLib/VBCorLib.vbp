@@ -320,7 +320,6 @@ Class=ThreadStatic; System\Threading\ThreadStatic.cls
 RelatedDoc=ChangeLog.txt
 Class=StringBuilderCache; System\StringBuilderCache.cls
 Class=SafeFindHandle; System\Win32\SafeHandles\SafeFindHandle.cls
-Module=Comparisons; System\Comparisons.bas
 Module=Casting; System\Casts.bas
 Class=IEqualityComparer; System\Collections\IEqualityComparer.cls
 Class=EqualityComparer; System\Collections\EqualityComparer.cls

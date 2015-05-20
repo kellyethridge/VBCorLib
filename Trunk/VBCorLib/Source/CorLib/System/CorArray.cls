@@ -879,11 +879,8 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         Exit Function
     End If
     
-    Dim Comparer As IComparer
-    Set Comparer = Statics.Comparer.Default
-    
     Do While ElemCount > 0
-        If Comparer.Compare(Arr(ElemIndex), Value) = 0 Then
+        If Object.Equals(Arr(ElemIndex), Value) Then
             LastIndexOf = ElemIndex
             Exit Function
         End If
@@ -1500,88 +1497,6 @@ Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Lon
         .cElements = Length
     End With
 End Sub
-
-Private Function SZIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal pfn As Long) As Long
-    Dim Comparer As Func_T_T_Boolean
-    Set Comparer = NewDelegate(pfn)
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSA)
-    
-    Dim pvData As Long
-    pvData = MemLong(pSA + PVDATA_OFFSET)
-    
-    Index = Index - SafeArrayGetLBound(pSA, 1)
-    Do While Count > 0
-        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
-            SZIndexOf = Index + SafeArrayGetLBound(pSA, 1)
-            Exit Function
-        End If
-        Count = Count - 1
-        Index = Index + 1
-    Loop
-
-    SZIndexOf = SafeArrayGetLBound(pSA, 1) - 1
-End Function
-
-Private Function SZLastIndexOf(ByVal pSA As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal pfn As Long) As Long
-    Dim Comparer As Func_T_T_Boolean
-    Set Comparer = NewDelegate(pfn)
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(pSA)
-    
-    Dim pvData As Long
-    pvData = MemLong(pSA + PVDATA_OFFSET)
-    
-    Index = Index - SafeArrayGetLBound(pSA, 1)
-    Do While Count > 0
-        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
-            SZLastIndexOf = Index + SafeArrayGetLBound(pSA, 1)
-            Exit Function
-        End If
-        Count = Count - 1
-        Index = Index - 1
-    Loop
-
-    SZLastIndexOf = SafeArrayGetLBound(pSA, 1) - 1
-End Function
-
-Private Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
-    Select Case SafeArrayGetVartype(pSA) And &HFF
-        Case vbLong:                    RetVal = SZIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualLongs)
-        Case vbString:                  RetVal = SZIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualStrings)
-        Case vbDouble:                  RetVal = SZIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualDoubles)
-        Case vbDate:                    RetVal = SZIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualDates)
-        Case vbObject, vbDataObject:    RetVal = SZIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualObjects)
-        Case vbVariant:                 RetVal = SZIndexOf(pSA, VarPtr(Value), StartIndex, Count, AddressOf EqualVariants)
-        Case vbInteger:                 RetVal = SZIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualIntegers)
-        Case vbSingle:                  RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualSingles)
-        Case vbByte:                    RetVal = SZIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualBytes)
-        Case vbBoolean:                 RetVal = SZIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualBooleans)
-        Case vbCurrency:                RetVal = SZIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualCurrencies)
-        Case Else: Exit Function
-    End Select
-    TrySZIndexOf = True
-End Function
-
-Private Function TrySZLastIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
-    Select Case SafeArrayGetVartype(pSA) And &HFF
-        Case vbLong:                    RetVal = SZLastIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualLongs)
-        Case vbString:                  RetVal = SZLastIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualStrings)
-        Case vbDouble:                  RetVal = SZLastIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualDoubles)
-        Case vbDate:                    RetVal = SZLastIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualDates)
-        Case vbObject, vbDataObject:    RetVal = SZLastIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualObjects)
-        Case vbVariant:                 RetVal = SZLastIndexOf(pSA, VarPtr(Value), StartIndex, Count, AddressOf EqualVariants)
-        Case vbInteger:                 RetVal = SZLastIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualIntegers)
-        Case vbSingle:                  RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualSingles)
-        Case vbByte:                    RetVal = SZLastIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualBytes)
-        Case vbBoolean:                 RetVal = SZLastIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualBooleans)
-        Case vbCurrency:                RetVal = SZLastIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualCurrencies)
-        Case Else: Exit Function
-    End Select
-    TrySZLastIndexOf = True
-End Function
 
 ''
 '   Attempt to locate an optimized sort routine for a specific data type.

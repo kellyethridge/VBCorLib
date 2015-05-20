@@ -34,6 +34,7 @@ Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Optimized sort routines. There could have been one
 '   all-purpose sort routine, but it would be too slow.
@@ -283,8 +284,8 @@ Public Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal R
     Do While Left < Right
         i = Left: j = Right: VariantCopyInd X, Keys((i + j) \ 2)
         Do
-            Do While SZCompareVariants(Keys(i), X) < 0: i = i + 1: Loop
-            Do While SZCompareVariants(Keys(j), X) > 0: j = j - 1: Loop
+            Do While Comparer.Default.Compare(Keys(i), X) < 0: i = i + 1: Loop
+            Do While Comparer.Default.Compare(Keys(j), X) > 0: j = j - 1: Loop
             If i > j Then Exit Do
             If i < j Then Helper.Swap16 Keys(i), Keys(j): If mHasSortItems Then SwapSortItems mSortItems, i, j
             i = i + 1: j = j - 1
@@ -319,5 +320,6 @@ Public Sub QuickSortGeneral(ByRef Keys As Variant, ByVal Left As Long, ByVal Rig
         End If
     Loop
 End Sub
+
 
 

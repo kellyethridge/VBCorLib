@@ -110,7 +110,42 @@ End Function
 ' @return Returns True if the value and the object are the same instance, False otherwise.
 '
 Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
-    Equals = EqualVariants(ObjA, ObjB)
+    Dim Obj As IObject
+    
+    Select Case VarType(ObjA)
+        Case vbString
+            If VarType(ObjB) = vbString Then
+                Equals = CorString.EqualsV(ObjA, ObjB)
+            End If
+        Case vbDate
+            Equals = Statics.cDateTime.Equals(ObjA, ObjB)
+        Case vbObject
+            If ObjA Is Nothing Then
+                If IsObject(ObjB) Then
+                    Equals = (ObjB Is Nothing)
+                End If
+            ElseIf TypeOf ObjA Is IObject Then
+                Set Obj = ObjA
+                Equals = Obj.Equals(ObjB)
+            ElseIf IsObject(ObjB) Then
+                If ObjB Is Nothing Then
+                    Exit Function
+                End If
+                
+                If TypeOf ObjB Is IObject Then
+                    Set Obj = ObjB
+                    Equals = Obj.Equals(ObjA)
+                Else
+                    Equals = (ObjA Is ObjB)
+                End If
+            End If
+        Case vbNull
+            Equals = IsNull(ObjB)
+        Case vbEmpty
+            Equals = IsEmpty(ObjB)
+        Case VarType(ObjB)
+            Equals = (ObjA = ObjB)
+    End Select
 End Function
 
 ''
