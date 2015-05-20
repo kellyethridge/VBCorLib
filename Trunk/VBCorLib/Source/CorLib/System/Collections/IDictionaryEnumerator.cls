@@ -43,6 +43,13 @@ Public Enum IDictionaryEnumType
     detValues
 End Enum
 
+Public Enum EnumerationType
+    EnumEntries
+    EnumKeys
+    EnumValues
+End Enum
+
+
 
 ''
 ' Returns a DictionaryEntry object for the current location in the collection.

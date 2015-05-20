@@ -28,14 +28,15 @@ Public Enum BucketStateEnum
 End Enum
 
 Public Type Bucket
-    Key As Variant
-    Value As Variant
-    hashcode As Long
-    State As BucketStateEnum
+    Key         As Variant
+    Value       As Variant
+    HashCode    As Long
+    State       As BucketStateEnum
 End Type
 
 Private mPrimes(0 To 71)    As Long
 Private mInited             As Boolean
+
 
 ''
 ' Returns the next prime number above the requested size.
@@ -50,11 +51,11 @@ Public Function GetPrime(ByVal Value As Long) As Long
         
     ' we'll do a very fast binary search locally.
     Dim hi As Long
-    Dim lo As Long
+    Dim Lo As Long
     Dim md As Long
     hi = 71
-    Do While lo <= hi
-        md = (lo + hi) \ 2
+    Do While Lo <= hi
+        md = (Lo + hi) \ 2
         Select Case mPrimes(md)
             Case Value
                 GetPrime = Value
@@ -62,7 +63,7 @@ Public Function GetPrime(ByVal Value As Long) As Long
             Case Is > Value
                 hi = md - 1
             Case Else
-                lo = md + 1
+                Lo = md + 1
         End Select
     Loop
     

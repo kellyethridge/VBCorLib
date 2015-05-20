@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "HTKeyCollection"
+Attribute VB_Name = "HashtableKeyCollection"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -40,7 +40,7 @@ Implements IObject
 Implements ICollection
 Implements IEnumerable
 
-Private mList As Hashtable
+Private mTable As Hashtable
 
 
 
@@ -48,27 +48,27 @@ Private mList As Hashtable
 ' in an Object datetype object.
 Public Function NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
-    Set NewEnum = CreateEnumerator(mList.GetKeyEnumerator)
+    Set NewEnum = CreateEnumerator(mTable.GetKeyEnumerator)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal List As Hashtable)
-    Set mList = List
+Friend Sub Init(ByVal Table As Hashtable)
+    Set mTable = Table
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -77,18 +77,18 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call mList.CopyKeys(Arr, Index)
+    mTable.CopyKeys Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
-    ICollection_Count = mList.Count
+    ICollection_Count = mTable.Count
 End Property
 
 Private Function ICollection_GetEnumerator() As IEnumerator
-    Set ICollection_GetEnumerator = mList.GetKeyEnumerator
+    Set ICollection_GetEnumerator = mTable.GetKeyEnumerator
 End Function
 
 Private Function ICollection_NewEnum() As stdole.IUnknown
@@ -97,7 +97,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = ICollection_GetEnumerator

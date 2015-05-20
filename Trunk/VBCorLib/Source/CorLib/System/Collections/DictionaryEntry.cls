@@ -44,9 +44,8 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const PROP_KEY As String = "Key"
-Private Const PROP_VALUE As String = "Value"
-
+Private Const KeyField      As String = "Key"
+Private Const ValueField    As String = "Value"
 
 Private mKey    As Variant
 Private mValue  As Variant
@@ -121,7 +120,13 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = MyBase.Equals(Me, Value)
+    On Error GoTo Catch
+    Dim Other As DictionaryEntry
+    Set Other = Value
+    
+    Equals = Object.Equals(mKey, Other.Key) And Object.Equals(mValue, Other.Value)
+    
+Catch:
 End Function
 
 ''
@@ -129,39 +134,39 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = MyBase.GetHashCode(Me)
+    GetHashCode = Object.GetHashCode(mKey) Xor Object.GetHashCode(mValue)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Key As Variant, ByVal Value As Variant)
-    Helper.MoveVariant mKey, Key
-    Helper.MoveVariant mValue, Value
+Friend Sub Init(ByRef Key As Variant, ByRef Value As Variant)
+    VariantCopyInd mKey, Key
+    VariantCopyInd mValue, Value
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        Helper.MoveVariant mKey, .ReadProperty(PROP_KEY, Empty)
-        Helper.MoveVariant mValue, .ReadProperty(PROP_VALUE, Empty)
+        Helper.MoveVariant mKey, .ReadProperty(KeyField, Empty)
+        Helper.MoveVariant mValue, .ReadProperty(ValueField, Empty)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty PROP_KEY, mKey
-        .WriteProperty PROP_VALUE, mValue
+        .WriteProperty KeyField, mKey
+        .WriteProperty ValueField, mValue
     End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

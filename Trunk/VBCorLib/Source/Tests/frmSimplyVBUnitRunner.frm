@@ -149,7 +149,7 @@ Private Sub AddSystemCollections()
         .Add New BitArrayTests
         .Add New TestSortedList
         .Add New ComparerTests
-        .Add New TestCaseInsensitiveHCP
+'        .Add New TestCaseInsensitiveHCP
 
         .Add NewSuite("ArrayList", _
             New ArrayListTests, _
@@ -167,9 +167,12 @@ Private Sub AddSystemCollections()
             New StackTests, _
             New StackEnumeratorTests)
         
-        .Add NewSuite("HashTable", _
+        .Add NewSuite("Hashtable", _
             New HashtableTests, _
-            New TestDictionaryEntry)
+            New HashtableEnumeratorTests, _
+            New HashtableKeyCollectionTests, _
+            New HashtableValueCollectionTests, _
+            New DictionaryEntryTests)
         
         AddTest .This
     End With
