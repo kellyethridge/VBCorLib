@@ -152,6 +152,24 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "14", 6, 5
             Test.Use "2", 6, 6
             Test.Use "3", 6, 2
+        
+        Case "Equals_WithValues_ReturnsExpected"
+            Test.Use "a", "a", StringComparison.Ordinal, True
+            Test.Use "b", "a", StringComparison.Ordinal, False
+            Test.Use "a", "b", StringComparison.Ordinal, False
+            Test.Use "A", "a", StringComparison.Ordinal, False
+            Test.Use "a", "A", StringComparison.Ordinal, False
+            Test.Use "a", "a", StringComparison.OrdinalIgnoreCase, True
+            Test.Use "A", "a", StringComparison.OrdinalIgnoreCase, True
+            Test.Use "a", "A", StringComparison.OrdinalIgnoreCase, True
+            Test.Use "b", "a", StringComparison.OrdinalIgnoreCase, False
+            Test.Use "a", "b", StringComparison.OrdinalIgnoreCase, False
+            Test.Use Space$(10), Space$(10), StringComparison.Ordinal, True
+            Test.Use Space$(10) & "a", Space$(10) & "b", StringComparison.Ordinal, False
+            Test.Use "aa", "a", StringComparison.Ordinal, False
+            Test.Use String$(10, "a"), String$(10, "A"), StringComparison.OrdinalIgnoreCase, True
+            Test.Use Space$(10) & "a", Space$(10) & "b", StringComparison.OrdinalIgnoreCase, False
+            Test.Use "aa", "a", StringComparison.OrdinalIgnoreCase, False
             
     End Select
 End Sub
@@ -666,6 +684,14 @@ Public Sub LastIndexOfAny_WithStartIndexPlusCountIsLessThanZero_ThrowsArgumentOu
     CorString.LastIndexOfAny "a", "a", 0, 2
     
     AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub Equals_WithValues_ReturnsExpected(ByVal a As String, ByVal b As String, ByVal ComparisonType As StringComparison, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorString.Equals(a, b, ComparisonType)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 

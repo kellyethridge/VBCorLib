@@ -986,7 +986,7 @@ End Property
 ' @return The requested format provider, or Nothing if no format provider was found.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If CorString.EqualsIgnoreCase(FormatType, NumberFormatInfoTypeName) Then
+    If CorString.Equals(FormatType, NumberFormatInfoTypeName, OrdinalIgnoreCase) Then
         Set GetFormat = Me
     End If
 End Function

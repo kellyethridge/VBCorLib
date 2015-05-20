@@ -302,9 +302,9 @@ End Function
 ' @return The format provider, or Nothing if a provider was not found.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If CorString.EqualsIgnoreCase(FormatType, NumberFormatInfoTypeName) Then
+    If CorString.Equals(FormatType, NumberFormatInfoTypeName, OrdinalIgnoreCase) Then
         Set GetFormat = NumberFormat
-    ElseIf CorString.EqualsIgnoreCase(FormatType, DateTimeFormatInfoTypeName) Then
+    ElseIf CorString.Equals(FormatType, DateTimeFormatInfoTypeName, OrdinalIgnoreCase) Then
         Set GetFormat = DateTimeFormat
     End If
 End Function
