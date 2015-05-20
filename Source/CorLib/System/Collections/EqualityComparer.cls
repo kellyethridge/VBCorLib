@@ -10,7 +10,7 @@ Attribute VB_Name = "EqualityComparer"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -38,22 +38,13 @@ Option Explicit
 Implements IEqualityComparer
 
 
-Public Function Equals(ByRef X As Variant, ByRef Y As Variant) As Boolean
-    Equals = Object.Equals(X, Y)
-End Function
-
-Public Function GetHashCode(ByRef Obj As Variant) As Long
-    GetHashCode = Object.GetHashCode(Obj)
-End Function
-
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IEqualityComparer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEqualityComparer_Equals(X As Variant, Y As Variant) As Boolean
-    IEqualityComparer_Equals = Equals(X, Y)
+    IEqualityComparer_Equals = Object.Equals(X, Y)
 End Function
 
 Private Function IEqualityComparer_GetHashCode(Obj As Variant) As Long
-    IEqualityComparer_GetHashCode = GetHashCode(Obj)
+    IEqualityComparer_GetHashCode = Object.GetHashCode(Obj)
 End Function

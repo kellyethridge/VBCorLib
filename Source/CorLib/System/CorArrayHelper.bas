@@ -48,18 +48,50 @@ Public Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByV
     TrySZBinarySearch = True
 End Function
 
-' This is an optimized search routine that uses a function pointer
-' to call a specific comparison routine.
-Private Function SZBinarySearch(ByVal pSA As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
+Public Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
+    Select Case SafeArrayGetVartype(pSA) And &HFF
+        Case vbLong:                    RetVal = SZIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualLongs)
+        Case vbString:                  RetVal = SZIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualStrings)
+        Case vbDouble:                  RetVal = SZIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualDoubles)
+        Case vbDate:                    RetVal = SZIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualDates)
+        Case vbObject, vbDataObject:    RetVal = SZIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualObjects)
+        Case vbInteger:                 RetVal = SZIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualIntegers)
+        Case vbSingle:                  RetVal = SZIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualSingles)
+        Case vbByte:                    RetVal = SZIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualBytes)
+        Case vbBoolean:                 RetVal = SZIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualBooleans)
+        Case vbCurrency:                RetVal = SZIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualCurrencies)
+        Case Else: Exit Function
+    End Select
+    TrySZIndexOf = True
+End Function
+
+Public Function TrySZLastIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Count As Long, ByRef RetVal As Long) As Boolean
+    Select Case SafeArrayGetVartype(pSA) And &HFF
+        Case vbLong:                    RetVal = SZLastIndexOf(pSA, VarPtr(CLng(Value)), StartIndex, Count, AddressOf EqualLongs)
+        Case vbString:                  RetVal = SZLastIndexOf(pSA, VarPtr(StrPtr(Value)), StartIndex, Count, AddressOf EqualStrings)
+        Case vbDouble:                  RetVal = SZLastIndexOf(pSA, VarPtr(CDbl(Value)), StartIndex, Count, AddressOf EqualDoubles)
+        Case vbDate:                    RetVal = SZLastIndexOf(pSA, VarPtr(CDate(Value)), StartIndex, Count, AddressOf EqualDates)
+        Case vbObject, vbDataObject:    RetVal = SZLastIndexOf(pSA, VarPtr(ObjPtr(Value)), StartIndex, Count, AddressOf EqualObjects)
+        Case vbInteger:                 RetVal = SZLastIndexOf(pSA, VarPtr(CInt(Value)), StartIndex, Count, AddressOf EqualIntegers)
+        Case vbSingle:                  RetVal = SZLastIndexOf(pSA, VarPtr(CSng(Value)), StartIndex, Count, AddressOf EqualSingles)
+        Case vbByte:                    RetVal = SZLastIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualBytes)
+        Case vbBoolean:                 RetVal = SZLastIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualBooleans)
+        Case vbCurrency:                RetVal = SZLastIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualCurrencies)
+        Case Else: Exit Function
+    End Select
+    TrySZLastIndexOf = True
+End Function
+
+Private Function SZBinarySearch(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
     Dim ElemSize    As Long
     Dim pvData      As Long
     Dim pLowElem    As Long
     Dim pHighElem   As Long
     Dim Comparer    As Func_T_T_Long
     
-    ElemSize = SafeArrayGetElemsize(pSA)
-    pvData = MemLong(pSA + PVDATA_OFFSET)
-    pLowElem = Index - SafeArrayGetLBound(pSA, 1)
+    ElemSize = SafeArrayGetElemsize(ArrayPtr)
+    pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
+    pLowElem = Index - SafeArrayGetLBound(ArrayPtr, 1)
     pHighElem = pLowElem + Count - 1
     Set Comparer = NewDelegate(ComparerAddress)
     
@@ -68,7 +100,7 @@ Private Function SZBinarySearch(ByVal pSA As Long, ByVal pValue As Long, ByVal I
         pMiddleElem = (pLowElem + pHighElem) \ 2
         Select Case Comparer.Invoke(ByVal pvData + pMiddleElem * ElemSize, ByVal pValue)
             Case 0
-                SZBinarySearch = pMiddleElem + SafeArrayGetLBound(pSA, 1)
+                SZBinarySearch = pMiddleElem + SafeArrayGetLBound(ArrayPtr, 1)
                 Exit Function
             Case Is > 0
                 pHighElem = pMiddleElem - 1
@@ -77,8 +109,56 @@ Private Function SZBinarySearch(ByVal pSA As Long, ByVal pValue As Long, ByVal I
         End Select
     Loop
     
-    SZBinarySearch = (Not pLowElem) + SafeArrayGetLBound(pSA, 1)
+    SZBinarySearch = (Not pLowElem) + SafeArrayGetLBound(ArrayPtr, 1)
 End Function
+
+Private Function SZIndexOf(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
+    Dim Comparer As Func_T_T_Boolean
+    Set Comparer = NewDelegate(ComparerAddress)
+    
+    Dim ElemSize As Long
+    ElemSize = SafeArrayGetElemsize(ArrayPtr)
+    
+    Dim pvData As Long
+    pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
+    
+    Index = Index - SafeArrayGetLBound(ArrayPtr, 1)
+    Do While Count > 0
+        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
+            SZIndexOf = Index + SafeArrayGetLBound(ArrayPtr, 1)
+            Exit Function
+        End If
+        Count = Count - 1
+        Index = Index + 1
+    Loop
+
+    SZIndexOf = SafeArrayGetLBound(ArrayPtr, 1) - 1
+End Function
+
+Private Function SZLastIndexOf(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
+    Dim Comparer As Func_T_T_Boolean
+    Set Comparer = NewDelegate(ComparerAddress)
+    
+    Dim ElemSize As Long
+    ElemSize = SafeArrayGetElemsize(ArrayPtr)
+    
+    Dim pvData As Long
+    pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
+    
+    Index = Index - SafeArrayGetLBound(ArrayPtr, 1)
+    Do While Count > 0
+        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
+            SZLastIndexOf = Index + SafeArrayGetLBound(ArrayPtr, 1)
+            Exit Function
+        End If
+        Count = Count - 1
+        Index = Index - 1
+    Loop
+
+    SZLastIndexOf = SafeArrayGetLBound(ArrayPtr, 1) - 1
+End Function
+
+
 
 Private Function SZCompareLongs(ByRef X As Long, ByRef Y As Long) As Long
     If X > Y Then
@@ -150,6 +230,54 @@ Private Function SZCompareComparables(ByRef X As Object, ByRef Y As Variant) As 
     SZCompareComparables = XComparable.CompareTo(Y)
 End Function
 
+Private Function EqualLongs(ByRef X As Long, ByRef Y As Long) As Boolean
+    EqualLongs = (X = Y)
+End Function
 
+Private Function EqualStrings(ByRef X As String, ByRef Y As String) As Boolean
+    EqualStrings = CorString.Equals(X, Y)
+End Function
+
+Private Function EqualDoubles(ByRef X As Double, ByRef Y As Double) As Boolean
+    EqualDoubles = (X = Y)
+End Function
+
+Private Function EqualIntegers(ByRef X As Integer, ByRef Y As Integer) As Boolean
+    EqualIntegers = (X = Y)
+End Function
+
+Private Function EqualSingles(ByRef X As Single, ByRef Y As Single) As Boolean
+    EqualSingles = (X = Y)
+End Function
+
+Private Function EqualDates(ByRef X As Date, ByRef Y As Date) As Boolean
+    EqualDates = (DateDiff("s", X, Y) = 0)
+End Function
+
+Private Function EqualBytes(ByRef X As Byte, ByRef Y As Byte) As Boolean
+    EqualBytes = (X = Y)
+End Function
+
+Private Function EqualBooleans(ByRef X As Boolean, ByRef Y As Boolean) As Boolean
+    EqualBooleans = (X = Y)
+End Function
+
+Private Function EqualCurrencies(ByRef X As Currency, ByRef Y As Currency) As Boolean
+    EqualCurrencies = (X = Y)
+End Function
+
+Private Function EqualObjects(ByRef X As Object, ByRef Y As Object) As Boolean
+    If Not X Is Nothing Then
+        If TypeOf X Is IObject Then
+            Dim Obj As IObject
+            Set Obj = X
+            EqualObjects = Obj.Equals(Y)
+        Else
+            EqualObjects = X Is Y
+        End If
+    Else
+        EqualObjects = Y Is Nothing
+    End If
+End Function
 
 

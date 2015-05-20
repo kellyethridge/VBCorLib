@@ -119,7 +119,7 @@ Public Function Contains(ByRef Value As Variant) As Boolean
     
     j = mHead
     For i = 1 To mCount
-        If EqualVariants(mItems(j), Value) Then
+        If Object.Equals(mItems(j), Value) Then
             Contains = True
             Exit Function
         End If
