@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "HTValueCollection"
+Attribute VB_Name = "HashtableValueCollection"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -65,8 +65,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String

@@ -51,6 +51,7 @@ Implements IDictionary
 Implements ICollection
 Implements IEnumerable
 Implements ICloneable
+Implements IVersionableCollection
 
 Private Const PROP_COUNT                As String = "Count"
 Private Const PROP_KEY                  As String = "Key"
@@ -88,7 +89,7 @@ Private mStringHashChars As WordBuffer
 ' @remarks The key can be any datatype other than vbUserDefinedType.
 ' If an object is being used as a key, then it should implement the
 ' IObject interface to allow for custom hashcode creation. If the
-' object doesn't not implement the interface, then the objects memory
+' object does not implement the interface, then the objects memory
 ' location is used for a hashcode. If two different objects should
 ' represent the same hashcode, then they need to implement the IObject
 ' interface and override the GetHashCode function.
@@ -204,22 +205,7 @@ End Function
 ' elements. Each DictionaryEntry contains a key and value from the table.
 '
 Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
-    Validation.CheckValidSingleDimArray Arr
-    
-    If ArrayIndex < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "ArrayIndex", ArgumentOutOfRange_LBound
-    If ArrayIndex + mCount > CorArray.LengthFirstDim(Arr) Then _
-        Error.Argument Argument_ArrayPlusOffTooSmall
-    
-    Dim i As Long
-    For i = 0 To UBound(mBuckets)
-        With mBuckets(i)
-            If .State = bsOccupied Then
-                Set Arr(ArrayIndex) = Cor.NewDictionaryEntry(.Key, .Value)
-                ArrayIndex = ArrayIndex + 1
-            End If
-        End With
-    Next
+    CopyToCore Arr, ArrayIndex, EnumEntries
 End Sub
 
 ''
@@ -250,7 +236,7 @@ End Function
 '
 Public Function GetEnumerator() As Object
     Dim Ret As New HashtableEnumerator
-    Ret.Init Me, SAPtr(mBuckets), detEntries
+    Ret.Init Me, mBuckets, EnumEntries
     Set GetEnumerator = Ret
 End Function
 
@@ -352,7 +338,7 @@ End Property
 ' @return An ICollection object used to access the keys of the table.
 '
 Public Property Get Keys() As ICollection
-    Dim Ret As New HTKeyCollection
+    Dim Ret As New HashtableKeyCollection
     Ret.Init Me
     Set Keys = Ret
 End Property
@@ -413,34 +399,30 @@ End Function
 ' @return An ICollection object used to access the values of the table.
 '
 Public Property Get Values() As ICollection
-    Dim Ret As New HTValueCollection
+    Dim Ret As New HashtableValueCollection
     Ret.Init Me
     Set Values = Ret
 End Property
 
-Friend Sub CopyKeys(ByRef DstArray As Variant, ByVal Index As Long)
-    InternalCopyTo DstArray, Index, detKeys
+Friend Sub CopyKeys(ByRef Arr As Variant, ByVal ArrayIndex As Long)
+    CopyToCore Arr, ArrayIndex, EnumKeys
 End Sub
 
-Friend Sub CopyValues(ByRef DstArray As Variant, ByVal Index As Long)
-    InternalCopyTo DstArray, Index, detValues
+Friend Sub CopyValues(ByRef Arr As Variant, ByVal ArrayIndex As Long)
+    CopyToCore Arr, ArrayIndex, EnumValues
 End Sub
 
 Friend Function GetKeyEnumerator() As IEnumerator
     Dim Ret As New HashtableEnumerator
-    Ret.Init Me, SAPtr(mBuckets), detKeys
+    Ret.Init Me, mBuckets, EnumKeys
     Set GetKeyEnumerator = Ret
 End Function
 
 Friend Function GetValueEnumerator() As IEnumerator
     Dim Ret As New HashtableEnumerator
-    Ret.Init Me, SAPtr(mBuckets), detValues
+    Ret.Init Me, mBuckets, EnumValues
     Set GetValueEnumerator = Ret
 End Function
-
-Friend Property Get Version() As Long
-    Version = mVersion
-End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -642,37 +624,48 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
     mVersion = mVersion + 1
 End Sub
 
-Private Sub InternalCopyTo(ByRef DstArray As Variant, ByVal Index As Long, ByVal CopyType As IDictionaryEnumType)
-    Dim Result As Long
-    Result = VerifyArrayRange(CorArray.ArrayPointer(DstArray), Index, mCount)
-    If Result <> NO_ERROR Then
-        ThrowArrayRangeException Result, "DstArray", Index, "Index", mCount, "Index"
+Private Sub CopyToCore(ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal EnumType As EnumerationType)
+    Validation.CheckValidSingleDimArray Arr
+    
+    If ArrayIndex < LBound(Arr) Then _
+        Error.ArgumentOutOfRange "ArrayIndex", ArgumentOutOfRange_LBound
+    If ArrayIndex + mCount > CorArray.LengthFirstDim(Arr) Then _
+        Error.Argument Argument_ArrayPlusOffTooSmall
+    
+    If mCount = 0 Then
+        Exit Sub
     End If
     
     Dim i As Long
     Dim j As Long
-    For i = 0 To mCapacity - 1
-        If mBuckets(i).State = bsOccupied Then
-            Select Case CopyType
-                Case detEntries
-                    Set DstArray(Index + j) = Cor.NewDictionaryEntry(mBuckets(i).Key, mBuckets(i).Value)
-                Case detKeys
-                    If IsObject(mBuckets(i).Key) Then
-                        Set DstArray(Index + j) = mBuckets(i).Key
-                    Else
-                        DstArray(Index + j) = mBuckets(i).Key
-                    End If
-                Case detValues
-                    If IsObject(mBuckets(i).Value) Then
-                        Set DstArray(Index + j) = mBuckets(i).Value
-                    Else
-                        DstArray(Index + j) = mBuckets(i).Value
-                    End If
-            End Select
-            j = j + 1
-            If j = mCount Then Exit Sub
-        End If
-    Next i
+    For i = 0 To UBound(mBuckets)
+        With mBuckets(i)
+            If .State = bsOccupied Then
+                Select Case EnumType
+                    Case EnumEntries
+                        Set Arr(ArrayIndex + j) = Cor.NewDictionaryEntry(.Key, .Value)
+                    Case EnumKeys
+                        If IsObject(.Key) Then
+                            Set Arr(ArrayIndex + j) = .Key
+                        Else
+                            Arr(ArrayIndex + j) = .Key
+                        End If
+                    Case EnumValues
+                        If IsObject(.Value) Then
+                            Set Arr(ArrayIndex + j) = .Value
+                        Else
+                            Arr(ArrayIndex + j) = .Value
+                        End If
+                End Select
+                                
+                j = j + 1
+                
+                If j = mCount Then
+                    Exit Sub
+                End If
+            End If
+        End With
+    Next
 End Sub
 
 
@@ -773,7 +766,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -789,7 +782,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -797,7 +790,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
     CopyTo Arr, Index
@@ -817,7 +810,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IDictionary Interface
+'   IDictionary
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IDictionary_Add(Key As Variant, Value As Variant)
     Add Key, Value
@@ -881,7 +874,7 @@ End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -890,3 +883,11 @@ End Function
 Private Function IEnumerable_NewEnum() As stdole.IUnknown
     Set IEnumerable_NewEnum = NewEnum
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionableCollection
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionableCollection_CurrentVersion() As Long
+    IVersionableCollection_CurrentVersion = mVersion
+End Property

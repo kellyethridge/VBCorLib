@@ -40,14 +40,14 @@ Implements IObject
 Implements IDictionaryEnumerator
 Implements IEnumerator
 
-Private mList As Hashtable
-Private mBuckets() As Bucket
-Private mEnumType As IDictionaryEnumType
-Private mIndex As Long
-Private mVersion As Long
-Private mCount As Long
-Private mEntries As Long
-Private mCapacity As Long
+Private mTable      As Hashtable
+Private mBuckets()  As Bucket
+Private mEnumType   As EnumerationType
+Private mIndex      As Long
+Private mVersion    As Long
+Private mCount      As Long
+Private mEntries    As Long
+Private mCapacity   As Long
 
 
 Public Function NewEnum() As IUnknown
@@ -56,13 +56,13 @@ Attribute NewEnum.VB_MemberFlags = "40"
     Set NewEnum = CreateEnumerator(Me)
 End Function
 
-Friend Sub Init(ByVal List As Hashtable, ByVal BucketsSAPtr As Long, ByVal HTEnumType As IDictionaryEnumType)
-    Set mList = List
-    SAPtr(mBuckets) = BucketsSAPtr
-    mEnumType = HTEnumType
+Friend Sub Init(ByVal Table As Hashtable, ByRef Buckets() As Bucket, ByVal EnumType As EnumerationType)
+    Set mTable = Table
+    SAPtr(mBuckets) = SAPtr(Buckets)
+    mEnumType = EnumType
     mIndex = -1
-    mVersion = List.Version
-    mCount = List.Count
+    mVersion = GetCollectionVersion(mTable)
+    mCount = Table.Count
     mCapacity = UBound(mBuckets) + 1
 End Sub
 
@@ -71,32 +71,35 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyValidEnum()
-    If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
-    If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
-    If mEntries > mCount Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+    If GetCollectionVersion(mTable) <> mVersion Then
+        Error.InvalidOperation InvalidOperation_VersionError
+    End If
+    If mIndex < 0 Then
+        Error.InvalidOperation InvalidOperation_EnumNotStarted
+    End If
+    If mEntries > mCount Then
+        Error.InvalidOperation InvalidOperation_EnumFinished
+    End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
-    SAPtr(mBuckets) = 0
+    SAPtr(mBuckets) = vbNullPtr
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -105,37 +108,36 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IDictionaryEnumerator Interface
+'   IDictionaryEnumerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IDictionaryEnumerator_Current() As Variant
-    Call VerifyValidEnum
+    VerifyValidEnum
     
     Select Case mEnumType
-        Case detEntries
+        Case EnumEntries
             Set IDictionaryEnumerator_Current = Cor.NewDictionaryEntry(mBuckets(mIndex).Key, mBuckets(mIndex).Value)
-        Case detKeys
+        Case EnumKeys
             VariantCopy IDictionaryEnumerator_Current, mBuckets(mIndex).Key
-        Case detValues
+        Case EnumValues
             VariantCopy IDictionaryEnumerator_Current, mBuckets(mIndex).Value
     End Select
 End Property
 
 Private Property Get IDictionaryEnumerator_Entry() As DictionaryEntry
-    Call VerifyValidEnum
-    
+    VerifyValidEnum
     Set IDictionaryEnumerator_Entry = Cor.NewDictionaryEntry(mBuckets(mIndex).Key, mBuckets(mIndex).Value)
 End Property
 
 Private Property Get IDictionaryEnumerator_Key() As Variant
-    Call VerifyValidEnum
-    Call VariantCopy(IDictionaryEnumerator_Key, mBuckets(mIndex).Key)
+    VerifyValidEnum
+    VariantCopy IDictionaryEnumerator_Key, mBuckets(mIndex).Key
 End Property
 
 Private Function IDictionaryEnumerator_MoveNext() As Boolean
-    If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+    If GetCollectionVersion(mTable) <> mVersion Then _
+        Error.InvalidOperation InvalidOperation_VersionError
     If mEntries > mCount Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
     
     Do
         mIndex = mIndex + 1
@@ -154,15 +156,15 @@ Private Sub IDictionaryEnumerator_Reset()
 End Sub
 
 Private Property Get IDictionaryEnumerator_Value() As Variant
-    Call VerifyValidEnum
-    Call VariantCopy(IDictionaryEnumerator_Value, mBuckets(mIndex).Value)
+    VerifyValidEnum
+    VariantCopy IDictionaryEnumerator_Value, mBuckets(mIndex).Value
 End Property
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerator Interface
+'   IEnumerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    Call Helper.MoveVariant(IEnumerator_Current, IDictionaryEnumerator_Current)
+    Helper.MoveVariant IEnumerator_Current, IDictionaryEnumerator_Current
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
