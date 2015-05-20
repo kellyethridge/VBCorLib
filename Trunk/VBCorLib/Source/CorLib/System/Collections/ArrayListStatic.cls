@@ -78,8 +78,12 @@ Public Function FixedSize(ByVal List As ArrayList) As ArrayList
         Throw Cor.NewArgumentNullException("List")
     
     Dim Ret As New FixedSizeArrayList
-    Call Ret.Init(List)
+    Ret.Init List
     Set FixedSize = Ret
+End Function
+
+Public Function FixedSizeList(ByVal List As IList) As IList
+
 End Function
 
 ''

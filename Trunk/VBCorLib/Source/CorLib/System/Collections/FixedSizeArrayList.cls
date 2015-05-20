@@ -86,7 +86,7 @@ End Sub
 
 Private Function ArrayList_Clone() As ArrayList
     Dim Ret As New FixedSizeArrayList
-    Call Ret.Init(mList.Clone)
+    Ret.Init mList.Clone
     Set ArrayList_Clone = Ret
 End Function
 
@@ -94,12 +94,12 @@ Private Function ArrayList_Contains(Value As Variant) As Boolean
     ArrayList_Contains = mList.Contains(Value)
 End Function
 
-Private Sub ArrayList_CopyTo(DstArray As Variant, Optional ArrayIndex As Variant)
-    Call mList.CopyTo(DstArray, ArrayIndex)
+Private Sub ArrayList_CopyTo(Arr As Variant, Optional ArrayIndex As Variant)
+    mList.CopyTo Arr, ArrayIndex
 End Sub
 
-Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    Call mList.CopyToEx(Index, DstArray, ArrayIndex, Count)
+Private Sub ArrayList_CopyToEx(ByVal Index As Long, Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
+    mList.CopyToEx Index, Arr, ArrayIndex, Count
 End Sub
 
 Private Property Get ArrayList_Count() As Long
@@ -110,15 +110,18 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
+    Dim Range As ListRange
+    Range = OptionalRange(Index, Count, 0, mList.Count)
+    If Range.Index < 0 Then _
+        Error.NegativeNumber "Index"
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count > mList.Count Then _
+        Error.InvalidOffsetLength
     
     Dim Ret As New ArrayListEnumerator
-    Call Ret.Init(Me, ElemIndex, ElemCount)
+    Ret.Init Me, Range.Index, Range.Count
     Set ArrayList_GetEnumerator = Ret
 End Function
 
@@ -127,13 +130,15 @@ Private Function ArrayList_GetHashCode() As Long
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    Dim Result As Long
-    Result = VerifyListRange(mList.Count, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    If Index < 0 Then _
+        Error.NegativeNumber "Index"
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Index + Count > mList.Count Then _
+        Error.InvalidOffsetLength
     
-    Dim Ret As RangedArrayList
-    Set Ret = New RangedArrayList
-    Call Ret.Init(Me, Index, Count)
+    Dim Ret As New RangedArrayList
+    Ret.Init Me, Index, Count
     Set ArrayList_GetRange = Ret
 End Function
 
@@ -145,7 +150,7 @@ Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_FixedSizeCollection))
 End Sub
 
-Private Sub ArrayList_InsertRange(ByVal Index As Long, c As Variant)
+Private Sub ArrayList_InsertRange(ByVal Index As Long, Source As Variant)
     Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_FixedSizeCollection))
 End Sub
 
@@ -157,16 +162,16 @@ Private Property Get ArrayList_IsReadOnly() As Boolean
     ArrayList_IsReadOnly = False
 End Property
 
-Private Property Set ArrayList_Item(ByVal Index As Long, RHS As Variant)
-    Set mList(Index) = RHS
+Private Property Set ArrayList_Item(ByVal Index As Long, Value As Variant)
+    Set mList(Index) = Value
 End Property
 
-Private Property Let ArrayList_Item(ByVal Index As Long, RHS As Variant)
-    mList(Index) = RHS
+Private Property Let ArrayList_Item(ByVal Index As Long, Value As Variant)
+    mList(Index) = Value
 End Property
 
 Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(ArrayList_Item, mList(Index))
+    Helper.MoveVariant ArrayList_Item, mList(Index)
 End Property
 
 Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
@@ -190,15 +195,15 @@ Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
 End Sub
 
 Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Call mList.Reverse(Index, Count)
+    mList.Reverse Index, Count
 End Sub
 
-Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
-    Call mList.SetRange(Index, c)
+Private Sub ArrayList_SetRange(ByVal Index As Long, Source As Variant)
+    mList.SetRange Index, Source
 End Sub
 
-Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
-    Call mList.Sort(StartIndex, Count, Comparer)
+Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
+    mList.Sort Index, Count, Comparer
 End Sub
 
 Private Function ArrayList_ToArray(Optional ByVal ArrayType As VbVarType = 12&) As Variant
@@ -242,7 +247,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call ArrayList_CopyTo(Arr, Index)
+    ArrayList_CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
