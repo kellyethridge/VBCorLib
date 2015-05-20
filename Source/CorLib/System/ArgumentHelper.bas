@@ -186,63 +186,6 @@ Public Function GetOptionalArrayRange(ByVal pSafeArray As Long, _
     End If
 End Function
 
-''
-' Assigns given values or default values and checks the range is valid.
-' This version checks that the Index - Count does not extend below the lower bound.
-'
-' @param pSafeArray A pointer to a SafeArray structure.
-' @param OptionalIndex The index value supplied by the caller.
-' @param ReturnIndex Returns the index of the starting range of the array.
-' @param OptionalCount The count value supplied by the caller.
-' @param ReturnCount Returns the number of elements to include in the range.
-' @return If the function is successful, then NO_ERROR is returned,
-' otherwise, an exception error message is returned.
-' @remarks <p>Range checking is performed to ensure a Index and Count value pair do not extend outside of the array.</p>
-'
-Public Function GetOptionalArrayRangeReverse(ByVal pSafeArray As Long, _
-                                             ByRef OptionalIndex As Variant, ByRef ReturnIndex As Long, _
-                                             ByRef OptionalCount As Variant, ByRef ReturnCount As Long) As Long
-    Dim LowerBound As Long
-    Dim UpperBound As Long
-    
-    ' This function is optimized by not refactoring
-    ' common sections with other helper rountine in
-    ' order to cut down on total function calls.
-    
-    If pSafeArray = vbNullPtr Then
-        GetOptionalArrayRangeReverse = ArgumentNull_Array
-        Exit Function
-    End If
-    
-    If SafeArrayGetDim(pSafeArray) <> 1 Then
-        GetOptionalArrayRangeReverse = Rank_MultiDimNotSupported
-        Exit Function
-    End If
-    
-    LowerBound = SafeArrayGetLBound(pSafeArray, 1)
-    UpperBound = SafeArrayGetUBound(pSafeArray, 1)
-    
-    Dim Result As Long
-    Result = GetOptionalLongPair(OptionalIndex, UpperBound, ReturnIndex, OptionalCount, UpperBound - LowerBound + 1, ReturnCount)
-    If Result <> NO_ERROR Then
-        GetOptionalArrayRangeReverse = Result
-        Exit Function
-    End If
-    
-    If ReturnIndex > UpperBound Then
-        GetOptionalArrayRangeReverse = ArgumentOutOfRange_UBound
-        Exit Function
-    End If
-    
-    If ReturnCount < 0 Then
-        GetOptionalArrayRangeReverse = ArgumentOutOfRange_NeedNonNegNum
-        Exit Function
-    End If
-    
-    If ReturnIndex - ReturnCount + 1 < LowerBound Then
-        GetOptionalArrayRangeReverse = Argument_InvalidOffLen
-    End If
-End Function
 
 ''
 ' Verifies the index and count are within the bounds and size of a one-dimensional array.
@@ -285,51 +228,6 @@ Public Function VerifyArrayRange(ByVal pSafeArray As Long, ByVal Index As Long, 
     ' Can't have the range extend past the end of the array.
     If Index + Count - 1 > SafeArrayGetUBound(pSafeArray, 1) Then
         VerifyArrayRange = Argument_InvalidOffLen
-    End If
-End Function
-
-''
-' Verifies the index and count are within the bounds and size of a one-dimensional array.
-' This version ensures that Index - Count does not extend below the lower bound.
-'
-' @param pSA A pointer to a SafeArray structure.
-' @param Index The index into the array.
-' @param Count The number of elements to include.
-' @return If this function succeeds, then NO_ERROR is returned, otherwise
-' and error exception code is returned.
-'
-Public Function VerifyArrayRangeReverse(ByVal pSafeArray As Long, ByVal Index As Long, ByVal Count As Long) As Long
-    ' This function is optimized by not refactoring
-    ' common sections with other helper rountine in
-    ' order to cut down on total function calls.
-
-    ' Check if the array is a null array.
-    If pSafeArray = vbNullPtr Then
-        VerifyArrayRangeReverse = ArgumentNull_Array
-        Exit Function
-    End If
-    
-    ' Ensure we only have a 1-Dimension array.
-    If SafeArrayGetDim(pSafeArray) <> 1 Then
-        VerifyArrayRangeReverse = Rank_MultiDimNotSupported
-        Exit Function
-    End If
-    
-    ' Can't have an index after the end of the array.
-    If Index > SafeArrayGetUBound(pSafeArray, 1) Then
-        VerifyArrayRangeReverse = ArgumentOutOfRange_UBound
-        Exit Function
-    End If
-    
-    ' Can't have a negative count.
-    If Count < 0 Then
-        VerifyArrayRangeReverse = ArgumentOutOfRange_NeedNonNegNum
-        Exit Function
-    End If
-    
-    ' Can't have the range extend past the beginning of the array.
-    If Index - Count + 1 < SafeArrayGetLBound(pSafeArray, 1) Then
-        VerifyArrayRangeReverse = Argument_InvalidOffLen
     End If
 End Function
 
@@ -464,32 +362,4 @@ Public Function GetOptionalListRange(ByVal RangeSize As Long, _
     End If
 End Function
 
-Public Function GetOptionalListRangeReverse(ByVal RangeSize As Long, _
-                                            ByRef OptionalIndex As Variant, ByRef ReturnIndex As Long, _
-                                            ByRef OptionalCount As Variant, ByRef ReturnCount As Long) As Long
-    ' Get our optional values.
-    Dim Result As Long
-    Result = GetOptionalLongPair(OptionalIndex, RangeSize - 1, ReturnIndex, OptionalCount, RangeSize, ReturnCount)
-    If Result <> NO_ERROR Then
-        GetOptionalListRangeReverse = Result
-        Exit Function
-    End If
-    
-    ' Can't have an index before the start of the range.
-    If ReturnIndex >= RangeSize Then
-        GetOptionalListRangeReverse = ArgumentOutOfRange_UBound
-        Exit Function
-    End If
-    
-    ' Can't have a negative count.
-    If ReturnCount < 0 Then
-        GetOptionalListRangeReverse = ArgumentOutOfRange_NeedNonNegNum
-        Exit Function
-    End If
-    
-    ' Can't have the range extend past the beginning of the array.
-    If ReturnIndex - ReturnCount + 1 < 0 Then
-        GetOptionalListRangeReverse = Argument_InvalidOffLen
-    End If
-End Function
 
