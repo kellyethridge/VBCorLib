@@ -326,7 +326,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
         Error.ArgumentNull "Value", ArgumentNull_Array
     
     Dim Range As ListRange
-    Range = GetOptionalStepRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    Range = OptionalStepRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
     
     ValidateArrayArguments Value, Range.Index, Range.Count
     
@@ -338,30 +338,30 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
     
     Dim i       As Long
     Dim b       As Long
-    Dim Pos     As Long
+    Dim pos     As Long
     Dim Nibble  As Long
     Dim Offset  As Long
     
     Offset = 1
     Do While i < Range.Count
         If i > 0 Then
-            Chars(Pos) = vbMinusChar
-            Pos = Pos + 1
+            Chars(pos) = vbMinusChar
+            pos = pos + 1
         End If
         
         b = Value(Range.Index + i)
         Do
             Nibble = b And &HF
             If Nibble > 9 Then
-                Chars(Pos + Offset) = Nibble + ALPHA_OFFSET
+                Chars(pos + Offset) = Nibble + ALPHA_OFFSET
             Else
-                Chars(Pos + Offset) = Nibble + vbZeroChar
+                Chars(pos + Offset) = Nibble + vbZeroChar
             End If
             b = (b And &HF0&) \ &H10&
             Offset = 1 - Offset
         Loop While Offset = 0
         
-        Pos = Pos + 2
+        pos = pos + 2
         i = i + 1
     Loop
     

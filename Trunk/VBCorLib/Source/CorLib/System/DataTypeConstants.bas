@@ -47,6 +47,8 @@ Public Const SizeOfSafeArray1d      As Long = SizeOfSafeArray + SizeOfSafeArrayB
 Public Const SizeOfGuid             As Long = 16
 Public Const SizeOfGuidSafeArray1d  As Long = SizeOfSafeArray1d + SizeOfGuid
 Public Const SizeOfVariant          As Long = 16
+Public Const SizeOfPtr              As Long = SizeOfLong
+Public Const SizeOfChar             As Long = SizeOfInteger
 
 ' Byte offsets into the SafeArray structure.
 Public Const FFEATURES_OFFSET               As Long = 2

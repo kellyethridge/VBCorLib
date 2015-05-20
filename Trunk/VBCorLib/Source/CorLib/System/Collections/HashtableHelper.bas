@@ -1,4 +1,4 @@
-Attribute VB_Name = "modHashtableHelpers"
+Attribute VB_Name = "HashtableHelper"
 '    CopyRight (c) 2004 Kelly Ethridge
 '
 '    This file is part of VBCorLib.
@@ -41,13 +41,10 @@ Private mInited             As Boolean
 ''
 ' Returns the next prime number above the requested size.
 '
-' @param Value The requested value.
-' @return The next prime above the requested value.
-' @remarks The internal array of the Hashtable is
-' incremented to the next prime above the requested size.
-'
 Public Function GetPrime(ByVal Value As Long) As Long
-    If Not mInited Then InitPrimes
+    If Not mInited Then
+        InitPrimes
+    End If
         
     ' we'll do a very fast binary search locally.
     Dim hi As Long
@@ -67,7 +64,10 @@ Public Function GetPrime(ByVal Value As Long) As Long
         End Select
     Loop
     
-    If md < 0 Then md = Not md
+    If md < 0 Then
+        md = Not md
+    End If
+    
     GetPrime = mPrimes(md)
 End Function
 

@@ -222,7 +222,8 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mDecoders = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, Comparer:=New CaseInsensitiveComparer)
+'    Set mDecoders = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, Comparer:=New CaseInsensitiveComparer)
+    Debug.Assert False
     
     ' Add our known set of decoders.
     Call AddDecoder(New ResStringTableDecoder)
@@ -241,8 +242,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

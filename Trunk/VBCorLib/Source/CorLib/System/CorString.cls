@@ -84,13 +84,10 @@ End Function
 ' @return A string created from the chars in an integer array.
 '
 Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    If CorArray.IsNull(Chars) Then _
-        Error.ArgumentNull "Chars", ArgumentNull_Array
-    If CorArray.Rank(Chars) <> 1 Then _
-        Error.Rank
+    Validation.CheckValidSingleDimArray Chars, Parameter_Chars
 
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
+    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
     
     If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -174,7 +171,7 @@ End Function
 '
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, Length, 0, Len(s), Parameter_StartIndex, Parameter_Length)
+    Range = OptionalRange(StartIndex, Length, 0, Len(s), Parameter_StartIndex, Parameter_Length)
     
     If Range.Index < 0 Then _
         Error.NegativeNumber "StartIndex"
@@ -186,7 +183,7 @@ Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Vari
     Dim Chars() As Integer
     If Range.Count > 0 Then
         ReDim Chars(0 To Range.Count - 1)
-        CopyMemory Chars(0), ByVal StrPtr(s) + Range.Index * 2, Range.Count * 2
+        CopyMemory Chars(0), ByVal StrPtr(s) + Range.Index * SizeOfChar, Range.Count * SizeOfChar
     Else
         Chars = Cor.NewIntegers()
     End If
@@ -292,13 +289,10 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
         Exit Function
     End If
     
-    If CorArray.IsNull(Value) Then _
-        Error.ArgumentNull "Value", ArgumentNull_Array
-    If CorArray.Rank(Value) <> 1 Then _
-        Error.Rank
+    Validation.CheckValidSingleDimArray Value, Parameter_Value
     
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    Range = OptionalRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
@@ -330,7 +324,7 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
     Dim CharCount       As Long
     Dim RemovalCount    As Long
     CharCount = Len(s)
-    RemovalCount = GetOptionalLong(Count, CharCount - StartIndex)
+    RemovalCount = OptionalLong(Count, CharCount - StartIndex)
     
     If StartIndex < 0 Then _
         Error.NegativeNumber "StartIndex"
@@ -339,10 +333,10 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
     If StartIndex + RemovalCount > Len(s) Then _
         Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
     
-    Dim sp As Long
-    sp = StrPtr(s)
-    Remove = SysAllocStringLen(sp, CharCount - RemovalCount)
-    CopyMemory ByVal StrPtr(Remove) + StartIndex * 2, ByVal sp + (StartIndex + RemovalCount) * 2, (CharCount - (StartIndex + RemovalCount)) * 2
+    Dim SPtr As Long
+    SPtr = StrPtr(s)
+    Remove = SysAllocStringLen(SPtr, CharCount - RemovalCount)
+    CopyMemory ByVal StrPtr(Remove) + StartIndex * SizeOfChar, ByVal SPtr + (StartIndex + RemovalCount) * SizeOfChar, (CharCount - (StartIndex + RemovalCount)) * SizeOfChar
 End Function
 
 ''
@@ -362,7 +356,7 @@ Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional B
     End If
     
     Dim Range As ListRange
-    Range = GetOptionalStepRange(StartIndex, Count, 0, Len(s), Parameter_StartIndex)
+    Range = OptionalStepRange(StartIndex, Count, 0, Len(s), Parameter_StartIndex)
     
     If Range.Index < 0 Then _
         Error.NegativeNumber "StartIndex"
@@ -394,7 +388,7 @@ Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Option
     End If
 
     Dim Range As ListRange
-    Range = GetOptionalStepRangeReverse(StartIndex, Count, Len(s) - 1, Len(s), Parameter_StartIndex)
+    Range = OptionalReverseStepRange(StartIndex, Count, Len(s) - 1, Len(s), Parameter_StartIndex)
     
     If Range.Index < 0 Then _
         Error.NegativeNumber "StartIndex"
@@ -645,11 +639,11 @@ Private Function JoinStrings(ByRef Separator As String, ByRef Value As Variant, 
     Dim ArrayStruct     As SafeArray1d
     
     With ArrayStruct
-        .cbElements = 4
+        .cbElements = SizeOfPtr
         .cDims = 1
         .cElements = Range.Count
         .fFeatures = &H100
-        .pvData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * 4
+        .pvData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * SizeOfPtr
     End With
     
     SAPtr(SubStrings) = VarPtr(ArrayStruct)
@@ -674,25 +668,12 @@ Private Function JoinVariants(ByRef Separator As String, ByRef Value As Variant,
 End Function
 
 Private Function JoinArray(ByRef Separator As String, ByRef Value As Variant, ByRef Range As ListRange) As String
-    Dim Strings()   As String
-    Dim Item        As Variant
-    Dim Index       As Long
-    Dim StopIndex   As Long
+    Dim Strings() As String
+    ReDim Strings(0 To Range.Count - 1)
     
-    Index = LBound(Value)
-    StopIndex = Range.Index + Range.Count - 1
-    ReDim Strings(Range.Index To StopIndex)
-    
-    For Each Item In Value
-        If Index >= Range.Index Then
-            Strings(Index) = Object.ToString(Item)
-        End If
-        
-        Index = Index + 1
-        
-        If Index > StopIndex Then
-            Exit For
-        End If
+    Dim i As Long
+    For i = 0 To Range.Count - 1
+        Strings(i) = Object.ToString(Value(Range.Index + i))
     Next
     
     JoinArray = VBA.Join(Strings, Separator)

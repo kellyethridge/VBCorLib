@@ -40,6 +40,7 @@ Public Enum ResourceString
     Format_InvalidString = 602
     Format_InvalidTimeSpan = 603
     Overflow_TimeSpan = 1300
+    InvalidCast_FromTo = 1400
 End Enum
 
 Public Enum IOExceptionString

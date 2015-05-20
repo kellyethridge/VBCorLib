@@ -37,6 +37,7 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mCharBuffer As CharBuffer
 
 ''
 ' Returns a default hashcode for the specific value.
@@ -179,16 +180,27 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HashString(ByRef Value As Variant) As Long
-    Dim Chars() As Integer
-    Chars = AsChars(Value)
+    Dim Ptr     As Long
+    Dim Length  As Long
+    
+    Ptr = StrPtr(Value)
+    Length = MemLong(Ptr - 4) \ 2
+    mCharBuffer.Buffer.pvData = Ptr
+    mCharBuffer.Buffer.cElements = Length
     
     Dim i As Long
-    For i = 0 To UBound(Chars)
-        HashString = ((HashString * 16) + Chars(i)) And &H3FFFFFF
+    For i = 0 To Length - 1
+        HashString = ((HashString * 16) + mCharBuffer.Chars(i)) And &H3FFFFFF
     Next
-    
-    FreeChars Chars
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitChars mCharBuffer
+End Sub

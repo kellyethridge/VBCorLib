@@ -119,8 +119,8 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As 
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    ElemIndex = GetOptionalLong(Index, LBound(InArray))
-    ElemCount = GetOptionalLong(Length, (UBound(InArray) - LBound(InArray) + 1) - ElemIndex)
+    ElemIndex = OptionalLong(Index, LBound(InArray))
+    ElemCount = OptionalLong(Length, (UBound(InArray) - LBound(InArray) + 1) - ElemIndex)
     If ElemIndex < LBound(InArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If ElemCount < 0 Then _

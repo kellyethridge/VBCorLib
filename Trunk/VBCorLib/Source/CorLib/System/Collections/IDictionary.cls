@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: IDictionary
+' Module: IDictionary
 '
 
 ''
@@ -42,11 +45,11 @@ Attribute VB_Exposed = True
 Option Explicit
 
 ''
-' Returns an IEnumerator object.
+' Returns an IDictionaryEnumerator object.
 '
 ' @return The enumerator.
 '
-Public Function GetEnumerator() As IEnumerator: End Function
+Public Function GetEnumerator() As IDictionaryEnumerator: End Function
 
 ''
 ' Returns an IEnumVariant object.
@@ -73,7 +76,7 @@ Public Property Get Count() As Long: End Property
 ' @param arr The array to copy the elements into.
 ' @param index The index in the destination array to start copying the elements to.
 '
-Public Sub CopyTo(ByRef arr As Variant, ByVal Index As Long): End Sub
+Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long): End Sub
 
 ''
 ' Returns if this instance is fixed-size.
@@ -108,7 +111,7 @@ Attribute Item.VB_UserMemId = 0
 ' @param Key The key used to identify the value.
 ' @param value The value to associate with the key.
 '
-Public Property Let Item(ByRef Key As Variant, ByRef value As Variant): End Property
+Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant): End Property
 
 ''
 ' Sets the value in the list that is associated to the specified key.
@@ -116,7 +119,7 @@ Public Property Let Item(ByRef Key As Variant, ByRef value As Variant): End Prop
 ' @param Key The key used to identify the value.
 ' @param value The value to associate with the key.
 '
-Public Property Set Item(ByRef Key As Variant, ByRef value As Variant): End Property
+Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant): End Property
 
 ''
 ' Returns a collection of the keys in the list.
@@ -131,7 +134,7 @@ Public Property Get Keys() As ICollection: End Property
 ' @return A collection of the values in the list.
 
 
-Public Property Get values() As ICollection: End Property
+Public Property Get Values() As ICollection: End Property
 
 ''
 ' Adds a new value that is associated with the key to the list.
@@ -139,7 +142,7 @@ Public Property Get values() As ICollection: End Property
 ' @param Key The new key used to locate the value.
 ' @param value The value to be associated with the key.
 '
-Public Sub Add(ByRef Key As Variant, ByRef value As Variant): End Sub
+Public Sub Add(ByRef Key As Variant, ByRef Value As Variant): End Sub
 
 ''
 ' Clears the list of its contents.

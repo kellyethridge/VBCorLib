@@ -66,19 +66,15 @@ Private Const SUBTYPE_EMPTY     As Long = 1
 Private Const SUBTYPE_NOTHING   As Long = 2
 
 Private Const DEF_CAPACITY  As Long = 32
-Private Const LOAD_FACTOR   As Double = 0.9
+Private Const DefaultLoadFactor As Single = 1!
 
+Private mLoadFactor     As Single
+Private mLoadSize       As Long
 Private mCount          As Long
 Private mBuckets()      As Bucket
 Private mCapacity       As Long
 Private mVersion        As Long
-Private mLoadThreshold  As Long
-Private mProvider       As IHashcodeProvider
-Private mComparer       As IComparer
-
-' used in hashing a string key.
-Private mStringHashChars As WordBuffer
-
+Private mKeyComparer    As IEqualityComparer
 
 
 ''
@@ -135,7 +131,7 @@ End Sub
 '
 Public Function Clone() As Hashtable
     Set Clone = New Hashtable
-    Clone.InitClone mBuckets, mCount, mLoadThreshold, mProvider, mComparer
+    Clone.InitClone mBuckets, mCount, mLoadFactor, mLoadSize, mKeyComparer
 End Function
 
 ''
@@ -187,7 +183,7 @@ Public Function ContainsValue(ByRef Value As Variant) As Boolean
     For i = 0 To mCapacity - 1
         With mBuckets(i)
             If .State = bsOccupied Then
-                If EqualVariants(.Value, Value) Then
+                If Object.Equals(.Value, Value) Then
                     ContainsValue = True
                     Exit Function
                 End If
@@ -285,10 +281,10 @@ End Property
 '
 Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
-    Dim i As Long
-    i = GetKeyIndex(Key)
-    If i >= 0 Then
-        VariantCopy Item, mBuckets(i).Value
+    Dim Index As Long
+    Index = GetKeyIndex(Key)
+    If Index >= 0 Then
+        VariantCopy Item, mBuckets(Index).Value
     End If
 End Property
 
@@ -360,10 +356,10 @@ End Function
 ' @param Key The key use to lookup the key/value pair to be removed.
 '
 Public Sub Remove(ByRef Key As Variant)
-    Dim i As Long
-    i = GetKeyIndex(Key)
-    If i >= 0 Then
-        With mBuckets(i)
+    Dim Index As Long
+    Index = GetKeyIndex(Key)
+    If Index >= 0 Then
+        With mBuckets(Index)
             .HashCode = 0
             .Key = Empty
             .State = bsDeleted
@@ -375,9 +371,10 @@ Public Sub Remove(ByRef Key As Variant)
         ' If there are no more items, we want to ensure all buckets
         ' are marked as empty for faster instertions.
         If mCount = 0 Then
+            Dim i As Long
             For i = 0 To UBound(mBuckets)
                 mBuckets(i).State = bsEmpty
-            Next i
+            Next
         End If
         
         mVersion = mVersion + 1
@@ -429,96 +426,103 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    InitWordBuffer mStringHashChars, 0, 0
+    Init Nothing, 0, 1!, Nothing
 End Sub
 
 Private Sub Class_InitProperties()
-    InitCapacity DEF_CAPACITY, Nothing, Nothing
+    Init Nothing, 0, 1!, Nothing
 End Sub
 
-Friend Sub InitCapacity(ByVal Capacity As Long, ByVal hcp As IHashcodeProvider, ByVal Comparer As IComparer)
-    mCapacity = GetPrime(Capacity)
-    mLoadThreshold = mCapacity * LOAD_FACTOR
-    ReDim mBuckets(0 To mCapacity - 1)
-    Set mProvider = hcp
-    Set mComparer = Comparer
-End Sub
-
-Friend Sub InitDictionary(ByVal d As IDictionary, ByVal hcp As IHashcodeProvider, ByVal Comparer As IComparer)
-    If d Is Nothing Then
-        InitCapacity DEF_CAPACITY, hcp, Comparer
+Friend Sub Init(ByVal d As IDictionary, ByVal Capacity As Long, ByVal LoadFactor As Single, ByVal EqualityComparer As IEqualityComparer)
+    mLoadFactor = LoadFactor * 0.72!
+    
+    If EqualityComparer Is Nothing Then
+        Set mKeyComparer = Statics.EqualityComparer.Default
     Else
-        InitCapacity d.Count, hcp, Comparer
-        Dim Entry As DictionaryEntry
-        For Each Entry In d
-            InsertItem Entry.Key, Entry.Value, True, True
-        Next Entry
+        Set mKeyComparer = EqualityComparer
+    End If
+    
+    If d Is Nothing Then
+        SetCapacity Capacity
+        ReDim mBuckets(0 To mCapacity - 1)
+    Else
+        SetCapacity d.Count
+        ReDim mBuckets(0 To mCapacity - 1)
+        
+        With d.GetEnumerator
+            Do While .MoveNext
+                Add .Key, .Value
+            Loop
+        End With
     End If
 End Sub
 
-Friend Sub InitClone(ByRef Buckets() As Bucket, ByVal Count As Long, ByVal LoadThreshold As Long, ByVal Provider As IHashcodeProvider, ByVal Comparer As IComparer)
+Friend Sub InitClone(ByRef Buckets() As Bucket, ByVal Count As Long, ByVal LoadFactor As Single, ByVal LoadSize As Long, ByVal KeyComparer As IEqualityComparer)
     mCount = Count
     mBuckets = Buckets
     mCapacity = UBound(Buckets) + 1
-    mLoadThreshold = LoadThreshold
-    Set mProvider = Provider
-    Set mComparer = Comparer
+    mLoadFactor = LoadFactor
+    mLoadSize = LoadSize
+    Set mKeyComparer = KeyComparer
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub ExpandTable()
-    mCapacity = GetPrime(mCapacity * 2)
-    mLoadThreshold = mCapacity * LOAD_FACTOR
+Private Sub SetCapacity(ByVal Capacity As Long)
+    mCapacity = GetPrime(Capacity)
+    mLoadSize = mCapacity * mLoadFactor
+End Sub
+
+Private Sub Expand()
+    SetCapacity GetPrime(mCapacity * 2)
     ReinsertItems
 End Sub
 
 Private Sub ReinsertItems()
     Dim OldBuckets() As Bucket
-    ReDim OldBuckets(0 To mCapacity - 1)
-    Helper.Swap4 ByVal ArrPtr(OldBuckets), ByVal ArrPtr(mBuckets)
+    SAPtr(OldBuckets) = SAPtr(mBuckets)
+    SAPtr(mBuckets) = vbNullPtr
     
+    ReDim mBuckets(0 To mCapacity - 1)
     mCount = 0
     
     Dim i As Long
     For i = 0 To UBound(OldBuckets)
-        If OldBuckets(i).State = bsOccupied Then
-            InsertItem OldBuckets(i).Key, OldBuckets(i).Value, True, True
-        End If
+        With OldBuckets(i)
+            If .State = bsOccupied Then
+                InsertItem .Key, .Value, True, True
+            End If
+        End With
     Next i
 End Sub
 
 Private Function GetKeyIndex(ByRef Key As Variant) As Long
-    Dim Step                As Long
-    Dim Index               As Long
-    Dim HashCode            As Long
-    Dim FirstIndex          As Long
-    Dim ComparerIsNothing   As Boolean
+    Dim Step        As Long
+    Dim Index       As Long
+    Dim HashCode    As Long
+    Dim FirstIndex  As Long
     
     HashCode = InitHashCode(Key, Step, Index)
     FirstIndex = Index
-    ComparerIsNothing = mComparer Is Nothing
     
     Do
-        Select Case mBuckets(Index).State
-            Case bsEmpty
-                GetKeyIndex = -1
-                Exit Function
-            Case bsOccupied
-                If mBuckets(Index).HashCode = HashCode Then
-                    If ComparerIsNothing Then
-                        If EqualVariants(Key, mBuckets(Index).Key) Then
+        With mBuckets(Index)
+            Select Case .State
+                Case bsEmpty
+                    GetKeyIndex = -1
+                    Exit Function
+                Case bsOccupied
+                    If .HashCode = HashCode Then
+                        If mKeyComparer.Equals(Key, .Key) Then
                             GetKeyIndex = Index
                             Exit Function
                         End If
-                    ElseIf mComparer.Compare(Key, mBuckets(Index).Key) = 0 Then
-                        GetKeyIndex = Index
-                        Exit Function
                     End If
-                End If
-        End Select
+            End Select
+        End With
+        
         Index = (Index + Step) Mod mCapacity
     Loop While Index <> FirstIndex
     
@@ -526,11 +530,7 @@ Private Function GetKeyIndex(ByRef Key As Variant) As Long
 End Function
 
 Private Function InitHashCode(ByRef Key As Variant, ByRef Step As Long, ByRef Index As Long) As Long
-    If mProvider Is Nothing Then
-        InitHashCode = Object.GetHashCode(Key) And &H7FFFFFFF
-    Else
-        InitHashCode = mProvider.GetHashCode(Key) And &H7FFFFFFF
-    End If
+    InitHashCode = mKeyComparer.GetHashCode(Key) And &H7FFFFFFF
     Step = 1 + (((InitHashCode \ 32) + 1) Mod (mCapacity - 1))
     Index = InitHashCode Mod mCapacity
 End Function
@@ -540,65 +540,53 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
     Dim Index               As Long
     Dim FirstEmpty          As Long
     Dim HashCode            As Long
-    Dim UseDefaultCompare   As Boolean
     Dim FirstIndex          As Long
     
-    If mCount > mLoadThreshold Then
-        ExpandTable
+    If mCount > mLoadSize Then
+        Expand
     End If
     
     HashCode = InitHashCode(Key, Step, Index)
     FirstIndex = Index
     FirstEmpty = -1
-    UseDefaultCompare = mComparer Is Nothing
     
     Do
-        Select Case mBuckets(Index).State
-            Case bsEmpty
-                ' we bookmark this bucket as our first available bucket.
-                If FirstEmpty = -1 Then FirstEmpty = Index
-                
-                ' we can exit here because we have found an empty bucket.
-                ' Meaning there are no more buckets on this chain so no
-                ' duplicate key could exist.
-                Exit Do
-                
-            Case bsOccupied
-                If mBuckets(Index).HashCode = HashCode Then
-                    If UseDefaultCompare Then
-                        If EqualVariants(Key, mBuckets(Index).Key) Then
+        With mBuckets(Index)
+            Select Case .State
+                Case bsEmpty
+                    ' we bookmark this bucket as our first available bucket.
+                    If FirstEmpty = -1 Then FirstEmpty = Index
+                    
+                    ' we can exit here because we have found an empty bucket.
+                    ' Meaning there are no more buckets on this chain so no
+                    ' duplicate key could exist.
+                    Exit Do
+                    
+                Case bsOccupied
+                    If .HashCode = HashCode Then
+                        If mKeyComparer.Equals(Key, .Key) Then
                             If Adding Then _
                                 Throw Cor.NewArgumentException("An element with the same key already exists in the collection.", "key")
-                            
-                            ' v2.0 - we copy the key so the same updated key stays with the updated value.
-                            VariantCopyInd mBuckets(Index).Key, Key
-                            VariantCopyInd mBuckets(Index).Value, Value
+                                    
+                            VariantCopyInd .Key, Key
+                            VariantCopyInd .Value, Value
                             mVersion = mVersion + 1
                             Exit Sub
                         End If
-                    ElseIf mComparer.Compare(Key, mBuckets(Index).Key) = 0 Then
-                        If Adding Then _
-                            Throw Cor.NewArgumentException("An element with the same key already exists in the collection.", "key")
-                        
-                        ' v2.0 - we copy the key so the same updated key stays with the updated value.
-                        VariantCopyInd mBuckets(Index).Key, Key
-                        VariantCopyInd mBuckets(Index).Value, Value
-                        mVersion = mVersion + 1
-                        Exit Sub
                     End If
-                End If
-            
-            Case bsDeleted
-                ' we bookmark this bucket as our first available bucket
-                ' to place the value and key in. We only do this once
-                ' to the first occurence of a deleted bucket.
-                If FirstEmpty = -1 Then FirstEmpty = Index
                 
-                ' we don't exit here because we need to keep
-                ' checking to see if the key exists in the
-                ' chain of buckets further down.
+                Case bsDeleted
+                    ' we bookmark this bucket as our first available bucket
+                    ' to place the value and key in. We only do this once
+                    ' to the first occurence of a deleted bucket.
+                    If FirstEmpty = -1 Then FirstEmpty = Index
+                    
+                    ' we don't exit here because we need to keep
+                    ' checking to see if the key exists in the
+                    ' chain of buckets further down.
+            End Select
+        End With
         
-        End Select
         Index = (Index + Step) Mod mCapacity
         
         ' If we end up on the starting index then we have
@@ -674,16 +662,16 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        Dim Comparer As Object
+        Dim Comparer As IEqualityComparer
         If .ReadProperty(PROP_USEDEFAULTCOMPARER, False) Then
-            Set Comparer = Comparer.Default
+            Set Comparer = EqualityComparer.Default
         Else
             Set Comparer = .ReadProperty(PROP_COMPARER, Nothing)
         End If
         
         Dim Count As Long
         Count = .ReadProperty(PROP_COUNT)
-        InitCapacity Count, .ReadProperty(PROP_PROVIDER, Nothing), Comparer
+        Init Nothing, Count, DefaultLoadFactor, Comparer
         
         Dim i As Long
         For i = 1 To Count
@@ -709,21 +697,16 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
         ' Simply save the number of elements are in this Hashtable.
         .WriteProperty PROP_COUNT, mCount
         
-        ' The provider will either be Nothing or a user-supplied
-        ' provider. If so, we hope it is persitable or an exception
-        ' will be thrown.
-        .WriteProperty PROP_PROVIDER, mProvider
-        
         ' We don't want to create a duplicate of the default comparer object,
         ' so we will just set a flag that says to use the default comparer
         ' object when the Hashtable is deserialized.
-        If mComparer Is Comparer.Default Then
+        If mKeyComparer Is EqualityComparer.Default Then
             .WriteProperty PROP_USEDEFAULTCOMPARER, True
         Else
             ' Either we aren't using a comparer at all or we are
             ' using a user-supplied comparer. If so, we hope it
             ' is persistable, or an exception will be thrown.
-            .WriteProperty PROP_COMPARER, mComparer
+            .WriteProperty PROP_COMPARER, mKeyComparer
         End If
         
         ' Iterate through the buckets in this hashtable. If the bucket
@@ -832,7 +815,7 @@ Private Property Get IDictionary_Count() As Long
     IDictionary_Count = Count
 End Property
 
-Private Function IDictionary_GetEnumerator() As IEnumerator
+Private Function IDictionary_GetEnumerator() As IDictionaryEnumerator
     Set IDictionary_GetEnumerator = GetEnumerator
 End Function
 
