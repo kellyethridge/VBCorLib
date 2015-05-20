@@ -221,8 +221,8 @@ Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Option
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     
-    ElemIndex = GetOptionalLong(Index, 0)
-    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    ElemIndex = OptionalLong(Index, 0)
+    ElemCount = OptionalLong(Count, mCount - ElemIndex)
     
     If ElemIndex < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
@@ -260,8 +260,8 @@ Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex A
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
     
-    ElemIndex = GetOptionalLong(StartIndex, 0)
-    ElemCount = GetOptionalLong(Count, mCount)
+    ElemIndex = OptionalLong(StartIndex, 0)
+    ElemCount = OptionalLong(Count, mCount)
     
     If ElemIndex < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("StartIndex", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
@@ -440,8 +440,8 @@ Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count
     
     Dim ElemCount As Long
     Dim ElemIndex As Long
-    ElemIndex = GetOptionalLong(Index, 0)
-    ElemCount = GetOptionalLong(Count, mCount - ElemIndex)
+    ElemIndex = OptionalLong(Index, 0)
+    ElemCount = OptionalLong(Count, mCount - ElemIndex)
     
     If ElemIndex < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", ElemIndex, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))

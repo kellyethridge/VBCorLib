@@ -604,7 +604,7 @@ Private Property Get IDictionary_Count() As Long
     IDictionary_Count = Count
 End Property
 
-Private Function IDictionary_GetEnumerator() As IEnumerator
+Private Function IDictionary_GetEnumerator() As IDictionaryEnumerator
     Set IDictionary_GetEnumerator = GetEnumerator
 End Function
 

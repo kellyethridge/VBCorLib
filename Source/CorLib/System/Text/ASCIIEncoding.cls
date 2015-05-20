@@ -199,7 +199,7 @@ Private Function GetByteCountChars(ByRef Chars As Variant, ByRef Index As Varian
     Validation.CheckValidSingleDimArray Chars, Parameter_Chars
         
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
+    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
 
     If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -233,7 +233,7 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
         Error.ArgumentNull "Chars", ArgumentNull_Array
     
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(AttachedChars), CorArray.LengthFirstDim(AttachedChars))
+    Range = OptionalRange(Index, Count, LBound(AttachedChars), CorArray.LengthFirstDim(AttachedChars))
 
     If Range.Index < LBound(AttachedChars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -320,7 +320,7 @@ Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Vari
     Validation.CheckValidSingleDimArray Bytes, Parameter_Bytes
     
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
+    Range = OptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
 
     If Range.Index < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -345,7 +345,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Vari
     Validation.CheckValidSingleDimArray Bytes, Parameter_Bytes
 
     Dim Range As ListRange
-    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
+    Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
 
     If Range.Index < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
@@ -485,7 +485,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Var
     Validation.CheckValidSingleDimArray Bytes, Parameter_Bytes
 
     Dim Range As ListRange
-    Range = GetOptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
+    Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
 
     If Range.Index < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound

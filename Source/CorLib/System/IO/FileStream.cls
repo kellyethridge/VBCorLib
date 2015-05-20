@@ -498,11 +498,8 @@ End Function
 Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     VerifyCanRead
     VerifyIsOpen
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
     
-    If IsNullByteArray(Bytes) Then _
-        Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If IsMultiDimByteArray(Bytes) Then _
-        Error.Rank
     If Offset < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Count < 0 Then _
@@ -640,7 +637,7 @@ Public Sub WriteByte(ByVal Value As Byte)
     If mWritePosition = mBufferSize Then
         Flush
     End If
-    If IsNullByteArray(mBuffer) Then
+    If SAPtr(mBuffer) = vbNullPtr Then
         ReDim mBuffer(0 To mBufferSize - 1)
     End If
     
@@ -661,9 +658,8 @@ End Sub
 Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long)
     VerifyCanWrite
     VerifyIsOpen
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
     
-    If IsNullByteArray(Bytes) Then _
-        Error.ArgumentNull "Bytes", ArgumentNull_Array
     If Offset < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Count < 0 Then _
@@ -674,7 +670,7 @@ Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count A
     If Count = 0 Then
         Exit Sub
     End If
-    If IsNullByteArray(mBuffer) Then
+    If SAPtr(mBuffer) = vbNullPtr Then
         ReDim mBuffer(0 To mBufferSize - 1)
     End If
     
@@ -941,7 +937,7 @@ Private Sub FillBuffer()
     mReadPosition = 0
     mWritePosition = 0
     
-    If IsNullByteArray(mBuffer) Then
+    If SAPtr(mBuffer) = vbNullPtr Then
         ReDim mBuffer(0 To mBufferSize - 1)
     End If
     

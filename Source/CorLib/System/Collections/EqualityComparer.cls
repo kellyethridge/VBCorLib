@@ -37,30 +37,18 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IEqualityComparer
 
-Private mComparer   As IComparer
-Private mObject     As ObjectStatic
-
 
 Public Function Equals(ByRef X As Variant, ByRef Y As Variant) As Boolean
-    Equals = mComparer.Compare(X, Y) = 0
+    Equals = Object.Equals(X, Y)
 End Function
 
 Public Function GetHashCode(ByRef Obj As Variant) As Long
-    GetHashCode = mObject.GetHashCode(Obj)
+    GetHashCode = Object.GetHashCode(Obj)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mComparer = Comparer.Default
-    Set mObject = Object
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEqualityComparer Interface
+'   IEqualityComparer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEqualityComparer_Equals(X As Variant, Y As Variant) As Boolean
     IEqualityComparer_Equals = Equals(X, Y)

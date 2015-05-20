@@ -319,7 +319,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Bytes() As Byte
     Dim Range   As ListRange
     
-    Range = GetOptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
+    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
 
     If Range.Index < LBound(Buffer) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound

@@ -459,7 +459,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Validation.CheckValidSingleDimArrayPtr BufferPtr, Parameter_Buffer
     
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
+    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
     
     If Range.Index < LBound(Buffer) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound

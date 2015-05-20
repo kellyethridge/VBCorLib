@@ -23,7 +23,7 @@ Attribute VB_Name = "ArgumentHelper"
 ''
 ' This modules contains functions used to help with optional parameters and
 ' verifying ranges of values.
-' <p>All of the functions return an error code except GetOptionalLong. This
+' <p>All of the functions return an error code except OptionalLong. This
 ' function returns a valid integer value or throws an exception if a the
 ' supplied optional value is not an integer type.</p>
 '
@@ -34,52 +34,18 @@ Public Type ListRange
     Count As Long
 End Type
 
-Public Function IsNullByteArray(ByRef Bytes() As Byte) As Boolean
-    IsNullByteArray = (SAPtr(Bytes) = vbNullPtr)
-End Function
-
-Public Function IsMultiDimByteArray(ByRef Bytes() As Byte) As Boolean
-    IsMultiDimByteArray = (SafeArrayGetDim(SAPtr(Bytes)) > 1)
-End Function
-
-Public Function IsNullCharArray(ByRef Chars() As Integer) As Boolean
-    IsNullCharArray = (SAPtr(Chars) = vbNullPtr)
-End Function
-
-Public Function IsMultiDimCharArray(ByRef Chars() As Integer) As Boolean
-    IsMultiDimCharArray = (SafeArrayGetDim(SAPtr(Chars)) > 1)
-End Function
-
-Public Function IfLong(ByRef Value As Variant, ByVal Default As Long) As Long
-    If IsMissing(Value) Then
-        IfLong = Default
-    Else
-        IfLong = Value
-    End If
-End Function
 
 ''
 ' Returns an optional value or a default value if the optional value is missing.
 '
-' @param OptionalValue The optional variant value.
-' @param Default The default return value is the optionavalue is missing.
-' @return A vbLong value derived from the optional value or default value.
-' @remarks The calling function passes in an Optional Variant type from it's function
-' parameter list. The value will maintain its Missing status into this call if it was
-' not supplied to the caller's function.
-' <p>Only vbLong, vbInteger, and vbByte are value OptionalValue datatypes. All others
-' will cause an ArgumentException to be thrown.</p>
-'
-Public Function GetOptionalLong(ByRef OptionalValue As Variant, ByVal DefaultValue As Long) As Long
-    Select Case VarType(OptionalValue)
+Public Function OptionalLong(ByRef Value As Variant, ByVal Default As Long) As Long
+    Select Case VarType(Value)
         Case vbMissing
-            GetOptionalLong = DefaultValue
-        
+            OptionalLong = Default
         Case vbLong, vbInteger, vbByte
-            GetOptionalLong = OptionalValue
-        
+            OptionalLong = Value
         Case Else
-            Throw Cor.NewArgumentException("The Optional value must be an integer type.")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "Long"))
     End Select
 End Function
 
@@ -107,59 +73,59 @@ Public Function GetOptionalLongPair(ByRef OptionalValue1 As Variant, ByVal Defau
             ReturnValue1 = DefaultValue1
             ReturnValue2 = DefaultValue2
         Else
-            ReturnValue1 = GetOptionalLong(OptionalValue1, DefaultValue1)
-            ReturnValue2 = GetOptionalLong(OptionalValue2, DefaultValue2)
+            ReturnValue1 = OptionalLong(OptionalValue1, DefaultValue1)
+            ReturnValue2 = OptionalLong(OptionalValue2, DefaultValue2)
         End If
     Else
         GetOptionalLongPair = Argument_ParamRequired
     End If
 End Function
 
-Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
+Public Function OptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
     Dim FirstIsMissing As Boolean
     
     FirstIsMissing = IsMissing(Index)
     
     If FirstIsMissing = IsMissing(Count) Then
         If FirstIsMissing Then
-            GetOptionalRange.Index = DefaultIndex
-            GetOptionalRange.Count = DefaultCount
+            OptionalRange.Index = DefaultIndex
+            OptionalRange.Count = DefaultCount
         Else
-            GetOptionalRange.Index = GetOptionalLong(Index, DefaultIndex)
-            GetOptionalRange.Count = GetOptionalLong(Count, DefaultCount)
+            OptionalRange.Index = OptionalLong(Index, DefaultIndex)
+            OptionalRange.Count = OptionalLong(Count, DefaultCount)
         End If
     Else
         ThrowMissing Index, IndexParameter, CountParameter
     End If
 End Function
 
-Public Function GetOptionalStepRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
+Public Function OptionalStepRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
     If IsMissing(Index) Then
-        GetOptionalStepRange.Index = DefaultIndex
+        OptionalStepRange.Index = DefaultIndex
         
         If IsMissing(Count) Then
-            GetOptionalStepRange.Count = DefaultCount
+            OptionalStepRange.Count = DefaultCount
         Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), Environment.GetResourceString(IndexParameter))
         End If
     Else
-        GetOptionalStepRange.Index = CLng(Index)
-        GetOptionalStepRange.Count = GetOptionalLong(Count, DefaultCount - GetOptionalStepRange.Index)
+        OptionalStepRange.Index = CLng(Index)
+        OptionalStepRange.Count = OptionalLong(Count, DefaultCount - OptionalStepRange.Index)
     End If
 End Function
 
-Public Function GetOptionalStepRangeReverse(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
+Public Function OptionalReverseStepRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ParameterString = Parameter_Index, Optional ByVal CountParameter As ParameterString = Parameter_Count) As ListRange
     If IsMissing(Index) Then
-        GetOptionalStepRangeReverse.Index = DefaultIndex
+        OptionalReverseStepRange.Index = DefaultIndex
         
         If IsMissing(Count) Then
-            GetOptionalStepRangeReverse.Count = DefaultCount
+            OptionalReverseStepRange.Count = DefaultCount
         Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), Environment.GetResourceString(IndexParameter))
         End If
     Else
-        GetOptionalStepRangeReverse.Index = CLng(Index)
-        GetOptionalStepRangeReverse.Count = GetOptionalLong(Count, GetOptionalStepRangeReverse.Index + 1)
+        OptionalReverseStepRange.Index = CLng(Index)
+        OptionalReverseStepRange.Count = OptionalLong(Count, OptionalReverseStepRange.Index + 1)
     End If
 End Function
 

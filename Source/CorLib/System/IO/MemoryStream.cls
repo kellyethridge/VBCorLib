@@ -411,10 +411,8 @@ End Sub
 ' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
 '
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    If IsNullByteArray(Buffer) Then _
-        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
-    If IsMultiDimByteArray(Buffer) Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
+    CheckValidSingleDimArray Buffer, Parameter_Buffer
+    
     If Offset < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
@@ -474,10 +472,8 @@ End Sub
 ' <p>After reading from the stream, the current position will advance the number of byte as returend.</p>
 '
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
-    If IsNullByteArray(Buffer) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-    If IsMultiDimByteArray(Buffer) Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
+    CheckValidSingleDimArray Buffer, Parameter_Buffer
+    
     If Offset < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _

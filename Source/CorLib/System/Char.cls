@@ -67,7 +67,7 @@ End Function
 
 Private Function IsWhiteSpaceString(ByRef s As Variant, ByRef Index As Variant) As Boolean
     Dim CharIndex As Long
-    CharIndex = GetOptionalLong(Index, 0)
+    CharIndex = OptionalLong(Index, 0)
     
     If CharIndex < 0 Or CharIndex >= Len(s) Then _
         Error.ArgumentOutOfRange "Index"

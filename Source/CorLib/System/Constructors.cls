@@ -969,9 +969,14 @@ End Function
 ' @param Comparer A custom comparer used to compare specific values.
 ' @return A new Hashtable object.
 '
-Public Function NewHashtable(Optional ByVal d As IDictionary, Optional ByVal hcp As IHashcodeProvider, Optional ByVal Comparer As IComparer) As Hashtable
+Public Function NewHashtable(Optional ByVal d As IDictionary, Optional ByVal LoadFactor As Single = 1!, Optional ByVal EqualityComparer As IEqualityComparer) As Hashtable
     Set NewHashtable = New Hashtable
-    Call NewHashtable.InitDictionary(d, hcp, Comparer)
+    NewHashtable.Init d, 0, LoadFactor, EqualityComparer
+End Function
+
+Public Function NewHashtable2(ByVal Capacity As Long, Optional ByVal LoadFactor As Single = 1!, Optional ByVal EqualityComparer As IEqualityComparer) As Hashtable
+    Set NewHashtable2 = New Hashtable
+    NewHashtable2.Init Nothing, Capacity, LoadFactor, EqualityComparer
 End Function
 
 ''

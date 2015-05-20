@@ -40,7 +40,7 @@ Option Explicit
 
 Private Const BufferCapacity As Long = 16
 
-Private Type Bucket
+Private Type BufferBucket
     TablePtr    As Long
     Self        As IUnknown
     ReleasePtr  As Long
@@ -49,9 +49,31 @@ Private Type Bucket
     InUse       As Boolean
 End Type
 
-Private mInited     As Boolean
-Private mBuffers()  As Bucket
+Public Type CharBuffer
+    TablePtr    As Long
+    Self        As IUnknown
+    ReleasePtr  As Long
+    Chars()     As Integer
+    Buffer      As SafeArray1d
+End Type
 
+Private mInited     As Boolean
+Private mBuffers()  As BufferBucket
+
+
+Public Sub InitChars(ByRef Chars As CharBuffer)
+    With Chars
+        .TablePtr = VarPtr(.TablePtr)
+        ObjectPtr(.Self) = .TablePtr
+        .ReleasePtr = FuncAddr(AddressOf ReleaseCharBuffer)
+        SAPtr(.Chars) = VarPtr(.Buffer)
+        With .Buffer
+            .cbElements = 2
+            .cDims = 1
+            .cLocks = 1
+        End With
+    End With
+End Sub
 
 ''
 ' Allocates an Integer array backed by the String passed in.
@@ -149,7 +171,7 @@ Private Sub InitBuffers()
             .Buffer.cLocks = 1
             .TablePtr = VarPtr(.TablePtr)
             ObjectPtr(.Self) = .TablePtr
-            .ReleasePtr = FuncAddr(AddressOf ReleaseBucket)
+            .ReleasePtr = FuncAddr(AddressOf ReleaseBufferBucket)
             .BufferPtr = VarPtr(.Buffer)
         End With
     Next
@@ -182,8 +204,15 @@ Private Function FindAllocatedBufferIndex(ByRef Chars() As Integer) As Long
     FindAllocatedBufferIndex = -1
 End Function
 
-Private Function ReleaseBucket(ByRef This As Bucket) As Long
+Private Function ReleaseBufferBucket(ByRef This As BufferBucket) As Long
     This.Buffer.pvData = vbNullPtr
     This.Buffer.cElements = 0
     This.Buffer.cLocks = 0
+End Function
+
+Private Function ReleaseCharBuffer(ByRef This As CharBuffer) As Long
+    This.Buffer.pvData = vbNullPtr
+    This.Buffer.cElements = 0
+    This.Buffer.cLocks = 0
+    SAPtr(This.Chars) = vbNullPtr
 End Function

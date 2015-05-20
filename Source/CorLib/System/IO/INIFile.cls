@@ -424,7 +424,8 @@ Public Function GetValues(ByVal Section As String) As IDictionary
     Loop While Size = Len(Buf) - 2
     
     Dim Ret As Hashtable
-    Set Ret = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, Comparer:=New CaseInsensitiveComparer)
+'    Set Ret = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, Comparer:=New CaseInsensitiveComparer)
+    Debug.Assert False
     
     If Size > 0 Then
         Dim Entries() As String
