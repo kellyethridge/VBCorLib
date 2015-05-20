@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "ArrayListReadOnlyTests"
+Attribute VB_Name = "ReadOnlyArrayListTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -26,6 +26,27 @@ Public Sub ReadOnly_WithNothing_ThrowsArgumentNullException()
     AssertArgumentNullException Err, "List"
 End Sub
 
-Public Sub Add_WhenCalled_ThrowsInvalidOperationException()
-
+Public Sub IsReadOnly_WhenCalled_ReturnsTrue()
+    Dim Actual As Boolean
+    
+    With MakeList
+        Actual = .IsReadOnly
+    End With
+    
+    Assert.That Actual, Iz.True
 End Sub
+
+Public Sub Add_WhenCalled_ThrowsInvalidOperationException()
+    On Error Resume Next
+    
+    With MakeList
+        .Add 1
+    End With
+    
+    Assert
+End Sub
+
+
+Private Function MakeList() As ArrayList
+    Set MakeList = ArrayList.ReadOnly(Cor.NewArrayList(Source:=Array(1, 2, 3)))
+End Function

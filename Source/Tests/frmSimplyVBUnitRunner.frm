@@ -157,7 +157,8 @@ Private Sub AddSystemCollections()
             New ArrayListRangedTests, _
             New ArrayListRepeatTests, _
             New ArrayListEnumeratorTests, _
-            New ArrayListReadOnlyTests)
+            New ReadOnlyArrayListTests, _
+            New FixedSizeArrayListTests)
         
         .Add NewSuite("Queue", _
             New QueueTests, _
