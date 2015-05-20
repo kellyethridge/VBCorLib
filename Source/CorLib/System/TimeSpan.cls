@@ -238,9 +238,8 @@ End Function
 ' where the bracketed fields are optional. The optional fields will be
 ' included in the string their value is not zero, or the TimeSpan is negative.
 Public Function ToString() As String
-    ' use a cached version to lower overhead. The length is set to zero.
     Dim Output As StringBuilder
-    Set Output = TimeSpan.StringBuilder
+    Set Output = StringBuilderCache.Acquire
     
     Dim ms As Currency
     ms = mMilliseconds
@@ -276,7 +275,7 @@ Public Function ToString() As String
         AppendComponent Output, TicksComponent, 7
     End If
     
-    ToString = Output.ToString
+    ToString = StringBuilderCache.GetStringAndRelease(Output)
 End Function
 
 ''
@@ -299,12 +298,12 @@ Public Function GetHashCode() As Long
     End With
 End Function
 
-Public Function LessThan(ByRef other As TimeSpan) As Boolean
-    LessThan = TimeSpan.LessThan(Me, other)
+Public Function LessThan(ByRef Other As TimeSpan) As Boolean
+    LessThan = TimeSpan.LessThan(Me, Other)
 End Function
 
-Public Function GreaterThan(ByRef other As TimeSpan) As Boolean
-    GreaterThan = TimeSpan.GreaterThan(Me, other)
+Public Function GreaterThan(ByRef Other As TimeSpan) As Boolean
+    GreaterThan = TimeSpan.GreaterThan(Me, Other)
 End Function
 
 
@@ -321,7 +320,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Long, ByVal Width As Long)
     Dim ComponentString As String
@@ -333,7 +332,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     mMilliseconds = PropBag.ReadProperty(PROP_MILLISECONDS, DEF_TIMESPAN)
@@ -345,16 +344,16 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    On Error GoTo errTrap
+    On Error GoTo Catch
     
-    Dim other As TimeSpan
-    Set other = Value
-    IObject_Equals = Equals(other)
+    Dim Other As TimeSpan
+    Set Other = Value
+    IObject_Equals = Equals(Other)
     
-errTrap:
+Catch:
 End Function
 
 Private Function IObject_GetHashcode() As Long
@@ -365,17 +364,18 @@ Private Function IObject_ToString() As String
     IObject_ToString = ToString
 End Function
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IComparable_CompareTo
+'   IComparable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparable_CompareTo(Value As Variant) As Long
-    On Error GoTo errTrap
+    On Error GoTo Catch
     
-    Dim other As TimeSpan
-    Set other = Value
-    IComparable_CompareTo = CompareTo(other)
+    Dim Other As TimeSpan
+    Set Other = Value
+    IComparable_CompareTo = CompareTo(Other)
     Exit Function
     
-errTrap:
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_TimeSpanRequired), Environment.GetResourceString(Parameter_Value))
+Catch:
+    Error.Argument Argument_TimeSpanRequired, "Value"
 End Function

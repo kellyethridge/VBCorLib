@@ -48,16 +48,12 @@ Public Enum ParseError
     FormatError
 End Enum
 
-Private mBuffer     As WordBuffer
+Private mBuffer     As CharBuffer
 Private mIndex      As Long
 Private mChar       As Long
 Private mError      As ParseError
 
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Methods
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Property Get Error() As ParseError
     Error = mError
 End Property
@@ -108,7 +104,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
     
     SkipBlanks
     
-    If mIndex < mBuffer.SA.cElements - 1 Then
+    If mIndex < mBuffer.Buffer.cElements - 1 Then
         If mError = ParseError.None Then
             mError = ParseError.FormatError
         End If
@@ -121,12 +117,19 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
 End Function
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitChars mBuffer
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Init(ByRef s As String)
-    InitWordBuffer mBuffer, StrPtr(s), Len(s)
+    SetChars mBuffer, s
     mIndex = -1
     mError = ParseError.None
     mChar = 0
@@ -139,8 +142,8 @@ End Property
 Private Sub NextChar()
     mIndex = mIndex + 1
     
-    If mIndex < mBuffer.SA.cElements Then
-        mChar = mBuffer.Data(mIndex)
+    If mIndex < mBuffer.Buffer.cElements Then
+        mChar = mBuffer.Chars(mIndex)
     Else
         mIndex = mIndex - 1
         mChar = 0
@@ -155,11 +158,11 @@ End Sub
 
 Private Function NextNonDigit() As Integer
     Dim i As Long
-    For i = mIndex To mBuffer.SA.cElements - 1
-        Select Case mBuffer.Data(i)
+    For i = mIndex To mBuffer.Buffer.cElements - 1
+        Select Case mBuffer.Chars(i)
             Case vbZeroChar To vbNineChar
             Case Else
-                NextNonDigit = mBuffer.Data(i)
+                NextNonDigit = mBuffer.Chars(i)
                 Exit Function
         End Select
     Next i
@@ -257,4 +260,5 @@ Private Function TryParseNumber(ByVal MaxValue As Long, ByRef Result As Long) As
         mError = ParseError.OverflowError
     End If
 End Function
+
 
