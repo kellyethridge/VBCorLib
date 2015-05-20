@@ -910,6 +910,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IFormattable Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IFormattable_ToString(ByVal Format As String, ByVal Provider As IFormatProvider) As String
+Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String
     IFormattable_ToString = ToString(Format, Provider)
 End Function

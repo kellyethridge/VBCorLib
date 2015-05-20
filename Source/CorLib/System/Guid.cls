@@ -136,7 +136,7 @@ End Function
 ' </pre>
 ' <b>B</b> is the default format.
 '
-Public Function ToString(Optional ByVal Format As String, Optional ByVal Provider As IFormatProvider) As String
+Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     If Format = "X" Then
         Dim sb As StringBuilder
         Set sb = StringBuilderCache.Acquire
@@ -342,7 +342,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function EqualFields(ByVal MyField As Long, ByVal TheirField As Long, ByRef Result As Long) As Boolean
     If MyField < TheirField Then
@@ -357,7 +357,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
@@ -382,7 +382,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -398,7 +398,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IComparable Interface
+'   IComparable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparable_CompareTo(Value As Variant) As Long
     IComparable_CompareTo = CompareTo(Value)
@@ -406,8 +406,8 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IFormattable Interface
+'   IFormattable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IFormattable_ToString(ByVal Format As String, ByVal Provider As IFormatProvider) As String
+Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String
     IFormattable_ToString = ToString(Format, Provider)
 End Function

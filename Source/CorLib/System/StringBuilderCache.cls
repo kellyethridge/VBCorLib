@@ -41,6 +41,7 @@ Private mCache As New Stack
 
 Private Sub Class_Initialize()
     mCache.Push New StringBuilder
+    mCache.Push New StringBuilder
 End Sub
 
 Friend Function Acquire() As StringBuilder

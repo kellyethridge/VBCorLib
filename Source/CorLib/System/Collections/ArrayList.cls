@@ -282,12 +282,9 @@ End Sub
 ' @remarks The destination array must be large enough to hold the number of elements being copied.
 '
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
+    CheckValidSingleDimArray Arr
     If mCount - Index < Count Then _
         Error.InvalidOffsetLength
-    If CorArray.IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    If CorArray.Rank(Arr) <> 1 Then _
-        Error.Rank
         
     CorArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
 End Sub
@@ -729,10 +726,6 @@ Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
 
-'Public Property Get Version() As Long
-'    Version = mVersion
-'End Property
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -749,6 +742,10 @@ Friend Sub Init(ByVal Comparer As IComparer, ByRef Source As Variant)
     If Not IsMissing(Source) Then
         AddRange Source
     End If
+End Sub
+
+Private Sub Class_InitProperties()
+    Capacity = DEF_CAPACITY
 End Sub
 
 
@@ -840,12 +837,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_InitProperties()
-    Capacity = DEF_CAPACITY
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     On Error GoTo errTrap
     With PropBag
