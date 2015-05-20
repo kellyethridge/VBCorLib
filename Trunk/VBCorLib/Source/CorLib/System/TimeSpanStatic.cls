@@ -243,10 +243,10 @@ End Function
 '
 ' This is to be used only by TimeSpan objects in an immediate
 ' context since it is shared by all TimeSpan objects.
-Friend Property Get StringBuilder() As StringBuilder
-    mStringBuilder.Length = 0
-    Set StringBuilder = mStringBuilder
-End Property
+'Friend Property Get StringBuilder() As StringBuilder
+'    mStringBuilder.Length = 0
+'    Set StringBuilder = mStringBuilder
+'End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
