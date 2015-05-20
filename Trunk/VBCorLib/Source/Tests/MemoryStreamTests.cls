@@ -329,7 +329,7 @@ Public Sub ReadBlock_WithNullOutputBuffer_ThrowsArgumentNullException()
     On Error Resume Next
     ms.ReadBlock OutputBuffer, 0, 3
     
-    AssertArgumentNullException Err, "Bytes"
+    AssertArgumentNullException Err, "Buffer"
 End Sub
 
 Public Sub ReadBlock_WithMultipleDimensionOutputBuffer_ThrowsRankException()

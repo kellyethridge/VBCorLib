@@ -197,7 +197,7 @@ Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal C
     Dim Result As StreamAsyncResult
     Set Result = Cor.NewStreamAsyncResult(State)
     
-    On Error GoTo errTrap:
+    On Error GoTo Catch
     Result.CompletedSynchronously = True
     Result.IsCompleted = True
     WriteBlock Buffer, Offset, Count
@@ -206,7 +206,7 @@ Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal C
         Callback.Execute Result
     End If
     
-errTrap:
+Catch:
     Dim Ex As Exception
     If Catch(Ex, Err) Then
         Set Result.Exception = Ex
@@ -320,21 +320,25 @@ End Property
 ''
 ' Sets the current capacity for the internal stream buffer.
 '
-' @param RHS The number of bytes to allocate for the internal array.
+' @param Value The number of bytes to allocate for the internal array.
 ' @remarks The capacity cannot be set less than the current length of
 ' the stream. If the underlying byte array is user-supplied, then an
 ' exception will be thrown if the capacity is modified.
 '
-Public Property Let Capacity(ByVal RHS As Long)
+Public Property Let Capacity(ByVal Value As Long)
     If Not mExpandable Then _
-        Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_MemoryStreamNotExpandable))
-    If RHS < mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity))
+        Error.NotSupported NotSupported_MemoryStreamNotExpandable
+    If Value < mLength Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
     
     EnsureOpen
     
-    If RHS = mLength Then Exit Property
-    mCapacity = RHS - 1
+    If Value = mLength Then
+        Exit Property
+    End If
+    
+    mCapacity = Value
+    
     If mBufferSet Then
         ReDim Preserve mBuffer(0 To mCapacity - 1)
     Else
@@ -369,17 +373,17 @@ End Property
 ''
 ' Sets the current position within the stream.
 '
-' @param RHS The absolution position within the stream.
+' @param Value The absolution position within the stream.
 ' @remarks The position is the index at which the next read or write
 ' will occur. Position is always zero based, even if a user-supplied
 ' array is not.
 '
-Public Property Let Position(ByVal RHS As Currency)
-    If RHS < 0@ Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+Public Property Let Position(ByVal Value As Currency)
+    If Value < 0@ Then _
+        Error.NegativeNumber "Value"
     
     EnsureOpen
-    mPosition = Int(RHS)
+    mPosition = Int(Value)
 End Property
 
 ''
@@ -414,11 +418,11 @@ Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count 
     CheckValidSingleDimArray Buffer, Parameter_Buffer
     
     If Offset < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Offset"
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Count"
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
+        Error.InvalidOffsetLength
         
     EnsureWritable
     EnsureOpen
@@ -475,11 +479,11 @@ Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
     CheckValidSingleDimArray Buffer, Parameter_Buffer
     
     If Offset < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Offset"
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.NegativeNumber "Count"
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
+        Error.InvalidOffsetLength
     
     EnsureOpen
     EnsureBuffer
@@ -536,7 +540,7 @@ Public Function SeekPosition(ByVal Offset As Currency, ByVal Loc As SeekOrigin) 
         Case FromEnd
             Position = mLength + Offset
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidSeekOrigin))
+            Error.Argument Argument_InvalidSeekOrigin
     End Select
     SeekPosition = mPosition
 End Function
@@ -565,7 +569,7 @@ Public Sub SetLength(ByVal Value As Currency)
         Case Is > mCapacity
             Capacity = Value
         Case Is < 0@
-            Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+            Error.NegativeNumber "Value"
     End Select
     
     mLength = Value
@@ -606,7 +610,7 @@ End Sub
 '
 Public Sub WriteTo(ByVal Stream As Stream)
     If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
+        Error.ArgumentNull "Stream", ArgumentNull_Stream
     EnsureBuffer
     EnsureOpen
     
@@ -645,11 +649,25 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As Variant, ByVal Writable As Boolean, ByVal Mode As BufferMode)
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(Buffer), Index, mIndex, Count, mCapacity)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Buffer", mIndex, "Index", mCapacity, "Count", IsMissing(Index)
+    Dim Range As ListRange
     
+    CheckValidSingleDimArray Buffer, Parameter_Buffer
+    
+    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
+    If Range.Index < LBound(Buffer) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
+        Error.InvalidOffsetLength
+    
+'    Dim Result As Long
+'    Result = GetOptionalArrayRange(SAPtr(Buffer), Index, mIndex, Count, mCapacity)
+'    If Result <> NO_ERROR Then _
+'        ThrowArrayRangeException Result, "Buffer", mIndex, "Index", mCapacity, "Count", IsMissing(Index)
+    
+    mIndex = Range.Index
+    mCapacity = Range.Count
     mCanWrite = Writable
     mMode = Mode
     mLength = mCapacity
