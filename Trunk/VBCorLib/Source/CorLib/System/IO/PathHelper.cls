@@ -164,7 +164,7 @@ Friend Function OrdinalStartsWith(ByRef CompareTo As String, ByVal IgnoreCase As
     Dim Current As String
     Current = ToString
     If IgnoreCase Then
-        OrdinalStartsWith = CorString.EqualsIgnoreCase(Current, CompareTo)
+        OrdinalStartsWith = CorString.Equals(Current, CompareTo, OrdinalIgnoreCase)
     Else
         OrdinalStartsWith = CorString.Equals(Current, CompareTo)
     End If

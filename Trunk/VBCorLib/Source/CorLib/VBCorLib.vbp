@@ -315,7 +315,6 @@ Class=BigInteger; System\BigInteger.cls
 Class=IListWrapper; System\Collections\IListWrapper.cls
 Class=TimeSpanParser; System\TimeSpanParser.cls
 Module=Resources; System\Resources.bas
-Class=StringUtils; System\StringUtils.cls
 Class=Thread; System\Threading\Thread.cls
 Class=ThreadStatic; System\Threading\ThreadStatic.cls
 RelatedDoc=ChangeLog.txt

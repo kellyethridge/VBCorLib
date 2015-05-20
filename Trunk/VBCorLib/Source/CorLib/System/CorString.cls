@@ -46,7 +46,15 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mStringUtils As New StringUtils
+Public Enum StringComparison
+    Ordinal = 4
+    OrdinalIgnoreCase = 5
+End Enum
+
+Private mComparisonString1()    As Long
+Private mComparisonString2()    As Long
+Private mComparisonHeader1      As SafeArray1d
+Private mComparisonHeader2      As SafeArray1d
 
 
 ''
@@ -436,22 +444,65 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
     CopyMemory ByVal TargetPtr + StartIndex + ValueLength, ByVal SourcePtr + StartIndex, LenB(Insert) - (StartIndex + ValueLength)
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friends
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function EqualsIgnoreCase(ByRef String1 As String, ByRef String2 As String) As Boolean
-    EqualsIgnoreCase = mStringUtils.EqualStrings(String1, String2, vbTextCompare)
+Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
+    Select Case ComparisonType
+        Case StringComparison.Ordinal
+            Equals = OrdinalEquals(StrPtr(a), StrPtr(b))
+        Case StringComparison.OrdinalIgnoreCase
+            Equals = OrdinalIgnoreCaseEquals(StrPtr(a), StrPtr(b))
+        Case Else
+            Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
+    End Select
 End Function
 
-Friend Function Equals(ByRef String1 As String, ByRef String2 As String) As Boolean
-    Equals = mStringUtils.EqualStrings(String1, String2, vbBinaryCompare)
+Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
+    Select Case ComparisonType
+        Case StringComparison.Ordinal
+            EqualsV = OrdinalEquals(StrPtr(a), StrPtr(b))
+        Case StringComparison.OrdinalIgnoreCase
+            EqualsV = OrdinalIgnoreCaseEquals(StrPtr(a), StrPtr(b))
+        Case Else
+            Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
+    End Select
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitComparisonStrings
+End Sub
+
+Private Sub Class_Terminate()
+    ReleaseComparisonStrings
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub InitComparisonStrings()
+    With mComparisonHeader1
+        .cbElements = SizeOfChar * 2
+        .cDims = 1
+        .cElements = &H7FFFFFFF
+    End With
+    With mComparisonHeader2
+        .cbElements = SizeOfChar * 2
+        .cDims = 1
+        .cElements = &H7FFFFFFF
+    End With
+    
+    SAPtr(mComparisonString1) = VarPtr(mComparisonHeader1)
+    SAPtr(mComparisonString2) = VarPtr(mComparisonHeader2)
+End Sub
+
+Private Sub ReleaseComparisonStrings()
+    SAPtr(mComparisonString1) = vbNullPtr
+    SAPtr(mComparisonString2) = vbNullPtr
+End Sub
+
 Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
     Dim Output As StringBuilder
     Set Output = StringBuilderCache.Acquire
@@ -707,4 +758,195 @@ NonEnumerable:
     Error.Argument Argument_NotEnumerable, "Value"
 End Function
 
+' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation
+Private Function OrdinalEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
+    Dim i       As Long
+    Dim Len1    As Long
+    Dim Tmp     As Long
+    
+    Len1 = MemLong(Ptr1 - 4)
+        
+    ' Make an informed decision as to whether we should continue
+    If Len1 <> MemLong(Ptr2 - 4) Then
+        Exit Function
+    End If
+    
+    mComparisonHeader1.pvData = Ptr1
+    mComparisonHeader2.pvData = Ptr2
+    
+    Tmp = Len1 \ 4
+    ' The first two characters come cheap
+    If mComparisonString1(i) <> mComparisonString2(i) Then GoTo BailOut Else i = i + 1
+   
+DoLoop:
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If mComparisonString1(i) <> mComparisonString2(i) Then GoTo NotEqual Else i = i + 1
+        If i <= Tmp Then GoTo DoLoop
+    
+NotEqual:
+    ' some characters don't match, but we need to check to
+    ' see if it happened after the end of the string, a
+    ' nasty side-effect of cascading ifs
+    If Tmp * 4 = Len1 Then
+        If i >= Tmp Then OrdinalEquals = True
+    Else
+        If i > Tmp Then OrdinalEquals = True
+    End If
+    
+BailOut:
+    ' Lengths don't match, let's do absolutely nothing
+End Function
+
+' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation
+Private Function OrdinalIgnoreCaseEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
+    Dim i       As Long
+    Dim SLen    As Long
+    Dim Tmp1    As Long
+    Dim Tmp2    As Long
+    Dim Tmp3    As Long
+    Dim Tmp4    As Long
+    Dim Alt     As Long
+    
+    SLen = MemLong(Ptr1 - 4)
+    If SLen <> MemLong(Ptr2 - 4) Then
+        Exit Function
+    End If
+    
+    mComparisonHeader1.pvData = Ptr1
+    mComparisonHeader2.pvData = Ptr2
+
+    For i = 0 To SLen \ 4 - 1
+        Tmp1 = mComparisonString1(i)
+        Tmp2 = (Tmp1 And &HFFFF&)
+        Tmp3 = mComparisonString2(i)
+        Tmp4 = (Tmp3 And &HFFFF&)
+                
+        Select Case Tmp2
+            Case 97& To 122&: Alt = Tmp2 - 32
+            Case 65& To 90&: Alt = Tmp2 + 32
+            Case 49&: Alt = 185
+            Case 50&: Alt = 178
+            Case 51&: Alt = 179
+            Case 138&: Alt = 154
+            Case 140&: Alt = 156
+            Case 142&: Alt = 158
+            Case 154&: Alt = 138
+            Case 156&: Alt = 140
+            Case 158&: Alt = 142
+            Case 159&: Alt = 255
+            Case 178&: Alt = 50
+            Case 179&: Alt = 51
+            Case 185&: Alt = 49
+            Case 192& To 214&: Alt = Tmp2 + 32
+            Case 216& To 222&: Alt = Tmp2 + 32
+            Case 224& To 246&: Alt = Tmp2 - 32
+            Case 248& To 254&: Alt = Tmp2 - 32
+            Case 255&: Alt = 376
+            Case 338&: Alt = 339
+            Case 339&: Alt = 338
+            Case 352&: Alt = 353
+            Case 353&: Alt = 352
+            Case 376&: Alt = 255
+            Case 381&: Alt = 382
+            Case 382&: Alt = 381
+        End Select
+                
+        If Alt <> Tmp4 Then
+            If Tmp2 <> Tmp4 Then Exit Function
+        End If
+        Tmp2 = (Tmp1 And &HFFFF0000)
+        Tmp4 = (Tmp3 And &HFFFF0000)
+        Select Case Tmp2
+            Case &H610000 To &H7A0000: Alt = Tmp2 - &H200000
+            Case &H410000 To &H5A0000: Alt = Tmp2 + &H200000
+            Case &H310000: Alt = &HB90000
+            Case &H320000: Alt = &HB20000
+            Case &H330000: Alt = &HB30000
+            Case &H8A0000: Alt = &H9A0000
+            Case &H8C0000: Alt = &H9C0000
+            Case &H8E0000: Alt = &H9E0000
+            Case &H9B0000: Alt = &H8A0000
+            Case &H9C0000: Alt = &H8C0000
+            Case &H9E0000: Alt = &H8E0000
+            Case &H9F0000: Alt = &HFF0000
+            Case &HB20000: Alt = &H320000
+            Case &HB30000: Alt = &H970000
+            Case &HB90000: Alt = &H310000
+            Case &HC00000 To &HD60000: Alt = Tmp2 + &H200000
+            Case &HD80000 To &HDE0000: Alt = Tmp2 + &H200000
+            Case &HE00000 To &HF60000: Alt = Tmp2 - &H200000
+            Case &HF80000 To &HFE0000: Alt = Tmp2 - &H200000
+            Case &HFF0000: Alt = &H1780000
+            Case &H1520000: Alt = &H1530000
+            Case &H1530000: Alt = &H1520000
+            Case &H1600000: Alt = &H1610000
+            Case &H1610000: Alt = &H1600000
+            Case &H1780000: Alt = &HFF0000
+            Case &H17D0000: Alt = &H17E0000
+            Case &H17E0000: Alt = &H17D0000
+        End Select
+        If Alt <> Tmp4 Then
+            If Tmp2 <> Tmp4 Then Exit Function
+        End If
+    Next i
+    
+    If (SLen \ 2 And 1) Then
+        Tmp2 = (mComparisonString1(i) And &HFFFF&)
+        Tmp4 = (mComparisonString2(i) And &HFFFF&)
+        
+        Select Case Tmp2
+            Case 97& To 122&: Alt = Tmp2 - 32
+            Case 65& To 90&: Alt = Tmp2 + 32
+            Case 49&: Alt = 185
+            Case 50&: Alt = 178
+            Case 51&: Alt = 179
+            Case 138&: Alt = 154
+            Case 140&: Alt = 156
+            Case 142&: Alt = 158
+            Case 154&: Alt = 138
+            Case 156&: Alt = 140
+            Case 158&: Alt = 142
+            Case 159&: Alt = 255
+            Case 178&: Alt = 50
+            Case 179&: Alt = 51
+            Case 185&: Alt = 49
+            Case 192& To 214&: Alt = Tmp2 + 32
+            Case 216& To 222&: Alt = Tmp2 + 32
+            Case 224& To 246&: Alt = Tmp2 - 32
+            Case 248& To 254&: Alt = Tmp2 - 32
+            Case 255&: Alt = 376
+            Case 338&: Alt = 339
+            Case 339&: Alt = 338
+            Case 352&: Alt = 353
+            Case 353&: Alt = 352
+            Case 376&: Alt = 255
+            Case 381&: Alt = 382
+            Case 382&: Alt = 381
+        End Select
+        
+        If Tmp2 <> Tmp4 Then
+            If Alt <> Tmp4 Then Exit Function
+        End If
+    End If
+
+    OrdinalIgnoreCaseEquals = True
+End Function
 

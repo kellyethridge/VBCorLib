@@ -97,7 +97,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
     SourceFileName = Path.GetFullPath(CorString.TrimEnd(SourceFileName, mDirectorySeparators))
     DestinationFileName = Path.GetFullPath(CorString.TrimEnd(DestinationFileName, mDirectorySeparators))
     
-    If CorString.EqualsIgnoreCase(SourceFileName, DestinationFileName) Then
+    If CorString.Equals(SourceFileName, DestinationFileName, OrdinalIgnoreCase) Then
         Exit Sub
     End If
     
