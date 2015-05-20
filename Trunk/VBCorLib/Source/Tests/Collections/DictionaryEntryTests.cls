@@ -22,10 +22,15 @@ End Sub
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "Equals_WithValues_ReturnsExpected"
-            Test.Use 1, 1, False
-            Test.Use "a", 2, False
-            Test.Use "b", 1, False
-            Test.Use "a", 1, True
+            Test.Use Cor.NewDictionaryEntry(1, 1), False
+            Test.Use Cor.NewDictionaryEntry("a", 2), False
+            Test.Use Cor.NewDictionaryEntry("b", 1), False
+            Test.Use Cor.NewDictionaryEntry("a", 1), True
+            Test.Use Empty, False
+            Test.Use Nothing, False
+            Test.Use Null, False
+            Test.Use "abc", False
+            Test.Use 1, False
             
     End Select
 End Sub
@@ -39,14 +44,12 @@ Public Sub NewDictionaryEntry_WhenCalled_StoresValues()
     Assert.That Actual.Value, Iz.EqualTo("value")
 End Sub
 
-Public Sub Equals_WithValues_ReturnsExpected(ByRef Key As Variant, ByRef Value As Variant, ByVal Expected As Boolean)
-    Dim Entry1 As DictionaryEntry
-    Dim Entry2 As DictionaryEntry
-    Set Entry1 = Cor.NewDictionaryEntry("a", 1)
-    Set Entry2 = Cor.NewDictionaryEntry(Key, Value)
+Public Sub Equals_WithValues_ReturnsExpected(ByRef Value As Variant, ByVal Expected As Boolean)
+    Dim Entry As DictionaryEntry
+    Set Entry = Cor.NewDictionaryEntry("a", 1)
     
     Dim Actual As Boolean
-    Actual = Entry1.Equals(Entry2)
+    Actual = Entry.Equals(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

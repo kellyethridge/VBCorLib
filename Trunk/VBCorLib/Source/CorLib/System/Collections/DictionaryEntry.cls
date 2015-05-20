@@ -124,7 +124,9 @@ Public Function Equals(ByRef Value As Variant) As Boolean
     Dim Other As DictionaryEntry
     Set Other = Value
     
-    Equals = Object.Equals(mKey, Other.Key) And Object.Equals(mValue, Other.Value)
+    If Not Other Is Nothing Then
+        Equals = Object.Equals(mKey, Other.Key) And Object.Equals(mValue, Other.Value)
+    End If
     
 Catch:
 End Function
