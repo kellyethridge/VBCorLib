@@ -92,8 +92,8 @@ Private Function Guid_ToByteArray() As Byte()
     Guid_ToByteArray = mGuid.ToByteArray
 End Function
 
-Private Function Guid_ToString(Optional ByVal Format As String, Optional ByVal provider As IFormatProvider) As String
-    Guid_ToString = mGuid.ToString(Format, provider)
+Private Function Guid_ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
+    Guid_ToString = mGuid.ToString(Format, Provider)
 End Function
 
 Private Function Guid_ToProgramID() As String
@@ -112,6 +112,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IFormattable Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IFormattable_ToString(ByVal Format As String, ByVal provider As IFormatProvider) As String
-    IFormattable_ToString = mGuid.ToString(Format, provider)
+Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String
+    IFormattable_ToString = mGuid.ToString(Format, Provider)
 End Function

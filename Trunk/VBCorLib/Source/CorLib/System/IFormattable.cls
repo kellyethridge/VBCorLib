@@ -49,5 +49,5 @@ Option Explicit
 '
 ' @see IFormatProvider
 '
-Public Function ToString(ByVal Format As String, ByVal Provider As IFormatProvider) As String: End Function
+Public Function ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String: End Function
 
