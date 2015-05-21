@@ -101,43 +101,45 @@ End Function
 ''
 ' Copies the internal bit-array to a compatible array.
 '
-' @param DstArray The array to copy the values to.
-' @param Index The starting position in the array to
-' begin copying to.
+' @param Arr The array to copy the values to.
+' @param Index The starting position in the array to begin copying to.
 ' @remarks CopyTo supports the copying to three array types: Long, Byte
 ' and Boolean. When copying to Long or Byte type arrays, the bits in the
 ' elements are equivalents to the bits in the BitArray. When copying to
 ' a Boolean array, each boolean element represents a single bit in the array.
 '
-Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    If CorArray.IsNull(DstArray) Then _
-        Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
-    If Index < LBound(DstArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If CorArray.Rank(DstArray) <> 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
+Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
+    CheckValidSingleDimArray Arr
     
-    Select Case VarType(DstArray)
+    If Index < LBound(Arr) Then _
+        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+    
+    Select Case VarType(Arr)
         Case vbLongArray
-            Call CorArray.CopyEx(mBits, 0, DstArray, Index, (mLength + 31) \ 32)
+            CorArray.CopyEx mBits, 0, Arr, Index, (mLength + 31) \ 32
         
         Case vbByteArray
-            If (Index + (mLength + 7) \ 8) - 1 > UBound(DstArray) Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayPlusOffTooSmall), "index")
+            If (Index + (mLength + 7) \ 8) - 1 > UBound(Arr) Then _
+                Error.InvalidOffsetLength
             
-            Call Buffer.BlockCopy(mBits, 0, DstArray, Index - LBound(DstArray), (mLength + 7) \ 8)
+            Buffer.BlockCopy mBits, 0, Arr, Index - LBound(Arr), (mLength + 7) \ 8
             
         Case vbBooleanArray
-            If CorArray.GetLength(DstArray) < mLength Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayPlusOffTooSmall), "index")
+            If CorArray.GetLength(Arr) < mLength Then _
+                Error.InvalidOffsetLength
+            
+            Dim Booleans() As Boolean
+            SAPtr(Booleans) = CorArray.ArrayPointer(Arr)
             
             Dim i As Long
             For i = 0 To mLength - 1
-                DstArray(Index + i) = CBool(mBits(i \ 32) And Powers(i Mod 32))
+                Booleans(Index + i) = CBool(mBits(i \ 32) And Powers(i Mod 32))
             Next i
-        
+            
+            SAPtr(Booleans) = vbNullPtr
+            
         Case Else
-            Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
+            Error.Argument Argument_BitArrayTypeUnsupported, "Arr"
     End Select
 End Sub
 

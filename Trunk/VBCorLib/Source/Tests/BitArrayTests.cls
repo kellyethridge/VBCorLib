@@ -27,6 +27,23 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Constructor_WithDefaultValue_CreatesInitializedList"
             Test.Use True
             Test.Use False
+            
+        Case "CopyTo_WithValues_PerformsCopy"
+            Test.Use NewLongs(0, 0), NewLongs(1, 2)
+            Test.Use NewBytes(0, 0, 0, 0, 0), NewBytes(&H1, 0, 0, 0, &H2)
+            Test.Use CorArray.CreateInstance(vbBoolean, 34), NewBooleans(True, False, False, False, False, False, False, False, False, False, _
+                                                                         False, False, False, False, False, False, False, False, False, False, _
+                                                                         False, False, False, False, False, False, False, False, False, False, _
+                                                                         False, False, False, True)
+            
+        Case "CopyTo_WithValuesAndOffset_PerformatCopy"
+            Test.Use NewLongs(0, 0, 0), NewLongs(0, 1, 2)
+            Test.Use NewBytes(0, 0, 0, 0, 0, 0), NewBytes(0, &H1, 0, 0, 0, &H2)
+            Test.Use CorArray.CreateInstance(vbBoolean, 35), NewBooleans(False, True, False, False, False, False, False, False, False, False, _
+                                                                         False, False, False, False, False, False, False, False, False, False, _
+                                                                         False, False, False, False, False, False, False, False, False, False, _
+                                                                         False, False, False, False, True)
+        
     End Select
 End Sub
 
@@ -95,6 +112,89 @@ Public Sub Item_WithIndexGreaterThanItemCount_ThrowsArgumentOutOfRangeException(
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
+Public Sub CopyTo_WithValues_PerformsCopy(ByRef Target As Variant, ByRef Expected As Variant)
+    AssertCopyTo Target, 0, Expected
+End Sub
+
+Public Sub CopyTo_WithValuesAndOffset_PerformatCopy(ByRef Target As Variant, ByRef Expected As Variant)
+    AssertCopyTo Target, 1, Expected
+End Sub
+
+Private Sub AssertCopyTo(ByRef Target As Variant, ByVal Index As Long, ByRef Expected As Variant)
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(34)
+    Bits(0) = True
+    Bits(33) = True
+    
+    Bits.CopyTo Target, Index
+    
+    Assert.That Target, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CopyTo_WithUnsupportedArrayType_ThrowsArgumentException()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    On Error Resume Next
+    Dim Target(0 To 1) As Integer
+    Bits.CopyTo Target, 0
+    
+    AssertArgumentException Err, "Arr"
+End Sub
+
+Public Sub CopyTo_WithNullArray_ThrowsArgumentNullException()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    On Error Resume Next
+    Dim NullTarget() As Byte
+    Bits.CopyTo NullTarget, 0
+    
+    AssertArgumentNullException Err, "Arr"
+End Sub
+
+Public Sub CopyTo_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    On Error Resume Next
+    Dim Target(1 To 2) As Long
+    Bits.CopyTo Target, 0
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CopyTo_WithByteArrayTooSmall_ThrowsArgumentException()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    On Error Resume Next
+    Dim Target(0) As Byte
+    Bits.CopyTo Target, 0
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub CopyTo_WithBooleanArrayTooSmall_ThrowsArgumentException()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    On Error Resume Next
+    Dim Target(0 To 8) As Boolean
+    Bits.CopyTo Target, 0
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub FromBytes_WhenCalled_CreatesWithBytes()
+    Dim Bits As BitArray
+    
+    Set Bits = BitArray.FromBytes(NewBytes(&HFF, 0, &HFF, 0, &HFF))
+
+    Dim Actual(0 To 1) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HFF00FF, &HFF))
+End Sub
 
 
 'Private list As bitarray

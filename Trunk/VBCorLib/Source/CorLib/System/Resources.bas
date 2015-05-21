@@ -126,6 +126,7 @@ Public Enum ArgumentString
     Argument_PathUriFormatNotSupported = 839
     Arg_PathIllegalUNC = 840
     Arg_PathGlobalRoot = 841
+    Argument_BitArrayTypeUnsupported = 842
 End Enum
 
 Public Enum ArgumentNullString
