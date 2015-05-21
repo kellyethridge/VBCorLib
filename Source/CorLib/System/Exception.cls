@@ -121,12 +121,12 @@ End Property
 ''
 ' Sets a link to a help file associated with the exception.
 '
-' @param RHS Set the Uniform Resource Name (URN) or Uniform Resource Locator (URL).
+' @param Value Set the Uniform Resource Name (URN) or Uniform Resource Locator (URL).
 ' @remarks The return value, which represents a help file, is a URN or URL. For example, the HelpLink value could be:<br>
 ' "http://www.myhelpsite.com"
 '
-Public Property Let HelpLink(ByVal RHS As String)
-    mBase.HelpLink = RHS
+Public Property Let HelpLink(ByRef Value As String)
+    mBase.HelpLink = Value
 End Property
 
 ''
@@ -149,8 +149,8 @@ End Property
 ' error codes to be returned. This is the same as <b>Err.Number</b>.
 ' @see Exception
 '
-Public Property Let HResult(ByVal RHS As Long)
-    mBase.HResult = RHS
+Public Property Let HResult(ByVal Value As Long)
+    mBase.HResult = Value
 End Property
 
 ''
@@ -173,8 +173,8 @@ End Property
 ' the function being called when the exception was thrown. This is to help
 ' narrow down exactly where the exception had occurred.
 '
-Public Property Let Source(ByVal RHS As String)
-    mBase.Source = RHS
+Public Property Let Source(ByRef Value As String)
+    mBase.Source = Value
 End Property
 
 ''
@@ -239,7 +239,7 @@ End Function
 ' @return Returns True if Value is the same instance as the exception object, False otherwise.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = mBase.Equals(Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -251,14 +251,14 @@ End Function
 ' hashcode as the exception object.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = mBase.GetHashCode
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Message As String, ByRef InnerException As Exception)
+Friend Sub Init(ByRef Message As String, ByVal InnerException As Exception)
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
 End Sub
 

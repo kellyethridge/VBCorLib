@@ -306,37 +306,37 @@ Public Function ToString(Optional ByRef FormattedMessage As String)
     End If
 End Function
 
+'''
+'' Provides a basic implementation of the Equals function of the <b>IObject</b> interface.
 ''
-' Provides a basic implementation of the Equals function of the <b>IObject</b> interface.
-'
-' @param Value The value to determine if is the same object instance as the Subclass exception.
-' @param Subclass The Subclass exception object being compared to.
-' @return Returns True if Value IS Subclass, False otherwise.
-'
-Public Function Equals(ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        Equals = (Value Is Subclass)
-    End If
-End Function
-
+'' @param Value The value to determine if is the same object instance as the Subclass exception.
+'' @param Subclass The Subclass exception object being compared to.
+'' @return Returns True if Value IS Subclass, False otherwise.
 ''
-' Provides a basic implementation of the GetHashcode function of the <b>IObject</b> interface.
+'Public Function Equals(ByRef Value As Variant) As Boolean
+'    If IsObject(Value) Then
+'        Equals = (Value Is Subclass)
+'    End If
+'End Function
 '
-' @param Subclass The parent Subclass object to derive the hashcode from.
-' @return A 32-bit value used to help identify the Subclass object.
-' @remarks The value generated is not unique across all hashcodes. Additional
-' measures must be taken to find a unique value that happens to have the same
-' hashcode as the Subclass object.
-'
-Public Function GetHashCode() As Long
-    GetHashCode = mSubclass
-End Function
+'''
+'' Provides a basic implementation of the GetHashcode function of the <b>IObject</b> interface.
+''
+'' @param Subclass The parent Subclass object to derive the hashcode from.
+'' @return A 32-bit value used to help identify the Subclass object.
+'' @remarks The value generated is not unique across all hashcodes. Additional
+'' measures must be taken to find a unique value that happens to have the same
+'' hashcode as the Subclass object.
+''
+'Public Function GetHashCode() As Long
+'    GetHashCode = mSubclass
+'End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Subclass As Object, ByVal AppTitle As String, ByVal Message As String, ByVal InnerException As Exception, ByVal HResult As Long, ByVal Source As String, ByVal HelpLink As String)
+Friend Sub Init(ByVal Subclass As Object, ByRef AppTitle As String, ByRef Message As String, ByVal InnerException As Exception, ByVal HResult As Long, ByRef Source As String, ByRef HelpLink As String)
     SetClassName AppTitle, TypeName(Subclass)
     mSubclass = WeakPtr(Subclass)
     mMessage = Message
@@ -368,7 +368,7 @@ End Sub
 ' {AppTitle}            - When Subclass is Nothing and AppTitle is valid.
 ' {Unknown}             - When AppTitle and Subclass are invalid.
 '
-Private Sub SetClassName(ByVal AppTitle As String, ByVal SubclassName As String)
+Private Sub SetClassName(ByRef AppTitle As String, ByRef SubclassName As String)
     mSubclassName = AppTitle
     
     If Len(mSubclassName) > 0 Then
