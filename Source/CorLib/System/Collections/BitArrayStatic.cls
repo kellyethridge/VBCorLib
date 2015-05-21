@@ -52,9 +52,9 @@ Option Explicit
 ' @return A BitArray initialized to the number of bits an their
 ' state in the values array.
 '
-Public Function FromLongs(ByRef values() As Long) As BitArray
+Public Function FromLongs(ByRef Values() As Long) As BitArray
     Set FromLongs = New BitArray
-    Call FromLongs.InitFromLongs(values)
+    Call FromLongs.InitFromLongs(Values)
 End Function
 
 ''
@@ -65,9 +65,9 @@ End Function
 ' @return A BitArray initialized to the number of bits and their
 ' state in the values array.
 '
-Public Function FromBytes(ByRef values() As Byte) As BitArray
+Public Function FromBytes(ByRef Values() As Byte) As BitArray
     Set FromBytes = New BitArray
-    Call FromBytes.InitFromBytes(values)
+    FromBytes.InitFromBytes Values
 End Function
 
 ''
@@ -79,7 +79,7 @@ End Function
 ' boolean elements in the array. Each bit is set to the corrisponding
 ' boolean value in the array.
 '
-Public Function FromBooleans(ByRef values() As Boolean) As BitArray
+Public Function FromBooleans(ByRef Values() As Boolean) As BitArray
     Set FromBooleans = New BitArray
-    Call FromBooleans.InitFromBooleans(values)
+    Call FromBooleans.InitFromBooleans(Values)
 End Function
