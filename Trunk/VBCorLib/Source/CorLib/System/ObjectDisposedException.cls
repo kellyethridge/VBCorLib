@@ -90,12 +90,12 @@ End Property
 ''
 ' Sets a link to a help file associated with the exception.
 '
-' @param RHS Set the Uniform Resource Name (URN) or Uniform Resource Locator (URL).
+' @param Value Set the Uniform Resource Name (URN) or Uniform Resource Locator (URL).
 ' @remarks The return value, which represents a help file, is a URN or URL. For example, the HelpLink value could be:<br>
 ' "http://www.myhelpsite.com"
 '
-Public Property Let HelpLink(ByVal RHS As String)
-    mBase.HelpLink = RHS
+Public Property Let HelpLink(ByRef Value As String)
+    mBase.HelpLink = Value
 End Property
 
 ''
@@ -113,13 +113,13 @@ End Property
 ''
 ' Sets the HRESULT, a coded numerical value that is assigned to a specific exception.
 '
-' @param RHS The value of the associated HResult.
+' @param Value The value of the associated HResult.
 ' @remarks An HResult is associated with an error result code. This allows for VB specific
 ' error codes to be returned. This is the same as <b>Err.Number</b>.
 ' @see Exception
 '
-Public Property Let HResult(ByVal RHS As Long)
-    mBase.HResult = RHS
+Public Property Let HResult(ByVal Value As Long)
+    mBase.HResult = Value
 End Property
 
 ''
@@ -137,13 +137,13 @@ End Property
 ''
 ' Sets a description of the source of the exception.
 '
-' @param RHS A description of the source of the exception.
+' @param Value A description of the source of the exception.
 ' @remarks The source of an exception generally will contain the name of
 ' the function being called when the exception was thrown. This is to help
 ' narrow down exactly where the exception had occurred.
 '
-Public Property Let Source(ByVal RHS As String)
-    mBase.Source = RHS
+Public Property Let Source(ByRef Value As String)
+    mBase.Source = Value
 End Property
 
 ''
@@ -227,11 +227,13 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal ObjectName As String, ByVal Message As String)
-    If Len(Message) = 0 Then Message = DEF_MESSAGE
+Friend Sub Init(ByRef ObjectName As String, ByVal Message As String)
+    If Len(Message) = 0 Then
+        Message = DEF_MESSAGE
+    End If
     Set mBase = Nothing
     Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, Nothing, DEF_HRESULT)
-    If Len(Message) > 0 Then Call mBase.SetValue(PROP_OBJECTNAME, ObjectName)
+    mBase.SetValue PROP_OBJECTNAME, ObjectName
 End Sub
 
 
@@ -239,7 +241,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Call Init(DEF_OBJECTNAME, DEF_MESSAGE)
+    Init DEF_OBJECTNAME, DEF_MESSAGE
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
@@ -247,7 +249,7 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty(PROP_BASE, mBase)
+    PropBag.WriteProperty PROP_BASE, mBase
 End Sub
 
 
@@ -258,8 +260,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -287,16 +289,16 @@ Private Function Exception_GetHashCode() As Long
     Exception_GetHashCode = GetHashCode
 End Function
 
-Private Property Let Exception_HelpLink(ByVal RHS As String)
-    HelpLink = RHS
+Private Property Let Exception_HelpLink(ByRef Value As String)
+    HelpLink = Value
 End Property
 
 Private Property Get Exception_HelpLink() As String
     Exception_HelpLink = HelpLink
 End Property
 
-Private Property Let Exception_HResult(ByVal RHS As Long)
-    HResult = RHS
+Private Property Let Exception_HResult(ByVal Value As Long)
+    HResult = Value
 End Property
 
 Private Property Get Exception_HResult() As Long
@@ -311,8 +313,8 @@ Private Property Get Exception_Message() As String
     Exception_Message = Message
 End Property
 
-Private Property Let Exception_Source(ByVal RHS As String)
-    Source = RHS
+Private Property Let Exception_Source(ByRef Value As String)
+    Source = Value
 End Property
 
 Private Property Get Exception_Source() As String
@@ -343,16 +345,16 @@ Private Function InvalidOperationException_GetHashCode() As Long
     InvalidOperationException_GetHashCode = GetHashCode
 End Function
 
-Private Property Let InvalidOperationException_HelpLink(ByVal RHS As String)
-    HelpLink = RHS
+Private Property Let InvalidOperationException_HelpLink(ByRef Value As String)
+    HelpLink = Value
 End Property
 
 Private Property Get InvalidOperationException_HelpLink() As String
     InvalidOperationException_HelpLink = HelpLink
 End Property
 
-Private Property Let InvalidOperationException_HResult(ByVal RHS As Long)
-    HResult = RHS
+Private Property Let InvalidOperationException_HResult(ByVal Value As Long)
+    HResult = Value
 End Property
 
 Private Property Get InvalidOperationException_HResult() As Long
@@ -367,8 +369,8 @@ Private Property Get InvalidOperationException_Message() As String
     InvalidOperationException_Message = Message
 End Property
 
-Private Property Let InvalidOperationException_Source(ByVal RHS As String)
-    Source = RHS
+Private Property Let InvalidOperationException_Source(ByRef Value As String)
+    Source = Value
 End Property
 
 Private Property Get InvalidOperationException_Source() As String
@@ -399,16 +401,16 @@ Private Function SystemException_GetHashCode() As Long
     SystemException_GetHashCode = GetHashCode
 End Function
 
-Private Property Let SystemException_HelpLink(ByVal RHS As String)
-    HelpLink = RHS
+Private Property Let SystemException_HelpLink(ByRef Value As String)
+    HelpLink = Value
 End Property
 
 Private Property Get SystemException_HelpLink() As String
     SystemException_HelpLink = HelpLink
 End Property
 
-Private Property Let SystemException_HResult(ByVal RHS As Long)
-    HResult = RHS
+Private Property Let SystemException_HResult(ByVal Value As Long)
+    HResult = Value
 End Property
 
 Private Property Get SystemException_HResult() As Long
@@ -423,8 +425,8 @@ Private Property Get SystemException_Message() As String
     SystemException_Message = Message
 End Property
 
-Private Property Let SystemException_Source(ByVal RHS As String)
-    Source = RHS
+Private Property Let SystemException_Source(ByRef Value As String)
+    Source = Value
 End Property
 
 Private Property Get SystemException_Source() As String

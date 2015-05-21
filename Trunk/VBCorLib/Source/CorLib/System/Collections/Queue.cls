@@ -63,24 +63,6 @@ Private mCount      As Long
 Private mVersion    As Long
 
 
-Private Sub Class_InitProperties()
-    ReDim mItems(0 To DefaultCapacity - 1)
-    mCapacity = DefaultCapacity
-End Sub
-
-Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal head As Long, ByVal Tail As Long)
-    mItems = Items
-    mCount = Count
-    mHead = head
-    mTail = Tail
-    mCapacity = UBound(Items) + 1
-End Sub
-
-Friend Sub Init(ByRef Source As Variant)
-    WriteRange Source
-End Sub
-
-
 ''
 ' Clears the contents of the queue
 '
@@ -285,7 +267,28 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_InitProperties()
+    ReDim mItems(0 To DefaultCapacity - 1)
+    mCapacity = DefaultCapacity
+End Sub
+
+Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal head As Long, ByVal Tail As Long)
+    mItems = Items
+    mCount = Count
+    mHead = head
+    mTail = Tail
+    mCapacity = UBound(Items) + 1
+End Sub
+
+Friend Sub Init(ByRef Source As Variant)
+    WriteRange Source
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub NormalizeArray(ByVal NewCapacity As Long)
     Dim NewItems() As Variant
@@ -415,7 +418,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -431,7 +434,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -439,7 +442,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
     Call CopyTo(Arr, Index)
@@ -459,7 +462,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -471,7 +474,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IVersionableCollection Interface
+'   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IVersionableCollection_CurrentVersion() As Long
     IVersionableCollection_CurrentVersion = mVersion

@@ -98,9 +98,9 @@ End Function
 ' @return The fully created Exception object.
 ' @see Exception
 '
-Public Function NewException(ByVal Message As String, Optional ByVal InnerException As Exception) As Exception
+Public Function NewException(ByRef Message As String, Optional ByVal InnerException As Exception) As Exception
     Set NewException = New Exception
-    Call NewException.Init(Message, InnerException)
+    NewException.Init Message, InnerException
 End Function
 
 ''
@@ -112,9 +112,9 @@ End Function
 ' @see SystemException
 ' @see Exception
 '
-Public Function NewSystemException(ByVal Message As String, Optional ByVal InnerException As Exception) As SystemException
+Public Function NewSystemException(ByRef Message As String, Optional ByVal InnerException As Exception) As SystemException
     Set NewSystemException = New SystemException
-    Call NewSystemException.Init(Message, InnerException)
+    NewSystemException.Init Message, InnerException
 End Function
 
 ''
@@ -776,7 +776,7 @@ End Function
 ' &HEF, &HBB, &HBF - UTF8Encoding<br>
 ' If no encoding is identified, then Encoding.UTF8 is used.
 '
-Public Function NewStreamReader(ByVal Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal determineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 1024, Optional ByVal LeaveOpen As Boolean) As StreamReader
+Public Function NewStreamReader(ByRef Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal determineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 1024, Optional ByVal LeaveOpen As Boolean) As StreamReader
     Set NewStreamReader = New StreamReader
     NewStreamReader.Init Source, Encoding, determineEncodingFromByteOrderMarks, BufferSize, LeaveOpen
 End Function
@@ -1011,9 +1011,9 @@ End Function
 ' @param Control Whether the control key was pressed.
 ' @return A new ConsoleKeyInfo object.
 '
-Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As ConsoleKey, ByVal Shift As Boolean, ByVal alt As Boolean, ByVal Control As Boolean) As ConsoleKeyInfo
+Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As ConsoleKey, ByVal Shift As Boolean, ByVal Alt As Boolean, ByVal Control As Boolean) As ConsoleKeyInfo
     Set NewConsoleKeyInfo = New ConsoleKeyInfo
-    Call NewConsoleKeyInfo.Init(KeyChar, Key, Shift, alt, Control)
+    Call NewConsoleKeyInfo.Init(KeyChar, Key, Shift, Alt, Control)
 End Function
 
 ''
@@ -1114,9 +1114,9 @@ End Function
 ' <p>This class is persistable and will also attempt to persist the custom values that
 ' have been added to it. If the persistence fails, then an error will occur.</p>
 '
-Public Function NewExceptionBase(Optional ByVal Subclass As Object, Optional ByVal AppTitle As String, Optional ByVal Message As String, Optional ByVal InnerException As Exception, Optional ByVal HResult As Long = 5, Optional ByVal Source As String, Optional ByVal HelpLink As String) As ExceptionBase
+Public Function NewExceptionBase(Optional ByVal Subclass As Object, Optional ByRef AppTitle As String, Optional ByRef Message As String, Optional ByVal InnerException As Exception, Optional ByVal HResult As Long = 5, Optional ByRef Source As String, Optional ByRef HelpLink As String) As ExceptionBase
     Set NewExceptionBase = New ExceptionBase
-    Call NewExceptionBase.Init(Subclass, AppTitle, Message, InnerException, HResult, Source, HelpLink)
+    NewExceptionBase.Init Subclass, AppTitle, Message, InnerException, HResult, Source, HelpLink
 End Function
 
 ''
@@ -1128,7 +1128,7 @@ End Function
 '
 Public Function NewQueue(ByRef Source As Variant) As Queue
     Set NewQueue = New Queue
-    Call NewQueue.Init(Source)
+    NewQueue.Init Source
 End Function
 
 ''

@@ -459,7 +459,7 @@ End Function
 ' @remarks The end of a line is indicated when either a Return (13), LineFeed (10),
 ' or a Return-LineFeed combination have been encountered.
 '
-Public Function ReadAllLines(ByVal Path As String, Optional ByVal Encoding As Encoding) As String()
+Public Function ReadAllLines(ByRef Path As String, Optional ByVal Encoding As Encoding) As String()
     Dim Lines() As String
     Dim Index   As Long
     
