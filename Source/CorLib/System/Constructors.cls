@@ -371,12 +371,12 @@ End Function
 ' Creates a new BitArray object.
 '
 ' @param Length The number of bits the object will represent.
-' @param value The value to initialize all the bits to (True = 1, False = 0).
+' @param Value The value to initialize all the bits to (True = 1, False = 0).
 ' @return A new BitArray object set to the specified length with the specified value.
 '
 Public Function NewBitArray(ByVal Length As Long, Optional ByVal Value As Boolean = False) As BitArray
     Set NewBitArray = New BitArray
-    Call NewBitArray.Init(Length, Value)
+    NewBitArray.Init Length, Value
 End Function
 
 ''

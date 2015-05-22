@@ -207,4 +207,5 @@ Public Enum ParameterString
     Parameter_DestinationArray = 2024
     Parameter_Keys = 2025
     Parameter_Items = 2026
+    Parameter_Values = 2027
 End Enum

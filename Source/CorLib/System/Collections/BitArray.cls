@@ -112,7 +112,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     CheckValidSingleDimArray Arr
     
     If Index < LBound(Arr) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     
     Select Case VarType(Arr)
         Case vbLongArray
@@ -208,9 +208,9 @@ Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mLength Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
     
-    Dim bit As Long
-    Index = GetBitIndex(Index, bit)
-    Item = CBool(mBits(Index) And bit)
+    Dim Bit As Long
+    Index = GetBitIndex(Index, Bit)
+    Item = CBool(mBits(Index) And Bit)
 End Property
 
 ''
@@ -224,12 +224,12 @@ Public Property Let Item(ByVal Index As Long, ByVal RHS As Boolean)
     If Index < 0 Or Index >= mLength Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
-    Dim bit As Long
-    Index = GetBitIndex(Index, bit)
+    Dim Bit As Long
+    Index = GetBitIndex(Index, Bit)
     If RHS Then
-        mBits(Index) = mBits(Index) Or bit
+        mBits(Index) = mBits(Index) Or Bit
     Else
-        mBits(Index) = mBits(Index) And (Not bit)
+        mBits(Index) = mBits(Index) And (Not Bit)
     End If
     mVersion = mVersion + 1
 End Property
@@ -246,24 +246,24 @@ End Property
 ''
 ' Sets the number of bits represented in the array.
 '
-' @param RHS The number of bits to represent.
+' @param Value The number of bits to represent.
 ' @remarks If the length of the array is increased, then the
 ' newly available bits are set to 0 (False).
 '
-Public Property Let Length(ByVal RHS As Long)
-    If RHS <> mLength Then
+Public Property Let Length(ByVal Value As Long)
+    If Value <> mLength Then
         Dim Index As Long
-        Index = (RHS - 1) \ 32
+        Index = (Value - 1) \ 32
         ReDim Preserve mBits(0 To Index)
         mUBound = Index
         
-        Dim bit As Long
-        bit = RHS - Index * 32
-        If bit > 0 Then
-            bit = Powers(bit - 1)
-            mBits(mUBound) = mBits(mUBound) And bit
+        Dim Bit As Long
+        Bit = Value - Index * 32
+        If Bit > 0 Then
+            Bit = Powers(Bit - 1)
+            mBits(mUBound) = mBits(mUBound) And Bit
         End If
-        mLength = RHS
+        mLength = Value
     End If
     mVersion = mVersion + 1
 End Property
@@ -405,19 +405,17 @@ Friend Sub InitFromBooleans(ByRef Values() As Boolean)
     Next i
 End Sub
 
-Friend Sub InitFromBytes(ByRef Values() As Byte)
-    If CorArray.IsNull(Values) Then _
-        Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
+Friend Sub InitFromBytes(ByRef Bytes() As Byte)
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
     
     Dim Size As Long
-    Size = CorArray.GetLength(Values, 1)
+    Size = CorArray.LengthFirstDim(Bytes)
     Me.Length = Size * 8
-    Call CopyMemory(mBits(0), Values(0), Size)
+    CopyMemory mBits(0), Bytes(LBound(Bytes)), Size
 End Sub
 
 Friend Sub InitFromLongs(ByRef Values() As Long)
-    If CorArray.IsNull(Values) Then _
-        Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
+    CheckValidSingleDimArray Values, Parameter_Values
     
     mBits = Values
     mUBound = UBound(Values)
@@ -479,9 +477,9 @@ Private Function IObject_ToString() As String
     IObject_ToString = ToString
 End Function
 
-Private Function GetBitIndex(ByVal Index As Long, ByRef bit As Long) As Long
+Private Function GetBitIndex(ByVal Index As Long, ByRef Bit As Long) As Long
     GetBitIndex = Index \ 32
-    bit = Powers(Index - GetBitIndex * 32)
+    Bit = Powers(Index - GetBitIndex * 32)
 End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
