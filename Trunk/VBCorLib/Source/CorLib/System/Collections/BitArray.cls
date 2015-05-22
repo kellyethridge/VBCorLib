@@ -63,6 +63,9 @@ Private Const PROP_LENGTH       As String = "Length"
 Private Const PROP_BITSUBOUND   As String = "BitsUBound"
 Private Const PROP_BITS         As String = "Bits"
 
+Private Const BitsPerLong       As Long = 32
+Private Const BitsPerByte       As Long = 8
+
 Private mBits()     As Long
 Private mLength     As Long
 Private mUBound     As Long
@@ -72,7 +75,7 @@ Private mVersion    As Long
 ' Performs a bitwise AND on the current instance of BitArray using the
 ' bits in another instance of BitArray.
 '
-' @param bits The BitArray object with which to perform the bitwise
+' @param Bits The BitArray object with which to perform the bitwise
 ' AND operation with.
 ' @return The internal set of bits is modified based on the operation,
 ' however, the object returns itself for ease of concatenated operations.
@@ -81,9 +84,9 @@ Public Function AndBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
         Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
-        Throw Cor.NewArgumentException("Both arrays must have the same length.", "bits")
+        Error.Argument Argument_ArrayLengthsDiffer
     
-    Call Bits.ApplyAndTo(mBits)
+    Bits.ApplyAndTo mBits
     mVersion = mVersion + 1
     Set AndBits = Me
 End Function
@@ -95,7 +98,7 @@ End Function
 '
 Public Function Clone() As BitArray
     Set Clone = New BitArray
-    Call Clone.CloneHelper(mBits, mLength)
+    Clone.CloneHelper mBits, mLength
 End Function
 
 ''
@@ -116,13 +119,13 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     
     Select Case VarType(Arr)
         Case vbLongArray
-            CorArray.CopyEx mBits, 0, Arr, Index, (mLength + 31) \ 32
+            CorArray.CopyEx mBits, 0, Arr, Index, (mLength + 31) \ BitsPerLong
         
         Case vbByteArray
-            If (Index + (mLength + 7) \ 8) - 1 > UBound(Arr) Then _
+            If (Index + (mLength + 7) \ BitsPerByte) - 1 > UBound(Arr) Then _
                 Error.InvalidOffsetLength
             
-            Buffer.BlockCopy mBits, 0, Arr, Index - LBound(Arr), (mLength + 7) \ 8
+            Buffer.BlockCopy mBits, 0, Arr, Index - LBound(Arr), (mLength + 7) \ BitsPerByte
             
         Case vbBooleanArray
             If CorArray.GetLength(Arr) < mLength Then _
@@ -133,7 +136,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
             
             Dim i As Long
             For i = 0 To mLength - 1
-                Booleans(Index + i) = CBool(mBits(i \ 32) And Powers(i Mod 32))
+                Booleans(Index + i) = CBool(mBits(i \ BitsPerLong) And Powers(i Mod BitsPerLong))
             Next i
             
             SAPtr(Booleans) = vbNullPtr
@@ -173,7 +176,7 @@ End Function
 '
 Public Function GetEnumerator() As IEnumerator
     Dim Ret As New BitArrayEnumerator
-    Call Ret.Init(Me)
+    Ret.Init Me
     Set GetEnumerator = Ret
 End Function
 
@@ -199,14 +202,14 @@ End Property
 ''
 ' Returns the value of a specific bit in the array.
 '
-' @param index The specific bit to return.
+' @param Index The specific bit to return.
 ' @return Value of the specified bit.
 ' @remarks The index is zero based.
 '
 Public Property Get Item(ByVal Index As Long) As Boolean
 Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
     Dim Bit As Long
     Index = GetBitIndex(Index, Bit)
@@ -216,17 +219,17 @@ End Property
 ''
 ' Sets the value of a specific bit in the array.
 '
-' @param index The specific bit to set.
-' @param RHS The value to set the specified bit to.
+' @param Index The specific bit to set.
+' @param Value The value to set the specified bit to.
 ' @remarks The index is zero based.'
 '
-Public Property Let Item(ByVal Index As Long, ByVal RHS As Boolean)
+Public Property Let Item(ByVal Index As Long, ByVal Value As Boolean)
     If Index < 0 Or Index >= mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
 
     Dim Bit As Long
     Index = GetBitIndex(Index, Bit)
-    If RHS Then
+    If Value Then
         mBits(Index) = mBits(Index) Or Bit
     Else
         mBits(Index) = mBits(Index) And (Not Bit)
@@ -253,16 +256,18 @@ End Property
 Public Property Let Length(ByVal Value As Long)
     If Value <> mLength Then
         Dim Index As Long
-        Index = (Value - 1) \ 32
+        Index = (Value - 1) \ BitsPerLong
         ReDim Preserve mBits(0 To Index)
         mUBound = Index
         
         Dim Bit As Long
-        Bit = Value - Index * 32
+        Bit = Value - Index * BitsPerLong
+        
         If Bit > 0 Then
             Bit = Powers(Bit - 1)
             mBits(mUBound) = mBits(mUBound) And Bit
         End If
+        
         mLength = Value
     End If
     mVersion = mVersion + 1
@@ -309,7 +314,7 @@ Public Function OrBits(ByVal Bits As BitArray) As BitArray
     If Bits.Length <> mLength Then _
         Throw Cor.NewArgumentException("Both arrays must have the same length.", "bits")
     
-    Call Bits.ApplyOrTo(mBits)
+    Bits.ApplyOrTo mBits
     mVersion = mVersion + 1
     Set OrBits = Me
 End Function
@@ -341,21 +346,64 @@ End Function
 ' Performs a bitwise XOR on the current instance of BitArray using the
 ' bits in another instance of BitArray.
 '
-' @param bits The BitArray object with which to perform the bitwise
+' @param Bits The BitArray object with which to perform the bitwise
 ' XOR operation with.
 ' @return The internal set of bits is modified based on the operation,
 ' however, the object returns itself for ease of concatenated operations.
 '
 Public Function XorBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Bits", ArgumentNull_Array
     If Bits.Length <> mLength Then _
-        Throw Cor.NewArgumentException("Both arrays must have the same length.", "bits")
+        Error.Argument Argument_ArrayLengthsDiffer
 
-    Call Bits.ApplyXorTo(mBits)
+    Bits.ApplyXorTo mBits
     mVersion = mVersion + 1
     Set XorBits = Me
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Length As Long, ByVal Value As Boolean)
+    Me.Length = Length
+    SetAll Value
+End Sub
+
+Friend Sub InitFromBooleans(ByRef Values() As Boolean)
+    CheckValidSingleDimArray Values, Parameter_Values
+
+    Dim i   As Long
+    Dim lb  As Long
+    Me.Length = CorArray.GetLength(Values, 1)
+    lb = LBound(Values)
+    For i = 0 To mLength - 1
+        Item(i) = Values(lb + i)
+    Next i
+End Sub
+
+Friend Sub InitFromBytes(ByRef Bytes() As Byte)
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
+    
+    Dim Size As Long
+    Size = CorArray.LengthFirstDim(Bytes)
+    Me.Length = Size * 8
+    CopyMemory mBits(0), Bytes(LBound(Bytes)), Size
+End Sub
+
+Friend Sub InitFromLongs(ByRef Values() As Long)
+    CheckValidSingleDimArray Values, Parameter_Values
+    
+    mBits = Values
+    mUBound = UBound(Values)
+    mLength = (mUBound + 1) * BitsPerLong
+End Sub
+
+Friend Sub CloneHelper(ByRef Bits() As Long, ByVal Length As Long)
+    mBits = Bits
+    mLength = Length
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -382,45 +430,6 @@ Friend Sub ApplyXorTo(ByRef Bits() As Long)
     Next
 End Sub
 
-Friend Sub CloneHelper(ByRef Bits() As Long, ByVal Length As Long)
-    mBits = Bits
-    mLength = Length
-End Sub
-
-Friend Sub Init(ByVal Length As Long, ByVal Value As Boolean)
-    Me.Length = Length
-    Call SetAll(Value)
-End Sub
-
-Friend Sub InitFromBooleans(ByRef Values() As Boolean)
-    If CorArray.IsNull(Values) Then _
-        Throw Cor.NewArgumentNullException("Values", Environment.GetResourceString(ArgumentNull_Array))
-
-    Dim i   As Long
-    Dim lb  As Long
-    Me.Length = CorArray.GetLength(Values, 1)
-    lb = LBound(Values)
-    For i = 0 To mLength - 1
-        Item(i) = Values(lb + i)
-    Next i
-End Sub
-
-Friend Sub InitFromBytes(ByRef Bytes() As Byte)
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
-    
-    Dim Size As Long
-    Size = CorArray.LengthFirstDim(Bytes)
-    Me.Length = Size * 8
-    CopyMemory mBits(0), Bytes(LBound(Bytes)), Size
-End Sub
-
-Friend Sub InitFromLongs(ByRef Values() As Long)
-    CheckValidSingleDimArray Values, Parameter_Values
-    
-    mBits = Values
-    mUBound = UBound(Values)
-    mLength = (mUBound + 1) * 32
-End Sub
 
 Friend Property Get Version() As Long
     Version = mVersion
@@ -432,7 +441,7 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
     ReDim mBits(0)
-    mLength = 32
+    mLength = BitsPerLong
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
@@ -478,8 +487,8 @@ Private Function IObject_ToString() As String
 End Function
 
 Private Function GetBitIndex(ByVal Index As Long, ByRef Bit As Long) As Long
-    GetBitIndex = Index \ 32
-    Bit = Powers(Index - GetBitIndex * 32)
+    GetBitIndex = Index \ BitsPerLong
+    Bit = Powers(Index - GetBitIndex * BitsPerLong)
 End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
