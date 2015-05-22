@@ -36,7 +36,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
                                                                          False, False, False, False, False, False, False, False, False, False, _
                                                                          False, False, False, True)
             
-        Case "CopyTo_WithValuesAndOffset_PerformatCopy"
+        Case "CopyTo_WithValuesAndOffset_PerformsCopy"
             Test.Use NewLongs(0, 0, 0), NewLongs(0, 1, 2)
             Test.Use NewBytes(0, 0, 0, 0, 0, 0), NewBytes(0, &H1, 0, 0, 0, &H2)
             Test.Use CorArray.CreateInstance(vbBoolean, 35), NewBooleans(False, True, False, False, False, False, False, False, False, False, _
@@ -116,7 +116,7 @@ Public Sub CopyTo_WithValues_PerformsCopy(ByRef Target As Variant, ByRef Expecte
     AssertCopyTo Target, 0, Expected
 End Sub
 
-Public Sub CopyTo_WithValuesAndOffset_PerformatCopy(ByRef Target As Variant, ByRef Expected As Variant)
+Public Sub CopyTo_WithValuesAndOffset_PerformsCopy(ByRef Target As Variant, ByRef Expected As Variant)
     AssertCopyTo Target, 1, Expected
 End Sub
 
@@ -186,6 +186,18 @@ Public Sub CopyTo_WithBooleanArrayTooSmall_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+Public Sub CopyTo_WhenLengthIsShortened_CopiesToArray()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(34)
+    Bits(33) = True
+    Bits.Length = 33
+    
+    Dim Actual(0 To 1) As Long
+    Bits.CopyTo Actual, 0
+    
+    Assert.That Actual, Iz.EqualTo(NewLongs(0, 0))
+End Sub
+
 Public Sub FromBytes_WhenCalled_CreatesWithBytes()
     Dim Bits As BitArray
     
@@ -224,6 +236,60 @@ Public Sub FromLongs_WithNullArray_ThrowsArgumentNullException()
     AssertArgumentNullException Err, "Values"
 End Sub
 
+Public Sub FromBooleans_WhenCalled_CreatesWithBooleans()
+    Dim Bits As BitArray
+    
+    Set Bits = BitArray.FromBooleans(NewBooleans(True, False, True, False))
+    
+    Dim Actual(0) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&H5))
+End Sub
+
+Public Sub FromBooleans_WithNullArray_ThrowsArgumentNullException()
+    On Error Resume Next
+    Dim NullBooleans() As Boolean
+    
+    BitArray.FromBooleans NullBooleans
+    
+    AssertArgumentNullException Err, "Values"
+End Sub
+
+Public Sub AndBits_WithValue_PerformsAndOperation()
+    Dim Bits As BitArray
+    Set Bits = BitArray.FromLongs(NewLongs(&HFFFFFFFF))
+    
+    Bits.AndBits CreateMask
+    
+    Dim Actual(0) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&H55555555))
+End Sub
+
+Public Sub AndBits_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    Bits.AndBits Nothing
+    
+    AssertArgumentNullException Err, "Bits"
+End Sub
+
+Public Sub AndBits_WithDifferentNumberOfElements_ThrowsArgumentException()
+    On Error Resume Next
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(31)
+    
+    Bits.AndBits CreateMask
+    
+    AssertArgumentException Err
+End Sub
+
+
+Private Function CreateMask() As BitArray
+    Set CreateMask = BitArray.FromLongs(NewLongs(&H55555555))
+End Function
 
 'Private list As bitarray
 '

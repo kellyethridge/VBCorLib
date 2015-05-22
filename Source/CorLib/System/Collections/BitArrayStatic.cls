@@ -54,7 +54,7 @@ Option Explicit
 '
 Public Function FromLongs(ByRef Values() As Long) As BitArray
     Set FromLongs = New BitArray
-    Call FromLongs.InitFromLongs(Values)
+    FromLongs.InitFromLongs Values
 End Function
 
 ''
@@ -81,5 +81,5 @@ End Function
 '
 Public Function FromBooleans(ByRef Values() As Boolean) As BitArray
     Set FromBooleans = New BitArray
-    Call FromBooleans.InitFromBooleans(Values)
+    FromBooleans.InitFromBooleans Values
 End Function
