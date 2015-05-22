@@ -196,6 +196,34 @@ Public Sub FromBytes_WhenCalled_CreatesWithBytes()
     Assert.That Actual, Iz.EqualTo(NewLongs(&HFF00FF, &HFF))
 End Sub
 
+Public Sub FromBytes_WithNullArray_ThrowsArgumentNullException()
+    On Error Resume Next
+    Dim NullBytes() As Byte
+    
+    BitArray.FromBytes NullBytes
+    
+    AssertArgumentNullException Err, "Bytes"
+End Sub
+
+Public Sub FromLongs_WhenCalled_CreatesWithLongs()
+    Dim Bits As BitArray
+    
+    Set Bits = BitArray.FromLongs(NewLongs(&HFF00FF00, &HFF))
+    
+    Dim Actual(0 To 1) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HFF00FF00, &HFF))
+End Sub
+
+Public Sub FromLongs_WithNullArray_ThrowsArgumentNullException()
+    On Error Resume Next
+    Dim NullLongs() As Long
+    
+    BitArray.FromLongs NullLongs
+    
+    AssertArgumentNullException Err, "Values"
+End Sub
+
 
 'Private list As bitarray
 '
@@ -311,58 +339,3 @@ End Sub
 '    Next v
 'End Sub
 '
-'Public Sub TestCopyToLongs()
-'    Dim l(1) As Long
-'    list.SetAll True
-'
-'    list.CopyTo l, 0
-'
-'    Assert.AreEqual -1, l(0)
-'    Assert.AreEqual 0, l(1)
-'
-'End Sub
-'
-'Public Sub TestCopyToBytes()
-'    Dim b(3) As Byte
-'    list.SetAll True
-'
-'    list.CopyTo b, 0
-'    Dim i As Long
-'    For i = 0 To 3
-'        Assert.AreEqual 255, b(i)
-'    Next i
-'End Sub
-'
-'Public Sub TestCopyToBooleans()
-'    Dim b(31) As Boolean
-'    list.SetAll True
-'    list.CopyTo b, 0
-'    Dim i As Long
-'    For i = 0 To 31
-'        Assert.IsTrue b(i)
-'    Next i
-'End Sub
-'
-'Public Sub TestCopyToWrongType()
-'    Dim a(31) As Integer
-'    On Error GoTo errTrap
-'    list.CopyTo a, 0
-'    On Error GoTo 0
-'    Assert.Fail "Error should have been raised."
-'errTrap:
-'    Dim Ex As Exception
-'    Assert.IsTrue Catch(Ex), "Exception should have been caught."
-'    Assert.IsTrue TypeOf Ex Is ArrayTypeMismatchException, "Wrong exception type."
-'End Sub
-'
-'
-'Private Sub AssertAlternatingPattern()
-'    Dim i As Long
-'    For i = 0 To list.Count - 1
-'        If i And 1 Then
-'            Assert.IsFalse list(i), "Index " & i & " should be false."
-'        Else
-'            Assert.IsTrue list(i), "Index " & i & " should be true."
-'        End If
-'    Next i
-'End Sub
