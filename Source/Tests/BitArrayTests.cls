@@ -29,20 +29,22 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use False
             
         Case "CopyTo_WithValues_PerformsCopy"
-            Test.Use NewLongs(0, 0), NewLongs(1, 2)
-            Test.Use NewBytes(0, 0, 0, 0, 0), NewBytes(&H1, 0, 0, 0, &H2)
-            Test.Use CorArray.CreateInstance(vbBoolean, 34), NewBooleans(True, False, False, False, False, False, False, False, False, False, _
-                                                                         False, False, False, False, False, False, False, False, False, False, _
-                                                                         False, False, False, False, False, False, False, False, False, False, _
-                                                                         False, False, False, True)
+            Test.Use NewLongs(0, 0), NewLongs(&HFFFFFFFF, &H3)
+            Test.Use NewBytes(0, 0, 0, 0, 0), NewBytes(&HFF, &HFF, &HFF, &HFF, &H3)
+            Test.Use CorArray.CreateInstance(vbBoolean, 34), NewBooleans(True, True, True, True, True, True, True, True, _
+                                                                         True, True, True, True, True, True, True, True, _
+                                                                         True, True, True, True, True, True, True, True, _
+                                                                         True, True, True, True, True, True, True, True, _
+                                                                         True, True)
             
         Case "CopyTo_WithValuesAndOffset_PerformsCopy"
-            Test.Use NewLongs(0, 0, 0), NewLongs(0, 1, 2)
-            Test.Use NewBytes(0, 0, 0, 0, 0, 0), NewBytes(0, &H1, 0, 0, 0, &H2)
-            Test.Use CorArray.CreateInstance(vbBoolean, 35), NewBooleans(False, True, False, False, False, False, False, False, False, False, _
-                                                                         False, False, False, False, False, False, False, False, False, False, _
-                                                                         False, False, False, False, False, False, False, False, False, False, _
-                                                                         False, False, False, False, True)
+            Test.Use NewLongs(0, 0, 0), NewLongs(0, &HFFFFFFFF, &H3)
+            Test.Use NewBytes(0, 0, 0, 0, 0, 0), NewBytes(0, &HFF, &HFF, &HFF, &HFF, &H3)
+            Test.Use CorArray.CreateInstance(vbBoolean, 35), NewBooleans(False, True, True, True, True, True, True, True, _
+                                                                         True, True, True, True, True, True, True, True, _
+                                                                         True, True, True, True, True, True, True, True, _
+                                                                         True, True, True, True, True, True, True, True, _
+                                                                         True, True, True)
         
     End Select
 End Sub
@@ -112,6 +114,39 @@ Public Sub Item_WithIndexGreaterThanItemCount_ThrowsArgumentOutOfRangeException(
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
+Public Sub Length_WithValueLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    With Cor.NewBitArray(10)
+        .Length = -1
+    End With
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
+Public Sub Length_WhenShortened_TruncatesElements()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(34)
+    Bits(33) = True
+    
+    Bits.Length = 33
+    
+    Dim Actual(0 To 1) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(0, 0))
+End Sub
+
+Public Sub Length_WhenLengthend_CreatesNewElements()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(16, True)
+    
+    Bits.Length = 32
+    
+    Dim Actual(0) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HFFFF&))
+End Sub
+
 Public Sub CopyTo_WithValues_PerformsCopy(ByRef Target As Variant, ByRef Expected As Variant)
     AssertCopyTo Target, 0, Expected
 End Sub
@@ -122,9 +157,7 @@ End Sub
 
 Private Sub AssertCopyTo(ByRef Target As Variant, ByVal Index As Long, ByRef Expected As Variant)
     Dim Bits As BitArray
-    Set Bits = Cor.NewBitArray(34)
-    Bits(0) = True
-    Bits(33) = True
+    Set Bits = Cor.NewBitArray(34, True)
     
     Bits.CopyTo Target, Index
     
@@ -184,18 +217,6 @@ Public Sub CopyTo_WithBooleanArrayTooSmall_ThrowsArgumentException()
     Bits.CopyTo Target, 0
     
     AssertArgumentException Err
-End Sub
-
-Public Sub CopyTo_WhenLengthIsShortened_CopiesToArray()
-    Dim Bits As BitArray
-    Set Bits = Cor.NewBitArray(34)
-    Bits(33) = True
-    Bits.Length = 33
-    
-    Dim Actual(0 To 1) As Long
-    Bits.CopyTo Actual, 0
-    
-    Assert.That Actual, Iz.EqualTo(NewLongs(0, 0))
 End Sub
 
 Public Sub FromBytes_WhenCalled_CreatesWithBytes()
