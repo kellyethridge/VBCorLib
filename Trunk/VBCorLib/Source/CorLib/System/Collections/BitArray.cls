@@ -120,12 +120,14 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     Select Case VarType(Arr)
         Case vbLongArray
             CorArray.CopyEx mBits, 0, Arr, Index, (mLength + 31) \ BitsPerLong
-        
+            MaskOffLastElement Arr, Index, BitsPerLong
+            
         Case vbByteArray
             If (Index + (mLength + 7) \ BitsPerByte) - 1 > UBound(Arr) Then _
                 Error.InvalidOffsetLength
             
             Buffer.BlockCopy mBits, 0, Arr, Index - LBound(Arr), (mLength + 7) \ BitsPerByte
+            MaskOffLastElement Arr, Index, BitsPerByte
             
         Case vbBooleanArray
             If CorArray.GetLength(Arr) < mLength Then _
@@ -254,20 +256,14 @@ End Property
 ' newly available bits are set to 0 (False).
 '
 Public Property Let Length(ByVal Value As Long)
+    If Value < 0 Then _
+        Error.NegativeNumber "Value"
+        
     If Value <> mLength Then
-        Dim Index As Long
-        Index = (Value - 1) \ BitsPerLong
-        ReDim Preserve mBits(0 To Index)
-        mUBound = Index
-        
-        Dim Bit As Long
-        Bit = Value - Index * BitsPerLong
-        
-        If Bit > 0 Then
-            Bit = Powers(Bit - 1)
-            mBits(mUBound) = mBits(mUBound) And Bit
-        End If
-        
+        Dim LastElementIndex As Long
+        LastElementIndex = (Value - 1) \ BitsPerLong
+        ReDim Preserve mBits(0 To LastElementIndex)
+        mUBound = LastElementIndex
         mLength = Value
     End If
     mVersion = mVersion + 1
@@ -329,6 +325,9 @@ Public Sub SetAll(ByVal Value As Boolean)
     For i = 0 To mUBound
         mBits(i) = Value
     Next i
+        
+    MaskOffLastElement mBits, 0, BitsPerLong
+        
     mVersion = mVersion + 1
 End Sub
 
@@ -434,6 +433,41 @@ End Sub
 Friend Property Get Version() As Long
     Version = mVersion
 End Property
+
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub MaskOffLastElement(ByRef Arr As Variant, ByVal Index As Long, ByVal BitsPerElement As Long)
+    Dim TargetLength        As Long
+    Dim LastElementIndex    As Long
+    Dim LastMaskBit         As Long
+    
+    If mLength Mod BitsPerElement > 0 Then
+        TargetLength = (mLength - 1) \ BitsPerElement
+        LastElementIndex = LBound(Arr) + Index + TargetLength
+        LastMaskBit = mLength - TargetLength * BitsPerElement
+        
+        If LastMaskBit > 0 Then
+            Arr(LastElementIndex) = Arr(LastElementIndex) And GetMask(LastMaskBit)
+        End If
+    End If
+End Sub
+
+Private Function GetMask(ByVal LastMaskBit As Long) As Long
+    Dim Mask As Long
+    
+    Mask = Powers(LastMaskBit - 1)
+    
+    If Mask = &H80000000 Then
+        Mask = &HFFFFFFFF
+    Else
+        Mask = (Mask - 1) Or Mask
+    End If
+    
+    GetMask = Mask
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
