@@ -39,14 +39,10 @@ Attribute VB_Exposed = True
 ' Manages a compact array of bit values. Each bit represents
 ' a boolean, where True = 1, and False = 0.
 '
-' @remarks The default size is 32 bits represented. A <b>BitArray</b> with a
-' different size can be creates using the public constructor or static constructors.
-' <p>The following are some of the available methods to create a <b>BitArray</b>.
+' @remarks <p>The following are some of the available methods to create a <b>BitArray</b>.
 ' <pre>
-' Set bits = New BitArray
-' - or -
 ' Set bits = NewBitArray(128)
-' - or -
+'
 ' Set bits = BitArray.FromBooleans(BooleanArray)
 ' </pre></p>
 ' @see Constructors
@@ -130,7 +126,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
             MaskOffLastElement Arr, Index, BitsPerByte
             
         Case vbBooleanArray
-            If CorArray.GetLength(Arr) < mLength Then _
+            If CorArray.LengthFirstDim(Arr) < mLength Then _
                 Error.InvalidOffsetLength
             
             Dim Booleans() As Boolean
@@ -261,9 +257,8 @@ Public Property Let Length(ByVal Value As Long)
         
     If Value <> mLength Then
         Dim LastElementIndex As Long
-        LastElementIndex = (Value - 1) \ BitsPerLong
-        ReDim Preserve mBits(0 To LastElementIndex)
-        mUBound = LastElementIndex
+        mUBound = (Value - 1) \ BitsPerLong
+        ReDim Preserve mBits(0 To mUBound)
         mLength = Value
     End If
     mVersion = mVersion + 1
@@ -361,6 +356,31 @@ Public Function XorBits(ByVal Bits As BitArray) As BitArray
     Set XorBits = Me
 End Function
 
+Friend Sub ApplyAndTo(ByRef Bits() As Long)
+    Dim i As Long
+    For i = 0 To mUBound
+        Bits(i) = Bits(i) And mBits(i)
+    Next i
+End Sub
+
+Friend Sub ApplyOrTo(ByRef Bits() As Long)
+    Dim i As Long
+    For i = 0 To mUBound
+        Bits(i) = Bits(i) Or mBits(i)
+    Next i
+End Sub
+
+Friend Sub ApplyXorTo(ByRef Bits() As Long)
+    Dim i As Long
+    For i = 0 To mUBound
+        Bits(i) = Bits(i) Xor mBits(i)
+    Next
+End Sub
+
+Friend Property Get Version() As Long
+    Version = mVersion
+End Property
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -387,7 +407,7 @@ Friend Sub InitFromBytes(ByRef Bytes() As Byte)
     
     Dim Size As Long
     Size = CorArray.LengthFirstDim(Bytes)
-    Me.Length = Size * 8
+    Me.Length = Size * BitsPerByte
     CopyMemory mBits(0), Bytes(LBound(Bytes)), Size
 End Sub
 
@@ -403,37 +423,6 @@ Friend Sub CloneHelper(ByRef Bits() As Long, ByVal Length As Long)
     mBits = Bits
     mLength = Length
 End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub ApplyAndTo(ByRef Bits() As Long)
-    Dim i As Long
-    For i = 0 To mUBound
-        Bits(i) = Bits(i) And mBits(i)
-    Next i
-End Sub
-
-Friend Sub ApplyOrTo(ByRef Bits() As Long)
-    Dim i As Long
-    For i = 0 To mUBound
-        Bits(i) = Bits(i) Or mBits(i)
-    Next i
-End Sub
-
-Friend Sub ApplyXorTo(ByRef Bits() As Long)
-    Dim i As Long
-    For i = 0 To mUBound
-        Bits(i) = Bits(i) Xor mBits(i)
-    Next
-End Sub
-
-
-Friend Property Get Version() As Long
-    Version = mVersion
-End Property
-
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -469,15 +458,15 @@ Private Function GetMask(ByVal LastMaskBit As Long) As Long
     GetMask = Mask
 End Function
 
+Private Function GetBitIndex(ByVal Index As Long, ByRef Bit As Long) As Long
+    GetBitIndex = Index \ BitsPerLong
+    Bit = Powers(Index - GetBitIndex * BitsPerLong)
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_InitProperties()
-    ReDim mBits(0)
-    mLength = BitsPerLong
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
         mUBound = .ReadProperty(PROP_UBOUND)
@@ -493,13 +482,13 @@ End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_UBOUND, mUBound)
-        Call .WriteProperty(PROP_LENGTH, mLength)
-        Call .WriteProperty(PROP_BITSUBOUND, UBound(mBits))
+        .WriteProperty PROP_UBOUND, mUBound
+        .WriteProperty PROP_LENGTH, mLength
+        .WriteProperty PROP_BITSUBOUND, UBound(mBits)
         
         Dim i As Long
         For i = 0 To UBound(mBits)
-            Call .WriteProperty(PROP_BITS & i, mBits(i))
+            .WriteProperty PROP_BITS & i, mBits(i)
         Next i
     End With
 End Sub
@@ -520,11 +509,6 @@ Private Function IObject_ToString() As String
     IObject_ToString = ToString
 End Function
 
-Private Function GetBitIndex(ByVal Index As Long, ByRef Bit As Long) As Long
-    GetBitIndex = Index \ BitsPerLong
-    Bit = Powers(Index - GetBitIndex * BitsPerLong)
-End Function
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   ICloneable Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -536,7 +520,7 @@ End Function
 '   ICollection Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long

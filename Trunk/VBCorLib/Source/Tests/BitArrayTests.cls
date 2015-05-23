@@ -219,6 +219,17 @@ Public Sub CopyTo_WithBooleanArrayTooSmall_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+Public Sub SetAll_WithTrue_SetsBitsToOne()
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    Bits.SetAll True
+    
+    Dim Actual(0) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&H3FF))
+End Sub
+
 Public Sub FromBytes_WhenCalled_CreatesWithBytes()
     Dim Bits As BitArray
     
@@ -312,24 +323,6 @@ Private Function CreateMask() As BitArray
     Set CreateMask = BitArray.FromLongs(NewLongs(&H55555555))
 End Function
 
-'Private list As bitarray
-'
-'Public Sub Setup()
-'    Set list = newbitarray(32)
-'End Sub
-'
-'Public Sub TestAnd()
-'    Dim andlist As bitarray
-'    Set andlist = newbitarray(list.Count)
-'    Dim i As Long
-'    For i = 0 To andlist.Count - 1
-'        andlist(i) = Not CBool(i And 1)
-'    Next i
-'    list.SetAll True
-'    list.AndBits andlist
-'    AssertAlternatingPattern
-'End Sub
-'
 'Public Sub TestOr()
 '    Dim orlist As bitarray
 '    Dim i As Long
@@ -339,32 +332,6 @@ End Function
 '    Next i
 '    list.OrBits orlist
 '    AssertAlternatingPattern
-'End Sub
-'
-'Public Sub TestSetAll()
-'    Dim i As Long
-'    list.SetAll True
-'    For i = 0 To list.Count - 1
-'        Assert.IsTrue list(i), "Failed at " & i
-'    Next i
-'
-'    list.SetAll False
-'    For i = 0 To list.Count - 1
-'        Assert.IsFalse list(i), "Failed at " & i
-'    Next i
-'End Sub
-'
-'Public Sub TestSetLengthClearsNewBits()
-'    Dim i As Long
-'    i = list.Length
-'    list.Length = list.Length + 35
-'    list.SetAll True
-'    list.Length = list.Length - 35
-'    list.Length = list.Length + 35
-'
-'    For i = i To list.Count - 1
-'        Assert.IsFalse list(i), "New bits were not cleared."
-'    Next i
 'End Sub
 '
 'Public Sub TestNot()
@@ -387,35 +354,6 @@ End Function
 '    For i = 0 To list.Count - 1
 '        Assert.IsTrue list(i), "Bit should be true."
 '    Next i
-'End Sub
-'
-'Public Sub TestFromLongs()
-'    Dim l() As Long
-'    l = NewLongs(&H55555555, &H55555555)
-'
-'    Set list = bitarray.FromLongs(l)
-'    Assert.AreEqual 64, list.Count, "Count should be 64."
-'    AssertAlternatingPattern
-'End Sub
-'
-'Public Sub TestFromBytes()
-'    Dim b() As Byte
-'    b = NewBytes(&H55, &H55, &H55)
-'
-'    Set list = bitarray.FromBytes(b)
-'    Assert.AreEqual 24, list.Count, "Count should be 24."
-'    AssertAlternatingPattern
-'End Sub
-'
-'Public Sub TestFromBooleans()
-'    Dim b(60) As Boolean
-'    Dim i As Long
-'    For i = 0 To 60
-'        b(i) = Not CBool(i And 1)
-'    Next i
-'    Set list = bitarray.FromBooleans(b)
-'    Assert.AreEqual 61, list.Count, "Count should be 61."
-'    AssertAlternatingPattern
 'End Sub
 '
 'Public Sub TestEnumerator()
