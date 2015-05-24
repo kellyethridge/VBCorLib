@@ -1,14 +1,14 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-  Persistable = 0  'NotPersistable
+  Persistable = 1  'Persistable
   DataBindingBehavior = 0  'vbNone
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
 Attribute VB_Name = "BitArray"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'The MIT License (MIT)
@@ -39,11 +39,15 @@ Attribute VB_Exposed = True
 ' Manages a compact array of bit values. Each bit represents
 ' a boolean, where True = 1, and False = 0.
 '
-' @remarks <p>The following are some of the available methods to create a <b>BitArray</b>.
+' @remarks The default BitArray size is 32 bits unless a constructor is used
+' to define a custom size.
+' <p>The following are some of the available methods to create a <b>BitArray</b>.
 ' <pre>
-' Set bits = NewBitArray(128)
+' Set Bits = New BitArray()
 '
-' Set bits = BitArray.FromBooleans(BooleanArray)
+' Set Bits = NewBitArray(128)
+'
+' Set Bits = BitArray.FromBooleans(BooleanArray)
 ' </pre></p>
 ' @see Constructors
 ' @see BitArrayStatic
@@ -53,6 +57,7 @@ Implements IObject
 Implements IEnumerable
 Implements ICollection
 Implements ICloneable
+Implements IVersionableCollection
 
 Private Const PROP_UBOUND       As String = "Ubound"
 Private Const PROP_LENGTH       As String = "Length"
@@ -77,6 +82,7 @@ Private mVersion    As Long
 ' however, the object returns itself for ease of concatenated operations.
 '
 Public Function AndBits(ByVal Bits As BitArray) As BitArray
+    EnsureInited
     If Bits Is Nothing Then _
         Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
@@ -93,6 +99,7 @@ End Function
 ' @return A duplicate of the current instance.
 '
 Public Function Clone() As BitArray
+    EnsureInited
     Set Clone = New BitArray
     Clone.CloneHelper mBits, mLength
 End Function
@@ -108,6 +115,7 @@ End Function
 ' a Boolean array, each boolean element represents a single bit in the array.
 '
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
+    EnsureInited
     CheckValidSingleDimArray Arr
     
     If Index < LBound(Arr) Then _
@@ -152,6 +160,7 @@ End Sub
 ' property is read-only.
 '
 Public Property Get Count() As Long
+    EnsureInited
     Count = mLength
 End Property
 
@@ -173,6 +182,7 @@ End Function
 ' @return An enumerator
 '
 Public Function GetEnumerator() As IEnumerator
+    EnsureInited
     Dim Ret As New BitArrayEnumerator
     Ret.Init Me
     Set GetEnumerator = Ret
@@ -206,12 +216,13 @@ End Property
 '
 Public Property Get Item(ByVal Index As Long) As Boolean
 Attribute Item.VB_UserMemId = 0
+    EnsureInited
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
-    Dim Bit As Long
-    Index = GetBitIndex(Index, Bit)
-    Item = CBool(mBits(Index) And Bit)
+    Dim bit As Long
+    Index = GetBitIndex(Index, bit)
+    Item = CBool(mBits(Index) And bit)
 End Property
 
 ''
@@ -222,15 +233,16 @@ End Property
 ' @remarks The index is zero based.'
 '
 Public Property Let Item(ByVal Index As Long, ByVal Value As Boolean)
+    EnsureInited
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
 
-    Dim Bit As Long
-    Index = GetBitIndex(Index, Bit)
+    Dim bit As Long
+    Index = GetBitIndex(Index, bit)
     If Value Then
-        mBits(Index) = mBits(Index) Or Bit
+        mBits(Index) = mBits(Index) Or bit
     Else
-        mBits(Index) = mBits(Index) And (Not Bit)
+        mBits(Index) = mBits(Index) And (Not bit)
     End If
     mVersion = mVersion + 1
 End Property
@@ -241,6 +253,7 @@ End Property
 ' @return The number of bits represented.
 '
 Public Property Get Length() As Long
+    EnsureInited
     Length = mLength
 End Property
 
@@ -252,6 +265,7 @@ End Property
 ' newly available bits are set to 0 (False).
 '
 Public Property Let Length(ByVal Value As Long)
+    EnsureInited
     If Value < 0 Then _
         Error.NegativeNumber "Value"
         
@@ -282,6 +296,7 @@ End Function
 ' for concatenated operations.
 '
 Public Function NotBits() As BitArray
+    EnsureInited
     Dim i As Long
     For i = 0 To mUBound
         mBits(i) = Not mBits(i)
@@ -300,6 +315,7 @@ End Function
 ' however, the object returns itself for ease of concatenated operations.
 '
 Public Function OrBits(ByVal Bits As BitArray) As BitArray
+    EnsureInited
     If Bits Is Nothing Then _
         Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
@@ -316,6 +332,7 @@ End Function
 ' @param value The value to set all the bits to.
 '
 Public Sub SetAll(ByVal Value As Boolean)
+    EnsureInited
     Dim i As Long
     For i = 0 To mUBound
         mBits(i) = Value
@@ -346,6 +363,7 @@ End Function
 ' however, the object returns itself for ease of concatenated operations.
 '
 Public Function XorBits(ByVal Bits As BitArray) As BitArray
+    EnsureInited
     If Bits Is Nothing Then _
         Error.ArgumentNull "Bits", ArgumentNull_Array
     If Bits.Length <> mLength Then _
@@ -357,6 +375,7 @@ Public Function XorBits(ByVal Bits As BitArray) As BitArray
 End Function
 
 Friend Sub ApplyAndTo(ByRef Bits() As Long)
+    EnsureInited
     Dim i As Long
     For i = 0 To mUBound
         Bits(i) = Bits(i) And mBits(i)
@@ -364,6 +383,7 @@ Friend Sub ApplyAndTo(ByRef Bits() As Long)
 End Sub
 
 Friend Sub ApplyOrTo(ByRef Bits() As Long)
+    EnsureInited
     Dim i As Long
     For i = 0 To mUBound
         Bits(i) = Bits(i) Or mBits(i)
@@ -371,15 +391,12 @@ Friend Sub ApplyOrTo(ByRef Bits() As Long)
 End Sub
 
 Friend Sub ApplyXorTo(ByRef Bits() As Long)
+    EnsureInited
     Dim i As Long
     For i = 0 To mUBound
         Bits(i) = Bits(i) Xor mBits(i)
     Next
 End Sub
-
-Friend Property Get Version() As Long
-    Version = mVersion
-End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -428,6 +445,13 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub EnsureInited()
+    If SAPtr(mBits) = vbNullPtr Then
+        ReDim mBits(0)
+        mLength = 32
+    End If
+End Sub
+
 Private Sub MaskOffLastElement(ByRef Arr As Variant, ByVal Index As Long, ByVal BitsPerElement As Long)
     Dim TargetLength        As Long
     Dim LastElementIndex    As Long
@@ -458,9 +482,9 @@ Private Function GetMask(ByVal LastMaskBit As Long) As Long
     GetMask = Mask
 End Function
 
-Private Function GetBitIndex(ByVal Index As Long, ByRef Bit As Long) As Long
+Private Function GetBitIndex(ByVal Index As Long, ByRef bit As Long) As Long
     GetBitIndex = Index \ BitsPerLong
-    Bit = Powers(Index - GetBitIndex * BitsPerLong)
+    bit = Powers(Index - GetBitIndex * BitsPerLong)
 End Function
 
 
@@ -495,7 +519,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -510,14 +534,14 @@ Private Function IObject_ToString() As String
 End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
 End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
     CopyTo Arr, Index
@@ -536,7 +560,7 @@ Private Function ICollection_NewEnum() As stdole.IUnknown
 End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -546,3 +570,10 @@ Private Function IEnumerable_NewEnum() As stdole.IUnknown
     Set IEnumerable_NewEnum = NewEnum
 End Function
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionableCollection
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionableCollection_CurrentVersion() As Long
+    IVersionableCollection_CurrentVersion = mVersion
+End Property

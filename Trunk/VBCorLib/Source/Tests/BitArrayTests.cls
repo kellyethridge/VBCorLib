@@ -318,49 +318,103 @@ Public Sub AndBits_WithDifferentNumberOfElements_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+Public Sub OrBits_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    Bits.OrBits Nothing
+    
+    AssertArgumentNullException Err, "Bits"
+End Sub
+
+Public Sub OrBits_WithValue_PerformsOrOperation()
+    Dim Bits As BitArray
+    Set Bits = BitArray.FromLongs(NewLongs(&H80000000))
+    
+    Bits.OrBits CreateMask
+    
+    Dim Actual(0) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HD5555555))
+End Sub
+
+Public Sub OrBits_WithDifferentNumberOfElements_ThrowsArgumentException()
+    On Error Resume Next
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(31)
+    
+    Bits.OrBits CreateMask
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub XorBits_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(10)
+    
+    Bits.XorBits Nothing
+    
+    AssertArgumentNullException Err, "Bits"
+End Sub
+
+Public Sub XorBits_WithValue_PerformsOrOperation()
+    Dim Bits As BitArray
+    Set Bits = BitArray.FromLongs(NewLongs(&HFFFFFFFF))
+    
+    Bits.XorBits CreateMask
+    
+    Dim Actual(0) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HAAAAAAAA))
+End Sub
+
+Public Sub XorBits_WithDifferentNumberOfElements_ThrowsArgumentException()
+    On Error Resume Next
+    Dim Bits As BitArray
+    Set Bits = Cor.NewBitArray(31)
+    
+    Bits.XorBits CreateMask
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub NotBits_WithValue_PerformsOrOperation()
+    Dim Bits As BitArray
+    Set Bits = BitArray.FromLongs(NewLongs(&H55555555))
+    
+    Bits.NotBits
+    
+    Dim Actual(0) As Long
+    Bits.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HAAAAAAAA))
+End Sub
+
+Public Sub Serialization_WhenCalled_SerializesInstance()
+    Dim Bits As BitArray
+    Set Bits = CreateMask
+    
+    Dim Bits2 As BitArray
+    Set Bits2 = Persist(Bits)
+    
+    Dim Actual(0) As Long
+    Bits2.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&H55555555))
+End Sub
+
+Public Sub New_WhenCalled_InitializesTo32Bits()
+    Dim Bits As New BitArray
+    
+    Bits(31) = True
+    
+    Assert.That Bits.Length, Iz.EqualTo(32)
+    Assert.That Bits(31), Iz.True
+End Sub
+
 
 Private Function CreateMask() As BitArray
     Set CreateMask = BitArray.FromLongs(NewLongs(&H55555555))
 End Function
 
-'Public Sub TestOr()
-'    Dim orlist As bitarray
-'    Dim i As Long
-'    Set orlist = newbitarray(list.Count)
-'    For i = 0 To orlist.Count - 1
-'        orlist(i) = Not CBool(i And 1)
-'    Next i
-'    list.OrBits orlist
-'    AssertAlternatingPattern
-'End Sub
-'
-'Public Sub TestNot()
-'    Dim i As Long
-'
-'    For i = 0 To list.Count - 1
-'        list(i) = i And 1
-'    Next i
-'    list.NotBits
-'    AssertAlternatingPattern
-'End Sub
-'
-'Public Sub TestXor()
-'    Dim i As Long
-'    Dim b As bitarray
-'    Set b = newbitarray(list.Count)
-'    b.SetAll True
-'    list.XorBits b
-'
-'    For i = 0 To list.Count - 1
-'        Assert.IsTrue list(i), "Bit should be true."
-'    Next i
-'End Sub
-'
-'Public Sub TestEnumerator()
-'    Dim v As Variant
-'    list.SetAll True
-'    For Each v In list
-'        Assert.IsTrue v
-'    Next v
-'End Sub
 '

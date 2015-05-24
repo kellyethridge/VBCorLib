@@ -147,6 +147,7 @@ End Sub
 Private Sub AddSystemCollections()
     With Sim.NewTestSuite("System.Collections")
         .Add New BitArrayTests
+        .Add New BitArrayEnumeratorTests
         .Add New TestSortedList
         .Add New ComparerTests
 '        .Add New TestCaseInsensitiveHCP

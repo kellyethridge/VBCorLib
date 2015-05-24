@@ -31,6 +31,7 @@ Attribute VB_Exposed = True
 '
 '    Module: BitArrayEnumerator
 '
+
 ''
 ' This class is used to enumerate the individual bits being
 ' managed by a BitArray object.
@@ -48,23 +49,23 @@ Private mVersion    As Long
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Friend
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As BitArray)
     Set mList = List
-    mVersion = List.Version
+    mVersion = GetCollectionVersion(List)
     mIndex = -1
     mEndIndex = List.Count - 1
 End Sub
 
-Friend Sub CloneHelper(ByVal List As BitArray, ByVal Index As Long)
-    Call Init(List)
+Friend Sub InitClone(ByVal List As BitArray, ByVal Index As Long)
+    Init List
     mIndex = Index
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
@@ -80,11 +81,11 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New BitArrayEnumerator
-    Call Ret.CloneHelper(mList, mIndex)
+    Ret.InitClone mList, mIndex
     Set ICloneable_Clone = Ret
 End Function
 
@@ -93,21 +94,21 @@ End Function
 '   IEnumerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+    If GetCollectionVersion(mList) <> mVersion Then _
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
+        Error.InvalidOperation InvalidOperation_EnumNotStarted
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
 
     IEnumerator_Current = mList(mIndex)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
+    If GetCollectionVersion(mList) <> mVersion Then _
+        Error.InvalidOperation InvalidOperation_VersionError
     If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+        Error.InvalidOperation InvalidOperation_EnumFinished
     
     If mIndex = mEndIndex Then
         mIndex = mEndIndex + 1
