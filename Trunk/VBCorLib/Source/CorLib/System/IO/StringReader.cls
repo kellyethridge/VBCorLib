@@ -46,7 +46,6 @@ Private mString         As String
 Private mStringBuffer   As CharBuffer
 Private mIsClosed       As Boolean
 Private mPosition       As Long
-'Private mBuffer     As WordBuffer
 Private mLength         As Long
 
 
@@ -130,12 +129,15 @@ End Function
 ' @remarks <p>The returned line does not contain the termination character.
 ' If the character is a CarriageReturn followed immediately by a LineFeed, then
 ' the LineFeed character is also consumed.</P>
-' <p>If there are no more characters to be read, then Null is returned.</p>
+' <p>If there are no more characters to be read, then vbNullString is returned.</p>
 '
 Public Function ReadLine() As String
     VerifyIsOpen
     
-    If mPosition >= mLength Then Exit Function
+    If mPosition >= mLength Then
+        ReadLine = vbNullString
+        Exit Function
+    End If
     
     Dim i As Long
     i = mPosition
@@ -160,7 +162,9 @@ Public Function ReadLine() As String
         mPosition = mPosition + 1
         ' if a Cr was followed by an Lf then consume the Lf
         If mPosition < mLength Then
-            If mStringBuffer.Chars(mPosition) = vbLineFeedChar Then mPosition = mPosition + 1
+            If mStringBuffer.Chars(mPosition) = vbLineFeedChar Then
+                mPosition = mPosition + 1
+            End If
         End If
     Else
         ' consume the found terminator.
@@ -171,14 +175,18 @@ End Function
 ''
 ' Returns from the current position in the string to the end.
 '
-' @return If there are no more characters to be read, then Null is returned.
+' @return If there are no more characters to be read, then vbNullString is returned.
 '
 Public Function ReadToEnd() As String
     VerifyIsOpen
-    If mPosition < mLength Then
-        ReadToEnd = Mid$(mString, mPosition + 1)
-        mPosition = mLength
+    
+    If mPosition >= mLength Then
+        ReadToEnd = vbNullString
+        Exit Function
     End If
+
+    ReadToEnd = Mid$(mString, mPosition + 1)
+    mPosition = mLength
 End Function
 
 ''
