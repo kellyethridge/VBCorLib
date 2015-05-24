@@ -42,11 +42,12 @@ Option Explicit
 Implements IObject
 Implements TextReader
 
-Private mString     As String
-Private mIsClosed   As Boolean
-Private mPosition   As Long
-Private mBuffer     As WordBuffer
-Private mLength     As Long
+Private mString         As String
+Private mStringBuffer   As CharBuffer
+Private mIsClosed       As Boolean
+Private mPosition       As Long
+'Private mBuffer     As WordBuffer
+Private mLength         As Long
 
 
 ''
@@ -67,9 +68,10 @@ End Sub
 ' actual character in the string.
 '
 Public Function Peek() As Long
-    Call VerifyIsOpen
+    VerifyIsOpen
+    
     If mPosition < mLength Then
-        AsWord(Peek) = mBuffer.Data(mPosition)
+        AsWord(Peek) = mStringBuffer.Chars(mPosition)
     Else
         Peek = -1
     End If
@@ -85,12 +87,10 @@ End Function
 ' actual character in the string.
 '
 Public Function Read() As Long
-    Call VerifyIsOpen
-    If mPosition < mLength Then
-        AsWord(Read) = mBuffer.Data(mPosition)
+    Read = Peek
+    
+    If Read >= 0 Then
         mPosition = mPosition + 1
-    Else
-        Read = -1
     End If
 End Function
 
@@ -104,15 +104,22 @@ End Function
 ' @remarks If not enough characters exist to fill <i>Count</i> characters, then
 ' fewer characters will be returned than <i>Count</i>.
 '
-Public Function ReadBlock(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
-    Call VerifyIsOpen
+Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
+    VerifyIsOpen
+    CheckValidSingleDimArray Buffer, Parameter_Buffer
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Chars), Index, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", Index, "Index", Count, "Count")
+    If Index < LBound(Buffer) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Index + Count - 1 > UBound(Buffer) Then _
+        Error.Argument Argument_InvalidOffLen
     
-    If mPosition + Count > mLength Then Count = mLength - mPosition
-    Call CopyMemory(Chars(Index), mBuffer.Data(mPosition), Count * 2)
+    If mPosition + Count > mLength Then
+        Count = mLength - mPosition
+    End If
+    
+    CopyMemory Buffer(Index), mStringBuffer.Chars(mPosition), Count * SizeOfChar
     ReadBlock = Count
 End Function
 
@@ -126,14 +133,14 @@ End Function
 ' <p>If there are no more characters to be read, then Null is returned.</p>
 '
 Public Function ReadLine() As String
-    Call VerifyIsOpen
+    VerifyIsOpen
     
     If mPosition >= mLength Then Exit Function
     
     Dim i As Long
     i = mPosition
     Do While mPosition < mLength
-        Select Case mBuffer.Data(mPosition)
+        Select Case mStringBuffer.Chars(mPosition)
             Case vbReturnChar, vbLineFeedChar: Exit Do
         End Select
         mPosition = mPosition + 1
@@ -148,12 +155,12 @@ Public Function ReadLine() As String
     
     ReadLine = Mid$(mString, i + 1, mPosition - i)
     
-    If mBuffer.Data(mPosition) = vbReturnChar Then
+    If mStringBuffer.Chars(mPosition) = vbReturnChar Then
         ' consume the found terminator.
         mPosition = mPosition + 1
         ' if a Cr was followed by an Lf then consume the Lf
         If mPosition < mLength Then
-            If mBuffer.Data(mPosition) = vbLineFeedChar Then mPosition = mPosition + 1
+            If mStringBuffer.Chars(mPosition) = vbLineFeedChar Then mPosition = mPosition + 1
         End If
     Else
         ' consume the found terminator.
@@ -167,7 +174,7 @@ End Function
 ' @return If there are no more characters to be read, then Null is returned.
 '
 Public Function ReadToEnd() As String
-    Call VerifyIsOpen
+    VerifyIsOpen
     If mPosition < mLength Then
         ReadToEnd = Mid$(mString, mPosition + 1)
         mPosition = mLength
@@ -202,36 +209,39 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef s As String, ByVal IsOwner As Boolean)
     If IsOwner Then
-        Call Helper.Swap4(ByVal VarPtr(s), mString)
+        Helper.Swap4 ByVal VarPtr(s), mString
     Else
         mString = s
     End If
+    
     mLength = Len(mString)
-    Call InitWordBuffer(mBuffer, StrPtr(mString), mLength)
+    InitChars mStringBuffer, mString
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyIsOpen()
-    If mIsClosed Then Throw Cor.NewObjectDisposedException("StringReader", "Cannot read from StringReader when closed.")
+    If mIsClosed Then
+        Error.ObjectDisposed ObjectDisposed_ReaderClosed
+    End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -240,10 +250,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   TextReader Interface
+'   TextReader
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub TextReader_CloseReader()
-    Call CloseReader
+    CloseReader
 End Sub
 
 Private Function TextReader_Equals(Value As Variant) As Boolean

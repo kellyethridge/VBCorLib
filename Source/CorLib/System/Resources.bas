@@ -80,6 +80,7 @@ Public Enum ObjectDisposedString
     ObjectDisposed_StreamClosed = 1200
     ObjectDisposed_FileNotOpen = 1201
     ObjectDisposed_Generic = 1202
+    ObjectDisposed_ReaderClosed = 1203
 End Enum
 
 Public Enum ArgumentString

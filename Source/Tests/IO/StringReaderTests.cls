@@ -14,65 +14,135 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ICategorizable
 
-Private sr As StringReader
-
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.IO"
 End Sub
 
-Public Sub TestRead()
-    Dim ch As Long
-    Dim i As Long
+Public Sub Read_WithEmptyString_ReturnsMinusOne()
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("")
     
-    Set sr = NewStringReader("abcdefghijk")
-    i = Asc("a")
-    ch = sr.Read
-    Do While ch > 0
-        Assert.AreEqual i, ch
-        i = i + 1
-        ch = sr.Read
-    Loop
-    Assert.AreEqual Asc("l"), i
-    Assert.AreEqual -1, sr.Read
-End Sub
-
-Public Sub TestPeek()
-    Set sr = NewStringReader("a")
-    Assert.AreEqual Asc("a"), sr.Peek
-    Assert.AreEqual Asc("a"), sr.Read
-    Assert.AreEqual -1, sr.Read
-End Sub
-
-Public Sub TestReadBlock()
-    Dim ch(100) As Integer
-    Dim i As Long
+    Dim Actual As Long
+    Actual = Reader.Read
     
-    Set sr = NewStringReader("abcdefghijk")
+    Assert.That Actual, Iz.EqualTo(-1)
+End Sub
+
+Public Sub Read_WhenCalled_ReturnsExpected()
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("abc")
     
-    Assert.AreEqual 11, sr.ReadBlock(ch, 0, 100)
-    For i = 0 To 10
-        Assert.AreEqual Asc("a") + i, ch(i)
-    Next i
+    Assert.That Reader.Read, Iz.EqualTo(Asc("a"))
+    Assert.That Reader.Read, Iz.EqualTo(Asc("b"))
+    Assert.That Reader.Read, Iz.EqualTo(Asc("c"))
+    Assert.That Reader.Read, Iz.EqualTo(-1)
 End Sub
 
-Public Sub TestReadBlockPastEndOfStream()
-    Dim ch(10) As Integer
-    Dim i As Long
+Public Sub Peek_WithEmptyString_ReturnsMinusOne()
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("")
     
-    Set sr = Cor.NewStringReader("12345678")
-    Assert.AreEqual 8, sr.ReadBlock(ch, 0, 11)
+    Dim Actual As Long
+    Actual = Reader.Peek
+    
+    Assert.That Actual, Iz.EqualTo(-1)
 End Sub
 
-Public Sub TestReadLine()
-    Set sr = NewStringReader("abc" & vbCr & vbLf & "def" & vbLf & vbCr)
-    Assert.AreEqual "abc", sr.ReadLine
-    Assert.AreEqual "def", sr.ReadLine
-    Assert.IsFalse CorString.IsNull(sr.ReadLine)
-    Assert.IsTrue CorString.IsNull(sr.ReadLine)
+Public Sub Peek_WhenCalled_ReturnsValue()
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("ab")
+    
+    Dim Actual As Long
+    Actual = Reader.Peek
+    
+    Assert.That Actual, Iz.EqualTo(Asc("a"))
 End Sub
 
-Public Sub TestReadToEnd()
-    Set sr = NewStringReader("abcdefghi")
-    sr.Read
-    Assert.AreEqual "bcdefghi", sr.ReadToEnd
+Public Sub Peek_WhenCalled_DoesNotAdvancePosition()
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("ab")
+    
+    Reader.Peek
+    
+    Dim Actual As Long
+    Actual = Reader.Read
+    Assert.That Actual, Iz.EqualTo(Asc("a"))
 End Sub
+
+Public Sub ReadBlock_WithNullChars_ThrowsArgumentNullException()
+    Dim NullChars() As Integer
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("abc")
+    
+    On Error Resume Next
+    Reader.ReadBlock NullChars, 0, 1
+    
+    AssertArgumentNullException Err, "Buffer"
+End Sub
+
+Public Sub ReadBlock_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Chars(2 To 5) As Integer
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("abc")
+    
+    On Error Resume Next
+    Reader.ReadBlock Chars, 1, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub ReadBlock_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Chars(0 To 1) As Integer
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("abc")
+    
+    On Error Resume Next
+    Reader.ReadBlock Chars, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub ReadBlock_WithIndexPlusCountInvalid_ThrowsArgumentException()
+    Dim Chars(0 To 1) As Integer
+    Dim Reader As StringReader
+    Set Reader = Cor.NewStringReader("abc")
+    
+    On Error Resume Next
+    Reader.ReadBlock Chars, 1, 2
+    
+    AssertArgumentException Err
+End Sub
+
+'Public Sub TestReadBlock()
+'    Dim ch(100) As Integer
+'    Dim i As Long
+'
+'    Set sr = NewStringReader("abcdefghijk")
+'
+'    Assert.AreEqual 11, sr.ReadBlock(ch, 0, 100)
+'    For i = 0 To 10
+'        Assert.AreEqual Asc("a") + i, ch(i)
+'    Next i
+'End Sub
+'
+'Public Sub TestReadBlockPastEndOfStream()
+'    Dim ch(10) As Integer
+'    Dim i As Long
+'
+'    Set sr = Cor.NewStringReader("12345678")
+'    Assert.AreEqual 8, sr.ReadBlock(ch, 0, 11)
+'End Sub
+'
+'Public Sub TestReadLine()
+'    Set sr = NewStringReader("abc" & vbCr & vbLf & "def" & vbLf & vbCr)
+'    Assert.AreEqual "abc", sr.ReadLine
+'    Assert.AreEqual "def", sr.ReadLine
+'    Assert.IsFalse CorString.IsNull(sr.ReadLine)
+'    Assert.IsTrue CorString.IsNull(sr.ReadLine)
+'End Sub
+'
+'Public Sub TestReadToEnd()
+'    Set sr = NewStringReader("abcdefghi")
+'    sr.Read
+'    Assert.AreEqual "bcdefghi", sr.ReadToEnd
+'End Sub
