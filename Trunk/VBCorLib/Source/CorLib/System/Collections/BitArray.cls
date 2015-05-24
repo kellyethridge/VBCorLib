@@ -101,7 +101,7 @@ End Function
 Public Function Clone() As BitArray
     EnsureInited
     Set Clone = New BitArray
-    Clone.CloneHelper mBits, mLength
+    Clone.InitClone mBits, mLength
 End Function
 
 ''
@@ -436,9 +436,10 @@ Friend Sub InitFromLongs(ByRef Values() As Long)
     mLength = (mUBound + 1) * BitsPerLong
 End Sub
 
-Friend Sub CloneHelper(ByRef Bits() As Long, ByVal Length As Long)
+Friend Sub InitClone(ByRef Bits() As Long, ByVal Length As Long)
     mBits = Bits
     mLength = Length
+    mUBound = (mLength - 1) \ BitsPerLong
 End Sub
 
 

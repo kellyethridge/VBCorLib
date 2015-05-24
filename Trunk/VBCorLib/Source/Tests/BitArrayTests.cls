@@ -412,6 +412,32 @@ Public Sub New_WhenCalled_InitializesTo32Bits()
     Assert.That Bits(31), Iz.True
 End Sub
 
+Public Sub Clone_WhenCalled_ReturnsClonedInstance()
+    Dim Original As BitArray
+    Set Original = Cor.NewBitArray(33, True)
+    
+    Dim Cloned As BitArray
+    Set Cloned = Original.Clone
+    
+    Assert.That Cloned, Iz.Not.SameAs(Original)
+    Dim Actual(0 To 1) As Long
+    Cloned.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HFFFFFFFF, &H1))
+End Sub
+
+Public Sub Not_WithCloned_PerformsOperation()
+    Dim Original As BitArray
+    Set Original = Cor.NewBitArray(33, False)
+    Dim Cloned As BitArray
+    Set Cloned = Original.Clone
+    
+    Cloned.NotBits
+    
+    Dim Actual(0 To 1) As Long
+    Cloned.CopyTo Actual, 0
+    Assert.That Actual, Iz.EqualTo(NewLongs(&HFFFFFFFF, &H1))
+End Sub
+
 
 Private Function CreateMask() As BitArray
     Set CreateMask = BitArray.FromLongs(NewLongs(&H55555555))
