@@ -47,14 +47,14 @@ Option Explicit
 ''
 ' Compares two elements and returns their relationship.
 '
-' @param x The left-hand-side of the equation.
-' @param y the right-hand-side of the equation.
+' @param a The left-hand-side of the equation.
+' @param b the right-hand-side of the equation.
 ' @return Value indicating the relationships between the values.
 ' @remarks <br>
 ' Comparison guide:<br>
-' x is the same value as y returns a 0.<br>
-' x is less than the value y returns a negative value (-1).<br>
-' x is greater than the value y returns a positive value (1).<br>
+' a is the same value as b returns a 0.<br>
+' a is less than the value b returns a negative value (-1).<br>
+' a is greater than the value b returns a positive value (1).<br>
 ' @include "..\..\Includes\IComparerCompare.txt"
-Public Function Compare(ByRef x As Variant, ByRef y As Variant) As Long: End Function
+Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long: End Function
 

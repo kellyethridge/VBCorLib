@@ -35,6 +35,7 @@ Public Object                   As New ObjectStatic
 Public CorArray                 As New CorArray
 Public CorString                As New CorString
 Public Comparer                 As New ComparerStatic
+Public CaseInsensitiveComparer  As New CaseInsensitiveComparerStatic
 Public Environment              As New Environment
 Public Buffer                   As New Buffer
 Public NumberFormatInfo         As New NumberFormatInfoStatic

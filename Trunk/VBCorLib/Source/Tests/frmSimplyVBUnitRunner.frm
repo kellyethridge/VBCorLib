@@ -150,7 +150,7 @@ Private Sub AddSystemCollections()
         .Add New BitArrayEnumeratorTests
         .Add New TestSortedList
         .Add New ComparerTests
-'        .Add New TestCaseInsensitiveHCP
+        .Add New CaseInsensitiveComparerTests
 
         .Add NewSuite("ArrayList", _
             New ArrayListTests, _

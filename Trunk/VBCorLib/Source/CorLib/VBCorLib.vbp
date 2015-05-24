@@ -348,6 +348,7 @@ Class=PathHelper; System\IO\PathHelper.cls
 Class=NumberStatic; System\Number.cls
 Module=Validation; System\Validation.bas
 ResFile32="VBCorLib.RES"
+Class=CaseInsensitiveComparerStatic; System\Collections\CaseInsensitiveComparerStatic.cls
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"

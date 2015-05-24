@@ -75,72 +75,72 @@ End Function
 ''
 ' Returns the comparison between to values.
 '
-' @param x The left-hand-side of the equation.
-' @param y the right-hand-side of the equation.
+' @param a The left-hand-side of the equation.
+' @param b the right-hand-side of the equation.
 ' @return The relationship between the values.<br>
 ' Relationship guide:<br>
-' x is equal to y returns 0.<br>
-' x is greater than y returns a positive value (1).<br>
-' x is less than y returns a negative value (-1).
+' a is equal to b returns 0.<br>
+' a is greater than b returns a positive value (1).<br>
+' a is less than b returns a negative value (-1).
 '
-Public Function Compare(ByRef X As Variant, ByRef Y As Variant) As Long
+Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
     Dim Comparable As IComparable
-    Dim XVarType As VbVarType
-    Dim YVarType As VbVarType
+    Dim AVarType As VbVarType
+    Dim BVarType As VbVarType
     
-    XVarType = VarType(X)
-    YVarType = VarType(Y)
+    AVarType = VarType(a)
+    BVarType = VarType(b)
     
-    Select Case XVarType
+    Select Case AVarType
         Case vbNull
-            If YVarType <> vbNull Then
+            If BVarType <> vbNull Then
                 Compare = -1
             End If
             Exit Function
 
         Case vbEmpty
-            If YVarType = vbNull Then
+            If BVarType = vbNull Then
                 Compare = 1
-            ElseIf YVarType <> vbEmpty Then
+            ElseIf BVarType <> vbEmpty Then
                 Compare = -1
             End If
             Exit Function
             
         Case vbObject, vbDataObject
-            If Not X Is Nothing Then
-                If TypeOf X Is IComparable Then
-                    Set Comparable = X
-                    Compare = Comparable.CompareTo(Y)
+            If Not a Is Nothing Then
+                If TypeOf a Is IComparable Then
+                    Set Comparable = a
+                    Compare = Comparable.CompareTo(b)
                     Exit Function
-                ElseIf X Is Y Then
+                ElseIf a Is b Then
                     Compare = 0
                     Exit Function
                 End If
             End If
             
-        Case YVarType
-            If X < Y Then
+        Case BVarType
+            If a < b Then
                 Compare = -1
-            ElseIf X > Y Then
+            ElseIf a > b Then
                 Compare = 1
             End If
             Exit Function
     End Select
 
-    Select Case YVarType
+    Select Case BVarType
         Case vbNull, vbEmpty
             Compare = 1
             
         Case vbObject, vbDataObject
-            If TypeOf Y Is IComparable Then
-                Set Comparable = Y
-                Compare = -Comparable.CompareTo(X)
+            If TypeOf b Is IComparable Then
+                Set Comparable = b
+                Compare = -Comparable.CompareTo(a)
             Else
                 Throw Cor.NewArgumentException("Object must implement IComparable interface.")
             End If
             
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, TypeName(X)))
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, TypeName(a)))
     End Select
 End Function
 
@@ -148,8 +148,8 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IComparer Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
-    IComparer_Compare = Compare(X, Y)
+Private Function IComparer_Compare(a As Variant, b As Variant) As Long
+    IComparer_Compare = Compare(a, b)
 End Function
 
 
@@ -160,8 +160,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

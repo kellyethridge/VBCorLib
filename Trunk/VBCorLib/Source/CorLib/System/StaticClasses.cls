@@ -116,6 +116,17 @@ Public Property Get Comparer() As ComparerStatic
 End Property
 
 ''
+' Provides access to CaseInsensitiveComparer static methods.
+'
+' @return Returns the class container of the static methods.
+' @see CaseInsensitiveComparer
+' @see CaseInsensitiveComparerStatic
+'
+Public Property Get CaseInsensitiveComparer() As CaseInsensitiveComparerStatic
+    Set CaseInsensitiveComparer = Statics.CaseInsensitiveComparer
+End Property
+
+''
 ' Returns a reference used to access the methods of the <b>Environment</b> Property Gets.
 '
 ' @return A reference that can be used to access methods of the <b>Environment</b> class.
