@@ -272,18 +272,14 @@ Private Sub AddSystemIO()
         .Add New TestFileNotFoundException
         .Add New TestINIFile
         .Add New DriveInfoTests
-        .Add New TestStringReader
+        .Add New StringReaderTests
         .Add New TestStringWriter
         .Add New DirectoryTests
         .Add New DirectoryInfoTests
         .Add New MemoryStreamTests
         .Add New PathTests
         .Add New FileStreamTests
-        
-        .Add NewSuite("StreamWriter", _
-            New StreamWriterTests, _
-            New TestStreamWriterWithMem, _
-            New TestSWWithMemAutoFlush)
+        .Add New StreamWriterTests
         
         AddTest .This
     End With

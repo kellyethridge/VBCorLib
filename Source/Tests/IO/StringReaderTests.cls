@@ -6,14 +6,11 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestStringReader"
+Attribute VB_Name = "StringReaderTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'
-'   TestStringReader
-'
 Option Explicit
 Implements ICategorizable
 
