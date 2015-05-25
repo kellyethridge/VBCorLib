@@ -273,7 +273,7 @@ Private Sub AddSystemIO()
         .Add New TestINIFile
         .Add New DriveInfoTests
         .Add New StringReaderTests
-        .Add New TestStringWriter
+        .Add New StringWriterTests
         .Add New DirectoryTests
         .Add New DirectoryInfoTests
         .Add New MemoryStreamTests

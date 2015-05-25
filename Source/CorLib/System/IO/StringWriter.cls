@@ -42,9 +42,9 @@ Option Explicit
 Implements IObject
 Implements TextWriter
 
-Private mSB         As StringBuilder
+Private mSB         As New StringBuilder
 Private mProvider   As IFormatProvider
-Private mEncoding   As UnicodeEncoding
+Private mEncoding   As New UnicodeEncoding
 Private mNewLine    As String
 Private mIsClosed   As Boolean
 
@@ -56,7 +56,6 @@ Private mIsClosed   As Boolean
 ' @return The encoding of the output string.
 '
 Public Property Get Encoding() As Encoding
-    If mEncoding Is Nothing Then Set mEncoding = New UnicodeEncoding
     Set Encoding = mEncoding
 End Property
 
@@ -67,7 +66,10 @@ End Property
 ' @remarks The format provider used is the returned by the current culture.
 '
 Public Property Get FormatProvider() As IFormatProvider
-    If mProvider Is Nothing Then Set mProvider = CultureInfo.CurrentCulture
+    If mProvider Is Nothing Then
+        Set mProvider = CultureInfo.CurrentCulture
+    End If
+    
     Set FormatProvider = mProvider
 End Property
 
@@ -84,11 +86,11 @@ End Property
 ''
 ' Sets the string to be used as the new-line set of characters.
 '
-' @param RHS The new-line set of characters.
+' @param Value The new-line set of characters.
 ' @remarks The default is CarriageReturn-LineFeed.
 '
-Public Property Let NewLine(ByVal RHS As String)
-    mNewLine = RHS
+Public Property Let NewLine(ByRef Value As String)
+    mNewLine = Value
 End Property
 
 ''
@@ -114,23 +116,38 @@ End Sub
 ' @return The StringBuilder being used to write to the string.
 '
 Public Function GetStringBuilder() As StringBuilder
-    Call VerifyBuilder
     Set GetStringBuilder = mSB
 End Function
 
 ''
 ' Writes a value to the string.
 '
-' @param value The value to be written to the stream.
+' @param Value The value to be written to the stream.
 ' @param args The arguments to be used in formatting the Value.
 ' @remarks The <i>args</i> are used when argument indexes are supplied
 ' in the value to be written. Indexes are indicate by enclosing the
 ' specific index in curly braces {}. The indexes start at 0.
 '
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
-    Call InternalWriteValue(Value, a)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+    WriteCore Value, SwappedArgs
+End Sub
+
+Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    CheckValidSingleDimArray Chars, Parameter_Chars
+    
+    Dim Range As ListRange
+    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
+    
+    If Range.Index < LBound(Chars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.NegativeNumber "Count"
+    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
+        Error.InvalidOffsetLength
+    
+    mSB.Append Chars, Index, Count
 End Sub
 
 ''
@@ -147,9 +164,14 @@ End Sub
 ' the current culture for this computer is used.</p>
 '
 Public Sub WriteLine(ParamArray Values() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(12))
-    Call InternalWriteLine(a)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
+    WriteLineCore SwappedArgs
+End Sub
+
+Public Sub WriteCharsLine(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    WriteChars Chars, Index, Count
+    mSB.AppendString mNewLine
 End Sub
 
 ''
@@ -157,7 +179,6 @@ End Sub
 '
 ' @return String representing this instance.
 Public Function ToString() As String
-    Call VerifyBuilder
     ToString = mSB.ToString
 End Function
 
@@ -165,7 +186,7 @@ End Function
 ' Returns a boolean indicating if the value and this object
 ' instance are the same instance.
 '
-' @param value The value to compare equality to.
+' @param Value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
@@ -181,8 +202,12 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mNewLine = Environment.NewLine
+End Sub
+
 Friend Sub Init(ByVal sb As StringBuilder, ByVal Provider As IFormatProvider)
     Set mSB = sb
     Set mProvider = Provider
@@ -190,62 +215,52 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifyBuilder()
-    If mSB Is Nothing Then Set mSB = New StringBuilder
-End Sub
-
 Private Sub VerifyIsOpen()
-    If mIsClosed Then Throw Cor.NewObjectDisposedException("StringWriter", "Cannot write to a closed StringWriter.")
+    If mIsClosed Then
+        Error.ObjectDisposed ObjectDisposed_WriterClosed
+    End If
 End Sub
 
-Private Sub InternalWrite(ByRef Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
+Private Sub WriteCore(ByRef Value As Variant, ByRef Args() As Variant)
+    VerifyIsOpen
+    
     Dim s As String
+    s = Object.ToString(Value, Provider:=FormatProvider)
     
-    Call VerifyIsOpen
-    Call VerifyBuilder
-    If NewLine Then s = mNewLine
-    s = Value & s
-    
-    Call mSB.InternalAppendFormat(Nothing, s, Args)
+    If SAPtr(Args) = vbNullPtr Then
+        mSB.AppendString s
+    ElseIf UBound(Args) < LBound(Args) Then
+        mSB.AppendString s
+    Else
+        mSB.InternalAppendFormat FormatProvider, s, Args
+    End If
 End Sub
 
-Private Sub InternalWriteLine(ByRef Args() As Variant)
-    Dim ub As Long
-    Dim s As String
-    
+Private Sub WriteLineCore(ByRef Args() As Variant)
+    Dim ub  As Long
     ub = UBound(Args)
     
-    If ub >= 0 Then s = Convert.ToString(Args(0))
-    If ub > 0 Then
-        Dim i As Long
-        For i = 1 To ub
-            Call Helper.MoveVariant(Args(i - 1), Args(i))
-        Next i
-        ReDim Preserve Args(UBound(Args) - 1)
-    ElseIf ub = 0 Then
-        Args = CorArray.CreateInstance(vbVariant)
+    If ub >= 0 Then
+        Dim s As String
+        s = Object.ToString(Args(0), Provider:=FormatProvider) & mNewLine
+        
+        If ub > 0 Then
+            CopyMemory Args(0), Args(1), (ub - LBound(Args)) * SizeOfVariant
+            ZeroMemory Args(ub), SizeOfVariant
+            mSB.InternalAppendFormat FormatProvider, s, Args
+        Else
+            mSB.AppendString Object.ToString(Args(0), Provider:=FormatProvider) & mNewLine
+        End If
+    Else
+        mSB.AppendString mNewLine
     End If
-    
-    Call InternalWrite(s, Args, True)
-End Sub
-
-Private Sub InternalWriteValue(ByRef Value As Variant, ByRef Args() As Variant)
-    Call InternalWrite(Convert.ToString(Value), Args, False)
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    mNewLine = Environment.NewLine
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -261,10 +276,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   TextWriter Interface
+'   TextWriter
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub TextWriter_CloseWriter()
-    Call CloseWriter
+    CloseWriter
 End Sub
 
 Private Property Get TextWriter_Encoding() As Encoding
@@ -276,7 +291,7 @@ Private Function TextWriter_Equals(Value As Variant) As Boolean
 End Function
 
 Private Sub TextWriter_Flush()
-    Call Flush
+    Flush
 End Sub
 
 Private Property Get TextWriter_FormatProvider() As IFormatProvider
@@ -300,21 +315,21 @@ Private Function TextWriter_ToString() As String
 End Function
 
 Private Sub TextWriter_WriteChars(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
-
+    WriteChars Chars, Index, Count
 End Sub
 
 Private Sub TextWriter_WriteCharsLine(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
-
+    WriteCharsLine Chars, Index, Count
 End Sub
 
 Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(12))
-    Call InternalWriteLine(a)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
+    WriteLineCore SwappedArgs
 End Sub
 
 Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
-    Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
-    Call InternalWriteValue(Value, a)
+    Dim SwappedArgs() As Variant
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+    WriteCore Value, SwappedArgs
 End Sub

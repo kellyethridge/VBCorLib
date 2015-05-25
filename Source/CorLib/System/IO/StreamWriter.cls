@@ -502,6 +502,10 @@ Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
     End If
 End Sub
 
+Private Sub TextWriter_WriteLineChars(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
+    
+End Sub
+
 Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     VerifyIsOpen
 

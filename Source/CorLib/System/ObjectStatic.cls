@@ -186,7 +186,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                 Set DateFormatter = DateTimeFormatInfo.CurrentInfo
             End If
             
-            ToString = DateFormatter.Format(Value, Format)
+            ToString = DateFormatter.Format(CDate(Value), Format)
             
         Case vbObject
             If Value Is Nothing Then
