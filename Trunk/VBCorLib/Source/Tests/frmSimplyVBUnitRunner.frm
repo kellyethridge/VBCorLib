@@ -94,14 +94,12 @@ End Sub
 Private Sub AddSystem()
     With Sim.NewTestSuite("System")
         .Add New ExceptionTests
-        .Add New TestSystemException
-        .Add New TestDefaultSystemEx
+        .Add New SystemExceptionTests
         .Add New ArgumentExceptionTests
         .Add New ArgumentNullExceptionTests
         .Add New ArgumentOutOfRangeTests
         .Add New TestExceptionMethods
-        .Add New TestInvalidCastException
-        .Add New TestDefInvalidCast
+        .Add New InvalidCastExceptionTests
         .Add New CorStringTests
         .Add New CharTests
         .Add New CharEnumeratorTests
