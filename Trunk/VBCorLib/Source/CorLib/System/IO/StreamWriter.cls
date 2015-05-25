@@ -215,7 +215,7 @@ Public Sub WriteLine(ParamArray Value() As Variant)
     End If
 End Sub
 
-Public Sub WriteCharsLine(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+Public Sub WriteLineChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
     
     WriteCore CorString.FromCharArray(Chars, Index, Count)
@@ -482,10 +482,6 @@ Private Sub TextWriter_WriteChars(Chars() As Integer, Optional Index As Variant,
     WriteChars Chars, Index, Count
 End Sub
 
-Private Sub TextWriter_WriteCharsLine(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
-    WriteCharsLine Chars, Index, Count
-End Sub
-
 Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
     VerifyIsOpen
     
@@ -503,7 +499,7 @@ Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
 End Sub
 
 Private Sub TextWriter_WriteLineChars(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
-    
+    WriteLineChars Chars, Index, Count
 End Sub
 
 Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)

@@ -123,13 +123,13 @@ Public Function GetStringBuilder() As StringBuilder
 End Function
 
 ''
-' Writes a value to the string.
+' Writes a text representation of the value to the underlying stream using both the
+' format provider and encoding objects.
 '
 ' @param Value The value to be written to the stream.
-' @param args The arguments to be used in formatting the Value.
-' @remarks The <i>args</i> are used when argument indexes are supplied
-' in the value to be written. Indexes are indicate by enclosing the
-' specific index in curly braces {}. The indexes start at 0.
+' @param Args An array of zero or more values to be formatted and written.
+' @remarks This method uses the composite formatting feature to convert the value
+' to its text representation and embed it in a string.
 '
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim SwappedArgs() As Variant
@@ -137,6 +137,16 @@ Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     WriteCore Value, SwappedArgs
 End Sub
 
+''
+' Writes the string representation of the characters to the stream using both the
+' format provider and encoding objects.
+'
+' @param Chars The characters to be written.
+' @param Index The beginning index within the Chars array to begin writing to the stream.
+' @param Count The number of characters to write to the stream.
+' @remarks This method uses the composite formatting feature to convert the value
+' to its text representation and embed it in a string.
+'
 Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     CheckValidSingleDimArray Chars, Parameter_Chars
     
@@ -154,17 +164,13 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
 End Sub
 
 ''
-' Writes a value to the string, followed by a new-line set of characters.
+' Writes a text representation of the value followed by a NewLine to the underlying stream using both the
+' format provider and encoding objects.
 '
-' @param Values The value to be written to the string
-' @remarks The first argument in <i>values</i> is the output to the
-' string. Any additional arguments are used as formatting information.
-' An argument can be refered to through formatting indexes. A
-' formatting index is an integer enclosed in curly braces {}. The
-' indexes start at 0.
-' <p>Numbers and Dates will be formatted to the culture that was
-' passed in using Cor.NewStringWriter. If no culture was specified, then
-' the current culture for this computer is used.</p>
+' @param Values An array of args containing a value or composite formatting string and a list
+' of args to be formatted.
+' @remarks This method uses the composite formatting feature to convert the value
+' to its text representation and embed it in a string.
 '
 Public Sub WriteLine(ParamArray Values() As Variant)
     Dim SwappedArgs() As Variant
@@ -172,7 +178,16 @@ Public Sub WriteLine(ParamArray Values() As Variant)
     WriteLineCore SwappedArgs
 End Sub
 
-Public Sub WriteCharsLine(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+''
+' Writes the string representation of the characters followed by a NewLine to the stream using both the
+' format provider and encoding objects.
+'
+' @param Chars The characters to be written.
+' @param Index The beginning index within the Chars array to begin writing to the stream.
+' @param Count The number of characters to write to the stream.
+' @remarks Both Index and Count must be excluded or included. Neither argument can be supplied individually.
+'
+Public Sub WriteLineChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     WriteChars Chars, Index, Count
     mSB.AppendString mNewLine
 End Sub
@@ -323,14 +338,14 @@ Private Sub TextWriter_WriteChars(Chars() As Integer, Optional Index As Variant,
     WriteChars Chars, Index, Count
 End Sub
 
-Private Sub TextWriter_WriteCharsLine(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
-    WriteCharsLine Chars, Index, Count
-End Sub
-
 Private Sub TextWriter_WriteLine(ParamArray Value() As Variant)
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(12)
     WriteLineCore SwappedArgs
+End Sub
+
+Private Sub TextWriter_WriteLineChars(Chars() As Integer, Optional Index As Variant, Optional Count As Variant)
+    WriteLineChars Chars, Index, Count
 End Sub
 
 Private Sub TextWriter_WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)

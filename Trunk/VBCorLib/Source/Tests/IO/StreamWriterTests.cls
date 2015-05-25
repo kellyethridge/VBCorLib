@@ -234,7 +234,7 @@ Public Sub WriteCharsLine_WhenCalled_WritesCharsAndNewLine()
     Dim Actual() As Byte
     
     With Cor.NewStreamWriter(Store)
-        .WriteCharsLine NewIntegers(48, 49)
+        .WriteLineChars NewChars("0", "1")
     End With
     
     Actual = Store.ToArray

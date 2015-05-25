@@ -111,7 +111,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
             If Not File.Exists(SourceFileName) Then _
                 IOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
-                Error.IOException IOException_DirectoryExists
+                Error.IOException IOExceptionString.IOException_DirectoryExists
         End If
         IOError DllError, SourceFileName
     End If
