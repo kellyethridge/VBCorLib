@@ -112,20 +112,20 @@ End Function
 ''
 ' Copies the values to an array.
 '
-' @param dstArray The array to receive the values.
+' @param Arr The array to receive the values.
 ' @param index The starting position in dstArray to start placing the values.
 '
-Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    If CorArray.IsNull(DstArray) Then _
-        Error.ArgumentNull "DstArray", ArgumentNull_Array
-    If CorArray.Rank(DstArray) <> 1 Then _
-        Error.Argument Argument_MultiDimNotSupported, "DstArray"
+Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
+    If CorArray.IsNull(Arr) Then _
+        Error.ArgumentNull "Arr", ArgumentNull_Array
+    If CorArray.Rank(Arr) <> 1 Then _
+        Error.Argument Argument_MultiDimNotSupported, "Arr" ' .NET throws an ArgumentException instead of RankException.
     
-    If Index < LBound(DstArray) Then _
+    If Index < LBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
     
-    CorArray.CopyEx mItems, 0, DstArray, Index, mCount
-    CorArray.Reverse DstArray, Index, mCount
+    CorArray.CopyEx mItems, 0, Arr, Index, mCount
+    CorArray.Reverse Arr, Index, mCount
 End Sub
 
 ''
@@ -348,7 +348,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -364,7 +364,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -372,7 +372,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
     CopyTo Arr, Index
@@ -392,7 +392,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -404,7 +404,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IVersionableCollection Interface
+'   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IVersionableCollection_CurrentVersion() As Long
     IVersionableCollection_CurrentVersion = mVersion

@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = True
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Math2
+' Module: MathExt
 '
 
 ''
@@ -111,9 +114,9 @@ End Function
 ' @param Remainder The variable to place the remainder of the division.
 ' @return The quotient of the division.
 '
-Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef Remainder As Long) As Long
+Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef remainder As Long) As Long
     DivRem = a \ b
-    Remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
+    remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
 End Function
 
 ''
@@ -147,9 +150,9 @@ End Property
 ' the maximum value.
 ' <p>If both values are equavalent then <b>x</b> is returned.</p>
 '
-Public Function Max(ByRef x As Variant, ByRef y As Variant) As Variant
+Public Function Max(ByRef X As Variant, ByRef Y As Variant) As Variant
     On Error GoTo errTrap
-    Call GetMax(x, y, Max)
+    GetMax X, Y, Max
     Exit Function
     
 errTrap:
@@ -207,9 +210,9 @@ End Function
 ' the minimum value.
 ' <p>If both values are equavalent then <b>x</b> is returned.</p>
 '
-Public Function Min(ByRef x As Variant, ByRef y As Variant) As Variant
+Public Function Min(ByRef X As Variant, ByRef Y As Variant) As Variant
     On Error GoTo errTrap
-    Call GetMin(x, y, Min)
+    GetMin X, Y, Min
     Exit Function
     
 errTrap:
@@ -237,10 +240,10 @@ Public Function MinIn(ByRef List As Variant) As Variant
     Dim v As Variant
     For Each v In List
         If IsFirstElement Then
-            Call VariantCopy(MinIn, v)
+            VariantCopy MinIn, v
             IsFirstElement = False
         Else
-            Call GetMin(MinIn, v, MinIn)
+            GetMin MinIn, v, MinIn
         End If
     Next v
     
@@ -281,7 +284,7 @@ End Function
 ' @return The hyberbolic cosine.
 '
 Public Function Cosh(ByVal d As Double) As Double
-    Cosh = (Exp(d) + Exp(-d)) / 2
+    Cosh = (exp(d) + exp(-d)) / 2
 End Function
 
 ''
@@ -291,7 +294,7 @@ End Function
 ' @return The hyberbolic sine.
 '
 Public Function Sinh(ByVal d As Double) As Double
-    Sinh = (Exp(d) - Exp(-d)) / 2
+    Sinh = (exp(d) - exp(-d)) / 2
 End Function
 
 ''
@@ -301,13 +304,13 @@ End Function
 ' @return The hyperbolic tangent.
 '
 Public Function Tanh(ByVal d As Double) As Double
-    Dim posExp As Double
-    Dim negExp As Double
+    Dim PosExp As Double
+    Dim NegExp As Double
     
-    posExp = Exp(d)
-    negExp = Exp(-d)
+    PosExp = exp(d)
+    NegExp = exp(-d)
     
-    Tanh = (posExp - negExp) / (posExp + negExp)
+    Tanh = (PosExp - NegExp) / (PosExp + NegExp)
 End Function
 
 ''
@@ -338,11 +341,15 @@ End Function
 ' @param y A devisor.
 ' @return The remainder of the division.
 '
-Public Function IEEERemainder(ByVal x As Double, ByVal y As Double) As Double
-    Dim ret As Double
-    ret = (x - (y * Round(x / y)))
-    If (ret = 0#) And (x < 0#) Then ret = mNegativeZero
-    IEEERemainder = ret
+Public Function IEEERemainder(ByVal X As Double, ByVal Y As Double) As Double
+    Dim Ret As Double
+    Ret = (X - (Y * Round(X / Y)))
+    
+    If (Ret = 0#) And (X < 0#) Then
+        Ret = mNegativeZero
+    End If
+    
+    IEEERemainder = Ret
 End Function
 
 ''
@@ -367,48 +374,50 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub GetMin(ByRef x As Variant, ByRef y As Variant, ByRef RetVal As Variant)
-    If Not IsObject(x) Then
-        If x > y Then
-            RetVal = y
-        Else
-            RetVal = x
-        End If
-    ElseIf TypeOf x Is IComparable Then
-        Dim c As IComparable
-        Set c = x
-        If c.CompareTo(y) > 0 Then
-            Set RetVal = y
-        Else
-            Set RetVal = x
-        End If
-    End If
-End Sub
-
-Private Sub GetMax(ByRef x As Variant, ByRef y As Variant, ByRef RetVal As Variant)
-    If Not IsObject(x) Then
-        If x < y Then
-            RetVal = y
-        Else
-            RetVal = x
-        End If
-    ElseIf TypeOf x Is IComparable Then
-        Dim c As IComparable
-        Set c = x
-        If c.CompareTo(y) < 0 Then
-            Set RetVal = y
-        Else
-            Set RetVal = x
-        End If
-    End If
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mNegativeZero = AsDouble(NEG_ZERO)
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub GetMin(ByRef X As Variant, ByRef Y As Variant, ByRef RetVal As Variant)
+    If Not IsObject(X) Then
+        If X > Y Then
+            RetVal = Y
+        Else
+            RetVal = X
+        End If
+    ElseIf TypeOf X Is IComparable Then
+        Dim c As IComparable
+        Set c = X
+        If c.CompareTo(Y) > 0 Then
+            Set RetVal = Y
+        Else
+            Set RetVal = X
+        End If
+    End If
+End Sub
+
+Private Sub GetMax(ByRef X As Variant, ByRef Y As Variant, ByRef RetVal As Variant)
+    If Not IsObject(X) Then
+        If X < Y Then
+            RetVal = Y
+        Else
+            RetVal = X
+        End If
+    ElseIf TypeOf X Is IComparable Then
+        Dim c As IComparable
+        Set c = X
+        If c.CompareTo(Y) < 0 Then
+            Set RetVal = Y
+        Else
+            Set RetVal = X
+        End If
+    End If
+End Sub
+
+

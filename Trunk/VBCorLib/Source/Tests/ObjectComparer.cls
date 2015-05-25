@@ -15,11 +15,5 @@ Option Explicit
 Implements SimplyVBUnitType.IEqualityComparer
 
 Private Function IEqualityComparer_Equals(X As Variant, Y As Variant) As Boolean
-    Dim Left    As IObject
-    Dim Right   As IObject
-    
-    Set Left = X
-    Set Right = Y
-    
-    IEqualityComparer_Equals = Left.Equals(Right)
+    IEqualityComparer_Equals = Object.Equals(X, Y)
 End Function
