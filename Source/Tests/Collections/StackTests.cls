@@ -190,7 +190,7 @@ Public Sub CopyTo_WithMultiDimensionalArray_ThrowsArgumentException()
     Dim Target(0 To 1, 0 To 1) As Variant
     SUT.CopyTo Target, 0
     
-    AssertArgumentException Err, "DstArray"
+    AssertArgumentException Err, "Arr"
 End Sub
 
 Public Sub CopyTo_WithNotEnoughRoomToCopyStack_ThrowsArgumentException()

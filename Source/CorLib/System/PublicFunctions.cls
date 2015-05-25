@@ -76,7 +76,7 @@ End Function
 ' before the source variants is moved into it.</p>
 '
 Public Sub MoveVariant(ByRef Destination As Variant, ByRef Source As Variant)
-    Call Helper.MoveVariant(Destination, Source)
+    Helper.MoveVariant Destination, Source
 End Sub
 
 ''
@@ -90,7 +90,7 @@ End Sub
 ' before the source variants is copied into it.</p>
 '
 Public Sub CopyVariant(ByRef Destination As Variant, ByRef Source As Variant)
-    Call VariantCopyInd(Destination, Source)
+    VariantCopyInd Destination, Source
 End Sub
 
 ''

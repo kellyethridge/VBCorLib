@@ -108,7 +108,7 @@ Private Sub AddSystem()
         .Add New BufferTests
         .Add New TestVersion
         .Add New TestRandom
-        .Add New TestMathExt
+        .Add New MathExtTests
         .Add New GuidTests
         .Add New BitConverterTests
         .Add New CDateTimeTests

@@ -18,11 +18,16 @@ Implements IObject
 Public Value As Long
 
 Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = MyBase.Equals(Me, Value)
+    On Error GoTo Catch
+    Dim Other As Int32
+    Set Other = Value
+    IObject_Equals = Me.Value = Other.Value
+    
+Catch:
 End Function
 
 Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+    IObject_GetHashCode = Me.Value
 End Function
 
 Private Function IObject_ToString() As String
