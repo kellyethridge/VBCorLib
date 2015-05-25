@@ -55,9 +55,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewVariants(CDec(1), CDec(2), CDec(3), CDec(4), CDec(5)), CDec(1), 0
             Test.Use NewVariants(CDec(1), CDec(2), CDec(3), CDec(4), CDec(5)), CDec(3), 2
             Test.Use NewVariants(CDec(1), CDec(2), CDec(3), CDec(4), CDec(5)), CDec(5), 4
-            Test.Use Array(MakeInt32(1), MakeInt32(2), MakeInt32(3), MakeInt32(4), MakeInt32(5)), MakeInt32(1), 0
-            Test.Use Array(MakeInt32(1), MakeInt32(2), MakeInt32(3), MakeInt32(4), MakeInt32(5)), MakeInt32(3), 2
-            Test.Use Array(MakeInt32(1), MakeInt32(2), MakeInt32(3), MakeInt32(4), MakeInt32(5)), MakeInt32(5), 4
+            Test.Use Array(NewInt32(1), NewInt32(2), NewInt32(3), NewInt32(4), NewInt32(5)), NewInt32(1), 0
+            Test.Use Array(NewInt32(1), NewInt32(2), NewInt32(3), NewInt32(4), NewInt32(5)), NewInt32(3), 2
+            Test.Use Array(NewInt32(1), NewInt32(2), NewInt32(3), NewInt32(4), NewInt32(5)), NewInt32(5), 4
             
     End Select
 End Sub

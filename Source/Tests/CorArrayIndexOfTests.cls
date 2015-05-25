@@ -34,16 +34,24 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewVariants("1", "2", "3", "4", "5", "6"), "4", 3
             
             Dim Arr(2) As Int32
-            Set Arr(0) = New Int32
-            Set Arr(1) = New Int32
-            Set Arr(2) = New Int32
+            Set Arr(0) = NewInt32(1)
+            Set Arr(1) = NewInt32(2)
+            Set Arr(2) = NewInt32(3)
             Test.Use Arr, Arr(2), 2
-            Test.Use Arr, New Int32, -1
+            Test.Use Arr, NewInt32(2), 1
+            Test.Use Arr, NewInt32(4), -1
             Set Arr(2) = Nothing
             Test.Use Arr, Nothing, 2
             
             Dim ArrLongs(1 To 3) As Long
             Test.Use ArrLongs, 1, 0
+            
+            Dim ArrObjects(2) As FakeObject
+            Set ArrObjects(0) = New FakeObject
+            Set ArrObjects(1) = New FakeObject
+            Set ArrObjects(2) = New FakeObject
+            Test.Use ArrObjects, ArrObjects(2), 2
+            Test.Use ArrObjects, New FakeObject, -1
             
     End Select
 End Sub

@@ -84,11 +84,11 @@ Public Sub TestMin()
 End Sub
 
 Public Sub TestMinObject()
-    Dim X As New Int32
-    Dim Y As New Int32
+    Dim X As Int32
+    Dim Y As Int32
     
-    X.Value = 2
-    Y.Value = 5
+    Set X = NewInt32(2)
+    Set Y = NewInt32(5)
     
     Assert.AreEqual X, Min(X, Y)
     Assert.AreEqual X, Min(Y, X)

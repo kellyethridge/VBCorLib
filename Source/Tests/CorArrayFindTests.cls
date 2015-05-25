@@ -34,8 +34,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         
         Case "Find_WithValues_ReturnsExpected"
             ReDim ArrInt32(1)
-            Set ArrInt32(0) = MakeInt32(1)
-            Set ArrInt32(1) = MakeInt32(2)
+            Set ArrInt32(0) = NewInt32(1)
+            Set ArrInt32(1) = NewInt32(2)
             Test.Use NewBytes(1, 2, 3, 4, 5), AddressOf FindByteCallback, 3, CByte(3)
             Test.Use NewIntegers(1, 2, 3, 4, 5), AddressOf FindIntegerCallback, 3, 3
             Test.Use NewLongs(1, 2, 3, 4, 5), AddressOf FindLongCallback, 3, 3&
@@ -62,10 +62,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewLongs(1, 1, 2, 2, 2, 3, 3, 4), AddressOf FindLongCallback, 2, NewLongs(2, 2, 2)
             Test.Use NewLongs(1, 1, 2, 2, 2, 3, 3, 4), AddressOf FindLongCallback, 5, NewLongs()
             ReDim ArrInt32(3)
-            Set ArrInt32(0) = MakeInt32(1)
-            Set ArrInt32(1) = MakeInt32(2)
-            Set ArrInt32(2) = MakeInt32(3)
-            Set ArrInt32(3) = MakeInt32(2)
+            Set ArrInt32(0) = NewInt32(1)
+            Set ArrInt32(1) = NewInt32(2)
+            Set ArrInt32(2) = NewInt32(3)
+            Set ArrInt32(3) = NewInt32(2)
             Test.Use ArrInt32, AddressOf FindInt32Callback, 2, Array(ArrInt32(1), ArrInt32(3))
             
         Case "TrueForAll_WithValues_ReturnsExpected"
@@ -264,9 +264,9 @@ End Sub
 Public Sub FindLast_WithExistingValue_ReturnsLastInstance()
     CorArrayCallbacks.FindCallbackValue = 2
     Dim Arr(2) As Int32
-    Set Arr(0) = MakeInt32(2)
-    Set Arr(1) = MakeInt32(2)
-    Set Arr(2) = MakeInt32(3)
+    Set Arr(0) = NewInt32(2)
+    Set Arr(1) = NewInt32(2)
+    Set Arr(2) = NewInt32(3)
     Dim Actual As Int32
     
     Set Actual = CorArray.FindLast(Arr, AddressOf FindInt32Callback)
@@ -277,9 +277,9 @@ End Sub
 Public Sub FindLast_WithNonExistingValue_ReturnsDefault()
     CorArrayCallbacks.FindCallbackValue = 4
     Dim Arr(2) As Int32
-    Set Arr(0) = MakeInt32(2)
-    Set Arr(1) = MakeInt32(2)
-    Set Arr(2) = MakeInt32(3)
+    Set Arr(0) = NewInt32(2)
+    Set Arr(1) = NewInt32(2)
+    Set Arr(2) = NewInt32(3)
     Dim Actual As Int32
     
     Set Actual = CorArray.FindLast(Arr, AddressOf FindInt32Callback)
