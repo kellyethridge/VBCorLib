@@ -239,6 +239,8 @@ Private Sub WriteCore(ByRef Value As Variant, ByRef Args() As Variant)
 End Sub
 
 Private Sub WriteLineCore(ByRef Args() As Variant)
+    VerifyIsOpen
+    
     Dim ub  As Long
     ub = UBound(Args)
     
