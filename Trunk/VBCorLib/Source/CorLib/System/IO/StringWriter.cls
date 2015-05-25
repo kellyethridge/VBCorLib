@@ -246,18 +246,18 @@ Private Sub WriteLineCore(ByRef Args() As Variant)
     
     If ub >= 0 Then
         Dim s As String
-        s = Object.ToString(Args(0), Provider:=FormatProvider) & mNewLine
+        s = Object.ToString(Args(0), Provider:=FormatProvider)
         
         If ub > 0 Then
             CopyMemory Args(0), Args(1), (ub - LBound(Args)) * SizeOfVariant
             ZeroMemory Args(ub), SizeOfVariant
             mSB.InternalAppendFormat FormatProvider, s, Args
         Else
-            mSB.AppendString Object.ToString(Args(0), Provider:=FormatProvider) & mNewLine
+            mSB.AppendString s
         End If
-    Else
-        mSB.AppendString mNewLine
     End If
+    
+    mSB.AppendString mNewLine
 End Sub
 
 
