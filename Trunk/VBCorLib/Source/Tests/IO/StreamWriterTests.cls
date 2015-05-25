@@ -35,8 +35,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use CDec(1.1), NewBytes(49, 46, 49)
             Test.Use "Hello", NewBytes(72, 101, 108, 108, 111)
             
-            Dim Obj As New Int32
-            Obj.Value = 10
+            Dim Obj As Int32
+            Set Obj = NewInt32(10)
             Test.Use Obj, NewBytes(49, 48)
             
     End Select

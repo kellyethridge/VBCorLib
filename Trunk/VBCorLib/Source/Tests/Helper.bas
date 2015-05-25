@@ -61,7 +61,7 @@ End Sub
 
 Public Function NewInt32(ByVal Value As Long) As Int32
     Set NewInt32 = New Int32
-    NewInt32.Value = Value
+    NewInt32.Init Value
 End Function
 
 Public Function ReadFile(ByVal FileName As String) As String
@@ -78,9 +78,9 @@ Public Function GenerateString(ByVal Size As Long) As String
     Dim i As Long
     
     For i = 1 To Size
-        Dim Ch As Long
-        Ch = Ran.NextRange(32, Asc("z"))
-        sb.AppendChar Ch
+        Dim ch As Long
+        ch = Ran.NextRange(32, Asc("z"))
+        sb.AppendChar ch
     Next
     
     GenerateString = sb.ToString

@@ -30,7 +30,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use True, "True"
             Test.Use String$(10000, "a"), String$(10000, "a")
             Test.Use "", ""
-            Test.Use MakeInt32(5), "5"
+            Test.Use NewInt32(5), "5"
             
         Case "Replace_WithValues_Replaces"
             Test.Use "abcd", "bc", "45", "a45d"

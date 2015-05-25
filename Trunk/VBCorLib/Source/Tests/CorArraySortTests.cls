@@ -94,11 +94,11 @@ End Sub
 
 Public Sub Sort_WithComparableObjects_SortsObjects()
     Dim a(4) As Int32
-    Set a(0) = MakeInt32(3)
-    Set a(1) = MakeInt32(2)
-    Set a(2) = MakeInt32(5)
-    Set a(3) = MakeInt32(4)
-    Set a(4) = MakeInt32(0)
+    Set a(0) = NewInt32(3)
+    Set a(1) = NewInt32(2)
+    Set a(2) = NewInt32(5)
+    Set a(3) = NewInt32(4)
+    Set a(4) = NewInt32(0)
     
     CorArray.Sort a
     

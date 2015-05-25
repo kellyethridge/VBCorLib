@@ -8,11 +8,6 @@ Option Explicit
 
 Public FindCallbackValue As Variant
 
-Public Function MakeInt32(ByVal Value As Long) As Int32
-    Set MakeInt32 = New Int32
-    MakeInt32.Value = Value
-End Function
-
 Public Function FindByteCallback(ByRef Value As Byte) As Boolean
     FindByteCallback = Value = CByte(FindCallbackValue)
 End Function

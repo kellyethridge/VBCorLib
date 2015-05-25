@@ -10,6 +10,7 @@ Class=MockObject; MockObject.cls
 Class=FakeAsyncCallback; FakeAsyncCallback.cls
 Class=FakeStream; FakeStream.cls
 Class=FakeSafeHandle; FakeSafeHandle.cls
+Class=FakeObject; FakeObject.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"

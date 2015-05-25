@@ -15,7 +15,18 @@ Option Explicit
 Implements IComparable
 Implements IObject
 
-Public Value As Long
+Private mInited As Boolean
+Private mValue As Long
+
+Public Property Get Value() As Long
+    Value = mValue
+End Property
+
+Public Sub Init(ByVal Value As Long)
+    Debug.Assert Not mInited
+    mValue = Value
+    mInited = True
+End Sub
 
 Private Function IObject_Equals(Value As Variant) As Boolean
     On Error GoTo Catch
