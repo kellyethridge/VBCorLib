@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: File
+' Module: File
 '
 
 ''
@@ -108,7 +111,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
             If Not File.Exists(SourceFileName) Then _
                 IOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
-                Throw Cor.NewIOException(Environment.GetResourceString(ResourceString.IOException_DirectoryExists))
+                Error.IOException IOException_DirectoryExists
         End If
         IOError DllError, SourceFileName
     End If
@@ -149,7 +152,7 @@ Public Sub Delete(ByVal Path As String)
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
-    VBCorLib.Path.VerifyPath Path, True
+    Statics.Path.VerifyPath Path, True
     
     If Api.DeleteFile(Path) = BOOL_FALSE Then
         Dim Result As Long
@@ -275,13 +278,15 @@ Public Sub Move(ByRef SourceFileName As String, ByVal DestinationFileName As Str
     If Len(DestinationFileName) = 0 Then _
         Error.Argument Argument_EmptyPath, "DestinationFileName"
 
-    Call Path.VerifyPath(SourceFileName)
-    Call Path.VerifyPath(DestinationFileName)
+    Path.VerifyPath SourceFileName
+    Path.VerifyPath DestinationFileName
     
     If Not File.Exists(SourceFileName) Then _
         IOError ERROR_FILE_NOT_FOUND, SourceFileName
     
-    If Api.MoveFile(SourceFileName, DestinationFileName) = BOOL_FALSE Then IOError Err.LastDllError, DestinationFileName
+    If Api.MoveFile(SourceFileName, DestinationFileName) = BOOL_FALSE Then
+        IOError Err.LastDllError, DestinationFileName
+    End If
 End Sub
 
 ''
@@ -516,7 +521,7 @@ End Sub
 '
 Public Sub WriteAllbytes(ByRef Path As String, ByRef Bytes() As Byte)
     If CorArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
     
     With Cor.NewFileStream(Path, FileMode.Create)
         .WriteBlock Bytes, LBound(Bytes), CorArray.GetLength(Bytes)
@@ -543,13 +548,10 @@ Public Sub WriteAllLines(ByVal Path As String, ByRef Contents As Variant, Option
 End Sub
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetFileData(ByVal p As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
     p = CorString.TrimEnd(p, mDirectorySeparators)
     
-    Call Path.VerifyPath(p, True)
+    Path.VerifyPath p, True
     If Api.GetFileAttributesEx(p, 0, Data) = BOOL_FALSE Then
         GetFileData = GetFileDataFallback(p, Data)
     End If
@@ -557,7 +559,15 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mDirectorySeparators = Cor.NewIntegers(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
     Dim FileData As WIN32_FIND_DATA
@@ -594,7 +604,7 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     End If
     
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
+        Error.Argument Argument_EmptyPath, "Path"
         
     VBCorLib.Path.CheckValidPath Path
     
@@ -625,9 +635,3 @@ Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUT
 End Sub
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    mDirectorySeparators = Cor.NewIntegers(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-End Sub
