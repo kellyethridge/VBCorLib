@@ -52,19 +52,8 @@ Option Explicit
 Implements IObject
 Implements IComparable
 
-Private Const PROP_MILLISECONDS         As String = "Milliseconds"
-Private Const DEF_TIMESPAN              As Long = 0
-
-Private Const SECONDS_PER_MINUTE        As Long = 60
-Private Const MINUTES_PER_HOUR          As Long = 60
-Private Const HOURS_PER_DAY             As Long = 24
-
-Private Const TICKS_PER_MILLISECOND     As Currency = 10000
-Private Const MILLISECONDS_PER_TICK     As Currency = 0.0001@
-Private Const MILLISECONDS_PER_SECOND   As Currency = 1000@
-Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Private Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
+Private Const PROP_MILLISECONDS As String = "Milliseconds"
+Private Const DEF_TIMESPAN      As Long = 0
 
 Private mMilliseconds As Currency
 
@@ -255,11 +244,11 @@ Public Function ToString() As String
         Output.AppendChar vbPeriodChar
     End If
 
-    AppendComponent Output, Int(ms / MILLISECONDS_PER_HOUR) Mod 24, 2
+    AppendComponent Output, Int(ms / MILLISECONDS_PER_HOUR) Mod HOURS_PER_DAY, 2
     Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MILLISECONDS_PER_MINUTE) Mod 60, 2
+    AppendComponent Output, Int(ms / MILLISECONDS_PER_MINUTE) Mod MINUTES_PER_HOUR, 2
     Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MILLISECONDS_PER_SECOND) Mod 60, 2
+    AppendComponent Output, Int(ms / MILLISECONDS_PER_SECOND) Mod SECONDS_PER_MINUTE, 2
     
     Dim MillisecondComponent    As Long
     Dim TicksComponent          As Long
@@ -298,12 +287,12 @@ Public Function GetHashCode() As Long
     End With
 End Function
 
-Public Function LessThan(ByRef Other As TimeSpan) As Boolean
-    LessThan = TimeSpan.LessThan(Me, Other)
+Public Function LessThan(ByRef other As TimeSpan) As Boolean
+    LessThan = TimeSpan.LessThan(Me, other)
 End Function
 
-Public Function GreaterThan(ByRef Other As TimeSpan) As Boolean
-    GreaterThan = TimeSpan.GreaterThan(Me, Other)
+Public Function GreaterThan(ByRef other As TimeSpan) As Boolean
+    GreaterThan = TimeSpan.GreaterThan(Me, other)
 End Function
 
 
@@ -349,9 +338,9 @@ End Sub
 Private Function IObject_Equals(Value As Variant) As Boolean
     On Error GoTo Catch
     
-    Dim Other As TimeSpan
-    Set Other = Value
-    IObject_Equals = Equals(Other)
+    Dim other As TimeSpan
+    Set other = Value
+    IObject_Equals = Equals(other)
     
 Catch:
 End Function
@@ -371,9 +360,9 @@ End Function
 Private Function IComparable_CompareTo(Value As Variant) As Long
     On Error GoTo Catch
     
-    Dim Other As TimeSpan
-    Set Other = Value
-    IComparable_CompareTo = CompareTo(Other)
+    Dim other As TimeSpan
+    Set other = Value
+    IComparable_CompareTo = CompareTo(other)
     Exit Function
     
 Catch:

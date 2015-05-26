@@ -263,7 +263,7 @@ Private Sub AddSystemIO()
     With Sim.NewTestSuite("System.IO")
         .Add New BinaryReaderTests
         .Add New BinaryWriterTests
-        .Add New TestFileInfo
+        .Add New FileInfoTests
         .Add New FileTests
         .Add New StreamReaderTests
         .Add New TestMappedFile

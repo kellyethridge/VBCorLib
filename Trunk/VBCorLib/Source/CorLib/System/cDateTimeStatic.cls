@@ -52,18 +52,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private Const SECONDS_PER_MINUTE        As Currency = 60@
-Private Const MINUTES_PER_HOUR          As Currency = 60@
-Private Const HOURS_PER_DAY             As Long = 24
-
-Private Const MILLISECONDS_PER_SECOND   As Currency = 1000@
-Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Private Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
-
-Private Const DAYS_TO_18991231          As Long = 693593
-Private Const MILLISECONDS_TO_18991231  As Currency = 1@ * DAYS_TO_18991231 * MILLISECONDS_PER_DAY
-
 ' we put this here instead of cDateTime to prevent conflicts with
 ' the cDateTime.DayOfWeek property.
 
@@ -332,47 +320,21 @@ Public Function SpecifyKind(ByVal Value As cDateTime, ByVal Kind As DateTimeKind
     SpecifyKind.InitFromMilliseconds Value.TotalMilliseconds, Kind
 End Function
 
-Public Function Equals(ByRef T1 As Variant, ByRef T2 As Variant) As Boolean
+Public Function Equals(ByRef t1 As Variant, ByRef t2 As Variant) As Boolean
     Dim MS1 As Currency
     Dim MS2 As Currency
     
-    If Not TryGetMilliseconds(T1, MS1) Then
+    If Not TryGetMilliseconds(t1, MS1) Then
         Exit Function
     End If
     
-    If Not TryGetMilliseconds(T2, MS2) Then
+    If Not TryGetMilliseconds(t2, MS2) Then
         Exit Function
     End If
     
     Equals = MS1 = MS2
 End Function
 
-Private Function TryGetMilliseconds(ByRef Value As Variant, ByRef Result As Currency) As Boolean
-    Select Case VarType(Value)
-        Case vbDate
-            Result = GetMilliseconds(Value)
-            TryGetMilliseconds = True
-        
-        Case vbObject
-            If Value Is Nothing Then
-                Exit Function
-            End If
-            
-            If TypeOf Value Is cDateTime Then
-                Result = GetMillisecondsFromDateTime(Value)
-                TryGetMilliseconds = True
-            End If
-    End Select
-End Function
-
-Private Function GetMillisecondsFromDateTime(ByVal d As cDateTime) As Currency
-    GetMillisecondsFromDateTime = d.TotalMilliseconds
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetMilliseconds(ByVal d As Date) As Currency
     Dim Days As Currency
     
@@ -415,9 +377,35 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mDaysInMonth = Cor.NewLongs(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
     Set mDateAscDateTime = New cDateTime
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function TryGetMilliseconds(ByRef Value As Variant, ByRef Result As Currency) As Boolean
+    Select Case VarType(Value)
+        Case vbDate
+            Result = GetMilliseconds(Value)
+            TryGetMilliseconds = True
+        
+        Case vbObject
+            If Value Is Nothing Then
+                Exit Function
+            End If
+            
+            If TypeOf Value Is cDateTime Then
+                Result = GetMillisecondsFromDateTime(Value)
+                TryGetMilliseconds = True
+            End If
+    End Select
+End Function
+
+Private Function GetMillisecondsFromDateTime(ByVal d As cDateTime) As Currency
+    GetMillisecondsFromDateTime = d.TotalMilliseconds
+End Function
