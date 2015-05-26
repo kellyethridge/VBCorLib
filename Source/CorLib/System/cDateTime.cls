@@ -64,26 +64,14 @@ Private Const PROP_KIND                 As String = "Kind"
 Private Const DEF_MILLISECONDS          As Long = 0@
 Private Const DEF_KIND                  As Long = 0
 
-Private Const SECONDS_PER_MINUTE        As Currency = 60@
-Private Const MINUTES_PER_HOUR          As Currency = 60@
-Private Const HOURS_PER_DAY             As Long = 24
-Private Const MONTHS_PER_YEAR           As Long = 12
-
-Private Const MILLISECONDS_PER_SECOND   As Currency = 1000@
-Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Private Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
-
-Private Const DAYS_TO_18991231          As Long = 693593
-Private Const MILLISECONDS_TO_18991231  As Currency = 1@ * DAYS_TO_18991231 * MILLISECONDS_PER_DAY
 Private Const DAYS_PER_YEAR             As Long = 365
 Private Const DAYS_PER_4_YEARS          As Long = DAYS_PER_YEAR * 4 + 1
 Private Const DAYS_PER_100_YEARS        As Long = DAYS_PER_4_YEARS * 25 - 1
 Private Const DAYS_PER_400_YEARS        As Long = DAYS_PER_100_YEARS * 4 + 1
 Private Const DAYS_TO_YEAR_10000        As Currency = DAYS_PER_400_YEARS * 25 - 366
 Private Const MAX_MILLISECONDS          As Currency = DAYS_TO_YEAR_10000 * MILLISECONDS_PER_DAY
-Private Const DAYS_TO_16011231          As Currency = DAYS_PER_400_YEARS * 4
-Private Const MILLISECONDS_TO_16011231  As Currency = DAYS_TO_16011231 * MILLISECONDS_PER_DAY
+Private Const DAYS_TO_1601              As Currency = DAYS_PER_400_YEARS * 4
+Private Const MILLISECONDS_TO_1601      As Currency = DAYS_TO_1601 * MILLISECONDS_PER_DAY
 
 Private Const FILETIME_MINIMUM          As Currency = 50491123200000@
 
@@ -487,7 +475,7 @@ Public Function ToFileTime() As Currency
     ms = TimeZone.CurrentTimeZone.ToUniversalTime(Me).TotalMilliseconds
     If ms < FILETIME_MINIMUM Then _
         Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
-    ToFileTime = ms - MILLISECONDS_TO_16011231
+    ToFileTime = ms - MILLISECONDS_TO_1601
 End Function
 
 ''
@@ -499,7 +487,7 @@ End Function
 Public Function ToFileTimeUtc() As Currency
     If mMilliseconds < FILETIME_MINIMUM Then _
         Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
-    ToFileTimeUtc = mMilliseconds - MILLISECONDS_TO_16011231
+    ToFileTimeUtc = mMilliseconds - MILLISECONDS_TO_1601
 End Function
 
 ''
@@ -765,7 +753,7 @@ Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
 End Sub
 
 Friend Sub InitFromFileTime(ByVal Time As Currency, ByVal Kind As DateTimeKind)
-    mMilliseconds = Time + MILLISECONDS_TO_16011231
+    mMilliseconds = Time + MILLISECONDS_TO_1601
     mKind = Kind
 End Sub
 

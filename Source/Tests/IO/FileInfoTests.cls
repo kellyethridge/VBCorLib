@@ -6,14 +6,11 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestFileInfo"
+Attribute VB_Name = "FileInfoTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'
-'   TestFileInfo
-'
 Option Explicit
 Implements ICategorizable
 
