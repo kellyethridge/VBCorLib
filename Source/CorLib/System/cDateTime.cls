@@ -59,21 +59,21 @@ Implements IObject
 Implements IComparable
 Implements IFormattable
 
-Private Const PROP_MILLISECONDS         As String = "Milliseconds"
-Private Const PROP_KIND                 As String = "Kind"
-Private Const DEF_MILLISECONDS          As Long = 0@
-Private Const DEF_KIND                  As Long = 0
+Private Const PropMilliseconds  As String = "Milliseconds"
+Private Const PropKind          As String = "Kind"
 
-Private Const DAYS_PER_YEAR             As Long = 365
-Private Const DAYS_PER_4_YEARS          As Long = DAYS_PER_YEAR * 4 + 1
-Private Const DAYS_PER_100_YEARS        As Long = DAYS_PER_4_YEARS * 25 - 1
-Private Const DAYS_PER_400_YEARS        As Long = DAYS_PER_100_YEARS * 4 + 1
-Private Const DAYS_TO_YEAR_10000        As Currency = DAYS_PER_400_YEARS * 25 - 366
-Private Const MAX_MILLISECONDS          As Currency = DAYS_TO_YEAR_10000 * MILLISECONDS_PER_DAY
-Private Const DAYS_TO_1601              As Currency = DAYS_PER_400_YEARS * 4
-Private Const MILLISECONDS_TO_1601      As Currency = DAYS_TO_1601 * MILLISECONDS_PER_DAY
+Private Const DefaultMilliseconds   As Long = 0@
+Private Const DefaultKind           As Long = 0
 
-Private Const FILETIME_MINIMUM          As Currency = 50491123200000@
+Private Const DaysPer100Years       As Long = DaysPer4Years * 25 - 1
+Private Const DaysPer400Years       As Long = DaysPer100Years * 4 + 1
+Private Const DaysTo10000           As Currency = DaysPer400Years * 25 - 366
+Private Const MaxMilliseconds       As Currency = DaysTo10000 * MillisecondsPerDay
+Private Const DaysTo1601            As Currency = DaysPer400Years * 4
+Private Const MillisecondsTo1601    As Currency = DaysTo1601 * MillisecondsPerDay
+
+Private Const MinFiletime As Currency = 50491123200000@
+
 
 ' Currency works perfectly as the 64bit Integer in .NET. Even though the
 ' time is represented in milliseconds here, the fractional portion is exactly
@@ -117,16 +117,16 @@ End Property
 Public Function ToOADate() As Date
     If mMilliseconds = 0@ Then Exit Function
     
-    If mMilliseconds < MILLISECONDS_PER_DAY Then
-        ToOADate = 1# * mMilliseconds / MILLISECONDS_PER_DAY
+    If mMilliseconds < MillisecondsPerDay Then
+        ToOADate = 1# * mMilliseconds / MillisecondsPerDay
     Else
         Dim Days As Double
-        Days = Int(mMilliseconds / MILLISECONDS_PER_DAY)
+        Days = Int(mMilliseconds / MillisecondsPerDay)
         
         Dim Time As Double
-        Time = (mMilliseconds - (Days * MILLISECONDS_PER_DAY)) / MILLISECONDS_PER_DAY
+        Time = (mMilliseconds - (Days * MillisecondsPerDay)) / MillisecondsPerDay
         
-        Days = Days - DAYS_TO_18991231
+        Days = Days - DaysTo1899
         If Days < 0# Then
             ToOADate = Days - Time
         Else
@@ -182,7 +182,7 @@ End Property
 ' align to the 1-based values of vbDayOfWeek.
 '
 Public Property Get DayOfWeek() As DayOfWeek
-    DayOfWeek = Int(mMilliseconds / MILLISECONDS_PER_DAY + 1) Mod 7
+    DayOfWeek = Int(mMilliseconds / MillisecondsPerDay + 1) Mod 7
 End Property
 
 ''
@@ -191,7 +191,7 @@ End Property
 ' @return The current hour.
 '
 Public Property Get Hour() As Long
-    Hour = Int(mMilliseconds / MILLISECONDS_PER_HOUR) Mod HOURS_PER_DAY
+    Hour = Int(mMilliseconds / MillisecondsPerHour) Mod HoursPerDay
 End Property
 
 ''
@@ -200,8 +200,8 @@ End Property
 ' @return The current minute.
 '
 Public Property Get Minute() As Long
-    'Minute = Int(mMilliseconds / MILLISECONDS_PER_MINUTE) Mod MINUTES_PER_HOUR
-    Minute = Modulus(Int(mMilliseconds / MILLISECONDS_PER_MINUTE), MINUTES_PER_HOUR)
+    'Minute = Int(mMilliseconds / MillisecondsPerMinute) Mod MinutesPerHour
+    Minute = Modulus(Int(mMilliseconds / MillisecondsPerMinute), MinutesPerHour)
 End Property
 
 ''
@@ -210,7 +210,7 @@ End Property
 ' @return The current second.
 '
 Public Property Get Second() As Long
-    Second = Modulus(Int(mMilliseconds / MILLISECONDS_PER_SECOND), SECONDS_PER_MINUTE)
+    Second = Modulus(Int(mMilliseconds / MillisecondsPerSecond), SecondsPerMinute)
 End Property
 
 ''
@@ -219,7 +219,7 @@ End Property
 ' @return The current millisecond.
 '
 Public Property Get Millisecond() As Long
-    Millisecond = Modulus(mMilliseconds, MILLISECONDS_PER_SECOND)
+    Millisecond = Modulus(mMilliseconds, MillisecondsPerSecond)
 End Property
 
 ''
@@ -253,7 +253,7 @@ End Property
 ' original date representation. The new date will have a time of 12:00AM.
 '
 Public Property Get DateOnly() As cDateTime
-    Set DateOnly = cDateTime.FromMilliseconds(mMilliseconds - Modulus(mMilliseconds, MILLISECONDS_PER_DAY))
+    Set DateOnly = cDateTime.FromMilliseconds(mMilliseconds - Modulus(mMilliseconds, MillisecondsPerDay))
 End Property
 
 ''
@@ -264,7 +264,7 @@ End Property
 ' It now will have a date of 1/1/0001.
 '
 Public Property Get TimeOfDay() As TimeSpan
-    Set TimeOfDay = TimeSpan.FromMilliseconds(mMilliseconds - (mMilliseconds - Modulus(mMilliseconds, MILLISECONDS_PER_DAY)))
+    Set TimeOfDay = TimeSpan.FromMilliseconds(mMilliseconds - (mMilliseconds - Modulus(mMilliseconds, MillisecondsPerDay)))
 End Property
 
 ''
@@ -295,7 +295,7 @@ Public Function AddMilliseconds(ByVal Value As Double) As cDateTime
         Value = Fix(Value + 0.5)
     End If
     
-    If Value < -MAX_MILLISECONDS Or Value > MAX_MILLISECONDS Then _
+    If Value < -MaxMilliseconds Or Value > MaxMilliseconds Then _
         Throw New ArgumentOutOfRangeException
     
     Set AddMilliseconds = cDateTime.FromMilliseconds(mMilliseconds + CCur(Value), mKind)
@@ -309,7 +309,7 @@ End Function
 ' @return The new cDateTime containing the calculated value.
 '
 Public Function AddDays(ByVal Value As Double) As cDateTime
-    Set AddDays = AddMilliseconds(Value * MILLISECONDS_PER_DAY)
+    Set AddDays = AddMilliseconds(Value * MillisecondsPerDay)
 End Function
 
 ''
@@ -320,7 +320,7 @@ End Function
 ' @return The new cDateTime instance containing the calculated value.
 '
 Public Function AddHours(ByVal Value As Double) As cDateTime
-    Set AddHours = AddMilliseconds(Value * MILLISECONDS_PER_HOUR)
+    Set AddHours = AddMilliseconds(Value * MillisecondsPerHour)
 End Function
 
 ''
@@ -331,7 +331,7 @@ End Function
 ' @return The new cDateTime instance containing the calculated value.
 '
 Public Function AddMinutes(ByVal Value As Double) As cDateTime
-    Set AddMinutes = AddMilliseconds(Value * MILLISECONDS_PER_MINUTE)
+    Set AddMinutes = AddMilliseconds(Value * MillisecondsPerMinute)
 End Function
 
 ''
@@ -361,23 +361,23 @@ Public Function AddMonths(ByVal Months As Long) As cDateTime
     Dim yearsToAdd As Long
     Dim monthsToAdd As Long
     
-    yearsToAdd = MathExt.DivRem(Months, MONTHS_PER_YEAR, monthsToAdd)
+    yearsToAdd = MathExt.DivRem(Months, MonthsPerYear, monthsToAdd)
     
     Month = Month + monthsToAdd
     Year = Year + yearsToAdd
     Select Case Month
         Case Is < 1
-            Month = Month + MONTHS_PER_YEAR
+            Month = Month + MonthsPerYear
             Year = Year - 1
-        Case Is > MONTHS_PER_YEAR
-            Month = Month - MONTHS_PER_YEAR
+        Case Is > MonthsPerYear
+            Month = Month - MonthsPerYear
             Year = Year + 1
     End Select
     
     Dim MaxDays As Long
     MaxDays = cDateTime.DaysInMonth(Year, Month)
     If Day > MaxDays Then Day = MaxDays
-    Set AddMonths = cDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * MILLISECONDS_PER_DAY + Modulus(mMilliseconds, MILLISECONDS_PER_DAY), mKind)
+    Set AddMonths = cDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(mMilliseconds, MillisecondsPerDay), mKind)
 End Function
 
 ''
@@ -388,7 +388,7 @@ End Function
 ' @return The new cDateTime instance containing the calculated value.
 '
 Public Function AddSeconds(ByVal Value As Double) As cDateTime
-    Set AddSeconds = AddMilliseconds(Value * MILLISECONDS_PER_SECOND)
+    Set AddSeconds = AddMilliseconds(Value * MillisecondsPerSecond)
 End Function
 
 ''
@@ -402,7 +402,7 @@ Public Function AddTicks(ByRef Value As Variant) As cDateTime
     Dim DecimalValue As Variant
     DecimalValue = CDec(Value)
     
-    If DecimalValue < CDec(0) Or DecimalValue > CDec(MAX_MILLISECONDS) * 10000 Then _
+    If DecimalValue < CDec(0) Or DecimalValue > CDec(MaxMilliseconds) * 10000 Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", DecimalValue, "Ticks is outside the valid range of values")
     
     Set AddTicks = cDateTime.FromMilliseconds(mMilliseconds + DecimalValue / 10000, mKind)
@@ -416,7 +416,7 @@ End Function
 ' @return The new cDateTime instance containing the calculated value.
 '
 Public Function AddYears(ByVal Value As Long) As cDateTime
-    Set AddYears = AddMonths(Value * MONTHS_PER_YEAR)
+    Set AddYears = AddMonths(Value * MonthsPerYear)
 End Function
 
 ''
@@ -473,9 +473,9 @@ End Function
 Public Function ToFileTime() As Currency
     Dim ms As Currency
     ms = TimeZone.CurrentTimeZone.ToUniversalTime(Me).TotalMilliseconds
-    If ms < FILETIME_MINIMUM Then _
+    If ms < MinFiletime Then _
         Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
-    ToFileTime = ms - MILLISECONDS_TO_1601
+    ToFileTime = ms - MillisecondsTo1601
 End Function
 
 ''
@@ -485,9 +485,9 @@ End Function
 ' @remarks FileTime values cannot be less than 1/1/1601 12:00:00AM.
 '
 Public Function ToFileTimeUtc() As Currency
-    If mMilliseconds < FILETIME_MINIMUM Then _
+    If mMilliseconds < MinFiletime Then _
         Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
-    ToFileTimeUtc = mMilliseconds - MILLISECONDS_TO_1601
+    ToFileTimeUtc = mMilliseconds - MillisecondsTo1601
 End Function
 
 ''
@@ -586,17 +586,6 @@ End Function
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = Statics.cDateTime.Equals(Me, Value)
-'    Select Case VarType(Value)
-'        Case vbObject
-'            If Value Is Nothing Then Exit Function
-'            If TypeOf Value Is cDateTime Then
-'                Dim dt As cDateTime
-'                Set dt = Value
-'                Equals = (mMilliseconds = dt.TotalMilliseconds)
-'            End If
-'        Case vbDate
-'            Equals = (mMilliseconds = cDateTime.AscDateTime(Value).TotalMilliseconds)
-'    End Select
 End Function
 
 ''
@@ -732,7 +721,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, ByVal Calendar As Calendar, ByVal Kind As DateTimeKind)
     If Calendar Is Nothing Then
-        mMilliseconds = GetTotalDays(Year, Month, Day) * MILLISECONDS_PER_DAY + GetTotalMilliseconds(Hour, Minute, Second, Millisecond)
+        mMilliseconds = GetTotalDays(Year, Month, Day) * MillisecondsPerDay + GetTotalMilliseconds(Hour, Minute, Second, Millisecond)
     Else
         mMilliseconds = Calendar.ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond).TotalMilliseconds
     End If
@@ -740,8 +729,8 @@ Friend Sub Init(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVa
 End Sub
 
 Friend Sub InitFromMilliseconds(ByVal ms As Currency, ByVal Kind As DateTimeKind)
-    If ms < 0@ Or ms > MAX_MILLISECONDS Then _
-        Throw Cor.NewArgumentOutOfRangeException("ms", ms, "Milliseconds must be between 0 and " & MAX_MILLISECONDS & " inclusively.")
+    If ms < 0@ Or ms > MaxMilliseconds Then _
+        Throw Cor.NewArgumentOutOfRangeException("ms", ms, "Milliseconds must be between 0 and " & MaxMilliseconds & " inclusively.")
         
     mMilliseconds = ms
     mKind = Kind
@@ -753,7 +742,7 @@ Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
 End Sub
 
 Friend Sub InitFromFileTime(ByVal Time As Currency, ByVal Kind As DateTimeKind)
-    mMilliseconds = Time + MILLISECONDS_TO_1601
+    mMilliseconds = Time + MillisecondsTo1601
     mKind = Kind
 End Sub
 
@@ -787,20 +776,20 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim Days As Long
-    Days = Int(mMilliseconds / MILLISECONDS_PER_DAY)
+    Days = Int(mMilliseconds / MillisecondsPerDay)
     
     Dim years400 As Long
-    years400 = Days \ DAYS_PER_400_YEARS
-    Days = Days - years400 * DAYS_PER_400_YEARS
+    years400 = Days \ DaysPer400Years
+    Days = Days - years400 * DaysPer400Years
     
     Dim years100 As Long
-    years100 = Days \ DAYS_PER_100_YEARS
+    years100 = Days \ DaysPer100Years
     If years100 = 4 Then years100 = 3   ' leap year
-    Days = Days - years100 * DAYS_PER_100_YEARS
+    Days = Days - years100 * DaysPer100Years
     
     Dim years4 As Long
-    years4 = Days \ DAYS_PER_4_YEARS
-    Days = Days - years4 * DAYS_PER_4_YEARS
+    years4 = Days \ DaysPer4Years
+    Days = Days - years4 * DaysPer4Years
     
     Dim Years As Long
     Years = Days \ 365
@@ -810,7 +799,7 @@ Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Yea
     Year = years400 * 400 + years100 * 100 + years4 * 4 + Years + 1
     If DatePart = YearPart Then Exit Sub
     
-    Days = Days - Years * DAYS_PER_YEAR
+    Days = Days - Years * DaysPerYear
     
     ' Return the DayOfYear
     DayOfYear = Days + 1
@@ -853,7 +842,7 @@ Private Function GetTotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day
 End Function
 
 Private Function GetTotalMilliseconds(ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long) As Currency
-    GetTotalMilliseconds = Hour * MILLISECONDS_PER_HOUR + Minute * MILLISECONDS_PER_MINUTE + Second * MILLISECONDS_PER_SECOND + Millisecond
+    GetTotalMilliseconds = Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond
 End Function
 
 
@@ -862,15 +851,15 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mMilliseconds = .ReadProperty(PROP_MILLISECONDS, DEF_MILLISECONDS)
-        mKind = .ReadProperty(PROP_KIND, DEF_KIND)
+        mMilliseconds = .ReadProperty(PropMilliseconds, DefaultMilliseconds)
+        mKind = .ReadProperty(PropKind, DefaultKind)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_MILLISECONDS, mMilliseconds)
-        Call .WriteProperty(PROP_KIND, mKind)
+        .WriteProperty PropMilliseconds, mMilliseconds
+        .WriteProperty PropKind, mKind
     End With
 End Sub
 

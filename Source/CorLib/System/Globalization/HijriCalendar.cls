@@ -66,16 +66,16 @@ Private Const MAX_FIXED_DAYS            As Long = 3530161
 Private Const MAX_YEAR                  As Long = 9666
 Private Const MAX_SHORTMONTH            As Long = 4
 Private Const MAX_SHORTDAY              As Long = 3
-Private Const MONTHS_PER_YEAR           As Long = 12
+Private Const MonthsPerYear           As Long = 12
 
-Private Const SECONDS_PER_MINUTE        As Long = 60
-Private Const MINUTES_PER_HOUR          As Long = 60
-Private Const HOURS_PER_DAY             As Long = 24
+Private Const SecondsPerMinute        As Long = 60
+Private Const MinutesPerHour          As Long = 60
+Private Const HoursPerDay             As Long = 24
 
-Private Const MILLISECONDS_PER_SECOND   As Currency = 1000@
-Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Private Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
+Private Const MillisecondsPerSecond   As Currency = 1000@
+Private Const MillisecondsPerMinute   As Currency = MillisecondsPerSecond * SecondsPerMinute
+Private Const MillisecondsPerHour     As Currency = MillisecondsPerMinute * MinutesPerHour
+Private Const MillisecondsPerDay      As Currency = MillisecondsPerHour * HoursPerDay
 
 Private mHijriAdjustment    As Long
 Private mTwoDigitYearMax    As Long
@@ -141,7 +141,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateT
     Dim Day As Long
     Call GetDateParts(Time, Complete, Year, Month, Day)
     Month = Month + Months
-    Year = Year + MathExt.DivRem(Month, MONTHS_PER_YEAR, Month)
+    Year = Year + MathExt.DivRem(Month, MonthsPerYear, Month)
     
     Dim MaxDays As Long
     MaxDays = GetDaysInMonth(Year, Month)
@@ -152,7 +152,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateT
     
     Dim ms As Currency
     ms = cDateTime.GetcDateTime(Time).TotalMilliseconds
-    Set AddMonths = cDateTime.FromMilliseconds(MILLISECONDS_PER_DAY * FixedDays + Modulus(ms, MILLISECONDS_PER_DAY))
+    Set AddMonths = cDateTime.FromMilliseconds(MillisecondsPerDay * FixedDays + Modulus(ms, MillisecondsPerDay))
 End Function
 
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As cDateTime
@@ -164,7 +164,7 @@ Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As cDateTim
 End Function
 
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As cDateTime
-    Set AddYears = AddMonths(Time, Years * MONTHS_PER_YEAR)
+    Set AddYears = AddMonths(Time, Years * MonthsPerYear)
 End Function
 
 Public Function GetDayOfMonth(ByRef Time As Variant) As Long
@@ -232,7 +232,7 @@ Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Varian
     If Year = MAX_YEAR Then
         GetMonthsInYear = MAX_SHORTMONTH
     Else
-        GetMonthsInYear = MONTHS_PER_YEAR
+        GetMonthsInYear = MonthsPerYear
     End If
 End Function
 
@@ -279,10 +279,10 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     Call VerifyYearMonthDay(Year, Month, Day)
     
     Dim ms As Currency
-    ms = GetFixedDaysFromParts(Year, Month, Day) * MILLISECONDS_PER_DAY
+    ms = GetFixedDaysFromParts(Year, Month, Day) * MillisecondsPerDay
     
     If ms >= 0 Then
-        Set ToDateTime = cDateTime.FromMilliseconds(ms + Hour * MILLISECONDS_PER_HOUR + Minute * MILLISECONDS_PER_MINUTE + Second * MILLISECONDS_PER_SECOND + Millisecond)
+        Set ToDateTime = cDateTime.FromMilliseconds(ms + Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond)
     Else
         Throw Cor.NewArgumentOutOfRangeException(Message:="Invalid Year, Month, or Day for this calendar")
     End If
@@ -350,7 +350,7 @@ End Sub
 Private Sub VerifyYearMonth(ByVal Year As Long, ByVal Month As Long)
     Call VerifyYear(Year)
     If (Month < 1) Or _
-       (Month > MONTHS_PER_YEAR) Or _
+       (Month > MonthsPerYear) Or _
        (Year = MAX_YEAR And Month > MAX_SHORTMONTH) Then
         Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, IIf(Year = 9666, 4, 12)))
     End If
@@ -372,7 +372,7 @@ End Sub
 Private Function GetFixedDays(ByRef Time As Variant) As Long
     Dim dt As cDateTime
     Set dt = cDateTime.GetcDateTime(Time)
-    GetFixedDays = Int(dt.TotalMilliseconds / MILLISECONDS_PER_DAY) + mHijriAdjustment
+    GetFixedDays = Int(dt.TotalMilliseconds / MillisecondsPerDay) + mHijriAdjustment
     
     If GetFixedDays < 1 Or GetFixedDays > MAX_FIXED_DAYS Then _
         Throw Cor.NewArgumentOutOfRangeException("Time", Time, "Hijri calendary only represents dates from 1/1/0001 to 4/3/9666.")
@@ -440,8 +440,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

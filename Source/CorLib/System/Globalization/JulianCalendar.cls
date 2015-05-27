@@ -48,18 +48,15 @@ Implements Calendar
 Private Const DEF_TWODIGITYEARMAX       As Long = 2029
 Private Const PROP_TWODIGITYEARMAX      As String = "TwoDigitYearMax"
 
-Private Const SECONDS_PER_MINUTE        As Long = 60
-Private Const MINUTES_PER_HOUR          As Long = 60
-Private Const HOURS_PER_DAY             As Long = 24
-Private Const MONTHS_PER_YEAR           As Long = 12
+Private Const SecondsPerMinute        As Long = 60
+Private Const MinutesPerHour          As Long = 60
+Private Const HoursPerDay             As Long = 24
+Private Const MonthsPerYear           As Long = 12
 
-Private Const MILLISECONDS_PER_SECOND   As Currency = 1000@
-Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Private Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
-
-Private Const DAYS_PER_YEAR             As Long = 365
-Private Const DAYS_PER_4_YEARS          As Long = DAYS_PER_YEAR * 4 + 1
+Private Const MillisecondsPerSecond   As Currency = 1000@
+Private Const MillisecondsPerMinute   As Currency = MillisecondsPerSecond * SecondsPerMinute
+Private Const MillisecondsPerHour     As Currency = MillisecondsPerMinute * MinutesPerHour
+Private Const MillisecondsPerDay      As Currency = MillisecondsPerHour * HoursPerDay
 
 Private mTwoDigitYearMax As Long
 
@@ -113,18 +110,18 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateT
     Call GetDateParts(Time, Complete, Year, Month, Day)
     
     Dim yearsToAdd As Long
-    yearsToAdd = Int(Months / MONTHS_PER_YEAR)
+    yearsToAdd = Int(Months / MonthsPerYear)
     
     Dim monthsToAdd As Long
-    monthsToAdd = Months - yearsToAdd * MONTHS_PER_YEAR
+    monthsToAdd = Months - yearsToAdd * MonthsPerYear
     
     Month = Month + monthsToAdd
     Year = Year + yearsToAdd
     If Month < 1 Then
-        Month = Month + MONTHS_PER_YEAR
+        Month = Month + MonthsPerYear
         Year = Year - 1
-    ElseIf Month > MONTHS_PER_YEAR Then
-        Month = Month - MONTHS_PER_YEAR
+    ElseIf Month > MonthsPerYear Then
+        Month = Month - MonthsPerYear
         Year = Year + 1
     End If
     
@@ -135,7 +132,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateT
     Dim TOD As Currency
     TOD = cDateTime.GetcDateTime(Time).TotalMilliseconds
     
-    Set AddMonths = cDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MILLISECONDS_PER_DAY + Modulus(TOD, MILLISECONDS_PER_DAY))
+    Set AddMonths = cDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(TOD, MillisecondsPerDay))
 End Function
 
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As cDateTime
@@ -253,7 +250,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Day, CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month)))
     
-    Set ToDateTime = cDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MILLISECONDS_PER_DAY + TotalTime(Hour, Minute, Second, Millisecond))
+    Set ToDateTime = cDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MillisecondsPerDay + TotalTime(Hour, Minute, Second, Millisecond))
 End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
@@ -327,11 +324,11 @@ Private Sub GetDateParts(ByRef Time As Variant, ByVal DatePart As DatePartPrecis
     ms = cDateTime.GetcDateTime(Time).TotalMilliseconds
     
     Dim FixedDays As Long
-    FixedDays = Int(ms / MILLISECONDS_PER_DAY) + 2  ' Julian calendar starts 2 days after Gregorian
+    FixedDays = Int(ms / MillisecondsPerDay) + 2  ' Julian calendar starts 2 days after Gregorian
     
     Dim years4 As Long
-    years4 = FixedDays \ DAYS_PER_4_YEARS
-    FixedDays = FixedDays - years4 * DAYS_PER_4_YEARS
+    years4 = FixedDays \ DaysPer4Years
+    FixedDays = FixedDays - years4 * DaysPer4Years
     
     Dim Years As Long
     Years = FixedDays \ 365
@@ -340,7 +337,7 @@ Private Sub GetDateParts(ByRef Time As Variant, ByVal DatePart As DatePartPrecis
     
     If DatePart = YearPart Then Exit Sub
     
-    FixedDays = FixedDays - Years * DAYS_PER_YEAR
+    FixedDays = FixedDays - Years * DaysPerYear
     DayOfYear = FixedDays + 1
     If DatePart = DayOfTheYear Then Exit Sub
     
@@ -380,7 +377,7 @@ Private Function TotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day As
 End Function
 
 Private Function TotalTime(ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long) As Currency
-    TotalTime = Hour * MILLISECONDS_PER_HOUR + Minute * MILLISECONDS_PER_MINUTE + Second * MILLISECONDS_PER_SECOND + Millisecond
+    TotalTime = Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond
 End Function
 
 

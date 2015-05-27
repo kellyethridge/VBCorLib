@@ -52,19 +52,19 @@ Private Const PROP_TWODIGITYEARMAX As String = "TwoDigitYearMax"
 ' is September 7, 3761 BC in the Gregorian calendar, which is RD -1,373,427.
 Private Const EPOCH As Long = -1373427
 
-Private Const SECONDS_PER_MINUTE        As Long = 60
-Private Const MINUTES_PER_HOUR          As Long = 60
-Private Const HOURS_PER_DAY             As Long = 24
+Private Const SecondsPerMinute        As Long = 60
+Private Const MinutesPerHour          As Long = 60
+Private Const HoursPerDay             As Long = 24
 
-Private Const MILLISECONDS_PER_SECOND   As Currency = 1000@
-Private Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Private Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Private Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
+Private Const MillisecondsPerSecond   As Currency = 1000@
+Private Const MillisecondsPerMinute   As Currency = MillisecondsPerSecond * SecondsPerMinute
+Private Const MillisecondsPerHour     As Currency = MillisecondsPerMinute * MinutesPerHour
+Private Const MillisecondsPerDay      As Currency = MillisecondsPerHour * HoursPerDay
 
 Private Const PARTS_PER_HOUR            As Long = 1080
 
 Private Const MIN_MILLISECONDS          As Currency = 49914748800000@
-Private Const MAX_MILLISECONDS          As Currency = 70678396799999@
+Private Const MaxMilliseconds          As Currency = 70678396799999@
 Private Const MIN_HEBREWYEAR            As Long = 5343
 Private Const MAX_HEBREWYEAR            As Long = 6000
 
@@ -115,7 +115,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateT
     End If
     
     ms = cDateTime.GetcDateTime(Time).TotalMilliseconds
-    TOD = Modulus(ms, MILLISECONDS_PER_DAY)
+    TOD = Modulus(ms, MillisecondsPerDay)
     Call GetDateParts(ms, Complete, Year, Month, Day)
     Month = ToDotNetMonth(Year, Month)
     
@@ -171,7 +171,7 @@ Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As cDateTim
     Month = ToDotNetMonth(Year, Month)
     Year = Year + Years
     
-    Set AddYears = ToDateTime(Year, Month, Day, 0, 0, 0, 0).AddMilliseconds(Modulus(ms, MILLISECONDS_PER_DAY))
+    Set AddYears = ToDateTime(Year, Month, Day, 0, 0, 0, 0).AddMilliseconds(Modulus(ms, MillisecondsPerDay))
 End Function
 
 Public Function GetEra(ByRef Time As Variant) As Long
@@ -270,7 +270,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     
     Dim Days As Long
     Days = GetFixedDaysFromParts(Year, ToHebrewMonth(Year, Month), Day) - 1
-    Set ToDateTime = cDateTime.FromMilliseconds(Days * MILLISECONDS_PER_DAY + Hour * MILLISECONDS_PER_HOUR + Minute * MILLISECONDS_PER_MINUTE + Second * MILLISECONDS_PER_SECOND + Millisecond)
+    Set ToDateTime = cDateTime.FromMilliseconds(Days * MillisecondsPerDay + Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond)
 End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
@@ -455,10 +455,10 @@ End Function
 Private Sub GetDateParts(ByVal ms As Currency, ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim FixedDays As Long
     
-    If ms < MIN_MILLISECONDS Or ms > MAX_MILLISECONDS Then _
+    If ms < MIN_MILLISECONDS Or ms > MaxMilliseconds Then _
         Throw Cor.NewArgumentOutOfRangeException(ms, Message:="The Hebrew calendar only supports the years 5343 to 6000 (1582 to 2240 in Gregorian).")
     
-    FixedDays = Int(ms / MILLISECONDS_PER_DAY) + 1
+    FixedDays = Int(ms / MillisecondsPerDay) + 1
     
     Year = Int((FixedDays - EPOCH) / 365.246822205978)  ' this is an approximation
     Do While FixedDays >= GetFixedDaysFromParts(Year, 7, 1): Year = Year + 1: Loop
@@ -487,7 +487,7 @@ End Sub
 Private Function GetFixedDays(ByRef Time As Variant) As Long
     Dim dt As cDateTime
     Set dt = cDateTime.GetcDateTime(Time)
-    GetFixedDays = Int(dt.TotalMilliseconds / MILLISECONDS_PER_DAY) + 1
+    GetFixedDays = Int(dt.TotalMilliseconds / MillisecondsPerDay) + 1
 End Function
 
 Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long
