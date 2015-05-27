@@ -141,7 +141,7 @@ End Function
 ' @return The year of the date.
 '
 Public Property Get Year() As Long
-    Call GetDateParts(YearPart, Year)
+    GetDateParts YearPart, Year
 End Property
 
 ''
@@ -150,7 +150,7 @@ End Property
 ' @return The day of the date.
 '
 Public Property Get Day() As Long
-    Call GetDateParts(DayPart, , , Day)
+    GetDateParts DayPart, Day:=Day
 End Property
 
 ''
@@ -159,7 +159,7 @@ End Property
 ' @return The month of the date.
 '
 Public Property Get Month() As Long
-    Call GetDateParts(MonthPart, , Month)
+    GetDateParts MonthPart, Month:=Month
 End Property
 
 ''
@@ -170,7 +170,7 @@ End Property
 ' and will range from 1-365 or 1-366 for leap years.
 '
 Public Property Get DayOfYear() As Long
-    Call GetDateParts(DayOfTheYear, , , , DayOfYear)
+    GetDateParts DayOfTheYear, DayOfYear:=DayOfYear
 End Property
 
 ''
@@ -182,7 +182,7 @@ End Property
 ' align to the 1-based values of vbDayOfWeek.
 '
 Public Property Get DayOfWeek() As DayOfWeek
-    DayOfWeek = Int(mMilliseconds / MillisecondsPerDay + 1) Mod 7
+    DayOfWeek = Int(mMilliseconds / MillisecondsPerDay + 1) Mod DaysPerWeek
 End Property
 
 ''
@@ -200,7 +200,6 @@ End Property
 ' @return The current minute.
 '
 Public Property Get Minute() As Long
-    'Minute = Int(mMilliseconds / MillisecondsPerMinute) Mod MinutesPerHour
     Minute = Modulus(Int(mMilliseconds / MillisecondsPerMinute), MinutesPerHour)
 End Property
 
@@ -356,15 +355,15 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
     Dim Year    As Long
     Dim Month   As Long
     Dim Day     As Long
-    Call GetDateParts(Complete, Year, Month, Day)
+    GetDateParts Complete, Year, Month, Day
     
-    Dim yearsToAdd As Long
-    Dim monthsToAdd As Long
+    Dim YearsToAdd  As Long
+    Dim MonthsToAdd As Long
     
-    yearsToAdd = MathExt.DivRem(Months, MonthsPerYear, monthsToAdd)
+    YearsToAdd = MathExt.DivRem(Months, MonthsPerYear, MonthsToAdd)
     
-    Month = Month + monthsToAdd
-    Year = Year + yearsToAdd
+    Month = Month + MonthsToAdd
+    Year = Year + YearsToAdd
     Select Case Month
         Case Is < 1
             Month = Month + MonthsPerYear
@@ -376,7 +375,10 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
     
     Dim MaxDays As Long
     MaxDays = CorDateTime.DaysInMonth(Year, Month)
-    If Day > MaxDays Then Day = MaxDays
+    If Day > MaxDays Then
+        Day = MaxDays
+    End If
+    
     Set AddMonths = CorDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(mMilliseconds, MillisecondsPerDay), mKind)
 End Function
 
@@ -433,35 +435,27 @@ Public Function CompareTo(ByRef Value As Variant) As Long
     
     Select Case VariantType(Value) And &HFF
         Case vbObject
-            If Value Is Nothing Then
-                CompareTo = 1
-            Else
-                Dim dt As CorDateTime
-                On Error GoTo errTrap
-                Set dt = Value
-                ms = dt.TotalMilliseconds
-                If mMilliseconds < ms Then
-                    CompareTo = -1
-                ElseIf mMilliseconds > ms Then
-                    CompareTo = 1
-                End If
-            End If
+            If Value Is Nothing Then _
+                Error.ArgumentNull "Value"
+            If Not TypeOf Value Is CorDateTime Then _
+                Error.Argument Argument_DateRequired, "Value"
+                
+            Dim Other As CorDateTime
+            Set Other = Value
+            ms = Other.TotalMilliseconds
+            
         Case vbDate
-            ms = CorDateTime.AscDateTime(Value).TotalMilliseconds
-            If mMilliseconds < ms Then
-                CompareTo = -1
-            ElseIf mMilliseconds > ms Then
-                CompareTo = 1
-            End If
-        Case vbNull, vbEmpty, vbError
-            CompareTo = 1
+            ms = CorDateTime.GetMilliseconds(Value)
+        
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "value")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "Value")
     End Select
-    Exit Function
     
-errTrap:
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "value")
+    If mMilliseconds < ms Then
+        CompareTo = -1
+    ElseIf mMilliseconds > ms Then
+        CompareTo = 1
+    End If
 End Function
 
 ''
@@ -516,10 +510,16 @@ End Function
 ' @return String representing this instance.
 ' @see DateTimeFormatInfo
 '
-Public Function ToString(Optional ByVal Format As String, Optional ByVal Provider As IFormatProvider) As String
+Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim Info As DateTimeFormatInfo
-    If Not Provider Is Nothing Then Set Info = Provider.GetFormat("DateTimeFormatInfo")
-    If Info Is Nothing Then Set Info = CultureInfo.CurrentCulture.DateTimeFormat
+    If Not Provider Is Nothing Then
+        Set Info = Provider.GetFormat(DateTimeFormatInfoTypeName)
+    End If
+    
+    If Info Is Nothing Then
+        Set Info = CultureInfo.CurrentCulture.DateTimeFormat
+    End If
+    
     ToString = Info.Format(Me, Format)
 End Function
 
@@ -603,7 +603,7 @@ Public Function Subtract(ByRef Value As Variant) As Object
     Select Case VarType(Value)
         Case vbObject
             If Value Is Nothing Then _
-                Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value))
+                Error.ArgumentNull "Value", ArgumentNull_Generic
             
             If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan
@@ -614,12 +614,12 @@ Public Function Subtract(ByRef Value As Variant) As Object
                 Set dt = Value
                 Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - dt.TotalMilliseconds)
             Else
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidDateSubtraction), Environment.GetResourceString(Parameter_Value))
+                Error.Argument Argument_InvalidDateSubtraction, "Value"
             End If
         Case vbDate
-            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.AscDateTime(Value).TotalMilliseconds)
+            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.GetMilliseconds(Value))
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidDateSubtraction), Environment.GetResourceString(Parameter_Value))
+            Error.Argument Argument_InvalidDateSubtraction, "Value"
     End Select
 End Function
 
@@ -641,7 +641,7 @@ End Function
 ' @return Returns True if this object is greater than the dt object.
 ' @remarks This is provided for quick comparisions of two CorDateTime objects.
 '
-Public Function GreaterThan(ByRef dt As CorDateTime) As Boolean
+Public Function GreaterThan(ByVal dt As CorDateTime) As Boolean
     If dt Is Nothing Then
         GreaterThan = True
     Else
@@ -656,7 +656,7 @@ End Function
 ' @return Returns True if this object is less than the dt object.
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function LessThan(ByRef dt As CorDateTime) As Boolean
+Public Function LessThan(ByVal dt As CorDateTime) As Boolean
     If dt Is Nothing Then Exit Function
     LessThan = (mMilliseconds < dt.TotalMilliseconds)
 End Function
@@ -668,7 +668,7 @@ End Function
 ' @return Returns True if this object is greater than or equal to the dt object.
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function GreaterThanOrEqualTo(ByRef dt As CorDateTime) As Boolean
+Public Function GreaterThanOrEqualTo(ByVal dt As CorDateTime) As Boolean
     If dt Is Nothing Then
         GreaterThanOrEqualTo = True
     Else
@@ -683,7 +683,7 @@ End Function
 ' @return Returns True if this object is less than or equal to the dt object.
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function LessThanOrEqualTo(ByRef dt As CorDateTime) As Boolean
+Public Function LessThanOrEqualTo(ByVal dt As CorDateTime) As Boolean
     If dt Is Nothing Then Exit Function
     LessThanOrEqualTo = (mMilliseconds <= dt.TotalMilliseconds)
 End Function
@@ -695,7 +695,7 @@ End Function
 ' @return Returns True if this object is equal to the dt object.
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function EqualTo(ByRef dt As CorDateTime) As Boolean
+Public Function EqualTo(ByVal dt As CorDateTime) As Boolean
     If dt Is Nothing Then Exit Function
     EqualTo = (mMilliseconds = dt.TotalMilliseconds)
 End Function
@@ -707,7 +707,7 @@ End Function
 ' @return Returns True if this object is not equal to the dt object.
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function NotEqualTo(ByRef dt As CorDateTime) As Boolean
+Public Function NotEqualTo(ByVal dt As CorDateTime) As Boolean
     If dt Is Nothing Then
         NotEqualTo = True
     Else
@@ -716,9 +716,8 @@ Public Function NotEqualTo(ByRef dt As CorDateTime) As Boolean
 End Function
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, ByVal Calendar As Calendar, ByVal Kind As DateTimeKind)
     If Calendar Is Nothing Then
@@ -773,7 +772,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim Days As Long
@@ -848,7 +847,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
@@ -866,7 +865,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -886,7 +885,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IFormattable Interface
+'   IFormattable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String
     IFormattable_ToString = ToString(Format, Provider)

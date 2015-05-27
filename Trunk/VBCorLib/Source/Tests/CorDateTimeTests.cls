@@ -27,7 +27,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/1/100#
             Test.Use #1/1/9999 11:59:59 PM#
             
-        Case "FromOADate_WithValues_ReturnscDateTime"
+        Case "FromOADate_WithValue_ReturnsDateTime"
             Test.Use #12:00:00 AM#
             Test.Use #5/5/1900 3:30:00 PM#
             Test.Use #1/1/100#
@@ -94,16 +94,19 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2016, 2, 29
             
         Case "CompareTo_WithValues_ReturnsExpected"
-            Test.Use 5, 10, -1
-            Test.Use 10, 5, 1
-            Test.Use 10, 10, 0
+            Test.Use #1/1/2001#, 0
+            Test.Use NewDate(#1/1/2001#), 0
+            Test.Use #1/1/2000#, 1
+            Test.Use NewDate(#1/1/2000#), 1
+            Test.Use #1/1/2002#, -1
+            Test.Use NewDate(#1/1/2002#), -1
             
         Case "Subtract_WithTimeSpans_ReturnsExpected"
             Test.Use TimeSpan.Zero, NewDateTime(2001, 1, 1)
             Test.Use TimeSpan.FromHours(-1), NewDate(#1/1/2001 1:00:00 AM#)
             Test.Use TimeSpan.FromHours(1), NewDate(#12/31/2000 11:00:00 PM#)
             
-        Case "Subtract_WithDates_ReturnsExpected"
+        Case "Subtract_WithDate_ReturnsExpected"
             Test.Use #12/31/2000#, TimeSpan.FromDays(1)
             Test.Use NewDateTime(2000, 12, 31), TimeSpan.FromDays(1)
             
@@ -161,7 +164,7 @@ Public Sub ToOADate_WithValues_ReturnsExpected(ByVal Expected As Date)
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub FromOADate_WithValues_ReturnsDateTime(ByVal d As Date)
+Public Sub FromOADate_WithValue_ReturnsDateTime(ByVal d As Date)
     Dim Actual As CorDateTime
         
     Set Actual = CorDateTime.FromOADate(d)
@@ -365,16 +368,30 @@ errTrap:
     AssertArgumentOutOfRangeException Err, ParameterName
 End Sub
 
-Public Sub CompareTo_WithValues_ReturnsExpected(ByVal LeftHours As Double, ByVal RightHours As Double, ByVal Expected As Long)
-    Dim Left As CorDateTime
-    Dim Right As CorDateTime
-    Set Left = CorDateTime.MinValue.AddHours(LeftHours)
-    Set Right = CorDateTime.MinValue.AddHours(RightHours)
+Public Sub CompareTo_WithValues_ReturnsExpected(ByRef Other As Variant, ByVal Expected As Long)
+    Dim This As CorDateTime
+    Set This = NewDate(#1/1/2001#)
     
     Dim Actual As Long
-    Actual = Left.CompareTo(Right)
+    Actual = This.CompareTo(Other)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CompareTo_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    NewDate(#1/1/2001#).CompareTo Nothing
+    
+    AssertArgumentNullException Err, "Value"
+End Sub
+
+Public Sub CompareTo_WithUnsupportedType_ThrowsArgumentException()
+    On Error Resume Next
+    
+    NewDate(#1/1/2001#).CompareTo Empty
+    
+    AssertArgumentException Err, "Value"
 End Sub
 
 Public Sub Subtract_WithTimeSpans_ReturnsExpected(ByVal TimeSpanToSubtract As TimeSpan, ByVal Expected As CorDateTime)

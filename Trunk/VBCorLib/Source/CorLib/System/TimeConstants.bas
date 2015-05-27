@@ -28,6 +28,7 @@ Public Const TicksPerMillisecond    As Long = 10000
 Public Const SecondsPerMinute       As Long = 60
 Public Const MinutesPerHour         As Long = 60
 Public Const HoursPerDay            As Long = 24
+Public Const DaysPerWeek            As Long = 7
 Public Const DaysPerYear            As Long = 365
 Public Const MonthsPerYear          As Long = 12
 Public Const DaysPer4Years          As Long = DaysPerYear * 4 + 1
