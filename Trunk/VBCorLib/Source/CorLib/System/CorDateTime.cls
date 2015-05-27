@@ -62,7 +62,7 @@ Implements IFormattable
 Private Const PropMilliseconds  As String = "Milliseconds"
 Private Const PropKind          As String = "Kind"
 
-Private Const DefaultMilliseconds   As Long = 0@
+Private Const DefaultMilliseconds   As Long = 0
 Private Const DefaultKind           As Long = 0
 
 Private Const DaysPer100Years       As Long = DaysPer4Years * 25 - 1
@@ -564,16 +564,17 @@ End Function
 '
 ' @return 64-bit representation of the CorDateTime
 ' @remarks The upper 2 bits are used to represent the DateTimeKind
-' of the object, the lower 62-bits are used to represent the 100-nanosecond
-' segmented time.
+' of the object, the lower 62-bits are used to represent the ticks.
 '
 Public Function ToBinary() As Currency
     ToBinary = mMilliseconds
+    
     If mKind = LocalKind Then
         Dim ts As TimeSpan
         Set ts = TimeZone.CurrentTimeZone.GetUtcOffset(Me)
         ToBinary = ToBinary - ts.TotalMilliseconds
     End If
+    
     MemByte(VarPtr(ToBinary) + 7) = MemByte(VarPtr(ToBinary) + 7) Or (mKind * &H40)
 End Function
 
