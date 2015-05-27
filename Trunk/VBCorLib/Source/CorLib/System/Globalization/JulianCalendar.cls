@@ -79,28 +79,28 @@ Public Property Let TwoDigitYearMax(ByVal RHS As Long)
     mTwoDigitYearMax = RHS
 End Property
 
-Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As cDateTime
-    Set AddDays = cDateTime.GetcDateTime(Time).AddDays(Days)
+Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
+    Set AddDays = CorDateTime.GetcDateTime(Time).AddDays(Days)
 End Function
 
-Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As cDateTime
-    Set AddHours = cDateTime.GetcDateTime(Time).AddHours(Hours)
+Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
+    Set AddHours = CorDateTime.GetcDateTime(Time).AddHours(Hours)
 End Function
 
-Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As cDateTime
-    Set AddMilliseconds = cDateTime.GetcDateTime(Time).AddMilliseconds(Milliseconds)
+Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
+    Set AddMilliseconds = CorDateTime.GetcDateTime(Time).AddMilliseconds(Milliseconds)
 End Function
 
-Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As cDateTime
-    Set AddMinutes = cDateTime.GetcDateTime(Time).AddMinutes(Minutes)
+Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
+    Set AddMinutes = CorDateTime.GetcDateTime(Time).AddMinutes(Minutes)
 End Function
 
-Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateTime
+Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
     If Months < -120000 Or Months > 120000 Then _
         Throw Cor.NewArgumentOutOfRangeException("Months", Months, "Months must be between -120000 and 120000 inclusively.")
     
     If Months = 0 Then
-        Set AddMonths = cDateTime.GetcDateTime(Time)
+        Set AddMonths = CorDateTime.GetcDateTime(Time)
         Exit Function
     End If
 
@@ -130,20 +130,20 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateT
     If Day > MaxDays Then Day = MaxDays
     
     Dim TOD As Currency
-    TOD = cDateTime.GetcDateTime(Time).TotalMilliseconds
+    TOD = CorDateTime.GetcDateTime(Time).TotalMilliseconds
     
-    Set AddMonths = cDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(TOD, MillisecondsPerDay))
+    Set AddMonths = CorDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(TOD, MillisecondsPerDay))
 End Function
 
-Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As cDateTime
-    Set AddSeconds = cDateTime.GetcDateTime(Time).AddSeconds(Seconds)
+Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
+    Set AddSeconds = CorDateTime.GetcDateTime(Time).AddSeconds(Seconds)
 End Function
 
-Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As cDateTime
-    Set AddWeeks = cDateTime.GetcDateTime(Time).AddDays(Weeks * 7)
+Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
+    Set AddWeeks = CorDateTime.GetcDateTime(Time).AddDays(Weeks * 7)
 End Function
 
-Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As cDateTime
+Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
     Set AddYears = AddMonths(Time, Years * 12)
 End Function
 
@@ -160,23 +160,23 @@ Public Function GetYear(ByRef Time As Variant) As Long
 End Function
 
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = cDateTime.GetcDateTime(Time).Hour
+    GetHour = CorDateTime.GetcDateTime(Time).Hour
 End Function
 
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = cDateTime.GetcDateTime(Time).Minute
+    GetMinute = CorDateTime.GetcDateTime(Time).Minute
 End Function
 
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = cDateTime.GetcDateTime(Time).Second
+    GetSecond = CorDateTime.GetcDateTime(Time).Second
 End Function
 
 Public Function GetMilliseconds(ByRef Time As Variant) As Long
-    GetMilliseconds = cDateTime.GetcDateTime(Time).Millisecond
+    GetMilliseconds = CorDateTime.GetcDateTime(Time).Millisecond
 End Function
 
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = cDateTime.GetcDateTime(Time).DayOfWeek
+    GetDayOfWeek = CorDateTime.GetcDateTime(Time).DayOfWeek
 End Function
 
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
@@ -193,7 +193,7 @@ Public Function GetDayOfYear(ByRef Time As Variant) As Long
 End Function
 
 Public Function GetEra(ByRef Time As Variant) As Long
-    Call cDateTime.GetcDateTime(Time)
+    Call CorDateTime.GetcDateTime(Time)
     GetEra = 1
 End Function
 
@@ -207,7 +207,7 @@ Public Function GetDaysInMonth(ByVal Year As Long, ByVal Month As Long, Optional
     Call VerifyEra(Era)
     Call VerifyYear(Year)
     Call VerifyMonth(Month)
-    GetDaysInMonth = cDateTime.DaysInMonth(Year, Month)
+    GetDaysInMonth = CorDateTime.DaysInMonth(Year, Month)
     If Month = 2 Then
         If IsLeapYear(Year) Then
             GetDaysInMonth = 29
@@ -242,7 +242,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     End If
 End Function
 
-Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByVal Era As Variant) As cDateTime
+Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByVal Era As Variant) As CorDateTime
     Call VerifyEra(Era)
     Call VerifyYear(Year)
     Call VerifyMonth(Month)
@@ -250,7 +250,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Day, CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month)))
     
-    Set ToDateTime = cDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MillisecondsPerDay + TotalTime(Hour, Minute, Second, Millisecond))
+    Set ToDateTime = CorDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MillisecondsPerDay + TotalTime(Hour, Minute, Second, Millisecond))
 End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
@@ -321,7 +321,7 @@ End Sub
 
 Private Sub GetDateParts(ByRef Time As Variant, ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim ms As Currency
-    ms = cDateTime.GetcDateTime(Time).TotalMilliseconds
+    ms = CorDateTime.GetcDateTime(Time).TotalMilliseconds
     
     Dim FixedDays As Long
     FixedDays = Int(ms / MillisecondsPerDay) + 2  ' Julian calendar starts 2 days after Gregorian
@@ -400,35 +400,35 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Calendar Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Calendar_AddDays(Time As Variant, ByVal Days As Long) As cDateTime
+Private Function Calendar_AddDays(Time As Variant, ByVal Days As Long) As CorDateTime
     Set Calendar_AddDays = AddDays(Time, Days)
 End Function
 
-Private Function Calendar_AddHours(Time As Variant, ByVal Hours As Long) As cDateTime
+Private Function Calendar_AddHours(Time As Variant, ByVal Hours As Long) As CorDateTime
     Set Calendar_AddHours = AddHours(Time, Hours)
 End Function
 
-Private Function Calendar_AddMilliseconds(Time As Variant, ByVal Milliseconds As Double) As cDateTime
+Private Function Calendar_AddMilliseconds(Time As Variant, ByVal Milliseconds As Double) As CorDateTime
     Set Calendar_AddMilliseconds = AddMilliseconds(Time, Milliseconds)
 End Function
 
-Private Function Calendar_AddMinutes(Time As Variant, ByVal Minutes As Long) As cDateTime
+Private Function Calendar_AddMinutes(Time As Variant, ByVal Minutes As Long) As CorDateTime
     Set Calendar_AddMinutes = AddMinutes(Time, Minutes)
 End Function
 
-Private Function Calendar_AddMonths(Time As Variant, ByVal Months As Long) As cDateTime
+Private Function Calendar_AddMonths(Time As Variant, ByVal Months As Long) As CorDateTime
     Set Calendar_AddMonths = AddMonths(Time, Months)
 End Function
 
-Private Function Calendar_AddSeconds(Time As Variant, ByVal Seconds As Long) As cDateTime
+Private Function Calendar_AddSeconds(Time As Variant, ByVal Seconds As Long) As CorDateTime
     Set Calendar_AddSeconds = AddSeconds(Time, Seconds)
 End Function
 
-Private Function Calendar_AddWeeks(Time As Variant, ByVal Weeks As Long) As cDateTime
+Private Function Calendar_AddWeeks(Time As Variant, ByVal Weeks As Long) As CorDateTime
     Set Calendar_AddWeeks = AddWeeks(Time, Weeks)
 End Function
 
-Private Function Calendar_AddYears(Time As Variant, ByVal Years As Long) As cDateTime
+Private Function Calendar_AddYears(Time As Variant, ByVal Years As Long) As CorDateTime
     Set Calendar_AddYears = AddYears(Time, Years)
 End Function
 
@@ -512,7 +512,7 @@ Private Function Calendar_IsLeapYear(ByVal Year As Long, Optional Era As Variant
     Calendar_IsLeapYear = IsLeapYear(Year, Era)
 End Function
 
-Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As cDateTime
+Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As CorDateTime
     Set Calendar_ToDateTime = ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond, Era)
 End Function
 

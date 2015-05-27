@@ -37,7 +37,7 @@ Attribute VB_Exposed = True
 
 ''
 ' Provides a repository of formatting information to be used in formatting
-' cDateTime and Date values to match that of a specific locale.
+' CorDateTime and Date values to match that of a specific locale.
 '
 ' @remarks Formatting dates can vary greatly across multiple cultures. Each
 ' culture can provide formatting information that is specific to itself. A DateTimeFormatInfo
@@ -717,7 +717,7 @@ Public Function GetMonthName(ByVal Month As Long) As String
 End Function
 
 ''
-' Formats a cDateTime object or Date value in the pattern specified by
+' Formats a CorDateTime object or Date value in the pattern specified by
 ' the formatting command. If no command is specified, then 'G' is assumed.
 ' If the command cannot be found, then a custom pattern is assumed.
 '
@@ -743,7 +743,7 @@ End Function
 '
 Public Function Format(ByRef Value As Variant, Optional ByVal fmt As String) As String
     VerifyLoaded
-    Format = CustomFormat(cDateTime.GetcDateTime(Value), GetPattern(fmt))
+    Format = CustomFormat(CorDateTime.GetcDateTime(Value), GetPattern(fmt))
 End Function
 
 ''
@@ -844,7 +844,7 @@ Private Sub LoadCommon(ByVal LCID As Long)
     End With
 End Sub
 
-Private Function CustomFormat(ByRef dt As cDateTime, ByRef Pattern As String) As String
+Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) As String
     Dim cnt         As Long
     Dim pos         As Long
     Dim sb          As StringBuilder

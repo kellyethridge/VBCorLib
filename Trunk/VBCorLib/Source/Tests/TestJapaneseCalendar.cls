@@ -29,11 +29,11 @@ End Sub
 
 
 Public Sub TestAddDays()
-    Dim d1 As cDateTime
-    Dim d2 As cDateTime
+    Dim d1 As CorDateTime
+    Dim d2 As CorDateTime
     Dim i As Long
     
-    Set d1 = cDateTime.FromOADate(#1/1/2000#)
+    Set d1 = CorDateTime.FromOADate(#1/1/2000#)
     Set d2 = d1
     
     For i = 1 To 1000
@@ -44,11 +44,11 @@ Public Sub TestAddDays()
 End Sub
 
 Public Sub TestAddMonths()
-    Dim d1 As cDateTime
-    Dim d2 As cDateTime
+    Dim d1 As CorDateTime
+    Dim d2 As CorDateTime
     Dim i As Long
     
-    Set d1 = cDateTime.FromOADate(#1/1/2000#)
+    Set d1 = CorDateTime.FromOADate(#1/1/2000#)
     Set d2 = d1
     
     For i = 1 To 1000
@@ -59,11 +59,11 @@ Public Sub TestAddMonths()
 End Sub
 
 Public Sub TestAddYears()
-    Dim d1 As cDateTime
-    Dim d2 As cDateTime
+    Dim d1 As CorDateTime
+    Dim d2 As CorDateTime
     Dim i As Long
     
-    Set d1 = cDateTime.FromOADate(#1/1/2000#)
+    Set d1 = CorDateTime.FromOADate(#1/1/2000#)
     Set d2 = d1
     
     For i = 1 To 1000
@@ -74,11 +74,11 @@ Public Sub TestAddYears()
 End Sub
 
 Public Sub TestAddWeeks()
-    Dim d1 As cDateTime
-    Dim d2 As cDateTime
+    Dim d1 As CorDateTime
+    Dim d2 As CorDateTime
     Dim i As Long
     
-    Set d1 = cDateTime.FromOADate(#1/1/2000#)
+    Set d1 = CorDateTime.FromOADate(#1/1/2000#)
     Set d2 = d1
     
     For i = 1 To 1000
@@ -90,7 +90,7 @@ End Sub
 
 Public Sub TestGetYear()
     Dim sr As StreamReader
-    Dim d As cDateTime
+    Dim d As CorDateTime
     Dim i As Long
     
     Assert.AreEqual 1, cal.GetYear(#9/8/1868#)
@@ -104,7 +104,7 @@ Public Sub TestGetYear()
     
     Set sr = File.OpenText(App.Path & "\Dummy Test Files\TestJapaneseCalendar_GetYear.txt")
     
-    Set d = cDateTime.FromOADate(#1/1/1900#)
+    Set d = CorDateTime.FromOADate(#1/1/1900#)
     For i = 1 To 100
         Assert.AreEqual CLng(sr.ReadLine), cal.GetYear(d)
         Set d = d.AddYears(1)
@@ -130,19 +130,19 @@ Public Sub TestIsLeapYear()
 End Sub
 
 Public Sub TestToDateTimeForCurrentEra()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = cal.ToDateTime(1, 1, 1, 0, 0, 0, 0)
     Assert.AreEqual #1/1/1989#, dt.ToOADate
 End Sub
 
 Public Sub TestToDateTimeForHeiseiEra()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = cal.ToDateTime(1, 1, 1, 0, 0, 0, 0, 4)
     Assert.AreEqual #1/1/1989#, dt.ToOADate
 End Sub
 
 Public Sub TestToDateTimeForShowaEra()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = cal.ToDateTime(1, 1, 1, 0, 0, 0, 0, 3)
     Assert.AreEqual #1/1/1926#, dt.ToOADate
     
@@ -151,7 +151,7 @@ Public Sub TestToDateTimeForShowaEra()
 End Sub
 
 Public Sub TestToDateTimeForTaishoEra()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = cal.ToDateTime(1, 1, 1, 0, 0, 0, 0, 2)
     Assert.AreEqual #1/1/1912#, dt.ToOADate
     
@@ -160,7 +160,7 @@ Public Sub TestToDateTimeForTaishoEra()
 End Sub
 
 Public Sub TestToDateTimeForMeijiEra()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = cal.ToDateTime(1, 1, 1, 0, 0, 0, 0, 1)
     Assert.AreEqual #1/1/1868#, dt.ToOADate
     

@@ -31,7 +31,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Missing
             Test.Use 0#
             Test.Use 0
-            Test.Use cDateTime.MinValue
+            Test.Use CorDateTime.MinValue
             Test.Use TimeSpan.Zero
             Test.Use CDec(0)
             

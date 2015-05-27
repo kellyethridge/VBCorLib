@@ -21,7 +21,7 @@ Attribute VB_Name = "modcDateTimeHelpers"
 '
 
 ''
-' Provides some common functions for the cDateTime class.
+' Provides some common functions for the CorDateTime class.
 '
 Option Explicit
 
@@ -33,14 +33,14 @@ Public Enum DatePartPrecision
     Complete
 End Enum
 
-' We don't want to keep creating these in each cDateTime object,
+' We don't want to keep creating these in each CorDateTime object,
 ' so cache them one time here.
 Public DaysToMonthLeapYear()    As Long
 Public DaysToMonth()            As Long
 
 
 ''
-' Initialize the values used by the cDateTime class.
+' Initialize the values used by the CorDateTime class.
 '
 Public Sub InitcDateTimeHelpers()
     DaysToMonth = Cor.NewLongs(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365)

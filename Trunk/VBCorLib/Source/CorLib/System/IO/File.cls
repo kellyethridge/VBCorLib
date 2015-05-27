@@ -204,21 +204,21 @@ End Function
 ' Returns the time the file was created in local time.
 '
 ' @param Path The file to retrieve the creation time of.
-' @return A cDateTime object representing the creation time.
+' @return A CorDateTime object representing the creation time.
 '
-Public Function GetCreationTime(ByRef Path As String) As cDateTime
+Public Function GetCreationTime(ByRef Path As String) As CorDateTime
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
     FillFileData Path, Data
-    Set GetCreationTime = cDateTime.FromFileTime(Data.ftCreationTime)
+    Set GetCreationTime = CorDateTime.FromFileTime(Data.ftCreationTime)
 End Function
 
 ''
 ' Returns the time the file was created in UTC time.
 '
 ' @param Path The file to retrieve the creation time of.
-' @return A cDateTime object representing the creation time.
+' @return A CorDateTime object representing the creation time.
 '
-Public Function GetCreationTimeUtc(ByRef Path As String) As cDateTime
+Public Function GetCreationTimeUtc(ByRef Path As String) As CorDateTime
     Set GetCreationTimeUtc = GetCreationTime(Path).ToUniversalTime
 End Function
 
@@ -226,21 +226,21 @@ End Function
 ' Returns the time the file was accessed in local time.
 '
 ' @param Path The file to retrieve the last access time for.
-' @return A cDateTime object that represents the last time the file was accessed.
+' @return A CorDateTime object that represents the last time the file was accessed.
 '
-Public Function GetLastAccessTime(ByRef Path As String) As cDateTime
+Public Function GetLastAccessTime(ByRef Path As String) As CorDateTime
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
     FillFileData Path, Data
-    Set GetLastAccessTime = cDateTime.FromFileTime(Data.ftLastAccessTime)
+    Set GetLastAccessTime = CorDateTime.FromFileTime(Data.ftLastAccessTime)
 End Function
 
 ''
 ' Returns The last time a file was accessed in UTC time.
 '
 ' @param Path The file to get the last accessed time for.
-' @return A cDateTime object representing the last time the file was accessed.
+' @return A CorDateTime object representing the last time the file was accessed.
 '
-Public Function GetLastAccessTimeUtc(ByRef Path As String) As cDateTime
+Public Function GetLastAccessTimeUtc(ByRef Path As String) As CorDateTime
     Set GetLastAccessTimeUtc = GetLastAccessTime(Path).ToUniversalTime
 End Function
 
@@ -248,21 +248,21 @@ End Function
 ' Returns the last time the file was written to in local time.
 '
 ' @param Path The file to retrieve the last written time for.
-' @return A cDateTime object representing the last time the file was written to.
+' @return A CorDateTime object representing the last time the file was written to.
 '
-Public Function GetLastWriteTime(ByRef Path As String) As cDateTime
+Public Function GetLastWriteTime(ByRef Path As String) As CorDateTime
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
     FillFileData Path, Data
-    Set GetLastWriteTime = cDateTime.FromFileTime(Data.ftLastWriteTime)
+    Set GetLastWriteTime = CorDateTime.FromFileTime(Data.ftLastWriteTime)
 End Function
 
 ''
 ' Returns the last time the file was written to in UTC time.
 '
 ' @param sPath The file to retrieve the last written time for.
-' @return A cDateTime object representing the last time a file was written to.
+' @return A CorDateTime object representing the last time a file was written to.
 '
-Public Function GetLastWriteTimeUtc(ByVal sPath As String) As cDateTime
+Public Function GetLastWriteTimeUtc(ByVal sPath As String) As CorDateTime
     Set GetLastWriteTimeUtc = GetLastWriteTime(sPath).ToUniversalTime
 End Function
 
@@ -359,60 +359,60 @@ End Sub
 ' Sets the time of creation for a file in local time.
 '
 ' @param Path The file to set the time of creation for.
-' @param CreationTime A Date or cDateTime object of the new time.
+' @param CreationTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTime
+    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTime
 End Sub
 
 ''
 ' Sets the time of creation for a file in UTC time.
 '
 ' @param Path The file to set the time of creation for.
-' @param CreationTime A Date or cDateTime object of the new time.
+' @param CreationTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
+    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
 End Sub
 
 ''
 ' Sets the last time the file was accessed in local time.
 '
 ' @param Path The file to set the last access time for.
-' @param LastAccessTime A Date or cDateTime object of the new time.
+' @param LastAccessTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTime
+    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTime
 End Sub
 
 ''
 ' Sets the last time the file was accessed in UTC time.
 '
 ' @param Path The file to set the last access time for.
-' @param LastAccessTime A Date or cDateTime object of the new time.
+' @param LastAccessTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
+    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
 End Sub
 
 ''
 ' Sets the last time the file was written to in local time.
 '
 ' @param sPath The file to set the last written time for.
-' @param LastWriteTime A Date or cDateTime object of the new time.
+' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTime
+    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTime
 End Sub
 
 ''
 ' Sets the last time the file was written to in UTC time.
 '
 ' @param sPath The file to set the last written time for.
-' @param LastWriteTime A Date or cDateTime object of the new time.
+' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTimeUtc(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
+    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
 End Sub
 
 ''

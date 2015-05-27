@@ -67,12 +67,12 @@ Public Sub TestGetLongDefault()
 End Sub
 
 Public Sub TestSetGetDateTime()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     
     Set dt = NewDate(#1/1/2005 8:30:00 AM#)
     ini.SetValue "test", "date", dt
     
-    Dim dt2 As cDateTime
+    Dim dt2 As CorDateTime
     Set dt2 = ini.GetDateTime("test", "date")
     
     Assert.IsTrue dt.Equals(dt2)

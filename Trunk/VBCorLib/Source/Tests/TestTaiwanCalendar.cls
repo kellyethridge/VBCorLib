@@ -42,7 +42,7 @@ Public Sub TestToFourDigitYear()
 End Sub
 
 Public Sub TestToDateTime()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = Cor.NewDateTime(2001, 1, 1, 1, 1, 1, 1)
     Assert.IsTrue dt.Equals(cal.ToDateTime(90, 1, 1, 1, 1, 1, 1))
 End Sub

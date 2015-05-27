@@ -181,10 +181,10 @@ End Sub
 ' Returns the time of creation for the specified directory in local time.
 '
 ' @param Path The directory to retrieve the creation time of.
-' @return A cDateTime object containing the creation time of the directory.
+' @return A CorDateTime object containing the creation time of the directory.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetCreationTime(ByVal Path As String) As cDateTime
+Public Function GetCreationTime(ByVal Path As String) As CorDateTime
     Set GetCreationTime = File.GetCreationTime(Path)
 End Function
 
@@ -192,10 +192,10 @@ End Function
 ' Returns the time of creation for the specified directory in UTC time.
 '
 ' @param Path The directory to retrieve the creation time of.
-' @return A cDateTime object containing the creation time of the directory.
+' @return A CorDateTime object containing the creation time of the directory.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetCreationTimeUtc(ByVal Path As String) As cDateTime
+Public Function GetCreationTimeUtc(ByVal Path As String) As CorDateTime
     Set GetCreationTimeUtc = File.GetCreationTimeUtc(Path)
 End Function
 
@@ -203,10 +203,10 @@ End Function
 ' Returns the time the directory was last accessed in local time.
 '
 ' @param Path The directory to retrieve the last time it was accessed.
-' @return A cDateTime object containing the time the directory was last accessed.
+' @return A CorDateTime object containing the time the directory was last accessed.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetLastAccessTime(ByVal Path As String) As cDateTime
+Public Function GetLastAccessTime(ByVal Path As String) As CorDateTime
     Set GetLastAccessTime = File.GetLastAccessTime(Path)
 End Function
 
@@ -214,10 +214,10 @@ End Function
 ' Returns the time the directory was last accessed in UTC time.
 '
 ' @param Path The directory to retrieve the last time it was accessed.
-' @return A cDateTime object containing the time the directory was last accessed.
+' @return A CorDateTime object containing the time the directory was last accessed.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetLastAccessTimeUtc(ByVal Path As String) As cDateTime
+Public Function GetLastAccessTimeUtc(ByVal Path As String) As CorDateTime
     Set GetLastAccessTimeUtc = File.GetLastAccessTimeUtc(Path)
 End Function
 
@@ -225,10 +225,10 @@ End Function
 ' Returns the time the directory was last written to in local time.
 '
 ' @param Path The directory to retrieve the last time it was written to.
-' @return A cDateTime object containing the last time the directory was written to.
+' @return A CorDateTime object containing the last time the directory was written to.
 ' @remarks The path can relative or absolute.
 '
-Public Function GetLastWriteTime(ByVal Path As String) As cDateTime
+Public Function GetLastWriteTime(ByVal Path As String) As CorDateTime
     Set GetLastWriteTime = File.GetLastWriteTime(Path)
 End Function
 
@@ -236,10 +236,10 @@ End Function
 ' Returns the time the directory was last written to in UTC time.
 '
 ' @param Path The directory to retrieve the last time it was written to.
-' @return A cDateTime object containing the last time the directory was written to.
+' @return A CorDateTime object containing the last time the directory was written to.
 ' @remarks The path can relative or absolute.
 '
-Public Function GetLastWriteTimeUtc(ByVal Path As String) As cDateTime
+Public Function GetLastWriteTimeUtc(ByVal Path As String) As CorDateTime
     Set GetLastWriteTimeUtc = File.GetLastWriteTimeUtc(Path)
 End Function
 
@@ -424,65 +424,65 @@ End Sub
 ' Sets the creation time of the specified directory to the local time.
 '
 ' @param Path The directory to set the creation time for.
-' @param CreationTime A Date or cDateTime object of the new time.
+' @param CreationTime A Date or CorDateTime object of the new time.
 ' @remarks The time will have the UTC offset removed before setting the
 ' the directory to it. When the time is read, it will be in local time to the timezone.
 '
 Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTime
+    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTime
 End Sub
 
 ''
 ' Sets the creation time of the specified directory to UTC time.
 '
 ' @param Path The directory to set the creation time for in UTC.
-' @param CreationTime A Date or cDateTime object of the new UTC time.
+' @param CreationTime A Date or CorDateTime object of the new UTC time.
 ' @remarks The directory is set to the actual time passed in.
 '
 Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, cDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
+    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
 End Sub
 
 ''
 ' Sets the time the directory was last accessed in local time.
 '
 ' @param Path The directory to set the new time for.
-' @param LastAccessTime A Date or cDateTime object of the new time.
+' @param LastAccessTime A Date or CorDateTime object of the new time.
 ' @remarks The UTC offset is removed from the time before setting the directory.
 '
 Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTime
+    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTime
 End Sub
 
 ''
 ' Sets the time the directory was last accessed in UTC time.
 '
 ' @param Path The directory to set the new time for.
-' @param LastAccessTime A Date or cDateTime object of the new time.
+' @param LastAccessTime A Date or CorDateTime object of the new time.
 ' @remarks The directory is set to the actual time passed in.
 '
 Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , cDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
+    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
 End Sub
 
 ''
 ' Sets the time the directory was last written to in local time.
 '
 ' @param Path The directory to set the new time for.
-' @param LastWriteTime A Date or cDateTime object of the new time.
+' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTime
+    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTime
 End Sub
 
 ''
 ' Sets the time the directory was last written to in UTC time.
 '
 ' @param Path The directory to set the new time for.
-' @param LastWriteTime A Date or cDateTime object of the new time.
+' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTimeUtc(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , cDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
+    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
 End Sub
 
 

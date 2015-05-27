@@ -73,7 +73,7 @@ Public Sub TestToLocalTime()
     Dim Zone As TimeZone
     Set Zone = TimeZone.CurrentTimeZone
     
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = Zone.ToLocalTime(#1/1/2004 12:00:00 PM#)
     Assert.IsTrue dt.Equals(#1/1/2004 4:00:00 AM#), "ToLocalTime should return 1/1/2004 4am."
     
@@ -85,7 +85,7 @@ Public Sub TestToUniversalTime()
     Dim Zone As TimeZone
     Set Zone = TimeZone.CurrentTimeZone
     
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Set dt = Zone.ToUniversalTime(#1/1/2004 12:00:00 PM#)
     Assert.IsTrue dt.Equals(#1/1/2004 8:00:00 PM#), "ToUniversalTime should return 1/1/2004 8pm."
     

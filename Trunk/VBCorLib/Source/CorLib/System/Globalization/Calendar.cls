@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Calendar
+' Module: Calendar
 '
 
 ''
@@ -102,76 +105,76 @@ Public Property Get TwoDigitYearMax() As Long: End Property
 Public Property Let TwoDigitYearMax(ByVal RHS As Long): End Property
 
 ''
-' Returns a <b>cDateTime</b> that is the specified number of days from the original Time.
+' Returns a <b>CorDateTime</b> that is the specified number of days from the original Time.
 '
 ' @param Time The date inwhich to add the days to.
 ' @param Days The number of days to be added. This value can be negative.
-' @return The new <b>cDateTime</b> with the days added or subtracted.
+' @return The new <b>CorDateTime</b> with the days added or subtracted.
 '
-Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As cDateTime: End Function
+Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>cDateTime</b> this is the specified number of hours from the original Time.
+' Returns a <b>CorDateTime</b> this is the specified number of hours from the original Time.
 '
 ' @param Time The time to add the specified number of hours to.
 ' @param Hours The number of hours to be added to <i>Time</i>. This can be negative.
 ' @return Returns a <b>cDateTime</b> with the specified number of hours added.
 '
-Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As cDateTime: End Function
+Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>cDateTime</b> this is the specified number of Milliseconds from the original Time.
+' Returns a <b>CorDateTime</b> this is the specified number of Milliseconds from the original Time.
 '
 ' @param Time The time to add the specified number of Milliseconds to.
 ' @param Milliseconds The number of Milliseconds to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>cDateTime</b> with the specified number of Milliseconds added.
+' @return Returns a <b>CorDateTime</b> with the specified number of Milliseconds added.
 '
-Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As cDateTime: End Function
+Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime: End Function
 
 ''
-' Returns a <b>cDateTime</b> this is the specified number of Minutes from the original Time.
+' Returns a <b>CorDateTime</b> this is the specified number of Minutes from the original Time.
 '
 ' @param Time The time to add the specified number of Minutes to.
 ' @param Minutes The number of Minutes to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>cDateTime</b> with the specified number of Minutes added.
+' @return Returns a <b>CorDateTime</b> with the specified number of Minutes added.
 '
-Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As cDateTime: End Function
+Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>cDateTime</b> this is the specified number of Months from the original Time.
+' Returns a <b>CorDateTime</b> this is the specified number of Months from the original Time.
 '
 ' @param Time The time to add the specified number of Months to.
 ' @param Months The number of Months to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>cDateTime</b> with the specified number of Months added.
+' @return Returns a <b>CorDateTime</b> with the specified number of Months added.
 '
-Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateTime: End Function
+Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>cDateTime</b> this is the specified number of Seconds from the original Time.
+' Returns a <b>CorDateTime</b> this is the specified number of Seconds from the original Time.
 '
 ' @param Time The time to add the specified number of Seconds to.
 ' @param Seconds The number of Seconds to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>cDateTime</b> with the specified number of Seconds added.
+' @return Returns a <b>CorDateTime</b> with the specified number of Seconds added.
 '
-Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As cDateTime: End Function
+Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>cDateTime</b> this is the specified number of Weeks from the original Time.
+' Returns a <b>CorDateTime</b> this is the specified number of Weeks from the original Time.
 '
 ' @param Time The time to add the specified number of Weeks to.
 ' @param Weeks The number of Weeks to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>cDateTime</b> with the specified number of Weeks added.
+' @return Returns a <b>CorDateTime</b> with the specified number of Weeks added.
 '
-Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As cDateTime: End Function
+Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>cDateTime</b> this is the specified number of Years from the original Time.
+' Returns a <b>CorDateTime</b> this is the specified number of Years from the original Time.
 '
 ' @param Time The time to add the specified number of Years to.
 ' @param Years The number of Years to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>cDateTime</b> with the specified number of Years added.
+' @return Returns a <b>CorDateTime</b> with the specified number of Years added.
 '
-Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As cDateTime: End Function
+Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime: End Function
 
 ''
 ' Returns a boolean indicating if the value and this object
@@ -344,7 +347,7 @@ Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional By
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean: End Function
 
 ''
-' Returns a Gregorian cDateTime computed using the specific calendar rules.
+' Returns a Gregorian CorDateTime computed using the specific calendar rules.
 '
 ' @param Year The Year in the specific calendar type.
 ' @param Month The Month in the specific calendar type.
@@ -356,7 +359,7 @@ Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As
 ' @param Era The era the year is in.
 ' @return A Gregorian version of the date specified.
 '
-Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As cDateTime: End Function
+Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime: End Function
 
 ''
 ' Returns a 4-digit year from a 2-digit number.

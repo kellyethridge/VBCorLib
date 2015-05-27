@@ -46,7 +46,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 ' @see TimeSpanStatic
-' @see cDateTime
+' @see CorDateTime
 '
 Option Explicit
 Implements IObject

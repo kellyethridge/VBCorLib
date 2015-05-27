@@ -118,7 +118,7 @@ Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
                 Equals = CorString.EqualsV(ObjA, ObjB)
             End If
         Case vbDate
-            Equals = Statics.cDateTime.Equals(ObjA, ObjB)
+            Equals = Statics.CorDateTime.Equals(ObjA, ObjB)
         Case vbObject
             If ObjA Is Nothing Then
                 If IsObject(ObjB) Then

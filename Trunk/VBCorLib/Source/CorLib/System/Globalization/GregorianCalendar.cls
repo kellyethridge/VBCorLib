@@ -138,29 +138,29 @@ End Property
 ''
 ' Adds a number of days to the date provided using Gregorian math.
 '
-' @param Time This is a Date or cDateTime object to add a number of days to.
+' @param Time This is a Date or CorDateTime object to add a number of days to.
 ' @param Days The number of days to be added to <i>Time</i>.
 ' @return A <b>cDateTime</b> object with the new date.
 ' @remarks Using this method works exactly like using the <b>AddDays</b>
 ' method on the <b>cDateTime</b> objects.
-' <p>A new cDateTime object is returned with the days added to the
-' original <i>Time</i>. If a Date is passed in, a cDateTime object is
+' <p>A new CorDateTime object is returned with the days added to the
+' original <i>Time</i>. If a Date is passed in, a CorDateTime object is
 ' still returned.</p>
 ' <p>A negative value can be supplied for <i>Days</i>.</p>
 '
-Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As cDateTime
-    Set AddDays = cDateTime.GetcDateTime(Time).AddDays(Days)
+Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
+    Set AddDays = CorDateTime.GetcDateTime(Time).AddDays(Days)
 End Function
 
 ''
 ' Adds a number of hours to the date provided.
 '
-' @param Time A Date or cDateTime object to add a number of hours to.
+' @param Time A Date or CorDateTime object to add a number of hours to.
 ' @param Hours The number of hours to be added to the time portion of a date.
 ' @return Returns a <b>cDateTime</b> with the specified number of hours added.
 '
-Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As cDateTime
-    Set AddHours = cDateTime.GetcDateTime(Time).AddHours(Hours)
+Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
+    Set AddHours = CorDateTime.GetcDateTime(Time).AddHours(Hours)
 End Function
 
 ''
@@ -170,8 +170,8 @@ End Function
 ' @param Milliseconds The number of Milliseconds to be added to <i>Time</i>. This can be negative.
 ' @return Returns a <b>cDateTime</b> with the specified number of Milliseconds added.
 '
-Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As cDateTime
-    Set AddMilliseconds = cDateTime.GetcDateTime(Time).AddMilliseconds(Milliseconds)
+Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
+    Set AddMilliseconds = CorDateTime.GetcDateTime(Time).AddMilliseconds(Milliseconds)
 End Function
 
 ''
@@ -181,8 +181,8 @@ End Function
 ' @param Minutes The number of Minutes to be added to <i>Time</i>. This can be negative.
 ' @return Returns a <b>cDateTime</b> with the specified number of Minutes added.
 '
-Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As cDateTime
-    Set AddMinutes = cDateTime.GetcDateTime(Time).AddMinutes(Minutes)
+Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
+    Set AddMinutes = CorDateTime.GetcDateTime(Time).AddMinutes(Minutes)
 End Function
 
 ''
@@ -192,8 +192,8 @@ End Function
 ' @param Months The number of Months to be added to <i>Time</i>. This can be negative.
 ' @return Returns a <b>cDateTime</b> with the specified number of Months added.
 '
-Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As cDateTime
-    Set AddMonths = cDateTime.GetcDateTime(Time).AddMonths(Months)
+Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
+    Set AddMonths = CorDateTime.GetcDateTime(Time).AddMonths(Months)
 End Function
 
 ''
@@ -203,8 +203,8 @@ End Function
 ' @param Seconds The number of Seconds to be added to <i>Time</i>. This can be negative.
 ' @return Returns a <b>cDateTime</b> with the specified number of Seconds added.
 '
-Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As cDateTime
-    Set AddSeconds = cDateTime.GetcDateTime(Time).AddSeconds(Seconds)
+Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
+    Set AddSeconds = CorDateTime.GetcDateTime(Time).AddSeconds(Seconds)
 End Function
 
 ''
@@ -214,7 +214,7 @@ End Function
 ' @param Weeks The number of Weeks to be added to <i>Time</i>. This can be negative.
 ' @return Returns a <b>cDateTime</b> with the specified number of Weeks added.
 '
-Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As cDateTime
+Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
     Set AddWeeks = AddDays(Time, Weeks * 7)
 End Function
 
@@ -225,8 +225,8 @@ End Function
 ' @param Years The number of Years to be added to <i>Time</i>. This can be negative.
 ' @return Returns a <b>cDateTime</b> with the specified number of Years added.
 '
-Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As cDateTime
-    Set AddYears = cDateTime.GetcDateTime(Time).AddYears(Years)
+Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
+    Set AddYears = CorDateTime.GetcDateTime(Time).AddYears(Years)
 End Function
 
 ''
@@ -236,7 +236,7 @@ End Function
 ' @return The day of the month for the specified date.
 '
 Public Function GetDayOfMonth(ByRef Time As Variant) As Long
-    GetDayOfMonth = cDateTime.GetcDateTime(Time).Day
+    GetDayOfMonth = CorDateTime.GetcDateTime(Time).Day
 End Function
 
 ''
@@ -248,7 +248,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = cDateTime.GetcDateTime(Time).DayOfWeek
+    GetDayOfWeek = CorDateTime.GetcDateTime(Time).DayOfWeek
 End Function
 
 ''
@@ -258,7 +258,7 @@ End Function
 ' @return The day of the year.
 '
 Public Function GetDayOfYear(ByRef Time As Variant) As Long
-    GetDayOfYear = cDateTime.GetcDateTime(Time).DayOfYear
+    GetDayOfYear = CorDateTime.GetcDateTime(Time).DayOfYear
 End Function
 
 ''
@@ -271,7 +271,7 @@ End Function
 '
 Public Function GetDaysInMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Long
     Call VerifyEra(Era)
-    GetDaysInMonth = cDateTime.DaysInMonth(Year, Month)
+    GetDaysInMonth = CorDateTime.DaysInMonth(Year, Month)
 End Function
 
 ''
@@ -285,7 +285,7 @@ End Function
 '
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
     Call VerifyEra(Era)
-    If cDateTime.IsLeapYear(Year) Then
+    If CorDateTime.IsLeapYear(Year) Then
         GetDaysInYear = 366
     Else
         GetDaysInYear = 365
@@ -301,8 +301,8 @@ End Function
 ' the current era of AD. This returns a constant of 1.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    Dim dt As cDateTime
-    Set dt = cDateTime.GetcDateTime(Time)    ' verifies we have a date
+    Dim dt As CorDateTime
+    Set dt = CorDateTime.GetcDateTime(Time)    ' verifies we have a date
     GetEra = 1
 End Function
 
@@ -313,7 +313,7 @@ End Function
 ' @return The hour portion of the time.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = cDateTime.GetcDateTime(Time).Hour
+    GetHour = CorDateTime.GetcDateTime(Time).Hour
 End Function
 
 ''
@@ -323,7 +323,7 @@ End Function
 ' @return The millisecond portion of the time.
 '
 Public Function GetMilliseconds(ByRef Time As Variant) As Double
-    GetMilliseconds = cDateTime.GetcDateTime(Time).Millisecond
+    GetMilliseconds = CorDateTime.GetcDateTime(Time).Millisecond
 End Function
 
 ''
@@ -333,7 +333,7 @@ End Function
 ' @return The minute portion of the time.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = cDateTime.GetcDateTime(Time).Minute
+    GetMinute = CorDateTime.GetcDateTime(Time).Minute
 End Function
 
 ''
@@ -343,7 +343,7 @@ End Function
 ' @return The month portion of the time.
 '
 Public Function GetMonth(ByRef Time As Variant) As Long
-    GetMonth = cDateTime.GetcDateTime(Time).Month
+    GetMonth = CorDateTime.GetcDateTime(Time).Month
 End Function
 
 ''
@@ -367,7 +367,7 @@ End Function
 ' @return The second portion of the time.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = cDateTime.GetcDateTime(Time).Second
+    GetSecond = CorDateTime.GetcDateTime(Time).Second
 End Function
 
 ''
@@ -389,7 +389,7 @@ End Function
 ' @return The year portion of the time.
 '
 Public Function GetYear(ByRef Time As Variant) As Long
-    GetYear = cDateTime.GetcDateTime(Time).Year
+    GetYear = CorDateTime.GetcDateTime(Time).Year
 End Function
 
 ''
@@ -445,11 +445,11 @@ Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As
     Call VerifyEra(Era)
     Call VerifyYear(Year)
     
-    IsLeapYear = cDateTime.IsLeapYear(Year)
+    IsLeapYear = CorDateTime.IsLeapYear(Year)
 End Function
 
 ''
-' Returns a Gregorian cDateTime computed using the specific calendar rules.
+' Returns a Gregorian CorDateTime computed using the specific calendar rules.
 '
 ' @param Year The Year in the specific calendar type.
 ' @param Month The Month in the specific calendar type.
@@ -461,7 +461,7 @@ End Function
 ' @param Era The era the year is in.
 ' @return A Gregorian version of the date specified.
 '
-Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As cDateTime
+Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime
     Call VerifyEra(Era)
     Set ToDateTime = Cor.NewDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond)
 End Function
@@ -554,35 +554,35 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Calendar Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Calendar_AddDays(Time As Variant, ByVal Days As Long) As cDateTime
+Private Function Calendar_AddDays(Time As Variant, ByVal Days As Long) As CorDateTime
     Set Calendar_AddDays = AddDays(Time, Days)
 End Function
 
-Private Function Calendar_AddHours(Time As Variant, ByVal Hours As Long) As cDateTime
+Private Function Calendar_AddHours(Time As Variant, ByVal Hours As Long) As CorDateTime
     Set Calendar_AddHours = AddHours(Time, Hours)
 End Function
 
-Private Function Calendar_AddMilliseconds(Time As Variant, ByVal Milliseconds As Double) As cDateTime
+Private Function Calendar_AddMilliseconds(Time As Variant, ByVal Milliseconds As Double) As CorDateTime
     Set Calendar_AddMilliseconds = AddMilliseconds(Time, Milliseconds)
 End Function
 
-Private Function Calendar_AddMinutes(Time As Variant, ByVal Minutes As Long) As cDateTime
+Private Function Calendar_AddMinutes(Time As Variant, ByVal Minutes As Long) As CorDateTime
     Set Calendar_AddMinutes = AddMinutes(Time, Minutes)
 End Function
 
-Private Function Calendar_AddMonths(Time As Variant, ByVal Months As Long) As cDateTime
+Private Function Calendar_AddMonths(Time As Variant, ByVal Months As Long) As CorDateTime
     Set Calendar_AddMonths = AddMonths(Time, Months)
 End Function
 
-Private Function Calendar_AddSeconds(Time As Variant, ByVal Seconds As Long) As cDateTime
+Private Function Calendar_AddSeconds(Time As Variant, ByVal Seconds As Long) As CorDateTime
     Set Calendar_AddSeconds = AddSeconds(Time, Seconds)
 End Function
 
-Private Function Calendar_AddWeeks(Time As Variant, ByVal Weeks As Long) As cDateTime
+Private Function Calendar_AddWeeks(Time As Variant, ByVal Weeks As Long) As CorDateTime
     Set Calendar_AddWeeks = AddWeeks(Time, Weeks)
 End Function
 
-Private Function Calendar_AddYears(Time As Variant, ByVal Years As Long) As cDateTime
+Private Function Calendar_AddYears(Time As Variant, ByVal Years As Long) As CorDateTime
     Set Calendar_AddYears = AddYears(Time, Years)
 End Function
 
@@ -666,7 +666,7 @@ Private Function Calendar_IsLeapYear(ByVal Year As Long, Optional Era As Variant
     Calendar_IsLeapYear = IsLeapYear(Year, Era)
 End Function
 
-Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As cDateTime
+Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As CorDateTime
     Set Calendar_ToDateTime = ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond, Era)
 End Function
 
@@ -715,8 +715,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

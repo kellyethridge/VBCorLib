@@ -39,11 +39,11 @@ Option Explicit
 Public Function InternalGetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek, ByVal Cal As Calendar) As Long
     Dim FirstWeekLength As Long
     Dim Offset          As Long
-    Dim dt              As cDateTime
+    Dim dt              As CorDateTime
     Dim WholeWeeks      As Long
     Dim doy             As Long
 
-    Set dt = cDateTime.GetcDateTime(Time)
+    Set dt = CorDateTime.GetcDateTime(Time)
 
     FirstWeekLength = FirstDayOfWeek - Cal.GetDayOfWeek(Cal.ToDateTime(Cal.GetYear(dt), 1, 1, 0, 0, 0, 0))
     If FirstWeekLength < 0 Then FirstWeekLength = FirstWeekLength + 7

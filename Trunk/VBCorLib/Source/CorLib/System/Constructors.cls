@@ -453,12 +453,12 @@ End Function
 ' @param Minute The minute of the time portion of the date.
 ' @param Second The second of the time portion of the date.
 ' @param Millisecond The millisecond of the time portion of the date.
-' @param Calendar The calendar to use to create a cDateTime for a specific culture.
-' @param Kind Specifies whether the cDateTime is a UTC, Local, or unspecified time type.
-' @return A new cDateTime object initialized to the specified date and time.
+' @param Calendar The calendar to use to create a CorDateTime for a specific culture.
+' @param Kind Specifies whether the CorDateTime is a UTC, Local, or unspecified time type.
+' @return A new CorDateTime object initialized to the specified date and time.
 '
-Public Function NewDateTime(Optional ByVal Year As Long, Optional ByVal Month As Long, Optional ByVal Day As Long, Optional ByVal Hour As Long, Optional ByVal Minute As Long, Optional ByVal Second As Long, Optional ByVal Millisecond As Long, Optional ByVal Calendar As Calendar, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
-    Set NewDateTime = New cDateTime
+Public Function NewDateTime(Optional ByVal Year As Long, Optional ByVal Month As Long, Optional ByVal Day As Long, Optional ByVal Hour As Long, Optional ByVal Minute As Long, Optional ByVal Second As Long, Optional ByVal Millisecond As Long, Optional ByVal Calendar As Calendar, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As CorDateTime
+    Set NewDateTime = New CorDateTime
     NewDateTime.Init Year, Month, Day, Hour, Minute, Second, Millisecond, Calendar, Kind
 End Function
 
@@ -923,14 +923,14 @@ Friend Function NewRegistryKey(ByVal Key As Long, ByVal Name As String, ByVal Wr
 End Function
 
 ''
-' Allows for quickly creating a cDateTime object from a VB Date value.
+' Allows for quickly creating a CorDateTime object from a VB Date value.
 '
-' @param Value The date of the new cDateTime.
-' @param Kind Specifies whether the cDateTime is a UTC, Local, or unspecified time type.
-' @return A cDateTime object.
+' @param Value The date of the new CorDateTime.
+' @param Kind Specifies whether the CorDateTime is a UTC, Local, or unspecified time type.
+' @return A CorDateTime object.
 '
-Public Function NewDate(ByVal Value As Date, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As cDateTime
-    Set NewDate = Statics.cDateTime.FromOADate(Value, Kind)
+Public Function NewDate(ByVal Value As Date, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As CorDateTime
+    Set NewDate = Statics.CorDateTime.FromOADate(Value, Kind)
 End Function
 
 ''
@@ -1025,7 +1025,7 @@ End Function
 Public Function NewTime(ByVal DateValue As Variant) As TimeSpan
     Select Case VarType(DateValue)
         Case vbDate:    Set NewTime = NewTimeSpan(, Hour(DateValue), Minute(DateValue), Second(DateValue))
-        Case Else:      Set NewTime = cDateTime.GetcDateTime(DateValue).TimeOfDay
+        Case Else:      Set NewTime = CorDateTime.GetcDateTime(DateValue).TimeOfDay
     End Select
 End Function
 
