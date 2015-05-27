@@ -24,17 +24,19 @@ Attribute VB_Name = "TimeConstants"
 '
 Option Explicit
 
-Public Const TICKS_PER_MILLISECOND     As Long = 10000
-Public Const SECONDS_PER_MINUTE        As Long = 60
-Public Const MINUTES_PER_HOUR          As Long = 60
-Public Const HOURS_PER_DAY             As Long = 24
+Public Const TicksPerMillisecond    As Long = 10000
+Public Const SecondsPerMinute       As Long = 60
+Public Const MinutesPerHour         As Long = 60
+Public Const HoursPerDay            As Long = 24
+Public Const DaysPerYear            As Long = 365
+Public Const MonthsPerYear          As Long = 12
+Public Const DaysPer4Years          As Long = DaysPerYear * 4 + 1
 
-Public Const MILLISECONDS_PER_TICK     As Currency = 0.0001@
-Public Const MILLISECONDS_PER_SECOND   As Long = 1000
-Public Const MILLISECONDS_PER_MINUTE   As Currency = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Public Const MILLISECONDS_PER_HOUR     As Currency = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Public Const MILLISECONDS_PER_DAY      As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
+Public Const MillisecondsPerTick    As Currency = 0.0001@
+Public Const MillisecondsPerSecond  As Long = 1000
+Public Const MillisecondsPerMinute  As Currency = MillisecondsPerSecond * SecondsPerMinute
+Public Const MillisecondsPerHour    As Currency = MillisecondsPerMinute * MinutesPerHour
+Public Const MillisecondsPerDay     As Currency = MillisecondsPerHour * HoursPerDay
 
-Public Const MONTHS_PER_YEAR           As Long = 12
-Public Const DAYS_TO_18991231          As Long = 693593
-Public Const MILLISECONDS_TO_18991231  As Currency = 1@ * DAYS_TO_18991231 * MILLISECONDS_PER_DAY
+Public Const DaysTo1899             As Long = 693593
+Public Const MillisecondsTo1899     As Currency = 1@ * DaysTo1899 * MillisecondsPerDay

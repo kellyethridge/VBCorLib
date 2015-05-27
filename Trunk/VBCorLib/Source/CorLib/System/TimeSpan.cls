@@ -52,7 +52,7 @@ Option Explicit
 Implements IObject
 Implements IComparable
 
-Private Const PROP_MILLISECONDS As String = "Milliseconds"
+Private Const PropMilliseconds As String = "Milliseconds"
 Private Const DEF_TIMESPAN      As Long = 0
 
 Private mMilliseconds As Currency
@@ -105,7 +105,7 @@ End Property
 ' @remarks The returned duration can contain a fractional
 ' part if necessary to represent the duration.
 Public Property Get TotalSeconds() As Double
-    TotalSeconds = mMilliseconds / MILLISECONDS_PER_SECOND
+    TotalSeconds = mMilliseconds / MillisecondsPerSecond
 End Property
 
 ''
@@ -115,7 +115,7 @@ End Property
 ' @remarks The returned duration can contain a fractional
 ' part if necessary to represent the duration.
 Public Property Get TotalMinutes() As Double
-    TotalMinutes = mMilliseconds / MILLISECONDS_PER_MINUTE
+    TotalMinutes = mMilliseconds / MillisecondsPerMinute
 End Property
 
 ''
@@ -123,7 +123,7 @@ End Property
 '
 ' @return This timespan in hours.
 Public Property Get TotalHours() As Double
-    TotalHours = mMilliseconds / MILLISECONDS_PER_HOUR
+    TotalHours = mMilliseconds / MillisecondsPerHour
 End Property
 
 ''
@@ -133,7 +133,7 @@ End Property
 ' @remarks The returned duration can contain a fractional
 ' part if necessary to represent the duration.
 Public Property Get TotalDays() As Double
-    TotalDays = mMilliseconds / MILLISECONDS_PER_DAY
+    TotalDays = mMilliseconds / MillisecondsPerDay
 End Property
 
 ''
@@ -143,7 +143,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Milliseconds() As Long
-    Milliseconds = AsLong(mMilliseconds * MILLISECONDS_PER_TICK) Mod 1000
+    Milliseconds = AsLong(mMilliseconds * MillisecondsPerTick) Mod 1000
 End Property
 
 ''
@@ -153,7 +153,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Seconds() As Long
-    Seconds = Fix(mMilliseconds / MILLISECONDS_PER_SECOND) Mod 60
+    Seconds = Fix(mMilliseconds / MillisecondsPerSecond) Mod 60
 End Property
 
 ''
@@ -163,7 +163,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Minutes() As Long
-    Minutes = Fix(mMilliseconds / MILLISECONDS_PER_MINUTE) Mod 60
+    Minutes = Fix(mMilliseconds / MillisecondsPerMinute) Mod 60
 End Property
 
 ''
@@ -173,7 +173,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Hours() As Long
-    Hours = Fix(mMilliseconds / MILLISECONDS_PER_HOUR) Mod 24
+    Hours = Fix(mMilliseconds / MillisecondsPerHour) Mod 24
 End Property
 
 ''
@@ -183,7 +183,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Days() As Long
-    Days = Fix(mMilliseconds / MILLISECONDS_PER_DAY)
+    Days = Fix(mMilliseconds / MillisecondsPerDay)
 End Property
 
 ''
@@ -192,7 +192,7 @@ End Property
 ' @return The duration in ticks
 ' @remarks A tick is defined as 100 nanoseconds, or 1/10000 of a millisecond.
 Public Property Get Ticks() As Variant
-    Ticks = CDec(mMilliseconds) * TICKS_PER_MILLISECOND
+    Ticks = CDec(mMilliseconds) * TicksPerMillisecond
 End Property
 
 ''
@@ -238,22 +238,22 @@ Public Function ToString() As String
     End If
     
     Dim Days As Long
-    Days = Int(ms / MILLISECONDS_PER_DAY)
+    Days = Int(ms / MillisecondsPerDay)
     If Days <> 0 Then
         Output.Append Days
         Output.AppendChar vbPeriodChar
     End If
 
-    AppendComponent Output, Int(ms / MILLISECONDS_PER_HOUR) Mod HOURS_PER_DAY, 2
+    AppendComponent Output, Int(ms / MillisecondsPerHour) Mod HoursPerDay, 2
     Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MILLISECONDS_PER_MINUTE) Mod MINUTES_PER_HOUR, 2
+    AppendComponent Output, Int(ms / MillisecondsPerMinute) Mod MinutesPerHour, 2
     Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MILLISECONDS_PER_SECOND) Mod SECONDS_PER_MINUTE, 2
+    AppendComponent Output, Int(ms / MillisecondsPerSecond) Mod SecondsPerMinute, 2
     
     Dim MillisecondComponent    As Long
     Dim TicksComponent          As Long
-    MillisecondComponent = Modulus(ms, MILLISECONDS_PER_SECOND)
-    TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TICKS_PER_MILLISECOND
+    MillisecondComponent = Modulus(ms, MillisecondsPerSecond)
+    TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TicksPerMillisecond
     
     If MillisecondComponent <> 0 Then
         Output.AppendChar vbPeriodChar
@@ -300,7 +300,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Days As Long, ByVal Hours As Long, ByVal Minutes As Long, ByVal Seconds As Long, ByVal Milliseconds As Long)
-    InitFromMilliseconds (Days * MILLISECONDS_PER_DAY) + (Hours * MILLISECONDS_PER_HOUR) + (Minutes * MILLISECONDS_PER_MINUTE) + (Seconds * MILLISECONDS_PER_SECOND) + Milliseconds
+    InitFromMilliseconds (Days * MillisecondsPerDay) + (Hours * MillisecondsPerHour) + (Minutes * MillisecondsPerMinute) + (Seconds * MillisecondsPerSecond) + Milliseconds
 End Sub
 
 Friend Sub InitFromMilliseconds(ByVal Value As Currency)
@@ -324,11 +324,11 @@ End Sub
 '   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    mMilliseconds = PropBag.ReadProperty(PROP_MILLISECONDS, DEF_TIMESPAN)
+    mMilliseconds = PropBag.ReadProperty(PropMilliseconds, DEF_TIMESPAN)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_MILLISECONDS, mMilliseconds
+    PropBag.WriteProperty PropMilliseconds, mMilliseconds
 End Sub
 
 

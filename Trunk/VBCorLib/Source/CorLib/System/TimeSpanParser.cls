@@ -33,14 +33,14 @@ Attribute VB_Exposed = False
 '
 
 Option Explicit
-Private Const MILLISECONDS_PER_SECOND       As Long = 1000
-Private Const SECONDS_PER_MINUTE            As Long = 60
-Private Const MINUTES_PER_HOUR              As Long = 60
-Private Const HOURS_PER_DAY                 As Long = 24
+Private Const MillisecondsPerSecond       As Long = 1000
+Private Const SecondsPerMinute            As Long = 60
+Private Const MinutesPerHour              As Long = 60
+Private Const HoursPerDay                 As Long = 24
 
-Private Const MILLISECONDS_PER_MINUTE       As Long = MILLISECONDS_PER_SECOND * SECONDS_PER_MINUTE
-Private Const MILLISECONDS_PER_HOUR         As Long = MILLISECONDS_PER_MINUTE * MINUTES_PER_HOUR
-Private Const MILLISECONDS_PER_DAY          As Currency = MILLISECONDS_PER_HOUR * HOURS_PER_DAY
+Private Const MillisecondsPerMinute       As Long = MillisecondsPerSecond * SecondsPerMinute
+Private Const MillisecondsPerHour         As Long = MillisecondsPerMinute * MinutesPerHour
+Private Const MillisecondsPerDay          As Currency = MillisecondsPerHour * HoursPerDay
 
 Public Enum ParseError
     None
@@ -84,7 +84,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
             If Not TryParseNumber(MaxDays, DaysParsed) Then
                 Exit Function
             End If
-            Result = Result + DaysParsed * MILLISECONDS_PER_DAY
+            Result = Result + DaysParsed * MillisecondsPerDay
             
             If Char = vbPeriodChar Then
                 NextChar
@@ -177,7 +177,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
         Exit Function
     End If
     
-    Result = HoursParsed * MILLISECONDS_PER_HOUR
+    Result = HoursParsed * MillisecondsPerHour
     
     ' when parsing time we require at least hours and minutes.
     If Char <> vbColonChar Then
@@ -193,7 +193,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
         Exit Function
     End If
     
-    Result = Result + MinutesParsed * MILLISECONDS_PER_MINUTE
+    Result = Result + MinutesParsed * MillisecondsPerMinute
     
     ' check for possible seconds
     If Char = vbColonChar Then
@@ -209,7 +209,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
                 Exit Function
             End If
             
-            Result = Result + SecondsParsed * MILLISECONDS_PER_SECOND
+            Result = Result + SecondsParsed * MillisecondsPerSecond
         End If
         
         If Char = vbPeriodChar Then

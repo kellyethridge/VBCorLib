@@ -339,12 +339,12 @@ Friend Function GetMilliseconds(ByVal d As Date) As Currency
     Dim Days As Currency
     
     If d < 0# Then
-        Days = Fix(d * MILLISECONDS_PER_DAY - 0.5)
-        Days = Days - Modulus(Days, MILLISECONDS_PER_DAY) * 2
+        Days = Fix(d * MillisecondsPerDay - 0.5)
+        Days = Days - Modulus(Days, MillisecondsPerDay) * 2
     Else
-        Days = Fix(d * MILLISECONDS_PER_DAY + 0.5)
+        Days = Fix(d * MillisecondsPerDay + 0.5)
     End If
-    GetMilliseconds = Days + MILLISECONDS_TO_18991231
+    GetMilliseconds = Days + MillisecondsTo1899
 End Function
 
 Friend Function AscDateTime(ByVal d As Date) As cDateTime
