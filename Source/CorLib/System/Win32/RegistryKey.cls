@@ -567,10 +567,10 @@ End Function
 ''
 ' Returns the last time the subkey was written to.
 '
-' @return A cDateTime object.
-' @remarks This method returns cDateTime.MinValue on Windows 95,98 and ME.
+' @return A CorDateTime object.
+' @remarks This method returns CorDateTime.MinValue on Windows 95,98 and ME.
 '
-Public Function GetLastWriteTime() As cDateTime
+Public Function GetLastWriteTime() As CorDateTime
     Call VerifyHandle
     
     If Environment.IsNT Then
@@ -580,9 +580,9 @@ Public Function GetLastWriteTime() As cDateTime
         Result = Api.RegQueryInfoKey(mHKey, vbNullString, 0, 0, 0, 0, 0, 0, 0, 0, 0, VarPtr(Time))
         If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey"
         
-        Set GetLastWriteTime = cDateTime.FromFileTime(Time)
+        Set GetLastWriteTime = CorDateTime.FromFileTime(Time)
     Else
-        Set GetLastWriteTime = cDateTime.MinValue
+        Set GetLastWriteTime = CorDateTime.MinValue
     End If
 End Function
 

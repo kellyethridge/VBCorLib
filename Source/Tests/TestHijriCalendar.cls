@@ -112,12 +112,12 @@ Public Sub TestAddDays()
 End Sub
 
 Public Sub TestDayOfYear()
-    Dim d As cDateTime
+    Dim d As CorDateTime
     Dim sr As StreamReader
     Dim i As Long
     
     Set sr = File.OpenText(App.Path & "\Dummy Test Files\TesthijriCalendar_DayOfYear.txt")
-    Set d = cDateTime.FromOADate(#1/1/2000#)
+    Set d = CorDateTime.FromOADate(#1/1/2000#)
     
     For i = 1 To 500
         Assert.AreEqual CLng(sr.ReadLine), cal.GetDayOfYear(d)
@@ -129,11 +129,11 @@ End Sub
 Public Sub TestGetWeekOfYear()
     Dim sr As StreamReader
     Dim i As Long
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Dim j As Long
 
     Set sr = NewStreamReader(App.Path & "\Dummy Test Files\TestHijriCalendar_WeekOfYear.txt")
-    Set dt = cDateTime.FromOADate(#1/1/2000#)
+    Set dt = CorDateTime.FromOADate(#1/1/2000#)
 
     ' tests using CalendarWeekRule.FirstDay and first day of week of DayOfWeek.Friday
     For i = 1 To 366

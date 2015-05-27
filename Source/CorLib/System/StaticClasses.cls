@@ -203,11 +203,11 @@ End Property
 ' Returns a reference used to access static methods of the <b>cDateTime</b> class.
 '
 ' @return A reference that can be used to access static methods of the <b>cDateTime</b> class.
-' @see cDateTime
+' @see CorDateTime
 ' @see cDateTimeStatic
 '
-Public Property Get cDateTime() As cDateTimeStatic
-    Set cDateTime = Statics.cDateTime
+Public Property Get CorDateTime() As cDateTimeStatic
+    Set CorDateTime = Statics.CorDateTime
 End Property
 
 ''

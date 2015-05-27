@@ -47,8 +47,8 @@ Option Explicit
 Implements IObject
 
 Private mDelta      As TimeSpan
-Private mStartTime  As cDateTime
-Private mEndTime    As cDateTime
+Private mStartTime  As CorDateTime
+Private mEndTime    As CorDateTime
 
 
 ''
@@ -56,7 +56,7 @@ Private mEndTime    As cDateTime
 '
 ' @return The date of the start of daylight savings.
 '
-Public Property Get StartTime() As cDateTime
+Public Property Get StartTime() As CorDateTime
     Set StartTime = mStartTime
 End Property
 
@@ -65,7 +65,7 @@ End Property
 '
 ' @return The date of the end of daylight savings.
 '
-Public Property Get EndTime() As cDateTime
+Public Property Get EndTime() As CorDateTime
     Set EndTime = mEndTime
 End Property
 
@@ -113,8 +113,8 @@ End Function
 Friend Sub Init(ByRef StartTime As Variant, ByRef EndTime As Variant, ByVal Delta As TimeSpan)
     If Delta Is Nothing Then Set Delta = TimeSpan.Zero
     Set mDelta = Delta
-    Set mStartTime = cDateTime.GetcDateTime(StartTime)
-    Set mEndTime = cDateTime.GetcDateTime(EndTime)
+    Set mStartTime = CorDateTime.GetcDateTime(StartTime)
+    Set mEndTime = CorDateTime.GetcDateTime(EndTime)
 End Sub
 
 

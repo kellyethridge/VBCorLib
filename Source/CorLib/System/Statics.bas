@@ -41,7 +41,7 @@ Public Buffer                   As New Buffer
 Public NumberFormatInfo         As New NumberFormatInfoStatic
 Public BitConverter             As New BitConverter
 Public TimeSpan                 As New TimeSpanStatic
-Public cDateTime                As New cDateTimeStatic
+Public CorDateTime                As New cDateTimeStatic
 Public DateTimeFormatInfo       As New DateTimeFormatInfoStatic
 Public CultureTable             As New CultureTable
 Public CultureInfo              As New CultureInfoStatic

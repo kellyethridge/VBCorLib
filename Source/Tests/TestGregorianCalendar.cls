@@ -30,11 +30,11 @@ Public Sub TestGetWeekOfYear()
     Dim cal As New GregorianCalendar
     Dim sr As StreamReader
     Dim i As Long
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Dim j As Long
     
     Set sr = NewStreamReader(App.Path & "\Dummy Test Files\TestGregorianCalendar_WeekOfYear.txt")
-    Set dt = cDateTime.FromOADate(#1/1/2004#)
+    Set dt = CorDateTime.FromOADate(#1/1/2004#)
     
     ' tests using CalendarWeekRule.FirstDay and first day of week of DayOfWeek.Saturday
     For i = 1 To 366

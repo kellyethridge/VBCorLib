@@ -28,12 +28,12 @@ Public Sub Setup()
 End Sub
 
 Public Sub TestAddDays()
-    Dim jcdt As cDateTime
-    Dim gcdt As cDateTime
+    Dim jcdt As CorDateTime
+    Dim gcdt As CorDateTime
     Dim i As Long
     
-    Set jcdt = cDateTime.MinValue
-    Set gcdt = cDateTime.MinValue
+    Set jcdt = CorDateTime.MinValue
+    Set gcdt = CorDateTime.MinValue
     
     For i = 1 To 2000
         Assert.IsTrue jcdt.EqualTo(gcdt), CorString.Format("JC {0} <> GC {1}", jcdt, gcdt)
@@ -43,10 +43,10 @@ Public Sub TestAddDays()
 End Sub
 
 Public Sub TestAddMonths()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Dim i As Long
     
-    Set dt = cDateTime.FromOADate(#1/31/1000#)
+    Set dt = CorDateTime.FromOADate(#1/31/1000#)
     For i = 1 To 100
         Set dt = jc.AddMonths(dt, i)
     Next i
@@ -54,9 +54,9 @@ Public Sub TestAddMonths()
 End Sub
 
 Public Sub TestAddMonthsOnLeapYear()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     
-    Set dt = cDateTime.FromOADate(#1/31/1000#)
+    Set dt = CorDateTime.FromOADate(#1/31/1000#)
     Set dt = jc.AddMonths(dt, 1)
     Assert.AreEqual 3, dt.Month, "Should return month of 3."
     Assert.AreEqual 3, dt.Day, "Should return day of 3."
@@ -86,9 +86,9 @@ End Sub
 
 Public Sub TestGetDayOfYear()
     Dim i As Long
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     
-    Set dt = cDateTime.FromOADate(#1/1/1000#)
+    Set dt = CorDateTime.FromOADate(#1/1/1000#)
     For i = 360 To 369
         Assert.AreEqual (i Mod 365) + 1, jc.GetDayOfYear(dt)
         Set dt = jc.AddDays(dt, 1)
@@ -98,7 +98,7 @@ Public Sub TestGetDayOfYear()
 End Sub
 
 Public Sub TestToDateTime()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     
     Set dt = jc.ToDateTime(1000, 2, 29, 1, 1, 1, 1)
     Assert.AreEqual 3, dt.Month
@@ -109,11 +109,11 @@ End Sub
 Public Sub TestGetWeekOfYear()
     Dim sr As StreamReader
     Dim i As Long
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     Dim j As Long
     
     Set sr = NewStreamReader(App.Path & "\Dummy Test Files\TestJulianCalendar_WeekOfYear.txt")
-    Set dt = cDateTime.FromOADate(#1/1/1000#)
+    Set dt = CorDateTime.FromOADate(#1/1/1000#)
     
     ' tests using CalendarWeekRule.FirstDay and first day of week of DayOfWeek.Friday
     For i = 1 To 366

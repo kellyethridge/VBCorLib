@@ -47,11 +47,11 @@ End Sub
 
 Public Sub TestGetYear()
     Dim sr As StreamReader
-    Dim d As cDateTime
+    Dim d As CorDateTime
     Dim i As Long
     
     Set sr = File.OpenText(App.Path & "\dummy test files\hebrewcalendar_getyear.txt")
-    Set d = cDateTime.FromOADate(#1/1/1950#)
+    Set d = CorDateTime.FromOADate(#1/1/1950#)
     
     For i = 1 To 100
         Assert.AreEqual CLng(sr.ReadLine), cal.GetYear(d)
@@ -84,10 +84,10 @@ End Sub
 Public Sub TestGetMonth()
     Dim sr As StreamReader
     Dim i As Long
-    Dim d As cDateTime
+    Dim d As CorDateTime
     
     Set sr = File.OpenText(App.Path & "\dummy test files\HebrewCalendar_GetMonth.txt")
-    Set d = cDateTime.FromOADate(#1/1/2000#)
+    Set d = CorDateTime.FromOADate(#1/1/2000#)
     
     For i = 1 To 100
         Assert.AreEqual CLng(sr.ReadLine), cal.GetMonth(d), "Incorrect month for #" & d.ToShortDateString & "#"

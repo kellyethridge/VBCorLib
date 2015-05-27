@@ -222,8 +222,8 @@ End Function
 ' @return A TimeSpan representing the time of day.
 '
 Public Function FromDate(ByRef Value As Variant) As TimeSpan
-    Dim dt As cDateTime
-    Set dt = cDateTime.GetcDateTime(Value)
+    Dim dt As CorDateTime
+    Set dt = CorDateTime.GetcDateTime(Value)
     Set FromDate = dt.TimeOfDay
 End Function
 

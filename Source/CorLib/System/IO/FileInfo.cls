@@ -57,9 +57,9 @@ Private mOriginalFileName   As String
 Private mIsDirty            As Boolean
 Private mFileAttributes     As FileAttributes
 Private mFileSize           As Currency
-Private mCreationTime       As cDateTime
-Private mLastAccessTime     As cDateTime
-Private mLastWriteTime      As cDateTime
+Private mCreationTime       As CorDateTime
+Private mLastAccessTime     As CorDateTime
+Private mLastWriteTime      As CorDateTime
 
 
 
@@ -89,7 +89,7 @@ Public Property Let Attributes(ByVal RHS As FileAttributes)
 End Property
 
 ''
-' Returns the creation time as a cDateTime object.
+' Returns the creation time as a CorDateTime object.
 '
 ' @return The creation time of the file.
 '
@@ -101,19 +101,19 @@ End Property
 ''
 ' Sets the creation time of the file.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTime(ByVal RHS As Variant)
-    Set Me.CreationTime = cDateTime.GetcDateTime(RHS)
+    Set Me.CreationTime = CorDateTime.GetcDateTime(RHS)
 End Property
 
 ''
 ' Sets the creation time of the file.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set CreationTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+    If Not TypeOf RHS Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
 
     Set mCreationTime = RHS
@@ -134,19 +134,19 @@ End Property
 ''
 ' Sets the creation time of the file in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTimeUtc(ByVal RHS As Variant)
-    Set Me.CreationTimeUtc = cDateTime.GetcDateTime(RHS)
+    Set Me.CreationTimeUtc = CorDateTime.GetcDateTime(RHS)
 End Property
 
 ''
 ' Sets the creation time of the file in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set CreationTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+    If Not TypeOf RHS Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTimeUtc")
 
     Call File.SetCreationTimeUtc(mFileName, RHS)
@@ -156,7 +156,7 @@ End Property
 ''
 ' Returns the last time the file was accessed.
 '
-' @return A cDateTime object of the last access time.
+' @return A CorDateTime object of the last access time.
 '
 Public Property Get LastAccessTime() As Variant
     If mIsDirty Then Refresh
@@ -166,19 +166,19 @@ End Property
 ''
 ' Sets the time the file was last accessed.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = cDateTime.GetcDateTime(RHS)
+    Set Me.LastAccessTime = CorDateTime.GetcDateTime(RHS)
 End Property
 
 ''
 ' Sets the time the file was last accessed.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set LastAccessTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+    If Not TypeOf RHS Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
         
     Set mLastAccessTime = RHS
@@ -189,7 +189,7 @@ End Property
 ''
 ' Returns the time the file was last accessed in UTC time.
 '
-' @return A cDateTime object of the last accessed UTC time.
+' @return A CorDateTime object of the last accessed UTC time.
 '
 Public Property Get LastAccessTimeUtc() As Variant
     If mIsDirty Then Refresh
@@ -199,19 +199,19 @@ End Property
 ''
 ' Sets the time the file was last accessed in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new UTC time.
+' @param RHS A Date or CorDateTime object of the new UTC time.
 '
 Public Property Let LastAccessTimeUtc(ByVal RHS As Variant)
-    Set Me.LastAccessTimeUtc = cDateTime.GetcDateTime(RHS)
+    Set Me.LastAccessTimeUtc = CorDateTime.GetcDateTime(RHS)
 End Property
 
 ''
 ' Sets the time the file was last accessed in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new UTC time.
+' @param RHS A Date or CorDateTime object of the new UTC time.
 
 Public Property Set LastAccessTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+    If Not TypeOf RHS Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTimeUtc")
     
     Call File.SetLastAccessTimeUtc(mFileName, RHS)
@@ -221,7 +221,7 @@ End Property
 ''
 ' Returns the last time the file was written to.
 '
-' @return A cDateTime object of the last time the file was written to.
+' @return A CorDateTime object of the last time the file was written to.
 '
 Public Property Get LastWriteTime() As Variant
     If mIsDirty Then Refresh
@@ -231,19 +231,19 @@ End Property
 ''
 ' Sets the last time the file was written to.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = cDateTime.GetcDateTime(RHS)
+    Set Me.LastAccessTime = CorDateTime.GetcDateTime(RHS)
 End Property
 
 ''
 ' Sets the last time the file was written to.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set LastWriteTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+    If Not TypeOf RHS Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastWriteTime")
     
     Set mLastWriteTime = RHS
@@ -254,7 +254,7 @@ End Property
 ''
 ' Returns the last time the file was accessed in UTC time.
 '
-' @return A cDateTime object of the last time the file was written to.
+' @return A CorDateTime object of the last time the file was written to.
 '
 Public Property Get LastWriteTimeUtc() As Variant
     If mIsDirty Then Refresh
@@ -264,19 +264,19 @@ End Property
 ''
 ' Sets the last the time file was written to in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTimeUtc(ByVal RHS As Variant)
-    Set Me.LastWriteTimeUtc = cDateTime.GetcDateTime(RHS)
+    Set Me.LastWriteTimeUtc = CorDateTime.GetcDateTime(RHS)
 End Property
 
 ''
 ' Sets the last time the file was written to in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set LastWriteTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is cDateTime Then _
+    If Not TypeOf RHS Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTimeUtc")
     
     Call File.SetLastWriteTimeUtc(mFileName, RHS)
@@ -365,9 +365,9 @@ Public Sub Refresh()
     
     With Data
         mFileAttributes = .dwFileAttributes
-        Set mCreationTime = cDateTime.FromFileTime(.ftCreationTime)
-        Set mLastAccessTime = cDateTime.FromFileTime(.ftLastAccessTime)
-        Set mLastWriteTime = cDateTime.FromFileTime(.ftLastWriteTime)
+        Set mCreationTime = CorDateTime.FromFileTime(.ftCreationTime)
+        Set mLastAccessTime = CorDateTime.FromFileTime(.ftLastAccessTime)
+        Set mLastWriteTime = CorDateTime.FromFileTime(.ftLastWriteTime)
     End With
     
     ' The nFileSizeLow and hFileSizeHigh are in reverse order in

@@ -48,9 +48,9 @@ Private mPath           As String
 Private mOriginalPath   As String
 Private mIsDirty        As Boolean
 Private mFileAttributes As Long
-Private mCreationTime   As cDateTime
-Private mLastAccessTime As cDateTime
-Private mLastWriteTime  As cDateTime
+Private mCreationTime   As CorDateTime
+Private mLastAccessTime As CorDateTime
+Private mLastWriteTime  As CorDateTime
 
 
 ''
@@ -104,7 +104,7 @@ End Property
 ''
 ' Returns the creation time for this directory in local time.
 '
-' @return A cDateTime object representing the creation time for this directory.
+' @return A CorDateTime object representing the creation time for this directory.
 ' @remarks The time returned is the UTC time with the timezone offset applied.
 ' For Pacific Coast, a -8 hours is added to the time before returning.
 '
@@ -123,18 +123,18 @@ End Property
 ' being written to the directory.
 '
 Public Property Let CreationTime(ByVal Value As Variant)
-    Set CreationTime = cDateTime.GetcDateTime(Value)
+    Set CreationTime = CorDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the creation time for the directory in local time.
 '
-' @param Value A cDateTime object of the new time.
+' @param Value A CorDateTime object of the new time.
 ' @remarks The time has the UTC timezone offset applied to it before
 ' being written to the directory.
 '
 Public Property Set CreationTime(ByVal Value As Variant)
-    If Not TypeOf Value Is cDateTime Then _
+    If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
     
     Directory.SetCreationTime mPath, Value
@@ -144,7 +144,7 @@ End Property
 ''
 ' Returns the creation time as UTC time.
 '
-' @return A cDateTime object of the UTC time.
+' @return A CorDateTime object of the UTC time.
 ' @remarks The time returned is the time on the directory without
 ' any offsets being applied.
 '
@@ -163,18 +163,18 @@ End Property
 ' being written to the directory.
 '
 Public Property Let CreationTimeUtc(ByVal Value As Variant)
-    Set Me.CreationTimeUtc = cDateTime.GetcDateTime(Value)
+    Set Me.CreationTimeUtc = CorDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the creation time as UTC time.
 '
-' @param Value A cDateTime object of the new time.
+' @param Value A CorDateTime object of the new time.
 ' @remarks The time has the UTC timezone offset removed from it before
 ' being written to the directory.
 '
 Public Property Set CreationTimeUtc(ByVal Value As Variant)
-    If Not TypeOf Value Is cDateTime Then _
+    If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
 
     Directory.SetCreationTimeUtc mPath, Value
@@ -184,7 +184,7 @@ End Property
 ''
 ' Returns the last time the directory was accessed in local time.
 '
-' @return A cDateTime object of the time.
+' @return A CorDateTime object of the time.
 ' @remarks The returned time is the UTC time with the UTC timezone offset applied.
 '
 Public Property Get LastAccessTime() As Variant
@@ -197,19 +197,19 @@ End Property
 ''
 ' Sets the time the directory was last accessed in local time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTime(ByVal Value As Variant)
-    Set Me.LastAccessTime = cDateTime.GetcDateTime(Value)
+    Set Me.LastAccessTime = CorDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the time the directory was last accessed in local time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Set LastAccessTime(ByVal Value As Variant)
-    If Not TypeOf Value Is cDateTime Then _
+    If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
     Directory.SetLastAccessTime mPath, Value
@@ -219,7 +219,7 @@ End Property
 ''
 ' Returns the last time the directory was accessed in UTC time.
 '
-' @return a cDateTime object of the time.
+' @return a CorDateTime object of the time.
 '
 Public Property Get LastAccessTimeUtc() As Variant
     If mIsDirty Then
@@ -231,19 +231,19 @@ End Property
 ''
 ' Sets the last time the directory was accessed in UTC time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTimeUtc(ByVal Value As Variant)
-    Set Me.LastAccessTimeUtc = cDateTime.GetcDateTime(Value)
+    Set Me.LastAccessTimeUtc = CorDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the last time the directory was accessed in UTC time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Set LastAccessTimeUtc(ByVal Value As Variant)
-    If Not TypeOf Value Is cDateTime Then _
+    If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
     Directory.SetLastAccessTimeUtc mPath, Value
@@ -253,7 +253,7 @@ End Property
 ''
 ' Returns the last time the directory was written to in local time.
 '
-' @return A cDateTime object of the time.
+' @return A CorDateTime object of the time.
 '
 Public Property Get LastWriteTime() As Variant
     If mIsDirty Then
@@ -265,19 +265,19 @@ End Property
 ''
 ' Sets the last time the directory was written to in local time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTime(ByVal Value As Variant)
-    Set LastWriteTime = cDateTime.GetcDateTime(Value)
+    Set LastWriteTime = CorDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the last time the directory was written to in local time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Set LastWriteTime(ByVal Value As Variant)
-    If Not TypeOf Value Is cDateTime Then _
+    If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastWriteTime")
     
     Directory.SetLastWriteTime mPath, Value
@@ -287,7 +287,7 @@ End Property
 ''
 ' Returns the last time the directory was written to in UTC time.
 '
-' @return A cDateTime object of the time.
+' @return A CorDateTime object of the time.
 '
 Public Property Get LastWriteTimeUtc() As Variant
     If mIsDirty Then
@@ -299,19 +299,19 @@ End Property
 ''
 ' Sets the last time the directory was written to in UTC time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTimeUtc(ByVal Value As Variant)
-    Set LastWriteTimeUtc = cDateTime.GetcDateTime(Value)
+    Set LastWriteTimeUtc = CorDateTime.GetcDateTime(Value)
 End Property
 
 ''
 ' Sets the last time the directory was written to in UTC time.
 '
-' @param Value A Date or cDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Set LastWriteTimeUtc(ByVal Value As Variant)
-    If Not TypeOf Value Is cDateTime Then _
+    If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
     Directory.SetLastWriteTimeUtc mPath, Value
@@ -332,9 +332,9 @@ Public Sub Refresh()
     
     With Data
         mFileAttributes = .dwFileAttributes
-        Set mCreationTime = cDateTime.FromFileTime(.ftCreationTime)
-        Set mLastAccessTime = cDateTime.FromFileTime(.ftLastAccessTime)
-        Set mLastWriteTime = cDateTime.FromFileTime(.ftLastWriteTime)
+        Set mCreationTime = CorDateTime.FromFileTime(.ftCreationTime)
+        Set mLastAccessTime = CorDateTime.FromFileTime(.ftLastAccessTime)
+        Set mLastWriteTime = CorDateTime.FromFileTime(.ftLastWriteTime)
     End With
     
     mIsDirty = False

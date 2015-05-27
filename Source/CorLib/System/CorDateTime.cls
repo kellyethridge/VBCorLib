@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "cDateTime"
+Attribute VB_Name = "CorDateTime"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -32,18 +32,18 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: cDateTime
+' Module: CorDateTime
 '
 
 ''
 ' Represents a point in time.
 '
-' @remarks The cDateTime class can represent a point in time from
+' @remarks The CorDateTime class can represent a point in time from
 ' 1/1/0001 12:00:00 AM to 12/31/9999 11:59:59 PM. The time is represented
 ' in a gregorian calendar set.
 '
 ' <pre>
-' Dim dt As cDateTime
+' Dim dt As CorDateTime
 ' Set dt = NewDate(#1/1/2005 8:30:00AM#")
 ' </pre>
 '
@@ -84,7 +84,7 @@ Private mKind           As DateTimeKind
 
 
 ''
-' Returns the kind of cDateTime.
+' Returns the kind of CorDateTime.
 '
 ' @return The kind.
 ' @remarks A <b>cDateTime</b> can be Universal Coordinated Time (UTC),
@@ -95,7 +95,7 @@ Public Property Get Kind() As DateTimeKind
 End Property
 
 ''
-' Returns if this cDateTime instance is currently in daylight savings time.
+' Returns if this CorDateTime instance is currently in daylight savings time.
 '
 ' @return If this instance is in daylight savings.
 ' @remarks This uses the current time zone settings of the system to
@@ -252,8 +252,8 @@ End Property
 ' @remarks The date portion does not include the time portion from the
 ' original date representation. The new date will have a time of 12:00AM.
 '
-Public Property Get DateOnly() As cDateTime
-    Set DateOnly = cDateTime.FromMilliseconds(mMilliseconds - Modulus(mMilliseconds, MillisecondsPerDay))
+Public Property Get DateOnly() As CorDateTime
+    Set DateOnly = CorDateTime.FromMilliseconds(mMilliseconds - Modulus(mMilliseconds, MillisecondsPerDay))
 End Property
 
 ''
@@ -269,26 +269,26 @@ End Property
 
 ''
 ' Adds a specified amount of time to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param ts The amount of time to add.
 ' @return The new date object containing the new calculated time.
 '
-Public Function Add(ByRef Value As TimeSpan) As cDateTime
+Public Function Add(ByRef Value As TimeSpan) As CorDateTime
     If Value Is Nothing Then _
         Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Generic))
 
-    Set Add = cDateTime.FromMilliseconds(mMilliseconds + Value.TotalMilliseconds, mKind)
+    Set Add = CorDateTime.FromMilliseconds(mMilliseconds + Value.TotalMilliseconds, mKind)
 End Function
 
 ''
 ' Adds a specified number of milliseconds to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param value The number of milliseconds to add.
 ' @return The new date containing the new calculated time.
 '
-Public Function AddMilliseconds(ByVal Value As Double) As cDateTime
+Public Function AddMilliseconds(ByVal Value As Double) As CorDateTime
     If Value < 0# Then
         Value = Fix(Value - 0.5)
     Else
@@ -298,53 +298,53 @@ Public Function AddMilliseconds(ByVal Value As Double) As cDateTime
     If Value < -MaxMilliseconds Or Value > MaxMilliseconds Then _
         Throw New ArgumentOutOfRangeException
     
-    Set AddMilliseconds = cDateTime.FromMilliseconds(mMilliseconds + CCur(Value), mKind)
+    Set AddMilliseconds = CorDateTime.FromMilliseconds(mMilliseconds + CCur(Value), mKind)
 End Function
 
 ''
 ' Adds a specified number of days to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param value The number of days to add.
-' @return The new cDateTime containing the calculated value.
+' @return The new CorDateTime containing the calculated value.
 '
-Public Function AddDays(ByVal Value As Double) As cDateTime
+Public Function AddDays(ByVal Value As Double) As CorDateTime
     Set AddDays = AddMilliseconds(Value * MillisecondsPerDay)
 End Function
 
 ''
 ' Adds a specified number of hours to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param value The number of hours to add.
-' @return The new cDateTime instance containing the calculated value.
+' @return The new CorDateTime instance containing the calculated value.
 '
-Public Function AddHours(ByVal Value As Double) As cDateTime
+Public Function AddHours(ByVal Value As Double) As CorDateTime
     Set AddHours = AddMilliseconds(Value * MillisecondsPerHour)
 End Function
 
 ''
 ' Adds a specified number of minutes to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param value The number of minutes to add.
-' @return The new cDateTime instance containing the calculated value.
+' @return The new CorDateTime instance containing the calculated value.
 '
-Public Function AddMinutes(ByVal Value As Double) As cDateTime
+Public Function AddMinutes(ByVal Value As Double) As CorDateTime
     Set AddMinutes = AddMilliseconds(Value * MillisecondsPerMinute)
 End Function
 
 ''
 ' Adds a specified number of months to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param Months The number of months to be added.
-' @return The new cDateTime instance containing the calculated value.
+' @return The new CorDateTime instance containing the calculated value.
 ' @remarks If the new month does not have as many days in it as the
 ' original month, then the day is set to the last day of the new month
 ' if it exceeds the maximum number of days for the new month.
 '
-Public Function AddMonths(ByVal Months As Long) As cDateTime
+Public Function AddMonths(ByVal Months As Long) As CorDateTime
     If Months < -120000 Or Months > 120000 Then _
         Throw Cor.NewArgumentOutOfRangeException("Months", Months, "Months must be between -120000 and 120000 inclusively.")
     
@@ -375,54 +375,54 @@ Public Function AddMonths(ByVal Months As Long) As cDateTime
     End Select
     
     Dim MaxDays As Long
-    MaxDays = cDateTime.DaysInMonth(Year, Month)
+    MaxDays = CorDateTime.DaysInMonth(Year, Month)
     If Day > MaxDays Then Day = MaxDays
-    Set AddMonths = cDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(mMilliseconds, MillisecondsPerDay), mKind)
+    Set AddMonths = CorDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(mMilliseconds, MillisecondsPerDay), mKind)
 End Function
 
 ''
 ' Adds a specified number of seconds to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param value The number of seconds to be added.
-' @return The new cDateTime instance containing the calculated value.
+' @return The new CorDateTime instance containing the calculated value.
 '
-Public Function AddSeconds(ByVal Value As Double) As cDateTime
+Public Function AddSeconds(ByVal Value As Double) As CorDateTime
     Set AddSeconds = AddMilliseconds(Value * MillisecondsPerSecond)
 End Function
 
 ''
 ' Adds a specified number of ticks to the current date, returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param value The number of ticks to be added.
-' @return the new cDateTime instance containing the calcuated value.
+' @return the new CorDateTime instance containing the calcuated value.
 '
-Public Function AddTicks(ByRef Value As Variant) As cDateTime
+Public Function AddTicks(ByRef Value As Variant) As CorDateTime
     Dim DecimalValue As Variant
     DecimalValue = CDec(Value)
     
     If DecimalValue < CDec(0) Or DecimalValue > CDec(MaxMilliseconds) * 10000 Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", DecimalValue, "Ticks is outside the valid range of values")
     
-    Set AddTicks = cDateTime.FromMilliseconds(mMilliseconds + DecimalValue / 10000, mKind)
+    Set AddTicks = CorDateTime.FromMilliseconds(mMilliseconds + DecimalValue / 10000, mKind)
 End Function
 
 ''
 ' Adds a specified number of years to the current date., returning a
-' new cDateTime instance with the calcuated value.
+' new CorDateTime instance with the calcuated value.
 '
 ' @param value The number of years to be added.
-' @return The new cDateTime instance containing the calculated value.
+' @return The new CorDateTime instance containing the calculated value.
 '
-Public Function AddYears(ByVal Value As Long) As cDateTime
+Public Function AddYears(ByVal Value As Long) As CorDateTime
     Set AddYears = AddMonths(Value * MonthsPerYear)
 End Function
 
 ''
-' Compares this instance to a passed in cDateTime instance.
+' Compares this instance to a passed in CorDateTime instance.
 '
-' @param value The cDateTime or Date value to compare against this instance.
+' @param value The CorDateTime or Date value to compare against this instance.
 ' @return A value indicating the relation to the passed in value. Negative
 ' indicates this instance is less than the argument, zero indicates the two
 ' values are equal, and positive indicates this value is greater than the
@@ -436,7 +436,7 @@ Public Function CompareTo(ByRef Value As Variant) As Long
             If Value Is Nothing Then
                 CompareTo = 1
             Else
-                Dim dt As cDateTime
+                Dim dt As CorDateTime
                 On Error GoTo errTrap
                 Set dt = Value
                 ms = dt.TotalMilliseconds
@@ -447,7 +447,7 @@ Public Function CompareTo(ByRef Value As Variant) As Long
                 End If
             End If
         Case vbDate
-            ms = cDateTime.AscDateTime(Value).TotalMilliseconds
+            ms = CorDateTime.AscDateTime(Value).TotalMilliseconds
             If mMilliseconds < ms Then
                 CompareTo = -1
             ElseIf mMilliseconds > ms Then
@@ -465,9 +465,9 @@ errTrap:
 End Function
 
 ''
-' Converts the cDateTime to a FileTime representation, adjusting for timezone.
+' Converts the CorDateTime to a FileTime representation, adjusting for timezone.
 '
-' @return The filetime representation of the cDateTime.
+' @return The filetime representation of the CorDateTime.
 ' @remarks FileTime values cannot be less than 1/1/1601 12:00:00AM.
 '
 Public Function ToFileTime() As Currency
@@ -479,9 +479,9 @@ Public Function ToFileTime() As Currency
 End Function
 
 ''
-' Converts the cDateTime to a FileTime representation, ignoring the timezone offset.
+' Converts the CorDateTime to a FileTime representation, ignoring the timezone offset.
 '
-' @return The filetime representation of the cDateTime.
+' @return The filetime representation of the CorDateTime.
 ' @remarks FileTime values cannot be less than 1/1/1601 12:00:00AM.
 '
 Public Function ToFileTimeUtc() As Currency
@@ -491,20 +491,20 @@ Public Function ToFileTimeUtc() As Currency
 End Function
 
 ''
-' Returns a cDateTime with the timezone offset applied to this instance.
+' Returns a CorDateTime with the timezone offset applied to this instance.
 '
-' @return The cDateTime object with the timezone offset applied.
+' @return The CorDateTime object with the timezone offset applied.
 '
-Public Function ToLocalTime() As cDateTime
+Public Function ToLocalTime() As CorDateTime
     Set ToLocalTime = TimeZone.CurrentTimeZone.ToLocalTime(Me)
 End Function
 
 ''
-' Returns a cDateTime with the timezone offset removed from this instance.
+' Returns a CorDateTime with the timezone offset removed from this instance.
 '
-' @return The cDateTime object with the timezone offset removed.
+' @return The CorDateTime object with the timezone offset removed.
 '
-Public Function ToUniversalTime() As cDateTime
+Public Function ToUniversalTime() As CorDateTime
     Set ToUniversalTime = TimeZone.CurrentTimeZone.ToUniversalTime(Me)
 End Function
 
@@ -562,7 +562,7 @@ End Function
 ''
 ' Returns a 64-bit representation of the time and kind.
 '
-' @return 64-bit representation of the cDateTime
+' @return 64-bit representation of the CorDateTime
 ' @remarks The upper 2 bits are used to represent the DateTimeKind
 ' of the object, the lower 62-bits are used to represent the 100-nanosecond
 ' segmented time.
@@ -585,17 +585,17 @@ End Function
 ' @return Boolean indicating equality.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Statics.cDateTime.Equals(Me, Value)
+    Equals = Statics.CorDateTime.Equals(Me, Value)
 End Function
 
 ''
-' Subtracts either a cDateTime instance or a TimeSpan instance from this
-' cDateTime instance.
+' Subtracts either a CorDateTime instance or a TimeSpan instance from this
+' CorDateTime instance.
 '
-' @param value A cDateTime or TimeSpan object to subtract from this instance.
-' @return If subtracting a cDateTime object from this, then a TimeSpan
+' @param value A CorDateTime or TimeSpan object to subtract from this instance.
+' @return If subtracting a CorDateTime object from this, then a TimeSpan
 ' representing the difference in time between the two is returned. If subtracting
-' a TimeSpan object from this instance, then a new cDateTime with a difference
+' a TimeSpan object from this instance, then a new CorDateTime with a difference
 ' of the TimeSpan obect from this instance is returned.
 '
 Public Function Subtract(ByRef Value As Variant) As Object
@@ -607,16 +607,16 @@ Public Function Subtract(ByRef Value As Variant) As Object
             If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan
                 Set ts = Value
-                Set Subtract = cDateTime.FromMilliseconds(mMilliseconds - ts.TotalMilliseconds, mKind)
-            ElseIf TypeOf Value Is cDateTime Then
-                Dim dt As cDateTime
+                Set Subtract = CorDateTime.FromMilliseconds(mMilliseconds - ts.TotalMilliseconds, mKind)
+            ElseIf TypeOf Value Is CorDateTime Then
+                Dim dt As CorDateTime
                 Set dt = Value
                 Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - dt.TotalMilliseconds)
             Else
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidDateSubtraction), Environment.GetResourceString(Parameter_Value))
             End If
         Case vbDate
-            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - cDateTime.AscDateTime(Value).TotalMilliseconds)
+            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.AscDateTime(Value).TotalMilliseconds)
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidDateSubtraction), Environment.GetResourceString(Parameter_Value))
     End Select
@@ -634,13 +634,13 @@ Public Function GetHashCode() As Long
 End Function
 
 ''
-' Determines if this instance is greater than another cDateTime object.
+' Determines if this instance is greater than another CorDateTime object.
 '
-' @param dt The cDateTime object to compare against.
+' @param dt The CorDateTime object to compare against.
 ' @return Returns True if this object is greater than the dt object.
-' @remarks This is provided for quick comparisions of two cDateTime objects.
+' @remarks This is provided for quick comparisions of two CorDateTime objects.
 '
-Public Function GreaterThan(ByRef dt As cDateTime) As Boolean
+Public Function GreaterThan(ByRef dt As CorDateTime) As Boolean
     If dt Is Nothing Then
         GreaterThan = True
     Else
@@ -649,25 +649,25 @@ Public Function GreaterThan(ByRef dt As cDateTime) As Boolean
 End Function
 
 ''
-' Determines if this instance is less than another cDateTime object.
+' Determines if this instance is less than another CorDateTime object.
 '
-' @param dt The cDateTime object to compare against.
+' @param dt The CorDateTime object to compare against.
 ' @return Returns True if this object is less than the dt object.
-' @remarks This is provided for quick comprisons of two cDateTimeObjects.
+' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function LessThan(ByRef dt As cDateTime) As Boolean
+Public Function LessThan(ByRef dt As CorDateTime) As Boolean
     If dt Is Nothing Then Exit Function
     LessThan = (mMilliseconds < dt.TotalMilliseconds)
 End Function
 
 ''
-' Determines if this instance is greater than or equal to another cDateTime object.
+' Determines if this instance is greater than or equal to another CorDateTime object.
 '
-' @param dt The cDateTime object to compare against.
+' @param dt The CorDateTime object to compare against.
 ' @return Returns True if this object is greater than or equal to the dt object.
-' @remarks This is provided for quick comprisons of two cDateTimeObjects.
+' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function GreaterThanOrEqualTo(ByRef dt As cDateTime) As Boolean
+Public Function GreaterThanOrEqualTo(ByRef dt As CorDateTime) As Boolean
     If dt Is Nothing Then
         GreaterThanOrEqualTo = True
     Else
@@ -676,37 +676,37 @@ Public Function GreaterThanOrEqualTo(ByRef dt As cDateTime) As Boolean
 End Function
 
 ''
-' Determines if this instance is less than or equal to another cDateTime object.
+' Determines if this instance is less than or equal to another CorDateTime object.
 '
-' @param dt The cDateTime object to compare against.
+' @param dt The CorDateTime object to compare against.
 ' @return Returns True if this object is less than or equal to the dt object.
-' @remarks This is provided for quick comprisons of two cDateTimeObjects.
+' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function LessThanOrEqualTo(ByRef dt As cDateTime) As Boolean
+Public Function LessThanOrEqualTo(ByRef dt As CorDateTime) As Boolean
     If dt Is Nothing Then Exit Function
     LessThanOrEqualTo = (mMilliseconds <= dt.TotalMilliseconds)
 End Function
 
 ''
-' Determines if this instance is equal to another cDateTime object.
+' Determines if this instance is equal to another CorDateTime object.
 '
-' @param dt The cDateTime object to compare against.
+' @param dt The CorDateTime object to compare against.
 ' @return Returns True if this object is equal to the dt object.
-' @remarks This is provided for quick comprisons of two cDateTimeObjects.
+' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function EqualTo(ByRef dt As cDateTime) As Boolean
+Public Function EqualTo(ByRef dt As CorDateTime) As Boolean
     If dt Is Nothing Then Exit Function
     EqualTo = (mMilliseconds = dt.TotalMilliseconds)
 End Function
 
 ''
-' Determines if this instance is not equal to another cDateTime object.
+' Determines if this instance is not equal to another CorDateTime object.
 '
-' @param dt The cDateTime object to compare against.
+' @param dt The CorDateTime object to compare against.
 ' @return Returns True if this object is not equal to the dt object.
-' @remarks This is provided for quick comprisons of two cDateTimeObjects.
+' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
-Public Function NotEqualTo(ByRef dt As cDateTime) As Boolean
+Public Function NotEqualTo(ByRef dt As CorDateTime) As Boolean
     If dt Is Nothing Then
         NotEqualTo = True
     Else
@@ -737,7 +737,7 @@ Friend Sub InitFromMilliseconds(ByVal ms As Currency, ByVal Kind As DateTimeKind
 End Sub
 
 Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
-    mMilliseconds = Statics.cDateTime.GetMilliseconds(d)
+    mMilliseconds = Statics.CorDateTime.GetMilliseconds(d)
     mKind = Kind
 End Sub
 
@@ -831,7 +831,7 @@ Private Function GetTotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day
         Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
     
     Dim Days As Long
-    If cDateTime.IsLeapYear(Year) Then
+    If CorDateTime.IsLeapYear(Year) Then
         Days = DaysToMonthLeapYear(Month - 1)
     Else
         Days = DaysToMonth(Month - 1)

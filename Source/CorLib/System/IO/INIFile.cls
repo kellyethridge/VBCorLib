@@ -288,17 +288,17 @@ Public Function GetDecimal(ByVal Section As String, ByVal Key As String, Optiona
 End Function
 
 ''
-' Returns a cDateTime value from the specified key in the specified section of an INI file.
+' Returns a CorDateTime value from the specified key in the specified section of an INI file.
 '
 ' @param Section The section within the INI file to search for the key.
 ' @param Key The key in the section of an INI file to retrieve the value of.
 ' @param Default The default value to return if the key is not found in the section, or
-' the value could not be converted to a cDateTime.
+' the value could not be converted to a CorDateTime.
 ' @remarks An INI file contains all values as Strings. The value is converted back
-' into a cDateTime using the Cor.NewDate function. If an error happens, then the default is returned.
+' into a CorDateTime using the Cor.NewDate function. If an error happens, then the default is returned.
 ' </p>Passing in Nothing as the default will return a <b>cDateTime</b> of #12:00:00 AM# for the default.</p>
 '
-Public Function GetDateTime(ByVal Section As String, ByVal Key As String, Optional ByVal Default As cDateTime) As cDateTime
+Public Function GetDateTime(ByVal Section As String, ByVal Key As String, Optional ByVal Default As CorDateTime) As CorDateTime
     On Error GoTo errDefault
     
     Dim s As String
@@ -310,7 +310,7 @@ Public Function GetDateTime(ByVal Section As String, ByVal Key As String, Option
     
 errDefault:
     If Default Is Nothing Then
-        Set Default = cDateTime.FromOADate(#12:00:00 AM#)
+        Set Default = CorDateTime.FromOADate(#12:00:00 AM#)
     Else
         Set GetDateTime = Default
     End If

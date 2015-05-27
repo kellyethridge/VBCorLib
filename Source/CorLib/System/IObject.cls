@@ -58,7 +58,7 @@ Option Explicit
 ' @remarks <p>This should be overridden to provide the type of equality
 ' checking that is appropriate for each class.  Most classes simply
 ' check to see if the value is the same object instance as this object,
-' meaning, they are both the same object in memory. cDateTime checks to
+' meaning, they are both the same object in memory. CorDateTime checks to
 ' see if the value has the same date as this instance, and TimeSpan
 ' checks to see if the value has the same number of milliseconds as this
 ' instance to determine equality.</p>
@@ -91,7 +91,7 @@ Public Function Equals(ByRef Value As Variant) As Boolean: End Function
 ' <p>This should be overridden to provide a value to identify
 ' this object instance. Most objects return their location in memory,
 ' unless the objects need to be considered the same as other objects.
-' This occurs for both cDateTime and TimeSpan objects for example. All cDateTime
+' This occurs for both CorDateTime and TimeSpan objects for example. All CorDateTime
 ' objects that have the same date will generate the same hashcode. Same
 ' for TimeSpan. If the spans are the same, so are the hashcodes.</p>
 ' <p>A default implementation for this method could be<br>
@@ -110,7 +110,7 @@ Public Function GetHashCode() As Long: End Function
 ' @return A string representation of the object.
 ' @remarks This should be overridden to return appropriate string values
 ' for the given object.As examples, the StringBuilder returns the current state of the
-' internal string that is being built, and the cDateTime object returns
+' internal string that is being built, and the CorDateTime object returns
 ' the date and time for that object instance.
 '
 Public Function ToString() As String: End Function

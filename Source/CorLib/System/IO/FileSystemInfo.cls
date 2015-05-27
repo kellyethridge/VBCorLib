@@ -91,126 +91,126 @@ Public Property Let Attributes(ByVal RHS As FileAttributes): End Property
 ''
 ' Returns the time the FileSystemInfo entry was created in local time.
 '
-' @return A cDateTime object of the creation time.
+' @return A CorDateTime object of the creation time.
 '
 Public Property Get CreationTime() As Variant: End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was created in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTime(ByVal RHS As Variant): End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was created in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set CreationTime(ByVal RHS As Variant): End Property
 
 ''
 ' Returns the time the FileSystemInfo entry was last accessed in local time.
 '
-' @return A cDateTime object of the time.
+' @return A CorDateTime object of the time.
 '
 Public Property Get LastAccessTime() As Variant: End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last accessed in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTime(ByVal RHS As Variant): End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last accessed in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set LastAccessTime(ByVal RHS As Variant): End Property
 
 ''
 ' Returns the time the FileSystemInfo entry was last written to in local time.
 '
-' @return A cDateTime object of the time.
+' @return A CorDateTime object of the time.
 '
 Public Property Get LastWriteTime() As Variant: End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last written to in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTime(ByVal RHS As Variant): End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last written to in local time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set LastWriteTime(ByVal RHS As Variant): End Property
 
 ''
 ' Returns the time the FileSystemInfo entry was created in UTC time.
 '
-' @return A cDateTime object of the creation time.
+' @return A CorDateTime object of the creation time.
 '
 Public Property Get CreationTimeUtc() As Variant: End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was created in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTimeUtc(ByVal RHS As Variant): End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was created in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set CreationTimeUtc(ByVal RHS As Variant): End Property
 
 ''
 ' Returns the time the FileSystemInfo entry was last accessed in UTC time.
 '
-' @return A cDateTime object of the time.
+' @return A CorDateTime object of the time.
 '
 Public Property Get LastAccessTimeUtc() As Variant: End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last accessed in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTimeUtc(ByVal RHS As Variant): End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last accessed in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set LastAccessTimeUtc(ByVal RHS As Variant): End Property
 
 ''
 ' Returns the time the FileSystemInfo entry was last written to in UTC time.
 '
-' @return A cDateTime object of the time.
+' @return A CorDateTime object of the time.
 '
 Public Property Get LastWriteTimeUtc() As Variant: End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last written to in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTimeUtc(ByVal RHS As Variant): End Property
 
 ''
 ' Sets the time the FileSystemInfo entry was last written to in UTC time.
 '
-' @param RHS A Date or cDateTime object of the new time.
+' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Set LastWriteTimeUtc(ByVal RHS As Variant): End Property
 

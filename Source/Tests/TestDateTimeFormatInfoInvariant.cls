@@ -185,9 +185,9 @@ Public Sub TestEscapedQuote()
 End Sub
 
 Public Sub TestFractionsOfSecond()
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     
-    Set dt = cDateTime.FromMilliseconds(91234567890765.4321@)
+    Set dt = CorDateTime.FromMilliseconds(91234567890765.4321@)
     
     Assert.AreEqual "7654321", info.Format(dt, "fffffff")
     Assert.AreEqual "765432", info.Format(dt, "ffffff")

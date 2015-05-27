@@ -95,9 +95,9 @@ End Function
 ' @param dayLightTimes the daylight period to check the time against.
 ' @return Indicating if the time was in the daylight savings period.
 Public Function IsDayLightSavingTime(ByRef Time As Variant, Optional ByVal dayLightTimes As DayLightTime) As Boolean
-    Dim dt As cDateTime
+    Dim dt As CorDateTime
     
-    Set dt = cDateTime.GetcDateTime(Time)
+    Set dt = CorDateTime.GetcDateTime(Time)
     If dayLightTimes Is Nothing Then Set dayLightTimes = GetDayLightTimes(dt.Year)
     
     With dayLightTimes
@@ -120,10 +120,10 @@ End Function
 '
 ' @param time The UTC time to convert to local time.
 ' @return The local time converted from the UTC time.
-Public Function ToLocalTime(ByRef Time As Variant) As cDateTime
-    Dim dt As cDateTime
+Public Function ToLocalTime(ByRef Time As Variant) As CorDateTime
+    Dim dt As CorDateTime
     
-    Set dt = cDateTime.GetcDateTime(Time)
+    Set dt = CorDateTime.GetcDateTime(Time)
     Set ToLocalTime = dt.Add(GetUtcOffset(dt))
 End Function
 
@@ -132,10 +132,10 @@ End Function
 '
 ' @param time The local time to have the UTC offset removed.
 ' @return The UTC time converted from the local time.
-Public Function ToUniversalTime(ByRef Time As Variant) As cDateTime
-    Dim dt As cDateTime
+Public Function ToUniversalTime(ByRef Time As Variant) As CorDateTime
+    Dim dt As CorDateTime
     
-    Set dt = cDateTime.GetcDateTime(Time)
+    Set dt = CorDateTime.GetcDateTime(Time)
     Set ToUniversalTime = dt.Subtract(GetUtcOffset(dt))
 End Function
 
@@ -170,11 +170,11 @@ End Function
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Dim r As Long
+    Dim R As Long
     
-    r = GetTimeZoneInformation(mTimeZoneInfo)
-    If r = TIME_ZONE_ID_UNKNOWN Or mTimeZoneInfo.DaylightBias = 0 Then
-        Set mNotUsedDayLightTimes = Cor.NewDayLightTime(cDateTime.MinValue, cDateTime.MinValue, TimeSpan.Zero)
+    R = GetTimeZoneInformation(mTimeZoneInfo)
+    If R = TIME_ZONE_ID_UNKNOWN Or mTimeZoneInfo.DaylightBias = 0 Then
+        Set mNotUsedDayLightTimes = Cor.NewDayLightTime(CorDateTime.MinValue, CorDateTime.MinValue, TimeSpan.Zero)
     End If
     
     mDayLightName = SysAllocString(VarPtr(mTimeZoneInfo.DayLightName(0)))
@@ -188,8 +188,8 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetDayLightTimes(ByVal Year As Long) As DayLightTime
-    Dim StartTime As cDateTime
-    Dim EndTime As cDateTime
+    Dim StartTime As CorDateTime
+    Dim EndTime As CorDateTime
     
     If mNotUsedDayLightTimes Is Nothing Then
         Set StartTime = GetCrossOverPoint(Year, mTimeZoneInfo.DaylightDate)
@@ -200,8 +200,8 @@ Private Function GetDayLightTimes(ByVal Year As Long) As DayLightTime
     End If
 End Function
 
-Private Function GetCrossOverPoint(ByVal Year As Long, ByRef Time As SYSTEMTIME) As cDateTime
-    Dim Ret As cDateTime
+Private Function GetCrossOverPoint(ByVal Year As Long, ByRef Time As SYSTEMTIME) As CorDateTime
+    Dim Ret As CorDateTime
     Dim mydow As DayOfWeek
     Dim targetdow As DayOfWeek
     
@@ -235,8 +235,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
