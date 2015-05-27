@@ -109,7 +109,7 @@ Private Sub AddSystem()
         .Add New MathExtTests
         .Add New GuidTests
         .Add New BitConverterTests
-        .Add New CDateTimeTests
+        .Add New CorDateTimeTests
         .Add New TestEnvironment
         .Add New TimeZoneTests
         .Add New TimeSpanTests
