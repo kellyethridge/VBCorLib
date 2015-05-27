@@ -41,40 +41,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Null, False
             Test.Use Nothing, False
             Test.Use Empty, False
-            
-        Case "Year_WithValue_ReturnsExpected"
-            Test.Use #12:00:00 AM#, 1899
-            Test.Use #1/1/100#, 100
-            Test.Use #1/1/9999#, 9999
-            
-        Case "Month_WithValue_ReturnsExpected"
-            Test.Use #12:00:00 AM#, 12
-            Test.Use #1/1/100#, 1
-            Test.Use #12/31/9999 11:59:59 PM#, 12
-            
-        Case "Day_WithValue_ReturnsExpected"
-            Test.Use #12:00:00 AM#, 30
-            Test.Use #1/1/100#, 1
-            Test.Use #12/31/9999 11:59:59 PM#, 31
-            Test.Use #2/29/2016#, 29
-            
-        Case "Hour_WithValue_ReturnsExpected"
-            Test.Use #12:00:00 AM#, 0
-            Test.Use #1/1/100#, 0
-            Test.Use #12/31/9999 11:59:59 PM#, 23
-        
-        Case "Minute_WithValue_ReturnsExpected"
-            Test.Use #12:00:00 AM#, 0
-            Test.Use #12:59:00 AM#, 59
-            Test.Use #1/1/100#, 0
-            Test.Use #12/31/9999 11:59:59 PM#, 59
-            
-        Case "Second_WithValue_ReturnsExpected"
-            Test.Use #12:00:00 AM#, 0
-            Test.Use #12:00:59 AM#, 59
-            Test.Use #1/1/100#, 0
-            Test.Use #12/31/9999 11:59:59 PM#, 59
-        
+                   
         Case "IsLeapYear_WithValue_ReturnsExpected"
             Test.Use 2015, False
             Test.Use 2016, True
@@ -149,113 +116,73 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
+Public Sub NewDateTime_WhenCalled_CreatesInstance()
+    Dim Actual As CorDateTime
+    
+    Set Actual = NewDateTime(1000, 2, 3, 4, 5, 6, 7)
+    
+    Assert.That Actual.Year, Iz.EqualTo(1000)
+    Assert.That Actual.Month, Iz.EqualTo(2)
+    Assert.That Actual.Day, Iz.EqualTo(3)
+    Assert.That Actual.Hour, Iz.EqualTo(4)
+    Assert.That Actual.Minute, Iz.EqualTo(5)
+    Assert.That Actual.Second, Iz.EqualTo(6)
+    Assert.That Actual.Millisecond, Iz.EqualTo(7)
+End Sub
+
+Public Sub NewDate_WhenCalled_CreatesInstance()
+    Dim Actual As CorDateTime
+    
+    Set Actual = NewDate(#2/3/1000 4:05:06 AM#)
+    
+    Assert.That Actual.Year, Iz.EqualTo(1000)
+    Assert.That Actual.Month, Iz.EqualTo(2)
+    Assert.That Actual.Day, Iz.EqualTo(3)
+    Assert.That Actual.Hour, Iz.EqualTo(4)
+    Assert.That Actual.Minute, Iz.EqualTo(5)
+    Assert.That Actual.Second, Iz.EqualTo(6)
+    Assert.That Actual.Millisecond, Iz.EqualTo(0)
+End Sub
+
 Public Sub ToOADate_WithDefaultDate_ReturnsMidnight()
-    Dim Source As New CorDateTime
+    Dim SUT As New CorDateTime
     
     Dim Actual As Date
-    Actual = Source.ToOADate
+    Actual = SUT.ToOADate
     
     Assert.That Actual, Iz.EqualTo(#12:00:00 AM#)
 End Sub
 
 Public Sub ToOADate_WithValues_ReturnsExpected(ByVal Expected As Date)
-    Dim Source As CorDateTime
-    Set Source = NewDateTime(Year(Expected), Month(Expected), Day(Expected), Hour(Expected), Minute(Expected), Second(Expected))
-    
     Dim Actual As Date
-    Actual = Source.ToOADate
+    
+    Actual = NewDate(Expected).ToOADate
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub FromOADate_WithValues_ReturnscDateTime(ByVal Expected As Date)
-    Dim dt As CorDateTime
+Public Sub FromOADate_WithValues_ReturnsDateTime(ByVal d As Date)
+    Dim Actual As CorDateTime
         
-    Set dt = CorDateTime.FromOADate(Expected)
-    
-    Dim Actual As Date
-    Actual = dt.ToOADate
-    Assert.That Actual, Iz.EqualTo(Expected)
+    Set Actual = CorDateTime.FromOADate(d)
+            
+    Assert.That Actual.Year, Iz.EqualTo(Year(d))
+    Assert.That Actual.Month, Iz.EqualTo(Month(d))
+    Assert.That Actual.Day, Iz.EqualTo(Day(d))
+    Assert.That Actual.Hour, Iz.EqualTo(Hour(d))
+    Assert.That Actual.Minute, Iz.EqualTo(Minute(d))
+    Assert.That Actual.Second, Iz.EqualTo(Second(d))
+    Assert.That Actual.Millisecond, Iz.EqualTo(0)
 End Sub
 
 Public Sub Equals_WithValues_ReturnsExpected(ByVal Other As Variant, ByVal Expected As Boolean)
-    Dim dt As CorDateTime
-    Set dt = NewDateTime(2004, 1, 2, 3, 4, 5)
+    Dim SUT As CorDateTime
+    Set SUT = NewDateTime(2004, 1, 2, 3, 4, 5)
     
     Dim Actual As Boolean
-    Actual = dt.Equals(Other)
+    Actual = CorDateTime.Equals(SUT, Other)
     
     Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Year_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
-    Dim Actual As Long
-    Actual = dt.Year
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Month_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
-    Dim Actual As Long
-    Actual = dt.Month
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Day_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
-    Dim Actual As Long
-    Actual = dt.Day
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Hour_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
-    Dim Actual As Long
-    Actual = dt.Hour
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Minute_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
-    Dim Actual As Long
-    Actual = dt.Minute
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Second_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
-    Dim Actual As Long
-    Actual = dt.Second
-    
-    Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub Millisecond_WhenCalled_ReturnsMillisecondComponent()
-    Dim dt As CorDateTime
-    Set dt = NewDateTime(1, 1, 1, 1, 1, 1, 37)
-    
-    Dim Actual As Long
-    Actual = dt.Millisecond
-    
-    Assert.That Actual, Iz.EqualTo(37)
 End Sub
 
 Public Sub IsLeapYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal Expected As Boolean)
@@ -266,7 +193,7 @@ Public Sub IsLeapYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal Expect
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Constructor_WithTimeComponentsOnly_SetsToOADate()
+Public Sub NewDateTime_WithTimeComponentsOnly_SetsToOADate()
     Dim dt As CorDateTime
     
     Set dt = NewDateTime(Hour:=18, Minute:=39, Second:=52)
@@ -275,66 +202,53 @@ Public Sub Constructor_WithTimeComponentsOnly_SetsToOADate()
 End Sub
 
 Public Sub DayOfYear_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Long)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
     Dim Actual As Long
-    Actual = dt.DayOfYear
+    
+    Actual = NewDate(d).DayOfYear
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub DayOfWeek_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As DayOfWeek)
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.FromOADate(d)
-    
     Dim Actual As DayOfWeek
-    Actual = dt.DayOfWeek
+    
+    Actual = NewDate(d).DayOfWeek
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TotalMilliseconds_WhenCalled_ReturnsExpected()
-    Dim dt As CorDateTime
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
-    
+Public Sub TotalMilliseconds_WhenCalled_ReturnsMilliseconds()
     Dim Actual As Currency
-    Actual = dt.TotalMilliseconds
+    
+    Actual = NewDateTime(2004, 1, 1, 1, 1, 1, 1).TotalMilliseconds
     
     Const Expected As Currency = 63208515661001@
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestTicks()
-    Dim dt As CorDateTime
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
-    
+Public Sub Ticks_WhenCalled_ReturnsTicks()
     Dim Actual As Variant
-    Actual = dt.Ticks
+    
+    Actual = NewDateTime(2004, 1, 1, 1, 1, 1, 1).Ticks
     
     Assert.That Actual, Iz.EqualTo(CDec("632085156610010000"))
 End Sub
 
 Public Sub DateOnly_WhenCalled_ReturnsDateTimeWithDatePartOnly()
-    Dim dt As CorDateTime
-    Set dt = NewDateTime(2004, 1, 1, 1, 1, 1, 1)
+    Dim Actual As CorDateTime
+        
+    Set Actual = NewDateTime(2004, 1, 1, 1, 1, 1, 1).DateOnly
     
-    Set dt = dt.DateOnly
-    
-    Dim Actual As Boolean
-    Actual = dt.Equals(#1/1/2004#)
-    Assert.That Actual, Iz.True
+    Assert.That Actual, Equals(#1/1/2004#)
 End Sub
 
 Public Sub TimeOfDay_WhenCalled_ReturnsExpected()
-    Dim dt As CorDateTime
-    Set dt = NewDateTime(2004, 1, 1, 6, 10, 15, 100)
-    
     Dim Actual As TimeSpan
-    Set Actual = dt.TimeOfDay
+    
+    Set Actual = NewDateTime(2004, 1, 1, 6, 10, 15, 100).TimeOfDay
     
     Dim Expected As TimeSpan
-    Set Expected = newtimespan(Hours:=6, Minutes:=10, Seconds:=15, Milliseconds:=100)
+    Set Expected = NewTimeSpan(Hours:=6, Minutes:=10, Seconds:=15, Milliseconds:=100)
     Assert.That Actual, Equals(Expected)
 End Sub
 
@@ -473,7 +387,7 @@ Public Sub Subtract_WithTimeSpans_ReturnsExpected(ByVal TimeSpanToSubtract As Ti
     Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub Subtract_WithDates_ReturnsExpected(ByVal DateToSubtract As Variant, ByVal Expected As TimeSpan)
+Public Sub Subtract_WithDate_ReturnsExpected(ByVal DateToSubtract As Variant, ByVal Expected As TimeSpan)
     Dim dt As CorDateTime
     Set dt = NewDate(#1/1/2001#)
     
@@ -494,7 +408,7 @@ errTrap:
     AssertArgumentNullException Err, "Value"
 End Sub
 
-Public Sub Subtract_WithNonsupportedObject_ThrowsArgumentException()
+Public Sub Subtract_WithNonSupportedObject_ThrowsArgumentException()
     On Error GoTo errTrap
     Dim dt As CorDateTime
     Set dt = NewDate(#1/1/2001#)
@@ -633,25 +547,27 @@ Public Sub TestQuotedFormatting()
     Assert.AreEqual "5 tt 05", dt.ToString("d 'tt' 05")
 End Sub
 
-Public Sub TestFromBinary()
-    Dim dt As CorDateTime
+Public Sub FromBinary_WhenCalled_ReturnsExpected()
+    Dim Actual As CorDateTime
     
-    Set dt = CorDateTime.FromBinary(-915885960650477.5808@)
-    Assert.AreEqual DateTimeKind.LocalKind, dt.Kind
-    Assert.AreEqual 205, dt.Year
-    Assert.AreEqual 6, dt.Month
-    Assert.AreEqual 7, dt.Day
-    Assert.AreEqual 20, dt.Hour
-    Assert.AreEqual 57, dt.Minute
-    Assert.AreEqual 15, dt.Second
+    Set Actual = CorDateTime.FromBinary(-915885960650477.5808@)
+    
+    Assert.AreEqual DateTimeKind.LocalKind, Actual.Kind
+    Assert.AreEqual 205, Actual.Year
+    Assert.AreEqual 6, Actual.Month
+    Assert.AreEqual 7, Actual.Day
+    Assert.AreEqual 20, Actual.Hour
+    Assert.AreEqual 57, Actual.Minute
+    Assert.AreEqual 15, Actual.Second
 End Sub
 '205, 6, 7, 20, 57, 15
 
-Public Sub TestToBinary()
-    Dim dt As CorDateTime
+Public Sub ToBinary_WhenCalled_ReturnsCompositeTicksAndKind()
+    Dim Actual As Currency
     
-    Set dt = NewDate(#6/7/205 8:57:15 PM#, LocalKind)
-    Assert.AreEqual -915885960650477.5808@, dt.ToBinary
+    Actual = NewDate(#6/7/205 8:57:15 PM#, LocalKind).ToBinary
+    
+    Assert.That Actual, Iz.EqualTo(-915885960650477.5808@)
 End Sub
 
 Public Sub TestMaxDateToString()
