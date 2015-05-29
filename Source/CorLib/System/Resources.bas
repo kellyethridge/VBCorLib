@@ -28,7 +28,6 @@ Public Enum ResourceStringKey
     Arg_PathIllegal = 838
     Arg_PathIllegalUNC = 840
     Arg_PathGlobalRoot = 841
-    
     Argument_MultiDimNotSupported = 200
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
@@ -71,7 +70,6 @@ Public Enum ResourceStringKey
     Argument_PathUriFormatNotSupported = 839
     Argument_BitArrayTypeUnsupported = 842
     Argument_ArrayLengthsDiffer = 843
-
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902
@@ -79,7 +77,6 @@ Public Enum ResourceStringKey
     ArgumentNull_TimeSpan = 904
     ArgumentNull_Generic = 905
     ArgumentNull_Buffer = 906
-
     ArgumentOutOfRange_MustBeNonNegNum = 700
     ArgumentOutOfRange_SmallCapacity = 701
     ArgumentOutOfRange_NeedNonNegNum = 702
@@ -116,30 +113,22 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_CursorSize = 733
     ArgumentOutOfRange_IndexCountBuffer = 734
     ArgumentOutOfRange_IndexCount = 735
-
     ArrayTypeMismatch_Incompatible = 102
     ArrayTypeMismatch_Exception = 103
     ArrayTypeMismatch_Compare = 104
-    
     Exception_WasThrown = 101
-    
     IOException_Exception = 400
     IOException_DirectoryExists = 401
     IOException_FileTooLong2GB = 402
     IOException_PathTooLong = 403
-    
     FileNotFound_Exception = 500
-    
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
     Format_InvalidString = 602
     Format_InvalidTimeSpan = 603
-    
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
-    
     InvalidCast_FromTo = 1400
-    
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101
     InvalidOperation_EnumFinished = 1102
@@ -149,22 +138,18 @@ Public Enum ResourceStringKey
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
     InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
-    
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
     NotSupported_MemoryStreamNotExpandable = 1002
     NotSupported_UnwritableStream = 1003
     NotSupported_UnreadableStream = 1004
     NotSupported_UnseekableStream = 1005
-    
     ObjectDisposed_StreamClosed = 1200
     ObjectDisposed_FileNotOpen = 1201
     ObjectDisposed_Generic = 1202
     ObjectDisposed_ReaderClosed = 1203
     ObjectDisposed_WriterClosed = 1204
-    
     Overflow_TimeSpan = 1300
-    
     Parameter_Index = 2000
     Parameter_Count = 2001
     Parameter_StartIndex = 2002
@@ -193,6 +178,5 @@ Public Enum ResourceStringKey
     Parameter_Keys = 2025
     Parameter_Items = 2026
     Parameter_Values = 2027
-    
     Rank_MultiDimNotSupported = 200
 End Enum
