@@ -165,11 +165,6 @@ Public Enum ResourceStringKey
     
     Overflow_TimeSpan = 1300
     
-    Rank_MultiDimNotSupported = 200
-End Enum
-
-Public Enum ParameterString
-    Parameter_None = 0
     Parameter_Index = 2000
     Parameter_Count = 2001
     Parameter_StartIndex = 2002
@@ -198,4 +193,6 @@ Public Enum ParameterString
     Parameter_Keys = 2025
     Parameter_Items = 2026
     Parameter_Values = 2027
+    
+    Rank_MultiDimNotSupported = 200
 End Enum
