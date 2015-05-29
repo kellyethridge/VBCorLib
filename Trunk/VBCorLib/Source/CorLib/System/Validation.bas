@@ -24,16 +24,16 @@ Attribute VB_Name = "Validation"
 '
 Option Explicit
 
-Public Sub CheckValidSingleDimArray(ByRef Arr As Variant, Optional ByVal ParameterName As ParameterString = Parameter_Arr)
+Public Sub CheckValidSingleDimArray(ByRef Arr As Variant, Optional ByVal ParameterKey As ResourceStringKey = Parameter_Arr)
     Dim Ptr As Long
     Ptr = CorArray.ArrayPointer(Arr)
     
-    CheckValidSingleDimArrayPtr Ptr, ParameterName
+    CheckValidSingleDimArrayPtr Ptr, ParameterKey
 End Sub
 
-Public Sub CheckValidSingleDimArrayPtr(ByVal Ptr As Long, Optional ByVal ParameterName As ParameterString = Parameter_Arr)
+Public Sub CheckValidSingleDimArrayPtr(ByVal Ptr As Long, Optional ByVal ParameterKey As ResourceStringKey = Parameter_Arr)
     If Ptr = vbNullPtr Then
-        Error.ArgumentNull Environment.GetResourceString(ParameterName), ArgumentNull_Array
+        Error.ArgumentNull Environment.GetResourceString(ParameterKey), ArgumentNull_Array
     End If
     If SafeArrayGetDim(Ptr) <> 1 Then
         Error.Rank
