@@ -26,21 +26,29 @@ Option Explicit
 
 Public Enum ResourceString
     None = 0
-    Exception_WasThrown = 101
+    
     ArrayTypeMismatch_Incompatible = 102
     ArrayTypeMismatch_Exception = 103
     ArrayTypeMismatch_Compare = 104
-    Rank_MultiDimNotSupported = 200
+    
+    Exception_WasThrown = 101
+    
     IOException_Exception = 400
     IOException_DirectoryExists = 401
     IOException_FileTooLong2GB = 402
+    
     FileNotFound_Exception = 500
+    
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
     Format_InvalidString = 602
     Format_InvalidTimeSpan = 603
-    Overflow_TimeSpan = 1300
+    
     InvalidCast_FromTo = 1400
+    
+    Overflow_TimeSpan = 1300
+    
+    Rank_MultiDimNotSupported = 200
 End Enum
 
 Public Enum IOExceptionString
