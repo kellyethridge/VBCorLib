@@ -86,16 +86,15 @@ Public Function OptionalRange(ByRef Index As Variant, ByRef Count As Variant, By
     
     FirstIsMissing = IsMissing(Index)
     
-    If FirstIsMissing = IsMissing(Count) Then
-        If FirstIsMissing Then
-            OptionalRange.Index = DefaultIndex
-            OptionalRange.Count = DefaultCount
-        Else
-            OptionalRange.Index = OptionalLong(Index, DefaultIndex)
-            OptionalRange.Count = OptionalLong(Count, DefaultCount)
-        End If
+    If FirstIsMissing <> IsMissing(Count) Then _
+        Error.Argument Argument_ParamRequired, IIf(IsMissing(Index), "Index", "Count")
+    
+    If FirstIsMissing Then
+        OptionalRange.Index = DefaultIndex
+        OptionalRange.Count = DefaultCount
     Else
-        ThrowMissing Index, IndexParameter, CountParameter
+        OptionalRange.Index = OptionalLong(Index, DefaultIndex)
+        OptionalRange.Count = OptionalLong(Count, DefaultCount)
     End If
 End Function
 
@@ -314,7 +313,7 @@ Public Sub ThrowListRangeException(ByVal ErrorCode As Long, ByVal Index As Long,
     End Select
 End Sub
 
-Public Sub ThrowMissing(ByRef ParameterToCheck As Variant, ByVal FirstParameter As ResourceString, ByVal SecondParameter As ResourceString)
+Public Sub ThrowMissing(ByRef ParameterToCheck As Variant, ByVal FirstParameter As ResourceStringKey, ByVal SecondParameter As ResourceStringKey)
     Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(ParameterToCheck), Environment.GetResourceString(FirstParameter), Environment.GetResourceString(SecondParameter)))
 End Sub
 

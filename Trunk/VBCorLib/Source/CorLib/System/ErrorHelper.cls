@@ -36,28 +36,28 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Friend Sub Argument(ByVal Message As ArgumentString, Optional ByRef ParamName As String)
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Message), ParamName)
+Friend Sub Argument(ByVal Key As ResourceStringKey, Optional ByRef ParamName As String)
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Key), ParamName)
 End Sub
 
-Friend Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Message As ArgumentNullString = ArgumentNull_Exception)
-    Throw Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Message))
+Friend Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentNull_Exception)
+    Throw Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Key))
 End Sub
 
-Friend Sub ArgumentOutOfRange(ByRef ParamName As String, Optional ByVal Message As ArgumentOutOfRangeString = ArgumentOutOfRange_Exception)
-    Throw Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(Message))
+Friend Sub ArgumentOutOfRange(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentOutOfRange_Exception)
+    Throw Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(Key))
 End Sub
 
-Friend Sub Rank(Optional ByVal Message As ResourceString = Rank_MultiDimNotSupported)
-    Throw Cor.NewRankException(Environment.GetResourceString(Message))
+Friend Sub Rank(Optional ByVal Key As ResourceStringKey = Rank_MultiDimNotSupported)
+    Throw Cor.NewRankException(Environment.GetResourceString(Key))
 End Sub
 
-Friend Sub ObjectDisposed(Optional ByVal Message As ObjectDisposedString = ObjectDisposed_Generic)
-    Throw Cor.NewObjectDisposedException("", Environment.GetResourceString(Message))
+Friend Sub ObjectDisposed(Optional ByVal Key As ResourceStringKey = ObjectDisposed_Generic)
+    Throw Cor.NewObjectDisposedException("", Environment.GetResourceString(Key))
 End Sub
 
-Friend Sub IndexOutOfRange(ByVal Message As IndexOutOfRangeString)
-    Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(Message))
+Friend Sub IndexOutOfRange(ByVal Key As ResourceStringKey)
+    Throw Cor.NewIndexOutOfRangeException(Environment.GetResourceString(Key))
 End Sub
 
 Friend Sub NegativeNumber(ByVal ParamName As String)
@@ -68,15 +68,15 @@ Friend Sub InvalidOffsetLength()
     Argument Argument_InvalidOffLen
 End Sub
 
-Friend Sub InvalidOperation(ByVal Message As InvalidOperationString)
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(Message))
+Friend Sub InvalidOperation(ByVal Key As ResourceStringKey)
+    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(Key))
 End Sub
 
-Friend Sub NotSupported(ByVal Message As NotSupportedString)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(Message))
+Friend Sub NotSupported(ByVal Key As ResourceStringKey)
+    Throw Cor.NewNotSupportedException(Environment.GetResourceString(Key))
 End Sub
 
-Friend Sub IOException(ByVal Message As IOExceptionString)
-    Throw Cor.NewIOException(Environment.GetResourceString(Message))
+Friend Sub IOException(ByVal Key As ResourceStringKey)
+    Throw Cor.NewIOException(Environment.GetResourceString(Key))
 End Sub
 

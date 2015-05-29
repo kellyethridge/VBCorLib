@@ -96,7 +96,7 @@ Friend Function GetFullPathName() As Long
     Dim Result As Long
     Result = GetFullPathNameW(mCharBuffer, mLength, FinalBuffer, ByVal 0)
     If Result >= mMaxPath Then _
-        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOExceptionString.IOException_PathTooLong))
+        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOException_PathTooLong))
     If Result = 0 Then _
         IOError Err.LastDllError
     
@@ -118,7 +118,7 @@ Friend Function TryExpandShortFileName() As Boolean
     Dim Result As Long
     Result = GetLongPathNameW(mCharBuffer, ShortFileNameBuffer, mMaxPath)
     If Result > mMaxPath Then _
-        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOExceptionString.IOException_PathTooLong))
+        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOException_PathTooLong))
     If Result = 0 Then
         Dim DllError As Long
         DllError = Err.LastDllError
@@ -148,7 +148,7 @@ Friend Sub Fixup(ByVal LenSavedName As Long, ByVal LastSlash As Long)
     Result = TryExpandShortFileName
     Append Path.DirectorySeparatorChar
     If mLength + LenSavedName >= mMaxPath Then _
-        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOExceptionString.IOException_PathTooLong))
+        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOException_PathTooLong))
     
     CopyMemory mChars(mLength), ByVal StrPtr(SavedName), LenSavedName
     mLength = mLength + LenSavedName
