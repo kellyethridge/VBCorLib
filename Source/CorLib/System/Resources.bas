@@ -24,76 +24,12 @@ Attribute VB_Name = "Resources"
 '
 Option Explicit
 
-Public Enum ResourceString
-    None = 0
+Public Enum ResourceStringKey
+    Arg_PathIllegal = 838
+    Arg_PathIllegalUNC = 840
+    Arg_PathGlobalRoot = 841
     
-    ArrayTypeMismatch_Incompatible = 102
-    ArrayTypeMismatch_Exception = 103
-    ArrayTypeMismatch_Compare = 104
-    
-    Exception_WasThrown = 101
-    
-    IOException_Exception = 400
-    IOException_DirectoryExists = 401
-    IOException_FileTooLong2GB = 402
-    
-    FileNotFound_Exception = 500
-    
-    Format_InvalidBase64Character = 600
-    Format_InvalidNumberOfCharacters = 601
-    Format_InvalidString = 602
-    Format_InvalidTimeSpan = 603
-    
-    InvalidCast_FromTo = 1400
-    
-    Overflow_TimeSpan = 1300
-    
-    Rank_MultiDimNotSupported = 200
-End Enum
-
-Public Enum IOExceptionString
-    IOException_Exception = 400
-    IOException_DirectoryExists = 401
-    IOException_FileTooLong2GB = 402
-    IOException_PathTooLong = 403
-End Enum
-
-Public Enum NotSupportedString
-    NotSupported_ReadOnlyCollection = 1000
-    NotSupported_FixedSizeCollection = 1001
-    NotSupported_MemoryStreamNotExpandable = 1002
-    NotSupported_UnwritableStream = 1003
-    NotSupported_UnreadableStream = 1004
-    NotSupported_UnseekableStream = 1005
-End Enum
-
-Public Enum InvalidOperationString
-    InvalidOperation_EmptyStack = 1100
-    InvalidOperation_EnumNotStarted = 1101
-    InvalidOperation_EnumFinished = 1102
-    InvalidOperation_VersionError = 1103
-    InvalidOperation_EmptyQueue = 1104
-    InvalidOperation_Comparer_Arg = 1105
-    InvalidOperation_ReadOnly = 1106
-    InvalidOperation_Timeouts = 1107
-    InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
-End Enum
-
-Public Enum IndexOutOfRangeString
-    IndexOutOfRange_Dimension = 300
-    IndexOutOfRange_ArrayBounds = 301
-End Enum
-
-Public Enum ObjectDisposedString
-    ObjectDisposed_StreamClosed = 1200
-    ObjectDisposed_FileNotOpen = 1201
-    ObjectDisposed_Generic = 1202
-    ObjectDisposed_ReaderClosed = 1203
-    ObjectDisposed_WriterClosed = 1204
-End Enum
-
-Public Enum ArgumentString
-    Argument_MultiDimNotSupported = ResourceString.Rank_MultiDimNotSupported
+    Argument_MultiDimNotSupported = 200
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
     Argument_Exception = 802
@@ -132,15 +68,10 @@ Public Enum ArgumentString
     Argument_InvalidSeekOffset = 835
     Argument_InvalidStreamSource = 836
     Argument_NotEnumerable = 837
-    Arg_PathIllegal = 838
     Argument_PathUriFormatNotSupported = 839
-    Arg_PathIllegalUNC = 840
-    Arg_PathGlobalRoot = 841
     Argument_BitArrayTypeUnsupported = 842
     Argument_ArrayLengthsDiffer = 843
-End Enum
 
-Public Enum ArgumentNullString
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902
@@ -148,9 +79,7 @@ Public Enum ArgumentNullString
     ArgumentNull_TimeSpan = 904
     ArgumentNull_Generic = 905
     ArgumentNull_Buffer = 906
-End Enum
 
-Public Enum ArgumentOutOfRangeString
     ArgumentOutOfRange_MustBeNonNegNum = 700
     ArgumentOutOfRange_SmallCapacity = 701
     ArgumentOutOfRange_NeedNonNegNum = 702
@@ -187,6 +116,56 @@ Public Enum ArgumentOutOfRangeString
     ArgumentOutOfRange_CursorSize = 733
     ArgumentOutOfRange_IndexCountBuffer = 734
     ArgumentOutOfRange_IndexCount = 735
+
+    ArrayTypeMismatch_Incompatible = 102
+    ArrayTypeMismatch_Exception = 103
+    ArrayTypeMismatch_Compare = 104
+    
+    Exception_WasThrown = 101
+    
+    IOException_Exception = 400
+    IOException_DirectoryExists = 401
+    IOException_FileTooLong2GB = 402
+    IOException_PathTooLong = 403
+    
+    FileNotFound_Exception = 500
+    
+    Format_InvalidBase64Character = 600
+    Format_InvalidNumberOfCharacters = 601
+    Format_InvalidString = 602
+    Format_InvalidTimeSpan = 603
+    
+    IndexOutOfRange_Dimension = 300
+    IndexOutOfRange_ArrayBounds = 301
+    
+    InvalidCast_FromTo = 1400
+    
+    InvalidOperation_EmptyStack = 1100
+    InvalidOperation_EnumNotStarted = 1101
+    InvalidOperation_EnumFinished = 1102
+    InvalidOperation_VersionError = 1103
+    InvalidOperation_EmptyQueue = 1104
+    InvalidOperation_Comparer_Arg = 1105
+    InvalidOperation_ReadOnly = 1106
+    InvalidOperation_Timeouts = 1107
+    InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
+    
+    NotSupported_ReadOnlyCollection = 1000
+    NotSupported_FixedSizeCollection = 1001
+    NotSupported_MemoryStreamNotExpandable = 1002
+    NotSupported_UnwritableStream = 1003
+    NotSupported_UnreadableStream = 1004
+    NotSupported_UnseekableStream = 1005
+    
+    ObjectDisposed_StreamClosed = 1200
+    ObjectDisposed_FileNotOpen = 1201
+    ObjectDisposed_Generic = 1202
+    ObjectDisposed_ReaderClosed = 1203
+    ObjectDisposed_WriterClosed = 1204
+    
+    Overflow_TimeSpan = 1300
+    
+    Rank_MultiDimNotSupported = 200
 End Enum
 
 Public Enum ParameterString

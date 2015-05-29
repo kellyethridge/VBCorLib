@@ -111,7 +111,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
             If Not File.Exists(SourceFileName) Then _
                 IOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
-                Error.IOException IOExceptionString.IOException_DirectoryExists
+                Error.IOException IOException_DirectoryExists
         End If
         IOError DllError, SourceFileName
     End If
@@ -442,7 +442,7 @@ Public Function ReadAllBytes(ByRef Path As String) As Byte()
     With Cor.NewFileStream(Path, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadWriteShare)
         Length = .Length
         If Length > MaxLength Then _
-            Throw Cor.NewIOException(Environment.GetResourceString(ResourceString.IOException_FileTooLong2GB))
+            Throw Cor.NewIOException(Environment.GetResourceString(IOException_FileTooLong2GB))
             
         If Length > 0 Then
             ReDim Bytes(0 To Length - 1)

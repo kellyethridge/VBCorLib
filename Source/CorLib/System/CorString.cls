@@ -307,7 +307,7 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
     If Range.Count < 0 Then _
         Error.NegativeNumber "Count"
     If Range.Index + Range.Count - 1 > UBound(Value) Then _
-        Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
+        Error.ArgumentOutOfRange "", Argument_InvalidOffLen
     
     Select Case VarType(Value)
         Case vbStringArray
@@ -339,7 +339,7 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
     If RemovalCount < 0 Then _
         Error.NegativeNumber "Count"
     If StartIndex + RemovalCount > Len(s) Then _
-        Error.ArgumentOutOfRange "", ArgumentString.Argument_InvalidOffLen
+        Error.ArgumentOutOfRange "", Argument_InvalidOffLen
     
     Dim SPtr As Long
     SPtr = StrPtr(s)

@@ -916,7 +916,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If mHandle.IsClosed Then
-        Throw Cor.NewObjectDisposedException("Stream", Environment.GetResourceString(ObjectDisposedString.ObjectDisposed_StreamClosed))
+        Throw Cor.NewObjectDisposedException("Stream", Environment.GetResourceString(ObjectDisposed_StreamClosed))
     End If
 End Sub
 

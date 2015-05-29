@@ -660,11 +660,7 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function GetResourceString(ByVal Key As Long, ParamArray Values() As Variant) As String
-    If Key = ResourceString.None Then
-        Exit Function
-    End If
-    
+Friend Function GetResourceString(ByVal Key As ResourceStringKey, ParamArray Values() As Variant) As String
     Dim Text As String
     Text = LoadResString(Key)
 
