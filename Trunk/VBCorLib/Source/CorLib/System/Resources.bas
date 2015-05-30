@@ -61,7 +61,7 @@ Public Enum ResourceStringKey
     Argument_NeedIntrinsicType = 829
     Argument_CharArrayRequired = 830
     Argument_InvalidDateSubtraction = 831
-    Argument_InvalidCharsInPath = 832
+    Argument_InvalidPathChars = 832
     Argument_InvalidValueType = 833
     Argument_InvalidFileModeAndAccessCombo = 834
     Argument_InvalidSeekOffset = 835

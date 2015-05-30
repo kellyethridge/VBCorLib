@@ -533,7 +533,7 @@ library VBCorType {
 		[entry("GetFileSize"), usesgetlasterror] long GetFileSize([in] long hFile, [in] void * lpFileSizeHigh);
 		[entry("GetFileType"), usesgetlasterror] long GetFileType([in] long hFile);
 		[entry("GetFullPathNameA"), usesgetlasterror] long GetFullPathNameA([in] LPSTR FileName, [in] long BufferLength, [in] LPSTR Buffer, [in] void * FilePart);
-		[entry("GetFullPathNameW"), usesgetlasterror] long GetFullPathNameW([in] LPWSTR FileName, [in] long BufferLength, [in] LPWSTR Buffer, [in] void * FilePart);
+		[entry("GetFullPathNameW"), usesgetlasterror] long GetFullPathNameW([in] void * FileName, [in] long BufferLength, [in] void * Buffer, [in] void * FilePart);
 		[entry("GetLocaleInfoA"), usesgetlasterror] long GetLocaleInfoA([in] long Locale, [in] long LCType, [in] LPSTR lpLCData, [in] long cchData);
 		[entry("GetLocaleInfoW"), usesgetlasterror] long GetLocaleInfoW([in] long Locale, [in] long LCType, [in] LPWSTR lpLCData, [in] long cchData);
 		[entry("GetLocalTime")] void GetLocalTime([in] SYSTEMTIME * lpSystemTime);

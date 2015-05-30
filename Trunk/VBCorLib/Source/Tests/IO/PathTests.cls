@@ -112,6 +112,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "file.txt\", ""
             Test.Use ".txt", ""
 
+'                    // Legal: "\.. \", "\...\", "\. \"
+'                    // Illegal: "\.. .\", "\. .\", "\ .\"
+
         Case "GetFullPath_WithValue_ReturnsExpected"
             Test.Use "file.txt", "c:\windows\file.txt"
             Test.Use "\file.txt", "c:\file.txt"
@@ -128,12 +131,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "c:\abc\def\ghi\..\..\jkl", "c:\abc\jkl"
             Test.Use "..\jkl", "c:\jkl"
             Test.Use "//server/share/file.txt", "\\server\share\file.txt"
+            Test.Use "abc\.. \def", "c:\windows\def"
+            Test.Use "abc\. .b\def", "c:\windows\abc\. .b\def"
+            Test.Use "abc\def  ", "c:\windows\abc\def"
             
         Case "GetFullPath_WithInvalidPath_ThrowsArgumentException"
             Test.Use "\\server"
             Test.Use "\\server\"
             Test.Use ""
             Test.Use " "
+            Test.Use "\.. .\abc"
+            Test.Use "\. .\abc"
+            Test.Use "\ .\abc"
             
         Case "GetPathRoot_WithValue_ReturnsExpected"
             Test.Use "\mydir\", "\"

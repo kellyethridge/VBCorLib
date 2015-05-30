@@ -35,7 +35,7 @@ Attribute VB_Exposed = False
 ' Module: Win32ApiW
 '
 Option Explicit
-Implements IWin32API
+Implements IWin32Api
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

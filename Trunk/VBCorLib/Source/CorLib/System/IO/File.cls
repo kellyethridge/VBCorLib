@@ -93,9 +93,9 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
     If Len(DestinationFileName) = 0 Then _
         Throw Error.Argument(Argument_EmptyFileName, "DestinationFileName")
     If Path.HasIllegalCharacters(SourceFileName) Then _
-        Throw Error.Argument(Argument_InvalidCharsInPath, "SourceFileName")
+        Throw Error.Argument(Argument_InvalidPathChars, "SourceFileName")
     If Path.HasIllegalCharacters(DestinationFileName) Then _
-        Throw Error.Argument(Argument_InvalidCharsInPath, "DestinationFileName")
+        Throw Error.Argument(Argument_InvalidPathChars, "DestinationFileName")
     
     SourceFileName = Path.GetFullPath(CorString.TrimEnd(SourceFileName, mDirectorySeparators))
     DestinationFileName = Path.GetFullPath(CorString.TrimEnd(DestinationFileName, mDirectorySeparators))
