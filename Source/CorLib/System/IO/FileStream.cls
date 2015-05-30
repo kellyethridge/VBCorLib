@@ -61,13 +61,13 @@ Option Explicit
 Implements IObject
 Implements Stream
 
-Private Const FILE_ATTRIBUTE_NORMAL     As Long = &H80
-Private Const FILE_TYPE_DISK            As Long = 1
-Private Const MIN_BUFFERSIZE            As Long = 8
-Private Const NO_ERROR                  As Long = 0
-Private Const INVALID_SET_FILE_POINTER  As Long = -1
-Private Const INVALID_FILE_SIZE         As Long = -1
-Private Const ERROR_BROKEN_PIPE         As Long = 109
+Private Const MinBufferSize            As Long = 8
+
+'Private Const FILE_ATTRIBUTE_NORMAL     As Long = &H80
+'Private Const FILE_TYPE_DISK            As Long = 1
+'Private Const INVALID_SET_FILE_POINTER  As Long = -1
+'Private Const INVALID_FILE_SIZE         As Long = -1
+'Private Const ERROR_BROKEN_PIPE         As Long = 109
 
 'Public Type NativeOverlapped
 '    InternalLow     As Long
@@ -163,7 +163,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Get ReadTimeout() As Long
-    Error.InvalidOperation InvalidOperation_Timeouts
+    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
 End Property
 
 ''
@@ -173,7 +173,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Let ReadTimeout(ByVal Value As Long)
-    Error.InvalidOperation InvalidOperation_Timeouts
+    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
 End Property
 
 ''
@@ -183,7 +183,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Get WriteTimeout() As Long
-    Error.InvalidOperation InvalidOperation_Timeouts
+    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
 End Property
 
 ''
@@ -193,7 +193,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Let WriteTimeout(ByVal Value As Long)
-    Error.InvalidOperation InvalidOperation_Timeouts
+    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
 End Property
 
 ''
@@ -394,12 +394,12 @@ Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigi
         Case FromCurrent:       NewPosition = mFilePosition + Offset
         Case FromEnd:           NewPosition = Length + Offset
         Case Else
-            Error.Argument Argument_InvalidSeekOrigin
+            Throw Error.Argument(Argument_InvalidSeekOrigin)
     End Select
     
     If NewPosition < mMinPosition Then
         If mMinPosition = 0@ Then
-            Error.Argument Argument_InvalidSeekOffset
+            Throw Error.Argument(Argument_InvalidSeekOffset)
         Else
             Throw Cor.NewIOException("Seeking to a position prior to append-start position may cause data to be overwritten.")
         End If
@@ -501,11 +501,11 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
     CheckValidSingleDimArray Bytes, Parameter_Bytes
     
     If Offset < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Offset", ArgumentOutOfRange_LBound)
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Offset + Count - 1 > UBound(Bytes) Then _
-        Error.Argument Argument_InvalidOffLen
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     If Count = 0 Then
         Exit Function
@@ -600,18 +600,18 @@ End Function
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
-        Error.ArgumentNull "AsyncResult"
+        Throw Error.ArgumentNull("AsyncResult")
     If mActiveAsyncResult Is Nothing Then _
-        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
+        Throw Error.Argument(InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult")
     If Not AsyncResult Is mActiveAsyncResult Then _
-        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
+        Throw Error.InvalidOperation(InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple)
     
     Dim Result As StreamAsyncResult
     Set Result = AsyncResult
     If Not Result.IsReadType Then _
-        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
+        Throw Error.Argument(InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult")
     If Result.EndCalled Then _
-        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
+        Throw Error.Argument(InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult")
     If Not Result.Exception Is Nothing Then _
         Throw Result.Exception
     
@@ -661,7 +661,7 @@ Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count A
     CheckValidSingleDimArray Bytes, Parameter_Bytes
     
     If Offset < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Offset", ArgumentOutOfRange_LBound)
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Offset + Count - 1 > UBound(Bytes) Then _
@@ -836,9 +836,9 @@ End Function
 Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
     Path = CorString.Trim(Path)
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     If BufferSize <= 0 Then _
-        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
+        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedPosNum)
     
     ValidateFileMode Mode
     ValidateFileAccess Access
@@ -877,21 +877,17 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
         mBufferOffset = mMinPosition
     End If
     
-    If BufferSize < MIN_BUFFERSIZE Then
-        BufferSize = MIN_BUFFERSIZE
-    End If
-    
-    mBufferSize = BufferSize
+    mBufferSize = MathExt.Max(BufferSize, MinBufferSize)
 End Sub
 
 Friend Sub InitWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAccess, ByVal BufferSize As Long)
     If Handle.IsInvalid Then _
-        Error.Argument Argument_InvalidHandle
+        Throw Error.Argument(Argument_InvalidHandle)
     If BufferSize < 1 Then _
         Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedNonNegNum)
     
     Set mHandle = Handle
-    mBufferSize = BufferSize
+    mBufferSize = MathExt.Max(BufferSize, MinBufferSize)
     mCanSeek = (GetFileType(Handle) = FILE_TYPE_DISK)
     mCanWrite = CBool(Access And WriteAccess)
     mCanRead = CBool(Access And ReadAccess)

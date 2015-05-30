@@ -35,6 +35,9 @@ Public Const INVALID_HANDLE_VALUE       As Long = -1
 Public Const FILE_TYPE_DISK             As Long = &H1
 Public Const FILE_ATTRIBUTE_DIRECTORY   As Long = &H10
 Public Const INVALID_FILE_ATTRIBUTES    As Long = -1
+Public Const INVALID_SET_FILE_POINTER  As Long = -1
+Public Const INVALID_FILE_SIZE         As Long = -1
+Public Const ERROR_BROKEN_PIPE         As Long = 109
 
 ' File manipulation function attributes
 Public Const GENERIC_READ               As Long = &H80000000

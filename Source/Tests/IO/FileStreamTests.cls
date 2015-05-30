@@ -113,8 +113,7 @@ Public Sub NewFileStream_WithBufferSizeLessThanOne_ThrowsArgumentOutOfRangeExcep
     FileName = Path.Combine(mBuilder.TempFolder, "Test.txt")
     
     On Error Resume Next
-    With NewFileStream(FileName, Create, BufferSize:=0)
-    End With
+    NewFileStream FileName, Create, BufferSize:=0
     
     AssertArgumentOutOfRangeException Err, "BufferSize"
 End Sub
