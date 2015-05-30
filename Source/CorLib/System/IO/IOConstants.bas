@@ -24,10 +24,10 @@ Attribute VB_Name = "IOConstants"
 '
 Option Explicit
 
+
 Public Const MAX_PATH                   As Long = 260
-Public Const MAX_DIRECTORY_PATH         As Long = 260
-Public Const NO_ERROR                   As Long = 0
-Public Const MAX_COMPONENT_LENGTH       As Long = 255
+Public Const MAX_DIR                    As Long = 255
+Public Const MAX_LONG_PATH              As Long = 32000
 
 Public Const FILE_FLAG_OVERLAPPED       As Long = &H40000000
 Public Const FILE_ATTRIBUTE_NORMAL      As Long = &H80
@@ -60,6 +60,7 @@ Public Const FILE_MAP_READ              As Long = SECTION_MAP_READ
 Public Const FILE_MAP_ALL_ACCESS        As Long = SECTION_ALL_ACCESS
 Public Const NULL_HANDLE                As Long = 0
 
+Public Const NO_ERROR                   As Long = 0
 Public Const ERROR_PATH_NOT_FOUND       As Long = 3
 Public Const ERROR_ACCESS_DENIED        As Long = 5
 Public Const ERROR_FILE_NOT_FOUND       As Long = 2

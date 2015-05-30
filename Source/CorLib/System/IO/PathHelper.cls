@@ -48,6 +48,31 @@ Friend Sub Append(ByVal Ch As Integer)
     mPosition = mPosition + 1
 End Sub
 
+Friend Property Get Chars(ByVal Index As Long) As Integer
+    Debug.Assert Index >= 0 And Index < mPosition
+    
+    Chars = mFinalBuffer(Index)
+End Property
+
+Friend Function GetFullPathName() As Long
+    Dim NewBuffer() As Integer
+    Dim NewLength   As Long
+    
+    ReDim NewBuffer(0 To mPosition + MAX_PATH)
+    NewLength = GetFullPathNameW(mFinalBuffer(0), mPosition + MAX_PATH, NewBuffer(0), ByVal vbNullPtr)
+    Helper.Swap4 ByVal ArrPtr(mFinalBuffer), ByVal ArrPtr(NewBuffer)
+    mPosition = NewLength
+    GetFullPathName = NewLength
+End Function
+
 Friend Property Get Length() As Long
     Length = mPosition
 End Property
+
+Friend Function ToString() As String
+    ToString = SysAllocStringLen(VarPtr(mFinalBuffer(0)), mPosition)
+End Function
+
+Private Sub Class_Initialize()
+    ReDim mFinalBuffer(0 To MAX_PATH)
+End Sub

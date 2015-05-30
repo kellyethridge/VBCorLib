@@ -94,7 +94,7 @@ Private Sub Setup()
     mCurrentDirectory = Directory.GetCurrentDirectory
     mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
     
-    If Not Directory.Exists(mTempFolder) Then
+    If Helper.FolderExists(mTempFolder) Then
         Directory.CreateDirectory mTempFolder
     End If
 End Sub
@@ -102,9 +102,12 @@ End Sub
 Private Sub Teardown()
     Directory.SetCurrentDirectory mCurrentDirectory
     
-    If Directory.Exists(mTempFolder) Then
+    On Error GoTo Catch
+    If Helper.FolderExists(mTempFolder) Then
         Directory.Delete mTempFolder, True
     End If
+    
+Catch:
 End Sub
 
 Private Sub Class_Initialize()

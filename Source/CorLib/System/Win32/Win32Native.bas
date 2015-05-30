@@ -26,8 +26,12 @@ Attribute VB_Name = "Win32Native"
 ' These are here because these are not supported on Win9x.
 Option Explicit
 
-Public Api As IWin32Api
+Private Type FileNameBuffer
+    Buffer As String * 32000
+End Type
 
+Public Api As IWin32Api
+Private FileName As FileNameBuffer
 
 Public Sub InitWin32Api()
     Set Api = New Win32ApiW
@@ -69,13 +73,20 @@ Public Function GetUserObjectInformation(ByVal hObj As Long, ByVal nIndex As Lon
 End Function
 
 Public Function GetSystemMenu(ByVal hwnd As Long, ByVal bRevert As Boolean) As Long
-    Dim boolRevert As BOOL
-    boolRevert = IIf(bRevert, BOOL_TRUE, BOOL_FALSE)
-    GetSystemMenu = VBCorType.GetSystemMenu(hwnd, boolRevert)
+    Dim BoolRevert As BOOL
+    BoolRevert = IIf(bRevert, BOOL_TRUE, BOOL_FALSE)
+    GetSystemMenu = VBCorType.GetSystemMenu(hwnd, BoolRevert)
 End Function
 
 Public Function RemoveMenu(ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
     RemoveMenu = VBCorType.RemoveMenu(hMenu, nPosition, wFlags)
+End Function
+
+Public Function GetFullPathName(ByRef Path As String) As String
+    Dim Output As String
+    Dim Length As Long
+    
+    
 End Function
 
 
@@ -83,7 +94,7 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function MakeWide(ByRef PartialPath As String) As String
-    Dim Root        As String
+    Dim root        As String
     Dim FullPath    As String
     FullPath = Path.GetFullPath(PartialPath)
     
@@ -92,10 +103,10 @@ Private Function MakeWide(ByRef PartialPath As String) As String
         ' MSDN says the format is \\?\UNC\Server\Share\... ,
         ' so we need to trim off the first backslash from the path
         FullPath = Mid$(FullPath, 2)
-        Root = "UNC"
+        root = "UNC"
     End If
     
-    MakeWide = "\\?\" & Root & FullPath
+    MakeWide = "\\?\" & root & FullPath
 End Function
 
 Private Sub FindDataWToFindData(ByRef Source As WIN32_FIND_DATAW, ByRef Dest As WIN32_FIND_DATA)
