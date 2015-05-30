@@ -36,146 +36,18 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Private mMaxPath    As Long
-Private mCapacity   As Long
-Private mCharBuffer As String
-Private mChars()    As Integer
-Private mLength     As Long
-Private mDoNotTryExpandShortFileName As Boolean
+Private mFinalBuffer()  As Integer
+Private mPosition       As Long
 
+Friend Sub Append(ByVal Ch As Integer)
+    If mPosition > UBound(mFinalBuffer) Then
+        ReDim Preserve mFinalBuffer(0 To mPosition * 2)
+    End If
 
-Private Sub Class_Initialize()
-    mMaxPath = Path.MaxPath
-    mCapacity = mMaxPath
-    mCharBuffer = String$(mMaxPath, 0)
-    mChars = AllocChars(mCharBuffer)
-End Sub
-
-Private Sub Class_Terminate()
-    FreeChars mChars
+    mFinalBuffer(mPosition) = Ch
+    mPosition = mPosition + 1
 End Sub
 
 Friend Property Get Length() As Long
-    Length = mLength
+    Length = mPosition
 End Property
-
-Friend Property Let Length(ByVal Value As Long)
-    mLength = Value
-End Property
-
-Friend Property Get Capacity() As Long
-    Capacity = mCapacity
-End Property
-
-Friend Property Get Chars(ByVal Index As Long) As Integer
-    If Index < 0 Or Index > mLength Then _
-        Error.IndexOutOfRange IndexOutOfRange_ArrayBounds
-    
-    Chars = mChars(Index)
-End Property
-
-Friend Property Let Chars(ByVal Index As Long, ByVal Value As Integer)
-    If Index < 0 Or Index > mLength Then _
-        Error.IndexOutOfRange IndexOutOfRange_ArrayBounds
-        
-    Chars(Index) = Value
-End Property
-
-Friend Sub Append(ByVal Char As Integer)
-    If mLength + 1 > mCapacity Then _
-        Error.IOException IOException_PathTooLong
-    
-    mChars(mLength) = Char
-    mLength = mLength + 1
-End Sub
-
-Friend Function GetFullPathName() As Long
-    Dim FinalBuffer As String
-    FinalBuffer = String$(Path.MaxPath + 1, 0)
-    
-    Dim Result As Long
-    Result = GetFullPathNameW(mCharBuffer, mLength, FinalBuffer, ByVal 0)
-    If Result >= mMaxPath Then _
-        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOException_PathTooLong))
-    If Result = 0 Then _
-        IOError Err.LastDllError
-    
-    CopyMemory mChars(0), ByVal StrPtr(FinalBuffer), Result * 2
-    mLength = Result
-    GetFullPathName = Result
-End Function
-
-Friend Function TryExpandShortFileName() As Boolean
-    If mDoNotTryExpandShortFileName Then
-        Exit Function
-    End If
-    
-    NullTerminate
-    
-    Dim ShortFileNameBuffer As String
-    ShortFileNameBuffer = String$(Path.MaxPath + 1, 0)
-    
-    Dim Result As Long
-    Result = GetLongPathNameW(mCharBuffer, ShortFileNameBuffer, mMaxPath)
-    If Result > mMaxPath Then _
-        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOException_PathTooLong))
-    If Result = 0 Then
-        Dim DllError As Long
-        DllError = Err.LastDllError
-        If DllError = ERROR_FILE_NOT_FOUND Or DllError = ERROR_PATH_NOT_FOUND Then
-            mDoNotTryExpandShortFileName = True
-        End If
-        
-        Exit Function
-    End If
-    
-    CopyMemory mChars(0), ByVal StrPtr(ShortFileNameBuffer), Result
-    mLength = Result
-    NullTerminate
-    
-    TryExpandShortFileName = True
-End Function
-
-Friend Sub Fixup(ByVal LenSavedName As Long, ByVal LastSlash As Long)
-    Dim SavedName As String
-    SavedName = String$(LenSavedName, 0)
-    CopyMemory ByVal StrPtr(SavedName), mChars(LastSlash + 1), LenSavedName
-    mLength = LastSlash
-    NullTerminate
-    mDoNotTryExpandShortFileName = False
-    
-    Dim Result As Boolean
-    Result = TryExpandShortFileName
-    Append Path.DirectorySeparatorChar
-    If mLength + LenSavedName >= mMaxPath Then _
-        Throw Cor.NewPathTooLongException(Environment.GetResourceString(IOException_PathTooLong))
-    
-    CopyMemory mChars(mLength), ByVal StrPtr(SavedName), LenSavedName
-    mLength = mLength + LenSavedName
-End Sub
-
-Friend Function OrdinalStartsWith(ByRef CompareTo As String, ByVal IgnoreCase As Boolean) As Boolean
-    If mLength < Len(CompareTo) Then
-        Exit Function
-    End If
-    
-    NullTerminate
-    
-    Dim Current As String
-    Current = ToString
-    If IgnoreCase Then
-        OrdinalStartsWith = CorString.Equals(Current, CompareTo, OrdinalIgnoreCase)
-    Else
-        OrdinalStartsWith = CorString.Equals(Current, CompareTo)
-    End If
-End Function
-
-Public Function ToString() As String
-    ToString = Left$(mCharBuffer, mLength)
-End Function
-
-Private Sub NullTerminate()
-    mChars(mLength) = 0
-End Sub
-
-

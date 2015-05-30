@@ -166,6 +166,11 @@ Public Sub FreeChars(ByRef Chars() As Integer)
     SAPtr(Chars) = vbNullPtr
 End Sub
 
+Public Sub FreeCharsAndThrow(ByRef Chars() As Integer, ByVal Ex As Exception)
+    FreeChars Chars
+    Throw Ex
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
