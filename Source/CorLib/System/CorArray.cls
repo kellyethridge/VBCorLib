@@ -153,11 +153,11 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
     ElementCount = OptionalLong(Count, UBound(Arr) - ElementIndex + 1)
     
     If ElementIndex < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If ElementCount < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_Count)
     If ElementIndex + ElementCount - 1 > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_UBound
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_UBound)
     
     Dim ElementSize As Long
     ElementSize = SafeArrayGetElemsize(Ptr)
@@ -342,12 +342,12 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     ElemIndex = OptionalLong(Index, UBound(Arr))
     ElemCount = OptionalLong(Count, ElemIndex + 1)
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayBounds
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_ArrayBounds)
     If ElemCount < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
-        
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_LBound)
+    
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(Ptr)
     
@@ -490,11 +490,11 @@ End Function
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     CheckValidSingleDimArray Arr
     If Index < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Length < 0 Then _
-        Error.NegativeNumber "Length"
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Length - 1 > UBound(Arr) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     BinarySearchEx = BinarySearchCore(Arr, Index, Length, Value, Comparer)
 End Function
@@ -511,13 +511,13 @@ Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long
     
     pSafeArray = ArrayPointer(Arr)
     If pSafeArray = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
     If Index < LBound(Arr) Then _
-        Error.IndexOutOfRange IndexOutOfRange_ArrayBounds
+        Throw Error.IndexOutOfRange(IndexOutOfRange_ArrayBounds)
     If Length < 0 Then _
-        Error.IndexOutOfRange IndexOutOfRange_ArrayBounds
+        Throw Error.IndexOutOfRange(IndexOutOfRange_ArrayBounds)
     If Index + Length - 1 > UBound(Arr) Then _
-        Error.IndexOutOfRange IndexOutOfRange_ArrayBounds
+        Throw Error.IndexOutOfRange(IndexOutOfRange_ArrayBounds)
     
     If Length = 0 Then Exit Sub
     
@@ -570,9 +570,9 @@ End Sub
 ' </pre>
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
     If IsNull(SourceArray) Then _
-        Error.ArgumentNull "SourceArray", ArgumentNull_Array
+        Throw Error.ArgumentNull("SourceArray", ArgumentNull_Array)
     If IsNull(DestinationArray) Then _
-        Error.ArgumentNull "DestinationArray", ArgumentNull_Array
+        Throw Error.ArgumentNull("DestinationArray", ArgumentNull_Array)
     
     CopyEx SourceArray, LBound(SourceArray), DestinationArray, LBound(DestinationArray), Length
 End Sub
@@ -600,28 +600,28 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     Dim pSourceSafeArray As Long
     pSourceSafeArray = ArrayPointer(SourceArray)
     If pSourceSafeArray = vbNullPtr Then _
-        Error.ArgumentNull "SourceArray", ArgumentNull_Array
+        Throw Error.ArgumentNull("SourceArray", ArgumentNull_Array)
     
     Dim pDestinationSafeArray As Long
     pDestinationSafeArray = ArrayPointer(DestinationArray)
     If pDestinationSafeArray = vbNullPtr Then _
-        Error.ArgumentNull "DestinationArray", ArgumentNull_Array
-        
+        Throw Error.ArgumentNull("DestinationArray", ArgumentNull_Array)
+    
     Dim SourceLength As Long
     SourceLength = LengthCore(pSourceSafeArray, 0)
     Dim DestinationLength As Long
     DestinationLength = LengthCore(pDestinationSafeArray, 0)
     
     If Length < 0 Then _
-        Error.NegativeNumber "Length"
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
-        Error.Argument Argument_LongerThanSrCorArray
+        Throw Error.Argument(Argument_LongerThanSrCorArray)
     If Length + DestinationIndex - LBound(DestinationArray) > DestinationLength Then _
-        Error.Argument Argument_LongerThanDestArray
+        Throw Error.Argument(Argument_LongerThanDestArray)
     If SourceIndex < LBound(SourceArray) Then _
-        Error.ArgumentOutOfRange "SourceIndex", ArgumentOutOfRange_ArrayLB
+        Throw Error.ArgumentOutOfRange("SourceIndex", ArgumentOutOfRange_ArrayLB)
     If DestinationIndex < LBound(DestinationArray) Then _
-        Error.ArgumentOutOfRange "DestinationIndex", ArgumentOutOfRange_ArrayLB
+        Throw Error.ArgumentOutOfRange("DestinationIndex", ArgumentOutOfRange_ArrayLB)
     
     Dim SourceArrayType As VbVarType
     SourceArrayType = VarType(SourceArray) And &HFF    ' knock off the vbArray bit.
@@ -690,25 +690,25 @@ Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Le
     Select Case ElementType
         Case vbByte, vbInteger, vbLong, vbDouble, vbSingle, vbBoolean, vbCurrency, vbDate, vbString, vbObject, vbVariant
         Case Else
-            Error.Argument Argument_MustBeVbVarType, "ElementType"
+            Throw Error.Argument(Argument_MustBeVbVarType, "ElementType")
     End Select
     
     If Length1 < 0 Then _
-        Error.NegativeNumber "Length1"
+        Throw Error.ArgumentOutOfRange("Length1", ArgumentOutOfRange_NeedNonNegNum)
     
     Rank = 1
     Bounds(0).cElements = Length1
     
     If Not IsMissing(Length2) Then
         If CLng(Length2) < 0 Then _
-            Error.NegativeNumber "Length2"
+            Throw Error.ArgumentOutOfRange("Length2", ArgumentOutOfRange_NeedNonNegNum)
         
         Rank = 2
         Bounds(1).cElements = Length2
     
         If Not IsMissing(Length3) Then
             If CLng(Length3) < 0 Then _
-                Error.NegativeNumber "Length3"
+                Throw Error.ArgumentOutOfRange("Length3", ArgumentOutOfRange_NeedNonNegNum)
             
             Rank = 3
             Bounds(2).cElements = Length3
@@ -731,7 +731,7 @@ Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long
     Dim SafeArrayPtr  As Long
     SafeArrayPtr = ArrayPointer(Arr)
     If SafeArrayPtr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
     
     GetLength = LengthCore(SafeArrayPtr, Dimension)
 End Function
@@ -742,7 +742,7 @@ Friend Function LengthCore(ByVal SafeArrayPtr As Long, Optional ByVal Dimension 
     Dim Rank As Long
     Rank = SafeArrayGetDim(SafeArrayPtr)
     If Dimension > Rank Then _
-        Error.IndexOutOfRange IndexOutOfRange_Dimension
+        Throw Error.IndexOutOfRange(IndexOutOfRange_Dimension)
     
     Dim ArrayBoundPtr As Long
     ArrayBoundPtr = SafeArrayPtr + SizeOfSafeArray
@@ -789,7 +789,7 @@ Public Function Rank(ByRef Arr As Variant) As Long
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
     If Ptr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
     
     Rank = SafeArrayGetDim(Ptr)
 End Function
@@ -813,10 +813,10 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Range = OptionalStepRange(StartIndex, Count, LBound(Arr), LengthFirstDim(Arr), Parameter_StartIndex)
     
     If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_ArrayBounds)
     If Range.Count < 0 Or Range.Index + Range.Count - 1 > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
-        
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_Count)
+    
     On Error GoTo errTrap
     If TrySZIndexOf(Ptr, Value, Range.Index, Range.Count, IndexOf) Then
         Exit Function
@@ -868,11 +868,11 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     ElemCount = OptionalLong(Count, ElemIndex - LBound(Arr) + 1)
     
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_ArrayBounds)
     If ElemCount < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_Count)
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_LBound)
     
     On Error GoTo errTrap
     If TrySZLastIndexOf(Ptr, Value, ElemIndex, ElemCount, LastIndexOf) Then
@@ -914,11 +914,11 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     ElemCount = OptionalLong(Count, UBound(Arr) - ElemIndex + 1)
     
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If ElemCount < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(Ptr)
@@ -981,7 +981,7 @@ End Sub
 ' @include "..\Includes\CorArray_Sort.txt"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
     
     Dim Length As Long
     Length = UBound(Arr) - LBound(Arr) + 1
@@ -1013,7 +1013,7 @@ End Sub
 '
 Public Sub SortEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
     
     SortKeyEx Arr, Empty, Index, Length, Comparer
 End Sub
@@ -1042,7 +1042,7 @@ End Sub
 ' @include "..\Includes\CorArray.SortKey.txt"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Keys) Then _
-        Error.ArgumentNull "Keys", ArgumentNull_Array
+        Throw Error.ArgumentNull("Keys", ArgumentNull_Array)
     
     Dim Length As Long
     Length = UBound(Keys) - LBound(Keys) + 1
@@ -1081,15 +1081,15 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     CheckValidSingleDimArrayPtr KeysPtr, Parameter_Keys
     
     If Index < LBound(Keys) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Length < 0 Then _
-        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Length - 1 > UBound(Keys) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     If Not IsEmpty(Items) Then
         If Not IsArray(Items) Then _
-            Error.Argument Argument_ArrayRequired, "Items"
+            Throw Error.Argument(Argument_ArrayRequired, "Items")
         
         ItemsPtr = ArrayPointer(Items)
         CheckValidSingleDimArrayPtr ItemsPtr, Parameter_Items
@@ -1097,7 +1097,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
-            Error.Argument Argument_MatchingBounds
+            Throw Error.Argument(Argument_MatchingBounds)
         
         SetSortItems ItemsPtr
     End If
@@ -1135,7 +1135,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
                 QuickSortGeneral Keys, Index, Index + Length - 1
             End If
         Case Else
-            Error.Argument Argument_InvalidComparer, "Comparer"
+            Throw Error.Argument(Argument_InvalidComparer, "Comparer")
     End Select
     
     CleanUpSortRoutine
@@ -1161,7 +1161,7 @@ Friend Function ArrayPointer(ByRef Arg As Variant) As Long
     ArgType = VariantType(Arg)
     
     If (ArgType And vbArray) = 0 Then _
-        Error.Argument Argument_ArrayRequired
+        Throw Error.Argument(Argument_ArrayRequired)
     
     ArrayPointer = MemLong(VB6.vbaRefVarAry(Arg))
     

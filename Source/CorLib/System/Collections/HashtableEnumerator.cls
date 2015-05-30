@@ -72,13 +72,13 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyValidEnum()
     If GetCollectionVersion(mTable) <> mVersion Then
-        Error.InvalidOperation InvalidOperation_VersionError
+        Throw Error.InvalidOperation(InvalidOperation_VersionError)
     End If
     If mIndex < 0 Then
-        Error.InvalidOperation InvalidOperation_EnumNotStarted
+        Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
     End If
     If mEntries > mCount Then
-        Error.InvalidOperation InvalidOperation_EnumFinished
+        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
     End If
 End Sub
 
@@ -135,9 +135,9 @@ End Property
 
 Private Function IDictionaryEnumerator_MoveNext() As Boolean
     If GetCollectionVersion(mTable) <> mVersion Then _
-        Error.InvalidOperation InvalidOperation_VersionError
+        Throw Error.InvalidOperation(InvalidOperation_VersionError)
     If mEntries > mCount Then _
-        Error.InvalidOperation InvalidOperation_EnumFinished
+        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
     
     Do
         mIndex = mIndex + 1

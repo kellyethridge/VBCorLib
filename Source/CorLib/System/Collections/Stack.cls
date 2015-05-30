@@ -117,12 +117,12 @@ End Function
 '
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     If CorArray.IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
     If CorArray.Rank(Arr) <> 1 Then _
-        Error.Argument Argument_MultiDimNotSupported, "Arr" ' .NET throws an ArgumentException instead of RankException.
+        Throw Error.Argument(Argument_MultiDimNotSupported, "Arr")  ' .NET throws an ArgumentException instead of RankException.
     
     If Index < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_ArrayLB)
     
     CorArray.CopyEx mItems, 0, Arr, Index, mCount
     CorArray.Reverse Arr, Index, mCount
@@ -185,7 +185,7 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Error.InvalidOperation InvalidOperation_EmptyStack
+        Throw Error.InvalidOperation(InvalidOperation_EmptyStack)
     
     VariantCopy Peek, mItems(mCount - 1)
 End Function
@@ -197,7 +197,7 @@ End Function
 '
 Public Function Pop() As Variant
     If mCount = 0 Then _
-        Error.InvalidOperation InvalidOperation_EmptyStack
+        Throw Error.InvalidOperation(InvalidOperation_EmptyStack)
     
     mCount = mCount - 1
     Helper.MoveVariant Pop, mItems(mCount)
@@ -251,14 +251,14 @@ End Function
 Private Sub WriteRange(ByRef Source As Variant)
     If IsArray(Source) Then
         If CorArray.IsNull(Source) Then _
-            Error.ArgumentNull "Source", ArgumentNull_Array
+            Throw Error.ArgumentNull("Source", ArgumentNull_Array)
         If CorArray.Rank(Source) <> 1 Then _
-            Error.Argument Argument_MultiDimNotSupported, "Source"
+            Throw Error.Argument(Argument_MultiDimNotSupported, "Source")
         
         WriteArray Source
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Error.ArgumentNull "Source", ArgumentNull_Collection
+            Throw Error.ArgumentNull("Source", ArgumentNull_Collection)
         
         If TypeOf Source Is Collection Then
             WriteCollection Source

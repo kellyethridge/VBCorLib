@@ -161,23 +161,23 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
             Dim Bytes() As Byte
             SAPtr(Bytes) = CorArray.ArrayPointer(Source)
             If CorArray.IsNull(Bytes) Then _
-                Error.ArgumentNull "Source", ArgumentNull_Array
+                Throw Error.ArgumentNull("Source", ArgumentNull_Array)
             Set GetStream = Cor.NewMemoryStream(Bytes, Writable:=False)
             SAPtr(Bytes) = 0
             
         Case vbObject
             If Source Is Nothing Then _
-                Error.ArgumentNull "Source", ArgumentNull_Stream
+                Throw Error.ArgumentNull("Source", ArgumentNull_Stream)
             If TypeOf Source Is Stream Then
                 Set GetStream = Source
             ElseIf TypeOf Source Is SafeFileHandle Then
                 Set GetStream = Cor.NewFileStreamWithHandle(Source, Access)
             Else
-                Error.Argument Argument_StreamRequired
+                Throw Error.Argument(Argument_StreamRequired)
             End If
                 
         Case Else
-            Error.Argument Argument_StreamRequired
+            Throw Error.Argument(Argument_StreamRequired)
     End Select
 End Function
 

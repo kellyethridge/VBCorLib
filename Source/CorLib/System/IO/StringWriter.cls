@@ -154,11 +154,11 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
     Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
     
     If Range.Index < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     mSB.Append Chars, Index, Count
 End Sub
@@ -237,7 +237,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyIsOpen()
     If mIsClosed Then
-        Error.ObjectDisposed ObjectDisposed_WriterClosed
+        Throw Error.ObjectDisposed(ObjectDisposed_WriterClosed)
     End If
 End Sub
 

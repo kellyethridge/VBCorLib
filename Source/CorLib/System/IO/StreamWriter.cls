@@ -177,7 +177,7 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
     VerifyIsOpen
     
     If SAPtr(Chars) = vbNullPtr Then _
-        Error.ArgumentNull "Chars", ArgumentNull_Array
+        Throw Error.ArgumentNull("Chars", ArgumentNull_Array)
         
     Dim Output As String
     Output = CorString.FromCharArray(Chars, Index, Count)
@@ -260,14 +260,14 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
     Dim EmitBOM As Boolean
     
     If BufferSize < 0 Then _
-        Error.NegativeNumber "BufferSize"
+        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedNonNegNum)
     
     Select Case VarType(Source)
         Case vbObject
             If Source Is Nothing Then _
-                Error.ArgumentNull "Source", ArgumentNull_Stream
+                Throw Error.ArgumentNull("Source", ArgumentNull_Stream)
             If Not TypeOf Source Is Stream Then _
-                Error.Argument Argument_StreamRequired, "Source"
+                Throw Error.Argument(Argument_StreamRequired, "Source")
                 
             Set mStream = Source
         
@@ -284,7 +284,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
             Set mStream = Cor.NewFileStream(CStr(Source), Mode, FileAccess.WriteAccess, FileShare.ReadShare)
         
         Case Else
-            Error.Argument Argument_InvalidStreamSource, "Source"
+            Throw Error.Argument(Argument_InvalidStreamSource, "Source")
     End Select
         
     If Encoding Is Nothing Then
@@ -384,7 +384,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If Not mIsOpen Then
-        Error.ObjectDisposed ObjectDisposed_StreamClosed
+        Throw Error.ObjectDisposed(ObjectDisposed_StreamClosed)
     End If
 End Sub
 

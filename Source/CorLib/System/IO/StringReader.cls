@@ -108,11 +108,11 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
     CheckValidSingleDimArray Buffer, Parameter_Buffer
     
     If Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     If mPosition + Count > mLength Then
         Count = mLength - mPosition
@@ -236,7 +236,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyIsOpen()
     If mIsClosed Then
-        Error.ObjectDisposed ObjectDisposed_ReaderClosed
+        Throw Error.ObjectDisposed(ObjectDisposed_ReaderClosed)
     End If
 End Sub
 

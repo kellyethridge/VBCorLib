@@ -616,9 +616,9 @@ Private Sub CopyToCore(ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Enu
     Validation.CheckValidSingleDimArray Arr
     
     If ArrayIndex < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "ArrayIndex", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("ArrayIndex", ArgumentOutOfRange_LBound)
     If ArrayIndex + mCount > CorArray.LengthFirstDim(Arr) Then _
-        Error.Argument Argument_ArrayPlusOffTooSmall
+        Throw Error.Argument(Argument_ArrayPlusOffTooSmall)
     
     If mCount = 0 Then
         Exit Sub

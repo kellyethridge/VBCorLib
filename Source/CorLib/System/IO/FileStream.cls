@@ -273,11 +273,11 @@ Public Sub LockStream(ByVal Position As Currency, ByVal Length As Currency)
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Error.NegativeNumber "Position"
+        Throw Error.ArgumentOutOfRange("Position", ArgumentOutOfRange_NeedNonNegNum)
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Error.NegativeNumber "Length"
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
@@ -299,11 +299,11 @@ Public Sub UnlockStream(ByVal Position As Currency, ByVal Length As Currency)
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Error.NegativeNumber "Position"
+        Throw Error.ArgumentOutOfRange("Position", ArgumentOutOfRange_NeedNonNegNum)
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Error.NegativeNumber "Length"
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
@@ -370,7 +370,7 @@ End Property
 '
 Public Property Let Position(ByVal Value As Currency)
     If Value < 0@ Then _
-        Error.NegativeNumber "Value"
+        Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
         
     SeekPosition Value, SeekOrigin.FromBeginning
 End Property
@@ -444,7 +444,7 @@ Public Sub SetLength(ByVal Value As Currency)
     Value = Int(Value)
     If Value < mMinPosition Then
         If mMinPosition = 0@ Then
-            Error.NegativeNumber "Value"
+            Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
         Else
             Throw Cor.NewIOException("Setting the length to a position prior to the append-start postion is not permitted.")
         End If
@@ -503,7 +503,7 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
     If Offset < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Offset + Count - 1 > UBound(Bytes) Then _
         Error.Argument Argument_InvalidOffLen
     
@@ -663,9 +663,9 @@ Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count A
     If Offset < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Offset + Count - 1 > UBound(Bytes) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     If Count = 0 Then
         Exit Sub
@@ -887,8 +887,8 @@ End Sub
 Friend Sub InitWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAccess, ByVal BufferSize As Long)
     If Handle.IsInvalid Then _
         Error.Argument Argument_InvalidHandle
-    If BufferSize < 0 Then _
-        Error.NegativeNumber "BufferSize"
+    If BufferSize < 1 Then _
+        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedNonNegNum)
     
     Set mHandle = Handle
     mBufferSize = BufferSize

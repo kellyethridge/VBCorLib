@@ -162,11 +162,11 @@ End Function
 ' @include "..\..\Includes\ArrayListBinarySearch.txt"
 Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If Index < 0 Then _
-        Error.NegativeNumber "Index"
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mCount Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     If mCount = 0 Then
         BinarySearchEx = -1
@@ -200,7 +200,7 @@ End Property
 ' @include "..\..\Includes\ArrayListCapacity.txt"
 Public Property Let Capacity(ByVal Value As Long)
     If Value < mCount Then _
-        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
+        Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_SmallCapacity)
     
     If Value = 0 Then
         Value = DEF_CAPACITY
@@ -267,7 +267,7 @@ End Function
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
     If CorArray.IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
     
     CorArray.CopyEx mItems, 0, Arr, OptionalLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
@@ -284,7 +284,7 @@ End Sub
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
     CheckValidSingleDimArray Arr
     If mCount - Index < Count Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
         
     CorArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
 End Sub
@@ -324,11 +324,11 @@ Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Co
     Dim Range As ListRange
     Range = OptionalRange(Index, Count, 0, mCount)
     If Range.Index < 0 Then _
-        Error.NegativeNumber "Index"
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mCount Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
 
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, Range.Index, Range.Count
@@ -357,11 +357,11 @@ End Function
 '
 Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
     If Index < 0 Then _
-        Error.NegativeNumber "Index"
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mCount Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
         
     Dim Ranged As New RangedArrayList
     Ranged.Init Me, Index, Count
@@ -383,9 +383,9 @@ Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Var
     Range = OptionalStepRange(StartIndex, Count, 0, mCount, Parameter_StartIndex)
     
     If Range.Index > mCount Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_Index)
     If Range.Count < 0 Or Range.Index + Range.Count > mCount Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_Count)
     
     If mCount = 0 Then
         IndexOf = -1
@@ -405,7 +405,7 @@ End Function
 '
 Public Sub Insert(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index > mCount Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayListInsert
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_ArrayListInsert)
     
     EnsureCapacity mCount + 1
     InsertSpace Index, 1
@@ -429,7 +429,7 @@ End Sub
 '
 Public Sub InsertRange(ByVal Index As Long, ByRef Source As Variant)
     If Index < 0 Or Index > mCount Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayListInsert
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_ArrayListInsert)
     
     WriteRange Index, Source, True
     mVersion = mVersion + 1
@@ -470,7 +470,7 @@ End Property
 Public Property Get Item(ByVal Index As Long) As Variant
 Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mCount Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     
     VariantCopy Item, mItems(Index)
 End Property
@@ -487,7 +487,7 @@ End Property
 '
 Public Property Let Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     
     mItems(Index) = Value
     mVersion = mVersion + 1
@@ -505,7 +505,7 @@ End Property
 '
 Public Property Set Item(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     
     Set mItems(Index) = Value
     mVersion = mVersion + 1
@@ -527,13 +527,13 @@ Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As
     Range.Count = OptionalLong(Count, Range.Index + 1)
     
     If Range.Index < 0 Then _
-        Error.NegativeNumber "StartIndex"
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index >= mCount Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LargerThanCollection
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_LargerThanCollection)
     If Range.Index - Range.Count + 1 < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_LargerThanCollection
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_LargerThanCollection)
     
     If mCount = 0 Then
         LastIndexOf = -1
@@ -583,7 +583,7 @@ End Sub
 '
 Public Sub RemoveAt(ByVal Index As Long)
     If Index < 0 Or Index >= mCount Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     
     mItems(Index) = Empty
     RemoveSpace Index, 1
@@ -600,11 +600,11 @@ End Sub
 '
 Public Sub RemoveRange(ByVal Index As Long, ByVal Count As Long)
     If Index < 0 Then _
-        Error.NegativeNumber "Index"
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mCount Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
 
     Dim i As Long
     For i = Index To Index + Count - 1
@@ -629,11 +629,11 @@ Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Vari
     Range = OptionalRange(Index, Count, 0, mCount)
 
     If Range.Index < 0 Then _
-        Error.NegativeNumber "Index"
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mCount Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
 
 
     CorArray.Reverse mItems, Range.Index, Range.Count
@@ -669,12 +669,11 @@ Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant
     Range = OptionalRange(Index, Count, 0, mCount)
 
     If Range.Index < 0 Then _
-        Error.NegativeNumber "Index"
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mCount Then _
-        Error.InvalidOffsetLength
-
+        Throw Error.Argument(Argument_InvalidOffLen)
 
     If Comparer Is Nothing Then
         Set Comparer = mComparer
@@ -785,15 +784,15 @@ End Sub
 Private Sub WriteRange(ByVal Index As Long, ByRef Source As Variant, ByVal Insert As Boolean)
     If IsArray(Source) Then
         If CorArray.IsNull(Source) Then _
-            Error.ArgumentNull "Source", ArgumentNull_Array
+            Throw Error.ArgumentNull("Source", ArgumentNull_Array)
         If CorArray.Rank(Source) <> 1 Then _
-            Error.Rank
+            Throw Error.Rank
             
         WriteArray Index, Source, Insert
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Error.ArgumentNull "Source", ArgumentNull_Collection
-            
+            Throw Error.ArgumentNull("Source", ArgumentNull_Collection)
+        
         If TypeOf Source Is Collection Then
             WriteVBCollection Index, Source, Insert
         ElseIf TypeOf Source Is ICollection Then

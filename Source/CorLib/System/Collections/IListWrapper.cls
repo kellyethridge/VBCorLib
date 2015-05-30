@@ -151,11 +151,11 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
     Dim HighIndex   As Long
     
     If Index < 0 Then _
-        Error.NegativeNumber "Index"
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mList.Count Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     If Comparer Is Nothing Then
         Set Comparer = VBCorLib.Comparer.Default

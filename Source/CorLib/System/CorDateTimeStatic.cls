@@ -122,9 +122,9 @@ End Function
 '
 Public Function DaysInMonth(ByVal Year As Long, ByVal Month As Long) As Long
     If Year < 1 Or Year > 9999 Then _
-        Error.ArgumentOutOfRange "Year", ArgumentOutOfRange_Year
+        Throw Error.ArgumentOutOfRange("Year", ArgumentOutOfRange_Year)
     If Month < 1 Or Month > 12 Then _
-        Error.ArgumentOutOfRange "Month", ArgumentOutOfRange_Month
+        Throw Error.ArgumentOutOfRange("Month", ArgumentOutOfRange_Month)
     
     If Month = 2 Then
         If IsLeapYear(Year) Then
@@ -173,7 +173,7 @@ End Function
 '
 Public Function FromFileTimeUtc(ByVal Time As Currency) As CorDateTime
     If Time < 0 Then _
-        Error.NegativeNumber "Time"
+        Throw Error.ArgumentOutOfRange("Time", ArgumentOutOfRange_NeedNonNegNum)
     
     Set FromFileTimeUtc = New CorDateTime
     FromFileTimeUtc.InitFromFileTime Time, UtcKind
