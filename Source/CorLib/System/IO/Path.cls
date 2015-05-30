@@ -649,6 +649,17 @@ Friend Function InternalGetFullRootedPath(ByVal Path As String) As String
     InternalGetFullRootedPath = InternalGetFullPath(Path)
 End Function
 
+Friend Function NormalizePath(ByRef Path As String) As String
+    Dim Helper      As New PathHelper
+    Dim PathChars() As Integer
+    Dim Position    As Long
+    
+    PathChars = AllocChars(Path)
+    
+    
+    FreeChars PathChars
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors

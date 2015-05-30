@@ -27,6 +27,7 @@ Option Explicit
 Public Const MAX_PATH                   As Long = 260
 Public Const MAX_DIRECTORY_PATH         As Long = 260
 Public Const NO_ERROR                   As Long = 0
+Public Const MAX_COMPONENT_LENGTH       As Long = 255
 
 Public Const FILE_FLAG_OVERLAPPED       As Long = &H40000000
 Public Const FILE_ATTRIBUTE_NORMAL      As Long = &H80
