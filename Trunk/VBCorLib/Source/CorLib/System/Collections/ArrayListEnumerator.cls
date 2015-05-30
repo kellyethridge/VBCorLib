@@ -92,20 +92,20 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
     If GetCollectionVersion(mList) <> mVersion Then _
-        Error.InvalidOperation InvalidOperation_VersionError
+        Throw Error.InvalidOperation(InvalidOperation_VersionError)
     If mIndex < mStartIndex Then _
-        Error.InvalidOperation InvalidOperation_EnumNotStarted
+        Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
     If mIndex > mEndIndex Then _
-        Error.InvalidOperation InvalidOperation_EnumFinished
+        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
         
     Helper.MoveVariant IEnumerator_Current, mList(mIndex)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
     If GetCollectionVersion(mList) <> mVersion Then _
-        Error.InvalidOperation InvalidOperation_VersionError
+        Throw Error.InvalidOperation(InvalidOperation_VersionError)
     If mIndex > mEndIndex Then _
-        Error.InvalidOperation InvalidOperation_EnumFinished
+        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
     
     If mIndex = mEndIndex Then
         mIndex = mEndIndex + 1

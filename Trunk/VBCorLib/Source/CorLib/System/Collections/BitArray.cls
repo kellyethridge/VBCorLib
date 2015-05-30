@@ -86,7 +86,7 @@ Public Function AndBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
         Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
-        Error.Argument Argument_ArrayLengthsDiffer
+        Throw Error.Argument(Argument_ArrayLengthsDiffer)
     
     Bits.ApplyAndTo mBits
     mVersion = mVersion + 1
@@ -119,7 +119,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     CheckValidSingleDimArray Arr
     
     If Index < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     
     Select Case VarType(Arr)
         Case vbLongArray
@@ -128,14 +128,14 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
             
         Case vbByteArray
             If (Index + (mLength + 7) \ BitsPerByte) - 1 > UBound(Arr) Then _
-                Error.InvalidOffsetLength
+                Throw Error.Argument(Argument_InvalidOffLen)
             
             Buffer.BlockCopy mBits, 0, Arr, Index - LBound(Arr), (mLength + 7) \ BitsPerByte
             MaskOffLastElement Arr, Index, BitsPerByte
             
         Case vbBooleanArray
             If CorArray.LengthFirstDim(Arr) < mLength Then _
-                Error.InvalidOffsetLength
+                Throw Error.Argument(Argument_InvalidOffLen)
             
             Dim Booleans() As Boolean
             SAPtr(Booleans) = CorArray.ArrayPointer(Arr)
@@ -148,7 +148,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
             SAPtr(Booleans) = vbNullPtr
             
         Case Else
-            Error.Argument Argument_BitArrayTypeUnsupported, "Arr"
+            Throw Error.Argument(Argument_BitArrayTypeUnsupported, "Arr")
     End Select
 End Sub
 
@@ -218,7 +218,7 @@ Public Property Get Item(ByVal Index As Long) As Boolean
 Attribute Item.VB_UserMemId = 0
     EnsureInited
     If Index < 0 Or Index >= mLength Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     
     Dim bit As Long
     Index = GetBitIndex(Index, bit)
@@ -235,7 +235,7 @@ End Property
 Public Property Let Item(ByVal Index As Long, ByVal Value As Boolean)
     EnsureInited
     If Index < 0 Or Index >= mLength Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
 
     Dim bit As Long
     Index = GetBitIndex(Index, bit)
@@ -267,8 +267,8 @@ End Property
 Public Property Let Length(ByVal Value As Long)
     EnsureInited
     If Value < 0 Then _
-        Error.NegativeNumber "Value"
-        
+        Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
+    
     If Value <> mLength Then
         Dim LastElementIndex As Long
         mUBound = (Value - 1) \ BitsPerLong
@@ -365,9 +365,9 @@ End Function
 Public Function XorBits(ByVal Bits As BitArray) As BitArray
     EnsureInited
     If Bits Is Nothing Then _
-        Error.ArgumentNull "Bits", ArgumentNull_Array
+        Throw Error.ArgumentNull("Bits", ArgumentNull_Array)
     If Bits.Length <> mLength Then _
-        Error.Argument Argument_ArrayLengthsDiffer
+        Throw Error.Argument(Argument_ArrayLengthsDiffer)
 
     Bits.ApplyXorTo mBits
     mVersion = mVersion + 1

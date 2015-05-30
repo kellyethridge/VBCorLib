@@ -75,10 +75,10 @@ Private mSingleChar(0)  As Integer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Stream Is Nothing Then _
-        Error.ArgumentNull "Stream", ArgumentNull_Stream
+        Throw Error.ArgumentNull("Stream", ArgumentNull_Stream)
     If Not Stream.CanRead Then _
-        Error.Argument Argument_ReadableStreamRequired
-        
+        Throw Error.Argument(Argument_ReadableStreamRequired)
+    
     Set mStream = Stream
     If Encoding Is Nothing Then
         Set mEncoding = New UTF8Encoding
@@ -189,8 +189,8 @@ End Function
 Public Function ReadBytes(ByVal Count As Long) As Byte()
     VerifyIsOpen
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
-        
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+    
     Dim Bytes() As Byte
     If Count > 0 Then
         ReDim Bytes(0 To Count - 1)
@@ -222,7 +222,7 @@ End Function
 Public Function ReadChars(ByVal Count As Long) As Integer()
     VerifyIsOpen
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     
     Dim Chars() As Integer
     If Count > 0 Then
@@ -440,7 +440,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If mStream Is Nothing Then
-        Error.ObjectDisposed ObjectDisposed_FileNotOpen
+        Throw Error.ObjectDisposed(ObjectDisposed_FileNotOpen)
     End If
 End Sub
 
@@ -462,11 +462,11 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
     
     If Range.Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     Select Case VarType(Buffer)
         Case vbByteArray
@@ -474,7 +474,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
         Case vbIntegerArray
             ReadToBuffer = ReadToCharBuffer(BufferPtr, Range)
         Case Else
-            Error.Argument Argument_UnsupportedArray, "Buffer"
+            Throw Error.Argument(Argument_UnsupportedArray, "Buffer")
     End Select
 End Function
 

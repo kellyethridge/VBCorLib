@@ -114,11 +114,11 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
     Range = OptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_Index)
     If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Value) Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_IndexCount)
 
     AppendCharsCore Chars, Range.Index, Range.Count
     
@@ -141,11 +141,11 @@ Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Varian
     Range = OptionalRange(StartIndex, Count, 0, ValueLength, Parameter_StartIndex)
 
     If Range.Index < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_Index)
     If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > ValueLength Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_IndexCount)
 
     AppendCore ValuePtr, Range.Index, Range.Count
 End Sub
@@ -187,7 +187,7 @@ End Sub
 '
 Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1) As StringBuilder
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Char < -&H7FFF& Or Char > &HFFFF& Then _
         Throw Cor.NewArgumentOutOfRangeException("Char", Char, "Char must be between -32767 and 65535 inclusively.")
     
@@ -303,17 +303,17 @@ End Sub
 '
 Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByVal DestinationIndex As Long, ByVal Count As Long)
     If SourceIndex < 0 Or SourceIndex > mLength Then _
-        Error.ArgumentOutOfRange "SourceIndex", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("SourceIndex", ArgumentOutOfRange_Index)
     If SAPtr(Destination) = vbNullPtr Then _
-        Error.ArgumentNull "Destination", ArgumentNull_Array
+        Throw Error.ArgumentNull("Destination", ArgumentNull_Array)
     If DestinationIndex < LBound(Destination) Then _
-        Error.ArgumentOutOfRange "DestinationIndex", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("DestinationIndex", ArgumentOutOfRange_LBound)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If SourceIndex + Count > mLength Then _
-        Error.Argument Argument_LongerThanSrcString
+        Throw Error.Argument(Argument_LongerThanSrcString)
     If DestinationIndex + Count - 1 > UBound(Destination) Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_OffsetOut
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_OffsetOut)
     
     If Count > 0 Then
         CopyMemory Destination(DestinationIndex), ByVal mStringPtr + SourceIndex * BytesPerChar, Count * BytesPerChar
@@ -362,7 +362,7 @@ End Property
 Public Property Get Chars(ByVal Index As Long) As Integer
 Attribute Chars.VB_UserMemId = 0
     If Index < 0 Or Index >= mLength Then _
-        Error.IndexOutOfRange ArgumentOutOfRange_Index
+        Throw Error.IndexOutOfRange(ArgumentOutOfRange_Index)
     
     Chars = mString(Index)
 End Property
@@ -376,7 +376,7 @@ End Property
 '
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     
     mString(Index) = Char
 End Property
@@ -458,9 +458,9 @@ End Function
 '
 Public Function Insert(ByVal Index As Long, ByRef Value As Variant, Optional ByVal Count As Long = 1) As StringBuilder
     If Index < 0 Or Index > mLength Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     
     Dim s As String
     s = Object.ToString(Value)
@@ -490,19 +490,19 @@ End Function
 '
 Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef CharCount As Variant) As StringBuilder
     If Index < 0 Or Index > mLength Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     If SAPtr(Chars) = vbNullPtr Then _
-        Error.ArgumentNull "Chars", ArgumentNull_Array
+        Throw Error.ArgumentNull("Chars", ArgumentNull_Array)
     
     Dim Range As ListRange
     Range = OptionalRange(StartIndex, CharCount, LBound(Chars), CorArray.LengthFirstDim(Chars), Parameter_StartIndex, Parameter_CharCount)
     
     If Range.Index < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_LBound)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "CharCount"
+        Throw Error.ArgumentOutOfRange("CharCount", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_Index)
     
     If Range.Count > 0 Then
         InsertSpace Index, Range.Count
@@ -530,7 +530,7 @@ End Property
 '
 Public Property Let Length(ByVal Value As Long)
     If Value < 0 Then _
-        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NegativeLength)
     
     If Value > mLength Then
         If Value > mCapacity Then
@@ -551,12 +551,12 @@ End Property
 '
 Public Function Remove(ByVal StartIndex As Long, ByVal Length As Long) As StringBuilder
     If StartIndex < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_StartIndex)
     If Length < 0 Then _
-        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NegativeLength)
     If StartIndex + Length > mLength Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
-        
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_Index)
+    
     If Length > 0 Then
         CopyMemory ByVal mStringPtr + StartIndex * 2, ByVal mStringPtr + (StartIndex + Length) * BytesPerChar, (mLength - (StartIndex + Length)) * BytesPerChar
         mLength = mLength - Length
@@ -576,17 +576,17 @@ End Function
 '
 Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     If Len(OldValue) = 0 Then _
-        Error.Argument Argument_EmptyName, "OldValue"
+        Throw Error.Argument(Argument_EmptyName, "OldValue")
     
     Dim Range As ListRange
     Range = OptionalRange(StartIndex, Count, 0, mLength, Parameter_StartIndex)
     
     If Range.Index < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_StartIndex)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mLength Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_Index)
     
     Dim MatchCount      As Long
     Dim MatchIndexes()  As Long
@@ -621,11 +621,11 @@ Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Le
     Range = OptionalRange(StartIndex, Length, 0, mLength, Parameter_StartIndex, Parameter_Length)
     
     If Range.Index < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_StartIndex)
     If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NegativeLength)
     If Range.Index + Range.Count > mLength Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_Index)
     
     If Range.Count > 0 Then
         ToString = SysAllocStringLen(mStringPtr + Range.Index * BytesPerChar, Range.Count)
@@ -643,14 +643,14 @@ Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Length As 
     ElemCount = OptionalLong(Length, Len(s) - ElemIndex)
         
     If ElemIndex < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_StartIndex)
     If ElemCount < 0 Then _
-        Error.NegativeNumber "Length"
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If ElemIndex + ElemCount > Len(s) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_IndexLength
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_IndexLength)
     If Capacity < 0 Then _
-        Error.NegativeNumber "Capacity"
-        
+        Throw Error.ArgumentOutOfRange("Capacity", ArgumentOutOfRange_NeedNonNegNum)
+    
     If Capacity = 0 Then
         Capacity = DefaultCapacity
     End If

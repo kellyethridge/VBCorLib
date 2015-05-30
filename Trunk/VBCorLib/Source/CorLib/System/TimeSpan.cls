@@ -366,5 +366,5 @@ Private Function IComparable_CompareTo(Value As Variant) As Long
     Exit Function
     
 Catch:
-    Error.Argument Argument_TimeSpanRequired, "Value"
+    Throw Error.Argument(Argument_TimeSpanRequired, "Value")
 End Function

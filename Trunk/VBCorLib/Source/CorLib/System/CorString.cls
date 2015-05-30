@@ -98,11 +98,11 @@ Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As 
     Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
     
     If Range.Index < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     If Range.Count = 0 Then
         FromCharArray = ""
@@ -182,11 +182,11 @@ Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Vari
     Range = OptionalRange(StartIndex, Length, 0, Len(s), Parameter_StartIndex, Parameter_Length)
     
     If Range.Index < 0 Then _
-        Error.NegativeNumber "StartIndex"
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Length"
+        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > Len(s) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_IndexCount
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_IndexCount)
     
     Dim Chars() As Integer
     If Range.Count > 0 Then
@@ -303,11 +303,11 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
     Range = OptionalRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_LBound)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Value) Then _
-        Error.ArgumentOutOfRange "", Argument_InvalidOffLen
+        Throw Error.ArgumentOutOfRange("", Argument_InvalidOffLen)
     
     Select Case VarType(Value)
         Case vbStringArray
@@ -335,11 +335,11 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
     RemovalCount = OptionalLong(Count, CharCount - StartIndex)
     
     If StartIndex < 0 Then _
-        Error.NegativeNumber "StartIndex"
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_NeedNonNegNum)
     If RemovalCount < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If StartIndex + RemovalCount > Len(s) Then _
-        Error.ArgumentOutOfRange "", Argument_InvalidOffLen
+        Throw Error.ArgumentOutOfRange("", Argument_InvalidOffLen)
     
     Dim SPtr As Long
     SPtr = StrPtr(s)
@@ -367,13 +367,13 @@ Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional B
     Range = OptionalStepRange(StartIndex, Count, 0, Len(s), Parameter_StartIndex)
     
     If Range.Index < 0 Then _
-        Error.NegativeNumber "StartIndex"
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index > Len(s) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_Index)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > Len(s) Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_Count)
     
     IndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index + Range.Count - 1, 1)
 End Function
@@ -399,11 +399,11 @@ Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Option
     Range = OptionalReverseStepRange(StartIndex, Count, Len(s) - 1, Len(s), Parameter_StartIndex)
     
     If Range.Index < 0 Then _
-        Error.NegativeNumber "StartIndex"
+        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index - Range.Count + 1 < 0 Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
+        Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_Count)
     
     LastIndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
 End Function
@@ -420,7 +420,7 @@ End Function
 '
 Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
     If StartIndex < 0 Or StartIndex > Len(s) Then _
-        Error.ArgumentOutOfRange "StartIndex"
+        Throw Error.ArgumentOutOfRange("StartIndex")
     
     Dim ValueLength As Long
     ValueLength = Len(Value)
@@ -451,7 +451,7 @@ Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal Comp
         Case StringComparison.OrdinalIgnoreCase
             Equals = OrdinalIgnoreCaseEquals(StrPtr(a), StrPtr(b))
         Case Else
-            Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
+            Throw Error.ArgumentOutOfRange("ComparisonType", ArgumentOutOfRange_Enum)
     End Select
 End Function
 
@@ -462,7 +462,7 @@ Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal C
         Case StringComparison.OrdinalIgnoreCase
             EqualsV = OrdinalIgnoreCaseEquals(StrPtr(a), StrPtr(b))
         Case Else
-            Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
+            Throw Error.ArgumentOutOfRange("ComparisonType", ArgumentOutOfRange_Enum)
     End Select
 End Function
 
@@ -514,7 +514,7 @@ Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal
     Dim OfAnyChars() As Integer
     OfAnyChars = AsChars(OfAny)
     If SAPtr(OfAnyChars) = vbNullPtr Then _
-        Error.ArgumentNull "OfAny", ArgumentNull_Array
+        Throw Error.ArgumentNull("OfAny", ArgumentNull_Array)
     
     Dim Chars() As Integer
     Chars = AllocChars(s)
@@ -556,7 +556,7 @@ Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal T
             TrimCore = TrimWhiteSpace(s, TrimHead, TrimTail)
             
         Case Else
-            Error.Argument Argument_CharArrayRequired, "TrimChars"
+            Throw Error.Argument(Argument_CharArrayRequired, "TrimChars")
     End Select
 End Function
 
@@ -732,7 +732,7 @@ End Function
 
 Private Function JoinCollection(ByRef Separator As String, ByVal Value As Object) As String
     If Value Is Nothing Then _
-        Error.ArgumentNull "Value"
+        Throw Error.ArgumentNull("Value")
     
     Dim AppendSeparator As Boolean
     Dim Item            As Variant
@@ -755,7 +755,7 @@ Private Function JoinCollection(ByRef Separator As String, ByVal Value As Object
     
 NonEnumerable:
     StringBuilderCache.Release ResultBuilder
-    Error.Argument Argument_NotEnumerable, "Value"
+    Throw Error.Argument(Argument_NotEnumerable, "Value")
 End Function
 
 ' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation

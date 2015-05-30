@@ -269,7 +269,7 @@ End Function
 '
 Public Function GetDirectoryName(ByVal Path As String) As String
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
     FixupPath Path
     
@@ -279,7 +279,7 @@ Public Function GetDirectoryName(ByVal Path As String) As String
             MinSlashes = 4
         ElseIf .HiWord = vbVolumeSeparatorChar Then
             If (.LoWord = vbVolumeSeparatorChar) Or (InStr(3, Path, vbVolumeSeparatorString) > 0) Then _
-                Error.Argument Argument_InvalidPathFormat, "Path"
+                Throw Error.Argument(Argument_InvalidPathFormat, "Path")
             
             Select Case Asc(Path)
                 Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
@@ -288,7 +288,7 @@ Public Function GetDirectoryName(ByVal Path As String) As String
                     End If
                     
                 Case Else
-                    Error.Argument Argument_InvalidPathFormat, "Path"
+                    Throw Error.Argument(Argument_InvalidPathFormat, "Path")
             End Select
             
         Else
@@ -372,7 +372,7 @@ Public Function GetFullPath(ByVal Path As String) As String
     
     Path = CorString.Trim(Path)
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
         
     FixupPath Path
     
@@ -441,7 +441,7 @@ End Function
 '
 Public Function GetPathRoot(ByVal Path As String) As String
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
     FixupPath Path
     
@@ -453,7 +453,7 @@ Public Function GetPathRoot(ByVal Path As String) As String
                     Exit Function
                 
                 Case vbVolumeSeparatorChar
-                    Error.Argument Argument_InvalidPathFormat, "Path"
+                    Throw Error.Argument(Argument_InvalidPathFormat, "Path")
                 
                 Case Else
                     GetPathRoot = vbDirectorySeparatorString
@@ -471,7 +471,7 @@ Public Function GetPathRoot(ByVal Path As String) As String
                     End If
                     
                 Case Else
-                    Error.Argument Argument_InvalidPathFormat, "Path"
+                    Throw Error.Argument(Argument_InvalidPathFormat, "Path")
                     
             End Select
         End If
@@ -537,7 +537,7 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
     For i = 0 To Len(Path) - 1
         Select Case mBuffer.Data(i)
             Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
-                Error.Argument Argument_InvalidCharsInPath, "Path"
+                Throw Error.Argument(Argument_InvalidCharsInPath, "Path")
                 
             Case vbAltDirectorySeparatorChar
                 If FixSlashes Then
@@ -551,7 +551,7 @@ End Sub
 
 Friend Sub CheckValidPath(ByRef Path As String)
     If HasIllegalCharacters(Path) Then
-        Error.Argument Argument_InvalidCharsInPath
+        Throw Error.Argument(Argument_InvalidCharsInPath)
     End If
 End Sub
 
@@ -590,7 +590,7 @@ Friend Sub CheckValidPathAndFixSlashes(ByRef Path As String)
     For i = 0 To Len(Path) - 1
         Select Case mBuffer.Data(i)
             Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
-                Error.Argument Argument_InvalidCharsInPath, "Path"
+                Throw Error.Argument(Argument_InvalidCharsInPath, "Path")
                 
             Case vbAltDirectorySeparatorChar
                 mBuffer.Data(i) = vbDirectorySeparatorChar

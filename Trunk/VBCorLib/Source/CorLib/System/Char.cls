@@ -51,7 +51,7 @@ Public Function IsWhiteSpace(ByRef CharOrString As Variant, Optional ByVal Index
         Case vbString
             IsWhiteSpace = IsWhiteSpaceString(CharOrString, Index)
         Case Else
-            Error.Argument Argument_InvalidValueType, "String or Integer"
+            Throw Error.Argument(Argument_InvalidValueType, "String or Integer")
     End Select
 End Function
 
@@ -70,7 +70,7 @@ Private Function IsWhiteSpaceString(ByRef s As Variant, ByRef Index As Variant) 
     CharIndex = OptionalLong(Index, 0)
     
     If CharIndex < 0 Or CharIndex >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
+        Throw Error.ArgumentOutOfRange("Index")
     
     Dim Ptr As Long
     Ptr = StrPtr(s) + CharIndex * 2

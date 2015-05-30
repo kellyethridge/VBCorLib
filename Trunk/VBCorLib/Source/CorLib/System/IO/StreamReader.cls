@@ -172,13 +172,13 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
     VerifyIsOpen
     
     If SAPtr(Buffer) = vbNullPtr Then _
-        Error.ArgumentNull "Buffer", ArgumentNull_Array
+        Throw Error.ArgumentNull("Buffer", ArgumentNull_Array)
     If Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count - 1 > UBound(Buffer) Then _
-        Error.InvalidOffsetLength
+        Throw Error.Argument(Argument_InvalidOffLen)
     
     Dim AvailableChars As Long
     ' We will loop until we have read the
@@ -375,14 +375,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal determineEncodingFromByteOrderMarks As Boolean, ByVal BufferSize As Long, ByVal LeaveOpen As Boolean)
     If BufferSize <= 0 Then _
-        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
+        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedPosNum)
     
     Select Case VarType(Source)
         Case vbObject
             If Source Is Nothing Then _
-                Error.ArgumentNull "Source", ArgumentNull_Stream
+                Throw Error.ArgumentNull("Source", ArgumentNull_Stream)
             If Not TypeOf Source Is Stream Then _
-                Error.Argument Argument_StreamRequired, "Source"
+                Throw Error.Argument(Argument_StreamRequired, "Source")
         
             Set mStream = Source
         
@@ -390,7 +390,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal deter
             Set mStream = Cor.NewFileStream(CStr(Source), FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare)
         
         Case Else
-            Error.Argument Argument_InvalidStreamSource, "Source"
+            Throw Error.Argument(Argument_InvalidStreamSource, "Source")
     End Select
     
     mDetermineEncoding = determineEncodingFromByteOrderMarks
@@ -492,7 +492,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If Not mIsOpen Then
-        Error.ObjectDisposed ObjectDisposed_StreamClosed
+        Throw Error.ObjectDisposed(ObjectDisposed_StreamClosed)
     End If
 End Sub
 

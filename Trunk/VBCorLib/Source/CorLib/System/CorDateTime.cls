@@ -357,13 +357,13 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
     Dim Day     As Long
     GetDateParts Complete, Year, Month, Day
     
-    Dim YearsToAdd  As Long
-    Dim MonthsToAdd As Long
+    Dim yearsToAdd  As Long
+    Dim monthsToAdd As Long
     
-    YearsToAdd = MathExt.DivRem(Months, MonthsPerYear, MonthsToAdd)
+    yearsToAdd = MathExt.DivRem(Months, MonthsPerYear, monthsToAdd)
     
-    Month = Month + MonthsToAdd
-    Year = Year + YearsToAdd
+    Month = Month + monthsToAdd
+    Year = Year + yearsToAdd
     Select Case Month
         Case Is < 1
             Month = Month + MonthsPerYear
@@ -436,13 +436,13 @@ Public Function CompareTo(ByRef Value As Variant) As Long
     Select Case VariantType(Value) And &HFF
         Case vbObject
             If Value Is Nothing Then _
-                Error.ArgumentNull "Value"
+                Throw Error.ArgumentNull("Value")
             If Not TypeOf Value Is CorDateTime Then _
-                Error.Argument Argument_DateRequired, "Value"
+                Throw Error.Argument(Argument_DateRequired, "Value")
                 
-            Dim Other As CorDateTime
-            Set Other = Value
-            ms = Other.TotalMilliseconds
+            Dim other As CorDateTime
+            Set other = Value
+            ms = other.TotalMilliseconds
             
         Case vbDate
             ms = CorDateTime.GetMilliseconds(Value)
@@ -603,7 +603,7 @@ Public Function Subtract(ByRef Value As Variant) As Object
     Select Case VarType(Value)
         Case vbObject
             If Value Is Nothing Then _
-                Error.ArgumentNull "Value", ArgumentNull_Generic
+                Throw Error.ArgumentNull("Value", ArgumentNull_Generic)
             
             If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan
@@ -614,12 +614,12 @@ Public Function Subtract(ByRef Value As Variant) As Object
                 Set dt = Value
                 Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - dt.TotalMilliseconds)
             Else
-                Error.Argument Argument_InvalidDateSubtraction, "Value"
+                Throw Error.Argument(Argument_InvalidDateSubtraction, "Value")
             End If
         Case vbDate
             Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.GetMilliseconds(Value))
         Case Else
-            Error.Argument Argument_InvalidDateSubtraction, "Value"
+            Throw Error.Argument(Argument_InvalidDateSubtraction, "Value")
     End Select
 End Function
 

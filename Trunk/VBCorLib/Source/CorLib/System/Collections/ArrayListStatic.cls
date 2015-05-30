@@ -57,8 +57,8 @@ Option Explicit
 '
 Public Function ReadOnly(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
-        Error.ArgumentNull "List"
-        
+        Throw Error.ArgumentNull("List")
+    
     Dim Ret As New ReadOnlyArrayList
     Ret.Init List
     Set ReadOnly = Ret
@@ -95,7 +95,7 @@ End Function
 '
 Public Function Repeat(ByRef Value As Variant, ByVal Count As Long) As ArrayList
     If Count < 0 Then _
-        Error.NegativeNumber "Count"
+        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     
     Set Repeat = New ArrayList
     Repeat.Capacity = Count
@@ -116,7 +116,7 @@ End Function
 '
 Public Function Adapter(ByVal List As IList) As ArrayList
     If List Is Nothing Then _
-        Error.ArgumentNull "List"
+        Throw Error.ArgumentNull("List")
     
     Dim Wrapper As New IListWrapper
     Wrapper.Init List

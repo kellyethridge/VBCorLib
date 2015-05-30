@@ -89,14 +89,14 @@ End Sub
 '
 Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As String, Optional ByVal OverWrite As Boolean = False)
     If Len(SourceFileName) = 0 Then _
-        Error.Argument Argument_EmptyFileName, "SourceFileName"
+        Throw Error.Argument(Argument_EmptyFileName, "SourceFileName")
     If Len(DestinationFileName) = 0 Then _
-        Error.Argument Argument_EmptyFileName, "DestinationFileName"
+        Throw Error.Argument(Argument_EmptyFileName, "DestinationFileName")
     If Path.HasIllegalCharacters(SourceFileName) Then _
-        Error.Argument Argument_InvalidCharsInPath, "SourceFileName"
+        Throw Error.Argument(Argument_InvalidCharsInPath, "SourceFileName")
     If Path.HasIllegalCharacters(DestinationFileName) Then _
-        Error.Argument Argument_InvalidCharsInPath, "DestinationFileName"
-        
+        Throw Error.Argument(Argument_InvalidCharsInPath, "DestinationFileName")
+    
     SourceFileName = Path.GetFullPath(CorString.TrimEnd(SourceFileName, mDirectorySeparators))
     DestinationFileName = Path.GetFullPath(CorString.TrimEnd(DestinationFileName, mDirectorySeparators))
     
@@ -111,7 +111,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
             If Not File.Exists(SourceFileName) Then _
                 IOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
-                Error.IOException IOException_DirectoryExists
+                Throw Error.IO(IOException_DirectoryExists)
         End If
         IOError DllError, SourceFileName
     End If
@@ -150,7 +150,7 @@ End Function
 '
 Public Sub Delete(ByVal Path As String)
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
     Statics.Path.VerifyPath Path, True
     
@@ -274,9 +274,9 @@ End Function
 '
 Public Sub Move(ByRef SourceFileName As String, ByVal DestinationFileName As String)
     If Len(SourceFileName) = 0 Then _
-        Error.Argument Argument_EmptyPath, "SourceFileName"
+        Throw Error.Argument(Argument_EmptyPath, "SourceFileName")
     If Len(DestinationFileName) = 0 Then _
-        Error.Argument Argument_EmptyPath, "DestinationFileName"
+        Throw Error.Argument(Argument_EmptyPath, "DestinationFileName")
 
     Path.VerifyPath SourceFileName
     Path.VerifyPath DestinationFileName
@@ -346,7 +346,7 @@ End Function
 '
 Public Sub SetAttributes(ByRef Path As String, ByVal Attributes As FileAttributes)
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
     Statics.Path.CheckValidPathAndFixSlashes Path
     
@@ -469,7 +469,7 @@ Public Function ReadAllLines(ByRef Path As String, Optional ByVal Encoding As En
     Dim Index   As Long
     
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
     ReDim Lines(0 To 15)
     With Cor.NewStreamReader(Path, Encoding)
@@ -521,7 +521,7 @@ End Sub
 '
 Public Sub WriteAllbytes(ByRef Path As String, ByRef Bytes() As Byte)
     If CorArray.IsNull(Bytes) Then _
-        Error.ArgumentNull "Bytes", ArgumentNull_Array
+        Throw Error.ArgumentNull("Bytes", ArgumentNull_Array)
     
     With Cor.NewFileStream(Path, FileMode.Create)
         .WriteBlock Bytes, LBound(Bytes), CorArray.GetLength(Bytes)
@@ -604,7 +604,7 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     End If
     
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
         
     VBCorLib.Path.CheckValidPath Path
     
@@ -625,7 +625,7 @@ End Sub
 
 Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA)
     If Len(Path) = 0 Then _
-        Error.Argument Argument_EmptyPath, "Path"
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
     Dim DllError As Long
     DllError = GetFileData(Path, Data)

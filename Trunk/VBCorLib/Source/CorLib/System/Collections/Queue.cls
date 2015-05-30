@@ -118,13 +118,13 @@ End Function
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.IsNull(DstArray) Then _
-        Error.ArgumentNull "DstArray", ArgumentNull_Array
+        Throw Error.ArgumentNull("DstArray", ArgumentNull_Array)
     If CorArray.Rank(DstArray) <> 1 Then _
-        Error.Argument Argument_MultiDimNotSupported, "DstArray"
+        Throw Error.Argument(Argument_MultiDimNotSupported, "DstArray")
     If Index < LBound(DstArray) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Index + mCount - 1 > UBound(DstArray) Then _
-        Error.Argument Argument_InvalidOffLen
+        Throw Error.Argument(Argument_InvalidOffLen)
         
     If mHead < mTail Then
         CorArray.CopyEx mItems, mHead, DstArray, Index, mCount
@@ -150,7 +150,7 @@ End Property
 '
 Public Function Dequeue() As Variant
     If mCount = 0 Then _
-        Error.InvalidOperation InvalidOperation_EmptyQueue
+        Throw Error.InvalidOperation(InvalidOperation_EmptyQueue)
     
     Helper.MoveVariant Dequeue, mItems(mHead)
     mHead = (mHead + 1) Mod mCapacity
@@ -221,7 +221,7 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Error.InvalidOperation InvalidOperation_EmptyQueue
+        Throw Error.InvalidOperation(InvalidOperation_EmptyQueue)
     
     VariantCopy Peek, mItems(mHead)
 End Function
@@ -334,7 +334,7 @@ Private Sub WriteRange(ByRef Source As Variant)
         WriteArray Source
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Error.ArgumentNull "Source", ArgumentNull_Collection
+            Throw Error.ArgumentNull("Source", ArgumentNull_Collection)
         
         If TypeOf Source Is Collection Then
             WriteVBCollection Source
@@ -350,7 +350,7 @@ End Sub
 
 Private Sub WriteArray(ByRef Source As Variant)
     If CorArray.IsNull(Source) Then _
-        Error.ArgumentNull "Source", ArgumentNull_Array
+        Throw Error.ArgumentNull("Source", ArgumentNull_Array)
     
     WriteCollection CorArray.LengthFirstDim(Source), Source
 End Sub
