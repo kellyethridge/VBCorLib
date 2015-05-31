@@ -52,7 +52,7 @@ End Sub
 Friend Sub SetVolumeLabel(ByVal VolumeChar As Integer)
     InitExtendedPathLength
     Append VolumeChar
-    Append Path.VolumeSeparatorChar
+    Append vbVolumeSeparatorChar
 End Sub
 
 Friend Property Get Chars(ByVal Index As Long) As Integer
@@ -64,11 +64,22 @@ End Property
 Friend Function GetFullPathName() As Long
     Dim NewBuffer() As Integer
     Dim NewLength   As Long
+    Dim AppendSlash As Boolean
     
     ReDim NewBuffer(0 To mPosition + MAX_PATH)
+    
+    If Length = 4 Then
+        AppendSlash = mFinalBuffer(mPosition - 2) = vbDirectorySeparatorChar And _
+                      mFinalBuffer(mPosition - 1) = vbPeriodChar
+    End If
+    
     NewLength = GetFullPathNameW(mFinalBuffer(0), mPosition + MAX_PATH, NewBuffer(0), ByVal vbNullPtr)
     Helper.Swap4 ByVal ArrPtr(mFinalBuffer), ByVal ArrPtr(NewBuffer)
     mPosition = NewLength
+    If AppendSlash Then
+        Append vbDirectorySeparatorChar
+    End If
+    
     GetFullPathName = Length
 End Function
 
@@ -80,14 +91,22 @@ Friend Function ToString() As String
     ToString = SysAllocStringLen(VarPtr(mFinalBuffer(mPrefixSize)), Length)
 End Function
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     ReDim mFinalBuffer(0 To MAX_PATH)
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitExtendedPathLength()
-    Append Path.DirectorySeparatorChar
-    Append Path.DirectorySeparatorChar
+    Append vbDirectorySeparatorChar
+    Append vbDirectorySeparatorChar
     Append vbQuestionMarkChar
-    Append Path.DirectorySeparatorChar
+    Append vbDirectorySeparatorChar
     mPrefixSize = 4
 End Sub
