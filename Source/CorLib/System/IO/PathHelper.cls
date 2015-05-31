@@ -62,6 +62,12 @@ Friend Property Get Chars(ByVal Index As Long) As Integer
     Chars = mFinalBuffer(Index + mPrefixSize)
 End Property
 
+Friend Function IsUNCPath() As Boolean
+    If Length > 1 Then
+        IsUNCPath = AsLong(mFinalBuffer(mPrefixSize)) = vbDoubleDirectorySeparatorChar
+    End If
+End Function
+
 Friend Function GetFullPathName() As Long
     Dim NewBuffer() As Integer
     Dim NewLength   As Long

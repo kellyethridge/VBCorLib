@@ -28,6 +28,7 @@ Public Enum ResourceStringKey
     Arg_PathIllegal = 838
     Arg_PathIllegalUNC = 840
     Arg_PathGlobalRoot = 841
+    
     Argument_MultiDimNotSupported = 200
     Argument_InvalidOffLen = 800
     Argument_ArrayPlusOffTooSmall = 801
@@ -70,6 +71,7 @@ Public Enum ResourceStringKey
     Argument_PathUriFormatNotSupported = 839
     Argument_BitArrayTypeUnsupported = 842
     Argument_ArrayLengthsDiffer = 843
+    
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
     ArgumentNull_Stream = 902

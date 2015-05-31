@@ -603,7 +603,7 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     If Len(Path) = 0 Then _
         Throw Error.Argument(Argument_EmptyPath, "Path")
         
-    VBCorLib.Path.CheckValidPath Path
+    Statics.Path.CheckValidPathChars Path
     
     Dim FileHandle As Long
     FileHandle = Api.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_ATTRIBUTE_NORMAL, 0)

@@ -69,18 +69,29 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "a", "", "a"
             Test.Use "", "b", "b"
             
-        Case "GetDirectoryName_WithValue_ReturnsExpected"
+        Case "GetDirectoryName_WithValidPath_ReturnsExpected"
             Test.Use "c:\abc", "c:\"
             Test.Use "c:\abc\", "c:\abc"
             Test.Use "c:\", ""
             Test.Use "abc", ""
             Test.Use "abc\", "abc"
             Test.Use "\\server\share", ""
+            Test.Use "\\server\", ""
+            Test.Use "\\server", ""
             Test.Use "\\server\share\", "\\server\share"
             Test.Use "\\\\server\\share\\", "\\server\share"
             Test.Use "C:\Documents and Settings\Kelly\Local Settings\Temp\tmpC24.tmp", "C:\Documents and Settings\Kelly\Local Settings\Temp"
             Test.Use "c:\....\abc", "c:\.."
             Test.Use "c:\....\abc\", "c:\..\abc"
+            Test.Use "file:\rep\file.txt", "file:\rep"
+            Test.Use "http:\rep\file.txt", "http:\rep"
+            Test.Use "c:\abc\def    ", "c:\abc"
+            Test.Use "cde:abc.txt", ""
+        
+        Case "GetDirectoryName_WithInvalidPath_ThrowsArgumentException"
+            Test.Use "c:\abc<\def"
+            Test.Use " "
+            Test.Use ""
             
         Case "GetExtension_WithValue_ReturnsExpected"
             Test.Use "file.txt", ".txt"
@@ -156,6 +167,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "\\\", "\\"
             Test.Use "\\.\", "\\.\"
             Test.Use "\\\a", "\\a"
+            
+        Case "GetFullPath_WithUriFormat_ThrowsArgumentException"
+            Test.Use "http://www.example.com"
+            Test.Use "file:\\c:\abc.txt"
+            
     End Select
 End Sub
 
@@ -220,12 +236,20 @@ Public Sub Combine_WithValues_ReturnsExpected(ByVal Path1 As String, ByVal Path2
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetDirectoryName_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
+Public Sub GetDirectoryName_WithValidPath_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
     Dim Actual As String
     
     Actual = Path.GetDirectoryName(PathToUse)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetDirectoryName_WithInvalidPath_ThrowsArgumentException(ByVal InvalidPath As String)
+    On Error Resume Next
+    
+    Path.GetDirectoryName InvalidPath
+    
+    AssertArgumentException Err
 End Sub
 
 Public Sub GetExtension_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
@@ -353,7 +377,13 @@ Public Sub GetFullPath_WithShortFolderAndNonExistingShortFileName_ReturnsExpande
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-
+Public Sub GetFullPath_WithUriFormat_ThrowsArgumentException(ByVal UriPath As String)
+    On Error Resume Next
+    
+    Path.GetFullPath UriPath
+    
+    AssertArgumentException Err
+End Sub
 
 
 
