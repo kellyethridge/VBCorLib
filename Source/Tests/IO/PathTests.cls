@@ -315,17 +315,64 @@ Public Sub GetTempPath_WhenCalled_NewTempPath()
     Assert.That Right$(TempPath, 1), Iz.EqualTo(Path.DirectorySeparator)
 End Sub
 
-'Public Sub GetFullPath_WithShortFileName_ReturnsExpandedFileName()
-'    Dim Expected As String
-'    Dim ShortPath As String
-'    Expected = mBuilder.CreateFile("abcdefghij.txt")
-'    ShortPath = Path.Combine(mBuilder.TempFolder, "abcdef~1.txt")
-'
-'    Dim Actual As String
-'    Actual = Path.GetFullPath(ShortPath)
-'
-'    Assert.That Actual, Iz.EqualTo(Expected)
-'End Sub
+Public Sub GetFullPath_WithShortFileName_ReturnsExpandedFileName()
+    Dim Expected As String
+    Dim ShortPath As String
+    Expected = mBuilder.CreateFile("abcdefghij.txt")
+    ShortPath = Path.Combine(mBuilder.TempFolder, "abcdef~1.txt")
+
+    Dim Actual As String
+    Actual = Path.GetFullPath(ShortPath)
+
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetFullPath_WithShortFolderName_ReturnsExpandedFolderName()
+    Dim Expected As String
+    Dim ShortPath As String
+    mBuilder.CreateFolder
+    Expected = mBuilder.CreateFile("SubFolder\File.txt")
+    ShortPath = Path.Combine(mBuilder.TempFolder, "SubFol~1\File.txt")
+    
+    Dim Actual As String
+    Actual = Path.GetFullPath(ShortPath)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetFullPath_WithShortFolderAndNonExistingShortFileName_ReturnsExpandedFolderName()
+    Dim Expected As String
+    Dim ShortPath As String
+    Expected = Path.Combine(mBuilder.CreateFolder("SubFolder"), "SuperF~1.txt")
+    mBuilder.CreateFile "SubFolder\DifferentFile.txt"
+    ShortPath = Path.Combine(mBuilder.TempFolder, "SubFol~1\SuperF~1.txt")
+    
+    Dim Actual As String
+    Actual = Path.GetFullPath(ShortPath)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

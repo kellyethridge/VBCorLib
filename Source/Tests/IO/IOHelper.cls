@@ -94,7 +94,7 @@ Private Sub Setup()
     mCurrentDirectory = Directory.GetCurrentDirectory
     mTempFolder = Path.Combine(Path.GetTempPath, TempSubFolder)
     
-    If Helper.FolderExists(mTempFolder) Then
+    If Not Helper.FolderExists(mTempFolder) Then
         Directory.CreateDirectory mTempFolder
     End If
 End Sub

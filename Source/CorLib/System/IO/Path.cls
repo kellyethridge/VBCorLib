@@ -52,6 +52,7 @@ Private Const ERROR_BAD_PATHNAME    As Long = 161&
 
 Private mInvalidPathChars()     As Integer
 Private mInvalidFileNameChars() As Integer
+Private mTrimEndChars()         As Integer
 Private mBuffer                 As WordBuffer
 Private mPath                   As New StringBuilder
 
@@ -361,7 +362,7 @@ End Function
 ' existence verified.
 ' <p>If <i>Path</i> is already rooted, then <i>Path</i> is returned.</p>
 '
-Public Function GetFullPath(ByVal Path As String) As String
+Public Function GetFullPath(ByRef Path As String) As String
     GetFullPath = NormalizePath(Path, True)
 End Function
 
@@ -434,16 +435,17 @@ End Function
 ' @return The temporary path for the current user.
 '
 Public Function GetTempPath() As String
-    Dim PathName As String
-    Dim Size As Long
+    Dim PathName    As String
+    Dim Size        As Long
     
     PathName = String$(MaxPath, 0)
-    Size = Api.GetTempPath(Len(PathName), PathName)
+    Size = GetTempPathW(MaxPath, PathName)
+    
     If Size = 0 Or Size > MaxPath Then
         IOError Err.LastDllError
     End If
 
-    GetTempPath = GetLongPathName(Left$(PathName, Size))
+    GetTempPath = GetFullPath(Left$(PathName, Size))
 End Function
 
 ''
@@ -591,7 +593,7 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
     
     If FullCheck Then
         Dim CleanPath As String
-        CleanPath = CorString.TrimEnd(Path)
+        CleanPath = CorString.TrimEnd(Path, mTrimEndChars)
         If HasIllegalCharacters(CleanPath) Then _
             Throw Error.Argument(Argument_InvalidPathChars)
         
@@ -724,6 +726,7 @@ Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer 
     Dim Ch          As Integer
     Dim MaxIndex    As Long
     Dim LastSigChar As Long
+    Dim TryExpand   As Boolean
     
     MaxIndex = UBound(PathChars)
     
@@ -732,6 +735,8 @@ Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer 
         Ch = PathChars(Pos)
         
         Select Case Ch
+            Case vbTildaChar
+                TryExpand = True
             Case vbVolumeSeparatorChar
                 FreeChars PathChars
                 Throw Error.Argument(Arg_PathIllegal)
@@ -750,6 +755,10 @@ Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer 
         NewBuffer.Append PathChars(j)
     Next
     
+    If TryExpand Then
+        NewBuffer.TryExpandShortFileName
+    End If
+    
     Index = Pos
 End Sub
 
@@ -760,6 +769,7 @@ End Sub
 Private Sub Class_Initialize()
     mInvalidPathChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F)
     mInvalidFileNameChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F, &H3A, &H2A, &H3F, &H5C, &H2F)
+    mTrimEndChars = Cor.NewIntegers(&H9, &HA, &HB, &HC, &HD, &H20, &H85, &HA0)
     
     InitWordBuffer mBuffer, 0, &H7FFFFFFF
 End Sub

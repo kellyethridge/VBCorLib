@@ -53,10 +53,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Copy_WithInvalidFileName_ThrowsArgumentException"
             Test.Use "c:\file.txt", "", "DestinationFileName"
             Test.Use "", "c:\file.txt", "SourceFileName"
-            Test.Use "    ", "c:\file.txt", "SourceFileName"
-            Test.Use "c:\file.txt", "    ", "DestinationFileName"
-            Test.Use "c:\>\file.txt", "c:\file2.txt", "SourceFileName"
-            Test.Use "c:\file.txt", "c:\<file.txt", "DestinationFileName"
+            Test.Use "    ", "c:\file.txt", ""
+            Test.Use "c:\file.txt", "    ", ""
+            Test.Use "c:\>\file.txt", "c:\file2.txt", ""
+            Test.Use "c:\file.txt", "c:\<file.txt", ""
             
         Case "ReadAllLines_WithLinesContainingDifferentLineSeparators_ReturnsArrayOfLines"
             Test.Use "1" & vbCrLf & "2" & vbCrLf & "3"
@@ -226,7 +226,7 @@ Public Sub Delete_WithInvalidPath_ThrowsArgumentException(ByVal InvalidPath As S
     
     File.Delete InvalidPath
     
-    AssertArgumentException Err, "Path"
+    AssertArgumentException Err
 End Sub
 
 Public Sub ReadAllLines_WithInvalidPath_ThrowsArgumentException(ByVal Path As String)
