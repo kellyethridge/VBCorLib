@@ -92,13 +92,9 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
         Throw Error.Argument(Argument_EmptyFileName, "SourceFileName")
     If Len(DestinationFileName) = 0 Then _
         Throw Error.Argument(Argument_EmptyFileName, "DestinationFileName")
-    If Path.HasIllegalCharacters(SourceFileName) Then _
-        Throw Error.Argument(Argument_InvalidPathChars, "SourceFileName")
-    If Path.HasIllegalCharacters(DestinationFileName) Then _
-        Throw Error.Argument(Argument_InvalidPathChars, "DestinationFileName")
     
-    SourceFileName = Path.GetFullPath(CorString.TrimEnd(SourceFileName, mDirectorySeparators))
-    DestinationFileName = Path.GetFullPath(CorString.TrimEnd(DestinationFileName, mDirectorySeparators))
+    SourceFileName = Path.GetFullPath(SourceFileName)
+    DestinationFileName = Path.GetFullPath(DestinationFileName)
     
     If CorString.Equals(SourceFileName, DestinationFileName, OrdinalIgnoreCase) Then
         Exit Sub
@@ -148,13 +144,14 @@ End Function
 ' @param Path The file to be deleted.
 ' @remarks If the file did not exist, nothing happens.
 '
-Public Sub Delete(ByVal Path As String)
+Public Sub Delete(ByRef Path As String)
     If Len(Path) = 0 Then _
         Throw Error.Argument(Argument_EmptyPath, "Path")
     
-    Statics.Path.VerifyPath Path, True
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
     
-    If Api.DeleteFile(Path) = BOOL_FALSE Then
+    If Api.DeleteFile(FullPath) = BOOL_FALSE Then
         Dim Result As Long
         Result = Err.LastDllError
         If Result <> ERROR_FILE_NOT_FOUND Then

@@ -82,13 +82,6 @@ Public Function RemoveMenu(ByVal hMenu As Long, ByVal nPosition As Long, ByVal w
     RemoveMenu = VBCorType.RemoveMenu(hMenu, nPosition, wFlags)
 End Function
 
-Public Function GetFullPathName(ByRef Path As String) As String
-    Dim Output As String
-    Dim Length As Long
-    
-    
-End Function
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers

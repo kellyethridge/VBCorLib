@@ -39,6 +39,7 @@ Option Explicit
 Private mFinalBuffer()  As Integer
 Private mPosition       As Long
 Private mPrefixSize     As Long
+Private mStopExpanding  As Boolean
 
 Friend Sub Append(ByVal Ch As Integer)
     If mPosition > UBound(mFinalBuffer) Then
@@ -81,6 +82,29 @@ Friend Function GetFullPathName() As Long
     End If
     
     GetFullPathName = Length
+End Function
+
+Friend Function TryExpandShortFileName() As Boolean
+    If mStopExpanding Then
+        Exit Function
+    End If
+    
+    Dim NewBuffer() As Integer
+    Dim Result      As Long
+    
+    ReDim NewBuffer(0 To mPosition + MAX_PATH)
+    
+    Result = GetLongPathNameW(mFinalBuffer(0), NewBuffer(0), mPosition + MAX_PATH)
+    
+    If Result <> 0 Then
+        Helper.Swap4 ByVal ArrPtr(mFinalBuffer), ByVal ArrPtr(NewBuffer)
+        mPosition = Result
+        TryExpandShortFileName = True
+    Else
+        If Result = ERROR_FILE_NOT_FOUND Or Result = ERROR_PATH_NOT_FOUND Then
+            mStopExpanding = True
+        End If
+    End If
 End Function
 
 Friend Property Get Length() As Long

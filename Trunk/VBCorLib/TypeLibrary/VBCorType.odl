@@ -598,7 +598,7 @@ library VBCorType {
 		[entry("GetDriveTypeA")] long GetDriveType([in] LPSTR lpRootPathName);
 		[entry("GetDiskFreeSpaceExA"), usesgetlasterror] long GetDiskFreeSpaceEx([in] LPSTR lpDirectoryName, [in] CURRENCY * lpFreeBytesAvailableToCaller, [in] CURRENCY * lpTotalNumberOfBytes, [in] CURRENCY * lpTotalNumberOfFreeBytes);
 		[entry("GetLongPathNameA"), usesgetlasterror] long GetLongPathNameA([in] LPSTR lpszShortPath, [in] LPSTR lpszLongPath, [in] long cchBuffer);
-		[entry("GetLongPathNameW"), usesgetlasterror] long GetLongPathNameW([in] LPWSTR lpszShortPath, [in] LPWSTR lpszLongPath, [in] long cchBuffer);
+		[entry("GetLongPathNameW"), usesgetlasterror] long GetLongPathNameW([in] void * lpszShortPath, [in] void * lpszLongPath, [in] long cchBuffer);
 		[entry("RtlFillMemory")] void FillMemory([in] void * Destination, [in] long Length, [in] byte Fill);
 		[entry("GetSystemInfo")] void GetSystemInfo([in] SYSTEM_INFO * lpSystemInfo);
 		[entry("GetUserDefaultUILanguage")] long GetUserDefaultUILanguage();
