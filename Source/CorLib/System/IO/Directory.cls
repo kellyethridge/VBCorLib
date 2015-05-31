@@ -83,21 +83,21 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
         
     Statics.Path.FixupPath Path
-    Path = CorString.TrimEnd(Path, Statics.Path.DirectorySeparatorString)
+    Path = CorString.TrimEnd(Path, Statics.Path.DirectorySeparator)
     
     If Len(Path) > Statics.Path.MaxPath Then _
         Throw New PathTooLongException
-    If InStr(3, Path, Statics.Path.VolumeSeparatorString) > 0 Then _
+    If InStr(3, Path, Statics.Path.VolumeSeparator) > 0 Then _
         Throw New NotSupportedException
     
     Dim DirectoryNames() As String
-    DirectoryNames = Split(Path, Statics.Path.DirectorySeparatorString)
+    DirectoryNames = Split(Path, Statics.Path.DirectorySeparator)
     
     Dim i As Long
     i = CorArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
-        TestDirectory = CorString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
+        TestDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
         If Directory.Exists(TestDirectory) Then Exit Do
         i = i - 1
     Loop While i > 0
@@ -105,7 +105,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     Do While i <= UBound(DirectoryNames)
         i = i + 1
         Dim NewDirectory As String
-        NewDirectory = CorString.Join(Statics.Path.DirectorySeparatorString, DirectoryNames, 0, i)
+        NewDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
         If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then IOError Err.LastDllError
     Loop
     

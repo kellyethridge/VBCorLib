@@ -312,7 +312,7 @@ Public Sub GetTempPath_WhenCalled_NewTempPath()
     
     Assert.That TempPath, Iz.Not.Empty
     Assert.That Path.IsPathRooted(TempPath), Iz.True
-    Assert.That Right$(TempPath, 1), Iz.EqualTo(Path.DirectorySeparatorString)
+    Assert.That Right$(TempPath, 1), Iz.EqualTo(Path.DirectorySeparator)
 End Sub
 
 'Public Sub GetFullPath_WithShortFileName_ReturnsExpandedFileName()

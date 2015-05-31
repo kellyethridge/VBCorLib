@@ -24,6 +24,14 @@ Attribute VB_Name = "IOConstants"
 '
 Option Explicit
 
+Public Const vbPathSeparatorChar            As Integer = vbSemiColonChar
+Public Const vbVolumeSeparatorChar          As Integer = vbColonChar
+Public Const vbDirectorySeparatorChar       As Integer = vbBackslashChar
+Public Const vbAltDirectorySeparatorChar    As Integer = vbForwardSlashChar
+Public Const vbPathSeparator                As String = ";"
+Public Const vbVolumeSeparator              As String = ":"
+Public Const vbDirectorySeparator           As String = "\"
+Public Const vbAltDirectorySeparator        As String = "/"
 
 Public Const MAX_PATH                   As Long = 260
 Public Const MAX_DIR                    As Long = 255

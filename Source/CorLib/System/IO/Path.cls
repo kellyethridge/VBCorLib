@@ -47,18 +47,8 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-'Private Const MaxLongPath           As Long = 32000
-'Private Const MaxDirectoryLength    As Long = 255
 Private Const NOT_FOUND             As Long = &H0
 Private Const ERROR_BAD_PATHNAME    As Long = 161&
-
-Private Const vbPathSeparator               As Integer = vbSemiColonChar
-Private Const vbVolumeSeparatorChar         As Integer = vbColonChar
-Private Const vbDirectorySeparatorChar      As Integer = vbBackslashChar
-Private Const vbAltDirectorySeparatorChar   As Integer = vbForwardSlashChar
-Private Const vbVolumeSeparatorString       As String = ":"
-Private Const vbDirectorySeparatorString    As String = "\"
-Private Const vbAltDirectorySeparatorString As String = "/"
 
 Private mInvalidPathChars()     As Integer
 Private mInvalidFileNameChars() As Integer
@@ -90,8 +80,8 @@ End Property
 ' @return The string of the alternative directory separator "/".
 ' @remarks The alternate string is usually found on systems such as Unix.
 '
-Public Property Get AltDirectorySeparatorString() As String
-    AltDirectorySeparatorString = "/"
+Public Property Get AltDirectorySeparator() As String
+    AltDirectorySeparator = vbAltDirectorySeparator
 End Property
 
 ''
@@ -108,8 +98,8 @@ End Property
 '
 ' @return The directory separator string for windows "\".
 '
-Public Property Get DirectorySeparatorString() As String
-    DirectorySeparatorString = vbDirectorySeparatorString
+Public Property Get DirectorySeparator() As String
+    DirectorySeparator = vbDirectorySeparator
 End Property
 
 ''
@@ -117,8 +107,8 @@ End Property
 '
 ' @return The environment variable string separator character code (59).
 '
-Public Property Get PathSeparator() As Integer
-    PathSeparator = vbPathSeparator
+Public Property Get PathSeparatorChar() As Integer
+    PathSeparatorChar = vbPathSeparatorChar
 End Property
 
 ''
@@ -126,8 +116,8 @@ End Property
 '
 ' @return The environment variable string separator ";".
 '
-Public Property Get PathSeparatorString() As String
-    PathSeparatorString = ";"
+Public Property Get PathSeparator() As String
+    PathSeparator = vbPathSeparator
 End Property
 
 ''
@@ -144,8 +134,8 @@ End Property
 '
 ' @return The string version of the volume separator ":".
 '
-Public Property Get VolumeSeparatorString() As String
-    VolumeSeparatorString = vbVolumeSeparatorString
+Public Property Get VolumeSeparator() As String
+    VolumeSeparator = vbVolumeSeparator
 End Property
 
 ''
@@ -254,7 +244,7 @@ Public Function Combine(ByVal Path1 As String, ByVal Path2 As String) As String
     If IsSeparator(LastChar(Path1)) Then
         Combine = Path1 & Path2
     Else
-        Combine = Path1 & Me.DirectorySeparatorString & Path2
+        Combine = Path1 & vbDirectorySeparator & Path2
     End If
 End Function
 
@@ -282,7 +272,7 @@ Public Function GetDirectoryName(ByVal Path As String) As String
         If (.LoWord = vbDirectorySeparatorChar) And (.HiWord = vbDirectorySeparatorChar) Then
             MinSlashes = 4
         ElseIf .HiWord = vbVolumeSeparatorChar Then
-            If (.LoWord = vbVolumeSeparatorChar) Or (InStr(3, Path, vbVolumeSeparatorString) > 0) Then _
+            If (.LoWord = vbVolumeSeparatorChar) Or (InStr(3, Path, vbVolumeSeparator) > 0) Then _
                 Throw Error.Argument(Argument_InvalidPathFormat, "Path")
             
             Select Case Asc(Path)
@@ -302,9 +292,9 @@ Public Function GetDirectoryName(ByVal Path As String) As String
     
     Dim PathLength As Long
     If (MinSlashes > 0) And (CorString.CharCount(Path, vbDirectorySeparatorChar) >= MinSlashes) Then
-        PathLength = InStrRev(Path, vbDirectorySeparatorString)
+        PathLength = InStrRev(Path, vbDirectorySeparator)
         If PathLength = 3 Then
-            If Mid$(Path, 2, 1) <> vbVolumeSeparatorString Then
+            If Mid$(Path, 2, 1) <> vbVolumeSeparator Then
                 PathLength = PathLength - 1
             End If
         Else
@@ -400,7 +390,7 @@ Public Function GetPathRoot(ByVal Path As String) As String
                     Throw Error.Argument(Argument_InvalidPathFormat, "Path")
                 
                 Case Else
-                    GetPathRoot = vbDirectorySeparatorString
+                    GetPathRoot = vbDirectorySeparator
                     Exit Function
             End Select
         End If
@@ -411,7 +401,7 @@ Public Function GetPathRoot(ByVal Path As String) As String
                     GetPathRoot = Left$(Path, 2)
                     
                     If Len(Path) > 2 Then
-                        GetPathRoot = GetPathRoot + vbDirectorySeparatorString
+                        GetPathRoot = GetPathRoot + vbDirectorySeparator
                     End If
                     
                 Case Else
@@ -570,7 +560,7 @@ Friend Sub FixupPath(ByRef Path As String)
         End If
     Next i
     
-    Path = Join(Parts, vbDirectorySeparatorString)
+    Path = Join(Parts, vbDirectorySeparator)
 End Sub
 
 Friend Function InternalGetFullPath(ByVal Path As String) As String
@@ -579,9 +569,9 @@ Friend Function InternalGetFullPath(ByVal Path As String) As String
     If Len(Path) = 0 Then
         InternalGetFullPath = Directory.GetCurrentDirectory
     Else
-        InternalGetFullPath = Replace$(Path, vbAltDirectorySeparatorString, vbDirectorySeparatorString)
+        InternalGetFullPath = Replace$(Path, vbAltDirectorySeparator, vbDirectorySeparator)
         If Asc(Right$(InternalGetFullPath, 1)) <> vbDirectorySeparatorChar Then
-            InternalGetFullPath = InternalGetFullPath & vbDirectorySeparatorString
+            InternalGetFullPath = InternalGetFullPath & vbDirectorySeparator
         End If
     End If
 End Function
