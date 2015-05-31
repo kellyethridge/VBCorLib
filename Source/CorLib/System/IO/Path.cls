@@ -67,7 +67,11 @@ Private mPath                   As New StringBuilder
 
 
 Friend Property Get MaxPath() As Long
-    MaxPath = MAX_LONG_PATH
+    MaxPath = MAX_PATH
+End Property
+
+Friend Property Get MaxLongPath() As Long
+    MaxLongPath = MAX_LONG_PATH
 End Property
 
 ''
@@ -369,69 +373,6 @@ End Function
 '
 Public Function GetFullPath(ByVal Path As String) As String
     GetFullPath = NormalizePath(Path, True)
-    Exit Function
-    
-    Const DoubleBackSlash As Long = &H5C005C
-    
-    Path = CorString.Trim(Path)
-    If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
-        
-    FixupPath Path
-    
-    Dim Ptr As Long
-    Ptr = StrPtr(Path)
-    
-    ' quickly check the first two charcters for possible UNC path.
-    ' convert first two characters into a long.
-    If MemLong(Ptr) = DoubleBackSlash Then
-        VerifyUNCPathFormat Path
-    End If
-    
-    ' convert first two characters into two integers.
-    With MemDWord(Ptr)
-        If .LoWord = vbVolumeSeparatorChar Then _
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidPathFormat), "Path")
-
-        ' check if absolute path ( a:, b:, ...) is being specified.
-        If .HiWord = vbVolumeSeparatorChar Then
-            Select Case .LoWord
-                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
-                Case Else
-                    Throw Cor.NewArgumentException("Incorrect absolute path information.", "Path")
-            End Select
-        End If
-    End With
-    
-    ' make sure no more than 1 volume separator exists.
-    If InStr(3, Path, vbVolumeSeparatorString) > 0 Then _
-        Throw Cor.NewNotSupportedException("Path format is not supported.")
-    
-    Dim PathParts() As String
-    PathParts = Split(Path, vbDirectorySeparatorString)
-    
-    Dim i As Long
-    For i = 0 To UBound(PathParts)
-        Select Case PathParts(i)
-            Case "..", "."
-                ' do nothing
-            Case Else
-                PathParts(i) = CorString.TrimEnd(PathParts(i), ".")
-        End Select
-    Next i
-    
-    Path = Join(PathParts, vbDirectorySeparatorString)
-    
-    Dim OutputBuffer As String
-    OutputBuffer = String$(MaxPath, 0)
-    
-    Dim Size As Long
-    Size = Api.GetFullPathName(Path, Len(OutputBuffer), OutputBuffer, 0)
-    
-    If Size = 0 Then _
-        Throw Cor.NewPathTooLongException("The qualified path is longer than the maximum of 260 characters.")
-    
-    GetFullPath = Left$(OutputBuffer, Size)
 End Function
 
 ''
@@ -669,8 +610,11 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
         PathChars = AllocChars(Path)
     End If
     
-    MaxIndex = UBound(PathChars)
+    If Not PrepareForUNCPath(PathChars, Index, NewBuffer) Then
+        PrepareForVolumeLabel PathChars, Index, NewBuffer
+    End If
     
+    MaxIndex = UBound(PathChars)
     Do While Index <= MaxIndex
         If ProcessPreSigCharSegment(PathChars, NewBuffer, Index) Then
             ProcessSigCharSegment PathChars, NewBuffer, Index
@@ -694,6 +638,31 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
     NormalizePath = NewPath
 End Function
 
+Private Function PrepareForUNCPath(ByRef PathChars() As Integer, ByRef Index As Long, ByVal NewBuffer As PathHelper) As Boolean
+    If UBound(PathChars) > 0 Then
+        If PathChars(0) = vbDirectorySeparatorChar Or PathChars(0) = vbAltDirectorySeparatorChar Then
+            NewBuffer.Append vbDirectorySeparatorChar
+            Index = 1
+            PrepareForUNCPath = True
+        End If
+    End If
+End Function
+
+Private Sub PrepareForVolumeLabel(ByRef PathChars() As Integer, ByRef Index As Long, ByVal NewBuffer As PathHelper)
+    If UBound(PathChars) > 0 Then
+        If PathChars(1) = vbVolumeSeparatorChar Then
+            Select Case PathChars(0)
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
+                    NewBuffer.SetVolumeLabel PathChars(0)
+                    Index = 2
+                Case Else
+                    Throw Error.Argument(Arg_PathIllegal)
+            End Select
+        End If
+    End If
+End Sub
+
+
 Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByRef Index As Long) As Boolean
     Dim Pos             As Long
     Dim Ch              As Integer
@@ -701,6 +670,7 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
     Dim HasSpaces       As Boolean
     Dim HasPeriods      As Boolean
     Dim FoundSigChar    As Boolean
+    Dim FoundSlash      As Boolean
     Dim LastPeriodIndex As Long
     Dim LastSpaceIndex  As Long
     
@@ -711,6 +681,9 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
         Ch = PathChars(Pos)
         
         Select Case Ch
+            Case vbVolumeSeparatorChar
+                FreeChars PathChars
+                Throw Error.Argument(Arg_PathIllegal)
             Case vbPeriodChar
                 HasPeriods = True
                 LastPeriodIndex = Pos
@@ -722,7 +695,10 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
                     Exit Do
                 End If
                 
-                NewBuffer.Append vbDirectorySeparatorChar
+                If Not FoundSlash Then
+                    NewBuffer.Append vbDirectorySeparatorChar
+                    FoundSlash = True
+                End If
                 Index = Index + 1
             Case Else
                 FoundSigChar = True
@@ -766,6 +742,9 @@ Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer 
         Ch = PathChars(Pos)
         
         Select Case Ch
+            Case vbVolumeSeparatorChar
+                FreeChars PathChars
+                Throw Error.Argument(Arg_PathIllegal)
             Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar
                 Exit Do
             Case vbPeriodChar, vbSpaceChar
@@ -835,13 +814,15 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
     Dim FoundServer     As Boolean
     Dim FoundShare      As Boolean
     Dim FoundSeparator  As Boolean
-
+    Dim MaxIndex        As Long
     Dim Ch As Integer
 
     PathChars = AllocChars(Path)
+    MaxIndex = UBound(PathChars)
+    
     Pos = 2
-    Ch = PathChars(Pos)
-    Do While Ch <> 0
+    Do While Pos <= MaxIndex
+        Ch = PathChars(Pos)
         Select Case Ch
             Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar
                 FoundSeparator = True
@@ -854,13 +835,12 @@ Private Sub VerifyUNCPathFormat(ByRef Path As String)
                 End If
         End Select
         Pos = Pos + 1
-        Ch = PathChars(Pos)
     Loop
 
     FreeChars PathChars
     
     If (Not FoundServer) Or (Not FoundShare) Then _
-        Throw Cor.NewArgumentException("UNC path must be in the format of \\server\share.")
+        Throw Error.Argument(Arg_PathIllegalUNC)
 End Sub
 
 ''
