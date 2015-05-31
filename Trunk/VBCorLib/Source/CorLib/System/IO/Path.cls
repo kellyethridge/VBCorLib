@@ -544,26 +544,6 @@ Friend Sub FixupPath(ByRef Path As String)
     Path = Join(Parts, vbDirectorySeparator)
 End Sub
 
-Friend Function InternalGetFullPath(ByVal Path As String) As String
-    VerifyPath Path
-    
-    If Len(Path) = 0 Then
-        InternalGetFullPath = Directory.GetCurrentDirectory
-    Else
-        InternalGetFullPath = Replace$(Path, vbAltDirectorySeparator, vbDirectorySeparator)
-        If Asc(Right$(InternalGetFullPath, 1)) <> vbDirectorySeparatorChar Then
-            InternalGetFullPath = InternalGetFullPath & vbDirectorySeparator
-        End If
-    End If
-End Function
-
-Friend Function InternalGetFullRootedPath(ByVal Path As String) As String
-    If Not IsPathRooted(Path) Then
-        Path = GetFullPath(Path)
-    End If
-    InternalGetFullRootedPath = InternalGetFullPath(Path)
-End Function
-
 Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) As String
     Dim NewBuffer   As New PathHelper
     Dim PathChars() As Integer

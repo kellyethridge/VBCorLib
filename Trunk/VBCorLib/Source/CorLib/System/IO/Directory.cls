@@ -135,16 +135,17 @@ End Function
 ' directory will be deleted along with the top directory. Otherwise, the specified
 ' directory must be empty to be deleted.
 '
-Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = False)
+Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = False)
     If Len(Path) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath))
     
-    Path = CorString.TrimEnd(Statics.Path.InternalGetFullPath(Path), "/\")
+    Dim NormalizedPath As String
+    NormalizedPath = CorString.TrimEnd(Statics.Path.GetFullPath(Path), "/\")
     
     If Recursive Then
         Dim Data As WIN32_FIND_DATA
         
-        With SafeFindFirstFile(Path & "\*", Data)
+        With SafeFindFirstFile(NormalizedPath & "\*", Data)
             If Not .IsInvalid Then
                 ' Simply loop through any files or directories
                 ' within this directory and delete them.
@@ -154,7 +155,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
                     
                     If Len(FileName) > 0 Then
                         Dim FullPath As String
-                        FullPath = Statics.Path.Combine(Path, FileName)
+                        FullPath = Statics.Path.Combine(NormalizedPath, FileName)
                         
                         If CBool(Data.dwFileAttributes And FileAttributes.DirectoryAttr) Then
                             Delete FullPath, True
@@ -172,7 +173,7 @@ Public Sub Delete(ByVal Path As String, Optional ByVal Recursive As Boolean = Fa
         End With
     End If
     
-    If Api.RemoveDirectory(Path) = BOOL_FALSE Then
+    If Api.RemoveDirectory(NormalizedPath) = BOOL_FALSE Then
         If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then IOError Err.LastDllError, Path
     End If
 End Sub
@@ -373,30 +374,33 @@ End Function
 ''
 ' Moves a directory and all of its contents to another location.
 '
-' @param SourceDirectory The directory to be moved.
-' @param DestinationDirectory The directory to be moved to.
+' @param SourceDirName The directory to be moved.
+' @param DestDirName The directory to be moved to.
 ' @remarks The destination directory is the source directory renamed
 ' after the moving of the source directory.
 '
-Public Sub Move(ByVal SourceDirectory As String, ByVal DestinationDirectory As String)
-    If Len(SourceDirectory) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "SourceDirectory")
-    If Len(DestinationDirectory) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "DestinationDirectory")
+Public Sub Move(ByRef SourceDirName As String, ByRef DestDirName As String)
+    If Len(SourceDirName) = 0 Then _
+        Throw Error.Argument(Argument_EmptyPath, "SourceDirName")
+    If Len(DestDirName) = 0 Then _
+        Throw Error.Argument(Argument_EmptyPath, "DestDirName")
     
-    SourceDirectory = Path.InternalGetFullRootedPath(SourceDirectory)
-    DestinationDirectory = Path.InternalGetFullRootedPath(DestinationDirectory)
+    Dim FullSourceDirName   As String
+    Dim FullDestDirName     As String
     
-    If StrComp(SourceDirectory, DestinationDirectory, vbTextCompare) = 0 Then _
+    FullSourceDirName = Path.GetFullPath(SourceDirName)
+    FullDestDirName = Path.GetFullPath(DestDirName)
+    
+    If CorString.Equals(FullSourceDirName, FullDestDirName, OrdinalIgnoreCase) Then _
         Throw Cor.NewIOException("Source and Destination directories must be different.")
-    If Path.GetPathRoot(SourceDirectory) <> Path.GetPathRoot(DestinationDirectory) Then _
+    If Path.GetPathRoot(FullSourceDirName) <> Path.GetPathRoot(FullDestDirName) Then _
         Throw Cor.NewIOException("Source and Destination directories must be on the same root drive.")
         
-    If Api.MoveFile(SourceDirectory, DestinationDirectory) = BOOL_FALSE Then
+    If Api.MoveFile(FullSourceDirName, FullDestDirName) = BOOL_FALSE Then
         Dim Result  As Long
         Result = Err.LastDllError
         If Result = ERROR_FILE_NOT_FOUND Then
-            IOError ERROR_PATH_NOT_FOUND, SourceDirectory
+            IOError ERROR_PATH_NOT_FOUND, SourceDirName
         Else
             IOError Result
         End If
@@ -510,7 +514,7 @@ End Sub
 
 Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef SearchPattern As String, ByVal EntriesToInclude As SystemEntryTypes, ByVal SearchOpt As SearchOption) As String()
     Dim FullPath As String
-    FullPath = Path.InternalGetFullPath(InitialPath)
+    FullPath = Path.GetFullPath(InitialPath)
     
     VerifySearchPattern SearchPattern
     
