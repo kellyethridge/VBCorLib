@@ -112,9 +112,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "file.txt\", ""
             Test.Use ".txt", ""
 
-'                    // Legal: "\.. \", "\...\", "\. \"
-'                    // Illegal: "\.. .\", "\. .\", "\ .\"
-
         Case "GetFullPath_WithValue_ReturnsExpected"
             Test.Use "file.txt", "c:\windows\file.txt"
             Test.Use "\file.txt", "c:\file.txt"
@@ -134,6 +131,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "abc\.. \def", "c:\windows\def"
             Test.Use "abc\. .b\def", "c:\windows\abc\. .b\def"
             Test.Use "abc\def  ", "c:\windows\abc\def"
+            Test.Use "c:\foo\.", "c:\foo"
+            Test.Use "c:\.", "c:\"
             
         Case "GetFullPath_WithInvalidPath_ThrowsArgumentException"
             Test.Use "\\server"
@@ -276,7 +275,7 @@ Public Sub GetFullPath_WithMultipleColons_ThrowsNotSupportedException()
     Path.GetFullPath "c:\a:"
     
 errTrap:
-    AssertNotSupportedException Err
+    AssertArgumentException Err
 End Sub
 
 Public Sub GetPathRoot_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
