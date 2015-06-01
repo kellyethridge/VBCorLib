@@ -357,7 +357,7 @@ Private Function CreateFullPaths(ByVal Source As Variant) As Collection
     
     Dim Item As Variant
     For Each Item In Source
-        CreateFullPaths.Add Path.Combine(mBuilder.TempFolder, Item)
+        CreateFullPaths.Add Path.Combine(mBuilder.TempFolder, CStr(Item))
     Next
 End Function
 

@@ -87,6 +87,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "http:\rep\file.txt", "http:\rep"
             Test.Use "c:\abc\def    ", "c:\abc"
             Test.Use "cde:abc.txt", ""
+            Test.Use "abcd:\def.txt", "abcd:"
         
         Case "GetDirectoryName_WithInvalidPath_ThrowsArgumentException"
             Test.Use "c:\abc<\def"
@@ -299,7 +300,7 @@ Public Sub GetFullPath_WithMultipleColons_ThrowsNotSupportedException()
     Path.GetFullPath "c:\a:"
     
 errTrap:
-    AssertArgumentException Err
+    AssertNotSupportedException Err
 End Sub
 
 Public Sub GetPathRoot_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)

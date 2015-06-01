@@ -80,25 +80,35 @@ End Sub
 '
 Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "Path")
-        
-    Statics.Path.FixupPath Path
-    Path = CorString.TrimEnd(Path, Statics.Path.DirectorySeparator)
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
-    If Len(Path) > Statics.Path.MaxPath Then _
-        Throw New PathTooLongException
-    If InStr(3, Path, Statics.Path.VolumeSeparator) > 0 Then _
-        Throw New NotSupportedException
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
+    
+    If Len(FullPath) > 1 And Statics.Path.IsDirectorySeparator(CorString.LastChar(FullPath)) Then
+        FullPath = Left$(FullPath, Len(FullPath) - 1)
+    End If
+    
+'    Statics.Path.FixupPath Path
+'    Path = CorString.TrimEnd(Path, Statics.Path.DirectorySeparator)
+    
+'    If Len(Path) > Statics.Path.MaxPath Then _
+'        Throw New PathTooLongException
+'    If InStr(3, Path, Statics.Path.VolumeSeparator) > 0 Then _
+'        Throw New NotSupportedException
     
     Dim DirectoryNames() As String
-    DirectoryNames = Split(Path, Statics.Path.DirectorySeparator)
+    DirectoryNames = Split(FullPath, Statics.Path.DirectorySeparator)
     
     Dim i As Long
     i = CorArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
         TestDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
-        If Directory.Exists(TestDirectory) Then Exit Do
+        If Directory.Exists(TestDirectory) Then
+            Exit Do
+        End If
+        
         i = i - 1
     Loop While i > 0
 
@@ -106,10 +116,12 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
         i = i + 1
         Dim NewDirectory As String
         NewDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
-        If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then IOError Err.LastDllError
+        If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then
+            IOError Err.LastDllError
+        End If
     Loop
     
-    Set CreateDirectory = Cor.NewDirectoryInfo(Path)
+    Set CreateDirectory = Cor.NewDirectoryInfo(FullPath)
 End Function
 
 ''

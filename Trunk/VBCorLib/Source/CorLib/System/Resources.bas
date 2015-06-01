@@ -71,6 +71,7 @@ Public Enum ResourceStringKey
     Argument_PathUriFormatNotSupported = 839
     Argument_BitArrayTypeUnsupported = 842
     Argument_ArrayLengthsDiffer = 843
+    Argument_PathFormatNotSupported = 844
     
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901

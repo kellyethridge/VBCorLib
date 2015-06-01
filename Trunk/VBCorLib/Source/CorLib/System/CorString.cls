@@ -466,6 +466,17 @@ Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal C
     End Select
 End Function
 
+Friend Function LastChar(ByRef s As String) As Integer
+    Dim Length As Long
+    Length = Len(s)
+    
+    If Length > 0 Then
+        Dim LastCharIndex As Long
+        LastCharIndex = Length - 1
+        LastChar = MemWord(StrPtr(s) + LastCharIndex * 2)
+    End If
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
