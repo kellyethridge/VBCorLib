@@ -81,13 +81,26 @@ Friend Function GetFullPathName() As Long
     End If
     
     NewLength = GetFullPathNameW(mFinalBuffer(0), mPosition + MAX_PATH, NewBuffer(0), ByVal vbNullPtr)
-    Helper.Swap4 ByVal ArrPtr(mFinalBuffer), ByVal ArrPtr(NewBuffer)
-    mPosition = NewLength
-    If AppendSlash Then
-        Append vbDirectorySeparatorChar
+    
+    If NewLength <> 0 Then
+        Helper.Swap4 ByVal ArrPtr(mFinalBuffer), ByVal ArrPtr(NewBuffer)
+        mPosition = NewLength
+        If AppendSlash Then
+            Append vbDirectorySeparatorChar
+        End If
+            
+        GetFullPathName = Length
+    End If
+End Function
+
+Friend Function StartsWith(ByRef CompareTo As String) As Boolean
+    If Len(CompareTo) > Length Then
+        Exit Function
     End If
     
-    GetFullPathName = Length
+    Dim s As String
+    s = SysAllocStringLen(VarPtr(mFinalBuffer(mPrefixSize)), Len(CompareTo))
+    StartsWith = CorString.Equals(CompareTo, s, OrdinalIgnoreCase)
 End Function
 
 Friend Function TryExpandShortFileName() As Boolean
