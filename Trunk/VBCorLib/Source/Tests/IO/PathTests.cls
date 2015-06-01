@@ -385,7 +385,13 @@ Public Sub GetFullPath_WithUriFormat_ThrowsArgumentException(ByVal UriPath As St
     AssertArgumentException Err
 End Sub
 
-
+Public Sub GetTempFileName_WhenCalled_ReturnsNonEmpty()
+    Dim Actual As String
+    
+    Actual = Path.GetTempFileName
+    
+    Assert.That Actual, Iz.Not.Empty
+End Sub
 
 
 
