@@ -455,8 +455,8 @@ End Sub
 ' @remarks The time will have the UTC offset removed before setting the
 ' the directory to it. When the time is read, it will be in local time to the timezone.
 '
-Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTime
+Public Sub SetCreationTime(ByRef Path As String, ByRef CreationTime As Variant)
+    SetCreationTimeUtc Path, TimeZone.CurrentTimeZone.ToUniversalTime(CreationTime)
 End Sub
 
 ''
@@ -466,8 +466,10 @@ End Sub
 ' @param CreationTime A Date or CorDateTime object of the new UTC time.
 ' @remarks The directory is set to the actual time passed in.
 '
-Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTimeUtc
+Public Sub SetCreationTimeUtc(ByRef Path As String, ByRef CreationTime As Variant)
+    Dim Time As Currency
+    Time = GetFileTimeUtc(CreationTime)
+    SetFileTimeCore Path, VarPtr(Time), vbNullPtr, vbNullPtr
 End Sub
 
 ''
@@ -477,8 +479,8 @@ End Sub
 ' @param LastAccessTime A Date or CorDateTime object of the new time.
 ' @remarks The UTC offset is removed from the time before setting the directory.
 '
-Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTime
+Public Sub SetLastAccessTime(ByRef Path As String, ByRef LastAccessTime As Variant)
+    SetLastAccessTimeUtc Path, TimeZone.CurrentTimeZone.ToUniversalTime(LastAccessTime)
 End Sub
 
 ''
@@ -488,8 +490,10 @@ End Sub
 ' @param LastAccessTime A Date or CorDateTime object of the new time.
 ' @remarks The directory is set to the actual time passed in.
 '
-Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTimeUtc
+Public Sub SetLastAccessTimeUtc(ByRef Path As String, ByRef LastAccessTime As Variant)
+    Dim Time As Currency
+    Time = GetFileTimeUtc(LastAccessTime)
+    SetFileTimeCore Path, vbNullPtr, VarPtr(Time), vbNullPtr
 End Sub
 
 ''
@@ -498,9 +502,8 @@ End Sub
 ' @param Path The directory to set the new time for.
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTime
-'    SetLastWriteTimeUtc Path, LastWriteTime
+Public Sub SetLastWriteTime(ByRef Path As String, ByRef LastWriteTime As Variant)
+    SetLastWriteTimeUtc Path, TimeZone.CurrentTimeZone.ToUniversalTime(LastWriteTime)
 End Sub
 
 ''
@@ -510,15 +513,9 @@ End Sub
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTimeUtc(ByRef Path As String, ByRef LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTimeUtc
-'    Dim Time As Currency
-'    Time = GetFileTimeUtc(LastWriteTime)
-'
-'    With OpenHandle(Path)
-'        If SetFileTime(.DangerousGetHandle, ByVal vbNullPtr, ByVal vbNullPtr, Time) = BOOL_FALSE Then
-'            IOError Err.LastDllError, Path
-'        End If
-'    End With
+    Dim Time As Currency
+    Time = GetFileTimeUtc(LastWriteTime)
+    SetFileTimeCore Path, vbNullPtr, vbNullPtr, VarPtr(Time)
 End Sub
 
 
@@ -536,7 +533,7 @@ Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
         Throw Error.Argument(Arg_PathIsAVolume)
     
     Dim Handle As SafeFileHandle
-    Set Handle = Win32Native.SafeCreateFile(FullPath, WriteAccess, WriteShare, OpenExisting)
+    Set Handle = Win32Native.SafeCreateFile(FullPath, WriteAccess, WriteShare, OpenExisting, FILE_FLAG_BACKUP_SEMANTICS)
     If Handle.IsInvalid Then _
         IOError Err.LastDllError, FullPath
         
@@ -630,31 +627,12 @@ Private Function IsIOError(ByVal Error As Long) As Boolean
     End Select
 End Function
 
-Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)
-    Dim CreationTimePtr     As Long
-    Dim LastAccessTimePtr   As Long
-    Dim LastWriteTimePtr    As Long
-    
-    If Not IsMissing(CreationTime) Then CreationTimePtr = VarPtr(CreationTime) + VARIANTDATA_OFFSET
-    If Not IsMissing(LastAccessTime) Then LastAccessTimePtr = VarPtr(LastAccessTime) + VARIANTDATA_OFFSET
-    If Not IsMissing(LastWriteTime) Then LastWriteTimePtr = VarPtr(LastWriteTime) + VARIANTDATA_OFFSET
-    
-    If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), "sPath")
-    
-    Statics.Path.VerifyPath Path
-    
-    Dim DirHandle As Long
-    DirHandle = Api.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_FLAG_BACKUP_SEMANTICS, 0)
-    If DirHandle = INVALID_HANDLE Then
-        IOError Err.LastDllError, Path
-    End If
-    
-    If SetFileTime(DirHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr) = BOOL_FALSE Then
-        Close CloseHandle(DirHandle)
-        IOError Err.LastDllError, Path
-    End If
-    CloseHandle DirHandle
+Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long, ByVal LastAccessTimePtr As Long, ByVal LastWriteTimePtr As Long)
+    With OpenHandle(Path)
+        If SetFileTime(.DangerousGetHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr) = BOOL_FALSE Then
+            IOError Err.LastDllError, Path
+        End If
+    End With
 End Sub
 
 Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATA) As String
