@@ -28,6 +28,7 @@ Public Enum ResourceStringKey
     Arg_PathIllegal = 838
     Arg_PathIllegalUNC = 840
     Arg_PathGlobalRoot = 841
+    Arg_PathIsAVolume = 845
     
     Argument_MultiDimNotSupported = 200
     Argument_InvalidOffLen = 800

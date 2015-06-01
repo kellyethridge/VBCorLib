@@ -116,6 +116,28 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, 0, "Month"
             Test.Use 1, 13, "Month"
             
+        Case "ToFileTime_WithKinds_ReturnsExpected"
+            Test.Use DateTimeKind.LocalKind, DateTimeKind.UtcKind, False
+            Test.Use DateTimeKind.LocalKind, DateTimeKind.UnspecifiedKind, True
+            Test.Use DateTimeKind.UtcKind, DateTimeKind.UtcKind, True
+            Test.Use DateTimeKind.UtcKind, DateTimeKind.UnspecifiedKind, False
+            
+        Case "ToFileTimeUtc_WithKinds_ReturnsExpected"
+            Test.Use DateTimeKind.LocalKind, DateTimeKind.UtcKind, False
+            Test.Use DateTimeKind.LocalKind, DateTimeKind.UnspecifiedKind, False
+            Test.Use DateTimeKind.UtcKind, DateTimeKind.LocalKind, False
+            Test.Use DateTimeKind.UtcKind, DateTimeKind.UnspecifiedKind, True
+        
+        Case "ToUniversalTime_WithKinds_ReturnsUtcKind"
+            Test.Use DateTimeKind.UtcKind
+            Test.Use DateTimeKind.UnspecifiedKind
+            Test.Use DateTimeKind.LocalKind
+            
+        Case "ToLocalTime_WithKinds_ReturnsUtcKind"
+            Test.Use DateTimeKind.UtcKind
+            Test.Use DateTimeKind.UnspecifiedKind
+            Test.Use DateTimeKind.LocalKind
+        
     End Select
 End Sub
 
@@ -251,7 +273,7 @@ Public Sub TimeOfDay_WhenCalled_ReturnsExpected()
     Set Actual = NewDateTime(2004, 1, 1, 6, 10, 15, 100).TimeOfDay
     
     Dim Expected As TimeSpan
-    Set Expected = NewTimeSpan(Hours:=6, Minutes:=10, Seconds:=15, Milliseconds:=100)
+    Set Expected = newtimespan(Hours:=6, Minutes:=10, Seconds:=15, Milliseconds:=100)
     Assert.That Actual, Equals(Expected)
 End Sub
 
@@ -529,33 +551,78 @@ errTrap:
     AssertArgumentOutOfRangeException Err, "Time"
 End Sub
 
-' This test is subject to the current timezone. Modify this test
-' as necessary to your timezone.
-Public Sub TestToLocalTime()
-    Dim dt As CorDateTime
+Public Sub ToFileTime_WithKinds_ReturnsExpected(ByVal k1 As DateTimeKind, ByVal k2 As DateTimeKind, ByVal Expected As Boolean)
+    Dim t1 As Currency
+    Dim t2 As Currency
     
-    Set dt = CorDateTime.FromOADate(#1/1/2004 12:00:00 PM#)
-    Set dt = dt.ToLocalTime
-    Assert.IsTrue dt.Equals(#1/1/2004 4:00:00 AM#), "ToLocalTime should return 1/1/2004 4AM."
+    t1 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k1).ToFileTime
+    t2 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k2).ToFileTime
     
-    Set dt = CorDateTime.FromOADate(#6/1/2004 12:00:00 PM#)
-    Set dt = dt.ToLocalTime
-    Assert.IsTrue dt.Equals(#6/1/2004 5:00:00 AM#), "ToLocalTime should return 6/1/2004 5AM."
+    Dim Actual As Boolean
+    Actual = t1 = t2
+    Assert.That Actual, Iz.EqualTo(Expected), CorString.Format("t1={0}, t2={1}", CorDateTime.FromFileTime(t1), CorDateTime.FromFileTime(t2))
 End Sub
 
-' This test is subject to the current timezone. Modify this test
-' as necessary to your timezone.
-Public Sub TestToUniversalTime()
-    Dim dt As CorDateTime
+Public Sub ToFileTime_WhenLessThanMinAllowed_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
     
-    Set dt = CorDateTime.FromOADate(#1/1/2004 12:00:00 PM#)
-    Set dt = dt.ToUniversalTime
-    Assert.IsTrue dt.Equals(#1/1/2004 8:00:00 PM#), "ToUniversalTime should return 1/1/2004 8PM."
+    NewDate(#12/31/1600 11:59:59 PM#, UtcKind).ToFileTime
     
-    Set dt = CorDateTime.FromOADate(#6/1/2004 12:00:00 PM#)
-    Set dt = dt.ToUniversalTime
-    Assert.IsTrue dt.Equals(#6/1/2004 7:00:00 PM#), "ToUniversalTime should return 6/1/2004 7PM."
+    AssertArgumentOutOfRangeException Err
 End Sub
+
+Public Sub ToFileTimeUtc_WithKinds_ReturnsExpected(ByVal k1 As DateTimeKind, ByVal k2 As DateTimeKind, ByVal Expected As Boolean)
+    Dim t1 As Currency
+    Dim t2 As Currency
+    
+    t1 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k1).ToFileTimeUtc
+    t2 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k2).ToFileTimeUtc
+    
+    Dim Actual As Boolean
+    Actual = t1 = t2
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToLocalTime_WithLocalKind_ReturnsSameValue()
+    Dim d As CorDateTime
+    Set d = NewDate(#1/1/2001 6:00:00 AM#, LocalKind)
+    
+    Dim Actual As CorDateTime
+    Set Actual = d.ToLocalTime
+    
+    Assert.That Actual, Equals(#1/1/2001 6:00:00 AM#)
+End Sub
+
+Public Sub ToLocalTime_WithKinds_ReturnsLocalKind(ByVal k As DateTimeKind)
+    Dim d As CorDateTime
+    Set d = NewDate(#1/1/2001 6:00:00 AM#, k)
+    
+    Dim Actual As DateTimeKind
+    Actual = d.ToLocalTime.Kind
+    
+    Assert.That Actual, Iz.EqualTo(LocalKind)
+End Sub
+
+Public Sub ToUniversalTime_WithUtcKind_ReturnsSameValue()
+    Dim d As CorDateTime
+    Set d = NewDate(#1/1/2001 6:00:00 AM#, UtcKind)
+    
+    Dim Actual As CorDateTime
+    Set Actual = d.ToUniversalTime
+    
+    Assert.That Actual, Equals(#1/1/2001 6:00:00 AM#)
+End Sub
+
+Public Sub ToUniversalTime_WithKinds_ReturnsUtcKind(ByVal k As DateTimeKind)
+    Dim d As CorDateTime
+    Set d = NewDate(#1/1/2001 6:00:00 AM#, k)
+    
+    Dim Actual As DateTimeKind
+    Actual = d.ToUniversalTime.Kind
+    
+    Assert.That Actual, Iz.EqualTo(UtcKind)
+End Sub
+
 
 Public Sub TestQuotedFormatting()
     Dim dt As CorDateTime

@@ -104,7 +104,7 @@ End Property
 ' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTime(ByVal RHS As Variant)
-    Set Me.CreationTime = CorDateTime.GetcDateTime(RHS)
+    Set Me.CreationTime = CorDateTime.GetDateTime(RHS)
 End Property
 
 ''
@@ -137,7 +137,7 @@ End Property
 ' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTimeUtc(ByVal RHS As Variant)
-    Set Me.CreationTimeUtc = CorDateTime.GetcDateTime(RHS)
+    Set Me.CreationTimeUtc = CorDateTime.GetDateTime(RHS)
 End Property
 
 ''
@@ -169,7 +169,7 @@ End Property
 ' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = CorDateTime.GetcDateTime(RHS)
+    Set Me.LastAccessTime = CorDateTime.GetDateTime(RHS)
 End Property
 
 ''
@@ -202,7 +202,7 @@ End Property
 ' @param RHS A Date or CorDateTime object of the new UTC time.
 '
 Public Property Let LastAccessTimeUtc(ByVal RHS As Variant)
-    Set Me.LastAccessTimeUtc = CorDateTime.GetcDateTime(RHS)
+    Set Me.LastAccessTimeUtc = CorDateTime.GetDateTime(RHS)
 End Property
 
 ''
@@ -234,7 +234,7 @@ End Property
 ' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = CorDateTime.GetcDateTime(RHS)
+    Set Me.LastAccessTime = CorDateTime.GetDateTime(RHS)
 End Property
 
 ''
@@ -267,7 +267,7 @@ End Property
 ' @param RHS A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTimeUtc(ByVal RHS As Variant)
-    Set Me.LastWriteTimeUtc = CorDateTime.GetcDateTime(RHS)
+    Set Me.LastWriteTimeUtc = CorDateTime.GetDateTime(RHS)
 End Property
 
 ''

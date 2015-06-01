@@ -223,7 +223,7 @@ End Function
 '
 Public Function FromDate(ByRef Value As Variant) As TimeSpan
     Dim dt As CorDateTime
-    Set dt = CorDateTime.GetcDateTime(Value)
+    Set dt = CorDateTime.GetDateTime(Value)
     Set FromDate = dt.TimeOfDay
 End Function
 

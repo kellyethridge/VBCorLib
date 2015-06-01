@@ -113,8 +113,8 @@ End Function
 Friend Sub Init(ByRef StartTime As Variant, ByRef EndTime As Variant, ByVal Delta As TimeSpan)
     If Delta Is Nothing Then Set Delta = TimeSpan.Zero
     Set mDelta = Delta
-    Set mStartTime = CorDateTime.GetcDateTime(StartTime)
-    Set mEndTime = CorDateTime.GetcDateTime(EndTime)
+    Set mStartTime = CorDateTime.GetDateTime(StartTime)
+    Set mEndTime = CorDateTime.GetDateTime(EndTime)
 End Sub
 
 

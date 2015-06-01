@@ -149,7 +149,7 @@ End Property
 ' <p>A negative value can be supplied for <i>Days</i>.</p>
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = CorDateTime.GetcDateTime(Time).AddDays(Days)
+    Set AddDays = CorDateTime.GetDateTime(Time).AddDays(Days)
 End Function
 
 ''
@@ -160,7 +160,7 @@ End Function
 ' @return Returns a <b>cDateTime</b> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = CorDateTime.GetcDateTime(Time).AddHours(Hours)
+    Set AddHours = CorDateTime.GetDateTime(Time).AddHours(Hours)
 End Function
 
 ''
@@ -171,7 +171,7 @@ End Function
 ' @return Returns a <b>cDateTime</b> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = CorDateTime.GetcDateTime(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = CorDateTime.GetDateTime(Time).AddMilliseconds(Milliseconds)
 End Function
 
 ''
@@ -182,7 +182,7 @@ End Function
 ' @return Returns a <b>cDateTime</b> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = CorDateTime.GetcDateTime(Time).AddMinutes(Minutes)
+    Set AddMinutes = CorDateTime.GetDateTime(Time).AddMinutes(Minutes)
 End Function
 
 ''
@@ -193,7 +193,7 @@ End Function
 ' @return Returns a <b>cDateTime</b> with the specified number of Months added.
 '
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
-    Set AddMonths = CorDateTime.GetcDateTime(Time).AddMonths(Months)
+    Set AddMonths = CorDateTime.GetDateTime(Time).AddMonths(Months)
 End Function
 
 ''
@@ -204,7 +204,7 @@ End Function
 ' @return Returns a <b>cDateTime</b> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = CorDateTime.GetcDateTime(Time).AddSeconds(Seconds)
+    Set AddSeconds = CorDateTime.GetDateTime(Time).AddSeconds(Seconds)
 End Function
 
 ''
@@ -226,7 +226,7 @@ End Function
 ' @return Returns a <b>cDateTime</b> with the specified number of Years added.
 '
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
-    Set AddYears = CorDateTime.GetcDateTime(Time).AddYears(Years)
+    Set AddYears = CorDateTime.GetDateTime(Time).AddYears(Years)
 End Function
 
 ''
@@ -236,7 +236,7 @@ End Function
 ' @return The day of the month for the specified date.
 '
 Public Function GetDayOfMonth(ByRef Time As Variant) As Long
-    GetDayOfMonth = CorDateTime.GetcDateTime(Time).Day
+    GetDayOfMonth = CorDateTime.GetDateTime(Time).Day
 End Function
 
 ''
@@ -248,7 +248,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = CorDateTime.GetcDateTime(Time).DayOfWeek
+    GetDayOfWeek = CorDateTime.GetDateTime(Time).DayOfWeek
 End Function
 
 ''
@@ -258,7 +258,7 @@ End Function
 ' @return The day of the year.
 '
 Public Function GetDayOfYear(ByRef Time As Variant) As Long
-    GetDayOfYear = CorDateTime.GetcDateTime(Time).DayOfYear
+    GetDayOfYear = CorDateTime.GetDateTime(Time).DayOfYear
 End Function
 
 ''
@@ -302,7 +302,7 @@ End Function
 '
 Public Function GetEra(ByRef Time As Variant) As Long
     Dim dt As CorDateTime
-    Set dt = CorDateTime.GetcDateTime(Time)    ' verifies we have a date
+    Set dt = CorDateTime.GetDateTime(Time)    ' verifies we have a date
     GetEra = 1
 End Function
 
@@ -313,7 +313,7 @@ End Function
 ' @return The hour portion of the time.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = CorDateTime.GetcDateTime(Time).Hour
+    GetHour = CorDateTime.GetDateTime(Time).Hour
 End Function
 
 ''
@@ -323,7 +323,7 @@ End Function
 ' @return The millisecond portion of the time.
 '
 Public Function GetMilliseconds(ByRef Time As Variant) As Double
-    GetMilliseconds = CorDateTime.GetcDateTime(Time).Millisecond
+    GetMilliseconds = CorDateTime.GetDateTime(Time).Millisecond
 End Function
 
 ''
@@ -333,7 +333,7 @@ End Function
 ' @return The minute portion of the time.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = CorDateTime.GetcDateTime(Time).Minute
+    GetMinute = CorDateTime.GetDateTime(Time).Minute
 End Function
 
 ''
@@ -343,7 +343,7 @@ End Function
 ' @return The month portion of the time.
 '
 Public Function GetMonth(ByRef Time As Variant) As Long
-    GetMonth = CorDateTime.GetcDateTime(Time).Month
+    GetMonth = CorDateTime.GetDateTime(Time).Month
 End Function
 
 ''
@@ -367,7 +367,7 @@ End Function
 ' @return The second portion of the time.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = CorDateTime.GetcDateTime(Time).Second
+    GetSecond = CorDateTime.GetDateTime(Time).Second
 End Function
 
 ''
@@ -389,7 +389,7 @@ End Function
 ' @return The year portion of the time.
 '
 Public Function GetYear(ByRef Time As Variant) As Long
-    GetYear = CorDateTime.GetcDateTime(Time).Year
+    GetYear = CorDateTime.GetDateTime(Time).Year
 End Function
 
 ''

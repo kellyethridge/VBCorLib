@@ -477,6 +477,12 @@ Friend Function LastChar(ByRef s As String) As Integer
     End If
 End Function
 
+Friend Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
+    Debug.Assert Index >= 0 And Index < Len(s)
+    
+    CharAt = MemWord(StrPtr(s) + Index * 2)
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors

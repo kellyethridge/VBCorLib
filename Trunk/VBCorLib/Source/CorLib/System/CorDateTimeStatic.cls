@@ -360,18 +360,21 @@ End Function
 ' @remarks If d is already a CorDateTime object, then it is returned.
 ' If d is a Date value, then a new CorDateTime object is created.
 '
-Friend Function GetcDateTime(ByRef d As Variant) As CorDateTime
+Friend Function GetDateTime(ByRef d As Variant) As CorDateTime
     Select Case VarType(d)
         Case vbObject
+            If d Is Nothing Then _
+                Throw Error.Argument(Argument_DateRequired)
+                
             If TypeOf d Is CorDateTime Then
-                Set GetcDateTime = d
+                Set GetDateTime = d
             Else
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired))
+                Throw Error.Argument(Argument_DateRequired)
             End If
         Case vbDate
-            Set GetcDateTime = FromOADate(d)
+            Set GetDateTime = FromOADate(d)
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired))
+            Throw Error.Argument(Argument_DateRequired)
     End Select
 End Function
 

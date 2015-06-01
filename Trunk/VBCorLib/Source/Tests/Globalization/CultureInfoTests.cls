@@ -107,7 +107,7 @@ Public Sub GetAllInvariantCultures_WhenCalled_ContainsInvariantCulture()
     Dim Invariant As CultureInfo
     Set Invariant = CultureInfo.InvariantCulture
     
-    Assert.That Cultures, Has.Some.EqualTo(Invariant).Using(New ObjectComparer)
+    Assert.That Cultures, Has.Some.EqualTo(Invariant).Using(New CorObjectComparer)
 End Sub
 
 Public Sub OptionalCalendars_WhenCalled_DoesNotReturnNull()

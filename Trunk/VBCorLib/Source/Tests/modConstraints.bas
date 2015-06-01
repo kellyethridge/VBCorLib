@@ -1,8 +1,7 @@
 Attribute VB_Name = "modConstraints"
 Option Explicit
 
-Private mObjectComparer As New ObjectComparer
-
-Public Function Equals(ByRef Other As Variant) As IConstraint
-    Set Equals = Iz.EqualTo(Other).Using(mObjectComparer)
+Public Function Equals(ByRef Expected As Variant) As CorEqualsConstraint
+    Set Equals = New CorEqualsConstraint
+    Equals.Init Expected
 End Function

@@ -97,7 +97,7 @@ End Function
 Public Function IsDayLightSavingTime(ByRef Time As Variant, Optional ByVal dayLightTimes As DayLightTime) As Boolean
     Dim dt As CorDateTime
     
-    Set dt = CorDateTime.GetcDateTime(Time)
+    Set dt = CorDateTime.GetDateTime(Time)
     If dayLightTimes Is Nothing Then Set dayLightTimes = GetDayLightTimes(dt.Year)
     
     With dayLightTimes
@@ -118,25 +118,33 @@ End Function
 ''
 ' Returns the time with the UTC offset applied to get the local time.
 '
-' @param time The UTC time to convert to local time.
+' @param Time The UTC time to convert to local time.
 ' @return The local time converted from the UTC time.
 Public Function ToLocalTime(ByRef Time As Variant) As CorDateTime
-    Dim dt As CorDateTime
+    Dim d As CorDateTime
+    Set d = CorDateTime.GetDateTime(Time)
     
-    Set dt = CorDateTime.GetcDateTime(Time)
-    Set ToLocalTime = dt.Add(GetUtcOffset(dt))
+    If d.Kind = LocalKind Then
+        Set ToLocalTime = d
+    Else
+        Set ToLocalTime = d.Add(GetUtcOffset(d))
+    End If
 End Function
 
 ''
 ' Returns the local time with UTC offset removed to get the UTC time.
 '
-' @param time The local time to have the UTC offset removed.
+' @param Time The local time to have the UTC offset removed.
 ' @return The UTC time converted from the local time.
 Public Function ToUniversalTime(ByRef Time As Variant) As CorDateTime
-    Dim dt As CorDateTime
+    Dim d As CorDateTime
+    Set d = CorDateTime.GetDateTime(Time)
     
-    Set dt = CorDateTime.GetcDateTime(Time)
-    Set ToUniversalTime = dt.Subtract(GetUtcOffset(dt))
+    If d.Kind = UtcKind Then
+        Set ToUniversalTime = d
+    Else
+        Set ToUniversalTime = CorDateTime.SpecifyKind(d.Subtract(GetUtcOffset(d)), UtcKind)
+    End If
 End Function
 
 ''
