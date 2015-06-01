@@ -743,7 +743,7 @@ End Function
 '
 Public Function Format(ByRef Value As Variant, Optional ByVal fmt As String) As String
     VerifyLoaded
-    Format = CustomFormat(CorDateTime.GetcDateTime(Value), GetPattern(fmt))
+    Format = CustomFormat(CorDateTime.GetDateTime(Value), GetPattern(fmt))
 End Function
 
 ''

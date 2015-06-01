@@ -465,11 +465,7 @@ End Function
 ' @remarks FileTime values cannot be less than 1/1/1601 12:00:00AM.
 '
 Public Function ToFileTime() As Currency
-    Dim ms As Currency
-    ms = TimeZone.CurrentTimeZone.ToUniversalTime(Me).TotalMilliseconds
-    If ms < MinFiletime Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
-    ToFileTime = ms - MillisecondsTo1601
+    ToFileTime = ToUniversalTime.ToFileTimeUtc
 End Function
 
 ''
@@ -479,9 +475,20 @@ End Function
 ' @remarks FileTime values cannot be less than 1/1/1601 12:00:00AM.
 '
 Public Function ToFileTimeUtc() As Currency
-    If mMilliseconds < MinFiletime Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_InvalidFileTime))
-    ToFileTimeUtc = mMilliseconds - MillisecondsTo1601
+    Dim ms As Currency
+    
+    If mKind = LocalKind Then
+        ms = ToUniversalTime.TotalMilliseconds
+    Else
+        ms = mMilliseconds
+    End If
+    
+    ms = ms - MillisecondsTo1601
+    
+    If ms < 0 Then _
+        Throw Error.ArgumentOutOfRange(vbNullString, ArgumentOutOfRange_InvalidFileTime)
+    
+    ToFileTimeUtc = ms
 End Function
 
 ''
@@ -490,7 +497,11 @@ End Function
 ' @return The CorDateTime object with the timezone offset applied.
 '
 Public Function ToLocalTime() As CorDateTime
-    Set ToLocalTime = TimeZone.CurrentTimeZone.ToLocalTime(Me)
+    If mKind = LocalKind Then
+        Set ToLocalTime = Me
+    Else
+        Set ToLocalTime = TimeZone.CurrentTimeZone.ToLocalTime(Me)
+    End If
 End Function
 
 ''
@@ -499,7 +510,11 @@ End Function
 ' @return The CorDateTime object with the timezone offset removed.
 '
 Public Function ToUniversalTime() As CorDateTime
-    Set ToUniversalTime = TimeZone.CurrentTimeZone.ToUniversalTime(Me)
+    If mKind = UtcKind Then
+        Set ToUniversalTime = Me
+    Else
+        Set ToUniversalTime = TimeZone.CurrentTimeZone.ToUniversalTime(Me)
+    End If
 End Function
 
 ''

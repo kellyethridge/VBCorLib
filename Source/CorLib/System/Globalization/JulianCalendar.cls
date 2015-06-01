@@ -80,19 +80,19 @@ Public Property Let TwoDigitYearMax(ByVal RHS As Long)
 End Property
 
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = CorDateTime.GetcDateTime(Time).AddDays(Days)
+    Set AddDays = CorDateTime.GetDateTime(Time).AddDays(Days)
 End Function
 
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = CorDateTime.GetcDateTime(Time).AddHours(Hours)
+    Set AddHours = CorDateTime.GetDateTime(Time).AddHours(Hours)
 End Function
 
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = CorDateTime.GetcDateTime(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = CorDateTime.GetDateTime(Time).AddMilliseconds(Milliseconds)
 End Function
 
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = CorDateTime.GetcDateTime(Time).AddMinutes(Minutes)
+    Set AddMinutes = CorDateTime.GetDateTime(Time).AddMinutes(Minutes)
 End Function
 
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
@@ -100,7 +100,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
         Throw Cor.NewArgumentOutOfRangeException("Months", Months, "Months must be between -120000 and 120000 inclusively.")
     
     If Months = 0 Then
-        Set AddMonths = CorDateTime.GetcDateTime(Time)
+        Set AddMonths = CorDateTime.GetDateTime(Time)
         Exit Function
     End If
 
@@ -130,17 +130,17 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
     If Day > MaxDays Then Day = MaxDays
     
     Dim TOD As Currency
-    TOD = CorDateTime.GetcDateTime(Time).TotalMilliseconds
+    TOD = CorDateTime.GetDateTime(Time).TotalMilliseconds
     
     Set AddMonths = CorDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(TOD, MillisecondsPerDay))
 End Function
 
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = CorDateTime.GetcDateTime(Time).AddSeconds(Seconds)
+    Set AddSeconds = CorDateTime.GetDateTime(Time).AddSeconds(Seconds)
 End Function
 
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
-    Set AddWeeks = CorDateTime.GetcDateTime(Time).AddDays(Weeks * 7)
+    Set AddWeeks = CorDateTime.GetDateTime(Time).AddDays(Weeks * 7)
 End Function
 
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
@@ -160,23 +160,23 @@ Public Function GetYear(ByRef Time As Variant) As Long
 End Function
 
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = CorDateTime.GetcDateTime(Time).Hour
+    GetHour = CorDateTime.GetDateTime(Time).Hour
 End Function
 
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = CorDateTime.GetcDateTime(Time).Minute
+    GetMinute = CorDateTime.GetDateTime(Time).Minute
 End Function
 
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = CorDateTime.GetcDateTime(Time).Second
+    GetSecond = CorDateTime.GetDateTime(Time).Second
 End Function
 
 Public Function GetMilliseconds(ByRef Time As Variant) As Long
-    GetMilliseconds = CorDateTime.GetcDateTime(Time).Millisecond
+    GetMilliseconds = CorDateTime.GetDateTime(Time).Millisecond
 End Function
 
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = CorDateTime.GetcDateTime(Time).DayOfWeek
+    GetDayOfWeek = CorDateTime.GetDateTime(Time).DayOfWeek
 End Function
 
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
@@ -193,7 +193,7 @@ Public Function GetDayOfYear(ByRef Time As Variant) As Long
 End Function
 
 Public Function GetEra(ByRef Time As Variant) As Long
-    Call CorDateTime.GetcDateTime(Time)
+    Call CorDateTime.GetDateTime(Time)
     GetEra = 1
 End Function
 
@@ -321,7 +321,7 @@ End Sub
 
 Private Sub GetDateParts(ByRef Time As Variant, ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim ms As Currency
-    ms = CorDateTime.GetcDateTime(Time).TotalMilliseconds
+    ms = CorDateTime.GetDateTime(Time).TotalMilliseconds
     
     Dim FixedDays As Long
     FixedDays = Int(ms / MillisecondsPerDay) + 2  ' Julian calendar starts 2 days after Gregorian

@@ -119,7 +119,7 @@ Public Sub CreateDirectory_WithIllegalCharacters_ThrowsArgumentException(ByVal I
     Directory.CreateDirectory IllegalPath
     
 errTrap:
-    AssertArgumentException Err, "Path"
+    AssertArgumentException Err
 End Sub
 
 Public Sub CreateDirectory_WithColonAfterRoot_ThrowsNotSupportedException()

@@ -1025,7 +1025,7 @@ End Function
 Public Function NewTime(ByVal DateValue As Variant) As TimeSpan
     Select Case VarType(DateValue)
         Case vbDate:    Set NewTime = NewTimeSpan(, Hour(DateValue), Minute(DateValue), Second(DateValue))
-        Case Else:      Set NewTime = CorDateTime.GetcDateTime(DateValue).TimeOfDay
+        Case Else:      Set NewTime = CorDateTime.GetDateTime(DateValue).TimeOfDay
     End Select
 End Function
 

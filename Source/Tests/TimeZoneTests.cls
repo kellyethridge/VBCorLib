@@ -69,26 +69,23 @@ Public Sub IsDayLightSavings_WithValues_ReturnsExpected(ByVal DateToTest As Date
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TestToLocalTime()
-    Dim Zone As TimeZone
-    Set Zone = TimeZone.CurrentTimeZone
-    
+Public Sub ToLocalTime_WithLocalDateTime_ReturnsSameValue()
     Dim dt As CorDateTime
-    Set dt = Zone.ToLocalTime(#1/1/2004 12:00:00 PM#)
-    Assert.IsTrue dt.Equals(#1/1/2004 4:00:00 AM#), "ToLocalTime should return 1/1/2004 4am."
+    Set dt = Cor.NewDate(#1/1/2004 12:00:00 PM#, LocalKind)
     
-    Set dt = Zone.ToLocalTime(#6/1/2004 12:00:00 PM#)
-    Assert.IsTrue dt.Equals(#6/1/2004 5:00:00 AM#), "ToLocalTime should return 6/1/2004 5am."
+    Dim Actual As CorDateTime
+    Set Actual = TimeZone.CurrentTimeZone.ToLocalTime(dt)
+    
+    Assert.That Actual, Equals(dt)
 End Sub
 
-Public Sub TestToUniversalTime()
-    Dim Zone As TimeZone
-    Set Zone = TimeZone.CurrentTimeZone
-    
+Public Sub ToUniversalTime_WithUtcDateTime_ReturnsSameValue()
     Dim dt As CorDateTime
-    Set dt = Zone.ToUniversalTime(#1/1/2004 12:00:00 PM#)
-    Assert.IsTrue dt.Equals(#1/1/2004 8:00:00 PM#), "ToUniversalTime should return 1/1/2004 8pm."
+    Set dt = Cor.NewDate(#1/1/2004 12:00:00 PM#, UtcKind)
     
-    Set dt = Zone.ToUniversalTime(#6/1/2004 12:00:00 PM#)
-    Assert.IsTrue dt.Equals(#6/1/2004 7:00:00 PM#), "ToUniversalTime should return 6/1/2004 7pm."
+    Dim Actual As CorDateTime
+    Set Actual = TimeZone.CurrentTimeZone.ToUniversalTime(dt)
+    
+    Assert.That Actual, Equals(dt)
 End Sub
+

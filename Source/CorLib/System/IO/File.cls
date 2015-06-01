@@ -359,7 +359,7 @@ End Sub
 ' @param CreationTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTime
+    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTime
 End Sub
 
 ''
@@ -369,7 +369,7 @@ End Sub
 ' @param CreationTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
+    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -379,7 +379,7 @@ End Sub
 ' @param LastAccessTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTime
+    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTime
 End Sub
 
 ''
@@ -389,7 +389,7 @@ End Sub
 ' @param LastAccessTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
+    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -399,7 +399,7 @@ End Sub
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTime
+    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTime
 End Sub
 
 ''
@@ -409,7 +409,7 @@ End Sub
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTimeUtc(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
+    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTimeUtc
 End Sub
 
 ''

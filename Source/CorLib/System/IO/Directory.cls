@@ -369,15 +369,15 @@ End Function
 ' @return A DirectoryInfo object representing the parent directory.
 ' @remarks The path can be absolute or relative.
 '
-Public Function GetParent(ByVal Path As String) As DirectoryInfo
+Public Function GetParent(ByRef Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), Environment.GetResourceString(Parameter_Path))
+        Throw Error.Argument(Argument_EmptyPath, "Path")
 
-    Statics.Path.VerifyPath Path
-    Path = Statics.Path.GetFullPath(Path)
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
     
     Dim DirName As String
-    DirName = Statics.Path.GetDirectoryName(Path)
+    DirName = Statics.Path.GetDirectoryName(FullPath)
     If Len(DirName) > 0 Then
         Set GetParent = Cor.NewDirectoryInfo(DirName)
     End If
@@ -425,15 +425,26 @@ End Sub
 ' @param Path The new directory to set as the current directory.
 ' @remarks The path can be absolute or relative.
 '
-Public Sub SetCurrentDirectory(ByVal Path As String)
+Public Sub SetCurrentDirectory(ByRef Path As String)
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), Environment.GetResourceString(Parameter_Path))
+        Throw Error.Argument(Argument_EmptyPath, "Path")
     
-    Statics.Path.VerifyPath Path
-    If Not Exists(Path) Then _
-        Throw New DirectoryNotFoundException
+'    Statics.Path.VerifyPath Path
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
+
+'    If Not Exists(Path) Then _
+'        Throw New DirectoryNotFoundException
     
-    If Api.SetCurrentDirectory(Path) = BOOL_FALSE Then IOError Err.LastDllError, Path
+'    If Api.SetCurrentDirectory(Path) = BOOL_FALSE Then IOError Err.LastDllError, Path
+    If Not Win32Native.SetCurrentDirectory(FullPath) Then
+        Dim ErrorCode As Long
+        ErrorCode = Err.LastDllError
+        If ErrorCode = IOConstants.ERROR_FILE_NOT_FOUND Then
+            ErrorCode = IOConstants.ERROR_PATH_NOT_FOUND
+        End If
+        IOError ErrorCode, FullPath
+    End If
 End Sub
 
 ''
@@ -445,7 +456,7 @@ End Sub
 ' the directory to it. When the time is read, it will be in local time to the timezone.
 '
 Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTime
+    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTime
 End Sub
 
 ''
@@ -456,7 +467,7 @@ End Sub
 ' @remarks The directory is set to the actual time passed in.
 '
 Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetcDateTime(CreationTime).ToFileTimeUtc
+    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -467,7 +478,7 @@ End Sub
 ' @remarks The UTC offset is removed from the time before setting the directory.
 '
 Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTime
+    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTime
 End Sub
 
 ''
@@ -478,7 +489,7 @@ End Sub
 ' @remarks The directory is set to the actual time passed in.
 '
 Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetcDateTime(LastAccessTime).ToFileTimeUtc
+    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTimeUtc
 End Sub
 
 ''
@@ -488,7 +499,8 @@ End Sub
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTime
+    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTime
+'    SetLastWriteTimeUtc Path, LastWriteTime
 End Sub
 
 ''
@@ -497,14 +509,44 @@ End Sub
 ' @param Path The directory to set the new time for.
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetLastWriteTimeUtc(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetcDateTime(LastWriteTime).ToFileTimeUtc
+Public Sub SetLastWriteTimeUtc(ByRef Path As String, ByRef LastWriteTime As Variant)
+    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTimeUtc
+'    Dim Time As Currency
+'    Time = GetFileTimeUtc(LastWriteTime)
+'
+'    With OpenHandle(Path)
+'        If SetFileTime(.DangerousGetHandle, ByVal vbNullPtr, ByVal vbNullPtr, Time) = BOOL_FALSE Then
+'            IOError Err.LastDllError, Path
+'        End If
+'    End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
+    
+    Dim root As String
+    root = Statics.Path.GetPathRoot(FullPath)
+    
+    If (FullPath = root) And (CorString.CharAt(Path, 1) = vbVolumeSeparatorChar) Then _
+        Throw Error.Argument(Arg_PathIsAVolume)
+    
+    Dim Handle As SafeFileHandle
+    Set Handle = Win32Native.SafeCreateFile(FullPath, WriteAccess, WriteShare, OpenExisting)
+    If Handle.IsInvalid Then _
+        IOError Err.LastDllError, FullPath
+        
+    Set OpenHandle = Handle
+End Function
+
+Private Function GetFileTimeUtc(ByRef Time As Variant) As Currency
+    GetFileTimeUtc = CorDateTime.GetDateTime(Time).ToFileTimeUtc
+End Function
+
 Private Sub VerifySearchPattern(ByRef Pattern As String)
     Dim i As Long
     

@@ -123,7 +123,7 @@ End Property
 ' being written to the directory.
 '
 Public Property Let CreationTime(ByVal Value As Variant)
-    Set CreationTime = CorDateTime.GetcDateTime(Value)
+    Set CreationTime = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
@@ -163,7 +163,7 @@ End Property
 ' being written to the directory.
 '
 Public Property Let CreationTimeUtc(ByVal Value As Variant)
-    Set Me.CreationTimeUtc = CorDateTime.GetcDateTime(Value)
+    Set Me.CreationTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
@@ -200,7 +200,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTime(ByVal Value As Variant)
-    Set Me.LastAccessTime = CorDateTime.GetcDateTime(Value)
+    Set Me.LastAccessTime = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
@@ -234,7 +234,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTimeUtc(ByVal Value As Variant)
-    Set Me.LastAccessTimeUtc = CorDateTime.GetcDateTime(Value)
+    Set Me.LastAccessTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
@@ -268,7 +268,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTime(ByVal Value As Variant)
-    Set LastWriteTime = CorDateTime.GetcDateTime(Value)
+    Set LastWriteTime = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
@@ -302,7 +302,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTimeUtc(ByVal Value As Variant)
-    Set LastWriteTimeUtc = CorDateTime.GetcDateTime(Value)
+    Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
 ''

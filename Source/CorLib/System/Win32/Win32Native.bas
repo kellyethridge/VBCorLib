@@ -82,12 +82,15 @@ Public Function RemoveMenu(ByVal hMenu As Long, ByVal nPosition As Long, ByVal w
     RemoveMenu = VBCorType.RemoveMenu(hMenu, nPosition, wFlags)
 End Function
 
+Public Function SetCurrentDirectory(ByRef PathName As String) As Boolean
+    SetCurrentDirectory = (SetCurrentDirectoryW(PathName) <> BOOL_FALSE)
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function MakeWide(ByRef PartialPath As String) As String
-    Dim root        As String
     Dim FullPath    As String
     FullPath = Path.GetFullPath(PartialPath)
     
@@ -95,11 +98,10 @@ Private Function MakeWide(ByRef PartialPath As String) As String
     If Left$(FullPath, 2) = "\\" Then
         ' MSDN says the format is \\?\UNC\Server\Share\... ,
         ' so we need to trim off the first backslash from the path
-        FullPath = Mid$(FullPath, 2)
-        root = "UNC"
+        MakeWide = "\\?\UNC" & Mid$(FullPath, 2)
+    Else
+        MakeWide = "\\?\" & FullPath
     End If
-    
-    MakeWide = "\\?\" & root & FullPath
 End Function
 
 Private Sub FindDataWToFindData(ByRef Source As WIN32_FIND_DATAW, ByRef Dest As WIN32_FIND_DATA)

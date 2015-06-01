@@ -47,9 +47,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private Const NOT_FOUND             As Long = &H0
-Private Const ERROR_BAD_PATHNAME    As Long = 161&
-
 Private mInvalidPathChars()     As Integer
 Private mInvalidFileNameChars() As Integer
 Private mTrimEndChars()         As Integer
