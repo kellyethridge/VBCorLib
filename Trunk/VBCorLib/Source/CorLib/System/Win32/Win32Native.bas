@@ -37,9 +37,9 @@ Public Sub InitWin32Api()
     Set Api = New Win32ApiW
 End Sub
 
-Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode) As SafeFileHandle
+Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode, Optional ByVal FlagsAndAttributes = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
     Dim FileHandle As Long
-    FileHandle = CreateFileW(MakeWide(FileName), DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FILE_ATTRIBUTE_NORMAL, 0)
+    FileHandle = CreateFileW(MakeWide(FileName), DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FlagsAndAttributes, 0)
     Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle, True)
 End Function
 

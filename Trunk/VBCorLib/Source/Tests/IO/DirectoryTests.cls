@@ -284,6 +284,16 @@ Public Sub LastWriteTime_WhenCalled_IsSetAndRead()
     Assert.That Actual, Iz.EqualTo(#2/2/2015 8:40:00 AM#)
 End Sub
 
+Public Sub LastWriteTime_WithNonExistingFile_ThrowsFileNotFoundException()
+    Dim NonExistingFileName As String
+    NonExistingFileName = Path.Combine(mBuilder.TempFolder, "NothingHere.txt")
+    
+    On Error Resume Next
+    Directory.SetLastWriteTime NonExistingFileName, Now
+    
+    AssertFileNotFoundException Err, NonExistingFileName
+End Sub
+
 Public Sub GetParent_WithFile_ReturnsParentDirectory()
     Dim FileName As String
     FileName = mBuilder.CreateFile
