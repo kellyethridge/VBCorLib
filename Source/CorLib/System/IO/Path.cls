@@ -148,25 +148,30 @@ End Property
 ' @remarks Passing in an <i>Extension</i> of <i>vbNullString</i> will remove
 ' any extension and period from the path.
 '
-Public Function ChangeExtension(ByVal Path As String, ByVal Extension As String) As String
-    If Len(Path) = 0 Then Exit Function
-    
-    VerifyPath Path
-    
-    If Not CorString.IsNull(Extension) Then
-        If Len(Extension) = 0 Then
-            Extension = "."
-        ElseIf Asc(Extension) <> vbPeriodChar Then
-            Extension = "." & Extension
-        End If
+Public Function ChangeExtension(ByRef Path As String, ByRef Extension As String) As String
+    If Len(Path) = 0 Then
+        Exit Function
     End If
+    
+    CheckValidPathChars Path
     
     Dim PeriodIndex As Long
     PeriodIndex = GetExtensionCharIndex(Path)
-    If PeriodIndex = NOT_FOUND Then
-        ChangeExtension = Path & Extension
+    
+    If PeriodIndex > 0 Then
+        ChangeExtension = Left$(Path, PeriodIndex - 1)
     Else
-        ChangeExtension = Left$(Path, PeriodIndex - 1) & Extension
+        ChangeExtension = Path
+    End If
+    
+    If Not CorString.IsNull(Extension) Then
+        If Len(Extension) = 0 Then
+            ChangeExtension = ChangeExtension & "."
+        ElseIf AscW(Extension) = vbPeriodChar Then
+            ChangeExtension = ChangeExtension & Extension
+        Else
+            ChangeExtension = ChangeExtension & "." & Extension
+        End If
     End If
 End Function
 
@@ -180,13 +185,13 @@ End Function
 ' \\Server\Share\File, and \MyFile are rooted.</p>
 ' <p>This function does not verify that the path actually exists.</p>
 '
-Public Function IsPathRooted(ByVal Path As String) As Boolean
+Public Function IsPathRooted(ByRef Path As String) As Boolean
     If Len(Path) = 0 Then Exit Function
     
-    FixupPath Path
+    CheckValidPathChars Path
     
     With FirstTwoChars(Path)
-        If .LoWord = vbDirectorySeparatorChar Then
+        If IsDirectorySeparator(.LoWord) Then
             IsPathRooted = True
         ElseIf .HiWord = vbVolumeSeparatorChar Then
             IsPathRooted = True
@@ -204,13 +209,13 @@ End Function
 ' characters or volume separator is encountered before a '.', then the
 ' filename is considered not to have an extension.
 '
-Public Function HasExtension(ByVal Path As String) As Boolean
-    VerifyPath Path
+Public Function HasExtension(ByRef Path As String) As Boolean
+    CheckValidPathChars Path
     
-    Select Case GetExtensionCharIndex(Path)
-        Case Len(Path): Exit Function
-        Case Is > 0: HasExtension = True
-    End Select
+    Dim Index As Long
+    Index = GetExtensionCharIndex(Path)
+    
+    HasExtension = Index > 0 And Index < Len(Path)
 End Function
 
 ''
@@ -290,12 +295,10 @@ End Function
 ' @param Path The filename to retrieve the extension of.
 ' @return The extension of the filename
 '
-Public Function GetExtension(ByVal Path As String) As String
-    Path = GetFileName(Path)
-    
+Public Function GetExtension(ByRef Path As String) As String
     Dim Index As Long
-    Index = InStrRev(Path, ".")
-    If (Index > 0) And (Index < Len(Path)) Then
+    Index = GetExtensionCharIndex(Path)
+    If Index > 0 And Index < Len(Path) Then
         GetExtension = Mid$(Path, Index)
     End If
 End Function
@@ -307,10 +310,17 @@ End Function
 ' @return The filetime portion of the specified path.
 ' @remarks This function does not verify that the file exists.
 '
-Public Function GetFileName(ByVal Path As String) As String
-    VerifyPath Path
+Public Function GetFileName(ByRef Path As String) As String
+    CheckValidPathChars Path
     
-    GetFileName = Mid$(Path, GetDirectoryCharIndex(Path) + 1)
+    Dim Index As Long
+    Index = GetDirectoryCharIndex(Path)
+    
+    If Index > 0 Then
+        GetFileName = Mid$(Path, Index + 1)
+    Else
+        GetFileName = Path
+    End If
 End Function
 
 ''
@@ -320,14 +330,17 @@ End Function
 ' @return A filename without the extension present.
 ' @remarks This function does not verify the file exists.
 '
-Public Function GetFileNameWithoutExtension(ByVal Path As String) As String
-    Path = GetFileName(Path)
+Public Function GetFileNameWithoutExtension(ByRef Path As String) As String
+    Dim FileName As String
+    FileName = GetFileName(Path)
     
     Dim Index As Long
-    Index = InStrRev(Path, ".")
-    If Index > 0 Then Path = Left$(Path, Index - 1)
-    
-    GetFileNameWithoutExtension = Path
+    Index = InStrRev(FileName, ".")
+    If Index > 0 Then
+        GetFileNameWithoutExtension = Left$(FileName, Index - 1)
+    Else
+        GetFileNameWithoutExtension = FileName
+    End If
 End Function
 
 ''
@@ -825,54 +838,44 @@ Private Sub VerifyUNCPathFormat(ByVal NewBuffer As PathHelper, ByVal LengthToChe
         Throw Error.Argument(Arg_PathIllegalUNC)
 End Sub
 
-''
-' Returns a 1-based index for the extension separator character
-' in the string. Works like the InStrRev.
-'
-' @param Path The path to search for the extension separator character.
-' @return A 1-based index of the separator character, or 0 if not found.
-'
 Private Function GetExtensionCharIndex(ByRef Path As String) As Long
-    mBuffer.SA.pvData = StrPtr(Path)
+    Dim PathChars() As Integer
+    PathChars = AllocChars(Path)
     
     Dim Index As Long
     Index = Len(Path) - 1
     
     Do While Index >= 0
-        Select Case mBuffer.Data(Index)
+        Select Case PathChars(Index)
             Case vbPeriodChar
+                GetExtensionCharIndex = Index + 1
                 Exit Do
             Case vbAltDirectorySeparatorChar, vbDirectorySeparatorChar, vbVolumeSeparatorChar
-                GetExtensionCharIndex = NOT_FOUND
-                Exit Function
-        End Select
-        Index = Index - 1
-    Loop
-    
-    GetExtensionCharIndex = Index + 1
-End Function
-
-''
-' Returns a 1-based index for the last separator character
-' in the string. Works like the InStrRev.
-'
-' @param Path The path to search for the last separator character.
-' @return A 1-based index of the separator character, or 0 if not found.
-'
-Private Function GetDirectoryCharIndex(ByRef Path As String) As Long
-    mBuffer.SA.pvData = StrPtr(Path)
-    
-    Dim Index As Long
-    Index = Len(Path) - 1
-    Do While Index >= 0
-        Select Case mBuffer.Data(Index)
-            Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar, vbVolumeSeparatorChar
                 Exit Do
         End Select
         Index = Index - 1
     Loop
     
-    GetDirectoryCharIndex = Index + 1
+    FreeChars PathChars
+End Function
+
+Private Function GetDirectoryCharIndex(ByRef Path As String) As Long
+    Dim PathChars() As Integer
+    PathChars = AllocChars(Path)
+    
+    Dim Index As Long
+    Index = Len(Path) - 1
+    
+    Do While Index >= 0
+        If IsSeparator(PathChars(Index)) Then
+            GetDirectoryCharIndex = Index + 1
+            Exit Do
+        End If
+        
+        Index = Index - 1
+    Loop
+        
+    FreeChars PathChars
 End Function
 
 Private Function GetLongPathName(ByRef ShortPath As String) As String
