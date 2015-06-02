@@ -226,7 +226,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef FileName As String, ByVal Message As String, ByVal InnerException As Exception)
     If Len(Message) = 0 Then
-        Message = Environment.GetResourceString(FileNotFound_Exception)
+        Message = Environment.GetResourceString(IO_FileNotFound)
     End If
     
     Set mBase = Nothing
@@ -241,7 +241,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init Environment.GetResourceString(FileNotFound_Exception), DEF_HRESULT, Nothing
+    Init Environment.GetResourceString(IO_FileNotFound), DEF_HRESULT, Nothing
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)

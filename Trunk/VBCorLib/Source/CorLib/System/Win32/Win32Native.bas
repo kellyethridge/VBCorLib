@@ -39,7 +39,7 @@ End Sub
 
 Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode, Optional ByVal FlagsAndAttributes = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
     Dim FileHandle As Long
-    FileHandle = CreateFileW(MakeWide(FileName), DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FlagsAndAttributes, 0)
+    FileHandle = CreateFileW(FileName, DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FlagsAndAttributes, 0)
     Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle, True)
 End Function
 
@@ -47,7 +47,7 @@ Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData A
     Dim WideData    As WIN32_FIND_DATAW
     Dim FileHandle  As Long
     
-    FileHandle = FindFirstFileW(MakeWide(FileName), WideData)
+    FileHandle = FindFirstFileW(FileName, WideData)
     FindDataWToFindData WideData, FindFileData
     Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
 End Function
@@ -86,24 +86,26 @@ Public Function SetCurrentDirectory(ByRef PathName As String) As Boolean
     SetCurrentDirectory = (SetCurrentDirectoryW(PathName) <> BOOL_FALSE)
 End Function
 
+Public Function GetMessage(ByVal ErrorCode As Long) As String
+    Const FORMAT_MESSAGE_FLAGS As Long = FORMAT_MESSAGE_FROM_SYSTEM Or _
+                                         FORMAT_MESSAGE_IGNORE_INSERTS Or _
+                                         FORMAT_MESSAGE_ARGUMENT_ARRAY
+    Dim Buf     As String
+    Dim Size    As Long
+    
+    Buf = String$(1024, vbNullChar)
+    Size = FormatMessageA(FORMAT_MESSAGE_FLAGS, ByVal 0&, ErrorCode, 0, Buf, Len(Buf), ByVal 0&)
+    
+    If Size > 0 Then
+        GetMessage = Left$(Buf, Size - 2)
+    Else
+        GetMessage = Environment.GetResourceString(UnknownError_Num, ErrorCode)
+    End If
+End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function MakeWide(ByRef PartialPath As String) As String
-    Dim FullPath    As String
-    FullPath = Path.GetFullPath(PartialPath)
-    
-    ' Check if we have a UNC path.
-    If Left$(FullPath, 2) = "\\" Then
-        ' MSDN says the format is \\?\UNC\Server\Share\... ,
-        ' so we need to trim off the first backslash from the path
-        MakeWide = "\\?\UNC" & Mid$(FullPath, 2)
-    Else
-        MakeWide = "\\?\" & FullPath
-    End If
-End Function
-
 Private Sub FindDataWToFindData(ByRef Source As WIN32_FIND_DATAW, ByRef Dest As WIN32_FIND_DATA)
     With Dest
         .cAlternateFileName = SysAllocString(VarPtr(Source.cAlternateFileName(0)))

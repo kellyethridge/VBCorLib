@@ -179,7 +179,7 @@ Public Property Get MachineName() As String
     Dim Ret As String
     Ret = String$(Size, 0)
     If Api.GetComputerName(Ret, Size) = BOOL_FALSE Then _
-        Throw Cor.NewInvalidOperationException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewInvalidOperationException(GetMessage(Err.LastDllError))
     
     MachineName = Left$(Ret, Size)
 End Property
@@ -618,7 +618,7 @@ Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal Value As Strin
     Select Case Target
         Case EnvironmentVariableTarget.Process
             If Api.SetEnvironmentVariable(Variable, Value) = BOOL_FALSE Then _
-                Throw Cor.NewArgumentException(GetSystemMessage(Err.LastDllError), "Value")
+                Throw Cor.NewArgumentException(GetMessage(Err.LastDllError), "Value")
                 
         Case EnvironmentVariableTarget.Machine, EnvironmentVariableTarget.User
             Call VerifyNTMachine
@@ -655,19 +655,14 @@ Public Property Get ProcessorCount() As Long
     ProcessorCount = Info.dwNumberOfProcessors
 End Property
 
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function GetResourceString(ByVal Key As ResourceStringKey, ParamArray Values() As Variant) As String
+Friend Function GetResourceString(ByVal Key As ResourceStringKey, ParamArray Args() As Variant) As String
     Dim Text As String
     Text = LoadResString(Key)
 
-    If UBound(Values) >= 0 Then
-        Dim SwappedValues() As Variant
-        Helper.Swap4 ByVal ArrPtr(SwappedValues), ByVal Helper.DerefEBP(16)
-        GetResourceString = CorString.FormatArray(Text, SwappedValues)
+    If UBound(Args) >= 0 Then
+        Dim Arguments() As Variant
+        Helper.Swap4 ByVal ArrPtr(Arguments), ByVal Helper.DerefEBP(16)
+        GetResourceString = CorString.FormatArray(Text, Arguments)
     Else
         GetResourceString = Text
     End If
@@ -685,7 +680,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ' we need to use the GetEnvironmentStrings API method instead of

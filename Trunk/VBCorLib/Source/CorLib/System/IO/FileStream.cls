@@ -411,14 +411,10 @@ Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigi
     
     Select Case NewPosition
         Case mBufferOffset To mBufferOffset + mBytesBuffered - 1
-            Debug.Print "SeekPosition: Seeking within current buffer."
-            
             ' in same buffer works only for reading
             mReadPosition = NewPosition - mBufferOffset
             mFilePosition = NewPosition
         Case Else
-            Debug.Print "SeekPosition: Seeking outside current buffer."
-            
             mFilePosition = InternalSeek(Offset, Origin)
             mBufferOffset = mFilePosition
             mBytesBuffered = 0
@@ -937,13 +933,11 @@ Private Sub FillBuffer()
         ReDim mBuffer(0 To mBufferSize - 1)
     End If
     
-    Debug.Print "FileStream: Filling buffer (" & mBufferSize & ")"
     If ReadFile(mHandle, mBuffer(0), mBufferSize, mBytesBuffered, ByVal 0&) = BOOL_FALSE Then
         If mHandle <> ERROR_BROKEN_PIPE Then
             IOError Err.LastDllError
         End If
     End If
-    Debug.Print "FileStream: Buffered (" & mBytesBuffered & ") bytes"
 End Sub
 
 Private Function InternalSeek(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency

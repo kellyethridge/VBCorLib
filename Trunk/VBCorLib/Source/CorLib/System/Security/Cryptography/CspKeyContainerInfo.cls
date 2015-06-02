@@ -232,7 +232,7 @@ Private Sub VerifyLoaded()
     
     Dim Key As Long
     If CryptGetUserKey(prov, mKeyNumber, Key) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
     Dim Permissions As Long
     Permissions = CryptoAPI.GetKeyParamLong(Key, KP_PERMISSIONS)
@@ -254,8 +254,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -541,21 +541,20 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal sPath As String)
-    Path.VerifyPath sPath
-    mOriginalPath = sPath
-    If Not Path.IsPathRooted(sPath) Then
-        mPath = Path.GetFullPath(sPath)
-    Else
-        mPath = sPath
-    End If
+Private Sub Class_Initialize()
+    MarkDirty
+End Sub
+
+Friend Sub Init(ByRef Path As String)
+    mOriginalPath = Path
+    mPath = Statics.Path.GetFullPath(Path)
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub MarkDirty()
     mIsDirty = True
@@ -563,12 +562,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    MarkDirty
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     Init PropBag.ReadProperty("Path")
 End Sub
@@ -579,7 +574,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -595,7 +590,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   FileSystemInfo Interface
+'   FileSystemInfo
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get FileSystemInfo_Attributes() As FileAttributes
     FileSystemInfo_Attributes = Attributes

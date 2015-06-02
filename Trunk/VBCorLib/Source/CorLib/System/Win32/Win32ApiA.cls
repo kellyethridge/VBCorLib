@@ -35,7 +35,7 @@ Attribute VB_Exposed = False
 ' Module: Win32ApiA
 '
 Option Explicit
-Implements IWin32API
+Implements IWin32Api
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -107,7 +107,7 @@ Private Function IWin32API_GetEnvironmentStrings() As String
     lpStrings = GetEnvironmentStringsA
     
     If lpStrings = vbNullPtr Then _
-        Throw Cor.NewInvalidOperationException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewInvalidOperationException(GetMessage(Err.LastDllError))
     
     Dim i As Long
     i = lpStrings

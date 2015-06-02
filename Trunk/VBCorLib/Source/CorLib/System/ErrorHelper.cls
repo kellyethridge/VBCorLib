@@ -72,3 +72,79 @@ Friend Function IO(ByVal Key As ResourceStringKey) As IOException
     Set IO = Cor.NewIOException(Environment.GetResourceString(Key))
 End Function
 
+Friend Function WinIOError(ByVal ErrCode As Long, ByRef Path As String) As Exception
+    Dim Ex As IOException
+    
+    Select Case ErrCode
+        Case ERROR_PATH_NOT_FOUND
+            Set Ex = Cor.NewDirectoryNotFoundException("The directory '" & Path & "' could not be found.")
+        Case ERROR_FILE_NOT_FOUND
+            If Len(Path) = 0 Then
+                Set Ex = Cor.NewFileNotFoundException(Message:=Environment.GetResourceString(IO_FileNotFound))
+            Else
+                Set Ex = Cor.NewFileNotFoundException(Path, Environment.GetResourceString(IO_FileNotFound_Name, Path))
+            End If
+        Case ERROR_ACCESS_DENIED
+            Set Ex = Cor.NewInvalidOperationException("Permission to the specified file is denied.")
+        Case Else
+            Set Ex = Cor.NewIOException(GetMessage(ErrCode))
+    End Select
+    Ex.HResult = ErrCode
+    
+    Set WinIOError = Ex
+End Function
+
+'            switch (errorCode) {
+'            Case Win32Native.ERROR_FILE_NOT_FOUND:
+'                if (str.Length == 0)
+'                    throw new FileNotFoundException(Environment.GetResourceString("IO.FileNotFound"));
+'                Else
+'                    throw new FileNotFoundException(Environment.GetResourceString("IO.FileNotFound_FileName", str), str);
+'
+'            Case Win32Native.ERROR_PATH_NOT_FOUND:
+'                if (str.Length == 0)
+'                    throw new DirectoryNotFoundException(Environment.GetResourceString("IO.PathNotFound_NoPathName"));
+'                Else
+'                    throw new DirectoryNotFoundException(Environment.GetResourceString("IO.PathNotFound_Path", str));
+'
+'            Case Win32Native.ERROR_ACCESS_DENIED:
+'                if (str.Length == 0)
+'                    throw new UnauthorizedAccessException(Environment.GetResourceString("UnauthorizedAccess_IODenied_NoPathName"));
+'                Else
+'                    throw new UnauthorizedAccessException(Environment.GetResourceString("UnauthorizedAccess_IODenied_Path", str));
+'
+'            Case Win32Native.ERROR_ALREADY_EXISTS:
+'                if (str.Length == 0)
+'                    goto default;
+'                throw new IOException(Environment.GetResourceString("IO.IO_AlreadyExists_Name", str), Win32Native.MakeHRFromErrorCode(errorCode), maybeFullPath);
+'
+'            Case Win32Native.ERROR_FILENAME_EXCED_RANGE:
+'                throw new PathTooLongException(Environment.GetResourceString("IO.PathTooLong"));
+'
+'            Case Win32Native.ERROR_INVALID_DRIVE:
+'                throw new DriveNotFoundException(Environment.GetResourceString("IO.DriveNotFound_Drive", str));
+'
+'            Case Win32Native.ERROR_INVALID_PARAMETER:
+'                throw new IOException(Win32Native.GetMessage(errorCode), Win32Native.MakeHRFromErrorCode(errorCode), maybeFullPath);
+'
+'            Case Win32Native.ERROR_SHARING_VIOLATION:
+'                if (str.Length == 0)
+'                    throw new IOException(Environment.GetResourceString("IO.IO_SharingViolation_NoFileName"), Win32Native.MakeHRFromErrorCode(errorCode), maybeFullPath);
+'                Else
+'                    throw new IOException(Environment.GetResourceString("IO.IO_SharingViolation_File", str), Win32Native.MakeHRFromErrorCode(errorCode), maybeFullPath);
+'
+'            Case Win32Native.ERROR_FILE_EXISTS:
+'                if (str.Length == 0)
+'                    goto default;
+'                throw new IOException(Environment.GetResourceString("IO.IO_FileExists_Name", str), Win32Native.MakeHRFromErrorCode(errorCode), maybeFullPath);
+'
+
+
+
+
+
+
+
+
+
+

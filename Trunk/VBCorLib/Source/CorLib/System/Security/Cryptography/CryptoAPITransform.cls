@@ -290,7 +290,7 @@ Private Function EncryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     Dim Size As Long
     Size = TotalBytes - mBlockSize ' We don't want to include the CryptoAPI padding block as part of the data to encrypt.
     If CryptEncrypt(mCipherKey, 0, True, 0, OutputBuffer(0), Size, TotalBytes) = 0 Then _
-        Throw Cor.NewCryptographicException("Encryption failed: " & GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException("Encryption failed: " & GetMessage(Err.LastDllError))
 
     ' Size will be set to the total bytes encrypted, including the additional block of padding.
     ' We don't want that additional block of padding from the CryptoAPI since we've added our own,
@@ -313,7 +313,7 @@ Private Function EncryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As 
     Call CopyMemory(OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount)
 
     If CryptEncrypt(mCipherKey, 0, False, 0, OutputBuffer(OutputOffset), InputCount, InputCount) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException("Failed to encrypt data. " & GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException("Failed to encrypt data. " & GetMessage(Err.LastDllError))
 
     EncryptBlock = InputCount
 End Function
@@ -356,7 +356,7 @@ Private Function DecryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As 
     ' Have the decryption routine work on the bytes in the output buffer. The decrypted bytes
     ' will be placed back into the same buffer.
     If CryptDecrypt(mCipherKey, 0, False, 0, OutputBuffer(OutputOffset), TotalBytes) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException("Could not decrypt data. " & GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException("Could not decrypt data. " & GetMessage(Err.LastDllError))
 
     ' Return how many bytes we actually decrypted.
     DecryptBlock = TotalBytes
@@ -404,7 +404,7 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' final block because we don't want the CryptoAPI to deal with any padding. We will
     ' deal with that next ourselves so we can support different padding types.
     If CryptDecrypt(mCipherKey, 0, False, 0, OutputBuffer(0), TotalBytes) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException("Could not decrypt data. " & GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException("Could not decrypt data. " & GetMessage(Err.LastDllError))
 
     ' Remove the padding based on the type of padding expected.
     Dim DepadCount As Long

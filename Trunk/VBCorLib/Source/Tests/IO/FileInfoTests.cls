@@ -20,30 +20,30 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
     Cat.ForFixture "System.IO"
 End Sub
 
-Public Sub Setup()
-    Set info = Cor.NewFileInfo(App.Path & "\TestFileInfo.cls")
-End Sub
-
-Public Sub TestExists()
-    Assert.IsTrue info.Exists
-End Sub
-
-Public Sub TestLength()
-    Assert.AreEqual CCur(FileLen(App.Path & "\TestFileInfo.cls")), info.Length
-End Sub
-
-Public Sub TestName()
-    Assert.AreEqual "TestFileInfo.cls", info.Name
-End Sub
-
-Public Sub TestParent()
-    Assert.AreEqual LCase$(App.Path), LCase$(info.DirectoryName)
-End Sub
-
-Public Sub TestExtension()
-    Assert.AreEqual ".cls", info.Extension
-End Sub
-
-Public Sub TestFullName()
-    Assert.AreEqual LCase$(App.Path & "\testfileinfo.cls"), LCase$(info.FullName)
-End Sub
+'Public Sub Setup()
+'    Set info = Cor.NewFileInfo(App.Path & "\TestFileInfo.cls")
+'End Sub
+'
+'Public Sub TestExists()
+'    Assert.IsTrue info.Exists
+'End Sub
+'
+'Public Sub TestLength()
+'    Assert.AreEqual CCur(FileLen(App.Path & "\TestFileInfo.cls")), info.Length
+'End Sub
+'
+'Public Sub TestName()
+'    Assert.AreEqual "TestFileInfo.cls", info.Name
+'End Sub
+'
+'Public Sub TestParent()
+'    Assert.AreEqual LCase$(App.Path), LCase$(info.DirectoryName)
+'End Sub
+'
+'Public Sub TestExtension()
+'    Assert.AreEqual ".cls", info.Extension
+'End Sub
+'
+'Public Sub TestFullName()
+'    Assert.AreEqual LCase$(App.Path & "\testfileinfo.cls"), LCase$(info.FullName)
+'End Sub

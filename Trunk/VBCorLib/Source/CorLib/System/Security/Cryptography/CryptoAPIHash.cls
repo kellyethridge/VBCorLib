@@ -76,7 +76,7 @@ Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal ByteCoun
     ReDim Ret(0 To mHashSize - 1)
     
     If CryptGetHashParam(mHasher, HP_HASHVAL, Ret(0), mHashSize, 0) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException("Could not retrieve hash value from service provider. " & GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException("Could not retrieve hash value from service provider. " & GetMessage(Err.LastDllError))
     
     IHashAlgorithm_HashFinal = Ret
 End Function

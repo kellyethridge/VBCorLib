@@ -311,7 +311,7 @@ Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByV
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If SourceIndex + Count > mLength Then _
-        Throw Error.Argument(Argument_LongerThanSrcString)
+        Throw Error.Argument(Arg_LongerThanSrcString)
     If DestinationIndex + Count - 1 > UBound(Destination) Then _
         Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_OffsetOut)
     

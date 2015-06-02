@@ -86,7 +86,7 @@ Public Function AndBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
         Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
     If Bits.Length <> mLength Then _
-        Throw Error.Argument(Argument_ArrayLengthsDiffer)
+        Throw Error.Argument(Arg_ArrayLengthsDiffer)
     
     Bits.ApplyAndTo mBits
     mVersion = mVersion + 1
@@ -148,7 +148,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
             SAPtr(Booleans) = vbNullPtr
             
         Case Else
-            Throw Error.Argument(Argument_BitArrayTypeUnsupported, "Arr")
+            Throw Error.Argument(Arg_BitArrayTypeUnsupported, "Arr")
     End Select
 End Sub
 
@@ -367,7 +367,7 @@ Public Function XorBits(ByVal Bits As BitArray) As BitArray
     If Bits Is Nothing Then _
         Throw Error.ArgumentNull("Bits", ArgumentNull_Array)
     If Bits.Length <> mLength Then _
-        Throw Error.Argument(Argument_ArrayLengthsDiffer)
+        Throw Error.Argument(Arg_ArrayLengthsDiffer)
 
     Bits.ApplyXorTo mBits
     mVersion = mVersion + 1

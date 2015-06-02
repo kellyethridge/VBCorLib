@@ -466,11 +466,16 @@ library VBCorType {
 	module Constants {
 		const long MAX_PATH_A			= 0x00000104;
 		const long MAX_PATH_W			= 0x00007FFF;
-		const long FORMAT_MESSAGE_FROM_SYSTEM	= 0x00001000;
+		
+		const long FORMAT_MESSAGE_FROM_SYSTEM		= 0x00001000;
+        const long FORMAT_MESSAGE_IGNORE_INSERTS 	= 0x00000200;
+        const long FORMAT_MESSAGE_ARGUMENT_ARRAY 	= 0x00002000;        
+
 		const long TIME_ZONE_ID_DAYLIGHT	= 0x00000002;
 		const long TIME_ZONE_ID_INVALID		= 0xFFFFFFFF;
 		const long TIME_ZONE_ID_STANDARD	= 0x00000001;
 		const long TIME_ZONE_ID_UNKNOWN		= 0x00000000;
+		
 		const long FADF_AUTO			= 0x00000001;
 		const long FADF_BSTR			= 0x00000100;
 		const long FADF_DISPATCH		= 0x00000400;
@@ -482,8 +487,9 @@ library VBCorType {
 		const long FADF_STATIC			= 0x00000002;
 		const long FADF_UNKNOWN 		= 0x00000200;
 		const long FADF_VARIANT 		= 0x00000800;
+		
 		const long E_FAIL			= 0x80004005;
-		const long E_NOINTERFACE		= 0x80004002;
+		const long E_NOINTERFACE	= 0x80004002;
 		const long S_OK 			= 0x00000000;
 	}
 
