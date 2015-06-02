@@ -25,6 +25,15 @@ Attribute VB_Name = "Resources"
 Option Explicit
 
 Public Enum ResourceStringKey
+    Exception_WasThrown = 101
+    ArrayTypeMismatch_Incompatible = 102
+    ArrayTypeMismatch_Exception = 103
+    ArrayTypeMismatch_Compare = 104
+    Rank_MultiDimNotSupported = 105
+    Rank_MustMatch = 106
+    UnauthorizedAccess_IODenied_NoPathName = 107
+    UnauthorizedAccess_IODenied_Path = 108
+    
     Arg_PathIllegal = 200
     Arg_PathIllegalUNC = 201
     Arg_PathGlobalRoot = 202
@@ -119,19 +128,19 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_IndexCountBuffer = 734
     ArgumentOutOfRange_IndexCount = 735
     
-    ArrayTypeMismatch_Incompatible = 102
-    ArrayTypeMismatch_Exception = 103
-    ArrayTypeMismatch_Compare = 104
-    
-    Exception_WasThrown = 101
-    
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
     IO_FileTooLong2GB = 402
     IO_PathTooLong = 403
     IO_FileNotFound = 404
     IO_FileNotFound_Name = 405
-    
+    IO_PathNotFound_NoPathName = 406
+    IO_PathNotFound_Path = 407
+    IO_DriveNotFound_Drive = 408
+    IO_SharingViolation_NoFileName = 409
+    IO_SharingViolation_File = 410
+    IO_FileExists_Name = 411
+
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
     Format_InvalidString = 602
@@ -193,6 +202,4 @@ Public Enum ResourceStringKey
     Parameter_Items = 2026
     Parameter_Values = 2027
     
-    Rank_MultiDimNotSupported = 105
-    Rank_MustMatch = 106
 End Enum
