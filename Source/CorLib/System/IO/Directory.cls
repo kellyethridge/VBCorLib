@@ -85,17 +85,9 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    If Len(FullPath) > 1 And Statics.Path.IsDirectorySeparator(CorString.LastChar(FullPath)) Then
+    If Len(FullPath) > 1 And CorString.LastChar(FullPath) = vbDirectorySeparatorChar Then
         FullPath = Left$(FullPath, Len(FullPath) - 1)
     End If
-    
-'    Statics.Path.FixupPath Path
-'    Path = CorString.TrimEnd(Path, Statics.Path.DirectorySeparator)
-    
-'    If Len(Path) > Statics.Path.MaxPath Then _
-'        Throw New PathTooLongException
-'    If InStr(3, Path, Statics.Path.VolumeSeparator) > 0 Then _
-'        Throw New NotSupportedException
     
     Dim DirectoryNames() As String
     DirectoryNames = Split(FullPath, Statics.Path.DirectorySeparator)
@@ -104,7 +96,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     i = CorArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
-        TestDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
+        TestDirectory = CorString.Join(vbDirectorySeparator, DirectoryNames, 0, i)
         If Directory.Exists(TestDirectory) Then
             Exit Do
         End If

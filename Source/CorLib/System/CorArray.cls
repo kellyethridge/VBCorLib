@@ -615,9 +615,9 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     If Length < 0 Then _
         Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
-        Throw Error.Argument(Argument_LongerThanSrCorArray)
+        Throw Error.Argument(Arg_LongerThanSrcArray)
     If Length + DestinationIndex - LBound(DestinationArray) > DestinationLength Then _
-        Throw Error.Argument(Argument_LongerThanDestArray)
+        Throw Error.Argument(Arg_LongerThanDestArray)
     If SourceIndex < LBound(SourceArray) Then _
         Throw Error.ArgumentOutOfRange("SourceIndex", ArgumentOutOfRange_ArrayLB)
     If DestinationIndex < LBound(DestinationArray) Then _

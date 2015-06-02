@@ -202,13 +202,13 @@ Public Function ExportCspBlob(ByVal IncludePrivateParameters As Boolean) As Byte
     
     Dim Size As Long
     If CryptExportKey(mKey, 0, BlobType, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
     Dim Blob() As Byte
     ReDim Blob(0 To Size - 1)
     
     If CryptExportKey(mKey, 0, BlobType, 0, Blob(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
     ExportCspBlob = Blob
 End Function
@@ -257,7 +257,7 @@ Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
     
     If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.GetLength(KeyBlob), 0, IIf(mPublicOnly, 0, CRYPT_EXPORTABLE), mKey) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 End Sub
 
 ''
@@ -299,13 +299,13 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByVal Str As String) As Byte()
 
     Dim Size As Long
     If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 
     Dim Signature() As Byte
     ReDim Signature(0 To Size - 1)
     
     If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
     Call CryptDestroyHash(Hash)
     
@@ -493,7 +493,7 @@ Private Sub GenerateKey()
         ' Something went wrong. If it's something other than
         ' not finding the key, then it's bad, so fail.
         If Err.LastDllError <> NTE_NO_KEY Then _
-            Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+            Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
             
         ' We didn't find an existing key, so continue and create a new one.
     End If
@@ -512,7 +512,7 @@ Private Sub GenerateKey()
 
     ' Let'er rip! This can take a bit with large key sizes.
     If CryptGenKey(mProvider, mKeyNumber, Flags, mKey) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 End Sub
 
 Private Sub DeleteKey()
@@ -541,10 +541,10 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     
     Dim Hash As Long
     If CryptCreateHash(mProvider, CALG_SHA1, 0, 0, Hash) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 
     If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = 0 Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 
     SetHash = Hash
     Exit Function

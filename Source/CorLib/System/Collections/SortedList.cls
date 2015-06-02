@@ -189,7 +189,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.Rank(DstArray) <> 1 Then _
         Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
     If Index + mCount - 1 > UBound(DstArray) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ArrayPlusOffTooSmall))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_ArrayPlusOffTooSmall))
     
     For i = 0 To mCount - 1
         Set DstArray(Index + i) = Cor.NewDictionaryEntry(mKeys(i), mValues(i))

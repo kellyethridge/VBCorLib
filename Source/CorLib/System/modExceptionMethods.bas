@@ -92,21 +92,3 @@ Public Sub ClearException()
     Set mException = Nothing
 End Sub
 
-''
-' Gets a formatted message from a system error code.
-'
-' @param MessageID The error code to retrieve the message for.
-' @return A system message representing the code, or "Unknown Error." if the code was not found.
-'
-Public Function GetSystemMessage(ByVal MessageId As Long) As String
-    Dim Buf As String
-    Dim Size As Long
-    
-    Buf = String$(1024, vbNullChar)
-    Size = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, ByVal 0&, MessageId, 0, Buf, Len(Buf), ByVal 0&)
-    If Size > 0 Then
-        GetSystemMessage = Left$(Buf, Size - 2)
-    Else
-        GetSystemMessage = "Unknown Error."
-    End If
-End Function

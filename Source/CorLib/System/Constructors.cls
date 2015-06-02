@@ -722,9 +722,9 @@ End Function
 ' attempt at verifying the <i>Path</i>. Only when an attempt to manipulate
 ' the actual directroy is the path validated.
 '
-Public Function NewDirectoryInfo(ByVal Path As String) As DirectoryInfo
+Public Function NewDirectoryInfo(ByRef Path As String) As DirectoryInfo
     Set NewDirectoryInfo = New DirectoryInfo
-    Call NewDirectoryInfo.Init(Path)
+    NewDirectoryInfo.Init Path
 End Function
 
 ''

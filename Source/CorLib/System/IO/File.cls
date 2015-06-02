@@ -107,7 +107,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
             If Not File.Exists(SourceFileName) Then _
                 IOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
-                Throw Error.IO(IOException_DirectoryExists)
+                Throw Error.IO(IO_AlreadyExists_Name)
         End If
         IOError DllError, SourceFileName
     End If
@@ -267,22 +267,25 @@ End Function
 ' Moves a file from one location to another.
 '
 ' @param SourceFileName The file to be moved.
-' @param DestinationFileName The location and filename the file is to be moved to.
+' @param DestFileName The location and filename the file is to be moved to.
 '
-Public Sub Move(ByRef SourceFileName As String, ByVal DestinationFileName As String)
+Public Sub Move(ByRef SourceFileName As String, ByRef DestFileName As String)
     If Len(SourceFileName) = 0 Then _
         Throw Error.Argument(Argument_EmptyPath, "SourceFileName")
-    If Len(DestinationFileName) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "DestinationFileName")
+    If Len(DestFileName) = 0 Then _
+        Throw Error.Argument(Argument_EmptyPath, "DestFileName")
 
-    Path.VerifyPath SourceFileName
-    Path.VerifyPath DestinationFileName
+    Dim FullSource  As String
+    Dim FullDest    As String
+
+    FullSource = Path.GetFullPath(SourceFileName)
+    FullDest = Path.GetFullPath(DestFileName)
+
+    If Not File.Exists(FullSource) Then _
+        IOError ERROR_FILE_NOT_FOUND, FullSource
     
-    If Not File.Exists(SourceFileName) Then _
-        IOError ERROR_FILE_NOT_FOUND, SourceFileName
-    
-    If Api.MoveFile(SourceFileName, DestinationFileName) = BOOL_FALSE Then
-        IOError Err.LastDllError, DestinationFileName
+    If MoveFileW(FullSource, FullDest) = BOOL_FALSE Then
+        IOError Err.LastDllError, FullDest
     End If
 End Sub
 
@@ -345,10 +348,11 @@ Public Sub SetAttributes(ByRef Path As String, ByVal Attributes As FileAttribute
     If Len(Path) = 0 Then _
         Throw Error.Argument(Argument_EmptyPath, "Path")
     
-    Statics.Path.CheckValidPathAndFixSlashes Path
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
     
-    If Api.SetFileAttributes(Path, Attributes) = BOOL_FALSE Then
-        IOError Err.LastDllError, Path
+    If Api.SetFileAttributes(FullPath, Attributes) = BOOL_FALSE Then
+        IOError Err.LastDllError, FullPath
     End If
 End Sub
 
@@ -439,7 +443,7 @@ Public Function ReadAllBytes(ByRef Path As String) As Byte()
     With Cor.NewFileStream(Path, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadWriteShare)
         Length = .Length
         If Length > MaxLength Then _
-            Throw Cor.NewIOException(Environment.GetResourceString(IOException_FileTooLong2GB))
+            Throw Cor.NewIOException(Environment.GetResourceString(IO_FileTooLong2GB))
             
         If Length > 0 Then
             ReDim Bytes(0 To Length - 1)
@@ -545,12 +549,15 @@ Public Sub WriteAllLines(ByVal Path As String, ByRef Contents As Variant, Option
 End Sub
 
 
-Friend Function GetFileData(ByVal p As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
-    p = CorString.TrimEnd(p, mDirectorySeparators)
+Friend Function GetFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
     
-    Path.VerifyPath p, True
-    If Api.GetFileAttributesEx(p, 0, Data) = BOOL_FALSE Then
-        GetFileData = GetFileDataFallback(p, Data)
+'    Path.VerifyPath p, True
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
+    FullPath = CorString.TrimEnd(FullPath, mDirectorySeparators)
+    
+    If Api.GetFileAttributesEx(FullPath, 0, Data) = BOOL_FALSE Then
+        GetFileData = GetFileDataFallback(FullPath, Data)
     End If
 End Function
 

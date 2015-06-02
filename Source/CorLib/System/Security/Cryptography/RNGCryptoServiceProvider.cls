@@ -56,7 +56,7 @@ Public Sub GetBytes(ByRef Data() As Byte)
         Throw Cor.NewArgumentNullException("Date", Environment.GetResourceString(ArgumentNull_Array))
     
     If CryptGenRandom(mProvider, CorArray.GetLength(Data), Data(LBound(Data))) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetSystemMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
 End Sub
 
