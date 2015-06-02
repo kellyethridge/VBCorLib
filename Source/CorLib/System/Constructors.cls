@@ -1804,3 +1804,8 @@ Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle 
     Set NewSafeHandle = New SafeHandle
     NewSafeHandle.Init PreexistingHandle, OwnsHandle
 End Function
+
+Public Function NewDriveNotFoundException(ByRef Message As String, Optional ByVal InnerException As Exception) As DriveNotFoundException
+    Set NewDriveNotFoundException = New DriveNotFoundException
+    NewDriveNotFoundException.Init Message, InnerException
+End Function

@@ -432,8 +432,8 @@ Public Sub SetCurrentDirectory(ByRef Path As String)
     If Not Win32Native.SetCurrentDirectory(FullPath) Then
         Dim ErrorCode As Long
         ErrorCode = Err.LastDllError
-        If ErrorCode = IOConstants.ERROR_FILE_NOT_FOUND Then
-            ErrorCode = IOConstants.ERROR_PATH_NOT_FOUND
+        If ErrorCode = Win32Native.ERROR_FILE_NOT_FOUND Then
+            ErrorCode = Win32Native.ERROR_PATH_NOT_FOUND
         End If
         IOError ErrorCode, FullPath
     End If
