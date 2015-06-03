@@ -90,20 +90,66 @@ Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException(
     Assert.That Actual, Iz.SameAs(Inner1)
 End Sub
 
-Public Sub TestPersitence()
+Public Sub Serialization_WhenCalled_SerializesException()
     Const Message As String = "User Error."
     Dim Inner   As New Exception
     Dim Ex      As ArgumentException
     Set Ex = Cor.NewArgumentException(Message, "Param", Inner)
     
-    Dim Bag As New PropertyBag
-    Bag.WriteProperty "ex", Ex
     Dim Actual As ArgumentException
-    Set Actual = Bag.ReadProperty("ex")
+    Set Actual = Persist(Ex)
     
     Assert.That Actual, Iz.Not.SameAs(Ex)
     Assert.That Actual.Message, Iz.EqualTo(Message & vbCrLf & "Parameter name: Param")
     Assert.That Actual.ParamName, Iz.EqualTo("Param")
     Assert.That Actual.InnerException, Iz.Not.Nothing
 End Sub
+
+Public Sub CatchArgument_WithArgumentThrown_CatchesException()
+    On Error Resume Next
+    Dim Ex As New ArgumentException
+    Throw Ex
+    
+    Dim Actual As Boolean
+    Dim ActualEx As ArgumentException
+    Actual = CatchArgument(ActualEx)
+    
+    Assert.That Actual, Iz.True
+    Assert.That ActualEx, Iz.SameAs(Ex)
+End Sub
+
+Public Sub CatchArgument_WithNonArgumentThrown_DoesNotCatch()
+    On Error Resume Next
+    Throw New SystemException
+    
+    Dim Actual As Boolean
+    Dim ActualEx As ArgumentException
+    Actual = CatchArgument(ActualEx)
+    
+    Assert.That Actual, Iz.False
+    Assert.That ActualEx, Iz.Nothing
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

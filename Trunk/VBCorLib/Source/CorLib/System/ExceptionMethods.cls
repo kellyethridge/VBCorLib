@@ -165,3 +165,48 @@ End Sub
 Public Sub ClearException()
     ExceptionManagement.ClearException
 End Sub
+
+Public Function PeekException() As Exception
+    Set PeekException = ExceptionManagement.PeekException
+End Function
+
+Public Function TakeException() As Exception
+    Set TakeException = ExceptionManagement.TakeException
+End Function
+
+Public Function CatchArgument(ByRef Ex As ArgumentException) As Boolean
+    CatchArgument = ExceptionManagement.CatchArgument(Ex)
+End Function
+
+Public Function CatchArgumentNull(ByRef Ex As ArgumentNullException) As Boolean
+    CatchArgumentNull = ExceptionManagement.CatchArgumentNull(Ex)
+End Function
+
+Public Function CatchArgumentOutOfRange(ByRef Ex As ArgumentOutOfRangeException) As Boolean
+    CatchArgumentOutOfRange = ExceptionManagement.CatchArgumentOutOfRange(Ex)
+End Function
+
+Public Function CatchDirectoryNotFound(ByRef Ex As DirectoryNotFoundException) As Boolean
+    CatchDirectoryNotFound = ExceptionManagement.CatchDirectoryNotFound(Ex)
+End Function
+
+Public Function CatchFileNotFound(ByRef Ex As FileNotFoundException) As Boolean
+    CatchFileNotFound = ExceptionManagement.CatchFileNotFound(Ex)
+End Function
+
+Public Function CatchPathTooLong(ByRef Ex As PathTooLongException) As Boolean
+    CatchPathTooLong = ExceptionManagement.CatchPathTooLong(Ex)
+End Function
+
+
+
+
+
+
+
+
+
+
+
+
+

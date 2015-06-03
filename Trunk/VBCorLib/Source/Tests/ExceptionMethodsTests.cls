@@ -101,3 +101,47 @@ Public Sub Catch_FromErrObject_ReturnsCaughtException()
     Assert.That ActualEx.Source, Iz.EqualTo("Source")
 End Sub
 
+Public Sub PeekException_WithThrownException_ReturnsException()
+    On Error Resume Next
+    Dim Ex As New ArgumentException
+    Throw Ex
+    
+    Dim Actual As Exception
+    Set Actual = PeekException
+    
+    Assert.That Actual, Iz.SameAs(Ex)
+End Sub
+
+Public Sub PeekException_WhenCalled_DoesNotClearException()
+    On Error Resume Next
+    Throw New Exception
+    
+    PeekException
+    
+    Assert.That PeekException, Iz.Not.Nothing
+End Sub
+
+Public Sub TakeException_WhenCalled_ReturnsAndClearsException()
+    On Error Resume Next
+    Dim Ex As New Exception
+    Throw Ex
+    
+    Dim Actual As Exception
+    Set Actual = TakeException
+    
+    Assert.That Actual, Iz.SameAs(Ex)
+    Assert.That PeekException, Iz.Nothing
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
