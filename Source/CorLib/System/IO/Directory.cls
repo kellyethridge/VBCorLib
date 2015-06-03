@@ -85,7 +85,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    If Len(FullPath) > 1 And CorString.LastChar(FullPath) = vbDirectorySeparatorChar Then
+    If Len(FullPath) > 1 And CorString.LastChar(FullPath) = corDirectorySeparatorChar Then
         FullPath = Left$(FullPath, Len(FullPath) - 1)
     End If
     
@@ -96,7 +96,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     i = CorArray.GetLength(DirectoryNames)
     Do
         Dim TestDirectory As String
-        TestDirectory = CorString.Join(vbDirectorySeparator, DirectoryNames, 0, i)
+        TestDirectory = CorString.Join(corDirectorySeparator, DirectoryNames, 0, i)
         If Directory.Exists(TestDirectory) Then
             Exit Do
         End If
@@ -521,7 +521,7 @@ Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     Dim root As String
     root = Statics.Path.GetPathRoot(FullPath)
     
-    If (FullPath = root) And (CorString.CharAt(Path, 1) = vbVolumeSeparatorChar) Then _
+    If (FullPath = root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
         Throw Error.Argument(Arg_PathIsAVolume)
     
     Dim Handle As SafeFileHandle

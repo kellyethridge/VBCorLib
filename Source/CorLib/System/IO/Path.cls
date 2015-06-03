@@ -69,7 +69,7 @@ End Property
 ' @remarks The alternate character is usually found on systems such as Unix.
 '
 Public Property Get AltDirectorySeparatorChar() As Integer
-    AltDirectorySeparatorChar = vbAltDirectorySeparatorChar
+    AltDirectorySeparatorChar = corAltDirectorySeparatorChar
 End Property
 
 ''
@@ -79,7 +79,7 @@ End Property
 ' @remarks The alternate string is usually found on systems such as Unix.
 '
 Public Property Get AltDirectorySeparator() As String
-    AltDirectorySeparator = vbAltDirectorySeparator
+    AltDirectorySeparator = corAltDirectorySeparator
 End Property
 
 ''
@@ -88,7 +88,7 @@ End Property
 ' @return The directory separator character for Windows (92).
 '
 Public Property Get DirectorySeparatorChar() As Integer
-    DirectorySeparatorChar = vbDirectorySeparatorChar
+    DirectorySeparatorChar = corDirectorySeparatorChar
 End Property
 
 ''
@@ -97,7 +97,7 @@ End Property
 ' @return The directory separator string for windows "\".
 '
 Public Property Get DirectorySeparator() As String
-    DirectorySeparator = vbDirectorySeparator
+    DirectorySeparator = corDirectorySeparator
 End Property
 
 ''
@@ -106,7 +106,7 @@ End Property
 ' @return The environment variable string separator character code (59).
 '
 Public Property Get PathSeparatorChar() As Integer
-    PathSeparatorChar = vbPathSeparatorChar
+    PathSeparatorChar = corPathSeparatorChar
 End Property
 
 ''
@@ -115,7 +115,7 @@ End Property
 ' @return The environment variable string separator ";".
 '
 Public Property Get PathSeparator() As String
-    PathSeparator = vbPathSeparator
+    PathSeparator = corPathSeparator
 End Property
 
 ''
@@ -124,7 +124,7 @@ End Property
 ' @return The character code for the volume separator (58).
 '
 Public Property Get VolumeSeparatorChar() As Integer
-    VolumeSeparatorChar = vbVolumeSeparatorChar
+    VolumeSeparatorChar = corVolumeSeparatorChar
 End Property
 
 ''
@@ -133,7 +133,7 @@ End Property
 ' @return The string version of the volume separator ":".
 '
 Public Property Get VolumeSeparator() As String
-    VolumeSeparator = vbVolumeSeparator
+    VolumeSeparator = corVolumeSeparator
 End Property
 
 ''
@@ -190,7 +190,7 @@ Public Function IsPathRooted(ByRef Path As String) As Boolean
     With FirstTwoChars(Path)
         If IsDirectorySeparator(.LoWord) Then
             IsPathRooted = True
-        ElseIf .HiWord = vbVolumeSeparatorChar Then
+        ElseIf .HiWord = corVolumeSeparatorChar Then
             IsPathRooted = True
         End If
     End With
@@ -247,7 +247,7 @@ Public Function Combine(ByRef Path1 As String, ByRef Path2 As String) As String
     If IsSeparator(CorString.LastChar(Path1)) Then
         Combine = Path1 & Path2
     Else
-        Combine = Path1 & vbDirectorySeparator & Path2
+        Combine = Path1 & corDirectorySeparator & Path2
     End If
 End Function
 
@@ -272,7 +272,7 @@ Public Function GetDirectoryName(ByRef Path As String) As String
     RootLength = GetRootLength(NormalizedPath)
     
     If RootLength < Len(NormalizedPath) Then
-        PathLength = InStrRev(NormalizedPath, vbDirectorySeparator)
+        PathLength = InStrRev(NormalizedPath, corDirectorySeparator)
         
         If PathLength = 3 Then
             If RootLength <> 3 Then
@@ -354,7 +354,7 @@ Public Function GetFullPath(ByRef Path As String) As String
     Dim FullPath As String
     FullPath = NormalizePath(Path, True)
     
-    If InStr(3, FullPath, vbVolumeSeparator) >= 3 Then _
+    If InStr(3, FullPath, corVolumeSeparator) >= 3 Then _
         Throw Error.NotSupported(Argument_PathFormatNotSupported)
         
     GetFullPath = FullPath
@@ -438,9 +438,9 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
             Case corQuoteChar, corLessThanChar, corGreaterThanChar, corPipeChar, Is < corSpaceChar
                 Throw Error.Argument(Argument_InvalidPathChars, "Path")
                 
-            Case vbAltDirectorySeparatorChar
+            Case corAltDirectorySeparatorChar
                 If FixSlashes Then
-                    mBuffer.Data(i) = vbDirectorySeparatorChar
+                    mBuffer.Data(i) = corDirectorySeparatorChar
                 End If
         End Select
     Next
@@ -479,8 +479,8 @@ Friend Sub CheckValidPathAndFixSlashes(ByRef Path As String)
             Case corQuoteChar, corLessThanChar, corGreaterThanChar, corPipeChar, Is < corSpaceChar
                 Throw Error.Argument(Argument_InvalidPathChars, "Path")
                 
-            Case vbAltDirectorySeparatorChar
-                mBuffer.Data(i) = vbDirectorySeparatorChar
+            Case corAltDirectorySeparatorChar
+                mBuffer.Data(i) = corDirectorySeparatorChar
         End Select
     Next
     
@@ -513,7 +513,7 @@ Friend Sub FixupPath(ByRef Path As String)
         End If
     Next i
     
-    Path = Join(Parts, vbDirectorySeparator)
+    Path = Join(Parts, corDirectorySeparator)
 End Sub
 
 Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) As String
@@ -569,14 +569,14 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
 End Function
 
 Friend Function IsDirectorySeparator(ByVal Ch As Integer) As Boolean
-    IsDirectorySeparator = Ch = vbDirectorySeparatorChar Or _
-                           Ch = vbAltDirectorySeparatorChar
+    IsDirectorySeparator = Ch = corDirectorySeparatorChar Or _
+                           Ch = corAltDirectorySeparatorChar
 End Function
 
 Private Function PrepareForUNCPath(ByRef PathChars() As Integer, ByRef Index As Long, ByVal NewBuffer As PathHelper) As Boolean
     If UBound(PathChars) > 0 Then
-        If PathChars(0) = vbDirectorySeparatorChar Or PathChars(0) = vbAltDirectorySeparatorChar Then
-            NewBuffer.Append vbDirectorySeparatorChar
+        If PathChars(0) = corDirectorySeparatorChar Or PathChars(0) = corAltDirectorySeparatorChar Then
+            NewBuffer.Append corDirectorySeparatorChar
             Index = 1
             PrepareForUNCPath = True
         End If
@@ -585,7 +585,7 @@ End Function
 
 Private Sub PrepareForVolumeLabel(ByRef PathChars() As Integer, ByRef Index As Long, ByVal NewBuffer As PathHelper)
     If UBound(PathChars) > 0 Then
-        If PathChars(1) = vbVolumeSeparatorChar Then
+        If PathChars(1) = corVolumeSeparatorChar Then
             Select Case PathChars(0)
                 Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
                     NewBuffer.SetVolumeLabel PathChars(0)
@@ -622,13 +622,13 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
             Case corSpaceChar
                 HasSpaces = True
                 LastSpaceIndex = pos
-            Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar
+            Case corDirectorySeparatorChar, corAltDirectorySeparatorChar
                 If pos > Index Then
                     Exit Do
                 End If
                 
                 If Not FoundSlash Then
-                    NewBuffer.Append vbDirectorySeparatorChar
+                    NewBuffer.Append corDirectorySeparatorChar
                     FoundSlash = True
                 End If
                 Index = Index + 1
@@ -677,7 +677,7 @@ Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer 
         Select Case Ch
             Case corTildaChar
                 TryExpand = True
-            Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar
+            Case corDirectorySeparatorChar, corAltDirectorySeparatorChar
                 Exit Do
             Case corPeriodChar, corSpaceChar
             Case Else
@@ -748,12 +748,12 @@ Private Function GetRootLength(ByRef Path As String) As Long
                 Else
                     Result = 1
                 End If
-            ElseIf .HiWord = vbVolumeSeparatorChar Then
+            ElseIf .HiWord = corVolumeSeparatorChar Then
                 Result = 2
                 
                 ' check for following directory separator
                 If Length > 2 Then
-                    If PathChars(2) = vbDirectorySeparatorChar Then
+                    If PathChars(2) = corDirectorySeparatorChar Then
                         Result = 3
                     End If
                 End If
@@ -767,9 +767,9 @@ Private Function GetRootLength(ByRef Path As String) As Long
 End Function
 
 Private Function IsSeparator(ByVal Ch As Integer) As Boolean
-    IsSeparator = Ch = vbDirectorySeparatorChar Or _
-                  Ch = vbAltDirectorySeparatorChar Or _
-                  Ch = vbVolumeSeparatorChar
+    IsSeparator = Ch = corDirectorySeparatorChar Or _
+                  Ch = corAltDirectorySeparatorChar Or _
+                  Ch = corVolumeSeparatorChar
 End Function
 
 Private Sub VerifyUNCPathFormat(ByVal NewBuffer As PathHelper, ByVal LengthToCheck As Long)
@@ -777,7 +777,7 @@ Private Sub VerifyUNCPathFormat(ByVal NewBuffer As PathHelper, ByVal LengthToChe
     pos = 2
     
     Do While pos < LengthToCheck
-        If NewBuffer.Chars(pos) = vbDirectorySeparatorChar Then
+        If NewBuffer.Chars(pos) = corDirectorySeparatorChar Then
             pos = pos + 1
             Exit Do
         End If
@@ -800,7 +800,7 @@ Private Function GetExtensionCharIndex(ByRef Path As String) As Long
             Case corPeriodChar
                 GetExtensionCharIndex = Index + 1
                 Exit Do
-            Case vbAltDirectorySeparatorChar, vbDirectorySeparatorChar, vbVolumeSeparatorChar
+            Case corAltDirectorySeparatorChar, corDirectorySeparatorChar, corVolumeSeparatorChar
                 Exit Do
         End Select
         Index = Index - 1
