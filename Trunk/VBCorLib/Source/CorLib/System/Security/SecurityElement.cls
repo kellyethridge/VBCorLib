@@ -315,7 +315,7 @@ Private Sub AddAttributes(ByVal sb As StringBuilder)
     
     Dim de As DictionaryEntry
     For Each de In mAttributes
-        Call sb.AppendFormat(" {0}={2}{1}{2}", de.Key, de.Value, Chr$(vbQuoteChar))
+        Call sb.AppendFormat(" {0}={2}{1}{2}", de.Key, de.Value, Chr$(corQuoteChar))
     Next de
 End Sub
 
@@ -368,8 +368,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

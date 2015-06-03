@@ -233,7 +233,7 @@ Public Function ToString() As String
     Dim ms As Currency
     ms = mMilliseconds
     If ms < 0 Then
-        Output.AppendChar vbMinusChar
+        Output.AppendChar corMinusChar
         ms = -ms
     End If
     
@@ -241,13 +241,13 @@ Public Function ToString() As String
     Days = Int(ms / MillisecondsPerDay)
     If Days <> 0 Then
         Output.Append Days
-        Output.AppendChar vbPeriodChar
+        Output.AppendChar corPeriodChar
     End If
 
     AppendComponent Output, Int(ms / MillisecondsPerHour) Mod HoursPerDay, 2
-    Output.AppendChar vbColonChar
+    Output.AppendChar corColonChar
     AppendComponent Output, Int(ms / MillisecondsPerMinute) Mod MinutesPerHour, 2
-    Output.AppendChar vbColonChar
+    Output.AppendChar corColonChar
     AppendComponent Output, Int(ms / MillisecondsPerSecond) Mod SecondsPerMinute, 2
     
     Dim MillisecondComponent    As Long
@@ -256,11 +256,11 @@ Public Function ToString() As String
     TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TicksPerMillisecond
     
     If MillisecondComponent <> 0 Then
-        Output.AppendChar vbPeriodChar
+        Output.AppendChar corPeriodChar
         AppendComponent Output, MillisecondComponent, 3
         AppendComponent Output, TicksComponent, 4
     ElseIf TicksComponent <> 0 Then
-        Output.AppendChar vbPeriodChar
+        Output.AppendChar corPeriodChar
         AppendComponent Output, TicksComponent, 7
     End If
     
@@ -315,7 +315,7 @@ Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Lo
     Dim ComponentString As String
     ComponentString = Component
     
-    Output.AppendChar vbZeroChar, Width - Len(ComponentString)
+    Output.AppendChar corZeroChar, Width - Len(ComponentString)
     Output.AppendString ComponentString
 End Sub
 

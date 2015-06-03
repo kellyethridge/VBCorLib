@@ -165,14 +165,14 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
         Case 1
             OutputBuffer(0) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ 4)
             OutputBuffer(1) = Base64Bytes((InputBuffer(InputOffset) And &H3) * &H10)
-            OutputBuffer(2) = vbEqualChar
-            OutputBuffer(3) = vbEqualChar
+            OutputBuffer(2) = corEqualChar
+            OutputBuffer(3) = corEqualChar
         
         Case 2
             OutputBuffer(0) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ 4)
             OutputBuffer(1) = Base64Bytes(((InputBuffer(InputOffset) And &H3) * &H10) Or ((InputBuffer(InputOffset + 1) And &HF0) \ &H10))
             OutputBuffer(2) = Base64Bytes((InputBuffer(InputOffset + 1) And &HF) * 4)
-            OutputBuffer(3) = vbEqualChar
+            OutputBuffer(3) = corEqualChar
     
         Case 3
             Call InternalTransformBlock(InputBuffer, InputOffset, OutputBuffer, 0)
@@ -277,8 +277,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

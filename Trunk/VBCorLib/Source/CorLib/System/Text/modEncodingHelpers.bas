@@ -36,7 +36,7 @@ Public Sub InitEncodingHelpers()
     
     ReDim Base64CharToBits(0 To 127)
     For i = 0 To 127
-        Base64CharToBits(i) = vbInvalidChar
+        Base64CharToBits(i) = corInvalidChar
     Next i
     For i = 0 To 25
         Base64CharToBits(65 + i) = i

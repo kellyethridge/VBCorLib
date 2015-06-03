@@ -164,7 +164,7 @@ Public Function ChangeExtension(ByRef Path As String, ByRef Extension As String)
     If Not CorString.IsNull(Extension) Then
         If Len(Extension) = 0 Then
             ChangeExtension = ChangeExtension & "."
-        ElseIf AscW(Extension) = vbPeriodChar Then
+        ElseIf AscW(Extension) = corPeriodChar Then
             ChangeExtension = ChangeExtension & Extension
         Else
             ChangeExtension = ChangeExtension & "." & Extension
@@ -435,7 +435,7 @@ Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean
     Dim i As Long
     For i = 0 To Len(Path) - 1
         Select Case mBuffer.Data(i)
-            Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
+            Case corQuoteChar, corLessThanChar, corGreaterThanChar, corPipeChar, Is < corSpaceChar
                 Throw Error.Argument(Argument_InvalidPathChars, "Path")
                 
             Case vbAltDirectorySeparatorChar
@@ -461,7 +461,7 @@ Friend Function HasIllegalCharacters(ByRef Path As String) As Boolean
     Dim i As Long
     For i = 0 To Len(Path) - 1
         Select Case PathChars(i)
-            Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
+            Case corQuoteChar, corLessThanChar, corGreaterThanChar, corPipeChar, Is < corSpaceChar
                 HasIllegalCharacters = True
                 Exit For
         End Select
@@ -476,7 +476,7 @@ Friend Sub CheckValidPathAndFixSlashes(ByRef Path As String)
     Dim i As Long
     For i = 0 To Len(Path) - 1
         Select Case mBuffer.Data(i)
-            Case vbQuoteChar, vbLessThanChar, vbGreaterThanChar, vbPipeChar, Is < vbSpaceChar
+            Case corQuoteChar, corLessThanChar, corGreaterThanChar, corPipeChar, Is < corSpaceChar
                 Throw Error.Argument(Argument_InvalidPathChars, "Path")
                 
             Case vbAltDirectorySeparatorChar
@@ -587,7 +587,7 @@ Private Sub PrepareForVolumeLabel(ByRef PathChars() As Integer, ByRef Index As L
     If UBound(PathChars) > 0 Then
         If PathChars(1) = vbVolumeSeparatorChar Then
             Select Case PathChars(0)
-                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
+                Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
                     NewBuffer.SetVolumeLabel PathChars(0)
                     Index = 2
                 Case Else
@@ -616,10 +616,10 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
         Ch = PathChars(pos)
         
         Select Case Ch
-            Case vbPeriodChar
+            Case corPeriodChar
                 HasPeriods = True
                 LastPeriodIndex = pos
-            Case vbSpaceChar
+            Case corSpaceChar
                 HasSpaces = True
                 LastSpaceIndex = pos
             Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar
@@ -675,11 +675,11 @@ Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer 
         Ch = PathChars(pos)
         
         Select Case Ch
-            Case vbTildaChar
+            Case corTildaChar
                 TryExpand = True
             Case vbDirectorySeparatorChar, vbAltDirectorySeparatorChar
                 Exit Do
-            Case vbPeriodChar, vbSpaceChar
+            Case corPeriodChar, corSpaceChar
             Case Else
                 LastSigChar = pos
         End Select
@@ -797,7 +797,7 @@ Private Function GetExtensionCharIndex(ByRef Path As String) As Long
     
     Do While Index >= 0
         Select Case PathChars(Index)
-            Case vbPeriodChar
+            Case corPeriodChar
                 GetExtensionCharIndex = Index + 1
                 Exit Do
             Case vbAltDirectorySeparatorChar, vbDirectorySeparatorChar, vbVolumeSeparatorChar

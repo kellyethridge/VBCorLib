@@ -493,6 +493,64 @@ library VBCorType {
         const long S_OK             = 0x00000000;
     }
 
+    [dllname("CharConstants")]
+    module CharConstants{
+        const short corTerminator         = 0;
+        const short corUpperAChar         = 0x41;
+        const short corLowerAChar         = 0x61;
+        const short corLowerDChar         = 0x64;
+        const short corUpperDChar         = 0x44;
+        const short corLowerEChar         = 0x65;
+        const short corUpperEChar         = 0x45;
+        const short corLowerFChar         = 0x66;
+        const short corUpperFChar         = 0x46;
+        const short corLowerGChar         = 0x67;
+        const short corUpperGChar         = 0x47;
+        const short corLowerHChar         = 0x68;
+        const short corUpperHChar         = 0x48;
+        const short corLowerMChar         = 0x6D;
+        const short corUpperMChar         = 0x4D;
+        const short corLowerRChar         = 0x72;
+        const short corUpperRChar         = 0x52;
+        const short corLowerSChar         = 0x73;
+        const short corLowerTChar         = 0x74;
+        const short corUpperTChar         = 0x54;
+        const short corLowerUChar         = 0x75;
+        const short corUpperUChar         = 0x55;
+        const short corLowerYChar         = 0x79;
+        const short corUpperYChar         = 0x59;
+        const short corUpperZChar         = 0xFA;
+        const short corLowerZChar         = 0x7A;
+        const short corPipeChar           = 0x7C;
+        const short corZeroChar           = 0x30;
+        const short corOneChar            = 0x31;
+        const short corFiveChar           = 0x35;
+        const short corEightChar          = 0x38;
+        const short corNineChar           = 0x39;
+        const short corPlusChar           = 0x2B;
+        const short corMinusChar          = 0x2D;
+        const short corBackslashChar      = 0x5C;
+        const short corForwardSlashChar   = 0x2F;
+        const short corColonChar          = 0x3A;
+        const short corSemiColonChar      = 0x3B;
+        const short corLessThanChar       = 0x3C;
+        const short corEqualChar          = 0x3D;
+        const short corGreaterThanChar    = 0x3E;
+        const short corReturnChar         = 0xD;
+        const short corLineFeedChar       = 0xA;
+        const short corSpaceChar          = 0x20;
+        const short corPoundChar          = 0x23;
+        const short corDollarChar         = 0x24;
+        const short corPercentChar        = 0x25;
+        const short corQuoteChar          = 0x22;
+        const short corSecondaryQuoteChar = 0x27;
+        const short corCommaChar          = 0x2C;
+        const short corPeriodChar         = 0x2E;
+        const short corTildaChar          = 0x7E;
+        const short corQuestionMarkChar   = 0x3F;
+        const long corInvalidChar         = 0xFFFFFFFF;        
+    }
+
     [dllname("VBErrorConstants")]
     module VBErrorConstants {
         const long corInvalidProcedureCall  = 5;

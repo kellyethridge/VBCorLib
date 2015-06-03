@@ -92,7 +92,7 @@ Public Sub Generate()
     Dim de As DictionaryEntry
     For Each de In mValues
        Call sb.Append(de.Key)
-       Call sb.AppendChar(vbEqualChar)
+       Call sb.AppendChar(corEqualChar)
        Call sb.Append(de.Value)
        Call sb.AppendChar(0)
     Next de

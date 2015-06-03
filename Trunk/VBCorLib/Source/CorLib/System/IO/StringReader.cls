@@ -143,7 +143,7 @@ Public Function ReadLine() As String
     i = mPosition
     Do While mPosition < mLength
         Select Case mStringBuffer.Chars(mPosition)
-            Case vbReturnChar, vbLineFeedChar: Exit Do
+            Case corReturnChar, corLineFeedChar: Exit Do
         End Select
         mPosition = mPosition + 1
     Loop
@@ -157,12 +157,12 @@ Public Function ReadLine() As String
     
     ReadLine = Mid$(mString, i + 1, mPosition - i)
     
-    If mStringBuffer.Chars(mPosition) = vbReturnChar Then
+    If mStringBuffer.Chars(mPosition) = corReturnChar Then
         ' consume the found terminator.
         mPosition = mPosition + 1
         ' if a Cr was followed by an Lf then consume the Lf
         If mPosition < mLength Then
-            If mStringBuffer.Chars(mPosition) = vbLineFeedChar Then
+            If mStringBuffer.Chars(mPosition) = corLineFeedChar Then
                 mPosition = mPosition + 1
             End If
         End If
