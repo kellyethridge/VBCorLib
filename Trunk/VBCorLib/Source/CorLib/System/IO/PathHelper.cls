@@ -53,7 +53,7 @@ End Sub
 Friend Sub SetVolumeLabel(ByVal VolumeChar As Integer)
     InitExtendedPathLength
     Append VolumeChar
-    Append vbVolumeSeparatorChar
+    Append corVolumeSeparatorChar
 End Sub
 
 Friend Property Get Chars(ByVal Index As Long) As Integer
@@ -64,7 +64,7 @@ End Property
 
 Friend Function IsUNCPath() As Boolean
     If Length > 1 Then
-        IsUNCPath = AsLong(mFinalBuffer(mPrefixSize)) = vbDoubleDirectorySeparatorChar
+        IsUNCPath = AsLong(mFinalBuffer(mPrefixSize)) = corDoubleDirectorySeparatorChar
     End If
 End Function
 
@@ -76,7 +76,7 @@ Friend Function GetFullPathName() As Long
     ReDim NewBuffer(0 To mPosition + MAX_PATH)
     
     If Length = 4 Then
-        AppendSlash = mFinalBuffer(mPosition - 2) = vbDirectorySeparatorChar And _
+        AppendSlash = mFinalBuffer(mPosition - 2) = corDirectorySeparatorChar And _
                       mFinalBuffer(mPosition - 1) = corPeriodChar
     End If
     
@@ -86,7 +86,7 @@ Friend Function GetFullPathName() As Long
         Helper.Swap4 ByVal ArrPtr(mFinalBuffer), ByVal ArrPtr(NewBuffer)
         mPosition = NewLength
         If AppendSlash Then
-            Append vbDirectorySeparatorChar
+            Append corDirectorySeparatorChar
         End If
             
         GetFullPathName = Length
@@ -147,9 +147,9 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitExtendedPathLength()
-    Append vbDirectorySeparatorChar
-    Append vbDirectorySeparatorChar
+    Append corDirectorySeparatorChar
+    Append corDirectorySeparatorChar
     Append corQuestionMarkChar
-    Append vbDirectorySeparatorChar
+    Append corDirectorySeparatorChar
     mPrefixSize = 4
 End Sub

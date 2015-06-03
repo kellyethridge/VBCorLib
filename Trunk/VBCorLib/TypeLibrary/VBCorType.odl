@@ -551,6 +551,19 @@ library VBCorType {
         const long corInvalidChar         = 0xFFFFFFFF;        
     }
 
+    [dllname("IOConstants")]
+    module IOConstants {
+        const short corPathSeparatorChar            = 0x3B;
+        const short corVolumeSeparatorChar          = 0x3A;
+        const short corDirectorySeparatorChar       = 0x5C;
+        const short corAltDirectorySeparatorChar    = 0x2F;
+        const long corDoubleDirectorySeparatorChar  = 0x005C005C;
+        const LPSTR corPathSeparator                 = ";";
+        const LPSTR corVolumeSeparator               = ":";        
+        const LPSTR corDirectorySeparator            = "\\";
+        const LPSTR corAltDirectorySeparator         = "/";
+    }
+
     [dllname("VBErrorConstants")]
     module VBErrorConstants {
         const long corInvalidProcedureCall  = 5;
@@ -576,6 +589,37 @@ library VBCorType {
         const long corAutomationError       = 440;
         const long corArgumentNotOptional   = 449;
         const long corKeyAlreadyAssociated  = 457;
+    }
+
+    [dllname("HResultConstants")]
+    module HResultConstants {
+        const long E_POINTER                  = 0x80004003;
+        const long COR_E_EXCEPTION            = 0x80131500;
+        const long COR_E_SYSTEM               = 0x80131501;
+        const long COR_E_RANK                 = 0x80131517;
+        const long COR_E_INVALIDOPERATION     = 0x80131509;
+        const long COR_E_OBJECTDISPOSED       = 0x80131622;
+        const long COR_E_INVALIDCAST          = 0x80004002;
+        const long COR_E_INDEXOUTOFRANGE      = 0x80131508;
+        const long COR_E_ARGUMENT             = 0x80070057;
+        const long COR_E_ARGUMENTOUTOFRANGE   = 0x80131502;
+        const long COR_E_OUTOFMEMORY          = 0x8007000E;
+        const long COR_E_FORMAT               = 0x80131537;
+        const long COR_E_NOTSUPPORTED         = 0x80131515;
+        const long COR_E_SERIALIZATION        = 0x8013150C;
+        const long COR_E_ARRAYTYPEMISMATCH    = 0x80131503;
+        const long COR_E_IO                   = 0x39;
+        const long COR_E_FILENOTFOUND         = 0x35;
+        const long COR_E_PLATFORMNOTSUPPORTED = 0x80131539;
+        const long COR_E_PATHTOOLONG          = 0x800700CE;
+        const long COR_E_DIRECTORYNOTFOUND    = 0x80070003;
+        const long COR_E_ENDOFSTREAM          = 0x80070026;
+        const long COR_E_ARITHMETIC           = 0x80070216;
+        const long COR_E_OVERFLOW             = 0x6;
+        const long COR_E_APPLICATION          = 0x80131600;
+        const long COR_E_UNAUTHORIZEDACCESS   = 0x46;
+        const long CORSEC_E_CRYPTO            = 0x80131430;
+        const long CORSEC_E_XMLSYNTAX         = 0x80131418;
     }
 
     [dllname("kernel32.dll"), helpstring("Access to API functions within the Kernel32.dll system file.")]
