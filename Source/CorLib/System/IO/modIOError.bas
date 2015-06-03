@@ -36,9 +36,8 @@ Public Sub IOError(ByVal e As Long, Optional ByVal src As String)
         Case ERROR_ACCESS_DENIED
             Set Ex = Cor.NewInvalidOperationException("Permission to the specified file is denied.")
         Case Else
-            Set Ex = Cor.NewIOException(GetMessage(e))
+            Set Ex = Cor.NewIOException(GetMessage(e), e)
     End Select
-    Ex.HResult = e
     Ex.Source = src
     Throw Ex
 End Sub

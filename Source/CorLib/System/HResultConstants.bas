@@ -24,20 +24,21 @@ Attribute VB_Name = "HResultConstants"
 '
 Option Explicit
 
-Public Const E_POINTER                  As Long = &H5B
+Public Const E_POINTER                  As Long = &H80004003
 Public Const COR_E_EXCEPTION            As Long = &H80131500
 Public Const COR_E_SYSTEM               As Long = &H80131501
-Public Const COR_E_RANK                 As Long = &H9
-Public Const COR_E_INVALIDOPERATION     As Long = &H5
-Public Const COR_E_INVALIDCAST          As Long = &HD
-Public Const COR_E_INDEXOUTOFRANGE      As Long = &H9
-Public Const COR_E_ARGUMENT             As Long = &H5
-Public Const COR_E_ARGUMENTOUTOFRANGE   As Long = &H5
-Public Const COR_E_OUTOFMEMORY          As Long = &H7
+Public Const COR_E_RANK                 As Long = &H80131517
+Public Const COR_E_INVALIDOPERATION     As Long = &H80131509
+Public Const COR_E_OBJECTDISPOSED       As Long = &H80131622
+Public Const COR_E_INVALIDCAST          As Long = &H80004002
+Public Const COR_E_INDEXOUTOFRANGE      As Long = &H80131508
+Public Const COR_E_ARGUMENT             As Long = &H80070057
+Public Const COR_E_ARGUMENTOUTOFRANGE   As Long = &H80131502
+Public Const COR_E_OUTOFMEMORY          As Long = &H8007000E
 Public Const COR_E_FORMAT               As Long = &H80131537
-Public Const COR_E_NOTSUPPORTED         As Long = &H1B6
-Public Const COR_E_SERIALIZATION        As Long = &H14A
-Public Const COR_E_ARRAYTYPEMISMATCH    As Long = &HD
+Public Const COR_E_NOTSUPPORTED         As Long = &H80131515
+Public Const COR_E_SERIALIZATION        As Long = &H8013150C
+Public Const COR_E_ARRAYTYPEMISMATCH    As Long = &H80131503
 Public Const COR_E_IO                   As Long = &H39
 Public Const COR_E_FILENOTFOUND         As Long = &H35
 Public Const COR_E_PLATFORMNOTSUPPORTED As Long = &H80131539
@@ -49,3 +50,4 @@ Public Const COR_E_OVERFLOW             As Long = &H6
 Public Const COR_E_APPLICATION          As Long = &H80131600
 Public Const COR_E_UNAUTHORIZEDACCESS   As Long = &H46
 Public Const CORSEC_E_CRYPTO            As Long = &H80131430
+Public Const CORSEC_E_XMLSYNTAX         As Long = &H80131418

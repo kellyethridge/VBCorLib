@@ -58,10 +58,8 @@ Implements IObject
 Implements Exception
 Implements SystemException
 
-Private Const ParamNameProperty As String = "ParamName"
-Private Const BaseProperty      As String = "Base"
-Private Const DefaultParamName  As String = vbNullString
-Private Const DefaultHResult    As Long = COR_E_ARGUMENT
+Private Const PropParamName As String = "ParamName"
+Private Const PropBase      As String = "Base"
 
 Private mBase As ExceptionBase
 
@@ -84,7 +82,7 @@ End Property
 ' @see Exception
 '
 Public Property Get ParamName() As String
-    ParamName = mBase.GetValue(ParamNameProperty, DefaultParamName)
+    ParamName = mBase.GetValue(PropParamName, vbNullString)
 End Property
 
 ''
@@ -118,19 +116,15 @@ End Property
 ' @see Exception
 '
 Public Property Get HResult() As Long
-    HResult = mBase.HResult
+    HResult = COR_E_ARGUMENT
 End Property
 
 ''
-' Sets the HRESULT, a coded numerical value that is assigned to a specific exception.
+' Returns the VB error number associated with this exception instance.
 '
-' @param Value The value of the associated HResult.
-' @remarks An HResult is associated with an error result code. This allows for VB specific
-' error codes to be returned. This is the same as <b>Err.Number</b>.
-' @see Exception
-'
-Public Property Let HResult(ByVal Value As Long)
-    mBase.HResult = Value
+' @return A VB error that matches the number return by <b>Err.Number</b>.
+Public Property Get ErrorNumber() As Long
+    ErrorNumber = corInvalidProcedureCall
 End Property
 
 ''
@@ -168,7 +162,7 @@ End Property
 ' <p>This property can be set in the constructor <b>NewArgumentException</b>.
 '
 Public Property Get Message() As String
-    Message = mBase.Message
+    Message = GetExceptionMessage(mBase, Arg_ArgumentException)
     
     Dim ParamName As String
     ParamName = Me.ParamName
@@ -242,34 +236,33 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByVal InnerException As Exception)
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DefaultHResult)
-    If Len(ParamName) > 0 Then
-        mBase.SetValue ParamNameProperty, ParamName
-    End If
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init Environment.GetResourceString(Argument_Exception), DefaultParamName, Nothing
+    Set mBase = Cor.NewExceptionBase(Me, App)
 End Sub
 
+Friend Sub Init(ByRef Message As String, ByRef ParamName As String, ByVal InnerException As Exception)
+    mBase.Message = Message
+    mBase.SetValue PropParamName, ParamName
+    Set mBase.InnerException = InnerException
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(BaseProperty, Nothing)
+    Set mBase = PropBag.ReadProperty(PropBase, Nothing)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty BaseProperty, mBase
+    PropBag.WriteProperty PropBase, mBase
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -285,7 +278,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Exception Interface
+'   Exception
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Exception_Data() As IDictionary
     Set Exception_Data = Data
@@ -311,12 +304,12 @@ Private Property Get Exception_HelpLink() As String
     Exception_HelpLink = HelpLink
 End Property
 
-Private Property Let Exception_HResult(ByVal Value As Long)
-    HResult = Value
-End Property
-
 Private Property Get Exception_HResult() As Long
     Exception_HResult = HResult
+End Property
+
+Private Property Get Exception_ErrorNumber() As Long
+    Exception_ErrorNumber = ErrorNumber
 End Property
 
 Private Property Get Exception_InnerException() As Exception
@@ -341,7 +334,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SystemException Interface
+'   SystemException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get SystemException_Data() As IDictionary
     Set SystemException_Data = Data
@@ -350,6 +343,10 @@ End Property
 Private Function SystemException_Equals(Value As Variant) As Boolean
     SystemException_Equals = Equals(Value)
 End Function
+
+Private Property Get SystemException_ErrorNumber() As Long
+    SystemException_ErrorNumber = ErrorNumber
+End Property
 
 Private Function SystemException_GetBaseException() As Exception
     Set SystemException_GetBaseException = GetBaseException
@@ -365,10 +362,6 @@ End Property
 
 Private Property Get SystemException_HelpLink() As String
     SystemException_HelpLink = HelpLink
-End Property
-
-Private Property Let SystemException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get SystemException_HResult() As Long

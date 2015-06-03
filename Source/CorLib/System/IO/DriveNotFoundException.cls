@@ -40,15 +40,9 @@ Implements Exception
 Implements SystemException
 Implements IOException
 
-' Default Values
-Private Const DEF_HRESULT   As Long = COR_E_DIRECTORYNOTFOUND
-Private Const DEF_MESSAGE   As String = vbNullString
+Private Const PropBase As String = "Base"
 
-' Property names used with the PropertyBag
-Private Const PROP_BASE As String = "Base"
-
-' The ExceptionBase class handles everything this class will perform.
-Private mBase As VBCorLib.ExceptionBase
+Private mBase As ExceptionBase
 
 
 Public Property Get Data() As IDictionary
@@ -86,19 +80,16 @@ End Property
 ' @see Exception
 '
 Public Property Get HResult() As Long
-    HResult = mBase.HResult
+    HResult = COR_E_DIRECTORYNOTFOUND
 End Property
 
 ''
-' Sets the HRESULT, a coded numerical value that is assigned to a specific exception.
+' Returns the VB error number associated with this exception instance.
 '
-' @param Value The value of the associated HResult.
-' @remarks An HResult is associated with an error result code. This allows for VB specific
-' error codes to be returned. This is the same as <b>Err.Number</b>.
-' @see Exception
+' @return A VB error that matches the number return by <b>Err.Number</b>.
 '
-Public Property Let HResult(ByVal Value As Long)
-    mBase.HResult = Value
+Public Property Get ErrorNumber() As Long
+    ErrorNumber = corPathNotFound
 End Property
 
 ''
@@ -136,7 +127,7 @@ End Property
 ' <p>This property can be set in the constructor <b>NewException</b>.
 '
 Public Property Get Message() As String
-    Message = mBase.Message
+    Message = GetExceptionMessage(mBase, Arg_DriveNotFoundException)
 End Property
 
 ''
@@ -207,12 +198,12 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init DEF_MESSAGE, Nothing
+    Set mBase = Cor.NewExceptionBase(Me, App)
 End Sub
 
 Friend Sub Init(ByRef Message As String, ByRef InnerException As Exception)
-    Set mBase = Nothing
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
+    mBase.Message = Message
+    Set mBase.InnerException = InnerException
 End Sub
 
 
@@ -220,11 +211,11 @@ End Sub
 '   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE)
+    Set mBase = PropBag.ReadProperty(PropBase)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty PropBase, mBase
 End Sub
 
 
@@ -238,6 +229,10 @@ End Property
 Private Function Exception_Equals(Value As Variant) As Boolean
     Exception_Equals = Equals(Value)
 End Function
+
+Private Property Get Exception_ErrorNumber() As Long
+    Exception_ErrorNumber = ErrorNumber
+End Property
 
 Private Function Exception_GetBaseException() As VBCorLib.Exception
     Set Exception_GetBaseException = GetBaseException
@@ -253,10 +248,6 @@ End Property
 
 Private Property Get Exception_HelpLink() As String
     Exception_HelpLink = HelpLink
-End Property
-
-Private Property Let Exception_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get Exception_HResult() As Long
@@ -311,6 +302,14 @@ Private Function SystemException_Equals(Value As Variant) As Boolean
     SystemException_Equals = Equals(Value)
 End Function
 
+Private Property Get IOException_ErrorNumber() As Long
+    IOException_ErrorNumber = ErrorNumber
+End Property
+
+Private Property Get SystemException_ErrorNumber() As Long
+    SystemException_ErrorNumber = ErrorNumber
+End Property
+
 Private Function SystemException_GetBaseException() As VBCorLib.Exception
     Set SystemException_GetBaseException = GetBaseException
 End Function
@@ -325,10 +324,6 @@ End Property
 
 Private Property Get SystemException_HelpLink() As String
     SystemException_HelpLink = HelpLink
-End Property
-
-Private Property Let SystemException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get SystemException_HResult() As Long
@@ -381,10 +376,6 @@ End Property
 
 Private Property Get IOException_HelpLink() As String
     IOException_HelpLink = HelpLink
-End Property
-
-Private Property Let IOException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get IOException_HResult() As Long

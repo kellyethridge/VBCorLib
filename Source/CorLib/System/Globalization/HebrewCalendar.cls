@@ -456,7 +456,7 @@ Private Sub GetDateParts(ByVal ms As Currency, ByVal DatePart As DatePartPrecisi
     Dim FixedDays As Long
     
     If ms < MIN_MILLISECONDS Or ms > MaxMilliseconds Then _
-        Throw Cor.NewArgumentOutOfRangeException(ms, Message:="The Hebrew calendar only supports the years 5343 to 6000 (1582 to 2240 in Gregorian).")
+        Throw Cor.NewArgumentOutOfRangeException(ActualValue:=ms, Message:="The Hebrew calendar only supports the years 5343 to 6000 (1582 to 2240 in Gregorian).")
     
     FixedDays = Int(ms / MillisecondsPerDay) + 1
     

@@ -92,8 +92,15 @@ Public Function CUnk(ByVal Obj As IUnknown) As IUnknown
     Set CUnk = Obj
 End Function
 
-Public Function WeakPtr(ByVal Source As Object) As Long
-    WeakPtr = ObjPtr(CUnk(Source))
+Public Function WeakPtr(ByVal Obj As IUnknown) As Long
+    WeakPtr = ObjPtr(Obj)
+End Function
+
+Public Function StrongPtr(ByVal Ptr As Long) As IUnknown
+    Dim Obj As IUnknown
+    ObjectPtr(Obj) = Ptr
+    Set StrongPtr = Obj
+    ObjectPtr(Obj) = vbNullPtr
 End Function
 
 ''

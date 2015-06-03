@@ -99,7 +99,7 @@ End Sub
 Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException()
     Dim Inner1 As New Exception
     Dim Inner2 As Exception
-    Set Inner2 = Cor.NewException("", Inner1)
+    Set Inner2 = Cor.NewException("", InnerException:=Inner1)
     Dim Ex As ArgumentOutOfRangeException
     Set Ex = Cor.NewArgumentOutOfRangeException(InnerException:=Inner2)
 
