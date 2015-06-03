@@ -228,13 +228,13 @@ Friend Sub Init(ByVal FileName As String, ByVal Access As FileAccess, ByVal Shar
     mFileLength = FileLen(mFileName)
 
     mFileHandle = Api.CreateFile(FileName, Access, Share, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
-    If mFileHandle = INVALID_HANDLE Then IOError Err.LastDllError, FileName
+    If mFileHandle = INVALID_HANDLE Then IOError.WinIOError Err.LastDllError, FileName
     
     mMapHandle = Api.CreateFileMapping(mFileHandle, 0, PageAccess, 0, 0, vbNullString)
-    If mMapHandle = vbNullPtr Then IOError Err.LastDllError, FileName
+    If mMapHandle = vbNullPtr Then IOError.WinIOError Err.LastDllError, FileName
     
     mViewHandle = MapViewOfFile(mMapHandle, MapAccess, 0, 0, 0)
-    If mViewHandle = vbNullPtr Then IOError Err.LastDllError, FileName
+    If mViewHandle = vbNullPtr Then IOError.WinIOError Err.LastDllError, FileName
 End Sub
 
 Private Sub VerifyOpen()

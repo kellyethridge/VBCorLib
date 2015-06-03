@@ -189,11 +189,13 @@ End Sub
 ' to the Registry. Excessive calls to this function can impact system performance.</p>
 '
 Public Sub Flush()
-    Call VerifyHandle
+    VerifyHandle
     
     Dim Result As Long
     Result = RegFlushKey(mHKey)
-    If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey.Flush"
+    If Result <> ERROR_SUCCESS Then
+        Error.ApiError Result
+    End If
 End Sub
 
 ''
@@ -213,7 +215,9 @@ Public Function CreateSubKey(ByVal SubKey As String) As RegistryKey
     Dim Result As Long
     Dim NewKey As Long
     Result = Api.RegCreateKeyEx(mHKey, SubKey, 0, vbNullString, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, 0, NewKey, 0)
-    If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey"
+    If Result <> ERROR_SUCCESS Then
+        Error.ApiError Result
+    End If
     
     Set CreateSubKey = Cor.NewRegistryKey(NewKey, Path.Combine(mName, SubKey), True)
 End Function
@@ -243,7 +247,9 @@ Public Sub DeleteSubKey(ByVal SubKey As String, Optional ByVal ThrowOnMissingSub
         
         Dim Result As Long
         Result = Api.RegDeleteKey(mHKey, SubKey)
-        If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey"
+        If Result <> ERROR_SUCCESS Then
+            Error.ApiError Result
+        End If
         rk.CloseKey
     End If
 End Sub
@@ -276,7 +282,9 @@ Public Sub DeleteSubKeyTree(ByVal SubKey As String)
     
     Dim Result As Long
     Result = Api.RegDeleteKey(mHKey, SubKey)
-    If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey.DeleteSubKeyTree"
+    If Result <> ERROR_SUCCESS Then
+        Error.ApiError Result
+    End If
 End Sub
 
 ''
@@ -306,7 +314,9 @@ Public Function GetSubKeyNames() As String()
         
         Dim Result As Long
         Result = Api.RegEnumKeyEx(mHKey, KeyCount, Buf, BufferSize, 0, vbNullString, 0, 0@)
-        If Result <> ERROR_SUCCESS Then IOError Result, "GetSubKeyNames"
+        If Result <> ERROR_SUCCESS Then
+            Error.ApiError Result
+        End If
         
         Ret(KeyCount) = Left$(Buf, BufferSize)
     Loop
@@ -346,7 +356,9 @@ Public Function GetValueNames() As String()
         
         Dim Result As Long
         Result = Api.RegEnumValue(mHKey, ValueCount, Buf, BufferSize, 0, 0, 0, 0)
-        If Result <> ERROR_SUCCESS Then IOError Result, "GetValueNames"
+        If Result <> ERROR_SUCCESS Then
+            Error.ApiError Result
+        End If
         
         Ret(ValueCount) = Left$(Buf, BufferSize)
     Loop
@@ -397,7 +409,7 @@ Public Sub SetValue(ByVal Name As String, ByRef Value As Variant, Optional ByVal
     End If
     On Error GoTo 0
     
-    If Result <> ERROR_SUCCESS Then IOError Result
+    If Result <> ERROR_SUCCESS Then Error.ApiError Result
     Exit Sub
 
 errTrap:
@@ -444,7 +456,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
         If Not IsMissing(Default) Then Call VariantCopyInd(GetValue, Default)
         Exit Function
     ElseIf Result <> ERROR_SUCCESS Then
-        IOError Result
+        Error.ApiError Result
     End If
     
     Select Case ValueType
@@ -452,14 +464,14 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             Dim sz As String
             sz = String$(ValueSize, 0)
             Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, sz)
-            If Result <> ERROR_SUCCESS Then IOError Result
+            If Result <> ERROR_SUCCESS Then Error.ApiError Result
             GetValue = CorString.TrimEnd(sz, vbNullChar)
             Exit Function
             
         Case DWordKind
             Dim i As Long
             Result = Api.RegQueryValueEx(mHKey, Name, ValueType, VarPtr(i), 4)
-            If Result <> ERROR_SUCCESS Then IOError Result
+            If Result <> ERROR_SUCCESS Then Error.ApiError Result
             GetValue = i
             
         Case BinaryKind, REG_NONE
@@ -467,7 +479,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             If ValueSize > 0 Then
                 ReDim Bytes(0 To ValueSize - 1)
                 Result = Api.RegQueryValueEx(mHKey, Name, ValueType, VarPtr(Bytes(0)), ValueSize)
-                If Result <> ERROR_SUCCESS Then IOError Result
+                If Result <> ERROR_SUCCESS Then Error.ApiError Result
             Else
                 Bytes = Cor.NewBytes
             End If
@@ -479,7 +491,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             Dim MultiSZ As String
             MultiSZ = String$(ValueSize, 0)
             Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, MultiSZ)
-            If Result <> ERROR_SUCCESS Then IOError Result
+            If Result <> ERROR_SUCCESS Then Error.ApiError Result
             GetValue = Split(CorString.TrimEnd(MultiSZ, vbNullChar), vbNullChar)
             Exit Function
             
@@ -487,7 +499,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             Dim ExpSZ As String
             ExpSZ = String$(ValueSize, 0)
             Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, ExpSZ)
-            If Result <> ERROR_SUCCESS Then IOError Result
+            If Result <> ERROR_SUCCESS Then Error.ApiError Result
             ExpSZ = CorString.TrimEnd(ExpSZ, vbNullChar)
             
             If Options <> DoNotExpandEnvironmentVariables Then
@@ -500,7 +512,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
         Case QWordKind
             Dim c As Currency
             Result = Api.RegQueryValueEx(mHKey, Name, ValueType, VarPtr(c), 8)
-            If Result <> ERROR_SUCCESS Then IOError Result
+            If Result <> ERROR_SUCCESS Then Error.ApiError Result
             GetValue = c
             
         Case Else
@@ -534,7 +546,7 @@ Public Property Get SubKeyCount() As Long
     
     Dim Result As Long
     Result = Api.RegQueryInfoKey(mHKey, vbNullString, 0, 0, VarPtr(SubKeyCount), 0, 0, 0, 0, 0, 0, 0)
-    If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey"
+    If Result <> ERROR_SUCCESS Then Error.ApiError Result
 End Property
 
 ''
@@ -547,7 +559,7 @@ Public Property Get ValueCount() As Long
     
     Dim Result As Long
     Result = Api.RegQueryInfoKey(mHKey, vbNullString, 0, 0, 0, 0, 0, VarPtr(ValueCount), 0, 0, 0, 0)
-    If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey"
+    If Result <> ERROR_SUCCESS Then Error.ApiError Result
 End Property
 
 ''
@@ -561,7 +573,7 @@ Public Function GetValueKind(ByVal Name As String) As RegistryValueKind
     
     Dim Result As Long
     Result = Api.RegQueryValueEx(mHKey, Name, GetValueKind, 0, 0)
-    If Result <> ERROR_SUCCESS Then IOError Result, "GetValueKind"
+    If Result <> ERROR_SUCCESS Then Error.ApiError Result
 End Function
 
 ''
@@ -578,7 +590,7 @@ Public Function GetLastWriteTime() As CorDateTime
         Dim Time    As Currency
         
         Result = Api.RegQueryInfoKey(mHKey, vbNullString, 0, 0, 0, 0, 0, 0, 0, 0, 0, VarPtr(Time))
-        If Result <> ERROR_SUCCESS Then IOError Result, "RegistryKey"
+        If Result <> ERROR_SUCCESS Then Error.ApiError Result
         
         Set GetLastWriteTime = CorDateTime.FromFileTime(Time)
     Else
@@ -675,7 +687,7 @@ Private Sub VerifyHandle()
         Throw Cor.NewObjectDisposedException("RegistryKey", "The Registry Key is closed.")
     
     If mHKey = HKEY_DYN_DATA Then
-        If Environment.IsNT Then IOError ERROR_INVALID_HANDLE
+        If Environment.IsNT Then Error.ApiError ERROR_INVALID_HANDLE
     End If
 End Sub
 

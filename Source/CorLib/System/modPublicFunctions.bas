@@ -133,17 +133,21 @@ End Function
 ' @return The value retrieved from the system for the specified locale.
 '
 Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As String
-    Dim Buf As String
-    Dim Size As Long
-    Dim er As Long
+    Dim Buf     As String
+    Dim Size    As Long
     
     Size = 128
     Do
         Buf = String$(Size, vbNullChar)
-        Size = Api.GetLocaleInfo(LCID, LCType, Buf, Size)
-        If Size > 0 Then Exit Do
-        er = Err.LastDllError
-        If er <> ERROR_INSUFFICIENT_BUFFER Then IOError er
+        Size = GetLocaleInfoW(LCID, LCType, Buf, Size)
+        If Size > 0 Then _
+            Exit Do
+                
+        Dim ErrorCode As Long
+        ErrorCode = Err.LastDllError
+        If ErrorCode <> ERROR_INSUFFICIENT_BUFFER Then _
+            Error.ApiError ErrorCode
+            
         Size = Api.GetLocaleInfo(LCID, LCType, vbNullString, 0)
     Loop
     

@@ -386,7 +386,7 @@ Public Function GetTempFileName() As String
     FileName = String$(MaxPath, 0)
     
     If GetTempFileNameW(GetTempPath, "tmp", 0, FileName) = BOOL_FALSE Then
-        IOError Err.LastDllError
+        IOError.WinIOError Err.LastDllError
     End If
     
     GetTempFileName = SysAllocString(StrPtr(FileName))
@@ -405,7 +405,7 @@ Public Function GetTempPath() As String
     Size = GetTempPathW(MaxPath, PathName)
     
     If Size = 0 Or Size > MaxPath Then
-        IOError Err.LastDllError
+        IOError.WinIOError Err.LastDllError
     End If
 
     GetTempPath = GetFullPath(Left$(PathName, Size))

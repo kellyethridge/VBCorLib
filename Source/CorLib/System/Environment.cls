@@ -263,7 +263,7 @@ Public Property Get UserDomainName() As String
     Sid = String$(Size, 0)
     
     If Win32Native.LookupAccountName(vbNullString, UserName, Sid, Size, DomainName, Size, 0) = BOOL_FALSE Then
-        IOError Err.LastDllError
+        IOError.WinIOError Err.LastDllError
     End If
     
     UserDomainName = Left$(DomainName, Size)
@@ -513,7 +513,7 @@ Public Function GetEnvironmentVariable(ByVal Name As String, Optional ByVal Targ
                     Dim Result As Long
                     Result = Err.LastDllError
                     If Result = ERROR_ENVVAR_NOT_FOUND Or (Result = 0) Then Exit Function
-                    IOError Result, "Name"
+                    Error.ApiError Result
                 End If
             Loop While Size > Len(Buf)
             GetEnvironmentVariable = Left$(Buf, Size)

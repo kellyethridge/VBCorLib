@@ -127,7 +127,7 @@ Public Sub SetValue(ByVal Section As String, ByVal Key As String, ByRef Value As
     ' delete the INI entry instead.
     If CorString.IsNull(s) Then s = ""
     
-    If Api.WritePrivateProfileString(Section, Key, s, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.WritePrivateProfileString(Section, Key, s, mFileName) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     If mAutoFlush Then Call Flush
 End Sub
 
@@ -385,7 +385,7 @@ Public Sub DeleteKey(ByVal Section As String, ByVal Key As String)
     If Len(Key) = 0 Then _
         Throw Cor.NewArgumentException("Key cannot be an empty string.", "Key")
     
-    If Api.WritePrivateProfileString(Section, Key, vbNullString, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.WritePrivateProfileString(Section, Key, vbNullString, mFileName) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     If mAutoFlush Then Call Flush
 End Sub
 
@@ -398,7 +398,7 @@ Public Sub DeleteSection(ByVal Section As String)
     If Len(Section) = 0 Then _
         Throw Cor.NewArgumentException("Section cannot be an empty string.", "Section")
     
-    If Api.WritePrivateProfileString(Section, vbNullString, vbNullString, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.WritePrivateProfileString(Section, vbNullString, vbNullString, mFileName) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     If mAutoFlush Then Call Flush
 End Sub
 

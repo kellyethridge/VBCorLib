@@ -109,7 +109,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
         Dim NewDirectory As String
         NewDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
         If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then
-            IOError Err.LastDllError
+            IOError.WinIOError Err.LastDllError
         End If
     Loop
     
@@ -164,7 +164,7 @@ Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = Fa
                         If CBool(Data.dwFileAttributes And FileAttributes.DirectoryAttr) Then
                             Delete FullPath, True
                         Else
-                            If Api.DeleteFile(FullPath) = BOOL_FALSE Then IOError Err.LastDllError, FullPath
+                            If Api.DeleteFile(FullPath) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError, FullPath
                         End If
                     End If
                 Loop While Api.FindNextFile(.DangerousGetHandle, Data) = BOOL_TRUE
@@ -172,13 +172,13 @@ Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = Fa
                 Dim Result As Long
                 Result = Err.LastDllError
                 
-                If Result <> ERROR_NO_MORE_FILES Then IOError Result, FullPath
+                If Result <> ERROR_NO_MORE_FILES Then IOError.WinIOError Result, FullPath
             End If
         End With
     End If
     
     If Api.RemoveDirectory(NormalizedPath) = BOOL_FALSE Then
-        If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then IOError Err.LastDllError, Path
+        If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then IOError.WinIOError Err.LastDllError, Path
     End If
 End Sub
 
@@ -259,7 +259,7 @@ Public Function GetCurrentDirectory() As String
     
     Dim Size As Long
     Size = Api.GetCurrentDirectory(Len(Result), Result)
-    If Size = 0 Then IOError Err.LastDllError
+    If Size = 0 Then IOError.WinIOError Err.LastDllError
     
     GetCurrentDirectory = Left$(Result, Size)
 End Function
@@ -404,9 +404,9 @@ Public Sub Move(ByRef SourceDirName As String, ByRef DestDirName As String)
         Dim Result  As Long
         Result = Err.LastDllError
         If Result = ERROR_FILE_NOT_FOUND Then
-            IOError ERROR_PATH_NOT_FOUND, SourceDirName
+            IOError.WinIOError ERROR_PATH_NOT_FOUND, SourceDirName
         Else
-            IOError Result
+            IOError.WinIOError Result
         End If
     End If
 End Sub
@@ -435,7 +435,7 @@ Public Sub SetCurrentDirectory(ByRef Path As String)
         If ErrorCode = Win32Native.ERROR_FILE_NOT_FOUND Then
             ErrorCode = Win32Native.ERROR_PATH_NOT_FOUND
         End If
-        IOError ErrorCode, FullPath
+        IOError.WinIOError ErrorCode, FullPath
     End If
 End Sub
 
@@ -527,7 +527,7 @@ Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     Dim Handle As SafeFileHandle
     Set Handle = Win32Native.SafeCreateFile(FullPath, WriteAccess, WriteShare, OpenExisting, FILE_FLAG_BACKUP_SEMANTICS)
     If Handle.IsInvalid Then _
-        IOError Err.LastDllError, FullPath
+        IOError.WinIOError Err.LastDllError, FullPath
         
     Set OpenHandle = Handle
 End Function
@@ -596,7 +596,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
         Dim Error As Long
         Error = Err.LastDllError
     
-        If IsIOError(Error) Then IOError Error, InitialPath
+        If IsIOError(Error) Then IOError.WinIOError Error, InitialPath
     End With
     
     Dim SubFolder As Variant
@@ -622,7 +622,7 @@ End Function
 Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long, ByVal LastAccessTimePtr As Long, ByVal LastWriteTimePtr As Long)
     With OpenHandle(Path)
         If SetFileTime(.DangerousGetHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr) = BOOL_FALSE Then
-            IOError Err.LastDllError, Path
+            IOError.WinIOError Err.LastDllError, Path
         End If
     End With
 End Sub
