@@ -87,11 +87,8 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-' Default Values
-Private Const DEF_HRESULT As Long = COR_E_EXCEPTION
-
 ' Property names used with the PropertyBag
-Private Const PROP_BASE As String = "Base"
+Private Const PropBase As String = "Base"
 
 ' The ExceptionBase class handles everything this class will perform.
 Private mBase As ExceptionBase
@@ -138,19 +135,16 @@ End Property
 ' @see Exception
 '
 Public Property Get HResult() As Long
-    HResult = mBase.HResult
+    HResult = COR_E_EXCEPTION
 End Property
 
 ''
-' Sets the HRESULT, a coded numerical value that is assigned to a specific exception.
+' Returns the VB error number associated with this exception instance.
 '
-' @param RHS The value of the associated HResult.
-' @remarks An HResult is associated with an error result code. This allows for VB specific
-' error codes to be returned. This is the same as <b>Err.Number</b>.
-' @see Exception
+' @return A VB error that matches the number return by <b>Err.Number</b>.
 '
-Public Property Let HResult(ByVal Value As Long)
-    mBase.HResult = Value
+Public Property Get ErrorNumber() As Long
+    ErrorNumber = mBase.ErrorNumber
 End Property
 
 ''
@@ -188,7 +182,7 @@ End Property
 ' <p>This property can be set in the constructor <b>NewException</b>.
 '
 Public Property Get Message() As String
-    Message = mBase.Message
+    Message = GetExceptionMessage(mBase, Exception_WasThrown, mBase.TypeName)
 End Property
 
 ''
@@ -256,31 +250,34 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Message As String, ByVal InnerException As Exception)
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init vbNullString, Nothing
+    Set mBase = Cor.NewExceptionBase(Me, App)
+    mBase.ErrorNumber = corInvalidProcedureCall
 End Sub
 
+Friend Sub Init(ByRef Message As String, ByVal ErrorNumber As Long, ByVal InnerException As Exception)
+    mBase.Message = Message
+    mBase.ErrorNumber = ErrorNumber
+    Set mBase.InnerException = InnerException
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE)
+    Set mBase = PropBag.ReadProperty(PropBase)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty PropBase, mBase
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

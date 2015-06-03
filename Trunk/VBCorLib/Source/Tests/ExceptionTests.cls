@@ -41,7 +41,7 @@ End Sub
 Public Sub InnerException_WhenSupplied_ReturnsInnerException()
     Dim Inner   As New Exception
     Dim Ex      As Exception
-    Set Ex = Cor.NewException("", Inner)
+    Set Ex = Cor.NewException("", InnerException:=Inner)
     
     Dim Actual As Exception
     Set Actual = Ex.InnerException
@@ -61,9 +61,9 @@ End Sub
 Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException()
     Dim Inner1 As New Exception
     Dim Inner2 As Exception
-    Set Inner2 = Cor.NewException("", Inner1)
+    Set Inner2 = Cor.NewException("", InnerException:=Inner1)
     Dim Ex As Exception
-    Set Ex = Cor.NewException("", Inner2)
+    Set Ex = Cor.NewException("", InnerException:=Inner2)
     
     Dim Actual As Exception
     Set Actual = Ex.GetBaseException
@@ -71,20 +71,24 @@ Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException(
     Assert.That Actual, Iz.SameAs(Inner1)
 End Sub
 
-Public Sub TestPersitence()
-    Const Message As String = "User Error."
+Public Sub Serialization_WhenCalled_ClonesException()
     Dim Inner   As New Exception
     Dim Ex      As Exception
-    Set Ex = Cor.NewException(Message, Inner)
+    Set Ex = Cor.NewException("Msg", 91, Inner)
+    Ex.Source = "abc"
+    Ex.HelpLink = "Link"
+    Ex.Data("x") = 1
     
-    Dim Bag As New PropertyBag
-    Bag.WriteProperty "ex", Ex
     Dim Actual As Exception
-    Set Actual = Bag.ReadProperty("ex")
+    Set Actual = Persist(Ex)
     
     Assert.That Actual, Iz.Not.SameAs(Ex)
-    Assert.That Actual.Message, Iz.EqualTo(Message)
+    Assert.That Actual.Message, Iz.EqualTo("Msg")
     Assert.That Actual.InnerException, Iz.Not.Nothing
+    Assert.That Actual.Source, Iz.EqualTo("abc")
+    Assert.That Actual.HelpLink, Iz.EqualTo("Link")
+    Assert.That Actual.Data("x"), Iz.EqualTo(1)
+    Assert.That Actual.ErrorNumber, Iz.EqualTo(91)
 End Sub
 
 

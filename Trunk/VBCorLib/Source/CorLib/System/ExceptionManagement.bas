@@ -1,4 +1,4 @@
-Attribute VB_Name = "modExceptionMethods"
+Attribute VB_Name = "ExceptionManagement"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -48,8 +48,7 @@ Public Function Catch(ByRef Ex As Exception, Optional ByVal Err As ErrObject) As
         Catch = True
     ElseIf Not Err Is Nothing Then
         If Err.Number Then
-            Set Ex = Cor.NewException(Err.Description, Err.Number)
-            Ex.Source = Err.Source
+            Set Ex = CreateException(Err.Description, Err.Number, Err.Source, Err.HelpFile)
             Err.Clear
             Catch = True
         End If
@@ -70,9 +69,7 @@ Public Sub Throw(Optional ByVal Ex As Object)
         ElseIf TypeOf Ex Is ErrObject Then
             Dim ErrObj As ErrObject
             Set ErrObj = Ex
-            Set mException = Cor.NewException(ErrObj.Description, ErrObj.Number)
-            mException.Source = ErrObj.Source
-            mException.HelpLink = ErrObj.HelpFile
+            Set mException = CreateException(ErrObj.Description, ErrObj.Number, ErrObj.Source, ErrObj.HelpFile)
         Else
             Set mException = Cor.NewSystemException("Invalid Throw argument. Must be an Exception type or ErrObject.")
         End If
@@ -82,6 +79,12 @@ Public Sub Throw(Optional ByVal Ex As Object)
         Err.Raise mException.ErrorNumber, mException.Source, mException.Message
     End If
 End Sub
+
+Private Function CreateException(ByRef Message As String, ByVal ErrorNumber As Long, ByRef Source As String, ByRef HelpLink As String) As Exception
+    Set CreateException = Cor.NewException(Message, ErrorNumber)
+    CreateException.Source = Source
+    CreateException.HelpLink = HelpLink
+End Function
 
 ''
 ' Clears a cached exception if one exists.

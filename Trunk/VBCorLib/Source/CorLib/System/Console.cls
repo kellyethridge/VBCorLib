@@ -597,9 +597,9 @@ End Sub
 '
 Public Sub SetBufferSize(ByVal Width As Long, ByVal Height As Long)
     If Width < 1 Or Width > MaxWindowSize Then _
-        Throw Cor.NewArgumentOutOfRangeException("Width must be between 1 and 32767.", "Width", Width)
+        Throw Cor.NewArgumentOutOfRangeException("Width", Width, "Width must be between 1 and 32767.")
     If Height < 1 Or Height > MaxWindowSize Then _
-        Throw Cor.NewArgumentOutOfRangeException("Height must be between 1 and 32767.", "Height", Height)
+        Throw Cor.NewArgumentOutOfRangeException("Height", Height, "Height must be between 1 and 32767.")
     
     With GetBufferInfo.srWindow
         If Width < .Right - .Left + 1 Then _

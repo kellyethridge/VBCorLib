@@ -57,11 +57,15 @@ Implements Exception
 Implements SystemException
 Implements ArgumentException
 
-Private Const ParamNameProperty     As String = "ParamName"
-Private Const ActualValueProperty   As String = "ActualValue"
-Private Const BaseProperty          As String = "Base"
-Private Const DefaultParamName      As String = vbNullString
-Private Const DefaultHResult        As Long = COR_E_ARGUMENTOUTOFRANGE
+Public Enum InvocationMethod
+    GenericInvocation
+    ArrayInvocation
+    PropertyInvocation
+End Enum
+
+Private Const PropParamName     As String = "ParamName"
+Private Const PropActualValue   As String = "ActualValue"
+Private Const PropBase          As String = "Base"
 
 Private mBase As ExceptionBase
 
@@ -81,7 +85,7 @@ End Property
 ' @return A value of the parameter that caused the exception.
 '
 Public Property Get ActualValue() As Variant
-    Helper.MoveVariant ActualValue, mBase.GetValue(ActualValueProperty, MissingVariant)
+    Helper.MoveVariant ActualValue, mBase.GetValue(PropActualValue, MissingVariant)
 End Property
 
 ''
@@ -93,7 +97,7 @@ End Property
 ' @see Exception
 '
 Public Property Get ParamName() As String
-    ParamName = mBase.GetValue(ParamNameProperty, DefaultParamName)
+    ParamName = mBase.GetValue(PropParamName, vbNullString)
 End Property
 
 ''
@@ -127,19 +131,16 @@ End Property
 ' @see Exception
 '
 Public Property Get HResult() As Long
-    HResult = mBase.HResult
+    HResult = COR_E_ARGUMENTOUTOFRANGE
 End Property
 
 ''
-' Sets the HRESULT, a coded numerical value that is assigned to a specific exception.
+' Returns the VB error number associated with this exception instance.
 '
-' @param Value The value of the associated HResult.
-' @remarks An HResult is associated with an error result code. This allows for VB specific
-' error codes to be returned. This is the same as <b>Err.Number</b>.
-' @see Exception
+' @return A VB error that matches the number return by <b>Err.Number</b>.
 '
-Public Property Let HResult(ByVal Value As Long)
-    mBase.HResult = Value
+Public Property Get ErrorNumber() As Long
+    ErrorNumber = mBase.ErrorNumber
 End Property
 
 ''
@@ -177,7 +178,7 @@ End Property
 ' <p>This property can be set in the constructor <b>NewArgumentNullException</b>.
 '
 Public Property Get Message() As String
-    Message = mBase.Message
+    Message = GetExceptionMessage(mBase, Arg_ArgumentOutOfRangeException)
     
     If Len(ParamName) > 0 Then
         Message = Message & vbCrLf & "Parameter name: " & ParamName
@@ -188,7 +189,7 @@ Public Property Get Message() As String
             Message = Message & vbCrLf
         End If
         
-        Message = Message & "Actual value was " & Convert.ToString(ActualValue) & "."
+        Message = Message & "Actual value was " & Object.ToString(ActualValue) & "."
     End If
 End Property
 
@@ -257,42 +258,56 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef ParamName As String, ByRef ActualValue As Variant, ByRef Message As String, ByRef InnerException As Exception)
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DefaultHResult)
-    
-    If Len(ParamName) > 0 Then
-        mBase.SetValue ParamNameProperty, ParamName
-    End If
-    
-    If Not IsMissing(ActualValue) Then
-        mBase.SetValue ActualValueProperty, ActualValue
-    End If
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init DefaultParamName, MissingVariant, Environment.GetResourceString(ArgumentOutOfRange_Exception), Nothing
+    Set mBase = Cor.NewExceptionBase(Me, App)
+    mBase.ErrorNumber = corInvalidProcedureCall
 End Sub
 
+Friend Sub Init(ByRef ParamName As String, ByRef ActualValue As Variant, ByRef Message As String, ByVal InnerException As Exception, ByVal Method As InvocationMethod)
+    mBase.SetValue PropParamName, ParamName
+    mBase.SetValue PropActualValue, ActualValue
+    mBase.Message = Message
+    mBase.ErrorNumber = GetErrorNumber(Method)
+    Set mBase.InnerException = InnerException
+End Sub
+
+Private Function GetErrorNumber(ByVal Method As InvocationMethod) As Long
+    Select Case Method
+        Case InvocationMethod.GenericInvocation
+            GetErrorNumber = corInvalidProcedureCall
+        Case InvocationMethod.ArrayInvocation
+            GetErrorNumber = corSubscriptOutOfRange
+        Case InvocationMethod.PropertyInvocation
+            GetErrorNumber = corInvalidPropertyValue
+        Case Else
+            Throw Cor.NewArgumentOutOfRangeException("Method", Method, Environment.GetResourceString(ArgumentOutOfRange_Enum))
+    End Select
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(BaseProperty, Nothing)
+    Set mBase = PropBag.ReadProperty(PropBase)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty BaseProperty, mBase
+    PropBag.WriteProperty PropBase, mBase
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ArgumentException Interface
+'   ArgumentException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ArgumentException_Data() As IDictionary
     Set ArgumentException_Data = Data
+End Property
+
+Private Property Get ArgumentException_ErrorNumber() As Long
+    ArgumentException_ErrorNumber = ErrorNumber
 End Property
 
 Private Function ArgumentException_Equals(Value As Variant) As Boolean
@@ -313,10 +328,6 @@ End Property
 
 Private Property Get ArgumentException_HelpLink() As String
     ArgumentException_HelpLink = HelpLink
-End Property
-
-Private Property Let ArgumentException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get ArgumentException_HResult() As Long
@@ -349,7 +360,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -365,10 +376,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Exception Interface
+'   Exception
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Exception_Data() As IDictionary
     Set Exception_Data = Data
+End Property
+
+Private Property Get Exception_ErrorNumber() As Long
+    Exception_ErrorNumber = ErrorNumber
 End Property
 
 Private Function Exception_Equals(Value As Variant) As Boolean
@@ -389,10 +404,6 @@ End Property
 
 Private Property Get Exception_HelpLink() As String
     Exception_HelpLink = HelpLink
-End Property
-
-Private Property Let Exception_HResult(ByVal RHS As Long)
-    HResult = RHS
 End Property
 
 Private Property Get Exception_HResult() As Long
@@ -420,9 +431,8 @@ Private Function Exception_ToString() As String
 End Function
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SystemException Interface
+'   SystemException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get SystemException_Data() As IDictionary
     Set SystemException_Data = Data
@@ -431,6 +441,10 @@ End Property
 Private Function SystemException_Equals(Value As Variant) As Boolean
     SystemException_Equals = Equals(Value)
 End Function
+
+Private Property Get SystemException_ErrorNumber() As Long
+    SystemException_ErrorNumber = ErrorNumber
+End Property
 
 Private Function SystemException_GetBaseException() As Exception
     Set SystemException_GetBaseException = GetBaseException
@@ -446,10 +460,6 @@ End Property
 
 Private Property Get SystemException_HelpLink() As String
     SystemException_HelpLink = HelpLink
-End Property
-
-Private Property Let SystemException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get SystemException_HResult() As Long

@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: ObjectDisposedException
+' Module: ObjectDisposedException
 '
 
 ''
@@ -45,11 +48,8 @@ Implements Exception
 Implements SystemException
 Implements InvalidOperationException
 
-Private Const PROP_BASE         As String = "Base"
-Private Const PROP_OBJECTNAME   As String = "ObjectName"
-Private Const DEF_OBJECTNAME    As String = ""
-Private Const DEF_MESSAGE       As String = "Cannot perform action on disposed object."
-Private Const DEF_HRESULT       As Long = COR_E_INVALIDOPERATION
+Private Const PropBase         As String = "Base"
+Private Const PropObjectName   As String = "ObjectName"
 
 Private mBase As ExceptionBase
 
@@ -73,7 +73,7 @@ End Property
 ' @see Constructors
 '
 Public Property Get ObjectName() As String
-    ObjectName = mBase.GetValue(PROP_OBJECTNAME, "")
+    ObjectName = mBase.GetValue(PropObjectName, vbNullString)
 End Property
 
 ''
@@ -107,21 +107,17 @@ End Property
 ' @see Exception
 '
 Public Property Get HResult() As Long
-    HResult = mBase.HResult
+    HResult = COR_E_OBJECTDISPOSED
 End Property
 
 ''
-' Sets the HRESULT, a coded numerical value that is assigned to a specific exception.
+' Returns the VB error number associated with this exception instance.
 '
-' @param Value The value of the associated HResult.
-' @remarks An HResult is associated with an error result code. This allows for VB specific
-' error codes to be returned. This is the same as <b>Err.Number</b>.
-' @see Exception
+' @return A VB error that matches the number return by <b>Err.Number</b>.
 '
-Public Property Let HResult(ByVal Value As Long)
-    mBase.HResult = Value
+Public Property Get ErrorNumber() As Long
+    ErrorNumber = corInvalidProcedureCall
 End Property
-
 ''
 ' Gets a description of the source of the exception.
 '
@@ -157,7 +153,7 @@ End Property
 ' <p>This property can be set in the constructor <b>NewSystemException</b>.
 '
 Public Property Get Message() As String
-    Message = mBase.Message
+    Message = GetExceptionMessage(mBase, ObjectDisposed_Generic)
 End Property
 
 ''
@@ -225,36 +221,32 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef ObjectName As String, ByVal Message As String)
-    If Len(Message) = 0 Then
-        Message = DEF_MESSAGE
-    End If
-    Set mBase = Nothing
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, Nothing, DEF_HRESULT)
-    mBase.SetValue PROP_OBJECTNAME, ObjectName
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init DEF_OBJECTNAME, DEF_MESSAGE
+    Set mBase = Cor.NewExceptionBase(Me, App)
 End Sub
 
+Friend Sub Init(ByRef ObjectName As String, ByVal Message As String)
+    mBase.SetValue PropObjectName, ObjectName
+    mBase.Message = Message
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE, Nothing)
+    Set mBase = PropBag.ReadProperty(PropBase, Nothing)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty PropBase, mBase
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -269,9 +261,8 @@ Private Function IObject_ToString() As String
 End Function
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Exception Interface
+'   Exception
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Exception_Data() As IDictionary
     Set Exception_Data = Data
@@ -280,6 +271,10 @@ End Property
 Private Function Exception_Equals(Value As Variant) As Boolean
     Exception_Equals = Equals(Value)
 End Function
+
+Private Property Get Exception_ErrorNumber() As Long
+    Exception_ErrorNumber = ErrorNumber
+End Property
 
 Private Function Exception_GetBaseException() As Exception
     Set Exception_GetBaseException = GetBaseException
@@ -295,10 +290,6 @@ End Property
 
 Private Property Get Exception_HelpLink() As String
     Exception_HelpLink = HelpLink
-End Property
-
-Private Property Let Exception_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get Exception_HResult() As Long
@@ -327,7 +318,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   InvalidOperationException Interface
+'   InvalidOperationException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get InvalidOperationException_Data() As IDictionary
     Set InvalidOperationException_Data = Data
@@ -336,6 +327,10 @@ End Property
 Private Function InvalidOperationException_Equals(Value As Variant) As Boolean
     InvalidOperationException_Equals = Equals(Value)
 End Function
+
+Private Property Get InvalidOperationException_ErrorNumber() As Long
+    InvalidOperationException_ErrorNumber = ErrorNumber
+End Property
 
 Private Function InvalidOperationException_GetBaseException() As Exception
     Set InvalidOperationException_GetBaseException = GetBaseException
@@ -351,10 +346,6 @@ End Property
 
 Private Property Get InvalidOperationException_HelpLink() As String
     InvalidOperationException_HelpLink = HelpLink
-End Property
-
-Private Property Let InvalidOperationException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get InvalidOperationException_HResult() As Long
@@ -383,7 +374,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SystemException Interface
+'   SystemException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get SystemException_Data() As IDictionary
     Set SystemException_Data = Data
@@ -392,6 +383,10 @@ End Property
 Private Function SystemException_Equals(Value As Variant) As Boolean
     SystemException_Equals = Equals(Value)
 End Function
+
+Private Property Get SystemException_ErrorNumber() As Long
+    SystemException_ErrorNumber = ErrorNumber
+End Property
 
 Private Function SystemException_GetBaseException() As Exception
     Set SystemException_GetBaseException = GetBaseException
@@ -407,10 +402,6 @@ End Property
 
 Private Property Get SystemException_HelpLink() As String
     SystemException_HelpLink = HelpLink
-End Property
-
-Private Property Let SystemException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get SystemException_HResult() As Long

@@ -24,7 +24,7 @@ Public Sub Message_WithDefaultConstructor_ReturnsDefaultMessage()
     Dim Actual As String
     Actual = Ex.Message
     
-    Const Expected As String = "System Error."
+    Const Expected As String = "System error."
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
@@ -72,7 +72,7 @@ Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException(
     Assert.That Actual, Iz.SameAs(Inner1)
 End Sub
 
-Public Sub TestPersitence()
+Public Sub Serialization_WhenCalled_SerializesException()
     Const Message As String = "User Error."
     Dim Inner   As New Exception
     Dim Ex      As SystemException

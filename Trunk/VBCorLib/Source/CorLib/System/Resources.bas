@@ -27,12 +27,12 @@ Option Explicit
 Public Enum ResourceStringKey
     Exception_WasThrown = 101
     ArrayTypeMismatch_Incompatible = 102
-    ArrayTypeMismatch_Exception = 103
     ArrayTypeMismatch_Compare = 104
     Rank_MultiDimNotSupported = 105
     Rank_MustMatch = 106
     UnauthorizedAccess_IODenied_NoPathName = 107
     UnauthorizedAccess_IODenied_Path = 108
+    XMLSyntax_InvalidSyntax = 109
     
     Arg_PathIllegal = 200
     Arg_PathIllegalUNC = 201
@@ -44,10 +44,32 @@ Public Enum ResourceStringKey
     Arg_LongerThanSrcString = 207
     Arg_BitArrayTypeUnsupported = 208
     Arg_ArrayLengthsDiffer = 209
-    
+    Arg_ArgumentException = 210
+    Arg_ApplicationException = 211
+    Arg_ArithmeticException = 212
+    Arg_ArrayTypeMismatchException = 213
+    Arg_CryptographyException = 214
+    Arg_DirectoryNotFoundException = 215
+    Arg_IOException = 216
+    Arg_InvalidCastException = 217
+    Arg_IndexOutOfRangeException = 218
+    Arg_RankException = 219
+    Arg_DriveNotFoundException = 220
+    Arg_InvalidOperationException = 221
+    Arg_OutOfMemoryException = 222
+    Arg_FormatException = 223
+    Arg_NotSupportedException = 224
+    Arg_SerializationException = 225
+    Arg_PlatformNotSupported = 226
+    Arg_EndOfStreamException = 227
+    Arg_OverflowException = 228
+    Arg_UnauthorizedAccessException = 229
+    Arg_ExternalException = 230
+    Arg_ArgumentOutOfRangeException = 231
+    Arg_SystemException = 232
+
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
-    Argument_Exception = 802    '?
     Argument_ArrayRequired = 803
     Argument_MatchingBounds = 804 '?
     Argument_IndexPlusTypeSize = 805 '?

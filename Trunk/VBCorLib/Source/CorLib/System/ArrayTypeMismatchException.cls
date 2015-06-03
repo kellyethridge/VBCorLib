@@ -51,8 +51,7 @@ Implements IObject
 Implements Exception
 Implements SystemException
 
-Private Const PROP_BASE     As String = "Base"
-Private Const DEF_HRESULT   As Long = COR_E_ARRAYTYPEMISMATCH
+Private Const PropBase As String = "Base"
 
 Private mBase As ExceptionBase
 
@@ -99,19 +98,16 @@ End Property
 ' @see Exception
 '
 Public Property Get HResult() As Long
-    HResult = mBase.HResult
+    HResult = COR_E_ARRAYTYPEMISMATCH
 End Property
 
 ''
-' Sets the HRESULT, a coded numerical value that is assigned to a specific exception.
+' Returns the VB error number associated with this exception instance.
 '
-' @param Value The value of the associated HResult.
-' @remarks An HResult is associated with an error result code. This allows for VB specific
-' error codes to be returned. This is the same as <b>Err.Number</b>.
-' @see Exception
+' @return A VB error that matches the number return by <b>Err.Number</b>.
 '
-Public Property Let HResult(ByVal Value As Long)
-    mBase.HResult = Value
+Public Property Get ErrorNumber() As Long
+    ErrorNumber = corAutomationError
 End Property
 
 ''
@@ -149,7 +145,7 @@ End Property
 ' <p>This property can be set in the constructor <b>NewArgumentException</b>.
 '
 Public Property Get Message() As String
-    Message = mBase.Message
+    Message = GetExceptionMessage(mBase, Arg_ArrayTypeMismatchException)
 End Property
 
 ''
@@ -217,27 +213,27 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Message As String, ByVal InnerException As Exception)
-    Set mBase = Nothing
-    Set mBase = Cor.NewExceptionBase(Me, App.Title, Message, InnerException, DEF_HRESULT)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    Init Environment.GetResourceString(ArrayTypeMismatch_Exception), Nothing
+    Set mBase = Cor.NewExceptionBase(Me, App)
 End Sub
 
+Friend Sub Init(ByRef Message As String, ByVal InnerException As Exception)
+    mBase.Message = Message
+    Set mBase.InnerException = InnerException
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Set mBase = PropBag.ReadProperty(PROP_BASE, Nothing)
+    Set mBase = PropBag.ReadProperty(PropBase, Nothing)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty PROP_BASE, mBase
+    PropBag.WriteProperty PropBase, mBase
 End Sub
 
 
@@ -264,6 +260,10 @@ Private Property Get Exception_Data() As IDictionary
     Set Exception_Data = Data
 End Property
 
+Private Property Get Exception_ErrorNumber() As Long
+    Exception_ErrorNumber = ErrorNumber
+End Property
+
 Private Function Exception_Equals(Value As Variant) As Boolean
     Exception_Equals = Equals(Value)
 End Function
@@ -282,10 +282,6 @@ End Property
 
 Private Property Get Exception_HelpLink() As String
     Exception_HelpLink = HelpLink
-End Property
-
-Private Property Let Exception_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get Exception_HResult() As Long
@@ -324,6 +320,10 @@ Private Function SystemException_Equals(Value As Variant) As Boolean
     SystemException_Equals = Equals(Value)
 End Function
 
+Private Property Get SystemException_ErrorNumber() As Long
+    SystemException_ErrorNumber = ErrorNumber
+End Property
+
 Private Function SystemException_GetBaseException() As Exception
     Set SystemException_GetBaseException = GetBaseException
 End Function
@@ -338,10 +338,6 @@ End Property
 
 Private Property Get SystemException_HelpLink() As String
     SystemException_HelpLink = HelpLink
-End Property
-
-Private Property Let SystemException_HResult(ByVal Value As Long)
-    HResult = Value
 End Property
 
 Private Property Get SystemException_HResult() As Long

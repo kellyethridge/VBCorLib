@@ -98,9 +98,9 @@ End Function
 ' @return The fully created Exception object.
 ' @see Exception
 '
-Public Function NewException(ByRef Message As String, Optional ByVal InnerException As Exception) As Exception
+Public Function NewException(ByVal Message As String, Optional ByVal ErrorNumber As Long = corInvalidProcedureCall, Optional ByVal InnerException As Exception) As Exception
     Set NewException = New Exception
-    NewException.Init Message, InnerException
+    NewException.Init Message, ErrorNumber, InnerException
 End Function
 
 ''
@@ -217,9 +217,9 @@ End Function
 ' @return A fully created AgrumentOutOfRangeException object.
 ' @see ArgumentOutOfRangeException
 '
-Public Function NewArgumentOutOfRangeException(Optional ByVal ParamName As String, Optional ByVal ActualValue As Variant, Optional ByVal Message As String, Optional ByVal InnerException As Exception) As ArgumentOutOfRangeException
+Public Function NewArgumentOutOfRangeException(Optional ByRef ParamName As String, Optional ByRef ActualValue As Variant, Optional ByRef Message As String, Optional ByVal InnerException As Exception, Optional Method As InvocationMethod) As ArgumentOutOfRangeException
     Set NewArgumentOutOfRangeException = New ArgumentOutOfRangeException
-    NewArgumentOutOfRangeException.Init ParamName, ActualValue, Message, InnerException
+    NewArgumentOutOfRangeException.Init ParamName, ActualValue, Message, InnerException, Method
 End Function
 
 ''
@@ -467,12 +467,13 @@ End Function
 '
 ' @param Message A human-readable error message.
 ' @param HResult The underlying error code.
+' @param ErrorCode The VB error number.
 ' @param InnerException The exception that caused this exception.
 ' @return A new IOException object.
 '
-Public Function NewIOException(ByVal Message As String, Optional ByVal HResult As Long = COR_E_IO, Optional ByVal InnerException As Exception) As IOException
+Public Function NewIOException(ByRef Message As String, Optional ByVal HResult As Long = COR_E_IO, Optional ByVal ErrorCode As Long = corDeviceIOError, Optional ByVal InnerException As Exception) As IOException
     Set NewIOException = New IOException
-    Call NewIOException.Init(Message, HResult, InnerException)
+    NewIOException.Init Message, HResult, ErrorCode, InnerException
 End Function
 
 ''
@@ -1096,12 +1097,9 @@ End Function
 ' Creates a new base utility class that can be contained within an exception class.
 '
 ' @param Subclass The containing exception class that will contain this object instance.
-' @param AppTitle The title of the application that contains the exception class.
 ' @param Message An understandable message that describes the exception being thrown.
 ' @param InnerException The exception that caused the current exception to be thrown.
-' @param HResult The error code for the current exception.
-' @param Source A description of the source of the current exception.
-' @param HelpLink A file or URL link to a help resource.
+' @param AppObject The App object of the application that contains the exception class.
 ' @return A new base class used for default handling of exception routines.
 ' @remarks Most exception classes simply contain this information to be retrieved for
 ' viewing. Few exception classes have additional requirements. This class can be used
@@ -1114,9 +1112,9 @@ End Function
 ' <p>This class is persistable and will also attempt to persist the custom values that
 ' have been added to it. If the persistence fails, then an error will occur.</p>
 '
-Public Function NewExceptionBase(Optional ByVal Subclass As Object, Optional ByRef AppTitle As String, Optional ByRef Message As String, Optional ByVal InnerException As Exception, Optional ByVal HResult As Long = 5, Optional ByRef Source As String, Optional ByRef HelpLink As String) As ExceptionBase
+Public Function NewExceptionBase(ByVal Subclass As Exception, Optional ByVal AppObject As Object) As ExceptionBase
     Set NewExceptionBase = New ExceptionBase
-    NewExceptionBase.Init Subclass, AppTitle, Message, InnerException, HResult, Source, HelpLink
+    NewExceptionBase.Init Subclass, AppObject
 End Function
 
 ''

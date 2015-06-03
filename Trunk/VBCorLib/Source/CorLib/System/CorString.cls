@@ -138,7 +138,7 @@ End Function
 '
 Public Function FormatEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim SwappedArgs() As Variant
-    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
+    Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(20)
     FormatEx = FormatCore(Provider, FormatText, SwappedArgs)
 End Function
 

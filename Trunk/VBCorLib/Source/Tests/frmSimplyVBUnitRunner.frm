@@ -98,7 +98,7 @@ Private Sub AddSystem()
         .Add New ArgumentExceptionTests
         .Add New ArgumentNullExceptionTests
         .Add New ArgumentOutOfRangeTests
-        .Add New TestExceptionMethods
+        .Add New ExceptionMethodsTests
         .Add New InvalidCastExceptionTests
         .Add New CorStringTests
         .Add New CharTests
