@@ -109,20 +109,43 @@ Public Sub GetBaseException_WithMultipleInnerExceptions_ReturnsDeepestException(
     Assert.That Actual, Iz.SameAs(Inner1)
 End Sub
 
-Public Sub TestPersitence()
+Public Sub Serialization_WhenCalled_SerializesException()
     Const Message As String = "User Error."
     Dim Inner   As New Exception
     Dim Ex      As ArgumentOutOfRangeException
     Set Ex = Cor.NewArgumentOutOfRangeException("Param", 1, Message, Inner)
 
-    Dim Bag As New PropertyBag
-    Bag.WriteProperty "ex", Ex
     Dim Actual As ArgumentOutOfRangeException
-    Set Actual = Bag.ReadProperty("ex")
+    Set Actual = Persist(Ex)
 
     Assert.That Actual, Iz.Not.SameAs(Ex)
     Assert.That Actual.ParamName, Iz.EqualTo("Param")
     Assert.That Actual.ActualValue, Iz.EqualTo(1)
     Assert.That Actual.InnerException, Iz.Not.Nothing
     Assert.That Actual.Message, Iz.EqualTo(Message & vbCrLf & "Parameter name: Param" & vbCrLf & "Actual value was 1.")
+End Sub
+
+Public Sub CatchArgumentOutOfRange_WithArgumentOutOfRangeThrown_CatchesException()
+    On Error Resume Next
+    Dim Ex As New ArgumentOutOfRangeException
+    Throw Ex
+    
+    Dim Actual As Boolean
+    Dim ActualEx As ArgumentOutOfRangeException
+    Actual = CatchArgumentOutOfRange(ActualEx)
+    
+    Assert.That Actual, Iz.True
+    Assert.That ActualEx, Iz.SameAs(Ex)
+End Sub
+
+Public Sub CatchArgumentOutOfRange_WithNonArgumentOutOfRangeThrown_DoesNotCatch()
+    On Error Resume Next
+    Throw New SystemException
+    
+    Dim Actual As Boolean
+    Dim ActualEx As ArgumentOutOfRangeException
+    Actual = CatchArgumentOutOfRange(ActualEx)
+    
+    Assert.That Actual, Iz.False
+    Assert.That ActualEx, Iz.Nothing
 End Sub
