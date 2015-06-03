@@ -98,7 +98,7 @@ Public Sub Generate()
     Next de
     Call sb.AppendChar(0)
     
-    If API.WritePrivateProfileSection(mSection, sb.ToString, mFileName) = BOOL_FALSE Then IOError Err.LastDllError
+    If Api.WritePrivateProfileSection(mSection, sb.ToString, mFileName) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
 End Sub
 
 ''
@@ -149,8 +149,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

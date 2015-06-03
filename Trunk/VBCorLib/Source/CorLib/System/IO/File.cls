@@ -105,11 +105,11 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
         DllError = Err.LastDllError
         If DllError <> ERROR_FILE_EXISTS Then
             If Not File.Exists(SourceFileName) Then _
-                IOError ERROR_FILE_NOT_FOUND, SourceFileName
+                IOError.WinIOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
                 Throw Error.IO(IO_AlreadyExists_Name)
         End If
-        IOError DllError, SourceFileName
+        IOError.WinIOError DllError, SourceFileName
     End If
 End Sub
 
@@ -155,7 +155,7 @@ Public Sub Delete(ByRef Path As String)
         Dim Result As Long
         Result = Err.LastDllError
         If Result <> ERROR_FILE_NOT_FOUND Then
-            IOError Result, Path
+            IOError.WinIOError Result, Path
         End If
     End If
 End Sub
@@ -193,7 +193,7 @@ Public Function GetAttributes(ByRef Path As String) As FileAttributes
     
     GetAttributes = Api.GetFileAttributes(FullPath)
     If GetAttributes = INVALID_FILE_ATTRIBUTES Then
-        IOError Err.LastDllError, FullPath
+        IOError.WinIOError Err.LastDllError, FullPath
     End If
 End Function
 
@@ -282,10 +282,10 @@ Public Sub Move(ByRef SourceFileName As String, ByRef DestFileName As String)
     FullDest = Path.GetFullPath(DestFileName)
 
     If Not File.Exists(FullSource) Then _
-        IOError ERROR_FILE_NOT_FOUND, FullSource
+        IOError.WinIOError ERROR_FILE_NOT_FOUND, FullSource
     
     If MoveFileW(FullSource, FullDest) = BOOL_FALSE Then
-        IOError Err.LastDllError, FullDest
+        IOError.WinIOError Err.LastDllError, FullDest
     End If
 End Sub
 
@@ -352,7 +352,7 @@ Public Sub SetAttributes(ByRef Path As String, ByVal Attributes As FileAttribute
     FullPath = Statics.Path.GetFullPath(Path)
     
     If Api.SetFileAttributes(FullPath, Attributes) = BOOL_FALSE Then
-        IOError Err.LastDllError, FullPath
+        IOError.WinIOError Err.LastDllError, FullPath
     End If
 End Sub
 
@@ -615,13 +615,13 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     Dim FileHandle As Long
     FileHandle = Api.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_ATTRIBUTE_NORMAL, 0)
     If FileHandle = INVALID_HANDLE Then _
-        IOError Err.LastDllError, Path
+        IOError.WinIOError Err.LastDllError, Path
         
     If SetFileTime(FileHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr) = BOOL_FALSE Then
         Dim e As Long
         e = Err.LastDllError
         CloseHandle FileHandle
-        IOError e, Path
+        IOError.WinIOError e, Path
     End If
     
     CloseHandle FileHandle
@@ -634,7 +634,7 @@ Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUT
     Dim DllError As Long
     DllError = GetFileData(Path, Data)
     If DllError <> NO_ERROR Then
-        IOError DllError, Path
+        IOError.WinIOError DllError, Path
     End If
 End Sub
 

@@ -84,7 +84,7 @@ Public Property Get DriveFormat() As String
     Dim Buf As String
     
     Buf = String$(32, 0)
-    If GetVolumeInformation(mName, vbNullString, 0, ByVal 0&, 0, 0, Buf, Len(Buf)) = BOOL_FALSE Then IOError Err.LastDllError
+    If GetVolumeInformation(mName, vbNullString, 0, ByVal 0&, 0, 0, Buf, Len(Buf)) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     DriveFormat = SysAllocString(StrPtr(Buf))
 End Property
 
@@ -97,7 +97,7 @@ Public Property Get VolumeLabel() As String
     Dim Buf As String
     
     Buf = String$(32, 0)
-    If GetVolumeInformation(mName, Buf, Len(Buf), ByVal 0&, 0, 0, vbNullString, 0) = BOOL_FALSE Then IOError Err.LastDllError
+    If GetVolumeInformation(mName, Buf, Len(Buf), ByVal 0&, 0, 0, vbNullString, 0) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     VolumeLabel = SysAllocString(StrPtr(Buf))
 End Property
 
@@ -107,7 +107,7 @@ End Property
 ' @param RHS The new volume name.
 '
 Public Property Let VolumeLabel(ByVal RHS As String)
-    If SetVolumeLabel(mName, RHS) = BOOL_FALSE Then IOError Err.LastDllError
+    If SetVolumeLabel(mName, RHS) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
 End Property
 
 ''
@@ -134,7 +134,7 @@ End Property
 ' @return The serial number.
 '
 Public Property Get SerialNumber() As Long
-    If GetVolumeInformation(mName, vbNullString, 0, SerialNumber, 0, 0, vbNullString, 0) = BOOL_FALSE Then IOError Err.LastDllError
+    If GetVolumeInformation(mName, vbNullString, 0, SerialNumber, 0, 0, vbNullString, 0) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
 End Property
 
 ''
@@ -144,7 +144,7 @@ End Property
 ' @return The amount of free space available to the current account.
 '
 Public Property Get AvailableFreeSpace() As Currency
-    If GetDiskFreeSpaceEx(mName, AvailableFreeSpace, 0@, 0@) = BOOL_FALSE Then IOError Err.LastDllError
+    If GetDiskFreeSpaceEx(mName, AvailableFreeSpace, 0@, 0@) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     AvailableFreeSpace = 10000@ * AvailableFreeSpace
 End Property
 
@@ -154,7 +154,7 @@ End Property
 ' @return The amount of free space.
 '
 Public Property Get TotalFreeSpace() As Currency
-    If GetDiskFreeSpaceEx(mName, 0@, 0@, TotalFreeSpace) = BOOL_FALSE Then IOError Err.LastDllError
+    If GetDiskFreeSpaceEx(mName, 0@, 0@, TotalFreeSpace) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     TotalFreeSpace = 10000@ * TotalFreeSpace
 End Property
 
@@ -164,7 +164,7 @@ End Property
 ' @return The maximum storage amount.
 '
 Public Property Get TotalSize() As Currency
-    If GetDiskFreeSpaceEx(mName, 0@, TotalSize, 0@) = BOOL_FALSE Then IOError Err.LastDllError
+    If GetDiskFreeSpaceEx(mName, 0@, TotalSize, 0@) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
     TotalSize = 10000@ * TotalSize
 End Property
 
@@ -208,14 +208,14 @@ Private Sub SetName(ByVal Name As String)
     
     If Len(Name) = 1 Then Name = Name & ":\"
     
-    Dim Root As String
-    Select Case GetPathRootAndType(Name, Root)
+    Dim root As String
+    Select Case GetPathRootAndType(Name, root)
         Case PATHTYPE_SHARE
-            mName = Root & "\"
+            mName = root & "\"
         Case PATHTYPE_VOLUME
-            Select Case Asc(Root)
+            Select Case Asc(root)
                 Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
-                    mName = Root
+                    mName = root
                 Case Else
                     Throw Cor.NewArgumentException("Drive letters can only be letters a to z, or A to Z.", "Name")
             End Select
@@ -224,10 +224,10 @@ Private Sub SetName(ByVal Name As String)
     End Select
 End Sub
 
-Private Function GetPathRootAndType(ByRef sPath As String, ByRef Root As String) As Long
-    Root = Path.GetPathRoot(sPath)
-    If Len(Root) < 2 Then Exit Function
-    If Left$(Root, 2) = "\\" Then
+Private Function GetPathRootAndType(ByRef sPath As String, ByRef root As String) As Long
+    root = Path.GetPathRoot(sPath)
+    If Len(root) < 2 Then Exit Function
+    If Left$(root, 2) = "\\" Then
         GetPathRootAndType = PATHTYPE_SHARE
     Else
         GetPathRootAndType = PATHTYPE_VOLUME

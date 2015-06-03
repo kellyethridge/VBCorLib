@@ -327,7 +327,7 @@ Public Sub Refresh()
     
     Result = File.GetFileData(mPath, Data)
     If Result <> NO_ERROR Then
-        IOError Result, mPath
+        IOError.WinIOError Result, mPath
     End If
     
     With Data

@@ -283,7 +283,7 @@ Public Sub LockStream(ByVal Position As Currency, ByVal Length As Currency)
     AsCurr(pos) = CCur(0.0001@ * Position)
     With AsDLong(CCur(0.0001@ * Length))
         If LockFile(mHandle, pos.LoDWord, pos.HiDWord, .LoDWord, .HiDWord) = BOOL_FALSE Then
-            IOError Err.LastDllError
+            IOError.WinIOError Err.LastDllError
         End If
     End With
 End Sub
@@ -308,7 +308,9 @@ Public Sub UnlockStream(ByVal Position As Currency, ByVal Length As Currency)
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
     With AsDLong(CCur(0.0001@ * Length))
-        If UnlockFile(mHandle, pos.LoDWord, pos.HiDWord, .LoDWord, .HiDWord) = BOOL_FALSE Then IOError Err.LastDllError
+        If UnlockFile(mHandle, pos.LoDWord, pos.HiDWord, .LoDWord, .HiDWord) = BOOL_FALSE Then
+            IOError.WinIOError Err.LastDllError
+        End If
     End With
 End Sub
 
@@ -340,7 +342,7 @@ Public Property Get Length() As Currency
             Dim DllError As Long
             DllError = Err.LastDllError
             If DllError <> NO_ERROR Then
-                IOError DllError
+                IOError.WinIOError DllError
             End If
         End If
     End With
@@ -451,7 +453,7 @@ Public Sub SetLength(ByVal Value As Currency)
     
     InternalSeek Value, FromBeginning
     If SetEndOfFile(mHandle) = BOOL_FALSE Then
-        IOError Err.LastDllError
+        IOError.WinIOError Err.LastDllError
     End If
 End Sub
 
@@ -534,7 +536,7 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
         ' Read the rest of the requested amount of data from the file.
         If ReadFile(mHandle, Bytes(Offset + Available), Count - Available, Count, ByVal 0&) = BOOL_FALSE Then
             If mHandle <> ERROR_BROKEN_PIPE Then
-                IOError Err.LastDllError
+                IOError.WinIOError Err.LastDllError
             End If
         End If
         
@@ -685,7 +687,7 @@ Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count A
     If Count > mBufferSize Then
         Dim BytesWritten As Long
         If WriteFile(mHandle, Bytes(Offset), Count, BytesWritten, ByVal 0&) = BOOL_FALSE Then
-            IOError Err.LastDllError
+            IOError.WinIOError Err.LastDllError
         End If
         
         Count = BytesWritten
@@ -770,7 +772,7 @@ Public Sub Flush()
     Dim BytesWritten As Long
     If mWritePosition > 0 Then
         If WriteFile(mHandle, mBuffer(0), mWritePosition, BytesWritten, ByVal 0&) = BOOL_FALSE Then
-            IOError Err.LastDllError
+            IOError.WinIOError Err.LastDllError
         End If
         
         mWritePosition = 0
@@ -859,7 +861,7 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
     
     Set mHandle = Win32Native.SafeCreateFile(Path, Access, Share, Mode)
     If mHandle.IsInvalid Then
-        IOError Err.LastDllError, Path
+        IOError.WinIOError Err.LastDllError, Path
     End If
     
     mName = Statics.Path.GetFileName(Path)
@@ -935,7 +937,7 @@ Private Sub FillBuffer()
     
     If ReadFile(mHandle, mBuffer(0), mBufferSize, mBytesBuffered, ByVal 0&) = BOOL_FALSE Then
         If mHandle <> ERROR_BROKEN_PIPE Then
-            IOError Err.LastDllError
+            IOError.WinIOError Err.LastDllError
         End If
     End If
 End Sub
@@ -953,7 +955,7 @@ Private Function InternalSeek(ByVal Offset As Currency, ByVal Origin As SeekOrig
             Dim DllError As Long
             DllError = Err.LastDllError
             If DllError <> NO_ERROR Then
-                IOError DllError
+                IOError.WinIOError DllError
             End If
         End If
         InternalSeek = 10000@ * AsCurr(.LoDWord)

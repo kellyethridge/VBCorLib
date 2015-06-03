@@ -184,7 +184,7 @@ Private Function Stream_ReadBlock(Buffer() As Byte, ByVal Offset As Long, ByVal 
     If Not mCanRead Then _
         Throw Cor.NewNotSupportedException("Stream does not support reading")
     
-    If ReadFile(mHandle, Buffer(Offset), Count, Stream_ReadBlock, ByVal 0&) = BOOL_FALSE Then IOError Err.LastDllError
+    If ReadFile(mHandle, Buffer(Offset), Count, Stream_ReadBlock, ByVal 0&) = BOOL_FALSE Then Statics.Error.ApiError Err.LastDllError
 End Function
 
 Private Function Stream_ReadByte() As Long
@@ -225,7 +225,7 @@ Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Coun
     If Not mCanWrite Then _
         Throw Cor.NewNotSupportedException("The stream does not support writing.")
     
-    If WriteFile(mHandle, Buffer(Offset), Count, 0, ByVal 0&) = BOOL_FALSE Then IOError Err.LastDllError
+    If WriteFile(mHandle, Buffer(Offset), Count, 0, ByVal 0&) = BOOL_FALSE Then Statics.Error.ApiError Err.LastDllError
 End Sub
 
 Private Sub Stream_WriteByte(ByVal Value As Byte)

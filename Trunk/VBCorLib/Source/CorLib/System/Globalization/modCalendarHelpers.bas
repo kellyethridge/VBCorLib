@@ -79,6 +79,6 @@ End Function
 ' @return The numeric value from the calendar on the system.
 '
 Public Function GetCalendarLong(ByVal Cal As Long, ByVal CalType As Long) As Long
-    If GetCalendarInfo(LOCALE_USER_DEFAULT, Cal, CalType Or CAL_RETURN_NUMBER, vbNullString, 0, GetCalendarLong) = BOOL_FALSE Then IOError Err.LastDllError
+    If GetCalendarInfo(LOCALE_USER_DEFAULT, Cal, CalType Or CAL_RETURN_NUMBER, vbNullString, 0, GetCalendarLong) = BOOL_FALSE Then Error.ApiError Err.LastDllError
 End Function
 

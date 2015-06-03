@@ -361,7 +361,7 @@ Public Sub Refresh()
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
     Dim e As Long
     e = File.GetFileData(mFileName, Data)
-    If e <> NO_ERROR Then IOError e, mFileName
+    If e <> NO_ERROR Then IOError.WinIOError e, mFileName
     
     With Data
         mFileAttributes = .dwFileAttributes
