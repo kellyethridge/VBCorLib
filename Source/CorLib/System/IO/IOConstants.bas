@@ -24,10 +24,10 @@ Attribute VB_Name = "IOConstants"
 '
 Option Explicit
 
-Public Const vbPathSeparatorChar            As Integer = vbSemiColonChar
-Public Const vbVolumeSeparatorChar          As Integer = vbColonChar
-Public Const vbDirectorySeparatorChar       As Integer = vbBackslashChar
-Public Const vbAltDirectorySeparatorChar    As Integer = vbForwardSlashChar
+Public Const vbPathSeparatorChar            As Integer = corSemiColonChar
+Public Const vbVolumeSeparatorChar          As Integer = corColonChar
+Public Const vbDirectorySeparatorChar       As Integer = corBackslashChar
+Public Const vbAltDirectorySeparatorChar    As Integer = corForwardSlashChar
 Public Const vbDoubleDirectorySeparatorChar As Long = &H5C005C
 Public Const vbPathSeparator                As String = ";"
 Public Const vbVolumeSeparator              As String = ":"

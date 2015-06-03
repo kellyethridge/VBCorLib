@@ -43,7 +43,7 @@ Implements IObject
 Implements ICryptoTransform
 
 Private Const DEF_IGNOREWHITESPACES             As Boolean = True
-Private Const vbBase64TerminatorChar            As Long = vbEqualChar
+Private Const vbBase64TerminatorChar            As Long = corEqualChar
 
 
 ''
@@ -147,7 +147,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
                     Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
                     
                 b = Base64CharToBits(b)
-                If b = vbInvalidChar Then _
+                If b = corInvalidChar Then _
                     Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
                     
                 mBits = mBits Or b
@@ -272,8 +272,8 @@ Private Sub SmallBufferError(ByVal ParamName As String)
     Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), ParamName)
 End Sub
 
-Private Function CanProcessChar(ByVal ch As Long) As Boolean
-    If IsWhiteSpace(ch) Then
+Private Function CanProcessChar(ByVal Ch As Long) As Boolean
+    If IsWhiteSpace(Ch) Then
         If Not mIgnoreWhiteSpaces Then
             Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
         End If
@@ -282,8 +282,8 @@ Private Function CanProcessChar(ByVal ch As Long) As Boolean
     End If
 End Function
 
-Private Function IsWhiteSpace(ByVal ch As Long) As Boolean
-    Select Case ch
+Private Function IsWhiteSpace(ByVal Ch As Long) As Boolean
+    Select Case Ch
         Case &H20, &H9, &HA, &HB, &HC, &HD, &H85, &HA0: IsWhiteSpace = True
     End Select
 End Function
@@ -338,8 +338,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

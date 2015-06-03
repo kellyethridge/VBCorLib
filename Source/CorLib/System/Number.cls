@@ -93,7 +93,7 @@ Private Function ParseSpecifiers(ByRef Format As String, ByVal DefaultFormat As 
             Chars = AllocChars(Format)
             
             Select Case Chars(0)
-                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
+                Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
                     ParseSpecifiers.Format = Chars(0)
                     
                     Dim Precision   As Long
@@ -103,8 +103,8 @@ Private Function ParseSpecifiers(ByRef Format As String, ByVal DefaultFormat As 
                         Ch = Chars(i)
                         
                         Select Case Ch
-                            Case vbZeroChar To vbNineChar
-                                Precision = Precision * 10 + Ch - vbZeroChar
+                            Case corZeroChar To corNineChar
+                                Precision = Precision * 10 + Ch - corZeroChar
                             Case Else
                                 ParseSpecifiers.Format = UserDefinedSpecifier
                                 ParseSpecifiers.Precision = DefaultPrecision

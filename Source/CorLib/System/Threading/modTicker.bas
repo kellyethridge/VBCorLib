@@ -39,7 +39,7 @@ Public Function StartTicker(ByVal Source As Ticker) As Long
     NewId = SetTimer(vbNullPtr, vbNullPtr, Source.Interval, AddressOf TickerCallback)
     
     If NewId = 0 Then _
-        Error.ApiError Err.LastDllError
+        Error.Win32Error Err.LastDllError
     
     mTickers(NewId) = ObjPtr(CUnk(Source))
     StartTicker = NewId
@@ -47,7 +47,7 @@ End Function
 
 Public Sub StopTicker(ByVal TimerId As Long)
     If KillTimer(vbNullPtr, TimerId) = BOOL_FALSE Then
-        Error.ApiError Err.LastDllError
+        Error.Win32Error Err.LastDllError
     End If
         
     mTickers.Remove TimerId

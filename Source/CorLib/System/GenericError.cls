@@ -32,7 +32,7 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: ErrorHelper
+' Module: GenericError
 '
 Option Explicit
 
@@ -53,7 +53,7 @@ Friend Function Rank(Optional ByVal Key As ResourceStringKey = Rank_MultiDimNotS
 End Function
 
 Friend Function ObjectDisposed(Optional ByVal Key As ResourceStringKey = ObjectDisposed_Generic) As ObjectDisposedException
-    Set ObjectDisposed = Cor.NewObjectDisposedException("", Environment.GetResourceString(Key))
+    Set ObjectDisposed = Cor.NewObjectDisposedException(vbNullString, Environment.GetResourceString(Key))
 End Function
 
 Friend Function IndexOutOfRange(ByVal Key As ResourceStringKey) As IndexOutOfRangeException
@@ -72,7 +72,7 @@ Friend Function IO(ByVal Key As ResourceStringKey) As IOException
     Set IO = Cor.NewIOException(Environment.GetResourceString(Key))
 End Function
 
-Friend Sub ApiError(ByVal ErrorCode As Long)
+Friend Sub Win32Error(ByVal ErrorCode As Long)
     Dim Message As String
     Message = GetMessage(ErrorCode)
     Throw Cor.NewApplicationException(Message)

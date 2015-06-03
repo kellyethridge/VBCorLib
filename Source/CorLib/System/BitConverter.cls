@@ -345,7 +345,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
     Offset = 1
     Do While i < Range.Count
         If i > 0 Then
-            Chars(pos) = vbMinusChar
+            Chars(pos) = corMinusChar
             pos = pos + 1
         End If
         
@@ -355,7 +355,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
             If Nibble > 9 Then
                 Chars(pos + Offset) = Nibble + ALPHA_OFFSET
             Else
-                Chars(pos + Offset) = Nibble + vbZeroChar
+                Chars(pos + Offset) = Nibble + corZeroChar
             End If
             b = (b And &HF0&) \ &H10&
             Offset = 1 - Offset

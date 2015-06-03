@@ -77,7 +77,7 @@ Friend Function GetFullPathName() As Long
     
     If Length = 4 Then
         AppendSlash = mFinalBuffer(mPosition - 2) = vbDirectorySeparatorChar And _
-                      mFinalBuffer(mPosition - 1) = vbPeriodChar
+                      mFinalBuffer(mPosition - 1) = corPeriodChar
     End If
     
     NewLength = GetFullPathNameW(mFinalBuffer(0), mPosition + MAX_PATH, NewBuffer(0), ByVal vbNullPtr)
@@ -149,7 +149,7 @@ End Sub
 Private Sub InitExtendedPathLength()
     Append vbDirectorySeparatorChar
     Append vbDirectorySeparatorChar
-    Append vbQuestionMarkChar
+    Append corQuestionMarkChar
     Append vbDirectorySeparatorChar
     mPrefixSize = 4
 End Sub

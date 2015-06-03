@@ -86,7 +86,7 @@ Public Function OpenRemoteBaseKey(ByVal hKey As RegistryHive, ByVal MachineName 
     Dim NewKey As Long
     
     Result = RegConnectRegistry(MachineName, hKey, NewKey)
-    If Result <> ERROR_SUCCESS Then Error.ApiError Result
+    If Result <> ERROR_SUCCESS Then Error.Win32Error Result
     
     Set OpenRemoteBaseKey = Cor.NewRegistryKey(NewKey, GetRootName(NewKey), True)
 End Function
