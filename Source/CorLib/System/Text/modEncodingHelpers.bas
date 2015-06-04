@@ -72,7 +72,7 @@ Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, B
             SAPtr(Chars) = VarPtr(CharsSA)
             AttachChars = Len(Source)
             
-        Case vbIntegerArray
+        Case corIntegerArray
             Dim CharPtr As Long
             CharPtr = CorArray.ArrayPointer(Source)
             If CharPtr = vbNullPtr Then _

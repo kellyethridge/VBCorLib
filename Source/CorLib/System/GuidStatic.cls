@@ -154,7 +154,7 @@ End Function
 '
 Public Function FromMemory(ByVal lpGuid As Long) As Guid
     Dim b(15) As Byte
-    Call CopyMemory(b(0), ByVal lpGuid, SizeOfGuid)
+    Call CopyMemory(b(0), ByVal lpGuid, corSizeOfGuid)
     Set FromMemory = FromByteArray(b)
 End Function
 

@@ -421,19 +421,14 @@ Public Sub SetCurrentDirectory(ByRef Path As String)
     If Len(Path) = 0 Then _
         Throw Error.Argument(Argument_EmptyPath, "Path")
     
-'    Statics.Path.VerifyPath Path
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
 
-'    If Not Exists(Path) Then _
-'        Throw New DirectoryNotFoundException
-    
-'    If Api.SetCurrentDirectory(Path) = BOOL_FALSE Then IOError Err.LastDllError, Path
     If Not Win32Native.SetCurrentDirectory(FullPath) Then
         Dim ErrorCode As Long
         ErrorCode = Err.LastDllError
-        If ErrorCode = Win32Native.ERROR_FILE_NOT_FOUND Then
-            ErrorCode = Win32Native.ERROR_PATH_NOT_FOUND
+        If ErrorCode = ERROR_FILE_NOT_FOUND Then
+            ErrorCode = ERROR_PATH_NOT_FOUND
         End If
         IOError.WinIOError ErrorCode, FullPath
     End If

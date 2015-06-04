@@ -268,31 +268,31 @@ Private Sub WriteByte(ByVal Value As Byte)
 End Sub
 
 Private Sub WriteInt32(ByVal Value As Long)
-    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, SizeOfLong
+    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, corSizeOfLong
 End Sub
 
 Private Sub WriteInt16(ByVal Value As Integer)
-    mOutStream.WriteBlock AsDByteArr(Value).Bytes, 0, SizeOfInteger
+    mOutStream.WriteBlock AsDByteArr(Value).Bytes, 0, corSizeOfInteger
 End Sub
 
 Private Sub WriteSingle(ByVal Value As Single)
-    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, SizeOfSingle
+    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, corSizeOfSingle
 End Sub
 
 Private Sub WriteDouble(ByVal Value As Double)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, SizeOfDouble
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, corSizeOfDouble
 End Sub
 
 Private Sub WriteDate(ByVal Value As Date)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, SizeOfDate
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, corSizeOfDate
 End Sub
 
 Private Sub WriteCurrency(ByVal Value As Currency)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, SizeOfCurrency
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, corSizeOfCurrency
 End Sub
 
 Private Sub WriteDecimal(ByRef Value As Variant)
-    mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, SizeOfDecimal
+    mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, corSizeOfDecimal
 End Sub
 
 Private Sub WriteString(ByRef Value As String)
@@ -304,10 +304,10 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
     Validation.CheckValidSingleDimArray Value, Parameter_Value
     
     Select Case VarType(Value)
-        Case vbByteArray
+        Case corByteArray
             WriteBytes Value, Index, Count
         
-        Case vbIntegerArray
+        Case corIntegerArray
             WriteBytes mEncoding.GetBytes(Value, Index, Count)
             
         Case Else

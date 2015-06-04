@@ -91,7 +91,7 @@ Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Var
     Call VerifyNotDisposed
     
     Select Case VarType(Source)
-        Case vbByteArray:   Call ComputeHashOnBytes(Source, Index, Count)
+        Case corByteArray:   Call ComputeHashOnBytes(Source, Index, Count)
         Case vbObject:      Call ComputeHashOnStream(Source)
         Case Else:          Throw Cor.NewArgumentException("Invalid source. Must be a byte array or Stream object.", "Source")
     End Select

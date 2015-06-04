@@ -160,7 +160,7 @@ End Function
 '
 ' @return The next byte in the stream.
 Public Function ReadByte() As Byte
-    FillBuffer SizeOfByte
+    FillBuffer corSizeOfByte
     ReadByte = mBuffer(0)
 End Function
 
@@ -260,7 +260,7 @@ End Function
 ' @return A Long datatype read from the stream.
 '
 Public Function ReadInt32() As Long
-    FillBuffer SizeOfLong
+    FillBuffer corSizeOfLong
     ReadInt32 = AsLong(mBuffer(0))
 End Function
 
@@ -270,7 +270,7 @@ End Function
 ' @return An Integer datatype read from the stream.
 '
 Public Function ReadInt16() As Integer
-    FillBuffer SizeOfInteger
+    FillBuffer corSizeOfInteger
     ReadInt16 = AsWord(mBuffer(0))
 End Function
 
@@ -280,7 +280,7 @@ End Function
 ' @return A Double datatype read from the stream.
 '
 Public Function ReadDouble() As Double
-    FillBuffer SizeOfDouble
+    FillBuffer corSizeOfDouble
     ReadDouble = AsDouble(mBuffer(0))
 End Function
 
@@ -307,7 +307,7 @@ End Function
 ' @return A Currency datatype.
 '
 Public Function ReadCurrency() As Currency
-    FillBuffer SizeOfCurrency
+    FillBuffer corSizeOfCurrency
     ReadCurrency = AsCurr(mBuffer(0))
 End Function
 
@@ -317,7 +317,7 @@ End Function
 ' @return A Single datatype.
 '
 Public Function ReadSingle() As Single
-    FillBuffer SizeOfSingle
+    FillBuffer corSizeOfSingle
     ReadSingle = AsSingle(mBuffer(0))
 End Function
 
@@ -345,7 +345,7 @@ End Function
 ' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
 '
 Public Function ReadDecimal() As Variant
-    FillBuffer SizeOfDecimal
+    FillBuffer corSizeOfDecimal
     ReadDecimal = BitConverter.ToDecimal(mBuffer, 0)
 End Function
 
@@ -469,9 +469,9 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
         Throw Error.Argument(Argument_InvalidOffLen)
     
     Select Case VarType(Buffer)
-        Case vbByteArray
+        Case corByteArray
             ReadToBuffer = ReadToByteBuffer(BufferPtr, Range)
-        Case vbIntegerArray
+        Case corIntegerArray
             ReadToBuffer = ReadToCharBuffer(BufferPtr, Range)
         Case Else
             Throw Error.Argument(Argument_UnsupportedArray, "Buffer")

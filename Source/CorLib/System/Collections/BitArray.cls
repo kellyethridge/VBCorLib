@@ -122,18 +122,18 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
         Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     
     Select Case VarType(Arr)
-        Case vbLongArray
+        Case corLongArray
             CorArray.CopyEx mBits, 0, Arr, Index, (mLength + 31) \ BitsPerLong
             MaskOffLastElement Arr, Index, BitsPerLong
             
-        Case vbByteArray
+        Case corByteArray
             If (Index + (mLength + 7) \ BitsPerByte) - 1 > UBound(Arr) Then _
                 Throw Error.Argument(Argument_InvalidOffLen)
             
             Buffer.BlockCopy mBits, 0, Arr, Index - LBound(Arr), (mLength + 7) \ BitsPerByte
             MaskOffLastElement Arr, Index, BitsPerByte
             
-        Case vbBooleanArray
+        Case corBooleanArray
             If CorArray.LengthFirstDim(Arr) < mLength Then _
                 Throw Error.Argument(Argument_InvalidOffLen)
             

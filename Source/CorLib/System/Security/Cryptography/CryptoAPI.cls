@@ -54,6 +54,13 @@ Private Type SIMPLEBLOB512
     EncryptedKey(0 To 63)   As Byte
 End Type
 
+Private Type PROV_ENUMALGS
+    aiAlgid     As Long
+    dwBitLen    As Long
+    dwNameLen   As Long
+    szName      As String * 20
+End Type
+
 Private mRSAProviderName    As String
 Private mDSAProviderName    As String
 Private mHasHighEncryption  As Boolean
@@ -210,7 +217,7 @@ End Function
 
 Friend Sub SetKeyParam(ByVal Key As Long, ByVal Param As Long, ByRef Value As Variant, Optional ByVal Flags As Long)
     Select Case VarType(Value)
-        Case vbByteArray
+        Case corByteArray
             Dim bPtr As Long
             bPtr = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET)
             If CryptSetKeyParam(Key, Param, ByVal bPtr, Flags) = BOOL_FALSE Then Call CryptoError

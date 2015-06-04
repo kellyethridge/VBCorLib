@@ -40,7 +40,7 @@ End Type
 '
 Public Function OptionalLong(ByRef Value As Variant, ByVal Default As Long) As Long
     Select Case VarType(Value)
-        Case vbMissing
+        Case corMissing
             OptionalLong = Default
         Case vbLong, vbInteger, vbByte
             OptionalLong = Value

@@ -184,7 +184,7 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     Select Case VarType(Chars)
         Case vbString
             GetByteCount = GetByteCountString(Chars)
-        Case vbIntegerArray
+        Case corIntegerArray
             GetByteCount = GetByteCountChars(Chars, Index, Count)
         Case Else
             Throw Error.Argument(Argument_ArrayRequired, "Chars")

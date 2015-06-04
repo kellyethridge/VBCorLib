@@ -212,7 +212,7 @@ Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByV
     
     If IsMissing(Key) Then
         mKey = CryptoHelper.GetRandomBytes(mKeySize)
-    ElseIf VarType(Key) <> vbByteArray Then
+    ElseIf VarType(Key) <> corByteArray Then
         Throw Cor.NewArgumentException("Key must be a Byte array.", "Key")
     ElseIf CorArray.IsNull(Key) Then
         Throw Cor.NewArgumentNullException("Key")
