@@ -33,14 +33,14 @@ Attribute VB_Exposed = False
 '
 
 Option Explicit
-Private Const MillisecondsPerSecond       As Long = 1000
-Private Const SecondsPerMinute            As Long = 60
-Private Const MinutesPerHour              As Long = 60
-Private Const HoursPerDay                 As Long = 24
+Private Const corMillisecondsPerSecond       As Long = 1000
+Private Const corSecondsPerMinute            As Long = 60
+Private Const corMinutesPerHour              As Long = 60
+Private Const corHoursPerDay                 As Long = 24
 
-Private Const MillisecondsPerMinute       As Long = MillisecondsPerSecond * SecondsPerMinute
-Private Const MillisecondsPerHour         As Long = MillisecondsPerMinute * MinutesPerHour
-Private Const MillisecondsPerDay          As Currency = MillisecondsPerHour * HoursPerDay
+Private Const corMillisecondsPerMinute       As Long = corMillisecondsPerSecond * corSecondsPerMinute
+Private Const corMillisecondsPerHour         As Long = corMillisecondsPerMinute * corMinutesPerHour
+Private Const corMillisecondsPerDay          As Currency = corMillisecondsPerHour * corHoursPerDay
 
 Public Enum ParseError
     None
@@ -84,7 +84,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
             If Not TryParseNumber(MaxDays, DaysParsed) Then
                 Exit Function
             End If
-            Result = Result + DaysParsed * MillisecondsPerDay
+            Result = Result + DaysParsed * corMillisecondsPerDay
             
             If Char = corPeriodChar Then
                 NextChar
@@ -177,7 +177,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
         Exit Function
     End If
     
-    Result = HoursParsed * MillisecondsPerHour
+    Result = HoursParsed * corMillisecondsPerHour
     
     ' when parsing time we require at least hours and minutes.
     If Char <> corColonChar Then
@@ -193,7 +193,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
         Exit Function
     End If
     
-    Result = Result + MinutesParsed * MillisecondsPerMinute
+    Result = Result + MinutesParsed * corMillisecondsPerMinute
     
     ' check for possible seconds
     If Char = corColonChar Then
@@ -209,7 +209,7 @@ Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean
                 Exit Function
             End If
             
-            Result = Result + SecondsParsed * MillisecondsPerSecond
+            Result = Result + SecondsParsed * corMillisecondsPerSecond
         End If
         
         If Char = corPeriodChar Then

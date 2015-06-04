@@ -227,7 +227,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Value As Variant)
     Select Case VariantType(Value)
-        Case vbByteArray
+        Case corByteArray
             FromByteArray Value
         
         Case vbString

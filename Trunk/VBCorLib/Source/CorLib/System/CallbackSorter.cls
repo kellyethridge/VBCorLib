@@ -86,7 +86,7 @@ Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Lon
             Call SortInt128(Left, Right)
         Case Else
             With mKeyItems
-                Call CopyMemory(.SA, ByVal pSAKeys, SizeOfSafeArray1d)
+                Call CopyMemory(.SA, ByVal pSAKeys, corSizeOfSafeArray1d)
                 mElemSize = .SA.cbElements
                 mPivotBuffer = CoTaskMemAlloc(mElemSize)
                 .Buffer = CoTaskMemAlloc(mElemSize)
@@ -104,7 +104,7 @@ Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Lon
 End Sub
 
 Private Sub InitSortItems(ByVal pSA As Long)
-    Call CopyMemory(mSortItems.SA, ByVal pSA, SizeOfSafeArray1d)
+    Call CopyMemory(mSortItems.SA, ByVal pSA, corSizeOfSafeArray1d)
     Select Case mSortItems.SA.cbElements
         Case 1, 2, 4, 8, 16
         Case Else: mSortItems.Buffer = CoTaskMemAlloc(mSortItems.SA.cbElements)

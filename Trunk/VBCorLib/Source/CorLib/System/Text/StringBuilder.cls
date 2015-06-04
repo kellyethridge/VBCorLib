@@ -87,7 +87,7 @@ Private mChars      As WordBuffer
 '
 Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     Select Case VarType(Value)
-        Case vbIntegerArray
+        Case corIntegerArray
             AppendCharsValue Value, StartIndex, Count
             
         Case vbString

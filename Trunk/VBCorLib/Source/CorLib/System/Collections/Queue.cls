@@ -300,13 +300,13 @@ Private Sub NormalizeArray(ByVal NewCapacity As Long)
     Else
         ReDim NewItems(0 To NewCapacity - 1)
         If mHead < mTail Then
-            CopyMemory NewItems(0), mItems(mHead), (mTail - mHead) * SizeOfVariant
+            CopyMemory NewItems(0), mItems(mHead), (mTail - mHead) * corSizeOfVariant
         Else
-            CopyMemory NewItems(0), mItems(mHead), (mCapacity - mHead) * SizeOfVariant
-            CopyMemory NewItems(mCapacity - mHead), mItems(0), mHead * SizeOfVariant
+            CopyMemory NewItems(0), mItems(mHead), (mCapacity - mHead) * corSizeOfVariant
+            CopyMemory NewItems(mCapacity - mHead), mItems(0), mHead * corSizeOfVariant
         End If
         
-        ZeroMemory mItems(0), mCapacity * SizeOfVariant
+        ZeroMemory mItems(0), mCapacity * corSizeOfVariant
         Helper.Swap4 ByVal ArrPtr(mItems), ByVal ArrPtr(NewItems)
     End If
     mTail = mCount

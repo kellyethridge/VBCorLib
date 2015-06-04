@@ -193,13 +193,13 @@ Friend Sub Init(ByRef Password As Variant, ByRef Salt As Variant, ByVal Iteratio
     
     Select Case VarType(Password)
         Case vbString:      mPRF.Key = Encoding.UTF8.GetBytes(Password)
-        Case vbByteArray:   mPRF.Key = Password
+        Case corByteArray:   mPRF.Key = Password
         Case Else
             Throw Cor.NewArgumentException("Password must be a byte array or string", "Password")
     End Select
 
     Select Case VarType(Salt)
-        Case vbByteArray:               Me.Salt = Salt
+        Case corByteArray:               Me.Salt = Salt
         Case vbLong, vbInteger, vbByte: Me.Salt = CryptoHelper.GetRandomBytes(Salt)
         Case Else
             Throw Cor.NewArgumentException("Salt must be a byte array or a number.", "Salt")

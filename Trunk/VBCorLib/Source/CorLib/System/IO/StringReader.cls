@@ -118,7 +118,7 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
         Count = mLength - mPosition
     End If
     
-    CopyMemory Buffer(Index), mStringBuffer.Chars(mPosition), Count * SizeOfChar
+    CopyMemory Buffer(Index), mStringBuffer.Chars(mPosition), Count * corSizeOfChar
     ReadBlock = Count
 End Function
 

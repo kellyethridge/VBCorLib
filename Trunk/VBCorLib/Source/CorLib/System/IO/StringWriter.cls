@@ -267,8 +267,8 @@ Private Sub WriteLineCore(ByRef Args() As Variant)
         s = Object.ToString(Args(0), Provider:=FormatProvider)
         
         If ub > 0 Then
-            CopyMemory Args(0), Args(1), (ub - LBound(Args)) * SizeOfVariant
-            ZeroMemory Args(ub), SizeOfVariant
+            CopyMemory Args(0), Args(1), (ub - LBound(Args)) * corSizeOfVariant
+            ZeroMemory Args(ub), corSizeOfVariant
             mSB.InternalAppendFormat FormatProvider, s, Args
         Else
             mSB.AppendString s

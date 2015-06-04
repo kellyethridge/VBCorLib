@@ -264,9 +264,7 @@ library VBCorType {
     //
     // Interfaces
     //
-    [
-        uuid(0000000C-0000-0000-C000-000000000046), odl
-    ]
+    [uuid(0000000C-0000-0000-C000-000000000046), odl]
     interface IStream : IUnknown
     {
         HRESULT Read([in] void * pv, [in] long cb, [in] long * pcbRead);
@@ -290,9 +288,7 @@ library VBCorType {
         long Release();
     }
 
-    [
-        uuid(55A2F2D0-8919-11D0-818F-00A0C90FFFC3), odl
-    ]
+    [uuid(55A2F2D0-8919-11D0-818F-00A0C90FFFC3), odl]
     interface IRecordInfo : IUnknown
     {
         HRESULT RecordInit([in] long pvNew);
@@ -313,9 +309,7 @@ library VBCorType {
         HRESULT RecordDestroy([in] long pvRecord);
     }
 
-    [
-        uuid(CA5F4EEF-6976-4E85-AD58-A71658C7767A), odl
-    ]
+    [uuid(CA5F4EEF-6976-4E85-AD58-A71658C7767A), odl]
     interface IHelper : IUnknown
     {
         void Swap4([in] void * x, [in] void * y);
@@ -374,85 +368,61 @@ library VBCorType {
         boolean Invoke([in] void * Arg1, [in] void * Arg2);
     }
 
-
-
-
-
-    [
-        uuid(DECA6F21-BD22-4303-BC15-E45636505044), odl
-    ]
+    [uuid(DECA6F21-BD22-4303-BC15-E45636505044), odl]
     interface IOneArgReturnBool : IUnknown
     {
         boolean Call([in] long Arg);  // obsolete
     }
 
-    [
-        uuid(B9DC947B-5BE0-4572-873C-C08E891FAF71), odl
-    ]
+    [uuid(B9DC947B-5BE0-4572-873C-C08E891FAF71), odl]
     interface IOneArgReturnVoid : IUnknown
     {
         void Call([in] long lpArg); // obsolete
     }
 
-    [
-        uuid(C7F4D1EC-F31E-4058-9DBE-647DF9EBC9BE), odl
-    ]
+    [uuid(C7F4D1EC-F31E-4058-9DBE-647DF9EBC9BE), odl]
     interface IOneRefReturnLong : IUnknown
     {
         long Call([in] void * Arg); // obsolete
     }
 
-    [
-        uuid(B196B283-BAB4-101A-B69C-00AA00341D07), odl
-    ]
+    [uuid(B196B283-BAB4-101A-B69C-00AA00341D07), odl]
     interface IProvideClassInfo :IVBUnknown
     {
         long GetClassInfo([in] long * ppTI);
     }
 
-    [
-        uuid(40A8C97E-FD06-4dd0-8039-0D13B5A80ED8), odl
-    ]
+    [uuid(40A8C97E-FD06-4dd0-8039-0D13B5A80ED8), odl]
     interface ISortRoutine : IUnknown
     {
         void Call([in] long * pSA, [in] long Left, [in] long Right);
     }
 
-    [
-        uuid(30C64962-0541-4ee6-8EC7-5EFA3C808ED0), odl
-    ]
+    [uuid(30C64962-0541-4ee6-8EC7-5EFA3C808ED0), odl]
     interface ITwoArgReturnLong : IUnknown
     {
         long Call([in] long x, [in] long y);    // obsolete
     }
 
-    [
-        uuid(3A7A8F77-A63D-4fbd-81E4-2EC6020F0F75), odl
-    ]
+    [uuid(3A7A8F77-A63D-4fbd-81E4-2EC6020F0F75), odl]
     interface ITwoArgReturnVoid : IUnknown
     {
         void Call([in] long x, [in] long y); // Obsolete
     }
 
-    [
-        uuid(821C2117-3C0E-4245-AACB-6D468A3A0787), odl
-    ]
+    [uuid(821C2117-3C0E-4245-AACB-6D468A3A0787), odl]
     interface ITwoRefReturnBool : IUnknown
     {
         boolean Call([in] void * x, [in] void * y);  // obsolete
     }
 
-    [
-        uuid(F6811C30-06B4-47a4-9217-BDD97FBF9C75), odl
-    ]
+    [uuid(F6811C30-06B4-47a4-9217-BDD97FBF9C75), odl]
     interface ITwoRefReturnLong : IUnknown
     {
         long Call([in] void * x, [in] void * y);   // obsolete
     }
 
-    [
-        uuid(6F2AB419-A80B-4129-B9C2-E81C528AE3E2), odl
-    ]
+    [uuid(6F2AB419-A80B-4129-B9C2-E81C528AE3E2), odl]
     interface ITwoArgReturnBool : IUnknown
     {
         boolean Call([in] long x, [in] long y);   // obsolete
@@ -464,6 +434,8 @@ library VBCorType {
 
     [dllname("Win32Constants")]
     module Win32Constants {
+        const long PAGE_EXECUTE_READWRITE = 0x40;
+        
         const long MAX_PATH_A           = 0x00000104;
         const long MAX_PATH_W           = 0x00007FFF;
         
@@ -475,120 +447,375 @@ library VBCorType {
         const long TIME_ZONE_ID_INVALID     = 0xFFFFFFFF;
         const long TIME_ZONE_ID_STANDARD    = 0x00000001;
         const long TIME_ZONE_ID_UNKNOWN     = 0x00000000;
-        
-        const long FADF_AUTO            = 0x00000001;
-        const long FADF_BSTR            = 0x00000100;
-        const long FADF_DISPATCH        = 0x00000400;
-        const long FADF_EMBEDDED        = 0x00000004;
-        const long FADF_FIXEDSIZE       = 0x00000010;
-        const long FADF_HAVEIID         = 0x00000040;
-        const long FADF_HAVEVARTYPE     = 0x00000080;
-        const long FADF_RECORD          = 0x00000020;
-        const long FADF_STATIC          = 0x00000002;
-        const long FADF_UNKNOWN         = 0x00000200;
-        const long FADF_VARIANT         = 0x00000800;
-        
+                
         const long E_FAIL           = 0x80004005;
         const long E_NOINTERFACE    = 0x80004002;
         const long S_OK             = 0x00000000;
+
+        const long MAX_PATH                   = 260;
+        const long MAX_DIR                    = 255;
+        const long MAX_LONG_PATH              = 32000;
+
+        const long FILE_FLAG_OVERLAPPED       = 0x40000000;
+        const long FILE_ATTRIBUTE_NORMAL      = 0x80;
+        const long INVALID_HANDLE_VALUE       = -1;
+        const long FILE_TYPE_DISK             = 0x1;
+        const long FILE_ATTRIBUTE_DIRECTORY   = 0x10;
+        const long INVALID_FILE_ATTRIBUTES    = -1;
+        const long INVALID_SET_FILE_POINTER   = -1;
+        const long INVALID_FILE_SIZE          = -1;
+        const long ERROR_BROKEN_PIPE          = 109;
+
+        const long GENERIC_READ               = 0x80000000;
+        const long GENERIC_WRITE              = 0x40000000;
+        const long OPEN_EXISTING              = 3;
+        const long PAGE_READONLY              = 0x2;
+        const long PAGE_READWRITE             = 0x4;
+        const long PAGE_WRITECOPY             = 0x8;
+        const long INVALID_HANDLE             = -1;
+        const long FILE_SHARE_READ            = 1;
+        const long FILE_SHARE_WRITE           = 2;
+        const long STANDARD_RIGHTS_REQUIRED   = 0xF0000;
+        const long SECTION_QUERY              = 0x1;
+        const long SECTION_MAP_WRITE          = 0x2;
+        const long SECTION_MAP_READ           = 0x4;
+        const long SECTION_MAP_EXECUTE        = 0x8;
+        const long SECTION_EXTEND_SIZE        = 0x10;
+        const long SECTION_ALL_ACCESS         = 983071;   // STANDARD_RIGHTS_REQUIRED Or SECTION_QUERY Or SECTION_MAP_WRITE Or SECTION_MAP_READ Or SECTION_MAP_EXECUTE Or SECTION_EXTEND_SIZE
+        const long FILE_MAP_READ              = 0x4;      // SECTION_MAP_READ
+        const long FILE_MAP_ALL_ACCESS        = 983071;   // SECTION_ALL_ACCESS
+        const long NULL_HANDLE                = 0;
+
+        const long NO_ERROR                   = 0x0;
+        const long ERROR_PATH_NOT_FOUND       = 0x3;
+        const long ERROR_ACCESS_DENIED        = 0x5;
+        const long ERROR_FILE_NOT_FOUND       = 0x2;
+        const long ERROR_INVALID_DRIVE        = 0xF;
+        const long ERROR_SHARING_VIOLATION    = 0x20;
+        const long ERROR_FILE_EXISTS          = 0x50;
+        const long ERROR_INVALID_PARAMETER    = 0x57;
+        const long ERROR_INSUFFICIENT_BUFFER  = 0x7A;
+        const long ERROR_ALREADY_EXISTS       = 0xB7;
+        const long ERROR_FILENAME_EXCED_RANGE = 0xCE;
+
+        const long LOCALE_USER_DEFAULT            = 0x400;
+
+        const long CAL_ITWODIGITYEARMAX           = 0x30;
+        const long CAL_GREGORIAN                  = 1;
+        const long CAL_HEBREW                     = 8;
+        const long CAL_HIJRI                      = 6;
+        const long CAL_JAPAN                      = 3;
+        const long CAL_KOREA                      = 5;
+        const long CAL_THAI                       = 7;
+        const long CAL_TAIWAN                     = 4;
+        const long CAL_RETURN_NUMBER              = 0x20000000;
+
+        const long LCID_INSTALLED                 = 0x1;
+        const long LCID_SUPPORTED                 = 0x2;
+        const long INVARIANT_LCID                 = 127;
+             
+        const long ILCID                          = 0;
+        const long IPARENTLCID                    = 1;
+        const long ICALENDARTYPE                  = 2;
+        const long IFIRSTWEEKOFYEAR               = 3;
+        const long IFIRSTDAYOFWEEK                = 4;
+        const long ICURRENCYDECIMALDIGITS         = 5;
+        const long ICURRENCYNEGATIVEPATTERN       = 6;
+        const long ICURRENCYPOSITIVEPATTERN       = 7;
+        const long INUMBERDECIMALDIGITS           = 8;
+        const long INUMBERNEGATIVEPATTERN         = 9;
+        const long IPERCENTDECIMALDIGITS          = 10;
+        const long IPERCENTNEGATIVEPATTERN        = 11;
+        const long IPERCENTPOSITIVEPATTERN        = 12;
+
+        const long SENGLISHNAME                   = 0;
+        const long SDISPLAYNAME                   = 1;
+        const long SNAME                          = 2;
+        const long SNATIVENAME                    = 3;
+        const long STHREELETTERISOLANGUAGENAME    = 4;
+        const long STWOLETTERISOLANGUAGENAME      = 5;
+        const long STHREELETTERWINDOWSLANGUAGENAME = 6;
+        const long SOPTIONALCALENDARS             = 7;
+        const long SABBREVIATEDDAYNAMES           = 8;
+        const long SABBREVIATEDMONTHNAMES         = 9;
+        const long SAMDESIGNATOR                  = 10;
+        const long SDATESEPARATOR                 = 11;
+        const long SDAYNAMES                      = 12;
+        const long SLONGDATEPATTERN               = 13;
+        const long SLONGTIMEPATTERN               = 14;
+        const long SMONTHDAYPATTERN               = 15;
+        const long SMONTHNAMES                    = 16;
+        const long SPMDESIGNATOR                  = 17;
+        const long SSHORTDATEPATTERN              = 18;
+        const long SSHORTTIMEPATTERN              = 19;
+        const long STIMESEPARATOR                 = 20;
+        const long SYEARMONTHPATTERN              = 21;
+        const long SALLLONGDATEPATTERNS           = 22;
+        const long SALLSHORTDATEPATTERNS          = 23;
+        const long SALLLONGTIMEPATTERNS           = 24;
+        const long SALLSHORTTIMEPATTERNS          = 25;
+        const long SALLMONTHDAYPATTERNS           = 26;
+        const long SCURRENCYGROUPSIZES            = 27;
+        const long SNUMBERGROUPSIZES              = 28;
+        const long SPERCENTGROUPSIZES             = 29;
+        const long SCURRENCYDECIMALSEPARATOR      = 30;
+        const long SCURRENCYGROUPSEPARATOR        = 31;
+        const long SCURRENCYSYMBOL                = 32;
+        const long SNANSYMBOL                     = 33;
+        const long SNEGATIVEINFINITYSYMBOL        = 34;
+        const long SNEGATIVESIGN                  = 35;
+        const long SNUMBERDECIMALSEPARATOR        = 36;
+        const long SNUMBERGROUPSEPARATOR          = 37;
+        const long SPERCENTDECIMALSEPARATOR       = 38;
+        const long SPERCENTGROUPSEPARATOR         = 39;
+        const long SPERCENTSYMBOL                 = 40;
+        const long SPERMILLESYMBOL                = 41;
+        const long SPOSITIVEINFINITYSYMBOL        = 42;
+        const long SPOSITIVESIGN                  = 43;
+
+        const long LOCALE_RETURN_NUMBER           = 0x20000000;
+        const long LOCALE_ICENTURY                = 0x24;
+        const long LOCALE_ICOUNTRY                = 0x5;
+        const long LOCALE_ICURRDIGITS             = 0x19;
+        const long LOCALE_ICURRENCY               = 0x1B;
+        const long LOCALE_IDATE                   = 0x21;
+        const long LOCALE_IDAYLZERO               = 0x26;
+        const long LOCALE_IDEFAULTANSICODEPAGE    = 0x1004;
+        const long LOCALE_IDEFAULTCODEPAGE        = 0xB;
+        const long LOCALE_IDEFAULTCOUNTRY         = 0xA;
+        const long LOCALE_IDEFAULTEBCDICCODEPAGE  = 0x1012;
+        const long LOCALE_IDEFAULTLANGUAGE        = 0x9;
+        const long LOCALE_IDEFAULTMACCODEPAGE     = 0x1011;
+        const long LOCALE_IDIGITS                 = 0x11;
+        const long LOCALE_IDIGITSUBSTITUTION      = 0x1014;
+        const long LOCALE_IFIRSTDAYOFWEEK         = 0x100C;
+        const long LOCALE_IFIRSTWEEKOFYEAR        = 0x100D;
+        const long LOCALE_IINTLCURRDIGITS         = 0x1A;
+        const long LOCALE_ILANGUAGE               = 0x1;
+        const long LOCALE_ILDATE                  = 0x22;
+        const long LOCALE_ILZERO                  = 0x12;
+        const long LOCALE_IMEASURE                = 0xD;
+        const long LOCALE_IMONLZERO               = 0x27;
+        const long LOCALE_INEGCURR                = 0x1C;
+        const long LOCALE_INEGNUMBER              = 0x1010;
+        const long LOCALE_INEGSEPBYSPACE          = 0x57;
+        const long LOCALE_INEGSIGNPOSN            = 0x53;
+        const long LOCALE_INEGSYMPRECEDES         = 0x56;
+        const long LOCALE_IOPTIONALCALENDAR       = 0x100B;
+        const long LOCALE_IPAPERSIZE              = 0x100A;
+        const long LOCALE_IPOSSEPBYSPACE          = 0x55;
+        const long LOCALE_IPOSSIGNPOSN            = 0x52;
+        const long LOCALE_IPOSSYMPRECEDES         = 0x54;
+        const long LOCALE_ITIME                   = 0x23;
+        const long LOCALE_ITIMEMARKPOSN           = 0x1005;
+        const long LOCALE_ITLZERO                 = 0x25;
+        const long LOCALE_NOUSEROVERRIDE          = 0x80000000;
+        const long LOCALE_S1159                   = 0x28;
+        const long LOCALE_S2359                   = 0x29;
+        const long LOCALE_SABBREVCTRYNAME         = 0x7;
+        const long LOCALE_SABBREVDAYNAME1         = 0x31;
+        const long LOCALE_SABBREVDAYNAME2         = 0x32;
+        const long LOCALE_SABBREVDAYNAME3         = 0x33;
+        const long LOCALE_SABBREVDAYNAME4         = 0x34;
+        const long LOCALE_SABBREVDAYNAME5         = 0x35;
+        const long LOCALE_SABBREVDAYNAME6         = 0x36;
+        const long LOCALE_SABBREVDAYNAME7         = 0x37;
+        const long LOCALE_SABBREVLANGNAME         = 0x3;
+        const long LOCALE_SABBREVMONTHNAME1       = 0x44;
+        const long LOCALE_SABBREVMONTHNAME10      = 0x4D;
+        const long LOCALE_SABBREVMONTHNAME11      = 0x4E;
+        const long LOCALE_SABBREVMONTHNAME12      = 0x4F;
+        const long LOCALE_SABBREVMONTHNAME13      = 0x100F;
+        const long LOCALE_SABBREVMONTHNAME2       = 0x45;
+        const long LOCALE_SABBREVMONTHNAME3       = 0x46;
+        const long LOCALE_SABBREVMONTHNAME4       = 0x47;
+        const long LOCALE_SABBREVMONTHNAME5       = 0x48;
+        const long LOCALE_SABBREVMONTHNAME6       = 0x49;
+        const long LOCALE_SABBREVMONTHNAME7       = 0x4A;
+        const long LOCALE_SABBREVMONTHNAME8       = 0x4B;
+        const long LOCALE_SABBREVMONTHNAME9       = 0x4C;
+        const long LOCALE_SCOUNTRY                = 0x6;
+        const long LOCALE_SCURRENCY               = 0x14;
+        const long LOCALE_SDATE                   = 0x1D;
+        const long LOCALE_SDAYNAME1               = 0x2A;
+        const long LOCALE_SDAYNAME2               = 0x2B;
+        const long LOCALE_SDAYNAME3               = 0x2C;
+        const long LOCALE_SDAYNAME4               = 0x2D;
+        const long LOCALE_SDAYNAME5               = 0x2E;
+        const long LOCALE_SDAYNAME6               = 0x2F;
+        const long LOCALE_SDAYNAME7               = 0x30;
+        const long LOCALE_SDECIMAL                = 0xE;
+        const long LOCALE_SENGCOUNTRY             = 0x1002;
+        const long LOCALE_SENGCURRNAME            = 0x1007;
+        const long LOCALE_SENGLANGUAGE            = 0x1001;
+        const long LOCALE_SGROUPING               = 0x10;
+        const long LOCALE_SINTLSYMBOL             = 0x15;
+        const long LOCALE_SISO3166CTRYNAME        = 0x5A;
+        const long LOCALE_SISO639LANGNAME         = 0x59;
+        const long LOCALE_SLANGUAGE               = 0x2;
+        const long LOCALE_SLIST                   = 0xC;
+        const long LOCALE_SLONGDATE               = 0x20;
+        const long LOCALE_SMONDECIMALSEP          = 0x16;
+        const long LOCALE_SMONGROUPING            = 0x18;
+        const long LOCALE_SMONTHNAME1             = 0x38;
+        const long LOCALE_SMONTHNAME10            = 0x41;
+        const long LOCALE_SMONTHNAME11            = 0x42;
+        const long LOCALE_SMONTHNAME12            = 0x43;
+        const long LOCALE_SMONTHNAME13            = 0x100E;
+        const long LOCALE_SMONTHNAME2             = 0x39;
+        const long LOCALE_SMONTHNAME3             = 0x3A;
+        const long LOCALE_SMONTHNAME4             = 0x3B;
+        const long LOCALE_SMONTHNAME5             = 0x3C;
+        const long LOCALE_SMONTHNAME6             = 0x3D;
+        const long LOCALE_SMONTHNAME7             = 0x3E;
+        const long LOCALE_SMONTHNAME8             = 0x3F;
+        const long LOCALE_SMONTHNAME9             = 0x40;
+        const long LOCALE_SMONTHOUSANDSEP         = 0x17;
+        const long LOCALE_SNATIVECTRYNAME         = 0x8;
+        const long LOCALE_SNATIVECURRNAME         = 0x1008;
+        const long LOCALE_SNATIVEDIGITS           = 0x13;
+        const long LOCALE_SNATIVELANGNAME         = 0x4;
+        const long LOCALE_SNEGATIVESIGN           = 0x51;
+        const long LOCALE_SPOSITIVESIGN           = 0x50;
+        const long LOCALE_SSHORTDATE              = 0x1F;
+        const long LOCALE_SSORTNAME               = 0x1013;
+        const long LOCALE_STHOUSAND               = 0xF;
+        const long LOCALE_STIME                   = 0x1E;
+        const long LOCALE_STIMEFORMAT             = 0x1003;
+        const long LOCALE_SYEARMONTH              = 0x1006;
+
+
     }
 
-    [dllname("CharConstants")]
-    module CharConstants{
-        const short corTerminator         = 0;
-        const short corUpperAChar         = 0x41;
-        const short corLowerAChar         = 0x61;
-        const short corLowerDChar         = 0x64;
-        const short corUpperDChar         = 0x44;
-        const short corLowerEChar         = 0x65;
-        const short corUpperEChar         = 0x45;
-        const short corLowerFChar         = 0x66;
-        const short corUpperFChar         = 0x46;
-        const short corLowerGChar         = 0x67;
-        const short corUpperGChar         = 0x47;
-        const short corLowerHChar         = 0x68;
-        const short corUpperHChar         = 0x48;
-        const short corLowerMChar         = 0x6D;
-        const short corUpperMChar         = 0x4D;
-        const short corLowerRChar         = 0x72;
-        const short corUpperRChar         = 0x52;
-        const short corLowerSChar         = 0x73;
-        const short corLowerTChar         = 0x74;
-        const short corUpperTChar         = 0x54;
-        const short corLowerUChar         = 0x75;
-        const short corUpperUChar         = 0x55;
-        const short corLowerYChar         = 0x79;
-        const short corUpperYChar         = 0x59;
-        const short corUpperZChar         = 0xFA;
-        const short corLowerZChar         = 0x7A;
-        const short corPipeChar           = 0x7C;
-        const short corZeroChar           = 0x30;
-        const short corOneChar            = 0x31;
-        const short corFiveChar           = 0x35;
-        const short corEightChar          = 0x38;
-        const short corNineChar           = 0x39;
-        const short corPlusChar           = 0x2B;
-        const short corMinusChar          = 0x2D;
-        const short corBackslashChar      = 0x5C;
-        const short corForwardSlashChar   = 0x2F;
-        const short corColonChar          = 0x3A;
-        const short corSemiColonChar      = 0x3B;
-        const short corLessThanChar       = 0x3C;
-        const short corEqualChar          = 0x3D;
-        const short corGreaterThanChar    = 0x3E;
-        const short corReturnChar         = 0xD;
-        const short corLineFeedChar       = 0xA;
-        const short corSpaceChar          = 0x20;
-        const short corPoundChar          = 0x23;
-        const short corDollarChar         = 0x24;
-        const short corPercentChar        = 0x25;
-        const short corQuoteChar          = 0x22;
-        const short corSecondaryQuoteChar = 0x27;
-        const short corCommaChar          = 0x2C;
-        const short corPeriodChar         = 0x2E;
-        const short corTildaChar          = 0x7E;
-        const short corQuestionMarkChar   = 0x3F;
-        const long corInvalidChar         = 0xFFFFFFFF;        
-    }
-
-    [dllname("IOConstants")]
-    module IOConstants {
+    [dllname("CorConst longants")]
+    module CorConstants {
+        const long corTicksPerMillisecond           = 10000;
+        const long corSecondsPerMinute              = 60;
+        const long corMinutesPerHour                = 60;
+        const long corHoursPerDay                   = 24;
+        const long corDaysPerWeek                   = 7;
+        const long corDaysPerYear                   = 365;
+        const long corMonthsPerYear                 = 12;
+        const long corDaysPer4Years                 = 1461;             // corDaysPerYear * 4 + 1
+        const currency corMillisecondsPerTick       = 0.0001;
+        const long corMillisecondsPerSecond         = 1000;
+        const currency corMillisecondsPerMinute     = 60000;            // corMillisecondsPerSecond * corSecondsPerMinute
+        const currency corMillisecondsPerHour       = 3600000;          // corMillisecondsPerMinute * corMinutesPerHour
+        const currency corMillisecondsPerDay        = 86400000;         // corMillisecondsPerHour * corHoursPerDay
+        const long corDaysTo1899                    = 693593;
+        const currency corMillisecondsTo1899        = 59926435200000;   // 1@ * corDaysTo1899 * corMillisecondsPerDay
+        const short corTerminator                   = 0;
+        const short corUpperAChar                   = 0x41;
+        const short corLowerAChar                   = 0x61;
+        const short corLowerDChar                   = 0x64;
+        const short corUpperDChar                   = 0x44;
+        const short corLowerEChar                   = 0x65;
+        const short corUpperEChar                   = 0x45;
+        const short corLowerFChar                   = 0x66;
+        const short corUpperFChar                   = 0x46;
+        const short corLowerGChar                   = 0x67;
+        const short corUpperGChar                   = 0x47;
+        const short corLowerHChar                   = 0x68;
+        const short corUpperHChar                   = 0x48;
+        const short corLowerMChar                   = 0x6D;
+        const short corUpperMChar                   = 0x4D;
+        const short corLowerRChar                   = 0x72;
+        const short corUpperRChar                   = 0x52;
+        const short corLowerSChar                   = 0x73;
+        const short corLowerTChar                   = 0x74;
+        const short corUpperTChar                   = 0x54;
+        const short corLowerUChar                   = 0x75;
+        const short corUpperUChar                   = 0x55;
+        const short corLowerYChar                   = 0x79;
+        const short corUpperYChar                   = 0x59;
+        const short corUpperZChar                   = 0xFA;
+        const short corLowerZChar                   = 0x7A;
+        const short corPipeChar                     = 0x7C;
+        const short corZeroChar                     = 0x30;
+        const short corOneChar                      = 0x31;
+        const short corFiveChar                     = 0x35;
+        const short corEightChar                    = 0x38;
+        const short corNineChar                     = 0x39;
+        const short corPlusChar                     = 0x2B;
+        const short corMinusChar                    = 0x2D;
+        const short corBackslashChar                = 0x5C;
+        const short corForwardSlashChar             = 0x2F;
+        const short corColonChar                    = 0x3A;
+        const short corSemiColonChar                = 0x3B;
+        const short corLessThanChar                 = 0x3C;
+        const short corEqualChar                    = 0x3D;
+        const short corGreaterThanChar              = 0x3E;
+        const short corReturnChar                   = 0xD;
+        const short corLineFeedChar                 = 0xA;
+        const short corSpaceChar                    = 0x20;
+        const short corPoundChar                    = 0x23;
+        const short corDollarChar                   = 0x24;
+        const short corPercentChar                  = 0x25;
+        const short corQuoteChar                    = 0x22;
+        const short corSecondaryQuoteChar           = 0x27;
+        const short corCommaChar                    = 0x2C;
+        const short corPeriodChar                   = 0x2E;
+        const short corTildaChar                    = 0x7E;
+        const short corQuestionMarkChar             = 0x3F;
+        const long corInvalidChar                   = 0xFFFFFFFF;        
         const short corPathSeparatorChar            = 0x3B;
         const short corVolumeSeparatorChar          = 0x3A;
         const short corDirectorySeparatorChar       = 0x5C;
         const short corAltDirectorySeparatorChar    = 0x2F;
         const long corDoubleDirectorySeparatorChar  = 0x005C005C;
-        const LPSTR corPathSeparator                 = ";";
-        const LPSTR corVolumeSeparator               = ":";        
-        const LPSTR corDirectorySeparator            = "\\";
-        const LPSTR corAltDirectorySeparator         = "/";
-    }
-
-    [dllname("VBErrorConstants")]
-    module VBErrorConstants {
-        const long corInvalidProcedureCall  = 5;
-        const long corOutOfMemory           = 7;
-        const long corOverflow              = 6;
-        const long corSubscriptOutOfRange   = 9;
-        const long corDivisionByZero        = 11;
-        const long corTypeMismatch          = 13;
-        const long corBadNameOrNumber       = 52;
-        const long corFileNotFound          = 53;
-        const long corBadFileMode           = 54;
-        const long corFileAlreadyOpen       = 55;
-        const long corDeviceIOError         = 57;
-        const long corFileAlreadyExists     = 58;
-        const long corInputPastEndOfFile    = 62;
-        const long corPermissionDenied      = 70;
-        const long corPathAccessError       = 75;
-        const long corPathNotFound          = 76;
-        const long corObjectNotSet          = 91;
-        const long corNotSerializable       = 330;
-        const long corInvalidPropertyValue  = 380;
-        const long corInvalidPropertyArrayIndex = 381;
-        const long corAutomationError       = 440;
-        const long corArgumentNotOptional   = 449;
-        const long corKeyAlreadyAssociated  = 457;
+        const LPSTR corPathSeparator                = ";";
+        const LPSTR corVolumeSeparator              = ":";        
+        const LPSTR corDirectorySeparator           = "\\";
+        const LPSTR corAltDirectorySeparator        = "/";
+        const long corInvalidProcedureCall          = 5;
+        const long corOutOfMemory                   = 7;
+        const long corOverflow                      = 6;
+        const long corSubscriptOutOfRange           = 9;
+        const long corDivisionByZero                = 11;
+        const long corTypeMismatch                  = 13;
+        const long corBadNameOrNumber               = 52;
+        const long corFileNotFound                  = 53;
+        const long corBadFileMode                   = 54;
+        const long corFileAlreadyOpen               = 55;
+        const long corDeviceIOError                 = 57;
+        const long corFileAlreadyExists             = 58;
+        const long corInputPastEndOfFile            = 62;
+        const long corPermissionDenied              = 70;
+        const long corPathAccessError               = 75;
+        const long corPathNotFound                  = 76;
+        const long corObjectNotSet                  = 91;
+        const long corNotSerializable               = 330;
+        const long corInvalidPropertyValue          = 380;
+        const long corInvalidPropertyArrayIndex     = 381;
+        const long corAutomationError               = 440;
+        const long corArgumentNotOptional           = 449;
+        const long corKeyAlreadyAssociated          = 457;
+        const LPSTR corNumberFormatInfoTypeName     = "NumberFormatInfo";
+        const LPSTR corDateTimeFormatInfoTypeName   = "DateTimeFormatInfo";
+        const long corMissing                       = 0xA;
+        const long corIntegerArray                  = 0x2002;
+        const long corByteArray                     = 0x2011;
+        const long corLongArray                     = 0x2003;
+        const long corBooleanArray                  = 0x200B;
+        const long corStringArray                   = 0x2008;
+        const long corVariantArray                  = 0x2003;
+        const long corSizeOfByte                    = 1;
+        const long corSizeOfInteger                 = 2;
+        const long corSizeOfLong                    = 4;
+        const long corSizeOfSingle                  = 4;
+        const long corSizeOfDouble                  = 8;
+        const long corSizeOfCurrency                = 8;
+        const long corSizeOfDecimal                 = 16;
+        const long corSizeOfBoolean                 = 1;
+        const long corSizeOfDate                    = 8;
+        const long corSizeOfSafeArray               = 16;
+        const long corSizeOfSafeArrayBound          = 8;
+        const long corSizeOfSafeArray1d             = 24;
+        const long corSizeOfGuid                    = 16;
+        const long corSizeOfGuidSafeArray1d         = 40;
+        const long corSizeOfVariant                 = 16;
+        const long corSizeOfPtr                     = 4;
+        const long corSizeOfChar                    = 2;
     }
 
     [dllname("HResultConstants")]
@@ -620,6 +847,7 @@ library VBCorType {
         const long COR_E_UNAUTHORIZEDACCESS   = 0x46;
         const long CORSEC_E_CRYPTO            = 0x80131430;
         const long CORSEC_E_XMLSYNTAX         = 0x80131418;
+
     }
 
     [dllname("kernel32.dll"), helpstring("Access to API functions within the Kernel32.dll system file.")]
@@ -745,6 +973,25 @@ library VBCorType {
 
     [dllname("oleaut32.dll"), helpstring("Access to API functions within the Oleaut32.dll system file.")]
     module OleAut32 {
+        const long FADF_AUTO            = 0x00000001;
+        const long FADF_BSTR            = 0x00000100;
+        const long FADF_DISPATCH        = 0x00000400;
+        const long FADF_EMBEDDED        = 0x00000004;
+        const long FADF_FIXEDSIZE       = 0x00000010;
+        const long FADF_HAVEIID         = 0x00000040;
+        const long FADF_HAVEVARTYPE     = 0x00000080;
+        const long FADF_RECORD          = 0x00000020;
+        const long FADF_STATIC          = 0x00000002;
+        const long FADF_UNKNOWN         = 0x00000200;
+        const long FADF_VARIANT         = 0x00000800;
+
+        const long FFEATURES_OFFSET     = 2;
+        const long CBELEMENTS_OFFSET    = 4;
+        const long PVDATA_OFFSET        = 12;
+        const long LBOUND_OFFSET        = 20;
+        const long CLOCKS_OFFSET        = 8;
+        const long CELEMENTS_OFFSET     = 16;
+
         [entry("OleLoadPicture")] HRESULT OleLoadPicture([in] IStream * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
         [entry("SafeArrayCopyData")] HRESULT SafeArrayCopyData([in] long psaSource, [in] long psaTarget);
         [entry("SafeArrayCreate")] long SafeArrayCreate([in] VBA.vbVarType vt, [in] long cDims, [in] SafeArrayBound * rgsaBounds);
@@ -768,6 +1015,10 @@ library VBCorType {
 
     [dllname("ole32.dll"), helpstring("Access to API functions within the Ole32.dll system file.")]
     module Ole32 {
+        const long VARIANTDATA_OFFSET   = 8;
+        const long VT_BYREF             = 0x4000;
+        const long PICTYPE_BITMAP       = 1;
+
         [entry("CLSIDFromProgID")] HRESULT CLSIDFromProgID([in] LPWSTR ProgID, [out, retval] VBGUID * RetVal);
         [entry("CLSIDFromString")] HRESULT CLSIDFromString([in] LPWSTR lpSz, [out, retval] VBGUID * RetVal);
         [entry("CoCreateGuid")] HRESULT CoCreateGuid([out, retval] VBGUID * RetVal);
@@ -782,6 +1033,134 @@ library VBCorType {
 
     [dllname("advapi32.dll"), helpstring("Access to API functions within the Advapi32.dll system file.")]
     module Advapi32 {
+        const long REG_NONE                   = 0;
+        const long REG_UNKNOWN                = 0;
+        const long REG_SZ                     = 1;
+        const long REG_DWORD                  = 4;
+        const long REG_BINARY                 = 3;
+        const long REG_MULTI_SZ               = 7;
+        const long REG_EXPAND_SZ              = 2;
+        const long REG_QWORD                  = 11;
+
+        const long ERROR_SUCCESS              = 0;
+        const long ERROR_INVALID_HANDLE       = 6;
+        const long ERROR_INVALID_PARAMETER    = 87;
+        const long ERROR_CALL_NOT_IMPLEMENTED = 120;
+        const long ERROR_MORE_DATA            = 234;
+        const long ERROR_NO_MORE_ITEMS        = 259;
+        const long ERROR_CANTOPEN             = 1011;
+        const long ERROR_CANTREAD             = 1012;
+        const long ERROR_CANTWRITE            = 1013;
+        const long ERROR_REGISTRY_RECOVERED   = 1014;
+        const long ERROR_REGISTRY_CORRUPT     = 1015;
+        const long ERROR_REGISTRY_IO_FAILED   = 1016;
+        const long ERROR_NOT_REGISTRY_FILE    = 1017;
+        const long ERROR_KEY_DELETED          = 1018;
+
+        const long HKEY_CLASSES_ROOT      = 0x80000000;
+        const long HKEY_CURRENT_CONFIG    = 0x80000005;
+        const long HKEY_CURRENT_USER      = 0x80000001;
+        const long HKEY_DYN_DATA          = 0x80000006;
+        const long HKEY_LOCAL_MACHINE     = 0x80000002;
+        const long HKEY_USERS             = 0x80000003;
+        const long HKEY_PERFORMANCE_DATA  = 0x80000004;
+
+        const long READ_CONTROL           = 0x20000;
+        const long STANDARD_RIGHTS_ALL    = 0x1F0000;
+        const long STANDARD_RIGHTS_READ   = 0x20000;   //READ_CONTROL
+        const long KEY_QUERY_VALUE        = 0x1;
+        const long KEY_SET_VALUE          = 0x2;
+        const long KEY_CREATE_SUB_KEY     = 0x4;
+        const long KEY_ENUMERATE_SUB_KEYS = 0x8;
+        const long KEY_CREATE_LINK        = 0x20;
+        const long KEY_NOTIFY             = 0x10;
+        const long SYNCHRONIZE            = 0x100000;
+        const long KEY_READ               = 0x20019;   // ((STANDARD_RIGHTS_READ Or KEY_QUERY_VALUE Or KEY_ENUMERATE_SUB_KEYS Or KEY_NOTIFY) And (Not SYNCHRONIZE))
+        const long KEY_ALL_ACCESS         = 0xF003F;   // ((STANDARD_RIGHTS_ALL Or KEY_QUERY_VALUE Or KEY_SET_VALUE Or KEY_CREATE_SUB_KEY Or KEY_ENUMERATE_SUB_KEYS Or KEY_NOTIFY Or KEY_CREATE_LINK) And (Not SYNCHRONIZE))
+
+        const long PROV_RSA_FULL           = 1;
+        const long PROV_DSS_DH             = 13;
+
+        const long KP_IV                   = 1;
+        const long KP_MODE                 = 4;
+        const long KP_MODE_BITS            = 5;
+        const long KP_EFFECTIVE_KEYLEN     = 19;
+        const long KP_SALT                 = 2;
+        const long KP_PERMISSIONS          = 6;
+
+        const long PP_NAME                 = 4;
+        const long PP_UNIQUE_CONTAINER     = 36;
+        const long PP_CONTAINER            = 6;
+        const long PP_PROVTYPE             = 16;
+        const long PP_ENUMALGS             = 1;
+
+        const long ALG_CLASS_DATA_ENCRYPT  = 0x6000;    //(3 * 2 ^ 13)
+        const long ALG_TYPE_BLOCK          = 0x600;     //(3 * 2 ^ 9)
+        const long ALG_SID_DES             = 0x1;
+        const long ALG_SID_RC2             = 0x2;
+        const long ALG_SID_3DES            = 0x3;
+        const long ALG_SID_3DES_112        = 0x9;
+        const long ALG_CLASS_HASH          = 0x8000;    //(4 * 2 ^ 13)
+        const long ALG_TYPE_ANY            = 0x0;
+        const long ALG_SID_SHA1            = 0x4;
+        const long ALG_SID_MD5             = 0x3;
+        const long ALG_CLASS_KEY_EXCHANGE  = 0xA000;    //(5 * 2 ^ 13)
+        const long ALG_TYPE_RSA            = 0x400;     //(2 * 2 ^ 9)
+        const long ALG_SID_RSA_ANY         = 0x0;
+        const long ALG_CLASS_SIGNATURE     = 0x2000;    //(1 * 2 ^ 13)
+        const long ALG_SID_DSS_ANY         = 0x0;
+        const long ALG_TYPE_DSS            = 0x200;     //(1 * 2 ^ 9)
+
+        const long CALG_DES                = 0x6601;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_DES)
+        const long CALG_RC2                = 0x6602;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_RC2)
+        const long CALG_3DES               = 0x6603;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_3DES)
+        const long CALG_3DES_112           = 0x6609;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_3DES_112)
+        const long CALG_SHA1               = 0xFFFF8004;    //(ALG_CLASS_HASH Or ALG_TYPE_ANY Or ALG_SID_SHA1)
+        const long CALG_MD5                = 0xFFFF8003;    //(ALG_CLASS_HASH Or ALG_TYPE_ANY Or ALG_SID_MD5)
+        const long CALG_RSA_KEYX           = 0xFFFFA400;    //(ALG_CLASS_KEY_EXCHANGE Or ALG_TYPE_RSA Or ALG_SID_RSA_ANY)
+        const long CALG_RSA_SIGN           = 0x2400;        //(ALG_CLASS_SIGNATURE Or ALG_TYPE_RSA Or ALG_SID_RSA_ANY)
+        const long CALG_DSS_SIGN           = 0x2200;        //(ALG_CLASS_SIGNATURE Or ALG_TYPE_DSS Or ALG_SID_DSS_ANY)
+
+        const long CRYPT_OAEP              = 0x40;
+        const long CRYPT_EXPORTABLE        = 0x1;
+        const long CRYPT_ARCHIVABLE        = 0x4000;
+        const long CRYPT_USER_PROTECTED    = 0x2;
+        const long CRYPT_MODE_CBC          = 1;
+        const long CRYPT_MACHINE_KEYSET    = 0x20;
+        const long CRYPT_NEWKEYSET         = 0x8;
+        const long CRYPT_DELETEKEYSET      = 0x10;
+        const long CRYPT_DECRYPT           = 0x2;
+        const long CRYPT_OID_INFO_NAME_KEY  = 0x2;
+        const long CRYPT_EXPORT            = 0x4;
+        const long CRYPT_FIRST             = 0x1;
+        const long CRYPT_NO_SALT           = 0x10;
+
+        const long PKCS7_PADDING           = 0x2;
+
+        const long HP_HASHSIZE             = 0x4;
+        const long HP_HASHVAL              = 0x2;
+
+        const long AT_KEYEXCHANGE          = 0x1;
+        const long AT_SIGNATURE            = 0x2;
+
+        const long NTE_BAD_KEYSET          = 0x80090016;
+        const long NTE_EXISTS              = 0x8009000F;
+        const long NTE_NO_KEY              = 0x8009000D;
+
+        const long PUBLICKEYBLOB           = 0x6;
+        const long PRIVATEKEYBLOB          = 0x7;
+        const long SIMPLEBLOB              = 0x1;
+
+        const LPSTR MS_ENH_DSS_DH_PROV      = "Microsoft Enhanced DSS and Diffie-Hellman Cryptographic Provider";
+        const LPSTR MS_DEF_DSS_DH_PROV      = "Microsoft Base DSS and Diffie-Hellman Cryptographic Provider";
+        const LPSTR MS_DEF_PROV             = "Microsoft Base Cryptographic Provider v1.0";
+        const LPSTR MS_STRONG_PROV          = "Microsoft Strong Cryptographic Provider";
+        const LPSTR MS_ENHANCED_PROV        = "Microsoft Enhanced Cryptographic Provider v1.0";
+
+        const long SC_CLOSE                = 0xF060;
+        const long MF_BYCOMMAND            = 0x0;
+
+
         [entry("GetUserNameA"), usesgetlasterror] long GetUserNameA([in] LPSTR lpBuffer, [in] long * nSize);
         [entry("CryptAcquireContextA"), usesgetlasterror] long CryptAcquireContext([in] long * hProv, [in] LPSTR pszContainer, [in] LPSTR pszProvider, [in] long dwProvType, [in] long dwFlags);
         [entry("CryptReleaseContext"), usesgetlasterror] long CryptReleaseContext([in] long hProv, [in] long dwFlags);
@@ -835,6 +1214,8 @@ library VBCorType {
 
     [dllname("user32.dll"), helpstring("Access to API functions within the User32.dll system file.")]
     module User32 {
+        const long PICTYPE_ICON = 3;
+
         [entry("SendMessageTimeoutA"), usesgetlasterror] long  SendMessageTimeout([in] long hWnd, [in] long Msg, [in] long wParam, [in] long lParam, [in] long fuFlags, [in] long uTimeout, [in] long * lpdwResult);
         [entry("GetKeyState")] short GetKeyState([in] long nVirtKey);
         [entry("CharLowerA")] long  CharLower([in] long Char);

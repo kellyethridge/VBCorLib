@@ -100,7 +100,7 @@ End Property
 ' @return A VB error that matches the number return by <b>Err.Number</b>.
 '
 Public Property Get ErrorNumber() As Long
-    ErrorNumber = VBErrorConstants.corPathNotFound
+    ErrorNumber = corPathNotFound
 End Property
 
 ''

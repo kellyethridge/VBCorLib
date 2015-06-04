@@ -65,12 +65,12 @@ Private Const PropKind          As String = "Kind"
 Private Const DefaultMilliseconds   As Long = 0
 Private Const DefaultKind           As Long = 0
 
-Private Const DaysPer100Years       As Long = DaysPer4Years * 25 - 1
+Private Const DaysPer100Years       As Long = corDaysPer4Years * 25 - 1
 Private Const DaysPer400Years       As Long = DaysPer100Years * 4 + 1
 Private Const DaysTo10000           As Currency = DaysPer400Years * 25 - 366
-Private Const MaxMilliseconds       As Currency = DaysTo10000 * MillisecondsPerDay
+Private Const MaxMilliseconds       As Currency = DaysTo10000 * corMillisecondsPerDay
 Private Const DaysTo1601            As Currency = DaysPer400Years * 4
-Private Const MillisecondsTo1601    As Currency = DaysTo1601 * MillisecondsPerDay
+Private Const MillisecondsTo1601    As Currency = DaysTo1601 * corMillisecondsPerDay
 
 Private Const MinFiletime As Currency = 50491123200000@
 
@@ -117,16 +117,16 @@ End Property
 Public Function ToOADate() As Date
     If mMilliseconds = 0@ Then Exit Function
     
-    If mMilliseconds < MillisecondsPerDay Then
-        ToOADate = 1# * mMilliseconds / MillisecondsPerDay
+    If mMilliseconds < corMillisecondsPerDay Then
+        ToOADate = 1# * mMilliseconds / corMillisecondsPerDay
     Else
         Dim Days As Double
-        Days = Int(mMilliseconds / MillisecondsPerDay)
+        Days = Int(mMilliseconds / corMillisecondsPerDay)
         
         Dim Time As Double
-        Time = (mMilliseconds - (Days * MillisecondsPerDay)) / MillisecondsPerDay
+        Time = (mMilliseconds - (Days * corMillisecondsPerDay)) / corMillisecondsPerDay
         
-        Days = Days - DaysTo1899
+        Days = Days - corDaysTo1899
         If Days < 0# Then
             ToOADate = Days - Time
         Else
@@ -182,7 +182,7 @@ End Property
 ' align to the 1-based values of vbDayOfWeek.
 '
 Public Property Get DayOfWeek() As DayOfWeek
-    DayOfWeek = Int(mMilliseconds / MillisecondsPerDay + 1) Mod DaysPerWeek
+    DayOfWeek = Int(mMilliseconds / corMillisecondsPerDay + 1) Mod corDaysPerWeek
 End Property
 
 ''
@@ -191,7 +191,7 @@ End Property
 ' @return The current hour.
 '
 Public Property Get Hour() As Long
-    Hour = Int(mMilliseconds / MillisecondsPerHour) Mod HoursPerDay
+    Hour = Int(mMilliseconds / corMillisecondsPerHour) Mod corHoursPerDay
 End Property
 
 ''
@@ -200,7 +200,7 @@ End Property
 ' @return The current minute.
 '
 Public Property Get Minute() As Long
-    Minute = Modulus(Int(mMilliseconds / MillisecondsPerMinute), MinutesPerHour)
+    Minute = Modulus(Int(mMilliseconds / corMillisecondsPerMinute), corMinutesPerHour)
 End Property
 
 ''
@@ -209,7 +209,7 @@ End Property
 ' @return The current second.
 '
 Public Property Get Second() As Long
-    Second = Modulus(Int(mMilliseconds / MillisecondsPerSecond), SecondsPerMinute)
+    Second = Modulus(Int(mMilliseconds / corMillisecondsPerSecond), corSecondsPerMinute)
 End Property
 
 ''
@@ -218,7 +218,7 @@ End Property
 ' @return The current millisecond.
 '
 Public Property Get Millisecond() As Long
-    Millisecond = Modulus(mMilliseconds, MillisecondsPerSecond)
+    Millisecond = Modulus(mMilliseconds, corMillisecondsPerSecond)
 End Property
 
 ''
@@ -252,7 +252,7 @@ End Property
 ' original date representation. The new date will have a time of 12:00AM.
 '
 Public Property Get DateOnly() As CorDateTime
-    Set DateOnly = CorDateTime.FromMilliseconds(mMilliseconds - Modulus(mMilliseconds, MillisecondsPerDay))
+    Set DateOnly = CorDateTime.FromMilliseconds(mMilliseconds - Modulus(mMilliseconds, corMillisecondsPerDay))
 End Property
 
 ''
@@ -263,7 +263,7 @@ End Property
 ' It now will have a date of 1/1/0001.
 '
 Public Property Get TimeOfDay() As TimeSpan
-    Set TimeOfDay = TimeSpan.FromMilliseconds(mMilliseconds - (mMilliseconds - Modulus(mMilliseconds, MillisecondsPerDay)))
+    Set TimeOfDay = TimeSpan.FromMilliseconds(mMilliseconds - (mMilliseconds - Modulus(mMilliseconds, corMillisecondsPerDay)))
 End Property
 
 ''
@@ -308,7 +308,7 @@ End Function
 ' @return The new CorDateTime containing the calculated value.
 '
 Public Function AddDays(ByVal Value As Double) As CorDateTime
-    Set AddDays = AddMilliseconds(Value * MillisecondsPerDay)
+    Set AddDays = AddMilliseconds(Value * corMillisecondsPerDay)
 End Function
 
 ''
@@ -319,7 +319,7 @@ End Function
 ' @return The new CorDateTime instance containing the calculated value.
 '
 Public Function AddHours(ByVal Value As Double) As CorDateTime
-    Set AddHours = AddMilliseconds(Value * MillisecondsPerHour)
+    Set AddHours = AddMilliseconds(Value * corMillisecondsPerHour)
 End Function
 
 ''
@@ -330,7 +330,7 @@ End Function
 ' @return The new CorDateTime instance containing the calculated value.
 '
 Public Function AddMinutes(ByVal Value As Double) As CorDateTime
-    Set AddMinutes = AddMilliseconds(Value * MillisecondsPerMinute)
+    Set AddMinutes = AddMilliseconds(Value * corMillisecondsPerMinute)
 End Function
 
 ''
@@ -360,16 +360,16 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
     Dim yearsToAdd  As Long
     Dim monthsToAdd As Long
     
-    yearsToAdd = MathExt.DivRem(Months, MonthsPerYear, monthsToAdd)
+    yearsToAdd = MathExt.DivRem(Months, corMonthsPerYear, monthsToAdd)
     
     Month = Month + monthsToAdd
     Year = Year + yearsToAdd
     Select Case Month
         Case Is < 1
-            Month = Month + MonthsPerYear
+            Month = Month + corMonthsPerYear
             Year = Year - 1
-        Case Is > MonthsPerYear
-            Month = Month - MonthsPerYear
+        Case Is > corMonthsPerYear
+            Month = Month - corMonthsPerYear
             Year = Year + 1
     End Select
     
@@ -379,7 +379,7 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
         Day = MaxDays
     End If
     
-    Set AddMonths = CorDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * MillisecondsPerDay + Modulus(mMilliseconds, MillisecondsPerDay), mKind)
+    Set AddMonths = CorDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * corMillisecondsPerDay + Modulus(mMilliseconds, corMillisecondsPerDay), mKind)
 End Function
 
 ''
@@ -390,7 +390,7 @@ End Function
 ' @return The new CorDateTime instance containing the calculated value.
 '
 Public Function AddSeconds(ByVal Value As Double) As CorDateTime
-    Set AddSeconds = AddMilliseconds(Value * MillisecondsPerSecond)
+    Set AddSeconds = AddMilliseconds(Value * corMillisecondsPerSecond)
 End Function
 
 ''
@@ -418,7 +418,7 @@ End Function
 ' @return The new CorDateTime instance containing the calculated value.
 '
 Public Function AddYears(ByVal Value As Long) As CorDateTime
-    Set AddYears = AddMonths(Value * MonthsPerYear)
+    Set AddYears = AddMonths(Value * corMonthsPerYear)
 End Function
 
 ''
@@ -528,7 +528,7 @@ End Function
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim Info As DateTimeFormatInfo
     If Not Provider Is Nothing Then
-        Set Info = Provider.GetFormat(DateTimeFormatInfoTypeName)
+        Set Info = Provider.GetFormat(corDateTimeFormatInfoTypeName)
     End If
     
     If Info Is Nothing Then
@@ -736,7 +736,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, ByVal Calendar As Calendar, ByVal Kind As DateTimeKind)
     If Calendar Is Nothing Then
-        mMilliseconds = GetTotalDays(Year, Month, Day) * MillisecondsPerDay + GetTotalMilliseconds(Hour, Minute, Second, Millisecond)
+        mMilliseconds = GetTotalDays(Year, Month, Day) * corMillisecondsPerDay + GetTotalMilliseconds(Hour, Minute, Second, Millisecond)
     Else
         mMilliseconds = Calendar.ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond).TotalMilliseconds
     End If
@@ -791,7 +791,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim Days As Long
-    Days = Int(mMilliseconds / MillisecondsPerDay)
+    Days = Int(mMilliseconds / corMillisecondsPerDay)
     
     Dim years400 As Long
     years400 = Days \ DaysPer400Years
@@ -803,8 +803,8 @@ Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Yea
     Days = Days - years100 * DaysPer100Years
     
     Dim years4 As Long
-    years4 = Days \ DaysPer4Years
-    Days = Days - years4 * DaysPer4Years
+    years4 = Days \ corDaysPer4Years
+    Days = Days - years4 * corDaysPer4Years
     
     Dim Years As Long
     Years = Days \ 365
@@ -814,7 +814,7 @@ Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Yea
     Year = years400 * 400 + years100 * 100 + years4 * 4 + Years + 1
     If DatePart = YearPart Then Exit Sub
     
-    Days = Days - Years * DaysPerYear
+    Days = Days - Years * corDaysPerYear
     
     ' Return the DayOfYear
     DayOfYear = Days + 1
@@ -857,7 +857,7 @@ Private Function GetTotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day
 End Function
 
 Private Function GetTotalMilliseconds(ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long) As Currency
-    GetTotalMilliseconds = Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond
+    GetTotalMilliseconds = Hour * corMillisecondsPerHour + Minute * corMillisecondsPerMinute + Second * corMillisecondsPerSecond + Millisecond
 End Function
 
 

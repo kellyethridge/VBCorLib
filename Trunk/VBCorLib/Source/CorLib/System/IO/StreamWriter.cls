@@ -326,8 +326,8 @@ Private Sub WriteFormatLine(ByRef Args() As Variant)
         Case Is > 0
             Dim Value As Variant
             Helper.MoveVariant Value, Args(0)
-            CopyMemory Args(0), Args(1), (ArgsUBound + 1) * SizeOfVariant
-            ZeroMemory Args(ArgsUBound), SizeOfVariant
+            CopyMemory Args(0), Args(1), (ArgsUBound + 1) * corSizeOfVariant
+            ZeroMemory Args(ArgsUBound), corSizeOfVariant
             Args(ArgsUBound) = Empty
             WriteFormatToStream Value, Args
     

@@ -66,7 +66,7 @@ Private mIterator   As IDictionaryEnumerator
 ' <p>Null arrays are not encoded. False will be returned.</p>
 '
 Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Optional ByRef ResourceType As Variant, Optional ByRef LanguageID As Variant) As Boolean
-    If VarType(Value) <> vbByteArray Then Exit Function
+    If VarType(Value) <> corByteArray Then Exit Function
     If CorArray.IsNull(Value) Then Exit Function
     
     Dim Key As ResourceKey
