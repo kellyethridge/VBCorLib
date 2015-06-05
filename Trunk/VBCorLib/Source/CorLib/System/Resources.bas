@@ -67,7 +67,8 @@ Public Enum ResourceStringKey
     Arg_ExternalException = 230
     Arg_ArgumentOutOfRangeException = 231
     Arg_SystemException = 232
-
+    Arg_MustBeOfType = 233
+    
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
     Argument_ArrayRequired = 803
@@ -103,6 +104,7 @@ Public Enum ResourceStringKey
     Argument_InvalidStreamSource = 836 '?
     Argument_NotEnumerable = 837 '?
     Argument_PathUriFormatNotSupported = 839
+    Argument_ImplementIComparable = 840
     Argument_PathFormatNotSupported = 844
     
     ArgumentNull_Array = 900

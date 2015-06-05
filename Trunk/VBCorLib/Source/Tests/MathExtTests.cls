@@ -42,7 +42,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2, 5, 5
             Test.Use NewInt32(2), NewInt32(5), NewInt32(5)
             Test.Use NewInt32(5), NewInt32(2), NewInt32(5)
-            
+        
+        Case "Min_WithValues_ReturnsExpected"
+            Test.Use 5, 5, 5
+            Test.Use 5, 2, 2
+            Test.Use 2, 5, 2
+            Test.Use NewInt32(2), NewInt32(5), NewInt32(2)
+            Test.Use NewInt32(5), NewInt32(2), NewInt32(2)
     End Select
 End Sub
 
@@ -78,20 +84,20 @@ Public Sub Max_WithValues_ReturnsExpected(ByRef Value1 As Variant, ByRef Value2 
     Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestMin()
-    Assert.AreEqual 2, Min(2, 5)
-    Assert.AreEqual 2, Min(5, 2)
+Public Sub Min_WithValues_ReturnsExpected(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
+    Dim Actual As Variant
+    
+    MoveVariant Actual, Min(Value1, Value2)
+    
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestMinObject()
-    Dim X As Int32
-    Dim Y As Int32
+Public Sub Max_WithNonComparable_ThrowsArgumentException()
+    On Error Resume Next
     
-    Set X = NewInt32(2)
-    Set Y = NewInt32(5)
+    Max Me, New MathExtTests
     
-    Assert.AreEqual X, Min(X, Y)
-    Assert.AreEqual X, Min(Y, X)
+    AssertArgumentException Err
 End Sub
 
 Public Sub TestDivRem()
