@@ -48,17 +48,19 @@ Private mStartIndex     As Long
 Private mEndIndex       As Long
 Private mIndex          As Long
 Private mVersion        As Long
+Private mBase           As EnumeratorBase
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
+    Set mBase = Cor.NewEnumeratorBase(List, Count, Index)
     Set mList = List
-    mVersion = GetCollectionVersion(List)
-    mStartIndex = Index
-    mEndIndex = Index + Count - 1
-    mIndex = Index - 1
+'    mVersion = GetCollectionVersion(List)
+'    mStartIndex = Index
+'    mEndIndex = Index + Count - 1
+'    mIndex = Index - 1
 End Sub
 
 Friend Sub InitClone(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Index As Long)
@@ -91,32 +93,39 @@ End Function
 '   IEnumerator Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If GetCollectionVersion(mList) <> mVersion Then _
-        Throw Error.InvalidOperation(InvalidOperation_VersionError)
-    If mIndex < mStartIndex Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
-    If mIndex > mEndIndex Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
-        
-    Helper.MoveVariant IEnumerator_Current, mList(mIndex)
+'    If GetCollectionVersion(mList) <> mVersion Then _
+'        Throw Error.InvalidOperation(InvalidOperation_VersionError)
+'    If mIndex < mStartIndex Then _
+'        Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
+'    If mIndex > mEndIndex Then _
+'        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
+'    mBase.CheckCurrent
+    
+    Helper.MoveVariant IEnumerator_Current, mList(mBase.Index)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If GetCollectionVersion(mList) <> mVersion Then _
-        Throw Error.InvalidOperation(InvalidOperation_VersionError)
-    If mIndex > mEndIndex Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
-    
-    If mIndex = mEndIndex Then
-        mIndex = mEndIndex + 1
-    Else
-        mIndex = mIndex + 1
-        IEnumerator_MoveNext = True
-    End If
+'    If GetCollectionVersion(mList) <> mVersion Then _
+'        Throw Error.InvalidOperation(InvalidOperation_VersionError)
+'    If mIndex > mEndIndex Then _
+'        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
+'
+'    If mIndex = mEndIndex Then
+'        mIndex = mEndIndex + 1
+'    Else
+'        mIndex = mIndex + 1
+'        IEnumerator_MoveNext = True
+'    End If
+'    If mBase.MoveNext Then
+'        mIndex = mIndex + 1
+'        IEnumerator_MoveNext = True
+'    End If
+    IEnumerator_MoveNext = mBase.MoveNext
 End Function
 
 Private Sub IEnumerator_Reset()
-    mIndex = mStartIndex - 1
+'    mIndex = mStartIndex - 1
+    mBase.Reset
 End Sub
 
 

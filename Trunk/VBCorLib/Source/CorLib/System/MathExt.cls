@@ -339,7 +339,7 @@ End Function
 ' @return An angle in radians.
 '
 Public Function CRad(ByVal Degrees As Double) As Double
-    CRad = C_PI * Degrees / 180#
+    CRad = corPI * Degrees / 180#
 End Function
 
 
