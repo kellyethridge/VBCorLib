@@ -48,10 +48,10 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private Const ATN_1     As Double = 0.785398163397448
-Private Const LOG_10    As Double = 2.30258509299405
-Private Const NEG_ZERO  As Currency = -922337203685477.5807@ - 0.0001@   ' VB won't accept -922337203685477.5808@ as a constant
-Private Const C_PI      As Double = 3.14159265358979
+Private Const corPI         As Double = 3.14159265358979
+Private Const corAtn1       As Double = 0.785398163397448
+Private Const corLog10      As Double = 2.30258509299405
+Private Const corNegZero    As Currency = -922337203685477.5807@ - 0.0001@   ' VB won't accept -922337203685477.5808@ as a constant
 
 Private mNegativeZero As Double
 
@@ -91,8 +91,8 @@ End Function
 ' @param Count The number of bits to shift.
 ' @return The newly shifted value.
 '
-Public Function lshift(ByVal Value As Long, ByVal Count As Long) As Long
-    lshift = Helper.ShiftLeft(Value, Count)
+Public Function LShift(ByVal Value As Long, ByVal Count As Long) As Long
+    LShift = Helper.ShiftLeft(Value, Count)
 End Function
 
 ''
@@ -102,8 +102,8 @@ End Function
 ' @param Count The number of bits to shift.
 ' @return The newly shifted value.
 '
-Public Function rshift(ByVal Value As Long, ByVal Count As Long) As Long
-    rshift = Helper.ShiftRight(Value, Count)
+Public Function RShift(ByVal Value As Long, ByVal Count As Long) As Long
+    RShift = Helper.ShiftRight(Value, Count)
 End Function
 
 ''
@@ -114,9 +114,9 @@ End Function
 ' @param Remainder The variable to place the remainder of the division.
 ' @return The quotient of the division.
 '
-Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef remainder As Long) As Long
+Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef Remainder As Long) As Long
     DivRem = a \ b
-    remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
+    Remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
 End Function
 
 ''
@@ -134,7 +134,7 @@ End Property
 ' @return Pi (approx 3.14159265358979)
 '
 Public Property Get PI() As Double
-    PI = C_PI
+    PI = corPI
 End Property
 
 ''
@@ -234,7 +234,7 @@ End Function
 ' @return The angle in radians.
 '
 Public Function ACos(ByVal d As Double) As Double
-    ACos = Atn(-d / Sqr(-d * d + 1)) + 2 * ATN_1
+    ACos = Atn(-d / Sqr(-d * d + 1)) + 2 * corAtn1
 End Function
 
 ''
@@ -301,7 +301,7 @@ End Function
 ' @return A base 10 log value.
 '
 Public Function Log10(ByVal d As Double) As Double
-    Log10 = Log(d) / LOG_10
+    Log10 = Log(d) / corLog10
 End Function
 
 ''
@@ -329,7 +329,7 @@ End Function
 ' @return An angle in degrees.
 '
 Public Function CDeg(ByVal Radians As Double) As Double
-    CDeg = 180# * Radians / C_PI
+    CDeg = 180# * Radians / corPI
 End Function
 
 ''
@@ -347,7 +347,7 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    mNegativeZero = AsDouble(NEG_ZERO)
+    mNegativeZero = AsDouble(corNegZero)
 End Sub
 
 

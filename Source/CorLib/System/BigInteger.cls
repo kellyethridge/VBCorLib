@@ -893,9 +893,11 @@ Private Function ParseFormatSpecifier(ByVal Format As String, ByRef Specifier As
         Dim Ch As Long
         Ch = Asc(Mid$(Format, i, 1))
         Select Case Ch
-            Case 48 To 57
+            Case corZeroChar To corNineChar
                 Result = Result * 10 + (Ch - 48)
-                If Result > 1000000 Then Exit For   ' hopefully over 1 million digits is enough.
+                If Result > 1000000 Then
+                    Exit For   ' hopefully over 1 million digits is enough.
+                End If
             Case Else
                 Call Err.Raise(5, , "Invalid format specifier")
         End Select
@@ -923,8 +925,8 @@ Private Function ShiftLeftNumber(ByRef n As Number, ByVal bitCount As Long) As I
     Else
         Dim lowermask   As Long: lowermask = ((PowersOf2(16 - remainingBits) And &HFFFF&) - 1) And &HFFFF&
         Dim uppermask   As Long: uppermask = (Not lowermask) And &HFFFF&
-        Dim rshift      As Long: rshift = PowersOf2(16 - remainingBits) And &HFFFF&
-        Dim lshift      As Long: lshift = PowersOf2(remainingBits) And &HFFFF&
+        Dim RShift      As Long: RShift = PowersOf2(16 - remainingBits) And &HFFFF&
+        Dim LShift      As Long: LShift = PowersOf2(remainingBits) And &HFFFF&
         
         Dim srcInt      As Integer
         Dim dstInt      As Integer
@@ -936,22 +938,22 @@ Private Function ShiftLeftNumber(ByRef n As Number, ByVal bitCount As Long) As I
             srcInt = n.Digits(j)
             
             If InIDE Then
-                newNumber(i) = dstInt Or GetInt(GetLong((srcInt And lowermask)) * lshift)
+                newNumber(i) = dstInt Or GetInt(GetLong((srcInt And lowermask)) * LShift)
             Else
-                newNumber(i) = dstInt Or ((srcInt And &HFFFF&) And lowermask) * lshift
+                newNumber(i) = dstInt Or ((srcInt And &HFFFF&) And lowermask) * LShift
             End If
             i = i + 1
             
-            dstInt = ((srcInt And &HFFFF&) And uppermask) \ rshift
+            dstInt = ((srcInt And &HFFFF&) And uppermask) \ RShift
             
             j = j + 1
             If j = n.Precision Then Exit Do
         Loop
         
         If InIDE Then
-            If n.Sign = Negative Then dstInt = dstInt Or GetInt(&H10000 - lshift)
+            If n.Sign = Negative Then dstInt = dstInt Or GetInt(&H10000 - LShift)
         Else
-            If n.Sign = Negative Then dstInt = dstInt Or (&H10000 - lshift)
+            If n.Sign = Negative Then dstInt = dstInt Or (&H10000 - LShift)
         End If
                
         newNumber(i) = dstInt
@@ -979,8 +981,8 @@ Private Function ShiftRightNumber(ByRef n As Number, ByVal bitCount As Long) As 
     Else
         Dim lowermask   As Long: lowermask = ((PowersOf2(remainingBits) And &HFFFF&) - 1) And &HFFFF&
         Dim uppermask   As Long: uppermask = (Not lowermask) And &HFFFF&
-        Dim rshift      As Long: rshift = PowersOf2(remainingBits) And &HFFFF&
-        Dim lshift      As Long: lshift = PowersOf2(16 - remainingBits) And &HFFFF&
+        Dim RShift      As Long: RShift = PowersOf2(remainingBits) And &HFFFF&
+        Dim LShift      As Long: LShift = PowersOf2(16 - remainingBits) And &HFFFF&
         
         Dim srcInt      As Integer
         Dim dstInt      As Integer
@@ -990,7 +992,7 @@ Private Function ShiftRightNumber(ByRef n As Number, ByVal bitCount As Long) As 
         j = wordCount
         srcInt = n.Digits(j)
         Do
-            dstInt = ((srcInt And &HFFFF&) And uppermask) \ rshift
+            dstInt = ((srcInt And &HFFFF&) And uppermask) \ RShift
             
             j = j + 1
             If j = n.Precision Then Exit Do
@@ -998,18 +1000,18 @@ Private Function ShiftRightNumber(ByRef n As Number, ByVal bitCount As Long) As 
             srcInt = n.Digits(j)
             
             If InIDE Then
-                newNumber(i) = dstInt Or GetInt(GetLong(srcInt And lowermask) * lshift)
+                newNumber(i) = dstInt Or GetInt(GetLong(srcInt And lowermask) * LShift)
             Else
-                newNumber(i) = dstInt Or (((srcInt And &HFFFF&) And lowermask) * lshift)
+                newNumber(i) = dstInt Or (((srcInt And &HFFFF&) And lowermask) * LShift)
             End If
             
             i = i + 1
         Loop
             
         If InIDE Then
-            If n.Sign = Negative Then dstInt = dstInt Or GetInt(&H10000 - lshift)
+            If n.Sign = Negative Then dstInt = dstInt Or GetInt(&H10000 - LShift)
         Else
-            If n.Sign = Negative Then dstInt = dstInt Or (&H10000 - lshift)
+            If n.Sign = Negative Then dstInt = dstInt Or (&H10000 - LShift)
         End If
         
         newNumber(i) = dstInt
