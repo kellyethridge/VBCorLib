@@ -91,8 +91,8 @@ End Function
 ' @param Count The number of bits to shift.
 ' @return The newly shifted value.
 '
-Public Function LShift(ByVal Value As Long, ByVal Count As Long) As Long
-    LShift = Helper.ShiftLeft(Value, Count)
+Public Function lshift(ByVal Value As Long, ByVal Count As Long) As Long
+    lshift = Helper.ShiftLeft(Value, Count)
 End Function
 
 ''
@@ -102,8 +102,8 @@ End Function
 ' @param Count The number of bits to shift.
 ' @return The newly shifted value.
 '
-Public Function RShift(ByVal Value As Long, ByVal Count As Long) As Long
-    RShift = Helper.ShiftRight(Value, Count)
+Public Function rshift(ByVal Value As Long, ByVal Count As Long) As Long
+    rshift = Helper.ShiftRight(Value, Count)
 End Function
 
 ''
@@ -124,8 +124,8 @@ End Function
 '
 ' @return <b><i>e</i></b> (Approx 2.71828182845905)
 '
-Public Property Get E() As Double
-    E = 2.71828182845905
+Public Property Get e() As Double
+    e = 2.71828182845905
 End Property
 
 ''
@@ -140,23 +140,20 @@ End Property
 ''
 ' Returns the maximum of two values.
 '
-' @param x Value to test as potential max value.
-' @param y Value to test as potential max value.
+' @param X Value to test as potential max value.
+' @param Y Value to test as potential max value.
 ' @return The max value.
-' @remarks No type checking is performed to determine the maximum of two
-' values given. A string compared to an integer is a legal pair of values
-' to test. The only type checked is for an <b>IComparable</b> object. If
-' <b>x</b> is an <b>IComparable</b>, then the object is used to test for
+' @remarks The values must be of the same type for the comparison to be performed.
+' If <b>X</b> is an <b>IComparable</b>, then the object is used to test for
 ' the maximum value.
-' <p>If both values are equavalent then <b>x</b> is returned.</p>
+' <p>If both values are equavalent then <b>X</b> is returned.</p>
 '
 Public Function Max(ByRef X As Variant, ByRef Y As Variant) As Variant
-    On Error GoTo errTrap
-    GetMax X, Y, Max
-    Exit Function
-    
-errTrap:
-    Throw Cor.NewArgumentException("Values could not be compared.")
+    If IsGtOrEq(X, Y) Then
+        VariantCopyInd Max, X
+    Else
+        VariantCopyInd Max, Y
+    End If
 End Function
 
 ''
@@ -165,36 +162,24 @@ End Function
 ' @param List The list of values to continue searching for the maximum.
 ' @return The maximum value found.
 ' @remarks The list can be an <b>Array</b>, <b>Collection</b>, or <b>ICollection</b> object.
-' <p>No type checking is performed to determine the maximum of two
-' values given. A string compared to an integer is a legal pair of values
-' to test. The only type checked is for an <b>IComparable</b> object. If
-' <b>x</b> is an <b>IComparable</b>, then the object is used to test for
-' the maximum value.</p>
+' <p>The values must be of the same type for the comparison to be performed.
+' If <b>X</b> is an <b>IComparable</b>, then the object is used to test for
+' the maximum value.
 '
 Public Function MaxIn(ByRef List As Variant) As Variant
-    On Error GoTo errTrap
+    Dim StartComparing  As Boolean
+    Dim Value           As Variant
     
-    Dim IsFirstElement As Boolean
-    IsFirstElement = True
-    
-    Dim v As Variant
-    For Each v In List
-        If IsFirstElement Then
-            Call VariantCopy(MaxIn, v)
-            IsFirstElement = False
+    For Each Value In List
+        If StartComparing Then
+            If IsGtOrEq(Value, MaxIn) Then
+                Helper.MoveVariant MaxIn, Value
+            End If
         Else
-            Call GetMax(MaxIn, v, MaxIn)
+            Helper.MoveVariant MaxIn, Value
+            StartComparing = True
         End If
-    Next v
-    
-    On Error GoTo 0
-    If IsFirstElement Then _
-        Throw Cor.NewArgumentException("List cannot be empty.", "List")
-        
-    Exit Function
-    
-errTrap:
-    Throw Cor.NewArgumentException("Could not compare values.", "List")
+    Next
 End Function
 
 ''
@@ -203,20 +188,17 @@ End Function
 ' @param x Value to test as potential min value.
 ' @param y Value to test as potential min value.
 ' @return The min value.
-' @remarks No type checking is performed to determine the minimum of two
-' values given. A string compared to an integer is a legal pair of values
-' to test. The only type checked is for an <b>IComparable</b> object. If
-' <b>x</b> is an <b>IComparable</b>, then the object is used to test for
+' @remarks The values must be of the same type for the comparison to be performed.
+' If <b>X</b> is an <b>IComparable</b>, then the object is used to test for
 ' the minimum value.
-' <p>If both values are equavalent then <b>x</b> is returned.</p>
+' <p>If both values are equavalent then <b>X</b> is returned.</p>
 '
 Public Function Min(ByRef X As Variant, ByRef Y As Variant) As Variant
-    On Error GoTo errTrap
-    GetMin X, Y, Min
-    Exit Function
-    
-errTrap:
-    Throw Cor.NewArgumentException("Values could not be compared.")
+    If IsLtOrEq(X, Y) Then
+        VariantCopyInd Min, X
+    Else
+        VariantCopyInd Min, Y
+    End If
 End Function
 
 ''
@@ -225,36 +207,24 @@ End Function
 ' @param List A list of values to find the mininum value in.
 ' @return The mininum value found in the list.
 ' @remarks The list can be an <b>Array</b>, <b>Collection</b>, or <b>ICollection</b> object.
-' <p>No type checking is performed to determine the minimum of two
-' values given. A string compared to an integer is a legal pair of values
-' to test. The only type checked is for an <b>IComparable</b> object. If
-' <b>x</b> is an <b>IComparable</b>, then the object is used to test for
-' the minimum value.</p>
+' <p>The values must be of the same type for the comparison to be performed.
+' If <b>X</b> is an <b>IComparable</b>, then the object is used to test for
+' the minimum value.
 '
 Public Function MinIn(ByRef List As Variant) As Variant
-    On Error GoTo errTrap
+    Dim StartComparing  As Boolean
+    Dim Value           As Variant
     
-    Dim IsFirstElement As Boolean
-    IsFirstElement = True
-    
-    Dim v As Variant
-    For Each v In List
-        If IsFirstElement Then
-            VariantCopy MinIn, v
-            IsFirstElement = False
+    For Each Value In List
+        If StartComparing Then
+            If IsLtOrEq(Value, MinIn) Then
+                Helper.MoveVariant MinIn, Value
+            End If
         Else
-            GetMin MinIn, v, MinIn
+            Helper.MoveVariant MinIn, Value
+            StartComparing = True
         End If
-    Next v
-    
-    On Error GoTo 0
-    If IsFirstElement Then _
-        Throw Cor.NewArgumentException("List cannot be empty.", "List")
-        
-    Exit Function
-    
-errTrap:
-    Throw Cor.NewArgumentException("Could not compare values.", "List")
+    Next
 End Function
 
 ''
@@ -384,40 +354,30 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub GetMin(ByRef X As Variant, ByRef Y As Variant, ByRef RetVal As Variant)
-    If Not IsObject(X) Then
-        If X > Y Then
-            RetVal = Y
-        Else
-            RetVal = X
-        End If
-    ElseIf TypeOf X Is IComparable Then
-        Dim c As IComparable
-        Set c = X
-        If c.CompareTo(Y) > 0 Then
-            Set RetVal = Y
-        Else
-            Set RetVal = X
-        End If
-    End If
-End Sub
+Private Function IsGtOrEq(ByRef X As Variant, ByRef Y As Variant) As Boolean
+    Select Case VarType(X)
+        Case vbObject
+            If Not IsObject(Y) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+            
+            IsGtOrEq = Comparer.Default.Compare(X, Y) >= 0
+        Case VarType(Y)
+            IsGtOrEq = X >= Y
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+    End Select
+End Function
 
-Private Sub GetMax(ByRef X As Variant, ByRef Y As Variant, ByRef RetVal As Variant)
-    If Not IsObject(X) Then
-        If X < Y Then
-            RetVal = Y
-        Else
-            RetVal = X
-        End If
-    ElseIf TypeOf X Is IComparable Then
-        Dim c As IComparable
-        Set c = X
-        If c.CompareTo(Y) < 0 Then
-            Set RetVal = Y
-        Else
-            Set RetVal = X
-        End If
-    End If
-End Sub
-
-
+Private Function IsLtOrEq(ByRef X As Variant, ByRef Y As Variant) As Boolean
+    Select Case VarType(X)
+        Case vbObject
+            If Not IsObject(Y) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+            
+            IsLtOrEq = Comparer.Default.Compare(X, Y) <= 0
+        Case VarType(Y)
+            IsLtOrEq = X <= Y
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+    End Select
+End Function

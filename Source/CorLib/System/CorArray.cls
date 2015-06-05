@@ -1191,7 +1191,7 @@ Private Function BinarySearchCore(ByRef Arr As Variant, ByVal Index As Long, ByV
     On Error GoTo errTrap
     
     If Comparer Is Nothing Then
-        If CorArrayHelper.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, BinarySearchCore) Then
+        If CorArraySearch.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, BinarySearchCore) Then
             Exit Function
         End If
         
