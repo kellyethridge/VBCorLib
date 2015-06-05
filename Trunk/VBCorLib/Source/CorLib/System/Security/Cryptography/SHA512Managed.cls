@@ -364,7 +364,9 @@ Private Sub UAdd64(ByRef xh As Long, ByRef xl As Long, ByVal yh As Long, ByVal y
 End Sub
 
 Private Function RShiftHi(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
-    If Count < 32 Then RShiftHi = Helper.ShiftRight(xh, Count)
+    If Count < 32 Then
+        RShiftHi = Helper.ShiftRight(xh, Count)
+    End If
 End Function
 
 Private Function RShiftLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long

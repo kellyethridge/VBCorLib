@@ -49,6 +49,41 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2, 5, 2
             Test.Use NewInt32(2), NewInt32(5), NewInt32(2)
             Test.Use NewInt32(5), NewInt32(2), NewInt32(2)
+            
+        Case "DivRem_WithValues_ReturnsExpected"
+            Test.Use 11, 4, 2, 3
+            Test.Use -11, 4, -2, -3
+            Test.Use -11, -4, 2, -3
+            Test.Use 11, -4, -2, 3
+        
+        Case "MinIn_WithValues_ReturnsExpected"
+            Test.Use Array(5, 4, 3, 2, 1), 1
+            Test.Use Array(#1/1/2001#, #1/2/2001#, #1/3/2001#), #1/1/2001#
+            Test.Use Array(NewDate(#1/1/2001#), NewDate(#1/2/2001#), NewDate(#1/1/2000#)), NewDate(#1/1/2000#)
+            Test.Use Array(), Empty
+            Test.Use NewCollection(5, 4, 3, 2, 1), 1
+            Test.Use NewCollection(#1/1/2001#, #1/2/2001#, #1/3/2001#), #1/1/2001#
+            Test.Use NewCollection(NewDate(#1/1/2001#), NewDate(#1/2/2001#), NewDate(#1/1/2000#)), NewDate(#1/1/2000#)
+            Test.Use New Collection, Empty
+            Test.Use Cor.NewArrayList(Source:=Array(5, 4, 3, 2, 1)), 1
+            Test.Use Cor.NewArrayList(Source:=Array(#1/1/2001#, #1/2/2001#, #1/3/2001#)), #1/1/2001#
+            Test.Use Cor.NewArrayList(Source:=Array(NewDate(#1/1/2001#), NewDate(#1/2/2001#), NewDate(#1/1/2000#))), NewDate(#1/1/2000#)
+            Test.Use New ArrayList, Empty
+            
+        Case "MaxIn_WithValues_ReturnsExpected"
+            Test.Use Array(5, 4, 3, 2, 1), 5
+            Test.Use Array(#1/1/2001#, #1/2/2001#, #1/3/2001#), #1/3/2001#
+            Test.Use Array(NewDate(#1/1/2001#), NewDate(#1/2/2001#), NewDate(#1/1/2000#)), NewDate(#1/2/2001#)
+            Test.Use Array(), Empty
+            Test.Use NewCollection(5, 4, 3, 2, 1), 5
+            Test.Use NewCollection(#1/1/2001#, #1/2/2001#, #1/3/2001#), #1/3/2001#
+            Test.Use NewCollection(NewDate(#1/1/2001#), NewDate(#1/2/2001#), NewDate(#1/1/2000#)), NewDate(#1/2/2001#)
+            Test.Use New Collection, Empty
+            Test.Use Cor.NewArrayList(Source:=Array(5, 4, 3, 2, 1)), 5
+            Test.Use Cor.NewArrayList(Source:=Array(#1/1/2001#, #1/2/2001#, #1/3/2001#)), #1/3/2001#
+            Test.Use Cor.NewArrayList(Source:=Array(NewDate(#1/1/2001#), NewDate(#1/2/2001#), NewDate(#1/1/2000#))), NewDate(#1/2/2001#)
+            Test.Use New ArrayList, Empty
+        
     End Select
 End Sub
 
@@ -100,63 +135,30 @@ Public Sub Max_WithNonComparable_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
-Public Sub TestDivRem()
-    Dim Q As Long
-    Dim r As Long
+Public Sub DivRem_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long, ByVal ExpectedQ As Long, ByVal ExpectedR As Long)
+    Dim ActualQ As Long
+    Dim ActualR As Long
     
-    Q = DivRem(11, 4, r)
+    ActualQ = DivRem(a, b, ActualR)
     
-    Assert.AreEqual 2, Q
-    Assert.AreEqual 3, r
+    Assert.That ActualQ, Iz.EqualTo(ExpectedQ)
+    Assert.That ActualR, Iz.EqualTo(ExpectedR)
 End Sub
 
-Public Sub TestDivRemNegNum()
-    Dim Q As Long
-    Dim r As Long
+Public Sub MinIn_WithValues_ReturnsExpected(ByRef List As Variant, ByRef Expected As Variant)
+    Dim Actual As Variant
     
-    Q = DivRem(-11, 4, r)
+    MoveVariant Actual, MinIn(List)
     
-    Assert.AreEqual -2, Q
-    Assert.AreEqual -3, r
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestDivRemNegNumAndDenom()
-    Dim Q As Long
-    Dim r As Long
+Public Sub MaxIn_WithValues_ReturnsExpected(ByRef List As Variant, ByRef Expected As Variant)
+    Dim Actual As Variant
     
-    Q = DivRem(-11, -4, r)
+    MoveVariant Actual, MaxIn(List)
     
-    Assert.AreEqual 2, Q
-    Assert.AreEqual -3, r
+    Assert.That Actual, Equals(Expected)
 End Sub
 
-Public Sub TestDivRemNegDenom()
-    Dim Q As Long
-    Dim r As Long
-    
-    Q = DivRem(11, -4, r)
-    
-    Assert.AreEqual -2, Q
-    Assert.AreEqual 3, r
-End Sub
-
-Public Sub TestMinInArray()
-    Dim a(10)
-    Dim i As Long
-    For i = 0 To 10
-        a(i) = 10 - i
-    Next i
-    
-    Assert.AreEqual 0, MinIn(a)
-End Sub
-
-Public Sub TestMaxInArray()
-    Dim a(10)
-    Dim i As Long
-    For i = 0 To 10
-        a(i) = i
-    Next i
-    
-    Assert.AreEqual 10, MaxIn(a)
-End Sub
 
