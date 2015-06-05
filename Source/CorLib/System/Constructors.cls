@@ -1807,3 +1807,11 @@ Public Function NewDriveNotFoundException(ByRef Message As String, Optional ByVa
     Set NewDriveNotFoundException = New DriveNotFoundException
     NewDriveNotFoundException.Init Message, InnerException
 End Function
+
+Public Function NewEnumeratorBase(ByVal Target As Object, ByVal Length As Long, Optional ByVal StartIndex As Long) As EnumeratorBase
+    Set NewEnumeratorBase = New EnumeratorBase
+    NewEnumeratorBase.Init Target, Length, StartIndex
+End Function
+
+
+

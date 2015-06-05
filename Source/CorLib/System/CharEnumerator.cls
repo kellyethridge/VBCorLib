@@ -185,46 +185,25 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef s As String, ByVal CopyString As Boolean)
-    Dim ptr As Long
+    Dim Ptr As Long
     
     If CopyString Then
         mStringCopy = s
-        ptr = StrPtr(mStringCopy)
+        Ptr = StrPtr(mStringCopy)
     Else
-        ptr = StrPtr(s)
+        Ptr = StrPtr(s)
     End If
     mEndIndex = Len(s) - 1
-    InitWordBuffer mString, ptr, mEndIndex + 1
+    InitWordBuffer mString, Ptr, mEndIndex + 1
     Reset
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    With PropBag
-        mIndex = .ReadProperty("Index")
-        mEndIndex = .ReadProperty("EndIndex")
-        mStringCopy = .ReadProperty("String")
-        InitWordBuffer mString, StrPtr(mStringCopy), mEndIndex + 1
-    End With
-End Sub
-
-Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    With PropBag
-        .WriteProperty "Index", mIndex
-        .WriteProperty "EndIndex", mEndIndex
-        .WriteProperty "String", mStringCopy
-    End With
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -240,7 +219,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerator Interface
+'   IEnumerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
     IEnumerator_Current = Current

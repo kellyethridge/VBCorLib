@@ -342,6 +342,7 @@ Class=PathHelper; System\IO\PathHelper.cls
 Class=DriveNotFoundException; System\IO\DriveNotFoundException.cls
 Class=IOError; System\IO\IOError.cls
 ResFile32="VBCorLib.RES"
+Class=EnumeratorBase; System\Collections\EnumeratorBase.cls
 Startup="Sub Main"
 HelpFile=""
 Title="VBCorLib"

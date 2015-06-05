@@ -77,7 +77,7 @@ Private Function IsWhiteSpaceString(ByRef s As Variant, ByRef Index As Variant) 
         Throw Error.ArgumentOutOfRange("Index")
     
     Dim Ptr As Long
-    Ptr = StrPtr(s) + CharIndex * 2
+    Ptr = StrPtr(s) + CharIndex * corSizeOfChar
     IsWhiteSpaceString = IsWhiteSpaceChar(MemWord(Ptr))
 End Function
 
