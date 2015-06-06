@@ -829,11 +829,12 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
-    Path = CorString.Trim(Path)
-    If Len(Path) = 0 Then _
+Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As FileAccess, ByVal Share As FileShare, ByVal BufferSize As Long, ByVal UseAsync As Boolean)
+    Dim TrimmedPath As String
+    TrimmedPath = CorString.Trim(Path)
+    If Len(TrimmedPath) = 0 Then _
         Throw Error.Argument(Argument_EmptyPath, "Path")
     If BufferSize <= 0 Then _
         Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedPosNum)
@@ -857,14 +858,15 @@ Friend Sub Init(ByVal Path As String, ByVal Mode As FileMode, ByVal Access As Fi
         Access = ReadWriteAccess
     End If
     
-    Statics.Path.CheckValidPathAndFixSlashes Path
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(TrimmedPath)
     
-    Set mHandle = Win32Native.SafeCreateFile(Path, Access, Share, Mode)
+    Set mHandle = Win32Native.SafeCreateFile(FullPath, Access, Share, Mode)
     If mHandle.IsInvalid Then
-        IOError.WinIOError Err.LastDllError, Path
+        IOError.WinIOError Err.LastDllError, FullPath
     End If
     
-    mName = Statics.Path.GetFileName(Path)
+    mName = Statics.Path.GetFileName(FullPath)
     mCanWrite = CBool(Access And FileAccess.WriteAccess)
     mCanRead = CBool(Access And FileAccess.ReadAccess) And (Mode <> Truncate)
     mCanSeek = (GetFileType(mHandle) = FILE_TYPE_DISK)
@@ -896,6 +898,10 @@ Friend Sub InitWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAc
             mFilePosition = InternalSeek(0@, FromEnd)
         End If
     End If
+End Sub
+
+Private Sub Class_Terminate()
+    CloseStream
 End Sub
 
 
@@ -964,15 +970,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    CloseStream
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -988,7 +986,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Stream Interface
+'   Stream
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
     Set Stream_BeginRead = BeginRead(Buffer, Offset, Count, Callback, State)
