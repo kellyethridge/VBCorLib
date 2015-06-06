@@ -40,9 +40,12 @@ Implements ICloneable
 Private mLength         As Long
 Private mCount          As Long
 Private mStartIndex     As Long
+Private mCollection     As IVersionableCollection
+Private mVersion        As Long
 
 
 Public Function MoveNext() As Boolean
+    EnsureUnchangedVersion
     EnsureNotFinished
     
     mCount = mCount + 1
@@ -54,6 +57,7 @@ Public Sub Reset()
 End Sub
 
 Public Property Get Index() As Long
+    EnsureUnchangedVersion
     EnsureStarted
     EnsureNotFinished
     
@@ -62,32 +66,42 @@ End Property
 
 Public Function Clone() As EnumeratorBase
     Set Clone = New EnumeratorBase
-    Clone.InitClone mStartIndex, mLength, mCount
+    Clone.InitClone mStartIndex, mLength, mCount, mCollection
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal StartIndex As Long, ByVal Length As Long)
+Friend Sub Init(ByVal StartIndex As Long, ByVal Length As Long, ByVal Collection As IVersionableCollection)
     If Length < 0 Then _
         Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     
     mLength = Length
     mStartIndex = StartIndex
-    Reset
+    mCount = -1
+    Set mCollection = IfObject(Collection, NullVersionableCollection.Instance)
+    mVersion = mCollection.CurrentVersion
 End Sub
 
-Friend Sub InitClone(ByVal StartIndex As Long, ByVal Length As Long, ByVal Count As Long)
+Friend Sub InitClone(ByVal StartIndex As Long, ByVal Length As Long, ByVal Count As Long, ByVal Collection As IVersionableCollection)
     mStartIndex = StartIndex
     mLength = Length
     mCount = Count
+    Set mCollection = Collection
+    mVersion = mCollection.CurrentVersion
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub EnsureUnchangedVersion()
+    If mCollection.CurrentVersion <> mVersion Then
+        Throw Error.InvalidOperation(InvalidOperation_VersionError)
+    End If
+End Sub
+
 Private Sub EnsureStarted()
     If mCount < 0 Then
         Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)

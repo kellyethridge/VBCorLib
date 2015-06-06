@@ -35,6 +35,14 @@ Public Type ListRange
 End Type
 
 
+Public Function IfObject(ByVal ObjA As Object, ByVal ObjB As Object) As Object
+    If ObjA Is Nothing Then
+        Set IfObject = ObjB
+    Else
+        Set IfObject = ObjA
+    End If
+End Function
+
 ''
 ' Returns an optional value or a default value if the optional value is missing.
 '

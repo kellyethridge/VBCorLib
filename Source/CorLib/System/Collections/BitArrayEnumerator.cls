@@ -44,8 +44,8 @@ Implements IObject
 Implements IEnumerator
 Implements ICloneable
 
-Private mBase As CollectionEnumeratorBase
-Private mList       As BitArray
+Private mBase As EnumeratorBase
+Private mList As BitArray
 
 
 Public Function NewEnum() As IUnknown
@@ -59,13 +59,13 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As BitArray)
+    Set mBase = Cor.NewEnumeratorBase(0, List.Count, List)
     Set mList = List
-    Set mBase = Cor.NewCollectionEnumeratorBase(List, 0, List.Count)
 End Sub
 
-Friend Sub InitClone(ByVal List As BitArray, ByVal Base As CollectionEnumeratorBase)
-    Set mList = List
+Friend Sub InitClone(ByVal Base As EnumeratorBase, ByVal List As BitArray)
     Set mBase = Base
+    Set mList = List
 End Sub
 
 
@@ -90,7 +90,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New BitArrayEnumerator
-    Ret.InitClone mList, mBase.Clone
+    Ret.InitClone mBase.Clone, mList
     Set ICloneable_Clone = Ret
 End Function
 
