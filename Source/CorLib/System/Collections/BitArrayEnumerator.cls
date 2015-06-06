@@ -8,28 +8,31 @@ BEGIN
 END
 Attribute VB_Name = "BitArrayEnumerator"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+Attribute VB_Exposed = False
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: BitArrayEnumerator
+' Module: BitArrayEnumerator
 '
 
 ''
@@ -41,26 +44,28 @@ Implements IObject
 Implements IEnumerator
 Implements ICloneable
 
+Private mBase As CollectionEnumeratorBase
 Private mList       As BitArray
-Private mIndex      As Long
-Private mEndIndex   As Long
-Private mVersion    As Long
 
+
+Public Function NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+Attribute NewEnum.VB_MemberFlags = "40"
+    Set NewEnum = CreateEnumerator(Me)
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As BitArray)
     Set mList = List
-    mVersion = GetCollectionVersion(List)
-    mIndex = -1
-    mEndIndex = List.Count - 1
+    Set mBase = Cor.NewCollectionEnumeratorBase(List, 0, List.Count)
 End Sub
 
-Friend Sub InitClone(ByVal List As BitArray, ByVal Index As Long)
-    Init List
-    mIndex = Index
+Friend Sub InitClone(ByVal List As BitArray, ByVal Base As CollectionEnumeratorBase)
+    Set mList = List
+    Set mBase = Base
 End Sub
 
 
@@ -85,7 +90,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New BitArrayEnumerator
-    Ret.InitClone mList, mIndex
+    Ret.InitClone mList, mBase.Clone
     Set ICloneable_Clone = Ret
 End Function
 
@@ -94,30 +99,13 @@ End Function
 '   IEnumerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If GetCollectionVersion(mList) <> mVersion Then _
-        Throw Error.InvalidOperation(InvalidOperation_VersionError)
-    If mIndex < 0 Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
-    If mIndex > mEndIndex Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
-
-    IEnumerator_Current = mList(mIndex)
+    IEnumerator_Current = mList(mBase.Index)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If GetCollectionVersion(mList) <> mVersion Then _
-        Throw Error.InvalidOperation(InvalidOperation_VersionError)
-    If mIndex > mEndIndex Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
-    
-    If mIndex = mEndIndex Then
-        mIndex = mEndIndex + 1
-    Else
-        mIndex = mIndex + 1
-        IEnumerator_MoveNext = True
-    End If
+    IEnumerator_MoveNext = mBase.MoveNext
 End Function
 
 Private Sub IEnumerator_Reset()
-    mIndex = -1
+    mBase.Reset
 End Sub

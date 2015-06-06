@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "EnumeratorBase"
+Attribute VB_Name = "CollectionEnumeratorBase"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
@@ -32,17 +32,26 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: EnumeratorBase
+' Module: CollectionEnumeratorBase
 '
 Option Explicit
 Implements ICloneable
 
-Private mLength         As Long
-Private mCount          As Long
-Private mStartIndex     As Long
+Private mCollection As IVersionableCollection
+Private mVersion    As Long
+Private mLength     As Long
+Private mCount      As Long
+Private mStartIndex As Long
 
+
+Public Sub CheckCurrent()
+    EnsureUnchangedVersion
+    EnsureStarted
+    EnsureNotFinished
+End Sub
 
 Public Function MoveNext() As Boolean
+    EnsureUnchangedVersion
     EnsureNotFinished
     
     mCount = mCount + 1
@@ -54,31 +63,38 @@ Public Sub Reset()
 End Sub
 
 Public Property Get Index() As Long
+    EnsureUnchangedVersion
     EnsureStarted
     EnsureNotFinished
     
     Index = mStartIndex + mCount
 End Property
 
-Public Function Clone() As EnumeratorBase
-    Set Clone = New EnumeratorBase
-    Clone.InitClone mStartIndex, mLength, mCount
+Public Function Clone() As CollectionEnumeratorBase
+    Set Clone = New CollectionEnumeratorBase
+    Clone.InitClone mCollection, mStartIndex, mLength, mCount
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal StartIndex As Long, ByVal Length As Long)
+Friend Sub Init(ByVal Collection As IVersionableCollection, ByVal StartIndex As Long, ByVal Length As Long)
+    If Collection Is Nothing Then _
+        Throw Error.ArgumentNull("Collection")
     If Length < 0 Then _
         Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     
+    Set mCollection = Collection
+    mVersion = Collection.CurrentVersion
     mLength = Length
     mStartIndex = StartIndex
     Reset
 End Sub
 
-Friend Sub InitClone(ByVal StartIndex As Long, ByVal Length As Long, ByVal Count As Long)
+Friend Sub InitClone(ByVal Collection As IVersionableCollection, ByVal StartIndex As Long, ByVal Length As Long, ByVal Count As Long)
+    Set mCollection = Collection
+    mVersion = Collection.CurrentVersion
     mStartIndex = StartIndex
     mLength = Length
     mCount = Count
@@ -88,6 +104,12 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub EnsureUnchangedVersion()
+    If mCollection.CurrentVersion <> mVersion Then
+        Throw Error.InvalidOperation(InvalidOperation_VersionError)
+    End If
+End Sub
+
 Private Sub EnsureStarted()
     If mCount < 0 Then
         Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
@@ -107,3 +129,4 @@ End Sub
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
 End Function
+
