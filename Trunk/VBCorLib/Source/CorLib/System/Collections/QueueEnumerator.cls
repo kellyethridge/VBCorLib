@@ -40,7 +40,6 @@ Implements IEnumerator
 Implements ICloneable
 
 Private mBase       As EnumeratorBase
-Private mQueue      As Queue
 Private mItems()    As Variant
 Private mCapacity   As Long
 
@@ -57,14 +56,12 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal q As Queue, ByVal Head As Long, ByRef Items() As Variant)
     Set mBase = Cor.NewEnumeratorBase(Head, q.Count, q)
-    Set mQueue = q
     SAPtr(mItems) = SAPtr(Items)
     mCapacity = CorArray.LengthFirstDim(mItems)
 End Sub
 
-Friend Sub InitClone(ByVal Base As EnumeratorBase, ByVal q As Queue, ByRef Items() As Variant)
+Friend Sub InitClone(ByVal Base As EnumeratorBase, ByRef Items() As Variant)
     Set mBase = Base
-    Set mQueue = q
     SAPtr(mItems) = SAPtr(Items)
     mCapacity = CorArray.LengthFirstDim(mItems)
 End Sub
@@ -94,7 +91,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New QueueEnumerator
-    Ret.InitClone mBase.Clone, mQueue, mItems
+    Ret.InitClone mBase.Clone, mItems
     Set ICloneable_Clone = Ret
 End Function
 
