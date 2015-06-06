@@ -57,7 +57,7 @@ Option Explicit
 '
 Public Function ReadOnly(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
-        Throw Error.ArgumentNull("List")
+        Error.ArgumentNull "List"
     
     Dim Ret As New ReadOnlyArrayList
     Ret.Init List
@@ -116,7 +116,7 @@ End Function
 '
 Public Function Adapter(ByVal List As IList) As ArrayList
     If List Is Nothing Then _
-        Throw Error.ArgumentNull("List")
+        Error.ArgumentNull "List"
     
     Dim Wrapper As New IListWrapper
     Wrapper.Init List

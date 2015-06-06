@@ -177,7 +177,7 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
     VerifyIsOpen
     
     If SAPtr(Chars) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Chars", ArgumentNull_Array)
+        Error.ArgumentNull "Chars", ArgumentNull_Array
         
     Dim Output As String
     Output = CorString.FromCharArray(Chars, Index, Count)
@@ -265,7 +265,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
     Select Case VarType(Source)
         Case vbObject
             If Source Is Nothing Then _
-                Throw Error.ArgumentNull("Source", ArgumentNull_Stream)
+                Error.ArgumentNull "Source", ArgumentNull_Stream
             If Not TypeOf Source Is Stream Then _
                 Error.Argument Argument_StreamRequired, "Source"
                 

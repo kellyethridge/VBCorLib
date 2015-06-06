@@ -610,7 +610,7 @@ End Sub
 '
 Public Sub WriteTo(ByVal Stream As Stream)
     If Stream Is Nothing Then _
-        Throw Error.ArgumentNull("Stream", ArgumentNull_Stream)
+        Error.ArgumentNull "Stream", ArgumentNull_Stream
     EnsureBuffer
     EnsureOpen
     

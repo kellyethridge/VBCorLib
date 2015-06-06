@@ -598,7 +598,7 @@ End Function
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
-        Throw Error.ArgumentNull("AsyncResult")
+        Error.ArgumentNull "AsyncResult"
     If mActiveAsyncResult Is Nothing Then _
         Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
     If Not AsyncResult Is mActiveAsyncResult Then _

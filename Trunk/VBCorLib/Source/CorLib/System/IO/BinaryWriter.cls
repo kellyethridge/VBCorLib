@@ -57,7 +57,7 @@ Private mSingleChar(0)  As Integer
 
 Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
     If Output Is Nothing Then _
-        Throw Error.ArgumentNull("Output", ArgumentNull_Stream)
+        Error.ArgumentNull "Output", ArgumentNull_Stream
     If Not Output.CanWrite Then _
         Error.Argument Argument_StreamNotWritable
     

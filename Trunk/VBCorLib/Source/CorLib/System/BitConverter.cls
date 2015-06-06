@@ -323,7 +323,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
     Const ALPHA_OFFSET As Long = 55
 
     If SAPtr(Value) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Value", ArgumentNull_Array)
+        Error.ArgumentNull "Value", ArgumentNull_Array
     
     Dim Range As ListRange
     Range = OptionalStepRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
@@ -375,7 +375,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ValidateArrayArguments(ByRef Value() As Byte, ByVal StartIndex As Long, ByVal Count As Long)
     If SAPtr(Value) = vbNullPtr Then
-        Throw Error.ArgumentNull("Value", ArgumentNull_Array)
+        Error.ArgumentNull "Value", ArgumentNull_Array
     End If
     If StartIndex < LBound(Value) Then
         Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_ArrayLB)

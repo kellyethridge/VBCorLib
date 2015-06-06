@@ -305,7 +305,7 @@ Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByV
     If SourceIndex < 0 Or SourceIndex > mLength Then _
         Throw Error.ArgumentOutOfRange("SourceIndex", ArgumentOutOfRange_Index)
     If SAPtr(Destination) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Destination", ArgumentNull_Array)
+        Error.ArgumentNull "Destination", ArgumentNull_Array
     If DestinationIndex < LBound(Destination) Then _
         Throw Error.ArgumentOutOfRange("DestinationIndex", ArgumentOutOfRange_LBound)
     If Count < 0 Then _
@@ -492,7 +492,7 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
     If Index < 0 Or Index > mLength Then _
         Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
     If SAPtr(Chars) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Chars", ArgumentNull_Array)
+        Error.ArgumentNull "Chars", ArgumentNull_Array
     
     Dim Range As ListRange
     Range = OptionalRange(StartIndex, CharCount, LBound(Chars), CorArray.LengthFirstDim(Chars), Parameter_StartIndex, Parameter_CharCount)

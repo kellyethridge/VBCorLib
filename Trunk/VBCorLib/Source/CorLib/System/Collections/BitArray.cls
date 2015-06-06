@@ -365,7 +365,7 @@ End Function
 Public Function XorBits(ByVal Bits As BitArray) As BitArray
     EnsureInited
     If Bits Is Nothing Then _
-        Throw Error.ArgumentNull("Bits", ArgumentNull_Array)
+        Error.ArgumentNull "Bits", ArgumentNull_Array
     If Bits.Length <> mLength Then _
         Error.Argument Arg_ArrayLengthsDiffer
 

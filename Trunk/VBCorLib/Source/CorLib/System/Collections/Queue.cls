@@ -118,7 +118,7 @@ End Function
 '
 Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.IsNull(DstArray) Then _
-        Throw Error.ArgumentNull("DstArray", ArgumentNull_Array)
+        Error.ArgumentNull "DstArray", ArgumentNull_Array
     If CorArray.Rank(DstArray) <> 1 Then _
         Error.Argument Argument_MultiDimNotSupported, "DstArray"
     If Index < LBound(DstArray) Then _
@@ -334,7 +334,7 @@ Private Sub WriteRange(ByRef Source As Variant)
         WriteArray Source
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Throw Error.ArgumentNull("Source", ArgumentNull_Collection)
+            Error.ArgumentNull "Source", ArgumentNull_Collection
         
         If TypeOf Source Is Collection Then
             WriteVBCollection Source
@@ -350,7 +350,7 @@ End Sub
 
 Private Sub WriteArray(ByRef Source As Variant)
     If CorArray.IsNull(Source) Then _
-        Throw Error.ArgumentNull("Source", ArgumentNull_Array)
+        Error.ArgumentNull "Source", ArgumentNull_Array
     
     WriteCollection CorArray.LengthFirstDim(Source), Source
 End Sub

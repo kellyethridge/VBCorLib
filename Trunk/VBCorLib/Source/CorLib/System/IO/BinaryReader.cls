@@ -75,7 +75,7 @@ Private mSingleChar(0)  As Integer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Stream Is Nothing Then _
-        Throw Error.ArgumentNull("Stream", ArgumentNull_Stream)
+        Error.ArgumentNull "Stream", ArgumentNull_Stream
     If Not Stream.CanRead Then _
         Error.Argument Argument_ReadableStreamRequired
     

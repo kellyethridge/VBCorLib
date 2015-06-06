@@ -531,7 +531,7 @@ Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal
     Dim OfAnyChars() As Integer
     OfAnyChars = AsChars(OfAny)
     If SAPtr(OfAnyChars) = vbNullPtr Then _
-        Throw Error.ArgumentNull("OfAny", ArgumentNull_Array)
+        Error.ArgumentNull "OfAny", ArgumentNull_Array
     
     Dim Chars() As Integer
     Chars = AllocChars(s)
@@ -749,7 +749,7 @@ End Function
 
 Private Function JoinCollection(ByRef Separator As String, ByVal Value As Object) As String
     If Value Is Nothing Then _
-        Throw Error.ArgumentNull("Value")
+        Error.ArgumentNull "Value"
     
     Dim AppendSeparator As Boolean
     Dim Item            As Variant
