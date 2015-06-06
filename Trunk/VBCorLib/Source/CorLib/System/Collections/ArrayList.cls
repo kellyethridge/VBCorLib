@@ -166,7 +166,7 @@ Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef V
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     If mCount = 0 Then
         BinarySearchEx = -1
@@ -284,7 +284,7 @@ End Sub
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
     CheckValidSingleDimArray Arr
     If mCount - Index < Count Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
         
     CorArray.CopyEx mItems, Index, Arr, ArrayIndex, Count
 End Sub
@@ -328,7 +328,7 @@ Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Co
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
 
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, Range.Index, Range.Count
@@ -361,7 +361,7 @@ Public Function GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
         
     Dim Ranged As New RangedArrayList
     Ranged.Init Me, Index, Count
@@ -604,7 +604,7 @@ Public Sub RemoveRange(ByVal Index As Long, ByVal Count As Long)
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
 
     Dim i As Long
     For i = Index To Index + Count - 1
@@ -633,7 +633,7 @@ Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Vari
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
 
 
     CorArray.Reverse mItems, Range.Index, Range.Count
@@ -673,7 +673,7 @@ Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
 
     If Comparer Is Nothing Then
         Set Comparer = mComparer

@@ -119,7 +119,7 @@ Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Option
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count > mList.Count Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, Range.Index, Range.Count
@@ -136,7 +136,7 @@ Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mList.Count Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     Dim Ret As New RangedArrayList
     Ret.Init Me, Index, Count

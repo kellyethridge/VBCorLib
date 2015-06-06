@@ -364,17 +364,17 @@ Friend Function GetDateTime(ByRef d As Variant) As CorDateTime
     Select Case VarType(d)
         Case vbObject
             If d Is Nothing Then _
-                Throw Error.Argument(Argument_DateRequired)
+                Error.Argument Argument_DateRequired
                 
             If TypeOf d Is CorDateTime Then
                 Set GetDateTime = d
             Else
-                Throw Error.Argument(Argument_DateRequired)
+                Error.Argument Argument_DateRequired
             End If
         Case vbDate
             Set GetDateTime = FromOADate(d)
         Case Else
-            Throw Error.Argument(Argument_DateRequired)
+            Error.Argument Argument_DateRequired
     End Select
 End Function
 

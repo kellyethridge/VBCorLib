@@ -80,7 +80,7 @@ End Sub
 '
 Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
@@ -363,7 +363,7 @@ End Function
 '
 Public Function GetParent(ByRef Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
 
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
@@ -385,9 +385,9 @@ End Function
 '
 Public Sub Move(ByRef SourceDirName As String, ByRef DestDirName As String)
     If Len(SourceDirName) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "SourceDirName")
+        Error.Argument Argument_EmptyPath, "SourceDirName"
     If Len(DestDirName) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "DestDirName")
+        Error.Argument Argument_EmptyPath, "DestDirName"
     
     Dim FullSourceDirName   As String
     Dim FullDestDirName     As String
@@ -419,7 +419,7 @@ End Sub
 '
 Public Sub SetCurrentDirectory(ByRef Path As String)
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
@@ -517,7 +517,7 @@ Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     root = Statics.Path.GetPathRoot(FullPath)
     
     If (FullPath = root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
-        Throw Error.Argument(Arg_PathIsAVolume)
+        Error.Argument Arg_PathIsAVolume
     
     Dim Handle As SafeFileHandle
     Set Handle = Win32Native.SafeCreateFile(FullPath, WriteAccess, WriteShare, OpenExisting, FILE_FLAG_BACKUP_SEMANTICS)

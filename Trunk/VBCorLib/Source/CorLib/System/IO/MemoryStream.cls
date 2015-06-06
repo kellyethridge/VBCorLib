@@ -422,7 +422,7 @@ Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count 
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
         
     EnsureWritable
     EnsureOpen
@@ -483,7 +483,7 @@ Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     EnsureOpen
     EnsureBuffer
@@ -540,7 +540,7 @@ Public Function SeekPosition(ByVal Offset As Currency, ByVal Loc As SeekOrigin) 
         Case FromEnd
             Position = mLength + Offset
         Case Else
-            Throw Error.Argument(Argument_InvalidSeekOrigin)
+            Error.Argument Argument_InvalidSeekOrigin
     End Select
     SeekPosition = mPosition
 End Function
@@ -659,13 +659,8 @@ Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As V
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
-    
-'    Dim Result As Long
-'    Result = GetOptionalArrayRange(SAPtr(Buffer), Index, mIndex, Count, mCapacity)
-'    If Result <> NO_ERROR Then _
-'        ThrowArrayRangeException Result, "Buffer", mIndex, "Index", mCapacity, "Count", IsMissing(Index)
-    
+        Error.Argument Argument_InvalidOffLen
+        
     mIndex = Range.Index
     mCapacity = Range.Count
     mCanWrite = Writable

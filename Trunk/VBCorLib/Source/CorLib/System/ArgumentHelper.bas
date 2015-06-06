@@ -95,7 +95,7 @@ Public Function OptionalRange(ByRef Index As Variant, ByRef Count As Variant, By
     IndexIsMissing = IsMissing(Index)
     
     If IndexIsMissing <> IsMissing(Count) Then _
-        Throw Error.Argument(Argument_ParamRequired, IIf(IndexIsMissing, "Index", "Count"))
+        Error.Argument Argument_ParamRequired, IIf(IndexIsMissing, "Index", "Count")
     
     If IndexIsMissing Then
         OptionalRange.Index = DefaultIndex

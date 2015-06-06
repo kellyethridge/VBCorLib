@@ -51,7 +51,7 @@ Public Function IsWhiteSpace(ByRef CharOrString As Variant, Optional ByRef Index
         Case vbString
             IsWhiteSpace = IsWhiteSpaceString(CharOrString, Index)
         Case Else
-            Throw Error.Argument(Argument_InvalidValueType, "String or Integer")
+            Error.Argument Argument_InvalidValueType, "String or Integer"
     End Select
 End Function
 

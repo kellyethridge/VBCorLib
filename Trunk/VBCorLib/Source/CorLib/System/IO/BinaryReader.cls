@@ -77,7 +77,7 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Stream Is Nothing Then _
         Throw Error.ArgumentNull("Stream", ArgumentNull_Stream)
     If Not Stream.CanRead Then _
-        Throw Error.Argument(Argument_ReadableStreamRequired)
+        Error.Argument Argument_ReadableStreamRequired
     
     Set mStream = Stream
     If Encoding Is Nothing Then
@@ -466,7 +466,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     Select Case VarType(Buffer)
         Case corByteArray
@@ -474,7 +474,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
         Case corIntegerArray
             ReadToBuffer = ReadToCharBuffer(BufferPtr, Range)
         Case Else
-            Throw Error.Argument(Argument_UnsupportedArray, "Buffer")
+            Error.Argument Argument_UnsupportedArray, "Buffer"
     End Select
 End Function
 

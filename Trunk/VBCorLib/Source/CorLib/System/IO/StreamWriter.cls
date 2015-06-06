@@ -267,7 +267,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
             If Source Is Nothing Then _
                 Throw Error.ArgumentNull("Source", ArgumentNull_Stream)
             If Not TypeOf Source Is Stream Then _
-                Throw Error.Argument(Argument_StreamRequired, "Source")
+                Error.Argument Argument_StreamRequired, "Source"
                 
             Set mStream = Source
         
@@ -284,7 +284,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
             Set mStream = Cor.NewFileStream(CStr(Source), Mode, FileAccess.WriteAccess, FileShare.ReadShare)
         
         Case Else
-            Throw Error.Argument(Argument_InvalidStreamSource, "Source")
+            Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
         
     If Encoding Is Nothing Then

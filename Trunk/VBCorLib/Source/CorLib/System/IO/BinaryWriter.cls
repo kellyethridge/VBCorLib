@@ -59,7 +59,7 @@ Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
     If Output Is Nothing Then _
         Throw Error.ArgumentNull("Output", ArgumentNull_Stream)
     If Not Output.CanWrite Then _
-        Throw Error.Argument(Argument_StreamNotWritable)
+        Error.Argument Argument_StreamNotWritable
     
     Set mOutStream = Output
     If Encoding Is Nothing Then
@@ -251,7 +251,7 @@ Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef
         Case vbString:      WriteString CStr(Value)
         Case vbDecimal:     WriteDecimal Value
         Case Else
-            Throw Error.Argument(Argument_NeedIntrinsicType, "Value")
+            Error.Argument Argument_NeedIntrinsicType, "Value"
     End Select
 End Sub
 
@@ -311,7 +311,7 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
             WriteBytes mEncoding.GetBytes(Value, Index, Count)
             
         Case Else
-            Throw Error.Argument(Argument_UnsupportedArray, "Value")
+            Error.Argument Argument_UnsupportedArray, "Value"
     End Select
 End Sub
 
@@ -326,7 +326,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
 
     On Error GoTo CleanExit
     SAPtr(Bytes) = CorArray.ArrayPointer(Buffer)

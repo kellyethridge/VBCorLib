@@ -143,7 +143,7 @@ Public Function AsChars(ByRef v As Variant) As Integer()
             SAPtr(AsChars) = CorArray.ArrayPointer(v)
             
         Case Else
-            Throw Error.Argument(Argument_CharArrayRequired)
+            Error.Argument Argument_CharArrayRequired
             
     End Select
 End Function

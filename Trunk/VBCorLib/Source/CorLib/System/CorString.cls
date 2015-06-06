@@ -102,7 +102,7 @@ Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As 
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     If Range.Count = 0 Then
         FromCharArray = ""
@@ -573,7 +573,7 @@ Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal T
             TrimCore = TrimWhiteSpace(s, TrimHead, TrimTail)
             
         Case Else
-            Throw Error.Argument(Argument_CharArrayRequired, "TrimChars")
+            Error.Argument Argument_CharArrayRequired, "TrimChars"
     End Select
 End Function
 
@@ -772,7 +772,7 @@ Private Function JoinCollection(ByRef Separator As String, ByVal Value As Object
     
 NonEnumerable:
     StringBuilderCache.Release ResultBuilder
-    Throw Error.Argument(Argument_NotEnumerable, "Value")
+    Error.Argument Argument_NotEnumerable, "Value"
 End Function
 
 ' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation

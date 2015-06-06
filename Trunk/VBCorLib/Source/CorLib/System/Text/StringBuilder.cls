@@ -311,7 +311,7 @@ Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByV
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If SourceIndex + Count > mLength Then _
-        Throw Error.Argument(Arg_LongerThanSrcString)
+        Error.Argument Arg_LongerThanSrcString
     If DestinationIndex + Count - 1 > UBound(Destination) Then _
         Throw Error.ArgumentOutOfRange("", ArgumentOutOfRange_OffsetOut)
     
@@ -576,7 +576,7 @@ End Function
 '
 Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     If Len(OldValue) = 0 Then _
-        Throw Error.Argument(Argument_EmptyName, "OldValue")
+        Error.Argument Argument_EmptyName, "OldValue"
     
     Dim Range As ListRange
     Range = OptionalRange(StartIndex, Count, 0, mLength, Parameter_StartIndex)
