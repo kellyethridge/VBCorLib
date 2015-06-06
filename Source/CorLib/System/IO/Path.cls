@@ -258,7 +258,7 @@ End Function
 '
 Public Function GetDirectoryName(ByRef Path As String) As String
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
     CheckValidPathChars Path
     
@@ -426,7 +426,7 @@ End Function
 
 Friend Sub CheckValidPathChars(ByRef Path As String)
     If HasIllegalCharacters(Path) Then
-        Throw Error.Argument(Argument_InvalidPathChars)
+        Error.Argument Argument_InvalidPathChars
     End If
 End Sub
 
@@ -456,7 +456,7 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
         Dim CleanPath As String
         CleanPath = CorString.TrimEnd(Path, mTrimEndChars)
         If HasIllegalCharacters(CleanPath) Then _
-            Throw Error.Argument(Argument_InvalidPathChars)
+            Error.Argument Argument_InvalidPathChars
         
         PathChars = AllocChars(CleanPath)
     Else
@@ -477,12 +477,12 @@ Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) 
     FreeChars PathChars
     
     If NewBuffer.Length = 0 Then _
-        Throw Error.Argument(Arg_PathIllegal)
+        Error.Argument Arg_PathIllegal
     
     Dim MaxUNCPathCheck As Long
     If FullCheck Then
         If NewBuffer.StartsWith("http:") Or NewBuffer.StartsWith("file:") Then _
-            Throw Error.Argument(Argument_PathUriFormatNotSupported)
+            Error.Argument Argument_PathUriFormatNotSupported
     
         MaxUNCPathCheck = NewBuffer.GetFullPathName
     Else
@@ -521,7 +521,7 @@ Private Sub PrepareForVolumeLabel(ByRef PathChars() As Integer, ByRef Index As L
                     NewBuffer.SetVolumeLabel PathChars(0)
                     Index = 2
                 Case Else
-                    Throw Error.Argument(Arg_PathIllegal)
+                    Error.Argument Arg_PathIllegal
             End Select
         End If
     End If
@@ -576,7 +576,7 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
     Else
         If HasSpaces And ((LastSpaceIndex < LastPeriodIndex) Or (Not HasPeriods)) Then
             FreeChars PathChars
-            Throw Error.Argument(Arg_PathIllegal)
+            Error.Argument Arg_PathIllegal
         End If
     
         LastCharIndex = MathExt.Min(Index + 1, LastPeriodIndex)
@@ -713,7 +713,7 @@ Private Sub VerifyUNCPathFormat(ByVal NewBuffer As PathHelper, ByVal LengthToChe
     Loop
 
     If pos = LengthToCheck Then _
-        Throw Error.Argument(Arg_PathIllegalUNC)
+        Error.Argument Arg_PathIllegalUNC
 End Sub
 
 Private Function GetExtensionCharIndex(ByRef Path As String) As Long

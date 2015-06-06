@@ -158,7 +158,7 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
     If Range.Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     mSB.Append Chars, Index, Count
 End Sub

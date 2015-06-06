@@ -178,7 +178,7 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count - 1 > UBound(Buffer) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     Dim AvailableChars As Long
     ' We will loop until we have read the
@@ -382,7 +382,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal deter
             If Source Is Nothing Then _
                 Throw Error.ArgumentNull("Source", ArgumentNull_Stream)
             If Not TypeOf Source Is Stream Then _
-                Throw Error.Argument(Argument_StreamRequired, "Source")
+                Error.Argument Argument_StreamRequired, "Source"
         
             Set mStream = Source
         
@@ -390,7 +390,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal deter
             Set mStream = Cor.NewFileStream(CStr(Source), FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare)
         
         Case Else
-            Throw Error.Argument(Argument_InvalidStreamSource, "Source")
+            Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
     
     mDetermineEncoding = determineEncodingFromByteOrderMarks

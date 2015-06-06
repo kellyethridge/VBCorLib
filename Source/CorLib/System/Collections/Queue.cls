@@ -120,11 +120,11 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.IsNull(DstArray) Then _
         Throw Error.ArgumentNull("DstArray", ArgumentNull_Array)
     If CorArray.Rank(DstArray) <> 1 Then _
-        Throw Error.Argument(Argument_MultiDimNotSupported, "DstArray")
+        Error.Argument Argument_MultiDimNotSupported, "DstArray"
     If Index < LBound(DstArray) Then _
         Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Index + mCount - 1 > UBound(DstArray) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
         
     If mHead < mTail Then
         CorArray.CopyEx mItems, mHead, DstArray, Index, mCount

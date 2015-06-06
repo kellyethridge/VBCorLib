@@ -134,7 +134,7 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
     If Count < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Count > mCount Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     Dim ItemIndex As Long
     ItemIndex = mList.BinarySearchEx(mIndex + Index, Count, Value, Comparer)

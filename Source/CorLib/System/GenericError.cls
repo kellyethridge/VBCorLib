@@ -36,9 +36,9 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Friend Function Argument(ByVal Key As ResourceStringKey, Optional ByRef ParamName As String) As ArgumentException
-    Set Argument = Cor.NewArgumentException(Environment.GetResourceString(Key), ParamName)
-End Function
+Friend Sub Argument(ByVal Key As ResourceStringKey, Optional ByRef ParamName As String)
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Key), ParamName)
+End Sub
 
 Friend Function ArgumentNull(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentNull_Exception) As ArgumentNullException
     Set ArgumentNull = Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Key))

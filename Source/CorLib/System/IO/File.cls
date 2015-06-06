@@ -89,9 +89,9 @@ End Sub
 '
 Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As String, Optional ByVal OverWrite As Boolean = False)
     If Len(SourceFileName) = 0 Then _
-        Throw Error.Argument(Argument_EmptyFileName, "SourceFileName")
+        Error.Argument Argument_EmptyFileName, "SourceFileName"
     If Len(DestinationFileName) = 0 Then _
-        Throw Error.Argument(Argument_EmptyFileName, "DestinationFileName")
+        Error.Argument Argument_EmptyFileName, "DestinationFileName"
     
     SourceFileName = Path.GetFullPath(SourceFileName)
     DestinationFileName = Path.GetFullPath(DestinationFileName)
@@ -146,7 +146,7 @@ End Function
 '
 Public Sub Delete(ByRef Path As String)
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
@@ -271,9 +271,9 @@ End Function
 '
 Public Sub Move(ByRef SourceFileName As String, ByRef DestFileName As String)
     If Len(SourceFileName) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "SourceFileName")
+        Error.Argument Argument_EmptyPath, "SourceFileName"
     If Len(DestFileName) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "DestFileName")
+        Error.Argument Argument_EmptyPath, "DestFileName"
 
     Dim FullSource  As String
     Dim FullDest    As String
@@ -346,7 +346,7 @@ End Function
 '
 Public Sub SetAttributes(ByRef Path As String, ByVal Attributes As FileAttributes)
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
@@ -470,7 +470,7 @@ Public Function ReadAllLines(ByRef Path As String, Optional ByVal Encoding As En
     Dim Index   As Long
     
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
     ReDim Lines(0 To 15)
     With Cor.NewStreamReader(Path, Encoding)
@@ -608,7 +608,7 @@ Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTim
     End If
     
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
         
     Statics.Path.CheckValidPathChars Path
     
@@ -629,7 +629,7 @@ End Sub
 
 Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA)
     If Len(Path) = 0 Then _
-        Throw Error.Argument(Argument_EmptyPath, "Path")
+        Error.Argument Argument_EmptyPath, "Path"
     
     Dim DllError As Long
     DllError = GetFileData(Path, Data)

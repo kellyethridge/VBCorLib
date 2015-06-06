@@ -494,7 +494,7 @@ Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal 
     If Length < 0 Then _
         Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Length - 1 > UBound(Arr) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     BinarySearchEx = BinarySearchCore(Arr, Index, Length, Value, Comparer)
 End Function
@@ -615,9 +615,9 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
     If Length < 0 Then _
         Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Length + SourceIndex - LBound(SourceArray) > SourceLength Then _
-        Throw Error.Argument(Arg_LongerThanSrcArray)
+        Error.Argument Arg_LongerThanSrcArray
     If Length + DestinationIndex - LBound(DestinationArray) > DestinationLength Then _
-        Throw Error.Argument(Arg_LongerThanDestArray)
+        Error.Argument Arg_LongerThanDestArray
     If SourceIndex < LBound(SourceArray) Then _
         Throw Error.ArgumentOutOfRange("SourceIndex", ArgumentOutOfRange_ArrayLB)
     If DestinationIndex < LBound(DestinationArray) Then _
@@ -690,7 +690,7 @@ Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Le
     Select Case ElementType
         Case vbByte, vbInteger, vbLong, vbDouble, vbSingle, vbBoolean, vbCurrency, vbDate, vbString, vbObject, vbVariant
         Case Else
-            Throw Error.Argument(Argument_MustBeVbVarType, "ElementType")
+            Error.Argument Argument_MustBeVbVarType, "ElementType"
     End Select
     
     If Length1 < 0 Then _
@@ -918,7 +918,7 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     If ElemCount < 0 Then _
         Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
     If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(Ptr)
@@ -1085,11 +1085,11 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     If Length < 0 Then _
         Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
     If Index + Length - 1 > UBound(Keys) Then _
-        Throw Error.Argument(Argument_InvalidOffLen)
+        Error.Argument Argument_InvalidOffLen
     
     If Not IsEmpty(Items) Then
         If Not IsArray(Items) Then _
-            Throw Error.Argument(Argument_ArrayRequired, "Items")
+            Error.Argument Argument_ArrayRequired, "Items"
         
         ItemsPtr = ArrayPointer(Items)
         CheckValidSingleDimArrayPtr ItemsPtr, Parameter_Items
@@ -1097,7 +1097,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
-            Throw Error.Argument(Argument_MatchingBounds)
+            Error.Argument Argument_MatchingBounds
         
         SetSortItems ItemsPtr
     End If
@@ -1135,7 +1135,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
                 QuickSortGeneral Keys, Index, Index + Length - 1
             End If
         Case Else
-            Throw Error.Argument(Argument_InvalidComparer, "Comparer")
+            Error.Argument Argument_InvalidComparer, "Comparer"
     End Select
     
     CleanUpSortRoutine
@@ -1161,7 +1161,7 @@ Friend Function ArrayPointer(ByRef Arg As Variant) As Long
     ArgType = VariantType(Arg)
     
     If (ArgType And vbArray) = 0 Then _
-        Throw Error.Argument(Argument_ArrayRequired)
+        Error.Argument Argument_ArrayRequired
     
     ArrayPointer = MemLong(VB6.vbaRefVarAry(Arg))
     

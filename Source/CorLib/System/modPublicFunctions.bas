@@ -184,11 +184,11 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
             ElseIf TypeOf Source Is SafeFileHandle Then
                 Set GetStream = Cor.NewFileStreamWithHandle(Source, Access)
             Else
-                Throw Error.Argument(Argument_StreamRequired)
+                Error.Argument Argument_StreamRequired
             End If
                 
         Case Else
-            Throw Error.Argument(Argument_StreamRequired)
+            Error.Argument Argument_StreamRequired
     End Select
 End Function
 

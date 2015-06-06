@@ -438,7 +438,7 @@ Public Function CompareTo(ByRef Value As Variant) As Long
             If Value Is Nothing Then _
                 Throw Error.ArgumentNull("Value")
             If Not TypeOf Value Is CorDateTime Then _
-                Throw Error.Argument(Argument_DateRequired, "Value")
+                Error.Argument Argument_DateRequired, "Value"
                 
             Dim other As CorDateTime
             Set other = Value
@@ -629,12 +629,12 @@ Public Function Subtract(ByRef Value As Variant) As Object
                 Set dt = Value
                 Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - dt.TotalMilliseconds)
             Else
-                Throw Error.Argument(Argument_InvalidDateSubtraction, "Value")
+                Error.Argument Argument_InvalidDateSubtraction, "Value"
             End If
         Case vbDate
             Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.GetMilliseconds(Value))
         Case Else
-            Throw Error.Argument(Argument_InvalidDateSubtraction, "Value")
+            Error.Argument Argument_InvalidDateSubtraction, "Value"
     End Select
 End Function
 

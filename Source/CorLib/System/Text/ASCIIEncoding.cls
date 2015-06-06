@@ -187,7 +187,7 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
         Case corIntegerArray
             GetByteCount = GetByteCountChars(Chars, Index, Count)
         Case Else
-            Throw Error.Argument(Argument_ArrayRequired, "Chars")
+            Error.Argument Argument_ArrayRequired, "Chars"
     End Select
 End Function
 
@@ -295,7 +295,7 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     If ByteIndex < LBound(Bytes) Or ByteIndex > UBound(Bytes) Then _
         Throw Error.ArgumentOutOfRange("ByteIndex", ArgumentOutOfRange_Index)
     If ByteIndex + CharCount - 1 > UBound(Bytes) Then _
-        Throw Error.Argument(Argument_SmallConversionBuffer, "Bytes")
+        Error.Argument Argument_SmallConversionBuffer, "Bytes"
     
     GetBytesEx = GetBytesCore(AttachedChars, CharIndex, CharCount, Bytes, ByteIndex)
     
@@ -392,7 +392,7 @@ Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal
     If CharIndex < LBound(Chars) Then _
         Throw Error.ArgumentOutOfRange("CharIndex", ArgumentOutOfRange_LBound)
     If CharIndex + ByteCount - 1 > UBound(Chars) Then _
-        Throw Error.Argument(Argument_SmallConversionBuffer, "Chars")
+        Error.Argument Argument_SmallConversionBuffer, "Chars"
         
     GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
 End Function
