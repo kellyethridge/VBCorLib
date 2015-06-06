@@ -46,6 +46,7 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
+Implements IVersionableCollection
 
 Private mList       As ArrayList
 Private mVersion    As Long
@@ -601,3 +602,9 @@ Private Sub IList_RemoveAt(ByVal Index As Long)
 End Sub
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionableCollection
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionableCollection_CurrentVersion() As Long
+    IVersionableCollection_CurrentVersion = GetCollectionVersion(mList)
+End Property
