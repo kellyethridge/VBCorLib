@@ -267,7 +267,7 @@ End Function
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
     If CorArray.IsNull(Arr) Then _
-        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
+        Error.ArgumentNull "Arr", ArgumentNull_Array
     
     CorArray.CopyEx mItems, 0, Arr, OptionalLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
@@ -784,14 +784,14 @@ End Sub
 Private Sub WriteRange(ByVal Index As Long, ByRef Source As Variant, ByVal Insert As Boolean)
     If IsArray(Source) Then
         If CorArray.IsNull(Source) Then _
-            Throw Error.ArgumentNull("Source", ArgumentNull_Array)
+            Error.ArgumentNull "Source", ArgumentNull_Array
         If CorArray.Rank(Source) <> 1 Then _
             Throw Error.Rank
             
         WriteArray Index, Source, Insert
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Throw Error.ArgumentNull("Source", ArgumentNull_Collection)
+            Error.ArgumentNull "Source", ArgumentNull_Collection
         
         If TypeOf Source Is Collection Then
             WriteVBCollection Index, Source, Insert

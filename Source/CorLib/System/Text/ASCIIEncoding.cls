@@ -230,7 +230,7 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     On Error GoTo Catch
     
     If SAPtr(AttachedChars) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Chars", ArgumentNull_Array)
+        Error.ArgumentNull "Chars", ArgumentNull_Array
     
     Dim Range As ListRange
     Range = OptionalRange(Index, Count, LBound(AttachedChars), CorArray.LengthFirstDim(AttachedChars))
@@ -283,9 +283,9 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     On Error GoTo Catch
     
     If SAPtr(AttachedChars) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Chars", ArgumentNull_Array)
+        Error.ArgumentNull "Chars", ArgumentNull_Array
     If SAPtr(Bytes) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Bytes", ArgumentNull_Array)
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
     If CharIndex < LBound(AttachedChars) Then _
         Throw Error.ArgumentOutOfRange("CharIndex", ArgumentOutOfRange_LBound)
     If CharCount < 0 Then _

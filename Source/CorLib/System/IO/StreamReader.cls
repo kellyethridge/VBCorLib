@@ -172,7 +172,7 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
     VerifyIsOpen
     
     If SAPtr(Buffer) = vbNullPtr Then _
-        Throw Error.ArgumentNull("Buffer", ArgumentNull_Array)
+        Error.ArgumentNull "Buffer", ArgumentNull_Array
     If Index < LBound(Buffer) Then _
         Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
     If Count < 0 Then _
@@ -380,7 +380,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal deter
     Select Case VarType(Source)
         Case vbObject
             If Source Is Nothing Then _
-                Throw Error.ArgumentNull("Source", ArgumentNull_Stream)
+                Error.ArgumentNull "Source", ArgumentNull_Stream
             If Not TypeOf Source Is Stream Then _
                 Error.Argument Argument_StreamRequired, "Source"
         

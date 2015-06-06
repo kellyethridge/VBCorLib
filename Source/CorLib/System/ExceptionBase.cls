@@ -330,7 +330,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Subclass As Exception, ByVal AppObject As Object)
     If Subclass Is Nothing Then _
-        Throw Error.ArgumentNull("Subclass")
+        Error.ArgumentNull "Subclass"
     
     mTypeName = GetComponentName(AppObject) & VBA.TypeName(Subclass)
     mSubclassPtr = WeakPtr(Subclass)

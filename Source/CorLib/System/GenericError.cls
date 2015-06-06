@@ -40,9 +40,9 @@ Friend Sub Argument(ByVal Key As ResourceStringKey, Optional ByRef ParamName As 
     Throw Cor.NewArgumentException(Environment.GetResourceString(Key), ParamName)
 End Sub
 
-Friend Function ArgumentNull(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentNull_Exception) As ArgumentNullException
-    Set ArgumentNull = Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Key))
-End Function
+Friend Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentNull_Exception)
+    Throw Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Key))
+End Sub
 
 Friend Function ArgumentOutOfRange(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentOutOfRange_Exception) As ArgumentOutOfRangeException
     Set ArgumentOutOfRange = Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(Key))

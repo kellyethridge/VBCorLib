@@ -436,7 +436,7 @@ Public Function CompareTo(ByRef Value As Variant) As Long
     Select Case VariantType(Value) And &HFF
         Case vbObject
             If Value Is Nothing Then _
-                Throw Error.ArgumentNull("Value")
+                Error.ArgumentNull "Value"
             If Not TypeOf Value Is CorDateTime Then _
                 Error.Argument Argument_DateRequired, "Value"
                 
@@ -618,7 +618,7 @@ Public Function Subtract(ByRef Value As Variant) As Object
     Select Case VarType(Value)
         Case vbObject
             If Value Is Nothing Then _
-                Throw Error.ArgumentNull("Value", ArgumentNull_Generic)
+                Error.ArgumentNull "Value", ArgumentNull_Generic
             
             If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan

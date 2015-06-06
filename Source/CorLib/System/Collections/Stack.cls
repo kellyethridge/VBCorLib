@@ -117,7 +117,7 @@ End Function
 '
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     If CorArray.IsNull(Arr) Then _
-        Throw Error.ArgumentNull("Arr", ArgumentNull_Array)
+        Error.ArgumentNull "Arr", ArgumentNull_Array
     If CorArray.Rank(Arr) <> 1 Then _
         Error.Argument Argument_MultiDimNotSupported, "Arr"  ' .NET throws an ArgumentException instead of RankException.
     
@@ -251,14 +251,14 @@ End Function
 Private Sub WriteRange(ByRef Source As Variant)
     If IsArray(Source) Then
         If CorArray.IsNull(Source) Then _
-            Throw Error.ArgumentNull("Source", ArgumentNull_Array)
+            Error.ArgumentNull "Source", ArgumentNull_Array
         If CorArray.Rank(Source) <> 1 Then _
             Error.Argument Argument_MultiDimNotSupported, "Source"
         
         WriteArray Source
     ElseIf IsObject(Source) Then
         If Source Is Nothing Then _
-            Throw Error.ArgumentNull("Source", ArgumentNull_Collection)
+            Error.ArgumentNull "Source", ArgumentNull_Collection
         
         If TypeOf Source Is Collection Then
             WriteCollection Source

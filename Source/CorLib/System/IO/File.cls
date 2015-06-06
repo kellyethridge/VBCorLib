@@ -522,7 +522,7 @@ End Sub
 '
 Public Sub WriteAllbytes(ByRef Path As String, ByRef Bytes() As Byte)
     If CorArray.IsNull(Bytes) Then _
-        Throw Error.ArgumentNull("Bytes", ArgumentNull_Array)
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
     
     With Cor.NewFileStream(Path, FileMode.Create)
         .WriteBlock Bytes, LBound(Bytes), CorArray.GetLength(Bytes)
