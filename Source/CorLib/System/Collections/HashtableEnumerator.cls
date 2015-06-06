@@ -11,36 +11,36 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: HashtableEnumerator
+' Module: HashtableEnumerator
 '
-''
-' Class derived from IObject.
-'
-
 Option Explicit
 Implements IObject
 Implements IDictionaryEnumerator
 Implements IEnumerator
+Implements ICloneable
 
-Private mTable      As Hashtable
+Private mTable      As IVersionableCollection
 Private mBuckets()  As Bucket
 Private mEnumType   As EnumerationType
 Private mIndex      As Long
@@ -56,22 +56,12 @@ Attribute NewEnum.VB_MemberFlags = "40"
     Set NewEnum = CreateEnumerator(Me)
 End Function
 
-Friend Sub Init(ByVal Table As Hashtable, ByRef Buckets() As Bucket, ByVal EnumType As EnumerationType)
-    Set mTable = Table
-    SAPtr(mBuckets) = SAPtr(Buckets)
-    mEnumType = EnumType
-    mIndex = -1
-    mVersion = GetCollectionVersion(mTable)
-    mCount = Table.Count
-    mCapacity = UBound(mBuckets) + 1
-End Sub
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyValidEnum()
-    If GetCollectionVersion(mTable) <> mVersion Then
+    If mTable.CurrentVersion <> mVersion Then
         Throw Error.InvalidOperation(InvalidOperation_VersionError)
     End If
     If mIndex < 0 Then
@@ -86,9 +76,40 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Table As Hashtable, ByRef Buckets() As Bucket, ByVal EnumType As EnumerationType)
+    Set mTable = Table
+    SAPtr(mBuckets) = SAPtr(Buckets)
+    mEnumType = EnumType
+    mIndex = -1
+    mVersion = mTable.CurrentVersion
+    mCount = Table.Count
+    mCapacity = UBound(mBuckets) + 1
+End Sub
+
+Friend Sub InitClone(ByVal Table As Hashtable, ByRef Buckets() As Bucket, ByVal EnumType As EnumerationType, ByVal Index As Long, ByVal Entries As Long, ByVal Capacity As Long)
+    Set mTable = Table
+    mVersion = mTable.CurrentVersion
+    SAPtr(mBuckets) = SAPtr(Buckets)
+    mEnumType = EnumType
+    mIndex = Index
+    mCount = Table.Count
+    mEntries = Entries
+    mCapacity = Capacity
+End Sub
+
 Private Sub Class_Terminate()
     SAPtr(mBuckets) = vbNullPtr
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Dim Ret As New HashtableEnumerator
+    Ret.InitClone mTable, mBuckets, mEnumType, mIndex, mEntries, mCapacity
+    Set ICloneable_Clone = Ret
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -159,6 +180,7 @@ Private Property Get IDictionaryEnumerator_Value() As Variant
     VerifyValidEnum
     VariantCopy IDictionaryEnumerator_Value, mBuckets(mIndex).Value
 End Property
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IEnumerator

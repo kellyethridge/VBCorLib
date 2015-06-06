@@ -87,6 +87,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements IEnumerator
+Implements ICloneable
 
 Private mBase   As EnumeratorBase
 Private mBuffer As CharBuffer
@@ -141,6 +142,25 @@ Public Sub Reset()
 End Sub
 
 ''
+' Returns a clone of this instance of the enumerator.
+'
+' @return A clone of the CharEnumerator.
+' @remarks <p>The cloned enumerator will begin enumerating at the location
+' the original enumerator was at when the clone was created.</p>
+' <p>The original string will always be copied when a clone is created.</p>
+'
+Public Function Clone() As CharEnumerator
+    Dim Ret As New CharEnumerator
+    Dim s   As String
+    
+    StringPtr(s) = mBuffer.Buffer.pvData
+    Ret.InitClone mBase.Clone, s
+    StringPtr(s) = vbNullPtr
+    
+    Set Clone = Ret
+End Function
+
+''
 ' Returns a string representation of this object instance.
 '
 ' @return String representing this instance.
@@ -183,6 +203,20 @@ Friend Sub Init(ByRef s As String, ByVal CopyString As Boolean)
         InitChars mBuffer, s
     End If
 End Sub
+
+Friend Sub InitClone(ByVal Base As EnumeratorBase, ByRef s As String)
+    Set mBase = Base
+    mString = s
+    InitChars mBuffer, s
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
