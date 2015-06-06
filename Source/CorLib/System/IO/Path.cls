@@ -50,8 +50,6 @@ Option Explicit
 Private mInvalidPathChars()     As Integer
 Private mInvalidFileNameChars() As Integer
 Private mTrimEndChars()         As Integer
-Private mBuffer                 As WordBuffer
-Private mPath                   As New StringBuilder
 
 
 Friend Property Get MaxPath() As Long
@@ -426,28 +424,6 @@ Public Function GetInvalidFileNameChars() As Integer()
 End Function
 
 
-Friend Sub VerifyPath(ByRef Path As String, Optional ByVal FixSlashes As Boolean = False)
-    If Len(Path) > MAX_PATH Then _
-        Throw New PathTooLongException
-    
-    mBuffer.SA.pvData = StrPtr(Path)
-    
-    Dim i As Long
-    For i = 0 To Len(Path) - 1
-        Select Case mBuffer.Data(i)
-            Case corQuoteChar, corLessThanChar, corGreaterThanChar, corPipeChar, Is < corSpaceChar
-                Throw Error.Argument(Argument_InvalidPathChars, "Path")
-                
-            Case corAltDirectorySeparatorChar
-                If FixSlashes Then
-                    mBuffer.Data(i) = corDirectorySeparatorChar
-                End If
-        End Select
-    Next
-
-    mBuffer.SA.pvData = vbNullPtr
-End Sub
-
 Friend Sub CheckValidPathChars(ByRef Path As String)
     If HasIllegalCharacters(Path) Then
         Throw Error.Argument(Argument_InvalidPathChars)
@@ -469,52 +445,6 @@ Friend Function HasIllegalCharacters(ByRef Path As String) As Boolean
     
     FreeChars PathChars
 End Function
-
-Friend Sub CheckValidPathAndFixSlashes(ByRef Path As String)
-    mBuffer.SA.pvData = StrPtr(Path)
-    
-    Dim i As Long
-    For i = 0 To Len(Path) - 1
-        Select Case mBuffer.Data(i)
-            Case corQuoteChar, corLessThanChar, corGreaterThanChar, corPipeChar, Is < corSpaceChar
-                Throw Error.Argument(Argument_InvalidPathChars, "Path")
-                
-            Case corAltDirectorySeparatorChar
-                mBuffer.Data(i) = corDirectorySeparatorChar
-        End Select
-    Next
-    
-    mBuffer.SA.pvData = vbNullPtr
-End Sub
-
-
-Friend Sub FixupPath(ByRef Path As String)
-    VerifyPath Path, True
-    
-    mPath.Length = 0
-    mPath.AppendString Path
-    
-    Dim i As Long
-    Do
-        i = mPath.Length
-        mPath.Replace "\\", "\", 1, i - 1
-    Loop While i > mPath.Length
-    Do
-        i = mPath.Length
-        mPath.Replace "...\", "..\"
-    Loop While i > mPath.Length
-    
-    Dim Parts() As String
-    Parts = Split(mPath.ToString, "\")
-    
-    For i = 0 To UBound(Parts)
-        If Len(Parts(i)) > 2 Then
-            Parts(i) = CorString.TrimEnd(Parts(i), ".")
-        End If
-    Next i
-    
-    Path = Join(Parts, corDirectorySeparator)
-End Sub
 
 Friend Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean) As String
     Dim NewBuffer   As New PathHelper
@@ -707,8 +637,6 @@ Private Sub Class_Initialize()
     mInvalidPathChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F)
     mInvalidFileNameChars = Cor.NewIntegers(&H22, &H3C, &H3E, &H7C, &H0, &H1, &H2, &H3, &H4, &H5, &H6, &H7, &H8, &H9, &HA, &HB, &HC, &HD, &HE, &HF, &H10, &H11, &H12, &H13, &H14, &H15, &H16, &H17, &H18, &H19, &H1A, &H1B, &H1C, &H1D, &H1E, &H1F, &H3A, &H2A, &H3F, &H5C, &H2F)
     mTrimEndChars = Cor.NewIntegers(&H9, &HA, &HB, &HC, &HD, &H20, &H85, &HA0)
-    
-    InitWordBuffer mBuffer, 0, &H7FFFFFFF
 End Sub
 
 
