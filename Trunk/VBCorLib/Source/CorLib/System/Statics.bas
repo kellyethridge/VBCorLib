@@ -30,6 +30,10 @@ Attribute VB_Name = "Statics"
 '
 Option Explicit
 
+Public Type NullVersionableCollection
+    Instance As New IVersionableCollection
+End Type
+
 Public Cor                      As New Constructors
 Public Object                   As New ObjectStatic
 Public CorArray                 As New CorArray
@@ -96,4 +100,6 @@ Public Char                     As New Char
 Public Error                    As New GenericError
 Public IOError                  As New IOError
 Public Number                   As New NumberStatic
+Public NullVersionableCollection As NullVersionableCollection
+
 

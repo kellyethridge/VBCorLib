@@ -43,8 +43,8 @@ Implements IObject
 Implements IEnumerator
 Implements ICloneable
 
+Private mBase As EnumeratorBase
 Private mList As ArrayList
-Private mBase As CollectionEnumeratorBase
 
 
 Public Function NewEnum() As IUnknown
@@ -58,13 +58,13 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
-    Set mBase = Cor.NewCollectionEnumeratorBase(List, Index, Count)
+    Set mBase = Cor.NewEnumeratorBase(Index, Count, List)
     Set mList = List
 End Sub
 
-Friend Sub InitClone(ByVal List As ArrayList, ByVal Base As CollectionEnumeratorBase)
-    Set mList = List
+Friend Sub InitClone(ByVal Base As EnumeratorBase, ByVal List As ArrayList)
     Set mBase = Base
+    Set mList = List
 End Sub
 
 
@@ -73,7 +73,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New ArrayListEnumerator
-    Ret.InitClone mList, mBase.Clone
+    Ret.InitClone mBase.Clone, mList
     Set ICloneable_Clone = Ret
 End Function
 

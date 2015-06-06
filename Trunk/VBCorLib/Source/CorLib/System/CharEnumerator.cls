@@ -88,10 +88,9 @@ Option Explicit
 Implements IObject
 Implements IEnumerator
 
-Private mString     As WordBuffer
-Private mIndex      As Long
-Private mEndIndex   As Long
-Private mStringCopy As String
+Private mBase   As EnumeratorBase
+Private mBuffer As CharBuffer
+Private mString As String
 
 
 
@@ -120,12 +119,7 @@ End Function
 ' corrisponding positive value, add &h10000 (65536) to the value.
 '
 Public Property Get Current() As Integer
-    If mIndex < 0 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
-    If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
-
-    Current = mString.Data(mIndex)
+    Current = mBuffer.Chars(mBase.Index)
 End Property
 
 ''
@@ -136,22 +130,14 @@ End Property
 ' @return Indication if the move was successful.
 '
 Public Function MoveNext() As Boolean
-    If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
-
-    If mIndex = mEndIndex Then
-        mIndex = mEndIndex + 1
-    Else
-        mIndex = mIndex + 1
-        MoveNext = True
-    End If
+    MoveNext = mBase.MoveNext
 End Function
 
 ''
 ' Requests the enumerator resets itself to begin enumerating from the beginning.
 '
 Public Sub Reset()
-    mIndex = -1
+    mBase.Reset
 End Sub
 
 ''
@@ -188,17 +174,14 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef s As String, ByVal CopyString As Boolean)
-    Dim Ptr As Long
+    Set mBase = Cor.NewEnumeratorBase(0, Len(s))
     
     If CopyString Then
-        mStringCopy = s
-        Ptr = StrPtr(mStringCopy)
+        mString = s
+        InitChars mBuffer, mString
     Else
-        Ptr = StrPtr(s)
+        InitChars mBuffer, s
     End If
-    mEndIndex = Len(s) - 1
-    InitWordBuffer mString, Ptr, mEndIndex + 1
-    Reset
 End Sub
 
 
