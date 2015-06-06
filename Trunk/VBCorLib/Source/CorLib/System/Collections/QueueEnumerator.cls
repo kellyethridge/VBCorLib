@@ -11,67 +11,40 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) s2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: QueueEnumerator
+' Module: QueueEnumerator
 '
-
-''
-' Class derived from IObject.
-'
-
 Option Explicit
 Implements IObject
 Implements IEnumerator
 Implements ICloneable
 
+Private mBase       As EnumeratorBase
 Private mQueue      As Queue
 Private mItems()    As Variant
-Private mHead       As Long
 Private mCapacity   As Long
-Private mIndex      As Long
-Private mEndIndex   As Long
-Private mVersion    As Long
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long)
-    Set mQueue = q
-    mHead = head
-    SAPtr(mItems) = ItemsSAPtr
-    mCapacity = UBound(mItems) + 1
-    mEndIndex = q.Count - 1
-    mVersion = GetCollectionVersion(q)
-    mIndex = -1
-End Sub
-
-Friend Sub InitClone(ByVal q As Queue, ByVal head As Long, ByVal ItemsSAPtr As Long, ByVal Index As Long)
-    Init q, head, ItemsSAPtr
-    mIndex = Index
-End Sub
-
-
-''
-' To allow this object to be used with For..Each.
-'
 Public Function NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
 Attribute NewEnum.VB_MemberFlags = "40"
@@ -80,15 +53,29 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal q As Queue, ByVal Head As Long, ByRef Items() As Variant)
+    Set mBase = Cor.NewEnumeratorBase(Head, q.Count, q)
+    Set mQueue = q
+    SAPtr(mItems) = SAPtr(Items)
+    mCapacity = CorArray.LengthFirstDim(mItems)
+End Sub
+
+Friend Sub InitClone(ByVal Base As EnumeratorBase, ByVal q As Queue, ByRef Items() As Variant)
+    Set mBase = Base
+    Set mQueue = q
+    SAPtr(mItems) = SAPtr(Items)
+    mCapacity = CorArray.LengthFirstDim(mItems)
+End Sub
+
 Private Sub Class_Terminate()
-    SAPtr(mItems) = 0
+    SAPtr(mItems) = vbNullPtr
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
@@ -103,43 +90,26 @@ Private Function IObject_ToString() As String
 End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New QueueEnumerator
-    Ret.InitClone mQueue, mHead, SAPtr(mItems), mIndex
+    Ret.InitClone mBase.Clone, mQueue, mItems
     Set ICloneable_Clone = Ret
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerator Interface
+'   IEnumerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If GetCollectionVersion(mQueue) <> mVersion Then _
-        Throw Error.InvalidOperation(InvalidOperation_VersionError)
-    If mIndex < 0 Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
-    If mIndex > mEndIndex Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
-        
-    VariantCopy IEnumerator_Current, mItems((mHead + mIndex) Mod mCapacity)
+    VariantCopy IEnumerator_Current, mItems(mBase.Index Mod mCapacity)
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If GetCollectionVersion(mQueue) <> mVersion Then _
-        Throw Error.InvalidOperation(InvalidOperation_VersionError)
-    If mIndex > mEndIndex Then _
-        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
-    
-    If mIndex = mEndIndex Then
-        mIndex = mEndIndex + 1
-        Exit Function
-    End If
-    mIndex = mIndex + 1
-    IEnumerator_MoveNext = True
+    IEnumerator_MoveNext = mBase.MoveNext
 End Function
 
 Private Sub IEnumerator_Reset()
-    mIndex = -1
+    mBase.Reset
 End Sub

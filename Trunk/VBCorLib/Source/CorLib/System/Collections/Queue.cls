@@ -189,7 +189,7 @@ End Function
 '
 Public Function GetEnumerator() As IEnumerator
     Dim Ret As New QueueEnumerator
-    Ret.Init Me, mHead, SAPtr(mItems)
+    Ret.Init Me, mHead, mItems
     Set GetEnumerator = Ret
 End Function
 
@@ -274,10 +274,10 @@ Private Sub Class_InitProperties()
     mCapacity = DefaultCapacity
 End Sub
 
-Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal head As Long, ByVal Tail As Long)
+Friend Sub InitClone(ByRef Items() As Variant, ByVal Count As Long, ByVal Head As Long, ByVal Tail As Long)
     mItems = Items
     mCount = Count
-    mHead = head
+    mHead = Head
     mTail = Tail
     mCapacity = UBound(Items) + 1
 End Sub
