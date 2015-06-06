@@ -154,7 +154,7 @@ End Function
 '
 Public Function GetEnumerator() As IEnumerator
     Dim Ret As New StackEnumerator
-    Ret.Init Me, SAPtr(mItems)
+    Ret.Init Me, mItems
     Set GetEnumerator = Ret
 End Function
 
