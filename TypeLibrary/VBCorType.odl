@@ -687,7 +687,7 @@ library VBCorType {
 
     }
 
-    [dllname("CorConst longants")]
+    [dllname("CorConstants")]
     module CorConstants {
         const long corTicksPerMillisecond           = 10000;
         const long corSecondsPerMinute              = 60;
@@ -798,7 +798,7 @@ library VBCorType {
         const long corLongArray                     = 0x2003;
         const long corBooleanArray                  = 0x200B;
         const long corStringArray                   = 0x2008;
-        const long corVariantArray                  = 0x2003;
+        const long corVariantArray                  = 0x200c;
         const long corSizeOfByte                    = 1;
         const long corSizeOfInteger                 = 2;
         const long corSizeOfLong                    = 4;

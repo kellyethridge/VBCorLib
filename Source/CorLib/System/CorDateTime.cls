@@ -486,7 +486,7 @@ Public Function ToFileTimeUtc() As Currency
     ms = ms - MillisecondsTo1601
     
     If ms < 0 Then _
-        Throw Error.ArgumentOutOfRange(vbNullString, ArgumentOutOfRange_InvalidFileTime)
+        Error.ArgumentOutOfRange vbNullString, ArgumentOutOfRange_InvalidFileTime
     
     ToFileTimeUtc = ms
 End Function

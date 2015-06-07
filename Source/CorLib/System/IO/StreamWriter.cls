@@ -260,7 +260,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Append As Boolean, ByVal Encoding
     Dim EmitBOM As Boolean
     
     If BufferSize < 0 Then _
-        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedNonNegNum
     
     Select Case VarType(Source)
         Case vbObject
@@ -384,7 +384,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If Not mIsOpen Then
-        Throw Error.ObjectDisposed(ObjectDisposed_StreamClosed)
+        Error.ObjectDisposed ObjectDisposed_StreamClosed
     End If
 End Sub
 

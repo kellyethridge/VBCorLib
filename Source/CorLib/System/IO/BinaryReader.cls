@@ -189,7 +189,7 @@ End Function
 Public Function ReadBytes(ByVal Count As Long) As Byte()
     VerifyIsOpen
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
     Dim Bytes() As Byte
     If Count > 0 Then
@@ -222,7 +222,7 @@ End Function
 Public Function ReadChars(ByVal Count As Long) As Integer()
     VerifyIsOpen
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
     Dim Chars() As Integer
     If Count > 0 Then
@@ -440,7 +440,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If mStream Is Nothing Then
-        Throw Error.ObjectDisposed(ObjectDisposed_FileNotOpen)
+        Error.ObjectDisposed ObjectDisposed_FileNotOpen
     End If
 End Sub
 
@@ -462,9 +462,9 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
     
     If Range.Index < LBound(Buffer) Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
         Error.Argument Argument_InvalidOffLen
     

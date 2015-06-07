@@ -122,7 +122,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
         Error.Argument Argument_MultiDimNotSupported, "Arr"  ' .NET throws an ArgumentException instead of RankException.
     
     If Index < LBound(Arr) Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_ArrayLB)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
     
     CorArray.CopyEx mItems, 0, Arr, Index, mCount
     CorArray.Reverse Arr, Index, mCount
@@ -185,7 +185,7 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Throw Error.InvalidOperation(InvalidOperation_EmptyStack)
+        Error.InvalidOperation InvalidOperation_EmptyStack
     
     VariantCopy Peek, mItems(mCount - 1)
 End Function
@@ -197,7 +197,7 @@ End Function
 '
 Public Function Pop() As Variant
     If mCount = 0 Then _
-        Throw Error.InvalidOperation(InvalidOperation_EmptyStack)
+        Error.InvalidOperation InvalidOperation_EmptyStack
     
     mCount = mCount - 1
     Helper.MoveVariant Pop, mItems(mCount)

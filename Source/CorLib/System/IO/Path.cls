@@ -353,7 +353,7 @@ Public Function GetFullPath(ByRef Path As String) As String
     FullPath = NormalizePath(Path, True)
     
     If InStr(3, FullPath, corVolumeSeparator) >= 3 Then _
-        Throw Error.NotSupported(Argument_PathFormatNotSupported)
+        Error.NotSupported Argument_PathFormatNotSupported
         
     GetFullPath = FullPath
 End Function

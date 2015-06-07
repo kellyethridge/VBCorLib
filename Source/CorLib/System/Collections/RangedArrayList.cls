@@ -130,9 +130,9 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
     VerifyVersion
     
     If Index < 0 Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Index + Count > mCount Then _
         Error.Argument Argument_InvalidOffLen
     

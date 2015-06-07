@@ -174,9 +174,9 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
     If SAPtr(Buffer) = vbNullPtr Then _
         Error.ArgumentNull "Buffer", ArgumentNull_Array
     If Index < LBound(Buffer) Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Index + Count - 1 > UBound(Buffer) Then _
         Error.Argument Argument_InvalidOffLen
     
@@ -375,7 +375,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal determineEncodingFromByteOrderMarks As Boolean, ByVal BufferSize As Long, ByVal LeaveOpen As Boolean)
     If BufferSize <= 0 Then _
-        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedPosNum)
+        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
     
     Select Case VarType(Source)
         Case vbObject
@@ -492,7 +492,7 @@ End Sub
 
 Private Sub VerifyIsOpen()
     If Not mIsOpen Then
-        Throw Error.ObjectDisposed(ObjectDisposed_StreamClosed)
+        Error.ObjectDisposed ObjectDisposed_StreamClosed
     End If
 End Sub
 

@@ -74,7 +74,7 @@ Private Function IsWhiteSpaceString(ByRef s As Variant, ByRef Index As Variant) 
     CharIndex = OptionalLong(Index, 0)
     
     If CharIndex < 0 Or CharIndex >= Len(s) Then _
-        Throw Error.ArgumentOutOfRange("Index")
+        Error.ArgumentOutOfRange "Index"
     
     Dim Ptr As Long
     Ptr = StrPtr(s) + CharIndex * corSizeOfChar

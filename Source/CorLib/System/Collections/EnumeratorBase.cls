@@ -75,7 +75,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal StartIndex As Long, ByVal Length As Long, ByVal Collection As IVersionableCollection)
     If Length < 0 Then _
-        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
     
     mLength = Length
     mStartIndex = StartIndex
@@ -98,19 +98,19 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub EnsureUnchangedVersion()
     If mCollection.CurrentVersion <> mVersion Then
-        Throw Error.InvalidOperation(InvalidOperation_VersionError)
+        Error.InvalidOperation InvalidOperation_VersionError
     End If
 End Sub
 
 Private Sub EnsureStarted()
     If mCount < 0 Then
-        Throw Error.InvalidOperation(InvalidOperation_EnumNotStarted)
+        Error.InvalidOperation InvalidOperation_EnumNotStarted
     End If
 End Sub
 
 Private Sub EnsureNotFinished()
     If mCount >= mLength Then
-        Throw Error.InvalidOperation(InvalidOperation_EnumFinished)
+        Error.InvalidOperation InvalidOperation_EnumFinished
     End If
 End Sub
 

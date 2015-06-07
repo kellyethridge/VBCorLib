@@ -30,7 +30,7 @@ Public Sub ValidateFileMode(ByVal Mode As FileMode)
             Exit Sub
     End Select
     
-    Throw Error.ArgumentOutOfRange("Mode", ArgumentOutOfRange_Enum)
+    Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
 End Sub
 
 Public Sub ValidateFileAccess(ByVal Access As FileAccess)
@@ -39,7 +39,7 @@ Public Sub ValidateFileAccess(ByVal Access As FileAccess)
             Exit Sub
     End Select
 
-    Throw Error.ArgumentOutOfRange("Access", ArgumentOutOfRange_Enum)
+    Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
 End Sub
 
 Public Sub ValidateFileShare(ByVal Share As FileShare)
@@ -48,7 +48,7 @@ Public Sub ValidateFileShare(ByVal Share As FileShare)
             Exit Sub
     End Select
     
-    Throw Error.ArgumentOutOfRange("Share", ArgumentOutOfRange_Enum)
+    Error.ArgumentOutOfRange "Share", ArgumentOutOfRange_Enum
 End Sub
 
 Public Function GetFileModeDisplayName(ByVal Mode As FileMode) As String
@@ -62,7 +62,7 @@ Public Function GetFileModeDisplayName(ByVal Mode As FileMode) As String
         Case OpenOrCreate:  Result = "OpenOrCreate"
         Case Truncate:      Result = "Truncate"
         Case Else
-            Throw Error.ArgumentOutOfRange("Mode", ArgumentOutOfRange_Enum)
+            Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
     End Select
     
     GetFileModeDisplayName = Result
@@ -77,7 +77,7 @@ Public Function GetFileAccessDisplayName(ByVal Access As FileAccess) As String
         Case WriteAccess:       Result = "WriteAccess"
         Case ReadWriteAccess:   Result = "ReadWriteAccess"
         Case Else
-            Throw Error.ArgumentOutOfRange("Access", ArgumentOutOfRange_Enum)
+            Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
     End Select
     
     GetFileAccessDisplayName = Result
