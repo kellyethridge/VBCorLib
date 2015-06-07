@@ -119,7 +119,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
     CheckValidSingleDimArray Arr
     
     If Index < LBound(Arr) Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     
     Select Case VarType(Arr)
         Case corLongArray
@@ -218,7 +218,7 @@ Public Property Get Item(ByVal Index As Long) As Boolean
 Attribute Item.VB_UserMemId = 0
     EnsureInited
     If Index < 0 Or Index >= mLength Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
     Dim bit As Long
     Index = GetBitIndex(Index, bit)
@@ -235,7 +235,7 @@ End Property
 Public Property Let Item(ByVal Index As Long, ByVal Value As Boolean)
     EnsureInited
     If Index < 0 Or Index >= mLength Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
 
     Dim bit As Long
     Index = GetBitIndex(Index, bit)
@@ -267,7 +267,7 @@ End Property
 Public Property Let Length(ByVal Value As Long)
     EnsureInited
     If Value < 0 Then _
-        Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
     
     If Value <> mLength Then
         Dim LastElementIndex As Long

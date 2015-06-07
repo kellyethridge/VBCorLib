@@ -107,7 +107,7 @@ Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As Str
             If Not File.Exists(SourceFileName) Then _
                 IOError.WinIOError ERROR_FILE_NOT_FOUND, SourceFileName
             If Directory.Exists(DestinationFileName) Then _
-                Throw Error.IO(IO_AlreadyExists_Name)
+                Error.IO IO_AlreadyExists_Name
         End If
         IOError.WinIOError DllError, SourceFileName
     End If

@@ -36,7 +36,7 @@ Public Sub CheckValidSingleDimArrayPtr(ByVal Ptr As Long, Optional ByVal Paramet
         Error.ArgumentNull Environment.GetResourceString(ParameterKey), ArgumentNull_Array
     End If
     If SafeArrayGetDim(Ptr) <> 1 Then
-        Throw Error.Rank
+        Error.Rank
     End If
 End Sub
 

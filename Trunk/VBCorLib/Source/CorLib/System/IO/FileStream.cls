@@ -163,7 +163,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Get ReadTimeout() As Long
-    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -173,7 +173,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Let ReadTimeout(ByVal Value As Long)
-    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -183,7 +183,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Get WriteTimeout() As Long
-    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -193,7 +193,7 @@ End Property
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Let WriteTimeout(ByVal Value As Long)
-    Throw Error.InvalidOperation(InvalidOperation_Timeouts)
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 ''
@@ -273,11 +273,11 @@ Public Sub LockStream(ByVal Position As Currency, ByVal Length As Currency)
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Throw Error.ArgumentOutOfRange("Position", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Position", ArgumentOutOfRange_NeedNonNegNum
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
@@ -299,11 +299,11 @@ Public Sub UnlockStream(ByVal Position As Currency, ByVal Length As Currency)
     
     Position = Int(Position)
     If Position < 0@ Then _
-        Throw Error.ArgumentOutOfRange("Position", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Position", ArgumentOutOfRange_NeedNonNegNum
     
     Length = Int(Length)
     If Length < 0@ Then _
-        Throw Error.ArgumentOutOfRange("Length", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
     
     Dim pos As DLong
     AsCurr(pos) = CCur(0.0001@ * Position)
@@ -372,7 +372,7 @@ End Property
 '
 Public Property Let Position(ByVal Value As Currency)
     If Value < 0@ Then _
-        Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
         
     SeekPosition Value, SeekOrigin.FromBeginning
 End Property
@@ -442,7 +442,7 @@ Public Sub SetLength(ByVal Value As Currency)
     Value = Int(Value)
     If Value < mMinPosition Then
         If mMinPosition = 0@ Then
-            Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
+            Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
         Else
             Throw Cor.NewIOException("Setting the length to a position prior to the append-start postion is not permitted.")
         End If
@@ -499,9 +499,9 @@ Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Cou
     CheckValidSingleDimArray Bytes, Parameter_Bytes
     
     If Offset < LBound(Bytes) Then _
-        Throw Error.ArgumentOutOfRange("Offset", ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Offset + Count - 1 > UBound(Bytes) Then _
         Error.Argument Argument_InvalidOffLen
     
@@ -602,7 +602,7 @@ Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If mActiveAsyncResult Is Nothing Then _
         Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
     If Not AsyncResult Is mActiveAsyncResult Then _
-        Throw Error.InvalidOperation(InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple)
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     
     Dim Result As StreamAsyncResult
     Set Result = AsyncResult
@@ -659,9 +659,9 @@ Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count A
     CheckValidSingleDimArray Bytes, Parameter_Bytes
     
     If Offset < LBound(Bytes) Then _
-        Throw Error.ArgumentOutOfRange("Offset", ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Offset + Count - 1 > UBound(Bytes) Then _
         Error.Argument Argument_InvalidOffLen
     
@@ -837,7 +837,7 @@ Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As Fi
     If Len(TrimmedPath) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     If BufferSize <= 0 Then _
-        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedPosNum)
+        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
     
     ValidateFileMode Mode
     ValidateFileAccess Access
@@ -884,7 +884,7 @@ Friend Sub InitWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAc
     If Handle.IsInvalid Then _
         Error.Argument Argument_InvalidHandle
     If BufferSize < 1 Then _
-        Throw Error.ArgumentOutOfRange("BufferSize", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedNonNegNum
     
     Set mHandle = Handle
     mBufferSize = MathExt.Max(BufferSize, MinBufferSize)

@@ -378,10 +378,10 @@ Private Sub ValidateArrayArguments(ByRef Value() As Byte, ByVal StartIndex As Lo
         Error.ArgumentNull "Value", ArgumentNull_Array
     End If
     If StartIndex < LBound(Value) Then
-        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_ArrayLB)
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayLB
     End If
     If StartIndex > UBound(Value) - Count + 1 Then
-        Throw Error.ArgumentOutOfRange("StartIndex", ArgumentOutOfRange_Index)
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
     End If
 End Sub
 

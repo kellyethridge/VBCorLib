@@ -122,7 +122,7 @@ Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
     If CorArray.Rank(DstArray) <> 1 Then _
         Error.Argument Argument_MultiDimNotSupported, "DstArray"
     If Index < LBound(DstArray) Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Index + mCount - 1 > UBound(DstArray) Then _
         Error.Argument Argument_InvalidOffLen
         
@@ -150,7 +150,7 @@ End Property
 '
 Public Function Dequeue() As Variant
     If mCount = 0 Then _
-        Throw Error.InvalidOperation(InvalidOperation_EmptyQueue)
+        Error.InvalidOperation InvalidOperation_EmptyQueue
     
     Helper.MoveVariant Dequeue, mItems(mHead)
     mHead = (mHead + 1) Mod mCapacity
@@ -221,7 +221,7 @@ End Function
 '
 Public Function Peek() As Variant
     If mCount = 0 Then _
-        Throw Error.InvalidOperation(InvalidOperation_EmptyQueue)
+        Error.InvalidOperation InvalidOperation_EmptyQueue
     
     VariantCopy Peek, mItems(mHead)
 End Function

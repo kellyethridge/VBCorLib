@@ -444,7 +444,7 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
     End If
     
     If ID < 0 Then _
-        Throw Error.ArgumentOutOfRange("LCID", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "LCID", ArgumentOutOfRange_NeedNonNegNum
     Load ID
 End Sub
 

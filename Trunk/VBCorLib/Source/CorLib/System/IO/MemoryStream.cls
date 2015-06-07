@@ -327,9 +327,9 @@ End Property
 '
 Public Property Let Capacity(ByVal Value As Long)
     If Not mExpandable Then _
-        Throw Error.NotSupported(NotSupported_MemoryStreamNotExpandable)
+        Error.NotSupported NotSupported_MemoryStreamNotExpandable
     If Value < mLength Then _
-        Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_SmallCapacity)
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
     
     EnsureOpen
     
@@ -380,7 +380,7 @@ End Property
 '
 Public Property Let Position(ByVal Value As Currency)
     If Value < 0@ Then _
-        Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
     
     EnsureOpen
     mPosition = Int(Value)
@@ -418,9 +418,9 @@ Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count 
     CheckValidSingleDimArray Buffer, Parameter_Buffer
     
     If Offset < 0 Then _
-        Throw Error.ArgumentOutOfRange("Offset", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_NeedNonNegNum
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
         Error.Argument Argument_InvalidOffLen
         
@@ -479,9 +479,9 @@ Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
     CheckValidSingleDimArray Buffer, Parameter_Buffer
     
     If Offset < 0 Then _
-        Throw Error.ArgumentOutOfRange("Offset", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_NeedNonNegNum
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
         Error.Argument Argument_InvalidOffLen
     
@@ -569,7 +569,7 @@ Public Sub SetLength(ByVal Value As Currency)
         Case Is > mCapacity
             Capacity = Value
         Case Is < 0@
-            Throw Error.ArgumentOutOfRange("Value", ArgumentOutOfRange_NeedNonNegNum)
+            Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
     End Select
     
     mLength = Value
@@ -655,9 +655,9 @@ Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As V
     
     Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
     If Range.Index < LBound(Buffer) Then _
-        Throw Error.ArgumentOutOfRange("Index", ArgumentOutOfRange_LBound)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
         Error.Argument Argument_InvalidOffLen
         

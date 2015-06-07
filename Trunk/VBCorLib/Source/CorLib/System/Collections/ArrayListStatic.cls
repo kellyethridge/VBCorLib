@@ -95,7 +95,7 @@ End Function
 '
 Public Function Repeat(ByRef Value As Variant, ByVal Count As Long) As ArrayList
     If Count < 0 Then _
-        Throw Error.ArgumentOutOfRange("Count", ArgumentOutOfRange_NeedNonNegNum)
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
     Set Repeat = New ArrayList
     Repeat.Capacity = Count
