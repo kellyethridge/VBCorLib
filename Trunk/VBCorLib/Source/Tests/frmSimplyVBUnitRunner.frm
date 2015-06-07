@@ -104,7 +104,7 @@ Private Sub AddSystem()
         .Add New CharTests
         .Add New CharEnumeratorTests
         .Add New BufferTests
-        .Add New TestVersion
+        .Add New VersionTests
         .Add New TestRandom
         .Add New MathExtTests
         .Add New GuidTests
