@@ -229,7 +229,13 @@ End Sub
 
 Friend Sub Init(ByRef FileName As String, ByRef Message As String, ByVal InnerException As Exception)
     mBase.SetValue PropFileName, FileName
-    mBase.Message = Message
+    
+    If Len(FileName) > 0 And CorString.IsNull(Message) Then
+        mBase.Message = Environment.GetResourceString(IO_FileNotFound_Name, FileName)
+    Else
+        mBase.Message = Message
+    End If
+    
     Set mBase.InnerException = InnerException
 End Sub
 
