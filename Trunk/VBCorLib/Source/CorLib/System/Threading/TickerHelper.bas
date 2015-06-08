@@ -1,4 +1,4 @@
-Attribute VB_Name = "modTicker"
+Attribute VB_Name = "TickerHelper"
 'The MIT License (MIT)
 'Copyright (c) 2014 Kelly Ethridge
 '
