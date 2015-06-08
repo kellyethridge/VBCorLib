@@ -42,6 +42,29 @@ Public SortComparer     As IComparer
 '   Optimized sort routines. There could have been one
 '   all-purpose sort routine, but it would be too slow.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Public Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As Long) As Boolean
+    Dim pfn As Long
+    Select Case SafeArrayGetVartype(pSA) And &HFF
+        Case vbLong:                    pfn = FuncAddr(AddressOf QuickSortLong)
+        Case vbString:                  pfn = FuncAddr(AddressOf QuickSortString)
+        Case vbDouble, vbDate:          pfn = FuncAddr(AddressOf QuickSortDouble)
+        Case vbObject, vbDataObject:    pfn = FuncAddr(AddressOf QuickSortObject)
+        Case vbVariant:                 pfn = FuncAddr(AddressOf QuickSortVariant)
+        Case vbInteger:                 pfn = FuncAddr(AddressOf QuickSortInteger)
+        Case vbSingle:                  pfn = FuncAddr(AddressOf QuickSortSingle)
+        Case vbByte:                    pfn = FuncAddr(AddressOf QuickSortByte)
+        Case vbCurrency:                pfn = FuncAddr(AddressOf QuickSortCurrency)
+        Case vbBoolean:                 pfn = FuncAddr(AddressOf QuickSortBoolean)
+        Case Else: Exit Function
+    End Select
+    
+    Dim Sorter As Action_T_T_T
+    Set Sorter = NewDelegate(pfn)
+    Sorter.Invoke pSA, ByVal Left, ByVal Right
+
+    TrySZSort = True
+End Function
+
 Public Sub SetSortKeys(ByVal pSA As Long)
     CopyMemory mSortKeys.SA, ByVal pSA, corSizeOfSafeArray1d
     Select Case mSortKeys.SA.cbElements
@@ -92,7 +115,7 @@ Public Sub SwapSortItems(ByRef Items As SortItems, ByVal i As Long, ByVal j As L
     End With
 End Sub
 
-Public Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Long, t As Long
     Do While Left < Right
         i = Left: j = Right: X = Keys((i + j) \ 2)
@@ -113,7 +136,7 @@ Public Sub QuickSortLong(ByRef Keys() As Long, ByVal Left As Long, ByVal Right A
     Loop
 End Sub
 
-Public Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As String
     Do While Left < Right
         i = Left: j = Right: X = StringRef(Keys((i + j) \ 2))
@@ -135,7 +158,7 @@ Public Sub QuickSortString(ByRef Keys() As String, ByVal Left As Long, ByVal Rig
     Loop
 End Sub
 
-Public Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Variant, Key As IComparable
     Do While Left < Right
         i = Left: j = Right: Set X = Keys((i + j) \ 2)
@@ -156,7 +179,7 @@ Public Sub QuickSortObject(ByRef Keys() As Object, ByVal Left As Long, ByVal Rig
     Loop
 End Sub
 
-Public Sub QuickSortInteger(ByRef Keys() As Integer, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortInteger(ByRef Keys() As Integer, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Integer, t As Integer
     Do While Left < Right
         i = Left: j = Right: X = Keys((i + j) \ 2)
@@ -177,7 +200,7 @@ Public Sub QuickSortInteger(ByRef Keys() As Integer, ByVal Left As Long, ByVal R
     Loop
 End Sub
 
-Public Sub QuickSortByte(ByRef Keys() As Byte, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortByte(ByRef Keys() As Byte, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Byte, t As Byte
     Do While Left < Right
         i = Left: j = Right: X = Keys((i + j) \ 2)
@@ -198,7 +221,7 @@ Public Sub QuickSortByte(ByRef Keys() As Byte, ByVal Left As Long, ByVal Right A
     Loop
 End Sub
 
-Public Sub QuickSortDouble(ByRef Keys() As Double, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortDouble(ByRef Keys() As Double, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Double, t As Double
     Do While Left < Right
         i = Left: j = Right: X = Keys((i + j) \ 2)
@@ -219,7 +242,7 @@ Public Sub QuickSortDouble(ByRef Keys() As Double, ByVal Left As Long, ByVal Rig
     Loop
 End Sub
 
-Public Sub QuickSortSingle(ByRef Keys() As Single, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortSingle(ByRef Keys() As Single, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Single, t As Single
     Do While Left < Right
         i = Left: j = Right: X = Keys((i + j) \ 2)
@@ -240,7 +263,7 @@ Public Sub QuickSortSingle(ByRef Keys() As Single, ByVal Left As Long, ByVal Rig
     Loop
 End Sub
 
-Public Sub QuickSortCurrency(ByRef Keys() As Currency, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortCurrency(ByRef Keys() As Currency, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Currency, t As Currency
     Do While Left < Right
         i = Left: j = Right: X = Keys((i + j) \ 2)
@@ -261,7 +284,7 @@ Public Sub QuickSortCurrency(ByRef Keys() As Currency, ByVal Left As Long, ByVal
     Loop
 End Sub
 
-Public Sub QuickSortBoolean(ByRef Keys() As Boolean, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortBoolean(ByRef Keys() As Boolean, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Boolean, t As Boolean
     Do While Left < Right
         i = Left: j = Right: X = Keys((i + j) \ 2)
@@ -282,7 +305,7 @@ Public Sub QuickSortBoolean(ByRef Keys() As Boolean, ByVal Left As Long, ByVal R
     Loop
 End Sub
 
-Public Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal Right As Long)
+Private Sub QuickSortVariant(ByRef Keys() As Variant, ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, X As Variant
     Do While Left < Right
         i = Left: j = Right: VariantCopyInd X, Keys((i + j) \ 2)

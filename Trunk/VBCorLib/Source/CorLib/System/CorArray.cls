@@ -1125,7 +1125,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
             
         ' try optimized routines first, then fallback to the default IComparer object.
         Case vbError
-            If Not TrySZSort(KeysPtr, Index, Index + Length - 1) Then
+            If Not CorArraySort.TrySZSort(KeysPtr, Index, Index + Length - 1) Then
                 ' If we get here, then no optimized routine existed,
                 ' so we'll set our comparer to the default and loop
                 ' around again, letting this case statement fall
@@ -1500,24 +1500,24 @@ End Sub
 
 ''
 '   Attempt to locate an optimized sort routine for a specific data type.
-Private Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As Long) As Boolean
-    Dim pfn As Long
-    Select Case SafeArrayGetVartype(pSA) And &HFF
-        Case vbLong:                    pfn = FuncAddr(AddressOf QuickSortLong)
-        Case vbString:                  pfn = FuncAddr(AddressOf QuickSortString)
-        Case vbDouble, vbDate:          pfn = FuncAddr(AddressOf QuickSortDouble)
-        Case vbObject, vbDataObject:    pfn = FuncAddr(AddressOf QuickSortObject)
-        Case vbVariant:                 pfn = FuncAddr(AddressOf QuickSortVariant)
-        Case vbInteger:                 pfn = FuncAddr(AddressOf QuickSortInteger)
-        Case vbSingle:                  pfn = FuncAddr(AddressOf QuickSortSingle)
-        Case vbByte:                    pfn = FuncAddr(AddressOf QuickSortByte)
-        Case vbCurrency:                pfn = FuncAddr(AddressOf QuickSortCurrency)
-        Case vbBoolean:                 pfn = FuncAddr(AddressOf QuickSortBoolean)
-        Case Else: Exit Function
-    End Select
-    mSortDelegator.pfn = pfn
-    mSorter.Call pSA, Left, Right
-    TrySZSort = True
-End Function
+'Private Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As Long) As Boolean
+'    Dim pfn As Long
+'    Select Case SafeArrayGetVartype(pSA) And &HFF
+'        Case vbLong:                    pfn = FuncAddr(AddressOf QuickSortLong)
+'        Case vbString:                  pfn = FuncAddr(AddressOf QuickSortString)
+'        Case vbDouble, vbDate:          pfn = FuncAddr(AddressOf QuickSortDouble)
+'        Case vbObject, vbDataObject:    pfn = FuncAddr(AddressOf QuickSortObject)
+'        Case vbVariant:                 pfn = FuncAddr(AddressOf QuickSortVariant)
+'        Case vbInteger:                 pfn = FuncAddr(AddressOf QuickSortInteger)
+'        Case vbSingle:                  pfn = FuncAddr(AddressOf QuickSortSingle)
+'        Case vbByte:                    pfn = FuncAddr(AddressOf QuickSortByte)
+'        Case vbCurrency:                pfn = FuncAddr(AddressOf QuickSortCurrency)
+'        Case vbBoolean:                 pfn = FuncAddr(AddressOf QuickSortBoolean)
+'        Case Else: Exit Function
+'    End Select
+'    mSortDelegator.pfn = pfn
+'    mSorter.Call pSA, Left, Right
+'    TrySZSort = True
+'End Function
 
 
