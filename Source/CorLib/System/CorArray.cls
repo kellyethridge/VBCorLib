@@ -56,15 +56,8 @@ Private Type GuidSafeArray1d
     SA      As SafeArray1d
 End Type
 
-Private mSortDelegator          As FunctionDelegator
-Private mSorter                 As ISortRoutine
-
 Private CallbackSorter          As New CallbackSorter
 
-
-Private Sub Class_Initialize()
-    Set mSorter = InitDelegator(mSortDelegator)
-End Sub
 
 ''
 ' Uses a callback method to check if an element in an array exists.
@@ -1498,26 +1491,5 @@ Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Lon
     End With
 End Sub
 
-''
-'   Attempt to locate an optimized sort routine for a specific data type.
-'Private Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As Long) As Boolean
-'    Dim pfn As Long
-'    Select Case SafeArrayGetVartype(pSA) And &HFF
-'        Case vbLong:                    pfn = FuncAddr(AddressOf QuickSortLong)
-'        Case vbString:                  pfn = FuncAddr(AddressOf QuickSortString)
-'        Case vbDouble, vbDate:          pfn = FuncAddr(AddressOf QuickSortDouble)
-'        Case vbObject, vbDataObject:    pfn = FuncAddr(AddressOf QuickSortObject)
-'        Case vbVariant:                 pfn = FuncAddr(AddressOf QuickSortVariant)
-'        Case vbInteger:                 pfn = FuncAddr(AddressOf QuickSortInteger)
-'        Case vbSingle:                  pfn = FuncAddr(AddressOf QuickSortSingle)
-'        Case vbByte:                    pfn = FuncAddr(AddressOf QuickSortByte)
-'        Case vbCurrency:                pfn = FuncAddr(AddressOf QuickSortCurrency)
-'        Case vbBoolean:                 pfn = FuncAddr(AddressOf QuickSortBoolean)
-'        Case Else: Exit Function
-'    End Select
-'    mSortDelegator.pfn = pfn
-'    mSorter.Call pSA, Left, Right
-'    TrySZSort = True
-'End Function
 
 
