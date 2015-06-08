@@ -1025,7 +1025,7 @@ End Function
 '
 Public Function NewTime(ByVal DateValue As Variant) As TimeSpan
     Select Case VarType(DateValue)
-        Case vbDate:    Set NewTime = NewTimeSpan(, Hour(DateValue), Minute(DateValue), Second(DateValue))
+        Case vbDate:    Set NewTime = NewTimeSpan(Hours:=Hour(DateValue), Minutes:=Minute(DateValue), Seconds:=Second(DateValue))
         Case Else:      Set NewTime = CorDateTime.GetDateTime(DateValue).TimeOfDay
     End Select
 End Function
@@ -1060,16 +1060,16 @@ End Function
 ' </pre>
 ' The two parameters must be declared as ByRef.
 '
-Public Function NewTicker(ByVal Interval As Long, Optional ByVal Data As Variant, Optional ByVal AutoReset As Boolean = True, Optional ByVal AddressOfCallback As Long) As Ticker
+Public Function NewTicker(ByVal Interval As Long, Optional ByRef Data As Variant, Optional ByVal AutoReset As Boolean = True, Optional ByVal AddressOfCallback As Long) As Ticker
     Set NewTicker = New Ticker
-    Call NewTicker.Init(Interval, Data, AutoReset, AddressOfCallback)
+    NewTicker.Init Interval, Data, AutoReset, AddressOfCallback
 End Function
 
 ''
 ' Creates an array of values.
 '
-' @param arraytype The target datatype of the resultant array and the values to be converted to.
-' @param arrayelements The values to be put into the new array.
+' @param ElementType The target datatype of the resultant array and the values to be converted to.
+' @param ArrayElements The values to be put into the new array.
 ' @return An array of the specified datatype and containing the array elements with conversion,
 ' or an empty array if no elements are defined.
 ' <p>Elements of a size that are a multiple of 4 will not create a new array
@@ -1077,9 +1077,6 @@ End Function
 ' to be created.</p>
 '
 Public Function NewArray(ByVal ElementType As VbVarType, ParamArray ArrayElements() As Variant) As Variant
-    Dim Args() As Variant
-    Helper.Swap4 ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16)
-    
     Dim Length As Long
     Length = UBound(Args) + 1
     
@@ -1087,6 +1084,9 @@ Public Function NewArray(ByVal ElementType As VbVarType, ParamArray ArrayElement
     Ret = CorArray.CreateInstance(ElementType, Length)
     
     If Length > 0 Then
+        Dim Args() As Variant
+        Helper.Swap4 ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16)
+        
         CorArray.CopyEx Args, 0, Ret, 0, Length
     End If
     

@@ -85,8 +85,7 @@ Private mInterval   As Long
 Private mAutoReset  As Boolean
 Private mTimerId    As Long
 Private mData       As Variant
-Private mDelegator  As FunctionDelegator
-Private mCallback   As ITwoArgReturnVoid
+Private mCallback   As Action_T_T
 
 
 ''
@@ -107,7 +106,7 @@ End Property
 ' @remarks The data is not used by the Ticker. It is to allow
 ' a developer to associate values to the Ticker if needed.
 '
-Public Property Let Data(ByVal Value As Variant)
+Public Property Let Data(ByRef Value As Variant)
     mData = Value
 End Property
 
@@ -118,44 +117,8 @@ End Property
 ' @remarks The data is not used by the Ticker. It is to allow
 ' a developer to associate values to the Ticker if needed.
 '
-Public Property Set Data(ByVal Value As Variant)
+Public Property Set Data(ByRef Value As Variant)
     Set mData = Value
-End Property
-
-''
-' Returns the callback address of the function used by the Ticker object.
-'
-' @return Callback address. Setting this to zero will stop the callback.
-' @remarks A callback method is used to allow a Ticker object to
-' notify the function without having to use an Event. A function callback
-' must have the following signature, or the application may crash.
-' <pre>
-' Public Sub TickerCallback(ByRef Ticker As Ticker, ByRef Data As Variant)
-'     '' do stuff
-' End Sub
-' </pre>
-' The two parameters must be declared as ByRef.
-'
-Public Property Get Callback() As Long
-    Callback = mDelegator.pfn
-End Property
-
-''
-' Sets the callback address of the function to be used by the Ticker object.
-'
-' @param RHS The address of the callback function. Setting this to zero will stop the callback.
-' @remarks A callback method is used to allow a Ticker object to
-' notify the function without having to use an Event. A function callback
-' must have the following signature, or the application may crash.
-' <pre>
-' Public Sub TickerCallback(ByRef Ticker As Ticker, ByRef Data As Variant)
-'     '' do stuff
-' End Sub
-' </pre>
-' The two parameters must be declared as ByRef.
-'
-Public Property Let Callback(ByVal Value As Long)
-    mDelegator.pfn = Value
 End Property
 
 ''
@@ -204,8 +167,8 @@ End Property
 '
 Public Property Let Interval(ByVal Value As Long)
     If Value < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-        
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
+    
     mInterval = Value
     If Enabled Then
         StartTicker
@@ -288,10 +251,6 @@ Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interfacek
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub OnElapsed()
     If Not mAutoReset Then
         StopTicker
@@ -299,25 +258,27 @@ Friend Sub OnElapsed()
     
     RaiseEvent Elapsed(mData)
     
-    If mDelegator.pfn <> vbNullPtr Then
-        mCallback.Call VarPtr(Me), VarPtr(mData)
+    If Not mCallback Is Nothing Then
+        mCallback.Invoke VarPtr(Me), VarPtr(mData)
     End If
 End Sub
 
-Friend Sub Init(ByVal Interval As Long, ByVal Data As Variant, ByVal AutoReset As Long, ByVal AddressOfCallback As Long)
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Interval As Long, ByRef Data As Variant, ByVal AutoReset As Long, ByVal AddressOfCallback As Long)
     Me.Interval = Interval
     Me.AutoReset = AutoReset
-    Helper.MoveVariant mData, Data
-    Me.Callback = AddressOfCallback
+    VariantCopyInd mData, Data
+    
+    If AddressOfCallback <> vbNullPtr Then
+        Set mCallback = NewDelegate(AddressOfCallback)
+    End If
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mAutoReset = True
-    Set mCallback = InitDelegator(mDelegator)
 End Sub
 
 Private Sub Class_Terminate()
@@ -326,14 +287,14 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
