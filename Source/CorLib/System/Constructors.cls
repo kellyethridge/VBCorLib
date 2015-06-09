@@ -1078,7 +1078,7 @@ End Function
 '
 Public Function NewArray(ByVal ElementType As VbVarType, ParamArray ArrayElements() As Variant) As Variant
     Dim Length As Long
-    Length = UBound(Args) + 1
+    Length = UBound(ArrayElements) + 1
     
     Dim Ret As Variant
     Ret = CorArray.CreateInstance(ElementType, Length)

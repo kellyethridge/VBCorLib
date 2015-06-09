@@ -106,6 +106,8 @@ Public Enum ResourceStringKey
     Argument_PathUriFormatNotSupported = 839
     Argument_ImplementIComparable = 840
     Argument_PathFormatNotSupported = 844
+    Argument_AddingDuplicate = 845
+    Argument_AddingDuplicate_Key = 846
     
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901

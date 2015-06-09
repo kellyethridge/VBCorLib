@@ -67,24 +67,15 @@ Private mVersion    As Long
 ' @param value The value associated with the key.
 ' @remark key must be unique.
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
-    Dim i As Long
-    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
-    If i >= 0 Then _
-        Throw Cor.NewArgumentException("An element with this key already exists.", "key")
+    Dim Index As Long
+    i = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
     
-    i = Not i
-    Call EnsureCapacity(mCount + 1)
-    If i < mCount Then
-        Call CopyMemory(mKeys(i + 1), mKeys(i), (mCount - i) * 16)
-        Call ZeroMemory(mKeys(i), 16)
-        Call CopyMemory(mValues(i + 1), mValues(i), (mCount - i) * 16)
-        Call ZeroMemory(mValues(i), 16)
-    End If
-    Call VariantCopyInd(mKeys(i), Key)
-    Call VariantCopyInd(mValues(i), Value)
-    mCount = mCount + 1
-    mVersion = mVersion + 1
+    If i >= 0 Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_AddingDuplicate_Key, GetKey(i), Key))
+    
+    Insert Not i, Key, Value
 End Sub
+
 
 ''
 ' Returns the size of the underlying array.
@@ -104,15 +95,19 @@ End Property
 ' @remarks If the capacity is set less than the number of items in the
 ' array, an ArgumentOutOfRangeException exception will be thrown.
 '
-Public Property Let Capacity(ByVal RHS As Long)
-    If RHS < mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_SmallCapacity))
-    If RHS = mCapacity Then Exit Property
-    If RHS = 0 Then RHS = DEF_CAPACITY
-    mCapacity = RHS
-    ReDim Preserve mKeys(0 To mCapacity - 1)
-    ReDim Preserve mValues(0 To mCapacity - 1)
-    mVersion = mVersion + 1
+Public Property Let Capacity(ByVal Value As Long)
+    If Value < mCount Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
+    
+    If Value > mCapacity Then
+        ReDim Preserve mKeys(0 To Value - 1)
+        ReDim Preserve mValues(0 To Value - 1)
+    Else
+        Erase mKeys
+        Erase mValues
+    End If
+    
+    mCapacity = Value
 End Property
 
 ''
@@ -157,7 +152,7 @@ End Function
 ' @return Indication of the key existing in the list.
 '
 Public Function ContainsKey(ByRef Key As Variant) As Boolean
-    ContainsKey = (CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer) >= 0)
+    ContainsKey = (CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer) >= 0)
 End Function
 
 ''
@@ -340,10 +335,11 @@ End Property
 '
 Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
-    Dim i As Long
-    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
-    If i < 0 Then Exit Property
-    Call VariantCopy(Item, mValues(i))
+    Dim Index As Long
+    Index = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
+    If Index >= 0 Then
+        VariantCopy Item, mValues(Index)
+    End If
 End Property
 
 ''
@@ -356,13 +352,15 @@ End Property
 ' it is added with the associated value.
 '
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
-    Dim i As Long
-    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
-    If i < 0 Then
-        Call Add(Key, Value)
-    Else
-        mValues(i) = Value
+    Dim Index As Long
+    Index = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
+    
+    If Index >= 0 Then
+        mValues(Index) = Value
         mVersion = mVersion + 1
+    Else
+'        Add Key, Value
+        Insert Not Index, Key, Value
     End If
 End Property
 
@@ -376,13 +374,15 @@ End Property
 ' it is added with the associated value.
 '
 Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
-    Dim i As Long
-    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
-    If i < 0 Then
-        Call Add(Key, Value)
-    Else
-        Set mValues(i) = Value
+    Dim Index As Long
+    Index = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
+    
+    If Index >= 0 Then
+        Set mValues(Index) = Value
         mVersion = mVersion + 1
+    Else
+'        Add Key, Value
+        Insert Not Index, Key, Value
     End If
 End Property
 
@@ -414,7 +414,7 @@ End Function
 Public Sub Remove(ByRef Key As Variant)
     Dim i As Long
     If mCount = 0 Then Exit Sub
-    i = CorArray.BinarySearchEx(mKeys, Key, 0, mCount, mComparer)
+    i = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
     If i >= 0 Then Call RemoveAt(i)
 End Sub
 
@@ -481,10 +481,6 @@ Public Property Get Values() As ICollection
     Set Values = NewSortedValueList
 End Property
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetKeyEnumerator() As IEnumerator
     Dim Ret As New SortedListEnumerator
     Call Ret.Init(Me, SAPtr(mKeys), SAPtr(mValues), slKeys)
@@ -497,17 +493,50 @@ Friend Function GetValueEnumerator() As IEnumerator
     Set GetValueEnumerator = Ret
 End Function
 
+Friend Sub CopyKeysTo(ByRef DstArray As Variant, ByVal Index As Long)
+    Call CorArray.CopyEx(mKeys, 0, DstArray, Index, mCount)
+End Sub
+
+Friend Sub CopyValuesTo(ByRef DstArray As Variant, ByVal Index As Long)
+    Call CorArray.CopyEx(mValues, 0, DstArray, Index, mCount)
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal List As IDictionary, ByVal Comparer As IComparer, ByVal Capacity As Long)
+    Set mComparer = Comparer
+    
+    If List Is Nothing Then
+        Me.Capacity = Capacity
+    Else
+        mCount = List.Count
+        Me.Capacity = mCount
+        Call List.Keys.CopyTo(mKeys, 0)
+        Call List.Values.CopyTo(mValues, 0)
+        Call CorArray.SortKeyEx(mKeys, mValues, 0, mCount, Comparer)
+    End If
+End Sub
+
+Friend Sub CloneHelper(ByRef Keys() As Variant, ByRef Values() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
+    mCount = Count
+    Set mComparer = Comparer
+    mKeys = Keys
+    mValues = Values
+    mCapacity = UBound(Keys) + 1
+End Sub
+
 Private Sub Class_InitProperties()
     ReDim mKeys(0 To DEF_CAPACITY - 1)
     ReDim mValues(0 To DEF_CAPACITY - 1)
     mCapacity = DEF_CAPACITY
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
         mCount = .ReadProperty("Count", 0)
@@ -538,7 +567,27 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Insert(ByVal Index As Long, ByRef Key As Variant, ByRef Value As Variant)
+    EnsureCapacity mCount + 1
+    
+    If Index < mCount Then
+        CopyMemory mKeys(Index + 1), mKeys(Index), (mCount - Index) * 16
+        ZeroMemory mKeys(Index), 16
+        CopyMemory mValues(Index + 1), mValues(Index), (mCount - Index) * 16
+        ZeroMemory mValues(Index), 16
+    End If
+    
+    VariantCopyInd mKeys(Index), Key
+    VariantCopyInd mValues(Index), Value
+    mCount = mCount + 1
+    mVersion = mVersion + 1
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -554,16 +603,25 @@ End Function
 
 Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     Dim NewCapacity As Long
-    If RequiredCapacity <= mCapacity Then Exit Sub
-    NewCapacity = mCapacity * 2
-    If RequiredCapacity > NewCapacity Then NewCapacity = RequiredCapacity
+    
+    If mCapacity = 0 Then
+        NewCapacity = DEF_CAPACITY
+    Else
+        NewCapacity = mCapacity * 2
+    End If
+    
+    If RequiredCapacity > NewCapacity Then
+        NewCapacity = RequiredCapacity
+    End If
+    
     ReDim Preserve mKeys(0 To NewCapacity - 1)
     ReDim Preserve mValues(0 To NewCapacity - 1)
     mCapacity = NewCapacity
 End Sub
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
     Call CopyTo(Arr, Index)
@@ -582,7 +640,7 @@ Private Function ICollection_NewEnum() As stdole.IUnknown
 End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IDictionary Interface
+'   IDictionary
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IDictionary_Add(Key As Variant, Value As Variant)
     Call Add(Key, Value)
@@ -645,7 +703,7 @@ Private Property Get IDictionary_Values() As ICollection
 End Property
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -664,39 +722,6 @@ Private Function NewSortedValueList() As SortedValueList
     Set NewSortedValueList = New SortedValueList
     Call NewSortedValueList.Init(Me)
 End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub CloneHelper(ByRef Keys() As Variant, ByRef Values() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
-    mCount = Count
-    Set mComparer = Comparer
-    mKeys = Keys
-    mValues = Values
-    mCapacity = UBound(Keys) + 1
-End Sub
-
-Friend Sub CopyKeysTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Call CorArray.CopyEx(mKeys, 0, DstArray, Index, mCount)
-End Sub
-
-Friend Sub CopyValuesTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Call CorArray.CopyEx(mValues, 0, DstArray, Index, mCount)
-End Sub
-
-Friend Sub Init(ByVal List As IDictionary, ByVal Comparer As IComparer, ByVal Capacity As Long)
-    Set mComparer = Comparer
-    If List Is Nothing Then
-        Me.Capacity = Capacity
-    Else
-        mCount = List.Count
-        Me.Capacity = mCount
-        Call List.Keys.CopyTo(mKeys, 0)
-        Call List.Values.CopyTo(mValues, 0)
-        Call CorArray.SortKeyEx(mKeys, mValues, 0, mCount, Comparer)
-    End If
-End Sub
 
 Friend Property Get Version() As Long
     Version = mVersion
