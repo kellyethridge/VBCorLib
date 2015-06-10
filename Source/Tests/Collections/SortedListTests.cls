@@ -50,6 +50,37 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1
             Test.Use 3
             
+        Case "GetByIndex_WithValue_ReturnsExpected"
+            Test.Use 0, "hi"
+            Test.Use 1, 3
+            Test.Use 2, NewInt32(7)
+        
+        Case "GetByIndex_WithInvalidIndex_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use 3
+            
+        Case "SetByIndex_WithInvalidIndex_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use 3
+        
+        Case "RemoveAt_WithInvalidIndex_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use 3
+            
+        Case "CopyTo_WithIndex_CopiesToArray"
+            Test.Use 0, Array(Cor.NewDictionaryEntry(1, "a"), Cor.NewDictionaryEntry(2, "b"), Cor.NewDictionaryEntry(3, "c"), Nothing)
+            Test.Use 1, Array(Nothing, Cor.NewDictionaryEntry(1, "a"), Cor.NewDictionaryEntry(2, "b"), Cor.NewDictionaryEntry(3, "c"))
+    
+        Case "IndexOfKey_WithValue_ReturnsExpected"
+            Test.Use 1, 0
+            Test.Use 2, 1
+            Test.Use 3, -1
+        
+        Case "IndexOfValue_WithValue_ReturnsExpected"
+            Test.Use "a", 0
+            Test.Use "b", 1
+            Test.Use "c", -1
+            
     End Select
 End Sub
 
@@ -89,6 +120,16 @@ Public Sub Add_WithDifferentKeyDataTypes_ThrowsInvalidOperation()
     
     Debug.Print Err.Description
     AssertInvalidOperationException Err
+End Sub
+
+Public Sub Add_WithCapacitySetToZero_AddsItem()
+    Dim List As New SortedList
+    List.Capacity = 0
+    
+    List.Add 1, "a"
+    
+    Assert.That List(1), Iz.EqualTo("a")
+    Assert.That List.Capacity, Iz.EqualTo(16)
 End Sub
 
 Public Sub Item_WithKey_ReturnsValue()
@@ -204,7 +245,204 @@ Public Sub GetKey_WithInvalidIndex_ThrowsArgumentOutOfRangeException(ByVal Inval
 
     List.GetKey InvalidIndex
     
-    AssertArgumentOutOfRangeException Err
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub GetByIndex_WithValue_ReturnsExpected(ByVal Index As Long, ByRef Expected As Variant)
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+    
+    Dim Actual As Variant
+    MoveVariant Actual, List.GetByIndex(Index)
+    
+    Assert.That Actual, Equals(Expected)
+End Sub
+
+Public Sub GetByIndex_WithInvalidIndex_ThrowsArgumentOutOfRangeException(ByVal InvalidIndex As Long)
+    On Error Resume Next
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+    
+    List.GetByIndex InvalidIndex
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub SetByIndex_WhenCalled_ReplacesValue()
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+
+    List.SetByIndex 2, 7
+    
+    Assert.That List.GetByIndex(2), Iz.EqualTo(7)
+End Sub
+
+Public Sub SetByIndex_WithInvalidIndex_ThrowsArgumentOutOfRangeException(ByVal InvalidIndex As Long)
+    On Error Resume Next
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+    
+    List.SetByIndex InvalidIndex, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub Remove_WithExistingKey_RemovesItem()
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+
+    List.Remove 1
+    
+    Assert.That List.Count, Iz.EqualTo(2)
+    Assert.That List.GetKey(1), Iz.EqualTo(3)
+    Assert.That List.GetByIndex(1), Equals(NewInt32(7))
+End Sub
+
+Public Sub Remove_WithNonExistingKey_ReturnsEmpty()
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+
+    Dim Actual As Variant
+    Actual = List(5)
+    
+    Assert.That Actual, Iz.vbEmpty
+End Sub
+
+Public Sub RemoveAt_WithValue_RemovesItem()
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+
+    List.RemoveAt 1
+    
+    Assert.That List.Count, Iz.EqualTo(2)
+    Assert.That List.GetKey(1), Iz.EqualTo(3)
+    Assert.That List.GetByIndex(1), Equals(NewInt32(7))
+End Sub
+
+Public Sub RemoveAt_WithInvalidIndex_ThrowsArgumentOutOfRangeException(ByVal InvalidIndex As Long)
+    On Error Resume Next
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+
+    List.RemoveAt InvalidIndex
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub CopyTo_WithIndex_CopiesToArray(ByVal Index As Long, ByRef Expected As Variant)
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    List.Add 3, "c"
+    
+    Dim Actual(0 To 3) As DictionaryEntry
+    List.CopyTo Actual, Index
+        
+    Assert.That Actual, Iz.EqualTo(Expected).Using(New CorObjectComparer)
+End Sub
+
+Public Sub CopyTo_WithNullArray_ThrowsArgumentNullException()
+    On Error Resume Next
+    Dim List As New SortedList
+    Dim NullArray() As DictionaryEntry
+    
+    List.CopyTo NullArray, 0
+    
+    AssertArgumentNullException Err, "Arr"
+End Sub
+
+Public Sub CopyTo_WithMultiDimArray_ThrowsArgumentException()
+    On Error Resume Next
+    Dim List As New SortedList
+    Dim MultiDim(1, 1) As Variant
+    
+    List.CopyTo MultiDim, 0
+    
+    AssertArgumentException Err, "Arr"
+End Sub
+
+Public Sub CopyTo_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    Dim List As New SortedList
+    Dim Target(1 To 1) As Variant
+     
+    List.CopyTo Target, 0
+     
+    AssertArgumentOutOfRangeException Err, "ArrayIndex"
+End Sub
+
+Public Sub CopyTo_WithIndexAndListCountGreaterThanUBound_ThrowsArgumentException()
+    On Error Resume Next
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    Dim Target(0 To 1) As Variant
+    
+    List.CopyTo Target, 1
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub IndexOfKey_WithValue_ReturnsExpected(ByRef Key As Variant, ByVal Expected As Long)
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    
+    Dim Actual As Long
+    Actual = List.IndexOfKey(Key)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IndexOfValue_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expected As Long)
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    
+    Dim Actual As Long
+    Actual = List.IndexOfValue(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub TrimToSize_WhenCalled_SetsCapacityToCount()
+    Dim List As New SortedList
+    List.Capacity = 100
+    List.Add 1, "a"
+    List.Add 2, "b"
+    
+    List.TrimToSize
+    
+    Assert.That List.Capacity, Iz.EqualTo(2)
+    Assert.That List.GetByIndex(0), Iz.EqualTo("a")
+    Assert.That List.GetByIndex(1), Iz.EqualTo("b")
+End Sub
+
+Public Sub Enumeration_WhenCalled_EnumeratesList()
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    List.Add 3, "c"
+
+    Dim Expected() As Variant
+    Expected = Array(Cor.NewDictionaryEntry(1, "a"), Cor.NewDictionaryEntry(2, "b"), Cor.NewDictionaryEntry(3, "c"))
+    Assert.That List, Iz.EqualTo(Expected).Using(New CorObjectComparer)
 End Sub
 
 'Public Sub TestClone()
@@ -217,95 +455,6 @@ End Sub
 '    For i = 1 To 10
 '        Assert.AreEqual i, list2(i)
 '    Next i
-'End Sub
-'
-'Public Sub TestCopyTo()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, "Item" & i
-'    Next i
-'    Dim a() As DictionaryEntry
-'    ReDim a(9)
-'    List.CopyTo a, 0
-'    For i = 0 To 9
-'        Assert.AreEqual i + 1, a(i).Key
-'        Assert.AreEqual "Item" & i + 1, a(i).Value
-'    Next i
-'End Sub
-'
-'Public Sub TestIndexOfKey()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    Assert.AreEqual 5, List.IndexOfKey(6&), "Should return 5."
-'End Sub
-'
-'Public Sub TestIndexOfValue()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    Assert.AreEqual 5, List.IndexOfValue(6&), "Should return 5."
-'End Sub
-'
-'Public Sub TestRemove()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    List.Remove 5&
-'    Assert.AreEqual 9, List.Count, "Count should be 9."
-'    For i = 1 To 9
-'        Assert.AreEqual IIf(i < 5, i, i + 1), List.GetKey(i - 1)
-'    Next i
-'End Sub
-'
-'Public Sub TestRemoveAt()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    List.RemoveAt 4
-'    Assert.AreEqual 9, List.Count, "Count should be 9."
-'    For i = 1 To 9
-'        Assert.AreEqual IIf(i < 5, i, i + 1), List.GetKey(i - 1)
-'    Next i
-'End Sub
-'
-'Public Sub TestSetByIndex()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    List.SetByIndex 4, "Hello"
-'    Assert.AreEqual 10, List.Count, "Count should not change."
-'    For i = 0 To 9
-'        Assert.AreEqual IIf(i = 4, "Hello", i + 1), List.GetByIndex(i)
-'    Next i
-'End Sub
-'
-'Public Sub TestTrimToSize()
-'    Dim i As Long
-'    For i = 1 To 5
-'        List.Add i, i
-'    Next i
-'    List.TrimToSize
-'    Assert.AreEqual 5, List.Capacity, "Capacity should be 5."
-'End Sub
-'
-'Public Sub TestEnumerator()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    Dim Entry As DictionaryEntry
-'    i = 1
-'    For Each Entry In List
-'        Assert.AreEqual i, Entry.Key
-'        Assert.AreEqual i, Entry.Value
-'        i = i + 1
-'    Next Entry
 'End Sub
 '
 'Public Sub TestCreateWithList()
