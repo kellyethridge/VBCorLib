@@ -68,12 +68,12 @@ Private mVersion    As Long
 ' @remark key must be unique.
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
-    i = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
+    Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
     
-    If i >= 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_AddingDuplicate_Key, GetKey(i), Key))
+    If Index >= 0 Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_AddingDuplicate_Key, GetKey(Index), Key))
     
-    Insert Not i, Key, Value
+    Insert Not Index, Key, Value
 End Sub
 
 
@@ -152,7 +152,7 @@ End Function
 ' @return Indication of the key existing in the list.
 '
 Public Function ContainsKey(ByRef Key As Variant) As Boolean
-    ContainsKey = (CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer) >= 0)
+    ContainsKey = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer) >= 0
 End Function
 
 ''
@@ -255,8 +255,9 @@ End Function
 '
 Public Function GetKey(ByVal Index As Long) As Variant
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
-    Call VariantCopy(GetKey, mKeys(Index))
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+        
+    VariantCopy GetKey, mKeys(Index)
 End Function
 
 ''
@@ -336,7 +337,8 @@ End Property
 Public Property Get Item(ByRef Key As Variant) As Variant
 Attribute Item.VB_UserMemId = 0
     Dim Index As Long
-    Index = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
+    Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
+    
     If Index >= 0 Then
         VariantCopy Item, mValues(Index)
     End If
@@ -353,13 +355,12 @@ End Property
 '
 Public Property Let Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
-    Index = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
+    Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
     
     If Index >= 0 Then
         mValues(Index) = Value
         mVersion = mVersion + 1
     Else
-'        Add Key, Value
         Insert Not Index, Key, Value
     End If
 End Property
@@ -375,13 +376,12 @@ End Property
 '
 Public Property Set Item(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
-    Index = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
+    Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
     
     If Index >= 0 Then
         Set mValues(Index) = Value
         mVersion = mVersion + 1
     Else
-'        Add Key, Value
         Insert Not Index, Key, Value
     End If
 End Property
@@ -585,22 +585,6 @@ Private Sub Insert(ByVal Index As Long, ByRef Key As Variant, ByRef Value As Var
     mVersion = mVersion + 1
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Equals(Value)
-End Function
-
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
-End Function
-
-Private Function IObject_ToString() As String
-    IObject_ToString = ToString
-End Function
-
 Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     Dim NewCapacity As Long
     
@@ -618,6 +602,22 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     ReDim Preserve mValues(0 To NewCapacity - 1)
     mCapacity = NewCapacity
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
+End Function
+
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
+End Function
+
+Private Function IObject_ToString() As String
+    IObject_ToString = ToString
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
