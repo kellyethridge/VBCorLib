@@ -459,7 +459,7 @@ End Sub
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     CheckValidSingleDimArray Arr
-    BinarySearch = BinarySearchCore(Arr, LBound(Arr), CorArray.LengthFirstDim(Arr), Value, Comparer)
+    BinarySearch = InternalBinarySearch(Arr, LBound(Arr), CorArray.LengthFirstDim(Arr), Value, Comparer)
 End Function
 
 ''
@@ -489,7 +489,7 @@ Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal 
     If Index + Length - 1 > UBound(Arr) Then _
         Error.Argument Argument_InvalidOffLen
     
-    BinarySearchEx = BinarySearchCore(Arr, Index, Length, Value, Comparer)
+    BinarySearchEx = InternalBinarySearch(Arr, Index, Length, Value, Comparer)
 End Function
 
 ''
@@ -1176,15 +1176,11 @@ Friend Function ArrayPointer(ByRef Arg As Variant) As Long
     End Select
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function BinarySearchCore(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
+Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
     On Error GoTo errTrap
     
     If Comparer Is Nothing Then
-        If CorArraySearch.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, BinarySearchCore) Then
+        If CorArraySearch.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, InternalBinarySearch) Then
             Exit Function
         End If
         
@@ -1202,7 +1198,7 @@ Private Function BinarySearchCore(ByRef Arr As Variant, ByVal Index As Long, ByV
         MiddleIndex = (LowIndex + HighIndex) \ 2
         Select Case Comparer.Compare(Arr(MiddleIndex), Value)
             Case 0
-                BinarySearchCore = MiddleIndex
+                InternalBinarySearch = MiddleIndex
                 Exit Function
             Case Is > 0
                 HighIndex = MiddleIndex - 1
@@ -1211,11 +1207,16 @@ Private Function BinarySearchCore(ByRef Arr As Variant, ByVal Index As Long, ByV
         End Select
     Loop
     
-    BinarySearchCore = (Not (LowIndex - LBound(Arr))) + LBound(Arr)
+    InternalBinarySearch = (Not (LowIndex - LBound(Arr))) + LBound(Arr)
     Exit Function
 errTrap:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' This function assigns the default value of the specific

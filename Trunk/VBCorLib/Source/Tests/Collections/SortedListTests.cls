@@ -13,11 +13,44 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 Implements ICategorizable
-
-Private List As SortedList
+Implements ITestCaseSource
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Collections"
+End Sub
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "Contains_WithNumericKeys_ReturnsExpected"
+            Test.Use 1, True
+            Test.Use 2, False
+            Test.Use 3, True
+            Test.Use 5, True
+            Test.Use 6, False
+        
+        Case "Contains_WithObjectKeys_ReturnsExpected"
+            Test.Use NewInt32(1), True
+            Test.Use NewInt32(2), False
+            Test.Use NewInt32(3), True
+            
+        Case "ContainsValue_WithValue_ReturnsExpected"
+            Test.Use "hi", True
+            Test.Use "bye", False
+            Test.Use 3, True
+            Test.Use 4, False
+            Test.Use NewInt32(7), True
+            Test.Use NewInt32(8), False
+            
+        Case "GetKey_WithValue_ReturnsExpected"
+            Test.Use 0, 1
+            Test.Use 1, 2
+            Test.Use 2, 3
+            
+        Case "GetKey_WithInvalidIndex_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use 3
+            
+    End Select
 End Sub
 
 Public Sub Count_WhenEmpty_ReturnsZero()
@@ -45,6 +78,17 @@ Public Sub Add_WithExistingKey_ThrowsArgumentException()
     List.Add 1, "bye"
     
     AssertArgumentException Err
+End Sub
+
+Public Sub Add_WithDifferentKeyDataTypes_ThrowsInvalidOperation()
+    On Error Resume Next
+    Dim List As New SortedList
+    
+    List.Add 1, "a"
+    List.Add 2&, "b"
+    
+    Debug.Print Err.Description
+    AssertInvalidOperationException Err
 End Sub
 
 Public Sub Item_WithKey_ReturnsValue()
@@ -103,6 +147,66 @@ Public Sub GetByIndex_WhenCalled_ReturnsInSortedOrder()
     Assert.That List.GetByIndex(2), Iz.EqualTo("Me")
 End Sub
 
+Public Sub Contains_WithNumericKeys_ReturnsExpected(ByRef Key As Variant, ByVal Expected As Boolean)
+    Dim List As New SortedList
+    List.Add 1, "hi"
+    List.Add 3, "bye"
+    List.Add 5, "5"
+    
+    Dim Actual As Boolean
+    Actual = List.Contains(Key)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Contains_WithObjectKeys_ReturnsExpected(ByRef Key As Variant, ByVal Expected As Boolean)
+    Dim List As New SortedList
+    List.Add NewInt32(1), "hi"
+    List.Add NewInt32(3), "bye"
+    List.Add NewInt32(5), "5"
+    
+    Dim Actual As Boolean
+    Actual = List.Contains(Key)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ContainsValue_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expected As Boolean)
+    Dim List As New SortedList
+    List.Add 1, "hi"
+    List.Add 2, 3
+    List.Add 3, NewInt32(7)
+    
+    Dim Actual As Boolean
+    Actual = List.ContainsValue(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetKey_WithValue_ReturnsExpected(ByVal Index As Long, ByVal Expected As Long)
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+    
+    Dim Actual As Long
+    Actual = List.GetKey(Index)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetKey_WithInvalidIndex_ThrowsArgumentOutOfRangeException(ByVal InvalidIndex As Long)
+    On Error Resume Next
+    Dim List As New SortedList
+    List.Add 3, NewInt32(7)
+    List.Add 2, 3
+    List.Add 1, "hi"
+
+    List.GetKey InvalidIndex
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
 'Public Sub TestClone()
 '    Dim i As Long
 '    For i = 1 To 10
@@ -113,22 +217,6 @@ End Sub
 '    For i = 1 To 10
 '        Assert.AreEqual i, list2(i)
 '    Next i
-'End Sub
-'
-'Public Sub TestContains()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    Assert.IsTrue List.Contains(3&)
-'End Sub
-'
-'Public Sub TestContainsValue()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, "Item" & i
-'    Next i
-'    Assert.IsTrue List.ContainsValue("Item3")
 'End Sub
 '
 'Public Sub TestCopyTo()
@@ -143,14 +231,6 @@ End Sub
 '        Assert.AreEqual i + 1, a(i).Key
 '        Assert.AreEqual "Item" & i + 1, a(i).Value
 '    Next i
-'End Sub
-'
-'Public Sub TestGetKey()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    Assert.AreEqual 6, List.GetKey(5), "Should return 6."
 'End Sub
 '
 'Public Sub TestIndexOfKey()
@@ -283,5 +363,6 @@ End Sub
 '        i = i + 1
 '    Next v
 'End Sub
+
 
 
