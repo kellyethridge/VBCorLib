@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: SortedList
+' Module: SortedList
 '
 
 ''
@@ -68,12 +71,17 @@ Private mVersion    As Long
 ' @remark key must be unique.
 Public Sub Add(ByRef Key As Variant, ByRef Value As Variant)
     Dim Index As Long
-    Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
     
-    If Index >= 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_AddingDuplicate_Key, GetKey(Index), Key))
+    If mCount > 0 Then
+        Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
+        
+        If Index >= 0 Then _
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_AddingDuplicate_Key, GetKey(Index), Key))
+            
+        Index = Not Index
+    End If
     
-    Insert Not Index, Key, Value
+    Insert Index, Key, Value
 End Sub
 
 
@@ -90,7 +98,7 @@ End Property
 ''
 ' Sets the size of the underlying array.
 '
-' @param RHS The number of elements the underlying array can contain
+' @param Value The number of elements the underlying array can contain
 ' before it needs to be resized.
 ' @remarks If the capacity is set less than the number of items in the
 ' array, an ArgumentOutOfRangeException exception will be thrown.
@@ -99,7 +107,7 @@ Public Property Let Capacity(ByVal Value As Long)
     If Value < mCount Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
     
-    If Value > mCapacity Then
+    If Value > 0 Then
         ReDim Preserve mKeys(0 To Value - 1)
         ReDim Preserve mValues(0 To Value - 1)
     Else
@@ -169,25 +177,24 @@ End Function
 ''
 ' Creates a DictionaryEntry for each Key/Value pair and places it in the array.
 '
-' @param dstArray The array to copy the DictionaryEntry objects to.
-' @param Index The starting index in dstArray to begin copying to.
-' @remarks Since DictionaryEntry objects are being stored in the array,
+' @param Arr The array to copy the DictionaryEntry objects to.
+' @param ArrayIndex The starting index in dstArray to begin copying to.
+' @remarks Because DictionaryEntry objects are being stored in the array,
 ' the array must be able to accept that type of object.
 '
-Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
+Public Sub CopyTo(ByRef Arr As Variant, ByVal ArrayIndex As Long)
+    If CorArray.IsNull(Arr) Then _
+        Error.ArgumentNull "Arr", ArgumentNull_Array
+    If CorArray.Rank(Arr) <> 1 Then _
+        Error.Argument Arg_RankMultiDimNotSupported, "Arr"
+    If ArrayIndex < LBound(Arr) Then _
+        Error.ArgumentOutOfRange "ArrayIndex", ArgumentOutOfRange_LBound
+    If ArrayIndex + mCount - 1 > UBound(Arr) Then _
+        Error.Argument Arg_ArrayPlusOffTooSmall
+    
     Dim i As Long
-    
-    If CorArray.IsNull(DstArray) Then _
-        Throw Cor.NewArgumentNullException("dstArray", Environment.GetResourceString(ArgumentNull_Array))
-    If Index < LBound(DstArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If CorArray.Rank(DstArray) <> 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
-    If Index + mCount - 1 > UBound(DstArray) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_ArrayPlusOffTooSmall))
-    
     For i = 0 To mCount - 1
-        Set DstArray(Index + i) = Cor.NewDictionaryEntry(mKeys(i), mValues(i))
+        Set Arr(ArrayIndex + i) = Cor.NewDictionaryEntry(mKeys(i), mValues(i))
     Next i
 End Sub
 
@@ -221,8 +228,9 @@ End Function
 '
 Public Function GetByIndex(ByVal Index As Long) As Variant
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
-    Call VariantCopy(GetByIndex, mValues(Index))
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    
+    VariantCopy GetByIndex, mValues(Index)
 End Function
 
 ''
@@ -232,7 +240,7 @@ End Function
 '
 Public Function GetEnumerator() As IEnumerator
     Dim Ret As New SortedListEnumerator
-    Call Ret.Init(Me, SAPtr(mKeys), SAPtr(mValues), slEntries)
+    Ret.Init Me, SAPtr(mKeys), SAPtr(mValues), slEntries
     Set GetEnumerator = Ret
 End Function
 
@@ -290,7 +298,14 @@ End Function
 ' the key was not found in the list.
 '
 Public Function IndexOfKey(ByRef Key As Variant) As Long
-    IndexOfKey = CorArray.IndexOf(mKeys, Key, 0, mCount)
+    Dim Index As Long
+    Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
+    
+    If Index < 0 Then
+        Index = -1
+    End If
+    
+    IndexOfKey = Index
 End Function
 
 ''
@@ -412,10 +427,16 @@ End Function
 ' @param Key The key used to find the value to be removed.
 '
 Public Sub Remove(ByRef Key As Variant)
-    Dim i As Long
-    If mCount = 0 Then Exit Sub
-    i = CorArray.BinarySearchEx(mKeys, 0, mCount, Key, mComparer)
-    If i >= 0 Then Call RemoveAt(i)
+    If mCount = 0 Then
+        Exit Sub
+    End If
+    
+    Dim Index As Long
+    Index = CorArray.InternalBinarySearch(mKeys, 0, mCount, Key, mComparer)
+    
+    If Index >= 0 Then
+        RemoveAt Index
+    End If
 End Sub
 
 ''
@@ -425,16 +446,26 @@ End Sub
 '
 Public Sub RemoveAt(ByVal Index As Long)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
     mKeys(Index) = Empty
     mValues(Index) = Empty
+    
     If Index < mCount - 1 Then
-        Call CopyMemory(mKeys(Index), mKeys(Index + 1), (mCount - Index) * 16)
-        Call ZeroMemory(mKeys(mCount - 1), 16)
-        Call CopyMemory(mValues(Index), mValues(Index + 1), (mCount - Index) * 16)
-        Call ZeroMemory(mValues(mCount - 1), 16)
+        Dim SourceIndex     As Long
+        Dim NumberToCopy    As Long
+        SourceIndex = Index + 1
+        NumberToCopy = (mCount - Index) * corSizeOfVariant
+        
+        CopyMemory mKeys(Index), mKeys(SourceIndex), NumberToCopy
+        CopyMemory mValues(Index), mValues(SourceIndex), NumberToCopy
+        
+        Dim LastIndex As Long
+        LastIndex = mCount - 1
+        ZeroMemory mKeys(LastIndex), corSizeOfVariant
+        ZeroMemory mValues(LastIndex), corSizeOfVariant
     End If
+    
     mCount = mCount - 1
     mVersion = mVersion + 1
 End Sub
@@ -448,8 +479,9 @@ End Sub
 '
 Public Sub SetByIndex(ByVal Index As Long, ByRef Value As Variant)
     If Index < 0 Or Index >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_Index))
-    Call VariantCopyInd(mValues(Index), Value)
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    
+    VariantCopyInd mValues(Index), Value
     mVersion = mVersion + 1
 End Sub
 

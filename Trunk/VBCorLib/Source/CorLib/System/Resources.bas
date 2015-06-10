@@ -68,6 +68,7 @@ Public Enum ResourceStringKey
     Arg_ArgumentOutOfRangeException = 231
     Arg_SystemException = 232
     Arg_MustBeOfType = 233
+    Arg_RankMultiDimNotSupported = 234
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
