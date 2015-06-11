@@ -357,14 +357,14 @@ End Function
 ''
 ' Creates a new SortedList object with specific initialization options.
 '
-' @param list An object implementing IDictionary used to initialize the list from.
+' @param d An object implementing IDictionary used to initialize the list from.
 ' @param comparer An object implementing IComparer used to search and sort keys in the list.
 ' @param capacity An initial list size.
 ' @return A new SortedList object with the specific initializations.
 '
-Public Function NewSortedList(Optional ByVal List As IDictionary, Optional ByVal Comparer As IComparer, Optional ByVal Capacity As Long = 16) As SortedList
+Public Function NewSortedList(Optional ByVal d As IDictionary, Optional ByVal Comparer As IComparer, Optional ByVal Capacity As Long) As SortedList
     Set NewSortedList = New SortedList
-    Call NewSortedList.Init(List, Comparer, Capacity)
+    NewSortedList.Init d, Comparer, Capacity
 End Function
 
 ''

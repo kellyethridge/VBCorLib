@@ -43,7 +43,6 @@ Implements IEnumerable
 Private mList As SortedList
 
 
-
 Public Function NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
     Set NewEnum = CreateEnumerator(mList.GetKeyEnumerator)
@@ -73,11 +72,12 @@ Private Function IObject_ToString() As String
     IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call mList.CopyKeysTo(Arr, Index)
+    mList.CopyKeysTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
@@ -92,8 +92,9 @@ Private Function ICollection_NewEnum() As stdole.IUnknown
     Set ICollection_NewEnum = NewEnum
 End Function
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = mList.GetKeyEnumerator
@@ -103,15 +104,16 @@ Private Function IEnumerable_NewEnum() As stdole.IUnknown
     Set IEnumerable_NewEnum = NewEnum
 End Function
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IList Interface
+'   IList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IList_Add(Value As Variant) As Long
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    Error.NotSupported NotSupported_ReadOnlyCollection
 End Function
 
 Private Sub IList_Clear()
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    Error.NotSupported NotSupported_ReadOnlyCollection
 End Sub
 
 Private Function IList_Contains(Value As Variant) As Boolean
@@ -119,7 +121,7 @@ Private Function IList_Contains(Value As Variant) As Boolean
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call mList.CopyKeysTo(Arr, Index)
+    mList.CopyKeysTo Arr, Index
 End Sub
 
 Private Property Get IList_Count() As Long
@@ -135,7 +137,7 @@ Private Function IList_IndexOf(Value As Variant) As Long
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    Error.NotSupported NotSupported_ReadOnlyCollection
 End Sub
 
 Private Property Get IList_IsFixedSize() As Boolean
@@ -147,15 +149,15 @@ Private Property Get IList_IsReadOnly() As Boolean
 End Property
 
 Private Property Set IList_Item(ByVal Index As Long, Value As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    Error.NotSupported NotSupported_ReadOnlyCollection
 End Property
 
 Private Property Let IList_Item(ByVal Index As Long, Value As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    Error.NotSupported NotSupported_ReadOnlyCollection
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(IList_Item, mList.GetKey(Index))
+    Helper.MoveVariant IList_Item, mList.GetKey(Index)
 End Property
 
 Private Function IList_NewEnum() As stdole.IUnknown
@@ -163,9 +165,9 @@ Private Function IList_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub IList_Remove(Value As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    Error.NotSupported NotSupported_ReadOnlyCollection
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    Error.NotSupported NotSupported_ReadOnlyCollection
 End Sub

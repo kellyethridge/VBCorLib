@@ -54,7 +54,11 @@ Implements ICollection
 Implements IDictionary
 Implements IVersionableCollection
 
-Private Const DEF_CAPACITY As Long = 16
+Private Const DefaultCapacity   As Long = 16
+Private Const PropCount         As String = "Count"
+Private Const PropCapacity      As String = "Capacity"
+Private Const PropComparer      As String = "Comparer"
+
 
 Private mKeys()     As Variant
 Private mValues()   As Variant
@@ -140,7 +144,7 @@ End Sub
 '
 Public Function Clone() As SortedList
     Set Clone = New SortedList
-    Call Clone.CloneHelper(mKeys, mValues, mCount, mComparer)
+    Clone.InitClone mKeys, mValues, mCount, mComparer
 End Function
 
 ''
@@ -526,12 +530,12 @@ Friend Function GetValueEnumerator() As IEnumerator
     Set GetValueEnumerator = Ret
 End Function
 
-Friend Sub CopyKeysTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Call CorArray.CopyEx(mKeys, 0, DstArray, Index, mCount)
+Friend Sub CopyKeysTo(ByRef Arr As Variant, ByVal Index As Long)
+    CorArray.CopyEx mKeys, 0, Arr, Index, mCount
 End Sub
 
-Friend Sub CopyValuesTo(ByRef DstArray As Variant, ByVal Index As Long)
-    Call CorArray.CopyEx(mValues, 0, DstArray, Index, mCount)
+Friend Sub CopyValuesTo(ByRef Arr As Variant, ByVal Index As Long)
+    CorArray.CopyEx mValues, 0, Arr, Index, mCount
 End Sub
 
 
@@ -546,13 +550,13 @@ Friend Sub Init(ByVal List As IDictionary, ByVal Comparer As IComparer, ByVal Ca
     Else
         mCount = List.Count
         Me.Capacity = mCount
-        Call List.Keys.CopyTo(mKeys, 0)
-        Call List.Values.CopyTo(mValues, 0)
-        Call CorArray.SortKeyEx(mKeys, mValues, 0, mCount, Comparer)
+        List.Keys.CopyTo mKeys, 0
+        List.Values.CopyTo mValues, 0
+        CorArray.SortKeyEx mKeys, mValues, 0, mCount, Comparer
     End If
 End Sub
 
-Friend Sub CloneHelper(ByRef Keys() As Variant, ByRef Values() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
+Friend Sub InitClone(ByRef Keys() As Variant, ByRef Values() As Variant, ByVal Count As Long, ByVal Comparer As IComparer)
     mCount = Count
     Set mComparer = Comparer
     mKeys = Keys
@@ -561,9 +565,9 @@ Friend Sub CloneHelper(ByRef Keys() As Variant, ByRef Values() As Variant, ByVal
 End Sub
 
 Private Sub Class_InitProperties()
-    ReDim mKeys(0 To DEF_CAPACITY - 1)
-    ReDim mValues(0 To DEF_CAPACITY - 1)
-    mCapacity = DEF_CAPACITY
+    ReDim mKeys(0 To DefaultCapacity - 1)
+    ReDim mValues(0 To DefaultCapacity - 1)
+    mCapacity = DefaultCapacity
 End Sub
 
 
@@ -572,31 +576,39 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mCount = .ReadProperty("Count", 0)
-        Call EnsureCapacity(.ReadProperty("Capacity", DEF_CAPACITY))
-        Set mComparer = .ReadProperty("Comparer", Nothing)
+        mCount = .ReadProperty(PropCount, 0)
+        EnsureCapacity .ReadProperty(PropCapacity, DefaultCapacity)
+        Set mComparer = .ReadProperty(PropComparer, Nothing)
         
         Dim i As Long
         For i = 0 To mCount - 1
-            Call Helper.MoveVariant(mKeys(i), .ReadProperty("Key" & i))
-            Call Helper.MoveVariant(mValues(i), .ReadProperty("Value" & i))
+            Helper.MoveVariant mKeys(i), .ReadProperty(MakeKeyKey(i))
+            Helper.MoveVariant mValues(i), .ReadProperty(MakeValueKey(i))
         Next i
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("Count", mCount)
-        Call .WriteProperty("Capacity", mCapacity)
-        Call .WriteProperty("Comparer", mComparer)
+        .WriteProperty PropCount, mCount
+        .WriteProperty PropCapacity, mCapacity
+        .WriteProperty PropComparer, mComparer
         
         Dim i As Long
         For i = 0 To mCount - 1
-            Call .WriteProperty("Key" & i, mKeys(i))
-            Call .WriteProperty("Value" & i, mValues(i))
+            .WriteProperty MakeKeyKey(i), mKeys(i)
+            .WriteProperty MakeValueKey(i), mValues(i)
         Next i
     End With
 End Sub
+
+Private Function MakeKeyKey(ByVal Index As Long) As String
+    MakeKeyKey = "Key" & Index
+End Function
+
+Private Function MakeValueKey(ByVal Index As Long) As String
+    MakeValueKey = "Value" & Index
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -606,10 +618,16 @@ Private Sub Insert(ByVal Index As Long, ByRef Key As Variant, ByRef Value As Var
     EnsureCapacity mCount + 1
     
     If Index < mCount Then
-        CopyMemory mKeys(Index + 1), mKeys(Index), (mCount - Index) * 16
-        ZeroMemory mKeys(Index), 16
-        CopyMemory mValues(Index + 1), mValues(Index), (mCount - Index) * 16
-        ZeroMemory mValues(Index), 16
+        Dim DestIndex       As Long
+        Dim NumberToCopy    As Long
+        DestIndex = Index + 1
+        NumberToCopy = (mCount - Index) * corSizeOfVariant
+    
+        CopyMemory mKeys(DestIndex), mKeys(Index), NumberToCopy
+        CopyMemory mValues(DestIndex), mValues(Index), NumberToCopy
+        
+        ZeroMemory mKeys(Index), corSizeOfVariant
+        ZeroMemory mValues(Index), corSizeOfVariant
     End If
     
     VariantCopyInd mKeys(Index), Key
@@ -622,7 +640,7 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     Dim NewCapacity As Long
     
     If mCapacity = 0 Then
-        NewCapacity = DEF_CAPACITY
+        NewCapacity = DefaultCapacity
     Else
         NewCapacity = mCapacity * 2
     End If
