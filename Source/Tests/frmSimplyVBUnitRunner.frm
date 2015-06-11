@@ -146,9 +146,12 @@ Private Sub AddSystemCollections()
     With Sim.NewTestSuite("System.Collections")
         .Add New BitArrayTests
         .Add New BitArrayEnumeratorTests
-        .Add New SortedListTests
         .Add New ComparerTests
         .Add New CaseInsensitiveComparerTests
+
+        .Add NewSuite("SortedList", _
+            New SortedListTests, _
+            New SortedListEnumeratorTests)
 
         .Add NewSuite("ArrayList", _
             New ArrayListTests, _

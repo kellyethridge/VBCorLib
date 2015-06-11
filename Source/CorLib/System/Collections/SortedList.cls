@@ -52,6 +52,7 @@ Implements IObject
 Implements IEnumerable
 Implements ICollection
 Implements IDictionary
+Implements IVersionableCollection
 
 Private Const DEF_CAPACITY As Long = 16
 
@@ -240,7 +241,7 @@ End Function
 '
 Public Function GetEnumerator() As IEnumerator
     Dim Ret As New SortedListEnumerator
-    Ret.Init Me, SAPtr(mKeys), SAPtr(mValues), slEntries
+    Ret.Init Me, mKeys, mValues, slEntries
     Set GetEnumerator = Ret
 End Function
 
@@ -515,13 +516,13 @@ End Property
 
 Friend Function GetKeyEnumerator() As IEnumerator
     Dim Ret As New SortedListEnumerator
-    Call Ret.Init(Me, SAPtr(mKeys), SAPtr(mValues), slKeys)
+    Ret.Init Me, mKeys, mValues, slKeys
     Set GetKeyEnumerator = Ret
 End Function
 
 Friend Function GetValueEnumerator() As IEnumerator
     Dim Ret As New SortedListEnumerator
-    Call Ret.Init(Me, SAPtr(mKeys), SAPtr(mValues), slValues)
+    Ret.Init Me, mKeys, mValues, slValues
     Set GetValueEnumerator = Ret
 End Function
 
@@ -635,6 +636,16 @@ Private Sub EnsureCapacity(ByVal RequiredCapacity As Long)
     mCapacity = NewCapacity
 End Sub
 
+Private Function NewSortedKeyList() As SortedKeyList
+    Set NewSortedKeyList = New SortedKeyList
+    Call NewSortedKeyList.Init(Me)
+End Function
+
+Private Function NewSortedValueList() As SortedValueList
+    Set NewSortedValueList = New SortedValueList
+    Call NewSortedValueList.Init(Me)
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IObject
@@ -656,7 +667,7 @@ End Function
 '   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
@@ -675,11 +686,11 @@ End Function
 '   IDictionary
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IDictionary_Add(Key As Variant, Value As Variant)
-    Call Add(Key, Value)
+    Add Key, Value
 End Sub
 
 Private Sub IDictionary_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function IDictionary_Contains(Key As Variant) As Boolean
@@ -687,7 +698,7 @@ Private Function IDictionary_Contains(Key As Variant) As Boolean
 End Function
 
 Private Sub IDictionary_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call CopyTo(Arr, Index)
+    CopyTo Arr, Index
 End Sub
 
 Private Property Get IDictionary_Count() As Long
@@ -706,16 +717,16 @@ Private Property Get IDictionary_IsReadOnly() As Boolean
     IDictionary_IsReadOnly = IsReadOnly
 End Property
 
-Private Property Set IDictionary_Item(Key As Variant, RHS As Variant)
-    Set Item(Key) = RHS
+Private Property Set IDictionary_Item(Key As Variant, Value As Variant)
+    Set Item(Key) = Value
 End Property
 
-Private Property Let IDictionary_Item(Key As Variant, RHS As Variant)
-    Item(Key) = RHS
+Private Property Let IDictionary_Item(Key As Variant, Value As Variant)
+    Item(Key) = Value
 End Property
 
 Private Property Get IDictionary_Item(Key As Variant) As Variant
-    Call Helper.MoveVariant(IDictionary_Item, Item(Key))
+    Helper.MoveVariant IDictionary_Item, Item(Key)
 End Property
 
 Private Property Get IDictionary_Keys() As ICollection
@@ -727,12 +738,13 @@ Private Function IDictionary_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub IDictionary_Remove(Key As Variant)
-    Call Remove(Key)
+    Remove Key
 End Sub
 
 Private Property Get IDictionary_Values() As ICollection
     Set IDictionary_Values = Values
 End Property
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IEnumerable
@@ -745,16 +757,10 @@ Private Function IEnumerable_NewEnum() As stdole.IUnknown
     Set IEnumerable_NewEnum = NewEnum
 End Function
 
-Private Function NewSortedKeyList() As SortedKeyList
-    Set NewSortedKeyList = New SortedKeyList
-    Call NewSortedKeyList.Init(Me)
-End Function
 
-Private Function NewSortedValueList() As SortedValueList
-    Set NewSortedValueList = New SortedValueList
-    Call NewSortedValueList.Init(Me)
-End Function
-
-Friend Property Get Version() As Long
-    Version = mVersion
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionableCollection
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionableCollection_CurrentVersion() As Long
+    IVersionableCollection_CurrentVersion = mVersion
 End Property
