@@ -45,13 +45,10 @@ Public Enum SortedListEnumType
     slValues
 End Enum
 
-
+Private mBase       As EnumeratorBase
 Private mList       As SortedList
-Private mIndex      As Long
-Private mEndIndex   As Long
 Private mKeys()     As Variant
 Private mValues()   As Variant
-Private mVersion    As Long
 Private mEnumType   As SortedListEnumType
 
 
@@ -63,30 +60,32 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal List As SortedList, ByVal KeysSAPtr As Long, ByVal ValuesSAPtr As Long, ByVal EnumType As SortedListEnumType)
+Friend Sub Init(ByVal List As SortedList, ByRef Keys() As Variant, ByRef Values() As Variant, ByVal EnumType As SortedListEnumType)
+    Set mBase = Cor.NewEnumeratorBase(0, List.Count, List)
     Set mList = List
-    SAPtr(mKeys) = KeysSAPtr
-    SAPtr(mValues) = ValuesSAPtr
-    mVersion = List.Version
-    mEndIndex = List.Count - 1
-    mIndex = -1
+    SAPtr(mKeys) = SAPtr(Keys)
+    SAPtr(mValues) = SAPtr(Values)
     mEnumType = EnumType
 End Sub
 
+Friend Sub InitClone(ByVal Base As EnumeratorBase, ByVal List As SortedList, ByRef Keys() As Variant, ByRef Values() As Variant, ByVal EnumType As SortedListEnumType)
+    Set mBase = Base
+    Set mList = List
+    SAPtr(mKeys) = SAPtr(Keys)
+    SAPtr(mValues) = SAPtr(Values)
+    mEnumType = EnumType
+End Sub
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
-    SAPtr(mKeys) = 0
-    SAPtr(mValues) = 0
+    SAPtr(mKeys) = vbNullPtr
+    SAPtr(mValues) = vbNullPtr
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
@@ -100,51 +99,39 @@ Private Function IObject_ToString() As String
     IObject_ToString = MyBase.ToString(Me, App)
 End Function
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Dim Ret As New SortedListEnumerator
-    Call Ret.Init(mList, SAPtr(mKeys), SAPtr(mValues), mEnumType)
+    Ret.InitClone mBase.Clone, mList, mKeys, mValues, mEnumType
     Set ICloneable_Clone = Ret
 End Function
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerator Interface
+'   IEnumerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IEnumerator_Current() As Variant
-    If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
-    If mIndex = -1 Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumNotStarted))
-    If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
+    Dim Index As Long
+    Index = mBase.Index
     
     Select Case mEnumType
         Case slEntries
-            Set IEnumerator_Current = Cor.NewDictionaryEntry(mKeys(mIndex), mValues(mIndex))
+            Set IEnumerator_Current = Cor.NewDictionaryEntry(mKeys(Index), mValues(Index))
         Case slKeys
-            Call VariantCopy(IEnumerator_Current, mKeys(mIndex))
+            VariantCopy IEnumerator_Current, mKeys(Index)
         Case slValues
-            Call VariantCopy(IEnumerator_Current, mValues(mIndex))
+            VariantCopy IEnumerator_Current, mValues(Index)
     End Select
 End Property
 
 Private Function IEnumerator_MoveNext() As Boolean
-    If mList.Version <> mVersion Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_VersionError))
-    If mIndex > mEndIndex Then _
-        Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_EnumFinished))
-    
-    If mIndex = mEndIndex Then
-        mIndex = mEndIndex + 1
-    Else
-        mIndex = mIndex + 1
-        IEnumerator_MoveNext = True
-    End If
+    IEnumerator_MoveNext = mBase.MoveNext
 End Function
 
 Private Sub IEnumerator_Reset()
-    mIndex = -1
+    mBase.Reset
 End Sub
 
