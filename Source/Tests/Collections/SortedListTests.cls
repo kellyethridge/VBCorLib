@@ -445,73 +445,85 @@ Public Sub Enumeration_WhenCalled_EnumeratesList()
     Assert.That List, Iz.EqualTo(Expected).Using(New CorObjectComparer)
 End Sub
 
-'Public Sub TestClone()
-'    Dim i As Long
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    Dim list2 As SortedList
-'    Set list2 = List.Clone
-'    For i = 1 To 10
-'        Assert.AreEqual i, list2(i)
-'    Next i
-'End Sub
-'
-'Public Sub TestCreateWithList()
-'    Dim l2 As SortedList
-'    Dim i As Long
-'
-'    For i = 1 To 10
-'        List.Add i, i
-'    Next i
-'    Set l2 = newsortedlist(List)
-'    Assert.AreEqual 10, l2.Capacity, "Capacity should be 10."
-'    For i = 1 To 10
-'        Assert.AreEqual i, l2.GetKey(i - 1)
-'    Next i
-'End Sub
-'
-'Public Sub TestPersitence()
-'    Dim l2 As SortedList
-'    Dim i As Long
-'    For i = 1 To 100
-'        List.Add i, i
-'    Next i
-'    Dim pp1 As New PropertyBag
-'    Dim pp2 As New PropertyBag
-'    pp1.WriteProperty "list", List
-'    pp2.Contents = pp1.Contents
-'    Set l2 = pp2.ReadProperty("list")
-'
-'    Assert.AreEqual 100, l2.Count
-'    For i = 1 To 10
-'        Assert.AreEqual i, l2(i)
-'    Next i
-'End Sub
-'
-'Public Sub TestValueAndKeyList()
-'    List.Add 1, "hi"
-'    Assert.AreEqual 1, List.GetKeyList(0)
-'    Assert.AreEqual "hi", List.GetValueList(0)
-'End Sub
-'
-'Public Sub TestEnumerateKeysAndValues()
-'    List.Add 1, "value0"
-'    List.Add 2, "value1"
-'
-'    Dim v As Variant
-'    Dim i As Long
-'    For Each v In List.Keys
-'        Assert.AreEqual List.GetKey(i), v
-'        i = i + 1
-'    Next v
-'
-'    i = 0
-'    For Each v In List.Values
-'        Assert.AreEqual "value" & i, v
-'        i = i + 1
-'    Next v
-'End Sub
+Public Sub Clone_WhenCalled_ReturnsCopyOfList()
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    List.Add 3, "c"
+    
+    Dim Actual As SortedList
+    Set Actual = List.Clone
+    
+    Dim Expected() As Variant
+    Expected = Array(Cor.NewDictionaryEntry(1, "a"), Cor.NewDictionaryEntry(2, "b"), Cor.NewDictionaryEntry(3, "c"))
+    Assert.That Actual, Iz.Not.SameAs(List)
+    Assert.That Actual, Iz.EqualTo(Expected).Using(New CorObjectComparer)
+End Sub
 
+Public Sub Serialization_WhenCalled_SerializesList()
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    List.Add 3, "c"
+    
+    Dim Actual As SortedList
+    Set Actual = Persist(List)
+    
+    Dim Expected() As Variant
+    Expected = Array(Cor.NewDictionaryEntry(1, "a"), Cor.NewDictionaryEntry(2, "b"), Cor.NewDictionaryEntry(3, "c"))
+    Assert.That Actual, Iz.EqualTo(Expected).Using(New CorObjectComparer)
+End Sub
 
+Public Sub GetKeyList_WhenCalled_ReturnsListOfKeys()
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    List.Add 3, "c"
 
+    Dim Actual As IList
+    Set Actual = List.GetKeyList
+    
+    Dim Expected() As Variant
+    Expected = Array(1, 2, 3)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub KeyList_WithIndex_ReturnsValue()
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    List.Add 3, "c"
+
+    Dim Actual As IList
+    Set Actual = List.GetKeyList
+
+    Assert.That Actual(1), Iz.EqualTo(2)
+End Sub
+
+Public Sub GetValueList_WhenCalled_ReturnsListOfValues()
+    Dim List As New SortedList
+    List.Add 1, "a"
+    List.Add 2, "b"
+    List.Add 3, "c"
+
+    Dim Actual As IList
+    Set Actual = List.GetValueList
+    
+    Dim Expected() As Variant
+    Expected = Array("a", "b", "c")
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub NewSortedList_WithHashtable_CreatesFilledList()
+    Dim Table As New Hashtable
+    Table.Add 1, "a"
+    Table.Add 3, "c"
+    Table.Add 2, "b"
+    
+    Dim Actual As SortedList
+    Set Actual = Cor.NewSortedList(Table)
+    
+    Dim Expected() As Variant
+    Expected = Array(Cor.NewDictionaryEntry(1, "a"), Cor.NewDictionaryEntry(2, "b"), Cor.NewDictionaryEntry(3, "c"))
+    Assert.That Actual, Iz.EqualTo(Expected).Using(New CorObjectComparer)
+End Sub
