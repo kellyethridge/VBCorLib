@@ -111,7 +111,7 @@ End Type
 
 Private mProps      As PropsType
 Private mLoaded     As Boolean
-Private mPattern    As WordBuffer
+Private mPattern    As CharBuffer
 
 
 ''
@@ -863,8 +863,7 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     Dim Percented   As Boolean
     Dim Quote       As Long
     
-    mPattern.SA.pvData = StrPtr(Pattern)
-    mPattern.SA.cElements = Len(Pattern)
+    InitChars mPattern, Pattern
     Set sb = DateTimeFormatInfo.StringBuilder   ' use a cached builder.
     sb.Length = 0
     
@@ -879,8 +878,8 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     Second = dt.Second
     Designator = IIf(Hour < 12, mProps.AMDesignator, mProps.PMDesignator)
     
-    Do While pos < mPattern.SA.cElements
-        Ch = mPattern.Data(pos)
+    Do While pos < mPattern.Buffer.cElements
+        Ch = mPattern.Chars(pos)
         cnt = GetRepeatCount(pos)
         
         If Not Escaped Then
@@ -1006,10 +1005,10 @@ Private Function GetRepeatCount(ByVal Index As Long) As Long
     Dim i As Long
     Dim Ch As Integer
     
-    Ch = mPattern.Data(Index)
+    Ch = mPattern.Chars(Index)
     i = Index + 1
-    Do While i < mPattern.SA.cElements
-        If mPattern.Data(i) <> Ch Then Exit Do
+    Do While i < mPattern.Buffer.cElements
+        If mPattern.Chars(i) <> Ch Then Exit Do
         i = i + 1
     Loop
     GetRepeatCount = i - Index
@@ -1044,21 +1043,22 @@ End Function
 ''
 ' Returns a list of date and time patterns avaiable.
 Private Function CombineAllDateTimePatterns() As String()
-    Const FORMATS As String = "dDfFgGmMrRstTUuYy"
-    mPattern.SA.pvData = StrPtr(FORMATS)
-    
     Dim List As ArrayList
     Set List = New ArrayList
     
-    Dim i As Long
-    For i = 0 To Len(FORMATS) - 1
-        Call List.AddRange(GetSpecificDateTimePattern(mPattern.Data(i)))
-    Next i
+    Dim Patterns As String
+    Patterns = "dDfFgGmMrRstTUuYy"
     
-    Dim Ret() As String
-    ReDim Ret(List.Count - 1)
-    Call List.CopyTo(Ret)
-    CombineAllDateTimePatterns = Ret
+    Dim Chars() As Integer
+    Chars = AllocChars(Patterns)
+    
+    Dim i As Long
+    For i = 0 To Len(Patterns) - 1
+        Call List.AddRange(GetSpecificDateTimePattern(Chars(i)))
+    Next i
+    FreeChars Chars
+    
+    CombineAllDateTimePatterns = List.ToArray(vbString)
 End Function
 
 ''
@@ -1197,10 +1197,6 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Call InitWordBuffer(mPattern, 0, &H7FFFFFFF)
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With mProps
         Set .Calendar = PropBag.ReadProperty(PROP_CALENDAR, Nothing)

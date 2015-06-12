@@ -98,9 +98,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mChars As WordBuffer
-
-
 ''
 ' Converts the value of a subset of a byte array to an equivalent
 ' subset of a Unicode character string consisting of base-64 characters. Parameters specify
@@ -129,9 +126,11 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As 
         Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_IndexLength))
     
     ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(ElemCount, InsertLineBreaks))
-    mChars.SA.pvData = StrPtr(ToBase64String)
-    mChars.SA.cElements = Len(ToBase64String)
-    InternalToBase64CharArray InArray, ElemIndex, ElemCount, mChars.Data, 0, InsertLineBreaks
+    
+    Dim Chars() As Integer
+    Chars = AllocChars(ToBase64String)
+    ToBase64CharArrayCore InArray, ElemIndex, ElemCount, Chars, 0, InsertLineBreaks
+    FreeChars Chars
 End Function
 
 ''
@@ -169,7 +168,7 @@ Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long
     If IndexOut + Size - 1 > UBound(OutArray) Then _
         Throw Cor.NewArgumentOutOfRangeException("IndexOut", Message:=Environment.GetResourceString(ArgumentOutOfRange_OffsetOut))
     
-    ToBase64CharArray = InternalToBase64CharArray(InArray, IndexIn, Length, OutArray, IndexOut, InsertLineBreaks)
+    ToBase64CharArray = ToBase64CharArrayCore(InArray, IndexIn, Length, OutArray, IndexOut, InsertLineBreaks)
 End Function
 
 ''
@@ -255,9 +254,10 @@ End Function
 ' @return A byte array containing the decoded base-64 characters.
 '
 Public Function FromBase64String(ByRef s As String) As Byte()
-    mChars.SA.pvData = StrPtr(s)
-    mChars.SA.cElements = Len(s)
-    FromBase64String = FromBase64CharArray(mChars.Data, 0, Len(s))
+    Dim Chars() As Integer
+    Chars = AllocChars(s)
+    FromBase64String = FromBase64CharArray(Chars, 0, Len(s))
+    FreeChars Chars
 End Function
 
 ''
@@ -265,11 +265,10 @@ End Function
 ' supplied formatting or provider arguments.
 '
 ' @param Value The value to convert to a string.
-' @param Format Formatting information for converting the value.
 ' @param Provider A formatting provider to help custom formatting.
 ' @return A string representation of the value.
 '
-Public Function ToString(ByRef Value As Variant, Optional ByRef Provider As IFormatProvider) As String
+Public Function ToString(ByRef Value As Variant, Optional ByVal Provider As IFormatProvider) As String
     ToString = Object.ToString(Value, Provider:=Provider)
 End Function
 
@@ -277,7 +276,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function InternalToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, ByVal InsertLineBreaks As Boolean) As Long
+Private Function ToBase64CharArrayCore(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, ByVal InsertLineBreaks As Boolean) As Long
     Dim MaxIndex As Long
     MaxIndex = IndexIn + (Length - (Length Mod 3))
     
@@ -326,7 +325,7 @@ Private Function InternalToBase64CharArray(ByRef InArray() As Byte, ByVal IndexI
             OutArray(IndexOut + 3) = corEqualChar
             IndexOut = IndexOut + 4
     End Select
-    InternalToBase64CharArray = IndexOut
+    ToBase64CharArrayCore = IndexOut
 End Function
 
 Private Function CalculateOutputLength(ByVal Length As Long, ByVal InsertLineBreaks As Boolean) As Long
@@ -344,9 +343,3 @@ Private Function CalculateOutputLength(ByVal Length As Long, ByVal InsertLineBre
 End Function
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    InitWordBuffer mChars, 0, &H7FFFFFFF
-End Sub
