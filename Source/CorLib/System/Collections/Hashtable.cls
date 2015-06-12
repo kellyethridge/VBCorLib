@@ -53,20 +53,18 @@ Implements IEnumerable
 Implements ICloneable
 Implements IVersionableCollection
 
-Private Const PROP_COUNT                As String = "Count"
-Private Const PROP_KEY                  As String = "Key"
-Private Const PROP_VALUESUBTYPE         As String = "ValueSubType"
-Private Const PROP_VALUE                As String = "Value"
-Private Const PROP_PROVIDER             As String = "Provider"
-Private Const PROP_COMPARER             As String = "Comparer"
-Private Const PROP_USEDEFAULTCOMPARER   As String = "UseDefaultComparer"
-
-Private Const SUBTYPE_NORMAL    As Long = 0
-Private Const SUBTYPE_EMPTY     As Long = 1
-Private Const SUBTYPE_NOTHING   As Long = 2
-
-Private Const DEF_CAPACITY  As Long = 32
-Private Const DefaultLoadFactor As Single = 1!
+Private Const PropCount                 As String = "Count"
+Private Const PropKey                   As String = "Key"
+Private Const PropValueSubtype          As String = "ValueSubType"
+Private Const PropValue                 As String = "Value"
+Private Const PropProvider              As String = "Provider"
+Private Const PropComparer              As String = "Comparer"
+Private Const PropUseDefaultComparer    As String = "UseDefaultComparer"
+Private Const SubtypeNormal             As Long = 0
+Private Const SubtypeEmpty              As Long = 1
+Private Const SubtypeNothing            As Long = 2
+Private Const DefaultCapacity           As Long = 32
+Private Const DefaultLoadFactor         As Single = 1!
 
 Private mLoadFactor     As Single
 Private mLoadSize       As Long
@@ -555,7 +553,9 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
             Select Case .State
                 Case bsEmpty
                     ' we bookmark this bucket as our first available bucket.
-                    If FirstEmpty = -1 Then FirstEmpty = Index
+                    If FirstEmpty = -1 Then
+                        FirstEmpty = Index
+                    End If
                     
                     ' we can exit here because we have found an empty bucket.
                     ' Meaning there are no more buckets on this chain so no
@@ -566,7 +566,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                     If .HashCode = HashCode Then
                         If mKeyComparer.Equals(Key, .Key) Then
                             If Adding Then _
-                                Throw Cor.NewArgumentException("An element with the same key already exists in the collection.", "key")
+                                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_AddingDuplicate_Key, .Key, Key), "key")
                                     
                             VariantCopyInd .Key, Key
                             VariantCopyInd .Value, Value
@@ -579,7 +579,9 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                     ' we bookmark this bucket as our first available bucket
                     ' to place the value and key in. We only do this once
                     ' to the first occurence of a deleted bucket.
-                    If FirstEmpty = -1 Then FirstEmpty = Index
+                    If FirstEmpty = -1 Then
+                        FirstEmpty = Index
+                    End If
                     
                     ' we don't exit here because we need to keep
                     ' checking to see if the key exists in the
@@ -613,8 +615,10 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
 End Sub
 
 Private Sub CopyToCore(ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal EnumType As EnumerationType)
-    Validation.CheckValidSingleDimArray Arr
-    
+    If CorArray.IsNull(Arr) Then _
+        Error.ArgumentNull "Arr", ArgumentNull_Array
+    If CorArray.Rank(Arr) <> 1 Then _
+        Error.Argument Arg_RankMultiDimNotSupported, "Arr"
     If ArrayIndex < LBound(Arr) Then _
         Error.ArgumentOutOfRange "ArrayIndex", ArgumentOutOfRange_LBound
     If ArrayIndex + mCount > CorArray.LengthFirstDim(Arr) Then _
@@ -663,14 +667,14 @@ End Sub
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
         Dim Comparer As IEqualityComparer
-        If .ReadProperty(PROP_USEDEFAULTCOMPARER, False) Then
+        If .ReadProperty(PropUseDefaultComparer, False) Then
             Set Comparer = EqualityComparer.Default
         Else
-            Set Comparer = .ReadProperty(PROP_COMPARER, Nothing)
+            Set Comparer = .ReadProperty(PropComparer, Nothing)
         End If
         
         Dim Count As Long
-        Count = .ReadProperty(PROP_COUNT)
+        Count = .ReadProperty(PropCount, 0)
         Init Nothing, Count, DefaultLoadFactor, Comparer
         
         Dim i As Long
@@ -680,13 +684,13 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
             ' correctly, or at all, except the key name. Even when reading with a default
             ' value of Empty, it returns an empty string "". So now we maintain a flag
             ' with each value to determine the correct value.
-            Select Case .ReadProperty("ValueSubType" & i, SUBTYPE_NORMAL)
-                Case SUBTYPE_NORMAL
-                    Add .ReadProperty(PROP_KEY & i, Nothing), .ReadProperty(PROP_VALUE & i)
-                Case SUBTYPE_EMPTY
-                    Add .ReadProperty(PROP_KEY & i, Nothing), Empty
-                Case SUBTYPE_NOTHING
-                    Add .ReadProperty(PROP_KEY & i, Nothing), Nothing
+            Select Case .ReadProperty(MakeValueSubTypeKey(i), SubtypeNormal)
+                Case SubtypeNormal
+                    Add .ReadProperty(MakeKeyKey(i), Nothing), .ReadProperty(MakeValueKey(i))
+                Case SubtypeEmpty
+                    Add .ReadProperty(MakeKeyKey(i), Nothing), Empty
+                Case SubtypeNothing
+                    Add .ReadProperty(MakeKeyKey(i), Nothing), Nothing
             End Select
         Next i
     End With
@@ -695,18 +699,18 @@ End Sub
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
         ' Simply save the number of elements are in this Hashtable.
-        .WriteProperty PROP_COUNT, mCount
+        .WriteProperty PropCount, mCount
         
         ' We don't want to create a duplicate of the default comparer object,
         ' so we will just set a flag that says to use the default comparer
         ' object when the Hashtable is deserialized.
         If mKeyComparer Is EqualityComparer.Default Then
-            .WriteProperty PROP_USEDEFAULTCOMPARER, True
+            .WriteProperty PropUseDefaultComparer, True
         Else
             ' Either we aren't using a comparer at all or we are
             ' using a user-supplied comparer. If so, we hope it
             ' is persistable, or an exception will be thrown.
-            .WriteProperty PROP_COMPARER, mKeyComparer
+            .WriteProperty PropComparer, mKeyComparer
         End If
         
         ' Iterate through the buckets in this hashtable. If the bucket
@@ -719,7 +723,7 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
             With mBuckets(i)
                 If .State = bsOccupied Then
                     Count = Count + 1
-                    PropBag.WriteProperty PROP_KEY & Count, .Key
+                    PropBag.WriteProperty MakeKeyKey(Count), .Key
                     
                     ' When persisting data within a Class_WriteProperties event, it seems that
                     ' object values of Nothing and variant values of Empty do not get persisted
@@ -728,17 +732,17 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
                     ' with each value to determine the correct value.
                     Select Case VarType(.Value)
                         Case vbEmpty
-                            PropBag.WriteProperty PROP_VALUESUBTYPE & Count, SUBTYPE_EMPTY
+                            PropBag.WriteProperty MakeValueSubTypeKey(Count), SubtypeEmpty
                         
                         Case vbObject
                             If .Value Is Nothing Then
-                                PropBag.WriteProperty PROP_VALUESUBTYPE & Count, SUBTYPE_NOTHING
+                                PropBag.WriteProperty MakeValueSubTypeKey(Count), SubtypeNothing
                             Else
-                                PropBag.WriteProperty PROP_VALUE & Count, .Value
+                                PropBag.WriteProperty MakeValueKey(Count), .Value
                             End If
                         
                         Case Else
-                            PropBag.WriteProperty PROP_VALUE & Count, .Value
+                            PropBag.WriteProperty MakeValueKey(Count), .Value
                     
                     End Select
                 End If
@@ -746,6 +750,18 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
         Next i
     End With
 End Sub
+
+Private Function MakeKeyKey(ByVal Count As Long) As String
+    MakeKeyKey = PropKey & Count
+End Function
+
+Private Function MakeValueKey(ByVal Count As Long) As String
+    MakeValueKey = PropValue & Count
+End Function
+
+Private Function MakeValueSubTypeKey(ByVal Count As Long) As String
+    MakeValueSubTypeKey = PropValueSubtype & Count
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

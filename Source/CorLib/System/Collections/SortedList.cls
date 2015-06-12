@@ -116,8 +116,8 @@ Public Property Let Capacity(ByVal Value As Long)
         ReDim Preserve mKeys(0 To Value - 1)
         ReDim Preserve mValues(0 To Value - 1)
     Else
-        Erase mKeys
-        Erase mValues
+        mKeys = Array()
+        mValues = Array()
     End If
     
     mCapacity = Value
@@ -565,9 +565,8 @@ Friend Sub InitClone(ByRef Keys() As Variant, ByRef Values() As Variant, ByVal C
 End Sub
 
 Private Sub Class_InitProperties()
-    ReDim mKeys(0 To DefaultCapacity - 1)
-    ReDim mValues(0 To DefaultCapacity - 1)
-    mCapacity = DefaultCapacity
+    mKeys = Array()
+    mValues = Array()
 End Sub
 
 
@@ -656,12 +655,12 @@ End Sub
 
 Private Function NewSortedKeyList() As SortedKeyList
     Set NewSortedKeyList = New SortedKeyList
-    Call NewSortedKeyList.Init(Me)
+    NewSortedKeyList.Init Me
 End Function
 
 Private Function NewSortedValueList() As SortedValueList
     Set NewSortedValueList = New SortedValueList
-    Call NewSortedValueList.Init(Me)
+    NewSortedValueList.Init Me
 End Function
 
 
