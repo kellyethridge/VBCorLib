@@ -669,12 +669,8 @@ End Sub
 ' @returns An array of the specified type with the specified dimensions.
 ' @remarks If a length is zero, then an empty array is returned, not a Null array.
 ' If one length is defined as zero, then all other defined lengths must be zero.
-' This does not mean that lenghts 2 and 3 need to be set to zero if only an empty
+' This does not mean that lengths 2 and 3 need to be set to zero if only an empty
 ' one-dimensional array is being created.
-' <p>Elements of a size that are a multiple of 4 will not create a new array
-' when being returned. All other datatype sizes will cause a new array
-' to be created. The array must also be assigned at the end of the code
-' so VB can optimize returning the Variant datatype and not copy it when possible.</p>
 '
 Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Length1 As Long = 0, Optional ByRef Length2 As Variant, Optional ByRef Length3 As Variant) As Variant
     Dim Bounds(2)   As SafeArrayBound
