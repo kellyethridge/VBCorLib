@@ -77,7 +77,7 @@ Public Sub MoveNext_AfterHavingPassedEnd_ThrowsInvalidOperationException()
     AssertInvalidOperationException Err
 End Sub
 
-Public Sub Current_WhenTableHasChanged_ThrowsInvalidOperationException()
+Public Sub Current_WhenListHasChanged_ThrowsInvalidOperationException()
     Dim List As New SortedList
     List.Add "a", 1
     Dim En As IEnumerator
@@ -108,12 +108,11 @@ Public Sub Reset_WhenCalled_RestartsEnumeration()
 End Sub
 
 
-
 Private Function MakeEnumerator() As IEnumerator
-    Dim Table As New SortedList
-    Table.Add "a", 1
+    Dim List As New SortedList
+    List.Add "a", 1
     
-    Set MakeEnumerator = Table.GetEnumerator
+    Set MakeEnumerator = List.GetEnumerator
 End Function
 
 

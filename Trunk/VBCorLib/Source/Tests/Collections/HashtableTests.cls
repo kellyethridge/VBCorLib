@@ -179,12 +179,9 @@ Public Sub CopyTo_WhenCalled_CopiesEntriesToArray()
     
     Table.CopyTo Target, 0
     
-    Assert.That Target(0).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
-    Assert.That Target(1).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
-    Assert.That Target(0).Key, Iz.Not.EqualTo(Target(1).Key)
-    Assert.That Target(0).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
-    Assert.That Target(1).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
-    Assert.That Target(0).Value, Iz.Not.EqualTo(Target(1).Value)
+    Dim Expected As Variant
+    Expected = Array(Cor.NewDictionaryEntry("a", 1), Cor.NewDictionaryEntry("b", 2))
+    Assert.That Target, Iz.EquivalentTo(Expected).Using(New CorObjectComparer)
 End Sub
 
 Public Sub CopyTo_WithIndex_CopiesEntriesToArrayOffset()
@@ -196,10 +193,52 @@ Public Sub CopyTo_WithIndex_CopiesEntriesToArrayOffset()
     Table.CopyTo Target, 1
     
     Assert.That Target(0), Iz.vbEmpty
-    Assert.That Target(1).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
-    Assert.That Target(2).Key, Iz.EqualTo("a").OrElse.EqualTo("b")
-    Assert.That Target(1).Key, Iz.Not.EqualTo(Target(2).Key)
-    Assert.That Target(1).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
-    Assert.That Target(2).Value, Iz.EqualTo(1).OrElse.EqualTo(2)
-    Assert.That Target(1).Value, Iz.Not.EqualTo(Target(2).Value)
+    Dim Expected As Variant
+    Expected = Array(Empty, Cor.NewDictionaryEntry("a", 1), Cor.NewDictionaryEntry("b", 2))
+    Assert.That Target, Iz.EquivalentTo(Expected).Using(New CorObjectComparer)
 End Sub
+
+Public Sub CopyTo_WithNullArray_ThrowsArgumentNullException()
+    Dim Table As New Hashtable
+    Dim NullTarget() As Variant
+    
+    On Error Resume Next
+    Table.CopyTo NullTarget, 0
+    
+    AssertArgumentNullException Err, "Arr"
+End Sub
+
+Public Sub CopyTo_WithMultiDimArray_ThrowsArgumentException()
+    Dim Table As New Hashtable
+    Dim MultiDimTarget(0, 0) As Variant
+    
+    On Error Resume Next
+    Table.CopyTo MultiDimTarget, 0
+    
+    AssertArgumentException Err, "Arr"
+End Sub
+
+Public Sub CopyTo_WithArrayIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Table As New Hashtable
+    Table.Add "a", 1
+    Dim Target(1 To 2) As Variant
+    
+    On Error Resume Next
+    Table.CopyTo Target, 0
+    
+    AssertArgumentOutOfRangeException Err, "ArrayIndex"
+End Sub
+
+Public Sub CopyTo_WithIndexAndListCountGreaterThanUBound_ThrowsArgumentException()
+    On Error Resume Next
+    Dim List As New Hashtable
+    List.Add 1, "a"
+    List.Add 2, "b"
+    Dim Target(0 To 1) As Variant
+    
+    List.CopyTo Target, 1
+    
+    AssertArgumentException Err
+End Sub
+
+

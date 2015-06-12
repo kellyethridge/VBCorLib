@@ -151,7 +151,9 @@ Private Sub AddSystemCollections()
 
         .Add NewSuite("SortedList", _
             New SortedListTests, _
-            New SortedListEnumeratorTests)
+            New SortedListEnumeratorTests, _
+            New SortedKeyListTests, _
+            New SortedValueListTests)
 
         .Add NewSuite("ArrayList", _
             New ArrayListTests, _

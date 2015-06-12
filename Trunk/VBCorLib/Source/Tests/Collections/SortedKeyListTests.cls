@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "HashtableKeyCollectionTests"
+Attribute VB_Name = "SortedKeyListTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -77,12 +77,12 @@ Public Sub MoveNext_AfterHavingPassedEnd_ThrowsInvalidOperationException()
 End Sub
 
 Public Sub Current_WhenTableHasChanged_ThrowsInvalidOperationException()
-    Dim Table As New Hashtable
-    Table.Add "a", 1
+    Dim List As New SortedList
+    List.Add "a", 1
     Dim En As IEnumerator
-    Set En = Table.Keys.GetEnumerator
+    Set En = List.GetKeyList.GetEnumerator
     En.MoveNext
-    Table.Add "b", 2
+    List.Add "b", 2
     
     On Error Resume Next
     Dim Actual As Variant
@@ -106,36 +106,36 @@ Public Sub Reset_WhenCalled_RestartsEnumeration()
 End Sub
 
 Public Sub CopyTo_WhenCalled_CopiesEntriesToArray()
-    Dim Table As New Hashtable
-    Table.Add "a", 1
-    Table.Add "b", 2
+    Dim List As New SortedList
+    List.Add "a", 1
+    List.Add "b", 2
     Dim Target(0 To 1) As String
     
-    Table.Keys.CopyTo Target, 0
+    List.GetKeyList.CopyTo Target, 0
     
     Assert.That Target, Iz.EquivalentTo(Array("a", "b"))
 End Sub
 
 Public Sub CopyTo_WithIndex_CopiesEntriesToArrayOffset()
-    Dim Table As New Hashtable
-    Table.Add "a", 1
-    Table.Add "b", 2
+    Dim List As New SortedList
+    List.Add "a", 1
+    List.Add "b", 2
     Dim Target(0 To 2) As Variant
     
-    Table.Keys.CopyTo Target, 1
+    List.GetKeyList.CopyTo Target, 1
     
     Assert.That Target(0), Iz.vbEmpty
     Assert.That Target, Iz.EquivalentTo(Array(Empty, "a", "b"))
 End Sub
 
 Public Sub ForEach_WhenCalled_EnumeratesKeys()
-    Dim Table As New Hashtable
-    Table.Add "a", 1
-    Table.Add "b", 2
+    Dim List As New SortedList
+    List.Add "a", 1
+    List.Add "b", 2
     
     Dim Keys As New ArrayList
     Dim Key As Variant
-    For Each Key In Table.Keys
+    For Each Key In List.GetKeyList
         Keys.Add Key
     Next
     
@@ -144,10 +144,11 @@ End Sub
 
 
 Private Function MakeEnumerator() As IEnumerator
-    Dim Table As New Hashtable
-    Table.Add "a", 1
+    Dim List As New SortedList
+    List.Add "a", 1
     
-    Set MakeEnumerator = Table.Keys.GetEnumerator
+    Set MakeEnumerator = List.GetKeyList.GetEnumerator
 End Function
+
 
 
