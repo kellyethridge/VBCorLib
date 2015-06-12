@@ -71,7 +71,7 @@ Private OldStrSA    As SafeArray1d
 Private BufStrSA    As SafeArray1d
 
 ' used by AppendFormat
-Private mChars      As WordBuffer
+Private mChars      As CharBuffer
 
 
 ''
@@ -694,14 +694,14 @@ Private Sub Class_Initialize()
     SAPtr(mString) = VarPtr(mStringSA)
     mStringSA.pvData = mStringPtr
     
-    InitWordBuffer mChars, 0, &H7FFFFFFF
+    InitChars mChars
 End Sub
 
 Private Sub Class_Terminate()
     CoTaskMemFree mStringPtr
-    SAPtr(OldStr) = 0
-    SAPtr(BufStr) = 0
-    SAPtr(mString) = 0
+    SAPtr(OldStr) = vbNullPtr
+    SAPtr(BufStr) = vbNullPtr
+    SAPtr(mString) = vbNullPtr
 End Sub
 
 
@@ -776,19 +776,20 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
     End If
     
     Max = Len(Format)
-    mChars.SA.pvData = StrPtr(Format)
-    mChars.SA.cElements = Max
+'    mChars.SA.pvData = StrPtr(Format)
+'    mChars.SA.cElements = Max
+    SetChars mChars, Format
     
     ' Parse normal substring.
     Do While Index < Max
-        Select Case mChars.Data(Index)
+        Select Case mChars.Chars(Index)
             Case OpenBraceChar
                 ' potential escape or format info.
                 
                 If Index > SubStringStart Then
                     ' If we have some characters, just append them now
                     ' even if the "{" may be escaped. Most times it won't be.
-                    AppendCharsCore mChars.Data, SubStringStart, Index - SubStringStart
+                    AppendCharsCore mChars.Chars, SubStringStart, Index - SubStringStart
                 End If
                 
                 Index = Index + 1
@@ -799,7 +800,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                 If Index = Max Then FormatError
                 
                 ' We have enough characters to test for possible escape.
-                If mChars.Data(Index) = OpenBraceChar Then
+                If mChars.Chars(Index) = OpenBraceChar Then
                     ' escape it by setting the start of the substring to the second one.
                     SubStringStart = Index
                 Else
@@ -854,13 +855,13 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
                 ' Need enough characters to test for escape.
                 If Index = Max Then FormatError
                 
-                If mChars.Data(Index) = CloseBraceChar Then
+                If mChars.Chars(Index) = CloseBraceChar Then
                     ' escape it and add the substring to this point.
                     ' The substring ends one character back because we
                     ' don't want to include both "}}" in the substring.
                     If Index - 1 > SubStringStart Then
                         ' Append the current substring.
-                        AppendCharsCore mChars.Data, SubStringStart, Index - SubStringStart - 1
+                        AppendCharsCore mChars.Chars, SubStringStart, Index - SubStringStart - 1
                     End If
                     SubStringStart = Index
                 Else
@@ -873,7 +874,7 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
     
     If Index > SubStringStart Then
         ' If we have some characters, just append them now.
-        AppendCharsCore mChars.Data, SubStringStart, Index - SubStringStart
+        AppendCharsCore mChars.Chars, SubStringStart, Index - SubStringStart
     End If
 End Sub
 
@@ -887,7 +888,7 @@ End Sub
 '
 Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As Long, ByRef ArgWidth As Long, ByRef ArgFormat As String) As Long
     Dim Max As Long
-    Max = mChars.SA.cElements
+    Max = mChars.Buffer.cElements
     
     ' Get the argument index.
     ArgIndex = ParseNumber(Index)
@@ -896,7 +897,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
     
     With mChars
         ' Check if a column size is being defined.
-        If .Data(Index) = corCommaChar Then
+        If .Chars(Index) = corCommaChar Then
             Index = ConsumeSpaces(Index + 1)
             
             ' Get the column width and aligment. Remember
@@ -910,7 +911,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
         End If
         
         ' Check if formatting is being specified.
-        If .Data(Index) = corColonChar Then
+        If .Chars(Index) = corColonChar Then
             Dim StartIndex As Long
             
             ' everything from here to the "}" is part of the argument formatting.
@@ -919,8 +920,8 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
             Do
                 ' can never reach the end until after a "}".
                 If Index = Max Then FormatError
-                If .Data(Index) = CloseBraceChar Then
-                    ArgFormat = SysAllocStringLen(VarPtr(.Data(StartIndex)), Index - StartIndex)
+                If .Chars(Index) = CloseBraceChar Then
+                    ArgFormat = SysAllocStringLen(VarPtr(.Chars(StartIndex)), Index - StartIndex)
                     Exit Do
                 End If
                 Index = Index + 1
@@ -931,7 +932,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
         End If
         
         ' if we get here we should have reached the closing "}".
-        If .Data(Index) <> CloseBraceChar Then FormatError
+        If .Chars(Index) <> CloseBraceChar Then FormatError
     End With
     ParseArgumentFormatting = Index
 End Function
@@ -945,12 +946,12 @@ End Function
 '
 Private Function ConsumeSpaces(ByVal Index As Long) As Long
     Dim Max As Long
-    Max = mChars.SA.cElements
+    Max = mChars.Buffer.cElements
     
     Do
         ' Can never hit the end consuming spaces.
         If Index = Max Then FormatError
-        If mChars.Data(Index) <> corSpaceChar Then Exit Do
+        If mChars.Chars(Index) <> corSpaceChar Then Exit Do
         Index = Index + 1
     Loop
     
@@ -966,7 +967,7 @@ End Function
 '
 Private Function ParseNumber(ByRef Index As Long) As Long
     Dim Max As Long
-    Max = mChars.SA.cElements
+    Max = mChars.Buffer.cElements
     
     Dim Sign As Long
     Sign = 1
@@ -981,7 +982,7 @@ Private Function ParseNumber(ByRef Index As Long) As Long
         If Index = Max Then FormatError
         
         Dim Ch As Integer
-        Ch = mChars.Data(Index)
+        Ch = mChars.Chars(Index)
         Select Case Ch
             Case corZeroChar To corNineChar
                 ' Keep adding digits to the number
