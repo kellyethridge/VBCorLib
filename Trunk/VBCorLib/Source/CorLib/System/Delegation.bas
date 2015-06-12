@@ -25,19 +25,34 @@ Attribute VB_Name = "Delegation"
 Option Explicit
 
 Private Const DelegationCode        As Currency = -368956918007638.6215@     ' delegator code from Matt Curland
-Private Const OffsetToFirstFunction As Long = 12
-Private Const SizeOfDelegate        As Long = 28
+Private Const SizeOfLocalDelegate   As Long = 12
 
-Private Type Delegate
-    pVTable     As Long
-    pfn         As Long
-    cRefs       As Long
-    Func(3)     As Long
+Private Type LocalDelegateVTable
+    Func(3) As Long
 End Type
 
+Private Type DelegateVTable
+    Func(7) As Long
+End Type
 
-Private mDelegateStructure  As FunctionDelegator
+Private Type LocalDelegate
+    pVTable     As Long
+    pFn         As Long
+    cRefs       As Long
+End Type
+
+Public Type Delegate
+    pVTable As Long
+    pFn     As Long
+End Type
+
 Private mDelegateCode       As Currency
+Private mDelegateTemplate   As LocalDelegate
+Private mLocalVTable        As LocalDelegateVTable
+Private mLocalVTablePtr     As Long
+Private mVTable             As DelegateVTable
+Private mOkVTablePtr        As Long
+Private mFailVTablePtr      As Long
 
 
 ''
@@ -47,19 +62,28 @@ Private mDelegateCode       As Currency
 ' @param pfn The address to function to be called.
 ' @return A lightweight COM object used to call a function.
 '
-Public Function NewDelegate(ByVal pfn As Long) As IUnknown
+Public Function NewDelegate(ByVal pFn As Long) As IUnknown
     Init
 
     Dim This As Long
-    This = CoTaskMemAlloc(SizeOfDelegate)
+    This = CoTaskMemAlloc(SizeOfLocalDelegate)
     If This = vbNullPtr Then _
         Throw New OutOfMemoryException
     
-    mDelegateStructure.pfn = pfn
-    mDelegateStructure.pVTable = This + OffsetToFirstFunction
+    mDelegateTemplate.pFn = pFn
+    mDelegateTemplate.pVTable = mLocalVTablePtr
         
-    CopyMemory ByVal This, mDelegateStructure, SizeOfDelegate
+    CopyMemory ByVal This, mDelegateTemplate, SizeOfLocalDelegate
     ObjectPtr(NewDelegate) = This
+End Function
+
+Public Function InitDelegate(ByRef Struct As Delegate, Optional ByVal pFn As Long) As IUnknown
+    Init
+    
+    Struct.pFn = pFn
+    Struct.pVTable = mOkVTablePtr
+    
+    ObjectPtr(InitDelegate) = VarPtr(Struct)
 End Function
 
 
@@ -67,43 +91,72 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Init()
-    If mDelegateCode = 0@ Then
+    If mLocalVTablePtr = vbNullPtr Then
         mDelegateCode = DelegationCode
-        
         VirtualProtect mDelegateCode, 8, PAGE_EXECUTE_READWRITE, 0&
         
-        With mDelegateStructure
-            .Func(0) = FuncAddr(AddressOf Delegate_QueryInterface)
-            .Func(1) = FuncAddr(AddressOf Delegate_AddRef)
-            .Func(2) = FuncAddr(AddressOf Delegate_Release)
+        With mLocalVTable
+            .Func(0) = FuncAddr(AddressOf LocalDelegate_QueryInterface)
+            .Func(1) = FuncAddr(AddressOf LocalDelegate_AddRef)
+            .Func(2) = FuncAddr(AddressOf LocalDelegate_Release)
             .Func(3) = VarPtr(mDelegateCode)
-            .cRefs = 1
+        End With
+        
+        mLocalVTablePtr = VarPtr(mLocalVTable)
+        mDelegateTemplate.cRefs = 1
+        
+        With mVTable
+            .Func(0) = FuncAddr(AddressOf Delegate_OKQueryInterface)
+            .Func(1) = FuncAddr(AddressOf Delegate_AddRefRelease)
+            .Func(2) = .Func(1)
+            .Func(3) = VarPtr(mDelegateCode)
+            .Func(4) = FuncAddr(AddressOf Delegate_FailQueryInterface)
+            .Func(5) = .Func(1)
+            .Func(6) = .Func(1)
+            .Func(7) = VarPtr(mDelegateCode)
+            
+            mOkVTablePtr = VarPtr(.Func(0))
+            mFailVTablePtr = VarPtr(.Func(4))
         End With
     End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   VTable functions used by a newly created lightweight COM function delegate
+'   VTable functions
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Delegate_QueryInterface(ByRef This As Delegate, ByVal riid As Long, ByRef pvObj As Long) As Long
+Private Function LocalDelegate_QueryInterface(ByRef This As LocalDelegate, ByVal riid As Long, ByRef pvObj As Long) As Long
     pvObj = VarPtr(This)
     This.cRefs = This.cRefs + 1
 End Function
 
-Private Function Delegate_AddRef(ByRef This As Delegate) As Long
+Private Function LocalDelegate_AddRef(ByRef This As LocalDelegate) As Long
     This.cRefs = This.cRefs + 1
-    Delegate_AddRef = This.cRefs
+    LocalDelegate_AddRef = This.cRefs
 End Function
 
-Private Function Delegate_Release(ByRef This As Delegate) As Long
+Private Function LocalDelegate_Release(ByRef This As LocalDelegate) As Long
     This.cRefs = This.cRefs - 1
     
     If This.cRefs = 0 Then
         CoTaskMemFree VarPtr(This)
     Else
-        Delegate_Release = This.cRefs
+        LocalDelegate_Release = This.cRefs
     End If
+End Function
+
+Private Function Delegate_OKQueryInterface(ByRef This As Delegate, ByVal riid As Long, ByRef pvObj As Long) As Long
+    pvObj = VarPtr(This)
+    This.pVTable = mFailVTablePtr
+End Function
+
+Private Function Delegate_FailQueryInterface(ByRef This As Delegate, ByVal riid As Long, ByRef pvObj As Long) As Long
+    pvObj = vbNullPtr
+    Delegate_FailQueryInterface = E_NOINTERFACE
+End Function
+
+Private Function Delegate_AddRefRelease(ByVal This As Long) As Long
+    ' do nothing
 End Function
 
 
