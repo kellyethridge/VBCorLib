@@ -311,7 +311,7 @@ Private mPercentNegativePatterns()  As String
 ' utility variables
 Private mPtrNumberBuffer    As Long
 Private mNumber             As NumberType
-Private mAppendStringBuffer As WordBuffer
+Private mAppendStringBuffer As CharBuffer
 
 ' this is the set of NumberFormatInfo properties.
 Private mProps  As PropsType
@@ -324,7 +324,7 @@ Private mOutputPos                  As Long
 
 
 ' used to parse the format specifier components.
-Private mFormatSpecifier As WordBuffer
+Private mFormatSpecifier As CharBuffer
 
 
 ''
@@ -1374,13 +1374,13 @@ Private Sub FormatNumber(ByVal FormatPrecision As Long)
         Pattern = "#"
     End If
     
-    mFormatSpecifier.SA.pvData = StrPtr(Pattern)
+    InitChars mFormatSpecifier, Pattern
     
     Dim i   As Long
     Dim Ch  As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Data(i)
+            Ch = mFormatSpecifier.Chars(i)
             Select Case Ch
                 Case corPoundChar:    FormatGroups FormatPrecision, .NumberGroupSizes, .NumberGroupSeparator, .NumberDecimalSeparator
                 Case corMinusChar:    AppendString .NegativeSign
@@ -1406,13 +1406,13 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
         Pattern = mCurrencyPositivePatterns(mProps.CurrencyPositivePattern)
     End If
     
-    mFormatSpecifier.SA.pvData = StrPtr(Pattern)
+    InitChars mFormatSpecifier, Pattern
     
     Dim i   As Long
     Dim Ch  As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Data(i)
+            Ch = mFormatSpecifier.Chars(i)
             Select Case Ch
                 Case corPoundChar:    FormatGroups DecimalPlaces, .CurrencyGroupSizes, .CurrencyGroupSeparator, .CurrencyDecimalSeparator
                 Case corMinusChar:    AppendString .NegativeSign
@@ -1433,13 +1433,13 @@ Private Sub FormatPercent(ByVal DecimalPlaces As Long)
         Pattern = mPercentPositivePatterns(mProps.PercentPositivePattern)
     End If
     
-    mFormatSpecifier.SA.pvData = StrPtr(Pattern)
+    InitChars mFormatSpecifier, Pattern
     
     Dim i   As Long
     Dim Ch  As Integer
     With mProps
         For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Data(i)
+            Ch = mFormatSpecifier.Chars(i)
             Select Case Ch
                 Case corPoundChar:    FormatGroups DecimalPlaces, .PercentGroupSizes, .PercentGroupSeparator, .PercentDecimalSeparator
                 Case corMinusChar:    AppendString .NegativeSign
@@ -1803,43 +1803,39 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
             FormatPrecision = UnknownPrecision
             
         Case Else
-            With mFormatSpecifier
-                ' Hook up the string to access it as an Integer array.
-                .SA.pvData = StrPtr(Format)
-        
-                FormatType = .Data(0)
-                
-                Select Case FormatType
-                    Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
-                        ' We've got a format letter, so attempt to get any precision digits.
-                        If FormatLength = 1 Then
-                            FormatPrecision = UnknownPrecision
-                            Exit Sub
-                        End If
-                        
-                        FormatPrecision = 0   ' we need to reset this because it's a ByRef variable.
-                        
-                        Dim Ch  As Long
-                        Dim i   As Long
-                        For i = 1 To FormatLength - 1
-                            Ch = .Data(i)
-                            
-                            Select Case Ch
-                                Case corZeroChar To corNineChar
-                                    FormatPrecision = FormatPrecision * 10 + Ch - corZeroChar
-                                Case Else
-                                    FormatType = CustomFormat
-                                    FormatPrecision = UnknownPrecision
-                                    Exit Sub
-                            End Select
-                        Next i
-                        
-                    Case Else
-                        FormatType = CustomFormat
+            InitChars mFormatSpecifier, Format
+            FormatType = mFormatSpecifier.Chars(0)
+            
+            Select Case FormatType
+                Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
+                    ' We've got a format letter, so attempt to get any precision digits.
+                    If FormatLength = 1 Then
                         FormatPrecision = UnknownPrecision
                         Exit Sub
-                End Select
-            End With
+                    End If
+                    
+                    FormatPrecision = 0   ' we need to reset this because it's a ByRef variable.
+                    
+                    Dim Ch  As Long
+                    Dim i   As Long
+                    For i = 1 To FormatLength - 1
+                        Ch = mFormatSpecifier.Chars(i)
+                        
+                        Select Case Ch
+                            Case corZeroChar To corNineChar
+                                FormatPrecision = FormatPrecision * 10 + Ch - corZeroChar
+                            Case Else
+                                FormatType = CustomFormat
+                                FormatPrecision = UnknownPrecision
+                                Exit Sub
+                        End Select
+                    Next i
+                    
+                Case Else
+                    FormatType = CustomFormat
+                    FormatPrecision = UnknownPrecision
+                    Exit Sub
+            End Select
     End Select
 End Sub
 
@@ -1857,41 +1853,38 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
             ParseSpecifiers.Precision = UnknownPrecision
             
         Case Else
-            With mFormatSpecifier
-                ' Hook up the string to access it as an Integer array.
-                .SA.pvData = StrPtr(Format)
-        
-                Select Case .Data(0)
-                    Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
-                        ParseSpecifiers.Format = .Data(0)
-                        
-                        If FormatLength = 1 Then
-                            ParseSpecifiers.Precision = UnknownPrecision
-                            Exit Function
-                        End If
-                        
-                        Dim Precision   As Long
-                        Dim Ch          As Long
-                        Dim i           As Long
-                        For i = 1 To FormatLength - 1
-                            Ch = .Data(i)
-                            
-                            Select Case Ch
-                                Case corZeroChar To corNineChar
-                                    Precision = Precision * 10 + Ch - corZeroChar
-                                Case Else
-                                    ParseSpecifiers.Format = CustomSpecifier
-                                    ParseSpecifiers.Precision = UnknownPrecision
-                                    Exit Function
-                            End Select
-                        Next i
-                        
-                        ParseSpecifiers.Precision = Precision
-                    Case Else
-                        ParseSpecifiers.Format = CustomSpecifier
+            InitChars mFormatSpecifier, Format
+            
+            Select Case mFormatSpecifier.Chars(0)
+                Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
+                    ParseSpecifiers.Format = mFormatSpecifier.Chars(0)
+                    
+                    If FormatLength = 1 Then
                         ParseSpecifiers.Precision = UnknownPrecision
-                End Select
-            End With
+                        Exit Function
+                    End If
+                    
+                    Dim Precision   As Long
+                    Dim Ch          As Long
+                    Dim i           As Long
+                    For i = 1 To FormatLength - 1
+                        Ch = mFormatSpecifier.Chars(i)
+                        
+                        Select Case Ch
+                            Case corZeroChar To corNineChar
+                                Precision = Precision * 10 + Ch - corZeroChar
+                            Case Else
+                                ParseSpecifiers.Format = CustomSpecifier
+                                ParseSpecifiers.Precision = UnknownPrecision
+                                Exit Function
+                        End Select
+                    Next i
+                    
+                    ParseSpecifiers.Precision = Precision
+                Case Else
+                    ParseSpecifiers.Format = CustomSpecifier
+                    ParseSpecifiers.Precision = UnknownPrecision
+            End Select
     End Select
 End Function
 
@@ -2164,15 +2157,13 @@ Private Sub AppendString(ByRef StringToAppend As String)
     StringToAppendLength = Len(StringToAppend)
     
     If StringToAppendLength < 6 Then
-        With mAppendStringBuffer
-            .SA.pvData = StrPtr(StringToAppend)
-            Dim i As Long
-            For i = 0 To StringToAppendLength - 1
-                mOutput(mOutputPos + i) = .Data(i)
-            Next i
-        End With
+        InitChars mAppendStringBuffer, StringToAppend
+        Dim i As Long
+        For i = 0 To StringToAppendLength - 1
+            mOutput(mOutputPos + i) = mAppendStringBuffer.Chars(i)
+        Next i
     Else
-        CopyMemory mOutput(mOutputPos), ByVal StrPtr(StringToAppend), StringToAppendLength * 2
+        CopyMemory mOutput(mOutputPos), ByVal StrPtr(StringToAppend), StringToAppendLength * corSizeOfChar
     End If
     
     mOutputPos = mOutputPos + StringToAppendLength
@@ -2341,8 +2332,8 @@ Private Sub Class_Initialize()
     
     SAPtr(mNumber.Digits) = VarPtr(mNumber.DigitsSA)
     
-    InitWordBuffer mAppendStringBuffer, 0, 128
-    InitWordBuffer mFormatSpecifier, 0, 128
+    InitChars mAppendStringBuffer
+    InitChars mFormatSpecifier
 End Sub
 
 Private Sub Class_InitProperties()
