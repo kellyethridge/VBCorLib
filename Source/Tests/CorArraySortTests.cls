@@ -32,6 +32,17 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#)
             Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2)
             
+        Case "Sort_WithCallback_SortsItems"
+            Test.Use NewBytes(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareBytes
+            Test.Use NewIntegers(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareIntegers
+            Test.Use NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareLongs
+            Test.Use NewSingles(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareSingles
+            Test.Use NewDoubles(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareDoubles
+            Test.Use NewCurrencys(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareCurrencies
+            Test.Use NewStrings("c", "d", "a", "B", "A"), AddressOf CompareStrings
+            Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#), AddressOf CompareDates
+            Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareVariants
+            
     End Select
 End Sub
 
@@ -105,16 +116,22 @@ Public Sub Sort_WithComparableObjects_SortsObjects()
     Assert.That a, Iz.Ordered.Using(New ComparableComparer)
 End Sub
 
-Public Sub Sort_WithCallback_SortsStrings()
-    Dim a() As String
-    a = NewStrings("c", "d", "a", "B", "A")
+Public Sub Sort_WithCallback_SortsItems(ByRef Items As Variant, ByVal Callback As Long)
+    CorArray.Sort Items, Callback
     
-    CorArray.Sort a, AddressOf CompareStringsAscending
-    
-    Assert.That a, Iz.Ordered
+    Assert.That Items, Iz.Ordered
 End Sub
 
-Public Sub Sort_WithCallback_SortsUDTs()
+'Public Sub Sort_WithCallback_SortsStrings()
+'    Dim a() As String
+'    a = NewStrings("c", "d", "a", "B", "A")
+'
+'    CorArray.Sort a, AddressOf CompareStringsAscending
+'
+'    Assert.That a, Iz.Ordered
+'End Sub
+
+Public Sub Sort_WithUDTsUsingCallback_SortsUDTs()
     Dim a(4) As VBGUID
     a(0).Data1 = 3
     a(1).Data1 = 2

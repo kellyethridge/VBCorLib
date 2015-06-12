@@ -16,7 +16,6 @@ Class=InvalidCastException; System\InvalidCastException.cls
 Module=ExceptionManagement; System\ExceptionManagement.bas
 Class=IndexOutOfRangeException; System\IndexOutOfRangeException.cls
 Class=IComparer; System\Collections\IComparer.cls
-Module=modFunctionDelegator; System\modFunctionDelegator.bas
 Class=IComparable; System\IComparable.cls
 Class=Comparer; System\Collections\Comparer.cls
 Class=RankException; System\RankException.cls
