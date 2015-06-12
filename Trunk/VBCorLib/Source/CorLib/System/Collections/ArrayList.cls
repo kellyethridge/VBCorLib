@@ -695,14 +695,11 @@ End Sub
 ' not be converted to a Long. An exception will be thrown.</p>
 '
 Public Function ToArray(Optional ByVal ArrayType As VbVarType = vbVariant) As Variant
-    Dim Ret As Variant
-    Ret = CorArray.CreateInstance(ArrayType, mCount)
+    ToArray = CorArray.CreateInstance(ArrayType, mCount)
     
     If mCount > 0 Then
-        CorArray.CopyEx mItems, 0, Ret, 0, mCount
+        CorArray.CopyEx mItems, 0, ToArray, 0, mCount
     End If
-    
-    ToArray = Ret
 End Function
 
 ''
