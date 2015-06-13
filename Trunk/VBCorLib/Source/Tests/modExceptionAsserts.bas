@@ -1,6 +1,11 @@
 Attribute VB_Name = "modExceptionAsserts"
 Option Explicit
 
+Public Sub AssertNoException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Assert.That Catch(Ex, Err), Iz.False, "An exception is not expected to be thrown."
+End Sub
+
 Public Sub AssertArgumentException(ByVal Err As ErrObject, Optional ByRef ParamName As String)
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)

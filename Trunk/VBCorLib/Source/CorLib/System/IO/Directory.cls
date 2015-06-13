@@ -123,10 +123,13 @@ End Function
 ' @return Indication of the existence of the path.
 ' @remarks The path can be relative or absolute.
 '
-Public Function Exists(ByVal Path As String) As Boolean
-    Dim Data As WIN32_FILE_ATTRIBUTE_DATA
+Public Function Exists(ByRef Path As String) As Boolean
+    Dim Data        As WIN32_FILE_ATTRIBUTE_DATA
+    Dim FullPath    As String
     
-    If File.GetFileData(Path, Data) = NO_ERROR Then
+    FullPath = Statics.Path.GetFullPath(Path)
+    
+    If File.GetFileData(FullPath, Data) = NO_ERROR Then
         Exists = CBool(Data.dwFileAttributes And FileAttributes.DirectoryAttr)
     End If
 End Function

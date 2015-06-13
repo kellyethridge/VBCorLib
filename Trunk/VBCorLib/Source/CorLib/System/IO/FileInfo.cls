@@ -52,14 +52,19 @@ Option Explicit
 Implements IObject
 Implements FileSystemInfo
 
-Private mFileName           As String
+Private Const PropOriginalFileName  As String = "OriginalFileName"
+Private Const PropFullName          As String = "FullName"
+Private Const PropName              As String = "Name"
+
 Private mOriginalFileName   As String
-Private mIsDirty            As Boolean
+Private mFullName           As String
+Private mName               As String
+Private mIOResult           As Long
 Private mFileAttributes     As FileAttributes
 Private mFileSize           As Currency
-Private mCreationTime       As CorDateTime
-Private mLastAccessTime     As CorDateTime
-Private mLastWriteTime      As CorDateTime
+Private mCreationTimeUtc    As CorDateTime
+Private mLastAccessTimeUtc  As CorDateTime
+Private mLastWriteTimeUtc   As CorDateTime
 
 
 
@@ -72,20 +77,29 @@ Private mLastWriteTime      As CorDateTime
 ' the individual attribute bits.
 '
 Public Property Get Attributes() As FileAttributes
-    If mIsDirty Then Refresh
+    If IsDirty Then
+        Refresh
+    End If
+    
     Attributes = mFileAttributes
 End Property
 
 ''
-' Sets the attributes for the file (ReadOnly, Hiddin, ...)
+' Sets the attributes for the file (ReadOnly, Hidden, ...)
 '
-' @param RHS The attributes to set the file to.
+' @param Value The attributes to set the file to.
 ' @remarks All attributes are set at once. In order to modify a single attribute,
 ' the remaining attribute settings need to be included with the modified attribute.
 '
-Public Property Let Attributes(ByVal RHS As FileAttributes)
-    Call File.SetAttributes(mFileName, RHS)
-    Call MarkDirty
+Public Property Let Attributes(ByVal Value As FileAttributes)
+    Dim Success As Boolean
+    Success = CBool(SetFileAttributesW(mFullName, Value))
+    
+    If Not Success Then
+        IOError.WinIOError Err.LastDllError, mFullName
+    End If
+    
+    MarkDirty
 End Property
 
 ''
@@ -94,31 +108,25 @@ End Property
 ' @return The creation time of the file.
 '
 Public Property Get CreationTime() As Variant
-    If mIsDirty Then Refresh
-    Set CreationTime = mCreationTime
+    Set CreationTime = GetCreationTimeUtc.ToLocalTime
 End Property
 
 ''
 ' Sets the creation time of the file.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let CreationTime(ByVal RHS As Variant)
-    Set Me.CreationTime = CorDateTime.GetDateTime(RHS)
+Public Property Let CreationTime(ByRef Value As Variant)
+    Set CreationTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
 End Property
 
 ''
 ' Sets the creation time of the file.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set CreationTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is CorDateTime Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
-
-    Set mCreationTime = RHS
-    File.SetCreationTime mFileName, mCreationTime
-    Call MarkDirty
+Public Property Set CreationTime(ByRef Value As Variant)
+    Set CreationTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -127,30 +135,26 @@ End Property
 ' @return The creation time of the file in UTC time.
 '
 Public Property Get CreationTimeUtc() As Variant
-    If mIsDirty Then Refresh
-    Set CreationTimeUtc = mCreationTime.ToUniversalTime
+    Set CreationTimeUtc = GetCreationTimeUtc
 End Property
 
 ''
 ' Sets the creation time of the file in UTC time.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let CreationTimeUtc(ByVal RHS As Variant)
-    Set Me.CreationTimeUtc = CorDateTime.GetDateTime(RHS)
+Public Property Let CreationTimeUtc(ByRef Value As Variant)
+    Set CreationTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
 ' Sets the creation time of the file in UTC time.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set CreationTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is CorDateTime Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTimeUtc")
-
-    Call File.SetCreationTimeUtc(mFileName, RHS)
-    Call MarkDirty
+Public Property Set CreationTimeUtc(ByRef Value As Variant)
+    File.SetCreationTimeUtc mFullName, Value
+    MarkDirty
 End Property
 
 ''
@@ -159,31 +163,25 @@ End Property
 ' @return A CorDateTime object of the last access time.
 '
 Public Property Get LastAccessTime() As Variant
-    If mIsDirty Then Refresh
-    Set LastAccessTime = mLastAccessTime
+    Set LastAccessTime = GetLastAccessTimeUtc.ToLocalTime
 End Property
 
 ''
 ' Sets the time the file was last accessed.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let LastAccessTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = CorDateTime.GetDateTime(RHS)
+Public Property Let LastAccessTime(ByRef Value As Variant)
+    Set LastAccessTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
 End Property
 
 ''
 ' Sets the time the file was last accessed.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set LastAccessTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is CorDateTime Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
-        
-    Set mLastAccessTime = RHS
-    Call File.SetLastAccessTime(mFileName, mLastAccessTime)
-    Call MarkDirty
+Public Property Set LastAccessTime(ByRef Value As Variant)
+    Set LastAccessTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -192,30 +190,26 @@ End Property
 ' @return A CorDateTime object of the last accessed UTC time.
 '
 Public Property Get LastAccessTimeUtc() As Variant
-    If mIsDirty Then Refresh
-    Set LastAccessTimeUtc = mLastAccessTime.ToUniversalTime
+    Set LastAccessTimeUtc = GetLastAccessTimeUtc
 End Property
 
 ''
 ' Sets the time the file was last accessed in UTC time.
 '
-' @param RHS A Date or CorDateTime object of the new UTC time.
+' @param Value A Date or CorDateTime object of the new UTC time.
 '
-Public Property Let LastAccessTimeUtc(ByVal RHS As Variant)
-    Set Me.LastAccessTimeUtc = CorDateTime.GetDateTime(RHS)
+Public Property Let LastAccessTimeUtc(ByRef Value As Variant)
+    Set LastAccessTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
 ' Sets the time the file was last accessed in UTC time.
 '
-' @param RHS A Date or CorDateTime object of the new UTC time.
+' @param Value A Date or CorDateTime object of the new UTC time.
 
-Public Property Set LastAccessTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is CorDateTime Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTimeUtc")
-    
-    Call File.SetLastAccessTimeUtc(mFileName, RHS)
-    Call MarkDirty
+Public Property Set LastAccessTimeUtc(ByRef Value As Variant)
+    File.SetLastAccessTimeUtc mFullName, Value
+    MarkDirty
 End Property
 
 ''
@@ -224,31 +218,25 @@ End Property
 ' @return A CorDateTime object of the last time the file was written to.
 '
 Public Property Get LastWriteTime() As Variant
-    If mIsDirty Then Refresh
-    Set LastWriteTime = mLastWriteTime
+    Set LastWriteTime = GetLastWriteTimeUtc.ToLocalTime
 End Property
 
 ''
 ' Sets the last time the file was written to.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let LastWriteTime(ByVal RHS As Variant)
-    Set Me.LastAccessTime = CorDateTime.GetDateTime(RHS)
+Public Property Let LastWriteTime(ByRef Value As Variant)
+    Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
 End Property
 
 ''
 ' Sets the last time the file was written to.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set LastWriteTime(ByVal RHS As Variant)
-    If Not TypeOf RHS Is CorDateTime Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastWriteTime")
-    
-    Set mLastWriteTime = RHS
-    Call File.SetLastWriteTime(mFileName, mLastWriteTime)
-    Call MarkDirty
+Public Property Set LastWriteTime(ByRef Value As Variant)
+    Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -257,30 +245,26 @@ End Property
 ' @return A CorDateTime object of the last time the file was written to.
 '
 Public Property Get LastWriteTimeUtc() As Variant
-    If mIsDirty Then Refresh
-    Set LastWriteTimeUtc = mLastWriteTime.ToUniversalTime
+    Set LastWriteTimeUtc = GetLastWriteTimeUtc
 End Property
 
 ''
 ' Sets the last the time file was written to in UTC time.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let LastWriteTimeUtc(ByVal RHS As Variant)
-    Set Me.LastWriteTimeUtc = CorDateTime.GetDateTime(RHS)
+Public Property Let LastWriteTimeUtc(ByRef Value As Variant)
+    Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
 ''
 ' Sets the last time the file was written to in UTC time.
 '
-' @param RHS A Date or CorDateTime object of the new time.
+' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set LastWriteTimeUtc(ByVal RHS As Variant)
-    If Not TypeOf RHS Is CorDateTime Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTimeUtc")
-    
-    Call File.SetLastWriteTimeUtc(mFileName, RHS)
-    Call MarkDirty
+Public Property Set LastWriteTimeUtc(ByRef Value As Variant)
+    File.SetLastWriteTimeUtc mFullName, Value
+    MarkDirty
 End Property
 
 ''
@@ -300,7 +284,7 @@ End Property
 ' @remarks This does not very the existence of the file.
 '
 Public Property Get DirectoryName() As String
-    DirectoryName = Path.GetDirectoryName(mFileName)
+    DirectoryName = Path.GetDirectoryName(mFullName)
 End Property
 
 ''
@@ -309,7 +293,11 @@ End Property
 ' @return An indication of the existence of the file.
 '
 Public Property Get Exists() As Boolean
-    Exists = File.Exists(mFileName)
+    If IsDirty Then
+        Refresh
+    End If
+    
+    Exists = (mIOResult = NO_ERROR)
 End Property
 
 ''
@@ -318,7 +306,7 @@ End Property
 ' @return The extension portion of the filename.
 '
 Public Property Get Extension() As String
-    Extension = Path.GetExtension(mFileName)
+    Extension = Path.GetExtension(mFullName)
 End Property
 
 ''
@@ -329,7 +317,7 @@ End Property
 ' filename, then the currenct directory is used.
 '
 Public Property Get FullName() As String
-    FullName = Path.GetFullPath(mFileName)
+    FullName = mFullName
 End Property
 
 ''
@@ -339,7 +327,10 @@ End Property
 ' @remarks A Currency datatype is used to allow file sizes greater than 2gig.
 '
 Public Property Get Length() As Currency
-    If mIsDirty Then Refresh
+    If IsDirty Then
+        Refresh
+    End If
+    
     Length = mFileSize
 End Property
 
@@ -349,7 +340,7 @@ End Property
 ' @return The filename and extension.
 '
 Public Property Get Name() As String
-    Name = Path.GetFileName(mFileName)
+    Name = mName
 End Property
 
 ''
@@ -359,26 +350,23 @@ End Property
 '
 Public Sub Refresh()
     Dim Data As WIN32_FILE_ATTRIBUTE_DATA
-    Dim e As Long
-    e = File.GetFileData(mFileName, Data)
-    If e <> NO_ERROR Then IOError.WinIOError e, mFileName
     
-    With Data
-        mFileAttributes = .dwFileAttributes
-        Set mCreationTime = CorDateTime.FromFileTime(.ftCreationTime)
-        Set mLastAccessTime = CorDateTime.FromFileTime(.ftLastAccessTime)
-        Set mLastWriteTime = CorDateTime.FromFileTime(.ftLastWriteTime)
-    End With
-    
-    ' The nFileSizeLow and hFileSizeHigh are in reverse order in
-    ' WIN32_FIND_DATA, so we need to manually reverse the 4 byte sections.
-    Dim Ptr As Long
-    Ptr = VarPtr(mFileSize)
-    MemLong(Ptr) = Data.nFileSizeLow
-    MemLong(Ptr + 4) = Data.nFileSizeHigh
-    mFileSize = 10000@ * mFileSize
-    
-    mIsDirty = False
+    mIOResult = File.GetFileData(mFullName, Data)
+        
+    If mIOResult = NO_ERROR Then
+        With Data
+            mFileAttributes = .dwFileAttributes
+            Set mCreationTimeUtc = CorDateTime.FromFileTimeUtc(.ftCreationTime)
+            Set mLastAccessTimeUtc = CorDateTime.FromFileTimeUtc(.ftLastAccessTime)
+            Set mLastWriteTimeUtc = CorDateTime.FromFileTimeUtc(.ftLastWriteTime)
+        End With
+        
+        Dim Ptr As Long
+        Ptr = VarPtr(mFileSize)
+        MemLong(Ptr) = Data.nFileSizeLow
+        MemLong(Ptr + 4) = Data.nFileSizeHigh
+        mFileSize = 10000@ * mFileSize
+    End If
 End Sub
 
 ''
@@ -387,7 +375,7 @@ End Sub
 ' @return A Stream writer to the file.
 '
 Public Function AppendText() As StreamWriter
-    Set AppendText = File.AppendText(mFileName)
+    Set AppendText = File.AppendText(mFullName)
 End Function
 
 ''
@@ -397,9 +385,10 @@ End Function
 ' @param OverWrite Permission to overwrite an existing file.
 ' @remarks The destination must be on the same volume as this file.
 '
-Public Sub CopyTo(ByVal DestFileName As String, Optional ByVal OverWrite As Boolean)
-    Call File.Copy(mFileName, DestFileName, OverWrite)
-End Sub
+Public Function CopyTo(ByVal DestFileName As String, Optional ByVal OverWrite As Boolean = False) As FileInfo
+    File.Copy mFullName, DestFileName, OverWrite
+    Set CopyTo = Cor.NewFileInfo(DestFileName)
+End Function
 
 ''
 ' Creates this file and returns a FileStream object to access it.
@@ -408,7 +397,7 @@ End Sub
 ' @remarks If the file does not exist it will be created. If it already exists, it will be overwritten.
 '
 Public Function Create() As FileStream
-    Set Create = File.Create(mFileName)
+    Set Create = File.Create(mFullName)
 End Function
 
 ''
@@ -418,14 +407,20 @@ End Function
 ' @remarks If the file does not exist it will be created. If it already exists, it will be overwritten.
 '
 Public Function CreateText() As StreamWriter
-    Set CreateText = File.CreateText(mFileName)
+    Set CreateText = File.CreateText(mFullName)
 End Function
 
 ''
 ' Deletes this file.
 '
 Public Sub Delete()
-    Call File.Delete(mFileName)
+    If Not CBool(DeleteFileW(mFullName)) Then
+        Dim Result As Long
+        Result = Err.LastDllError
+        If Result <> ERROR_FILE_NOT_FOUND Then
+            IOError.WinIOError Result, mFullName
+        End If
+    End If
 End Sub
 
 ''
@@ -434,8 +429,21 @@ End Sub
 ' @param DestFileName The new location and name of the file.
 ' @remarks The new location must be on the same volume as the source filename.
 '
-Public Sub MoveTo(ByVal DestFileName As String)
-    Call File.Move(mFileName, DestFileName)
+Public Sub MoveTo(ByRef DestFileName As String)
+    If Len(DestFileName) = 0 Then _
+        Error.Argument Argument_EmptyFileName, "DestFileName"
+    
+    Dim FullDestFileName As String
+    FullDestFileName = Path.GetFullPath(DestFileName)
+    
+    If Not CBool(MoveFileW(mFullName, FullDestFileName)) Then
+        IOError.WinIOError Err.LastDllError
+    End If
+    
+    mOriginalFileName = DestFileName
+    mFullName = Path.GetFullPath(DestFileName)
+    mName = Path.GetFileName(mFullName)
+    MarkDirty
 End Sub
 
 ''
@@ -447,7 +455,7 @@ End Sub
 ' @return A FileStream object to this file.
 '
 Public Function OpenFile(ByVal Mode As FileMode, Optional ByVal Access As FileAccess = ReadWriteAccess, Optional ByVal Share As FileShare = FileShare.None) As FileStream
-    Set OpenFile = File.OpenFile(mFileName, Mode, Access, Share)
+    Set OpenFile = File.OpenFile(mFullName, Mode, Access, Share)
 End Function
 
 ''
@@ -456,7 +464,7 @@ End Function
 ' @return A FileStream that has ReadOnly access to the file.
 '
 Public Function OpenRead() As FileStream
-    Set OpenRead = File.OpenRead(mFileName)
+    Set OpenRead = File.OpenRead(mFullName)
 End Function
 
 ''
@@ -466,7 +474,7 @@ End Function
 ' @remarks The StreamReader's default encoding is used.
 '
 Public Function OpenText() As StreamReader
-    Set OpenText = File.OpenText(mFileName)
+    Set OpenText = File.OpenText(mFullName)
 End Function
 
 ''
@@ -475,7 +483,7 @@ End Function
 ' @return A FileStream used to write to the file.
 '
 Public Function OpenWrite() As FileStream
-    Set OpenWrite = File.OpenWrite(mFileName)
+    Set OpenWrite = File.OpenWrite(mFullName)
 End Function
 
 ''
@@ -483,7 +491,7 @@ End Function
 '
 ' @return String representing this instance.
 Public Function ToString() As String
-    ToString = mFileName
+    ToString = mFullName
 End Function
 
 ''
@@ -506,40 +514,73 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal FileName As String)
+Friend Sub Init(ByRef FileName As String)
     mOriginalFileName = FileName
-    mFileName = Path.GetFullPath(FileName)
+    mFullName = Path.GetFullPath(FileName)
+    mName = Path.GetFileName(FileName)
+End Sub
+
+Private Sub Class_Initialize()
+    MarkDirty
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub MarkDirty()
-    mIsDirty = True
+    mIOResult = -1
 End Sub
+
+Private Property Get IsDirty() As Long
+    IsDirty = (mIOResult = -1)
+End Property
+
+Private Function GetCreationTimeUtc() As CorDateTime
+    If IsDirty Then
+        Refresh
+    End If
+    
+    Set GetCreationTimeUtc = mCreationTimeUtc
+End Function
+
+Private Function GetLastAccessTimeUtc() As CorDateTime
+    If IsDirty Then
+        Refresh
+    End If
+    
+    Set GetLastAccessTimeUtc = mLastAccessTimeUtc
+End Function
+
+Private Function GetLastWriteTimeUtc() As CorDateTime
+    If IsDirty Then
+        Refresh
+    End If
+    
+    Set GetLastWriteTimeUtc = mLastWriteTimeUtc
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Call MarkDirty
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Call Init(PropBag.ReadProperty("FileName"))
+    mOriginalFileName = PropBag.ReadProperty(PropOriginalFileName, "")
+    mFullName = PropBag.ReadProperty(PropFullName, "")
+    mName = PropBag.ReadProperty(PropName, "")
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty("FileName", mOriginalFileName)
+    PropBag.WriteProperty PropOriginalFileName, mOriginalFileName
+    PropBag.WriteProperty PropFullName, mFullName
+    PropBag.WriteProperty PropName, mName
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -555,34 +596,34 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   FileSystemInfo Interface
+'   FileSystemInfo
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get FileSystemInfo_Attributes() As FileAttributes
     FileSystemInfo_Attributes = Attributes
 End Property
 
-Private Property Let FileSystemInfo_Attributes(ByVal RHS As FileAttributes)
-    Attributes = RHS
+Private Property Let FileSystemInfo_Attributes(ByVal Value As FileAttributes)
+    Attributes = Value
 End Property
 
-Private Property Set FileSystemInfo_CreationTime(ByVal RHS As Variant)
-    Set CreationTime = RHS
+Private Property Set FileSystemInfo_CreationTime(ByRef Value As Variant)
+    Set CreationTime = Value
 End Property
 
-Private Property Let FileSystemInfo_CreationTime(ByVal RHS As Variant)
-    CreationTime = RHS
+Private Property Let FileSystemInfo_CreationTime(ByRef Value As Variant)
+    CreationTime = Value
 End Property
 
 Private Property Get FileSystemInfo_CreationTime() As Variant
     Set FileSystemInfo_CreationTime = CreationTime
 End Property
 
-Private Property Set FileSystemInfo_CreationTimeUtc(ByVal RHS As Variant)
-    Set CreationTimeUtc = RHS
+Private Property Set FileSystemInfo_CreationTimeUtc(ByRef Value As Variant)
+    Set CreationTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_CreationTimeUtc(ByVal RHS As Variant)
-    CreationTimeUtc = RHS
+Private Property Let FileSystemInfo_CreationTimeUtc(ByRef Value As Variant)
+    CreationTimeUtc = Value
 End Property
 
 Private Property Get FileSystemInfo_CreationTimeUtc() As Variant
@@ -590,7 +631,7 @@ Private Property Get FileSystemInfo_CreationTimeUtc() As Variant
 End Property
 
 Private Sub FileSystemInfo_Delete()
-    Call Delete
+    Delete
 End Sub
 
 Private Function FileSystemInfo_Equals(Value As Variant) As Boolean
@@ -613,48 +654,48 @@ Private Function FileSystemInfo_GetHashCode() As Long
     FileSystemInfo_GetHashCode = GetHashCode
 End Function
 
-Private Property Set FileSystemInfo_LastAccessTime(ByVal RHS As Variant)
-    Set LastAccessTime = RHS
+Private Property Set FileSystemInfo_LastAccessTime(ByRef Value As Variant)
+    Set LastAccessTime = Value
 End Property
 
 Private Property Get FileSystemInfo_LastAccessTime() As Variant
     Set FileSystemInfo_LastAccessTime = LastAccessTime
 End Property
 
-Private Property Let FileSystemInfo_LastAccessTime(ByVal RHS As Variant)
-    LastAccessTime = RHS
+Private Property Let FileSystemInfo_LastAccessTime(ByRef Value As Variant)
+    LastAccessTime = Value
 End Property
 
-Private Property Set FileSystemInfo_LastAccessTimeUtc(ByVal RHS As Variant)
-    Set LastAccessTimeUtc = RHS
+Private Property Set FileSystemInfo_LastAccessTimeUtc(ByRef Value As Variant)
+    Set LastAccessTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_LastAccessTimeUtc(ByVal RHS As Variant)
-    LastAccessTimeUtc = RHS
+Private Property Let FileSystemInfo_LastAccessTimeUtc(ByRef Value As Variant)
+    LastAccessTimeUtc = Value
 End Property
 
 Private Property Get FileSystemInfo_LastAccessTimeUtc() As Variant
     Set FileSystemInfo_LastAccessTimeUtc = LastAccessTimeUtc
 End Property
 
-Private Property Set FileSystemInfo_LastWriteTime(ByVal RHS As Variant)
-    Set LastWriteTime = RHS
+Private Property Set FileSystemInfo_LastWriteTime(ByRef Value As Variant)
+    Set LastWriteTime = Value
 End Property
 
-Private Property Let FileSystemInfo_LastWriteTime(ByVal RHS As Variant)
-    LastWriteTime = RHS
+Private Property Let FileSystemInfo_LastWriteTime(ByRef Value As Variant)
+    LastWriteTime = Value
 End Property
 
 Private Property Get FileSystemInfo_LastWriteTime() As Variant
     Set FileSystemInfo_LastWriteTime = LastWriteTime
 End Property
 
-Private Property Set FileSystemInfo_LastWriteTimeUtc(ByVal RHS As Variant)
-    Set LastWriteTimeUtc = RHS
+Private Property Set FileSystemInfo_LastWriteTimeUtc(ByRef Value As Variant)
+    Set LastWriteTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_LastWriteTimeUtc(ByVal RHS As Variant)
-    LastWriteTimeUtc = RHS
+Private Property Let FileSystemInfo_LastWriteTimeUtc(ByRef Value As Variant)
+    LastWriteTimeUtc = Value
 End Property
 
 Private Property Get FileSystemInfo_LastWriteTimeUtc() As Variant
@@ -666,7 +707,7 @@ Private Property Get FileSystemInfo_Name() As String
 End Property
 
 Private Sub FileSystemInfo_Refresh()
-    Call Refresh
+    Refresh
 End Sub
 
 Private Function FileSystemInfo_ToString() As String

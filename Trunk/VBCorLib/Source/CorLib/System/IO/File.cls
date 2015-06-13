@@ -151,7 +151,7 @@ Public Sub Delete(ByRef Path As String)
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    If Api.DeleteFile(FullPath) = BOOL_FALSE Then
+    If Not CBool(DeleteFileW(FullPath)) Then
         Dim Result As Long
         Result = Err.LastDllError
         If Result <> ERROR_FILE_NOT_FOUND Then
@@ -166,10 +166,13 @@ End Sub
 ' @param Path The file to check for existence.
 ' @return Whether the file exists or not.
 '
-Public Function Exists(ByVal Path As String) As Boolean
-    Dim Data As WIN32_FILE_ATTRIBUTE_DATA
+Public Function Exists(ByRef Path As String) As Boolean
+    Dim Data        As WIN32_FILE_ATTRIBUTE_DATA
+    Dim FullPath    As String
     
-    If GetFileData(Path, Data) = NO_ERROR Then
+    FullPath = Statics.Path.GetFullPath(Path)
+    
+    If GetFileData(FullPath, Data) = NO_ERROR Then
         Exists = Not CBool(Data.dwFileAttributes And FileAttributes.DirectoryAttr)
     End If
 End Function
@@ -284,7 +287,7 @@ Public Sub Move(ByRef SourceFileName As String, ByRef DestFileName As String)
     If Not File.Exists(FullSource) Then _
         IOError.WinIOError ERROR_FILE_NOT_FOUND, FullSource
     
-    If MoveFileW(FullSource, FullDest) = BOOL_FALSE Then
+    If Not CBool(MoveFileW(FullSource, FullDest)) Then
         IOError.WinIOError Err.LastDllError, FullDest
     End If
 End Sub
@@ -548,16 +551,9 @@ Public Sub WriteAllLines(ByVal Path As String, ByRef Contents As Variant, Option
     End With
 End Sub
 
-
 Friend Function GetFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
-    
-'    Path.VerifyPath p, True
-    Dim FullPath As String
-    FullPath = Statics.Path.GetFullPath(Path)
-    FullPath = CorString.TrimEnd(FullPath, mDirectorySeparators)
-    
-    If Api.GetFileAttributesEx(FullPath, 0, Data) = BOOL_FALSE Then
-        GetFileData = GetFileDataFallback(FullPath, Data)
+    If Not CBool(GetFileAttributesExW(Path, 0, Data)) Then
+        GetFileData = GetFileDataFallback(Path, Data)
     End If
 End Function
 
@@ -574,9 +570,12 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
-    Dim FileData As WIN32_FIND_DATA
+    Dim FileData    As WIN32_FIND_DATA
+    Dim TrimmedPath As String
     
-    With SafeFindFirstFile(Path, FileData)
+    TrimmedPath = CorString.TrimEnd(Path, mDirectorySeparators)
+    
+    With SafeFindFirstFile(TrimmedPath, FileData)
         If Not .IsInvalid Then
             Data.dwFileAttributes = FileData.dwFileAttributes
             Data.ftCreationTime = FileData.ftCreationTime
@@ -631,10 +630,13 @@ Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUT
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
+    
     Dim DllError As Long
-    DllError = GetFileData(Path, Data)
+    DllError = GetFileData(FullPath, Data)
     If DllError <> NO_ERROR Then
-        IOError.WinIOError DllError, Path
+        IOError.WinIOError DllError, FullPath
     End If
 End Sub
 

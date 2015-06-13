@@ -122,7 +122,7 @@ End Property
 ' @remarks The time has the UTC timezone offset applied to it before
 ' being written to the directory.
 '
-Public Property Let CreationTime(ByVal Value As Variant)
+Public Property Let CreationTime(ByRef Value As Variant)
     Set CreationTime = CorDateTime.GetDateTime(Value)
 End Property
 
@@ -133,7 +133,7 @@ End Property
 ' @remarks The time has the UTC timezone offset applied to it before
 ' being written to the directory.
 '
-Public Property Set CreationTime(ByVal Value As Variant)
+Public Property Set CreationTime(ByRef Value As Variant)
     If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
     
@@ -162,7 +162,7 @@ End Property
 ' @remarks The time has the UTC timezone offset removed from it before
 ' being written to the directory.
 '
-Public Property Let CreationTimeUtc(ByVal Value As Variant)
+Public Property Let CreationTimeUtc(ByRef Value As Variant)
     Set Me.CreationTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
@@ -173,7 +173,7 @@ End Property
 ' @remarks The time has the UTC timezone offset removed from it before
 ' being written to the directory.
 '
-Public Property Set CreationTimeUtc(ByVal Value As Variant)
+Public Property Set CreationTimeUtc(ByRef Value As Variant)
     If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "CreationTime")
 
@@ -199,7 +199,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let LastAccessTime(ByVal Value As Variant)
+Public Property Let LastAccessTime(ByRef Value As Variant)
     Set Me.LastAccessTime = CorDateTime.GetDateTime(Value)
 End Property
 
@@ -208,7 +208,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set LastAccessTime(ByVal Value As Variant)
+Public Property Set LastAccessTime(ByRef Value As Variant)
     If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
@@ -233,7 +233,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let LastAccessTimeUtc(ByVal Value As Variant)
+Public Property Let LastAccessTimeUtc(ByRef Value As Variant)
     Set Me.LastAccessTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
@@ -242,7 +242,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set LastAccessTimeUtc(ByVal Value As Variant)
+Public Property Set LastAccessTimeUtc(ByRef Value As Variant)
     If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
@@ -267,7 +267,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let LastWriteTime(ByVal Value As Variant)
+Public Property Let LastWriteTime(ByRef Value As Variant)
     Set LastWriteTime = CorDateTime.GetDateTime(Value)
 End Property
 
@@ -276,7 +276,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set LastWriteTime(ByVal Value As Variant)
+Public Property Set LastWriteTime(ByRef Value As Variant)
     If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastWriteTime")
     
@@ -301,7 +301,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Let LastWriteTimeUtc(ByVal Value As Variant)
+Public Property Let LastWriteTimeUtc(ByRef Value As Variant)
     Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value)
 End Property
 
@@ -310,7 +310,7 @@ End Property
 '
 ' @param Value A Date or CorDateTime object of the new time.
 '
-Public Property Set LastWriteTimeUtc(ByVal Value As Variant)
+Public Property Set LastWriteTimeUtc(ByRef Value As Variant)
     If Not TypeOf Value Is CorDateTime Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "LastAccessTime")
     
@@ -600,11 +600,11 @@ Private Property Let FileSystemInfo_Attributes(ByVal Value As FileAttributes)
     Attributes = Value
 End Property
 
-Private Property Set FileSystemInfo_CreationTime(ByVal Value As Variant)
+Private Property Set FileSystemInfo_CreationTime(ByRef Value As Variant)
     Set CreationTime = Value
 End Property
 
-Private Property Let FileSystemInfo_CreationTime(ByVal Value As Variant)
+Private Property Let FileSystemInfo_CreationTime(ByRef Value As Variant)
     CreationTime = Value
 End Property
 
@@ -612,11 +612,11 @@ Private Property Get FileSystemInfo_CreationTime() As Variant
     Set FileSystemInfo_CreationTime = CreationTime
 End Property
 
-Private Property Set FileSystemInfo_CreationTimeUtc(ByVal Value As Variant)
+Private Property Set FileSystemInfo_CreationTimeUtc(ByRef Value As Variant)
     Set CreationTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_CreationTimeUtc(ByVal Value As Variant)
+Private Property Let FileSystemInfo_CreationTimeUtc(ByRef Value As Variant)
     CreationTimeUtc = Value
 End Property
 
@@ -648,7 +648,7 @@ Private Function FileSystemInfo_GetHashCode() As Long
     FileSystemInfo_GetHashCode = GetHashCode
 End Function
 
-Private Property Set FileSystemInfo_LastAccessTime(ByVal Value As Variant)
+Private Property Set FileSystemInfo_LastAccessTime(ByRef Value As Variant)
     Set LastAccessTime = Value
 End Property
 
@@ -656,15 +656,15 @@ Private Property Get FileSystemInfo_LastAccessTime() As Variant
     Set FileSystemInfo_LastAccessTime = LastAccessTime
 End Property
 
-Private Property Let FileSystemInfo_LastAccessTime(ByVal Value As Variant)
+Private Property Let FileSystemInfo_LastAccessTime(ByRef Value As Variant)
     LastAccessTime = Value
 End Property
 
-Private Property Set FileSystemInfo_LastAccessTimeUtc(ByVal Value As Variant)
+Private Property Set FileSystemInfo_LastAccessTimeUtc(ByRef Value As Variant)
     Set LastAccessTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_LastAccessTimeUtc(ByVal Value As Variant)
+Private Property Let FileSystemInfo_LastAccessTimeUtc(ByRef Value As Variant)
     LastAccessTimeUtc = Value
 End Property
 
@@ -672,11 +672,11 @@ Private Property Get FileSystemInfo_LastAccessTimeUtc() As Variant
     Set FileSystemInfo_LastAccessTimeUtc = LastAccessTimeUtc
 End Property
 
-Private Property Set FileSystemInfo_LastWriteTime(ByVal Value As Variant)
+Private Property Set FileSystemInfo_LastWriteTime(ByRef Value As Variant)
     Set LastWriteTime = Value
 End Property
 
-Private Property Let FileSystemInfo_LastWriteTime(ByVal Value As Variant)
+Private Property Let FileSystemInfo_LastWriteTime(ByRef Value As Variant)
     LastWriteTime = Value
 End Property
 
@@ -684,11 +684,11 @@ Private Property Get FileSystemInfo_LastWriteTime() As Variant
     Set FileSystemInfo_LastWriteTime = LastWriteTime
 End Property
 
-Private Property Set FileSystemInfo_LastWriteTimeUtc(ByVal Value As Variant)
+Private Property Set FileSystemInfo_LastWriteTimeUtc(ByRef Value As Variant)
     Set LastWriteTimeUtc = Value
 End Property
 
-Private Property Let FileSystemInfo_LastWriteTimeUtc(ByVal Value As Variant)
+Private Property Let FileSystemInfo_LastWriteTimeUtc(ByRef Value As Variant)
     LastWriteTimeUtc = Value
 End Property
 

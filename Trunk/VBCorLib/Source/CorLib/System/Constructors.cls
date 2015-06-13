@@ -792,9 +792,9 @@ End Function
 ' will be verified at that time. Portions of the object that doesn't directly interact
 ' with the file will not verify the existence of the file.
 '
-Public Function NewFileInfo(ByVal FileName As String) As FileInfo
+Public Function NewFileInfo(ByRef FileName As String) As FileInfo
     Set NewFileInfo = New FileInfo
-    Call NewFileInfo.Init(FileName)
+    NewFileInfo.Init FileName
 End Function
 
 ''
@@ -808,7 +808,7 @@ End Function
 '
 Public Function NewBinaryWriter(ByVal Stream As Stream, Optional ByVal Encoding As Encoding) As BinaryWriter
     Set NewBinaryWriter = New BinaryWriter
-    Call NewBinaryWriter.Init(Stream, Encoding)
+    NewBinaryWriter.Init Stream, Encoding
 End Function
 
 ''
