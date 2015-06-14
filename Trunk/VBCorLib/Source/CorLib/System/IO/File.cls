@@ -84,32 +84,35 @@ End Sub
 ' Copies a file.
 '
 ' @param SourceFileName The file to be copied.
-' @param DestinationFileName The location and name of the copied file.
+' @param DestFileName The location and name of the copied file.
 ' @param OverWrite Indicates if the file already exists it should be overwritten.
 '
-Public Sub Copy(ByVal SourceFileName As String, ByVal DestinationFileName As String, Optional ByVal OverWrite As Boolean = False)
+Public Sub Copy(ByRef SourceFileName As String, ByRef DestFileName As String, Optional ByVal OverWrite As Boolean = False)
     If Len(SourceFileName) = 0 Then _
         Error.Argument Argument_EmptyFileName, "SourceFileName"
-    If Len(DestinationFileName) = 0 Then _
-        Error.Argument Argument_EmptyFileName, "DestinationFileName"
+    If Len(DestFileName) = 0 Then _
+        Error.Argument Argument_EmptyFileName, "DestFileName"
     
-    SourceFileName = Path.GetFullPath(SourceFileName)
-    DestinationFileName = Path.GetFullPath(DestinationFileName)
+    Dim SourceFullName  As String
+    Dim DestFullName    As String
     
-    If CorString.Equals(SourceFileName, DestinationFileName, OrdinalIgnoreCase) Then
+    SourceFullName = Path.GetFullPath(SourceFileName)
+    DestFullName = Path.GetFullPath(DestFileName)
+    
+    If CorString.Equals(SourceFullName, DestFullName, OrdinalIgnoreCase) Then
         Exit Sub
     End If
     
-    If Api.CopyFile(SourceFileName, DestinationFileName, Not OverWrite) = BOOL_FALSE Then
+    If Not CBool(CopyFileW(SourceFullName, DestFullName, Not OverWrite)) Then
         Dim DllError As Long
         DllError = Err.LastDllError
         If DllError <> ERROR_FILE_EXISTS Then
-            If Not File.Exists(SourceFileName) Then _
+            If Not File.Exists(SourceFullName) Then _
                 IOError.WinIOError ERROR_FILE_NOT_FOUND, SourceFileName
-            If Directory.Exists(DestinationFileName) Then _
-                Error.IO IO_AlreadyExists_Name
+            If Directory.Exists(DestFullName) Then _
+                Throw Cor.NewIOException(Environment.GetResourceString(Arg_FileIsDirectory_Name, DestFileName))
         End If
-        IOError.WinIOError DllError, SourceFileName
+        IOError.WinIOError DllError, DestFileName
     End If
 End Sub
 

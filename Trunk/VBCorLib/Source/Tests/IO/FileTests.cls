@@ -51,7 +51,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "c:\<\File.txt"
             
         Case "Copy_WithInvalidFileName_ThrowsArgumentException"
-            Test.Use "c:\file.txt", "", "DestinationFileName"
+            Test.Use "c:\file.txt", "", "DestFileName"
             Test.Use "", "c:\file.txt", "SourceFileName"
             Test.Use "    ", "c:\file.txt", ""
             Test.Use "c:\file.txt", "    ", ""
