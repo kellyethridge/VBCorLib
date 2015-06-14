@@ -125,7 +125,7 @@ End Sub
 ' @remarks The FileStream is declared as Cor.NewFileStream(Path, FileMode.Create, FileAccess.ReadWriteAccess, FileShare.None, BufferSize).
 ' @see FileStream
 '
-Public Function Create(ByVal Path As String, Optional ByVal BufferSize As Long = 4096) As FileStream
+Public Function Create(ByRef Path As String, Optional ByVal BufferSize As Long = 4096) As FileStream
     Set Create = Cor.NewFileStream(Path, FileMode.Create, FileAccess.ReadWriteAccess, FileShare.None, BufferSize)
 End Function
 
@@ -137,7 +137,7 @@ End Function
 ' @remarks The StreamWriter is declared as Cor.NewStreamWriter(Path).
 ' @see StreamWriter
 '
-Public Function CreateText(ByVal Path As String) As StreamWriter
+Public Function CreateText(ByRef Path As String) As StreamWriter
     Set CreateText = Cor.NewStreamWriter(Path)
 End Function
 
@@ -262,11 +262,11 @@ End Function
 ''
 ' Returns the last time the file was written to in UTC time.
 '
-' @param sPath The file to retrieve the last written time for.
+' @param Path The file to retrieve the last written time for.
 ' @return A CorDateTime object representing the last time a file was written to.
 '
-Public Function GetLastWriteTimeUtc(ByVal sPath As String) As CorDateTime
-    Set GetLastWriteTimeUtc = GetLastWriteTime(sPath).ToUniversalTime
+Public Function GetLastWriteTimeUtc(ByRef Path As String) As CorDateTime
+    Set GetLastWriteTimeUtc = GetLastWriteTime(Path).ToUniversalTime
 End Function
 
 ''
@@ -368,8 +368,8 @@ End Sub
 ' @param Path The file to set the time of creation for.
 ' @param CreationTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetCreationTime(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTime
+Public Sub SetCreationTime(ByRef Path As String, ByRef CreationTime As Variant)
+    SetCreationTimeUtc Path, CorDateTime.GetDateTime(CreationTime).ToUniversalTime
 End Sub
 
 ''
@@ -378,8 +378,10 @@ End Sub
 ' @param Path The file to set the time of creation for.
 ' @param CreationTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetCreationTimeUtc(ByVal Path As String, ByVal CreationTime As Variant)
-    InternalSetFileTime Path, CorDateTime.GetDateTime(CreationTime).ToFileTimeUtc
+Public Sub SetCreationTimeUtc(ByRef Path As String, ByRef CreationTime As Variant)
+    Dim Time As Currency
+    Time = GetFileTimeUtc(CreationTime)
+    SetFileTimeCore Path, VarPtr(Time), vbNullPtr, vbNullPtr
 End Sub
 
 ''
@@ -388,8 +390,8 @@ End Sub
 ' @param Path The file to set the last access time for.
 ' @param LastAccessTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetLastAccessTime(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTime
+Public Sub SetLastAccessTime(ByRef Path As String, ByRef LastAccessTime As Variant)
+    SetLastAccessTimeUtc Path, CorDateTime.GetDateTime(LastAccessTime).ToUniversalTime
 End Sub
 
 ''
@@ -398,8 +400,10 @@ End Sub
 ' @param Path The file to set the last access time for.
 ' @param LastAccessTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetLastAccessTimeUtc(ByVal Path As String, ByVal LastAccessTime As Variant)
-    InternalSetFileTime Path, , CorDateTime.GetDateTime(LastAccessTime).ToFileTimeUtc
+Public Sub SetLastAccessTimeUtc(ByRef Path As String, ByRef LastAccessTime As Variant)
+    Dim Time As Currency
+    Time = GetFileTimeUtc(LastAccessTime)
+    SetFileTimeCore Path, vbNullPtr, VarPtr(Time), vbNullPtr
 End Sub
 
 ''
@@ -408,8 +412,8 @@ End Sub
 ' @param sPath The file to set the last written time for.
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetLastWriteTime(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTime
+Public Sub SetLastWriteTime(ByRef Path As String, ByRef LastWriteTime As Variant)
+    SetLastWriteTimeUtc Path, CorDateTime.GetDateTime(LastWriteTime).ToUniversalTime
 End Sub
 
 ''
@@ -418,8 +422,10 @@ End Sub
 ' @param sPath The file to set the last written time for.
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
-Public Sub SetLastWriteTimeUtc(ByVal Path As String, ByVal LastWriteTime As Variant)
-    InternalSetFileTime Path, , , CorDateTime.GetDateTime(LastWriteTime).ToFileTimeUtc
+Public Sub SetLastWriteTimeUtc(ByRef Path As String, ByRef LastWriteTime As Variant)
+    Dim Time As Currency
+    Time = GetFileTimeUtc(LastWriteTime)
+    SetFileTimeCore Path, vbNullPtr, vbNullPtr, VarPtr(Time)
 End Sub
 
 ''
@@ -429,7 +435,7 @@ End Sub
 ' @param Encoding The encoding to be used in reading the file.
 ' @return A string containing the contents of the file.
 '
-Public Function ReadAllText(ByVal Path As String, Optional ByVal Encoding As Encoding) As String
+Public Function ReadAllText(ByRef Path As String, Optional ByVal Encoding As Encoding) As String
     With Cor.NewStreamReader(Path, Encoding)
         ReadAllText = .ReadToEnd
     End With
@@ -512,7 +518,7 @@ End Function
 ' @Remarks If the file does not exist, it will be created. If the file already
 ' exists, it will be overwritten.
 '
-Public Sub WriteAllText(ByRef Path As String, ByVal Contents As String, Optional ByVal Encoding As Encoding)
+Public Sub WriteAllText(ByRef Path As String, ByRef Contents As String, Optional ByVal Encoding As Encoding)
     With Cor.NewStreamWriter(Path, Encoding:=Encoding)
         .WriteValue Contents
     End With
@@ -544,7 +550,7 @@ End Sub
 ' @remarks If the file doesn't exist it will be created. If the file already
 ' exists, it will be overwritten.
 '
-Public Sub WriteAllLines(ByVal Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
+Public Sub WriteAllLines(ByRef Path As String, ByRef Contents As Variant, Optional ByVal Encoding As Encoding)
     With Cor.NewStreamWriter(Path, Encoding:=Encoding)
         Dim Line As Variant
         
@@ -592,42 +598,32 @@ Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_F
     End With
 End Function
 
-Private Sub InternalSetFileTime(ByRef Path As String, Optional ByVal CreationTime As Variant, Optional ByVal LastAccessTime As Variant, Optional ByVal LastWriteTime As Variant)
-    Dim CreationTimePtr As Long
-    Dim LastAccessTimePtr As Long
-    Dim LastWriteTimePtr As Long
-    
-    If Not IsMissing(CreationTime) Then
-        CreationTimePtr = VarPtr(CreationTime) + 8
-    End If
-    
-    If Not IsMissing(LastAccessTime) Then
-        LastAccessTimePtr = VarPtr(LastAccessTime) + 8
-    End If
-    
-    If Not IsMissing(LastWriteTime) Then
-        LastWriteTimePtr = VarPtr(LastWriteTime) + 8
-    End If
-    
+Private Function GetFileTimeUtc(ByRef Time As Variant) As Currency
+    GetFileTimeUtc = CorDateTime.GetDateTime(Time).ToFileTimeUtc
+End Function
+
+Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long, ByVal LastAccessTimePtr As Long, ByVal LastWriteTimePtr As Long)
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
         
-    Statics.Path.CheckValidPathChars Path
+    Dim FullPath As String
+    FullPath = Statics.Path.GetFullPath(Path)
     
-    Dim FileHandle As Long
-    FileHandle = Api.CreateFile(Path, FileAccess.WriteAccess, FileShare.None, 0, FileMode.OpenExisting, FILE_ATTRIBUTE_NORMAL, 0)
-    If FileHandle = INVALID_HANDLE Then _
-        IOError.WinIOError Err.LastDllError, Path
+    With SafeCreateFile(FullPath, FileAccess.WriteAccess, FileShare.None, FileMode.OpenExisting)
+        If .IsInvalid Then _
+            IOError.WinIOError Err.LastDllError, Path
         
-    If SetFileTime(FileHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr) = BOOL_FALSE Then
-        Dim e As Long
-        e = Err.LastDllError
-        CloseHandle FileHandle
-        IOError.WinIOError e, Path
-    End If
-    
-    CloseHandle FileHandle
+        If Not CBool(SetFileTime(.DangerousGetHandle, ByVal CreationTimePtr, ByVal LastAccessTimePtr, ByVal LastWriteTimePtr)) Then
+            IOError.WinIOError Err.LastDllError, Path
+        End If
+    End With
 End Sub
+
+Private Function GetFileTimePtr(ByRef Time As Variant) As Long
+    If Not IsEmpty(Time) Then
+        GetFileTimePtr = VarPtr(Time) + 8
+    End If
+End Function
 
 Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA)
     If Len(Path) = 0 Then _
