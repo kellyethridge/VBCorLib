@@ -343,9 +343,7 @@ Private Sub WriteFormatToStream(ByRef Format As Variant, ByRef Args() As Variant
 End Sub
 
 Private Sub WriteValueToStream(ByRef Value As Variant)
-    Dim Output As String
-    Output = Convert.ToString(Value)
-    WriteCore Output
+    WriteCore Object.ToString(Value)
 End Sub
 
 Private Sub WriteCore(ByRef Value As String)

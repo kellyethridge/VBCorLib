@@ -58,19 +58,6 @@ Private mDirectorySeparatorChar      As Integer
 Private mAltDirectorySeparatorChar   As Integer
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    mDirectorySeparatorChar = Path.DirectorySeparatorChar
-    mAltDirectorySeparatorChar = Path.AltDirectorySeparatorChar
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   API
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 ''
 ' Creates a directory and any subdirectories in the specified path.
 '
@@ -506,6 +493,15 @@ Public Sub SetLastWriteTimeUtc(ByRef Path As String, ByRef LastWriteTime As Vari
     Dim Time As Currency
     Time = GetFileTimeUtc(LastWriteTime)
     SetFileTimeCore Path, vbNullPtr, vbNullPtr, VarPtr(Time)
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mDirectorySeparatorChar = Path.DirectorySeparatorChar
+    mAltDirectorySeparatorChar = Path.AltDirectorySeparatorChar
 End Sub
 
 
