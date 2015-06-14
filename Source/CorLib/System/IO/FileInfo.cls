@@ -385,7 +385,7 @@ End Function
 ' @param OverWrite Permission to overwrite an existing file.
 ' @remarks The destination must be on the same volume as this file.
 '
-Public Function CopyTo(ByVal DestFileName As String, Optional ByVal OverWrite As Boolean = False) As FileInfo
+Public Function CopyTo(ByRef DestFileName As String, Optional ByVal OverWrite As Boolean = False) As FileInfo
     File.Copy mFullName, DestFileName, OverWrite
     Set CopyTo = Cor.NewFileInfo(DestFileName)
 End Function
