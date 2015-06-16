@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Version
+' Module: Version
 '
 
 ''
@@ -43,17 +46,16 @@ Implements IObject
 Implements ICloneable
 Implements IComparable
 
-Private Const PROP_MAJOR            As String = "Major"
-Private Const PROP_MINOR            As String = "Minor"
-Private Const PROP_BUILD            As String = "Build"
-Private Const PROP_REVISION         As String = "Revision"
+Private Const PropMajor         As String = "Major"
+Private Const PropMinor         As String = "Minor"
+Private Const PropBuild         As String = "Build"
+Private Const PropRevision      As String = "Revision"
 
-Private Const UNUSED                As Long = -1
-Private Const DEF_MAJOR             As Long = 0
-Private Const DEF_MINOR             As Long = 0
-Private Const DEF_BUILD             As Long = UNUSED
-Private Const DEF_REVISION          As Long = UNUSED
-
+Private Const UnsetComponent    As Long = -1
+Private Const DefaultMajor      As Long = 0
+Private Const DefaultMinor      As Long = 0
+Private Const DefaultBuild      As Long = UnsetComponent
+Private Const DefaultRevision   As Long = UnsetComponent
 
 Private mMajor      As Long
 Private mMinor      As Long
@@ -130,7 +132,7 @@ End Property
 '
 Public Function Clone() As Version
     Set Clone = New Version
-    Call Clone.CloneHelper(mMajor, mMinor, mBuild, mRevision)
+    Clone.InitClone mMajor, mMinor, mBuild, mRevision
 End Function
 
 ''
@@ -143,52 +145,57 @@ End Function
 ' Zero indicates this instance is equal to the value.
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Select Case VarType(Value)
-        Case vbObject
-            If Value Is Nothing Then: CompareTo = 1: Exit Function
-            If Not TypeOf Value Is Version Then Throw Cor.NewArgumentException("Value must of type Version.", "value")
+    If Not IsObject(Value) Then _
+        Error.Argument Argument_VersionRequired, "Value"
+        
+    If Value Is Nothing Then
+        CompareTo = 1
+        Exit Function
+    End If
+    
+    If Not TypeOf Value Is Version Then _
+        Error.Argument Argument_VersionRequired, "Value"
 
-            Dim v As Version
-            Set v = Value
-            If Not EqualFields(mMajor, v.Major, CompareTo) Then Exit Function
-            If Not EqualFields(mMinor, v.Minor, CompareTo) Then Exit Function
-            If Not EqualFields(mBuild, v.Build, CompareTo) Then Exit Function
-            If Not EqualFields(mRevision, v.Revision, CompareTo) Then Exit Function
-
-        Case vbNull, vbEmpty, vbError
-            CompareTo = 1
-        Case Else
-            Throw Cor.NewArgumentException("Value must of type Version.", "value")
-    End Select
+    Dim Other As Version
+    Set Other = Value
+    
+    If Not EqualFields(mMajor, Other.Major, CompareTo) Then Exit Function
+    If Not EqualFields(mMinor, Other.Minor, CompareTo) Then Exit Function
+    If Not EqualFields(mBuild, Other.Build, CompareTo) Then Exit Function
+    If Not EqualFields(mRevision, Other.Revision, CompareTo) Then Exit Function
 End Function
 
 ''
 ' Returns a string representation of this object instance.
 '
-' @param vFieldCount The number of fields to be included in the result string.
+' @param FieldCount The number of fields to be included in the result string.
 ' @return String representing this instance in the form of Major.Minor[.Build[.Revision]]
 '
-Public Function ToString(Optional ByRef vFieldCount As Variant) As String
-    Dim Ret As String
-    Dim FieldCount As Long
-    Dim maxfield As Long
+Public Function ToString(Optional ByRef FieldCount As Variant) As String
+    Dim Count       As Long
+    Dim MaxCount    As Long
     
-    If IsMissing(vFieldCount) Then
-        FieldCount = -1
-    Else
-        FieldCount = vFieldCount
-        maxfield = GetMaxFieldCount
-        If FieldCount < 0 Or FieldCount > maxfield Then _
-            Throw Cor.NewArgumentOutOfRangeException("FieldCount", FieldCount, Environment.GetResourceString(ArgumentOutOfRange_VersionFieldCount, maxfield))
+    MaxCount = GetMaxFieldCount
+    Count = OptionalLong(FieldCount, MaxCount)
+    
+    If Count < 0 Or Count > MaxCount Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(ArgumentOutOfRange_Bounds_Lower_Upper, 0, MaxCount), "FieldCount")
+    
+    If Count >= 1 Then
+        ToString = mMajor
     End If
     
-    If FieldCount <> 0 Then Ret = mMajor
-    If FieldCount < 0 Or FieldCount > 1 Then Ret = Ret & "." & mMinor
-    If mBuild >= 0 And (FieldCount < 0 Or FieldCount > 2) Then
-        Ret = Ret & "." & mBuild
-        If mRevision >= 0 And (FieldCount < 0 Or FieldCount > 3) Then Ret = Ret & "." & mRevision
+    If Count >= 2 Then
+        ToString = ToString & "." & mMinor
     End If
-    ToString = Ret
+    
+    If Count >= 3 Then
+        ToString = ToString & "." & mBuild
+    End If
+    
+    If Count = 4 Then
+        ToString = ToString & "." & mRevision
+    End If
 End Function
 
 ''
@@ -200,10 +207,12 @@ End Function
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
     If IsObject(Value) Then
-        If Value Is Nothing Then Exit Function
+        If Value Is Nothing Then
+            Exit Function
+        End If
         
         If TypeOf Value Is Version Then
-            Equals = (CompareTo(Value) = 0)
+            Equals = EqualTo(Value)
         End If
     End If
 End Function
@@ -222,60 +231,62 @@ Public Function GetHashCode() As Long
     GetHashCode = Ret Or (mRevision And &HFF&)
 End Function
 
-Public Function EqualTo(ByRef Value As Version) As Boolean
-    If Value Is Nothing Then Exit Function
+Public Function EqualTo(ByVal Value As Version) As Boolean
     EqualTo = (CompareTo(Value) = 0)
 End Function
 
-Public Function LessThan(ByRef Value As Version) As Boolean
-    If Value Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Value")
-    
+Public Function LessThan(ByVal Value As Version) As Boolean
     LessThan = (CompareTo(Value) < 0)
 End Function
 
-Public Function LessThanOrEqualTo(ByRef Value As Version) As Boolean
-    If Value Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Value")
-    
+Public Function LessThanOrEqualTo(ByVal Value As Version) As Boolean
     LessThanOrEqualTo = (CompareTo(Value) <= 0)
 End Function
 
-Public Function GreaterThan(ByRef Value As Version) As Boolean
+Public Function GreaterThan(ByVal Value As Version) As Boolean
     GreaterThan = Not LessThanOrEqualTo(Value)
 End Function
 
-Public Function GreaterThanOrEqualTo(ByRef Value As Version) As Boolean
+Public Function GreaterThanOrEqualTo(ByVal Value As Version) As Boolean
     GreaterThanOrEqualTo = Not LessThan(Value)
 End Function
 
-Public Function NotEqualTo(ByRef Value As Version) As Boolean
+Public Function NotEqualTo(ByVal Value As Version) As Boolean
     NotEqualTo = Not EqualTo(Value)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Major As Long, ByVal Minor As Long, ByRef vBuild As Variant, ByRef vRevision As Variant)
-    If Major < 0 Or Minor < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(IIf(Major < 0, "Major", "Minor"), Message:="Version's parameters must be equal to or greater than zero.")
-    
-    If Not IsMissing(vBuild) Then
-        mBuild = vBuild
-        If mBuild < 0 Then Throw Cor.NewArgumentOutOfRangeException("Build", Message:="Version's parameters must be equal to or greater than zero.")
-    End If
-    If Not IsMissing(vRevision) Then
-        If mBuild < 0 Then Throw Cor.NewArgumentException("Cannot include a revision without a build value.", "Revision")
-        mRevision = vRevision
-        If mRevision < 0 Then Throw Cor.NewArgumentOutOfRangeException("Revision", Message:="Version's parameters must be equal to or greater than zero.")
-    End If
+Private Sub Class_InitProperties()
+    mBuild = DefaultBuild
+    mRevision = DefaultRevision
+End Sub
+
+Friend Sub Init(ByVal Major As Long, ByVal Minor As Long, ByRef Build As Variant, ByRef Revision As Variant)
+    If Major < 0 Then _
+        Error.ArgumentOutOfRange "Major", ArgumentOutOfRange_NeedNonNegNum
+    If Minor < 0 Then _
+        Error.ArgumentOutOfRange "Minor", ArgumentOutOfRange_NeedNonNegNum
     
     mMajor = Major
     mMinor = Minor
+    
+    If TryOptionalLong(Build, mBuild) And mBuild < 0 Then _
+        Error.ArgumentOutOfRange "Build", ArgumentOutOfRange_NeedNonNegNum
+    
+    If TryOptionalLong(Revision, mRevision) Then
+        If mBuild = UnsetComponent Then _
+            Error.Argument Argument_ParamRequired, "Build"
+        
+        If mRevision < 0 Then
+            Error.ArgumentOutOfRange "Revision", ArgumentOutOfRange_NeedNonNegNum
+        End If
+    End If
 End Sub
 
-Friend Sub CloneHelper(ByVal Major As Long, ByVal Minor As Long, ByVal Build As Long, ByVal Revision As Long)
+Friend Sub InitClone(ByVal Major As Long, ByVal Minor As Long, ByVal Build As Long, ByVal Revision As Long)
     mMajor = Major
     mMinor = Minor
     mBuild = Build
@@ -307,59 +318,54 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetMaxFieldCount() As Long
-    If mBuild < 0 Then
+    If mBuild = UnsetComponent Then
         GetMaxFieldCount = 2
-    ElseIf mRevision < 0 Then
+    ElseIf mRevision = UnsetComponent Then
         GetMaxFieldCount = 3
     Else
         GetMaxFieldCount = 4
     End If
 End Function
 
-Private Function EqualFields(ByVal MyField As Long, ByVal TheirField As Long, ByRef RetVal As Long) As Boolean
-    If MyField < TheirField Then
-        RetVal = -1
-    ElseIf MyField > TheirField Then
-        RetVal = 1
+Private Function EqualFields(ByVal MyField As Long, ByVal OtherField As Long, ByRef Result As Long) As Boolean
+    If MyField < OtherField Then
+        Result = -1
+    ElseIf MyField > OtherField Then
+        Result = 1
     Else
-        RetVal = 0
+        Result = 0
         EqualFields = True
     End If
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_InitProperties()
-    mBuild = UNUSED
-    mRevision = UNUSED
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mMajor = .ReadProperty(PROP_MAJOR, DEF_MAJOR)
-        mMinor = .ReadProperty(PROP_MINOR, DEF_MINOR)
-        mBuild = .ReadProperty(PROP_BUILD, DEF_BUILD)
-        mRevision = .ReadProperty(PROP_REVISION, DEF_REVISION)
+        mMajor = .ReadProperty(PropMajor, DefaultMajor)
+        mMinor = .ReadProperty(PropMinor, DefaultMinor)
+        mBuild = .ReadProperty(PropBuild, DefaultBuild)
+        mRevision = .ReadProperty(PropRevision, DefaultRevision)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_MAJOR, mMajor)
-        Call .WriteProperty(PROP_MINOR, mMinor)
-        Call .WriteProperty(PROP_BUILD, mBuild)
-        Call .WriteProperty(PROP_REVISION, mRevision)
+        .WriteProperty PropMajor, mMajor
+        .WriteProperty PropMinor, mMinor
+        .WriteProperty PropBuild, mBuild
+        .WriteProperty PropRevision, mRevision
     End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -375,7 +381,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -383,7 +389,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IComparable Interface
+'   IComparable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparable_CompareTo(Value As Variant) As Long
     IComparable_CompareTo = CompareTo(Value)
