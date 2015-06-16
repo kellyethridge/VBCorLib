@@ -43,6 +43,26 @@ Public Function IfObject(ByVal ObjA As Object, ByVal ObjB As Object) As Object
     End If
 End Function
 
+Public Function CLong(ByRef Value As Variant) As Long
+    Select Case VarType(Value)
+        Case vbLong, vbInteger, vbByte
+            CLong = Value
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "Long"))
+    End Select
+End Function
+
+Public Function TryOptionalLong(ByRef Value As Variant, ByRef Result As Long) As Boolean
+    Select Case VarType(Value)
+        Case corMissing
+        Case vbLong, vbInteger, vbByte
+            Result = Value
+            TryOptionalLong = True
+        Case Else
+            Throw Cor.NewArgumentException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "Long"))
+    End Select
+End Function
+
 ''
 ' Returns an optional value or a default value if the optional value is missing.
 '
