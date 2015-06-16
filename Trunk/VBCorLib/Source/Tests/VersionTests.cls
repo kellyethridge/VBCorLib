@@ -68,6 +68,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 3, "1.2.3"
             Test.Use 4, "1.2.3.4"
             
+        Case "TryParse_WithValues_ReturnsExpected"
+            Test.Use "1.2", Cor.NewVersion(1, 2)
+            Test.Use "1.2.3", Cor.NewVersion(1, 2, 3)
+            Test.Use "1.2.3.4", Cor.NewVersion(1, 2, 3, 4)
+        
+        Case "Parse_WithInvalidComponentCount_ThrowsArgumentException"
+            Test.Use "1"
+            Test.Use "1.2.3.4.5"
+            
     End Select
 End Sub
 
@@ -262,10 +271,19 @@ Public Sub Serialization_WhenCalled_SerializesInstance()
     Assert.That Actual, Equals(SUT)
 End Sub
 
-'Public Sub TestParse()
-'    Dim v As Version
-'
-'    Set v = Version.Parse("1.2.3.4")
-'    Assert.IsTrue v.Equals(newversion(1, 2, 3, 4)), "Versions should be equal."
-'End Sub
+Public Sub TryParse_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Version)
+    Dim Actual As Version
+    
+    Assert.That Version.TryParse(s, Actual), Iz.True
+    
+    Assert.That Actual, Equals(Expected)
+End Sub
+
+Public Sub Parse_WithInvalidComponentCount_ThrowsArgumentException(ByVal s As String)
+    On Error Resume Next
+    
+    Version.Parse s
+    
+    AssertArgumentException Err
+End Sub
 

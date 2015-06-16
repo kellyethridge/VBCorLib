@@ -70,6 +70,7 @@ Public Enum ResourceStringKey
     Arg_MustBeOfType = 233
     Arg_RankMultiDimNotSupported = 234
     Arg_FileIsDirectory_Name = 235
+    Arg_VersionString = 236
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800

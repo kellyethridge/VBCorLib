@@ -6,11 +6,11 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "VersionStatic"
+Attribute VB_Name = "VersionParser"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = True
+Attribute VB_Exposed = False
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -32,32 +32,56 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: VersionStatic
-'
-
-''
-' Provides static methods to help create Version objects.
-'
-' @see Version
+' Module: VersionParser
 '
 Option Explicit
 
-Private mParser As New VersionParser
+Private mException      As Exception
+Private mComponents()   As String
 
-''
-' Parses a string in the format of 0.0[.0][.0]
-'
-' @param s The string to be parsed.
-' @return A version defined from the string.
-' @remarks Atleast 2 of the version numbers must be supplied, and
-' all version numbers must be non-negative.
-'
-Public Function Parse(ByRef s As String) As Version
-    If Not mParser.TryParse(s, Parse) Then
-        mParser.ThrowError
+
+Friend Property Get HasError() As Boolean
+    HasError = Not mException Is Nothing
+End Property
+
+Friend Sub ThrowError()
+    If HasError Then
+        Throw mException
     End If
+End Sub
+
+Friend Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
+    Init s
+    If Not HasValidComponentCount Then
+        Exit Function
+    End If
+    
+    Select Case UBound(mComponents)
+        Case 1
+            Set Result = Cor.NewVersion(mComponents(0), mComponents(1))
+        Case 2
+            Set Result = Cor.NewVersion(mComponents(0), mComponents(1), CLng(mComponents(2)))
+        Case 3
+            Set Result = Cor.NewVersion(mComponents(0), mComponents(1), CLng(mComponents(2)), CLng(mComponents(3)))
+    End Select
+    
+    TryParse = True
 End Function
 
-Public Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
-    TryParse = mParser.TryParse(s, Result)
+Private Sub Init(ByRef s As String)
+    Set mException = Nothing
+    mComponents = Split(s, ".")
+End Sub
+
+Private Function HasValidComponentCount() As Boolean
+    Select Case UBound(mComponents)
+        Case Is < 1, Is > 3
+            Set mException = Cor.NewArgumentException(Environment.GetResourceString(Arg_VersionString))
+        Case Else
+            HasValidComponentCount = True
+    End Select
+End Function
+
+Private Function TryParseComponent(ByVal Index As Long, ByRef Result As Long) As Boolean
+    
 End Function

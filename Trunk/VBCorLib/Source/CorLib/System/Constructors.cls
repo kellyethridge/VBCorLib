@@ -424,7 +424,7 @@ End Function
 '
 Public Function NewVersion(ByVal Major As Long, ByVal Minor As Long, Optional ByRef Build As Variant, Optional ByRef Revision As Variant) As Version
     Set NewVersion = New Version
-    Call NewVersion.Init(Major, Minor, Build, Revision)
+    NewVersion.Init Major, Minor, Build, Revision
 End Function
 
 ''
@@ -440,7 +440,7 @@ End Function
 '
 Public Function NewTimeSpan(Optional ByVal Days As Long, Optional ByVal Hours As Long, Optional ByVal Minutes As Long, Optional ByVal Seconds As Long, Optional ByVal Milliseconds As Long) As TimeSpan
     Set NewTimeSpan = New TimeSpan
-    Call NewTimeSpan.Init(Days, Hours, Minutes, Seconds, Milliseconds)
+    NewTimeSpan.Init Days, Hours, Minutes, Seconds, Milliseconds
 End Function
 
 ''
