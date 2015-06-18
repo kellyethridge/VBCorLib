@@ -156,13 +156,13 @@ Public Function CompareTo(ByRef Value As Variant) As Long
     If Not TypeOf Value Is Version Then _
         Error.Argument Argument_VersionRequired, "Value"
 
-    Dim Other As Version
-    Set Other = Value
+    Dim other As Version
+    Set other = Value
     
-    If Not EqualFields(mMajor, Other.Major, CompareTo) Then Exit Function
-    If Not EqualFields(mMinor, Other.Minor, CompareTo) Then Exit Function
-    If Not EqualFields(mBuild, Other.Build, CompareTo) Then Exit Function
-    If Not EqualFields(mRevision, Other.Revision, CompareTo) Then Exit Function
+    If Not EqualFields(mMajor, other.Major, CompareTo) Then Exit Function
+    If Not EqualFields(mMinor, other.Minor, CompareTo) Then Exit Function
+    If Not EqualFields(mBuild, other.Build, CompareTo) Then Exit Function
+    If Not EqualFields(mRevision, other.Revision, CompareTo) Then Exit Function
 End Function
 
 ''
@@ -291,29 +291,6 @@ Friend Sub InitClone(ByVal Major As Long, ByVal Minor As Long, ByVal Build As Lo
     mMinor = Minor
     mBuild = Build
     mRevision = Revision
-End Sub
-
-Friend Sub Parse(ByRef s As String)
-    Dim Parts() As String
-    Dim ub As Long
-    
-    Parts = Split(s, ".")
-    ub = UBound(Parts)
-    If ub < 1 Or ub > 3 Then _
-        Throw Cor.NewArgumentException("String must contain 2 to 4 fields.")
-    mMajor = Parts(0)
-    mMinor = Parts(1)
-    If mMajor < 0 Or mMinor < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(IIf(mMajor < 0, "Major", "Minor"), Message:="Version's parameters must be equal to or greater than zero.")
-    
-    If ub > 1 Then
-        mBuild = Parts(2)
-        If mBuild < 0 Then Throw Cor.NewArgumentOutOfRangeException("Build", Message:="Version's parameters must be equal to or greater than zero.")
-        If ub > 2 Then
-            mRevision = Parts(3)
-            If mRevision < 0 Then Throw Cor.NewArgumentOutOfRangeException("Revisiont", Message:="Version's parameters must be equal to or greater than zero.")
-        End If
-    End If
 End Sub
 
 

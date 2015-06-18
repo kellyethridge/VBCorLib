@@ -36,18 +36,17 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
+Private Const MajorComponent As Long = 0
+Private Const MinorComponent As Long = 1
+Private Const BuildComponent As Long = 2
+Private Const RevisionComponent As Long = 3
+
 Private mException      As Exception
 Private mComponents()   As String
 
 
-Friend Property Get HasError() As Boolean
-    HasError = Not mException Is Nothing
-End Property
-
 Friend Sub ThrowError()
-    If HasError Then
-        Throw mException
-    End If
+    Throw mException
 End Sub
 
 Friend Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
@@ -56,13 +55,31 @@ Friend Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
         Exit Function
     End If
     
+    Dim Major As Long
+    Dim Minor As Long
+    Dim Build As Long
+    Dim Revision As Long
+    
+    If Not TryParseComponent(MajorComponent, Major) Then
+        Exit Function
+    End If
+    If Not TryParseComponent(MinorComponent, Minor) Then
+        Exit Function
+    End If
+    
     Select Case UBound(mComponents)
         Case 1
-            Set Result = Cor.NewVersion(mComponents(0), mComponents(1))
+            Set Result = Cor.NewVersion(Major, Minor)
         Case 2
-            Set Result = Cor.NewVersion(mComponents(0), mComponents(1), CLng(mComponents(2)))
+            If Not TryParseComponent(BuildComponent, Build) Then
+                Exit Function
+            End If
+            Set Result = Cor.NewVersion(Major, Minor, Build)
         Case 3
-            Set Result = Cor.NewVersion(mComponents(0), mComponents(1), CLng(mComponents(2)), CLng(mComponents(3)))
+            If Not (TryParseComponent(BuildComponent, Build) And TryParseComponent(RevisionComponent, Revision)) Then
+                Exit Function
+            End If
+            Set Result = Cor.NewVersion(Major, Minor, Build, Revision)
     End Select
     
     TryParse = True
@@ -82,6 +99,29 @@ Private Function HasValidComponentCount() As Boolean
     End Select
 End Function
 
-Private Function TryParseComponent(ByVal Index As Long, ByRef Result As Long) As Boolean
+Private Function TryParseComponent(ByVal Component As Long, ByRef Result As Long) As Boolean
+    On Error GoTo Catch
     
+    Result = CLng(mComponents(Component))
+    TryParseComponent = True
+    Exit Function
+    
+Catch:
+    Select Case Err.Number
+        Case corTypeMismatch
+            Set mException = Cor.NewFormatException(Environment.GetResourceString(Arg_VersionString))
+        Case corOverflow
+            Set mException = New OverflowException
+        Case Else
+            Set mException = Cor.NewException(Err.Description, Err.Number)
+    End Select
 End Function
+
+
+
+
+
+
+
+
+
