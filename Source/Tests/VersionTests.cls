@@ -74,8 +74,21 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1.2.3.4", Cor.NewVersion(1, 2, 3, 4)
         
         Case "Parse_WithInvalidComponentCount_ThrowsArgumentException"
+            Test.Use ""
             Test.Use "1"
             Test.Use "1.2.3.4.5"
+        
+        Case "Parse_WithInvalidComponent_ThrowsFormatException"
+            Test.Use "1.a"
+            Test.Use "1.1.a"
+            Test.Use "1.1.1.a"
+            Test.Use "a.1"
+        
+        Case "Parse_WithTooLargeIntegers_ThrowsOverflowExeption"
+            Test.Use "3000000000.1.1.1"
+            Test.Use "1.3000000000.1.1"
+            Test.Use "1.1.3000000000.1"
+            Test.Use "1.1.1.3000000000"
             
     End Select
 End Sub
@@ -285,5 +298,21 @@ Public Sub Parse_WithInvalidComponentCount_ThrowsArgumentException(ByVal s As St
     Version.Parse s
     
     AssertArgumentException Err
+End Sub
+
+Public Sub Parse_WithInvalidComponent_ThrowsFormatException(ByVal s As String)
+    On Error Resume Next
+    
+    Version.Parse s
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub Parse_WithTooLargeIntegers_ThrowsOverflowExeption(ByVal s As String)
+    On Error Resume Next
+    
+    Version.Parse s
+    
+    AssertOverflowException Err
 End Sub
 
