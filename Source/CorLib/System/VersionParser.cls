@@ -92,10 +92,10 @@ End Sub
 
 Private Function HasValidComponentCount() As Boolean
     Select Case UBound(mComponents)
-        Case Is < 1, Is > 3
-            Set mException = Cor.NewArgumentException(Environment.GetResourceString(Arg_VersionString))
-        Case Else
+        Case 1 To 3
             HasValidComponentCount = True
+        Case Else
+            Set mException = Cor.NewArgumentException(Environment.GetResourceString(Arg_VersionString))
     End Select
 End Function
 
@@ -103,7 +103,13 @@ Private Function TryParseComponent(ByVal Component As Long, ByRef Result As Long
     On Error GoTo Catch
     
     Result = CLng(mComponents(Component))
-    TryParseComponent = True
+    If Result < 0 Then
+        Dim ParamName As String
+        ParamName = Choose(Component + 1, "Major", "Minor", "Build", "Revision")
+        mException = Cor.NewArgumentOutOfRangeException(ParamName, Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+    Else
+        TryParseComponent = True
+    End If
     Exit Function
     
 Catch:

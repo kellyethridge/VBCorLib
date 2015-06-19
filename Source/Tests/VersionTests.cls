@@ -89,6 +89,23 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1.3000000000.1.1"
             Test.Use "1.1.3000000000.1"
             Test.Use "1.1.1.3000000000"
+        
+        Case "TryParse_WithInvalidValues_ReturnsFalse"
+            Test.Use ""
+            Test.Use "1"
+            Test.Use "1.2.3.4.5"
+            Test.Use "1.a"
+            Test.Use "1.1.a"
+            Test.Use "1.1.1.a"
+            Test.Use "a.1"
+            Test.Use "3000000000.1.1.1"
+            Test.Use "1.3000000000.1.1"
+            Test.Use "1.1.3000000000.1"
+            Test.Use "1.1.1.3000000000"
+            Test.Use "1.1.1.-1"
+            Test.Use "1.1.-1.1"
+            Test.Use "1.-1.1.1"
+            Test.Use "-1.1.1.1"
             
     End Select
 End Sub
@@ -290,6 +307,15 @@ Public Sub TryParse_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected
     Assert.That Version.TryParse(s, Actual), Iz.True
     
     Assert.That Actual, Equals(Expected)
+End Sub
+
+Public Sub TryParse_WithInvalidValues_ReturnsFalse(ByVal s As String)
+    Dim Result As Version
+    Dim Actual As Boolean
+    
+    Actual = Version.TryParse(s, Result)
+    
+    Assert.That Actual, Iz.False
 End Sub
 
 Public Sub Parse_WithInvalidComponentCount_ThrowsArgumentException(ByVal s As String)
