@@ -122,13 +122,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use DateTimeKind.UtcKind, 13079181600000@
             
         Case "ToFileTimeUtc_WithKinds_ReturnsExpected"
-'            Test.Use DateTimeKind.LocalKind, DateTimeKind.UtcKind, False
-'            Test.Use DateTimeKind.LocalKind, DateTimeKind.UnspecifiedKind, False
-'            Test.Use DateTimeKind.UtcKind, DateTimeKind.LocalKind, False
-'            Test.Use DateTimeKind.UtcKind, DateTimeKind.UnspecifiedKind, True
-'130792068000000000
-'130791816000000000
-'130791816000000000
             Test.Use DateTimeKind.LocalKind, 13079206800000@
             Test.Use DateTimeKind.UnspecifiedKind, 13079181600000@
             Test.Use DateTimeKind.UtcKind, 13079181600000@
@@ -142,6 +135,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use DateTimeKind.UtcKind
             Test.Use DateTimeKind.UnspecifiedKind
             Test.Use DateTimeKind.LocalKind
+        
+        Case "ToString_WithStandardFormat_ReturnsExpected"
+            Test.Use "d", "en-US", "6/15/2009"
+            Test.Use "d", "fr-FR", "15/06/2009"
+            Test.Use "d", "ja-JP", "2009/06/15"
+            
         
     End Select
 End Sub
@@ -464,32 +463,6 @@ errTrap:
     AssertArgumentException Err, "Value"
 End Sub
 
-' This test is subject to the current timezone. Modify this test
-' as necessary to your timezone.
-Public Sub TestToFileTime()
-    AssertPacificTimeZone
-    
-    Dim dt As CorDateTime
-    
-    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
-    Assert.AreEqual 12731000766006@, dt.ToFileTime
-    
-    Set dt = NewDateTime(2004, 1, 6, 6, 6, 6, 6)
-    Assert.AreEqual 12717871566006@, dt.ToFileTime
-End Sub
-
-' This test is subject to the current timezone. Modify this test
-' as necessary to your timezone.
-Public Sub TestToFileTimeUtc()
-    Dim dt As CorDateTime
-    
-    Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
-    Assert.AreEqual 12730975566006@, dt.ToFileTimeUtc
-    
-    Set dt = NewDateTime(2004, 1, 6, 6, 6, 6, 6)
-    Assert.AreEqual 12717842766006@, dt.ToFileTimeUtc
-End Sub
-
 Public Sub Now_WhenCalled_ReturnsLocalTime()
     Dim dt As CorDateTime
 
@@ -666,4 +639,33 @@ Public Sub TestMaxDateToString()
     Set dt = NewDate(#12/31/9999 11:59:59 PM#)
     Assert.AreEqual "12/31/9999 11:59:59 PM", dt.ToString("MM/dd/yyyy hh:mm:ss tt")
 End Sub
+
+Public Sub ToString_WithStandardFormat_ReturnsExpected(ByVal Format As String, ByVal CultureName As String, ByVal Expected As String)
+    Dim Culture As CultureInfo
+    Set Culture = NewCultureInfo(CultureName, False)
+    Dim Actual As String
+    
+    Actual = NewDateTime(2009, 6, 15, 13, 45, 30).ToString(Format, Culture)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
