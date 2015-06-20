@@ -127,7 +127,7 @@ Public Function ToLocalTime(ByRef Time As Variant) As CorDateTime
     If d.Kind = LocalKind Then
         Set ToLocalTime = d
     Else
-        Set ToLocalTime = d.Add(GetUtcOffset(d))
+        Set ToLocalTime = CorDateTime.SpecifyKind(d.Add(GetUtcOffset(d)), LocalKind)
     End If
 End Function
 
