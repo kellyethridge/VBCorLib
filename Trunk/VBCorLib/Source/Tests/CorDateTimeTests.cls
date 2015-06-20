@@ -117,23 +117,28 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, 13, "Month"
             
         Case "ToFileTime_WithKinds_ReturnsExpected"
-            Test.Use DateTimeKind.LocalKind, DateTimeKind.UtcKind, False
-            Test.Use DateTimeKind.LocalKind, DateTimeKind.UnspecifiedKind, True
-            Test.Use DateTimeKind.UtcKind, DateTimeKind.UtcKind, True
-            Test.Use DateTimeKind.UtcKind, DateTimeKind.UnspecifiedKind, False
+            Test.Use DateTimeKind.UnspecifiedKind, 13079206800000@
+            Test.Use DateTimeKind.LocalKind, 13079206800000@
+            Test.Use DateTimeKind.UtcKind, 13079181600000@
             
         Case "ToFileTimeUtc_WithKinds_ReturnsExpected"
-            Test.Use DateTimeKind.LocalKind, DateTimeKind.UtcKind, False
-            Test.Use DateTimeKind.LocalKind, DateTimeKind.UnspecifiedKind, False
-            Test.Use DateTimeKind.UtcKind, DateTimeKind.LocalKind, False
-            Test.Use DateTimeKind.UtcKind, DateTimeKind.UnspecifiedKind, True
-        
+'            Test.Use DateTimeKind.LocalKind, DateTimeKind.UtcKind, False
+'            Test.Use DateTimeKind.LocalKind, DateTimeKind.UnspecifiedKind, False
+'            Test.Use DateTimeKind.UtcKind, DateTimeKind.LocalKind, False
+'            Test.Use DateTimeKind.UtcKind, DateTimeKind.UnspecifiedKind, True
+'130792068000000000
+'130791816000000000
+'130791816000000000
+            Test.Use DateTimeKind.LocalKind, 13079206800000@
+            Test.Use DateTimeKind.UnspecifiedKind, 13079181600000@
+            Test.Use DateTimeKind.UtcKind, 13079181600000@
+
         Case "ToUniversalTime_WithKinds_ReturnsUtcKind"
             Test.Use DateTimeKind.UtcKind
             Test.Use DateTimeKind.UnspecifiedKind
             Test.Use DateTimeKind.LocalKind
             
-        Case "ToLocalTime_WithKinds_ReturnsUtcKind"
+        Case "ToLocalTime_WithKinds_ReturnsLocalKind"
             Test.Use DateTimeKind.UtcKind
             Test.Use DateTimeKind.UnspecifiedKind
             Test.Use DateTimeKind.LocalKind
@@ -462,6 +467,8 @@ End Sub
 ' This test is subject to the current timezone. Modify this test
 ' as necessary to your timezone.
 Public Sub TestToFileTime()
+    AssertPacificTimeZone
+    
     Dim dt As CorDateTime
     
     Set dt = NewDateTime(2004, 6, 6, 6, 6, 6, 6)
@@ -543,24 +550,21 @@ Public Sub FromFileTimeUtc_WhenCalled_ReturnsExpected()
 End Sub
 
 Public Sub FromFileTimeUtc_WithNegativeValue_ThrowsArgumentOutOfRangeException()
-    On Error GoTo errTrap
+    On Error Resume Next
     
     CorDateTime.FromFileTimeUtc -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Time"
 End Sub
 
-Public Sub ToFileTime_WithKinds_ReturnsExpected(ByVal k1 As DateTimeKind, ByVal k2 As DateTimeKind, ByVal Expected As Boolean)
-    Dim t1 As Currency
-    Dim t2 As Currency
+Public Sub ToFileTime_WithKinds_ReturnsExpected(ByVal Kind As DateTimeKind, ByVal Expected As Currency)
+    AssertPacificTimeZone
     
-    t1 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k1).ToFileTime
-    t2 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k2).ToFileTime
+    Dim Actual As Currency
     
-    Dim Actual As Boolean
-    Actual = t1 = t2
-    Assert.That Actual, Iz.EqualTo(Expected), CorString.Format("t1={0}, t2={1}", CorDateTime.FromFileTime(t1), CorDateTime.FromFileTime(t2))
+    Actual = NewDateTime(2015, 6, 19, 10, 0, 0, Kind:=Kind).ToFileTime
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToFileTime_WhenLessThanMinAllowed_ThrowsArgumentOutOfRangeException()
@@ -571,15 +575,13 @@ Public Sub ToFileTime_WhenLessThanMinAllowed_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub ToFileTimeUtc_WithKinds_ReturnsExpected(ByVal k1 As DateTimeKind, ByVal k2 As DateTimeKind, ByVal Expected As Boolean)
-    Dim t1 As Currency
-    Dim t2 As Currency
+Public Sub ToFileTimeUtc_WithKinds_ReturnsExpected(ByVal Kind As DateTimeKind, ByVal Expected As Currency)
+    AssertPacificTimeZone
     
-    t1 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k1).ToFileTimeUtc
-    t2 = NewDateTime(2001, 6, 1, 15, 0, 0, Kind:=k2).ToFileTimeUtc
+    Dim Actual As Currency
     
-    Dim Actual As Boolean
-    Actual = t1 = t2
+    Actual = NewDateTime(2015, 6, 19, 10, 0, 0, Kind:=Kind).ToFileTimeUtc
+    
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
@@ -632,6 +634,8 @@ Public Sub TestQuotedFormatting()
 End Sub
 
 Public Sub FromBinary_WhenCalled_ReturnsExpected()
+    AssertPacificTimeZone
+    
     Dim Actual As CorDateTime
     
     Set Actual = CorDateTime.FromBinary(-915885960650477.5808@)
@@ -647,6 +651,8 @@ End Sub
 '205, 6, 7, 20, 57, 15
 
 Public Sub ToBinary_WhenCalled_ReturnsCompositeTicksAndKind()
+    AssertPacificTimeZone
+    
     Dim Actual As Currency
     
     Actual = NewDate(#6/7/205 8:57:15 PM#, LocalKind).ToBinary

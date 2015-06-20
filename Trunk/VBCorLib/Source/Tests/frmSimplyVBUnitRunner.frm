@@ -53,6 +53,8 @@ Option Explicit
 '   5. Add public subs of the tests you want run. No parameters.
 
 Private Sub Form_Load()
+    SkipUnsupportedTimeZone = False
+
     AddMicrosoftWin32
     AddSystem
     AddSystemCollections

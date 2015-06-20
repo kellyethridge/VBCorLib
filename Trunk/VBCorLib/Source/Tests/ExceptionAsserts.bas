@@ -1,5 +1,28 @@
-Attribute VB_Name = "modExceptionAsserts"
+Attribute VB_Name = "ExceptionAsserts"
 Option Explicit
+
+Public SkipUnsupportedTimeZone As Boolean
+
+Public Sub AssertPacificTimeZone()
+    Dim Info As TIME_ZONE_INFORMATION
+    Dim Result As Long
+    
+    Result = GetTimeZoneInformation(Info)
+    If Result = TIME_ZONE_ID_INVALID Then
+        Assert.Fail "Could not discover time zone information"
+    End If
+    
+    Dim StandardName As String
+    StandardName = SysAllocString(VarPtr(Info.StandardName(0)))
+    
+    If StandardName <> "Pacific Standard Time" Then
+        If SkipUnsupportedTimeZone Then
+            Assert.Pass "Time zone specific test was skipped."
+        Else
+            Assert.Ignore "Test only works for Pacific time zone."
+        End If
+    End If
+End Sub
 
 Public Sub AssertNoException(ByVal Err As ErrObject)
     Dim Ex As Exception
