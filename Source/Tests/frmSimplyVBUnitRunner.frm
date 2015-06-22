@@ -123,8 +123,7 @@ Private Sub AddSystem()
             New ObjectToStringWithDoublesTests, _
             New ObjectToStringWithLongsTests, _
             New ObjectToStringWithSinglesTests, _
-            New ObjectToStringWithValuesTests, _
-            New ObjectToStringWithDatesTests)
+            New ObjectToStringWithValuesTests)
         
         .Add NewSuite("Convert", _
             New ToBase64Tests, _
