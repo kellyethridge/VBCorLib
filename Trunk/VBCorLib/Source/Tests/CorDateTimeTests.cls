@@ -151,7 +151,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "mm m", "05 5"
             Test.Use "ss s", "06 6"
             Test.Use "fff ff f", "123 12 1"
-        
+            Test.Use "\d", "d"
+            Test.Use "\dddd", "dSat"
+            
     End Select
 End Sub
 
