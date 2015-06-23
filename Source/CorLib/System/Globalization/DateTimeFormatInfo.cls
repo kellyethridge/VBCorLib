@@ -864,8 +864,9 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     Dim Quote       As Long
     
     InitChars mPattern, Pattern
-    Set sb = DateTimeFormatInfo.StringBuilder   ' use a cached builder.
-    sb.Length = 0
+    Set sb = StringBuilderCache.Acquire 'DateTimeFormatInfo.StringBuilder   ' use a cached builder.
+    
+    On Error GoTo Catch
     
     Day = dt.Day
     Month = dt.Month
@@ -944,11 +945,12 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
                         secfrac = (secfrac \ CLng(10 ^ (7 - cnt)))
                         Call sb.AppendFormat("{0:g" & cnt & "}", secfrac)
                         
-                    Case Else:              Call sb.AppendChar(Ch)
+                    Case Else
+                        sb.AppendChar Ch
                 End Select
             End If
         Else
-            Call sb.AppendChar(Ch)
+            sb.AppendChar Ch
             Escaped = False
             cnt = 1
         End If
@@ -959,7 +961,12 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     If Quote <> 0 Then _
         Throw Cor.NewFormatException("A matching quote was not found in the format string.")
     
-    CustomFormat = sb.ToString
+    CustomFormat = StringBuilderCache.GetStringAndRelease(sb)
+    Exit Function
+    
+Catch:
+    StringBuilderCache.Release sb
+    Throw
 End Function
 
 Private Function GetSecondsFraction(ByRef Ticks As Variant) As Long
