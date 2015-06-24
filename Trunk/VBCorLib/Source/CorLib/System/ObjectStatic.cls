@@ -40,7 +40,9 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mCharBuffer As CharBuffer
+Private mCharBuffer     As CharBuffer
+Private mDateAsDateTime As CorDateTime
+
 
 ''
 ' Returns a default hashcode for the specific value.
@@ -49,10 +51,10 @@ Private mCharBuffer As CharBuffer
 ' @return The hashcode value.
 ' @remarks An object should never pass itself into this
 ' function. Instead, the object should implement the default
-' hashcode by using ObjPtr.
+' hashcode by using MyBase.
 ' <pre>
 ' Public Function GetHashCode As Long
-'     GetHashCode = ObjPtr(CUnk(Me))
+'     GetHashCode = MyBase.GetHashCode(Me)
 ' End Function
 ' </pre>
 '
@@ -60,7 +62,7 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte, vbBoolean
             GetHashCode = CLng(Value)
-            
+        
         Case vbString
             GetHashCode = HashString(Value)
         
@@ -68,20 +70,20 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             With AsDLong(CDbl(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-            
+        
         Case vbSingle
             GetHashCode = AsLong(CSng(Value))
-            
+        
         Case vbDate
             With AsDLong(CDate(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-            
+        
         Case vbCurrency
             With AsDLong(CCur(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-            
+        
         Case vbObject, vbDataObject
             If Value Is Nothing Then
                 Exit Function
@@ -94,7 +96,7 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             Else
                 GetHashCode = ObjPtr(CUnk(Value))
             End If
-            
+        
         Case vbDecimal
             With AsDWord(Value)
                 GetHashCode = .HiWord
@@ -189,7 +191,8 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                 Set DateFormatter = DateTimeFormatInfo.CurrentInfo
             End If
             
-            ToString = DateFormatter.Format(CDate(Value), Format)
+            mDateAsDateTime.InitFromDate Value, UnspecifiedKind
+            ToString = DateFormatter.Format(mDateAsDateTime, Format)
             
         Case vbObject
             If Value Is Nothing Then
@@ -205,6 +208,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
             Else
                 ToString = TypeName(Value)
             End If
+            
         Case vbEmpty
             ToString = "Empty"
         Case vbNull
@@ -241,4 +245,5 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     InitChars mCharBuffer
+    Set mDateAsDateTime = New CorDateTime
 End Sub

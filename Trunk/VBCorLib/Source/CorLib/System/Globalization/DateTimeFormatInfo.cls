@@ -721,8 +721,8 @@ End Function
 ' the formatting command. If no command is specified, then 'G' is assumed.
 ' If the command cannot be found, then a custom pattern is assumed.
 '
-' @param value The date to be formatted.
-' @param fmt The formatting command or custom pattern to format the date to.
+' @param Value The date to be formatted.
+' @param FormatString The formatting command or custom pattern to format the date to.
 ' @return The formatted date value.
 ' @remarks <p>Formatting can be accomplished by either specifying a formatting command,
 ' or entering a custom date format.<br><br>
@@ -741,9 +741,9 @@ End Function
 ' u - UniversalSortableDateTimePattern<br>
 ' y,Y - YearMonthPattern<br>
 '
-Public Function Format(ByRef Value As Variant, Optional ByVal fmt As String) As String
+Friend Function Format(ByVal Value As CorDateTime, Optional ByRef FormatString As String) As String
     VerifyLoaded
-    Format = CustomFormat(CorDateTime.GetDateTime(Value), GetPattern(fmt))
+    Format = CustomFormat(Value, GetPattern(FormatString))
 End Function
 
 ''
@@ -864,20 +864,27 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     Dim Quote       As Long
     
     InitChars mPattern, Pattern
-    Set sb = StringBuilderCache.Acquire 'DateTimeFormatInfo.StringBuilder   ' use a cached builder.
+    Set sb = StringBuilderCache.Acquire
     
     On Error GoTo Catch
     
-    Day = dt.Day
-    Month = dt.Month
-    Year = dt.Year
+    dt.GetDateParts DatePartPrecision.Complete, Year, Month, Day
+    
     YearMod100 = Year Mod 100
     Hour = dt.Hour
     HourMod12 = Hour Mod 12
-    If HourMod12 = 0 Then HourMod12 = 12    ' we want 12:00:00 AM, not 00:00:00 AM
+    If HourMod12 = 0 Then
+        HourMod12 = 12    ' we want 12:00:00 AM, not 00:00:00 AM
+    End If
+    
     Minute = dt.Minute
     Second = dt.Second
-    Designator = IIf(Hour < 12, mProps.AMDesignator, mProps.PMDesignator)
+    
+    If Hour < 12 Then
+        Designator = mProps.AMDesignator
+    Else
+        Designator = mProps.PMDesignator
+    End If
     
     Do While pos < mPattern.Buffer.cElements
         Ch = mPattern.Chars(pos)
@@ -894,22 +901,35 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
             
             Else
                 Select Case Ch
-                    Case corLowerDChar:          Call Append1to4CountValue(sb, cnt, Day, mProps.AbbreviatedDayNames(dt.DayOfWeek), mProps.DayNames(dt.DayOfWeek))
-                    Case corUpperMChar:          Call Append1to4CountValue(sb, cnt, Month, mProps.AbbreviatedMonthNames(Month - 1), mProps.MonthNames(Month - 1))
-                    Case corLowerHChar:          Call Append1or2DigitNumber(sb, cnt, HourMod12)
-                    Case corUpperHChar:          Call Append1or2DigitNumber(sb, cnt, Hour)
-                    Case corLowerMChar:          Call Append1or2DigitNumber(sb, cnt, Minute)
-                    Case corLowerSChar:          Call Append1or2DigitNumber(sb, cnt, Second)
-                    Case corColonChar:           Call sb.AppendString(mProps.TimeSeparator)
-                    Case corForwardSlashChar:    Call sb.AppendString(mProps.DateSeparator)
-                    Case corQuoteChar:     Quote = corQuoteChar
-                    Case corSecondaryQuoteChar:     Quote = corSecondaryQuoteChar
-                    
+                    Case corLowerDChar
+                        Append1to4CountValue sb, cnt, Day, mProps.AbbreviatedDayNames(dt.DayOfWeek), mProps.DayNames(dt.DayOfWeek)
+                    Case corUpperMChar
+                        Append1to4CountValue sb, cnt, Month, mProps.AbbreviatedMonthNames(Month - 1), mProps.MonthNames(Month - 1)
+                    Case corLowerHChar
+                        Append1or2DigitNumber sb, cnt, HourMod12
+                    Case corUpperHChar
+                        Append1or2DigitNumber sb, cnt, Hour
+                    Case corLowerMChar
+                        Append1or2DigitNumber sb, cnt, Minute
+                    Case corLowerSChar
+                        Append1or2DigitNumber sb, cnt, Second
+                    Case corColonChar
+                        sb.AppendString mProps.TimeSeparator
+                    Case corForwardSlashChar
+                        sb.AppendString mProps.DateSeparator
+                    Case corQuoteChar
+                        Quote = corQuoteChar
+                    Case corSecondaryQuoteChar
+                        Quote = corSecondaryQuoteChar
                     Case corLowerYChar
                         Select Case cnt
-                            Case 1:         Call sb.Append(YearMod100)
-                            Case 2:
-                                If YearMod100 < 10 Then Call sb.AppendChar(corZeroChar)
+                            Case 1
+                                sb.Append YearMod100
+                            Case 2
+                                If YearMod100 < 10 Then
+                                    sb.AppendChar corZeroChar
+                                End If
+                                
                                 sb.Append YearMod100
                             Case Else
                                 sb.AppendFormat "{0:d" & cnt & "}", Year
@@ -923,15 +943,24 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
                         End If
                     
                     Case corLowerZChar
-                        If ZoneOffset Is Nothing Then Set ZoneOffset = TimeZone.CurrentTimeZone.GetUtcOffset(dt)
+                        If ZoneOffset Is Nothing Then
+                            Set ZoneOffset = TimeZone.CurrentTimeZone.GetUtcOffset(dt)
+                        End If
+                        
                         Select Case cnt
-                            Case 1:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "0;-0"))
-                            Case 2:         Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00"))
-                            Case Else:      Call sb.AppendString(VBA.Format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.Format$(ZoneOffset.Minutes, "00"))
+                            Case 1
+                                sb.AppendString VBA.Format$(ZoneOffset.Hours, "0;-0")
+                            Case 2
+                                sb.AppendString VBA.Format$(ZoneOffset.Hours, "00;-00")
+                            Case Else
+                                sb.AppendString VBA.Format$(ZoneOffset.Hours, "00;-00") & ":" & VBA.Format$(ZoneOffset.Minutes, "00")
                         End Select
                     
                     Case corPercentChar
-                        If Percented Then Call FormatError
+                        If Percented Then
+                            FormatError
+                        End If
+                        
                         cnt = 1
                     
                     Case corBackslashChar
@@ -940,10 +969,13 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
                     
                     Case corLowerFChar
                         Dim secfrac As Long
-                        If cnt > 7 Then Call FormatError
+                        If cnt > 7 Then
+                            FormatError
+                        End If
+                        
                         secfrac = GetSecondsFraction(dt.Ticks)
                         secfrac = (secfrac \ CLng(10 ^ (7 - cnt)))
-                        Call sb.AppendFormat("{0:g" & cnt & "}", secfrac)
+                        sb.AppendFormat "{0:g" & cnt & "}", secfrac
                         
                     Case Else
                         sb.AppendChar Ch
@@ -981,23 +1013,30 @@ End Sub
 Private Sub Append1to4CountValue(ByRef sb As StringBuilder, ByVal cnt As Long, ByVal Value As Long, ByRef ThreeCountValue As String, ByRef FourCountValue As String)
     Select Case cnt
         Case 1
-            Call sb.Append(Value)
+            sb.Append Value
         Case 2
-            If Value < 10 Then Call sb.AppendChar(corZeroChar)
-            Call sb.Append(Value)
+            If Value < 10 Then
+                sb.AppendChar corZeroChar
+            End If
+            
+            sb.Append Value
+            
         Case 3
-            Call sb.AppendString(ThreeCountValue)
+            sb.AppendString ThreeCountValue
         Case Else
-            Call sb.AppendString(FourCountValue)
+            sb.AppendString FourCountValue
     End Select
 End Sub
 
 Private Sub Append1or2DigitNumber(ByRef sb As StringBuilder, ByVal cnt As Long, ByVal Value As Long)
     If cnt = 1 Then
-        Call sb.Append(Value)
+        sb.Append Value
     Else
-        If Value < 10 Then Call sb.AppendChar(corZeroChar)
-        Call sb.Append(Value)
+        If Value < 10 Then
+            sb.AppendChar corZeroChar
+        End If
+        
+        sb.Append Value
     End If
 End Sub
 
@@ -1021,30 +1060,46 @@ Private Function GetRepeatCount(ByVal Index As Long) As Long
     GetRepeatCount = i - Index
 End Function
 
-Private Function GetPattern(ByVal fmt As String) As String
-    If Len(fmt) = 0 Then fmt = "G"
-    If Len(fmt) = 1 Then
-        Select Case Asc(fmt)
-            Case corLowerDChar:               GetPattern = mProps.ShortDatePattern
-            Case corUpperDChar:               GetPattern = mProps.LongDatePattern
-            Case corLowerTChar:               GetPattern = mProps.ShortTimePattern
-            Case corUpperTChar:               GetPattern = mProps.LongTimePattern
-            Case corLowerFChar:               GetPattern = mProps.LongDatePattern & " " & mProps.ShortTimePattern
-            Case corUpperFChar:               GetPattern = Me.FullDateTimePattern
-            Case corLowerGChar:               GetPattern = mProps.ShortDatePattern & " " & mProps.ShortTimePattern
-            Case corUpperGChar:               GetPattern = mProps.ShortDatePattern & " " & mProps.LongTimePattern
-            Case corLowerMChar, corUpperMChar:     GetPattern = mProps.MonthDayPattern
-            Case corLowerRChar, corUpperRChar:     GetPattern = C_RFC1123Pattern
-            Case corLowerSChar:               GetPattern = C_SORTABLEDATETIMEPATTERN
-            Case corLowerUChar:               GetPattern = C_UNIVERSALSORTABLEDATETIMEPATTERN
-            Case corUpperUChar:               GetPattern = Me.FullDateTimePattern
-            Case corLowerYChar, corUpperYChar:     GetPattern = mProps.YearMonthPattern
-            Case Else
-                Throw Cor.NewFormatException("Invalid format specifier.")
-        End Select
-    Else
-        GetPattern = fmt
-    End If
+Private Function GetPattern(ByRef Format As String) As String
+    Select Case Len(Format)
+        Case 0
+            GetPattern = mProps.ShortDatePattern & " " & mProps.LongTimePattern
+        Case 1
+            Select Case AscW(Format)
+                Case corLowerDChar
+                    GetPattern = mProps.ShortDatePattern
+                Case corUpperDChar
+                    GetPattern = mProps.LongDatePattern
+                Case corLowerTChar
+                    GetPattern = mProps.ShortTimePattern
+                Case corUpperTChar
+                    GetPattern = mProps.LongTimePattern
+                Case corLowerFChar
+                    GetPattern = mProps.LongDatePattern & " " & mProps.ShortTimePattern
+                Case corUpperFChar
+                    GetPattern = Me.FullDateTimePattern
+                Case corLowerGChar
+                    GetPattern = mProps.ShortDatePattern & " " & mProps.ShortTimePattern
+                Case corUpperGChar
+                    GetPattern = mProps.ShortDatePattern & " " & mProps.LongTimePattern
+                Case corLowerMChar, corUpperMChar
+                    GetPattern = mProps.MonthDayPattern
+                Case corLowerRChar, corUpperRChar
+                    GetPattern = C_RFC1123Pattern
+                Case corLowerSChar
+                    GetPattern = C_SORTABLEDATETIMEPATTERN
+                Case corLowerUChar
+                    GetPattern = C_UNIVERSALSORTABLEDATETIMEPATTERN
+                Case corUpperUChar
+                    GetPattern = Me.FullDateTimePattern
+                Case corLowerYChar, corUpperYChar
+                    GetPattern = mProps.YearMonthPattern
+                Case Else
+                    Throw Cor.NewFormatException("Invalid format specifier.")
+            End Select
+        Case Else
+            GetPattern = Format
+    End Select
 End Function
 
 ''

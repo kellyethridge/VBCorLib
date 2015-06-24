@@ -142,17 +142,36 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "d", "ja-JP", "2009/06/15"
             
         Case "ToString_WithFormat_ReturnsExpected"
+            Test.Use "", "02/03/2001 13:05:06"
             Test.Use "d", "02/03/2001"
             Test.Use "dddd ddd dd d", "Saturday Sat 03 3"
             Test.Use "yyyy yy", "2001 01"
             Test.Use "MMMM MMM MM M", "February Feb 02 2"
-            Test.Use "HH H", "04 4"
-            Test.Use "hh h", "04 4"
+            Test.Use "HH H", "13 13"
+            Test.Use "hh h", "01 1"
             Test.Use "mm m", "05 5"
             Test.Use "ss s", "06 6"
             Test.Use "fff ff f", "123 12 1"
+            Test.Use "tt t", "PM P"
+            Test.Use "HH:mm:ss", "13:05:06"
+            Test.Use "h:mm:ss tt", "1:05:06 PM"
             Test.Use "\d", "d"
             Test.Use "\dddd", "dSat"
+            Test.Use "%z", "-8"
+            Test.Use "%zz", "-08"
+            Test.Use "%zzz", "-08:00"
+            Test.Use "%zzzz", "-08:00"
+            Test.Use "'HH H'", "HH H"
+            Test.Use "'\'HH H\''", "'HH H'"
+            
+        Case "ToString_WithFractionsOfSecond_ReturnsExpected"
+            Test.Use "%f", "7"
+            Test.Use "ff", "76"
+            Test.Use "fff", "765"
+            Test.Use "ffff", "7654"
+            Test.Use "fffff", "76543"
+            Test.Use "ffffff", "765432"
+            Test.Use "fffffff", "7654321"
             
     End Select
 End Sub
@@ -665,12 +684,18 @@ End Sub
 Public Sub ToString_WithFormat_ReturnsExpected(ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = NewDateTime(2001, 2, 3, 4, 5, 6, 123).ToString(Format, CultureInfo.InvariantCulture)
+    Actual = NewDateTime(2001, 2, 3, 13, 5, 6, 123).ToString(Format, CultureInfo.InvariantCulture)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-
+Public Sub ToString_WithFractionsOfSecond_ReturnsExpected(ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = CorDateTime.FromMilliseconds(91234567890765.4321@).ToString(Format)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 
