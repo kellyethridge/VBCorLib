@@ -518,12 +518,30 @@ Public Function ToUniversalTime() As CorDateTime
 End Function
 
 ''
-' Returns a string representation of this object instance.
+' Formats a CorDateTime object or Date value in the pattern specified by
+' the formatting command. If no command is specified, then 'G' is assumed.
+' If the command cannot be found, then a custom pattern is assumed.
 '
 ' @param Format The format inwhich the date should represent.
 ' @param provider A formatting provider to format the date.
 ' @return String representing this instance.
 ' @see DateTimeFormatInfo
+' @remarks <p>Formatting can be accomplished by either specifying a formatting command,
+' or entering a custom date format.<br><br>
+' D - LongDatePattern<br>
+' d - ShortDateTimePattern<br>
+' F - FullDateTimePattern (Long Date and Long Time)<br>
+' f - Full date and time (Long Date and Short Time)<br>
+' G - General (Short Date and Long Time)<br>
+' g - General (Short Date and Short Time)<br>
+' m,M - MonthDayPattern<br>
+' r,R - RFC1123Pattern<br>
+' s - SortableDateTimePattern<br>
+' T - LongTimePattern<br>
+' t - ShortTimePattern<br>
+' U - Full Date and Time (Long Date, Long Time) using universal time<br>
+' u - UniversalSortableDateTimePattern<br>
+' y,Y - YearMonthPattern<br>
 '
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim Info As DateTimeFormatInfo
@@ -785,11 +803,7 @@ Friend Sub InitFromBinary(ByVal Value As Currency)
     End If
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
+Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim Days As Long
     Days = Int(mMilliseconds / corMillisecondsPerDay)
     
@@ -829,6 +843,10 @@ Private Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Yea
     End If
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CalculateDay(ByVal Days As Long, ByRef Month As Long, ByRef Months() As Long) As Long
     Do While Months(Month) <= Days
         Month = Month + 1

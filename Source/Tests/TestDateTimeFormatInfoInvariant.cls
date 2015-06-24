@@ -141,61 +141,10 @@ Public Sub TestGetAllPatterns()
     Assert.AreEqual 26, CorArray.GetLength(s), "s should contain 26 elements."
 End Sub
 
-Public Sub TestFormatDayPart()
-    Assert.AreEqual "Thursday Thu 01 1", info.Format(#1/1/2004#, "dddd ddd dd d")
-End Sub
-
-Public Sub TestFormatTime()
-    Assert.AreEqual "05:30:15", info.Format(#5:30:15 AM#, "HH:mm:ss")
-End Sub
-
-Public Sub TestCustomFormat()
-    Assert.AreEqual "Thursday, 01 January 02004 18:30", info.Format(#1/1/2004 6:30:00 PM#, "dddd, dd MMMM yyyyy HH:mm")
-End Sub
-
 Public Sub TestIsReadOnly()
     Assert.IsFalse info.IsReadOnly, "Locally created info should not be ReadOnly."
     Assert.IsTrue CultureInfo.CurrentCulture.DateTimeFormat.IsReadOnly, "CurrentCulture supplied should be ReadOnly."
     Assert.IsTrue CultureInfo.InvariantCulture.DateTimeFormat.IsReadOnly, "CurrentCulture supplied should be ReadOnly."
-End Sub
-
-Public Sub TestTimeZoneFormats()
-    Dim s As String
-    
-    s = info.Format(Time, "%z")
-    Assert.AreEqual "-8", s
-    
-    s = info.Format(Time, "%zz")
-    Assert.AreEqual "-08", s
-    
-    s = info.Format(Time, "%zzz")
-    Assert.AreEqual "-08:00", s
-    
-    s = info.Format(Time, "%zzzzzzz")
-    Assert.AreEqual "-08:00", s
-End Sub
-
-Public Sub TestEscapeSequence()
-    Assert.AreEqual "d", info.Format(Now, "\d")
-    Assert.AreEqual "\", info.Format(Now, "\\")
-End Sub
-
-Public Sub TestEscapedQuote()
-    Assert.AreEqual "aa'", info.Format(Now, "'aa\''")
-End Sub
-
-Public Sub TestFractionsOfSecond()
-    Dim dt As CorDateTime
-    
-    Set dt = CorDateTime.FromMilliseconds(91234567890765.4321@)
-    
-    Assert.AreEqual "7654321", info.Format(dt, "fffffff")
-    Assert.AreEqual "765432", info.Format(dt, "ffffff")
-    Assert.AreEqual "76543", info.Format(dt, "fffff")
-    Assert.AreEqual "7654", info.Format(dt, "ffff")
-    Assert.AreEqual "765", info.Format(dt, "fff")
-    Assert.AreEqual "76", info.Format(dt, "ff")
-    Assert.AreEqual "7", info.Format(dt, "%f")
 End Sub
 
 Public Sub TestPersistence()

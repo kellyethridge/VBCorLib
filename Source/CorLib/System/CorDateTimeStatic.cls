@@ -91,7 +91,6 @@ End Enum
 
 
 Private mDaysInMonth()      As Long
-Private mDateAscDateTime    As CorDateTime
 Private mMinValue           As CorDateTime
 Private mMaxValue           As CorDateTime
 
@@ -347,10 +346,6 @@ Friend Function GetMilliseconds(ByVal d As Date) As Currency
     GetMilliseconds = Days + corMillisecondsTo1899
 End Function
 
-Friend Function AscDateTime(ByVal d As Date) As CorDateTime
-    Set AscDateTime = mDateAscDateTime
-    AscDateTime.InitFromDate d, UnspecifiedKind
-End Function
 
 ''
 ' This is used to get a valid CorDateTime value.
@@ -384,7 +379,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mDaysInMonth = Cor.NewLongs(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-    Set mDateAscDateTime = New CorDateTime
 End Sub
 
 
