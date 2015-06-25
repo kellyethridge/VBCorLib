@@ -230,6 +230,47 @@ Public Sub Serialization_WhenCalled_SerializesInstance()
     Assert.That Actual.DayNames, Iz.EqualTo(NewStrings("M", "T", "W", "Th", "F", "S", "S"))
 End Sub
 
+Public Sub GetInstance_WithFormatProvider_ReturnsDateTimeFormatInfo()
+    Dim Provider As New FakeFormatProvider
+    Set Provider.GetFormatResult = New DateTimeFormatInfo
+    
+    Dim Actual As DateTimeFormatInfo
+    Set Actual = DateTimeFormatInfo.GetInstance(Provider)
+    
+    Assert.That Provider.FormatType, Iz.EqualTo("DateTimeFormatInfo")
+    Assert.That Actual, Iz.SameAs(Provider.GetFormatResult)
+End Sub
+
+Public Sub GetInstance_WithDateTimeFormatInfo_ReturnsSameInstance()
+    Dim Provider As New DateTimeFormatInfo
+    
+    Dim Actual As DateTimeFormatInfo
+    Set Actual = DateTimeFormatInfo.GetInstance(Provider)
+    
+    Assert.That Actual, Iz.SameAs(Provider)
+End Sub
+
+Public Sub GetInstance_WithCultureInfo_ReturnsDateTimeFormatInfoFromCulture()
+    Dim Culture As CultureInfo
+    Set Culture = Cor.NewCultureInfo("fr-FR")
+    
+    Dim Actual As DateTimeFormatInfo
+    Set Actual = DateTimeFormatInfo.GetInstance(Culture)
+    
+    Assert.That Actual, Iz.SameAs(Culture.DateTimeFormat)
+End Sub
+
+Public Sub GetInstance_WithNoInfoAvailable_ReturnsCurrentInfo()
+    Dim Expected As DateTimeFormatInfo
+    Set Expected = DateTimeFormatInfo.CurrentInfo
+    
+    Dim Actual As DateTimeFormatInfo
+    Set Actual = DateTimeFormatInfo.GetInstance(New FakeFormatProvider)
+    
+    Assert.That Actual, Iz.SameAs(Expected)
+End Sub
+
+
 Private Function MakeInfo() As DateTimeFormatInfo
     Set MakeInfo = CultureInfo.InvariantCulture.DateTimeFormat
 End Function
