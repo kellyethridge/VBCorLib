@@ -146,7 +146,7 @@ End Sub
 ' into the 16 strings of the specific resource entry.
 Private Function GetResourceEntryID(ByVal StringID As Long)
     If StringID < 1 Or StringID > 65535 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ResourceName", StringID, "String ID's can only be 1 to 65535.")
+        Throw Cor.NewArgumentOutOfRangeException("ResourceName", "String ID's can only be 1 to 65535.")
     
     ' shift the upper 12 bits right and add 1
     ' because we can never have a 0 ID. The 1

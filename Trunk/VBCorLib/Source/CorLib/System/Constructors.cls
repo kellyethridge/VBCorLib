@@ -211,15 +211,15 @@ End Function
 ' Creates a new ArgumentOutOfRangeException object.
 '
 ' @param ParamName The parameter that caused the exception.
-' @param ActualValue The value of the parameter that caused the exception.
 ' @param Message A human-readable message explaining the exception.
+' @param ActualValue The value of the parameter that caused the exception.
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created AgrumentOutOfRangeException object.
 ' @see ArgumentOutOfRangeException
 '
-Public Function NewArgumentOutOfRangeException(Optional ByRef ParamName As String, Optional ByRef ActualValue As Variant, Optional ByRef Message As String, Optional ByVal InnerException As Exception, Optional Method As InvocationMethod) As ArgumentOutOfRangeException
+Public Function NewArgumentOutOfRangeException(Optional ByRef ParamName As String, Optional ByRef Message As String, Optional ByRef ActualValue As Variant, Optional ByVal InnerException As Exception, Optional Method As InvocationMethod) As ArgumentOutOfRangeException
     Set NewArgumentOutOfRangeException = New ArgumentOutOfRangeException
-    NewArgumentOutOfRangeException.Init ParamName, ActualValue, Message, InnerException, Method
+    NewArgumentOutOfRangeException.Init ParamName, Message, ActualValue, InnerException, Method
 End Function
 
 ''

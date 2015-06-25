@@ -276,7 +276,7 @@ End Function
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     Select Case Year
         Case Is < 0
-            Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+            Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
             
         Case Is < 100
             Dim Y As Long
@@ -285,7 +285,7 @@ Public Function ToFourDigitYear(ByVal Year As Long) As Long
             If Y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
             
         Case Is < MIN_HEBREWYEAR, Is > MAX_HEBREWYEAR
-            Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_HEBREWYEAR, MAX_HEBREWYEAR))
+            Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_HEBREWYEAR, MAX_HEBREWYEAR))
             
         Case Else
             ToFourDigitYear = Year
@@ -333,7 +333,7 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < MIN_HEBREWYEAR Or Year > MAX_HEBREWYEAR Then Throw Cor.NewArgumentOutOfRangeException("Year", Year, "Hebrew year must be between 5343 and 6000.")
+    If Year < MIN_HEBREWYEAR Or Year > MAX_HEBREWYEAR Then Throw Cor.NewArgumentOutOfRangeException("Year", "Hebrew year must be between 5343 and 6000.")
 End Sub
 
 Private Sub VerifyMonthYear(ByVal Month As Long, ByVal Year As Long)
@@ -346,7 +346,7 @@ Private Sub VerifyMonthYear(ByVal Month As Long, ByVal Year As Long)
     End If
     
     If Month < 1 Or Month > Max Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, CorString.Format("Month must be between 1 and {0} for year {1}.", Max, Year))
+        Throw Cor.NewArgumentOutOfRangeException("Month", CorString.Format("Month must be between 1 and {0} for year {1}.", Max, Year))
 End Sub
 
 ' this is based on the algorithm found at "http://www.funaba.org/en/calendar.html"

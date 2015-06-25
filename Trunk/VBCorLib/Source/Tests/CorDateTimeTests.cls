@@ -173,6 +173,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "ffffff", "765432"
             Test.Use "fffffff", "7654321"
             
+        Case "ToString_WithValue_ReturnsExpected"
+            Test.Use CorDateTime.MinValue, "1/1/0001 12:00:00 AM"
+            Test.Use CorDateTime.MaxValue, "12/31/9999 11:59:59 PM"
+            
     End Select
 End Sub
 
@@ -629,14 +633,6 @@ Public Sub ToUniversalTime_WithKinds_ReturnsUtcKind(ByVal k As DateTimeKind)
     Assert.That Actual, Iz.EqualTo(UtcKind)
 End Sub
 
-
-Public Sub TestQuotedFormatting()
-    Dim dt As CorDateTime
-    
-    Set dt = CorDateTime.FromOADate(#1/5/2005#)
-    Assert.AreEqual "5 tt 05", dt.ToString("d 'tt' 05")
-End Sub
-
 Public Sub FromBinary_WhenCalled_ReturnsExpected()
     AssertPacificTimeZone
     
@@ -664,11 +660,12 @@ Public Sub ToBinary_WhenCalled_ReturnsCompositeTicksAndKind()
     Assert.That Actual, Iz.EqualTo(-915885960650477.5808@)
 End Sub
 
-Public Sub TestMaxDateToString()
-    Dim dt As CorDateTime
+Public Sub ToString_WithValue_ReturnsExpected(ByVal d As CorDateTime, ByVal Expected As String)
+    Dim Actual As String
     
-    Set dt = NewDate(#12/31/9999 11:59:59 PM#)
-    Assert.AreEqual "12/31/9999 11:59:59 PM", dt.ToString("MM/dd/yyyy hh:mm:ss tt")
+    Actual = d.ToString(Provider:=NewCultureInfo("en-US", False))
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCultureInfo_ReturnsExpected(ByVal Format As String, ByVal CultureName As String, ByVal Expected As String)

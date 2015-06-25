@@ -165,7 +165,7 @@ End Function
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
     Call VerifyMonth(Month)
     If Day < 1 Or Day > GetDaysInMonth(Year, Month, Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
     
     If Month = 2 And Day = 29 Then
         IsLeapDay = IsLeapYear(Year, Era)
@@ -190,7 +190,7 @@ End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     If Year < MIN_TAIWANYEAR Or Year > MAX_TAIWANYEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_TAIWANYEAR, MAX_TAIWANYEAR))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_TAIWANYEAR, MAX_TAIWANYEAR))
     
     ToFourDigitYear = Year
 End Function
@@ -238,13 +238,13 @@ End Sub
 Private Function GetGregorianYear(ByVal Year As Long, ByRef Era As Variant) As Long
     Call VerifyEra(Era)
     If Year < MIN_TAIWANYEAR Or Year > MAX_TAIWANYEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_TAIWANYEAR, MAX_TAIWANYEAR))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_TAIWANYEAR, MAX_TAIWANYEAR))
     
     GetGregorianYear = Year + YEAR_OFFSET
 End Function
 
 Private Sub VerifyMonth(ByVal Month As Long)
-    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
 End Sub
 
 

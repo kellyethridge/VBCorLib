@@ -129,7 +129,7 @@ End Function
 
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
     If Months < -120000 Or Months > 120000 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Months", Months, Environment.GetResourceString(ArgumentOutOfRange_Range, -120000, 120000))
+        Throw Cor.NewArgumentOutOfRangeException("Months", Environment.GetResourceString(ArgumentOutOfRange_Range, -120000, 120000))
     
     If Months = 0 Then
         Set AddMonths = CorDateTime.GetDateTime(Time)
@@ -253,7 +253,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     
     MaxDays = Me.GetDaysInMonth(Year, Month)
     If Day < 1 Or Day > MaxDays Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MaxDays))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MaxDays))
         
     If Day = 30 And Month = 12 Then IsLeapDay = IsLeapYear(Year, Era)
 End Function
@@ -292,7 +292,7 @@ Public Function ToFourDigitYear(ByVal Year As Long) As Long
     Dim Y As Long
     
     If Year < 0 Or Year > MAX_YEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
 
     If Year < 100 Then
         Y = Year Mod 100
@@ -344,7 +344,7 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < 1 Or Year > MAX_YEAR Then Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9666))
+    If Year < 1 Or Year > MAX_YEAR Then Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9666))
 End Sub
 
 Private Sub VerifyYearMonth(ByVal Year As Long, ByVal Month As Long)
@@ -352,7 +352,7 @@ Private Sub VerifyYearMonth(ByVal Year As Long, ByVal Month As Long)
     If (Month < 1) Or _
        (Month > corMonthsPerYear) Or _
        (Year = MAX_YEAR And Month > MAX_SHORTMONTH) Then
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, IIf(Year = 9666, 4, 12)))
+        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, IIf(Year = 9666, 4, 12)))
     End If
 End Sub
 
@@ -361,10 +361,10 @@ Private Sub VerifyYearMonthDay(ByVal Year As Long, ByVal Month As Long, ByVal Da
     If Year = MAX_YEAR Then
         If Month = MAX_SHORTMONTH Then
             If Day > MAX_SHORTDAY Then
-                Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MAX_SHORTDAY))
+                Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MAX_SHORTDAY))
             End If
         ElseIf Day > mMonthDays(Month - 1) Then
-            Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, mMonthDays(Month - 1)))
+            Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, mMonthDays(Month - 1)))
         End If
     End If
 End Sub
@@ -375,7 +375,7 @@ Private Function GetFixedDays(ByRef Time As Variant) As Long
     GetFixedDays = Int(dt.TotalMilliseconds / corMillisecondsPerDay) + mHijriAdjustment
     
     If GetFixedDays < 1 Or GetFixedDays > MAX_FIXED_DAYS Then _
-        Throw Cor.NewArgumentOutOfRangeException("Time", Time, "Hijri calendary only represents dates from 1/1/0001 to 4/3/9666.")
+        Throw Cor.NewArgumentOutOfRangeException("Time", "Hijri calendary only represents dates from 1/1/0001 to 4/3/9666.")
 End Function
 
 Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long

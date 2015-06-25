@@ -592,14 +592,17 @@ End Function
 ''
 ' Returns the abbreviated name for the specified day-of-the-week.
 '
-' @param dow The Day-Of-Week to get the name of.
+' @param DayOfWeek The Day-Of-Week to get the name of.
 ' @return The abbreviated version of the name for the day-of-week.
 ' @remarks DayOfWeek is 0 based. It is not identical to the vbDayOfweek,
 ' which is 1 based.
 '
-Public Function GetAbbreviatedDayName(ByVal dow As DayOfWeek) As String
+Public Function GetAbbreviatedDayName(ByVal DayOfWeek As DayOfWeek) As String
+    If DayOfWeek < 0 Or DayOfWeek > 6 Then _
+        Throw Cor.NewArgumentOutOfRangeException("DayOfWeek", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 6))
+
     VerifyLoaded
-    GetAbbreviatedDayName = mProps.AbbreviatedDayNames(dow)
+    GetAbbreviatedDayName = mProps.AbbreviatedDayNames(DayOfWeek)
 End Function
 
 ''
@@ -627,7 +630,7 @@ Public Function GetAbbreviatedMonthName(ByVal Month As Long) As String
     VerifyLoaded
     
     If Month < MinMonth Or Month > MaxMonth Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
+        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
     
     GetAbbreviatedMonthName = mProps.AbbreviatedMonthNames(Month - 1)
 End Function
@@ -711,7 +714,7 @@ Public Function GetMonthName(ByVal Month As Long) As String
     VerifyLoaded
     
     If Month < MinMonth Or Month > MaxMonth Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
+        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, MinMonth, MaxMonth))
     
     GetMonthName = mProps.MonthNames(Month - 1)
 End Function

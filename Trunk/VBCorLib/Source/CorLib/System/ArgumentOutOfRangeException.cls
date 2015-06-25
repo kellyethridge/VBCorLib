@@ -265,7 +265,7 @@ Private Sub Class_InitProperties()
     mBase.ErrorNumber = corInvalidProcedureCall
 End Sub
 
-Friend Sub Init(ByRef ParamName As String, ByRef ActualValue As Variant, ByRef Message As String, ByVal InnerException As Exception, ByVal Method As InvocationMethod)
+Friend Sub Init(ByRef ParamName As String, ByRef Message As String, ByRef ActualValue As Variant, ByVal InnerException As Exception, ByVal Method As InvocationMethod)
     mBase.SetValue PropParamName, ParamName
     mBase.SetValue PropActualValue, ActualValue
     mBase.Message = Message
@@ -282,7 +282,7 @@ Private Function GetErrorNumber(ByVal Method As InvocationMethod) As Long
         Case InvocationMethod.PropertyInvocation
             GetErrorNumber = corInvalidPropertyValue
         Case Else
-            Throw Cor.NewArgumentOutOfRangeException("Method", Method, Environment.GetResourceString(ArgumentOutOfRange_Enum))
+            Throw Cor.NewArgumentOutOfRangeException("Method", Environment.GetResourceString(ArgumentOutOfRange_Enum), Method)
     End Select
 End Function
 
