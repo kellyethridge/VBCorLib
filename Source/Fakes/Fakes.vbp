@@ -11,6 +11,7 @@ Class=FakeAsyncCallback; FakeAsyncCallback.cls
 Class=FakeStream; FakeStream.cls
 Class=FakeSafeHandle; FakeSafeHandle.cls
 Class=FakeObject; FakeObject.cls
+Class=FakeFormatProvider; FakeFormatProvider.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"

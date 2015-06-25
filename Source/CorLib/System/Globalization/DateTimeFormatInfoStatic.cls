@@ -8,7 +8,7 @@ BEGIN
 END
 Attribute VB_Name = "DateTimeFormatInfoStatic"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'The MIT License (MIT)
@@ -98,9 +98,18 @@ End Function
 '
 Public Function GetInstance(ByVal FormatProvider As IFormatProvider) As DateTimeFormatInfo
     If Not FormatProvider Is Nothing Then
-        Set GetInstance = FormatProvider.GetFormat("DateTimeFormatInfo")
-        If GetInstance Is Nothing Then Set GetInstance = CurrentInfo
-    Else
+        If TypeOf FormatProvider Is CultureInfo Then
+            Dim CultureProvider As CultureInfo
+            Set CultureProvider = FormatProvider
+            Set GetInstance = CultureProvider.DateTimeFormat
+        ElseIf TypeOf FormatProvider Is DateTimeFormatInfo Then
+            Set GetInstance = FormatProvider
+        Else
+            Set GetInstance = FormatProvider.GetFormat(corDateTimeFormatInfoTypeName)
+        End If
+    End If
+            
+    If GetInstance Is Nothing Then
         Set GetInstance = CurrentInfo
     End If
 End Function
