@@ -315,7 +315,7 @@ End Function
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("CharCount", CharCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("CharCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
 
     GetMaxByteCount = CharCount * CHAR_SIZE
 End Function
@@ -328,7 +328,7 @@ End Function
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     If ByteCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteCount", ByteCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("ByteCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
 
     GetMaxCharCount = ByteCount \ CHAR_SIZE
 End Function

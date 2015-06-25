@@ -178,7 +178,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
             Call InternalTransformBlock(InputBuffer, InputOffset, OutputBuffer, 0)
         
         Case Else
-            Throw Cor.NewArgumentOutOfRangeException("InputCount", InputCount, "Cannot process more than 3 byte block sizes.")
+            Throw Cor.NewArgumentOutOfRangeException("InputCount", "Cannot process more than 3 byte block sizes.")
     End Select
     
     TransformFinalBlock = OutputBuffer

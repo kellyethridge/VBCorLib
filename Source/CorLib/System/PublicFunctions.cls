@@ -48,7 +48,7 @@ Option Explicit
 '
 Public Function LongToChar(ByVal Value As Long) As Integer
     If Value < -32767 Or Value > 65535 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Value, "Value must be between -32767 and 65535 inclusively.")
+        Throw Cor.NewArgumentOutOfRangeException("Value", "Value must be between -32767 and 65535 inclusively.")
     If Value > 32767 Then Value = Value - 65536
     LongToChar = Value
 End Function

@@ -370,7 +370,7 @@ End Function
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("CharCount", CharCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("CharCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     GetMaxByteCount = CharCount * 4
 End Function
 
@@ -382,7 +382,7 @@ End Function
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     If ByteCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteCount", ByteCount, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("ByteCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     GetMaxCharCount = ByteCount
 End Function
 
@@ -480,7 +480,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
     If CorArray.IsNull(Bytes) Then _
         Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
     If ByteIndex < LBound(Bytes) Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", ByteIndex, Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Environment.GetResourceString(ArgumentOutOfRange_LBound))
     
     If Not Encoder Is Nothing Then HighSurrogateChar = Encoder.HighSurrogateChar
     StartIndex = ByteIndex
@@ -575,9 +575,9 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     If putChars Then
         maxCharIndex = UBound(Chars)
         If CharIndex < LBound(Chars) Then _
-            Throw Cor.NewArgumentOutOfRangeException("CharIndex", CharIndex, Environment.GetResourceString(ArgumentOutOfRange_LBound))
+            Throw Cor.NewArgumentOutOfRangeException("CharIndex", Environment.GetResourceString(ArgumentOutOfRange_LBound))
         If CharIndex > maxCharIndex Then _
-            Throw Cor.NewArgumentOutOfRangeException("CharIndex", CharIndex, Environment.GetResourceString(ArgumentOutOfRange_UBound))
+            Throw Cor.NewArgumentOutOfRangeException("CharIndex", Environment.GetResourceString(ArgumentOutOfRange_UBound))
     End If
     If Not Decoder Is Nothing Then
         BytesLeft = Decoder.BytesLeft
@@ -706,9 +706,9 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
     Dim HasHighSurrogate As Boolean
     
     If Index < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Index, Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException("Index", Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Count, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Count", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Index + Count - 1 > UBound(Chars) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
 

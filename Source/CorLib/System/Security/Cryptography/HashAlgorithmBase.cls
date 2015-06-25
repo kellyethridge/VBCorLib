@@ -162,7 +162,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     If CorArray.IsNull(InputBuffer) Then _
         Throw Cor.NewArgumentNullException("InputBuffer")
     If InputOffset < LBound(InputBuffer) Then _
-        Throw Cor.NewArgumentOutOfRangeException("InputOffset", InputOffset, Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Throw Cor.NewArgumentOutOfRangeException("InputOffset", Environment.GetResourceString(ArgumentOutOfRange_LBound))
     If (CorArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     

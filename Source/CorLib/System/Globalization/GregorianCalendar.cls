@@ -407,7 +407,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     Call VerifyYear(Year)
     Call VerifyMonth(Month)
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
     
     If Month = 2 Then
         IsLeapDay = (Day = 29)
@@ -482,7 +482,7 @@ End Function
 '
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     If Year < 0 Or Year > 9999 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
 
     If Year < 100 Then
         Dim Y As Long
@@ -543,11 +543,11 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < 1 Or Year > 9999 Then Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999))
+    If Year < 1 Or Year > 9999 Then Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999))
 End Sub
 
 Private Sub VerifyMonth(ByVal Month As Long)
-    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
 End Sub
 
 

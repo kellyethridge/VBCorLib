@@ -191,7 +191,7 @@ End Function
 
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
     If Month < 1 Or Month > 12 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, "Month must be between 1 and 12.")
+        Throw Cor.NewArgumentOutOfRangeException("Month", "Month must be between 1 and 12.")
     
     If Month = 2 Then
         IsLeapMonth = IsLeapYear(Year, Era)
@@ -200,7 +200,7 @@ End Function
 
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
     If Day < 1 Or Day > Me.GetDaysInMonth(Year, Month, Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, "Day must be between 1 and " & GetDaysInMonth(Year, Month, Era) & " for the specified month.")
+        Throw Cor.NewArgumentOutOfRangeException("Day", "Day must be between 1 and " & GetDaysInMonth(Year, Month, Era) & " for the specified month.")
     
     If Day = 29 Then IsLeapDay = IsLeapMonth(Year, Month, Era)
 End Function
@@ -221,7 +221,7 @@ End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     If Year < 1 Or Year > 8011 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 8011))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 8011))
         
     ToFourDigitYear = Year
 End Function
@@ -270,16 +270,16 @@ End Sub
 
 Private Function GetGregorianYear(ByVal Year As Long, ByVal Era As Long) As Long
     If Year < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     
     Era = Era - 1
     If Era < 0 Or Era > UBound(mEraLengths) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Era", Era, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, UBound(mEraLengths) + 1))
+        Throw Cor.NewArgumentOutOfRangeException("Era", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, UBound(mEraLengths) + 1))
     
     Dim ms As Currency
     ms = mEraStart(Era)
     If Year > mEraLengths(Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, mEraLengths(Era)))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, mEraLengths(Era)))
     
     GetGregorianYear = CorDateTime.FromMilliseconds(ms).Year + Year - 1
 End Function
@@ -290,7 +290,7 @@ Private Function GetCurrentEra(ByVal Era As Variant) As Long
     Else
         If Era = 0 Then Era = UBound(mEras) + 1
         If Era < 1 Or Era > UBound(mEras) + 1 Then _
-            Throw Cor.NewArgumentOutOfRangeException("Era", Era, "Japanese eras range from 1 to 4.")
+            Throw Cor.NewArgumentOutOfRangeException("Era", "Japanese eras range from 1 to 4.")
         GetCurrentEra = Era
     End If
 End Function

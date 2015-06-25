@@ -344,7 +344,7 @@ Private Sub AddSystemGlobalization()
         .Add New TestGregorianCalendar
         .Add New TestHijriCalendar
         .Add New CultureInfoTests
-        .Add New TestDateTimeFormatInfoInv
+        .Add New DateTimeFormatInfoTests
         
         AddTest .This
     End With

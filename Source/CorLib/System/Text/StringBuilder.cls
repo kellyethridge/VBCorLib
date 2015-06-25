@@ -189,7 +189,7 @@ Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1)
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Char < -&H7FFF& Or Char > &HFFFF& Then _
-        Throw Cor.NewArgumentOutOfRangeException("Char", Char, "Char must be between -32767 and 65535 inclusively.")
+        Throw Cor.NewArgumentOutOfRangeException("Char", "Char must be between -32767 and 65535 inclusively.")
     
     If Char > &H7FFF& Then Char = Char - &H10000
     

@@ -97,7 +97,7 @@ End Function
 
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
     If Months < -120000 Or Months > 120000 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Months", Months, "Months must be between -120000 and 120000 inclusively.")
+        Throw Cor.NewArgumentOutOfRangeException("Months", "Months must be between -120000 and 120000 inclusively.")
     
     If Months = 0 Then
         Set AddMonths = CorDateTime.GetDateTime(Time)
@@ -233,7 +233,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     Call VerifyYear(Year)
     Call VerifyMonth(Month)
     If Day < 1 Or Day > GetDaysInMonth(Year, Month, Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month, Era)))
+        Throw Cor.NewArgumentOutOfRangeException("Day", CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month, Era)))
     
     If Month = 2 Then
         If IsLeapYear(Year, Era) Then
@@ -248,14 +248,14 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     Call VerifyMonth(Month)
         
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month)))
+        Throw Cor.NewArgumentOutOfRangeException("Day", CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month)))
     
     Set ToDateTime = CorDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * corMillisecondsPerDay + TotalTime(Hour, Minute, Second, Millisecond))
 End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     If Year < 0 Or Year > 9999 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
 
     If Year < 100 Then
         Dim Y As Long
@@ -312,11 +312,11 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < 1 Or Year > 9999 Then Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999))
+    If Year < 1 Or Year > 9999 Then Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999))
 End Sub
 
 Private Sub VerifyMonth(ByVal Month As Long)
-    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
 End Sub
 
 Private Sub GetDateParts(ByRef Time As Variant, ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
@@ -359,11 +359,11 @@ Private Function TotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     If Year = 0 And Month = 0 And Day = 0 Then Exit Function
     
     If Year < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Year, Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
     If Month < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Month, Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
     If Day < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Day, Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
     
     Dim Days As Long
     If IsLeapYear(Year) Then
