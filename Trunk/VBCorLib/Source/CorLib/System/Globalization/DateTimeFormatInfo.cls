@@ -54,29 +54,29 @@ Implements IObject
 Implements ICloneable
 Implements IFormatProvider
 
-Private Const PROP_ABBREVIATEDDAYNAMES      As String = "AbbreviatedDayNames"
-Private Const PROP_ABBREVIATEDMONTHNAMES    As String = "AbbreviatedMonthNames"
-Private Const PROP_AMDESIGNATOR             As String = "AMDesignator"
-Private Const PROP_DATESEPARATOR            As String = "DateSeparator"
-Private Const PROP_DAYNAMES                 As String = "DayNames"
-Private Const PROP_FIRSTDAYOFWEEK           As String = "FirstDayOfWeek"
-Private Const PROP_FULLDATETIMEPATTERN      As String = "FullDateTimePattern"
-Private Const PROP_LONGDATEPATTERN          As String = "LongDatePattern"
-Private Const PROP_LONGTIMEPATTERN          As String = "LongTimePattern"
-Private Const PROP_MONTHDAYPATTERN          As String = "MonthDayPattern"
-Private Const PROP_MONTHNAMES               As String = "MonthNames"
-Private Const PROP_PMDESIGNATOR             As String = "PMDesignator"
-Private Const PROP_SHORTDATEPATTERN         As String = "ShortDatePattern"
-Private Const PROP_SHORTTIMEPATTERN         As String = "ShortTimePattern"
-Private Const PROP_TIMESEPARATOR            As String = "TimeSeparator"
-Private Const PROP_YEARMONTHPATTERN         As String = "YearMonthPattern"
-Private Const PROP_CALENDARWEEKRULE         As String = "CalendarWeekRule"
-Private Const PROP_CALENDAR                 As String = "Calendar"
-Private Const PROP_ISREADONLY               As String = "IsReadOnly"
+Private Const PropAbbreviatedDayNames   As String = "AbbreviatedDayNames"
+Private Const PropAbbreviatedMonthNames As String = "AbbreviatedMonthNames"
+Private Const PropAMDesignator          As String = "AMDesignator"
+Private Const PropDateSeparator         As String = "DateSeparator"
+Private Const PropDayNames              As String = "DayNames"
+Private Const PropFirstDayOfWeek        As String = "FirstDayOfWeek"
+Private Const PropFullDateTimePattern   As String = "FullDateTimePattern"
+Private Const PropLongDatePattern       As String = "LongDatePattern"
+Private Const PropLongTimePattern       As String = "LongTimePattern"
+Private Const PropMonthDayPattern       As String = "MonthDayPattern"
+Private Const PropMonthNames            As String = "MonthNames"
+Private Const PropPMDesignator          As String = "PMDesignator"
+Private Const PropShortDatePattern      As String = "ShortDatePattern"
+Private Const PropShortTimePattern      As String = "ShortTimePattern"
+Private Const PropTimeSeparator         As String = "TimeSeparator"
+Private Const PropYearMonthPattern      As String = "YearMonthPattern"
+Private Const PropCalendarWeekRule      As String = "CalendarWeekRule"
+Private Const PropCalendar              As String = "Calendar"
+Private Const PropIsReadOnly            As String = "IsReadOnly"
 
-Private Const C_RFC1123Pattern                      As String = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'"
-Private Const C_SORTABLEDATETIMEPATTERN             As String = "yyyy'-'MM'-'dd'T'HH':'mm':'ss"
-Private Const C_UNIVERSALSORTABLEDATETIMEPATTERN    As String = "yyyy'-'MM'-'dd HH':'mm':'ss'Z'"
+Private Const PatternRFC1123                    As String = "ddd, dd MMM yyyy HH':'mm':'ss 'GMT'"
+Private Const PatternSortableDateTime           As String = "yyyy'-'MM'-'dd'T'HH':'mm':'ss"
+Private Const PatternUniversalSortableDateTime  As String = "yyyy'-'MM'-'dd HH':'mm':'ss'Z'"
 
 Private Const MinMonth As Long = 1
 Private Const MaxMonth As Long = 13
@@ -105,7 +105,6 @@ Private Type PropsType
     AllMonthDayPatterns()   As String
     Calendar                As Calendar
     CalendarWeekRule        As CalendarWeekRule
-    
     IsReadOnly              As Boolean
 End Type
 
@@ -127,12 +126,12 @@ End Property
 ''
 ' Sets the definition of the first week for the calendar year.
 '
-' @param RHS A <b>CalendarWeekRule</b> value.
+' @param Value A <b>CalendarWeekRule</b> value.
 '
-Public Property Let CalendarWeekRule(ByVal RHS As CalendarWeekRule)
+Public Property Let CalendarWeekRule(ByVal Value As CalendarWeekRule)
     VerifyWritable
     VerifyLoaded
-    mProps.CalendarWeekRule = RHS
+    mProps.CalendarWeekRule = Value
 End Property
 
 ''
@@ -172,12 +171,12 @@ End Property
 ''
 ' Sets the weekday names to be used by this FormatProvider.
 '
-' @param RHS An array of weekday names to be uses as abbreviated weekday names.
+' @param Value An array of weekday names to be uses as abbreviated weekday names.
 ' @remarks The array must contain exactly 7 days. If the DateTimeFormatInfo
 ' is ReadOnly then an exception will be thrown.
 '
-Public Property Let AbbreviatedDayNames(ByRef RHS() As String)
-    AssignDayNames RHS, mProps.AbbreviatedDayNames
+Public Property Let AbbreviatedDayNames(ByRef Value() As String)
+    mProps.AbbreviatedDayNames = CopyArray(Value, 7)
 End Property
 
 ''
@@ -193,13 +192,13 @@ End Property
 ''
 ' Sets the abbreviated month names to be used by the formatter.
 '
-' @param RHS The array of month names to be used.
+' @param Value The array of month names to be used.
 ' @remarks There must be exactly 13 months. Some cultures have 13 months in the
 ' year. For those cultures that only have 12, and empty string as the 13 is all that is needed.<br>
 ' If the formatter is ReadOnly, an exception will be thrown.
 '
-Public Property Let AbbreviatedMonthNames(ByRef RHS() As String)
-    AssignMonthNames RHS, mProps.AbbreviatedMonthNames
+Public Property Let AbbreviatedMonthNames(ByRef Value() As String)
+    mProps.AbbreviatedMonthNames = CopyArray(Value, 13)
 End Property
 
 ''
@@ -215,13 +214,13 @@ End Property
 ''
 ' Sets the string that is display for times from 12:00:00 AM to 11:59:59 AM.
 '
-' @param RHS The new AM designator.
+' @param Value The new AM designator.
 ' @remarks If this formatter is ReadOnly, an exception will be thrown.
 '
-Public Property Let AMDesignator(ByRef RHS As String)
+Public Property Let AMDesignator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.AMDesignator = RHS
+    mProps.AMDesignator = Value
 End Property
 
 ''
@@ -239,13 +238,13 @@ End Property
 ' Sets the string that is display when separating the components of a date,
 ' such as year, month, day.
 '
-' @param RHS The new date separator. Generally this is '/'.
+' @param Value The new date separator. Generally this is '/'.
 ' @remarks If this formatter is ReadOnly, an exception will be thrown.
 '
-Public Property Let DateSeparator(ByRef RHS As String)
+Public Property Let DateSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.DateSeparator = RHS
+    mProps.DateSeparator = Value
 End Property
 
 ''
@@ -261,14 +260,12 @@ End Property
 ''
 ' Sets the names for the weekdays.
 '
-' @param RHS An array containing the weekday names to be used.
+' @param Value An array containing the weekday names to be used.
 ' @remarks There must be exactly 7 names. If this formatter is
 ' ReadOnly, an exception will be thrown.
 '
-Public Property Let DayNames(ByRef RHS() As String)
-    VerifyWritable
-    VerifyLoaded
-    AssignDayNames RHS, mProps.DayNames
+Public Property Let DayNames(ByRef Value() As String)
+    mProps.DayNames = CopyArray(Value, 7)
 End Property
 
 ''
@@ -285,13 +282,13 @@ End Property
 ''
 ' Sets the first day of the week.
 '
-' @param RHS The enum for the first day of the week.
+' @param Value The enum for the first day of the week.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let FirstDayOfWeek(ByVal RHS As DayOfWeek)
+Public Property Let FirstDayOfWeek(ByVal Value As DayOfWeek)
     VerifyWritable
     VerifyLoaded
-    mProps.FirstDayOfWeek = RHS
+    mProps.FirstDayOfWeek = Value
 End Property
 
 ''
@@ -312,13 +309,13 @@ End Property
 ' Sets the formatting pattern used for a full date and time formatting,
 ' and is associated with the 'F' formatting command.
 '
-' @param RHS The new full date and time formatting pattern.
+' @param Value The new full date and time formatting pattern.
 ' @remark If this formatter is ReadOnly, an exception will be thrown.
 '
-Public Property Let FullDateTimePattern(ByRef RHS As String)
+Public Property Let FullDateTimePattern(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.FullDateTimePattern = RHS
+    mProps.FullDateTimePattern = Value
 End Property
 
 ''
@@ -331,8 +328,8 @@ Public Property Get IsReadOnly() As Boolean
 End Property
 
 ' for internal use only.
-Friend Property Let IsReadOnly(ByVal RHS As Boolean)
-    mProps.IsReadOnly = RHS
+Friend Property Let IsReadOnly(ByVal Value As Boolean)
+    mProps.IsReadOnly = Value
 End Property
 
 ''
@@ -350,13 +347,13 @@ End Property
 ' Sets a pattern used for formatting just the date portion and is
 ' associated with the 'D' formatting command.
 '
-' @param RHS The pattern used to format the date.
+' @param Value The pattern used to format the date.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let LongDatePattern(ByRef RHS As String)
+Public Property Let LongDatePattern(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.LongDatePattern = RHS
+    mProps.LongDatePattern = Value
     mProps.FullDateTimePattern = Empty
 End Property
 
@@ -375,13 +372,13 @@ End Property
 ' Sets the pattern used to format the time part when using the
 ' 'T' formatting command.
 '
-' @param RHS The new formatting pattern.
+' @param Value The new formatting pattern.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let LongTimePattern(ByRef RHS As String)
+Public Property Let LongTimePattern(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.LongTimePattern = RHS
+    mProps.LongTimePattern = Value
     mProps.FullDateTimePattern = Empty
 End Property
 
@@ -400,13 +397,13 @@ End Property
 ' Sets the month/day formatting pattern associated with either
 ' 'm' or 'M' formatting commands.
 '
-' @param RHS The new Month/Day pattern
+' @param Value The new Month/Day pattern
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let MonthDayPattern(ByRef RHS As String)
+Public Property Let MonthDayPattern(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.MonthDayPattern = RHS
+    mProps.MonthDayPattern = Value
 End Property
 
 ''
@@ -422,13 +419,13 @@ End Property
 ''
 ' Sets the full month names to be used by the formatter.
 '
-' @param RHS The array of month names.
+' @param Value The array of month names.
 ' @remarks There must be exactly 13 months. Some cultures have 13 months
 ' in a calendar year. If a culture only has 12 months, then 13th month is empty.
 ' If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let MonthNames(ByRef RHS() As String)
-    AssignMonthNames RHS, mProps.MonthNames
+Public Property Let MonthNames(ByRef Value() As String)
+    mProps.MonthNames = CopyArray(Value, 13)
 End Property
 
 ''
@@ -444,13 +441,13 @@ End Property
 ''
 ' Sets the string display for times between 12:00:00 PM and 12:00:00 AM.
 '
-' @param RHS The new PM designator. Generally this is 'PM'.
+' @param Value The new PM designator. Generally this is 'PM'.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let PMDesignator(ByRef RHS As String)
+Public Property Let PMDesignator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.PMDesignator = RHS
+    mProps.PMDesignator = Value
 End Property
 
 ''
@@ -460,7 +457,7 @@ End Property
 ' @return The RFC-1123 pattern <ddd, dd MMM yyyy HH':'mm':'ss 'GMT'>.
 '
 Public Property Get RFC1123Pattern() As String
-    RFC1123Pattern = C_RFC1123Pattern
+    RFC1123Pattern = PatternRFC1123
 End Property
 
 ''
@@ -476,13 +473,13 @@ End Property
 ''
 ' Sets the pattern used in formatting dates with the 'd' formatting command.
 '
-' @param RHS The new short date formatting pattern.
+' @param Value The new short date formatting pattern.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let ShortDatePattern(ByRef RHS As String)
+Public Property Let ShortDatePattern(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.ShortDatePattern = RHS
+    mProps.ShortDatePattern = Value
 End Property
 
 ''
@@ -498,13 +495,13 @@ End Property
 ''
 ' Sets the formatting pattern for a short time using the 't' formatting command.
 '
-' @param RHS The new short time formatting pattern.
+' @param Value The new short time formatting pattern.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let ShortTimePattern(ByRef RHS As String)
+Public Property Let ShortTimePattern(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.ShortDatePattern = RHS
+    mProps.ShortDatePattern = Value
 End Property
 
 ''
@@ -516,7 +513,7 @@ End Property
 ' @remarks This pattern is the same across all cultures.
 '
 Public Property Get SortableDateTimePattern() As String
-    SortableDateTimePattern = C_SORTABLEDATETIMEPATTERN
+    SortableDateTimePattern = PatternSortableDateTime
 End Property
 
 ''
@@ -532,13 +529,13 @@ End Property
 ''
 ' Set the separator for time components.
 '
-' @param RHS The new time component separator.
+' @param Value The new time component separator.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let TimeSeparator(ByRef RHS As String)
+Public Property Let TimeSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.TimeSeparator = RHS
+    mProps.TimeSeparator = Value
 End Property
 
 ''
@@ -551,7 +548,7 @@ End Property
 ' across all cultures.
 '
 Public Property Get UniversalSortableDateTimePattern() As String
-    UniversalSortableDateTimePattern = C_UNIVERSALSORTABLEDATETIMEPATTERN
+    UniversalSortableDateTimePattern = PatternUniversalSortableDateTime
 End Property
 
 ''
@@ -569,13 +566,13 @@ End Property
 ' Sets the pattern that represents a YearMonth combination. This is
 ' associated with the 'y' or 'Y' formatting commands.
 '
-' @param RHS The new YearMonth formatting pattern.
+' @param Value The new YearMonth formatting pattern.
 ' @remarks If this formatter is ReadOnly, an exception is thrown.
 '
-Public Property Let YearMonthPattern(ByRef RHS As String)
+Public Property Let YearMonthPattern(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.YearMonthPattern = RHS
+    mProps.YearMonthPattern = Value
 End Property
 
 ''
@@ -586,7 +583,7 @@ End Property
 '
 Public Function Clone() As DateTimeFormatInfo
     Set Clone = New DateTimeFormatInfo
-    Clone.CloneHelper mProps
+    Clone.InitClone mProps
 End Function
 
 ''
@@ -646,21 +643,22 @@ Public Function GetAllDateTimePatterns(Optional ByRef Format As Variant) As Stri
     VerifyLoaded
     If IsMissing(Format) Then
         GetAllDateTimePatterns = CombineAllDateTimePatterns
+    ElseIf VarType(Format) = vbString Then
+        GetAllDateTimePatterns = GetSpecificDateTimePattern(AscW(Format))
     Else
-        If VarType(Format) = vbString Then Format = Asc(Format)
-        GetAllDateTimePatterns = GetSpecificDateTimePattern(Format)
+        GetAllDateTimePatterns = GetSpecificDateTimePattern(CLng(Format))
     End If
 End Function
 
 ''
 ' Returns the full name for the day of the week.
 '
-' @param dow The day of the week to get the name for.
+' @param DayOfWeek The day of the week to get the name for.
 ' @return The name for the day of the week.
 '
-Public Function GetDayName(ByVal dow As DayOfWeek) As String
+Public Function GetDayName(ByVal DayOfWeek As DayOfWeek) As String
     VerifyLoaded
-    GetDayName = mProps.DayNames(dow)
+    GetDayName = mProps.DayNames(DayOfWeek)
 End Function
 
 ''
@@ -671,7 +669,7 @@ End Function
 ' @remarks This method is not fully implemented. It will return 1
 ' for all era names and cultures.
 '
-Public Function GetEra(ByRef eraName As String) As Long
+Public Function GetEra(ByRef EraName As String) As Long
     VerifyLoaded
     ' need to update the culture table to handle multiple eras.
     GetEra = 1
@@ -777,13 +775,13 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub CloneHelper(ByRef props As PropsType)
+Friend Sub InitClone(ByRef props As PropsType)
     mProps = props
 End Sub
 
-Friend Sub Load(ByVal LCID As Long, ByVal UseUserOverride As Boolean, Optional ByVal Calendar As Calendar)
+Friend Sub Init(ByVal LCID As Long, ByVal UseUserOverride As Boolean, Optional ByVal Calendar As Calendar)
     If Not CultureTable.IsLoaded Then _
         Throw Cor.NewNotSupportedException("Cannot load DateTimeFormatInfo without culture table.")
     
@@ -800,7 +798,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub LoadUserOverride(ByVal LCID As Long)
     With mProps
@@ -848,7 +846,7 @@ Private Sub LoadCommon(ByVal LCID As Long)
 End Sub
 
 Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) As String
-    Dim cnt         As Long
+    Dim Count       As Long
     Dim pos         As Long
     Dim sb          As StringBuilder
     Dim Day         As Long
@@ -891,31 +889,34 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     
     Do While pos < mPattern.Buffer.cElements
         Ch = mPattern.Chars(pos)
-        cnt = GetRepeatCount(pos)
+        Count = GetRepeatCount(pos)
         
         If Not Escaped Then
             If Quote <> 0 Then
                 Select Case Ch
-                    Case corBackslashChar:   Escaped = True
-                    Case Quote:         Quote = 0
-                    Case Else:          Call sb.AppendChar(Ch)
+                    Case corBackslashChar
+                        Escaped = True
+                    Case Quote
+                        Quote = 0
+                    Case Else
+                        sb.AppendChar Ch
                 End Select
-                cnt = 1
+                Count = 1
             
             Else
                 Select Case Ch
                     Case corLowerDChar
-                        Append1to4CountValue sb, cnt, Day, mProps.AbbreviatedDayNames(dt.DayOfWeek), mProps.DayNames(dt.DayOfWeek)
+                        Append1to4CountValue sb, Count, Day, mProps.AbbreviatedDayNames(dt.DayOfWeek), mProps.DayNames(dt.DayOfWeek)
                     Case corUpperMChar
-                        Append1to4CountValue sb, cnt, Month, mProps.AbbreviatedMonthNames(Month - 1), mProps.MonthNames(Month - 1)
+                        Append1to4CountValue sb, Count, Month, mProps.AbbreviatedMonthNames(Month - 1), mProps.MonthNames(Month - 1)
                     Case corLowerHChar
-                        Append1or2DigitNumber sb, cnt, HourMod12
+                        Append1or2DigitNumber sb, Count, HourMod12
                     Case corUpperHChar
-                        Append1or2DigitNumber sb, cnt, Hour
+                        Append1or2DigitNumber sb, Count, Hour
                     Case corLowerMChar
-                        Append1or2DigitNumber sb, cnt, Minute
+                        Append1or2DigitNumber sb, Count, Minute
                     Case corLowerSChar
-                        Append1or2DigitNumber sb, cnt, Second
+                        Append1or2DigitNumber sb, Count, Second
                     Case corColonChar
                         sb.AppendString mProps.TimeSeparator
                     Case corForwardSlashChar
@@ -925,7 +926,7 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
                     Case corSecondaryQuoteChar
                         Quote = corSecondaryQuoteChar
                     Case corLowerYChar
-                        Select Case cnt
+                        Select Case Count
                             Case 1
                                 sb.Append YearMod100
                             Case 2
@@ -935,11 +936,11 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
                                 
                                 sb.Append YearMod100
                             Case Else
-                                sb.AppendFormat "{0:d" & cnt & "}", Year
+                                sb.AppendFormat "{0:d" & Count & "}", Year
                         End Select
                         
                     Case corLowerTChar
-                        If cnt = 1 Then
+                        If Count = 1 Then
                             sb.Append Designator, 0, 1
                         Else
                             sb.AppendString Designator
@@ -950,7 +951,7 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
                             Set ZoneOffset = TimeZone.CurrentTimeZone.GetUtcOffset(dt)
                         End If
                         
-                        Select Case cnt
+                        Select Case Count
                             Case 1
                                 sb.AppendString VBA.Format$(ZoneOffset.Hours, "0;-0")
                             Case 2
@@ -964,21 +965,21 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
                             FormatError
                         End If
                         
-                        cnt = 1
+                        Count = 1
                     
                     Case corBackslashChar
                         Escaped = True
-                        cnt = 1
+                        Count = 1
                     
                     Case corLowerFChar
                         Dim secfrac As Long
-                        If cnt > 7 Then
+                        If Count > 7 Then
                             FormatError
                         End If
                         
                         secfrac = GetSecondsFraction(dt.Ticks)
-                        secfrac = (secfrac \ CLng(10 ^ (7 - cnt)))
-                        sb.AppendFormat "{0:g" & cnt & "}", secfrac
+                        secfrac = (secfrac \ CLng(10 ^ (7 - Count)))
+                        sb.AppendFormat "{0:g" & Count & "}", secfrac
                         
                     Case Else
                         sb.AppendChar Ch
@@ -987,10 +988,10 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
         Else
             sb.AppendChar Ch
             Escaped = False
-            cnt = 1
+            Count = 1
         End If
         Percented = (Ch = corPercentChar)
-        pos = pos + cnt
+        pos = pos + Count
     Loop
     
     If Quote <> 0 Then _
@@ -1031,8 +1032,8 @@ Private Sub Append1to4CountValue(ByRef sb As StringBuilder, ByVal cnt As Long, B
     End Select
 End Sub
 
-Private Sub Append1or2DigitNumber(ByRef sb As StringBuilder, ByVal cnt As Long, ByVal Value As Long)
-    If cnt = 1 Then
+Private Sub Append1or2DigitNumber(ByRef sb As StringBuilder, ByVal Count As Long, ByVal Value As Long)
+    If Count = 1 Then
         sb.Append Value
     Else
         If Value < 10 Then
@@ -1051,13 +1052,16 @@ End Sub
 ' @return The number of time the character repeated starting at the index.
 '
 Private Function GetRepeatCount(ByVal Index As Long) As Long
-    Dim i As Long
-    Dim Ch As Integer
+    Dim i   As Long
+    Dim Ch  As Integer
     
     Ch = mPattern.Chars(Index)
     i = Index + 1
     Do While i < mPattern.Buffer.cElements
-        If mPattern.Chars(i) <> Ch Then Exit Do
+        If mPattern.Chars(i) <> Ch Then
+            Exit Do
+        End If
+        
         i = i + 1
     Loop
     GetRepeatCount = i - Index
@@ -1088,11 +1092,11 @@ Private Function GetPattern(ByRef Format As String) As String
                 Case corLowerMChar, corUpperMChar
                     GetPattern = mProps.MonthDayPattern
                 Case corLowerRChar, corUpperRChar
-                    GetPattern = C_RFC1123Pattern
+                    GetPattern = PatternRFC1123
                 Case corLowerSChar
-                    GetPattern = C_SORTABLEDATETIMEPATTERN
+                    GetPattern = PatternSortableDateTime
                 Case corLowerUChar
-                    GetPattern = C_UNIVERSALSORTABLEDATETIMEPATTERN
+                    GetPattern = PatternUniversalSortableDateTime
                 Case corUpperUChar
                     GetPattern = Me.FullDateTimePattern
                 Case corLowerYChar, corUpperYChar
@@ -1108,18 +1112,16 @@ End Function
 ''
 ' Returns a list of date and time patterns avaiable.
 Private Function CombineAllDateTimePatterns() As String()
-    Dim List As ArrayList
-    Set List = New ArrayList
+    Dim List        As New ArrayList
+    Dim Patterns    As String
+    Dim Chars()     As Integer
     
-    Dim Patterns As String
     Patterns = "dDfFgGmMrRstTUuYy"
-    
-    Dim Chars() As Integer
     Chars = AllocChars(Patterns)
     
     Dim i As Long
     For i = 0 To Len(Patterns) - 1
-        Call List.AddRange(GetSpecificDateTimePattern(Chars(i)))
+        List.AddRange GetSpecificDateTimePattern(Chars(i))
     Next i
     FreeChars Chars
     
@@ -1159,11 +1161,11 @@ Private Function GetSpecificDateTimePattern(ByVal Pattern As Long) As String()
         Case corUpperMChar, corLowerMChar
             Ret(0) = mProps.MonthDayPattern
         Case corUpperRChar, corLowerRChar
-            Ret(0) = C_RFC1123Pattern
+            Ret(0) = PatternRFC1123
         Case corLowerSChar
-            Ret(0) = C_SORTABLEDATETIMEPATTERN
+            Ret(0) = PatternSortableDateTime
         Case corLowerUChar
-            Ret(0) = C_UNIVERSALSORTABLEDATETIMEPATTERN
+            Ret(0) = PatternUniversalSortableDateTime
         Case corLowerYChar, corUpperYChar
             Ret(0) = mProps.YearMonthPattern
         Case Else
@@ -1203,117 +1205,116 @@ Private Function CreateDateTimePatterns(ByRef DatePatterns() As String, ByRef Ti
 End Function
 
 Private Sub VerifyWritable()
-    If mProps.IsReadOnly Then Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_ReadOnly))
+    If mProps.IsReadOnly Then
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    End If
 End Sub
 
-Private Sub ReadStringArray(ByRef a() As String, ByVal Name As String, ByVal bag As PropertyBag)
-    With bag
+Private Function ReadStringArray(ByRef Name As String, ByVal Bag As PropertyBag) As String()
+    With Bag
         Dim Count As Long
         Count = .ReadProperty(Name & "_Count", 0)
-        a = CorArray.CreateInstance(vbString, Count)
+        
+        Dim Values() As String
+        Values = CorArray.CreateInstance(vbString, Count)
         
         Dim i As Long
         For i = 0 To Count - 1
-            a(i) = .ReadProperty(Name & "_" & i)
+            Values(i) = .ReadProperty(Name & "_" & i)
         Next i
+        
+        ReadStringArray = Values
     End With
-End Sub
+End Function
 
-Private Sub WriteStringArray(ByRef a() As String, ByVal Name As String, ByVal bag As PropertyBag)
-    With bag
-        Call .WriteProperty(Name & "_Count", UBound(a) + 1)
+Private Sub WriteStringArray(ByRef Arr() As String, ByRef Name As String, ByVal Bag As PropertyBag)
+    With Bag
+        .WriteProperty Name & "_Count", UBound(Arr) + 1
+        
         Dim i As Long
-        For i = 0 To UBound(a)
-            Call .WriteProperty(Name & "_" & i, a(i))
+        For i = 0 To UBound(Arr)
+            .WriteProperty Name & "_" & i, Arr(i)
         Next i
     End With
 End Sub
 
 Private Sub VerifyLoaded()
-    If mLoaded Then Exit Sub
-    Call Load(INVARIANT_LCID, False)
+    If Not mLoaded Then
+        Init INVARIANT_LCID, False
+    End If
 End Sub
 
-Private Sub AssignDayNames(ByRef Source() As String, ByRef DayNames() As String)
-    Call VerifyWritable
-    Call VerifyLoaded
-
-    If CorArray.Rank(Source) <> 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
-    If CorArray.GetLength(Source) <> 7 Then _
-        Throw Cor.NewArgumentException("Array must contain exactly 7 elements.")
+Private Function CopyArray(ByRef Source() As String, ByVal RequiredLength As Long) As String()
+    VerifyWritable
+    VerifyLoaded
+    CheckValidSingleDimArray Source, Parameter_Value
     
-    ReDim DayNames(0 To 6)
-    Call CorArray.CopyEx(Source, LBound(Source), DayNames, 0, 7)
-End Sub
+    If CorArray.GetLength(Source) <> RequiredLength Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidArrayLength, RequiredLength), "Value")
+    
+    Dim Target() As String
+    ReDim Target(0 To RequiredLength - 1)
+    CorArray.CopyEx Source, LBound(Source), Target, 0, RequiredLength
+    CopyArray = Target
+End Function
 
-Private Sub AssignMonthNames(ByRef Source() As String, ByRef MonthNames() As String)
-    Call VerifyWritable
-    Call VerifyLoaded
-    If CorArray.Rank(Source) <> 1 Then _
-        Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
-    If CorArray.GetLength(Source) <> 13 Then _
-        Throw Cor.NewArgumentException("Array must contain exactly 13 elements.")
-        
-    ReDim MonthNames(0 To 12)
-    Call CorArray.CopyEx(Source, LBound(Source), MonthNames, 0, 13)
-End Sub
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With mProps
-        Set .Calendar = PropBag.ReadProperty(PROP_CALENDAR, Nothing)
-        .CalendarWeekRule = PropBag.ReadProperty(PROP_CALENDARWEEKRULE)
-        .AMDesignator = PropBag.ReadProperty(PROP_AMDESIGNATOR)
-        .DateSeparator = PropBag.ReadProperty(PROP_DATESEPARATOR)
-        .FirstDayOfWeek = PropBag.ReadProperty(PROP_FIRSTDAYOFWEEK)
-        .FullDateTimePattern = PropBag.ReadProperty(PROP_FULLDATETIMEPATTERN)
-        .LongDatePattern = PropBag.ReadProperty(PROP_LONGDATEPATTERN)
-        .LongTimePattern = PropBag.ReadProperty(PROP_LONGTIMEPATTERN)
-        .MonthDayPattern = PropBag.ReadProperty(PROP_MONTHDAYPATTERN)
-        .PMDesignator = PropBag.ReadProperty(PROP_PMDESIGNATOR)
-        .ShortDatePattern = PropBag.ReadProperty(PROP_SHORTDATEPATTERN)
-        .ShortTimePattern = PropBag.ReadProperty(PROP_SHORTTIMEPATTERN)
-        .TimeSeparator = PropBag.ReadProperty(PROP_TIMESEPARATOR)
-        .YearMonthPattern = PropBag.ReadProperty(PROP_YEARMONTHPATTERN)
-        .IsReadOnly = PropBag.ReadProperty(PROP_ISREADONLY)
-        Call ReadStringArray(.AbbreviatedDayNames, PROP_ABBREVIATEDDAYNAMES, PropBag)
-        Call ReadStringArray(.AbbreviatedMonthNames, PROP_ABBREVIATEDMONTHNAMES, PropBag)
-        Call ReadStringArray(.MonthNames, PROP_MONTHNAMES, PropBag)
-        Call ReadStringArray(.DayNames, PROP_DAYNAMES, PropBag)
+        Set .Calendar = PropBag.ReadProperty(PropCalendar, Nothing)
+        .CalendarWeekRule = PropBag.ReadProperty(PropCalendarWeekRule)
+        .AMDesignator = PropBag.ReadProperty(PropAMDesignator)
+        .DateSeparator = PropBag.ReadProperty(PropDateSeparator)
+        .FirstDayOfWeek = PropBag.ReadProperty(PropFirstDayOfWeek)
+        .FullDateTimePattern = PropBag.ReadProperty(PropFullDateTimePattern)
+        .LongDatePattern = PropBag.ReadProperty(PropLongDatePattern)
+        .LongTimePattern = PropBag.ReadProperty(PropLongTimePattern)
+        .MonthDayPattern = PropBag.ReadProperty(PropMonthDayPattern)
+        .PMDesignator = PropBag.ReadProperty(PropPMDesignator)
+        .ShortDatePattern = PropBag.ReadProperty(PropShortDatePattern)
+        .ShortTimePattern = PropBag.ReadProperty(PropShortTimePattern)
+        .TimeSeparator = PropBag.ReadProperty(PropTimeSeparator)
+        .YearMonthPattern = PropBag.ReadProperty(PropYearMonthPattern)
+        .IsReadOnly = PropBag.ReadProperty(PropIsReadOnly)
+        .AbbreviatedDayNames = ReadStringArray(PropAbbreviatedDayNames, PropBag)
+        .AbbreviatedMonthNames = ReadStringArray(PropAbbreviatedMonthNames, PropBag)
+        .MonthNames = ReadStringArray(PropMonthNames, PropBag)
+        .DayNames = ReadStringArray(PropDayNames, PropBag)
     End With
+    
     mLoaded = True
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With mProps
-        Call PropBag.WriteProperty(PROP_CALENDAR, .Calendar)
-        Call PropBag.WriteProperty(PROP_CALENDARWEEKRULE, .CalendarWeekRule)
-        Call WriteStringArray(.AbbreviatedDayNames, PROP_ABBREVIATEDDAYNAMES, PropBag)
-        Call WriteStringArray(.AbbreviatedMonthNames, PROP_ABBREVIATEDMONTHNAMES, PropBag)
-        Call PropBag.WriteProperty(PROP_AMDESIGNATOR, .AMDesignator)
-        Call PropBag.WriteProperty(PROP_DATESEPARATOR, .DateSeparator)
-        Call WriteStringArray(.DayNames, PROP_DAYNAMES, PropBag)
-        Call PropBag.WriteProperty(PROP_FIRSTDAYOFWEEK, .FirstDayOfWeek)
-        Call PropBag.WriteProperty(PROP_FULLDATETIMEPATTERN, .FullDateTimePattern)
-        Call PropBag.WriteProperty(PROP_LONGDATEPATTERN, .LongDatePattern)
-        Call PropBag.WriteProperty(PROP_LONGTIMEPATTERN, .LongTimePattern)
-        Call PropBag.WriteProperty(PROP_MONTHDAYPATTERN, .MonthDayPattern)
-        Call WriteStringArray(.MonthNames, PROP_MONTHNAMES, PropBag)
-        Call PropBag.WriteProperty(PROP_PMDESIGNATOR, .PMDesignator)
-        Call PropBag.WriteProperty(PROP_SHORTDATEPATTERN, .ShortDatePattern)
-        Call PropBag.WriteProperty(PROP_SHORTTIMEPATTERN, .ShortTimePattern)
-        Call PropBag.WriteProperty(PROP_TIMESEPARATOR, .TimeSeparator)
-        Call PropBag.WriteProperty(PROP_YEARMONTHPATTERN, .YearMonthPattern)
-        Call PropBag.WriteProperty(PROP_ISREADONLY, .IsReadOnly)
+        PropBag.WriteProperty PropCalendar, .Calendar
+        PropBag.WriteProperty PropCalendarWeekRule, .CalendarWeekRule
+        WriteStringArray .AbbreviatedDayNames, PropAbbreviatedDayNames, PropBag
+        WriteStringArray .AbbreviatedMonthNames, PropAbbreviatedMonthNames, PropBag
+        PropBag.WriteProperty PropAMDesignator, .AMDesignator
+        PropBag.WriteProperty PropDateSeparator, .DateSeparator
+        WriteStringArray .DayNames, PropDayNames, PropBag
+        PropBag.WriteProperty PropFirstDayOfWeek, .FirstDayOfWeek
+        PropBag.WriteProperty PropFullDateTimePattern, .FullDateTimePattern
+        PropBag.WriteProperty PropLongDatePattern, .LongDatePattern
+        PropBag.WriteProperty PropLongTimePattern, .LongTimePattern
+        PropBag.WriteProperty PropMonthDayPattern, .MonthDayPattern
+        WriteStringArray .MonthNames, PropMonthNames, PropBag
+        PropBag.WriteProperty PropPMDesignator, .PMDesignator
+        PropBag.WriteProperty PropShortDatePattern, .ShortDatePattern
+        PropBag.WriteProperty PropShortTimePattern, .ShortTimePattern
+        PropBag.WriteProperty PropTimeSeparator, .TimeSeparator
+        PropBag.WriteProperty PropYearMonthPattern, .YearMonthPattern
+        PropBag.WriteProperty PropIsReadOnly, .IsReadOnly
     End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -1329,7 +1330,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -1337,7 +1338,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IFormatProvider Interface
+'   IFormatProvider
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     Set IFormatProvider_GetFormat = GetFormat(FormatType)

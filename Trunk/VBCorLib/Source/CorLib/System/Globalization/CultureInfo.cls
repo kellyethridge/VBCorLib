@@ -354,7 +354,7 @@ Public Property Get DateTimeFormat() As DateTimeFormatInfo
         
     If mDateTimeFormat Is Nothing Then
         Set mDateTimeFormat = New DateTimeFormatInfo
-        mDateTimeFormat.Load mProps.LCID, mProps.UseUserOverride, Me.Calendar
+        mDateTimeFormat.Init mProps.LCID, mProps.UseUserOverride, Me.Calendar
         mDateTimeFormat.IsReadOnly = mProps.IsReadOnly
     End If
     Set DateTimeFormat = mDateTimeFormat
@@ -430,8 +430,12 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
         Case vbLong, vbInteger, vbByte
             ID = NameOrLCID
         Case vbString
-            If CultureTable.IsLoaded Then
-                ID = CultureTable.GetCultureID(NameOrLCID)
+            If Len(NameOrLCID) > 0 Then
+                If CultureTable.IsLoaded Then
+                    ID = CultureTable.GetCultureID(NameOrLCID)
+                End If
+            Else
+                ID = INVARIANT_LCID
             End If
         Case Else
             Throw Cor.NewArgumentException("Invalid Culture Identifier.", "NameOrLCID")

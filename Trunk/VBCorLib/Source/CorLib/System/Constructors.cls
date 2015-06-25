@@ -513,7 +513,7 @@ End Function
 '
 Public Function NewCultureInfo(ByRef NameOrLCID As Variant, Optional ByVal UseUserOverride As Boolean = True) As CultureInfo
     Set NewCultureInfo = New CultureInfo
-    Call NewCultureInfo.Init(NameOrLCID, UseUserOverride)
+    NewCultureInfo.Init NameOrLCID, UseUserOverride
 End Function
 
 ''
