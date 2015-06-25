@@ -12,16 +12,12 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' Testing DateTimeFormatInfo is just for ensure the correctness of the class,
+' Testing DateTimeFormatInfo is to ensure the correctness of the class,
 ' not testing that the culture information itself is correct.
 '
 Option Explicit
 Implements ICategorizable
 Implements ITestCaseSource
-
-'Private info As DateTimeFormatInfo
-'Private i As Long
-'Private s() As String
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Globalization"
@@ -37,6 +33,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use DayOfWeek.Thursday, "Thu"
             Test.Use DayOfWeek.Friday, "Fri"
             Test.Use DayOfWeek.Saturday, "Sat"
+            
+        Case "GetAbbreviatedDayName_WithInvalidDayOfWeek_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use 7
+            
+        Case "GetAllDateTimePatterns_WithValue_ReturnsArrayOfPatterns"
+            Test.Use "d", NewStrings("MM/dd/yyyy")
+            Test.Use "D", NewStrings("dddd, dd MMMM yyyy")
+            Test.Use "F", NewStrings("dddd, dd MMMM yyyy HH:mm:ss")
+            Test.Use "f", NewStrings("dddd, dd MMMM yyyy HH:mm", "dddd, dd MMMM yyyy hh:mm tt", "dddd, dd MMMM yyyy H:mm", "dddd, dd MMMM yyyy h:mm tt")
+            Test.Use "g", NewStrings("MM/dd/yyyy HH:mm", "MM/dd/yyyy hh:mm tt", "MM/dd/yyyy H:mm", "MM/dd/yyyy h:mm tt")
+            Test.Use "G", NewStrings("MM/dd/yyyy HH:mm:ss")
             
     End Select
 End Sub
@@ -89,6 +97,42 @@ Public Sub DayNames_WhenCalled_ReturnsArrayOfDayNames()
     Assert.That Actual, Iz.EqualTo(NewStrings("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
 End Sub
 
+Public Sub DayNames_WithInvalidArrayLength_ThrowsArgumentException()
+    Dim info As New DateTimeFormatInfo
+    
+    On Error Resume Next
+    info.DayNames = NewStrings("1", "2", "3", "4", "5", "6", "7", "8")
+    
+    AssertArgumentException Err, "Value"
+End Sub
+
+Public Sub AbbreviatedDayName_WithInvalidArraylength_ThrowsArgumentException()
+    Dim info As New DateTimeFormatInfo
+    
+    On Error Resume Next
+    info.AbbreviatedDayNames = NewStrings("1", "2", "3", "4", "5", "6", "7", "8")
+    
+    AssertArgumentException Err, "Value"
+End Sub
+
+Public Sub MonthNames_WithInvalidArrayLength_ThrowsArgumentException()
+    Dim info As New DateTimeFormatInfo
+    
+    On Error Resume Next
+    info.MonthNames = NewStrings("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+    
+    AssertArgumentException Err, "Value"
+End Sub
+
+Public Sub AbbreviatedMonthNames_WithInvalidArrayLength_ThrowsArgumentException()
+    Dim info As New DateTimeFormatInfo
+    
+    On Error Resume Next
+    info.AbbreviatedMonthNames = NewStrings("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12")
+    
+    AssertArgumentException Err, "Value"
+End Sub
+
 Public Sub FirstDayOfWeek_WhenCalled_ReturnsSunday()
     Dim Actual As DayOfWeek
     
@@ -102,7 +146,7 @@ Public Sub LongDatePattern_WhenCalled_ReturnsDateFormatPattern()
     
     Actual = MakeInfo.LongDatePattern
     
-    Assert.That Actual, Iz.EqualTo("dddd, MMMM dd, yyyy")
+    Assert.That Actual, Iz.EqualTo("dddd, dd MMMM yyyy")
 End Sub
 
 Public Sub LongTimePattern_WhenCalled_ReturnsDateFormatPattern()
@@ -110,7 +154,7 @@ Public Sub LongTimePattern_WhenCalled_ReturnsDateFormatPattern()
     
     Actual = MakeInfo.LongTimePattern
     
-    Assert.That Actual, Iz.EqualTo("h:mm:ss tt")
+    Assert.That Actual, Iz.EqualTo("HH:mm:ss")
 End Sub
 
 Public Sub FullDateTimePattern_WhenCalled_ReturnsDateFormatPattern()
@@ -118,7 +162,7 @@ Public Sub FullDateTimePattern_WhenCalled_ReturnsDateFormatPattern()
     
     Actual = MakeInfo.FullDateTimePattern
     
-    Assert.That Actual, Iz.EqualTo("dddd, MMMM dd, yyyy h:mm:ss tt")
+    Assert.That Actual, Iz.EqualTo("dddd, dd MMMM yyyy HH:mm:ss")
 End Sub
 
 Public Sub GetAbbreviatedDayName_WithDay_ReturnsName(ByVal Day As DayOfWeek, ByVal Expected As String)
@@ -137,93 +181,57 @@ Public Sub GetAbbreviatedDayName_WithInvalidDayOfWeek_ThrowsArgumentOutOfRangeEx
     AssertArgumentOutOfRangeException Err, "DayOfWeek"
 End Sub
 
-'Public Sub TestGetAllDateTimePatterns_LowerD()
-'    s = info.GetAllDateTimePatterns("d")
-'    Assert.AreEqual 1, CorArray.GetLength(s), "Should return 1 element array."
-'    Assert.AreEqual "MM/dd/yyyy", s(0)
-'End Sub
-'
-'Public Sub TestGetAllDateTimePatterns_UpperD()
-'    s = info.GetAllDateTimePatterns("D")
-'    Assert.AreEqual 1, CorArray.GetLength(s), "Should return 1 element array."
-'    Assert.AreEqual "dddd, dd MMMM yyyy", s(0)
-'End Sub
-'
-'Public Sub TestGetAllDateTimePatterns_UpperF()
-'    s = info.GetAllDateTimePatterns("F")
-'    Assert.AreEqual 1, CorArray.GetLength(s), "Should return 1 element array."
-'    Assert.AreEqual "dddd, dd MMMM yyyy HH:mm:ss", s(0)
-'End Sub
-'
-'Public Sub TestGetAllDateTimePatterns_LowerF()
-'    s = info.GetAllDateTimePatterns("f")
-'    Assert.AreEqual 4, CorArray.GetLength(s), "Should return 4 element array."
-'    Assert.That s, Iz.EquivalentTo(Array("dddd, dd MMMM yyyy HH:mm", "dddd, dd MMMM yyyy hh:mm tt", "dddd, dd MMMM yyyy H:mm", "dddd, dd MMMM yyyy h:mm tt"))
-'
-''    Dim i As Long
-''    For i = 0 To UBound(s)
-''        Assert.That s(i), Iz.SubsetOf(Array("dddd, dd MMMM yyyy HH:mm", "dddd, dd MMMM yyyy hh:mm tt", "dddd, dd MMMM yyyy H:mm", "dddd, dd MMMM yyyy h:mm tt"))
-''    Next i
-'End Sub
-'
-'Public Sub TestGetAllPatterns_LowerG()
-'    Dim s() As String
-'    Dim i As Long
-'
-'    s = info.GetAllDateTimePatterns("g")
-'    Assert.AreEqual 4, CorArray.GetLength(s), "s should contain 4 elements."
-'    Assert.That s, Iz.EquivalentTo(Array("MM/dd/yyyy HH:mm", "MM/dd/yyyy hh:mm tt", "MM/dd/yyyy H:mm", "MM/dd/yyyy h:mm tt"))
-'
-''    For i = 0 To 3
-''        Assert.That s(i), Iz.SubsetOf(Array("MM/dd/yyyy HH:mm", "MM/dd/yyyy hh:mm tt", "MM/dd/yyyy H:mm", "MM/dd/yyyy h:mm tt"))
-''    Next i
-'End Sub
-'
-'Public Sub TestGetAllPatterns_UpperG()
-'    Dim s() As String
-'
-'    s = info.GetAllDateTimePatterns("G")
-'    Assert.AreEqual 1, CorArray.GetLength(s), "s should contain 1 element."
-'    Assert.AreEqual "MM/dd/yyyy HH:mm:ss", s(0)
-'End Sub
-'
-'Public Sub TestGetAllPatterns()
-'    Dim s() As String
-'    Dim i As Long
-'
-'    s = info.GetAllDateTimePatterns
-'    Assert.AreEqual 26, CorArray.GetLength(s), "s should contain 26 elements."
-'End Sub
-'
-'Public Sub TestIsReadOnly()
-'    Assert.IsFalse info.IsReadOnly, "Locally created info should not be ReadOnly."
-'    Assert.IsTrue CultureInfo.CurrentCulture.DateTimeFormat.IsReadOnly, "CurrentCulture supplied should be ReadOnly."
-'    Assert.IsTrue CultureInfo.InvariantCulture.DateTimeFormat.IsReadOnly, "CurrentCulture supplied should be ReadOnly."
-'End Sub
-'
-'Public Sub TestPersistence()
-'    info.DateSeparator = "^"
-'
-'    Dim Days() As String
-'    Days = Cor.NewStrings("M", "T", "W", "Th", "F", "S", "S")
-'
-'    info.AbbreviatedDayNames = Days
-'
-'    Dim Bag As New PropertyBag
-'    Bag.WriteProperty "Info", info
-'
-'    Dim bag2 As New PropertyBag
-'    bag2.Contents = Bag.Contents
-'
-'    Dim NewInfo As DateTimeFormatInfo
-'    Set NewInfo = bag2.ReadProperty("Info")
-'
-'    Assert.AreEqual "^", NewInfo.DateSeparator
-'    Assert.AreEqual Days, NewInfo.AbbreviatedDayNames
-'End Sub
+Public Sub GetAllDateTimePatterns_WithValue_ReturnsArrayOfPatterns(ByVal Format As String, ByRef Expected As Variant)
+    Dim Actual() As String
+    
+    Actual = MakeInfo.GetAllDateTimePatterns(Format)
+    
+    Assert.That Actual, Iz.EquivalentTo(Expected)
+End Sub
+
+Public Sub GetAllDateTimePatterns_WhenCalled_Returns26ElementArray()
+    Dim Actual() As String
+    
+    Actual = MakeInfo.GetAllDateTimePatterns
+    
+    Assert.That CorArray.GetLength(Actual), Iz.EqualTo(26)
+End Sub
+
+Public Sub ReadOnly_WithReadOnlyInfo_ReturnsSameInstance()
+    Dim info As DateTimeFormatInfo
+    Set info = MakeInfo
+    
+    Dim Actual As DateTimeFormatInfo
+    Set Actual = DateTimeFormatInfo.ReadOnly(info)
+    
+    Assert.That Actual, Iz.SameAs(info)
+    Assert.That Actual.IsReadOnly, Iz.True
+End Sub
+
+Public Sub ReadOnly_WithNonReadOnlyInfo_ReturnsReadOnlyCopy()
+    Dim info As New DateTimeFormatInfo
+    
+    Dim Actual As DateTimeFormatInfo
+    Set Actual = DateTimeFormatInfo.ReadOnly(info)
+    
+    Assert.That Actual, Iz.Not.SameAs(info)
+    Assert.That Actual.IsReadOnly, Iz.True
+End Sub
+
+Public Sub Serialization_WhenCalled_SerializesInstance()
+    Dim info As New DateTimeFormatInfo
+    info.DateSeparator = "^"
+    info.DayNames = NewStrings("M", "T", "W", "Th", "F", "S", "S")
+    
+    Dim Actual As DateTimeFormatInfo
+    Set Actual = Persist(info)
+    
+    Assert.That Actual.DateSeparator, Iz.EqualTo("^")
+    Assert.That Actual.DayNames, Iz.EqualTo(NewStrings("M", "T", "W", "Th", "F", "S", "S"))
+End Sub
 
 Private Function MakeInfo() As DateTimeFormatInfo
-    Set MakeInfo = NewCultureInfo("en-US", False).DateTimeFormat
+    Set MakeInfo = CultureInfo.InvariantCulture.DateTimeFormat
 End Function
 
 

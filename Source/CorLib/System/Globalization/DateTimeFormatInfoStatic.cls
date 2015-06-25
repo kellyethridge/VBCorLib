@@ -49,8 +49,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mStringBuilder As StringBuilder
-
 
 ''
 ' Returns the DateTimeFormatInfo object from the Invariant culture type.
@@ -107,18 +105,3 @@ Public Function GetInstance(ByVal FormatProvider As IFormatProvider) As DateTime
     End If
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Property Get StringBuilder() As StringBuilder
-    Set StringBuilder = mStringBuilder
-End Property
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mStringBuilder = New StringBuilder
-End Sub
