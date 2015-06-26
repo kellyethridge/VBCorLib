@@ -275,24 +275,24 @@ End Property
 ' @return An instance of this culture. ReadOnly status is retained.
 '
 Public Function Clone() As CultureInfo
-    Dim dtInfo As DateTimeFormatInfo
+    Dim DTInfo As DateTimeFormatInfo
     If Not mDateTimeFormat Is Nothing Then
-        Set dtInfo = mDateTimeFormat.Clone
+        Set DTInfo = mDateTimeFormat.Clone
     End If
     
-    Dim nInfo As NumberFormatInfo
+    Dim NumInfo As NumberFormatInfo
     If Not mNumberFormat Is Nothing Then
-        Set nInfo = mNumberFormat.Clone
+        Set NumInfo = mNumberFormat.Clone
     End If
         
-    Dim pb As New PropertyBag
-    pb.WriteProperty "Calendar", mCalendar
+    Dim Bag As New PropertyBag
+    Bag.WriteProperty "Calendar", mCalendar
     
-    Dim calInfo As Calendar
-    Set calInfo = pb.ReadProperty("Calendar", Nothing)
+    Dim CalInfo As Calendar
+    Set CalInfo = Bag.ReadProperty("Calendar", Nothing)
     
     Set Clone = New CultureInfo
-    Clone.CloneHelper mProps, dtInfo, nInfo, calInfo
+    Clone.InitClone mProps, DTInfo, NumInfo, CalInfo
 End Function
 
 ''
@@ -401,12 +401,14 @@ End Function
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
     If IsObject(Value) Then
-        If Value Is Nothing Then Exit Function
+        If Value Is Nothing Then
+            Exit Function
+        End If
         
-        Dim c As CultureInfo
         If TypeOf Value Is CultureInfo Then
-            Set c = Value
-            Equals = (c.LCID = mProps.LCID)
+            Dim Other As CultureInfo
+            Set Other = Value
+            Equals = Other.Name = mProps.Name
         End If
     End If
 End Function
@@ -416,12 +418,12 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = Me.LCID
+    GetHashCode = Object.GetHashCode(mProps.Name)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
     Dim ID As Long
@@ -452,16 +454,17 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
     Load ID
 End Sub
 
-Friend Sub CloneHelper(ByRef props As PropsType, ByVal dtInfo As DateTimeFormatInfo, ByVal nInfo As NumberFormatInfo, ByVal calInfo As Calendar)
-    mProps = props
-    Set mDateTimeFormat = dtInfo
-    Set mNumberFormat = nInfo
-    Set mCalendar = calInfo
+Friend Sub InitClone(ByRef Props As PropsType, ByVal DTInfo As DateTimeFormatInfo, ByVal NumInfo As NumberFormatInfo, ByVal CalInfo As Calendar)
+    mProps = Props
+    Set mDateTimeFormat = DTInfo
+    Set mNumberFormat = NumInfo
+    Set mCalendar = CalInfo
+    mLoaded = True
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyWritable()
     If mProps.IsReadOnly Then Throw Cor.NewInvalidOperationException("Culture is Read-Only.")
@@ -533,7 +536,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
@@ -575,7 +578,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -591,7 +594,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -599,7 +602,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IFormatProvider Interface
+'   IFormatProvider
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     Set IFormatProvider_GetFormat = GetFormat(FormatType)

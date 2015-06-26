@@ -169,7 +169,7 @@ Public Sub Constructor_WithenUS_ReturnsUsEnglish()
     Assert.That c.ThreeLetterWindowsLanguageName, Iz.EqualTo("ENU")
     Assert.That c.TwoLetterISOLanguageName, Iz.EqualTo("en")
     Assert.That c.DateTimeFormat.DayNames, Iz.EqualTo(Array("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
-    Assert.That c.DateTimeFormat.LongDatePattern, Iz.EqualTo("dddd, MMMM d, yyyy")
+    Assert.That c.DateTimeFormat.LongDatePattern, Iz.EqualTo("dddd, MMMM dd, yyyy")
     Assert.That c.DateTimeFormat.LongTimePattern, Iz.EqualTo("h:mm:ss tt")
 End Sub
 
