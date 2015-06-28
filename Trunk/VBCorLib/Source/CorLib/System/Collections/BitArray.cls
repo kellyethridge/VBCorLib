@@ -59,13 +59,13 @@ Implements ICollection
 Implements ICloneable
 Implements IVersionableCollection
 
-Private Const PROP_UBOUND       As String = "Ubound"
-Private Const PROP_LENGTH       As String = "Length"
-Private Const PROP_BITSUBOUND   As String = "BitsUBound"
-Private Const PROP_BITS         As String = "Bits"
+Private Const PropUBound        As String = "Ubound"
+Private Const PropLength        As String = "Length"
+Private Const PropBitsUBound    As String = "BitsUBound"
+Private Const PropBits          As String = "Bits"
 
-Private Const BitsPerLong       As Long = 32
-Private Const BitsPerByte       As Long = 8
+Private Const BitsPerLong As Long = 32
+Private Const BitsPerByte As Long = 8
 
 Private mBits()     As Long
 Private mLength     As Long
@@ -317,9 +317,9 @@ End Function
 Public Function OrBits(ByVal Bits As BitArray) As BitArray
     EnsureInited
     If Bits Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Bits", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Bits", ArgumentNull_Array
     If Bits.Length <> mLength Then _
-        Throw Cor.NewArgumentException("Both arrays must have the same length.", "bits")
+        Error.Argument Arg_ArrayLengthsDiffer
     
     Bits.ApplyOrTo mBits
     mVersion = mVersion + 1
@@ -494,26 +494,26 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mUBound = .ReadProperty(PROP_UBOUND)
-        mLength = .ReadProperty(PROP_LENGTH)
+        mUBound = .ReadProperty(PropUBound)
+        mLength = .ReadProperty(PropLength)
         
-        ReDim mBits(0 To CLng(.ReadProperty(PROP_BITSUBOUND)))
+        ReDim mBits(0 To CLng(.ReadProperty(PropBitsUBound)))
         Dim i As Long
         For i = 0 To UBound(mBits)
-            mBits(i) = .ReadProperty(PROP_BITS & i, 0)
+            mBits(i) = .ReadProperty(PropBits & i, 0)
         Next i
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty PROP_UBOUND, mUBound
-        .WriteProperty PROP_LENGTH, mLength
-        .WriteProperty PROP_BITSUBOUND, UBound(mBits)
+        .WriteProperty PropUBound, mUBound
+        .WriteProperty PropLength, mLength
+        .WriteProperty PropBitsUBound, UBound(mBits)
         
         Dim i As Long
         For i = 0 To UBound(mBits)
-            .WriteProperty PROP_BITS & i, mBits(i)
+            .WriteProperty PropBits & i, mBits(i)
         Next i
     End With
 End Sub

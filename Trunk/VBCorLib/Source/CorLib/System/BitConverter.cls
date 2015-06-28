@@ -295,7 +295,7 @@ Public Function ToDecimal(ByRef Value() As Byte, ByVal StartIndex As Long) As Va
     
     ' check precision
     If Value(StartIndex + 14) > 28 Then _
-        Throw Cor.NewOverflowException("Decimal precision must be from 0 to 28 places.")
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_DecimalScale
     
     Dim Ptr As Long
     Ptr = VarPtr(ToDecimal)
@@ -371,7 +371,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ValidateArrayArguments(ByRef Value() As Byte, ByVal StartIndex As Long, ByVal Count As Long)
     If SAPtr(Value) = vbNullPtr Then

@@ -55,21 +55,6 @@ Private mEncoding       As Encoding
 Private mSingleChar(0)  As Integer
 
 
-Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
-    If Output Is Nothing Then _
-        Error.ArgumentNull "Output", ArgumentNull_Stream
-    If Not Output.CanWrite Then _
-        Error.Argument Argument_StreamNotWritable
-    
-    Set mOutStream = Output
-    If Encoding Is Nothing Then
-        Set mEncoding = Cor.NewUTF8Encoding(False, True)
-    Else
-        Set mEncoding = Encoding
-    End If
-End Sub
-
-
 ''
 ' Returns the underlying stream this writer is writing to.
 '
@@ -225,6 +210,24 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Output As Stream, ByVal Encoding As Encoding)
+    If Output Is Nothing Then _
+        Error.ArgumentNull "Output", ArgumentNull_Stream
+    If Not Output.CanWrite Then _
+        Error.Argument Argument_StreamNotWritable
+    
+    Set mOutStream = Output
+    If Encoding Is Nothing Then
+        Set mEncoding = Cor.NewUTF8Encoding(False, True)
+    Else
+        Set mEncoding = Encoding
+    End If
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub WriteStringLength(ByVal Length As Long)
@@ -328,20 +331,20 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
         Error.Argument Argument_InvalidOffLen
 
-    On Error GoTo CleanExit
+    On Error GoTo Catch
     SAPtr(Bytes) = CorArray.ArrayPointer(Buffer)
     mOutStream.WriteBlock Bytes, Range.Index, Range.Count
     SAPtr(Bytes) = vbNullPtr
     Exit Sub
     
-CleanExit:
+Catch:
     SAPtr(Bytes) = vbNullPtr
     Throw Err
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

@@ -70,28 +70,6 @@ Private mBuffer()       As Byte
 Private mSingleChar(0)  As Integer
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
-    If Stream Is Nothing Then _
-        Error.ArgumentNull "Stream", ArgumentNull_Stream
-    If Not Stream.CanRead Then _
-        Error.Argument Argument_ReadableStreamRequired
-    
-    Set mStream = Stream
-    If Encoding Is Nothing Then
-        Set mEncoding = New UTF8Encoding
-    Else
-        Set mEncoding = Encoding
-    End If
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   API
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 ''
 ' Returns the underlying Stream being read by the Reader.
 '
@@ -419,6 +397,28 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    ReDim mBuffer(0 To DefaultCapacity - 1)
+End Sub
+
+Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
+    If Stream Is Nothing Then _
+        Error.ArgumentNull "Stream", ArgumentNull_Stream
+    If Not Stream.CanRead Then _
+        Error.Argument Argument_ReadableStreamRequired
+    
+    Set mStream = Stream
+    If Encoding Is Nothing Then
+        Set mEncoding = New UTF8Encoding
+    Else
+        Set mEncoding = Encoding
+    End If
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub FillBuffer(ByVal Count As Long)
@@ -481,22 +481,22 @@ End Function
 Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByRef BufferRange As ListRange) As Long
     Dim Buffer() As Byte
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     SAPtr(Buffer) = BufferPtr
     ReadToByteBuffer = mStream.ReadBlock(Buffer, BufferRange.Index, BufferRange.Count)
     
-errTrap:
+Catch:
     SAPtr(Buffer) = vbNullPtr
 End Function
 
 Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As ListRange) As Long
     Dim Buffer() As Integer
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     SAPtr(Buffer) = BufferPtr
     ReadToCharBuffer = ReadCharBytes(Buffer, BufferRange.Index, BufferRange.Count)
     
-errTrap:
+Catch:
     SAPtr(Buffer) = vbNullPtr
 End Function
 
@@ -567,15 +567,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    ReDim mBuffer(0 To DefaultCapacity - 1)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

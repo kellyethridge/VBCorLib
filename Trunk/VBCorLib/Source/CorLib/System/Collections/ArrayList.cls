@@ -57,17 +57,17 @@ Implements ICloneable
 Implements IList
 Implements IVersionableCollection
 
-Private Const PROP_COUNT            As String = "Count"
-Private Const PROP_CAPACITY         As String = "Capacity"
-Private Const PROP_ITEMPREFIX       As String = "Item"
-Private Const PROP_SUBTYPE          As String = "SubType"
-Private Const PROP_DEFAULTCOMPARER  As String = "DefaultComparer"
-Private Const PROP_COMPARER         As String = "Comparer"
+Private Const PropCount             As String = "Count"
+Private Const PropCapacity          As String = "Capacity"
+Private Const PropItemPrefix        As String = "Item"
+Private Const PropSubType           As String = "SubType"
+Private Const PropDefaultComparer   As String = "DefaultComparer"
+Private Const PropComparer          As String = "Comparer"
 
-Private Const SUBTYPE_NORMAL        As Long = 0
-Private Const SUBTYPE_EMPTY         As Long = 1
-Private Const SUBTYPE_NOTHING       As Long = 2
-Private Const DEF_CAPACITY          As Long = 16
+Private Const SubTypeNormal     As Long = 0
+Private Const SubTypeEmpty      As Long = 1
+Private Const SubTypeNothing    As Long = 2
+Private Const DefaultCapacity   As Long = 16
 
 Private mItems()    As Variant
 Private mCount      As Long
@@ -75,10 +75,6 @@ Private mCapacity   As Long
 Private mVersion    As Long
 Private mComparer   As IComparer
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   API
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Adds a new item to the end of the list.
@@ -203,7 +199,7 @@ Public Property Let Capacity(ByVal Value As Long)
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
     
     If Value = 0 Then
-        Value = DEF_CAPACITY
+        Value = DefaultCapacity
     End If
     
     If Value <> mCapacity Then
@@ -741,7 +737,7 @@ Friend Sub Init(ByVal Comparer As IComparer, ByRef Source As Variant)
 End Sub
 
 Private Sub Class_InitProperties()
-    Capacity = DEF_CAPACITY
+    Capacity = DefaultCapacity
 End Sub
 
 
@@ -836,10 +832,10 @@ End Sub
 '   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    On Error GoTo errTrap
+    On Error GoTo Catch
     With PropBag
-        mCount = .ReadProperty(PROP_COUNT, 0)
-        EnsureCapacity .ReadProperty(PROP_CAPACITY, DEF_CAPACITY)
+        mCount = .ReadProperty(PropCount, 0)
+        EnsureCapacity .ReadProperty(PropCapacity, DefaultCapacity)
         
         Dim i As Long
         For i = 0 To mCount - 1
@@ -848,32 +844,32 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
             ' correctly, or at all, except the key name. Even when reading with a default
             ' value of Empty, it returns an empty string "". So now we maintain a flag
             ' with each value to determine the correct value.
-            Select Case .ReadProperty(PROP_SUBTYPE & i, SUBTYPE_NORMAL)
-                Case SUBTYPE_NORMAL
-                    Helper.MoveVariant mItems(i), .ReadProperty(PROP_ITEMPREFIX & i)
+            Select Case .ReadProperty(MakeSubTypeKey(i), SubTypeNormal)
+                Case SubTypeNormal
+                    Helper.MoveVariant mItems(i), .ReadProperty(MakeItemKey(i))
                 
-                Case SUBTYPE_EMPTY
+                Case SubTypeEmpty
                     mItems(i) = Empty
                 
-                Case SUBTYPE_NOTHING
+                Case SubTypeNothing
                     Set mItems(i) = Nothing
             End Select
         Next i
         
-        If .ReadProperty(PROP_DEFAULTCOMPARER, False) Then
+        If .ReadProperty(PropDefaultComparer, False) Then
             Set mComparer = Comparer.Default
         Else
-            Set mComparer = .ReadProperty(PROP_COMPARER, Nothing)
+            Set mComparer = .ReadProperty(PropComparer, Nothing)
         End If
     End With
     Exit Sub
     
-errTrap:
+Catch:
     Throw Cor.NewSerializationException(Err.Description)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    On Error GoTo errTrap
+    On Error GoTo Catch
     With PropBag
         Dim i As Long
         For i = 0 To mCount - 1
@@ -884,38 +880,46 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
             ' with each value to determine the correct value.
             Select Case VarType(mItems(i))
                 Case vbEmpty
-                    PropBag.WriteProperty PROP_SUBTYPE & i, SUBTYPE_EMPTY
+                    PropBag.WriteProperty MakeSubTypeKey(i), SubTypeEmpty
                 
                 Case vbObject
                     If mItems(i) Is Nothing Then
-                        PropBag.WriteProperty PROP_SUBTYPE & i, SUBTYPE_NOTHING
+                        PropBag.WriteProperty MakeSubTypeKey(i), SubTypeNothing
                     Else
-                        PropBag.WriteProperty PROP_ITEMPREFIX & i, mItems(i)
+                        PropBag.WriteProperty MakeItemKey(i), mItems(i)
                     End If
                 
                 Case Else
-                    PropBag.WriteProperty PROP_ITEMPREFIX & i, mItems(i)
+                    PropBag.WriteProperty MakeItemKey(i), mItems(i)
             
             End Select
         Next i
         
-        .WriteProperty PROP_COUNT, mCount
-        .WriteProperty PROP_CAPACITY, mCapacity
+        .WriteProperty PropCount, mCount
+        .WriteProperty PropCapacity, mCapacity
         If mComparer Is Comparer.Default Then
-            .WriteProperty PROP_DEFAULTCOMPARER, True
+            .WriteProperty PropDefaultComparer, True
         Else
-            .WriteProperty PROP_COMPARER, mComparer, Nothing
+            .WriteProperty PropComparer, mComparer, Nothing
         End If
     End With
     Exit Sub
     
-errTrap:
+Catch:
     Throw Cor.NewSerializationException(Err.Description)
 End Sub
 
+Private Function MakeSubTypeKey(ByVal ItemId As Long) As String
+    MakeSubTypeKey = PropSubType & ItemId
+End Function
+
+Private Function MakeItemKey(ByVal ItemId As Long) As String
+    MakeItemKey = PropItemPrefix & ItemId
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -931,7 +935,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -939,7 +943,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
     CopyTo Arr, Index
@@ -959,7 +963,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -971,7 +975,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IList Interface
+'   IList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IList_Add(Value As Variant) As Long
     IList_Add = Add(Value)
@@ -1039,7 +1043,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IVersionableCollection Interface
+'   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IVersionableCollection_CurrentVersion() As Long
     IVersionableCollection_CurrentVersion = mVersion
