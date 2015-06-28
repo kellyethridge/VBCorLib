@@ -107,7 +107,7 @@ Public Sub TestGetCommandLineArgs()
     WriteLine "--- VISUAL INSPECTION ---"
     WriteLine "--- GetCommandLingArgs ---"
     WriteLine "Should have no empty args unless quoted."
-    WriteLine "Count: " & CorArray.GetLength(s)
+    WriteLine "Count: " & CorArray.Length(s)
     WriteLine "Program: " & s(0)
     For i = 1 To UBound(s)
         WriteLine "Arg(" & i & ") = " & s(i)

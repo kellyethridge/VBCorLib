@@ -537,7 +537,7 @@ Public Sub WriteAllbytes(ByRef Path As String, ByRef Bytes() As Byte)
         Error.ArgumentNull "Bytes", ArgumentNull_Array
     
     With Cor.NewFileStream(Path, FileMode.Create)
-        .WriteBlock Bytes, LBound(Bytes), CorArray.GetLength(Bytes)
+        .WriteBlock Bytes, LBound(Bytes), CorArray.Length(Bytes)
     End With
 End Sub
 

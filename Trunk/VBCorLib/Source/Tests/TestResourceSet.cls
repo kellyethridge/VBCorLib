@@ -44,7 +44,7 @@ Public Sub TestGetObjectCustom()
     Dim i As Long
     
     b = mResourceSet.GetObject(101, "Custom")
-    Assert.AreEqual 10, CorArray.GetLength(b)
+    Assert.AreEqual 10, CorArray.Length(b)
     For i = 0 To 9
         Assert.AreEqual i + 48, b(i)
     Next i

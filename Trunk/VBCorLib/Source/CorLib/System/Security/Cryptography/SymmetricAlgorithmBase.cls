@@ -255,7 +255,7 @@ End Function
 '
 Public Sub SetIV(ByRef RgbIV() As Byte)
     Dim Size As Long
-    Size = CorArray.GetLength(RgbIV)
+    Size = CorArray.Length(RgbIV)
     
     If (Size * 8) <> mBlockSize Then _
         Throw Cor.NewCryptographicException("Invalid IV length.")
@@ -291,7 +291,7 @@ End Function
 '
 Public Sub SetKey(ByRef RgbKey() As Byte)
     Dim Size As Long
-    Size = CorArray.GetLength(RgbKey)
+    Size = CorArray.Length(RgbKey)
     
     If Not ValidKeySize(Size * 8) Then _
         Throw Cor.NewArgumentException("Invalid key size.", "Key")
@@ -363,7 +363,7 @@ Public Function CloneRgbKey(ByRef RgbKey As Variant) As Byte()
         Throw Cor.NewCryptographicException("Invalid key size.")
         
     Dim Size As Long
-    Size = CorArray.GetLength(RgbKey)
+    Size = CorArray.Length(RgbKey)
     If Not IsLegalSize(mLegalKeySizes, Size * 8) Then _
         Throw Cor.NewCryptographicException("Invalid key size.")
     
@@ -400,7 +400,7 @@ Public Function CloneRgbIV(ByRef RgbIV As Variant) As Byte()
         Ret = CryptoHelper.GetRandomBytes(mBlockSize \ 8)
     Else
         Dim Size As Long
-        Size = CorArray.GetLength(RgbIV)
+        Size = CorArray.Length(RgbIV)
         If (Size * 8) <> mBlockSize Then _
             Throw Cor.NewCryptographicException("Invalid RgbIV length.")
         

@@ -34,7 +34,7 @@ Public Sub TestGetPreamble()
     
     b = e.GetPreamble
     Assert.IsFalse CorArray.IsNull(b)
-    Assert.AreEqual 3, CorArray.GetLength(b)
+    Assert.AreEqual 3, CorArray.Length(b)
     '0xEF, 0xBB, 0xBF
     Assert.AreEqual &HEF, b(0)
     Assert.AreEqual &HBB, b(1)
@@ -44,14 +44,14 @@ End Sub
 Public Sub TestGetBytesFrom1CharString()
     s = Chr$(&H7F)
     b = e.GetBytes(s)
-    Assert.AreEqual 1, CorArray.GetLength(b)
+    Assert.AreEqual 1, CorArray.Length(b)
     Assert.AreEqual &H7F, b(0)
 End Sub
 
 Public Sub TestGetBytesFrom100CharString()
     s = String$(100, &H7F)
     b = e.GetBytes(s)
-    Assert.AreEqual 100, CorArray.GetLength(b)
+    Assert.AreEqual 100, CorArray.Length(b)
     
     Dim i As Long
     For i = 0 To 99
@@ -64,7 +64,7 @@ Public Sub TestGetBytesFromSurrogatePair()
     
     ch = NewIntegers(&HD800, &HDC00)
     b = e.GetBytes(ch)
-    Assert.AreEqual 4, CorArray.GetLength(b)
+    Assert.AreEqual 4, CorArray.Length(b)
     Assert.AreEqual 240, b(0)
     Assert.AreEqual 144, b(1)
     Assert.AreEqual 128, b(2)
@@ -76,7 +76,7 @@ Public Sub TestGetBytesFromHighSurrogateOnly()
     
     ch = NewIntegers(&HD801)
     b = e.GetBytes(ch)
-    Assert.AreEqual 3, CorArray.GetLength(b)
+    Assert.AreEqual 3, CorArray.Length(b)
     Assert.AreEqual 237, b(0)
     Assert.AreEqual 160, b(1)
     Assert.AreEqual 129, b(2)
@@ -84,7 +84,7 @@ End Sub
 
 Public Sub TestGetBytesFromLowSurrogateOnly()
     b = e.GetBytes(ChrW$(&HDC01))
-    Assert.AreEqual 3, CorArray.GetLength(b)
+    Assert.AreEqual 3, CorArray.Length(b)
     Assert.AreEqual 237, b(0)
     Assert.AreEqual 176, b(1)
     Assert.AreEqual 129, b(2)
@@ -96,7 +96,7 @@ Public Sub TestGetBytesExFromHighSurrogateOnly()
     ch = NewIntegers(&HD801)
     ReDim b(0 To e.GetByteCount(ch) - 1)
     Assert.AreEqual 3, e.GetBytesEx(ch, 0, 1, b, 0)
-    Assert.AreEqual 3, CorArray.GetLength(b)
+    Assert.AreEqual 3, CorArray.Length(b)
     Assert.AreEqual 237, b(0)
     Assert.AreEqual 160, b(1)
     Assert.AreEqual 129, b(2)
@@ -105,7 +105,7 @@ End Sub
 Public Sub TestGetBytesExFromLowSurrogateOnly()
     ReDim b(0 To e.GetByteCount(ChrW$(&HDC01)) - 1)
     Assert.AreEqual 3, e.GetBytesEx(ChrW$(&HDC01), 0, 1, b, 0)
-    Assert.AreEqual 3, CorArray.GetLength(b)
+    Assert.AreEqual 3, CorArray.Length(b)
     Assert.AreEqual 237, b(0)
     Assert.AreEqual 176, b(1)
     Assert.AreEqual 129, b(2)
@@ -113,7 +113,7 @@ End Sub
 
 Public Sub TestGetBytesFromAll()
     b = e.GetBytes(NewIntegers(97, &HD801, &HDC01, &H600))
-    Assert.AreEqual 7, CorArray.GetLength(b)
+    Assert.AreEqual 7, CorArray.Length(b)
     Assert.AreEqual 97, b(0)
     Assert.AreEqual 240, b(1)
     Assert.AreEqual 144, b(2)
@@ -125,7 +125,7 @@ End Sub
 
 Public Sub TestGetBytesFromSubArray()
     b = e.GetBytes(NewIntegers(97, &HD801, &HDC01, &H600), 1, 2)
-    Assert.AreEqual 4, CorArray.GetLength(b)
+    Assert.AreEqual 4, CorArray.Length(b)
     Assert.AreEqual 240, b(0)
     Assert.AreEqual 144, b(1)
     Assert.AreEqual 144, b(2)
@@ -199,14 +199,14 @@ Public Sub TestEncodeChars0To1000()
     Next i
     b = e.GetBytes(ch)
     
-    Assert.AreEqual 1874, CorArray.GetLength(b)
+    Assert.AreEqual 1874, CorArray.Length(b)
     FF = FreeFile
     Open App.Path & "\UTF8_Chars_0to1000.txt" For Binary As #FF
     ReDim fileBytes(0 To LOF(FF) - 1)
     Get #FF, , fileBytes
     Close #FF
     
-    For i = 0 To CorArray.GetLength(b) - 1
+    For i = 0 To CorArray.Length(b) - 1
         Assert.AreEqual fileBytes(i), b(i)
     Next i
 End Sub
@@ -219,7 +219,7 @@ Public Sub TestGetBytesFromHugeString()
     s = String$(100000, "1")
     Assert.AreEqual 100000, e.GetByteCount(s)
     b = e.GetBytes(s)
-    Assert.AreEqual 100000, CorArray.GetLength(b)
+    Assert.AreEqual 100000, CorArray.Length(b)
     For i = 0 To UBound(b)
         Assert.AreEqual 49, b(i)
     Next i
@@ -230,7 +230,7 @@ Public Sub TestEncodingEmptyString()
     
     b = e.GetBytes("")
     Assert.IsFalse CorArray.IsNull(b), "Array should not be null."
-    Assert.AreEqual 0, CorArray.GetLength(b)
+    Assert.AreEqual 0, CorArray.Length(b)
 
     ReDim b(10)
     Assert.AreEqual 0, e.GetBytesEx("", 0, 0, b, 0)

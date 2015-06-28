@@ -80,7 +80,7 @@ Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
     DirectoryNames = Split(FullPath, Statics.Path.DirectorySeparator)
     
     Dim i As Long
-    i = CorArray.GetLength(DirectoryNames)
+    i = CorArray.Length(DirectoryNames)
     Do
         Dim TestDirectory As String
         TestDirectory = CorString.Join(corDirectorySeparator, DirectoryNames, 0, i)

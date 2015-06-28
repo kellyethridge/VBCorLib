@@ -707,6 +707,8 @@ library VBCorType {
         const short corTerminator                   = 0;
         const short corUpperAChar                   = 0x41;
         const short corLowerAChar                   = 0x61;
+        const short corUpperBChar                   = 0x42;
+        const short corLowerBChar                   = 0x62;
         const short corLowerDChar                   = 0x64;
         const short corUpperDChar                   = 0x44;
         const short corLowerEChar                   = 0x65;
@@ -719,6 +721,10 @@ library VBCorType {
         const short corUpperHChar                   = 0x48;
         const short corLowerMChar                   = 0x6D;
         const short corUpperMChar                   = 0x4D;
+        const short corUpperNChar                   = 0x4E;
+        const short corLowerNChar                   = 0x6E;
+        const short corUpperPChar                   = 0x50;
+        const short corLowerPChar                   = 0x70;
         const short corLowerRChar                   = 0x72;
         const short corUpperRChar                   = 0x52;
         const short corLowerSChar                   = 0x73;
@@ -726,6 +732,8 @@ library VBCorType {
         const short corUpperTChar                   = 0x54;
         const short corLowerUChar                   = 0x75;
         const short corUpperUChar                   = 0x55;
+        const short corUpperXChar                   = 0x58;
+        const short corLowerXChar                   = 0x78;
         const short corLowerYChar                   = 0x79;
         const short corUpperYChar                   = 0x59;
         const short corUpperZChar                   = 0xFA;

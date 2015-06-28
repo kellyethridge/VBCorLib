@@ -219,7 +219,7 @@ Friend Sub Init(ByVal ResourceId As Long, ByVal Pic As IPicture, ByVal ResourceT
         mColorCount = Powers(.biBitCount)
         mPlanes = .biPlanes
         mBitCount = .biBitCount
-        mBytesInRes = CorArray.GetLength(Bytes)
+        mBytesInRes = CorArray.Length(Bytes)
     End With
     
     mResourceID = ResourceId

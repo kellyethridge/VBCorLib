@@ -107,7 +107,7 @@ End Function
 Public Function CompareTo(ByRef Value As Variant) As Long
     Dim other As Guid
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     Set other = Value
     If other Is Nothing Then
         CompareTo = 1
@@ -117,8 +117,8 @@ Public Function CompareTo(ByRef Value As Variant) As Long
     
     Exit Function
     
-errTrap:
-    Throw Cor.NewArgumentException("A Guid object is required.", "Value")
+Catch:
+    Error.Argument Arg_MustBeGuid, "Value"
 End Function
 
 ''
@@ -127,48 +127,24 @@ End Function
 ' @param Format The format of the guid value to be returned.
 ' @param Provider A format provider used to format the guid.
 ' @return String representing of the guid.
-' @remarks There are 4 format types: "D","B","N","P".<br>
+' @remarks There are 5 format types: "D","B","N","P","X".<br>
 ' <pre>
-' "D" = XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-' "B" = {XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX}
-' "P" = (XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX)
-' "N" = XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+' "D" = 00000000-0000-0000-0000-000000000000
+' "B" = {00000000-0000-0000-0000-000000000000}
+' "P" = (00000000-0000-0000-0000-000000000000)
+' "N" = 00000000000000000000000000000000
+' "X" = {0x00000000,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}}
 ' </pre>
 ' <b>B</b> is the default format.
 '
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    If Format = "X" Then
-        Dim sb As StringBuilder
-        Set sb = StringBuilderCache.Acquire
-        sb.AppendString "{"
-        sb.AppendFormat "0x{0:x8},0x{1:x4},0x{2:x4},", mGuid.Data1, mGuid.Data2, mGuid.Data3
-        sb.AppendString "{"
-        sb.AppendFormat "0x{0:x2},0x{1:x2},0x{2:x2},0x{3:x2},0x{4:x2},0x{5:x2},0x{6:x2},0x{7:x2}", mGuid.Data4(0), mGuid.Data4(1), mGuid.Data4(2), mGuid.Data4(3), mGuid.Data4(4), mGuid.Data4(5), mGuid.Data4(6), mGuid.Data4(7)
-        sb.AppendString "}}"
-        
-        ToString = StringBuilderCache.GetStringAndRelease(sb)
-        Exit Function
-    End If
-    
-    Dim Buf As String
-    Dim Size As Long
-    
-    Buf = String$(45, 0)
-    Size = StringFromGUID2(mGuid, Buf, Len(Buf))
-    ToString = Left$(Buf, Size - 1)
-    
-    Select Case UCase$(Format)
-        Case "D"
-            ToString = Mid$(ToString, 2, 36)
-        Case "N"
-            ToString = Replace$(Mid$(ToString, 2, 36), "-", "")
-        Case "P"
-            Mid$(ToString, 1, 1) = "("
-            Mid$(ToString, 38, 1) = ")"
-        Case "B", ""
-            ' already formatted to this and is the default
+    Select Case Len(Format)
+        Case 0
+            ToString = Guid.ToString(mGuid, corUpperDChar)
+        Case 1
+            ToString = Guid.ToString(mGuid, AscW(Format))
         Case Else
-            Throw Cor.NewArgumentException("Invalid Format specified.", "Format")
+            Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidGuidFormatSpecification))
     End Select
 End Function
 
@@ -223,7 +199,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Value As Variant)
     Select Case VariantType(Value)
@@ -324,7 +300,7 @@ Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, By
         
         If CorArray.IsNull(d) Then _
             Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-        If CorArray.GetLength(d) <> 8 Then _
+        If CorArray.Length(d) <> 8 Then _
             Throw Cor.NewArgumentException("Array must be 8 bytes in length.", "Bytes")
         
         CopyMemory .Data4(0), d(LBound(d)), 8

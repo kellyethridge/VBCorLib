@@ -100,13 +100,13 @@ Public Sub LongTestWriteDifferentBlockLengths()
         Set cs = NewCryptoStream(ms, csp.CreateEncryptor, WriteMode)
         Dim c As Long
         c = 0
-        Do While (CorArray.GetLength(b) - c) > i
+        Do While (CorArray.Length(b) - c) > i
             cs.WriteBlock b, c, i
             c = c + i
         Loop
         
-        If c < CorArray.GetLength(b) Then
-            cs.WriteBlock b, c, CorArray.GetLength(b) - c
+        If c < CorArray.Length(b) Then
+            cs.WriteBlock b, c, CorArray.Length(b) - c
         End If
         cs.FlushFinalBlock
         
@@ -117,8 +117,8 @@ Public Sub LongTestWriteDifferentBlockLengths()
         ms2.Position = 0
         Set cs = NewCryptoStream(ms2, csp.CreateDecryptor, ReadMode)
         Dim b2() As Byte
-        ReDim b2(0 To CorArray.GetLength(b) - 1)
-        Assert.AreEqual CorArray.GetLength(b), cs.ReadBlock(b2, 0, CorArray.GetLength(b))
+        ReDim b2(0 To CorArray.Length(b) - 1)
+        Assert.AreEqual CorArray.Length(b), cs.ReadBlock(b2, 0, CorArray.Length(b))
         Assert.AreEqual b, b2
     Next i
 End Sub
@@ -138,7 +138,7 @@ Public Sub LongTestReadDifferentBlockLengths()
     r.NextBytes b
     
     Set cs = NewCryptoStream(ms, csp.CreateEncryptor, WriteMode)
-    cs.WriteBlock b, 0, CorArray.GetLength(b)
+    cs.WriteBlock b, 0, CorArray.Length(b)
     cs.FlushFinalBlock
     ms.WriteTo ms2
     
@@ -153,13 +153,13 @@ Public Sub LongTestReadDifferentBlockLengths()
         Set cs = NewCryptoStream(ms, csp.CreateDecryptor, ReadMode)
         Dim c As Long
         c = 0
-        Do While (CorArray.GetLength(b2) - c) > i
+        Do While (CorArray.Length(b2) - c) > i
             Assert.AreEqual i, cs.ReadBlock(b2, c, i), "Read failed."
             c = c + i
         Loop
         
-        If c < CorArray.GetLength(b2) Then
-            Assert.AreEqual CorArray.GetLength(b2) - c, cs.ReadBlock(b2, c, CorArray.GetLength(b2) - c), "Final block read failed."
+        If c < CorArray.Length(b2) Then
+            Assert.AreEqual CorArray.Length(b2) - c, cs.ReadBlock(b2, c, CorArray.Length(b2) - c), "Final block read failed."
         End If
         
         Assert.AreEqual b, b2, "Array is wrong."
@@ -180,7 +180,7 @@ Public Sub BigRead()
     r.NextBytes b
     
     Set cs = NewCryptoStream(ms, csp.CreateEncryptor, WriteMode)
-    cs.WriteBlock b, 0, CorArray.GetLength(b)
+    cs.WriteBlock b, 0, CorArray.Length(b)
     cs.FlushFinalBlock
     
     Dim ms2 As New MemoryStream

@@ -25,7 +25,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     Dim ObjectArray()   As Object
         
     Select Case Test.MethodName
-        Case "GetLength_WithValue_ReturnsExpected"
+        Case "Length_WithValue_ReturnsExpected"
             Test.Use(Array()).Expect 0
             
             ReDim LongArray(1 To 10)
@@ -61,33 +61,33 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Function GetLength_WithValue_ReturnsExpected(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
-    GetLength_WithValue_ReturnsExpected = CorArray.GetLength(Arr, Dimension)
+Public Function Length_WithValue_ReturnsExpected(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
+    Length_WithValue_ReturnsExpected = CorArray.Length(Arr, Dimension)
 End Function
 
-Public Sub GetLength_WithInvalidDimension_Throws()
+Public Sub Length_WithInvalidDimension_Throws()
     Dim Arr(1 To 10, 1 To 15)
     
     On Error Resume Next
-    CorArray.GetLength Arr, 3
+    CorArray.Length Arr, 3
 
     AssertIndexOutOfRangeException Err
 End Sub
 
-Public Sub GetLength_WithNonArray_Throws()
+Public Sub Length_WithNonArray_Throws()
     Dim NotAnArray As Long
     
     On Error Resume Next
-    CorArray.GetLength NotAnArray
+    CorArray.Length NotAnArray
 
     AssertArgumentException Err
 End Sub
 
-Public Sub GetLength_WithUninitializedArray_Throws()
+Public Sub Length_WithUninitializedArray_Throws()
     Dim NullArray() As Long
     
     On Error Resume Next
-    CorArray.GetLength NullArray
+    CorArray.Length NullArray
 
     AssertArgumentNullException Err, "Arr"
 End Sub

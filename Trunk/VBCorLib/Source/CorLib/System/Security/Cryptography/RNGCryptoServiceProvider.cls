@@ -55,7 +55,7 @@ Public Sub GetBytes(ByRef Data() As Byte)
     If CorArray.IsNull(Data) Then _
         Throw Cor.NewArgumentNullException("Date", Environment.GetResourceString(ArgumentNull_Array))
     
-    If CryptGenRandom(mProvider, CorArray.GetLength(Data), Data(LBound(Data))) = BOOL_FALSE Then _
+    If CryptGenRandom(mProvider, CorArray.Length(Data), Data(LBound(Data))) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
 End Sub
@@ -71,7 +71,7 @@ Public Sub GetNonZeroBytes(ByRef Data() As Byte)
     ' We double the size of the array and fill it with
     ' random values, banking on the odds that half of
     ' it will not be zeros.
-    ReDim BigData(CorArray.GetLength(Data) * 2 - 1)
+    ReDim BigData(CorArray.Length(Data) * 2 - 1)
     Call GetBytes(BigData)
     
     Dim j As Long

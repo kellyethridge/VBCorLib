@@ -41,7 +41,7 @@ Attribute VB_Exposed = True
 ' @remarks This class cannot be directly instantiated. To access the methods
 ' use the class name directly.
 ' <pre>
-' Debug.Print CorArray.GetLength(MyArray)
+' Debug.Print CorArray.Length(MyArray)
 ' </pre>
 '
 Option Explicit
@@ -716,13 +716,13 @@ End Function
 ' @param dimension (Optional) the specific dimension to get the number of elements.
 ' @return The number of elements in the specified dimension or the entire array.
 '
-Public Function GetLength(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
+Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
     Dim SafeArrayPtr  As Long
     SafeArrayPtr = ArrayPointer(Arr)
     If SafeArrayPtr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    GetLength = LengthCore(SafeArrayPtr, Dimension)
+    Length = LengthCore(SafeArrayPtr, Dimension)
 End Function
 
 Friend Function LengthCore(ByVal SafeArrayPtr As Long, Optional ByVal Dimension As Long) As Long

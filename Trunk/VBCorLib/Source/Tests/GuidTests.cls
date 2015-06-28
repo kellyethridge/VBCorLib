@@ -18,9 +18,7 @@ Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
 
-Private Const TEST_GUID As String = "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-Private Const TEST_GUID_LOWER As String = "{C200E360-38C5-11CE-AE62-08002B2B79EE}"
-Private Const TEST_GUID_UPPER As String = "{C200E360-38C5-11CE-AE62-08002B2B79FF}"
+Private Const TEST_GUID As String = "{c200e360-38c5-11ce-ae62-08002b2b79ef}"
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System"
@@ -29,18 +27,23 @@ End Sub
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "ToString_WithFormats_ReturnsExpected"
-            Test.Use "", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "B", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "P", "(C200E360-38C5-11CE-AE62-08002B2B79EF)"
-            Test.Use "D", "C200E360-38C5-11CE-AE62-08002B2B79EF"
-            Test.Use "N", "C200E36038C511CEAE6208002B2B79EF"
+            Test.Use "", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "B", "{c200e360-38c5-11ce-ae62-08002b2b79ef}"
+            Test.Use "b", "{c200e360-38c5-11ce-ae62-08002b2b79ef}"
+            Test.Use "P", "(c200e360-38c5-11ce-ae62-08002b2b79ef)"
+            Test.Use "p", "(c200e360-38c5-11ce-ae62-08002b2b79ef)"
+            Test.Use "D", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "d", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "N", "c200e36038c511ceae6208002b2b79ef"
+            Test.Use "n", "c200e36038c511ceae6208002b2b79ef"
             Test.Use "X", "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}"
+            Test.Use "x", "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}"
             
         Case "Parse_WithValues_ReturnsExpected"
-            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "C200E36038C511CEAE6208002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
-            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             
         Case "Equals_WithValues_ReturnsExpected"
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "{C200E360-38C5-11CE-AE62-08002B2B79EE}", False
@@ -64,6 +67,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "NewGuid_WithValue_ReturnsExpected"
             Test.Use NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF), "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            
+        Case "ToString_WithInvalidFormatSpecifier_ThrowsFormatException"
+            Test.Use "f"
+            Test.Use "BB"
             
     End Select
 End Sub
@@ -163,24 +170,26 @@ errTrap:
     AssertArgumentNullException Err, "Value"
 End Sub
 
-Public Sub TestPersistence()
-    Dim G1 As VBCorLib.Guid
-    Dim G2 As VBCorLib.Guid
-    Dim pp1 As New PropertyBag
-    Dim pp2 As New PropertyBag
+Public Sub ToString_WithInvalidFormatSpecifier_ThrowsFormatException(ByVal InvalidFormat As String)
+    On Error Resume Next
     
-    Set G1 = Guid.NewGuid
-    pp1.WriteProperty "g", G1
-    pp2.Contents = pp1.Contents
+    Guid.NewGuid.ToString InvalidFormat
     
-    Set G2 = pp2.ReadProperty("g")
+    AssertFormatException Err
+End Sub
+
+Public Sub Serialization_WhenCalled_SerializesInstance()
+    Dim Original As VBCorLib.Guid
+    Set Original = Guid.NewGuid
     
-    Assert.IsTrue G2.Equals(G1), "Guids should be equal."
+    Dim Actual As Guid
+    Set Actual = Persist(Original)
     
+    Assert.That Actual, Equals(Original)
 End Sub
 
 Public Sub EmptyGuid_WhenCalled_ReturnsGuidWithZeroValue()
-    Assert.AreEqual "{00000000-0000-0000-0000-000000000000}", Guid.EmptyGuid.ToString
+    Assert.AreEqual "00000000-0000-0000-0000-000000000000", Guid.EmptyGuid.ToString
 End Sub
 
 

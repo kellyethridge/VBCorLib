@@ -85,8 +85,8 @@ Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef 
     Dim SourceLength        As Long
     Dim DestinationLength   As Long
     
-    SourceLength = CorArray.GetLength(Source) * SafeArrayGetElemsize(SourcePtr)
-    DestinationLength = CorArray.GetLength(Destination) * SafeArrayGetElemsize(DestinationPtr)
+    SourceLength = CorArray.Length(Source) * SafeArrayGetElemsize(SourcePtr)
+    DestinationLength = CorArray.Length(Destination) * SafeArrayGetElemsize(DestinationPtr)
     
     If SourceOffset + Count > SourceLength Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
@@ -111,7 +111,7 @@ Public Function ByteLength(ByRef Arr As Variant) As Long
     If ArrayPtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
     
-    ByteLength = SafeArrayGetElemsize(ArrayPtr) * CorArray.GetLength(Arr)
+    ByteLength = SafeArrayGetElemsize(ArrayPtr) * CorArray.Length(Arr)
 End Function
 
 ''
@@ -131,7 +131,7 @@ Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
     
     If ArrayPtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
-    If Index < 0 Or Index >= CorArray.GetLength(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
+    If Index < 0 Or Index >= CorArray.Length(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
     GetByte = MemByte(MemLong(ArrayPtr + PVDATA_OFFSET) + Index)
@@ -154,7 +154,7 @@ Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byt
     
     If ArrayPtr = vbNullPtr Then _
         Throw Cor.NewArgumentNullException("Arr", Environment.GetResourceString(ArgumentNull_Array))
-    If Index < 0 Or Index >= CorArray.GetLength(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
+    If Index < 0 Or Index >= CorArray.Length(Arr) * SafeArrayGetElemsize(ArrayPtr) Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
 
     MemByte(MemLong(ArrayPtr + PVDATA_OFFSET) + Index) = Value

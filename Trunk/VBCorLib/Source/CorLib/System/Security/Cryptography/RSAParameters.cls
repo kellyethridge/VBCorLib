@@ -363,11 +363,11 @@ Friend Function ToCspBlob(ByVal KeyNumber As Long) As Byte()
     
     ' Build RSAPUBKEY structure
     Call writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352)))
-    Call writer.WriteValue(CLng(CorArray.GetLength(mModulus) * 8))
+    Call writer.WriteValue(CLng(CorArray.Length(mModulus) * 8))
     Call writer.WriteValue(ReverseByteCopy(mExponent))
     
     Dim i As Long
-    i = 4 - CorArray.GetLength(mExponent)
+    i = 4 - CorArray.Length(mExponent)
     Do While i > 0
         Call writer.WriteValue(CByte(0))
         i = i - 1

@@ -114,7 +114,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateIcon(ByRef Bytes() As Byte) As StdPicture
     Dim hr As Long
-    hr = CreateIconFromResource(Bytes(0), CorArray.GetLength(Bytes), True, &H30000)
+    hr = CreateIconFromResource(Bytes(0), CorArray.Length(Bytes), True, &H30000)
     If hr = 0 Then Exit Function
     
     Dim NewIcon As PictDesc

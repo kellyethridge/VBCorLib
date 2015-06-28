@@ -104,8 +104,8 @@ Public Sub SetKey(ByRef Key() As Byte)
     If CorArray.IsNull(Key) Then _
         Throw Cor.NewArgumentNullException("Key")
     
-    mKey = CorArray.CreateInstance(vbByte, CorArray.GetLength(Key))
-    Call Buffer.BlockCopy(Key, 0, mKey, 0, CorArray.GetLength(Key))
+    mKey = CorArray.CreateInstance(vbByte, CorArray.Length(Key))
+    Call Buffer.BlockCopy(Key, 0, mKey, 0, CorArray.Length(Key))
     Call Initialize
 End Sub
 
@@ -231,7 +231,7 @@ End Sub
 
 Private Sub EndHash(ByRef Hash() As Byte)
     Call mHashAlgorithm.TransformBlock(mKeyOpad, 0, mKeySize, mKeyOpad, 0)
-    Call mHashAlgorithm.TransformFinalBlock(Hash, 0, CorArray.GetLength(Hash))
+    Call mHashAlgorithm.TransformFinalBlock(Hash, 0, CorArray.Length(Hash))
     
     mHashStarted = False
 End Sub
@@ -249,7 +249,7 @@ Private Sub ExpandKey()
     If Not CorArray.IsNull(mKeyIpad) Then Exit Sub
     
     Dim K0() As Byte
-    Select Case CorArray.GetLength(mKey)
+    Select Case CorArray.Length(mKey)
         Case Is < mKeySize
             K0 = mKey
             ReDim Preserve K0(0 To mKeySize - 1)

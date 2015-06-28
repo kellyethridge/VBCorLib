@@ -92,7 +92,7 @@ Public Sub TestEncodeEmptyString()
     
     b = En.GetBytes("")
     Assert.IsFalse CorArray.IsNull(b)
-    Assert.AreEqual 0, CorArray.GetLength(b)
+    Assert.AreEqual 0, CorArray.Length(b)
     
     ReDim b(10)
     Assert.AreEqual 0, En.GetBytesEx("", 0, 0, b, 0)
@@ -105,7 +105,7 @@ Public Sub TestDecodeEmptyArray()
     b = CorArray.CreateInstance(vbByte)
     ch = En.GetChars(b)
     Assert.IsFalse CorArray.IsNull(ch), "Array should not be null."
-    Assert.AreEqual 0, CorArray.GetLength(ch)
+    Assert.AreEqual 0, CorArray.Length(ch)
     
     ReDim ch(10)
     Assert.AreEqual 0, En.GetCharsEx(b, 0, 0, ch, 0)

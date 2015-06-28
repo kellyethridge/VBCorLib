@@ -42,7 +42,7 @@ Public Sub EncryptOneByte128BitKey()
     
     Dim b2() As Byte
     b2 = t.TransformFinalBlock(b, 0, 1)
-    Assert.AreEqual 8, CorArray.GetLength(b2)
+    Assert.AreEqual 8, CorArray.Length(b2)
     
     Dim i As Long
     For i = 1 To 8
@@ -51,8 +51,8 @@ Public Sub EncryptOneByte128BitKey()
     
     ' repeat to test resetting is correct
     Erase b2
-    b2 = t.TransformFinalBlock(b, 0, CorArray.GetLength(b))
-    Assert.AreEqual 8, CorArray.GetLength(b2)
+    b2 = t.TransformFinalBlock(b, 0, CorArray.Length(b))
+    Assert.AreEqual 8, CorArray.Length(b2)
     For i = 1 To 8
         Assert.AreEqual CLng(Choose(i, 78, 228, 36, 62, 169, 116, 61, 240)), b2(i - 1)
     Next i

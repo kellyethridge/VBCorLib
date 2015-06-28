@@ -204,7 +204,7 @@ Public Function Decrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     If fOAEP Then Flags = CRYPT_OAEP
     
     Dim Size As Long
-    Size = CorArray.GetLength(Rgb)
+    Size = CorArray.Length(Rgb)
     
     ' We need to make a copy of the original array because we dont' want
     ' to alter its contents. Also, the copy is reversed in order to deal
@@ -248,7 +248,7 @@ Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     If fOAEP Then Flags = CRYPT_OAEP
     
     Dim Size As Long
-    Size = CorArray.GetLength(Rgb)
+    Size = CorArray.Length(Rgb)
     
     ' We copy the original array so we don't alter the
     ' original array during the encryption process.
@@ -336,7 +336,7 @@ Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     Call VerifyLoaded(False)
     Call DeleteKey
     
-    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.GetLength(KeyBlob), 0, CRYPT_EXPORTABLE, mKey) = BOOL_FALSE Then _
+    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.Length(KeyBlob), 0, CRYPT_EXPORTABLE, mKey) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
     mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
@@ -470,7 +470,7 @@ Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef S
     Dim RevSig() As Byte
     RevSig = ReverseByteCopy(Signature)
     
-    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.GetLength(Signature), mKey, vbNullString, 0))
+    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.Length(Signature), mKey, vbNullString, 0))
     Call CryptDestroyHash(Hash)
 End Function
 
@@ -611,7 +611,7 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
             Throw Cor.NewArgumentException("Only SHA1 and MD5 hash algorithms are supported.", "Str")
     End Select
     
-    If CorArray.GetLength(RgbHash) <> HashLen Then _
+    If CorArray.Length(RgbHash) <> HashLen Then _
         Throw Cor.NewCryptographicException("Invalid hash length.")
     
     On Error GoTo errTrap

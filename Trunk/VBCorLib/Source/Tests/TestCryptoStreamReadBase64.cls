@@ -30,7 +30,7 @@ End Sub
 Public Sub Setup()
     org = Encoding.ASCII.GetBytes("Hello, world!")
     buf = Encoding.ASCII.GetBytes(Convert.ToBase64String(org))
-    Set ms = Cor.NewMemoryStream(buf, 0, CorArray.GetLength(buf), False)
+    Set ms = Cor.NewMemoryStream(buf, 0, CorArray.Length(buf), False)
     Set cs = Cor.NewCryptoStream(ms, New FromBase64Transform, ReadMode)
 End Sub
 

@@ -32,7 +32,7 @@ Public Sub TestByteOrderMark()
     Dim b() As Byte
     
     b = En.GetPreamble
-    Assert.AreEqual 2, CorArray.GetLength(b)
+    Assert.AreEqual 2, CorArray.Length(b)
     Assert.AreEqual &HFF, b(0)
     Assert.AreEqual &HFE, b(1)
 End Sub
@@ -53,7 +53,7 @@ Public Sub TestGetBytes()
     Dim i As Long
     
     b = En.GetBytes(String$(50, " "))
-    Assert.AreEqual 100, CorArray.GetLength(b)
+    Assert.AreEqual 100, CorArray.Length(b)
     
     For i = 0 To UBound(b)
         If i And 1 Then
@@ -71,7 +71,7 @@ Public Sub TestGetChars()
     
     b = En.GetBytes(String$(50, " "))
     ch = En.GetChars(b)
-    Assert.AreEqual 50, CorArray.GetLength(ch)
+    Assert.AreEqual 50, CorArray.Length(ch)
     
     For i = 0 To UBound(ch)
         Assert.AreEqual 32, ch(i)
@@ -137,7 +137,7 @@ Public Sub TestEncodeEmptyString()
     
     b = En.GetBytes("")
     Assert.IsFalse CorArray.IsNull(b), "Array should not be null."
-    Assert.AreEqual 0, CorArray.GetLength(b)
+    Assert.AreEqual 0, CorArray.Length(b)
     
     ReDim b(10)
     Assert.AreEqual 0, En.GetBytesEx("", 0, 0, b, 0)

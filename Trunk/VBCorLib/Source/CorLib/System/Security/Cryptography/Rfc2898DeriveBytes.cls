@@ -103,7 +103,7 @@ Public Property Let Salt(ByRef RHS() As Byte)
         Throw Cor.NewArgumentNullException("Salt")
     
     Dim Size As Long
-    Size = CorArray.GetLength(RHS)
+    Size = CorArray.Length(RHS)
     
     If Size < 8 Then _
         Throw Cor.NewArgumentException("Cannot set Salt less than 8 bytes in length.", "Salt")
@@ -213,7 +213,7 @@ End Sub
 Private Function NextBlockBytes() As Byte()
     mBlockCount = mBlockCount + 1
     
-    Call mPRF.TransformBlock(mSalt, 0, CorArray.GetLength(mSalt), mSalt, 0)
+    Call mPRF.TransformBlock(mSalt, 0, CorArray.Length(mSalt), mSalt, 0)
     
     Dim Result() As Byte
     Result = mPRF.ComputeHash(AsQByteArr(SwapEndian(mBlockCount)).Bytes)

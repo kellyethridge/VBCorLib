@@ -140,7 +140,7 @@ Public Sub TestGet1001CharsFromfile()
     Assert.AreEqual 1001, En.GetCharCount(b), "GetCharCount should return 1001."
     
     ch = En.GetChars(b)
-    Assert.AreEqual 1001, CorArray.GetLength(ch), "Length should be 1001."
+    Assert.AreEqual 1001, CorArray.Length(ch), "Length should be 1001."
     
     For i = 0 To 1000
         Assert.AreEqual i, ch(i), "Wrong char at index " & i & "."
@@ -155,7 +155,7 @@ Public Sub TestEmptyArray()
     b = CorArray.CreateInstance(vbByte)
     ch = En.GetChars(b)
     Assert.IsFalse CorArray.IsNull(ch)
-    Assert.AreEqual 0, CorArray.GetLength(ch)
+    Assert.AreEqual 0, CorArray.Length(ch)
     
     ReDim ch(10)
     Assert.AreEqual 0, En.GetCharsEx(b, 0, 0, ch, 0)
