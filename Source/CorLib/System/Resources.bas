@@ -158,6 +158,7 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_IndexCountBuffer = 734
     ArgumentOutOfRange_IndexCount = 735
     ArgumentOutOfRange_Bounds_Lower_Upper = 736
+    ArgumentOutOfRange_DecimalScale = 737
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?

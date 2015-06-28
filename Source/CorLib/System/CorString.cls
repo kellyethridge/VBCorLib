@@ -46,6 +46,11 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+''
+' Enum flag to indicate how strings should be compared.
+'
+' @remarks The values assigned to each enum is equal to the .NET version of the enum.
+'
 Public Enum StringComparison
     Ordinal = 4
     OrdinalIgnoreCase = 5
@@ -521,6 +526,9 @@ Private Sub ReleaseComparisonStrings()
 End Sub
 
 Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
+    If SAPtr(Args) = vbNullPtr Then _
+        Error.ArgumentNull "Args", ArgumentNull_Array
+    
     Dim Output As StringBuilder
     Set Output = StringBuilderCache.Acquire
     Output.InternalAppendFormat Provider, Format, Args

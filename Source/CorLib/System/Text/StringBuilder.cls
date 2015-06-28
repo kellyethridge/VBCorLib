@@ -776,8 +776,6 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
     End If
     
     Max = Len(Format)
-'    mChars.SA.pvData = StrPtr(Format)
-'    mChars.SA.cElements = Max
     SetChars mChars, Format
     
     ' Parse normal substring.
