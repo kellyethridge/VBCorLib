@@ -15,8 +15,6 @@ Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
 
-Private mOldCulture As CultureInfo
-
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Globalization"
 End Sub
@@ -38,54 +36,45 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Sub Setup()
-    Set mOldCulture = Thread.CurrentThread.CurrentCulture
-End Sub
-
-Public Sub Teardown()
-    Set Thread.CurrentThread.CurrentCulture = mOldCulture
-End Sub
-
 Public Sub Constructor_WithIdentifier2067_ReturnsCultureInfo()
-    Dim info As CultureInfo
+    Dim Info As CultureInfo
     
-    Set info = Cor.NewCultureInfo(2067)
+    Set Info = Cor.NewCultureInfo(2067)
     
-    Assert.That info.IsReadOnly, Iz.False, "Should be read-only."
-    Assert.That info.LCID, Iz.EqualTo(2067)
-    Assert.That info.Name, Iz.EqualTo("nl-BE")
-    Assert.That info.UseUserOverride, Iz.True, "Should be user override."
+    Assert.That Info.IsReadOnly, Iz.False, "Should be read-only."
+    Assert.That Info.LCID, Iz.EqualTo(2067)
+    Assert.That Info.Name, Iz.EqualTo("nl-BE")
+    Assert.That Info.UseUserOverride, Iz.True, "Should be user override."
 End Sub
 
 Public Sub Constructor_WithNegativeIdentifier_ThrowsArgumentOutOfRangeException()
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Cor.NewCultureInfo -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "LCID"
 End Sub
 
 Public Sub Constructor_WithCultureName_ReturnsCultureInfo()
-    Dim info As CultureInfo
+    Dim Info As CultureInfo
     
-    Set info = Cor.NewCultureInfo("nl-BE")
+    Set Info = Cor.NewCultureInfo("nl-BE")
     
-    Assert.That info.IsReadOnly, Iz.False
-    Assert.That info.LCID, Iz.EqualTo(2067)
-    Assert.That info.Name, Iz.EqualTo("nl-BE")
-    Assert.That info.UseUserOverride, Iz.True
+    Assert.That Info.IsReadOnly, Iz.False
+    Assert.That Info.LCID, Iz.EqualTo(2067)
+    Assert.That Info.Name, Iz.EqualTo("nl-BE")
+    Assert.That Info.UseUserOverride, Iz.True
 End Sub
 
 Public Sub Constructor_WithUseUserOverride_ReturnsExpected(ByVal UseUserOverride As Boolean)
-    Dim info As CultureInfo
+    Dim Info As CultureInfo
     
-    Set info = Cor.NewCultureInfo(2067, UseUserOverride)
+    Set Info = Cor.NewCultureInfo(2067, UseUserOverride)
     
-    Assert.That info.IsReadOnly, Iz.False
-    Assert.That info.LCID, Iz.EqualTo(2067)
-    Assert.That info.Name, Iz.EqualTo("nl-BE")
-    Assert.That info.UseUserOverride, Iz.EqualTo(UseUserOverride)
+    Assert.That Info.IsReadOnly, Iz.False
+    Assert.That Info.LCID, Iz.EqualTo(2067)
+    Assert.That Info.Name, Iz.EqualTo("nl-BE")
+    Assert.That Info.UseUserOverride, Iz.EqualTo(UseUserOverride)
 End Sub
 
 Public Sub DateTimeFormat_WithNeutralCulture_ThrowsNotSupportedExeption()
