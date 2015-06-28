@@ -256,7 +256,7 @@ Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     
     mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
     
-    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.GetLength(KeyBlob), 0, IIf(mPublicOnly, 0, CRYPT_EXPORTABLE), mKey) = BOOL_FALSE Then _
+    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.Length(KeyBlob), 0, IIf(mPublicOnly, 0, CRYPT_EXPORTABLE), mKey) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 End Sub
 
@@ -370,7 +370,7 @@ Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef S
     Call CorArray.Reverse(RevSig, LBound(RevSig), 20)
     Call CorArray.Reverse(RevSig, LBound(RevSig) + 20, 20)
     
-    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.GetLength(RevSig), mKey, vbNullString, 0))
+    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.Length(RevSig), mKey, vbNullString, 0))
     Call CryptDestroyHash(Hash)
 End Function
 
@@ -534,7 +534,7 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
             Throw Cor.NewArgumentException("Hash OID not supported", "Str")
     End Select
     
-    If CorArray.GetLength(RgbHash) <> 20 Then _
+    If CorArray.Length(RgbHash) <> 20 Then _
         Throw Cor.NewCryptographicException("Invalid hash length.")
     
     On Error GoTo errTrap

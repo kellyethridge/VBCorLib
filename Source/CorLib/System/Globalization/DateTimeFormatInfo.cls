@@ -1249,7 +1249,7 @@ Private Function CopyArray(ByRef Source() As String, ByVal RequiredLength As Lon
     VerifyLoaded
     CheckValidSingleDimArray Source, Parameter_Value
     
-    If CorArray.GetLength(Source) <> RequiredLength Then _
+    If CorArray.Length(Source) <> RequiredLength Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidArrayLength, RequiredLength), "Value")
     
     Dim Target() As String

@@ -55,7 +55,7 @@ End Sub
 Public Sub Test1Byte()
     ReDim PT(0)
     ht = csp.ComputeHash(PT)
-    Assert.AreEqual 20, CorArray.GetLength(ht)
+    Assert.AreEqual 20, CorArray.Length(ht)
     
     Dim Expected() As Byte
     Expected = Cor.NewBytes(&H5B, &HA9, &H3C, &H9D, &HB0, &HCF, &HF9, &H3F, &H52, &HB5, &H21, &HD7, &H42, &HE, &H43, &HF6, &HED, &HA2, &H78, &H4F)

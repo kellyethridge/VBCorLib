@@ -272,7 +272,7 @@ Public Sub DeleteSubKeyTree(ByVal SubKey As String)
     
     Dim SubKeys() As String
     SubKeys = rk.GetSubKeyNames
-    If CorArray.GetLength(SubKeys) > 0 Then
+    If CorArray.Length(SubKeys) > 0 Then
         Dim i As Long
         For i = 0 To UBound(SubKeys)
             Call rk.DeleteSubKeyTree(SubKeys(i))
@@ -703,7 +703,7 @@ Private Function SetValueMultiSZ(ByRef Name As String, ByRef Value As Variant) A
     Dim s As String
     If CorArray.IsNull(Value) Then
         s = vbNullChar
-    ElseIf CorArray.GetLength(Value) > 0 Then
+    ElseIf CorArray.Length(Value) > 0 Then
         s = Join(Value, vbNullChar) & (vbNullChar & vbNullChar)
     Else
         s = vbNullChar
@@ -725,7 +725,7 @@ Private Function SetValueBinary(ByRef Name As String, ByRef Value As Variant) As
     Dim Size    As Long
     
     If Not CorArray.IsNull(Value) Then
-        Size = CorArray.GetLength(Value)
+        Size = CorArray.Length(Value)
         If Size > 0 Then lpData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET)
     End If
     

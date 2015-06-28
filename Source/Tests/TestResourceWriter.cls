@@ -52,7 +52,7 @@ Public Sub TestWrite1ByteEntry()
     Dim b As Variant
     b = Resources.GetObject(101, "Custom")
     Assert.IsTrue IsArray(b), "Should return an array."
-    Assert.AreEqual 1, CorArray.GetLength(b)
+    Assert.AreEqual 1, CorArray.Length(b)
     Assert.AreEqual 25, b(0)
 End Sub
 
@@ -126,6 +126,6 @@ Public Sub TestWrite3String1ByteEntry()
     Dim b As Variant
     b = Resources.GetObject(101, "Custom")
     Assert.IsTrue IsArray(b), "Should return an array."
-    Assert.AreEqual 1, CorArray.GetLength(b)
+    Assert.AreEqual 1, CorArray.Length(b)
     Assert.AreEqual 25, b(0)
 End Sub

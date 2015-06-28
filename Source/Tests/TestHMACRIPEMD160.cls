@@ -43,7 +43,7 @@ Public Sub NewReturnsRandomKey()
     Dim Key() As Byte
     Key = csp.Key
     Assert.IsFalse CorArray.IsNull(Key)
-    Assert.AreEqual 64, CorArray.GetLength(Key)
+    Assert.AreEqual 64, CorArray.Length(Key)
 End Sub
 
 Public Sub CannotUseNullKeyInConstructor()

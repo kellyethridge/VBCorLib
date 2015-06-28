@@ -194,7 +194,7 @@ Public Sub GetAllDateTimePatterns_WhenCalled_Returns26ElementArray()
     
     Actual = MakeInfo.GetAllDateTimePatterns
     
-    Assert.That CorArray.GetLength(Actual), Iz.EqualTo(26)
+    Assert.That CorArray.Length(Actual), Iz.EqualTo(26)
 End Sub
 
 Public Sub ReadOnly_WithReadOnlyInfo_ReturnsSameInstance()

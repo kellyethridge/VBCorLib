@@ -33,7 +33,7 @@ Public Sub TestGetPreamble()
     
     b = e.GetPreamble
     Assert.IsFalse CorArray.IsNull(b)
-    Assert.AreEqual 0, CorArray.GetLength(b)
+    Assert.AreEqual 0, CorArray.Length(b)
 End Sub
 
 Public Sub TestPlus()

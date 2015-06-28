@@ -422,7 +422,7 @@ Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Opt
     Paths = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
     
     Dim NumPaths As Long
-    NumPaths = CorArray.GetLength(Paths)
+    NumPaths = CorArray.Length(Paths)
     If NumPaths > 0 Then
         Dim i As Long
         ReDim Directories(0 To NumPaths - 1)
@@ -461,7 +461,7 @@ Public Function GetFiles(Optional ByVal SearchPattern As String = "*", Optional 
     Files = Directory.GetFiles(mPath, SearchPattern, SearchOpt)
     
     Dim NumFiles As Long
-    NumFiles = CorArray.GetLength(Files)
+    NumFiles = CorArray.Length(Files)
     If NumFiles > 0 Then
         Dim i As Long
         ReDim Ret(0 To NumFiles - 1)
@@ -490,7 +490,7 @@ Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*",
     Folders = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
     
     Dim InfoCount As Long
-    InfoCount = CorArray.GetLength(Files) + CorArray.GetLength(Folders)
+    InfoCount = CorArray.Length(Files) + CorArray.Length(Folders)
     
     Dim Ret() As FileSystemInfo
     If InfoCount > 0 Then

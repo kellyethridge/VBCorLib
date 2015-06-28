@@ -234,7 +234,7 @@ Public Sub FlushFinalBlock()
         Throw Cor.NewNotSupportedException("Cannot call FlushFinalBlock twice.")
     
     mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-    Call mStream.WriteBlock(mOutputBuffer, 0, CorArray.GetLength(mOutputBuffer))
+    Call mStream.WriteBlock(mOutputBuffer, 0, CorArray.Length(mOutputBuffer))
     
     If TypeOf mStream Is CryptoStream Then
         Dim cs As CryptoStream
@@ -559,7 +559,7 @@ Private Function FillBuffer() As Boolean
             ' Using the TransformFinalBlock will strip away the padding from what we
             ' have left in our input buffer.
             mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-            mBytesBuffered = CorArray.GetLength(mOutputBuffer)
+            mBytesBuffered = CorArray.Length(mOutputBuffer)
             Exit Do
         End If
     Loop While mBytesBuffered = 0

@@ -33,11 +33,11 @@ Public Sub AutoGenerateKeyAndIV()
     Dim b() As Byte
     b = csp.Key
     Assert.IsFalse CorArray.IsNull(b), "Key should not be null."
-    Assert.AreEqual 16, CorArray.GetLength(b), "Key should be 16 bytes."
+    Assert.AreEqual 16, CorArray.Length(b), "Key should be 16 bytes."
     
     Erase b
     b = csp.IV
     Assert.IsFalse CorArray.IsNull(b), "IV should not be null."
-    Assert.AreEqual 16, CorArray.GetLength(b), "IV should be 16 bytes."
+    Assert.AreEqual 16, CorArray.Length(b), "IV should be 16 bytes."
 End Sub
 

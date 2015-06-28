@@ -115,7 +115,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCursor(ByRef Bytes() As Byte) As StdPicture
     Dim hr As Long
-    hr = CreateIconFromResource(Bytes(0), CorArray.GetLength(Bytes), False, &H30000)
+    hr = CreateIconFromResource(Bytes(0), CorArray.Length(Bytes), False, &H30000)
     If hr = 0 Then Exit Function
     
     Dim NewCursor As PictDesc

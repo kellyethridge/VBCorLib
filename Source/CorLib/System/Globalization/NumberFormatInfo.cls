@@ -2246,7 +2246,7 @@ Private Sub VerifyAndSetGroupSizes(ByRef Source() As Long, ByRef Target() As Lon
     VerifyGroupSizes Source
     
     Dim Length As Long
-    Length = CorArray.GetLength(Source)
+    Length = CorArray.Length(Source)
     
     If Length > 0 Then
         ReDim Target(0 To Length - 1)
@@ -2276,8 +2276,8 @@ Private Sub VerifyGroupSizes(ByRef Arr As Variant)
     Next i
 End Sub
 
-Private Sub ReadLongArray(ByRef a() As Long, ByVal Name As String, ByVal bag As PropertyBag)
-    With bag
+Private Sub ReadLongArray(ByRef a() As Long, ByVal Name As String, ByVal Bag As PropertyBag)
+    With Bag
         Dim Count As Long
         Count = .ReadProperty(Name & "_Count", 0)
         If Count = 0 Then
@@ -2294,8 +2294,8 @@ Private Sub ReadLongArray(ByRef a() As Long, ByVal Name As String, ByVal bag As 
     End With
 End Sub
 
-Private Sub WriteLongArray(ByRef a() As Long, ByVal Name As String, ByVal bag As PropertyBag)
-    With bag
+Private Sub WriteLongArray(ByRef a() As Long, ByVal Name As String, ByVal Bag As PropertyBag)
+    With Bag
         .WriteProperty Name & "_Count", UBound(a) + 1
         
         Dim i As Long

@@ -288,7 +288,7 @@ Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
         ' we have to retrieve it manually.
         ReDim mY(0 To ByteLen - 1)
         Dim Index As Long
-        Index = CorArray.GetLength(PublicBlob) - (24 + ByteLen)
+        Index = CorArray.Length(PublicBlob) - (24 + ByteLen)
         Buffer.BlockCopy PublicBlob, Index, mY, 0, ByteLen
         CorArray.Reverse mY
     End If
@@ -319,7 +319,7 @@ Friend Function ToCspBlob() As Byte()
     Dim BlobType As Byte
     If CorArray.IsNull(mX) Then
         BlobType = PUBLICKEYBLOB
-    ElseIf CorArray.GetLength(mX) = 0 Then
+    ElseIf CorArray.Length(mX) = 0 Then
         BlobType = PUBLICKEYBLOB
     Else
         BlobType = PRIVATEKEYBLOB
@@ -333,7 +333,7 @@ Friend Function ToCspBlob() As Byte()
     
     ' Build DSSPUBKEY structure
     Call writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31535344, &H32535344)))
-    Call writer.WriteValue(CLng(CorArray.GetLength(mP) * 8))
+    Call writer.WriteValue(CLng(CorArray.Length(mP) * 8))
 
     Call writer.WriteValue(ReverseByteCopy(mP))
     Call writer.WriteValue(ReverseByteCopy(mQ))

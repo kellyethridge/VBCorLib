@@ -194,7 +194,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
         Throw Cor.NewArgumentNullException("InputBuffer")
     If InputOffset < LBound(InputBuffer) Then _
         Throw Cor.NewArgumentOutOfRangeException("InputOffset", Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If (CorArray.GetLength(InputBuffer) - InputCount < InputOffset) Then _
+    If (CorArray.Length(InputBuffer) - InputCount < InputOffset) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     If mIsEncrypting Then
@@ -296,7 +296,7 @@ Friend Sub Init(ByRef RgbKey() As Byte, ByRef RgbIV() As Byte, ByVal Base As Sym
     End With
     
     mNb = mBlockSizeBits \ 32
-    mNk = CorArray.GetLength(RgbKey) \ 4
+    mNk = CorArray.Length(RgbKey) \ 4
     
     Call InitLookupTables
     Call CalculateNumberOfRounds
@@ -865,7 +865,7 @@ End Sub
 Private Sub CreateExpandedKey(ByRef RgbKey() As Byte)
     ReDim mExpKey(0 To (mNb * (mNr + 1)) - 1)
     
-    Call CopyMemory(mExpKey(0), RgbKey(0), CorArray.GetLength(RgbKey))
+    Call CopyMemory(mExpKey(0), RgbKey(0), CorArray.Length(RgbKey))
     
     Dim w As Long
     Dim i As Long

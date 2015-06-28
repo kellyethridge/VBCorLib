@@ -158,10 +158,10 @@ Public Sub LongTransformBlockMultipleCalls()
         Dim FinalBlock() As Byte
         FinalBlock = t.TransformFinalBlock(CT, CTIndex, UBound(CT) - CTIndex + 1)
         
-        Buffer.BlockCopy FinalBlock, 0, NewPT, PTIndex, CorArray.GetLength(FinalBlock)
+        Buffer.BlockCopy FinalBlock, 0, NewPT, PTIndex, CorArray.Length(FinalBlock)
         
         If (csp.Padding <> PaddingMode.None) And (csp.Padding <> PaddingMode.Zeros) Then
-            ReDim Preserve NewPT(0 To UBound(NewPT) - (t.OutputBlockSize - CorArray.GetLength(FinalBlock)))
+            ReDim Preserve NewPT(0 To UBound(NewPT) - (t.OutputBlockSize - CorArray.Length(FinalBlock)))
         End If
         
         Assert.AreEqual PT, NewPT, "Plain text entry " & c & " is incorrect."
@@ -171,7 +171,7 @@ End Sub
 Public Sub ResetForNewText()
     Do
         GetNextEntry
-    Loop While CorArray.GetLength(CT) < 32
+    Loop While CorArray.Length(CT) < 32
     
     Dim NewPT() As Byte
     ReDim Preserve PT(15)

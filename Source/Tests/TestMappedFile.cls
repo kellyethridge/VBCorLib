@@ -54,7 +54,7 @@ Public Sub TestByteView()
     b = File.CreateView
     
     Assert.IsFalse CorArray.IsNull(b), "Array should not be null."
-    Assert.AreEqual 2, CorArray.GetLength(b), "Array should be 2 bytes long."
+    Assert.AreEqual 2, CorArray.Length(b), "Array should be 2 bytes long."
     Assert.AreEqual CHAR_A, b(0)
     Assert.AreEqual CHAR_B, b(1)
     

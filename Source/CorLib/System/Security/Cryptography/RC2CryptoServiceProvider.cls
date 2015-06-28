@@ -361,7 +361,7 @@ Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, B
     ' We calculate the effective key size because the key itself may have been passed into the CreateEncryptor/CreateDecryptor
     ' functions so the KeySize property may not reflect the true size of the key to be used.
     Set CreateCipher = New CryptoAPITransform
-    Call CreateCipher.Init(CALG_RC2, Key, mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, CorArray.GetLength(Key) * 8, mUseSalt)
+    Call CreateCipher.Init(CALG_RC2, Key, mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, CorArray.Length(Key) * 8, mUseSalt)
 End Function
 
 

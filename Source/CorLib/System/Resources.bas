@@ -71,6 +71,7 @@ Public Enum ResourceStringKey
     Arg_RankMultiDimNotSupported = 234
     Arg_FileIsDirectory_Name = 235
     Arg_VersionString = 236
+    Arg_MustBeGuid = 237
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
@@ -177,6 +178,8 @@ Public Enum ResourceStringKey
     Format_InvalidNumberOfCharacters = 601
     Format_InvalidString = 602
     Format_InvalidTimeSpan = 603
+    Format_InvalidGuidFormatSpecification = 604
+    
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
     InvalidCast_FromTo = 1400
