@@ -74,6 +74,8 @@ Private mGuid As VBGUID
 ' is not immutable.</p>
 '
 Public Property Get Handle() As Long
+Attribute Handle.VB_UserMemId = 0
+Attribute Handle.VB_MemberFlags = "40"
     Handle = VarPtr(mGuid)
 End Property
 
