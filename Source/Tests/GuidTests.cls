@@ -11,9 +11,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'
-' GuidTests
-'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -163,10 +160,9 @@ End Sub
 Public Sub NewGuid_WithNullArray_ThrowsArgumentNullException()
     Dim NullArray() As Byte
     
-    On Error GoTo errTrap
+    On Error Resume Next
     NewGuid NullArray
     
-errTrap:
     AssertArgumentNullException Err, "Value"
 End Sub
 
@@ -189,7 +185,13 @@ Public Sub Serialization_WhenCalled_SerializesInstance()
 End Sub
 
 Public Sub EmptyGuid_WhenCalled_ReturnsGuidWithZeroValue()
-    Assert.AreEqual "00000000-0000-0000-0000-000000000000", Guid.EmptyGuid.ToString
+    Dim Actual As Guid
+    
+    Set Actual = Guid.EmptyGuid
+    
+    Dim Expected As Guid
+    Set Expected = NewGuid("00000000-0000-0000-0000-000000000000")
+    Assert.That Actual, Equals(Expected)
 End Sub
 
 

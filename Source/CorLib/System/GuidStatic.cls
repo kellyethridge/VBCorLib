@@ -57,7 +57,6 @@ Private mEmptyGuid As Guid
 Private mFormats() As String
 
 
-
 ''
 ' Returns a guid that is guaranteed to be all zeros.
 '
@@ -76,7 +75,7 @@ End Function
 '
 Public Function NewGuid() As Guid
     Set NewGuid = New Guid
-    Call NewGuid.NewGuid
+    NewGuid.InitNew
 End Function
 
 ''
@@ -89,7 +88,7 @@ End Function
 '
 Public Function Parse(ByVal strGuid As String) As Guid
     Set Parse = New Guid
-    Call Parse.Parse(strGuid)
+    Parse.Parse strGuid
 End Function
 
 ''
@@ -101,7 +100,7 @@ End Function
 '
 Public Function FromByteArray(ByRef Bytes() As Byte) As Guid
     Set FromByteArray = New Guid
-    Call FromByteArray.FromByteArray(Bytes)
+    FromByteArray.FromByteArray Bytes
 End Function
 
 ''
@@ -116,7 +115,7 @@ End Function
 '
 Public Function FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByRef d() As Byte) As Guid
     Set FromParts = New Guid
-    Call FromParts.FromParts(a, b, c, d)
+    FromParts.FromParts a, b, c, d
 End Function
 
 ''
@@ -163,24 +162,6 @@ Public Function FromMemory(ByVal lpGuid As Long) As Guid
 End Function
 
 ''
-' Returns a Guid already set to the IUnknown interface.
-'
-' @return A preconfigured Guid object of type IUnknown.
-'
-Public Property Get IUnknownGuid() As Guid
-    Set IUnknownGuid = Guid.Parse("{00000000-0000-0000-C000-000000000046}")
-End Property
-
-''
-' Returns a Guid already set to the IDispatch (Object) interface.
-'
-' @return A preconfigured Guid object of type IDispatch (Object).
-'
-Public Property Get IDispatchGuid() As Guid
-    Set IDispatchGuid = Guid.Parse("{00020400-0000-0000-C000-000000000046}")
-End Property
-
-''
 ' Returns a Read-Only wrapper for the supplied Guid object.
 '
 ' @param g The Guid object to wrap as Read-Only.
@@ -190,20 +171,14 @@ End Property
 ' Handle property, which allows direct access to the guid structure.
 '
 Public Function ReadOnly(ByVal g As Guid) As Guid
-    Dim Ret As New ReadOnlyGuid
-    Call Ret.Init(g)
-    Set ReadOnly = Ret
-End Function
-
-''
-' Returns a Guid representation of the Program ID in the form of <Server.Class>.
-'
-' @param ProgID The Program ID to return the Guid of. The format for the Program ID is <Server.Class>.
-' @return A Guid representaion of the Program ID.
-'
-Public Function FromProgramID(ByVal ProgID As String) As Guid
-    Set FromProgramID = New Guid
-    Call FromProgramID.FromProgramID(ProgID)
+    If g Is Nothing Then _
+        Error.ArgumentNull "g", ArgumentNull_Generic
+    
+    If g.IsReadOnly Then
+        Set ReadOnly = g
+    Else
+        Set ReadOnly = g.CreateReadOnly
+    End If
 End Function
 
 Friend Function ToString(ByRef g As VBGUID, ByVal Format As Integer) As String
@@ -232,7 +207,7 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mEmptyGuid = Guid.ReadOnly(Guid.FromValues(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0))
+    Set mEmptyGuid = ReadOnly(New Guid)
     mFormats = Cor.NewStrings("{0:x8}-{1:x4}-{2:x4}-{3:x2}{4:x2}-{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2}", _
                               "{{{0:x8}-{1:x4}-{2:x4}-{3:x2}{4:x2}-{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2}}}", _
                               "({0:x8}-{1:x4}-{2:x4}-{3:x2}{4:x2}-{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2})", _
