@@ -99,10 +99,6 @@ Private Function Guid_ToString(Optional ByRef Format As String, Optional ByVal P
     Guid_ToString = mGuid.ToString(Format, Provider)
 End Function
 
-Private Function Guid_ToProgramID() As String
-    Guid_ToProgramID = mGuid.ToProgramID
-End Function
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IComparable Interface

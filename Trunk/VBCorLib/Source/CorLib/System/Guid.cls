@@ -49,12 +49,11 @@ Implements IObject
 Implements IComparable
 Implements IFormattable
 
-Private Const GuidSize As Long = 16
-
 Private Const REGDB_E_CLASSNOTREG   As Long = &H80040154
 Private Const REGDB_E_READREGDB     As Long = &H80040150
 
-Private mGuid As VBGUID
+Private mGuid       As VBGUID
+Private mIsReadOnly As Boolean
 
 
 ''
@@ -74,8 +73,10 @@ Private mGuid As VBGUID
 ' is not immutable.</p>
 '
 Public Property Get Handle() As Long
-Attribute Handle.VB_UserMemId = 0
 Attribute Handle.VB_MemberFlags = "40"
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    
     Handle = VarPtr(mGuid)
 End Property
 
@@ -85,7 +86,7 @@ End Property
 ' @return Returns <b>True</b> if the guid is locked, otherwise <b>False</b>.
 '
 Public Property Get IsReadOnly() As Boolean
-    IsReadOnly = False
+    IsReadOnly = mIsReadOnly
 End Property
 
 ''
@@ -94,9 +95,9 @@ End Property
 ' @return An array of bytes representing the guid.
 '
 Public Function ToByteArray() As Byte()
-    Dim Result(0 To GuidSize - 1) As Byte
+    Dim Result(0 To corSizeOfGuid - 1) As Byte
     
-    CopyMemory Result(0), mGuid, GuidSize
+    CopyMemory Result(0), mGuid, corSizeOfGuid
     ToByteArray = Result
 End Function
 
@@ -107,14 +108,14 @@ End Function
 ' @return A Long
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Dim other As Guid
+    Dim Other As Guid
     
     On Error GoTo Catch
-    Set other = Value
-    If other Is Nothing Then
+    Set Other = Value
+    If Other Is Nothing Then
         CompareTo = 1
     Else
-        CompareTo = -other.InternalCompare(mGuid)
+        CompareTo = -Other.InternalCompare(mGuid)
     End If
     
     Exit Function
@@ -151,42 +152,20 @@ Public Function ToString(Optional ByRef Format As String, Optional ByVal Provide
 End Function
 
 ''
-' Returns the Program ID associated with the guid in the <Server.Class> format.
-'
-' @return A string containing the Program ID associated with the guid.
-'
-Public Function ToProgramID() As String
-    Dim lpszProgID As Long
-    Select Case ProgIDFromCLSID(mGuid, lpszProgID)
-        Case REGDB_E_CLASSNOTREG
-            Throw Cor.NewInvalidOperationException("The Program ID is not a registered class.")
-            
-        Case REGDB_E_READREGDB
-            Throw Cor.NewUnauthorizedAccessException("The Registry could not be read.")
-    End Select
-    
-    ToProgramID = SysAllocString(lpszProgID)
-    CoTaskMemFree lpszProgID
-End Function
-
-''
 ' Returns a boolean indicating if the value and this object
 ' instance are the same instance.
 '
 ' @param value The value to compare equalit to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        If Value Is Nothing Then
-            Exit Function
-        End If
-        
-        If TypeOf Value Is Guid Then
-            Dim g As Guid
-            Set g = Value
-            Equals = g.InternalEquals(mGuid)
-        End If
-    End If
+    Dim Other As Guid
+    
+    On Error GoTo Catch
+    Set Other = Value
+'    Equals = Other.InternalEquals(mGuid)
+    Equals = IsEqualGUID(mGuid, ByVal Other.Handle)
+
+Catch:
 End Function
 
 ''
@@ -197,6 +176,11 @@ Public Function GetHashCode() As Long
     With mGuid
         GetHashCode = .Data1 Xor AsLong(.Data2) Xor AsLong(.Data4(0)) Xor AsLong(.Data4(4))
     End With
+End Function
+
+Friend Function CreateReadOnly() As Guid
+    Set CreateReadOnly = New Guid
+    CreateReadOnly.InitReadOnly mGuid
 End Function
 
 
@@ -218,9 +202,16 @@ Friend Sub Init(ByRef Value As Variant)
     End Select
 End Sub
 
-Friend Function InternalEquals(ByRef g As VBGUID) As Boolean
-    InternalEquals = IsEqualGUID(g, mGuid)
-End Function
+Friend Sub InitReadOnly(ByRef Other As VBGUID)
+    mGuid = Other
+    mIsReadOnly = True
+End Sub
+
+Friend Sub InitNew()
+    mGuid = CoCreateGuid
+End Sub
+
+
 
 Friend Function InternalCompare(ByRef g As VBGUID) As Long
     With mGuid
@@ -235,12 +226,7 @@ Friend Function InternalCompare(ByRef g As VBGUID) As Long
     End With
 End Function
 
-Friend Sub NewGuid()
-    mGuid = CoCreateGuid
-End Sub
-
 Friend Sub Parse(ByVal s As String)
-    
     If Len(s) = 38 Then
         '{C200E360-38C5-11CE-AE62-08002B2B79EF} or
         '(C200E360-38C5-11CE-AE62-08002B2B79EF)
@@ -307,15 +293,6 @@ Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, By
         
         CopyMemory .Data4(0), d(LBound(d)), 8
     End With
-End Sub
-
-Friend Sub FromProgramID(ByVal ProgID As String)
-    On Error GoTo errTrap
-    mGuid = CLSIDFromProgID(ProgID)
-    Exit Sub
-    
-errTrap:
-    Throw Cor.NewArgumentException(CorString.Format("Program ID '{0}' was not found.", ProgID), "ProgID")
 End Sub
 
 

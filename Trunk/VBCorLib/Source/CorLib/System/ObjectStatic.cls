@@ -161,7 +161,7 @@ End Function
 ' @return A string representation of the object.
 '
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim ValueType As Long
+    Dim ValueType As VbVarType
     ValueType = VarType(Value)
     
     If ValueType = vbVariant Then
