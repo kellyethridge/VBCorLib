@@ -705,6 +705,9 @@ library VBCorType {
         const long corDaysTo1899                    = 693593;
         const currency corMillisecondsTo1899        = 59926435200000;   // 1@ * corDaysTo1899 * corMillisecondsPerDay
         const short corTerminator                   = 0;
+        const short corOpenParenChar                = 0x28;
+        const short corCloseParenChar               = 0x29;
+        const short corHyphenChar                   = 0x2D;
         const short corUpperAChar                   = 0x41;
         const short corLowerAChar                   = 0x61;
         const short corUpperBChar                   = 0x42;
@@ -738,7 +741,9 @@ library VBCorType {
         const short corUpperYChar                   = 0x59;
         const short corUpperZChar                   = 0xFA;
         const short corLowerZChar                   = 0x7A;
+        const short corOpenBraceChar                = 0x7B;
         const short corPipeChar                     = 0x7C;
+        const short corCloseBraceChar               = 0x7D;
         const short corZeroChar                     = 0x30;
         const short corOneChar                      = 0x31;
         const short corFiveChar                     = 0x35;
