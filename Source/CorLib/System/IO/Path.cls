@@ -505,7 +505,7 @@ End Function
 
 Private Function PrepareForUNCPath(ByRef PathChars() As Integer, ByRef Index As Long, ByVal NewBuffer As PathHelper) As Boolean
     If UBound(PathChars) > 0 Then
-        If PathChars(0) = corDirectorySeparatorChar Or PathChars(0) = corAltDirectorySeparatorChar Then
+        If IsDirectorySeparator(PathChars(0)) Then
             NewBuffer.Append corDirectorySeparatorChar
             Index = 1
             PrepareForUNCPath = True
@@ -526,7 +526,6 @@ Private Sub PrepareForVolumeLabel(ByRef PathChars() As Integer, ByRef Index As L
         End If
     End If
 End Sub
-
 
 Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByVal FullCheck As Boolean, ByRef Index As Long) As Boolean
     Dim pos             As Long
