@@ -54,7 +54,6 @@ Attribute VB_Exposed = True
 Option Explicit
 
 Private mEmptyGuid As Guid
-Private mFormats() As String
 
 
 ''
@@ -181,36 +180,10 @@ Public Function ReadOnly(ByVal g As Guid) As Guid
     End If
 End Function
 
-Friend Function ToString(ByRef g As VBGUID, ByVal Format As Integer) As String
-    Dim FormatIndex As Long
-    
-    Select Case Format
-        Case corUpperDChar, corLowerDChar
-            FormatIndex = 0
-        Case corUpperBChar, corLowerBChar
-            FormatIndex = 1
-        Case corUpperPChar, corLowerPChar
-            FormatIndex = 2
-        Case corUpperNChar, corLowerNChar
-            FormatIndex = 3
-        Case corUpperXChar, corLowerXChar
-            FormatIndex = 4
-        Case Else
-            Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidGuidFormatSpecification))
-    End Select
-        
-    ToString = CorString.Format(mFormats(FormatIndex), g.Data1, g.Data2, g.Data3, g.Data4(0), g.Data4(1), g.Data4(2), g.Data4(3), g.Data4(4), g.Data4(5), g.Data4(6), g.Data4(7))
-End Function
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mEmptyGuid = ReadOnly(New Guid)
-    mFormats = Cor.NewStrings("{0:x8}-{1:x4}-{2:x4}-{3:x2}{4:x2}-{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2}", _
-                              "{{{0:x8}-{1:x4}-{2:x4}-{3:x2}{4:x2}-{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2}}}", _
-                              "({0:x8}-{1:x4}-{2:x4}-{3:x2}{4:x2}-{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2})", _
-                              "{0:x8}{1:x4}{2:x4}{3:x2}{4:x2}{5:x2}{6:x2}{7:x2}{8:x2}{9:x2}{10:x2}", _
-                              "{{0x{0:x8},0x{1:x4},0x{2:x4},{{0x{3:x2},0x{4:x2},0x{5:x2},0x{6:x2},0x{7:x2},0x{8:x2},0x{9:x2},0x{10:x2}}}}}")
 End Sub

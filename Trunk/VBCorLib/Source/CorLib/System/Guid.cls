@@ -108,14 +108,14 @@ End Function
 ' @return A Long
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Dim Other As Guid
+    Dim other As Guid
     
     On Error GoTo Catch
-    Set Other = Value
-    If Other Is Nothing Then
+    Set other = Value
+    If other Is Nothing Then
         CompareTo = 1
     Else
-        CompareTo = -Other.InternalCompare(mGuid)
+        CompareTo = -other.InternalCompare(mGuid)
     End If
     
     Exit Function
@@ -141,15 +141,151 @@ End Function
 ' <b>B</b> is the default format.
 '
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
+    Dim Output      As String
+    Dim FormatCh    As Integer
+    Dim GuidChars() As Integer
+    
     Select Case Len(Format)
         Case 0
-            ToString = Guid.ToString(mGuid, corUpperDChar)
+            FormatCh = corUpperDChar
         Case 1
-            ToString = Guid.ToString(mGuid, AscW(Format))
+            FormatCh = AscW(Format)
         Case Else
             Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidGuidFormatSpecification))
     End Select
+    
+    Select Case FormatCh
+        Case corUpperDChar, corLowerDChar
+            Output = SysAllocStringLen(0, 36)
+            GuidChars = AllocChars(Output)
+            ToStandardString GuidChars, 0, True
+        Case corUpperBChar, corLowerBChar
+            Output = SysAllocStringLen(0, 38)
+            GuidChars = AllocChars(Output)
+            GuidChars(0) = corOpenBraceChar
+            GuidChars(37) = corCloseBraceChar
+            ToStandardString GuidChars, 1, True
+        Case corUpperPChar, corLowerPChar
+            Output = SysAllocStringLen(0, 38)
+            GuidChars = AllocChars(Output)
+            GuidChars(0) = corOpenParenChar
+            GuidChars(37) = corCloseParenChar
+            ToStandardString GuidChars, 1, True
+        Case corUpperNChar, corLowerNChar
+            Output = SysAllocStringLen(0, 32)
+            GuidChars = AllocChars(Output)
+            ToStandardString GuidChars, 0, False
+        Case corUpperXChar, corLowerXChar
+            ToString = ToHexString
+            Exit Function
+        Case Else
+            Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidGuidFormatSpecification))
+    End Select
+
+    FreeChars GuidChars
+    ToString = Output
 End Function
+
+Private Sub ToStandardString(ByRef GuidChars() As Integer, ByVal Offset As Long, ByVal UseDash As Boolean)
+    Offset = HexToChars(GuidChars, Offset, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False)
+    Offset = HexToChars(GuidChars, Offset, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False)
+    If UseDash Then
+        GuidChars(Offset) = corHyphenChar
+        Offset = Offset + 1
+    End If
+    Offset = HexToChars(GuidChars, Offset, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False)
+    If UseDash Then
+        GuidChars(Offset) = corHyphenChar
+        Offset = Offset + 1
+    End If
+    Offset = HexToChars(GuidChars, Offset, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False)
+    If UseDash Then
+        GuidChars(Offset) = corHyphenChar
+        Offset = Offset + 1
+    End If
+    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(0), mGuid.Data4(1), False)
+    If UseDash Then
+        GuidChars(Offset) = corHyphenChar
+        Offset = Offset + 1
+    End If
+    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(2), mGuid.Data4(3), False)
+    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(4), mGuid.Data4(5), False)
+    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(6), mGuid.Data4(7), False)
+End Sub
+
+Private Function ToHexString() As String
+    Dim Output      As String
+    Dim GuidChars() As Integer
+    
+    Output = SysAllocStringLen(0, 68)
+    GuidChars = AllocChars(Output)
+    
+    GuidChars(0) = corOpenBraceChar
+    GuidChars(1) = corZeroChar
+    GuidChars(2) = corLowerXChar
+    HexToChars GuidChars, 3, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False
+    HexToChars GuidChars, 7, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False
+    GuidChars(11) = corCommaChar
+    GuidChars(12) = corZeroChar
+    GuidChars(13) = corLowerXChar
+    HexToChars GuidChars, 14, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False
+    GuidChars(18) = corCommaChar
+    GuidChars(19) = corZeroChar
+    GuidChars(20) = corLowerXChar
+    HexToChars GuidChars, 21, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False
+    GuidChars(25) = corCommaChar
+    GuidChars(26) = corOpenBraceChar
+    HexToChars GuidChars, 27, mGuid.Data4(0), mGuid.Data4(1), True
+    GuidChars(36) = corCommaChar
+    HexToChars GuidChars, 37, mGuid.Data4(2), mGuid.Data4(3), True
+    GuidChars(46) = corCommaChar
+    HexToChars GuidChars, 47, mGuid.Data4(4), mGuid.Data4(5), True
+    GuidChars(56) = corCommaChar
+    HexToChars GuidChars, 57, mGuid.Data4(6), mGuid.Data4(7), True
+    GuidChars(66) = corCloseBraceChar
+    GuidChars(67) = corCloseBraceChar
+    
+    FreeChars GuidChars
+    ToHexString = Output
+End Function
+
+Private Function HexToChars(ByRef GuidChars() As Integer, ByVal Offset As Long, ByVal a As Long, ByVal b As Long, ByVal IsHex As Boolean) As Long
+    a = a And &HFF
+    b = b And &HFF
+    
+    If IsHex Then
+        GuidChars(Offset) = corZeroChar
+        GuidChars(Offset + 1) = corLowerXChar
+        Offset = Offset + 2
+    End If
+    
+    GuidChars(Offset) = HexToChar(a \ &H10)
+    GuidChars(Offset + 1) = HexToChar(a)
+    Offset = Offset + 2
+    
+    If IsHex Then
+        GuidChars(Offset) = corCommaChar
+        GuidChars(Offset + 1) = corZeroChar
+        GuidChars(Offset + 2) = corLowerXChar
+        Offset = Offset + 3
+    End If
+    
+    GuidChars(Offset) = HexToChar(b \ &H10)
+    GuidChars(Offset + 1) = HexToChar(b)
+    
+    HexToChars = Offset + 2
+End Function
+
+Private Function HexToChar(ByVal a As Long) As Integer
+    a = a And &HF
+    
+    If a > 9 Then
+        HexToChar = a - 10 + corLowerAChar
+    Else
+        HexToChar = a + corZeroChar
+    End If
+End Function
+
 
 ''
 ' Returns a boolean indicating if the value and this object
@@ -158,12 +294,12 @@ End Function
 ' @param value The value to compare equalit to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Dim Other As Guid
+    Dim other As Guid
     
     On Error GoTo Catch
-    Set Other = Value
+    Set other = Value
 '    Equals = Other.InternalEquals(mGuid)
-    Equals = IsEqualGUID(mGuid, ByVal Other.Handle)
+    Equals = IsEqualGUID(mGuid, ByVal other.Handle)
 
 Catch:
 End Function
@@ -202,8 +338,8 @@ Friend Sub Init(ByRef Value As Variant)
     End Select
 End Sub
 
-Friend Sub InitReadOnly(ByRef Other As VBGUID)
-    mGuid = Other
+Friend Sub InitReadOnly(ByRef other As VBGUID)
+    mGuid = other
     mIsReadOnly = True
 End Sub
 
