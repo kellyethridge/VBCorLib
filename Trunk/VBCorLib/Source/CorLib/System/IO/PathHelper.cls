@@ -64,7 +64,8 @@ End Property
 
 Friend Function IsUNCPath() As Boolean
     If Length > 1 Then
-        IsUNCPath = AsLong(mFinalBuffer(mPrefixSize)) = corDoubleDirectorySeparatorChar
+        IsUNCPath = mFinalBuffer(mPrefixSize) = corDirectorySeparatorChar And _
+                    mFinalBuffer(mPrefixSize + 1) = corDirectorySeparatorChar
     End If
 End Function
 
