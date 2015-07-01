@@ -58,8 +58,9 @@ Private Enum FormatOptions
     Closure = 2
 End Enum
 
-Private mGuid       As VBGUID
-Private mIsReadOnly As Boolean
+Private mGuid           As VBGUID
+Private mReadOnlyGuid   As VBGUID
+Private mIsReadOnly     As Boolean
 
 
 ''
@@ -80,10 +81,12 @@ Private mIsReadOnly As Boolean
 '
 Public Property Get Handle() As Long
 Attribute Handle.VB_MemberFlags = "40"
-    If mIsReadOnly Then _
-        Error.InvalidOperation InvalidOperation_ReadOnly
-    
-    Handle = VarPtr(mGuid)
+    If mIsReadOnly Then
+        mReadOnlyGuid = mGuid
+        Handle = VarPtr(mReadOnlyGuid)
+    Else
+        Handle = VarPtr(mGuid)
+    End If
 End Property
 
 ''
@@ -336,7 +339,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Value As Variant)
+Friend Sub Init(ByRef Value As Variant, ByVal IsReadOnly As Boolean)
     Select Case VariantType(Value)
         Case corByteArray
             FromByteArray Value
@@ -349,6 +352,8 @@ Friend Sub Init(ByRef Value As Variant)
                 Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Array))
                 
     End Select
+    
+    mIsReadOnly = IsReadOnly
 End Sub
 
 Friend Sub InitReadOnly(ByRef other As VBGUID)
