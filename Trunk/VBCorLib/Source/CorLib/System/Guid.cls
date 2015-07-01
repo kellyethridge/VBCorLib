@@ -52,6 +52,12 @@ Implements IFormattable
 Private Const REGDB_E_CLASSNOTREG   As Long = &H80040154
 Private Const REGDB_E_READREGDB     As Long = &H80040150
 
+Private Enum FormatOptions
+    None = 0
+    Dashes = 1
+    Closure = 2
+End Enum
+
 Private mGuid       As VBGUID
 Private mIsReadOnly As Boolean
 
@@ -141,9 +147,7 @@ End Function
 ' <b>B</b> is the default format.
 '
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim Output      As String
-    Dim FormatCh    As Integer
-    Dim GuidChars() As Integer
+    Dim FormatCh As Integer
     
     Select Case Len(Format)
         Case 0
@@ -156,62 +160,71 @@ Public Function ToString(Optional ByRef Format As String, Optional ByVal Provide
     
     Select Case FormatCh
         Case corUpperDChar, corLowerDChar
-            Output = SysAllocStringLen(0, 36)
-            GuidChars = AllocChars(Output)
-            ToStandardString GuidChars, 0, True
+            ToString = ToStandardString(FormatOptions.Dashes)
         Case corUpperBChar, corLowerBChar
-            Output = SysAllocStringLen(0, 38)
-            GuidChars = AllocChars(Output)
-            GuidChars(0) = corOpenBraceChar
-            GuidChars(37) = corCloseBraceChar
-            ToStandardString GuidChars, 1, True
+            ToString = ToStandardString(FormatOptions.Dashes Or FormatOptions.Closure, corOpenBraceChar, corCloseBraceChar)
         Case corUpperPChar, corLowerPChar
-            Output = SysAllocStringLen(0, 38)
-            GuidChars = AllocChars(Output)
-            GuidChars(0) = corOpenParenChar
-            GuidChars(37) = corCloseParenChar
-            ToStandardString GuidChars, 1, True
+            ToString = ToStandardString(FormatOptions.Dashes Or FormatOptions.Closure, corOpenParenChar, corCloseParenChar)
         Case corUpperNChar, corLowerNChar
-            Output = SysAllocStringLen(0, 32)
-            GuidChars = AllocChars(Output)
-            ToStandardString GuidChars, 0, False
+            ToString = ToStandardString(FormatOptions.None)
         Case corUpperXChar, corLowerXChar
             ToString = ToHexString
-            Exit Function
         Case Else
-            Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidGuidFormatSpecification))
+            Error.Format Format_InvalidGuidFormatSpecification
     End Select
-
-    FreeChars GuidChars
-    ToString = Output
 End Function
 
-Private Sub ToStandardString(ByRef GuidChars() As Integer, ByVal Offset As Long, ByVal UseDash As Boolean)
+Private Function ToStandardString(ByVal Options As FormatOptions, Optional ByVal OpenChar As Integer, Optional ByVal CloseChar As Integer) As String
+    Dim Size        As Long
+    Dim Offset      As Long
+    Dim Output      As String
+    Dim GuidChars() As Integer
+    
+    Size = 32
+    If Options And Dashes Then
+        Size = Size + 4
+    End If
+    If Options And Closure Then
+        Size = Size + 2
+    End If
+    
+    Output = SysAllocStringLen(0, Size)
+    GuidChars = AllocChars(Output)
+    
+    If Options And Closure Then
+        GuidChars(0) = OpenChar
+        Offset = 1
+    End If
+    
     Offset = HexToChars(GuidChars, Offset, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False)
     Offset = HexToChars(GuidChars, Offset, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False)
-    If UseDash Then
-        GuidChars(Offset) = corHyphenChar
-        Offset = Offset + 1
-    End If
+    Offset = AddDash(GuidChars, Offset, Options)
     Offset = HexToChars(GuidChars, Offset, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False)
-    If UseDash Then
-        GuidChars(Offset) = corHyphenChar
-        Offset = Offset + 1
-    End If
+    Offset = AddDash(GuidChars, Offset, Options)
     Offset = HexToChars(GuidChars, Offset, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False)
-    If UseDash Then
-        GuidChars(Offset) = corHyphenChar
-        Offset = Offset + 1
-    End If
+    Offset = AddDash(GuidChars, Offset, Options)
     Offset = HexToChars(GuidChars, Offset, mGuid.Data4(0), mGuid.Data4(1), False)
-    If UseDash Then
-        GuidChars(Offset) = corHyphenChar
-        Offset = Offset + 1
-    End If
+    Offset = AddDash(GuidChars, Offset, Options)
     Offset = HexToChars(GuidChars, Offset, mGuid.Data4(2), mGuid.Data4(3), False)
     Offset = HexToChars(GuidChars, Offset, mGuid.Data4(4), mGuid.Data4(5), False)
     Offset = HexToChars(GuidChars, Offset, mGuid.Data4(6), mGuid.Data4(7), False)
-End Sub
+    
+    If Options And Closure Then
+        GuidChars(Offset) = CloseChar
+    End If
+    
+    FreeChars GuidChars
+    ToStandardString = Output
+End Function
+
+Private Function AddDash(ByRef GuidChars() As Integer, ByVal Offset As Long, ByVal Options As FormatOptions) As Long
+    If Options And Dashes Then
+        GuidChars(Offset) = corHyphenChar
+        Offset = Offset + 1
+    End If
+    
+    AddDash = Offset
+End Function
 
 Private Function ToHexString() As String
     Dim Output      As String

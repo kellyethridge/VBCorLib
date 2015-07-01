@@ -113,7 +113,7 @@ Public Sub Serialization_WhenCalled_SerializesException()
     Const Message As String = "User Error."
     Dim Inner   As New Exception
     Dim Ex      As ArgumentOutOfRangeException
-    Set Ex = Cor.NewArgumentOutOfRangeException("Param", 1, Message, Inner)
+    Set Ex = Cor.NewArgumentOutOfRangeException("Param", Message, 1, Inner)
 
     Dim Actual As ArgumentOutOfRangeException
     Set Actual = Persist(Ex)
