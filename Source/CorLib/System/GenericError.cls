@@ -78,4 +78,7 @@ Friend Sub Win32Error(ByVal ErrorCode As Long)
     Throw Cor.NewApplicationException(Message)
 End Sub
 
+Friend Sub Format(ByVal Key As ResourceStringKey)
+    Throw Cor.NewFormatException(Environment.GetResourceString(Key))
+End Sub
 
