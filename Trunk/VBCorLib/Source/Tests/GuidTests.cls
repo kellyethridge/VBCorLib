@@ -155,6 +155,7 @@ Public Sub NewGuid_WithValue_ReturnsExpected(ByVal Value As Variant, ByVal Expec
     Dim ExpectedGuid As Guid
     Set ExpectedGuid = Guid.Parse(Expected)
     Assert.That Actual, Equals(ExpectedGuid)
+    Assert.That Actual.IsReadOnly, Iz.True
 End Sub
 
 Public Sub NewGuid_WithNullArray_ThrowsArgumentNullException()

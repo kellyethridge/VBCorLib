@@ -1783,9 +1783,9 @@ Public Function NewCollection(ParamArray Values() As Variant) As Collection
     Next
 End Function
 
-Public Function NewGuid(ByRef Value As Variant, Optional ByVal IsReadOnly As Boolean) As Guid
+Public Function NewGuid(ByRef Value As Variant, Optional ByVal Writable As Boolean) As Guid
     Set NewGuid = New Guid
-    NewGuid.Init Value, IsReadOnly
+    NewGuid.Init Value, Writable
 End Function
 
 Friend Function NewSafeFindHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFindHandle

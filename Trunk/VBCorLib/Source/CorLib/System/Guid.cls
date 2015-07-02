@@ -339,7 +339,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Value As Variant, ByVal IsReadOnly As Boolean)
+Friend Sub Init(ByRef Value As Variant, ByVal Writable As Boolean)
     Select Case VariantType(Value)
         Case corByteArray
             FromByteArray Value
@@ -353,19 +353,18 @@ Friend Sub Init(ByRef Value As Variant, ByVal IsReadOnly As Boolean)
                 
     End Select
     
-    mIsReadOnly = IsReadOnly
+    mIsReadOnly = Not Writable
 End Sub
 
-Friend Sub InitReadOnly(ByRef other As VBGUID)
-    mGuid = other
+Friend Sub InitReadOnly(ByRef g As VBGUID)
+    mGuid = g
     mIsReadOnly = True
 End Sub
 
 Friend Sub InitNew()
     mGuid = CoCreateGuid
+    mIsReadOnly = True
 End Sub
-
-
 
 Friend Function InternalCompare(ByRef g As VBGUID) As Long
     With mGuid
