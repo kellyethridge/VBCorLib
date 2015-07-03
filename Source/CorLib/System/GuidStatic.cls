@@ -53,7 +53,9 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mEmptyGuid As Guid
+Private mEmptyGuid      As Guid
+Private mIUnknownGuid   As Guid
+Private mIDispatchGuid  As Guid
 
 
 ''
@@ -61,9 +63,17 @@ Private mEmptyGuid As Guid
 '
 ' @return A zero value guid.
 '
-Public Function EmptyGuid() As Guid
+Public Property Get EmptyGuid() As Guid
     Set EmptyGuid = mEmptyGuid
-End Function
+End Property
+
+Public Property Get IUnknownGuid() As Guid
+    Set IUnknownGuid = mIUnknownGuid
+End Property
+
+Public Property Get IDispatchGuid() As Guid
+    Set IDispatchGuid = mIDispatchGuid
+End Property
 
 ''
 ' Returns a new <b>Guid</b> object with a random guid generated.
@@ -81,13 +91,13 @@ End Function
 ' Parses a string representation of a guid, returning a <b>Guid</b>
 ' containing the parsed value.
 '
-' @param strGuid The guid string to be parsed.
+' @param s The guid string to be parsed.
 ' @param LockGuid Locks the guids handle.
 ' @return A <b>Guid</b> set to the parsed value.
 '
-Public Function Parse(ByVal strGuid As String) As Guid
+Public Function Parse(ByRef s As String) As Guid
     Set Parse = New Guid
-    Parse.Parse strGuid
+    Parse.Parse s
 End Function
 
 ''
@@ -186,4 +196,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mEmptyGuid = ReadOnly(New Guid)
+    Set mIUnknownGuid = ReadOnly(Parse("{00000000-0000-0000-C000-000000000046}"))
+    Set mIDispatchGuid = ReadOnly(Parse("{00020400-0000-0000-C000-000000000046}"))
 End Sub
