@@ -117,14 +117,14 @@ End Function
 ' @return A Long
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Dim other As Guid
+    Dim Other As Guid
     
     On Error GoTo Catch
-    Set other = Value
-    If other Is Nothing Then
+    Set Other = Value
+    If Other Is Nothing Then
         CompareTo = 1
     Else
-        CompareTo = -other.InternalCompare(mGuid)
+        CompareTo = -Other.InternalCompare(mGuid)
     End If
     
     Exit Function
@@ -310,12 +310,11 @@ End Function
 ' @param value The value to compare equalit to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Dim other As Guid
+    Dim Other As Guid
     
     On Error GoTo Catch
-    Set other = Value
-'    Equals = Other.InternalEquals(mGuid)
-    Equals = IsEqualGUID(mGuid, ByVal other.Handle)
+    Set Other = Value
+    Equals = IsEqualGUID(mGuid, ByVal Other.Handle)
 
 Catch:
 End Function
@@ -348,9 +347,9 @@ Friend Sub Init(ByRef Value As Variant, ByVal Writable As Boolean)
             Parse Value
             
         Case Else
-            If IsArray(Value) Then _
+            If IsArray(Value) Then
                 Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Array))
-                
+            End If
     End Select
     
     mIsReadOnly = Not Writable

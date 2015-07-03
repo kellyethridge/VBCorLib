@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Represents a version number.
+' Represents a version number in the format Major.Minor[.Build[.Revision]].
 '
 ' @see Constructors
 ' @see VersionStatic
@@ -156,13 +156,13 @@ Public Function CompareTo(ByRef Value As Variant) As Long
     If Not TypeOf Value Is Version Then _
         Error.Argument Argument_VersionRequired, "Value"
 
-    Dim other As Version
-    Set other = Value
+    Dim Other As Version
+    Set Other = Value
     
-    If Not EqualFields(mMajor, other.Major, CompareTo) Then Exit Function
-    If Not EqualFields(mMinor, other.Minor, CompareTo) Then Exit Function
-    If Not EqualFields(mBuild, other.Build, CompareTo) Then Exit Function
-    If Not EqualFields(mRevision, other.Revision, CompareTo) Then Exit Function
+    If Not EqualFields(mMajor, Other.Major, CompareTo) Then Exit Function
+    If Not EqualFields(mMinor, Other.Minor, CompareTo) Then Exit Function
+    If Not EqualFields(mBuild, Other.Build, CompareTo) Then Exit Function
+    If Not EqualFields(mRevision, Other.Revision, CompareTo) Then Exit Function
 End Function
 
 ''

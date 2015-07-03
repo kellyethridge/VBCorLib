@@ -44,8 +44,8 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const KeyField      As String = "Key"
-Private Const ValueField    As String = "Value"
+Private Const PropKey      As String = "Key"
+Private Const PropValue    As String = "Value"
 
 Private mKey    As Variant
 Private mValue  As Variant
@@ -154,15 +154,15 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        Helper.MoveVariant mKey, .ReadProperty(KeyField, Empty)
-        Helper.MoveVariant mValue, .ReadProperty(ValueField, Empty)
+        Helper.MoveVariant mKey, .ReadProperty(PropKey, Empty)
+        Helper.MoveVariant mValue, .ReadProperty(PropValue, Empty)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty KeyField, mKey
-        .WriteProperty ValueField, mValue
+        .WriteProperty PropKey, mKey
+        .WriteProperty PropValue, mValue
     End With
 End Sub
 
