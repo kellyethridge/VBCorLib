@@ -400,17 +400,13 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        If Value Is Nothing Then
-            Exit Function
-        End If
-        
-        If TypeOf Value Is CultureInfo Then
-            Dim Other As CultureInfo
-            Set Other = Value
-            Equals = Other.Name = mProps.Name
-        End If
-    End If
+    Dim Other As CultureInfo
+    
+    On Error GoTo Catch
+    Set Other = Value
+    Equals = Other.Name = mProps.Name
+
+Catch:
 End Function
 
 ''
@@ -454,8 +450,8 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
     Load ID
 End Sub
 
-Friend Sub InitClone(ByRef Props As PropsType, ByVal DTInfo As DateTimeFormatInfo, ByVal NumInfo As NumberFormatInfo, ByVal CalInfo As Calendar)
-    mProps = Props
+Friend Sub InitClone(ByRef props As PropsType, ByVal DTInfo As DateTimeFormatInfo, ByVal NumInfo As NumberFormatInfo, ByVal CalInfo As Calendar)
+    mProps = props
     Set mDateTimeFormat = DTInfo
     Set mNumberFormat = NumInfo
     Set mCalendar = CalInfo

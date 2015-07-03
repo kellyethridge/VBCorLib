@@ -433,22 +433,22 @@ End Function
 Public Function CompareTo(ByRef Value As Variant) As Long
     Dim ms As Currency
     
-    Select Case VariantType(Value) And &HFF
+    Select Case VarType(Value)
         Case vbObject
             If Value Is Nothing Then _
                 Error.ArgumentNull "Value"
             If Not TypeOf Value Is CorDateTime Then _
                 Error.Argument Argument_DateRequired, "Value"
                 
-            Dim other As CorDateTime
-            Set other = Value
-            ms = other.TotalMilliseconds
+            Dim Other As CorDateTime
+            Set Other = Value
+            ms = Other.TotalMilliseconds
             
         Case vbDate
             ms = CorDateTime.GetMilliseconds(Value)
         
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_DateRequired), "Value")
+            Error.Argument Argument_DateRequired, "Value"
     End Select
     
     If mMilliseconds < ms Then

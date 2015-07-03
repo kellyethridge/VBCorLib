@@ -79,7 +79,9 @@ Public Property Get Precision() As Long
     
     Ret = mNumber.Precision * 2
     If Ret > 0 Then
-        If (mNumber.Digits(mNumber.Precision - 1) And &HFF00) = 0 Then Ret = Ret - 1
+        If (mNumber.Digits(mNumber.Precision - 1) And &HFF00) = 0 Then
+            Ret = Ret - 1
+        End If
     End If
     
     Precision = Ret
@@ -155,8 +157,8 @@ End Function
 ' If this instance = other then 0 is returned<br>
 ' If this instance > other then 1 is returned.<br>
 '
-Public Function CompareTo(ByVal other As BigInteger) As Long
-    CompareTo = BigInteger.Compare(Me, other)
+Public Function CompareTo(ByVal Other As BigInteger) As Long
+    CompareTo = BigInteger.Compare(Me, Other)
 End Function
 
 ''
@@ -168,8 +170,8 @@ End Function
 ' object. The BInt function is called to convert the other value to
 ' a BigInteger object before comparison.
 '
-Public Function Equals(ByVal other As BigInteger) As Boolean
-    Equals = BigInteger.Equals(Me, other)
+Public Function Equals(ByVal Other As BigInteger) As Boolean
+    Equals = BigInteger.Equals(Me, Other)
 End Function
 
 ''

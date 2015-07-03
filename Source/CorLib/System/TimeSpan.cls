@@ -52,8 +52,8 @@ Option Explicit
 Implements IObject
 Implements IComparable
 
-Private Const PropMilliseconds As String = "Milliseconds"
-Private Const DEF_TIMESPAN      As Long = 0
+Private Const PropMilliseconds      As String = "Milliseconds"
+Private Const DefaultMilliseconds   As Long = 0
 
 Private mMilliseconds As Currency
 
@@ -287,12 +287,12 @@ Public Function GetHashCode() As Long
     End With
 End Function
 
-Public Function LessThan(ByRef other As TimeSpan) As Boolean
-    LessThan = TimeSpan.LessThan(Me, other)
+Public Function LessThan(ByRef Other As TimeSpan) As Boolean
+    LessThan = TimeSpan.LessThan(Me, Other)
 End Function
 
-Public Function GreaterThan(ByRef other As TimeSpan) As Boolean
-    GreaterThan = TimeSpan.GreaterThan(Me, other)
+Public Function GreaterThan(ByRef Other As TimeSpan) As Boolean
+    GreaterThan = TimeSpan.GreaterThan(Me, Other)
 End Function
 
 
@@ -324,7 +324,7 @@ End Sub
 '   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    mMilliseconds = PropBag.ReadProperty(PropMilliseconds, DEF_TIMESPAN)
+    mMilliseconds = PropBag.ReadProperty(PropMilliseconds, DefaultMilliseconds)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
@@ -338,9 +338,9 @@ End Sub
 Private Function IObject_Equals(Value As Variant) As Boolean
     On Error GoTo Catch
     
-    Dim other As TimeSpan
-    Set other = Value
-    IObject_Equals = Equals(other)
+    Dim Other As TimeSpan
+    Set Other = Value
+    IObject_Equals = Equals(Other)
     
 Catch:
 End Function
@@ -360,9 +360,9 @@ End Function
 Private Function IComparable_CompareTo(Value As Variant) As Long
     On Error GoTo Catch
     
-    Dim other As TimeSpan
-    Set other = Value
-    IComparable_CompareTo = CompareTo(other)
+    Dim Other As TimeSpan
+    Set Other = Value
+    IComparable_CompareTo = CompareTo(Other)
     Exit Function
     
 Catch:
