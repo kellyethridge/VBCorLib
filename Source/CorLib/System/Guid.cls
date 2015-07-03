@@ -59,7 +59,7 @@ Private Enum FormatOptions
 End Enum
 
 Private mGuid           As VBGUID
-Private mReadOnlyGuid   As VBGUID
+Private mGuidCopy   As VBGUID
 Private mIsReadOnly     As Boolean
 
 
@@ -82,8 +82,8 @@ Private mIsReadOnly     As Boolean
 Public Property Get Handle() As Long
 Attribute Handle.VB_MemberFlags = "40"
     If mIsReadOnly Then
-        mReadOnlyGuid = mGuid
-        Handle = VarPtr(mReadOnlyGuid)
+        mGuidCopy = mGuid
+        Handle = VarPtr(mGuidCopy)
     Else
         Handle = VarPtr(mGuid)
     End If
@@ -340,7 +340,7 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Value As Variant, ByVal Writable As Boolean)
-    Select Case VariantType(Value)
+    Select Case VarType(Value)
         Case corByteArray
             FromByteArray Value
         
@@ -358,12 +358,12 @@ End Sub
 
 Friend Sub InitReadOnly(ByRef g As VBGUID)
     mGuid = g
+    mGuidCopy = g
     mIsReadOnly = True
 End Sub
 
 Friend Sub InitNew()
-    mGuid = CoCreateGuid
-    mIsReadOnly = True
+    InitReadOnly CoCreateGuid
 End Sub
 
 Friend Function InternalCompare(ByRef g As VBGUID) As Long
@@ -410,7 +410,7 @@ Friend Sub Parse(ByVal s As String)
     End Select
     
     On Error GoTo errTrap
-    mGuid = GUIDFromString(s)
+    InitReadOnly GUIDFromString(s)
     Exit Sub
     
 errTrap:
@@ -429,12 +429,15 @@ Friend Sub FromByteArray(ByRef b As Variant)
     
     Dim Bytes() As Byte
     SAPtr(Bytes) = Ptr
-    CopyMemory mGuid, Bytes(LBound(Bytes)), 16
+    Dim g As VBGUID
+    CopyMemory g, Bytes(LBound(Bytes)), 16
+    InitReadOnly g
     SAPtr(Bytes) = vbNullPtr
 End Sub
 
 Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByRef d() As Byte)
-    With mGuid
+    Dim g As VBGUID
+    With g
         .Data1 = a
         .Data2 = b
         .Data3 = c
@@ -446,21 +449,41 @@ Friend Sub FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, By
         
         CopyMemory .Data4(0), d(LBound(d)), 8
     End With
+    
+    InitReadOnly g
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function EqualFields(ByVal MyField As Long, ByVal TheirField As Long, ByRef Result As Long) As Boolean
-    If MyField < TheirField Then
+Private Function EqualFields(ByVal a As Long, ByVal b As Long, ByRef Result As Long) As Boolean
+    Dim Upper8A As Long
+    Dim Upper8B As Long
+    
+    Upper8A = ((a And &HFF000000) \ &H1000000) And &HFF
+    Upper8B = ((b And &HFF000000) \ &H1000000) And &HFF
+    Result = 0
+    
+    If Upper8A < Upper8B Then
         Result = -1
-    ElseIf MyField > TheirField Then
+    ElseIf Upper8A > Upper8B Then
         Result = 1
     Else
-        Result = 0
-        EqualFields = True
+        Dim Lower24A As Long
+        Dim Lower24B As Long
+        
+        Lower24A = a And &HFFFFFF
+        Lower24B = b And &HFFFFFF
+        
+        If Lower24A < Lower24B Then
+            Result = -1
+        ElseIf Lower24A > Lower24B Then
+            Result = 1
+        End If
     End If
+    
+    EqualFields = Result = 0
 End Function
 
 

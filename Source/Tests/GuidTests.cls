@@ -57,6 +57,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use("{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}").Expect Iz.Negative
             Test.Use("{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79ED}").Expect Iz.Positive
             
+        Case "CompareTo_WithAnyValueAgainstEmpty_ReturnsPositive"
+            Test.Use "{F0000000-0000-0000-0000-000000000000}"
+            Test.Use "{00000000-F000-0000-0000-000000000000}"
+            Test.Use "{00000000-0000-F000-0000-000000000000}"
+            Test.Use "{00000000-0000-0000-F000-000000000000}"
+
         Case "GetHashCode_WhenCalled_ReturnsExpected"
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79EE}", True
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EE}", "{C200E360-38C5-11CE-AE62-08002B2B79Ef}", False
@@ -122,6 +128,16 @@ Public Function CompareTo_WithValues_ReturnsExpected(ByVal Left As String, ByVal
     
     CompareTo_WithValues_ReturnsExpected = Actual
 End Function
+
+Public Sub CompareTo_WithAnyValueAgainstEmpty_ReturnsPositive(ByVal s As String)
+    Dim g As Guid
+    Set g = NewGuid(s)
+    
+    Dim Actual As Long
+    Actual = g.CompareTo(Guid.EmptyGuid)
+    
+    Assert.That Actual, Iz.Positive
+End Sub
 
 Public Sub GetHashCode_WhenCalled_ReturnsExpected(ByVal Guid1 As String, ByVal Guid2 As String, ByVal Expected As Boolean)
     Dim Guid1Guid As Guid
