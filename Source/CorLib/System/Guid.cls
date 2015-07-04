@@ -147,7 +147,7 @@ End Function
 ' "N" = 00000000000000000000000000000000
 ' "X" = {0x00000000,0x0000,0x0000,{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00}}
 ' </pre>
-' <b>B</b> is the default format.
+' <b>D</b> is the default format.
 '
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim FormatCh As Integer
@@ -334,37 +334,6 @@ Friend Function CreateReadOnly() As Guid
     CreateReadOnly.InitReadOnly mGuid
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Value As Variant, ByVal Writable As Boolean)
-    Select Case VarType(Value)
-        Case corByteArray
-            FromByteArray Value
-        
-        Case vbString
-            Parse Value
-            
-        Case Else
-            If IsArray(Value) Then
-                Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Array))
-            End If
-    End Select
-    
-    mIsReadOnly = Not Writable
-End Sub
-
-Friend Sub InitReadOnly(ByRef g As VBGUID)
-    mGuid = g
-    mGuidCopy = g
-    mIsReadOnly = True
-End Sub
-
-Friend Sub InitNew()
-    InitReadOnly CoCreateGuid
-End Sub
-
 Friend Function InternalCompare(ByRef g As VBGUID) As Long
     With mGuid
         If Not EqualFields(.Data1, g.Data1, InternalCompare) Then Exit Function
@@ -378,15 +347,49 @@ Friend Function InternalCompare(ByRef g As VBGUID) As Long
     End With
 End Function
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByRef Value As Variant, ByVal Writable As Boolean)
+    Select Case VarType(Value)
+        Case vbString
+            Parse Value
+        Case corByteArray
+            FromByteArray Value
+        Case vbLong
+            Dim g As VBGUID
+            CopyMemory g, ByVal CLng(Value), corSizeOfGuid
+            InitReadOnly g
+        Case Else
+            Error.Format Format_InvalidGuidFormatSpecification
+    End Select
+    
+    mIsReadOnly = Not Writable
+End Sub
+
+Friend Sub InitReadOnly(ByRef g As VBGUID)
+    mGuid = g
+    mIsReadOnly = True
+End Sub
+
+Friend Sub InitNew()
+    InitReadOnly CoCreateGuid
+End Sub
+
 Friend Sub Parse(ByVal s As String)
     If Len(s) = 38 Then
         '{C200E360-38C5-11CE-AE62-08002B2B79EF} or
         '(C200E360-38C5-11CE-AE62-08002B2B79EF)
         Select Case Asc(s)
-            Case 123:   If Asc(Right$(s, 1)) <> 125 Then FormatError
-            Case 40:    If Asc(Right$(s, 1)) <> 41 Then FormatError
-            Case Else:  FormatError
+            Case corOpenBraceChar
+                If Asc(Right$(s, 1)) <> corCloseBraceChar Then FormatError
+            Case corOpenParenChar
+                If Asc(Right$(s, 1)) <> corCloseParenChar Then FormatError
+            Case Else
+                FormatError
         End Select
+        
         s = Mid$(s, 2, 36)
     End If
     
@@ -394,10 +397,10 @@ Friend Sub Parse(ByVal s As String)
         Case 36
             'C200E360-38C5-11CE-AE62-08002B2B79EF
             If s Like "*[!0-9a-fA-F,-]*" Then FormatError
-            If Asc(Mid$(s, 9, 1)) <> 45 Then FormatError
-            If Asc(Mid$(s, 14, 1)) <> 45 Then FormatError
-            If Asc(Mid$(s, 19, 1)) <> 45 Then FormatError
-            If Asc(Mid$(s, 24, 1)) <> 45 Then FormatError
+            If Asc(Mid$(s, 9, 1)) <> corHyphenChar Then FormatError
+            If Asc(Mid$(s, 14, 1)) <> corHyphenChar Then FormatError
+            If Asc(Mid$(s, 19, 1)) <> corHyphenChar Then FormatError
+            If Asc(Mid$(s, 24, 1)) <> corHyphenChar Then FormatError
             s = "{" & s & "}"
         Case 32
             'C200E36038C511CEAE6208002B2B79EF
@@ -408,28 +411,24 @@ Friend Sub Parse(ByVal s As String)
             FormatError
     End Select
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     InitReadOnly GUIDFromString(s)
     Exit Sub
     
-errTrap:
+Catch:
     FormatError
 End Sub
 
-Private Sub FormatError()
-    Throw Cor.NewFormatException("Invalid Guid string format.")
-End Sub
-
-Friend Sub FromByteArray(ByRef b As Variant)
+Private Sub FromByteArray(ByRef b As Variant)
     Dim Ptr As Long
     Ptr = CorArray.ArrayPointer(b)
     If Ptr = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Value), Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Value", ArgumentNull_Array
     
     Dim Bytes() As Byte
     SAPtr(Bytes) = Ptr
     Dim g As VBGUID
-    CopyMemory g, Bytes(LBound(Bytes)), 16
+    CopyMemory g, Bytes(LBound(Bytes)), corSizeOfGuid
     InitReadOnly g
     SAPtr(Bytes) = vbNullPtr
 End Sub
@@ -456,6 +455,10 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub FormatError()
+    Throw Cor.NewFormatException("Invalid Guid string format.")
+End Sub
+
 Private Function EqualFields(ByVal a As Long, ByVal b As Long, ByRef Result As Long) As Boolean
     Dim Upper8A As Long
     Dim Upper8B As Long

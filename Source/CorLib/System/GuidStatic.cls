@@ -101,18 +101,6 @@ Public Function Parse(ByRef s As String) As Guid
 End Function
 
 ''
-' Converts an array of 16 bytes into a Guid.
-'
-' @param Bytes The bytes to convert to a guid.
-' @param LockGuid Locks the guids handle.
-' @return A new guid object set to the 16 bytes.
-'
-Public Function FromByteArray(ByRef Bytes() As Byte) As Guid
-    Set FromByteArray = New Guid
-    FromByteArray.FromByteArray Bytes
-End Function
-
-''
 ' Creates a guid using specified values and byte array.
 '
 ' @param a A value representing 12345678-xxxx-xxxx-xxxx-xxxxxxxxxxxx
@@ -156,18 +144,6 @@ Public Function FromValues(ByVal a As Long, ByVal b As Integer, ByVal c As Integ
     Bytes(7) = k
     
     Set FromValues = FromParts(a, b, c, Bytes)
-End Function
-
-''
-' Creates a Guid based on a 16-byte block of memory.
-'
-' @param lpGuid A poiner to the memory location of the 16 bytes.
-' @return A new guid object.
-'
-Public Function FromMemory(ByVal lpGuid As Long) As Guid
-    Dim b(15) As Byte
-    Call CopyMemory(b(0), ByVal lpGuid, corSizeOfGuid)
-    Set FromMemory = FromByteArray(b)
 End Function
 
 ''
