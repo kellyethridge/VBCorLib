@@ -34,13 +34,44 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "X", "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}"
             Test.Use "x", "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}"
             
-        Case "Parse_WithValues_ReturnsExpected"
+        Case "Parse_WithValue_ReturnsExpected"
             Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             Test.Use "C200E36038C511CEAE6208002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             Test.Use "C200E36038C511CEAE6208002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             
+        Case "TryParseExact_WithValidValue_ReturnsGuid"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "b"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "B"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "p"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "P"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF", "n"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF", "N"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "d"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "D"
+            
+        Case "TryParseExact_WithInvalidValue_ReturnsEmptyGuid"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "p"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "b"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF", "d"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "n"
+            Test.Use "{c200e360 38c5 11ce ae62 08002b2b79ef}", "b"
+            Test.Use "(C200E360 38C5 11CE AE62 08002B2B79EF)", "p"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF", "P"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef", "B"
+            Test.Use "C200E36038C511CEAE6208002B2B79E", "N"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79E", "d"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", ""
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "z"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79Z", "d"
+        
+        Case "TryParse_WithValidValue_ReturnsGuid"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF"
+        
         Case "Equals_WithValues_ReturnsExpected"
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EE}", False
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", True
@@ -87,12 +118,77 @@ Public Sub ToString_WithFormats_ReturnsExpected(ByVal GuidFormat As String, ByVa
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Parse_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As String)
+Public Sub Parse_WithValue_ReturnsExpected(ByVal s As String, ByVal Expected As String)
     Dim Actual As VBCorLib.Guid
     
     Set Actual = Guid.Parse(s)
     
     Assert.That Actual.ToString, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Parse_WithInvalidValue_ThrowsFormatException()
+    On Error Resume Next
+    
+    Guid.Parse "[c200e360-38c5-11ce-ae62-08002b2b79ef]"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub ParseExact_WithInvalidFormatSpecifier_ThrowsFormatException()
+    On Error Resume Next
+    
+    Guid.ParseExact "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "z"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub ParseExact_WithInvalidValue_ThrowsFormatException()
+    On Error Resume Next
+    
+    Guid.ParseExact "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "P"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub ParseExact_WithWrongLengthValue_ThrowFormatException()
+    On Error Resume Next
+    
+    Guid.ParseExact "{c200e360-38c5-11ce-ae62-08002b2b79ef", "b"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub TryParseExact_WithValidValue_ReturnsGuid(ByVal s As String, ByVal Format As String)
+    Dim Actual As Guid
+    Dim Result As Boolean
+    
+    Result = Guid.TryParseExact(s, Format, Actual)
+    
+    Dim Expected As Guid
+    Set Expected = Guid.Parse("{c200e360-38c5-11ce-ae62-08002b2b79ef}")
+    Assert.That Result, Iz.True
+    Assert.That Actual, Equals(Expected)
+End Sub
+
+Public Sub TryParseExact_WithInvalidValue_ReturnsEmptyGuid(ByVal s As String, ByVal Format As String)
+    Dim Actual As Guid
+    Dim Result As Boolean
+    
+    Result = Guid.TryParseExact(s, Format, Actual)
+    
+    Assert.That Result, Iz.False
+    Assert.That Actual, Equals(Guid.EmptyGuid)
+End Sub
+
+Public Sub TryParse_WithValidValue_ReturnsGuid(ByVal s As String)
+    Dim Actual As Guid
+    Dim Result As Boolean
+    
+    Result = Guid.TryParse(s, Actual)
+    
+    Const Expected As String = "{c200e360-38c5-11ce-ae62-08002b2b79ef}"
+    Assert.That Result, Iz.True
+    Assert.That Actual.ToString("b"), Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Equals_WithValues_ReturnsExpected(ByRef s As String, ByVal Expected As Boolean)
@@ -199,13 +295,13 @@ Public Sub ToString_WithInvalidFormatSpecifier_ThrowsFormatException(ByVal Inval
 End Sub
 
 Public Sub Serialization_WhenCalled_SerializesInstance()
-    Dim Original As VBCorLib.Guid
-    Set Original = Guid.NewGuid
+    Dim original As VBCorLib.Guid
+    Set original = Guid.NewGuid
     
     Dim Actual As Guid
-    Set Actual = Persist(Original)
+    Set Actual = Persist(original)
     
-    Assert.That Actual, Equals(Original)
+    Assert.That Actual, Equals(original)
 End Sub
 
 Public Sub EmptyGuid_WhenCalled_ReturnsGuidWithZeroValue()

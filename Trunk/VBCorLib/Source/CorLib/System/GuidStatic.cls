@@ -53,6 +53,7 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mParser         As New GuidParser
 Private mEmptyGuid      As Guid
 Private mIUnknownGuid   As Guid
 Private mIDispatchGuid  As Guid
@@ -78,13 +79,41 @@ End Property
 ''
 ' Returns a new <b>Guid</b> object with a random guid generated.
 '
-' @param LockGuid Locks the guids handle.
 ' @return A new <b>Guid</b> object.
 ' @see Guid
 '
 Public Function NewGuid() As Guid
     Set NewGuid = New Guid
-    NewGuid.InitNew
+    NewGuid.InitReadOnly CoCreateGuid
+End Function
+
+Public Function TryParseExact(ByRef s As String, ByRef Format As String, ByRef Result As Guid) As Boolean
+    Dim FormatCh As Integer
+    
+    If Len(Format) = 1 Then
+        FormatCh = AscW(Format)
+    End If
+    
+    TryParseExact = TryParseCore(s, FormatCh, Result)
+End Function
+
+Public Function TryParse(ByRef s As String, ByRef Result As Guid) As Boolean
+    Dim Format As Integer
+    
+    Select Case Len(s)
+        Case 38
+            If AscW(s) = corOpenBraceChar Then
+                Format = corUpperBChar
+            Else
+                Format = corUpperPChar
+            End If
+        Case 36
+            Format = corUpperDChar
+        Case 32
+            Format = corUpperNChar
+    End Select
+    
+    TryParse = TryParseCore(s, Format, Result)
 End Function
 
 ''
@@ -96,8 +125,15 @@ End Function
 ' @return A <b>Guid</b> set to the parsed value.
 '
 Public Function Parse(ByRef s As String) As Guid
-    Set Parse = New Guid
-    Parse.Parse s
+    If Not TryParse(s, Parse) Then
+        mParser.ThrowError
+    End If
+End Function
+
+Public Function ParseExact(ByRef s As String, ByRef Format As String) As Guid
+    If Not TryParseExact(s, Format, ParseExact) Then
+        mParser.ThrowError
+    End If
 End Function
 
 ''
@@ -107,12 +143,23 @@ End Function
 ' @param b A value representing xxxxxxxx-1234-xxxx-xxxx-xxxxxxxxxxxx
 ' @param c A value representing xxxxxxxx-xxxx-1234-xxxx-xxxxxxxxxxxx
 ' @param d An array representing xxxxxxxx-xxxx-xxxx-1234-123456789012
-' @param LockGuid Locks the guids handle.
 ' @return A new guid initialized to the values and byte array specified.
 '
 Public Function FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByRef d() As Byte) As Guid
+    Dim g As VBGUID
+    g.Data1 = a
+    g.Data2 = b
+    g.Data3 = c
+    
+    If CorArray.IsNull(d) Then _
+        Throw Cor.NewArgumentNullException("d", Environment.GetResourceString(ArgumentNull_Array))
+    If CorArray.Length(d) <> 8 Then _
+        Throw Cor.NewArgumentException("Array must be 8 bytes in length.", "Bytes")
+    
+    CopyMemory g.Data4(0), d(LBound(d)), 8
+    
     Set FromParts = New Guid
-    FromParts.FromParts a, b, c, d
+    FromParts.InitReadOnly g
 End Function
 
 ''
@@ -129,21 +176,24 @@ End Function
 ' @param i A Byte
 ' @param j A Byte
 ' @param k A Byte
-' @param LockGuid Locks the guids handle.
 ' @return A new guid initialized to the values and bytes specified.
 '
 Public Function FromValues(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByVal d As Byte, ByVal e As Byte, ByVal f As Byte, ByVal g As Byte, ByVal h As Byte, ByVal i As Byte, ByVal j As Byte, ByVal k As Byte) As Guid
-    Dim Bytes(7) As Byte
-    Bytes(0) = d
-    Bytes(1) = e
-    Bytes(2) = f
-    Bytes(3) = g
-    Bytes(4) = h
-    Bytes(5) = i
-    Bytes(6) = j
-    Bytes(7) = k
+    Dim x As VBGUID
+    x.Data1 = a
+    x.Data2 = b
+    x.Data3 = c
+    x.Data4(0) = d
+    x.Data4(1) = e
+    x.Data4(2) = f
+    x.Data4(3) = g
+    x.Data4(4) = h
+    x.Data4(5) = i
+    x.Data4(6) = j
+    x.Data4(7) = k
     
-    Set FromValues = FromParts(a, b, c, Bytes)
+    Set FromValues = New Guid
+    FromValues.InitReadOnly x
 End Function
 
 ''
@@ -166,6 +216,10 @@ Public Function ReadOnly(ByVal g As Guid) As Guid
     End If
 End Function
 
+Friend Property Get Parser() As GuidParser
+    Set Parser = mParser
+End Property
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -175,3 +229,21 @@ Private Sub Class_Initialize()
     Set mIUnknownGuid = ReadOnly(Parse("{00000000-0000-0000-C000-000000000046}"))
     Set mIDispatchGuid = ReadOnly(Parse("{00020400-0000-0000-C000-000000000046}"))
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function TryParseCore(ByRef s As String, ByVal Format As Integer, ByRef Result As Guid) As Boolean
+    Dim g As VBGUID
+    
+    If mParser.TryParseExact(s, Format, g) Then
+        Set Result = New Guid
+        Result.InitReadOnly g
+        TryParseCore = True
+    Else
+        Set Result = mEmptyGuid
+    End If
+End Function
+
+
