@@ -36,6 +36,10 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
+Private Const LengthOfEnclosed      As Long = 38
+Private Const LengthOfDashesOnly    As Long = 36
+Private Const LengthOfDigitsOnly    As Long = 32
+
 Private Enum ParseOptions
     None = 0
     Dashes = 1
@@ -47,51 +51,80 @@ Private mException  As Exception
 Private mChars()    As Integer
 Private mIndex      As Long
 
+
 Friend Sub ThrowError()
     Throw mException
 End Sub
 
-Friend Function TryParseExact(ByRef s As String, ByVal Format As Integer, ByRef Result As VBGUID) As Boolean
-    mChars = AllocChars(s)
-    mIndex = 0
+Friend Function TryParse(ByRef InputString As String, ByRef Result As VBGUID) As Boolean
+    Dim Trimmed As String
+    Dim Format  As Integer
+    
+    Trimmed = CorString.Trim(InputString)
+    Init Trimmed
+    
+    Select Case Len(Trimmed)
+        Case LengthOfEnclosed
+            If AscW(Trimmed) = corOpenBraceChar Then
+                TryParse = TryParseCore(Braces Or Dashes, Result)
+            Else
+                TryParse = TryParseCore(Parens Or Dashes, Result)
+            End If
+        Case LengthOfDashesOnly
+            TryParse = TryParseCore(Dashes, Result)
+        Case LengthOfDigitsOnly
+            TryParse = TryParseCore(ParseOptions.None, Result)
+        Case Else
+            TryParse = TryParseHexCore(Result)
+    End Select
+    
+    FreeChars mChars
+End Function
+
+Friend Function TryParseExact(ByRef InputString As String, ByVal Format As Integer, ByRef Result As VBGUID) As Boolean
+    Dim Trimmed As String
+    
+    Trimmed = CorString.Trim(InputString)
+    Init Trimmed
     
     Select Case Format
         Case corLowerBChar, corUpperBChar
-            If Len(s) = 38 Then
+            If Len(Trimmed) = LengthOfEnclosed Then
                 TryParseExact = TryParseCore(Dashes Or Braces, Result)
             Else
                 FormatError
             End If
         Case corLowerPChar, corUpperPChar
-            If Len(s) = 38 Then
+            If Len(Trimmed) = LengthOfEnclosed Then
                 TryParseExact = TryParseCore(Dashes Or Parens, Result)
             Else
                 FormatError
             End If
         Case corLowerNChar, corUpperNChar
-            If Len(s) = 32 Then
+            If Len(Trimmed) = LengthOfDigitsOnly Then
                 TryParseExact = TryParseCore(ParseOptions.None, Result)
             Else
                 FormatError
             End If
         Case corLowerDChar, corUpperDChar
-            If Len(s) = 36 Then
+            If Len(Trimmed) = LengthOfDashesOnly Then
                 TryParseExact = TryParseCore(Dashes, Result)
             Else
                 FormatError
             End If
         Case corLowerXChar, corUpperXChar
-            If EatAllWhiteSpace = 68 Then
-                TryParseExact = TryParseHexCore(Result)
-            Else
-                FormatError
-            End If
+            TryParseExact = TryParseHexCore(Result)
         Case Else
             FormatSpecificationError
     End Select
     
     FreeChars mChars
 End Function
+
+Private Sub Init(ByRef InputString As String)
+    mChars = AllocChars(InputString)
+    mIndex = 0
+End Sub
 
 Private Function EatAllWhiteSpace() As Long
     Dim Length      As Long
@@ -111,6 +144,11 @@ Private Function EatAllWhiteSpace() As Long
 End Function
 
 Private Function TryParseHexCore(ByRef Result As VBGUID) As Boolean
+    If EatAllWhiteSpace <> 68 Then
+        FormatError
+        Exit Function
+    End If
+
     If Not TryConsumeChar(corOpenBraceChar) Then
         Exit Function
     End If
