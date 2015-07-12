@@ -368,24 +368,6 @@ library VBCorType {
         boolean Invoke([in] void * Arg1, [in] void * Arg2);
     }
 
-    [uuid(DECA6F21-BD22-4303-BC15-E45636505044), odl]
-    interface IOneArgReturnBool : IUnknown
-    {
-        boolean Call([in] long Arg);  // obsolete
-    }
-
-    [uuid(B9DC947B-5BE0-4572-873C-C08E891FAF71), odl]
-    interface IOneArgReturnVoid : IUnknown
-    {
-        void Call([in] long lpArg); // obsolete
-    }
-
-    [uuid(C7F4D1EC-F31E-4058-9DBE-647DF9EBC9BE), odl]
-    interface IOneRefReturnLong : IUnknown
-    {
-        long Call([in] void * Arg); // obsolete
-    }
-
     [uuid(B196B283-BAB4-101A-B69C-00AA00341D07), odl]
     interface IProvideClassInfo :IVBUnknown
     {
@@ -396,36 +378,6 @@ library VBCorType {
     interface ISortRoutine : IUnknown
     {
         void Call([in] long * pSA, [in] long Left, [in] long Right);
-    }
-
-    [uuid(30C64962-0541-4ee6-8EC7-5EFA3C808ED0), odl]
-    interface ITwoArgReturnLong : IUnknown
-    {
-        long Call([in] long x, [in] long y);    // obsolete
-    }
-
-    [uuid(3A7A8F77-A63D-4fbd-81E4-2EC6020F0F75), odl]
-    interface ITwoArgReturnVoid : IUnknown
-    {
-        void Call([in] long x, [in] long y); // Obsolete
-    }
-
-    [uuid(821C2117-3C0E-4245-AACB-6D468A3A0787), odl]
-    interface ITwoRefReturnBool : IUnknown
-    {
-        boolean Call([in] void * x, [in] void * y);  // obsolete
-    }
-
-    [uuid(F6811C30-06B4-47a4-9217-BDD97FBF9C75), odl]
-    interface ITwoRefReturnLong : IUnknown
-    {
-        long Call([in] void * x, [in] void * y);   // obsolete
-    }
-
-    [uuid(6F2AB419-A80B-4129-B9C2-E81C528AE3E2), odl]
-    interface ITwoArgReturnBool : IUnknown
-    {
-        boolean Call([in] long x, [in] long y);   // obsolete
     }
 
     //
