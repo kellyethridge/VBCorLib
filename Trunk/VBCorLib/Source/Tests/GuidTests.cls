@@ -70,6 +70,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "z"
             Test.Use "C200E360-38C5-11CE-AE62-08002B2B79Z", "d"
         
+        Case "TryParse_WithInvalidValue_ReturnsFalse"
+            Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79eK}"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EFF"
+            Test.Use "C200E36038C511CEAE6208002B2B79 F"
+            Test.Use "C200E360-38C5-11CE-AE62 08002B2B79EF"
+            Test.Use "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}"
+            Test.Use "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,Xxef}}"
+        
         Case "TryParse_WithValidValue_ReturnsGuid"
             Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}"
             Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)"
@@ -199,6 +207,16 @@ Public Sub TryParse_WithValidValue_ReturnsGuid(ByVal s As String)
     Const Expected As String = "{c200e360-38c5-11ce-ae62-08002b2b79ef}"
     Assert.That Result, Iz.True
     Assert.That Actual.ToString("b"), Iz.EqualTo(Expected)
+End Sub
+
+Public Sub TryParse_WithInvalidValue_ReturnsFalse(ByRef InvalidInput As String)
+    Dim Actual As Boolean
+    Dim Result As Guid
+    
+    Actual = Guid.TryParse(InvalidInput, Result)
+    
+    Assert.That Actual, Iz.False
+    Assert.That Result, Equals(Guid.EmptyGuid)
 End Sub
 
 Public Sub Equals_WithValues_ReturnsExpected(ByRef s As String, ByVal Expected As Boolean)

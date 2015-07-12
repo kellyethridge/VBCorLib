@@ -87,38 +87,33 @@ Public Function NewGuid() As Guid
     NewGuid.InitReadOnly CoCreateGuid
 End Function
 
-Public Function TryParseExact(ByRef s As String, ByRef Format As String, ByRef Result As Guid) As Boolean
-    Dim FormatCh As Integer
+Public Function TryParseExact(ByRef InputString As String, ByRef Format As String, ByRef Result As Guid) As Boolean
+    Dim Output      As VBGUID
+    Dim FormatCh    As Integer
     
     If Len(Format) = 1 Then
         FormatCh = AscW(Format)
     End If
-    
-    TryParseExact = TryParseCore(CorString.Trim(s), FormatCh, Result)
+        
+    If mParser.TryParseExact(InputString, FormatCh, Output) Then
+        Set Result = New Guid
+        Result.InitReadOnly Output
+        TryParseExact = True
+    Else
+        Set Result = mEmptyGuid
+    End If
 End Function
 
-Public Function TryParse(ByRef s As String, ByRef Result As Guid) As Boolean
-    Dim GuidString  As String
-    Dim Format      As Integer
+Public Function TryParse(ByRef InputString As String, ByRef Result As Guid) As Boolean
+    Dim Output As VBGUID
     
-    GuidString = CorString.Trim(s)
-    
-    Select Case Len(GuidString)
-        Case 38
-            If AscW(s) = corOpenBraceChar Then
-                Format = corUpperBChar
-            Else
-                Format = corUpperPChar
-            End If
-        Case 36
-            Format = corUpperDChar
-        Case 32
-            Format = corUpperNChar
-        Case Else
-            Format = corUpperXChar
-    End Select
-    
-    TryParse = TryParseCore(GuidString, Format, Result)
+    If mParser.TryParse(InputString, Output) Then
+        Set Result = New Guid
+        Result.InitReadOnly Output
+        TryParse = True
+    Else
+        Set Result = mEmptyGuid
+    End If
 End Function
 
 ''
@@ -234,21 +229,5 @@ Private Sub Class_Initialize()
     Set mIUnknownGuid = ReadOnly(Parse("{00000000-0000-0000-C000-000000000046}"))
     Set mIDispatchGuid = ReadOnly(Parse("{00020400-0000-0000-C000-000000000046}"))
 End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function TryParseCore(ByRef s As String, ByVal Format As Integer, ByRef Result As Guid) As Boolean
-    Dim g As VBGUID
-    
-    If mParser.TryParseExact(s, Format, g) Then
-        Set Result = New Guid
-        Result.InitReadOnly g
-        TryParseCore = True
-    Else
-        Set Result = mEmptyGuid
-    End If
-End Function
 
 

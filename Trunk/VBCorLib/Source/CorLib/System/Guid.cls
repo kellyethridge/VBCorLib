@@ -180,6 +180,129 @@ Public Function ToString(Optional ByRef Format As String, Optional ByVal Provide
     End Select
 End Function
 
+
+
+''
+' Returns a boolean indicating if the value and this object
+' instance are the same instance.
+'
+' @param value The value to compare equalit to.
+' @return Boolean indicating equality.
+Public Function Equals(ByRef Value As Variant) As Boolean
+    Dim Other As Guid
+    
+    On Error GoTo Catch
+    Set Other = Value
+    Equals = IsEqualGUID(mGuid, ByVal Other.Handle)
+
+Catch:
+End Function
+
+''
+' Returns a pseudo-unique number identifying this instance.
+'
+' @return Pseudo-unique number identifying this instance.
+Public Function GetHashCode() As Long
+    With mGuid
+        GetHashCode = .Data1 Xor AsLong(.Data2) Xor AsLong(.Data4(0)) Xor AsLong(.Data4(4))
+    End With
+End Function
+
+Friend Function CreateReadOnly() As Guid
+    Set CreateReadOnly = New Guid
+    CreateReadOnly.InitReadOnly mGuid
+End Function
+
+Friend Function InternalCompare(ByRef g As VBGUID) As Long
+    If Not EqualFields(mGuid.Data1, g.Data1, InternalCompare) Then Exit Function
+    If Not EqualFields(mGuid.Data2, g.Data2, InternalCompare) Then Exit Function
+    If Not EqualFields(mGuid.Data3, g.Data3, InternalCompare) Then Exit Function
+    
+    Dim i As Long
+    For i = 0 To 7
+        If Not EqualFields(mGuid.Data4(i), g.Data4(i), InternalCompare) Then Exit Function
+    Next i
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByRef Value As Variant)
+    Select Case VarType(Value)
+        Case vbString
+            Parse Value
+        Case corByteArray
+            FromByteArray Value
+        Case vbLong
+            CopyMemory mGuid, ByVal CLng(Value), corSizeOfGuid
+        Case Else
+            Error.Argument Format_GuidUnrecognized
+    End Select
+    
+    mIsReadOnly = True
+End Sub
+
+Friend Sub InitReadOnly(ByRef g As VBGUID)
+    mGuid = g
+    mIsReadOnly = True
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub FromByteArray(ByRef Value As Variant)
+    Dim Ptr As Long
+    Ptr = CorArray.ArrayPointer(Value)
+    If Ptr = vbNullPtr Then _
+        Error.ArgumentNull "Value", ArgumentNull_Array
+    If SafeArrayGetDim(Ptr) <> 1 Then _
+        Error.Rank
+    If CorArray.LengthFirstDim(Value) <> corSizeOfGuid Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, 16))
+    
+    Dim Bytes() As Byte
+    SAPtr(Bytes) = Ptr
+    CopyMemory mGuid, Bytes(LBound(Bytes)), corSizeOfGuid
+    SAPtr(Bytes) = vbNullPtr
+End Sub
+
+Private Sub Parse(ByVal InputString As String)
+    If Not Guid.Parser.TryParse(InputString, mGuid) Then
+        Guid.Parser.ThrowError
+    End If
+End Sub
+
+Private Function EqualFields(ByVal a As Long, ByVal b As Long, ByRef Result As Long) As Boolean
+    Dim Upper8A As Long
+    Dim Upper8B As Long
+    
+    Upper8A = ((a And &HFF000000) \ &H1000000) And &HFF
+    Upper8B = ((b And &HFF000000) \ &H1000000) And &HFF
+    Result = 0
+    
+    If Upper8A < Upper8B Then
+        Result = -1
+    ElseIf Upper8A > Upper8B Then
+        Result = 1
+    Else
+        Dim Lower24A As Long
+        Dim Lower24B As Long
+        
+        Lower24A = a And &HFFFFFF
+        Lower24B = b And &HFFFFFF
+        
+        If Lower24A < Lower24B Then
+            Result = -1
+        ElseIf Lower24A > Lower24B Then
+            Result = 1
+        End If
+    End If
+    
+    EqualFields = Result = 0
+End Function
+
 Private Function ToStandardString(ByVal Options As FormatOptions, Optional ByVal OpenChar As Integer, Optional ByVal CloseChar As Integer) As String
     Dim Size        As Long
     Dim Offset      As Long
@@ -303,147 +426,6 @@ Private Function HexToChar(ByVal a As Long) As Integer
     Else
         HexToChar = a + corZeroChar
     End If
-End Function
-
-
-''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
-'
-' @param value The value to compare equalit to.
-' @return Boolean indicating equality.
-Public Function Equals(ByRef Value As Variant) As Boolean
-    Dim Other As Guid
-    
-    On Error GoTo Catch
-    Set Other = Value
-    Equals = IsEqualGUID(mGuid, ByVal Other.Handle)
-
-Catch:
-End Function
-
-''
-' Returns a pseudo-unique number identifying this instance.
-'
-' @return Pseudo-unique number identifying this instance.
-Public Function GetHashCode() As Long
-    With mGuid
-        GetHashCode = .Data1 Xor AsLong(.Data2) Xor AsLong(.Data4(0)) Xor AsLong(.Data4(4))
-    End With
-End Function
-
-Friend Function CreateReadOnly() As Guid
-    Set CreateReadOnly = New Guid
-    CreateReadOnly.InitReadOnly mGuid
-End Function
-
-Friend Function InternalCompare(ByRef g As VBGUID) As Long
-    If Not EqualFields(mGuid.Data1, g.Data1, InternalCompare) Then Exit Function
-    If Not EqualFields(mGuid.Data2, g.Data2, InternalCompare) Then Exit Function
-    If Not EqualFields(mGuid.Data3, g.Data3, InternalCompare) Then Exit Function
-    
-    Dim i As Long
-    For i = 0 To 7
-        If Not EqualFields(mGuid.Data4(i), g.Data4(i), InternalCompare) Then Exit Function
-    Next i
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Value As Variant)
-    Select Case VarType(Value)
-        Case vbString
-            Parse Value
-        Case corByteArray
-            FromByteArray Value
-        Case vbLong
-            CopyMemory mGuid, ByVal CLng(Value), corSizeOfGuid
-        Case Else
-            Error.Argument Format_GuidUnrecognized
-    End Select
-    
-    mIsReadOnly = True
-End Sub
-
-Friend Sub InitReadOnly(ByRef g As VBGUID)
-    mGuid = g
-    mIsReadOnly = True
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub FromByteArray(ByRef Value As Variant)
-    Dim Ptr As Long
-    Ptr = CorArray.ArrayPointer(Value)
-    If Ptr = vbNullPtr Then _
-        Error.ArgumentNull "Value", ArgumentNull_Array
-    If SafeArrayGetDim(Ptr) <> 1 Then _
-        Error.Rank
-    If CorArray.LengthFirstDim(Value) <> corSizeOfGuid Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, 16))
-    
-    Dim Bytes() As Byte
-    SAPtr(Bytes) = Ptr
-    CopyMemory mGuid, Bytes(LBound(Bytes)), corSizeOfGuid
-    SAPtr(Bytes) = vbNullPtr
-End Sub
-
-Private Sub Parse(ByVal s As String)
-    Dim Format As Integer
-    
-    s = CorString.Trim(s)
-    
-    Select Case Len(s)
-        Case 38
-            If AscW(s) = corOpenBraceChar Then
-                Format = corUpperBChar
-            Else
-                Format = corUpperPChar
-            End If
-        Case 36
-            Format = corUpperDChar
-        Case 32
-            Format = corUpperNChar
-        Case Else
-            Format = corUpperXChar
-    End Select
-    
-    If Not Guid.Parser.TryParseExact(s, Format, mGuid) Then
-        Guid.Parser.ThrowError
-    End If
-End Sub
-
-Private Function EqualFields(ByVal a As Long, ByVal b As Long, ByRef Result As Long) As Boolean
-    Dim Upper8A As Long
-    Dim Upper8B As Long
-    
-    Upper8A = ((a And &HFF000000) \ &H1000000) And &HFF
-    Upper8B = ((b And &HFF000000) \ &H1000000) And &HFF
-    Result = 0
-    
-    If Upper8A < Upper8B Then
-        Result = -1
-    ElseIf Upper8A > Upper8B Then
-        Result = 1
-    Else
-        Dim Lower24A As Long
-        Dim Lower24B As Long
-        
-        Lower24A = a And &HFFFFFF
-        Lower24B = b And &HFFFFFF
-        
-        If Lower24A < Lower24B Then
-            Result = -1
-        ElseIf Lower24A > Lower24B Then
-            Result = 1
-        End If
-    End If
-    
-    EqualFields = Result = 0
 End Function
 
 
