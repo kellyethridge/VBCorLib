@@ -94,13 +94,16 @@ Public Function TryParseExact(ByRef s As String, ByRef Format As String, ByRef R
         FormatCh = AscW(Format)
     End If
     
-    TryParseExact = TryParseCore(s, FormatCh, Result)
+    TryParseExact = TryParseCore(CorString.Trim(s), FormatCh, Result)
 End Function
 
 Public Function TryParse(ByRef s As String, ByRef Result As Guid) As Boolean
-    Dim Format As Integer
+    Dim GuidString  As String
+    Dim Format      As Integer
     
-    Select Case Len(s)
+    GuidString = CorString.Trim(s)
+    
+    Select Case Len(GuidString)
         Case 38
             If AscW(s) = corOpenBraceChar Then
                 Format = corUpperBChar
@@ -111,9 +114,11 @@ Public Function TryParse(ByRef s As String, ByRef Result As Guid) As Boolean
             Format = corUpperDChar
         Case 32
             Format = corUpperNChar
+        Case Else
+            Format = corUpperXChar
     End Select
     
-    TryParse = TryParseCore(s, Format, Result)
+    TryParse = TryParseCore(GuidString, Format, Result)
 End Function
 
 ''
@@ -179,21 +184,21 @@ End Function
 ' @return A new guid initialized to the values and bytes specified.
 '
 Public Function FromValues(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByVal d As Byte, ByVal e As Byte, ByVal f As Byte, ByVal g As Byte, ByVal h As Byte, ByVal i As Byte, ByVal j As Byte, ByVal k As Byte) As Guid
-    Dim x As VBGUID
-    x.Data1 = a
-    x.Data2 = b
-    x.Data3 = c
-    x.Data4(0) = d
-    x.Data4(1) = e
-    x.Data4(2) = f
-    x.Data4(3) = g
-    x.Data4(4) = h
-    x.Data4(5) = i
-    x.Data4(6) = j
-    x.Data4(7) = k
+    Dim X As VBGUID
+    X.Data1 = a
+    X.Data2 = b
+    X.Data3 = c
+    X.Data4(0) = d
+    X.Data4(1) = e
+    X.Data4(2) = f
+    X.Data4(3) = g
+    X.Data4(4) = h
+    X.Data4(5) = i
+    X.Data4(6) = j
+    X.Data4(7) = k
     
     Set FromValues = New Guid
-    FromValues.InitReadOnly x
+    FromValues.InitReadOnly X
 End Function
 
 ''

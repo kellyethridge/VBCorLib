@@ -40,6 +40,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             Test.Use "C200E36038C511CEAE6208002B2B79EF", "c200e360-38c5-11ce-ae62-08002b2b79ef"
+            Test.Use " C200E36038C511CEAE6208002B2B79EF ", "c200e360-38c5-11ce-ae62-08002b2b79ef"
             
         Case "TryParseExact_WithValidValue_ReturnsGuid"
             Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "b"
@@ -50,6 +51,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "C200E36038C511CEAE6208002B2B79EF", "N"
             Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "d"
             Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "D"
+            Test.Use "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}", "x"
+            Test.Use "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}", "X"
+            Test.Use " { 0xc20 0e360 , 0x38c 5,0x11ce, {0xae, 0x62,0x08,0x00,0x2b,0x2b,0x79,0xef} } ", "X"
             
         Case "TryParseExact_WithInvalidValue_ReturnsEmptyGuid"
             Test.Use "{c200e360-38c5-11ce-ae62-08002b2b79ef}", "p"
@@ -71,7 +75,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)"
             Test.Use "C200E36038C511CEAE6208002B2B79EF"
             Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF"
-        
+            Test.Use "{0xc200e360,0x38c5,0x11ce,{0xae,0x62,0x08,0x00,0x2b,0x2b,0x79,0xef}}"
+            
         Case "Equals_WithValues_ReturnsExpected"
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EE}", False
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", True
@@ -100,6 +105,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "NewGuid_WithValue_ReturnsExpected"
             Test.Use NewBytes(&H60, &HE3, &H0, &HC2, &HC5, &H38, &HCE, &H11, &HAE, &H62, &H8, &H0, &H2B, &H2B, &H79, &HEF), "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
             Test.Use "{C200E360-38C5-11CE-AE62-08002B2B79EF}", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "(C200E360-38C5-11CE-AE62-08002B2B79EF)", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "C200E360-38C5-11CE-AE62-08002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use "C200E36038C511CEAE6208002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use " C200E36038C511CEAE6208002B2B79EF", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
+            Test.Use " { 0xc20 0e360 , 0x38c 5,0x11ce, {0xae, 0x62,0x08,0x00,0x2b,0x2b,0x79,0xef} } ", "{C200E360-38C5-11CE-AE62-08002B2B79EF}"
             
         Case "ToString_WithInvalidFormatSpecifier_ThrowsFormatException"
             Test.Use "f"
@@ -295,13 +305,14 @@ Public Sub ToString_WithInvalidFormatSpecifier_ThrowsFormatException(ByVal Inval
 End Sub
 
 Public Sub Serialization_WhenCalled_SerializesInstance()
-    Dim original As VBCorLib.Guid
-    Set original = Guid.NewGuid
+    Dim Original As VBCorLib.Guid
+    Set Original = Guid.NewGuid
     
     Dim Actual As Guid
-    Set Actual = Persist(original)
+    Set Actual = Persist(Original)
     
-    Assert.That Actual, Equals(original)
+    Assert.That Actual, Equals(Original)
+    Assert.That Actual.IsReadOnly, Iz.True
 End Sub
 
 Public Sub EmptyGuid_WhenCalled_ReturnsGuidWithZeroValue()

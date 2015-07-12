@@ -43,142 +43,182 @@ Private Enum ParseOptions
     Parens = 4
 End Enum
 
-Private mException As Exception
+Private mException  As Exception
+Private mChars()    As Integer
+Private mIndex      As Long
 
 Friend Sub ThrowError()
     Throw mException
 End Sub
 
 Friend Function TryParseExact(ByRef s As String, ByVal Format As Integer, ByRef Result As VBGUID) As Boolean
-    Dim GuidString  As String
-    Dim GuidChars() As Integer
+    mChars = AllocChars(s)
+    mIndex = 0
     
-    GuidString = CorString.Trim(s)
-    GuidChars = AllocChars(GuidString)
-        
     Select Case Format
         Case corLowerBChar, corUpperBChar
-            If Len(GuidString) = 38 Then
-                TryParseExact = TryParseCore(GuidChars, Dashes Or Braces, Result)
+            If Len(s) = 38 Then
+                TryParseExact = TryParseCore(Dashes Or Braces, Result)
             Else
                 FormatError
             End If
-            
         Case corLowerPChar, corUpperPChar
-            If Len(GuidString) = 38 Then
-                TryParseExact = TryParseCore(GuidChars, Dashes Or Parens, Result)
+            If Len(s) = 38 Then
+                TryParseExact = TryParseCore(Dashes Or Parens, Result)
             Else
                 FormatError
             End If
-            
         Case corLowerNChar, corUpperNChar
-            If Len(GuidString) = 32 Then
-                TryParseExact = TryParseCore(GuidChars, ParseOptions.None, Result)
+            If Len(s) = 32 Then
+                TryParseExact = TryParseCore(ParseOptions.None, Result)
             Else
                 FormatError
             End If
-            
         Case corLowerDChar, corUpperDChar
-            If Len(GuidString) = 36 Then
-                TryParseExact = TryParseCore(GuidChars, Dashes, Result)
+            If Len(s) = 36 Then
+                TryParseExact = TryParseCore(Dashes, Result)
             Else
                 FormatError
             End If
-            
+        Case corLowerXChar, corUpperXChar
+            If EatAllWhiteSpace = 68 Then
+                TryParseExact = TryParseHexCore(Result)
+            Else
+                FormatError
+            End If
         Case Else
             FormatSpecificationError
     End Select
     
-    FreeChars GuidChars
+    FreeChars mChars
 End Function
 
-Private Function TryParseCore(ByRef Chars() As Integer, ByVal Options As ParseOptions, ByRef Result As VBGUID) As Boolean
-    Dim Index As Long
+Private Function EatAllWhiteSpace() As Long
+    Dim Length      As Long
+    Dim SrcIndex    As Long
+    Dim DstIndex    As Long
     
+    Length = UBound(mChars) + 1
+    Do While SrcIndex < Length
+        If Not Char.IsWhiteSpaceChar(mChars(SrcIndex)) Then
+            mChars(DstIndex) = mChars(SrcIndex)
+            DstIndex = DstIndex + 1
+        End If
+        SrcIndex = SrcIndex + 1
+    Loop
+    
+    EatAllWhiteSpace = DstIndex
+End Function
+
+Private Function TryParseHexCore(ByRef Result As VBGUID) As Boolean
+    If Not TryConsumeChar(corOpenBraceChar) Then
+        Exit Function
+    End If
+    
+    If Not TryConsumeHexPrefix(False) Then
+        Exit Function
+    End If
+    
+    If Not TryParseNumber(8, Result.Data1) Then
+        Exit Function
+    End If
+        
+    If Not TryParseHexInt16(True, Result.Data2) Then
+        Exit Function
+    End If
+    
+    If Not TryParseHexInt16(True, Result.Data3) Then
+        Exit Function
+    End If
+    
+    If Not TryConsumeChar(corCommaChar) Then
+        Exit Function
+    End If
+    
+    If Not TryConsumeChar(corOpenBraceChar) Then
+        Exit Function
+    End If
+    
+    Dim i As Long
+    For i = 0 To 7
+        If Not TryParseHexByte(i > 0, Result.Data4(i)) Then
+            Exit Function
+        End If
+    Next
+    
+    If Not TryConsumeChar(corCloseBraceChar) Then
+        Exit Function
+    End If
+    
+    If Not TryConsumeChar(corCloseBraceChar) Then
+        Exit Function
+    End If
+    
+    TryParseHexCore = True
+End Function
+
+Private Function TryParseCore(ByVal Options As ParseOptions, ByRef Result As VBGUID) As Boolean
     If Options And Braces Then
-        If Chars(Index) <> corOpenBraceChar Then
-            FormatError
-            Exit Function
-        End If
-        Index = Index + 1
-    ElseIf Options And Parens Then
-        If Chars(Index) <> corOpenParenChar Then
-            FormatError
-            Exit Function
-        End If
-        Index = Index + 1
-    End If
-    
-    If Not TryParseHex(Chars(), Index, 8, Result.Data1) Then
-        Exit Function
-    End If
-    
-    If Options And Dashes Then
-        If Not TryParseDash(Chars, Index) Then
-            Exit Function
-        End If
-    End If
-    
-    If Not TryParseHexInt16(Chars, Index, Result.Data2) Then
-        Exit Function
-    End If
-    
-    If Options And Dashes Then
-        If Not TryParseDash(Chars, Index) Then
-            Exit Function
-        End If
-    End If
-    
-    If Not TryParseHexInt16(Chars, Index, Result.Data3) Then
-        Exit Function
-    End If
-    
-    If Options And Dashes Then
-        If Not TryParseDash(Chars, Index) Then
-            Exit Function
-        End If
-    End If
-    
-    If Not TryParseHexByte(Chars, Index, Result.Data4(0)) Then
-        Exit Function
-    End If
-    If Not TryParseHexByte(Chars, Index, Result.Data4(1)) Then
-        Exit Function
-    End If
-    
-    If Options And Dashes Then
-        If Not TryParseDash(Chars, Index) Then
-            Exit Function
-        End If
-    End If
-    
-    If Not TryParseHexByte(Chars, Index, Result.Data4(2)) Then
-        Exit Function
-    End If
-    If Not TryParseHexByte(Chars, Index, Result.Data4(3)) Then
-        Exit Function
-    End If
-    If Not TryParseHexByte(Chars, Index, Result.Data4(4)) Then
-        Exit Function
-    End If
-    If Not TryParseHexByte(Chars, Index, Result.Data4(5)) Then
-        Exit Function
-    End If
-    If Not TryParseHexByte(Chars, Index, Result.Data4(6)) Then
-        Exit Function
-    End If
-    If Not TryParseHexByte(Chars, Index, Result.Data4(7)) Then
-        Exit Function
-    End If
-    
-    If Options And Braces Then
-        If Chars(Index) <> corCloseBraceChar Then
-            FormatError
+        If Not TryConsumeChar(corOpenBraceChar) Then
             Exit Function
         End If
     ElseIf Options And Parens Then
-        If Chars(Index) <> corCloseParenChar Then
-            FormatError
+        If Not TryConsumeChar(corOpenParenChar) Then
+            Exit Function
+        End If
+    End If
+    
+    If Not TryParseNumber(8, Result.Data1) Then
+        Exit Function
+    End If
+    
+    If Options And Dashes Then
+        If Not TryConsumeChar(corHyphenChar) Then
+            Exit Function
+        End If
+    End If
+    
+    If Not TryParseInt16(Result.Data2) Then
+        Exit Function
+    End If
+    
+    If Options And Dashes Then
+        If Not TryConsumeChar(corHyphenChar) Then
+            Exit Function
+        End If
+    End If
+    
+    If Not TryParseInt16(Result.Data3) Then
+        Exit Function
+    End If
+    
+    If Options And Dashes Then
+        If Not TryConsumeChar(corHyphenChar) Then
+            Exit Function
+        End If
+    End If
+    
+    Dim i As Long
+    For i = 0 To 7
+        If i = 2 Then
+            If Options And Dashes Then
+                If Not TryConsumeChar(corHyphenChar) Then
+                    Exit Function
+                End If
+            End If
+        End If
+        
+        If Not TryParseByte(Result.Data4(i)) Then
+            Exit Function
+        End If
+    Next
+
+    If Options And Braces Then
+        If Not TryConsumeChar(corCloseBraceChar) Then
+            Exit Function
+        End If
+    ElseIf Options And Parens Then
+        If Not TryConsumeChar(corCloseParenChar) Then
             Exit Function
         End If
     End If
@@ -186,32 +226,72 @@ Private Function TryParseCore(ByRef Chars() As Integer, ByVal Options As ParseOp
     TryParseCore = True
 End Function
 
-Private Function TryParseDash(ByRef Chars() As Integer, ByRef Index As Long) As Boolean
-    If Chars(Index) = corHyphenChar Then
-        Index = Index + 1
-        TryParseDash = True
+Private Function TryConsumeChar(ByVal Ch As Integer) As Boolean
+    If mChars(mIndex) = Ch Then
+        mIndex = mIndex + 1
+        TryConsumeChar = True
     Else
         FormatError
     End If
 End Function
 
-Private Function TryParseHexByte(ByRef Chars() As Integer, ByRef Index As Long, ByRef Result As Byte) As Boolean
-    Dim Value As Long
-    If TryParseHex(Chars, Index, 2, Value) Then
-        Result = Value
-        TryParseHexByte = True
+Private Function TryConsumeHexPrefix(ByVal ConsumeComma As Boolean) As Boolean
+    If ConsumeComma Then
+        If Not TryConsumeChar(corCommaChar) Then
+            Exit Function
+        End If
     End If
+    
+    If Not TryConsumeChar(corZeroChar) Then
+        Exit Function
+    End If
+    
+    Dim NextChar As Integer
+    NextChar = mChars(mIndex)
+    If (NextChar <> corLowerXChar) And (NextChar <> corUpperXChar) Then
+        FormatError
+        Exit Function
+    End If
+    
+    mIndex = mIndex + 1
+    TryConsumeHexPrefix = True
 End Function
 
-Private Function TryParseHexInt16(ByRef Chars() As Integer, ByRef Index As Long, ByRef Result As Integer) As Boolean
+Private Function TryParseHexByte(ByVal ConsumeComma As Boolean, ByRef Result As Byte) As Boolean
+    If Not TryConsumeHexPrefix(ConsumeComma) Then
+        Exit Function
+    End If
+
+    TryParseHexByte = TryParseByte(Result)
+End Function
+
+Private Function TryParseByte(ByRef Result As Byte) As Boolean
     Dim Output As Long
-    If TryParseHex(Chars, Index, 4, Output) Then
-        Result = AsWord(Output)
-        TryParseHexInt16 = True
+        
+    If TryParseNumber(2, Output) Then
+        Result = Output
+        TryParseByte = True
     End If
 End Function
 
-Private Function TryParseHex(ByRef Chars() As Integer, ByRef Index As Long, ByVal Count As Long, ByRef Result As Long) As Boolean
+Private Function TryParseHexInt16(ByVal ConsumeComma As Boolean, ByRef Result As Integer) As Boolean
+    If Not TryConsumeHexPrefix(ConsumeComma) Then
+        Exit Function
+    End If
+    
+    TryParseHexInt16 = TryParseInt16(Result)
+End Function
+
+Private Function TryParseInt16(ByRef Result As Integer) As Boolean
+    Dim Output As Long
+    
+    If TryParseNumber(4, Output) Then
+        Result = AsWord(Output)
+        TryParseInt16 = True
+    End If
+End Function
+
+Private Function TryParseNumber(ByVal Count As Long, ByRef Result As Long) As Boolean
     Result = 0
     
     Dim i As Long
@@ -219,15 +299,15 @@ Private Function TryParseHex(ByRef Chars() As Integer, ByRef Index As Long, ByVa
         Result = Helper.ShiftLeft(Result, 4)
         
         Dim Value As Long
-        If Not TryParseHexChar(Chars(i + Index), Value) Then
+        If Not TryParseHexChar(mChars(i + mIndex), Value) Then
             Exit Function
         End If
         
         Result = Result Or Value
     Next
     
-    Index = Index + Count
-    TryParseHex = True
+    mIndex = mIndex + Count
+    TryParseNumber = True
 End Function
 
 Private Function TryParseHexChar(ByVal Ch As Integer, ByRef Result As Long) As Boolean

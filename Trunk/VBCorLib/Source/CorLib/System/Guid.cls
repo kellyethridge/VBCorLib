@@ -49,8 +49,11 @@ Implements IObject
 Implements IComparable
 Implements IFormattable
 
-Private Const REGDB_E_CLASSNOTREG   As Long = &H80040154
-Private Const REGDB_E_READREGDB     As Long = &H80040150
+Private Const PropData1         As String = "Data1"
+Private Const PropData2         As String = "Data2"
+Private Const PropData3         As String = "Data3"
+Private Const PropData4         As String = "Data4"
+Private Const PropIsReadOnly    As String = "IsReadOnly"
 
 Private Enum FormatOptions
     None = 0
@@ -392,6 +395,8 @@ End Sub
 Private Sub Parse(ByVal s As String)
     Dim Format As Integer
     
+    s = CorString.Trim(s)
+    
     Select Case Len(s)
         Case 38
             If AscW(s) = corOpenBraceChar Then
@@ -403,6 +408,8 @@ Private Sub Parse(ByVal s As String)
             Format = corUpperDChar
         Case 32
             Format = corUpperNChar
+        Case Else
+            Format = corUpperXChar
     End Select
     
     If Not Guid.Parser.TryParseExact(s, Format, mGuid) Then
@@ -445,22 +452,25 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mGuid.Data1 = .ReadProperty("Data1")
-        mGuid.Data2 = .ReadProperty("Data2")
-        mGuid.Data3 = .ReadProperty("Data3")
+        mGuid.Data1 = .ReadProperty(PropData1, 0)
+        mGuid.Data2 = .ReadProperty(PropData2, 0)
+        mGuid.Data3 = .ReadProperty(PropData3, 0)
         
         Dim b() As Byte
-        b = .ReadProperty("Data4")
+        b = .ReadProperty(PropData4, 0)
         CopyMemory mGuid.Data4(0), b(0), 8
+        
+        mIsReadOnly = .ReadProperty(PropIsReadOnly, False)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty "Data1", mGuid.Data1
-        .WriteProperty "Data2", mGuid.Data2
-        .WriteProperty "Data3", mGuid.Data3
-        .WriteProperty "Data4", mGuid.Data4
+        .WriteProperty PropData1, mGuid.Data1
+        .WriteProperty PropData2, mGuid.Data2
+        .WriteProperty PropData3, mGuid.Data3
+        .WriteProperty PropData4, mGuid.Data4
+        .WriteProperty PropIsReadOnly, mIsReadOnly
     End With
 End Sub
 
