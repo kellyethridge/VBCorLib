@@ -1,27 +1,48 @@
 ** VBCorLib **
 
 version 3.0 (BREAKING CHANGES)
-	* Fixed cArray.Copy(Ex) for type Double.
+	* Renamed cArray to CorArray.
+	* Renamed cString to CorString.
+	* Renamed cDateTime to CorDateTime.
+	* Fixed CorArray.Copy and CorArray.CopyEx for type Double.
 	* Added NewDecimals array creator.
-	* Fixed cArray.IndexOf when searching byte arrays.
-	* Fixed cArray.LastIndexOf when searching byte arrays.
+	* Fixed CorArray.IndexOf when searching byte arrays.
+	* Fixed CorArray.LastIndexOf when searching byte arrays.
 	* Fixed array comparison of objects. Would break if element was Nothing.
-	* Fixed cArray.FindIndex. Returned incorrect result when supplying index.
+	* Fixed CorArray.FindIndex. Returned incorrect result when supplying index.
 	* Refactored cArray.BinarySearch signature to include a cArray.BinarySearchEx, removing need for optional values. *POSSIBLE BREAKING*
-	* Updated cArray.CreateInstance to build multi-dimension arrays in same order as VB6. *BREAKING*
-	* Updated cArray.CreateInstance to support multi-dimension arrays with selected 0 lengths.
+	* Updated CorArray.CreateInstance to build multi-dimension arrays in same order as VB6. *BREAKING*
+	* Updated CorArray.CreateInstance to support multi-dimension arrays with selected 0 lengths.
 	* Removed ciArrayTypes. Replaced with VbVarType. *BREAKING*
-	* Removed cArray.NewArray. *BREAKING*
+	* Removed CorArray.NewArray. *BREAKING*
+	* Renamed CorArray.GetLength to CorArray.Length.
+	* Renamed CorArray.GetRank to CorArray.Rank.
 	* Fixed missing floating point leading zero before decimal.
 	* Fixed max negative Long not displaying correct number.
 	* Changed Convert.ToString(Nothing) returns "" instead of "Nothing".
-	* Removed cString.CharCount method. *BREAKING*
+	* Removed CorString.CharCount method. *BREAKING*
 	* Removed Comparer parameter from Queue.Contains method to align more with .NET.
 	* Removed Comparer parameter from Stack.Contains method to align more with .NET.
 	* Added LeaveOpen constructor parameter to StreamReader.
 	* Added EndOfStream property to StreamReader.
 	* Added SafeFileHandle type.
 	* Added MyBase methods to separate IObject implementations from standard Object.* calls.
+	* Reordered 'Message' and 'ParamName' arguments in ArgumentException to more align with .NET. **
+	* Reordered 'Message', 'ParamName', and 'ActualValue' arguments in ArgumentOutOfRangeException to more align with .NET. **
+	* Fixed ArrayList.SetRange when using ICollection source would insert instead of overwriting.
+	* Fixed MemoryStream SeekPosition when using FromEnd. Was off by 1.
+	* Fixed MemoryStream ReadBlock not honoring lower-bound of output buffer.
+	* Refactored ArrayList binary search method into BinarySearch and BinarySearchEx to require the index and count in a separate call. **
+	* TimeSpan.Add and TimeSpan.Subtract now support argument of Nothing as equating to zero.
+	* Added Guid.TryParse, Guid.TryParseExact and Guid.ParseExact methods.
+	* Enhanced Guid parsing methods to support 'B', 'b', 'D', 'd', 'P', 'p', 'N', 'n', 'X', 'x' format specifications.
+	* Changed default ToString method for Guid with not format specified from 'B' to 'D' to align with .NET 2.0.
+	* Guid objects are now always read-only when using a constructor or parsing.
+	* Removed Guid.FromByteArray and Guid.FromMemory methods.
+	* NewGuid now accepts a byte array or memory pointer.
+	* Added Char static class.
+	* Fixed CorDateTime.ToLocalTime and CorDateTime.ToUniversalTime. Were not setting corret DateTimeKind.
+	* Removed 'Format' parameter from Convert.ToString to align with .NET.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
