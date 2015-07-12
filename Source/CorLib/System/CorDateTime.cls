@@ -807,25 +807,25 @@ Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year
     Dim Days As Long
     Days = Int(mMilliseconds / corMillisecondsPerDay)
     
-    Dim years400 As Long
-    years400 = Days \ DaysPer400Years
-    Days = Days - years400 * DaysPer400Years
+    Dim Years400 As Long
+    Years400 = Days \ DaysPer400Years
+    Days = Days - Years400 * DaysPer400Years
     
-    Dim years100 As Long
-    years100 = Days \ DaysPer100Years
-    If years100 = 4 Then years100 = 3   ' leap year
-    Days = Days - years100 * DaysPer100Years
+    Dim Years100 As Long
+    Years100 = Days \ DaysPer100Years
+    If Years100 = 4 Then Years100 = 3   ' leap year
+    Days = Days - Years100 * DaysPer100Years
     
-    Dim years4 As Long
-    years4 = Days \ corDaysPer4Years
-    Days = Days - years4 * corDaysPer4Years
+    Dim Years4 As Long
+    Years4 = Days \ corDaysPer4Years
+    Days = Days - Years4 * corDaysPer4Years
     
     Dim Years As Long
     Years = Days \ 365
     If Years = 4 Then Years = 3 ' leap year
     
     ' Return the Year.
-    Year = years400 * 400 + years100 * 100 + years4 * 4 + Years + 1
+    Year = Years400 * 400 + Years100 * 100 + Years4 * 4 + Years + 1
     If DatePart = YearPart Then Exit Sub
     
     Days = Days - Years * corDaysPerYear
@@ -834,9 +834,9 @@ Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year
     DayOfYear = Days + 1
     If DatePart = DayOfTheYear Then Exit Sub
     
-    ' Month will be set in the CalculateDays method.
+    ' Month will be set in the CalculateDay method.
     ' Day is set to the result of CalculateDays.
-    If Years = 3 And (years100 = 3 Or years4 <> 24) Then
+    If Years = 3 And (Years100 = 3 Or Years4 <> 24) Then
         Day = CalculateDay(Days, Month, DaysToMonthLeapYear) + 1
     Else
         Day = CalculateDay(Days, Month, DaysToMonth) + 1
@@ -848,6 +848,8 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CalculateDay(ByVal Days As Long, ByRef Month As Long, ByRef Months() As Long) As Long
+    Month = 0
+    
     Do While Months(Month) <= Days
         Month = Month + 1
     Loop
