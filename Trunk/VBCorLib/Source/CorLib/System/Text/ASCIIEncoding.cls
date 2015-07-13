@@ -55,9 +55,9 @@ Option Explicit
 Implements IObject
 Implements Encoding
 
-Private Const CODE_PAGE             As Long = 20127
-Private Const WINDOWS_CODE_PAGE     As Long = 1252
-Private Const BYTE_QUESTION_MARK    As Byte = 63
+Private Const QuestionMarkByte As Byte = 63
+
+Private mPreamble() As Byte
 
 
 ''
@@ -85,7 +85,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get CodePage() As Long
-    CodePage = CODE_PAGE
+    CodePage = 20127
 End Property
 
 ''
@@ -166,7 +166,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get WindowsCodePage() As Long
-    WindowsCodePage = WINDOWS_CODE_PAGE
+    WindowsCodePage = 1252
 End Property
 
 ''
@@ -189,26 +189,6 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
         Case Else
             Error.Argument Argument_ArrayRequired, "Chars"
     End Select
-End Function
-
-Private Function GetByteCountString(ByRef Chars As Variant) As Long
-    GetByteCountString = Len(Chars)
-End Function
-
-Private Function GetByteCountChars(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
-    Validation.CheckValidSingleDimArray Chars, Parameter_Chars
-        
-    Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
-
-    If Range.Index < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
-
-    GetByteCountChars = Range.Count
 End Function
 
 ''
@@ -317,7 +297,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Validation.CheckValidSingleDimArray Bytes, Parameter_Bytes
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
     
     Dim Range As ListRange
     Range = OptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
@@ -342,7 +322,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
-    Validation.CheckValidSingleDimArray Bytes, Parameter_Bytes
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
 
     Dim Range As ListRange
     Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
@@ -380,8 +360,8 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Validation.CheckValidSingleDimArray Bytes, Parameter_Bytes
-    Validation.CheckValidSingleDimArray Chars, Parameter_Chars
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
+    CheckValidSingleDimArray Chars, Parameter_Chars
     
     If ByteIndex < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
@@ -469,7 +449,11 @@ End Function
 ' @see Encoding
 '
 Public Function GetPreamble() As Byte()
-    GetPreamble = Cor.NewBytes()
+    If SAPtr(mPreamble) = vbNullPtr Then
+        mPreamble = Cor.NewBytes()
+    End If
+    
+    GetPreamble = mPreamble
 End Function
 
 ''
@@ -482,7 +466,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
-    Validation.CheckValidSingleDimArray Bytes, Parameter_Bytes
+    CheckValidSingleDimArray Bytes, Parameter_Bytes
 
     Dim Range As ListRange
     Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
@@ -531,13 +515,33 @@ End Function
 ' @see IObject
 '
 Public Function GetHashCode() As Long
-    GetHashCode = CODE_PAGE
+    GetHashCode = CodePage
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function GetByteCountString(ByRef Chars As Variant) As Long
+    GetByteCountString = Len(Chars)
+End Function
+
+Private Function GetByteCountChars(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
+    CheckValidSingleDimArray Chars, Parameter_Chars
+        
+    Dim Range As ListRange
+    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
+
+    If Range.Index < LBound(Chars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+
+    GetByteCountChars = Range.Count
+End Function
+
 Private Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     Dim i   As Long
     Dim Ch  As Long
@@ -547,10 +551,12 @@ Private Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByV
             ' we need to have a range because by using Integers to
             ' represent unicode characters, we could end up with
             ' negative numbers.
-            Case 0 To 127:  Bytes(ByteIndex + i) = Ch
-            Case Else:      Bytes(ByteIndex + i) = BYTE_QUESTION_MARK
+            Case 0 To 127
+                Bytes(ByteIndex + i) = Ch
+            Case Else
+                Bytes(ByteIndex + i) = QuestionMarkByte
         End Select
-    Next i
+    Next
     GetBytesCore = Count
 End Function
 
@@ -562,7 +568,7 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
         If b < 128 Then
             Chars(CharIndex + i) = b
         Else
-            Chars(CharIndex + i) = BYTE_QUESTION_MARK
+            Chars(CharIndex + i) = QuestionMarkByte
         End If
     Next i
     GetCharsCore = ByteCount
@@ -570,7 +576,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -586,7 +592,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Encoding Interface
+'   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Encoding_BodyName() As String
     Encoding_BodyName = BodyName
