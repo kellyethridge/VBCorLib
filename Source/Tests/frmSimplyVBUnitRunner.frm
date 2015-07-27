@@ -273,7 +273,7 @@ Private Sub AddSystemIO()
         .Add New FileInfoTests
         .Add New FileTests
         .Add New StreamReaderTests
-        .Add New TestMappedFile
+        .Add New MemoryMappedFileTests
         .Add New FileNotFoundExceptionTests
         .Add New TestINIFile
         .Add New DriveInfoTests
