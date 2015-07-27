@@ -94,92 +94,17 @@ Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Vari
             AppendStringValue Value, StartIndex, Count
             
         Case Else
-            Dim s As String
-            s = Object.ToString(Value)
-            AppendCore StrPtr(s), 0, Len(s)
+            AppendString Object.ToString(Value)
     End Select
     
     Set Append = Me
 End Function
 
-Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef CharCount As Variant)
-    CheckValidSingleDimArray Value, Parameter_Value
-    
-    Dim Chars() As Integer
-    Chars = AsChars(Value)
-    
-    On Error GoTo Catch
-    
-    Dim Range As ListRange
-    Range = OptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
-    
-    If Range.Index < LBound(Value) Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Value) Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
-
-    AppendCharsCore Chars, Range.Index, Range.Count
-    
-    FreeChars Chars
-    Exit Sub
-
-Catch:
-    FreeChars Chars
-    Throw
-End Sub
-
-Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef Count As Variant)
-    Dim ValuePtr    As Long
-    Dim ValueLength As Long
-
-    ValuePtr = StrPtr(Value)
-    ValueLength = Len(Value)
-
-    Dim Range As ListRange
-    Range = OptionalRange(StartIndex, Count, 0, ValueLength, Parameter_StartIndex)
-
-    If Range.Index < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count > ValueLength Then _
-        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
-
-    AppendCore ValuePtr, Range.Index, Range.Count
-End Sub
-
-Private Sub AppendCharsCore(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal CharCount As Long)
-    Debug.Assert SAPtr(Chars) <> vbNullPtr
-    
-    If CharCount > 0 Then
-        Dim FirstElementPtr As Long
-        FirstElementPtr = VarPtr(Chars(LBound(Chars)))
-        
-        AppendCore FirstElementPtr, StartIndex, CharCount
-    End If
-End Sub
-
-Private Sub AppendCore(ByVal CharPtr As Long, ByVal StartIndex As Long, ByVal CharCount As Long)
-    If CharCount > 0 Then
-        Dim NewLength As Long
-        NewLength = mLength + CharCount
-
-        If NewLength > mCapacity Then
-            EnsureCapacity NewLength
-        End If
-
-        CopyMemory mString(mLength), ByVal CharPtr + StartIndex * BytesPerChar, CharCount * BytesPerChar
-        mLength = NewLength
-    End If
-End Sub
-
 ''
 ' Appends a character a specified number of times to the end of string value.
 '
-' @param char The AscW character code to append.
-' @param count The number of times to append the character.
+' @param Char The AscW character code to append.
+' @param Count The number of times to append the character.
 ' @return This instance of StringBuilder.
 ' @remarks The character is a unicode value from -32767 to 65535. For values that
 ' are greater than 32767 (&H7FFF), 65536 (&H10000) is subtracted from it to map the
@@ -191,11 +116,11 @@ Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1)
     If Char < -&H7FFF& Or Char > &HFFFF& Then _
         Throw Cor.NewArgumentOutOfRangeException("Char", "Char must be between -32767 and 65535 inclusively.")
     
-    If Char > &H7FFF& Then Char = Char - &H10000
-    
-    If mLength + Count > mCapacity Then
-        EnsureCapacity mLength + Count
+    If Char > &H7FFF& Then
+        Char = Char - &H10000
     End If
+    
+    EnsureCapacity mLength + Count
     
     ' appending 1 character at a time happens 99%
     ' of the time, so optimize for it.
@@ -207,7 +132,6 @@ Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1)
     mLength = mLength + Count
     Set AppendChar = Me
 End Function
-
 
 ''
 ' Appends a string with formatted arguments.
@@ -277,28 +201,15 @@ End Function
 ' StringBuilder. There is no return reference to the StringBuilder.
 '
 Public Sub AppendString(ByRef s As String)
-    Dim CharCount As Long
-    CharCount = Len(s)
-    
-    If CharCount > 0 Then
-        Dim NewLength As Long
-        NewLength = mLength + CharCount
-        
-        If NewLength > mCapacity Then
-            EnsureCapacity NewLength
-        End If
-        
-        CopyMemory ByVal mStringPtr + mLength * BytesPerChar, ByVal StrPtr(s), CharCount * BytesPerChar
-        mLength = NewLength
-    End If
+    AppendCore StrPtr(s), 0, Len(s)
 End Sub
 
 ''
 ' Copies a set of characters from the StringBuilder into a character array.
 '
-' @param sourceindex The starting index in the StringBuilder to be copying from (0-based).
+' @param SourceIndex The starting index in the StringBuilder to be copying from (0-based).
 ' @param Destination The character array to copy to.
-' @param destinationindex The start index to begin placing characters in to.
+' @param DestinationIndex The start index to begin placing characters in to.
 ' @param Count The number of characters to copy.
 '
 Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByVal DestinationIndex As Long, ByVal Count As Long)
@@ -332,15 +243,15 @@ End Property
 ''
 ' Sets the amount of memory allocated in characters.
 '
-' @param RHS The number of characters to allocate.
+' @param Value The number of characters to allocate.
 '
-Public Property Let Capacity(ByVal RHS As Long)
-    If RHS < mLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:="Cannot set capacity less than the length of the current instance.")
+Public Property Let Capacity(ByVal Value As Long)
+    If Value < mLength Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
     
-    If RHS <> mCapacity Then
+    If Value <> mCapacity Then
         Dim Ptr As Long
-        Ptr = CoTaskMemAlloc(RHS * BytesPerChar)
+        Ptr = CoTaskMemAlloc(Value * BytesPerChar)
         If Ptr = vbNullPtr Then _
             Throw New OutOfMemoryException
             
@@ -348,7 +259,7 @@ Public Property Let Capacity(ByVal RHS As Long)
         CoTaskMemFree mStringPtr
         mStringPtr = Ptr
         mStringSA.pvData = Ptr
-        mCapacity = RHS
+        mCapacity = Value
     End If
 End Property
 
@@ -424,16 +335,16 @@ End Property
 ''
 ' Sets the fill character used to pad empty space.
 '
-' @param RHS The character as either a String or Integer value.
+' @param Value The character as either a String or Integer value.
 ' @remarks The new value can be either String, in which case the
 ' first characters is used, or it can be a number.
 '
-Public Property Let FillCharacter(ByVal RHS As Variant)
-    Select Case VarType(RHS)
+Public Property Let FillCharacter(ByRef Value As Variant)
+    Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte
-            mFillChar = AscW(ChrW$(RHS))
+            mFillChar = AscW(ChrW$(Value))
         Case vbString
-            mFillChar = AscW(RHS)
+            mFillChar = AscW(Value)
         Case Else
             Throw Cor.NewInvalidCastException("Fill Character can be either a string or number.")
     End Select
@@ -597,9 +508,12 @@ Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Opti
         NewLength = mLength - ((Len(OldValue) - Len(NewValue)) * MatchCount)
 
         Select Case NewLength
-            Case mLength:       ReplaceEqualLength NewValue, MatchIndexes, MatchCount
-            Case Is < mLength:  ReplaceSmallerLength NewValue, MatchIndexes, MatchCount, Len(OldValue)
-            Case Else:          ReplaceLargerLength NewValue, MatchIndexes, MatchCount, Len(OldValue), NewLength
+            Case mLength
+                ReplaceEqualLength NewValue, MatchIndexes, MatchCount
+            Case Is < mLength
+                ReplaceSmallerLength NewValue, MatchIndexes, MatchCount, Len(OldValue)
+            Case Else
+                ReplaceLargerLength NewValue, MatchIndexes, MatchCount, Len(OldValue), NewLength
         End Select
 
         mLength = NewLength
@@ -632,137 +546,7 @@ Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Le
     End If
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Length As Variant, ByVal Capacity As Long)
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    ElemIndex = OptionalLong(StartIndex, 0)
-    ElemCount = OptionalLong(Length, Len(s) - ElemIndex)
-        
-    If ElemIndex < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
-    If ElemCount < 0 Then _
-        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
-    If ElemIndex + ElemCount > Len(s) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_IndexLength
-    If Capacity < 0 Then _
-        Error.ArgumentOutOfRange "Capacity", ArgumentOutOfRange_NeedNonNegNum
-    
-    If Capacity = 0 Then
-        Capacity = DefaultCapacity
-    End If
-    
-    If ElemCount > Capacity Then
-        Capacity = ElemCount
-    End If
-    
-    If Capacity <> mCapacity Then
-        CoTaskMemFree mStringPtr
-        mStringPtr = CoTaskMemAlloc(Capacity * BytesPerChar)
-        mCapacity = Capacity
-    End If
-      
-    If ElemCount > 0 Then
-        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
-        mLength = ElemCount
-    End If
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    mFillChar = DefaultFillChar
-    mStringPtr = CoTaskMemAlloc(DefaultCapacity * BytesPerChar)
-    If mStringPtr = vbNullPtr Then _
-        Throw New OutOfMemoryException
-    mCapacity = DefaultCapacity
-    
-    With OldStrSA
-        .cbElements = BytesPerChar
-        .cDims = 1
-        .cElements = &H7FFFFFFF
-    End With
-    SAPtr(OldStr) = VarPtr(OldStrSA)
-    BufStrSA = OldStrSA
-    SAPtr(BufStr) = VarPtr(BufStrSA)
-    mStringSA = OldStrSA
-    SAPtr(mString) = VarPtr(mStringSA)
-    mStringSA.pvData = mStringPtr
-    
-    InitChars mChars
-End Sub
-
-Private Sub Class_Terminate()
-    CoTaskMemFree mStringPtr
-    SAPtr(OldStr) = vbNullPtr
-    SAPtr(BufStr) = vbNullPtr
-    SAPtr(mString) = vbNullPtr
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IObject_Equals(Value As Variant) As Boolean
-    IObject_Equals = Equals(Value)
-End Function
-
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
-End Function
-
-Private Function IObject_ToString() As String
-    IObject_ToString = ToString
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Fill(ByVal Index As Long, ByVal Char As Integer, ByVal Count As Long)
-    Dim i As Long
-    
-    For i = Index To Index + Count - 1
-        mString(i) = Char
-    Next i
-End Sub
-
-Private Sub FormatError()
-    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidString))
-End Sub
-
-Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
-    Dim NewLength As Long
-    NewLength = mLength + Size
-    
-    EnsureCapacity NewLength
-    
-    If Index < mLength Then
-        ' Create space in the string. The new space is uninitialized.
-        CopyMemory ByVal mStringPtr + (Index + Size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar
-    End If
-    
-    mLength = NewLength
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend helper methods
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-' We can supply a custom formatter through the IFormatProvider interface.
-' This article lead me to believe that the StringBuilder.AppendFormat function
-' can use an ICustomFormatter object, even though information about it is
-' scarce in the MSDN.
-'
-' "http://www.codeproject.com/csharp/custstrformat.asp"
-'
-Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
+Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
     Dim CustomFormatter     As ICustomFormatter
     Dim HasCustomFormatter  As Boolean
     Dim Index               As Long
@@ -876,6 +660,190 @@ Friend Sub InternalAppendFormat(ByRef Provider As IFormatProvider, ByRef Format 
     End If
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Length As Variant, ByVal Capacity As Long)
+    Dim ElemIndex As Long
+    Dim ElemCount As Long
+    ElemIndex = OptionalLong(StartIndex, 0)
+    ElemCount = OptionalLong(Length, Len(s) - ElemIndex)
+        
+    If ElemIndex < 0 Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
+    If ElemCount < 0 Then _
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
+    If ElemIndex + ElemCount > Len(s) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_IndexLength
+    If Capacity < 0 Then _
+        Error.ArgumentOutOfRange "Capacity", ArgumentOutOfRange_NeedNonNegNum
+    
+    If Capacity = 0 Then
+        Capacity = DefaultCapacity
+    End If
+    
+    If ElemCount > Capacity Then
+        Capacity = ElemCount
+    End If
+    
+    If Capacity <> mCapacity Then
+        CoTaskMemFree mStringPtr
+        mStringPtr = CoTaskMemAlloc(Capacity * BytesPerChar)
+        mCapacity = Capacity
+    End If
+      
+    If ElemCount > 0 Then
+        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
+        mLength = ElemCount
+    End If
+End Sub
+
+Private Sub Class_Initialize()
+    mFillChar = DefaultFillChar
+    mStringPtr = CoTaskMemAlloc(DefaultCapacity * BytesPerChar)
+    If mStringPtr = vbNullPtr Then _
+        Throw New OutOfMemoryException
+    mCapacity = DefaultCapacity
+    
+    With OldStrSA
+        .cbElements = BytesPerChar
+        .cDims = 1
+        .cElements = &H7FFFFFFF
+    End With
+    SAPtr(OldStr) = VarPtr(OldStrSA)
+    BufStrSA = OldStrSA
+    SAPtr(BufStr) = VarPtr(BufStrSA)
+    mStringSA = OldStrSA
+    SAPtr(mString) = VarPtr(mStringSA)
+    mStringSA.pvData = mStringPtr
+    
+    InitChars mChars
+End Sub
+
+Private Sub Class_Terminate()
+    CoTaskMemFree mStringPtr
+    SAPtr(OldStr) = vbNullPtr
+    SAPtr(BufStr) = vbNullPtr
+    SAPtr(mString) = vbNullPtr
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
+End Function
+
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
+End Function
+
+Private Function IObject_ToString() As String
+    IObject_ToString = ToString
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef CharCount As Variant)
+    CheckValidSingleDimArray Value, Parameter_Value
+    
+    Dim Chars() As Integer
+    Chars = AsChars(Value)
+    
+    On Error GoTo Catch
+    
+    Dim Range As ListRange
+    Range = OptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    
+    If Range.Index < LBound(Value) Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index + Range.Count - 1 > UBound(Value) Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
+
+    AppendCharsCore Chars, Range.Index, Range.Count
+    
+    FreeChars Chars
+    Exit Sub
+
+Catch:
+    FreeChars Chars
+    Throw
+End Sub
+
+Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef Count As Variant)
+    Dim ValuePtr    As Long
+    Dim ValueLength As Long
+
+    ValuePtr = StrPtr(Value)
+    ValueLength = Len(Value)
+
+    Dim Range As ListRange
+    Range = OptionalRange(StartIndex, Count, 0, ValueLength, Parameter_StartIndex)
+
+    If Range.Index < 0 Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index + Range.Count > ValueLength Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexCount
+
+    AppendCore ValuePtr, Range.Index, Range.Count
+End Sub
+
+Private Sub AppendCharsCore(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal CharCount As Long)
+    Debug.Assert SAPtr(Chars) <> vbNullPtr
+    
+    If CharCount > 0 Then
+        Dim FirstElementPtr As Long
+        FirstElementPtr = VarPtr(Chars(LBound(Chars)))
+        
+        AppendCore FirstElementPtr, StartIndex, CharCount
+    End If
+End Sub
+
+Private Sub AppendCore(ByVal CharPtr As Long, ByVal StartIndex As Long, ByVal CharCount As Long)
+    If CharCount > 0 Then
+        Dim NewLength As Long
+        NewLength = mLength + CharCount
+        EnsureCapacity NewLength
+        CopyMemory mString(mLength), ByVal CharPtr + StartIndex * BytesPerChar, CharCount * BytesPerChar
+        mLength = NewLength
+    End If
+End Sub
+
+Private Sub Fill(ByVal Index As Long, ByVal Char As Integer, ByVal Count As Long)
+    Dim i As Long
+    
+    For i = Index To Index + Count - 1
+        mString(i) = Char
+    Next i
+End Sub
+
+Private Sub FormatError()
+    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidString))
+End Sub
+
+Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
+    Dim NewLength As Long
+    NewLength = mLength + Size
+    
+    EnsureCapacity NewLength
+    
+    If Index < mLength Then
+        ' Create space in the string. The new space is uninitialized.
+        CopyMemory ByVal mStringPtr + (Index + Size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar
+    End If
+    
+    mLength = NewLength
+End Sub
+
+''
 ' We must be inside "{}". We must end with a matching "}" or it is a format error.
 '
 ' @param Index The index of the first character after the "{".
