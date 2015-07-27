@@ -48,6 +48,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "hahahahahahahahahaha", "ha", "blahblah", "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah"
             Test.Use "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah", "blahblah", "ha", "hahahahahahahahahaha"
             Test.Use "abcabcabc", "abcf", "", "abcabcabc"
+            
+        Case "AppendString_WithValue_AppendText"
+            Test.Use "bye", "hellobye"
+            Test.Use "", "hello"
+            
     End Select
 End Sub
 
@@ -840,6 +845,15 @@ Public Sub AppendFormatEx_WithEmptyReturn_FormatsAsEmpty()
     Dim Actual As String
     Actual = sb.ToString
     Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub AppendString_WithValue_AppendText(ByVal s As String, ByVal Expected As String)
+    Dim sb As New StringBuilder
+    sb.Append "hello"
+    
+    sb.AppendString s
+    
+    Assert.That sb.ToString, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub CopyTo_WhenCalled_CopiesStringToArray()

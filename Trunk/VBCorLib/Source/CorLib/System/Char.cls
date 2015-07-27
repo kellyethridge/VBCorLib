@@ -39,7 +39,7 @@ Option Explicit
 ''
 ' Indicates if a character is considered white space.
 '
-' @param Character A string or integer to check if is white space.
+' @param CharOrString A string or integer to check if is white space.
 ' @param Index An index into the string to determine if a specific character is white space.
 ' This parameter is ignored if a non-string character is passed in.
 ' @return If the character is considered white space then True is returned, otherwise False is returned.
