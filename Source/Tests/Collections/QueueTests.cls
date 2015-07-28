@@ -123,7 +123,7 @@ Public Sub CopyTo_WithNullArray_ThrowsArgumentNullException()
     On Error Resume Next
     SUT.CopyTo NullArray, 0
     
-    AssertArgumentNullException Err, "DstArray"
+    AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub CopyTo_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
@@ -194,18 +194,21 @@ Public Sub CopyTo_WithCircleQueueWrapped_CopiesItemsToArray()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-'Public Sub TestEnumerator()
-'    Dim i As Long
-'    For i = 1 To 100
-'        Q.Enqueue i
-'    Next i
-'    Dim v As Variant
-'    i = 1
-'    For Each v In Q
-'        Assert.AreEqual i, v
-'        i = i + 1
-'    Next v
-'End Sub
+Public Sub GetEnumerator_WhenCalled_Enumerates()
+    Dim SUT As Queue
+    Set SUT = Cor.NewQueue(Array(1, 2, 3, 4, 5))
+    
+    Dim i As Long
+    Dim Value As Variant
+    Dim Actual(0 To 4) As Long
+    i = 0
+    For Each Value In SUT
+        Actual(i) = Value
+        i = i + 1
+    Next
+    
+    Assert.That Actual, Iz.EqualTo(Array(1, 2, 3, 4, 5))
+End Sub
 
 Public Sub Peek_WithEmptyQueue_ThrowsInvalidOperationException()
     Dim SUT As New Queue
@@ -249,7 +252,7 @@ Public Sub ToArray_WhenCalled_ReturnsArrayOfItemsInOrderOfEnqueue()
     Assert.That Actual, Iz.EqualTo(Array(1, 3, 2))
 End Sub
 
-Public Sub QueueShouldBePersistable()
+Public Sub Serialization_WhenCalled_SerializesInstance()
     Dim SUT As New Queue
     SUT.Enqueue 1
     SUT.Enqueue "hi"

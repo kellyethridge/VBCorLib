@@ -126,9 +126,8 @@ Private Sub InsertItems(ByVal Index As Long, Items As Variant)
 End Sub
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ArrayList Interface
+'   ArrayList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ArrayList_Add(Value As Variant) As Long
     ArrayList_Add = mList.Add(Value)

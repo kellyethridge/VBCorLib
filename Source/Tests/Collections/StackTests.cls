@@ -206,15 +206,13 @@ Public Sub CopyTo_WithNotEnoughRoomToCopyStack_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
-Public Sub TestPersitence()
+Public Sub Serialization_WhenCalled_SerializesInstance()
     Dim SUT As New Stack
     SUT.Push 1
     
-    Dim Bag As New PropertyBag
-    Bag.WriteProperty "Stack", SUT
-    
     Dim Actual As Stack
-    Set Actual = Bag.ReadProperty("Stack")
+    Set Actual = Persist(SUT)
+    
     Assert.That Actual.Pop, Iz.EqualTo(1)
 End Sub
 

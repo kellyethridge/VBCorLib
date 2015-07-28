@@ -112,25 +112,25 @@ End Function
 ''
 ' Copy the contents of the queue to an array.
 '
-' @param dstArray The array to copy the contents to.
-' @param index The starting index in the dstArray to copy the contents to.
+' @param Arr The array to copy the contents to.
+' @param Index The starting index in the dstArray to copy the contents to.
 ' @remarks The values in the queue will be cast to the array datatype if possible.
 '
-Public Sub CopyTo(ByRef DstArray As Variant, ByVal Index As Long)
-    If CorArray.IsNull(DstArray) Then _
-        Error.ArgumentNull "DstArray", ArgumentNull_Array
-    If CorArray.Rank(DstArray) <> 1 Then _
-        Error.Argument Argument_MultiDimNotSupported, "DstArray"
-    If Index < LBound(DstArray) Then _
+Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
+    If CorArray.IsNull(Arr) Then _
+        Error.ArgumentNull "Arr", ArgumentNull_Array
+    If CorArray.Rank(Arr) <> 1 Then _
+        Error.Argument Arg_RankException
+    If Index < LBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Index + mCount - 1 > UBound(DstArray) Then _
+    If Index + mCount - 1 > UBound(Arr) Then _
         Error.Argument Argument_InvalidOffLen
         
     If mHead < mTail Then
-        CorArray.CopyEx mItems, mHead, DstArray, Index, mCount
+        CorArray.CopyEx mItems, mHead, Arr, Index, mCount
     Else
-        CorArray.CopyEx mItems, mHead, DstArray, Index, mCapacity - mHead
-        CorArray.CopyEx mItems, 0, DstArray, (mCapacity - mHead) + Index, mTail
+        CorArray.CopyEx mItems, mHead, Arr, Index, mCapacity - mHead
+        CorArray.CopyEx mItems, 0, Arr, (mCapacity - mHead) + Index, mTail
     End If
 End Sub
 
