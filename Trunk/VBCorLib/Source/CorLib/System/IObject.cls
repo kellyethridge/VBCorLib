@@ -97,7 +97,7 @@ Public Function Equals(ByRef Value As Variant) As Boolean: End Function
 ' <p>A default implementation for this method could be<br>
 ' <pre>
 ' Public Function GetHashCode() As Long
-'     GetHashCode = ObjPtr(CUnk(Me))
+'     GetHashCode = MyBase.GetHashCode(Me)
 ' End Function
 ' </pre>
 '
