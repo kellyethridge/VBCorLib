@@ -203,7 +203,7 @@ Friend Sub Init(ByVal Parameters As CspParameters)
         mProviderName = .ProviderName
         mProviderType = .ProviderType
         mKeyContainerName = .KeyContainerName
-        mKeyNumber = IIf(.KeyNumber = -1, VBCorLib.KeyNumber.Exchange, .KeyNumber)
+        mKeyNumber = IIf(.KeyNumber = -1, CorLib.KeyNumber.Exchange, .KeyNumber)
         mMachineKeyStore = CBool(.Flags And UseMachineKeyStore)
     End With
 End Sub

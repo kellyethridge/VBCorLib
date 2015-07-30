@@ -158,7 +158,7 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
         Error.Argument Argument_InvalidOffLen
     
     If Comparer Is Nothing Then
-        Set Comparer = VBCorLib.Comparer.Default
+        Set Comparer = CorLib.Comparer.Default
     End If
     
     LowIndex = Index
@@ -504,7 +504,7 @@ Private Sub ArrayList_Sort(Optional ByRef Index As Variant, Optional ByRef Count
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
         
     If Comparer Is Nothing Then
-        Set mComparer = VBCorLib.Comparer.Default
+        Set mComparer = CorLib.Comparer.Default
     Else
         Set mComparer = Comparer
     End If

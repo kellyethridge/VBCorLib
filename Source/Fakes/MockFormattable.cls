@@ -18,7 +18,7 @@ Public Result As String
 Public Format As String
 Public Provider As IFormatProvider
 
-Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As VBCorLib.IFormatProvider) As String
+Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String
     Me.Format = Format
     Set Me.Provider = Provider
     IFormattable_ToString = Me.Result

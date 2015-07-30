@@ -1099,7 +1099,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
             SetSortKeys KeysPtr
             
             If Comparer Is Nothing Then
-                Set SortComparer = VBCorLib.Comparer.Default
+                Set SortComparer = CorLib.Comparer.Default
             Else
                 Set SortComparer = Comparer
             End If
@@ -1120,7 +1120,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
                 ' around again, letting this case statement fall
                 ' into the QuickSortGeneral routine.
                 SetSortKeys KeysPtr
-                Set SortComparer = VBCorLib.Comparer.Default
+                Set SortComparer = CorLib.Comparer.Default
                 QuickSortGeneral Keys, Index, Index + Length - 1
             End If
         Case Else

@@ -25,6 +25,6 @@ Public Property Get Called() As Boolean
     Called = mCalled
 End Property
 
-Private Sub AsyncCallback_Execute(ByVal ar As VBCorLib.IAsyncResult)
+Private Sub AsyncCallback_Execute(ByVal ar As IAsyncResult)
     mCalled = True
 End Sub

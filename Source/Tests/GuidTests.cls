@@ -137,7 +137,7 @@ Public Sub ToString_WithFormats_ReturnsExpected(ByVal GuidFormat As String, ByVa
 End Sub
 
 Public Sub Parse_WithValue_ReturnsExpected(ByVal s As String, ByVal Expected As String)
-    Dim Actual As VBCorLib.Guid
+    Dim Actual As CorLib.Guid
     
     Set Actual = Guid.Parse(s)
     
@@ -323,7 +323,7 @@ Public Sub ToString_WithInvalidFormatSpecifier_ThrowsFormatException(ByVal Inval
 End Sub
 
 Public Sub Serialization_WhenCalled_SerializesInstance()
-    Dim Original As VBCorLib.Guid
+    Dim Original As CorLib.Guid
     Set Original = Guid.NewGuid
     
     Dim Actual As Guid

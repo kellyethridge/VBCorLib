@@ -104,7 +104,7 @@ End Sub
 
 
 
-Private Sub base_CheckForWeakKey(RgbKey() As Byte, Ex As VBCorLib.Exception)
+Private Sub base_CheckForWeakKey(RgbKey() As Byte, Ex As Exception)
     mWeaknessTested = True
     Set Ex = mEx
 End Sub

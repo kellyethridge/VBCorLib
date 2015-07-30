@@ -44,7 +44,7 @@ Private Const DefaultHResult    As Long = E_FAIL   ' Invalid procedure call or a
 Private Const DefaultMessage    As String = "External component has thrown an exception."
 Private Const BaseProperty      As String = "Base"
 
-Private mBase As VBCorLib.ExceptionBase
+Private mBase As CorLib.ExceptionBase
 
 
 
@@ -232,7 +232,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Exception
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get Exception_Data() As VBCorLib.IDictionary
+Private Property Get Exception_Data() As IDictionary
     Set Exception_Data = Data
 End Property
 
@@ -244,7 +244,7 @@ Private Property Get Exception_ErrorNumber() As Long
     Exception_ErrorNumber = ErrorNumber
 End Property
 
-Private Function Exception_GetBaseException() As VBCorLib.Exception
+Private Function Exception_GetBaseException() As Exception
     Set Exception_GetBaseException = GetBaseException
 End Function
 
@@ -264,7 +264,7 @@ Private Property Get Exception_HResult() As Long
     Exception_HResult = HResult
 End Property
 
-Private Property Get Exception_InnerException() As VBCorLib.Exception
+Private Property Get Exception_InnerException() As Exception
     Set Exception_InnerException = InnerException
 End Property
 
@@ -304,7 +304,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' SystemException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get SystemException_Data() As VBCorLib.IDictionary
+Private Property Get SystemException_Data() As IDictionary
     Set SystemException_Data = Data
 End Property
 
@@ -316,7 +316,7 @@ Private Property Get SystemException_ErrorNumber() As Long
     SystemException_ErrorNumber = ErrorNumber
 End Property
 
-Private Function SystemException_GetBaseException() As VBCorLib.Exception
+Private Function SystemException_GetBaseException() As Exception
     Set SystemException_GetBaseException = GetBaseException
 End Function
 
@@ -336,7 +336,7 @@ Private Property Get SystemException_HResult() As Long
     SystemException_HResult = HResult
 End Property
 
-Private Property Get SystemException_InnerException() As VBCorLib.Exception
+Private Property Get SystemException_InnerException() As Exception
     Set SystemException_InnerException = InnerException
 End Property
 

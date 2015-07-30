@@ -23,7 +23,7 @@ Public FormatArg As Variant
 Public Disable As Boolean
 
 
-Private Function ICustomFormatter_Format(ByVal FormatText As String, Arg As Variant, ByVal Provider As VBCorLib.IFormatProvider) As String
+Private Function ICustomFormatter_Format(ByVal FormatText As String, Arg As Variant, ByVal Provider As IFormatProvider) As String
     Me.FormatText = FormatText
     Me.FormatArg = Arg
     
