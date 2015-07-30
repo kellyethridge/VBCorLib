@@ -82,13 +82,13 @@ Private Function IWin32API_ExpandEnvironmentStrings(lpSrc As String, lpDst As St
     IWin32API_ExpandEnvironmentStrings = ExpandEnvironmentStringsA(lpSrc, lpDst, nSize)
 End Function
 
-Private Function IWin32API_FindFirstFile(FileName As String, FindFileData As VBCorType.WIN32_FIND_DATA) As Long
+Private Function IWin32API_FindFirstFile(FileName As String, FindFileData As CorType.WIN32_FIND_DATA) As Long
     Dim Data As WIN32_FIND_DATAA
     IWin32API_FindFirstFile = FindFirstFileA(FileName, Data)
     FindDataAToFindData Data, FindFileData
 End Function
 
-Private Function IWin32API_FindNextFile(ByVal Handle As Long, FindFileData As VBCorType.WIN32_FIND_DATA) As Long
+Private Function IWin32API_FindNextFile(ByVal Handle As Long, FindFileData As CorType.WIN32_FIND_DATA) As Long
     Dim Data As WIN32_FIND_DATAA
     IWin32API_FindNextFile = FindNextFileA(Handle, Data)
     FindDataAToFindData Data, FindFileData
@@ -131,7 +131,7 @@ Private Function IWin32API_GetFileAttributes(FileName As String) As Long
     IWin32API_GetFileAttributes = GetFileAttributesA(FileName)
 End Function
 
-Private Function IWin32API_GetFileAttributesEx(FileName As String, ByVal fInfoLevelId As Long, lpFileInformation As VBCorType.WIN32_FILE_ATTRIBUTE_DATA) As Long
+Private Function IWin32API_GetFileAttributesEx(FileName As String, ByVal fInfoLevelId As Long, lpFileInformation As CorType.WIN32_FILE_ATTRIBUTE_DATA) As Long
     IWin32API_GetFileAttributesEx = GetFileAttributesExA(FileName, fInfoLevelId, lpFileInformation)
 End Function
 

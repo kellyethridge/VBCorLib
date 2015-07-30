@@ -118,7 +118,7 @@ Public Function LookupAccountName(ByVal lpSystemName As String, ByVal lpAccountN
 End Function
 
 Public Function GetProcessWindowStation() As Long
-    GetProcessWindowStation = VBCorType.GetProcessWindowStation
+    GetProcessWindowStation = CorType.GetProcessWindowStation
 End Function
 
 Public Function GetUserObjectInformation(ByVal hObj As Long, ByVal nIndex As Long, ByVal pvInfo As Long, ByVal nLength As Long, ByRef lpnLengthNeeded As Long) As Long
@@ -128,11 +128,11 @@ End Function
 Public Function GetSystemMenu(ByVal hwnd As Long, ByVal bRevert As Boolean) As Long
     Dim BoolRevert As BOOL
     BoolRevert = IIf(bRevert, BOOL_TRUE, BOOL_FALSE)
-    GetSystemMenu = VBCorType.GetSystemMenu(hwnd, BoolRevert)
+    GetSystemMenu = CorType.GetSystemMenu(hwnd, BoolRevert)
 End Function
 
 Public Function RemoveMenu(ByVal hMenu As Long, ByVal nPosition As Long, ByVal wFlags As Long) As Long
-    RemoveMenu = VBCorType.RemoveMenu(hMenu, nPosition, wFlags)
+    RemoveMenu = CorType.RemoveMenu(hMenu, nPosition, wFlags)
 End Function
 
 Public Function SetCurrentDirectory(ByRef PathName As String) As Boolean

@@ -112,11 +112,11 @@ Public Sub CopyEx_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef
 End Sub
 
 Public Sub Copy_WithUDT_CopiesElements()
-    Dim SourceUDTs(0 To 2) As VBCorType.VBGUID
+    Dim SourceUDTs(0 To 2) As CorType.VBGUID
     SourceUDTs(0).Data1 = 1
     SourceUDTs(1).Data1 = 2
     SourceUDTs(2).Data1 = 3
-    Dim TargetUDTs(0 To 2) As VBCorType.VBGUID
+    Dim TargetUDTs(0 To 2) As CorType.VBGUID
 
     CorArray.Copy SourceUDTs, TargetUDTs, 3
     
