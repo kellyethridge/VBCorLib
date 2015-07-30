@@ -45,11 +45,11 @@ Public Sub DifferentKeyNumbers()
     Dim info As CspKeyContainerInfo
     
     Set info = Cor.NewCspKeyContainerInfo(Params)
-    Assert.AreEqual VBCorLib.KeyNumber.Exchange, info.KeyNumber
+    Assert.AreEqual KeyNumber.Exchange, info.KeyNumber
     
     Params.KeyNumber = 2
     Set info = Cor.NewCspKeyContainerInfo(Params)
-    Assert.AreEqual VBCorLib.KeyNumber.Signature, info.KeyNumber
+    Assert.AreEqual KeyNumber.Signature, info.KeyNumber
     
     Params.KeyNumber = 3
     Set info = Cor.NewCspKeyContainerInfo(Params)

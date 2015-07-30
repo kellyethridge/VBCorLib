@@ -222,7 +222,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' Exception
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get Exception_Data() As VBCorLib.IDictionary
+Private Property Get Exception_Data() As IDictionary
     Set Exception_Data = Data
 End Property
 
@@ -234,7 +234,7 @@ Private Property Get Exception_ErrorNumber() As Long
     Exception_ErrorNumber = ErrorNumber
 End Property
 
-Private Function Exception_GetBaseException() As VBCorLib.Exception
+Private Function Exception_GetBaseException() As Exception
     Set Exception_GetBaseException = GetBaseException
 End Function
 
@@ -254,7 +254,7 @@ Private Property Get Exception_HResult() As Long
     Exception_HResult = HResult
 End Property
 
-Private Property Get Exception_InnerException() As VBCorLib.Exception
+Private Property Get Exception_InnerException() As Exception
     Set Exception_InnerException = InnerException
 End Property
 
@@ -294,7 +294,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' SystemException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get SystemException_Data() As VBCorLib.IDictionary
+Private Property Get SystemException_Data() As IDictionary
     Set SystemException_Data = Data
 End Property
 
@@ -310,7 +310,7 @@ Private Property Get SystemException_ErrorNumber() As Long
     SystemException_ErrorNumber = ErrorNumber
 End Property
 
-Private Function SystemException_GetBaseException() As VBCorLib.Exception
+Private Function SystemException_GetBaseException() As Exception
     Set SystemException_GetBaseException = GetBaseException
 End Function
 
@@ -330,7 +330,7 @@ Private Property Get SystemException_HResult() As Long
     SystemException_HResult = HResult
 End Property
 
-Private Property Get SystemException_InnerException() As VBCorLib.Exception
+Private Property Get SystemException_InnerException() As Exception
     Set SystemException_InnerException = InnerException
 End Property
 
@@ -354,7 +354,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 ' IOException
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IOException_Data() As VBCorLib.IDictionary
+Private Property Get IOException_Data() As IDictionary
     Set IOException_Data = Data
 End Property
 
@@ -362,7 +362,7 @@ Private Function IOException_Equals(Value As Variant) As Boolean
     IOException_Equals = Equals(Value)
 End Function
 
-Private Function IOException_GetBaseException() As VBCorLib.Exception
+Private Function IOException_GetBaseException() As Exception
     Set IOException_GetBaseException = GetBaseException
 End Function
 
@@ -382,7 +382,7 @@ Private Property Get IOException_HResult() As Long
     IOException_HResult = HResult
 End Property
 
-Private Property Get IOException_InnerException() As VBCorLib.Exception
+Private Property Get IOException_InnerException() As Exception
     Set IOException_InnerException = InnerException
 End Property
 

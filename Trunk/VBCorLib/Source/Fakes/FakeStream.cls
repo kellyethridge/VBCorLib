@@ -27,11 +27,11 @@ Private Sub Class_Initialize()
     CanSeek = True
 End Sub
 
-Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As VBCorLib.AsyncCallback, Optional ByVal State As Variant) As VBCorLib.IAsyncResult
+Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
 
 End Function
 
-Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As VBCorLib.AsyncCallback, Optional ByVal State As Variant) As VBCorLib.IAsyncResult
+Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
 
 End Function
 
@@ -55,11 +55,11 @@ Private Sub Stream_CloseStream()
     IsClosed = True
 End Sub
 
-Private Function Stream_EndRead(ByVal AsyncResult As VBCorLib.IAsyncResult) As Long
+Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
 
 End Function
 
-Private Sub Stream_EndWrite(ByVal AsyncResult As VBCorLib.IAsyncResult)
+Private Sub Stream_EndWrite(ByVal AsyncResult As IAsyncResult)
 
 End Sub
 
@@ -103,7 +103,7 @@ Private Property Get Stream_ReadTimeout() As Long
 
 End Property
 
-Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As VBCorLib.SeekOrigin) As Currency
+Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
 
 End Function
 

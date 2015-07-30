@@ -33,7 +33,7 @@ End Sub
 
 
 ' format a value when requested, or return nothing if we didn't format it.
-Private Function ICustomFormatter_Format(ByVal fmt As String, Arg As Variant, ByVal Provider As VBCorLib.IFormatProvider) As String
+Private Function ICustomFormatter_Format(ByVal fmt As String, Arg As Variant, ByVal Provider As IFormatProvider) As String
     ' we only format strings.
     If VarType(Arg) = vbString Then
         ' we simply reverse a string value.

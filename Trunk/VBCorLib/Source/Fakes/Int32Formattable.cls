@@ -37,7 +37,7 @@ Private Function IComparable_CompareTo(Value As Variant) As Long
     If mValue > l Then IComparable_CompareTo = 1
 End Function
 
-Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As VBCorLib.IFormatProvider) As String
+Private Function IFormattable_ToString(ByRef Format As String, ByVal Provider As IFormatProvider) As String
     IFormattable_ToString = VBA.Format$(mValue, String$(Val(Format), "0"))
 End Function
 

@@ -40,7 +40,7 @@ Option Explicit
 Public Type Number
     Digits()    As Integer
     Precision   As Long
-    Sign        As VBCorLib.Sign
+    Sign        As CorLib.Sign
 End Type
 
 
@@ -317,16 +317,16 @@ Public Function SingleInPlaceDivideBy10(ByRef n As Number) As Long
         Exit Function
     End If
 
-    Dim r As Long
+    Dim R As Long
     Dim i As Long
     Dim f As Boolean
     Dim d As Long
 
     For i = n.Precision - 1 To 0 Step -1
-        r = (r * &H10000) + (n.Digits(i) And &HFFFF&)
-        d = r \ 10
+        R = (R * &H10000) + (n.Digits(i) And &HFFFF&)
+        d = R \ 10
         n.Digits(i) = d And &HFFFF&
-        r = r - (d * 10)
+        R = R - (d * 10)
 
         If Not f Then
             If n.Digits(i) = 0 Then
@@ -337,7 +337,7 @@ Public Function SingleInPlaceDivideBy10(ByRef n As Number) As Long
         End If
     Next i
 
-    SingleInPlaceDivideBy10 = r
+    SingleInPlaceDivideBy10 = R
 End Function
 
 ''
@@ -518,7 +518,7 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
         Exit Function
     End If
 
-    Dim r       As Long
+    Dim R       As Long
     Dim q()     As Integer
     ReDim q(0 To Length)
     
@@ -531,26 +531,26 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
     
     Dim i As Long
     For i = Length - 1 To 0 Step -1
-        r = r * &H10000 + (u(i) And &HFFFF&)
+        R = R * &H10000 + (u(i) And &HFFFF&)
         
-        If r And &H80000000 Then
+        If R And &H80000000 Then
             Dim q1 As Long
-            q1 = (r And &H7FFFFFFF) \ v
-            r = (r And &H7FFFFFFF) - (q1 * v) + r2
+            q1 = (R And &H7FFFFFFF) \ v
+            R = (R And &H7FFFFFFF) - (q1 * v) + r2
 
-            If r >= v Then
+            If R >= v Then
                 q1 = q1 + 1
-                r = r - v
+                R = R - v
             End If
 
             q(i) = q1 + q2
         Else
-            q(i) = r \ v
-            r = r - (q(i) And &HFFFF&) * v
+            q(i) = R \ v
+            R = R - (q(i) And &HFFFF&) * v
         End If
     Next i
     
-    remainder = r
+    remainder = R
     SinglePlaceDivide = q
 End Function
 
@@ -655,16 +655,16 @@ Private Sub NegateIDE(ByRef n As Number)
 End Sub
 
 Private Function SingleInPlaceDivideBy10IDE(ByRef n As Number) As Long
-    Dim r As Long
+    Dim R As Long
     Dim i As Long
     Dim f As Boolean
     Dim d As Long
     
     For i = n.Precision - 1 To 0 Step -1
-        r = (r * &H10000) + GetLong(n.Digits(i))
-        d = r \ 10
+        R = (R * &H10000) + GetLong(n.Digits(i))
+        d = R \ 10
         n.Digits(i) = GetInt(d)
-        r = r - (d * 10)
+        R = R - (d * 10)
         
         If Not f Then
             If n.Digits(i) = 0 Then
@@ -675,7 +675,7 @@ Private Function SingleInPlaceDivideBy10IDE(ByRef n As Number) As Long
         End If
     Next i
 
-    SingleInPlaceDivideBy10IDE = r
+    SingleInPlaceDivideBy10IDE = R
 End Function
 
 Private Function GradeSchoolAddIDE(ByRef u As Number, ByRef v As Number) As Integer()
@@ -821,15 +821,15 @@ Private Function GradeSchoolDivideIDE(ByRef u As Number, ByRef v As Number, ByRe
     GradeSchoolDivideIDE = quotient
 End Function
 
-Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
-    Dim v As Currency: v = GetLong(y)
-    Dim w As Currency: w = (v * x) * 0.0001@
+Private Function UInt32x16To32(ByVal X As Long, ByVal Y As Integer) As Long
+    Dim v As Currency: v = GetLong(Y)
+    Dim w As Currency: w = (v * X) * 0.0001@
     Call CopyMemory(UInt32x16To32, w, 4)
 End Function
 
-Private Function UInt32Compare(ByVal x As Long, ByVal y As Long) As Long
-    Dim u As Currency: Call CopyMemory(u, x, 4)
-    Dim v As Currency: Call CopyMemory(v, y, 4)
+Private Function UInt32Compare(ByVal X As Long, ByVal Y As Long) As Long
+    Dim u As Currency: Call CopyMemory(u, X, 4)
+    Dim v As Currency: Call CopyMemory(v, Y, 4)
     UInt32Compare = Sgn(u - v)
 End Function
 
@@ -898,55 +898,55 @@ Private Function SinglePlaceDivideIDE(ByRef u() As Integer, ByVal Length As Long
     Dim q() As Integer
     ReDim q(0 To Length)
     
-    Dim r As Long
+    Dim R As Long
     Dim i As Long
     For i = Length - 1 To 0 Step -1
-        r = r * &H10000 + GetLong(u(i))
-        q(i) = GetInt(UInt32d16To32(r, v))
-        r = GetInt(UInt32m16To32(r, v))
+        R = R * &H10000 + GetLong(u(i))
+        q(i) = GetInt(UInt32d16To32(R, v))
+        R = GetInt(UInt32m16To32(R, v))
     Next i
     
-    remainder = r
+    remainder = R
     SinglePlaceDivideIDE = q
 End Function
 
-Public Function GetLong(ByVal x As Long) As Long
-    GetLong = x And &HFFFF&
+Public Function GetLong(ByVal X As Long) As Long
+    GetLong = X And &HFFFF&
 End Function
 
-Private Function UInt16x16To32(ByVal x As Long, ByVal y As Long) As Long
-    Dim u As Currency: u = GetLong(x)
-    Dim v As Currency: v = GetLong(y)
+Private Function UInt16x16To32(ByVal X As Long, ByVal Y As Long) As Long
+    Dim u As Currency: u = GetLong(X)
+    Dim v As Currency: v = GetLong(Y)
     Dim w As Currency: w = (u * v) * 0.0001@
     Call CopyMemory(UInt16x16To32, w, 4)
 End Function
 
-Private Function UInt32d16To32(ByVal x As Long, ByVal y As Long) As Long
+Private Function UInt32d16To32(ByVal X As Long, ByVal Y As Long) As Long
     Dim d As Currency
-    Call CopyMemory(d, x, 4)
+    Call CopyMemory(d, X, 4)
     d = d * 10000@
-    UInt32d16To32 = Int(d / GetLong(y))
+    UInt32d16To32 = Int(d / GetLong(Y))
 End Function
 
-Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
+Private Function UInt32m16To32(ByVal X As Long, ByVal Y As Long) As Long
     Dim q As Currency
     Dim d As Currency
-    Dim v As Currency: v = GetLong(y)
-    Call CopyMemory(d, x, 4)
+    Dim v As Currency: v = GetLong(Y)
+    Call CopyMemory(d, X, 4)
     d = d * 10000@
     q = Int(d / v)
     UInt32m16To32 = d - q * v
 End Function
 
-Private Function Make32(ByVal x As Integer, ByVal y As Integer) As Long
-    Make32 = LeftShift16(GetLong(x)) Or GetLong(y)
+Private Function Make32(ByVal X As Integer, ByVal Y As Integer) As Long
+    Make32 = LeftShift16(GetLong(X)) Or GetLong(Y)
 End Function
 
-Private Function RightShift16(ByVal x As Long) As Long
-    RightShift16 = ((x And &HFFFF0000) \ &H10000) And &HFFFF&
+Private Function RightShift16(ByVal X As Long) As Long
+    RightShift16 = ((X And &HFFFF0000) \ &H10000) And &HFFFF&
 End Function
 
-Private Function LeftShift16(ByVal x As Long) As Long
-    If x And &H8000& Then LeftShift16 = &H80000000
-    LeftShift16 = LeftShift16 Or ((x And &H7FFF) * &H10000)
+Private Function LeftShift16(ByVal X As Long) As Long
+    If X And &H8000& Then LeftShift16 = &H80000000
+    LeftShift16 = LeftShift16 Or ((X And &H7FFF) * &H10000)
 End Function

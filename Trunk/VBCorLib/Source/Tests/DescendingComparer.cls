@@ -12,12 +12,12 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
-Implements VBCorLib.IComparer
+Implements CorLib.IComparer
 
-Private Function IComparer_Compare(x As Variant, y As Variant) As Long
-    If x < y Then
+Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
+    If X < Y Then
         IComparer_Compare = 1
-    ElseIf x > y Then
+    ElseIf X > Y Then
         IComparer_Compare = -1
     End If
 End Function
