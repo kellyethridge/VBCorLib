@@ -1,10 +1,10 @@
 [
-    helpstring("VB.EXT: VBCorLib Type Library 3.0"),
+    helpstring("VB.EXT: CorLib Type Library 3.0"),
     uuid(1F852AFD-5C0A-46d0-8AA1-4319E8EF72C0),
     lcid(0x00000000),
     version(3.0)
 ]
-library VBCorType {
+library CorType {
     importlib("stdole2.tlb");
     importlib("msvbvm60.dll");
 

@@ -325,7 +325,7 @@ Public Function GetLogicalDrives() As String()
     ReDim Drives(25) As String ' just allocate the maximum letters possible.
     
     Dim Mask As Long
-    Mask = VBCorType.GetLogicalDrives
+    Mask = CorType.GetLogicalDrives
     
     Dim Letter As Long
     Letter = corUpperAChar

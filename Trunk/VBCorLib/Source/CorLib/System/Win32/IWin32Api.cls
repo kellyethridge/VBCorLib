@@ -25,9 +25,9 @@ Public Function DeleteFile(FileName As String) As Long: End Function
 
 Public Function ExpandEnvironmentStrings(lpSrc As String, lpDst As String, ByVal nSize As Long) As Long: End Function
 
-Public Function FindFirstFile(FileName As String, FindFileData As VBCorType.WIN32_FIND_DATA) As Long: End Function
+Public Function FindFirstFile(FileName As String, FindFileData As CorType.WIN32_FIND_DATA) As Long: End Function
 
-Public Function FindNextFile(ByVal Handle As Long, FindFileData As VBCorType.WIN32_FIND_DATA) As Long: End Function
+Public Function FindNextFile(ByVal Handle As Long, FindFileData As CorType.WIN32_FIND_DATA) As Long: End Function
 
 Public Function GetComputerName(Buffer As String, Size As Long) As Long: End Function
 
@@ -39,7 +39,7 @@ Public Function GetEnvironmentVariable(Name As String, Buffer As String, ByVal S
 
 Public Function GetFileAttributes(FileName As String) As Long: End Function
 
-Public Function GetFileAttributesEx(FileName As String, ByVal fInfoLevelId As Long, lpFileInformation As VBCorType.WIN32_FILE_ATTRIBUTE_DATA) As Long: End Function
+Public Function GetFileAttributesEx(FileName As String, ByVal fInfoLevelId As Long, lpFileInformation As CorType.WIN32_FILE_ATTRIBUTE_DATA) As Long: End Function
 
 Public Function GetFullPathName(FileName As String, ByVal BufferLength As Long, Buffer As String, ByVal lpFilePart As Long) As Long: End Function
 

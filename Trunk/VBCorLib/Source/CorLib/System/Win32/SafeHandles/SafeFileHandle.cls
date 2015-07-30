@@ -79,7 +79,7 @@ End Sub
 '   SafeHandle Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub mBase_ReleaseHandle()
-    VBCorType.CloseHandle DangerousGetHandle
+    CorType.CloseHandle DangerousGetHandle
 End Sub
 
 Private Sub SafeHandle_CloseHandle()

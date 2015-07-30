@@ -40,7 +40,7 @@ Public Function FindDateCallback(ByRef Value As Date) As Boolean
     FindDateCallback = Value = CDate(FindCallbackValue)
 End Function
 
-Public Function FindVBGuidCallback(ByRef Value As VBCorType.VBGUID) As Boolean
+Public Function FindVBGuidCallback(ByRef Value As CorType.VBGUID) As Boolean
     FindVBGuidCallback = Value.Data1 = CLng(FindCallbackValue)
 End Function
 
