@@ -90,7 +90,7 @@ Public Function MakeHRFromErrorCode(ByVal ErrorCode As Long)
     MakeHRFromErrorCode = &H80070000 Or ErrorCode
 End Function
 
-Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode, Optional ByVal FlagsAndAttributes = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
+Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As Long, ByVal ShareMode As Long, ByVal CreationDisposition As Long, Optional ByVal FlagsAndAttributes = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
     Dim FileHandle As Long
     FileHandle = CreateFileW(FileName, DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FlagsAndAttributes, 0)
     Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle, True)
