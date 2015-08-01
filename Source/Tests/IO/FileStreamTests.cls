@@ -316,7 +316,7 @@ Public Sub Position_WhenSetBeforeStartOfAppendPoint_ThrowsIOException()
     AssertIOException Err
 End Sub
 
-Public Sub WriteBlock_WithData_WritesToFile()
+Public Sub WriteBlock_WhenCreatingNew_WritesNewFile()
     Dim FileName As String
     FileName = Path.Combine(mBuilder.TempFolder, "File.txt")
     
@@ -329,6 +329,58 @@ Public Sub WriteBlock_WithData_WritesToFile()
     Dim Actual() As Byte
     Actual = mBuilder.ReadBinaryFile(FileName)
     Assert.That Actual, Iz.EqualTo(Data)
+End Sub
+
+Public Sub WriteBlock_WhenAppending_AppendsToFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateBinaryFile(Data:=NewBytes(1, 2, 3))
+    
+    With NewFileStream(FileName, Append)
+        .WriteBlock NewBytes(4, 5, 6), 0, 3
+    End With
+    
+    Dim Actual() As Byte
+    Actual = mBuilder.ReadBinaryFile(FileName)
+    Assert.That Actual, Iz.EqualTo(NewBytes(1, 2, 3, 4, 5, 6))
+End Sub
+
+Public Sub WriteBlock_WhenCreating_OverwritesFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateBinaryFile(Data:=NewBytes(1, 2, 3))
+    
+    With NewFileStream(FileName, Create)
+        .WriteBlock NewBytes(4, 5, 6), 0, 3
+    End With
+    
+    Dim Actual() As Byte
+    Actual = mBuilder.ReadBinaryFile(FileName)
+    Assert.That Actual, Iz.EqualTo(NewBytes(4, 5, 6))
+End Sub
+
+Public Sub WriteBlock_WhenOpenOrCreatingAndFileExists_OverwritesFile()
+    Dim FileName As String
+    FileName = mBuilder.CreateBinaryFile(Data:=NewBytes(1, 2, 3))
+    
+    With NewFileStream(FileName, OpenOrCreate)
+        .WriteBlock NewBytes(4, 5, 6), 0, 3
+    End With
+    
+    Dim Actual() As Byte
+    Actual = mBuilder.ReadBinaryFile(FileName)
+    Assert.That Actual, Iz.EqualTo(NewBytes(4, 5, 6))
+End Sub
+
+Public Sub WriteBlock_WhenOpenOrCreateAndFileDoesNotExist_WritesNewFile()
+    Dim FileName As String
+    FileName = Path.Combine(mBuilder.TempFolder, "File.txt")
+    
+    With NewFileStream(FileName, OpenOrCreate)
+        .WriteBlock NewBytes(4, 5, 6), 0, 3
+    End With
+    
+    Dim Actual() As Byte
+    Actual = mBuilder.ReadBinaryFile(FileName)
+    Assert.That Actual, Iz.EqualTo(NewBytes(4, 5, 6))
 End Sub
 
 Public Sub WriteBlock_WithNullArray_ThrowsArgumentNullException()
@@ -445,5 +497,16 @@ Public Sub NewFileStream_WithNonExistingFile_ThrowsFileNotFoundException()
     End With
     
     AssertFileNotFoundException Err, FileName
+End Sub
+
+Public Sub NewFileStream_WithCreatingNewAndFileExists_ThrowsIOException()
+    Dim FileName As String
+    FileName = mBuilder.CreateFile
+    
+    On Error Resume Next
+    With NewFileStream(FileName, CreateNew)
+    End With
+    
+    AssertIOException Err
 End Sub
 

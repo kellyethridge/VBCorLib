@@ -24,18 +24,9 @@ Attribute VB_Name = "FileFlagHelper"
 '
 Option Explicit
 
-Public Sub ValidateFileMode(ByVal Mode As FileMode)
-    Select Case Mode
-        Case FileMode.Append, FileMode.Create, FileMode.CreateNew, FileMode.OpenExisting, FileMode.OpenOrCreate, FileMode.Truncate
-            Exit Sub
-    End Select
-    
-    Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
-End Sub
-
 Public Sub ValidateFileAccess(ByVal Access As FileAccess)
     Select Case Access
-        Case FileAccess.DefaultAccess, FileAccess.ReadAccess, FileAccess.ReadWriteAccess, FileAccess.WriteAccess
+        Case 0, FileAccess.ReadAccess, FileAccess.ReadWriteAccess, FileAccess.WriteAccess
             Exit Sub
     End Select
 
@@ -72,7 +63,7 @@ Public Function GetFileAccessDisplayName(ByVal Access As FileAccess) As String
     Dim Result As String
     
     Select Case Access
-        Case DefaultAccess:     Result = "DefaultAccess"
+        Case 0:     Result = "DefaultAccess"
         Case ReadAccess:        Result = "ReadAccess"
         Case WriteAccess:       Result = "WriteAccess"
         Case ReadWriteAccess:   Result = "ReadWriteAccess"

@@ -61,7 +61,8 @@ Option Explicit
 Implements IObject
 Implements Stream
 
-Private Const MinBufferSize            As Long = 8
+Private Const DefaultAccess As Long = 0
+Private Const MinBufferSize As Long = 8
 
 'Private Const FILE_ATTRIBUTE_NORMAL     As Long = &H80
 'Private Const FILE_TYPE_DISK            As Long = 1
@@ -93,12 +94,12 @@ Private Const MinBufferSize            As Long = 8
 ' read is made, then an exception will be thrown.
 '
 Public Enum FileMode
-    Append = &H80
-    Create = 2
     CreateNew = 1
+    Create = 2
     OpenExisting = 3
     OpenOrCreate = 4
     Truncate = 5
+    Append = 6
 End Enum
 
 ''
@@ -109,10 +110,9 @@ End Enum
 ' @param ReadWriteAccess Grants both read and write permissions to the FileStream.
 '
 Public Enum FileAccess
-    DefaultAccess = 0
-    ReadAccess = &H80000000
-    WriteAccess = &H40000000
-    ReadWriteAccess = &HC0000000
+    ReadAccess = 1
+    WriteAccess = 2
+    ReadWriteAccess = 3
 End Enum
 
 ''
@@ -838,30 +838,36 @@ Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As Fi
         Error.Argument Argument_EmptyPath, "Path"
     If BufferSize <= 0 Then _
         Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
+    If Mode < FileMode.CreateNew Or Mode > FileMode.Append Then _
+        Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
+    If Share < FileShare.None Or Share > FileShare.ReadWriteShare Then _
+        Error.ArgumentOutOfRange "Share", ArgumentOutOfRange_Enum
     
-    ValidateFileMode Mode
-    ValidateFileAccess Access
-    ValidateFileShare Share
+    Dim AccessFlag As Long
+    Select Case Access
+        Case FileAccess.ReadAccess
+            AccessFlag = GENERIC_READ
+        Case FileAccess.WriteAccess
+            AccessFlag = GENERIC_WRITE
+        Case FileAccess.ReadWriteAccess
+            AccessFlag = GENERIC_READ Or GENERIC_WRITE
+        Case Else
+            Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
+    End Select
     
     Dim AppendMode As Boolean
     If Mode = FileMode.Append Then
-        If Access = DefaultAccess Then
-            Access = WriteAccess
-        ElseIf Access And ReadAccess Then
+        If Access And FileAccess.ReadAccess Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidFileModeAndAccessCombo, GetFileModeDisplayName(Mode), GetFileAccessDisplayName(Access)))
-        End If
+        
         AppendMode = True
         Mode = FileMode.OpenOrCreate
-    End If
-    
-    If Access = DefaultAccess Then
-        Access = ReadWriteAccess
     End If
     
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(TrimmedPath)
     
-    Set mHandle = Win32Native.SafeCreateFile(FullPath, Access, Share, Mode)
+    Set mHandle = Win32Native.SafeCreateFile(FullPath, AccessFlag, Share, Mode)
     If mHandle.IsInvalid Then
         IOError.WinIOError Err.LastDllError, FullPath
     End If

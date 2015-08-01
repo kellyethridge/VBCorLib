@@ -163,7 +163,7 @@ End Function
 ' vbByte Array: Attempts to create a MemoryStream.
 ' vbObject:     Attempts to convert the object to a Stream object.
 '
-Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = DefaultAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As Stream
+Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optional ByVal Access As FileAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As Stream
     Select Case VarType(Source)
         Case vbString
             Set GetStream = Cor.NewFileStream(CStr(Source), Mode, Access, Share)

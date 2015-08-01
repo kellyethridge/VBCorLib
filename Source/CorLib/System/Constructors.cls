@@ -654,7 +654,15 @@ End Function
 ' @param UseAsync Flag used to open the file in asyncronous mode (currently not supported).
 ' @return The new FileStream opened to the specified file.
 '
-Public Function NewFileStream(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = DefaultAccess, Optional ByVal Share As FileShare = FileShare.ReadShare, Optional ByVal BufferSize As Long = 4096, Optional ByVal UseAsync As Boolean = False) As FileStream
+Public Function NewFileStream(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess, Optional ByVal Share As FileShare = FileShare.ReadShare, Optional ByVal BufferSize As Long = 4096, Optional ByVal UseAsync As Boolean = False) As FileStream
+    If Access = 0 Then
+        If Mode = FileMode.Append Then
+            Access = FileAccess.WriteAccess
+        Else
+            Access = FileAccess.ReadWriteAccess
+        End If
+    End If
+    
     Set NewFileStream = New FileStream
     NewFileStream.Init Path, Mode, Access, Share, BufferSize, UseAsync
 End Function
