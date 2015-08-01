@@ -73,7 +73,7 @@ Public Guid                     As New GuidStatic
 Public Convert                  As New Convert
 Public ResourceManager          As New ResourceManagerStatic
 Public DriveInfo                As New DriveInfoStatic
-Public MathExt                  As New MathExt
+Public CorMath                  As New CorMath
 Public EventArgs                As New EventArgsStatic
 Public DES                      As New DESStatic
 Public TripleDES                As New TripleDESStatic

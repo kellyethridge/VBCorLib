@@ -255,7 +255,7 @@ Private Sub HashCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As 
         Dim AmountToCopy As Long
         
         ' we only want to copy enough into the buffer to just fill it, if possible.
-        AmountToCopy = MathExt.Min(mBlockSize - mBytesBuffered, Count)
+        AmountToCopy = CorMath.Min(mBlockSize - mBytesBuffered, Count)
         Call CopyMemory(mBuffer(mBytesBuffered), Bytes(Index), AmountToCopy)
         mBytesBuffered = mBytesBuffered + AmountToCopy
         Index = Index + AmountToCopy

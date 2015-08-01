@@ -1069,7 +1069,7 @@ End Sub
 '
 Private Sub ReplaceLargerLength(ByRef NewValue As String, ByRef MatchIndexes() As Long, ByVal MatchCount As Long, ByVal OldValueLength As Long, ByVal NewLength As Long)
     Dim NewCapacity As Long
-    NewCapacity = MathExt.Max(NewLength, mCapacity)
+    NewCapacity = CorMath.Max(NewLength, mCapacity)
     
     Dim NewBuffer As Long
     NewBuffer = CoTaskMemAlloc(NewCapacity * BytesPerChar)

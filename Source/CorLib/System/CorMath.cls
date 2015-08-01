@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "MathExt"
+Attribute VB_Name = "CorMath"
 Attribute VB_GlobalNameSpace = True
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -114,9 +114,9 @@ End Function
 ' @param Remainder The variable to place the remainder of the division.
 ' @return The quotient of the division.
 '
-Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef Remainder As Long) As Long
+Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef remainder As Long) As Long
     DivRem = a \ b
-    Remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
+    remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
 End Function
 
 ''
