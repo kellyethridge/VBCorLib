@@ -20,7 +20,7 @@ Attribute VB_Name = "Enumeration"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modIEnumerator
+' Module: Enumeration
 '
 
 ''
@@ -43,18 +43,23 @@ End Type
 
 Private IID_IUnknown        As VBGUID
 Private IID_IEnumVariant    As VBGUID
+Private mWrapperTemplate    As EnumeratorWrapper
 Private mInitialized        As Boolean
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'  Public Functions
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Function CreateEnumerator(ByVal Enumerator As IEnumerator) As IUnknown
-    Dim Wrapper As EnumeratorWrapper
+    Init
     
-    Initialize
-    InitVTable Wrapper
-    Set CreateEnumerator = AllocateObject(Wrapper, Enumerator)
+    Dim This As Long
+    This = CoTaskMemAlloc(LenB(mWrapperTemplate))
+    If This = vbNullPtr Then _
+        Throw New OutOfMemoryException
+
+    Set mWrapperTemplate.Enumerator = Enumerator
+    CopyMemory ByVal This, mWrapperTemplate, LenB(mWrapperTemplate)
+    ObjectPtr(mWrapperTemplate.Enumerator) = vbNullPtr
+    
+    ObjectPtr(CreateEnumerator) = This
 End Function
 
 Public Function GetCollectionVersion(ByVal Obj As Object) As Long
@@ -69,11 +74,12 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Initialize()
+Private Sub Init()
     If Not mInitialized Then
         InitGUIDS
+        InitWrapperTemplate
         mInitialized = True
     End If
 End Sub
@@ -90,8 +96,8 @@ Private Sub InitGUIDS()
     End With
 End Sub
 
-Private Sub InitVTable(ByRef Table As EnumeratorWrapper)
-    With Table
+Private Sub InitWrapperTemplate()
+    With mWrapperTemplate
         .cRefs = 1
         .Func(0) = FuncAddr(AddressOf QueryInterface)
         .Func(1) = FuncAddr(AddressOf AddRef)
@@ -100,31 +106,16 @@ Private Sub InitVTable(ByRef Table As EnumeratorWrapper)
         .Func(4) = FuncAddr(AddressOf IEnumVariant_Skip)
         .Func(5) = FuncAddr(AddressOf IEnumVariant_Reset)
         .Func(6) = FuncAddr(AddressOf IEnumVariant_Clone)
+        .pVTable = VarPtr(.Func(0))
     End With
 End Sub
-
-Private Function AllocateObject(ByRef Wrapper As EnumeratorWrapper, ByVal Enumerator As IEnumerator) As IUnknown
-    Dim This As Long
-    This = CoTaskMemAlloc(Len(Wrapper))
-    If This = vbNullPtr Then _
-        Throw New OutOfMemoryException
-    
-    Wrapper.pVTable = This + OffsetToFirstFunction
-    Set Wrapper.Enumerator = Enumerator
-    Call CopyMemory(ByVal This, Wrapper, LenB(Wrapper))
-    Call ZeroMemory(Wrapper, LenB(Wrapper)) ' we zero the structure to prevent the Wrapper.Enumerator reference count from changing.
-    
-    ObjectPtr(AllocateObject) = This
-End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '  VTable functions in the IEnumVariant and IUnknown interfaces.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-' When VB queries the interface, we support only two.
-' IUnknown
-' IEnumVariant
+' When VB queries the interface, we support only two: IUnknown, IEnumVariant
 Private Function QueryInterface(ByRef This As EnumeratorWrapper, ByRef riid As VBGUID, ByRef pvObj As Long) As Long
     Dim IsMatch As Boolean
     
@@ -137,7 +128,7 @@ Private Function QueryInterface(ByRef This As EnumeratorWrapper, ByRef riid As V
     
     If IsMatch Then
         pvObj = VarPtr(This)
-        Call AddRef(This)
+        AddRef This
     Else
         QueryInterface = E_NOINTERFACE
     End If
@@ -153,20 +144,20 @@ Private Function Release(ByRef This As EnumeratorWrapper) As Long
     Release = This.cRefs
     
     If This.cRefs = 0 Then
-        Call Delete(This)
+        Delete This
     End If
 End Function
 
 Private Sub Delete(ByRef This As EnumeratorWrapper)
    Set This.Enumerator = Nothing
-   Call CoTaskMemFree(VarPtr(This))
+   CoTaskMemFree VarPtr(This)
 End Sub
 
 Private Function IEnumVariant_Next(ByRef This As EnumeratorWrapper, ByVal celt As Long, ByRef prgVar As Variant, ByVal pceltFetched As Long) As Long
     Const NumberOfItemsFetched As Long = 1
     
     If This.Enumerator.MoveNext Then
-        Call Helper.MoveVariant(prgVar, This.Enumerator.Current)
+        Helper.MoveVariant prgVar, This.Enumerator.Current
         
         If pceltFetched <> vbNullPtr Then
             MemLong(pceltFetched) = NumberOfItemsFetched
@@ -187,7 +178,7 @@ Private Function IEnumVariant_Skip(ByRef This As EnumeratorWrapper, ByVal celt A
 End Function
 
 Private Function IEnumVariant_Reset(ByRef This As EnumeratorWrapper) As Long
-   Call This.Enumerator.Reset
+   This.Enumerator.Reset
 End Function
 
 Private Function IEnumVariant_Clone(ByRef This As EnumeratorWrapper, ByRef ppenum As stdole.IUnknown) As Long
