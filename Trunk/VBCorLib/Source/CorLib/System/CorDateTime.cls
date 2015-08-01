@@ -360,7 +360,7 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
     Dim yearsToAdd  As Long
     Dim monthsToAdd As Long
     
-    yearsToAdd = MathExt.DivRem(Months, corMonthsPerYear, monthsToAdd)
+    yearsToAdd = CorMath.DivRem(Months, corMonthsPerYear, monthsToAdd)
     
     Month = Month + monthsToAdd
     Year = Year + yearsToAdd
@@ -816,16 +816,16 @@ Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year
     If Years100 = 4 Then Years100 = 3   ' leap year
     Days = Days - Years100 * DaysPer100Years
     
-    Dim Years4 As Long
-    Years4 = Days \ corDaysPer4Years
-    Days = Days - Years4 * corDaysPer4Years
+    Dim years4 As Long
+    years4 = Days \ corDaysPer4Years
+    Days = Days - years4 * corDaysPer4Years
     
     Dim Years As Long
     Years = Days \ 365
     If Years = 4 Then Years = 3 ' leap year
     
     ' Return the Year.
-    Year = Years400 * 400 + Years100 * 100 + Years4 * 4 + Years + 1
+    Year = Years400 * 400 + Years100 * 100 + years4 * 4 + Years + 1
     If DatePart = YearPart Then Exit Sub
     
     Days = Days - Years * corDaysPerYear
@@ -836,7 +836,7 @@ Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year
     
     ' Month will be set in the CalculateDay method.
     ' Day is set to the result of CalculateDays.
-    If Years = 3 And (Years100 = 3 Or Years4 <> 24) Then
+    If Years = 3 And (Years100 = 3 Or years4 <> 24) Then
         Day = CalculateDay(Days, Month, DaysToMonthLeapYear) + 1
     Else
         Day = CalculateDay(Days, Month, DaysToMonth) + 1

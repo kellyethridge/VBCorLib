@@ -417,7 +417,7 @@ Public Function GetValues(ByVal Section As String) As IDictionary
     Size = 16384
     Do
         Size = Size * 2
-        If Not Environment.IsNT Then Size = MathExt.Min(32767, Size)
+        If Not Environment.IsNT Then Size = CorMath.Min(32767, Size)
         
         Buf = String$(Size, vbNullChar)
         Size = Api.GetPrivateProfileSection(Section, Buf, Size, mFileName)

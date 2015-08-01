@@ -593,7 +593,7 @@ Private Sub WriteToBuffer(ByRef Buffer() As Byte, ByRef Offset As Long, ByRef Co
     ' Determine how many bytes are needed to fill the buffer. The buffer should
     ' never be full already, so the best we can do is fill it.
     Dim AmountToCopy As Long
-    AmountToCopy = MathExt.Min(mInputBlockSize - mBytesBuffered, Count)
+    AmountToCopy = CorMath.Min(mInputBlockSize - mBytesBuffered, Count)
     
     ' Don't need to waste our time if there is nothing to do.
     If AmountToCopy = 0 Then Exit Sub
@@ -657,7 +657,7 @@ Private Function ReadBufferedBytes(ByRef Buffer() As Byte, ByRef Offset As Long,
     
     ' Only copy what we want or what we already have, which
     ' ever is the smaller value.
-    AmountToCopy = MathExt.Min(mBytesBuffered, Count)
+    AmountToCopy = CorMath.Min(mBytesBuffered, Count)
     
     ' Make sure there is room in the return buffer.
     If (Offset + AmountToCopy - 1) > UBound(Buffer) Then _

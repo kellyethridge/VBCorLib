@@ -119,7 +119,7 @@ End Property
 '
 Public Function GetBytes(ByVal cb As Long) As Byte()
     Dim Blocks As Long
-    Blocks = MathExt.Ceiling(cb / BLOCK_SIZE)
+    Blocks = CorMath.Ceiling(cb / BLOCK_SIZE)
     
     Dim Bytes() As Byte
     ReDim Bytes(0 To (Blocks * BLOCK_SIZE) + mBytesBuffered - 1)

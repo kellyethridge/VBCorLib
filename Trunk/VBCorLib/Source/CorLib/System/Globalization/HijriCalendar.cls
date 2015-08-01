@@ -141,7 +141,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
     Dim Day As Long
     Call GetDateParts(Time, Complete, Year, Month, Day)
     Month = Month + Months
-    Year = Year + MathExt.DivRem(Month, corMonthsPerYear, Month)
+    Year = Year + CorMath.DivRem(Month, corMonthsPerYear, Month)
     
     Dim MaxDays As Long
     MaxDays = GetDaysInMonth(Year, Month)
@@ -399,7 +399,7 @@ Private Sub GetDateParts(ByRef Time As Variant, ByVal DatePart As DatePartPrecis
     If DatePart = DayOfTheYear Then Exit Sub
     
     If DayOfYear <> 355 Then
-        Month = MathExt.Ceiling((DayOfYear - 30) / 29.5) + 1
+        Month = CorMath.Ceiling((DayOfYear - 30) / 29.5) + 1
     Else
         Month = 12
     End If

@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "MathExtTests"
+Attribute VB_Name = "CorMathTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -130,7 +130,7 @@ End Sub
 Public Sub Max_WithNonComparable_ThrowsArgumentException()
     On Error Resume Next
     
-    Max Me, New MathExtTests
+    Max Me, New CorMathTests
     
     AssertArgumentException Err
 End Sub

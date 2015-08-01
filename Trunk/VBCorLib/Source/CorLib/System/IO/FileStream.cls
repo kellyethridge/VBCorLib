@@ -877,7 +877,7 @@ Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As Fi
         mBufferOffset = mMinPosition
     End If
     
-    mBufferSize = MathExt.Max(BufferSize, MinBufferSize)
+    mBufferSize = CorMath.Max(BufferSize, MinBufferSize)
 End Sub
 
 Friend Sub InitWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAccess, ByVal BufferSize As Long)
@@ -887,7 +887,7 @@ Friend Sub InitWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAc
         Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedNonNegNum
     
     Set mHandle = Handle
-    mBufferSize = MathExt.Max(BufferSize, MinBufferSize)
+    mBufferSize = CorMath.Max(BufferSize, MinBufferSize)
     mCanSeek = (GetFileType(Handle) = FILE_TYPE_DISK)
     mCanWrite = CBool(Access And WriteAccess)
     mCanRead = CBool(Access And ReadAccess)

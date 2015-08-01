@@ -578,7 +578,7 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
             Error.Argument Arg_PathIllegal
         End If
     
-        LastCharIndex = MathExt.Min(Index + 1, LastPeriodIndex)
+        LastCharIndex = CorMath.Min(Index + 1, LastPeriodIndex)
     End If
     
     Dim j As Long
