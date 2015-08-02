@@ -194,12 +194,15 @@ Public Enum ResourceStringKey
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
     InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
+    
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
     NotSupported_MemoryStreamNotExpandable = 1002
     NotSupported_UnwritableStream = 1003
     NotSupported_UnreadableStream = 1004
     NotSupported_UnseekableStream = 1005
+    NotSupported_FileStreamOnNonFiles = 1006
+    
     ObjectDisposed_StreamClosed = 1200
     ObjectDisposed_FileNotOpen = 1201
     ObjectDisposed_Generic = 1202

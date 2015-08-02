@@ -840,20 +840,10 @@ Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As Fi
         Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
     If Mode < FileMode.CreateNew Or Mode > FileMode.Append Then _
         Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
+    If Access < FileAccess.ReadAccess Or Access > FileAccess.ReadWriteAccess Then _
+        Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
     If Share < FileShare.None Or Share > FileShare.ReadWriteShare Then _
         Error.ArgumentOutOfRange "Share", ArgumentOutOfRange_Enum
-    
-    Dim AccessFlag As Long
-    Select Case Access
-        Case FileAccess.ReadAccess
-            AccessFlag = GENERIC_READ
-        Case FileAccess.WriteAccess
-            AccessFlag = GENERIC_WRITE
-        Case FileAccess.ReadWriteAccess
-            AccessFlag = GENERIC_READ Or GENERIC_WRITE
-        Case Else
-            Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
-    End Select
     
     Dim AppendMode As Boolean
     If Mode = FileMode.Append Then
@@ -867,7 +857,7 @@ Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As Fi
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(TrimmedPath)
     
-    Set mHandle = Win32Native.SafeCreateFile(FullPath, AccessFlag, Share, Mode)
+    Set mHandle = Win32Native.SafeCreateFile(FullPath, Access, Share, Mode)
     If mHandle.IsInvalid Then
         IOError.WinIOError Err.LastDllError, FullPath
     End If
