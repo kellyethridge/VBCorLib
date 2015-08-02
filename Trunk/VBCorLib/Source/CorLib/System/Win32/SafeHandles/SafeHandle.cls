@@ -43,19 +43,6 @@ Private mOwnsHandle As Boolean
 Public Event ReleaseHandle()
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
-    mHandle = PreexistingHandle
-    mOwnsHandle = OwnsHandle
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   API
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 ''
 ' Returns the wrapped handle.
 '
@@ -95,3 +82,14 @@ Public Sub CloseHandle()
         mIsClosed = True
     End If
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
+    mHandle = PreexistingHandle
+    mOwnsHandle = OwnsHandle
+End Sub
+
+

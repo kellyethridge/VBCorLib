@@ -90,10 +90,33 @@ Public Function MakeHRFromErrorCode(ByVal ErrorCode As Long)
     MakeHRFromErrorCode = &H80070000 Or ErrorCode
 End Function
 
-Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As Long, ByVal ShareMode As Long, ByVal CreationDisposition As Long, Optional ByVal FlagsAndAttributes = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
+Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAccess, ByVal ShareMode As FileShare, ByVal CreationDisposition As FileMode, Optional ByVal FlagsAndAttributes = FILE_ATTRIBUTE_NORMAL) As SafeFileHandle
+    Dim AccessFlag As Long
+    Select Case DesiredAccess
+        Case FileAccess.ReadAccess
+            AccessFlag = GENERIC_READ
+        Case FileAccess.WriteAccess
+            AccessFlag = GENERIC_WRITE
+        Case FileAccess.ReadWriteAccess
+            AccessFlag = GENERIC_READ Or GENERIC_WRITE
+        Case Else
+            Error.ArgumentOutOfRange "DesiredAccess", ArgumentOutOfRange_Enum
+    End Select
+    
     Dim FileHandle As Long
-    FileHandle = CreateFileW(FileName, DesiredAccess, ShareMode, ByVal 0, CreationDisposition, FlagsAndAttributes, 0)
-    Set SafeCreateFile = Cor.NewSafeFileHandle(FileHandle, True)
+    Dim SafeHandle As SafeFileHandle
+    FileHandle = CreateFileW(FileName, AccessFlag, ShareMode, ByVal 0, CreationDisposition, FlagsAndAttributes, 0)
+    Set SafeHandle = Cor.NewSafeFileHandle(FileHandle, True)
+    
+    If Not SafeHandle.IsInvalid Then
+        Dim FileType As Long
+        FileType = GetFileType(SafeHandle)
+        
+        If FileType <> FILE_TYPE_DISK Then _
+            Error.NotSupported NotSupported_FileStreamOnNonFiles
+    End If
+    
+    Set SafeCreateFile = SafeHandle
 End Function
 
 Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData As WIN32_FIND_DATA) As SafeFindHandle
