@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: SHA1CryptoServiceProvider
+' Module: SHA1CryptoServiceProvider
 '
 
 ''
@@ -46,6 +49,11 @@ Implements IObject
 Implements HashAlgorithm
 Implements SHA1
 Implements ICryptoTransform
+
+Private Const ALG_CLASS_HASH    As Long = (4 * 2 ^ 13)
+Private Const ALG_TYPE_ANY      As Long = 0
+Private Const ALG_SID_SHA1      As Long = 4
+Private Const CALG_SHA1         As Long = (ALG_CLASS_HASH Or ALG_TYPE_ANY Or ALG_SID_SHA1)
 
 Private mBase As HashAlgorithmBase
 Private mCore As IHashAlgorithm
@@ -111,7 +119,7 @@ End Property
 ' Releases any resources.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -132,7 +140,7 @@ End Function
 ' Resets the hashing algorithm to start again.
 '
 Public Sub Initialize()
-    Call mCore.Initialize
+    mCore.Initialize
 End Sub
 
 ''
@@ -204,17 +212,17 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mCore = Cor.NewCryptoAPIHash(CALG_SHA1, Me.HashSize)
     Set mBase = Cor.NewHashAlgorithmBase(mCore)
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   HashAlgorithm Interface
+'   HashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get HashAlgorithm_CanReuseTransform() As Boolean
     HashAlgorithm_CanReuseTransform = CanReuseTransform
@@ -225,7 +233,7 @@ Private Property Get HashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub HashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function HashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -249,7 +257,7 @@ Private Property Get HashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub HashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get HashAlgorithm_InputBlockSize() As Long
@@ -274,7 +282,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -302,14 +310,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -318,7 +326,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SHA1 Interface
+'   SHA1
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get SHA1_CanReuseTransform() As Boolean
     SHA1_CanReuseTransform = CanReuseTransform
@@ -332,7 +340,7 @@ Private Sub SHA1_Clear()
     Call Clear
 End Sub
 
-Private Function SHA1_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
+Function SHA1_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
     SHA1_ComputeHash = ComputeHash(Source, Index, Count)
 End Function
 
@@ -353,7 +361,7 @@ Private Property Get SHA1_HashSize() As Long
 End Property
 
 Private Sub SHA1_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get SHA1_InputBlockSize() As Long

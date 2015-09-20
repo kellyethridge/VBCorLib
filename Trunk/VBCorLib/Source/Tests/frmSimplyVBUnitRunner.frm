@@ -187,69 +187,69 @@ End Sub
 
 Private Sub AddSystemSecurityCryptography()
     With Sim.NewTestSuite("System.Security.Cryptography")
-        .Add New TestRNGCryptoServiceProvider
-        .Add New TestToBase64Transform
-        .Add New TestFromBase64Transform
-        .Add New TestSHA1CryptoServiceProvider
-        .Add New TestSHA1Managed
-        .Add New TestSHA256Managed
-        .Add New TestSHA512Managed
-        .Add New TestSHA384Managed
-        .Add New TestMD5CryptoServiceProvider
-        .Add New TestRIPEMD160Managed
-        .Add New TestHMACSHA1
-        .Add New TestHMACSHA1Managed
-        .Add New TestHMACSHA256
-        .Add New TestHMACSHA384
-        .Add New TestHMACSHA512
-        .Add New TestHMACMD5
-        .Add New TestHMACRIPEMD160
-        .Add New TestMACTripleDES
-        .Add New TestRfc2898DeriveBytes
-        .Add New CryptoConfigTests
-        .Add New TestCspParameters
-        .Add New TestCspKeyContainerInfo
-        .Add New TestRSACryptoServiceProvider
-        .Add New TestRSASignAndVerify
-        .Add New TestDSACryptoServiceProvider
-        
-        .Add NewSuite("CryptoStream", _
-            New TestCryptoStream, _
-            New TestCryptoStreamReadBase64, _
-            New TestCryptoStreamWriteBase64, _
-            New TestCryptoStreamFullBase64, _
-            New TestCryptoStreamMultiBlock)
-            
-        .Add NewSuite("DESCryptoServiceProvider", _
-            New TestDESWeakKeys, _
-            New TestDESCryptoServiceProvider, _
-            New TestDESEncryption, _
-            New TestDESPaddingModes, _
-            New TestDESDecryption)
-        
-        .Add NewSuite("TripleDESCryptoServiceProvider", _
-            New TestTripleDESWeakKeys, _
-            New TestTripleDESCryptoServiceProvider, _
-            New TestTripleDESEncryption, _
-            New TestTripleDESDecryption)
-        
-        .Add NewSuite("SymmetricalAlgorithm", _
-            New TestSymmetricAlgorithmBase, _
-            New TestSymmetricAlgorithmBaseKey)
-        
-        .Add NewSuite("RC2CryptoServiceProvider", _
-            New TestRC2Encryption, _
-            New TestRC2Decryption)
-        
-        .Add NewSuite("RijndaelManaged", _
-            New TestRijndaelManaged128, _
-            New TestRijndaelEncryptionECB, _
-            New TestRijndaelEncryptionCBC, _
-            New TestRijndaelEncryptionCFB, _
-            New TestRijndaelDecryptionECB, _
-            New TestRijndaelDecryptionCBC, _
-            New TestRijndaelDecryptionCFB)
-        
+'        .Add New TestRNGCryptoServiceProvider
+'        .Add New TestToBase64Transform
+'        .Add New TestFromBase64Transform
+        .Add New SHA1CryptoServiceProviderTests
+'        .Add New TestSHA1Managed
+'        .Add New TestSHA256Managed
+'        .Add New TestSHA512Managed
+'        .Add New TestSHA384Managed
+'        .Add New TestMD5CryptoServiceProvider
+'        .Add New TestRIPEMD160Managed
+'        .Add New TestHMACSHA1
+'        .Add New TestHMACSHA1Managed
+'        .Add New TestHMACSHA256
+'        .Add New TestHMACSHA384
+'        .Add New TestHMACSHA512
+'        .Add New TestHMACMD5
+'        .Add New TestHMACRIPEMD160
+'        .Add New TestMACTripleDES
+'        .Add New TestRfc2898DeriveBytes
+'        .Add New CryptoConfigTests
+'        .Add New TestCspParameters
+'        .Add New TestCspKeyContainerInfo
+'        .Add New TestRSACryptoServiceProvider
+'        .Add New TestRSASignAndVerify
+'        .Add New TestDSACryptoServiceProvider
+'
+'        .Add NewSuite("CryptoStream", _
+'            New TestCryptoStream, _
+'            New TestCryptoStreamReadBase64, _
+'            New TestCryptoStreamWriteBase64, _
+'            New TestCryptoStreamFullBase64, _
+'            New TestCryptoStreamMultiBlock)
+'
+'        .Add NewSuite("DESCryptoServiceProvider", _
+'            New TestDESWeakKeys, _
+'            New TestDESCryptoServiceProvider, _
+'            New TestDESEncryption, _
+'            New TestDESPaddingModes, _
+'            New TestDESDecryption)
+'
+'        .Add NewSuite("TripleDESCryptoServiceProvider", _
+'            New TestTripleDESWeakKeys, _
+'            New TestTripleDESCryptoServiceProvider, _
+'            New TestTripleDESEncryption, _
+'            New TestTripleDESDecryption)
+'
+'        .Add NewSuite("SymmetricalAlgorithm", _
+'            New TestSymmetricAlgorithmBase, _
+'            New TestSymmetricAlgorithmBaseKey)
+'
+'        .Add NewSuite("RC2CryptoServiceProvider", _
+'            New TestRC2Encryption, _
+'            New TestRC2Decryption)
+'
+'        .Add NewSuite("RijndaelManaged", _
+'            New TestRijndaelManaged128, _
+'            New TestRijndaelEncryptionECB, _
+'            New TestRijndaelEncryptionCBC, _
+'            New TestRijndaelEncryptionCFB, _
+'            New TestRijndaelDecryptionECB, _
+'            New TestRijndaelDecryptionCBC, _
+'            New TestRijndaelDecryptionCFB)
+'
         AddTest .This
     End With
 End Sub

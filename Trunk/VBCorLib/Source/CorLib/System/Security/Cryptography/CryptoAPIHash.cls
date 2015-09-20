@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Friend License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Friend License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Friend License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: CryptoAPIHash
+' Module: CryptoAPIHash
 '
 
 ''
@@ -44,9 +47,8 @@ Private mHashAlg        As Long
 Private mHashSize       As Long
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal HashAlg As Long, ByVal HashSize As Long)
     mHashSize = HashSize \ 8
@@ -54,36 +56,43 @@ Friend Sub Init(ByVal HashAlg As Long, ByVal HashSize As Long)
     mHashAlg = HashAlg
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
-    If mHasher <> vbNullPtr Then Call CryptDestroyHash(mHasher)
+    DestroyHasher
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IHashAlgorithm Interface
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub DestroyHasher()
+    If mHasher <> vbNullPtr Then
+        CryptDestroyHash mHasher
+    End If
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IHashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IHashAlgorithm_HashCore(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
-    If CryptHashData(mHasher, Bytes(Index), Count, 0) = BOOL_FALSE Then _
+    If CryptHashData(mHasher, Bytes(Index), Count, 0) = BOOL_FALSE Then
         Throw Cor.NewCryptographicException("Could not perform hash on data.")
+    End If
 End Sub
 
 Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal ByteCount As Long, ByVal MessageLength As Currency) As Byte()
-    Dim Ret() As Byte
-    ReDim Ret(0 To mHashSize - 1)
+    Dim Result() As Byte
+    ReDim Result(0 To mHashSize - 1)
     
-    If CryptGetHashParam(mHasher, HP_HASHVAL, Ret(0), mHashSize, 0) = BOOL_FALSE Then _
+    If CryptGetHashParam(mHasher, HP_HASHVAL, Result(0), mHashSize, 0) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException("Could not retrieve hash value from service provider. " & GetMessage(Err.LastDllError))
     
-    IHashAlgorithm_HashFinal = Ret
+    IHashAlgorithm_HashFinal = Result
 End Function
 
 Private Sub IHashAlgorithm_Initialize()
-    If mHasher <> 0 Then Call CryptDestroyHash(mHasher)
+    DestroyHasher
     
     If CryptCreateHash(mProvider, mHashAlg, 0, 0, mHasher) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException("Could not create hash algorithm.")
+        Throw Cor.NewCryptographicException("Could not create hash algorithm->" & GetMessage(Err.LastDllError))
 End Sub
