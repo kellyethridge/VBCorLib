@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: HashAlgorithmBase
+' Module: HashAlgorithmBase
 '
 
 ''
@@ -68,8 +71,8 @@ Private mInternalCall       As Boolean
 ' @remarks Calling this property is only valid after the <b>TransformFinalBlock</b> has been called.
 '
 Public Property Get Hash() As Byte()
-    Call VerifyNotDisposed
-
+    VerifyNotDisposed
+    
     If Not mHashFinished Then _
         Throw Cor.NewInvalidOperationException("Cannot get Hash until TransformFinalBlock is called.")
 
@@ -88,18 +91,21 @@ End Property
 ' <p>If data has already been processed using TransformBlock, then that data will be included in the hashing process.</p>
 '
 Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     
     Select Case VarType(Source)
-        Case corByteArray:   Call ComputeHashOnBytes(Source, Index, Count)
-        Case vbObject:      Call ComputeHashOnStream(Source)
-        Case Else:          Throw Cor.NewArgumentException("Invalid source. Must be a byte array or Stream object.", "Source")
+        Case corByteArray
+            ComputeHashOnBytes Source, Index, Count
+        Case vbObject
+            ComputeHashOnStream Source
+        Case Else
+            Throw Cor.NewArgumentException("Invalid source. Must be a byte array or Stream object.", "Source")
     End Select
     
-    Dim Ret() As Byte
-    Ret = mCore.HashFinal(mBuffer, mBytesBuffered, mMessageLength)
-    Call InternalInitialize
-    ComputeHash = Ret
+    Dim Result() As Byte
+    Result = mCore.HashFinal(mBuffer, mBytesBuffered, mMessageLength)
+    InternalInitialize
+    ComputeHash = Result
 End Function
 
 ''
@@ -118,23 +124,23 @@ End Function
 ' the hash computation.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     
     Dim Result As Long
     Result = VerifyArrayRange(SAPtr(InputBuffer), InputOffset, InputCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputOffset", InputCount, "InputCount")
     
-    Call HashCore(InputBuffer, InputOffset, InputCount)
+    HashCore InputBuffer, InputOffset, InputCount
     
     If Not CorArray.IsNull(OutputBuffer) Then
         ' We won't bother to copy if the OutputBuffer and offset are the same as
-        ' the InputBuffer and offset since this would must be copying the same
+        ' the InputBuffer and offset since this would be copying the same
         ' data over the top of itself.
         If (SAPtr(InputBuffer) <> SAPtr(OutputBuffer)) Or (InputOffset <> OutputOffset) Then
             Result = VerifyArrayRange(SAPtr(OutputBuffer), OutputOffset, InputCount)
             If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "OutputBuffer", OutputOffset, "OutputBuffer", InputCount, "OutputCount")
                 
-            Call CopyMemory(OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount)
+            CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
         End If
     End If
     
@@ -157,7 +163,7 @@ End Function
 ' to allow computing of a new hash value.</p>
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     
     If CorArray.IsNull(InputBuffer) Then _
         Throw Cor.NewArgumentNullException("InputBuffer")
@@ -166,20 +172,20 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     If (CorArray.Length(InputBuffer) - InputCount < InputOffset) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
-    Dim Ret() As Byte
+    Dim Result() As Byte
     If InputCount > 0 Then
-        Call HashCore(InputBuffer, InputOffset, InputCount)
+        HashCore InputBuffer, InputOffset, InputCount
         
-        ReDim Ret(0 To InputCount - 1)
-        Call CopyMemory(Ret(0), InputBuffer(InputOffset), InputCount)
+        ReDim Result(0 To InputCount - 1)
+        CopyMemory Result(0), InputBuffer(InputOffset), InputCount
     Else
-        Ret = Cor.NewBytes
+        Result = Cor.NewBytes
     End If
     
     mHash = mCore.HashFinal(mBuffer, mBytesBuffered, mMessageLength)
     mHashFinished = True
-    Call InternalInitialize
-    TransformFinalBlock = Ret
+    InternalInitialize
+    TransformFinalBlock = Result
 End Function
 
 ''
@@ -202,50 +208,64 @@ End Sub
 ' source to be responsible for calling that method.
 '
 Public Sub Initialize()
-    If mExecutingCall Then Exit Sub
+    If mExecutingCall Then
+        Exit Sub
+    End If
+    
     mExecutingCall = True
     
-    If mInternalCall Then Call mCore.Initialize
-    If mUseBuffer Then ReDim mBuffer(0 To mBlockSize - 1)
-    mBytesBuffered = 0
-    mMessageLength = 0@
+    If mInternalCall Then
+        mCore.Initialize
+    End If
     
+    If mUseBuffer Then
+        ReDim mBuffer(0 To mBlockSize - 1)
+    End If
+    
+    mBytesBuffered = 0
+    mMessageLength = 0
     mExecutingCall = False
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Callback As IHashAlgorithm, ByVal KeepWeakReference As Boolean, ByVal UseBuffer As Boolean, ByVal BlockSize As Long)
     mUseBuffer = UseBuffer
     mBlockSize = BlockSize
-    mKeepWeakReference = KeepWeakReference
     
     If KeepWeakReference Then
         ObjectPtr(mCore) = ObjectPtr(Callback)
+        mKeepWeakReference = True
     Else
         Set mCore = Callback
     End If
 End Sub
 
+Private Sub Class_Terminate()
+    If mKeepWeakReference Then ObjectPtr(mCore) = vbNullPtr
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InternalInitialize()
     mInternalCall = True
-    Call Initialize
+    Initialize
     mInternalCall = False
 End Sub
 
 Private Sub HashCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
-    If Count = 0 Then Exit Sub
+    If Count = 0 Then
+        Exit Sub
+    End If
     
     mMessageLength = mMessageLength + Count
     
     If Not mUseBuffer Then
-        Call mCore.HashCore(Bytes, Index, Count)
+        mCore.HashCore Bytes, Index, Count
         Exit Sub
     End If
     
@@ -256,35 +276,35 @@ Private Sub HashCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As 
         
         ' we only want to copy enough into the buffer to just fill it, if possible.
         AmountToCopy = CorMath.Min(mBlockSize - mBytesBuffered, Count)
-        Call CopyMemory(mBuffer(mBytesBuffered), Bytes(Index), AmountToCopy)
+        CopyMemory mBuffer(mBytesBuffered), Bytes(Index), AmountToCopy
         mBytesBuffered = mBytesBuffered + AmountToCopy
         Index = Index + AmountToCopy
         Count = Count - AmountToCopy
         
         ' if we filled the buffer then compute the hash and start over.
         If mBytesBuffered = mBlockSize Then
-            Call mCore.HashCore(mBuffer, 0, mBlockSize)
+            mCore.HashCore mBuffer, 0, mBlockSize
             mBytesBuffered = 0
         End If
     End If
     
     ' process as many full blocks as we can.
     Do While Count >= mBlockSize
-        Call mCore.HashCore(Bytes, Index, mBlockSize)
+        mCore.HashCore Bytes, Index, mBlockSize
         Index = Index + mBlockSize
         Count = Count - mBlockSize
     Loop
     
     ' and store any remaining partial blocks.
     If Count > 0 Then
-        Call CopyMemory(mBuffer(0), Bytes(Index), Count)
+        CopyMemory mBuffer(0), Bytes(Index), Count
         mBytesBuffered = Count
     End If
 End Sub
 
 Private Sub ComputeHashOnStream(ByRef Source As Variant)
     If Source Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Source")
+        Error.ArgumentNull "Source", ArgumentNull_Generic
     If Not TypeOf Source Is Stream Then _
         Throw Cor.NewArgumentException("Source must implement the Stream interface.", "Source")
     
@@ -292,11 +312,13 @@ Private Sub ComputeHashOnStream(ByRef Source As Variant)
     Set Stream = Source
     
     ReDim InputBuffer(4095) As Byte
+    Dim BytesRead           As Long
     Do
-        Dim BytesRead As Long
         BytesRead = Stream.ReadBlock(InputBuffer, 0, 4096)
-        If BytesRead = 0 Then Exit Do
-        Call HashCore(InputBuffer, 0, BytesRead)
+        If BytesRead = 0 Then
+            Exit Do
+        End If
+        HashCore InputBuffer, 0, BytesRead
     Loop
 End Sub
 
@@ -311,17 +333,19 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Source", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
     
     On Error GoTo errTrap
-    Call ClearException
+    ClearException
     
     Dim Bytes() As Byte
     SAPtr(Bytes) = pSA
-    Call HashCore(Bytes, ElemIndex, ElemCount)
+    HashCore Bytes, ElemIndex, ElemCount
 
 errTrap:
     SAPtr(Bytes) = vbNullPtr
     
     Dim Ex As Exception
-    If Catch(Ex) Then Throw Ex
+    If Catch(Ex) Then
+        Throw Ex
+    End If
 End Sub
 
 Private Sub VerifyNotDisposed()
@@ -330,10 +354,3 @@ Private Sub VerifyNotDisposed()
     End If
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    If mKeepWeakReference Then ObjectPtr(mCore) = vbNullPtr
-End Sub
