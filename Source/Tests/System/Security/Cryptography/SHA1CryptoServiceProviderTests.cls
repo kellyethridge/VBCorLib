@@ -150,6 +150,57 @@ Public Sub Hash_BeforeTransformFinalBlockIsCalled_ThrowsInvalidOperationExceptio
     AssertInvalidOperationException Err
 End Sub
 
+Public Sub TransformBlock_WithNullInputBuffer_ThrowsArgumentNullException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Bytes() As Byte
+    
+    On Error Resume Next
+    Provider.TransformBlock Bytes, 0, 1, Bytes, 0
+    
+    AssertArgumentNullException Err, "InputBuffer"
+End Sub
+
+Public Sub TransformBlock_WithInputOffsetLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Bytes(2 To 5) As Byte
+    
+    On Error Resume Next
+    Provider.TransformBlock Bytes, 1, 1, Bytes, 2
+    
+    AssertArgumentOutOfRangeException Err, "InputOffset"
+End Sub
+
+Public Sub TransformBlock_WithInputOffsetPlusInputCountGreaterThanUBound_ThrowsArgumentException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Bytes(0 To 5) As Byte
+    
+    On Error Resume Next
+    Provider.TransformBlock Bytes, 0, 7, Bytes, 0
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub TransformBlock_WithOutputOffsetLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Bytes(2 To 5) As Byte
+    
+    On Error Resume Next
+    Provider.TransformBlock Bytes, 2, 4, Bytes, 1
+    
+    AssertArgumentOutOfRangeException Err, "OutputOffset"
+End Sub
+
+Public Sub TransformBlock_WithOutputOffsetPlusInputCountGreaterThanUBound_ThrowsArgumentException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Bytes(2 To 5) As Byte
+    
+    On Error Resume Next
+    Provider.TransformBlock Bytes, 2, 4, Bytes, 3
+    
+    AssertArgumentException Err
+End Sub
+
+
 Private Function HexToBytes(ByRef s As String) As Byte()
     s = Replace$(s, " ", "")
     Dim Bytes() As Byte

@@ -76,7 +76,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IHashAlgorithm_HashCore(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
     If CryptHashData(mHasher, Bytes(Index), Count, 0) = BOOL_FALSE Then
-        Throw Cor.NewCryptographicException("Could not perform hash on data.")
+        Throw Cor.NewCryptographicException("Could not perform hash on data->" & GetMessage(Err.LastDllError))
     End If
 End Sub
 
@@ -85,7 +85,7 @@ Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal ByteCoun
     ReDim Result(0 To mHashSize - 1)
     
     If CryptGetHashParam(mHasher, HP_HASHVAL, Result(0), mHashSize, 0) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException("Could not retrieve hash value from service provider. " & GetMessage(Err.LastDllError))
+        Throw Cor.NewCryptographicException("Could not retrieve hash value from service provider->" & GetMessage(Err.LastDllError))
     
     IHashAlgorithm_HashFinal = Result
 End Function

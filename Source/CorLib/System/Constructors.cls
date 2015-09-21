@@ -1544,7 +1544,7 @@ End Function
 '
 Public Function NewHashAlgorithmBase(ByVal Callback As IHashAlgorithm, Optional ByVal KeepWeakReference As Boolean, Optional ByVal UseBuffer As Boolean, Optional ByVal BlockSize As Long) As HashAlgorithmBase
     Set NewHashAlgorithmBase = New HashAlgorithmBase
-    Call NewHashAlgorithmBase.Init(Callback, KeepWeakReference, UseBuffer, BlockSize)
+    NewHashAlgorithmBase.Init Callback, KeepWeakReference, UseBuffer, BlockSize
 End Function
 
 ''
@@ -1559,7 +1559,7 @@ End Function
 '
 Public Function NewCryptoAPIHash(ByVal HashAlg As Long, ByVal HashSize As Long) As CryptoAPIHash
     Set NewCryptoAPIHash = New CryptoAPIHash
-    Call NewCryptoAPIHash.Init(HashAlg, HashSize)
+    NewCryptoAPIHash.Init HashAlg, HashSize
 End Function
 
 ''
@@ -1572,7 +1572,7 @@ End Function
 '
 Public Function NewHMACSHA1(ByRef Key() As Byte, Optional ByVal UseManagedSha1 As Boolean = False) As HMACSHA1
     Set NewHMACSHA1 = New HMACSHA1
-    Call NewHMACSHA1.Init(Key, UseManagedSha1)
+    NewHMACSHA1.Init Key, UseManagedSha1
 End Function
 
 ''
