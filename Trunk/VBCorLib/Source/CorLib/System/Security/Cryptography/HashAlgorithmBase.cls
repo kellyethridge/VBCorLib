@@ -74,7 +74,7 @@ Public Property Get Hash() As Byte()
     VerifyNotDisposed
     
     If Not mHashFinished Then _
-        Throw Cor.NewInvalidOperationException("Cannot get Hash until TransformFinalBlock is called.")
+        Error.InvalidOperation Cryptography_HashNotYetFinalized
 
     Hash = mHash
 End Property
@@ -99,7 +99,7 @@ Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Var
         Case vbObject
             ComputeHashOnStream Source
         Case Else
-            Throw Cor.NewArgumentException("Invalid source. Must be a byte array or Stream object.", "Source")
+            Error.Argument Argument_ByteArrayOrStreamRequired, "Source"
     End Select
     
     Dim Result() As Byte
@@ -126,19 +126,24 @@ End Function
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
     VerifyNotDisposed
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InputBuffer), InputOffset, InputCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputOffset", InputCount, "InputCount")
+    If SAPtr(InputBuffer) = vbNullPtr Then _
+        Error.ArgumentNull "InputBuffer"
+    If InputOffset < LBound(InputBuffer) Then _
+        Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
+    If InputOffset + InputCount - 1 > UBound(InputBuffer) Then _
+        Error.Argument Argument_InvalidOffLen
     
     HashCore InputBuffer, InputOffset, InputCount
     
-    If Not CorArray.IsNull(OutputBuffer) Then
+    If SAPtr(OutputBuffer) <> vbNullPtr Then
         ' We won't bother to copy if the OutputBuffer and offset are the same as
         ' the InputBuffer and offset since this would be copying the same
         ' data over the top of itself.
         If (SAPtr(InputBuffer) <> SAPtr(OutputBuffer)) Or (InputOffset <> OutputOffset) Then
-            Result = VerifyArrayRange(SAPtr(OutputBuffer), OutputOffset, InputCount)
-            If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "OutputBuffer", OutputOffset, "OutputBuffer", InputCount, "OutputCount")
+            If OutputOffset < LBound(OutputBuffer) Then _
+                Error.ArgumentOutOfRange "OutputOffset", ArgumentOutOfRange_ArrayLB
+            If OutputOffset + InputCount - 1 > UBound(OutputBuffer) Then _
+                Error.Argument Argument_InvalidOffLen
                 
             CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
         End If
@@ -306,7 +311,7 @@ Private Sub ComputeHashOnStream(ByRef Source As Variant)
     If Source Is Nothing Then _
         Error.ArgumentNull "Source", ArgumentNull_Generic
     If Not TypeOf Source Is Stream Then _
-        Throw Cor.NewArgumentException("Source must implement the Stream interface.", "Source")
+        Error.Argument Argument_StreamRequired, "Source"
     
     Dim Stream As Stream
     Set Stream = Source

@@ -33,6 +33,7 @@ Public Enum ResourceStringKey
     UnauthorizedAccess_IODenied_NoPathName = 107
     UnauthorizedAccess_IODenied_Path = 108
     XMLSyntax_InvalidSyntax = 109
+    Cryptography_HashNotYetFinalized = 110
     
     Arg_PathIllegal = 200
     Arg_PathIllegalUNC = 201
@@ -114,6 +115,7 @@ Public Enum ResourceStringKey
     Argument_AddingDuplicate = 845
     Argument_AddingDuplicate_Key = 846
     Argument_InvalidArrayLength = 847
+    Argument_ByteArrayOrStreamRequired = 848
     
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
@@ -161,6 +163,8 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_IndexCount = 735
     ArgumentOutOfRange_Bounds_Lower_Upper = 736
     ArgumentOutOfRange_DecimalScale = 737
+    
+    
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
