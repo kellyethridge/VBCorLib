@@ -89,7 +89,7 @@ Public Sub TransformFinalBlock_WithByteArray_ReturnsExpected(ByVal Message As St
     Dim ActualHash()    As Byte
     Dim ActualInput()   As Byte
     ActualInput = Provider.TransformFinalBlock(Bytes, 0, CorArray.Length(Bytes))
-    ActualHash = Provider.Hash
+    ActualHash = Provider.hash
     
     Dim Expected() As Byte
     Expected = HexToBytes(Digest)
@@ -112,7 +112,7 @@ Public Sub TransformBlock_With1ByteAtATime_ComputesExpected(ByVal Message As Str
     Dim Expected() As Byte
     Expected = HexToBytes(Digest)
     Assert.That Provider.TransformFinalBlock(PT, UBound(PT) + 1, 0), Iz.Empty
-    Assert.That Provider.Hash, Iz.EqualTo(Expected)
+    Assert.That Provider.hash, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TransformBlock_With5BytesAtATime_ComputesExpected(ByVal Message As String, ByVal Digest As String)
@@ -135,7 +135,7 @@ Public Sub TransformBlock_With5BytesAtATime_ComputesExpected(ByVal Message As St
     
     Dim Expected() As Byte
     Expected = HexToBytes(Digest)
-    Assert.That Provider.Hash, Iz.EqualTo(Expected)
+    Assert.That Provider.hash, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Hash_BeforeTransformFinalBlockIsCalled_ThrowsInvalidOperationException()
@@ -145,7 +145,7 @@ Public Sub Hash_BeforeTransformFinalBlockIsCalled_ThrowsInvalidOperationExceptio
     
     On Error Resume Next
     Dim Actual() As Byte
-    Actual = Provider.Hash
+    Actual = Provider.hash
     
     AssertInvalidOperationException Err
 End Sub
