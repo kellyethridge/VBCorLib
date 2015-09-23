@@ -362,6 +362,7 @@ VersionCompanyName="Home"
 VersionFileDescription="VB.EXT Core Class Library"
 VersionLegalCopyright="Copyright Kelly Ethridge"
 VersionProductName="VB.EXT: CorLib 3.0"
+CondComp="RELEASE = 0"
 CompilationType=0
 OptimizationType=0
 FavorPentiumPro(tm)=0
