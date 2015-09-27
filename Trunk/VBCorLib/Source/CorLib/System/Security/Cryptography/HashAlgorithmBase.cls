@@ -249,7 +249,9 @@ Friend Sub Init(ByVal Callback As IHashAlgorithm, ByVal KeepWeakReference As Boo
 End Sub
 
 Private Sub Class_Terminate()
-    If mKeepWeakReference Then ObjectPtr(mCore) = vbNullPtr
+    If mKeepWeakReference Then
+        ObjectPtr(mCore) = vbNullPtr
+    End If
 End Sub
 
 
@@ -316,8 +318,8 @@ Private Sub ComputeHashOnStream(ByRef Source As Variant)
     Dim Stream As Stream
     Set Stream = Source
     
-    ReDim InputBuffer(4095) As Byte
-    Dim BytesRead           As Long
+    Dim InputBuffer(0 To 4095)  As Byte
+    Dim BytesRead               As Long
     Do
         BytesRead = Stream.ReadBlock(InputBuffer, 0, 4096)
         If BytesRead = 0 Then
@@ -328,29 +330,34 @@ Private Sub ComputeHashOnStream(ByRef Source As Variant)
 End Sub
 
 Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    Dim pSA As Long
-    pSA = CorArray.ArrayPointer(Source)
+    On Error GoTo Catch
     
-    Dim Result      As Long
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Result = GetOptionalArrayRange(pSA, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Source", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Dim Buffer() As Byte
+    SAPtr(Buffer) = CorArray.ArrayPointer(Source)
     
-    On Error GoTo errTrap
-    ClearException
+    If SAPtr(Buffer) = vbNullPtr Then _
+        Error.ArgumentNull "Source", ArgumentNull_Array
     
-    Dim Bytes() As Byte
-    SAPtr(Bytes) = pSA
-    HashCore Bytes, ElemIndex, ElemCount
-
-errTrap:
-    SAPtr(Bytes) = vbNullPtr
+    Dim Range As ListRange
+    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
+    If Range.Index < LBound(Buffer) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Count < 0 Or Range.Count > CorArray.LengthFirstDim(Buffer) Then _
+        Error.Argument Argument_InvalidValue, "Count"
+    If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
+        Error.Argument Argument_InvalidOffLen
     
-    Dim Ex As Exception
-    If Catch(Ex) Then
-        Throw Ex
-    End If
+    HashCore Buffer, Range.Index, Range.Count
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
+    Throw
+    
+Finally:
+    SAPtr(Buffer) = vbNullPtr
+    Return
 End Sub
 
 Private Sub VerifyNotDisposed()

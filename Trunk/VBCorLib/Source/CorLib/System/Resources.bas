@@ -116,6 +116,7 @@ Public Enum ResourceStringKey
     Argument_AddingDuplicate_Key = 846
     Argument_InvalidArrayLength = 847
     Argument_ByteArrayOrStreamRequired = 848
+    Argument_InvalidValue = 849
     
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
