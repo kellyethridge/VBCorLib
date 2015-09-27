@@ -57,6 +57,16 @@ Public Sub Constructor_WhenCalled_SetsDefaultValues()
     Assert.That Provider.CanTransformMultipleBlocks, Iz.True
 End Sub
 
+Public Sub ComputeHash_WithNonSupportedType_ThrowsArgumentException()
+    Dim InvalidType(0 To 100) As Long
+    Dim Provider As New SHA1CryptoServiceProvider
+    
+    On Error Resume Next
+    Provider.ComputeHash InvalidType
+    
+    AssertArgumentException Err, "Source"
+End Sub
+
 Public Sub ComputeHash_WithByteArray_ReturnsExpected(ByVal Message As String, ByVal Digest As String)
     Dim Provider As New SHA1CryptoServiceProvider
     
@@ -66,6 +76,56 @@ Public Sub ComputeHash_WithByteArray_ReturnsExpected(ByVal Message As String, By
     Dim Expected() As Byte
     Expected = HexToBytes(Digest)
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ComputeHash_WithNullByteArray_ThrowsArgumentNullException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim NullArray() As Byte
+    
+    On Error Resume Next
+    Provider.ComputeHash NullArray
+    
+    AssertArgumentNullException Err, "Source"
+End Sub
+
+Public Sub ComputeHash_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Message(5 To 10) As Byte
+    
+    On Error Resume Next
+    Provider.ComputeHash Message, 4, 4
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub ComputeHash_WithCountLessThanZero_ThrowsArgumentException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Message(5 To 10) As Byte
+    
+    On Error Resume Next
+    Provider.ComputeHash Message, 5, -1
+    
+    AssertArgumentException Err, "Count"
+End Sub
+
+Public Sub ComputeHash_WithCountGreaterThanBufferLength_ThrowsArgumentException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Message(5 To 10) As Byte
+    
+    On Error Resume Next
+    Provider.ComputeHash Message, 5, 7
+    
+    AssertArgumentException Err, "Count"
+End Sub
+
+Public Sub ComputeHash_WithIndexPlusCountGreaterThanUBound_ThrowsArgumentOutOfRangeException()
+    Dim Provider As New SHA1CryptoServiceProvider
+    Dim Message(5 To 10) As Byte
+    
+    On Error Resume Next
+    Provider.ComputeHash Message, 10, 2
+    
+    AssertArgumentException Err
 End Sub
 
 Public Sub ComputeHash_WithStream_ReturnsExpected(ByVal Message As String, ByVal Digest As String)
