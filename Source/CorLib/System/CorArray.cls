@@ -806,7 +806,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     If Range.Count < 0 Or Range.Index + Range.Count - 1 > UBound(Arr) Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     If TrySZIndexOf(Ptr, Value, Range.Index, Range.Count, IndexOf) Then
         Exit Function
     End If
@@ -822,7 +822,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     IndexOf = LBound(Arr) - 1
     Exit Function
     
-errTrap:
+Catch:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
@@ -863,7 +863,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     If TrySZLastIndexOf(Ptr, Value, ElemIndex, ElemCount, LastIndexOf) Then
         Exit Function
     End If
@@ -880,7 +880,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     LastIndexOf = LBound(Arr) - 1
     Exit Function
     
-errTrap:
+Catch:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 
@@ -1091,8 +1091,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
         SetSortItems ItemsPtr
     End If
     
-    On Error GoTo errTrap
-    ClearException
+    On Error GoTo Catch
     Select Case VarType(Comparer)
         ' use an IComparer object to sort with.
         Case vbObject
@@ -1127,12 +1126,17 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
             Error.Argument Argument_InvalidComparer, "Comparer"
     End Select
     
-    CleanUpSortRoutine
+    GoSub Finally
     Exit Sub
     
-errTrap:
-    CleanUpSortRoutine
+Catch:
+    GoSub Finally
     Throw
+Finally:
+    ClearSortKeys
+    ClearSortItems
+    Set SortComparer = Nothing
+    Return
 End Sub
 
 Private Sub CleanUpSortRoutine()
@@ -1173,7 +1177,7 @@ Friend Function ArrayPointer(ByRef Arg As Variant) As Long
 End Function
 
 Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
-    On Error GoTo errTrap
+    On Error GoTo Catch
     
     If Comparer Is Nothing Then
         If CorArraySearch.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, InternalBinarySearch) Then
@@ -1205,7 +1209,8 @@ Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, 
     
     InternalBinarySearch = (Not (LowIndex - LBound(Arr))) + LBound(Arr)
     Exit Function
-errTrap:
+    
+Catch:
     Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Comparer_Arg, Err.Description))
 End Function
 

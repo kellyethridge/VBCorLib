@@ -24,7 +24,7 @@ Public Sub Message_WithDefaultConstructor_ReturnsDefaultMessage()
     Dim Actual As String
     Actual = Ex.Message
     
-    Assert.That Actual, Iz.EqualTo("Exception of type 'VBCorLib.Exception' was thrown.")
+    Assert.That Actual, Iz.EqualTo("Exception of type 'CorLib.Exception' was thrown.")
 End Sub
 
 Public Sub Constructor_WithMessage_StoresMessage()

@@ -454,7 +454,7 @@ Private Function ReadOneChar() As Long
 End Function
 
 Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
-    Dim BufferPtr   As Long
+    Dim BufferPtr As Long
     BufferPtr = CorArray.ArrayPointer(Buffer)
     Validation.CheckValidSingleDimArrayPtr BufferPtr, Parameter_Buffer
     
@@ -485,8 +485,15 @@ Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     SAPtr(Buffer) = BufferPtr
     ReadToByteBuffer = mStream.ReadBlock(Buffer, BufferRange.Index, BufferRange.Count)
     
+    GoSub Finally
+    Exit Function
+    
 Catch:
+    GoSub Finally
+    Throw Err
+Finally:
     SAPtr(Buffer) = vbNullPtr
+    Return
 End Function
 
 Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As ListRange) As Long
@@ -496,8 +503,15 @@ Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     SAPtr(Buffer) = BufferPtr
     ReadToCharBuffer = ReadCharBytes(Buffer, BufferRange.Index, BufferRange.Count)
     
+    GoSub Finally
+    Exit Function
+    
 Catch:
+    GoSub Finally
+    Throw Err
+Finally:
     SAPtr(Buffer) = vbNullPtr
+    Return
 End Function
 
 Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
