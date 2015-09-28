@@ -90,8 +90,12 @@ End Function
 ' Acquires a DSA specific context from a provider.
 '
 Friend Function AcquireDSAContext(Optional ByRef ContainerName As String, Optional ByRef ProviderName As String, Optional ByRef ProviderType As Long, Optional ByVal Flags As Long) As Long
-    If Len(ProviderName) = 0 Then ProviderName = mDSAProviderName
-    If ProviderType = 0 Then ProviderType = PROV_DSS_DH
+    If Len(ProviderName) = 0 Then
+        ProviderName = mDSAProviderName
+    End If
+    If ProviderType = 0 Then
+        ProviderType = PROV_DSS_DH
+    End If
     AcquireDSAContext = AcquireContext(ContainerName, ProviderName, ProviderType, Flags)
 End Function
 
@@ -108,17 +112,27 @@ End Property
 ' @remarks If the container does not exist, it will be created.
 '
 Friend Function AcquireContext(Optional ByRef ContainerName As String, Optional ByRef ProviderName As String, Optional ByRef ProviderType As Long, Optional ByVal Flags As Long) As Long
-    If ProviderType = 0 Then ProviderType = PROV_RSA_FULL
-    If Len(ProviderName) = 0 Then ProviderName = mRSAProviderName
-    If Len(ContainerName) = 0 Then ContainerName = CorString.Format("COR{0}", Guid.NewGuid)
+    If ProviderType = 0 Then
+        ProviderType = PROV_RSA_FULL
+    End If
+    If Len(ProviderName) = 0 Then
+        ProviderName = mRSAProviderName
+    End If
+    If Len(ContainerName) = 0 Then
+        ContainerName = CorString.Format("COR{0}", Guid.NewGuid)
+    End If
     
     ' Try to acquire a provider with a new key container.
     If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags Or CRYPT_NEWKEYSET) = BOOL_FALSE Then
         ' We fail if an error occurs other than the key container already existing.
-        If Err.LastDllError <> NTE_EXISTS Then Call CryptoError
+        If Err.LastDllError <> NTE_EXISTS Then
+            CryptoError
+        End If
         
         ' Attempt to acquire the existing key container, failing on any error.
-        If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags) = BOOL_FALSE Then Call CryptoError
+        If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags) = BOOL_FALSE Then
+            CryptoError
+        End If
     End If
 End Function
 
@@ -126,7 +140,9 @@ End Function
 ' Releases an existing context with the option to delete all keys contained in the associated key container.
 '
 Friend Sub ReleaseContext(ByVal Provider As Long, Optional ByVal DeleteKeySet As Boolean)
-    If Provider = vbNullPtr Then Exit Sub
+    If Provider = vbNullPtr Then
+        Exit Sub
+    End If
     
     Dim ContainerName   As String
     Dim ProviderName    As String
@@ -138,7 +154,9 @@ Friend Sub ReleaseContext(ByVal Provider As Long, Optional ByVal DeleteKeySet As
         ProviderType = GetProvParamLong(Provider, PP_PROVTYPE)
     End If
     
-    If CryptReleaseContext(Provider, 0) = BOOL_FALSE Then Call CryptoError
+    If CryptReleaseContext(Provider, 0) = BOOL_FALSE Then
+        CryptoError
+    End If
     
     If DeleteKeySet Then
         CryptAcquireContext Provider, ContainerName, ProviderName, ProviderType, CRYPT_DELETEKEYSET
@@ -150,16 +168,20 @@ End Sub
 '
 Friend Function ImportPlainTextKey(ByVal Provider As Long, ByVal AlgId As Long, ByRef RgbKey() As Byte, Optional ByVal UseSalt As Boolean) As Long
     If mExponentOfOneKey = vbNullPtr Then
-        Call CreateExponentOfOneKey
+        CreateExponentOfOneKey
     End If
     
     Dim Flags As Long
-    If Not UseSalt Then Flags = CRYPT_NO_SALT
+    If Not UseSalt Then
+        Flags = CRYPT_NO_SALT
+    End If
     
     Dim Blob As SIMPLEBLOB512
     Blob = CreateSessionBlob(AlgId, RgbKey)
     
-    If CryptImportKey(Provider, Blob, Len(Blob), mExponentOfOneKey, Flags, ImportPlainTextKey) = BOOL_FALSE Then CryptoError
+    If CryptImportKey(Provider, Blob, Len(Blob), mExponentOfOneKey, Flags, ImportPlainTextKey) = BOOL_FALSE Then
+        CryptoError
+    End If
 End Function
 
 ''
@@ -167,7 +189,9 @@ End Function
 '
 Friend Sub DestroyKey(ByVal Key As Long)
     If Key <> vbNullPtr Then
-        If CryptDestroyKey(Key) = BOOL_FALSE Then Call CryptoError
+        If CryptDestroyKey(Key) = BOOL_FALSE Then
+            CryptoError
+        End If
     End If
 End Sub
 
@@ -175,7 +199,9 @@ End Sub
 ' Returns a numeric parameter from the specified provider.
 '
 Friend Function GetProvParamLong(ByVal Provider As Long, ByVal Param As Long, Optional ByVal Flags As Long) As Long
-    If CryptGetProvParam(Provider, Param, GetProvParamLong, 4, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetProvParam(Provider, Param, GetProvParamLong, 4, Flags) = BOOL_FALSE Then
+        CryptoError
+    End If
 End Function
 
 ''
@@ -183,12 +209,16 @@ End Function
 '
 Friend Function GetProvParamString(ByVal Provider As Long, ByVal Param As Long, Optional ByVal Flags As Long) As String
     Dim Size As Long
-    If CryptGetProvParam(Provider, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetProvParam(Provider, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then
+        CryptoError
+    End If
     
     Dim Bytes() As Byte
     ReDim Bytes(0 To Size - 1)
     
-    If CryptGetProvParam(Provider, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetProvParam(Provider, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then
+        CryptoError
+    End If
         
     GetProvParamString = Left$(StrConv(Bytes, vbUnicode), Size - 1)
 End Function
@@ -197,7 +227,9 @@ End Function
 ' Returns a numeric parameter from the speicified key.
 '
 Friend Function GetKeyParamLong(ByVal Key As Long, ByVal Param As Long, Optional ByVal Flags As Long) As Long
-    If CryptGetKeyParam(Key, Param, GetKeyParamLong, 4, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetKeyParam(Key, Param, GetKeyParamLong, 4, Flags) = BOOL_FALSE Then
+        CryptoError
+    End If
 End Function
 
 ''
@@ -205,12 +237,16 @@ End Function
 '
 Friend Function GetKeyParamString(ByVal Key As Long, ByVal Param As Long, Optional ByVal Flags As Long) As String
     Dim Size As Long
-    If CryptGetKeyParam(Key, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetKeyParam(Key, Param, ByVal 0&, Size, Flags) = BOOL_FALSE Then
+        CryptoError
+    End If
     
     Dim Bytes() As Byte
     ReDim Bytes(0 To Size - 1)
     
-    If CryptGetKeyParam(Key, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then Call CryptoError
+    If CryptGetKeyParam(Key, Param, Bytes(0), Size, Flags) = BOOL_FALSE Then
+        CryptoError
+    End If
     
     GetKeyParamString = Left$(StrConv(Bytes, vbUnicode), Size - 1)
 End Function
@@ -220,9 +256,13 @@ Friend Sub SetKeyParam(ByVal Key As Long, ByVal Param As Long, ByRef Value As Va
         Case corByteArray
             Dim bPtr As Long
             bPtr = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET)
-            If CryptSetKeyParam(Key, Param, ByVal bPtr, Flags) = BOOL_FALSE Then Call CryptoError
+            If CryptSetKeyParam(Key, Param, ByVal bPtr, Flags) = BOOL_FALSE Then
+                CryptoError
+            End If
         Case vbLong, vbInteger, vbByte
-            If CryptSetKeyParam(Key, Param, CLng(Value), Flags) = BOOL_FALSE Then Call CryptoError
+            If CryptSetKeyParam(Key, Param, CLng(Value), Flags) = BOOL_FALSE Then
+                CryptoError
+            End If
         Case Else
             Throw Cor.NewNotSupportedException(CorString.Format("Key param type '{0}' not supported.", TypeName(Value)))
     End Select
@@ -247,7 +287,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub CryptoError()
     Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
@@ -337,7 +377,9 @@ Private Sub CreateExponentOfOneKey()
     Dim Blob() As Byte
     Blob = Params.ToCspBlob(AT_KEYEXCHANGE)
     
-    If CryptImportKey(mDefaultProvider, Blob(0), CorArray.Length(Blob), 0, CRYPT_EXPORTABLE, mExponentOfOneKey) = BOOL_FALSE Then Call CryptoError
+    If CryptImportKey(mDefaultProvider, Blob(0), CorArray.Length(Blob), 0, CRYPT_EXPORTABLE, mExponentOfOneKey) = BOOL_FALSE Then
+        CryptoError
+    End If
 End Sub
 
 ''
@@ -372,7 +414,7 @@ Private Function CreateSessionBlob(ByVal AlgId As Long, ByRef RgbKey() As Byte) 
         ' that can be filled up. Deduct the key size and the extra zero byte.
         Dim Bytes() As Byte
         Bytes = CryptoHelper.GetNonZeroRandomBytes(60 - ub)
-        Call CopyMemory(.EncryptedKey(ub + 2), Bytes(0), 60 - ub)
+        CopyMemory .EncryptedKey(ub + 2), Bytes(0), 60 - ub
         
         .EncryptedKey(62) = 2
     End With
@@ -380,13 +422,17 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call DetermineProviderSupport
+    DetermineProviderSupport
 End Sub
 
 Private Sub Class_Terminate()
-    If mExponentOfOneKey <> vbNullPtr Then Call CryptDestroyKey(mExponentOfOneKey)
-    If mDefaultProvider <> vbNullPtr Then Call ReleaseContext(mDefaultProvider, True)
+    If mExponentOfOneKey <> vbNullPtr Then
+        CryptDestroyKey mExponentOfOneKey
+    End If
+    If mDefaultProvider <> vbNullPtr Then
+        ReleaseContext mDefaultProvider, True
+    End If
 End Sub

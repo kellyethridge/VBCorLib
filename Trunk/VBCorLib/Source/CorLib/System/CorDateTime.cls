@@ -690,8 +690,9 @@ End Function
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
 Public Function LessThan(ByVal dt As CorDateTime) As Boolean
-    If dt Is Nothing Then Exit Function
-    LessThan = (mMilliseconds < dt.TotalMilliseconds)
+    If Not dt Is Nothing Then
+        LessThan = (mMilliseconds < dt.TotalMilliseconds)
+    End If
 End Function
 
 ''
@@ -717,8 +718,9 @@ End Function
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
 Public Function LessThanOrEqualTo(ByVal dt As CorDateTime) As Boolean
-    If dt Is Nothing Then Exit Function
-    LessThanOrEqualTo = (mMilliseconds <= dt.TotalMilliseconds)
+    If Not dt Is Nothing Then
+        LessThanOrEqualTo = (mMilliseconds <= dt.TotalMilliseconds)
+    End If
 End Function
 
 ''
@@ -729,8 +731,9 @@ End Function
 ' @remarks This is provided for quick comprisons of two CorDateTime Objects.
 '
 Public Function EqualTo(ByVal dt As CorDateTime) As Boolean
-    If dt Is Nothing Then Exit Function
-    EqualTo = (mMilliseconds = dt.TotalMilliseconds)
+    If Not dt Is Nothing Then
+        EqualTo = (mMilliseconds = dt.TotalMilliseconds)
+    End If
 End Function
 
 ''

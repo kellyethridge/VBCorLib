@@ -286,10 +286,10 @@ End Function
 ' @remarks This method will not throw an exception if the string cannot be parsed.
 '
 Public Function TryParse(ByRef s As String, ByRef Result As CorDateTime) As Boolean
-    On Error GoTo errTrap
+    On Error GoTo Catch
     Set Result = Parse(s)
     TryParse = True
-errTrap:
+Catch:
 End Function
 
 ''

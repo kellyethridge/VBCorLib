@@ -120,7 +120,7 @@ Public Function EncodeOID(ByVal Str As String) As Byte()
     If UBound(Octets) = 0 Then _
         Throw Cor.NewCryptographicException("Invalid OID.")
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     
     EncodingStream.WriteByte X680_OBJECT_IDENTIFIER_TYPE_TAG
     EncodingStream.WriteByte 0 ' place holder for the length.
@@ -143,7 +143,7 @@ Public Function EncodeOID(ByVal Str As String) As Byte()
     EncodeOID = Ret
     Exit Function
     
-errTrap:
+Catch:
     Throw Cor.NewCryptographicException("Invalid OID.")
 End Function
 
@@ -173,7 +173,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ' X.690 8.19.2
@@ -198,6 +198,6 @@ Private Function EncodeNumber(ByVal Value As Long, ByRef Result() As Byte) As Lo
 End Function
 
 ' X.690 8.19.4
-Private Function EncodeFirstTwoIdentifiers(ByVal x As Long, ByVal y As Long) As Long
-    EncodeFirstTwoIdentifiers = (x * 40) + y
+Private Function EncodeFirstTwoIdentifiers(ByVal X As Long, ByVal Y As Long) As Long
+    EncodeFirstTwoIdentifiers = (X * 40) + Y
 End Function
