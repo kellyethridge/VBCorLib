@@ -69,7 +69,6 @@ Private mCurrentUICulture   As CultureInfo
 Private mInstalledUICulture As CultureInfo
 
 
-
 ''
 ' Returns a ReadOnly wrapped CultureInfo object.
 '

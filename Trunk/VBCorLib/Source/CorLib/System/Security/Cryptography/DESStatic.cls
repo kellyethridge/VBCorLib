@@ -115,7 +115,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyKeySize(ByRef RgbKey As Variant)
     If CorArray.IsNull(RgbKey) Then _
@@ -173,7 +173,8 @@ Private Function Parse64BitKeyString(ByVal s As String) As Currency
 End Function
 
 Private Function Get64BitKey(ByRef RgbKey() As Byte) As Currency
-    Call VerifyKeySize(RgbKey)
+    Const ParityBit As Byte = 1
+    VerifyKeySize RgbKey
     
     Dim lb      As Long
     lb = LBound(RgbKey)
@@ -181,7 +182,7 @@ Private Function Get64BitKey(ByRef RgbKey() As Byte) As Currency
     Dim b(7)    As Byte
     Dim i       As Long
     For i = 0 To 7
-        b(i) = RgbKey(i + lb) Or 1 ' we set the parity bit to on
+        b(i) = RgbKey(i + lb) Or ParityBit
     Next i
     
     Get64BitKey = AsCurr(b(0))
@@ -197,10 +198,10 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call InitWeakKeys
-    Call InitSemiWeakKeys
-    Call InitLegalSizes
+    InitWeakKeys
+    InitSemiWeakKeys
+    InitLegalSizes
 End Sub

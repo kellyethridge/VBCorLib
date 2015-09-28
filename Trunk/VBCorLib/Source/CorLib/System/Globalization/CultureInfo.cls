@@ -48,7 +48,6 @@ Implements IObject
 Implements ICloneable
 Implements IFormatProvider
 
-
 Private Const PROP_LCID                             As String = "LCID"
 Private Const PROP_PARENTLCID                       As String = "ParentLCID"
 Private Const PROP_NAME                             As String = "Name"
@@ -332,14 +331,14 @@ End Property
 '
 ' @param RHS The NumberFormatInfo to associate with this object instance.
 '
-Public Property Set NumberFormat(ByVal RHS As NumberFormatInfo)
+Public Property Set NumberFormat(ByVal Value As NumberFormatInfo)
     VerifyWritable
-    If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("NumberFormat")
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
     If IsNeutralCulture Then _
         Throw Cor.NewNotSupportedException("Neutral cultures cannot provide formatting.")
         
-    Set mNumberFormat = RHS
+    Set mNumberFormat = Value
 End Property
 
 ''
@@ -365,10 +364,10 @@ End Property
 '
 ' @param RHS The DateTimeFormatInfo object to associate with this object instance.
 '
-Public Property Set DateTimeFormat(ByVal RHS As DateTimeFormatInfo)
+Public Property Set DateTimeFormat(ByVal Value As DateTimeFormatInfo)
     VerifyWritable
-    If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("DateTimeFormat")
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
     If IsNeutralCulture Then _
         Throw Cor.NewNotSupportedException("Neutral cultures cannot provide formatting.")
     

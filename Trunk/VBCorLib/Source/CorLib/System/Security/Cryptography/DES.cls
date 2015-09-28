@@ -64,7 +64,7 @@ Public Property Get BlockSize() As Long: End Property
 ''
 ' Sets the block size in bits.
 '
-' @param RHS The size of the block in bits.
+' @param Value The size of the block in bits.
 ' @remarks This always returns 64.
 ' <p>The block size is the amount of data that is processed as a single unit
 ' by the cipher. It will always require a block of 64 bits (8 bytes) to operate,
@@ -72,7 +72,7 @@ Public Property Get BlockSize() As Long: End Property
 ' must be padded to meet the block size requirement. The padding is automatically
 ' performed by the routine</p>
 '
-Public Property Let BlockSize(ByVal RHS As Long): End Property
+Public Property Let BlockSize(ByVal Value As Long): End Property
 
 ''
 ' Returns the feedback size in bits.
@@ -88,14 +88,14 @@ Public Property Get FeedbackSize() As Long: End Property
 ''
 ' Sets the feedback size in bits.
 '
-' @param RHS The size of feedback in bits.
+' @param Value The size of feedback in bits.
 ' @remarks DES only supports 64 bits.
 ' <p>The feedback size determines how much of the previous data processed is to be used
 ' on the next block of data. This is to prevent identical blocks of data to appear the
 ' same when encrypted.</p>
 ' <p>Not all modes of DES support feedback.</p>
 '
-Public Property Let FeedbackSize(ByVal RHS As Long): End Property
+Public Property Let FeedbackSize(ByVal Value As Long): End Property
 
 ''
 ' Returns the Initialization Vector (IV).
@@ -110,12 +110,12 @@ Public Property Get IV() As Byte(): End Property
 ''
 ' Sets the Initialization Vectory (IV).
 '
-' @param RHS A set of bytes representing the IV.
+' @param Value A set of bytes representing the IV.
 ' @remarks Only an 8-byte array is supported.
 ' <p>When the very first block of data is process there is no previous data to pull
 ' feedback data from, so the Initialization Vector is used as a dummy set of data for feedback.</p>
 '
-Public Property Let IV(ByRef RHS() As Byte): End Property
+Public Property Let IV(ByRef Value() As Byte): End Property
 
 ''
 ' Returns the secret key used by the cryptographic operation.
@@ -129,11 +129,11 @@ Public Property Get Key() As Byte(): End Property
 ''
 ' Sets the secret key to be used by the cryptographic operation.
 '
-' @param RHS The new secret key to be used.
+' @param Value The new secret key to be used.
 ' @remarks Valid key sizes are determined by the individual algorithms. A list of valid sizes can be obtained
 ' through the <b>LegalKeySizes</b> property.
 '
-Public Property Let Key(ByRef RHS() As Byte): End Property
+Public Property Let Key(ByRef Value() As Byte): End Property
 
 ''
 ' Returns the size of the key, in bits, used by the cryptographic operation.
@@ -146,10 +146,10 @@ Public Property Get KeySize() As Long: End Property
 ''
 ' Sets the size of the key, in bits.
 '
-' @param RHS The size of the key in bits.
+' @param Value The size of the key in bits.
 ' @remarks This will cause the <b>Key</b> property to reset and regenerate when needed.
 '
-Public Property Let KeySize(ByVal RHS As Long): End Property
+Public Property Let KeySize(ByVal Value As Long): End Property
 
 ''
 ' Returns a list of legal block sizes.
@@ -178,11 +178,11 @@ Public Property Get Mode() As CipherMode: End Property
 ''
 ' Sets the mode the current algorithm is set to.
 '
-' @param RHS The new mode for the algorithm.
+' @param Value The new mode for the algorithm.
 ' @remarks The algoritm can operate in several modes. The modes determine how the data
 ' is processed from one block to the next.
 '
-Public Property Let Mode(ByVal RHS As CipherMode): End Property
+Public Property Let Mode(ByVal Value As CipherMode): End Property
 
 ''
 ' Returns the padding to be used by the algorithm.
@@ -196,11 +196,11 @@ Public Property Get Padding() As PaddingMode: End Property
 ''
 ' Sets the padding to be used by the algorithm.
 '
-' @param RHS The new padding value to be used.
+' @param Value The new padding value to be used.
 ' @remarks Padding is added to the end of plain text data to make the data length
 ' an even multiple of the block size.
 '
-Public Property Let Padding(ByVal RHS As PaddingMode): End Property
+Public Property Let Padding(ByVal Value As PaddingMode): End Property
 
 ''
 ' Releases all resources.

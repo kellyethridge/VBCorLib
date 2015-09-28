@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: CspParameters
+' Module: CspParameters
 '
 
 ''
@@ -65,14 +68,11 @@ End Enum
 Private Const DEF_KEYNUMBER     As Long = -1
 Private Const DEF_PROVIDERTYPE  As Long = 1
 
-
 Private mKeyContainerName   As String
 Private mKeyNumber          As Long
 Private mProviderName       As String
 Private mProviderType       As Long
 Private mFlags              As CspProviderFlags
-
-
 
 
 ''
@@ -88,11 +88,11 @@ End Property
 ''
 ' Sets the key container name.
 '
-' @param RHS The key container name that will hold a key.
+' @param Value The key container name that will hold a key.
 ' @remarks A key can be kept within a container for later retrieval. This is the name of that container.
 '
-Public Property Let KeyContainerName(ByVal RHS As String)
-    mKeyContainerName = RHS
+Public Property Let KeyContainerName(ByVal Value As String)
+    mKeyContainerName = Value
 End Property
 
 ''
@@ -109,12 +109,12 @@ End Property
 ''
 ' Sets if an Asymmetric algorithm key is a Signature or Exchange key.
 '
-' @param RHS Set to 1 for Exchange, or 2 for Signature.
+' @param Value Set to 1 for Exchange, or 2 for Signature.
 ' @remarks An Exchange key is a public/private key pair use for Asymmetric encryption. A Signature is a
 ' key pair used to digitally sign a message or file.
 '
-Public Property Let KeyNumber(ByVal RHS As Long)
-    mKeyNumber = RHS
+Public Property Let KeyNumber(ByVal Value As Long)
+    mKeyNumber = Value
 End Property
 
 ''
@@ -129,10 +129,10 @@ End Property
 ''
 ' Sets the name of the provider to create when acquiring a crypto service provider.
 '
-' @param RHS The provider name to acquire.
+' @param Value The provider name to acquire.
 '
-Public Property Let ProviderName(ByVal RHS As String)
-    mProviderName = RHS
+Public Property Let ProviderName(ByVal Value As String)
+    mProviderName = Value
 End Property
 
 ''
@@ -168,7 +168,7 @@ End Property
 ''
 ' Sets the provider type code.
 '
-' @param RHS The provider type code.
+' @param Value The provider type code.
 ' @remarks Some provider type codes are:
 ' <pre>
 ' PROV_RSA_FULL         = 1
@@ -191,8 +191,8 @@ End Property
 ' PROV_RSA_AES          = 24
 '</pre>
 '
-Public Property Let ProviderType(ByVal RHS As Long)
-    mProviderType = RHS
+Public Property Let ProviderType(ByVal Value As Long)
+    mProviderType = Value
 End Property
 
 ''
@@ -207,13 +207,13 @@ End Property
 ''
 ' Sets flags used to modify the behavior of cryptographic providers.
 '
-' @param RHS The flags set for cryptographic providers.
+' @param Value The flags set for cryptographic providers.
 '
-Public Property Let Flags(ByVal RHS As CspProviderFlags)
-    If (RHS And &HFFFFFF80) <> 0 Then _
-        Throw Cor.NewArgumentException("Invalid CspParameter flag value.", "Flags")
+Public Property Let Flags(ByVal Value As CspProviderFlags)
+    If (Value And &HFFFFFF80) <> 0 Then _
+        Throw Cor.NewArgumentException("Invalid CspParameter flag value.", "Value")
     
-    mFlags = RHS
+    mFlags = Value
 End Property
 
 ''
@@ -254,7 +254,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal TypeIn As Long, ByVal ProviderNameIn As String, ByVal ContainerNameIn As String)
     mProviderType = TypeIn
@@ -262,10 +262,6 @@ Friend Sub Init(ByVal TypeIn As Long, ByVal ProviderNameIn As String, ByVal Cont
     mKeyContainerName = ContainerNameIn
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mKeyNumber = DEF_KEYNUMBER
     mProviderType = DEF_PROVIDERTYPE
@@ -273,14 +269,14 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

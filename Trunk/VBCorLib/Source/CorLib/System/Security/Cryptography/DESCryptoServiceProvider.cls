@@ -60,7 +60,6 @@ Private WithEvents mBase As SymmetricAlgorithmBase
 Attribute mBase.VB_VarHelpID = -1
 
 
-
 ''
 ' Returns the block size, in bits, used by this algorithm.
 '
@@ -74,11 +73,11 @@ End Property
 ''
 ' Sets the block size, in bits, used by this algorithm.
 '
-' @param RHS The new block size in bits.
+' @param Value The new block size in bits.
 ' @remarks The only valid block size is 64 bits.
 '
-Public Property Let BlockSize(ByVal RHS As Long)
-    mBase.BlockSize = RHS
+Public Property Let BlockSize(ByVal Value As Long)
+    mBase.BlockSize = Value
 End Property
 
 ''
@@ -104,11 +103,11 @@ End Property
 ''
 ' Sets the Feedback size in bits.
 '
-' @param RHS The new feedback size in bits.
+' @param Value The new feedback size in bits.
 ' @remarks Only 64 bits is valid.
 '
-Public Property Let FeedbackSize(ByVal RHS As Long)
-    mBase.FeedbackSize = RHS
+Public Property Let FeedbackSize(ByVal Value As Long)
+    mBase.FeedbackSize = Value
 End Property
 
 ''
@@ -123,11 +122,11 @@ End Property
 ''
 ' Sets the key size in bits.
 '
-' @param RHS The new key size in bits.
+' @param Value The new key size in bits.
 ' @remarks Only 64 bits is supported for DES encryption.
 '
-Public Property Let KeySize(ByVal RHS As Long)
-    mBase.KeySize = RHS
+Public Property Let KeySize(ByVal Value As Long)
+    mBase.KeySize = Value
 End Property
 
 ''
@@ -151,10 +150,10 @@ End Property
 ''
 ' Sets the Cipher mode this algorithm will use.
 '
-' @param RHS The cipher mode to use.
+' @param Value The cipher mode to use.
 '
-Public Property Let Mode(ByVal RHS As CipherMode)
-    mBase.Mode = RHS
+Public Property Let Mode(ByVal Value As CipherMode)
+    mBase.Mode = Value
 End Property
 
 ''
@@ -169,10 +168,10 @@ End Property
 ''
 ' Sets the padding mode to be used.
 '
-' @param RHS The new padding mode.
+' @param Value The new padding mode.
 '
-Public Property Let Padding(ByVal RHS As PaddingMode)
-    mBase.Padding = RHS
+Public Property Let Padding(ByVal Value As PaddingMode)
+    mBase.Padding = Value
 End Property
 
 ''
@@ -188,18 +187,18 @@ End Property
 ''
 ' Sets the secret key.
 '
-' @param RHS The new secret key.
+' @param Value The new secret key.
 ' @param The key must be a valid key length. Currently only 64 bits (8 bytes) is supported.
 '
-Public Property Let Key(ByRef RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Public Property Let Key(ByRef Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 ''
 ' Generates a random key to be used.
 '
 Public Sub GenerateKey()
-    Call mBase.GenerateKey
+    mBase.GenerateKey
 End Sub
 
 ''
@@ -215,25 +214,25 @@ End Property
 ''
 ' Sets the Initialization Vector to be used.
 '
-' @param RHS The new IV to use.
+' @param Value The new IV to use.
 ' @remarks The array must be 8 bytes in length.
 '
-Public Property Let IV(ByRef RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Public Property Let IV(ByRef Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 ''
 ' Generates a random IV array to use.
 '
 Public Sub GenerateIV()
-    Call mBase.GenerateIV
+    mBase.GenerateIV
 End Sub
 
 ''
 ' Clears the Key and IV arrays.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -310,25 +309,25 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
     If IsMissing(RgbKey) <> IsMissing(RgbIV) Then _
         Throw Cor.NewArgumentException("Argument is missing.", IIf(IsMissing(RgbKey), "RgbKey", "RgbIV"))
     
     Set CreateCipher = New CryptoAPITransform
-    Call CreateCipher.Init(CALG_DES, mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting)
+    CreateCipher.Init CALG_DES, mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mBase = New SymmetricAlgorithmBase
     With mBase
-        Call .AddLegalBlockSize(DEF_MINBLOCKSIZE, DEF_MAXBLOCKSIZE, DEF_BLOCKSKIPSIZE)
-        Call .AddLegalKeySize(DEF_MINKEYSIZE, DEF_MAXKEYSIZE, DEF_KEYSKIPSIZE)
+        .AddLegalBlockSize DEF_MINBLOCKSIZE, DEF_MAXBLOCKSIZE, DEF_BLOCKSKIPSIZE
+        .AddLegalKeySize DEF_MINKEYSIZE, DEF_MAXKEYSIZE, DEF_KEYSKIPSIZE
         .BlockSize = DEF_BLOCKSIZE
         .KeySize = DEF_KEYSIZE
         .FeedbackSize = DEF_FEEDBACKSIZE
@@ -339,10 +338,10 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   DES Interface
+'   DES
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let DES_BlockSize(ByVal RHS As Long)
-    BlockSize = RHS
+Private Property Let DES_BlockSize(ByVal Value As Long)
+    BlockSize = Value
 End Property
 
 Private Property Get DES_BlockSize() As Long
@@ -350,7 +349,7 @@ Private Property Get DES_BlockSize() As Long
 End Property
 
 Private Sub DES_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function DES_CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
@@ -365,8 +364,8 @@ Private Function DES_Equals(Value As Variant) As Boolean
     DES_Equals = Equals(Value)
 End Function
 
-Private Property Let DES_FeedbackSize(ByVal RHS As Long)
-    FeedbackSize = RHS
+Private Property Let DES_FeedbackSize(ByVal Value As Long)
+    FeedbackSize = Value
 End Property
 
 Private Property Get DES_FeedbackSize() As Long
@@ -374,35 +373,35 @@ Private Property Get DES_FeedbackSize() As Long
 End Property
 
 Private Sub DES_GenerateIV()
-    Call GenerateIV
+    GenerateIV
 End Sub
 
 Private Sub DES_GenerateKey()
-    Call GenerateKey
+    GenerateKey
 End Sub
 
 Private Function DES_GetHashCode() As Long
     DES_GetHashCode = GetHashCode
 End Function
 
-Private Property Let DES_IV(RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Private Property Let DES_IV(Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 Private Property Get DES_IV() As Byte()
     DES_IV = IV
 End Property
 
-Private Property Let DES_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let DES_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get DES_Key() As Byte()
     DES_Key = Key
 End Property
 
-Private Property Let DES_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let DES_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get DES_KeySize() As Long
@@ -417,16 +416,16 @@ Private Property Get DES_LegalKeySizes() As KeySizes()
     DES_LegalKeySizes = LegalKeySizes
 End Property
 
-Private Property Let DES_Mode(ByVal RHS As CipherMode)
-    Mode = RHS
+Private Property Let DES_Mode(ByVal Value As CipherMode)
+    Mode = Value
 End Property
 
 Private Property Get DES_Mode() As CipherMode
     DES_Mode = Mode
 End Property
 
-Private Property Let DES_Padding(ByVal RHS As PaddingMode)
-    Padding = RHS
+Private Property Let DES_Padding(ByVal Value As PaddingMode)
+    Padding = Value
 End Property
 
 Private Property Get DES_Padding() As PaddingMode
@@ -443,7 +442,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -473,10 +472,10 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SymmetricAlgorithm Interface
+'   SymmetricAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let SymmetricAlgorithm_BlockSize(ByVal RHS As Long)
-    BlockSize = RHS
+Private Property Let SymmetricAlgorithm_BlockSize(ByVal Value As Long)
+    BlockSize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_BlockSize() As Long
@@ -484,7 +483,7 @@ Private Property Get SymmetricAlgorithm_BlockSize() As Long
 End Property
 
 Private Sub SymmetricAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function SymmetricAlgorithm_CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
@@ -499,8 +498,8 @@ Private Function SymmetricAlgorithm_Equals(Value As Variant) As Boolean
     SymmetricAlgorithm_Equals = Equals(Value)
 End Function
 
-Private Property Let SymmetricAlgorithm_FeedbackSize(ByVal RHS As Long)
-    FeedbackSize = RHS
+Private Property Let SymmetricAlgorithm_FeedbackSize(ByVal Value As Long)
+    FeedbackSize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_FeedbackSize() As Long
@@ -508,35 +507,35 @@ Private Property Get SymmetricAlgorithm_FeedbackSize() As Long
 End Property
 
 Private Sub SymmetricAlgorithm_GenerateIV()
-    Call GenerateIV
+    GenerateIV
 End Sub
 
 Private Sub SymmetricAlgorithm_GenerateKey()
-    Call GenerateKey
+    GenerateKey
 End Sub
 
 Private Function SymmetricAlgorithm_GetHashCode() As Long
     SymmetricAlgorithm_GetHashCode = GetHashCode
 End Function
 
-Private Property Let SymmetricAlgorithm_IV(RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Private Property Let SymmetricAlgorithm_IV(Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 Private Property Get SymmetricAlgorithm_IV() As Byte()
     SymmetricAlgorithm_IV = IV
 End Property
 
-Private Property Let SymmetricAlgorithm_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let SymmetricAlgorithm_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Key() As Byte()
     SymmetricAlgorithm_Key = Key
 End Property
 
-Private Property Let SymmetricAlgorithm_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let SymmetricAlgorithm_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_KeySize() As Long
@@ -551,16 +550,16 @@ Private Property Get SymmetricAlgorithm_LegalKeySizes() As KeySizes()
     SymmetricAlgorithm_LegalKeySizes = LegalKeySizes
 End Property
 
-Private Property Let SymmetricAlgorithm_Mode(ByVal RHS As CipherMode)
-    Mode = RHS
+Private Property Let SymmetricAlgorithm_Mode(ByVal Value As CipherMode)
+    Mode = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Mode() As CipherMode
     SymmetricAlgorithm_Mode = Mode
 End Property
 
-Private Property Let SymmetricAlgorithm_Padding(ByVal RHS As PaddingMode)
-    Padding = RHS
+Private Property Let SymmetricAlgorithm_Padding(ByVal Value As PaddingMode)
+    Padding = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Padding() As PaddingMode

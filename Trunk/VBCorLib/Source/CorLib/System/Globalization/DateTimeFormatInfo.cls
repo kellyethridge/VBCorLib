@@ -141,7 +141,9 @@ End Property
 ' @remarks If no calendar is associated then a <b>GregorianCalendar</b> is returned.
 '
 Public Property Get Calendar() As Calendar
-    If mProps.Calendar Is Nothing Then Set mProps.Calendar = New GregorianCalendar
+    If mProps.Calendar Is Nothing Then
+        Set mProps.Calendar = New GregorianCalendar
+    End If
     Set Calendar = mProps.Calendar
 End Property
 
@@ -153,7 +155,7 @@ End Property
 Public Property Set Calendar(ByVal Value As Calendar)
     VerifyWritable
     If Value Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Value")
+        Error.ArgumentNull "Value"
     
     Set mProps.Calendar = Value
 End Property
