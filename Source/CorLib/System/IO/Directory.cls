@@ -65,7 +65,7 @@ Private mAltDirectorySeparatorChar   As Integer
 ' @return A DirectoryInfo object that represents the created directory.
 ' @remarks The path to be created can be a relative or absolute path.
 '
-Public Function CreateDirectory(ByVal Path As String) As DirectoryInfo
+Public Function CreateDirectory(ByRef Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
@@ -131,7 +131,7 @@ End Function
 '
 Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = False)
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath))
+        Error.Argument Argument_EmptyPath
     
     Dim NormalizedPath As String
     NormalizedPath = CorString.TrimEnd(Statics.Path.GetFullPath(Path), "/\")
@@ -168,7 +168,9 @@ Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = Fa
     End If
     
     If Api.RemoveDirectory(NormalizedPath) = BOOL_FALSE Then
-        If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then IOError.WinIOError Err.LastDllError, Path
+        If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then
+            IOError.WinIOError Err.LastDllError, Path
+        End If
     End If
 End Sub
 
@@ -179,7 +181,7 @@ End Sub
 ' @return A CorDateTime object containing the creation time of the directory.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetCreationTime(ByVal Path As String) As CorDateTime
+Public Function GetCreationTime(ByRef Path As String) As CorDateTime
     Set GetCreationTime = File.GetCreationTime(Path)
 End Function
 
@@ -190,7 +192,7 @@ End Function
 ' @return A CorDateTime object containing the creation time of the directory.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetCreationTimeUtc(ByVal Path As String) As CorDateTime
+Public Function GetCreationTimeUtc(ByRef Path As String) As CorDateTime
     Set GetCreationTimeUtc = File.GetCreationTimeUtc(Path)
 End Function
 
@@ -201,7 +203,7 @@ End Function
 ' @return A CorDateTime object containing the time the directory was last accessed.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetLastAccessTime(ByVal Path As String) As CorDateTime
+Public Function GetLastAccessTime(ByRef Path As String) As CorDateTime
     Set GetLastAccessTime = File.GetLastAccessTime(Path)
 End Function
 
@@ -212,7 +214,7 @@ End Function
 ' @return A CorDateTime object containing the time the directory was last accessed.
 ' @remarks The path can be relative or absolute.
 '
-Public Function GetLastAccessTimeUtc(ByVal Path As String) As CorDateTime
+Public Function GetLastAccessTimeUtc(ByRef Path As String) As CorDateTime
     Set GetLastAccessTimeUtc = File.GetLastAccessTimeUtc(Path)
 End Function
 
@@ -223,7 +225,7 @@ End Function
 ' @return A CorDateTime object containing the last time the directory was written to.
 ' @remarks The path can relative or absolute.
 '
-Public Function GetLastWriteTime(ByVal Path As String) As CorDateTime
+Public Function GetLastWriteTime(ByRef Path As String) As CorDateTime
     Set GetLastWriteTime = File.GetLastWriteTime(Path)
 End Function
 
@@ -234,7 +236,7 @@ End Function
 ' @return A CorDateTime object containing the last time the directory was written to.
 ' @remarks The path can relative or absolute.
 '
-Public Function GetLastWriteTimeUtc(ByVal Path As String) As CorDateTime
+Public Function GetLastWriteTimeUtc(ByRef Path As String) As CorDateTime
     Set GetLastWriteTimeUtc = File.GetLastWriteTimeUtc(Path)
 End Function
 
@@ -265,7 +267,7 @@ End Function
 ' an empty zero-length array.
 ' @remarks The path can be absolute or relative.
 '
-Public Function GetDirectories(ByVal Path As String, Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
+Public Function GetDirectories(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
     GetDirectories = InternalGetFileSystemEntries(Path, SearchPattern, DirectoryEntry, SearchOpt)
 End Function
 
@@ -277,15 +279,17 @@ End Function
 ' @remarks If the path is relative, then the current directory will
 ' be used as the root.
 '
-Public Function GetDirectoryRoot(ByVal Path As String) As String
+Public Function GetDirectoryRoot(ByRef Path As String) As String
     If Len(Path) = 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), Environment.GetResourceString(Parameter_Path))
+        Error.Argument Argument_EmptyPath, "Path"
     
-    If Not Statics.Path.IsPathRooted(Path) Then
-        Path = Statics.Path.GetFullPath(Path)
+    If Statics.Path.IsPathRooted(Path) Then
+        GetDirectoryRoot = Statics.Path.GetPathRoot(Path)
+    Else
+        Dim FullPath As String
+        FullPath = Statics.Path.GetFullPath(Path)
+        GetDirectoryRoot = Statics.Path.GetPathRoot(FullPath)
     End If
-    
-    GetDirectoryRoot = Statics.Path.GetPathRoot(Path)
 End Function
 
 ''
@@ -298,7 +302,7 @@ End Function
 ' @remarks The path can be absolute or relative. The path is not included in the
 ' filename result.
 '
-Public Function GetFiles(ByVal Path As String, Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
+Public Function GetFiles(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
     GetFiles = InternalGetFileSystemEntries(Path, SearchPattern, FileEntry, SearchOpt)
 End Function
 
@@ -311,7 +315,7 @@ End Function
 ' matched the pattern, then an empty, zero-length array is returned.
 ' @remarks The path can be absolute or relative.
 '
-Public Function GetFileSystemEntries(ByVal Path As String, Optional ByVal SearchPattern As String = "*", Optional SearchOpt As SearchOption = TopDirectoryOnly) As String()
+Public Function GetFileSystemEntries(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional SearchOpt As SearchOption = TopDirectoryOnly) As String()
     GetFileSystemEntries = InternalGetFileSystemEntries(Path, SearchPattern, DirectoryEntry Or FileEntry, SearchOpt)
 End Function
 
@@ -506,16 +510,16 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    Dim root As String
-    root = Statics.Path.GetPathRoot(FullPath)
+    Dim Root As String
+    Root = Statics.Path.GetPathRoot(FullPath)
     
-    If (FullPath = root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
+    If (FullPath = Root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
         Error.Argument Arg_PathIsAVolume
     
     Dim Handle As SafeFileHandle
@@ -532,7 +536,6 @@ End Function
 
 Private Sub VerifySearchPattern(ByRef Pattern As String)
     Dim i As Long
-    
     i = InStr(Pattern, "..")
     
     If i > 0 Then
@@ -622,19 +625,19 @@ Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long,
 End Sub
 
 Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATA) As String
-    Dim Ret As String
-    Ret = Data.cFileName
-    If Len(Ret) = 0 Then
-        Ret = Data.cAlternateFileName
+    Dim Result As String
+    Result = Data.cFileName
+    If Len(Result) = 0 Then
+        Result = Data.cAlternateFileName
     End If
     
     If (Data.dwFileAttributes And FileAttributes.DirectoryAttr) = FileAttributes.DirectoryAttr Then
-        Select Case Len(Ret)
-            Case 1: If Asc(Ret) = corPeriodChar Then Exit Function
-            Case 2: If AsLong(ByVal StrPtr(Ret)) = DOUBLE_PERIOD Then Exit Function
+        Select Case Len(Result)
+            Case 1: If Asc(Result) = corPeriodChar Then Exit Function
+            Case 2: If AsLong(ByVal StrPtr(Result)) = DOUBLE_PERIOD Then Exit Function
         End Select
     End If
     
-    GetFileNameFromFindData = Ret
+    GetFileNameFromFindData = Result
 End Function
 
