@@ -49,20 +49,20 @@ Private mRNG As New RNGCryptoServiceProvider
 ' @remarks Zeros may be included.
 '
 Friend Function GetRandomBytes(ByVal Size As Long) As Byte()
-    Dim Ret() As Byte
-    ReDim Ret(0 To Size - 1)
-    Call FillRandomBytes(Ret)
-    GetRandomBytes = Ret
+    Dim Bytes() As Byte
+    ReDim Bytes(0 To Size - 1)
+    FillRandomBytes Bytes
+    GetRandomBytes = Bytes
 End Function
 
 ''
 ' Returns an array of random bytes not containing zeros.
 '
 Friend Function GetNonZeroRandomBytes(ByVal Size As Long) As Byte()
-    Dim Ret() As Byte
-    ReDim Ret(0 To Size - 1)
-    Call mRNG.GetNonZeroBytes(Ret)
-    GetNonZeroRandomBytes = Ret
+    Dim Bytes() As Byte
+    ReDim Bytes(0 To Size - 1)
+    mRNG.GetNonZeroBytes Bytes
+    GetNonZeroRandomBytes = Bytes
 End Function
 
 ''
@@ -72,7 +72,7 @@ End Function
 ' @remarks Zeros may be included.
 '
 Friend Sub FillRandomBytes(ByRef RgbKey() As Byte)
-    Call mRNG.GetBytes(RgbKey)
+    mRNG.GetBytes RgbKey
 End Sub
 
 ''
@@ -186,12 +186,15 @@ Friend Function DepadBlock(ByRef Data() As Byte, ByVal Padding As PaddingMode, B
 
     ' This kind of padding means all padding bytes must contain the number of padding bytes.
     ' Otherwise, the remaining padding bytes must have a value of zero.
-    If Padding = PaddingMode.PKCS7 Then ReqByteValue = PadLength
+    If Padding = PaddingMode.PKCS7 Then
+        ReqByteValue = PadLength
+    End If
 
     ' Make sure the padding bytes (except the last) is of the specified value.
     Dim i As Long
     For i = ub - PadLength + 1 To ub - 1
-        If Data(i) <> ReqByteValue Then Throw Cor.NewCryptographicException("Invalid padding.")
+        If Data(i) <> ReqByteValue Then _
+            Throw Cor.NewCryptographicException("Invalid padding.")
     Next i
 
     ' Return how many padding bytes there were.

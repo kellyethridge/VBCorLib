@@ -231,12 +231,15 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
         GetBytes = Cor.NewBytes()
     End If
 
-    FreeChars AttachedChars
+    GoSub Finally
     Exit Function
     
 Catch:
-    FreeChars AttachedChars
+    GoSub Finally
     Throw
+Finally:
+    FreeChars AttachedChars
+    Return
 End Function
 
 ''
@@ -279,12 +282,15 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     
     GetBytesEx = GetBytesCore(AttachedChars, CharIndex, CharCount, Bytes, ByteIndex)
     
-    FreeChars AttachedChars
+    GoSub Finally
     Exit Function
     
 Catch:
-    FreeChars AttachedChars
+    GoSub Finally
     Throw
+Finally:
+    FreeChars AttachedChars
+    Return
 End Function
 
 ''

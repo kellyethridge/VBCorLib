@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: CryptoStream
+' Module: CryptoStream
 '
 
 ''
@@ -112,7 +115,7 @@ End Property
 ' @remarks Always throws a NotSupportedException exception.
 '
 Public Property Get Position() As Currency
-    Throw Cor.NewNotSupportedException("Seeking is not supported.")
+    Error.NotSupported NotSupported_UnseekableStream
 End Property
 
 ''
@@ -122,7 +125,7 @@ End Property
 ' @remarks Always throws a NotSupportedException exception.
 '
 Public Property Let Position(ByVal RHS As Currency)
-    Throw Cor.NewNotSupportedException("Seeking is not supported.")
+    Error.NotSupported NotSupported_UnseekableStream
 End Property
 
 ''
@@ -132,7 +135,7 @@ End Property
 ' @remarks Always throws a NotSupportedException exception.
 '
 Public Property Get Length() As Currency
-    Throw Cor.NewNotSupportedException("Seeking is not supported.")
+    Error.NotSupported NotSupported_UnseekableStream
 End Property
 
 ''
@@ -142,7 +145,7 @@ End Property
 ' @remarks Always throws a NotSupportedException exception.
 '
 Public Sub SetLength(ByVal Value As Currency)
-    Throw Cor.NewNotSupportedException("Seeking is not supported.")
+    Error.NotSupported NotSupported_UnseekableStream
 End Sub
 
 ''
@@ -154,7 +157,7 @@ End Sub
 ' @remarks Always throws a NotSupportedException exception.
 '
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    Throw Cor.NewNotSupportedException("Seeking is not supported.")
+    Error.NotSupported NotSupported_UnseekableStream
 End Function
 
 ''
@@ -206,8 +209,10 @@ End Property
 ' Closes the underlying Stream.
 '
 Public Sub CloseStream()
-    If Me.CanWrite And (Not mFinalTransformed) Then Call FlushFinalBlock
-    Call mStream.CloseStream
+    If Me.CanWrite And (Not mFinalTransformed) Then
+        FlushFinalBlock
+    End If
+    mStream.CloseStream
     Erase mInputBuffer
     Erase mOutputBuffer
 End Sub
@@ -219,7 +224,7 @@ End Sub
 ' to flush the remaining data to the underlying stream.
 '
 Public Sub Flush()
-    Call mStream.Flush
+    mStream.Flush
 End Sub
 
 ''
@@ -229,21 +234,21 @@ End Sub
 '
 Public Sub FlushFinalBlock()
     If Not CanWrite Then _
-        Throw Cor.NewNotSupportedException("Stream does not support writing.")
+        Error.NotSupported NotSupported_UnwritableStream
     If mFinalTransformed Then _
         Throw Cor.NewNotSupportedException("Cannot call FlushFinalBlock twice.")
     
     mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-    Call mStream.WriteBlock(mOutputBuffer, 0, CorArray.Length(mOutputBuffer))
+    mStream.WriteBlock mOutputBuffer, 0, CorArray.Length(mOutputBuffer)
     
     If TypeOf mStream Is CryptoStream Then
         Dim cs As CryptoStream
         Set cs = mStream
-        Call cs.FlushFinalBlock
+        cs.FlushFinalBlock
     End If
     
-    Call Flush
-    Call InitBuffers
+    Flush
+    InitBuffers
     mFinalTransformed = True
 End Sub
 
@@ -258,13 +263,13 @@ End Sub
 '
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     If Not CanRead Then _
-        Throw Cor.NewNotSupportedException("The Stream does not support reading.")
+        Error.NotSupported NotSupported_UnreadableStream
     If CorArray.IsNull(Buffer) Then _
-        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Buffer", ArgumentNull_Array
     If Offset < LBound(Buffer) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Offset", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
     Dim BytesRead  As Long
     
@@ -295,7 +300,7 @@ End Function
 '
 Public Function ReadByte() As Long
     If Not CanRead Then _
-        Throw Cor.NewNotSupportedException("The Stream does not support reading.")
+        Error.NotSupported NotSupported_UnreadableStream
     
     If mBytesBuffered = 0 Then
         If Not FillBuffer Then
@@ -322,24 +327,28 @@ End Function
 '
 Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
     If Not CanRead Then _
-        Throw Cor.NewNotSupportedException("The Stream does not support reading.")
+        Error.NotSupported NotSupported_UnreadableStream
     
-    Dim Ret As StreamAsyncResult
-    Set Ret = Cor.NewStreamAsyncResult(State)
+    Dim Result As StreamAsyncResult
+    Set Result = Cor.NewStreamAsyncResult(State)
     
-    On Error GoTo errTrap
-    With Ret
-        .BytesRead = ReadBlock(Buffer, Offset, Count)
-        .IsCompleted = True
-        .IsReadType = True
-    End With
+    On Error GoTo Catch
+    Result.BytesRead = ReadBlock(Buffer, Offset, Count)
+    Result.IsCompleted = True
+    Result.IsReadType = True
 
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
-
-errTrap:
+    If Not Callback Is Nothing Then
+        Callback.Execute Result
+    End If
+    
+    GoTo Finally
+    
+Catch:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
-    Set BeginRead = Ret
+    Catch Ex, Err
+    Set Result.Exception = Ex
+Finally:
+    Set BeginRead = Result
 End Function
 
 ''
@@ -350,7 +359,7 @@ End Function
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult")
+        Error.ArgumentNull "AsyncResult", ArgumentNull_Generic
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     
@@ -361,7 +370,9 @@ Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If Result.EndCalled Then _
         Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
     
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    If Not Result.Exception Is Nothing Then
+        Throw Result.Exception
+    End If
     
     EndRead = Result.BytesRead
 End Function
@@ -377,18 +388,18 @@ End Function
 '
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
     If Not CanWrite Then _
-        Throw Cor.NewNotSupportedException("Stream does not support writing.")
+        Error.NotSupported NotSupported_UnwritableStream
     
     Dim Result As Long
     Result = VerifyArrayRange(SAPtr(Buffer), Offset, Count)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Buffer", Offset, "Offset", Count, "Count", False)
     
     If (Count > mInputBlockSize) And mTransform.CanTransformMultipleBlocks Then
-        Call WriteMultiBlock(Buffer, Offset, Count)
+        WriteMultiBlock Buffer, Offset, Count
     End If
     
     Do While Count > 0
-        Call WriteToBuffer(Buffer, Offset, Count)
+        WriteToBuffer Buffer, Offset, Count
     Loop
 End Sub
 
@@ -399,13 +410,15 @@ End Sub
 '
 Public Sub WriteByte(ByVal Value As Byte)
     If Not CanWrite Then _
-        Throw Cor.NewNotSupportedException("Stream does not support writing.")
+        Error.NotSupported NotSupported_UnwritableStream
     
     mInputBuffer(mInputIndex) = Value
     mInputIndex = mInputIndex + 1
     mBytesBuffered = mBytesBuffered + 1
     
-    If mBytesBuffered = mInputBlockSize Then Call FlushBuffer
+    If mBytesBuffered = mInputBlockSize Then
+        FlushBuffer
+    End If
 End Sub
 
 ''
@@ -421,22 +434,27 @@ End Sub
 ' information about the buffer read.
 '
 Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Dim Ret As StreamAsyncResult
+    Dim Result As StreamAsyncResult
+    Set Result = Cor.NewStreamAsyncResult(State)
     
-    Set Ret = Cor.NewStreamAsyncResult(State)
-    On Error GoTo errTrap:
-    With Ret
-        .CompletedSynchronously = True
-        .IsCompleted = True
-    End With
-    Call WriteBlock(Buffer, Offset, Count)
+    On Error GoTo Catch
     
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
+    Result.CompletedSynchronously = True
+    Result.IsCompleted = True
+    WriteBlock Buffer, Offset, Count
     
-errTrap:
+    If Not Callback Is Nothing Then
+        Callback.Execute Result
+    End If
+    
+    GoTo Finally
+    
+Catch:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
-    Set BeginWrite = Ret
+    Catch Ex, Err
+    Set Result.Exception = Ex
+Finally:
+    Set BeginWrite = Result
 End Function
 
 ''
@@ -446,7 +464,7 @@ End Function
 '
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult")
+        Error.ArgumentNull "AsyncResult", ArgumentNull_Generic
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     
@@ -457,7 +475,9 @@ Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If Result.EndCalled Then _
         Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
 
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    If Not Result.Exception Is Nothing Then
+        Throw Result.Exception
+    End If
 End Sub
 
 ''
@@ -498,22 +518,22 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByVal Mode As CryptoStreamMode)
     If Stream Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Stream", Environment.GetResourceString(ArgumentNull_Stream))
+        Error.ArgumentNull "Stream", ArgumentNull_Stream
     If Transform Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Transform")
+        Error.ArgumentNull "Transform", ArgumentNull_Generic
     
     Select Case Mode
         Case CryptoStreamMode.ReadMode
             If Not Stream.CanRead Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamNotReadable), "Stream")
+                Error.Argument Argument_StreamNotReadable, "Stream"
                 
         Case CryptoStreamMode.WriteMode
             If Not Stream.CanWrite Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_StreamNotWritable), "Stream")
+                Error.Argument Argument_StreamNotWritable, "Stream"
                 
         Case Else
             Throw Cor.NewArgumentException("Invalid mode.", "mode")
@@ -525,13 +545,16 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByV
     
     mOutputBlockSize = mTransform.OutputBlockSize
     mInputBlockSize = mTransform.InputBlockSize
-    
-    Call InitBuffers
+    InitBuffers
+End Sub
+
+Private Sub Class_Terminate()
+    CloseStream
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitBuffers()
     ReDim mInputBuffer(0 To mInputBlockSize - 1)
@@ -579,7 +602,7 @@ Private Sub FlushBuffer()
     
     ' Write it out. It's possible nothing was actually transformed. However, we will just
     ' rely on the Stream object to optimize for a count of zero bytes to write.
-    Call mStream.WriteBlock(mOutputBuffer, 0, TotalBytesTransformed)
+    mStream.WriteBlock mOutputBuffer, 0, TotalBytesTransformed
     
     mBytesBuffered = 0
     mInputIndex = 0
@@ -596,10 +619,12 @@ Private Sub WriteToBuffer(ByRef Buffer() As Byte, ByRef Offset As Long, ByRef Co
     AmountToCopy = CorMath.Min(mInputBlockSize - mBytesBuffered, Count)
     
     ' Don't need to waste our time if there is nothing to do.
-    If AmountToCopy = 0 Then Exit Sub
+    If AmountToCopy = 0 Then
+        Exit Sub
+    End If
     
     ' Fill our buffer with as much as possible. We still may not have filled it.
-    Call CopyMemory(mInputBuffer(mInputIndex), Buffer(Offset), AmountToCopy)
+    CopyMemory mInputBuffer(mInputIndex), Buffer(Offset), AmountToCopy
     
     ' And we update everyone according to how much we moved.
     mBytesBuffered = mBytesBuffered + AmountToCopy
@@ -608,7 +633,9 @@ Private Sub WriteToBuffer(ByRef Buffer() As Byte, ByRef Offset As Long, ByRef Co
     Count = Count - AmountToCopy
     
     ' And if we did fill the buffer, get it transformed and written to the Stream.
-    If mBytesBuffered = mInputBlockSize Then Call FlushBuffer
+    If mBytesBuffered = mInputBlockSize Then
+        FlushBuffer
+    End If
 End Sub
 
 ''
@@ -623,11 +650,15 @@ End Sub
 Private Sub WriteMultiBlock(ByRef InputBuffer() As Byte, ByRef InputOffset As Long, ByRef InputCount As Long)
     ' If we have bytes buffered then we need to fill that buffer and flush
     ' it before we do our multiblock transformation.
-    If mBytesBuffered > 0 Then Call WriteToBuffer(InputBuffer, InputOffset, InputCount)
+    If mBytesBuffered > 0 Then
+        WriteToBuffer InputBuffer, InputOffset, InputCount
+    End If
     
     ' If there isn't even enough bytes to fill a block, then how can we do multiblock?
     ' InputCount can be modified in the WriteToBuffer call.
-    If InputCount <= mInputBlockSize Then Exit Sub
+    If InputCount <= mInputBlockSize Then
+        Exit Sub
+    End If
     
     ' How many blocks will we be doing at once?
     Dim TotalBytes As Long
@@ -642,7 +673,7 @@ Private Sub WriteMultiBlock(ByRef InputBuffer() As Byte, ByRef InputOffset As Lo
     
     ' If anything was transformed, then write it out to the Stream.
     If TotalBytesTransformed > 0 Then
-        Call mStream.WriteBlock(OutputBuffer, 0, TotalBytesTransformed)
+        mStream.WriteBlock OutputBuffer, 0, TotalBytesTransformed
         InputOffset = InputOffset + TotalBytes
         InputCount = InputCount - TotalBytes
     End If
@@ -651,7 +682,9 @@ End Sub
 Private Function ReadBufferedBytes(ByRef Buffer() As Byte, ByRef Offset As Long, ByRef Count As Long) As Long
     ' If nothing is buffered, we can't read from it
     ' and return what it contains.
-    If mBytesBuffered = 0 Then Exit Function
+    If mBytesBuffered = 0 Then
+        Exit Function
+    End If
     
     Dim AmountToCopy As Long
     
@@ -661,10 +694,10 @@ Private Function ReadBufferedBytes(ByRef Buffer() As Byte, ByRef Offset As Long,
     
     ' Make sure there is room in the return buffer.
     If (Offset + AmountToCopy - 1) > UBound(Buffer) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Buffer")
+        Error.Argument Argument_SmallConversionBuffer, "Buffer"
     
     ' Copy the data to the return buffer and update all the counters.
-    Call CopyMemory(Buffer(Offset), mOutputBuffer(mOutputIndex), AmountToCopy)
+    CopyMemory Buffer(Offset), mOutputBuffer(mOutputIndex), AmountToCopy
     Offset = Offset + AmountToCopy
     Count = Count - AmountToCopy
     mBytesBuffered = mBytesBuffered - AmountToCopy
@@ -675,7 +708,9 @@ End Function
 Private Function ReadMultiBlock(ByRef Buffer() As Byte, ByRef Offset As Long, ByRef Count As Long) As Long
     ' If less than atleast 1 full block is requested, then
     ' we can't perform a mutli-block read, so exit.
-    If Count < mOutputBlockSize Then Exit Function
+    If Count < mOutputBlockSize Then
+        Exit Function
+    End If
     
     Dim Result As Long
     
@@ -690,7 +725,9 @@ Private Function ReadMultiBlock(ByRef Buffer() As Byte, ByRef Offset As Long, By
     Dim BytesRead As Long
     BytesRead = mStream.ReadBlock(InputBuffer, 0, TotalBytes)
     
-    If BytesRead = 0 Then Exit Function
+    If BytesRead = 0 Then
+        Exit Function
+    End If
     
     Dim TotalBytesTransformed As Long
     TotalBytesTransformed = mTransform.TransformBlock(InputBuffer, 0, BytesRead, Buffer, Offset)
@@ -704,15 +741,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    Call CloseStream
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -728,14 +757,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Stream Interface
+'   Stream
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
     Stream_BeginRead = BeginRead(Buffer, Offset, Count, Callback, State)
 End Function
 
 Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Call BeginWrite(Buffer, Offset, Count, Callback, State)
+    BeginWrite Buffer, Offset, Count, Callback, State
 End Function
 
 Private Property Get Stream_CanRead() As Boolean
@@ -755,7 +784,7 @@ Private Property Get Stream_CanWrite() As Boolean
 End Property
 
 Private Sub Stream_CloseStream()
-    Call CloseStream
+    CloseStream
 End Sub
 
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
@@ -763,7 +792,7 @@ Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
 End Function
 
 Private Sub Stream_EndWrite(ByVal AsyncResult As IAsyncResult)
-    Call EndWrite(AsyncResult)
+    EndWrite AsyncResult
 End Sub
 
 Private Function Stream_Equals(Value As Variant) As Boolean
@@ -771,7 +800,7 @@ Private Function Stream_Equals(Value As Variant) As Boolean
 End Function
 
 Private Sub Stream_Flush()
-    Call Flush
+    Flush
 End Sub
 
 Private Function Stream_GetHashCode() As Long
@@ -782,8 +811,8 @@ Private Property Get Stream_Length() As Currency
     Stream_Length = Length
 End Property
 
-Private Property Let Stream_Position(ByVal RHS As Currency)
-    Position = RHS
+Private Property Let Stream_Position(ByVal Value As Currency)
+    Position = Value
 End Property
 
 Private Property Get Stream_Position() As Currency
@@ -798,8 +827,8 @@ Private Function Stream_ReadByte() As Long
     Stream_ReadByte = ReadByte
 End Function
 
-Private Property Let Stream_ReadTimeout(ByVal RHS As Long)
-    ReadTimeout = RHS
+Private Property Let Stream_ReadTimeout(ByVal Value As Long)
+    ReadTimeout = Value
 End Property
 
 Private Property Get Stream_ReadTimeout() As Long
@@ -811,7 +840,7 @@ Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As S
 End Function
 
 Private Sub Stream_SetLength(ByVal Value As Currency)
-    Call SetLength(Value)
+    SetLength Value
 End Sub
 
 Private Function Stream_ToString() As String
@@ -819,15 +848,15 @@ Private Function Stream_ToString() As String
 End Function
 
 Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    Call WriteBlock(Buffer, Offset, Count)
+    WriteBlock Buffer, Offset, Count
 End Sub
 
 Private Sub Stream_WriteByte(ByVal Value As Byte)
-    Call WriteByte(Value)
+    WriteByte Value
 End Sub
 
-Private Property Let Stream_WriteTimeout(ByVal RHS As Long)
-    WriteTimeout = RHS
+Private Property Let Stream_WriteTimeout(ByVal Value As Long)
+    WriteTimeout = Value
 End Property
 
 Private Property Get Stream_WriteTimeout() As Long

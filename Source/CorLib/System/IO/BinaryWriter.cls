@@ -331,15 +331,20 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
         Error.Argument Argument_InvalidOffLen
 
-    On Error GoTo Catch
     SAPtr(Bytes) = CorArray.ArrayPointer(Buffer)
+    
+    On Error GoTo Catch
     mOutStream.WriteBlock Bytes, Range.Index, Range.Count
-    SAPtr(Bytes) = vbNullPtr
+    
+    GoSub Finally
     Exit Sub
     
 Catch:
-    SAPtr(Bytes) = vbNullPtr
+    GoSub Finally
     Throw Err
+Finally:
+    SAPtr(Bytes) = vbNullPtr
+    Return
 End Sub
 
 

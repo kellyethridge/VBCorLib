@@ -110,7 +110,7 @@ End Property
 ' This will release the key and context of the CryptoAPI provider.
 '
 Public Sub Clear()
-    Call CryptoAPI.DestroyKey(mCipherKey)
+    CryptoAPI.DestroyKey mCipherKey
     Erase mLastBlock
 End Sub
 
@@ -119,10 +119,10 @@ End Sub
 '
 Public Sub Reset()
     mHasLastBlock = False
-    Call CryptEncrypt(mCipherKey, 0, True, 0, ByVal 0&, 0, 0)
+    CryptEncrypt mCipherKey, 0, True, 0, ByVal 0&, 0, 0
 
     ReDim mLastBlock(0 To mBlockSize - 1)
-    Call CryptDecrypt(mCipherKey, 0, True, 0, mLastBlock(0), InputBlockSize)
+    CryptDecrypt mCipherKey, 0, True, 0, mLastBlock(0), InputBlockSize
     ReDim mLastBlock(0 To mBlockSize - 1)
 End Sub
 
@@ -222,7 +222,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Algorithm As Long, ByRef RgbKey() As Byte, ByRef RgbIV() As Byte, ByVal Base As SymmetricAlgorithmBase, ByVal IsEncrypting As Boolean, Optional ByVal EffectiveKeySize As Long = 0, Optional ByVal UseSalt As Boolean = False)
     With Base
@@ -231,11 +231,17 @@ Friend Sub Init(ByVal Algorithm As Long, ByRef RgbKey() As Byte, ByRef RgbIV() A
         
         mCipherKey = CryptoAPI.ImportPlainTextKey(CryptoAPI.DefaultProvider, Algorithm, RgbKey, UseSalt)
 
-        Call CryptoAPI.SetKeyParam(mCipherKey, KP_MODE, .Mode)
+        CryptoAPI.SetKeyParam mCipherKey, KP_MODE, .Mode
 
-        If .Mode <> CipherMode.ECB Then Call CryptoAPI.SetKeyParam(mCipherKey, KP_IV, RgbIV)
-        If .Mode = CipherMode.CFB Then Call CryptoAPI.SetKeyParam(mCipherKey, KP_MODE_BITS, .FeedbackSize)
-        If EffectiveKeySize > 0 Then Call CryptoAPI.SetKeyParam(mCipherKey, KP_EFFECTIVE_KEYLEN, EffectiveKeySize)
+        If .Mode <> CipherMode.ECB Then
+            CryptoAPI.SetKeyParam mCipherKey, KP_IV, RgbIV
+        End If
+        If .Mode = CipherMode.CFB Then
+            CryptoAPI.SetKeyParam mCipherKey, KP_MODE_BITS, .FeedbackSize
+        End If
+        If EffectiveKeySize > 0 Then
+            CryptoAPI.SetKeyParam mCipherKey, KP_EFFECTIVE_KEYLEN, EffectiveKeySize
+        End If
 
         mBlockSize = .BlockSize \ 8
         mPadding = .Padding
@@ -249,10 +255,13 @@ Friend Sub Init(ByVal Algorithm As Long, ByRef RgbKey() As Byte, ByRef RgbIV() A
     mIsEncrypting = IsEncrypting
 End Sub
 
+Private Sub Class_Terminate()
+    Clear
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
@@ -282,7 +291,9 @@ Private Function EncryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
 
     ' We have to copy the data to be encrypted to our output buffer because CryptoAPI
     ' puts the encrypted data back into the working array.
-    If InputCount > 0 Then Call CopyMemory(OutputBuffer(0), InputBuffer(InputOffset), InputCount)
+    If InputCount > 0 Then
+        CopyMemory OutputBuffer(0), InputBuffer(InputOffset), InputCount
+    End If
 
     ' We subtract the number of padding bytes that were not added.
     TotalBytes = TotalBytes - CryptoHelper.PadBlock(OutputBuffer, FullBlocks * mBlockSize + RemainingBytes, mPadding, mBlockSize - RemainingBytes, mBlockSize)
@@ -303,14 +314,14 @@ Private Function EncryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
         OutputBuffer = Cor.NewBytes()
     End If
 
-    Call Reset
+    Reset
     EncryptFinalBlock = OutputBuffer
 End Function
 
 Private Function EncryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
     ' Since the cipher changes the data within the same array, we need to copy the
     ' plain text data to the output buffer and let the cipher work on that buffer.
-    Call CopyMemory(OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount)
+    CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
 
     If CryptEncrypt(mCipherKey, 0, False, 0, OutputBuffer(OutputOffset), InputCount, InputCount) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException("Failed to encrypt data. " & GetMessage(Err.LastDllError))
@@ -333,7 +344,7 @@ Private Function DecryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As 
     ' If we buffered the last block from the previous call, then we now need to
     ' include it in this decryption process as the first block of the InputBuffer.
     If mHasLastBlock Then
-        Call CopyMemory(OutputBuffer(NextOutputOffset), mLastBlock(0), mBlockSize)
+        CopyMemory OutputBuffer(NextOutputOffset), mLastBlock(0), mBlockSize
         NextOutputOffset = NextOutputOffset + mBlockSize
         TotalBytes = TotalBytes + mBlockSize
         mHasLastBlock = False
@@ -345,13 +356,15 @@ Private Function DecryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As 
     If mKeepLastBlock Then
         TotalBytes = TotalBytes - mBlockSize
         InputCount = InputCount - mBlockSize
-        Call CopyMemory(mLastBlock(0), InputBuffer(InputOffset + InputCount), mBlockSize)
+        CopyMemory mLastBlock(0), InputBuffer(InputOffset + InputCount), mBlockSize
         mHasLastBlock = True
     End If
 
     ' If there is anything left in the InputBuffer to process we need to copy it to the
     ' output buffer which the decryption routine will work on.
-    If InputCount > 0 Then Call CopyMemory(OutputBuffer(NextOutputOffset), InputBuffer(InputOffset), InputCount)
+    If InputCount > 0 Then
+        CopyMemory OutputBuffer(NextOutputOffset), InputBuffer(InputOffset), InputCount
+    End If
 
     ' Have the decryption routine work on the bytes in the output buffer. The decrypted bytes
     ' will be placed back into the same buffer.
@@ -378,7 +391,7 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' If we still don't have anything to process (no previous block and nothing in this block)
     ' then simply reset everything and return an empty byte array representing the final block.
     If TotalBytes = 0 Then
-        Call Reset
+        Reset
         DecryptFinalBlock = Cor.NewBytes
         Exit Function
     End If
@@ -391,14 +404,16 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' to now copy that block into the working buffer.
     Dim OutputOffset As Long
     If mHasLastBlock Then
-        Call CopyMemory(OutputBuffer(0), mLastBlock(0), mBlockSize)
+        CopyMemory OutputBuffer(0), mLastBlock(0), mBlockSize
         OutputOffset = mBlockSize
         mHasLastBlock = False
     End If
 
     ' If there is something in the InputBuffer to be processed, then
     ' add it to the working buffer, too.
-    If InputCount > 0 Then Call CopyMemory(OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount)
+    If InputCount > 0 Then
+        CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
+    End If
 
     ' Decrypt the working buffer. We don't tell the CryptDecrypt method that this is the
     ' final block because we don't want the CryptoAPI to deal with any padding. We will
@@ -422,21 +437,13 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
         OutputBuffer = Cor.NewBytes
     End If
 
-    Call Reset
+    Reset
     DecryptFinalBlock = OutputBuffer
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    Call Clear
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
