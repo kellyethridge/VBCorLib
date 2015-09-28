@@ -94,7 +94,7 @@ Friend Property Get IsLoaded() As Boolean
 End Property
 
 Friend Function GetString(ByVal LCID As Integer, ByVal Index As Long) As String
-    On Error GoTo errTrap
+    On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)
     
     Dim pos As Long
@@ -102,12 +102,12 @@ Friend Function GetString(ByVal LCID As Integer, ByVal Index As Long) As String
     GetString = SysAllocString(pos)
     Exit Function
     
-errTrap:
+Catch:
     Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
 End Function
 
 Friend Function GetStringArray(ByVal LCID As Integer, ByVal Index As Long) As String()
-    On Error GoTo errTrap
+    On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)   ' this will throw an error if the culture does not exist
                                                 ' since it will return Empty and fail to assign.
     ' Move to the start of the array elements.
@@ -139,22 +139,22 @@ Friend Function GetStringArray(ByVal LCID As Integer, ByVal Index As Long) As St
     GetStringArray = Ret
     Exit Function
     
-errTrap:
+Catch:
     Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
 End Function
 
 Friend Function GetNumber(ByVal LCID As Integer, ByVal Index As Long) As Integer
-    On Error GoTo errTrap
+    On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)
     GetNumber = mCulture(0).Numbers(Index)
     Exit Function
     
-errTrap:
+Catch:
     Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
 End Function
 
 Friend Function GetNumberArray(ByVal LCID As Integer, ByVal Index As Long) As Long()
-    On Error GoTo errTrap
+    On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)
     
     Dim pos As Long
@@ -181,7 +181,7 @@ Friend Function GetNumberArray(ByVal LCID As Integer, ByVal Index As Long) As Lo
     GetNumberArray = Ret
     Exit Function
     
-errTrap:
+Catch:
     Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
 End Function
 
@@ -191,11 +191,13 @@ Friend Function GetCultureID(ByVal Name As String) As Long
     If mNamesToLCID Is Nothing Then
         Set mNamesToLCID = New Hashtable
         For Each ID In mCulturesByLCID.Keys
-            Call mNamesToLCID.Add(GetString(ID, SNAME), ID)
+            mNamesToLCID.Add GetString(ID, SNAME), ID
         Next ID
     End If
     ID = mNamesToLCID(Name)
-    If Not IsEmpty(ID) Then GetCultureID = ID
+    If Not IsEmpty(ID) Then
+        GetCultureID = ID
+    End If
 End Function
 
 Friend Function IsNeutral(ByVal LCID As Long) As Boolean
@@ -206,44 +208,44 @@ Friend Function IsNeutral(ByVal LCID As Long) As Boolean
         ' in there LCID like the other cultures, so we
         ' must check them by hand.
         Select Case LCID
-            Case INVARIANT_LCID, zh_CHS_LCID, zh_CHT_LCID: IsNeutral = True
+            Case INVARIANT_LCID, zh_CHS_LCID, zh_CHT_LCID
+                IsNeutral = True
         End Select
     End If
 End Function
 
 Friend Function GetCultures(ByVal Types As CultureTypes) As CultureInfo()
-    Dim getNeutral As Boolean
-    getNeutral = CBool(Types And NeutralCultures)
+    Dim GetNeutral As Boolean
+    GetNeutral = CBool(Types And NeutralCultures)
     
-    Dim getSpecific As Boolean
-    getSpecific = CBool(Types And SpecificCultures)
+    Dim GetSpecific As Boolean
+    GetSpecific = CBool(Types And SpecificCultures)
     
-    Dim getInstalled As Boolean
-    getInstalled = CBool(Types And InstalledWin32Cultures)
+    Dim GetInstalled As Boolean
+    GetInstalled = CBool(Types And InstalledWin32Cultures)
     
-    Dim List As ArrayList
-    Set List = New ArrayList
-    
-    Dim ID As Variant
+    Dim Cultures    As New ArrayList
+    Dim ID          As Variant
     For Each ID In mCulturesByLCID.Keys
         If IsNeutral(ID) Then
-            If getNeutral Then Call List.Add(Cor.NewCultureInfo(ID))
-        ElseIf IsInstalled(ID) And getInstalled Then
-            Call List.Add(Cor.NewCultureInfo(ID))
-        ElseIf getSpecific Then
-            Call List.Add(Cor.NewCultureInfo(ID))
+            If GetNeutral Then
+                Cultures.Add Cor.NewCultureInfo(ID)
+        ElseIf IsInstalled(ID) And GetInstalled Then
+                Cultures.Add Cor.NewCultureInfo(ID)
+        ElseIf GetSpecific Then
+                Cultures.Add Cor.NewCultureInfo(ID)
         End If
     Next ID
     
-    Dim Ret() As CultureInfo
-    ReDim Ret(0 To List.Count - 1)
-    Call List.CopyTo(Ret)
-    GetCultures = Ret
+    Dim Result() As CultureInfo
+    ReDim Result(0 To List.Count - 1)
+    Cultures.CopyTo Result
+    GetCultures = Result
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IsInstalled(ByVal LCID As Long) As Boolean
     IsInstalled = IsValidLocale(LCID, LCID_INSTALLED)
@@ -257,7 +259,7 @@ Private Sub Load()
     mCultureInfo = LoadResData(101, "CULTUREINFO")
     mBaseAddress = VarPtr(mCultureInfo(0))
     mStringPoolAddress = mBaseAddress + MemLong(mBaseAddress + STRINGPOOL_OFFSET_OFFSET)
-    Call LoadLCIDLookup
+    LoadLCIDLookup
 End Sub
 
 Private Sub LoadLCIDLookup()
@@ -275,7 +277,7 @@ Private Sub LoadLCIDLookup()
     
     Do While NumCultures > 0
         mCultureSA.pvData = pos
-        Call mCulturesByLCID.Add(mCulture(0).Numbers(ILCID), pos)
+        mCulturesByLCID.Add mCulture(0).Numbers(ILCID), pos
         pos = pos + CultureSize
         NumCultures = NumCultures - 1
     Loop
@@ -283,7 +285,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     With mCultureSA
@@ -291,9 +293,9 @@ Private Sub Class_Initialize()
         .cElements = 1
     End With
     SAPtr(mCulture) = VarPtr(mCultureSA)
-    Call Load
+    Load
 End Sub
 
 Private Sub Class_Terminate()
-    SAPtr(mCulture) = 0
+    SAPtr(mCulture) = vbNullPtr
 End Sub

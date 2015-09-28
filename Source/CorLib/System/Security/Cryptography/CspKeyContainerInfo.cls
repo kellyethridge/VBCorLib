@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: CspKeyContainerInfo
+' Module: CspKeyContainerInfo
 '
 
 ''
@@ -37,7 +40,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 Implements IObject
-
 
 Private mProviderName           As String
 Private mProviderType           As Long
@@ -63,13 +65,17 @@ Public Property Get Accessible() As Boolean
     Accessible = mAccessible
 End Property
 
+Friend Property Let Accessible(ByVal Value As Boolean)
+    mAccessible = Value
+End Property
+
 ''
 ' Returns if a key in a key container can be exported out of the container.
 '
 ' @return Returns True if the key can be exported, False otherwise.
 '
 Public Property Get Exportable() As Boolean
-    Call VerifyLoaded
+    VerifyLoaded
     Exportable = mExportable
 End Property
 
@@ -106,7 +112,7 @@ End Property
 ' @return Returns True if protected, False otherwise.
 '
 Public Property Get Protected() As Boolean
-    Call VerifyLoaded
+    VerifyLoaded
     Protected = mProtected
 End Property
 
@@ -137,6 +143,10 @@ Public Property Get RandomlyGenerated() As Boolean
     RandomlyGenerated = mRandomlyGenerated
 End Property
 
+Friend Property Let RandomlyGenerated(ByVal Value As Boolean)
+    mRandomlyGenerated = Value
+End Property
+
 ''
 ' Returns if the key can be removed from the key container.
 '
@@ -152,7 +162,7 @@ End Property
 ' @return A unique key container name.
 '
 Public Property Get UniqueKeyContainerName() As String
-    Call VerifyLoaded
+    VerifyLoaded
     UniqueKeyContainerName = mUniqueKeyContainerName
 End Property
 
@@ -194,7 +204,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Parameters As CspParameters)
     mAccessible = True
@@ -208,30 +218,23 @@ Friend Sub Init(ByVal Parameters As CspParameters)
     End With
 End Sub
 
-Friend Property Let RandomlyGenerated(ByVal RHS As Boolean)
-    mRandomlyGenerated = RHS
-End Property
-
-Friend Property Let Accessible(ByVal RHS As Boolean)
-    mAccessible = RHS
-End Property
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyLoaded()
-    If mIsLoaded Then Exit Sub
+    If mIsLoaded Then
+        Exit Sub
+    End If
     
     On Error GoTo 0
     
-    Dim prov As Long
-    prov = CryptoAPI.AcquireContext(mKeyContainerName, mProviderName, mProviderType)
-    
-    mUniqueKeyContainerName = CryptoAPI.GetProvParamString(prov, PP_UNIQUE_CONTAINER)
+    Dim Provider As Long
+    Provider = CryptoAPI.AcquireContext(mKeyContainerName, mProviderName, mProviderType)
+    mUniqueKeyContainerName = CryptoAPI.GetProvParamString(Provider, PP_UNIQUE_CONTAINER)
     
     Dim Key As Long
-    If CryptGetUserKey(prov, mKeyNumber, Key) = BOOL_FALSE Then _
+    If CryptGetUserKey(Provider, mKeyNumber, Key) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
     Dim Permissions As Long
@@ -239,16 +242,15 @@ Private Sub VerifyLoaded()
     mExportable = (Permissions And CRYPT_EXPORT)
     
     If Len(mProviderName) = 0 Then
-        mProviderName = CryptoAPI.GetProvParamString(prov, PP_NAME)
+        mProviderName = CryptoAPI.GetProvParamString(Provider, PP_NAME)
     End If
     
-errTrap:
-    Call CryptoAPI.ReleaseContext(prov, True)
-End Sub
+    CryptoAPI.ReleaseContext Provider, True
+End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

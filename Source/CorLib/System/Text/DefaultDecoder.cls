@@ -42,9 +42,8 @@ Implements Decoder
 Private mEncoding As Encoding
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Encoding As Encoding)
     Set mEncoding = Encoding
@@ -52,7 +51,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_ToString() As String
     IObject_ToString = MyBase.ToString(Me, App)
@@ -68,7 +67,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Decoder Interface
+'   Decoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function Decoder_Equals(Value As Variant) As Boolean
     Decoder_Equals = IObject_Equals(Value)

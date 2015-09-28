@@ -108,10 +108,12 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef StartTime As Variant, ByRef EndTime As Variant, ByVal Delta As TimeSpan)
-    If Delta Is Nothing Then Set Delta = TimeSpan.Zero
+    If Delta Is Nothing Then
+        Set Delta = TimeSpan.Zero
+    End If
     Set mDelta = Delta
     Set mStartTime = CorDateTime.GetDateTime(StartTime)
     Set mEndTime = CorDateTime.GetDateTime(EndTime)
@@ -119,7 +121,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
@@ -131,15 +133,15 @@ End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("StartTime", mStartTime)
-        Call .WriteProperty("EndTime", mEndTime)
-        Call .WriteProperty("Delta", mDelta)
+        .WriteProperty "StartTime", mStartTime
+        .WriteProperty "EndTime", mEndTime
+        .WriteProperty "Delta", mDelta
     End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
