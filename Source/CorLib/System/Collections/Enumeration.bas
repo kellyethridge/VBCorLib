@@ -114,11 +114,10 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '  VTable functions in the IEnumVariant and IUnknown interfaces.
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-' When VB queries the interface, we support only two: IUnknown, IEnumVariant
 Private Function QueryInterface(ByRef This As EnumeratorWrapper, ByRef riid As VBGUID, ByRef pvObj As Long) As Long
     Dim IsMatch As Boolean
     
+    ' When VB queries the interface, we support only two: IUnknown, IEnumVariant
     Select Case riid.Data1
         Case IID_IEnumVariant_Data1
             IsMatch = CBool(IsEqualGUID(riid, IID_IEnumVariant))
