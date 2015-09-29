@@ -525,7 +525,7 @@ Private Sub ReleaseComparisonStrings()
     SAPtr(mComparisonString2) = vbNullPtr
 End Sub
 
-Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
+Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant) As String
     If SAPtr(Args) = vbNullPtr Then _
         Error.ArgumentNull "Args", ArgumentNull_Array
     

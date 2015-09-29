@@ -63,9 +63,8 @@ Public Sub Throw(Optional ByVal Ex As Object)
 End Sub
 
 Public Function Catch(ByRef Ex As Exception, Optional ByVal Err As ErrObject) As Boolean
-    If Not mException Is Nothing Then
-        Set Ex = mException
-        Set mException = Nothing
+    If Not PeekException Is Nothing Then
+        Set Ex = TakeException
         Catch = True
     ElseIf Not Err Is Nothing Then
         If Err.Number Then
