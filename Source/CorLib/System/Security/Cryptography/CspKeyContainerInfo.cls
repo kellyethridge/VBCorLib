@@ -246,7 +246,7 @@ Private Sub VerifyLoaded()
     End If
     
     CryptoAPI.ReleaseContext Provider, True
-End Property
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

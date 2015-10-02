@@ -44,18 +44,16 @@ Option Explicit
 ' This parameter is ignored if a non-string character is passed in.
 ' @return If the character is considered white space then True is returned, otherwise False is returned.
 '
-Public Function IsWhiteSpace(ByRef CharOrString As Variant, Optional ByRef Index As Variant) As Boolean
-    Select Case VarType(CharOrString)
-        Case vbInteger
-            IsWhiteSpace = IsWhiteSpaceChar(CharOrString)
-        Case vbString
-            IsWhiteSpace = IsWhiteSpaceString(CharOrString, Index)
-        Case Else
-            Error.Argument Argument_InvalidValueType, "String or Integer"
-    End Select
+Public Function IsWhiteSpace(ByRef s As Variant, ByVal Index As Long) As Boolean
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+        
+    Dim Ptr As Long
+    Ptr = StrPtr(s) + Index * corSizeOfChar
+    IsWhiteSpace = IsWhiteSpaceChar(MemWord(Ptr))
 End Function
 
-Friend Function IsWhiteSpaceChar(ByVal Character As Integer) As Boolean
+Public Function IsWhiteSpaceChar(ByVal Character As Integer) As Boolean
     Select Case Character
         Case &H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, _
              &H2000 To &H200A, _
@@ -63,22 +61,6 @@ Friend Function IsWhiteSpaceChar(ByVal Character As Integer) As Boolean
              &H3000
             IsWhiteSpaceChar = True
     End Select
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IsWhiteSpaceString(ByRef s As Variant, ByRef Index As Variant) As Boolean
-    Dim CharIndex As Long
-    CharIndex = OptionalLong(Index, 0)
-    
-    If CharIndex < 0 Or CharIndex >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-    
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + CharIndex * corSizeOfChar
-    IsWhiteSpaceString = IsWhiteSpaceChar(MemWord(Ptr))
 End Function
 
 

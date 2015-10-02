@@ -371,7 +371,7 @@ Public Property Set DateTimeFormat(ByVal Value As DateTimeFormatInfo)
     If IsNeutralCulture Then _
         Throw Cor.NewNotSupportedException("Neutral cultures cannot provide formatting.")
     
-    Set mDateTimeFormat = RHS
+    Set mDateTimeFormat = Value
 End Property
 
 ''

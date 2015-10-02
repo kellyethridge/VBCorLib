@@ -230,15 +230,16 @@ Friend Function GetCultures(ByVal Types As CultureTypes) As CultureInfo()
         If IsNeutral(ID) Then
             If GetNeutral Then
                 Cultures.Add Cor.NewCultureInfo(ID)
+            End If
         ElseIf IsInstalled(ID) And GetInstalled Then
                 Cultures.Add Cor.NewCultureInfo(ID)
         ElseIf GetSpecific Then
                 Cultures.Add Cor.NewCultureInfo(ID)
         End If
-    Next ID
+    Next
     
     Dim Result() As CultureInfo
-    ReDim Result(0 To List.Count - 1)
+    ReDim Result(0 To Cultures.Count - 1)
     Cultures.CopyTo Result
     GetCultures = Result
 End Function
