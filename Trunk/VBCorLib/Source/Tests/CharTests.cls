@@ -24,35 +24,7 @@ End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
-        Case "IsWhiteSpace_WithValue_ReturnsExpected"
-            Test.Use &H20, True
-            Test.Use &H1680, True
-            Test.Use &H180E, True
-            Test.Use &H2000, True
-            Test.Use &H2001, True
-            Test.Use &H2002, True
-            Test.Use &H2003, True
-            Test.Use &H2004, True
-            Test.Use &H2005, True
-            Test.Use &H2006, True
-            Test.Use &H2007, True
-            Test.Use &H2008, True
-            Test.Use &H2009, True
-            Test.Use &H200A, True
-            Test.Use &H202F, True
-            Test.Use &H205F, True
-            Test.Use &H3000, True
-            Test.Use &H2028, True
-            Test.Use &H2029, True
-            Test.Use &H9, True
-            Test.Use &HA, True
-            Test.Use &HB, True
-            Test.Use &HC, True
-            Test.Use &HD, True
-            Test.Use &H85, True
-            Test.Use &HA0, True
-            Test.Use 65, False
-            
+        Case "IsWhiteSpace_WithString_ReturnsExpected"
             Test.Use ChrW$(&H20), True
             Test.Use ChrW$(&H1680), True
             Test.Use ChrW$(&H180E), True
@@ -88,13 +60,42 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 3, False
             Test.Use 4, True
             
+        Case "IsWhiteSpaceChar_WithChar_ReturnsExpected"
+            Test.Use &H20, True
+            Test.Use &H1680, True
+            Test.Use &H180E, True
+            Test.Use &H2000, True
+            Test.Use &H2001, True
+            Test.Use &H2002, True
+            Test.Use &H2003, True
+            Test.Use &H2004, True
+            Test.Use &H2005, True
+            Test.Use &H2006, True
+            Test.Use &H2007, True
+            Test.Use &H2008, True
+            Test.Use &H2009, True
+            Test.Use &H200A, True
+            Test.Use &H202F, True
+            Test.Use &H205F, True
+            Test.Use &H3000, True
+            Test.Use &H2028, True
+            Test.Use &H2029, True
+            Test.Use &H9, True
+            Test.Use &HA, True
+            Test.Use &HB, True
+            Test.Use &HC, True
+            Test.Use &HD, True
+            Test.Use &H85, True
+            Test.Use &HA0, True
+            Test.Use 65, False
+            
     End Select
 End Sub
 
-Public Sub IsWhiteSpace_WithValue_ReturnsExpected(ByRef ch As Variant, ByVal Expected As Boolean)
+Public Sub IsWhiteSpace_WithString_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsWhiteSpace(ch)
+    Actual = Char.IsWhiteSpace(s, 0)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -104,6 +105,14 @@ Public Sub IsWhiteSpace_WithStringIndex_ReturnsExpected(ByVal Index As Long, ByV
     Dim Actual As Boolean
      
     Actual = Char.IsWhiteSpace(s, Index)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsWhiteSpaceChar_WithChar_ReturnsExpected(ByVal Ch As Integer, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.IsWhiteSpaceChar(Ch)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -124,10 +133,10 @@ Public Sub IsWhiteSpace_WithIndexPassedStringLength_ThrowsArgumentOutOfException
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub IsWhiteSpace_WithNonStringOrChar_ThrowsArgumentException()
+Public Sub IsWhiteSpace_WithEmptyString_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    Char.IsWhiteSpace CLng(1)
+    Char.IsWhiteSpace "", 0
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
