@@ -97,7 +97,7 @@ End Function
 ' @return The TimeSpan initialized to the specified number of seconds.
 '
 Public Function FromSeconds(ByVal Value As Double) As TimeSpan
-    Set FromSeconds = FromMilliseconds(Value * corMillisecondsPerSecond)
+    Set FromSeconds = FromMilliseconds(Value * MillisecondsPerSecond)
 End Function
 
 ''
@@ -107,7 +107,7 @@ End Function
 ' @return The TimeSpan initialized to the specified number of minutes.
 '
 Public Function FromMinutes(ByVal Value As Double) As TimeSpan
-    Set FromMinutes = FromMilliseconds(Value * corMillisecondsPerMinute)
+    Set FromMinutes = FromMilliseconds(Value * MillisecondsPerMinute)
 End Function
 
 ''
@@ -117,7 +117,7 @@ End Function
 ' @return The TimeSpan initialized to the specified number of hours.
 '
 Public Function FromHours(ByVal Value As Double) As TimeSpan
-    Set FromHours = FromMilliseconds(Value * corMillisecondsPerHour)
+    Set FromHours = FromMilliseconds(Value * MillisecondsPerHour)
 End Function
 
 ''
@@ -127,7 +127,7 @@ End Function
 ' @return The TimeSpan initialized to the specified number of days.
 '
 Public Function FromDays(ByVal Value As Double) As TimeSpan
-    Set FromDays = FromMilliseconds(Value * corMillisecondsPerDay)
+    Set FromDays = FromMilliseconds(Value * MilliSecondsPerDay)
 End Function
 
 ''

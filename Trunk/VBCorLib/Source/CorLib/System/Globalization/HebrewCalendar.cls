@@ -52,14 +52,14 @@ Private Const PROP_TWODIGITYEARMAX As String = "TwoDigitYearMax"
 ' is September 7, 3761 BC in the Gregorian calendar, which is RD -1,373,427.
 Private Const EPOCH As Long = -1373427
 
-Private Const corSecondsPerMinute        As Long = 60
-Private Const corMinutesPerHour          As Long = 60
-Private Const corHoursPerDay             As Long = 24
+Private Const SecondsPerMinute        As Long = 60
+Private Const MinutesPerHour          As Long = 60
+Private Const HoursPerDay             As Long = 24
 
-Private Const corMillisecondsPerSecond   As Currency = 1000@
-Private Const corMillisecondsPerMinute   As Currency = corMillisecondsPerSecond * corSecondsPerMinute
-Private Const corMillisecondsPerHour     As Currency = corMillisecondsPerMinute * corMinutesPerHour
-Private Const corMillisecondsPerDay      As Currency = corMillisecondsPerHour * corHoursPerDay
+Private Const MillisecondsPerSecond   As Currency = 1000@
+Private Const MillisecondsPerMinute   As Currency = MillisecondsPerSecond * SecondsPerMinute
+Private Const MillisecondsPerHour     As Currency = MillisecondsPerMinute * MinutesPerHour
+Private Const MilliSecondsPerDay      As Currency = MillisecondsPerHour * HoursPerDay
 
 Private Const PARTS_PER_HOUR            As Long = 1080
 
@@ -115,7 +115,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
     End If
     
     ms = CorDateTime.GetDateTime(Time).TotalMilliseconds
-    TOD = Modulus(ms, corMillisecondsPerDay)
+    TOD = Modulus(ms, MilliSecondsPerDay)
     Call GetDateParts(ms, Complete, Year, Month, Day)
     Month = ToDotNetMonth(Year, Month)
     
@@ -171,7 +171,7 @@ Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateT
     Month = ToDotNetMonth(Year, Month)
     Year = Year + Years
     
-    Set AddYears = ToDateTime(Year, Month, Day, 0, 0, 0, 0).AddMilliseconds(Modulus(ms, corMillisecondsPerDay))
+    Set AddYears = ToDateTime(Year, Month, Day, 0, 0, 0, 0).AddMilliseconds(Modulus(ms, MilliSecondsPerDay))
 End Function
 
 Public Function GetEra(ByRef Time As Variant) As Long
@@ -270,7 +270,7 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     
     Dim Days As Long
     Days = GetFixedDaysFromParts(Year, ToHebrewMonth(Year, Month), Day) - 1
-    Set ToDateTime = CorDateTime.FromMilliseconds(Days * corMillisecondsPerDay + Hour * corMillisecondsPerHour + Minute * corMillisecondsPerMinute + Second * corMillisecondsPerSecond + Millisecond)
+    Set ToDateTime = CorDateTime.FromMilliseconds(Days * MilliSecondsPerDay + Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond)
 End Function
 
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
@@ -458,7 +458,7 @@ Private Sub GetDateParts(ByVal ms As Currency, ByVal DatePart As DatePartPrecisi
     If ms < MIN_MILLISECONDS Or ms > MaxMilliseconds Then _
         Throw Cor.NewArgumentOutOfRangeException(ActualValue:=ms, Message:="The Hebrew calendar only supports the years 5343 to 6000 (1582 to 2240 in Gregorian).")
     
-    FixedDays = Int(ms / corMillisecondsPerDay) + 1
+    FixedDays = Int(ms / MilliSecondsPerDay) + 1
     
     Year = Int((FixedDays - EPOCH) / 365.246822205978)  ' this is an approximation
     Do While FixedDays >= GetFixedDaysFromParts(Year, 7, 1): Year = Year + 1: Loop
@@ -487,7 +487,7 @@ End Sub
 Private Function GetFixedDays(ByRef Time As Variant) As Long
     Dim dt As CorDateTime
     Set dt = CorDateTime.GetDateTime(Time)
-    GetFixedDays = Int(dt.TotalMilliseconds / corMillisecondsPerDay) + 1
+    GetFixedDays = Int(dt.TotalMilliseconds / MilliSecondsPerDay) + 1
 End Function
 
 Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long

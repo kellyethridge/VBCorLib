@@ -105,7 +105,7 @@ Public Function GetInstance(ByVal FormatProvider As IFormatProvider) As DateTime
         ElseIf TypeOf FormatProvider Is DateTimeFormatInfo Then
             Set GetInstance = FormatProvider
         Else
-            Set GetInstance = FormatProvider.GetFormat(corDateTimeFormatInfoTypeName)
+            Set GetInstance = FormatProvider.GetFormat(corDateTimeFormatInfo)
         End If
     End If
             
