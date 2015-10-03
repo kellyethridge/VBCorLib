@@ -335,15 +335,16 @@ Public Function Equals(ByRef t1 As Variant, ByRef t2 As Variant) As Boolean
 End Function
 
 Friend Function GetMilliseconds(ByVal d As Date) As Currency
+    Const MillisecondsTo1899 As Currency = 59926435200000#
     Dim Days As Currency
     
     If d < 0# Then
-        Days = Fix(d * corMillisecondsPerDay - 0.5)
-        Days = Days - Modulus(Days, corMillisecondsPerDay) * 2
+        Days = Fix(d * MilliSecondsPerDay - 0.5)
+        Days = Days - Modulus(Days, MilliSecondsPerDay) * 2
     Else
-        Days = Fix(d * corMillisecondsPerDay + 0.5)
+        Days = Fix(d * MilliSecondsPerDay + 0.5)
     End If
-    GetMilliseconds = Days + corMillisecondsTo1899
+    GetMilliseconds = Days + MillisecondsTo1899
 End Function
 
 

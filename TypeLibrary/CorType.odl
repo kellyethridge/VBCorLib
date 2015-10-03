@@ -13,6 +13,7 @@ library CorType {
     typedef long  DWORD;
     typedef short WORD;
     typedef long  LPVOID;
+    typedef currency curr;
 
     //
     // Public Enums
@@ -286,7 +287,7 @@ library CorType {
         long QueryInterface([in] void * riid, [in, out] long * ppvObj);
         long AddRef();
         long Release();
-    }
+    };
 
     [uuid(55A2F2D0-8919-11D0-818F-00A0C90FFFC3), odl]
     interface IRecordInfo : IUnknown
@@ -307,7 +308,7 @@ library CorType {
         long RecordCreate();
         HRESULT RecordCreateCopy([in] long * pvSource, [out, retval] long * RetVal);
         HRESULT RecordDestroy([in] long pvRecord);
-    }
+    };
 
     [uuid(CA5F4EEF-6976-4E85-AD58-A71658C7767A), odl]
     interface IHelper : IUnknown
@@ -324,61 +325,61 @@ library CorType {
         long ShiftLeft([in] long Value, [in] long Count);
         long UAdd([in] long x, [in] long y);
         void UAdd64([in] long * xh, [in] long * xl, [in] long yh, [in] long yl);
-    }
+    };
 
     [uuid(083FA053-ADAB-46c4-83EA-C82DD8786DF1), odl]
     interface Action_T : IUnknown
     {
         void Invoke([in] void * Arg);
-    }
+    };
 
     [uuid(CE820967-75F9-42bf-88AF-FE522EA86F86), odl]
     interface Action_T_T : IUnknown
     {
         void Invoke([in] void * Arg1, [in] void * Arg2);
-    }
+    };
 
     [uuid(DCFEECAA-05A6-42fe-8EED-2496D046E138), odl]
     interface Action_T_T_T : IUnknown
     {
         void Invoke([in] void * Arg1, [in] void * Arg2, [in] void * Arg3);
-    }
+    };
 
     [uuid(AF710B54-E600-433d-AD3D-38A165A10721), odl]
     interface Func_T_Long : IUnknown
     {
         long Invoke([in] void * Arg);
-    }
+    };
 
     [uuid(3D2E19E1-FC9B-4e73-ABD2-9FC6CDFB2C25), odl]
     interface Func_T_T_Long : IUnknown
     {
         long Invoke([in] void * Arg1, [in] void * Arg2);
-    }
+    };
 
     [uuid(330EAE0B-41FF-496b-951A-B985F2BEF9DC), odl]
     interface Func_T_Boolean : IUnknown
     {
         boolean Invoke([in] void * Arg);
-    }
+    };
 
     [uuid(CF0FC6BD-E0A1-4b75-949F-5D57F5F3655E), odl]
     interface Func_T_T_Boolean : IUnknown
     {
         boolean Invoke([in] void * Arg1, [in] void * Arg2);
-    }
+    };
 
     [uuid(B196B283-BAB4-101A-B69C-00AA00341D07), odl]
     interface IProvideClassInfo :IVBUnknown
     {
         long GetClassInfo([in] long * ppTI);
-    }
+    };
 
     [uuid(40A8C97E-FD06-4dd0-8039-0D13B5A80ED8), odl]
     interface ISortRoutine : IUnknown
     {
         void Call([in] long * pSA, [in] long Left, [in] long Right);
-    }
+    };
 
     //
     // Modules
@@ -635,27 +636,27 @@ library CorType {
         const long LOCALE_STIME                   = 0x1E;
         const long LOCALE_STIMEFORMAT             = 0x1003;
         const long LOCALE_SYEARMONTH              = 0x1006;
-
-
     }
 
-    [dllname("CorConstants")]
-    module CorConstants {
-        const long corTicksPerMillisecond           = 10000;
-        const long corSecondsPerMinute              = 60;
-        const long corMinutesPerHour                = 60;
-        const long corHoursPerDay                   = 24;
-        const long corDaysPerWeek                   = 7;
-        const long corDaysPerYear                   = 365;
-        const long corMonthsPerYear                 = 12;
-        const long corDaysPer4Years                 = 1461;             // corDaysPerYear * 4 + 1
-        const currency corMillisecondsPerTick       = 0.0001;
-        const long corMillisecondsPerSecond         = 1000;
-        const currency corMillisecondsPerMinute     = 60000;            // corMillisecondsPerSecond * corSecondsPerMinute
-        const currency corMillisecondsPerHour       = 3600000;          // corMillisecondsPerMinute * corMinutesPerHour
-        const currency corMillisecondsPerDay        = 86400000;         // corMillisecondsPerHour * corHoursPerDay
-        const long corDaysTo1899                    = 693593;
-        const currency corMillisecondsTo1899        = 59926435200000;   // 1@ * corDaysTo1899 * corMillisecondsPerDay
+    [dllname("CorTime")]
+    module CorTime {
+        const long TicksPerMillisecond   = 10000;
+        const long SecondsPerMinute      = 60;
+        const long MinutesPerHour        = 60;
+        const long HoursPerDay           = 24;
+        const long DaysPerWeek           = 7;
+        const long DaysPerYear           = 365;
+        const long MonthsPerYear         = 12;
+        const long DaysPer4Years         = 1461;             // DaysPerYear * 4 + 1
+        const curr MillisecondsPerTick   = 0.0001;
+        const long MillisecondsPerSecond = 1000;
+        const long MillisecondsPerMinute = 60000;            // MillisecondsPerSecond * corSecondsPerMinute
+        const long MillisecondsPerHour   = 3600000;          // MillisecondsPerMinute * corMinutesPerHour
+        const curr MillisecondsPerDay    = 86400000;         // MillisecondsPerHour * corHoursPerDay
+    }
+
+    [dllname("CorChar")]
+    module CorChar {
         const short corTerminator                   = 0;
         const short corOpenParenChar                = 0x28;
         const short corCloseParenChar               = 0x29;
@@ -732,55 +733,71 @@ library CorType {
         const LPSTR corVolumeSeparator              = ":";        
         const LPSTR corDirectorySeparator           = "\\";
         const LPSTR corAltDirectorySeparator        = "/";
-        const long corInvalidProcedureCall          = 5;
-        const long corOutOfMemory                   = 7;
-        const long corOverflow                      = 6;
-        const long corSubscriptOutOfRange           = 9;
-        const long corDivisionByZero                = 11;
-        const long corTypeMismatch                  = 13;
-        const long corBadNameOrNumber               = 52;
-        const long corFileNotFound                  = 53;
-        const long corBadFileMode                   = 54;
-        const long corFileAlreadyOpen               = 55;
-        const long corDeviceIOError                 = 57;
-        const long corFileAlreadyExists             = 58;
-        const long corInputPastEndOfFile            = 62;
-        const long corPermissionDenied              = 70;
-        const long corPathAccessError               = 75;
-        const long corPathNotFound                  = 76;
-        const long corObjectNotSet                  = 91;
-        const long corNotSerializable               = 330;
-        const long corInvalidPropertyValue          = 380;
-        const long corInvalidPropertyArrayIndex     = 381;
-        const long corAutomationError               = 440;
-        const long corArgumentNotOptional           = 449;
-        const long corKeyAlreadyAssociated          = 457;
-        const LPSTR corNumberFormatInfoTypeName     = "NumberFormatInfo";
-        const LPSTR corDateTimeFormatInfoTypeName   = "DateTimeFormatInfo";
-        const long corMissing                       = 0xA;
-        const long corIntegerArray                  = 0x2002;
-        const long corByteArray                     = 0x2011;
-        const long corLongArray                     = 0x2003;
-        const long corBooleanArray                  = 0x200B;
-        const long corStringArray                   = 0x2008;
-        const long corVariantArray                  = 0x200c;
-        const long corSizeOfByte                    = 1;
-        const long corSizeOfInteger                 = 2;
-        const long corSizeOfLong                    = 4;
-        const long corSizeOfSingle                  = 4;
-        const long corSizeOfDouble                  = 8;
-        const long corSizeOfCurrency                = 8;
-        const long corSizeOfDecimal                 = 16;
-        const long corSizeOfBoolean                 = 1;
-        const long corSizeOfDate                    = 8;
-        const long corSizeOfSafeArray               = 16;
-        const long corSizeOfSafeArrayBound          = 8;
-        const long corSizeOfSafeArray1d             = 24;
-        const long corSizeOfGuid                    = 16;
-        const long corSizeOfGuidSafeArray1d         = 40;
-        const long corSizeOfVariant                 = 16;
-        const long corSizeOfPtr                     = 4;
-        const long corSizeOfChar                    = 2;
+    }
+
+    [dllname("CorTypeName")]
+    module CorTypeName {
+        const LPSTR corNumberFormatInfo   = "NumberFormatInfo";
+        const LPSTR corDateTimeFormatInfo = "DateTimeFormatInfo";        
+    }
+
+    [dllname("CorErrorCode")]
+    module CorErrorCode {
+        const long corInvalidProcedureCall      = 5;
+        const long corOutOfMemory               = 7;
+        const long corOverflow                  = 6;
+        const long corSubscriptOutOfRange       = 9;
+        const long corDivisionByZero            = 11;
+        const long corTypeMismatch              = 13;
+        const long corBadNameOrNumber           = 52;
+        const long corFileNotFound              = 53;
+        const long corBadFileMode               = 54;
+        const long corFileAlreadyOpen           = 55;
+        const long corDeviceIOError             = 57;
+        const long corFileAlreadyExists         = 58;
+        const long corInputPastEndOfFile        = 62;
+        const long corPermissionDenied          = 70;
+        const long corPathAccessError           = 75;
+        const long corPathNotFound              = 76;
+        const long corObjectNotSet              = 91;
+        const long corNotSerializable           = 330;
+        const long corInvalidPropertyValue      = 380;
+        const long corInvalidPropertyArrayIndex = 381;
+        const long corAutomationError           = 440;
+        const long corArgumentNotOptional       = 449;
+        const long corKeyAlreadyAssociated      = 457;        
+    }
+
+    [dllname("CorTypeSize")]
+    module CorTypeSize {
+        const long corSizeOfByte            = 1;
+        const long corSizeOfInteger         = 2;
+        const long corSizeOfLong            = 4;
+        const long corSizeOfSingle          = 4;
+        const long corSizeOfDouble          = 8;
+        const long corSizeOfCurrency        = 8;
+        const long corSizeOfDecimal         = 16;
+        const long corSizeOfBoolean         = 1;
+        const long corSizeOfDate            = 8;
+        const long corSizeOfSafeArray       = 16;
+        const long corSizeOfSafeArrayBound  = 8;
+        const long corSizeOfSafeArray1d     = 24;
+        const long corSizeOfGuid            = 16;
+        const long corSizeOfGuidSafeArray1d = 40;
+        const long corSizeOfVariant         = 16;
+        const long corSizeOfPtr             = 4;
+        const long corSizeOfChar            = 2;        
+    }
+
+    [dllname("CorVarType")]
+    module CorVarType {
+        const long corMissing      = 0xA;
+        const long corIntegerArray = 0x2002;
+        const long corByteArray    = 0x2011;
+        const long corLongArray    = 0x2003;
+        const long corBooleanArray = 0x200B;
+        const long corStringArray  = 0x2008;
+        const long corVariantArray = 0x200c;        
     }
 
     [dllname("HResultConstants")]
@@ -1213,5 +1230,5 @@ library CorType {
     module VB6 {
         [entry("__vbaRefVarAry")] long vbaRefVarAry([in] VARIANT * ArrayToDeref);
     }
-}
+};
 

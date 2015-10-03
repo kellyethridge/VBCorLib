@@ -105,7 +105,7 @@ End Property
 ' @remarks The returned duration can contain a fractional
 ' part if necessary to represent the duration.
 Public Property Get TotalSeconds() As Double
-    TotalSeconds = mMilliseconds / corMillisecondsPerSecond
+    TotalSeconds = mMilliseconds / MillisecondsPerSecond
 End Property
 
 ''
@@ -115,7 +115,7 @@ End Property
 ' @remarks The returned duration can contain a fractional
 ' part if necessary to represent the duration.
 Public Property Get TotalMinutes() As Double
-    TotalMinutes = mMilliseconds / corMillisecondsPerMinute
+    TotalMinutes = mMilliseconds / MillisecondsPerMinute
 End Property
 
 ''
@@ -123,7 +123,7 @@ End Property
 '
 ' @return This timespan in hours.
 Public Property Get TotalHours() As Double
-    TotalHours = mMilliseconds / corMillisecondsPerHour
+    TotalHours = mMilliseconds / MillisecondsPerHour
 End Property
 
 ''
@@ -133,7 +133,7 @@ End Property
 ' @remarks The returned duration can contain a fractional
 ' part if necessary to represent the duration.
 Public Property Get TotalDays() As Double
-    TotalDays = mMilliseconds / corMillisecondsPerDay
+    TotalDays = mMilliseconds / MilliSecondsPerDay
 End Property
 
 ''
@@ -143,7 +143,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Milliseconds() As Long
-    Milliseconds = AsLong(mMilliseconds * corMillisecondsPerTick) Mod 1000
+    Milliseconds = AsLong(mMilliseconds * MillisecondsPerTick) Mod 1000
 End Property
 
 ''
@@ -153,7 +153,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Seconds() As Long
-    Seconds = Fix(mMilliseconds / corMillisecondsPerSecond) Mod 60
+    Seconds = Fix(mMilliseconds / MillisecondsPerSecond) Mod 60
 End Property
 
 ''
@@ -163,7 +163,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Minutes() As Long
-    Minutes = Fix(mMilliseconds / corMillisecondsPerMinute) Mod 60
+    Minutes = Fix(mMilliseconds / MillisecondsPerMinute) Mod 60
 End Property
 
 ''
@@ -173,7 +173,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Hours() As Long
-    Hours = Fix(mMilliseconds / corMillisecondsPerHour) Mod 24
+    Hours = Fix(mMilliseconds / MillisecondsPerHour) Mod 24
 End Property
 
 ''
@@ -183,7 +183,7 @@ End Property
 ' @remarks This does not represent the entire duration of the
 ' timespan, only the specified portion of it.
 Public Property Get Days() As Long
-    Days = Fix(mMilliseconds / corMillisecondsPerDay)
+    Days = Fix(mMilliseconds / MilliSecondsPerDay)
 End Property
 
 ''
@@ -192,7 +192,7 @@ End Property
 ' @return The duration in ticks
 ' @remarks A tick is defined as 100 nanoseconds, or 1/10000 of a millisecond.
 Public Property Get Ticks() As Variant
-    Ticks = CDec(mMilliseconds) * corTicksPerMillisecond
+    Ticks = CDec(mMilliseconds) * TicksPerMillisecond
 End Property
 
 ''
@@ -238,22 +238,22 @@ Public Function ToString() As String
     End If
     
     Dim Days As Long
-    Days = Int(ms / corMillisecondsPerDay)
+    Days = Int(ms / MilliSecondsPerDay)
     If Days <> 0 Then
         Output.Append Days
         Output.AppendChar corPeriodChar
     End If
 
-    AppendComponent Output, Int(ms / corMillisecondsPerHour) Mod corHoursPerDay, 2
+    AppendComponent Output, Int(ms / MillisecondsPerHour) Mod HoursPerDay, 2
     Output.AppendChar corColonChar
-    AppendComponent Output, Int(ms / corMillisecondsPerMinute) Mod corMinutesPerHour, 2
+    AppendComponent Output, Int(ms / MillisecondsPerMinute) Mod MinutesPerHour, 2
     Output.AppendChar corColonChar
-    AppendComponent Output, Int(ms / corMillisecondsPerSecond) Mod corSecondsPerMinute, 2
+    AppendComponent Output, Int(ms / MillisecondsPerSecond) Mod SecondsPerMinute, 2
     
     Dim MillisecondComponent    As Long
     Dim TicksComponent          As Long
-    MillisecondComponent = Modulus(ms, corMillisecondsPerSecond)
-    TicksComponent = (mMilliseconds - Int(mMilliseconds)) * corTicksPerMillisecond
+    MillisecondComponent = Modulus(ms, MillisecondsPerSecond)
+    TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TicksPerMillisecond
     
     If MillisecondComponent <> 0 Then
         Output.AppendChar corPeriodChar
@@ -300,7 +300,7 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Days As Long, ByVal Hours As Long, ByVal Minutes As Long, ByVal Seconds As Long, ByVal Milliseconds As Long)
-    InitFromMilliseconds (Days * corMillisecondsPerDay) + (Hours * corMillisecondsPerHour) + (Minutes * corMillisecondsPerMinute) + (Seconds * corMillisecondsPerSecond) + Milliseconds
+    InitFromMilliseconds (Days * MilliSecondsPerDay) + (Hours * MillisecondsPerHour) + (Minutes * MillisecondsPerMinute) + (Seconds * MillisecondsPerSecond) + Milliseconds
 End Sub
 
 Friend Sub InitFromMilliseconds(ByVal Value As Currency)
