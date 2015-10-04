@@ -209,7 +209,7 @@ Public Sub StartTicker()
     StopTicker
     
     If mInterval > 0 Then
-        mTimerId = TickerHelper.StartTicker(Me)
+        mTimerId = TickerShared.StartTicker(Me)
     End If
 End Sub
 
@@ -218,7 +218,7 @@ End Sub
 '
 Public Sub StopTicker()
     If Enabled Then
-        TickerHelper.StopTicker mTimerId
+        TickerShared.StopTicker mTimerId
     End If
 End Sub
 

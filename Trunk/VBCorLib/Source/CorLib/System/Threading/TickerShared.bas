@@ -1,4 +1,4 @@
-Attribute VB_Name = "TickerHelper"
+Attribute VB_Name = "TickerShared"
 'The MIT License (MIT)
 'Copyright (c) 2014 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "TickerHelper"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modTicker
+' Module: TickerShared
 '
 
 ''
