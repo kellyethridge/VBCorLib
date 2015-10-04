@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: FromBase64Transform
+' Module: FromBase64Transform
 '
 
 ''
@@ -42,8 +45,7 @@ Option Explicit
 Implements IObject
 Implements ICryptoTransform
 
-Private Const DEF_IGNOREWHITESPACES             As Boolean = True
-Private Const vbBase64TerminatorChar            As Long = corEqualChar
+Private Const Base64TerminatorChar As Long = corEqualChar
 
 
 ''
@@ -123,14 +125,18 @@ End Sub
 ' @return The number of bytes transformed.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InputBuffer), InputOffset, InputCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputOffset", InputCount, "InputCount", False)
-    
+    If SAPtr(InputBuffer) = vbNullPtr Then _
+        Error.ArgumentNull "InputBuffer", ArgumentNull_Array
+    If InputOffset < LBound(InputBuffer) Then _
+        Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
+    If InputCount < 0 Then _
+        Error.ArgumentOutOfRange "InputCount", ArgumentOutOfRange_NeedNonNegNum
+    If InputOffset + InputCount - 1 > UBound(InputBuffer) Then _
+        Error.Argument Argument_InvalidOffLen
     If SAPtr(OutputBuffer) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("OutputBuffer", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "OutputBuffer", ArgumentNull_Array
     If OutputOffset < LBound(OutputBuffer) Then _
-        Throw Cor.NewArgumentOutOfRangeException("OutputOffset", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Error.ArgumentOutOfRange "OutputOffset", ArgumentOutOfRange_ArrayLB
     
     Dim StartingOffset As Long
     StartingOffset = OutputOffset
@@ -142,19 +148,19 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
         Dim b As Long
         b = InputBuffer(InputOffset)
         If CanProcessChar(b) Then
-            If b <> vbBase64TerminatorChar Then
+            If b <> Base64TerminatorChar Then
                 If mTermCount > 0 Then _
-                    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                    Error.Format Format_InvalidBase64Character
                     
                 b = Base64CharToBits(b)
                 If b = corInvalidChar Then _
-                    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                    Error.Format Format_InvalidBase64Character
                     
                 mBits = mBits Or b
             Else
                 mTermCount = mTermCount + 1
                 If mTermCount > 2 Then _
-                    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                    Error.Format Format_InvalidBase64Character
                 
             End If
             mBitCount = mBitCount + 6
@@ -164,7 +170,9 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
             Else
                 Dim NewOffset As Long
                 NewOffset = OutputOffset + (2 - mTermCount)
-                If NewOffset > OutputBufferUB Then Call SmallBufferError("OutputBuffer")
+                If NewOffset > OutputBufferUB Then
+                    SmallBufferError "OutputBuffer"
+                End If
                 
                 OutputBuffer(OutputOffset) = (mBits And &HFF0000) \ &H10000
                 
@@ -179,7 +187,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
                 End Select
                 
                 OutputOffset = NewOffset + 1
-                Call Reset
+                Reset
             End If
         End If
         
@@ -199,26 +207,35 @@ End Function
 ' @return The final transformed data.
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InputBuffer), InputOffset, InputCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputOffset", InputCount, "InputCount", False)
+    If SAPtr(InputBuffer) = vbNullPtr Then _
+        Error.ArgumentNull "InputBuffer", ArgumentNull_Array
+    If InputOffset < LBound(InputBuffer) Then _
+        Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
+    If InputCount < 0 Then _
+        Error.ArgumentOutOfRange "InputCount", ArgumentOutOfRange_NeedNonNegNum
+    If InputOffset + InputCount - 1 > UBound(InputBuffer) Then _
+        Error.Argument Argument_InvalidOffLen
 
-    Dim Ret() As Byte
+    Dim Result() As Byte
     If (mBitCount \ 6) + InputCount < 4 Then
-        Ret = Cor.NewBytes()
+        Result = Cor.NewBytes()
     ElseIf mTermCount > 0 Then
         ReDim Ret(0 To 1 - mTermCount)
-        Call TransformBlock(InputBuffer, InputOffset, InputCount, Ret, 0)
+        TransformBlock InputBuffer, InputOffset, InputCount, Result, 0
     Else
-        ReDim Ret(0 To InputCount)
+        ReDim Result(0 To InputCount)
+        Dim Count As Long
         
-        Dim i As Long
-        i = TransformBlock(InputBuffer, InputOffset, InputCount, Ret, 0)
-        ReDim Preserve Ret(0 To i - 1)
+        Count = TransformBlock(InputBuffer, InputOffset, InputCount, Result, 0)
+        If Count > 0 Then
+            ReDim Preserve Result(0 To Count - 1)
+        Else
+            Result = Cor.NewBytes()
+        End If
     End If
         
-    Call Reset
-    TransformFinalBlock = Ret
+    Reset
+    TransformFinalBlock = Result
 End Function
 
 ''
@@ -258,34 +275,32 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+     mIgnoreWhiteSpaces = True
+End Sub
+
 Friend Sub Init(ByVal WhiteSpaces As FromBase64TransformMode)
     mIgnoreWhiteSpaces = (WhiteSpaces = IgnoreWhiteSpaces)
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub SmallBufferError(ByVal ParamName As String)
     Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), ParamName)
 End Sub
 
-Private Function CanProcessChar(ByVal Ch As Long) As Boolean
-    If IsWhiteSpace(Ch) Then
+Private Function CanProcessChar(ByVal Ch As Integer) As Boolean
+    If Char.IsWhiteSpaceChar(Ch) Then
         If Not mIgnoreWhiteSpaces Then
-            Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+            Error.Format Format_InvalidBase64Character
         End If
     Else
         CanProcessChar = True
     End If
-End Function
-
-Private Function IsWhiteSpace(ByVal Ch As Long) As Boolean
-    Select Case Ch
-        Case &H20, &H9, &HA, &HB, &HC, &HD, &H85, &HA0: IsWhiteSpace = True
-    End Select
 End Function
 
 Private Sub Reset()
@@ -296,15 +311,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-     mIgnoreWhiteSpaces = DEF_IGNOREWHITESPACES
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -332,7 +339,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
