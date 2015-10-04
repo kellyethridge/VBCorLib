@@ -221,6 +221,17 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    With Statics.SHA512
+        CopyMemory mKh(0), ByVal .KPtr.HiDWord, 320
+        CopyMemory mKl(0), ByVal .KPtr.LoDWord, 320
+        mStatePtr = .StatePtr
+    End With
+    
+    Set mBase = Cor.NewHashAlgorithmBase(Me, True, True, 128)
+    Initialize
+End Sub
+
 Friend Sub Init(ByRef StatePtr As DLong)
     mStatePtr = StatePtr
     Initialize
@@ -591,21 +602,6 @@ Private Function LilSig1Lo(ByVal xh As Long, ByVal xl As Long) As Long
     LilSig1Lo = RRotateLo(xh, xl, 19) Xor RRotateLo(xh, xl, 61) Xor RShiftLo(xh, xl, 6)
 End Function
 #End If
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    With Statics.SHA512
-        CopyMemory mKh(0), ByVal .KPtr.HiDWord, 320
-        CopyMemory mKl(0), ByVal .KPtr.LoDWord, 320
-        mStatePtr = .StatePtr
-    End With
-    
-    Set mBase = Cor.NewHashAlgorithmBase(Me, True, True, 128)
-    Initialize
-End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

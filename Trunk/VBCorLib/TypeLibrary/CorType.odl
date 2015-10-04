@@ -1091,14 +1091,14 @@ library CorType {
         const long ALG_SID_RSA_ANY         = 0x0;
         const long ALG_CLASS_SIGNATURE     = 0x2000;    //(1 * 2 ^ 13)
         const long ALG_SID_DSS_ANY         = 0x0;
-        const long ALG_TYPE_DSS            = 0x200;     //(1 * 2 ^ 9)
+        const long ALG_TYPE_DSS            = 0x200;     //(1 * 2 ^ 9);
 
         const long CALG_DES                = 0x6601;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_DES)
         const long CALG_RC2                = 0x6602;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_RC2)
         const long CALG_3DES               = 0x6603;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_3DES)
         const long CALG_3DES_112           = 0x6609;        //(ALG_CLASS_DATA_ENCRYPT Or ALG_TYPE_BLOCK Or ALG_SID_3DES_112)
-        const long CALG_SHA1               = 0xFFFF8004;    //(ALG_CLASS_HASH Or ALG_TYPE_ANY Or ALG_SID_SHA1)
-        const long CALG_MD5                = 0xFFFF8003;    //(ALG_CLASS_HASH Or ALG_TYPE_ANY Or ALG_SID_MD5)
+        const long CALG_SHA1               = 0x8004;        //(ALG_CLASS_HASH Or ALG_TYPE_ANY Or ALG_SID_SHA1)
+        const long CALG_MD5                = 0x8003;        //(ALG_CLASS_HASH Or ALG_TYPE_ANY Or ALG_SID_MD5)
         const long CALG_RSA_KEYX           = 0xFFFFA400;    //(ALG_CLASS_KEY_EXCHANGE Or ALG_TYPE_RSA Or ALG_SID_RSA_ANY)
         const long CALG_RSA_SIGN           = 0x2400;        //(ALG_CLASS_SIGNATURE Or ALG_TYPE_RSA Or ALG_SID_RSA_ANY)
         const long CALG_DSS_SIGN           = 0x2200;        //(ALG_CLASS_SIGNATURE Or ALG_TYPE_DSS Or ALG_SID_DSS_ANY)
