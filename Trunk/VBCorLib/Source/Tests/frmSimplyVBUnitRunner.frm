@@ -189,7 +189,7 @@ Private Sub AddSystemSecurityCryptography()
     With Sim.NewTestSuite("System.Security.Cryptography")
 '        .Add New TestRNGCryptoServiceProvider
         .Add New ToBase64TransformTests
-'        .Add New TestFromBase64Transform
+        .Add New FromBase64TransformTests
         .Add New SHA1CryptoServiceProviderTests
         .Add New SHA1ManagedTests
         .Add New SHA256ManagedTests
