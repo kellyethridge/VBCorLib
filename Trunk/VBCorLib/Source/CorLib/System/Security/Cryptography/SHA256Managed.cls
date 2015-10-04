@@ -117,7 +117,7 @@ End Property
 ' Releases any resources.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -149,7 +149,7 @@ Public Sub Initialize()
     mState(6) = &H1F83D9AB
     mState(7) = &H5BE0CD19
     
-    Call mBase.Initialize
+    mBase.Initialize
 End Sub
 
 ''
@@ -221,7 +221,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, ByVal MessageLength As Currency) As Byte()
     Buffer(BufferCount) = &H80
@@ -232,7 +232,7 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
     
     Dim FinalBuffer() As Byte
     ReDim FinalBuffer(0 To Size - 1)
-    Call CopyMemory(FinalBuffer(0), Buffer(0), BufferCount)
+    CopyMemory FinalBuffer(0), Buffer(0), BufferCount
     
     Dim i As Long
     With AsOByteArr(MessageLength * 0.0008@)
@@ -241,99 +241,22 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
         Next i
     End With
     
-    Call Transform(FinalBuffer, 0)
-    If Size = 128 Then Call Transform(FinalBuffer, 64)
+    Transform FinalBuffer, 0
+    If Size = 128 Then
+        Transform FinalBuffer, 64
+    End If
     
-    Dim Ret() As Byte
-    ReDim Ret(31)
+    Dim Result(0 To 31) As Byte
     For i = 0 To 7
-        AsLong(Ret(i * 4)) = SwapEndian(mState(i))
+        AsLong(Result(i * 4)) = SwapEndian(mState(i))
     Next i
     
-    HashFinal = Ret
+    HashFinal = Result
 End Function
 
+#If Release Then
+' Must disable Integer overflow checks.
 Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
-    If InIDE Then
-        Call TransformIDE(Bytes, Index)
-    Else
-        Call TransformNative(Bytes, Index)
-    End If
-End Sub
-
-''
-' Runs in the IDE.
-'
-Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
-    Dim i As Long
-    For i = 0 To 15
-        mW(i) = SwapEndian(AsLong(Bytes(Index)))
-        Index = Index + 4
-    Next i
-    
-    Dim s0 As Long
-    Dim s1 As Long
-    For i = 16 To 63
-        s0 = RRotate(mW(i - 15), 7) Xor RRotate(mW(i - 15), 18) Xor Helper.ShiftRight(mW(i - 15), 3)
-        s1 = RRotate(mW(i - 2), 17) Xor RRotate(mW(i - 2), 19) Xor Helper.ShiftRight(mW(i - 2), 10)
-        mW(i) = Helper.UAdd(Helper.UAdd(Helper.UAdd(mW(i - 16), s0), s1), mW(i - 7))
-    Next i
-    
-    Dim a As Long
-    Dim b As Long
-    Dim c As Long
-    Dim d As Long
-    Dim e As Long
-    Dim f As Long
-    Dim g As Long
-    Dim h As Long
-    Dim t1 As Long
-    Dim Maj As Long
-    Dim t2 As Long
-    Dim Ch As Long
-    
-    a = mState(0)
-    b = mState(1)
-    c = mState(2)
-    d = mState(3)
-    e = mState(4)
-    f = mState(5)
-    g = mState(6)
-    h = mState(7)
-    
-    For i = 0 To 63
-        s0 = RRotate(a, 2) Xor RRotate(a, 13) Xor RRotate(a, 22)
-        Maj = ((a And b) Xor (a And c) Xor (b And c))
-        t2 = Helper.UAdd(s0, Maj)
-        s1 = RRotate(e, 6) Xor RRotate(e, 11) Xor RRotate(e, 25)
-        Ch = (e And f) Xor ((Not e) And g)
-        t1 = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(h, s1), Ch), mK(i)), mW(i))
-        
-        h = g
-        g = f
-        f = e
-        e = Helper.UAdd(d, t1)
-        d = c
-        c = b
-        b = a
-        a = Helper.UAdd(t1, t2)
-    Next i
-    
-    mState(0) = Helper.UAdd(mState(0), a)
-    mState(1) = Helper.UAdd(mState(1), b)
-    mState(2) = Helper.UAdd(mState(2), c)
-    mState(3) = Helper.UAdd(mState(3), d)
-    mState(4) = Helper.UAdd(mState(4), e)
-    mState(5) = Helper.UAdd(mState(5), f)
-    mState(6) = Helper.UAdd(mState(6), g)
-    mState(7) = Helper.UAdd(mState(7), h)
-
-End Sub
-
-''
-' Runs when compiled. Must disable Integer overflow checks.
-'
-Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     Dim i As Long
     For i = 0 To 15
         mW(i) = (Bytes(Index) * &H1000000) Or (Bytes(Index + 1) * &H10000) Or (Bytes(Index + 2) * &H100&) Or Bytes(Index + 3)
@@ -404,20 +327,89 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     mState(6) = mState(6) + g
     mState(7) = mState(7) + h
 End Sub
+#Else
+Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
+    Dim i As Long
+    For i = 0 To 15
+        mW(i) = SwapEndian(AsLong(Bytes(Index)))
+        Index = Index + 4
+    Next i
+    
+    Dim s0 As Long
+    Dim s1 As Long
+    For i = 16 To 63
+        s0 = RRotate(mW(i - 15), 7) Xor RRotate(mW(i - 15), 18) Xor Helper.ShiftRight(mW(i - 15), 3)
+        s1 = RRotate(mW(i - 2), 17) Xor RRotate(mW(i - 2), 19) Xor Helper.ShiftRight(mW(i - 2), 10)
+        mW(i) = Helper.UAdd(Helper.UAdd(Helper.UAdd(mW(i - 16), s0), s1), mW(i - 7))
+    Next i
+    
+    Dim a As Long
+    Dim b As Long
+    Dim c As Long
+    Dim d As Long
+    Dim e As Long
+    Dim f As Long
+    Dim g As Long
+    Dim h As Long
+    Dim t1 As Long
+    Dim Maj As Long
+    Dim t2 As Long
+    Dim Ch As Long
+    
+    a = mState(0)
+    b = mState(1)
+    c = mState(2)
+    d = mState(3)
+    e = mState(4)
+    f = mState(5)
+    g = mState(6)
+    h = mState(7)
+    
+    For i = 0 To 63
+        s0 = RRotate(a, 2) Xor RRotate(a, 13) Xor RRotate(a, 22)
+        Maj = ((a And b) Xor (a And c) Xor (b And c))
+        t2 = Helper.UAdd(s0, Maj)
+        s1 = RRotate(e, 6) Xor RRotate(e, 11) Xor RRotate(e, 25)
+        Ch = (e And f) Xor ((Not e) And g)
+        t1 = Helper.UAdd(Helper.UAdd(Helper.UAdd(Helper.UAdd(h, s1), Ch), mK(i)), mW(i))
+        
+        h = g
+        g = f
+        f = e
+        e = Helper.UAdd(d, t1)
+        d = c
+        c = b
+        b = a
+        a = Helper.UAdd(t1, t2)
+    Next i
+    
+    mState(0) = Helper.UAdd(mState(0), a)
+    mState(1) = Helper.UAdd(mState(1), b)
+    mState(2) = Helper.UAdd(mState(2), c)
+    mState(3) = Helper.UAdd(mState(3), d)
+    mState(4) = Helper.UAdd(mState(4), e)
+    mState(5) = Helper.UAdd(mState(5), f)
+    mState(6) = Helper.UAdd(mState(6), g)
+    mState(7) = Helper.UAdd(mState(7), h)
+
+End Sub
+#End If
+
+
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call CopyMemory(mK(0), ByVal Statics.SHA256.KPtr, 256)
+    CopyMemory mK(0), ByVal Statics.SHA256.KPtr, 256
     Set mBase = Cor.NewHashAlgorithmBase(Me, True, True, 64)
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   HashAlgorithm Interface
+'   HashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get HashAlgorithm_CanReuseTransform() As Boolean
     HashAlgorithm_CanReuseTransform = CanReuseTransform
@@ -428,7 +420,7 @@ Private Property Get HashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub HashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function HashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -452,7 +444,7 @@ Private Property Get HashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub HashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get HashAlgorithm_InputBlockSize() As Long
@@ -477,7 +469,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -505,10 +497,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IHashAlgorithm Interface
+'   IHashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IHashAlgorithm_HashCore(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
-    Call Transform(Bytes, Index)
+    Transform Bytes, Index
 End Sub
 
 Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal ByteCount As Long, ByVal MessageLength As Currency) As Byte()
@@ -516,12 +508,12 @@ Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal ByteCoun
 End Function
 
 Private Sub IHashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -537,7 +529,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SHA256 Interface
+'   SHA256
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get SHA256_CanReuseTransform() As Boolean
     SHA256_CanReuseTransform = CanReuseTransform
@@ -548,7 +540,7 @@ Private Property Get SHA256_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub SHA256_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function SHA256_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -572,7 +564,7 @@ Private Property Get SHA256_HashSize() As Long
 End Property
 
 Private Sub SHA256_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get SHA256_InputBlockSize() As Long
