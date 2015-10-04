@@ -81,7 +81,7 @@ Class=Encoding; System\Text\Encoding.cls
 Class=Decoder; System\Text\Decoder.cls
 Class=CorDateTimeStatic; System\CorDateTimeStatic.cls
 Module=HashtableHelper; System\Collections\HashtableHelper.bas
-Module=modcDateTimeHelpers; System\modcDateTimeHelpers.bas
+Module=CorDateTimeShared; System\CorDateTimeShared.bas
 Class=DateTimeFormatInfoStatic; System\Globalization\DateTimeFormatInfoStatic.cls
 Class=IOException; System\IO\IOException.cls
 Class=FileNotFoundException; System\IO\FileNotFoundException.cls
@@ -188,7 +188,7 @@ Class=CallbackSorter; System\CallbackSorter.cls
 Class=INIFile; System\IO\INIFile.cls
 Class=INISectionWriter; System\IO\INISectionWriter.cls
 Class=Ticker; System\Threading\Ticker.cls
-Module=TickerHelper; System\Threading\TickerHelper.bas
+Module=TickerShared; System\Threading\TickerShared.bas
 Module=ArgumentHelper; System\ArgumentHelper.bas
 Class=ExceptionBase; System\ExceptionBase.cls
 Module=Statics; System\Statics.bas
@@ -362,7 +362,7 @@ VersionCompanyName="Home"
 VersionFileDescription="VB.EXT Core Class Library"
 VersionLegalCopyright="Copyright Kelly Ethridge"
 VersionProductName="VB.EXT: CorLib 3.0"
-CondComp="RELEASE = 0"
+CondComp="Release = 0"
 CompilationType=0
 OptimizationType=0
 FavorPentiumPro(tm)=0

@@ -1,4 +1,4 @@
-Attribute VB_Name = "modcDateTimeHelpers"
+Attribute VB_Name = "CorDateTimeShared"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "modcDateTimeHelpers"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modcDateTimeHelpers
+' Module: CorDateTimeShared
 '
 
 ''
