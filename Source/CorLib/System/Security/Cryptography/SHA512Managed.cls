@@ -59,8 +59,6 @@ Private mKl(0 To 79)        As Long
 Private mStatePtr           As DLong
 
 
-
-
 ''
 ' Returns if this service provider can be reused to transfrom more data.
 '
@@ -122,7 +120,7 @@ End Property
 ' Releases any resources.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -146,10 +144,10 @@ Public Sub Initialize()
     Erase mWh
     Erase mWl
     
-    Call CopyMemory(mStateH(0), ByVal mStatePtr.HiDWord, 32)
-    Call CopyMemory(mStateL(0), ByVal mStatePtr.LoDWord, 32)
+    CopyMemory mStateH(0), ByVal mStatePtr.HiDWord, 32
+    CopyMemory mStateL(0), ByVal mStatePtr.LoDWord, 32
     
-    Call mBase.Initialize
+    mBase.Initialize
 End Sub
 
 ''
@@ -221,16 +219,16 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef StatePtr As DLong)
     mStatePtr = StatePtr
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, ByVal MessageLength As Currency) As Byte()
     Buffer(BufferCount) = &H80
@@ -241,7 +239,7 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
 
     Dim FinalBuffer() As Byte
     ReDim FinalBuffer(0 To Size - 1)
-    Call CopyMemory(FinalBuffer(0), Buffer(0), BufferCount)
+    CopyMemory FinalBuffer(0), Buffer(0), BufferCount
 
     Dim i As Long
     With AsOByteArr(MessageLength * 0.0008@)
@@ -250,195 +248,23 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
         Next i
     End With
 
-    Call Transform(FinalBuffer, 0)
-    If Size = 256 Then Call Transform(FinalBuffer, 128)
+    Transform FinalBuffer, 0
+    If Size = 256 Then
+        Transform FinalBuffer, 128
+    End If
 
-    Dim Ret() As Byte
-    ReDim Ret(63)
+    Dim Result(0 To 63) As Byte
     For i = 0 To 7
-        AsLong(Ret(i * 8)) = SwapEndian(mStateH(i))
-        AsLong(Ret(i * 8 + 4)) = SwapEndian(mStateL(i))
+        AsLong(Result(i * 8)) = SwapEndian(mStateH(i))
+        AsLong(Result(i * 8 + 4)) = SwapEndian(mStateL(i))
     Next i
 
-    HashFinal = Ret
+    HashFinal = Result
 End Function
 
+#If Release Then
+' Must disable Integer overflow checks.
 Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
-    If InIDE Then
-        Call TransformIDE(Bytes, Index)
-    Else
-        Call TransformNative(Bytes, Index)
-    End If
-End Sub
-
-''
-' Runs in the IDE.
-'
-Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
-    Dim i As Long
-    For i = 0 To 15
-        mWh(i) = SwapEndian(AsLong(Bytes(Index)))
-        mWl(i) = SwapEndian(AsLong(Bytes(Index + 4)))
-        Index = Index + 8
-    Next i
-    
-    Dim T1l As Long
-    Dim T1h As Long
-    Dim T2l As Long
-    Dim T2h As Long
-    Dim s0l As Long
-    Dim s0h As Long
-    Dim s1l As Long
-    Dim s1h As Long
-    For i = 16 To 79
-        T1l = mWl(i - 2)
-        T1h = mWh(i - 2)
-        s1l = LilSig1Lo(T1h, T1l)
-        s1h = LilSig1Hi(T1h, T1l)
-
-        T2l = mWl(i - 15)
-        T2h = mWh(i - 15)
-        s0l = LilSig0Lo(T2h, T2l)
-        s0h = LilSig0Hi(T2h, T2l)
-        
-        Call UAdd64(s1h, s1l, mWh(i - 7), mWl(i - 7))
-        Call UAdd64(s1h, s1l, s0h, s0l)
-        Call UAdd64(s1h, s1l, mWh(i - 16), mWl(i - 16))
-
-        mWh(i) = s1h
-        mWl(i) = s1l
-    Next i
-    
-    Dim Ah As Long, Al As Long
-    Dim Bh As Long, Bl As Long
-    Dim Ch As Long, Cl As Long
-    Dim Dh As Long, Dl As Long
-    Dim Eh As Long, El As Long
-    Dim Fh As Long, Fl As Long
-    Dim Gh As Long, Gl As Long
-    Dim Hh As Long, Hl As Long
-    
-    Ah = mStateH(0): Al = mStateL(0)
-    Bh = mStateH(1): Bl = mStateL(1)
-    Ch = mStateH(2): Cl = mStateL(2)
-    Dh = mStateH(3): Dl = mStateL(3)
-    Eh = mStateH(4): El = mStateL(4)
-    Fh = mStateH(5): Fl = mStateL(5)
-    Gh = mStateH(6): Gl = mStateL(6)
-    Hh = mStateH(7): Hl = mStateL(7)
-    
-    For i = 0 To 79
-        T1h = Hh: T1l = Hl
-        Call UAdd64(T1h, T1l, BigSIG1Hi(Eh, El), BigSIG1Lo(Eh, El))
-        Call UAdd64(T1h, T1l, Choice(Eh, Fh, Gh), Choice(El, Fl, Gl))
-        Call UAdd64(T1h, T1l, mKh(i), mKl(i))
-        Call UAdd64(T1h, T1l, mWh(i), mWl(i))
-
-        T2h = BigSIG0Hi(Ah, Al): T2l = BigSIG0Lo(Ah, Al)
-        Call UAdd64(T2h, T2l, Maj(Ah, Bh, Ch), Maj(Al, Bl, Cl))
-
-        Hh = Gh: Hl = Gl
-        Gh = Fh: Gl = Fl
-        Fh = Eh: Fl = El
-        Eh = Dh: El = Dl
-        Call UAdd64(Eh, El, T1h, T1l)
-        Dh = Ch: Dl = Cl
-        Ch = Bh: Cl = Bl
-        Bh = Ah: Bl = Al
-        Ah = T1h: Al = T1l
-        Call UAdd64(Ah, Al, T2h, T2l)
-    Next i
-    
-    Call UAdd64(mStateH(0), mStateL(0), Ah, Al)
-    Call UAdd64(mStateH(1), mStateL(1), Bh, Bl)
-    Call UAdd64(mStateH(2), mStateL(2), Ch, Cl)
-    Call UAdd64(mStateH(3), mStateL(3), Dh, Dl)
-    Call UAdd64(mStateH(4), mStateL(4), Eh, El)
-    Call UAdd64(mStateH(5), mStateL(5), Fh, Fl)
-    Call UAdd64(mStateH(6), mStateL(6), Gh, Gl)
-    Call UAdd64(mStateH(7), mStateL(7), Hh, Hl)
-End Sub
-
-Private Sub UAdd64(ByRef xh As Long, ByRef xl As Long, ByVal yh As Long, ByVal yl As Long)
-    Call Helper.UAdd64(xh, xl, yh, yl)
-End Sub
-
-Private Function RShiftHi(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
-    If Count < 32 Then
-        RShiftHi = Helper.ShiftRight(xh, Count)
-    End If
-End Function
-
-Private Function RShiftLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
-    If Count < 32 Then
-        RShiftLo = Helper.ShiftLeft(xh, 32 - Count) Or Helper.ShiftRight(xl, Count)
-    Else
-        RShiftLo = Helper.ShiftRight(xh, Count - 32)
-    End If
-End Function
-
-Private Function RRotateHi(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
-    If Count < 32 Then
-        RRotateHi = Helper.ShiftRight(xh, Count) Or Helper.ShiftLeft(xl, 32 - Count)
-    Else
-        RRotateHi = Helper.ShiftLeft(xh, 64 - Count) Or Helper.ShiftRight(xl, Count - 32)
-    End If
-End Function
-
-Private Function RRotateLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
-    If Count < 32 Then
-        RRotateLo = Helper.ShiftLeft(xh, 32 - Count) Or Helper.ShiftRight(xl, Count)
-    Else
-        RRotateLo = Helper.ShiftRight(xh, Count - 32) Or Helper.ShiftLeft(xl, 64 - Count)
-    End If
-End Function
-
-Private Function Choice(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
-    Choice = (X And Y) Xor ((Not X) And z)
-End Function
-
-Private Function Maj(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
-    Maj = (X And Y) Xor (X And z) Xor (Y And z)
-End Function
-
-Private Function BigSIG0Hi(ByVal xh As Long, ByVal xl As Long) As Long
-    BigSIG0Hi = RRotateHi(xh, xl, 28) Xor RRotateHi(xh, xl, 34) Xor RRotateHi(xh, xl, 39)
-End Function
-
-Private Function BigSIG0Lo(ByVal xh As Long, ByVal xl As Long) As Long
-    BigSIG0Lo = RRotateLo(xh, xl, 28) Xor RRotateLo(xh, xl, 34) Xor RRotateLo(xh, xl, 39)
-End Function
-
-Private Function BigSIG1Hi(ByVal xh As Long, ByVal xl As Long) As Long
-    BigSIG1Hi = RRotateHi(xh, xl, 14) Xor RRotateHi(xh, xl, 18) Xor RRotateHi(xh, xl, 41)
-End Function
-
-Private Function BigSIG1Lo(ByVal xh As Long, ByVal xl As Long) As Long
-    BigSIG1Lo = RRotateLo(xh, xl, 14) Xor RRotateLo(xh, xl, 18) Xor RRotateLo(xh, xl, 41)
-End Function
-
-Private Function LilSig0Hi(ByVal xh As Long, ByVal xl As Long) As Long
-    LilSig0Hi = RRotateHi(xh, xl, 1) Xor RRotateHi(xh, xl, 8) Xor RShiftHi(xh, xl, 7)
-End Function
-
-Private Function LilSig0Lo(ByVal xh As Long, ByVal xl As Long) As Long
-    LilSig0Lo = RRotateLo(xh, xl, 1) Xor RRotateLo(xh, xl, 8) Xor RShiftLo(xh, xl, 7)
-End Function
-
-Private Function LilSig1Hi(ByVal xh As Long, ByVal xl As Long) As Long
-    LilSig1Hi = RRotateHi(xh, xl, 19) Xor RRotateHi(xh, xl, 61) Xor RShiftHi(xh, xl, 6)
-End Function
-
-Private Function LilSig1Lo(ByVal xh As Long, ByVal xl As Long) As Long
-    LilSig1Lo = RRotateLo(xh, xl, 19) Xor RRotateLo(xh, xl, 61) Xor RShiftLo(xh, xl, 6)
-End Function
-
-
-
-''
-' Runs when compiled. Must disable Integer overflow checks.
-'
-Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     Dim i As Long
     For i = 0 To 15
         mWh(i) = (Bytes(Index) * &H1000000) Or (Bytes(Index + 1) * &H10000) Or (Bytes(Index + 2) * &H100&) Or Bytes(Index + 3)
@@ -605,25 +431,185 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     mStateH(6) = mStateH(6) + Gh: mStateL(6) = mStateL(6) + Gl: If (mStateL(6) - &H80000000) < (Gl - &H80000000) Then mStateH(6) = mStateH(6) + 1
     mStateH(7) = mStateH(7) + Hh: mStateL(7) = mStateL(7) + Hl: If (mStateL(7) - &H80000000) < (Hl - &H80000000) Then mStateH(7) = mStateH(7) + 1
 End Sub
+#Else
+Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
+    Dim i As Long
+    For i = 0 To 15
+        mWh(i) = SwapEndian(AsLong(Bytes(Index)))
+        mWl(i) = SwapEndian(AsLong(Bytes(Index + 4)))
+        Index = Index + 8
+    Next i
+    
+    Dim T1l As Long
+    Dim T1h As Long
+    Dim T2l As Long
+    Dim T2h As Long
+    Dim s0l As Long
+    Dim s0h As Long
+    Dim s1l As Long
+    Dim s1h As Long
+    For i = 16 To 79
+        T1l = mWl(i - 2)
+        T1h = mWh(i - 2)
+        s1l = LilSig1Lo(T1h, T1l)
+        s1h = LilSig1Hi(T1h, T1l)
+
+        T2l = mWl(i - 15)
+        T2h = mWh(i - 15)
+        s0l = LilSig0Lo(T2h, T2l)
+        s0h = LilSig0Hi(T2h, T2l)
+        
+        Call UAdd64(s1h, s1l, mWh(i - 7), mWl(i - 7))
+        Call UAdd64(s1h, s1l, s0h, s0l)
+        Call UAdd64(s1h, s1l, mWh(i - 16), mWl(i - 16))
+
+        mWh(i) = s1h
+        mWl(i) = s1l
+    Next i
+    
+    Dim Ah As Long, Al As Long
+    Dim Bh As Long, Bl As Long
+    Dim Ch As Long, Cl As Long
+    Dim Dh As Long, Dl As Long
+    Dim Eh As Long, El As Long
+    Dim Fh As Long, Fl As Long
+    Dim Gh As Long, Gl As Long
+    Dim Hh As Long, Hl As Long
+    
+    Ah = mStateH(0): Al = mStateL(0)
+    Bh = mStateH(1): Bl = mStateL(1)
+    Ch = mStateH(2): Cl = mStateL(2)
+    Dh = mStateH(3): Dl = mStateL(3)
+    Eh = mStateH(4): El = mStateL(4)
+    Fh = mStateH(5): Fl = mStateL(5)
+    Gh = mStateH(6): Gl = mStateL(6)
+    Hh = mStateH(7): Hl = mStateL(7)
+    
+    For i = 0 To 79
+        T1h = Hh: T1l = Hl
+        UAdd64 T1h, T1l, BigSIG1Hi(Eh, El), BigSIG1Lo(Eh, El)
+        UAdd64 T1h, T1l, Choice(Eh, Fh, Gh), Choice(El, Fl, Gl)
+        UAdd64 T1h, T1l, mKh(i), mKl(i)
+        UAdd64 T1h, T1l, mWh(i), mWl(i)
+
+        T2h = BigSIG0Hi(Ah, Al): T2l = BigSIG0Lo(Ah, Al)
+        UAdd64 T2h, T2l, Maj(Ah, Bh, Ch), Maj(Al, Bl, Cl)
+
+        Hh = Gh: Hl = Gl
+        Gh = Fh: Gl = Fl
+        Fh = Eh: Fl = El
+        Eh = Dh: El = Dl
+        UAdd64 Eh, El, T1h, T1l
+        Dh = Ch: Dl = Cl
+        Ch = Bh: Cl = Bl
+        Bh = Ah: Bl = Al
+        Ah = T1h: Al = T1l
+        UAdd64 Ah, Al, T2h, T2l
+    Next i
+    
+    UAdd64 mStateH(0), mStateL(0), Ah, Al
+    UAdd64 mStateH(1), mStateL(1), Bh, Bl
+    UAdd64 mStateH(2), mStateL(2), Ch, Cl
+    UAdd64 mStateH(3), mStateL(3), Dh, Dl
+    UAdd64 mStateH(4), mStateL(4), Eh, El
+    UAdd64 mStateH(5), mStateL(5), Fh, Fl
+    UAdd64 mStateH(6), mStateL(6), Gh, Gl
+    UAdd64 mStateH(7), mStateL(7), Hh, Hl
+End Sub
+
+Private Sub UAdd64(ByRef xh As Long, ByRef xl As Long, ByVal yh As Long, ByVal yl As Long)
+    Helper.UAdd64 xh, xl, yh, yl
+End Sub
+
+Private Function RShiftHi(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
+    If Count < 32 Then
+        RShiftHi = Helper.ShiftRight(xh, Count)
+    End If
+End Function
+
+Private Function RShiftLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
+    If Count < 32 Then
+        RShiftLo = Helper.ShiftLeft(xh, 32 - Count) Or Helper.ShiftRight(xl, Count)
+    Else
+        RShiftLo = Helper.ShiftRight(xh, Count - 32)
+    End If
+End Function
+
+Private Function RRotateHi(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
+    If Count < 32 Then
+        RRotateHi = Helper.ShiftRight(xh, Count) Or Helper.ShiftLeft(xl, 32 - Count)
+    Else
+        RRotateHi = Helper.ShiftLeft(xh, 64 - Count) Or Helper.ShiftRight(xl, Count - 32)
+    End If
+End Function
+
+Private Function RRotateLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Long) As Long
+    If Count < 32 Then
+        RRotateLo = Helper.ShiftLeft(xh, 32 - Count) Or Helper.ShiftRight(xl, Count)
+    Else
+        RRotateLo = Helper.ShiftRight(xh, Count - 32) Or Helper.ShiftLeft(xl, 64 - Count)
+    End If
+End Function
+
+Private Function Choice(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    Choice = (X And Y) Xor ((Not X) And z)
+End Function
+
+Private Function Maj(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
+    Maj = (X And Y) Xor (X And z) Xor (Y And z)
+End Function
+
+Private Function BigSIG0Hi(ByVal xh As Long, ByVal xl As Long) As Long
+    BigSIG0Hi = RRotateHi(xh, xl, 28) Xor RRotateHi(xh, xl, 34) Xor RRotateHi(xh, xl, 39)
+End Function
+
+Private Function BigSIG0Lo(ByVal xh As Long, ByVal xl As Long) As Long
+    BigSIG0Lo = RRotateLo(xh, xl, 28) Xor RRotateLo(xh, xl, 34) Xor RRotateLo(xh, xl, 39)
+End Function
+
+Private Function BigSIG1Hi(ByVal xh As Long, ByVal xl As Long) As Long
+    BigSIG1Hi = RRotateHi(xh, xl, 14) Xor RRotateHi(xh, xl, 18) Xor RRotateHi(xh, xl, 41)
+End Function
+
+Private Function BigSIG1Lo(ByVal xh As Long, ByVal xl As Long) As Long
+    BigSIG1Lo = RRotateLo(xh, xl, 14) Xor RRotateLo(xh, xl, 18) Xor RRotateLo(xh, xl, 41)
+End Function
+
+Private Function LilSig0Hi(ByVal xh As Long, ByVal xl As Long) As Long
+    LilSig0Hi = RRotateHi(xh, xl, 1) Xor RRotateHi(xh, xl, 8) Xor RShiftHi(xh, xl, 7)
+End Function
+
+Private Function LilSig0Lo(ByVal xh As Long, ByVal xl As Long) As Long
+    LilSig0Lo = RRotateLo(xh, xl, 1) Xor RRotateLo(xh, xl, 8) Xor RShiftLo(xh, xl, 7)
+End Function
+
+Private Function LilSig1Hi(ByVal xh As Long, ByVal xl As Long) As Long
+    LilSig1Hi = RRotateHi(xh, xl, 19) Xor RRotateHi(xh, xl, 61) Xor RShiftHi(xh, xl, 6)
+End Function
+
+Private Function LilSig1Lo(ByVal xh As Long, ByVal xl As Long) As Long
+    LilSig1Lo = RRotateLo(xh, xl, 19) Xor RRotateLo(xh, xl, 61) Xor RShiftLo(xh, xl, 6)
+End Function
+#End If
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     With Statics.SHA512
-        Call CopyMemory(mKh(0), ByVal .KPtr.HiDWord, 320)
-        Call CopyMemory(mKl(0), ByVal .KPtr.LoDWord, 320)
+        CopyMemory mKh(0), ByVal .KPtr.HiDWord, 320
+        CopyMemory mKl(0), ByVal .KPtr.LoDWord, 320
         mStatePtr = .StatePtr
     End With
     
     Set mBase = Cor.NewHashAlgorithmBase(Me, True, True, 128)
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   HashAlgorithm Interface
+'   HashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get HashAlgorithm_CanReuseTransform() As Boolean
     HashAlgorithm_CanReuseTransform = CanReuseTransform
@@ -634,7 +620,7 @@ Private Property Get HashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub HashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function HashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -658,7 +644,7 @@ Private Property Get HashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub HashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get HashAlgorithm_InputBlockSize() As Long
@@ -683,7 +669,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -711,10 +697,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IHashAlgorithm Interface
+'   IHashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IHashAlgorithm_HashCore(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
-    Call Transform(Bytes, Index)
+    Transform Bytes, Index
 End Sub
 
 Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, ByVal MessageLength As Currency) As Byte()
@@ -722,12 +708,12 @@ Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal BufferCo
 End Function
 
 Private Sub IHashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -743,7 +729,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SHA512 Interface
+'   SHA512
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get SHA512_CanReuseTransform() As Boolean
     SHA512_CanReuseTransform = CanReuseTransform
@@ -754,7 +740,7 @@ Private Property Get SHA512_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub SHA512_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function SHA512_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -778,7 +764,7 @@ Private Property Get SHA512_HashSize() As Long
 End Property
 
 Private Sub SHA512_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get SHA512_InputBlockSize() As Long
