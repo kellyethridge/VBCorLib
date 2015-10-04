@@ -126,7 +126,7 @@ End Function
 '
 Public Function NewUnauthorizedAccessException(ByVal Message As String, Optional ByVal InnerException As Exception) As UnauthorizedAccessException
     Set NewUnauthorizedAccessException = New UnauthorizedAccessException
-    Call NewUnauthorizedAccessException.Init(Message, InnerException)
+    NewUnauthorizedAccessException.Init Message, InnerException
 End Function
 
 ''
@@ -138,7 +138,7 @@ End Function
 '
 Public Function NewNotSupportedException(ByVal Message As String, Optional ByVal InnerException As Exception) As NotSupportedException
     Set NewNotSupportedException = New NotSupportedException
-    Call NewNotSupportedException.Init(Message, InnerException)
+    NewNotSupportedException.Init Message, InnerException
 End Function
 
 ''
@@ -231,7 +231,7 @@ End Function
 '
 Public Function NewInvalidCastException(ByVal Message As String, Optional ByVal InnerException As Exception) As InvalidCastException
     Set NewInvalidCastException = New InvalidCastException
-    Call NewInvalidCastException.Init(Message, InnerException)
+    NewInvalidCastException.Init Message, InnerException
 End Function
 
 ''
@@ -243,7 +243,7 @@ End Function
 '
 Public Function NewIndexOutOfRangeException(ByVal Message As String, Optional ByVal InnerException As Exception) As IndexOutOfRangeException
     Set NewIndexOutOfRangeException = New IndexOutOfRangeException
-    Call NewIndexOutOfRangeException.Init(Message, InnerException)
+    NewIndexOutOfRangeException.Init Message, InnerException
 End Function
 
 ''
@@ -255,7 +255,7 @@ End Function
 '
 Public Function NewRankException(ByVal Message As String, Optional ByVal InnerException As Exception) As RankException
     Set NewRankException = New RankException
-    Call NewRankException.Init(Message, InnerException)
+    NewRankException.Init Message, InnerException
 End Function
 
 ''
@@ -267,7 +267,7 @@ End Function
 '
 Public Function NewInvalidOperationException(ByVal Message As String, Optional ByVal InnerException As Exception) As InvalidOperationException
     Set NewInvalidOperationException = New InvalidOperationException
-    Call NewInvalidOperationException.Init(Message, InnerException)
+    NewInvalidOperationException.Init Message, InnerException
 End Function
 
 ''
@@ -315,7 +315,7 @@ End Function
 '
 Public Function NewSerializationException(ByVal Message As String, Optional ByVal InnerException As Exception) As SerializationException
     Set NewSerializationException = New SerializationException
-    Call NewSerializationException.Init(Message, InnerException)
+    NewSerializationException.Init Message, InnerException
 End Function
 
 ''
@@ -339,7 +339,7 @@ End Function
 '
 Public Function NewArrayTypeMismatchException(ByVal Message As String, Optional ByVal InnerException As Exception) As ArrayTypeMismatchException
     Set NewArrayTypeMismatchException = New ArrayTypeMismatchException
-    Call NewArrayTypeMismatchException.Init(Message, InnerException)
+    NewArrayTypeMismatchException.Init Message, InnerException
 End Function
 
 ''
@@ -387,7 +387,7 @@ End Function
 '
 Public Function NewWeakReference(ByVal Target As Object) As WeakReference
     Set NewWeakReference = New WeakReference
-    Call NewWeakReference.Init(Target)
+    NewWeakReference.Init Target
 End Function
 
 ''
@@ -399,7 +399,7 @@ End Function
 '
 Public Function NewFormatException(ByVal Message As String, Optional ByVal InnerException As Exception) As FormatException
     Set NewFormatException = New FormatException
-    Call NewFormatException.Init(Message, InnerException)
+    NewFormatException.Init Message, InnerException
 End Function
 
 ''
@@ -410,7 +410,7 @@ End Function
 '
 Public Function NewRandom(ByVal seed As Long) As Random
     Set NewRandom = New Random
-    Call NewRandom.Init(seed)
+    NewRandom.Init seed
 End Function
 
 ''
@@ -486,7 +486,7 @@ End Function
 '
 Public Function NewFileNotFoundException(Optional ByVal FileName As String, Optional ByVal Message As String, Optional ByVal InnerException As Exception) As FileNotFoundException
     Set NewFileNotFoundException = New FileNotFoundException
-    Call NewFileNotFoundException.Init(FileName, Message, InnerException)
+    NewFileNotFoundException.Init FileName, Message, InnerException
 End Function
 
 ''
@@ -499,7 +499,7 @@ End Function
 '
 Public Function NewMemoryMappedFile(ByVal Path As String, Optional ByVal Access As FileAccess = FileAccess.ReadAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As MemoryMappedFile
     Set NewMemoryMappedFile = New MemoryMappedFile
-    Call NewMemoryMappedFile.Init(Path, Access, Share)
+    NewMemoryMappedFile.Init Path, Access, Share
 End Function
 
 ''
@@ -526,7 +526,7 @@ End Function
 '
 Public Function NewDayLightTime(ByRef StartTime As Variant, ByRef EndTime As Variant, ByVal Delta As TimeSpan) As DayLightTime
     Set NewDayLightTime = New DayLightTime
-    Call NewDayLightTime.Init(StartTime, EndTime, Delta)
+    NewDayLightTime.Init StartTime, EndTime, Delta
 End Function
 
 ''
@@ -539,7 +539,7 @@ End Function
 '
 Public Function NewOperatingSystem(ByVal Platform As PlatformID, ByVal Version As Version, Optional ByVal ServicePack As String) As OperatingSystem
     Set NewOperatingSystem = New OperatingSystem
-    Call NewOperatingSystem.Init(Platform, Version, ServicePack)
+    NewOperatingSystem.Init Platform, Version, ServicePack
 End Function
 
 ''
@@ -551,7 +551,7 @@ End Function
 '
 Public Function NewPlatformNotSupportedException(ByVal Message As String, Optional ByVal InnerException As Exception) As PlatformNotSupportedException
     Set NewPlatformNotSupportedException = New PlatformNotSupportedException
-    Call NewPlatformNotSupportedException.Init(Message, InnerException)
+    NewPlatformNotSupportedException.Init Message, InnerException
 End Function
 
 ''
@@ -563,7 +563,7 @@ End Function
 '
 Public Function NewPathTooLongException(ByVal Message As String, Optional ByVal InnerException As Exception) As PathTooLongException
     Set NewPathTooLongException = New PathTooLongException
-    Call NewPathTooLongException.Init(Message, InnerException)
+    NewPathTooLongException.Init Message, InnerException
 End Function
 
 ''
@@ -576,7 +576,7 @@ End Function
 '
 Public Function NewUTF8Encoding(ByVal ShouldEmitUTF8Identifier As Boolean, Optional ByVal ShouldThrowException As Boolean) As UTF8Encoding
     Set NewUTF8Encoding = New UTF8Encoding
-    Call NewUTF8Encoding.Init(ShouldEmitUTF8Identifier, ShouldThrowException)
+    NewUTF8Encoding.Init ShouldEmitUTF8Identifier, ShouldThrowException
 End Function
 
 ''
@@ -588,7 +588,7 @@ End Function
 '
 Public Function NewUTF7Encoding(ByVal AllowOptionals As Boolean) As UTF7Encoding
     Set NewUTF7Encoding = New UTF7Encoding
-    Call NewUTF7Encoding.Init(AllowOptionals)
+    NewUTF7Encoding.Init AllowOptionals
 End Function
 
 ''
@@ -606,7 +606,7 @@ End Function
 ' For internal use only.
 Friend Function NewStreamAsyncResult(ByVal ObjectState As Variant) As StreamAsyncResult
     Set NewStreamAsyncResult = New StreamAsyncResult
-    Call NewStreamAsyncResult.Init(ObjectState)
+    NewStreamAsyncResult.Init ObjectState
 End Function
 
 ''
@@ -640,7 +640,7 @@ End Function
 '
 Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Capacity As Long = 512) As StringBuilder
     Set NewStringBuilder = New StringBuilder
-    Call NewStringBuilder.Init(s, StartIndex, Count, Capacity)
+    NewStringBuilder.Init s, StartIndex, Count, Capacity
 End Function
 
 ''
@@ -692,7 +692,7 @@ End Function
 '
 Public Function NewUnicodeEncoding(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean) As UnicodeEncoding
     Set NewUnicodeEncoding = New UnicodeEncoding
-    Call NewUnicodeEncoding.Init(BigEndian, ByteOrderMark)
+    NewUnicodeEncoding.Init BigEndian, ByteOrderMark
 End Function
 
 ''
@@ -705,7 +705,7 @@ End Function
 '
 Public Function NewStringWriter(Optional ByVal sb As StringBuilder, Optional ByVal Provider As IFormatProvider) As StringWriter
     Set NewStringWriter = New StringWriter
-    Call NewStringWriter.Init(sb, Provider)
+    NewStringWriter.Init sb, Provider
 End Function
 
 ''
@@ -719,7 +719,7 @@ End Function
 '
 Public Function NewStringReader(ByRef s As String, Optional ByVal IsOwner As Boolean) As StringReader
     Set NewStringReader = New StringReader
-    Call NewStringReader.Init(s, IsOwner)
+    NewStringReader.Init s, IsOwner
 End Function
 
 ''
@@ -745,7 +745,7 @@ End Function
 '
 Public Function NewDirectoryNotFoundException(ByVal Message As String, Optional ByVal InnerException As Exception) As DirectoryNotFoundException
     Set NewDirectoryNotFoundException = New DirectoryNotFoundException
-    Call NewDirectoryNotFoundException.Init(Message, InnerException)
+    NewDirectoryNotFoundException.Init Message, InnerException
 End Function
 
 ''
@@ -830,7 +830,7 @@ End Function
 '
 Public Function NewEndOfStreamException(ByVal Message As String, Optional ByVal InnerException As Exception) As EndOfStreamException
     Set NewEndOfStreamException = New EndOfStreamException
-    Call NewEndOfStreamException.Init(Message, InnerException)
+    NewEndOfStreamException.Init Message, InnerException
 End Function
 
 ''
@@ -843,7 +843,7 @@ End Function
 '
 Public Function NewBinaryReader(ByVal Stream As Stream, Optional ByVal Encoding As Encoding) As BinaryReader
     Set NewBinaryReader = New BinaryReader
-    Call NewBinaryReader.Init(Stream, Encoding)
+    NewBinaryReader.Init Stream, Encoding
 End Function
 
 ''
@@ -856,7 +856,7 @@ End Function
 '
 Public Function NewOverflowException(ByVal Message As String, Optional ByVal InnerException As Exception) As OverflowException
     Set NewOverflowException = New OverflowException
-    Call NewOverflowException.Init(Message, InnerException)
+    NewOverflowException.Init Message, InnerException
 End Function
 
 ''
@@ -875,7 +875,7 @@ End Function
 '
 Public Function NewCharEnumerator(ByRef s As String, Optional ByVal CopyString As Boolean = True) As CharEnumerator
     Set NewCharEnumerator = New CharEnumerator
-    Call NewCharEnumerator.Init(s, CopyString)
+    NewCharEnumerator.Init s, CopyString
 End Function
 
 ''
@@ -886,7 +886,7 @@ End Function
 '
 Public Function NewGregorianCalendar(ByVal CalendarType As GregorianCalendarTypes) As GregorianCalendar
     Set NewGregorianCalendar = New GregorianCalendar
-    Call NewGregorianCalendar.Init(CalendarType)
+    NewGregorianCalendar.Init CalendarType
 End Function
 
 ''
@@ -900,7 +900,7 @@ End Function
 '
 Public Function NewApplicationException(ByVal Message As String, Optional ByVal InnerException As Exception) As ApplicationException
     Set NewApplicationException = New ApplicationException
-    Call NewApplicationException.Init(Message, InnerException)
+    NewApplicationException.Init Message, InnerException
 End Function
 
 ''
@@ -911,7 +911,7 @@ End Function
 '
 Public Function NewResourceReader(ByRef Source As Variant) As ResourceReader
     Set NewResourceReader = New ResourceReader
-    Call NewResourceReader.Init(Source)
+    NewResourceReader.Init Source
 End Function
 
 ''
@@ -922,13 +922,13 @@ End Function
 '
 Public Function NewResourceWriter(ByRef Source As Variant) As ResourceWriter
     Set NewResourceWriter = New ResourceWriter
-    Call NewResourceWriter.Init(Source)
+    NewResourceWriter.Init Source
 End Function
 
 ' for internal use only
 Friend Function NewRegistryKey(ByVal Key As Long, ByVal Name As String, ByVal Writable As Boolean) As RegistryKey
     Set NewRegistryKey = New RegistryKey
-    Call NewRegistryKey.Init(Key, Name, Writable)
+    NewRegistryKey.Init Key, Name, Writable
 End Function
 
 ''
@@ -951,7 +951,7 @@ End Function
 '
 Public Function NewResourceSet(ByVal CultureID As Variant, ByRef Source As Variant) As ResourceSet
     Set NewResourceSet = New ResourceSet
-    Call NewResourceSet.Init(CultureID, Source)
+    NewResourceSet.Init CultureID, Source
 End Function
 
 ''
@@ -967,7 +967,7 @@ End Function
 '
 Public Function NewResourceManager(ByRef Source As Variant) As ResourceManager
     Set NewResourceManager = New ResourceManager
-    Call NewResourceManager.InitFromFile(Source)
+    NewResourceManager.InitFromFile Source
 End Function
 
 ''
@@ -996,7 +996,7 @@ End Function
 '
 Public Function NewWinResourceReader(ByVal FileName As String) As WinResourceReader
     Set NewWinResourceReader = New WinResourceReader
-    Call NewWinResourceReader.Init(FileName)
+    NewWinResourceReader.Init FileName
 End Function
 
 ''
@@ -1007,7 +1007,7 @@ End Function
 '
 Public Function NewDriveInfo(ByVal Name As String) As DriveInfo
     Set NewDriveInfo = New DriveInfo
-    Call NewDriveInfo.Init(Name)
+    NewDriveInfo.Init Name
 End Function
 
 ''
@@ -1022,7 +1022,7 @@ End Function
 '
 Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As ConsoleKey, ByVal Shift As Boolean, ByVal Alt As Boolean, ByVal Control As Boolean) As ConsoleKeyInfo
     Set NewConsoleKeyInfo = New ConsoleKeyInfo
-    Call NewConsoleKeyInfo.Init(KeyChar, Key, Shift, Alt, Control)
+    NewConsoleKeyInfo.Init KeyChar, Key, Shift, Alt, Control
 End Function
 
 ''
@@ -1033,8 +1033,10 @@ End Function
 '
 Public Function NewTime(ByVal DateValue As Variant) As TimeSpan
     Select Case VarType(DateValue)
-        Case vbDate:    Set NewTime = NewTimeSpan(Hours:=Hour(DateValue), Minutes:=Minute(DateValue), Seconds:=Second(DateValue))
-        Case Else:      Set NewTime = CorDateTime.GetDateTime(DateValue).TimeOfDay
+        Case vbDate
+            Set NewTime = NewTimeSpan(Hours:=Hour(DateValue), Minutes:=Minute(DateValue), Seconds:=Second(DateValue))
+        Case Else
+            Set NewTime = CorDateTime.GetDateTime(DateValue).TimeOfDay
     End Select
 End Function
 
@@ -1046,7 +1048,7 @@ End Function
 '
 Public Function NewINIFile(ByVal FileName As String) As INIFile
     Set NewINIFile = New INIFile
-    Call NewINIFile.Init(FileName)
+    NewINIFile.Init FileName
 End Function
 
 ''
@@ -1148,7 +1150,7 @@ End Function
 '
 Public Function NewResourceKey(ByRef Name As Variant, ByRef ResourceType As Variant, ByVal LanguageID As Long) As ResourceKey
     Set NewResourceKey = New ResourceKey
-    Call NewResourceKey.Init(Name, ResourceType, LanguageID)
+    NewResourceKey.Init Name, ResourceType, LanguageID
 End Function
 
 ''
@@ -1160,7 +1162,7 @@ End Function
 '
 Public Function NewResPictureGroup(ByVal GroupType As PictureGroupTypes) As ResPictureGroup
     Set NewResPictureGroup = New ResPictureGroup
-    Call NewResPictureGroup.InitNew(GroupType)
+    NewResPictureGroup.InitNew GroupType
 End Function
 
 ''
@@ -1172,7 +1174,7 @@ End Function
 '
 Public Function NewExternalException(ByVal Message As String, Optional ByVal InnerException As Exception) As ExternalException
     Set NewExternalException = New ExternalException
-    Call NewExternalException.Init(Message, InnerException)
+    NewExternalException.Init Message, InnerException
 End Function
 
 ''
@@ -1185,7 +1187,7 @@ End Function
 '
 Public Function NewCspParameters(ByVal TypeIn As Long, Optional ByVal ProviderNameIn As String, Optional ByVal ContainerNameIn As String) As CspParameters
     Set NewCspParameters = New CspParameters
-    Call NewCspParameters.Init(TypeIn, ProviderNameIn, ContainerNameIn)
+    NewCspParameters.Init TypeIn, ProviderNameIn, ContainerNameIn
 End Function
 
 ''
@@ -1204,7 +1206,7 @@ End Function
 '
 Public Function NewRNGCryptoServiceProvider(ByVal CspParams As CspParameters) As RNGCryptoServiceProvider
     Set NewRNGCryptoServiceProvider = New RNGCryptoServiceProvider
-    Call NewRNGCryptoServiceProvider.Init(CspParams)
+    NewRNGCryptoServiceProvider.Init CspParams
 End Function
 
 ''
@@ -1219,7 +1221,7 @@ End Function
 '
 Public Function NewCryptographicException(ByVal Message As String, Optional ByVal InnerException As Exception) As CryptographicException
     Set NewCryptographicException = New CryptographicException
-    Call NewCryptographicException.Init(Message, InnerException)
+    NewCryptographicException.Init Message, InnerException
 End Function
 
 ''
@@ -1240,7 +1242,7 @@ End Function
 '
 Public Function NewKeySizes(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long) As KeySizes
     Set NewKeySizes = New KeySizes
-    Call NewKeySizes.Init(MinSize, MaxSize, SkipSize)
+    NewKeySizes.Init MinSize, MaxSize, SkipSize
 End Function
 
 ''
@@ -1252,7 +1254,7 @@ End Function
 '
 Public Function NewFromBase64Transform(ByVal WhiteSpaces As FromBase64TransformMode) As FromBase64Transform
     Set NewFromBase64Transform = New FromBase64Transform
-    Call NewFromBase64Transform.Init(WhiteSpaces)
+    NewFromBase64Transform.Init WhiteSpaces
 End Function
 
 ''
@@ -1266,7 +1268,7 @@ End Function
 '
 Public Function NewCryptoStream(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByVal Mode As CryptoStreamMode) As CryptoStream
     Set NewCryptoStream = New CryptoStream
-    Call NewCryptoStream.Init(Stream, Transform, Mode)
+    NewCryptoStream.Init Stream, Transform, Mode
 End Function
 
 ''
@@ -1455,7 +1457,7 @@ End Function
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
 '
-Public Function NewCurrencys(ParamArray Values() As Variant) As Currency()
+Public Function NewCurrencies(ParamArray Values() As Variant) As Currency()
     Dim Ret() As Currency
     SAPtr(Ret) = SafeArrayCreateVector(vbCurrency, 0, UBound(Values) + 1)
     
@@ -1509,7 +1511,7 @@ End Function
 '
 Public Function NewCspKeyContainerInfo(ByVal Parameters As CspParameters) As CspKeyContainerInfo
     Set NewCspKeyContainerInfo = New CspKeyContainerInfo
-    Call NewCspKeyContainerInfo.Init(Parameters)
+    NewCspKeyContainerInfo.Init Parameters
 End Function
 
 ''
@@ -1523,7 +1525,7 @@ End Function
 '
 Public Function NewRfc2898DeriveBytes(ByRef Password As Variant, ByRef Salt As Variant, Optional ByVal Iterations As Long = 1000) As Rfc2898DeriveBytes
     Set NewRfc2898DeriveBytes = New Rfc2898DeriveBytes
-    Call NewRfc2898DeriveBytes.Init(Password, Salt, Iterations)
+    NewRfc2898DeriveBytes.Init Password, Salt, Iterations
 End Function
 
 ''
@@ -1587,7 +1589,7 @@ End Function
 '
 Public Function NewHMACBase(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, Optional ByVal HashName As String, Optional ByRef Key As Variant) As HMACBase
     Set NewHMACBase = New HMACBase
-    Call NewHMACBase.Init(HashAlgorithm, KeySize, HashName, Key)
+    NewHMACBase.Init HashAlgorithm, KeySize, HashName, Key
 End Function
 
 ''
@@ -1599,7 +1601,7 @@ End Function
 '
 Public Function NewHMACSHA256(ByRef Key() As Byte) As HMACSHA256
     Set NewHMACSHA256 = New HMACSHA256
-    Call NewHMACSHA256.Init(Key)
+    NewHMACSHA256.Init Key
 End Function
 
 ''
@@ -1611,7 +1613,7 @@ End Function
 '
 Public Function NewHMACSHA384(ByRef Key() As Byte) As HMACSHA384
     Set NewHMACSHA384 = New HMACSHA384
-    Call NewHMACSHA384.Init(Key)
+    NewHMACSHA384.Init Key
 End Function
 
 ''
@@ -1623,7 +1625,7 @@ End Function
 '
 Public Function NewHMACSHA512(ByRef Key() As Byte) As HMACSHA512
     Set NewHMACSHA512 = New HMACSHA512
-    Call NewHMACSHA512.Init(Key)
+    NewHMACSHA512.Init Key
 End Function
 
 ''
@@ -1635,7 +1637,7 @@ End Function
 '
 Public Function NewHMACMD5(ByRef Key() As Byte) As HMACMD5
     Set NewHMACMD5 = New HMACMD5
-    Call NewHMACMD5.Init(Key)
+    NewHMACMD5.Init Key
 End Function
 
 ''
@@ -1647,7 +1649,7 @@ End Function
 '
 Public Function NewHMACRIPEMD160(ByRef Key() As Byte) As HMACRIPEMD160
     Set NewHMACRIPEMD160 = New HMACRIPEMD160
-    Call NewHMACRIPEMD160.Init(Key)
+    NewHMACRIPEMD160.Init Key
 End Function
 
 ''
@@ -1661,7 +1663,7 @@ End Function
 '
 Public Function NewRSACryptoServiceProvider(Optional ByVal KeySize As Long, Optional ByVal Parameters As CspParameters) As RSACryptoServiceProvider
     Set NewRSACryptoServiceProvider = New RSACryptoServiceProvider
-    Call NewRSACryptoServiceProvider.Init(KeySize, Parameters)
+    NewRSACryptoServiceProvider.Init KeySize, Parameters
 End Function
 
 ''
@@ -1674,7 +1676,7 @@ End Function
 '
 Public Function NewDSACryptoServiceProvider(Optional ByVal KeySize As Long, Optional ByVal Parameters As CspParameters) As DSACryptoServiceProvider
     Set NewDSACryptoServiceProvider = New DSACryptoServiceProvider
-    Call NewDSACryptoServiceProvider.Init(KeySize, Parameters)
+    NewDSACryptoServiceProvider.Init KeySize, Parameters
 End Function
 
 ''
@@ -1688,7 +1690,7 @@ End Function
 '
 Public Function NewSecurityElement(ByVal Tag As String, Optional ByVal Text As String) As SecurityElement
     Set NewSecurityElement = New SecurityElement
-    Call NewSecurityElement.Init(Tag, Text)
+    NewSecurityElement.Init Tag, Text
 End Function
 
 ''
@@ -1702,7 +1704,7 @@ End Function
 '
 Public Function NewXmlSyntaxException(Optional ByVal LineNumber As Variant, Optional ByVal Message As Variant, Optional ByVal InnerException As Exception) As XmlSyntaxException
     Set NewXmlSyntaxException = New XmlSyntaxException
-    Call NewXmlSyntaxException.Init(LineNumber, Message, InnerException)
+    NewXmlSyntaxException.Init LineNumber, Message, InnerException
 End Function
 
 ''
@@ -1714,7 +1716,7 @@ End Function
 '
 Public Function NewMACTripleDES(ByRef RgbKey() As Byte, Optional ByVal StrTripleDES As String = "3DES") As MACTripleDES
     Set NewMACTripleDES = New MACTripleDES
-    Call NewMACTripleDES.Init(RgbKey, StrTripleDES)
+    NewMACTripleDES.Init RgbKey, StrTripleDES
 End Function
 
 ''
@@ -1734,7 +1736,7 @@ End Function
 '
 Public Function NewBigInteger(ByRef Value As Variant) As BigInteger
     Set NewBigInteger = New BigInteger
-    Call NewBigInteger.Init(Value)
+    NewBigInteger.Init Value
 End Function
 
 ''
