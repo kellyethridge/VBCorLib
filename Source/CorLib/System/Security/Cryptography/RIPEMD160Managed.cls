@@ -115,7 +115,7 @@ End Property
 ' Releases any resources.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -142,7 +142,7 @@ Public Sub Initialize()
     mState(3) = &H10325476
     mState(4) = &HC3D2E1F0
     
-    Call mBase.Initialize
+    mBase.Initialize
 End Sub
 
 ''
@@ -214,7 +214,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, ByVal MessageLength As Currency) As Byte()
     Buffer(BufferCount) = &H80
@@ -225,31 +225,23 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
 
     Dim FinalBuffer() As Byte
     ReDim FinalBuffer(0 To Size - 1)
-    Call CopyMemory(FinalBuffer(0), Buffer(0), BufferCount)
-    Call CopyMemory(FinalBuffer(Size - 8), MessageLength * 0.0008@, 8)
-    Call Transform(FinalBuffer, 0)
-    If Size = 128 Then Call Transform(FinalBuffer, 64)
+    CopyMemory FinalBuffer(0), Buffer(0), BufferCount
+    CopyMemory FinalBuffer(Size - 8), MessageLength * 0.0008@, 8
+    Transform FinalBuffer, 0
+    If Size = 128 Then
+        Transform FinalBuffer, 64
+    End If
     
-    Dim Ret() As Byte
-    ReDim Ret(19)
-    Call CopyMemory(Ret(0), mState(0), 20)
+    Dim Result(0 To 19) As Byte
+    CopyMemory Result(0), mState(0), 20
 
-    HashFinal = Ret
+    HashFinal = Result
 End Function
 
+#If Release Then
+' Must disable Integer overflow checks.
 Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
-    If InIDE Then
-        Call TransformIDE(Bytes, Index)
-    Else
-        Call TransformNative(Bytes, Index)
-    End If
-End Sub
-
-''
-' Runs in the IDE.
-'
-Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
-    Call CopyMemory(mX(0), Bytes(Index), 64)
+    CopyMemory mX(0), Bytes(Index), 64
     
     Dim aa As Long
     Dim bb As Long
@@ -273,1008 +265,802 @@ Private Sub TransformIDE(ByRef Bytes() As Byte, ByVal Index As Long)
     ddd = dd
     eee = ee
     
-    Call fnFF(aa, bb, cc, dd, ee, mX(0), 11)
-    Call fnFF(ee, aa, bb, cc, dd, mX(1), 14)
-    Call fnFF(dd, ee, aa, bb, cc, mX(2), 15)
-    Call fnFF(cc, dd, ee, aa, bb, mX(3), 12)
-    Call fnFF(bb, cc, dd, ee, aa, mX(4), 5)
-    Call fnFF(aa, bb, cc, dd, ee, mX(5), 8)
-    Call fnFF(ee, aa, bb, cc, dd, mX(6), 7)
-    Call fnFF(dd, ee, aa, bb, cc, mX(7), 9)
-    Call fnFF(cc, dd, ee, aa, bb, mX(8), 11)
-    Call fnFF(bb, cc, dd, ee, aa, mX(9), 13)
-    Call fnFF(aa, bb, cc, dd, ee, mX(10), 14)
-    Call fnFF(ee, aa, bb, cc, dd, mX(11), 15)
-    Call fnFF(dd, ee, aa, bb, cc, mX(12), 6)
-    Call fnFF(cc, dd, ee, aa, bb, mX(13), 7)
-    Call fnFF(bb, cc, dd, ee, aa, mX(14), 9)
-    Call fnFF(aa, bb, cc, dd, ee, mX(15), 8)
-
-    Call fnGG(ee, aa, bb, cc, dd, mX(7), 7)
-    Call fnGG(dd, ee, aa, bb, cc, mX(4), 6)
-    Call fnGG(cc, dd, ee, aa, bb, mX(13), 8)
-    Call fnGG(bb, cc, dd, ee, aa, mX(1), 13)
-    Call fnGG(aa, bb, cc, dd, ee, mX(10), 11)
-    Call fnGG(ee, aa, bb, cc, dd, mX(6), 9)
-    Call fnGG(dd, ee, aa, bb, cc, mX(15), 7)
-    Call fnGG(cc, dd, ee, aa, bb, mX(3), 15)
-    Call fnGG(bb, cc, dd, ee, aa, mX(12), 7)
-    Call fnGG(aa, bb, cc, dd, ee, mX(0), 12)
-    Call fnGG(ee, aa, bb, cc, dd, mX(9), 15)
-    Call fnGG(dd, ee, aa, bb, cc, mX(5), 9)
-    Call fnGG(cc, dd, ee, aa, bb, mX(2), 11)
-    Call fnGG(bb, cc, dd, ee, aa, mX(14), 7)
-    Call fnGG(aa, bb, cc, dd, ee, mX(11), 13)
-    Call fnGG(ee, aa, bb, cc, dd, mX(8), 12)
-
-    Call fnHH(dd, ee, aa, bb, cc, mX(3), 11)
-    Call fnHH(cc, dd, ee, aa, bb, mX(10), 13)
-    Call fnHH(bb, cc, dd, ee, aa, mX(14), 6)
-    Call fnHH(aa, bb, cc, dd, ee, mX(4), 7)
-    Call fnHH(ee, aa, bb, cc, dd, mX(9), 14)
-    Call fnHH(dd, ee, aa, bb, cc, mX(15), 9)
-    Call fnHH(cc, dd, ee, aa, bb, mX(8), 13)
-    Call fnHH(bb, cc, dd, ee, aa, mX(1), 15)
-    Call fnHH(aa, bb, cc, dd, ee, mX(2), 14)
-    Call fnHH(ee, aa, bb, cc, dd, mX(7), 8)
-    Call fnHH(dd, ee, aa, bb, cc, mX(0), 13)
-    Call fnHH(cc, dd, ee, aa, bb, mX(6), 6)
-    Call fnHH(bb, cc, dd, ee, aa, mX(13), 5)
-    Call fnHH(aa, bb, cc, dd, ee, mX(11), 12)
-    Call fnHH(ee, aa, bb, cc, dd, mX(5), 7)
-    Call fnHH(dd, ee, aa, bb, cc, mX(12), 5)
-    
-    Call fnII(cc, dd, ee, aa, bb, mX(1), 11)
-    Call fnII(bb, cc, dd, ee, aa, mX(9), 12)
-    Call fnII(aa, bb, cc, dd, ee, mX(11), 14)
-    Call fnII(ee, aa, bb, cc, dd, mX(10), 15)
-    Call fnII(dd, ee, aa, bb, cc, mX(0), 14)
-    Call fnII(cc, dd, ee, aa, bb, mX(8), 15)
-    Call fnII(bb, cc, dd, ee, aa, mX(12), 9)
-    Call fnII(aa, bb, cc, dd, ee, mX(4), 8)
-    Call fnII(ee, aa, bb, cc, dd, mX(13), 9)
-    Call fnII(dd, ee, aa, bb, cc, mX(3), 14)
-    Call fnII(cc, dd, ee, aa, bb, mX(7), 5)
-    Call fnII(bb, cc, dd, ee, aa, mX(15), 6)
-    Call fnII(aa, bb, cc, dd, ee, mX(14), 8)
-    Call fnII(ee, aa, bb, cc, dd, mX(5), 6)
-    Call fnII(dd, ee, aa, bb, cc, mX(6), 5)
-    Call fnII(cc, dd, ee, aa, bb, mX(2), 12)
-
-    Call fnJJ(bb, cc, dd, ee, aa, mX(4), 9)
-    Call fnJJ(aa, bb, cc, dd, ee, mX(0), 15)
-    Call fnJJ(ee, aa, bb, cc, dd, mX(5), 5)
-    Call fnJJ(dd, ee, aa, bb, cc, mX(9), 11)
-    Call fnJJ(cc, dd, ee, aa, bb, mX(7), 6)
-    Call fnJJ(bb, cc, dd, ee, aa, mX(12), 8)
-    Call fnJJ(aa, bb, cc, dd, ee, mX(2), 13)
-    Call fnJJ(ee, aa, bb, cc, dd, mX(10), 12)
-    Call fnJJ(dd, ee, aa, bb, cc, mX(14), 5)
-    Call fnJJ(cc, dd, ee, aa, bb, mX(1), 12)
-    Call fnJJ(bb, cc, dd, ee, aa, mX(3), 13)
-    Call fnJJ(aa, bb, cc, dd, ee, mX(8), 14)
-    Call fnJJ(ee, aa, bb, cc, dd, mX(11), 11)
-    Call fnJJ(dd, ee, aa, bb, cc, mX(6), 8)
-    Call fnJJ(cc, dd, ee, aa, bb, mX(15), 5)
-    Call fnJJ(bb, cc, dd, ee, aa, mX(13), 6)
-
-    Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(5), 8)
-    Call fnJJJ(eee, aaa, bbb, ccc, ddd, mX(14), 9)
-    Call fnJJJ(ddd, eee, aaa, bbb, ccc, mX(7), 9)
-    Call fnJJJ(ccc, ddd, eee, aaa, bbb, mX(0), 11)
-    Call fnJJJ(bbb, ccc, ddd, eee, aaa, mX(9), 13)
-    Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(2), 15)
-    Call fnJJJ(eee, aaa, bbb, ccc, ddd, mX(11), 15)
-    Call fnJJJ(ddd, eee, aaa, bbb, ccc, mX(4), 5)
-    Call fnJJJ(ccc, ddd, eee, aaa, bbb, mX(13), 7)
-    Call fnJJJ(bbb, ccc, ddd, eee, aaa, mX(6), 7)
-    Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(15), 8)
-    Call fnJJJ(eee, aaa, bbb, ccc, ddd, mX(8), 11)
-    Call fnJJJ(ddd, eee, aaa, bbb, ccc, mX(1), 14)
-    Call fnJJJ(ccc, ddd, eee, aaa, bbb, mX(10), 14)
-    Call fnJJJ(bbb, ccc, ddd, eee, aaa, mX(3), 12)
-    Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(12), 6)
-
-    Call fnIII(eee, aaa, bbb, ccc, ddd, mX(6), 9)
-    Call fnIII(ddd, eee, aaa, bbb, ccc, mX(11), 13)
-    Call fnIII(ccc, ddd, eee, aaa, bbb, mX(3), 15)
-    Call fnIII(bbb, ccc, ddd, eee, aaa, mX(7), 7)
-    Call fnIII(aaa, bbb, ccc, ddd, eee, mX(0), 12)
-    Call fnIII(eee, aaa, bbb, ccc, ddd, mX(13), 8)
-    Call fnIII(ddd, eee, aaa, bbb, ccc, mX(5), 9)
-    Call fnIII(ccc, ddd, eee, aaa, bbb, mX(10), 11)
-    Call fnIII(bbb, ccc, ddd, eee, aaa, mX(14), 7)
-    Call fnIII(aaa, bbb, ccc, ddd, eee, mX(15), 7)
-    Call fnIII(eee, aaa, bbb, ccc, ddd, mX(8), 12)
-    Call fnIII(ddd, eee, aaa, bbb, ccc, mX(12), 7)
-    Call fnIII(ccc, ddd, eee, aaa, bbb, mX(4), 6)
-    Call fnIII(bbb, ccc, ddd, eee, aaa, mX(9), 15)
-    Call fnIII(aaa, bbb, ccc, ddd, eee, mX(1), 13)
-    Call fnIII(eee, aaa, bbb, ccc, ddd, mX(2), 11)
-
-    Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(15), 9)
-    Call fnHHH(ccc, ddd, eee, aaa, bbb, mX(5), 7)
-    Call fnHHH(bbb, ccc, ddd, eee, aaa, mX(1), 15)
-    Call fnHHH(aaa, bbb, ccc, ddd, eee, mX(3), 11)
-    Call fnHHH(eee, aaa, bbb, ccc, ddd, mX(7), 8)
-    Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(14), 6)
-    Call fnHHH(ccc, ddd, eee, aaa, bbb, mX(6), 6)
-    Call fnHHH(bbb, ccc, ddd, eee, aaa, mX(9), 14)
-    Call fnHHH(aaa, bbb, ccc, ddd, eee, mX(11), 12)
-    Call fnHHH(eee, aaa, bbb, ccc, ddd, mX(8), 13)
-    Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(12), 5)
-    Call fnHHH(ccc, ddd, eee, aaa, bbb, mX(2), 14)
-    Call fnHHH(bbb, ccc, ddd, eee, aaa, mX(10), 13)
-    Call fnHHH(aaa, bbb, ccc, ddd, eee, mX(0), 13)
-    Call fnHHH(eee, aaa, bbb, ccc, ddd, mX(4), 7)
-    Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(13), 5)
-
-    Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(8), 15)
-    Call fnGGG(bbb, ccc, ddd, eee, aaa, mX(6), 5)
-    Call fnGGG(aaa, bbb, ccc, ddd, eee, mX(4), 8)
-    Call fnGGG(eee, aaa, bbb, ccc, ddd, mX(1), 11)
-    Call fnGGG(ddd, eee, aaa, bbb, ccc, mX(3), 14)
-    Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(11), 14)
-    Call fnGGG(bbb, ccc, ddd, eee, aaa, mX(15), 6)
-    Call fnGGG(aaa, bbb, ccc, ddd, eee, mX(0), 14)
-    Call fnGGG(eee, aaa, bbb, ccc, ddd, mX(5), 6)
-    Call fnGGG(ddd, eee, aaa, bbb, ccc, mX(12), 9)
-    Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(2), 12)
-    Call fnGGG(bbb, ccc, ddd, eee, aaa, mX(13), 9)
-    Call fnGGG(aaa, bbb, ccc, ddd, eee, mX(9), 12)
-    Call fnGGG(eee, aaa, bbb, ccc, ddd, mX(7), 5)
-    Call fnGGG(ddd, eee, aaa, bbb, ccc, mX(10), 15)
-    Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(14), 8)
-
-    Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(12), 8)
-    Call fnFFF(aaa, bbb, ccc, ddd, eee, mX(15), 5)
-    Call fnFFF(eee, aaa, bbb, ccc, ddd, mX(10), 12)
-    Call fnFFF(ddd, eee, aaa, bbb, ccc, mX(4), 9)
-    Call fnFFF(ccc, ddd, eee, aaa, bbb, mX(1), 12)
-    Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(5), 5)
-    Call fnFFF(aaa, bbb, ccc, ddd, eee, mX(8), 14)
-    Call fnFFF(eee, aaa, bbb, ccc, ddd, mX(7), 6)
-    Call fnFFF(ddd, eee, aaa, bbb, ccc, mX(6), 8)
-    Call fnFFF(ccc, ddd, eee, aaa, bbb, mX(2), 13)
-    Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(13), 6)
-    Call fnFFF(aaa, bbb, ccc, ddd, eee, mX(14), 5)
-    Call fnFFF(eee, aaa, bbb, ccc, ddd, mX(0), 15)
-    Call fnFFF(ddd, eee, aaa, bbb, ccc, mX(3), 13)
-    Call fnFFF(ccc, ddd, eee, aaa, bbb, mX(9), 11)
-    Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(11), 11)
-
-    ddd = Helper.UAdd(Helper.UAdd(ddd, cc), mState(1))
-    mState(1) = Helper.UAdd(Helper.UAdd(mState(2), dd), eee)
-    mState(2) = Helper.UAdd(Helper.UAdd(mState(3), ee), aaa)
-    mState(3) = Helper.UAdd(Helper.UAdd(mState(4), aa), bbb)
-    mState(4) = Helper.UAdd(Helper.UAdd(mState(0), bb), ccc)
-    mState(0) = ddd
-End Sub
-
-''
-' Runs when compiled. Must disable Integer overflow checks.
-'
-Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
-    Call CopyMemory(mX(0), Bytes(Index), 64)
-    
-    Dim aa As Long
-    Dim bb As Long
-    Dim dd As Long
-    Dim cc As Long
-    Dim ee As Long
-    Dim aaa As Long
-    Dim bbb As Long
-    Dim ccc As Long
-    Dim ddd As Long
-    Dim eee As Long
-    
-    aa = mState(0)
-    bb = mState(1)
-    cc = mState(2)
-    dd = mState(3)
-    ee = mState(4)
-    aaa = aa
-    bbb = bb
-    ccc = cc
-    ddd = dd
-    eee = ee
-    
-    'Call fnFF(aa, bb, cc, dd, ee, mX(0), 11)
+    'fnFF(aa, bb, cc, dd, ee, mX(0), 11)
     aa = aa + (bb Xor cc Xor dd) + mX(0)
     aa = ((aa * &H800&) Or (((aa And &HFFE00000) \ &H200000) And &H7FF&)) + ee
     cc = (cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&)
     
-    'Call fnFF(ee, aa, bb, cc, dd, mX(1), 14)
+    'fnFF ee, aa, bb, cc, dd, mX(1), 14)
     ee = ee + (aa Xor bb Xor cc) + mX(1)
     ee = ((ee * &H4000&) Or (((ee And &HFFFC0000) \ &H40000) And &H3FFF&)) + dd
     bb = (bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&)
     
-    'Call fnFF(dd, ee, aa, bb, cc, mX(2), 15)
+    'fnFF(dd, ee, aa, bb, cc, mX(2), 15)
     dd = dd + (ee Xor aa Xor bb) + mX(2)
     dd = ((dd * &H8000&) Or (((dd And &HFFFE0000) \ &H20000) And &H7FFF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFF(cc, dd, ee, aa, bb, mX(3), 12)
+    'fnFF(cc, dd, ee, aa, bb, mX(3), 12)
     cc = cc + (dd Xor ee Xor aa) + mX(3)
     cc = ((cc * &H1000&) Or (((cc And &HFFF00000) \ &H100000) And &HFFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
         
-    'Call fnFF(bb, cc, dd, ee, aa, mX(4), 5)
+    'fnFF(bb, cc, dd, ee, aa, mX(4), 5)
     bb = bb + (cc Xor dd Xor ee) + mX(4)
     bb = ((bb * &H20&) Or (((bb And &HF8000000) \ &H8000000) And &H1F&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFF(aa, bb, cc, dd, ee, mX(5), 8)
+    'fnFF(aa, bb, cc, dd, ee, mX(5), 8)
     aa = aa + (bb Xor cc Xor dd) + mX(5)
     aa = ((aa * &H100&) Or (((aa And &HFF000000) \ &H1000000) And &HFF&)) + ee
     cc = (cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&)
     
-    'Call fnFF(ee, aa, bb, cc, dd, mX(6), 7)
+    'fnFF(ee, aa, bb, cc, dd, mX(6), 7)
     ee = ee + (aa Xor bb Xor cc) + mX(6)
     ee = ((ee * &H80&) Or (((ee And &HFE000000) \ &H2000000) And &H7F&)) + dd
     bb = (bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&)
         
-    'Call fnFF(dd, ee, aa, bb, cc, mX(7), 9)
+    'fnFF(dd, ee, aa, bb, cc, mX(7), 9)
     dd = dd + (ee Xor aa Xor bb) + mX(7)
     dd = ((dd * &H200&) Or (((dd And &HFF800000) \ &H800000) And &H1FF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFF(cc, dd, ee, aa, bb, mX(8), 11)
+    'fnFF(cc, dd, ee, aa, bb, mX(8), 11)
     cc = cc + (dd Xor ee Xor aa) + mX(8)
     cc = ((cc * &H800&) Or (((cc And &HFFE00000) \ &H200000) And &H7FF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFF(bb, cc, dd, ee, aa, mX(9), 13)
+    'fnFF(bb, cc, dd, ee, aa, mX(9), 13)
     bb = bb + (cc Xor dd Xor ee) + mX(9)
     bb = ((bb * &H2000&) Or (((bb And &HFFF80000) \ &H80000) And &H1FFF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFF(aa, bb, cc, dd, ee, mX(10), 14)
+    'fnFF(aa, bb, cc, dd, ee, mX(10), 14)
     aa = aa + (bb Xor cc Xor dd) + mX(10)
     aa = ((aa * &H4000&) Or (((aa And &HFFFC0000) \ &H40000) And &H3FFF&)) + ee
     cc = (cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&)
     
-    'Call fnFF(ee, aa, bb, cc, dd, mX(11), 15)
+    'fnFF(ee, aa, bb, cc, dd, mX(11), 15)
     ee = ee + (aa Xor bb Xor cc) + mX(11)
     ee = ((ee * &H8000&) Or (((ee And &HFFFE0000) \ &H20000) And &H7FFF&)) + dd
     bb = (bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&)
     
-    'Call fnFF(dd, ee, aa, bb, cc, mX(12), 6)
+    'fnFF(dd, ee, aa, bb, cc, mX(12), 6)
     dd = dd + (ee Xor aa Xor bb) + mX(12)
     dd = ((dd * &H40&) Or (((dd And &HFC000000) \ &H4000000) And &H3F&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFF(cc, dd, ee, aa, bb, mX(13), 7)
+    'fnFF(cc, dd, ee, aa, bb, mX(13), 7)
     cc = cc + (dd Xor ee Xor aa) + mX(13)
     cc = ((cc * &H80&) Or (((cc And &HFE000000) \ &H2000000) And &H7F&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFF(bb, cc, dd, ee, aa, mX(14), 9)
+    'fnFF(bb, cc, dd, ee, aa, mX(14), 9)
     bb = bb + (cc Xor dd Xor ee) + mX(14)
     bb = ((bb * &H200&) Or (((bb And &HFF800000) \ &H800000) And &H1FF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFF(aa, bb, cc, dd, ee, mX(15), 8)
+    'fnFF(aa, bb, cc, dd, ee, mX(15), 8)
     aa = aa + (bb Xor cc Xor dd) + mX(15)
     aa = ((aa * &H100&) Or (((aa And &HFF000000) \ &H1000000) And &HFF&)) + ee
     cc = (cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&)
 
-    'Call fnGG(ee, aa, bb, cc, dd, mX(7), 7)
+    'fnGG(ee, aa, bb, cc, dd, mX(7), 7)
     ee = ee + ((aa And bb) Or ((Not aa) And cc)) + mX(7) + &H5A827999
     ee = ((ee * &H80&) Or (((ee And &HFE000000) \ &H2000000) And &H7F&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(dd, ee, aa, bb, cc, mX(4), 6)
+    'fnGG(dd, ee, aa, bb, cc, mX(4), 6)
     dd = dd + ((ee And aa) Or ((Not ee) And bb)) + mX(4) + &H5A827999
     dd = ((dd * &H40&) Or (((dd And &HFC000000) \ &H4000000) And &H3F&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(cc, dd, ee, aa, bb, mX(13), 8)
+    'fnGG(cc, dd, ee, aa, bb, mX(13), 8)
     cc = cc + ((dd And ee) Or ((Not dd) And aa)) + mX(13) + &H5A827999
     cc = ((cc * &H100&) Or (((cc And &HFF000000) \ &H1000000) And &HFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(bb, cc, dd, ee, aa, mX(1), 13)
+    'fnGG(bb, cc, dd, ee, aa, mX(1), 13)
     bb = bb + ((cc And dd) Or ((Not cc) And ee)) + mX(1) + &H5A827999
     bb = ((bb * &H2000&) Or (((bb And &HFFF80000) \ &H80000) And &H1FFF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(aa, bb, cc, dd, ee, mX(10), 11)
+    'fnGG(aa, bb, cc, dd, ee, mX(10), 11)
     aa = aa + ((bb And cc) Or ((Not bb) And dd)) + mX(10) + &H5A827999
     aa = ((aa * &H800&) Or (((aa And &HFFE00000) \ &H200000) And &H7FF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(ee, aa, bb, cc, dd, mX(6), 9)
+    'fnGG(ee, aa, bb, cc, dd, mX(6), 9)
     ee = ee + ((aa And bb) Or ((Not aa) And cc)) + mX(6) + &H5A827999
     ee = ((ee * &H200&) Or (((ee And &HFF800000) \ &H800000) And &H1FF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(dd, ee, aa, bb, cc, mX(15), 7)
+    'fnGG(dd, ee, aa, bb, cc, mX(15), 7)
     dd = dd + ((ee And aa) Or ((Not ee) And bb)) + mX(15) + &H5A827999
     dd = ((dd * &H80&) Or (((dd And &HFE000000) \ &H2000000) And &H7F&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(cc, dd, ee, aa, bb, mX(3), 15)
+    'fnGG(cc, dd, ee, aa, bb, mX(3), 15)
     cc = cc + ((dd And ee) Or ((Not dd) And aa)) + mX(3) + &H5A827999
     cc = ((cc * &H8000&) Or (((cc And &HFFFE0000) \ &H20000) And &H7FFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(bb, cc, dd, ee, aa, mX(12), 7)
+    'fnGG(bb, cc, dd, ee, aa, mX(12), 7)
     bb = bb + ((cc And dd) Or ((Not cc) And ee)) + mX(12) + &H5A827999
     bb = ((bb * &H80&) Or (((bb And &HFE000000) \ &H2000000) And &H7F&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGG(aa, bb, cc, dd, ee, mX(0), 12)
+    'fnGG(aa, bb, cc, dd, ee, mX(0), 12)
     aa = aa + ((bb And cc) Or ((Not bb) And dd)) + mX(0) + &H5A827999
     aa = ((aa * &H1000&) Or (((aa And &HFFF00000) \ &H100000) And &HFFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(ee, aa, bb, cc, dd, mX(9), 15)
+    'fnGG(ee, aa, bb, cc, dd, mX(9), 15)
     ee = ee + ((aa And bb) Or ((Not aa) And cc)) + mX(9) + &H5A827999
     ee = ((ee * &H8000&) Or (((ee And &HFFFE0000) \ &H20000) And &H7FFF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(dd, ee, aa, bb, cc, mX(5), 9)
+    'fnGG(dd, ee, aa, bb, cc, mX(5), 9)
     dd = dd + ((ee And aa) Or ((Not ee) And bb)) + mX(5) + &H5A827999
     dd = ((dd * &H200&) Or (((dd And &HFF800000) \ &H800000) And &H1FF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(cc, dd, ee, aa, bb, mX(2), 11)
+    'fnGG(cc, dd, ee, aa, bb, mX(2), 11)
     cc = cc + ((dd And ee) Or ((Not dd) And aa)) + mX(2) + &H5A827999
     cc = ((cc * &H800&) Or (((cc And &HFFE00000) \ &H200000) And &H7FF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(bb, cc, dd, ee, aa, mX(14), 7)
+    'fnGG(bb, cc, dd, ee, aa, mX(14), 7)
     bb = bb + ((cc And dd) Or ((Not cc) And ee)) + mX(14) + &H5A827999
     bb = ((bb * &H80&) Or (((bb And &HFE000000) \ &H2000000) And &H7F&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(aa, bb, cc, dd, ee, mX(11), 13)
+    'fnGG(aa, bb, cc, dd, ee, mX(11), 13)
     aa = aa + ((bb And cc) Or ((Not bb) And dd)) + mX(11) + &H5A827999
     aa = ((aa * &H2000&) Or (((aa And &HFFF80000) \ &H80000) And &H1FFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGG(ee, aa, bb, cc, dd, mX(8), 12)
+    'fnGG(ee, aa, bb, cc, dd, mX(8), 12)
     ee = ee + ((aa And bb) Or ((Not aa) And cc)) + mX(8) + &H5A827999
     ee = ((ee * &H1000&) Or (((ee And &HFFF00000) \ &H100000) And &HFFF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(dd, ee, aa, bb, cc, mX(3), 11)
+    'fnHH(dd, ee, aa, bb, cc, mX(3), 11)
     dd = dd + ((ee Or (Not aa)) Xor bb) + mX(3) + &H6ED9EBA1
     dd = ((dd * &H800&) Or (((dd And &HFFE00000) \ &H200000) And &H7FF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(cc, dd, ee, aa, bb, mX(10), 13)
+    'fnHH(cc, dd, ee, aa, bb, mX(10), 13)
     cc = cc + ((dd Or (Not ee)) Xor aa) + mX(10) + &H6ED9EBA1
     cc = ((cc * &H2000&) Or (((cc And &HFFF80000) \ &H80000) And &H1FFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(bb, cc, dd, ee, aa, mX(14), 6)
+    'fnHH(bb, cc, dd, ee, aa, mX(14), 6)
     bb = bb + ((cc Or (Not dd)) Xor ee) + mX(14) + &H6ED9EBA1
     bb = ((bb * &H40&) Or (((bb And &HFC000000) \ &H4000000) And &H3F&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(aa, bb, cc, dd, ee, mX(4), 7)
+    'fnHH(aa, bb, cc, dd, ee, mX(4), 7)
     aa = aa + ((bb Or (Not cc)) Xor dd) + mX(4) + &H6ED9EBA1
     aa = ((aa * &H80&) Or (((aa And &HFE000000) \ &H2000000) And &H7F&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(ee, aa, bb, cc, dd, mX(9), 14)
+    'fnHH(ee, aa, bb, cc, dd, mX(9), 14)
     ee = ee + ((aa Or (Not bb)) Xor cc) + mX(9) + &H6ED9EBA1
     ee = ((ee * &H4000&) Or (((ee And &HFFFC0000) \ &H40000) And &H3FFF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(dd, ee, aa, bb, cc, mX(15), 9)
+    'fnHH(dd, ee, aa, bb, cc, mX(15), 9)
     dd = dd + ((ee Or (Not aa)) Xor bb) + mX(15) + &H6ED9EBA1
     dd = ((dd * &H200&) Or (((dd And &HFF800000) \ &H800000) And &H1FF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(cc, dd, ee, aa, bb, mX(8), 13)
+    'fnHH(cc, dd, ee, aa, bb, mX(8), 13)
     cc = cc + ((dd Or (Not ee)) Xor aa) + mX(8) + &H6ED9EBA1
     cc = ((cc * &H2000&) Or (((cc And &HFFF80000) \ &H80000) And &H1FFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(bb, cc, dd, ee, aa, mX(1), 15)
+    'fnHH(bb, cc, dd, ee, aa, mX(1), 15)
     bb = bb + ((cc Or (Not dd)) Xor ee) + mX(1) + &H6ED9EBA1
     bb = ((bb * &H8000&) Or (((bb And &HFFFE0000) \ &H20000) And &H7FFF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(aa, bb, cc, dd, ee, mX(2), 14)
+    'fnHH(aa, bb, cc, dd, ee, mX(2), 14)
     aa = aa + ((bb Or (Not cc)) Xor dd) + mX(2) + &H6ED9EBA1
     aa = ((aa * &H4000&) Or (((aa And &HFFFC0000) \ &H40000) And &H3FFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHH(ee, aa, bb, cc, dd, mX(7), 8)
+    'fnHH(ee, aa, bb, cc, dd, mX(7), 8)
     ee = ee + ((aa Or (Not bb)) Xor cc) + mX(7) + &H6ED9EBA1
     ee = ((ee * &H100&) Or (((ee And &HFF000000) \ &H1000000) And &HFF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(dd, ee, aa, bb, cc, mX(0), 13)
+    'fnHH(dd, ee, aa, bb, cc, mX(0), 13)
     dd = dd + ((ee Or (Not aa)) Xor bb) + mX(0) + &H6ED9EBA1
     dd = ((dd * &H2000&) Or (((dd And &HFFF80000) \ &H80000) And &H1FFF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(cc, dd, ee, aa, bb, mX(6), 6)
+    'fnHH(cc, dd, ee, aa, bb, mX(6), 6)
     cc = cc + ((dd Or (Not ee)) Xor aa) + mX(6) + &H6ED9EBA1
     cc = ((cc * &H40&) Or (((cc And &HFC000000) \ &H4000000) And &H3F&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(bb, cc, dd, ee, aa, mX(13), 5)
+    'fnHH(bb, cc, dd, ee, aa, mX(13), 5)
     bb = bb + ((cc Or (Not dd)) Xor ee) + mX(13) + &H6ED9EBA1
     bb = ((bb * &H20&) Or (((bb And &HF8000000) \ &H8000000) And &H1F&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(aa, bb, cc, dd, ee, mX(11), 12)
+    'fnHH(aa, bb, cc, dd, ee, mX(11), 12)
     aa = aa + ((bb Or (Not cc)) Xor dd) + mX(11) + &H6ED9EBA1
     aa = ((aa * &H1000&) Or (((aa And &HFFF00000) \ &H100000) And &HFFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(ee, aa, bb, cc, dd, mX(5), 7)
+    'fnHH(ee, aa, bb, cc, dd, mX(5), 7)
     ee = ee + ((aa Or (Not bb)) Xor cc) + mX(5) + &H6ED9EBA1
     ee = ((ee * &H80&) Or (((ee And &HFE000000) \ &H2000000) And &H7F&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHH(dd, ee, aa, bb, cc, mX(12), 5)
+    'fnHH(dd, ee, aa, bb, cc, mX(12), 5)
     dd = dd + ((ee Or (Not aa)) Xor bb) + mX(12) + &H6ED9EBA1
     dd = ((dd * &H20&) Or (((dd And &HF8000000) \ &H8000000) And &H1F&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
         
-    'Call fnII(cc, dd, ee, aa, bb, mX(1), 11)
+    'fnII(cc, dd, ee, aa, bb, mX(1), 11)
     cc = cc + ((dd And aa) Or (ee And (Not aa))) + mX(1) + &H8F1BBCDC
     cc = ((cc * &H800&) Or (((cc And &HFFE00000) \ &H200000) And &H7FF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(bb, cc, dd, ee, aa, mX(9), 12)
+    'fnII(bb, cc, dd, ee, aa, mX(9), 12)
     bb = bb + ((cc And ee) Or (dd And (Not ee))) + mX(9) + &H8F1BBCDC
     bb = ((bb * &H1000&) Or (((bb And &HFFF00000) \ &H100000) And &HFFF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(aa, bb, cc, dd, ee, mX(11), 14)
+    'fnII(aa, bb, cc, dd, ee, mX(11), 14)
     aa = aa + ((bb And dd) Or (cc And (Not dd))) + mX(11) + &H8F1BBCDC
     aa = ((aa * &H4000&) Or (((aa And &HFFFC0000) \ &H40000) And &H3FFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
         
-    'Call fnII(ee, aa, bb, cc, dd, mX(10), 15)
+    'fnII(ee, aa, bb, cc, dd, mX(10), 15)
     ee = ee + ((aa And cc) Or (bb And (Not cc))) + mX(10) + &H8F1BBCDC
     ee = ((ee * &H8000&) Or (((ee And &HFFFE0000) \ &H20000) And &H7FFF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(dd, ee, aa, bb, cc, mX(0), 14)
+    'fnII(dd, ee, aa, bb, cc, mX(0), 14)
     dd = dd + ((ee And bb) Or (aa And (Not bb))) + mX(0) + &H8F1BBCDC
     dd = ((dd * &H4000&) Or (((dd And &HFFFC0000) \ &H40000) And &H3FFF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnII(cc, dd, ee, aa, bb, mX(8), 15)
+    'fnII(cc, dd, ee, aa, bb, mX(8), 15)
     cc = cc + ((dd And aa) Or (ee And (Not aa))) + mX(8) + &H8F1BBCDC
     cc = ((cc * &H8000&) Or (((cc And &HFFFE0000) \ &H20000) And &H7FFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(bb, cc, dd, ee, aa, mX(12), 9)
+    'fnII(bb, cc, dd, ee, aa, mX(12), 9)
     bb = bb + ((cc And ee) Or (dd And (Not ee))) + mX(12) + &H8F1BBCDC
     bb = ((bb * &H200&) Or (((bb And &HFF800000) \ &H800000) And &H1FF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(aa, bb, cc, dd, ee, mX(4), 8)
+    'fnII(aa, bb, cc, dd, ee, mX(4), 8)
     aa = aa + ((bb And dd) Or (cc And (Not dd))) + mX(4) + &H8F1BBCDC
     aa = ((aa * &H100&) Or (((aa And &HFF000000) \ &H1000000) And &HFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(ee, aa, bb, cc, dd, mX(13), 9)
+    'fnII(ee, aa, bb, cc, dd, mX(13), 9)
     ee = ee + ((aa And cc) Or (bb And (Not cc))) + mX(13) + &H8F1BBCDC
     ee = ((ee * &H200&) Or (((ee And &HFF800000) \ &H800000) And &H1FF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(dd, ee, aa, bb, cc, mX(3), 14)
+    'fnII(dd, ee, aa, bb, cc, mX(3), 14)
     dd = dd + ((ee And bb) Or (aa And (Not bb))) + mX(3) + &H8F1BBCDC
     dd = ((dd * &H4000&) Or (((dd And &HFFFC0000) \ &H40000) And &H3FFF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(cc, dd, ee, aa, bb, mX(7), 5)
+    'fnII(cc, dd, ee, aa, bb, mX(7), 5)
     cc = cc + ((dd And aa) Or (ee And (Not aa))) + mX(7) + &H8F1BBCDC
     cc = ((cc * &H20&) Or (((cc And &HF8000000) \ &H8000000) And &H1F&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(bb, cc, dd, ee, aa, mX(15), 6)
+    'fnII(bb, cc, dd, ee, aa, mX(15), 6)
     bb = bb + ((cc And ee) Or (dd And (Not ee))) + mX(15) + &H8F1BBCDC
     bb = ((bb * &H40&) Or (((bb And &HFC000000) \ &H4000000) And &H3F&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(aa, bb, cc, dd, ee, mX(14), 8)
+    'fnII(aa, bb, cc, dd, ee, mX(14), 8)
     aa = aa + ((bb And dd) Or (cc And (Not dd))) + mX(14) + &H8F1BBCDC
     aa = ((aa * &H100&) Or (((aa And &HFF000000) \ &H1000000) And &HFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
         
-    'Call fnII(ee, aa, bb, cc, dd, mX(5), 6)
+    'fnII(ee, aa, bb, cc, dd, mX(5), 6)
     ee = ee + ((aa And cc) Or (bb And (Not cc))) + mX(5) + &H8F1BBCDC
     ee = ((ee * &H40&) Or (((ee And &HFC000000) \ &H4000000) And &H3F&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(dd, ee, aa, bb, cc, mX(6), 5)
+    'fnII(dd, ee, aa, bb, cc, mX(6), 5)
     dd = dd + ((ee And bb) Or (aa And (Not bb))) + mX(6) + &H8F1BBCDC
     dd = ((dd * &H20&) Or (((dd And &HF8000000) \ &H8000000) And &H1F&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnII(cc, dd, ee, aa, bb, mX(2), 12)
+    'fnII(cc, dd, ee, aa, bb, mX(2), 12)
     cc = cc + ((dd And aa) Or (ee And (Not aa))) + mX(2) + &H8F1BBCDC
     cc = ((cc * &H1000&) Or (((cc And &HFFF00000) \ &H100000) And &HFFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(bb, cc, dd, ee, aa, mX(4), 9)
+    'fnJJ(bb, cc, dd, ee, aa, mX(4), 9)
     bb = bb + (cc Xor (dd Or (Not ee))) + mX(4) + &HA953FD4E
     bb = ((bb * &H200&) Or (((bb And &HFF800000) \ &H800000) And &H1FF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(aa, bb, cc, dd, ee, mX(0), 15)
+    'fnJJ(aa, bb, cc, dd, ee, mX(0), 15)
     aa = aa + (bb Xor (cc Or (Not dd))) + mX(0) + &HA953FD4E
     aa = ((aa * &H8000&) Or (((aa And &HFFFE0000) \ &H20000) And &H7FFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJ(ee, aa, bb, cc, dd, mX(5), 5)
+    'fnJJ(ee, aa, bb, cc, dd, mX(5), 5)
     ee = ee + (aa Xor (bb Or (Not cc))) + mX(5) + &HA953FD4E
     ee = ((ee * &H20&) Or (((ee And &HF8000000) \ &H8000000) And &H1F&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJ(dd, ee, aa, bb, cc, mX(9), 11)
+    'fnJJ(dd, ee, aa, bb, cc, mX(9), 11)
     dd = dd + (ee Xor (aa Or (Not bb))) + mX(9) + &HA953FD4E
     dd = ((dd * &H800&) Or (((dd And &HFFE00000) \ &H200000) And &H7FF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJ(cc, dd, ee, aa, bb, mX(7), 6)
+    'fnJJ(cc, dd, ee, aa, bb, mX(7), 6)
     cc = cc + (dd Xor (ee Or (Not aa))) + mX(7) + &HA953FD4E
     cc = ((cc * &H40&) Or (((cc And &HFC000000) \ &H4000000) And &H3F&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJ(bb, cc, dd, ee, aa, mX(12), 8)
+    'fnJJ(bb, cc, dd, ee, aa, mX(12), 8)
     bb = bb + (cc Xor (dd Or (Not ee))) + mX(12) + &HA953FD4E
     bb = ((bb * &H100&) Or (((bb And &HFF000000) \ &H1000000) And &HFF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJ(aa, bb, cc, dd, ee, mX(2), 13)
+    'fnJJ(aa, bb, cc, dd, ee, mX(2), 13)
     aa = aa + (bb Xor (cc Or (Not dd))) + mX(2) + &HA953FD4E
     aa = ((aa * &H2000&) Or (((aa And &HFFF80000) \ &H80000) And &H1FFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(ee, aa, bb, cc, dd, mX(10), 12)
+    'fnJJ(ee, aa, bb, cc, dd, mX(10), 12)
     ee = ee + (aa Xor (bb Or (Not cc))) + mX(10) + &HA953FD4E
     ee = ((ee * &H1000&) Or (((ee And &HFFF00000) \ &H100000) And &HFFF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(dd, ee, aa, bb, cc, mX(14), 5)
+    'fnJJ(dd, ee, aa, bb, cc, mX(14), 5)
     dd = dd + (ee Xor (aa Or (Not bb))) + mX(14) + &HA953FD4E
     dd = ((dd * &H20&) Or (((dd And &HF8000000) \ &H8000000) And &H1F&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(cc, dd, ee, aa, bb, mX(1), 12)
+    'fnJJ(cc, dd, ee, aa, bb, mX(1), 12)
     cc = cc + (dd Xor (ee Or (Not aa))) + mX(1) + &HA953FD4E
     cc = ((cc * &H1000&) Or (((cc And &HFFF00000) \ &H100000) And &HFFF&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(bb, cc, dd, ee, aa, mX(3), 13)
+    'fnJJ(bb, cc, dd, ee, aa, mX(3), 13)
     bb = bb + (cc Xor (dd Or (Not ee))) + mX(3) + &HA953FD4E
     bb = ((bb * &H2000&) Or (((bb And &HFFF80000) \ &H80000) And &H1FFF&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(aa, bb, cc, dd, ee, mX(8), 14)
+    'fnJJ(aa, bb, cc, dd, ee, mX(8), 14)
     aa = aa + (bb Xor (cc Or (Not dd))) + mX(8) + &HA953FD4E
     aa = ((aa * &H4000&) Or (((aa And &HFFFC0000) \ &H40000) And &H3FFF&)) + ee
     cc = ((cc * &H400&) Or (((cc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(ee, aa, bb, cc, dd, mX(11), 11)
+    'fnJJ(ee, aa, bb, cc, dd, mX(11), 11)
     ee = ee + (aa Xor (bb Or (Not cc))) + mX(11) + &HA953FD4E
     ee = ((ee * &H800&) Or (((ee And &HFFE00000) \ &H200000) And &H7FF&)) + dd
     bb = ((bb * &H400&) Or (((bb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(dd, ee, aa, bb, cc, mX(6), 8)
+    'fnJJ(dd, ee, aa, bb, cc, mX(6), 8)
     dd = dd + (ee Xor (aa Or (Not bb))) + mX(6) + &HA953FD4E
     dd = ((dd * &H100&) Or (((dd And &HFF000000) \ &H1000000) And &HFF&)) + cc
     aa = ((aa * &H400&) Or (((aa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(cc, dd, ee, aa, bb, mX(15), 5)
+    'fnJJ(cc, dd, ee, aa, bb, mX(15), 5)
     cc = cc + (dd Xor (ee Or (Not aa))) + mX(15) + &HA953FD4E
     cc = ((cc * &H20&) Or (((cc And &HF8000000) \ &H8000000) And &H1F&)) + bb
     ee = ((ee * &H400&) Or (((ee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJ(bb, cc, dd, ee, aa, mX(13), 6)
+    'fnJJ(bb, cc, dd, ee, aa, mX(13), 6)
     bb = bb + (cc Xor (dd Or (Not ee))) + mX(13) + &HA953FD4E
     bb = ((bb * &H40&) Or (((bb And &HFC000000) \ &H4000000) And &H3F&)) + aa
     dd = ((dd * &H400&) Or (((dd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(5), 8)
+    'fnJJJ(aaa, bbb, ccc, ddd, eee, mX(5), 8)
     aaa = aaa + (bbb Xor (ccc Or (Not ddd))) + mX(5) + &H50A28BE6
     aaa = ((aaa * &H100&) Or (((aaa And &HFF000000) \ &H1000000) And &HFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJJ(eee, aaa, bbb, ccc, ddd, mX(14), 9)
+    'fnJJJ(eee, aaa, bbb, ccc, ddd, mX(14), 9)
     eee = eee + (aaa Xor (bbb Or (Not ccc))) + mX(14) + &H50A28BE6
     eee = ((eee * &H200&) Or (((eee And &HFF800000) \ &H800000) And &H1FF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(ddd, eee, aaa, bbb, ccc, mX(7), 9)
+    'fnJJJ(ddd, eee, aaa, bbb, ccc, mX(7), 9)
     ddd = ddd + (eee Xor (aaa Or (Not bbb))) + mX(7) + &H50A28BE6
     ddd = ((ddd * &H200&) Or (((ddd And &HFF800000) \ &H800000) And &H1FF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(ccc, ddd, eee, aaa, bbb, mX(0), 11)
+    'fnJJJ(ccc, ddd, eee, aaa, bbb, mX(0), 11)
     ccc = ccc + (ddd Xor (eee Or (Not aaa))) + mX(0) + &H50A28BE6
     ccc = ((ccc * &H800&) Or (((ccc And &HFFE00000) \ &H200000) And &H7FF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(bbb, ccc, ddd, eee, aaa, mX(9), 13)
+    'fnJJJ(bbb, ccc, ddd, eee, aaa, mX(9), 13)
     bbb = bbb + (ccc Xor (ddd Or (Not eee))) + mX(9) + &H50A28BE6
     bbb = ((bbb * &H2000&) Or (((bbb And &HFFF80000) \ &H80000) And &H1FFF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(2), 15)
+    'fnJJJ(aaa, bbb, ccc, ddd, eee, mX(2), 15)
     aaa = aaa + (bbb Xor (ccc Or (Not ddd))) + mX(2) + &H50A28BE6
     aaa = ((aaa * &H8000&) Or (((aaa And &HFFFE0000) \ &H20000) And &H7FFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(eee, aaa, bbb, ccc, ddd, mX(11), 15)
+    'fnJJJ(eee, aaa, bbb, ccc, ddd, mX(11), 15)
     eee = eee + (aaa Xor (bbb Or (Not ccc))) + mX(11) + &H50A28BE6
     eee = ((eee * &H8000&) Or (((eee And &HFFFE0000) \ &H20000) And &H7FFF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(ddd, eee, aaa, bbb, ccc, mX(4), 5)
+    'fnJJJ(ddd, eee, aaa, bbb, ccc, mX(4), 5)
     ddd = ddd + (eee Xor (aaa Or (Not bbb))) + mX(4) + &H50A28BE6
     ddd = ((ddd * &H20&) Or (((ddd And &HF8000000) \ &H8000000) And &H1F&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(ccc, ddd, eee, aaa, bbb, mX(13), 7)
+    'fnJJJ(ccc, ddd, eee, aaa, bbb, mX(13), 7)
     ccc = ccc + (ddd Xor (eee Or (Not aaa))) + mX(13) + &H50A28BE6
     ccc = ((ccc * &H80&) Or (((ccc And &HFE000000) \ &H2000000) And &H7F&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJJ(bbb, ccc, ddd, eee, aaa, mX(6), 7)
+    'fnJJJ(bbb, ccc, ddd, eee, aaa, mX(6), 7)
     bbb = bbb + (ccc Xor (ddd Or (Not eee))) + mX(6) + &H50A28BE6
     bbb = ((bbb * &H80&) Or (((bbb And &HFE000000) \ &H2000000) And &H7F&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(15), 8)
+    'fnJJJ(aaa, bbb, ccc, ddd, eee, mX(15), 8)
     aaa = aaa + (bbb Xor (ccc Or (Not ddd))) + mX(15) + &H50A28BE6
     aaa = ((aaa * &H100&) Or (((aaa And &HFF000000) \ &H1000000) And &HFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(eee, aaa, bbb, ccc, ddd, mX(8), 11)
+    'fnJJJ(eee, aaa, bbb, ccc, ddd, mX(8), 11)
     eee = eee + (aaa Xor (bbb Or (Not ccc))) + mX(8) + &H50A28BE6
     eee = ((eee * &H800&) Or (((eee And &HFFE00000) \ &H200000) And &H7FF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(ddd, eee, aaa, bbb, ccc, mX(1), 14)
+    'fnJJJ(ddd, eee, aaa, bbb, ccc, mX(1), 14)
     ddd = ddd + (eee Xor (aaa Or (Not bbb))) + mX(1) + &H50A28BE6
     ddd = ((ddd * &H4000&) Or (((ddd And &HFFFC0000) \ &H40000) And &H3FFF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(ccc, ddd, eee, aaa, bbb, mX(10), 14)
+    'fnJJJ(ccc, ddd, eee, aaa, bbb, mX(10), 14)
     ccc = ccc + (ddd Xor (eee Or (Not aaa))) + mX(10) + &H50A28BE6
     ccc = ((ccc * &H4000&) Or (((ccc And &HFFFC0000) \ &H40000) And &H3FFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnJJJ(bbb, ccc, ddd, eee, aaa, mX(3), 12)
+    'fnJJJ(bbb, ccc, ddd, eee, aaa, mX(3), 12)
     bbb = bbb + (ccc Xor (ddd Or (Not eee))) + mX(3) + &H50A28BE6
     bbb = ((bbb * &H1000&) Or (((bbb And &HFFF00000) \ &H100000) And &HFFF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnJJJ(aaa, bbb, ccc, ddd, eee, mX(12), 6)
+    'fnJJJ(aaa, bbb, ccc, ddd, eee, mX(12), 6)
     aaa = aaa + (bbb Xor (ccc Or (Not ddd))) + mX(12) + &H50A28BE6
     aaa = ((aaa * &H40&) Or (((aaa And &HFC000000) \ &H4000000) And &H3F&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(eee, aaa, bbb, ccc, ddd, mX(6), 9)
+    'fnIII(eee, aaa, bbb, ccc, ddd, mX(6), 9)
     eee = eee + ((aaa And ccc) Or (bbb And (Not ccc))) + mX(6) + &H5C4DD124
     eee = ((eee * &H200&) Or (((eee And &HFF800000) \ &H800000) And &H1FF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnIII(ddd, eee, aaa, bbb, ccc, mX(11), 13)
+    'fnIII(ddd, eee, aaa, bbb, ccc, mX(11), 13)
     ddd = ddd + ((eee And bbb) Or (aaa And (Not bbb))) + mX(11) + &H5C4DD124
     ddd = ((ddd * &H2000&) Or (((ddd And &HFFF80000) \ &H80000) And &H1FFF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnIII(ccc, ddd, eee, aaa, bbb, mX(3), 15)
+    'fnIII(ccc, ddd, eee, aaa, bbb, mX(3), 15)
     ccc = ccc + ((ddd And aaa) Or (eee And (Not aaa))) + mX(3) + &H5C4DD124
     ccc = ((ccc * &H8000&) Or (((ccc And &HFFFE0000) \ &H20000) And &H7FFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(bbb, ccc, ddd, eee, aaa, mX(7), 7)
+    'fnIII(bbb, ccc, ddd, eee, aaa, mX(7), 7)
     bbb = bbb + ((ccc And eee) Or (ddd And (Not eee))) + mX(7) + &H5C4DD124
     bbb = ((bbb * &H80&) Or (((bbb And &HFE000000) \ &H2000000) And &H7F&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(aaa, bbb, ccc, ddd, eee, mX(0), 12)
+    'fnIII(aaa, bbb, ccc, ddd, eee, mX(0), 12)
     aaa = aaa + ((bbb And ddd) Or (ccc And (Not ddd))) + mX(0) + &H5C4DD124
     aaa = ((aaa * &H1000&) Or (((aaa And &HFFF00000) \ &H100000) And &HFFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(eee, aaa, bbb, ccc, ddd, mX(13), 8)
+    'fnIII(eee, aaa, bbb, ccc, ddd, mX(13), 8)
     eee = eee + ((aaa And ccc) Or (bbb And (Not ccc))) + mX(13) + &H5C4DD124
     eee = ((eee * &H100&) Or (((eee And &HFF000000) \ &H1000000) And &HFF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnIII(ddd, eee, aaa, bbb, ccc, mX(5), 9)
+    'fnIII(ddd, eee, aaa, bbb, ccc, mX(5), 9)
     ddd = ddd + ((eee And bbb) Or (aaa And (Not bbb))) + mX(5) + &H5C4DD124
     ddd = ((ddd * &H200&) Or (((ddd And &HFF800000) \ &H800000) And &H1FF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnIII(ccc, ddd, eee, aaa, bbb, mX(10), 11)
+    'fnIII(ccc, ddd, eee, aaa, bbb, mX(10), 11)
     ccc = ccc + ((ddd And aaa) Or (eee And (Not aaa))) + mX(10) + &H5C4DD124
     ccc = ((ccc * &H800&) Or (((ccc And &HFFE00000) \ &H200000) And &H7FF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(bbb, ccc, ddd, eee, aaa, mX(14), 7)
+    'fnIII(bbb, ccc, ddd, eee, aaa, mX(14), 7)
     bbb = bbb + ((ccc And eee) Or (ddd And (Not eee))) + mX(14) + &H5C4DD124
     bbb = ((bbb * &H80&) Or (((bbb And &HFE000000) \ &H2000000) And &H7F&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(aaa, bbb, ccc, ddd, eee, mX(15), 7)
+    'fnIII(aaa, bbb, ccc, ddd, eee, mX(15), 7)
     aaa = aaa + ((bbb And ddd) Or (ccc And (Not ddd))) + mX(15) + &H5C4DD124
     aaa = ((aaa * &H80&) Or (((aaa And &HFE000000) \ &H2000000) And &H7F&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnIII(eee, aaa, bbb, ccc, ddd, mX(8), 12)
+    'fnIII(eee, aaa, bbb, ccc, ddd, mX(8), 12)
     eee = eee + ((aaa And ccc) Or (bbb And (Not ccc))) + mX(8) + &H5C4DD124
     eee = ((eee * &H1000&) Or (((eee And &HFFF00000) \ &H100000) And &HFFF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(ddd, eee, aaa, bbb, ccc, mX(12), 7)
+    'fnIII(ddd, eee, aaa, bbb, ccc, mX(12), 7)
     ddd = ddd + ((eee And bbb) Or (aaa And (Not bbb))) + mX(12) + &H5C4DD124
     ddd = ((ddd * &H80&) Or (((ddd And &HFE000000) \ &H2000000) And &H7F&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(ccc, ddd, eee, aaa, bbb, mX(4), 6)
+    'fnIII(ccc, ddd, eee, aaa, bbb, mX(4), 6)
     ccc = ccc + ((ddd And aaa) Or (eee And (Not aaa))) + mX(4) + &H5C4DD124
     ccc = ((ccc * &H40&) Or (((ccc And &HFC000000) \ &H4000000) And &H3F&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(bbb, ccc, ddd, eee, aaa, mX(9), 15)
+    'fnIII(bbb, ccc, ddd, eee, aaa, mX(9), 15)
     bbb = bbb + ((ccc And eee) Or (ddd And (Not eee))) + mX(9) + &H5C4DD124
     bbb = ((bbb * &H8000&) Or (((bbb And &HFFFE0000) \ &H20000) And &H7FFF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(aaa, bbb, ccc, ddd, eee, mX(1), 13)
+    'fnIII(aaa, bbb, ccc, ddd, eee, mX(1), 13)
     aaa = aaa + ((bbb And ddd) Or (ccc And (Not ddd))) + mX(1) + &H5C4DD124
     aaa = ((aaa * &H2000&) Or (((aaa And &HFFF80000) \ &H80000) And &H1FFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnIII(eee, aaa, bbb, ccc, ddd, mX(2), 11)
+    'fnIII(eee, aaa, bbb, ccc, ddd, mX(2), 11)
     eee = eee + ((aaa And ccc) Or (bbb And (Not ccc))) + mX(2) + &H5C4DD124
     eee = ((eee * &H800&) Or (((eee And &HFFE00000) \ &H200000) And &H7FF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(15), 9)
+    'fnHHH(ddd, eee, aaa, bbb, ccc, mX(15), 9)
     ddd = ddd + ((eee Or (Not aaa)) Xor bbb) + mX(15) + &H6D703EF3
     ddd = ((ddd * &H200&) Or (((ddd And &HFF800000) \ &H800000) And &H1FF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHHH(ccc, ddd, eee, aaa, bbb, mX(5), 7)
+    'fnHHH(ccc, ddd, eee, aaa, bbb, mX(5), 7)
     ccc = ccc + ((ddd Or (Not eee)) Xor aaa) + mX(5) + &H6D703EF3
     ccc = ((ccc * &H80&) Or (((ccc And &HFE000000) \ &H2000000) And &H7F&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHHH(bbb, ccc, ddd, eee, aaa, mX(1), 15)
+    'fnHHH(bbb, ccc, ddd, eee, aaa, mX(1), 15)
     bbb = bbb + ((ccc Or (Not ddd)) Xor eee) + mX(1) + &H6D703EF3
     bbb = ((bbb * &H8000&) Or (((bbb And &HFFFE0000) \ &H20000) And &H7FFF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(aaa, bbb, ccc, ddd, eee, mX(3), 11)
+    'fnHHH(aaa, bbb, ccc, ddd, eee, mX(3), 11)
     aaa = aaa + ((bbb Or (Not ccc)) Xor ddd) + mX(3) + &H6D703EF3
     aaa = ((aaa * &H800&) Or (((aaa And &HFFE00000) \ &H200000) And &H7FF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(eee, aaa, bbb, ccc, ddd, mX(7), 8)
+    'fnHHH(eee, aaa, bbb, ccc, ddd, mX(7), 8)
     eee = eee + ((aaa Or (Not bbb)) Xor ccc) + mX(7) + &H6D703EF3
     eee = ((eee * &H100&) Or (((eee And &HFF000000) \ &H1000000) And &HFF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(14), 6)
+    'fnHHH(ddd, eee, aaa, bbb, ccc, mX(14), 6)
     ddd = ddd + ((eee Or (Not aaa)) Xor bbb) + mX(14) + &H6D703EF3
     ddd = ((ddd * &H40&) Or (((ddd And &HFC000000) \ &H4000000) And &H3F&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHHH(ccc, ddd, eee, aaa, bbb, mX(6), 6)
+    'fnHHH(ccc, ddd, eee, aaa, bbb, mX(6), 6)
     ccc = ccc + ((ddd Or (Not eee)) Xor aaa) + mX(6) + &H6D703EF3
     ccc = ((ccc * &H40&) Or (((ccc And &HFC000000) \ &H4000000) And &H3F&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHHH(bbb, ccc, ddd, eee, aaa, mX(9), 14)
+    'fnHHH(bbb, ccc, ddd, eee, aaa, mX(9), 14)
     bbb = bbb + ((ccc Or (Not ddd)) Xor eee) + mX(9) + &H6D703EF3
     bbb = ((bbb * &H4000&) Or (((bbb And &HFFFC0000) \ &H40000) And &H3FFF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHHH(aaa, bbb, ccc, ddd, eee, mX(11), 12)
+    'fnHHH(aaa, bbb, ccc, ddd, eee, mX(11), 12)
     aaa = aaa + ((bbb Or (Not ccc)) Xor ddd) + mX(11) + &H6D703EF3
     aaa = ((aaa * &H1000&) Or (((aaa And &HFFF00000) \ &H100000) And &HFFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(eee, aaa, bbb, ccc, ddd, mX(8), 13)
+    'fnHHH(eee, aaa, bbb, ccc, ddd, mX(8), 13)
     eee = eee + ((aaa Or (Not bbb)) Xor ccc) + mX(8) + &H6D703EF3
     eee = ((eee * &H2000&) Or (((eee And &HFFF80000) \ &H80000) And &H1FFF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(12), 5)
+    'fnHHH(ddd, eee, aaa, bbb, ccc, mX(12), 5)
     ddd = ddd + ((eee Or (Not aaa)) Xor bbb) + mX(12) + &H6D703EF3
     ddd = ((ddd * &H20&) Or (((ddd And &HF8000000) \ &H8000000) And &H1F&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(ccc, ddd, eee, aaa, bbb, mX(2), 14)
+    'fnHHH(ccc, ddd, eee, aaa, bbb, mX(2), 14)
     ccc = ccc + ((ddd Or (Not eee)) Xor aaa) + mX(2) + &H6D703EF3
     ccc = ((ccc * &H4000&) Or (((ccc And &HFFFC0000) \ &H40000) And &H3FFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(bbb, ccc, ddd, eee, aaa, mX(10), 13)
+    'fnHHH(bbb, ccc, ddd, eee, aaa, mX(10), 13)
     bbb = bbb + ((ccc Or (Not ddd)) Xor eee) + mX(10) + &H6D703EF3
     bbb = ((bbb * &H2000&) Or (((bbb And &HFFF80000) \ &H80000) And &H1FFF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(aaa, bbb, ccc, ddd, eee, mX(0), 13)
+    'fnHHH(aaa, bbb, ccc, ddd, eee, mX(0), 13)
     aaa = aaa + ((bbb Or (Not ccc)) Xor ddd) + mX(0) + &H6D703EF3
     aaa = ((aaa * &H2000&) Or (((aaa And &HFFF80000) \ &H80000) And &H1FFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnHHH(eee, aaa, bbb, ccc, ddd, mX(4), 7)
+    'fnHHH(eee, aaa, bbb, ccc, ddd, mX(4), 7)
     eee = eee + ((aaa Or (Not bbb)) Xor ccc) + mX(4) + &H6D703EF3
     eee = ((eee * &H80&) Or (((eee And &HFE000000) \ &H2000000) And &H7F&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnHHH(ddd, eee, aaa, bbb, ccc, mX(13), 5)
+    'fnHHH(ddd, eee, aaa, bbb, ccc, mX(13), 5)
     ddd = ddd + ((eee Or (Not aaa)) Xor bbb) + mX(13) + &H6D703EF3
     ddd = ((ddd * &H20&) Or (((ddd And &HF8000000) \ &H8000000) And &H1F&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(8), 15)
+    'fnGGG(ccc, ddd, eee, aaa, bbb, mX(8), 15)
     ccc = ccc + ((ddd And eee) Or ((Not ddd) And aaa)) + mX(8) + &H7A6D76E9
     ccc = ((ccc * &H8000&) Or (((ccc And &HFFFE0000) \ &H20000) And &H7FFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGGG(bbb, ccc, ddd, eee, aaa, mX(6), 5)
+    'fnGGG(bbb, ccc, ddd, eee, aaa, mX(6), 5)
     bbb = bbb + ((ccc And ddd) Or ((Not ccc) And eee)) + mX(6) + &H7A6D76E9
     bbb = ((bbb * &H20&) Or (((bbb And &HF8000000) \ &H8000000) And &H1F&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(aaa, bbb, ccc, ddd, eee, mX(4), 8)
+    'fnGGG(aaa, bbb, ccc, ddd, eee, mX(4), 8)
     aaa = aaa + ((bbb And ccc) Or ((Not bbb) And ddd)) + mX(4) + &H7A6D76E9
     aaa = ((aaa * &H100&) Or (((aaa And &HFF000000) \ &H1000000) And &HFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(eee, aaa, bbb, ccc, ddd, mX(1), 11)
+    'fnGGG(eee, aaa, bbb, ccc, ddd, mX(1), 11)
     eee = eee + ((aaa And bbb) Or ((Not aaa) And ccc)) + mX(1) + &H7A6D76E9
     eee = ((eee * &H800&) Or (((eee And &HFFE00000) \ &H200000) And &H7FF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(ddd, eee, aaa, bbb, ccc, mX(3), 14)
+    'fnGGG(ddd, eee, aaa, bbb, ccc, mX(3), 14)
     ddd = ddd + ((eee And aaa) Or ((Not eee) And bbb)) + mX(3) + &H7A6D76E9
     ddd = ((ddd * &H4000&) Or (((ddd And &HFFFC0000) \ &H40000) And &H3FFF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(11), 14)
+    'fnGGG(ccc, ddd, eee, aaa, bbb, mX(11), 14)
     ccc = ccc + ((ddd And eee) Or ((Not ddd) And aaa)) + mX(11) + &H7A6D76E9
     ccc = ((ccc * &H4000&) Or (((ccc And &HFFFC0000) \ &H40000) And &H3FFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGGG(bbb, ccc, ddd, eee, aaa, mX(15), 6)
+    'fnGGG(bbb, ccc, ddd, eee, aaa, mX(15), 6)
     bbb = bbb + ((ccc And ddd) Or ((Not ccc) And eee)) + mX(15) + &H7A6D76E9
     bbb = ((bbb * &H40&) Or (((bbb And &HFC000000) \ &H4000000) And &H3F&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(aaa, bbb, ccc, ddd, eee, mX(0), 14)
+    'fnGGG(aaa, bbb, ccc, ddd, eee, mX(0), 14)
     aaa = aaa + ((bbb And ccc) Or ((Not bbb) And ddd)) + mX(0) + &H7A6D76E9
     aaa = ((aaa * &H4000&) Or (((aaa And &HFFFC0000) \ &H40000) And &H3FFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(eee, aaa, bbb, ccc, ddd, mX(5), 6)
+    'fnGGG(eee, aaa, bbb, ccc, ddd, mX(5), 6)
     eee = eee + ((aaa And bbb) Or ((Not aaa) And ccc)) + mX(5) + &H7A6D76E9
     eee = ((eee * &H40&) Or (((eee And &HFC000000) \ &H4000000) And &H3F&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGGG(ddd, eee, aaa, bbb, ccc, mX(12), 9)
+    'fnGGG(ddd, eee, aaa, bbb, ccc, mX(12), 9)
     ddd = ddd + ((eee And aaa) Or ((Not eee) And bbb)) + mX(12) + &H7A6D76E9
     ddd = ((ddd * &H200&) Or (((ddd And &HFF800000) \ &H800000) And &H1FF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(2), 12)
+    'fnGGG(ccc, ddd, eee, aaa, bbb, mX(2), 12)
     ccc = ccc + ((ddd And eee) Or ((Not ddd) And aaa)) + mX(2) + &H7A6D76E9
     ccc = ((ccc * &H1000&) Or (((ccc And &HFFF00000) \ &H100000) And &HFFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(bbb, ccc, ddd, eee, aaa, mX(13), 9)
+    'fnGGG(bbb, ccc, ddd, eee, aaa, mX(13), 9)
     bbb = bbb + ((ccc And ddd) Or ((Not ccc) And eee)) + mX(13) + &H7A6D76E9
     bbb = ((bbb * &H200&) Or (((bbb And &HFF800000) \ &H800000) And &H1FF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(aaa, bbb, ccc, ddd, eee, mX(9), 12)
+    'fnGGG(aaa, bbb, ccc, ddd, eee, mX(9), 12)
     aaa = aaa + ((bbb And ccc) Or ((Not bbb) And ddd)) + mX(9) + &H7A6D76E9
     aaa = ((aaa * &H1000&) Or (((aaa And &HFFF00000) \ &H100000) And &HFFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(eee, aaa, bbb, ccc, ddd, mX(7), 5)
+    'fnGGG(eee, aaa, bbb, ccc, ddd, mX(7), 5)
     eee = eee + ((aaa And bbb) Or ((Not aaa) And ccc)) + mX(7) + &H7A6D76E9
     eee = ((eee * &H20&) Or (((eee And &HF8000000) \ &H8000000) And &H1F&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnGGG(ddd, eee, aaa, bbb, ccc, mX(10), 15)
+    'fnGGG(ddd, eee, aaa, bbb, ccc, mX(10), 15)
     ddd = ddd + ((eee And aaa) Or ((Not eee) And bbb)) + mX(10) + &H7A6D76E9
     ddd = ((ddd * &H8000&) Or (((ddd And &HFFFE0000) \ &H20000) And &H7FFF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnGGG(ccc, ddd, eee, aaa, bbb, mX(14), 8)
+    'fnGGG(ccc, ddd, eee, aaa, bbb, mX(14), 8)
     ccc = ccc + ((ddd And eee) Or ((Not ddd) And aaa)) + mX(14) + &H7A6D76E9
     ccc = ((ccc * &H100&) Or (((ccc And &HFF000000) \ &H1000000) And &HFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(12), 8)
+    'fnFFF(bbb, ccc, ddd, eee, aaa, mX(12), 8)
     bbb = bbb + (ccc Xor ddd Xor eee) + mX(12)
     bbb = ((bbb * &H100&) Or (((bbb And &HFF000000) \ &H1000000) And &HFF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFFF(aaa, bbb, ccc, ddd, eee, mX(15), 5)
+    'fnFFF(aaa, bbb, ccc, ddd, eee, mX(15), 5)
     aaa = aaa + (bbb Xor ccc Xor ddd) + mX(15)
     aaa = ((aaa * &H20&) Or (((aaa And &HF8000000) \ &H8000000) And &H1F&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFFF(eee, aaa, bbb, ccc, ddd, mX(10), 12)
+    'fnFFF(eee, aaa, bbb, ccc, ddd, mX(10), 12)
     eee = eee + (aaa Xor bbb Xor ccc) + mX(10)
     eee = ((eee * &H1000&) Or (((eee And &HFFF00000) \ &H100000) And &HFFF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(ddd, eee, aaa, bbb, ccc, mX(4), 9)
+    'fnFFF(ddd, eee, aaa, bbb, ccc, mX(4), 9)
     ddd = ddd + (eee Xor aaa Xor bbb) + mX(4)
     ddd = ((ddd * &H200&) Or (((ddd And &HFF800000) \ &H800000) And &H1FF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFFF(ccc, ddd, eee, aaa, bbb, mX(1), 12)
+    'fnFFF(ccc, ddd, eee, aaa, bbb, mX(1), 12)
     ccc = ccc + (ddd Xor eee Xor aaa) + mX(1)
     ccc = ((ccc * &H1000&) Or (((ccc And &HFFF00000) \ &H100000) And &HFFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(5), 5)
+    'fnFFF(bbb, ccc, ddd, eee, aaa, mX(5), 5)
     bbb = bbb + (ccc Xor ddd Xor eee) + mX(5)
     bbb = ((bbb * &H20&) Or (((bbb And &HF8000000) \ &H8000000) And &H1F&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
     
-    'Call fnFFF(aaa, bbb, ccc, ddd, eee, mX(8), 14)
+    'fnFFF(aaa, bbb, ccc, ddd, eee, mX(8), 14)
     aaa = aaa + (bbb Xor ccc Xor ddd) + mX(8)
     aaa = ((aaa * &H4000&) Or (((aaa And &HFFFC0000) \ &H40000) And &H3FFF&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(eee, aaa, bbb, ccc, ddd, mX(7), 6)
+    'fnFFF(eee, aaa, bbb, ccc, ddd, mX(7), 6)
     eee = eee + (aaa Xor bbb Xor ccc) + mX(7)
     eee = ((eee * &H40&) Or (((eee And &HFC000000) \ &H4000000) And &H3F&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(ddd, eee, aaa, bbb, ccc, mX(6), 8)
+    'fnFFF(ddd, eee, aaa, bbb, ccc, mX(6), 8)
     ddd = ddd + (eee Xor aaa Xor bbb) + mX(6)
     ddd = ((ddd * &H100&) Or (((ddd And &HFF000000) \ &H1000000) And &HFF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(ccc, ddd, eee, aaa, bbb, mX(2), 13)
+    'fnFFF(ccc, ddd, eee, aaa, bbb, mX(2), 13)
     ccc = ccc + (ddd Xor eee Xor aaa) + mX(2)
     ccc = ((ccc * &H2000&) Or (((ccc And &HFFF80000) \ &H80000) And &H1FFF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(13), 6)
+    'fnFFF(bbb, ccc, ddd, eee, aaa, mX(13), 6)
     bbb = bbb + (ccc Xor ddd Xor eee) + mX(13)
     bbb = ((bbb * &H40&) Or (((bbb And &HFC000000) \ &H4000000) And &H3F&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(aaa, bbb, ccc, ddd, eee, mX(14), 5)
+    'fnFFF(aaa, bbb, ccc, ddd, eee, mX(14), 5)
     aaa = aaa + (bbb Xor ccc Xor ddd) + mX(14)
     aaa = ((aaa * &H20&) Or (((aaa And &HF8000000) \ &H8000000) And &H1F&)) + eee
     ccc = ((ccc * &H400&) Or (((ccc And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(eee, aaa, bbb, ccc, ddd, mX(0), 15)
+    'fnFFF(eee, aaa, bbb, ccc, ddd, mX(0), 15)
     eee = eee + (aaa Xor bbb Xor ccc) + mX(0)
     eee = ((eee * &H8000&) Or (((eee And &HFFFE0000) \ &H20000) And &H7FFF&)) + ddd
     bbb = ((bbb * &H400&) Or (((bbb And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(ddd, eee, aaa, bbb, ccc, mX(3), 13)
+    'fnFFF(ddd, eee, aaa, bbb, ccc, mX(3), 13)
     ddd = ddd + (eee Xor aaa Xor bbb) + mX(3)
     ddd = ((ddd * &H2000&) Or (((ddd And &HFFF80000) \ &H80000) And &H1FFF&)) + ccc
     aaa = ((aaa * &H400&) Or (((aaa And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(ccc, ddd, eee, aaa, bbb, mX(9), 11)
+    'fnFFF(ccc, ddd, eee, aaa, bbb, mX(9), 11)
     ccc = ccc + (ddd Xor eee Xor aaa) + mX(9)
     ccc = ((ccc * &H800&) Or (((ccc And &HFFE00000) \ &H200000) And &H7FF&)) + bbb
     eee = ((eee * &H400&) Or (((eee And &HFFC00000) \ &H400000) And &H3FF&))
 
-    'Call fnFFF(bbb, ccc, ddd, eee, aaa, mX(11), 11)
+    'fnFFF(bbb, ccc, ddd, eee, aaa, mX(11), 11)
     bbb = bbb + (ccc Xor ddd Xor eee) + mX(11)
     bbb = ((bbb * &H800&) Or (((bbb And &HFFE00000) \ &H200000) And &H7FF&)) + aaa
     ddd = ((ddd * &H400&) Or (((ddd And &HFFC00000) \ &H400000) And &H3FF&))
@@ -1284,6 +1070,209 @@ Private Sub TransformNative(ByRef Bytes() As Byte, ByVal Index As Long)
     mState(2) = mState(3) + ee + aaa
     mState(3) = mState(4) + aa + bbb
     mState(4) = mState(0) + bb + ccc
+    mState(0) = ddd
+End Sub
+#Else
+Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
+    CopyMemory mX(0), Bytes(Index), 64
+    
+    Dim aa As Long
+    Dim bb As Long
+    Dim dd As Long
+    Dim cc As Long
+    Dim ee As Long
+    Dim aaa As Long
+    Dim bbb As Long
+    Dim ccc As Long
+    Dim ddd As Long
+    Dim eee As Long
+    
+    aa = mState(0)
+    bb = mState(1)
+    cc = mState(2)
+    dd = mState(3)
+    ee = mState(4)
+    aaa = aa
+    bbb = bb
+    ccc = cc
+    ddd = dd
+    eee = ee
+    
+    fnFF aa, bb, cc, dd, ee, mX(0), 11
+    fnFF ee, aa, bb, cc, dd, mX(1), 14
+    fnFF dd, ee, aa, bb, cc, mX(2), 15
+    fnFF cc, dd, ee, aa, bb, mX(3), 12
+    fnFF bb, cc, dd, ee, aa, mX(4), 5
+    fnFF aa, bb, cc, dd, ee, mX(5), 8
+    fnFF ee, aa, bb, cc, dd, mX(6), 7
+    fnFF dd, ee, aa, bb, cc, mX(7), 9
+    fnFF cc, dd, ee, aa, bb, mX(8), 11
+    fnFF bb, cc, dd, ee, aa, mX(9), 13
+    fnFF aa, bb, cc, dd, ee, mX(10), 14
+    fnFF ee, aa, bb, cc, dd, mX(11), 15
+    fnFF dd, ee, aa, bb, cc, mX(12), 6
+    fnFF cc, dd, ee, aa, bb, mX(13), 7
+    fnFF bb, cc, dd, ee, aa, mX(14), 9
+    fnFF aa, bb, cc, dd, ee, mX(15), 8
+
+    fnGG ee, aa, bb, cc, dd, mX(7), 7
+    fnGG dd, ee, aa, bb, cc, mX(4), 6
+    fnGG cc, dd, ee, aa, bb, mX(13), 8
+    fnGG bb, cc, dd, ee, aa, mX(1), 13
+    fnGG aa, bb, cc, dd, ee, mX(10), 11
+    fnGG ee, aa, bb, cc, dd, mX(6), 9
+    fnGG dd, ee, aa, bb, cc, mX(15), 7
+    fnGG cc, dd, ee, aa, bb, mX(3), 15
+    fnGG bb, cc, dd, ee, aa, mX(12), 7
+    fnGG aa, bb, cc, dd, ee, mX(0), 12
+    fnGG ee, aa, bb, cc, dd, mX(9), 15
+    fnGG dd, ee, aa, bb, cc, mX(5), 9
+    fnGG cc, dd, ee, aa, bb, mX(2), 11
+    fnGG bb, cc, dd, ee, aa, mX(14), 7
+    fnGG aa, bb, cc, dd, ee, mX(11), 13
+    fnGG ee, aa, bb, cc, dd, mX(8), 12
+
+    fnHH dd, ee, aa, bb, cc, mX(3), 11
+    fnHH cc, dd, ee, aa, bb, mX(10), 13
+    fnHH bb, cc, dd, ee, aa, mX(14), 6
+    fnHH aa, bb, cc, dd, ee, mX(4), 7
+    fnHH ee, aa, bb, cc, dd, mX(9), 14
+    fnHH dd, ee, aa, bb, cc, mX(15), 9
+    fnHH cc, dd, ee, aa, bb, mX(8), 13
+    fnHH bb, cc, dd, ee, aa, mX(1), 15
+    fnHH aa, bb, cc, dd, ee, mX(2), 14
+    fnHH ee, aa, bb, cc, dd, mX(7), 8
+    fnHH dd, ee, aa, bb, cc, mX(0), 13
+    fnHH cc, dd, ee, aa, bb, mX(6), 6
+    fnHH bb, cc, dd, ee, aa, mX(13), 5
+    fnHH aa, bb, cc, dd, ee, mX(11), 12
+    fnHH ee, aa, bb, cc, dd, mX(5), 7
+    fnHH dd, ee, aa, bb, cc, mX(12), 5
+    
+    fnII cc, dd, ee, aa, bb, mX(1), 11
+    fnII bb, cc, dd, ee, aa, mX(9), 12
+    fnII aa, bb, cc, dd, ee, mX(11), 14
+    fnII ee, aa, bb, cc, dd, mX(10), 15
+    fnII dd, ee, aa, bb, cc, mX(0), 14
+    fnII cc, dd, ee, aa, bb, mX(8), 15
+    fnII bb, cc, dd, ee, aa, mX(12), 9
+    fnII aa, bb, cc, dd, ee, mX(4), 8
+    fnII ee, aa, bb, cc, dd, mX(13), 9
+    fnII dd, ee, aa, bb, cc, mX(3), 14
+    fnII cc, dd, ee, aa, bb, mX(7), 5
+    fnII bb, cc, dd, ee, aa, mX(15), 6
+    fnII aa, bb, cc, dd, ee, mX(14), 8
+    fnII ee, aa, bb, cc, dd, mX(5), 6
+    fnII dd, ee, aa, bb, cc, mX(6), 5
+    fnII cc, dd, ee, aa, bb, mX(2), 12
+
+    fnJJ bb, cc, dd, ee, aa, mX(4), 9
+    fnJJ aa, bb, cc, dd, ee, mX(0), 15
+    fnJJ ee, aa, bb, cc, dd, mX(5), 5
+    fnJJ dd, ee, aa, bb, cc, mX(9), 11
+    fnJJ cc, dd, ee, aa, bb, mX(7), 6
+    fnJJ bb, cc, dd, ee, aa, mX(12), 8
+    fnJJ aa, bb, cc, dd, ee, mX(2), 13
+    fnJJ ee, aa, bb, cc, dd, mX(10), 12
+    fnJJ dd, ee, aa, bb, cc, mX(14), 5
+    fnJJ cc, dd, ee, aa, bb, mX(1), 12
+    fnJJ bb, cc, dd, ee, aa, mX(3), 13
+    fnJJ aa, bb, cc, dd, ee, mX(8), 14
+    fnJJ ee, aa, bb, cc, dd, mX(11), 11
+    fnJJ dd, ee, aa, bb, cc, mX(6), 8
+    fnJJ cc, dd, ee, aa, bb, mX(15), 5
+    fnJJ bb, cc, dd, ee, aa, mX(13), 6
+
+    fnJJJ aaa, bbb, ccc, ddd, eee, mX(5), 8
+    fnJJJ eee, aaa, bbb, ccc, ddd, mX(14), 9
+    fnJJJ ddd, eee, aaa, bbb, ccc, mX(7), 9
+    fnJJJ ccc, ddd, eee, aaa, bbb, mX(0), 11
+    fnJJJ bbb, ccc, ddd, eee, aaa, mX(9), 13
+    fnJJJ aaa, bbb, ccc, ddd, eee, mX(2), 15
+    fnJJJ eee, aaa, bbb, ccc, ddd, mX(11), 15
+    fnJJJ ddd, eee, aaa, bbb, ccc, mX(4), 5
+    fnJJJ ccc, ddd, eee, aaa, bbb, mX(13), 7
+    fnJJJ bbb, ccc, ddd, eee, aaa, mX(6), 7
+    fnJJJ aaa, bbb, ccc, ddd, eee, mX(15), 8
+    fnJJJ eee, aaa, bbb, ccc, ddd, mX(8), 11
+    fnJJJ ddd, eee, aaa, bbb, ccc, mX(1), 14
+    fnJJJ ccc, ddd, eee, aaa, bbb, mX(10), 14
+    fnJJJ bbb, ccc, ddd, eee, aaa, mX(3), 12
+    fnJJJ aaa, bbb, ccc, ddd, eee, mX(12), 6
+
+    fnIII eee, aaa, bbb, ccc, ddd, mX(6), 9
+    fnIII ddd, eee, aaa, bbb, ccc, mX(11), 13
+    fnIII ccc, ddd, eee, aaa, bbb, mX(3), 15
+    fnIII bbb, ccc, ddd, eee, aaa, mX(7), 7
+    fnIII aaa, bbb, ccc, ddd, eee, mX(0), 12
+    fnIII eee, aaa, bbb, ccc, ddd, mX(13), 8
+    fnIII ddd, eee, aaa, bbb, ccc, mX(5), 9
+    fnIII ccc, ddd, eee, aaa, bbb, mX(10), 11
+    fnIII bbb, ccc, ddd, eee, aaa, mX(14), 7
+    fnIII aaa, bbb, ccc, ddd, eee, mX(15), 7
+    fnIII eee, aaa, bbb, ccc, ddd, mX(8), 12
+    fnIII ddd, eee, aaa, bbb, ccc, mX(12), 7
+    fnIII ccc, ddd, eee, aaa, bbb, mX(4), 6
+    fnIII bbb, ccc, ddd, eee, aaa, mX(9), 15
+    fnIII aaa, bbb, ccc, ddd, eee, mX(1), 13
+    fnIII eee, aaa, bbb, ccc, ddd, mX(2), 11
+
+    fnHHH ddd, eee, aaa, bbb, ccc, mX(15), 9
+    fnHHH ccc, ddd, eee, aaa, bbb, mX(5), 7
+    fnHHH bbb, ccc, ddd, eee, aaa, mX(1), 15
+    fnHHH aaa, bbb, ccc, ddd, eee, mX(3), 11
+    fnHHH eee, aaa, bbb, ccc, ddd, mX(7), 8
+    fnHHH ddd, eee, aaa, bbb, ccc, mX(14), 6
+    fnHHH ccc, ddd, eee, aaa, bbb, mX(6), 6
+    fnHHH bbb, ccc, ddd, eee, aaa, mX(9), 14
+    fnHHH aaa, bbb, ccc, ddd, eee, mX(11), 12
+    fnHHH eee, aaa, bbb, ccc, ddd, mX(8), 13
+    fnHHH ddd, eee, aaa, bbb, ccc, mX(12), 5
+    fnHHH ccc, ddd, eee, aaa, bbb, mX(2), 14
+    fnHHH bbb, ccc, ddd, eee, aaa, mX(10), 13
+    fnHHH aaa, bbb, ccc, ddd, eee, mX(0), 13
+    fnHHH eee, aaa, bbb, ccc, ddd, mX(4), 7
+    fnHHH ddd, eee, aaa, bbb, ccc, mX(13), 5
+
+    fnGGG ccc, ddd, eee, aaa, bbb, mX(8), 15
+    fnGGG bbb, ccc, ddd, eee, aaa, mX(6), 5
+    fnGGG aaa, bbb, ccc, ddd, eee, mX(4), 8
+    fnGGG eee, aaa, bbb, ccc, ddd, mX(1), 11
+    fnGGG ddd, eee, aaa, bbb, ccc, mX(3), 14
+    fnGGG ccc, ddd, eee, aaa, bbb, mX(11), 14
+    fnGGG bbb, ccc, ddd, eee, aaa, mX(15), 6
+    fnGGG aaa, bbb, ccc, ddd, eee, mX(0), 14
+    fnGGG eee, aaa, bbb, ccc, ddd, mX(5), 6
+    fnGGG ddd, eee, aaa, bbb, ccc, mX(12), 9
+    fnGGG ccc, ddd, eee, aaa, bbb, mX(2), 12
+    fnGGG bbb, ccc, ddd, eee, aaa, mX(13), 9
+    fnGGG aaa, bbb, ccc, ddd, eee, mX(9), 12
+    fnGGG eee, aaa, bbb, ccc, ddd, mX(7), 5
+    fnGGG ddd, eee, aaa, bbb, ccc, mX(10), 15
+    fnGGG ccc, ddd, eee, aaa, bbb, mX(14), 8
+
+    fnFFF bbb, ccc, ddd, eee, aaa, mX(12), 8
+    fnFFF aaa, bbb, ccc, ddd, eee, mX(15), 5
+    fnFFF eee, aaa, bbb, ccc, ddd, mX(10), 12
+    fnFFF ddd, eee, aaa, bbb, ccc, mX(4), 9
+    fnFFF ccc, ddd, eee, aaa, bbb, mX(1), 12
+    fnFFF bbb, ccc, ddd, eee, aaa, mX(5), 5
+    fnFFF aaa, bbb, ccc, ddd, eee, mX(8), 14
+    fnFFF eee, aaa, bbb, ccc, ddd, mX(7), 6
+    fnFFF ddd, eee, aaa, bbb, ccc, mX(6), 8
+    fnFFF ccc, ddd, eee, aaa, bbb, mX(2), 13
+    fnFFF bbb, ccc, ddd, eee, aaa, mX(13), 6
+    fnFFF aaa, bbb, ccc, ddd, eee, mX(14), 5
+    fnFFF eee, aaa, bbb, ccc, ddd, mX(0), 15
+    fnFFF ddd, eee, aaa, bbb, ccc, mX(3), 13
+    fnFFF ccc, ddd, eee, aaa, bbb, mX(9), 11
+    fnFFF bbb, ccc, ddd, eee, aaa, mX(11), 11
+
+    ddd = Helper.UAdd(Helper.UAdd(ddd, cc), mState(1))
+    mState(1) = Helper.UAdd(Helper.UAdd(mState(2), dd), eee)
+    mState(2) = Helper.UAdd(Helper.UAdd(mState(3), ee), aaa)
+    mState(3) = Helper.UAdd(Helper.UAdd(mState(4), aa), bbb)
+    mState(4) = Helper.UAdd(Helper.UAdd(mState(0), bb), ccc)
     mState(0) = ddd
 End Sub
 
@@ -1366,19 +1355,20 @@ Private Sub fnJJJ(ByRef a As Long, ByVal b As Long, ByRef c As Long, ByVal d As 
     a = Helper.UAdd(LRotate(a, s), e)
     c = LRotate(c, 10)
 End Sub
+#End If
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mBase = Cor.NewHashAlgorithmBase(Me, True, True, 64)
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   HashAlgorithm Interface
+'   HashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get HashAlgorithm_CanReuseTransform() As Boolean
     HashAlgorithm_CanReuseTransform = CanReuseTransform
@@ -1389,7 +1379,7 @@ Private Property Get HashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub HashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function HashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -1413,7 +1403,7 @@ Private Property Get HashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub HashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get HashAlgorithm_InputBlockSize() As Long
@@ -1438,7 +1428,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -1466,10 +1456,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IHashAlgorithm Interface
+'   IHashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IHashAlgorithm_HashCore(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
-    Call Transform(Bytes, Index)
+    Transform Bytes, Index
 End Sub
 
 Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal ByteCount As Long, ByVal MessageLength As Currency) As Byte()
@@ -1477,19 +1467,19 @@ Private Function IHashAlgorithm_HashFinal(ByRef Buffer() As Byte, ByVal ByteCoun
 End Function
 
 Private Sub IHashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = GetHashCode
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -1498,7 +1488,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   RIPEMD160 Interface
+'   RIPEMD160
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get RIPEMD160_CanReuseTransform() As Boolean
     RIPEMD160_CanReuseTransform = CanReuseTransform
@@ -1509,7 +1499,7 @@ Private Property Get RIPEMD160_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub RIPEMD160_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function RIPEMD160_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -1533,7 +1523,7 @@ Private Property Get RIPEMD160_HashSize() As Long
 End Property
 
 Private Sub RIPEMD160_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get RIPEMD160_InputBlockSize() As Long
