@@ -245,7 +245,8 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
         Transform FinalBuffer, 64
     End If
     
-    Dim Result(0 To 19) As Byte
+    Dim Result() As Byte
+    ReDim Result(0 To 19)
     For i = 0 To 4
         AsLong(Result(i * 4)) = SwapEndian(mState(i))
     Next i
@@ -253,7 +254,7 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
     HashFinal = Result
 End Function
 
-#If RELEASE Then
+#If Release Then
 ' Must disable Integer overflow checks.
 Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
     Dim t As Long

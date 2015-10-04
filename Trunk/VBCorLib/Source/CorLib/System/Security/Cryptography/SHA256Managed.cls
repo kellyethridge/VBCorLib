@@ -246,7 +246,8 @@ Private Function HashFinal(ByRef Buffer() As Byte, ByVal BufferCount As Long, By
         Transform FinalBuffer, 64
     End If
     
-    Dim Result(0 To 31) As Byte
+    Dim Result() As Byte
+    ReDim Result(0 To 31)
     For i = 0 To 7
         AsLong(Result(i * 4)) = SwapEndian(mState(i))
     Next i
