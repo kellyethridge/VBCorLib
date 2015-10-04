@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: ToBase64Transform
+' Module: ToBase64Transform
 '
 
 ''
@@ -44,16 +47,6 @@ Option Explicit
 Implements IObject
 Implements ICryptoTransform
 
-Private Const DEF_INPUTBLOCKSIZE                As Long = 3
-Private Const DEF_OUTPUTBLOCKSIZE               As Long = 4
-Private Const DEF_CANREUSETRANSFORM             As Boolean = True
-Private Const DEF_CANTRANSFORMMULTIPLEBLOCKS    As Boolean = False
-
-
-Private mEncoding   As ASCIIEncoding
-Private mChars()    As Integer
-
-
 
 ''
 ' Returns if this transform object can be reused.
@@ -62,7 +55,7 @@ Private mChars()    As Integer
 ' @remarks This always returns <b>True</b>.
 '
 Public Property Get CanReuseTransform() As Boolean
-    CanReuseTransform = DEF_CANREUSETRANSFORM
+    CanReuseTransform = True
 End Property
 
 ''
@@ -72,7 +65,7 @@ End Property
 ' @remarks This always returns <b>False</b>.
 '
 Public Property Get CanTransformMultipleBlocks() As Boolean
-    CanTransformMultipleBlocks = DEF_CANTRANSFORMMULTIPLEBLOCKS
+    CanTransformMultipleBlocks = False
 End Property
 
 ''
@@ -85,7 +78,7 @@ End Property
 ' resulting output is 32bits of transformed data.
 '
 Public Property Get InputBlockSize() As Long
-    InputBlockSize = DEF_INPUTBLOCKSIZE
+    InputBlockSize = 3
 End Property
 
 ''
@@ -97,7 +90,7 @@ End Property
 ' resulting output is 32bits of transformed data.
 '
 Public Property Get OutputBlockSize() As Long
-    OutputBlockSize = DEF_OUTPUTBLOCKSIZE
+    OutputBlockSize = 4
 End Property
 
 ''
@@ -106,8 +99,6 @@ End Property
 ' @remarks Once all resources have been called, this transform instance will no longer work.
 '
 Public Sub Clear()
-    Erase mChars
-    Set mEncoding = Nothing
 End Sub
 
 ''
@@ -123,19 +114,24 @@ End Sub
 ' If more than 3 bytes is needed to be transformed, then this method needs to be called multiple times.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    If SAPtr(mChars) = vbNullPtr Then _
-        Throw New ObjectDisposedException
+    If SAPtr(InputBuffer) = vbNullPtr Then _
+        Error.ArgumentNull "InputBuffer", ArgumentNull_Array
+    If InputOffset < LBound(InputBuffer) Then _
+        Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
+    If InputCount < 0 Then _
+        Error.ArgumentOutOfRange "InputCount", ArgumentOutOfRange_NeedNonNegNum
+    If InputOffset + 2 > UBound(InputBuffer) Then _
+        Error.Argument Argument_InvalidOffLen
+    If SAPtr(OutputBuffer) = vbNullPtr Then _
+        Error.ArgumentNull "OutputBuffer", ArgumentNull_Array
+    If OutputOffset < LBound(OutputBuffer) Then _
+        Error.ArgumentOutOfRange "OutputOffset", ArgumentOutOfRange_ArrayLB
+    If OutputOffset + 3 > UBound(OutputBuffer) Then _
+        Error.Argument Argument_InvalidOffLen, "OutputOffset"
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InputBuffer), InputOffset, InputCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputIndex", InputCount, "InputCount", False)
+    TransformBlockCore InputBuffer, InputOffset, OutputBuffer, OutputOffset
     
-    Result = VerifyArrayRange(SAPtr(OutputBuffer), OutputOffset, DEF_OUTPUTBLOCKSIZE)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "OutputBuffer", OutputOffset, "OutputIndex", DEF_OUTPUTBLOCKSIZE, "", False)
-    
-    Call InternalTransformBlock(InputBuffer, InputOffset, OutputBuffer, OutputOffset)
-
-    TransformBlock = DEF_OUTPUTBLOCKSIZE
+    TransformBlock = OutputBlockSize
 End Function
 
 ''
@@ -151,9 +147,14 @@ End Function
 ' bytes are transformed, then a zero-length array is returned, not a null array.</p>
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InputBuffer), InputOffset, InputCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputOffset", InputCount, "InputCount", False)
+    If SAPtr(InputBuffer) = vbNullPtr Then _
+        Error.ArgumentNull "InputBuffer", ArgumentNull_Array
+    If InputOffset < LBound(InputBuffer) Then _
+        Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
+    If InputCount < 0 Then _
+        Error.ArgumentOutOfRange "InputCount", ArgumentOutOfRange_NeedNonNegNum
+    If InputOffset + InputCount - 1 > UBound(InputBuffer) Then _
+        Error.Argument Argument_InvalidOffLen
     
     Dim OutputBuffer() As Byte
     ReDim OutputBuffer(3)
@@ -175,7 +176,7 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
             OutputBuffer(3) = corEqualChar
     
         Case 3
-            Call InternalTransformBlock(InputBuffer, InputOffset, OutputBuffer, 0)
+            TransformBlockCore InputBuffer, InputOffset, OutputBuffer, 0
         
         Case Else
             Throw Cor.NewArgumentOutOfRangeException("InputCount", "Cannot process more than 3 byte block sizes.")
@@ -183,7 +184,6 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     
     TransformFinalBlock = OutputBuffer
 End Function
-
 
 ''
 ' This function determines if the value passed in is the same
@@ -223,9 +223,9 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub InternalTransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long)
+Private Sub TransformBlockCore(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long)
     OutputBuffer(OutputOffset) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ 4)
     OutputBuffer(OutputOffset + 1) = Base64Bytes(((InputBuffer(InputOffset) And &H3) * &H10) Or ((InputBuffer(InputOffset + 1) And &HF0) \ &H10))
     OutputBuffer(OutputOffset + 2) = Base64Bytes(((InputBuffer(InputOffset + 1) And &HF) * 4) Or ((InputBuffer(InputOffset + 2) And &HC0) \ &H40))
@@ -234,16 +234,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mEncoding = New ASCIIEncoding
-    ReDim mChars(0 To DEF_OUTPUTBLOCKSIZE - 1)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -271,7 +262,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
