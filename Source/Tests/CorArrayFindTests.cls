@@ -41,7 +41,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewLongs(1, 2, 3, 4, 5), AddressOf FindLongCallback, 3, 3&
             Test.Use NewSingles(1, 2, 3, 4, 5), AddressOf FindSingleCallback, 3, 3!
             Test.Use NewDoubles(1, 2, 3, 4, 5), AddressOf FindDoubleCallback, 3, 3#
-            Test.Use NewCurrencys(1, 2, 3, 4, 5), AddressOf FindCurrencyCallback, 3, 3@
+            Test.Use NewCurrencies(1, 2, 3, 4, 5), AddressOf FindCurrencyCallback, 3, 3@
             Test.Use ArrInt32, AddressOf FindInt32Callback, 2, ArrInt32(1)
             
             Test.Use NewBytes(1, 2, 3, 4, 5), AddressOf FindByteCallback, 0, CByte(0)
@@ -49,7 +49,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewLongs(1, 2, 3, 4, 5), AddressOf FindLongCallback, 0, 0&
             Test.Use NewSingles(1, 2, 3, 4, 5), AddressOf FindSingleCallback, 0, 0!
             Test.Use NewDoubles(1, 2, 3, 4, 5), AddressOf FindDoubleCallback, 0, 0#
-            Test.Use NewCurrencys(1, 2, 3, 4, 5), AddressOf FindCurrencyCallback, 0, 0@
+            Test.Use NewCurrencies(1, 2, 3, 4, 5), AddressOf FindCurrencyCallback, 0, 0@
             Test.Use NewDates(#1/1/2001#), AddressOf FindDateCallback, #1/2/2001#, #12:00:00 AM#
             Test.Use ArrInt32, AddressOf FindInt32Callback, 3, Nothing
             

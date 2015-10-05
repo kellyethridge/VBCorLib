@@ -1466,7 +1466,7 @@ Public Function NewCurrencies(ParamArray Values() As Variant) As Currency()
         Ret(i) = Values(i)
     Next
     
-    NewCurrencys = Ret
+    NewCurrencies = Ret
 End Function
 
 ''

@@ -303,7 +303,7 @@ Private Sub Class_Initialize()
     mTwoDigitYearMax = 99
     mEras = Cor.NewLongs(4, 3, 2, 1)
     mEraLengths = Cor.NewLongs(45, 15, 64, 8011)
-    mEraStart = Cor.NewCurrencys(ERA_MEIJI, ERA_TAISHO, ERA_SHOWA, ERA_HEISEI)
+    mEraStart = Cor.NewCurrencies(ERA_MEIJI, ERA_TAISHO, ERA_SHOWA, ERA_HEISEI)
     mEraStartYR2 = Cor.NewLongs(ERA_MEIJI_YR2, ERA_TAISHO_YR2, ERA_SHOWA_YR2, ERA_HEISEI_YR2)
 End Sub
 
