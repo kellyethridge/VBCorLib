@@ -27,7 +27,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2)
             Test.Use NewSingles(7, 8, 9, 6, 5, 4, 1, 3, 2)
             Test.Use NewDoubles(7, 8, 9, 6, 5, 4, 1, 3, 2)
-            Test.Use NewCurrencys(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewCurrencies(7, 8, 9, 6, 5, 4, 1, 3, 2)
             Test.Use NewStrings("c", "d", "a", "B", "A")
             Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#)
             Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2)
@@ -38,7 +38,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewLongs(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareLongs
             Test.Use NewSingles(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareSingles
             Test.Use NewDoubles(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareDoubles
-            Test.Use NewCurrencys(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareCurrencies
+            Test.Use NewCurrencies(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareCurrencies
             Test.Use NewStrings("c", "d", "a", "B", "A"), AddressOf CompareStrings
             Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#), AddressOf CompareDates
             Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareVariants

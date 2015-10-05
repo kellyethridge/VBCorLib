@@ -43,9 +43,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewSingles(1, 2, 3, 4, 5), 1, 0
             Test.Use NewSingles(1, 2, 3, 4, 5), 3, 2
             Test.Use NewSingles(1, 2, 3, 4, 5), 5, 4
-            Test.Use NewCurrencys(1, 2, 3, 4, 5), 1, 0
-            Test.Use NewCurrencys(1, 2, 3, 4, 5), 3, 2
-            Test.Use NewCurrencys(1, 2, 3, 4, 5), 5, 4
+            Test.Use NewCurrencies(1, 2, 3, 4, 5), 1, 0
+            Test.Use NewCurrencies(1, 2, 3, 4, 5), 3, 2
+            Test.Use NewCurrencies(1, 2, 3, 4, 5), 5, 4
             Test.Use NewDates(#1/1/2001#, #1/2/2001#, #1/3/2001#, #1/4/2001#, #1/5/2001#), #1/1/2001#, 0
             Test.Use NewDates(#1/1/2001#, #1/2/2001#, #1/3/2001#, #1/4/2001#, #1/5/2001#), #1/3/2001#, 2
             Test.Use NewDates(#1/1/2001#, #1/2/2001#, #1/3/2001#, #1/4/2001#, #1/5/2001#), #1/5/2001#, 4

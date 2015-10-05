@@ -28,7 +28,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewLongs(1, 2, 3, 4, 5, 6), 4, 3
             Test.Use NewDoubles(1, 2, 3, 4, 5, 6), 4, 3
             Test.Use NewSingles(1, 2, 3, 4, 5, 6), 4, 3
-            Test.Use NewCurrencys(1, 2, 3, 4, 5, 6), 4, 3
+            Test.Use NewCurrencies(1, 2, 3, 4, 5, 6), 4, 3
             Test.Use NewStrings("1", "2", "3", "4", "5", "6"), "4", 3
             Test.Use NewDates(#1/1/2001#, #2/1/2001#, #3/1/2001#, #4/1/2001#, #5/1/2001#, #6/1/2001#), #4/1/2001#, 3
             Test.Use NewVariants("1", "2", "3", "4", "5", "6"), "4", 3

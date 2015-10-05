@@ -12,7 +12,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestArrayCopy
+' CorArrayCopyTests
 '
 Option Explicit
 Implements ICategorizable
@@ -35,7 +35,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(1, 2, 3), NewLongs(0, 0, 0), NewLongs(1, 2, 3)
             Test.Use NewBytes(1, 2, 3), NewSingles(0, 0, 0), NewSingles(1, 2, 3)
             Test.Use NewBytes(1, 2, 3), NewDoubles(0, 0, 0), NewDoubles(1, 2, 3)
-            Test.Use NewBytes(1, 2, 3), NewCurrencys(0, 0, 0), NewCurrencys(1, 2, 3)
+            Test.Use NewBytes(1, 2, 3), NewCurrencies(0, 0, 0), NewCurrencies(1, 2, 3)
             Test.Use NewBytes(1, 2, 3), NewStrings("", "", ""), NewStrings("1", "2", "3")
             Test.Use NewBytes(1, 2, 3), NewVariants(0, 0, 0), NewVariants(CByte(1), CByte(2), CByte(3))
             
@@ -43,14 +43,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewIntegers(1, 2, 3), NewLongs(0, 0, 0), NewLongs(1, 2, 3)
             Test.Use NewIntegers(1, 2, 3), NewSingles(0, 0, 0), NewSingles(1, 2, 3)
             Test.Use NewIntegers(1, 2, 3), NewDoubles(0, 0, 0), NewDoubles(1, 2, 3)
-            Test.Use NewIntegers(1, 2, 3), NewCurrencys(0, 0, 0), NewCurrencys(1, 2, 3)
+            Test.Use NewIntegers(1, 2, 3), NewCurrencies(0, 0, 0), NewCurrencies(1, 2, 3)
             Test.Use NewIntegers(1, 2, 3), NewStrings("", "", ""), NewStrings("1", "2", "3")
             Test.Use NewIntegers(1, 2, 3), NewVariants(0, 0, 0), NewVariants(1, 2, 3)
             
             Test.Use NewLongs(1, 2, 3), NewLongs(0, 0, 0), NewLongs(1, 2, 3)
             Test.Use NewLongs(1, 2, 3), NewSingles(0, 0, 0), NewSingles(1, 2, 3)
             Test.Use NewLongs(1, 2, 3), NewDoubles(0, 0, 0), NewDoubles(1, 2, 3)
-            Test.Use NewLongs(1, 2, 3), NewCurrencys(0, 0, 0), NewCurrencys(1, 2, 3)
+            Test.Use NewLongs(1, 2, 3), NewCurrencies(0, 0, 0), NewCurrencies(1, 2, 3)
             Test.Use NewLongs(1, 2, 3), NewStrings("", "", ""), NewStrings("1", "2", "3")
             Test.Use NewLongs(1, 2, 3), NewVariants(0, 0, 0), NewVariants(1&, 2&, 3&)
             
@@ -63,10 +63,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewDoubles(1, 2, 3), NewStrings("", "", ""), NewStrings("1", "2", "3")
             Test.Use NewDoubles(1, 2, 3), NewVariants(0, 0, 0), NewVariants(1#, 2#, 3#)
             
-            Test.Use NewCurrencys(1, 2, 3), NewCurrencys(0, 0, 0), NewCurrencys(1, 2, 3)
-            Test.Use NewCurrencys(1, 2, 3), NewStrings("", "", ""), NewStrings("1", "2", "3")
-            Test.Use NewCurrencys(1, 2, 3), NewVariants(0, 0, 0), NewVariants(1@, 2@, 3@)
-            Test.Use NewCurrencys(1, 2, 3), NewDoubles(0, 0, 0), NewDoubles(1, 2, 3)
+            Test.Use NewCurrencies(1, 2, 3), NewCurrencies(0, 0, 0), NewCurrencies(1, 2, 3)
+            Test.Use NewCurrencies(1, 2, 3), NewStrings("", "", ""), NewStrings("1", "2", "3")
+            Test.Use NewCurrencies(1, 2, 3), NewVariants(0, 0, 0), NewVariants(1@, 2@, 3@)
+            Test.Use NewCurrencies(1, 2, 3), NewDoubles(0, 0, 0), NewDoubles(1, 2, 3)
             
             Test.Use Objects, Array(Nothing, Nothing, Nothing), Objects
             
