@@ -340,6 +340,7 @@ Class=VersionParser; System\VersionParser.cls
 Class=GuidParser; System\GuidParser.cls
 RelatedDoc=README.TXT
 ResFile32="CorLib.RES"
+Module=RandomShared; System\RandomShared.bas
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"

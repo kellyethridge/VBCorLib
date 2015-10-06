@@ -117,6 +117,7 @@ Public Enum ResourceStringKey
     Argument_InvalidArrayLength = 847
     Argument_ByteArrayOrStreamRequired = 848
     Argument_InvalidValue = 849
+    Argument_MinMaxValue = 850
     
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
