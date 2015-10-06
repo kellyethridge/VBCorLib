@@ -207,7 +207,7 @@ Private Sub AddSystemSecurityCryptography()
 '        .Add New TestMACTripleDES
 '        .Add New TestRfc2898DeriveBytes
 '        .Add New CryptoConfigTests
-'        .Add New TestCspParameters
+        .Add New CspParametersTests
 '        .Add New TestCspKeyContainerInfo
 '        .Add New TestRSACryptoServiceProvider
 '        .Add New TestRSASignAndVerify
