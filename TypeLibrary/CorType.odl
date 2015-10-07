@@ -1062,6 +1062,7 @@ library CorType {
 
         const long PROV_RSA_FULL           = 1;
         const long PROV_DSS_DH             = 13;
+        const long PROV_RSA_AES            = 24;
 
         const long KP_IV                   = 1;
         const long KP_MODE                 = 4;

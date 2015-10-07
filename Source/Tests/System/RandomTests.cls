@@ -101,6 +101,31 @@ Public Sub NextBytes_WhenCalled_FillsArrayWithValues()
     Assert.That Actual, Has.Some.Not.EqualTo(0)
 End Sub
 
+Public Sub NextBytes_WhenCalled_FillsWithRandomValues()
+    Dim Rand As New Random
+    
+    Dim Bytes1(10) As Byte
+    Dim Bytes2(10) As Byte
+    Rand.NextBytes Bytes1
+    Rand.NextBytes Bytes2
+    
+    Assert.That Bytes1, Iz.Not.EqualTo(Bytes2)
+End Sub
+
+Public Sub NextBytes_WithSameSeed_ReturnsSamePattern()
+    Dim Rand As Random
+    Dim Bytes1(10) As Byte
+    Dim Bytes2(10) As Byte
+    
+    Set Rand = Cor.NewRandom(-5)
+    Rand.NextBytes Bytes1
+    
+    Set Rand = Cor.NewRandom(-5)
+    Rand.NextBytes Bytes2
+    
+    Assert.That Bytes1, Iz.EqualTo(Bytes2)
+End Sub
+
 Public Sub NextBytes_WithNullArray_ThrowsArgumentNullException()
     Dim Rand As New Random
     Dim NullBytes() As Byte
