@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestCspParameters
+' CspParametersTests
 '
 Option Explicit
 Implements ICategorizable
@@ -21,42 +21,21 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
     Cat.ForFixture "System.Security.Cryptography"
 End Sub
 
-Public Sub CreateDefault()
+Public Sub Constructor_WhenCalled_SetsDefaultValues()
     Dim Params As New CspParameters
-    Assert.AreEqual CspProviderFlags.NoFlags, Params.Flags
-    Assert.AreEqual "", Params.KeyContainerName
-    Assert.AreEqual "", Params.ProviderName
-    Assert.AreEqual -1, Params.KeyNumber
-    Assert.AreEqual 1, Params.ProviderType
+    
+    Assert.That Params.ProviderType, Iz.EqualTo(PROV_RSA_AES)
+    Assert.That Params.KeyContainerName, Iz.Empty
+    Assert.That Params.ProviderName, Iz.Empty
+    Assert.That Params.KeyNumber, Iz.EqualTo(-1)
 End Sub
 
-Public Sub CreateWithProviderType1()
+Public Sub Constructor_WithValues_SetsProperties()
     Dim Params As CspParameters
-    Set Params = Cor.NewCspParameters(1)
-    Assert.AreEqual CspProviderFlags.NoFlags, Params.Flags
-    Assert.AreEqual "", Params.KeyContainerName
-    Assert.AreEqual "", Params.ProviderName
-    Assert.AreEqual -1, Params.KeyNumber
-    Assert.AreEqual 1, Params.ProviderType
+    
+    Set Params = Cor.NewCspParameters(5, "Provider", "Container")
+    
+    Assert.That Params.ProviderType, Iz.EqualTo(5)
+    Assert.That Params.ProviderName, Iz.EqualTo("Provider")
+    Assert.That Params.KeyContainerName, Iz.EqualTo("Container")
 End Sub
-
-Public Sub CreateWithProviderType2()
-    Dim Params As CspParameters
-    Set Params = Cor.NewCspParameters(2)
-    Assert.AreEqual CspProviderFlags.NoFlags, Params.Flags
-    Assert.AreEqual "", Params.KeyContainerName
-    Assert.AreEqual "", Params.ProviderName
-    Assert.AreEqual -1, Params.KeyNumber
-    Assert.AreEqual 2, Params.ProviderType
-End Sub
-
-Public Sub CreateWithAllParameters()
-    Dim Params As CspParameters
-    Set Params = Cor.NewCspParameters(2, "Provider", "Container")
-    Assert.AreEqual CspProviderFlags.NoFlags, Params.Flags
-    Assert.AreEqual "Container", Params.KeyContainerName
-    Assert.AreEqual "Provider", Params.ProviderName
-    Assert.AreEqual -1, Params.KeyNumber
-    Assert.AreEqual 2, Params.ProviderType
-End Sub
-

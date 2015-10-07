@@ -65,8 +65,7 @@ Public Enum CspProviderFlags
     UseUserProtectedKey = 32
 End Enum
 
-Private Const DEF_KEYNUMBER     As Long = -1
-Private Const DEF_PROVIDERTYPE  As Long = 1
+Private Const DefaultKeyNumber      As Long = -1
 
 Private mKeyContainerName   As String
 Private mKeyNumber          As Long
@@ -263,8 +262,9 @@ Friend Sub Init(ByVal TypeIn As Long, ByVal ProviderNameIn As String, ByVal Cont
 End Sub
 
 Private Sub Class_Initialize()
-    mKeyNumber = DEF_KEYNUMBER
-    mProviderType = DEF_PROVIDERTYPE
+    mFlags = NoFlags
+    mKeyNumber = DefaultKeyNumber
+    mProviderType = PROV_RSA_AES
 End Sub
 
 
