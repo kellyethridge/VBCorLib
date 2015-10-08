@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestCspKeyContainerInfo"
+Attribute VB_Name = "CspKeyContainerInfoTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestCspKeyContainerInfo
+' CspKeyContainerInfoTests
 '
 Option Explicit
 Implements ICategorizable
@@ -20,6 +20,24 @@ Implements ICategorizable
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Security.Cryptography"
 End Sub
+
+'Public Sub Constructor_WithDefaultParameters_StoresDefaults()
+'    Dim Params As New CspParameters
+'
+'    Dim info As CspKeyContainerInfo
+'    Set info = Cor.NewCspKeyContainerInfo(Params)
+'
+'    Assert.That info.KeyNumber, Iz.EqualTo(KeyNumber.Exchange)
+'    Assert.That info.Accessible, Iz.True
+'    Assert.That info.KeyContainerName, Iz.Empty
+'    Assert.That info.UniqueKeyContainerName, Iz.Not.Empty
+'    Assert.That info.MachineKeyStore, Iz.False
+'    Assert.That info.Protected, Iz.False
+'    Assert.That info.ProviderName, Iz.Not.Empty
+'    Assert.That info.ProviderType, Iz.EqualTo(1)
+'    Assert.That info.Removable, Iz.False
+'    Assert.That info.RandomlyGenerated, Iz.False
+'End Sub
 
 'Public Sub CreateDefault()
 '    Dim Params As New CspParameters
@@ -40,21 +58,21 @@ End Sub
 '    Assert.IsFalse info.RandomlyGenerated, "Random should be false"
 'End Sub
 
-Public Sub DifferentKeyNumbers()
-    Dim Params As New CspParameters
-    Dim info As CspKeyContainerInfo
-    
-    Set info = Cor.NewCspKeyContainerInfo(Params)
-    Assert.AreEqual KeyNumber.Exchange, info.KeyNumber
-    
-    Params.KeyNumber = 2
-    Set info = Cor.NewCspKeyContainerInfo(Params)
-    Assert.AreEqual KeyNumber.Signature, info.KeyNumber
-    
-    Params.KeyNumber = 3
-    Set info = Cor.NewCspKeyContainerInfo(Params)
-    Assert.AreEqual 3, info.KeyNumber
-End Sub
+'Public Sub DifferentKeyNumbers()
+'    Dim Params As New CspParameters
+'    Dim info As CspKeyContainerInfo
+'
+'    Set info = Cor.NewCspKeyContainerInfo(Params)
+'    Assert.AreEqual KeyNumber.Exchange, info.KeyNumber
+'
+'    Params.KeyNumber = 2
+'    Set info = Cor.NewCspKeyContainerInfo(Params)
+'    Assert.AreEqual KeyNumber.Signature, info.KeyNumber
+'
+'    Params.KeyNumber = 3
+'    Set info = Cor.NewCspKeyContainerInfo(Params)
+'    Assert.AreEqual 3, info.KeyNumber
+'End Sub
 
 'Public Sub ProviderNameLazyLoading()
 '    Dim Params As New CspParameters
