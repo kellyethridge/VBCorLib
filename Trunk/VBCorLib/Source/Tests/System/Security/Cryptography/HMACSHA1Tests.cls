@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "HMACMD5Tests"
+Attribute VB_Name = "HMACSHA1Tests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' HMACMD5Tests
+' HMACSHA1Tests
 '
 ' Test vector source: https://tools.ietf.org/html/rfc2202
 '
@@ -27,22 +27,22 @@ End Sub
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "ComputeHash_WithTextValues_ReturnsExpected"
-            Test.Use "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "Hi There", "9294727a3638bb1c13f48ef8158bfc9d"
-            Test.Use TextToHex("Jefe"), "what do ya want for nothing?", "750c783e6ab0b503eaa86e310a5db738"
-            Test.Use "0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c", "Test With Truncation", "56461ef2342edc00f9bab995690efd4c"
-            Test.Use HexString(&HAA, 80), "Test Using Larger Than Block-Size Key - Hash Key First", "6b1ab7fe4bd7bf8f0b62e6ce61b9d0cd"
-            Test.Use HexString(&HAA, 80), "Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data", "6f630fad67cda0ee1fb1f562db3aa53e"
+            Test.Use "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b", "Hi There", "b617318655057264e28bc0b6fb378c8ef146be00"
+            Test.Use TextToHex("Jefe"), "what do ya want for nothing?", "effcdf6ae5eb2fa2d27416d5f184df9c259a7c79"
+            Test.Use "0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c", "Test With Truncation", "4c1a03424b55e07fe7f27be1d58bb9324a9a5a04"
+            Test.Use HexString(&HAA, 80), "Test Using Larger Than Block-Size Key - Hash Key First", "aa4ae5e15272d00e95705637ce8a3b55ed402112"
+            Test.Use HexString(&HAA, 80), "Test Using Larger Than Block-Size Key and Larger Than One Block-Size Data", "e8e99d0f45237d786d6bbaa7965c7808bbff1a91"
             
         Case "ComputeHash_WithHexValues_ReturnsExpected"
-            Test.Use "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", HexString(&HDD, 50), "56be34521d144c88dbb8c733f0e8b3f6"
-            Test.Use "0102030405060708090a0b0c0d0e0f10111213141516171819", HexString(&HCD, 50), "697eaf0aca3a3aea3a75164746ffaa79"
+            Test.Use "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", HexString(&HDD, 50), "125d7342b9ac11cd91a39af48aa17b4f63f175d3"
+            Test.Use "0102030405060708090a0b0c0d0e0f10111213141516171819", HexString(&HCD, 50), "4c9007f4026250c6bc8414f9bf50c86c2d7235da"
                         
     End Select
 End Sub
 
 Public Sub ComputeHash_WithTextValues_ReturnsExpected(ByVal Key As String, ByVal Message As String, ByVal Expected As String)
-    Dim Csp As HMACMD5
-    Set Csp = Cor.NewHMACMD5(HexToBytes(Key))
+    Dim Csp As HMAC
+    Set Csp = CreateHMAC(Key)
     
     Dim Actual() As Byte
     Actual = Csp.ComputeHash(Encoding.UTF8.GetBytes(Message))
@@ -51,8 +51,8 @@ Public Sub ComputeHash_WithTextValues_ReturnsExpected(ByVal Key As String, ByVal
 End Sub
 
 Public Sub ComputeHash_WithHexValues_ReturnsExpected(ByVal Key As String, ByVal Message As String, ByVal Expected As String)
-    Dim Csp As HMACMD5
-    Set Csp = Cor.NewHMACMD5(HexToBytes(Key))
+    Dim Csp As HMAC
+    Set Csp = CreateHMAC(Key)
     
     Dim Actual() As Byte
     Actual = Csp.ComputeHash(HexToBytes(Message))
@@ -61,7 +61,8 @@ Public Sub ComputeHash_WithHexValues_ReturnsExpected(ByVal Key As String, ByVal 
 End Sub
 
 Public Sub ComputeHash_WithSameValueOnMultipleCalls_ReturnsSameResult()
-    Dim Csp As New HMACMD5
+    Dim Csp As HMAC
+    Set Csp = CreateHMAC
     Dim Source() As Byte
     Source = Encoding.UTF8.GetBytes("Hi there")
     
@@ -74,7 +75,8 @@ Public Sub ComputeHash_WithSameValueOnMultipleCalls_ReturnsSameResult()
 End Sub
 
 Public Sub Key_WithDefaultConstructor_ReturnsRandom64ByteArray()
-    Dim Csp As New HMACMD5
+    Dim Csp As HMAC
+    Set Csp = CreateHMAC
     
     Dim Actual() As Byte
     Actual = Csp.Key
@@ -88,16 +90,16 @@ Public Sub Constructor_WithNullKey_ThrowsArgumentNullException()
     Dim NullKey() As Byte
     
     On Error Resume Next
-    Cor.NewHMACMD5 NullKey
+    Cor.NewHMACSHA1 NullKey
     
     AssertArgumentNullException Err, "Key"
 End Sub
 
 Public Sub TransformBlock_WhenCalled_HashesValue()
-    Dim Csp As HMACMD5
+    Dim Csp As HMAC
     Dim Block1() As Byte
     Dim Block2() As Byte
-    Set Csp = Cor.NewHMACMD5(HexToBytes("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"))
+    Set Csp = CreateHMAC("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b")
     Block1 = Encoding.UTF8.GetBytes("Hi ")
     Block2 = Encoding.UTF8.GetBytes("There")
     
@@ -106,11 +108,12 @@ Public Sub TransformBlock_WhenCalled_HashesValue()
     Csp.TransformFinalBlock Block2, 0, 5
     Actual = Csp.Hash
     
-    Assert.That Actual, Iz.EqualTo(HexToBytes("9294727a3638bb1c13f48ef8158bfc9d"))
+    Assert.That Actual, Iz.EqualTo(HexToBytes("b617318655057264e28bc0b6fb378c8ef146be00"))
 End Sub
 
 Public Sub TransformFinalBlock_WhenCalledMultipleTimes_ReturnsSameResult()
-    Dim Csp As New HMACMD5
+    Dim Csp As HMAC
+    Set Csp = CreateHMAC
     Dim Source() As Byte
     Source = Encoding.UTF8.GetBytes("Hi there")
     
@@ -124,4 +127,10 @@ Public Sub TransformFinalBlock_WhenCalledMultipleTimes_ReturnsSameResult()
     Assert.That Hash1, Iz.EqualTo(Hash2)
 End Sub
 
-
+Private Function CreateHMAC(Optional ByRef Key As String) As HMAC
+    If Len(Key) > 0 Then
+        Set CreateHMAC = Cor.NewHMACSHA1(HexToBytes(Key))
+    Else
+        Set CreateHMAC = New HMACSHA1
+    End If
+End Function

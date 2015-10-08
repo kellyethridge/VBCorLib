@@ -54,6 +54,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 '
 Option Explicit
+
 Private mHashAlgorithm  As HashAlgorithm
 Private mKey()          As Byte
 Private mKeyIpad()      As Byte
@@ -62,7 +63,6 @@ Private mKeySize        As Long
 Private mHashStarted    As Boolean
 Private mHashName       As String
 Private mIsDisposed     As Boolean
-
 
 
 ''
