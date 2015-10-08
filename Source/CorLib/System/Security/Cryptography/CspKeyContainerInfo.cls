@@ -207,13 +207,28 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Parameters As CspParameters)
+    If Parameters Is Nothing Then _
+        Error.ArgumentNull "Parameters"
+        
     mAccessible = True
     
     With Parameters
         mProviderName = .ProviderName
         mProviderType = .ProviderType
         mKeyContainerName = .KeyContainerName
-        mKeyNumber = IIf(.KeyNumber = -1, CorLib.KeyNumber.Exchange, .KeyNumber)
+        
+        If .KeyNumber = -1 Then
+            If .ProviderType = PROV_RSA_FULL Or .ProviderType = PROV_RSA_AES Then
+                mKeyNumber = CorLib.KeyNumber.Exchange
+            ElseIf .ProviderType = PROV_DSS_DH Then
+                mKeyNumber = CorLib.KeyNumber.Signature
+            Else
+                mKeyNumber = .KeyNumber
+            End If
+        Else
+            mKeyNumber = .KeyNumber
+        End If
+        
         mMachineKeyStore = CBool(.Flags And UseMachineKeyStore)
     End With
 End Sub
@@ -227,15 +242,15 @@ Private Sub VerifyLoaded()
         Exit Sub
     End If
     
-    On Error GoTo 0
-    
     Dim Provider As Long
     Provider = CryptoAPI.AcquireContext(mKeyContainerName, mProviderName, mProviderType)
     mUniqueKeyContainerName = CryptoAPI.GetProvParamString(Provider, PP_UNIQUE_CONTAINER)
     
     Dim Key As Long
-    If CryptGetUserKey(Provider, mKeyNumber, Key) = BOOL_FALSE Then _
+    If CryptGetUserKey(Provider, mKeyNumber, Key) = BOOL_FALSE Then
+        CryptoAPI.ReleaseContext Provider
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+    End If
     
     Dim Permissions As Long
     Permissions = CryptoAPI.GetKeyParamLong(Key, KP_PERMISSIONS)

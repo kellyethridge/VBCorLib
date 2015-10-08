@@ -139,7 +139,7 @@ End Function
 ''
 ' Releases an existing context with the option to delete all keys contained in the associated key container.
 '
-Friend Sub ReleaseContext(ByVal Provider As Long, Optional ByVal DeleteKeySet As Boolean)
+Friend Sub ReleaseContext(ByVal Provider As Long, Optional ByVal DeleteKeySet As Boolean = False)
     If Provider = vbNullPtr Then
         Exit Sub
     End If
@@ -323,9 +323,14 @@ Private Sub DetermineProviderSupport()
                     mHasHighEncryption = True
                 End If
                 
-            Case MS_STRONG_PROV
+            Case MS_ENH_RSA_AES_PROV
                 ' We always prefer this provider.
-                mRSAProviderName = MS_STRONG_PROV
+                mRSAProviderName = MS_ENH_RSA_AES_PROV
+                mHasHighEncryption = True
+                
+            Case MS_ENH_RSA_AES_PROV_XP
+                ' This provider was named differently on XP.
+                mRSAProviderName = MS_ENH_RSA_AES_PROV_XP
                 mHasHighEncryption = True
                 
             Case MS_DEF_DSS_DH_PROV

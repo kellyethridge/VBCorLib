@@ -1139,6 +1139,8 @@ library CorType {
         const LPSTR MS_DEF_PROV             = "Microsoft Base Cryptographic Provider v1.0";
         const LPSTR MS_STRONG_PROV          = "Microsoft Strong Cryptographic Provider";
         const LPSTR MS_ENHANCED_PROV        = "Microsoft Enhanced Cryptographic Provider v1.0";
+        const LPSTR MS_ENH_RSA_AES_PROV     = "Microsoft Enhanced RSA and AES Cryptographic Provider";
+        const LPSTR MS_ENH_RSA_AES_PROV_XP  = "Microsoft Enhanced RSA and AES Cryptographic Provider (Prototype)";
 
         const long SC_CLOSE                = 0xF060;
         const long MF_BYCOMMAND            = 0x0;
