@@ -77,10 +77,10 @@ End Property
 ''
 ' Sets the name of the hash algorithm used.
 '
-' @param RHS The new hash name.
+' @param Value The new hash name.
 '
-Public Property Let HashName(ByVal RHS As String)
-    mHashName = HashName
+Public Property Let HashName(ByRef Value As String)
+    mHashName = Value
 End Property
 
 ''
@@ -120,6 +120,7 @@ End Sub
 '
 Public Function GetKey() As Byte()
     VerifyNotDisposed
+    InitNullKey
     GetKey = mKey
 End Function
 
@@ -184,11 +185,11 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
     VerifyNotDisposed
     StartHash
     
-    Dim Ret() As Byte
-    Ret = mHashAlgorithm.TransformFinalBlock(InputBuffer, InputOffset, InputCount)
+    Dim Result() As Byte
+    Result = mHashAlgorithm.TransformFinalBlock(InputBuffer, InputOffset, InputCount)
     
     EndHash mHashAlgorithm.Hash
-    TransformFinalBlock = Ret
+    TransformFinalBlock = Result
 End Function
 
 ''
@@ -214,14 +215,14 @@ Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByV
     mKeySize = KeySize
     mHashName = HashName
     
-    If IsMissing(Key) Then
-        mKey = CryptoHelper.GetRandomBytes(mKeySize)
-    ElseIf VarType(Key) <> corByteArray Then
-        Throw Cor.NewArgumentException("Key must be a Byte array.", "Key")
-    ElseIf CorArray.IsNull(Key) Then
-        Error.ArgumentNull "Key", ArgumentNull_Array
-    Else
-        mKey = Key
+    If Not IsMissing(Key) Then
+        If VarType(Key) <> corByteArray Then
+            Throw Cor.NewArgumentException("Key must be a Byte array.", "Key")
+        ElseIf CorArray.IsNull(Key) Then
+            Error.ArgumentNull "Key", ArgumentNull_Array
+        Else
+            mKey = Key
+        End If
     End If
 End Sub
 
@@ -232,6 +233,12 @@ End Sub
 Private Sub VerifyNotDisposed()
     If mIsDisposed Then
         Throw New ObjectDisposedException
+    End If
+End Sub
+
+Private Sub InitNullKey()
+    If SAPtr(mKey) = vbNullPtr Then
+        mKey = CryptoHelper.GetRandomBytes(mKeySize)
     End If
 End Sub
 
@@ -253,6 +260,8 @@ Private Sub ExpandKey()
     If SAPtr(mKeyIpad) <> vbNullPtr Then
         Exit Sub
     End If
+    
+    InitNullKey
     
     Dim K0() As Byte
     Select Case CorArray.LengthFirstDim(mKey)

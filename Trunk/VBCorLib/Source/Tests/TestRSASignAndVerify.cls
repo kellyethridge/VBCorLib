@@ -22,7 +22,7 @@ Private PT() As Byte
 Private ht() As Byte
 Private Sig() As Byte
 Private HA As String
-Private csp As RSACryptoServiceProvider
+Private Csp As RSACryptoServiceProvider
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Security.Cryptography"
@@ -30,17 +30,17 @@ End Sub
 
 
 
-Public Sub Setup()
-    Set csp = New RSACryptoServiceProvider
-    Call csp.ImportCspBlob(File.ReadAllBytes(App.Path & "\Cryptography Files\RSA_Default_Sign_CspBlob.txt"))
-    
-    FF = FreeFile
-    Open App.Path & "\Cryptography Files\RSA_Default_VerifyHash.txt" For Input As #FF
-End Sub
-
-Public Sub Teardown()
-    Close #FF
-End Sub
+'Public Sub Setup()
+'    Set Csp = New RSACryptoServiceProvider
+'    Call Csp.ImportCspBlob(File.ReadAllBytes(App.Path & "\Cryptography Files\RSA_Default_Sign_CspBlob.txt"))
+'
+'    FF = FreeFile
+'    Open App.Path & "\Cryptography Files\RSA_Default_VerifyHash.txt" For Input As #FF
+'End Sub
+'
+'Public Sub Teardown()
+'    Close #FF
+'End Sub
 
 
 
@@ -50,14 +50,14 @@ Public Sub VerifySignedHashes()
     Do While GetNextEntry
         Set HashObj = CryptoConfig.CreateFromName(HA)
         
-        Dim hash() As Byte
-        hash = HashObj.ComputeHash(PT)
-        Assert.AreEqual ht, hash
+        Dim Hash() As Byte
+        Hash = HashObj.ComputeHash(PT)
+        Assert.AreEqual ht, Hash
         
-        Assert.IsTrue csp.VerifyHash(hash, CryptoConfig.MapNameToOID(HA), Sig)
+        Assert.IsTrue Csp.VerifyHash(Hash, CryptoConfig.MapNameToOID(HA), Sig)
         
-        hash(0) = (hash(0) + 1) Mod 256
-        Assert.IsFalse csp.VerifyHash(hash, CryptoConfig.MapNameToOID(HA), Sig)
+        Hash(0) = (Hash(0) + 1) Mod 256
+        Assert.IsFalse Csp.VerifyHash(Hash, CryptoConfig.MapNameToOID(HA), Sig)
     Loop
 End Sub
 
@@ -67,37 +67,37 @@ Public Sub SignHashes()
     Do While GetNextEntry
         Set HashObj = CryptoConfig.CreateFromName(HA)
         
-        Dim hash() As Byte
-        hash = HashObj.ComputeHash(PT)
-        Assert.AreEqual ht, hash
+        Dim Hash() As Byte
+        Hash = HashObj.ComputeHash(PT)
+        Assert.AreEqual ht, Hash
         
         Dim Signature() As Byte
-        Signature = csp.SignHash(hash, CryptoConfig.MapNameToOID(HA))
+        Signature = Csp.SignHash(Hash, CryptoConfig.MapNameToOID(HA))
         Assert.AreEqual Sig, Signature
         
-        hash(0) = (hash(0) + 1) Mod 256
-        Signature = csp.SignHash(hash, CryptoConfig.MapNameToOID(HA))
+        Hash(0) = (Hash(0) + 1) Mod 256
+        Signature = Csp.SignHash(Hash, CryptoConfig.MapNameToOID(HA))
         Assert.That Sig, Iz.Not.EqualTo(Signature)
     Loop
 End Sub
 
 Public Sub VerifyData()
     Do While GetNextEntry
-        Assert.IsTrue csp.VerifyData(PT, HA, Sig)
+        Assert.IsTrue Csp.VerifyData(PT, HA, Sig)
         
         PT(0) = (PT(0) + 1) Mod 256
-        Assert.IsFalse csp.VerifyData(PT, HA, Sig)
+        Assert.IsFalse Csp.VerifyData(PT, HA, Sig)
     Loop
 End Sub
 
 Public Sub SignData()
     Do While GetNextEntry
         Dim Signature() As Byte
-        Signature = csp.SignData(PT, HA)
+        Signature = Csp.SignData(PT, HA)
         Assert.AreEqual Sig, Signature
     
         PT(0) = (PT(0) + 1) Mod 256
-        Signature = csp.SignData(PT, HA)
+        Signature = Csp.SignData(PT, HA)
         Assert.That Sig, Iz.Not.EqualTo(Signature)
     Loop
 End Sub

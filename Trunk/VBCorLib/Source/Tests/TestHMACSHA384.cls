@@ -17,7 +17,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ICategorizable
 
-Private csp As HMAC
+Private Csp As HMAC
 Private FF As Long
 Private PT() As Byte
 Private ht() As Byte
@@ -28,20 +28,20 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
 End Sub
 
 
-Public Sub Setup()
-    Set csp = New HMACSHA384
-    
-    FF = FreeFile
-    Open App.Path & "\Tests\Cryptography Files\HMACSHA384_Hashes.txt" For Input As #FF
-End Sub
-
-Public Sub Teardown()
-    Close #FF
-End Sub
+'Public Sub Setup()
+'    Set Csp = New HMACSHA384
+'
+'    FF = FreeFile
+'    Open App.Path & "\Tests\Cryptography Files\HMACSHA384_Hashes.txt" For Input As #FF
+'End Sub
+'
+'Public Sub Teardown()
+'    Close #FF
+'End Sub
 
 Public Sub NewReturnsRandomKey()
     Dim Key() As Byte
-    Key = csp.Key
+    Key = Csp.Key
     Assert.IsFalse CorArray.IsNull(Key)
     Assert.AreEqual 64, CorArray.Length(Key)
 End Sub
@@ -49,7 +49,7 @@ End Sub
 Public Sub CannotUseNullKeyInConstructor()
     Dim b() As Byte
     On Error GoTo errTrap
-    csp = Cor.NewHMACSHA384(b)
+    Csp = Cor.NewHMACSHA384(b)
     On Error GoTo 0
     Assert.Fail "An exception should be thrown."
     
@@ -60,39 +60,39 @@ errTrap:
 End Sub
 
 Public Sub TestEmptyArray()
-    csp.Key = Cor.NewBytes(0)
+    Csp.Key = Cor.NewBytes(0)
     
     Dim Expected() As Byte
     Expected = Cor.NewBytes(&HEA, &H97, &HC7, &HFB, &H43, &H9E, &H3E, &H5F, &HC1, &H2C, &H61, &HF2, &HD, &HEF, &HA2, &H56, &H87, &HA9, &H8, &H56, &HFC, &H87, &H95, &HD3, &HE, &H13, &H5C, &HF6, &H9A, &H31, &H6C, &H3C, &H95, &H22, &H6B, &HC3, &H94, &HF5, &H2B, &H86, &H0, &H10, &HD7, &H45, &HAF, &HFD, &H67, &HF8)
     
-    Assert.AreEqual Expected, csp.ComputeHash(Cor.NewBytes())
+    Assert.AreEqual Expected, Csp.ComputeHash(Cor.NewBytes())
 End Sub
 
 Public Sub Test1ByteArray()
-    csp.Key = Cor.NewBytes(0)
+    Csp.Key = Cor.NewBytes(0)
     
     Dim Expected() As Byte
     Expected = Cor.NewBytes(&HED, &H54, &H8F, &HD1, &HBE, &H20, &H4D, &HF8, &H58, &H69, &HC, &H61, &H75, &H66, &H73, &H88, &H7B, &H31, &H7B, &H6, &HB2, &H66, &H76, &H85, &H5, &H1B, &H3E, &H4C, &HCF, &HED, &H63, &HC, &HE9, &H3F, &H2F, &HCD, &HC1, &HE, &H5E, &H15, &H4D, &H5E, &H9F, &HA3, &H28, &H70, &H54, &H87)
     
-    Assert.AreEqual Expected, csp.ComputeHash(Cor.NewBytes(1))
+    Assert.AreEqual Expected, Csp.ComputeHash(Cor.NewBytes(1))
 End Sub
 
 Public Sub TestComputeHash()
     Do While GetNextEntry
-        csp.Key = KY
+        Csp.Key = KY
         
-        Assert.AreEqual ht, csp.ComputeHash(PT)
+        Assert.AreEqual ht, Csp.ComputeHash(PT)
     Loop
 End Sub
 
 Public Sub TestTransformFinalBlock()
     Do While GetNextEntry
-        csp.Key = KY
+        Csp.Key = KY
         
         Dim b() As Byte
-        b = csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
+        b = Csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
         Assert.AreEqual PT, b
-        Assert.AreEqual ht, csp.hash
+        Assert.AreEqual ht, Csp.Hash
     Loop
 End Sub
 
@@ -106,14 +106,14 @@ Public Sub TestTransformBlock1ByteAtATime()
         
         c = c + 1
         
-        csp.Key = KY
+        Csp.Key = KY
         
         For i = 0 To UBound(PT)
-            Assert.AreEqual 1, csp.TransformBlock(PT, i, 1, b, 0), "Entry: " & c
+            Assert.AreEqual 1, Csp.TransformBlock(PT, i, 1, b, 0), "Entry: " & c
             Assert.AreEqual PT(i), b(0), "TransformBlock Entry: " & c
         Next i
-        csp.TransformFinalBlock PT, UBound(PT) + 1, 0
-        Assert.AreEqual ht, csp.hash, "TransformFinalBlock Entry: " & c
+        Csp.TransformFinalBlock PT, UBound(PT) + 1, 0
+        Assert.AreEqual ht, Csp.Hash, "TransformFinalBlock Entry: " & c
     Loop
 End Sub
 
@@ -126,11 +126,11 @@ Public Sub TestTransformBlock5BytesAtATime()
         
         c = c + 1
         
-        csp.Key = KY
+        Csp.Key = KY
         
         i = 0
         Do While i <= (UBound(PT) - 5)
-            Assert.AreEqual 5, csp.TransformBlock(PT, i, 5, b, 0)
+            Assert.AreEqual 5, Csp.TransformBlock(PT, i, 5, b, 0)
             
             Dim j As Long
             For j = 0 To 4
@@ -139,18 +139,18 @@ Public Sub TestTransformBlock5BytesAtATime()
             
             i = i + 5
         Loop
-        csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
-        Assert.AreEqual ht, csp.hash, "Hash: Entry " & c
+        Csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
+        Assert.AreEqual ht, Csp.Hash, "Hash: Entry " & c
     Loop
 End Sub
 
 Public Sub HashLargeFileStream()
-    Dim hash() As Byte
-    hash = Cor.NewBytes(&H1A, &H35, &HE, &HBA, &H8D, &H19, &H12, &H18, &HCA, &H55, &HCB, &HE5, &H50, &H79, &H1E, &HC9, &HF, &HB5, &H99, &H76, &H6D, &H11, &HE3, &HBC, &H4E, &HFD, &H7B, &H88, &HC6, &H5C, &H8D, &H1E, &HF2, &H96, &HF7, &HEC, &H3C, &HEC, &HD2, &HA7, &HF, &HC1, &H4C, &HC, &HC7, &H4, &H48, &H5C)
+    Dim Hash() As Byte
+    Hash = Cor.NewBytes(&H1A, &H35, &HE, &HBA, &H8D, &H19, &H12, &H18, &HCA, &H55, &HCB, &HE5, &H50, &H79, &H1E, &HC9, &HF, &HB5, &H99, &H76, &H6D, &H11, &HE3, &HBC, &H4E, &HFD, &H7B, &H88, &HC6, &H5C, &H8D, &H1E, &HF2, &H96, &HF7, &HEC, &H3C, &HEC, &HD2, &HA7, &HF, &HC1, &H4C, &HC, &HC7, &H4, &H48, &H5C)
     
-    csp.Key = Cor.NewBytes(&HC4, &HF1, &HE1, &HF7, &HC, &H7B, &H53, &H32, &HCA, &HD7, &HAE, &H8A, &H1, &H60, &HB3, &H54, &HB1, &HB7, &H56, &H10, &H2D, &HC9, &HBF, &HCA, &HAE, &HD4, &H2B, &HF0, &HE5, &H97, &H45, &HCF, &HA6, &H3C, &HF0, &H25, &H11, &H98, &HE5, &H3A, &H5, &H22, &H67, &H7C, &HF1, &HCA, &HBC, &H36, &H13, &H5, &H29, &HD0, &H74, &HE3, &H8E, &H29, &H17, &HAE, &HDF, &HDC, &H2, &H27, &H3A, &H15)
+    Csp.Key = Cor.NewBytes(&HC4, &HF1, &HE1, &HF7, &HC, &H7B, &H53, &H32, &HCA, &HD7, &HAE, &H8A, &H1, &H60, &HB3, &H54, &HB1, &HB7, &H56, &H10, &H2D, &HC9, &HBF, &HCA, &HAE, &HD4, &H2B, &HF0, &HE5, &H97, &H45, &HCF, &HA6, &H3C, &HF0, &H25, &H11, &H98, &HE5, &H3A, &H5, &H22, &H67, &H7C, &HF1, &HCA, &HBC, &H36, &H13, &H5, &H29, &HD0, &H74, &HE3, &H8E, &H29, &H17, &HAE, &HDF, &HDC, &H2, &H27, &H3A, &H15)
     
-    Assert.AreEqual hash, csp.ComputeHash(File.OpenFile(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting))
+    Assert.AreEqual Hash, Csp.ComputeHash(File.OpenFile(App.Path & "\Tests\Cryptography Files\RC2_Entries.txt", OpenExisting))
 End Sub
 
 

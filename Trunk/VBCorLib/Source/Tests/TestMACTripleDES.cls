@@ -17,7 +17,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ICategorizable
 
-Private csp As MACTripleDes
+Private Csp As MACTripleDes
 Private PT() As Byte
 Private ht() As Byte
 Private FF As Long
@@ -26,16 +26,16 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
     Cat.ForFixture "System.Security.Cryptography"
 End Sub
 
-Public Sub Setup()
-    Set csp = New MACTripleDes
-    
-    FF = FreeFile
-    Open App.Path & "\Cryptography Files\MACTripleDES_Hashes.txt" For Input As #FF
-End Sub
-
-Public Sub Teardown()
-    Close #FF
-End Sub
+'Public Sub Setup()
+'    Set Csp = New MACTripleDes
+'
+'    FF = FreeFile
+'    Open App.Path & "\Cryptography Files\MACTripleDES_Hashes.txt" For Input As #FF
+'End Sub
+'
+'Public Sub Teardown()
+'    Close #FF
+'End Sub
 
 Public Sub TestEmptyArray()
     Dim i As Long
@@ -45,13 +45,13 @@ Public Sub TestEmptyArray()
         Key(i) = i
     Next i
     
-    csp.Key = Key
-    csp.Padding = PKCS7
+    Csp.Key = Key
+    Csp.Padding = PKCS7
     
     Dim Expected() As Byte
     Expected = Cor.NewBytes(&HA3, &HCF, &H6E, &HC8, &H8B, &HD9, &H7D, &H73)
     
-    Assert.AreEqual Expected, csp.ComputeHash(Cor.NewBytes())
+    Assert.AreEqual Expected, Csp.ComputeHash(Cor.NewBytes())
 End Sub
 
 Public Sub TestComputeHashesFromBytes()
@@ -61,7 +61,7 @@ Public Sub TestComputeHashesFromBytes()
         c = c + 1
         
         Dim b() As Byte
-        b = csp.ComputeHash(PT)
+        b = Csp.ComputeHash(PT)
         Assert.IsFalse CorArray.IsNull(b), "b should not be null."
         Assert.AreEqual ht, b, "Entry: " & c
     Loop
@@ -71,9 +71,9 @@ Public Sub TestTransformFinalBlock()
     Do While GetNextEntry
         
         Dim b() As Byte
-        b = csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
+        b = Csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
         Assert.AreEqual PT, b
-        Assert.AreEqual ht, csp.hash
+        Assert.AreEqual ht, Csp.Hash
     Loop
 End Sub
 
@@ -88,11 +88,11 @@ Public Sub TestTransformBlock1ByteAtATime()
         c = c + 1
         
         For i = 0 To UBound(PT)
-            Assert.AreEqual 1, csp.TransformBlock(PT, i, 1, b, 0), "Entry: " & c
+            Assert.AreEqual 1, Csp.TransformBlock(PT, i, 1, b, 0), "Entry: " & c
             Assert.AreEqual PT(i), b(0), "Entry: " & c
         Next i
-        csp.TransformFinalBlock PT, UBound(PT) + 1, 0
-        Assert.AreEqual ht, csp.hash, "Entry: " & c
+        Csp.TransformFinalBlock PT, UBound(PT) + 1, 0
+        Assert.AreEqual ht, Csp.Hash, "Entry: " & c
     Loop
 End Sub
 
@@ -107,7 +107,7 @@ Public Sub TestTransformBlock5BytesAtATime()
         
         i = 0
         Do While i <= (UBound(PT) - 5)
-            Assert.AreEqual 5, csp.TransformBlock(PT, i, 5, b, 0)
+            Assert.AreEqual 5, Csp.TransformBlock(PT, i, 5, b, 0)
             
             Dim j As Long
             For j = 0 To 4
@@ -116,8 +116,8 @@ Public Sub TestTransformBlock5BytesAtATime()
             
             i = i + 5
         Loop
-        csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
-        Assert.AreEqual ht, csp.hash, "Hash: Entry " & c
+        Csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
+        Assert.AreEqual ht, Csp.Hash, "Hash: Entry " & c
     Loop
 End Sub
 
@@ -125,12 +125,12 @@ Public Sub HashLargeFileStream()
     Dim fs As FileStream
     Set fs = Cor.NewFileStream(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting)
     
-    Dim hash() As Byte
-    hash = Cor.NewBytes(&H2B, &H6F, &H35, &HC8, &H18, &H3E, &H37, &H1D)
+    Dim Hash() As Byte
+    Hash = Cor.NewBytes(&H2B, &H6F, &H35, &HC8, &H18, &H3E, &H37, &H1D)
     
-    csp.Key = Cor.NewBytes(&H4B, &H60, &H72, &HD3, &HD8, &H76, &HAD, &H6C, &H33, &HC1, &H9D, &H53, &HDD, &HEA, &H31, &HD9, &H25, &HC0, &HFE, &H9C, &HCB, &H4D, &H43, &H1D)
+    Csp.Key = Cor.NewBytes(&H4B, &H60, &H72, &HD3, &HD8, &H76, &HAD, &H6C, &H33, &HC1, &H9D, &H53, &HDD, &HEA, &H31, &HD9, &H25, &HC0, &HFE, &H9C, &HCB, &H4D, &H43, &H1D)
     
-    Assert.AreEqual hash, csp.ComputeHash(fs)
+    Assert.AreEqual Hash, Csp.ComputeHash(fs)
 End Sub
 
 
@@ -150,8 +150,8 @@ Private Function GetNextEntry() As Boolean
         Select Case LCase$(Trim$(Parts(0)))
             Case "pt": PT = ConvertHexToBytes(Trim$(Parts(1)))
             Case "ht": ht = ConvertHexToBytes(Trim$(Parts(1)))
-            Case "ky": csp.Key = ConvertHexToBytes(Trim$(Parts(1)))
-            Case "pd": csp.Padding = CInt(Parts(1))
+            Case "ky": Csp.Key = ConvertHexToBytes(Trim$(Parts(1)))
+            Case "pd": Csp.Padding = CInt(Parts(1))
         End Select
         
         Line Input #FF, line

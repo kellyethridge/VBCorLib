@@ -11,9 +11,11 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+'   SHA384ManagedTests
+'
 Implements ICategorizable
 Implements ITestCaseSource
-
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Security.Cryptography"
@@ -88,7 +90,7 @@ Public Sub TransformFinalBlock_WithByteArray_ReturnsExpected(ByVal Message As St
     Dim ActualHash()    As Byte
     Dim ActualInput()   As Byte
     ActualInput = Provider.TransformFinalBlock(Bytes, 0, CorArray.Length(Bytes))
-    ActualHash = Provider.hash
+    ActualHash = Provider.Hash
     
     Dim Expected() As Byte
     Expected = HexToBytes(Digest)
@@ -111,7 +113,7 @@ Public Sub TransformBlock_With1ByteAtATime_ComputesExpected(ByVal Message As Str
     Dim Expected() As Byte
     Expected = HexToBytes(Digest)
     Assert.That Provider.TransformFinalBlock(PT, UBound(PT) + 1, 0), Iz.Empty
-    Assert.That Provider.hash, Iz.EqualTo(Expected)
+    Assert.That Provider.Hash, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TransformBlock_With5BytesAtATime_ComputesExpected(ByVal Message As String, ByVal Digest As String)
@@ -134,7 +136,7 @@ Public Sub TransformBlock_With5BytesAtATime_ComputesExpected(ByVal Message As St
     
     Dim Expected() As Byte
     Expected = HexToBytes(Digest)
-    Assert.That Provider.hash, Iz.EqualTo(Expected)
+    Assert.That Provider.Hash, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Hash_BeforeTransformFinalBlockIsCalled_ThrowsInvalidOperationException()
@@ -144,7 +146,7 @@ Public Sub Hash_BeforeTransformFinalBlockIsCalled_ThrowsInvalidOperationExceptio
     
     On Error Resume Next
     Dim Actual() As Byte
-    Actual = Provider.hash
+    Actual = Provider.Hash
     
     AssertInvalidOperationException Err
 End Sub
