@@ -83,7 +83,7 @@ End Property
 ' Acquires an RSA specific context from a provider.
 '
 Friend Function AcquireRSAContext(Optional ByRef ContainerName As String, Optional ByRef ProviderName As String, Optional ByVal Flags As Long) As Long
-    AcquireRSAContext = AcquireContext(ContainerName, ProviderName, PROV_RSA_FULL, Flags)
+    AcquireRSAContext = AcquireContext(ContainerName, ProviderName, PROV_RSA_AES, Flags)
 End Function
 
 ''
@@ -113,7 +113,7 @@ End Property
 '
 Friend Function AcquireContext(Optional ByRef ContainerName As String, Optional ByRef ProviderName As String, Optional ByRef ProviderType As Long, Optional ByVal Flags As Long) As Long
     If ProviderType = 0 Then
-        ProviderType = PROV_RSA_FULL
+        ProviderType = PROV_RSA_AES
     End If
     If Len(ProviderName) = 0 Then
         ProviderName = mRSAProviderName

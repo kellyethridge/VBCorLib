@@ -143,7 +143,7 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyProvider()
-    If mProvider = 0 Then Call Init(Cor.NewCspParameters(PROV_RSA_FULL))
+    If mProvider = 0 Then Call Init(Cor.NewCspParameters(PROV_RSA_AES))
 End Sub
 
 

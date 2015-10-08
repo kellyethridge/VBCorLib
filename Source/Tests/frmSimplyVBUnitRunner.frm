@@ -202,7 +202,7 @@ Private Sub AddSystemSecurityCryptography()
 '        .Add New TestHMACSHA256
 '        .Add New TestHMACSHA384
 '        .Add New TestHMACSHA512
-'        .Add New TestHMACMD5
+        .Add New HMACMD5Tests
 '        .Add New TestHMACRIPEMD160
 '        .Add New TestMACTripleDES
 '        .Add New TestRfc2898DeriveBytes

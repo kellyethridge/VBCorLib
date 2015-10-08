@@ -45,7 +45,7 @@ Implements RSA
 Implements ICspAsymmetricAlgorithm
 
 Private Const DEF_KEYNUMBER     As Long = AT_KEYEXCHANGE
-Private Const DEF_PROVIDERTYPE  As Long = PROV_RSA_FULL
+Private Const DEF_PROVIDERTYPE  As Long = PROV_RSA_AES
 
 Private mProvider           As Long
 Private mKey                As Long

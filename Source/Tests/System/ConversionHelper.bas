@@ -13,3 +13,29 @@ Public Function HexToBytes(ByRef s As String) As Byte()
     
     HexToBytes = Bytes
 End Function
+
+Public Function FillString(ByVal Pattern As String, ByVal Count As Long) As String
+    Dim sb As New SimplyVBComp.StringBuilder
+    Dim i As Long
+    For i = 1 To Count
+        sb.Append Pattern
+    Next
+    FillString = sb.ToString
+End Function
+
+Public Function HexString(ByVal Value As Byte, ByVal Count As Long) As String
+    HexString = FillString(Right$(Hex$(Value), 2), Count)
+End Function
+
+Public Function TextToHex(ByRef s As String) As String
+    Dim Bytes() As Byte
+    Bytes = Encoding.UTF8.GetBytes(s)
+    
+    Dim sb As New SimplyVBComp.StringBuilder
+    Dim i As Long
+    For i = 0 To UBound(Bytes)
+        sb.Append Right$(Hex$(Bytes(i)), 2)
+    Next
+    
+    TextToHex = sb.ToString
+End Function
