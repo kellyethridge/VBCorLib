@@ -50,7 +50,6 @@ Implements KeyedHashAlgorithm
 Implements HMAC
 Implements ICryptoTransform
 
-
 Private mBase As HMACBase
 
 
