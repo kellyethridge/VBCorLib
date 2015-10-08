@@ -8,28 +8,31 @@ BEGIN
 END
 Attribute VB_Name = "HMACBase"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: HMACBase
+' Module: HMACBase
 '
 
 ''
@@ -86,7 +89,7 @@ End Property
 ' @return The computed hash.
 '
 Public Property Get Hash() As Byte()
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     Hash = mHashAlgorithm.Hash
 End Property
 
@@ -98,15 +101,16 @@ End Property
 ' property assignment bug in VB6.
 '
 Public Sub SetKey(ByRef Key() As Byte)
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     If mHashStarted Then _
         Throw Cor.NewCryptographicException("Cannot change key after hash has started.")
-    If CorArray.IsNull(Key) Then _
-        Throw Cor.NewArgumentNullException("Key")
+    If SAPtr(Key) = vbNullPtr Then _
+        Error.ArgumentNull "Key", ArgumentNull_Array
     
-    mKey = CorArray.CreateInstance(vbByte, CorArray.Length(Key))
-    Call Buffer.BlockCopy(Key, 0, mKey, 0, CorArray.Length(Key))
-    Call Initialize
+    ' We copy the array to ensure a zero-based array.
+    mKey = CorArray.CreateInstance(vbByte, CorArray.LengthFirstDim(Key))
+    Buffer.BlockCopy Key, 0, mKey, 0, CorArray.LengthFirstDim(Key)
+    Initialize
 End Sub
 
 ''
@@ -115,7 +119,7 @@ End Sub
 ' @return The current key used.
 '
 Public Function GetKey() As Byte()
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     GetKey = mKey
 End Function
 
@@ -129,9 +133,9 @@ End Function
 ' @remarks For Stream objects, the stream is continuously read from and the hash computed until the stream contains no data.
 '
 Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Call VerifyNotDisposed
-    Call StartHash
-    Call EndHash(mHashAlgorithm.ComputeHash(Source, Index, Count))
+    VerifyNotDisposed
+    StartHash
+    EndHash mHashAlgorithm.ComputeHash(Source, Index, Count)
     ComputeHash = mHashAlgorithm.Hash
 End Function
 
@@ -139,11 +143,11 @@ End Function
 ' Resets an instance to begin computing a hash from the begining.
 '
 Public Sub Initialize()
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     Erase mKeyIpad
     Erase mKeyOpad
     mHashStarted = False
-    Call mHashAlgorithm.Initialize
+    mHashAlgorithm.Initialize
 End Sub
 
 ''
@@ -161,8 +165,8 @@ End Sub
 ' the InputOffset and OutputOffset are the same.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    Call VerifyNotDisposed
-    Call StartHash
+    VerifyNotDisposed
+    StartHash
     TransformBlock = mHashAlgorithm.TransformBlock(InputBuffer, InputOffset, InputCount, OutputBuffer, OutputOffset)
 End Function
 
@@ -177,13 +181,13 @@ End Function
 ' hash value, call the Hash property.
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    Call VerifyNotDisposed
-    Call StartHash
+    VerifyNotDisposed
+    StartHash
     
     Dim Ret() As Byte
     Ret = mHashAlgorithm.TransformFinalBlock(InputBuffer, InputOffset, InputCount)
     
-    Call EndHash(mHashAlgorithm.Hash)
+    EndHash mHashAlgorithm.Hash
     TransformFinalBlock = Ret
 End Function
 
@@ -200,7 +204,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByVal HashName As String, ByRef Key As Variant)
     If HashAlgorithm Is Nothing Then _
@@ -215,7 +219,7 @@ Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByV
     ElseIf VarType(Key) <> corByteArray Then
         Throw Cor.NewArgumentException("Key must be a Byte array.", "Key")
     ElseIf CorArray.IsNull(Key) Then
-        Throw Cor.NewArgumentNullException("Key")
+        Error.ArgumentNull "Key", ArgumentNull_Array
     Else
         mKey = Key
     End If
@@ -223,33 +227,35 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyNotDisposed()
-    If mIsDisposed Then Throw New ObjectDisposedException
+    If mIsDisposed Then
+        Throw New ObjectDisposedException
+    End If
 End Sub
 
 Private Sub EndHash(ByRef Hash() As Byte)
-    Call mHashAlgorithm.TransformBlock(mKeyOpad, 0, mKeySize, mKeyOpad, 0)
-    Call mHashAlgorithm.TransformFinalBlock(Hash, 0, CorArray.Length(Hash))
-    
+    mHashAlgorithm.TransformBlock mKeyOpad, 0, mKeySize, mKeyOpad, 0
+    mHashAlgorithm.TransformFinalBlock Hash, 0, CorArray.LengthFirstDim(Hash)
     mHashStarted = False
 End Sub
 
 Private Sub StartHash()
-    If mHashStarted Then Exit Sub
-    
-    Call ExpandKey
-    Call mHashAlgorithm.TransformBlock(mKeyIpad, 0, mKeySize, mKeyIpad, 0)
-    
-    mHashStarted = True
+    If Not mHashStarted Then
+        ExpandKey
+        mHashAlgorithm.TransformBlock mKeyIpad, 0, mKeySize, mKeyIpad, 0
+        mHashStarted = True
+    End If
 End Sub
 
 Private Sub ExpandKey()
-    If Not CorArray.IsNull(mKeyIpad) Then Exit Sub
+    If SAPtr(mKeyIpad) <> vbNullPtr Then
+        Exit Sub
+    End If
     
     Dim K0() As Byte
-    Select Case CorArray.Length(mKey)
+    Select Case CorArray.LengthFirstDim(mKey)
         Case Is < mKeySize
             K0 = mKey
             ReDim Preserve K0(0 To mKeySize - 1)
