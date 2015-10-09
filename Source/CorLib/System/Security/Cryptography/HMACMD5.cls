@@ -284,7 +284,7 @@ Private Property Get HMAC_Hash() As Byte()
     HMAC_Hash = Hash
 End Property
 
-Private Property Let HMAC_HashName(ByVal Value As String)
+Private Property Let HMAC_HashName(ByRef Value As String)
     HashName = Value
 End Property
 
