@@ -199,7 +199,7 @@ Private Sub AddSystemSecurityCryptography()
         .Add New RIPEMD160ManagedTests
         .Add New HMACSHA1Tests
         .Add New HMACSHA1ManagedTests
-'        .Add New TestHMACSHA256
+        .Add New HMACSHA256Tests
 '        .Add New TestHMACSHA384
 '        .Add New TestHMACSHA512
         .Add New HMACMD5Tests
