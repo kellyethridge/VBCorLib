@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: HMACSHA256
+' Module: HMACSHA256
 '
 
 ''
@@ -47,9 +50,7 @@ Implements KeyedHashAlgorithm
 Implements HMAC
 Implements ICryptoTransform
 
-
 Private mBase As HMACBase
-
 
 
 ''
@@ -64,10 +65,10 @@ End Property
 ''
 ' Sets the name of the hash.
 '
-' @param RHS The name of the hash.
+' @param Value The name of the hash.
 '
-Public Property Let HashName(ByVal RHS As String)
-    mBase.HashName = RHS
+Public Property Let HashName(ByRef Value As String)
+    mBase.HashName = Value
 End Property
 
 ''
@@ -82,10 +83,10 @@ End Property
 ''
 ' Sets the key to be used by the hash.
 '
-' @param RHS The new key value.
+' @param Value The new key value.
 '
-Public Property Let Key(ByRef RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Public Property Let Key(ByRef Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 ''
@@ -149,7 +150,7 @@ End Property
 ' Releases any resources.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -170,7 +171,7 @@ End Function
 ' Resets the hashing algorithm to start again.
 '
 Public Sub Initialize()
-    Call mBase.Initialize
+    mBase.Initialize
 End Sub
 
 ''
@@ -241,23 +242,19 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Key() As Byte)
-    Call mBase.SetKey(Key)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mBase = Cor.NewHMACBase(New SHA256Managed, 64, "SHA256")
 End Sub
 
+Friend Sub Init(ByRef Key() As Byte)
+    mBase.SetKey Key
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   HMAC Interface
+'   HMAC
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get HMAC_CanReuseTransform() As Boolean
     HMAC_CanReuseTransform = CanReuseTransform
@@ -268,7 +265,7 @@ Private Property Get HMAC_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub HMAC_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function HMAC_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -287,8 +284,8 @@ Private Property Get HMAC_Hash() As Byte()
     HMAC_Hash = Hash
 End Property
 
-Private Property Let HMAC_HashName(ByRef RHS As String)
-    HashName = RHS
+Private Property Let HMAC_HashName(ByRef Value As String)
+    HashName = Value
 End Property
 
 Private Property Get HMAC_HashName() As String
@@ -300,15 +297,15 @@ Private Property Get HMAC_HashSize() As Long
 End Property
 
 Private Sub HMAC_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get HMAC_InputBlockSize() As Long
     HMAC_InputBlockSize = InputBlockSize
 End Property
 
-Private Property Let HMAC_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let HMAC_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get HMAC_Key() As Byte()
@@ -333,7 +330,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -349,7 +346,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   HashAlgorithm Interface
+'   HashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get HashAlgorithm_CanReuseTransform() As Boolean
     HashAlgorithm_CanReuseTransform = CanReuseTransform
@@ -360,7 +357,7 @@ Private Property Get HashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub HashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function HashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -384,7 +381,7 @@ Private Property Get HashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub HashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get HashAlgorithm_InputBlockSize() As Long
@@ -409,7 +406,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -437,10 +434,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   KeyedHashAlgorithm Interface
+'   KeyedHashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let KeyedHashAlgorithm_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let KeyedHashAlgorithm_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get KeyedHashAlgorithm_Key() As Byte()
@@ -456,7 +453,7 @@ Private Property Get KeyedHashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub KeyedHashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function KeyedHashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -480,7 +477,7 @@ Private Property Get KeyedHashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub KeyedHashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get KeyedHashAlgorithm_InputBlockSize() As Long
