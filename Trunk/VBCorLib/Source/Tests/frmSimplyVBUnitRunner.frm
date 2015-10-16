@@ -200,7 +200,7 @@ Private Sub AddSystemSecurityCryptography()
         .Add New HMACSHA1Tests
         .Add New HMACSHA1ManagedTests
         .Add New HMACSHA256Tests
-'        .Add New TestHMACSHA384
+'        .Add New HMACSHA384Tests
 '        .Add New TestHMACSHA512
         .Add New HMACMD5Tests
         .Add New HMACRIPEMD160Tests
