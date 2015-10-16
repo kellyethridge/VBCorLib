@@ -252,7 +252,7 @@ End Sub
 '   Class Events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Set mBase = Cor.NewHMACBase(New SHA384Managed, 64, "SHA384")
+    Set mBase = Cor.NewHMACBase(New SHA384Managed, 128, "SHA384")
 End Sub
 
 

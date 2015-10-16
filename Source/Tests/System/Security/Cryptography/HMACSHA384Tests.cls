@@ -86,7 +86,7 @@ Public Sub Key_WithDefaultConstructor_ReturnsRandom64ByteArray()
     Actual = csp.Key
     
     Assert.That CorArray.IsNull(Actual), Iz.False
-    Assert.That CorArray.Length(Actual), Iz.EqualTo(64)
+    Assert.That CorArray.Length(Actual), Iz.EqualTo(128)
     Assert.That Actual, Has.Some.Not.EqualTo(0)
 End Sub
 
