@@ -1,3 +1,4 @@
 VBGROUP 5.0
 Project=CorLib\CorLib.vbp
 Project=Fakes\Fakes.vbp
+StartupProject=Tests\CorLib.Tests.vbp
