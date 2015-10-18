@@ -109,10 +109,10 @@ End Property
 ''
 ' Sets the timeout duration for a read operation.
 '
-' @param RHS The new duration in milliseconds
+' @param Value The new duration in milliseconds
 ' @remarks This always throws an InvalidOperationException.
 '
-Public Property Let ReadTimeout(ByVal RHS As Long)
+Public Property Let ReadTimeout(ByVal Value As Long)
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
@@ -129,10 +129,10 @@ End Property
 ''
 ' Sets the timeout duration for a write operation.
 '
-' @param RHS The new timeout duration in milliseconds.
+' @param Value The new timeout duration in milliseconds.
 ' @remarks This always throws an InvalidOperationException.
 '
-Public Property Let WriteTimeout(ByVal RHS As Long)
+Public Property Let WriteTimeout(ByVal Value As Long)
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
@@ -419,20 +419,14 @@ End Sub
 ' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
 '
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    CheckValidSingleDimArray Buffer, Parameter_Buffer
-    
-    If Offset < 0 Then _
-        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_NeedNonNegNum
-    If Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
-        
+    ValidateByteArrayRange Buffer, Offset, Count, Parameter_Buffer, Parameter_Offset
     EnsureWritable
     EnsureOpen
     EnsureBuffer
     
-    If Count = 0 Then Exit Sub
+    If Count = 0 Then
+        Exit Sub
+    End If
     
     EnsureCapacity mPosition + Count
     CopyMemory mBuffer(mIndex + mPosition), Buffer(Offset), Count
@@ -480,15 +474,7 @@ End Sub
 ' <p>After reading from the stream, the current position will advance the number of byte as returend.</p>
 '
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
-    CheckValidSingleDimArray Buffer, Parameter_Buffer
-    
-    If Offset < 0 Then _
-        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_NeedNonNegNum
-    If Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If LBound(Buffer) + Offset + Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
-    
+    ValidateByteArrayRange Buffer, Offset, Count, Parameter_Buffer, Parameter_Offset
     EnsureOpen
     EnsureBuffer
     
@@ -650,20 +636,17 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mExpandable = True
+    mCapacity = DefaultCapacity
+    mCanWrite = True
+End Sub
+
 Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As Variant, ByVal Writable As Boolean, ByVal Mode As BufferMode)
     Dim Range As ListRange
-    
-    CheckValidSingleDimArray Buffer, Parameter_Buffer
-    
-    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
-    If Range.Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
+    Range = ValidateByteArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
         
     mIndex = Range.Index
     mCapacity = Range.Count
@@ -690,7 +673,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub EnsureBuffer()
     If Not mBufferSet Then
@@ -730,14 +713,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    mExpandable = True
-    mCapacity = DefaultCapacity
-    mCanWrite = True
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
         mBuffer = .ReadProperty("Buffer")
@@ -768,7 +745,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -784,7 +761,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Stream Interface
+'   Stream
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
     Set Stream_BeginRead = BeginRead(Buffer, Offset, Count, Callback, State)
@@ -838,8 +815,8 @@ Private Property Get Stream_Length() As Currency
     Stream_Length = Length
 End Property
 
-Private Property Let Stream_Position(ByVal RHS As Currency)
-    Position = RHS
+Private Property Let Stream_Position(ByVal Value As Currency)
+    Position = Value
 End Property
 
 Private Property Get Stream_Position() As Currency
@@ -854,8 +831,8 @@ Private Function Stream_ReadByte() As Long
     Stream_ReadByte = ReadByte
 End Function
 
-Private Property Let Stream_ReadTimeout(ByVal RHS As Long)
-    ReadTimeout = RHS
+Private Property Let Stream_ReadTimeout(ByVal Value As Long)
+    ReadTimeout = Value
 End Property
 
 Private Property Get Stream_ReadTimeout() As Long
@@ -882,8 +859,8 @@ Private Sub Stream_WriteByte(ByVal Value As Byte)
     Call WriteByte(Value)
 End Sub
 
-Private Property Let Stream_WriteTimeout(ByVal RHS As Long)
-    WriteTimeout = RHS
+Private Property Let Stream_WriteTimeout(ByVal Value As Long)
+    WriteTimeout = Value
 End Property
 
 Private Property Get Stream_WriteTimeout() As Long

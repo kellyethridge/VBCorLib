@@ -170,15 +170,7 @@ End Function
 '
 Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
     VerifyIsOpen
-    
-    If SAPtr(Buffer) = vbNullPtr Then _
-        Error.ArgumentNull "Buffer", ArgumentNull_Array
-    If Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Index + Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
+    ValidateCharArrayRange Buffer, Index, Count, Parameter_Buffer
     
     Dim AvailableChars As Long
     ' We will loop until we have read the
@@ -412,6 +404,10 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal deter
     mIsOpen = True
 End Sub
 
+Private Sub Class_Terminate()
+    CloseReader
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
@@ -498,15 +494,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    CloseReader
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -522,7 +510,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   TextReader Interface
+'   TextReader
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub TextReader_CloseReader()
     CloseReader

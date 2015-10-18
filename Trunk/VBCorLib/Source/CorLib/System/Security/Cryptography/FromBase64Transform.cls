@@ -125,16 +125,14 @@ End Sub
 ' @return The number of bytes transformed.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    If SAPtr(InputBuffer) = vbNullPtr Then _
-        Error.ArgumentNull "InputBuffer", ArgumentNull_Array
+    ValidateByteArray InputBuffer, Parameter_InputBuffer
+    ValidateByteArray OutputBuffer, Parameter_OutputBuffer
     If InputOffset < LBound(InputBuffer) Then _
         Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
     If InputCount < 0 Then _
         Error.ArgumentOutOfRange "InputCount", ArgumentOutOfRange_NeedNonNegNum
     If InputOffset + InputCount - 1 > UBound(InputBuffer) Then _
         Error.Argument Argument_InvalidOffLen
-    If SAPtr(OutputBuffer) = vbNullPtr Then _
-        Error.ArgumentNull "OutputBuffer", ArgumentNull_Array
     If OutputOffset < LBound(OutputBuffer) Then _
         Error.ArgumentOutOfRange "OutputOffset", ArgumentOutOfRange_ArrayLB
     
@@ -207,14 +205,7 @@ End Function
 ' @return The final transformed data.
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    If SAPtr(InputBuffer) = vbNullPtr Then _
-        Error.ArgumentNull "InputBuffer", ArgumentNull_Array
-    If InputOffset < LBound(InputBuffer) Then _
-        Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
-    If InputCount < 0 Then _
-        Error.ArgumentOutOfRange "InputCount", ArgumentOutOfRange_NeedNonNegNum
-    If InputOffset + InputCount - 1 > UBound(InputBuffer) Then _
-        Error.Argument Argument_InvalidOffLen
+    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
 
     Dim Result() As Byte
     If (mBitCount \ 6) + InputCount < 4 Then

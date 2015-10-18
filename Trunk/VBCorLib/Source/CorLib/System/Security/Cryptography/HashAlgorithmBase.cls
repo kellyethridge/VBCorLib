@@ -125,13 +125,7 @@ End Function
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
     VerifyNotDisposed
-    
-    If SAPtr(InputBuffer) = vbNullPtr Then _
-        Error.ArgumentNull "InputBuffer"
-    If InputOffset < LBound(InputBuffer) Then _
-        Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
-    If InputOffset + InputCount - 1 > UBound(InputBuffer) Then _
-        Error.Argument Argument_InvalidOffLen
+    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
     
     HashCore InputBuffer, InputOffset, InputCount
     
@@ -169,13 +163,7 @@ End Function
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
     VerifyNotDisposed
-    
-    If CorArray.IsNull(InputBuffer) Then _
-        Throw Cor.NewArgumentNullException("InputBuffer")
-    If InputOffset < LBound(InputBuffer) Then _
-        Throw Cor.NewArgumentOutOfRangeException("InputOffset", Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If (CorArray.Length(InputBuffer) - InputCount < InputOffset) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
+    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
     
     Dim Result() As Byte
     If InputCount > 0 Then
@@ -333,28 +321,17 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     On Error GoTo Catch
     
     Dim Buffer() As Byte
-    SAPtr(Buffer) = CorArray.ArrayPointer(Source)
-    
-    If SAPtr(Buffer) = vbNullPtr Then _
-        Error.ArgumentNull "Source", ArgumentNull_Array
-    
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
-    If Range.Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Count < 0 Or Range.Count > CorArray.LengthFirstDim(Buffer) Then _
-        Error.Argument Argument_InvalidValue, "Count"
-    If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
-    
+    SAPtr(Buffer) = CorArray.ArrayPointer(Source)
+    Range = ValidateByteArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
     HashCore Buffer, Range.Index, Range.Count
+    
     GoSub Finally
     Exit Sub
     
 Catch:
     GoSub Finally
     Throw
-    
 Finally:
     SAPtr(Buffer) = vbNullPtr
     Return

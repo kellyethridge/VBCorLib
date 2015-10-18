@@ -749,7 +749,7 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef CharCount As Variant)
-    CheckValidSingleDimArray Value, Parameter_Value
+    ValidateArray Value, Parameter_Value
     
     Dim Chars() As Integer
     Chars = AsChars(Value)

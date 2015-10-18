@@ -117,14 +117,7 @@ End Function
 ' @remarks The values in the queue will be cast to the array datatype if possible.
 '
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
-    If CorArray.IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    If CorArray.Rank(Arr) <> 1 Then _
-        Error.Argument Arg_RankException
-    If Index < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Index + mCount - 1 > UBound(Arr) Then _
-        Error.Argument Argument_InvalidOffLen
+    ValidateArrayRange Arr, Index, mCount
         
     If mHead < mTail Then
         CorArray.CopyEx mItems, mHead, Arr, Index, mCount
