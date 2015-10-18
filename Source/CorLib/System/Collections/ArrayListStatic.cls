@@ -75,7 +75,7 @@ End Function
 '
 Public Function FixedSize(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
-        Throw Cor.NewArgumentNullException("List")
+        Error.ArgumentNull "List"
     
     Dim Ret As New FixedSizeArrayList
     Ret.Init List

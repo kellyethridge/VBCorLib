@@ -304,7 +304,7 @@ Private Sub WriteString(ByRef Value As String)
 End Sub
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    Validation.CheckValidSingleDimArray Value, Parameter_Value
+    ValidateArray Value, Parameter_Value
     
     Select Case VarType(Value)
         Case corByteArray
@@ -322,15 +322,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Bytes() As Byte
     Dim Range   As ListRange
     
-    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
-
-    If Range.Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
-
+    Range = ValidateArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
     SAPtr(Bytes) = CorArray.ArrayPointer(Buffer)
     
     On Error GoTo Catch

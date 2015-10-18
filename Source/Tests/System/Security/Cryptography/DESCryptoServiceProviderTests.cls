@@ -51,69 +51,69 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Constructor_WithOutKeyAndIV_AutoGenerates()
-    Dim Csp As New DESCryptoServiceProvider
+    Dim csp As New DESCryptoServiceProvider
     
-    Assert.That Csp.Key, Iz.Not.Empty
-    Assert.That Csp.IV, Iz.Not.Empty
-    Assert.That CorArray.Length(Csp.Key), Iz.EqualTo(8)
-    Assert.That CorArray.Length(Csp.IV), Iz.EqualTo(8)
+    Assert.That csp.Key, Iz.Not.Empty
+    Assert.That csp.IV, Iz.Not.Empty
+    Assert.That CorArray.Length(csp.Key), Iz.EqualTo(8)
+    Assert.That CorArray.Length(csp.IV), Iz.EqualTo(8)
 End Sub
 
 Public Sub Key_WhenSetToNull_ThrowsArgumentNullException()
-    Dim Csp As New DESCryptoServiceProvider
+    Dim csp As New DESCryptoServiceProvider
     Dim NullBytes() As Byte
     
     On Error Resume Next
-    Csp.Key = NullBytes
+    csp.Key = NullBytes
     
     AssertArgumentNullException Err, "Key"
 End Sub
 
 Public Sub Key_WhenSetToInvalidSize_ThrowsArgumentException()
-    Dim Csp As New DESCryptoServiceProvider
+    Dim csp As New DESCryptoServiceProvider
     Dim Key() As Byte
     ReDim Key(0)
     
     On Error Resume Next
-    Csp.Key = Key
+    csp.Key = Key
     
     AssertArgumentException Err, "Key"
 End Sub
 
 Public Sub Key_WhenSet_StoresKey()
-    Dim Csp As New DESCryptoServiceProvider
+    Dim csp As New DESCryptoServiceProvider
     Dim Key() As Byte
     Key = NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
     
-    Csp.Key = Key
+    csp.Key = Key
     
-    Assert.That Csp.Key, Iz.EqualTo(Key)
+    Assert.That csp.Key, Iz.EqualTo(Key)
 End Sub
 
 Public Sub IV_WhenSet_StoresIV()
-    Dim Csp As New DESCryptoServiceProvider
+    Dim csp As New DESCryptoServiceProvider
     Dim IV() As Byte
     IV = NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
     
-    Csp.IV = IV
+    csp.IV = IV
     
-    Assert.That Csp.IV, Iz.EqualTo(IV)
+    Assert.That csp.IV, Iz.EqualTo(IV)
 End Sub
 
 Public Sub KeySize_WithNonLegalSize_ThrowsCrypgraphicException()
-    Dim Csp As New DESCryptoServiceProvider
+    Dim csp As New DESCryptoServiceProvider
     
     On Error Resume Next
-    Csp.KeySize = 128
+    csp.KeySize = 128
     
     AssertCryptographicException Err
 End Sub
 
 Public Sub IV_WhenSetToInvalidSize_ThrowsCryptographicException()
-    Dim Csp As New DESCryptoServiceProvider
+    Dim csp As New DESCryptoServiceProvider
     
     On Error Resume Next
-    Csp.IV = NewBytes(1, 2, 3)
+    csp.IV = NewBytes(1, 2, 3)
     
     AssertCryptographicException Err
 End Sub
@@ -132,5 +132,9 @@ Public Sub IsSemiWeakKey_WithValue_ReturnsExpected(ByRef Key() As Byte, ByVal Ex
     Actual = DES.IsSemiWeakKey(Key)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Encrypt()
+
 End Sub
 
