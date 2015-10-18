@@ -496,14 +496,7 @@ End Function
 Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     VerifyCanRead
     VerifyIsOpen
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
-    
-    If Offset < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
-    If Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Offset + Count - 1 > UBound(Bytes) Then _
-        Error.Argument Argument_InvalidOffLen
+    ValidateByteArrayRange Bytes, Offset, Count, IndexParameter:=Parameter_Offset
     
     If Count = 0 Then
         Exit Function
@@ -656,14 +649,7 @@ End Sub
 Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long)
     VerifyCanWrite
     VerifyIsOpen
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
-    
-    If Offset < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
-    If Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Offset + Count - 1 > UBound(Bytes) Then _
-        Error.Argument Argument_InvalidOffLen
+    ValidateByteArrayRange Bytes, Offset, Count, IndexParameter:=Parameter_Offset
     
     If Count = 0 Then
         Exit Sub

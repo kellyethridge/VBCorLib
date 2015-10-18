@@ -47,11 +47,9 @@ Implements RIPEMD160
 Implements ICryptoTransform
 Implements IHashAlgorithm
 
-
 Private mBase               As HashAlgorithmBase
 Private mState(0 To 4)      As Long
 Private mX(0 To 15)         As Long
-
 
 
 ''

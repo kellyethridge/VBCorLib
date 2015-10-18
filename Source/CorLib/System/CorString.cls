@@ -97,17 +97,8 @@ End Function
 ' @return A string created from the chars in an integer array.
 '
 Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    Validation.CheckValidSingleDimArray Chars, Parameter_Chars
-
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
-    
-    If Range.Index < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Error.Argument Argument_InvalidOffLen
+    Range = ValidateCharArrayOptionalRange(Chars, Index, Count)
     
     If Range.Count = 0 Then
         FromCharArray = ""

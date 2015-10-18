@@ -137,14 +137,14 @@ Public Sub CopyTo_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub CopyTo_WithMultiDimDstArray_ThrowsArgumentException()
+Public Sub CopyTo_WithMultiDimDstArray_ThrowsRankException()
     Dim SUT As New Queue
     Dim DstArray(0 To 2, 0 To 2) As Long
     
     On Error Resume Next
     SUT.CopyTo DstArray, 0
     
-    AssertArgumentException Err
+    AssertRankException Err
 End Sub
 
 Public Sub CopyTo_WhenItemsWontFit_ThrowsArgumentException()

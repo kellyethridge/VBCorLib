@@ -148,17 +148,7 @@ End Sub
 ' to its text representation and embed it in a string.
 '
 Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    CheckValidSingleDimArray Chars, Parameter_Chars
-    
-    Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
-    
-    If Range.Index < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Error.Argument Argument_InvalidOffLen
+    ValidateCharArrayOptionalRange Chars, Index, Count, Parameter_Chars
     
     mSB.Append Chars, Index, Count
 End Sub
