@@ -4,16 +4,16 @@ Option Explicit
 Public SkipUnsupportedTimeZone As Boolean
 
 Public Sub AssertPacificTimeZone()
-    Dim Info As TIME_ZONE_INFORMATION
+    Dim info As TIME_ZONE_INFORMATION
     Dim Result As Long
     
-    Result = GetTimeZoneInformation(Info)
+    Result = GetTimeZoneInformation(info)
     If Result = TIME_ZONE_ID_INVALID Then
         Assert.Fail "Could not discover time zone information"
     End If
     
     Dim StandardName As String
-    StandardName = SysAllocString(VarPtr(Info.StandardName(0)))
+    StandardName = SysAllocString(VarPtr(info.StandardName(0)))
     
     If StandardName <> "Pacific Standard Time" Then
         If SkipUnsupportedTimeZone Then
@@ -174,6 +174,14 @@ Public Sub AssertIOException(ByVal Err As ErrObject)
     End If
 End Sub
 
+Public Sub AssertCryptographicException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is CryptographicException Then
+        WrongException "CryptographicException", Ex
+    End If
+End Sub
+
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
     If Not Catch(AssertExceptionThrown, Err) Then
         Assert.Fail "An exception should be thrown."
@@ -181,5 +189,5 @@ Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
 End Function
 
 Private Sub WrongException(ByVal Expected As String, ByVal Actual As Exception)
-    Assert.Fail "Expected '" & Expected & "' but was '" & TypeName(Actual) & "'."
+    Assert.Fail "Expected '" & Expected & "' but was '" & TypeName(Actual) & "'." & vbCrLf & "Message: " & Actual.Message
 End Sub

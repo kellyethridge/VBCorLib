@@ -290,8 +290,11 @@ End Function
 ' @remarks The bit length of the new value must be of a legal key size.
 '
 Public Sub SetKey(ByRef RgbKey() As Byte)
+    If SAPtr(RgbKey) = vbNullPtr Then _
+        Error.ArgumentNull "Key", ArgumentNull_Array
+        
     Dim Size As Long
-    Size = CorArray.Length(RgbKey)
+    Size = CorArray.LengthFirstDim(RgbKey)
     
     If Not ValidKeySize(Size * 8) Then _
         Throw Cor.NewArgumentException("Invalid key size.", "Key")
