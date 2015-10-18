@@ -668,6 +668,10 @@ Friend Function GetResourceString(ByVal Key As ResourceStringKey, ParamArray Arg
     End If
 End Function
 
+Friend Function GetParameterName(ByVal Key As ParameterResourceKey) As String
+    GetParameterName = LoadResString(Key)
+End Function
+
 Friend Sub VerifyNTMachine()
     If Not IsNT Then
         Throw Cor.NewNotSupportedException("This operation is only supported on Windows NT platforms.")

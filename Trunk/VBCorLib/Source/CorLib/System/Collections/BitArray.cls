@@ -571,7 +571,6 @@ Private Function IEnumerable_NewEnum() As stdole.IUnknown
     Set IEnumerable_NewEnum = NewEnum
 End Function
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

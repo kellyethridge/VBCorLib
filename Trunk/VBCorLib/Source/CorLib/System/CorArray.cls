@@ -135,11 +135,10 @@ End Function
 '
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
+    ValidateArray Arr
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
     
-    CheckValidSingleDimArrayPtr Ptr
-        
     Dim ElementIndex   As Long
     Dim ElementCount   As Long
     ElementIndex = OptionalLong(Index, LBound(Arr))
@@ -191,10 +190,10 @@ End Function
 '
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
+    ValidateArray Arr
+    
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
-    
-    CheckValidSingleDimArrayPtr Ptr
     
     Dim LowerBound As Long
     LowerBound = LBound(Arr)
@@ -325,11 +324,11 @@ End Function
 '
 ' @include "..\Includes\CorArray.Find.txt"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
+    ValidateArray Arr
+    
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
     
-    CheckValidSingleDimArrayPtr Ptr
-
     Dim ElemIndex As Long
     Dim ElemCount As Long
     ElemIndex = OptionalLong(Index, UBound(Arr))
@@ -378,10 +377,10 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
+    ValidateArray Arr
+    
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
-    
-    CheckValidSingleDimArrayPtr Ptr
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(Ptr)
@@ -420,10 +419,10 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
+    ValidateArray Arr
+    
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
-    
-    CheckValidSingleDimArrayPtr Ptr
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(Ptr)
@@ -458,7 +457,7 @@ End Sub
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    CheckValidSingleDimArray Arr
+    ValidateArray Arr
     BinarySearch = InternalBinarySearch(Arr, LBound(Arr), CorArray.LengthFirstDim(Arr), Value, Comparer)
 End Function
 
@@ -481,7 +480,7 @@ End Function
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    CheckValidSingleDimArray Arr
+    ValidateArray Arr
     If Index < LBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Length < 0 Then _
@@ -793,10 +792,10 @@ End Function
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
 Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    ValidateArray Arr
+    
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
-    
-    CheckValidSingleDimArrayPtr Ptr
     
     Dim Range As ListRange
     Range = OptionalStepRange(StartIndex, Count, LBound(Arr), LengthFirstDim(Arr), Parameter_StartIndex)
@@ -846,10 +845,10 @@ End Function
 ' then one less than the lower bound of the array is returned.
 '
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    ValidateArray Arr
+    
     Dim Ptr As Long
     Ptr = ArrayPointer(Arr)
-    
-    CheckValidSingleDimArrayPtr Ptr
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -892,10 +891,10 @@ End Function
 ' @param Count The number of elements to reverse in the array.
 '
 Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Dim Ptr As Long
-    Ptr = CorArray.ArrayPointer(Arr)
+    ValidateArray Arr
     
-    CheckValidSingleDimArrayPtr Ptr
+    Dim Ptr As Long
+    Ptr = ArrayPointer(Arr)
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -1063,11 +1062,12 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
+    ValidateArray Keys, Parameter_Keys
+    
     Dim KeysPtr  As Long
     Dim ItemsPtr As Long
     
     KeysPtr = ArrayPointer(Keys)
-    CheckValidSingleDimArrayPtr KeysPtr, Parameter_Keys
     
     If Index < LBound(Keys) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound

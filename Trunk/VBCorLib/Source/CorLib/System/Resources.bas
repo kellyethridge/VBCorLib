@@ -218,7 +218,9 @@ Public Enum ResourceStringKey
     Overflow_TimeSpan = 1300
     
     UnknownError_Num = 1500
-    
+End Enum
+
+Public Enum ParameterResourceKey
     Parameter_Index = 2000
     Parameter_Count = 2001
     Parameter_StartIndex = 2002
@@ -247,5 +249,4 @@ Public Enum ResourceStringKey
     Parameter_Keys = 2025
     Parameter_Items = 2026
     Parameter_Values = 2027
-    
 End Enum

@@ -454,19 +454,11 @@ Private Function ReadOneChar() As Long
 End Function
 
 Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
-    Dim BufferPtr As Long
+    Dim Range       As ListRange
+    Dim BufferPtr   As Long
+    
+    Range = ValidateArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
     BufferPtr = CorArray.ArrayPointer(Buffer)
-    Validation.CheckValidSingleDimArrayPtr BufferPtr, Parameter_Buffer
-    
-    Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(Buffer), CorArray.LengthFirstDim(Buffer))
-    
-    If Range.Index < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Buffer) Then _
-        Error.Argument Argument_InvalidOffLen
     
     Select Case VarType(Buffer)
         Case corByteArray
