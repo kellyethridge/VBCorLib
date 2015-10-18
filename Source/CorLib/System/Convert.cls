@@ -111,25 +111,22 @@ Option Explicit
 ' @return A string containg the byte array encoded as base-64 characters.
 '
 Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
-    If SAPtr(InArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("InArray", Environment.GetResourceString(ArgumentNull_Array))
+    Dim Range As ListRange
     
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    ElemIndex = OptionalLong(Index, LBound(InArray))
-    ElemCount = OptionalLong(Length, (UBound(InArray) - LBound(InArray) + 1) - ElemIndex)
-    If ElemIndex < LBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NegativeLength))
-    If ElemIndex + ElemCount - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:=Environment.GetResourceString(ArgumentOutOfRange_IndexLength))
+    ValidateByteArray InArray, Parameter_InArray
+    Range = OptionalStepRange(Index, Length, LBound(InArray), CorArray.LengthFirstDim(InArray))
+    If Range.Index < LBound(InArray) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
+    If Range.Index + Range.Count - 1 > UBound(InArray) Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexLength
     
-    ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(ElemCount, InsertLineBreaks))
+    ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(Range.Count, InsertLineBreaks))
     
     Dim Chars() As Integer
     Chars = AllocChars(ToBase64String)
-    ToBase64CharArrayCore InArray, ElemIndex, ElemCount, Chars, 0, InsertLineBreaks
+    ToBase64CharArrayCore InArray, Range.Index, Range.Count, Chars, 0, InsertLineBreaks
     FreeChars Chars
 End Function
 
@@ -149,24 +146,22 @@ End Function
 ' @remarks Added .NET 2.0 ability to insert linebreaks every 76 characters for MIME formatting.
 '
 Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, Optional ByVal InsertLineBreaks As Boolean = False) As Long
-    If SAPtr(InArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("InArray", Environment.GetResourceString(ArgumentNull_Array))
-    If SAPtr(OutArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("OutArray", Environment.GetResourceString(ArgumentNull_Array))
+    ValidateByteArray InArray, Parameter_InArray
+    ValidateCharArray OutArray, Parameter_OutArray
     If IndexIn < LBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Error.ArgumentOutOfRange "IndexIn", ArgumentOutOfRange_LBound
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NegativeLength))
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
     If IndexIn + Length - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Environment.GetResourceString(ArgumentOutOfRange_IndexLength))
+        Error.ArgumentOutOfRange "IndexIn", ArgumentOutOfRange_IndexLength
     If IndexOut < LBound(OutArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("IndexOut", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Error.ArgumentOutOfRange "IndexOut", ArgumentOutOfRange_LBound
         
     Dim Size As Long
     Size = CalculateOutputLength(Length, InsertLineBreaks)
     
     If IndexOut + Size - 1 > UBound(OutArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("IndexOut", Message:=Environment.GetResourceString(ArgumentOutOfRange_OffsetOut))
+        Error.ArgumentOutOfRange "IndexOut", ArgumentOutOfRange_OffsetOut
     
     ToBase64CharArray = ToBase64CharArrayCore(InArray, IndexIn, Length, OutArray, IndexOut, InsertLineBreaks)
 End Function
@@ -181,14 +176,13 @@ End Function
 ' @return A byte array that has been decoded from a base-64 character array.
 '
 Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As Long, ByVal Length As Long) As Byte()
-    If SAPtr(InArray) = vbNullPtr Then _
-        Throw Cor.NewArgumentNullException("InArray", Environment.GetResourceString(ArgumentNull_Array))
+    ValidateCharArray InArray, Parameter_InArray
     If IndexIn < LBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Environment.GetResourceString(ArgumentOutOfRange_LBound))
+        Error.ArgumentOutOfRange "IndexIn", ArgumentOutOfRange_LBound
     If Length < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Length", Message:=Environment.GetResourceString(ArgumentOutOfRange_NegativeLength))
+        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
     If IndexIn + Length - 1 > UBound(InArray) Then _
-        Throw Cor.NewArgumentOutOfRangeException("IndexIn", Message:=Environment.GetResourceString(ArgumentOutOfRange_IndexLength))
+        Error.ArgumentOutOfRange "IndexIn", ArgumentOutOfRange_IndexLength
     
     Dim Ret() As Byte
     SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, Length)
@@ -209,11 +203,11 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
                 
             Case &H20, &H9, &HA, &HB, &HC, &HD, &H85, &HA0
                 If TermCount > 0 Then _
-                    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                    Error.Format Format_InvalidBase64Character
                     
             Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar, corZeroChar To corNineChar, corPlusChar, corForwardSlashChar
                 If TermCount > 0 Then _
-                    Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                    Error.Format Format_InvalidBase64Character
                 
                 Bits = (Bits * &H40) Or Base64CharToBits(InArray(i))
                 bitCount = bitCount + 6
@@ -226,14 +220,15 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
                 CharCount = CharCount + 1
             
             Case Else
-                Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+                Error.Format Format_InvalidBase64Character
+
         End Select
         If TermCount > 2 Then _
-            Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidBase64Character))
+            Error.Format Format_InvalidBase64Character
     Next i
     
     If (CharCount Mod 4) <> 0 Then _
-        Throw Cor.NewFormatException(Environment.GetResourceString(Format_InvalidNumberOfCharacters))
+        Error.Format Format_InvalidNumberOfCharacters
     
     Do While bitCount >= 8
         Ret(j) = Helper.ShiftRight(Bits, bitCount - 8) And &HFF

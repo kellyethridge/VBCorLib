@@ -249,4 +249,6 @@ Public Enum ParameterResourceKey
     Parameter_Keys = 2025
     Parameter_Items = 2026
     Parameter_Values = 2027
+    Parameter_InArray = 2028
+    Parameter_OutArray = 2029
 End Enum
