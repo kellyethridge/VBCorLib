@@ -200,6 +200,7 @@ Public Enum ResourceStringKey
     InvalidOperation_ReadOnly = 1106
     InvalidOperation_Timeouts = 1107
     InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
+    InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple = 1109
     
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001

@@ -85,6 +85,7 @@ Private mLength         As Long
 Private mIsClosed       As Boolean
 Private mExpandable     As Boolean
 Private mIndex          As Long
+Private mAsyncPtr       As Long
 
 
 ''
@@ -159,7 +160,7 @@ Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
     Dim Result As StreamAsyncResult
     Set Result = Cor.NewStreamAsyncResult(State)
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     Result.BytesRead = ReadBlock(Buffer, Offset, Count)
     Result.IsCompleted = True
     Result.IsReadType = True
@@ -168,12 +169,13 @@ Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
         Callback.Execute Result
     End If
 
-errTrap:
+Catch:
     Dim Ex As Exception
     If Catch(Ex, Err) Then
         Set Result.Exception = Ex
     End If
     
+    mAsyncPtr = ObjPtr(Result)
     Set BeginRead = Result
 End Function
 
@@ -215,6 +217,7 @@ Catch:
         Set Result.Exception = Ex
     End If
     
+    mAsyncPtr = ObjPtr(Result)
     Set BeginWrite = Result
 End Function
 
@@ -233,17 +236,20 @@ End Function
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
         Error.ArgumentNull "AsyncResult"
-    If Not TypeOf AsyncResult Is StreamAsyncResult Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     
     Dim Result As StreamAsyncResult
-    Set Result = AsyncResult
+    Set Result = StrongPtr(mAsyncPtr)
+    If Result Is Nothing Then _
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
+    If Not Result Is AsyncResult Then _
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     If Not Result.IsReadType Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
-    If Result.EndCalled Then _
-        Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple, "AsyncResult"
     
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    mAsyncPtr = vbNullPtr
+    If Not Result.Exception Is Nothing Then
+        Throw Result.Exception
+    End If
     
     EndRead = Result.BytesRead
 End Function
@@ -262,18 +268,20 @@ End Function
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
         Throw Cor.NewArgumentNullException("AsyncResult")
-    If Not TypeOf AsyncResult Is StreamAsyncResult Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     
     Dim Result As StreamAsyncResult
-    Set Result = AsyncResult
+    Set Result = StrongPtr(mAsyncPtr)
+    If Result Is Nothing Then _
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple, "AsyncResult"
+    If Not Result Is AsyncResult Then _
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
     If Result.IsReadType Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
-    If Result.EndCalled Then _
-        Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
-
-    If Not Result.Exception Is Nothing Then _
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple, "AsyncResult"
+    
+    mAsyncPtr = vbNullPtr
+    If Not Result.Exception Is Nothing Then
         Throw Result.Exception
+    End If
 End Sub
 
 ''
@@ -558,7 +566,7 @@ Public Sub SetLength(ByVal Value As Currency)
             Next i
         Case Is > mCapacity
             Capacity = Value
-        Case Is < 0@
+        Case Is < 0
             Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
     End Select
     
@@ -577,10 +585,10 @@ Public Function ToArray() As Byte()
     EnsureBuffer
     
     If mLength > 0 Then
-        Dim Ret() As Byte
-        ReDim Ret(0 To mLength - 1)
-        CopyMemory Ret(0), mBuffer(mIndex), mLength
-        ToArray = Ret
+        Dim Result() As Byte
+        ReDim Result(0 To mLength - 1)
+        CopyMemory Result(0), mBuffer(mIndex), mLength
+        ToArray = Result
     Else
         ToArray = Cor.NewBytes
     End If
