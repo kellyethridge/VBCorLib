@@ -60,23 +60,20 @@ End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Initialization
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
     Set mBase = Cor.NewSafeHandle(PreexistingHandle, OwnsHandle)
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
     CloseHandle
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SafeHandle Interface
+'   SafeHandle
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub mBase_ReleaseHandle()
     FindClose DangerousGetHandle

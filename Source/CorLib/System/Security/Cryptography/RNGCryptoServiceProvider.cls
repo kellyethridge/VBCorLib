@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: RNGCryptoServiceProvider
+' Module: RNGCryptoServiceProvider
 '
 
 ''
@@ -43,21 +46,19 @@ Implements RandomNumberGenerator
 Private mProvider As Long
 
 
-
 ''
 ' Fills an array of bytes with random values.
 '
 ' @param Data The byte array to be filled.
 '
 Public Sub GetBytes(ByRef Data() As Byte)
-    Call VerifyProvider
+    VerifyProvider
     
     If CorArray.IsNull(Data) Then _
-        Throw Cor.NewArgumentNullException("Date", Environment.GetResourceString(ArgumentNull_Array))
-    
+        Error.ArgumentNull "Data", ArgumentNull_Array
+        
     If CryptGenRandom(mProvider, CorArray.Length(Data), Data(LBound(Data))) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
-    
 End Sub
 
 ''
@@ -72,20 +73,22 @@ Public Sub GetNonZeroBytes(ByRef Data() As Byte)
     ' random values, banking on the odds that half of
     ' it will not be zeros.
     ReDim BigData(CorArray.Length(Data) * 2 - 1)
-    Call GetBytes(BigData)
+    GetBytes BigData
     
-    Dim j As Long
+    Dim ubData  As Long
+    Dim j       As Long
+    Dim i       As Long
+    
     j = LBound(Data)
+    ubData = UBound(Data)
     
-    Dim ub As Long
-    ub = UBound(Data)
-    
-    Dim i As Long
     For i = 0 To UBound(BigData)
         If BigData(i) <> 0 Then
             Data(j) = BigData(i)
             j = j + 1
-            If j > ub Then Exit Sub
+            If j > ubData Then
+                Exit Sub
+            End If
         End If
     Next i
 End Sub
@@ -127,36 +130,36 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal CspParams As CspParameters)
     If CspParams Is Nothing Then _
-        Throw Cor.NewArgumentNullException("CspParams")
+        Error.ArgumentNull "CspParams"
     
     With CspParams
         mProvider = CryptoAPI.AcquireContext(.KeyContainerName, .ProviderName, .ProviderType, .Flags)
     End With
 End Sub
 
+Private Sub Class_Terminate()
+    If mProvider <> 0 Then
+        CryptoAPI.ReleaseContext mProvider, True
+    End If
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyProvider()
-    If mProvider = 0 Then Call Init(Cor.NewCspParameters(PROV_RSA_AES))
+    If mProvider = vbNullPtr Then
+        Init Cor.NewCspParameters(PROV_RSA_AES)
+    End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    If mProvider <> 0 Then Call CryptoAPI.ReleaseContext(mProvider, True)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -172,14 +175,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   RandomNumberGenerator Interface
+'   RandomNumberGenerator
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function RandomNumberGenerator_Equals(Value As Variant) As Boolean
     RandomNumberGenerator_Equals = Equals(Value)
 End Function
 
 Private Sub RandomNumberGenerator_GetBytes(Data() As Byte)
-    Call GetBytes(Data)
+    GetBytes Data
 End Sub
 
 Private Function RandomNumberGenerator_GetHashCode() As Long
@@ -187,7 +190,7 @@ Private Function RandomNumberGenerator_GetHashCode() As Long
 End Function
 
 Private Sub RandomNumberGenerator_GetNonZeroBytes(Data() As Byte)
-    Call GetNonZeroBytes(Data)
+    GetNonZeroBytes Data
 End Sub
 
 Private Function RandomNumberGenerator_ToString() As String
