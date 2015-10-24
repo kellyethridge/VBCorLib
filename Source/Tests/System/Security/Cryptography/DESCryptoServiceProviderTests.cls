@@ -134,7 +134,3 @@ Public Sub IsSemiWeakKey_WithValue_ReturnsExpected(ByRef Key() As Byte, ByVal Ex
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Encrypt()
-
-End Sub
-

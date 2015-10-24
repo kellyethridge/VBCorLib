@@ -221,9 +221,8 @@ Private Sub AddSystemSecurityCryptography()
 '            New TestCryptoStreamMultiBlock)
 '
         .Add NewSuite("DESCryptoServiceProvider", _
-            New DESCryptoServiceProviderTests)
-'            New TestDESWeakKeys, _
-'            New TestDESEncryption, _
+            New DESCryptoServiceProviderTests, _
+            New DESEncryptionTests)
 '            New TestDESPaddingModes, _
 '            New TestDESDecryption)
 '
