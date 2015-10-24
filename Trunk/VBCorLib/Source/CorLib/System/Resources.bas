@@ -33,7 +33,7 @@ Public Enum ResourceStringKey
     UnauthorizedAccess_IODenied_NoPathName = 107
     UnauthorizedAccess_IODenied_Path = 108
     XMLSyntax_InvalidSyntax = 109
-    Cryptography_HashNotYetFinalized = 110
+
     
     Arg_PathIllegal = 200
     Arg_PathIllegalUNC = 201
@@ -166,8 +166,6 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_Bounds_Lower_Upper = 736
     ArgumentOutOfRange_DecimalScale = 737
     
-    
-    
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
     IO_FileTooLong2GB = 402
@@ -180,6 +178,9 @@ Public Enum ResourceStringKey
     IO_SharingViolation_NoFileName = 409
     IO_SharingViolation_File = 410
     IO_FileExists_Name = 411
+    
+    Cryptography_HashNotYetFinalized = 500
+    Cryptography_CSP_CFBSizeNotSupported = 501
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601

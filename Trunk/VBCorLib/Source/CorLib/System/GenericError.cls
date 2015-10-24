@@ -82,3 +82,7 @@ Friend Sub Format(ByVal Key As ResourceStringKey)
     Throw Cor.NewFormatException(Environment.GetResourceString(Key))
 End Sub
 
+Friend Sub Cryptographic(ByVal Key As ResourceStringKey)
+    Throw Cor.NewCryptographicException(Environment.GetResourceString(Key))
+End Sub
+

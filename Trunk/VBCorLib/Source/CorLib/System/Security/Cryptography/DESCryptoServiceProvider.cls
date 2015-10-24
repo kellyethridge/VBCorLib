@@ -94,7 +94,6 @@ End Property
 ' Returns the Feedback Size in bits.
 '
 ' @return The Feedback size in bits.
-' @remarks Always returns 64 bits.
 '
 Public Property Get FeedbackSize() As Long
     FeedbackSize = mBase.FeedbackSize
@@ -104,7 +103,6 @@ End Property
 ' Sets the Feedback size in bits.
 '
 ' @param Value The new feedback size in bits.
-' @remarks Only 64 bits is valid.
 '
 Public Property Let FeedbackSize(ByVal Value As Long)
     mBase.FeedbackSize = Value
@@ -314,7 +312,9 @@ End Function
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
     If IsMissing(RgbKey) <> IsMissing(RgbIV) Then _
         Throw Cor.NewArgumentException("Argument is missing.", IIf(IsMissing(RgbKey), "RgbKey", "RgbIV"))
-    
+    If Mode = CipherMode.CFB And FeedbackSize <> 8 Then _
+        Error.Cryptographic Cryptography_CSP_CFBSizeNotSupported
+        
     Set CreateCipher = New CryptoAPITransform
     CreateCipher.Init CALG_DES, mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting
 End Function
