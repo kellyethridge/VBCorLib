@@ -46,15 +46,9 @@ Implements IObject
 Implements SymmetricAlgorithm
 Implements DES
 
-Private Const DEF_BLOCKSIZE     As Long = 64
-Private Const DEF_MINBLOCKSIZE  As Long = DEF_BLOCKSIZE
-Private Const DEF_MAXBLOCKSIZE  As Long = DEF_BLOCKSIZE
-Private Const DEF_BLOCKSKIPSIZE As Long = 0
-Private Const DEF_FEEDBACKSIZE  As Long = 8
-Private Const DEF_MINKEYSIZE    As Long = 64
-Private Const DEF_MAXKEYSIZE    As Long = 64
-Private Const DEF_KEYSIZE       As Long = DEF_MINKEYSIZE
-Private Const DEF_KEYSKIPSIZE   As Long = 0
+Private Const LegalBlockSize        As Long = 64
+Private Const LegalKeySize          As Long = 64
+Private Const DefaultFeedbackSize   As Long = 8
 
 Private WithEvents mBase As SymmetricAlgorithmBase
 Attribute mBase.VB_VarHelpID = -1
@@ -312,7 +306,7 @@ End Function
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
     If IsMissing(RgbKey) <> IsMissing(RgbIV) Then _
         Throw Cor.NewArgumentException("Argument is missing.", IIf(IsMissing(RgbKey), "RgbKey", "RgbIV"))
-    If Mode = CipherMode.CFB And FeedbackSize <> 8 Then _
+    If Mode = CipherMode.CFB And FeedbackSize <> DefaultFeedbackSize Then _
         Error.Cryptographic Cryptography_CSP_CFBSizeNotSupported
         
     Set CreateCipher = New CryptoAPITransform
@@ -326,11 +320,11 @@ End Function
 Private Sub Class_Initialize()
     Set mBase = New SymmetricAlgorithmBase
     With mBase
-        .AddLegalBlockSize DEF_MINBLOCKSIZE, DEF_MAXBLOCKSIZE, DEF_BLOCKSKIPSIZE
-        .AddLegalKeySize DEF_MINKEYSIZE, DEF_MAXKEYSIZE, DEF_KEYSKIPSIZE
-        .BlockSize = DEF_BLOCKSIZE
-        .KeySize = DEF_KEYSIZE
-        .FeedbackSize = DEF_FEEDBACKSIZE
+        .AddLegalBlockSize LegalBlockSize, LegalBlockSize, 0
+        .AddLegalKeySize LegalKeySize, LegalKeySize, 0
+        .BlockSize = LegalBlockSize
+        .KeySize = LegalKeySize
+        .FeedbackSize = DefaultFeedbackSize
         .Mode = CipherMode.CBC
         .Padding = PaddingMode.PKCS7
     End With

@@ -58,7 +58,6 @@ Private mKeepLastBlock      As Boolean
 Private mHasLastBlock       As Boolean
 
 
-
 ''
 ' Returns if the current transfrom can be reused after calling TransformFinalBlock.
 '
@@ -142,16 +141,9 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
     ' an exact multiple of mBlockSize. There can be no partial blocks.
     If (InputCount <= 0) Or (InputCount Mod mBlockSize <> 0) Then _
         Throw Cor.NewArgumentException("Invalid value.", "InputCount")
-
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(InputBuffer), InputOffset, InputCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "InputBuffer", InputOffset, "InputOffset", InputCount, "InputCount", False)
-
-    ' We can use the InputCount for the number of bytes to be outputted because
-    ' this cipher keeps the original number of bytes in the encrypted output, except
-    ' for any padding which is not added in this process.
-    Result = VerifyArrayRange(SAPtr(OutputBuffer), OutputOffset, InputCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "OutputBuffer", OutputOffset, "OutputOffset", InputCount, "", False)
+    
+    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
+    ValidateByteArrayRange OutputBuffer, OutputOffset, InputCount, Parameter_OutputBuffer, Parameter_OutputOffset, Parameter_InputCount
 
     If mIsEncrypting Then
         TransformBlock = EncryptBlock(InputBuffer, InputOffset, InputCount, OutputBuffer, OutputOffset)
@@ -170,12 +162,7 @@ End Function
 ' @remarks Once a final block has been processed, the transform is reset to begin transforming new data.
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    If CorArray.IsNull(InputBuffer) Then _
-        Throw Cor.NewArgumentNullException("InputBuffer")
-    If InputOffset < LBound(InputBuffer) Then _
-        Throw Cor.NewArgumentOutOfRangeException("InputOffset", Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If (CorArray.Length(InputBuffer) - InputCount < InputOffset) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
+    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
 
     If mIsEncrypting Then
         TransformFinalBlock = EncryptFinalBlock(InputBuffer, InputOffset, InputCount)
@@ -305,7 +292,7 @@ Private Function EncryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
 
     ' Size will be set to the total bytes encrypted, including the additional block of padding.
     ' We don't want that additional block of padding from the CryptoAPI since we've added our own,
-    ' so we will just strip of the last block of bytes.
+    ' so we will just strip off the last block of bytes.
     Dim NewSize As Long
     NewSize = Size - mBlockSize
     If NewSize > 0 Then
