@@ -258,4 +258,5 @@ Public Enum ParameterResourceKey
     Parameter_InputOffset = 2032
     Parameter_InputCount = 2033
     Parameter_OutputBuffer = 2034
+    Parameter_OutputOffset = 2035
 End Enum
