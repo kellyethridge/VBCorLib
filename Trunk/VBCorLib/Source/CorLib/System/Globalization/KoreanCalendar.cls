@@ -158,7 +158,7 @@ Public Function GetSecond(ByRef Time As Variant) As Long
 End Function
 
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
-    GetWeekOfYear = InternalGetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
+    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function
 
 Public Function GetYear(ByRef Time As Variant) As Long
@@ -403,7 +403,7 @@ End Property
 '   Class events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    mTwoDigitYearMax = GetCalendarLong(CAL_KOREA, CAL_ITWODIGITYEARMAX)
+    mTwoDigitYearMax = Statics.Calendar.GetCalendarInfoInt32(CAL_KOREA, CAL_ITWODIGITYEARMAX)
 End Sub
 
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
