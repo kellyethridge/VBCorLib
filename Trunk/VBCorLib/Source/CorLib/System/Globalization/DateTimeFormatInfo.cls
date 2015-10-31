@@ -329,10 +329,9 @@ Public Property Get IsReadOnly() As Boolean
     IsReadOnly = mProps.IsReadOnly
 End Property
 
-' for internal use only.
-Friend Property Let IsReadOnly(ByVal Value As Boolean)
-    mProps.IsReadOnly = Value
-End Property
+Friend Sub MarkReadOnly()
+    mProps.IsReadOnly = True
+End Sub
 
 ''
 ' Returns a pattern for formatting just the date portion and is
@@ -779,8 +778,8 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub InitClone(ByRef props As PropsType)
-    mProps = props
+Friend Sub InitClone(ByRef Props As PropsType)
+    mProps = Props
 End Sub
 
 Friend Sub Init(ByVal LCID As Long, ByVal UseUserOverride As Boolean, Optional ByVal Calendar As Calendar)
@@ -796,6 +795,13 @@ Friend Sub Init(ByVal LCID As Long, ByVal UseUserOverride As Boolean, Optional B
         LoadFromCultureTable LCID
     End If
     mLoaded = True
+End Sub
+
+Friend Sub InitCultureInfo(ByVal Info As CultureInfo)
+    Init Info.LCID, Info.UseUserOverride, Info.Calendar
+    If Info.IsReadOnly Then
+        MarkReadOnly
+    End If
 End Sub
 
 

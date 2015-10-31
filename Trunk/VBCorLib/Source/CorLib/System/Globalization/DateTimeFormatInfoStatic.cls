@@ -85,7 +85,7 @@ Public Function ReadOnly(ByVal Info As DateTimeFormatInfo) As DateTimeFormatInfo
         Set ReadOnly = Info
     Else
         Set ReadOnly = Info.Clone
-        ReadOnly.IsReadOnly = True
+        ReadOnly.MarkReadOnly
     End If
 End Function
 

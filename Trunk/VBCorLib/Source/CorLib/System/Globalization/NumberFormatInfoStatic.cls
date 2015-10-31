@@ -92,7 +92,7 @@ Public Function ReadOnly(ByVal Info As NumberFormatInfo) As NumberFormatInfo
         Set ReadOnly = Info
     Else
         Set ReadOnly = Info.Clone
-        ReadOnly.IsReadOnly = True
+        ReadOnly.MarkReadOnly
     End If
 End Function
 

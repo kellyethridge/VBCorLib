@@ -335,10 +335,9 @@ Public Property Get IsReadOnly() As Boolean
     IsReadOnly = mProps.IsReadOnly
 End Property
 
-' for internal use only.
-Friend Property Let IsReadOnly(ByVal RHS As Boolean)
-    mProps.IsReadOnly = RHS
-End Property
+Friend Sub MarkReadOnly()
+    mProps.IsReadOnly = True
+End Sub
 
 ''
 ' Returns a clone of this instance.
@@ -347,7 +346,7 @@ End Property
 ' @remarks The <b>IsReadOnly</b> is passed to the clone, aswell.
 Public Function Clone() As NumberFormatInfo
     Set Clone = New NumberFormatInfo
-    Clone.CloneHelper mProps
+    Clone.InitClone mProps
 End Function
 
 ''
@@ -1017,10 +1016,6 @@ Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function Format(ByRef Value As Variant, Optional ByRef FormatText As String) As String
     VerifyLoaded
     
@@ -1042,12 +1037,55 @@ Friend Function Format(ByRef Value As Variant, Optional ByRef FormatText As Stri
     End Select
 End Function
 
-Friend Sub CloneHelper(ByRef props As PropsType)
-    mProps = props
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitPatterns
+    
+    With mNumber.DigitsSA
+        .cbElements = 1
+        .cDims = 1
+        .cElements = 128
+    End With
+    
+    mPtrNumberBuffer = CoTaskMemAlloc(40)
+    If mPtrNumberBuffer = vbNullPtr Then _
+        Throw New OutOfMemoryException
+    
+    SAPtr(mNumber.Digits) = VarPtr(mNumber.DigitsSA)
+    
+    InitChars mAppendStringBuffer
+    InitChars mFormatSpecifier
+End Sub
+
+Private Sub Class_InitProperties()
+    mProps.PerMilleSymbol = ChrW$(&H2030)
+End Sub
+
+Friend Sub InitCultureInfo(ByVal Info As CultureInfo)
+    Load Info.LCID, Info.UseUserOverride
+    If Info.IsReadOnly Then
+        MarkReadOnly
+    End If
+End Sub
+
+Friend Sub InitClone(ByRef Props As PropsType)
+    mProps = Props
     mLoaded = True
 End Sub
 
-Friend Sub Load(ByVal LCID As Long, ByVal UseUserOverride As Boolean)
+Private Sub Class_Terminate()
+    SAPtr(mNumber.Digits) = 0
+    CoTaskMemFree mPtrNumberBuffer
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Load(ByVal LCID As Long, ByVal UseUserOverride As Boolean)
     If Not CultureTable.IsLoaded Then _
         Throw Cor.NewNotSupportedException("Cannot load NumberFormatInfo without culture table.")
     
@@ -1066,10 +1104,6 @@ Private Sub VerifyLoaded()
     Load INVARIANT_LCID, False
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub LoadUserOverride(ByVal LCID As Long)
     With mProps
         .NumberDecimalSeparator = GetLocaleString(LCID, LOCALE_SDECIMAL)
@@ -2315,31 +2349,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    InitPatterns
-    
-    With mNumber.DigitsSA
-        .cbElements = 1
-        .cDims = 1
-        .cElements = 128
-    End With
-    
-    mPtrNumberBuffer = CoTaskMemAlloc(40)
-    If mPtrNumberBuffer = vbNullPtr Then _
-        Throw New OutOfMemoryException
-    
-    SAPtr(mNumber.Digits) = VarPtr(mNumber.DigitsSA)
-    
-    InitChars mAppendStringBuffer
-    InitChars mFormatSpecifier
-End Sub
-
-Private Sub Class_InitProperties()
-    mProps.PerMilleSymbol = ChrW$(&H2030)
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With mProps
         .CurrencyDecimalDigits = PropBag.ReadProperty(PROP_CURRENCYDECIMALDIGITS)
@@ -2370,12 +2381,6 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
         .IsReadOnly = PropBag.ReadProperty(PROP_ISREADONLY)
     End With
     mLoaded = True
-End Sub
-
-
-Private Sub Class_Terminate()
-    SAPtr(mNumber.Digits) = 0
-    CoTaskMemFree mPtrNumberBuffer
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
@@ -2410,9 +2415,8 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
 End Sub
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -2428,7 +2432,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone
@@ -2436,7 +2440,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IFormatProvider Interface
+'   IFormatProvider
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IFormatProvider_GetFormat(ByRef FormatType As String) As Object
     Set IFormatProvider_GetFormat = GetFormat(FormatType)

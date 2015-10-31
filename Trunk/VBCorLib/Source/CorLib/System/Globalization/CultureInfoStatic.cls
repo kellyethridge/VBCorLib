@@ -80,7 +80,7 @@ Public Function ReadOnly(ByVal Culture As CultureInfo) As CultureInfo
         Set ReadOnly = Culture
     Else
         Set ReadOnly = Culture.Clone
-        ReadOnly.IsReadOnly = True
+        ReadOnly.MarkReadOnly
     End If
 End Function
 
@@ -111,7 +111,7 @@ End Property
 Public Property Get InvariantCulture() As CultureInfo
     If mInvariantCulture Is Nothing Then
         Set mInvariantCulture = Cor.NewCultureInfo(INVARIANT_LCID)
-        mInvariantCulture.IsReadOnly = True
+        mInvariantCulture.MarkReadOnly
     End If
     Set InvariantCulture = mInvariantCulture
 End Property
@@ -126,7 +126,7 @@ End Property
 Public Property Get CurrentUICulture() As CultureInfo
     If mCurrentUICulture Is Nothing Then
         Set mCurrentUICulture = Cor.NewCultureInfo(GetUserDefaultUILanguage)
-        mCurrentUICulture.IsReadOnly = True
+        mCurrentUICulture.MarkReadOnly
     End If
     Set CurrentUICulture = mCurrentUICulture
 End Property
@@ -141,7 +141,7 @@ End Property
 Public Property Get InstalledUICulture() As CultureInfo
     If mInstalledUICulture Is Nothing Then
         Set mInstalledUICulture = Cor.NewCultureInfo(GetSystemDefaultUILanguage)
-        mInstalledUICulture.IsReadOnly = True
+        mInstalledUICulture.MarkReadOnly
     End If
     Set InstalledUICulture = mInstalledUICulture
 End Property
