@@ -241,7 +241,7 @@ Public Function GetSecond(ByRef Time As Variant) As Long
 End Function
 
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
-    GetWeekOfYear = InternalGetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
+    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function
 
 Public Function GetYear(ByRef Time As Variant) As Long

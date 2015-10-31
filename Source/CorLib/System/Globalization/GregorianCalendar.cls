@@ -379,7 +379,7 @@ End Function
 ' @return The week that the date belongs to.
 '
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
-    GetWeekOfYear = InternalGetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
+    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function
 
 ''
@@ -691,7 +691,7 @@ End Property
 '   Class events
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
-    mTwoDigitYearMax = GetCalendarLong(CAL_GREGORIAN, CAL_ITWODIGITYEARMAX)
+    mTwoDigitYearMax = Statics.Calendar.GetCalendarInfoInt32(CAL_GREGORIAN, CAL_ITWODIGITYEARMAX)
     mCalendarType = GregorianCalendarTypes.Localized
 End Sub
 

@@ -53,3 +53,61 @@ Option Explicit
 Public Property Get CurrentEra() As Long
     CurrentEra = 0
 End Property
+
+''
+' Many of the calendars calculate the week of the year the same way,
+' so wrap up a function here to let them all share.
+'
+' @param Time The Date to calculate the week of the year from.
+' @param Rule How to determine what the first week of the year is.
+' @param FirstDayOfWeek Which day of the week is the start of the week.
+' @param Cal The Calendar to be used for specific calculations.
+' @return The week of the year.
+'
+Friend Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek, ByVal Cal As Calendar) As Long
+    Dim FirstWeekLength As Long
+    Dim Offset          As Long
+    Dim dt              As CorDateTime
+    Dim WholeWeeks      As Long
+    Dim doy             As Long
+
+    Set dt = CorDateTime.GetDateTime(Time)
+
+    FirstWeekLength = FirstDayOfWeek - Cal.GetDayOfWeek(Cal.ToDateTime(Cal.GetYear(dt), 1, 1, 0, 0, 0, 0))
+    If FirstWeekLength < 0 Then FirstWeekLength = FirstWeekLength + 7
+
+    Select Case Rule
+        Case FirstDay:              If FirstWeekLength > 0 Then Offset = 1
+        Case FirstFullWeek:         If FirstWeekLength >= 7 Then Offset = 1
+        Case FirstFourDayWeek:      If FirstWeekLength >= 4 Then Offset = 1
+    End Select
+
+    doy = Cal.GetDayOfYear(dt)
+    If doy > FirstWeekLength Then
+        WholeWeeks = (doy - FirstWeekLength) \ 7
+        If WholeWeeks * 7 + FirstWeekLength < doy Then Offset = Offset + 1
+    End If
+
+    GetWeekOfYear = WholeWeeks + Offset
+    If GetWeekOfYear = 0 Then
+        Dim Year    As Long
+        Dim Month   As Long
+        
+        Year = Cal.GetYear(dt) - 1
+        Month = Cal.GetMonthsInYear(Year)
+        GetWeekOfYear = GetWeekOfYear(Cal.ToDateTime(Year, Month, Cal.GetDaysInMonth(Year, Month), 0, 0, 0, 0), Rule, FirstDayOfWeek, Cal)
+    End If
+End Function
+
+''
+' Gets a numeric value from the system calendar settings.
+'
+' @param Cal The calendar to get the value from.
+' @param CalType The type of value to get from the calendar.
+' @return The numeric value from the calendar on the system.
+'
+Friend Function GetCalendarInfoInt32(ByVal Cal As Long, ByVal CalType As Long) As Long
+    If GetCalendarInfo(LOCALE_USER_DEFAULT, Cal, CalType Or CAL_RETURN_NUMBER, vbNullString, 0, GetCalendarInfoInt32) = BOOL_FALSE Then
+        Error.Win32Error Err.LastDllError
+    End If
+End Function

@@ -206,7 +206,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
 End Function
 
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
-    GetWeekOfYear = InternalGetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
+    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function
 
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
