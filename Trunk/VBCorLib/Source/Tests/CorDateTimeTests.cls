@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' CorDateTimeTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -421,11 +424,10 @@ Public Sub DaysInMonth_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Mont
 End Sub
 
 Public Sub DaysInMonth_WithInvalidValues_ThrowsArgumentOutOfRangeException(ByVal Year As Long, ByVal Month As Long, ByVal ParameterName As String)
-    On Error GoTo errTrap
+    On Error Resume Next
     
     CorDateTime.DaysInMonth Year, Month
     
-errTrap:
     AssertArgumentOutOfRangeException Err, ParameterName
 End Sub
 
@@ -476,25 +478,23 @@ Public Sub Subtract_WithDate_ReturnsExpected(ByVal DateToSubtract As Variant, By
 End Sub
 
 Public Sub Subtract_WithNothing_ThrowsArgumentNullException()
-    On Error GoTo errTrap
     Dim dt As CorDateTime
     Set dt = NewDate(#1/1/2001#)
     
+    On Error Resume Next
     dt.Subtract Nothing
     
-errTrap:
     AssertArgumentNullException Err, "Value"
 End Sub
 
 Public Sub Subtract_WithNonSupportedObject_ThrowsArgumentException()
-    On Error GoTo errTrap
     Dim dt As CorDateTime
     Set dt = NewDate(#1/1/2001#)
     
+    On Error Resume Next
     Dim Value As New Collection
     dt.Subtract Value
     
-errTrap:
     AssertArgumentException Err, "Value"
 End Sub
 
@@ -648,7 +648,6 @@ Public Sub FromBinary_WhenCalled_ReturnsExpected()
     Assert.AreEqual 57, Actual.Minute
     Assert.AreEqual 15, Actual.Second
 End Sub
-'205, 6, 7, 20, 57, 15
 
 Public Sub ToBinary_WhenCalled_ReturnsCompositeTicksAndKind()
     AssertPacificTimeZone

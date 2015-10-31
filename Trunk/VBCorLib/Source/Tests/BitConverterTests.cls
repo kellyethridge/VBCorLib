@@ -12,7 +12,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestBitConverter
+' BitConverterTests
 '
 Option Explicit
 Implements ITestCaseSource

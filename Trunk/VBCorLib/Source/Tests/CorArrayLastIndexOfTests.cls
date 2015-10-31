@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' CorArrayLastIndexOfTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -39,6 +42,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Set Arr(2) = Arr(0)
             Test.Use Arr, Arr(2), 2
             Test.Use Arr, New Int32, -1
+            
             Set Arr(0) = Nothing
             Set Arr(2) = Nothing
             Test.Use Arr, Nothing, 2
@@ -60,99 +64,54 @@ End Sub
 Public Sub LastIndexOf_WithNullArray_Throws()
     Dim Arr() As Long
 
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.LastIndexOf Arr, 1
 
-errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub LastIndexOf_WithMuliDimensionArray_Throws()
     Dim Arr(0, 0) As Long
 
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.LastIndexOf Arr, 0
 
-errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub LastIndexOf_WithStartIndexLessThanLBound_Throws()
     Dim Arr(0) As Long
 
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.LastIndexOf Arr, 0, -1
 
-errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub LastIndexOf_WithStartIndexGreaterThanUBound_Throws()
     Dim Arr(0) As Long
 
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.LastIndexOf Arr, 0, 1
 
-errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub LastIndexOf_WithCountLessThanZero_Throws()
     Dim Arr(0) As Long
 
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.LastIndexOf Arr, 0, 0, -1
 
-errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub LastIndexOf_WithStartIndexAndCountGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.LastIndexOf Arr, 0, 0, 2
     
-errTrap:
     AssertArgumentOutOfRangeException Err
 End Sub
 
-'Public Sub TestDefaultComparer()
-'    Dim a() As String
-'    Dim i As Long
-'
-'    ReDim a(0 To 100)
-'    For i = 0 To 100
-'        a(i) = "Item " & i
-'    Next i
-'
-'    i = CorArray.LastIndexOf(a, "Item 88", , , Comparer.Default)
-'    Assert.AreEqual 88, i, "LastIndexOf should return 88."
-'End Sub
-'
-'Public Sub TestNotInSubArray()
-'    Dim a() As Long
-'    Dim i As Long
-'
-'    ReDim a(-1 To 100)
-'    For i = 0 To 100
-'        a(i) = i
-'    Next i
-'
-'    i = CorArray.LastIndexOf(a, 50&, 20, 20)
-'    Assert.AreEqual -2, i, "LastIndexOfEx should return -1."
-'End Sub
-'
-'Public Sub TestNothing()
-'    Dim a() As Variant
-'    Dim i As Long
-'
-'    ReDim a(-10 To 100)
-'    For i = -10 To 100
-'        a(i) = "Item " & i
-'    Next i
-'    Set a(LBound(a)) = Nothing
-'    i = CorArray.LastIndexOf(a, Nothing)
-'    Assert.AreEqual LBound(a), i, "LastIndexOf should return " & LBound(a)
-'End Sub
-'

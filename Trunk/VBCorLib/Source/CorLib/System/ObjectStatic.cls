@@ -179,6 +179,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                 Set NumberFormatter = NumberFormatInfo.CurrentInfo
             End If
             
+            Debug.Assert Not NumberFormatter Is Nothing
             ToString = NumberFormatter.Format(Value, Format)
             
         Case vbDate
@@ -191,22 +192,23 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                 Set DateFormatter = DateTimeFormatInfo.CurrentInfo
             End If
             
+            Debug.Assert Not DateFormatter Is Nothing
             mDateAsDateTime.InitFromDate Value, UnspecifiedKind
             ToString = DateFormatter.Format(mDateAsDateTime, Format)
             
         Case vbObject
-            If Value Is Nothing Then
-                ToString = ""
-            ElseIf TypeOf Value Is IFormattable Then
-                Dim Formattable As IFormattable
-                Set Formattable = Value
-                ToString = Formattable.ToString(Format, Provider)
-            ElseIf TypeOf Value Is IObject Then
-                Dim Obj As IObject
-                Set Obj = Value
-                ToString = Obj.ToString
-            Else
-                ToString = TypeName(Value)
+            If Not Value Is Nothing Then
+                If TypeOf Value Is IFormattable Then
+                    Dim Formattable As IFormattable
+                    Set Formattable = Value
+                    ToString = Formattable.ToString(Format, Provider)
+                ElseIf TypeOf Value Is IObject Then
+                    Dim Obj As IObject
+                    Set Obj = Value
+                    ToString = Obj.ToString
+                Else
+                    ToString = TypeName(Value)
+                End If
             End If
             
         Case vbEmpty
@@ -214,7 +216,6 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
         Case vbNull
             ToString = "Null"
         Case corMissing
-            Exit Function
         Case Else
             ToString = Value
     End Select

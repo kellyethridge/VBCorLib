@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestDriveInfo
+' DriveInfoTests
 '
 Option Explicit
 Implements ITestCaseSource
@@ -27,7 +27,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "NewDriveInfo_WithDrive_ConvertsToRoot"
             Test.Use "c", "c:\"
             Test.Use "c:\", "c:\"
-            
     End Select
 End Sub
 
@@ -41,69 +40,69 @@ Public Sub GetDrives_WhenCalled_ReturnsNonEmptyList()
 End Sub
 
 Public Sub NewDriveInfo_WithDrive_ConvertsToRoot(ByVal Drive As String, ByVal Expected As String)
-    Dim info As DriveInfo
+    Dim Info As DriveInfo
     
-    Set info = NewDriveInfo(Drive)
+    Set Info = NewDriveInfo(Drive)
     
-    Assert.That info.Name, Iz.EqualTo(Expected).IgnoreCase
+    Assert.That Info.Name, Iz.EqualTo(Expected).IgnoreCase
 End Sub
 
 Public Sub DriveFormat_WhenCalled_ReturnsNTFS()
-    Dim info As DriveInfo
-    Set info = NewDriveInfo("c")
+    Dim Info As DriveInfo
+    Set Info = NewDriveInfo("c")
     Dim Actual As String
     
-    Actual = info.DriveFormat
+    Actual = Info.DriveFormat
     
     Assert.That Actual, Iz.EqualTo("NTFS")
 End Sub
 
 Public Sub DriveType_WhenCalled_ReturnsFixed()
-    Dim info As DriveInfo
-    Set info = NewDriveInfo("c")
+    Dim Info As DriveInfo
+    Set Info = NewDriveInfo("c")
     Dim Actual As DriveType
     
-    Actual = info.DriveType
+    Actual = Info.DriveType
     
     Assert.That Actual, Iz.EqualTo(DriveType.Fixed)
 End Sub
 
 Public Sub IsReady_WhenCalled_ReturnsTrue()
-    Dim info As DriveInfo
-    Set info = NewDriveInfo("c")
+    Dim Info As DriveInfo
+    Set Info = NewDriveInfo("c")
     Dim Actual As Boolean
     
-    Actual = info.IsReady
+    Actual = Info.IsReady
     
     Assert.That Actual, Iz.True
 End Sub
 
 Public Sub AvailableFreeSpace_WhenCalled_ReturnsGreaterThanZero()
-    Dim info As DriveInfo
-    Set info = NewDriveInfo("c")
+    Dim Info As DriveInfo
+    Set Info = NewDriveInfo("c")
     Dim Actual As Currency
     
-    Actual = info.AvailableFreeSpace
+    Actual = Info.AvailableFreeSpace
     
     Assert.That Actual, Iz.GreaterThan(0)
 End Sub
 
 Public Sub TotalFreeSpace_WhenCalled_ReturnsGreaterThanZero()
-    Dim info As DriveInfo
-    Set info = NewDriveInfo("c")
+    Dim Info As DriveInfo
+    Set Info = NewDriveInfo("c")
     Dim Actual As Currency
     
-    Actual = info.TotalFreeSpace
+    Actual = Info.TotalFreeSpace
     
     Assert.That Actual, Iz.GreaterThan(0)
 End Sub
 
 Public Sub TotalSize_WhenCalled_ReturnsGreaterThanZero()
-    Dim info As DriveInfo
-    Set info = NewDriveInfo("c")
+    Dim Info As DriveInfo
+    Set Info = NewDriveInfo("c")
     Dim Actual As Currency
     
-    Actual = info.TotalSize
+    Actual = Info.TotalSize
     
     Assert.That Actual, Iz.GreaterThan(0)
 End Sub

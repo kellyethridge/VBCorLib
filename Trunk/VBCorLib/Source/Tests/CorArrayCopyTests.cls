@@ -97,11 +97,10 @@ Public Sub Copy_WithValues_CopiesWithConversion(ByRef Source As Variant, ByRef D
 End Sub
 
 Public Sub Copy_WithIncompatibleTypes_ThrowsArrayTypeMismatchException(ByRef Source As Variant, ByRef Destination As Variant)
-    On Error GoTo errTrap
+    On Error Resume Next
     
     CorArray.Copy Source, Destination, 1
     
-errTrap:
     AssertArrayTypeMismatchException Err
 End Sub
 
@@ -126,132 +125,120 @@ Public Sub Copy_WithUDT_CopiesElements()
 End Sub
 
 Public Sub Copy_WithNegativeLength_Throws()
-    On Error GoTo errTrap
     Dim Arr(0) As Long
     
+    On Error Resume Next
     CorArray.Copy Arr, Arr, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
 Public Sub Copy_WithLengthGreaterThanSourceLength_ThrowsArgumentException()
-    On Error GoTo errTrap
     Dim Arr1(0) As Long
     Dim Arr2(2) As Long
     
+    On Error Resume Next
     CorArray.Copy Arr1, Arr2, 2
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
 Public Sub Copy_WithLengthGreaterThanDestinationLength_ThrowsArgumentException()
-    On Error GoTo errTrap
     Dim Arr1(0) As Long
     Dim Arr2(2) As Long
     
+    On Error Resume Next
     CorArray.Copy Arr2, Arr1, 2
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
 Public Sub CopyEx_WithLengthPlusStartIndexGreaterThanSourceLength_ThrowsArgumentException()
-    On Error GoTo errTrap
     Dim Arr1(1) As Long
     Dim Arr2(2) As Long
     
+    On Error Resume Next
     CorArray.CopyEx Arr1, 1, Arr2, 0, 2
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
 Public Sub CopyEx_WithLengthPlusDestinationIndexGreaterThanDestinationLength_ThrowsArgumentException()
-    On Error GoTo errTrap
     Dim Arr1(1) As Long
     Dim Arr2(2) As Long
     
+    On Error Resume Next
     CorArray.CopyEx Arr2, 0, Arr1, 1, 2
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
 Public Sub CopyEx_WithSourceIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
-    On Error GoTo errTrap
     Dim Arr1(1 To 1) As Long
     Dim Arr2(1 To 1) As Long
     
+    On Error Resume Next
     CorArray.CopyEx Arr1, 0, Arr2, 1, 1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "SourceIndex"
 End Sub
 
 Public Sub CopyEx_WithDestinationIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
-    On Error GoTo errTrap
     Dim Arr1(1 To 1) As Long
     Dim Arr2(1 To 1) As Long
     
+    On Error Resume Next
     CorArray.CopyEx Arr1, 1, Arr2, 0, 1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "DestinationIndex"
 End Sub
 
 Public Sub Copy_WithNullSource_ThrowsArgumentNull()
-    On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
+    On Error Resume Next
     CorArray.Copy NullArray, NonNull, 1
     
-errTrap:
     AssertArgumentNullException Err, "SourceArray"
 End Sub
 
 Public Sub Copy_WithNullDestination_ThrowsArgumentNullException()
-    On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
+    On Error Resume Next
     CorArray.Copy NonNull, NullArray, 1
     
-errTrap:
     AssertArgumentNullException Err, "DestinationArray"
 End Sub
 
 Public Sub CopyEx_WithNegativeLength_ThrowsArgumentOutOfRangeException()
-    On Error GoTo errTrap
     Dim Arr(0) As Long
     
+    On Error Resume Next
     CorArray.CopyEx Arr, 0, Arr, 0, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
 Public Sub CopyEx_WithNullSource_ThrowsArgumentNullException()
-    On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
+    On Error Resume Next
     CorArray.CopyEx NullArray, 0, NonNull, 0, 1
     
-errTrap:
     AssertArgumentNullException Err, "SourceArray"
 End Sub
 
 Public Sub CopyEx_WithNullDestination_ThrowsArgumentNullException()
-    On Error GoTo errTrap
     Dim NullArray() As Long
     Dim NonNull(0) As Long
     
+    On Error Resume Next
     CorArray.CopyEx NonNull, 0, NullArray, 0, 1
     
-errTrap:
     AssertArgumentNullException Err, "DestinationArray"
 End Sub
 

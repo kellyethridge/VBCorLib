@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestCharEnumerator
+' CharEnumeratorTests
 '
 Option Explicit
 Implements ICategorizable
@@ -73,40 +73,37 @@ Public Sub MoveNext_AfterLastCharacter_ReturnsFalse()
 End Sub
 
 Public Sub MoveNext_AfterFinalMoveNext_ThrowsInvalidOperationException()
-    On Error GoTo errTrap
     Dim Enumerator As CharEnumerator
     Set Enumerator = Cor.NewCharEnumerator("a")
     Enumerator.MoveNext
     Enumerator.MoveNext
 
+    On Error Resume Next
     Enumerator.MoveNext
     
-errTrap:
     AssertInvalidOperationException Err
 End Sub
 
 Public Sub Current_AfterLastCharactor_ThrowsInvalidOperationException()
-    On Error GoTo errTrap
     Dim Enumerator As CharEnumerator
     Set Enumerator = Cor.NewCharEnumerator("a")
     Enumerator.MoveNext
     Enumerator.MoveNext
 
+    On Error Resume Next
     Dim Value As Variant
     Value = Enumerator.Current
     
-errTrap:
     AssertInvalidOperationException Err
 End Sub
 
 Public Sub Current_BeforeStartingEnumeration_ThrowsInvalidOperationException()
-    On Error GoTo errTrap
     Dim Enumerator As CharEnumerator
     Set Enumerator = Cor.NewCharEnumerator("a")
     
+    On Error Resume Next
     Dim Value As Variant
     Value = Enumerator.Current
     
-errTrap:
     AssertInvalidOperationException Err
 End Sub

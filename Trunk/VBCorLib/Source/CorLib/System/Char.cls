@@ -44,7 +44,7 @@ Option Explicit
 ' This parameter is ignored if a non-string character is passed in.
 ' @return If the character is considered white space then True is returned, otherwise False is returned.
 '
-Public Function IsWhiteSpace(ByRef s As Variant, ByVal Index As Long) As Boolean
+Public Function IsWhiteSpace(ByRef s As String, ByVal Index As Long) As Boolean
     If Index < 0 Or Index >= Len(s) Then _
         Error.ArgumentOutOfRange "Index"
         

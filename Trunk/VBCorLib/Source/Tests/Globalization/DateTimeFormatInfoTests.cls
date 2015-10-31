@@ -12,6 +12,8 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
+' DateTimeFormatInfoTests
+'
 ' Testing DateTimeFormatInfo is to ensure the correctness of the class,
 ' not testing that the culture information itself is correct.
 '

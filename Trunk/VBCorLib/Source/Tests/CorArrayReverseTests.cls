@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' CorArrayReverseTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -41,50 +44,45 @@ End Sub
 Public Sub Reverse_WithNullArray_Throws()
     Dim Arr() As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.Reverse Arr
     
-errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub Reverse_WithMultiDimensionArray_Throws()
     Dim Arr(0, 0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.Reverse Arr
     
-errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub Reverse_WithIndexLessThanLBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.Reverse Arr, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Reverse_WithIndexGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.Reverse Arr, 1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub Reverse_WithIndexAndCountGreaterThanUBound_Throws()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.Reverse Arr, 0, 2
     
-errTrap:
     AssertArgumentException Err
 End Sub
 

@@ -75,59 +75,56 @@ End Sub
 
 Public Sub CreateDirectory_WhenCalled_CreatesFolder()
     Const SubFolder As String = "VBCorLib.Directory.CreateDirectory.Test"
-    On Error GoTo errTrap
     Dim FolderToCreate As String
     FolderToCreate = Path.Combine(Path.GetTempPath, SubFolder)
     
+    On Error GoTo Catch
     Directory.CreateDirectory FolderToCreate
     
     Dim Actual As Boolean
     Actual = Helper.FolderExists(FolderToCreate)
     Assert.That Actual, Iz.True
     
-errTrap:
+Catch:
     Helper.DeleteFolder FolderToCreate
 End Sub
 
 Public Sub CreateDirectory_WhenCalled_ReturnsDirectoryInfo()
     Const SubFolder As String = "VBCorLib.Directory.CreateDirectory.Test"
-    On Error GoTo errTrap
     Dim FolderToCreate As String
     FolderToCreate = Path.Combine(Path.GetTempPath, SubFolder)
     
+    On Error GoTo Catch
     Dim Actual As DirectoryInfo
     Set Actual = Directory.CreateDirectory(FolderToCreate)
 
     Assert.That Actual.Exists, Iz.True
 
-errTrap:
+Catch:
     Helper.DeleteFolder FolderToCreate
 End Sub
 
 Public Sub CreateDirectory_WithEmptyPath_ThrowsArgumentException()
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Directory.CreateDirectory ""
     
-errTrap:
     AssertArgumentException Err, "Path"
 End Sub
 
 Public Sub CreateDirectory_WithIllegalCharacters_ThrowsArgumentException(ByVal IllegalPath As String)
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Directory.CreateDirectory IllegalPath
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
 Public Sub CreateDirectory_WithColonAfterRoot_ThrowsNotSupportedException()
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Directory.CreateDirectory "c:\abc:d"
     
-errTrap:
     AssertNotSupportedException Err
 End Sub
 
@@ -315,11 +312,10 @@ Public Sub GetParent_WithSubFolder_ReturnsParentDirectory()
 End Sub
 
 Public Sub GetParent_WithEmptyPath_ThrowsArgumentException()
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Directory.GetParent ""
     
-errTrap:
     AssertArgumentException Err, "Path"
 End Sub
 
@@ -351,14 +347,14 @@ Public Sub CurrentDirectory_WhenCalled_IsSetAndRead()
     Dim NewFolder As String
     NewFolder = mBuilder.CreateFolder
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     Directory.SetCurrentDirectory NewFolder
     Dim Actual As String
     Actual = Directory.GetCurrentDirectory
     On Error GoTo 0
     
     Assert.That Actual, Iz.EqualTo(NewFolder)
-errTrap:
+Catch:
     ChDir OriginalCurrentDirectory
 End Sub
 

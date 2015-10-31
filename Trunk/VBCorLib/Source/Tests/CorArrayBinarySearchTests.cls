@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' CorArrayBinarySearchTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -128,18 +131,13 @@ Public Sub BinarySearchEx_WithLengthLessThanZero_Throws()
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub TestLengthTooLong()
+Public Sub BinarySearchEx_WithLengthTooLong_ThrowsArgumentException()
     Dim a(10) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.BinarySearchEx a, 0, 12, 1
-    On Error GoTo 0
-    Assert.Fail "An exception should have been raised."
     
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should have been caught."
-    Assert.IsTrue TypeOf Ex Is ArgumentException, "Wrong exception type caught."
+    AssertArgumentException Err
 End Sub
 
 

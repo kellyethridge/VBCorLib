@@ -11,12 +11,12 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' ArrayListRangedTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
-
-Private original As ArrayList
-Private List As ArrayList
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Collections"
@@ -34,52 +34,41 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Sub Setup()
-    Set original = New ArrayList
-    Dim i As Long
-    For i = 1 To 20
-        original.Add i
-    Next i
-    Set List = original.GetRange(4, 0)
-End Sub
-
 Public Sub GetRange_WithCountOfZero_ReturnsEmptyList()
     Dim List As New ArrayList
-    Dim Ranged As ArrayList
+    Dim Actual As ArrayList
+    List.AddRange NewLongs(1, 2, 3, 4)
     
-    Set Ranged = List.GetRange(0, 0)
+    Set Actual = List.GetRange(0, 0)
     
-    Assert.That Ranged, Iz.Empty
+    Assert.That Actual, Iz.Empty
 End Sub
 
 Public Sub GetRange_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim List As New ArrayList
-    On Error GoTo errTrap:
+    On Error Resume Next
     
     List.GetRange -1, 0
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub GetRange_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim List As New ArrayList
-    On Error GoTo errTrap
+    On Error Resume Next
     
     List.GetRange 0, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub GetRange_WithIndexPlusCountBeyondListSize_ThrowsArgumentException()
     Dim List As ArrayList
     Set List = ArrayList.Repeat(1, 10)
-    On Error GoTo errTrap
+    On Error Resume Next
     
     List.GetRange 2, 9
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
@@ -348,7 +337,7 @@ End Sub
 
 Private Function MakeFilledRanged(ByRef List As ArrayList) As ArrayList
     Set List = New ArrayList
-    List.AddRange (NewLongs(1, 2, 3, 4, 1, 2, 3, 4))
+    List.AddRange NewLongs(1, 2, 3, 4, 1, 2, 3, 4)
     Set MakeFilledRanged = List.GetRange(2, 5)
 End Function
 

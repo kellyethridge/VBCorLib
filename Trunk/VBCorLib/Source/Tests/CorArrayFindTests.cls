@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestCorArrayFinds
+' CorArrayFindTests
 '
 Option Explicit
 Implements ITestCaseSource

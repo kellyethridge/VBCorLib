@@ -79,7 +79,7 @@ Private mKey()              As Byte
 ' </pre>
 '
 Public Sub AddLegalBlockSize(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long)
-    Call AddKeySize(mLegalBlockSizes, MinSize, MaxSize, SkipSize)
+    AddKeySize mLegalBlockSizes, MinSize, MaxSize, SkipSize
 End Sub
 
 ''
@@ -103,14 +103,14 @@ End Property
 ''
 ' Sets the current block size to be used.
 '
-' @param RHS The new current block size to be used.
+' @param Value The new current block size to be used.
 ' @remarks The block size is in bits and must be one of the legal block sizes.
 '
-Public Property Let BlockSize(ByVal RHS As Long)
-    If Not IsLegalSize(mLegalBlockSizes, RHS) Then _
+Public Property Let BlockSize(ByVal Value As Long)
+    If Not IsLegalSize(mLegalBlockSizes, Value) Then _
         Throw Cor.NewCryptographicException("Invalid block size.")
     
-    mBlockSize = RHS
+    mBlockSize = Value
     Erase mIV
 End Property
 
@@ -128,7 +128,7 @@ End Property
 ' </pre>
 '
 Public Sub AddLegalKeySize(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long)
-    Call AddKeySize(mLegalKeySizes, MinSize, MaxSize, SkipSize)
+    AddKeySize mLegalKeySizes, MinSize, MaxSize, SkipSize
 End Sub
 
 ''
@@ -152,14 +152,14 @@ End Property
 ''
 ' Sets the new key size value to be used.
 '
-' @param RHS The new key size in bits.
+' @param Value The new key size in bits.
 ' @remarks The new value must be of a legal size.
 '
-Public Property Let KeySize(ByVal RHS As Long)
-    If Not IsLegalSize(mLegalKeySizes, RHS) Then _
+Public Property Let KeySize(ByVal Value As Long)
+    If Not IsLegalSize(mLegalKeySizes, Value) Then _
         Throw Cor.NewCryptographicException("Invalid key size.")
     
-    mKeySize = RHS
+    mKeySize = Value
     Erase mKey
 End Property
 
@@ -175,15 +175,15 @@ End Property
 ''
 ' Sets the current feedback size in bits to be used.
 '
-' @param RHS The new feedback size.
+' @param Value The new feedback size.
 ' @remarks The feedback size must be greater than zero and evenly divisible by 8.
 ' The size cannot be greater than the current block size.
 '
-Public Property Let FeedbackSize(ByVal RHS As Long)
-    If (RHS <= 0) Or (RHS > mBlockSize) Or (RHS Mod 8 <> 0) Then _
+Public Property Let FeedbackSize(ByVal Value As Long)
+    If (Value <= 0) Or (Value > mBlockSize) Or (Value Mod 8 <> 0) Then _
         Throw Cor.NewCryptographicException("Invalid feedback size.")
     
-    mFeedbackSize = RHS
+    mFeedbackSize = Value
 End Property
 
 ''
@@ -199,13 +199,13 @@ End Property
 ''
 ' Sets the cipher mode to be used.
 '
-' @param RHS The new cipher mode.
+' @param Value The new cipher mode.
 ' @see CipherMode
 '
-Public Property Let Mode(ByVal RHS As CipherMode)
-    Select Case RHS
+Public Property Let Mode(ByVal Value As CipherMode)
+    Select Case Value
         Case CipherMode.CBC, CipherMode.ECB, CipherMode.OFB, CipherMode.CFB
-            mMode = RHS
+            mMode = Value
         Case Else
             Throw Cor.NewCryptographicException("Invalid cipher mode for this cipher algorithm.")
     End Select
@@ -224,13 +224,13 @@ End Property
 ''
 ' Sets the padding mode to be used.
 '
-' @param RHS The new padding mode to be used.
+' @param Value The new padding mode to be used.
 ' @see PaddingMode
 '
-Public Property Let Padding(ByVal RHS As PaddingMode)
-    Select Case RHS
+Public Property Let Padding(ByVal Value As PaddingMode)
+    Select Case Value
         Case PaddingMode.None, PaddingMode.ANSIX923, PaddingMode.ISO10126, PaddingMode.PKCS7, PaddingMode.Zeros
-            mPadding = RHS
+            mPadding = Value
         Case Else
             Throw Cor.NewCryptographicException("The padding mode is not from the list of valid modes.")
     End Select
@@ -262,7 +262,7 @@ Public Sub SetIV(ByRef RgbIV() As Byte)
     
     ' We do this to support non-zero based arrays.
     ReDim mIV(0 To Size - 1)
-    Call Buffer.BlockCopy(RgbIV, 0, mIV, 0, Size)
+    Buffer.BlockCopy RgbIV, 0, mIV, 0, Size
 End Sub
 
 ''
@@ -305,7 +305,7 @@ Public Sub SetKey(ByRef RgbKey() As Byte)
     
     ' We do this so we have a zero-based key array.
     ReDim mKey(0 To Size - 1)
-    Call Buffer.BlockCopy(RgbKey, 0, mKey, 0, Size)
+    Buffer.BlockCopy RgbKey, 0, mKey, 0, Size
     mKeySize = Size * 8
 End Sub
 
@@ -320,7 +320,7 @@ Public Sub GenerateKey()
     ReDim mKey(0 To mKeySize \ 8 - 1)
     
     Do
-        Call CryptoHelper.FillRandomBytes(mKey)
+        CryptoHelper.FillRandomBytes mKey
         Set Ex = Nothing
         RaiseEvent CheckForWeakKey(mKey, Ex)
     Loop While Not Ex Is Nothing
@@ -372,7 +372,7 @@ Public Function CloneRgbKey(ByRef RgbKey As Variant) As Byte()
     
     Dim Ret() As Byte
     ReDim Ret(0 To Size - 1)
-    Call Buffer.BlockCopy(RgbKey, 0, Ret, 0, Size)
+    Buffer.BlockCopy RgbKey, 0, Ret, 0, Size
     
     Dim Ex As Exception
     RaiseEvent CheckForWeakKey(Ret, Ex)
@@ -408,7 +408,7 @@ Public Function CloneRgbIV(ByRef RgbIV As Variant) As Byte()
             Throw Cor.NewCryptographicException("Invalid RgbIV length.")
         
         ReDim Ret(0 To Size - 1)
-        Call Buffer.BlockCopy(RgbIV, 0, Ret, 0, Size)
+        Buffer.BlockCopy RgbIV, 0, Ret, 0, Size
     End If
     
     CloneRgbIV = Ret
@@ -427,7 +427,7 @@ Private Sub IncrementKeySizeCapacity(ByRef Arr() As KeySizes)
 End Sub
 
 Private Sub AddKeySize(ByRef Arr() As KeySizes, ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long)
-    Call IncrementKeySizeCapacity(Arr)
+    IncrementKeySizeCapacity Arr
     Set Arr(UBound(Arr)) = Cor.NewKeySizes(MinSize, MaxSize, SkipSize)
 End Sub
 

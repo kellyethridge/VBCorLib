@@ -222,9 +222,9 @@ Private Sub AddSystemSecurityCryptography()
 '
         .Add NewSuite("DESCryptoServiceProvider", _
             New DESCryptoServiceProviderTests, _
-            New DESEncryptionTests)
+            New DESEncryptionTests, _
+            New DESDecryptionTests)
 '            New TestDESPaddingModes, _
-'            New TestDESDecryption)
 '
 '        .Add NewSuite("TripleDESCryptoServiceProvider", _
 '            New TestTripleDESWeakKeys, _

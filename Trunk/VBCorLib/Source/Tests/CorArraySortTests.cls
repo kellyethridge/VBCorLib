@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' CorArraySortTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -53,44 +56,40 @@ Public Sub Sort_WithPrimitives_SortsAscending(ByRef Arr As Variant)
 End Sub
 
 Public Sub Sort_WithNullArray_ThrowsArgumentNullException()
-    On Error GoTo errTrap
     Dim Arr() As Long
     
+    On Error Resume Next
     CorArray.Sort Arr
     
-errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub Sort_WithMultiDimensionArray_ThrowsRankException()
-    On Error GoTo errTrap
     Dim Arr() As Long
     ReDim Arr(1, 1)
     
+    On Error Resume Next
     CorArray.Sort Arr
     
-errTrap:
     AssertRankException Err
 End Sub
 
 'Public Sub Sort_WithNonComparableValues_ThrowsInvalidOperationException()
-'    On Error GoTo errTrap
 '    Dim Arr As Variant
 '    Arr = Array(3, 2, "4", 1)
 '
+'    On Error Resume Next
 '    CorArray.Sort Arr
 '
-'errTrap:
 '    AssertInvalidOperationException Err
 'End Sub
 
 Public Sub Sort_WithInvalidComparer_ThrowsArgumentException()
-    On Error GoTo errTrap
     Dim Arr(0) As Long
     
+    On Error Resume Next
     CorArray.Sort Arr, "Comparer"
     
-errTrap:
     AssertArgumentException Err, "Comparer"
 End Sub
 
@@ -159,52 +158,47 @@ Public Sub Sort_WithNonZeroLBound_SortsValues()
 End Sub
 
 Public Sub SortEx_WithNullArray_Throws()
-    On Error GoTo errTrap
     Dim a() As Long
     
+    On Error Resume Next
     CorArray.SortEx a, 2, 4
     
-errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub SortEx_WithMultiDimensionArray_Throws()
-    On Error GoTo errTrap
     Dim Arr(1, 1) As Long
     
+    On Error Resume Next
     CorArray.SortEx Arr, 0, 1
     
-errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub SortEx_WithIndexLessThanLBound_Throws()
-    On Error GoTo errTrap
     Dim Arr(0) As Long
     
+    On Error Resume Next
     CorArray.SortEx Arr, -1, 1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub SortEx_WithLengthLessThanZero_Throws()
-    On Error GoTo errTrap
     Dim Arr(0) As Long
     
+    On Error Resume Next
     CorArray.SortEx Arr, 0, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
 Public Sub SortEx_WithRangeExtendingPassedEndOfArray_Throws()
-    On Error GoTo errTrap
     Dim Arr(1 To 10) As Long
     
+    On Error Resume Next
     CorArray.SortEx Arr, 1, 11
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
@@ -231,68 +225,62 @@ Public Sub SortEx_WithComparer_SortsSubArray()
 End Sub
 
 Public Sub SortKey_WithNullKeysArray_Throws()
-    On Error GoTo errTrap
     Dim Keys() As Long
     Dim Items(0) As Long
     
+    On Error Resume Next
     CorArray.SortKey Keys, Items
     
-errTrap:
     AssertArgumentNullException Err, "Keys"
 End Sub
 
 Public Sub SortKey_WithNullItemsArray_Throws()
-    On Error GoTo errTrap
     Dim Keys(0) As Long
     Dim Items() As Long
     
+    On Error Resume Next
     CorArray.SortKey Keys, Items
     
-errTrap:
     AssertArgumentNullException Err, "Items"
 End Sub
 
 Public Sub SortKey_WithMultiDimensionKeys_Throws()
-    On Error GoTo errTrap
     Dim Keys(0, 0) As Long
     Dim Items(0) As Long
     
+    On Error Resume Next
     CorArray.SortKey Keys, Items
     
-errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub SortKey_WithMultiDimensionItems_Throws()
-    On Error GoTo errTrap
     Dim Keys(0) As Long
     Dim Items(0, 0) As Long
     
+    On Error Resume Next
     CorArray.SortKey Keys, Items
     
-errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub SortKey_WithInvalidItems_Throws()
-    On Error GoTo errTrap
     Dim Keys(0) As Long
     Dim InvalidItems As Long
     
+    On Error Resume Next
     CorArray.SortKey Keys, InvalidItems
     
-errTrap:
     AssertArgumentException Err, "Items"
 End Sub
 
 Public Sub SortKeyEx_WithNullKeys_Throws()
-    On Error GoTo errTrap
     Dim Keys() As Long
     Dim Items(0) As Long
     
+    On Error Resume Next
     CorArray.SortKeyEx Keys, Items, 0, 1
     
-errTrap:
     AssertArgumentNullException Err, "Keys"
 End Sub
 
