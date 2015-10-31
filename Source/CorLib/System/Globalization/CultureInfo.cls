@@ -206,17 +206,17 @@ Public Property Get IsReadOnly() As Boolean
     IsReadOnly = mProps.IsReadOnly
 End Property
 
-Friend Property Let IsReadOnly(ByVal RHS As Boolean)
-    mProps.IsReadOnly = RHS
+Friend Sub MarkReadOnly()
+    mProps.IsReadOnly = True
     
     If Not mDateTimeFormat Is Nothing Then
-        mDateTimeFormat.IsReadOnly = RHS
+        mDateTimeFormat.MarkReadOnly
     End If
     
     If Not mNumberFormat Is Nothing Then
-        mNumberFormat.IsReadOnly = RHS
+        mNumberFormat.MarkReadOnly
     End If
-End Property
+End Sub
 
 ''
 ' Returns the native name for this culture instance.
@@ -320,8 +320,7 @@ Public Property Get NumberFormat() As NumberFormatInfo
     
     If mNumberFormat Is Nothing Then
         Set mNumberFormat = New NumberFormatInfo
-        mNumberFormat.Load mProps.LCID, mProps.UseUserOverride
-        mNumberFormat.IsReadOnly = mProps.IsReadOnly
+        mNumberFormat.InitCultureInfo Me
     End If
     Set NumberFormat = mNumberFormat
 End Property
@@ -353,8 +352,7 @@ Public Property Get DateTimeFormat() As DateTimeFormatInfo
         
     If mDateTimeFormat Is Nothing Then
         Set mDateTimeFormat = New DateTimeFormatInfo
-        mDateTimeFormat.Init mProps.LCID, mProps.UseUserOverride, Me.Calendar
-        mDateTimeFormat.IsReadOnly = mProps.IsReadOnly
+        mDateTimeFormat.InitCultureInfo Me
     End If
     Set DateTimeFormat = mDateTimeFormat
 End Property
@@ -449,8 +447,8 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
     Load ID
 End Sub
 
-Friend Sub InitClone(ByRef props As PropsType, ByVal DTInfo As DateTimeFormatInfo, ByVal NumInfo As NumberFormatInfo, ByVal CalInfo As Calendar)
-    mProps = props
+Friend Sub InitClone(ByRef Props As PropsType, ByVal DTInfo As DateTimeFormatInfo, ByVal NumInfo As NumberFormatInfo, ByVal CalInfo As Calendar)
+    mProps = Props
     Set mDateTimeFormat = DTInfo
     Set mNumberFormat = NumInfo
     Set mCalendar = CalInfo

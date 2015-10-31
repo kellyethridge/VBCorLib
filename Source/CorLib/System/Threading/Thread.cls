@@ -42,12 +42,12 @@ Private mCurrentCulture As CultureInfo
 Public Property Get CurrentCulture() As CultureInfo
     If mCurrentCulture Is Nothing Then
         Set mCurrentCulture = Cor.NewCultureInfo(GetSystemDefaultLCID)
-        mCurrentCulture.IsReadOnly = True
+        mCurrentCulture.MarkReadOnly
     End If
 
     Set CurrentCulture = mCurrentCulture
 End Property
 
-Public Property Set CurrentCulture(ByVal RHS As CultureInfo)
-    Set mCurrentCulture = RHS
+Public Property Set CurrentCulture(ByVal Value As CultureInfo)
+    Set mCurrentCulture = Value
 End Property
