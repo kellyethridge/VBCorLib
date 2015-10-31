@@ -21,3 +21,5 @@ SerializationError:
 DeserializationError:
     Assert.Fail "'" & TypeName(Source) & "' failed to deserialize: " & Err.Description
 End Function
+
+

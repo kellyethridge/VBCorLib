@@ -120,8 +120,9 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    On Error GoTo Catch
     Dim Other As DictionaryEntry
+    
+    On Error GoTo Catch
     Set Other = Value
     
     If Not Other Is Nothing Then

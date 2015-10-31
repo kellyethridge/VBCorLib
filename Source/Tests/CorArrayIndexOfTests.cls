@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' CorArrayIndexOfTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -67,59 +70,53 @@ End Sub
 Public Sub IndexOf_WithNullArray_ThrowsArgumentNullException()
     Dim Arr() As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.IndexOf Arr, 1
     
-errTrap:
     AssertArgumentNullException Err, "Arr"
 End Sub
 
 Public Sub IndexOf_WithMuliDimensionArray_ThrowsRankException()
     Dim Arr(0, 0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.IndexOf Arr, 0
     
-errTrap:
     AssertRankException Err
 End Sub
 
 Public Sub IndexOf_WithStartIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.IndexOf Arr, 0, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub IndexOf_WithStartIndexGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.IndexOf Arr, 0, 1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
 Public Sub IndexOf_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.IndexOf Arr, 0, 0, -1
     
-errTrap:
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub IndexOf_WithStartIndexAndCountGreaterThanUBound_ThrowsArgumentOutOfRangeException()
     Dim Arr(0) As Long
     
-    On Error GoTo errTrap
+    On Error Resume Next
     CorArray.IndexOf Arr, 0, 0, 2
     
-errTrap:
     AssertArgumentOutOfRangeException Err
 End Sub

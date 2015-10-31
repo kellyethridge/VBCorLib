@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-'   DESEncryptionTests
+' DESEncryptionTests
 '
 Option Explicit
 Implements ICategorizable

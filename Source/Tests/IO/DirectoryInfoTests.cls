@@ -12,7 +12,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestDirectoryInfo
+' DirectoryInfoTests
 '
 Option Explicit
 Implements ICategorizable

@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' StackTests
+'
 Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
@@ -71,10 +74,9 @@ End Sub
 Public Sub Pop_WhenStackIsEmpty_ThrowsInvalidOperationException()
     Dim SUT As New Stack
     
-    On Error GoTo errTrap
+    On Error Resume Next
     SUT.Pop
     
-errTrap:
     AssertInvalidOperationException Err
 End Sub
 
@@ -106,10 +108,9 @@ End Sub
 Public Sub Peek_WithEmptyStack_ThrowsInvalidOperationException()
     Dim SUT As New Stack
     
-    On Error GoTo errTrap
+    On Error Resume Next
     SUT.Peek
     
-errTrap:
     AssertInvalidOperationException Err
 End Sub
 
