@@ -43,9 +43,9 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private Const DES_KEY_LENGTH    As Long = 8    ' 56 bits + 8 bits parity
-Private Const DEF_BLOCKSIZE     As Long = 64
-Private Const DEF_KEYSIZE       As Long = 64
+Private Const DESBlockSize  As Long = 64
+Private Const DESKeySize    As Long = 64
+Private Const ParityBit     As Byte = 1
 
 Private mWeakKeys()         As Currency
 Private mSemiWeakKeys()     As Currency
@@ -121,7 +121,7 @@ Private Sub VerifyKeySize(ByRef RgbKey As Variant)
     If CorArray.IsNull(RgbKey) Then _
         Throw Cor.NewCryptographicException("Invalid key length.")
     
-    If CorArray.Length(RgbKey) <> DES_KEY_LENGTH Then _
+    If CorArray.Length(RgbKey) * 8 <> DESKeySize Then _
         Throw Cor.NewCryptographicException("Invalid key length.")
 End Sub
 
@@ -162,18 +162,17 @@ Private Sub InitSemiWeakKeys()
     mSemiWeakKeys(11) = Parse64BitKeyString("FEE0FEE0FEF1FEF1")
 End Sub
 
-Private Function Parse64BitKeyString(ByVal s As String) As Currency
+Private Function Parse64BitKeyString(ByRef Key As String) As Currency
     Dim b(7) As Byte
     Dim i As Long
     For i = 0 To 7
-        b(i) = CByte("&h" & Mid$(s, 1 + i * 2, 2)) Or 1
+        b(i) = CByte("&h" & Mid$(Key, 1 + i * 2, 2)) Or ParityBit
     Next i
     
     Parse64BitKeyString = AsCurr(b(0))
 End Function
 
 Private Function Get64BitKey(ByRef RgbKey() As Byte) As Currency
-    Const ParityBit As Byte = 1
     VerifyKeySize RgbKey
     
     Dim lb      As Long
@@ -190,10 +189,10 @@ End Function
 
 Private Sub InitLegalSizes()
     ReDim mLegalKeySizes(0)
-    Set mLegalKeySizes(0) = Cor.NewKeySizes(DEF_KEYSIZE, DEF_KEYSIZE, 0)
+    Set mLegalKeySizes(0) = Cor.NewKeySizes(DESKeySize, DESKeySize, 0)
     
     ReDim mLegalBlockSizes(0)
-    Set mLegalBlockSizes(0) = Cor.NewKeySizes(DEF_BLOCKSIZE, DEF_BLOCKSIZE, 0)
+    Set mLegalBlockSizes(0) = Cor.NewKeySizes(DESBlockSize, DESBlockSize, 0)
 End Sub
 
 

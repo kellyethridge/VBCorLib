@@ -76,7 +76,7 @@ Public Sub TransformBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As Cip
     Const Expected As String = "This is the message to encrypt!!"
     Assert.That Actual, Iz.EqualTo(CorArray.Length(MCrypt))
     Assert.That Encoding.ASCII.GetString(ActualOutput), Iz.EqualTo(Expected)
-    Assert.That Encryptor.TransformFinalBlock(NewBytes(), 0, 0), Iz.Empty
+    Assert.That Decryptor.TransformFinalBlock(NewBytes(), 0, 0), Iz.Empty
 End Sub
 
 Public Sub TransformFinalBlock_WithPaddingMode_ReturnsExpected(ByVal Padding As PaddingMode, ByRef Crypted As String)

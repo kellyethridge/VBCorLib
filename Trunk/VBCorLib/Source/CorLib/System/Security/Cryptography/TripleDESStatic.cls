@@ -43,9 +43,7 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mLegalBlockSizes()  As KeySizes
-Private mLegalKeySizes()    As KeySizes
-
+Private Const PartSize As Long = 8
 
 
 ''
@@ -71,62 +69,36 @@ End Function
 ' equal to the second 64 bits, or if the second 64 bits is equal to the third 64 bits.
 '
 Public Function IsWeakKey(ByRef RgbKey() As Byte) As Boolean
+    Const Key128Bit As Long = 16
+    Const Key192Bit As Long = 24
+    
     Dim Size As Long
     Size = CorArray.Length(RgbKey)
     
-    If Not IsLegalKeySize(Size * 8) Then _
-        Throw Cor.NewCryptographicException("Invalid key length.")
-    
-    If Size = 16 Then
-        IsWeakKey = IsWeakKey128(RgbKey)
-    Else
-        IsWeakKey = IsWeakKey192(RgbKey)
-    End If
+    Select Case Size
+        Case Key128Bit
+            IsWeakKey = HasMatchingParts(RgbKey, LBound(RgbKey))
+        Case Key192Bit
+            IsWeakKey = HasMatchingParts(RgbKey, LBound(RgbKey)) Or _
+                        HasMatchingParts(RgbKey, LBound(RgbKey) + PartSize)
+        Case Else
+            Throw Cor.NewCryptographicException("Invalid key length.")
+    End Select
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IsLegalKeySize(ByVal Bits As Long) As Boolean
+Private Function HasMatchingParts(ByRef RgbKey() As Byte, ByVal StartIndex As Long) As Boolean
     Dim i As Long
-    For i = 0 To UBound(mLegalKeySizes)
-        If mLegalKeySizes(i).IsLegalSize(Bits) Then
-            IsLegalKeySize = True
+    
+    For i = 0 To PartSize - 1
+        If (RgbKey(StartIndex + i) And &HFE) <> (RgbKey(StartIndex + i + PartSize) And &HFE) Then
             Exit Function
         End If
-    Next i
-End Function
-
-Private Function IsWeakKey128(ByRef RgbKey() As Byte) As Boolean
-    IsWeakKey128 = IsMatchingParts(RgbKey, LBound(RgbKey), LBound(RgbKey) + 8)
-End Function
-
-Private Function IsWeakKey192(ByRef RgbKey() As Byte) As Boolean
-    If IsWeakKey128(RgbKey) Then
-        IsWeakKey192 = True
-    ElseIf IsMatchingParts(RgbKey, LBound(RgbKey) + 8, LBound(RgbKey) + 16) Then
-        IsWeakKey192 = True
-    End If
-End Function
-
-Private Function IsMatchingParts(ByRef RgbKey() As Byte, ByVal Part1Index As Long, ByVal Part2Index As Long) As Boolean
-    Dim i As Long
-    For i = 0 To 7
-        If (RgbKey(Part1Index + i) And &HFE) <> (RgbKey(Part2Index + i) And &HFE) Then Exit Function
-    Next i
+    Next
     
-    IsMatchingParts = True
+    HasMatchingParts = True
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    ReDim mLegalBlockSizes(0)
-    Set mLegalBlockSizes(0) = Cor.NewKeySizes(64, 64, 0)
-    
-    ReDim mLegalKeySizes(0)
-    Set mLegalKeySizes(0) = Cor.NewKeySizes(128, 192, 64)
-End Sub
