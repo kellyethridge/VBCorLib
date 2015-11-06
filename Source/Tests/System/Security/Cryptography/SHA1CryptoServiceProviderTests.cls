@@ -87,7 +87,7 @@ Public Sub ComputeHash_WithNullByteArray_ThrowsArgumentNullException()
     On Error Resume Next
     Provider.ComputeHash NullArray
     
-    AssertArgumentNullException Err, "Source"
+    AssertArgumentNullException Err, "Buffer"
 End Sub
 
 Public Sub ComputeHash_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
@@ -117,7 +117,7 @@ Public Sub ComputeHash_WithCountGreaterThanBufferLength_ThrowsArgumentException(
     On Error Resume Next
     Provider.ComputeHash Message, 5, 7
     
-    AssertArgumentException Err, "Count"
+    AssertArgumentException Err
 End Sub
 
 Public Sub ComputeHash_WithIndexPlusCountGreaterThanUBound_ThrowsArgumentOutOfRangeException()
