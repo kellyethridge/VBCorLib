@@ -253,23 +253,19 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub FromByteArray(ByRef Value As Variant)
-    Dim Ptr As Long
-    Ptr = CorArray.ArrayPointer(Value)
-    If Ptr = vbNullPtr Then _
-        Error.ArgumentNull "Value", ArgumentNull_Array
-    If SafeArrayGetDim(Ptr) <> 1 Then _
-        Error.Rank
+    ValidateArray Value, Parameter_Value
+    
     If CorArray.LengthFirstDim(Value) <> corSizeOfGuid Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, 16))
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, corSizeOfGuid))
     
     Dim Bytes() As Byte
-    SAPtr(Bytes) = Ptr
+    SAPtr(Bytes) = CorArray.ArrayPointer(Value)
     CopyMemory mGuid, Bytes(LBound(Bytes)), corSizeOfGuid
     SAPtr(Bytes) = vbNullPtr
 End Sub
 
-Private Sub Parse(ByVal InputString As String)
-    If Not Guid.Parser.TryParse(InputString, mGuid) Then
+Private Sub Parse(ByRef Value As Variant)
+    If Not Guid.Parser.TryParse(CStr(Value), mGuid) Then
         Guid.Parser.ThrowError
     End If
 End Sub
@@ -306,8 +302,8 @@ End Function
 Private Function ToStandardString(ByVal Options As FormatOptions, Optional ByVal OpenChar As Integer, Optional ByVal CloseChar As Integer) As String
     Dim Size        As Long
     Dim Offset      As Long
-    Dim Output      As String
-    Dim GuidChars() As Integer
+    Dim Result      As String
+    Dim Output()    As Integer
     
     Size = 32
     If Options And Dashes Then
@@ -317,38 +313,38 @@ Private Function ToStandardString(ByVal Options As FormatOptions, Optional ByVal
         Size = Size + 2
     End If
     
-    Output = SysAllocStringLen(0, Size)
-    GuidChars = AllocChars(Output)
+    Result = SysAllocStringLen(vbNullPtr, Size)
+    Output = AllocChars(Result)
     
     If Options And Closure Then
-        GuidChars(0) = OpenChar
+        Output(0) = OpenChar
         Offset = 1
     End If
     
-    Offset = HexToChars(GuidChars, Offset, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False)
-    Offset = HexToChars(GuidChars, Offset, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False)
-    Offset = AddDash(GuidChars, Offset, Options)
-    Offset = HexToChars(GuidChars, Offset, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False)
-    Offset = AddDash(GuidChars, Offset, Options)
-    Offset = HexToChars(GuidChars, Offset, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False)
-    Offset = AddDash(GuidChars, Offset, Options)
-    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(0), mGuid.Data4(1), False)
-    Offset = AddDash(GuidChars, Offset, Options)
-    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(2), mGuid.Data4(3), False)
-    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(4), mGuid.Data4(5), False)
-    Offset = HexToChars(GuidChars, Offset, mGuid.Data4(6), mGuid.Data4(7), False)
+    Offset = HexToChars(Output, Offset, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False)
+    Offset = HexToChars(Output, Offset, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False)
+    Offset = AddDash(Output, Offset, Options)
+    Offset = HexToChars(Output, Offset, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False)
+    Offset = AddDash(Output, Offset, Options)
+    Offset = HexToChars(Output, Offset, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False)
+    Offset = AddDash(Output, Offset, Options)
+    Offset = HexToChars(Output, Offset, mGuid.Data4(0), mGuid.Data4(1), False)
+    Offset = AddDash(Output, Offset, Options)
+    Offset = HexToChars(Output, Offset, mGuid.Data4(2), mGuid.Data4(3), False)
+    Offset = HexToChars(Output, Offset, mGuid.Data4(4), mGuid.Data4(5), False)
+    Offset = HexToChars(Output, Offset, mGuid.Data4(6), mGuid.Data4(7), False)
     
     If Options And Closure Then
-        GuidChars(Offset) = CloseChar
+        Output(Offset) = CloseChar
     End If
     
-    FreeChars GuidChars
-    ToStandardString = Output
+    FreeChars Output
+    ToStandardString = Result
 End Function
 
-Private Function AddDash(ByRef GuidChars() As Integer, ByVal Offset As Long, ByVal Options As FormatOptions) As Long
+Private Function AddDash(ByRef Output() As Integer, ByVal Offset As Long, ByVal Options As FormatOptions) As Long
     If Options And Dashes Then
-        GuidChars(Offset) = corHyphenChar
+        Output(Offset) = corHyphenChar
         Offset = Offset + 1
     End If
     
@@ -356,64 +352,64 @@ Private Function AddDash(ByRef GuidChars() As Integer, ByVal Offset As Long, ByV
 End Function
 
 Private Function ToHexString() As String
-    Dim Output      As String
-    Dim GuidChars() As Integer
+    Dim Result      As String
+    Dim Output() As Integer
     
-    Output = SysAllocStringLen(0, 68)
-    GuidChars = AllocChars(Output)
+    Result = SysAllocStringLen(0, 68)
+    Output = AllocChars(Result)
     
-    GuidChars(0) = corOpenBraceChar
-    GuidChars(1) = corZeroChar
-    GuidChars(2) = corLowerXChar
-    HexToChars GuidChars, 3, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False
-    HexToChars GuidChars, 7, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False
-    GuidChars(11) = corCommaChar
-    GuidChars(12) = corZeroChar
-    GuidChars(13) = corLowerXChar
-    HexToChars GuidChars, 14, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False
-    GuidChars(18) = corCommaChar
-    GuidChars(19) = corZeroChar
-    GuidChars(20) = corLowerXChar
-    HexToChars GuidChars, 21, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False
-    GuidChars(25) = corCommaChar
-    GuidChars(26) = corOpenBraceChar
-    HexToChars GuidChars, 27, mGuid.Data4(0), mGuid.Data4(1), True
-    GuidChars(36) = corCommaChar
-    HexToChars GuidChars, 37, mGuid.Data4(2), mGuid.Data4(3), True
-    GuidChars(46) = corCommaChar
-    HexToChars GuidChars, 47, mGuid.Data4(4), mGuid.Data4(5), True
-    GuidChars(56) = corCommaChar
-    HexToChars GuidChars, 57, mGuid.Data4(6), mGuid.Data4(7), True
-    GuidChars(66) = corCloseBraceChar
-    GuidChars(67) = corCloseBraceChar
+    Output(0) = corOpenBraceChar
+    Output(1) = corZeroChar
+    Output(2) = corLowerXChar
+    HexToChars Output, 3, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False
+    HexToChars Output, 7, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False
+    Output(11) = corCommaChar
+    Output(12) = corZeroChar
+    Output(13) = corLowerXChar
+    HexToChars Output, 14, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False
+    Output(18) = corCommaChar
+    Output(19) = corZeroChar
+    Output(20) = corLowerXChar
+    HexToChars Output, 21, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False
+    Output(25) = corCommaChar
+    Output(26) = corOpenBraceChar
+    HexToChars Output, 27, mGuid.Data4(0), mGuid.Data4(1), True
+    Output(36) = corCommaChar
+    HexToChars Output, 37, mGuid.Data4(2), mGuid.Data4(3), True
+    Output(46) = corCommaChar
+    HexToChars Output, 47, mGuid.Data4(4), mGuid.Data4(5), True
+    Output(56) = corCommaChar
+    HexToChars Output, 57, mGuid.Data4(6), mGuid.Data4(7), True
+    Output(66) = corCloseBraceChar
+    Output(67) = corCloseBraceChar
     
-    FreeChars GuidChars
-    ToHexString = Output
+    FreeChars Output
+    ToHexString = Result
 End Function
 
-Private Function HexToChars(ByRef GuidChars() As Integer, ByVal Offset As Long, ByVal a As Long, ByVal b As Long, ByVal IsHex As Boolean) As Long
+Private Function HexToChars(ByRef Output() As Integer, ByVal Offset As Long, ByVal a As Long, ByVal b As Long, ByVal IsHex As Boolean) As Long
     a = a And &HFF
     b = b And &HFF
     
     If IsHex Then
-        GuidChars(Offset) = corZeroChar
-        GuidChars(Offset + 1) = corLowerXChar
+        Output(Offset) = corZeroChar
+        Output(Offset + 1) = corLowerXChar
         Offset = Offset + 2
     End If
     
-    GuidChars(Offset) = HexToChar(a \ &H10)
-    GuidChars(Offset + 1) = HexToChar(a)
+    Output(Offset) = HexToChar(a \ &H10)
+    Output(Offset + 1) = HexToChar(a)
     Offset = Offset + 2
     
     If IsHex Then
-        GuidChars(Offset) = corCommaChar
-        GuidChars(Offset + 1) = corZeroChar
-        GuidChars(Offset + 2) = corLowerXChar
+        Output(Offset) = corCommaChar
+        Output(Offset + 1) = corZeroChar
+        Output(Offset + 2) = corLowerXChar
         Offset = Offset + 3
     End If
     
-    GuidChars(Offset) = HexToChar(b \ &H10)
-    GuidChars(Offset + 1) = HexToChar(b)
+    Output(Offset) = HexToChar(b \ &H10)
+    Output(Offset + 1) = HexToChar(b)
     
     HexToChars = Offset + 2
 End Function
