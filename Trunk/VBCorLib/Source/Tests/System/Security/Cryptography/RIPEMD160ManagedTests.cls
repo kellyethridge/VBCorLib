@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-'   RIPEMD160ManagedTests
+' RIPEMD160ManagedTests
 '
 ' Test vector source: http://homes.esat.kuleuven.be/~bosselae/ripemd160.html
 '

@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' FileIntoTests
+'
 Option Explicit
 Implements ICategorizable
 Implements ITestCaseSource
@@ -34,31 +37,31 @@ Public Sub Teardown()
 End Sub
 
 Public Sub Name_WhenCalled_RetursFileNamePortion()
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo("c:\windows\file.txt")
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo("c:\windows\file.txt")
     
     Dim Actual As String
-    Actual = Info.Name
+    Actual = info.Name
     
     Assert.That Actual, Iz.EqualTo("file.txt")
 End Sub
 
 Public Sub FullName_WithFullPath_ReturnsFullPath()
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo("c:\windows\file.txt")
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo("c:\windows\file.txt")
     
     Dim Actual As String
-    Actual = Info.FullName
+    Actual = info.FullName
     
     Assert.That Actual, Iz.EqualTo("c:\windows\file.txt")
 End Sub
 
 Public Sub FullName_WithFileName_ReturnsFullPath()
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo("file.txt")
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo("file.txt")
     
     Dim Actual As String
-    Actual = Info.FullName
+    Actual = info.FullName
     
     Dim Expected As String
     Expected = Path.Combine(CurDir, "file.txt")
@@ -68,13 +71,13 @@ End Sub
 Public Sub Attributes_WhenSet_AreSetToFile()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="abc")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
-    Info.Attributes = FileAttributes.Hidden
+    info.Attributes = FileAttributes.Hidden
     
     Dim Actual As FileAttributes
-    Actual = Info.Attributes
+    Actual = info.Attributes
     Assert.That Actual, Iz.EqualTo(FileAttributes.Hidden)
 End Sub
 
@@ -82,11 +85,11 @@ Public Sub Attributes_WhenCalled_ReturnsCurrentAttributes()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="abc")
     SetAttr FileName, vbNormal
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
     Dim Actual As FileAttributes
-    Actual = Info.Attributes
+    Actual = info.Attributes
     
     Assert.That Actual, Iz.EqualTo(FileAttributes.Normal)
 End Sub
@@ -94,11 +97,11 @@ End Sub
 Public Sub Attributes_WhenCalledWithNonExistingFile_ThrowsFileNotFoundException()
     Dim FileName As String
     FileName = Path.Combine(mBuilder.TempFolder, "Missing.txt")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
     On Error Resume Next
-    Info.Attributes = Normal
+    info.Attributes = Normal
     
     AssertFileNotFoundException Err, FileName
 End Sub
@@ -106,12 +109,12 @@ End Sub
 Public Sub CreationTime_WhenCalled_SetsAndReturnsNewTime()
     Dim FileName As String
     FileName = mBuilder.CreateFile
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
-    Info.CreationTime = #1/1/2001 5:00:00 AM#
+    info.CreationTime = #1/1/2001 5:00:00 AM#
     Dim Actual As Date
-    Actual = Info.CreationTime.ToOADate
+    Actual = info.CreationTime.ToOADate
 
     Assert.That Actual, Iz.EqualTo(#1/1/2001 5:00:00 AM#)
 End Sub
@@ -119,12 +122,12 @@ End Sub
 Public Sub LastAccessTime_WhenCalled_SetsAndReturnsNewTime()
     Dim FileName As String
     FileName = mBuilder.CreateFile
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
-    Info.LastAccessTime = #1/1/2001 5:00:00 AM#
+    info.LastAccessTime = #1/1/2001 5:00:00 AM#
     Dim Actual As Date
-    Actual = Info.LastAccessTime.ToOADate
+    Actual = info.LastAccessTime.ToOADate
 
     Assert.That Actual, Iz.EqualTo(#1/1/2001 5:00:00 AM#)
 End Sub
@@ -132,12 +135,12 @@ End Sub
 Public Sub LastWriteTime_WhenCalled_SetsAndReturnsNewTime()
     Dim FileName As String
     FileName = mBuilder.CreateFile
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
-    Info.LastWriteTime = #1/1/2001 5:00:00 AM#
+    info.LastWriteTime = #1/1/2001 5:00:00 AM#
     Dim Actual As Date
-    Actual = Info.LastWriteTime.ToOADate
+    Actual = info.LastWriteTime.ToOADate
 
     Assert.That Actual, Iz.EqualTo(#1/1/2001 5:00:00 AM#)
 End Sub
@@ -145,11 +148,11 @@ End Sub
 Public Sub DirectoryName_WhenCalled_ReturnsDirectoryPortionOfPath()
     Dim FileName As String
     FileName = mBuilder.CreateFile
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
     Dim Actual As String
-    Actual = Info.DirectoryName
+    Actual = info.DirectoryName
     
     Dim Expected As String
     Expected = mBuilder.TempFolder
@@ -159,11 +162,11 @@ End Sub
 Public Sub Exists_WhenCalledWithExistingFile_ReturnsTrue()
     Dim FileName As String
     FileName = mBuilder.CreateFile
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
     Dim Actual As Boolean
-    Actual = Info.Exists
+    Actual = info.Exists
     
     Assert.That Actual, Iz.True
 End Sub
@@ -171,11 +174,11 @@ End Sub
 Public Sub Exists_WhenCalledWithNonExisitngFile_ReturnsFalse()
     Dim FileName As String
     FileName = Path.Combine(mBuilder.TempFolder, "Missing.txt")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
     Dim Actual As Boolean
-    Actual = Info.Exists
+    Actual = info.Exists
     
     Assert.That Actual, Iz.False
 End Sub
@@ -183,11 +186,11 @@ End Sub
 Public Sub Extension_WhenCalled_ReturnsFileExtension()
     Dim FileName As String
     FileName = mBuilder.CreateFile
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
     Dim Actual As String
-    Actual = Info.Extension
+    Actual = info.Extension
     
     Assert.That Actual, Iz.EqualTo(".txt")
 End Sub
@@ -195,11 +198,11 @@ End Sub
 Public Sub Length_WhenCalled_ReturnsFileLength()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="abc")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
 
     Dim Actual As Long
-    Actual = Info.Length
+    Actual = info.Length
     
     Assert.That Actual, Iz.EqualTo(3)
 End Sub
@@ -207,10 +210,10 @@ End Sub
 Public Sub Delete_WhenCalled_DeletesFile()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="abc")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     
-    Info.Delete
+    info.Delete
     
     Assert.That FileExists(FileName), Iz.False
 End Sub
@@ -218,11 +221,11 @@ End Sub
 Public Sub Delete_WithNonExistingFile_DoesNotThrowException()
     Dim FileName As String
     FileName = Path.Combine(mBuilder.TempFolder, "Missing.txt")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
 
     On Error Resume Next
-    Info.Delete
+    info.Delete
     
     AssertNoException Err
 End Sub
@@ -230,12 +233,12 @@ End Sub
 Public Sub MoveTo_WhenCalled_MovesFile()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="abc")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     Dim DestName As String
     DestName = Path.Combine(mBuilder.TempFolder, "NewFile.txt")
 
-    Info.MoveTo DestName
+    info.MoveTo DestName
     
     Assert.That FileExists(DestName), Iz.True
     Assert.That FileExists(FileName), Iz.False
@@ -244,15 +247,15 @@ End Sub
 Public Sub MoveTo_WhenCompleted_UpdatesFileInfo()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="abc")
-    Dim Info As FileInfo
-    Set Info = Cor.NewFileInfo(FileName)
+    Dim info As FileInfo
+    Set info = Cor.NewFileInfo(FileName)
     Dim DestName As String
     DestName = Path.Combine(mBuilder.TempFolder, "NewFile.txt")
 
-    Info.MoveTo DestName
+    info.MoveTo DestName
     
-    Assert.That Info.Name, Iz.EqualTo("NewFile.txt")
-    Assert.That Info.FullName, Iz.EqualTo(DestName)
+    Assert.That info.Name, Iz.EqualTo("NewFile.txt")
+    Assert.That info.FullName, Iz.EqualTo(DestName)
 End Sub
 
 
