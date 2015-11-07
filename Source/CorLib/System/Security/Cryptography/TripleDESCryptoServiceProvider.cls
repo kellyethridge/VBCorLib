@@ -321,8 +321,11 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
-    If IsMissing(RgbKey) <> IsMissing(RgbIV) Then _
-        Throw Cor.NewArgumentException("Argument is missing.", IIf(IsMissing(RgbKey), "RgbKey", "RgbIV"))
+    Dim ClonedKey() As Byte
+    Dim ClonedIV()  As Byte
+    
+    If Mode = CipherMode.CFB And FeedbackSize <> DefaultFeedbackSize Then _
+        Error.Cryptographic Cryptography_CSP_CFBSizeNotSupported
     
     Dim Alg As Long
     If mBase.KeySize = 128 Then
@@ -331,6 +334,9 @@ Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, B
         Alg = CALG_3DES
     End If
     
+    ClonedKey = mBase.CloneRgbKey(RgbKey)
+    ClonedIV = mBase.CloneRgbIV(RgbIV)
+        
     Set CreateCipher = New CryptoAPITransform
     CreateCipher.Init Alg, mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting
 End Function
