@@ -228,8 +228,8 @@ Private Sub AddSystemSecurityCryptography()
 '
         .Add NewSuite("TripleDESCryptoServiceProvider", _
             New TripleDESCryptoServiceProviderTests, _
-            New TripleDESEncryptionTests)
-'            New TestTripleDESDecryption)
+            New TripleDESEncryptionTests, _
+            New TripleDESDecryptionTests)
 '
 '        .Add NewSuite("SymmetricalAlgorithm", _
 '            New TestSymmetricAlgorithmBase, _
