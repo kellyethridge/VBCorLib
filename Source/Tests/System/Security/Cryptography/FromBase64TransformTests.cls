@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' FromBase64TransformTests
+'
 Option Explicit
 Implements ICategorizable
 Implements ITestCaseSource

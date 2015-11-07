@@ -11,6 +11,9 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
+'
+' FixedSizeArrayListTests
+'
 Option Explicit
 
 Public Sub FixedSize_WithNothing_ThrowsArgumentNullException()
