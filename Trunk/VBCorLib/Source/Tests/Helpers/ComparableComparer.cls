@@ -14,9 +14,9 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements SimplyVBUnitType.IComparer
 
-Private Function IComparer_Compare(x As Variant, y As Variant) As Long
+Private Function IComparer_Compare(X As Variant, Y As Variant) As Long
     Dim XComparable As IComparable
-    Set XComparable = x
+    Set XComparable = X
     
-    IComparer_Compare = XComparable.CompareTo(y)
+    IComparer_Compare = XComparable.CompareTo(Y)
 End Function

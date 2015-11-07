@@ -78,9 +78,9 @@ Public Function GenerateString(ByVal Size As Long) As String
     Dim i As Long
     
     For i = 1 To Size
-        Dim ch As Long
-        ch = Ran.NextRange(32, Asc("z"))
-        sb.AppendChar ch
+        Dim Ch As Long
+        Ch = Ran.NextRange(32, Asc("z"))
+        sb.AppendChar Ch
     Next
     
     GenerateString = sb.ToString
