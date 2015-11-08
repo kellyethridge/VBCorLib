@@ -75,7 +75,7 @@ Private mKey()              As Byte
 ' @remarks A derived class uses this to add the set of legal block sizes the implementing algorithm can process.
 ' <p>As an example, the RijndaelManaged class would be to call this method as such:
 ' <pre>
-' Call mBase.AddLegalBlockSize(128, 256, 64)
+' mBase.AddLegalBlockSize 128, 256, 64
 ' </pre>
 '
 Public Sub AddLegalBlockSize(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long)
@@ -124,7 +124,7 @@ End Property
 ' @remarks A derived class uses this to add the set of legal block sizes the implementing algorithm can process.
 ' <p>As an example, the RijndaelManaged class would be to call this method as such:
 ' <pre>
-' Call mBase.AddLegalKeySize(128, 256, 64)
+' mBase.AddLegalKeySize 128, 256, 64
 ' </pre>
 '
 Public Sub AddLegalKeySize(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long)
@@ -157,7 +157,7 @@ End Property
 '
 Public Property Let KeySize(ByVal Value As Long)
     If Not IsLegalSize(mLegalKeySizes, Value) Then _
-        Throw Cor.NewCryptographicException("Invalid key size.")
+        Error.Cryptographic Cryptography_InvalidKeySize
     
     mKeySize = Value
     Erase mKey
@@ -207,7 +207,7 @@ Public Property Let Mode(ByVal Value As CipherMode)
         Case CipherMode.CBC, CipherMode.ECB, CipherMode.OFB, CipherMode.CFB
             mMode = Value
         Case Else
-            Throw Cor.NewCryptographicException("Invalid cipher mode for this cipher algorithm.")
+            Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
     End Select
 End Property
 
@@ -232,7 +232,7 @@ Public Property Let Padding(ByVal Value As PaddingMode)
         Case PaddingMode.None, PaddingMode.ANSIX923, PaddingMode.ISO10126, PaddingMode.PKCS7, PaddingMode.Zeros
             mPadding = Value
         Case Else
-            Throw Cor.NewCryptographicException("The padding mode is not from the list of valid modes.")
+            Error.ArgumentOutOfRange "Padding", ArgumentOutOfRange_Enum
     End Select
 End Property
 
@@ -243,7 +243,10 @@ End Property
 ' @remarks If no IV has been set, then a random IV will be generated.
 '
 Public Function GetIV() As Byte()
-    If CorArray.IsNull(mIV) Then Call GenerateIV
+    If CorArray.IsNull(mIV) Then
+        GenerateIV
+    End If
+    
     GetIV = mIV
 End Function
 
@@ -258,7 +261,7 @@ Public Sub SetIV(ByRef RgbIV() As Byte)
     Size = CorArray.Length(RgbIV)
     
     If (Size * 8) <> mBlockSize Then _
-        Throw Cor.NewCryptographicException("Invalid IV length.")
+        Error.Cryptographic Cryptography_InvalidIVSize
     
     ' We do this to support non-zero based arrays.
     ReDim mIV(0 To Size - 1)
@@ -279,7 +282,10 @@ End Sub
 ' @remarks If no key has been set, then a random key will be generated.
 '
 Public Function GetKey() As Byte()
-    If CorArray.IsNull(mKey) Then Call GenerateKey
+    If CorArray.IsNull(mKey) Then
+        GenerateKey
+    End If
+    
     GetKey = mKey
 End Function
 
@@ -297,11 +303,13 @@ Public Sub SetKey(ByRef RgbKey() As Byte)
     Size = CorArray.LengthFirstDim(RgbKey)
     
     If Not ValidKeySize(Size * 8) Then _
-        Throw Cor.NewArgumentException("Invalid key size.", "Key")
+        Error.Argument Cryptography_InvalidKeySize, "Key"
     
     Dim Ex As Exception
     RaiseEvent CheckForWeakKey(RgbKey, Ex)
-    If Not Ex Is Nothing Then Throw Ex
+    If Not Ex Is Nothing Then
+        Throw Ex
+    End If
     
     ' We do this so we have a zero-based key array.
     ReDim mKey(0 To Size - 1)
@@ -361,24 +369,26 @@ Public Function CloneRgbKey(ByRef RgbKey As Variant) As Byte()
     End If
     
     If VarType(RgbKey) <> corByteArray Then _
-        Throw Cor.NewArgumentException("A byte array is required.", "RgbKey")
+        Error.Argument Argument_ByteArrayRequired, "Key"
     If CorArray.IsNull(RgbKey) Then _
-        Throw Cor.NewCryptographicException("Invalid key size.")
+        Error.Cryptographic Cryptography_InvalidKeySize
         
     Dim Size As Long
-    Size = CorArray.Length(RgbKey)
+    Size = CorArray.LengthFirstDim(RgbKey)
     If Not IsLegalSize(mLegalKeySizes, Size * 8) Then _
-        Throw Cor.NewCryptographicException("Invalid key size.")
+        Error.Cryptographic Cryptography_InvalidKeySize
     
-    Dim Ret() As Byte
-    ReDim Ret(0 To Size - 1)
-    Buffer.BlockCopy RgbKey, 0, Ret, 0, Size
+    Dim Result() As Byte
+    ReDim Result(0 To Size - 1)
+    Buffer.BlockCopy RgbKey, 0, Result, 0, Size
     
     Dim Ex As Exception
-    RaiseEvent CheckForWeakKey(Ret, Ex)
-    If Not Ex Is Nothing Then Throw Ex
+    RaiseEvent CheckForWeakKey(Result, Ex)
+    If Not Ex Is Nothing Then
+        Throw Ex
+    End If
     
-    CloneRgbKey = Ret
+    CloneRgbKey = Result
 End Function
 
 ''
@@ -396,22 +406,22 @@ Public Function CloneRgbIV(ByRef RgbIV As Variant) As Byte()
     End If
     
     If VarType(RgbIV) <> corByteArray Then _
-        Throw Cor.NewArgumentException("A byte array is required.", "RgbIV")
+        Error.Argument Argument_ByteArrayRequired, "RgbIV"
     
-    Dim Ret() As Byte
+    Dim Result() As Byte
     If CorArray.IsNull(RgbIV) Then
-        Ret = CryptoHelper.GetRandomBytes(mBlockSize \ 8)
+        Result = CryptoHelper.GetRandomBytes(mBlockSize \ 8)
     Else
         Dim Size As Long
         Size = CorArray.Length(RgbIV)
         If (Size * 8) <> mBlockSize Then _
-            Throw Cor.NewCryptographicException("Invalid RgbIV length.")
+            Error.Cryptographic Cryptography_InvalidIVSize
         
-        ReDim Ret(0 To Size - 1)
-        Buffer.BlockCopy RgbIV, 0, Ret, 0, Size
+        ReDim Result(0 To Size - 1)
+        Buffer.BlockCopy RgbIV, 0, Result, 0, Size
     End If
     
-    CloneRgbIV = Ret
+    CloneRgbIV = Result
 End Function
 
 

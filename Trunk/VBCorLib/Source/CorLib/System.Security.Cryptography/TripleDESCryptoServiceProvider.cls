@@ -321,9 +321,6 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
-    Dim ClonedKey() As Byte
-    Dim ClonedIV()  As Byte
-    
     If Mode = CipherMode.CFB And FeedbackSize <> DefaultFeedbackSize Then _
         Error.Cryptographic Cryptography_CSP_CFBSizeNotSupported
     
@@ -333,10 +330,7 @@ Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, B
     Else
         Alg = CALG_3DES
     End If
-    
-    ClonedKey = mBase.CloneRgbKey(RgbKey)
-    ClonedIV = mBase.CloneRgbIV(RgbIV)
-        
+
     Set CreateCipher = New CryptoAPITransform
     CreateCipher.Init Alg, mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting
 End Function
