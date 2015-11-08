@@ -118,6 +118,7 @@ Public Enum ResourceStringKey
     Argument_ByteArrayOrStreamRequired = 848
     Argument_InvalidValue = 849
     Argument_MinMaxValue = 850
+    Argument_ByteArrayRequired = 851
     
     ArgumentNull_Array = 900
     ArgumentNull_Exception = 901
@@ -181,6 +182,8 @@ Public Enum ResourceStringKey
     
     Cryptography_HashNotYetFinalized = 500
     Cryptography_CSP_CFBSizeNotSupported = 501
+    Cryptography_InvalidKeySize = 502
+    Cryptography_InvalidIVSize = 503
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
