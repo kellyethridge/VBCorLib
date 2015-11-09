@@ -59,14 +59,14 @@ Public Property Get BlockSize() As Long: End Property
 ''
 ' Sets the block size, in bits, used by the cryptographic operation.
 '
-' @param RHS The block size in bits.
+' @param Value The block size in bits.
 ' @remarks A block size is the basic unit size of data that can be encrypted or decrypted in a single operation. Data that is
 ' larger than a block size are processed by splitting the data into multiple blocks the same size as the block size then
 ' operating of the multiple blocks.
 ' <p>An invalid block size will cause a <b>CryptographicException</b>.
 ' <p>A list of legal block sizes can be obtained through the <b>LegalBlockSizes</b> property.</p>
 '
-Public Property Let BlockSize(ByVal RHS As Long): End Property
+Public Property Let BlockSize(ByVal Value As Long): End Property
 
 ''
 ' Returns the feedback size, in bits, used by the cryptographic operation.
@@ -80,11 +80,11 @@ Public Property Get FeedbackSize() As Long: End Property
 ''
 ' Sets the feedback size, in bits, used by the cryptographic operation.
 '
-' @param RHS The feedback size in bits.
+' @param Value The feedback size in bits.
 ' @remarks The feedback size determines the amount of data that is fed back to successive encryption or decryption operations.
 ' The feedback size cannot be greater than the block size.
 '
-Public Property Let FeedbackSize(ByVal RHS As Long): End Property
+Public Property Let FeedbackSize(ByVal Value As Long): End Property
 
 ''
 ' Returns the Initialization Vector used by the cryptographic operation.
@@ -100,14 +100,14 @@ Public Property Get IV() As Byte(): End Property
 ''
 ' Sets the Initialization Vector used by the cryptographic operation.
 '
-' @param RHS The new Initialization Vector.
+' @param Value The new Initialization Vector.
 ' @remarks If several blocks of same plain text are encrypted, the ciphered data could all be the same aswell. Using an
 ' Initialization Vector can prevent same plain text blocks to reproduce the same ciphered blocks.
 ' <p>This can be generated using the <b>GenerateIV</b> method, or a new one will be generated if one hasn't been set when
 ' this property is accessed.</p>
 ' <p>This must be set to an array the same size as the block size.</p>
 '
-Public Property Let IV(ByRef RHS() As Byte): End Property
+Public Property Let IV(ByRef Value() As Byte): End Property
 
 ''
 ' Returns the secret key used by the cryptographic operation.
@@ -122,11 +122,11 @@ Public Property Get Key() As Byte(): End Property
 ''
 ' Sets the secret key to be used by the cryptographic operation.
 '
-' @param RHS The new secret key to be used.
+' @param Value The new secret key to be used.
 ' @remarks Valid key sizes are determined by the individual algorithms. A list of valid sizes can be obtained
 ' through the <b>LegalKeySizes</b> property.
 '
-Public Property Let Key(ByRef RHS() As Byte): End Property
+Public Property Let Key(ByRef Value() As Byte): End Property
 
 ''
 ' Returns the size of the key, in bits, used by the cryptographic operation.
@@ -139,11 +139,11 @@ Public Property Get KeySize() As Long: End Property
 ''
 ' Sets the size of the key, in bits.
 '
-' @param RHS The size of the key in bits.
+' @param Value The size of the key in bits.
 ' @remarks The size of keys are measured in bits. Common key sizes are 64, 128, 192, and 256 bit lengths.
 ' <p>This will cause the <b>Key</b> property to reset and regenerate when needed.</p>
 '
-Public Property Let KeySize(ByVal RHS As Long): End Property
+Public Property Let KeySize(ByVal Value As Long): End Property
 
 ''
 ' Returns a list of legal block sizes.
@@ -171,11 +171,11 @@ Public Property Get Mode() As CipherMode: End Property
 ''
 ' Sets the mode the current algorithm is set to.
 '
-' @param RHS The new mode for the algorithm.
+' @param Value The new mode for the algorithm.
 ' @remarks The algoritm can operate in several modes. The modes determine how the data
 ' is processed from one block to the next.
 '
-Public Property Let Mode(ByVal RHS As CipherMode): End Property
+Public Property Let Mode(ByVal Value As CipherMode): End Property
 
 ''
 ' Returns the padding to be used by the algorithm.
@@ -189,11 +189,11 @@ Public Property Get Padding() As PaddingMode: End Property
 ''
 ' Sets the padding to be used by the algorithm.
 '
-' @param RHS The new padding value to be used.
+' @param Value The new padding value to be used.
 ' @remarks Padding is added to the end of plain text data to make the data length
 ' an even multiple of the block size.
 '
-Public Property Let Padding(ByVal RHS As PaddingMode): End Property
+Public Property Let Padding(ByVal Value As PaddingMode): End Property
 
 ''
 ' Releases all resources.

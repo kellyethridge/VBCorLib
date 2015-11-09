@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: RC2CryptoServiceProvider
+' Module: RC2CryptoServiceProvider
 '
 
 ''
@@ -43,20 +46,16 @@ Implements IObject
 Implements SymmetricAlgorithm
 Implements RC2
 
-Private Const DEF_BLOCKSIZE     As Long = 64
-Private Const DEF_MINBLOCKSIZE  As Long = DEF_BLOCKSIZE
-Private Const DEF_MAXBLOCKSIZE  As Long = DEF_BLOCKSIZE
-Private Const DEF_BLOCKSKIPSIZE As Long = 0
-Private Const DEF_FEEDBACKSIZE  As Long = 8
-Private Const DEF_MINKEYSIZE    As Long = 40
-Private Const DEF_MAXKEYSIZE    As Long = 128
-Private Const DEF_KEYSIZE       As Long = DEF_MAXKEYSIZE
-Private Const DEF_KEYSKIPSIZE   As Long = 8
+Private Const LegalBlockSize        As Long = 64
+Private Const DefaultFeedbackSize   As Long = 8
+Private Const LegalMinKeySize       As Long = 40
+Private Const LegalMaxKeySize       As Long = 128
+Private Const DefaultKeySize        As Long = LegalMaxKeySize
+Private Const LegalKeySkipSize      As Long = 8
 
 Private mBase       As SymmetricAlgorithmBase
 Attribute mBase.VB_VarHelpID = -1
 Private mUseSalt    As Boolean
-
 
 
 ''
@@ -71,15 +70,17 @@ End Property
 ''
 ' Sets the effective key size to be used.
 '
-' @param RHS The new effective key size.
+' @param Value The new effective key size.
 ' @remarks This property can only be set to the same value as KeySize.
 ' This property is useless in setting the effective key size. It is here
 ' to complete the .NET interface for this class.
 ' <p>The effective key size to use will ultimately be determined by
 ' the length of the actual key being used.</p>
 '
-Public Property Let EffectiveKeySize(ByVal RHS As Long)
-    If RHS <> mBase.KeySize Then Throw Cor.NewCryptographicException("EffectiveKeySize must match KeySize.")
+Public Property Let EffectiveKeySize(ByVal Value As Long)
+    If Value <> mBase.KeySize Then
+        Throw Cor.NewCryptographicException("EffectiveKeySize must match KeySize.")
+    End If
 End Property
 
 ''
@@ -94,10 +95,10 @@ End Property
 ''
 ' Sets if a salt value will be used with the key generation.
 '
-' @param RHS Whether a salt value will be used with the key generation.
+' @param Value Whether a salt value will be used with the key generation.
 '
-Public Property Let UseSalt(ByVal RHS As Boolean)
-    mUseSalt = RHS
+Public Property Let UseSalt(ByVal Value As Boolean)
+    mUseSalt = Value
 End Property
 
 ''
@@ -113,11 +114,11 @@ End Property
 ''
 ' Sets the block size, in bits, used by this algorithm.
 '
-' @param RHS The new block size in bits.
+' @param Value The new block size in bits.
 ' @remarks The only valid block size is 64 bits.
 '
-Public Property Let BlockSize(ByVal RHS As Long)
-    mBase.BlockSize = RHS
+Public Property Let BlockSize(ByVal Value As Long)
+    mBase.BlockSize = Value
 End Property
 
 ''
@@ -143,11 +144,11 @@ End Property
 ''
 ' Sets the Feedback size in bits.
 '
-' @param RHS The new feedback size in bits.
+' @param Value The new feedback size in bits.
 ' @remarks Only 64 bits is valid.
 '
-Public Property Let FeedbackSize(ByVal RHS As Long)
-    mBase.FeedbackSize = RHS
+Public Property Let FeedbackSize(ByVal Value As Long)
+    mBase.FeedbackSize = Value
 End Property
 
 ''
@@ -162,11 +163,11 @@ End Property
 ''
 ' Sets the key size in bits.
 '
-' @param RHS The new key size in bits.
+' @param Value The new key size in bits.
 ' @remarks Key sizes of 128 or 192 are supported.
 '
-Public Property Let KeySize(ByVal RHS As Long)
-    mBase.KeySize = RHS
+Public Property Let KeySize(ByVal Value As Long)
+    mBase.KeySize = Value
 End Property
 
 ''
@@ -190,10 +191,10 @@ End Property
 ''
 ' Sets the Cipher mode this algorithm will use.
 '
-' @param RHS The cipher mode to use.
+' @param Value The cipher mode to use.
 '
-Public Property Let Mode(ByVal RHS As CipherMode)
-    mBase.Mode = RHS
+Public Property Let Mode(ByVal Value As CipherMode)
+    mBase.Mode = Value
 End Property
 
 ''
@@ -208,10 +209,10 @@ End Property
 ''
 ' Sets the padding mode to be used.
 '
-' @param RHS The new padding mode.
+' @param Value The new padding mode.
 '
-Public Property Let Padding(ByVal RHS As PaddingMode)
-    mBase.Padding = RHS
+Public Property Let Padding(ByVal Value As PaddingMode)
+    mBase.Padding = Value
 End Property
 
 ''
@@ -227,18 +228,18 @@ End Property
 ''
 ' Sets the secret key.
 '
-' @param RHS The new secret key.
+' @param Value The new secret key.
 ' @param The key must be a valid key length. Currently only 64 bits (8 bytes) is supported.
 '
-Public Property Let Key(ByRef RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Public Property Let Key(ByRef Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 ''
 ' Generates a random key to be used.
 '
 Public Sub GenerateKey()
-    Call mBase.GenerateKey
+    mBase.GenerateKey
 End Sub
 
 ''
@@ -254,25 +255,25 @@ End Property
 ''
 ' Sets the Initialization Vector to be used.
 '
-' @param RHS The new IV to use.
+' @param Value The new IV to use.
 ' @remarks The array must be 8 bytes in length.
 '
-Public Property Let IV(ByRef RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Public Property Let IV(ByRef Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 ''
 ' Generates a random IV array to use.
 '
 Public Sub GenerateIV()
-    Call mBase.GenerateIV
+    mBase.GenerateIV
 End Sub
 
 ''
 ' Clears the Key and IV arrays.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -349,7 +350,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
     If IsMissing(RgbKey) <> IsMissing(RgbIV) Then _
@@ -361,29 +362,27 @@ Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, B
     ' We calculate the effective key size because the key itself may have been passed into the CreateEncryptor/CreateDecryptor
     ' functions so the KeySize property may not reflect the true size of the key to be used.
     Set CreateCipher = New CryptoAPITransform
-    Call CreateCipher.Init(CALG_RC2, Key, mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, CorArray.Length(Key) * 8, mUseSalt)
+    CreateCipher.Init CALG_RC2, Key, mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, CorArray.Length(Key) * 8, mUseSalt
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mBase = New SymmetricAlgorithmBase
     With mBase
-        Call .AddLegalBlockSize(DEF_MINBLOCKSIZE, DEF_MAXBLOCKSIZE, DEF_BLOCKSKIPSIZE)
-        Call .AddLegalKeySize(DEF_MINKEYSIZE, DEF_MAXKEYSIZE, DEF_KEYSKIPSIZE)
-        .BlockSize = DEF_BLOCKSIZE
-        .KeySize = DEF_KEYSIZE
-        .FeedbackSize = DEF_FEEDBACKSIZE
-        .Mode = CipherMode.CBC
-        .Padding = PaddingMode.PKCS7
+        .AddLegalBlockSize LegalBlockSize, LegalBlockSize, 0
+        .AddLegalKeySize LegalMinKeySize, LegalMaxKeySize, LegalKeySkipSize
+        .BlockSize = LegalBlockSize
+        .KeySize = DefaultKeySize
+        .FeedbackSize = DefaultFeedbackSize
     End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -399,10 +398,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   RC2 Interface
+'   RC2
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let RC2_BlockSize(ByVal RHS As Long)
-    BlockSize = RHS
+Private Property Let RC2_BlockSize(ByVal Value As Long)
+    BlockSize = Value
 End Property
 
 Private Property Get RC2_BlockSize() As Long
@@ -410,7 +409,7 @@ Private Property Get RC2_BlockSize() As Long
 End Property
 
 Private Sub RC2_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function RC2_CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
@@ -421,8 +420,8 @@ Private Function RC2_CreateEncryptor(Optional ByRef RgbKey As Variant, Optional 
     Set RC2_CreateEncryptor = CreateEncryptor(RgbKey, RgbIV)
 End Function
 
-Private Property Let RC2_EffectiveKeySize(ByVal RHS As Long)
-    EffectiveKeySize = RHS
+Private Property Let RC2_EffectiveKeySize(ByVal Value As Long)
+    EffectiveKeySize = Value
 End Property
 
 Private Property Get RC2_EffectiveKeySize() As Long
@@ -433,8 +432,8 @@ Private Function RC2_Equals(Value As Variant) As Boolean
     RC2_Equals = Equals(Value)
 End Function
 
-Private Property Let RC2_FeedbackSize(ByVal RHS As Long)
-    FeedbackSize = RHS
+Private Property Let RC2_FeedbackSize(ByVal Value As Long)
+    FeedbackSize = Value
 End Property
 
 Private Property Get RC2_FeedbackSize() As Long
@@ -442,35 +441,35 @@ Private Property Get RC2_FeedbackSize() As Long
 End Property
 
 Private Sub RC2_GenerateIV()
-    Call GenerateIV
+    GenerateIV
 End Sub
 
 Private Sub RC2_GenerateKey()
-    Call GenerateKey
+    GenerateKey
 End Sub
 
 Private Function RC2_GetHashCode() As Long
     RC2_GetHashCode = GetHashCode
 End Function
 
-Private Property Let RC2_IV(RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Private Property Let RC2_IV(Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 Private Property Get RC2_IV() As Byte()
     RC2_IV = IV
 End Property
 
-Private Property Let RC2_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let RC2_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get RC2_Key() As Byte()
     RC2_Key = Key
 End Property
 
-Private Property Let RC2_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let RC2_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get RC2_KeySize() As Long
@@ -485,16 +484,16 @@ Private Property Get RC2_LegalKeySizes() As KeySizes()
     RC2_LegalKeySizes = LegalKeySizes
 End Property
 
-Private Property Let RC2_Mode(ByVal RHS As CipherMode)
-    Mode = RHS
+Private Property Let RC2_Mode(ByVal Value As CipherMode)
+    Mode = Value
 End Property
 
 Private Property Get RC2_Mode() As CipherMode
     RC2_Mode = Mode
 End Property
 
-Private Property Let RC2_Padding(ByVal RHS As PaddingMode)
-    Padding = RHS
+Private Property Let RC2_Padding(ByVal Value As PaddingMode)
+    Padding = Value
 End Property
 
 Private Property Get RC2_Padding() As PaddingMode
@@ -511,10 +510,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SymmetricAlgorithm Interface
+'   SymmetricAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let SymmetricAlgorithm_BlockSize(ByVal RHS As Long)
-    BlockSize = RHS
+Private Property Let SymmetricAlgorithm_BlockSize(ByVal Value As Long)
+    BlockSize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_BlockSize() As Long
@@ -522,7 +521,7 @@ Private Property Get SymmetricAlgorithm_BlockSize() As Long
 End Property
 
 Private Sub SymmetricAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function SymmetricAlgorithm_CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
@@ -537,8 +536,8 @@ Private Function SymmetricAlgorithm_Equals(Value As Variant) As Boolean
     SymmetricAlgorithm_Equals = Equals(Value)
 End Function
 
-Private Property Let SymmetricAlgorithm_FeedbackSize(ByVal RHS As Long)
-    FeedbackSize = RHS
+Private Property Let SymmetricAlgorithm_FeedbackSize(ByVal Value As Long)
+    FeedbackSize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_FeedbackSize() As Long
@@ -546,35 +545,35 @@ Private Property Get SymmetricAlgorithm_FeedbackSize() As Long
 End Property
 
 Private Sub SymmetricAlgorithm_GenerateIV()
-    Call GenerateIV
+    GenerateIV
 End Sub
 
 Private Sub SymmetricAlgorithm_GenerateKey()
-    Call GenerateKey
+    GenerateKey
 End Sub
 
 Private Function SymmetricAlgorithm_GetHashCode() As Long
     SymmetricAlgorithm_GetHashCode = GetHashCode
 End Function
 
-Private Property Let SymmetricAlgorithm_IV(RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Private Property Let SymmetricAlgorithm_IV(Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 Private Property Get SymmetricAlgorithm_IV() As Byte()
     SymmetricAlgorithm_IV = IV
 End Property
 
-Private Property Let SymmetricAlgorithm_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let SymmetricAlgorithm_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Key() As Byte()
     SymmetricAlgorithm_Key = Key
 End Property
 
-Private Property Let SymmetricAlgorithm_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let SymmetricAlgorithm_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_KeySize() As Long
@@ -589,16 +588,16 @@ Private Property Get SymmetricAlgorithm_LegalKeySizes() As KeySizes()
     SymmetricAlgorithm_LegalKeySizes = LegalKeySizes
 End Property
 
-Private Property Let SymmetricAlgorithm_Mode(ByVal RHS As CipherMode)
-    Mode = RHS
+Private Property Let SymmetricAlgorithm_Mode(ByVal Value As CipherMode)
+    Mode = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Mode() As CipherMode
     SymmetricAlgorithm_Mode = Mode
 End Property
 
-Private Property Let SymmetricAlgorithm_Padding(ByVal RHS As PaddingMode)
-    Padding = RHS
+Private Property Let SymmetricAlgorithm_Padding(ByVal Value As PaddingMode)
+    Padding = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Padding() As PaddingMode
