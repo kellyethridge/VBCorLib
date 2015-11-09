@@ -47,6 +47,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use HexToBytes("E0FEE0FEF1FEF1FE"), True
             Test.Use HexToBytes("FEE0FEE0FEF1FEF1"), True
             
+        Case "BlockSize_WithInvalidValue_ThrowsCryptographicException"
+            Test.Use 32
+            Test.Use 96
+            
+        Case "FeedbackSize_WithInvalidValue_ThrowsCryptographiException"
+            Test.Use 0
+            Test.Use 72
+            Test.Use 63
+            
+        Case "FeedbackSize_WithValidValue_DoesNotThrow"
+            Test.Use 8
+            Test.Use 32
+            Test.Use 64
+            
     End Select
 End Sub
 
@@ -57,6 +71,30 @@ Public Sub Constructor_WithOutKeyAndIV_AutoGenerates()
     Assert.That csp.IV, Iz.Not.Empty
     Assert.That CorArray.Length(csp.Key), Iz.EqualTo(8)
     Assert.That CorArray.Length(csp.IV), Iz.EqualTo(8)
+End Sub
+
+Public Sub BlockSize_WithInvalidValue_ThrowsCryptographicException(ByVal InvalidValue As Long)
+    Dim csp As New DESCryptoServiceProvider
+    
+    On Error Resume Next
+    csp.BlockSize = InvalidValue
+    
+    AssertCryptographicException Err
+End Sub
+
+Public Sub FeedbackSize_WithInvalidValue_ThrowsCryptographiException(ByVal InvalidValue As Long)
+    Dim csp As New DESCryptoServiceProvider
+    
+    On Error Resume Next
+    csp.FeedbackSize = InvalidValue
+    
+    AssertCryptographicException Err
+End Sub
+
+Public Sub FeedbackSize_WithValidValue_DoesNotThrow(ByVal ValidValue As Long)
+    Dim csp As New DESCryptoServiceProvider
+    
+    csp.FeedbackSize = ValidValue
 End Sub
 
 Public Sub Key_WhenSetToNull_ThrowsArgumentNullException()
@@ -111,11 +149,21 @@ End Sub
 
 Public Sub IV_WhenSetToInvalidSize_ThrowsCryptographicException()
     Dim csp As New DESCryptoServiceProvider
+    Dim NotBlockSizeArray() As Byte
+    ReDim NotBlockSizeArray(1 To 7)
     
     On Error Resume Next
-    csp.IV = NewBytes(1, 2, 3)
+    csp.IV = NotBlockSizeArray
     
     AssertCryptographicException Err
+End Sub
+
+Public Sub GenerateIV_WhenCalled_GeneratesCorrectSizeArray()
+    Dim csp As New DESCryptoServiceProvider
+    
+    csp.GenerateIV
+    
+    Assert.That CorArray.Length(csp.IV), Iz.EqualTo(8)
 End Sub
 
 Public Sub IsWeakKey_WithValue_ReturnsExpected(ByRef Key() As Byte, ByVal Expected As Boolean)

@@ -108,7 +108,7 @@ End Property
 '
 Public Property Let BlockSize(ByVal Value As Long)
     If Not IsLegalSize(mLegalBlockSizes, Value) Then _
-        Throw Cor.NewCryptographicException("Invalid block size.")
+        Error.Cryptographic Cryptography_InvalidBlockSize
     
     mBlockSize = Value
     Erase mIV
@@ -181,7 +181,7 @@ End Property
 '
 Public Property Let FeedbackSize(ByVal Value As Long)
     If (Value <= 0) Or (Value > mBlockSize) Or (Value Mod 8 <> 0) Then _
-        Throw Cor.NewCryptographicException("Invalid feedback size.")
+        Error.Cryptographic Cryptography_InvalidFeedbackSize
     
     mFeedbackSize = Value
 End Property
