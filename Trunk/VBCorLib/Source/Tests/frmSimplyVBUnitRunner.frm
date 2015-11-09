@@ -224,20 +224,15 @@ Private Sub AddSystemSecurityCryptography()
             New DESCryptoServiceProviderTests, _
             New DESEncryptionTests, _
             New DESDecryptionTests)
-'            New TestDESPaddingModes, _
 '
         .Add NewSuite("TripleDESCryptoServiceProvider", _
             New TripleDESCryptoServiceProviderTests, _
             New TripleDESEncryptionTests, _
             New TripleDESDecryptionTests)
-'
-'        .Add NewSuite("SymmetricalAlgorithm", _
-'            New TestSymmetricAlgorithmBase, _
-'            New TestSymmetricAlgorithmBaseKey)
-'
-'        .Add NewSuite("RC2CryptoServiceProvider", _
-'            New TestRC2Encryption, _
-'            New TestRC2Decryption)
+
+        .Add NewSuite("RC2CryptoServiceProvider", _
+            New RC2EncryptionTests, _
+            New RC2DecryptionTests)
 '
 '        .Add NewSuite("RijndaelManaged", _
 '            New TestRijndaelManaged128, _
