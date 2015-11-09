@@ -318,6 +318,9 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
+    If Not CryptoAPI.SupportsAlgorithm(CryptoAPI.DefaultProvider, CALG_DES) Then _
+        Error.Cryptographic Cryptography_CSP_AlgorithmNotAvailable
+        
     Set mBase = New SymmetricAlgorithmBase
     With mBase
         .AddLegalBlockSize LegalBlockSize, LegalBlockSize, 0

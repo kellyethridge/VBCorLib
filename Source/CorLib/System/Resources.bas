@@ -184,6 +184,9 @@ Public Enum ResourceStringKey
     Cryptography_CSP_CFBSizeNotSupported = 501
     Cryptography_InvalidKeySize = 502
     Cryptography_InvalidIVSize = 503
+    Cryptography_InvalidBlockSize = 504
+    Cryptography_InvalidFeedbackSize = 505
+    Cryptography_CSP_AlgorithmNotAvailable = 506
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
