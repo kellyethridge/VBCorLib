@@ -116,6 +116,35 @@ Public Sub CreateEncryptor_WhenModeIsCFBAndFeedbackSizeIsNot8_ThrowsCryptographi
     AssertCryptographicException Err
 End Sub
 
+Public Sub CreateEncryptor_WithECBModeAndKeyOnly_DoesNotThrow()
+    Dim csp As New TripleDESCryptoServiceProvider
+    csp.Mode = CipherMode.ECB
+    
+    On Error Resume Next
+    csp.CreateEncryptor csp.Key
+        
+    AssertNoException Err
+End Sub
+
+Public Sub CreateEncryptor_WithNonECBModeAndKeyOnly_ThrowsArgumentException()
+    Dim csp As New TripleDESCryptoServiceProvider
+    csp.Mode = CipherMode.CBC
+    
+    On Error Resume Next
+    csp.CreateEncryptor csp.Key
+    
+    AssertArgumentException Err, "RgbIV"
+End Sub
+
+Public Sub CreateEncryptor_WithIVOnly_ThrowsArgumentException()
+    Dim csp As New TripleDESCryptoServiceProvider
+    
+    On Error Resume Next
+    csp.CreateEncryptor RgbIV:=NewBytes()
+    
+    AssertArgumentException Err, "RgbKey"
+End Sub
+
 Public Sub TransformBlock_WithInputOffsetLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim csp As New TripleDESCryptoServiceProvider
     Dim Encryptor As ICryptoTransform
