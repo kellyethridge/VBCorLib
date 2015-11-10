@@ -304,8 +304,14 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
-    If IsMissing(RgbKey) <> IsMissing(RgbIV) Then _
-        Throw Cor.NewArgumentException("Argument is missing.", IIf(IsMissing(RgbKey), "RgbKey", "RgbIV"))
+    If Not IsMissing(RgbKey) Then
+        If Mode <> CipherMode.ECB And IsMissing(RgbIV) Then
+            Throw Cor.NewArgumentException("IV must be supplied with Key.", "RgbIV")
+        End If
+    ElseIf Not IsMissing(RgbIV) Then
+        Throw Cor.NewArgumentException("Key must be supplied with IV.", "RgbKey")
+    End If
+
     If Mode = CipherMode.CFB And FeedbackSize <> DefaultFeedbackSize Then _
         Error.Cryptographic Cryptography_CSP_CFBSizeNotSupported
         
