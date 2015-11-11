@@ -8,6 +8,10 @@ Option Explicit
 
 Public FindCallbackValue As Variant
 
+Public Sub SetToNumber(ByRef e As Long)
+    e = 5
+End Sub
+
 Public Function FindByteCallback(ByRef Value As Byte) As Boolean
     FindByteCallback = Value = CByte(FindCallbackValue)
 End Function

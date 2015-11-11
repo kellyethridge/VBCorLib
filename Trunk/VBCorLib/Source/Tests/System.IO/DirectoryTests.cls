@@ -82,11 +82,11 @@ Public Sub CreateDirectory_WhenCalled_CreatesFolder()
     Directory.CreateDirectory FolderToCreate
     
     Dim Actual As Boolean
-    Actual = Helper.FolderExists(FolderToCreate)
+    Actual = FolderExists(FolderToCreate)
     Assert.That Actual, Iz.True
     
 Catch:
-    Helper.DeleteFolder FolderToCreate
+    DeleteFolder FolderToCreate
 End Sub
 
 Public Sub CreateDirectory_WhenCalled_ReturnsDirectoryInfo()
@@ -101,7 +101,7 @@ Public Sub CreateDirectory_WhenCalled_ReturnsDirectoryInfo()
     Assert.That Actual.Exists, Iz.True
 
 Catch:
-    Helper.DeleteFolder FolderToCreate
+    DeleteFolder FolderToCreate
 End Sub
 
 Public Sub CreateDirectory_WithEmptyPath_ThrowsArgumentException()
@@ -131,7 +131,7 @@ End Sub
 Public Sub Delete_WhenCalled_DeletesDirectory()
     Directory.Delete mBuilder.TempFolder
     
-    Assert.That Helper.FolderExists(mBuilder.TempFolder), Iz.False
+    Assert.That FolderExists(mBuilder.TempFolder), Iz.False
 End Sub
 
 Public Sub Delete_WithRecursive_DeletesSubfoldersAndFiles()
@@ -140,7 +140,7 @@ Public Sub Delete_WithRecursive_DeletesSubfoldersAndFiles()
     
     Directory.Delete mBuilder.TempFolder, True
     
-    Assert.That Helper.FolderExists(mBuilder.TempFolder), Iz.False
+    Assert.That FolderExists(mBuilder.TempFolder), Iz.False
 End Sub
 
 Public Sub Delete_WithRecursiveAndMultipleLevels_DeletesFolder()

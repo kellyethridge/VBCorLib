@@ -52,7 +52,6 @@ End Sub
 Public Sub Salt_WhenSetWithNull_ThrowsArgumentNullException()
     Dim Rfc As Rfc2898DeriveBytes
     Set Rfc = MakeRfc
-    Dim NullBytes() As Byte
     
     On Error Resume Next
     Rfc.Salt = NullBytes

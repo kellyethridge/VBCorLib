@@ -86,11 +86,9 @@ Private Sub AddSystemDiagnostics()
 End Sub
 
 Private Sub AddSystemThreading()
-    With Sim.NewTestSuite("System.Threading")
-        .Add New TestTicker
-        
-        AddTest .This
-    End With
+'    With Sim.NewTestSuite("System.Threading")
+'        AddTest .This
+'    End With
 End Sub
 
 Private Sub AddSystem()

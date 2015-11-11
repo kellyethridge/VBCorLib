@@ -1,4 +1,4 @@
-Attribute VB_Name = "Helper"
+Attribute VB_Name = "VBIOHelper"
 Option Explicit
 
 Public Function FolderExists(ByRef Folder As String) As Boolean
@@ -59,11 +59,6 @@ Public Sub DeleteFile(ByRef FileName As String)
     End If
 End Sub
 
-Public Function NewInt32(ByVal Value As Long) As Int32
-    Set NewInt32 = New Int32
-    NewInt32.Init Value
-End Function
-
 Public Function ReadFile(ByVal FileName As String) As String
     Dim FileNumber As Long
     FileNumber = FreeFile
@@ -72,16 +67,3 @@ Public Function ReadFile(ByVal FileName As String) As String
     Close #FileNumber
 End Function
 
-Public Function GenerateString(ByVal Size As Long) As String
-    Dim Ran As New Random
-    Dim sb As New StringBuilder
-    Dim i As Long
-    
-    For i = 1 To Size
-        Dim Ch As Long
-        Ch = Ran.NextRange(32, Asc("z"))
-        sb.AppendChar Ch
-    Next
-    
-    GenerateString = sb.ToString
-End Function
