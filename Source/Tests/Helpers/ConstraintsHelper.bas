@@ -1,4 +1,4 @@
-Attribute VB_Name = "modConstraints"
+Attribute VB_Name = "ConstraintsHelper"
 Option Explicit
 
 Public Function Equals(ByRef Expected As Variant) As CorEqualsConstraint
