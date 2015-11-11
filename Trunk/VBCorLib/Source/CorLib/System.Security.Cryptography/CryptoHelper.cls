@@ -49,20 +49,28 @@ Private mRNG As New RNGCryptoServiceProvider
 ' @remarks Zeros may be included.
 '
 Friend Function GetRandomBytes(ByVal Size As Long) As Byte()
-    Dim Bytes() As Byte
-    ReDim Bytes(0 To Size - 1)
-    FillRandomBytes Bytes
-    GetRandomBytes = Bytes
+    If Size > 0 Then
+        Dim Bytes() As Byte
+        ReDim Bytes(0 To Size - 1)
+        FillRandomBytes Bytes
+        GetRandomBytes = Bytes
+    Else
+        GetRandomBytes = Cor.NewBytes
+    End If
 End Function
 
 ''
 ' Returns an array of random bytes not containing zeros.
 '
 Friend Function GetNonZeroRandomBytes(ByVal Size As Long) As Byte()
-    Dim Bytes() As Byte
-    ReDim Bytes(0 To Size - 1)
-    mRNG.GetNonZeroBytes Bytes
-    GetNonZeroRandomBytes = Bytes
+    If Size > 0 Then
+        Dim Bytes() As Byte
+        ReDim Bytes(0 To Size - 1)
+        mRNG.GetNonZeroBytes Bytes
+        GetNonZeroRandomBytes = Bytes
+    Else
+        GetNonZeroRandomBytes = Cor.NewBytes
+    End If
 End Function
 
 ''

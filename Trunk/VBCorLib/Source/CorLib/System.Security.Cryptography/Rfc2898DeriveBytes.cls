@@ -47,10 +47,9 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const BLOCK_SIZE As Long = 20   ' the length of the computed hash from HMACSHA1
+Private Const BlockSize As Long = 20   ' the length of the computed hash from HMACSHA1
 
-
-Private mPRF                As New HMACSHA1
+Private mHasher             As HMACSHA1
 Private mIterations         As Long
 Private mSalt()             As Byte
 
@@ -58,7 +57,6 @@ Private mSalt()             As Byte
 Private mBlockCount         As Long
 Private mBuffer(0 To 19)    As Byte
 Private mBytesBuffered      As Long
-
 
 
 ''
@@ -73,14 +71,15 @@ End Property
 ''
 ' Sets the number of iterations to be used when computing the next set of bytes.
 '
-' @param RHS The number of iterations to be used.
+' @param Value The number of iterations to be used.
 ' @remarks The value must be greater than 0.
 '
-Public Property Let IterationCount(ByVal RHS As Long)
-    If RHS < 1 Then _
-        Throw Cor.NewArgumentException("Cannot set iteration count less than 1.", "IterationCount")
+Public Property Let IterationCount(ByVal Value As Long)
+    If Value < 1 Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedPosNum
     
-    mIterations = RHS
+    mIterations = Value
+    Reset
 End Property
 
 ''
@@ -95,21 +94,16 @@ End Property
 ''
 ' Sets the Salt to be used during key generation.
 '
-' @param RHS The Salt to be used.
+' @param Value The Salt to be used.
 ' @remarks The length of the array cannot be less than 8 bytes.
 '
-Public Property Let Salt(ByRef RHS() As Byte)
-    If CorArray.IsNull(RHS) Then _
-        Throw Cor.NewArgumentNullException("Salt")
+Public Property Let Salt(ByRef Value() As Byte)
+    ValidateArray Value, Parameter_Value
+    If CorArray.Length(Value) < 8 Then _
+        Error.Argument Cryptography_PasswordDerivedBytes_FewBytesSalt, "Value"
     
-    Dim Size As Long
-    Size = CorArray.Length(RHS)
-    
-    If Size < 8 Then _
-        Throw Cor.NewArgumentException("Cannot set Salt less than 8 bytes in length.", "Salt")
-    
-    ReDim mSalt(0 To Size - 1)
-    Call Buffer.BlockCopy(RHS, 0, mSalt, 0, Size)
+    mSalt = Value
+    Reset
 End Property
 
 ''
@@ -119,22 +113,26 @@ End Property
 '
 Public Function GetBytes(ByVal cb As Long) As Byte()
     Dim Blocks As Long
-    Blocks = CorMath.Ceiling(cb / BLOCK_SIZE)
+    Blocks = CorMath.Ceiling(cb / BlockSize)
     
     Dim Bytes() As Byte
-    ReDim Bytes(0 To (Blocks * BLOCK_SIZE) + mBytesBuffered - 1)
+    ReDim Bytes(0 To (Blocks * BlockSize) + mBytesBuffered - 1)
     
-    If mBytesBuffered > 0 Then Call CopyMemory(Bytes(0), mBuffer(0), mBytesBuffered)
+    If mBytesBuffered > 0 Then
+        CopyMemory Bytes(0), mBuffer(0), mBytesBuffered
+    End If
     
     Dim i As Long
     For i = 1 To Blocks
         Dim BlockBytes() As Byte
         BlockBytes = NextBlockBytes
-        Call CopyMemory(Bytes((i - 1) * BLOCK_SIZE + mBytesBuffered), BlockBytes(0), BLOCK_SIZE)
+        CopyMemory Bytes((i - 1) * BlockSize + mBytesBuffered), BlockBytes(0), BlockSize
     Next i
     
-    mBytesBuffered = (Blocks * BLOCK_SIZE) - cb
-    If mBytesBuffered > 0 Then Call CopyMemory(mBuffer(0), Bytes(cb), mBytesBuffered)
+    mBytesBuffered = (Blocks * BlockSize) - cb
+    If mBytesBuffered > 0 Then
+        CopyMemory mBuffer(0), Bytes(cb), mBytesBuffered
+    End If
     
     ReDim Preserve Bytes(0 To cb - 1)
     GetBytes = Bytes
@@ -144,9 +142,10 @@ End Function
 ' Resets the key generator.
 '
 Public Sub Reset()
-    mPRF.Initialize
+    mHasher.Initialize
     mBlockCount = 0
     mBytesBuffered = 0
+    CorArray.Clear mBuffer, 0, 20
 End Sub
 
 ''
@@ -186,65 +185,74 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Password As Variant, ByRef Salt As Variant, ByVal Iterations As Long)
-    Me.IterationCount = Iterations
+    InitHasher Password
+    InitSalt Salt
+    IterationCount = Iterations
+End Sub
+
+Private Sub InitHasher(ByRef Password As Variant)
+    Dim Key() As Byte
     
     Select Case VarType(Password)
-        Case vbString:      mPRF.Key = Encoding.UTF8.GetBytes(Password)
-        Case corByteArray:   mPRF.Key = Password
+        Case vbString
+            Key = Encoding.UTF8.GetBytes(Password)
+        Case corByteArray
+            Key = Password
         Case Else
-            Throw Cor.NewArgumentException("Password must be a byte array or string", "Password")
+            Error.Argument Argument_ByteArrayOrStringRequired, "Password"
     End Select
+    
+    Set mHasher = Cor.NewHMACSHA1(Key)
+End Sub
 
+Private Sub InitSalt(ByRef Salt As Variant)
     Select Case VarType(Salt)
-        Case corByteArray:               Me.Salt = Salt
-        Case vbLong, vbInteger, vbByte: Me.Salt = CryptoHelper.GetRandomBytes(Salt)
+        Case corByteArray
+            Me.Salt = Salt
+        Case vbLong, vbInteger, vbByte
+            If Salt < 0 Then _
+                Error.ArgumentOutOfRange "Salt", ArgumentOutOfRange_NeedNonNegNum
+                
+            Me.Salt = CryptoHelper.GetRandomBytes(Salt)
         Case Else
-            Throw Cor.NewArgumentException("Salt must be a byte array or a number.", "Salt")
+            Error.Argument Argument_ByteArrayOrNumberRequired, "Salt"
     End Select
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function NextBlockBytes() As Byte()
     mBlockCount = mBlockCount + 1
     
-    Call mPRF.TransformBlock(mSalt, 0, CorArray.Length(mSalt), mSalt, 0)
+    mHasher.TransformBlock mSalt, LBound(mSalt), CorArray.Length(mSalt), mSalt, LBound(mSalt)
     
     Dim Result() As Byte
-    Result = mPRF.ComputeHash(AsQByteArr(SwapEndian(mBlockCount)).Bytes)
+    Result = mHasher.ComputeHash(AsQByteArr(SwapEndian(mBlockCount)).Bytes)
     
-    Dim sum() As Byte
-    sum = Result
+    Dim Sum() As Byte
+    Sum = Result
     
     Dim i As Long
     For i = 2 To mIterations
-        Result = mPRF.ComputeHash(Result)
+        Result = mHasher.ComputeHash(Result)
         
         Dim j As Long
-        For j = 0 To BLOCK_SIZE - 1
-            sum(j) = sum(j) Xor Result(j)
+        For j = 0 To BlockSize - 1
+            Sum(j) = Sum(j) Xor Result(j)
         Next j
     Next i
     
-    NextBlockBytes = sum
+    NextBlockBytes = Sum
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    mIterations = 1000
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
