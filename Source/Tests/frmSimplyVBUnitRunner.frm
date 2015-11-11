@@ -205,7 +205,7 @@ Private Sub AddSystemSecurityCryptography()
         .Add New HMACMD5Tests
         .Add New HMACRIPEMD160Tests
 '        .Add New TestMACTripleDES
-'        .Add New TestRfc2898DeriveBytes
+        .Add New Rfc2898DeriveBytesTests
 '        .Add New CryptoConfigTests
         .Add New CspParametersTests
         .Add New CspKeyContainerInfoTests
