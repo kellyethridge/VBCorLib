@@ -154,7 +154,7 @@ Public Sub Copy_WhenOverridingExisting_CopiesFile()
     File.Copy SourceFileName, NewFileName, True
 
     Dim Actual As String
-    Actual = Helper.ReadFile(NewFileName)
+    Actual = ReadFile(NewFileName)
     Assert.That Actual, Iz.EqualTo("Copied")
 End Sub
 
@@ -176,7 +176,7 @@ Public Sub Copy_WithSourceAndDestinationAsSameFile_DoesNothing()
     
     File.Copy FileName, FileName
     
-    Assert.That Helper.ReadFile(FileName), Iz.EqualTo("abc")
+    Assert.That ReadFile(FileName), Iz.EqualTo("abc")
 End Sub
 
 Public Sub CreationTime_WhenCalled_SetsAndReturnsNewTime()
@@ -218,7 +218,7 @@ Public Sub Delete_WithExistingFiled_DeletesFile()
     
     File.Delete FileName
     
-    Assert.That Helper.FileExists(FileName), Iz.False
+    Assert.That FileExists(FileName), Iz.False
 End Sub
 
 Public Sub Delete_WithInvalidPath_ThrowsArgumentException(ByVal InvalidPath As String)
