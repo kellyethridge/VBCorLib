@@ -190,6 +190,7 @@ Public Enum ResourceStringKey
     Cryptography_InvalidFeedbackSize = 505
     Cryptography_CSP_AlgorithmNotAvailable = 506
     Cryptography_PasswordDerivedBytes_FewBytesSalt = 507
+    Cryptography_RC2_EKSKS2 = 508
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601

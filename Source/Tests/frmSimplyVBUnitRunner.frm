@@ -229,6 +229,7 @@ Private Sub AddSystemSecurityCryptography()
             New TripleDESDecryptionTests)
 
         .Add NewSuite("RC2CryptoServiceProvider", _
+            New RC2CryptoServiceProviderTests, _
             New RC2EncryptionTests, _
             New RC2DecryptionTests)
 '

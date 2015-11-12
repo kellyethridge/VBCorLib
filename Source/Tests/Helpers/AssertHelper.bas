@@ -1,7 +1,13 @@
-Attribute VB_Name = "ExceptionAsserts"
+Attribute VB_Name = "AssertHelper"
 Option Explicit
 
 Public SkipUnsupportedTimeZone As Boolean
+
+Public Sub AssertKeySizes(ByVal Actual As KeySizes, ByVal ExpectedMin As Long, ByVal ExpectedMax As Long, ByVal ExpectedSkip As Long)
+    Assert.That Actual.MinSize, Iz.EqualTo(ExpectedMin), "Wrong MinSize"
+    Assert.That Actual.MaxSize, Iz.EqualTo(ExpectedMax), "Wrong MaxSize"
+    Assert.That Actual.SkipSize, Iz.EqualTo(ExpectedSkip), "Wrong SkipSize"
+End Sub
 
 Public Sub AssertPacificTimeZone()
     Dim info As TIME_ZONE_INFORMATION

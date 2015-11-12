@@ -58,7 +58,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1.1!, 1.1!, True
             Test.Use 1.1!, 1.1, False
             Test.Use #1/1/2001#, #1/1/2001#, True
+            Test.Use #1/1/2001#, #1/1/2001 12:00:01 AM#, False
             Test.Use NewDate(#1/1/2001#), NewDate(#1/1/2001#), True
+            Test.Use NewDate(#1/1/2001#), NewDate(#1/1/2001 12:00:01 PM#), False
             Test.Use NewDate(#1/1/2001#), #1/1/2001#, True
             Test.Use #1/1/2001#, NewDate(#1/1/2001#), True
             
