@@ -36,17 +36,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Private Sub AddTests(ByVal Test As TestCaseCollector)
-    Test.Use CipherMode.ECB, "26 1E 57 8E C9 62 BF B8 3E 96", "00 00 00 00 00 00 00 00", 80, "F9 9A 3A DB 00 3B 7A EB 81 E3 6B A9 E5 37 10 D1 F9 9A 3A DB 00 3B 7A EB 81 E3 6B A9 E5 37 10 D1"
-    Test.Use CipherMode.CBC, "26 1E 57 8E C9 62 BF B8 3E 96", "01 02 03 04 05 06 07 08", 40, "71 2D 11 99 C9 A0 78 4F CD F1 1E 3D FD 21 7E DB B2 6E 0D A4 72 BC 31 51 48 EF 4E 68 3B DC CD 7D"
+    Test.Use CipherMode.ECB, "26 1E 57 8E C9 62 BF B8 3E 96", "00 00 00 00 00 00 00 00", "F9 9A 3A DB 00 3B 7A EB 81 E3 6B A9 E5 37 10 D1 F9 9A 3A DB 00 3B 7A EB 81 E3 6B A9 E5 37 10 D1"
 End Sub
 
-Public Sub TransformFinalBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByVal EffectiveKeySize As Long, ByRef Expected As String)
+Public Sub TransformFinalBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByRef Expected As String)
     Dim csp         As New RC2CryptoServiceProvider
     Dim Encryptor   As ICryptoTransform
     Dim Message()   As Byte
     csp.Mode = CipherMode
     csp.Padding = PaddingMode.None
-    csp.EffectiveKeySize = EffectiveKeySize
     Set Encryptor = csp.CreateEncryptor(HexToBytes(Key), HexToBytes(IV))
     Message = HexToBytes("11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00")
 
@@ -56,13 +54,12 @@ Public Sub TransformFinalBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode A
     Assert.That Actual, Iz.EqualTo(HexToBytes(Expected))
 End Sub
 
-Public Sub TransformBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByVal EffectiveKeySize As Long, ByRef Expected As String)
+Public Sub TransformBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByRef Expected As String)
     Dim csp         As New RC2CryptoServiceProvider
     Dim Encryptor   As ICryptoTransform
     Dim Message()   As Byte
     csp.Mode = CipherMode
     csp.Padding = PaddingMode.None
-    csp.EffectiveKeySize = EffectiveKeySize
     Set Encryptor = csp.CreateEncryptor(HexToBytes(Key), HexToBytes(IV))
     Message = HexToBytes("11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00")
     

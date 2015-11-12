@@ -53,10 +53,9 @@ Private Const LegalMaxKeySize       As Long = 128
 Private Const DefaultKeySize        As Long = LegalMaxKeySize
 Private Const LegalKeySkipSize      As Long = 8
 
-Private mBase       As SymmetricAlgorithmBase
+Private mBase               As SymmetricAlgorithmBase
 Attribute mBase.VB_VarHelpID = -1
-Private mUseSalt    As Boolean
-Private mEffectiveKeySize As Long
+Private mUseSalt            As Boolean
 
 
 ''
@@ -65,16 +64,23 @@ Private mEffectiveKeySize As Long
 ' @return The effective key size.
 '
 Public Property Get EffectiveKeySize() As Long
-    EffectiveKeySize = mEffectiveKeySize
+    EffectiveKeySize = KeySize
 End Property
 
 ''
 ' Sets the effective key size to be used.
 '
 ' @param Value The new effective key size.
+' @remarks This property can only be set to the same value as KeySize.
+' This property is useless in setting the effective key size. It is here
+' to complete the .NET interface for this class.
+' <p>The effective key size to use will ultimately be determined by
+' the length of the actual key being used.</p>
 '
 Public Property Let EffectiveKeySize(ByVal Value As Long)
-    mEffectiveKeySize = Value
+    If Value <> KeySize Then
+        Error.Cryptographic Cryptography_RC2_EKSKS2
+    End If
 End Property
 
 ''
@@ -358,8 +364,11 @@ Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, B
     If Mode = CipherMode.CFB And FeedbackSize <> DefaultFeedbackSize Then _
         Error.Cryptographic Cryptography_CSP_CFBSizeNotSupported
     
+    Dim Key() As Byte
+    Key = mBase.CloneRgbKey(RgbKey)
+    
     Set CreateCipher = New CryptoAPITransform
-    CreateCipher.Init CALG_RC2, mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, mEffectiveKeySize, mUseSalt
+    CreateCipher.Init CALG_RC2, Key, mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, CorArray.Length(Key) * 8, mUseSalt
 End Function
 
 
