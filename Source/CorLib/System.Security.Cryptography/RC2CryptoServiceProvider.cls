@@ -56,6 +56,7 @@ Private Const LegalKeySkipSize      As Long = 8
 Private mBase       As SymmetricAlgorithmBase
 Attribute mBase.VB_VarHelpID = -1
 Private mUseSalt    As Boolean
+Private mEffectiveKeySize As Long
 
 
 ''
@@ -64,23 +65,16 @@ Private mUseSalt    As Boolean
 ' @return The effective key size.
 '
 Public Property Get EffectiveKeySize() As Long
-    EffectiveKeySize = mBase.KeySize
+    EffectiveKeySize = mEffectiveKeySize
 End Property
 
 ''
 ' Sets the effective key size to be used.
 '
 ' @param Value The new effective key size.
-' @remarks This property can only be set to the same value as KeySize.
-' This property is useless in setting the effective key size. It is here
-' to complete the .NET interface for this class.
-' <p>The effective key size to use will ultimately be determined by
-' the length of the actual key being used.</p>
 '
 Public Property Let EffectiveKeySize(ByVal Value As Long)
-    If Value <> mBase.KeySize Then
-        Throw Cor.NewCryptographicException("EffectiveKeySize must match KeySize.")
-    End If
+    mEffectiveKeySize = Value
 End Property
 
 ''
@@ -353,16 +347,19 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, ByVal IsEncrypting As Boolean) As CryptoAPITransform
-    If IsMissing(RgbKey) <> IsMissing(RgbIV) Then _
-        Throw Cor.NewArgumentException("Argument is missing.", IIf(IsMissing(RgbKey), "RgbKey", "RgbIV"))
+    If Not IsMissing(RgbKey) Then
+        If Mode <> CipherMode.ECB And IsMissing(RgbIV) Then
+            Throw Cor.NewArgumentException("IV must be supplied with Key.", "RgbIV")
+        End If
+    ElseIf Not IsMissing(RgbIV) Then
+        Throw Cor.NewArgumentException("Key must be supplied with IV.", "RgbKey")
+    End If
+
+    If Mode = CipherMode.CFB And FeedbackSize <> DefaultFeedbackSize Then _
+        Error.Cryptographic Cryptography_CSP_CFBSizeNotSupported
     
-    Dim Key() As Byte
-    Key = mBase.CloneRgbKey(RgbKey)
-    
-    ' We calculate the effective key size because the key itself may have been passed into the CreateEncryptor/CreateDecryptor
-    ' functions so the KeySize property may not reflect the true size of the key to be used.
     Set CreateCipher = New CryptoAPITransform
-    CreateCipher.Init CALG_RC2, Key, mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, CorArray.Length(Key) * 8, mUseSalt
+    CreateCipher.Init CALG_RC2, mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting, mEffectiveKeySize, mUseSalt
 End Function
 
 

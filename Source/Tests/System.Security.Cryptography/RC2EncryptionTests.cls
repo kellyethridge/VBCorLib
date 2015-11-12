@@ -12,66 +12,140 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestRC2Encryption
+' RC2EncryptionTests
+'
+' Test vectors from http://cryptomanager.com/tv.html#ciphs
 '
 Option Explicit
 Implements ICategorizable
-
-Private csp As RC2CryptoServiceProvider
-Private Trans As CryptoAPITransform
+Implements ITestCaseSource
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Security.Cryptography"
 End Sub
 
-Public Sub Setup()
-    Set csp = New RC2CryptoServiceProvider
-    csp.Key = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6)
-    csp.IV = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
-    csp.Padding = PKCS7
-    csp.Mode = CBC
-    Set Trans = csp.CreateEncryptor
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "TransformFinalBlock_WithCipherMode_ReturnsExpected"
+            AddTests Test
+            
+        Case "TransformBlock_WithCipherMode_ReturnsExpected"
+            AddTests Test
+        
+    End Select
 End Sub
 
-Public Sub EncryptOneByte()
-    Dim b() As Byte
-    b = NewArray(vbByte, 1)
-    
-    Dim t As ICryptoTransform
-    Set t = csp.CreateEncryptor
-    
-    Dim b2() As Byte
-    b2 = t.TransformFinalBlock(b, 0, 1)
-    Assert.AreEqual 8, CorArray.Length(b2)
-    
-    Dim i As Long
-    For i = 1 To 8
-        Assert.AreEqual CLng(Choose(i, 197, 147, 2, 31, 57, 167, 110, 91)), b2(i - 1)
-    Next i
-    
-    ' repeat to test resetting is correct
-    Erase b2
-    b2 = t.TransformFinalBlock(b, 0, CorArray.Length(b))
-    Assert.AreEqual 8, CorArray.Length(b2)
-    For i = 1 To 8
-        Assert.AreEqual CLng(Choose(i, 197, 147, 2, 31, 57, 167, 110, 91)), b2(i - 1)
-    Next i
+Private Sub AddTests(ByVal Test As TestCaseCollector)
+    Test.Use CipherMode.ECB, "26 1E 57 8E C9 62 BF B8 3E 96", "00 00 00 00 00 00 00 00", 80, "F9 9A 3A DB 00 3B 7A EB 81 E3 6B A9 E5 37 10 D1 F9 9A 3A DB 00 3B 7A EB 81 E3 6B A9 E5 37 10 D1"
+    Test.Use CipherMode.CBC, "26 1E 57 8E C9 62 BF B8 3E 96", "01 02 03 04 05 06 07 08", 40, "71 2D 11 99 C9 A0 78 4F CD F1 1E 3D FD 21 7E DB B2 6E 0D A4 72 BC 31 51 48 EF 4E 68 3B DC CD 7D"
 End Sub
 
-Public Sub EncryptFirst8Bytes()
-    Dim src() As Byte
-    src = Encoding.ASCII.GetBytes("Now is the time for")
+Public Sub TransformFinalBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByVal EffectiveKeySize As Long, ByRef Expected As String)
+    Dim csp         As New RC2CryptoServiceProvider
+    Dim Encryptor   As ICryptoTransform
+    Dim Message()   As Byte
+    csp.Mode = CipherMode
+    csp.Padding = PaddingMode.None
+    csp.EffectiveKeySize = EffectiveKeySize
+    Set Encryptor = csp.CreateEncryptor(HexToBytes(Key), HexToBytes(IV))
+    Message = HexToBytes("11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00")
+
+    Dim Actual() As Byte
+    Actual = Encryptor.TransformFinalBlock(Message, 0, CorArray.Length(Message))
     
-    Dim dst(100) As Byte
-    
-    Dim t As ICryptoTransform
-    Set t = csp.CreateEncryptor
-    
-    Assert.AreEqual 8, t.TransformBlock(src, 0, 8, dst, 0)
-    
-    Dim i As Long
-    For i = 1 To 8
-        Assert.AreEqual CLng(Choose(i, 185, 238, 77, 115, 57, 7, 145, 165)), dst(i - 1)
-    Next i
+    Assert.That Actual, Iz.EqualTo(HexToBytes(Expected))
 End Sub
 
+Public Sub TransformBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByVal EffectiveKeySize As Long, ByRef Expected As String)
+    Dim csp         As New RC2CryptoServiceProvider
+    Dim Encryptor   As ICryptoTransform
+    Dim Message()   As Byte
+    csp.Mode = CipherMode
+    csp.Padding = PaddingMode.None
+    csp.EffectiveKeySize = EffectiveKeySize
+    Set Encryptor = csp.CreateEncryptor(HexToBytes(Key), HexToBytes(IV))
+    Message = HexToBytes("11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF 00")
+    
+    Dim Actual          As Long
+    Dim ActualOutput()  As Byte
+    ReDim ActualOutput(UBound(Message))
+    Actual = Encryptor.TransformBlock(Message, 0, CorArray.Length(Message), ActualOutput, 0)
+    
+    Assert.That Actual, Iz.EqualTo(CorArray.Length(Message))
+    Assert.That ActualOutput, Iz.EqualTo(HexToBytes(Expected))
+    Assert.That Encryptor.TransformFinalBlock(NewBytes(), 0, 0), Iz.Empty
+End Sub
+
+Public Sub CreateEncryptor_WhenModeIsOFB_ThrowsCryptographicException()
+    Dim csp As New RC2CryptoServiceProvider
+    csp.Mode = CipherMode.OFB
+    
+    On Error Resume Next
+    csp.CreateEncryptor
+    
+    AssertCryptographicException Err
+End Sub
+
+Public Sub CreateEncryptor_WhenModeIsCFBAndFeedbackSizeIsNot8_ThrowsCryptographicException()
+    Dim csp As New RC2CryptoServiceProvider
+    csp.Mode = CipherMode.CFB
+    csp.FeedbackSize = 16
+    
+    On Error Resume Next
+    csp.CreateEncryptor
+    
+    AssertCryptographicException Err
+End Sub
+
+Public Sub CreateEncryptor_WithECBModeAndKeyOnly_DoesNotThrow()
+    Dim csp As New RC2CryptoServiceProvider
+    csp.Mode = CipherMode.ECB
+    
+    On Error Resume Next
+    csp.CreateEncryptor csp.Key
+        
+    AssertNoException Err
+End Sub
+
+Public Sub CreateEncryptor_WithNonECBModeAndKeyOnly_ThrowsArgumentException()
+    Dim csp As New RC2CryptoServiceProvider
+    csp.Mode = CipherMode.CBC
+    
+    On Error Resume Next
+    csp.CreateEncryptor csp.Key
+    
+    AssertArgumentException Err, "RgbIV"
+End Sub
+
+Public Sub CreateEncryptor_WithIVOnly_ThrowsArgumentException()
+    Dim csp As New RC2CryptoServiceProvider
+    
+    On Error Resume Next
+    csp.CreateEncryptor RgbIV:=NewBytes()
+    
+    AssertArgumentException Err, "RgbKey"
+End Sub
+
+Public Sub TransformBlock_WithInputOffsetLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim csp As New DESCryptoServiceProvider
+    Dim Encryptor As ICryptoTransform
+    Set Encryptor = csp.CreateEncryptor
+    Dim Message(5 To 12) As Byte
+    
+    On Error Resume Next
+    Encryptor.TransformBlock Message, 4, 8, NewBytes(), 0
+    
+    AssertArgumentOutOfRangeException Err, "InputOffset"
+End Sub
+
+Public Sub TransformBlock_WithInputCountLessThanZero_ThrowsArgumentException()
+    Dim csp As New RC2CryptoServiceProvider
+    Dim Encryptor As ICryptoTransform
+    Set Encryptor = csp.CreateEncryptor
+    Dim Message(5 To 12) As Byte
+    
+    On Error Resume Next
+    Encryptor.TransformBlock Message, 4, -1, NewBytes(), 0
+    
+    AssertArgumentException Err, "InputCount"
+End Sub
