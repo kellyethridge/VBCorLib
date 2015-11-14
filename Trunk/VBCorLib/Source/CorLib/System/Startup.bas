@@ -1,4 +1,4 @@
-Attribute VB_Name = "modMain"
+Attribute VB_Name = "Startup"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
