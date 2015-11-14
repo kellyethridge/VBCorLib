@@ -724,45 +724,6 @@ Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) A
     Length = LengthCore(SafeArrayPtr, Dimension)
 End Function
 
-Friend Function LengthCore(ByVal SafeArrayPtr As Long, Optional ByVal Dimension As Long) As Long
-    Debug.Assert SafeArrayPtr <> 0
-    
-    Dim Rank As Long
-    Rank = SafeArrayGetDim(SafeArrayPtr)
-    If Dimension > Rank Then _
-        Error.IndexOutOfRange IndexOutOfRange_Dimension
-    
-    Dim ArrayBoundPtr As Long
-    ArrayBoundPtr = SafeArrayPtr + corSizeOfSafeArray
-    
-    If Dimension < 1 Then
-        ' optimize for 99% of calls
-        If Rank = 1 Then
-            LengthCore = MemLong(ArrayBoundPtr)
-        Else
-            LengthCore = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
-        End If
-    Else
-        LengthCore = GetDimensionSize(ArrayBoundPtr, Rank, Dimension)
-    End If
-End Function
-
-Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal Rank As Long) As Long
-    Dim Result As Long
-    
-    Result = 1
-    Dim Ptr As Long
-    For Ptr = ArrayBoundPtr To ArrayBoundPtr + (corSizeOfSafeArrayBound * (Rank - 1)) Step corSizeOfSafeArrayBound
-        Result = Result * MemLong(Ptr)
-    Next
-
-    CalculateProductOfDimensions = Result
-End Function
-
-Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Long, ByVal Dimension As Long) As Long
-    ArrayBoundPtr = ArrayBoundPtr + (Rank - Dimension) * corSizeOfSafeArrayBound
-    GetDimensionSize = MemLong(ArrayBoundPtr)
-End Function
 
 Friend Function LengthFirstDim(ByRef Arr As Variant) As Long
     LengthFirstDim = UBound(Arr) - LBound(Arr) + 1
@@ -1218,6 +1179,45 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function LengthCore(ByVal SafeArrayPtr As Long, Optional ByVal Dimension As Long) As Long
+    Debug.Assert SafeArrayPtr <> 0
+    
+    Dim Rank As Long
+    Rank = SafeArrayGetDim(SafeArrayPtr)
+    If Dimension > Rank Then _
+        Error.IndexOutOfRange IndexOutOfRange_Dimension
+    
+    Dim ArrayBoundPtr As Long
+    ArrayBoundPtr = SafeArrayPtr + corSizeOfSafeArray
+    
+    If Dimension < 1 Then
+        ' optimize for 99% of calls
+        If Rank = 1 Then
+            LengthCore = MemLong(ArrayBoundPtr)
+        Else
+            LengthCore = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
+        End If
+    Else
+        LengthCore = GetDimensionSize(ArrayBoundPtr, Rank, Dimension)
+    End If
+End Function
+
+Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal Rank As Long) As Long
+    Dim Result As Long
+    
+    Result = 1
+    Dim Ptr As Long
+    For Ptr = ArrayBoundPtr To ArrayBoundPtr + (corSizeOfSafeArrayBound * (Rank - 1)) Step corSizeOfSafeArrayBound
+        Result = Result * MemLong(Ptr)
+    Next
+
+    CalculateProductOfDimensions = Result
+End Function
+
+Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Long, ByVal Dimension As Long) As Long
+    ArrayBoundPtr = ArrayBoundPtr + (Rank - Dimension) * corSizeOfSafeArrayBound
+    GetDimensionSize = MemLong(ArrayBoundPtr)
+End Function
 
 ''
 ' This function assigns the default value of the specific

@@ -239,7 +239,7 @@ Public Sub FlushFinalBlock()
         Throw Cor.NewNotSupportedException("Cannot call FlushFinalBlock twice.")
     
     mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-    mStream.WriteBlock mOutputBuffer, 0, CorArray.Length(mOutputBuffer)
+    mStream.WriteBlock mOutputBuffer, 0, CorArray.LengthFirstDim(mOutputBuffer)
     
     If TypeOf mStream Is CryptoStream Then
         Dim cs As CryptoStream
@@ -361,14 +361,14 @@ Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
         Error.ArgumentNull "AsyncResult", ArgumentNull_Generic
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     
     Dim Result As StreamAsyncResult
     Set Result = AsyncResult
     If Not Result.IsReadType Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     If Result.EndCalled Then _
-        Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     
     If Not Result.Exception Is Nothing Then
         Throw Result.Exception
@@ -390,9 +390,7 @@ Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count 
     If Not CanWrite Then _
         Error.NotSupported NotSupported_UnwritableStream
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Buffer), Offset, Count)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Buffer", Offset, "Offset", Count, "Count", False)
+    ValidateArrayRange Buffer, Offset, Count, Parameter_Buffer, Parameter_Offset
     
     If (Count > mInputBlockSize) And mTransform.CanTransformMultipleBlocks Then
         WriteMultiBlock Buffer, Offset, Count
@@ -466,14 +464,14 @@ Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
         Error.ArgumentNull "AsyncResult", ArgumentNull_Generic
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
     
     Dim Result As StreamAsyncResult
     Set Result = AsyncResult
     If Result.IsReadType Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
     If Result.EndCalled Then _
-        Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
 
     If Not Result.Exception Is Nothing Then
         Throw Result.Exception
