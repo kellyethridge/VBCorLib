@@ -1,4 +1,4 @@
-Attribute VB_Name = "modHelper"
+Attribute VB_Name = "ExternalHelper"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "modHelper"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modHelper
+' Module: ExternalHelper
 '
 
 ''
@@ -44,11 +44,6 @@ Private Const ShiftLeftOffset       As Long = 76
 Private Const UAddOffset            As Long = 80
 Private Const UAdd64Offset          As Long = 84
 
-
-' We expose this directly so we don't have to manage reference counting. This requires
-' a call to InitHelper before it can be used. The call is currently made in Main.
-Public Helper As IHelper
-
 Private Type HelperVTable
     pVTable     As Long
     Func(17)    As Long
@@ -57,10 +52,8 @@ End Type
 Private mAsm()      As Long
 Private mMSVCLib    As Long
 
+Public Helper       As IHelper
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Public Methods
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Sub InitHelper()
     Dim Table As HelperVTable
     
@@ -71,7 +64,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitVTable(ByRef Table As HelperVTable)
     With Table
@@ -238,7 +231,6 @@ Private Sub InitAsm()
 End Sub
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IUnknown Interface Methods
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -251,5 +243,6 @@ Private Function AddRef(ByVal This As Long) As Long
 End Function
 
 Private Function Release(ByVal This As Long) As Long
+    Debug.Print "Helper.Release"
     CoTaskMemFree This
 End Function
