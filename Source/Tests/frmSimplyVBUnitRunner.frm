@@ -211,6 +211,7 @@ Private Sub AddSystemSecurityCryptography()
 '        .Add New TestRSASignAndVerify
 '        .Add New TestDSACryptoServiceProvider
 '
+        .Add New CryptoStreamTests
 '        .Add NewSuite("CryptoStream", _
 '            New TestCryptoStream, _
 '            New TestCryptoStreamReadBase64, _
