@@ -53,7 +53,6 @@ Implements IObject
 Implements Stream
 
 
-
 ''
 ' Specifies modes for a CryptoStream.
 '
@@ -121,10 +120,10 @@ End Property
 ''
 ' Sets the current position within the Stream.
 '
-' @param RHS The new position.
+' @param Value The new position.
 ' @remarks Always throws a NotSupportedException exception.
 '
-Public Property Let Position(ByVal RHS As Currency)
+Public Property Let Position(ByVal Value As Currency)
     Error.NotSupported NotSupported_UnseekableStream
 End Property
 
@@ -181,10 +180,10 @@ End Property
 ''
 ' Sets the timeout period for Read operations.
 '
-' @param RHS The timeout period in milliseconds.
+' @param Value The timeout period in milliseconds.
 '
-Public Property Let ReadTimeout(ByVal RHS As Long)
-    mStream.ReadTimeout = RHS
+Public Property Let ReadTimeout(ByVal Value As Long)
+    mStream.ReadTimeout = Value
 End Property
 
 ''
@@ -199,10 +198,10 @@ End Property
 ''
 ' Sets the timeout period for a write operation.
 '
-' @param RHS The timeout period in milliseconds.
+' @param Value The timeout period in milliseconds.
 '
-Public Property Let WriteTimeout(ByVal RHS As Long)
-    mStream.WriteTimeout = RHS
+Public Property Let WriteTimeout(ByVal Value As Long)
+    mStream.WriteTimeout = Value
 End Property
 
 ''
@@ -264,16 +263,11 @@ End Sub
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     If Not CanRead Then _
         Error.NotSupported NotSupported_UnreadableStream
-    If CorArray.IsNull(Buffer) Then _
-        Error.ArgumentNull "Buffer", ArgumentNull_Array
-    If Offset < LBound(Buffer) Then _
-        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
-    If Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    
-    Dim BytesRead  As Long
+        
+    ValidateArrayRange Buffer, Offset, Count, Parameter_Buffer, Parameter_Offset
     
     ' Just grab anything that might already be buffered.
+    Dim BytesRead  As Long
     BytesRead = ReadBufferedBytes(Buffer, Offset, Count)
     
     ' Take advantage of transforming multiple blocks if possible.
@@ -325,7 +319,7 @@ End Function
 ' @return An IAsyncResult object used to identify the corrisponding Endread and report
 ' information about the buffer read.
 '
-Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     If Not CanRead Then _
         Error.NotSupported NotSupported_UnreadableStream
     
@@ -359,7 +353,7 @@ End Function
 '
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
-        Error.ArgumentNull "AsyncResult", ArgumentNull_Generic
+        Error.ArgumentNull "AsyncResult"
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     
@@ -431,7 +425,7 @@ End Sub
 ' @return An IAsyncResult object used to identify the corrisponding EndBread and report
 ' information about the buffer read.
 '
-Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Result As StreamAsyncResult
     Set Result = Cor.NewStreamAsyncResult(State)
     
@@ -462,7 +456,7 @@ End Function
 '
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
-        Error.ArgumentNull "AsyncResult", ArgumentNull_Generic
+        Error.ArgumentNull "AsyncResult"
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Error.Argument InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
     
@@ -757,11 +751,11 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Stream
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Stream_BeginRead = BeginRead(Buffer, Offset, Count, Callback, State)
 End Function
 
-Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     BeginWrite Buffer, Offset, Count, Callback, State
 End Function
 

@@ -556,7 +556,7 @@ End Function
 ' @return An IAsyncResult object used to identify the corrisponding Endread and report
 ' information about the buffer read.
 '
-Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Ret As StreamAsyncResult
     Set Ret = Cor.NewStreamAsyncResult(State)
     
@@ -699,7 +699,7 @@ End Sub
 ' @return An IAsyncResult object used to identify the corrisponding EndBread and report
 ' information about the buffer read.
 '
-Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Ret As StreamAsyncResult
     Set Ret = Cor.NewStreamAsyncResult(State)
     
@@ -970,11 +970,11 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Stream
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Set Stream_BeginRead = BeginRead(Buffer, Offset, Count, Callback, State)
 End Function
 
-Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
+Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Set Stream_BeginWrite = BeginWrite(Buffer, Offset, Count, Callback, State)
 End Function
 

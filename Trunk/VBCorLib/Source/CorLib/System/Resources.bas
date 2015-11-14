@@ -123,12 +123,11 @@ Public Enum ResourceStringKey
     Argument_ByteArrayOrNumberRequired = 853
     
     ArgumentNull_Array = 900
-    ArgumentNull_Exception = 901
+    ArgumentNull_Buffer = 901
     ArgumentNull_Stream = 902
     ArgumentNull_Collection = 903
     ArgumentNull_TimeSpan = 904
     ArgumentNull_Generic = 905
-    ArgumentNull_Buffer = 906
     
     ArgumentOutOfRange_MustBeNonNegNum = 700
     ArgumentOutOfRange_SmallCapacity = 701

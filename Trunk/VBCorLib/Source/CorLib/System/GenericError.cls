@@ -40,7 +40,7 @@ Friend Sub Argument(ByVal Key As ResourceStringKey, Optional ByRef ParamName As 
     Throw Cor.NewArgumentException(Environment.GetResourceString(Key), ParamName)
 End Sub
 
-Friend Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentNull_Exception)
+Friend Sub ArgumentNull(ByRef ParamName As String, Optional ByVal Key As ResourceStringKey = ArgumentNull_Generic)
     Throw Cor.NewArgumentNullException(ParamName, Environment.GetResourceString(Key))
 End Sub
 
