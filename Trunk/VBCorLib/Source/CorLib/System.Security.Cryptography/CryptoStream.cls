@@ -536,7 +536,7 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByV
                 Error.Argument Argument_StreamNotWritable, "Stream"
                 
         Case Else
-            Throw Cor.NewArgumentException("Invalid mode.", "mode")
+            Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
     End Select
     
     Set mStream = Stream
@@ -667,7 +667,7 @@ Private Sub WriteMultiBlock(ByRef InputBuffer() As Byte, ByRef InputOffset As Lo
     Dim OutputBuffer() As Byte
     ReDim OutputBuffer(0 To TotalBytes - 1)
     
-    ' apply the cipher to the big array of bytes.
+    ' Apply the tranform to the big array of bytes.
     Dim TotalBytesTransformed As Long
     TotalBytesTransformed = mTransform.TransformBlock(InputBuffer, InputOffset, TotalBytes, OutputBuffer, 0)
     

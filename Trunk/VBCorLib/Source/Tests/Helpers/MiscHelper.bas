@@ -24,6 +24,16 @@ Public Function GenerateString(ByVal Size As Long) As String
     GenerateString = sb.ToString
 End Function
 
+Public Function GenerateBytes(ByVal Size As Long) As Byte()
+    Dim Ran As New Random
+    Dim Result() As Byte
+    ReDim Result(0 To Size - 1)
+    
+    Ran.NextBytes Result
+    
+    GenerateBytes = Result
+End Function
+
 Public Property Get NullBytes() As Byte()
 End Property
 
