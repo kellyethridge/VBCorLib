@@ -52,48 +52,48 @@ Friend Property Get Exception() As Exception
     Set Exception = mException
 End Property
 
-Friend Property Set Exception(ByVal RHS As Exception)
-    Set mException = RHS
+Friend Property Set Exception(ByVal Value As Exception)
+    Set mException = Value
 End Property
 
 Friend Property Get IsReadType() As Boolean
     IsReadType = mIsReadType
 End Property
 
-Friend Property Let IsReadType(ByVal RHS As Boolean)
-    mIsReadType = RHS
+Friend Property Let IsReadType(ByVal Value As Boolean)
+    mIsReadType = Value
 End Property
 
 Friend Property Get EndCalled() As Boolean
     EndCalled = mEndCalled
 End Property
 
-Friend Property Let EndCalled(ByVal RHS As Boolean)
-    mEndCalled = RHS
+Friend Property Let EndCalled(ByVal Value As Boolean)
+    mEndCalled = Value
 End Property
 
 Friend Property Get CompletedSynchronously() As Boolean
     CompletedSynchronously = mCompletedSynchronously
 End Property
 
-Friend Property Let CompletedSynchronously(ByVal RHS As Boolean)
-    mCompletedSynchronously = RHS
+Friend Property Let CompletedSynchronously(ByVal Value As Boolean)
+    mCompletedSynchronously = Value
 End Property
 
 Friend Property Get BytesRead() As Long
     BytesRead = mBytesRead
 End Property
 
-Friend Property Let BytesRead(ByVal RHS As Long)
-    mBytesRead = RHS
+Friend Property Let BytesRead(ByVal Value As Long)
+    mBytesRead = Value
 End Property
 
 Friend Property Get IsCompleted() As Boolean
     IsCompleted = mIsCompleted
 End Property
 
-Friend Property Let IsCompleted(ByVal RHS As Boolean)
-    mIsCompleted = RHS
+Friend Property Let IsCompleted(ByVal Value As Boolean)
+    mIsCompleted = Value
 End Property
 
 
@@ -124,13 +124,16 @@ Friend Function GetHashCode() As Long
 End Function
 
 
-Friend Sub Init(ByVal ObjectState As Variant)
-    Helper.MoveVariant mObjectState, ObjectState
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByRef ObjectState As Variant)
+    VariantCopyInd mObjectState, ObjectState
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -144,6 +147,10 @@ Private Function IObject_ToString() As String
     IObject_ToString = ToString
 End Function
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IAsyncResult
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get IAsyncResult_AsyncState() As Variant
     VariantCopy IAsyncResult_AsyncState, mObjectState
 End Property

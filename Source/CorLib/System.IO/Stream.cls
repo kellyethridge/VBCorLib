@@ -171,7 +171,7 @@ Public Property Let Position(ByVal Value As Currency): End Property
 ' @param State Information the caller can use to distinguish from other reads.
 ' @return Represents the current read state.
 '
-Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult: End Function
+Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult: End Function
 
 ''
 ' Begins an Asynchronous writing process.
@@ -183,7 +183,7 @@ Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Co
 ' @param State A user-supplied information used to distinguish this from other writings.
 ' @return Represents the current write state.
 '
-Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult: End Function
+Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult: End Function
 
 ''
 ' Closes the current stream.

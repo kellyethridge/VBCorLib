@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: NullStream
+' Module: NullStream
 '
 
 ''
@@ -44,14 +47,14 @@ Implements Stream
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashCode() As Long
-    IObject_GetHashCode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashcode() As Long
+    IObject_GetHashcode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -60,31 +63,31 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Stream Interface
+'   Stream
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Dim Ret As StreamAsyncResult
+Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
+    Dim Result As New StreamAsyncResult
+    Result.IsCompleted = True
+    Result.CompletedSynchronously = True
+    Result.IsReadType = True
     
-    Set Ret = New StreamAsyncResult
-    With Ret
-        .IsCompleted = True
-        .CompletedSynchronously = True
-        .IsReadType = True
-    End With
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
-    Set Stream_BeginRead = Ret
+    If Not Callback Is Nothing Then
+        Callback.Execute Result
+    End If
+    
+    Set Stream_BeginRead = Result
 End Function
 
-Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByVal State As Variant) As IAsyncResult
-    Dim Ret As StreamAsyncResult
+Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
+    Dim Result As New StreamAsyncResult
+    Result.IsCompleted = True
+    Result.CompletedSynchronously = True
+
+    If Not Callback Is Nothing Then
+        Callback.Execute Result
+    End If
     
-    Set Ret = New StreamAsyncResult
-    With Ret
-        .IsCompleted = True
-        .CompletedSynchronously = True
-    End With
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
-    Set Stream_BeginWrite = Ret
+    Set Stream_BeginWrite = Result
 End Function
 
 Private Property Get Stream_CanRead() As Boolean
@@ -111,16 +114,18 @@ Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
     Dim Result As StreamAsyncResult
     
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult")
+        Error.ArgumentNull "AsyncResult"
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     Set Result = AsyncResult
     If Not Result.IsReadType Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     If Result.EndCalled Then _
-        Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple
     
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    If Not Result.Exception Is Nothing Then
+        Throw Result.Exception
+    End If
     
     Stream_EndRead = Result.BytesRead
 End Function
@@ -129,16 +134,19 @@ Private Sub Stream_EndWrite(ByVal AsyncResult As IAsyncResult)
     Dim Result As StreamAsyncResult
     
     If AsyncResult Is Nothing Then _
-        Throw Cor.NewArgumentNullException("AsyncResult")
+        Error.ArgumentNull "AsyncResult"
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
+    
     Set Result = AsyncResult
     If Result.IsReadType Then _
-        Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+        Error.Argument InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
     If Result.EndCalled Then _
-        Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
+        Error.InvalidOperation InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple
 
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    If Not Result.Exception Is Nothing Then
+        Throw Result.Exception
+    End If
 End Sub
 
 Private Function Stream_Equals(Value As Variant) As Boolean
@@ -150,7 +158,7 @@ Private Sub Stream_Flush()
 End Sub
 
 Private Function Stream_GetHashCode() As Long
-    Stream_GetHashCode = IObject_GetHashCode
+    Stream_GetHashCode = IObject_GetHashcode
 End Function
 
 Private Property Get Stream_Length() As Currency
@@ -174,11 +182,11 @@ Private Function Stream_ReadByte() As Long
 End Function
 
 Private Property Let Stream_ReadTimeout(ByVal RHS As Long)
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 Private Property Get Stream_ReadTimeout() As Long
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
@@ -202,9 +210,9 @@ Private Sub Stream_WriteByte(ByVal Value As Byte)
 End Sub
 
 Private Property Let Stream_WriteTimeout(ByVal RHS As Long)
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 Private Property Get Stream_WriteTimeout() As Long
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property

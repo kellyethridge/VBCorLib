@@ -604,7 +604,7 @@ Public Function NewObjectDisposedException(ByVal ObjectName As String, Optional 
 End Function
 
 ' For internal use only.
-Friend Function NewStreamAsyncResult(ByVal ObjectState As Variant) As StreamAsyncResult
+Friend Function NewStreamAsyncResult(ByRef ObjectState As Variant) As StreamAsyncResult
     Set NewStreamAsyncResult = New StreamAsyncResult
     NewStreamAsyncResult.Init ObjectState
 End Function
