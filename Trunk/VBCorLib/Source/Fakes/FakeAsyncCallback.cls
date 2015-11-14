@@ -14,17 +14,10 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements AsyncCallback
 
-Private mResult As IAsyncResult
-Private mCalled As Boolean
-
-Public Property Get Result() As IAsyncResult
-    Set Result = mResult
-End Property
-
-Public Property Get Called() As Boolean
-    Called = mCalled
-End Property
+Public Result As IAsyncResult
+Public Called As Boolean
 
 Private Sub AsyncCallback_Execute(ByVal ar As IAsyncResult)
-    mCalled = True
+    Called = True
+    Set Result = ar
 End Sub
