@@ -235,7 +235,7 @@ Public Sub FlushFinalBlock()
     If Not CanWrite Then _
         Error.NotSupported NotSupported_UnwritableStream
     If mFinalTransformed Then _
-        Throw Cor.NewNotSupportedException("Cannot call FlushFinalBlock twice.")
+        Error.NotSupported Cryptography_CryptoStream_FlushFinalBlockTwice
     
     mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
     mStream.WriteBlock mOutputBuffer, 0, CorArray.LengthFirstDim(mOutputBuffer)
@@ -516,7 +516,7 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByV
     If Stream Is Nothing Then _
         Error.ArgumentNull "Stream", ArgumentNull_Stream
     If Transform Is Nothing Then _
-        Error.ArgumentNull "Transform", ArgumentNull_Generic
+        Error.ArgumentNull "Transform"
     
     Select Case Mode
         Case CryptoStreamMode.ReadMode
