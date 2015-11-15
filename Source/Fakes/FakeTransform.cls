@@ -21,6 +21,7 @@ Public OutputBlockSize              As Long
 Public Enabled                      As Boolean
 Public TransformBlockCount          As New Count
 Public TransformFinalBlockCount     As New Count
+Public EnforceBlockSizeMultiple     As Boolean
 
 
 Public Sub Init(ByVal Enabled As Boolean, Optional CanReuse As Boolean, Optional CanTransformMultiple As Boolean, Optional BlockSize As Long)
@@ -55,6 +56,12 @@ End Property
 
 Private Function ICryptoTransform_TransformBlock(InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
     Me.TransformBlockCount.Increment
+    
+    If EnforceBlockSizeMultiple Then
+        If InputCount Mod InputBlockSize <> 0 Then
+            Err.Raise 5, "TransformBlock", "InputCount must be exact multple of InputBlockSize"
+        End If
+    End If
     
     If Enabled And InputCount > 0 Then
         CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount

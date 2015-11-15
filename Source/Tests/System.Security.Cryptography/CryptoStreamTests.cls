@@ -42,6 +42,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 24, True
             Test.Use 30, True
             
+        Case "ReadBlock_UsingMultiBlockWithVariousDataSizes_CallsTransformOnce"
+            Test.Use 16
+            Test.Use 24
+            Test.Use 30
+            
     End Select
 End Sub
 
@@ -213,6 +218,23 @@ Public Sub FlushFinalBlock_WithCryptoStreamOutput_CallsFlushFinalBlockOnOutput()
     Assert.That Output.FlushFinalBlockCount, Iz.EqualTo(1)
 End Sub
 
-
-
+Public Sub ReadBlock_UsingMultiBlockWithVariousDataSizes_CallsTransformOnce(ByVal DataSize As Long)
+    Dim Stream As MemoryStream
+    Dim Transform As New FakeTransform
+    Dim Data() As Byte
+    Data = GenerateBytes(DataSize)
+    Set Stream = Cor.NewMemoryStream(Data, writable:=False)
+    Transform.CanTransformMultipleBlocks = True
+    
+    Dim Actual As Long
+    Dim ActualData() As Byte
+    ReDim ActualData(0 To DataSize - 1)
+    With Cor.NewCryptoStream(Stream, Transform, ReadMode)
+        Actual = .ReadBlock(ActualData, 0, DataSize)
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(DataSize)
+    Assert.That Transform.TransformBlockCount, Iz.EqualTo(1)
+    Assert.That ActualData, Iz.EqualTo(Data)
+End Sub
 
