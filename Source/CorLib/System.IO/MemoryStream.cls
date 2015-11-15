@@ -642,16 +642,6 @@ Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
-''
-' Returns a reference to itself to assist in With..End With blocks
-'
-' @remarks This property is marked hidden.
-'
-Public Property Get This() As MemoryStream
-Attribute This.VB_MemberFlags = "40"
-    Set This = Me
-End Property
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
