@@ -562,26 +562,24 @@ End Sub
 ' We like to have a full buffer to read from for small reads.
 '
 Private Function FillBuffer() As Boolean
-    Do
-        ' We need to read a full block of bytes in at one time. The Stream
-        ' being read from must have an exact multiple of mInputBlockSize bytes
-        ' to read or it will eventually fail.
-        Dim BytesRead As Long
-        BytesRead = mStream.ReadBlock(mInputBuffer, 0, mInputBlockSize)
-        
-        ' If we did that, then we can assume we are not at the end of the Stream.
-        If BytesRead > 0 Then
-            ' So just transform the whole buffer to our output buffer.
-            mBytesBuffered = mTransform.TransformBlock(mInputBuffer, 0, BytesRead, mOutputBuffer, 0)
-        Else
-            ' We didn't have any bytes, so we assume the end of the stream was reached.
-            ' Using the TransformFinalBlock will strip away the padding from what we
-            ' have left in our input buffer.
-            mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-            mBytesBuffered = CorArray.Length(mOutputBuffer)
-            Exit Do
-        End If
-    Loop While mBytesBuffered = 0
+    ' We need to read a full block of bytes in at one time. The Stream
+    ' being read from must have an exact multiple of mInputBlockSize bytes
+    ' to read or it will eventually fail.
+    Dim BytesRead As Long
+    BytesRead = mStream.ReadBlock(mInputBuffer, 0, mInputBlockSize)
+    
+    ' If we did that, then we can assume we are not at the end of the Stream.
+    If BytesRead = mInputBlockSize Then
+        ' So just transform the whole buffer to our output buffer.
+        mBytesBuffered = mTransform.TransformBlock(mInputBuffer, 0, BytesRead, mOutputBuffer, 0)
+    Else
+        ' We didn't have any bytes, so we assume the end of the stream was reached.
+        ' Using the TransformFinalBlock will strip away the padding from what we
+        ' have left in our input buffer.
+        mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, BytesRead)
+        mBytesBuffered = CorArray.LengthFirstDim(mOutputBuffer)
+        mFinalTransformed = True
+    End If
     
     mOutputIndex = 0
     FillBuffer = (mBytesBuffered > 0)
