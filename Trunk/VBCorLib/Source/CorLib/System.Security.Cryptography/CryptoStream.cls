@@ -208,12 +208,16 @@ End Property
 ' Closes the underlying Stream.
 '
 Public Sub CloseStream()
-    If Me.CanWrite And (Not mFinalTransformed) Then
-        FlushFinalBlock
+    If Not mStream Is Nothing Then
+        If Me.CanWrite And (Not mFinalTransformed) Then
+            FlushFinalBlock
+        End If
+        
+        mStream.CloseStream
+        Erase mInputBuffer
+        Erase mOutputBuffer
+        Set mStream = Nothing
     End If
-    mStream.CloseStream
-    Erase mInputBuffer
-    Erase mOutputBuffer
 End Sub
 
 ''

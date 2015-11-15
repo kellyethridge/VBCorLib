@@ -61,6 +61,42 @@ Public Sub Constructor_WithWriteMode_SetsReadWriteMode()
     Assert.That Stream.CanWrite, Iz.True
 End Sub
 
+Public Sub Constructor_WithNullStream_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    Cor.NewCryptoStream Nothing, New FakeTransform, WriteMode
+    
+    AssertArgumentNullException Err, "Stream"
+End Sub
+
+Public Sub Constructor_WithNullTransform_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    Cor.NewCryptoStream New FakeStream, Nothing, WriteMode
+    
+    AssertArgumentNullException Err, "Transform"
+End Sub
+
+Public Sub Constructor_WithWriteModeOnReadOnlyStream_ThrowsArgumentException()
+    Dim Output As New FakeStream
+    Output.CanWrite = False
+    
+    On Error Resume Next
+    Cor.NewCryptoStream Output, New FakeTransform, WriteMode
+    
+    AssertArgumentException Err, "Stream"
+End Sub
+
+Public Sub Constructor_WithReadModeOnWriteOnlyStream_ThrowsArgumentException()
+    Dim Output As New FakeStream
+    Output.CanRead = False
+    
+    On Error Resume Next
+    Cor.NewCryptoStream Output, New FakeTransform, ReadMode
+    
+    AssertArgumentException Err, "Stream"
+End Sub
+
 Public Sub WriteBlock_UsingMultiBlockWithVariousDataSizes_CallsTransformOnce(ByVal DataSize As Long)
     Dim Output As New MemoryStream
     Dim Transform As New FakeTransform
@@ -141,6 +177,40 @@ Public Sub FlushFinalBlock_WithPartialBlockWritten_FlushesToStream()
         Assert.That Transform.TransformFinalBlockCount, Iz.EqualTo(1)
         Assert.That Output.ToArray, Iz.EqualTo(Data)
     End With
+End Sub
+
+Public Sub FlushFinalBlock_WhenCalledTwice_ThrowsNotSupportedException()
+    Dim Output As New MemoryStream
+    
+    On Error Resume Next
+    With Cor.NewCryptoStream(Output, New FakeTransform, WriteMode)
+        .FlushFinalBlock
+        .FlushFinalBlock
+    End With
+    
+    AssertNotSupportedException Err
+End Sub
+
+Public Sub FlushFinalBlock_WhenInReadMode_ThrowsNotSupportedException()
+    Dim Output As New MemoryStream
+    
+    On Error Resume Next
+    With Cor.NewCryptoStream(Output, New FakeTransform, ReadMode)
+        .FlushFinalBlock
+    End With
+    
+    AssertNotSupportedException Err
+End Sub
+
+Public Sub FlushFinalBlock_WithCryptoStreamOutput_CallsFlushFinalBlockOnOutput()
+    Dim Output As New CryptoStreamSpy
+    Output.Mode = WriteMode
+    
+    With Cor.NewCryptoStream(Output, New FakeTransform, WriteMode)
+        .FlushFinalBlock
+    End With
+    
+    Assert.That Output.FlushFinalBlockCount, Iz.EqualTo(1)
 End Sub
 
 
