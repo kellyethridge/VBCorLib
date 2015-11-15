@@ -19,8 +19,8 @@ Public CanTransformMultipleBlocks   As Boolean
 Public InputBlockSize               As Long
 Public OutputBlockSize              As Long
 Public Enabled                      As Boolean
-Public TransformBlockCount          As Long
-Public TransformFinalBlockCount     As Long
+Public TransformBlockCount          As New Count
+Public TransformFinalBlockCount     As New Count
 
 
 Public Sub Init(ByVal Enabled As Boolean, Optional CanReuse As Boolean, Optional CanTransformMultiple As Boolean, Optional BlockSize As Long)
@@ -54,7 +54,7 @@ Private Property Get ICryptoTransform_OutputBlockSize() As Long
 End Property
 
 Private Function ICryptoTransform_TransformBlock(InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    TransformBlockCount = TransformBlockCount + 1
+    Me.TransformBlockCount.Increment
     
     If Enabled And InputCount > 0 Then
         CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
@@ -63,7 +63,7 @@ Private Function ICryptoTransform_TransformBlock(InputBuffer() As Byte, ByVal In
 End Function
 
 Private Function ICryptoTransform_TransformFinalBlock(InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    TransformFinalBlockCount = TransformFinalBlockCount + 1
+    Me.TransformFinalBlockCount.Increment
     
     If Enabled And InputCount > 0 Then
         Dim Result() As Byte
