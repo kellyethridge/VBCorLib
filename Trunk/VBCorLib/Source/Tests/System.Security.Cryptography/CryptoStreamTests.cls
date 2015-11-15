@@ -46,6 +46,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 16
             Test.Use 24
             Test.Use 30
+        
+        Case "ReadBlock_WithoutMultiBlockWithVariousDataSizes_CallsTransformExpectedTimes"
+            Test.Use 16, 2
+            Test.Use 24, 3
+            Test.Use 30, 3
             
     End Select
 End Sub
@@ -223,7 +228,7 @@ Public Sub ReadBlock_UsingMultiBlockWithVariousDataSizes_CallsTransformOnce(ByVa
     Dim Transform As New FakeTransform
     Dim Data() As Byte
     Data = GenerateBytes(DataSize)
-    Set Stream = Cor.NewMemoryStream(Data, writable:=False)
+    Set Stream = Cor.NewMemoryStream(Data, Writable:=False)
     Transform.CanTransformMultipleBlocks = True
     
     Dim Actual As Long
@@ -235,6 +240,26 @@ Public Sub ReadBlock_UsingMultiBlockWithVariousDataSizes_CallsTransformOnce(ByVa
     
     Assert.That Actual, Iz.EqualTo(DataSize)
     Assert.That Transform.TransformBlockCount, Iz.EqualTo(1)
+    Assert.That ActualData, Iz.EqualTo(Data)
+End Sub
+
+Public Sub ReadBlock_WithoutMultiBlockWithVariousDataSizes_CallsTransformExpectedTimes(ByVal DataSize As Long, ByVal Expected As Long)
+    Dim Stream As MemoryStream
+    Dim Transform As New FakeTransform
+    Dim Data() As Byte
+    Data = GenerateBytes(DataSize)
+    Set Stream = Cor.NewMemoryStream(Data, Writable:=False)
+    Transform.CanTransformMultipleBlocks = False
+    
+    Dim Actual As Long
+    Dim ActualData() As Byte
+    ReDim ActualData(0 To DataSize - 1)
+    With Cor.NewCryptoStream(Stream, Transform, ReadMode)
+        Actual = .ReadBlock(ActualData, 0, DataSize)
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(DataSize)
+    Assert.That Transform.TransformBlockCount, Iz.EqualTo(Expected)
     Assert.That ActualData, Iz.EqualTo(Data)
 End Sub
 
