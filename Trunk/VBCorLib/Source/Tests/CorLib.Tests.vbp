@@ -57,7 +57,6 @@ Class=ComparerTests; System.Collections\ComparerTests.cls
 Class=DESCryptoServiceProviderTests; System.Security.Cryptography\DESCryptoServiceProviderTests.cls
 Class=DESDecryptionTests; System.Security.Cryptography\DESDecryptionTests.cls
 Class=DESEncryptionTests; System.Security.Cryptography\DESEncryptionTests.cls
-Class=TestDESPaddingModes; TestDESPaddingModes.cls
 Class=DictionaryEntryTests; System.Collections\DictionaryEntryTests.cls
 Class=DirectoryTests; System.IO\DirectoryTests.cls
 Class=DirectoryInfoTests; System.IO\DirectoryInfoTests.cls
