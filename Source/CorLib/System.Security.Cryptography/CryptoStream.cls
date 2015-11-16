@@ -52,7 +52,6 @@ Option Explicit
 Implements IObject
 Implements Stream
 
-
 ''
 ' Specifies modes for a CryptoStream.
 '
@@ -75,7 +74,6 @@ Private mBytesBuffered      As Long
 Private mFinalTransformed   As Boolean
 Private mOutputBlockSize    As Long
 Private mInputBlockSize     As Long
-
 
 
 ''

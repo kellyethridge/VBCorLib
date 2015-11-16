@@ -263,3 +263,28 @@ Public Sub ReadBlock_WithoutMultiBlockWithVariousDataSizes_CallsTransformExpecte
     Assert.That ActualData, Iz.EqualTo(Data)
 End Sub
 
+Public Sub ReadByte_WhenCalled_ReturnsNextByte()
+    Dim Stream As MemoryStream
+    Set Stream = Cor.NewMemoryStream(Cor.NewBytes(1, 2, 3, 4, 5), Mode:=AcquireMode)
+    
+    Dim Actual As Long
+    With Cor.NewCryptoStream(Stream, New FakeTransform, ReadMode)
+        Actual = .ReadByte
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(1)
+End Sub
+
+Public Sub ReadByte_WhenPassedEndOfStream_ReturnsMinusOne()
+    Dim Stream As MemoryStream
+    Set Stream = Cor.NewMemoryStream(GenerateBytes(30), Mode:=AcquireMode)
+    
+    Dim Actual As Long
+    With Cor.NewCryptoStream(Stream, New FakeTransform, ReadMode)
+        Dim Data(0 To 29) As Byte
+        .ReadBlock Data, 0, 30
+        Actual = .ReadByte
+    End With
+    
+    Assert.That Actual, Iz.EqualTo(-1)
+End Sub
