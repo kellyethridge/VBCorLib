@@ -286,20 +286,18 @@ Public Sub GetFullPath_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVa
 End Sub
 
 Public Sub GetFullPath_WithInvalidPath_ThrowsArgumentException(ByVal InvalidPath As String)
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Path.GetFullPath InvalidPath
     
-errTrap:
     AssertArgumentException Err
 End Sub
 
 Public Sub GetFullPath_WithMultipleColons_ThrowsNotSupportedException()
-    On Error GoTo errTrap
+    On Error Resume Next
     
     Path.GetFullPath "c:\a:"
     
-errTrap:
     AssertNotSupportedException Err
 End Sub
 
@@ -312,7 +310,7 @@ Public Sub GetPathRoot_WithValue_ReturnsExpected(ByVal PathToUse As String, ByVa
 End Sub
 
 Public Sub GetTempFileName_WhenCalled_ReturnsNewlyCreatedTempFile()
-    On Error GoTo errTrap
+    On Error GoTo Catch
     Dim TempFileName As String
     
     TempFileName = Path.GetTempFileName
@@ -320,7 +318,7 @@ Public Sub GetTempFileName_WhenCalled_ReturnsNewlyCreatedTempFile()
     Assert.That TempFileName, Iz.Not.Empty
     Assert.That FileLen(TempFileName), Iz.EqualTo(0)
     
-errTrap:
+Catch:
     If Len(Dir(TempFileName)) > 0 Then
         Kill TempFileName
     End If

@@ -202,7 +202,7 @@ Private Sub AddSystemSecurityCryptography()
         .Add New HMACSHA512Tests
         .Add New HMACMD5Tests
         .Add New HMACRIPEMD160Tests
-'        .Add New TestMACTripleDES
+        .Add New MACTripleDESTests
         .Add New Rfc2898DeriveBytesTests
 '        .Add New CryptoConfigTests
         .Add New CspParametersTests
@@ -212,13 +212,6 @@ Private Sub AddSystemSecurityCryptography()
 '        .Add New TestDSACryptoServiceProvider
 '
         .Add New CryptoStreamTests
-'        .Add NewSuite("CryptoStream", _
-'            New TestCryptoStream, _
-'            New TestCryptoStreamReadBase64, _
-'            New TestCryptoStreamWriteBase64, _
-'            New TestCryptoStreamFullBase64, _
-'            New TestCryptoStreamMultiBlock)
-'
         .Add NewSuite("DESCryptoServiceProvider", _
             New DESCryptoServiceProviderTests, _
             New DESEncryptionTests, _
