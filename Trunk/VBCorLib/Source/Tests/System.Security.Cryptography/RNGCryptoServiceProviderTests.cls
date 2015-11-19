@@ -50,7 +50,7 @@ Public Sub GetNonZeroBytes_WhenCalled_FillArrayWithNonZeroRandomValues()
     Assert.That Actual, Has.None.EqualTo(0)
 End Sub
 
-Public Sub GetNotZeroBytes_WhenCalled_RandomlyFillsArrays()
+Public Sub GetNonZeroBytes_WhenCalled_RandomlyFillsArrays()
     Dim Generator As New RNGCryptoServiceProvider
     
     Dim Actual1(1 To 10) As Byte
