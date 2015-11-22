@@ -16,171 +16,148 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ICategorizable
+Implements ITestCaseSource
 
-'Private csp As MACTripleDes
-'Private PT() As Byte
-'Private ht() As Byte
-'Private FF As Long
+Private mKey() As Byte
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Security.Cryptography"
 End Sub
 
-'Public Sub Setup()
-'    Set Csp = New MACTripleDes
-'
-'    FF = FreeFile
-'    Open App.Path & "\Cryptography Files\MACTripleDES_Hashes.txt" For Input As #FF
-'End Sub
-'
-'Public Sub Teardown()
-'    Close #FF
-'End Sub
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "ComputeHash_WhenSettingKeyProperty_ReturnsExpected"
+            AddTests Test
+            
+        Case "ComputeHash_WhenConstructingWithKey_ReturnsExpected"
+            AddTests Test
+            
+        Case "ComputeHash_WithSpecifiedSubArray_ReturnsExpected"
+            AddTests Test
+            
+        Case "ComputeHash_WithStream_ReturnsExpected"
+            AddTests Test
+            
+        Case "TransformFinalBlock_WhenCalled_ComputesHash"
+            AddTests Test
+            
+        Case "TransformBlock_WhenCalled_ComputesHash"
+            AddTests Test
+            
+    End Select
+End Sub
 
-'Public Sub TestEmptyArray()
-'    Dim i As Long
-'    Dim Key() As Byte
-'    ReDim Key(0 To 23)
-'    For i = 0 To 23
-'        Key(i) = i
-'    Next i
-'
-'    csp.Key = Key
-'    csp.Padding = PKCS7
-'
-'    Dim Expected() As Byte
-'    Expected = Cor.NewBytes(&HA3, &HCF, &H6E, &HC8, &H8B, &HD9, &H7D, &H73)
-'
-'    Assert.AreEqual Expected, csp.ComputeHash(Cor.NewBytes())
-'End Sub
-'
-'Public Sub TestComputeHashesFromBytes()
-'    Dim c As Long
-'
-'    Do While GetNextEntry
-'        c = c + 1
-'
-'        Dim b() As Byte
-'        b = csp.ComputeHash(PT)
-'        Assert.IsFalse CorArray.IsNull(b), "b should not be null."
-'        Assert.AreEqual ht, b, "Entry: " & c
-'    Loop
-'End Sub
-'
-'Public Sub TestTransformFinalBlock()
-'    Do While GetNextEntry
-'
-'        Dim b() As Byte
-'        b = csp.TransformFinalBlock(PT, 0, UBound(PT) + 1)
-'        Assert.AreEqual PT, b
-'        Assert.AreEqual ht, csp.Hash
-'    Loop
-'End Sub
-'
-'Public Sub TestTransformBlock1ByteAtATime()
-'    Dim c As Long
-'
-'    Do While GetNextEntry
-'        Dim i As Long
-'        Dim b() As Byte
-'        ReDim b(0)
-'
-'        c = c + 1
-'
-'        For i = 0 To UBound(PT)
-'            Assert.AreEqual 1, csp.TransformBlock(PT, i, 1, b, 0), "Entry: " & c
-'            Assert.AreEqual PT(i), b(0), "Entry: " & c
-'        Next i
-'        csp.TransformFinalBlock PT, UBound(PT) + 1, 0
-'        Assert.AreEqual ht, csp.Hash, "Entry: " & c
-'    Loop
-'End Sub
-'
-'Public Sub TestTransformBlock5BytesAtATime()
-'    Do While GetNextEntry
-'        Dim c As Long
-'        Dim i As Long
-'        Dim b() As Byte
-'        ReDim b(4)
-'
-'        c = c + 1
-'
-'        i = 0
-'        Do While i <= (UBound(PT) - 5)
-'            Assert.AreEqual 5, csp.TransformBlock(PT, i, 5, b, 0)
-'
-'            Dim j As Long
-'            For j = 0 To 4
-'                Assert.AreEqual PT(i + j), b(j), "TransformBlock: Entry " & c
-'            Next j
-'
-'            i = i + 5
-'        Loop
-'        csp.TransformFinalBlock PT, i, UBound(PT) - i + 1
-'        Assert.AreEqual ht, csp.Hash, "Hash: Entry " & c
-'    Loop
-'End Sub
-'
-'Public Sub HashLargeFileStream()
-'    Dim fs As FileStream
-'    Set fs = Cor.NewFileStream(App.Path & "\Cryptography Files\RC2_Entries.txt", OpenExisting)
-'
-'    Dim Hash() As Byte
-'    Hash = Cor.NewBytes(&H2B, &H6F, &H35, &HC8, &H18, &H3E, &H37, &H1D)
-'
-'    csp.Key = Cor.NewBytes(&H4B, &H60, &H72, &HD3, &HD8, &H76, &HAD, &H6C, &H33, &HC1, &H9D, &H53, &HDD, &HEA, &H31, &HD9, &H25, &HC0, &HFE, &H9C, &HCB, &H4D, &H43, &H1D)
-'
-'    Assert.AreEqual Hash, csp.ComputeHash(fs)
-'End Sub
-'
-'
-'
-'
-'
-'
-'
-'Private Function GetNextEntry() As Boolean
-'    If EOF(FF) Then Exit Function
-'
-'    Dim line As String
-'    Line Input #FF, line
-'    Do While Len(line) > 0
-'        Dim Parts() As String
-'        Parts = Split(line, "=")
-'        Select Case LCase$(Trim$(Parts(0)))
-'            Case "pt": PT = ConvertHexToBytes(Trim$(Parts(1)))
-'            Case "ht": ht = ConvertHexToBytes(Trim$(Parts(1)))
-'            Case "ky": csp.Key = ConvertHexToBytes(Trim$(Parts(1)))
-'            Case "pd": csp.Padding = CInt(Parts(1))
-'        End Select
-'
-'        Line Input #FF, line
-'    Loop
-'    GetNextEntry = True
-'End Function
-'
-'Private Function ConvertHexToBytes(ByVal s As String) As Byte()
-'    Dim ret() As Byte
-'    ReDim ret(0 To Len(s) \ 2 - 1)
-'
-'    Dim i As Long
-'    For i = 0 To UBound(ret)
-'        ret(i) = CByte("&h" & Mid$(s, (i * 2) + 1, 2))
-'    Next i
-'
-'    ConvertHexToBytes = ret
-'End Function
-'
-'Private Function ConvertBytesToHex(ByRef Bytes() As Byte) As String
-'    Dim i As Long
-'    Dim sb As New StringBuilder
-'
-'    For i = 0 To UBound(Bytes)
-'        sb.AppendFormat "{0:X2}", Bytes(i)
-'    Next i
-'
-'    ConvertBytesToHex = sb.ToString
-'End Function
-'
-'
-'
+Private Sub AddTests(ByVal Test As TestCaseCollector)
+    Test.Use ByteArray(7), NewBytes(&H86, &HE9, &H65, &HBD, &H1E, &HC4, &H44, &H61)
+    Test.Use ByteArray(8), NewBytes(&H86, &HE9, &H65, &HBD, &H1E, &HC4, &H44, &H61)
+    Test.Use ByteArray(14), NewBytes(&H23, &HD6, &H92, &HA0, &H80, &H6E, &HC9, &H30)
+    Test.Use ByteArray(48), NewBytes(&HA3, &HE, &H34, &H26, &H8B, &H49, &HEF, &H49)
+End Sub
+
+Public Sub FixtureSetup()
+    mKey = HexToBytes("0123456789abcdef23456789abcdef010123456789abcdef")
+End Sub
+
+Public Sub Constructor_WithNullKey_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    Cor.NewMACTripleDES NullBytes
+    
+    AssertArgumentNullException Err, "Key"
+End Sub
+
+Public Sub Constructor_WithKeyAndName_CreatesInstance()
+    Cor.NewMACTripleDES mKey, "TripleDES"
+End Sub
+
+Public Sub Constructor_WithInvalidAlgorithmName_ThrowsInvalidCastException()
+    On Error Resume Next
+    
+    Cor.NewMACTripleDES mKey, "DES"
+    
+    AssertInvalidCastException Err
+End Sub
+
+Public Sub Invariants()
+    Dim csp As New MACTripleDES
+    Assert.That csp.CanReuseTransform, Iz.True, "CanReuseTransform"
+    Assert.That csp.CanTransformMultipleBlocks, Iz.True, "CanTransformMultipleBlocks"
+    Assert.That csp.HashSize, Iz.EqualTo(64), "HashSize"
+    Assert.That csp.InputBlockSize, Iz.EqualTo(1), "InputBlockSize"
+    Assert.That csp.OutputBlockSize, Iz.EqualTo(1), "OutputBlockSize"
+    Assert.That csp.ToString, Iz.EqualTo("CorLib.MACTripleDES"), "ToString"
+    Assert.That csp.Key, Iz.Not.Empty
+End Sub
+
+Public Sub ComputeHash_WhenSettingKeyProperty_ReturnsExpected(ByRef Msg() As Byte, ByRef Expected() As Byte)
+    Dim csp As New MACTripleDES
+    csp.Key = mKey
+    
+    Dim Actual() As Byte
+    Actual = csp.ComputeHash(Msg)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ComputeHash_WhenConstructingWithKey_ReturnsExpected(ByRef Msg() As Byte, ByRef Expected() As Byte)
+    Dim csp As MACTripleDES
+    Set csp = Cor.NewMACTripleDES(mKey)
+    
+    Dim Actual() As Byte
+    Actual = csp.ComputeHash(Msg)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ComputeHash_WithSpecifiedSubArray_ReturnsExpected(ByRef Msg() As Byte, ByRef Expected() As Byte)
+    Dim csp As New MACTripleDES
+    csp.Key = mKey
+    
+    Dim Actual() As Byte
+    Actual = csp.ComputeHash(Msg, LBound(Msg), CorArray.Length(Msg))
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ComputeHash_WithStream_ReturnsExpected(ByRef Msg() As Byte, ByRef Expected() As Byte)
+    Dim csp As New MACTripleDES
+    Dim ms As MemoryStream
+    csp.Key = mKey
+    Set ms = Cor.NewMemoryStream(Msg)
+    
+    Dim Actual() As Byte
+    Actual = csp.ComputeHash(ms)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub TransformFinalBlock_WhenCalled_ComputesHash(ByRef Msg() As Byte, ByRef Expected() As Byte)
+    Dim csp As New MACTripleDES
+    csp.Key = mKey
+    
+    Dim Actual() As Byte
+    Actual = csp.TransformFinalBlock(Msg, LBound(Msg), CorArray.Length(Msg))
+    
+    Assert.That Actual, Iz.EqualTo(Msg)
+    Assert.That csp.Hash, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub TransformBlock_WhenCalled_ComputesHash(ByRef Msg() As Byte, ByRef Expected() As Byte)
+    Dim Copy(0 To 1) As Byte
+    Dim csp As New MACTripleDES
+    csp.Key = mKey
+    
+    Dim i As Long
+    For i = LBound(Msg) To UBound(Msg) - 1
+        csp.TransformBlock Msg, i, 1, Copy, 0
+    Next
+    csp.TransformFinalBlock Msg, UBound(Msg), 1
+    
+    Assert.That csp.Hash, Iz.EqualTo(Expected)
+End Sub
+
+Private Function ByteArray(ByVal Size As Long) As Byte()
+    Dim Arr() As Byte
+    ReDim Arr(0 To Size - 1)
+    ByteArray = Arr
+End Function

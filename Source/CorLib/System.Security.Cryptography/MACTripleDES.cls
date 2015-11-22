@@ -314,8 +314,21 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef RgbKey() As Byte, ByVal StrTripleDES As String)
+    On Error GoTo Catch
     Set mTripleDES = CryptoConfig.CreateFromName(StrTripleDES)
     Call SetKey(RgbKey)
+    mTripleDES.IV = Cor.NewBytes(0, 0, 0, 0, 0, 0, 0, 0)
+    mTripleDES.Padding = PaddingMode.Zeros
+    
+    Exit Sub
+    
+Catch:
+    Dim Ex As Exception
+    Catch Ex, Err
+    If Ex.ErrorNumber = 13 Then _
+        Throw Cor.NewInvalidCastException(Err.Description)
+    
+    Throw Ex
 End Sub
 
 
@@ -391,8 +404,8 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mTripleDES = New TripleDESCryptoServiceProvider
-    mTripleDES.Mode = CipherMode.CBC
     mTripleDES.IV = Cor.NewBytes(0, 0, 0, 0, 0, 0, 0, 0)
+    mTripleDES.Padding = PaddingMode.Zeros
     Call mHashStream.Init(8)
 End Sub
 
