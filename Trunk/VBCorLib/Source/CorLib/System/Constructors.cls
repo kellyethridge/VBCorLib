@@ -1714,9 +1714,9 @@ End Function
 ' @param StrTripleDES The name of the TripleDES implementation to be used.
 ' @return A new MACTripleDES object.
 '
-Public Function NewMACTripleDES(ByRef RgbKey() As Byte, Optional ByVal StrTripleDES As String = "3DES") As MACTripleDES
+Public Function NewMACTripleDES(ByRef RgbKey() As Byte, Optional ByVal StrTripleDES As String) As MACTripleDES
     Set NewMACTripleDES = New MACTripleDES
-    NewMACTripleDES.Init RgbKey, StrTripleDES
+    NewMACTripleDES.Init RgbKey, IfString(StrTripleDES, "3DES")
 End Function
 
 ''

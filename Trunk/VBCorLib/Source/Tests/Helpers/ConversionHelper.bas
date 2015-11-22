@@ -1,8 +1,14 @@
 Attribute VB_Name = "ConversionHelper"
 Option Explicit
 
-Public Function HexToBytes(ByRef s As String) As Byte()
+Public Function HexToBytes(ByRef s As String, Optional ByVal Reverse As Boolean = False) As Byte()
     s = Replace$(s, " ", "")
+    
+    If Len(s) = 0 Then
+        HexToBytes = Cor.NewBytes()
+        Exit Function
+    End If
+    
     Dim Bytes() As Byte
     ReDim Bytes(0 To Len(s) \ 2 - 1)
     
@@ -10,6 +16,10 @@ Public Function HexToBytes(ByRef s As String) As Byte()
     For i = 0 To UBound(Bytes)
         Bytes(i) = CByte("&h" & Mid$(s, (i * 2) + 1, 2))
     Next i
+    
+    If Reverse Then
+        CorArray.Reverse Bytes
+    End If
     
     HexToBytes = Bytes
 End Function

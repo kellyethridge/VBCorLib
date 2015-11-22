@@ -243,6 +243,5 @@ Private Function AddRef(ByVal This As Long) As Long
 End Function
 
 Private Function Release(ByVal This As Long) As Long
-    Debug.Print "Helper.Release"
     CoTaskMemFree This
 End Function
