@@ -637,3 +637,7 @@ End Property
 Public Property Get Char() As Char
     Set Char = Statics.Char
 End Property
+
+Public Property Get StringComparer() As StringComparerStatic
+    Set StringComparer = Statics.StringComparer
+End Property

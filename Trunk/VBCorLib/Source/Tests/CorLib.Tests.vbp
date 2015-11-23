@@ -210,6 +210,7 @@ Module=ConversionHelper; Helpers\ConversionHelper.bas
 Module=MiscHelper; Helpers\MiscHelper.bas
 Class=RC2CryptoServiceProviderTests; System.Security.Cryptography\RC2CryptoServiceProviderTests.cls
 ResFile32="CorLib.Tests.RES"
+Class=StringComparerTests; System\StringComparerTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

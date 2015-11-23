@@ -114,6 +114,7 @@ Private Sub AddSystem()
         .Add New TimeZoneTests
         .Add New TimeSpanTests
         .Add New ArrayConstructorTests
+        .Add New StringComparerTests
         
         .Add NewSuite("Object", _
             New ObjectBaseTests, _
