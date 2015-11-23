@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: MACTripleDES
+' Module: MACTripleDES
 '
 
 ''
@@ -48,25 +51,24 @@ Private mDisposed       As Boolean
 Private mHashStarted    As Boolean
 
 
-
 ''
 ' Returns the padding being used by the algorithm.
 '
 ' @return The padding being used.
 '
 Public Property Get Padding() As PaddingMode
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     Padding = mTripleDES.Padding
 End Property
 
 ''
 ' Sets the padding to be used by the hash algorithm.
 '
-' @param RHS The new padding value.
+' @param Value The new padding value.
 '
-Public Property Let Padding(ByVal RHS As PaddingMode)
-    Call VerifyNotDisposed
-    mTripleDES.Padding = RHS
+Public Property Let Padding(ByVal Value As PaddingMode)
+    VerifyNotDisposed
+    mTripleDES.Padding = Value
 End Property
 
 ''
@@ -75,22 +77,22 @@ End Property
 ' @return The key being used.
 '
 Public Property Get Key() As Byte()
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     Key = mTripleDES.Key
 End Property
 
 ''
 ' Sets the key to be used by the hash algorithm.
 '
-' @param RHS The new key to be used.
+' @param Value The new key to be used.
 '
-Public Property Let Key(ByRef RHS() As Byte)
-    Call VerifyNotDisposed
+Public Property Let Key(ByRef Value() As Byte)
+    VerifyNotDisposed
     
     If mHashStarted Then _
         Throw Cor.NewCryptographicException("Cannot change key after hash has started.")
     
-    Call SetKey(RHS)
+    SetKey Value
     Set mStream = Nothing
 End Property
 
@@ -120,7 +122,7 @@ End Property
 ' @remarks The size of the array will vary depending on the hash algorithm being performed.
 '
 Public Property Get Hash() As Byte()
-    Call VerifyNotDisposed
+    VerifyNotDisposed
     
     If mHashStarted Then _
         Throw Cor.NewInvalidOperationException("Cannot get Hash until TransformFinalBlock is called.")
@@ -183,16 +185,19 @@ End Sub
 ' <p>If data has already been processed using TransformBlock, then that data will be included in the hashing process.</p>
 '
 Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Call VerifyNotDisposed
-    Call StartHash
+    VerifyNotDisposed
+    StartHash
     
     Select Case VarType(Source)
-        Case corByteArray:   Call ComputeHashOnBytes(Source, Index, Count)
-        Case vbObject:      Call ComputeHashOnStream(Source)
-        Case Else:          Throw Cor.NewArgumentException("Invalid source. Must be a byte array or Stream object.", "Source")
+        Case corByteArray
+            ComputeHashOnBytes Source, Index, Count
+        Case vbObject
+            ComputeHashOnStream Source
+        Case Else
+            Throw Cor.NewArgumentException("Invalid source. Must be a byte array or Stream object.", "Source")
     End Select
     
-    Call EndHash
+    EndHash
     ComputeHash = mHashStream.Hash
 End Function
 
@@ -249,23 +254,21 @@ End Function
 ' the hash computation.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    Call VerifyNotDisposed
-    Call StartHash
+    ValidateArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
+    VerifyNotDisposed
+    StartHash
     
     If Not CorArray.IsNull(OutputBuffer) Then
         ' We won't bother to copy if the OutputBuffer and offset are the same as
         ' the InputBuffer and offset since this would be copying the same
         ' data over the top of itself.
         If (SAPtr(InputBuffer) <> SAPtr(OutputBuffer)) Or (InputOffset <> OutputOffset) Then
-            Dim Result As Long
-            Result = VerifyArrayRange(SAPtr(OutputBuffer), OutputOffset, InputCount)
-            If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "OutputBuffer", OutputOffset, "OutputBuffer", InputCount, "OutputCount")
-                
-            Call CopyMemory(OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount)
+            ValidateArrayRange OutputBuffer, OutputOffset, InputCount, Parameter_OutputBuffer, Parameter_OutputOffset, Parameter_InputCount
+            CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
         End If
     End If
     
-    Call mStream.WriteBlock(InputBuffer, InputOffset, InputCount)
+    mStream.WriteBlock InputBuffer, InputOffset, InputCount
     TransformBlock = InputCount
 End Function
 
@@ -284,39 +287,40 @@ End Function
 ' to allow computing of a new hash value.</p>
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    Call VerifyNotDisposed
-    
-    If CorArray.IsNull(InputBuffer) Then _
-        Throw Cor.NewArgumentNullException("InputBuffer")
-    If InputOffset < LBound(InputBuffer) Then _
-        Throw Cor.NewArgumentOutOfRangeException("InputOffset", Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If (CorArray.Length(InputBuffer) - InputCount < InputOffset) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
+    VerifyNotDisposed
+    ValidateArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
 
-    Call StartHash
+    StartHash
     
-    Dim Ret() As Byte
+    Dim Result() As Byte
     If InputCount > 0 Then
-        Call mStream.WriteBlock(InputBuffer, InputOffset, InputCount)
+        mStream.WriteBlock InputBuffer, InputOffset, InputCount
         
-        ReDim Ret(0 To InputCount - 1)
-        Call CopyMemory(Ret(0), InputBuffer(InputOffset), InputCount)
+        ReDim Result(0 To InputCount - 1)
+        CopyMemory Result(0), InputBuffer(InputOffset), InputCount
     Else
-        Ret = Cor.NewBytes
+        Result = Cor.NewBytes
     End If
     
-    Call EndHash
-    TransformFinalBlock = Ret
+    EndHash
+    TransformFinalBlock = Result
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    Set mTripleDES = New TripleDESCryptoServiceProvider
+    mTripleDES.IV = Cor.NewBytes(0, 0, 0, 0, 0, 0, 0, 0)
+    mTripleDES.Padding = PaddingMode.Zeros
+    mHashStream.Init 8
+End Sub
+
 Friend Sub Init(ByRef RgbKey() As Byte, ByVal StrTripleDES As String)
     On Error GoTo Catch
     Set mTripleDES = CryptoConfig.CreateFromName(StrTripleDES)
-    Call SetKey(RgbKey)
+    SetKey RgbKey
     mTripleDES.IV = Cor.NewBytes(0, 0, 0, 0, 0, 0, 0, 0)
     mTripleDES.Padding = PaddingMode.Zeros
     
@@ -333,7 +337,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub SetKey(ByRef Key() As Byte)
     ' we have to do it this way to work around the Byte array assignment bug in VB6.
@@ -349,8 +353,8 @@ Private Sub StartHash()
 End Sub
 
 Private Sub EndHash()
-    Call mStream.FlushFinalBlock
-    Call Initialize
+    mStream.FlushFinalBlock
+    Initialize
     mHashStarted = False
 End Sub
 
@@ -368,50 +372,40 @@ Private Sub ComputeHashOnStream(ByRef Source As Variant)
     Do
         BytesRead = Stream.ReadBlock(InputBuffer, 0, 4096)
         If BytesRead = 0 Then Exit Do
-        Call mStream.WriteBlock(InputBuffer, 0, BytesRead)
+        mStream.WriteBlock InputBuffer, 0, BytesRead
     Loop
 End Sub
 
 Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    Dim pSA As Long
-    pSA = CorArray.ArrayPointer(Source)
+    Dim Range As ListRange
+    Range = ValidateArrayOptionalRange(Source, Index, Count, Parameter_Source)
     
-    Dim Result      As Long
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Result = GetOptionalArrayRange(pSA, Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Source", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
-    
-    On Error GoTo errTrap
+    On Error GoTo Catch
     Dim Bytes() As Byte
-    SAPtr(Bytes) = pSA
-    Call mStream.WriteBlock(Bytes, ElemIndex, ElemCount)
+    SAPtr(Bytes) = CorArray.ArrayPointer(Source)
+    mStream.WriteBlock Bytes, Range.Index, Range.Count
 
-errTrap:
-    SAPtr(Bytes) = vbNullPtr
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
     Throw
+    Exit Sub
+Finally:
+    SAPtr(Bytes) = vbNullPtr
+    Return
 End Sub
 
 Private Sub VerifyNotDisposed()
     If mDisposed Then
-        Throw Cor.NewObjectDisposedException("SHA1CryptoServiceProvider", "The service provider has been disposed.")
+        Throw Cor.NewObjectDisposedException("MACTripleDES", "The service provider has been disposed.")
     End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mTripleDES = New TripleDESCryptoServiceProvider
-    mTripleDES.IV = Cor.NewBytes(0, 0, 0, 0, 0, 0, 0, 0)
-    mTripleDES.Padding = PaddingMode.Zeros
-    Call mHashStream.Init(8)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -427,7 +421,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   HashAlgorithm Interface
+'   HashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get HashAlgorithm_CanReuseTransform() As Boolean
     HashAlgorithm_CanReuseTransform = CanReuseTransform
@@ -438,7 +432,7 @@ Private Property Get HashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub HashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function HashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -462,7 +456,7 @@ Private Property Get HashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub HashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get HashAlgorithm_InputBlockSize() As Long
@@ -487,7 +481,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
@@ -515,10 +509,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   KeyedHashAlgorithm Interface
+'   KeyedHashAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let KeyedHashAlgorithm_Key(RHS() As Byte)
-    Call SetKey(RHS)
+Private Property Let KeyedHashAlgorithm_Key(Value() As Byte)
+    SetKey Value
 End Property
 
 Private Property Get KeyedHashAlgorithm_Key() As Byte()
@@ -534,7 +528,7 @@ Private Property Get KeyedHashAlgorithm_CanTransformMultipleBlocks() As Boolean
 End Property
 
 Private Sub KeyedHashAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function KeyedHashAlgorithm_ComputeHash(Source As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()
@@ -558,7 +552,7 @@ Private Property Get KeyedHashAlgorithm_HashSize() As Long
 End Property
 
 Private Sub KeyedHashAlgorithm_Initialize()
-    Call Initialize
+    Initialize
 End Sub
 
 Private Property Get KeyedHashAlgorithm_InputBlockSize() As Long
