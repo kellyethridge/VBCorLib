@@ -40,6 +40,8 @@ Attribute VB_Exposed = True
 
 Option Explicit
 
+Private mDefaultAlgos As Hashtable
+
 ''
 ' Creates a cryptography object based on the name.
 '
@@ -75,33 +77,8 @@ Option Explicit
 ' </pre>
 ' If a custom object is required, then the standard <Server>.<Class> format can be used.
 '
-Public Function CreateFromName(ByVal AlgName As String) As Object
-    Dim Ret As Object
-    
-    Select Case LCase$(AlgName)
-        Case "des":                             Set Ret = New DESCryptoServiceProvider
-        Case "tripledes", "triple des", "3des": Set Ret = New TripleDESCryptoServiceProvider
-        Case "rc2":                             Set Ret = New RC2CryptoServiceProvider
-        Case "rijndael":                        Set Ret = New RijndaelManaged
-        Case "sha", "sha1", "hashalgorithm":    Set Ret = New SHA1CryptoServiceProvider
-        Case "sha256", "sha-256":               Set Ret = New SHA256Managed
-        Case "sha512", "sha-512":               Set Ret = New SHA512Managed
-        Case "sha384", "sha-384":               Set Ret = New SHA384Managed
-        Case "md5":                             Set Ret = New MD5CryptoServiceProvider
-        Case "hmacsha1":                        Set Ret = New HMACSHA1
-        Case "hmacsha256":                      Set Ret = New HMACSHA256
-        Case "hmacsha384":                      Set Ret = New HMACSHA384
-        Case "hmacsha512":                      Set Ret = New HMACSHA512
-        Case "hmacmd5":                         Set Ret = New HMACMD5
-        Case "hmacripemd160":                   Set Ret = New HMACRIPEMD160
-        Case "mactripledes":                    Set Ret = New MACTripleDES
-        Case "rsa":                             Set Ret = New RSACryptoServiceProvider
-        Case "dsa":                             Set Ret = New DSACryptoServiceProvider
-        Case "":                                Set Ret = Nothing
-        Case Else:                              Set Ret = CreateObject(AlgName)
-    End Select
-    
-    Set CreateFromName = Ret
+Public Function CreateFromName(ByRef AlgName As String) As IObject
+    Set CreateFromName = CreateFromDefault(AlgName)
 End Function
 
 ''
@@ -198,6 +175,111 @@ Private Function EncodeNumber(ByVal Value As Long, ByRef Result() As Byte) As Lo
 End Function
 
 ' X.690 8.19.4
-Private Function EncodeFirstTwoIdentifiers(ByVal X As Long, ByVal Y As Long) As Long
-    EncodeFirstTwoIdentifiers = (X * 40) + Y
+Private Function EncodeFirstTwoIdentifiers(ByVal x As Long, ByVal y As Long) As Long
+    EncodeFirstTwoIdentifiers = (x * 40) + y
 End Function
+
+Private Function CreateFromDefault(ByRef AlgName As String) As IObject
+    Dim Algo As Variant
+    Algo = DefaultAlgos(AlgName)
+    
+    If Not IsEmpty(Algo) Then
+        Set CreateFromDefault = CreateObject(Algo)
+    End If
+End Function
+
+Private Property Get DefaultAlgos() As Hashtable
+    Const DESCryptoServiceProviderType          As String = "CorLib.DESCryptoServiceProvider"
+    Const TripleDESCryptoServiceProviderType    As String = "CorLib.TripleDESCryptoServiceProvider"
+    Const RC2CryptoServiceProviderType          As String = "CorLib.RC2CryptoServiceProvider"
+    Const RijndaelManagedType                   As String = "CorLib.RijndaelManaged"
+    Const SHA1CryptoServiceProviderType         As String = "CorLib.SHA1CryptoServiceProvider"
+    Const SHA256ManagedType                     As String = "CorLib.SHA256Managed"
+    Const SHA512ManagedType                     As String = "CorLib.SHA512Managed"
+    Const SHA384ManagedType                     As String = "CorLib.SHA384Managed"
+    Const MD5CryptoServiceProviderType          As String = "CorLib.MD5CryptoServiceProvider"
+    Const HMACSHA1Type                          As String = "CorLib.HMACSHA1"
+    Const HMACSHA256Type                        As String = "CorLib.HMACSHA256"
+    Const HMACSHA384Type                        As String = "CorLib.HMACSHA384"
+    Const HMACSHA512Type                        As String = "CorLib.HMACSHA512"
+    Const HMACMD5Type                           As String = "CorLib.HMACMD5"
+    Const HMACRIPEMD160Type                     As String = "CorLib.HMACRIPEMD160"
+    Const MACTripleDESType                      As String = "CorLib.MACTripleDES"
+    Const RSACryptoServiceProviderType          As String = "CorLib.RSACryptoServiceProvider"
+    Const DSACryptoServiceProviderType          As String = "CorLib.DSACryptoServiceProvider"
+    Const RNGCryptoServiceProviderType          As String = "CorLib.RNGCryptoServiceProvider"
+    
+    If mDefaultAlgos Is Nothing Then
+        Set mDefaultAlgos = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
+        With mDefaultAlgos
+            .Add "DES", DESCryptoServiceProviderType
+            .Add "CorLib.DES", DESCryptoServiceProviderType
+            .Add "TripleDES", TripleDESCryptoServiceProviderType
+            .Add "Triple DES", TripleDESCryptoServiceProviderType
+            .Add "3DES", TripleDESCryptoServiceProviderType
+            .Add "RC2", RC2CryptoServiceProviderType
+            .Add "CorLib.RC2", RC2CryptoServiceProviderType
+            .Add "Rijndael", RijndaelManagedType
+            .Add "CorLib.Rijndael", RijndaelManagedType
+            .Add "CorLib.SymmetricAlgorithm", RijndaelManagedType
+            .Add "SHA", SHA1CryptoServiceProviderType
+            .Add "SHA1", SHA1CryptoServiceProviderType
+            .Add "CorLib.SHA1", SHA1CryptoServiceProviderType
+            .Add "CorLib.SHA1CryptoServiceProvider", SHA1CryptoServiceProviderType
+            .Add "CorLib.HashAlgorithm", SHA1CryptoServiceProviderType
+            .Add "SHA256", SHA256ManagedType
+            .Add "SHA-256", SHA256ManagedType
+            .Add "CorLib.SHA256", SHA256ManagedType
+            .Add "SHA512", SHA512ManagedType
+            .Add "SHA-512", SHA512ManagedType
+            .Add "CorLib.SHA512", SHA512ManagedType
+            .Add "SHA384", SHA384ManagedType
+            .Add "SHA-384", SHA384ManagedType
+            .Add "CorLib.SHA384", SHA384ManagedType
+            .Add "MD5", MD5CryptoServiceProviderType
+            .Add "CorLib.MD5", MD5CryptoServiceProviderType
+            .Add "CorLib.MD5cryptoserviceprovider", MD5CryptoServiceProviderType
+            .Add "HMACSHA1", HMACSHA1Type
+            .Add "CorLib.HMAC", HMACSHA1Type
+            .Add "CorLib.HMACSHA1", HMACSHA1Type
+            .Add "CorLib.KeyedHashAlgorithm", HMACSHA1Type
+            .Add "HMACSHA256", HMACSHA256Type
+            .Add "CorLib.HMACSHA256", HMACSHA256Type
+            .Add "HMACSHA384", HMACSHA384Type
+            .Add "CorLib.HMACSHA384", HMACSHA384Type
+            .Add "HMACSHA512", HMACSHA512Type
+            .Add "CorLib.HMACSHA512", HMACSHA512Type
+            .Add "HMACMD5", HMACMD5Type
+            .Add "CorLib.HMACMD5", HMACMD5Type
+            .Add "HMACRIPEMD160", HMACRIPEMD160Type
+            .Add "CorLib.HMACRIPEMD160", HMACRIPEMD160Type
+            .Add "MACTripleDES", MACTripleDESType
+            .Add "CorLib.MACTripleDES", MACTripleDESType
+            .Add "RSA", RSACryptoServiceProviderType
+            .Add "CorLib.RSA", RSACryptoServiceProviderType
+            .Add "CorLib.AsymmetricAlgorithm", RSACryptoServiceProviderType
+            .Add "DSA", DSACryptoServiceProviderType
+            .Add "CorLib.DSA", DSACryptoServiceProviderType
+            .Add "RandomNumberGenerator", RNGCryptoServiceProviderType
+            .Add "CorLib.RandomNumberGenerator", RNGCryptoServiceProviderType
+            
+            
+        End With
+    End If
+    
+    Set DefaultAlgos = mDefaultAlgos
+End Property
+
+
+
+
+
+
+
+
+
+
+
+
+
+

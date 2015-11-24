@@ -61,4 +61,73 @@ Public Sub EncodeOID_WithValue_ReturnsExpected(ByVal Oid As String, ByRef Expect
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+' Shamelessly stolen from mono-project
+Public Sub CreateFromName_WithDefaultAlgorithms_ReturnsExpected()
+    CreateFromName "SHA", "CorLib.SHA1CryptoServiceProvider"
+    CreateFromName "SHA1", "CorLib.SHA1CryptoServiceProvider"
+    CreateFromName "CorLib.SHA1", "CorLib.SHA1CryptoServiceProvider"
+    CreateFromName "CorLib.HashAlgorithm", "CorLib.SHA1CryptoServiceProvider"
+    CreateFromName "CorLib.SHA1CryptoServiceProvider", "CorLib.SHA1CryptoServiceProvider"
+    CreateFromName "MD5", "CorLib.MD5CryptoServiceProvider"
+    CreateFromName "CorLib.MD5", "CorLib.MD5CryptoServiceProvider"
+    CreateFromName "CorLib.MD5CryptoServiceProvider", "CorLib.MD5CryptoServiceProvider"
+    CreateFromName "SHA256", "CorLib.SHA256Managed"
+    CreateFromName "SHA-256", "CorLib.SHA256Managed"
+    CreateFromName "CorLib.SHA256", "CorLib.SHA256Managed"
+    CreateFromName "SHA384", "CorLib.SHA384Managed"
+    CreateFromName "SHA-384", "CorLib.SHA384Managed"
+    CreateFromName "CorLib.SHA384", "CorLib.SHA384Managed"
+    CreateFromName "SHA512", "CorLib.SHA512Managed"
+    CreateFromName "SHA-512", "CorLib.SHA512Managed"
+    CreateFromName "CorLib.SHA512", "CorLib.SHA512Managed"
+    CreateFromName "RSA", "CorLib.RSACryptoServiceProvider"
+    CreateFromName "CorLib.RSA", "CorLib.RSACryptoServiceProvider"
+    CreateFromName "CorLib.AsymmetricAlgorithm", "CorLib.RSACryptoServiceProvider"
+'    CreateFromName "DSA", "CorLib.DSACryptoServiceProvider"
+'    CreateFromName "CorLib.DSA", "CorLib.DSACryptoServiceProvider"
+    CreateFromName "DES", "CorLib.DESCryptoServiceProvider"
+    CreateFromName "CorLib.DES", "CorLib.DESCryptoServiceProvider"
+    CreateFromName "3DES", "CorLib.TripleDESCryptoServiceProvider"
+    CreateFromName "TripleDES", "CorLib.TripleDESCryptoServiceProvider"
+    CreateFromName "Triple DES", "CorLib.TripleDESCryptoServiceProvider"
+    
+    CreateFromName "CorLib.SymmetricAlgorithm", "CorLib.RijndaelManaged"
+    CreateFromName "RC2", "CorLib.RC2CryptoServiceProvider"
+    CreateFromName "CorLib.RC2", "CorLib.RC2CryptoServiceProvider"
+    CreateFromName "Rijndael", "CorLib.RijndaelManaged"
+    CreateFromName "CorLib.Rijndael", "CorLib.RijndaelManaged"
+    
+    CreateFromName "RandomNumberGenerator", "CorLib.RNGCryptoServiceProvider"
+    CreateFromName "CorLib.RandomNumberGenerator", "CorLib.RNGCryptoServiceProvider"
+    CreateFromName "CorLib.KeyedHashAlgorithm", "CorLib.HMACSHA1"
+    CreateFromName "HMACSHA1", "CorLib.HMACSHA1"
+    CreateFromName "CorLib.HMACSHA1", "CorLib.HMACSHA1"
+    CreateFromName "MACTripleDES", "CorLib.MACTripleDES"
+    CreateFromName "CorLib.MACTripleDES", "CorLib.MACTripleDES"
+    
+    Assert.That CryptoConfig.CreateFromName("HMAC"), Iz.Nothing, "HMAC"
+    CreateFromName "CorLib.HMAC", "CorLib.HMACSHA1"
+    CreateFromName "HMACMD5", "CorLib.HMACMD5"
+    CreateFromName "CorLib.HMACMD5", "CorLib.HMACMD5"
+    CreateFromName "HMACRIPEMD160", "CorLib.HMACRIPEMD160"
+    CreateFromName "CorLib.HMACRIPEMD160", "CorLib.HMACRIPEMD160"
+    CreateFromName "HMACSHA256", "CorLib.HMACSHA256"
+    CreateFromName "CorLib.HMACSHA256", "CorLib.HMACSHA256"
+    CreateFromName "HMACSHA384", "CorLib.HMACSHA384"
+    CreateFromName "CorLib.HMACSHA384", "CorLib.HMACSHA384"
+    CreateFromName "HMACSHA512", "CorLib.HMACSHA512"
+    CreateFromName "CorLib.HMACSHA512", "CorLib.HMACSHA512"
+End Sub
+
+Private Sub CreateFromName(ByRef Name As String, ByRef ObjectName As String)
+    Dim Actual As IObject
+    Set Actual = CryptoConfig.CreateFromName(Name)
+    
+    If Len(ObjectName) = 0 Then
+        Assert.That Actual, Iz.Nothing
+    Else
+        Assert.That Actual, Iz.Not.Nothing, Name
+        Assert.That Actual.ToString, Iz.EqualTo(ObjectName), Name
+    End If
+End Sub
 
