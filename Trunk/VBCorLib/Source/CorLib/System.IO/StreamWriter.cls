@@ -181,7 +181,7 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
         
     Dim Output As String
     Output = CorString.FromCharArray(Chars, Index, Count)
-    WriteValueToStream Output
+    WriteCore Output
     
     If mAutoFlush Then
         InternalFlush True, False
@@ -325,7 +325,7 @@ Private Sub WriteFormatLine(ByRef Args() As Variant)
     
     Select Case ArgsUBound
         Case 0
-            WriteCore Convert.ToString(Args(0))
+            WriteValueToStream Args(0)
             
         Case Is > 0
             Dim Value As Variant
@@ -424,8 +424,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
