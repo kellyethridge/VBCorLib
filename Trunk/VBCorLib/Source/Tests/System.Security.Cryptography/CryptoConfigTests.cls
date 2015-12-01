@@ -117,7 +117,35 @@ Public Sub CreateFromName_WithDefaultAlgorithms_ReturnsExpected()
     CreateFromName "CorLib.HMACSHA384", "CorLib.HMACSHA384"
     CreateFromName "HMACSHA512", "CorLib.HMACSHA512"
     CreateFromName "CorLib.HMACSHA512", "CorLib.HMACSHA512"
+    
+    CreateFromName "RIPEMD160", "CorLib.RIPEMD160Managed"
+    CreateFromName "RIPEMD-160", "CorLib.RIPEMD160Managed"
+    CreateFromName "CorLib.RIPEMD160", "CorLib.RIPEMD160Managed"
+    
+    CreateFromName "CorLib.MemoryStream", "CorLib.MemoryStream"
+    
+    Assert.That CryptoConfig.CreateFromName("NonExistingAlgorithm"), Iz.Nothing
 End Sub
+
+Public Sub CreateFromName_WithURL_ReturnsExpected()
+    CreateFromName "http://www.w3.org/2000/09/xmldsig#hmac-sha1", ""
+    ' URL used in DigestMethod element
+    CreateFromName "http://www.w3.org/2000/09/xmldsig#sha1", "CorLib.SHA1CryptoServiceProvider"
+    ' URL used in Reference element
+    CreateFromName "http://www.w3.org/2000/09/xmldsig#Object", ""
+    CreateFromName "http://www.w3.org/2000/09/xmldsig#Manifest", ""
+    CreateFromName "http://www.w3.org/2000/09/xmldsig#SignatureProperties", ""
+    ' LAMESPEC: only documentated in ".NET Framework Security" book
+    CreateFromName "http://www.w3.org/2001/04/xmlenc#sha256", "CorLib.SHA256Managed"
+    CreateFromName "http://www.w3.org/2001/04/xmlenc#sha384", ""
+    CreateFromName "http://www.w3.org/2001/04/xmlenc#sha512", "CorLib.SHA512Managed"
+
+    CreateFromName "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256", "CorLib.HMACSHA256"
+    CreateFromName "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384", "CorLib.HMACSHA384"
+    CreateFromName "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512", "CorLib.HMACSHA512"
+    CreateFromName "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160", "CorLib.HMACRIPEMD160"
+End Sub
+
 
 Private Sub CreateFromName(ByRef Name As String, ByRef ObjectName As String)
     Dim Actual As IObject

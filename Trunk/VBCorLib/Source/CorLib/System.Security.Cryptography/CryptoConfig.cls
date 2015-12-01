@@ -77,8 +77,15 @@ Private mDefaultAlgos As Hashtable
 ' </pre>
 ' If a custom object is required, then the standard <Server>.<Class> format can be used.
 '
-Public Function CreateFromName(ByRef AlgName As String) As IObject
-    Set CreateFromName = CreateFromDefault(AlgName)
+Public Function CreateFromName(ByRef AlgName As String) As Object
+    Dim Result As Object
+    Set Result = CreateFromDefault(AlgName)
+    
+    If Result Is Nothing Then
+        Set Result = CreateFromClassName(AlgName)
+    End If
+    
+    Set CreateFromName = Result
 End Function
 
 ''
@@ -179,13 +186,19 @@ Private Function EncodeFirstTwoIdentifiers(ByVal x As Long, ByVal y As Long) As 
     EncodeFirstTwoIdentifiers = (x * 40) + y
 End Function
 
-Private Function CreateFromDefault(ByRef AlgName As String) As IObject
+Private Function CreateFromDefault(ByRef AlgName As String) As Object
     Dim Algo As Variant
     Algo = DefaultAlgos(AlgName)
     
     If Not IsEmpty(Algo) Then
         Set CreateFromDefault = CreateObject(Algo)
     End If
+End Function
+
+Private Function CreateFromClassName(ByRef Name As String) As Object
+    On Error GoTo Catch
+    Set CreateFromClassName = CreateObject(Name)
+Catch:
 End Function
 
 Private Property Get DefaultAlgos() As Hashtable
@@ -208,6 +221,7 @@ Private Property Get DefaultAlgos() As Hashtable
     Const RSACryptoServiceProviderType          As String = "CorLib.RSACryptoServiceProvider"
     Const DSACryptoServiceProviderType          As String = "CorLib.DSACryptoServiceProvider"
     Const RNGCryptoServiceProviderType          As String = "CorLib.RNGCryptoServiceProvider"
+    Const RIPEMD160ManagedType                  As String = "CorLib.RIPEMD160Managed"
     
     If mDefaultAlgos Is Nothing Then
         Set mDefaultAlgos = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
@@ -262,7 +276,16 @@ Private Property Get DefaultAlgos() As Hashtable
             .Add "CorLib.DSA", DSACryptoServiceProviderType
             .Add "RandomNumberGenerator", RNGCryptoServiceProviderType
             .Add "CorLib.RandomNumberGenerator", RNGCryptoServiceProviderType
-            
+            .Add "RIPEMD160", RIPEMD160ManagedType
+            .Add "RIPEMD-160", RIPEMD160ManagedType
+            .Add "CorLib.RIPEMD160", RIPEMD160ManagedType
+            .Add "http://www.w3.org/2000/09/xmldsig#sha1", SHA1CryptoServiceProviderType
+            .Add "http://www.w3.org/2001/04/xmlenc#sha256", SHA256ManagedType
+            .Add "http://www.w3.org/2001/04/xmlenc#sha512", SHA512ManagedType
+            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256", HMACSHA256Type
+            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384", HMACSHA384Type
+            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512", HMACSHA512Type
+            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160", HMACRIPEMD160Type
             
         End With
     End If
