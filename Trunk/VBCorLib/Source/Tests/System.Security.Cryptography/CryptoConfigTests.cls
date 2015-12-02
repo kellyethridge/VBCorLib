@@ -146,9 +146,43 @@ Public Sub CreateFromName_WithURL_ReturnsExpected()
     CreateFromName "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160", "CorLib.HMACRIPEMD160"
 End Sub
 
+Public Sub AddAlgorithm_WithEmptyTypeName_ThrowsArgumentException()
+    On Error Resume Next
+    
+    CryptoConfig.AddAlgorithm "", "abc"
+    
+    AssertArgumentException Err, "TypeName"
+End Sub
+
+Public Sub AddAlgorithm_WithNonStringAlgName_ThrowsInvalidCastException()
+    On Error Resume Next
+    
+    CryptoConfig.AddAlgorithm "Server.Class", 1234
+    
+    AssertInvalidCastException Err
+End Sub
+
+Public Sub AddAlgorithm_WithEmptyAlgName_ThrowsArgumentException()
+    On Error Resume Next
+    
+    CryptoConfig.AddAlgorithm "Server.Class", ""
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub CreateFromName_WithCustomAlgoAdded_ReturnsCustomAlgoInstance()
+    CryptoConfig.AddAlgorithm "Fakes.MockObject", "MyType"
+    
+    Dim Actual As Object
+    Set Actual = CryptoConfig.CreateFromName("MyType")
+    
+    Assert.That Actual, Iz.Not.Nothing
+    Assert.That TypeOf Actual Is MockObject, Iz.True
+End Sub
+
 
 Private Sub CreateFromName(ByRef Name As String, ByRef ObjectName As String)
-    Dim Actual As IObject
+    Dim Actual As Object
     Set Actual = CryptoConfig.CreateFromName(Name)
     
     If Len(ObjectName) = 0 Then
