@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2015 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: DriveInfo
+' Module: DriveInfo
 '
 
 ''
@@ -84,7 +87,10 @@ Public Property Get DriveFormat() As String
     Dim Buf As String
     
     Buf = String$(32, 0)
-    If GetVolumeInformation(mName, vbNullString, 0, ByVal 0&, 0, 0, Buf, Len(Buf)) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
+    If GetVolumeInformation(mName, vbNullString, 0, ByVal 0&, 0, 0, Buf, Len(Buf)) = BOOL_FALSE Then
+        IOError.WinIOError Err.LastDllError
+    End If
+    
     DriveFormat = SysAllocString(StrPtr(Buf))
 End Property
 
@@ -97,17 +103,22 @@ Public Property Get VolumeLabel() As String
     Dim Buf As String
     
     Buf = String$(32, 0)
-    If GetVolumeInformation(mName, Buf, Len(Buf), ByVal 0&, 0, 0, vbNullString, 0) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
+    If GetVolumeInformation(mName, Buf, Len(Buf), ByVal 0&, 0, 0, vbNullString, 0) = BOOL_FALSE Then
+        IOError.WinIOError Err.LastDllError
+    End If
+    
     VolumeLabel = SysAllocString(StrPtr(Buf))
 End Property
 
 ''
 ' Sets the volume name.
 '
-' @param RHS The new volume name.
+' @param Value The new volume name.
 '
-Public Property Let VolumeLabel(ByVal RHS As String)
-    If SetVolumeLabel(mName, RHS) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
+Public Property Let VolumeLabel(ByRef Value As String)
+    If SetVolumeLabel(mName, Value) = BOOL_FALSE Then
+        IOError.WinIOError Err.LastDllError
+    End If
 End Property
 
 ''
@@ -134,7 +145,9 @@ End Property
 ' @return The serial number.
 '
 Public Property Get SerialNumber() As Long
-    If GetVolumeInformation(mName, vbNullString, 0, SerialNumber, 0, 0, vbNullString, 0) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
+    If GetVolumeInformation(mName, vbNullString, 0, SerialNumber, 0, 0, vbNullString, 0) = BOOL_FALSE Then
+        IOError.WinIOError Err.LastDllError
+    End If
 End Property
 
 ''
@@ -144,7 +157,10 @@ End Property
 ' @return The amount of free space available to the current account.
 '
 Public Property Get AvailableFreeSpace() As Currency
-    If GetDiskFreeSpaceEx(mName, AvailableFreeSpace, 0@, 0@) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
+    If GetDiskFreeSpaceEx(mName, AvailableFreeSpace, 0@, 0@) = BOOL_FALSE Then
+        IOError.WinIOError Err.LastDllError
+    End If
+    
     AvailableFreeSpace = 10000@ * AvailableFreeSpace
 End Property
 
@@ -154,7 +170,10 @@ End Property
 ' @return The amount of free space.
 '
 Public Property Get TotalFreeSpace() As Currency
-    If GetDiskFreeSpaceEx(mName, 0@, 0@, TotalFreeSpace) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
+    If GetDiskFreeSpaceEx(mName, 0@, 0@, TotalFreeSpace) = BOOL_FALSE Then
+        IOError.WinIOError Err.LastDllError
+    End If
+    
     TotalFreeSpace = 10000@ * TotalFreeSpace
 End Property
 
@@ -164,7 +183,10 @@ End Property
 ' @return The maximum storage amount.
 '
 Public Property Get TotalSize() As Currency
-    If GetDiskFreeSpaceEx(mName, 0@, TotalSize, 0@) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError
+    If GetDiskFreeSpaceEx(mName, 0@, TotalSize, 0@) = BOOL_FALSE Then
+        IOError.WinIOError Err.LastDllError
+    End If
+    
     TotalSize = 10000@ * TotalSize
 End Property
 
@@ -183,7 +205,7 @@ End Function
 ' @param value The value to compare equalit to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -191,17 +213,21 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Name As String)
+Friend Sub Init(ByRef Name As String)
     SetName Name
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub SetName(ByVal Name As String)
     If Len(Name) = 0 Then _
         Throw Cor.NewArgumentException("Volume name cannot be an empty string.", "Name")
@@ -236,7 +262,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     mName = PropBag.ReadProperty(PROP_NAME, "")
@@ -248,14 +274,14 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
