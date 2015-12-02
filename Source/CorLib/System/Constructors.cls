@@ -1005,7 +1005,7 @@ End Function
 ' @param Name The name of the drive (C:\, \\Server\Share).
 ' @return A <b>DriveInfo</b> object representing the specified drive.
 '
-Public Function NewDriveInfo(ByVal Name As String) As DriveInfo
+Public Function NewDriveInfo(ByRef Name As String) As DriveInfo
     Set NewDriveInfo = New DriveInfo
     NewDriveInfo.Init Name
 End Function
