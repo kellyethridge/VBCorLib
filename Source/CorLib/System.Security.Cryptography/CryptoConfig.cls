@@ -42,6 +42,7 @@ Option Explicit
 
 Private mDefaultAlgos   As Hashtable
 Private mAppAlgos       As New Hashtable
+Private mDefaultOids    As Hashtable
 
 
 ''
@@ -164,22 +165,13 @@ End Function
 ' @return The object identifier (OID) for the object.
 '
 Public Function MapNameToOID(ByVal Name As String) As String
-    Dim Ret As String
+    Dim Oid As Variant
     
-    Select Case LCase$(Name)
-        Case "sha1", "sha": Ret = "1.3.14.3.2.26"
-        Case "sha256":      Ret = "2.16.840.1.101.3.4.2.1"
-        Case "sha384":      Ret = "2.16.840.1.101.3.4.2.2"
-        Case "sha512":      Ret = "2.16.840.1.101.3.4.2.3"
-        Case "md5":         Ret = "1.2.840.113549.2.5"
-        Case "ripemd160":   Ret = "1.3.36.3.2.1"
-        Case Else
-            Ret = "1.2.840.113549.1.9.9"
-    End Select
-
-    MapNameToOID = Ret
+    Oid = DefaultOids(Name)
+    If Not IsEmpty(Oid) Then
+        MapNameToOID = Oid
+    End If
 End Function
-
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -316,6 +308,65 @@ Private Sub InitDefaultAlgos()
     End With
 End Sub
 
+Private Property Get DefaultOids() As Hashtable
+    If mDefaultOids Is Nothing Then
+        InitDefaultOids
+    End If
+    
+    Set DefaultOids = mDefaultOids
+End Property
+
+Private Sub InitDefaultOids()
+    Const OID_RSA_SMIMEalgCMS3DESwrap   As String = "1.2.840.113549.1.9.16.3.6"
+    Const OID_RSA_MD5                   As String = "1.2.840.113549.2.5"
+    Const OID_RSA_RC2CBC                As String = "1.2.840.113549.3.2"
+    Const OID_RSA_DES_EDE3_CBC          As String = "1.2.840.113549.3.7"
+    Const OID_OIWSEC_desCBC             As String = "1.3.14.3.2.7"
+    Const OID_OIWSEC_SHA1               As String = "1.3.14.3.2.26"
+    Const OID_OIWSEC_SHA256             As String = "2.16.840.1.101.3.4.2.1"
+    Const OID_OIWSEC_SHA384             As String = "2.16.840.1.101.3.4.2.2"
+    Const OID_OIWSEC_SHA512             As String = "2.16.840.1.101.3.4.2.3"
+    Const OID_OIWSEC_RIPEMD160          As String = "1.3.36.3.2.1"
+    
+    Set mDefaultOids = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
+    With mDefaultOids
+        .Add "", "1.2.840.113549.1.9.9"
+        .Add "SHA", OID_OIWSEC_SHA1
+        .Add "SHA1", OID_OIWSEC_SHA1
+        .Add "CorLib.SHA1", OID_OIWSEC_SHA1
+        .Add "CorLib.SHA1CryptoServiceProvider", OID_OIWSEC_SHA1
+        .Add "CorLib.SHA1Managed", OID_OIWSEC_SHA1
+        .Add "SHA256", OID_OIWSEC_SHA256
+        .Add "CorLib.SHA256", OID_OIWSEC_SHA256
+        .Add "CorLib.SHA256CryptoServiceProvider", OID_OIWSEC_SHA256
+        .Add "CorLib.SHA256Cng", OID_OIWSEC_SHA256
+        .Add "CorLib.SHA256Managed", OID_OIWSEC_SHA256
+        .Add "SHA384", OID_OIWSEC_SHA384
+        .Add "CorLib.SHA384", OID_OIWSEC_SHA384
+        .Add "CorLib.SHA384CryptoServiceProvider", OID_OIWSEC_SHA384
+        .Add "CorLib.SHA384Cng", OID_OIWSEC_SHA384
+        .Add "CorLib.SHA384Managed", OID_OIWSEC_SHA384
+        .Add "SHA512", OID_OIWSEC_SHA512
+        .Add "CorLib.SHA512", OID_OIWSEC_SHA512
+        .Add "CorLib.SHA512CryptoServiceProvider", OID_OIWSEC_SHA512
+        .Add "CorLib.SHA512Cng", OID_OIWSEC_SHA512
+        .Add "CorLib.SHA512Managed", OID_OIWSEC_SHA512
+        .Add "RIPEMD160", OID_OIWSEC_RIPEMD160
+        .Add "CorLib.RIPEMD160", OID_OIWSEC_RIPEMD160
+        .Add "CorLib.RIPEMD160Managed", OID_OIWSEC_RIPEMD160
+        .Add "MD5", OID_RSA_MD5
+        .Add "CorLib.MD5", OID_RSA_MD5
+        .Add "CorLib.MD5CryptoServiceProvider", OID_RSA_MD5
+        .Add "CorLib.MD5Managed", OID_RSA_MD5
+        .Add "TripleDESKeyWrap", OID_RSA_SMIMEalgCMS3DESwrap
+        .Add "RC2", OID_RSA_RC2CBC
+        .Add "CorLib.RC2CryptoServiceProvider", OID_RSA_RC2CBC
+        .Add "DES", OID_OIWSEC_desCBC
+        .Add "CorLib.DESCryptoServiceProvider", OID_OIWSEC_desCBC
+        .Add "TripleDES", OID_RSA_DES_EDE3_CBC
+        .Add "CorLib.TripleDESCryptoServiceProvider", OID_RSA_DES_EDE3_CBC
+    End With
+End Sub
 
 
 
