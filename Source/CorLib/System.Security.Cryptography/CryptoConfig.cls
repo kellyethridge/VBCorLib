@@ -40,7 +40,9 @@ Attribute VB_Exposed = True
 
 Option Explicit
 
-Private mDefaultAlgos As Hashtable
+Private mDefaultAlgos   As Hashtable
+Private mAppAlgos       As New Hashtable
+
 
 ''
 ' Creates a cryptography object based on the name.
@@ -79,14 +81,38 @@ Private mDefaultAlgos As Hashtable
 '
 Public Function CreateFromName(ByRef AlgName As String) As Object
     Dim Result As Object
-    Set Result = CreateFromDefault(AlgName)
+    
+    On Error GoTo Catch
+    Set Result = CreateFromAlgTable(AlgName, mAppAlgos)
     
     If Result Is Nothing Then
-        Set Result = CreateFromClassName(AlgName)
+        Set Result = CreateFromAlgTable(AlgName, DefaultAlgos)
+    End If
+    
+    If Result Is Nothing Then
+        Set Result = CreateObject(AlgName)
     End If
     
     Set CreateFromName = Result
+Catch:
 End Function
+
+Public Sub AddAlgorithm(ByRef TypeName As String, ParamArray AlgNames() As Variant)
+    If Len(TypeName) = 0 Then _
+        Error.Argument Argument_EmptyName, "TypeName"
+    
+    Dim Name As Variant
+    For Each Name In AlgNames
+        If VarType(Name) <> vbString Then _
+            Throw New InvalidCastException
+        If Len(Name) = 0 Then _
+            Error.Argument Cryptography_AddNullOrEmptyName
+    Next
+    
+    For Each Name In AlgNames
+        mAppAlgos(Name) = TypeName
+    Next
+End Sub
 
 ''
 ' Returns the encoded version of an Object Identifier.
@@ -186,22 +212,24 @@ Private Function EncodeFirstTwoIdentifiers(ByVal x As Long, ByVal y As Long) As 
     EncodeFirstTwoIdentifiers = (x * 40) + y
 End Function
 
-Private Function CreateFromDefault(ByRef AlgName As String) As Object
+Private Function CreateFromAlgTable(ByRef AlgName As String, ByVal Algos As Hashtable) As Object
     Dim Algo As Variant
-    Algo = DefaultAlgos(AlgName)
+    Algo = Algos(AlgName)
     
     If Not IsEmpty(Algo) Then
-        Set CreateFromDefault = CreateObject(Algo)
+        Set CreateFromAlgTable = CreateObject(Algo)
     End If
 End Function
 
-Private Function CreateFromClassName(ByRef Name As String) As Object
-    On Error GoTo Catch
-    Set CreateFromClassName = CreateObject(Name)
-Catch:
-End Function
-
 Private Property Get DefaultAlgos() As Hashtable
+    If mDefaultAlgos Is Nothing Then
+        InitDefaultAlgos
+    End If
+    
+    Set DefaultAlgos = mDefaultAlgos
+End Property
+
+Private Sub InitDefaultAlgos()
     Const DESCryptoServiceProviderType          As String = "CorLib.DESCryptoServiceProvider"
     Const TripleDESCryptoServiceProviderType    As String = "CorLib.TripleDESCryptoServiceProvider"
     Const RC2CryptoServiceProviderType          As String = "CorLib.RC2CryptoServiceProvider"
@@ -223,79 +251,70 @@ Private Property Get DefaultAlgos() As Hashtable
     Const RNGCryptoServiceProviderType          As String = "CorLib.RNGCryptoServiceProvider"
     Const RIPEMD160ManagedType                  As String = "CorLib.RIPEMD160Managed"
     
-    If mDefaultAlgos Is Nothing Then
-        Set mDefaultAlgos = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
-        With mDefaultAlgos
-            .Add "DES", DESCryptoServiceProviderType
-            .Add "CorLib.DES", DESCryptoServiceProviderType
-            .Add "TripleDES", TripleDESCryptoServiceProviderType
-            .Add "Triple DES", TripleDESCryptoServiceProviderType
-            .Add "3DES", TripleDESCryptoServiceProviderType
-            .Add "RC2", RC2CryptoServiceProviderType
-            .Add "CorLib.RC2", RC2CryptoServiceProviderType
-            .Add "Rijndael", RijndaelManagedType
-            .Add "CorLib.Rijndael", RijndaelManagedType
-            .Add "CorLib.SymmetricAlgorithm", RijndaelManagedType
-            .Add "SHA", SHA1CryptoServiceProviderType
-            .Add "SHA1", SHA1CryptoServiceProviderType
-            .Add "CorLib.SHA1", SHA1CryptoServiceProviderType
-            .Add "CorLib.SHA1CryptoServiceProvider", SHA1CryptoServiceProviderType
-            .Add "CorLib.HashAlgorithm", SHA1CryptoServiceProviderType
-            .Add "SHA256", SHA256ManagedType
-            .Add "SHA-256", SHA256ManagedType
-            .Add "CorLib.SHA256", SHA256ManagedType
-            .Add "SHA512", SHA512ManagedType
-            .Add "SHA-512", SHA512ManagedType
-            .Add "CorLib.SHA512", SHA512ManagedType
-            .Add "SHA384", SHA384ManagedType
-            .Add "SHA-384", SHA384ManagedType
-            .Add "CorLib.SHA384", SHA384ManagedType
-            .Add "MD5", MD5CryptoServiceProviderType
-            .Add "CorLib.MD5", MD5CryptoServiceProviderType
-            .Add "CorLib.MD5cryptoserviceprovider", MD5CryptoServiceProviderType
-            .Add "HMACSHA1", HMACSHA1Type
-            .Add "CorLib.HMAC", HMACSHA1Type
-            .Add "CorLib.HMACSHA1", HMACSHA1Type
-            .Add "CorLib.KeyedHashAlgorithm", HMACSHA1Type
-            .Add "HMACSHA256", HMACSHA256Type
-            .Add "CorLib.HMACSHA256", HMACSHA256Type
-            .Add "HMACSHA384", HMACSHA384Type
-            .Add "CorLib.HMACSHA384", HMACSHA384Type
-            .Add "HMACSHA512", HMACSHA512Type
-            .Add "CorLib.HMACSHA512", HMACSHA512Type
-            .Add "HMACMD5", HMACMD5Type
-            .Add "CorLib.HMACMD5", HMACMD5Type
-            .Add "HMACRIPEMD160", HMACRIPEMD160Type
-            .Add "CorLib.HMACRIPEMD160", HMACRIPEMD160Type
-            .Add "MACTripleDES", MACTripleDESType
-            .Add "CorLib.MACTripleDES", MACTripleDESType
-            .Add "RSA", RSACryptoServiceProviderType
-            .Add "CorLib.RSA", RSACryptoServiceProviderType
-            .Add "CorLib.AsymmetricAlgorithm", RSACryptoServiceProviderType
-            .Add "DSA", DSACryptoServiceProviderType
-            .Add "CorLib.DSA", DSACryptoServiceProviderType
-            .Add "RandomNumberGenerator", RNGCryptoServiceProviderType
-            .Add "CorLib.RandomNumberGenerator", RNGCryptoServiceProviderType
-            .Add "RIPEMD160", RIPEMD160ManagedType
-            .Add "RIPEMD-160", RIPEMD160ManagedType
-            .Add "CorLib.RIPEMD160", RIPEMD160ManagedType
-            .Add "http://www.w3.org/2000/09/xmldsig#sha1", SHA1CryptoServiceProviderType
-            .Add "http://www.w3.org/2001/04/xmlenc#sha256", SHA256ManagedType
-            .Add "http://www.w3.org/2001/04/xmlenc#sha512", SHA512ManagedType
-            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256", HMACSHA256Type
-            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384", HMACSHA384Type
-            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512", HMACSHA512Type
-            .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160", HMACRIPEMD160Type
-            
-        End With
-    End If
-    
-    Set DefaultAlgos = mDefaultAlgos
-End Property
-
-
-
-
+    Set mDefaultAlgos = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
+    With mDefaultAlgos
+        .Add "DES", DESCryptoServiceProviderType
+        .Add "CorLib.DES", DESCryptoServiceProviderType
+        .Add "TripleDES", TripleDESCryptoServiceProviderType
+        .Add "Triple DES", TripleDESCryptoServiceProviderType
+        .Add "3DES", TripleDESCryptoServiceProviderType
+        .Add "RC2", RC2CryptoServiceProviderType
+        .Add "CorLib.RC2", RC2CryptoServiceProviderType
+        .Add "Rijndael", RijndaelManagedType
+        .Add "CorLib.Rijndael", RijndaelManagedType
+        .Add "CorLib.SymmetricAlgorithm", RijndaelManagedType
+        .Add "SHA", SHA1CryptoServiceProviderType
+        .Add "SHA1", SHA1CryptoServiceProviderType
+        .Add "CorLib.SHA1", SHA1CryptoServiceProviderType
+        .Add "CorLib.SHA1CryptoServiceProvider", SHA1CryptoServiceProviderType
+        .Add "CorLib.HashAlgorithm", SHA1CryptoServiceProviderType
+        .Add "SHA256", SHA256ManagedType
+        .Add "SHA-256", SHA256ManagedType
+        .Add "CorLib.SHA256", SHA256ManagedType
+        .Add "SHA512", SHA512ManagedType
+        .Add "SHA-512", SHA512ManagedType
+        .Add "CorLib.SHA512", SHA512ManagedType
+        .Add "SHA384", SHA384ManagedType
+        .Add "SHA-384", SHA384ManagedType
+        .Add "CorLib.SHA384", SHA384ManagedType
+        .Add "MD5", MD5CryptoServiceProviderType
+        .Add "CorLib.MD5", MD5CryptoServiceProviderType
+        .Add "CorLib.MD5cryptoserviceprovider", MD5CryptoServiceProviderType
+        .Add "HMACSHA1", HMACSHA1Type
+        .Add "CorLib.HMAC", HMACSHA1Type
+        .Add "CorLib.HMACSHA1", HMACSHA1Type
+        .Add "CorLib.KeyedHashAlgorithm", HMACSHA1Type
+        .Add "HMACSHA256", HMACSHA256Type
+        .Add "CorLib.HMACSHA256", HMACSHA256Type
+        .Add "HMACSHA384", HMACSHA384Type
+        .Add "CorLib.HMACSHA384", HMACSHA384Type
+        .Add "HMACSHA512", HMACSHA512Type
+        .Add "CorLib.HMACSHA512", HMACSHA512Type
+        .Add "HMACMD5", HMACMD5Type
+        .Add "CorLib.HMACMD5", HMACMD5Type
+        .Add "HMACRIPEMD160", HMACRIPEMD160Type
+        .Add "CorLib.HMACRIPEMD160", HMACRIPEMD160Type
+        .Add "MACTripleDES", MACTripleDESType
+        .Add "CorLib.MACTripleDES", MACTripleDESType
+        .Add "RSA", RSACryptoServiceProviderType
+        .Add "CorLib.RSA", RSACryptoServiceProviderType
+        .Add "CorLib.AsymmetricAlgorithm", RSACryptoServiceProviderType
+        .Add "DSA", DSACryptoServiceProviderType
+        .Add "CorLib.DSA", DSACryptoServiceProviderType
+        .Add "RandomNumberGenerator", RNGCryptoServiceProviderType
+        .Add "CorLib.RandomNumberGenerator", RNGCryptoServiceProviderType
+        .Add "RIPEMD160", RIPEMD160ManagedType
+        .Add "RIPEMD-160", RIPEMD160ManagedType
+        .Add "CorLib.RIPEMD160", RIPEMD160ManagedType
+        .Add "http://www.w3.org/2000/09/xmldsig#sha1", SHA1CryptoServiceProviderType
+        .Add "http://www.w3.org/2001/04/xmlenc#sha256", SHA256ManagedType
+        .Add "http://www.w3.org/2001/04/xmlenc#sha512", SHA512ManagedType
+        .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha256", HMACSHA256Type
+        .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha384", HMACSHA384Type
+        .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-sha512", HMACSHA512Type
+        .Add "http://www.w3.org/2001/04/xmldsig-more#hmac-ripemd160", HMACRIPEMD160Type
+    End With
+End Sub
 
 
 

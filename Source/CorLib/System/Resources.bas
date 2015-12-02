@@ -191,6 +191,7 @@ Public Enum ResourceStringKey
     Cryptography_PasswordDerivedBytes_FewBytesSalt = 507
     Cryptography_RC2_EKSKS2 = 508
     Cryptography_CryptoStream_FlushFinalBlockTwice = 509
+    Cryptography_AddNullOrEmptyName = 510
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
