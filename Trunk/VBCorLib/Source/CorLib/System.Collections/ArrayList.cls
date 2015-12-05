@@ -64,9 +64,9 @@ Private Const PropSubType           As String = "SubType"
 Private Const PropDefaultComparer   As String = "DefaultComparer"
 Private Const PropComparer          As String = "Comparer"
 
-Private Const SubTypeNormal     As Long = 0
-Private Const SubTypeEmpty      As Long = 1
-Private Const SubTypeNothing    As Long = 2
+Private Const SubtypeNormal     As Long = 0
+Private Const SubtypeEmpty      As Long = 1
+Private Const SubtypeNothing    As Long = 2
 Private Const DefaultCapacity   As Long = 16
 
 Private mItems()    As Variant
@@ -262,9 +262,7 @@ End Function
 ' the items from that index on.
 ' @include "..\..\Includes\ArrayListCopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
-    If CorArray.IsNull(Arr) Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
-    
+    ValidateArray Arr
     CorArray.CopyEx mItems, 0, Arr, OptionalLong(ArrayIndex, LBound(Arr)), mCount
 End Sub
 
@@ -278,7 +276,7 @@ End Sub
 ' @remarks The destination array must be large enough to hold the number of elements being copied.
 '
 Public Sub CopyToEx(ByVal Index As Long, ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    CheckValidSingleDimArray Arr
+    ValidateArray Arr
     If mCount - Index < Count Then _
         Error.Argument Argument_InvalidOffLen
         
@@ -844,14 +842,14 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
             ' correctly, or at all, except the key name. Even when reading with a default
             ' value of Empty, it returns an empty string "". So now we maintain a flag
             ' with each value to determine the correct value.
-            Select Case .ReadProperty(MakeSubTypeKey(i), SubTypeNormal)
-                Case SubTypeNormal
+            Select Case .ReadProperty(MakeSubTypeKey(i), SubtypeNormal)
+                Case SubtypeNormal
                     Helper.MoveVariant mItems(i), .ReadProperty(MakeItemKey(i))
                 
-                Case SubTypeEmpty
+                Case SubtypeEmpty
                     mItems(i) = Empty
                 
-                Case SubTypeNothing
+                Case SubtypeNothing
                     Set mItems(i) = Nothing
             End Select
         Next i
@@ -880,11 +878,11 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
             ' with each value to determine the correct value.
             Select Case VarType(mItems(i))
                 Case vbEmpty
-                    PropBag.WriteProperty MakeSubTypeKey(i), SubTypeEmpty
+                    PropBag.WriteProperty MakeSubTypeKey(i), SubtypeEmpty
                 
                 Case vbObject
                     If mItems(i) Is Nothing Then
-                        PropBag.WriteProperty MakeSubTypeKey(i), SubTypeNothing
+                        PropBag.WriteProperty MakeSubTypeKey(i), SubtypeNothing
                     Else
                         PropBag.WriteProperty MakeItemKey(i), mItems(i)
                     End If
@@ -925,8 +923,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

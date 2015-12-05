@@ -480,14 +480,7 @@ End Function
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\Includes\CorArray_BinarySearch.txt"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    ValidateArray Arr
-    If Index < LBound(Arr) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Length < 0 Then _
-        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
-    If Index + Length - 1 > UBound(Arr) Then _
-        Error.Argument Argument_InvalidOffLen
-    
+    ValidateArrayRange Arr, Index, Length, CountParameter:=Parameter_Length
     BinarySearchEx = InternalBinarySearch(Arr, Index, Length, Value, Comparer)
 End Function
 
@@ -1023,19 +1016,12 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
-    ValidateArray Keys, Parameter_Keys
+    ValidateArrayRange Keys, Index, Length, Parameter_Keys, CountParameter:=Parameter_Length
     
     Dim KeysPtr  As Long
     Dim ItemsPtr As Long
     
     KeysPtr = ArrayPointer(Keys)
-    
-    If Index < LBound(Keys) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Length < 0 Then _
-        Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
-    If Index + Length - 1 > UBound(Keys) Then _
-        Error.Argument Argument_InvalidOffLen
     
     If Not IsEmpty(Items) Then
         If Not IsArray(Items) Then _
