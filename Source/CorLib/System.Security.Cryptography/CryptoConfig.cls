@@ -121,7 +121,7 @@ End Sub
 ' @param Str The object identifier as described in the X.690 standard.
 ' @return An encoded version of the object identifier as described in the X.690 standard.
 '
-Public Function EncodeOID(ByVal Str As String) As Byte()
+Public Function EncodeOID(ByRef Str As String) As Byte()
     Const X680_OBJECT_IDENTIFIER_TYPE_TAG As Long = 6
     
     Dim EncodingStream  As New MemoryStream
@@ -147,11 +147,10 @@ Public Function EncodeOID(ByVal Str As String) As Byte()
         EncodingStream.WriteBlock Bytes, 0, Count
     Next i
     
-    Dim Ret() As Byte
-    Ret = EncodingStream.ToArray
-    Ret(1) = EncodingStream.Length - 2 ' we don't count this byte or the tag byte.
-    
-    EncodeOID = Ret
+    EncodingStream.Position = 1
+    EncodingStream.WriteByte EncodingStream.Length - 2
+    EncodeOID = EncodingStream.ToArray
+
     Exit Function
     
 Catch:
@@ -165,11 +164,11 @@ End Function
 ' @return The object identifier (OID) for the object.
 '
 Public Function MapNameToOID(ByVal Name As String) As String
-    Dim Oid As Variant
+    Dim OID As Variant
     
-    Oid = DefaultOids(Name)
-    If Not IsEmpty(Oid) Then
-        MapNameToOID = Oid
+    OID = DefaultOids(Name)
+    If Not IsEmpty(OID) Then
+        MapNameToOID = OID
     End If
 End Function
 
