@@ -114,170 +114,164 @@ Private Function SZBinarySearch(ByVal ArrayPtr As Long, ByVal pValue As Long, By
 End Function
 
 Private Function SZIndexOf(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
-    Dim Comparer As Func_T_T_Boolean
+    Dim pvData      As Long
+    Dim ElemSize    As Long
+    Dim Comparer    As Func_T_T_Boolean
+    
     Set Comparer = NewDelegate(ComparerAddress)
-    
-    Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(ArrayPtr)
-    
-    Dim pvData As Long
     pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
-    
     Index = Index - SafeArrayGetLBound(ArrayPtr, 1)
-    Do While Count > 0
-        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
-            SZIndexOf = Index + SafeArrayGetLBound(ArrayPtr, 1)
+    
+    Dim i As Long
+    For i = Index To Index + Count - 1
+        If Comparer.Invoke(ByVal pvData + i * ElemSize, ByVal pValue) Then
+            SZIndexOf = i + SafeArrayGetLBound(ArrayPtr, 1)
             Exit Function
         End If
-        Count = Count - 1
-        Index = Index + 1
-    Loop
+    Next
 
     SZIndexOf = SafeArrayGetLBound(ArrayPtr, 1) - 1
 End Function
 
 Private Function SZLastIndexOf(ByVal ArrayPtr As Long, ByVal pValue As Long, ByVal Index As Long, ByVal Count As Long, ByVal ComparerAddress As Long) As Long
-    Dim Comparer As Func_T_T_Boolean
+    Dim pvData      As Long
+    Dim ElemSize    As Long
+    Dim Comparer    As Func_T_T_Boolean
+    
     Set Comparer = NewDelegate(ComparerAddress)
-    
-    Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(ArrayPtr)
-    
-    Dim pvData As Long
     pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
-    
     Index = Index - SafeArrayGetLBound(ArrayPtr, 1)
-    Do While Count > 0
-        If Comparer.Invoke(ByVal pvData + Index * ElemSize, ByVal pValue) Then
-            SZLastIndexOf = Index + SafeArrayGetLBound(ArrayPtr, 1)
+    
+    Dim i As Long
+    For i = Index To Index - Count + 1 Step -1
+        If Comparer.Invoke(ByVal pvData + i * ElemSize, ByVal pValue) Then
+            SZLastIndexOf = i + SafeArrayGetLBound(ArrayPtr, 1)
             Exit Function
         End If
-        Count = Count - 1
-        Index = Index - 1
-    Loop
+    Next
 
     SZLastIndexOf = SafeArrayGetLBound(ArrayPtr, 1) - 1
 End Function
 
-
-
-Private Function SZCompareLongs(ByRef X As Long, ByRef Y As Long) As Long
-    If X > Y Then
+Private Function SZCompareLongs(ByRef x As Long, ByRef y As Long) As Long
+    If x > y Then
         SZCompareLongs = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         SZCompareLongs = -1
     End If
 End Function
 
-Private Function SZCompareIntegers(ByRef X As Integer, ByRef Y As Integer) As Long
-    If X > Y Then
+Private Function SZCompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
+    If x > y Then
         SZCompareIntegers = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         SZCompareIntegers = -1
     End If
 End Function
 
-Private Function SZCompareStrings(ByRef X As String, ByRef Y As String) As Long
-    SZCompareStrings = StrComp(X, Y, vbBinaryCompare)
+Private Function SZCompareStrings(ByRef x As String, ByRef y As String) As Long
+    SZCompareStrings = StrComp(x, y, vbBinaryCompare)
 End Function
 
-Private Function SZCompareDoubles(ByRef X As Double, ByRef Y As Double) As Long
-    If X > Y Then
+Private Function SZCompareDoubles(ByRef x As Double, ByRef y As Double) As Long
+    If x > y Then
         SZCompareDoubles = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         SZCompareDoubles = -1
     End If
 End Function
 
-Private Function SZCompareSingles(ByRef X As Single, ByRef Y As Single) As Long
-    If X > Y Then
+Private Function SZCompareSingles(ByRef x As Single, ByRef y As Single) As Long
+    If x > y Then
         SZCompareSingles = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         SZCompareSingles = -1
     End If
 End Function
 
-Private Function SZCompareBytes(ByRef X As Byte, ByRef Y As Byte) As Long
-    If X > Y Then
+Private Function SZCompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
+    If x > y Then
         SZCompareBytes = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         SZCompareBytes = -1
     End If
 End Function
 
-Private Function SZCompareBooleans(ByRef X As Boolean, ByRef Y As Boolean) As Long
-    If X > Y Then
+Private Function SZCompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
+    If x > y Then
         SZCompareBooleans = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         SZCompareBooleans = -1
     End If
 End Function
 
-Private Function SZCompareDates(ByRef X As Date, ByRef Y As Date) As Long
-    SZCompareDates = DateDiff("s", Y, X)
+Private Function SZCompareDates(ByRef x As Date, ByRef y As Date) As Long
+    SZCompareDates = DateDiff("s", y, x)
 End Function
 
-Private Function SZCompareCurrencies(ByRef X As Currency, ByRef Y As Currency) As Long
-    If X > Y Then
+Private Function SZCompareCurrencies(ByRef x As Currency, ByRef y As Currency) As Long
+    If x > y Then
         SZCompareCurrencies = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         SZCompareCurrencies = -1
     End If
 End Function
 
-Private Function SZCompareComparables(ByRef X As Object, ByRef Y As Variant) As Long
+Private Function SZCompareComparables(ByRef x As Object, ByRef y As Variant) As Long
     Dim XComparable As IComparable
-    Set XComparable = X
-    SZCompareComparables = XComparable.CompareTo(Y)
+    Set XComparable = x
+    SZCompareComparables = XComparable.CompareTo(y)
 End Function
 
-Private Function EqualLongs(ByRef X As Long, ByRef Y As Long) As Boolean
-    EqualLongs = (X = Y)
+Private Function EqualLongs(ByRef x As Long, ByRef y As Long) As Boolean
+    EqualLongs = (x = y)
 End Function
 
-Private Function EqualStrings(ByRef X As String, ByRef Y As String) As Boolean
-    EqualStrings = CorString.Equals(X, Y)
+Private Function EqualStrings(ByRef x As String, ByRef y As String) As Boolean
+    EqualStrings = CorString.Equals(x, y)
 End Function
 
-Private Function EqualDoubles(ByRef X As Double, ByRef Y As Double) As Boolean
-    EqualDoubles = (X = Y)
+Private Function EqualDoubles(ByRef x As Double, ByRef y As Double) As Boolean
+    EqualDoubles = (x = y)
 End Function
 
-Private Function EqualIntegers(ByRef X As Integer, ByRef Y As Integer) As Boolean
-    EqualIntegers = (X = Y)
+Private Function EqualIntegers(ByRef x As Integer, ByRef y As Integer) As Boolean
+    EqualIntegers = (x = y)
 End Function
 
-Private Function EqualSingles(ByRef X As Single, ByRef Y As Single) As Boolean
-    EqualSingles = (X = Y)
+Private Function EqualSingles(ByRef x As Single, ByRef y As Single) As Boolean
+    EqualSingles = (x = y)
 End Function
 
-Private Function EqualDates(ByRef X As Date, ByRef Y As Date) As Boolean
-    EqualDates = (DateDiff("s", X, Y) = 0)
+Private Function EqualDates(ByRef x As Date, ByRef y As Date) As Boolean
+    EqualDates = (DateDiff("s", x, y) = 0)
 End Function
 
-Private Function EqualBytes(ByRef X As Byte, ByRef Y As Byte) As Boolean
-    EqualBytes = (X = Y)
+Private Function EqualBytes(ByRef x As Byte, ByRef y As Byte) As Boolean
+    EqualBytes = (x = y)
 End Function
 
-Private Function EqualBooleans(ByRef X As Boolean, ByRef Y As Boolean) As Boolean
-    EqualBooleans = (X = Y)
+Private Function EqualBooleans(ByRef x As Boolean, ByRef y As Boolean) As Boolean
+    EqualBooleans = (x = y)
 End Function
 
-Private Function EqualCurrencies(ByRef X As Currency, ByRef Y As Currency) As Boolean
-    EqualCurrencies = (X = Y)
+Private Function EqualCurrencies(ByRef x As Currency, ByRef y As Currency) As Boolean
+    EqualCurrencies = (x = y)
 End Function
 
-Private Function EqualObjects(ByRef X As Object, ByRef Y As Object) As Boolean
-    If Not X Is Nothing Then
-        If TypeOf X Is IObject Then
+Private Function EqualObjects(ByRef x As Object, ByRef y As Object) As Boolean
+    If Not x Is Nothing Then
+        If TypeOf x Is IObject Then
             Dim Obj As IObject
-            Set Obj = X
-            EqualObjects = Obj.Equals(Y)
+            Set Obj = x
+            EqualObjects = Obj.Equals(y)
         Else
-            EqualObjects = X Is Y
+            EqualObjects = x Is y
         End If
     Else
-        EqualObjects = Y Is Nothing
+        EqualObjects = y Is Nothing
     End If
 End Function
 
