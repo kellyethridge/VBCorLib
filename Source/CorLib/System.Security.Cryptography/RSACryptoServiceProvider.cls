@@ -164,7 +164,7 @@ End Property
 ' part is required to encrypt data. The private key is used to decrypt data.
 '
 Public Property Get PublicOnly() As Boolean
-    Call VerifyLoaded
+    VerifyLoaded False
     PublicOnly = mPublicOnly
 End Property
 
@@ -510,24 +510,42 @@ Public Function ToString() As String
 End Function
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    ReDim mLegalKeySizes(0)
+    If CryptoAPI.HasHighEncryption Then
+        Set mLegalKeySizes(0) = Cor.NewKeySizes(384, 16384, 8)
+        mKeySize = 1024
+    Else
+        Set mLegalKeySizes(0) = Cor.NewKeySizes(384, 512, 8)
+        mKeySize = 512
+    End If
+    
+    mProviderType = DEF_PROVIDERTYPE
+    mKeyNumber = DEF_KEYNUMBER
+End Sub
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal KeySize As Long, ByVal Params As CspParameters)
-    If KeySize > 0 Then mKeySize = KeySize
+    If KeySize > 0 Then
+        mKeySize = KeySize
+    End If
     
     If Not Params Is Nothing Then
-        With Params
-            mProviderName = .ProviderName
-            mProviderType = .ProviderType
-            mKeyContainerName = .KeyContainerName
-            mKeyNumber = IIf(.KeyNumber = -1, DEF_KEYNUMBER, .KeyNumber)
-            mFlags = .Flags
-        End With
+        mProviderName = Params.ProviderName
+        mProviderType = Params.ProviderType
+        mKeyContainerName = Params.KeyContainerName
+        mKeyNumber = IIf(Params.KeyNumber = -1, DEF_KEYNUMBER, Params.KeyNumber)
+        mFlags = Params.Flags
         
         mPersistKeyInCsp = True
     End If
+End Sub
+
+Private Sub Class_Terminate()
+    CryptoAPI.DestroyKey mKey
+    CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
 End Sub
 
 
@@ -538,10 +556,10 @@ Private Sub VerifyLoaded(Optional ByVal IncludeKey As Boolean = True)
     If mIsDisposed Then _
         Throw New ObjectDisposedException
         
-    Call LoadProvider
+    LoadProvider
     
     If IncludeKey Then
-        Call GenerateKey
+        GenerateKey
     End If
 End Sub
 
@@ -551,10 +569,14 @@ End Sub
 ' a random name will be created. If the container itself already exists,
 ' then the existing container will be used instead of creating a new one.
 Private Sub LoadProvider()
-    If mProvider <> vbNullPtr Then Exit Sub
+    If mProvider <> vbNullPtr Then
+        Exit Sub
+    End If
     
     Dim dwFlags As Long
-    If mFlags And CspProviderFlags.UseMachineKeyStore Then dwFlags = CRYPT_MACHINE_KEYSET
+    If mFlags And CspProviderFlags.UseMachineKeyStore Then
+        dwFlags = CRYPT_MACHINE_KEYSET
+    End If
     
     mProvider = CryptoAPI.AcquireContext(mKeyContainerName, mProviderName, mProviderType, dwFlags)
 End Sub
@@ -675,30 +697,6 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    ReDim mLegalKeySizes(0)
-    If CryptoAPI.HasHighEncryption Then
-        Set mLegalKeySizes(0) = Cor.NewKeySizes(384, 16384, 8)
-        mKeySize = 1024
-    Else
-        Set mLegalKeySizes(0) = Cor.NewKeySizes(384, 512, 8)
-        mKeySize = 512
-    End If
-    
-    mProviderType = DEF_PROVIDERTYPE
-    mKeyNumber = DEF_KEYNUMBER
-End Sub
-
-Private Sub Class_Terminate()
-    Call CryptoAPI.DestroyKey(mKey)
-    Call CryptoAPI.ReleaseContext(mProvider, Not mPersistKeyInCsp)
-End Sub
-
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   AsymmetricAlgorithm Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AsymmetricAlgorithm_Clear()
@@ -769,8 +767,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

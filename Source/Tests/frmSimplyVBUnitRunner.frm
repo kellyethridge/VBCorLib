@@ -208,7 +208,7 @@ Private Sub AddSystemSecurityCryptography()
         .Add New CryptoConfigTests
         .Add New CspParametersTests
         .Add New CspKeyContainerInfoTests
-'        .Add New TestRSACryptoServiceProvider
+        .Add New RSACryptoServiceProviderTests
 '        .Add New TestRSASignAndVerify
 '        .Add New TestDSACryptoServiceProvider
 '

@@ -116,7 +116,7 @@ Friend Function AcquireContext(Optional ByRef ContainerName As String, Optional 
         ProviderType = PROV_RSA_AES
     End If
     If Len(ProviderName) = 0 Then
-        ProviderName = mRSAProviderName
+'        ProviderName = mRSAProviderName
     End If
     If Len(ContainerName) = 0 Then
         ContainerName = CorString.Format("COR{0}", Guid.NewGuid)
@@ -356,7 +356,7 @@ End Sub
 ' with plain text values, so Micorsoft has created a work-around.
 ' This function is derived from the Microsoft solution.
 '
-' http://support.microsoft.com/default.aspx?scid=KB;en-us;q228786
+' https://support.microsoft.com/en-us/kb/228786
 '
 Private Sub CreateExponentOfOneKey()
     Dim Csp As RSACryptoServiceProvider
@@ -390,7 +390,7 @@ End Sub
 ''
 ' Create a SIMPLEBLOB structure for key importing.
 '
-' http://support.microsoft.com/default.aspx?scid=KB;en-us;q228786
+' https://support.microsoft.com/en-us/kb/228786
 '
 Private Function CreateSessionBlob(ByVal AlgId As Long, ByRef RgbKey() As Byte) As SIMPLEBLOB512
     With CreateSessionBlob
