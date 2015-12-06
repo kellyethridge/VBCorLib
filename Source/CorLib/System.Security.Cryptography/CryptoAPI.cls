@@ -115,9 +115,9 @@ Friend Function AcquireContext(Optional ByRef ContainerName As String, Optional 
     If ProviderType = 0 Then
         ProviderType = PROV_RSA_AES
     End If
-    If Len(ProviderName) = 0 Then
+'    If Len(ProviderName) = 0 Then
 '        ProviderName = mRSAProviderName
-    End If
+'    End If
     If Len(ContainerName) = 0 Then
         ContainerName = CorString.Format("COR{0}", Guid.NewGuid)
     End If
