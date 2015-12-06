@@ -212,7 +212,7 @@ End Function
 '
 ' @return A string containing the characters up to the next new-line character.
 ' @remarks If there are no more bytes to in the stream, then a null string is returned.
-' This can be checked for using the <b>cString.IsNull</b> function.
+' This can be checked for using the <b>CorString.IsNull</b> function.
 '
 Public Function ReadLine() As String
     Dim Line        As String
@@ -295,7 +295,7 @@ Public Function ReadLine() As String
             End If
         Else
             ' The return was the last character in the buffer,
-            ' so fill the buffer with the next set of character.
+            ' so fill the buffer with the next set of characters.
             ' If atleast 1 character was read, then check for
             ' a linefeed and remove it, if so.
             If ReadBuffer > 0 Then
@@ -500,8 +500,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
