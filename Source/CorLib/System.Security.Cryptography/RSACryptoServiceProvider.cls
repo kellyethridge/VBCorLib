@@ -371,7 +371,7 @@ End Sub
 ' @see SHA1Manged
 ' @see MD5CryptoServiceProvider
 '
-Public Function SignData(ByRef InputStreamOrBuffer As Variant, ByVal hAlg As Variant, Optional ByRef Offset As Variant, Optional ByRef Count As Variant) As Byte()
+Public Function SignData(ByRef InputStreamOrBuffer As Variant, ByRef hAlg As Variant, Optional ByRef Offset As Variant, Optional ByRef Count As Variant) As Byte()
     Dim HashObj As HashAlgorithm
     Set HashObj = GetHash(hAlg)
     
