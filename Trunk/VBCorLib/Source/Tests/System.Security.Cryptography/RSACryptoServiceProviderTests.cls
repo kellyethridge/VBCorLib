@@ -96,10 +96,32 @@ Public Sub Properties_WhenCalled_ReturnsExpected()
     Assert.That csp.SignatureAlgorithm, Iz.EqualTo("http://www.w3.org/2000/09/xmldsig#rsa-sha1"), "SignatureAlgorithm(disposed)"
 End Sub
 
+Public Sub SignData_WithNullArray_ThrowsArgumentNullException()
+    Dim csp As New RSACryptoServiceProvider
+    
+    On Error Resume Next
+    csp.SignData NullBytes, SHA1.Create
+    
+    AssertArgumentNullException Err, "Buffer"
+End Sub
 
+Public Sub SignData_WithNullStream_ThrowsArgumentNullException()
+    Dim csp As New RSACryptoServiceProvider
+    
+    On Error Resume Next
+    csp.SignData Nothing, SHA1.Create
+    
+    AssertArgumentNullException Err, "Source"
+End Sub
 
-
-
+Public Sub SignData_WithInvalidOid_ThrowsArgument()
+    Dim csp As New RSACryptoServiceProvider
+    
+    On Error Resume Next
+    csp.SignData NewBytes(0, 0, 0, 0, 0), "1.2.3"
+    
+    AssertArgumentException Err, "hAlg"
+End Sub
 
 
 
