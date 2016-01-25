@@ -192,6 +192,7 @@ Public Enum ResourceStringKey
     Cryptography_RC2_EKSKS2 = 508
     Cryptography_CryptoStream_FlushFinalBlockTwice = 509
     Cryptography_AddNullOrEmptyName = 510
+    Cryptography_InvalidOID = 511
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
@@ -271,4 +272,5 @@ Public Enum ParameterResourceKey
     Parameter_OutputBuffer = 2034
     Parameter_OutputOffset = 2035
     Parameter_RgbHash = 2036
+    Parameter_Signature = 2037
 End Enum

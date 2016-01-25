@@ -255,7 +255,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal TypeIn As Long, ByVal ProviderNameIn As String, ByVal ContainerNameIn As String)
+Friend Sub Init(ByVal TypeIn As Long, ByRef ProviderNameIn As String, ByRef ContainerNameIn As String)
     mProviderType = TypeIn
     mProviderName = ProviderNameIn
     mKeyContainerName = ContainerNameIn

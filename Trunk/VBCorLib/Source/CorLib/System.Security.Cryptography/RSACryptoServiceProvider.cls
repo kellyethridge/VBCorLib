@@ -47,13 +47,6 @@ Implements ICspAsymmetricAlgorithm
 Private Const DEF_KEYNUMBER     As Long = AT_KEYEXCHANGE
 Private Const DEF_PROVIDERTYPE  As Long = PROV_RSA_AES
 
-'Private Const OID_RSA_MD5       As String = "1.2.840.113549.2.5"
-'Private Const OID_OIWSEC_SHA1   As String = "1.3.14.3.2.26"
-'Private Const OID_OIWSEC_SHA256 As String = "2.16.840.1.101.3.4.2.1"
-'Private Const OID_OIWSEC_SHA384 As String = "2.16.840.1.101.3.4.2.2"
-'Private Const OID_OIWSEC_SHA512 As String = "2.16.840.1.101.3.4.2.3"
-
-
 Private mProvider           As Long
 Private mKey                As Long
 Private mKeySize            As Long
@@ -67,7 +60,6 @@ Private mLegalKeySizes()    As KeySizes
 Private mRandomlyGenerated  As Boolean
 Private mPublicOnly         As Boolean
 Private mIsDisposed         As Boolean
-
 
 
 
@@ -397,7 +389,7 @@ End Function
 ' <p>The <i>Str</i> parameter can be "MD5", "SHA", "SHA1", "SHA256", "SHA384", "SHA512" or the OID.
 ' @see CryptoConfig
 '
-Public Function SignHash(ByRef RgbHash() As Byte, ByVal Str As String) As Byte()
+Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
     ValidateByteArray RgbHash, Parameter_RgbHash
     
     Dim Hash As Long
@@ -443,15 +435,20 @@ End Function
 ' @remarks The hash algorithms can be specified either by the OID string, the hash name, or an actual instance of a hash
 ' object that implements an <b>MD5</b>, <b>SHA1</b>, <b>SHA256</b>, <b>SHA384</b>, or <b>SHA512</b> interface.
 ' @see CryptoConfig
-' @see SHA1
 ' @see MD5
+' @see SHA1
+' @see SHA256
+' @see SHA384
+' @see SHA512
+' @see MD5CryptoServiceProvider
 ' @see SHA1CryptoServiceProvider
 ' @see SHA1Manged
-' @see MD5CryptoServiceProvider
+' @see SHA256Managed
+' @see SHA384Managed
+' @see SHA512Managed
 '
 Public Function VerifyData(ByRef Buffer() As Byte, ByRef hAlg As Variant, ByRef Signature() As Byte) As Boolean
-    If CorArray.IsNull(Buffer) Then _
-        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
+    ValidateByteArray Buffer, Parameter_Buffer
                   
     Dim HashObj As HashAlgorithm
     Set HashObj = GetHash(hAlg)
@@ -470,9 +467,9 @@ End Function
 ' <p>The <i>Str</i> parameter can be "MD5", "SHA", "SHA1", "SHA256", "SHA384", "SHA512" or the OID.
 ' @see CryptoConfig
 '
-Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef Signature() As Byte) As Boolean
-    If CorArray.IsNull(Signature) Then _
-        Throw Cor.NewArgumentNullException("Signature", Environment.GetResourceString(ArgumentNull_Array))
+Public Function VerifyHash(ByRef RgbHash() As Byte, ByRef Str As String, ByRef Signature() As Byte) As Boolean
+    ValidateByteArray RgbHash, Parameter_RgbHash
+    ValidateByteArray Signature, Parameter_Signature
     
     Dim Hash As Long
     Hash = SetHash(RgbHash, Str)
@@ -629,23 +626,19 @@ Private Sub DeleteKey()
     mKey = vbNullPtr
 End Sub
 
-Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
-    Call VerifyLoaded
-    
-    If CorArray.IsNull(RgbHash) Then _
-        Throw Cor.NewArgumentNullException("RgbHash", Environment.GetResourceString(ArgumentNull_Array))
+Private Function SetHash(ByRef RgbHash() As Byte, ByRef Str As String) As Long
+    VerifyLoaded
     
     Dim HashAlg As Long
     Dim HashLen As Long
-    Dim OID As String
-    OID = CryptoConfig.MapNameToOID(Str)
-    If Len(OID) = 0 Then
-        OID = Str
-    End If
     
-    Select Case OID
-        Case "1.3.14.3.2.26", "sha", "sha1":    HashAlg = CALG_SHA1: HashLen = 20
-        Case "1.2.840.113549.2.5", "md5":       HashAlg = CALG_MD5: HashLen = 16
+    Select Case GetOidFromHashName(Str)
+        Case CryptoConstants.OID_RSA_MD5
+            HashAlg = CALG_MD5
+            HashLen = 16
+        Case CryptoConstants.OID_OIWSEC_SHA1
+            HashAlg = CALG_SHA1
+            HashLen = 20
         Case CryptoConstants.OID_OIWSEC_SHA256
             HashAlg = CALG_SHA_256
             HashLen = 32
@@ -656,13 +649,13 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
             HashAlg = CALG_SHA_512
             HashLen = 64
         Case Else
-            Throw Cor.NewArgumentException("Only SHA1 and MD5 hash algorithms are supported.", "Str")
+            Error.Cryptographic Cryptography_InvalidOID
     End Select
     
     If CorArray.Length(RgbHash) <> HashLen Then _
         Throw Cor.NewCryptographicException("Invalid hash length.")
     
-    On Error GoTo errTrap
+    On Error GoTo Catch
     
     Dim Hash As Long
     If CryptCreateHash(mProvider, HashAlg, 0, 0, Hash) = BOOL_FALSE Then _
@@ -674,8 +667,10 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     SetHash = Hash
     Exit Function
     
-errTrap:
-    If Hash <> vbNullPtr Then Call CryptDestroyHash(Hash)
+Catch:
+    If Hash <> vbNullPtr Then
+        CryptDestroyHash Hash
+    End If
     
     Dim Ex As Exception
     If Catch(Ex) Then Throw Ex

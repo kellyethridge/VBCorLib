@@ -36,9 +36,10 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mHandle     As Long
-Private mIsClosed   As Boolean
-Private mOwnsHandle As Boolean
+Private mHandle         As Long
+Private mIsClosed       As Boolean
+Private mOwnsHandle     As Boolean
+Private mZeroIsInvalid  As Boolean
 
 Public Event ReleaseHandle()
 
@@ -65,7 +66,7 @@ End Property
 ' @remarks An invalid handle is equal to the value -1.
 '
 Public Property Get IsInvalid() As Boolean
-    IsInvalid = mHandle = INVALID_HANDLE
+    IsInvalid = (mHandle = INVALID_HANDLE) Or (mZeroIsInvalid And (mHandle = 0))
 End Property
 
 ''
@@ -87,9 +88,10 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
+Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean, ByVal ZeroIsInvalid As Boolean)
     mHandle = PreexistingHandle
     mOwnsHandle = OwnsHandle
+    mZeroIsInvalid = ZeroIsInvalid
 End Sub
 
 
