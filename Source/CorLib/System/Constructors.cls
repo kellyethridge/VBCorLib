@@ -1185,7 +1185,7 @@ End Function
 ' @param ContainerNameIn The provider container name.
 ' @return Returns a new CspParameters object.
 '
-Public Function NewCspParameters(ByVal TypeIn As Long, Optional ByVal ProviderNameIn As String, Optional ByVal ContainerNameIn As String) As CspParameters
+Public Function NewCspParameters(ByVal TypeIn As Long, Optional ByRef ProviderNameIn As String, Optional ByRef ContainerNameIn As String) As CspParameters
     Set NewCspParameters = New CspParameters
     NewCspParameters.Init TypeIn, ProviderNameIn, ContainerNameIn
 End Function
@@ -1808,9 +1808,9 @@ Public Function NewSafeFileHandle(ByVal PreexistingHandle As Long, ByVal OwnsHan
     NewSafeFileHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
-Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeHandle
+Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean, Optional ByVal ZeroIsInvalid = False) As SafeHandle
     Set NewSafeHandle = New SafeHandle
-    NewSafeHandle.Init PreexistingHandle, OwnsHandle
+    NewSafeHandle.Init PreexistingHandle, OwnsHandle, ZeroIsInvalid
 End Function
 
 Public Function NewDriveNotFoundException(ByRef Message As String, Optional ByVal InnerException As Exception) As DriveNotFoundException

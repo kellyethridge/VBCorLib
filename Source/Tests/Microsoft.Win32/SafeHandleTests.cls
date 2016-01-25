@@ -31,6 +31,14 @@ Public Sub NewSafeHandle_WhenCalled_CreatesAnOpenHandle()
     Assert.That SUT.IsInvalid, Iz.False
 End Sub
 
+Public Sub IsInvalid_WithZeroAsInvalid_ReturnsTrue()
+    Dim SUT As SafeHandle
+    
+    Set SUT = Cor.NewSafeHandle(0, True, True)
+    
+    Assert.That SUT.IsInvalid, Iz.True
+End Sub
+
 Public Sub CloseHandle_WhenClosed_NotifiesSubclass()
     Dim SUT As New FakeSafeHandle
     SUT.Init 2, True
