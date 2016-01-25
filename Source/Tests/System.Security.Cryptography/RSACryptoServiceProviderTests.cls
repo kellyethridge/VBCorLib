@@ -16,9 +16,24 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ICategorizable
+Implements ITestCaseSource
+
+Private Const MinKeySize As Long = 384
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Security.Cryptography"
+End Sub
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "SignHash_WithValues_IsVerified"
+            Test.Use "MD5", 16
+            Test.Use "SHA1", 20
+            Test.Use "SHA256", 32
+            Test.Use "SHA384", 48
+            Test.Use "SHA512", 64
+            
+    End Select
 End Sub
 
 Public Sub Constructor_WhenCalled_SetsDefaults()
@@ -32,9 +47,9 @@ End Sub
 Public Sub Constructor_WithKeySize_SetsKeySize()
     Dim csp As RSACryptoServiceProvider
     
-    Set csp = Cor.NewRSACryptoServiceProvider(384)
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
-    Assert.That csp.KeySize, Iz.EqualTo(384), "KeySize"
+    Assert.That csp.KeySize, Iz.EqualTo(MinKeySize), "KeySize"
     Assert.That csp.PersistKeyInCsp, Iz.False, "PersistKeyInCsp"
     Assert.That csp.PublicOnly, Iz.False, "PublicOnly"
 End Sub
@@ -69,6 +84,17 @@ Public Sub Constructor_WithTooSmallKeySize_ThrowsCryptographicException()
     On Error Resume Next
     
     With Cor.NewRSACryptoServiceProvider(SmallKeySize)
+        .ToXmlString True ' called to invoke key size validation.
+    End With
+        
+    AssertCryptographicException Err
+End Sub
+
+Public Sub Constructor_WithTooLargeKeySize_ThrowsCryptographicException()
+    Const LargeKeySize As Long = 32768
+    On Error Resume Next
+    
+    With Cor.NewRSACryptoServiceProvider(LargeKeySize)
         .ToXmlString True ' called to invoke key size validation.
     End With
         
@@ -122,6 +148,57 @@ Public Sub SignData_WithInvalidOid_ThrowsArgument()
     
     AssertArgumentException Err, "hAlg"
 End Sub
+
+Public Sub SignData_WithOid_DoesNotThrowException()
+    Dim Oid As String
+    Dim csp As New RSACryptoServiceProvider
+    Oid = CryptoConfig.MapNameToOID("SHA256")
+    
+    csp.SignData NewBytes(0, 0, 0, 0, 0), Oid
+End Sub
+
+Public Sub SignHash_WithNullArray_ThrowsArgumentNullException()
+    Dim csp As New RSACryptoServiceProvider
+    
+    On Error Resume Next
+    csp.SignHash NullBytes, "SHA1"
+    
+    AssertArgumentNullException Err, "RgbHash"
+End Sub
+
+'    void SignHash (string name, int size)
+'    {
+'        string oid = CryptoConfig.MapNameToOID (name);
+'        byte [] hash = new byte [size];
+'        rsa = new RSACryptoServiceProvider (1024);
+'        byte [] signature = rsa.SignHash (hash, oid);
+'        Assert.IsTrue (rsa.VerifyHash (hash, oid, signature), name);
+'        Assert.IsTrue (rsa.VerifyHash (hash, oid, signature), "OID");
+'    }
+Public Sub SignHash_WithValues_IsVerified(ByVal AlgName As String, ByVal Size As Long)
+    Dim Oid As String
+    Dim Hash() As Byte
+    Dim csp As RSACryptoServiceProvider
+    
+    Oid = CryptoConfig.MapNameToOID(AlgName)
+    ReDim Hash(0 To Size - 1)
+    Set csp = Cor.NewRSACryptoServiceProvider(1024)
+    
+    Dim Signature() As Byte
+    Signature = csp.SignHash(Hash, Oid)
+    
+    Assert.That csp.VerifyHash(Hash, Oid, Signature), Iz.True
+End Sub
+
+
+
+
+
+
+
+
+
+
 
 
 

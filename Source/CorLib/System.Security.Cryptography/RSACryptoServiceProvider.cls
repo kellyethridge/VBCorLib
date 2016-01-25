@@ -47,6 +47,13 @@ Implements ICspAsymmetricAlgorithm
 Private Const DEF_KEYNUMBER     As Long = AT_KEYEXCHANGE
 Private Const DEF_PROVIDERTYPE  As Long = PROV_RSA_AES
 
+'Private Const OID_RSA_MD5       As String = "1.2.840.113549.2.5"
+'Private Const OID_OIWSEC_SHA1   As String = "1.3.14.3.2.26"
+'Private Const OID_OIWSEC_SHA256 As String = "2.16.840.1.101.3.4.2.1"
+'Private Const OID_OIWSEC_SHA384 As String = "2.16.840.1.101.3.4.2.2"
+'Private Const OID_OIWSEC_SHA512 As String = "2.16.840.1.101.3.4.2.3"
+
+
 Private mProvider           As Long
 Private mKey                As Long
 Private mKeySize            As Long
@@ -225,8 +232,7 @@ End Function
 ' @param Rgb The value to be decrypted.
 ' @return The decrypted value.
 ' @remarks In .NET this would throw a NotSupportedException, however, it is
-' supported in VBCorLib. This is equivalen to calling Decrypt(Data, False).
-'
+' supported in VBCorLib. This is equivalent to calling Decrypt(Data, False).
 '
 Public Function DecryptValue(ByRef Rgb() As Byte) As Byte()
     DecryptValue = Decrypt(Rgb, False)
@@ -269,7 +275,7 @@ End Function
 ' @param Rgb The value to be encrypted.
 ' @return The encrypted value.
 ' @remarks In .NET this would throw a NotSupportedException, however, it is
-' supported in VBCorLib. This is equivalen to calling Encrypt(Data, False).
+' supported in VBCorLib. This is equivalent to calling Encrypt(Data, False).
 '
 Public Function EncryptValue(ByRef Rgb() As Byte) As Byte()
     EncryptValue = Encrypt(Rgb, False)
@@ -358,7 +364,7 @@ End Sub
 ' Signs data using the specified hash algorithm.
 '
 ' @param InputStreamOrBuffer The data to be signed. This can be a <b>Stream</b> object or a Byte Array.
-' @param hAlg The hash algorithm to use for signing. Only SHA1 and MD5 are supported.
+' @param hAlg The hash algorithm to use for signing. Only MD5, SHA1, SHA256, SHA384, and SHA512 hashes are supported.
 ' @param Offset The starting index of a Byte array input source. This is ignored for <b>Stream</b> input sources.
 ' @param Count The number of bytes of a Byte array input source to process. This is ignored for <b>Stream</b> input sources.
 ' @return The signature of the data.
@@ -373,9 +379,12 @@ End Sub
 '
 Public Function SignData(ByRef InputStreamOrBuffer As Variant, ByRef hAlg As Variant, Optional ByRef Offset As Variant, Optional ByRef Count As Variant) As Byte()
     Dim HashObj As HashAlgorithm
-    Set HashObj = GetHash(hAlg)
+    Dim Hash()  As Byte
     
-    SignData = SignHash(HashObj.ComputeHash(InputStreamOrBuffer, Offset, Count), GetOID(HashObj))
+    Set HashObj = GetHash(hAlg)
+    Hash = HashObj.ComputeHash(InputStreamOrBuffer, Offset, Count)
+    
+    SignData = SignHash(Hash, GetOidFromObject(HashObj))
 End Function
 
 ''
@@ -384,22 +393,24 @@ End Function
 ' @param RgbHash The hash value to be signed.
 ' @param Str The type of hash value being signed.
 ' @return The signature for the hash data.
-' @remarks Only SHA1 and MD5 hashes are supported.
-' <p>The <i>Str</i> parameter can be "SHA", "SHA1", "MD5", or the OID.
+' @remarks Only MD5, SHA1, SHA256, SHA384, and SHA512 hashes are supported.
+' <p>The <i>Str</i> parameter can be "MD5", "SHA", "SHA1", "SHA256", "SHA384", "SHA512" or the OID.
 ' @see CryptoConfig
 '
 Public Function SignHash(ByRef RgbHash() As Byte, ByVal Str As String) As Byte()
+    ValidateByteArray RgbHash, Parameter_RgbHash
+    
     Dim Hash As Long
     Hash = SetHash(RgbHash, Str)
 
     Dim Size As Long
-    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, ByVal 0&, Size) = BOOL_FALSE Then _
+    If CryptSignHash(Hash, mKeyNumber, vbNullString, 0, ByVal 0&, Size) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 
     Dim Signature() As Byte
     ReDim Signature(0 To Size - 1)
     
-    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
+    If CryptSignHash(Hash, mKeyNumber, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
     Call CryptDestroyHash(Hash)
@@ -426,11 +437,11 @@ End Function
 ' Verifies the data using the signature.
 '
 ' @param Buffer The data to be verified.
-' @param hAlg The hash algorithm used to verify to the data. This is the same algorithm used to sign the data. Only SHA1 and MD5 are supported.
+' @param hAlg The hash algorithm used to verify to the data. This is the same algorithm used to sign the data. Only MD5, SHA1, SHA256, SHA384, and SHA512 hashes are supported.
 ' @param Signature The signature used to ensure the data is valid.
 ' @return Returns True if the data has a valid signature, False otherwise.
 ' @remarks The hash algorithms can be specified either by the OID string, the hash name, or an actual instance of a hash
-' object that implements either the <b>SHA1</b> or <b>MD5</b> interface.
+' object that implements an <b>MD5</b>, <b>SHA1</b>, <b>SHA256</b>, <b>SHA384</b>, or <b>SHA512</b> interface.
 ' @see CryptoConfig
 ' @see SHA1
 ' @see MD5
@@ -445,7 +456,7 @@ Public Function VerifyData(ByRef Buffer() As Byte, ByRef hAlg As Variant, ByRef 
     Dim HashObj As HashAlgorithm
     Set HashObj = GetHash(hAlg)
     
-    VerifyData = VerifyHash(HashObj.ComputeHash(Buffer), GetOID(HashObj), Signature)
+    VerifyData = VerifyHash(HashObj.ComputeHash(Buffer), GetOidFromObject(HashObj), Signature)
 End Function
 
 ''
@@ -455,8 +466,8 @@ End Function
 ' @param Str The type of hash value being signed.
 ' @param Signature The signature for the hash data.
 ' @return Returns True if the signature is correct, False otherwise.
-' @remarks Only SHA1 and MD5 hashes are supported.
-' <p>The <i>Str</i> parameter can be "SHA", "SHA1", "MD5", or the OID.
+' @remarks Only MD5, SHA1, SHA256, SHA384, and SHA512 hashes are supported.
+' <p>The <i>Str</i> parameter can be "MD5", "SHA", "SHA1", "SHA256", "SHA384", "SHA512" or the OID.
 ' @see CryptoConfig
 '
 Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef Signature() As Byte) As Boolean
@@ -626,9 +637,24 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     
     Dim HashAlg As Long
     Dim HashLen As Long
-    Select Case LCase$(Str)
+    Dim OID As String
+    OID = CryptoConfig.MapNameToOID(Str)
+    If Len(OID) = 0 Then
+        OID = Str
+    End If
+    
+    Select Case OID
         Case "1.3.14.3.2.26", "sha", "sha1":    HashAlg = CALG_SHA1: HashLen = 20
         Case "1.2.840.113549.2.5", "md5":       HashAlg = CALG_MD5: HashLen = 16
+        Case CryptoConstants.OID_OIWSEC_SHA256
+            HashAlg = CALG_SHA_256
+            HashLen = 32
+        Case CryptoConstants.OID_OIWSEC_SHA384
+            HashAlg = CALG_SHA_384
+            HashLen = 48
+        Case CryptoConstants.OID_OIWSEC_SHA512
+            HashAlg = CALG_SHA_512
+            HashLen = 64
         Case Else
             Throw Cor.NewArgumentException("Only SHA1 and MD5 hash algorithms are supported.", "Str")
     End Select
@@ -642,7 +668,7 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
     If CryptCreateHash(mProvider, HashAlg, 0, 0, Hash) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 
-    If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = 0 Then _
+    If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 
     SetHash = Hash
@@ -655,15 +681,22 @@ errTrap:
     If Catch(Ex) Then Throw Ex
 End Function
 
-Private Function GetOID(ByVal HashObj As HashAlgorithm) As String
-    Dim OID As String
+Private Function GetOidFromObject(ByVal HashObj As HashAlgorithm) As String
+    Dim HashName As String
+    
     If TypeOf HashObj Is SHA1 Then
-        OID = CryptoConfig.MapNameToOID("SHA1")
+        HashName = "SHA1"
     ElseIf TypeOf HashObj Is MD5 Then
-        OID = CryptoConfig.MapNameToOID("MD5")
+        HashName = "MD5"
+    ElseIf TypeOf HashObj Is SHA256 Then
+        HashName = "SHA256"
+    ElseIf TypeOf HashObj Is SHA384 Then
+        HashName = "SHA384"
+    ElseIf TypeOf HashObj Is SHA512 Then
+        HashName = "SHA512"
     End If
     
-    GetOID = OID
+    GetOidFromObject = CryptoConfig.MapNameToOID(HashName)
 End Function
 
 Private Function GetHash(ByRef hAlg As Variant) As HashAlgorithm
@@ -671,21 +704,30 @@ Private Function GetHash(ByRef hAlg As Variant) As HashAlgorithm
     
     Select Case VarType(hAlg)
         Case vbString
-            Select Case LCase$(hAlg)
-                Case "1.3.14.3.2.26", "sha", "sha1": Set HashObj = New SHA1CryptoServiceProvider
-                Case "1.2.840.113549.2.5", "md5":    Set HashObj = New MD5CryptoServiceProvider
+            Select Case GetOidFromHashName(CStr(hAlg))
+                Case CryptoConstants.OID_RSA_MD5
+                    Set HashObj = MD5.Create
+                Case CryptoConstants.OID_OIWSEC_SHA1
+                    Set HashObj = SHA1.Create
+                Case CryptoConstants.OID_OIWSEC_SHA256
+                    Set HashObj = SHA256.Create
+                Case CryptoConstants.OID_OIWSEC_SHA384
+                    Set HashObj = SHA384.Create
+                Case CryptoConstants.OID_OIWSEC_SHA512
+                    Set HashObj = SHA512.Create
+                    
                 Case Else
-                    Throw Cor.NewArgumentException("Only SHA1 and MD5 hash algorithms are supported.", "hAlg")
+                    Throw Cor.NewArgumentException(hAlg & " hash algorithm is not supported.", "hAlg")
             End Select
             
         Case vbObject
             If hAlg Is Nothing Then _
                 Throw Cor.NewArgumentNullException("hAlg")
             
-            If (TypeOf hAlg Is SHA1) Or (TypeOf hAlg Is MD5) Then
+            If (TypeOf hAlg Is SHA1) Or (TypeOf hAlg Is MD5) Or (TypeOf hAlg Is SHA256) Or (TypeOf hAlg Is SHA384) Or (TypeOf hAlg Is SHA512) Then
                 Set HashObj = hAlg
             Else
-                Throw Cor.NewArgumentException("Hash object must be SHA1 or MD5 compatible.", "hAlg")
+                Throw Cor.NewArgumentException("Invalid hash algorithm.", "hAlg")
             End If
             
         Case Else
@@ -693,6 +735,18 @@ Private Function GetHash(ByRef hAlg As Variant) As HashAlgorithm
     End Select
     
     Set GetHash = HashObj
+End Function
+
+Private Function GetOidFromHashName(ByRef Name As String) As String
+    Dim OID As String
+    
+    OID = CryptoConfig.MapNameToOID(Name)
+    
+    If Len(OID) = 0 Then
+        OID = Name
+    End If
+    
+    GetOidFromHashName = OID
 End Function
 
 

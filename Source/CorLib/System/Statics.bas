@@ -80,8 +80,9 @@ Public TripleDES                As New TripleDESStatic
 Public RC2                      As New RC2Static
 Public Rijndael                 As New RijndaelStatic
 Public CryptoConfig             As New CryptoConfig
-Public SHA1                     As New SHA1Static
 Public StopWatch                As New StopWatchStatic
+Public MD5                      As New MD5Static
+Public SHA1                     As New SHA1Static
 Public SHA256                   As New SHA256Static
 Public SHA512                   As New SHA512Static
 Public SHA384                   As New SHA384Static

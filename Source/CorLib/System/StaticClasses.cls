@@ -533,21 +533,30 @@ Public Property Get CryptoConfig() As CryptoConfig
 End Property
 
 ''
-' Returns a reference used to access the SHA1 static methods.
-'
-' @return A reference to the single SHA1Static instance.
-'
-Public Property Get SHA1() As SHA1Static
-    Set SHA1 = Statics.SHA1
-End Property
-
-''
 ' Returns a reference used to access the StopWatch static methods.
 '
 ' @return A reference to the single StopWatchStatic instance.
 '
 Public Property Get StopWatch() As StopWatchStatic
     Set StopWatch = Statics.StopWatch
+End Property
+
+''
+' Returns a reference used to access the MD5 static methods
+'
+' @return A reference to the single MD5Static instance.
+'
+Public Property Get MD5() As MD5Static
+    Set MD5 = Statics.MD5
+End Property
+
+''
+' Returns a reference used to access the SHA1 static methods.
+'
+' @return A reference to the single SHA1Static instance.
+'
+Public Property Get SHA1() As SHA1Static
+    Set SHA1 = Statics.SHA1
 End Property
 
 ''

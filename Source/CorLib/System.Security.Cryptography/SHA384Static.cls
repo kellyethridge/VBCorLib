@@ -52,7 +52,7 @@ Private mStatePtr As DLong
 ' @return A new SHA-384 compatible implementation.
 ' @remarks If not name is given, then a new SHA384Managed is returned.
 '
-Public Function Create(Optional ByVal AlgName As String = "SHA384") As SHA384
+Public Function Create(Optional ByVal AlgName As String = "CorLib.SHA384") As SHA384
     Set Create = CryptoConfig.CreateFromName(AlgName)
 End Function
 

@@ -45,7 +45,6 @@ library CorType {
         STREAM_SEEK_END = 2
     } STREAM_SEEK;
 
-
     //
     // Type Structures
     //
@@ -1013,6 +1012,20 @@ library CorType {
         [entry("ProgIDFromCLSID")] long ProgIDFromCLSID([in] VBGUID * CLSID, [in] long * lplpszProgID);
     }
 
+    [dllname("CryptoConstants"), helpstring("Defined constants for crypto api.")]
+    module CryptoConstants {
+        const LPSTR OID_RSA_SMIMEalgCMS3DESwrap = "1.2.840.113549.1.9.16.3.6";
+        const LPSTR OID_RSA_MD5                 = "1.2.840.113549.2.5";
+        const LPSTR OID_RSA_RC2CBC              = "1.2.840.113549.3.2";
+        const LPSTR OID_RSA_DES_EDE3_CBC        = "1.2.840.113549.3.7";
+        const LPSTR OID_OIWSEC_desCBC           = "1.3.14.3.2.7";
+        const LPSTR OID_OIWSEC_SHA1             = "1.3.14.3.2.26";
+        const LPSTR OID_OIWSEC_SHA256           = "2.16.840.1.101.3.4.2.1";
+        const LPSTR OID_OIWSEC_SHA384           = "2.16.840.1.101.3.4.2.2";
+        const LPSTR OID_OIWSEC_SHA512           = "2.16.840.1.101.3.4.2.3";
+        const LPSTR OID_OIWSEC_RIPEMD160        = "1.3.36.3.2.1";
+    }
+
     [dllname("advapi32.dll"), helpstring("Access to API functions within the Advapi32.dll system file.")]
     module Advapi32 {
         const long REG_NONE                   = 0;
@@ -1103,6 +1116,9 @@ library CorType {
         const long CALG_RSA_KEYX           = 0xA400;        //(ALG_CLASS_KEY_EXCHANGE Or ALG_TYPE_RSA Or ALG_SID_RSA_ANY)
         const long CALG_RSA_SIGN           = 0x2400;        //(ALG_CLASS_SIGNATURE Or ALG_TYPE_RSA Or ALG_SID_RSA_ANY)
         const long CALG_DSS_SIGN           = 0x2200;        //(ALG_CLASS_SIGNATURE Or ALG_TYPE_DSS Or ALG_SID_DSS_ANY)
+        const long CALG_SHA_256            = 0x800C;
+        const long CALG_SHA_384            = 0x800D;
+        const long CALG_SHA_512            = 0x800E;
 
         const long CRYPT_OAEP              = 0x40;
         const long CRYPT_EXPORTABLE        = 0x1;

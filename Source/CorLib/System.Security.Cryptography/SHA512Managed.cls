@@ -471,9 +471,9 @@ Private Sub Transform(ByRef Bytes() As Byte, ByVal Index As Long)
         s0l = LilSig0Lo(T2h, T2l)
         s0h = LilSig0Hi(T2h, T2l)
         
-        Call UAdd64(s1h, s1l, mWh(i - 7), mWl(i - 7))
-        Call UAdd64(s1h, s1l, s0h, s0l)
-        Call UAdd64(s1h, s1l, mWh(i - 16), mWl(i - 16))
+        UAdd64 s1h, s1l, mWh(i - 7), mWl(i - 7)
+        UAdd64 s1h, s1l, s0h, s0l
+        UAdd64 s1h, s1l, mWh(i - 16), mWl(i - 16)
 
         mWh(i) = s1h
         mWl(i) = s1l
@@ -563,12 +563,12 @@ Private Function RRotateLo(ByVal xh As Long, ByVal xl As Long, ByVal Count As Lo
     End If
 End Function
 
-Private Function Choice(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
-    Choice = (X And Y) Xor ((Not X) And z)
+Private Function Choice(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
+    Choice = (x And y) Xor ((Not x) And z)
 End Function
 
-Private Function Maj(ByVal X As Long, ByVal Y As Long, ByVal z As Long) As Long
-    Maj = (X And Y) Xor (X And z) Xor (Y And z)
+Private Function Maj(ByVal x As Long, ByVal y As Long, ByVal z As Long) As Long
+    Maj = (x And y) Xor (x And z) Xor (y And z)
 End Function
 
 Private Function BigSIG0Hi(ByVal xh As Long, ByVal xl As Long) As Long
@@ -716,8 +716,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
