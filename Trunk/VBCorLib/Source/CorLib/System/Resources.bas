@@ -270,4 +270,5 @@ Public Enum ParameterResourceKey
     Parameter_InputCount = 2033
     Parameter_OutputBuffer = 2034
     Parameter_OutputOffset = 2035
+    Parameter_RgbHash = 2036
 End Enum

@@ -164,11 +164,11 @@ End Function
 ' @return The object identifier (OID) for the object.
 '
 Public Function MapNameToOID(ByVal Name As String) As String
-    Dim OID As Variant
+    Dim Oid As Variant
     
-    OID = DefaultOids(Name)
-    If Not IsEmpty(OID) Then
-        MapNameToOID = OID
+    Oid = DefaultOids(Name)
+    If Not IsEmpty(Oid) Then
+        MapNameToOID = Oid
     End If
 End Function
 
@@ -316,16 +316,16 @@ Private Property Get DefaultOids() As Hashtable
 End Property
 
 Private Sub InitDefaultOids()
-    Const OID_RSA_SMIMEalgCMS3DESwrap   As String = "1.2.840.113549.1.9.16.3.6"
-    Const OID_RSA_MD5                   As String = "1.2.840.113549.2.5"
-    Const OID_RSA_RC2CBC                As String = "1.2.840.113549.3.2"
-    Const OID_RSA_DES_EDE3_CBC          As String = "1.2.840.113549.3.7"
-    Const OID_OIWSEC_desCBC             As String = "1.3.14.3.2.7"
-    Const OID_OIWSEC_SHA1               As String = "1.3.14.3.2.26"
-    Const OID_OIWSEC_SHA256             As String = "2.16.840.1.101.3.4.2.1"
-    Const OID_OIWSEC_SHA384             As String = "2.16.840.1.101.3.4.2.2"
-    Const OID_OIWSEC_SHA512             As String = "2.16.840.1.101.3.4.2.3"
-    Const OID_OIWSEC_RIPEMD160          As String = "1.3.36.3.2.1"
+'    Const OID_RSA_SMIMEalgCMS3DESwrap   As String = "1.2.840.113549.1.9.16.3.6"
+'    Const OID_RSA_MD5                   As String = "1.2.840.113549.2.5"
+'    Const OID_RSA_RC2CBC                As String = "1.2.840.113549.3.2"
+'    Const OID_RSA_DES_EDE3_CBC          As String = "1.2.840.113549.3.7"
+'    Const OID_OIWSEC_desCBC             As String = "1.3.14.3.2.7"
+'    Const OID_OIWSEC_SHA1               As String = "1.3.14.3.2.26"
+'    Const OID_OIWSEC_SHA256             As String = "2.16.840.1.101.3.4.2.1"
+'    Const OID_OIWSEC_SHA384             As String = "2.16.840.1.101.3.4.2.2"
+'    Const OID_OIWSEC_SHA512             As String = "2.16.840.1.101.3.4.2.3"
+'    Const OID_OIWSEC_RIPEMD160          As String = "1.3.36.3.2.1"
     
     Set mDefaultOids = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
     With mDefaultOids

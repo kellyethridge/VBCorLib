@@ -441,6 +441,7 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
 End Function
 
 Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
+    
     Select Case ComparisonType
         Case StringComparison.Ordinal
             Equals = OrdinalEquals(StrPtr(a), StrPtr(b))
@@ -778,12 +779,23 @@ End Function
 Private Function OrdinalEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
     Dim i       As Long
     Dim Len1    As Long
+    Dim Len2    As Long
     Dim Tmp     As Long
     
-    Len1 = MemLong(Ptr1 - 4)
-        
+    If Ptr1 <> vbNullPtr Then
+        Len1 = MemLong(Ptr1 - 4)
+    End If
+    If Ptr2 <> vbNullPtr Then
+        Len2 = MemLong(Ptr2 - 4)
+    End If
+    
     ' Make an informed decision as to whether we should continue
-    If Len1 <> MemLong(Ptr2 - 4) Then
+    If Len1 <> Len2 Then
+        Exit Function
+    End If
+    
+    If Len1 = 0 Then
+        OrdinalEquals = True
         Exit Function
     End If
     
@@ -835,14 +847,26 @@ End Function
 Private Function OrdinalIgnoreCaseEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
     Dim i       As Long
     Dim SLen    As Long
+    Dim SLen2   As Long
     Dim Tmp1    As Long
     Dim Tmp2    As Long
     Dim Tmp3    As Long
     Dim Tmp4    As Long
     Dim Alt     As Long
     
-    SLen = MemLong(Ptr1 - 4)
-    If SLen <> MemLong(Ptr2 - 4) Then
+    If Ptr1 <> vbNullPtr Then
+        SLen = MemLong(Ptr1 - 4)
+    End If
+    If Ptr2 <> vbNullPtr Then
+        SLen2 = MemLong(Ptr2 - 4)
+    End If
+    
+    If SLen <> SLen2 Then
+        Exit Function
+    End If
+    
+    If SLen = 0 Then
+        OrdinalIgnoreCaseEquals = True
         Exit Function
     End If
     

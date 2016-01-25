@@ -173,6 +173,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use String$(10, "a"), String$(10, "A"), StringComparison.OrdinalIgnoreCase, True
             Test.Use Space$(10) & "a", Space$(10) & "b", StringComparison.OrdinalIgnoreCase, False
             Test.Use "aa", "a", StringComparison.OrdinalIgnoreCase, False
+            Test.Use "", "", StringComparison.Ordinal, True
+            Test.Use vbNullString, "", StringComparison.Ordinal, True
+            Test.Use "", vbNullString, StringComparison.Ordinal, True
+            Test.Use vbNullString, vbNullString, StringComparison.Ordinal, True
             
     End Select
 End Sub

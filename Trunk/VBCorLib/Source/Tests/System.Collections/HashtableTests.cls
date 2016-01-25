@@ -88,6 +88,27 @@ Public Sub Item_WithNonExistingKey_AddsToTable()
     Assert.That Table("abc"), Iz.EqualTo(123)
 End Sub
 
+Public Sub Item_WithNonExistingKeyUsingEmptyString_ReturnsEmpty()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    
+    Dim Actual As Variant
+    Actual = Table("")
+    
+    Assert.That Actual, Iz.vbEmpty
+End Sub
+
+Public Sub Item_WithEmptyStringAsKey_ReturnsValue()
+    Dim Table As New Hashtable
+    Table.Add "abc", 123
+    Table.Add "", 456
+    
+    Dim Actual As Variant
+    Actual = Table("")
+    
+    Assert.That Actual, Iz.EqualTo(456)
+End Sub
+
 Public Sub Item_WithExistingKey_ReplacesValue()
     Dim Table As New Hashtable
     Table.Add "abc", 123

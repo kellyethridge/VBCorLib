@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "SHA1Static"
+Attribute VB_Name = "MD5Static"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'The MIT License (MIT)
-'Copyright (c) 2015 Kelly Ethridge
+'Copyright (c) 2016 Kelly Ethridge
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -32,21 +32,11 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: SHA1Static
-'
-
-''
-' Provides methods specific to the SHA-1 class.
+' Module: MD5Static
 '
 Option Explicit
 
-''
-' Creates a new instance of the SHA-1 algorithm using the specified implementation.
-'
-' @param AlgName The name of the implementation to create.
-' @return A new implementation of the SHA-1 algorithm.
-' @remarks If no name is specified, then a new SHA1CryptoServiceProvider instance will be created.
-'
-Public Function Create(Optional ByRef AlgName As String = "CorLib.SHA1") As SHA1
-    Set Create = CryptoConfig.CreateFromName(AlgName)
+Public Function Create(Optional ByRef HashName As String = "CorLib.MD5") As MD5
+    Set Create = CryptoConfig.CreateFromName(HashName)
 End Function
+
