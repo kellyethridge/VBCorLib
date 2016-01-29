@@ -44,6 +44,8 @@ Implements AsymmetricAlgorithm
 Implements RSA
 Implements ICspAsymmetricAlgorithm
 
+Private Declare Function CryptDuplicateKey Lib "advapi32.dll" (ByVal hKey As Long, ByVal pdwReserved As Long, ByVal dwFlags As Long, ByRef phKey As Long) As Long
+
 Private Const DEF_KEYNUMBER     As Long = AT_KEYEXCHANGE
 Private Const DEF_PROVIDERTYPE  As Long = PROV_RSA_AES
 
@@ -69,7 +71,7 @@ Private mIsDisposed         As Boolean
 ' @return A CspKeyContainerInfo object.
 '
 Public Property Get CspKeyContainerInfo() As CspKeyContainerInfo
-    Call VerifyLoaded
+    VerifyLoaded
     
     Dim Params As CspParameters
     Set Params = Cor.NewCspParameters(mProviderType, mProviderName, mKeyContainerName)
@@ -180,8 +182,8 @@ End Property
 ' Releases any resources and disposes the RSA instance.
 '
 Public Sub Clear()
-    Call CryptoAPI.DestroyKey(mKey)
-    Call CryptoAPI.ReleaseContext(mProvider, Not mPersistKeyInCsp)
+    CryptoAPI.DestroyKey mKey
+    CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
     
     mIsDisposed = True
 End Sub
@@ -194,7 +196,7 @@ End Sub
 ' @return Returns the decrypted data.
 '
 Public Function Decrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
-    Call VerifyLoaded
+    VerifyLoaded
     
     If CorArray.IsNull(Rgb) Then _
         Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
@@ -237,7 +239,7 @@ End Function
 ' @param fOAEP A flag indicating if OAEP padding should be used, otherwise PKCS#1 v1.5 padding is used.
 '
 Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
-    Call VerifyLoaded
+    VerifyLoaded
     
     If CorArray.IsNull(Rgb) Then _
         Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
@@ -252,7 +254,7 @@ Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     ' original array during the encryption process.
     Dim Ret() As Byte
     ReDim Ret(0 To mKeySize \ 8 - 1)
-    Call Buffer.BlockCopy(Rgb, 0, Ret, 0, Size)
+    Buffer.BlockCopy Rgb, 0, Ret, 0, Size
     
     If CryptEncrypt(mKey, 0, True, Flags, Ret(0), Size, mKeySize \ 8) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
@@ -281,7 +283,7 @@ End Function
 ' @return An exported key blob structure.
 '
 Public Function ExportCspBlob(ByVal IncludePrivateParameters As Boolean) As Byte()
-    Call VerifyLoaded
+    VerifyLoaded
     
     Dim BlobType As Long
     BlobType = IIf(IncludePrivateParameters, PRIVATEKEYBLOB, PUBLICKEYBLOB)
@@ -308,7 +310,7 @@ End Function
 '
 Public Function ExportParameters(ByVal IncludePrivateParameters As Boolean) As RSAParameters
     Set ExportParameters = New RSAParameters
-    Call ExportParameters.FromCspBlob(Me.ExportCspBlob(IncludePrivateParameters))
+    ExportParameters.FromCspBlob ExportCspBlob(IncludePrivateParameters)
 End Function
 
 ''
@@ -316,10 +318,10 @@ End Function
 '
 ' @param XmlString The string containing the XML formatted parameters.
 '
-Public Sub FromXmlString(ByVal XmlString As String)
+Public Sub FromXmlString(ByRef XmlString As String)
     Dim Params As New RSAParameters
-    Call Params.FromXmlString(XmlString)
-    Call ImportParameters(Params)
+    Params.FromXmlString XmlString
+    ImportParameters Params
 End Sub
 
 ''
@@ -331,8 +333,8 @@ Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     If CorArray.IsNull(KeyBlob) Then _
         Throw Cor.NewArgumentNullException("KeyBlob", Environment.GetResourceString(ArgumentNull_Array))
     
-    Call VerifyLoaded(False)
-    Call DeleteKey
+    VerifyLoaded False
+    DeleteKey
     
     If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.Length(KeyBlob), 0, CRYPT_EXPORTABLE, mKey) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
@@ -349,7 +351,7 @@ Public Sub ImportParameters(ByVal Parameters As RSAParameters)
     If Parameters Is Nothing Then _
         Throw Cor.NewArgumentNullException("Parameters")
     
-    Call Me.ImportCspBlob(Parameters.ToCspBlob(mKeyNumber))
+    ImportCspBlob Parameters.ToCspBlob(mKeyNumber)
 End Sub
 
 ''
@@ -405,14 +407,9 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
     If CryptSignHash(Hash, mKeyNumber, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
     
-    Call CryptDestroyHash(Hash)
+    CryptDestroyHash Hash
     
     SignHash = ReverseByteCopy(Signature)
-    Exit Function
-
-errTrap:
-    If Hash <> vbNullPtr Then Call CryptDestroyHash(Hash)
-    Call Throw
 End Function
 
 ''
@@ -479,7 +476,7 @@ Public Function VerifyHash(ByRef RgbHash() As Byte, ByRef Str As String, ByRef S
     RevSig = ReverseByteCopy(Signature)
     
     VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.Length(Signature), mKey, vbNullString, 0))
-    Call CryptDestroyHash(Hash)
+    CryptDestroyHash Hash
 End Function
 
 ''
@@ -552,8 +549,10 @@ Friend Sub Init(ByVal KeySize As Long, ByVal Params As CspParameters)
 End Sub
 
 Private Sub Class_Terminate()
-    CryptoAPI.DestroyKey mKey
-    CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
+    If Not mIsDisposed Then
+        CryptoAPI.DestroyKey mKey
+        CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
+    End If
 End Sub
 
 
@@ -590,39 +589,39 @@ Private Sub LoadProvider()
 End Sub
 
 Private Sub GenerateKey()
-    If mKey <> vbNullPtr Then Exit Sub
-    
-    If mFlags And UseExistingKey Then
-        ' Try to get an existing key.
-        If CryptGetUserKey(mProvider, mKeyNumber, mKey) <> BOOL_FALSE Then Exit Sub
-        
-        ' Something went wrong. If it's something other than
-        ' not finding the key, then it's bad, so fail.
-        If Err.LastDllError <> NTE_NO_KEY Then _
-            Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
-            
-        ' We didn't find an existing key, so continue and create a new one.
+    If mKey <> vbNullPtr Then
+        Exit Sub
     End If
-    
+
+    If CryptGetUserKey(mProvider, mKeyNumber, mKey) = BOOL_FALSE Then
+        If (Err.LastDllError <> NTE_NO_KEY) Or (mFlags And UseExistingKey) Then _
+            Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        
+        GenerateNewKey
+    End If
+End Sub
+
+Private Sub GenerateNewKey()
     Dim Flags As Long
     Flags = Helper.ShiftLeft(mKeySize, 16)  ' the key size is held in the upper 16-bits.
     
-    ' We must specify to make the key archivable.
-    If mFlags And UseArchivableKey Then Flags = Flags Or CRYPT_ARCHIVABLE
+    If mFlags And UseArchivableKey Then
+        Flags = Flags Or CRYPT_ARCHIVABLE
+    End If
     
-    ' We must specify to NOT create an exportable key.
-    If (mFlags And UseNonExportableKey) = 0 Then Flags = Flags Or CRYPT_EXPORTABLE
+    If (mFlags And UseNonExportableKey) = 0 Then
+        Flags = Flags Or CRYPT_EXPORTABLE
+    End If
     
     If Not CryptoAPI.SupportsAlgorithm(mProvider, IIf(mKeyNumber = AT_KEYEXCHANGE, CALG_RSA_KEYX, CALG_RSA_SIGN)) Then _
         Throw Cor.NewCryptographicException("The Cryptography Service Provider (CSP) does not support the specified algorithm.")
     
-    ' Let'er rip! This can take a bit with large key sizes.
     If CryptGenKey(mProvider, mKeyNumber, Flags, mKey) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 End Sub
 
 Private Sub DeleteKey()
-    Call CryptoAPI.DestroyKey(mKey)
+    CryptoAPI.DestroyKey mKey
     mKey = vbNullPtr
 End Sub
 
@@ -655,25 +654,16 @@ Private Function SetHash(ByRef RgbHash() As Byte, ByRef Str As String) As Long
     If CorArray.Length(RgbHash) <> HashLen Then _
         Throw Cor.NewCryptographicException("Invalid hash length.")
     
-    On Error GoTo Catch
-    
     Dim Hash As Long
     If CryptCreateHash(mProvider, HashAlg, 0, 0, Hash) = BOOL_FALSE Then _
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
 
-    If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = BOOL_FALSE Then _
+    If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = BOOL_FALSE Then
+        CryptDestroyHash Hash
         Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+    End If
 
     SetHash = Hash
-    Exit Function
-    
-Catch:
-    If Hash <> vbNullPtr Then
-        CryptDestroyHash Hash
-    End If
-    
-    Dim Ex As Exception
-    If Catch(Ex) Then Throw Ex
 End Function
 
 Private Function GetOidFromObject(ByVal HashObj As HashAlgorithm) As String
@@ -749,15 +739,15 @@ End Function
 '   AsymmetricAlgorithm Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AsymmetricAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function AsymmetricAlgorithm_Equals(Value As Variant) As Boolean
     AsymmetricAlgorithm_Equals = Equals(Value)
 End Function
 
-Private Sub AsymmetricAlgorithm_FromXmlString(ByVal XmlString As String)
-    Call FromXmlString(XmlString)
+Private Sub AsymmetricAlgorithm_FromXmlString(ByRef XmlString As String)
+    FromXmlString XmlString
 End Sub
 
 Private Function AsymmetricAlgorithm_GetHashCode() As Long
@@ -768,8 +758,8 @@ Private Property Get AsymmetricAlgorithm_KeyExchangeAlgorithm() As String
     AsymmetricAlgorithm_KeyExchangeAlgorithm = KeyExchangeAlgorithm
 End Property
 
-Private Property Let AsymmetricAlgorithm_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let AsymmetricAlgorithm_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get AsymmetricAlgorithm_KeySize() As Long
@@ -805,7 +795,7 @@ Private Function ICspAsymmetricAlgorithm_ExportCspBlob(ByVal IncludePrivateParam
 End Function
 
 Private Sub ICspAsymmetricAlgorithm_ImportCspBlob(RawData() As Byte)
-    Call ImportCspBlob(RawData)
+    ImportCspBlob RawData
 End Sub
 
 
@@ -829,7 +819,7 @@ End Function
 '   RSA Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub RSA_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function RSA_DecryptValue(Rgb() As Byte) As Byte()
@@ -848,8 +838,8 @@ Private Function RSA_ExportParameters(ByVal IncludePrivateParameters As Boolean)
     Set RSA_ExportParameters = ExportParameters(IncludePrivateParameters)
 End Function
 
-Private Sub RSA_FromXmlString(ByVal XmlString As String)
-    Call FromXmlString(XmlString)
+Private Sub RSA_FromXmlString(ByRef XmlString As String)
+    FromXmlString XmlString
 End Sub
 
 Private Function RSA_GetHashCode() As Long
@@ -857,15 +847,15 @@ Private Function RSA_GetHashCode() As Long
 End Function
 
 Private Sub RSA_ImportParameters(ByVal Parameters As RSAParameters)
-    Call ImportParameters(Parameters)
+    ImportParameters Parameters
 End Sub
 
 Private Property Get RSA_KeyExchangeAlgorithm() As String
     RSA_KeyExchangeAlgorithm = KeyExchangeAlgorithm
 End Property
 
-Private Property Let RSA_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let RSA_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get RSA_KeySize() As Long

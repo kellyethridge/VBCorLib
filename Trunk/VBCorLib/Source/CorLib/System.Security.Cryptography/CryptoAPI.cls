@@ -115,22 +115,17 @@ Friend Function AcquireContext(Optional ByRef ContainerName As String, Optional 
     If ProviderType = 0 Then
         ProviderType = PROV_RSA_AES
     End If
-'    If Len(ProviderName) = 0 Then
-'        ProviderName = mRSAProviderName
-'    End If
+    
     If Len(ContainerName) = 0 Then
         ContainerName = CorString.Format("COR{0}", Guid.NewGuid)
     End If
     
-    ' Try to acquire a provider with a new key container.
-    If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags Or CRYPT_NEWKEYSET) = BOOL_FALSE Then
-        ' We fail if an error occurs other than the key container already existing.
-        If Err.LastDllError <> NTE_EXISTS Then
-            CryptoError
-        End If
-        
-        ' Attempt to acquire the existing key container, failing on any error.
-        If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags) = BOOL_FALSE Then
+    If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags) = BOOL_FALSE Then
+        If Err.LastDllError = NTE_BAD_KEYSET Then
+            If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags Or CRYPT_NEWKEYSET) = BOOL_FALSE Then
+                CryptoError
+            End If
+        Else
             CryptoError
         End If
     End If
@@ -145,12 +140,10 @@ Friend Sub ReleaseContext(ByVal Provider As Long, Optional ByVal DeleteKeySet As
     End If
     
     Dim ContainerName   As String
-    Dim ProviderName    As String
     Dim ProviderType    As Long
     
     If DeleteKeySet Then
         ContainerName = GetProvParamString(Provider, PP_CONTAINER)
-        ProviderName = GetProvParamString(Provider, PP_NAME)
         ProviderType = GetProvParamLong(Provider, PP_PROVTYPE)
     End If
     
@@ -159,7 +152,7 @@ Friend Sub ReleaseContext(ByVal Provider As Long, Optional ByVal DeleteKeySet As
     End If
     
     If DeleteKeySet Then
-        CryptAcquireContext Provider, ContainerName, ProviderName, ProviderType, CRYPT_DELETEKEYSET
+        CryptAcquireContext Provider, ContainerName, vbNullString, ProviderType, CRYPT_DELETEKEYSET
     End If
 End Sub
 
