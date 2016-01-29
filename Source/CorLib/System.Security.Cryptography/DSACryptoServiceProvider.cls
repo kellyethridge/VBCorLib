@@ -621,7 +621,7 @@ Private Function AsymmetricAlgorithm_Equals(Value As Variant) As Boolean
     AsymmetricAlgorithm_Equals = Equals(Value)
 End Function
 
-Private Sub AsymmetricAlgorithm_FromXmlString(ByVal XmlString As String)
+Private Sub AsymmetricAlgorithm_FromXmlString(ByRef XmlString As String)
     Call FromXmlString(XmlString)
 End Sub
 
@@ -633,8 +633,8 @@ Private Property Get AsymmetricAlgorithm_KeyExchangeAlgorithm() As String
     AsymmetricAlgorithm_KeyExchangeAlgorithm = KeyExchangeAlgorithm
 End Property
 
-Private Property Let AsymmetricAlgorithm_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let AsymmetricAlgorithm_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get AsymmetricAlgorithm_KeySize() As Long
@@ -681,8 +681,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

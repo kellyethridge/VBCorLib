@@ -372,26 +372,7 @@ Public Sub SignHash_WithCapiXml384woCRT_ThrowsCryptographicException()
     AssertCryptographicException Err
 End Sub
 
-Public Sub PersistKeyInCsp_WhenFalseAndClearNotCalled_StoresInSameContainerAsTrue()
-'        CspParameters csp = new CspParameters (1, null, "Persistence_PersistKeyInCsp_False");
-'        // MS generates (or load) keypair here
-'        // Mono load (if it exists) the keypair here
-'        RSACryptoServiceProvider rsa1 = new RSACryptoServiceProvider (minKeySize, csp);
-'        // Mono will generate the keypair here (if it doesn't exists)
-'        string first = rsa1.ToXmlString (true);
-'
-'        // persistance is "on" by default when a CspParameters is supplied
-'        Assert.IsTrue (rsa1.PersistKeyInCsp, "PersistKeyInCsp");
-'
-'        // this means nothing if we don't call Clear !!!
-'        rsa1.PersistKeyInCsp = false;
-'        Assert.IsFalse (rsa1.PersistKeyInCsp, "PersistKeyInCsp");
-'
-'        // reload using the same container name
-'        RSACryptoServiceProvider rsa2 = new RSACryptoServiceProvider (minKeySize, csp);
-'        string second = rsa2.ToXmlString (true);
-'
-'        Assert.AreEqual (first, second, "Key Pair Same Container");
+Public Sub PersistKeyInCsp_WhenFalseAndClearNotCalled_StoresInSameContainer()
     Dim Params As CspParameters
     Dim csp1 As RSACryptoServiceProvider
     Set Params = Cor.NewCspParameters(1, ContainerNameIn:="PersistKeyInCsp_WhenFalseAndClearNotCalled_StoresInSameContainerAsTrue")
@@ -409,6 +390,46 @@ Public Sub PersistKeyInCsp_WhenFalseAndClearNotCalled_StoresInSameContainerAsTru
     Second = csp2.ToXmlString(True)
     
     Assert.That First, Iz.EqualTo(Second)
+End Sub
+
+Public Sub PersistKeyInCsp_WhenTrueAndClearNotCalled_StoresInSameContainer()
+    Dim Params As CspParameters
+    Dim csp1 As RSACryptoServiceProvider
+    Set Params = Cor.NewCspParameters(1, ContainerNameIn:="PersistKeyInCsp_WhenTrueAndClearNotCalled_StoresInSameContainer")
+    Set csp1 = Cor.NewRSACryptoServiceProvider(MinKeySize, Params)
+
+    Dim First As String
+    Dim Second As String
+    First = csp1.ToXmlString(True)
+
+    Assert.That csp1.PersistKeyInCsp, Iz.True
+
+    Dim csp2 As RSACryptoServiceProvider
+    Set csp2 = Cor.NewRSACryptoServiceProvider(MinKeySize, Params)
+    Second = csp2.ToXmlString(True)
+
+    Assert.That First, Iz.EqualTo(Second)
+End Sub
+
+Public Sub PersistKeyInCsp_WhenTrueAndClearCalled_DoesNotStoresInSameContainer()
+    Dim Params As CspParameters
+    Dim csp1 As RSACryptoServiceProvider
+    Set Params = Cor.NewCspParameters(1, ContainerNameIn:="PersistKeyInCsp_WhenTrueAndClearNotCalled_DoesNotStoresInSameContainer")
+    Set csp1 = Cor.NewRSACryptoServiceProvider(MinKeySize, Params)
+
+    Dim First As String
+    Dim Second As String
+    First = csp1.ToXmlString(True)
+
+    Assert.That csp1.PersistKeyInCsp, Iz.True
+    csp1.PersistKeyInCsp = False
+    csp1.Clear
+
+    Dim csp2 As RSACryptoServiceProvider
+    Set csp2 = Cor.NewRSACryptoServiceProvider(MinKeySize, Params)
+    Second = csp2.ToXmlString(True)
+
+    Assert.That First, Iz.Not.EqualTo(Second)
 End Sub
 
 
