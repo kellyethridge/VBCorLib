@@ -136,15 +136,11 @@ Public Function EncodeOID(ByRef Str As String) As Byte()
     Output.WriteByte X680_OBJECT_IDENTIFIER_TYPE_TAG
     Output.WriteByte 0 ' place holder for the length.
     
-    Dim Bytes() As Byte
-    Dim Count   As Long
-    Count = EncodeNumber(EncodeFirstTwoIdentifiers(Octets(0), Octets(1)), Bytes)
-    Output.WriteBlock Bytes, 0, Count
+    EncodeNumber EncodeFirstTwoIdentifiers(Octets(0), Octets(1)), Output
     
     Dim i As Long
     For i = 2 To UBound(Octets)
-        Count = EncodeNumber(Octets(i), Bytes)
-        Output.WriteBlock Bytes, 0, Count
+        EncodeNumber Octets(i), Output
     Next i
     
     Output.Position = 1
@@ -178,9 +174,8 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ' X.690 8.19.2
-Private Function EncodeNumber(ByVal Value As Long, ByRef Result() As Byte) As Long
-    Dim Buf() As Byte
-    ReDim Buf(15)
+Private Sub EncodeNumber(ByVal Value As Long, ByVal Output As Stream)
+    Dim Buf(0 To 15) As Byte
     
     Buf(0) = Value And &H7F
     Value = (Value And &HFFFFFF80) \ &H80
@@ -192,11 +187,11 @@ Private Function EncodeNumber(ByVal Value As Long, ByRef Result() As Byte) As Lo
         Value = (Value And &HFFFFFF80) \ &H80
     Loop
     
-    ReDim Preserve Buf(0 To i)
-    
-    Result = ReverseByteCopy(Buf)
-    EncodeNumber = i + 1
-End Function
+    Do While i >= 0
+        Output.WriteByte Buf(i)
+        i = i - 1
+    Loop
+End Sub
 
 ' X.690 8.19.4
 Private Function EncodeFirstTwoIdentifiers(ByVal x As Long, ByVal y As Long) As Long
