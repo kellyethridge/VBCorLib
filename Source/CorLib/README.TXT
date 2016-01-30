@@ -44,18 +44,18 @@ version 3.0 (BREAKING CHANGES)
 	* Added Char static class.
 	* Fixed CorDateTime.ToLocalTime and CorDateTime.ToUniversalTime. Were not setting corret DateTimeKind.
 	* Removed 'Format' parameter from Convert.ToString to align with .NET.
-    * Added StringComparer class with Ordinal and OrdinalIgnoreCase implementations.
-    * Removed IHashCodeProvider. *BREAKING*
-    * Removed IEqualityComparer.
-    * Updated Hashtable to use IEqualityComparer instead of IHashCodeProvider/IComparer combonation. *BREAKING*
-    * Converting as many ByVal string parameters to ByRef as possible. *POSSIBLE BREAKING*
-    * Fixed SHA512Managed and SHA384Managed to produce correct .NET 2.0 values instead of broken 1.0 values.
-    * Added EnumeratorBase to help easily build list enumerators.
-    * Path class will attempt to expand short path formats if the path exists.
-    * CorString.Join methat signature changed to match .NET. *BREAKING*
-    * CorString.Join Separator is now required.
-    * CorString.Join improved to support any array or enumerable collection of items.
-    * Added Restart to StopWatch class.
+	* Added StringComparer class with Ordinal and OrdinalIgnoreCase implementations.
+	* Removed IHashCodeProvider. *BREAKING*
+	* Added IEqualityComparer.
+	* Updated Hashtable to use IEqualityComparer instead of IHashCodeProvider/IComparer combonation. *BREAKING*
+	* Converting as many ByVal string parameters to ByRef as possible. *POSSIBLE BREAKING*
+	* Fixed SHA512Managed and SHA384Managed to produce correct .NET 2.0 values instead of broken 1.0 values.
+	* Added EnumeratorBase to help easily build list enumerators.
+	* Path class will attempt to expand short path formats if the path exists.
+	* CorString.Join methat signature changed to match .NET. *BREAKING*
+	* CorString.Join Separator is now required.
+	* CorString.Join improved to support any array or enumerable collection of items.
+	* Added Restart to StopWatch class.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
