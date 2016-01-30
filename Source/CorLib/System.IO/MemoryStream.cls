@@ -759,8 +759,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -864,7 +864,7 @@ Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Coun
 End Sub
 
 Private Sub Stream_WriteByte(ByVal Value As Byte)
-    Call WriteByte(Value)
+    WriteByte Value
 End Sub
 
 Private Property Let Stream_WriteTimeout(ByVal Value As Long)
