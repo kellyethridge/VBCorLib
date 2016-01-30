@@ -56,7 +56,7 @@ Private mStatePtr   As DLong
 ' @return A new SHA-512 compatible implementation.
 ' @remarks If not name is given, then a new SHA512Managed is returned.
 '
-Public Function Create(Optional ByVal AlgName As String = "CorLib.SHA512") As SHA512
+Public Function Create(Optional ByRef AlgName As String = "CorLib.SHA512") As SHA512
     Set Create = CryptoConfig.CreateFromName(AlgName)
 End Function
 

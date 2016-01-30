@@ -10,7 +10,7 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed CorArray.LastIndexOf when searching byte arrays.
 	* Fixed array comparison of objects. Would break if element was Nothing.
 	* Fixed CorArray.FindIndex. Returned incorrect result when supplying index.
-	* Refactored cArray.BinarySearch signature to include a cArray.BinarySearchEx, removing need for optional values. *POSSIBLE BREAKING*
+	* Refactored CorArray.BinarySearch signature to include a CorArray.BinarySearchEx, removing need for optional values. *POSSIBLE BREAKING*
 	* Updated CorArray.CreateInstance to build multi-dimension arrays in same order as VB6. *BREAKING*
 	* Updated CorArray.CreateInstance to support multi-dimension arrays with selected 0 lengths.
 	* Removed ciArrayTypes. Replaced with VbVarType. *BREAKING*
@@ -25,6 +25,7 @@ version 3.0 (BREAKING CHANGES)
 	* Removed Comparer parameter from Stack.Contains method to align more with .NET.
 	* Added LeaveOpen constructor parameter to StreamReader.
 	* Added EndOfStream property to StreamReader.
+    * Added SafeHandle and SafeHandleBase types.
 	* Added SafeFileHandle type.
 	* Added MyBase methods to separate IObject implementations from standard Object.* calls.
 	* Reordered 'Message' and 'ParamName' arguments in ArgumentException to more align with .NET. **
@@ -43,6 +44,18 @@ version 3.0 (BREAKING CHANGES)
 	* Added Char static class.
 	* Fixed CorDateTime.ToLocalTime and CorDateTime.ToUniversalTime. Were not setting corret DateTimeKind.
 	* Removed 'Format' parameter from Convert.ToString to align with .NET.
+    * Added StringComparer class with Ordinal and OrdinalIgnoreCase implementations.
+    * Removed IHashCodeProvider. *BREAKING*
+    * Removed IEqualityComparer.
+    * Updated Hashtable to use IEqualityComparer instead of IHashCodeProvider/IComparer combonation. *BREAKING*
+    * Converting as many ByVal string parameters to ByRef as possible. *POSSIBLE BREAKING*
+    * Fixed SHA512Managed and SHA384Managed to produce correct .NET 2.0 values instead of broken 1.0 values.
+    * Added EnumeratorBase to help easily build list enumerators.
+    * Path class will attempt to expand short path formats if the path exists.
+    * CorString.Join methat signature changed to match .NET. *BREAKING*
+    * CorString.Join Separator is now required.
+    * CorString.Join improved to support any array or enumerable collection of items.
+    * Added Restart to StopWatch class.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
