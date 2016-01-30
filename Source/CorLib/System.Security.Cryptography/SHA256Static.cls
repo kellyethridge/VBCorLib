@@ -51,7 +51,7 @@ Private mKPtr   As Long
 ' @return A new SHA-256 compatible implementation.
 ' @remarks If not name is given, then a new SHA256Managed is returned.
 '
-Public Function Create(Optional ByVal AlgName As String = "CorLib.SHA256") As SHA256
+Public Function Create(Optional ByRef AlgName As String = "CorLib.SHA256") As SHA256
     Set Create = CryptoConfig.CreateFromName(AlgName)
 End Function
 
