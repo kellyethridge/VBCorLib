@@ -182,10 +182,12 @@ End Property
 ' Releases any resources and disposes the RSA instance.
 '
 Public Sub Clear()
-    CryptoAPI.DestroyKey mKey
-    CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
-    
-    mIsDisposed = True
+    If Not mIsDisposed Then
+        CryptoAPI.DestroyKey mKey
+        CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
+        
+        mIsDisposed = True
+    End If
 End Sub
 
 ''
@@ -549,10 +551,7 @@ Friend Sub Init(ByVal KeySize As Long, ByVal Params As CspParameters)
 End Sub
 
 Private Sub Class_Terminate()
-    If Not mIsDisposed Then
-        CryptoAPI.DestroyKey mKey
-        CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
-    End If
+    Clear
 End Sub
 
 

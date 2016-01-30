@@ -124,8 +124,8 @@ End Sub
 Public Function EncodeOID(ByRef Str As String) As Byte()
     Const X680_OBJECT_IDENTIFIER_TYPE_TAG As Long = 6
     
-    Dim EncodingStream  As New MemoryStream
-    Dim Octets()        As String
+    Dim Output      As New MemoryStream
+    Dim Octets()    As String
     Octets = Split(Str, ".")
     
     If UBound(Octets) = 0 Then _
@@ -133,23 +133,23 @@ Public Function EncodeOID(ByRef Str As String) As Byte()
     
     On Error GoTo Catch
     
-    EncodingStream.WriteByte X680_OBJECT_IDENTIFIER_TYPE_TAG
-    EncodingStream.WriteByte 0 ' place holder for the length.
+    Output.WriteByte X680_OBJECT_IDENTIFIER_TYPE_TAG
+    Output.WriteByte 0 ' place holder for the length.
     
     Dim Bytes() As Byte
     Dim Count   As Long
     Count = EncodeNumber(EncodeFirstTwoIdentifiers(Octets(0), Octets(1)), Bytes)
-    EncodingStream.WriteBlock Bytes, 0, Count
+    Output.WriteBlock Bytes, 0, Count
     
     Dim i As Long
     For i = 2 To UBound(Octets)
         Count = EncodeNumber(Octets(i), Bytes)
-        EncodingStream.WriteBlock Bytes, 0, Count
+        Output.WriteBlock Bytes, 0, Count
     Next i
     
-    EncodingStream.Position = 1
-    EncodingStream.WriteByte EncodingStream.Length - 2
-    EncodeOID = EncodingStream.ToArray
+    Output.Position = 1
+    Output.WriteByte Output.Length - 2
+    EncodeOID = Output.ToArray
 
     Exit Function
     
@@ -163,12 +163,12 @@ End Function
 ' @param Name The name of the object to obtain the identifier for.
 ' @return The object identifier (OID) for the object.
 '
-Public Function MapNameToOID(ByVal Name As String) As String
-    Dim Oid As Variant
+Public Function MapNameToOID(ByRef Name As String) As String
+    Dim OID As Variant
     
-    Oid = DefaultOids(Name)
-    If Not IsEmpty(Oid) Then
-        MapNameToOID = Oid
+    OID = DefaultOids(Name)
+    If Not IsEmpty(OID) Then
+        MapNameToOID = OID
     End If
 End Function
 
@@ -316,17 +316,6 @@ Private Property Get DefaultOids() As Hashtable
 End Property
 
 Private Sub InitDefaultOids()
-'    Const OID_RSA_SMIMEalgCMS3DESwrap   As String = "1.2.840.113549.1.9.16.3.6"
-'    Const OID_RSA_MD5                   As String = "1.2.840.113549.2.5"
-'    Const OID_RSA_RC2CBC                As String = "1.2.840.113549.3.2"
-'    Const OID_RSA_DES_EDE3_CBC          As String = "1.2.840.113549.3.7"
-'    Const OID_OIWSEC_desCBC             As String = "1.3.14.3.2.7"
-'    Const OID_OIWSEC_SHA1               As String = "1.3.14.3.2.26"
-'    Const OID_OIWSEC_SHA256             As String = "2.16.840.1.101.3.4.2.1"
-'    Const OID_OIWSEC_SHA384             As String = "2.16.840.1.101.3.4.2.2"
-'    Const OID_OIWSEC_SHA512             As String = "2.16.840.1.101.3.4.2.3"
-'    Const OID_OIWSEC_RIPEMD160          As String = "1.3.36.3.2.1"
-    
     Set mDefaultOids = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
     With mDefaultOids
         .Add "", "1.2.840.113549.1.9.9"
