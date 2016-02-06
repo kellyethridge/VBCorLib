@@ -650,3 +650,7 @@ End Property
 Public Property Get StringComparer() As StringComparerStatic
     Set StringComparer = Statics.StringComparer
 End Property
+
+Public Property Get RSACryptoServiceProvider() As RSACryptoServiceProviderStatic
+    Set RSACryptoServiceProvider = Statics.RSACryptoServiceProvider
+End Property

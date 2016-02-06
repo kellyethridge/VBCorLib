@@ -507,11 +507,11 @@ Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteg
     Set x = x.Absolute
     Set y = y.Absolute
     
-    Dim r As BigInteger
+    Dim R As BigInteger
     Do While y.Sign <> Sign.Zero
-        Set r = Modulus(x, y)
+        Set R = Modulus(x, y)
         Set x = y
-        Set y = r
+        Set y = R
     Loop
 
     Set GreatestCommonDivisor = x
@@ -751,7 +751,7 @@ Public Function NotBits(ByVal x As BigInteger) As BigInteger
     End If
     
     Dim xNumber As Number
-    Call x.CopyNumber(xNumber)
+    x.CopyNumber xNumber
         
     Dim i As Long
     For i = 0 To xNumber.Precision - 1
@@ -782,17 +782,17 @@ End Function
 ' @return Returns the baseValue^exponent result.
 ' @remarks Values of Nothing are treated as zero.
 '
-Public Function Pow(ByVal baseValue As BigInteger, ByVal exponent As BigInteger) As BigInteger
+Public Function Pow(ByVal baseValue As BigInteger, ByVal Exponent As BigInteger) As BigInteger
     If baseValue Is Nothing Then Set baseValue = mZero
-    If exponent Is Nothing Then Set exponent = mZero
+    If Exponent Is Nothing Then Set Exponent = mZero
 
-    If exponent.Sign = Sign.Negative Then _
+    If Exponent.Sign = Sign.Negative Then _
         Throw Cor.NewArgumentException("Exponent cannot be negative.", "exponent")
 
-    If exponent.Sign = Sign.Zero Then
+    If Exponent.Sign = Sign.Zero Then
         Set Pow = mOne
         Exit Function
-    ElseIf exponent.IsOne Then
+    ElseIf Exponent.IsOne Then
         Set Pow = baseValue
         Exit Function
     End If
@@ -802,12 +802,12 @@ Public Function Pow(ByVal baseValue As BigInteger, ByVal exponent As BigInteger)
 
     Dim isOdd As Boolean
     Do
-        isOdd = exponent.TestBit(0)
-        Set exponent = exponent.ShiftRight(1)
+        isOdd = Exponent.TestBit(0)
+        Set Exponent = Exponent.ShiftRight(1)
 
         If isOdd Then
             Set y = Multiply(y, z)
-            If exponent.Sign = Sign.Zero Then
+            If Exponent.Sign = Sign.Zero Then
                 Set Pow = y
                 Exit Function
             End If
@@ -825,9 +825,9 @@ End Function
 ' @return Returns the modulus of the raised baseValue.
 ' <p>Values of Nothing are treated as zero.</p>
 '
-Public Function ModPow(ByVal baseValue As BigInteger, ByVal exponent As BigInteger, ByVal m As BigInteger) As BigInteger
-    Set baseValue = Pow(baseValue, exponent)
-    Call DivRem(baseValue, m, ModPow)
+Public Function ModPow(ByVal baseValue As BigInteger, ByVal Exponent As BigInteger, ByVal m As BigInteger) As BigInteger
+    Set baseValue = Pow(baseValue, Exponent)
+    DivRem baseValue, m, ModPow
 End Function
 
 ''
@@ -1048,16 +1048,16 @@ Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef 
     Dim j As Long: j = 1
     Dim k As Long
     For i = Len(s) - 1 To 2 + StartIndex Step -1
-        Dim ch As Long
+        Dim Ch As Long
         Select Case mChars(i)
-            Case 48 To 57:  ch = mChars(i) - 48
-            Case 65 To 70:  ch = mChars(i) - 55
-            Case 97 To 102: ch = mChars(i) - 87
+            Case 48 To 57:  Ch = mChars(i) - 48
+            Case 65 To 70:  Ch = mChars(i) - 55
+            Case 97 To 102: Ch = mChars(i) - 87
             Case Else
                 Exit Function
         End Select
         
-        k = k + ch * j
+        k = k + Ch * j
         j = j * 16
         
         If j = &H10000 Then
@@ -1093,14 +1093,14 @@ Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByR
     Dim j As Long: j = 1
     Dim k As Long
     For i = Len(s) - 1 To 2 + StartIndex Step -1
-        Dim ch As Long
+        Dim Ch As Long
         Select Case mChars(i)
-            Case 48, 49: ch = mChars(i) - 48
+            Case 48, 49: Ch = mChars(i) - 48
             Case Else
                 Exit Function
         End Select
         
-        k = k + ch * j
+        k = k + Ch * j
         j = j * 2
         
         If j = &H10000 Then
@@ -1158,12 +1158,12 @@ Private Function InternalDivide(ByRef dividend As BigInteger, ByRef divisor As B
     If yNumber.Precision > 1 Then
         quotientNumber = GradeSchoolDivide(xNumber, yNumber, remainderNumber, includeRemainder)
     Else
-        Dim r As Long
-        quotientNumber = SinglePlaceDivide(xNumber.Digits, xNumber.Precision, yNumber.Digits(0), r)
+        Dim R As Long
+        quotientNumber = SinglePlaceDivide(xNumber.Digits, xNumber.Precision, yNumber.Digits(0), R)
         
         If includeRemainder Then
             ReDim remainderNumber(0)
-            remainderNumber(0) = r
+            remainderNumber(0) = R
         End If
     End If
     

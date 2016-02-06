@@ -103,5 +103,6 @@ Public IOError                  As New IOError
 Public Number                   As New NumberStatic
 Public NullVersionableCollection As NullVersionableCollection
 Public StringComparer           As New StringComparerStatic
+Public RSACryptoServiceProvider As New RSACryptoServiceProviderStatic
 
 

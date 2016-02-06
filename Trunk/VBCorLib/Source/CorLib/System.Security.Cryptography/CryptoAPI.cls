@@ -117,7 +117,7 @@ Friend Function AcquireContext(Optional ByRef ContainerName As String, Optional 
     End If
     
     If Len(ContainerName) = 0 Then
-        ContainerName = CorString.Format("COR{0}", Guid.NewGuid)
+        ContainerName = CorString.Format("COR_{0}", Guid.NewGuid)
     End If
     
     If CryptAcquireContext(AcquireContext, ContainerName, ProviderName, ProviderType, Flags) = BOOL_FALSE Then
@@ -359,9 +359,9 @@ Private Sub CreateExponentOfOneKey()
     Set Params = Csp.ExportParameters(True)
     
     Dim One() As Byte
-    ReDim One(0 To UBound(Params.exponent))
+    ReDim One(0 To UBound(Params.Exponent))
     One(UBound(One)) = 1
-    Params.exponent = One
+    Params.Exponent = One
     
     ReDim One(0 To UBound(Params.DP))
     One(UBound(One)) = 1

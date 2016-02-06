@@ -44,8 +44,6 @@ Implements AsymmetricAlgorithm
 Implements RSA
 Implements ICspAsymmetricAlgorithm
 
-Private Declare Function CryptDuplicateKey Lib "advapi32.dll" (ByVal hKey As Long, ByVal pdwReserved As Long, ByVal dwFlags As Long, ByRef phKey As Long) As Long
-
 Private Const DEF_KEYNUMBER     As Long = AT_KEYEXCHANGE
 Private Const DEF_PROVIDERTYPE  As Long = PROV_RSA_AES
 
@@ -532,6 +530,11 @@ Private Sub Class_Initialize()
     
     mProviderType = DEF_PROVIDERTYPE
     mKeyNumber = DEF_KEYNUMBER
+    mRandomlyGenerated = True
+    
+    If RSACryptoServiceProvider.UseMachineKeyStore Then
+        mFlags = UseMachineKeyStore
+    End If
 End Sub
 
 Friend Sub Init(ByVal KeySize As Long, ByVal Params As CspParameters)
@@ -545,6 +548,7 @@ Friend Sub Init(ByVal KeySize As Long, ByVal Params As CspParameters)
         mKeyContainerName = Params.KeyContainerName
         mKeyNumber = IIf(Params.KeyNumber = -1, DEF_KEYNUMBER, Params.KeyNumber)
         mFlags = Params.Flags
+        mRandomlyGenerated = Len(mKeyContainerName) > 0
         
         mPersistKeyInCsp = True
     End If

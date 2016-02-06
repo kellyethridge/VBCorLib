@@ -45,7 +45,7 @@ Public Sub CloseHandle_WhenClosed_NotifiesSubclass()
     
     SUT.CloseHandle
     
-    Assert.That SUT.ReleaseHandleCallCount, Iz.EqualTo(1)
+    Assert.That SUT.ReleaseHandleCallCount.Value, Iz.EqualTo(1)
     Assert.That SUT.IsClosed, Iz.True
 End Sub
 
@@ -55,7 +55,18 @@ Public Sub CloseHandle_WhenNotHandleOwner_DoesNotReleaseHandle()
     
     SUT.CloseHandle
     
-    Assert.That SUT.ReleaseHandleCallCount, Iz.EqualTo(0)
+    Assert.That SUT.ReleaseHandleCallCount.Value, Iz.EqualTo(0)
     Assert.That SUT.IsClosed, Iz.False
 End Sub
 
+Public Sub ReleaseHandle_WhenSetToNothing_IsCalled()
+    Dim SUT As FakeSafeHandle
+    Dim Count As Count
+    Set SUT = New FakeSafeHandle
+    Set Count = SUT.ReleaseHandleCallCount
+    SUT.Init 2, True
+    
+    Set SUT = Nothing
+    
+    Assert.That Count.Value, Iz.EqualTo(1)
+End Sub

@@ -25,7 +25,7 @@ version 3.0 (BREAKING CHANGES)
 	* Removed Comparer parameter from Stack.Contains method to align more with .NET.
 	* Added LeaveOpen constructor parameter to StreamReader.
 	* Added EndOfStream property to StreamReader.
-    * Added SafeHandle and SafeHandleBase types.
+	* Added SafeHandle and SafeHandleBase types.
 	* Added SafeFileHandle type.
 	* Added MyBase methods to separate IObject implementations from standard Object.* calls.
 	* Reordered 'Message' and 'ParamName' arguments in ArgumentException to more align with .NET. **

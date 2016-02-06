@@ -39,3 +39,4 @@ Public Sub Constructor_WithValues_SetsProperties()
     Assert.That Params.ProviderName, Iz.EqualTo("Provider")
     Assert.That Params.KeyContainerName, Iz.EqualTo("Container")
 End Sub
+

@@ -17,7 +17,7 @@ Implements SafeHandle
 Private WithEvents mBase As SafeHandle
 Attribute mBase.VB_VarHelpID = -1
 
-Public ReleaseHandleCallCount As Long
+Public ReleaseHandleCallCount As New Count
 
 
 Public Sub Init(ByVal Handle As Long, ByVal OwnsHandle As Boolean)
@@ -40,8 +40,12 @@ Public Property Get IsInvalid() As Boolean
     IsInvalid = mBase.IsInvalid
 End Property
 
+Private Sub Class_Terminate()
+    CloseHandle
+End Sub
+
 Private Sub mBase_ReleaseHandle()
-    ReleaseHandleCallCount = ReleaseHandleCallCount + 1
+    ReleaseHandleCallCount.Increment
 End Sub
 
 Private Sub SafeHandle_CloseHandle()
