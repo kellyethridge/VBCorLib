@@ -105,7 +105,7 @@ Public Function ToArray() As Byte()
         i = Me.Precision
         
         ReDim Ret(0 To i - 1)
-        Call Buffer.BlockCopy(mNumber.Digits, 0, Ret, 0, i)
+        Buffer.BlockCopy mNumber.Digits, 0, Ret, 0, i
     End If
         
     ToArray = Ret
@@ -452,8 +452,8 @@ End Function
 ' @param exponent The value to raise the BigInteger value to.
 ' @return Returns the BigInteger value raised to the specified power.
 '
-Public Function Pow(ByVal exponent As BigInteger) As BigInteger
-    Set Pow = BigInteger.Pow(Me, exponent)
+Public Function Pow(ByVal Exponent As BigInteger) As BigInteger
+    Set Pow = BigInteger.Pow(Me, Exponent)
 End Function
 
 ''

@@ -49,7 +49,6 @@ Private mKeyNumber              As KeyNumber
 Private mMachineKeyStore        As Boolean
 Private mExportable             As Boolean
 Private mAccessible             As Boolean
-Private mProtected              As Boolean
 Private mRandomlyGenerated      As Boolean
 Private mRemovable              As Boolean
 Private mIsLoaded               As Boolean
@@ -112,8 +111,6 @@ End Property
 ' @return Returns True if protected, False otherwise.
 '
 Public Property Get Protected() As Boolean
-    VerifyLoaded
-    Protected = mProtected
 End Property
 
 ''
@@ -243,7 +240,7 @@ Private Sub VerifyLoaded()
     End If
     
     Dim Provider As Long
-    Provider = CryptoAPI.AcquireContext(mKeyContainerName, mProviderName, mProviderType)
+    Provider = CryptoAPI.AcquireContext(mKeyContainerName, , mProviderType)
     mUniqueKeyContainerName = CryptoAPI.GetProvParamString(Provider, PP_UNIQUE_CONTAINER)
     
     Dim Key As Long
@@ -261,6 +258,7 @@ Private Sub VerifyLoaded()
     End If
     
     CryptoAPI.ReleaseContext Provider, True
+    mIsLoaded = True
 End Sub
 
 

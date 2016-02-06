@@ -93,5 +93,3 @@ Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean, By
     mOwnsHandle = OwnsHandle
     mZeroIsInvalid = ZeroIsInvalid
 End Sub
-
-

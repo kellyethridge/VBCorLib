@@ -72,8 +72,8 @@ End Property
 ' @param RHS The new D parameter value.
 ' @remarks This is the Private Exponent of the RSA key.
 '
-Public Property Let d(ByRef RHS() As Byte)
-    md = RHS
+Public Property Let d(ByRef Value() As Byte)
+    md = Value
 End Property
 
 ''
@@ -121,8 +121,8 @@ End Property
 '
 ' @return A byte array of the public exponent.
 '
-Public Property Get exponent() As Byte()
-    exponent = mExponent()
+Public Property Get Exponent() As Byte()
+    Exponent = mExponent()
 End Property
 
 ''
@@ -130,7 +130,7 @@ End Property
 '
 ' @param RHS The new exponent value.
 '
-Public Property Let exponent(ByRef RHS() As Byte)
+Public Property Let Exponent(ByRef RHS() As Byte)
     mExponent = RHS
 End Property
 
@@ -330,8 +330,6 @@ Friend Sub FromCspBlob(ByRef Blob() As Byte)
     ' make the array big-endian
     Call CorArray.Reverse(mExponent)
     
-    'Call Reader.ReadByte
-    
     ' start reading in all the key stuff.
     mModulus = ReverseByteCopy(Reader.ReadBytes(BitLen \ 8))
     
@@ -349,40 +347,40 @@ End Sub
 
 Friend Function ToCspBlob(ByVal KeyNumber As Long) As Byte()
     Dim ms As New MemoryStream
-    Dim writer As BinaryWriter
-    Set writer = Cor.NewBinaryWriter(ms)
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(ms)
     
     Dim BlobType As Byte
     BlobType = IIf(CorArray.IsNull(md), PUBLICKEYBLOB, PRIVATEKEYBLOB)
     
     ' Build BLOBHEADER structure
-    Call writer.WriteValue(BlobType)
-    Call writer.WriteValue(CByte(2))
-    Call writer.WriteValue(CInt(0))
-    Call writer.WriteValue(CLng(IIf(KeyNumber = AT_KEYEXCHANGE, CALG_RSA_KEYX, CALG_RSA_SIGN)))
+    Writer.WriteValue BlobType
+    Call Writer.WriteValue(CByte(2))
+    Call Writer.WriteValue(CInt(0))
+    Call Writer.WriteValue(CLng(IIf(KeyNumber = AT_KEYEXCHANGE, CALG_RSA_KEYX, CALG_RSA_SIGN)))
     
     ' Build RSAPUBKEY structure
-    Call writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352)))
-    Call writer.WriteValue(CLng(CorArray.Length(mModulus) * 8))
-    Call writer.WriteValue(ReverseByteCopy(mExponent))
+    Call Writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352)))
+    Call Writer.WriteValue(CLng(CorArray.Length(mModulus) * 8))
+    Call Writer.WriteValue(ReverseByteCopy(mExponent))
     
     Dim i As Long
     i = 4 - CorArray.Length(mExponent)
     Do While i > 0
-        Call writer.WriteValue(CByte(0))
+        Call Writer.WriteValue(CByte(0))
         i = i - 1
     Loop
     
     ' Start adding all the key stuff.
-    Call writer.WriteValue(ReverseByteCopy(mModulus))
+    Call Writer.WriteValue(ReverseByteCopy(mModulus))
     
     If BlobType = PRIVATEKEYBLOB Then
-        Call writer.WriteValue(ReverseByteCopy(mP))
-        Call writer.WriteValue(ReverseByteCopy(mQ))
-        Call writer.WriteValue(ReverseByteCopy(mDP))
-        Call writer.WriteValue(ReverseByteCopy(mDQ))
-        Call writer.WriteValue(ReverseByteCopy(mInverseQ))
-        Call writer.WriteValue(ReverseByteCopy(md))
+        Call Writer.WriteValue(ReverseByteCopy(mP))
+        Call Writer.WriteValue(ReverseByteCopy(mQ))
+        Call Writer.WriteValue(ReverseByteCopy(mDP))
+        Call Writer.WriteValue(ReverseByteCopy(mDQ))
+        Call Writer.WriteValue(ReverseByteCopy(mInverseQ))
+        Call Writer.WriteValue(ReverseByteCopy(md))
     End If
     
     ToCspBlob = ms.ToArray
@@ -434,8 +432,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

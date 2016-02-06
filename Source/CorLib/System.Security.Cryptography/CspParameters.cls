@@ -251,20 +251,31 @@ Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
 
+Friend Function Clone() As CspParameters
+    Set Clone = New CspParameters
+    Clone.InitClone Me
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mFlags = NoFlags
+    mKeyNumber = DefaultKeyNumber
+    mProviderType = PROV_RSA_AES
+End Sub
+
 Friend Sub Init(ByVal TypeIn As Long, ByRef ProviderNameIn As String, ByRef ContainerNameIn As String)
     mProviderType = TypeIn
     mProviderName = ProviderNameIn
     mKeyContainerName = ContainerNameIn
 End Sub
 
-Private Sub Class_Initialize()
-    mFlags = NoFlags
-    mKeyNumber = DefaultKeyNumber
-    mProviderType = PROV_RSA_AES
+Friend Sub InitClone(ByVal Params As CspParameters)
+    Init Params.ProviderType, Params.ProviderName, Params.KeyContainerName
+    mKeyNumber = Params.KeyNumber
+    mFlags = Params.Flags
 End Sub
 
 
