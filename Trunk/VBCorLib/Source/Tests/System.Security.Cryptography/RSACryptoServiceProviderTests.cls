@@ -226,46 +226,46 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Constructor_WhenCalled_SetsDefaults()
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
-    Assert.That Csp.KeySize, Iz.EqualTo(1024), "KeySize"
-    Assert.That Csp.PersistKeyInCsp, Iz.False, "PersistKeyInCsp"
-    Assert.That Csp.PublicOnly, Iz.False, "PublicOnly"
+    Assert.That csp.KeySize, Iz.EqualTo(1024), "KeySize"
+    Assert.That csp.PersistKeyInCsp, Iz.False, "PersistKeyInCsp"
+    Assert.That csp.PublicOnly, Iz.False, "PublicOnly"
 End Sub
 
 Public Sub Constructor_WithKeySize_SetsKeySize()
-    Dim Csp As RSACryptoServiceProvider
+    Dim csp As RSACryptoServiceProvider
     
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
-    Assert.That Csp.KeySize, Iz.EqualTo(MinKeySize), "KeySize"
-    Assert.That Csp.PersistKeyInCsp, Iz.False, "PersistKeyInCsp"
-    Assert.That Csp.PublicOnly, Iz.False, "PublicOnly"
+    Assert.That csp.KeySize, Iz.EqualTo(MinKeySize), "KeySize"
+    Assert.That csp.PersistKeyInCsp, Iz.False, "PersistKeyInCsp"
+    Assert.That csp.PublicOnly, Iz.False, "PublicOnly"
 End Sub
 
 Public Sub Constructor_WithCspParameters_SetsValues()
     Dim Params  As CspParameters
-    Dim Csp     As RSACryptoServiceProvider
+    Dim csp     As RSACryptoServiceProvider
     Set Params = Cor.NewCspParameters(1, , "CorLib1024")
     
-    Set Csp = Cor.NewRSACryptoServiceProvider(Parameters:=Params)
+    Set csp = Cor.NewRSACryptoServiceProvider(Parameters:=Params)
     
-    Assert.That Csp.KeySize, Iz.EqualTo(1024), "KeySize"
-    Assert.That Csp.PersistKeyInCsp, Iz.True, "PersistKeyInCsp"
-    Assert.That Csp.PublicOnly, Iz.False, "PublicOnly"
+    Assert.That csp.KeySize, Iz.EqualTo(1024), "KeySize"
+    Assert.That csp.PersistKeyInCsp, Iz.True, "PersistKeyInCsp"
+    Assert.That csp.PublicOnly, Iz.False, "PublicOnly"
 End Sub
 
 Public Sub Constructor_WithKeySizeAndCspParameters_SetsValues()
     Const KeySize   As Long = 512
     Dim Params      As CspParameters
-    Dim Csp         As RSACryptoServiceProvider
+    Dim csp         As RSACryptoServiceProvider
     Set Params = Cor.NewCspParameters(1, ContainerNameIn:="CorLib512")
     
-    Set Csp = Cor.NewRSACryptoServiceProvider(KeySize, Params)
+    Set csp = Cor.NewRSACryptoServiceProvider(KeySize, Params)
     
-    Assert.That Csp.KeySize, Iz.EqualTo(KeySize), "KeySize"
-    Assert.That Csp.PersistKeyInCsp, Iz.True, "PersistKeyInCsp"
-    Assert.That Csp.PublicOnly, Iz.False, "PublicOnly"
+    Assert.That csp.KeySize, Iz.EqualTo(KeySize), "KeySize"
+    Assert.That csp.PersistKeyInCsp, Iz.True, "PersistKeyInCsp"
+    Assert.That csp.PublicOnly, Iz.False, "PublicOnly"
 End Sub
 
 Public Sub Constructor_WithTooSmallKeySize_ThrowsCryptographicException()
@@ -291,66 +291,66 @@ Public Sub Constructor_WithTooLargeKeySize_ThrowsCryptographicException()
 End Sub
 
 Public Sub Properties_WhenCalled_ReturnsExpected()
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     Dim KeySizes() As KeySizes
     
-    KeySizes = Csp.LegalKeySizes
+    KeySizes = csp.LegalKeySizes
     Assert.That CorArray.Length(KeySizes), Iz.EqualTo(1), "LegalKeySizes"
     Assert.That KeySizes(0).MinSize, Iz.EqualTo(384), "LegalKeySize.MinSize"
     Assert.That KeySizes(0).MaxSize, Iz.EqualTo(16384), "LegalKeySize.MaxSize"
     Assert.That KeySizes(0).SkipSize, Iz.EqualTo(8), "LegalKeySize.SkipSize"
-    Assert.That Csp.KeyExchangeAlgorithm, Iz.EqualTo("RSA-PKCS1-KeyEx"), "KeyExchangeAlgorithm"
-    Assert.That Csp.SignatureAlgorithm, Iz.EqualTo("http://www.w3.org/2000/09/xmldsig#rsa-sha1"), "SignatureAlgorithm"
-    Csp.Clear
-    KeySizes = Csp.LegalKeySizes
+    Assert.That csp.KeyExchangeAlgorithm, Iz.EqualTo("RSA-PKCS1-KeyEx"), "KeyExchangeAlgorithm"
+    Assert.That csp.SignatureAlgorithm, Iz.EqualTo("http://www.w3.org/2000/09/xmldsig#rsa-sha1"), "SignatureAlgorithm"
+    csp.Clear
+    KeySizes = csp.LegalKeySizes
     Assert.That CorArray.Length(KeySizes), Iz.EqualTo(1), "LegalKeySizes(disposed)"
     Assert.That KeySizes(0).MinSize, Iz.EqualTo(384), "LegalKeySize.MinSize(disposed)"
     Assert.That KeySizes(0).MaxSize, Iz.EqualTo(16384), "LegalKeySize.MaxSize(disposed)"
     Assert.That KeySizes(0).SkipSize, Iz.EqualTo(8), "LegalKeySize.SkipSize(disposed)"
-    Assert.That Csp.KeyExchangeAlgorithm, Iz.EqualTo("RSA-PKCS1-KeyEx"), "KeyExchangeAlgorithm(disposed)"
-    Assert.That Csp.SignatureAlgorithm, Iz.EqualTo("http://www.w3.org/2000/09/xmldsig#rsa-sha1"), "SignatureAlgorithm(disposed)"
+    Assert.That csp.KeyExchangeAlgorithm, Iz.EqualTo("RSA-PKCS1-KeyEx"), "KeyExchangeAlgorithm(disposed)"
+    Assert.That csp.SignatureAlgorithm, Iz.EqualTo("http://www.w3.org/2000/09/xmldsig#rsa-sha1"), "SignatureAlgorithm(disposed)"
 End Sub
 
 Public Sub SignData_WithNullArray_ThrowsArgumentNullException()
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.SignData NullBytes, SHA1.Create
+    csp.SignData NullBytes, SHA1.Create
     
     AssertArgumentNullException Err, "Buffer"
 End Sub
 
 Public Sub SignData_WithNullStream_ThrowsArgumentNullException()
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.SignData Nothing, SHA1.Create
+    csp.SignData Nothing, SHA1.Create
     
     AssertArgumentNullException Err, "Source"
 End Sub
 
 Public Sub SignData_WithInvalidOid_ThrowsArgument()
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.SignData NewBytes(0, 0, 0, 0, 0), "1.2.3"
+    csp.SignData NewBytes(0, 0, 0, 0, 0), "1.2.3"
     
     AssertArgumentException Err, "hAlg"
 End Sub
 
 Public Sub SignData_WithOid_DoesNotThrowException()
     Dim Oid As String
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     Oid = CryptoConfig.MapNameToOID("SHA256")
     
-    Csp.SignData NewBytes(0, 0, 0, 0, 0), Oid
+    csp.SignData NewBytes(0, 0, 0, 0, 0), Oid
 End Sub
 
 Public Sub SignHash_WithNullArray_ThrowsArgumentNullException()
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.SignHash NullBytes, "SHA1"
+    csp.SignHash NullBytes, "SHA1"
     
     AssertArgumentNullException Err, "RgbHash"
 End Sub
@@ -358,54 +358,54 @@ End Sub
 Public Sub SignHash_WithValues_IsVerified(ByVal AlgName As String, ByVal Size As Long)
     Dim Oid As String
     Dim Hash() As Byte
-    Dim Csp As RSACryptoServiceProvider
+    Dim csp As RSACryptoServiceProvider
     
     Oid = CryptoConfig.MapNameToOID(AlgName)
     ReDim Hash(0 To Size - 1)
-    Set Csp = Cor.NewRSACryptoServiceProvider(1024)
+    Set csp = Cor.NewRSACryptoServiceProvider(1024)
     
     Dim Signature() As Byte
-    Signature = Csp.SignHash(Hash, Oid)
+    Signature = csp.SignHash(Hash, Oid)
     
-    Assert.That Csp.VerifyHash(Hash, Oid, Signature), Iz.True
+    Assert.That csp.VerifyHash(Hash, Oid, Signature), Iz.True
 End Sub
 
 Public Sub SignHash_WithRIPEMD160_ThrowsCryptographicException()
     Dim Hash(0 To 19) As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.SignHash Hash, "RIPEMD160"
+    csp.SignHash Hash, "RIPEMD160"
     
     AssertCryptographicException Err
 End Sub
 
 Public Sub SignHash_WithInvalidHashLength_ThrowsCryptographicException()
     Dim Hash(0 To 18) As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.SignHash Hash, "SHA1"
+    csp.SignHash Hash, "SHA1"
     
     AssertCryptographicException Err
 End Sub
 
 Public Sub VerifyData_WithNullData_ThrowsArgumentNullException()
     Dim Signature(0 To 19) As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.VerifyData NullBytes, "SHA1", Signature
+    csp.VerifyData NullBytes, "SHA1", Signature
     
     AssertArgumentNullException Err, "Buffer"
 End Sub
 
 Public Sub VerifyData_WithNullSignature_ThrowsArgumentNullException()
     Dim Hash(0 To 19) As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.VerifyData Hash, "SHA1", NullBytes
+    csp.VerifyData Hash, "SHA1", NullBytes
     
     AssertArgumentNullException Err, "Signature"
 End Sub
@@ -413,60 +413,60 @@ End Sub
 Public Sub VerifyHash_WithInvalidHashLength_ThrowsCryptographicException()
     Dim Hash(0 To 18) As Byte
     Dim Signature(0 To 8191) As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.VerifyHash Hash, "1.3.14.3.2.26", Signature
+    csp.VerifyHash Hash, "1.3.14.3.2.26", Signature
     
     AssertCryptographicException Err
 End Sub
 
 Public Sub VerifyHash_WithNullHash_ThrowsArgumentNullException()
     Dim Signature(0 To 8191) As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.VerifyHash NullBytes, "1.3.14.3.2.26", Signature
+    csp.VerifyHash NullBytes, "1.3.14.3.2.26", Signature
     
     AssertArgumentNullException Err, "RgbHash"
 End Sub
 
 Public Sub VerifyHash_WithNullSignature_ThrowsArgumentNullException()
     Dim Hash(0 To 19) As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
     On Error Resume Next
-    Csp.VerifyHash Hash, "1.3.14.3.2.26", NullBytes
+    csp.VerifyHash Hash, "1.3.14.3.2.26", NullBytes
     
     AssertArgumentNullException Err, "Signature"
 End Sub
 
 Public Sub ImportExport_WithCapiXml_ShouldNotThrowException(ByVal XmlString As String, ByVal CapiName As String)
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
-    Csp.FromXmlString XmlString
+    csp.FromXmlString XmlString
     Dim Actual As String
-    Actual = Csp.ToXmlString(True)
+    Actual = csp.ToXmlString(True)
     
     Assert.That Actual, Iz.EqualTo(XmlString), CapiName
 End Sub
 
 Public Sub FromXmlString_WhenCapiWithoutCRT_ShouldNotThrowException(ByVal XmlString As String)
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
-    Csp.FromXmlString XmlString
+    csp.FromXmlString XmlString
 End Sub
 
 Public Sub SignAndVerify_WithCapi_ShouldBeValid(ByVal XmlString As String)
     Dim Hash() As Byte
     Dim Signature() As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     Hash = NewBytes(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
-    Csp.FromXmlString XmlString
-    Signature = Csp.SignHash(Hash, "SHA1")
+    csp.FromXmlString XmlString
+    Signature = csp.SignHash(Hash, "SHA1")
     
     Dim Params As RSAParameters
-    Set Params = Csp.ExportParameters(False)
+    Set Params = csp.ExportParameters(False)
     Dim Key As New RSACryptoServiceProvider
     Key.ImportParameters Params
     
@@ -475,47 +475,47 @@ End Sub
 
 Public Sub SignHash_WithCapiXml384woCRT_ThrowsCryptographicException()
     Dim Hash(0 To 19) As Byte
-    Dim Csp As New RSACryptoServiceProvider
-    Csp.FromXmlString CapiXml384woCRT
+    Dim csp As New RSACryptoServiceProvider
+    csp.FromXmlString CapiXml384woCRT
     
     On Error Resume Next
-    Csp.SignHash Hash, "SHA1"
+    csp.SignHash Hash, "SHA1"
     
     AssertCryptographicException Err
 End Sub
 
 Public Sub ImportExport_WithMonoXml_ShouldNotThrowException(ByVal XmlString As String, ByVal MonoName As String)
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
 
-    Csp.FromXmlString XmlString
+    csp.FromXmlString XmlString
     Dim Actual As String
-    Actual = Csp.ToXmlString(True)
+    Actual = csp.ToXmlString(True)
     
     Assert.That Actual, Iz.EqualTo(XmlString), MonoName
 End Sub
 
 Public Sub FromXmlString_WhenMonoWithoutCRT_ShouldNotThrowException(ByVal XmlString As String)
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     
-    Csp.FromXmlString XmlString
+    csp.FromXmlString XmlString
 End Sub
 
 Public Sub ToXmlString_WhenIncludePrivateInfoWithoutCRT_ShouldThrowCryptographicException()
-    Dim Csp As New RSACryptoServiceProvider
-    Csp.FromXmlString CapiXml384woCRT
+    Dim csp As New RSACryptoServiceProvider
+    csp.FromXmlString CapiXml384woCRT
     
     On Error Resume Next
-    Csp.ToXmlString True
+    csp.ToXmlString True
     
     AssertCryptographicException Err
 End Sub
 
 Public Sub ExportParameters_WhenIncludePrivateInfoWithoutCRT_ShouldThrowCryptographicException()
-    Dim Csp As New RSACryptoServiceProvider
-    Csp.FromXmlString CapiXml384woCRT
+    Dim csp As New RSACryptoServiceProvider
+    csp.FromXmlString CapiXml384woCRT
     
     On Error Resume Next
-    Csp.ExportParameters True
+    csp.ExportParameters True
     
     AssertCryptographicException Err
 End Sub
@@ -523,13 +523,13 @@ End Sub
 Public Sub SignAndVerify_WithMono_ShouldBeValid(ByVal XmlString As String)
     Dim Hash() As Byte
     Dim Signature() As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     Hash = NewBytes(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
-    Csp.FromXmlString XmlString
-    Signature = Csp.SignHash(Hash, "SHA1")
+    csp.FromXmlString XmlString
+    Signature = csp.SignHash(Hash, "SHA1")
     
     Dim Params As RSAParameters
-    Set Params = Csp.ExportParameters(False)
+    Set Params = csp.ExportParameters(False)
     Dim Key As New RSACryptoServiceProvider
     Key.ImportParameters Params
     
@@ -538,24 +538,24 @@ End Sub
 
 Public Sub VerifyHash_WithCapi_ReturnsExpected(ByVal XmlString As String, ByRef Signature() As Byte, ByVal CapiName As String)
     Dim Hash() As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     Hash = NewBytes(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
-    Csp.FromXmlString XmlString
+    csp.FromXmlString XmlString
     
-    Assert.That Csp.VerifyHash(Hash, "SHA1", Signature), Iz.True, CapiName
+    Assert.That csp.VerifyHash(Hash, "SHA1", Signature), Iz.True, CapiName
     Signature(0) = 0
-    Assert.That Csp.VerifyHash(Hash, "SHA1", Signature), Iz.False, CapiName
+    Assert.That csp.VerifyHash(Hash, "SHA1", Signature), Iz.False, CapiName
 End Sub
 
 Public Sub VerifyHash_WithMono_ReturnsExpected(ByVal XmlString As String, ByRef Signature() As Byte, ByVal MonoName As String)
     Dim Hash() As Byte
-    Dim Csp As New RSACryptoServiceProvider
+    Dim csp As New RSACryptoServiceProvider
     Hash = NewBytes(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19)
-    Csp.FromXmlString XmlString
+    csp.FromXmlString XmlString
     
-    Assert.That Csp.VerifyHash(Hash, "SHA1", Signature), Iz.True, MonoName
+    Assert.That csp.VerifyHash(Hash, "SHA1", Signature), Iz.True, MonoName
     Signature(0) = 0
-    Assert.That Csp.VerifyHash(Hash, "SHA1", Signature), Iz.False, MonoName
+    Assert.That csp.VerifyHash(Hash, "SHA1", Signature), Iz.False, MonoName
 End Sub
 
 Public Sub PersistKeyInCsp_WhenFalseAndClearNotCalled_StoresInSameContainer()
@@ -628,74 +628,74 @@ End Sub
 
 Public Sub EncryptDecrypt_WithPKCS1_ReturnsOriginalValue()
     Dim Data(0 To 7) As Byte
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
     Dim EncData() As Byte
     Dim DecData() As Byte
-    EncData = Csp.Encrypt(Data, False)
-    DecData = Csp.Decrypt(EncData, False)
+    EncData = csp.Encrypt(Data, False)
+    DecData = csp.Decrypt(EncData, False)
     
     Assert.That DecData, Iz.EqualTo(Data)
 End Sub
 
 Public Sub EncryptDecrypt_WithfOAEP_ReturnsOriginalValue()
     Dim Data(0 To 7) As Byte
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(512)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(512)
     
     Dim EncData() As Byte
     Dim DecData() As Byte
-    EncData = Csp.Encrypt(Data, True)
-    DecData = Csp.Decrypt(EncData, True)
+    EncData = csp.Encrypt(Data, True)
+    DecData = csp.Decrypt(EncData, True)
     
     Assert.That DecData, Iz.EqualTo(Data)
 End Sub
 
 Public Sub CspKeyContainerInfo_WhenCalledWithNewKeyPair_ReturnsExpected()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
-    Dim Info As CspKeyContainerInfo
-    Set Info = Csp.CspKeyContainerInfo
+    Dim info As CspKeyContainerInfo
+    Set info = csp.CspKeyContainerInfo
     
-    Assert.That Info.Accessible, Iz.True, "Accessible"
-    Assert.That Info.Exportable, Iz.True, "Exportable"
-    Assert.That Info.KeyContainerName, Iz.Not.Empty, "KeyContainerName"
-    Assert.That Info.KeyNumber, Iz.EqualTo(KeyNumber.Exchange), "KeyNumber"
-    Assert.That Info.MachineKeyStore, Iz.False, "MachineKeyStore"
-    Assert.That Info.Protected, Iz.False, "Protected"
-    Assert.That Info.RandomlyGenerated, Iz.True, "RandomlyGenerated"
-    Assert.That Info.Removable, Iz.False, "Removable"
-    Assert.That Info.UniqueKeyContainerName, Iz.Not.Empty, "UniqueKeyContainerName"
+    Assert.That info.Accessible, Iz.True, "Accessible"
+    Assert.That info.Exportable, Iz.True, "Exportable"
+    Assert.That info.KeyContainerName, Iz.Not.Empty, "KeyContainerName"
+    Assert.That info.KeyNumber, Iz.EqualTo(KeyNumber.Exchange), "KeyNumber"
+    Assert.That info.MachineKeyStore, Iz.False, "MachineKeyStore"
+    Assert.That info.Protected, Iz.False, "Protected"
+    Assert.That info.RandomlyGenerated, Iz.True, "RandomlyGenerated"
+    Assert.That info.Removable, Iz.False, "Removable"
+    Assert.That info.UniqueKeyContainerName, Iz.Not.Empty, "UniqueKeyContainerName"
 End Sub
 
 Public Sub CspKeyContainerInfo_WhenCalledWithImportedKeyPair_ReturnsExpected()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
-    Csp.ImportParameters KeyPair(True)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    csp.ImportParameters KeyPair(True)
     
-    Dim Info As CspKeyContainerInfo
-    Set Info = Csp.CspKeyContainerInfo
+    Dim info As CspKeyContainerInfo
+    Set info = csp.CspKeyContainerInfo
     
-    Assert.That Info.Accessible, Iz.True, "Accessible"
-    Assert.That Info.Exportable, Iz.True, "Exportable"
-    Assert.That Info.KeyContainerName, Iz.Not.Empty, "KeyContainerName"
-    Assert.That Info.KeyNumber, Iz.EqualTo(KeyNumber.Exchange), "KeyNumber"
-    Assert.That Info.MachineKeyStore, Iz.False, "MachineKeyStore"
-    Assert.That Info.Protected, Iz.False, "Protected"
-    Assert.That Info.RandomlyGenerated, Iz.True, "RandomlyGenerated"
-    Assert.That Info.Removable, Iz.False, "Removable"
-    Assert.That Info.UniqueKeyContainerName, Iz.Not.Empty, "UniqueKeyContainerName"
+    Assert.That info.Accessible, Iz.True, "Accessible"
+    Assert.That info.Exportable, Iz.True, "Exportable"
+    Assert.That info.KeyContainerName, Iz.Not.Empty, "KeyContainerName"
+    Assert.That info.KeyNumber, Iz.EqualTo(KeyNumber.Exchange), "KeyNumber"
+    Assert.That info.MachineKeyStore, Iz.False, "MachineKeyStore"
+    Assert.That info.Protected, Iz.False, "Protected"
+    Assert.That info.RandomlyGenerated, Iz.True, "RandomlyGenerated"
+    Assert.That info.Removable, Iz.False, "Removable"
+    Assert.That info.UniqueKeyContainerName, Iz.Not.Empty, "UniqueKeyContainerName"
 End Sub
 
 Public Sub ExportCspBlob_WithPublicAndPrivate_ExportsBlob()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
-    Csp.ImportParameters KeyPair(True)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    csp.ImportParameters KeyPair(True)
     
     Dim Actual() As Byte
-    Actual = Csp.ExportCspBlob(True)
+    Actual = csp.ExportCspBlob(True)
     
     Const Expected As String = "07-02-00-00-00-A4-00-00-52-53-41-32-00-04-00-00-11-00-00-00-CB-BD-1D-09-FD-E5-F8-46-59-8F-2A-CA-98-72-53-E2-7F-68-C1-F6-41-9A-7A-52-1F-A5-61-7B-2D-B1-AA-E0-4E-39-98-45-45-B2-34-88-74-53-09-06-9D-64-6A-EE-84-25-3A-D9-B7-B4-E6-3E-72-37-C7-DF-A3-E0-B8-AF-7F-80-8B-5B-8A-9D-71-19-46-EC-E1-60-0D-52-ED-76-48-CD-6F-EB-CE-48-EA-61-AB-02-5C-03-AF-BA-DF-B8-1F-F5-54-74-F0-B6-D6-40-A4-43-10-D4-EE-07-8D-36-F7-71-A8-9D-2B-AC-38-23-9C-CE-82-06-09-2F-F8-BB-99-65-FB-58-2A-BA-41-75-39-1F-9D-45-76-21-25-5B-2D-0A-04-AA-E7-FA-28-7E-3B-1E-5D-6E-23-F0-4E-12-32-F6-84-3D-9E-1A-B8-93-A4-FD-F4-AE-44-9F-EB-99-01-60-B5-A1-10-0B-81-08-C9-B3-B9-B1-81-AE-CF-EE-03-15-46-AF-00-E7-41-A4-A5-16-04-4D-52-52-33-CE-CF-B5-04-32-B4-A3-0D-EA-92-2E-B4-66-16-B4-40-98-86-9D-8B-02-35-20-0F-5A-D0-B1-66-88-D0-42-6C-3F-35-D9-D1-AA-EA-33-12-34-F6-53-F4-27-F0-B1-7F-C9-81-C9-67-1F-3C-C9-AD-74-41-47-0A-91-FC-38-2B-20-2E-9A-2E-69-F7-C1-59-FF-14-74-B7-EA-75-09-49-D9-3E-B1-F2-51-B0-54-9B-AC-" & _
                              "D0-A4-83-01-DC-DD-07-EB-5A-9A-D6-FC-23-40-E2-E4-37-03-BA-3E-A6-4C-49-54-3D-DA-36-98-5A-24-F9-39-FE-07-98-84-95-A4-99-1B-0D-22-7A-E4-8A-FD-31-E9-42-E3-8A-6F-8F-3F-80-F9-A7-46-31-4C-A9-56-05-5C-1C-99-7E-8A-3A-BD-AD-61-A9-4C-86-78-F8-B7-51-03-75-F0-0A-FF-90-02-1E-47-F7-39-80-79-25-FB-ED-66-36-EA-98-E6-56-96-0F-2E-9E-4E-2B-40-BF-67-A9-67-B1-83-58-4F-15-32-86-C9-9F-11-E2-39-CD-7F-07-93-50-88-53-34-F7-71-F2-80-B3-23-94-AE-DB-5B-26-8D-19-01-63-BB-DA-4F-6C-B0-C1-B3-1C-5B-C8-4B-3A-46-E4-3F-88-B8-B7-C2-28-94-AF-94-48-CC-CE-A1-E1-FB-DD-3E-A1-74-4F-ED-26-99-93-0A-D2-F5-BE-C3-8D-D3-2C-09-6C-C5-68-AF-6A-E5-44-94-52-A9-F1-76-1C-11-BC-CF-AC-50-59-AD-F3-7F-C9-DA-3E-C9-2E-B8-DC-7F-E3-39-A9-82-C0-A2-0D-87-D6-69-26-39-5C-5E-74-65-C4-6B-8D-99-C7-B3-10-94-B2-41-96-57-01-38-81-84-27-B4-68-06-1E-25-31-3F-F8-CD-C1-30-DB-88-B9-C4-89-F2-FA-41-53-FC-DA-A5"
@@ -703,35 +703,35 @@ Public Sub ExportCspBlob_WithPublicAndPrivate_ExportsBlob()
 End Sub
 
 Public Sub ExportCspBlob_WithPublicOnly_ReturnsExpected()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
-    Csp.ImportParameters KeyPair(True)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    csp.ImportParameters KeyPair(True)
     
     Dim Actual() As Byte
-    Actual = Csp.ExportCspBlob(False)
+    Actual = csp.ExportCspBlob(False)
     
     Const Expected As String = "06-02-00-00-00-A4-00-00-52-53-41-31-00-04-00-00-11-00-00-00-CB-BD-1D-09-FD-E5-F8-46-59-8F-2A-CA-98-72-53-E2-7F-68-C1-F6-41-9A-7A-52-1F-A5-61-7B-2D-B1-AA-E0-4E-39-98-45-45-B2-34-88-74-53-09-06-9D-64-6A-EE-84-25-3A-D9-B7-B4-E6-3E-72-37-C7-DF-A3-E0-B8-AF-7F-80-8B-5B-8A-9D-71-19-46-EC-E1-60-0D-52-ED-76-48-CD-6F-EB-CE-48-EA-61-AB-02-5C-03-AF-BA-DF-B8-1F-F5-54-74-F0-B6-D6-40-A4-43-10-D4-EE-07-8D-36-F7-71-A8-9D-2B-AC-38-23-9C-CE-82-06-09-2F-F8-BB"
     Assert.That BitConverter.ToString(Actual), Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ExportCspBlob_WhenExportMissingPrivateKey_ThrowsCryptographicException()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
-    Csp.ImportParameters KeyPair(False)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    csp.ImportParameters KeyPair(False)
     
     On Error Resume Next
-    Csp.ExportCspBlob True
+    csp.ExportCspBlob True
     
     AssertCryptographicException Err
 End Sub
 
 Public Sub ExportCspBlob_WithMissingPrivateKey_ExportsPublicOnly()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
-    Csp.ImportParameters KeyPair(False)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    csp.ImportParameters KeyPair(False)
     
     Dim Actual() As Byte
-    Actual = Csp.ExportCspBlob(False)
+    Actual = csp.ExportCspBlob(False)
     
     Const Expected As String = "06-02-00-00-00-A4-00-00-52-53-41-31-00-04-00-00-11-00-00-00-CB-BD-1D-09-FD-E5-F8-46-59-8F-2A-CA-98-72-53-E2-7F-68-C1-F6-41-9A-7A-52-1F-A5-61-7B-2D-B1-AA-E0-4E-39-98-45-45-B2-34-88-74-53-09-06-9D-64-6A-EE-84-25-3A-D9-B7-B4-E6-3E-72-37-C7-DF-A3-E0-B8-AF-7F-80-8B-5B-8A-9D-71-19-46-EC-E1-60-0D-52-ED-76-48-CD-6F-EB-CE-48-EA-61-AB-02-5C-03-AF-BA-DF-B8-1F-F5-54-74-F0-B6-D6-40-A4-43-10-D4-EE-07-8D-36-F7-71-A8-9D-2B-AC-38-23-9C-CE-82-06-09-2F-F8-BB"
     Assert.That BitConverter.ToString(Actual), Iz.EqualTo(Expected)
@@ -754,13 +754,13 @@ Public Sub ImportCspBlog_WhenCalled_ImportsKeyPair()
             &HA, &HD2, &HF5, &HBE, &HC3, &H8D, &HD3, &H2C, &H9, &H6C, &HC5, &H68, &HAF, &H6A, &HE5, &H44, &H94, &H52, &HA9, &HF1, &H76, &H1C, &H11, &HBC, &HCF, &HAC, &H50, &H59, &HAD, &HF3, &H7F, &HC9, &HDA, &H3E, &HC9, &H2E, &HB8, &HDC, &H7F, &HE3, &H39, &HA9, &H82, &HC0, _
             &HA2, &HD, &H87, &HD6, &H69, &H26, &H39, &H5C, &H5E, &H74, &H65, &HC4, &H6B, &H8D, &H99, &HC7, &HB3, &H10, &H94, &HB2, &H41, &H96, &H57, &H1, &H38, &H81, &H84, &H27, &HB4, &H68, &H6, &H1E, &H25, &H31, &H3F, &HF8, &HCD, &HC1, &H30, &HDB, &H88, &HB9, &HC4, &H89, _
             &HF2, &HFA, &H41, &H53, &HFC, &HDA, &HA5)
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
-    Csp.ImportCspBlob Blob
+    csp.ImportCspBlob Blob
     
     Dim Actual() As Byte
-    Actual = Csp.ExportCspBlob(True)
+    Actual = csp.ExportCspBlob(True)
     Assert.That Actual, Iz.EqualTo(Blob)
 End Sub
 
@@ -769,33 +769,33 @@ Public Sub ImportCspBlog_WithPublicKey_ImportsPublicKey()
     Blob = NewBytes(&H6, &H2, &H0, &H0, &H0, &HA4, &H0, &H0, &H52, &H53, &H41, &H31, &H0, &H4, &H0, &H0, &H11, &H0, &H0, &H0, &HCB, &HBD, &H1D, &H9, &HFD, &HE5, &HF8, &H46, &H59, &H8F, &H2A, &HCA, &H98, &H72, &H53, &HE2, &H7F, &H68, &HC1, &HF6, &H41, &H9A, &H7A, &H52, &H1F, &HA5, &H61, &H7B, &H2D, &HB1, &HAA, &HE0, _
                      &H4E, &H39, &H98, &H45, &H45, &HB2, &H34, &H88, &H74, &H53, &H9, &H6, &H9D, &H64, &H6A, &HEE, &H84, &H25, &H3A, &HD9, &HB7, &HB4, &HE6, &H3E, &H72, &H37, &HC7, &HDF, &HA3, &HE0, &HB8, &HAF, &H7F, &H80, &H8B, &H5B, &H8A, &H9D, &H71, &H19, &H46, &HEC, &HE1, &H60, &HD, &H52, &HED, &H76, &H48, &HCD, &H6F, &HEB, _
                      &HCE, &H48, &HEA, &H61, &HAB, &H2, &H5C, &H3, &HAF, &HBA, &HDF, &HB8, &H1F, &HF5, &H54, &H74, &HF0, &HB6, &HD6, &H40, &HA4, &H43, &H10, &HD4, &HEE, &H7, &H8D, &H36, &HF7, &H71, &HA8, &H9D, &H2B, &HAC, &H38, &H23, &H9C, &HCE, &H82, &H6, &H9, &H2F, &HF8, &HBB)
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
-    Csp.ImportCspBlob Blob
+    csp.ImportCspBlob Blob
     
     Dim Actual() As Byte
-    Actual = Csp.ExportCspBlob(False)
+    Actual = csp.ExportCspBlob(False)
     Assert.That Actual, Iz.EqualTo(Blob)
 End Sub
 
 Public Sub ImportCspBlob_WithNullArray_ThrowsArgumentNullException()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
     On Error Resume Next
-    Csp.ImportCspBlob NullBytes
+    csp.ImportCspBlob NullBytes
     
     AssertArgumentNullException Err, "KeyBlob"
 End Sub
 
 Public Sub ImportCspBlob_WithInvalidBlob_ThrowsCryptographicException()
-    Dim Csp As RSACryptoServiceProvider
-    Set Csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
+    Dim csp As RSACryptoServiceProvider
+    Set csp = Cor.NewRSACryptoServiceProvider(MinKeySize)
     
     On Error Resume Next
     Dim Bytes(0 To 147) As Byte
-    Csp.ImportCspBlob Bytes
+    csp.ImportCspBlob Bytes
     
     AssertCryptographicException Err
 End Sub
@@ -854,26 +854,6 @@ Private Function KeyPair(ByVal IncludePrivateKey As Boolean) As RSAParameters
             &H99, &H26, &HED, &H4F, &H74, &HA1, &H3E, &HDD, &HFB, &HE1, &HA1, &HCE, &HCC, &H48, &H94, &HAF, _
             &H94, &H28, &HC2, &HB7, &HB8, &H88, &H3F, &HE4, &H46, &H3A, &H4B, &HC8, &H5B, &H1C, &HB3, &HC1)
             
-'            RSAParameters p = new RSAParameters();
-'            if (includePrivateKey) {
-'                p.D = (byte[]) rsaD.Clone();
-'                p.DP = (byte[]) rsaDP.Clone();
-'                p.DQ = (byte[]) rsaDQ.Clone();
-'                p.P = (byte[]) rsaP.Clone();
-'                p.Q = (byte[]) rsaQ.Clone();
-'                p.InverseQ = (byte[]) rsaInverseQ.Clone();
-'            }
-'            else {
-'                p.D = null;
-'                p.DP = null;
-'                p.DQ = null;
-'                p.P = null;
-'                p.Q = null;
-'                p.InverseQ = null;
-'            }
-'            p.Modulus = (byte[]) rsaModulus.Clone();
-'            p.Exponent = (byte[]) rsaExponent.Clone();
-'            return p;
     Dim p As New RSAParameters
     If IncludePrivateKey Then
         p.d = RsaD

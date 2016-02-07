@@ -211,6 +211,7 @@ Module=MiscHelper; Helpers\MiscHelper.bas
 Class=RC2CryptoServiceProviderTests; System.Security.Cryptography\RC2CryptoServiceProviderTests.cls
 Class=StringComparerTests; System\StringComparerTests.cls
 ResFile32="CorLib.Tests.RES"
+Class=RSAParametersTests; System.Security.Cryptography\RSAParametersTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

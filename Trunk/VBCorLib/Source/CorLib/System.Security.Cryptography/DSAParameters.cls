@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: DSAParameters
+' Module: DSAParameters
 '
 
 ''
@@ -169,8 +172,8 @@ End Property
 '
 ' @return The X parameter.
 '
-Public Property Get X() As Byte()
-    X = mX
+Public Property Get x() As Byte()
+    x = mX
 End Property
 
 ''
@@ -178,7 +181,7 @@ End Property
 '
 ' @param RHS The new X parameter.
 '
-Public Property Let X(ByRef RHS() As Byte)
+Public Property Let x(ByRef RHS() As Byte)
     mX = RHS
 End Property
 
@@ -187,8 +190,8 @@ End Property
 '
 ' @return The Y parameter.
 '
-Public Property Get Y() As Byte()
-    Y = mY
+Public Property Get y() As Byte()
+    y = mY
 End Property
 
 ''
@@ -196,7 +199,7 @@ End Property
 '
 ' @param RHS The new Y parameter.
 '
-Public Property Let Y(ByRef RHS() As Byte)
+Public Property Let y(ByRef RHS() As Byte)
     mY = RHS
 End Property
 
@@ -313,8 +316,8 @@ End Sub
 
 Friend Function ToCspBlob() As Byte()
     Dim ms As New MemoryStream
-    Dim writer As BinaryWriter
-    Set writer = Cor.NewBinaryWriter(ms)
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(ms)
     
     Dim BlobType As Byte
     If CorArray.IsNull(mX) Then
@@ -326,28 +329,28 @@ Friend Function ToCspBlob() As Byte()
     End If
     
     ' Build BLOBHEADER structure
-    Call writer.WriteValue(BlobType)
-    Call writer.WriteValue(CByte(2))
-    Call writer.WriteValue(CInt(0))
-    Call writer.WriteValue(CALG_DSS_SIGN)
+    Call Writer.WriteValue(BlobType)
+    Call Writer.WriteValue(CByte(2))
+    Call Writer.WriteValue(CInt(0))
+    Call Writer.WriteValue(CALG_DSS_SIGN)
     
     ' Build DSSPUBKEY structure
-    Call writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31535344, &H32535344)))
-    Call writer.WriteValue(CLng(CorArray.Length(mP) * 8))
+    Call Writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31535344, &H32535344)))
+    Call Writer.WriteValue(CLng(CorArray.Length(mP) * 8))
 
-    Call writer.WriteValue(ReverseByteCopy(mP))
-    Call writer.WriteValue(ReverseByteCopy(mQ))
-    Call writer.WriteValue(ReverseByteCopy(mG))
+    Call Writer.WriteValue(ReverseByteCopy(mP))
+    Call Writer.WriteValue(ReverseByteCopy(mQ))
+    Call Writer.WriteValue(ReverseByteCopy(mG))
     
     If BlobType = PUBLICKEYBLOB Then
-        Call writer.WriteValue(ReverseByteCopy(mY))
+        Call Writer.WriteValue(ReverseByteCopy(mY))
     Else
-        Call writer.WriteValue(ReverseByteCopy(mX))
+        Call Writer.WriteValue(ReverseByteCopy(mX))
     End If
     
     ' Build DSSSEED structure
-    Call writer.WriteValue(mCounter)
-    Call writer.WriteValue(ReverseByteCopy(mSeed))
+    Call Writer.WriteValue(mCounter)
+    Call Writer.WriteValue(ReverseByteCopy(mSeed))
     
     ToCspBlob = ms.ToArray
 End Function
@@ -457,8 +460,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
