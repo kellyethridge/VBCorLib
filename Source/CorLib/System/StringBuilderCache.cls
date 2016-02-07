@@ -53,7 +53,7 @@ Friend Function Acquire() As StringBuilder
     End If
 End Function
 
-Friend Function GetStringAndRelease(ByRef Builder As StringBuilder) As String
+Friend Function GetStringAndRelease(ByVal Builder As StringBuilder) As String
     Debug.Assert Not Builder Is Nothing
     
     If Builder.Length > 0 Then
@@ -63,7 +63,7 @@ Friend Function GetStringAndRelease(ByRef Builder As StringBuilder) As String
     Release Builder
 End Function
 
-Friend Sub Release(ByRef Builder As StringBuilder)
+Friend Sub Release(ByVal Builder As StringBuilder)
     Debug.Assert Not Builder Is Nothing
     
     mCache.Push Builder

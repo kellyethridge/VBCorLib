@@ -37,7 +37,7 @@ version 3.0 (BREAKING CHANGES)
 	* TimeSpan.Add and TimeSpan.Subtract now support argument of Nothing as equating to zero.
 	* Added Guid.TryParse, Guid.TryParseExact and Guid.ParseExact methods.
 	* Enhanced Guid parsing methods to support 'B', 'b', 'D', 'd', 'P', 'p', 'N', 'n', 'X', 'x' format specifications.
-	* Changed default ToString method for Guid with not format specified from 'B' to 'D' to align with .NET 2.0.
+	* Changed default ToString method for Guid with no format specified from 'B' to 'D' to align with .NET 2.0.
 	* Guid objects are now always read-only when using a constructor or parsing.
 	* Removed Guid.FromByteArray and Guid.FromMemory methods.
 	* NewGuid now accepts a byte array or memory pointer.
@@ -52,10 +52,11 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed SHA512Managed and SHA384Managed to produce correct .NET 2.0 values instead of broken 1.0 values.
 	* Added EnumeratorBase to help easily build list enumerators.
 	* Path class will attempt to expand short path formats if the path exists.
-	* CorString.Join methat signature changed to match .NET. *BREAKING*
+	* CorString.Join method signature changed to match .NET. *BREAKING*
 	* CorString.Join Separator is now required.
 	* CorString.Join improved to support any array or enumerable collection of items.
 	* Added Restart to StopWatch class.
+	* Removed RSAParameters InverseQ property from serialization process.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

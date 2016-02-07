@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: RSAParameters
+' Module: RSAParameters
 '
 
 ''
@@ -41,11 +44,10 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const PROP_MODULUS  As String = "Modulus"
-Private Const PROP_EXPONENT As String = "Exponent"
-Private Const PROP_INVERSEQ As String = "InverseQ"
+Private Const PropModulus  As String = "Modulus"
+Private Const PropExponent As String = "Exponent"
 
-Private md()        As Byte ' PrivateExponent
+Private mD()        As Byte ' PrivateExponent
 Private mDP()       As Byte ' Exponent1
 Private mDQ()       As Byte ' Exponent2
 Private mExponent() As Byte ' PublicExponent
@@ -63,17 +65,17 @@ Private mQ()        As Byte ' Prime2
 ' @remarks This is the Private Exponent of the RSA key.
 '
 Public Property Get d() As Byte()
-    d = md
+    d = mD
 End Property
 
 ''
 ' Sets the D parameter of the RSA key.
 '
-' @param RHS The new D parameter value.
+' @param Value The new D parameter value.
 ' @remarks This is the Private Exponent of the RSA key.
 '
 Public Property Let d(ByRef Value() As Byte)
-    md = Value
+    mD = Value
 End Property
 
 ''
@@ -89,11 +91,11 @@ End Property
 ''
 ' Sets the DP parameter of the key.
 '
-' @param RHS The new DP value.
+' @param Value The new DP value.
 ' @remarks This is the Exponent1 value of the key. It has the numeric value "d mod (p - 1)".
 '
-Public Property Let DP(ByRef RHS() As Byte)
-    mDP = RHS
+Public Property Let DP(ByRef Value() As Byte)
+    mDP = Value
 End Property
 
 ''
@@ -109,11 +111,11 @@ End Property
 ''
 ' Sets the DQ parameter of the key.
 '
-' @param RHS The new DQ value.
+' @param Value The new DQ value.
 ' @remarks This is the Exponent2 value of the key. It has the numeric value "d mod (q - 1)".
 '
-Public Property Let DQ(ByRef RHS() As Byte)
-    mDQ = RHS
+Public Property Let DQ(ByRef Value() As Byte)
+    mDQ = Value
 End Property
 
 ''
@@ -128,10 +130,10 @@ End Property
 ''
 ' Sets the public exponent of the key.
 '
-' @param RHS The new exponent value.
+' @param Value The new exponent value.
 '
-Public Property Let Exponent(ByRef RHS() As Byte)
-    mExponent = RHS
+Public Property Let Exponent(ByRef Value() As Byte)
+    mExponent = Value
 End Property
 
 ''
@@ -147,11 +149,11 @@ End Property
 ''
 ' Sets the InverseQ parameter of the key
 '
-' @param RHS The new InverseQ value.
+' @param Value The new InverseQ value.
 ' @remarks This is the Coefficient. It has a numeric value "(inverse of q) mod p".
 '
-Public Property Let InverseQ(ByRef RHS() As Byte)
-    mInverseQ = RHS
+Public Property Let InverseQ(ByRef Value() As Byte)
+    mInverseQ = Value
 End Property
 
 ''
@@ -167,11 +169,11 @@ End Property
 ''
 ' Sets the modulus of the key.
 '
-' @param RHS The new modulus value.
+' @param Value The new modulus value.
 ' @remarks This has a value of "prime1 * prime2" and is often known as "n".
 '
-Public Property Let Modulus(ByRef RHS() As Byte)
-    mModulus = RHS
+Public Property Let Modulus(ByRef Value() As Byte)
+    mModulus = Value
 End Property
 
 ''
@@ -187,11 +189,11 @@ End Property
 ''
 ' Sets the P parameter of the key.
 '
-' @param RHS The new P value.
+' @param Value The new P value.
 ' @remarks This is the Prime1 value of the key.
 '
-Public Property Let p(ByRef RHS() As Byte)
-    mP = RHS
+Public Property Let p(ByRef Value() As Byte)
+    mP = Value
 End Property
 
 ''
@@ -207,11 +209,11 @@ End Property
 ''
 ' Sets the Q parameter of the key.
 '
-' @param RHS The new Q value.
+' @param Value The new Q value.
 ' @remarks This is the Prime2 value of the key.
 '
-Public Property Let q(ByRef RHS() As Byte)
-    mQ = RHS
+Public Property Let q(ByRef Value() As Byte)
+    mQ = Value
 End Property
 
 ''
@@ -249,32 +251,29 @@ Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
 
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function ToXmlString() As String
-    Dim sb As New StringBuilder
-    Call sb.AppendString("<RSAKeyValue>")
-    Call AddElement(sb, "Modulus", mModulus)
-    Call AddElement(sb, "Exponent", mExponent)
+    Dim sb As StringBuilder
+    Set sb = StringBuilderCache.Acquire
     
-    If Not CorArray.IsNull(md) Then
-        Call AddElement(sb, "P", mP)
-        Call AddElement(sb, "Q", mQ)
-        Call AddElement(sb, "DP", mDP)
-        Call AddElement(sb, "DQ", mDQ)
-        Call AddElement(sb, "InverseQ", mInverseQ)
-        Call AddElement(sb, "D", md)
+    sb.AppendString "<RSAKeyValue>"
+    AddElement sb, "Modulus", mModulus
+    AddElement sb, "Exponent", mExponent
+    
+    If Not CorArray.IsNull(mD) Then
+        AddElement sb, "P", mP
+        AddElement sb, "Q", mQ
+        AddElement sb, "DP", mDP
+        AddElement sb, "DQ", mDQ
+        AddElement sb, "InverseQ", mInverseQ
+        AddElement sb, "D", mD
     End If
     
-    Call sb.AppendString("</RSAKeyValue>")
+    sb.AppendString "</RSAKeyValue>"
     
-    ToXmlString = sb.ToString
+    ToXmlString = StringBuilderCache.GetStringAndRelease(sb)
 End Function
 
-Friend Sub FromXmlString(ByVal Xml As String)
+Friend Sub FromXmlString(ByRef Xml As String)
     Dim Elements As SecurityElement
     Set Elements = SecurityElement.FromString(Xml)
     
@@ -291,7 +290,7 @@ Friend Sub FromXmlString(ByVal Xml As String)
         mDP = GetBytes(Elements, "DP")
         mDQ = GetBytes(Elements, "DQ")
         mInverseQ = GetBytes(Elements, "InverseQ")
-        md = GetBytes(Elements, "D")
+        mD = GetBytes(Elements, "D")
     End If
 End Sub
 
@@ -328,7 +327,7 @@ Friend Sub FromCspBlob(ByRef Blob() As Byte)
     End If
     
     ' make the array big-endian
-    Call CorArray.Reverse(mExponent)
+    CorArray.Reverse mExponent
     
     ' start reading in all the key stuff.
     mModulus = ReverseByteCopy(Reader.ReadBytes(BitLen \ 8))
@@ -339,10 +338,10 @@ Friend Sub FromCspBlob(ByRef Blob() As Byte)
         mDP = ReverseByteCopy(Reader.ReadBytes(BitLen \ 16))
         mDQ = ReverseByteCopy(Reader.ReadBytes(BitLen \ 16))
         mInverseQ = ReverseByteCopy(Reader.ReadBytes(BitLen \ 16))
-        md = ReverseByteCopy(Reader.ReadBytes(BitLen \ 8))
+        mD = ReverseByteCopy(Reader.ReadBytes(BitLen \ 8))
     End If
     
-    Call Reader.CloseReader
+    Reader.CloseReader
 End Sub
 
 Friend Function ToCspBlob(ByVal KeyNumber As Long) As Byte()
@@ -351,36 +350,36 @@ Friend Function ToCspBlob(ByVal KeyNumber As Long) As Byte()
     Set Writer = Cor.NewBinaryWriter(ms)
     
     Dim BlobType As Byte
-    BlobType = IIf(CorArray.IsNull(md), PUBLICKEYBLOB, PRIVATEKEYBLOB)
+    BlobType = IIf(CorArray.IsNull(mD), PUBLICKEYBLOB, PRIVATEKEYBLOB)
     
     ' Build BLOBHEADER structure
     Writer.WriteValue BlobType
-    Call Writer.WriteValue(CByte(2))
-    Call Writer.WriteValue(CInt(0))
-    Call Writer.WriteValue(CLng(IIf(KeyNumber = AT_KEYEXCHANGE, CALG_RSA_KEYX, CALG_RSA_SIGN)))
+    Writer.WriteValue CByte(2)
+    Writer.WriteValue CInt(0)
+    Writer.WriteValue CLng(IIf(KeyNumber = AT_KEYEXCHANGE, CALG_RSA_KEYX, CALG_RSA_SIGN))
     
     ' Build RSAPUBKEY structure
-    Call Writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352)))
-    Call Writer.WriteValue(CLng(CorArray.Length(mModulus) * 8))
-    Call Writer.WriteValue(ReverseByteCopy(mExponent))
+    Writer.WriteValue CLng(IIf(BlobType = PUBLICKEYBLOB, &H31415352, &H32415352))
+    Writer.WriteValue CLng(CorArray.Length(mModulus) * 8)
+    Writer.WriteValue ReverseByteCopy(mExponent)
     
     Dim i As Long
-    i = 4 - CorArray.Length(mExponent)
+    i = 4 - CorArray.LengthFirstDim(mExponent)
     Do While i > 0
-        Call Writer.WriteValue(CByte(0))
+        Writer.WriteValue CByte(0)
         i = i - 1
     Loop
     
     ' Start adding all the key stuff.
-    Call Writer.WriteValue(ReverseByteCopy(mModulus))
+    Writer.WriteValue ReverseByteCopy(mModulus)
     
     If BlobType = PRIVATEKEYBLOB Then
-        Call Writer.WriteValue(ReverseByteCopy(mP))
-        Call Writer.WriteValue(ReverseByteCopy(mQ))
-        Call Writer.WriteValue(ReverseByteCopy(mDP))
-        Call Writer.WriteValue(ReverseByteCopy(mDQ))
-        Call Writer.WriteValue(ReverseByteCopy(mInverseQ))
-        Call Writer.WriteValue(ReverseByteCopy(md))
+        Writer.WriteValue ReverseByteCopy(mP)
+        Writer.WriteValue ReverseByteCopy(mQ)
+        Writer.WriteValue ReverseByteCopy(mDP)
+        Writer.WriteValue ReverseByteCopy(mDQ)
+        Writer.WriteValue ReverseByteCopy(mInverseQ)
+        Writer.WriteValue ReverseByteCopy(mD)
     End If
     
     ToCspBlob = ms.ToArray
@@ -390,7 +389,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function GetBytes(ByVal Elements As SecurityElement, ByVal Name As String) As Byte()
+Private Function GetBytes(ByVal Elements As SecurityElement, ByRef Name As String) As Byte()
     Dim Text As String
     
     Text = Elements.SearchForTextOfTag(Name)
@@ -400,27 +399,25 @@ Private Function GetBytes(ByVal Elements As SecurityElement, ByVal Name As Strin
     GetBytes = Convert.FromBase64String(Text)
 End Function
 
-Private Sub AddElement(ByVal sb As StringBuilder, ByVal Tag As String, ByRef Bytes() As Byte)
-    Call sb.AppendFormat("<{0}>{1}</{0}>", Tag, Convert.ToBase64String(Bytes))
+Private Sub AddElement(ByVal sb As StringBuilder, ByRef Tag As String, ByRef Bytes() As Byte)
+    sb.AppendFormat "<{0}>{1}</{0}>", Tag, Convert.ToBase64String(Bytes)
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mModulus = .ReadProperty(PROP_MODULUS)
-        mExponent = .ReadProperty(PROP_EXPONENT)
-        mInverseQ = .ReadProperty(PROP_INVERSEQ)
+        mModulus = .ReadProperty(PropModulus)
+        mExponent = .ReadProperty(PropExponent)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_MODULUS, mModulus)
-        Call .WriteProperty(PROP_EXPONENT, mExponent)
-        Call .WriteProperty(PROP_INVERSEQ, mInverseQ)
+        .WriteProperty PropModulus, mModulus
+        .WriteProperty PropExponent, mExponent
     End With
 End Sub
 

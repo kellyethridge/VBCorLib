@@ -50,28 +50,29 @@ Public Function GetPrime(ByVal Value As Long) As Long
     End If
         
     ' we'll do a very fast binary search locally.
-    Dim hi As Long
-    Dim Lo As Long
-    Dim md As Long
-    hi = 71
-    Do While Lo <= hi
-        md = (Lo + hi) \ 2
-        Select Case mPrimes(md)
+    Dim High    As Long
+    Dim Low     As Long
+    Dim Index   As Long
+    
+    High = 71
+    Do While Low <= High
+        Index = (Low + High) \ 2
+        Select Case mPrimes(Index)
             Case Value
                 GetPrime = Value
                 Exit Function
             Case Is > Value
-                hi = md - 1
+                High = Index - 1
             Case Else
-                Lo = md + 1
+                Low = Index + 1
         End Select
     Loop
     
-    If md < 0 Then
-        md = Not md
+    If Index < 0 Then
+        Index = Not Index
     End If
     
-    GetPrime = mPrimes(md)
+    GetPrime = mPrimes(Index)
 End Function
 
 Private Sub InitPrimes()

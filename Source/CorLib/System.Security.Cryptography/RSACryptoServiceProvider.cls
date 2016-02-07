@@ -419,7 +419,7 @@ End Function
 ' @return An Xml representation of the RSA key.
 '
 Public Function ToXmlString(ByVal IncludePrivateParameters As Boolean) As String
-    ToXmlString = Me.ExportParameters(IncludePrivateParameters).ToXmlString
+    ToXmlString = ExportParameters(IncludePrivateParameters).ToXmlString
 End Function
 
 ''
