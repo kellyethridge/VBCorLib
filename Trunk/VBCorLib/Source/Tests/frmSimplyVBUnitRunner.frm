@@ -71,7 +71,7 @@ End Sub
 
 Private Sub AddSystemSecurity()
     With Sim.NewTestSuite("System.Security")
-        .Add New TestSecurityElement
+        .Add New SecurityElementTests
         
         AddTest .This
     End With
