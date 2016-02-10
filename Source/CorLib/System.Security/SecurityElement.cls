@@ -203,9 +203,9 @@ End Function
 ' @return A copy of the object.
 '
 Public Function Copy() As SecurityElement
-    Dim bag As New PropertyBag
-    Call bag.WriteProperty("Copy", Me)
-    Set Copy = bag.ReadProperty("Copy")
+    Dim Bag As New PropertyBag
+    Call Bag.WriteProperty("Copy", Me)
+    Set Copy = Bag.ReadProperty("Copy")
 End Function
 
 ''
@@ -282,15 +282,6 @@ Public Function ToString() As String
     ToString = sb.ToString
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Tag As String, ByVal Text As String)
-    mTag = Tag
-    mText = Text
-End Sub
-
 Friend Sub AddSelf(ByVal sb As StringBuilder, Optional ByVal IsRoot As Boolean)
     Call sb.AppendFormat("<{0}", mTag)
     Call AddAttributes(sb)
@@ -308,7 +299,19 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByRef Tag As String, ByRef Text As String)
+    If Not SecurityElement.IsValidTag(Tag) Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementTag, Tag))
+        
+    mTag = Tag
+    mText = Text
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AddAttributes(ByVal sb As StringBuilder)
     If mAttributes Is Nothing Then Exit Sub
@@ -368,8 +371,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -1688,7 +1688,7 @@ End Function
 ' @remarks A SecurityElement is a simple version of an XML tag with attributes and text.
 ' @see SecurityElement
 '
-Public Function NewSecurityElement(ByVal Tag As String, Optional ByVal Text As String) As SecurityElement
+Public Function NewSecurityElement(ByRef Tag As String, Optional ByRef Text As String) As SecurityElement
     Set NewSecurityElement = New SecurityElement
     NewSecurityElement.Init Tag, Text
 End Function

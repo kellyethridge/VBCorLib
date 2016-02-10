@@ -35,7 +35,7 @@ Public Sub AssertNoException(ByVal Err As ErrObject)
     Assert.That Catch(Ex, Err), Iz.False, "An exception is not expected to be thrown."
 End Sub
 
-Public Sub AssertArgumentException(ByVal Err As ErrObject, Optional ByRef ParamName As String)
+Public Function AssertArgumentException(ByVal Err As ErrObject, Optional ByRef ParamName As String) As ArgumentException
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentException Then
@@ -47,7 +47,9 @@ Public Sub AssertArgumentException(ByVal Err As ErrObject, Optional ByRef ParamN
         Set ArgEx = Ex
         Assert.That ArgEx.ParamName, Iz.EqualTo(ParamName), "Wrong parameter name given."
     End If
-End Sub
+    
+    Set AssertArgumentException = Ex
+End Function
 
 Public Sub AssertArgumentNullException(ByVal Err As ErrObject, ByRef ParamName As String)
     Dim Ex As Exception

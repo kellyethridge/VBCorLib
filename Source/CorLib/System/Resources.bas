@@ -121,6 +121,7 @@ Public Enum ResourceStringKey
     Argument_ByteArrayRequired = 851
     Argument_ByteArrayOrStringRequired = 852
     Argument_ByteArrayOrNumberRequired = 853
+    Argument_InvalidElementTag = 854
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
