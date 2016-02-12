@@ -60,6 +60,8 @@ Private mComparisonString1()    As Long
 Private mComparisonString2()    As Long
 Private mComparisonHeader1      As SafeArray1d
 Private mComparisonHeader2      As SafeArray1d
+Private mCharCheckerDelegate    As Delegate
+Private mCharChecker            As Func_T_Boolean
 
 
 ''
@@ -480,12 +482,21 @@ Friend Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
     CharAt = MemWord(StrPtr(s) + Index * 2)
 End Function
 
+Friend Function AnyChars(ByRef s As String, ByVal Predicate As Long) As Boolean
+    AnyChars = CheckChars(s, True, Predicate)
+End Function
+
+Friend Function AllChars(ByRef s As String, ByVal Predicate As Long) As Boolean
+    AllChars = CheckChars(s, False, Predicate)
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     InitComparisonStrings
+    Set mCharChecker = InitDelegate(mCharCheckerDelegate)
 End Sub
 
 Private Sub Class_Terminate()
@@ -670,20 +681,7 @@ Finally:
 End Function
 
 Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
-    ContainsOnlyWhiteSpace = True
-    
-    Dim Chars() As Integer
-    Chars = AllocChars(s)
-    
-    Dim i As Long
-    For i = 0 To UBound(Chars)
-        If Not Char.IsWhiteSpaceChar(Chars(i)) Then
-            ContainsOnlyWhiteSpace = False
-            Exit For
-        End If
-    Next
-        
-    FreeChars Chars
+    ContainsOnlyWhiteSpace = AllChars(s, AddressOf IsWhiteSpaceChar)
 End Function
 
 Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
@@ -989,4 +987,24 @@ Private Function OrdinalIgnoreCaseEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long)
 
     OrdinalIgnoreCaseEquals = True
 End Function
+
+Private Function CheckChars(ByRef s As String, ByVal SuccessfulState As Boolean, ByVal Predicate As Long) As Boolean
+    Dim Chars() As Integer
+    Dim i       As Long
+
+    mCharCheckerDelegate.pfn = Predicate
+    Chars = AllocChars(s)
+    CheckChars = Not SuccessfulState
+    
+    For i = 0 To UBound(Chars)
+        If mCharChecker.Invoke(Chars(i)) = SuccessfulState Then
+            CheckChars = SuccessfulState
+            Exit For
+        End If
+    Next
+    
+    FreeChars Chars
+End Function
+
+
 
