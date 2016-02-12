@@ -25,6 +25,39 @@ End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
+        Case "IsValidTag_WithValues_ReturnsExpected"
+            Test.Use "name", True
+            Test.Use "na<me", False
+            Test.Use "na>me", False
+            Test.Use "na me", False
+            Test.Use "", True
+            Test.Use vbNullString, True
+    
+        Case "IsValidText_WithValues_ReturnsExpected"
+            Test.Use "val<ue", False
+            Test.Use "val>ue", False
+            Test.Use "value", True
+            Test.Use "val ue", True
+            Test.Use "", True
+            Test.Use vbNullString, True
+            
+        Case "IsValidAttributeName_WithValues_ReturnsExpected"
+            Test.Use "name", True
+            Test.Use "na<me", False
+            Test.Use "na>me", False
+            Test.Use "na me", False
+            Test.Use "", True
+            Test.Use vbNullString, True
+        
+        Case "IsValidAttributeValue_WithValues_ReturnsExpected"
+            Test.Use "val<ue", False
+            Test.Use "val>ue", False
+            Test.Use "val""ue", False
+            Test.Use "value", True
+            Test.Use "val ue", True
+            Test.Use "", True
+            Test.Use vbNullString, True
+        
         Case "Constructor_WithTag_SetsDefaultValues"
             Test.Use "tag"
             Test.Use ""
@@ -34,6 +67,38 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "nam>e"
             
     End Select
+End Sub
+
+Public Sub IsValidTag_WithValues_ReturnsExpected(ByVal Tag As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = SecurityElement.IsValidTag(Tag)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsValidText_WithValues_ReturnsExpected(ByVal Text As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = SecurityElement.IsValidText(Text)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsValidAttributeName_WithValues_ReturnsExpected(ByVal Name As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = SecurityElement.IsValidAttributeName(Name)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsValidAttributeValue_WithValues_ReturnsExpected(ByVal Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = SecurityElement.IsValidAttributeValue(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Constructor_WithTag_SetsDefaultValues(ByVal Tag As String)
@@ -77,3 +142,83 @@ Public Sub Constructor_WithInvalidTagAndValidText_ThrowsArgumentException()
     Set Ex = AssertArgumentException(Err)
     Assert.That Ex.Message, Iz.StringContaining("na<me")
 End Sub
+
+Public Sub Attributes_WhenSetToNothing_ReturnsNothing()
+    Dim Element As New SecurityElement
+    
+    Set Element.Attributes = Nothing
+    
+    Assert.That Element.Attributes, Iz.Nothing
+End Sub
+
+Public Sub Attributes_WhenSetWithEmptyTable_ReturnsNothing()
+    Dim Element As New SecurityElement
+    
+    Set Element.Attributes = New Hashtable
+    
+    Assert.That Element.Attributes, Iz.Nothing
+End Sub
+
+Public Sub Attributes_WhenSetWithValidValues_ReturnsValidValues()
+    Dim Element As New SecurityElement
+    Dim Values As New Hashtable
+    Values.Add "name", "kelly"
+    
+    Set Element.Attributes = Values
+    
+    Dim Actual As Hashtable
+    Set Actual = Element.Attributes
+    Assert.That Actual, Iz.Not.Nothing
+    Assert.That Actual.Count, Iz.EqualTo(1)
+    Assert.That Actual("name"), Iz.EqualTo("kelly")
+End Sub
+
+Public Sub Attributes_WhenSetWithInvalidKey_ThrowsArgumentException()
+    
+End Sub
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

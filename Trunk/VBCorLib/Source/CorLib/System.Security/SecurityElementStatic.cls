@@ -45,7 +45,6 @@ Option Explicit
 Private Const vbLeftCheveron    As Long = 60
 Private Const vbRightCheveron   As Long = 62
 
-
 Private mEscapeFormatter    As New StringBuilder
 Private mTextFormatter      As New StringBuilder
 Private mXml                As New StringBuilder
@@ -87,12 +86,8 @@ End Function
 ' @return Returns True if the tag is valid, False otherwise.
 ' @remarks A tag is not valid if it contains any of the following: "<", ">", or a space.
 '
-Public Function IsValidTag(ByVal Tag As String) As Boolean
-    If InStr(Tag, " ") > 0 Then Exit Function
-    If InStr(Tag, "<") > 0 Then Exit Function
-    If InStr(Tag, ">") > 0 Then Exit Function
-    
-    IsValidTag = True
+Public Function IsValidTag(ByRef Tag As String) As Boolean
+    IsValidTag = CorString.AllChars(Tag, AddressOf IsValidTagChar)
 End Function
 
 ''
@@ -102,11 +97,8 @@ End Function
 ' @return Returns True if the text is valid, False otherwise.
 ' @remarks The text is not valid if it contains any of the following: "<", ">".
 '
-Public Function IsValidText(ByVal Text As String) As Boolean
-    If InStr(Text, "<") > 0 Then Exit Function
-    If InStr(Text, ">") > 0 Then Exit Function
-    
-    IsValidText = True
+Public Function IsValidText(ByRef Text As String) As Boolean
+    IsValidText = CorString.AllChars(Text, AddressOf IsValidTextChar)
 End Function
 
 ''
@@ -116,7 +108,7 @@ End Function
 ' @return Returns True if the attribute name is valid, False otherwise.
 ' @remarks The name if not valid if it contains any of the following: "<", ">", or a space.
 '
-Public Function IsValidAttributeName(ByVal Name As String) As Boolean
+Public Function IsValidAttributeName(ByRef Name As String) As Boolean
     IsValidAttributeName = IsValidTag(Name)
 End Function
 
@@ -127,8 +119,8 @@ End Function
 ' @return Returns True if the value is valid, False otherwise.
 ' @remarks The value is not valid if it contains any of the following: "<", ">".
 '
-Public Function IsValidAttributeValue(ByVal Value As String) As Boolean
-    IsValidAttributeValue = IsValidText(Value)
+Public Function IsValidAttributeValue(ByRef Value As String) As Boolean
+    IsValidAttributeValue = CorString.AllChars(Value, AddressOf IsValidAttributeValueChar)
 End Function
 
 ''
