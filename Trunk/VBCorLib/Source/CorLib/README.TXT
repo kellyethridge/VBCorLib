@@ -57,6 +57,10 @@ version 3.0 (BREAKING CHANGES)
 	* CorString.Join improved to support any array or enumerable collection of items.
 	* Added Restart to StopWatch class.
 	* Removed RSAParameters InverseQ property from serialization process.
+	* Updated SecurityElement Attributes property to match .NET characteristics.
+	* Fixed SecurityElement AddAttributes. Should throw ArgumentException when adding duplicate attribute name.
+	* Fixed SecurityElement GetAttribute. Was not unescaping escaped sequences.
+	* Fixed SecurityElement constructor. Was not validating tag or text.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -168,17 +168,19 @@ End Property
 ' @param Name The name of the new attribute. This is case sensitive.
 ' @param Value The value of the new attribute.
 '
-Public Sub AddAttribute(ByVal Name As String, ByVal Value As String)
+Public Sub AddAttribute(ByRef Name As String, ByRef Value As String)
     If mAttributes Is Nothing Then
         Set mAttributes = New Hashtable
     End If
     
     If Not SecurityElement.IsValidAttributeName(Name) Then _
-        Throw Cor.NewArgumentException("Invalid attribute name.", "Name")
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementName, Name))
     If Not SecurityElement.IsValidAttributeValue(Value) Then _
-        Throw Cor.NewArgumentException("Invalid attribute value.", "Value")
-    
-    mAttributes(Name) = Value
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementValue, Value))
+    If mAttributes.ContainsKey(Name) Then _
+        Error.Argument Argument_AttributeNamesMustBeUnique
+        
+    mAttributes.Add Name, Value
 End Sub
 
 ''
@@ -202,12 +204,20 @@ End Sub
 '
 ' @param Name The name of the attribute to retrieve.
 ' @return Returns the attribute value or an empty string if not found.
-' @remarks I so detest the underscore. It was either that or use an abbreviated
-' version of the word such as Attr.
+' @remarks This is the same as the Attribute method in the .NET SecurityElement class.
 '
-Public Function GetAttribute(ByVal Name As String) As String
-    If mAttributes.ContainsKey(Name) Then
-        GetAttribute = mAttributes(Name)
+Public Function GetAttribute(ByRef Name As String) As String
+    If Not mAttributes Is Nothing Then
+        If mAttributes.ContainsKey(Name) Then
+            Dim Result As String
+            Result = mAttributes(Name)
+            
+            If InStr(Result, "&") Then
+                GetAttribute = Unescape(Result)
+            Else
+                GetAttribute = Result
+            End If
+        End If
     End If
 End Function
 
@@ -318,7 +328,9 @@ End Sub
 Friend Sub Init(ByRef Tag As String, ByRef Text As String)
     If Not SecurityElement.IsValidTag(Tag) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementTag, Tag))
-        
+    If Not SecurityElement.IsValidText(Text) Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementText, Text))
+    
     mTag = Tag
     mText = Text
 End Sub
@@ -327,6 +339,19 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function Unescape(ByRef s As String) As String
+    Dim sb As StringBuilder
+    Set sb = StringBuilderCache.Acquire
+    sb.AppendString s
+    sb.Replace "&quot;", """"
+    sb.Replace "&lt;", "<"
+    sb.Replace "&gt;", ">"
+    sb.Replace "&apos;", "'"
+    sb.Replace "&amp;", "&"
+    
+    Unescape = StringBuilderCache.GetStringAndRelease(sb)
+End Function
+
 Private Sub AddAttributes(ByVal sb As StringBuilder)
     If mAttributes Is Nothing Then Exit Sub
     
