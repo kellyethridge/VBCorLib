@@ -58,6 +58,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "", True
             Test.Use vbNullString, True
         
+        Case "Escape_WithValues_ReturnsExpected"
+            Test.Use "val<ue", "val&lt;ue"
+            Test.Use "val>ue", "val&gt;ue"
+            Test.Use "val""ue", "val&quot;ue"
+            Test.Use "val'ue", "val&apos;ue"
+            Test.Use "val&ue", "val&amp;ue"
+            Test.Use "value", "value"
+            
         Case "Constructor_WithTag_SetsDefaultValues"
             Test.Use "tag"
             Test.Use ""
@@ -97,6 +105,14 @@ Public Sub IsValidAttributeValue_WithValues_ReturnsExpected(ByVal Value As Strin
     Dim Actual As Boolean
     
     Actual = SecurityElement.IsValidAttributeValue(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Escape_WithValues_ReturnsExpected(ByVal Value As String, ByVal Expected As String)
+    Dim Actual As String
+    
+    Actual = SecurityElement.Escape(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
