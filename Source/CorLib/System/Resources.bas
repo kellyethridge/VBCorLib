@@ -133,6 +133,7 @@ Public Enum ResourceStringKey
     ArgumentNull_Collection = 903
     ArgumentNull_TimeSpan = 904
     ArgumentNull_Generic = 905
+    ArgumentNull_Child = 906
     
     ArgumentOutOfRange_MustBeNonNegNum = 700
     ArgumentOutOfRange_SmallCapacity = 701
