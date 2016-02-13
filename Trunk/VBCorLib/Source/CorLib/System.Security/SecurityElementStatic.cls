@@ -45,7 +45,6 @@ Option Explicit
 Private Const vbLeftCheveron    As Long = 60
 Private Const vbRightCheveron   As Long = 62
 
-Private mEscapeFormatter    As New StringBuilder
 Private mTextFormatter      As New StringBuilder
 Private mXml                As New StringBuilder
 Private mIndex              As Long
@@ -66,17 +65,17 @@ Private mIndex              As Long
 ' Single Quote = &apos;
 ' </pre>
 '
-Public Function Escape(ByVal Text As String) As String
-    mEscapeFormatter.Length = 0
-    
-    Call mEscapeFormatter.AppendString(Text)
-    Call mEscapeFormatter.Replace("&", "&amp;")
-    Call mEscapeFormatter.Replace("<", "&lt;")
-    Call mEscapeFormatter.Replace(">", "&gt;")
-    Call mEscapeFormatter.Replace(Chr$(corQuoteChar), "&quot;")
-    Call mEscapeFormatter.Replace("'", "&apos;")
-    
-    Escape = mEscapeFormatter.ToString
+Public Function Escape(ByRef Text As String) As String
+    Dim sb As StringBuilder
+    Set sb = StringBuilderCache.Acquire _
+                                .Append(Text) _
+                                .Replace("&", "&amp;") _
+                                .Replace("<", "&lt;") _
+                                .Replace(">", "&gt;") _
+                                .Replace("""", "&quot;") _
+                                .Replace("'", "&apos;")
+
+    Escape = StringBuilderCache.GetStringAndRelease(sb)
 End Function
 
 ''
