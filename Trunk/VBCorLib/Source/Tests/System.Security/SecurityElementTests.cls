@@ -190,11 +190,66 @@ Public Sub Attributes_WhenSetWithValidValues_ReturnsValidValues()
 End Sub
 
 Public Sub Attributes_WhenSetWithInvalidKey_ThrowsArgumentException()
+    Dim Element As New SecurityElement
+    Dim Values As New Hashtable
+    Values.Add "The>Key", "value"
     
+    On Error Resume Next
+    Set Element.Attributes = Values
+    
+    AssertArgumentException Err
 End Sub
 
+Public Sub Attributes_WhenSetWithInvalidValue_ThrowsArgumentException()
+    Dim Element As New SecurityElement
+    Dim Values As New Hashtable
+    Values.Add "TheKey", "val>ue"
+    
+    On Error Resume Next
+    Set Element.Attributes = Values
+    
+    AssertArgumentException Err
+End Sub
 
+Public Sub Attributes_WhenChangeExisting_DoesNotAlterValue()
+    Dim Element As New SecurityElement
+    Dim Values As New Hashtable
+    Values.Add "Key", "Value"
+    Set Element.Attributes = Values
+    
+    Element.Attributes.Add "NewKey", "NewValue"
+    
+    Assert.That Element.Attributes.ContainsKey("NewKey"), Iz.False
+End Sub
 
+Public Sub Attributes_WhenChangingOriginalHashtable_DoesNotAlterValue()
+    Dim Element As New SecurityElement
+    Dim Values As New Hashtable
+    Values.Add "Key", "Value"
+    Set Element.Attributes = Values
+
+    Values.Add "NewKey", "NewValue"
+    
+    Assert.That Element.Attributes.ContainsKey("NewKey"), Iz.False
+End Sub
+
+Public Sub Tag_WhenSetWithInvalidValue_ThrowsArgumentException()
+    Dim Element As New SecurityElement
+    
+    On Error Resume Next
+    Element.Tag = "Ta<g"
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub Text_WhenSetWithInvalidValue_ThrowsArgumentException()
+    Dim Element As New SecurityElement
+    
+    On Error Resume Next
+    Element.Text = "Te<xt"
+    
+    AssertArgumentException Err
+End Sub
 
 
 

@@ -60,35 +60,42 @@ Private mAttributes As Hashtable
 ''
 ' Returns any attributes contained within the xml element.
 '
-' @return A IDictionary object containing key/value pairs of attributes or Nothing.
+' @return An IDictionary object containing key/value pairs of attributes or Nothing.
 ' @remarks The attribute names are case sensitive.
 '
 Public Property Get Attributes() As Hashtable
     If Not mAttributes Is Nothing Then
-        If mAttributes.Count > 0 Then
-            Set Attributes = mAttributes
-        End If
+        Set Attributes = Cor.NewHashtable(mAttributes)
     End If
 End Property
 
 ''
 ' Sets the attributes for this xml element.
 '
-' @param RHS An IDictionary of key/value pairs as attributes.
+' @param Value An IDictionary of key/value pairs as attributes.
 ' @remarks The attribute names and values are validated before the list is accepted.
 '
-Public Property Set Attributes(ByVal RHS As Hashtable)
-    If Not RHS Is Nothing Then
-        Dim de As DictionaryEntry
-        For Each de In RHS
-            If Not SecurityElement.IsValidAttributeName(de.Key) Then _
-                Throw Cor.NewArgumentException("Invalid attribute name found.")
-            If Not SecurityElement.IsValidAttributeValue(de.Value) Then _
-                Throw Cor.NewArgumentException("Invalid attribute value found.")
-        Next de
+Public Property Set Attributes(ByVal Value As Hashtable)
+    If Value Is Nothing Then
+        Set mAttributes = Nothing
+    ElseIf Value.Count = 0 Then
+        Set mAttributes = Nothing
+    Else
+        Dim Item    As DictionaryEntry
+        Dim Table   As Hashtable
+        Set Table = Cor.NewHashtable2(Value.Count)
+        
+        For Each Item In Value
+            If Not SecurityElement.IsValidAttributeName(Item.Key) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementName, Item.Key))
+            If Not SecurityElement.IsValidAttributeValue(Item.Value) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementValue, Item.Value))
+                
+            Table.Add Item.Key, Item.Value
+        Next
+        
+        Set mAttributes = Table
     End If
-
-    Set mAttributes = RHS
 End Property
 
 ''
@@ -123,14 +130,14 @@ End Property
 ''
 ' Sets the tag name for this SecurityElement.
 '
-' @param RHS The new tag name.
+' @param Value The new tag name.
 ' @remarks The tag is validated prior to setting.
 '
-Public Property Let Tag(ByVal RHS As String)
-    If Not SecurityElement.IsValidTag(RHS) Then _
-        Throw Cor.NewArgumentException("Invalid Tag.", "Tag")
-    
-    mTag = RHS
+Public Property Let Tag(ByRef Value As String)
+    If Not SecurityElement.IsValidTag(Value) Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementTag, Value))
+        
+    mTag = Value
 End Property
 
 ''
@@ -145,14 +152,14 @@ End Property
 ''
 ' Sets the text between the opening and closing element tags.
 '
-' @param RHS The new element text.
+' @param Value The new element text.
 ' @remarks The text is validated prior to being set.
 '
-Public Property Let Text(ByVal RHS As String)
-    If Not SecurityElement.IsValidText(RHS) Then _
-        Throw Cor.NewArgumentException("Invalid Text.", "Text")
+Public Property Let Text(ByRef Value As String)
+    If Not SecurityElement.IsValidText(Value) Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementText, Value))
     
-    mText = RHS
+    mText = Value
 End Property
 
 ''
