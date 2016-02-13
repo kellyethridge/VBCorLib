@@ -331,7 +331,37 @@ Public Sub GetAttribute_WithValueContainingEscapedSequence_UnescapesSequence(ByV
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub Children_WhenNewlyConstructed_ReturnsNothing()
+    Dim Element As New SecurityElement
+    
+    Dim Actual As ArrayList
+    Set Actual = Element.Children
+    
+    Assert.That Actual, Iz.Nothing
+End Sub
 
+Public Sub Children_WhenSet_StoresChildren()
+    Dim Children As New ArrayList
+    Dim Child As New SecurityElement
+    Children.Add Child
+    Dim Element As New SecurityElement
+    
+    Set Element.Children = Children
+    
+    Assert.That Element.Children, Iz.Not.Nothing
+    Assert.That Element.Children(0), Iz.SameAs(Child)
+End Sub
+
+Public Sub Children_WhenSetAndContainsNullChild_ThrowsArgumentException()
+    Dim Children As New ArrayList
+    Children.Add Nothing
+    Dim Element As New SecurityElement
+    
+    On Error Resume Next
+    Set Element.Children = Children
+    
+    AssertArgumentException Err
+End Sub
 
 
 

@@ -110,12 +110,20 @@ End Property
 ''
 ' Sets the list of children SecurityElements for this element.
 '
-' @param RHS The list of children to be set to this SecurityElement.
-' @remarks DotNET doesn't seem to validate this list prior to setting it,
-' so we won't bother to check either.
+' @param Value The list of children to be set to this SecurityElement.
 '
-Public Property Set Children(ByVal RHS As ArrayList)
-    Set mChildren = RHS
+Public Property Set Children(ByVal Value As ArrayList)
+    If Not Value Is Nothing Then
+        Dim Item As Variant
+        For Each Item In Value
+            If IsObject(Item) Then
+                If Item Is Nothing Then _
+                    Error.Argument ArgumentNull_Child
+            End If
+        Next
+    End If
+    
+    Set mChildren = Value
 End Property
 
 ''
