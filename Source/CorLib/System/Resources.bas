@@ -125,6 +125,7 @@ Public Enum ResourceStringKey
     Argument_InvalidElementName = 855
     Argument_InvalidElementValue = 856
     Argument_InvalidElementText = 857
+    Argument_AttributeNamesMustBeUnique = 858
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901

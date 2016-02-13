@@ -74,6 +74,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "na<me"
             Test.Use "nam>e"
             
+        Case "GetAttribute_WithValueContainingEscapedSequence_UnescapesSequence"
+            Test.Use "val&lt;ue", "val<ue"
+            Test.Use "val&gt;ue", "val>ue"
+            Test.Use "val&quot;ue", "val""ue"
+            Test.Use "val&apos;ue", "val'ue"
+            Test.Use "val&amp;ue", "val&ue"
+            
     End Select
 End Sub
 
@@ -157,6 +164,14 @@ Public Sub Constructor_WithInvalidTagAndValidText_ThrowsArgumentException()
     Dim Ex As ArgumentException
     Set Ex = AssertArgumentException(Err)
     Assert.That Ex.Message, Iz.StringContaining("na<me")
+End Sub
+
+Public Sub Constructor_WithValidTagAndInvalidText_ThrowsArgumentException()
+    On Error Resume Next
+    
+    Cor.NewSecurityElement "name", "te>xt"
+    
+    AssertArgumentException Err
 End Sub
 
 Public Sub Attributes_WhenSetToNothing_ReturnsNothing()
@@ -251,9 +266,70 @@ Public Sub Text_WhenSetWithInvalidValue_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+Public Sub AddAttribute_WithValidValues_AddsTottribute()
+    Dim Element As New SecurityElement
+    
+    Element.AddAttribute "version", "1.0"
+    
+    Assert.That Element.Attributes("version"), Iz.EqualTo("1.0")
+End Sub
 
+Public Sub AddAttribute_WithInvalidName_ThrowsArgumentException()
+    Dim Element As New SecurityElement
+    
+    On Error Resume Next
+    Element.AddAttribute "ver<sion", "1.0"
+    
+    AssertArgumentException Err
+End Sub
 
+Public Sub AddAttribute_WithInvalidValue_ThrowsArgumentException()
+    Dim Element As New SecurityElement
+    
+    On Error Resume Next
+    Element.AddAttribute "version", "1<0"
+    
+    AssertArgumentException Err
+End Sub
 
+Public Sub AddAttribute_WithExistingAttribute_ThrowsArgumentException()
+    Dim Element As New SecurityElement
+    Element.AddAttribute "version", "1.0"
+    
+    On Error Resume Next
+    Element.AddAttribute "version", "2.0"
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub GetAttribute_WithNonExistingName_ReturnsEmpty()
+    Dim Element As New SecurityElement
+    Dim Actual As String
+    
+    Actual = Element.GetAttribute("version")
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub GetAttribute_WithExistingName_ReturnsValue()
+    Dim Element As New SecurityElement
+    Element.AddAttribute "version", "1.0"
+    
+    Dim Actual As String
+    Actual = Element.GetAttribute("version")
+    
+    Assert.That Actual, Iz.EqualTo("1.0")
+End Sub
+
+Public Sub GetAttribute_WithValueContainingEscapedSequence_UnescapesSequence(ByVal EscapedValue As String, ByVal Expected As String)
+    Dim Element As New SecurityElement
+    Element.AddAttribute "version", EscapedValue
+        
+    Dim Actual As String
+    Actual = Element.GetAttribute("version")
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 
