@@ -144,7 +144,7 @@ End Property
 Public Property Let Tag(ByRef Value As String)
     If Not SecurityElement.IsValidTag(Value) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementTag, Value))
-        
+    
     mTag = Value
 End Property
 
@@ -198,13 +198,13 @@ End Sub
 '
 Public Sub AddChild(ByVal Child As SecurityElement)
     If Child Is Nothing Then _
-        Throw New ArgumentNullException
+        Error.ArgumentNull "Child"
     
     If mChildren Is Nothing Then
         Set mChildren = New ArrayList
     End If
     
-    Call mChildren.Add(Child)
+    mChildren.Add Child
 End Sub
 
 ''
@@ -286,7 +286,20 @@ End Function
 ' @return Returns True if they are equal, False otherwise.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = MyBase.Equals(Me, Value)
+    Dim Other As SecurityElement
+    
+    On Error GoTo Catch
+    Set Other = Value
+    If Other Is Nothing Then _
+        Exit Function
+    If mTag <> Other.Tag Then _
+        Exit Function
+    If mText <> Other.Text Then _
+        Exit Function
+    
+    Equals = True
+    
+Catch:
 End Function
 
 ''

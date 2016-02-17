@@ -81,6 +81,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "val&apos;ue", "val'ue"
             Test.Use "val&amp;ue", "val&ue"
             
+        Case "Equals_WithTagAndTextValues_ReturnsExpected"
+            Test.Use "Tag", "Text", True
+            Test.Use "tag", "Text", False
+            Test.Use "Tag", "text", False
+            
     End Select
 End Sub
 
@@ -266,7 +271,7 @@ Public Sub Text_WhenSetWithInvalidValue_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
-Public Sub AddAttribute_WithValidValues_AddsTottribute()
+Public Sub AddAttribute_WithValidValues_AddsToAttributes()
     Dim Element As New SecurityElement
     
     Element.AddAttribute "version", "1.0"
@@ -363,11 +368,35 @@ Public Sub Children_WhenSetAndContainsNullChild_ThrowsArgumentException()
     AssertArgumentException Err
 End Sub
 
+Public Sub AddChild_WithNothing_ThrowsArgumentNullException()
+    Dim Element As New SecurityElement
+    
+    On Error Resume Next
+    Element.AddChild Nothing
+    
+    AssertArgumentNullException Err, "Child"
+End Sub
 
+Public Sub AddChild_WithValue_AddsToChildrent()
+    Dim Element As New SecurityElement
+    Dim Child As New SecurityElement
+    
+    Element.AddChild Child
+    
+    Assert.That Element.Children(0), Iz.SameAs(Child)
+End Sub
 
-
-
-
+Public Sub Equals_WithTagAndTextValues_ReturnsExpected(ByVal Tag As String, ByVal Text As String, ByVal Expected As Boolean)
+    Dim Element1 As SecurityElement
+    Dim Element2 As SecurityElement
+    Set Element1 = Cor.NewSecurityElement("Tag", "Text")
+    Set Element2 = Cor.NewSecurityElement(Tag, Text)
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equals(Element2)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 

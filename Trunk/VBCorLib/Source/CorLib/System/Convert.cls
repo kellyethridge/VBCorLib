@@ -251,8 +251,19 @@ End Function
 Public Function FromBase64String(ByRef s As String) As Byte()
     Dim Chars() As Integer
     Chars = AllocChars(s)
+    
+    On Error GoTo Catch
     FromBase64String = FromBase64CharArray(Chars, 0, Len(s))
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
     FreeChars Chars
+    Return
 End Function
 
 ''
