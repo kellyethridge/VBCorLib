@@ -81,7 +81,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "val&apos;ue", "val'ue"
             Test.Use "val&amp;ue", "val&ue"
             
-        Case "Equals_WithTagAndTextValues_ReturnsExpected"
+        Case "Equal_WithTagAndTextValues_ReturnsExpected"
             Test.Use "Tag", "Text", True
             Test.Use "tag", "Text", False
             Test.Use "Tag", "text", False
@@ -386,20 +386,297 @@ Public Sub AddChild_WithValue_AddsToChildrent()
     Assert.That Element.Children(0), Iz.SameAs(Child)
 End Sub
 
-Public Sub Equals_WithTagAndTextValues_ReturnsExpected(ByVal Tag As String, ByVal Text As String, ByVal Expected As Boolean)
+Public Sub Equal_WithTagAndTextValues_ReturnsExpected(ByVal Tag As String, ByVal Text As String, ByVal Expected As Boolean)
     Dim Element1 As SecurityElement
     Dim Element2 As SecurityElement
     Set Element1 = Cor.NewSecurityElement("Tag", "Text")
     Set Element2 = Cor.NewSecurityElement(Tag, Text)
     
     Dim Actual As Boolean
-    Actual = Element1.Equals(Element2)
+    Actual = Element1.Equal(Element2)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub Equal_WithDifferingAttributeCount_ReturnsFalse()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddAttribute "a1", "a1"
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
 
+Public Sub Equal_WithDifferingAttributeCount_ReturnsFalse2()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element2.AddAttribute "a1", "a1"
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
 
+Public Sub Equal_WithDifferingAttributeCount_ReturnsFalse3()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddAttribute "a1", "a1"
+    Element1.AddAttribute "a2", "a2"
+    Element2.AddAttribute "a1", "a1"
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithSameAttributes_ReturnsTrue()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddAttribute "a1", "a1"
+    Element2.AddAttribute "a1", "a1"
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.True
+End Sub
+
+Public Sub Equal_WithDifferingAttributeNames_ReturnsFalse()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddAttribute "a1", "a1"
+    Element2.AddAttribute "a2", "a1"
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithDifferingAttributeValues_ReturnsFalse()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddAttribute "a1", "a1"
+    Element2.AddAttribute "a1", "a2"
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithSameAttributesInDifferingOrder_ReturnsFalse()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddAttribute "a1", "a1"
+    Element1.AddAttribute "a2", "a2"
+    Element2.AddAttribute "a2", "a2"
+    Element2.AddAttribute "a1", "a1"
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithDifferingChildCount_ReturnsFalse()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddChild New SecurityElement
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithDifferingChildCount_ReturnsFalse2()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element2.AddChild New SecurityElement
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithDifferingChildCount_ReturnsFalse3()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddChild New SecurityElement
+    Element1.AddChild New SecurityElement
+    Element2.AddChild New SecurityElement
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithEqualChildren_ReturnsTrue()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddChild Cor.NewSecurityElement("tag", "text")
+    Element2.AddChild Cor.NewSecurityElement("tag", "text")
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.True
+End Sub
+
+Public Sub Equal_WithUnequalChildren_ReturnsFalse()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddChild Cor.NewSecurityElement("tag1", "text")
+    Element2.AddChild Cor.NewSecurityElement("tag2", "text")
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Equal_WithSameChildrenInDifferingOrder_ReturnsFalse()
+    Dim Element1 As New SecurityElement
+    Dim Element2 As New SecurityElement
+    Element1.AddChild Cor.NewSecurityElement("tag1", "text")
+    Element1.AddChild Cor.NewSecurityElement("tag2", "text")
+    Element2.AddChild Cor.NewSecurityElement("tag2", "text")
+    Element2.AddChild Cor.NewSecurityElement("tag1", "text")
+    
+    Dim Actual As Boolean
+    Actual = Element1.Equal(Element2)
+    
+    Assert.That Actual, Iz.False
+End Sub
+
+Public Sub Copy_WithNoAttributesOrChildren_ReturnsShallowCopy()
+    Dim Element As SecurityElement
+    Set Element = Cor.NewSecurityElement("tag", "text")
+    
+    Dim Actual As SecurityElement
+    Set Actual = Element.Copy
+    
+    Assert.That Actual, Iz.Not.Nothing
+    Assert.That Actual.Tag, Iz.EqualTo("tag")
+    Assert.That Actual.Text, Iz.EqualTo("text")
+    Assert.That Actual.Attributes, Iz.Nothing
+    Assert.That Actual.Children, Iz.Nothing
+End Sub
+
+Public Sub Copy_WithAttributesAndChildren_ReturnsWithShallowCopy()
+    Dim Element As SecurityElement
+    Set Element = Cor.NewSecurityElement("tag", "text")
+    Element.AddAttribute "att", "value"
+    Dim Child As New SecurityElement
+    Element.AddChild Child
+    
+    Dim Actual As SecurityElement
+    Set Actual = Element.Copy
+    
+    Assert.That Actual, Iz.Not.Nothing
+    Assert.That Actual.Tag, Iz.EqualTo("tag")
+    Assert.That Actual.Text, Iz.EqualTo("text")
+    Assert.That Actual.Attributes, Iz.Not.Nothing, "Attributes"
+    Assert.That Actual.Attributes("att"), Iz.EqualTo("value")
+    Assert.That Actual.Children, Iz.Not.Nothing, "Children"
+    Assert.That Actual.Children(0), Iz.SameAs(Child)
+End Sub
+
+Public Sub SearchForTextOfTag_WithNoChildren_ReturnsEmpty()
+    Dim Element As New SecurityElement
+    
+    Dim Actual As String
+    Actual = Element.SearchForTextOfTag("tag")
+    
+    Assert.That Actual, Iz.Empty
+End Sub
+
+Public Sub SearchForTextOfTag_WithSelfHavingMatchingTag_ReturnsText()
+    Dim Element As SecurityElement
+    Set Element = Cor.NewSecurityElement("tag", "text")
+    
+    Dim Actual As String
+    Actual = Element.SearchForTextOfTag("tag")
+    
+    Assert.That Actual, Iz.EqualTo("text")
+End Sub
+
+Public Sub SearchForTextOfTag_WithChildMatchingTag_ReturnsChildText()
+    Dim Element As New SecurityElement
+    Element.AddChild Cor.NewSecurityElement("tag", "child_text")
+    
+    Dim Actual As String
+    Actual = Element.SearchForTextOfTag("tag")
+    
+    Assert.That Actual, Iz.EqualTo("child_text")
+End Sub
+
+Public Sub SearchForTextOfTag_WithGrandchildMatchingTag_ReturnsGrandchildText()
+    Dim Element As New SecurityElement
+    Dim Child As New SecurityElement
+    Element.AddChild Child
+    Child.AddChild Cor.NewSecurityElement("tag", "grandchild_text")
+    
+    Dim Actual As String
+    Actual = Element.SearchForTextOfTag("tag")
+    
+    Assert.That Actual, Iz.EqualTo("grandchild_text")
+End Sub
+
+Public Sub SearchForChildByTag_WithNoChildren_ReturnsNothing()
+    Dim Element As New SecurityElement
+    
+    Dim Actual As SecurityElement
+    Set Actual = Element.SearchForChildByTag("tag")
+    
+    Assert.That Actual, Iz.Nothing
+End Sub
+
+Public Sub SearchForChildByTag_WithNoMatchingTag_ReturnsNothing()
+    Dim Element As New SecurityElement
+    Element.AddChild Cor.NewSecurityElement("tag2", "text")
+    
+    Dim Actual As SecurityElement
+    Set Actual = Element.SearchForChildByTag("tag")
+    
+    Assert.That Actual, Iz.Nothing
+End Sub
+
+Public Sub SearchForChildByTag_WithMatchingTag_ReturnsChild()
+    Dim Element As New SecurityElement
+    Element.AddChild Cor.NewSecurityElement("tag", "text")
+    
+    Dim Actual As SecurityElement
+    Set Actual = Element.SearchForChildByTag("tag")
+    
+    Assert.That Actual.Text, Iz.EqualTo("text")
+End Sub
+
+Public Sub Serialization_WhenCalled_SerializesObject()
+    Dim Element As SecurityElement
+    Set Element = Cor.NewSecurityElement("elem", "elem_text")
+    Element.AddAttribute "name", "value"
+    Dim Child As SecurityElement
+    Set Child = Cor.NewSecurityElement("child", "child_text")
+    Child.AddAttribute "child_name", "child_value"
+    Element.AddChild Child
+    Dim Grand As SecurityElement
+    Set Grand = Cor.NewSecurityElement("grand", "grand_text")
+    Grand.AddAttribute "grand_name", "grand_value"
+    Child.AddChild Grand
+    
+    Dim Actual As SecurityElement
+    Set Actual = Persist(Element)
+    
+    Assert.That Actual.Equal(Element), Iz.True
+End Sub
 
 
 

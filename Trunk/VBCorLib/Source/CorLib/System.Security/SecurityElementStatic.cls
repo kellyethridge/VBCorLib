@@ -67,13 +67,13 @@ Private mIndex              As Long
 '
 Public Function Escape(ByRef Text As String) As String
     Dim sb As StringBuilder
-    Set sb = StringBuilderCache.Acquire _
-                                .Append(Text) _
-                                .Replace("&", "&amp;") _
-                                .Replace("<", "&lt;") _
-                                .Replace(">", "&gt;") _
-                                .Replace("""", "&quot;") _
-                                .Replace("'", "&apos;")
+    Set sb = StringBuilderCache.Acquire
+    sb.AppendString Text
+    sb.Replace "&", "&amp;"
+    sb.Replace "<", "&lt;"
+    sb.Replace ">", "&gt;"
+    sb.Replace """", "&quot;"
+    sb.Replace "'", "&apos;"
 
     Escape = StringBuilderCache.GetStringAndRelease(sb)
 End Function
