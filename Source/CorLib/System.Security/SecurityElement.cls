@@ -45,16 +45,15 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const PROP_TAG          As String = "Tag"
-Private Const PROP_TEXT         As String = "Text"
-Private Const PROP_CHILDREN     As String = "Children"
-Private Const PROP_ATTRIBUTES   As String = "Attributes"
-
+Private Const PropTag          As String = "Tag"
+Private Const PropText         As String = "Text"
+Private Const PropChildren     As String = "Children"
+Private Const PropAttributes   As String = "Attributes"
 
 Private mTag        As String
 Private mText       As String
 Private mChildren   As ArrayList
-Private mAttributes As Hashtable
+Private mAttributes As ArrayList
 
 
 ''
@@ -65,7 +64,12 @@ Private mAttributes As Hashtable
 '
 Public Property Get Attributes() As Hashtable
     If Not mAttributes Is Nothing Then
-        Set Attributes = Cor.NewHashtable(mAttributes)
+        Set Attributes = Cor.NewHashtable2(mAttributes.Count)
+        
+        Dim i As Long
+        For i = 0 To mAttributes.Count - 1 Step 2
+            Attributes.Add mAttributes(i), mAttributes(i + 1)
+        Next
     End If
 End Property
 
@@ -81,9 +85,8 @@ Public Property Set Attributes(ByVal Value As Hashtable)
     ElseIf Value.Count = 0 Then
         Set mAttributes = Nothing
     Else
-        Dim Item    As DictionaryEntry
-        Dim Table   As Hashtable
-        Set Table = Cor.NewHashtable2(Value.Count)
+        Dim Item As DictionaryEntry
+        Dim List As New ArrayList
         
         For Each Item In Value
             If Not SecurityElement.IsValidAttributeName(Item.Key) Then _
@@ -91,11 +94,20 @@ Public Property Set Attributes(ByVal Value As Hashtable)
             If Not SecurityElement.IsValidAttributeValue(Item.Value) Then _
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementValue, Item.Value))
                 
-            Table.Add Item.Key, Item.Value
+            List.Add Item.Key
+            List.Add Item.Value
         Next
         
-        Set mAttributes = Table
+        Set mAttributes = List
     End If
+End Property
+
+Friend Property Get InternalAttributes() As ArrayList
+    Set InternalAttributes = mAttributes
+End Property
+
+Friend Property Set InternalAttributes(ByVal Value As ArrayList)
+    Set mAttributes = Value
 End Property
 
 ''
@@ -117,8 +129,9 @@ Public Property Set Children(ByVal Value As ArrayList)
         Dim Item As Variant
         For Each Item In Value
             If IsObject(Item) Then
-                If Item Is Nothing Then _
+                If Item Is Nothing Then
                     Error.Argument ArgumentNull_Child
+                End If
             End If
         Next
     End If
@@ -178,17 +191,23 @@ End Property
 '
 Public Sub AddAttribute(ByRef Name As String, ByRef Value As String)
     If mAttributes Is Nothing Then
-        Set mAttributes = New Hashtable
+        Set mAttributes = New ArrayList
     End If
     
     If Not SecurityElement.IsValidAttributeName(Name) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementName, Name))
     If Not SecurityElement.IsValidAttributeValue(Value) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidElementValue, Value))
-    If mAttributes.ContainsKey(Name) Then _
-        Error.Argument Argument_AttributeNamesMustBeUnique
+    
+    Dim i As Long
+    For i = 0 To mAttributes.Count - 1 Step 2
+        If mAttributes(i) = Name Then
+            Error.Argument Argument_AttributeNamesMustBeUnique
+        End If
+    Next
         
-    mAttributes.Add Name, Value
+    mAttributes.Add Name
+    mAttributes.Add Value
 End Sub
 
 ''
@@ -216,16 +235,19 @@ End Sub
 '
 Public Function GetAttribute(ByRef Name As String) As String
     If Not mAttributes Is Nothing Then
-        If mAttributes.ContainsKey(Name) Then
-            Dim Result As String
-            Result = mAttributes(Name)
-            
-            If InStr(Result, "&") Then
-                GetAttribute = Unescape(Result)
-            Else
-                GetAttribute = Result
+        Dim i As Long
+        For i = 0 To mAttributes.Count - 1 Step 2
+            If mAttributes(i) = Name Then
+                Dim Result As String
+                Result = mAttributes(i + 1)
+                
+                If InStr(Result, "&") Then
+                    GetAttribute = Unescape(Result)
+                Else
+                    GetAttribute = Result
+                End If
             End If
-        End If
+        Next
     End If
 End Function
 
@@ -235,9 +257,8 @@ End Function
 ' @return A copy of the object.
 '
 Public Function Copy() As SecurityElement
-    Dim Bag As New PropertyBag
-    Call Bag.WriteProperty("Copy", Me)
-    Set Copy = Bag.ReadProperty("Copy")
+    Set Copy = New SecurityElement
+    Copy.InitCopy Me
 End Function
 
 ''
@@ -248,8 +269,10 @@ End Function
 ' @remarks Only the first level of children for this instance are searched,
 ' no grandchildren are searched.
 '
-Public Function SearchForChildByTag(ByVal Tag As String) As SecurityElement
-    If mChildren Is Nothing Then Exit Function
+Public Function SearchForChildByTag(ByRef Tag As String) As SecurityElement
+    If mChildren Is Nothing Then
+        Exit Function
+    End If
     
     Dim Child As SecurityElement
     For Each Child In mChildren
@@ -257,7 +280,7 @@ Public Function SearchForChildByTag(ByVal Tag As String) As SecurityElement
             Set SearchForChildByTag = Child
             Exit Function
         End If
-    Next Child
+    Next
 End Function
 
 ''
@@ -268,13 +291,102 @@ End Function
 ' @remarks Only the first level of children for this instance are searched,
 ' no grandchildren are searched.
 '
-Public Function SearchForTextOfTag(ByVal Tag As String) As String
+Public Function SearchForTextOfTag(ByRef Tag As String) As String
+    If Tag = mTag Then
+        SearchForTextOfTag = Unescape(mText)
+        Exit Function
+    End If
+    
     Dim Child As SecurityElement
-    Set Child = SearchForChildByTag(Tag)
+    Set Child = FindChildByTag(Tag)
     
     If Not Child Is Nothing Then
         SearchForTextOfTag = Child.Text
     End If
+End Function
+
+Friend Function FindChildByTag(ByRef Tag As String) As SecurityElement
+    If mChildren Is Nothing Then
+        Exit Function
+    End If
+        
+    Dim Result As SecurityElement
+    Dim Child As SecurityElement
+    For Each Child In mChildren
+        If Child.Tag = Tag Then
+            Set FindChildByTag = Child
+            Exit Function
+        End If
+        
+        Set Result = Child.FindChildByTag(Tag)
+        If Not Result Is Nothing Then
+            Set FindChildByTag = Result
+            Exit Function
+        End If
+    Next
+End Function
+
+Public Function Equal(ByVal Other As SecurityElement) As Boolean
+    If Other Is Nothing Then _
+        Exit Function
+    If mTag <> Other.Tag Then _
+        Exit Function
+    If mText <> Other.Text Then _
+        Exit Function
+    If Not EqualAttributes(Other) Then _
+        Exit Function
+    If Not EqualChildren(Other) Then _
+        Exit Function
+    
+    Equal = True
+End Function
+
+Private Function EqualAttributes(ByVal Other As SecurityElement) As Boolean
+    If Other.InternalAttributes Is Nothing Then
+        If Not mAttributes Is Nothing Then
+            Exit Function
+        End If
+    ElseIf mAttributes Is Nothing Then
+        Exit Function
+    ElseIf Other.InternalAttributes.Count <> mAttributes.Count Then
+        Exit Function
+    Else
+        With Other.InternalAttributes
+            Dim i As Long
+            For i = 0 To mAttributes.Count - 1
+                If mAttributes(i) <> .Item(i) Then
+                    Exit Function
+                End If
+            Next
+        End With
+    End If
+    
+    EqualAttributes = True
+End Function
+
+Private Function EqualChildren(ByVal Other As SecurityElement) As Boolean
+    If Other.Children Is Nothing Then
+        If Not mChildren Is Nothing Then
+            Exit Function
+        End If
+    ElseIf mChildren Is Nothing Then
+        Exit Function
+    ElseIf Other.Children.Count <> mChildren.Count Then
+        Exit Function
+    Else
+        With Other.Children
+            Dim i As Long
+            Dim Child As SecurityElement
+            For i = 0 To mChildren.Count - 1
+                Set Child = mChildren(i)
+                If Not Child.Equal(.Item(i)) Then
+                    Exit Function
+                End If
+            Next
+        End With
+    End If
+
+    EqualChildren = True
 End Function
 
 ''
@@ -286,20 +398,7 @@ End Function
 ' @return Returns True if they are equal, False otherwise.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Dim Other As SecurityElement
-    
-    On Error GoTo Catch
-    Set Other = Value
-    If Other Is Nothing Then _
-        Exit Function
-    If mTag <> Other.Tag Then _
-        Exit Function
-    If mText <> Other.Text Then _
-        Exit Function
-    
-    Equals = True
-    
-Catch:
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -356,6 +455,15 @@ Friend Sub Init(ByRef Tag As String, ByRef Text As String)
     mText = Text
 End Sub
 
+Friend Sub InitCopy(ByVal Source As SecurityElement)
+    mTag = Source.Tag
+    mText = Source.Text
+    Set Attributes = Source.Attributes
+    If Not Source.Children Is Nothing Then
+        Set mChildren = Cor.NewArrayList(Source:=Source.Children)
+    End If
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
@@ -403,23 +511,23 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mTag = .ReadProperty(PROP_TAG)
-        mText = .ReadProperty(PROP_TEXT)
-        Set mChildren = .ReadProperty(PROP_CHILDREN, Nothing)
-        Set mAttributes = .ReadProperty(PROP_ATTRIBUTES, Nothing)
+        mTag = .ReadProperty(PropTag)
+        mText = .ReadProperty(PropText)
+        Set mChildren = .ReadProperty(PropChildren, Nothing)
+        Set mAttributes = .ReadProperty(PropAttributes, Nothing)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_TAG, mTag)
-        Call .WriteProperty(PROP_TEXT, mText)
-        Call .WriteProperty(PROP_CHILDREN, mChildren, Nothing)
-        Call .WriteProperty(PROP_ATTRIBUTES, mAttributes, Nothing)
+        .WriteProperty PropTag, mTag
+        .WriteProperty PropText, mText
+        .WriteProperty PropChildren, mChildren, Nothing
+        .WriteProperty PropAttributes, mAttributes, Nothing
     End With
 End Sub
 
