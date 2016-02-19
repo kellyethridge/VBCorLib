@@ -139,6 +139,7 @@ Private Sub AddSystem()
             New CorArrayCreateInstanceTests, _
             New CorArrayFindTests)
     
+        .Add New PublicFunctionsTests
         AddTest .This
     End With
 End Sub
