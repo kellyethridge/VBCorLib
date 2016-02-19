@@ -206,6 +206,7 @@ Public Enum ResourceStringKey
     Format_InvalidTimeSpan = 603
     Format_InvalidGuidFormatSpecification = 604
     Format_GuidUnrecognized = 605
+    Format_UnrecognizedEscapeSequence = 606
     
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301

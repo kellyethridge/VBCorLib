@@ -26,9 +26,34 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     Select Case Test.MethodName
         Case "T_WithValue_ReturnsExpected"
             Test.Use "Text", "Text"
-            Test.Use "te\txt", "te" & vbTab & "xt"
-            Test.Use "te\rxt", "te" & vbCr & "xt"
-            Test.Use "te\nxt", "te" & vbLf & "xt"
+            Test.Use "\t", vbTab
+            Test.Use "\r", vbCr
+            Test.Use "\n", vbLf
+            Test.Use "\a", Chr$(7)
+            Test.Use "\b", vbBack
+            Test.Use "\f", Chr$(12)
+            Test.Use "\v", vbVerticalTab
+            Test.Use "\\", "\"
+            Test.Use "\0", vbNullChar
+            Test.Use "\xd", vbCr
+            Test.Use "\x0d", vbCr
+            Test.Use "\x00d", vbCr
+            Test.Use "\x000D", vbCr
+            Test.Use "\x000Dd", vbCr & "d"
+            Test.Use "\xdg", vbCr & "g"
+            Test.Use "\ud", vbCr
+            Test.Use "\u0d", vbCr
+            Test.Use "\u00d", vbCr
+            Test.Use "\u000D", vbCr
+            Test.Use "\u000Dd", vbCr & "d"
+            Test.Use "\udg", vbCr & "g"
+        
+        Case "T_WithInvalidEscapeSequence_ThrowsFormatException"
+            Test.Use "\"
+            Test.Use "\x"
+            Test.Use "\u"
+            Test.Use "\xj"
+            Test.Use "\uj"
             
     End Select
 End Sub
@@ -39,4 +64,12 @@ Public Sub T_WithValue_ReturnsExpected(ByVal Text As String, ByVal Expected As S
     Actual = t(Text)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub T_WithInvalidEscapeSequence_ThrowsFormatException(ByVal Text As String)
+    On Error Resume Next
+    
+    t Text
+    
+    AssertFormatException Err
 End Sub

@@ -42,44 +42,133 @@ Option Explicit
 
 Private mTextOut As New StringBuilder
 
-Public Function T(ByRef Text As String) As String
-    Const vbTabChar As Integer = 9
-    Const vbLowerNChar As Integer = 110
-    Const vbLowerRChar As Integer = 114
+Public Function t(ByRef Text As String) As String
+    Const vbBellChar        As Integer = 7
+    Const vbBackChar        As Integer = 8
+    Const vbTabChar         As Integer = 9
+    Const vbCrChar          As Integer = 13
+    Const vbLfChar          As Integer = 10
+    Const vbVerticalTabChar As Integer = 11
+    Const vbFormFeedChar    As Integer = 12
+    Const vbLowerNChar      As Integer = 110
+    Const vbLowerRChar      As Integer = 114
+    Const vbLowerAChar      As Integer = 97
+    Const vbLowerBChar      As Integer = 98
+    Const vbLowerFChar      As Integer = 102
+    Const vbLowerUChar      As Integer = 117
+    Const vbLowerVChar      As Integer = 118
+    Const vbZeroChar        As Integer = &H30
+    Const vbLowerXChar      As Integer = &H78
     
     Dim Chars() As Integer
     
     mTextOut.Length = 0
-    mTextOut.Capacity = Len(Text)
+    mTextOut.Capacity = LenB(Text)
     Chars = AllocChars(Text)
     
-    Dim i As Long
+    Dim i       As Long
+    Dim Length  As Long
     Dim Escaped As Boolean
-    Dim Ch As Integer
-    For i = 0 To UBound(Chars)
+    Dim Ch      As Integer
+    
+    Length = Len(Text)
+    
+    On Error GoTo Catch
+    Do While i < Length
         Ch = Chars(i)
         
         If Escaped Then
             Select Case Ch
                 Case corLowerTChar
-                    mTextOut.AppendChar vbTabChar
+                    Ch = vbTabChar
                 Case vbLowerNChar
-                    mTextOut.AppendChar 10
+                    Ch = vbLfChar
                 Case vbLowerRChar
-                    mTextOut.AppendChar 13
+                    Ch = vbCrChar
+                Case vbLowerAChar
+                    Ch = vbBellChar
+                Case vbLowerBChar
+                    Ch = vbBackChar
+                Case vbLowerFChar
+                    Ch = vbFormFeedChar
+                Case vbLowerVChar
+                    Ch = vbVerticalTabChar
+                Case vbZeroChar
+                    Ch = 0
+                Case vbLowerXChar, vbLowerUChar
+                    i = ReadHexChar(Chars, i + 1)
+                    Escaped = False
+                    GoTo Continue
             End Select
             
+            mTextOut.AppendChar Ch
             Escaped = False
         ElseIf Ch = corBackslashChar Then
             Escaped = True
         Else
             mTextOut.AppendChar Ch
         End If
-    Next
+        
+        i = i + 1
+Continue:
+    Loop
     
-    T = mTextOut.ToString
+    If Escaped Then _
+        Error.Format Format_UnrecognizedEscapeSequence
     
+    t = mTextOut.ToString
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
     FreeChars Chars
+    Return
+End Function
+
+Private Function ReadHexChar(ByRef Chars() As Integer, ByVal Index As Long) As Long
+    Dim Max     As Long
+    Dim Result  As Long
+    Dim Ch      As Long
+    Dim Count   As Long
+    
+    Max = UBound(Chars)
+    
+    If Index > Max Then _
+        Error.Format Format_UnrecognizedEscapeSequence
+    If Not TryHexToChar(Chars(Index), Result) Then _
+        Error.Format Format_UnrecognizedEscapeSequence
+    
+    Index = Index + 1
+    Do While Index <= Max And Count < 3
+        If Not TryHexToChar(Chars(Index), Ch) Then
+            Exit Do
+        End If
+        
+        Result = Result * &H10 + Ch
+        Index = Index + 1
+        Count = Count + 1
+    Loop
+    
+    mTextOut.AppendChar AsWord(Result)
+    ReadHexChar = Index
+End Function
+
+Private Function TryHexToChar(ByVal Ch As Integer, ByRef Result As Long) As Boolean
+    Select Case Ch
+        Case 48 To 57
+            Result = Ch - 48
+        Case 97 To 102
+            Result = Ch - 87
+        Case 65 To 70
+            Result = Ch - 55
+        Case Else
+            Exit Function
+    End Select
+    
+    TryHexToChar = True
 End Function
 
 ''
