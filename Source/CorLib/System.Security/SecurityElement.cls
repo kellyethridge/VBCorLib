@@ -437,7 +437,7 @@ Friend Sub AddSelf(ByVal sb As StringBuilder, Optional ByVal IsRoot As Boolean)
         Call AddChildren(sb)
         Call sb.AppendFormat("</{0}>{1}", mTag, vbCrLf)
     Else
-        Call sb.Append("/>")
+        sb.AppendLine "/>"
     End If
 End Sub
 
@@ -482,12 +482,22 @@ Private Function Unescape(ByRef s As String) As String
 End Function
 
 Private Sub AddAttributes(ByVal sb As StringBuilder)
-    If mAttributes Is Nothing Then Exit Sub
+    Dim IsFirst As Boolean
+    Dim i       As Long
     
-    Dim de As DictionaryEntry
-    For Each de In mAttributes
-        Call sb.AppendFormat(" {0}={2}{1}{2}", de.Key, de.Value, Chr$(corQuoteChar))
-    Next de
+    If mAttributes Is Nothing Then
+        Exit Sub
+    End If
+    
+    IsFirst = True
+    For i = 0 To mAttributes.Count - 1 Step 2
+        If IsFirst Then
+            sb.AppendFormat " {0}=""{1}""", mAttributes(i), mAttributes(i + 1)
+            IsFirst = False
+        Else
+            sb.AppendFormat "{0}{1}=""{2}""", vbCrLf, mAttributes(i), mAttributes(i + 1)
+        End If
+    Next
 End Sub
 
 Private Sub AddChildren(ByVal sb As StringBuilder)

@@ -40,6 +40,48 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mTextOut As New StringBuilder
+
+Public Function T(ByRef Text As String) As String
+    Const vbTabChar As Integer = 9
+    Const vbLowerNChar As Integer = 110
+    Const vbLowerRChar As Integer = 114
+    
+    Dim Chars() As Integer
+    
+    mTextOut.Length = 0
+    mTextOut.Capacity = Len(Text)
+    Chars = AllocChars(Text)
+    
+    Dim i As Long
+    Dim Escaped As Boolean
+    Dim Ch As Integer
+    For i = 0 To UBound(Chars)
+        Ch = Chars(i)
+        
+        If Escaped Then
+            Select Case Ch
+                Case corLowerTChar
+                    mTextOut.AppendChar vbTabChar
+                Case vbLowerNChar
+                    mTextOut.AppendChar 10
+                Case vbLowerRChar
+                    mTextOut.AppendChar 13
+            End Select
+            
+            Escaped = False
+        ElseIf Ch = corBackslashChar Then
+            Escaped = True
+        Else
+            mTextOut.AppendChar Ch
+        End If
+    Next
+    
+    T = mTextOut.ToString
+    
+    FreeChars Chars
+End Function
+
 ''
 ' Converts a Char value greater than 32768 to the corrisponding
 ' negative Integer value without overflow.

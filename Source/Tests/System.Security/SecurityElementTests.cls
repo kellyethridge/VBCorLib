@@ -678,6 +678,38 @@ Public Sub Serialization_WhenCalled_SerializesObject()
     Assert.That Actual.Equal(Element), Iz.True
 End Sub
 
+Public Sub ToString_WithTagOnly_ReturnsExpected()
+    Dim Element As New SecurityElement
+    Element.Tag = "tag"
+    
+    Dim Actual As String
+    Actual = Element.ToString
+    
+    Assert.That Actual, Iz.EqualTo("<tag/>" & vbCrLf)
+End Sub
+
+Public Sub ToString_WithTagAndText_ReturnsExpected()
+    Dim Element As SecurityElement
+    Set Element = Cor.NewSecurityElement("tag", "text")
+    
+    Dim Actual As String
+    Actual = Element.ToString
+    
+    Assert.That Actual, Iz.EqualTo("<tag>text</tag>" & vbCrLf)
+End Sub
+
+Public Sub ToString_WithTagAndAttribute_ReturnsExpected()
+    Dim Element As New SecurityElement
+    Element.Tag = "tag"
+    Element.AddAttribute "att", "val"
+    Element.AddAttribute "att2", "val2"
+    
+    Dim Actual As String
+    Actual = Element.ToString
+    
+    Assert.That Actual, Iz.EqualTo("<tag att=""val""" & vbCrLf & "att2=""val2""/>" & vbCrLf)
+End Sub
+
 
 
 
