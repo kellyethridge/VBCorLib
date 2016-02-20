@@ -685,7 +685,7 @@ Public Sub ToString_WithTagOnly_ReturnsExpected()
     Dim Actual As String
     Actual = Element.ToString
     
-    Assert.That Actual, Iz.EqualTo("<tag/>" & vbCrLf)
+    Assert.That Actual, Iz.EqualTo(t("<tag/>\r\n"))
 End Sub
 
 Public Sub ToString_WithTagAndText_ReturnsExpected()
@@ -695,7 +695,7 @@ Public Sub ToString_WithTagAndText_ReturnsExpected()
     Dim Actual As String
     Actual = Element.ToString
     
-    Assert.That Actual, Iz.EqualTo("<tag>text</tag>" & vbCrLf)
+    Assert.That Actual, Iz.EqualTo(t("<tag>text</tag>\r\n"))
 End Sub
 
 Public Sub ToString_WithTagAndAttribute_ReturnsExpected()
@@ -707,7 +707,7 @@ Public Sub ToString_WithTagAndAttribute_ReturnsExpected()
     Dim Actual As String
     Actual = Element.ToString
     
-    Assert.That Actual, Iz.EqualTo("<tag att=""val""" & vbCrLf & "att2=""val2""/>" & vbCrLf)
+    Assert.That Actual, Iz.EqualTo(t("<tag att=""val""\r\natt2=""val2""/>\r\n"))
 End Sub
 
 
