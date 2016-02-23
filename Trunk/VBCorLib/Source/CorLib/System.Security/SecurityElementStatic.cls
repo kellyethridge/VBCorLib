@@ -66,16 +66,41 @@ Private mIndex              As Long
 ' </pre>
 '
 Public Function Escape(ByRef Text As String) As String
-    Dim sb As StringBuilder
-    Set sb = StringBuilderCache.Acquire
-    sb.AppendString Text
-    sb.Replace "&", "&amp;"
-    sb.Replace "<", "&lt;"
-    sb.Replace ">", "&gt;"
-    sb.Replace """", "&quot;"
-    sb.Replace "'", "&apos;"
-
-    Escape = StringBuilderCache.GetStringAndRelease(sb)
+    Const vbAmpersandChar       As Integer = 38
+    Const vbLeftCheveronChar    As Integer = 60
+    Const vbRightCheveronChar   As Integer = 62
+    Const vbDoubleQuoteChar     As Integer = 34
+    Const vbSingleQuoteChar     As Integer = 39
+    
+    Dim Chars() As Integer
+    Dim Output  As StringBuilder
+    Dim i       As Long
+    Dim Ch      As Integer
+    
+    Chars = AllocChars(Text)
+    Set Output = StringBuilderCache.Acquire
+    Output.Capacity = LenB(Text)
+    
+    For i = 0 To UBound(Chars)
+        Ch = Chars(i)
+        Select Case Ch
+            Case vbAmpersandChar
+                Output.AppendString "&amp;"
+            Case vbLeftCheveronChar
+                Output.AppendString "&lt;"
+            Case vbRightCheveronChar
+                Output.AppendString "&gt;"
+            Case vbDoubleQuoteChar
+                Output.AppendString "&quot;"
+            Case vbSingleQuoteChar
+                Output.AppendString "&apos;"
+            Case Else
+                Output.AppendChar Ch
+        End Select
+    Next
+    
+    FreeChars Chars
+    Escape = StringBuilderCache.GetStringAndRelease(Output)
 End Function
 
 ''

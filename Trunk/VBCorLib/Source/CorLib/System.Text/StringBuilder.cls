@@ -254,8 +254,11 @@ Public Property Let Capacity(ByVal Value As Long)
         Ptr = CoTaskMemAlloc(Value * BytesPerChar)
         If Ptr = vbNullPtr Then _
             Throw New OutOfMemoryException
-            
-        CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
+        
+        If mLength > 0 Then
+            CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
+        End If
+        
         CoTaskMemFree mStringPtr
         mStringPtr = Ptr
         mStringSA.pvData = Ptr
@@ -736,8 +739,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
