@@ -443,7 +443,6 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
 End Function
 
 Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal ComparisonType As StringComparison = Ordinal) As Boolean
-    
     Select Case ComparisonType
         Case StringComparison.Ordinal
             Equals = OrdinalEquals(StrPtr(a), StrPtr(b))

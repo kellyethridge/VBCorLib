@@ -98,7 +98,7 @@ Public StringBuilderCache       As New StringBuilderCache
 Public EqualityComparer         As New EqualityComparerStatic
 Public MyBase                   As New ObjectBase
 Public Char                     As New Char
-Public Error                    As New GenericError
+Public Error                    As New ErrorStatic
 Public IOError                  As New IOError
 Public Number                   As New NumberStatic
 Public NullVersionableCollection As NullVersionableCollection
