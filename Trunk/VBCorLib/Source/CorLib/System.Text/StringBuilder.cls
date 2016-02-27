@@ -188,8 +188,11 @@ End Function
 ' @return A reference to this instance of StringBuilder.
 '
 Public Function AppendLine(Optional ByRef s As String) As StringBuilder
-    AppendString s
-    AppendString Environment.NewLine
+    If LenB(s) > 0 Then
+        AppendString s
+    End If
+    
+    AppendString vbCrLf
     Set AppendLine = Me
 End Function
 

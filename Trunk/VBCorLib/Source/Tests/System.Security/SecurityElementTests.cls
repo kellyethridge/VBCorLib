@@ -86,6 +86,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "tag", "Text", False
             Test.Use "Tag", "text", False
             
+        Case "FromString_WithInvalidXml_ThrowsXmlSyntaxException"
+            Test.Use ""
+            Test.Use "corlib"
+            
     End Select
 End Sub
 
@@ -751,6 +755,108 @@ Public Sub ToString_WithTagTextAndChildTagText_ReturnsExpected()
     
     Assert.That Actual, Iz.EqualTo(t("<parent_tag>parent_text\r\n<child_tag>child_text</child_tag>\r\n</parent_tag>\r\n"))
 End Sub
+
+Public Sub FromString_WithInvalidXml_ThrowsXmlSyntaxException(ByVal InvalidXml As String)
+    On Error Resume Next
+    
+    SecurityElement.FromString InvalidXml
+    
+    AssertXmlSyntaxException Err
+End Sub
+
+Public Sub FromString_WithXml_ReturnsSecurityElement()
+    Dim Element As SecurityElement
+    
+    Set Element = SecurityElement.FromString("<tag attribute=""value""><x:child attr=""1"">corlib</x:child><child/></tag>")
+    
+    Assert.That Element.Tag, Iz.EqualTo("tag")
+    Assert.That Element.Text, Iz.Empty
+    Assert.That Element.Attributes.Count, Iz.EqualTo(1)
+    Assert.That Element.Attributes("attribute"), Iz.EqualTo("value")
+    Assert.That Element.Children.Count, Iz.EqualTo(2)
+    
+    Dim Child As SecurityElement
+    Set Child = Element.Children(0)
+    Assert.That Child.Tag, Iz.EqualTo("x:child")
+    Assert.That Child.Text, Iz.EqualTo("corlib")
+    Assert.That Child.Attributes.Count, Iz.EqualTo(1)
+    Assert.That Child.GetAttribute("attr"), Iz.EqualTo("1")
+    
+    Set Child = Element.Children(1)
+    Assert.That Child.Tag, Iz.EqualTo("child")
+    Assert.That Child.Text, Iz.Empty
+    Assert.That Child.Attributes, Iz.Nothing
+End Sub
+
+Public Sub FromString_WithQuoteDelimiter_ReturnsSecurityElement()
+    Dim Element As SecurityElement
+    
+    Set Element = SecurityElement.FromString("<value name='Company'>Novell</value>")
+    
+    Assert.That Element.GetAttribute("name"), Iz.EqualTo("'Company'")
+    Assert.That Element.ToString, Iz.EqualTo(CorString.FormatEx(CultureInfo.InvariantCulture, "<value name=""'Company'"">Novell</value>{0}", vbCrLf))
+End Sub
+
+Public Sub FromString_WithEscapedXml_ReturnsSecurityElement()
+    Const Xml As String = "<values>" & vbCrLf & _
+                          "    <value name=""&quot;name&quot;&amp;&lt;address&gt;"">&lt;&apos;Suds&apos; &amp; &quot;Soda&quot;&gt;!</value>" & vbCrLf & _
+                          "</values>"
+    Dim Element As SecurityElement
+    
+    Set Element = SecurityElement.FromString(Xml)
+    
+    Assert.That Element.Tag, Iz.EqualTo("values")
+    Assert.That Element.Text, Iz.Empty
+    Assert.That Element.Attributes, Iz.Nothing
+    Assert.That Element.Children.Count, Iz.EqualTo(1)
+    
+    Dim Child As SecurityElement
+    Set Child = Element.Children(0)
+    Assert.That Child.Tag, Iz.EqualTo("value")
+    Assert.That Child.Text, Iz.EqualTo("<'Suds' & ""Soda"">!")
+    Assert.That Child.Attributes, Iz.Not.Nothing
+    Assert.That Child.GetAttribute("name"), Iz.EqualTo("""name""&<address>")
+    Assert.That Child.Children, Iz.Nothing
+End Sub
+
+Public Sub FromString_WithReferences_ReturnsSecurityElement()
+    Const Xml As String = "<value name=""name&#38;address"">Suds&#x26;Soda&#38;</value>"
+    Dim Element As SecurityElement
+    
+    Set Element = SecurityElement.FromString(Xml)
+    
+    Assert.That Element.GetAttribute("name"), Iz.EqualTo("name&#38;address")
+    Assert.That Element.Tag, Iz.EqualTo("value")
+    Assert.That Element.Text, Iz.EqualTo("Suds&#x26;Soda&#38;")
+    Assert.That Element.Children, Iz.Nothing
+End Sub
+
+Public Sub FromString_MonoBug333699()
+    Dim Values As New SecurityElement
+    Dim InfoValue As New SecurityElement
+    Values.Tag = "values"
+    InfoValue.Tag = "value"
+    InfoValue.AddAttribute "name", "string"
+    InfoValue.Text = SecurityElement.Escape("<'Suds' & ""Soda"">!")
+    Values.AddChild InfoValue
+    
+    Assert.That InfoValue.ToString, Iz.EqualTo("<value name=""string"">&lt;&apos;Suds&apos; &amp; &quot;Soda&quot;&gt;!</value>" & Environment.NewLine)
+    Assert.That InfoValue.Text, Iz.EqualTo("<'Suds' & ""Soda"">!")
+    Assert.That Values.Text, Iz.Empty
+    
+    Assert.That Values.ToString, Iz.EqualTo(CorString.Format("<values>{0}<value name=""string"">&lt;&apos;Suds&apos; &amp; &quot;Soda&quot;&gt;!</value>{0}</values>{0}", Environment.NewLine))
+    
+    Dim Sec As SecurityElement
+    Set Sec = SecurityElement.FromString(Values.ToString)
+    Assert.That Sec.Children.Count, Iz.EqualTo(1)
+    Assert.That Sec.Children(0).Text, Iz.EqualTo("<'Suds' & ""Soda"">!")
+End Sub
+
+
+
+
+
+
 
 
 
