@@ -167,7 +167,7 @@ End Property
 ' @return The element text.
 '
 Public Property Get Text() As String
-    Text = mText
+    Text = Unescape(mText)
 End Property
 
 ''
@@ -326,6 +326,13 @@ Friend Function FindChildByTag(ByRef Tag As String) As SecurityElement
     Next
 End Function
 
+''
+' Compares two SecurityElement instances for equality.
+'
+' @param Other The instance to compare equality to.
+' @return Returns if both instances contain the same properties, the
+' same attributes (in the same order) and equal children (in the same order).
+'
 Public Function Equal(ByVal Other As SecurityElement) As Boolean
     If Other Is Nothing Then _
         Exit Function
@@ -448,6 +455,42 @@ Friend Sub WriteTo(ByVal sb As StringBuilder)
     End If
 End Sub
 
+Private Sub AddAttributes(ByVal sb As StringBuilder)
+    Dim IsFirst As Boolean
+    Dim i       As Long
+    
+    If mAttributes Is Nothing Then
+        Exit Sub
+    End If
+    
+    IsFirst = True
+    For i = 0 To mAttributes.Count - 1 Step 2
+        If IsFirst Then
+            sb.AppendFormat " {0}=""{1}""", mAttributes(i), mAttributes(i + 1)
+            IsFirst = False
+        Else
+            sb.AppendFormat "{0}{1}=""{2}""", vbCrLf, mAttributes(i), mAttributes(i + 1)
+        End If
+    Next
+End Sub
+
+Private Sub AddChildren(ByVal sb As StringBuilder)
+    Dim Child As SecurityElement
+    For Each Child In mChildren
+        Child.WriteTo sb
+    Next Child
+End Sub
+
+Private Function HasChildren() As Boolean
+    If Not mChildren Is Nothing Then
+        HasChildren = (mChildren.Count > 0)
+    End If
+End Function
+
+Private Function HasText() As Boolean
+    HasText = (Len(mText) > 0)
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -488,46 +531,6 @@ Private Function Unescape(ByRef s As String) As String
     Unescape = StringBuilderCache.GetStringAndRelease(sb)
 End Function
 
-Private Sub AddAttributes(ByVal sb As StringBuilder)
-    Dim IsFirst As Boolean
-    Dim i       As Long
-    
-    If mAttributes Is Nothing Then
-        Exit Sub
-    End If
-    
-    IsFirst = True
-    For i = 0 To mAttributes.Count - 1 Step 2
-        If IsFirst Then
-            sb.AppendFormat " {0}=""{1}""", mAttributes(i), mAttributes(i + 1)
-            IsFirst = False
-        Else
-            sb.AppendFormat "{0}{1}=""{2}""", vbCrLf, mAttributes(i), mAttributes(i + 1)
-        End If
-    Next
-End Sub
-
-Private Sub AddChildren(ByVal sb As StringBuilder)
-    If mChildren Is Nothing Then
-        Exit Sub
-    End If
-    
-    Dim Child As SecurityElement
-    For Each Child In mChildren
-        Child.WriteTo sb
-    Next Child
-End Sub
-
-Private Function HasChildren() As Boolean
-    If Not mChildren Is Nothing Then
-        HasChildren = (mChildren.Count > 0)
-    End If
-End Function
-
-Private Function HasText() As Boolean
-    HasText = (Len(mText) > 0)
-End Function
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Serialization
@@ -552,7 +555,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

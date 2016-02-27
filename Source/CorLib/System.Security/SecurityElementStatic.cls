@@ -153,9 +153,12 @@ End Function
 ' @param Xml The string to parse into a SecurityElement.
 ' @return A SecurityElement representation of the XML string.
 '
-Public Function FromString(ByVal Xml As String) As SecurityElement
+Public Function FromString(ByRef Xml As String) As SecurityElement
+    If Len(Xml) = 0 Then _
+        Throw New XmlSyntaxException
+        
     mXml.Length = 0
-    Call mXml.AppendString(Xml)
+    mXml.AppendString Xml
     mIndex = 0
     
     Set FromString = StartElement
@@ -166,15 +169,18 @@ End Function
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function StartElement() As SecurityElement
-    Call ConsumeWhiteSpace
+    ConsumeWhiteSpace
 
     ' If we reached the end at this point
     ' then we are ok since we didn't actually
     ' start this element yet.
-    If mIndex = mXml.Length Then Exit Function
+    If mIndex = mXml.Length Then
+        Exit Function
+    End If
     
     ' We expected to start an element tag of some sort.
-    If mXml(mIndex) <> vbLeftCheveron Then Throw New XmlSyntaxException
+    If mXml(mIndex) <> vbLeftCheveron Then _
+        Throw New XmlSyntaxException
     
     ' We store this index incase we need to back out.
     ' We don't want to be passed start of a tag if we back out.
@@ -185,7 +191,7 @@ Private Function StartElement() As SecurityElement
     mIndex = mIndex + 1
     
     ' Get to the tag name.
-    Call ConsumeWhiteSpace
+    ConsumeWhiteSpace
     
     ' we may be inside a closing tag,
     ' so clean up and get out.
@@ -200,13 +206,13 @@ Private Function StartElement() As SecurityElement
         .Tag = GetName
         
         ' Get to the next set of characters.
-        Call ConsumeWhiteSpace
+        ConsumeWhiteSpace
         
         ' Lets get attributes if they exist.
         Set .Attributes = GetAttributes
         
         ' Get to the end of the tag.
-        Call ConsumeWhiteSpace
+        ConsumeWhiteSpace
         
         Dim EarlyEnd As Boolean
         If mXml(mIndex) = corForwardSlashChar Then
@@ -214,73 +220,89 @@ Private Function StartElement() As SecurityElement
             mIndex = mIndex + 1
         End If
         
-        Call ConsumeWhiteSpace
+        ConsumeWhiteSpace
                 
         ' Must be a '>'
-        If mXml(mIndex) <> vbRightCheveron Then Throw New XmlSyntaxException
+        If mXml(mIndex) <> vbRightCheveron Then _
+            Throw New XmlSyntaxException
                 
         ' Move passed the '>'
         mIndex = mIndex + 1
+        ConsumeWhiteSpace
                 
         If Not EarlyEnd Then
             .Text = GetText
             Set .Children = GetChildren
-            Call ConsumeWhiteSpace
-            Call EndElement(.Tag)
+            ConsumeWhiteSpace
+            EndElement .Tag
         End If
     End With
 
     Set StartElement = Element
 End Function
 
-Private Sub EndElement(ByVal Name As String)
-    If mIndex = mXml.Length Then Throw New XmlSyntaxException
+Private Sub EndElement(ByRef Name As String)
+    If mIndex = mXml.Length Then _
+        Throw New XmlSyntaxException
     
     ' must be a '<'
-    If mXml(mIndex) <> vbLeftCheveron Then Throw New XmlSyntaxException
-    mIndex = mIndex + 1
+    If mXml(mIndex) <> vbLeftCheveron Then _
+        Throw New XmlSyntaxException
     
-    Call ConsumeWhiteSpace
+    mIndex = mIndex + 1
+    ConsumeWhiteSpace
     
     ' must be a '/'
-    If mXml(mIndex) <> corForwardSlashChar Then Throw New XmlSyntaxException
-    mIndex = mIndex + 1
+    If mXml(mIndex) <> corForwardSlashChar Then _
+        Throw New XmlSyntaxException
     
-    Call ConsumeWhiteSpace
+    mIndex = mIndex + 1
+    ConsumeWhiteSpace
     
     Dim StartIndex As Long
     StartIndex = mIndex
     
     Do
-        If mIndex = mXml.Length Then Throw New XmlSyntaxException
+        If mIndex = mXml.Length Then _
+            Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
-            Case corSpaceChar, vbRightCheveron: Exit Do
+            Case corSpaceChar, vbRightCheveron
+                Exit Do
         End Select
         
         mIndex = mIndex + 1
     Loop
     
-    If StrComp(Name, mXml.ToString(StartIndex, mIndex - StartIndex), vbTextCompare) <> 0 Then Throw New XmlSyntaxException
+    If Not CorString.Equals(Name, mXml.ToString(StartIndex, mIndex - StartIndex), OrdinalIgnoreCase) Then _
+        Throw New XmlSyntaxException
     
-    Call ConsumeWhiteSpace
+    ConsumeWhiteSpace
     
-    If mIndex = mXml.Length Then Throw New XmlSyntaxException
-    If mXml(mIndex) <> vbRightCheveron Then Throw New XmlSyntaxException
+    If mIndex = mXml.Length Then _
+        Throw New XmlSyntaxException
+    If mXml(mIndex) <> vbRightCheveron Then _
+        Throw New XmlSyntaxException
+    
     mIndex = mIndex + 1
 End Sub
 
 Private Function GetChildren() As ArrayList
-    Dim Ret As New ArrayList
+    Dim Result As New ArrayList
     
     Do
         Dim Child As SecurityElement
         Set Child = StartElement
-        If Child Is Nothing Then Exit Do
-        Call Ret.Add(Child)
+        If Child Is Nothing Then
+            Exit Do
+        End If
+        
+        Result.Add Child
     Loop
     
-    If Ret.Count > 0 Then Set GetChildren = Ret
+    If Result.Count > 0 Then
+        Set GetChildren = Result
+    End If
 End Function
 
 Private Function GetText() As String
@@ -288,8 +310,11 @@ Private Function GetText() As String
     StartIndex = mIndex
     
     Do
-        If mIndex = mXml.Length Then Throw New XmlSyntaxException
-        If mXml(mIndex) = vbLeftCheveron Then Exit Do
+        If mIndex = mXml.Length Then _
+            Throw New XmlSyntaxException
+        If mXml(mIndex) = vbLeftCheveron Then
+            Exit Do
+        End If
         mIndex = mIndex + 1
     Loop
     
@@ -298,16 +323,16 @@ Private Function GetText() As String
     Text = CorString.TrimEnd(Text, vbCrLf)
     
     mTextFormatter.Length = 0
-    Call mTextFormatter.AppendString(Text)
-    Call mTextFormatter.Replace(vbCr, vbLf)
+    mTextFormatter.AppendString Text
+    mTextFormatter.Replace vbCr, vbLf
     
     Dim PreviousLength As Long
     Do
         PreviousLength = mTextFormatter.Length
-        Call mTextFormatter.Replace(vbLf & vbLf, vbLf)
+        mTextFormatter.Replace vbLf & vbLf, vbLf
     Loop While mTextFormatter.Length < PreviousLength
     
-    Call mTextFormatter.Replace(vbLf, " ")
+    mTextFormatter.Replace vbLf, " "
     GetText = mTextFormatter.ToString
 End Function
 
@@ -318,29 +343,31 @@ Private Function GetAttributes() As Hashtable
     Dim Attributes As New Hashtable
     
     Do
-        Call ConsumeWhiteSpace
+        ConsumeWhiteSpace
         
         ' Can't end getting an attribute
-        If mIndex = mXml.Length Then Throw New XmlSyntaxException
+        If mIndex = mXml.Length Then _
+            Throw New XmlSyntaxException
         
         Dim Name As String
         Name = GetName
-        If Len(Name) = 0 Then Exit Do
+        If Len(Name) = 0 Then
+            Exit Do
+        End If
         
-        Call ConsumeEquals
-        
-        Dim Value As String
-        Value = GetValue
-        
-        Attributes(Name) = Value
+        ConsumeEquals
+        Attributes(Name) = GetValue
     Loop
     
-    If Attributes.Count > 0 Then Set GetAttributes = Attributes
+    If Attributes.Count > 0 Then
+        Set GetAttributes = Attributes
+    End If
 End Function
 
 Private Sub ConsumeEquals()
     Do
-        If mIndex = mXml.Length Then Throw New XmlSyntaxException
+        If mIndex = mXml.Length Then _
+            Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
             Case corEqualChar, corSpaceChar
@@ -359,7 +386,8 @@ Private Function GetValue() As String
     StartIndex = mIndex
     
     Do
-        If mIndex = mXml.Length Then Throw New XmlSyntaxException
+        If mIndex = mXml.Length Then _
+            Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
             Case corQuoteChar
@@ -376,7 +404,9 @@ Private Function GetValue() As String
             
             Case corSpaceChar, corForwardSlashChar
                 ' we found an unquoted value
-                If Not InQuotes Then Exit Do
+                If Not InQuotes Then
+                    Exit Do
+                End If
                 
             Case vbRightCheveron
                 If Not InQuotes Then
@@ -402,7 +432,8 @@ Private Function GetName() As String
     
     Do
         ' Can't end getting a name.
-        If mIndex = mXml.Length Then Throw New XmlSyntaxException
+        If mIndex = mXml.Length Then _
+            Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
             Case corSpaceChar, corEqualChar, corForwardSlashChar, vbRightCheveron
