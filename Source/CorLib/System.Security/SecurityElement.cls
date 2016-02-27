@@ -421,21 +421,28 @@ End Function
 ' @return A string representation of this instance.
 '
 Public Function ToString() As String
-    Dim sb As New StringBuilder
-    Call AddSelf(sb, True)
-    ToString = sb.ToString
+    Dim sb As StringBuilder
+    Set sb = StringBuilderCache.Acquire
+    
+    WriteTo sb
+    
+    ToString = StringBuilderCache.GetStringAndRelease(sb)
 End Function
 
-Friend Sub AddSelf(ByVal sb As StringBuilder, Optional ByVal IsRoot As Boolean)
-    Call sb.AppendFormat("<{0}", mTag)
-    Call AddAttributes(sb)
+Friend Sub WriteTo(ByVal sb As StringBuilder)
+    sb.AppendFormat "<{0}", mTag
+    AddAttributes sb
     
     If HasChildren Or HasText Then
-        Call sb.Append(">")
-        Call sb.Append(mText)
-        If HasChildren Then Call sb.AppendLine
-        Call AddChildren(sb)
-        Call sb.AppendFormat("</{0}>{1}", mTag, vbCrLf)
+        sb.Append ">"
+        sb.Append mText
+        
+        If HasChildren Then
+            sb.AppendLine
+            AddChildren sb
+        End If
+        
+        sb.AppendFormat "</{0}>{1}", mTag, vbCrLf
     Else
         sb.AppendLine "/>"
     End If
@@ -501,11 +508,13 @@ Private Sub AddAttributes(ByVal sb As StringBuilder)
 End Sub
 
 Private Sub AddChildren(ByVal sb As StringBuilder)
-    If mChildren Is Nothing Then Exit Sub
+    If mChildren Is Nothing Then
+        Exit Sub
+    End If
     
     Dim Child As SecurityElement
     For Each Child In mChildren
-        Call Child.AddSelf(sb)
+        Child.WriteTo sb
     Next Child
 End Sub
 

@@ -710,9 +710,47 @@ Public Sub ToString_WithTagAndAttribute_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(t("<tag att=""val""\r\natt2=""val2""/>\r\n"))
 End Sub
 
+Public Sub ToString_WithTagAndChild_ReturnsExpected()
+    Dim Element As New SecurityElement
+    Element.Tag = "parent_tag"
+    Dim Child As New SecurityElement
+    Child.Tag = "child_tag"
+    Element.AddChild Child
+    
+    Dim Actual As String
+    Actual = Element.ToString
+    
+    Assert.That Actual, Iz.EqualTo(t("<parent_tag>\r\n<child_tag/>\r\n</parent_tag>\r\n"))
+End Sub
 
+Public Sub ToString_WithTagTextAndChild_ReturnsExpected()
+    Dim Element As New SecurityElement
+    Element.Tag = "parent_tag"
+    Element.Text = "parent_text"
+    Dim Child As New SecurityElement
+    Child.Tag = "child_tag"
+    Element.AddChild Child
+    
+    Dim Actual As String
+    Actual = Element.ToString
+    
+    Assert.That Actual, Iz.EqualTo(t("<parent_tag>parent_text\r\n<child_tag/>\r\n</parent_tag>\r\n"))
+End Sub
 
-
+Public Sub ToString_WithTagTextAndChildTagText_ReturnsExpected()
+    Dim Element As New SecurityElement
+    Element.Tag = "parent_tag"
+    Element.Text = "parent_text"
+    Dim Child As New SecurityElement
+    Child.Tag = "child_tag"
+    Child.Text = "child_text"
+    Element.AddChild Child
+    
+    Dim Actual As String
+    Actual = Element.ToString
+    
+    Assert.That Actual, Iz.EqualTo(t("<parent_tag>parent_text\r\n<child_tag>child_text</child_tag>\r\n</parent_tag>\r\n"))
+End Sub
 
 
 
