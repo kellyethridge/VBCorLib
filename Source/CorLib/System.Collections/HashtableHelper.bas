@@ -24,27 +24,27 @@ Attribute VB_Name = "HashtableHelper"
 '
 Option Explicit
 
-Public Enum BucketStateEnum
-    bsEmpty
-    bsOccupied
-    bsDeleted
+Public Enum HashBucketState
+    EmptyState
+    OccupiedState
+    DeletedState
 End Enum
 
-Public Type Bucket
+Public Type HashBucket
     Key         As Variant
     Value       As Variant
     HashCode    As Long
-    State       As BucketStateEnum
+    State       As HashBucketState
 End Type
 
-Private mPrimes(0 To 71)    As Long
-Private mInited             As Boolean
+Private mCapacities(0 To 71)    As Long
+Private mInited                 As Boolean
 
 
 ''
 ' Returns the next prime number equal to or above the requested size.
 '
-Public Function GetPrime(ByVal Value As Long) As Long
+Public Function GetHashtableCapacity(ByVal Value As Long) As Long
     If Not mInited Then
         InitPrimes
     End If
@@ -57,9 +57,9 @@ Public Function GetPrime(ByVal Value As Long) As Long
     High = 71
     Do While Low <= High
         Index = (Low + High) \ 2
-        Select Case mPrimes(Index)
+        Select Case mCapacities(Index)
             Case Value
-                GetPrime = Value
+                GetHashtableCapacity = Value
                 Exit Function
             Case Is > Value
                 High = Index - 1
@@ -72,82 +72,82 @@ Public Function GetPrime(ByVal Value As Long) As Long
         Index = Not Index
     End If
     
-    GetPrime = mPrimes(Index)
+    GetHashtableCapacity = mCapacities(Index)
 End Function
 
 Private Sub InitPrimes()
-   mPrimes(0) = 13
-   mPrimes(1) = 17
-   mPrimes(2) = 23
-   mPrimes(3) = 29
-   mPrimes(4) = 41
-   mPrimes(5) = 53
-   mPrimes(6) = 67
-   mPrimes(7) = 89
-   mPrimes(8) = 113
-   mPrimes(9) = 149
-   mPrimes(10) = 191
-   mPrimes(11) = 251
-   mPrimes(12) = 317
-   mPrimes(13) = 409
-   mPrimes(14) = 541
-   mPrimes(15) = 691
-   mPrimes(16) = 907
-   mPrimes(17) = 1171
-   mPrimes(18) = 1523
-   mPrimes(19) = 1973
-   mPrimes(20) = 2557
-   mPrimes(21) = 3323
-   mPrimes(22) = 4327
-   mPrimes(23) = 5623
-   mPrimes(24) = 7283
-   mPrimes(25) = 9461
-   mPrimes(26) = 12289
-   mPrimes(27) = 15971
-   mPrimes(28) = 20743
-   mPrimes(29) = 26947
-   mPrimes(30) = 35023
-   mPrimes(31) = 45481
-   mPrimes(32) = 59029
-   mPrimes(33) = 76673
-   mPrimes(34) = 99607
-   mPrimes(35) = 129379
-   mPrimes(36) = 168067
-   mPrimes(37) = 218287
-   mPrimes(38) = 283553
-   mPrimes(39) = 368323
-   mPrimes(40) = 478427
-   mPrimes(41) = 621451
-   mPrimes(42) = 807241
-   mPrimes(43) = 1048583
-   mPrimes(44) = 1362059
-   mPrimes(45) = 1769281
-   mPrimes(46) = 2298209
-   mPrimes(47) = 2985287
-   mPrimes(48) = 3877763
-   mPrimes(49) = 5037091
-   mPrimes(50) = 6542959
-   mPrimes(51) = 8499037
-   mPrimes(52) = 11039929
-   mPrimes(53) = 14340433
-   mPrimes(54) = 18627667
-   mPrimes(55) = 24196619
-   mPrimes(56) = 31430473
-   mPrimes(57) = 40826971
-   mPrimes(58) = 53032703
-   mPrimes(59) = 68887367
-   mPrimes(60) = 89482037
-   mPrimes(61) = 116233673
-   mPrimes(62) = 150983087
-   mPrimes(63) = 196121153
-   mPrimes(64) = 254753797
-   mPrimes(65) = 330915313
-   mPrimes(66) = 429846191
-   mPrimes(67) = 558353591
-   mPrimes(68) = 725279729
-   mPrimes(69) = 942110419
-   mPrimes(70) = 1223764877
-   mPrimes(71) = 2147483647
+   mCapacities(0) = 13
+   mCapacities(1) = 17
+   mCapacities(2) = 23
+   mCapacities(3) = 29
+   mCapacities(4) = 41
+   mCapacities(5) = 53
+   mCapacities(6) = 67
+   mCapacities(7) = 89
+   mCapacities(8) = 113
+   mCapacities(9) = 149
+   mCapacities(10) = 191
+   mCapacities(11) = 251
+   mCapacities(12) = 317
+   mCapacities(13) = 409
+   mCapacities(14) = 541
+   mCapacities(15) = 691
+   mCapacities(16) = 907
+   mCapacities(17) = 1171
+   mCapacities(18) = 1523
+   mCapacities(19) = 1973
+   mCapacities(20) = 2557
+   mCapacities(21) = 3323
+   mCapacities(22) = 4327
+   mCapacities(23) = 5623
+   mCapacities(24) = 7283
+   mCapacities(25) = 9461
+   mCapacities(26) = 12289
+   mCapacities(27) = 15971
+   mCapacities(28) = 20743
+   mCapacities(29) = 26947
+   mCapacities(30) = 35023
+   mCapacities(31) = 45481
+   mCapacities(32) = 59029
+   mCapacities(33) = 76673
+   mCapacities(34) = 99607
+   mCapacities(35) = 129379
+   mCapacities(36) = 168067
+   mCapacities(37) = 218287
+   mCapacities(38) = 283553
+   mCapacities(39) = 368323
+   mCapacities(40) = 478427
+   mCapacities(41) = 621451
+   mCapacities(42) = 807241
+   mCapacities(43) = 1048583
+   mCapacities(44) = 1362059
+   mCapacities(45) = 1769281
+   mCapacities(46) = 2298209
+   mCapacities(47) = 2985287
+   mCapacities(48) = 3877763
+   mCapacities(49) = 5037091
+   mCapacities(50) = 6542959
+   mCapacities(51) = 8499037
+   mCapacities(52) = 11039929
+   mCapacities(53) = 14340433
+   mCapacities(54) = 18627667
+   mCapacities(55) = 24196619
+   mCapacities(56) = 31430473
+   mCapacities(57) = 40826971
+   mCapacities(58) = 53032703
+   mCapacities(59) = 68887367
+   mCapacities(60) = 89482037
+   mCapacities(61) = 116233673
+   mCapacities(62) = 150983087
+   mCapacities(63) = 196121153
+   mCapacities(64) = 254753797
+   mCapacities(65) = 330915313
+   mCapacities(66) = 429846191
+   mCapacities(67) = 558353591
+   mCapacities(68) = 725279729
+   mCapacities(69) = 942110419
+   mCapacities(70) = 1223764877
+   mCapacities(71) = 2147483647
    mInited = True
 End Sub
 

@@ -41,7 +41,7 @@ Implements IEnumerator
 Implements ICloneable
 
 Private mTable      As IVersionableCollection
-Private mBuckets()  As Bucket
+Private mBuckets()  As HashBucket
 Private mEnumType   As EnumerationType
 Private mIndex      As Long
 Private mVersion    As Long
@@ -76,7 +76,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Table As Hashtable, ByRef Buckets() As Bucket, ByVal EnumType As EnumerationType)
+Friend Sub Init(ByVal Table As Hashtable, ByRef Buckets() As HashBucket, ByVal EnumType As EnumerationType)
     Set mTable = Table
     SAPtr(mBuckets) = SAPtr(Buckets)
     mEnumType = EnumType
@@ -86,7 +86,7 @@ Friend Sub Init(ByVal Table As Hashtable, ByRef Buckets() As Bucket, ByVal EnumT
     mCapacity = UBound(mBuckets) + 1
 End Sub
 
-Friend Sub InitClone(ByVal Table As Hashtable, ByRef Buckets() As Bucket, ByVal EnumType As EnumerationType, ByVal Index As Long, ByVal Entries As Long, ByVal Capacity As Long)
+Friend Sub InitClone(ByVal Table As Hashtable, ByRef Buckets() As HashBucket, ByVal EnumType As EnumerationType, ByVal Index As Long, ByVal Entries As Long, ByVal Capacity As Long)
     Set mTable = Table
     mVersion = mTable.CurrentVersion
     SAPtr(mBuckets) = SAPtr(Buckets)
@@ -119,8 +119,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -166,7 +166,7 @@ Private Function IDictionaryEnumerator_MoveNext() As Boolean
             mEntries = mCount + 1
             Exit Function
         End If
-    Loop While mBuckets(mIndex).State <> bsOccupied
+    Loop While mBuckets(mIndex).State <> OccupiedState
     mEntries = mEntries + 1
     IDictionaryEnumerator_MoveNext = True
 End Function
