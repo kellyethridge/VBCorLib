@@ -72,7 +72,7 @@ Private Const DefaultLoadFactor         As Single = 1!
 Private mLoadFactor     As Single
 Private mLoadSize       As Long
 Private mCount          As Long
-Private mBuckets()      As Bucket
+Private mBuckets()      As HashBucket
 Private mCapacity       As Long
 Private mVersion        As Long
 Private mKeyComparer    As IEqualityComparer
@@ -183,7 +183,7 @@ Public Function ContainsValue(ByRef Value As Variant) As Boolean
     
     For i = 0 To mCapacity - 1
         With mBuckets(i)
-            If .State = bsOccupied Then
+            If .State = OccupiedState Then
                 If Object.Equals(.Value, Value) Then
                     ContainsValue = True
                     Exit Function
@@ -363,7 +363,7 @@ Public Sub Remove(ByRef Key As Variant)
         With mBuckets(Index)
             .HashCode = 0
             .Key = Empty
-            .State = bsDeleted
+            .State = DeletedState
             .Value = Empty
         End With
         
@@ -374,7 +374,7 @@ Public Sub Remove(ByRef Key As Variant)
         If mCount = 0 Then
             Dim i As Long
             For i = 0 To UBound(mBuckets)
-                mBuckets(i).State = bsEmpty
+                mBuckets(i).State = EmptyState
             Next
         End If
         
@@ -460,7 +460,7 @@ Friend Sub Init(ByVal d As IDictionary, ByVal Capacity As Long, ByVal LoadFactor
     End If
 End Sub
 
-Friend Sub InitClone(ByRef Buckets() As Bucket, ByVal Count As Long, ByVal LoadFactor As Single, ByVal LoadSize As Long, ByVal KeyComparer As IEqualityComparer)
+Friend Sub InitClone(ByRef Buckets() As HashBucket, ByVal Count As Long, ByVal LoadFactor As Single, ByVal LoadSize As Long, ByVal KeyComparer As IEqualityComparer)
     mCount = Count
     mBuckets = Buckets
     mCapacity = UBound(Buckets) + 1
@@ -474,17 +474,17 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub SetCapacity(ByVal Capacity As Long)
-    mCapacity = GetPrime(Capacity)
+    mCapacity = GetHashtableCapacity(Capacity)
     mLoadSize = mCapacity * mLoadFactor
 End Sub
 
 Private Sub Expand()
-    SetCapacity GetPrime(mCapacity * 2)
+    SetCapacity GetHashtableCapacity(mCapacity * 2)
     ReinsertItems
 End Sub
 
 Private Sub ReinsertItems()
-    Dim OldBuckets() As Bucket
+    Dim OldBuckets() As HashBucket
     SAPtr(OldBuckets) = SAPtr(mBuckets)
     SAPtr(mBuckets) = vbNullPtr
     
@@ -494,7 +494,7 @@ Private Sub ReinsertItems()
     Dim i As Long
     For i = 0 To UBound(OldBuckets)
         With OldBuckets(i)
-            If .State = bsOccupied Then
+            If .State = OccupiedState Then
                 InsertItem .Key, .Value, True, True
             End If
         End With
@@ -513,10 +513,10 @@ Private Function GetKeyIndex(ByRef Key As Variant) As Long
     Do
         With mBuckets(Index)
             Select Case .State
-                Case bsEmpty
+                Case EmptyState
                     GetKeyIndex = -1
                     Exit Function
-                Case bsOccupied
+                Case OccupiedState
                     If .HashCode = HashCode Then
                         If mKeyComparer.Equals(Key, .Key) Then
                             GetKeyIndex = Index
@@ -556,7 +556,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
     Do
         With mBuckets(Index)
             Select Case .State
-                Case bsEmpty
+                Case EmptyState
                     ' we bookmark this bucket as our first available bucket.
                     If FirstEmpty = -1 Then
                         FirstEmpty = Index
@@ -567,7 +567,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                     ' duplicate key could exist.
                     Exit Do
                     
-                Case bsOccupied
+                Case OccupiedState
                     If .HashCode = HashCode Then
                         If mKeyComparer.Equals(Key, .Key) Then
                             If Adding Then _
@@ -580,7 +580,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
                         End If
                     End If
                 
-                Case bsDeleted
+                Case DeletedState
                     ' we bookmark this bucket as our first available bucket
                     ' to place the value and key in. We only do this once
                     ' to the first occurence of a deleted bucket.
@@ -612,7 +612,7 @@ Private Sub InsertItem(ByRef Key As Variant, ByRef Value As Variant, ByVal Addin
             VariantCopyInd .Key, Key
             VariantCopyInd .Value, Value
         End If
-        .State = bsOccupied
+        .State = OccupiedState
         .HashCode = HashCode
     End With
     mCount = mCount + 1
@@ -637,7 +637,7 @@ Private Sub CopyToCore(ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Enu
     Dim j As Long
     For i = 0 To UBound(mBuckets)
         With mBuckets(i)
-            If .State = bsOccupied Then
+            If .State = OccupiedState Then
                 Select Case EnumType
                     Case EnumEntries
                         Set Arr(ArrayIndex + j) = Cor.NewDictionaryEntry(.Key, .Value)
@@ -726,7 +726,7 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
         Dim Count   As Long
         For i = 0 To mCapacity - 1
             With mBuckets(i)
-                If .State = bsOccupied Then
+                If .State = OccupiedState Then
                     Count = Count + 1
                     PropBag.WriteProperty MakeKeyKey(Count), .Key
                     
