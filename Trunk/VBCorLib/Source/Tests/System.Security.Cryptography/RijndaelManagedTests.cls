@@ -33,7 +33,17 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 128, NewBytes(&H69, &HC4, &HE0, &HD8, &H6A, &H7B, &H4, &H30, &HD8, &HCD, &HB7, &H80, &H70, &HB4, &HC5, &H5A)
             Test.Use 192, NewBytes(&HDD, &HA9, &H7C, &HA4, &H86, &H4C, &HDF, &HE0, &H6E, &HAF, &H70, &HA0, &HEC, &HD, &H71, &H91)
             Test.Use 256, NewBytes(&H8E, &HA2, &HB7, &HCA, &H51, &H67, &H45, &HBF, &HEA, &HFC, &H49, &H90, &H4B, &H49, &H60, &H89)
-            
+        
+        Case "CreateEncryptor_WithInvalidIVSize_ThrowsCryptographicException"
+            Test.Use 0
+            Test.Use 7
+            Test.Use 512
+        
+        Case "CreateDecryptor_WithInvalidIVSize_ThrowsCryptographicException"
+            Test.Use 0
+            Test.Use 7
+            Test.Use 512
+        
     End Select
 End Sub
 
@@ -118,6 +128,100 @@ Public Sub CreateDecryptor_WithNullIV_DoesNotAlterIV()
     
     Assert.That Actual, Iz.Not.EqualTo(Data)
 End Sub
+
+Public Sub CreateDecryptor_WithKeyAndIV_DoesNotAlterOriginal()
+    Dim r As New RijndaelManaged
+    Dim OriginalKey() As Byte
+    Dim OriginalIV() As Byte
+    Dim Key() As Byte
+    Dim IV() As Byte
+    
+    OriginalKey = r.Key
+    OriginalIV = r.IV
+    Key = r.Key
+    IV = r.IV
+    CorArray.Reverse Key
+    CorArray.Reverse IV
+    
+    Assert.That r.CreateDecryptor(Key, IV), Iz.Not.Nothing
+    
+    Assert.That r.Key, Iz.EqualTo(OriginalKey)
+    Assert.That r.IV, Iz.EqualTo(OriginalIV)
+End Sub
+
+Public Sub CreateEncryptor_WithInvalidIVSize_ThrowsCryptographicException(ByVal Size As Long)
+    Dim r As New RijndaelManaged
+    Dim IV() As Byte
+    If Size >= 0 Then
+        IV = CorArray.CreateInstance(vbByte, Size)
+    End If
+    
+    On Error Resume Next
+    r.CreateEncryptor r.Key, IV
+    
+    AssertCryptographicException Err
+End Sub
+
+Public Sub CreateDecryptor_WithInvalidIVSize_ThrowsCryptographicException(ByVal Size As Long)
+    Dim r As New RijndaelManaged
+    Dim IV() As Byte
+    If Size >= 0 Then
+        IV = CorArray.CreateInstance(vbByte, Size)
+    End If
+    
+    On Error Resume Next
+    r.CreateDecryptor r.Key, IV
+    
+    AssertCryptographicException Err
+End Sub
+
+Public Sub Encrypt_MonoBug7193()
+    Const Size As Long = 23
+    Dim Original(0 To Size - 1) As Byte
+    Dim Expected() As Byte
+    Expected = NewBytes(&HDC, &HA8, &H39, &H5C, &HA1, &H89, &H3B, &H5, &HFA, &HD8, &HB5, &H76, &H5F, &H8F, &H40, &HCF, &HA7, &HFF, &H86, &HE6, &H30, &H67, &H6B)
+    Dim EncData() As Byte
+    Dim DecData() As Byte
+    
+    Dim r As New RijndaelManaged
+    r.Mode = CipherMode.CFB
+    r.FeedbackSize = 8
+    r.Padding = PaddingMode.None
+    r.Key = CorArray.CreateInstance(vbByte, 32)
+    r.IV = CorArray.CreateInstance(vbByte, 16)
+    Dim Encryptor As ICryptoTransform
+    Set Encryptor = r.CreateEncryptor
+    EncData = Encryptor.TransformFinalBlock(Original, 0, CorArray.Length(Original))
+    Assert.That CorArray.Length(EncData), Iz.EqualTo(Size), "EncData.Length"
+    Assert.That EncData, Iz.EqualTo(Expected), "encrypted"
+    Dim Decryptor As ICryptoTransform
+    Set Decryptor = r.CreateDecryptor
+    DecData = Decryptor.TransformFinalBlock(EncData, 0, CorArray.Length(EncData))
+    Assert.That DecData, Iz.EqualTo(Original), "roundtrip"
+End Sub
+
+'        public void CFB_7193 ()
+'        {
+'            const int size = 23; // not a block size
+'            byte [] original = new byte [size];
+'            byte [] expected = new byte [] { 0xDC, 0xA8, 0x39, 0x5C, 0xA1, 0x89, 0x3B, 0x05, 0xFA, 0xD8, 0xB5, 0x76, 0x5F, 0x8F, 0x40, 0xCF, 0xA7, 0xFF, 0x86, 0xE6, 0x30, 0x67, 0x6B };
+'            byte [] encdata;
+'            byte [] decdata;
+'            using (RijndaelManaged aes = new RijndaelManaged ()) {
+'                aes.Mode = CipherMode.CFB;
+'                aes.FeedbackSize = 8;
+'                aes.Padding = PaddingMode.None;
+'                aes.Key = new byte [32];
+'                aes.IV = new byte [16];
+'                using (ICryptoTransform encryptor = aes.CreateEncryptor ())
+'                    encdata = encryptor.TransformFinalBlock (original, 0, original.Length);
+'                Assert.AreEqual (size, encdata.Length, "enc.Length");
+'                Assert.AreEqual (BitConverter.ToString (expected), BitConverter.ToString (encdata), "encrypted");
+'                using (ICryptoTransform decryptor = aes.CreateDecryptor ())
+'                    decdata = decryptor.TransformFinalBlock (encdata, 0, encdata.Length);
+'                Assert.AreEqual (original, decdata, "roundtrip");
+'            }
+'        }
 
 Private Function CreateTransform(ByVal KeySize As Long, ByRef CreateMethod As String) As ICryptoTransform
     Dim IV(0 To 15) As Byte

@@ -288,6 +288,7 @@ Friend Sub Init(ByRef RgbKey() As Byte, ByRef RgbIV() As Byte, ByVal Base As Sym
         
         If mMode = CipherMode.CFB Then
             mInputBlockSize = .FeedbackSize \ 8
+            mOutputBlockSize = .FeedbackSize \ 8
         Else
             mInputBlockSize = mBlockSizeBytes
         End If
@@ -324,36 +325,55 @@ Private Function EncryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' of just filling in the last partial block.
     Dim RemainingBytes As Long
     RemainingBytes = InputCount - (FullBlocks * mOutputBlockSize)
-
-    If (mPadding = PaddingMode.None) And (RemainingBytes <> 0) Then _
-        Throw Cor.NewCryptographicException("Length of data to be encrypted is incorrect.")
+    
+    Dim PadSize As Long
+    Select Case mPadding
+        Case PaddingMode.None
+            If RemainingBytes <> 0 Then
+                Throw Cor.NewCryptographicException("Length of data to be encrypted is incorrect.")
+            End If
+        Case PaddingMode.Zeros
+            If RemainingBytes = 0 Then
+                PadSize = mOutputBlockSize
+            End If
+        Case Else
+            PadSize = mOutputBlockSize - RemainingBytes
+    End Select
 
     ' We need enough bytes to hold all the full blocks, 1 padded block produced by us.
     Dim TotalBytes As Long
-    TotalBytes = (FullBlocks + 1) * mOutputBlockSize
+    TotalBytes = InputCount + PadSize
     
     Dim OutputBuffer() As Byte
     ReDim OutputBuffer(0 To TotalBytes - 1)
 
     ' We have to copy the data to be encrypted to our output buffer because CryptoAPI
     ' puts the encrypted data back into the working array.
-    If InputCount > 0 Then Call CopyMemory(OutputBuffer(0), InputBuffer(InputOffset), InputCount)
+    If InputCount > 0 Then
+        CopyMemory OutputBuffer(0), InputBuffer(InputOffset), InputCount
+    End If
 
-    TotalBytes = TotalBytes - CryptoHelper.PadBlock(OutputBuffer, FullBlocks * mOutputBlockSize + RemainingBytes, mPadding, mOutputBlockSize - RemainingBytes, mOutputBlockSize)
-   
+    CryptoHelper.PadBlock OutputBuffer, FullBlocks * mOutputBlockSize + RemainingBytes, mPadding, PadSize, mOutputBlockSize
+    
     If TotalBytes > 0 Then
-        If TotalBytes < UBound(OutputBuffer) Then ReDim Preserve OutputBuffer(0 To TotalBytes - 1)
+        If TotalBytes < UBound(OutputBuffer) Then
+            ReDim Preserve OutputBuffer(0 To TotalBytes - 1)
+            Debug.Print "ReDim Outputbuffer (RijndaelMangedTransform)"
+        End If
         
         Select Case mMode
-            Case CipherMode.ECB: Call EncryptECB(OutputBuffer, 0, TotalBytes)
-            Case CipherMode.CBC: Call EncryptCBC(OutputBuffer, 0, TotalBytes)
-            Case CipherMode.CFB: Call EncryptCFB(OutputBuffer, 0, TotalBytes)
+            Case CipherMode.ECB
+                EncryptECB OutputBuffer, 0, TotalBytes
+            Case CipherMode.CBC
+                EncryptCBC OutputBuffer, 0, TotalBytes
+            Case CipherMode.CFB
+                EncryptCFB OutputBuffer, 0, TotalBytes
         End Select
     Else
         OutputBuffer = Cor.NewBytes()
     End If
     
-    Call Reset
+    Reset
     EncryptFinalBlock = OutputBuffer
 End Function
 
@@ -990,8 +1010,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
