@@ -228,6 +228,9 @@ Private Sub AddSystemSecurityCryptography()
             New RC2CryptoServiceProviderTests, _
             New RC2EncryptionTests, _
             New RC2DecryptionTests)
+        
+        .Add NewSuite("RijndaelManaged", _
+            New RijndaelManagedTests)
 '
 '        .Add NewSuite("RijndaelManaged", _
 '            New TestRijndaelManaged128, _
