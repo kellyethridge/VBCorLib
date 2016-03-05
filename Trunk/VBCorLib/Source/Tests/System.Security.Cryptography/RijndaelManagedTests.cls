@@ -200,28 +200,8 @@ Public Sub Encrypt_MonoBug7193()
     Assert.That DecData, Iz.EqualTo(Original), "roundtrip"
 End Sub
 
-'        public void CFB_7193 ()
-'        {
-'            const int size = 23; // not a block size
-'            byte [] original = new byte [size];
-'            byte [] expected = new byte [] { 0xDC, 0xA8, 0x39, 0x5C, 0xA1, 0x89, 0x3B, 0x05, 0xFA, 0xD8, 0xB5, 0x76, 0x5F, 0x8F, 0x40, 0xCF, 0xA7, 0xFF, 0x86, 0xE6, 0x30, 0x67, 0x6B };
-'            byte [] encdata;
-'            byte [] decdata;
-'            using (RijndaelManaged aes = new RijndaelManaged ()) {
-'                aes.Mode = CipherMode.CFB;
-'                aes.FeedbackSize = 8;
-'                aes.Padding = PaddingMode.None;
-'                aes.Key = new byte [32];
-'                aes.IV = new byte [16];
-'                using (ICryptoTransform encryptor = aes.CreateEncryptor ())
-'                    encdata = encryptor.TransformFinalBlock (original, 0, original.Length);
-'                Assert.AreEqual (size, encdata.Length, "enc.Length");
-'                Assert.AreEqual (BitConverter.ToString (expected), BitConverter.ToString (encdata), "encrypted");
-'                using (ICryptoTransform decryptor = aes.CreateDecryptor ())
-'                    decdata = decryptor.TransformFinalBlock (encdata, 0, encdata.Length);
-'                Assert.AreEqual (original, decdata, "roundtrip");
-'            }
-'        }
+
+
 
 Private Function CreateTransform(ByVal KeySize As Long, ByRef CreateMethod As String) As ICryptoTransform
     Dim IV(0 To 15) As Byte

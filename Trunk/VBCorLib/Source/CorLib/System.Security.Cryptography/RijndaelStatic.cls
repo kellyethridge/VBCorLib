@@ -73,7 +73,7 @@ Private mSBoxPtr    As Long
 ' @remarks If "Rijndael" or "RijndaelManaged" are passed in, then the
 ' default implementation <b>RijndaelManaged</b> is returned.
 '
-Public Function Create(Optional ByVal AlgName As String = "Rijndael") As Rijndael
+Public Function Create(Optional ByVal AlgName As String = "CorLib.Rijndael") As Rijndael
     Set Create = CryptoConfig.CreateFromName(AlgName)
 End Function
 
