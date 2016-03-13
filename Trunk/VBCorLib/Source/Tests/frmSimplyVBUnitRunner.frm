@@ -231,17 +231,9 @@ Private Sub AddSystemSecurityCryptography()
         
         .Add NewSuite("Rijndael", _
             New RijndaelManagedTests, _
-            New RijndaelTests)
-'
-'        .Add NewSuite("RijndaelManaged", _
-'            New TestRijndaelManaged128, _
-'            New TestRijndaelEncryptionECB, _
-'            New TestRijndaelEncryptionCBC, _
-'            New TestRijndaelEncryptionCFB, _
-'            New TestRijndaelDecryptionECB, _
-'            New TestRijndaelDecryptionCBC, _
-'            New TestRijndaelDecryptionCFB)
-'
+            New RijndaelTests, _
+            New RijndaelCfbTests)
+        
         AddTest .This
     End With
 End Sub

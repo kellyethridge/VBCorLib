@@ -61,7 +61,8 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed SecurityElement AddAttributes. Should throw ArgumentException when adding duplicate attribute name.
 	* Fixed SecurityElement GetAttribute. Was not unescaping escaped sequences.
 	* Fixed SecurityElement constructor. Was not validating tag or text.
-	* Fixed RijndaelManaged encrypting. TransformFinalBlock when using no padding and partial block length of data would still return full block length.
+	* Fixed RijndaelManaged encrypting. TransformFinalBlock when using PaddingMode.None and partial block length of data would still return full block length.
+	* Fixed RijndaelManaged encrypting. TransformFinalBlock when using PaddingMode.Zero and full block length of data would return additional block.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

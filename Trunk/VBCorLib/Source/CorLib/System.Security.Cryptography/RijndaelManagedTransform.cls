@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: RijndaelManagedTransform
+' Module: RijndaelManagedTransform
 '
 
 ''
@@ -299,12 +302,12 @@ Friend Sub Init(ByRef RgbKey() As Byte, ByRef RgbIV() As Byte, ByVal Base As Sym
     mNb = mBlockSizeBits \ 32
     mNk = CorArray.Length(RgbKey) \ 4
     
-    Call InitLookupTables
-    Call CalculateNumberOfRounds
-    Call CreateExpandedKey(RgbKey)
+    InitLookupTables
+    CalculateNumberOfRounds
+    CreateExpandedKey RgbKey
     
     mRgbIV = RgbIV
-    Call Reset
+    Reset
     
     If (mPadding <> PaddingMode.None) And (mPadding <> PaddingMode.Zeros) Then
         mKeepLastBlock = True
@@ -333,8 +336,8 @@ Private Function EncryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
                 Throw Cor.NewCryptographicException("Length of data to be encrypted is incorrect.")
             End If
         Case PaddingMode.Zeros
-            If RemainingBytes = 0 Then
-                PadSize = mOutputBlockSize
+            If RemainingBytes > 0 Then
+                PadSize = mOutputBlockSize - RemainingBytes
             End If
         Case Else
             PadSize = mOutputBlockSize - RemainingBytes
@@ -393,7 +396,7 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' If we still don't have anything to process (no previous block and nothing in this block)
     ' then simply reset everything and return an empty byte array representing the final block.
     If TotalBytes = 0 Then
-        Call Reset
+         Reset
         DecryptFinalBlock = Cor.NewBytes
         Exit Function
     End If
@@ -406,7 +409,7 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' to now copy that block into the working buffer.
     Dim OutputOffset As Long
     If mHasLastBlock Then
-        Call CopyMemory(OutputBuffer(0), mLastBlock(0), mInputBlockSize)
+        CopyMemory OutputBuffer(0), mLastBlock(0), mInputBlockSize
         OutputOffset = mInputBlockSize
         mHasLastBlock = False
     End If
@@ -418,9 +421,9 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
     ' Have the decryption routine work on the bytes in the output buffer. The decrypted bytes
     ' will be placed back into the same buffer.
     Select Case mMode
-        Case CipherMode.ECB: Call DecryptECB(OutputBuffer, 0, TotalBytes)
-        Case CipherMode.CBC: Call DecryptCBC(OutputBuffer, 0, TotalBytes)
-        Case CipherMode.CFB: Call DecryptCFB(OutputBuffer, 0, TotalBytes)
+        Case CipherMode.ECB: DecryptECB OutputBuffer, 0, TotalBytes
+        Case CipherMode.CBC: DecryptCBC OutputBuffer, 0, TotalBytes
+        Case CipherMode.CFB: DecryptCFB OutputBuffer, 0, TotalBytes
     End Select
 
     ' Remove the padding based on the type of padding expected.
@@ -439,7 +442,7 @@ Private Function DecryptFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffse
         OutputBuffer = Cor.NewBytes
     End If
 
-    Call Reset
+    Reset
     DecryptFinalBlock = OutputBuffer
 End Function
 
@@ -458,7 +461,7 @@ Private Function DecryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As 
     ' If we buffered the last block from the previous call, then we now need to
     ' include it in this decryption process as the first block of the InputBuffer.
     If mHasLastBlock Then
-        Call CopyMemory(OutputBuffer(NextOutputOffset), mLastBlock(0), mInputBlockSize)
+        CopyMemory OutputBuffer(NextOutputOffset), mLastBlock(0), mInputBlockSize
         NextOutputOffset = NextOutputOffset + mInputBlockSize
         TotalBytes = TotalBytes + mInputBlockSize
         mHasLastBlock = False
@@ -470,20 +473,22 @@ Private Function DecryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As 
     If mKeepLastBlock Then
         TotalBytes = TotalBytes - mInputBlockSize
         InputCount = InputCount - mInputBlockSize
-        Call CopyMemory(mLastBlock(0), InputBuffer(InputOffset + InputCount), mInputBlockSize)
+        CopyMemory mLastBlock(0), InputBuffer(InputOffset + InputCount), mInputBlockSize
         mHasLastBlock = True
     End If
 
     ' If there is anything left in the InputBuffer to process we need to copy it to the
     ' output buffer which the decryption routine will work on.
-    If InputCount > 0 Then Call CopyMemory(OutputBuffer(NextOutputOffset), InputBuffer(InputOffset), InputCount)
+    If InputCount > 0 Then
+        CopyMemory OutputBuffer(NextOutputOffset), InputBuffer(InputOffset), InputCount
+    End If
 
     ' Have the decryption routine work on the bytes in the output buffer. The decrypted bytes
     ' will be placed back into the same buffer.
     Select Case mMode
-        Case CipherMode.ECB: Call DecryptECB(OutputBuffer, OutputOffset, TotalBytes)
-        Case CipherMode.CBC: Call DecryptCBC(OutputBuffer, OutputOffset, TotalBytes)
-        Case CipherMode.CFB: Call DecryptCFB(OutputBuffer, OutputOffset, TotalBytes)
+        Case CipherMode.ECB: DecryptECB OutputBuffer, OutputOffset, TotalBytes
+        Case CipherMode.CBC: DecryptCBC OutputBuffer, OutputOffset, TotalBytes
+        Case CipherMode.CFB: DecryptCFB OutputBuffer, OutputOffset, TotalBytes
     End Select
 
     ' Return how many bytes we actually decrypted.
@@ -493,12 +498,12 @@ End Function
 Private Function EncryptBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
     ' Since the cipher changes the data within the same array, we need to copy the
     ' plain text data to the output buffer and let the cipher work on that buffer.
-    Call CopyMemory(OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount)
+    CopyMemory OutputBuffer(OutputOffset), InputBuffer(InputOffset), InputCount
 
     Select Case mMode
-        Case CipherMode.ECB: Call EncryptECB(OutputBuffer, OutputOffset, InputCount)
-        Case CipherMode.CBC: Call EncryptCBC(OutputBuffer, OutputOffset, InputCount)
-        Case CipherMode.CFB: Call EncryptCFB(OutputBuffer, OutputOffset, InputCount)
+        Case CipherMode.ECB: EncryptECB OutputBuffer, OutputOffset, InputCount
+        Case CipherMode.CBC: EncryptCBC OutputBuffer, OutputOffset, InputCount
+        Case CipherMode.CFB: EncryptCFB OutputBuffer, OutputOffset, InputCount
     End Select
 
     EncryptBlock = InputCount
@@ -515,11 +520,11 @@ Private Sub EncryptECB(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count A
     Dim i As Long
     For i = 0 To Count - 1 Step mInputBlockSize
         Select Case mBlockSizeBits
-            Case 128: Call Encrypt128(Bytes, Index + i)
-            Case 192: Call Encrypt192(Bytes, Index + i)
-            Case 256: Call Encrypt256(Bytes, Index + i)
+            Case 128: Encrypt128 Bytes, Index + i
+            Case 192: Encrypt192 Bytes, Index + i
+            Case 256: Encrypt256 Bytes, Index + i
         End Select
-    Next i
+    Next
 End Sub
 
 ''
@@ -533,17 +538,17 @@ Private Sub EncryptCBC(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count A
         Dim j As Long
         For j = 0 To mInputBlockSize - 1
             Bytes(Index + i + j) = Bytes(Index + i + j) Xor mWorkingIV(j)
-        Next j
+        Next
     
         Select Case mBlockSizeBits
-            Case 128: Call Encrypt128(Bytes, Index + i)
-            Case 192: Call Encrypt192(Bytes, Index + i)
-            Case 256: Call Encrypt256(Bytes, Index + i)
+            Case 128: Encrypt128 Bytes, Index + i
+            Case 192: Encrypt192 Bytes, Index + i
+            Case 256: Encrypt256 Bytes, Index + i
         End Select
         
         ' update the IV we are using for the next block to be mangled.
-        Call CopyMemory(ByVal mWorkingIVPtr, Bytes(Index + i), mInputBlockSize)
-    Next i
+        CopyMemory ByVal mWorkingIVPtr, Bytes(Index + i), mInputBlockSize
+    Next
 End Sub
 
 ''
@@ -554,29 +559,29 @@ Private Sub EncryptCFB(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count A
     Dim i As Long
     For i = 0 To Count - 1 Step mInputBlockSize
         ' encrypt the IV array first.
-        Call CopyMemory(ByVal mTempIVPtr, ByVal mWorkingIVPtr, mBlockSizeBytes)
+        CopyMemory ByVal mTempIVPtr, ByVal mWorkingIVPtr, mBlockSizeBytes
         
         Select Case mBlockSizeBits
-            Case 128: Call Encrypt128(mTempIV, 0)
-            Case 192: Call Encrypt192(mTempIV, 0)
-            Case 256: Call Encrypt256(mTempIV, 0)
+            Case 128: Encrypt128 mTempIV, 0
+            Case 192: Encrypt192 mTempIV, 0
+            Case 256: Encrypt256 mTempIV, 0
         End Select
         
         ' Xor the IV array with the plain text.
         Dim j As Long
         For j = 0 To mInputBlockSize - 1
             Bytes(Index + i + j) = Bytes(Index + i + j) Xor mTempIV(j)
-        Next j
+        Next
         
         ' move the unused portion down to be used next time around. The unused
         ' portion will be encrypted again, as well.
         If (mBlockSizeBytes - mInputBlockSize) > 0 Then
-            Call CopyMemory(ByVal mWorkingIVPtr, mWorkingIV(mInputBlockSize), mBlockSizeBytes - mInputBlockSize)
+            CopyMemory ByVal mWorkingIVPtr, mWorkingIV(mInputBlockSize), mBlockSizeBytes - mInputBlockSize
         End If
         
         ' Copy the cipher text back to the IV to be used in the next block.
-        Call CopyMemory(mWorkingIV(mBlockSizeBytes - mInputBlockSize), Bytes(Index + i), mInputBlockSize)
-    Next i
+        CopyMemory mWorkingIV(mBlockSizeBytes - mInputBlockSize), Bytes(Index + i), mInputBlockSize
+    Next
 End Sub
 
 ''
@@ -587,11 +592,11 @@ Private Sub DecryptECB(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count A
     Dim i As Long
     For i = 0 To Count - 1 Step mInputBlockSize
         Select Case mBlockSizeBits
-            Case 128: Call Decrypt128(Bytes, Index + i)
-            Case 192: Call Decrypt192(Bytes, Index + i)
-            Case 256: Call Decrypt256(Bytes, Index + i)
+            Case 128: Decrypt128 Bytes, Index + i
+            Case 192: Decrypt192 Bytes, Index + i
+            Case 256: Decrypt256 Bytes, Index + i
         End Select
-    Next i
+    Next
 End Sub
 
 ''
@@ -601,21 +606,21 @@ End Sub
 Private Sub DecryptCBC(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
     Dim i As Long
     For i = 0 To Count - 1 Step mInputBlockSize
-        Call CopyMemory(ByVal mTempIVPtr, Bytes(Index + i), mBlockSizeBytes)
+        CopyMemory ByVal mTempIVPtr, Bytes(Index + i), mBlockSizeBytes
         
         Select Case mBlockSizeBits
-            Case 128: Call Decrypt128(Bytes, Index + i)
-            Case 192: Call Decrypt192(Bytes, Index + i)
-            Case 256: Call Decrypt256(Bytes, Index + i)
+            Case 128: Decrypt128 Bytes, Index + i
+            Case 192: Decrypt192 Bytes, Index + i
+            Case 256: Decrypt256 Bytes, Index + i
         End Select
         
         Dim j As Long
         For j = 0 To mInputBlockSize - 1
             Bytes(Index + i + j) = Bytes(Index + i + j) Xor mWorkingIV(j)
-        Next j
+        Next
         
-        Call CopyMemory(ByVal mWorkingIVPtr, ByVal mTempIVPtr, mBlockSizeBytes)
-    Next i
+        CopyMemory ByVal mWorkingIVPtr, ByVal mTempIVPtr, mBlockSizeBytes
+    Next
 End Sub
 
 ''
@@ -625,25 +630,25 @@ End Sub
 Private Sub DecryptCFB(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
     Dim i As Long
     For i = 0 To Count - 1 Step mInputBlockSize
-        Call CopyMemory(ByVal mTempIVPtr, ByVal mWorkingIVPtr, mBlockSizeBytes)
+        CopyMemory ByVal mTempIVPtr, ByVal mWorkingIVPtr, mBlockSizeBytes
         
         Select Case mBlockSizeBits
-            Case 128: Call Encrypt128(mTempIV, 0)
-            Case 192: Call Encrypt192(mTempIV, 0)
-            Case 256: Call Encrypt256(mTempIV, 0)
+            Case 128: Encrypt128 mTempIV, 0
+            Case 192: Encrypt192 mTempIV, 0
+            Case 256: Encrypt256 mTempIV, 0
         End Select
         
         If (mBlockSizeBytes - mInputBlockSize) > 0 Then
-            Call CopyMemory(ByVal mWorkingIVPtr, mWorkingIV(mInputBlockSize), mBlockSizeBytes - mInputBlockSize)
+            CopyMemory ByVal mWorkingIVPtr, mWorkingIV(mInputBlockSize), mBlockSizeBytes - mInputBlockSize
         End If
         
-        Call CopyMemory(mWorkingIV(mBlockSizeBytes - mInputBlockSize), Bytes(Index + i), mInputBlockSize)
+        CopyMemory mWorkingIV(mBlockSizeBytes - mInputBlockSize), Bytes(Index + i), mInputBlockSize
         
         Dim j As Long
         For j = 0 To mInputBlockSize - 1
             Bytes(Index + i + j) = Bytes(Index + i + j) Xor mTempIV(j)
-        Next j
-    Next i
+        Next
+    Next
 End Sub
 
 
@@ -676,8 +681,8 @@ Private Sub Encrypt128(ByRef Bytes() As Byte, ByVal Index As Long)
             
             j = j + 4
 
-            Call CopyMemory(ByVal mSPtr, ByVal mTmpPtr, 16)
-        Next i
+            CopyMemory ByVal mSPtr, ByVal mTmpPtr, 16
+        Next
 
         MemLong(bPtr) = (mT4(.s(0)) And &HFF&) Xor (mT4(.s(5)) And &HFF00&) Xor (mT4(.s(10)) And &HFF0000) Xor (mT4(.s(15)) And &HFF000000) Xor mExpKey(j)
         MemLong(bPtr + 4) = (mT4(.s(4)) And &HFF&) Xor (mT4(.s(9)) And &HFF00&) Xor (mT4(.s(14)) And &HFF0000) Xor (mT4(.s(3)) And &HFF000000) Xor mExpKey(j + 1)
@@ -711,8 +716,8 @@ Private Sub Encrypt192(ByRef Bytes() As Byte, ByVal Index As Long)
             .T5 = mT0(.s(20)) Xor mT1(.s(1)) Xor mT2(.s(6)) Xor mT3(.s(11)) Xor mExpKey(j + 5)
             j = j + 6
 
-            Call CopyMemory(ByVal mSPtr, ByVal mTmpPtr, 24)
-        Next i
+            CopyMemory ByVal mSPtr, ByVal mTmpPtr, 24
+        Next
 
         MemLong(bPtr) = (mT4(.s(0)) And &HFF&) Xor (mT4(.s(5)) And &HFF00&) Xor (mT4(.s(10)) And &HFF0000) Xor (mT4(.s(15)) And &HFF000000) Xor mExpKey(j)
         MemLong(bPtr + 4) = (mT4(.s(4)) And &HFF&) Xor (mT4(.s(9)) And &HFF00&) Xor (mT4(.s(14)) And &HFF0000) Xor (mT4(.s(19)) And &HFF000000) Xor mExpKey(j + 1)
@@ -753,8 +758,8 @@ Private Sub Encrypt256(ByRef Bytes() As Byte, ByVal Index As Long)
             
             j = j + 8
             
-            Call CopyMemory(ByVal mSPtr, ByVal mTmpPtr, 32)
-        Next i
+            CopyMemory ByVal mSPtr, ByVal mTmpPtr, 32
+        Next
     
         MemLong(bPtr) = (mT4(.s(0)) And &HFF&) Xor (mT4(.s(5)) And &HFF00&) Xor (mT4(.s(14)) And &HFF0000) Xor (mT4(.s(19)) And &HFF000000) Xor mExpKey(j)
         MemLong(bPtr + 4) = (mT4(.s(4)) And &HFF&) Xor (mT4(.s(9)) And &HFF00&) Xor (mT4(.s(18)) And &HFF0000) Xor (mT4(.s(23)) And &HFF000000) Xor mExpKey(j + 1)
@@ -788,8 +793,8 @@ Private Sub Decrypt128(ByRef Bytes() As Byte, ByVal Index As Long)
             .T3 = mT0(.s(12)) Xor mT1(.s(9)) Xor mT2(.s(6)) Xor mT3(.s(3)) Xor mExpKey(j + 3)
             j = j + 4
 
-            Call CopyMemory(ByVal mSPtr, ByVal mTmpPtr, 16)
-        Next i
+            CopyMemory ByVal mSPtr, ByVal mTmpPtr, 16
+        Next
 
         MemLong(bPtr) = (mT4(.s(0)) And &HFF&) Xor (mT4(.s(13)) And &HFF00&) Xor (mT4(.s(10)) And &HFF0000) Xor (mT4(.s(7)) And &HFF000000) Xor mExpKey(j)
         MemLong(bPtr + 4) = (mT4(.s(4)) And &HFF&) Xor (mT4(.s(1)) And &HFF00&) Xor (mT4(.s(14)) And &HFF0000) Xor (mT4(.s(11)) And &HFF000000) Xor mExpKey(j + 1)
@@ -823,8 +828,8 @@ Private Sub Decrypt192(ByRef Bytes() As Byte, ByVal Index As Long)
             .T5 = mT0(.s(20)) Xor mT1(.s(17)) Xor mT2(.s(14)) Xor mT3(.s(11)) Xor mExpKey(j + 5)
             j = j + 6
 
-            Call CopyMemory(ByVal mSPtr, ByVal mTmpPtr, 24)
-        Next i
+            CopyMemory ByVal mSPtr, ByVal mTmpPtr, 24
+        Next
 
         MemLong(bPtr) = (mT4(.s(0)) And &HFF&) Xor (mT4(.s(21)) And &HFF00&) Xor (mT4(.s(18)) And &HFF0000) Xor (mT4(.s(15)) And &HFF000000) Xor mExpKey(j)
         MemLong(bPtr + 4) = (mT4(.s(4)) And &HFF&) Xor (mT4(.s(1)) And &HFF00&) Xor (mT4(.s(22)) And &HFF0000) Xor (mT4(.s(19)) And &HFF000000) Xor mExpKey(j + 1)
@@ -864,8 +869,8 @@ Private Sub Decrypt256(ByRef Bytes() As Byte, ByVal Index As Long)
             .T7 = mT0(.s(28)) Xor mT1(.s(25)) Xor mT2(.s(18)) Xor mT3(.s(15)) Xor mExpKey(j + 7)
             j = j + 8
             
-            Call CopyMemory(ByVal mSPtr, ByVal mTmpPtr, 32)
-        Next i
+            CopyMemory ByVal mSPtr, ByVal mTmpPtr, 32
+        Next
     
         MemLong(bPtr) = (mT4(.s(0)) And &HFF&) Xor (mT4(.s(29)) And &HFF00&) Xor (mT4(.s(22)) And &HFF0000) Xor (mT4(.s(19)) And &HFF000000) Xor mExpKey(j)
         MemLong(bPtr + 4) = (mT4(.s(4)) And &HFF&) Xor (mT4(.s(1)) And &HFF00&) Xor (mT4(.s(26)) And &HFF0000) Xor (mT4(.s(23)) And &HFF000000) Xor mExpKey(j + 1)
@@ -885,7 +890,7 @@ End Sub
 Private Sub CreateExpandedKey(ByRef RgbKey() As Byte)
     ReDim mExpKey(0 To (mNb * (mNr + 1)) - 1)
     
-    Call CopyMemory(mExpKey(0), RgbKey(0), CorArray.Length(RgbKey))
+    CopyMemory mExpKey(0), RgbKey(0), CorArray.Length(RgbKey)
     
     Dim w As Long
     Dim i As Long
@@ -899,7 +904,7 @@ Private Sub CreateExpandedKey(ByRef RgbKey() As Byte)
             w = SubWord(w)
         End If
         mExpKey(i) = mExpKey(i - mNk) Xor w
-    Next i
+    Next
     
     If (Not mIsEncrypting) And (mMode <> CipherMode.CFB) Then
         mExpKey = CreateDecryptionKey(mExpKey)
@@ -940,10 +945,10 @@ Private Function CreateDecryptionKey(ByRef ExpKey() As Long) As Long()
     Dim k    As Long
     k = mNb * mNr
     For i = 0 To mNr
-        Call CopyMemory(Ret(j), ExpKey(k), mBlockSizeBytes)
+        CopyMemory Ret(j), ExpKey(k), mBlockSizeBytes
         j = j + mNb
         k = k - mNb
-    Next i
+    Next
     
     Dim Te4(0 To 255) As Long
     Dim Td0(0 To 255) As Long
@@ -951,11 +956,11 @@ Private Function CreateDecryptionKey(ByRef ExpKey() As Long) As Long()
     Dim Td2(0 To 255) As Long
     Dim Td3(0 To 255) As Long
     
-    Call CopyMemory(Td0(0), ByVal Rijndael.Td0Ptr, 1024)
-    Call CopyMemory(Td1(0), ByVal Rijndael.Td1Ptr, 1024)
-    Call CopyMemory(Td2(0), ByVal Rijndael.Td2Ptr, 1024)
-    Call CopyMemory(Td3(0), ByVal Rijndael.Td3Ptr, 1024)
-    Call CopyMemory(Te4(0), ByVal Rijndael.Te4Ptr, 1024)
+    CopyMemory Td0(0), ByVal Rijndael.Td0Ptr, 1024
+    CopyMemory Td1(0), ByVal Rijndael.Td1Ptr, 1024
+    CopyMemory Td2(0), ByVal Rijndael.Td2Ptr, 1024
+    CopyMemory Td3(0), ByVal Rijndael.Td3Ptr, 1024
+    CopyMemory Te4(0), ByVal Rijndael.Te4Ptr, 1024
     
     For i = mNb To mNb * mNr - 1
         With AsQByteArr(Ret(i))
@@ -964,24 +969,24 @@ Private Function CreateDecryptionKey(ByRef ExpKey() As Long) As Long()
                      Td2(Te4(.Bytes(2)) And &HFF&) Xor _
                      Td3(Te4(.Bytes(3)) And &HFF&)
         End With
-    Next i
+    Next
     
     CreateDecryptionKey = Ret
 End Function
 
 Private Sub InitLookupTables()
     If (mIsEncrypting) Or (mMode = CipherMode.CFB) Then
-        Call CopyMemory(mT0(0), ByVal Rijndael.Te0Ptr, 1024)
-        Call CopyMemory(mT1(0), ByVal Rijndael.Te1Ptr, 1024)
-        Call CopyMemory(mT2(0), ByVal Rijndael.Te2Ptr, 1024)
-        Call CopyMemory(mT3(0), ByVal Rijndael.Te3Ptr, 1024)
-        Call CopyMemory(mT4(0), ByVal Rijndael.Te4Ptr, 1024)
+        CopyMemory mT0(0), ByVal Rijndael.Te0Ptr, 1024
+        CopyMemory mT1(0), ByVal Rijndael.Te1Ptr, 1024
+        CopyMemory mT2(0), ByVal Rijndael.Te2Ptr, 1024
+        CopyMemory mT3(0), ByVal Rijndael.Te3Ptr, 1024
+        CopyMemory mT4(0), ByVal Rijndael.Te4Ptr, 1024
     Else
-        Call CopyMemory(mT0(0), ByVal Rijndael.Td0Ptr, 1024)
-        Call CopyMemory(mT1(0), ByVal Rijndael.Td1Ptr, 1024)
-        Call CopyMemory(mT2(0), ByVal Rijndael.Td2Ptr, 1024)
-        Call CopyMemory(mT3(0), ByVal Rijndael.Td3Ptr, 1024)
-        Call CopyMemory(mT4(0), ByVal Rijndael.Td4Ptr, 1024)
+        CopyMemory mT0(0), ByVal Rijndael.Td0Ptr, 1024
+        CopyMemory mT1(0), ByVal Rijndael.Td1Ptr, 1024
+        CopyMemory mT2(0), ByVal Rijndael.Td2Ptr, 1024
+        CopyMemory mT3(0), ByVal Rijndael.Td3Ptr, 1024
+        CopyMemory mT4(0), ByVal Rijndael.Td4Ptr, 1024
     End If
     
     SAPtr(mSBox) = Rijndael.SBoxPtr
@@ -990,7 +995,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mTmpPtr = VarPtr(mTmp.T0)
@@ -1004,7 +1009,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -1020,7 +1025,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICryptoTransform Interface
+'   ICryptoTransform
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICryptoTransform_CanReuseTransform() As Boolean
     ICryptoTransform_CanReuseTransform = CanReuseTransform
