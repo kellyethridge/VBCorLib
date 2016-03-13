@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: RijndaelStatic
+' Module: RijndaelStatic
 '
 
 ''
@@ -82,62 +85,98 @@ End Function
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Property Get Te0Ptr() As Long
-    If mTe0Ptr = vbNullPtr Then Call InitTe0
+    If mTe0Ptr = vbNullPtr Then
+        InitTe0
+    End If
+    
     Te0Ptr = mTe0Ptr
 End Property
 
 Friend Property Get Te1Ptr() As Long
-    If mTe1Ptr = vbNullPtr Then Call InitTe1
+    If mTe1Ptr = vbNullPtr Then
+        InitTe1
+    End If
+    
     Te1Ptr = mTe1Ptr
 End Property
 
 Friend Property Get Te2Ptr() As Long
-    If mTe2Ptr = vbNullPtr Then Call InitTe2
+    If mTe2Ptr = vbNullPtr Then
+        InitTe2
+    End If
+    
     Te2Ptr = mTe2Ptr
 End Property
 
 Friend Property Get Te3Ptr() As Long
-    If mTe3Ptr = vbNullPtr Then Call InitTe3
+    If mTe3Ptr = vbNullPtr Then
+        InitTe3
+    End If
+    
     Te3Ptr = mTe3Ptr
 End Property
 
 Friend Property Get Te4Ptr() As Long
-    If mTe4Ptr = vbNullPtr Then Call InitTe4
+    If mTe4Ptr = vbNullPtr Then
+        InitTe4
+    End If
+    
     Te4Ptr = mTe4Ptr
 End Property
 
 Friend Property Get Td0Ptr() As Long
-    If mTd0Ptr = vbNullPtr Then Call InitTd0
+    If mTd0Ptr = vbNullPtr Then
+        InitTd0
+    End If
+    
     Td0Ptr = mTd0Ptr
 End Property
 
 Friend Property Get Td1Ptr() As Long
-    If mTd1Ptr = vbNullPtr Then Call InitTd1
+    If mTd1Ptr = vbNullPtr Then
+        InitTd1
+    End If
+    
     Td1Ptr = mTd1Ptr
 End Property
 
 Friend Property Get Td2Ptr() As Long
-    If mTd2Ptr = vbNullPtr Then Call InitTd2
+    If mTd2Ptr = vbNullPtr Then
+        InitTd2
+    End If
+    
     Td2Ptr = mTd2Ptr
 End Property
 
 Friend Property Get Td3Ptr() As Long
-    If mTd3Ptr = vbNullPtr Then Call InitTd3
+    If mTd3Ptr = vbNullPtr Then
+        InitTd3
+    End If
+    
     Td3Ptr = mTd3Ptr
 End Property
 
 Friend Property Get Td4Ptr() As Long
-    If mTd4Ptr = vbNullPtr Then Call InitTd4
+    If mTd4Ptr = vbNullPtr Then
+        InitTd4
+    End If
+    
     Td4Ptr = mTd4Ptr
 End Property
 
 Friend Property Get RConPtr() As Long
-    If mRConPtr = vbNullPtr Then Call InitRCon
+    If mRConPtr = vbNullPtr Then
+        InitRCon
+    End If
+    
     RConPtr = mRConPtr
 End Property
 
 Friend Property Get SBoxPtr() As Long
-    If mSBoxPtr = vbNullPtr Then Call InitSBox
+    If mSBoxPtr = vbNullPtr Then
+        InitSBox
+    End If
+    
     SBoxPtr = mSBoxPtr
 End Property
 

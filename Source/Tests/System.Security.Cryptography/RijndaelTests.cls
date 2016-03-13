@@ -16,14 +16,9 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ICategorizable
-Implements ITestCaseSource
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Security.Cryptography"
-End Sub
-
-Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
-
 End Sub
 
 Public Sub Constructor_WhenCalled_SetsDefaults()

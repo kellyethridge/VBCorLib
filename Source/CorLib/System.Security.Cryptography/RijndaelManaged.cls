@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2006 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: RijndaelManaged
+' Module: RijndaelManaged
 '
 
 ''
@@ -57,7 +60,6 @@ Private mBase As SymmetricAlgorithmBase
 Attribute mBase.VB_VarHelpID = -1
 
 
-
 ''
 ' Returns the block size, in bits, used by this algorithm.
 '
@@ -71,11 +73,11 @@ End Property
 ''
 ' Sets the block size, in bits, used by this algorithm.
 '
-' @param RHS The new block size in bits.
+' @param Value The new block size in bits.
 ' @remarks Block sizes of 128, 192, and 256 are supported.
 '
-Public Property Let BlockSize(ByVal RHS As Long)
-    mBase.BlockSize = RHS
+Public Property Let BlockSize(ByVal Value As Long)
+    mBase.BlockSize = Value
 End Property
 
 ''
@@ -100,10 +102,10 @@ End Property
 ''
 ' Sets the Feedback size in bits.
 '
-' @param RHS The new feedback size in bits.
+' @param Value The new feedback size in bits.
 '
-Public Property Let FeedbackSize(ByVal RHS As Long)
-    mBase.FeedbackSize = RHS
+Public Property Let FeedbackSize(ByVal Value As Long)
+    mBase.FeedbackSize = Value
 End Property
 
 ''
@@ -119,11 +121,11 @@ End Property
 ''
 ' Sets the key size in bits.
 '
-' @param RHS The new key size in bits.
+' @param Value The new key size in bits.
 ' @remarks 128, 192, and 256 bits are supported.
 '
-Public Property Let KeySize(ByVal RHS As Long)
-    mBase.KeySize = RHS
+Public Property Let KeySize(ByVal Value As Long)
+    mBase.KeySize = Value
 End Property
 
 ''
@@ -148,10 +150,10 @@ End Property
 ''
 ' Sets the Cipher mode this algorithm will use.
 '
-' @param RHS The cipher mode to use.
+' @param Value The cipher mode to use.
 '
-Public Property Let Mode(ByVal RHS As CipherMode)
-    mBase.Mode = RHS
+Public Property Let Mode(ByVal Value As CipherMode)
+    mBase.Mode = Value
 End Property
 
 ''
@@ -166,10 +168,10 @@ End Property
 ''
 ' Sets the padding mode to be used.
 '
-' @param RHS The new padding mode.
+' @param Value The new padding mode.
 '
-Public Property Let Padding(ByVal RHS As PaddingMode)
-    mBase.Padding = RHS
+Public Property Let Padding(ByVal Value As PaddingMode)
+    mBase.Padding = Value
 End Property
 
 ''
@@ -185,19 +187,19 @@ End Property
 ''
 ' Sets the secret key.
 '
-' @param RHS The new secret key.
+' @param Value The new secret key.
 ' @param The key must be a valid key length.
 ' @remarks  Key sizes of 128, 192, and 256 bits are supported.
 '
-Public Property Let Key(ByRef RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Public Property Let Key(ByRef Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 ''
 ' Generates a random key to be used.
 '
 Public Sub GenerateKey()
-    Call mBase.GenerateKey
+    mBase.GenerateKey
 End Sub
 
 ''
@@ -213,25 +215,25 @@ End Property
 ''
 ' Sets the Initialization Vector to be used.
 '
-' @param RHS The new IV to use.
+' @param Value The new IV to use.
 ' @remarks The array must be 8 bytes in length.
 '
-Public Property Let IV(ByRef RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Public Property Let IV(ByRef Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 ''
 ' Generates a random IV array to use.
 '
 Public Sub GenerateIV()
-    Call mBase.GenerateIV
+    mBase.GenerateIV
 End Sub
 
 ''
 ' Clears the Key and IV arrays.
 '
 Public Sub Clear()
-    Call mBase.Clear
+    mBase.Clear
 End Sub
 
 ''
@@ -317,18 +319,18 @@ Private Function CreateCipher(ByRef RgbKey As Variant, ByRef RgbIV As Variant, B
         Throw Cor.NewArgumentException("Argument is missing.", IIf(IsMissing(RgbKey), "RgbKey", "RgbIV"))
     
     Set CreateCipher = New RijndaelManagedTransform
-    Call CreateCipher.Init(mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting)
+    CreateCipher.Init mBase.CloneRgbKey(RgbKey), mBase.CloneRgbIV(RgbIV), mBase, IsEncrypting
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     Set mBase = New SymmetricAlgorithmBase
     With mBase
-        Call .AddLegalBlockSize(DEF_MINBLOCKSIZE, DEF_MAXBLOCKSIZE, DEF_BLOCKSKIPSIZE)
-        Call .AddLegalKeySize(DEF_MINKEYSIZE, DEF_MAXKEYSIZE, DEF_KEYSKIPSIZE)
+        .AddLegalBlockSize DEF_MINBLOCKSIZE, DEF_MAXBLOCKSIZE, DEF_BLOCKSKIPSIZE
+        .AddLegalKeySize DEF_MINKEYSIZE, DEF_MAXKEYSIZE, DEF_KEYSKIPSIZE
         .BlockSize = DEF_BLOCKSIZE
         .KeySize = DEF_KEYSIZE
         .FeedbackSize = DEF_FEEDBACKSIZE
@@ -339,10 +341,10 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   DES Interface
+'   Rijndael
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let Rijndael_BlockSize(ByVal RHS As Long)
-    BlockSize = RHS
+Private Property Let Rijndael_BlockSize(ByVal Value As Long)
+    BlockSize = Value
 End Property
 
 Private Property Get Rijndael_BlockSize() As Long
@@ -350,7 +352,7 @@ Private Property Get Rijndael_BlockSize() As Long
 End Property
 
 Private Sub Rijndael_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function Rijndael_CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
@@ -365,8 +367,8 @@ Private Function Rijndael_Equals(Value As Variant) As Boolean
     Rijndael_Equals = Equals(Value)
 End Function
 
-Private Property Let Rijndael_FeedbackSize(ByVal RHS As Long)
-    FeedbackSize = RHS
+Private Property Let Rijndael_FeedbackSize(ByVal Value As Long)
+    FeedbackSize = Value
 End Property
 
 Private Property Get Rijndael_FeedbackSize() As Long
@@ -374,35 +376,35 @@ Private Property Get Rijndael_FeedbackSize() As Long
 End Property
 
 Private Sub Rijndael_GenerateIV()
-    Call GenerateIV
+    GenerateIV
 End Sub
 
 Private Sub Rijndael_GenerateKey()
-    Call GenerateKey
+    GenerateKey
 End Sub
 
 Private Function Rijndael_GetHashCode() As Long
     Rijndael_GetHashCode = GetHashCode
 End Function
 
-Private Property Let Rijndael_IV(RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Private Property Let Rijndael_IV(Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 Private Property Get Rijndael_IV() As Byte()
     Rijndael_IV = IV
 End Property
 
-Private Property Let Rijndael_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let Rijndael_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get Rijndael_Key() As Byte()
     Rijndael_Key = Key
 End Property
 
-Private Property Let Rijndael_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let Rijndael_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get Rijndael_KeySize() As Long
@@ -417,16 +419,16 @@ Private Property Get Rijndael_LegalKeySizes() As KeySizes()
     Rijndael_LegalKeySizes = LegalKeySizes
 End Property
 
-Private Property Let Rijndael_Mode(ByVal RHS As CipherMode)
-    Mode = RHS
+Private Property Let Rijndael_Mode(ByVal Value As CipherMode)
+    Mode = Value
 End Property
 
 Private Property Get Rijndael_Mode() As CipherMode
     Rijndael_Mode = Mode
 End Property
 
-Private Property Let Rijndael_Padding(ByVal RHS As PaddingMode)
-    Padding = RHS
+Private Property Let Rijndael_Padding(ByVal Value As PaddingMode)
+    Padding = Value
 End Property
 
 Private Property Get Rijndael_Padding() As PaddingMode
@@ -443,7 +445,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -459,10 +461,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   SymmetricAlgorithm Interface
+'   SymmetricAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Let SymmetricAlgorithm_BlockSize(ByVal RHS As Long)
-    BlockSize = RHS
+Private Property Let SymmetricAlgorithm_BlockSize(ByVal Value As Long)
+    BlockSize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_BlockSize() As Long
@@ -470,7 +472,7 @@ Private Property Get SymmetricAlgorithm_BlockSize() As Long
 End Property
 
 Private Sub SymmetricAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function SymmetricAlgorithm_CreateDecryptor(Optional ByRef RgbKey As Variant, Optional ByRef RgbIV As Variant) As ICryptoTransform
@@ -485,8 +487,8 @@ Private Function SymmetricAlgorithm_Equals(Value As Variant) As Boolean
     SymmetricAlgorithm_Equals = Equals(Value)
 End Function
 
-Private Property Let SymmetricAlgorithm_FeedbackSize(ByVal RHS As Long)
-    FeedbackSize = RHS
+Private Property Let SymmetricAlgorithm_FeedbackSize(ByVal Value As Long)
+    FeedbackSize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_FeedbackSize() As Long
@@ -494,35 +496,35 @@ Private Property Get SymmetricAlgorithm_FeedbackSize() As Long
 End Property
 
 Private Sub SymmetricAlgorithm_GenerateIV()
-    Call GenerateIV
+    GenerateIV
 End Sub
 
 Private Sub SymmetricAlgorithm_GenerateKey()
-    Call GenerateKey
+    GenerateKey
 End Sub
 
 Private Function SymmetricAlgorithm_GetHashCode() As Long
     SymmetricAlgorithm_GetHashCode = GetHashCode
 End Function
 
-Private Property Let SymmetricAlgorithm_IV(RHS() As Byte)
-    Call mBase.SetIV(RHS)
+Private Property Let SymmetricAlgorithm_IV(Value() As Byte)
+    mBase.SetIV Value
 End Property
 
 Private Property Get SymmetricAlgorithm_IV() As Byte()
     SymmetricAlgorithm_IV = IV
 End Property
 
-Private Property Let SymmetricAlgorithm_Key(RHS() As Byte)
-    Call mBase.SetKey(RHS)
+Private Property Let SymmetricAlgorithm_Key(Value() As Byte)
+    mBase.SetKey Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Key() As Byte()
     SymmetricAlgorithm_Key = Key
 End Property
 
-Private Property Let SymmetricAlgorithm_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let SymmetricAlgorithm_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_KeySize() As Long
@@ -537,16 +539,16 @@ Private Property Get SymmetricAlgorithm_LegalKeySizes() As KeySizes()
     SymmetricAlgorithm_LegalKeySizes = LegalKeySizes
 End Property
 
-Private Property Let SymmetricAlgorithm_Mode(ByVal RHS As CipherMode)
-    Mode = RHS
+Private Property Let SymmetricAlgorithm_Mode(ByVal Value As CipherMode)
+    Mode = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Mode() As CipherMode
     SymmetricAlgorithm_Mode = Mode
 End Property
 
-Private Property Let SymmetricAlgorithm_Padding(ByVal RHS As PaddingMode)
-    Padding = RHS
+Private Property Let SymmetricAlgorithm_Padding(ByVal Value As PaddingMode)
+    Padding = Value
 End Property
 
 Private Property Get SymmetricAlgorithm_Padding() As PaddingMode
