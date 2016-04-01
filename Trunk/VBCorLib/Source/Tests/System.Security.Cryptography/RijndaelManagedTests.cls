@@ -200,7 +200,40 @@ Public Sub Encrypt_MonoBug7193()
     Assert.That DecData, Iz.EqualTo(Original), "roundtrip"
 End Sub
 
+Public Sub CBC_0()
+    Dim PlainText(31) As Byte
+    Dim IV(15) As Byte
+    Dim Key(15) As Byte
+    Dim r As New RijndaelManaged
+    r.BlockSize = 128
+    r.Mode = CipherMode.CBC
+    r.Padding = PaddingMode.Zeros
+    
+    Dim Expected() As Byte
+    Expected = NewBytes(&H66, &HE9, &H4B, &HD4, &HEF, &H8A, &H2C, &H3B, &H88, &H4C, &HFA, &H59, &HCA, &H34, &H2B, &H2E, &HF7, &H95, &HBD, &H4A, &H52, &HE2, &H9E, &HD7, &H13, &HD3, &H13, &HFA, &H20, &HE9, &H8D, &HBC)
+    
+    CheckCBC r.CreateEncryptor(Key, IV), r.CreateDecryptor(Key, IV), PlainText, Expected
+End Sub
 
+Public Sub CBC_1()
+    Dim PlainText(31) As Byte
+    Dim IV(15) As Byte
+    Dim Key(15) As Byte
+    Dim i As Long
+    For i = 0 To UBound(IV)
+        IV(i) = i
+    Next
+    
+    Dim r As New RijndaelManaged
+    r.BlockSize = 128
+    r.Mode = CipherMode.CBC
+    r.Padding = PaddingMode.Zeros
+    
+    Dim Expected() As Byte
+    Expected = NewBytes(&H7A, &HCA, &HF, &HD9, &HBC, &HD6, &HEC, &H7C, &H9F, &H97, &H46, &H66, &H16, &HE6, &HA2, &H82, &H66, &HC5, &H84, &H17, &H1D, &H3C, &H20, &H53, &H6F, &HA, &H9, &HDC, &H4D, &H1E, &H45, &H3B)
+    
+    CheckCBC r.CreateEncryptor(Key, IV), r.CreateDecryptor(Key, IV), PlainText, Expected
+End Sub
 
 
 Private Function CreateTransform(ByVal KeySize As Long, ByRef CreateMethod As String) As ICryptoTransform
@@ -239,8 +272,23 @@ Private Function CreatePlainText() As Byte()
     CreatePlainText = PlainText
 End Function
 
-
-
+Private Sub CheckCBC(ByVal Encryptor As ICryptoTransform, ByVal Decryptor As ICryptoTransform, ByRef PlainText() As Byte, ByRef Expected() As Byte)
+    Dim CipherText() As Byte
+    ReDim CipherText(UBound(PlainText))
+    
+    Dim i As Long
+    For i = 0 To UBound(PlainText) Step Encryptor.InputBlockSize
+        Encryptor.TransformBlock PlainText, i, Encryptor.InputBlockSize, CipherText, i
+    Next
+    Assert.That CipherText, Iz.EqualTo(Expected), "CBC"
+    
+    Dim RoundTrip() As Byte
+    ReDim RoundTrip(UBound(PlainText))
+    For i = 0 To UBound(CipherText) Step Decryptor.InputBlockSize
+        Decryptor.TransformBlock CipherText, i, Decryptor.InputBlockSize, RoundTrip, i
+    Next
+    Assert.That RoundTrip, Iz.EqualTo(PlainText), "CBC-rt"
+End Sub
 
 
 
