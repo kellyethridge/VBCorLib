@@ -25,153 +25,157 @@ End Sub
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
         Case "GetBytes_WithNullArray_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
     
         Case "GetBytes_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetBytes_WithCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetBytes_WithIndexPlusCountExtendBeyondChars_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetBytes_WithMissingCount_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetBytes_WithMissingIndex_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetByteCount_WithMissingCount_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetByteCount_WithMissingIndex_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetByteCount_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetByteCount_WithCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetByteCount_WithIndexPlusCountExtendBeyondChars_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithCharCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetByteCount_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetByteCount_WithCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetByteCount_WithIndexPlusCountExtendBeyondChars_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithCharCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithCharIndexPlusCharCountBeyondChars_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetBytesEx_WithByteIndexGreaterThanUBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithNotEnoughCapacity_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharCount_WithNullArray_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharCount_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharCount_WithCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharCount_WithIndexPlusCountIsNotInValidRange_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharCount_WithMissingIndex_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharCount_WithMissingCount_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetString_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetString_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetString_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetString_WithMissingByteIndex_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetString_WithMissingByteCount_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetString_WithNullBytes_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetChars_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetChars_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetChars_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetChars_WithNullBytes_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetChars_WithMissingByteIndex_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetChars_WithMissingByteCount_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharsEx_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharsEx_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharsEx_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharsEx_WithNullBytes_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharsEx_WithNullChars_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetCharsEx_WithNotEnoughCapacity_ThrowsArgumentException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
         
         Case "GetBytesEx_WithNullCharsArray_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
         Case "GetBytesEx_WithNullBytesArray_ThrowsArgumentNullException"
-            Test.Use New ASCIIEncoding
+            AddEncodings Test
             
     End Select
+End Sub
+
+Private Sub AddEncodings(ByVal Test As TestCaseCollector)
+    Test.Use New ASCIIEncoding
 End Sub
 
 
