@@ -306,11 +306,12 @@ Private Sub AddMicrosoftWin32()
         .Add New SafeHandleTests
         
         .Add NewSuite("RegistryKey", _
-            New TestRegistryDeleteValue, _
-            New TestRegistryKeySetGetValue, _
-            New TestRegistryRootKeys, _
-            New TestRegistryKey, _
-            New TestRegistrySetValues)
+            New RegistryKeyTests)
+'            New TestRegistryDeleteValue, _
+'            New TestRegistryKeySetGetValue, _
+'            New TestRegistryRootKeys, _
+'            New TestRegistryKey, _
+'            New TestRegistrySetValues)
         
         AddTest .This
     End With
