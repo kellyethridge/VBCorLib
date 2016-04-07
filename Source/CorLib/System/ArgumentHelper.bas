@@ -35,30 +35,9 @@ Public Type ListRange
 End Type
 
 
-Public Function IfObject(ByVal ObjA As Object, ByVal ObjB As Object) As Object
-    If ObjA Is Nothing Then
-        Set IfObject = ObjB
-    Else
-        Set IfObject = ObjA
-    End If
-End Function
 
-Public Function IfString(ByRef a As String, ByRef b As String) As String
-    If LenB(a) > 0 Then
-        IfString = a
-    Else
-        IfString = b
-    End If
-End Function
 
-Public Function CLong(ByRef Value As Variant) As Long
-    Select Case VarType(Value)
-        Case vbLong, vbInteger, vbByte
-            CLong = Value
-        Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "Long"))
-    End Select
-End Function
+
 
 Public Function TryOptionalLong(ByRef Value As Variant, ByRef Result As Long) As Boolean
     Select Case VarType(Value)

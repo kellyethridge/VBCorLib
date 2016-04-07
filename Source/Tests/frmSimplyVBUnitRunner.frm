@@ -304,14 +304,7 @@ End Sub
 Private Sub AddMicrosoftWin32()
     With Sim.NewTestSuite("Microsoft.Win32")
         .Add New SafeHandleTests
-        
-        .Add NewSuite("RegistryKey", _
-            New RegistryKeyTests)
-'            New TestRegistryDeleteValue, _
-'            New TestRegistryKeySetGetValue, _
-'            New TestRegistryRootKeys, _
-'            New TestRegistryKey, _
-'            New TestRegistrySetValues)
+        .Add New RegistryKeyTests
         
         AddTest .This
     End With
