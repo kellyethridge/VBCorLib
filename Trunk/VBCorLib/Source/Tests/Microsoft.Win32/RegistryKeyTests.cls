@@ -21,14 +21,6 @@ Implements ITestCaseSource
 Private Const RegistryPathBase              As String = "software\vb and vba program settings"
 Private Const RegistryKeysPath              As String = "software\vb and vba program settings\VBCorLibTests"
 Private Const RegistryValuesPath            As String = "software\vb and vba program settings\VBCorLibTests\Values"
-'Private Const RegistryKeyPath           As String = "HKEY_CURRENT_USER\" & RegistryPath
-Private Const REG_OPTION_NON_VOLATILE   As Long = 0
-Private Const REG_DWORD                 As Long = 4
-
-Private Declare Function RegQueryValueExStr Lib "advapi32.dll" Alias "RegQueryValueExA" (ByVal hKey As Long, ByVal lpValueName As String, ByVal lpReserved As Long, ByRef lpType As Long, ByVal lpData As String, ByRef lpcbData As Long) As Long
-
-Private mKey As RegistryKey
-Private hKey As Long
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "Microsoft.Win32"
@@ -44,7 +36,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewStrings("one", "two", "three")
             Test.Use "%PATH%"
         
-        Case "GetValueKey_WhenCalled_ReturnsExpected"
+        Case "GetValueKind_WhenCalled_ReturnsExpected"
             Test.Use CLng(1), RegistryValueKind.DWordKind
             Test.Use "One", RegistryValueKind.StringKind
             Test.Use CCur(1), RegistryValueKind.QWordKind
@@ -368,7 +360,7 @@ Public Sub DeleteSubKeyTree_WhenCalled_RemovesSubKeysFromRegistry()
     Assert.That Actual, Iz.Empty
 End Sub
 
-Public Sub GetValueKey_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByVal Expected As RegistryValueKind)
+Public Sub GetValueKind_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByVal Expected As RegistryValueKind)
     Dim Key As RegistryKey
     Set Key = Registry.CurrentUser.CreateSubKey(RegistryValuesPath)
     Key.SetValue "TestValue", Value

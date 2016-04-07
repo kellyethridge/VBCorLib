@@ -84,8 +84,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 Implements IObject
-Implements IEnumerable
-
 
 Private Const REG_OPTION_NON_VOLATILE       As Long = 0
 Private Const MAX_KEY_LENGTH                As Long = 255
@@ -131,7 +129,7 @@ Private mWritable   As Boolean
 ' @return The name of the key.
 '
 Public Property Get Name() As String
-    Call VerifyHandle
+    VerifyHandle
     Name = mName
 End Property
 
@@ -145,25 +143,17 @@ End Property
 ' node within the Registry.
 ' <p>If the requested SubKey was not found, then <b>Nothing</b> is returned. No error is thrown.</p>
 '
-Public Function OpenSubKey(ByVal Name As String, Optional ByVal Writable As Boolean = False) As RegistryKey
-    Call VerifyHandle
+Public Function OpenSubKey(ByRef Name As String, Optional ByVal Writable As Boolean = False) As RegistryKey
+    VerifyHandle
     
-    Name = CorString.Trim(Name, "\")
-    Call VerifyKey(Name)
+    Dim TrimmedName As String
+    TrimmedName = CorString.Trim(Name, "\")
+    VerifyKey TrimmedName
     
-    Dim Access As Long
-    If mWritable Then
-        Access = KEY_ALL_ACCESS
-    Else
-        Access = KEY_READ
-    End If
-    
-    Dim Result As Long
     Dim NewKey As Long
-    Result = Api.RegOpenKeyEx(mHKey, Name, 0, Access, NewKey)
-    If Result <> ERROR_SUCCESS Then Exit Function
-
-    Set OpenSubKey = Cor.NewRegistryKey(NewKey, Path.Combine(mName, Name), Writable)
+    If RegOpenKeyEx(mHKey, TrimmedName, 0, IIfLong(mWritable, KEY_ALL_ACCESS, KEY_READ), NewKey) = ERROR_SUCCESS Then
+        Set OpenSubKey = Cor.NewRegistryKey(NewKey, Path.Combine(mName, TrimmedName), Writable)
+    End If
 End Function
 
 ''
@@ -174,7 +164,7 @@ End Function
 '
 Public Sub CloseKey()
     If (Not IsSystemKey) And (mHKey <> vbNullPtr) Then
-        Call RegCloseKey(mHKey)
+        RegCloseKey mHKey
         mHKey = vbNullPtr
     End If
 End Sub
@@ -190,12 +180,7 @@ End Sub
 '
 Public Sub Flush()
     VerifyHandle
-    
-    Dim Result As Long
-    Result = RegFlushKey(mHKey)
-    If Result <> ERROR_SUCCESS Then
-        Error.Win32Error Result
-    End If
+    ThrowOnFailure RegFlushKey(mHKey)
 End Sub
 
 ''
@@ -205,22 +190,25 @@ End Sub
 ' @return A <b>RegistryKey</b> to manipulate the new Registry node.
 ' @remarks If the Registry node already exists, then it is returned.
 '
-Public Function CreateSubKey(ByVal SubKey As String) As RegistryKey
-    Call VerifyHandle
-    Call VerifyWritable
+Public Function CreateSubKey(ByRef SubKey As String) As RegistryKey
+    VerifyHandle
+    VerifyWritable
     
-    SubKey = CorString.Trim(SubKey, "\")
-    Call VerifyKey(SubKey)
+    Dim TrimmedKey As String
+    TrimmedKey = CorString.Trim(SubKey, "\")
+    VerifyKey TrimmedKey
     
-    Dim Result As Long
     Dim NewKey As Long
-    Result = Api.RegCreateKeyEx(mHKey, SubKey, 0, vbNullString, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, 0, NewKey, 0)
+    ThrowOnFailure RegCreateKeyEx(mHKey, TrimmedKey, 0, vbNullString, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, 0, NewKey, 0)
+    
+    Set CreateSubKey = Cor.NewRegistryKey(NewKey, Path.Combine(mName, TrimmedKey), True)
+End Function
+
+Private Sub ThrowOnFailure(ByVal Result As Long)
     If Result <> ERROR_SUCCESS Then
         Error.Win32Error Result
     End If
-    
-    Set CreateSubKey = Cor.NewRegistryKey(NewKey, Path.Combine(mName, SubKey), True)
-End Function
+End Sub
 
 ''
 ' Deletes a node from the Windows Registry.
@@ -231,12 +219,12 @@ End Function
 ' To delete all SubKeys use the <b>DeleteSubKeyTree</b> to recursively delete SubKeys
 ' and values.
 '
-Public Sub DeleteSubKey(ByVal SubKey As String, Optional ByVal ThrowOnMissingSubKey As Boolean = True)
-    Call VerifyHandle
-    Call VerifyWritable
+Public Sub DeleteSubKey(ByRef SubKey As String, Optional ByVal ThrowOnMissingSubKey As Boolean = True)
+    VerifyHandle
+    VerifyWritable
     
     Dim rk As RegistryKey
-    Set rk = Me.OpenSubKey(SubKey)
+    Set rk = OpenSubKey(SubKey)
     
     If rk Is Nothing Then
         If ThrowOnMissingSubKey Then _
@@ -245,11 +233,7 @@ Public Sub DeleteSubKey(ByVal SubKey As String, Optional ByVal ThrowOnMissingSub
         If rk.SubKeyCount > 0 Then _
             Throw Cor.NewInvalidOperationException("Cannot delete. SubKey contains keys.")
         
-        Dim Result As Long
-        Result = Api.RegDeleteKey(mHKey, SubKey)
-        If Result <> ERROR_SUCCESS Then
-            Error.Win32Error Result
-        End If
+        ThrowOnFailure RegDeleteKey(mHKey, SubKey)
         rk.CloseKey
     End If
 End Sub
@@ -260,31 +244,28 @@ End Sub
 ' @param SubKey The Registry node to be deleted.
 ' @remarks All subkeys and values are deleted recursively. Caution should be used.
 '
-Public Sub DeleteSubKeyTree(ByVal SubKey As String)
-    Call VerifyHandle
-    Call VerifyWritable
+Public Sub DeleteSubKeyTree(ByRef SubKey As String)
+    VerifyHandle
+    VerifyWritable
     
-    SubKey = CorString.Trim(SubKey, "\")
-    Call VerifyKey(SubKey)
+    Dim TrimmedKey As String
+    TrimmedKey = CorString.Trim(SubKey, "\")
+    VerifyKey TrimmedKey
     
     Dim rk As RegistryKey
-    Set rk = Me.OpenSubKey(SubKey, True)
+    Set rk = OpenSubKey(TrimmedKey, True)
     
     Dim SubKeys() As String
     SubKeys = rk.GetSubKeyNames
     If CorArray.Length(SubKeys) > 0 Then
         Dim i As Long
         For i = 0 To UBound(SubKeys)
-            Call rk.DeleteSubKeyTree(SubKeys(i))
+            rk.DeleteSubKeyTree SubKeys(i)
         Next i
     End If
-    Call rk.CloseKey
+    rk.CloseKey
     
-    Dim Result As Long
-    Result = Api.RegDeleteKey(mHKey, SubKey)
-    If Result <> ERROR_SUCCESS Then
-        Error.Win32Error Result
-    End If
+    ThrowOnFailure RegDeleteKey(mHKey, TrimmedKey)
 End Sub
 
 ''
@@ -295,30 +276,23 @@ End Sub
 ' <p>If no SubKeys exist then a zero-length array is returned.</p>
 '
 Public Function GetSubKeyNames() As String()
-    Call VerifyHandle
+    VerifyHandle
     
-    Dim Buf As String
+    Dim Buf         As String
+    Dim Count       As Long
+    Dim Ret()       As String
+    
     Buf = String$(MAX_KEY_LENGTH + 1, 0)
+    Count = SubKeyCount
+    Ret = CorArray.CreateInstance(vbString, Count)
     
-    Dim KeyCount As Long
-    KeyCount = Me.SubKeyCount
-    
-    Dim Ret() As String
-    Ret = CorArray.CreateInstance(vbString, KeyCount)
-    
-    Do While KeyCount > 0
-        KeyCount = KeyCount - 1
-        
+    Do While Count > 0
         Dim BufferSize As Long
+        
+        Count = Count - 1
         BufferSize = MAX_KEY_LENGTH + 1
-        
-        Dim Result As Long
-        Result = Api.RegEnumKeyEx(mHKey, KeyCount, Buf, BufferSize, 0, vbNullString, 0, 0@)
-        If Result <> ERROR_SUCCESS Then
-            Error.Win32Error Result
-        End If
-        
-        Ret(KeyCount) = Left$(Buf, BufferSize)
+        ThrowOnFailure RegEnumKeyEx(mHKey, Count, Buf, BufferSize, 0, vbNullString, 0, 0@)
+        Ret(Count) = Left$(Buf, BufferSize)
     Loop
 
     GetSubKeyNames = Ret
@@ -337,30 +311,23 @@ End Function
 ' the default name ("") in the returned list.</p>
 '
 Public Function GetValueNames() As String()
-    Call VerifyHandle
+    VerifyHandle
     
-    Dim Buf As String
+    Dim Buf     As String
+    Dim Count   As Long
+    Dim Ret()   As String
+    
     Buf = String$(Registry.MaxValueNameLength, 0)
-    
-    Dim ValueCount As Long
-    ValueCount = Me.ValueCount
-    
-    Dim Ret() As String
+    Count = ValueCount
     Ret = CorArray.CreateInstance(vbString, ValueCount)
     
-    Do While ValueCount > 0
-        ValueCount = ValueCount - 1
-        
+    Do While Count > 0
         Dim BufferSize As Long
+        
+        Count = Count - 1
         BufferSize = Len(Buf)
-        
-        Dim Result As Long
-        Result = Api.RegEnumValue(mHKey, ValueCount, Buf, BufferSize, 0, 0, 0, 0)
-        If Result <> ERROR_SUCCESS Then
-            Error.Win32Error Result
-        End If
-        
-        Ret(ValueCount) = Left$(Buf, BufferSize)
+        ThrowOnFailure RegEnumValue(mHKey, Count, Buf, BufferSize, 0, 0, 0, 0)
+        Ret(Count) = Left$(Buf, BufferSize)
     Loop
     
     GetValueNames = Ret
@@ -391,15 +358,15 @@ End Function
 ' In this case, the value is not changed and the 64-bits are saved to the registry as is.
 ' A vbCurrency of 1 will be saved to the registry as is, not as 0.0001.</p>
 '
-Public Sub SetValue(ByVal Name As String, ByRef Value As Variant, Optional ByVal ValueKind As RegistryValueKind = UnknownKind)
-    Call VerifyWritable
-    Call VerifyHandle
+Public Sub SetValue(ByRef Name As String, ByRef Value As Variant, Optional ByVal ValueKind As RegistryValueKind = UnknownKind)
+    VerifyWritable
+    VerifyHandle
     
     If Len(Name) > Registry.MaxValueNameLength Then _
         Throw Cor.NewArgumentException("Registry Value name must not exceed " & Registry.MaxValueNameLength & " characters.", "Name")
 
-    Call ClearException
-    On Error GoTo errTrap
+    ClearException
+    On Error GoTo Catch
     
     Dim Result As Long
     If ValueKind = UnknownKind Then
@@ -409,10 +376,10 @@ Public Sub SetValue(ByVal Name As String, ByRef Value As Variant, Optional ByVal
     End If
     On Error GoTo 0
     
-    If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+    ThrowOnFailure Result
     Exit Sub
 
-errTrap:
+Catch:
     Dim Ex As Exception
     If Catch(Ex) Then
         Throw Ex
@@ -441,8 +408,8 @@ End Sub
 ' 10000. To get the true 64-bit value, the vbCurrency value will need to be multiplied
 ' by 10000. The result may be an overflow.
 '
-Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant, Optional ByVal Options As RegistryValueOptions) As Variant
-    Call VerifyHandle
+Public Function GetValue(ByRef Name As String, Optional ByRef Default As Variant, Optional ByVal Options As RegistryValueOptions) As Variant
+    VerifyHandle
 
     If Len(Name) > Registry.MaxValueNameLength Then _
         Throw Cor.NewArgumentException("Registry Value name must not exceed " & Registry.MaxValueNameLength & " characters.", "Name")
@@ -450,36 +417,36 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
     Dim ValueType   As RegistryValueKind
     Dim ValueSize   As Long
     Dim Result      As Long
-    Result = Api.RegQueryValueEx(mHKey, Name, ValueType, 0, ValueSize)
+    Result = RegQueryValueEx(mHKey, Name, 0, ValueType, ByVal 0, ValueSize)
     
     If Result = ERROR_FILE_NOT_FOUND Then
-        If Not IsMissing(Default) Then Call VariantCopyInd(GetValue, Default)
+        If Not IsMissing(Default) Then
+            VariantCopyInd GetValue, Default
+        End If
+        
         Exit Function
-    ElseIf Result <> ERROR_SUCCESS Then
-        Error.Win32Error Result
+    Else
+        ThrowOnFailure Result
     End If
     
     Select Case ValueType
         Case StringKind
             Dim sz As String
             sz = String$(ValueSize, 0)
-            Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, sz)
-            If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+            ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, ByVal StrPtr(sz), LenB(sz))
             GetValue = CorString.TrimEnd(sz, vbNullChar)
             Exit Function
             
         Case DWordKind
             Dim i As Long
-            Result = Api.RegQueryValueEx(mHKey, Name, ValueType, VarPtr(i), 4)
-            If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+            ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, i, 4)
             GetValue = i
             
         Case BinaryKind, REG_NONE
             Dim Bytes() As Byte
             If ValueSize > 0 Then
                 ReDim Bytes(0 To ValueSize - 1)
-                Result = Api.RegQueryValueEx(mHKey, Name, ValueType, VarPtr(Bytes(0)), ValueSize)
-                If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+                ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, Bytes(0), ValueSize)
             Else
                 Bytes = Cor.NewBytes
             End If
@@ -490,16 +457,14 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
         Case MultiStringKind
             Dim MultiSZ As String
             MultiSZ = String$(ValueSize, 0)
-            Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, MultiSZ)
-            If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+            ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, ByVal StrPtr(MultiSZ), LenB(MultiSZ))
             GetValue = Split(CorString.TrimEnd(MultiSZ, vbNullChar), vbNullChar)
             Exit Function
             
         Case ExpandStringKind
             Dim ExpSZ As String
             ExpSZ = String$(ValueSize, 0)
-            Result = Api.RegQueryValueExStr(mHKey, Name, ValueType, ExpSZ)
-            If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+            ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, ByVal StrPtr(ExpSZ), LenB(ExpSZ))
             ExpSZ = CorString.TrimEnd(ExpSZ, vbNullChar)
             
             If Options <> DoNotExpandEnvironmentVariables Then
@@ -511,8 +476,7 @@ Public Function GetValue(ByVal Name As String, Optional ByRef Default As Variant
             
         Case QWordKind
             Dim c As Currency
-            Result = Api.RegQueryValueEx(mHKey, Name, ValueType, VarPtr(c), 8)
-            If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+            ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, ValueType, c, 8)
             GetValue = c
             
         Case Else
@@ -526,13 +490,11 @@ End Function
 ' @param Name The name of the value to be deleted, or an empty string to delete the default value for the key.
 ' @param ThrowOnMissingValue Whether to throw an exception if the value was not found.
 '
-Public Sub DeleteValue(ByVal Name As String, Optional ByVal ThrowOnMissingValue As Boolean = True)
-    Call VerifyWritable
-    Call VerifyHandle
+Public Sub DeleteValue(ByRef Name As String, Optional ByVal ThrowOnMissingValue As Boolean = True)
+    VerifyWritable
+    VerifyHandle
     
-    Dim Result As Long
-    Result = Api.RegDeleteValue(mHKey, Name)
-    If (Result = ERROR_FILE_NOT_FOUND) And ThrowOnMissingValue Then _
+    If (RegDeleteValue(mHKey, Name) = ERROR_FILE_NOT_FOUND) And ThrowOnMissingValue Then _
         Throw Cor.NewArgumentException("Value was not found.", "Name")
 End Sub
 
@@ -542,11 +504,8 @@ End Sub
 ' @return The number of SubKeys.
 '
 Public Property Get SubKeyCount() As Long
-    Call VerifyHandle
-    
-    Dim Result As Long
-    Result = Api.RegQueryInfoKey(mHKey, vbNullString, 0, 0, VarPtr(SubKeyCount), 0, 0, 0, 0, 0, 0, 0)
-    If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+    VerifyHandle
+    ThrowOnFailure RegQueryInfoKey(mHKey, vbNullString, ByVal 0, 0, SubKeyCount, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0)
 End Property
 
 ''
@@ -555,11 +514,8 @@ End Property
 ' @remarks The number of values.
 '
 Public Property Get ValueCount() As Long
-    Call VerifyHandle
-    
-    Dim Result As Long
-    Result = Api.RegQueryInfoKey(mHKey, vbNullString, 0, 0, 0, 0, 0, VarPtr(ValueCount), 0, 0, 0, 0)
-    If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+    VerifyHandle
+    ThrowOnFailure RegQueryInfoKey(mHKey, vbNullString, ByVal 0, 0, ByVal 0, ByVal 0, ByVal 0, ValueCount, ByVal 0, ByVal 0, ByVal 0, ByVal 0)
 End Property
 
 ''
@@ -568,12 +524,9 @@ End Property
 ' @param Name The name of the value to get the type of.
 ' @return The type of value in the registry.
 '
-Public Function GetValueKind(ByVal Name As String) As RegistryValueKind
-    Call VerifyHandle
-    
-    Dim Result As Long
-    Result = Api.RegQueryValueEx(mHKey, Name, GetValueKind, 0, 0)
-    If Result <> ERROR_SUCCESS Then Error.Win32Error Result
+Public Function GetValueKind(ByRef Name As String) As RegistryValueKind
+    VerifyHandle
+    ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, GetValueKind, ByVal 0, 0)
 End Function
 
 ''
@@ -583,43 +536,15 @@ End Function
 ' @remarks This method returns CorDateTime.MinValue on Windows 95,98 and ME.
 '
 Public Function GetLastWriteTime() As CorDateTime
-    Call VerifyHandle
+    VerifyHandle
     
     If Environment.IsNT Then
-        Dim Result  As Long
-        Dim Time    As Currency
-        
-        Result = Api.RegQueryInfoKey(mHKey, vbNullString, 0, 0, 0, 0, 0, 0, 0, 0, 0, VarPtr(Time))
-        If Result <> ERROR_SUCCESS Then Error.Win32Error Result
-        
+        Dim Time As Currency
+        ThrowOnFailure RegQueryInfoKey(mHKey, vbNullString, ByVal 0, 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, Time)
         Set GetLastWriteTime = CorDateTime.FromFileTime(Time)
     Else
         Set GetLastWriteTime = CorDateTime.MinValue
     End If
-End Function
-
-''
-' Returns an enumerator to enumerate the name/value pairs.
-'
-' @param EnumType A flag indicating which type of values to be enumerated in the key.
-' @param Options Additional options on how to handle registry values.
-' @return An IEnumerator object.
-'
-Public Function GetEnumerator(Optional ByVal EnumType As IDictionaryEnumType = detEntries, Optional ByVal Options As RegistryValueOptions) As Object
-    Call VerifyHandle
-    
-    Dim Ret As New RegistryKeyEnumerator
-    Call Ret.Init(Me, EnumType, Options)
-    Set GetEnumerator = Ret
-End Function
-
-''
-' Returns a For..Each compatible enumerator.
-'
-' @return A For..Each compatible enumerator.
-'
-Public Function NewEnum() As IUnknown
-    Set NewEnum = CreateEnumerator(GetEnumerator)
 End Function
 
 ''
@@ -650,17 +575,21 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Key As Long, ByVal Name As String, ByVal Writable As Boolean)
+Friend Sub Init(ByVal Key As Long, ByRef Name As String, ByVal Writable As Boolean)
     mHKey = Key
     mName = CorString.Trim(Name, "\")
     mWritable = Writable
 End Sub
 
+Private Sub Class_Terminate()
+    CloseKey
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyKey(ByRef Path As String)
     Dim Keys() As String
@@ -694,7 +623,9 @@ Private Sub VerifyWritable()
 End Sub
 
 Private Function SetValueSZ(ByRef Name As String, ByRef Value As Variant) As Long
-    SetValueSZ = Api.RegSetValueExStr(mHKey, Name, REG_SZ, Value & vbNullChar)
+    Dim Data As String
+    Data = Value & vbNullChar
+    SetValueSZ = RegSetValueEx(mHKey, Name, 0, REG_SZ, StrPtr(Data), LenB(Data))
 End Function
 
 Private Function SetValueMultiSZ(ByRef Name As String, ByRef Value As Variant) As Long
@@ -707,15 +638,17 @@ Private Function SetValueMultiSZ(ByRef Name As String, ByRef Value As Variant) A
         s = vbNullChar
     End If
     
-    SetValueMultiSZ = Api.RegSetValueExStr(mHKey, Name, REG_MULTI_SZ, s)
+    SetValueMultiSZ = RegSetValueEx(mHKey, Name, 0, REG_MULTI_SZ, StrPtr(s), LenB(s))
 End Function
 
 Private Function SetValueExpandSZ(ByRef Name As String, ByRef Value As Variant) As Long
-    SetValueExpandSZ = Api.RegSetValueExStr(mHKey, Name, REG_EXPAND_SZ, Value & vbNullChar)
+    Dim Data As String
+    Data = Value & vbNullChar
+    SetValueExpandSZ = RegSetValueEx(mHKey, Name, 0, REG_EXPAND_SZ, StrPtr(Data), LenB(Data))
 End Function
 
 Private Function SetValueDWord(ByRef Name As String, ByVal Value As Long) As Long
-    SetValueDWord = Api.RegSetValueEx(mHKey, Name, REG_DWORD, VarPtr(Value), 4)
+    SetValueDWord = RegSetValueEx(mHKey, Name, 0, REG_DWORD, VarPtr(Value), 4)
 End Function
 
 Private Function SetValueBinary(ByRef Name As String, ByRef Value As Variant) As Long
@@ -724,14 +657,16 @@ Private Function SetValueBinary(ByRef Name As String, ByRef Value As Variant) As
     
     If Not CorArray.IsNull(Value) Then
         Size = CorArray.Length(Value)
-        If Size > 0 Then lpData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET)
+        If Size > 0 Then
+            lpData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET)
+        End If
     End If
     
-    SetValueBinary = Api.RegSetValueEx(mHKey, Name, REG_BINARY, lpData, Size)
+    SetValueBinary = RegSetValueEx(mHKey, Name, 0, REG_BINARY, lpData, Size)
 End Function
 
 Private Function SetValueQWord(ByRef Name As String, ByVal Value As Currency) As Long
-    SetValueQWord = Api.RegSetValueEx(mHKey, Name, REG_QWORD, VarPtr(Value), 8)
+    SetValueQWord = RegSetValueEx(mHKey, Name, 0, REG_QWORD, VarPtr(Value), 8)
 End Function
 
 Private Function SetValueObject(ByRef Name As String, ByVal Value As IObject) As Long
@@ -742,12 +677,18 @@ Private Function SetValueDirect(ByRef Name As String, ByRef Value As Variant)
     Dim Result As Long
     
     Select Case VarType(Value)
-        Case vbLong, vbInteger, vbByte:     Result = SetValueDWord(Name, Value)
-        Case corStringArray, corVariantArray: Result = SetValueMultiSZ(Name, Value)
-        Case corByteArray:                   Result = SetValueBinary(Name, Value)
-        Case vbCurrency:                    Result = SetValueQWord(Name, Value)
-        Case vbObject:                      Result = SetValueObject(Name, Value)
-        Case Else:                          Result = SetValueSZ(Name, Value)
+        Case vbLong, vbInteger, vbByte
+            Result = SetValueDWord(Name, Value)
+        Case corStringArray, corVariantArray
+            Result = SetValueMultiSZ(Name, Value)
+        Case corByteArray
+            Result = SetValueBinary(Name, Value)
+        Case vbCurrency
+            Result = SetValueQWord(Name, Value)
+        Case vbObject
+            Result = SetValueObject(Name, Value)
+        Case Else
+            Result = SetValueSZ(Name, Value)
     End Select
     
     SetValueDirect = Result
@@ -757,10 +698,14 @@ Private Function SetValueWithConvert(ByRef Name As String, ByRef Value As Varian
     Dim Result As Long
     
     Select Case ValueKind
-        Case DWordKind:         Result = SetValueDWord(Name, Value)
-        Case BinaryKind:        Result = SetValueBinary(Name, Value)
-        Case MultiStringKind:   Result = SetValueMultiSZ(Name, Value)
-        Case ExpandStringKind:  Result = SetValueExpandSZ(Name, Value)
+        Case DWordKind
+            Result = SetValueDWord(Name, Value)
+        Case BinaryKind
+            Result = SetValueBinary(Name, Value)
+        Case MultiStringKind
+            Result = SetValueMultiSZ(Name, Value)
+        Case ExpandStringKind
+            Result = SetValueExpandSZ(Name, Value)
         Case QWordKind
             ' We assume if an actual Currency datatype value was passed in
             ' then that value was the expected 64-bit value. If a different
@@ -787,27 +732,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    Call CloseKey
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IEnumerable_GetEnumerator() As IEnumerator
-    Set IEnumerable_GetEnumerator = GetEnumerator
-End Function
-
-Private Function IEnumerable_NewEnum() As stdole.IUnknown
-    Set IEnumerable_NewEnum = NewEnum
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

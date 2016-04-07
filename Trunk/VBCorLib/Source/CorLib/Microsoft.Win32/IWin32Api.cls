@@ -59,28 +59,6 @@ Public Function GetTempPath(ByVal BufferLength As Long, Buffer As String) As Lon
 
 Public Function MoveFile(ExistingFileName As String, NewFileName As String) As Long: End Function
 
-Public Function RegCreateKeyEx(ByVal hKey As Long, lpSubKey As String, ByVal reserved As Long, lpClass As String, ByVal dwOptions As Long, ByVal samDesired As Long, ByVal lpSecurityAttributes As Long, phkResult As Long, lpdwDisposition As Long) As Long: End Function
-
-Public Function RegDeleteKey(ByVal hKey As Long, lpSubKey As String) As Long: End Function
-
-Public Function RegDeleteValue(ByVal hKey As Long, lpValueName As String) As Long: End Function
-
-Public Function RegEnumKeyEx(ByVal hKey As Long, ByVal dwIndex As Long, lpName As String, lpcName As Long, ByVal lpReserved As Long, lpClass As String, lpcClass As Long, lpftLastWriteTime As Currency) As Long: End Function
-
-Public Function RegEnumValue(ByVal hKey As Long, ByVal dwIndex As Long, lpValueName As String, lpcValueName As Long, ByVal lpReserved As Long, ByVal lpType As Long, ByVal lpData As Long, ByVal lpcbData As Long) As Long: End Function
-
-Public Function RegOpenKeyEx(ByVal hKey As Long, SubKey As String, ByVal Options As Long, ByVal Desired As Long, Result As Long) As Long: End Function
-
-Public Function RegQueryInfoKey(ByVal hKey As Long, lpClass As String, ByVal lpcClass As Long, ByVal lpReserve As Long, ByVal lpcSubKeys As Long, ByVal lpcMaxSubKeyLen As Long, ByVal lpcMaxClassLen As Long, ByVal lpcValues As Long, ByVal lpMaxValueNameLen As Long, ByVal lpMaxValueLen As Long, ByVal lpSecurityDescriptor As Long, ByVal lpLastWriteTime As Long) As Long: End Function
-
-Public Function RegQueryValueEx(ByVal hKey As Long, ValueName As String, ValueType As Long, ByVal lpData As Long, lpcbData As Long) As Long: End Function
-
-Public Function RegQueryValueExStr(ByVal hKey As Long, ValueName As String, ValueType As Long, Data As String) As Long: End Function
-
-Public Function RegSetValueEx(ByVal hKey As Long, ValueName As String, ByVal ValueType As Long, ByVal lpData As Long, ByVal cbData As Long) As Long: End Function
-
-Public Function RegSetValueExStr(ByVal hKey As Long, ValueName As String, ByVal ValueType As Long, Data As String) As Long: End Function
-
 Public Function RemoveDirectory(lpPathName As String) As Long: End Function
 
 Public Function SetCurrentDirectory(PathName As String) As Long: End Function

@@ -185,50 +185,6 @@ Private Function IWin32API_MoveFile(ExistingFileName As String, NewFileName As S
     IWin32API_MoveFile = MoveFileW(MakeWide(ExistingFileName), MakeWide(NewFileName))
 End Function
 
-Private Function IWin32API_RegCreateKeyEx(ByVal hKey As Long, lpSubKey As String, ByVal reserved As Long, lpClass As String, ByVal dwOptions As Long, ByVal samDesired As Long, ByVal lpSecurityAttributes As Long, phkResult As Long, lpdwDisposition As Long) As Long
-    IWin32API_RegCreateKeyEx = RegCreateKeyExW(hKey, lpSubKey, reserved, lpClass, dwOptions, samDesired, lpSecurityAttributes, phkResult, lpdwDisposition)
-End Function
-
-Private Function IWin32API_RegDeleteKey(ByVal hKey As Long, lpSubKey As String) As Long
-    IWin32API_RegDeleteKey = RegDeleteKeyW(hKey, lpSubKey)
-End Function
-
-Private Function IWin32API_RegDeleteValue(ByVal hKey As Long, lpValueName As String) As Long
-    IWin32API_RegDeleteValue = RegDeleteValueW(hKey, lpValueName)
-End Function
-
-Private Function IWin32API_RegEnumKeyEx(ByVal hKey As Long, ByVal dwIndex As Long, lpName As String, lpcName As Long, ByVal lpReserved As Long, lpClass As String, lpcClass As Long, lpftLastWriteTime As Currency) As Long
-    IWin32API_RegEnumKeyEx = RegEnumKeyExW(hKey, dwIndex, lpName, lpcName, lpReserved, lpClass, lpcClass, lpftLastWriteTime)
-End Function
-
-Private Function IWin32API_RegEnumValue(ByVal hKey As Long, ByVal dwIndex As Long, lpValueName As String, lpcValueName As Long, ByVal lpReserved As Long, ByVal lpType As Long, ByVal lpData As Long, ByVal lpcbData As Long) As Long
-    IWin32API_RegEnumValue = RegEnumValueW(hKey, dwIndex, lpValueName, lpcValueName, lpReserved, lpType, lpData, lpcbData)
-End Function
-
-Private Function IWin32API_RegOpenKeyEx(ByVal hKey As Long, SubKey As String, ByVal Options As Long, ByVal Desired As Long, Result As Long) As Long
-    IWin32API_RegOpenKeyEx = RegOpenKeyExW(hKey, SubKey, Options, Desired, Result)
-End Function
-
-Private Function IWin32API_RegQueryInfoKey(ByVal hKey As Long, lpClass As String, ByVal lpcClass As Long, ByVal lpReserve As Long, ByVal lpcSubKeys As Long, ByVal lpcMaxSubKeyLen As Long, ByVal lpcMaxClassLen As Long, ByVal lpcValues As Long, ByVal lpMaxValueNameLen As Long, ByVal lpMaxValueLen As Long, ByVal lpSecurityDescriptor As Long, ByVal lpLastWriteTime As Long) As Long
-    IWin32API_RegQueryInfoKey = RegQueryInfoKeyW(hKey, lpClass, ByVal lpcClass, lpReserve, ByVal lpcSubKeys, ByVal lpcMaxSubKeyLen, ByVal lpcMaxClassLen, ByVal lpcValues, ByVal lpMaxValueNameLen, ByVal lpMaxValueLen, ByVal lpSecurityDescriptor, ByVal lpLastWriteTime)
-End Function
-
-Private Function IWin32API_RegQueryValueEx(ByVal hKey As Long, ValueName As String, ValueType As Long, ByVal lpData As Long, lpcbData As Long) As Long
-    IWin32API_RegQueryValueEx = RegQueryValueExW(hKey, ValueName, 0, ValueType, ByVal lpData, lpcbData)
-End Function
-
-Private Function IWin32API_RegQueryValueExStr(ByVal hKey As Long, ValueName As String, ValueType As Long, Data As String) As Long
-    IWin32API_RegQueryValueExStr = RegQueryValueExW(hKey, ValueName, 0, ValueType, ByVal StrPtr(Data), LenB(Data))
-End Function
-
-Private Function IWin32API_RegSetValueEx(ByVal hKey As Long, ValueName As String, ByVal ValueType As Long, ByVal lpData As Long, ByVal cbData As Long) As Long
-    IWin32API_RegSetValueEx = RegSetValueExW(hKey, ValueName, 0, ValueType, lpData, cbData)
-End Function
-
-Private Function IWin32API_RegSetValueExStr(ByVal hKey As Long, ValueName As String, ByVal ValueType As Long, Data As String) As Long
-    IWin32API_RegSetValueExStr = RegSetValueExW(hKey, ValueName, 0, ValueType, StrPtr(Data), LenB(Data))
-End Function
-
 Private Function IWin32API_RemoveDirectory(lpPathName As String) As Long
     IWin32API_RemoveDirectory = RemoveDirectoryW(MakeWide(lpPathName))
 End Function

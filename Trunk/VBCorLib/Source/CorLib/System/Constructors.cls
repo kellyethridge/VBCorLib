@@ -926,7 +926,7 @@ Public Function NewResourceWriter(ByRef Source As Variant) As ResourceWriter
 End Function
 
 ' for internal use only
-Friend Function NewRegistryKey(ByVal Key As Long, ByVal Name As String, ByVal Writable As Boolean) As RegistryKey
+Friend Function NewRegistryKey(ByVal Key As Long, ByRef Name As String, ByVal Writable As Boolean) As RegistryKey
     Set NewRegistryKey = New RegistryKey
     NewRegistryKey.Init Key, Name, Writable
 End Function
