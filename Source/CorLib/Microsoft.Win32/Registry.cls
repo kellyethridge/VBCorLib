@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Registry
+' Module: Registry
 '
 
 ''
@@ -50,7 +53,6 @@ Option Explicit
 Private mClassesRoot        As RegistryKey
 Private mCurrentConfig      As RegistryKey
 Private mCurrentUser        As RegistryKey
-Private mDynData            As RegistryKey
 Private mLocalMachine       As RegistryKey
 Private mPerformanceData    As RegistryKey
 Private mUsers              As RegistryKey
@@ -58,14 +60,6 @@ Private mMaxValueNameLength As Long
 Private mMaxValueLength     As Long
 
 
-
-Public Property Get MaxValueNameLength() As Long
-    MaxValueNameLength = mMaxValueNameLength
-End Property
-
-Public Property Get MaxValueLength() As Long
-    MaxValueLength = mMaxValueLength
-End Property
 
 ''
 ' Returns a <b>RegistryKey</b> object that is then used to access registry keys and
@@ -94,16 +88,6 @@ End Property
 '
 Public Property Get CurrentUser() As RegistryKey
     Set CurrentUser = mCurrentUser
-End Property
-
-''
-' Contains dynamic registry data. This field reads the Windows registry base key HKEY_DYN_DATA.
-'
-' @remarks This root class is only available of Windows 95/98/ME. An exception
-' is thrown for other windows platforms.
-'
-Public Property Get DynData() As RegistryKey
-    Set DynData = mDynData
 End Property
 
 ''
@@ -142,11 +126,13 @@ End Property
 ' v = Registry.GetValue("HKEY_CURRENT_USER\Environment\", "TEMP")
 ' </pre>
 '
-Public Function GetValue(ByVal KeyName As String, ByVal ValueName As String, Optional ByRef DefaultValue As Variant) As Variant
-    Dim rk As RegistryKey
+Public Function GetValue(ByRef KeyName As String, ByRef ValueName As String, Optional ByRef DefaultValue As Variant) As Variant
+    Dim Key As RegistryKey
     
-    Set rk = GetSubKey(KeyName)
-    If Not rk Is Nothing Then Call Helper.MoveVariant(GetValue, rk.GetValue(ValueName, DefaultValue))
+    Set Key = GetSubKey(KeyName)
+    If Not Key Is Nothing Then
+        Helper.MoveVariant GetValue, Key.GetValue(ValueName, DefaultValue)
+    End If
 End Function
 
 ''
@@ -160,14 +146,14 @@ End Function
 ' Registry.SetValue "HKEY_CURRENT_USER\Environment\", "MyValue", "Hello"
 ' </pre>
 '
-Public Sub SetValue(ByVal KeyName As String, ByVal ValueName As String, ByRef Value As Variant)
-    Dim rk As RegistryKey
+Public Sub SetValue(ByRef KeyName As String, ByRef ValueName As String, ByRef Value As Variant)
+    Dim Key As RegistryKey
     
-    Set rk = GetSubKey(KeyName, True, True)
-    If rk Is Nothing Then _
+    Set Key = GetSubKey(KeyName, True, True)
+    If Key Is Nothing Then _
         Throw Cor.NewArgumentException("Could not save to registry key", "KeyName")
     
-    Call rk.SetValue(ValueName, Value)
+    Key.SetValue ValueName, Value
 End Sub
 
 ''
@@ -177,21 +163,27 @@ End Sub
 ' @return The root RegistryKey.
 ' @remarks The KeyName can contain subkeys. The root key name will be parsed out.
 '
-Public Function GetRootKey(ByVal KeyName As String) As RegistryKey
-    If Len(KeyName) = 0 Then Exit Function
-    KeyName = CorString.Trim(KeyName, "\")
+Public Function GetRootKey(ByRef KeyName As String) As RegistryKey
+    If Len(KeyName) = 0 Then
+        Exit Function
+    End If
     
     Dim Keys() As String
-    Keys = Split(KeyName, "\")
+    Keys = Split(CorString.Trim(KeyName, "\"), "\")
     
     Select Case UCase$(Keys(0))
-        Case "HKEY_CLASSES_ROOT":       Set GetRootKey = Me.ClassesRoot
-        Case "HKEY_CURRENT_CONFIG":     Set GetRootKey = Me.CurrentConfig
-        Case "HKEY_CURRENT_USER":       Set GetRootKey = Me.CurrentUser
-        Case "HKEY_DYN_DATA":           Set GetRootKey = Me.DynData
-        Case "HKEY_LOCAL_MACHINE":      Set GetRootKey = Me.LocalMachine
-        Case "HKEY_PERFORMANCE_DATA":   Set GetRootKey = Me.PerformanceData
-        Case "HKEY_USERS":              Set GetRootKey = Me.Users
+        Case "HKEY_CLASSES_ROOT"
+            Set GetRootKey = Me.ClassesRoot
+        Case "HKEY_CURRENT_CONFIG"
+            Set GetRootKey = Me.CurrentConfig
+        Case "HKEY_CURRENT_USER"
+            Set GetRootKey = Me.CurrentUser
+        Case "HKEY_LOCAL_MACHINE"
+            Set GetRootKey = Me.LocalMachine
+        Case "HKEY_PERFORMANCE_DATA"
+            Set GetRootKey = Me.PerformanceData
+        Case "HKEY_USERS"
+            Set GetRootKey = Me.Users
     End Select
 End Function
 
@@ -204,27 +196,41 @@ End Function
 ' @return A RegistryKey to the full path of the key name, or Nothing if the path does not exist.
 ' @remarks If AutoCreate is true, then Writable is ignored.
 '
-Public Function GetSubKey(ByVal KeyName As String, Optional ByVal AutoCreate As Boolean = False, Optional ByVal Writable As Boolean = False) As RegistryKey
-    If Len(KeyName) = 0 Then Exit Function
+Public Function GetSubKey(ByRef KeyName As String, Optional ByVal AutoCreate As Boolean = False, Optional ByVal Writable As Boolean = False) As RegistryKey
+    If Len(KeyName) = 0 Then
+        Exit Function
+    End If
     
-    Dim Ret As RegistryKey
-    Set Ret = GetRootKey(KeyName)
-    If Ret Is Nothing Then Exit Function
+    Dim Root As RegistryKey
+    Set Root = GetRootKey(KeyName)
+    If Root Is Nothing Then
+        Exit Function
+    End If
     
-    Dim i As Long
-    i = InStr(KeyName, "\")
-    If i = 0 Then Exit Function
+    Dim Index As Long
+    Index = InStr(KeyName, "\")
+    If Index = 0 Then
+        Exit Function
+    End If
         
     If AutoCreate Then
-        Set GetSubKey = Ret.CreateSubKey(Mid$(KeyName, i))
+        Set GetSubKey = Root.CreateSubKey(Mid$(KeyName, Index))
     Else
-        Set GetSubKey = Ret.OpenSubKey(Mid$(KeyName, i), Writable)
+        Set GetSubKey = Root.OpenSubKey(Mid$(KeyName, Index), Writable)
     End If
 End Function
 
+Friend Property Get MaxValueNameLength() As Long
+    MaxValueNameLength = mMaxValueNameLength
+End Property
+
+Friend Property Get MaxValueLength() As Long
+    MaxValueLength = mMaxValueLength
+End Property
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     If Environment.IsNT Then
@@ -238,7 +244,6 @@ Private Sub Class_Initialize()
     Set mClassesRoot = Cor.NewRegistryKey(HKEY_CLASSES_ROOT, "HKEY_CLASSES_ROOT", True)
     Set mCurrentConfig = Cor.NewRegistryKey(HKEY_CURRENT_CONFIG, "HKEY_CURRENT_CONFIG", True)
     Set mCurrentUser = Cor.NewRegistryKey(HKEY_CURRENT_USER, "HKEY_CURRENT_USER", True)
-    Set mDynData = Cor.NewRegistryKey(HKEY_DYN_DATA, "HKEY_DYN_DATA", True)
     Set mLocalMachine = Cor.NewRegistryKey(HKEY_LOCAL_MACHINE, "HKEY_LOCAL_MACHINE", True)
     Set mPerformanceData = Cor.NewRegistryKey(HKEY_PERFORMANCE_DATA, "HKEY_PERFORMANCE_DATA", True)
     Set mUsers = Cor.NewRegistryKey(HKEY_USERS, "HKEY_USERS", True)
