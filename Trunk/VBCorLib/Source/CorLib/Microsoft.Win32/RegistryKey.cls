@@ -129,7 +129,7 @@ Private mWritable   As Boolean
 ' @return The name of the key.
 '
 Public Property Get Name() As String
-    VerifyHandle
+    VerifyOpen
     Name = mName
 End Property
 
@@ -144,7 +144,7 @@ End Property
 ' <p>If the requested SubKey was not found, then <b>Nothing</b> is returned. No error is thrown.</p>
 '
 Public Function OpenSubKey(ByRef Name As String, Optional ByVal Writable As Boolean = False) As RegistryKey
-    VerifyHandle
+    VerifyOpen
     
     Dim TrimmedName As String
     TrimmedName = CorString.Trim(Name, "\")
@@ -179,7 +179,7 @@ End Sub
 ' to the Registry. Excessive calls to this function can impact system performance.</p>
 '
 Public Sub Flush()
-    VerifyHandle
+    VerifyOpen
     ThrowOnFailure RegFlushKey(mHKey)
 End Sub
 
@@ -191,7 +191,7 @@ End Sub
 ' @remarks If the Registry node already exists, then it is returned.
 '
 Public Function CreateSubKey(ByRef SubKey As String) As RegistryKey
-    VerifyHandle
+    VerifyOpen
     VerifyWritable
     
     Dim TrimmedKey As String
@@ -204,11 +204,6 @@ Public Function CreateSubKey(ByRef SubKey As String) As RegistryKey
     Set CreateSubKey = Cor.NewRegistryKey(NewKey, Path.Combine(mName, TrimmedKey), True)
 End Function
 
-Private Sub ThrowOnFailure(ByVal Result As Long)
-    If Result <> ERROR_SUCCESS Then
-        Error.Win32Error Result
-    End If
-End Sub
 
 ''
 ' Deletes a node from the Windows Registry.
@@ -220,7 +215,7 @@ End Sub
 ' and values.
 '
 Public Sub DeleteSubKey(ByRef SubKey As String, Optional ByVal ThrowOnMissingSubKey As Boolean = True)
-    VerifyHandle
+    VerifyOpen
     VerifyWritable
     
     Dim rk As RegistryKey
@@ -245,7 +240,7 @@ End Sub
 ' @remarks All subkeys and values are deleted recursively. Caution should be used.
 '
 Public Sub DeleteSubKeyTree(ByRef SubKey As String)
-    VerifyHandle
+    VerifyOpen
     VerifyWritable
     
     Dim TrimmedKey As String
@@ -276,7 +271,7 @@ End Sub
 ' <p>If no SubKeys exist then a zero-length array is returned.</p>
 '
 Public Function GetSubKeyNames() As String()
-    VerifyHandle
+    VerifyOpen
     
     Dim Buf         As String
     Dim Count       As Long
@@ -311,7 +306,7 @@ End Function
 ' the default name ("") in the returned list.</p>
 '
 Public Function GetValueNames() As String()
-    VerifyHandle
+    VerifyOpen
     
     Dim Buf     As String
     Dim Count   As Long
@@ -360,7 +355,7 @@ End Function
 '
 Public Sub SetValue(ByRef Name As String, ByRef Value As Variant, Optional ByVal ValueKind As RegistryValueKind = UnknownKind)
     VerifyWritable
-    VerifyHandle
+    VerifyOpen
     
     If Len(Name) > Registry.MaxValueNameLength Then _
         Throw Cor.NewArgumentException("Registry Value name must not exceed " & Registry.MaxValueNameLength & " characters.", "Name")
@@ -409,7 +404,7 @@ End Sub
 ' by 10000. The result may be an overflow.
 '
 Public Function GetValue(ByRef Name As String, Optional ByRef Default As Variant, Optional ByVal Options As RegistryValueOptions) As Variant
-    VerifyHandle
+    VerifyOpen
 
     If Len(Name) > Registry.MaxValueNameLength Then _
         Throw Cor.NewArgumentException("Registry Value name must not exceed " & Registry.MaxValueNameLength & " characters.", "Name")
@@ -492,7 +487,7 @@ End Function
 '
 Public Sub DeleteValue(ByRef Name As String, Optional ByVal ThrowOnMissingValue As Boolean = True)
     VerifyWritable
-    VerifyHandle
+    VerifyOpen
     
     If (RegDeleteValue(mHKey, Name) = ERROR_FILE_NOT_FOUND) And ThrowOnMissingValue Then _
         Throw Cor.NewArgumentException("Value was not found.", "Name")
@@ -504,7 +499,7 @@ End Sub
 ' @return The number of SubKeys.
 '
 Public Property Get SubKeyCount() As Long
-    VerifyHandle
+    VerifyOpen
     ThrowOnFailure RegQueryInfoKey(mHKey, vbNullString, ByVal 0, 0, SubKeyCount, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0)
 End Property
 
@@ -514,7 +509,7 @@ End Property
 ' @remarks The number of values.
 '
 Public Property Get ValueCount() As Long
-    VerifyHandle
+    VerifyOpen
     ThrowOnFailure RegQueryInfoKey(mHKey, vbNullString, ByVal 0, 0, ByVal 0, ByVal 0, ByVal 0, ValueCount, ByVal 0, ByVal 0, ByVal 0, ByVal 0)
 End Property
 
@@ -525,7 +520,7 @@ End Property
 ' @return The type of value in the registry.
 '
 Public Function GetValueKind(ByRef Name As String) As RegistryValueKind
-    VerifyHandle
+    VerifyOpen
     ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, GetValueKind, ByVal 0, 0)
 End Function
 
@@ -536,7 +531,7 @@ End Function
 ' @remarks This method returns CorDateTime.MinValue on Windows 95,98 and ME.
 '
 Public Function GetLastWriteTime() As CorDateTime
-    VerifyHandle
+    VerifyOpen
     
     If Environment.IsNT Then
         Dim Time As Currency
@@ -591,6 +586,12 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub ThrowOnFailure(ByVal Result As Long)
+    If Result <> ERROR_SUCCESS Then
+        Error.Win32Error Result
+    End If
+End Sub
+
 Private Sub VerifyKey(ByRef Path As String)
     Dim Keys() As String
     Keys = Split(Path, "\")
@@ -604,17 +605,12 @@ Private Sub VerifyKey(ByRef Path As String)
 End Sub
 
 Private Function IsSystemKey() As Boolean
-    If mHKey < &H80000006 Then Exit Function
-    If mHKey > &H80000000 Then Exit Function
-    IsSystemKey = True
+    IsSystemKey = (mHKey >= &H80000005 And mHKey <= &H80000000)
 End Function
 
-Private Sub VerifyHandle()
-    If mHKey = vbNullPtr Then _
+Private Sub VerifyOpen()
+    If mHKey = vbNullPtr Then
         Throw Cor.NewObjectDisposedException("RegistryKey", "The Registry Key is closed.")
-    
-    If mHKey = HKEY_DYN_DATA Then
-        If Environment.IsNT Then Error.Win32Error ERROR_INVALID_HANDLE
     End If
 End Sub
 

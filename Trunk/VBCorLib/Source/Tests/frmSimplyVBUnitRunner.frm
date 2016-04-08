@@ -305,6 +305,7 @@ Private Sub AddMicrosoftWin32()
     With Sim.NewTestSuite("Microsoft.Win32")
         .Add New SafeHandleTests
         .Add New RegistryKeyTests
+        .Add New RegistryTests
         
         AddTest .This
     End With

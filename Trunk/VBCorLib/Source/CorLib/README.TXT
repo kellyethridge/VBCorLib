@@ -63,6 +63,7 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed SecurityElement constructor. Was not validating tag or text.
 	* Fixed RijndaelManaged encrypting. TransformFinalBlock when using PaddingMode.None and partial block length of data would still return full block length.
 	* Fixed RijndaelManaged encrypting. TransformFinalBlock when using PaddingMode.Zero and full block length of data would return additional block.
+	* Removed RegistryKey support for HKEY_DYN_DATA.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
