@@ -95,7 +95,8 @@ Public Function CreateDirectory(ByRef Path As String) As DirectoryInfo
         i = i + 1
         Dim NewDirectory As String
         NewDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
-        If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then
+'        If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then
+        If CreateDirectoryW(NewDirectory, ByVal 0&) = BOOL_FALSE Then
             IOError.WinIOError Err.LastDllError
         End If
     Loop
@@ -137,7 +138,7 @@ Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = Fa
     NormalizedPath = CorString.TrimEnd(Statics.Path.GetFullPath(Path), "/\")
     
     If Recursive Then
-        Dim Data As WIN32_FIND_DATA
+        Dim Data As WIN32_FIND_DATAW
         
         With SafeFindFirstFile(NormalizedPath & "\*", Data)
             If Not .IsInvalid Then
@@ -154,10 +155,12 @@ Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = Fa
                         If CBool(Data.dwFileAttributes And FileAttributes.DirectoryAttr) Then
                             Delete FullPath, True
                         Else
-                            If Api.DeleteFile(FullPath) = BOOL_FALSE Then IOError.WinIOError Err.LastDllError, FullPath
+                            If DeleteFileW(FullPath) = BOOL_FALSE Then
+                                IOError.WinIOError Err.LastDllError, FullPath
+                            End If
                         End If
                     End If
-                Loop While Api.FindNextFile(.DangerousGetHandle, Data) = BOOL_TRUE
+                Loop While FindNextFileW(.DangerousGetHandle, Data) = BOOL_TRUE
                 
                 Dim Result As Long
                 Result = Err.LastDllError
@@ -516,10 +519,10 @@ Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    Dim Root As String
-    Root = Statics.Path.GetPathRoot(FullPath)
+    Dim root As String
+    root = Statics.Path.GetPathRoot(FullPath)
     
-    If (FullPath = Root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
+    If (FullPath = root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
         Error.Argument Arg_PathIsAVolume
     
     Dim Handle As SafeFileHandle
@@ -558,7 +561,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
     
     VerifySearchPattern SearchPattern
     
-    Dim Entry       As WIN32_FIND_DATA
+    Dim Entry       As WIN32_FIND_DATAW
     Dim Entries     As New ArrayList
     Dim SubFolders  As New ArrayList
     Dim FileHandle  As Long
@@ -587,7 +590,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
                         End If
                     End If
                 End If
-            Loop While Api.FindNextFile(.DangerousGetHandle, Entry) <> BOOL_FALSE
+            Loop While FindNextFileW(.DangerousGetHandle, Entry) <> BOOL_FALSE
         End If
         
         Dim Error As Long
@@ -604,7 +607,7 @@ Private Function InternalGetFileSystemEntries(ByRef InitialPath As String, ByRef
     InternalGetFileSystemEntries = Entries.ToArray(vbString)
 End Function
 
-Private Function EntryIsDirectory(ByRef Entry As WIN32_FIND_DATA) As Boolean
+Private Function EntryIsDirectory(ByRef Entry As WIN32_FIND_DATAW) As Boolean
     EntryIsDirectory = CBool(Entry.dwFileAttributes And FileAttributes.DirectoryAttr)
 End Function
 
@@ -624,17 +627,23 @@ Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long,
     End With
 End Sub
 
-Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATA) As String
+Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATAW) As String
     Dim Result As String
-    Result = Data.cFileName
+    Result = SysAllocString(VarPtr(Data.cFileName(0)))
     If Len(Result) = 0 Then
-        Result = Data.cAlternateFileName
+        Result = SysAllocString(VarPtr(Data.cAlternateFileName(0)))
     End If
     
     If (Data.dwFileAttributes And FileAttributes.DirectoryAttr) = FileAttributes.DirectoryAttr Then
         Select Case Len(Result)
-            Case 1: If Asc(Result) = corPeriodChar Then Exit Function
-            Case 2: If AsLong(ByVal StrPtr(Result)) = DOUBLE_PERIOD Then Exit Function
+            Case 1
+                If Asc(Result) = corPeriodChar Then
+                    Exit Function
+                End If
+            Case 2
+                If AsLong(ByVal StrPtr(Result)) = DOUBLE_PERIOD Then
+                    Exit Function
+                End If
         End Select
     End If
     

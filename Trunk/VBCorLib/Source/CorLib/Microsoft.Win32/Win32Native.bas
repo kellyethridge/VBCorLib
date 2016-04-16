@@ -119,12 +119,11 @@ Public Function SafeCreateFile(FileName As String, ByVal DesiredAccess As FileAc
     Set SafeCreateFile = SafeHandle
 End Function
 
-Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData As WIN32_FIND_DATA) As SafeFindHandle
-    Dim WideData    As WIN32_FIND_DATAW
+Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData As WIN32_FIND_DATAW) As SafeFindHandle
     Dim FileHandle  As Long
     
-    FileHandle = FindFirstFileW(FileName, WideData)
-    FindDataWToFindData WideData, FindFileData
+    FileHandle = FindFirstFileW(FileName, FindFileData)
+'    FindDataWToFindData WideData, FindFileData
     Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
 End Function
 

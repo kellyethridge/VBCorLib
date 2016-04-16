@@ -230,7 +230,7 @@ Friend Sub Init(ByVal FileName As String, ByVal Access As FileAccess, ByVal Shar
     mFileName = FileName
     mFileLength = FileLen(mFileName)
 
-    mFileHandle = Api.CreateFile(FileName, Access, Share, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
+    mFileHandle = CreateFileW(FileName, Access, Share, ByVal 0&, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
     If mFileHandle = INVALID_HANDLE Then IOError.WinIOError Err.LastDllError, FileName
     
     mMapHandle = Api.CreateFileMapping(mFileHandle, 0, PageAccess, 0, 0, vbNullString)
@@ -260,8 +260,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

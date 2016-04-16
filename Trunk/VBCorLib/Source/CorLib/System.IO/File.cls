@@ -579,7 +579,7 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA) As Long
-    Dim FileData    As WIN32_FIND_DATA
+    Dim FileData    As WIN32_FIND_DATAW
     Dim TrimmedPath As String
     
     TrimmedPath = CorString.TrimEnd(Path, mDirectorySeparators)

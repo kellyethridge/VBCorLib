@@ -73,40 +73,12 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IWin32API Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IWin32API_CopyFile(ExistingFileName As String, NewFileName As String, ByVal FailIfExists As Boolean) As Long
-    IWin32API_CopyFile = CopyFileW(MakeWide(ExistingFileName), MakeWide(NewFileName), FailIfExists)
-End Function
-
-Private Function IWin32API_CreateDirectory(PathName As String, Optional ByVal lpSecurityAttributes As Long = 0&) As Long
-    IWin32API_CreateDirectory = CreateDirectoryW(MakeWide(PathName), ByVal lpSecurityAttributes)
-End Function
-
-Private Function IWin32API_CreateFile(FileName As String, ByVal DesiredAccess As Long, ByVal ShareMode As Long, ByVal lpSecurityAttributes As Long, ByVal CreationDisposition As Long, ByVal FlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long
-    IWin32API_CreateFile = CreateFileW(MakeWide(FileName), DesiredAccess, ShareMode, ByVal lpSecurityAttributes, CreationDisposition, FlagsAndAttributes, hTemplateFile)
-End Function
-
 Private Function IWin32API_CreateFileMapping(ByVal hFile As Long, ByVal lpSecurityAttributes As Long, ByVal flProtect As Long, ByVal MaximumSizeHigh As Long, ByVal MaximumSizeLow As Long, Name As String) As Long
     IWin32API_CreateFileMapping = CreateFileMappingW(hFile, ByVal lpSecurityAttributes, flProtect, MaximumSizeHigh, MaximumSizeLow, Name)
 End Function
 
-Private Function IWin32API_DeleteFile(FileName As String) As Long
-    IWin32API_DeleteFile = DeleteFileW(MakeWide(FileName))
-End Function
-
 Private Function IWin32API_ExpandEnvironmentStrings(lpSrc As String, lpDst As String, ByVal nSize As Long) As Long
     IWin32API_ExpandEnvironmentStrings = ExpandEnvironmentStringsW(lpSrc, lpDst, nSize)
-End Function
-
-Private Function IWin32API_FindFirstFile(FileName As String, FindFileData As CorType.WIN32_FIND_DATA) As Long
-    Dim Data As WIN32_FIND_DATAW
-    IWin32API_FindFirstFile = FindFirstFileW(MakeWide(FileName), Data)
-    FindDataWToFindData Data, FindFileData
-End Function
-
-Private Function IWin32API_FindNextFile(ByVal Handle As Long, FindFileData As CorType.WIN32_FIND_DATA) As Long
-    Dim Data As WIN32_FIND_DATAW
-    IWin32API_FindNextFile = FindNextFileW(Handle, Data)
-    FindDataWToFindData Data, FindFileData
 End Function
 
 Private Function IWin32API_GetComputerName(Buffer As String, Size As Long) As Long

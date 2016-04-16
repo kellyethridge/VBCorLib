@@ -74,6 +74,8 @@ Public Enum ResourceStringKey
     Arg_VersionString = 236
     Arg_MustBeGuid = 237
     Arg_GuidArrayCtor = 238
+    Arg_RegSubKeyAbsent = 239
+    Arg_RegValStrLenBug = 240
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
@@ -211,6 +213,7 @@ Public Enum ResourceStringKey
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
     InvalidCast_FromTo = 1400
+    
     InvalidOperation_EmptyStack = 1100
     InvalidOperation_EnumNotStarted = 1101
     InvalidOperation_EnumFinished = 1102
@@ -221,6 +224,7 @@ Public Enum ResourceStringKey
     InvalidOperation_Timeouts = 1107
     InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
     InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple = 1109
+    InvalidOperation_RegRemoveSubKey = 1110
     
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001

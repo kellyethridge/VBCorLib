@@ -834,16 +834,12 @@ library CorType {
     [dllname("kernel32.dll"), helpstring("Access to API functions within the Kernel32.dll system file.")]
     module Kernel32 {
         [entry("CloseHandle"), usesgetlasterror] long CloseHandle([in] long hObject);
-        [entry("CopyFileA"), usesgetlasterror] long CopyFileA([in] LPSTR Source, [in] LPSTR Destination, [in] BOOL FailIfExists);
         [entry("CopyFileW"), usesgetlasterror] long CopyFileW([in] LPWSTR Source, [in] LPWSTR Destination, [in] BOOL FailIfExists);
         [entry("RtlMoveMemory")] void CopyMemory([in] void * Destination,[in] void * Source, [in] long Length);
-        [entry("CreateDirectoryA"), usesgetlasterror] long CreateDirectoryA([in] LPSTR PathName, [in] void * SecurityAttributes);
         [entry("CreateDirectoryW"), usesgetlasterror] long CreateDirectoryW([in] LPWSTR PathName, [in] void * SecurityAttributes);
-        [entry("CreateFileA"), usesgetlasterror] long CreateFileA([in] LPSTR FileName, [in] long DesiredAccess, [in] long ShareMode, [in] void * SecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile);
         [entry("CreateFileW"), usesgetlasterror] long CreateFileW([in] LPWSTR FileName, [in] long DesiredAccess, [in] long ShareMode, [in] void * SecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile);
         [entry("CreateFileMappingA"), usesgetlasterror] long CreateFileMappingA([in] long hFile, [in] void * SecurityAttributes, [in] long Protect, [in] long MaximumSizeHigh, [in] long MaximumSizeLow, [in] LPSTR Name);
         [entry("CreateFileMappingW"), usesgetlasterror] long CreateFileMappingW([in] long hFile, [in] void * SecurityAttributes, [in] long Protect, [in] long MaximumSizeHigh, [in] long MaximumSizeLow, [in] LPWSTR Name);
-        [entry("DeleteFileA"), usesgetlasterror] long DeleteFileA([in] LPSTR FileName);
         [entry("DeleteFileW"), usesgetlasterror] long DeleteFileW([in] LPWSTR FileName);
         [entry("EnumResourceLanguagesW"), usesgetlasterror] long EnumResourceLanguages([in] long hModule, [in] long lpType, [in] long lpName, [in] long lpEnumFunc, [in] long lParam);
         [entry("EnumResourceNamesW"), usesgetlasterror] long EnumResourceNames([in] long hModule, [in] long lpType, [in] long lpEnumFunc, [in] long lParam);
@@ -851,9 +847,7 @@ library CorType {
         [entry("ExpandEnvironmentStringsA"), usesgetlasterror] long ExpandEnvironmentStringsA([in] LPSTR lpSrc, [in] LPSTR lpDst, [in] long nSize);
         [entry("ExpandEnvironmentStringsW"), usesgetlasterror] long ExpandEnvironmentStringsW([in] LPWSTR lpSrc, [in] LPWSTR lpDst, [in] long nSize);
         [entry("FindClose"), usesgetlasterror] long FindClose([in] long hFile);
-        [entry("FindFirstFileA"), usesgetlasterror] long FindFirstFileA([in] LPSTR FileName, [in] WIN32_FIND_DATAA * FindFileData);
         [entry("FindFirstFileW"), usesgetlasterror] long FindFirstFileW([in] LPWSTR FileName, [in] WIN32_FIND_DATAW * FindFileData);
-        [entry("FindNextFileA"), usesgetlasterror] long FindNextFileA([in] long hFindFile, [in] WIN32_FIND_DATAA * FindFileData);
         [entry("FindNextFileW"), usesgetlasterror] long FindNextFileW([in] long hFindFile, [in] WIN32_FIND_DATAW * FindFileData);
         [entry("FindResourceExW"), usesgetlasterror] long FindResourceEx([in] long hModule, [in] long lpType, [in] long lpName, [in] short wLanguage);
         [entry("FormatMessageA"), usesgetlasterror] long FormatMessageA([in] long dwFlags, [in] void * lpSource, [in] long dwMessageId, [in] long dwLanguageId,[in] LPSTR lpBuffer, [in] long nSize, [in] long Arguments);
