@@ -218,18 +218,16 @@ Public Sub DeleteSubKey(ByRef SubKey As String, Optional ByVal ThrowOnMissingSub
     VerifyOpen
     VerifyWritable
     
-    Dim rk As RegistryKey
-    Set rk = OpenSubKey(SubKey)
-    
-    If rk Is Nothing Then
-        If ThrowOnMissingSubKey Then _
-            Throw Cor.NewArgumentException("The specified SubKey was not found.", "SubKey")
-    Else
-        If rk.SubKeyCount > 0 Then _
-            Throw Cor.NewInvalidOperationException("Cannot delete. SubKey contains keys.")
+    Dim Key As RegistryKey
+    Set Key = OpenSubKey(SubKey)
+    If Not Key Is Nothing Then
+        If Key.SubKeyCount > 0 Then _
+            Error.InvalidOperation InvalidOperation_RegRemoveSubKey
         
+        Key.CloseKey
         ThrowOnFailure RegDeleteKey(mHKey, SubKey)
-        rk.CloseKey
+    ElseIf ThrowOnMissingSubKey Then
+        Error.Argument Arg_RegSubKeyAbsent
     End If
 End Sub
 
@@ -273,24 +271,24 @@ End Sub
 Public Function GetSubKeyNames() As String()
     VerifyOpen
     
-    Dim Buf         As String
-    Dim Count       As Long
-    Dim Ret()       As String
+    Dim Name    As String
+    Dim Count   As Long
+    Dim Names() As String
     
-    Buf = String$(MAX_KEY_LENGTH + 1, 0)
+    Name = String$(MAX_KEY_LENGTH + 1, 0)
     Count = SubKeyCount
-    Ret = CorArray.CreateInstance(vbString, Count)
+    Names = CorArray.CreateInstance(vbString, Count)
     
     Do While Count > 0
-        Dim BufferSize As Long
+        Dim NameLength As Long
         
         Count = Count - 1
-        BufferSize = MAX_KEY_LENGTH + 1
-        ThrowOnFailure RegEnumKeyEx(mHKey, Count, Buf, BufferSize, 0, vbNullString, 0, 0@)
-        Ret(Count) = Left$(Buf, BufferSize)
+        NameLength = MAX_KEY_LENGTH + 1
+        ThrowOnFailure RegEnumKeyEx(mHKey, Count, Name, NameLength, 0, vbNullString, 0, 0@)
+        Names(Count) = Left$(Name, NameLength)
     Loop
 
-    GetSubKeyNames = Ret
+    GetSubKeyNames = Names
 End Function
 
 ''
@@ -308,24 +306,24 @@ End Function
 Public Function GetValueNames() As String()
     VerifyOpen
     
-    Dim Buf     As String
+    Dim Name    As String
     Dim Count   As Long
-    Dim Ret()   As String
+    Dim Names() As String
     
-    Buf = String$(Registry.MaxValueNameLength, 0)
+    Name = String$(Registry.MaxValueNameLength, 0)
     Count = ValueCount
-    Ret = CorArray.CreateInstance(vbString, ValueCount)
+    Names = CorArray.CreateInstance(vbString, ValueCount)
     
     Do While Count > 0
-        Dim BufferSize As Long
+        Dim NameLength As Long
         
         Count = Count - 1
-        BufferSize = Len(Buf)
-        ThrowOnFailure RegEnumValue(mHKey, Count, Buf, BufferSize, 0, 0, 0, 0)
-        Ret(Count) = Left$(Buf, BufferSize)
+        NameLength = Len(Name)
+        ThrowOnFailure RegEnumValue(mHKey, Count, Name, NameLength, 0, 0, 0, 0)
+        Names(Count) = Left$(Name, NameLength)
     Loop
     
-    GetValueNames = Ret
+    GetValueNames = Names
 End Function
 
 ''
@@ -358,7 +356,7 @@ Public Sub SetValue(ByRef Name As String, ByRef Value As Variant, Optional ByVal
     VerifyOpen
     
     If Len(Name) > Registry.MaxValueNameLength Then _
-        Throw Cor.NewArgumentException("Registry Value name must not exceed " & Registry.MaxValueNameLength & " characters.", "Name")
+        Error.Argument Arg_RegValStrLenBug
 
     ClearException
     On Error GoTo Catch

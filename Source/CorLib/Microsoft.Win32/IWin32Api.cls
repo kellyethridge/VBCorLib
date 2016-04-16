@@ -13,21 +13,9 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Function CopyFile(ExistingFileName As String, NewFileName As String, ByVal FailIfExists As Boolean) As Long: End Function
-
-Public Function CreateDirectory(PathName As String, Optional ByVal lpSecurityAttributes As Long = 0&) As Long: End Function
-
-Public Function CreateFile(FileName As String, ByVal DesiredAccess As Long, ByVal ShareMode As Long, ByVal lpSecurityAttributes As Long, ByVal CreationDisposition As Long, ByVal FlagsAndAttributes As Long, ByVal hTemplateFile As Long) As Long: End Function
-
 Public Function CreateFileMapping(ByVal hFile As Long, ByVal lpSecurityAttributes As Long, ByVal flProtect As Long, ByVal MaximumSizeHigh As Long, ByVal MaximumSizeLow As Long, Name As String) As Long: End Function
 
-Public Function DeleteFile(FileName As String) As Long: End Function
-
 Public Function ExpandEnvironmentStrings(lpSrc As String, lpDst As String, ByVal nSize As Long) As Long: End Function
-
-Public Function FindFirstFile(FileName As String, FindFileData As CorType.WIN32_FIND_DATA) As Long: End Function
-
-Public Function FindNextFile(ByVal Handle As Long, FindFileData As CorType.WIN32_FIND_DATA) As Long: End Function
 
 Public Function GetComputerName(Buffer As String, Size As Long) As Long: End Function
 
