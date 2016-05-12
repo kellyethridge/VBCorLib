@@ -56,8 +56,6 @@ Private mCurrentUser        As RegistryKey
 Private mLocalMachine       As RegistryKey
 Private mPerformanceData    As RegistryKey
 Private mUsers              As RegistryKey
-Private mMaxValueNameLength As Long
-Private mMaxValueLength     As Long
 
 
 
@@ -201,9 +199,9 @@ Public Function GetSubKey(ByRef KeyName As String, Optional ByVal AutoCreate As 
         Exit Function
     End If
     
-    Dim Root As RegistryKey
-    Set Root = GetRootKey(KeyName)
-    If Root Is Nothing Then
+    Dim root As RegistryKey
+    Set root = GetRootKey(KeyName)
+    If root Is Nothing Then
         Exit Function
     End If
     
@@ -214,33 +212,17 @@ Public Function GetSubKey(ByRef KeyName As String, Optional ByVal AutoCreate As 
     End If
         
     If AutoCreate Then
-        Set GetSubKey = Root.CreateSubKey(Mid$(KeyName, Index))
+        Set GetSubKey = root.CreateSubKey(Mid$(KeyName, Index))
     Else
-        Set GetSubKey = Root.OpenSubKey(Mid$(KeyName, Index), Writable)
+        Set GetSubKey = root.OpenSubKey(Mid$(KeyName, Index), Writable)
     End If
 End Function
-
-Friend Property Get MaxValueNameLength() As Long
-    MaxValueNameLength = mMaxValueNameLength
-End Property
-
-Friend Property Get MaxValueLength() As Long
-    MaxValueLength = mMaxValueLength
-End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    If Environment.IsNT Then
-        mMaxValueNameLength = 16383
-        mMaxValueLength = -1
-    Else
-        mMaxValueNameLength = 255
-        mMaxValueLength = 16300
-    End If
-    
     Set mClassesRoot = Cor.NewRegistryKey(HKEY_CLASSES_ROOT, "HKEY_CLASSES_ROOT", True)
     Set mCurrentConfig = Cor.NewRegistryKey(HKEY_CURRENT_CONFIG, "HKEY_CURRENT_CONFIG", True)
     Set mCurrentUser = Cor.NewRegistryKey(HKEY_CURRENT_USER, "HKEY_CURRENT_USER", True)

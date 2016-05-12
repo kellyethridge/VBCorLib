@@ -85,9 +85,10 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const REG_OPTION_NON_VOLATILE       As Long = 0
-Private Const MAX_KEY_LENGTH                As Long = 255
-Private Const DEFAULT_VALUE_NAME            As String = ""
+Private Const REG_OPTION_NON_VOLATILE   As Long = 0
+Private Const DEFAULT_VALUE_NAME        As String = ""
+Private Const MaxKeyLength              As Long = 255
+Private Const MaxValueNameLength        As Long = 16383
 
 
 ''
@@ -116,11 +117,9 @@ Public Enum RegistryValueOptions
     DoNotExpandEnvironmentVariables = 1
 End Enum
 
-
 Private mHKey       As Long
 Private mName       As String
 Private mWritable   As Boolean
-
 
 
 ''
@@ -129,7 +128,7 @@ Private mWritable   As Boolean
 ' @return The name of the key.
 '
 Public Property Get Name() As String
-    VerifyOpen
+    EnsureNotDisposed
     Name = mName
 End Property
 
@@ -144,11 +143,11 @@ End Property
 ' <p>If the requested SubKey was not found, then <b>Nothing</b> is returned. No error is thrown.</p>
 '
 Public Function OpenSubKey(ByRef Name As String, Optional ByVal Writable As Boolean = False) As RegistryKey
-    VerifyOpen
+    EnsureNotDisposed
     
     Dim TrimmedName As String
     TrimmedName = CorString.Trim(Name, "\")
-    VerifyKey TrimmedName
+    ValidateKey TrimmedName
     
     Dim NewKey As Long
     If RegOpenKeyEx(mHKey, TrimmedName, 0, IIfLong(mWritable, KEY_ALL_ACCESS, KEY_READ), NewKey) = ERROR_SUCCESS Then
@@ -179,7 +178,7 @@ End Sub
 ' to the Registry. Excessive calls to this function can impact system performance.</p>
 '
 Public Sub Flush()
-    VerifyOpen
+    EnsureNotDisposed
     ThrowOnFailure RegFlushKey(mHKey)
 End Sub
 
@@ -191,12 +190,12 @@ End Sub
 ' @remarks If the Registry node already exists, then it is returned.
 '
 Public Function CreateSubKey(ByRef SubKey As String) As RegistryKey
-    VerifyOpen
+    EnsureNotDisposed
     VerifyWritable
     
     Dim TrimmedKey As String
     TrimmedKey = CorString.Trim(SubKey, "\")
-    VerifyKey TrimmedKey
+    ValidateKey TrimmedKey
     
     Dim NewKey As Long
     ThrowOnFailure RegCreateKeyEx(mHKey, TrimmedKey, 0, vbNullString, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, 0, NewKey, 0)
@@ -215,7 +214,7 @@ End Function
 ' and values.
 '
 Public Sub DeleteSubKey(ByRef SubKey As String, Optional ByVal ThrowOnMissingSubKey As Boolean = True)
-    VerifyOpen
+    EnsureNotDisposed
     VerifyWritable
     
     Dim Key As RegistryKey
@@ -238,25 +237,25 @@ End Sub
 ' @remarks All subkeys and values are deleted recursively. Caution should be used.
 '
 Public Sub DeleteSubKeyTree(ByRef SubKey As String)
-    VerifyOpen
+    EnsureNotDisposed
     VerifyWritable
     
     Dim TrimmedKey As String
     TrimmedKey = CorString.Trim(SubKey, "\")
-    VerifyKey TrimmedKey
+    ValidateKey TrimmedKey
     
-    Dim rk As RegistryKey
-    Set rk = OpenSubKey(TrimmedKey, True)
+    Dim Key As RegistryKey
+    Set Key = OpenSubKey(TrimmedKey, True)
     
     Dim SubKeys() As String
-    SubKeys = rk.GetSubKeyNames
+    SubKeys = Key.GetSubKeyNames
     If CorArray.Length(SubKeys) > 0 Then
         Dim i As Long
         For i = 0 To UBound(SubKeys)
-            rk.DeleteSubKeyTree SubKeys(i)
+            Key.DeleteSubKeyTree SubKeys(i)
         Next i
     End If
-    rk.CloseKey
+    Key.CloseKey
     
     ThrowOnFailure RegDeleteKey(mHKey, TrimmedKey)
 End Sub
@@ -269,13 +268,13 @@ End Sub
 ' <p>If no SubKeys exist then a zero-length array is returned.</p>
 '
 Public Function GetSubKeyNames() As String()
-    VerifyOpen
+    EnsureNotDisposed
     
     Dim Name    As String
     Dim Count   As Long
     Dim Names() As String
     
-    Name = String$(MAX_KEY_LENGTH + 1, 0)
+    Name = String$(MaxKeyLength + 1, 0)
     Count = SubKeyCount
     Names = CorArray.CreateInstance(vbString, Count)
     
@@ -283,7 +282,7 @@ Public Function GetSubKeyNames() As String()
         Dim NameLength As Long
         
         Count = Count - 1
-        NameLength = MAX_KEY_LENGTH + 1
+        NameLength = MaxKeyLength + 1
         ThrowOnFailure RegEnumKeyEx(mHKey, Count, Name, NameLength, 0, vbNullString, 0, 0@)
         Names(Count) = Left$(Name, NameLength)
     Loop
@@ -304,13 +303,13 @@ End Function
 ' the default name ("") in the returned list.</p>
 '
 Public Function GetValueNames() As String()
-    VerifyOpen
+    EnsureNotDisposed
     
     Dim Name    As String
     Dim Count   As Long
     Dim Names() As String
     
-    Name = String$(Registry.MaxValueNameLength, 0)
+    Name = String$(MaxValueNameLength, 0)
     Count = ValueCount
     Names = CorArray.CreateInstance(vbString, ValueCount)
     
@@ -353,9 +352,9 @@ End Function
 '
 Public Sub SetValue(ByRef Name As String, ByRef Value As Variant, Optional ByVal ValueKind As RegistryValueKind = UnknownKind)
     VerifyWritable
-    VerifyOpen
+    EnsureNotDisposed
     
-    If Len(Name) > Registry.MaxValueNameLength Then _
+    If Len(Name) > MaxValueNameLength Then _
         Error.Argument Arg_RegValStrLenBug
 
     ClearException
@@ -402,10 +401,10 @@ End Sub
 ' by 10000. The result may be an overflow.
 '
 Public Function GetValue(ByRef Name As String, Optional ByRef Default As Variant, Optional ByVal Options As RegistryValueOptions) As Variant
-    VerifyOpen
+    EnsureNotDisposed
 
-    If Len(Name) > Registry.MaxValueNameLength Then _
-        Throw Cor.NewArgumentException("Registry Value name must not exceed " & Registry.MaxValueNameLength & " characters.", "Name")
+    If Len(Name) > MaxValueNameLength Then _
+        Error.Argument Arg_RegValStrLenBug
 
     Dim ValueType   As RegistryValueKind
     Dim ValueSize   As Long
@@ -473,7 +472,7 @@ Public Function GetValue(ByRef Name As String, Optional ByRef Default As Variant
             GetValue = c
             
         Case Else
-            Throw Cor.NewArgumentException("Unsupported Registry type.")
+            VariantCopyInd GetValue, Default
     End Select
 End Function
 
@@ -485,10 +484,11 @@ End Function
 '
 Public Sub DeleteValue(ByRef Name As String, Optional ByVal ThrowOnMissingValue As Boolean = True)
     VerifyWritable
-    VerifyOpen
+    EnsureNotDisposed
     
-    If (RegDeleteValue(mHKey, Name) = ERROR_FILE_NOT_FOUND) And ThrowOnMissingValue Then _
-        Throw Cor.NewArgumentException("Value was not found.", "Name")
+    If (RegDeleteValue(mHKey, Name) = ERROR_FILE_NOT_FOUND) And ThrowOnMissingValue Then
+        Error.Argument Arg_RegSubKeyValueAbsent
+    End If
 End Sub
 
 ''
@@ -497,7 +497,7 @@ End Sub
 ' @return The number of SubKeys.
 '
 Public Property Get SubKeyCount() As Long
-    VerifyOpen
+    EnsureNotDisposed
     ThrowOnFailure RegQueryInfoKey(mHKey, vbNullString, ByVal 0, 0, SubKeyCount, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0, ByVal 0)
 End Property
 
@@ -507,7 +507,7 @@ End Property
 ' @remarks The number of values.
 '
 Public Property Get ValueCount() As Long
-    VerifyOpen
+    EnsureNotDisposed
     ThrowOnFailure RegQueryInfoKey(mHKey, vbNullString, ByVal 0, 0, ByVal 0, ByVal 0, ByVal 0, ValueCount, ByVal 0, ByVal 0, ByVal 0, ByVal 0)
 End Property
 
@@ -518,7 +518,7 @@ End Property
 ' @return The type of value in the registry.
 '
 Public Function GetValueKind(ByRef Name As String) As RegistryValueKind
-    VerifyOpen
+    EnsureNotDisposed
     ThrowOnFailure RegQueryValueEx(mHKey, Name, 0, GetValueKind, ByVal 0, 0)
 End Function
 
@@ -529,7 +529,7 @@ End Function
 ' @remarks This method returns CorDateTime.MinValue on Windows 95,98 and ME.
 '
 Public Function GetLastWriteTime() As CorDateTime
-    VerifyOpen
+    EnsureNotDisposed
     
     If Environment.IsNT Then
         Dim Time As Currency
@@ -590,30 +590,39 @@ Private Sub ThrowOnFailure(ByVal Result As Long)
     End If
 End Sub
 
-Private Sub VerifyKey(ByRef Path As String)
-    Dim Keys() As String
-    Keys = Split(Path, "\")
+Private Sub ValidateKey(ByRef Name As String)
+    Dim NextSlash   As Long
+    Dim Current     As Long
     
-    Dim i As Long
-    For i = 0 To UBound(Keys)
-        If Len(Keys(i)) > MAX_KEY_LENGTH Then
-            Throw Cor.NewArgumentException("Key names cannot exceed 255 characters.")
+    NextSlash = InStr(Name, "\") - 1
+    Do While NextSlash > 0
+        If NextSlash - Current > MaxKeyLength Then
+            Error.Argument Arg_RegKeyStrLenBug
         End If
-    Next i
+        
+        Current = NextSlash + 1
+        NextSlash = InStr(Current + 1, Name, "\") - 1
+    Loop
+    
+    If Len(Name) - Current > MaxKeyLength Then
+        Error.Argument Arg_RegKeyStrLenBug
+    End If
 End Sub
 
 Private Function IsSystemKey() As Boolean
     IsSystemKey = (mHKey >= &H80000005 And mHKey <= &H80000000)
 End Function
 
-Private Sub VerifyOpen()
+Private Sub EnsureNotDisposed()
     If mHKey = vbNullPtr Then
-        Throw Cor.NewObjectDisposedException("RegistryKey", "The Registry Key is closed.")
+        Error.ObjectDisposed ObjectDisposed_RegKeyClosed
     End If
 End Sub
 
 Private Sub VerifyWritable()
-    If Not mWritable Then Throw Cor.NewUnauthorizedAccessException("The Registry Key is not writable.")
+    If Not mWritable Then
+        Error.UnauthorizedAccess UnauthorizedAccess_RegistryNoWrite
+    End If
 End Sub
 
 Private Function SetValueSZ(ByRef Name As String, ByRef Value As Variant) As Long

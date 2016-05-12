@@ -168,6 +168,16 @@ Public Sub OpenSubKey_WithNonExistingKey_ReturnsNothing()
     Assert.That Actual, Iz.Nothing
 End Sub
 
+Public Sub OpenSubKey_WithTooLongKey_ThrowsArgumentException()
+    Dim TooLongKey As String
+    TooLongKey = String$(256, "a")
+    
+    On Error Resume Next
+    Registry.CurrentUser.OpenSubKey RegistryKeysPath & "\" & String$(255, "b") & "\" & TooLongKey
+    
+    AssertArgumentException Err
+End Sub
+
 Public Sub DeleteSubKey_WhenCalled_RemovesSubKey()
     SaveSetting "VBCorLibTests", "Values", "Key1", "Value1"
     Dim Key As RegistryKey

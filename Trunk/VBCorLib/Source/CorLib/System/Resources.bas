@@ -30,10 +30,11 @@ Public Enum ResourceStringKey
     ArrayTypeMismatch_Compare = 104
     Rank_MultiDimNotSupported = 105
     Rank_MustMatch = 106
-    UnauthorizedAccess_IODenied_NoPathName = 107
-    UnauthorizedAccess_IODenied_Path = 108
     XMLSyntax_InvalidSyntax = 109
 
+    UnauthorizedAccess_RegistryNoWrite = 150
+    UnauthorizedAccess_IODenied_NoPathName = 151
+    UnauthorizedAccess_IODenied_Path = 152
     
     Arg_PathIllegal = 200
     Arg_PathIllegalUNC = 201
@@ -76,6 +77,8 @@ Public Enum ResourceStringKey
     Arg_GuidArrayCtor = 238
     Arg_RegSubKeyAbsent = 239
     Arg_RegValStrLenBug = 240
+    Arg_RegKeyStrLenBug = 241
+    Arg_RegSubKeyValueAbsent = 242
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
@@ -212,6 +215,7 @@ Public Enum ResourceStringKey
     
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
+    
     InvalidCast_FromTo = 1400
     
     InvalidOperation_EmptyStack = 1100
@@ -239,6 +243,7 @@ Public Enum ResourceStringKey
     ObjectDisposed_Generic = 1202
     ObjectDisposed_ReaderClosed = 1203
     ObjectDisposed_WriterClosed = 1204
+    ObjectDisposed_RegKeyClosed = 1205
     
     Overflow_TimeSpan = 1300
     

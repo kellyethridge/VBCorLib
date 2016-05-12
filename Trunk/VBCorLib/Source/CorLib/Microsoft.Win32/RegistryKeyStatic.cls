@@ -41,8 +41,8 @@ Attribute VB_Exposed = True
 ' @remarks This class cannot be directly instantiated. To access the
 ' methods, use the variable name directly.
 ' <pre>
-' Dim rk As RegistryKey
-' Set rk = RegistryKey.OpenRemoteBaseKey(LocalMachine, "RemoteName")
+' Dim Key As RegistryKey
+' Set Key = RegistryKey.OpenRemoteBaseKey(LocalMachine, "RemoteName")
 ' </pre>
 '
 ' @see Registry
@@ -57,7 +57,6 @@ Option Explicit
 ' @param ClassesRoot Specifies the HKEY_CLASSES_ROOT key.
 ' @param CurrentConfig Specifies the HKEY_CURRENT_CONFIG key.
 ' @param CurrentUser Specifies the HKEY_CURRENT_USER key.
-' @param DynData Specifies the HKEY_DYN_DATA key.
 ' @param LocalMachine Specifies the HKEY_LOCAL_MACHINE key.
 ' @param Users Specifies The HKEY_USERS key.
 ' @param PerformanceData Specifies the HKEY_PERFORMANCE_DATA key.
@@ -107,8 +106,6 @@ Private Function GetRootName(ByVal hKey As Long) As String
             GetRootName = "HKEY_CURRENT_CONFIG"
         Case HKEY_CURRENT_USER
             GetRootName = "HKEY_CURRENT_USER"
-        Case HKEY_DYN_DATA
-            GetRootName = "HKEY_DYN_DATA"
         Case HKEY_LOCAL_MACHINE
             GetRootName = "HKEY_LOCAL_MACHINE"
         Case HKEY_USERS
