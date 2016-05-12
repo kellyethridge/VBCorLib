@@ -86,3 +86,6 @@ Friend Sub Cryptographic(ByVal Key As ResourceStringKey)
     Throw Cor.NewCryptographicException(Environment.GetResourceString(Key))
 End Sub
 
+Friend Sub UnauthorizedAccess(ByVal Key As ResourceStringKey)
+    Throw Cor.NewUnauthorizedAccessException(Environment.GetResourceString(Key))
+End Sub
