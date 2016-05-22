@@ -127,10 +127,8 @@ End Property
 Public Function GetValue(ByRef KeyName As String, ByRef ValueName As String, Optional ByRef DefaultValue As Variant) As Variant
     Dim Key As RegistryKey
     
-    Set Key = GetSubKey(KeyName)
-    If Not Key Is Nothing Then
-        Helper.MoveVariant GetValue, Key.GetValue(ValueName, DefaultValue)
-    End If
+    Set Key = GetSubKey(KeyName, False)
+    Helper.MoveVariant GetValue, Key.GetValue(ValueName, DefaultValue)
 End Function
 
 ''
@@ -147,10 +145,7 @@ End Function
 Public Sub SetValue(ByRef KeyName As String, ByRef ValueName As String, ByRef Value As Variant)
     Dim Key As RegistryKey
     
-    Set Key = GetSubKey(KeyName, True, True)
-    If Key Is Nothing Then _
-        Throw Cor.NewArgumentException("Could not save to registry key", "KeyName")
-    
+    Set Key = GetSubKey(KeyName, True)
     Key.SetValue ValueName, Value
 End Sub
 
@@ -159,14 +154,7 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetRootKey(ByRef KeyName As String) As RegistryKey
-    If Len(KeyName) = 0 Then
-        Exit Function
-    End If
-    
-    Dim Keys() As String
-    Keys = Split(CorString.TrimEnd(KeyName, "\"), "\")
-    
-    Select Case UCase$(Keys(0))
+    Select Case UCase$(KeyName)
         Case "HKEY_CLASSES_ROOT"
             Set GetRootKey = Me.ClassesRoot
         Case "HKEY_CURRENT_CONFIG"
@@ -179,30 +167,27 @@ Private Function GetRootKey(ByRef KeyName As String) As RegistryKey
             Set GetRootKey = Me.PerformanceData
         Case "HKEY_USERS"
             Set GetRootKey = Me.Users
+        Case Else
+            Error.Argument Arg_RegInvalidKeyName
     End Select
 End Function
 
-Private Function GetSubKey(ByRef KeyName As String, Optional ByVal AutoCreate As Boolean = False, Optional ByVal Writable As Boolean = False) As RegistryKey
-    If Len(KeyName) = 0 Then
-        Exit Function
+Private Function GetSubKey(ByRef KeyName As String, ByVal Writable As Boolean) As RegistryKey
+    Dim BaseKeyName As String
+    Dim Index       As Long
+    
+    Index = InStr(KeyName, "\")
+    If Index > 0 Then
+        BaseKeyName = Left$(KeyName, Index - 1)
     End If
     
     Dim Root As RegistryKey
-    Set Root = GetRootKey(KeyName)
-    If Root Is Nothing Then
-        Exit Function
-    End If
+    Set Root = GetRootKey(BaseKeyName)
     
-    Dim Index As Long
-    Index = InStr(KeyName, "\")
-    If Index = 0 Then
-        Exit Function
-    End If
-        
-    If AutoCreate Then
+    If Writable Then
         Set GetSubKey = Root.CreateSubKey(Mid$(KeyName, Index))
     Else
-        Set GetSubKey = Root.OpenSubKey(Mid$(KeyName, Index), Writable)
+        Set GetSubKey = Root.OpenSubKey(Mid$(KeyName, Index))
     End If
 End Function
 
