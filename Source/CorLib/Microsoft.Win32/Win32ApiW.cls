@@ -39,7 +39,7 @@ Implements IWin32Api
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub FindDataWToFindData(ByRef Source As WIN32_FIND_DATAW, ByRef Dest As WIN32_FIND_DATA)
     With Dest
@@ -58,15 +58,15 @@ Private Function MakeWide(ByVal s As String) As String
     s = Path.GetFullPath(s)
     
     ' Check if we have a UNC path.
-    Dim root As String
+    Dim Root As String
     If Left$(Path.GetPathRoot(s), 2) = "\\" Then
         ' MSDN says the format is \\?\UNC\Server\Share\... ,
         ' so we need to trim off the first backslash from the path
         s = Mid$(s, 2)
-        root = "UNC"
+        Root = "UNC"
     End If
     
-    MakeWide = "\\?\" & root & s
+    MakeWide = "\\?\" & Root & s
 End Function
 
 

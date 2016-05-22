@@ -64,11 +64,3 @@ Public Sub GetValue_WhenCalled_ReturnsStoredValue()
     Assert.That Actual, Iz.EqualTo("Value")
 End Sub
 
-Public Sub GetRootKey_WithValue_ReturnsExpected(ByVal Key As String, ByVal Expected As RegistryKey)
-    Dim Actual As RegistryKey
-    
-    Set Actual = Registry.GetRootKey(Key)
-    
-    Assert.That Actual, Iz.SameAs(Expected)
-End Sub
-

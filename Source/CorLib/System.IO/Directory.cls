@@ -95,7 +95,7 @@ Public Function CreateDirectory(ByRef Path As String) As DirectoryInfo
         i = i + 1
         Dim NewDirectory As String
         NewDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
-'        If Api.CreateDirectory(NewDirectory) = BOOL_FALSE Then
+
         If CreateDirectoryW(NewDirectory, ByVal 0&) = BOOL_FALSE Then
             IOError.WinIOError Err.LastDllError
         End If
@@ -519,10 +519,10 @@ Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    Dim root As String
-    root = Statics.Path.GetPathRoot(FullPath)
+    Dim Root As String
+    Root = Statics.Path.GetPathRoot(FullPath)
     
-    If (FullPath = root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
+    If (FullPath = Root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
         Error.Argument Arg_PathIsAVolume
     
     Dim Handle As SafeFileHandle

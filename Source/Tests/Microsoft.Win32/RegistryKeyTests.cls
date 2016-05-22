@@ -57,9 +57,9 @@ End Sub
 
 Public Sub OpenSubKey_WithExistingPath_ReturnsKey()
     SaveSetting "VBCorLibTests", "Values", "Key1", "Value1"
-    Dim Actual As RegistryKey
     
-    Set Actual = Registry.GetSubKey(Rooted(RegistryValuesPath))
+    Dim Actual As RegistryKey
+    Set Actual = Registry.CurrentUser.OpenSubKey(RegistryValuesPath)
     
     Assert.That Actual, Iz.Not.Nothing
     Assert.That Actual.Name, Iz.EqualTo(Rooted(RegistryValuesPath))
@@ -70,7 +70,7 @@ Public Sub SubKeyCount_WhenCalled_ReturnsExpected()
     SaveSetting "VBCorLibTests", "Values2", "Key", "Value"
     SaveSetting "VBCorLibTests", "Values3", "Key", "Value"
     Dim Key As RegistryKey
-    Set Key = Registry.GetSubKey(Rooted(RegistryKeysPath))
+    Set Key = Registry.CurrentUser.OpenSubKey(RegistryKeysPath)
 
     Dim Actual As Long
     Actual = Key.SubKeyCount
@@ -83,7 +83,7 @@ Public Sub ValueCount_WhenCalled_ReturnsExpected()
     SaveSetting "VBCorLibTests", "Values", "Key2", "Value2"
     SaveSetting "VBCorLibTests", "Values", "Key3", "Value3"
     Dim Key As RegistryKey
-    Set Key = Registry.GetSubKey(Rooted(RegistryValuesPath))
+    Set Key = Registry.CurrentUser.OpenSubKey(RegistryValuesPath)
 
     Dim Actual As Long
     Actual = Key.ValueCount
@@ -96,7 +96,7 @@ Public Sub CreateSubKey_WhenCalled_CreatesKey()
     Registry.CurrentUser.CreateSubKey RegistryValuesPath & "2"
     
     Dim ParentKey As RegistryKey
-    Set ParentKey = Registry.GetSubKey(Rooted(RegistryKeysPath))
+    Set ParentKey = Registry.CurrentUser.OpenSubKey(RegistryKeysPath)
     
     Assert.That ParentKey, Iz.Not.Nothing
     Assert.That ParentKey.SubKeyCount, Iz.EqualTo(2)
@@ -383,18 +383,3 @@ End Sub
 
 
 
-''Public Sub TestRemote()
-''    Dim mKey As RegistryKey
-''    Dim s() As String
-''    Dim i As Long
-''
-''    Set mKey = RegistryKey.OpenRemoteBaseKey(CurrentUser, "Soze")
-''    Assert.IsNotNothing mKey
-''    s = mKey.GetSubKeyNames
-''    For i = 0 To UBound(s)
-''        WriteLine s(i)
-''    Next i
-''    mKey.CloseKey
-''End Sub
-'
-'
