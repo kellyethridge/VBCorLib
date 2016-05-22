@@ -42,8 +42,8 @@ Attribute VB_Exposed = True
 ' classes of registry keys.
 ' <p>To access these methods, use the <b>Registry.*</b> syntax:
 ' <pre>
-'     Dim rk As RegistryKey
-'     Set rk = Registry.ClassesRoot
+'     Dim Key As RegistryKey
+'     Set Key = Registry.ClassesRoot
 ' </pre>
 ' @see RegistryKey
 ' @see RegistryKeyStatic
@@ -154,20 +154,17 @@ Public Sub SetValue(ByRef KeyName As String, ByRef ValueName As String, ByRef Va
     Key.SetValue ValueName, Value
 End Sub
 
-''
-' Returns a root RegistryKey for the key defined in the key name.
-'
-' @param KeyName The keyname path, including the root name at the beginning.
-' @return The root RegistryKey.
-' @remarks The KeyName can contain subkeys. The root key name will be parsed out.
-'
-Public Function GetRootKey(ByRef KeyName As String) As RegistryKey
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function GetRootKey(ByRef KeyName As String) As RegistryKey
     If Len(KeyName) = 0 Then
         Exit Function
     End If
     
     Dim Keys() As String
-    Keys = Split(CorString.Trim(KeyName, "\"), "\")
+    Keys = Split(CorString.TrimEnd(KeyName, "\"), "\")
     
     Select Case UCase$(Keys(0))
         Case "HKEY_CLASSES_ROOT"
@@ -185,23 +182,14 @@ Public Function GetRootKey(ByRef KeyName As String) As RegistryKey
     End Select
 End Function
 
-''
-' Returns a RegistryKey to the full path of the key name.
-'
-' @param KeyName The full registry key path, including the root name.
-' @param AutoCreate Flag to indicate if the full path should be created if it does not exist.
-' @param Writable Flag to indicate if an existing path is writable.
-' @return A RegistryKey to the full path of the key name, or Nothing if the path does not exist.
-' @remarks If AutoCreate is true, then Writable is ignored.
-'
-Public Function GetSubKey(ByRef KeyName As String, Optional ByVal AutoCreate As Boolean = False, Optional ByVal Writable As Boolean = False) As RegistryKey
+Private Function GetSubKey(ByRef KeyName As String, Optional ByVal AutoCreate As Boolean = False, Optional ByVal Writable As Boolean = False) As RegistryKey
     If Len(KeyName) = 0 Then
         Exit Function
     End If
     
-    Dim root As RegistryKey
-    Set root = GetRootKey(KeyName)
-    If root Is Nothing Then
+    Dim Root As RegistryKey
+    Set Root = GetRootKey(KeyName)
+    If Root Is Nothing Then
         Exit Function
     End If
     
@@ -212,9 +200,9 @@ Public Function GetSubKey(ByRef KeyName As String, Optional ByVal AutoCreate As 
     End If
         
     If AutoCreate Then
-        Set GetSubKey = root.CreateSubKey(Mid$(KeyName, Index))
+        Set GetSubKey = Root.CreateSubKey(Mid$(KeyName, Index))
     Else
-        Set GetSubKey = root.OpenSubKey(Mid$(KeyName, Index), Writable)
+        Set GetSubKey = Root.OpenSubKey(Mid$(KeyName, Index), Writable)
     End If
 End Function
 

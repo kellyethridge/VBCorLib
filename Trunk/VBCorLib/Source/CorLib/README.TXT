@@ -64,6 +64,8 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed RijndaelManaged encrypting. TransformFinalBlock when using PaddingMode.None and partial block length of data would still return full block length.
 	* Fixed RijndaelManaged encrypting. TransformFinalBlock when using PaddingMode.Zero and full block length of data would return additional block.
 	* Removed RegistryKey support for HKEY_DYN_DATA.
+	* Removed Registry.GetRootKey to align with .NET framework.
+	* Removed Registry.GetSubKey to align with .NET framework.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
