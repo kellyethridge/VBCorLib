@@ -64,3 +64,23 @@ Public Sub GetValue_WhenCalled_ReturnsStoredValue()
     Assert.That Actual, Iz.EqualTo("Value")
 End Sub
 
+Public Sub GetValue_WithInvalidBaseKeyName_ThrowsArgumentException()
+    On Error Resume Next
+    Registry.GetValue "HKEY_INVALID_NAME\Software\vb and vba program settings\VBCorLibTests\TestValues", "Key", ""
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub GetValue_WithEmptyKey_ThrowsArgumentException()
+    On Error Resume Next
+    Registry.GetValue "", "Key", ""
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub SetValue_WithInvalidBaseKeyName_ThrowsArgumentException()
+    On Error Resume Next
+    Registry.SetValue "HKEY_INVALID_NAME\Software\vb and vba program settings\VBCorLibTests\TestValues", "Key", "Value"
+    
+    AssertArgumentException Err
+End Sub

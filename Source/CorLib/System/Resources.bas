@@ -79,6 +79,7 @@ Public Enum ResourceStringKey
     Arg_RegValStrLenBug = 240
     Arg_RegKeyStrLenBug = 241
     Arg_RegSubKeyValueAbsent = 242
+    Arg_RegInvalidKeyName = 243
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
