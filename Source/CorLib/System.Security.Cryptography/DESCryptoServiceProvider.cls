@@ -40,7 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks This provides access to the Windows CryptoAPI cryptography services.
 ' @see DES
-' @include "..\..\..\Includes\DESCryptoServiceProviderExample.txt"
+' @include "..\DocIncludes\DESCryptoServiceProvider.txt"
 Option Explicit
 Implements IObject
 Implements SymmetricAlgorithm
@@ -451,8 +451,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

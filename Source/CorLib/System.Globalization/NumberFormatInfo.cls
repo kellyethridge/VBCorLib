@@ -49,7 +49,7 @@ Attribute VB_Exposed = True
 ' @see NumberFormatInfoStatic
 ' @see IFormatProvider
 ' @see ICloneable
-' @include "..\..\Includes\NumberFormatInfo.txt"
+' @include "..\DocIncludes\NumberFormatInfo.txt"
 Option Explicit
 Implements IObject
 Implements IFormatProvider
@@ -2422,8 +2422,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

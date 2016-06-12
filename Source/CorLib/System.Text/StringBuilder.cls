@@ -147,7 +147,7 @@ End Function
 ' documentation for more information.</p>
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
-' @include "..\..\Includes\StringBuilder.AppendFormat.txt"
+' @include "..\DocIncludes\StringBuilder.AppendFormat.txt"
 Public Function AppendFormat(ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)

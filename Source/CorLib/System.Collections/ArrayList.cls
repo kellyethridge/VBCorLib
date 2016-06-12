@@ -84,7 +84,7 @@ Private mComparer   As IComparer
 ' @remarks As items are added, the capacity is increased as necessary. The items
 ' are appended to the end of the list and maintain the order they were added,
 ' provided no other method is used to change the order, such as Insert or Remove.
-' @include "..\..\Includes\ArrayListAdd.txt"
+' @include "..\DocIncludes\ArrayList.Add.txt"
 Public Function Add(ByRef Value As Variant) As Long
     Add = mCount
     Insert mCount, Value
@@ -103,7 +103,7 @@ End Function
 ' capacity in the <b>ArrayList</b>, then the capacity is increased to accommodate
 ' the collection of elements.</p>
 ' @see ICollection
-' @include "..\..\Includes\ArrayListAddRange.txt"
+' @include "..\DocIncludes\ArrayList.AddRange.txt"
 Public Sub AddRange(ByRef Source As Variant)
     InsertRange mCount, Source
 End Sub
@@ -128,7 +128,7 @@ End Sub
 ' determine where the value should have been found, negate (Not) the return value.</p>
 ' @see IComparer
 ' @see IComparable
-' @include "..\..\Includes\ArrayListBinarySearch.txt"
+' @include "..\DocIncludes\ArrayList.BinarySearch.txt"
 Public Function BinarySearch(ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     BinarySearch = BinarySearchEx(0, mCount, Value, Comparer)
 End Function
@@ -155,7 +155,7 @@ End Function
 ' determine where the value should have been found, negate (Not) the return value.</p>
 ' @see IComparer
 ' @see IComparable
-' @include "..\..\Includes\ArrayListBinarySearch.txt"
+' @include "..\DocIncludes\ArrayList.BinarySearch.txt"
 Public Function BinarySearchEx(ByVal Index As Long, ByVal Count As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     If Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
@@ -193,7 +193,7 @@ End Property
 ' @param Value The number of elements to set the array to.
 ' @remarks The capacity cannot be set less than the number of items in the list.
 ' If the capacity is set to zero, then it is set to the default capacity (16).
-' @include "..\..\Includes\ArrayListCapacity.txt"
+' @include "..\DocIncludes\ArrayList.Capacity.txt"
 Public Property Let Capacity(ByVal Value As Long)
     If Value < mCount Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
@@ -260,7 +260,7 @@ End Function
 ' @remarks The destination array must be large enough to hold all of the items. If an
 ' arrayindex is specified, then the destination array must be large enough to hold all of
 ' the items from that index on.
-' @include "..\..\Includes\ArrayListCopyTo.txt"
+' @include "..\DocIncludes\ArrayList.CopyTo.txt"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
     ValidateArray Arr
     CorArray.CopyEx mItems, 0, Arr, OptionalLong(ArrayIndex, LBound(Arr)), mCount
@@ -313,7 +313,7 @@ End Function
 ' @remarks This enumerator can be used in For..Each loops. To access the optional
 ' parameters, the GetEnumerator must be called instead of simply passing the object
 ' to the For..Each. This allows for a portion of the list to be enumerated.
-' @include "..\..\Includes\ArrayListGetEnumerator.txt"
+' @include "..\DocIncludes\ArrayList.GetEnumerator.txt"
 Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim Range As ListRange
     Range = OptionalRange(Index, Count, 0, mCount)

@@ -316,7 +316,7 @@ End Property
 ' Once the function returns, it can be called repeatedly until all key presses
 ' upto the return key are retrieved. The return key is also returned
 ' as a carriage-return (13) followed by a line-feed (10).
-' @include "..\Includes\ConsoleRead.txt"
+' @include "..\DocIncludes\Console.Read.txt"
 Public Function Read() As Long
     Read = In_.Read
 End Function
@@ -329,7 +329,7 @@ End Function
 ' not including the NewLine characters.
 ' @remarks The ReadLine function will block and not return until a NewLine
 ' characters is pressed. This is usually the Return key.
-' @include "..\Includes\ConsoleReadLine.txt"
+' @include "..\DocIncludes\Console.ReadLine.txt"
 Public Function ReadLine() As String
     ReadLine = In_.ReadLine
 End Function
@@ -449,7 +449,7 @@ End Function
 ' the current output stream. All additional parameters will be used as
 ' formatting information in the first parameter. If no parameters are
 ' provided, then an empty string is written with a NewLine.
-' @include "..\Includes\ConsoleWriteLine.txt"
+' @include "..\DocIncludes\Console.WriteLine.txt"
 Public Sub WriteLine(ParamArray Values() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(12))
@@ -463,7 +463,7 @@ End Sub
 ' @param Args Values to be used in a formatted output.
 ' @remarks Values are converted to their string representation for text output.
 ' A formatted output can be created similar to <b>cString.Format</b>.
-' @include "..\Includes\ConsoleWriteValue.txt"
+' @include "..\DocIncludes\Console.WriteValue.txt"
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim a() As Variant
     Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))

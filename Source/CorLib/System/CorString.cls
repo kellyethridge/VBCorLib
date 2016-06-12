@@ -117,7 +117,7 @@ End Function
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
-' @include "..\Includes\CorString.Format.txt"
+' @include "..\DocIncludes\CorString.Format.txt"
 Public Function Format(ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
