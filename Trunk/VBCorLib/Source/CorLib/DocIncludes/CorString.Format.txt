@@ -1,0 +1,101 @@
+@remarks Formatting is performed by inserting argument values into indexed locations within the supplied formatting string.
+To indicate the index for an argument to be inserted into the string, a pair of curly braces encloses the index value ''{n}'.
+The indexes begin at zero. So the first argument can be referenced with ''{0}' in the formatting string. The braces and index
+value will be replaced with the argument at index 0 in the list. 
+<p>Additional formatting information can be supplied along with the index to further customize how the argument is to be formatted as a string. A colon is used to indicate additional formatting information ''{0:n}'. In this case the 'n' indicates that value should be formatted as a numeric value.</p>
+<h4>Example</h4>
+<pre>
+'' This example shows how to format values when creating
+'' string output. It demonstrates the indexing property
+'' for the arguments and how they are inserted into the
+'' formatted string. It also demonstrates how additional
+'' formatting information can be used to customize the
+'' formatted output for the number values.
+Private Sub Main()
+    Dim b(9) As Byte
+    Dim r As Random
+    Dim i As Long
+    
+    '' Fill the array with random numbers.
+    Set r = NewRandom(-13)
+    r.NextBytes b
+    
+    '' Display normal formatted values.
+    Debug.Print
+    Debug.Print "normal formatting"
+    For i = 0 To 9
+        Debug.Print cString.Format("b({0}) = {1}", i, b(i))
+    Next i
+    
+    '' Display 3-digit formatted values.
+    Debug.Print
+    Debug.Print "3-digit formatting"
+    For i = 0 To 9
+        Debug.Print cString.Format("b({0}) = {1:d3}", i, b(i))
+    Next i
+    
+    '' Display Lowercase hexadecimal values.
+    Debug.Print
+    Debug.Print "Lowercase hexadecimal"
+    For i = 0 To 9
+        Debug.Print cString.Format("b({0}) = {1:x}", i, b(i))
+    Next i
+    
+    '' Display Uppercase 2-digit hexadecimal values.
+    Debug.Print
+    Debug.Print "Uppercase 2-digit hexadecimal"
+    For i = 0 To 9
+        Debug.Print cString.Format("b({0}) = {1:X2}", i, b(i))
+    Next i
+End Sub
+
+'' This code produces the following output.
+''
+''Normal formatting
+''b(0) = 153
+''b(1) = 114
+''b(2) = 8
+''b(3) = 87
+''b(4) = 232
+''b(5) = 175
+''b(6) = 25
+''b(7) = 10
+''b(8) = 91
+''b(9) = 238
+''
+''3-digit formatting
+''b(0) = 153
+''b(1) = 114
+''b(2) = 008
+''b(3) = 087
+''b(4) = 232
+''b(5) = 175
+''b(6) = 025
+''b(7) = 010
+''b(8) = 091
+''b(9) = 238
+''
+''Lowercase hexadecimal
+''b(0) = 99
+''b(1) = 72
+''b(2) = 8
+''b(3) = 57
+''b(4) = e8
+''b(5) = af
+''b(6) = 19
+''b(7) = a
+''b(8) = 5b
+''b(9) = ee
+''
+''Uppercase 2-digit hexadecimal
+''b(0) = 99
+''b(1) = 72
+''b(2) = 08
+''b(3) = 57
+''b(4) = E8
+''b(5) = AF
+''b(6) = 19
+''b(7) = 0A
+''b(8) = 5B
+''b(9) = EE
+</pre>

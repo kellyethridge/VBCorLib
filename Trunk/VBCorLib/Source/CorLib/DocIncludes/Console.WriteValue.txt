@@ -1,0 +1,38 @@
+@remarks
+<h4>Example</h4>
+In this example, the WriteValue function is used to display a sequence
+of values. The values are all written to the same line because WriteValue
+does not include a NewLine character after writing a value. A NewLine
+character has to be manually added to advance to the next line.
+<pre>
+Private Sub Main()
+    Dim i As Long
+    
+    '' Writes out a sequence of digits. The digits
+    '' are written on the same line.
+    Console.WriteValue "Loop 1: "
+    For i = 1 To 5
+        Console.WriteValue i
+    Next i
+    
+    '' Writes out a new line manually.
+    Console.WriteValue vbCrLf
+    
+    '' Writes formatted values on the same line.
+    Console.WriteValue "Loop 2: "
+    For i = 1 To 5
+        Console.WriteValue "i = {0}" & IIf(i < 5, ", ", ""), i
+    Next i
+    
+'' The outputs from the loops are
+'' Loop 1: 12345
+'' Loop 2: i = 1, i = 2, i = 3, i = 4, i = 5
+End Sub
+</pre>
+As shown, the first loop writes 5 digits to the console, each digit
+following the previous digit on the same line. WriteValue does not
+include line-breaks. A manual line-break is written to achieve the
+effect of advancing to the next line. The second loop uses a formatted
+value output. The argument is substituted in the formatted value and
+then written to the output onto the same single line. A comma is added
+to distinguish each iteration though the loop.

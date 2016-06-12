@@ -1,0 +1,124 @@
+@remarks
+<h4>Example</h4>
+<pre>
+Option Explicit
+
+'' This example demonstrates how an array can be sorted
+'' by using another array to determine the sort order for
+'' the original. This demonstration uses an array of type
+'' vbLong as the keys to sort the main Values array. Even
+'' though Values is a vbString type array, it will follow
+'' the Keys array when being sorted. Once the array is sorted
+'' using the Keys vbLong array, the Values array is displayed
+'' to show how the array did not sort using String text compare.
+'' The Values array is then sorted again using the standard
+'' sort method on the Values vbString type array and redisplayed.
+'' This will show the difference between sorting using a Key array
+'' of a different type to sort an original array and how the
+'' original array itself would be sorted on its own.
+Private Sub Main()
+    Dim values(14) As String
+    Dim keys(14) As Long
+    
+    '' Fill both arrays with random values.
+    FillKeysAndValues keys, values
+    
+    '' Display the current order of the values array.
+    DisplayValues "Unsorted Values Array.", values
+    
+    '' Sort the values array using the keys array
+    '' to determine the sort order.
+    cArray.SortKey keys, values
+    
+    '' Display the new sorted values array.
+    '' The values are sorted numerically because the
+    '' keys array is a numeric array.
+    DisplayValues "Sorted Values array using Keys array for sort order.", values
+    
+    '' Re-sort the values array by itself.
+    '' The values are sorted as strings.
+    cArray.Sort values
+    
+    '' Display the re-sorted values array, showing
+    '' the how string comparing affects sort order.
+    DisplayValues "Re-sorted Values array using standard sorting with String compares.", values
+    
+    '' Wait for user to press enter
+    Console.ReadLine
+End Sub
+
+'' Fill Keys and Values array.
+Private Sub FillKeysAndValues(ByRef keys() As Long, ByRef values() As String)
+    Dim i As Long
+    
+    Rnd -13
+    For i = LBound(keys) To UBound(keys)
+        keys(i) = Rnd * i
+        values(i) = "Value " & keys(i)
+    Next i
+End Sub
+
+'' Display Array
+Private Sub DisplayValues(ByVal title As String, ByRef values() As String)
+    Dim i As Long
+    
+    Debug.Print title
+    For i = LBound(values) To UBound(values)
+        Debug.Print cString.Format("values({0}) = {1}", i, values(i))
+    Next i
+End Sub
+
+'' This code produces the following output.
+''
+'' Unsorted Values Array.
+'' values(0) = Value 0
+'' values(1) = Value 0
+'' values(2) = Value 0
+'' values(3) = Value 1
+'' values(4) = Value 4
+'' values(5) = Value 3
+'' values(6) = Value 1
+'' values(7) = Value 0
+'' values(8) = Value 3
+'' values(9) = Value 8
+'' values(10) = Value 8
+'' values(11) = Value 8
+'' values(12) = Value 10
+'' values(13) = Value 10
+'' values(14) = Value 6
+'' Sorted Values array using Keys array for sort order.
+'' values(0) = Value 0
+'' values(1) = Value 0
+'' values(2) = Value 0
+'' values(3) = Value 0
+'' values(4) = Value 1
+'' values(5) = Value 1
+'' values(6) = Value 3
+'' values(7) = Value 3
+'' values(8) = Value 4
+'' values(9) = Value 6
+'' values(10) = Value 8
+'' values(11) = Value 8
+'' values(12) = Value 8
+'' values(13) = Value 10
+'' values(14) = Value 10
+'' Re-sorted Values array using standard sorting with String compares.
+'' values(0) = Value 0
+'' values(1) = Value 0
+'' values(2) = Value 0
+'' values(3) = Value 0
+'' values(4) = Value 1
+'' values(5) = Value 1
+'' values(6) = Value 10
+'' values(7) = Value 10
+'' values(8) = Value 3
+'' values(9) = Value 3
+'' values(10) = Value 4
+'' values(11) = Value 6
+'' values(12) = Value 8
+'' values(13) = Value 8
+'' values(14) = Value 8
+</pre>
+As you can see, the Value string array sorted as if numeric when using the Keys array to
+be sorted by. When it was sorted alone, it was sorted as a String array and the 'Value 10'
+appears in its string compared index.

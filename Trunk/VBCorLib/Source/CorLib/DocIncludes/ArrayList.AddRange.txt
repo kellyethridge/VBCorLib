@@ -1,0 +1,92 @@
+@remarks 
+<h4>Exceptions</h4>
+<table>
+<tr>
+<th width="50%">Exception Type</th><th>Condition</th>
+</tr><tr>
+<td>ArgumentNullException</td>
+<td><i>c</i> is an uninitialized array.<br>
+- or -<br>
+<i>c</i> is Nothing.</td>
+</tr>
+<tr>
+<td>NotSupportedException</td>
+<td>The <b>ArrayList</b> is Read-Only<br>
+- or -<br>
+The <b>ArrayList</b> is Fixed-Size.</td>
+</tr>
+<tr>
+<td>InvalidCastException</td><td><i>c</i> is not a <b>VBA.Collection</b>, <b>ICollection</b> object, or an <b>Array</b>.</td>
+</tr>
+</table>
+<h4>Example</h4>
+The following example shows how to add the elements from an existing
+collection to the <b>ArrayList</b> using the AddRange method.
+<p>An <b>ArrayList</b> is created and filled with an initial set of
+elements, then a <b>Queue</b> is filled with additional elements that
+will be added to the <b>ArrayList</b> using AddRange.
+<pre>
+Private Sub Main()
+    Dim list As New ArrayList
+    
+    '' add several elements to the ArrayList
+    list.Add "Humpty"
+    list.Add "Dumpty"
+    list.Add "sat"
+    list.Add "on"
+    list.Add "a"
+    list.Add "wall."
+    
+    '' Display the contents of the ArrayList
+    Console.WriteLine "The ArrayList initially contains:"
+    PrintValues list
+    
+    Dim que As New Queue
+    que.Enqueue "Humpty"
+    que.Enqueue "Dumpty"
+    que.Enqueue "had"
+    que.Enqueue "a"
+    que.Enqueue "great"
+    que.Enqueue "fall."
+    
+    '' Display the contents of the Queue
+    Console.WriteLine "The Queue initially contains:"
+    PrintValues que
+    
+    '' Add the elements in the Queue to the ArrayList
+    list.AddRange que
+    
+    '' Display the new contents of the ArrayList
+    Console.WriteLine "The ArrayList with the elements from the Queue:"
+    PrintValues list
+    
+    '' Wait for user to press return key
+    Console.ReadLine
+    
+End Sub
+
+Private Sub PrintValues(ByVal en As IEnumerable)
+    Const Space As String = " "
+    
+    Dim value As Variant
+    
+    Console.WriteValue vbTab
+    
+    '' Iterate over the list
+    For Each value In en
+        '' Write each value onto the same line
+        Console.WriteValue value
+        Console.WriteValue Space
+    Next value
+    Console.WriteLine
+End Sub
+
+'' This code produces the following output.
+''
+'' The ArrayList initially contains:
+''     Humpty Dumpty sat on a wall.
+'' The Queue initially contains:
+''     Humpty Dumpty had a great fall.
+'' The ArrayList with the elements from the Queue:
+''     Humpty Dumpty sat on a wall. Humpty Dumpty had a great fall.
+</pre>

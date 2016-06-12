@@ -1,0 +1,31 @@
+@remarks The following example demonstrates how to write output to
+the console using the <b>WriteLine</b> method. There are 3 ways to
+use the <b>WriteLine</b> method effectively, and they are shown below.
+<pre>
+Private Sub Main()
+    '' writes a NewLine to the console
+    Console.WriteLine
+    
+    '' writes a string followed by a NewLine
+    Console.WriteLine "Hello"
+    
+    '' writes a formatted string using the
+    '' supplied parameters, followed by a NewLine
+    Console.WriteLine "Hello, {0}", "Kelly"
+    
+    Console.WriteLine "Press Return"
+    Console.ReadLine    '' waits for return key to continue
+    
+    '' The above code outputs
+    ''
+    '' (Blank Line)
+    '' Hello
+    '' Hello, Kelly
+    '' Press Return
+End Sub
+</pre>
+As you can see, the <b>WriteLine</b> method accepts a variaty of
+parameters to create differently formatted outputs to the Console.
+The first parameter is the string to be written to the console, while
+any additional parameters are used by formatting information within
+the first parameter.

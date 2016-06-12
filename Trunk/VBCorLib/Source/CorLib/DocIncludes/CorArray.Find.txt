@@ -1,0 +1,92 @@
+@remarks 
+<p>The callback method signature needs to have 1 parameter that is of a
+ByRef definition for the the datatype the same as the array. The callback
+function must return a Boolean value indicating if the passed-by-ref
+element matches the criteria of the matching routine.</p>
+<p>It is extremely important to define the callback method correctly. If
+the method is incorrect, the application may crash.</p>
+<h4>Example</h4> This example demonstrates some of the <b>Find</b>
+methods and how to define a Callback method that the <b>Find</b> methods
+rely on in finding array elements that match a criteria. The criteria logic
+is defined by the developer. The callback function is used to check if a
+specific array element meets the criteria being searched for.
+<p>In the examples below, a String array is searched using various
+criteria. The two callback functions (MatchGreetings, MatchNonGreetings) are
+defined with 1 parameter of a <b>ByRef String</b> and returns a <b>Boolean</b>. 
+If the array datatype is a Long, the the callback will be defined as a
+<b>ByRef Long</b>.</p>
+<p>None of the values should be changed during the search.</p>
+<pre>
+Private Sub Main()
+    FindFirstGreeting
+    FindLastGreeting
+    FindAllGreetings
+    FindAllNonGreetings
+End Sub
+
+'' Searches from the beginning of the arry until the first
+'' successful match from the MatchGreetings function,
+'' returning the index the element was found at.
+Private Sub FindFirstGreeting()
+    Debug.Print cArray.FindIndex(GetStrings, AddressOf MatchGreetings)
+End Sub
+
+'' Searches from the end of the array until the first
+'' successful match from the MatchGreetings function,
+'' returning the index the element was found at.
+Private Sub FindLastGreeting()
+    Debug.Print cArray.FindLastIndex(GetStrings, AddressOf MatchGreetings)
+End Sub
+
+'' Finds all of the array elements that pass the criteria of the
+'' MatchGreetings function. The found elements are placed
+'' into a new array of the same datatype as the original array
+'' and returned.
+Private Sub FindAllGreetings()
+    Dim a() As String
+    a = cArray.FindAll(GetStrings, AddressOf MatchGreetings)
+    Debug.Print a(0), a(1)
+End Sub
+
+'' Finds all of the array elements that pass the criteria of the
+'' MatchNonGreetings function. The found elements are placed
+'' into a new array of the same datatype as the original array
+'' and returned.
+Private Sub FindAllNonGreetings()
+    Dim i As Long
+    Dim a() As String
+    
+    a = cArray.FindAll(GetStrings, AddressOf MatchNonGreetings)
+    For i = 0 To UBound(a)
+        Debug.Print a(i),
+    Next i
+End Sub
+
+'' Create a sample array of strings to search.
+Private Function GetStrings() As String()
+    GetStrings = cArray.NewArray(ciString, "One", "Two", "Hello", "Four", "Hi", "Six")
+End Function
+
+'' Callback method used to match a string element from
+'' the array to the possible greetings we are searching for.
+'' The method signature should be a ByRef of the datatype
+'' of the specific array being searched.
+Public Function MatchGreetings(ByRef s As String) As Boolean
+    MatchGreetings = ((s = "Hello") Or (s = "Hi"))
+End Function
+
+'' Callback method used to match a string element from
+'' the array to determine that we have matched against a non-greeting.
+'' The method signature should be a ByRef of the datatype
+'' of the specific array being searched.
+Public Function MatchNonGreetings(ByRef s As String) As Boolean
+    MatchNonGreetings = Not ((s = "Hello") Or (s = "Hi"))
+End Function
+
+'' this code produces the following output.
+''
+'' 2
+'' 4
+'' Hello         Hi
+'' One           Two           Four          Six
+</pre>

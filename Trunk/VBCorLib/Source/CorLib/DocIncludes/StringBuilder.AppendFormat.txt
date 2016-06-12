@@ -1,0 +1,50 @@
+@remarks <h4>Example</h4>
+<pre>
+'' This example uses the <b>AppendFormat</b> method to insert
+'' values into the string with formatting information. The
+'' output will show how the formatting information was used
+'' to transform the arguments into a formatted output.
+Private Sub Main()
+    Dim sb As New StringBuilder
+    
+    '' Indicates the index of the supplied
+    '' arguments to be inserted into the string.
+    sb.AppendFormat "My name {0}.", "Kelly"
+    sb.Append vbCrLf
+    
+    '' Insert an integer value that is 5 digits
+    '' in length, prepending leading zeros if necessary.
+    sb.AppendFormat "A number with leading zeros: {0:d5}.", 23
+    sb.Append vbCrLf
+    
+    '' Inserts the value into a column of 10 characters
+    '' with alignment to the right of the column.
+    sb.AppendFormat "Right aligned 10 character column: '{0,10}'.", "right"
+    sb.Append vbCrLf
+    
+    '' Inserts the value into a column of 10 characters
+    '' with alignment fo the left of the column.
+    sb.AppendFormat "Left aligned 10 character column: '{0,-10}'.", "left"
+    sb.Append vbCrLf
+    
+    '' To prevent the insertion of an argument and allow
+    '' for curly braces to be inserted into the string, two
+    '' braces must be placed together to cause an escape from
+    '' the formatting sequence.
+    sb.AppendFormat "Use two braces to put a single brace in the output without formatting. {{0}}", "No Used"
+    
+    '' Display the contents of the StringBuilder
+    Console.WriteLine sb.ToString
+    
+    '' Wait for user to press enter
+    Console.ReadLine
+End Sub
+
+'' This code produces the following output.
+''
+'' My name Kelly.
+'' A number with leading zeros: 00023.
+'' Right aligned 10 character column: '     right'.
+'' Left aligned 10 character column: 'left      '.
+'' Use two braces to put a single brace in the output without formatting. {0}
+</pre>

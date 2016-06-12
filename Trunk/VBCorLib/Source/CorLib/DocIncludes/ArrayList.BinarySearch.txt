@@ -1,0 +1,68 @@
+@remarks 
+<h4>Exceptions</h4>
+<table>
+<tr>
+<th width="50%">Exception Type</th><th>Condition</th>
+</tr><tr>
+<td>ArgumentException</td>
+<td>Neither <i>value</i> nor the elements in the list support the <b>IComparable</b> interface.</td>
+</tr>
+<tr>
+<td>InvalidOperationException</td>
+<td><i>value</i> and the elements in the array are not of the same datatype.</td>
+</tr>
+</table>
+<h4>Example</h4>
+The following code demonstrates how to search for a value in an <b>ArrayList</b> using BinarySearch.
+<pre>
+Private Sub Main()
+    Dim list As New ArrayList
+    Dim i As Integer
+    
+    For i = 1 To 5
+        list.Add i * 2
+    Next i
+    
+    '' Display the current values in the list
+    Console.WriteLine "The ArrayList contains:"
+    PrintValues list
+    
+    '' Find a non-existing value
+    FindValue list, 7
+    
+    '' Find an existing value
+    FindValue list, 4
+    
+    Console.ReadLine
+End Sub
+
+Private Sub PrintValues(ByVal en As IEnumerable)
+    Dim v As Variant
+    
+    Console.WriteValue vbTab
+    
+    For Each v In en
+        Console.WriteValue "{0} ", v
+    Next v
+    Console.WriteLine
+End Sub
+
+Private Sub FindValue(ByVal list As ArrayList, ByVal value As Variant)
+    Dim Index As Long
+    
+    Index = list.BinarySearch(value)
+    
+    If Index < 0 Then
+        Console.WriteLine "The value ({0}) was not found in the list. The next largest value was found at index {1}.", value, Not Index
+    Else
+        Console.WriteLine "the value ({0}) was found at index {1}.", value, Index
+    End If
+End Sub
+
+'' This code produces the following output.
+''
+'' The ArrayList contains:
+''     2 4 6 8 10
+'' The value (7) was not found in the list. the next largest value was found at index 3.
+'' The value (4) was found at index 1.
+</pre>

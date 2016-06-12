@@ -1,0 +1,10 @@
+@remarks
+<h4>Exceptions</h4>
+<table>
+<tr>
+<th width="50%">Exception Type</th><th>Condition</th>
+</tr><tr>
+<td>ArgumentException</td>
+<td>The Capacity was set to a value that is less than Count.</td>
+</tr>
+</table>

@@ -1,0 +1,61 @@
+@remarks
+' <p>This table is from the Microsoft Dot NET 1.1 MSDN.
+' <table>
+' <tr>
+' <th width="50%">Format Character</th><th>Description and Associated Properties</th>
+' </tr>
+' <tr>
+' <td>c, C</td>
+' <td>Currency format. CurrencyNegativePattern, CurrencyPositivePattern, CurrencySymbol, CurrencyGroupSizes, CurrencyGroupSeparator, CurrencyDecimalDigits, CurrencyDecimalSeparator.</td>
+' </tr>
+' <tr>
+' <td>d, D</td>
+' <td>Decimal format.</td>
+' </tr>
+' <td>e, E</td>
+' <td>Scientific (exponential) format.</td>
+' </tr>
+' <tr>
+' <td>f, F</td>
+' <td>Fixed-point format.</td>
+' </tr>
+' <tr>
+' <td>g, G</td>
+' <td>General format.</td>
+' </tr>
+' <tr>
+' <td>n, N</td>
+' <td>Number format. NumberNegativePattern, NumberGroupSizes, NumberGroupSeparator, NumberDecimalDigits, NumberDecimalSeparator.</td>
+' </tr>
+' <tr>
+' <td>x, X</td>
+' <td>Hexadecimal format.</td>
+' </tr>
+' </table>
+' </p>
+<pre>
+'' This example shows how to format a value as a currency using
+'' the default formatting setting and a custom setting.
+Private Sub Main()
+    Dim f As New NumberFormatInfo
+    
+    '' Display the value using the default currency formatting.
+    Console.WriteLine f.Format(123, "c")
+    
+    '' Set a custom currency format.
+    f.CurrencySymbol = "$$"
+    f.CurrencyDecimalDigits = 4
+    f.CurrencyPositivePattern = [$ n]
+    
+    '' Display the value using the custom currency formatting.
+    Console.WriteLine f.Format(123, "c")
+    
+    '' Wait for user to press enter
+    Console.ReadLine
+End Sub
+
+'' This code produces the following output
+''
+'' ¤123.00
+'' $$ 123.0000
+</pre>

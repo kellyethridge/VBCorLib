@@ -1,0 +1,54 @@
+@remarks 
+<h4>Exceptions</h4>
+<table>
+<tr>
+<th width="50%">Exception Type</th><th>Condition</th>
+</tr><tr>
+<td>NotSupportedException</td>
+<td>The <b>ArrayList</b> is Read-Only<br>
+- or -<br>
+The <b>ArrayList</b> is Fixed-Size.</td>
+</tr>
+</table>
+<h4>Example</h4>
+In the following example, several items are added to an <b>ArrayList</b>
+object and then iterated over, displaying the items in the list.
+<pre>
+Private Sub Main()
+    Dim list As New ArrayList
+    
+    '' add several elements to the ArrayList
+    list.Add "Humpty"
+    list.Add "Dumpty"
+    list.Add "sat"
+    list.Add "on"
+    list.Add "a"
+    list.Add "wall."
+    
+    '' Display the contents of the ArrayList
+    PrintValues list
+    
+    '' Wait for user to press return key
+    Console.ReadLine
+    
+End Sub
+
+Private Sub PrintValues(ByVal en As IEnumerable)
+    Const Space As String = " "
+    
+    Dim value As Variant
+    
+    '' Iterate over the list
+    For Each value In en
+        '' Write each value onto the same line
+        Console.WriteValue value
+        Console.WriteValue Space
+    Next value
+End Sub
+
+'' This code produces the following output.
+''
+'' Humpty Dumpty sat on a wall.
+</pre>
+The items are added to the list, then a For..Each statement is used
+to iterate over the list, displaying the name in the Console window.
