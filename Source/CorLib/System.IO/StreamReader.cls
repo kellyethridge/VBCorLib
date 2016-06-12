@@ -48,7 +48,7 @@ Attribute VB_Exposed = True
 ' @see Constructors
 ' @see StreamWriter
 ' @see TextReader
-' @include "..\DocIncludes\StreamReader.txt"
+' @include "..\DocIncludes\StreamReader.html"
 Option Explicit
 Implements IObject
 Implements TextReader

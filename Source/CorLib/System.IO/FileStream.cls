@@ -56,7 +56,7 @@ Attribute VB_Exposed = True
 '
 ' @see Constructors
 ' @see Stream
-' @include "..\DocIncludes\FileStream.txt"
+' @include "..\DocIncludes\FileStream.html"
 Option Explicit
 Implements IObject
 Implements Stream

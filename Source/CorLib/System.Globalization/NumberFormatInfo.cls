@@ -49,7 +49,7 @@ Attribute VB_Exposed = True
 ' @see NumberFormatInfoStatic
 ' @see IFormatProvider
 ' @see ICloneable
-' @include "..\DocIncludes\NumberFormatInfo.txt"
+' @include "..\DocIncludes\NumberFormatInfo.html"
 Option Explicit
 Implements IObject
 Implements IFormatProvider
