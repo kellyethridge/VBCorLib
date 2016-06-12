@@ -466,8 +466,8 @@ End Function
 ' Decodes a set of bytes into a String.
 '
 ' @param Bytes The set of bytes to be decoded into a string.
-' @param Index The index of the first byte to be decoded.
-' @param Count The number of bytes to be used in the decoding.
+' @param ByteIndex The index of the first byte to be decoded.
+' @param ByteCount The number of bytes to be used in the decoding.
 ' @return A string containing the decoded set of bytes.
 ' @see Encoding
 '
@@ -588,8 +588,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

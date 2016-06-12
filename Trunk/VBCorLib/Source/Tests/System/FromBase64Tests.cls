@@ -95,7 +95,7 @@ Public Sub FromBase64CharArray_WithIndexInLessThanLBound_Throws()
     On Error Resume Next
     Convert.FromBase64CharArray InArray, 0, 0
     
-    AssertArgumentOutOfRangeException Err, "IndexIn"
+    AssertArgumentOutOfRangeException Err, "Offset"
 End Sub
 
 Public Sub FromBase64CharArray_WithLengthLessThanZero_Throws()
@@ -113,7 +113,7 @@ Public Sub FromBase64CharArray_WithIndexInAndLengthGreaterThanUBound_Throws()
     On Error Resume Next
     Convert.FromBase64CharArray InArray, 0, 4
     
-    AssertArgumentOutOfRangeException Err, "IndexIn"
+    AssertArgumentOutOfRangeException Err, "Offset"
 End Sub
 
 Public Sub FromBase64String_WithMalformedString_Throws()

@@ -209,7 +209,7 @@ Public Sub GetFiles_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOption, 
     mBuilder.CreateFile "SubFolder\Sub.txt"
     
     Dim Actual() As String
-    Actual = Directory.GetFiles(mBuilder.TempFolder, SearchOpt:=Opt)
+    Actual = Directory.GetFiles(mBuilder.TempFolder, SearchOption:=Opt)
     
     Assert.That Actual, Iz.EqualTo(CreateFullPaths(Expected))
 End Sub
@@ -219,7 +219,7 @@ Public Sub GetDirectories_WithSearchOption_ReturnsExpected(ByVal Opt As SearchOp
     mBuilder.CreateFolder "SubFolder\SubSubFolder"
     
     Dim Actual() As String
-    Actual = Directory.GetDirectories(mBuilder.TempFolder, SearchOpt:=Opt)
+    Actual = Directory.GetDirectories(mBuilder.TempFolder, SearchOption:=Opt)
     
     Assert.That Actual, Iz.EqualTo(CreateFullPaths(Expected))
 End Sub
@@ -243,7 +243,7 @@ Public Sub GetFileSystemEntries_WithSubFoldersAndFiles_ReturnsAll()
     Expected.Add mBuilder.CreateFile("SubFolder\File.txt")
     
     Dim Actual() As String
-    Actual = Directory.GetFileSystemEntries(mBuilder.TempFolder, SearchOpt:=SearchOption.AllDirectories)
+    Actual = Directory.GetFileSystemEntries(mBuilder.TempFolder, SearchOption:=SearchOption.AllDirectories)
     
     Assert.That Actual, Iz.EquivalentTo(Expected)
 End Sub

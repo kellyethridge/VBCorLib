@@ -272,7 +272,7 @@ End Property
 ' Adds a specified amount of time to the current date, returning a
 ' new CorDateTime instance with the calcuated value.
 '
-' @param ts The amount of time to add.
+' @param Value The amount of time to add.
 ' @return The new date object containing the new calculated time.
 '
 Public Function Add(ByRef Value As TimeSpan) As CorDateTime
@@ -911,8 +911,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -220,7 +220,7 @@ Public Sub GetDirectories_WithTopDirectoriesSearchOption_ReturnsOnlyTopDirectory
     Set info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
     
     Dim Actual As Collection
-    Set Actual = GetPathNames(info.GetDirectories(SearchOpt:=SearchOption.TopDirectoryOnly))
+    Set Actual = GetPathNames(info.GetDirectories(SearchOption:=SearchOption.TopDirectoryOnly))
     
     Assert.That Actual, Iz.EquivalentTo(Expected)
 End Sub
@@ -233,7 +233,7 @@ Public Sub GetDirectories_WithAllDirectoriesSearchOption_ReturnsAllFolders()
     Set info = Cor.NewDirectoryInfo(mBuilder.TempFolder)
     
     Dim Actual As Collection
-    Set Actual = GetPathNames(info.GetDirectories(SearchOpt:=SearchOption.AllDirectories))
+    Set Actual = GetPathNames(info.GetDirectories(SearchOption:=SearchOption.AllDirectories))
     
     Assert.That Actual, Iz.EquivalentTo(Expected)
 End Sub

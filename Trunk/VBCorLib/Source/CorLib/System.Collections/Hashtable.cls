@@ -197,7 +197,7 @@ End Function
 ' Copies the contents of the table to an array.
 '
 ' @param Arr The array to copy the contents to.
-' @param Index The starting index in dstArray to begin copying to.
+' @param ArrayIndex The starting index in dstArray to begin copying to.
 ' @remarks The elements that are copied to the array are DictionaryEntry
 ' elements. Each DictionaryEntry contains a key and value from the table.
 '

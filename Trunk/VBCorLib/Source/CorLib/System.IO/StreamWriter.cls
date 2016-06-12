@@ -78,7 +78,7 @@ End Property
 ''
 ' Sets if the writer autoflushes after each write.
 '
-' @param RHS The new value.
+' @param Value The new value.
 '
 Public Property Let AutoFlush(ByVal Value As Boolean)
     mAutoFlush = Value
@@ -123,7 +123,7 @@ End Property
 ''
 ' Sets the new-line string used by this writer.
 '
-' @param RHS The new new-line value.
+' @param Value The new new-line value.
 '
 Public Property Let NewLine(ByVal Value As String)
     mNewLine = Value

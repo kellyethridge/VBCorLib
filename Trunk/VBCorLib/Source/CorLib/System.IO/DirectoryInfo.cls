@@ -415,14 +415,15 @@ End Sub
 ' Returns a list of directories within this directory.
 '
 ' @param SearchPattern A pattern for all directories to match.
+' @param SearchOption One of the enumeration values that specifies whether the search operation should include all subdirectories or only the current directory.
 ' @return A list of all matching directories.
 ' @remarks If no matching directories were found, then an empty array is returned.
 '
-Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As DirectoryInfo()
+Public Function GetDirectories(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOption As SearchOption = TopDirectoryOnly) As DirectoryInfo()
     Dim Directories()   As DirectoryInfo
     Dim Paths()         As String
     
-    Paths = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
+    Paths = Directory.GetDirectories(mPath, SearchPattern, SearchOption)
     
     Dim NumPaths As Long
     NumPaths = CorArray.Length(Paths)
@@ -455,13 +456,14 @@ End Sub
 ' Returns a list of file matching the pattern in this directory.
 '
 ' @param SearchPattern The pattern the files must match.
+' @param SearchOption One of the enumeration values that specifies whether the search operation should include all subdirectories or only the current directory.
 ' @return A list of files that matched the pattern.
 ' @remarks If no files matched the pattern, a zero-length array is returned.
 '
-Public Function GetFiles(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As FileInfo()
+Public Function GetFiles(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOption As SearchOption = TopDirectoryOnly) As FileInfo()
     Dim Ret()   As FileInfo
     Dim Files() As String
-    Files = Directory.GetFiles(mPath, SearchPattern, SearchOpt)
+    Files = Directory.GetFiles(mPath, SearchPattern, SearchOption)
     
     Dim NumFiles As Long
     NumFiles = CorArray.Length(Files)
@@ -482,15 +484,16 @@ End Function
 ' Returns a list of all entries in the directory that match the pattern.
 '
 ' @param SearchPattern The pattern to match against all entries.
+' @param SearchOption One of the enumeration values that specifies whether the search operation should include all subdirectories or only the current directory.
 ' @return A list of all entries that matched the pattern.
 ' @remarks If no entries matched the pattern, a zero-length array is returned.
 '
-Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As FileSystemInfo()
+Public Function GetFileSystemInfos(Optional ByVal SearchPattern As String = "*", Optional ByVal SearchOption As SearchOption = TopDirectoryOnly) As FileSystemInfo()
     Dim Files() As String
-    Files = Directory.GetFiles(mPath, SearchPattern, SearchOpt)
+    Files = Directory.GetFiles(mPath, SearchPattern, SearchOption)
     
     Dim Folders() As String
-    Folders = Directory.GetDirectories(mPath, SearchPattern, SearchOpt)
+    Folders = Directory.GetDirectories(mPath, SearchPattern, SearchOption)
     
     Dim InfoCount As Long
     InfoCount = CorArray.Length(Files) + CorArray.Length(Folders)

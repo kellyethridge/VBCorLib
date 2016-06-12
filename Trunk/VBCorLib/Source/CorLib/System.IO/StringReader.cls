@@ -99,7 +99,7 @@ End Function
 ''
 ' Fills an array with a block of characters from the string.
 '
-' @param Chars The array to receive the characters read from the string.
+' @param Buffer The array to receive the characters read from the string.
 ' @param Index The starting index in <i>Chars</i> to begin writing.
 ' @param Count The maximum number of characters to be read from the string.
 ' @return The actual number of characters read from the string.
@@ -244,8 +244,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

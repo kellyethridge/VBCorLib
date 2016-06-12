@@ -122,8 +122,8 @@ Public Enum NumberNegativePatterns
 End Enum
 
 ''
-' Output patterns for negative currency values. The <b>$</b> is the currency
-' symbol, then <b>-</b> is the negative symbol and <b>n</b> is the number.
+' Output patterns for negative currency values. The <strong>$</strong> is the currency
+' symbol, then <strong>-</strong> is the negative symbol and <strong>n</strong> is the number.
 '
 ' @param [($n)]
 ' @param [-$n]
@@ -161,7 +161,7 @@ Public Enum CurrencyNegativePatterns
 End Enum
 
 ''
-' Output patterns for positive currency values. The <b>$</b> is the currency symbol and <b>n</b> is the number.
+' Output patterns for positive currency values. The <strong>$</strong> is the currency symbol and <strong>n</strong> is the number.
 '
 ' @param [$n]
 ' @param [n$]
@@ -175,22 +175,22 @@ Public Enum CurrencyPositivePatterns
 End Enum
 
 ''
-' Output patterns for positive percentage values. The <b>#</b> is the number and the <b>%</b> is the percentage symbol.
+' Output patterns for positive percentage values. The <strong>#</strong> is the number and the <strong>%</strong> is the percentage symbol.
 '
 ' @param [n %]
 ' @param [n%]
 ' @param [%n]
 ' @param [% n]
 Public Enum PercentPositivePatterns
-    [# %] = 0
-    [#%] = 1
-    [%#] = 2
-    [% #] = 3
+    [n %] = 0
+    [n%] = 1
+    [%n] = 2
+    [% n] = 3
 End Enum
 
 ''
 ' Output patterns for negative percentage values. The <b>-</b> is the negative symbol,
-' <b>#</b> is the number and the <b>%</b> is the percentage symbol.
+' <strong>#</strong> is the number and the <strong>%</strong> is the percentage symbol.
 '
 ' @param [-n %]
 ' @param [-n%]
@@ -205,9 +205,9 @@ End Enum
 ' @param [% -n]
 ' @param [n- %]
 Public Enum PercentNegativePatterns
-    [-# %] = 0
-    [-#%] = 1
-    [-%#] = 2
+    [-n %] = 0
+    [-n%] = 1
+    [-%n] = 2
     [%-n] = 3
     [%n-] = 4
     [n-%] = 5

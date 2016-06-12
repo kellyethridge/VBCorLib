@@ -62,7 +62,7 @@ Public Property Get HashName() As String: End Property
 ''
 ' Sets the name of the hash being used.
 '
-' @param RHS The new name of the hash.
+' @param Value The new name of the hash.
 '
 Public Property Let HashName(ByRef Value As String): End Property
 
@@ -76,7 +76,7 @@ Public Property Get Key() As Byte(): End Property
 ''
 ' Sets the key to be used with the hash process.
 '
-' @param RHS The new key value.
+' @param Value The new key value.
 '
 Public Property Let Key(ByRef Value() As Byte): End Property
 

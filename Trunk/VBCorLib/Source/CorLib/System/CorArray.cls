@@ -487,9 +487,9 @@ End Function
 ''
 ' Clears a portion of the elements in an array.
 '
-' @param arr The array to clear elements from.
+' @param Arr The array to clear elements from.
 ' @param Index The starting element to being clearing.
-' @param Count The number of elements to be cleared.
+' @param Length The number of elements to be cleared.
 '
 Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long)
     Dim pSafeArray  As Long
@@ -543,16 +543,8 @@ End Sub
 '
 ' @param SourceArray The array from which to copy the elements.
 ' @param DestinationArray The array in which to place the elements.
-' @param Count The number of elements to copy.
-' @remarks The AddressOfCopier method signature must be two parameters
-' of ByRef for the datatypes of each of the arrays. The destination
-' array element is the first parameter.
-' <h4>Example</h4> This is an example of a callback method declaration.
-' <pre>
-' Public Sub CopyCallback(ByRef dst As String, ByRef src As MyClass)
-'     dst = src.Name
-' End Sub
-' </pre>
+' @param Length The number of elements to copy.
+'
 Public Sub Copy(ByRef SourceArray As Variant, ByRef DestinationArray As Variant, ByVal Length As Long)
     If IsNull(SourceArray) Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
@@ -565,22 +557,12 @@ End Sub
 ''
 ' Copies a section of one Array to another Array and performs type casting as necessary.
 '
-' @param sourcearray The array from which to copy the elements.
-' @param sourceindex The starting element in the source array to begin copying from.
-' @param destinationarray The array in which to place the elements.
-' @param destinationindex The starting element in the destination array to place elements.
-' @param Count The number of elements to copy.
-' @param AddressOfCopier A callback address to a method used to assign
-' elements from the source array to the destination array.
-' @remarks The AddressOfCopier method signature must be two parameters
-' of ByRef for the datatypes of each of the arrays. The destination
-' array element is the first parameter.
-' <h4>Example</h4> This is an example of a callback method declaration.
-' <pre>
-' Public Sub CopyCallback(ByRef dst As String, ByRef src As MyClass)
-'     dst = src.Name
-' End Sub
-' </pre>
+' @param Sourcearray The array from which to copy the elements.
+' @param Sourceindex The starting element in the source array to begin copying from.
+' @param Destinationarray The array in which to place the elements.
+' @param Destinationindex The starting element in the destination array to place elements.
+' @param Length The number of elements to copy.
+'
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
     Dim pSourceSafeArray As Long
     pSourceSafeArray = ArrayPointer(SourceArray)
@@ -937,8 +919,8 @@ End Sub
 '
 ' @param Arr The array to sort.
 ' @param Index The starting index in the array to start sorting.
-' @param Count The number of elements to be sorted.
-' @param Comparer (Optional) An IComparer object or address of a comparer callback function.
+' @param Length The number of elements to be sorted.
+' @param Comparer An IComparer object or address of a comparer callback function.
 ' @remarks The Comparer parameter can be an <b>IComparer</b> object or a
 ' callback address to a compare function using the <b>AddressOf</b> method. The
 ' callback method signature is defined as follows:

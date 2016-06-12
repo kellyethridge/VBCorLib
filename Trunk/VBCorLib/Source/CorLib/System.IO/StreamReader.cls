@@ -365,7 +365,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal determineEncodingFromByteOrderMarks As Boolean, ByVal BufferSize As Long, ByVal LeaveOpen As Boolean)
+Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal DetermineEncodingFromByteOrderMarks As Boolean, ByVal BufferSize As Long, ByVal LeaveOpen As Boolean)
     If BufferSize <= 0 Then _
         Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
     
@@ -385,7 +385,7 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal deter
             Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
     
-    mDetermineEncoding = determineEncodingFromByteOrderMarks
+    mDetermineEncoding = DetermineEncodingFromByteOrderMarks
     If Encoding Is Nothing Then
         Set mEncoding = Statics.Encoding.UTF8
     Else
@@ -482,7 +482,10 @@ Private Sub DetermineEncoding()
     ' we are going to use the default encoding for the reader.
     
     ' Get the Decoder from the encoding now.
-    If Not mEncoding Is Nothing Then Set mDecoder = mEncoding.GetDecoder
+    If Not mEncoding Is Nothing Then
+        Set mDecoder = mEncoding.GetDecoder
+    End If
+    
     mDetermineEncoding = False
 End Sub
 

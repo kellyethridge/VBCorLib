@@ -44,9 +44,9 @@ Option Explicit
 ''
 ' Returns a formatted value from a custom formatter.
 '
-' @param fmt The formatting information provided.
-' @param arg The value to be formatted.
-' @param provider A provider that may have formatting capabilities.
+' @param FormatText The formatting information provided.
+' @param Arg The value to be formatted.
+' @param Provider A provider that may have formatting capabilities.
 ' @return A formatted value.
 '
 Public Function Format(ByVal FormatText As String, ByRef Arg As Variant, ByVal Provider As IFormatProvider) As String: End Function

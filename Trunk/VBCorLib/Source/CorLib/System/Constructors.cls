@@ -94,10 +94,12 @@ End Function
 ' Creates a new Exception object.
 '
 ' @param Message A human-readable message explaining the exception.
+' @param ErrorNumber Represents a VBA specific error number.
 ' @param InnerException An exception that caused this exception.
 ' @return The fully created Exception object.
 ' @see Exception
-'
+' @remarks
+' The default error number is 5-Invalid Procedure Call.
 Public Function NewException(ByVal Message As String, Optional ByVal ErrorNumber As Long = corInvalidProcedureCall, Optional ByVal InnerException As Exception) As Exception
     Set NewException = New Exception
     NewException.Init Message, ErrorNumber, InnerException
@@ -214,6 +216,7 @@ End Function
 ' @param Message A human-readable message explaining the exception.
 ' @param ActualValue The value of the parameter that caused the exception.
 ' @param InnerException An exception that caused this exception.
+' @param Method Describes the type of method being executed which caused the exception.
 ' @return A fully created AgrumentOutOfRangeException object.
 ' @see ArgumentOutOfRangeException
 '
@@ -615,7 +618,8 @@ End Function
 ' @param Buffer The supplied byte array to act upon.
 ' @param Index The starting index in the array to begin usage.
 ' @param Count The total bytes that can be used by the stream.
-' @param writable Whether or not to allow the stream to be written to.
+' @param Writable Whether or not to allow the stream to be written to.
+' @param Mode Describes how the MemoryStream will manage the Buffer.
 ' @return The newly created MemoryStream containing the supplied byte buffer.
 ' @remarks By using a user supplied buffer, the user can decide how much of the
 ' buffer is actually accessable. The buffer cannot be increased in size. The stream
@@ -771,13 +775,14 @@ End Function
 '
 ' @param Source A FileName used to open an existing file as a FileStream, or an existing Stream object.
 ' @param Encoding The encoding to be used when decoding bytes from the stream.
-' @param determineEncodingFromByteOrderMarks Requests that the reader attempt to determine what type of
+' @param DetermineEncodingFromByteOrderMarks Requests that the reader attempt to determine what type of
 ' encoding is being used in the stream by reading the first few bytes.
 ' @param BufferSize The size of the internal cache used to improve performance.
+' @param LeaveOpen A boolean flag indicating if the underlying stream is to be left open once the StreamReader instance has closed.
 ' @return A newly initialized StreamReader object.
 ' @remarks <p>If a filename is specified, then an internal FileStream object is created using an
 ' initialization of Cor.NewFileStream(Source, FileMode.OpenExisting, FileAccess.ReadAccess, FileShare.ReadShare).</p>
-' <p>If <i>determineEncodingFromByteOrderMarks</i> is True, then up to 3 bytes are read from the stream
+' <p>If <em>DetermineEncodingFromByteOrderMarks</em> is True, then up to 3 bytes are read from the stream
 ' upon the first attempt to read any data from the stream. The bytes are used to determine if a specific
 ' encoding has been used. There are 3 encoding signatures that are looked for.<br>
 ' &HFE, &HFF - UnicodeEncoding with Little Endian byte ordering<br>
@@ -785,9 +790,9 @@ End Function
 ' &HEF, &HBB, &HBF - UTF8Encoding<br>
 ' If no encoding is identified, then Encoding.UTF8 is used.
 '
-Public Function NewStreamReader(ByRef Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal determineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 1024, Optional ByVal LeaveOpen As Boolean) As StreamReader
+Public Function NewStreamReader(ByRef Source As Variant, Optional ByVal Encoding As Encoding, Optional ByVal DetermineEncodingFromByteOrderMarks As Boolean = True, Optional ByVal BufferSize As Long = 1024, Optional ByVal LeaveOpen As Boolean) As StreamReader
     Set NewStreamReader = New StreamReader
-    NewStreamReader.Init Source, Encoding, determineEncodingFromByteOrderMarks, BufferSize, LeaveOpen
+    NewStreamReader.Init Source, Encoding, DetermineEncodingFromByteOrderMarks, BufferSize, LeaveOpen
 End Function
 
 ''
@@ -974,15 +979,27 @@ End Function
 ' Creates a new Hashtable object with specific settings.
 '
 ' @param d An IDictionary object containing keys and values to be added to the Hashtable.
-' @param hcp A hashcode generator used in place of the default hashcode algorithm.
-' @param Comparer A custom comparer used to compare specific values.
+' @param LoadFactor A number in the range from 0.1 through 1.0 that is multiplied by the default value which provides the best performance. The result is the maximum ratio of elements to buckets.
+' @param EqualityComparer The IEqualityComparer object that defines the hash code provider and the comparer to use with the Hashtable object.
 ' @return A new Hashtable object.
+' @see IEqualityComparer
+' @see Hashtable
 '
 Public Function NewHashtable(Optional ByVal d As IDictionary, Optional ByVal LoadFactor As Single = 1!, Optional ByVal EqualityComparer As IEqualityComparer) As Hashtable
     Set NewHashtable = New Hashtable
     NewHashtable.Init d, 0, LoadFactor, EqualityComparer
 End Function
 
+''
+' Creates a new Hashtable object with specific settings.
+'
+' @param Capacity Sets the initial capacity for the Hashtable instance.
+' @param LoadFactor A number in the range from 0.1 through 1.0 that is multiplied by the default value which provides the best performance. The result is the maximum ratio of elements to buckets.
+' @param EqualityComparer The IEqualityComparer object that defines the hash code provider and the comparer to use with the Hashtable object.
+' @return A new Hashtable object.
+' @see IEqualityComparer
+' @see Hashtable
+'
 Public Function NewHashtable2(ByVal Capacity As Long, Optional ByVal LoadFactor As Single = 1!, Optional ByVal EqualityComparer As IEqualityComparer) As Hashtable
     Set NewHashtable2 = New Hashtable
     NewHashtable2.Init Nothing, Capacity, LoadFactor, EqualityComparer
@@ -1130,9 +1147,9 @@ End Function
 ''
 ' Creates a new Queue initialized with the elements in the collection.
 '
-' @param Col The elements to place in the queue upon creation.
+' @param Source The elements to place in the queue upon creation.
 ' @return A Queue object with the elements placed in it.
-' @remarks The <i>Col</i> parameter can be a VBA.Collection, ICollection object or an Array.
+' @remarks The <em>Source</em> parameter can be a VBA.Collection, ICollection object or an Array.
 '
 Public Function NewQueue(ByRef Source As Variant) As Queue
     Set NewQueue = New Queue

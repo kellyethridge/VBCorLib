@@ -102,7 +102,7 @@ End Property
 ''
 ' Sets custom data associated with this Ticker instance.
 '
-' @param RHS The data to associate with this Ticker instance.
+' @param Value The data to associate with this Ticker instance.
 ' @remarks The data is not used by the Ticker. It is to allow
 ' a developer to associate values to the Ticker if needed.
 '
@@ -113,7 +113,7 @@ End Property
 ''
 ' Sets custom data associated with this Ticker instance.
 '
-' @param RHS The data to associate with this Ticker instance.
+' @param Value The data to associate with this Ticker instance.
 ' @remarks The data is not used by the Ticker. It is to allow
 ' a developer to associate values to the Ticker if needed.
 '
@@ -137,7 +137,7 @@ End Property
 ''
 ' Sets if the Ticker event will be recurring or not.
 '
-' @param RHS Flag indicating if the Ticker will be recurring.
+' @param Value Flag indicating if the Ticker will be recurring.
 ' @remarks If AutoReset is set to false, then the Ticker event
 ' will happen only once. The Ticker will need to be restarted
 ' for another event to occur.
@@ -161,7 +161,7 @@ End Property
 ''
 ' Sets the duration between Ticker events in milliseconds.
 '
-' @param RHS Duration between events in milliseconds.
+' @param Value Duration between events in milliseconds.
 ' @remarks If the Ticker is already running, it will be reset
 ' and begin a new duration with the new interval.
 '
@@ -187,7 +187,7 @@ End Property
 ''
 ' Sets the Ticker to be stopped or running.
 '
-' @param RHS Value indicating if the Ticker is stopped or running.
+' @param Value Value indicating if the Ticker is stopped or running.
 ' @remarks If setting Enabled to True and the Ticker is already
 ' running, then the Ticker will be stopped and restarted.
 '
@@ -293,8 +293,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
