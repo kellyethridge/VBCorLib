@@ -58,6 +58,6 @@ Option Explicit
 ' a is the same value as b returns a 0.<br>
 ' a is less than the value b returns a negative value (-1).<br>
 ' a is greater than the value b returns a positive value (1).<br>
-' @include "..\..\Includes\IComparerCompare.txt"
+' @include "..\DocIncludes\IComparer.Compare.txt"
 Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long: End Function
 

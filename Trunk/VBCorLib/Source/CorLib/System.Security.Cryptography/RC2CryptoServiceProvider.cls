@@ -40,7 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks This class uses the Windows CryptoAPI services.
 ' @see RC2
-' @include "..\..\..\Includes\RC2CryptoServiceProviderExample.txt"
+' @include "..\DocIncludes\RC2CryptoServiceProvider.txt"
 Option Explicit
 Implements IObject
 Implements SymmetricAlgorithm
@@ -394,8 +394,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

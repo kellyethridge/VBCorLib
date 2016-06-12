@@ -48,7 +48,7 @@ Attribute VB_Exposed = True
 ' @see DateTimeFormatInfoStatic
 ' @see ICloneable
 ' @see IFormatProvider
-' @include "..\..\Includes\DateTimeFormatInfo.txt"
+' @include "..\DocIncludes\DateTimeFormatInfo.txt"
 Option Explicit
 Implements IObject
 Implements ICloneable
@@ -1328,8 +1328,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

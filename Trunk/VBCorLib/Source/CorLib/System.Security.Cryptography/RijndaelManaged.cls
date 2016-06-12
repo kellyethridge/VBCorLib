@@ -40,7 +40,7 @@ Attribute VB_Exposed = True
 '
 ' @remarks Details about Rijndael can be found here: http://www.iaik.tugraz.at/research/krypto/AES/old/~rijmen/rijndael/
 ' @see RijndaelManagedTransform
-' @include "..\..\..\Includes\RijndaelManagedExample.txt"
+' @include "..\DocIncludes\RijndaelManaged.txt"
 Option Explicit
 Implements IObject
 Implements SymmetricAlgorithm
