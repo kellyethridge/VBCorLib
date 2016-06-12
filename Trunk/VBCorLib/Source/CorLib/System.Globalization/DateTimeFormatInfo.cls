@@ -48,7 +48,7 @@ Attribute VB_Exposed = True
 ' @see DateTimeFormatInfoStatic
 ' @see ICloneable
 ' @see IFormatProvider
-' @include "..\DocIncludes\DateTimeFormatInfo.txt"
+' @include "..\DocIncludes\DateTimeFormatInfo.html"
 Option Explicit
 Implements IObject
 Implements ICloneable

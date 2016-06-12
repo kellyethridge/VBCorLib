@@ -102,7 +102,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\DocIncludes\CorArray.Find.txt"
+' @include "..\DocIncludes\CorArray.Find.html"
 Public Function Find(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
     
@@ -133,7 +133,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\DocIncludes\CorArray.Find.txt"
+' @include "..\DocIncludes\CorArray.Find.html"
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     ValidateArray Arr
     Dim Ptr As Long
@@ -188,7 +188,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\DocIncludes\CorArray.Find.txt"
+' @include "..\DocIncludes\CorArray.Find.html"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     ValidateArray Arr
     
@@ -292,7 +292,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\DocIncludes\CorArray.Find.txt"
+' @include "..\DocIncludes\CorArray.Find.html"
 Public Function FindLast(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
     Dim Index As Long
     
@@ -322,7 +322,7 @@ End Function
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\DocIncludes\CorArray.Find.txt"
+' @include "..\DocIncludes\CorArray.Find.html"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     ValidateArray Arr
     
@@ -455,7 +455,7 @@ End Sub
 ' following is how to convert the return value to the array index:<br><br>
 ' Lowerbound of 0:  return = Not return<br>
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
-' @include "..\DocIncludes\CorArray.BinarySearch.txt"
+' @include "..\DocIncludes\CorArray.BinarySearch.html"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     ValidateArray Arr
     BinarySearch = InternalBinarySearch(Arr, LBound(Arr), CorArray.LengthFirstDim(Arr), Value, Comparer)
@@ -478,7 +478,7 @@ End Function
 ' following is how to convert the return value to the array index:<br><br>
 ' Lowerbound of 0:  return = Not return<br>
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
-' @include "..\DocIncludes\CorArray.BinarySearch.txt"
+' @include "..\DocIncludes\CorArray.BinarySearch.html"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     ValidateArrayRange Arr, Index, Length, CountParameter:=Parameter_Length
     BinarySearchEx = InternalBinarySearch(Arr, Index, Length, Value, Comparer)
@@ -920,7 +920,7 @@ End Sub
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\DocIncludes\CorArray.Sort.txt"
+' @include "..\DocIncludes\CorArray.Sort.html"
 Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
@@ -981,7 +981,7 @@ End Sub
 ' array is an array of Variants, then [Array Datatype] would be a Variant, not
 ' any specific sub-type within the variants of the array.</p>
 '
-' @include "..\DocIncludes\CorArray.SortKey.txt"
+' @include "..\DocIncludes\CorArray.SortKey.html"
 Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Keys) Then _
         Error.ArgumentNull "Keys", ArgumentNull_Array

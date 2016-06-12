@@ -39,7 +39,7 @@ Attribute VB_Exposed = True
 ' Provides cryptographic services using the TripleDES cryptographic service provider.
 '
 ' @see TripleDESStatic
-' @include "..\DocIncludes\TripleDESCryptoServiceProvider.txt"
+' @include "..\DocIncludes\TripleDESCryptoServiceProvider.html"
 Option Explicit
 Implements IObject
 Implements SymmetricAlgorithm
