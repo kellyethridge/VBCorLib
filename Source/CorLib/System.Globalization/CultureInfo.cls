@@ -328,7 +328,7 @@ End Property
 ''
 ' Sets the NumberFormatInfo for the specific culture object.
 '
-' @param RHS The NumberFormatInfo to associate with this object instance.
+' @param Value The NumberFormatInfo to associate with this object instance.
 '
 Public Property Set NumberFormat(ByVal Value As NumberFormatInfo)
     VerifyWritable
@@ -360,7 +360,7 @@ End Property
 ''
 ' Sets the DateTimeFormatInfo for the specific culture object.
 '
-' @param RHS The DateTimeFormatInfo object to associate with this object instance.
+' @param Value The DateTimeFormatInfo object to associate with this object instance.
 '
 Public Property Set DateTimeFormat(ByVal Value As DateTimeFormatInfo)
     VerifyWritable
@@ -577,8 +577,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

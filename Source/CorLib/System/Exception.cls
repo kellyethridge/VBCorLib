@@ -162,7 +162,7 @@ End Property
 ''
 ' Sets a description of the source of the exception.
 '
-' @param RHS A description of the source of the exception.
+' @param Value A description of the source of the exception.
 ' @remarks The source of an exception generally will contain the name of
 ' the function being called when the exception was thrown. This is to help
 ' narrow down exactly where the exception had occurred.
@@ -283,8 +283,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

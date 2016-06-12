@@ -169,7 +169,7 @@ End Property
 ''
 ' Sets the read timeout duration.
 '
-' @param RHS The timeout duration in milliseconds.
+' @param Value The timeout duration in milliseconds.
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Let ReadTimeout(ByVal Value As Long)
@@ -189,7 +189,7 @@ End Property
 ''
 ' Sets the write timeout duration.
 '
-' @param RHS The timeout duration in milliseconds.
+' @param Value The timeout duration in milliseconds.
 ' @remarks This is not supported in FileStream. An exception will be thrown.
 '
 Public Property Let WriteTimeout(ByVal Value As Long)

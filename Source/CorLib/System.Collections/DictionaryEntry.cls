@@ -63,7 +63,7 @@ End Property
 ''
 ' Sets the key portion of the entry.
 '
-' @param RHS The new key to set the entry to.
+' @param Value The new key to set the entry to.
 '
 Public Property Let Key(ByRef Value As Variant)
     mKey = Value
@@ -72,7 +72,7 @@ End Property
 ''
 ' Sets the key portion of the entry.
 '
-' @param RHS The new key to set the entry to.
+' @param Value The new key to set the entry to.
 '
 Public Property Set Key(ByRef Value As Variant)
     Set mKey = Value
@@ -90,7 +90,7 @@ End Property
 ''
 ' Sets the value portion of the entry.
 '
-' @param RHS The new value to set the entry to.
+' @param Value The new value to set the entry to.
 '
 Public Property Let Value(ByRef Value As Variant)
     mValue = Value
@@ -99,7 +99,7 @@ End Property
 ''
 ' Sets the value portion of the entry.
 '
-' @param RHS The new value to set the entry to.
+' @param Value The new value to set the entry to.
 '
 Public Property Set Value(ByRef Value As Variant)
     Set mValue = Value
@@ -175,8 +175,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

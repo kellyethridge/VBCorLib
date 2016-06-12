@@ -410,8 +410,8 @@ End Sub
 ''
 ' Inserts a collection of items into the list.
 '
-' @param index The index at which the items will be inserted.
-' @param c The collection of items to be inserted into the list.
+' @param Index The index at which the items will be inserted.
+' @param Source The collection of items to be inserted into the list.
 ' @remarks When the items are inserted, the items starting at the
 ' index will be moved out a number of spaced equal to the number of
 ' items to be inserted. If the capacity is reached, the list will
@@ -453,7 +453,7 @@ End Property
 ''
 ' Returns an item from the list.
 '
-' @param index The index in the list from which to return the item.
+' @param Index The index in the list from which to return the item.
 ' @return The item as the specified index.
 ' @remarks This property is set as the <i>Default</i> property for
 ' this class. Items can be accessed parentheses:<br><br>
@@ -471,8 +471,8 @@ End Property
 ''
 ' Sets an item in the list to a value.
 '
-' @param index The index in the list to set the value.
-' @param RHS The value to set in the list.
+' @param Index The index in the list to set the value.
+' @param Value The value to set in the list.
 ' @remarks This property is set as the <i>Default</i> property for
 ' this class. Items can be accessed using parentheses:<br><br>
 ' list(index) = value<br><br>
@@ -489,8 +489,8 @@ End Property
 ''
 ' Sets an item in the list to a value.
 '
-' @param index The index in the list to set the value.
-' @param RHS The value to set in the list.
+' @param Index The index in the list to set the value.
+' @param Value The value to set in the list.
 ' @remarks This property is set as the <i>Default</i> property for
 ' this class. Items can be accessed parentheses:<br><br>
 ' Set list(index) = value<br><br>

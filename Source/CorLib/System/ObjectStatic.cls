@@ -156,9 +156,12 @@ End Function
 ''
 ' Returns a default string representation of an object.
 '
-' @param YourObject The object to derive the name from.
-' @param YourApp the App object from the calling function.
-' @return A string representation of the object.
+' @param Value The value to create a string representation of.
+' @param Format Will be applied if the value implements <em>IFormattable</em>.
+' @param Provider Will be applied if the value implements <em>IFormattable</em>.
+' @return A string representation of the value.
+' @see IFormattable
+' @see IFormatProvider
 '
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim ValueType As VbVarType

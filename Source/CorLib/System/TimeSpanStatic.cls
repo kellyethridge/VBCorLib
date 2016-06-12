@@ -211,8 +211,8 @@ End Function
 ' @return Returns True if the string is successfully parsed, false otherwise.
 ' @remarks This method does not raise an error if the string cannot be parsed.
 '
-Public Function TryParse(ByVal s As String, ByRef RetVal As TimeSpan) As Boolean
-    TryParse = mParser.TryParse(s, RetVal)
+Public Function TryParse(ByVal s As String, ByRef Result As TimeSpan) As Boolean
+    TryParse = mParser.TryParse(s, Result)
 End Function
 
 ''

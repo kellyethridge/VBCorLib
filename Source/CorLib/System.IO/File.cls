@@ -409,7 +409,7 @@ End Sub
 ''
 ' Sets the last time the file was written to in local time.
 '
-' @param sPath The file to set the last written time for.
+' @param Path The file to set the last written time for.
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTime(ByRef Path As String, ByRef LastWriteTime As Variant)
@@ -419,7 +419,7 @@ End Sub
 ''
 ' Sets the last time the file was written to in UTC time.
 '
-' @param sPath The file to set the last written time for.
+' @param Path The file to set the last written time for.
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTimeUtc(ByRef Path As String, ByRef LastWriteTime As Variant)

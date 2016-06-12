@@ -150,7 +150,7 @@ End Property
 ''
 ' Sets the calendar associated with this <b>DateTimeFormatInfo</b>.
 '
-' @param RHS The calendar to associate with this object.
+' @param Value The calendar to associate with this object.
 '
 Public Property Set Calendar(ByVal Value As Calendar)
     VerifyWritable

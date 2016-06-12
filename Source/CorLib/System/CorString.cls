@@ -51,6 +51,13 @@ Option Explicit
 '
 ' @remarks The values assigned to each enum is equal to the .NET version of the enum.
 '
+    
+''
+' String comparisons
+'
+' @param Ordinal Specifies a case-sensitive string comparison.
+' @param OrdinalIgnoreCase Specifies a case-insensitive string comparison.
+'
 Public Enum StringComparison
     Ordinal = 4
     OrdinalIgnoreCase = 5

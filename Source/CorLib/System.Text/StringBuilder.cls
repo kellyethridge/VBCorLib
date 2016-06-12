@@ -441,7 +441,7 @@ End Property
 ''
 ' Sets the length of the current string value.
 '
-' @param RHS The length of the string value.
+' @param Value The length of the string value.
 ' @remarks If the new value is longer than the current length, then the
 ' new space is padded with FillCharacter (default 32).
 '
@@ -461,10 +461,10 @@ End Property
 ''
 ' Removes a number of characters from the string value.
 '
-' @param startindex The index in the string value to start removing from.
-' @param count The number of characters to remove from the string value.
+' @param StartIndex The index in the string value to start removing from.
+' @param Length The number of characters to remove from the string value.
 ' @return This instance of StringBuilder.
-' @remarks startindex is zero-based.
+' @remarks StartIndex is zero-based.
 '
 Public Function Remove(ByVal StartIndex As Long, ByVal Length As Long) As StringBuilder
     If StartIndex < 0 Then _

@@ -264,14 +264,14 @@ End Function
 ' that matches the search pattern.
 '
 ' @param Path The directory to find the requested directories.
-' @param SearchPattern A pattern to compare all the directories against, returning
-' those that match the pattern.
+' @param SearchPattern A pattern to compare all the directories against, returning those that match the pattern.
+' @param SearchOption One of the enumeration values that specifies whether the search operation should include all subdirectories or only the current directory.
 ' @return An array of the matching directories. If no directories match the pattern, then
 ' an empty zero-length array.
 ' @remarks The path can be absolute or relative.
 '
-Public Function GetDirectories(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
-    GetDirectories = InternalGetFileSystemEntries(Path, SearchPattern, DirectoryEntry, SearchOpt)
+Public Function GetDirectories(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional ByVal SearchOption As SearchOption = TopDirectoryOnly) As String()
+    GetDirectories = InternalGetFileSystemEntries(Path, SearchPattern, DirectoryEntry, SearchOption)
 End Function
 
 ''
@@ -300,13 +300,14 @@ End Function
 '
 ' @param Path The directory to search for the matching files.
 ' @param SearchPattern A pattern to match the files against.
+' @param SearchOption One of the enumeration values that specifies whether the search operation should include all subdirectories or only the current directory.
 ' @return The list of matching file names. If no filenames matched, then an empty,
 ' zero-length array is returned.
 ' @remarks The path can be absolute or relative. The path is not included in the
 ' filename result.
 '
-Public Function GetFiles(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional ByVal SearchOpt As SearchOption = TopDirectoryOnly) As String()
-    GetFiles = InternalGetFileSystemEntries(Path, SearchPattern, FileEntry, SearchOpt)
+Public Function GetFiles(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional ByVal SearchOption As SearchOption = TopDirectoryOnly) As String()
+    GetFiles = InternalGetFileSystemEntries(Path, SearchPattern, FileEntry, SearchOption)
 End Function
 
 ''
@@ -314,12 +315,13 @@ End Function
 '
 ' @param Path The directory to search for the files and directories.
 ' @param SearchPattern The pattern the filenames and directories must match.
+' @param SearchOption One of the enumeration values that specifies whether the search operation should include all subdirectories or only the current directory.
 ' @return The list of files and directories that matched the pattern. If no files or directories
 ' matched the pattern, then an empty, zero-length array is returned.
 ' @remarks The path can be absolute or relative.
 '
-Public Function GetFileSystemEntries(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional SearchOpt As SearchOption = TopDirectoryOnly) As String()
-    GetFileSystemEntries = InternalGetFileSystemEntries(Path, SearchPattern, DirectoryEntry Or FileEntry, SearchOpt)
+Public Function GetFileSystemEntries(ByRef Path As String, Optional ByRef SearchPattern As String = "*", Optional SearchOption As SearchOption = TopDirectoryOnly) As String()
+    GetFileSystemEntries = InternalGetFileSystemEntries(Path, SearchPattern, DirectoryEntry Or FileEntry, SearchOption)
 End Function
 
 ''

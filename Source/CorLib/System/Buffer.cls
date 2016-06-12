@@ -57,7 +57,7 @@ Option Explicit
 ' @param Source The array to copy bytes from.
 ' @param SourceOffset The starting byte position to begin copying.
 ' @param Destination The array to receive the bytes.
-' @param DestinationIndex The starting byte position to begin setting bytes.
+' @param DestinationOffset The starting byte position to begin setting bytes.
 ' @param Count The number of bytes to be copied.
 ' @remarks <p>The arrays are treated as byte arrays, so no datatype conversion
 ' takes place. All indexes are in bytes, not in the datatype of the specific

@@ -103,18 +103,18 @@ Option Explicit
 ' subset of a Unicode character string consisting of base-64 characters. Parameters specify
 ' the subsets as offsets of the input array and the number of elements in the input array to process.
 '
-' @param Bytes The bytes to be converted to a base-64 character array.
-' @param Index Index within <i>Bytes</i> to begin encoding to base-64 characters.
-' @param Count The number of bytes to encode.
+' @param InArray The bytes to be converted to a base-64 character array.
+' @param Offset Offset within <em>Bytes</em> to begin encoding to base-64 characters.
+' @param Length The number of bytes to encode.
 ' @param InsertLineBreaks Indicates if a vbCrLf should be inserted every 76 characters to
 ' conform with MIME line formatting.
 ' @return A string containg the byte array encoded as base-64 characters.
 '
-Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Index As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
+Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
     Dim Range As ListRange
     
     ValidateByteArray InArray, Parameter_InArray
-    Range = OptionalStepRange(Index, Length, LBound(InArray), CorArray.LengthFirstDim(InArray))
+    Range = OptionalStepRange(Offset, Length, LBound(InArray), CorArray.LengthFirstDim(InArray))
     If Range.Index < LBound(InArray) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _
@@ -175,14 +175,14 @@ End Function
 ' @param Length The number of characters to be decoded into the byte array.
 ' @return A byte array that has been decoded from a base-64 character array.
 '
-Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As Long, ByVal Length As Long) As Byte()
+Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As Long, ByVal Length As Long) As Byte()
     ValidateCharArray InArray, Parameter_InArray
-    If IndexIn < LBound(InArray) Then _
-        Error.ArgumentOutOfRange "IndexIn", ArgumentOutOfRange_LBound
+    If Offset < LBound(InArray) Then _
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Length < 0 Then _
         Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
-    If IndexIn + Length - 1 > UBound(InArray) Then _
-        Error.ArgumentOutOfRange "IndexIn", ArgumentOutOfRange_IndexLength
+    If Offset + Length - 1 > UBound(InArray) Then _
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_IndexLength
     
     Dim Ret() As Byte
     SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, Length)
@@ -194,7 +194,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal IndexIn As
     Dim Ch          As Integer
     Dim CharCount   As Long
     Dim TermCount   As Long
-    For i = IndexIn To IndexIn + Length - 1
+    For i = Offset To Offset + Length - 1
         Ch = InArray(i)
         Select Case Ch
             Case corEqualChar
