@@ -1,0 +1,62 @@
+@remarks <h4>Example</h4>
+This example shows several methods of enumerating over an <b>ArrayList</b> object.
+<pre>
+Private Sub Main()
+    Dim list As New ArrayList
+    
+    list.Add "The"
+    list.Add "quick"
+    list.Add "brown"
+    list.Add "fox"
+    
+    '' Display the words using the standard For..Each method.
+    Console.WriteLine "Using For..Each"
+    IterateUsingForEach list
+    
+    '' Display the words using the enumerator manually.
+    Console.WriteLine "Using an Enumerator"
+    IterateUsingEnumerator list
+    
+    '' Display a subset of the list using For..Each.
+    Console.WriteLine "Itertate Subset"
+    IterateSubset list, 1, 2
+    
+End Sub
+
+Private Sub IterateUsingForEach(ByVal list As ArrayList)
+    Dim word As Variant
+    
+    For Each word In list
+        Console.WriteValue vbTab & word
+    Next word
+    Console.WriteLine
+End Sub
+
+Private Sub IterateUsingEnumerator(ByVal list As ArrayList)
+    Dim en As IEnumerator
+    
+    Set en = list.GetEnumerator
+    Do While en.MoveNext
+        Console.WriteValue vbTab & en.Current
+    Loop
+    Console.WriteLine
+End Sub
+
+Private Sub IterateSubset(ByVal list As ArrayList, ByVal StartIndex As Long, ByVal Count As Long)
+    Dim word As Variant
+    
+    For Each word In list.GetEnumerator(StartIndex, Count)
+        Console.WriteLine "word is {0}", word
+    Next word
+End Sub
+
+'' The following output is produced by this code.
+''
+'' Using For..Each
+''     The    quick    brown    fox
+'' Using an Enumerator
+''     The    quick    brown    fox
+'' Iterate Subset
+'' word is quick
+'' word is brown
+</pre>

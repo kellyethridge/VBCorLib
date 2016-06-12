@@ -1,0 +1,42 @@
+@remarks <p>This example shows a very simple method of encrypting then decrypting a String value.
+<pre>
+Private Sub Main()
+    '' Create a new TripleDESCryptoServiceProvider key.
+    Dim Key As New TripleDESCryptoServiceProvider
+
+    '' Encrypt a string to a byte array.
+    Dim Buffer() As Byte
+    Buffer = Encrypt("This is some plaintext!", Key)
+
+    '' Decrypt the byte array back to a string.
+    Dim PlainText As String
+    PlainText = Decrypt(Buffer, Key)
+
+    '' Display the plaintext value to the console.
+    Console.WriteLine PlainText
+    Console.ReadKey
+End Sub 'Main
+
+
+'' Encrypt the string.
+Private Function Encrypt(ByVal PlainText As String, ByVal Key As SymmetricAlgorithm) As Byte()
+    Dim Buffer() As Byte
+    Buffer = StrConv(PlainText, vbFromUnicode)
+
+    Dim Encryptor As ICryptoTransform
+    Set Encryptor = Key.CreateEncryptor
+    Encrypt = Encryptor.TransformFinalBlock(Buffer, 0, cArray.GetLength(Buffer))
+End Function
+
+
+'' Decrypt the byte array.
+Public Function Decrypt(ByRef CypherText() As Byte, ByVal Key As SymmetricAlgorithm) As String
+    Dim Decryptor As ICryptoTransform
+    Set Decryptor = Key.CreateDecryptor
+    
+    Dim Buffer() As Byte
+    Buffer = Decryptor.TransformFinalBlock(CypherText, 0, cArray.GetLength(CypherText))
+    Decrypt = StrConv(Buffer, vbUnicode)
+End Function
+
+</pre></p>

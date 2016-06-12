@@ -1,0 +1,28 @@
+@remarks
+<h4>Example</h4>
+This examples shows how to continually read a line of characters from the
+Console keyboard. The function will block and wait for a NewLine (Return Key)
+is reached. All characters are returned not including the the NewLine characters.
+<pre>
+    Dim s As String
+    
+    '' Reads all of the characters upto a NewLine break.
+    '' If there are no characters (including NewLine) in the
+    '' buffer, then the function will block and wait.
+    s = Console.ReadLine
+    
+    '' Exit the loop if an empty line is returned.
+    Do While Len(s) > 0
+        Debug.Print s
+        DoEvents
+        
+        '' Continue reading an entire line at once. If no
+        '' characters are available, then the function will
+        '' block until the return key is pressed.
+        s = Console.ReadLine
+    Loop
+</pre>
+As shown here, the loop continually reads in an entire line of characters
+until an empty line is returned. The function blocks when no characters remain
+to be read in from the console input. The NewLine characters are not returned
+with the line.

@@ -1,0 +1,213 @@
+@remarks The following table lists standard formats to be used when formatting
+' dates. The format characters are associated with the <b>DateTimeFormatInfo</b>
+' class in representing date formats. The characters are case-sensitive.
+' <br><br>This table is taken from Microsoft .NET 1.1 MSDN.
+' <table>
+' <tr>
+' <th width="50%">Format Character</th><th>Description and Associated Properties</th>
+' </tr>
+' <tr>
+' <td>d</td>
+' <td>ShortDatePattern</td>
+' </tr>
+' <tr>
+' <td>D</td>
+' <td>LongDatePattern</td>
+' </tr>
+' <tr>
+' <td>f</td>
+' <td>Full Date and Time (Long Date and Short Time)</td>
+' </tr>
+' <tr>
+' <td>F</td>
+' <td>FullDateTimePattern (Long Date and Long Time)</td>
+' </tr>
+' <tr>
+' <td>g</td>
+' <td>General (Short Date and Short Time)</td>
+' </tr>
+' <tr>
+' <td>G</td>
+' <td>General (Short Date and Long Time)</td>
+' </tr>
+' <tr>
+' <td>m,M</td>
+' <td>MonthDayPattern</td>
+' </tr>
+' <tr>
+' <td>r,R</td>
+' <td>RFC1123Pattern</td>
+' </tr>
+' <tr>
+' <td>s</td>
+' <td>SortableDateTimePattern</td>
+' </tr>
+' <tr>
+' <td>t</td>
+' <td>ShortTimePattern</td>
+' </tr>
+' <td>T</td>
+' <td>LongTimePattern</td>
+' </tr>
+' <tr>
+' <td>u</td>
+' <td>UniversalSortableDateTimePattern</td>
+' </tr>
+' <tr>
+' <td>U</td>
+' <td>Full Date and Time (Long Date, Long Time) using universal time</td>
+' </tr>
+' <tr>
+' <td>y,Y</td>
+' <td>YearMonthPattern</td>
+' </tr>
+' </table>
+' The following table lists custom formatting characters that are used
+' to create custom date formats. Characters and whitespace contained within
+' a pair of single or double quotes will be included in the output. The format
+' characters are case-sensitive, so "MM" is recognized, but "mm" is not.
+' <table>
+' <tr>
+' <th width="50%">Format Character</th><th>Description and Associated Properties</th>
+' </tr>
+' <tr>
+' <td>d</td>
+' <td>The day of the month. Single-digit days will not have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>dd</td>
+' <td>The day of the month. Single-digit days will have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>ddd</td>
+' <td>The abbreviated name of the day of the week, as defined in AbbreviatedDayNames.</td>
+' </tr>
+' <tr>
+' <td>dddd</td>
+' <td>The full name of the day of the week, as defined in DayNames.</td>
+' </tr>
+' <tr>
+' <td>M</td>
+' <td>The numeric month. Single-digit months will not have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>MM</td>
+' <td>The numeric month. Single-digit months will have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>MMM</td>
+' <td>The abbreviated name of the month, as defined in AbbreviatedMonthNames.</td>
+' </tr>
+' <tr>
+' <td>MMMM</td>
+' <td>The full name of the month, as defined in MonthNames.</td>
+' </tr>
+' <tr>
+' <td>y</td>
+' <td>The year without the century. If the year without the century is less than 10, the year is displayed with no leading zero.</td>
+' </tr>
+' <tr>
+' <td>yy</td>
+' <td>The year without the century. If the year without the century is less than 10, the year is displayed with a leading zero.</td>
+' </tr>
+' <tr>
+' <td>yyyy</td>
+' <td>The year in four digits, including the century.</td>
+' </tr>
+' <tr>
+' <td>h</td>
+' <td>The hour in a 12-hour clock. Single-digit hours will not have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>hh</td>
+' <td>The hour in a 12-hour clock. Single-digit hours will have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>H</td>
+' <td>The hour in a 24-hour clock. Single-digit hours will not have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>HH</td>
+' <td>The hour in a 24-hour clock. Single-digit hours will have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>m</td>
+' <td>The minute. Single-digit minutes will not have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>mm</td>
+' <td>The minute. Single-digit minutes will have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>s</td>
+' <td>The second. Single-digit seconds will not have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>ss</td>
+' <td>The second. Single-digit seconds will have a leading zero.</td>
+' </tr>
+' <tr>
+' <td>f</td>
+' <td>The fraction of a second in single-digit precision. The remaining digits are truncated.</td>
+' </tr>
+' <tr>
+' <td>ff</td>
+' <td>The fraction of a second in double-digit precision. The remaining digits are truncated.</td>
+' </tr>
+' <tr>
+' <td>fff</td>
+' <td>The fraction of a second in three-digit precision. The remaining digits are truncated.</td>
+' </tr>
+' <tr>
+' <td>ffff</td>
+' <td>The fraction of a second in four-digit precision. The remaining digits are truncated.</td>
+' </tr>
+' <tr>
+' <td>fffff</td>
+' <td>The fraction of a second in five-digit precision. The remaining digits are truncated.</td>
+' </tr>
+' <tr>
+' <td>ffffff</td>
+' <td>The fraction of a second in six-digit precision. The remaining digits are truncated.</td>
+' </tr>
+' <tr>
+' <td>fffffff</td>
+' <td>The fraction of a second in seven-digit precision. The remaining digits are truncated.</td>
+' </tr>
+' <tr>
+' <td>t</td>
+' <td>The first character in the AM/PM designator defined in AMDesignator or PMDesignator, if any.</td>
+' </tr>
+' <tr>
+' <td>tt</td>
+' <td>The AM/PM designator defined in AMDesignator or PMDesignator, if any.</td>
+' </tr>
+' <tr>
+' <td>z</td>
+' <td>The time zone offset ("+" or "-" followed by the hour only). Single-digit hours will not have a leading zero. For example, Pacific Standard Time is "-8".</td>
+' </tr>
+' <tr>
+' <td>zz</td>
+' <td>The time zone offset ("+" or "-" followed by the hour only). Single-digit hours will have a leading zero. For example, Pacific Standard Time is "-08".</td>
+' </tr>
+' <tr>
+' <td>zzz</td>
+' <td>The full time zone offset ("+" or "-" followed by the hour and minutes). Single-digit hours and minutes will have leading zeros. For example, Pacific Standard Time is "-08:00".</td>
+' </tr>
+' <tr>
+' <td>:</td>
+' <td>The default time separator defined in TimeSeparator.</td>
+' </tr>
+' <tr>
+' <td>/</td>
+' <td>The default date separator defined in DateSeparator.</td>
+' </tr>
+' <tr>
+' <td>%<i>c</i></td>
+' <td>Where <i>c</i> is a format pattern if used alone. The "%" character can be omitted if the format pattern is combined with literal characters or other format patterns.</td>
+' </tr>
+' <tr>
+' <td>\<i>c</i></td>
+' <td>Where <i>c</i> is any character. Displays the character literally. To display the backslash character, use "\\".</td>
+' </tr>
+' </table>

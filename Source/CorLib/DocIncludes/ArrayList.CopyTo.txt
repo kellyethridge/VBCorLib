@@ -1,0 +1,91 @@
+@remarks
+<h4>Exceptions</h4>
+<table>
+<tr><th width="50%">Exception Type</th><th>Condition</th></tr>
+<tr>
+<td>ArgumentNullException</td><td>The destination array is a null array.</td>
+</tr>
+<tr>
+<td>ArgumentException</td><td><i>dstArray</i> is Multi-Dimension.<br>
+- or -<br>
+The number of elements in the <b>ArrayList</b> is greater than the
+destination array can contain.</td>
+</tr>
+<tr>
+<td>InvalidCastException</td><td>Elements in the <b>ArrayList</b> cannot be
+converted to a compatible datatype of the <i>dstArray</i>.</td>
+</tr>
+</table>
+<h4>Example</h4>
+This example shows how to copy elements from an <b>ArrayList</b> into an
+existing array, replacing any elements in the destination array.
+<pre>
+Private Sub Main()
+
+    '' Create our initial story in a regular String array.
+    Dim story() As String
+    story = cArray.NewArray(ciString, "Humpty", "Dumpty", "sat", "on", "a", "wall.")
+    
+    '' Display the current story.
+    Console.WriteLine "The initial story is:"
+    PrintValues story
+    
+    '' Create a new story in an ArrayList.
+    Dim words As New ArrayList
+    words.Add "Peter"
+    words.Add "Rabbit"
+    words.Add "slept"
+    words.Add "under"
+    words.Add "a"
+    words.Add "tree."
+    
+    '' Copies the third word to same word location in the array.
+    words.CopyToEx 2, story, 2, 1
+    
+    '' Display the new story.
+    Console.WriteLine "The story with 'sat' substituted by 'slept' is:"
+    PrintValues story
+    
+    '' Copies the first two elements to the first
+    '' two elements in the array.
+    words.CopyToEx 0, story, 0, 2
+    
+    '' Display the story with the new name.
+    Console.WriteLine "The story with the name changed is:"
+    PrintValues story
+    
+    '' Increase the size of the story array.
+    ReDim Preserve story(0 To 11)
+    
+    '' Append the words to the end of the current story.
+    words.CopyTo story, 6
+    
+    '' Display the final story.
+    Console.WriteLine "The final story is:"
+    PrintValues story
+    
+    '' Wait for a user presses Return.
+    Console.ReadLine
+End Sub
+
+Private Sub PrintValues(ByRef s() As String)
+    Dim i As Long
+    
+    Console.WriteValue vbTab
+    For i = LBound(s) To UBound(s)
+        Console.WriteValue "{0} ", s(i)
+    Next i
+    Console.WriteLine
+End Sub
+
+'' This code produces the following output.
+''
+'' The initial story is:
+''     Humpty Dumpty sat on a wall.
+'' The story with 'sat' substituted by 'slept' is:
+''     Humpty Dumpty slept on a wall.
+'' The story with the name changed is:
+''     Peter Rabbit slept on a wall.
+'' The final story is:
+''     Peter Rabbit slept on a wall. Peter Rabbit slept under a tree.
+</pre>

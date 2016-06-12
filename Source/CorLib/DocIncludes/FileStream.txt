@@ -1,0 +1,38 @@
+@remarks <h4>Example</h4>
+<pre>
+'' This example creates a new file and writes an array
+'' of bytes containing the encoded string data. Once
+'' the file is written to, it is re-opened and read from
+'' recreating the original string for display.
+Private Sub Main()
+    Dim fs As FileStream
+    Dim b() As Byte
+    
+    '' Encode a string using the default encoding scheme.
+    b = Encoding.Default.GetBytes("Hello")
+    
+    '' Open a text file. If the file already exits, it
+    '' will be overwritten.
+    Set fs = NewFileStream("data.txt", FileMode.Create)
+    
+    '' Write the encoded bytes to the file stream
+    fs.WriteBlock b, 0, cArray.GetLength(b)
+    fs.CloseStream
+    
+    '' Re-open the the file using a new FileStream object.
+    Set fs = NewFileStream("data.txt", FileMode.OpenExisting)
+    
+    '' Resize the byte array to hold all the bytes in the file.
+    ReDim b(0 To fs.Length - 1)
+    
+    '' Read in all bytes in the file.
+    fs.ReadBlock b, 0, fs.Length
+    fs.CloseStream
+    
+    '' Decode the byte array back into a string
+    '' and display the string.
+    Console.WriteLine Encoding.Default.GetString(b)
+    Console.ReadLine
+    
+End Sub
+</pre>

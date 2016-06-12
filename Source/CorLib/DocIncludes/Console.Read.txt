@@ -1,0 +1,33 @@
+@remarks
+<h4>Example</h4>
+This example shows how to read input from the console keyboard. 
+The Read function will block and wait for the return key to be
+pressed before returning. If there are characters already in the
+input stream, the function does not block and returns the next character.
+<pre>
+Private Sub Main()
+    Dim ch As Long
+    
+    '' reads from the console keyboard. The function
+    '' will block until the return key is pressed.
+    ch = Console.Read
+    
+    '' we will loop through the characters typed into
+    '' the console and exit the loop when CTRL+Z followed
+    '' by Return is pressed.
+    Do While ch &lt&gt 26
+        Debug.Print Chr$(ch);
+        DoEvents
+        
+        '' As long as there are characters remaining to be
+        '' from the console keyboard, this function won't block.
+        ch = Console.Read
+    Loop
+End Sub
+</pre>
+As shown here, the loop just retrieves characters from the console
+keyboard one character at a time. If there are no more characters
+in the buffer, then the Read function will block and wait for the
+Return key to be pressed again. The key combination of CTRL+Z (26)
+is used as an exit from the loop. CRTL+Z is what is used
+to signal the end of a file on unix platforms.

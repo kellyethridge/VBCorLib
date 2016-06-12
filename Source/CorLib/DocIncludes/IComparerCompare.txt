@@ -1,0 +1,102 @@
+@remarks <h4>Example</h4> The following example will demonstrate how to create a custom comparer object to be used to sort arrays using special logic that might be needed.
+<p>To begin you will need the following items in a new Standard EXE project.<br><br>
+1. A Reference to the VBCorLib library. This should be named VB.EXT: VBCorLib<br>
+2. A Module file with Main set as your startup choice.<br>
+3. A Class file that will implement the <b>IComparer</b> interface.<br></p>
+<p>Once the project is set up we can write our compare logic in the class. The following
+is the entire contents of the Class. Rename the class to <b>OddEvenComparer</b> and put
+the following code in its code window.
+<pre>
+'' We want to sort our numbers by grouping them in odd and even
+'' groups. We want all odd numbers to be first in the list and
+'' all even numbers to be last. Within each odd and even group
+'' we want those number to be sorted in ascending order in that group.
+''
+'' Our comparer will compare on two levels. The first level
+'' is to compare whether or not the two values are odd or even.
+'' If they are both odd or both even, then they belong in the
+'' same group, so we just compare them as normal to keep them
+'' sorted within their group. If one is odd and the other is even,
+'' then we want all odd numbers to be first in the sorted list.
+'' This means they are a lesser value than even numbers, even if
+'' the actual value is greater.
+''
+'' Example:  7 is less than 2 because 7 is odd.
+''
+Option Explicit
+
+'' Implement the IComparer interface to allow for custom
+'' comparisons to take place when sorting an array.
+Implements IComparer
+
+
+'' The IComparer interface implementation.
+'' The return value indicates if x is less than, equal to, or
+'' greater than y. Any method can be used to compare x to y,
+'' as long as it is consistant.
+''
+'' x < y should return a negative value
+'' x = y should return zero
+'' x > y should return a positive value
+Private Function IComparer_Compare(x As Variant, y As Variant) As Long
+    '' Check to see if x and y are both odd or both even.
+    If (x And 1) = (y And 1) Then
+        '' x and y are the same (odd or even), so we will
+        '' just use the default comparer object for them.
+        IComparer_Compare = Comparer.Default.Compare(x, y)
+    ElseIf x And 1 Then
+        '' if x is odd then we must indicate that x is less
+        '' than y by returning a negative value.
+        IComparer_Compare = -1
+    Else
+        '' x is even, therefore y is odd. x is then a
+        '' greater value and we indicate that by return
+        '' a positive value.
+        IComparer_Compare = 1
+    End If
+End Function
+</pre>
+<p>Now that the <b>OddEvenComparer</b> class is written, we can focuse on
+the <b>Main</b> method. In the Module code window copy the following.</p>
+<pre>
+Option Explicit
+
+Private Sub Main()
+    Dim ints() As Long
+    Dim i As Long
+    
+    '' Create an array using all digits from 0-9.
+    ints = cArray.NewArray(ciLong, 6, 4, 2, 8, 7, 1, 9, 0, 5, 3)
+    
+    '' sort the array using our custom IComparer object.
+    cArray.Sort ints, New OddEvenComparer
+    
+    '' Display the sorted array.
+    For i = 0 To 9
+        '' We use the formatting capabilities of the Console class
+        '' to allow for easy value replacement within the output string.
+        Console.WriteLine "ints({0}) = {1}", i, ints(i)
+    Next i
+    
+    '' Wait for user.
+    Console.WriteLine "Press Enter"
+    Console.ReadLine
+End Sub
+
+'' This code will produce the following output.
+''
+'' ints(0) = 1
+'' ints(1) = 3
+'' ints(2) = 5
+'' ints(3) = 7
+'' ints(4) = 9
+'' ints(5) = 0
+'' ints(6) = 2
+'' ints(7) = 4
+'' ints(8) = 6
+'' ints(9) = 8
+'' Press Enter
+</pre>
+<p>As you can see, using our custom comparer enables us to sort an array using
+what ever logic we need. This allows the framework to be extended to the user's
+needs as they are.

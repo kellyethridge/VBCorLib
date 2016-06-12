@@ -1,0 +1,12 @@
+@remarks <h4>Example</h4>
+This example fills an <b>ArrayList</b> with some values then prints them out.
+<pre>
+    '' A Comment
+    Dim list As New ArrayList
+    list.Add "John"
+    list.Add "Kelly"
+    Dim Name As Variant
+    For Each Name In list
+        Console.WriteLine Name
+    Next Name
+</pre>

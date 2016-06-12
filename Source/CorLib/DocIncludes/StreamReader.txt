@@ -1,0 +1,36 @@
+@remarks <h4>Example</h4>
+<pre>
+'' This example attempts to open a text file and
+'' read the lines and display them.
+Private Sub Main()
+    Dim sr As StreamReader
+    Dim line As String
+    
+    On Error GoTo errTrap
+    
+    '' Create a StreamReader to read in a file.
+    Set sr = NewStreamReader("TestFile.txt")
+    
+    '' Read in each line and display it until
+    '' the end of the file is reached.
+    Do
+        '' Read in characters until a carriage-return is reached.
+        line = sr.ReadLine
+        Console.WriteLine line
+        
+    '' A null string is equal to StrPtr(line) = 0
+    Loop While Not cString.IsNull(line)
+    sr.CloseReader
+    
+errTrap:
+    Dim ex As Exception
+    '' Check if an exception was thrown.
+    If Catch(ex) Then
+        Console.WriteLine "The file could not be opened."
+        Console.WriteLine ex.Message
+    End If
+    
+    '' Wait for the user to press enter.
+    Console.ReadLine
+End Sub
+</pre>

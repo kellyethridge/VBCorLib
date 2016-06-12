@@ -1,0 +1,67 @@
+@remarks <h4>Example</h4>
+<pre>
+'' This example creates an array of unsorted integers
+'' then uses the <b>cArray.Sort</b> method to sort the
+'' array, displaying the results.
+Private Sub Main()
+    Dim ints(9) As Integer
+    Dim i As Long
+    
+    '' Fill array with random values.
+    Rnd -13
+    For i = 0 To UBound(ints)
+        ints(i) = Rnd * 10
+    Next i
+    
+    '' Display original unsorted array of integers.
+    Console.WriteLine "Unsorted Array of Integers."
+    DisplayInts ints
+    
+    '' Sort array of integers.
+    cArray.Sort ints
+
+    '' Display sorted array of integers.
+    Console.WriteLine
+    Console.WriteLine "Sorted Array of Integers."
+    DisplayInts ints
+    
+    '' Wait for user to press enter.
+    Console.ReadLine
+    
+End Sub
+
+'' Displays an array of integers.
+Private Sub DisplayInts(ByRef ints() As Integer)
+    Dim i As Long
+    
+    For i = LBound(ints) To UBound(ints)
+        Console.WriteLine "ints({0}) = {1}", i, ints(i)
+    Next i
+End Sub
+
+'' This code produces the following output.
+''
+''Unsorted Array of Integers.
+''ints(0) = 6
+''ints(1) = 4
+''ints(2) = 0
+''ints(3) = 3
+''ints(4) = 9
+''ints(5) = 7
+''ints(6) = 1
+''ints(7) = 0
+''ints(8) = 4
+''ints(9) = 9
+''
+''Sorted Array of Integers.
+''ints(0) = 0
+''ints(1) = 0
+''ints(2) = 1
+''ints(3) = 3
+''ints(4) = 4
+''ints(5) = 4
+''ints(6) = 6
+''ints(7) = 7
+''ints(8) = 9
+''ints(9) = 9
+</pre>

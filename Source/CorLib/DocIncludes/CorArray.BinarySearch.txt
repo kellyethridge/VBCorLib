@@ -1,0 +1,48 @@
+@remarks
+<pre>
+'' This example searches a sorted list for values,
+'' displaying the index found, or the index the value
+'' should have been found.
+Private Sub Main()
+    Dim ints() As Integer
+    
+    '' Create a sorted array with the value 7 missing.
+    ints = cArray.NewArray(ciInteger, 1, 2, 3, 4, 5, 6, 8, 9, 10)
+    
+    '' Search for the value 6.
+    Search ints, 6
+    
+    '' Search for the missing value 7.
+    Search ints, 7
+    
+    '' Wait for user to press enter.
+    Console.ReadLine
+End Sub
+
+'' Performs a binary search on the array, searching for
+'' the requested value. If the value is found, then the
+'' search index will be equal or greater than the lower-bound
+'' of the array, otherwise, the value was not found.
+Private Sub Search(ByRef ints() As Integer, ByVal Value As Integer)
+    Dim i As Long
+    
+    i = cArray.BinarySearch(ints, Value)
+    
+    '' If the index is not less then then lower-bound
+    '' of the array, then the value was found.
+    If i >= LBound(ints) Then
+        Console.WriteLine "Value [{0}] found at index [{1}].", Value, i
+    Else
+        '' The value was not found. To determine where
+        '' the value should have been found, use Not to
+        '' negate the returned index value.
+        i = Not i
+        Console.WriteLine "Value [{0}] should be at index [{1}].", Value, i
+    End If
+End Sub
+
+'' This code produces the following output.
+''
+''Value [6] found at index [5].
+''Value [7] should be at index [6].
+</pre>
