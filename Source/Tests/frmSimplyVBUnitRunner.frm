@@ -212,13 +212,14 @@ Private Sub AddSystemSecurityCryptography()
         .Add New RSACryptoServiceProviderTests
         .Add New RSAParametersTests
 '        .Add New TestDSACryptoServiceProvider
-'
+
+        .Add New SymmetricAlgorithmBaseTests
         .Add New CryptoStreamTests
         .Add NewSuite("DESCryptoServiceProvider", _
             New DESCryptoServiceProviderTests, _
             New DESEncryptionTests, _
             New DESDecryptionTests)
-'
+
         .Add NewSuite("TripleDESCryptoServiceProvider", _
             New TripleDESCryptoServiceProviderTests, _
             New TripleDESEncryptionTests, _
