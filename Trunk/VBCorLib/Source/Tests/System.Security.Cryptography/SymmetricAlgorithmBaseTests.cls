@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TestSymmetricAlgorithmBase"
+Attribute VB_Name = "SymmetricAlgorithmBaseTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TestSymmetricAlgorithmBase
+' SymmetricAlgorithmBaseTests
 '
 Option Explicit
 Implements ICategorizable
