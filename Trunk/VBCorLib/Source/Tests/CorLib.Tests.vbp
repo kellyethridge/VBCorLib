@@ -205,6 +205,7 @@ Class=RijndaelManagedTests; System.Security.Cryptography\RijndaelManagedTests.cl
 Class=RijndaelTests; System.Security.Cryptography\RijndaelTests.cls
 Class=RijndaelCfbTests; System.Security.Cryptography\RijndaelCfbTests.cls
 ResFile32="CorLib.Tests.RES"
+Class=UTF7EncodingTests; System.Text\UTF7EncodingTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""
