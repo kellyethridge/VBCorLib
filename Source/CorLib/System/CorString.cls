@@ -302,7 +302,7 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
         Exit Function
     End If
     
-    Validation.CheckValidSingleDimArray Value, Parameter_Value
+    ValidateArray Value, Parameter_Value
     
     Dim Range As ListRange
     Range = OptionalRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)

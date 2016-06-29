@@ -1253,9 +1253,9 @@ Private Sub VerifyLoaded()
 End Sub
 
 Private Function CopyArray(ByRef Source() As String, ByVal RequiredLength As Long) As String()
+    ValidateArray Source, Parameter_Value
     VerifyWritable
     VerifyLoaded
-    CheckValidSingleDimArray Source, Parameter_Value
     
     If CorArray.Length(Source) <> RequiredLength Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidArrayLength, RequiredLength), "Value")
