@@ -115,8 +115,8 @@ End Function
 ' a Boolean array, each boolean element represents a single bit in the array.
 '
 Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
+    ValidateArray Arr
     EnsureInited
-    CheckValidSingleDimArray Arr
     
     If Index < LBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -408,8 +408,8 @@ Friend Sub Init(ByVal Length As Long, ByVal Value As Boolean)
 End Sub
 
 Friend Sub InitFromBooleans(ByRef Values() As Boolean)
-    CheckValidSingleDimArray Values, Parameter_Values
-
+    ValidateArray Values, Parameter_Values
+    
     Dim i   As Long
     Dim lb  As Long
     Me.Length = CorArray.Length(Values, 1)
@@ -420,7 +420,7 @@ Friend Sub InitFromBooleans(ByRef Values() As Boolean)
 End Sub
 
 Friend Sub InitFromBytes(ByRef Bytes() As Byte)
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
+    ValidateByteArray Bytes, Parameter_Bytes
     
     Dim Size As Long
     Size = CorArray.LengthFirstDim(Bytes)
@@ -429,7 +429,7 @@ Friend Sub InitFromBytes(ByRef Bytes() As Byte)
 End Sub
 
 Friend Sub InitFromLongs(ByRef Values() As Long)
-    CheckValidSingleDimArray Values, Parameter_Values
+    ValidateArray Values, Parameter_Values
     
     mBits = Values
     mUBound = UBound(Values)
@@ -526,8 +526,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

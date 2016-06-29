@@ -1006,11 +1006,8 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     KeysPtr = ArrayPointer(Keys)
     
     If Not IsEmpty(Items) Then
-        If Not IsArray(Items) Then _
-            Error.Argument Argument_ArrayRequired, "Items"
-        
+        ValidateArray Items, Parameter_Items
         ItemsPtr = ArrayPointer(Items)
-        CheckValidSingleDimArrayPtr ItemsPtr, Parameter_Items
         
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _

@@ -98,8 +98,8 @@ End Property
 ' @remarks The length of the array cannot be less than 8 bytes.
 '
 Public Property Let Salt(ByRef Value() As Byte)
-    ValidateArray Value, Parameter_Value
-    If CorArray.Length(Value) < 8 Then _
+    ValidateByteArray Value, Parameter_Value
+    If CorArray.LengthFirstDim(Value) < 8 Then _
         Error.Argument Cryptography_PasswordDerivedBytes_FewBytesSalt, "Value"
     
     mSalt = Value
@@ -234,8 +234,8 @@ Private Function NextBlockBytes() As Byte()
     Dim Result() As Byte
     Result = mHasher.ComputeHash(AsQByteArr(SwapEndian(mBlockCount)).Bytes)
     
-    Dim Sum() As Byte
-    Sum = Result
+    Dim sum() As Byte
+    sum = Result
     
     Dim i As Long
     For i = 2 To mIterations
@@ -243,11 +243,11 @@ Private Function NextBlockBytes() As Byte()
         
         Dim j As Long
         For j = 0 To BlockSize - 1
-            Sum(j) = Sum(j) Xor Result(j)
+            sum(j) = sum(j) Xor Result(j)
         Next j
     Next i
     
-    NextBlockBytes = Sum
+    NextBlockBytes = sum
 End Function
 
 
@@ -258,8 +258,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

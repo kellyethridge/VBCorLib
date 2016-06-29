@@ -303,7 +303,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
+    ValidateByteArray Bytes, Parameter_Bytes
     
     Dim Range As ListRange
     Range = OptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
@@ -328,7 +328,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
+    ValidateByteArray Bytes, Parameter_Bytes
 
     Dim Range As ListRange
     Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
@@ -366,8 +366,8 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
-    CheckValidSingleDimArray Chars, Parameter_Chars
+    ValidateByteArray Bytes, Parameter_Bytes
+    ValidateCharArray Chars, Parameter_Chars
     
     If ByteIndex < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
@@ -472,7 +472,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
-    CheckValidSingleDimArray Bytes, Parameter_Bytes
+    ValidateByteArray Bytes, Parameter_Bytes
 
     Dim Range As ListRange
     Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
@@ -533,7 +533,7 @@ Private Function GetByteCountString(ByRef Chars As Variant) As Long
 End Function
 
 Private Function GetByteCountChars(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As Long
-    CheckValidSingleDimArray Chars, Parameter_Chars
+    ValidateArray Chars, Parameter_Chars
         
     Dim Range As ListRange
     Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
