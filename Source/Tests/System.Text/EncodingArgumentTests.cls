@@ -176,6 +176,7 @@ End Sub
 
 Private Sub AddEncodings(ByVal Test As TestCaseCollector)
     Test.Use New ASCIIEncoding
+    Test.Use New UTF7Encoding
 End Sub
 
 
@@ -191,23 +192,25 @@ End Sub
 Public Sub GetBytes_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
     On Error Resume Next
     
-    Encoding.GetBytes "abc", -1, 0
+    Encoding.GetBytes "abc", -1, 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub GetBytes_WithCountLessThanZero_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+    Dim Chars(0 To 1) As Integer
     On Error Resume Next
     
-    Encoding.GetBytes "abc", 0, -1
+    Encoding.GetBytes Chars, 0, -1
     
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub GetBytes_WithIndexPlusCountExtendBeyondChars_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+    Dim Chars(1 To 2) As Integer
     On Error Resume Next
     
-    Encoding.GetBytes "abc", 1, 3
+    Encoding.GetBytes Chars, 1, 3
     
     AssertArgumentOutOfRangeException Err, "Chars"
 End Sub
@@ -409,7 +412,7 @@ Public Sub GetString_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeExcepti
     On Error Resume Next
     Encoding.GetString Bytes, 4, 1
     
-    AssertArgumentOutOfRangeException Err, "ByteIndex"
+    AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub GetString_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
@@ -418,7 +421,7 @@ Public Sub GetString_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException
     On Error Resume Next
     Encoding.GetString Bytes, 5, -1
     
-    AssertArgumentOutOfRangeException Err, "ByteCount"
+    AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub GetString_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
@@ -436,7 +439,7 @@ Public Sub GetString_WithMissingByteIndex_ThrowsArgumentException(ByVal Encoding
     On Error Resume Next
     Encoding.GetString Bytes, , 1
     
-    AssertArgumentException Err, "ByteIndex"
+    AssertArgumentException Err, "Index"
 End Sub
 
 Public Sub GetString_WithNullBytes_ThrowsArgumentNullException(ByVal Encoding As Encoding)
@@ -454,7 +457,7 @@ Public Sub GetString_WithMissingByteCount_ThrowsArgumentException(ByVal Encoding
     On Error Resume Next
     Encoding.GetString Bytes, 0
     
-    AssertArgumentException Err, "ByteCount"
+    AssertArgumentException Err, "Count"
 End Sub
 
 Public Sub GetChars_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
@@ -463,7 +466,7 @@ Public Sub GetChars_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeExceptio
     On Error Resume Next
     Encoding.GetChars Bytes, 4, 1
     
-    AssertArgumentOutOfRangeException Err, "ByteIndex"
+    AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
 Public Sub GetChars_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
@@ -472,7 +475,7 @@ Public Sub GetChars_WithByteCountLessThanZero_ThrowsArgumentOutOfRangeException(
     On Error Resume Next
     Encoding.GetChars Bytes, 5, -1
     
-    AssertArgumentOutOfRangeException Err, "ByteCount"
+    AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub GetChars_WithByteIndexPlusByteCountBeyondUBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
@@ -499,7 +502,7 @@ Public Sub GetChars_WithMissingByteIndex_ThrowsArgumentException(ByVal Encoding 
     On Error Resume Next
     Encoding.GetChars Bytes, , 1
     
-    AssertArgumentException Err, "ByteIndex"
+    AssertArgumentException Err, "Index"
 End Sub
 
 Public Sub GetChars_WithMissingByteCount_ThrowsArgumentException(ByVal Encoding As Encoding)
@@ -508,7 +511,7 @@ Public Sub GetChars_WithMissingByteCount_ThrowsArgumentException(ByVal Encoding 
     On Error Resume Next
     Encoding.GetChars Bytes, 0
     
-    AssertArgumentException Err, "ByteCount"
+    AssertArgumentException Err, "Count"
 End Sub
 
 Public Sub GetCharsEx_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)

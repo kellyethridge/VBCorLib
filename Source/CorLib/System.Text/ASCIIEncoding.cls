@@ -204,29 +204,19 @@ End Function
 ' @see Encoding
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Dim AttachedChars() As Integer
-    AttachedChars = AsChars(Chars)
+    Dim Chrs()  As Integer
+    Dim Range   As ListRange
+    Dim Output() As Byte
     
     On Error GoTo Catch
     
-    If SAPtr(AttachedChars) = vbNullPtr Then _
-        Error.ArgumentNull "Chars", ArgumentNull_Array
+    Chrs = AsChars(Chars)
+    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
     
-    Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(AttachedChars), CorArray.LengthFirstDim(AttachedChars))
-
-    If Range.Index < LBound(AttachedChars) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(AttachedChars) Then _
-        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCount
-
-    Dim Result() As Byte
     If Range.Count > 0 Then
-        ReDim Result(0 To GetByteCount(AttachedChars, Range.Index, Range.Count) - 1)
-        GetBytesCore AttachedChars, Range.Index, Range.Count, Result, 0
-        GetBytes = Result
+        ReDim Output(0 To GetByteCount(Chrs, Range.Index, Range.Count) - 1)
+        GetBytesCore Chrs, Range.Index, Range.Count, Output, 0
+        GetBytes = Output
     Else
         GetBytes = Cor.NewBytes()
     End If
@@ -238,7 +228,7 @@ Catch:
     GoSub Finally
     Throw
 Finally:
-    FreeChars AttachedChars
+    FreeChars Chrs
     Return
 End Function
 
@@ -265,20 +255,8 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     
     On Error GoTo Catch
     
-    If SAPtr(AttachedChars) = vbNullPtr Then _
-        Error.ArgumentNull "Chars", ArgumentNull_Array
-    If SAPtr(Bytes) = vbNullPtr Then _
-        Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If CharIndex < LBound(AttachedChars) Then _
-        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_LBound
-    If CharCount < 0 Then _
-        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
-    If CharIndex + CharCount - 1 > UBound(AttachedChars) Then _
-        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
-    If ByteIndex < LBound(Bytes) Or ByteIndex > UBound(Bytes) Then _
-        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_Index
-    If ByteIndex + CharCount - 1 > UBound(Bytes) Then _
-        Error.Argument Argument_SmallConversionBuffer, "Bytes"
+    Statics.Encoding.ValidateCharRange AttachedChars, CharIndex, CharCount
+    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, CharCount
     
     GetBytesEx = GetBytesCore(AttachedChars, CharIndex, CharCount, Bytes, ByteIndex)
     
@@ -303,17 +281,8 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    ValidateByteArray Bytes, Parameter_Bytes
-    
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
-
-    If Range.Index < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
     
     GetCharCount = Range.Count
 End Function
@@ -322,23 +291,14 @@ End Function
 ' Decodes a set of bytes into a set of characters.
 '
 ' @param Bytes The set of bytes to be decoded into characters.
-' @param ByteIndex The index of the first byte to be used in decoding.
-' @param ByteCount The number of bytes to be used in decoding.
+' @param Index The index of the first byte to be used in decoding.
+' @param Count The number of bytes to be used in decoding.
 ' @return An array of characters decoded from the set of bytes.
 ' @see Encoding
 '
-Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As Integer()
-    ValidateByteArray Bytes, Parameter_Bytes
-
+Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
     Dim Range As ListRange
-    Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
-
-    If Range.Index < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
     
     Dim Chars() As Integer
     If Range.Count > 0 Then
@@ -466,24 +426,15 @@ End Function
 ' Decodes a set of bytes into a String.
 '
 ' @param Bytes The set of bytes to be decoded into a string.
-' @param ByteIndex The index of the first byte to be decoded.
-' @param ByteCount The number of bytes to be used in the decoding.
+' @param Index The index of the first byte to be decoded.
+' @param Count The number of bytes to be used in the decoding.
 ' @return A string containing the decoded set of bytes.
 ' @see Encoding
 '
-Public Function GetString(ByRef Bytes() As Byte, Optional ByRef ByteIndex As Variant, Optional ByRef ByteCount As Variant) As String
-    ValidateByteArray Bytes, Parameter_Bytes
-
+Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Range As ListRange
-    Range = OptionalRange(ByteIndex, ByteCount, LBound(Bytes), UBound(Bytes) - LBound(Bytes) + 1, Parameter_ByteIndex, Parameter_ByteCount)
-
-    If Range.Index < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
-
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    
     GetString = SysAllocStringLen(0, Range.Count)
     
     Dim Chars() As Integer
@@ -536,14 +487,7 @@ Private Function GetByteCountChars(ByRef Chars As Variant, ByRef Index As Varian
     ValidateArray Chars, Parameter_Chars
         
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
-
-    If Range.Index < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
-    If Range.Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Range.Index + Range.Count - 1 > UBound(Chars) Then _
-        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+    Range = Statics.Encoding.ValidateOptionalCharRange(Chars, Index, Count)
 
     GetByteCountChars = Range.Count
 End Function
@@ -551,8 +495,10 @@ End Function
 Private Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     Dim i   As Long
     Dim Ch  As Long
+    
     For i = 0 To Count - 1
         Ch = Chars(Index + i)
+        
         Select Case Ch
             ' we need to have a range because by using Integers to
             ' represent unicode characters, we could end up with
@@ -563,12 +509,14 @@ Private Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByV
                 Bytes(ByteIndex + i) = QuestionMarkByte
         End Select
     Next
+    
     GetBytesCore = Count
 End Function
 
 Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     Dim i As Long
     Dim b As Byte
+    
     For i = 0 To ByteCount - 1
         b = Bytes(ByteIndex + i)
         If b < 128 Then
@@ -577,6 +525,7 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
             Chars(CharIndex + i) = QuestionMarkByte
         End If
     Next i
+    
     GetCharsCore = ByteCount
 End Function
 

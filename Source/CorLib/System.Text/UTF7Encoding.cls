@@ -49,13 +49,8 @@ Option Explicit
 Implements IObject
 Implements Encoding
 
-Private Const CODE_PAGE As Long = 65000
-
-Private mChars()                As Integer
-Private mCharsSA                As SafeArray1d
 Private mDirectlyEncodable()    As Boolean
 Private mAllowOptionals         As Boolean
-
 
 
 ''
@@ -99,7 +94,7 @@ End Property
 ' @return Code page identifier.
 '
 Public Property Get CodePage() As Long
-    CodePage = CODE_PAGE
+    CodePage = 65000
 End Property
 
 ''
@@ -168,15 +163,27 @@ End Property
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim Chrs()  As Integer
+    Dim Range   As ListRange
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    On Error GoTo Catch
     
-    GetByteCount = InternalGetByteCount(mChars, ElemIndex, ElemCount, Nothing)
+    Chrs = AsChars(Chars)
+    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
+    
+    If Range.Count > 0 Then
+        GetByteCount = InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing)
+    End If
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars Chrs
+    Return
 End Function
 
 ''
@@ -191,23 +198,32 @@ End Function
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim Range       As ListRange
+    Dim Chrs()      As Integer
+    Dim Output()    As Byte
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    On Error GoTo Catch
     
-    Dim Ret() As Byte
-    If ElemCount > 0 Then
-        ReDim Ret(0 To InternalGetByteCount(mChars, ElemIndex, ElemCount, Nothing) - 1)
-        Call InternalGetBytes(mChars, ElemIndex, ElemCount, Ret, 0, Nothing)
+    Chrs = AsChars(Chars)
+    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
+    
+    If Range.Count > 0 Then
+        ReDim Output(0 To InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing) - 1)
+        InternalGetBytes Chrs, Range.Index, Range.Count, Output, 0, Nothing
+        GetBytes = Output
     Else
-        Ret = Cor.NewBytes()
+        GetBytes = Cor.NewBytes()
     End If
     
-    GetBytes = Ret
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars Chrs
+    Return
 End Function
 
 ''
@@ -227,13 +243,29 @@ End Function
 ' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim Chrs()      As Integer
+    Dim Range       As ListRange
+    Dim ByteCount   As Long
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(mChars), CharIndex, CharCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount"
+    Chrs = AsChars(Chars)
     
-    GetBytesEx = InternalGetBytes(mChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
+    On Error GoTo Catch
+    
+    Statics.Encoding.ValidateCharRange Chrs, CharIndex, CharCount
+    ByteCount = InternalGetByteCount(Chrs, CharIndex, CharCount, Nothing)
+    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    
+    GetBytesEx = InternalGetBytes(Chrs, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars Chrs
+    Return
 End Function
 
 ''
@@ -245,21 +277,24 @@ End Function
 ' @return A string containing the decoded set of bytes.
 '
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
+    Dim Range   As ListRange
+    Dim Size    As Long
+    Dim Result  As String
+    Dim Output() As Integer
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Byte", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    Size = GetMaxCharCount(Range.Count)
+    Result = SysAllocStringLen(0, Size)
+    Output = AllocChars(Result)
+    Size = GetCharsEx(Bytes, Range.Index, Range.Count, Output, 0)
     
-    Dim Size As Long
-    Size = GetMaxCharCount(ElemCount)
+    If Len(Result) <> Size Then
+        GetString = Left$(Result, Size)
+    Else
+        GetString = Result
+    End If
     
-    Dim Ret As String
-    Ret = SysAllocStringLen(0, Size)
-    Call AttachChars(Ret, mChars, mCharsSA)
-    Size = GetCharsEx(Bytes, ElemIndex, ElemCount, mChars, 0)
-    GetString = Left$(Ret, Size)
+    FreeChars Output
 End Function
 
 ''
@@ -271,14 +306,11 @@ End Function
 ' @return The number of characters that would be decoded from the set of bytes.
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
+    Dim Range As ListRange
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
     
-    GetCharCount = InternalGetCharCount(Bytes, ElemIndex, ElemCount)
+    GetCharCount = InternalGetCharCount(Bytes, Range.Index, Range.Count)
 End Function
 
 ''
@@ -290,25 +322,24 @@ End Function
 ' @return An array of characters decoded from the set of bytes.
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
+    Dim Range       As ListRange
+    Dim Output()    As Integer
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
     
-    Dim Ret() As Integer
-    If ElemCount > 0 Then
-        ReDim Ret(0 To GetMaxCharCount(ElemCount))
+    If Range.Count > 0 Then
+        ReDim Output(0 To GetMaxCharCount(Range.Count))
         
         Dim Size As Long
-        Size = InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0, Nothing)
-        If Size <> UBound(Ret) + 1 Then ReDim Preserve Ret(0 To Size - 1)
+        Size = InternalGetChars(Bytes, Range.Index, Range.Count, Output, 0, Nothing)
+        If Size <> UBound(Output) + 1 Then
+            ReDim Preserve Output(0 To Size - 1)
+        End If
     Else
-        Ret = Cor.NewIntegers()
+        Output = Cor.NewIntegers()
     End If
     
-    GetChars = Ret
+    GetChars = Output
 End Function
 
 ''
@@ -325,9 +356,11 @@ End Function
 ' GetMaxCharCount to determine a size that will hold the decoded bytes.
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
+    Dim CharCount As Long
+    
+    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    CharCount = InternalGetCharCount(Bytes, ByteIndex, ByteCount)
+    Statics.Encoding.ValidateCharRange Chars, CharIndex, CharCount
     
     GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Nothing)
 End Function
@@ -340,7 +373,7 @@ End Function
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     If ByteCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
         
     GetMaxCharCount = ByteCount
 End Function
@@ -353,7 +386,7 @@ End Function
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("CharCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
     
     GetMaxByteCount = 2 + (-(Int(-((CharCount * 16) / 6))))
 End Function
@@ -377,9 +410,9 @@ End Function
 ' will allow Modified Base64 encoding to continue between encoding calls.
 '
 Public Function GetEncoder() As Encoder
-    Dim Ret As New UTF7Encoder
-    Call Ret.Init(Me)
-    Set GetEncoder = Ret
+    Dim Encoder As New UTF7Encoder
+    Encoder.Init Me
+    Set GetEncoder = Encoder
 End Function
 
 ''
@@ -395,9 +428,9 @@ End Function
 ' the same call in order to be decoded properly.
 '
 Public Function GetDecoder() As Decoder
-    Dim Ret As New UTF7Decoder
-    Call Ret.Init(Me)
-    Set GetDecoder = Ret
+    Dim Decoder As New UTF7Decoder
+    Decoder.Init Me
+    Set GetDecoder = Decoder
 End Function
 
 ''
@@ -416,12 +449,14 @@ End Function
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
     If IsObject(Value) Then
-        If Value Is Nothing Then Exit Function
+        If Value Is Nothing Then
+            Exit Function
+        End If
         
         If TypeOf Value Is UTF7Encoding Then
-            Dim en As UTF7Encoding
-            Set en = Value
-            Equals = (en.AllowOptionals = mAllowOptionals)
+            Dim Other As UTF7Encoding
+            Set Other = Value
+            Equals = (Other.AllowOptionals = mAllowOptionals)
         End If
     End If
 End Function
@@ -431,12 +466,12 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = CODE_PAGE Or CLng(IIf(mAllowOptionals, &H80000000, 0))
+    GetHashCode = CodePage Or IIfLong(mAllowOptionals, &H80000000, 0)
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal AllowOptionals As Boolean)
     Dim i As Long
@@ -449,23 +484,34 @@ Friend Sub Init(ByVal AllowOptionals As Boolean)
     mAllowOptionals = AllowOptionals
 End Sub
 
+Private Sub Class_Initialize()
+    Dim i As Long
+    
+    ReDim mDirectlyEncodable(0 To 127)
+    For i = 0 To 25
+        mDirectlyEncodable(65 + i) = True
+        mDirectlyEncodable(97 + i) = True
+    Next i
+    For i = 0 To 9
+        mDirectlyEncodable(48 + i) = True
+    Next i
+    For i = 1 To 13
+        mDirectlyEncodable(Choose(i, 9, 10, 13, 32, 39, 40, 41, 44, 45, 46, 47, 58, 63)) = True
+    Next i
+End Sub
+
 Friend Property Get AllowOptionals() As Boolean
     AllowOptionals = mAllowOptionals
 End Property
 
 Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF7Encoder) As Long
-    Dim Bits As Long
-    Dim bitCount As Long
-    Dim maxCharIndex As Long
-    Dim MaxByteIndex As Long
-    Dim Ch As Long
-    Dim ByteStartIndex As Long
-    Dim directlyEncodable As Boolean
-    
-    If CorArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-    If ByteIndex < LBound(Bytes) Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Environment.GetResourceString(ArgumentOutOfRange_LBound))
+    Dim Bits                As Long
+    Dim bitCount            As Long
+    Dim maxCharIndex        As Long
+    Dim MaxByteIndex        As Long
+    Dim Ch                  As Long
+    Dim ByteStartIndex      As Long
+    Dim directlyEncodable   As Boolean
     
     If Not Encoder Is Nothing Then
         With Encoder
@@ -486,15 +532,24 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
             If mDirectlyEncodable(Ch) Then
                 If bitCount >= 0 Then
                     If bitCount > 0 Then
-                        If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
+                        If ByteIndex > MaxByteIndex Then
+                            SmallBufferError "Bytes"
+                        End If
+                        
                         Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - bitCount) And &H3F)
                         ByteIndex = ByteIndex + 1
                     End If
-                    If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
+                    If ByteIndex > MaxByteIndex Then
+                        SmallBufferError "Bytes"
+                    End If
+                    
                     Bytes(ByteIndex) = corMinusChar
                     ByteIndex = ByteIndex + 1
                 End If
-                If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
+                If ByteIndex > MaxByteIndex Then
+                    SmallBufferError "Bytes"
+                End If
+                
                 Bytes(ByteIndex) = Ch
                 ByteIndex = ByteIndex + 1
                 bitCount = -1
@@ -503,13 +558,19 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         End If
         If Not directlyEncodable Then
             If Ch = corPlusChar And bitCount < 0 Then
-                If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
+                If ByteIndex > MaxByteIndex Then
+                    SmallBufferError "Bytes"
+                End If
+                
                 Bytes(ByteIndex) = corPlusChar
                 Bytes(ByteIndex + 1) = corMinusChar
                 ByteIndex = ByteIndex + 2
             Else
                 If bitCount < 0 Then
-                    If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
+                    If ByteIndex > MaxByteIndex Then
+                        SmallBufferError "Bytes"
+                    End If
+                    
                     Bytes(ByteIndex) = corPlusChar
                     ByteIndex = ByteIndex + 1
                     bitCount = 0
@@ -518,7 +579,10 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                 bitCount = bitCount + 16
                 Do While bitCount >= 6
                     bitCount = bitCount - 6
-                    If ByteIndex > MaxByteIndex Then Call SmallBufferError("Bytes")
+                    If ByteIndex > MaxByteIndex Then
+                        SmallBufferError "Bytes"
+                    End If
+                    
                     Bytes(ByteIndex) = Base64Bytes(Helper.ShiftRight(Bits, bitCount) And &H3F)
                     ByteIndex = ByteIndex + 1
                 Loop
@@ -537,14 +601,16 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
     
     If Flush And (bitCount >= 0) Then
         If bitCount > 0 Then
-            If ByteIndex > MaxByteIndex Then _
-                Throw Cor.NewArgumentException("Bytes conversion buffer is too small.", "Bytes")
+            If ByteIndex > MaxByteIndex Then
+                SmallBufferError "Bytes"
+            End If
             
             Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - bitCount) And &H3F)
             ByteIndex = ByteIndex + 1
         End If
-        If ByteIndex > MaxByteIndex Then _
-            Throw Cor.NewArgumentException("Bytes conversion buffer is too small.", "Bytes")
+        If ByteIndex > MaxByteIndex Then
+            SmallBufferError "Bytes"
+        End If
         
         Bytes(ByteIndex) = corMinusChar
         ByteIndex = ByteIndex + 1
@@ -561,12 +627,12 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
     InternalGetBytes = ByteIndex - ByteStartIndex
 End Function
 
-Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Encoder As UTF7Encoder) As Long
-    Dim bitCount As Long
-    Dim maxCharIndex As Long
-    Dim Ch As Long
-    Dim directlyEncodable As Boolean
-    Dim ByteIndex As Long
+Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF7Encoder) As Long
+    Dim bitCount            As Long
+    Dim maxCharIndex        As Long
+    Dim Ch                  As Long
+    Dim directlyEncodable   As Boolean
+    Dim ByteIndex           As Long
     
     If Not Encoder Is Nothing Then
         bitCount = Encoder.bitCount
@@ -578,12 +644,17 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
     Do While Index <= maxCharIndex
         AsWord(Ch) = Chars(Index)
         directlyEncodable = False
+        
         If Ch < &H80 Then
             If mDirectlyEncodable(Ch) Then
                 If bitCount >= 0 Then
-                    If bitCount > 0 Then ByteIndex = ByteIndex + 1
+                    If bitCount > 0 Then
+                        ByteIndex = ByteIndex + 1
+                    End If
+                    
                     ByteIndex = ByteIndex + 1
                 End If
+                
                 ByteIndex = ByteIndex + 1
                 bitCount = -1
                 directlyEncodable = True
@@ -597,6 +668,7 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
                     ByteIndex = ByteIndex + 1
                     bitCount = 0
                 End If
+                
                 bitCount = bitCount + 16
                 Do While bitCount >= 6
                     bitCount = bitCount - 6
@@ -626,11 +698,11 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
 End Function
 
 Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim InBase64 As Boolean
-    Dim MaxIndex As Long
-    Dim CharCount As Long
-    Dim b As Byte
-    Dim Bits As Currency
+    Dim InBase64    As Boolean
+    Dim MaxIndex    As Long
+    Dim CharCount   As Long
+    Dim b           As Byte
+    Dim Bits        As Currency
     
     MaxIndex = Index + Count
     Do While Index < MaxIndex
@@ -642,33 +714,31 @@ Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long,
                 CharCount = CharCount + 1
             End If
         ElseIf b = corMinusChar Then
-            If Bytes(Index - 1) = corPlusChar Then CharCount = CharCount + 1
-            CharCount = CharCount + Int(Bits / 16@)
-            Bits = 0@
+            If Bytes(Index - 1) = corPlusChar Then
+                CharCount = CharCount + 1
+            End If
+            
+            CharCount = CharCount + Int(Bits / 16)
+            Bits = 0
             InBase64 = False
         Else
-            Bits = Bits + 6@
+            Bits = Bits + 6
         End If
         Index = Index + 1
     Loop
     
-    InternalGetCharCount = Int(Bits / 16@) + CharCount
+    InternalGetCharCount = Int(Bits / 16) + CharCount
 End Function
 
 Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF7Decoder) As Long
-    Dim Bits As Long
-    Dim bitCount As Long
-    Dim b As Byte
-    Dim InBase64 As Boolean
-    Dim HasPlus As Boolean
-    Dim CharStartIndex As Long
-    Dim maxCharIndex As Long
-    Dim MaxByteIndex As Long
-    
-    If CorArray.IsNull(Chars) Then _
-        Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
-    If CharIndex < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException("CharIndex", Environment.GetResourceString(ArgumentOutOfRange_LBound))
+    Dim Bits            As Long
+    Dim bitCount        As Long
+    Dim b               As Byte
+    Dim InBase64        As Boolean
+    Dim HasPlus         As Boolean
+    Dim CharStartIndex  As Long
+    Dim maxCharIndex    As Long
+    Dim MaxByteIndex    As Long
     
     If Not Decoder Is Nothing Then
         With Decoder
@@ -684,11 +754,14 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     MaxByteIndex = ByteIndex + ByteCount - 1
     Do While ByteIndex <= MaxByteIndex
         b = Bytes(ByteIndex)
-        'Debug.Assert b <> 44
+        
         Select Case b
             Case corMinusChar
                 If HasPlus Then
-                    If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+                    If CharIndex > maxCharIndex Then
+                        SmallBufferError "Chars"
+                    End If
+                    
                     Chars(CharIndex) = corPlusChar
                     CharIndex = CharIndex + 1
                 ElseIf InBase64 Then
@@ -696,10 +769,14 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                     Bits = 0
                     InBase64 = False
                 Else
-                    If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+                    If CharIndex > maxCharIndex Then
+                        SmallBufferError "Chars"
+                    End If
+                    
                     Chars(CharIndex) = corMinusChar
                     CharIndex = CharIndex + 1
                 End If
+                
                 HasPlus = False
             Case corPlusChar
                 If InBase64 Then
@@ -718,7 +795,10 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         Bits = (Bits * &H40) Or Base64CharToBits(b)
                         bitCount = bitCount + 6
                     Else
-                        If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+                        If CharIndex > maxCharIndex Then
+                            SmallBufferError "Chars"
+                        End If
+                        
                         Chars(CharIndex) = b
                         CharIndex = CharIndex + 1
                         bitCount = 0
@@ -726,13 +806,20 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         InBase64 = False
                     End If
                 Else
-                    If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+                    If CharIndex > maxCharIndex Then
+                        SmallBufferError "Chars"
+                    End If
+                    
                     Chars(CharIndex) = b
                     CharIndex = CharIndex + 1
                 End If
+                
                 HasPlus = False
             Case Else
-                If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+                If CharIndex > maxCharIndex Then
+                    SmallBufferError "Chars"
+                End If
+                
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
                 bitCount = 0
@@ -741,7 +828,10 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 HasPlus = False
         End Select
         If bitCount >= 16 Then
-            If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+            If CharIndex > maxCharIndex Then
+                SmallBufferError "Chars"
+            End If
+            
             Chars(CharIndex) = AsWord(Helper.ShiftRight(Bits, bitCount - 16) And &HFFFF&)
             CharIndex = CharIndex + 1
             bitCount = bitCount - 16
@@ -751,12 +841,10 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     Loop
     
     If Not Decoder Is Nothing Then
-        With Decoder
-            .bitCount = bitCount
-            .Bits = Bits
-            .HasPlus = HasPlus
-            .InBase64 = InBase64
-        End With
+        Decoder.bitCount = bitCount
+        Decoder.Bits = Bits
+        Decoder.HasPlus = HasPlus
+        Decoder.InBase64 = InBase64
     End If
     
     InternalGetChars = CharIndex - CharStartIndex
@@ -764,59 +852,34 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub SmallBufferError(ByVal ParamName As String)
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), ParamName)
+Private Sub SmallBufferError(ByRef ParamName As String)
+    Error.Argument Argument_SmallConversionBuffer, ParamName
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Dim i As Long
-    
-    ReDim mDirectlyEncodable(0 To 127)
-    For i = 0 To 25
-        mDirectlyEncodable(65 + i) = True
-        mDirectlyEncodable(97 + i) = True
-    Next i
-    For i = 0 To 9
-        mDirectlyEncodable(48 + i) = True
-    Next i
-    For i = 1 To 13
-        mDirectlyEncodable(Choose(i, 9, 10, 13, 32, 39, 40, 41, 44, 45, 46, 47, 58, 63)) = True
-    Next i
-
-    With mCharsSA
-        .cbElements = 2
-        .cDims = 1
-    End With
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    Call Init(PropBag.ReadProperty("AllowOptionals", False))
-End Sub
-
-Private Sub Class_Terminate()
-    SAPtr(mChars) = 0
+    Init PropBag.ReadProperty("AllowOptionals", False)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty("AllowOptionals", mAllowOptionals)
+    PropBag.WriteProperty "AllowOptionals", mAllowOptionals
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -825,7 +888,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Encoding Interface
+'   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Encoding_BodyName() As String
     Encoding_BodyName = BodyName

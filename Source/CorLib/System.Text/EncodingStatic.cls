@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: EncodingStatic
+' Module: EncodingStatic
 '
 
 ''
@@ -137,9 +140,9 @@ Public Function Convert(ByVal srcEncoding As Encoding, ByVal dstEncoding As Enco
     If dstEncoding Is Nothing Then _
         Throw Cor.NewArgumentNullException("dstEncoding")
     
-    Dim ch() As Integer
-    ch = srcEncoding.GetChars(Bytes, Index, Count)
-    Convert = dstEncoding.GetBytes(ch)
+    Dim Ch() As Integer
+    Ch = srcEncoding.GetChars(Bytes, Index, Count)
+    Convert = dstEncoding.GetBytes(Ch)
 End Function
 
 ''
@@ -185,20 +188,82 @@ Public Function GetEncodings() As EncodingInfo()
     GetEncodings = EncodingTable.GetEncodings
 End Function
 
+Friend Function ValidateOptionalCharRange(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As ListRange
+    ValidateArray Chars, Parameter_Chars
+        
+    ValidateOptionalCharRange = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+    If ValidateOptionalCharRange.Count = 0 Then
+        Exit Function
+    End If
+    If ValidateOptionalCharRange.Index < LBound(Chars) Then
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+    End If
+    If ValidateOptionalCharRange.Count < 0 Then
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    End If
+    If ValidateOptionalCharRange.Index + ValidateOptionalCharRange.Count - 1 > UBound(Chars) Then
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+    End If
+End Function
+
+Friend Sub ValidateCharRange(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long)
+    ValidateArray Chars, Parameter_Chars
+    
+    If CharIndex < LBound(Chars) Then
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_LBound
+    End If
+    If CharCount < 0 Then
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
+    End If
+    If CharIndex + CharCount - 1 > UBound(Chars) Then
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+    End If
+End Sub
+
+Friend Function ValidateOptionalByteRange(ByRef Bytes() As Byte, ByRef Index As Variant, ByRef Count As Variant) As ListRange
+    ValidateByteArray Bytes
+    
+    ValidateOptionalByteRange = OptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
+    
+    If ValidateOptionalByteRange.Count = 0 Then
+        Exit Function
+    End If
+    If ValidateOptionalByteRange.Index < LBound(Bytes) Or ValidateOptionalByteRange.Index > UBound(Bytes) Then
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    End If
+    If ValidateOptionalByteRange.Count < 0 Then
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    End If
+    If ValidateOptionalByteRange.Index + ValidateOptionalByteRange.Count - 1 > UBound(Bytes) Then
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    End If
+End Function
+
+Friend Sub ValidateByteRange(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long)
+    ValidateByteArray Bytes
+    
+    If ByteIndex < LBound(Bytes) Or ByteIndex > UBound(Bytes) Then
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
+    End If
+    If ByteCount < 0 Then
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
+    End If
+    If ByteIndex + ByteCount - 1 > UBound(Bytes) Then
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_Index
+    End If
+End Sub
+
 Friend Property Get EncodingTable() As EncodingTable
     Set EncodingTable = mEncodingTable
 End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function NewCodePageEncoding(ByVal cp As Long) As CodePageEncoding
     Set NewCodePageEncoding = New CodePageEncoding
-    Call NewCodePageEncoding.Init(cp)
+    NewCodePageEncoding.Init cp
 End Function
 
