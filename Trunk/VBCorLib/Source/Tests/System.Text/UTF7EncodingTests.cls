@@ -157,14 +157,120 @@ Public Sub GetString_WithRFC1642Example_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetChars_WithRFC1642Example_ReturnsExpected2()
+    Dim Bytes()     As Byte
+    Dim Actual()    As Integer
+    Dim Encoding    As New UTF7Encoding
+    
+    Bytes = NewBytes(&H48, &H69, &H20, &H4D, &H6F, &H4D, &H20, &H2B, &H4A, &H6A, &H6F, &H41, &H49, &H51, &H2D)
+    
+    Actual = Encoding.GetChars(Bytes)
+    
+    Dim Expected() As Integer
+    Expected = NewIntegers(&H48, &H69, &H20, &H4D, &H6F, &H4D, &H20, &H263A, &H21)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetString_WithRFC1642Example_ReturnsExpected2()
+    Dim Bytes()     As Byte
+    Dim Actual      As String
+    Dim Encoding    As New UTF7Encoding
+    
+    Bytes = NewBytes(&H48, &H69, &H20, &H4D, &H6F, &H4D, &H20, &H2B, &H4A, &H6A, &H6F, &H41, &H49, &H51, &H2D)
+    
+    Actual = Encoding.GetString(Bytes)
+    
+    Dim Expected As String
+    Expected = t("\u0048\u0069\u0020\u004D\u006F\u004D\u0020\u263A\u0021")
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetChars_WithRFC1642Example_ReturnsExpected3()
+    Dim Bytes()     As Byte
+    Dim Actual()    As Integer
+    Dim Encoding    As New UTF7Encoding
+    
+    Bytes = NewBytes(&H2B, &H5A, &H65, &H56, &H6E, &H4C, &H49, &H71, &H65, &H2D)
+    
+    Actual = Encoding.GetChars(Bytes)
+    
+    Dim Expected() As Integer
+    Expected = NewIntegers(&H65E5, &H672C, &H8A9E)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetString_WithRFC1642Example_ReturnsExpected3()
+    Dim Bytes()     As Byte
+    Dim Actual      As String
+    Dim Encoding    As New UTF7Encoding
+    
+    Bytes = NewBytes(&H2B, &H5A, &H65, &H56, &H6E, &H4C, &H49, &H71, &H65, &H2D)
+    
+    Actual = Encoding.GetString(Bytes)
+    
+    Dim Expected As String
+    Expected = t("\u65E5\u672C\u8A9E")
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetChars_WithRFC1642Example_ReturnsExpected4()
+    Dim Bytes()     As Byte
+    Dim Actual()    As Integer
+    Dim Encoding    As New UTF7Encoding
+    
+    Bytes = NewBytes(&H49, &H74, &H65, &H6D, &H20, &H33, &H20, &H69, &H73, &H20, &H2B, &H41, &H4B, &H4D, &H2D, &H31, &H2E)
+    
+    Actual = Encoding.GetChars(Bytes)
+    
+    Dim Expected() As Integer
+    Expected = NewIntegers(&H49, &H74, &H65, &H6D, &H20, &H33, &H20, &H69, &H73, &H20, &HA3, &H31, &H2E)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetString_WithRFC1642Example_ReturnsExpected4()
+    Dim Bytes()     As Byte
+    Dim Actual      As String
+    Dim Encoding    As New UTF7Encoding
+    
+    Bytes = NewBytes(&H49, &H74, &H65, &H6D, &H20, &H33, &H20, &H69, &H73, &H20, &H2B, &H41, &H4B, &H4D, &H2D, &H31, &H2E)
+    
+    Actual = Encoding.GetString(Bytes)
+    
+    Dim Expected As String
+    Expected = t("\u0049\u0074\u0065\u006D\u0020\u0033\u0020\u0069\u0073\u0020\u00A3\u0031\u002E")
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetMaxCharCount_With50_Returns50()
+    Dim Encoding    As New UTF7Encoding
+    Dim Actual      As Long
+    
+    Actual = Encoding.GetMaxCharCount(50)
+    
+    Assert.That Actual, Iz.EqualTo(50)
+End Sub
 
+Public Sub GetMaxByteCount_With50_Returns152()
+    Dim Encoding    As New UTF7Encoding
+    Dim Actual      As Long
+    
+    Actual = Encoding.GetMaxByteCount(50)
+    
+    Assert.That Actual, Iz.EqualTo(152)
+End Sub
 
+Public Sub GetCharCount_WithValue_ReturnsExpected()
+    Const Original As String = "*123456789*123456789*123456789*123456789*123456789*123456789*123456789*123456789"
+    Dim Bytes() As Byte
+    
+    Bytes = Encoding.UTF7.GetBytes(Original)
+    Assert.That CorArray.Length(Bytes), Iz.EqualTo(112)
+    Assert.That Encoding.UTF7.GetCharCount(Bytes), Iz.EqualTo(80)
+    
+    Dim Decoded As String
+    Decoded = Encoding.UTF7.GetString(Bytes)
+    Assert.That Decoded, Iz.EqualTo(Original)
+End Sub
 
 
 

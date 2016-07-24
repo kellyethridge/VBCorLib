@@ -47,6 +47,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "\u000D", vbCr
             Test.Use "\u000Dd", vbCr & "d"
             Test.Use "\udg", vbCr & "g"
+            Test.Use "\u8A9E", ChrW$(-30050)
         
         Case "T_WithInvalidEscapeSequence_ThrowsFormatException"
             Test.Use "\"

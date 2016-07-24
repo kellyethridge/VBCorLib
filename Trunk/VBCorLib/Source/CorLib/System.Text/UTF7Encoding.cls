@@ -388,7 +388,7 @@ Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
     
-    GetMaxByteCount = 2 + (-(Int(-((CharCount * 16) / 6))))
+    GetMaxByteCount = CharCount * 3 + 2
 End Function
 
 ''

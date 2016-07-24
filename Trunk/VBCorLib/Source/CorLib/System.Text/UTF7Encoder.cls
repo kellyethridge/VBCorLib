@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2016 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: UTF7Encoder
+' Module: UTF7Encoder
 '
 Option Explicit
 Implements IObject
@@ -37,15 +40,9 @@ Implements Encoder
 
 Private mEncoding   As UTF7Encoding
 Private mFlush      As Boolean
-
-' state for GetBytes
 Private mBits       As Long
 Private mBitCount   As Long
 
-
-Friend Sub Init(ByVal Encoding As UTF7Encoding)
-    Set mEncoding = Encoding
-End Sub
 
 Friend Property Get Flush() As Boolean
     Flush = mFlush
@@ -63,21 +60,25 @@ Friend Property Get BitCount() As Long
     BitCount = mBitCount
 End Property
 
-Friend Property Let BitCount(ByVal RHS As Long)
-    mBitCount = RHS
+Friend Property Let BitCount(ByVal Value As Long)
+    mBitCount = Value
 End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mBitCount = -1
 End Sub
 
+Friend Sub Init(ByVal Encoding As UTF7Encoding)
+    Set mEncoding = Encoding
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_ToString() As String
     IObject_ToString = MyBase.ToString(Me, App)
@@ -93,28 +94,28 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Encoder Interface
+'   Encoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function Encoder_Equals(Value As Variant) As Boolean
     Encoder_Equals = IObject_Equals(Value)
 End Function
 
 Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Flush As Boolean) As Long
-    mFlush = Flush
+    Encoding.ValidateCharRange Chars, Index, Count
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Chars), Index, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", Index, "Index", Count, "Count"
+    mFlush = Flush
     
     Encoder_GetByteCount = mEncoding.InternalGetByteCount(Chars, Index, Count, Me)
 End Function
 
 Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long
-    mFlush = Flush
+    Dim ByteCount As Long
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Chars), CharIndex, CharCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount"
+    Encoding.ValidateCharRange Chars, CharIndex, CharCount
+    ByteCount = mEncoding.InternalGetByteCount(Chars, CharIndex, CharCount, Me)
+    Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    
+    mFlush = Flush
     
     Encoder_GetBytes = mEncoding.InternalGetBytes(Chars, CharIndex, CharCount, Bytes, ByteIndex, Me)
 End Function
