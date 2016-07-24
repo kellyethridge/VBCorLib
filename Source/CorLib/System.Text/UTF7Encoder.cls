@@ -55,15 +55,15 @@ Friend Property Get Bits() As Long
     Bits = mBits
 End Property
 
-Friend Property Let Bits(ByVal RHS As Long)
-    mBits = RHS
+Friend Property Let Bits(ByVal Value As Long)
+    mBits = Value
 End Property
 
-Friend Property Get bitCount() As Long
-    bitCount = mBitCount
+Friend Property Get BitCount() As Long
+    BitCount = mBitCount
 End Property
 
-Friend Property Let bitCount(ByVal RHS As Long)
+Friend Property Let BitCount(ByVal RHS As Long)
     mBitCount = RHS
 End Property
 

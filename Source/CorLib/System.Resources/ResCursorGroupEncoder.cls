@@ -105,7 +105,7 @@ Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Op
             AsWord(Bytes(Index)) = .Planes
             Index = Index + 2
             
-            AsWord(Bytes(Index)) = .bitCount
+            AsWord(Bytes(Index)) = .BitCount
             Index = Index + 2
             
             AsLong(Bytes(Index)) = .Size
@@ -119,7 +119,7 @@ Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Op
     Dim Key As ResourceKey
     Set Key = Cor.NewResourceKey(ResourceName, ResourceTypes.GroupCursor, GetLanguageID(LanguageID))
     
-    Call mResources.Add(Key, Bytes)
+    mResources.Add Key, Bytes
     Encode = True
 End Function
 
