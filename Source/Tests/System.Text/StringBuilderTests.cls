@@ -147,6 +147,16 @@ Public Sub AppendChar_WhenCalled_Appends()
     Assert.That Actual, Iz.EqualTo(String$(50, "0"))
 End Sub
 
+Public Sub AppendChar_WithJapaneseCharacter_Appends()
+    Dim sb As New StringBuilder
+    
+    sb.AppendChar -30050
+    
+    Dim Actual As String
+    Actual = sb.ToString
+    Assert.That Actual, Iz.EqualTo(ChrW$(-30050))
+End Sub
+
 Public Sub AppendChar_WithDefaultCount_AppendsOneCharacter()
     Dim sb As New StringBuilder
     

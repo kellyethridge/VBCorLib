@@ -110,17 +110,15 @@ Private Function Decoder_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", Index, "Index", Count, "Count"
-    
-    Decoder_GetCharCount = mEncoding.InternalGetCharCount(Bytes, Index, Count)
+    Decoder_GetCharCount = mEncoding.GetCharCount(Bytes, Index, Count)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
+    Dim CharCount As Long
+    
+    Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    CharCount = mEncoding.InternalGetCharCount(Bytes, ByteIndex, ByteCount)
+    Encoding.ValidateCharRange Chars, CharIndex, CharCount
     
     Decoder_GetChars = mEncoding.InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
