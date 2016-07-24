@@ -506,20 +506,21 @@ End Property
 
 Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF7Encoder) As Long
     Dim Bits                As Long
-    Dim bitCount            As Long
+    Dim BitCount            As Long
     Dim maxCharIndex        As Long
     Dim MaxByteIndex        As Long
     Dim Ch                  As Long
     Dim ByteStartIndex      As Long
     Dim directlyEncodable   As Boolean
     
+    
     If Not Encoder Is Nothing Then
         With Encoder
             Bits = .Bits
-            bitCount = .bitCount
+            BitCount = .BitCount
         End With
     Else
-        bitCount = -1
+        BitCount = -1
     End If
     
     ByteStartIndex = ByteIndex
@@ -530,13 +531,13 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         directlyEncodable = False
         If Ch < &H80 Then
             If mDirectlyEncodable(Ch) Then
-                If bitCount >= 0 Then
-                    If bitCount > 0 Then
+                If BitCount >= 0 Then
+                    If BitCount > 0 Then
                         If ByteIndex > MaxByteIndex Then
                             SmallBufferError "Bytes"
                         End If
                         
-                        Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - bitCount) And &H3F)
+                        Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - BitCount) And &H3F)
                         ByteIndex = ByteIndex + 1
                     End If
                     If ByteIndex > MaxByteIndex Then
@@ -552,12 +553,12 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                 
                 Bytes(ByteIndex) = Ch
                 ByteIndex = ByteIndex + 1
-                bitCount = -1
+                BitCount = -1
                 directlyEncodable = True
             End If
         End If
         If Not directlyEncodable Then
-            If Ch = corPlusChar And bitCount < 0 Then
+            If Ch = corPlusChar And BitCount < 0 Then
                 If ByteIndex > MaxByteIndex Then
                     SmallBufferError "Bytes"
                 End If
@@ -566,29 +567,32 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                 Bytes(ByteIndex + 1) = corMinusChar
                 ByteIndex = ByteIndex + 2
             Else
-                If bitCount < 0 Then
+                If BitCount < 0 Then
                     If ByteIndex > MaxByteIndex Then
                         SmallBufferError "Bytes"
                     End If
                     
                     Bytes(ByteIndex) = corPlusChar
                     ByteIndex = ByteIndex + 1
-                    bitCount = 0
+                    BitCount = 0
                 End If
+                
                 Bits = (Bits * &H10000) Or Ch
-                bitCount = bitCount + 16
-                Do While bitCount >= 6
-                    bitCount = bitCount - 6
+                BitCount = BitCount + 16
+                
+                Do While BitCount >= 6
+                    BitCount = BitCount - 6
                     If ByteIndex > MaxByteIndex Then
                         SmallBufferError "Bytes"
                     End If
                     
-                    Bytes(ByteIndex) = Base64Bytes(Helper.ShiftRight(Bits, bitCount) And &H3F)
+                    Bytes(ByteIndex) = Base64Bytes(Helper.ShiftRight(Bits, BitCount) And &H3F)
                     ByteIndex = ByteIndex + 1
                 Loop
-                Bits = Bits And (Powers(bitCount) - 1)
+                Bits = Bits And (Powers(BitCount) - 1)
             End If
         End If
+        
         Index = Index + 1
     Loop
     
@@ -599,13 +603,13 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         Flush = Encoder.Flush
     End If
     
-    If Flush And (bitCount >= 0) Then
-        If bitCount > 0 Then
+    If Flush And (BitCount >= 0) Then
+        If BitCount > 0 Then
             If ByteIndex > MaxByteIndex Then
                 SmallBufferError "Bytes"
             End If
             
-            Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - bitCount) And &H3F)
+            Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - BitCount) And &H3F)
             ByteIndex = ByteIndex + 1
         End If
         If ByteIndex > MaxByteIndex Then
@@ -614,13 +618,13 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         
         Bytes(ByteIndex) = corMinusChar
         ByteIndex = ByteIndex + 1
-        bitCount = -1
+        BitCount = -1
     End If
     
     If Not Encoder Is Nothing Then
         With Encoder
             .Bits = Bits
-            .bitCount = bitCount
+            .BitCount = BitCount
         End With
     End If
     
@@ -628,16 +632,16 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
 End Function
 
 Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF7Encoder) As Long
-    Dim bitCount            As Long
+    Dim BitCount            As Long
     Dim maxCharIndex        As Long
     Dim Ch                  As Long
     Dim directlyEncodable   As Boolean
     Dim ByteIndex           As Long
     
     If Not Encoder Is Nothing Then
-        bitCount = Encoder.bitCount
+        BitCount = Encoder.BitCount
     Else
-        bitCount = -1
+        BitCount = -1
     End If
     
     maxCharIndex = Index + Count - 1
@@ -647,8 +651,8 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
         
         If Ch < &H80 Then
             If mDirectlyEncodable(Ch) Then
-                If bitCount >= 0 Then
-                    If bitCount > 0 Then
+                If BitCount >= 0 Then
+                    If BitCount > 0 Then
                         ByteIndex = ByteIndex + 1
                     End If
                     
@@ -656,26 +660,27 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
                 End If
                 
                 ByteIndex = ByteIndex + 1
-                bitCount = -1
+                BitCount = -1
                 directlyEncodable = True
             End If
         End If
         If Not directlyEncodable Then
-            If Ch = corPlusChar And bitCount < 0 Then
+            If Ch = corPlusChar And BitCount < 0 Then
                 ByteIndex = ByteIndex + 2
             Else
-                If bitCount < 0 Then
+                If BitCount < 0 Then
                     ByteIndex = ByteIndex + 1
-                    bitCount = 0
+                    BitCount = 0
                 End If
                 
-                bitCount = bitCount + 16
-                Do While bitCount >= 6
-                    bitCount = bitCount - 6
+                BitCount = BitCount + 16
+                Do While BitCount >= 6
+                    BitCount = BitCount - 6
                     ByteIndex = ByteIndex + 1
                 Loop
             End If
         End If
+        
         Index = Index + 1
     Loop
     
@@ -686,12 +691,13 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
         Flush = Encoder.Flush
     End If
     
-    If Flush And (bitCount >= 0) Then
-        If bitCount > 0 Then
+    If Flush And (BitCount >= 0) Then
+        If BitCount > 0 Then
             ByteIndex = ByteIndex + 1
         End If
+        
         ByteIndex = ByteIndex + 1
-        bitCount = -1
+        BitCount = -1
     End If
     
     InternalGetByteCount = ByteIndex
@@ -707,6 +713,7 @@ Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long,
     MaxIndex = Index + Count
     Do While Index < MaxIndex
         b = Bytes(Index)
+        
         If Not InBase64 Then
             If b = corPlusChar Then
                 InBase64 = True
@@ -724,6 +731,7 @@ Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long,
         Else
             Bits = Bits + 6
         End If
+        
         Index = Index + 1
     Loop
     
@@ -732,7 +740,7 @@ End Function
 
 Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF7Decoder) As Long
     Dim Bits            As Long
-    Dim bitCount        As Long
+    Dim BitCount        As Long
     Dim b               As Byte
     Dim InBase64        As Boolean
     Dim HasPlus         As Boolean
@@ -743,7 +751,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     If Not Decoder Is Nothing Then
         With Decoder
             Bits = .Bits
-            bitCount = .bitCount
+            BitCount = .BitCount
             InBase64 = .InBase64
             HasPlus = .HasPlus
         End With
@@ -765,7 +773,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                     Chars(CharIndex) = corPlusChar
                     CharIndex = CharIndex + 1
                 ElseIf InBase64 Then
-                    bitCount = 0
+                    BitCount = 0
                     Bits = 0
                     InBase64 = False
                 Else
@@ -781,11 +789,11 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
             Case corPlusChar
                 If InBase64 Then
                     Bits = (Bits * &H40) Or Base64CharToBits(b)
-                    bitCount = bitCount + 6
+                    BitCount = BitCount + 6
                     HasPlus = False
                 Else
                     Bits = 0
-                    bitCount = 0
+                    BitCount = 0
                     InBase64 = True
                     HasPlus = True
                 End If
@@ -793,7 +801,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 If InBase64 Then
                     If Base64CharToBits(b) >= 0 Then
                         Bits = (Bits * &H40) Or Base64CharToBits(b)
-                        bitCount = bitCount + 6
+                        BitCount = BitCount + 6
                     Else
                         If CharIndex > maxCharIndex Then
                             SmallBufferError "Chars"
@@ -801,7 +809,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         
                         Chars(CharIndex) = b
                         CharIndex = CharIndex + 1
-                        bitCount = 0
+                        BitCount = 0
                         Bits = 0
                         InBase64 = False
                     End If
@@ -822,26 +830,27 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
-                bitCount = 0
+                BitCount = 0
                 Bits = 0
                 InBase64 = False
                 HasPlus = False
         End Select
-        If bitCount >= 16 Then
+        If BitCount >= 16 Then
             If CharIndex > maxCharIndex Then
                 SmallBufferError "Chars"
             End If
             
-            Chars(CharIndex) = AsWord(Helper.ShiftRight(Bits, bitCount - 16) And &HFFFF&)
+            Chars(CharIndex) = AsWord(Helper.ShiftRight(Bits, BitCount - 16) And &HFFFF&)
             CharIndex = CharIndex + 1
-            bitCount = bitCount - 16
+            BitCount = BitCount - 16
         End If
+        
         ByteIndex = ByteIndex + 1
         Bits = Bits And &HFFFFFF
     Loop
     
     If Not Decoder Is Nothing Then
-        Decoder.bitCount = bitCount
+        Decoder.BitCount = BitCount
         Decoder.Bits = Bits
         Decoder.HasPlus = HasPlus
         Decoder.InBase64 = InBase64

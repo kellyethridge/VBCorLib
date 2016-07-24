@@ -111,7 +111,8 @@ Option Explicit
 ' @return A string containg the byte array encoded as base-64 characters.
 '
 Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
-    Dim Range As ListRange
+    Dim Range   As ListRange
+    Dim Chars() As Integer
     
     ValidateByteArray InArray, Parameter_InArray
     Range = OptionalStepRange(Offset, Length, LBound(InArray), CorArray.LengthFirstDim(InArray))
@@ -124,7 +125,6 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As
     
     ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(Range.Count, InsertLineBreaks))
     
-    Dim Chars() As Integer
     Chars = AllocChars(ToBase64String)
     ToBase64CharArrayCore InArray, Range.Index, Range.Count, Chars, 0, InsertLineBreaks
     FreeChars Chars
@@ -190,7 +190,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
     Dim i           As Long
     Dim j           As Long
     Dim Bits        As Long
-    Dim bitCount    As Long
+    Dim BitCount    As Long
     Dim Ch          As Integer
     Dim CharCount   As Long
     Dim TermCount   As Long
@@ -210,12 +210,12 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
                     Error.Format Format_InvalidBase64Character
                 
                 Bits = (Bits * &H40) Or Base64CharToBits(InArray(i))
-                bitCount = bitCount + 6
-                If bitCount >= 8 Then
-                    Ret(j) = Helper.ShiftRight(Bits, bitCount - 8) And &HFF
+                BitCount = BitCount + 6
+                If BitCount >= 8 Then
+                    Ret(j) = Helper.ShiftRight(Bits, BitCount - 8) And &HFF
                     j = j + 1
-                    bitCount = bitCount - 8
-                    Bits = Bits And (Powers(bitCount) - 1)
+                    BitCount = BitCount - 8
+                    Bits = Bits And (Powers(BitCount) - 1)
                 End If
                 CharCount = CharCount + 1
             
@@ -230,11 +230,11 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
     If (CharCount Mod 4) <> 0 Then _
         Error.Format Format_InvalidNumberOfCharacters
     
-    Do While bitCount >= 8
-        Ret(j) = Helper.ShiftRight(Bits, bitCount - 8) And &HFF
+    Do While BitCount >= 8
+        Ret(j) = Helper.ShiftRight(Bits, BitCount - 8) And &HFF
         j = j + 1
-        bitCount = bitCount - 8
-        Bits = Bits And (Powers(bitCount) - 1)
+        BitCount = BitCount - 8
+        Bits = Bits And (Powers(BitCount) - 1)
     Loop
     
     If j - 1 <> UBound(Ret) Then ReDim Preserve Ret(0 To j - 1)

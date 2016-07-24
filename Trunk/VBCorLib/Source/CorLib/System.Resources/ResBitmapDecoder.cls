@@ -121,7 +121,7 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
     ' Create a Stream to write the data to, so we can read
     ' from it creating a bitmap picture.
     Dim Stream As IStream
-    Call CreateStreamOnHGlobal(0, True, Stream)
+    CreateStreamOnHGlobal 0, True, Stream
     
     ' We need to insert a BITMAPFILEHEADER so that
     ' the OleLoadPicture will work correctly, only
@@ -148,9 +148,9 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
         ' If ColorsUsed is 0 then the maximum number
         ' of colors is used based on the bits-per-pixel.
         If ColorsUsed = 0 Then
-            Dim bitCount As Long
-            bitCount = AsWord(Bytes(BITCOUNT_OFFSET))
-            ColorsUsed = Powers(bitCount)
+            Dim BitCount As Long
+            BitCount = AsWord(Bytes(BITCOUNT_OFFSET))
+            ColorsUsed = Powers(BitCount)
         End If
         
         ' Add the RGBQUAD structure offset.

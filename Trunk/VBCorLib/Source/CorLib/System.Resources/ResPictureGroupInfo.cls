@@ -101,8 +101,8 @@ End Property
 '
 ' @return The number of bits used to represent the color range.
 '
-Public Property Get bitCount() As Long
-    bitCount = mBitCount
+Public Property Get BitCount() As Long
+    BitCount = mBitCount
 End Property
 
 ''
@@ -212,7 +212,7 @@ Friend Sub Init(ByVal ResourceId As Long, ByVal Pic As IPicture, ByVal ResourceT
     Call Encoder.GetEncodedResource(Nothing, Bytes)
     
     Dim Info As BITMAPINFOHEADER
-    Call CopyMemory(Info, Bytes(0), Len(Info))
+    CopyMemory Info, Bytes(0), Len(Info)
     With Info
         mWidth = .biWidth
         mHeight = .biHeight
@@ -233,8 +233,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

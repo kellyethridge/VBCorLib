@@ -326,20 +326,9 @@ End Function
 ' @see Encoding
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    ValidateByteArray Bytes, Parameter_Bytes
-    ValidateCharArray Chars, Parameter_Chars
+    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    Statics.Encoding.ValidateCharRange Chars, CharIndex, ByteCount
     
-    If ByteIndex < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
-    If ByteCount < 0 Then _
-        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
-    If ByteIndex + ByteCount - 1 > UBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
-    If CharIndex < LBound(Chars) Then _
-        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_LBound
-    If CharIndex + ByteCount - 1 > UBound(Chars) Then _
-        Error.Argument Argument_SmallConversionBuffer, "Chars"
-        
     GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
 End Function
 

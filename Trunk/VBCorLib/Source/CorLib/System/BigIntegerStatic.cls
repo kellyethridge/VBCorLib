@@ -929,9 +929,12 @@ End Function
 ' @remarks If bitCount is negative, then a right shift is performed.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function ShiftLeft(ByVal x As BigInteger, ByVal bitCount As Long) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    Set ShiftLeft = x.ShiftLeft(bitCount)
+Public Function ShiftLeft(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
+    If x Is Nothing Then
+        Set x = mZero
+    End If
+    
+    Set ShiftLeft = x.ShiftLeft(BitCount)
 End Function
 
 ''
@@ -943,9 +946,9 @@ End Function
 ' @remarks If bitCount is negative, then a left shift is performed.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function ShiftRight(ByVal x As BigInteger, ByVal bitCount As Long) As BigInteger
+Public Function ShiftRight(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
     If x Is Nothing Then Set x = mZero
-    Set ShiftRight = x.ShiftRight(bitCount)
+    Set ShiftRight = x.ShiftRight(BitCount)
 End Function
 
 ''

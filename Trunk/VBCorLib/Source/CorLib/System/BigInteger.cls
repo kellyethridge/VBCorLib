@@ -463,17 +463,17 @@ End Function
 ' @return Returns a new BigInteger instance containing the bit shifted value.
 ' @remarks If bitCount is negative, then a left shift is performed.
 '
-Public Function ShiftRight(ByVal bitCount As Long) As BigInteger
-    If (bitCount = 0) Or (mNumber.Sign = Zero) Then
+Public Function ShiftRight(ByVal BitCount As Long) As BigInteger
+    If (BitCount = 0) Or (mNumber.Sign = Zero) Then
         Set ShiftRight = Me
         Exit Function
-    ElseIf bitCount < 0 Then
-        Set ShiftRight = ShiftLeft(-bitCount)
+    ElseIf BitCount < 0 Then
+        Set ShiftRight = ShiftLeft(-BitCount)
         Exit Function
     End If
     
     Dim wordCount As Long
-    wordCount = (bitCount And &HFFFFFFF0) \ &H10
+    wordCount = (BitCount And &HFFFFFFF0) \ &H10
 
     If wordCount >= mNumber.Precision Then
         If mNumber.Sign = Negative Then
@@ -485,7 +485,7 @@ Public Function ShiftRight(ByVal bitCount As Long) As BigInteger
     End If
     
     Set ShiftRight = New BigInteger
-    Call ShiftRight.InternalInit(ShiftRightNumber(mNumber, bitCount))
+    ShiftRight.InternalInit ShiftRightNumber(mNumber, BitCount)
 End Function
 
 ''
@@ -495,17 +495,17 @@ End Function
 ' @return Returns a new BigInteger instance containing the shifted value.
 ' @remarks If bitCount is negative, then a right shift is performed.
 '
-Public Function ShiftLeft(ByVal bitCount As Long) As BigInteger
-    If (bitCount = 0) Or (mNumber.Sign = Zero) Then
+Public Function ShiftLeft(ByVal BitCount As Long) As BigInteger
+    If (BitCount = 0) Or (mNumber.Sign = Zero) Then
         Set ShiftLeft = Me
         Exit Function
-    ElseIf bitCount < 0 Then
-        Set ShiftLeft = ShiftRight(-bitCount)
+    ElseIf BitCount < 0 Then
+        Set ShiftLeft = ShiftRight(-BitCount)
         Exit Function
     End If
     
     Set ShiftLeft = New BigInteger
-    Call ShiftLeft.InternalInit(ShiftLeftNumber(mNumber, bitCount))
+    Call ShiftLeft.InternalInit(ShiftLeftNumber(mNumber, BitCount))
 End Function
 
 
@@ -908,12 +908,12 @@ Private Function ParseFormatSpecifier(ByVal Format As String, ByRef Specifier As
     ParseFormatSpecifier = Result
 End Function
 
-Private Function ShiftLeftNumber(ByRef n As Number, ByVal bitCount As Long) As Integer()
+Private Function ShiftLeftNumber(ByRef n As Number, ByVal BitCount As Long) As Integer()
     Dim wordCount As Long
-    wordCount = (bitCount And &HFFFFFFF0) \ &H10
+    wordCount = (BitCount And &HFFFFFFF0) \ &H10
     
     Dim remainingBits As Long
-    remainingBits = bitCount And &HF
+    remainingBits = BitCount And &HF
     
     Dim newPrecision As Long
     newPrecision = n.Precision + wordCount
@@ -964,12 +964,12 @@ Private Function ShiftLeftNumber(ByRef n As Number, ByVal bitCount As Long) As I
     ShiftLeftNumber = newNumber
 End Function
 
-Private Function ShiftRightNumber(ByRef n As Number, ByVal bitCount As Long) As Integer()
+Private Function ShiftRightNumber(ByRef n As Number, ByVal BitCount As Long) As Integer()
     Dim wordCount As Long
-    wordCount = (bitCount And &HFFFFFFF0) \ &H10
+    wordCount = (BitCount And &HFFFFFFF0) \ &H10
     
     Dim remainingBits As Long
-    remainingBits = bitCount And &HF
+    remainingBits = BitCount And &HF
     
     Dim newPrecision As Long
     newPrecision = n.Precision - wordCount
