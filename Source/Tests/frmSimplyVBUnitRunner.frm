@@ -280,25 +280,14 @@ Private Sub AddSystemText()
         .Add New EncodingArgumentTests
         .Add New ASCIIEncodingTests
         .Add New UTF7EncodingTests
+        .Add New UTF8EncodingTests
         .Add New TestUnicodeEncodingBig
         .Add New TestUnicodeEncoding
         .Add New TestDetermineEncoding
         .Add New TestEncoding437
         .Add New StringBuilderTests
         .Add New TestCustomFormatter
-        
-'        .Add NewSuite("UTF7Encoding", _
-'            New TestUTF7GetChars, _
-'            New TestUTF7GetCharCount, _
-'            New TestUTF7GetBytes, _
-'            New TestUTF7GetByteCount)
-'
-'        .Add NewSuite("UTF8Encoding", _
-'            New TestUTF8GetChars, _
-'            New TestUTF8GetCharCount, _
-'            New TestUTF8Encoding, _
-'            New TestUTF8GetByteCount)
-        
+                
         AddTest .This
     End With
 End Sub
