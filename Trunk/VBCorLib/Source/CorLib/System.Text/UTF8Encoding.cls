@@ -371,7 +371,9 @@ End Function
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("CharCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    GetMaxByteCount = CharCount * 4
+    
+    ' chars are a max 3 bytes each.
+    GetMaxByteCount = (CharCount + 1) * 3 ' plus one incase the first char part of a surrogate pair from a previous operation.
 End Function
 
 ''
@@ -383,7 +385,8 @@ End Function
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     If ByteCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("ByteCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    GetMaxCharCount = ByteCount
+        
+    GetMaxCharCount = ByteCount + 1 ' plus one incase the first byte is the last byte of a surrogate pair from a previous operation.
 End Function
 
 ''
@@ -818,8 +821,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
