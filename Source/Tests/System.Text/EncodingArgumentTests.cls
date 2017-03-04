@@ -170,6 +170,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "GetBytesEx_WithNullBytesArray_ThrowsArgumentNullException"
             AddEncodings Test
+        
+        Case "GetMaxByteCount_WithNegativeValue_ThrowsArgumentOutOfRangeException"
+            AddEncodings Test
+            
+        Case "GetMaxCharCount_WithNegativeValue_ThrowsArgumentOutOfRangeException"
+            AddEncodings Test
             
     End Select
 End Sub
@@ -177,6 +183,7 @@ End Sub
 Private Sub AddEncodings(ByVal Test As TestCaseCollector)
     Test.Use New ASCIIEncoding
     Test.Use New UTF7Encoding
+    Test.Use New UTF8Encoding
 End Sub
 
 
@@ -585,9 +592,19 @@ Public Sub GetCharsEx_WithNotEnoughCapacity_ThrowsArgumentException(ByVal Encodi
     AssertArgumentOutOfRangeException Err, "Chars"
 End Sub
 
+Public Sub GetMaxByteCount_WithNegativeValue_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+    On Error Resume Next
+    Encoding.GetMaxByteCount -1
+    
+    AssertArgumentOutOfRangeException Err, "CharCount"
+End Sub
 
-
-
+Public Sub GetMaxCharCount_WithNegativeValue_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+    On Error Resume Next
+    Encoding.GetMaxCharCount -1
+    
+    AssertArgumentOutOfRangeException Err, "ByteCount"
+End Sub
 
 
 

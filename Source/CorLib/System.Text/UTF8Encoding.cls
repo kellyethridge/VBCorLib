@@ -54,10 +54,11 @@ Implements Encoding
 
 Private Const CODE_PAGE As Long = 65001
 
+Private Const Prop_ThrowException = "ThrowException"
+Private Const Prop_ShouldEmitUTF8Identifier = "EmitBOM"
+
 Private mThrowException             As Boolean
 Private mShouldEmitUTF8Identifier   As Boolean
-Private mChars()                    As Integer
-Private mCharsSA                    As SafeArray1d
 
 
 ''
@@ -171,15 +172,27 @@ End Property
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    AttachChars Chars, mChars, mCharsSA
+    Dim Chrs()  As Integer
+    Dim Range   As ListRange
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    On Error GoTo Catch
     
-    GetByteCount = InternalGetByteCount(mChars, ElemIndex, ElemCount, Nothing)
+    Chrs = AsChars(Chars)
+    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
+    
+    If Range.Count > 0 Then
+        GetByteCount = InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing)
+    End If
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars Chrs
+    Return
 End Function
 
 ''
@@ -194,23 +207,32 @@ End Function
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim Range       As ListRange
+    Dim Chrs()      As Integer
+    Dim Output()    As Byte
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    On Error GoTo Catch
     
-    Dim Ret() As Byte
-    If ElemCount > 0 Then
-        ReDim Ret(0 To InternalGetByteCount(mChars, ElemIndex, ElemCount, Nothing) - 1)
-        Call InternalGetBytes(mChars, ElemIndex, ElemCount, Ret, 0, Nothing)
+    Chrs = AsChars(Chars)
+    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
+    
+    If Range.Count > 0 Then
+        ReDim Output(0 To InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing) - 1)
+        InternalGetBytes Chrs, Range.Index, Range.Count, Output, 0, Nothing
+        GetBytes = Output
     Else
-        Ret = Cor.NewBytes()
+        GetBytes = Cor.NewBytes()
     End If
     
-    GetBytes = Ret
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars Chrs
+    Return
 End Function
 
 ''
@@ -230,13 +252,29 @@ End Function
 ' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim Chrs()      As Integer
+    Dim Range       As ListRange
+    Dim ByteCount   As Long
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(mChars), CharIndex, CharCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount")
+    Chrs = AsChars(Chars)
     
-    GetBytesEx = InternalGetBytes(mChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
+    On Error GoTo Catch
+    
+    Statics.Encoding.ValidateCharRange Chrs, CharIndex, CharCount
+    ByteCount = InternalGetByteCount(Chrs, CharIndex, CharCount, Nothing)
+    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    
+    GetBytesEx = InternalGetBytes(Chrs, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars Chrs
+    Return
 End Function
 
 ''
@@ -248,15 +286,12 @@ End Function
 ' @return The number of characters that would be decoded from the set of bytes.
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
+    Dim Range As ListRange
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
     
-    Dim nullch() As Integer
-    GetCharCount = InternalGetChars(Bytes, ElemIndex, ElemCount, nullch, 0, Nothing)
+    Dim NullChars() As Integer
+    GetCharCount = InternalGetChars(Bytes, Range.Index, Range.Count, NullChars, 0, Nothing)
 End Function
 
 ''
@@ -268,26 +303,24 @@ End Function
 ' @return An array of characters decoded from the set of bytes.
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
+    Dim Range       As ListRange
+    Dim Output()    As Integer
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
     
-    Dim Size As Long
-    Size = GetMaxCharCount(ElemCount)
-    
-    Dim Ret() As Integer
-    If ElemCount > 0 Then
-        ReDim Ret(0 To Size - 1)
-        Size = InternalGetChars(Bytes, ElemIndex, ElemCount, Ret, 0, Nothing)
-        ReDim Preserve Ret(0 To Size - 1)
+    If Range.Count > 0 Then
+        ReDim Output(0 To GetMaxCharCount(Range.Count))
+        
+        Dim Size As Long
+        Size = InternalGetChars(Bytes, Range.Index, Range.Count, Output, 0, Nothing)
+        If Size <> UBound(Output) + 1 Then
+            ReDim Preserve Output(0 To Size - 1)
+        End If
     Else
-        Ret = Cor.NewIntegers()
+        Output = Cor.NewIntegers()
     End If
     
-    GetChars = Ret
+    GetChars = Output
 End Function
 
 ''
@@ -304,9 +337,8 @@ End Function
 ' GetMaxCharCount to determine a size that will hold the decoded bytes.
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount")
+    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    ValidateCharArray Chars
     
     GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Nothing)
 End Function
@@ -320,26 +352,33 @@ End Function
 ' @return A string containing the decoded set of bytes.
 '
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
+    Dim Range       As ListRange
+    Dim Size        As Long
+    Dim Result      As String
+    Dim Output()    As Integer
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    Size = GetMaxCharCount(Range.Count)
+    Result = SysAllocStringLen(0, Size)
+    Output = AllocChars(Result)
     
-    Dim Size As Long
-    Size = GetMaxCharCount(ElemCount)
+    On Error GoTo Catch
+    Size = GetCharsEx(Bytes, Range.Index, Range.Count, Output, 0)
     
-    Dim Ret As String
-    Ret = SysAllocStringLen(0, Size)
-    With mCharsSA
-        .pvData = StrPtr(Ret)
-        .lLbound = 0
-        .cElements = Size
-    End With
-    SAPtr(mChars) = VarPtr(mCharsSA)
-    Size = InternalGetChars(Bytes, ElemIndex, ElemCount, mChars, 0, Nothing)
-    GetString = Left$(Ret, Size)
+    If Len(Result) <> Size Then
+        GetString = Left$(Result, Size)
+    Else
+        GetString = Result
+    End If
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars Output
 End Function
 
 ''
@@ -370,7 +409,7 @@ End Function
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
     If CharCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("CharCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
     
     ' chars are a max 3 bytes each.
     GetMaxByteCount = (CharCount + 1) * 3 ' plus one incase the first char part of a surrogate pair from a previous operation.
@@ -384,7 +423,7 @@ End Function
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     If ByteCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ByteCount", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
         
     GetMaxCharCount = ByteCount + 1 ' plus one incase the first byte is the last byte of a surrogate pair from a previous operation.
 End Function
@@ -401,9 +440,9 @@ End Function
 ' continue as if a single call was made.
 '
 Public Function GetEncoder() As Encoder
-    Dim Ret As New UTF8Encoder
-    Call Ret.Init(Me)
-    Set GetEncoder = Ret
+    Dim Encoder As New UTF8Encoder
+    Encoder.Init Me
+    Set GetEncoder = Encoder
 End Function
 
 ''
@@ -418,9 +457,9 @@ End Function
 ' continue decoding as if all the required bytes were in the same call.
 '
 Public Function GetDecoder() As Decoder
-    Dim Ret As New UTF8Decoder
-    Call Ret.Init(Me)
-    Set GetDecoder = Ret
+    Dim Decoder As New UTF8Decoder
+    Decoder.Init Me
+    Set GetDecoder = Decoder
 End Function
 
 ''
@@ -442,9 +481,9 @@ Public Function Equals(ByRef Value As Variant) As Boolean
         If Value Is Nothing Then Exit Function
         
         If TypeOf Value Is UTF8Encoding Then
-            Dim en As UTF8Encoding
-            Set en = Value
-            Equals = (mShouldEmitUTF8Identifier = en.EmitUTF8Identifier)
+            Dim Other As UTF8Encoding
+            Set Other = Value
+            Equals = (mShouldEmitUTF8Identifier = Other.EmitUTF8Identifier)
         End If
     End If
 End Function
@@ -459,13 +498,17 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal ShouldEmitUTF8Identifier As Long, ByVal ShouldThrowException As Boolean)
     mShouldEmitUTF8Identifier = ShouldEmitUTF8Identifier
     mThrowException = ShouldThrowException
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Friends
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Property Get EmitUTF8Identifier() As Boolean
     EmitUTF8Identifier = mShouldEmitUTF8Identifier
 End Property
@@ -801,10 +844,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private helpers
+'   helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub SmallBufferError(ByVal ParamName As String)
-    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), ParamName)
+    Error.ArgumentOutOfRange ParamName, Argument_SmallConversionBuffer
 End Sub
 
 Private Function EncodeSurrogate(ByVal Char As Long, ByRef Bytes() As Byte, ByVal Index As Long) As Long
@@ -822,37 +865,25 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    With mCharsSA
-        .cbElements = 2
-        .cDims = 1
-        .cElements = &H7FFFFFFF
-    End With
-End Sub
-
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mThrowException = .ReadProperty("ThrowException", True)
-        mShouldEmitUTF8Identifier = .ReadProperty("EmitBOM", True)
+        mThrowException = .ReadProperty(Prop_ThrowException, True)
+        mShouldEmitUTF8Identifier = .ReadProperty(Prop_ShouldEmitUTF8Identifier, True)
     End With
-End Sub
-
-Private Sub Class_Terminate()
-    SAPtr(mChars) = 0
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("ThrowException", mThrowException)
-        Call .WriteProperty("EmitBOM", mShouldEmitUTF8Identifier)
+        .WriteProperty Prop_ThrowException, mThrowException
+        .WriteProperty Prop_ShouldEmitUTF8Identifier, mShouldEmitUTF8Identifier
     End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -868,7 +899,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Encoding Interface
+'   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Encoding_BodyName() As String
     Encoding_BodyName = BodyName
