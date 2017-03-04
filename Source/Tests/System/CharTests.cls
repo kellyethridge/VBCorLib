@@ -89,6 +89,26 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HA0, True
             Test.Use 65, False
             
+        Case "IsHighSurrogateChar"
+            Test.Use &HD800&, True
+            Test.Use &HD800, True
+            Test.Use &HD7FF&, False
+            Test.Use &HD7FF, False
+            Test.Use &HDBFF&, True
+            Test.Use &HDBFF, True
+            Test.Use &HDC00&, False
+            Test.Use &HDC00, False
+            
+        Case "IsLowSurrogateChar"
+            Test.Use &HDC00, True
+            Test.Use &HDC00&, True
+            Test.Use &HDFFF, True
+            Test.Use &HDFFF&, True
+            Test.Use &HDBFF, False
+            Test.Use &HDBFF&, False
+            Test.Use &HE000, False
+            Test.Use &HE000&, False
+            
     End Select
 End Sub
 
@@ -140,3 +160,20 @@ Public Sub IsWhiteSpace_WithEmptyString_ThrowsArgumentOutOfRangeException()
     
     AssertArgumentOutOfRangeException Err
 End Sub
+
+Public Sub IsHighSurrogateChar(ByVal Value As Long, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.IsHighSurrogateChar(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsLowSurrogateChar(ByVal Value As Long, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.IsLowSurrogateChar(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
