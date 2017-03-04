@@ -196,7 +196,7 @@ Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Vari
     Dim Chars() As Integer
     If Range.Count > 0 Then
         ReDim Chars(0 To Range.Count - 1)
-        CopyMemory Chars(0), ByVal StrPtr(s) + Range.Index * corSizeOfChar, Range.Count * corSizeOfChar
+        CopyMemory Chars(0), ByVal StrPtr(s) + Range.Index * vbSizeOfChar, Range.Count * vbSizeOfChar
     Else
         Chars = Cor.NewIntegers()
     End If
@@ -315,9 +315,9 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
         Error.ArgumentOutOfRange "", Argument_InvalidOffLen
     
     Select Case VarType(Value)
-        Case corStringArray
+        Case vbStringArray
             Join = JoinStrings(Separator, Value, Range)
-        Case corVariantArray
+        Case vbVariantArray
             Join = JoinVariants(Separator, Value, Range)
         Case Else
             Join = JoinArray(Separator, Value, Range)
@@ -349,7 +349,7 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
     Dim SPtr As Long
     SPtr = StrPtr(s)
     Remove = SysAllocStringLen(SPtr, CharCount - RemovalCount)
-    CopyMemory ByVal StrPtr(Remove) + StartIndex * corSizeOfChar, ByVal SPtr + (StartIndex + RemovalCount) * corSizeOfChar, (CharCount - (StartIndex + RemovalCount)) * corSizeOfChar
+    CopyMemory ByVal StrPtr(Remove) + StartIndex * vbSizeOfChar, ByVal SPtr + (StartIndex + RemovalCount) * vbSizeOfChar, (CharCount - (StartIndex + RemovalCount)) * vbSizeOfChar
 End Function
 
 ''
@@ -515,12 +515,12 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitComparisonStrings()
     With mComparisonHeader1
-        .cbElements = corSizeOfChar * 2
+        .cbElements = vbSizeOfChar * 2
         .cDims = 1
         .cElements = &H7FFFFFFF
     End With
     With mComparisonHeader2
-        .cbElements = corSizeOfChar * 2
+        .cbElements = vbSizeOfChar * 2
         .cDims = 1
         .cElements = &H7FFFFFFF
     End With
@@ -580,13 +580,13 @@ End Function
 
 Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
     Select Case VarType(TrimChars)
-        Case vbString, corIntegerArray
+        Case vbString, vbIntegerArray
             Dim Chars() As Integer
             Chars = AsChars(TrimChars)
             TrimCore = TrimGeneral(s, Chars, TrimHead, TrimTail)
             FreeChars Chars
             
-        Case corMissing
+        Case vbMissing
             TrimCore = TrimWhiteSpace(s, TrimHead, TrimTail)
             
         Case Else
@@ -711,11 +711,11 @@ Private Function JoinStrings(ByRef Separator As String, ByRef Value As Variant, 
     Dim ArrayStruct     As SafeArray1d
     
     With ArrayStruct
-        .cbElements = corSizeOfPtr
+        .cbElements = vbSizeOfPtr
         .cDims = 1
         .cElements = Range.Count
         .fFeatures = &H100
-        .pvData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * corSizeOfPtr
+        .pvData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET) + (Range.Index - LBound(Value)) * vbSizeOfPtr
     End With
     
     SAPtr(SubStrings) = VarPtr(ArrayStruct)

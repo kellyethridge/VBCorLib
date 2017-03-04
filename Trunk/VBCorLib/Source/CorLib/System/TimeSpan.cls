@@ -233,7 +233,7 @@ Public Function ToString() As String
     Dim ms As Currency
     ms = mMilliseconds
     If ms < 0 Then
-        Output.AppendChar corMinusChar
+        Output.AppendChar vbMinusChar
         ms = -ms
     End If
     
@@ -241,13 +241,13 @@ Public Function ToString() As String
     Days = Int(ms / MilliSecondsPerDay)
     If Days <> 0 Then
         Output.Append Days
-        Output.AppendChar corPeriodChar
+        Output.AppendChar vbPeriodChar
     End If
 
     AppendComponent Output, Int(ms / MillisecondsPerHour) Mod HoursPerDay, 2
-    Output.AppendChar corColonChar
+    Output.AppendChar vbColonChar
     AppendComponent Output, Int(ms / MillisecondsPerMinute) Mod MinutesPerHour, 2
-    Output.AppendChar corColonChar
+    Output.AppendChar vbColonChar
     AppendComponent Output, Int(ms / MillisecondsPerSecond) Mod SecondsPerMinute, 2
     
     Dim MillisecondComponent    As Long
@@ -256,11 +256,11 @@ Public Function ToString() As String
     TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TicksPerMillisecond
     
     If MillisecondComponent <> 0 Then
-        Output.AppendChar corPeriodChar
+        Output.AppendChar vbPeriodChar
         AppendComponent Output, MillisecondComponent, 3
         AppendComponent Output, TicksComponent, 4
     ElseIf TicksComponent <> 0 Then
-        Output.AppendChar corPeriodChar
+        Output.AppendChar vbPeriodChar
         AppendComponent Output, TicksComponent, 7
     End If
     
@@ -315,7 +315,7 @@ Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Lo
     Dim ComponentString As String
     ComponentString = Component
     
-    Output.AppendChar corZeroChar, Width - Len(ComponentString)
+    Output.AppendChar vbZeroChar, Width - Len(ComponentString)
     Output.AppendString ComponentString
 End Sub
 
@@ -345,8 +345,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
 Catch:
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

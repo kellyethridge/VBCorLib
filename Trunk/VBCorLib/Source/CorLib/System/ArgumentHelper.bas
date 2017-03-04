@@ -41,7 +41,7 @@ End Type
 
 Public Function TryOptionalLong(ByRef Value As Variant, ByRef Result As Long) As Boolean
     Select Case VarType(Value)
-        Case corMissing
+        Case vbMissing
         Case vbLong, vbInteger, vbByte
             Result = Value
             TryOptionalLong = True
@@ -55,7 +55,7 @@ End Function
 '
 Public Function OptionalLong(ByRef Value As Variant, ByVal Default As Long) As Long
     Select Case VarType(Value)
-        Case corMissing
+        Case vbMissing
             OptionalLong = Default
         Case vbLong, vbInteger, vbByte
             OptionalLong = Value

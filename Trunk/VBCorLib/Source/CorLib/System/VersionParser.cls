@@ -114,9 +114,9 @@ Private Function TryParseComponent(ByVal Component As Long, ByRef Result As Long
     
 Catch:
     Select Case Err.Number
-        Case corTypeMismatch
+        Case vbTypeMismatch
             Set mException = Cor.NewFormatException(Environment.GetResourceString(Arg_VersionString))
-        Case corOverflow
+        Case vbOverflow
             Set mException = New OverflowException
         Case Else
             Set mException = Cor.NewException(Err.Description, Err.Number)

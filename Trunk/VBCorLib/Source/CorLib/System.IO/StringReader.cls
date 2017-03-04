@@ -114,7 +114,7 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
         Count = mLength - mPosition
     End If
     
-    CopyMemory Buffer(Index), mStringBuffer.Chars(mPosition), Count * corSizeOfChar
+    CopyMemory Buffer(Index), mStringBuffer.Chars(mPosition), Count * vbSizeOfChar
     ReadBlock = Count
 End Function
 
@@ -139,7 +139,7 @@ Public Function ReadLine() As String
     i = mPosition
     Do While mPosition < mLength
         Select Case mStringBuffer.Chars(mPosition)
-            Case corReturnChar, corLineFeedChar: Exit Do
+            Case vbReturnChar, vbLineFeedChar: Exit Do
         End Select
         mPosition = mPosition + 1
     Loop
@@ -153,12 +153,12 @@ Public Function ReadLine() As String
     
     ReadLine = Mid$(mString, i + 1, mPosition - i)
     
-    If mStringBuffer.Chars(mPosition) = corReturnChar Then
+    If mStringBuffer.Chars(mPosition) = vbReturnChar Then
         ' consume the found terminator.
         mPosition = mPosition + 1
         ' if a Cr was followed by an Lf then consume the Lf
         If mPosition < mLength Then
-            If mStringBuffer.Chars(mPosition) = corLineFeedChar Then
+            If mStringBuffer.Chars(mPosition) = vbLineFeedChar Then
                 mPosition = mPosition + 1
             End If
         End If

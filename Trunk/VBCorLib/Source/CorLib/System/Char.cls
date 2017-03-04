@@ -49,7 +49,7 @@ Public Function IsWhiteSpace(ByRef s As String, ByVal Index As Long) As Boolean
         Error.ArgumentOutOfRange "Index"
         
     Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * corSizeOfChar
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
     IsWhiteSpace = IsWhiteSpaceChar(MemWord(Ptr))
 End Function
 

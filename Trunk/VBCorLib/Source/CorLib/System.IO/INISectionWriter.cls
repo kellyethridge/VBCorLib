@@ -92,7 +92,7 @@ Public Sub Generate()
     Dim de As DictionaryEntry
     For Each de In mValues
        Call sb.Append(de.Key)
-       Call sb.AppendChar(corEqualChar)
+       Call sb.AppendChar(vbEqualChar)
        Call sb.Append(de.Value)
        Call sb.AppendChar(0)
     Next de
@@ -149,8 +149,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

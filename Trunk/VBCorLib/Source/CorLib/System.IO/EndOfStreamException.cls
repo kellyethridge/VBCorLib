@@ -104,7 +104,7 @@ End Property
 ' @return A VB error that matches the number return by <b>Err.Number</b>.
 '
 Public Property Get ErrorNumber() As Long
-    ErrorNumber = corInputPastEndOfFile
+    ErrorNumber = vbInputPastEndOfFile
 End Property
 
 ''
@@ -241,8 +241,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

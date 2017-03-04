@@ -197,7 +197,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
     For i = Offset To Offset + Length - 1
         Ch = InArray(i)
         Select Case Ch
-            Case corEqualChar
+            Case vbEqualChar
                 CharCount = CharCount + 1
                 TermCount = TermCount + 1
                 
@@ -205,7 +205,7 @@ Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As 
                 If TermCount > 0 Then _
                     Error.Format Format_InvalidBase64Character
                     
-            Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar, corZeroChar To corNineChar, corPlusChar, corForwardSlashChar
+            Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar, vbZeroChar To vbNineChar, vbPlusChar, vbForwardSlashChar
                 If TermCount > 0 Then _
                     Error.Format Format_InvalidBase64Character
                 
@@ -290,8 +290,8 @@ Private Function ToBase64CharArrayCore(ByRef InArray() As Byte, ByVal IndexIn As
     Dim CharCount   As Long
     For i = IndexIn To MaxIndex - 1 Step 3
         If InsertLineBreaks And (CharCount = 76) Then
-            OutArray(IndexOut) = corReturnChar
-            OutArray(IndexOut + 1) = corLineFeedChar
+            OutArray(IndexOut) = vbReturnChar
+            OutArray(IndexOut + 1) = vbLineFeedChar
             IndexOut = IndexOut + 2
             CharCount = 0
         End If
@@ -308,8 +308,8 @@ Private Function ToBase64CharArrayCore(ByRef InArray() As Byte, ByVal IndexIn As
         Select Case Length Mod 3
             Case 1, 2
                 If CharCount = 76 Then
-                    OutArray(IndexOut) = corReturnChar
-                    OutArray(IndexOut + 1) = corLineFeedChar
+                    OutArray(IndexOut) = vbReturnChar
+                    OutArray(IndexOut + 1) = vbLineFeedChar
                     IndexOut = IndexOut + 2
                 End If
         End Select
@@ -321,14 +321,14 @@ Private Function ToBase64CharArrayCore(ByRef InArray() As Byte, ByVal IndexIn As
         Case 1
             OutArray(IndexOut) = Base64Bytes((InArray(MaxIndex) And &HFC) \ 4)
             OutArray(IndexOut + 1) = Base64Bytes((InArray(MaxIndex) And &H3) * &H10)
-            OutArray(IndexOut + 2) = corEqualChar
-            OutArray(IndexOut + 3) = corEqualChar
+            OutArray(IndexOut + 2) = vbEqualChar
+            OutArray(IndexOut + 3) = vbEqualChar
             IndexOut = IndexOut + 4
         Case 2
             OutArray(IndexOut) = Base64Bytes((InArray(MaxIndex) And &HFC) \ 4)
             OutArray(IndexOut + 1) = Base64Bytes(((InArray(MaxIndex) And &H3) * &H10) Or ((InArray(MaxIndex + 1) And &HF0) \ &H10))
             OutArray(IndexOut + 2) = Base64Bytes((InArray(MaxIndex + 1) And &HF) * 4)
-            OutArray(IndexOut + 3) = corEqualChar
+            OutArray(IndexOut + 3) = vbEqualChar
             IndexOut = IndexOut + 4
     End Select
     ToBase64CharArrayCore = IndexOut

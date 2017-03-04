@@ -199,7 +199,7 @@ Private Sub InitHasher(ByRef Password As Variant)
     Select Case VarType(Password)
         Case vbString
             Key = Encoding.UTF8.GetBytes(Password)
-        Case corByteArray
+        Case vbByteArray
             Key = Password
         Case Else
             Error.Argument Argument_ByteArrayOrStringRequired, "Password"
@@ -210,7 +210,7 @@ End Sub
 
 Private Sub InitSalt(ByRef Salt As Variant)
     Select Case VarType(Salt)
-        Case corByteArray
+        Case vbByteArray
             Me.Salt = Salt
         Case vbLong, vbInteger, vbByte
             If Salt < 0 Then _

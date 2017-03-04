@@ -262,7 +262,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
     Set mBase = Cor.NewExceptionBase(Me, App)
-    mBase.ErrorNumber = corInvalidProcedureCall
+    mBase.ErrorNumber = vbInvalidProcedureCall
 End Sub
 
 Friend Sub Init(ByRef ParamName As String, ByRef Message As String, ByRef ActualValue As Variant, ByVal InnerException As Exception, ByVal Method As InvocationMethod)
@@ -276,11 +276,11 @@ End Sub
 Private Function GetErrorNumber(ByVal Method As InvocationMethod) As Long
     Select Case Method
         Case InvocationMethod.GenericInvocation
-            GetErrorNumber = corInvalidProcedureCall
+            GetErrorNumber = vbInvalidProcedureCall
         Case InvocationMethod.ArrayInvocation
-            GetErrorNumber = corSubscriptOutOfRange
+            GetErrorNumber = vbSubscriptOutOfRange
         Case InvocationMethod.PropertyInvocation
-            GetErrorNumber = corInvalidPropertyValue
+            GetErrorNumber = vbInvalidPropertyValue
         Case Else
             Throw Cor.NewArgumentOutOfRangeException("Method", Environment.GetResourceString(ArgumentOutOfRange_Enum), Method)
     End Select

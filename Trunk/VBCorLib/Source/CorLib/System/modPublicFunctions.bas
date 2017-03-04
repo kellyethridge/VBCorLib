@@ -162,7 +162,7 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
         Case vbString
             Set GetStream = Cor.NewFileStream(CStr(Source), Mode, Access, Share)
             
-        Case corByteArray
+        Case vbByteArray
             Dim Bytes() As Byte
             SAPtr(Bytes) = CorArray.ArrayPointer(Source)
             If CorArray.IsNull(Bytes) Then _

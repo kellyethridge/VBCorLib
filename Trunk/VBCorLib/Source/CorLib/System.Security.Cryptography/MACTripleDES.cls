@@ -189,7 +189,7 @@ Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Var
     StartHash
     
     Select Case VarType(Source)
-        Case corByteArray
+        Case vbByteArray
             ComputeHashOnBytes Source, Index, Count
         Case vbObject
             ComputeHashOnStream Source
@@ -411,8 +411,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

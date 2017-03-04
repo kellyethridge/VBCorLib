@@ -293,13 +293,13 @@ Private Sub NormalizeArray(ByVal NewCapacity As Long)
     Else
         ReDim NewItems(0 To NewCapacity - 1)
         If mHead < mTail Then
-            CopyMemory NewItems(0), mItems(mHead), (mTail - mHead) * corSizeOfVariant
+            CopyMemory NewItems(0), mItems(mHead), (mTail - mHead) * vbSizeOfVariant
         Else
-            CopyMemory NewItems(0), mItems(mHead), (mCapacity - mHead) * corSizeOfVariant
-            CopyMemory NewItems(mCapacity - mHead), mItems(0), mHead * corSizeOfVariant
+            CopyMemory NewItems(0), mItems(mHead), (mCapacity - mHead) * vbSizeOfVariant
+            CopyMemory NewItems(mCapacity - mHead), mItems(0), mHead * vbSizeOfVariant
         End If
         
-        ZeroMemory mItems(0), mCapacity * corSizeOfVariant
+        ZeroMemory mItems(0), mCapacity * vbSizeOfVariant
         Helper.Swap4 ByVal ArrPtr(mItems), ByVal ArrPtr(NewItems)
     End If
     mTail = mCount
@@ -417,8 +417,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

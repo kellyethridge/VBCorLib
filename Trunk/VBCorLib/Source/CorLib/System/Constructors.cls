@@ -100,7 +100,7 @@ End Function
 ' @see Exception
 ' @remarks
 ' The default error number is 5-Invalid Procedure Call.
-Public Function NewException(ByVal Message As String, Optional ByVal ErrorNumber As Long = corInvalidProcedureCall, Optional ByVal InnerException As Exception) As Exception
+Public Function NewException(ByVal Message As String, Optional ByVal ErrorNumber As Long = vbInvalidProcedureCall, Optional ByVal InnerException As Exception) As Exception
     Set NewException = New Exception
     NewException.Init Message, ErrorNumber, InnerException
 End Function
@@ -474,7 +474,7 @@ End Function
 ' @param InnerException The exception that caused this exception.
 ' @return A new IOException object.
 '
-Public Function NewIOException(ByRef Message As String, Optional ByVal HResult As Long = COR_E_IO, Optional ByVal ErrorCode As Long = corDeviceIOError, Optional ByVal InnerException As Exception) As IOException
+Public Function NewIOException(ByRef Message As String, Optional ByVal HResult As Long = COR_E_IO, Optional ByVal ErrorCode As Long = vbDeviceIOError, Optional ByVal InnerException As Exception) As IOException
     Set NewIOException = New IOException
     NewIOException.Init Message, HResult, ErrorCode, InnerException
 End Function

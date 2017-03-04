@@ -985,7 +985,7 @@ End Property
 ' @return The requested format provider, or Nothing if no format provider was found.
 '
 Public Function GetFormat(ByRef FormatType As String) As Object
-    If CorString.Equals(FormatType, corNumberFormatInfo, OrdinalIgnoreCase) Then
+    If CorString.Equals(FormatType, vbNumberFormatInfo, OrdinalIgnoreCase) Then
         Set GetFormat = Me
     End If
 End Function
@@ -1205,7 +1205,7 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
             If Not IsValidNumber(FormatSingle) Then _
                 Exit Function
             
-            If mNumber.Digits(0) = corZeroChar Then
+            If mNumber.Digits(0) = vbZeroChar Then
                 FormatSingle = "0"
                 Exit Function
             End If
@@ -1278,7 +1278,7 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
             
             If Not IsValidNumber(FormatDouble) Then Exit Function
             
-            If mNumber.Digits(0) = corZeroChar Then
+            If mNumber.Digits(0) = vbZeroChar Then
                 FormatDouble = "0"
                 Exit Function
             End If
@@ -1326,10 +1326,10 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
     
     Select Case Specifiers.Format
         Case FormatSpecifier.GeneralLowerSpecifier
-            FormatGeneralInt32 Specifiers.Precision, corLowerEChar
+            FormatGeneralInt32 Specifiers.Precision, vbLowerEChar
             
         Case FormatSpecifier.GeneralUpperSpecifier
-            FormatGeneralInt32 Specifiers.Precision, corUpperEChar
+            FormatGeneralInt32 Specifiers.Precision, vbUpperEChar
             
         Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
             FormatFixedDouble Specifiers.Precision
@@ -1344,10 +1344,10 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
             FormatCurrency Specifiers.Precision
             
         Case FormatSpecifier.ExponentLowerSpecifier
-            FormatExponentInt32 Specifiers.Precision, corLowerEChar
+            FormatExponentInt32 Specifiers.Precision, vbLowerEChar
             
         Case FormatSpecifier.ExponentUpperSpecifier
-            FormatExponentInt32 Specifiers.Precision, corUpperEChar
+            FormatExponentInt32 Specifiers.Precision, vbUpperEChar
         
         Case FormatSpecifier.PercentUpperSpecifier, FormatSpecifier.PercentLowerSpecifier
             If mNumber.Precision > 0 Then
@@ -1416,8 +1416,8 @@ Private Sub FormatNumber(ByVal FormatPrecision As Long)
         For i = 0 To Len(Pattern) - 1
             Ch = mFormatSpecifier.Chars(i)
             Select Case Ch
-                Case corPoundChar:    FormatGroups FormatPrecision, .NumberGroupSizes, .NumberGroupSeparator, .NumberDecimalSeparator
-                Case corMinusChar:    AppendString .NegativeSign
+                Case vbPoundChar:    FormatGroups FormatPrecision, .NumberGroupSizes, .NumberGroupSeparator, .NumberDecimalSeparator
+                Case vbMinusChar:    AppendString .NegativeSign
                 Case Else
                     mOutput(mOutputPos) = Ch
                     mOutputPos = mOutputPos + 1
@@ -1448,9 +1448,9 @@ Private Sub FormatCurrency(ByVal DecimalPlaces As Long)
         For i = 0 To Len(Pattern) - 1
             Ch = mFormatSpecifier.Chars(i)
             Select Case Ch
-                Case corPoundChar:    FormatGroups DecimalPlaces, .CurrencyGroupSizes, .CurrencyGroupSeparator, .CurrencyDecimalSeparator
-                Case corMinusChar:    AppendString .NegativeSign
-                Case corDollarChar:   AppendString .CurrencySymbol
+                Case vbPoundChar:    FormatGroups DecimalPlaces, .CurrencyGroupSizes, .CurrencyGroupSeparator, .CurrencyDecimalSeparator
+                Case vbMinusChar:    AppendString .NegativeSign
+                Case vbDollarChar:   AppendString .CurrencySymbol
                 Case Else
                     mOutput(mOutputPos) = Ch
                     mOutputPos = mOutputPos + 1
@@ -1475,9 +1475,9 @@ Private Sub FormatPercent(ByVal DecimalPlaces As Long)
         For i = 0 To Len(Pattern) - 1
             Ch = mFormatSpecifier.Chars(i)
             Select Case Ch
-                Case corPoundChar:    FormatGroups DecimalPlaces, .PercentGroupSizes, .PercentGroupSeparator, .PercentDecimalSeparator
-                Case corMinusChar:    AppendString .NegativeSign
-                Case corPercentChar:  AppendString .PercentSymbol
+                Case vbPoundChar:    FormatGroups DecimalPlaces, .PercentGroupSizes, .PercentGroupSeparator, .PercentDecimalSeparator
+                Case vbMinusChar:    AppendString .NegativeSign
+                Case vbPercentChar:  AppendString .PercentSymbol
                 Case Else
                     mOutput(mOutputPos) = Ch
                     mOutputPos = mOutputPos + 1
@@ -1538,8 +1538,8 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
                     AppendString GroupSeparator
                     DigitCount = GroupSize
                 End If
-                If Ch = corTerminator Then
-                    mOutput(mOutputPos) = corZeroChar
+                If Ch = vbTerminator Then
+                    mOutput(mOutputPos) = vbZeroChar
                 Else
                     mOutput(mOutputPos) = Ch
                     Ch = .Digits(DigitIndex + 1)
@@ -1550,11 +1550,11 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
                 RepeatingGroupDigitCount = RepeatingGroupDigitCount - 1
             Loop
         Else
-            mOutput(mOutputPos) = corZeroChar
+            mOutput(mOutputPos) = vbZeroChar
             mOutputPos = mOutputPos + 1
         End If
 
-        If (DigitIndex = 0 Or Ch <> corTerminator) Or (DigitIndex < .DecimalPosition And Ch = corTerminator) Then
+        If (DigitIndex = 0 Or Ch <> vbTerminator) Or (DigitIndex < .DecimalPosition And Ch = vbTerminator) Then
             Dim GroupSizeIndex As Long
             
             If HasGroups Then
@@ -1582,7 +1582,7 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
                     End If
                 End If
                 If Ch = 0 Then
-                    mOutput(mOutputPos) = corZeroChar
+                    mOutput(mOutputPos) = vbZeroChar
                 Else
                     mOutput(mOutputPos) = Ch
                     Ch = .Digits(DigitIndex + 1)
@@ -1601,15 +1601,15 @@ Private Sub FormatGroups(ByVal DecimalPlaces As Long, ByRef GroupSizes() As Long
             ' negative scale represents numbers such as 0.000000123,
             ' so we need to insert the zeros before the digits.
             Do While DigitIndex < 0
-                mOutput(mOutputPos) = corZeroChar
+                mOutput(mOutputPos) = vbZeroChar
                 mOutputPos = mOutputPos + 1
                 DigitIndex = DigitIndex + 1
                 DecimalPlaces = DecimalPlaces - 1
             Loop
-            If Ch <> corTerminator Then Ch = .Digits(i)
+            If Ch <> vbTerminator Then Ch = .Digits(i)
             Do While DecimalPlaces > 0
                 If Ch = 0 Then
-                    mOutput(mOutputPos) = corZeroChar
+                    mOutput(mOutputPos) = vbZeroChar
                 Else
                     mOutput(mOutputPos) = Ch
                     DigitIndex = DigitIndex + 1
@@ -1660,7 +1660,7 @@ Private Sub FormatHex(ByRef Value As Variant, ByRef Specifiers As Specifiers)
         If Ch > 9 Then
             mOutput(mOutputPos) = Ch + CaseOffset  ' add the offset to upper or lower 'a-f' or 'A-F'.
         Else
-            mOutput(mOutputPos) = corZeroChar + Ch
+            mOutput(mOutputPos) = vbZeroChar + Ch
         End If
         mOutputPos = mOutputPos - 1
         If HexValue < 0 Then
@@ -1672,7 +1672,7 @@ Private Sub FormatHex(ByRef Value As Variant, ByRef Specifiers As Specifiers)
     
     ' Add leading zeros if needed.
     Do While mOutputPos >= BUFFER_SIZE - Digits
-        mOutput(mOutputPos) = corZeroChar
+        mOutput(mOutputPos) = vbZeroChar
         mOutputPos = mOutputPos - 1
     Loop
     mOutputPos = mOutputPos + 1
@@ -1694,7 +1694,7 @@ Private Sub FormatDecimal(ByVal TotalDigits As Long)
         
         ' Insert the leading zeros until we reach the first digit.
         Do While TotalDigits > .Precision
-            mOutput(mOutputPos) = corZeroChar
+            mOutput(mOutputPos) = vbZeroChar
             mOutputPos = mOutputPos + 1
             TotalDigits = TotalDigits - 1
         Loop
@@ -1749,7 +1749,7 @@ Private Sub FormatScientific(ByVal Digits As Long, ByVal ExpChar As Integer)
             ' a 0 in the output buffer if we have run out of digits
             ' but required more digits to be displayed.
             If Ch = 0 Then
-                mOutput(mOutputPos) = corZeroChar
+                mOutput(mOutputPos) = vbZeroChar
                 OutOfDigits = True
             Else
                 mOutput(mOutputPos) = Ch
@@ -1775,14 +1775,14 @@ Private Sub RoundNumber(ByVal Digits As Long)
     
     With mNumber
         ' are we rounding up or down?
-        If .Digits(Digits) >= corFiveChar Then
+        If .Digits(Digits) >= vbFiveChar Then
             ' We don't round 9's directly, since they would just
             ' carry over, so we keep skipping them until there
             ' are no more. Then we'll round up the first non-nine digit.
             ' This will also lower the precision, since we had
             ' to keep dealing with the carry.
             Do While Digits > 0
-                If .Digits(Digits - 1) <> corNineChar Then Exit Do
+                If .Digits(Digits - 1) <> vbNineChar Then Exit Do
                 Digits = Digits - 1
             Loop
             
@@ -1794,14 +1794,14 @@ Private Sub RoundNumber(ByVal Digits As Long)
                 ' otherwise we ran out of digits, so we have to
                 ' scale up by 1 and add a 1. ie. 9999 -> 10000
                 .DecimalPosition = .DecimalPosition + 1
-                .Digits(Digits) = corOneChar
+                .Digits(Digits) = vbOneChar
                 Digits = 1
             End If
         Else
             ' rounding down while each digit to the left = 0, since
             ' we don't need those 0 anymore.
             Do While Digits > 0
-                If .Digits(Digits - 1) <> corZeroChar Then Exit Do
+                If .Digits(Digits - 1) <> vbZeroChar Then Exit Do
                 Digits = Digits - 1
             Loop
         End If
@@ -1841,7 +1841,7 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
             FormatType = mFormatSpecifier.Chars(0)
             
             Select Case FormatType
-                Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                     ' We've got a format letter, so attempt to get any precision digits.
                     If FormatLength = 1 Then
                         FormatPrecision = UnknownPrecision
@@ -1856,8 +1856,8 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
                         Ch = mFormatSpecifier.Chars(i)
                         
                         Select Case Ch
-                            Case corZeroChar To corNineChar
-                                FormatPrecision = FormatPrecision * 10 + Ch - corZeroChar
+                            Case vbZeroChar To vbNineChar
+                                FormatPrecision = FormatPrecision * 10 + Ch - vbZeroChar
                             Case Else
                                 FormatType = CustomFormat
                                 FormatPrecision = UnknownPrecision
@@ -1890,7 +1890,7 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
             InitChars mFormatSpecifier, Format
             
             Select Case mFormatSpecifier.Chars(0)
-                Case corLowerAChar To corLowerZChar, corUpperAChar To corUpperZChar
+                Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                     ParseSpecifiers.Format = mFormatSpecifier.Chars(0)
                     
                     If FormatLength = 1 Then
@@ -1905,8 +1905,8 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                         Ch = mFormatSpecifier.Chars(i)
                         
                         Select Case Ch
-                            Case corZeroChar To corNineChar
-                                Precision = Precision * 10 + Ch - corZeroChar
+                            Case vbZeroChar To vbNineChar
+                                Precision = Precision * 10 + Ch - vbZeroChar
                             Case Else
                                 ParseSpecifiers.Format = CustomSpecifier
                                 ParseSpecifiers.Precision = UnknownPrecision
@@ -1987,11 +1987,11 @@ Private Sub Int32ToNumber(ByVal Value As Long)
         
             OneTenth = Value \ 10
             ' This is about 2x faster than using Mod.
-            .Digits(DigitIndex) = (Value - (OneTenth * 10)) + corZeroChar
+            .Digits(DigitIndex) = (Value - (OneTenth * 10)) + vbZeroChar
             Value = OneTenth
         Loop
         If IsMaxNeg Then
-            .Digits(.Precision - 1) = corEightChar
+            .Digits(.Precision - 1) = vbEightChar
         End If
     End With
 End Sub
@@ -2065,7 +2065,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
             HasExponent = True
             DP = 1
         ElseIf DP <= 0 Then
-            mOutput(mOutputPos) = corZeroChar
+            mOutput(mOutputPos) = vbZeroChar
             mOutputPos = mOutputPos + 1
             DP = 0
         End If
@@ -2080,7 +2080,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
                 
                 If Not HasExponent Then
                     For DP = DP To .DecimalPosition + 1 Step -1
-                        mOutput(mOutputPos) = corZeroChar
+                        mOutput(mOutputPos) = vbZeroChar
                         mOutputPos = mOutputPos + 1
                     Next DP
                 End If
@@ -2095,7 +2095,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
             AppendExponent .DecimalPosition - 1, ExpChar, 2
         Else
             For i = i To .DecimalPosition - 1
-                mOutput(mOutputPos) = corZeroChar
+                mOutput(mOutputPos) = vbZeroChar
                 mOutputPos = mOutputPos + 1
             Next i
         End If
@@ -2114,7 +2114,7 @@ Private Sub FormatFixedInt32(ByVal FormatPrecision As Long)
         
         Dim i As Long
         If .Precision = 0 Then
-            mOutput(mOutputPos) = corZeroChar
+            mOutput(mOutputPos) = vbZeroChar
             mOutputPos = mOutputPos + 1
         Else
             For i = 0 To .Precision - 1
@@ -2127,7 +2127,7 @@ Private Sub FormatFixedInt32(ByVal FormatPrecision As Long)
             AppendString mProps.NumberDecimalSeparator
             
             For i = 1 To FormatPrecision
-                mOutput(mOutputPos) = corZeroChar
+                mOutput(mOutputPos) = vbZeroChar
                 mOutputPos = mOutputPos + 1
             Next i
         End If
@@ -2154,7 +2154,7 @@ Private Sub FormatFixedDouble(ByVal FormatPrecision As Long)
                 mOutputPos = mOutputPos + 1
             Next i
         Else
-            mOutput(mOutputPos) = corZeroChar
+            mOutput(mOutputPos) = vbZeroChar
             mOutputPos = mOutputPos + 1
             i = .DecimalPosition
         End If
@@ -2168,7 +2168,7 @@ Private Sub FormatFixedDouble(ByVal FormatPrecision As Long)
                 End If
                 
                 If .Precision = 0 Or Ch = 0 Then
-                    mOutput(mOutputPos) = corZeroChar
+                    mOutput(mOutputPos) = vbZeroChar
                     If i < 0 Then
                         i = i + 1
                     End If
@@ -2197,7 +2197,7 @@ Private Sub AppendString(ByRef StringToAppend As String)
             mOutput(mOutputPos + i) = mAppendStringBuffer.Chars(i)
         Next i
     Else
-        CopyMemory mOutput(mOutputPos), ByVal StrPtr(StringToAppend), StringToAppendLength * corSizeOfChar
+        CopyMemory mOutput(mOutputPos), ByVal StrPtr(StringToAppend), StringToAppendLength * vbSizeOfChar
     End If
     
     mOutputPos = mOutputPos + StringToAppendLength
@@ -2248,7 +2248,7 @@ Private Sub AppendExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal
     ' for Places not having enough digits.
     Dim i As Long
     For i = Digits To MinDigits - 1
-        mOutput(mOutputPos) = corZeroChar
+        mOutput(mOutputPos) = vbZeroChar
         mOutputPos = mOutputPos + 1
     Next i
     
@@ -2264,7 +2264,7 @@ Private Sub AppendExponent(ByVal Places As Long, ByVal ExpChar As Integer, ByVal
     Do While Places > 0
         Dim OneTenth As Long
         OneTenth = Places \ 10
-        mOutput(pos) = (Places - (OneTenth * 10)) + corZeroChar
+        mOutput(pos) = (Places - (OneTenth * 10)) + vbZeroChar
         Places = OneTenth
         pos = pos - 1
     Loop

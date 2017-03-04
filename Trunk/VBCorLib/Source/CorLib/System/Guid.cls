@@ -107,9 +107,9 @@ End Property
 ' @return An array of bytes representing the guid.
 '
 Public Function ToByteArray() As Byte()
-    Dim Result(0 To corSizeOfGuid - 1) As Byte
+    Dim Result(0 To vbSizeOfGuid - 1) As Byte
     
-    CopyMemory Result(0), mGuid, corSizeOfGuid
+    CopyMemory Result(0), mGuid, vbSizeOfGuid
     ToByteArray = Result
 End Function
 
@@ -157,7 +157,7 @@ Public Function ToString(Optional ByRef Format As String, Optional ByVal Provide
     
     Select Case Len(Format)
         Case 0
-            FormatCh = corUpperDChar
+            FormatCh = vbUpperDChar
         Case 1
             FormatCh = AscW(Format)
         Case Else
@@ -165,15 +165,15 @@ Public Function ToString(Optional ByRef Format As String, Optional ByVal Provide
     End Select
     
     Select Case FormatCh
-        Case corUpperDChar, corLowerDChar
+        Case vbUpperDChar, vbLowerDChar
             ToString = ToStandardString(FormatOptions.Dashes)
-        Case corUpperBChar, corLowerBChar
-            ToString = ToStandardString(FormatOptions.Dashes Or FormatOptions.Closure, corOpenBraceChar, corCloseBraceChar)
-        Case corUpperPChar, corLowerPChar
-            ToString = ToStandardString(FormatOptions.Dashes Or FormatOptions.Closure, corOpenParenChar, corCloseParenChar)
-        Case corUpperNChar, corLowerNChar
+        Case vbUpperBChar, vbLowerBChar
+            ToString = ToStandardString(FormatOptions.Dashes Or FormatOptions.Closure, vbOpenBraceChar, vbCloseBraceChar)
+        Case vbUpperPChar, vbLowerPChar
+            ToString = ToStandardString(FormatOptions.Dashes Or FormatOptions.Closure, vbOpenParenChar, vbCloseParenChar)
+        Case vbUpperNChar, vbLowerNChar
             ToString = ToStandardString(FormatOptions.None)
-        Case corUpperXChar, corLowerXChar
+        Case vbUpperXChar, vbLowerXChar
             ToString = ToHexString
         Case Else
             Error.Format Format_InvalidGuidFormatSpecification
@@ -232,10 +232,10 @@ Friend Sub Init(ByRef Value As Variant)
     Select Case VarType(Value)
         Case vbString
             Parse Value
-        Case corByteArray
+        Case vbByteArray
             FromByteArray Value
         Case vbLong
-            CopyMemory mGuid, ByVal CLng(Value), corSizeOfGuid
+            CopyMemory mGuid, ByVal CLng(Value), vbSizeOfGuid
         Case Else
             Error.Argument Format_GuidUnrecognized
     End Select
@@ -255,12 +255,12 @@ End Sub
 Private Sub FromByteArray(ByRef Value As Variant)
     ValidateArray Value, Parameter_Value
     
-    If CorArray.LengthFirstDim(Value) <> corSizeOfGuid Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, corSizeOfGuid))
+    If CorArray.LengthFirstDim(Value) <> vbSizeOfGuid Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, vbSizeOfGuid))
     
     Dim Bytes() As Byte
     SAPtr(Bytes) = CorArray.ArrayPointer(Value)
-    CopyMemory mGuid, Bytes(LBound(Bytes)), corSizeOfGuid
+    CopyMemory mGuid, Bytes(LBound(Bytes)), vbSizeOfGuid
     SAPtr(Bytes) = vbNullPtr
 End Sub
 
@@ -344,7 +344,7 @@ End Function
 
 Private Function AddDash(ByRef Output() As Integer, ByVal Offset As Long, ByVal Options As FormatOptions) As Long
     If Options And Dashes Then
-        Output(Offset) = corHyphenChar
+        Output(Offset) = vbHyphenChar
         Offset = Offset + 1
     End If
     
@@ -358,30 +358,30 @@ Private Function ToHexString() As String
     Result = SysAllocStringLen(0, 68)
     Output = AllocChars(Result)
     
-    Output(0) = corOpenBraceChar
-    Output(1) = corZeroChar
-    Output(2) = corLowerXChar
+    Output(0) = vbOpenBraceChar
+    Output(1) = vbZeroChar
+    Output(2) = vbLowerXChar
     HexToChars Output, 3, (mGuid.Data1 And &HFF000000) \ &H1000000, (mGuid.Data1 And &HFF0000) \ &H10000, False
     HexToChars Output, 7, (mGuid.Data1 And &HFF00) \ &H100, mGuid.Data1, False
-    Output(11) = corCommaChar
-    Output(12) = corZeroChar
-    Output(13) = corLowerXChar
+    Output(11) = vbCommaChar
+    Output(12) = vbZeroChar
+    Output(13) = vbLowerXChar
     HexToChars Output, 14, (mGuid.Data2 And &HFF00) \ &H100, mGuid.Data2, False
-    Output(18) = corCommaChar
-    Output(19) = corZeroChar
-    Output(20) = corLowerXChar
+    Output(18) = vbCommaChar
+    Output(19) = vbZeroChar
+    Output(20) = vbLowerXChar
     HexToChars Output, 21, (mGuid.Data3 And &HFF00) \ &H100, mGuid.Data3, False
-    Output(25) = corCommaChar
-    Output(26) = corOpenBraceChar
+    Output(25) = vbCommaChar
+    Output(26) = vbOpenBraceChar
     HexToChars Output, 27, mGuid.Data4(0), mGuid.Data4(1), True
-    Output(36) = corCommaChar
+    Output(36) = vbCommaChar
     HexToChars Output, 37, mGuid.Data4(2), mGuid.Data4(3), True
-    Output(46) = corCommaChar
+    Output(46) = vbCommaChar
     HexToChars Output, 47, mGuid.Data4(4), mGuid.Data4(5), True
-    Output(56) = corCommaChar
+    Output(56) = vbCommaChar
     HexToChars Output, 57, mGuid.Data4(6), mGuid.Data4(7), True
-    Output(66) = corCloseBraceChar
-    Output(67) = corCloseBraceChar
+    Output(66) = vbCloseBraceChar
+    Output(67) = vbCloseBraceChar
     
     FreeChars Output
     ToHexString = Result
@@ -392,8 +392,8 @@ Private Function HexToChars(ByRef Output() As Integer, ByVal Offset As Long, ByV
     b = b And &HFF
     
     If IsHex Then
-        Output(Offset) = corZeroChar
-        Output(Offset + 1) = corLowerXChar
+        Output(Offset) = vbZeroChar
+        Output(Offset + 1) = vbLowerXChar
         Offset = Offset + 2
     End If
     
@@ -402,9 +402,9 @@ Private Function HexToChars(ByRef Output() As Integer, ByVal Offset As Long, ByV
     Offset = Offset + 2
     
     If IsHex Then
-        Output(Offset) = corCommaChar
-        Output(Offset + 1) = corZeroChar
-        Output(Offset + 2) = corLowerXChar
+        Output(Offset) = vbCommaChar
+        Output(Offset + 1) = vbZeroChar
+        Output(Offset + 2) = vbLowerXChar
         Offset = Offset + 3
     End If
     
@@ -418,9 +418,9 @@ Private Function HexToChar(ByVal a As Long) As Integer
     a = a And &HF
     
     If a > 9 Then
-        HexToChar = a - 10 + corLowerAChar
+        HexToChar = a - 10 + vbLowerAChar
     Else
-        HexToChar = a + corZeroChar
+        HexToChar = a + vbZeroChar
     End If
 End Function
 
@@ -460,8 +460,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

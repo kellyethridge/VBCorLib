@@ -548,7 +548,7 @@ End Function
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim Info As DateTimeFormatInfo
     If Not Provider Is Nothing Then
-        Set Info = Provider.GetFormat(corDateTimeFormatInfo)
+        Set Info = Provider.GetFormat(vbDateTimeFormatInfo)
     End If
     
     If Info Is Nothing Then

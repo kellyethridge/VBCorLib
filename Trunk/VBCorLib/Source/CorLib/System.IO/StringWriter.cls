@@ -257,8 +257,8 @@ Private Sub WriteLineCore(ByRef Args() As Variant)
         s = Object.ToString(Args(0), Provider:=FormatProvider)
         
         If ub > 0 Then
-            CopyMemory Args(0), Args(1), (ub - LBound(Args)) * corSizeOfVariant
-            ZeroMemory Args(ub), corSizeOfVariant
+            CopyMemory Args(0), Args(1), (ub - LBound(Args)) * vbSizeOfVariant
+            ZeroMemory Args(ub), vbSizeOfVariant
             mSB.InternalAppendFormat FormatProvider, s, Args
         Else
             mSB.AppendString s
@@ -276,8 +276,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
