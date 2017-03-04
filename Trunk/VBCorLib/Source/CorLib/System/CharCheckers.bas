@@ -22,6 +22,10 @@ Attribute VB_Name = "CharCheckers"
 '
 ' Module: CharCheckers
 '
+
+''
+' These are used for callbacks for such functions a CorString.AllChars().
+'
 Option Explicit
 
 Private Const vbLeftCheveronChar    As Long = 60
