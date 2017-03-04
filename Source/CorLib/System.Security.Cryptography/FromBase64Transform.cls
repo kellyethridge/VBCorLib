@@ -45,7 +45,7 @@ Option Explicit
 Implements IObject
 Implements ICryptoTransform
 
-Private Const Base64TerminatorChar As Long = corEqualChar
+Private Const Base64TerminatorChar As Long = vbEqualChar
 
 
 ''
@@ -151,7 +151,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
                     Error.Format Format_InvalidBase64Character
                     
                 b = Base64CharToBits(b)
-                If b = corInvalidChar Then _
+                If b = vbInvalidChar Then _
                     Error.Format Format_InvalidBase64Character
                     
                 mBits = mBits Or b
@@ -336,8 +336,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

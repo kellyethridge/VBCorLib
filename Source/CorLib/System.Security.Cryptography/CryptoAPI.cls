@@ -246,7 +246,7 @@ End Function
 
 Friend Sub SetKeyParam(ByVal Key As Long, ByVal Param As Long, ByRef Value As Variant, Optional ByVal Flags As Long)
     Select Case VarType(Value)
-        Case corByteArray
+        Case vbByteArray
             Dim bPtr As Long
             bPtr = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET)
             If CryptSetKeyParam(Key, Param, ByVal bPtr, Flags) = BOOL_FALSE Then

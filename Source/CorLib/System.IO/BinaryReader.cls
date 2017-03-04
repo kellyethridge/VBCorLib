@@ -138,7 +138,7 @@ End Function
 '
 ' @return The next byte in the stream.
 Public Function ReadByte() As Byte
-    FillBuffer corSizeOfByte
+    FillBuffer vbSizeOfByte
     ReadByte = mBuffer(0)
 End Function
 
@@ -238,7 +238,7 @@ End Function
 ' @return A Long datatype read from the stream.
 '
 Public Function ReadInt32() As Long
-    FillBuffer corSizeOfLong
+    FillBuffer vbSizeOfLong
     ReadInt32 = AsLong(mBuffer(0))
 End Function
 
@@ -248,7 +248,7 @@ End Function
 ' @return An Integer datatype read from the stream.
 '
 Public Function ReadInt16() As Integer
-    FillBuffer corSizeOfInteger
+    FillBuffer vbSizeOfInteger
     ReadInt16 = AsWord(mBuffer(0))
 End Function
 
@@ -258,7 +258,7 @@ End Function
 ' @return A Double datatype read from the stream.
 '
 Public Function ReadDouble() As Double
-    FillBuffer corSizeOfDouble
+    FillBuffer vbSizeOfDouble
     ReadDouble = AsDouble(mBuffer(0))
 End Function
 
@@ -285,7 +285,7 @@ End Function
 ' @return A Currency datatype.
 '
 Public Function ReadCurrency() As Currency
-    FillBuffer corSizeOfCurrency
+    FillBuffer vbSizeOfCurrency
     ReadCurrency = AsCurr(mBuffer(0))
 End Function
 
@@ -295,7 +295,7 @@ End Function
 ' @return A Single datatype.
 '
 Public Function ReadSingle() As Single
-    FillBuffer corSizeOfSingle
+    FillBuffer vbSizeOfSingle
     ReadSingle = AsSingle(mBuffer(0))
 End Function
 
@@ -323,7 +323,7 @@ End Function
 ' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
 '
 Public Function ReadDecimal() As Variant
-    FillBuffer corSizeOfDecimal
+    FillBuffer vbSizeOfDecimal
     ReadDecimal = BitConverter.ToDecimal(mBuffer, 0)
 End Function
 
@@ -461,9 +461,9 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     BufferPtr = CorArray.ArrayPointer(Buffer)
     
     Select Case VarType(Buffer)
-        Case corByteArray
+        Case vbByteArray
             ReadToBuffer = ReadToByteBuffer(BufferPtr, Range)
-        Case corIntegerArray
+        Case vbIntegerArray
             ReadToBuffer = ReadToCharBuffer(BufferPtr, Range)
         Case Else
             Error.Argument Argument_UnsupportedArray, "Buffer"
@@ -579,8 +579,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

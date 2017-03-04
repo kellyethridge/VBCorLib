@@ -271,31 +271,31 @@ Private Sub WriteByte(ByVal Value As Byte)
 End Sub
 
 Private Sub WriteInt32(ByVal Value As Long)
-    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, corSizeOfLong
+    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, vbSizeOfLong
 End Sub
 
 Private Sub WriteInt16(ByVal Value As Integer)
-    mOutStream.WriteBlock AsDByteArr(Value).Bytes, 0, corSizeOfInteger
+    mOutStream.WriteBlock AsDByteArr(Value).Bytes, 0, vbSizeOfInteger
 End Sub
 
 Private Sub WriteSingle(ByVal Value As Single)
-    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, corSizeOfSingle
+    mOutStream.WriteBlock AsQByteArr(Value).Bytes, 0, vbSizeOfSingle
 End Sub
 
 Private Sub WriteDouble(ByVal Value As Double)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, corSizeOfDouble
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, vbSizeOfDouble
 End Sub
 
 Private Sub WriteDate(ByVal Value As Date)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, corSizeOfDate
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, vbSizeOfDate
 End Sub
 
 Private Sub WriteCurrency(ByVal Value As Currency)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, corSizeOfCurrency
+    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, vbSizeOfCurrency
 End Sub
 
 Private Sub WriteDecimal(ByRef Value As Variant)
-    mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, corSizeOfDecimal
+    mOutStream.WriteBlock BitConverter.GetBytes(CDec(Value)), 0, vbSizeOfDecimal
 End Sub
 
 Private Sub WriteString(ByRef Value As String)
@@ -307,10 +307,10 @@ Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Cou
     ValidateArray Value, Parameter_Value
     
     Select Case VarType(Value)
-        Case corByteArray
+        Case vbByteArray
             WriteBytes Value, Index, Count
         
-        Case corIntegerArray
+        Case vbIntegerArray
             WriteBytes mEncoding.GetBytes(Value, Index, Count)
             
         Case Else
@@ -347,8 +347,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

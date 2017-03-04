@@ -895,7 +895,7 @@ Private Function ParseFormatSpecifier(ByVal Format As String, ByRef Specifier As
         Dim Ch As Long
         Ch = Asc(Mid$(Format, i, 1))
         Select Case Ch
-            Case corZeroChar To corNineChar
+            Case vbZeroChar To vbNineChar
                 Result = Result * 10 + (Ch - 48)
                 If Result > 1000000 Then
                     Exit For   ' hopefully over 1 million digits is enough.

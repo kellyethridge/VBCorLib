@@ -84,7 +84,7 @@ Public Sub AddResource(ByRef Value As Variant, ByRef ResourceName As Variant, Op
     Call VerifyOpen
     
     If IsArray(Value) Then
-        If VarType(Value) = corByteArray Then
+        If VarType(Value) = vbByteArray Then
             If IsMissing(ResourceType) Then
                 Throw Cor.NewArgumentException("A ResourceType must be supplied for Byte Arrays.", "ResourceType")
             End If
@@ -227,7 +227,7 @@ Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data As Variant)
     Dim EncodedType() As Byte
     Dim i As Long
     
-    If VarType(Data) <> corByteArray Then _
+    If VarType(Data) <> vbByteArray Then _
         Throw Cor.NewInvalidCastException("Resource Encoder must return a Byte Array.")
     
     ' Write the number of bytes in the data portion of the resource.
@@ -343,8 +343,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

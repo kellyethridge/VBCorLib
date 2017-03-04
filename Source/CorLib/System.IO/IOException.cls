@@ -214,7 +214,7 @@ End Function
 Private Sub Class_InitProperties()
     Set mBase = Cor.NewExceptionBase(Me, App)
     mBase.HResult = COR_E_IO
-    mBase.ErrorNumber = corDeviceIOError
+    mBase.ErrorNumber = vbDeviceIOError
 End Sub
 
 Friend Sub Init(ByRef Message As String, ByVal HResult As Long, ByVal ErrorNumber As Long, ByVal InnerException As Exception)
@@ -244,8 +244,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

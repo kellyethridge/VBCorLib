@@ -254,7 +254,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_InitProperties()
     Set mBase = Cor.NewExceptionBase(Me, App)
-    mBase.ErrorNumber = corInvalidProcedureCall
+    mBase.ErrorNumber = vbInvalidProcedureCall
 End Sub
 
 Friend Sub Init(ByRef Message As String, ByVal ErrorNumber As Long, ByVal InnerException As Exception)

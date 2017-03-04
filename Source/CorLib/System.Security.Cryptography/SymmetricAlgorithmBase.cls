@@ -368,7 +368,7 @@ Public Function CloneRgbKey(ByRef RgbKey As Variant) As Byte()
         Exit Function
     End If
     
-    If VarType(RgbKey) <> corByteArray Then _
+    If VarType(RgbKey) <> vbByteArray Then _
         Error.Argument Argument_ByteArrayRequired, "Key"
     If CorArray.IsNull(RgbKey) Then _
         Error.Cryptographic Cryptography_InvalidKeySize
@@ -405,7 +405,7 @@ Public Function CloneRgbIV(ByRef RgbIV As Variant) As Byte()
         Exit Function
     End If
     
-    If VarType(RgbIV) <> corByteArray Then _
+    If VarType(RgbIV) <> vbByteArray Then _
         Error.Argument Argument_ByteArrayRequired, "RgbIV"
     
     Dim Result() As Byte

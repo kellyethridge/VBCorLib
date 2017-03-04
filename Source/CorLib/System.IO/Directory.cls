@@ -72,7 +72,7 @@ Public Function CreateDirectory(ByRef Path As String) As DirectoryInfo
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    If Len(FullPath) > 1 And CorString.LastChar(FullPath) = corDirectorySeparatorChar Then
+    If Len(FullPath) > 1 And CorString.LastChar(FullPath) = vbDirectorySeparatorChar Then
         FullPath = Left$(FullPath, Len(FullPath) - 1)
     End If
     
@@ -83,7 +83,7 @@ Public Function CreateDirectory(ByRef Path As String) As DirectoryInfo
     i = CorArray.Length(DirectoryNames)
     Do
         Dim TestDirectory As String
-        TestDirectory = CorString.Join(corDirectorySeparator, DirectoryNames, 0, i)
+        TestDirectory = CorString.Join(vbDirectorySeparator, DirectoryNames, 0, i)
         If Directory.Exists(TestDirectory) Then
             Exit Do
         End If
@@ -337,7 +337,7 @@ Public Function GetLogicalDrives() As String()
     Mask = CorType.GetLogicalDrives
     
     Dim Letter As Long
-    Letter = corUpperAChar
+    Letter = vbUpperAChar
     
     Dim i As Long
     Do While Mask <> 0
@@ -524,7 +524,7 @@ Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     Dim Root As String
     Root = Statics.Path.GetPathRoot(FullPath)
     
-    If (FullPath = Root) And (CorString.CharAt(Path, 1) = corVolumeSeparatorChar) Then _
+    If (FullPath = Root) And (CorString.CharAt(Path, 1) = vbVolumeSeparatorChar) Then _
         Error.Argument Arg_PathIsAVolume
     
     Dim Handle As SafeFileHandle
@@ -639,7 +639,7 @@ Private Function GetFileNameFromFindData(ByRef Data As WIN32_FIND_DATAW) As Stri
     If (Data.dwFileAttributes And FileAttributes.DirectoryAttr) = FileAttributes.DirectoryAttr Then
         Select Case Len(Result)
             Case 1
-                If Asc(Result) = corPeriodChar Then
+                If Asc(Result) = vbPeriodChar Then
                     Exit Function
                 End If
             Case 2

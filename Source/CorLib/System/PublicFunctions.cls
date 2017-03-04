@@ -79,7 +79,7 @@ Public Function t(ByRef Text As String) As String
         
         If Escaped Then
             Select Case Ch
-                Case corLowerTChar
+                Case vbLowerTChar
                     Ch = vbTabChar
                 Case vbLowerNChar
                     Ch = vbLfChar
@@ -103,7 +103,7 @@ Public Function t(ByRef Text As String) As String
             
             mTextOut.AppendChar Ch
             Escaped = False
-        ElseIf Ch = corBackslashChar Then
+        ElseIf Ch = vbBackslashChar Then
             Escaped = True
         Else
             mTextOut.AppendChar Ch

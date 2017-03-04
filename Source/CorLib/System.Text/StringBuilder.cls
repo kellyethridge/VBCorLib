@@ -49,7 +49,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const DefaultFillChar   As Integer = corSpaceChar
+Private Const DefaultFillChar   As Integer = vbSpaceChar
 Private Const DefaultCapacity   As Long = 512
 Private Const OpenBraceChar     As Long = 123
 Private Const CloseBraceChar    As Long = 125
@@ -87,7 +87,7 @@ Private mChars      As CharBuffer
 '
 Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     Select Case VarType(Value)
-        Case corIntegerArray
+        Case vbIntegerArray
             AppendCharsValue Value, StartIndex, Count
             
         Case vbString
@@ -621,7 +621,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     
                     ' Add leading padding.
                     If ArgWidth > Len(s) Then
-                        AppendChar corSpaceChar, ArgWidth - Len(s)
+                        AppendChar vbSpaceChar, ArgWidth - Len(s)
                     End If
                     
                     ' Finally append the formatted value to the string.
@@ -629,7 +629,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     
                     ' Add trailing padding.
                     If -ArgWidth > Len(s) Then
-                        AppendChar corSpaceChar, (-ArgWidth) - Len(s)
+                        AppendChar vbSpaceChar, (-ArgWidth) - Len(s)
                     End If
                     
                     SubStringStart = Index + 1
@@ -869,7 +869,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
     
     With mChars
         ' Check if a column size is being defined.
-        If .Chars(Index) = corCommaChar Then
+        If .Chars(Index) = vbCommaChar Then
             Index = ConsumeSpaces(Index + 1)
             
             ' Get the column width and aligment. Remember
@@ -883,7 +883,7 @@ Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As 
         End If
         
         ' Check if formatting is being specified.
-        If .Chars(Index) = corColonChar Then
+        If .Chars(Index) = vbColonChar Then
             Dim StartIndex As Long
             
             ' everything from here to the "}" is part of the argument formatting.
@@ -923,7 +923,7 @@ Private Function ConsumeSpaces(ByVal Index As Long) As Long
     Do
         ' Can never hit the end consuming spaces.
         If Index = Max Then FormatError
-        If mChars.Chars(Index) <> corSpaceChar Then Exit Do
+        If mChars.Chars(Index) <> vbSpaceChar Then Exit Do
         Index = Index + 1
     Loop
     
@@ -956,11 +956,11 @@ Private Function ParseNumber(ByRef Index As Long) As Long
         Dim Ch As Integer
         Ch = mChars.Chars(Index)
         Select Case Ch
-            Case corZeroChar To corNineChar
+            Case vbZeroChar To vbNineChar
                 ' Keep adding digits to the number
-                Number = Number * 10 + Ch - corZeroChar
+                Number = Number * 10 + Ch - vbZeroChar
                 NumberFound = True
-            Case corMinusChar
+            Case vbMinusChar
                 ' The "-" can only be the first character.
                 If Index <> FirstCharIndex Then FormatError
                 Sign = -1

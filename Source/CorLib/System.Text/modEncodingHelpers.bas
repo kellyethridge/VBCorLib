@@ -36,7 +36,7 @@ Public Sub InitEncodingHelpers()
     
     ReDim Base64CharToBits(0 To 127)
     For i = 0 To 127
-        Base64CharToBits(i) = corInvalidChar
+        Base64CharToBits(i) = vbInvalidChar
     Next i
     For i = 0 To 25
         Base64CharToBits(65 + i) = i
@@ -72,7 +72,7 @@ Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, B
             SAPtr(Chars) = VarPtr(CharsSA)
             AttachChars = Len(Source)
             
-        Case corIntegerArray
+        Case vbIntegerArray
             Dim CharPtr As Long
             CharPtr = CorArray.ArrayPointer(Source)
             If CharPtr = vbNullPtr Then _

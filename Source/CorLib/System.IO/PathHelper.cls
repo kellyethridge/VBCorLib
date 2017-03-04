@@ -53,7 +53,7 @@ End Sub
 Friend Sub SetVolumeLabel(ByVal VolumeChar As Integer)
     InitExtendedPathLength
     Append VolumeChar
-    Append corVolumeSeparatorChar
+    Append vbVolumeSeparatorChar
 End Sub
 
 Friend Property Get Chars(ByVal Index As Long) As Integer
@@ -64,8 +64,8 @@ End Property
 
 Friend Function IsUNCPath() As Boolean
     If Length > 1 Then
-        IsUNCPath = mFinalBuffer(mPrefixSize) = corDirectorySeparatorChar And _
-                    mFinalBuffer(mPrefixSize + 1) = corDirectorySeparatorChar
+        IsUNCPath = mFinalBuffer(mPrefixSize) = vbDirectorySeparatorChar And _
+                    mFinalBuffer(mPrefixSize + 1) = vbDirectorySeparatorChar
     End If
 End Function
 
@@ -77,8 +77,8 @@ Friend Function GetFullPathName() As Long
     ReDim NewBuffer(0 To mPosition + MAX_PATH)
     
     If Length = 4 Then
-        AppendSlash = mFinalBuffer(mPosition - 2) = corDirectorySeparatorChar And _
-                      mFinalBuffer(mPosition - 1) = corPeriodChar
+        AppendSlash = mFinalBuffer(mPosition - 2) = vbDirectorySeparatorChar And _
+                      mFinalBuffer(mPosition - 1) = vbPeriodChar
     End If
     
     NewLength = GetFullPathNameW(mFinalBuffer(0), mPosition + MAX_PATH, NewBuffer(0), ByVal vbNullPtr)
@@ -87,7 +87,7 @@ Friend Function GetFullPathName() As Long
         Helper.Swap4 ByVal ArrPtr(mFinalBuffer), ByVal ArrPtr(NewBuffer)
         mPosition = NewLength
         If AppendSlash Then
-            Append corDirectorySeparatorChar
+            Append vbDirectorySeparatorChar
         End If
             
         GetFullPathName = Length
@@ -148,9 +148,9 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitExtendedPathLength()
-    Append corDirectorySeparatorChar
-    Append corDirectorySeparatorChar
-    Append corQuestionMarkChar
-    Append corDirectorySeparatorChar
+    Append vbDirectorySeparatorChar
+    Append vbDirectorySeparatorChar
+    Append vbQuestionMarkChar
+    Append vbDirectorySeparatorChar
     mPrefixSize = 4
 End Sub

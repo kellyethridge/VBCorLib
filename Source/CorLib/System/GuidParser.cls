@@ -65,7 +65,7 @@ Friend Function TryParse(ByRef InputString As String, ByRef Result As VBGUID) As
     
     Select Case Len(Trimmed)
         Case LengthOfEnclosed
-            If AscW(Trimmed) = corOpenBraceChar Then
+            If AscW(Trimmed) = vbOpenBraceChar Then
                 TryParse = TryParseCore(Braces Or Dashes, Result)
             Else
                 TryParse = TryParseCore(Parens Or Dashes, Result)
@@ -88,31 +88,31 @@ Friend Function TryParseExact(ByRef InputString As String, ByVal Format As Integ
     Init Trimmed
     
     Select Case Format
-        Case corLowerBChar, corUpperBChar
+        Case vbLowerBChar, vbUpperBChar
             If Len(Trimmed) = LengthOfEnclosed Then
                 TryParseExact = TryParseCore(Dashes Or Braces, Result)
             Else
                 FormatError
             End If
-        Case corLowerPChar, corUpperPChar
+        Case vbLowerPChar, vbUpperPChar
             If Len(Trimmed) = LengthOfEnclosed Then
                 TryParseExact = TryParseCore(Dashes Or Parens, Result)
             Else
                 FormatError
             End If
-        Case corLowerNChar, corUpperNChar
+        Case vbLowerNChar, vbUpperNChar
             If Len(Trimmed) = LengthOfDigitsOnly Then
                 TryParseExact = TryParseCore(ParseOptions.None, Result)
             Else
                 FormatError
             End If
-        Case corLowerDChar, corUpperDChar
+        Case vbLowerDChar, vbUpperDChar
             If Len(Trimmed) = LengthOfDashesOnly Then
                 TryParseExact = TryParseCore(Dashes, Result)
             Else
                 FormatError
             End If
-        Case corLowerXChar, corUpperXChar
+        Case vbLowerXChar, vbUpperXChar
             TryParseExact = TryParseHexCore(Result)
         Case Else
             FormatSpecificationError
@@ -149,7 +149,7 @@ Private Function TryParseHexCore(ByRef Result As VBGUID) As Boolean
         Exit Function
     End If
 
-    If Not TryConsumeChar(corOpenBraceChar) Then
+    If Not TryConsumeChar(vbOpenBraceChar) Then
         Exit Function
     End If
     
@@ -169,11 +169,11 @@ Private Function TryParseHexCore(ByRef Result As VBGUID) As Boolean
         Exit Function
     End If
     
-    If Not TryConsumeChar(corCommaChar) Then
+    If Not TryConsumeChar(vbCommaChar) Then
         Exit Function
     End If
     
-    If Not TryConsumeChar(corOpenBraceChar) Then
+    If Not TryConsumeChar(vbOpenBraceChar) Then
         Exit Function
     End If
     
@@ -184,11 +184,11 @@ Private Function TryParseHexCore(ByRef Result As VBGUID) As Boolean
         End If
     Next
     
-    If Not TryConsumeChar(corCloseBraceChar) Then
+    If Not TryConsumeChar(vbCloseBraceChar) Then
         Exit Function
     End If
     
-    If Not TryConsumeChar(corCloseBraceChar) Then
+    If Not TryConsumeChar(vbCloseBraceChar) Then
         Exit Function
     End If
     
@@ -197,11 +197,11 @@ End Function
 
 Private Function TryParseCore(ByVal Options As ParseOptions, ByRef Result As VBGUID) As Boolean
     If Options And Braces Then
-        If Not TryConsumeChar(corOpenBraceChar) Then
+        If Not TryConsumeChar(vbOpenBraceChar) Then
             Exit Function
         End If
     ElseIf Options And Parens Then
-        If Not TryConsumeChar(corOpenParenChar) Then
+        If Not TryConsumeChar(vbOpenParenChar) Then
             Exit Function
         End If
     End If
@@ -211,7 +211,7 @@ Private Function TryParseCore(ByVal Options As ParseOptions, ByRef Result As VBG
     End If
     
     If Options And Dashes Then
-        If Not TryConsumeChar(corHyphenChar) Then
+        If Not TryConsumeChar(vbHyphenChar) Then
             Exit Function
         End If
     End If
@@ -221,7 +221,7 @@ Private Function TryParseCore(ByVal Options As ParseOptions, ByRef Result As VBG
     End If
     
     If Options And Dashes Then
-        If Not TryConsumeChar(corHyphenChar) Then
+        If Not TryConsumeChar(vbHyphenChar) Then
             Exit Function
         End If
     End If
@@ -231,7 +231,7 @@ Private Function TryParseCore(ByVal Options As ParseOptions, ByRef Result As VBG
     End If
     
     If Options And Dashes Then
-        If Not TryConsumeChar(corHyphenChar) Then
+        If Not TryConsumeChar(vbHyphenChar) Then
             Exit Function
         End If
     End If
@@ -240,7 +240,7 @@ Private Function TryParseCore(ByVal Options As ParseOptions, ByRef Result As VBG
     For i = 0 To 7
         If i = 2 Then
             If Options And Dashes Then
-                If Not TryConsumeChar(corHyphenChar) Then
+                If Not TryConsumeChar(vbHyphenChar) Then
                     Exit Function
                 End If
             End If
@@ -252,11 +252,11 @@ Private Function TryParseCore(ByVal Options As ParseOptions, ByRef Result As VBG
     Next
 
     If Options And Braces Then
-        If Not TryConsumeChar(corCloseBraceChar) Then
+        If Not TryConsumeChar(vbCloseBraceChar) Then
             Exit Function
         End If
     ElseIf Options And Parens Then
-        If Not TryConsumeChar(corCloseParenChar) Then
+        If Not TryConsumeChar(vbCloseParenChar) Then
             Exit Function
         End If
     End If
@@ -275,18 +275,18 @@ End Function
 
 Private Function TryConsumeHexPrefix(ByVal ConsumeComma As Boolean) As Boolean
     If ConsumeComma Then
-        If Not TryConsumeChar(corCommaChar) Then
+        If Not TryConsumeChar(vbCommaChar) Then
             Exit Function
         End If
     End If
     
-    If Not TryConsumeChar(corZeroChar) Then
+    If Not TryConsumeChar(vbZeroChar) Then
         Exit Function
     End If
     
     Dim NextChar As Integer
     NextChar = mChars(mIndex)
-    If (NextChar <> corLowerXChar) And (NextChar <> corUpperXChar) Then
+    If (NextChar <> vbLowerXChar) And (NextChar <> vbUpperXChar) Then
         FormatError
         Exit Function
     End If
@@ -350,14 +350,14 @@ End Function
 
 Private Function TryParseHexChar(ByVal Ch As Integer, ByRef Result As Long) As Boolean
     Select Case Ch
-        Case corZeroChar To corNineChar
-            Result = Ch - corZeroChar
+        Case vbZeroChar To vbNineChar
+            Result = Ch - vbZeroChar
             TryParseHexChar = True
-        Case corLowerAChar To corLowerFChar
-            Result = Ch - corLowerAChar + 10
+        Case vbLowerAChar To vbLowerFChar
+            Result = Ch - vbLowerAChar + 10
             TryParseHexChar = True
-        Case corUpperAChar To corUpperFChar
-            Result = Ch - corUpperAChar + 10
+        Case vbUpperAChar To vbUpperFChar
+            Result = Ch - vbUpperAChar + 10
             TryParseHexChar = True
         Case Else
             FormatError

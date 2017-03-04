@@ -544,7 +544,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                         SmallBufferError "Bytes"
                     End If
                     
-                    Bytes(ByteIndex) = corMinusChar
+                    Bytes(ByteIndex) = vbMinusChar
                     ByteIndex = ByteIndex + 1
                 End If
                 If ByteIndex > MaxByteIndex Then
@@ -558,13 +558,13 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
             End If
         End If
         If Not directlyEncodable Then
-            If Ch = corPlusChar And BitCount < 0 Then
+            If Ch = vbPlusChar And BitCount < 0 Then
                 If ByteIndex > MaxByteIndex Then
                     SmallBufferError "Bytes"
                 End If
                 
-                Bytes(ByteIndex) = corPlusChar
-                Bytes(ByteIndex + 1) = corMinusChar
+                Bytes(ByteIndex) = vbPlusChar
+                Bytes(ByteIndex + 1) = vbMinusChar
                 ByteIndex = ByteIndex + 2
             Else
                 If BitCount < 0 Then
@@ -572,7 +572,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
                         SmallBufferError "Bytes"
                     End If
                     
-                    Bytes(ByteIndex) = corPlusChar
+                    Bytes(ByteIndex) = vbPlusChar
                     ByteIndex = ByteIndex + 1
                     BitCount = 0
                 End If
@@ -616,7 +616,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
             SmallBufferError "Bytes"
         End If
         
-        Bytes(ByteIndex) = corMinusChar
+        Bytes(ByteIndex) = vbMinusChar
         ByteIndex = ByteIndex + 1
         BitCount = -1
     End If
@@ -665,7 +665,7 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
             End If
         End If
         If Not directlyEncodable Then
-            If Ch = corPlusChar And BitCount < 0 Then
+            If Ch = vbPlusChar And BitCount < 0 Then
                 ByteIndex = ByteIndex + 2
             Else
                 If BitCount < 0 Then
@@ -715,13 +715,13 @@ Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long,
         b = Bytes(Index)
         
         If Not InBase64 Then
-            If b = corPlusChar Then
+            If b = vbPlusChar Then
                 InBase64 = True
             Else
                 CharCount = CharCount + 1
             End If
-        ElseIf b = corMinusChar Then
-            If Bytes(Index - 1) = corPlusChar Then
+        ElseIf b = vbMinusChar Then
+            If Bytes(Index - 1) = vbPlusChar Then
                 CharCount = CharCount + 1
             End If
             
@@ -764,13 +764,13 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         b = Bytes(ByteIndex)
         
         Select Case b
-            Case corMinusChar
+            Case vbMinusChar
                 If HasPlus Then
                     If CharIndex > maxCharIndex Then
                         SmallBufferError "Chars"
                     End If
                     
-                    Chars(CharIndex) = corPlusChar
+                    Chars(CharIndex) = vbPlusChar
                     CharIndex = CharIndex + 1
                 ElseIf InBase64 Then
                     BitCount = 0
@@ -781,12 +781,12 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         SmallBufferError "Chars"
                     End If
                     
-                    Chars(CharIndex) = corMinusChar
+                    Chars(CharIndex) = vbMinusChar
                     CharIndex = CharIndex + 1
                 End If
                 
                 HasPlus = False
-            Case corPlusChar
+            Case vbPlusChar
                 If InBase64 Then
                     Bits = (Bits * &H40) Or Base64CharToBits(b)
                     BitCount = BitCount + 6

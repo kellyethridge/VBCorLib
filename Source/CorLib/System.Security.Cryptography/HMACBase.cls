@@ -216,7 +216,7 @@ Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByV
     mHashName = HashName
     
     If Not IsMissing(Key) Then
-        If VarType(Key) <> corByteArray Then
+        If VarType(Key) <> vbByteArray Then
             Throw Cor.NewArgumentException("Key must be a Byte array.", "Key")
         ElseIf CorArray.IsNull(Key) Then
             Error.ArgumentNull "Key", ArgumentNull_Array

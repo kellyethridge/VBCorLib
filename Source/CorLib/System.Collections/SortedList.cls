@@ -460,15 +460,15 @@ Public Sub RemoveAt(ByVal Index As Long)
         Dim SourceIndex     As Long
         Dim NumberToCopy    As Long
         SourceIndex = Index + 1
-        NumberToCopy = (mCount - Index) * corSizeOfVariant
+        NumberToCopy = (mCount - Index) * vbSizeOfVariant
         
         CopyMemory mKeys(Index), mKeys(SourceIndex), NumberToCopy
         CopyMemory mValues(Index), mValues(SourceIndex), NumberToCopy
         
         Dim LastIndex As Long
         LastIndex = mCount - 1
-        ZeroMemory mKeys(LastIndex), corSizeOfVariant
-        ZeroMemory mValues(LastIndex), corSizeOfVariant
+        ZeroMemory mKeys(LastIndex), vbSizeOfVariant
+        ZeroMemory mValues(LastIndex), vbSizeOfVariant
     End If
     
     mCount = mCount - 1
@@ -620,13 +620,13 @@ Private Sub Insert(ByVal Index As Long, ByRef Key As Variant, ByRef Value As Var
         Dim DestIndex       As Long
         Dim NumberToCopy    As Long
         DestIndex = Index + 1
-        NumberToCopy = (mCount - Index) * corSizeOfVariant
+        NumberToCopy = (mCount - Index) * vbSizeOfVariant
     
         CopyMemory mKeys(DestIndex), mKeys(Index), NumberToCopy
         CopyMemory mValues(DestIndex), mValues(Index), NumberToCopy
         
-        ZeroMemory mKeys(Index), corSizeOfVariant
-        ZeroMemory mValues(Index), corSizeOfVariant
+        ZeroMemory mKeys(Index), vbSizeOfVariant
+        ZeroMemory mValues(Index), vbSizeOfVariant
     End If
     
     VariantCopyInd mKeys(Index), Key
@@ -671,8 +671,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

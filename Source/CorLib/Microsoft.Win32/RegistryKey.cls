@@ -682,9 +682,9 @@ Private Function SetValueDirect(ByRef Name As String, ByRef Value As Variant)
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte
             Result = SetValueDWord(Name, Value)
-        Case corStringArray, corVariantArray
+        Case vbStringArray, vbVariantArray
             Result = SetValueMultiSZ(Name, Value)
-        Case corByteArray
+        Case vbByteArray
             Result = SetValueBinary(Name, Value)
         Case vbCurrency
             Result = SetValueQWord(Name, Value)

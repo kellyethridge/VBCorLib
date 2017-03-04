@@ -195,7 +195,7 @@ Private Function StartElement() As SecurityElement
     
     ' we may be inside a closing tag,
     ' so clean up and get out.
-    If mXml(mIndex) = corForwardSlashChar Then
+    If mXml(mIndex) = vbForwardSlashChar Then
         mIndex = OldIndex
         Exit Function
     End If
@@ -215,7 +215,7 @@ Private Function StartElement() As SecurityElement
         ConsumeWhiteSpace
         
         Dim EarlyEnd As Boolean
-        If mXml(mIndex) = corForwardSlashChar Then
+        If mXml(mIndex) = vbForwardSlashChar Then
             EarlyEnd = True
             mIndex = mIndex + 1
         End If
@@ -253,7 +253,7 @@ Private Sub EndElement(ByRef Name As String)
     ConsumeWhiteSpace
     
     ' must be a '/'
-    If mXml(mIndex) <> corForwardSlashChar Then _
+    If mXml(mIndex) <> vbForwardSlashChar Then _
         Throw New XmlSyntaxException
     
     mIndex = mIndex + 1
@@ -267,7 +267,7 @@ Private Sub EndElement(ByRef Name As String)
             Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
-            Case corSpaceChar, vbRightCheveron
+            Case vbSpaceChar, vbRightCheveron
                 Exit Do
         End Select
         
@@ -370,7 +370,7 @@ Private Sub ConsumeEquals()
             Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
-            Case corEqualChar, corSpaceChar
+            Case vbEqualChar, vbSpaceChar
             Case Else
                 Exit Sub
         End Select
@@ -390,7 +390,7 @@ Private Function GetValue() As String
             Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
-            Case corQuoteChar
+            Case vbQuoteChar
                 If Not InQuotes Then
                     InQuotes = True
                 Else
@@ -402,7 +402,7 @@ Private Function GetValue() As String
                     Exit Function
                 End If
             
-            Case corSpaceChar, corForwardSlashChar
+            Case vbSpaceChar, vbForwardSlashChar
                 ' we found an unquoted value
                 If Not InQuotes Then
                     Exit Do
@@ -436,7 +436,7 @@ Private Function GetName() As String
             Throw New XmlSyntaxException
         
         Select Case mXml(mIndex)
-            Case corSpaceChar, corEqualChar, corForwardSlashChar, vbRightCheveron
+            Case vbSpaceChar, vbEqualChar, vbForwardSlashChar, vbRightCheveron
                 ' We found the end
                 GetName = mXml.ToString(StartIndex, mIndex - StartIndex)
                 Exit Function
@@ -452,7 +452,7 @@ End Function
 Private Sub ConsumeWhiteSpace()
     Do While mIndex < mXml.Length
         Select Case mXml(mIndex)
-            Case corReturnChar, corLineFeedChar, corSpaceChar, vbKeyTab
+            Case vbReturnChar, vbLineFeedChar, vbSpaceChar, vbKeyTab
                 mIndex = mIndex + 1
             Case Else
                 Exit Do

@@ -94,7 +94,7 @@ Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Var
     VerifyNotDisposed
     
     Select Case VarType(Source)
-        Case corByteArray
+        Case vbByteArray
             ComputeHashOnBytes Source, Index, Count
         Case vbObject
             ComputeHashOnStream Source

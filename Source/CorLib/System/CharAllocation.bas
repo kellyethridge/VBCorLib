@@ -68,7 +68,7 @@ Public Sub InitChars(ByRef Chars As CharBuffer, Optional ByRef s As String)
         .ReleasePtr = FuncAddr(AddressOf ReleaseCharBuffer)
         SAPtr(.Chars) = VarPtr(.Buffer)
         With .Buffer
-            .cbElements = corSizeOfChar
+            .cbElements = vbSizeOfChar
             .cDims = 1
             .cLocks = 1
             .pvData = StrPtr(s)
@@ -138,7 +138,7 @@ Public Function AsChars(ByRef v As Variant) As Integer()
             AsChars = AllocChars(LocalString)
             StringPtr(LocalString) = vbNullPtr
             
-        Case corIntegerArray
+        Case vbIntegerArray
             ' Directly assigning an array pointer prevents the source array from being copied.
             SAPtr(AsChars) = CorArray.ArrayPointer(v)
             
