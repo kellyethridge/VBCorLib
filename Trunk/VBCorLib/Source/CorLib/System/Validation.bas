@@ -25,6 +25,9 @@ Attribute VB_Name = "Validation"
 Option Explicit
 
 Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal Parameter As ParameterResourceKey = Parameter_Arr)
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, Environment.GetParameterName(Parameter)
+        
     ValidateArrayPtr CorArray.ArrayPointer(Arr), Parameter
 End Sub
 

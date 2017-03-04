@@ -39,7 +39,7 @@ Option Explicit
 ''
 ' Indicates if a character is considered white space.
 '
-' @param CharOrString A string or integer to check if is white space.
+' @param CharOrString A string to check if character at specified index is white space.
 ' @param Index An index into the string to determine if a specific character is white space.
 ' This parameter is ignored if a non-string character is passed in.
 ' @return If the character is considered white space then True is returned, otherwise False is returned.
@@ -53,8 +53,14 @@ Public Function IsWhiteSpace(ByRef s As String, ByVal Index As Long) As Boolean
     IsWhiteSpace = IsWhiteSpaceChar(MemWord(Ptr))
 End Function
 
-Public Function IsWhiteSpaceChar(ByVal Character As Integer) As Boolean
-    Select Case Character
+''
+' Indicates if a character is considered white space.
+'
+' @param c An integer to check if is white space.
+' @return If the character is considered white space then True is returned, otherwise False is returned.
+'
+Public Function IsWhiteSpaceChar(ByVal c As Integer) As Boolean
+    Select Case c
         Case &H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, _
              &H2000 To &H200A, _
              &H2028, &H2029, &H202F, &H205F, _
@@ -63,4 +69,24 @@ Public Function IsWhiteSpaceChar(ByVal Character As Integer) As Boolean
     End Select
 End Function
 
+Public Function IsHighSurrogateChar(ByVal c As Long) As Boolean
+    Select Case c
+        Case &HD800& To &HDBFF&, &HD800 To &HDBFF
+            IsHighSurrogateChar = True
+    End Select
+End Function
 
+Public Function IsLowSurrogateChar(ByVal c As Long) As Boolean
+    Select Case c
+        Case &HDC00& To &HDFFF&, &HDC00 To &HDFFF
+            IsLowSurrogateChar = True
+    End Select
+End Function
+
+Public Function IsSurrogateChar(ByVal c As Long) As Boolean
+    If IsHighSurrogateChar(c) Then
+        IsSurrogateChar = True
+    ElseIf IsLowSurrogateChar(c) Then
+        IsSurrogateChar = True
+    End If
+End Function

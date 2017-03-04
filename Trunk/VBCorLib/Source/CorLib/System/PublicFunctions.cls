@@ -188,6 +188,23 @@ Public Function LongToChar(ByVal Value As Long) As Integer
 End Function
 
 ''
+' Returns character value from a string at the specified index.
+'
+' @param s The string to return the character from.
+' @param Index The position of the character in the string.
+' @return An integer representing the character.
+' @remarks The index is zero based.
+'
+Public Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
+    If Index < 0 Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
+    If Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    
+    CharAt = MemWord(StrPtr(s) + Index * 2)
+End Function
+
+''
 ' Converts an Integer to the corrisponding Long Ascii char.
 '
 ' @param Value An Integer character.

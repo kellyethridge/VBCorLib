@@ -570,12 +570,12 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     Dim Ch              As Long
     Dim CharCount       As Long
     Dim BytesLeft       As Long
-    Dim putChars        As Boolean
+    Dim PutChars        As Boolean
     Dim MaxIndex        As Long
     Dim maxCharIndex    As Long
     
-    putChars = Not CorArray.IsNull(Chars)
-    If putChars Then
+    PutChars = Not CorArray.IsNull(Chars)
+    If PutChars Then
         maxCharIndex = UBound(Chars)
         If CharIndex < LBound(Chars) Then _
             Throw Cor.NewArgumentOutOfRangeException("CharIndex", Environment.GetResourceString(ArgumentOutOfRange_LBound))
@@ -592,11 +592,12 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
 
     Do While ByteIndex < MaxIndex
         b = Bytes(ByteIndex)
+        
         ' only ascii an character will be 1 byte.   0xxxxxxx format
         If b < &H80 Then
             ' we were expecting more bytes to complete the sequence.
             If BytesInSequence > 0 Then Call ByteStreamError(ByteIndex)
-            If putChars Then
+            If PutChars Then
                 If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
@@ -627,7 +628,19 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         If Ch <> &H4 Then Call ByteStreamError(ByteIndex)
                     End If
                 Case Else
-                    Call ByteStreamError(ByteIndex)
+                    ByteStreamError ByteIndex
+                    
+                    If PutChars Then
+                        If CharIndex > maxCharIndex Then
+                            SmallBufferError "Chars"
+                        End If
+                        
+                        Chars(CharIndex) = &HFFFD
+                        CharIndex = CharIndex + 1
+                    End If
+                    
+                    BytesInSequence = 0
+                    CharCount = CharCount + 1
             End Select
         Else
             ' if we get in here then we must be on bytes 2-4 in a byte sequence,
@@ -638,21 +651,41 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
             BytesLeft = BytesLeft - 1
             Select Case BytesInSequence
                 Case 2      ' 110xxxxx 10xxxxxx -  char from &h80 to &h7ff
-                    If Ch = 0 Then Call ByteStreamError(ByteIndex)
-                    If BytesLeft = 0 Then
-                        If putChars Then
-                            If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
-                            Chars(CharIndex) = Ch
-                            CharIndex = CharIndex + 1
-                        End If
-                        BytesInSequence = 0
-                        CharCount = CharCount + 1
-                    End If
-                Case 3      ' 1110xxxx 10xxxxxx 10xxxxxx - char from &h800 to &hffff, including &hd800-&hdfff for bad surrogates
+                    Select Case Ch
+                        Case &H80 To &H7FF
+                            If BytesLeft = 0 Then
+                                If PutChars Then
+                                    If CharIndex > maxCharIndex Then
+                                        SmallBufferError "Chars"
+                                    End If
+                                    
+                                    Chars(CharIndex) = Ch
+                                    CharIndex = CharIndex + 1
+                                End If
+                                BytesInSequence = 0
+                                CharCount = CharCount + 1
+                            End If
+                            
+                        Case Else
+                            ByteStreamError ByteIndex
+                            If PutChars Then
+                                If CharIndex > maxCharIndex Then
+                                    SmallBufferError "Chars"
+                                End If
+                                
+                                Chars(CharIndex) = &HFFFD
+                                Chars(CharIndex + 1) = &HFFFD
+                                CharIndex = CharIndex + 2
+                            End If
+                            
+                            BytesInSequence = 0
+                            CharCount = CharCount + 2
+                    End Select
+                Case 3      ' 1110xxxx 10xxxxxx 10xxxxxx - char from &h800 to &hffff. We throw on &hd800-&hdfff for bad surrogates
                     If Ch = 0 Then Call ByteStreamError(ByteIndex)
                     Select Case BytesLeft
                         Case 0
-                            If putChars Then
+                            If PutChars Then
                                 If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
                                 Chars(CharIndex) = AsWord(Ch)
                                 CharIndex = CharIndex + 1
@@ -660,7 +693,10 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                             BytesInSequence = 0
                             CharCount = CharCount + 1
                         Case 1  ' check for shortest form conformity
-                            If Ch < &H20 Then Call ByteStreamError(ByteIndex)
+                            If Ch < &H20 Or Char.IsSurrogateChar(Ch * &H40) Then
+                                ByteStreamError ByteIndex
+                            End If
+                            
                     End Select
                 Case 4      ' 11110XXX 10XXxxxx 10xxxxxx 10xxxxxx - used for surrogate pairs
                     If BytesLeft = 0 Then
@@ -671,7 +707,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         hs = (Ch \ &H400) + &HD7C0&
                         If ls < &HDC00& Or ls > &HDFFF& Then Call ByteStreamError(ByteIndex)
                         If hs < &HD800& Or hs > &HDBFF& Then Call ByteStreamError(ByteIndex)
-                        If putChars Then
+                        If PutChars Then
                             If CharIndex + 1 > maxCharIndex Then Call SmallBufferError("Chars")
                             Chars(CharIndex + 1) = AsWord(ls)   ' AsWord is used to shove the highest bit in
                             Chars(CharIndex) = AsWord(hs)       ' without causing an overflow. The char will
@@ -779,8 +815,9 @@ Private Function EncodeSurrogate(ByVal Char As Long, ByRef Bytes() As Byte, ByVa
 End Function
 
 Private Sub ByteStreamError(ByVal Index As Long)
-    If Not mThrowException Then Exit Sub
-    Throw Cor.NewArgumentException(CorString.Format("An invalid byte was found at index {0}.", Index), "Bytes")
+    If mThrowException Then
+        Throw Cor.NewArgumentException(CorString.Format("An invalid byte was found at index {0}.", Index), "Bytes")
+    End If
 End Sub
 
 
