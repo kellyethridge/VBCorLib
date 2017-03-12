@@ -94,8 +94,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     End If
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = mCodePage
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = mCodePage
 End Function
 
 Private Function IObject_ToString() As String
@@ -106,6 +106,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
+
+End Property
+
+Private Property Get Encoding_DecoderFallback() As DecoderFallback
+
+End Property
+
 Private Property Get Encoding_BodyName() As String
     Encoding_BodyName = Table.BodyName(mCodePage)
 End Property

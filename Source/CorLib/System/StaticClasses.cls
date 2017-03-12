@@ -654,3 +654,7 @@ End Property
 Public Property Get RSACryptoServiceProvider() As RSACryptoServiceProviderStatic
     Set RSACryptoServiceProvider = Statics.RSACryptoServiceProvider
 End Property
+
+Public Property Get DecoderFallback() As DecoderFallbackStatic
+    Set DecoderFallback = Statics.DecoderFallback
+End Property

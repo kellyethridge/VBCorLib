@@ -277,16 +277,18 @@ End Sub
 
 Private Sub AddSystemText()
     With Sim.NewTestSuite("System.Text")
+        .Add New DecoderReplacementFallbackTests
+        .Add New DecoderReplacementFallbackBufferTests
         .Add New EncodingArgumentTests
         .Add New ASCIIEncodingTests
         .Add New UTF7EncodingTests
         .Add New UTF8EncodingTests
-        .Add New TestUnicodeEncodingBig
-        .Add New TestUnicodeEncoding
-        .Add New TestDetermineEncoding
-        .Add New TestEncoding437
+'        .Add New TestUnicodeEncodingBig
+        .Add New UnicodeEncodingTests
+'        .Add New TestDetermineEncoding
+'        .Add New TestEncoding437
         .Add New StringBuilderTests
-        .Add New TestCustomFormatter
+'        .Add New TestCustomFormatter
                 
         AddTest .This
     End With

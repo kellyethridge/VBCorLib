@@ -210,6 +210,23 @@ Public Function GetDecoder() As Decoder: End Function
 Public Function GetEncoder() As Encoder: End Function
 
 ''
+' Returns the <b>DecoderFallback</b> instance for the current Encoding object.
+'
+' @return An instance of a <b>DecoderFallback</b>.
+'
+' @see Encoding
+' @see DecoderFallBack
+Public Property Get DecoderFallback() As DecoderFallback: End Property
+
+''
+' Sets the <b>DecoderFallback</b> for the current Encoding object.
+'
+' @param Value The <b>DecoderFallback</b> object to set.
+' @remarks Assigning to a <i>read-only</i> Encoding object with cause an <b>InvalidOperationException</b> to be thrown.
+'
+Public Property Set DecoderFallback(ByVal Value As DecoderFallback): End Property
+
+''
 ' Returns the maximum number of bytes that can be created from a specific number of characters.
 '
 ' @param CharCount The number of characters to be encoded.

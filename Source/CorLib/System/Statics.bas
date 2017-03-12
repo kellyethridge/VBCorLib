@@ -51,6 +51,7 @@ Public CultureTable             As New CultureTable
 Public CultureInfo              As New CultureInfoStatic
 Public Path                     As New Path
 Public Encoding                 As New EncodingStatic
+Public DecoderFallback          As New DecoderFallbackStatic
 Public Directory                As New Directory
 Public File                     As New File
 Public Console                  As New Console

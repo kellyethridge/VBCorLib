@@ -1840,5 +1840,23 @@ Public Function NewEnumeratorBase(ByVal StartIndex As Long, ByVal Length As Long
     NewEnumeratorBase.Init StartIndex, Length, Collection
 End Function
 
+Public Function NewDecoderReplacementFallback(ByRef Replacement As String) As DecoderReplacementFallback
+    Set NewDecoderReplacementFallback = New DecoderReplacementFallback
+    NewDecoderReplacementFallback.Init Replacement
+End Function
 
+Public Function NewDecoderReplacementFallbackBuffer(ByVal Fallback As DecoderReplacementFallback) As DecoderReplacementFallbackBuffer
+    Set NewDecoderReplacementFallbackBuffer = New DecoderReplacementFallbackBuffer
+    NewDecoderReplacementFallbackBuffer.Init Fallback
+End Function
+
+Public Function NewDecoderFallbackException(ByRef Message As String, Optional ByVal InnerException As Exception) As DecoderFallbackException
+    Set NewDecoderFallbackException = New DecoderFallbackException
+    NewDecoderFallbackException.Init Message, InnerException
+End Function
+
+Public Function NewDecoderFallbackException2(ByRef Message As String, ByRef BytesUnknown() As Byte, ByVal Index As Long) As DecoderFallbackException
+    Set NewDecoderFallbackException2 = New DecoderFallbackException
+    NewDecoderFallbackException2.Init2 Message, BytesUnknown, Index
+End Function
 

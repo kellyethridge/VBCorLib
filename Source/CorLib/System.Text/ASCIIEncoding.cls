@@ -538,6 +538,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
+
+End Property
+
+Private Property Get Encoding_DecoderFallback() As DecoderFallback
+
+End Property
+
 Private Property Get Encoding_BodyName() As String
     Encoding_BodyName = BodyName
 End Property

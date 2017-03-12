@@ -109,6 +109,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HE000, False
             Test.Use &HE000&, False
             
+        Case "IsHighSurrogate_WithValues_ReturnsExpected"
+            Test.Use "a", 0, False
+            Test.Use ChrW$(&HD800), 0, True
+            Test.Use "aa", 1, False
+            Test.Use "a" & ChrW$(&HDBFF), 1, True
+            
+        Case "IsLowSurrogate_WithValues_ReturnsExpected"
+            Test.Use ChrW$(&HD800), 0, False
+            Test.Use ChrW$(&HDC00), 0, True
+            Test.Use "a" & ChrW$(&HDBFF), 1, False
+            Test.Use "a" & ChrW$(&HDFFF), 1, True
+            
     End Select
 End Sub
 
@@ -177,3 +189,50 @@ Public Sub IsLowSurrogateChar(ByVal Value As Long, ByVal Expected As Boolean)
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub IsHighSurrogate_WithValues_ReturnsExpected(ByRef s As String, ByVal Index As Long, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.IsHighSurrogate(s, Index)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsHighSurrogate_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.IsHighSurrogate "a", -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub IsHighSurrogate_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
+    On Error Resume Next
+    
+    Char.IsHighSurrogate "a", 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub IsLowSurrogate_WithValues_ReturnsExpected(ByRef s As String, ByVal Index As Long, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.IsLowSurrogate(s, Index)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsLowSurrogate_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.IsLowSurrogate "a", -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub IsLowSurrogate_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
+    On Error Resume Next
+    
+    Char.IsLowSurrogate "a", 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub

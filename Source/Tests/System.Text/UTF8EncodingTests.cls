@@ -166,6 +166,16 @@ Public Sub GetBytes_WithString_ReturnsEncoded()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetBytes_WithTwoHighSurrogates_ThrowsArgumentOutOfRangeException()
+    Dim Encoding As UTF8Encoding
+    Set Encoding = NewUTF8Encoding(False, True)
+    
+    On Error Resume Next
+    Encoding.GetBytes t("\uD800\uD800")
+    
+    AssertArgumentException Err, "Chars"
+End Sub
+
 Public Sub GetBytes_WithChars_ReturnsEncoded()
     Dim UTF8Enc As New UTF8Encoding
     Dim Chars() As Integer

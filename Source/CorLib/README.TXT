@@ -66,7 +66,9 @@ version 3.0 (BREAKING CHANGES)
 	* Removed RegistryKey support for HKEY_DYN_DATA.
 	* Removed Registry.GetRootKey to align with .NET framework.
 	* Removed Registry.GetSubKey to align with .NET framework.
+	* Added DecoderFallback to Encoding interface.
 	* Fixed UTF8Encoding to error on invalid surrogates.
+	* Fixed UnicodeEncoding GetChars/GetString/GetCharCount to correctly handle surrogates.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -517,7 +517,7 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
     Const HIGH_OFFSET   As Long = &HD800&
     Const LOW_OFFSET    As Long = &HDC00&
     
-    Dim uch                 As Long
+    Dim Ch                 As Long
     Dim MaxIndex            As Long
     Dim MaxByteIndex        As Long
     Dim StartIndex          As Long
@@ -528,23 +528,26 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
     If ByteIndex < LBound(Bytes) Then _
         Throw Cor.NewArgumentOutOfRangeException("ByteIndex", Environment.GetResourceString(ArgumentOutOfRange_LBound))
     
-    If Not Encoder Is Nothing Then HighSurrogateChar = Encoder.HighSurrogateChar
+    If Not Encoder Is Nothing Then
+        HighSurrogateChar = Encoder.HighSurrogateChar
+    End If
+    
     StartIndex = ByteIndex
     MaxByteIndex = UBound(Bytes) + 1
     MaxIndex = CharIndex + CharCount
+    
     Do While CharIndex < MaxIndex
-        AsWord(uch) = Chars(CharIndex)
-        
-        'If CharIndex = UBound(Chars) Then Stop
+        Ch = Chars(CharIndex) And &HFFFF&
         
         If HighSurrogateChar <> 0 Then
-            Select Case uch
+            Select Case Ch
                 Case &HDC00& To &HDFFF&
                     ' we have a surrogate pair.
                     Dim pair As Long
-                    If ByteIndex + 4 > MaxByteIndex Then Call SmallBufferError("Bytes")
+                    If ByteIndex + 4 > MaxByteIndex Then _
+                        SmallBufferError "Bytes"
                     
-                    pair = ((HighSurrogateChar - HIGH_OFFSET) * &H400) + (uch - LOW_OFFSET) + &H10000
+                    pair = ((HighSurrogateChar - HIGH_OFFSET) * &H400) + (Ch - LOW_OFFSET) + &H10000
                     Bytes(ByteIndex + 3) = &H80 Or (pair And &H3F)
                     Bytes(ByteIndex + 2) = &H80 Or ((pair \ &H40&) And &H3F)
                     Bytes(ByteIndex + 1) = &H80 Or ((pair \ &H1000&) And &H3F)
@@ -553,42 +556,55 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
                     HighSurrogateChar = 0
                 Case &HD800& To &HDBFF&
                     ' we have two high surrogates in a row
-                    If mThrowException Then Throw Cor.NewArgumentException("A high surrogate was followed by a second high surrogate.", "Chars")
-                    If ByteIndex + 3 > MaxByteIndex Then Call SmallBufferError("Bytes")
+                    If mThrowException Then _
+                        Throw Cor.NewArgumentException("A high surrogate was followed by a second high surrogate.", "Chars")
+                    If ByteIndex + 3 > MaxByteIndex Then _
+                        SmallBufferError "Bytes"
                     
                     ByteIndex = EncodeSurrogate(HighSurrogateChar, Bytes, ByteIndex)
-                    HighSurrogateChar = uch
+                    HighSurrogateChar = Ch
                 Case Else
-                    If mThrowException Then Throw Cor.NewArgumentException("A high surrogate was not followed by a low surrogate.", "Chars")
-                    If ByteIndex + 3 >= MaxByteIndex Then Call SmallBufferError("Bytes")
+                    If mThrowException Then _
+                        Throw Cor.NewArgumentException("A high surrogate was not followed by a low surrogate.", "Chars")
+                    If ByteIndex + 3 >= MaxByteIndex Then _
+                        SmallBufferError "Bytes"
                     
                     ByteIndex = EncodeSurrogate(HighSurrogateChar, Bytes, ByteIndex)
                     CharIndex = CharIndex - 1
                     HighSurrogateChar = 0
             End Select
         Else
-
-            Select Case uch
+            Select Case Ch
                 Case Is < &H80     ' ascii
-                    If ByteIndex + 1 > MaxByteIndex Then Call SmallBufferError("Bytes")
-                    Bytes(ByteIndex) = uch
+                    If ByteIndex + 1 > MaxByteIndex Then _
+                        SmallBufferError "Bytes"
+                    
+                    Bytes(ByteIndex) = Ch
                     ByteIndex = ByteIndex + 1
                 Case Is < &H800
-                    If ByteIndex + 2 > MaxByteIndex Then Call SmallBufferError("Bytes")
-                    Bytes(ByteIndex) = &HC0 Or (uch \ 64)
-                    Bytes(ByteIndex + 1) = &H80 Or (uch And &H3F)
+                    If ByteIndex + 2 > MaxByteIndex Then _
+                        SmallBufferError "Bytes"
+                    
+                    Bytes(ByteIndex) = &HC0 Or (Ch \ 64)
+                    Bytes(ByteIndex + 1) = &H80 Or (Ch And &H3F)
                     ByteIndex = ByteIndex + 2
                 Case &HD800& To &HDBFF&     ' high surrogate
-                    HighSurrogateChar = uch
+                    HighSurrogateChar = Ch
                 Case &HDC00& To &HDFFF&     ' low surrogate
-                    If mThrowException Then Throw Cor.NewArgumentException("A low surrogate was not preceeded by a high surrogate.", "Chars")
-                    If ByteIndex + 3 > MaxByteIndex Then Call SmallBufferError("Bytes")
-                    ByteIndex = EncodeSurrogate(uch, Bytes, ByteIndex)
+                    If mThrowException Then _
+                        Throw Cor.NewArgumentException("A low surrogate was not preceeded by a high surrogate.", "Chars")
+                    If ByteIndex + 3 > MaxByteIndex Then _
+                        SmallBufferError "Bytes"
+                        
+                    ByteIndex = EncodeSurrogate(Ch, Bytes, ByteIndex)
                 Case Else
-                    If ByteIndex + 3 > MaxByteIndex Then Call SmallBufferError("Bytes")
-                    ByteIndex = EncodeSurrogate(uch, Bytes, ByteIndex)
+                    If ByteIndex + 3 > MaxByteIndex Then _
+                        SmallBufferError "Bytes"
+                    
+                    ByteIndex = EncodeSurrogate(Ch, Bytes, ByteIndex)
             End Select
         End If
+        
         CharIndex = CharIndex + 1
     Loop
     
@@ -596,11 +612,15 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
         If Not Encoder.Flush Then
             Encoder.HighSurrogateChar = HighSurrogateChar
         Else
-            If mThrowException And (HighSurrogateChar <> 0) Then Throw Cor.NewArgumentException("A high surrogate was not followed by a low surrogate.", "Chars")
+            If mThrowException And (HighSurrogateChar <> 0) Then _
+                Throw Cor.NewArgumentException("A high surrogate was not followed by a low surrogate.", "Chars")
+            
             Encoder.HighSurrogateChar = 0
         End If
     ElseIf HighSurrogateChar <> 0 Then
-        If mThrowException Then Throw Cor.NewArgumentException("A high surrogate was not followed by a low surrogate.", "Chars")
+        If mThrowException Then _
+            Throw Cor.NewArgumentException("A high surrogate was not followed by a low surrogate.", "Chars")
+        
         ByteIndex = EncodeSurrogate(HighSurrogateChar, Bytes, ByteIndex)
     End If
     
@@ -639,9 +659,13 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         ' only ascii an character will be 1 byte.   0xxxxxxx format
         If b < &H80 Then
             ' we were expecting more bytes to complete the sequence.
-            If BytesInSequence > 0 Then Call ByteStreamError(ByteIndex)
+            If BytesInSequence > 0 Then _
+                ByteStreamError ByteIndex
+                
             If PutChars Then
-                If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+                If CharIndex > maxCharIndex Then _
+                    SmallBufferError "Chars"
+                
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
             End If
@@ -662,13 +686,16 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
             Select Case BytesInSequence
                 Case 2      ' 110xxxxx format
                     Ch = Ch And &H1F
-                    If Ch < 2 Then Call ByteStreamError(ByteIndex)
+                    If Ch < 2 Then _
+                        ByteStreamError ByteIndex
                 Case 3      ' 1110xxxx format
                     Ch = Ch And &HF
                 Case 4      ' 11110xxx format
                     Ch = Ch And &H7
                     If Ch <> 0 Then
-                        If Ch <> &H4 Then Call ByteStreamError(ByteIndex)
+                        If Ch <> &H4 Then
+                            ByteStreamError ByteIndex
+                        End If
                     End If
                 Case Else
                     ByteStreamError ByteIndex
@@ -688,10 +715,13 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         Else
             ' if we get in here then we must be on bytes 2-4 in a byte sequence,
             ' so they all will look like 10xxxxxx.
-            If (b And &HC0) <> &H80 Then Call ByteStreamError(ByteIndex)
+            If (b And &HC0) <> &H80 Then _
+                ByteStreamError ByteIndex
+            
             Ch = Ch * &H40
             Ch = Ch + (b And &H3F)
             BytesLeft = BytesLeft - 1
+            
             Select Case BytesInSequence
                 Case 2      ' 110xxxxx 10xxxxxx -  char from &h80 to &h7ff
                     Select Case Ch
@@ -705,6 +735,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                                     Chars(CharIndex) = Ch
                                     CharIndex = CharIndex + 1
                                 End If
+                                
                                 BytesInSequence = 0
                                 CharCount = CharCount + 1
                             End If
@@ -725,11 +756,15 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                             CharCount = CharCount + 2
                     End Select
                 Case 3      ' 1110xxxx 10xxxxxx 10xxxxxx - char from &h800 to &hffff. We throw on &hd800-&hdfff for bad surrogates
-                    If Ch = 0 Then Call ByteStreamError(ByteIndex)
+                    If Ch = 0 Then _
+                        ByteStreamError ByteIndex
+                    
                     Select Case BytesLeft
                         Case 0
                             If PutChars Then
-                                If CharIndex > maxCharIndex Then Call SmallBufferError("Chars")
+                                If CharIndex > maxCharIndex Then _
+                                    SmallBufferError "Chars"
+                                
                                 Chars(CharIndex) = AsWord(Ch)
                                 CharIndex = CharIndex + 1
                             End If
@@ -748,22 +783,29 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         
                         ls = (Ch And &H3FF) + &HDC00&
                         hs = (Ch \ &H400) + &HD7C0&
-                        If ls < &HDC00& Or ls > &HDFFF& Then Call ByteStreamError(ByteIndex)
-                        If hs < &HD800& Or hs > &HDBFF& Then Call ByteStreamError(ByteIndex)
+                        If ls < &HDC00& Or ls > &HDFFF& Then _
+                            ByteStreamError ByteIndex
+                        If hs < &HD800& Or hs > &HDBFF& Then _
+                            ByteStreamError ByteIndex
+                        
                         If PutChars Then
-                            If CharIndex + 1 > maxCharIndex Then Call SmallBufferError("Chars")
+                            If CharIndex + 1 > maxCharIndex Then _
+                                SmallBufferError "Chars"
+                            
                             Chars(CharIndex + 1) = AsWord(ls)   ' AsWord is used to shove the highest bit in
                             Chars(CharIndex) = AsWord(hs)       ' without causing an overflow. The char will
                             CharIndex = CharIndex + 2           ' be negative afterwards.
                         End If
+                        
                         CharCount = CharCount + 2
                         BytesInSequence = 0
                     Else
                         ' check for shortest form conformity
-                        If Ch = 0 Then Call ByteStreamError(ByteIndex)
+                        If Ch = 0 Then _
+                            ByteStreamError ByteIndex
                     End If
                 Case Else
-                    Call ByteStreamError(ByteIndex)
+                    ByteStreamError ByteIndex
                     BytesInSequence = 0
                     BytesLeft = 0
             End Select
@@ -800,17 +842,20 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
         Select Case Chars(Index)
             Case 0 To &H7F      ' ascii value
                 If HasHighSurrogate Then
-                    If mThrowException Then Throw Cor.NewArgumentException("An incorrect low surrogate was found immediately after a high surrogate.", "Chars")
+                    If mThrowException Then _
+                        Throw Cor.NewArgumentException("An incorrect low surrogate was found immediately after a high surrogate.", "Chars")
                 End If
                 Ret = Ret + 1
             Case &H80 To &H7FF     ' 2 byte UTF-8 encoding
                 If HasHighSurrogate Then
-                    If mThrowException Then Throw Cor.NewArgumentException("An incorrect low surrogate was found immediately after a high surrogate.", "Chars")
+                    If mThrowException Then _
+                        Throw Cor.NewArgumentException("An incorrect low surrogate was found immediately after a high surrogate.", "Chars")
                 End If
                 Ret = Ret + 2
             Case &HD800 To &HDBFF    ' high surrogate value
                 If HasHighSurrogate Then
-                    If mThrowException Then Throw Cor.NewArgumentException("Second high surrogate in a row was found.", "Chars")
+                    If mThrowException Then _
+                        Throw Cor.NewArgumentException("Second high surrogate in a row was found.", "Chars")
                 Else
                     HasHighSurrogate = True
                 End If
@@ -820,7 +865,9 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
                     Ret = Ret + 1
                     HasHighSurrogate = False
                 Else
-                    If mThrowException Then Throw Cor.NewArgumentException("Low surrogate was found without a precedding high surrogate.", "Chars")
+                    If mThrowException Then _
+                        Throw Cor.NewArgumentException("Low surrogate was found without a precedding high surrogate.", "Chars")
+                    
                     Ret = Ret + 3
                 End If
             Case Else
@@ -833,12 +880,15 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
     If HasHighSurrogate Then
         If Not Encoder Is Nothing Then
             If Encoder.Flush Then
-                If mThrowException Then Throw Cor.NewArgumentException("A high surrogate character was not followed by a low surrogate character.", "Chars")
+                If mThrowException Then _
+                    Throw Cor.NewArgumentException("A high surrogate character was not followed by a low surrogate character.", "Chars")
             End If
         Else
-            If mThrowException Then Throw Cor.NewArgumentException("Missing Low Surrogage.", "Chars")
+            If mThrowException Then _
+                Throw Cor.NewArgumentException("Missing Low Surrogage.", "Chars")
         End If
     End If
+    
     InternalGetByteCount = Ret
 End Function
 
@@ -846,7 +896,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub SmallBufferError(ByVal ParamName As String)
+Private Sub SmallBufferError(ByRef ParamName As String)
     Error.ArgumentOutOfRange ParamName, Argument_SmallConversionBuffer
 End Sub
 
@@ -901,6 +951,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
+
+End Property
+
+Private Property Get Encoding_DecoderFallback() As DecoderFallback
+
+End Property
+
 Private Property Get Encoding_BodyName() As String
     Encoding_BodyName = BodyName
 End Property

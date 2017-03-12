@@ -731,7 +731,7 @@ library CorType {
         const LPSTR vbPathSeparator                = ";";
         const LPSTR vbVolumeSeparator              = ":";        
         const LPSTR vbDirectorySeparator           = "\\";
-        const LPSTR vbAltDirectorySeparator        = "/";
+        const LPSTR vbAltDirectorySeparator        = "/";        
     }
 
     [dllname("CorTypeName")]
@@ -797,6 +797,20 @@ library CorType {
         const long vbBooleanArray = 0x200B;
         const long vbStringArray  = 0x2008;
         const long vbVariantArray = 0x200c;        
+    }
+
+    [dllname("CorBitwise")]
+    module CorBitwise {
+    	const long vbShift1Bit		= 0x2;
+    	const long vbShift2Bits		= 0x4;
+    	const long vbShift3Bits		= 0x8;
+    	const long vbShift4Bits		= 0x10;
+    	const long vbShift5Bits		= 0x20;
+    	const long vbShift6Bits		= 0x40;
+    	const long vbShift7Bits		= 0x80;
+    	const long vbShift8Bits		= 0x100;
+    	const long vbShift16Bits	= 0x10000;
+    	const long vbShift24Bits	= 0x1000000;
     }
 
     [dllname("HResultConstants")]
