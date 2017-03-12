@@ -132,6 +132,10 @@ Public Enum ResourceStringKey
     Argument_InvalidElementValue = 856
     Argument_InvalidElementText = 857
     Argument_AttributeNamesMustBeUnique = 858
+    Argument_InvalidCharSequenceNoIndex = 859
+    Argument_RecursiveFallbackBytes = 860
+    Argument_InvalidCodePageBytesIndex = 861
+    Argument_EncodingConversionOverflowChars = 862
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
@@ -179,6 +183,8 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_IndexCount = 735
     ArgumentOutOfRange_Bounds_Lower_Upper = 736
     ArgumentOutOfRange_DecimalScale = 737
+    ArgumentOutOfRange_GetCharCountOverflow = 738
+    ArgumentOutOfRange_GetByteCountOverflow = 739
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?

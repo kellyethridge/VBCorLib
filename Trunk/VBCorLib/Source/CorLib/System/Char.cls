@@ -69,18 +69,44 @@ Public Function IsWhiteSpaceChar(ByVal c As Integer) As Boolean
     End Select
 End Function
 
+Public Function IsHighSurrogate(ByRef s As String, ByVal Index As Long) As Boolean
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+    
+    Dim Ptr As Long
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    IsHighSurrogate = IsHighSurrogateChar(MemWord(Ptr))
+End Function
+
 Public Function IsHighSurrogateChar(ByVal c As Long) As Boolean
     Select Case c
-        Case &HD800& To &HDBFF&, &HD800 To &HDBFF
+        Case &HD800& To &HDBFF&, &HFFFFD800 To &HFFFFDBFF
             IsHighSurrogateChar = True
     End Select
 End Function
 
+Public Function IsLowSurrogate(ByRef s As String, ByVal Index As Long) As Boolean
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+    
+    Dim Ptr As Long
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    IsLowSurrogate = IsLowSurrogateChar(MemWord(Ptr))
+End Function
+
 Public Function IsLowSurrogateChar(ByVal c As Long) As Boolean
     Select Case c
-        Case &HDC00& To &HDFFF&, &HDC00 To &HDFFF
+        Case &HDC00& To &HDFFF&, &HFFFFDC00 To &HFFFFDFFF
             IsLowSurrogateChar = True
     End Select
+End Function
+
+Public Function IsSurrogate(ByRef s As String, ByVal Index As Long) As Boolean
+    If IsHighSurrogate(s, Index) Then
+        IsSurrogate = True
+    ElseIf IsLowSurrogate(s, Index) Then
+        IsSurrogate = True
+    End If
 End Function
 
 Public Function IsSurrogateChar(ByVal c As Long) As Boolean

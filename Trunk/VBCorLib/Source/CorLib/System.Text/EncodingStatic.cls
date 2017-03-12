@@ -243,7 +243,7 @@ End Function
 Friend Sub ValidateByteRange(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long)
     ValidateByteArray Bytes
     
-    If ByteIndex < LBound(Bytes) Or ByteIndex > UBound(Bytes) Then
+    If (ByteIndex < LBound(Bytes) Or ByteIndex > UBound(Bytes)) And ByteCount > 0 Then
         Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
     End If
     If ByteCount < 0 Then
