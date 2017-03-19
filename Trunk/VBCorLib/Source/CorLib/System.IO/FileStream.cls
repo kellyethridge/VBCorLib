@@ -843,7 +843,7 @@ Friend Sub Init(ByRef Path As String, ByVal Mode As FileMode, ByVal Access As Fi
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(TrimmedPath)
     
-    Set mHandle = Win32Native.SafeCreateFile(FullPath, Access, Share, Mode)
+    Set mHandle = SafeCreateFile(FullPath, Access, Share, Mode)
     If mHandle.IsInvalid Then
         IOError.WinIOError Err.LastDllError, FullPath
     End If

@@ -1,50 +1,54 @@
-Attribute VB_Name = "ArgumentHelper"
-'    CopyRight (c) 2005 Kelly Ethridge
+Attribute VB_Name = "Argument"
+'The MIT License (MIT)
+'Copyright (c) 2017 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: modArgumentHelpers
+' Module: ArgumentModule
 '
 
 ''
-' This modules contains functions used to help with optional parameters and
-' verifying ranges of values.
-' <p>All of the functions return an error code except OptionalLong. This
-' function returns a valid integer value or throws an exception if a the
-' supplied optional value is not an integer type.</p>
+' This modules contains functions used to help with method arguments.
 '
 Option Explicit
 
+' A ListRange is returned from methods that need to return both an Index and Count value.
 Public Type ListRange
     Index As Long
     Count As Long
 End Type
 
 
-
-
-
-
-Public Function TryOptionalLong(ByRef Value As Variant, ByRef Result As Long) As Boolean
+''
+' Converts only supported data types to a Long.
+' The supported data types are:
+'
+'       Long
+'       Integer
+'       Byte
+'
+' Any other data type will throw an exception.
+'
+Public Function CLong(ByRef Value As Variant) As Long
     Select Case VarType(Value)
-        Case vbMissing
         Case vbLong, vbInteger, vbByte
-            Result = Value
-            TryOptionalLong = True
+            CLong = Value
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "Long"))
     End Select
@@ -54,14 +58,11 @@ End Function
 ' Returns an optional value or a default value if the optional value is missing.
 '
 Public Function OptionalLong(ByRef Value As Variant, ByVal Default As Long) As Long
-    Select Case VarType(Value)
-        Case vbMissing
-            OptionalLong = Default
-        Case vbLong, vbInteger, vbByte
-            OptionalLong = Value
-        Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "Long"))
-    End Select
+    If IsMissing(Value) Then
+        OptionalLong = Default
+    Else
+        OptionalLong = CLong(Value)
+    End If
 End Function
 
 ''

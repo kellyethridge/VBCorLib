@@ -1,4 +1,4 @@
-Attribute VB_Name = "modWeakReferenceHelpers"
+Attribute VB_Name = "modWeakReference"
 '    CopyRight (c) 2004 Kelly Ethridge
 '
 '    This file is part of VBCorLib.

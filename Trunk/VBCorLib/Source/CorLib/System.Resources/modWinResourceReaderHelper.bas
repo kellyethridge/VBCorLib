@@ -1,4 +1,4 @@
-Attribute VB_Name = "modWinResourceReaderHelper"
+Attribute VB_Name = "modWinResourceReader"
 '    CopyRight (c) 2005 Kelly Ethridge
 '
 '    This file is part of VBCorLib.

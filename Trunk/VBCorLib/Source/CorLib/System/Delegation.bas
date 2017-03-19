@@ -37,13 +37,13 @@ End Type
 
 Private Type LocalDelegate
     pVTable     As Long
-    pFn         As Long
+    pfn         As Long
     cRefs       As Long
 End Type
 
 Public Type Delegate
     pVTable As Long
-    pFn     As Long
+    pfn     As Long
 End Type
 
 Private mDelegateCode       As Currency
@@ -62,7 +62,7 @@ Private mFailVTablePtr      As Long
 ' @param pfn The address to function to be called.
 ' @return A lightweight COM object used to call a function.
 '
-Public Function NewDelegate(ByVal pFn As Long) As IUnknown
+Public Function NewDelegate(ByVal pfn As Long) As IUnknown
     Init
 
     Dim This As Long
@@ -70,17 +70,17 @@ Public Function NewDelegate(ByVal pFn As Long) As IUnknown
     If This = vbNullPtr Then _
         Throw New OutOfMemoryException
     
-    mDelegateTemplate.pFn = pFn
+    mDelegateTemplate.pfn = pfn
     mDelegateTemplate.pVTable = mLocalVTablePtr
         
     CopyMemory ByVal This, mDelegateTemplate, SizeOfLocalDelegate
     ObjectPtr(NewDelegate) = This
 End Function
 
-Public Function InitDelegate(ByRef Struct As Delegate, Optional ByVal pFn As Long) As IUnknown
+Public Function InitDelegate(ByRef Struct As Delegate, Optional ByVal pfn As Long) As IUnknown
     Init
     
-    Struct.pFn = pFn
+    Struct.pfn = pfn
     Struct.pVTable = mOkVTablePtr
     
     ObjectPtr(InitDelegate) = VarPtr(Struct)

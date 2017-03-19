@@ -50,7 +50,10 @@ Friend Sub ThrowError()
 End Sub
 
 Friend Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
+    Set Result = Nothing
+    
     Init s
+    
     If Not HasValidComponentCount Then
         Exit Function
     End If
@@ -106,7 +109,7 @@ Private Function TryParseComponent(ByVal Component As Long, ByRef Result As Long
     If Result < 0 Then
         Dim ParamName As String
         ParamName = Choose(Component + 1, "Major", "Minor", "Build", "Revision")
-        mException = Cor.NewArgumentOutOfRangeException(ParamName, Message:=Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
+        mException = Cor.NewArgumentOutOfRangeException(ParamName, Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     Else
         TryParseComponent = True
     End If
@@ -122,12 +125,3 @@ Catch:
             Set mException = Cor.NewException(Err.Description, Err.Number)
     End Select
 End Function
-
-
-
-
-
-
-
-
-
