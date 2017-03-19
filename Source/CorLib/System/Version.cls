@@ -223,12 +223,11 @@ End Function
 ' @return Pseudo-unique number identifying this instance.
 '
 Public Function GetHashCode() As Long
-    ' modified for Lemmy
-    Dim Ret As Long
-    Ret = Helper.ShiftLeft(mMajor, 24)
-    Ret = Ret Or Helper.ShiftLeft(mMinor And &HFF, 16)
-    Ret = Ret Or Helper.ShiftLeft(mBuild And &HFF, 8)
-    GetHashCode = Ret Or (mRevision And &HFF&)
+    Dim Result As Long
+    Result = Helper.ShiftLeft(mMajor, 24)
+    Result = Result Or Helper.ShiftLeft(mMinor And &HFF, 16)
+    Result = Result Or Helper.ShiftLeft(mBuild And &HFF, 8)
+    GetHashCode = Result Or (mRevision And &HFF&)
 End Function
 
 Public Function EqualTo(ByVal Value As Version) As Boolean
@@ -273,10 +272,17 @@ Friend Sub Init(ByVal Major As Long, ByVal Minor As Long, ByRef Build As Variant
     mMajor = Major
     mMinor = Minor
     
-    If TryOptionalLong(Build, mBuild) And mBuild < 0 Then _
-        Error.ArgumentOutOfRange "Build", ArgumentOutOfRange_NeedNonNegNum
+    If Not IsMissing(Build) Then
+        mBuild = CLong(Build)
+        
+        If mBuild < 0 Then
+            Error.ArgumentOutOfRange "Build", ArgumentOutOfRange_NeedNonNegNum
+        End If
+    End If
     
-    If TryOptionalLong(Revision, mRevision) Then
+    If Not IsMissing(Revision) Then
+        mRevision = CLong(Revision)
+        
         If mBuild = UnsetComponent Then _
             Error.Argument Argument_ParamRequired, "Build"
         
@@ -348,8 +354,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

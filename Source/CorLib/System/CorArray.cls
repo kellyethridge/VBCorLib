@@ -1039,7 +1039,7 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
             
         ' try optimized routines first, then fallback to the default IComparer object.
         Case vbError
-            If Not CorArraySort.TrySZSort(KeysPtr, Index, Index + Length - 1) Then
+            If Not TrySZSort(KeysPtr, Index, Index + Length - 1) Then
                 ' If we get here, then no optimized routine existed,
                 ' so we'll set our comparer to the default and loop
                 ' around again, letting this case statement fall
@@ -1106,7 +1106,7 @@ Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, 
     On Error GoTo Catch
     
     If Comparer Is Nothing Then
-        If CorArraySearch.TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, InternalBinarySearch) Then
+        If TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, InternalBinarySearch) Then
             Exit Function
         End If
         

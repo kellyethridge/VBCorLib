@@ -127,11 +127,7 @@ Public Function GetExceptionMessage(ByVal Base As ExceptionBase, ByVal DefaultMe
         
         If UBound(Args) >= 0 Then
             Dim Arguments() As Variant
-            If InIDE Then
-                Helper.Swap4 ByVal ArrPtr(Arguments), ByVal Helper.DerefEBP(20)
-            Else
-                Helper.Swap4 ByVal ArrPtr(Arguments), ByVal Helper.DerefEBP(16)
-            End If
+            Arguments = Args
             Message = CorString.FormatArray(Message, Arguments)
         End If
     End If

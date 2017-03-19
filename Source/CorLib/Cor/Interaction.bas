@@ -1,4 +1,4 @@
-Attribute VB_Name = "CorInteraction"
+Attribute VB_Name = "Interaction"
 'The MIT License (MIT)
 'Copyright (c) 2016 Kelly Ethridge
 '

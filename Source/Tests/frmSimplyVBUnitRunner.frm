@@ -116,7 +116,7 @@ Private Sub AddSystem()
         .Add New ArrayConstructorTests
         .Add New StringComparerTests
         
-        .Add NewSuite("Object", _
+        .Add NewSuite("Object Tests", _
             New ObjectBaseTests, _
             New ObjectTests, _
             New ObjectToStringWithDoublesTests, _
@@ -124,11 +124,11 @@ Private Sub AddSystem()
             New ObjectToStringWithSinglesTests, _
             New ObjectToStringWithValuesTests)
         
-        .Add NewSuite("Convert", _
+        .Add NewSuite("Convert Tests", _
             New ToBase64Tests, _
             New FromBase64Tests)
     
-        .Add NewSuite("CorArray", _
+        .Add NewSuite("CorArray Tests", _
             New CorArrayTests, _
             New CorArrayCopyTests, _
             New CorArraySortTests, _
@@ -151,13 +151,13 @@ Private Sub AddSystemCollections()
         .Add New ComparerTests
         .Add New CaseInsensitiveComparerTests
 
-        .Add NewSuite("SortedList", _
+        .Add NewSuite("SortedList Tests", _
             New SortedListTests, _
             New SortedListEnumeratorTests, _
             New SortedKeyListTests, _
             New SortedValueListTests)
 
-        .Add NewSuite("ArrayList", _
+        .Add NewSuite("ArrayList Tests", _
             New ArrayListTests, _
             New ArrayListAdapterTests, _
             New ArrayListRangedTests, _
@@ -166,15 +166,15 @@ Private Sub AddSystemCollections()
             New ReadOnlyArrayListTests, _
             New FixedSizeArrayListTests)
         
-        .Add NewSuite("Queue", _
+        .Add NewSuite("Queue Tests", _
             New QueueTests, _
             New QueueEnumeratorTests)
                 
-        .Add NewSuite("Stack", _
+        .Add NewSuite("Stack Tests", _
             New StackTests, _
             New StackEnumeratorTests)
         
-        .Add NewSuite("Hashtable", _
+        .Add NewSuite("Hashtable Tests", _
             New HashtableTests, _
             New HashtableEnumeratorTests, _
             New HashtableKeyCollectionTests, _
@@ -215,22 +215,22 @@ Private Sub AddSystemSecurityCryptography()
 
         .Add New SymmetricAlgorithmBaseTests
         .Add New CryptoStreamTests
-        .Add NewSuite("DESCryptoServiceProvider", _
+        .Add NewSuite("DESCryptoServiceProvider Tests", _
             New DESCryptoServiceProviderTests, _
             New DESEncryptionTests, _
             New DESDecryptionTests)
 
-        .Add NewSuite("TripleDESCryptoServiceProvider", _
+        .Add NewSuite("TripleDESCryptoServiceProvider Tests", _
             New TripleDESCryptoServiceProviderTests, _
             New TripleDESEncryptionTests, _
             New TripleDESDecryptionTests)
 
-        .Add NewSuite("RC2CryptoServiceProvider", _
+        .Add NewSuite("RC2CryptoServiceProvider Tests", _
             New RC2CryptoServiceProviderTests, _
             New RC2EncryptionTests, _
             New RC2DecryptionTests)
         
-        .Add NewSuite("Rijndael", _
+        .Add NewSuite("Rijndael Tests", _
             New RijndaelManagedTests, _
             New RijndaelTests, _
             New RijndaelCfbTests)
@@ -241,11 +241,11 @@ End Sub
 
 Private Sub AddSystemResources()
     With Sim.NewTestSuite("System.Resources")
-        .Add New TestResourceKey
-        .Add New TestResourceWriter
-        .Add New TestResourceManager
-        .Add New TestResourceSet
-        .Add New TestResourceReader
+'        .Add New TestResourceKey
+'        .Add New TestResourceWriter
+'        .Add New TestResourceManager
+'        .Add New TestResourceSet
+'        .Add New TestResourceReader
         
         AddTest .This
     End With
@@ -260,7 +260,7 @@ Private Sub AddSystemIO()
         .Add New StreamReaderTests
         .Add New MemoryMappedFileTests
         .Add New FileNotFoundExceptionTests
-        .Add New TestINIFile
+'        .Add New TestINIFile
         .Add New DriveInfoTests
         .Add New StringReaderTests
         .Add New StringWriterTests
@@ -306,15 +306,15 @@ End Sub
 
 Private Sub AddSystemGlobalization()
     With Sim.NewTestSuite("System.Globalization")
-        .Add New TestThaiBuddhistCalendar
-        .Add New TestTaiwanCalendar
-        .Add New TestKoreanCalendar
-        .Add New TestJapaneseCalendar
-        .Add New TestHebrewCalendar
-        .Add New TestJulianCalendar
-        .Add New TestCodePageDecoder
-        .Add New TestGregorianCalendar
-        .Add New TestHijriCalendar
+'        .Add New TestThaiBuddhistCalendar
+'        .Add New TestTaiwanCalendar
+'        .Add New TestKoreanCalendar
+'        .Add New TestJapaneseCalendar
+'        .Add New TestHebrewCalendar
+'        .Add New TestJulianCalendar
+'        .Add New TestCodePageDecoder
+'        .Add New TestGregorianCalendar
+'        .Add New TestHijriCalendar
         .Add New CultureInfoTests
         .Add New DateTimeFormatInfoTests
         
@@ -324,7 +324,7 @@ End Sub
 
 Private Sub AddSystemNumerics()
     With Sim.NewTestSuite("System.Numerics")
-        .Add NewSuite("BigInteger", _
+        .Add NewSuite("BigInteger Tests", _
             New VBAdditionTests, _
             New VBBitTests, _
             New VBComparisonTests, _

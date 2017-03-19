@@ -1,4 +1,4 @@
-Attribute VB_Name = "Casting"
+Attribute VB_Name = "Conversion"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '

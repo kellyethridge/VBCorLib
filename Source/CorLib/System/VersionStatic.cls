@@ -45,7 +45,7 @@ Option Explicit
 Private mParser As New VersionParser
 
 ''
-' Parses a string in the format of 0.0[.0][.0]
+' Parses a string in the format of major.minor[.build[.revision]].
 '
 ' @param s The string to be parsed.
 ' @return A version defined from the string.
@@ -58,6 +58,16 @@ Public Function Parse(ByRef s As String) As Version
     End If
 End Function
 
+''
+' Tries to parse a string in the format of major.minor[.build[.revision]] returning a boolean value
+' indicating the success or failure of parsing. The parsed version is returned
+' through the <b>ByRef Result</b> parameter supplied.
+'
+' @param s The string containing the version information to be parsed.
+' @param Result The <b>ByRef</b> parameter used to pass the <pre>Version</pre>
+' back with on a successful parse.
+' @return <b>True</b> if the <i>input</i> was successfully parsed; otherwise <b>False</b>..
+'
 Public Function TryParse(ByRef s As String, ByRef Result As Version) As Boolean
     TryParse = mParser.TryParse(s, Result)
 End Function

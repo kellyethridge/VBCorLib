@@ -316,9 +316,11 @@ Public Sub TryParse_WithInvalidValues_ReturnsFalse(ByVal s As String)
     Dim Result As Version
     Dim Actual As Boolean
     
+    Set Result = New Version
     Actual = Version.TryParse(s, Result)
     
     Assert.That Actual, Iz.False
+    Assert.That Result, Iz.Nothing
 End Sub
 
 Public Sub Parse_WithInvalidComponentCount_ThrowsArgumentException(ByVal s As String)
