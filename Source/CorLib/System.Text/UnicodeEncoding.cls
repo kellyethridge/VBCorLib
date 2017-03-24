@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements Encoding
+Implements ICloneable
 
 Private mChars()        As Integer
 Private mCharsSA        As SafeArray1d
@@ -56,6 +57,11 @@ Private mEmitBOM        As Boolean
 Private mCodePage       As Long
 Private mDecoderFallback As DecoderFallback
 
+
+
+Public Function Clone() As UnicodeEncoding
+    
+End Function
 
 ''
 ' Returns if the current encoding uses single-byte code points.
@@ -175,15 +181,35 @@ End Property
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim LocalChars()    As Integer
+    Dim Range           As ListRange
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    LocalChars = AsChars(Chars)
     
-    GetByteCount = InternalGetByteCount(ElemCount)
+    On Error GoTo Catch
+    If SAPtr(LocalChars) = vbNullPtr Then _
+        Error.ArgumentNull "Chars", ArgumentNull_Array
+        
+    Range = GetArrayRange(LocalChars, Index, Count)
+    
+    If Range.Index < LBound(LocalChars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(LocalChars) - Range.Index + 1 < Range.Count Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+    
+    GetByteCount = GetByteCountCore(Range.Count)
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars LocalChars
+    Return
 End Function
 
 ''
@@ -198,19 +224,42 @@ End Function
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim Range           As ListRange
+    Dim LocalChars()    As Integer
+    Dim Output()        As Byte
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index)
+    LocalChars = AsChars(Chars)
     
-    Dim Ret() As Byte
-    Ret = CorArray.CreateInstance(vbByte, ElemCount * vbSizeOfChar)
-    Call InternalGetBytes(ElemIndex, ElemCount, Ret, 0)
+    On Error GoTo Catch
+    If SAPtr(LocalChars) = vbNullPtr Then _
+        Error.ArgumentNull "Chars", ArgumentNull_Array
     
-    GetBytes = Ret
+    Range = GetArrayRange(LocalChars, Index, Count)
+    
+    If Range.Index < LBound(LocalChars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(LocalChars) - Range.Index + 1 < Range.Count Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+    
+    If Range.Count > 0 Then
+        ReDim Output(0 To GetByteCountCore(Range.Count) - 1)
+        GetBytesCore LocalChars, Range.Index, Range.Count, Output, 0
+    Else
+        Output = Cor.NewBytes()
+    End If
+    
+    GoSub Finally
+    GetBytes = Output
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars LocalChars
+    Return
 End Function
 
 ''
@@ -230,19 +279,35 @@ End Function
 ' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim LocalChars() As Integer
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(mChars), CharIndex, CharCount)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount"
+    LocalChars = AsChars(Chars)
     
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, InternalGetByteCount(CharCount))
-    Select Case Result
-        Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Bytes")
-        Case Is <> NO_ERROR:                ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", 0, vbNullString
-    End Select
+    On Error GoTo Catch
+    If SAPtr(LocalChars) = vbNullPtr Or SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull IIf(SAPtr(LocalChars) = vbNullPtr, "Chars", "Bytes"), ArgumentNull_Array
+    If CharIndex < LBound(LocalChars) Then _
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_ArrayLB
+    If ByteIndex < LBound(Bytes) Or (ByteIndex > UBound(Bytes) And Len1D(Bytes) > 0) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_Index
+    If CharCount < 0 Then _
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(LocalChars) - CharIndex + 1 < CharCount Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
     
-    GetBytesEx = InternalGetBytes(CharIndex, CharCount, Bytes, ByteIndex)
+    If CharCount > 0 Then
+        GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex)
+    End If
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars LocalChars
+    Return
 End Function
 
 ''
@@ -255,8 +320,22 @@ End Function
 '
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
-    GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
+    
+    If SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    
+    Range = GetArrayRange(Bytes, Index, Count)
+    
+    If Range.Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - Range.Index + 1 < Range.Count Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    
+    If Range.Count > 0 Then
+        GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
+    End If
 End Function
 
 ''
@@ -271,7 +350,17 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     Dim Range       As ListRange
     Dim Output()    As Integer
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    If SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    
+    Range = GetArrayRange(Bytes, Index, Count)
+    
+    If Range.Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - Range.Index + 1 < Range.Count Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
     If Range.Count > 0 Then
         ReDim Output(0 To GetCharCountCore(Bytes, Range.Index, Range.Count) - 1)
@@ -297,8 +386,16 @@ End Function
 ' GetMaxCharCount to determine a size that will hold the decoded bytes.
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
-    ValidateCharArray Chars
+    If SAPtr(Bytes) = vbNullPtr Or SAPtr(Chars) = vbNullPtr Then _
+        Error.ArgumentNull IIf(SAPtr(Bytes) = vbNullPtr, "Bytes", "Chars"), ArgumentNull_Array
+    If ByteIndex < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_ArrayLB
+    If CharIndex < LBound(Chars) Or (CharIndex > UBound(Chars) And Len1D(Chars) > 0) Then _
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_Index
+    If ByteCount < 0 Then _
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - ByteIndex + 1 < ByteCount Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
     If ByteCount > 0 Then
         GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
@@ -375,10 +472,20 @@ End Function
 '
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Range   As ListRange
-    Dim Size    As Long
     Dim Chars() As Integer
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    If SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    
+    Range = GetArrayRange(Bytes, Index, Count)
+    
+    If Range.Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - Range.Index + 1 < Range.Count Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    
     GetString = String$(GetCharCountCore(Bytes, Range.Index, Range.Count), 0)
     Chars = AllocChars(GetString)
     
@@ -470,9 +577,13 @@ End Function
 Friend Sub Init(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean)
     mIsBigEndian = BigEndian
     mEmitBOM = ByteOrderMark
+    
     If BigEndian Then
         mCodePage = 1201
     End If
+End Sub
+
+Friend Sub InitClone(ByVal Other As UnicodeEncoding)
     
 End Sub
 
@@ -485,23 +596,23 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function InternalGetBytes(ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
+Private Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     If CharCount = 0 Then Exit Function
     
     If mIsBigEndian Then
         Dim i As Long
         Dim Ch As Long
         For i = 0 To CharCount - 1
-            Ch = mChars(CharIndex + i) And &HFFFF&
+            Ch = Chars(CharIndex + i) And &HFFFF&
             Bytes(ByteIndex) = (Ch \ vbShift8Bits) And &HFF
             Bytes(ByteIndex + 1) = Ch And &HFF
             ByteIndex = ByteIndex + 2
         Next i
     Else
-        Call CopyMemory(Bytes(ByteIndex), mChars(CharIndex), CharCount * vbSizeOfChar)
+        CopyMemory Bytes(ByteIndex), Chars(CharIndex), CharCount * vbSizeOfChar
     End If
     
-    InternalGetBytes = CharCount * vbSizeOfChar
+    GetBytesCore = CharCount * vbSizeOfChar
 End Function
 
 Private Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
@@ -588,8 +699,8 @@ Private Function GetFallbackCount(ByVal Ch As Long, ByRef FallbackBuffer As Deco
     End If
 End Function
 
-Private Function InternalGetByteCount(ByVal CharCount As Long) As Long
-    InternalGetByteCount = CharCount * vbSizeOfChar
+Private Function GetByteCountCore(ByVal CharCount As Long) As Long
+    GetByteCountCore = CharCount * vbSizeOfChar
 End Function
 
 Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
@@ -727,6 +838,14 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
         Call .WriteProperty("EmitBOM", mEmitBOM)
     End With
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

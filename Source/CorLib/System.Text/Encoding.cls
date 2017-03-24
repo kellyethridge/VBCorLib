@@ -44,6 +44,8 @@ Attribute VB_Exposed = True
 ' @see ASCIIEncoding
 '
 Option Explicit
+'Implements IObject
+'Implements ICloneable
 
 
 ''

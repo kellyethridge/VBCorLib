@@ -122,7 +122,7 @@ End Function
 ' an Integer array with the string as a backing-store. If an Integer array is
 ' passed in, then another reference to the array is returned.</p>
 ' <p>Once work is finished with the array, FreeChars must be called to remove
-' any references to the original string value.</p>
+' any references to the original string or array.</p>
 '
 Public Function AsChars(ByRef v As Variant) As Integer()
     If Not mInited Then
@@ -140,7 +140,7 @@ Public Function AsChars(ByRef v As Variant) As Integer()
             
         Case vbIntegerArray
             ' Directly assigning an array pointer prevents the source array from being copied.
-            SAPtr(AsChars) = CorArray.ArrayPointer(v)
+            SAPtr(AsChars) = VSAPtr(v)
             
         Case Else
             Error.Argument Argument_CharArrayRequired

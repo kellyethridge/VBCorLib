@@ -457,7 +457,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Dim Range       As ListRange
     Dim BufferPtr   As Long
     
-    Range = ValidateArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
+    Range = ValidateOptionalArrayRange(Buffer, Index, Count, Parameter_Buffer)
     BufferPtr = CorArray.ArrayPointer(Buffer)
     
     Select Case VarType(Buffer)

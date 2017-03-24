@@ -378,7 +378,7 @@ End Sub
 
 Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, ByRef Count As Variant)
     Dim Range As ListRange
-    Range = ValidateArrayOptionalRange(Source, Index, Count, Parameter_Source)
+    Range = ValidateOptionalArrayRange(Source, Index, Count, Parameter_Source)
     
     On Error GoTo Catch
     Dim Bytes() As Byte
