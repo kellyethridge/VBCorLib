@@ -315,7 +315,7 @@ End Function
 ' @include "..\DocIncludes\ArrayList.GetEnumerator.html"
 Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, 0, mCount)
+    Range = GetOptionalRange(Index, Count, 0, mCount)
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
     If Range.Count < 0 Then _
@@ -619,7 +619,7 @@ End Sub
 '
 Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, 0, mCount)
+    Range = GetOptionalRange(Index, Count, 0, mCount)
 
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
@@ -659,7 +659,7 @@ End Sub
 '
 Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, 0, mCount)
+    Range = GetOptionalRange(Index, Count, 0, mCount)
 
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum

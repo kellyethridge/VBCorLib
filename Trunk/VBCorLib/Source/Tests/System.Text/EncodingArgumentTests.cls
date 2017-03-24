@@ -159,7 +159,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "GetCharsEx_WithNullChars_ThrowsArgumentNullException"
             AddEncodings Test
             
-        Case "GetCharEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
+        Case "GetCharsEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException"
             AddEncodings Test
             
         Case "GetCharsEx_WithNotEnoughCapacity_ThrowsArgumentException"
@@ -177,6 +177,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "GetMaxCharCount_WithNegativeValue_ThrowsArgumentOutOfRangeException"
             AddEncodings Test
             
+        Case "GetCharsEx_WithCharIndexGreaterThanUBound_ThrowsArgumentOutOfRangeException"
+            AddEncodings Test
     End Select
 End Sub
 
@@ -184,6 +186,7 @@ Private Sub AddEncodings(ByVal Test As TestCaseCollector)
     Test.Use New ASCIIEncoding
     Test.Use New UTF7Encoding
     Test.Use New UTF8Encoding
+    Test.Use New UnicodeEncoding
 End Sub
 
 
@@ -571,12 +574,22 @@ Public Sub GetCharsEx_WithNullChars_ThrowsArgumentNullException(ByVal Encoding A
     AssertArgumentNullException Err, "Chars"
 End Sub
 
-Public Sub GetCharEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+Public Sub GetCharsEx_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
     Dim Bytes(10) As Byte
     Dim Chars(10) As Integer
     
     On Error Resume Next
     Encoding.GetCharsEx Bytes, 0, 1, Chars, -1
+    
+    AssertArgumentOutOfRangeException Err, "CharIndex"
+End Sub
+
+Public Sub GetCharsEx_WithCharIndexGreaterThanUBound_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
+    Dim Bytes(0 To 10) As Byte
+    Dim Chars(0 To 10) As Integer
+    
+    On Error Resume Next
+    Encoding.GetCharsEx Bytes, 0, 1, Chars, 11
     
     AssertArgumentOutOfRangeException Err, "CharIndex"
 End Sub

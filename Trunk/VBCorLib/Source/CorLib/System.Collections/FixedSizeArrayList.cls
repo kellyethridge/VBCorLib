@@ -113,7 +113,7 @@ End Function
 
 Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim Range As ListRange
-    Range = OptionalRange(Index, Count, 0, mList.Count)
+    Range = GetOptionalRange(Index, Count, 0, mList.Count)
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
     If Range.Count < 0 Then _
@@ -127,7 +127,7 @@ Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Option
 End Function
 
 Private Function ArrayList_GetHashCode() As Long
-    ArrayList_GetHashCode = IObject_GetHashcode
+    ArrayList_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
@@ -235,8 +235,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String

@@ -61,7 +61,7 @@ Public Function OptionalLong(ByRef Value As Variant, ByVal Default As Long) As L
     If IsMissing(Value) Then
         OptionalLong = Default
     Else
-        OptionalLong = CLong(Value)
+        OptionalLong = Value
     End If
 End Function
 
@@ -97,7 +97,25 @@ Public Function GetOptionalLongPair(ByRef OptionalValue1 As Variant, ByVal Defau
     End If
 End Function
 
-Public Function OptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ResourceStringKey = Parameter_Index, Optional ByVal CountParameter As ResourceStringKey = Parameter_Count) As ListRange
+Public Function GetArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant) As ListRange
+    Dim IndexIsMissing As Boolean
+    
+    IndexIsMissing = IsMissing(Index)
+    
+    If IsMissing(Count) = IndexIsMissing Then
+        If IndexIsMissing Then
+            GetArrayRange.Index = LBound(Arr)
+            GetArrayRange.Count = UBound(Arr) - LBound(Arr) + 1
+        Else
+            GetArrayRange.Index = Index
+            GetArrayRange.Count = Count
+        End If
+    Else
+        Error.Argument Argument_ParamRequired, IIf(IndexIsMissing, "Index", "Count")
+    End If
+End Function
+
+Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ResourceStringKey = Parameter_Index, Optional ByVal CountParameter As ResourceStringKey = Parameter_Count) As ListRange
     Dim IndexIsMissing As Boolean
     
     IndexIsMissing = IsMissing(Index)
@@ -110,11 +128,11 @@ Public Function OptionalRange(ByRef Index As Variant, ByRef Count As Variant, By
     End If
     
     If IndexIsMissing Then
-        OptionalRange.Index = DefaultIndex
-        OptionalRange.Count = DefaultCount
+        GetOptionalRange.Index = DefaultIndex
+        GetOptionalRange.Count = DefaultCount
     Else
-        OptionalRange.Index = OptionalLong(Index, DefaultIndex)
-        OptionalRange.Count = OptionalLong(Count, DefaultCount)
+        GetOptionalRange.Index = OptionalLong(Index, DefaultIndex)
+        GetOptionalRange.Count = OptionalLong(Count, DefaultCount)
     End If
 End Function
 

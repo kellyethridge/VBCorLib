@@ -188,10 +188,21 @@ Public Function GetEncodings() As EncodingInfo()
     GetEncodings = EncodingTable.GetEncodings
 End Function
 
+''
+' Returns reference to Encoding resources.
+'
+Friend Property Get EncodingTable() As EncodingTable
+    Set EncodingTable = mEncodingTable
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Validation for Encoding arguments
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function ValidateOptionalCharRange(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As ListRange
     ValidateArray Chars, Parameter_Chars
-        
-    ValidateOptionalCharRange = OptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
+    
+    ValidateOptionalCharRange = GetOptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars))
 
     If ValidateOptionalCharRange.Count = 0 Then
         Exit Function
@@ -224,7 +235,7 @@ End Sub
 Friend Function ValidateOptionalByteRange(ByRef Bytes() As Byte, ByRef Index As Variant, ByRef Count As Variant) As ListRange
     ValidateByteArray Bytes
     
-    ValidateOptionalByteRange = OptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
+    ValidateOptionalByteRange = GetOptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes))
     
     If ValidateOptionalByteRange.Count = 0 Then
         Exit Function
@@ -253,10 +264,6 @@ Friend Sub ValidateByteRange(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_Index
     End If
 End Sub
-
-Friend Property Get EncodingTable() As EncodingTable
-    Set EncodingTable = mEncodingTable
-End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

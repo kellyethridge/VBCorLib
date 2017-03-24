@@ -32,7 +32,7 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: GenericError
+' Module: ErrorStatic
 '
 Option Explicit
 
@@ -89,3 +89,4 @@ End Sub
 Friend Sub UnauthorizedAccess(ByVal Key As ResourceStringKey)
     Throw Cor.NewUnauthorizedAccessException(Environment.GetResourceString(Key))
 End Sub
+

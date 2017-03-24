@@ -412,7 +412,7 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
         Error.ArgumentNull "Chars", ArgumentNull_Array
     
     Dim Range As ListRange
-    Range = OptionalRange(StartIndex, CharCount, LBound(Chars), CorArray.LengthFirstDim(Chars), Parameter_StartIndex, Parameter_CharCount)
+    Range = GetOptionalRange(StartIndex, CharCount, LBound(Chars), CorArray.LengthFirstDim(Chars), Parameter_StartIndex, Parameter_CharCount)
     
     If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
@@ -496,7 +496,7 @@ Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Opti
         Error.Argument Argument_EmptyName, "OldValue"
     
     Dim Range As ListRange
-    Range = OptionalRange(StartIndex, Count, 0, mLength, Parameter_StartIndex)
+    Range = GetOptionalRange(StartIndex, Count, 0, mLength, Parameter_StartIndex)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
@@ -538,7 +538,7 @@ End Function
 '
 Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As String
     Dim Range As ListRange
-    Range = OptionalRange(StartIndex, Length, 0, mLength, Parameter_StartIndex, Parameter_Length)
+    Range = GetOptionalRange(StartIndex, Length, 0, mLength, Parameter_StartIndex, Parameter_Length)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
@@ -763,7 +763,7 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
     On Error GoTo Catch
     
     Dim Range As ListRange
-    Range = OptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    Range = GetOptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
@@ -790,7 +790,7 @@ Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Varian
     ValueLength = Len(Value)
 
     Dim Range As ListRange
-    Range = OptionalRange(StartIndex, Count, 0, ValueLength, Parameter_StartIndex)
+    Range = GetOptionalRange(StartIndex, Count, 0, ValueLength, Parameter_StartIndex)
 
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index

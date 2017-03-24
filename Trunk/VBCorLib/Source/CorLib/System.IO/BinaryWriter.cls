@@ -322,7 +322,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Bytes() As Byte
     Dim Range   As ListRange
     
-    Range = ValidateArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
+    Range = ValidateOptionalArrayRange(Buffer, Index, Count, Parameter_Buffer)
     SAPtr(Bytes) = CorArray.ArrayPointer(Buffer)
     
     On Error GoTo Catch
