@@ -136,6 +136,9 @@ Public Enum ResourceStringKey
     Argument_RecursiveFallbackBytes = 860
     Argument_InvalidCodePageBytesIndex = 861
     Argument_EncodingConversionOverflowChars = 862
+    Argument_RecursiveFallback = 863
+    Argument_InvalidHighSurrogate = 864
+    Argument_InvalidLowSurrogate = 865
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
@@ -185,6 +188,8 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_DecimalScale = 737
     ArgumentOutOfRange_GetCharCountOverflow = 738
     ArgumentOutOfRange_GetByteCountOverflow = 739
+    ArgumentOutOfRange_InvalidHighSurrogate = 740
+    ArgumentOutOfRange_InvalidLowSurrogate = 741
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?

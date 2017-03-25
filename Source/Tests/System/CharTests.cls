@@ -143,6 +143,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(&HFFFFD800, &HD801&).Expect Iz.Negative
             Test.Use(&HFFFFD801, &HD800&).Expect Iz.Positive
             
+        Case "ConvertToUtf32_WithValues_ReturnsExpected"
+            Test.Use &HD800, &HDC00, &H10000
+            Test.Use &HD800&, &HDC00&, &H10000
+            Test.Use &HDBFF, &HDFFF, &H10FFFF
+            Test.Use &HDBFF&, &HDFFF&, &H10FFFF
+        
+        Case "ConvertToUtf32Str_WithValues_ReturnsExpected"
+            Test.Use t("\x0"), 0
+            Test.Use t("\xD7FF"), &HD7FF&
+            Test.Use t("\xE000"), &HE000&
+            Test.Use t("\xFFFF"), &HFFFF&
+            Test.Use t("\xD800\xDC00"), &H10000
+            Test.Use t("\xDBFF\xDFFF"), &H10FFFF
+            
     End Select
 End Sub
 
@@ -270,3 +284,52 @@ End Sub
 Public Function Compare_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long) As Long
     Compare_WithValues_ReturnsExpected = Char.Compare(a, b)
 End Function
+
+Public Sub ConvertToUtf32_WithValues_ReturnsExpected(ByVal High As Long, ByVal Low As Long, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = Char.ConvertToUtf32(High, Low)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ConvertToUtf32_WithInvalidHighSurrogate_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.ConvertToUtf32 0, &HDC00
+    
+    AssertArgumentOutOfRangeException Err, "HighSurrogate"
+End Sub
+
+Public Sub ConvertToUtf32_WithInvalidLowSurrogate_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.ConvertToUtf32 &HD800, 0
+    
+    AssertArgumentOutOfRangeException Err, "LowSurrogate"
+End Sub
+
+Public Sub ConvertToUtf32Str_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = Char.ConvertToUtf32Str(s, 0)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ConvertToUtf32Str_WithHighSurrogateFollowedByNonLowSurrogate_ThrowsArgumentException()
+    On Error Resume Next
+    
+    Char.ConvertToUtf32Str t("\xD800\x0040"), 0
+    
+    AssertArgumentException Err, "s"
+End Sub
+
+Public Sub ConvertToUtf32Str_WithFirstCharAsLowSurrogate_ThrowsArgumentException()
+     On Error Resume Next
+     
+     Char.ConvertToUtf32Str t("\xDC00\xDC00"), 0
+     
+     AssertArgumentException Err, "s"
+End Sub
+

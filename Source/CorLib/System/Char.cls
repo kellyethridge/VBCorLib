@@ -232,3 +232,11 @@ End Function
 Public Function IsSurrogate(ByVal c As Long) As Boolean
     IsSurrogate = modChar.IsSurrogate(c)
 End Function
+
+Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
+    ConvertToUtf32 = modChar.ConvertToUtf32(HighSurrogate, LowSurrogate)
+End Function
+
+Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
+    ConvertToUtf32Str = modChar.ConvertToUtf32Str(s, Index)
+End Function
