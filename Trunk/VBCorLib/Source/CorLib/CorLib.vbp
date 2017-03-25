@@ -356,6 +356,7 @@ Class=EncoderFallbackBuffer; System.Text\EncoderFallbackBuffer.cls
 ResFile32="CorLib.RES"
 Class=EncoderReplacementFallbackBuffer; System.Text\EncoderReplacementFallbackBuffer.cls
 Module=modChar; System\modChar.bas
+Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"

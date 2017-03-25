@@ -1860,3 +1860,12 @@ Public Function NewDecoderFallbackException2(ByRef Message As String, ByRef Byte
     NewDecoderFallbackException2.Init2 Message, BytesUnknown, Index
 End Function
 
+Public Function NewEncoderReplacementFallback(ByRef Replacement As String) As EncoderReplacementFallback
+    Set NewEncoderReplacementFallback = New EncoderReplacementFallback
+    NewEncoderReplacementFallback.Init Replacement
+End Function
+
+Public Function NewEncoderReplacementFallbackBuffer(ByVal Fallback As EncoderReplacementFallback) As EncoderReplacementFallbackBuffer
+    Set NewEncoderReplacementFallbackBuffer = New EncoderReplacementFallbackBuffer
+    NewEncoderReplacementFallbackBuffer.Init Fallback
+End Function

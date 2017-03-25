@@ -202,6 +202,7 @@ Class=DecoderReplacementFallbackTests; System.Text\DecoderReplacementFallbackTes
 Class=DecoderReplacementFallbackBufferTests; System.Text\DecoderReplacementFallbackBufferTests.cls
 ResFile32="CorLib.Tests.RES"
 Class=EncoderReplacementFallbackBufferTests; System.Text\EncoderReplacementFallbackBufferTests.cls
+Class=EncoderReplacementFallbackTests; System.Text\EncoderReplacementFallbackTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

@@ -112,3 +112,40 @@ Public Function IsSurrogate(ByVal c As Long) As Boolean
     End If
 End Function
 
+Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
+    Const UnicodePlane1Start As Long = &H10000
+    
+    If Not IsHighSurrogate(HighSurrogate) Then _
+        Error.ArgumentOutOfRange "HighSurrogate", ArgumentOutOfRange_InvalidHighSurrogate
+    If Not IsLowSurrogate(LowSurrogate) Then _
+        Error.ArgumentOutOfRange "LowSurrogate", ArgumentOutOfRange_InvalidLowSurrogate
+        
+    ConvertToUtf32 = (HighSurrogate And &H3FF) * vbShift10Bits + (LowSurrogate And &H3FF) + UnicodePlane1Start
+End Function
+
+Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
+    Dim Char1   As Long
+    Dim Char2   As Long
+    Dim Ptr     As Long
+    
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
+    
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    Char1 = MemWord(Ptr) And &HFFFF&
+    
+    If IsLowSurrogate(Char1) Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidLowSurrogate, Index), "s")
+    
+    If IsHighSurrogate(Char1) Then
+        Char2 = MemWord(Ptr + vbSizeOfChar) And &HFFFF&
+                
+        If Not IsLowSurrogate(Char2) Then _
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidHighSurrogate, Index), "s")
+            
+        ConvertToUtf32Str = (Char1 And &H3FF) * vbShift10Bits + (Char2 And &H3FF) + &H10000
+    Else
+        ConvertToUtf32Str = Char1
+    End If
+End Function
+

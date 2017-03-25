@@ -809,6 +809,7 @@ library CorType {
     	const long vbShift6Bits		= 0x40;
     	const long vbShift7Bits		= 0x80;
     	const long vbShift8Bits		= 0x100;
+    	const long vbShift10Bits	= 0x400;
     	const long vbShift16Bits	= 0x10000;
     	const long vbShift24Bits	= 0x1000000;
     }
