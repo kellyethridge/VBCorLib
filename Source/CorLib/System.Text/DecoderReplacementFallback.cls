@@ -80,8 +80,8 @@ Friend Sub Init(ByRef Replacement As String)
     Dim i           As Long
     
     For i = 0 To Len(Replacement) - 1
-        If Char.IsSurrogate(Replacement, i) Then
-            If Char.IsHighSurrogate(Replacement, i) Then
+        If Char.IsSurrogateStr(Replacement, i) Then
+            If Char.IsHighSurrogateStr(Replacement, i) Then
                 If FoundHigh Then
                     Exit For
                 End If
@@ -89,7 +89,7 @@ Friend Sub Init(ByRef Replacement As String)
                 FoundHigh = True
             End If
             
-            If Char.IsLowSurrogate(Replacement, i) Then
+            If Char.IsLowSurrogateStr(Replacement, i) Then
                 If Not FoundHigh Then
                     FoundHigh = True
                     Exit For
@@ -120,9 +120,21 @@ Private Function DecoderFallback_CreateFallbackBuffer() As DecoderFallbackBuffer
     Set DecoderFallback_CreateFallbackBuffer = CreateFallbackBuffer
 End Function
 
+Private Function DecoderFallback_Equals(Value As Variant) As Boolean
+    DecoderFallback_Equals = Equals(Value)
+End Function
+
+Private Function DecoderFallback_GetHashCode() As Long
+    DecoderFallback_GetHashCode = GetHashCode
+End Function
+
 Private Property Get DecoderFallback_MaxCharCount() As Long
     DecoderFallback_MaxCharCount = MaxCharCount
 End Property
+
+Private Function DecoderFallback_ToString() As String
+    DecoderFallback_ToString = ToString
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

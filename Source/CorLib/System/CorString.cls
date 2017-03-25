@@ -655,7 +655,7 @@ Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, By
     Chars = AllocChars(s)
     If TrimHead Then
         For i = 0 To UBound(Chars)
-            If Not Char.IsWhiteSpaceChar(Chars(i)) Then
+            If Not Char.IsWhiteSpace(Chars(i)) Then
                 StartIndex = i
                 Exit For
             End If
@@ -669,7 +669,7 @@ Private Function TrimWhiteSpace(ByRef s As String, ByVal TrimHead As Boolean, By
     EndIndex = Len(s) - 1
     If TrimTail Then
         For i = UBound(Chars) To StartIndex Step -1
-            If Not Char.IsWhiteSpaceChar(Chars(i)) Then
+            If Not Char.IsWhiteSpace(Chars(i)) Then
                 EndIndex = i
                 Exit For
             End If
@@ -687,7 +687,7 @@ Finally:
 End Function
 
 Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
-    ContainsOnlyWhiteSpace = AllChars(s, AddressOf IsWhiteSpaceChar)
+    ContainsOnlyWhiteSpace = AllChars(s, AddressOf IsWhiteSpace)
 End Function
 
 Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long

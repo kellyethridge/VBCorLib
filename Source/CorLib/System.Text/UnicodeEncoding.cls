@@ -50,13 +50,11 @@ Implements IObject
 Implements Encoding
 Implements ICloneable
 
-Private mChars()        As Integer
-Private mCharsSA        As SafeArray1d
-Private mIsBigEndian    As Boolean
-Private mEmitBOM        As Boolean
-Private mCodePage       As Long
-Private mDecoderFallback As DecoderFallback
-
+Private mIsBigEndian        As Boolean
+Private mEmitBOM            As Boolean
+Private mCodePage           As Long
+Private mDecoderFallback    As DecoderFallback
+Private mEncoderFallback    As EncoderFallback
 
 
 Public Function Clone() As UnicodeEncoding
@@ -162,12 +160,20 @@ Public Property Get WindowsCodePage() As Long
     WindowsCodePage = mCodePage
 End Property
 
+Public Property Get DecoderFallback() As DecoderFallback
+    Set DecoderFallback = mDecoderFallback
+End Property
+
 Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
     Set mDecoderFallback = Value
 End Property
 
-Public Property Get DecoderFallback() As DecoderFallback
-    Set DecoderFallback = mDecoderFallback
+Public Property Get EncoderFallback() As EncoderFallback
+    Set EncoderFallback = mEncoderFallback
+End Property
+
+Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
+    Set mEncoderFallback = Value
 End Property
 
 ''
@@ -649,8 +655,8 @@ Private Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, By
         ByteIndex = ByteIndex + 1
         LastByte = -1
         
-        If Char.IsSurrogateChar(Ch) Then
-            If Char.IsHighSurrogateChar(Ch) Then
+        If Char.IsSurrogate(Ch) Then
+            If Char.IsHighSurrogate(Ch) Then
                 If LastChar > 0 Then
                     CharCount = CharCount - 1 + GetFallbackCount(LastChar, FallbackBuffer)
                 End If
@@ -731,8 +737,8 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
             ByteIndex = ByteIndex + 1
             LastByte = -1
             
-            If Char.IsSurrogateChar(Ch) Then
-                If Char.IsHighSurrogateChar(Ch) Then
+            If Char.IsSurrogate(Ch) Then
+                If Char.IsHighSurrogate(Ch) Then
                     ' we have preceeding high surrogate followed
                     ' by this high surrogate.
                     If LastChar > 0 Then
@@ -824,18 +830,14 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        Call Init(.ReadProperty("BigEndian", False), .ReadProperty("EmitBOM", True))
+        Init .ReadProperty("BigEndian", False), .ReadProperty("EmitBOM", True)
     End With
-End Sub
-
-Private Sub Class_Terminate()
-    SAPtr(mChars) = 0
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("BigEndian", mIsBigEndian)
-        Call .WriteProperty("EmitBOM", mEmitBOM)
+        .WriteProperty "BigEndian", mIsBigEndian
+        .WriteProperty "EmitBOM", mEmitBOM
     End With
 End Sub
 
