@@ -351,9 +351,9 @@ Class=DecoderFallbackStatic; ..\Tests\System.Text\DecoderFallbackStatic.cls
 Class=DecoderExceptionFallback; System.Text\DecoderExceptionFallback.cls
 Class=DecoderExceptionFallbackBuffer; System.Text\DecoderExceptionFallbackBuffer.cls
 Class=DecoderFallbackException; System.Text\DecoderFallbackException.cls
-ResFile32="CorLib.RES"
 Class=EncoderFallback; System.Text\EncoderFallback.cls
 Class=EncoderFallbackBuffer; System.Text\EncoderFallbackBuffer.cls
+ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -401,11 +401,15 @@ Num=2
 Description=Implements IObject on Encoding
 Status=0
 Priority=1
+AssignedTo=
+Comment=Don't actualy implement IObject, just add the methods to be part of the Encoding interface.
 
 [TASK2]
 Description=Implements ICloneable on Encoding
 Status=0
 Priority=1
+AssignedTo=
+Comment=Don't actually implement ICloneable, just add the method to be part of the Encoding interface.
 
 [TASK3]
 Description=

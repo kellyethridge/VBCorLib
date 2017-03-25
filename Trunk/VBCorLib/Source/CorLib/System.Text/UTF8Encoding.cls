@@ -771,7 +771,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                             BytesInSequence = 0
                             CharCount = CharCount + 1
                         Case 1  ' check for shortest form conformity
-                            If Ch < &H20 Or Char.IsSurrogateChar(Ch * &H40) Then
+                            If Ch < &H20 Or Char.IsSurrogate(Ch * &H40) Then
                                 ByteStreamError ByteIndex
                             End If
                             

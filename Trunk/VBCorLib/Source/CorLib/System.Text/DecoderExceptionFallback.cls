@@ -73,9 +73,21 @@ Private Function DecoderFallback_CreateFallbackBuffer() As DecoderFallbackBuffer
     Set DecoderFallback_CreateFallbackBuffer = CreateFallbackBuffer
 End Function
 
+Private Function DecoderFallback_Equals(Value As Variant) As Boolean
+    DecoderFallback_Equals = Equals(Value)
+End Function
+
+Private Function DecoderFallback_GetHashCode() As Long
+    DecoderFallback_GetHashCode = GetHashCode
+End Function
+
 Private Property Get DecoderFallback_MaxCharCount() As Long
     DecoderFallback_MaxCharCount = MaxCharCount
 End Property
+
+Private Function DecoderFallback_ToString() As String
+    DecoderFallback_ToString = ToString
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

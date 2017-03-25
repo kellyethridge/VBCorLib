@@ -24,7 +24,7 @@ End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
-        Case "IsWhiteSpace_WithString_ReturnsExpected"
+        Case "IsWhiteSpaceStr_WithString_ReturnsExpected"
             Test.Use ChrW$(&H20), True
             Test.Use ChrW$(&H1680), True
             Test.Use ChrW$(&H180E), True
@@ -53,14 +53,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use ChrW$(&HA0), True
             Test.Use ChrW$(65), False
             
-        Case "IsWhiteSpace_WithStringIndex_ReturnsExpected"
+        Case "IsWhiteSpaceStr_WithStringIndex_ReturnsExpected"
             Test.Use 0, True
             Test.Use 1, False
             Test.Use 2, True
             Test.Use 3, False
             Test.Use 4, True
             
-        Case "IsWhiteSpaceChar_WithChar_ReturnsExpected"
+        Case "IsWhiteSpace_WithChar_ReturnsExpected"
             Test.Use &H20, True
             Test.Use &H1680, True
             Test.Use &H180E, True
@@ -89,7 +89,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HA0, True
             Test.Use 65, False
             
-        Case "IsHighSurrogateChar"
+        Case "IsHighSurrogate"
             Test.Use &HD800&, True
             Test.Use &HD800, True
             Test.Use &HD7FF&, False
@@ -99,7 +99,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HDC00&, False
             Test.Use &HDC00, False
             
-        Case "IsLowSurrogateChar"
+        Case "IsLowSurrogate"
             Test.Use &HDC00, True
             Test.Use &HDC00&, True
             Test.Use &HDFFF, True
@@ -109,13 +109,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HE000, False
             Test.Use &HE000&, False
             
-        Case "IsHighSurrogate_WithValues_ReturnsExpected"
+        Case "IsHighSurrogateStr_WithValues_ReturnsExpected"
             Test.Use "a", 0, False
             Test.Use ChrW$(&HD800), 0, True
             Test.Use "aa", 1, False
             Test.Use "a" & ChrW$(&HDBFF), 1, True
             
-        Case "IsLowSurrogate_WithValues_ReturnsExpected"
+        Case "IsLowSurrogateStr_WithValues_ReturnsExpected"
             Test.Use ChrW$(&HD800), 0, False
             Test.Use ChrW$(&HDC00), 0, True
             Test.Use "a" & ChrW$(&HDBFF), 1, False
@@ -124,115 +124,115 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Sub IsWhiteSpace_WithString_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
+Public Sub IsWhiteSpaceStr_WithString_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsWhiteSpace(s, 0)
+    Actual = Char.IsWhiteSpaceStr(s, 0)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsWhiteSpace_WithStringIndex_ReturnsExpected(ByVal Index As Long, ByVal Expected As Boolean)
+Public Sub IsWhiteSpaceStr_WithStringIndex_ReturnsExpected(ByVal Index As Long, ByVal Expected As Boolean)
     Const s As String = " a b "
     Dim Actual As Boolean
      
-    Actual = Char.IsWhiteSpace(s, Index)
+    Actual = Char.IsWhiteSpaceStr(s, Index)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsWhiteSpaceChar_WithChar_ReturnsExpected(ByVal Ch As Integer, ByVal Expected As Boolean)
+Public Sub IsWhiteSpace_WithChar_ReturnsExpected(ByVal Ch As Integer, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsWhiteSpaceChar(Ch)
+    Actual = Char.IsWhiteSpace(Ch)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsWhiteSpace_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+Public Sub IsWhiteSpaceStr_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    Char.IsWhiteSpace "a", -1
+    Char.IsWhiteSpaceStr "a", -1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub IsWhiteSpace_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
+Public Sub IsWhiteSpaceStr_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
     On Error Resume Next
     
-    Char.IsWhiteSpace "a", 1
+    Char.IsWhiteSpaceStr "a", 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub IsWhiteSpace_WithEmptyString_ThrowsArgumentOutOfRangeException()
+Public Sub IsWhiteSpaceStr_WithEmptyString_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    Char.IsWhiteSpace "", 0
+    Char.IsWhiteSpaceStr "", 0
     
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub IsHighSurrogateChar(ByVal Value As Long, ByVal Expected As Boolean)
+Public Sub IsHighSurrogate(ByVal Value As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsHighSurrogateChar(Value)
+    Actual = Char.IsHighSurrogate(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsLowSurrogateChar(ByVal Value As Long, ByVal Expected As Boolean)
+Public Sub IsLowSurrogate(ByVal Value As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsLowSurrogateChar(Value)
+    Actual = Char.IsLowSurrogate(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsHighSurrogate_WithValues_ReturnsExpected(ByRef s As String, ByVal Index As Long, ByVal Expected As Boolean)
+Public Sub IsHighSurrogateStr_WithValues_ReturnsExpected(ByRef s As String, ByVal Index As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsHighSurrogate(s, Index)
+    Actual = Char.IsHighSurrogateStr(s, Index)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsHighSurrogate_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+Public Sub IsHighSurrogateStr_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    Char.IsHighSurrogate "a", -1
+    Char.IsHighSurrogateStr "a", -1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub IsHighSurrogate_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
+Public Sub IsHighSurrogateStr_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
     On Error Resume Next
     
-    Char.IsHighSurrogate "a", 1
+    Char.IsHighSurrogateStr "a", 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub IsLowSurrogate_WithValues_ReturnsExpected(ByRef s As String, ByVal Index As Long, ByVal Expected As Boolean)
+Public Sub IsLowSurrogateStr_WithValues_ReturnsExpected(ByRef s As String, ByVal Index As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = Char.IsLowSurrogate(s, Index)
+    Actual = Char.IsLowSurrogateStr(s, Index)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsLowSurrogate_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+Public Sub IsLowSurrogateStr_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    Char.IsLowSurrogate "a", -1
+    Char.IsLowSurrogateStr "a", -1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub IsLowSurrogate_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
+Public Sub IsLowSurrogateStr_WithIndexPassedStringLength_ThrowsArgumentOutOfException()
     On Error Resume Next
     
-    Char.IsLowSurrogate "a", 1
+    Char.IsLowSurrogateStr "a", 1
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub

@@ -61,6 +61,6 @@ Public Function IsValidAttributeValueChar(ByRef Char As Integer) As Boolean
     IsValidAttributeValueChar = True
 End Function
 
-Public Function IsWhiteSpaceChar(ByRef Char As Integer) As Boolean
-    IsWhiteSpaceChar = Statics.Char.IsWhiteSpaceChar(Char)
+Public Function IsWhiteSpace(ByRef Char As Integer) As Boolean
+    IsWhiteSpace = Statics.Char.IsWhiteSpace(Char)
 End Function
