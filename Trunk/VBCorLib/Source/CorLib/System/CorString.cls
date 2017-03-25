@@ -687,7 +687,7 @@ Finally:
 End Function
 
 Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
-    ContainsOnlyWhiteSpace = AllChars(s, AddressOf IsWhiteSpace)
+    ContainsOnlyWhiteSpace = AllChars(s, AddressOf IsWhiteSpaceCallback)
 End Function
 
 Friend Function CharCount(ByRef s As String, ByVal Char As Integer) As Long

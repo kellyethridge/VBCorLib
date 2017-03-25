@@ -34,33 +34,33 @@ Private Const vbSpaceChar           As Long = 32
 Private Const vbQuoteChar           As Long = 34
 
 
-Public Function IsValidTagChar(ByRef Char As Integer) As Boolean
+Public Function IsValidTagCallback(ByRef Char As Integer) As Boolean
     Select Case Char
         Case vbLeftCheveronChar, vbRightCheveronChar, vbSpaceChar
             Exit Function
     End Select
     
-    IsValidTagChar = True
+    IsValidTagCallback = True
 End Function
 
-Public Function IsValidTextChar(ByRef Char As Integer) As Boolean
+Public Function IsValidTextCallback(ByRef Char As Integer) As Boolean
     Select Case Char
         Case vbLeftCheveronChar, vbRightCheveronChar
             Exit Function
     End Select
     
-    IsValidTextChar = True
+    IsValidTextCallback = True
 End Function
 
-Public Function IsValidAttributeValueChar(ByRef Char As Integer) As Boolean
+Public Function IsValidAttributeValueCallback(ByRef Char As Integer) As Boolean
     Select Case Char
         Case vbLeftCheveronChar, vbRightCheveronChar, vbQuoteChar
             Exit Function
     End Select
     
-    IsValidAttributeValueChar = True
+    IsValidAttributeValueCallback = True
 End Function
 
-Public Function IsWhiteSpace(ByRef Char As Integer) As Boolean
-    IsWhiteSpace = Statics.Char.IsWhiteSpace(Char)
+Public Function IsWhiteSpaceCallback(ByRef Char As Integer) As Boolean
+    IsWhiteSpaceCallback = IsWhiteSpace(Char)
 End Function

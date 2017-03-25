@@ -43,6 +43,55 @@ Attribute VB_Exposed = True
 Option Explicit
 
 ''
+' Returns minimum character value.
+'
+' @remarks This return the value &H0000.
+'
+Public Property Get MinValue() As Integer
+    MinValue = 0
+End Property
+
+''
+' Returns the maximum character value.
+'
+' @remarks This returns the value &HFFFF.
+' <p>Because characters are represented using the <b>Integer</b> datatype the max
+' value will be a negative value. To correctly compare character values use the
+' <a href="Char.Equals.html">Char.Equals</a> and <a href="Char.Compare.html">Char.Compare</a> methods.
+'
+Public Property Get MaxValue() As Integer
+    MaxValue = &HFFFF
+End Property
+
+''
+' Compares two character code units.
+'
+' @param a A character to compare with.
+' @param b A character to compare with.
+' @return <p>Returns a <b>negative</b> value if parameter <i>a</i> is less than parameter <i>b</i>.</p>
+' <p>Returns a <b>positive</b> value if parameter <i>a</i> is greater than parameter <i>b</i>.</p>
+' <p>Returns a <b>zero</b> if parameter <i>a</i> is equal to parameter <i>b</i>.</p>
+' @remarks This method handles the discrepancy between integers and longs particularly when
+' dealing with negative integer values that should map to positive long values.
+'
+Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
+    Compare = modChar.Compare(a, b)
+End Function
+
+''
+' Evaluates two character code units for equality.
+'
+' @param a A character to compare with.
+' @param b A character to compare with.
+' @return <b>true</b> if parameter <i>a</i> is equal to parameter <i>b</i>; otherwise <b>false</b>.
+' @remarks This method handles the discrepancy between integers and longs particularly when
+' dealing with negative integer values that should map to positive long values.
+'
+Public Function Equals(ByVal a As Long, ByVal b As Long) As Boolean
+    Equals = modChar.Equals(a, b)
+End Function
+
+''
 ' Indicates if the specified character in a string is white space.
 '
 ' @param s A string.
@@ -58,12 +107,7 @@ Option Explicit
 ' </ul>
 ' </p>
 Public Function IsWhiteSpaceStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-        
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    IsWhiteSpaceStr = IsWhiteSpace(MemWord(Ptr))
+    IsWhiteSpaceStr = modChar.IsWhiteSpaceStr(s, Index)
 End Function
 
 ''
@@ -78,15 +122,11 @@ End Function
 '   <li>Members of the ParagraphSeparator category, which consists solely of the PARAGRAPH SEPARATOR character (U+2029).</li>
 '   <li>The characters CHARACTER TABULATION (U+0009), LINE FEED (U+000A), LINE TABULATION (U+000B), FORM FEED (U+000C), CARRIAGE RETURN (U+000D), and NEXT LINE (U+0085).</li>
 ' </ul>
+' <p>This method handles the discrepancy between integers and longs particularly when
+' dealing with negative integer values that should map to positive long values.</p>
 '
 Public Function IsWhiteSpace(ByVal c As Long) As Boolean
-    Select Case c
-        Case &H20, &HD, &H9, &HA, &HB, &HC, &H85, &HA0, &H1680, &H180E, _
-             &H2000 To &H200A, _
-             &H2028, &H2029, &H202F, &H205F, _
-             &H3000
-            IsWhiteSpace = True
-    End Select
+    IsWhiteSpace = modChar.IsWhiteSpace(c)
 End Function
 
 ''
@@ -107,12 +147,7 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsHighSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-    
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    IsHighSurrogateStr = IsHighSurrogate(MemWord(Ptr))
+    IsHighSurrogateStr = modChar.IsHighSurrogateStr(s, Index)
 End Function
 
 ''
@@ -120,13 +155,11 @@ End Function
 '
 ' @param c The Unicode character to evaluate.
 ' @return <b>true</b> if the value of <i>c</i> parameter ranges from U+D800 to U+DBFF; otherwise, <b>false</b>.
-' @remarks This method will handle the <b>vbInteger</b> datatype correctly if a negative value is supplied.
+' @remarks <p>This method handles the discrepancy between integers and longs particularly when
+' dealing with negative integer values that should map to positive long values.</p>
 '
 Public Function IsHighSurrogate(ByVal c As Long) As Boolean
-    Select Case c
-        Case &HD800& To &HDBFF&, &HFFFFD800 To &HFFFFDBFF
-            IsHighSurrogate = True
-    End Select
+    IsHighSurrogate = modChar.IsHighSurrogate(c)
 End Function
 
 ''
@@ -147,12 +180,7 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsLowSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If Index < 0 Or Index >= Len(s) Then _
-        Error.ArgumentOutOfRange "Index"
-    
-    Dim Ptr As Long
-    Ptr = StrPtr(s) + Index * vbSizeOfChar
-    IsLowSurrogateStr = IsLowSurrogate(MemWord(Ptr))
+    IsLowSurrogateStr = modChar.IsLowSurrogateStr(s, Index)
 End Function
 
 ''
@@ -160,13 +188,11 @@ End Function
 '
 ' @param c The Unicode character to evaluate.
 ' @return <b>true</b> if the value of <i>c</i> parameter ranges from U+DC00 to U+DFFF; otherwise, <b>false</b>.
-' @remarks This method will handle the <b>vbInteger</b> datatype correctly if a negative value is supplied.
+' @remarks <p>This method handles the discrepancy between integers and longs particularly when
+' dealing with negative integer values that should map to positive long values.</p>
 '
 Public Function IsLowSurrogate(ByVal c As Long) As Boolean
-    Select Case c
-        Case &HDC00& To &HDFFF&, &HFFFFDC00 To &HFFFFDFFF
-            IsLowSurrogate = True
-    End Select
+    IsLowSurrogate = modChar.IsLowSurrogate(c)
 End Function
 
 ''
@@ -185,11 +211,7 @@ End Function
 ' @see IsLowSurrogateStr
 '
 Public Function IsSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If IsHighSurrogateStr(s, Index) Then
-        IsSurrogateStr = True
-    ElseIf IsLowSurrogateStr(s, Index) Then
-        IsSurrogateStr = True
-    End If
+    IsSurrogateStr = modChar.IsSurrogateStr(s, Index)
 End Function
 
 ''
@@ -199,6 +221,8 @@ End Function
 ' @return <b>true</b> if <i>c</i> is either a high surrogate or a low surrogate; otherwise, <b>false</b>.
 ' @remarks <p>A surrogate is a Char with a UTF-16 code unit in the range from U+D800 to U+DFFF. The individual surrogate code unit has no interpretation of its own, but has meaning only when used as part of a surrogate pair.</p>
 ' <p>For more information about surrogate pairs, see the Unicode Standard at the <a href="http://www.unicode.org">OnlineUnicode home page</a>.</p>
+' <p>This method handles the discrepancy between integers and longs particularly when
+' dealing with negative integer values that should map to positive long values.</p>
 ' @see IsSurrogateStr
 ' @see IsHighSurrogate
 ' @see IsHighSurrogateStr
@@ -206,9 +230,5 @@ End Function
 ' @see IsLowSurrogateStr
 '
 Public Function IsSurrogate(ByVal c As Long) As Boolean
-    If IsHighSurrogate(c) Then
-        IsSurrogate = True
-    ElseIf IsLowSurrogate(c) Then
-        IsSurrogate = True
-    End If
+    IsSurrogate = modChar.IsSurrogate(c)
 End Function

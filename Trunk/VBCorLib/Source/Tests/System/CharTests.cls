@@ -121,6 +121,28 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "a" & ChrW$(&HDBFF), 1, False
             Test.Use "a" & ChrW$(&HDFFF), 1, True
             
+        Case "Equals_WithValues_ReturnsExpected"
+            Test.Use 1, 2, False
+            Test.Use 1, 1, True
+            Test.Use &HFFFF, &HFFFF&, True
+            Test.Use &HD800&, &HD800, True
+            Test.Use &HFFFFD800, &HD800, True
+            Test.Use &HFFFFD800, &HD800&, True
+            
+        Case "Compare_WithValues_ReturnsExpected"
+            Test.Use(1, 2).Expect Iz.Negative
+            Test.Use(2, 1).Expect Iz.Positive
+            Test.Use(2, 2).Expect Iz.EqualTo(0)
+            Test.Use(&HD800, &HD800&).Expect Iz.EqualTo(0)
+            Test.Use(&HD801, &HD800&).Expect Iz.Positive
+            Test.Use(&HD801&, &HD800).Expect Iz.Positive
+            Test.Use(&HFFFFD800, &HD800).Expect Iz.EqualTo(0)
+            Test.Use(&HFFFFD800, &HD800&).Expect Iz.EqualTo(0)
+            Test.Use(&HFFFFD801, &HD800).Expect Iz.Positive
+            Test.Use(&HFFFFD800, &HD801).Expect Iz.Negative
+            Test.Use(&HFFFFD800, &HD801&).Expect Iz.Negative
+            Test.Use(&HFFFFD801, &HD800&).Expect Iz.Positive
+            
     End Select
 End Sub
 
@@ -236,3 +258,15 @@ Public Sub IsLowSurrogateStr_WithIndexPassedStringLength_ThrowsArgumentOutOfExce
     
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
+
+Public Sub Equals_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.Equals(a, b)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Function Compare_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long) As Long
+    Compare_WithValues_ReturnsExpected = Char.Compare(a, b)
+End Function

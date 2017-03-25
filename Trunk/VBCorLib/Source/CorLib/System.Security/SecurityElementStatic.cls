@@ -111,7 +111,7 @@ End Function
 ' @remarks A tag is not valid if it contains any of the following: "<", ">", or a space.
 '
 Public Function IsValidTag(ByRef Tag As String) As Boolean
-    IsValidTag = CorString.AllChars(Tag, AddressOf IsValidTagChar)
+    IsValidTag = CorString.AllChars(Tag, AddressOf IsValidTagCallback)
 End Function
 
 ''
@@ -122,7 +122,7 @@ End Function
 ' @remarks The text is not valid if it contains any of the following: "<", ">".
 '
 Public Function IsValidText(ByRef Text As String) As Boolean
-    IsValidText = CorString.AllChars(Text, AddressOf IsValidTextChar)
+    IsValidText = CorString.AllChars(Text, AddressOf IsValidTextCallback)
 End Function
 
 ''
@@ -144,7 +144,7 @@ End Function
 ' @remarks The value is not valid if it contains any of the following: "<", ">".
 '
 Public Function IsValidAttributeValue(ByRef Value As String) As Boolean
-    IsValidAttributeValue = CorString.AllChars(Value, AddressOf IsValidAttributeValueChar)
+    IsValidAttributeValue = CorString.AllChars(Value, AddressOf IsValidAttributeValueCallback)
 End Function
 
 ''
