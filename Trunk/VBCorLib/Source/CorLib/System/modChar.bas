@@ -76,8 +76,8 @@ Public Function IsHighSurrogateStr(ByRef s As String, ByVal Index As Long) As Bo
 End Function
 
 Public Function IsHighSurrogate(ByVal c As Long) As Boolean
-    Select Case c
-        Case &HD800& To &HDBFF&, &HFFFFD800 To &HFFFFDBFF
+    Select Case c And &HFFFF&
+        Case &HD800& To &HDBFF&
             IsHighSurrogate = True
     End Select
 End Function
@@ -92,8 +92,8 @@ Public Function IsLowSurrogateStr(ByRef s As String, ByVal Index As Long) As Boo
 End Function
 
 Public Function IsLowSurrogate(ByVal c As Long) As Boolean
-    Select Case c
-        Case &HDC00& To &HDFFF&, &HFFFFDC00 To &HFFFFDFFF
+    Select Case c And &HFFFF&
+        Case &HDC00& To &HDFFF&
             IsLowSurrogate = True
     End Select
 End Function

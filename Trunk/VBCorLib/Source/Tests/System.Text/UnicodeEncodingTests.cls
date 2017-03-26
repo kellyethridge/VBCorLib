@@ -56,10 +56,38 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&H0, &HDC, &H0, &HDC), NewIntegers(&HFFFD, &HFFFD)
             Test.Use NewBytes(&HA0, &H3, &HA3, &H3), NewIntegers(&H3A0, &H3A3)
             Test.Use NewBytes(&H0, &HDC, &H0, &H0), NewIntegers(&HFFFD, &H0)
+        
+        Case "GetByteCount_WithValues_ReturnsExpected"
+            Test.Use t("za"), 4
+            Test.Use t("\xd800\xdc00"), 4
+            Test.Use t("\xd800a"), 4
+            Test.Use t("\xd800\xd800"), 4
+            Test.Use t("\xd800\xd800a"), 6
+            Test.Use t("A\xdc00"), 4
+            
+        Case "GetByteCount_WithValues_ReturnsExpected2"
+            Test.Use t("za"), 4
+            Test.Use t("\xd800\xdc00"), 4
+            Test.Use t("\xd800a"), 2
+            Test.Use t("\xd800\xd800"), 0
+            Test.Use t("\xd800\xd800a"), 2
+        
+        Case "GetBytes_WithLittleEndianEncoding_ReturnsExpected"
+            Test.Use t("\xD800\xD800"), NewBytes(&HFD, &HFF, &HFD, &HFF)
+            Test.Use t("\u03a0\u03a3"), NewBytes(&HA0, &H3, &HA3, &H3)
+            Test.Use t("\xD800\xDC00"), NewBytes(&H0, &HD8, &H0, &HDC)
+            Test.Use t("A\xD800"), NewBytes(&H41, &H0, &HFD, &HFF)
+            Test.Use t("A\xDC00"), NewBytes(&H41, &H0, &HFD, &HFF)
+            
+        Case "GetBytes_WithBigEndianEncoding_ReturnsEncoded"
+            Test.Use t("\xD800\xD800"), NewBytes(&HFF, &HFD, &HFF, &HFD)
+            Test.Use t("\u03a0\u03a3"), NewBytes(&H3, &HA0, &H3, &HA3)
+            Test.Use t("\xD800\xDC00"), NewBytes(&HD8, &H0, &HDC, &H0)
+            Test.Use t("A\xD800"), NewBytes(&H0, &H41, &HFF, &HFD)
+            Test.Use t("A\xDC00"), NewBytes(&H0, &H41, &HFF, &HFD)
             
     End Select
 End Sub
-
 
 Public Sub IsBrowserDisplay_WhenCalled_ReturnsFalse()
     Dim Enc As New UnicodeEncoding
@@ -81,29 +109,6 @@ Public Sub IsMailNewsSave_WhenCalled_ReturnsFalse()
     Assert.That Enc.IsMailNewsSave, Iz.False
 End Sub
 
-Public Sub GetBytes_WhenLittleEndian_ReturnsEncoded()
-    Dim Enc As New UnicodeEncoding
-    Dim Unicode As String
-    Unicode = t("\u03a0\u03a3")
-    
-    Dim Actual() As Byte
-    Actual = Enc.GetBytes(Unicode)
-    
-    Assert.That Actual, Iz.EqualTo(NewBytes(&HA0, &H3, &HA3, &H3))
-End Sub
-
-Public Sub GetBytes_WhenBigEndian_ReturnsEncoded()
-    Dim Enc As UnicodeEncoding
-    Set Enc = NewUnicodeEncoding(True, True)
-    Dim Unicode As String
-    Unicode = t("\u03a0\u03a3")
-    
-    Dim Actual() As Byte
-    Actual = Enc.GetBytes(Unicode)
-    
-    Assert.That Actual, Iz.EqualTo(NewBytes(&H3, &HA0, &H3, &HA3))
-End Sub
-
 Public Sub GetBytexEx_WhenLittleEndian_Encodes()
     Dim Enc As New UnicodeEncoding
     Dim Unicode As String
@@ -115,6 +120,25 @@ Public Sub GetBytexEx_WhenLittleEndian_Encodes()
     
     Assert.That ActualCount, Iz.EqualTo(4)
     Assert.That ActualBytes, Iz.EqualTo(NewBytes(&HA0, &H3, &HA3, &H3))
+End Sub
+
+Public Sub GetBytes_WithLittleEndianEncoding_ReturnsExpected(ByRef Chars As Variant, ByRef Expected() As Byte)
+    Dim Enc As New UnicodeEncoding
+    
+    Dim Actual() As Byte
+    Actual = Enc.GetBytes(Chars)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetBytes_WithBigEndianEncoding_ReturnsEncoded(ByRef Chars As Variant, ByRef Expected() As Byte)
+    Dim Enc As UnicodeEncoding
+    Set Enc = NewUnicodeEncoding(True, True)
+    
+    Dim Actual() As Byte
+    Actual = Enc.GetBytes(Chars)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
@@ -251,6 +275,21 @@ Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByVal 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetByteCount_WithValues_ReturnsExpected(ByRef Chars As Variant, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = MakeEncoding.GetByteCount(Chars)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetByteCount_WithValues_ReturnsExpected2(ByRef Chars As Variant, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = MakeEncoding(Replacement:="").GetByteCount(Chars)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
 
 
@@ -260,9 +299,10 @@ End Sub
 
 
 
-
-
-
+Private Function MakeEncoding(Optional ByVal BigEndian As Boolean, Optional ByVal Replacement As String = "?") As UnicodeEncoding
+    Set MakeEncoding = Cor.NewUnicodeEncoding(BigEndian, True)
+    Set MakeEncoding.EncoderFallback = Cor.NewEncoderReplacementFallback(Replacement)
+End Function
 
 
 
