@@ -133,7 +133,7 @@ Private Function EatAllWhiteSpace() As Long
     
     Length = UBound(mChars) + 1
     Do While SrcIndex < Length
-        If Not Char.IsWhiteSpace(mChars(SrcIndex)) Then
+        If Not IsWhiteSpace(mChars(SrcIndex)) Then
             mChars(DstIndex) = mChars(SrcIndex)
             DstIndex = DstIndex + 1
         End If

@@ -233,10 +233,46 @@ Public Function IsSurrogate(ByVal c As Long) As Boolean
     IsSurrogate = modChar.IsSurrogate(c)
 End Function
 
+''
+' Converts the value of a UTF-16 encoded surrogate pair into a Unicode code point.
+'
+' @param HighSurrogate A high surrogate code unit (that is, a code unit ranging from U+D800 through U+DBFF).
+' @param LowSurrogate A low surrogate code unit (that is, a code unit ranging from U+DC00 through U+DFFF).
+' @return The 21-bit Unicode code point represented by the highSurrogate and lowSurrogate parameters.
+' @remarks
+' <h4>Exceptions</h4>
+' <table style="width:auto">
+'   <tr><th>Exception</th><th>Condition</th></tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td><i>HighSurrogate</i> is not in the range U+D800 through U+DBFF, or <i>LowSurrogate</i> is not in the range U+DC00 through U+DFFF.</td>
+'   </tr>
+' </table>
+'
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
     ConvertToUtf32 = modChar.ConvertToUtf32(HighSurrogate, LowSurrogate)
 End Function
 
+''
+' Converts the value of a UTF-16 encoded character or surrogate pair at a specified position in a string into a Unicode code point.
+'
+' @param s A string that contains a character or surrogate pair.
+' @param Index The index position of the character or surrogate pair in s.
+' @return The 21-bit Unicode code point represented by the character or surrogate pair at the position in the <i>s</i> parameter specified by the <i>index</i> parameter.
+' @remarks
+' <h4>Exceptions</h4>
+' <table style="width:auto">
+'   <tr><th>Exception</th><th>Condition</th></tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td><i>index</i> is not a position within <i>s</i>.</td>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentException.html">ArgumentException</a></td>
+'       <td>The specified index position contains a surrogate pair, and either the first character in the pair is not a valid high surrogate or the second character in the pair is not a valid low surrogate.</td>
+'   </tr>
+' </table>
+'
 Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
     ConvertToUtf32Str = modChar.ConvertToUtf32Str(s, Index)
 End Function

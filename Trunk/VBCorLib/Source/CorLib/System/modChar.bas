@@ -29,6 +29,8 @@ Attribute VB_Name = "modChar"
 ' The public facing Char class forwards calls to this module for clients of this library.
 '
 Option Explicit
+Private Const UnicodePlane1Start As Long = &H10000
+
 
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
     a = a And &HFFFF&
@@ -113,7 +115,6 @@ Public Function IsSurrogate(ByVal c As Long) As Boolean
 End Function
 
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
-    Const UnicodePlane1Start As Long = &H10000
     
     If Not IsHighSurrogate(HighSurrogate) Then _
         Error.ArgumentOutOfRange "HighSurrogate", ArgumentOutOfRange_InvalidHighSurrogate
@@ -143,7 +144,7 @@ Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Lon
         If Not IsLowSurrogate(Char2) Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidHighSurrogate, Index), "s")
             
-        ConvertToUtf32Str = (Char1 And &H3FF) * vbShift10Bits + (Char2 And &H3FF) + &H10000
+        ConvertToUtf32Str = (Char1 And &H3FF) * vbShift10Bits + (Char2 And &H3FF) + UnicodePlane1Start
     Else
         ConvertToUtf32Str = Char1
     End If

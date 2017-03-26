@@ -285,7 +285,7 @@ Private Sub SmallBufferError(ByVal ParamName As String)
 End Sub
 
 Private Function CanProcessChar(ByVal Ch As Integer) As Boolean
-    If Char.IsWhiteSpace(Ch) Then
+    If IsWhiteSpace(Ch) Then
         If Not mIgnoreWhiteSpaces Then
             Error.Format Format_InvalidBase64Character
         End If

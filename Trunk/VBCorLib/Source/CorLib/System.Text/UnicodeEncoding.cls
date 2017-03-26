@@ -655,8 +655,8 @@ Private Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, By
         ByteIndex = ByteIndex + 1
         LastByte = -1
         
-        If Char.IsSurrogate(Ch) Then
-            If Char.IsHighSurrogate(Ch) Then
+        If IsSurrogate(Ch) Then
+            If IsHighSurrogate(Ch) Then
                 If LastChar > 0 Then
                     CharCount = CharCount - 1 + GetFallbackCount(LastChar, FallbackBuffer)
                 End If
@@ -737,8 +737,8 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
             ByteIndex = ByteIndex + 1
             LastByte = -1
             
-            If Char.IsSurrogate(Ch) Then
-                If Char.IsHighSurrogate(Ch) Then
+            If IsSurrogate(Ch) Then
+                If IsHighSurrogate(Ch) Then
                     ' we have preceeding high surrogate followed
                     ' by this high surrogate.
                     If LastChar > 0 Then
