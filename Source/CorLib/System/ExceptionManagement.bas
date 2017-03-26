@@ -44,6 +44,14 @@ Public Function TakeException() As Exception
     Set mException = Nothing
 End Function
 
+Public Sub ThrowOrErr(ByVal Ex As ErrObject)
+    If Not mException Is Nothing Then
+        Throw
+    Else
+        Throw Ex
+    End If
+End Sub
+
 Public Sub Throw(Optional ByVal Ex As Object)
     If Not Ex Is Nothing Then
         If TypeOf Ex Is Exception Then
