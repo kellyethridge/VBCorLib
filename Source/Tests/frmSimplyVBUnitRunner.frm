@@ -279,8 +279,10 @@ Private Sub AddSystemText()
     With Sim.NewTestSuite("System.Text")
         .Add New DecoderReplacementFallbackTests
         .Add New DecoderReplacementFallbackBufferTests
+        .Add New EncoderExceptionFallbackBufferTests
         .Add New EncoderReplacementFallbackTests
         .Add New EncoderReplacementFallbackBufferTests
+        .Add New EncoderFallbackExceptionTests
         .Add New EncodingArgumentTests
         .Add New ASCIIEncodingTests
         .Add New UTF7EncodingTests

@@ -57,7 +57,7 @@ Public Property Get Remaining() As Long: End Property
 ' @return <b>true</b> if the fallback buffer can process <i>UnknownCharOrHighSurrogate</i> as a non-surrogate or
 ' process <em>UnknownCharOrHighSurrogate</em> and <em>LowSurrogate</em> as a surrogate pair; <b>false</b> if the fallback buffer ignores the characters.
 '
-Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRef UnknownLowSurrogate As Variant) As Boolean: End Function
+Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRef UnknownLowSurrogate As Variant, Optional ByVal Index As Long) As Boolean: End Function
 
 ''
 ' When implemented in a derived class, retrieves the next character in the fallback buffer.

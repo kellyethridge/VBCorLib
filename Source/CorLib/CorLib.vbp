@@ -356,7 +356,11 @@ Class=EncoderFallbackBuffer; System.Text\EncoderFallbackBuffer.cls
 Class=EncoderReplacementFallbackBuffer; System.Text\EncoderReplacementFallbackBuffer.cls
 Module=modChar; System\modChar.bas
 Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
+Class=EncoderFallbackException; System.Text\EncoderFallbackException.cls
+Class=EncoderExceptionFallbackBuffer; System.Text\EncoderExceptionFallbackBuffer.cls
+Class=EncoderExceptionFallback; System.Text\EncoderExceptionFallback.cls
 ResFile32="CorLib.RES"
+Class=EncoderFallbackStatic; System.Text\EncoderFallbackStatic.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -398,7 +402,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=3
+Num=4
 
 [TASK1]
 Description=Implements IObject on Encoding
@@ -416,13 +420,12 @@ Comment=Don't actually implement ICloneable, just add the method to be part of t
 Description=Make Encodings read-only capable.
 Status=0
 Priority=1
-AssignedTo=
 Comment=Encodings are read-only by default. Cloning an Encoding returns a read-write version.
 
 [TASK4]
-Description=
-Status=
-Priority=
+Description=Fix UnicodeEncoding serialization
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 

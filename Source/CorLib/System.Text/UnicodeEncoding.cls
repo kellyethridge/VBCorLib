@@ -590,6 +590,7 @@ Friend Sub Init(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean, ByVa
     
     If ThrowOnInvalidBytes Then
         Set mDecoderFallback = Statics.DecoderFallback.ExceptionFallback
+        Set mEncoderFallback = Statics.EncoderFallback.ExceptionFallback
     End If
 End Sub
 
@@ -978,7 +979,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        Init .ReadProperty("BigEndian", False), .ReadProperty("EmitBOM", True)
+        Init .ReadProperty("BigEndian", False), .ReadProperty("EmitBOM", True), False
     End With
 End Sub
 
