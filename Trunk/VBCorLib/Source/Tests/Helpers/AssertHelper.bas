@@ -206,6 +206,26 @@ Public Sub AssertUnauthorizedAccessException(ByVal Err As ErrObject)
     End If
 End Sub
 
+Public Function AssertEncoderFallbackException(ByVal Err As ErrObject) As EncoderFallbackException
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is EncoderFallbackException Then
+        WrongException "EncoderFallbackException", Ex
+    End If
+
+    Set AssertEncoderFallbackException = Ex
+End Function
+
+Public Function AssertDecoderFallbackException(ByVal Err As ErrObject) As DecoderFallbackException
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is DecoderFallbackException Then
+        WrongException "DecoderFallbackException", Ex
+    End If
+    
+    Set AssertDecoderFallbackException = Ex
+End Function
+
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
     If Not Catch(AssertExceptionThrown, Err) Then
         Assert.Fail "An exception should be thrown."

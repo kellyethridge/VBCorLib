@@ -6,9 +6,9 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "EncoderReplacementFallbackBuffer"
+Attribute VB_Name = "EncoderExceptionFallbackBuffer"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
+Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'The MIT License (MIT)
@@ -32,56 +32,49 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: EncoderReplacementFallbackBuffer
-'
-
-''
-' Represents a substitute input string that is used when the original input character cannot be encoded. This class cannot be inherited.
+' Module: EncoderExceptionFallbackBuffer
 '
 Option Explicit
 Implements IObject
 Implements EncoderFallbackBuffer
 
-Private mDefaultString()    As Integer
-Private mFallbackCount      As Long
-Private mFallbackIndex      As Long
-
 
 Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRef UnknownLowSurrogate As Variant, Optional ByVal Index As Long) As Boolean
-    If IsMissing(UnknownLowSurrogate) Then
-        Fallback = UnknownCharFallback(UnknownCharOrHighSurrogate)
-    Else
-        Fallback = UnknownSurrogatePairFallback(UnknownCharOrHighSurrogate, UnknownLowSurrogate)
+    If Not IsMissing(UnknownLowSurrogate) Then
+        If Not Char.IsHighSurrogate(UnknownCharOrHighSurrogate) Then _
+            Throw Cor.NewArgumentOutOfRangeException("UnknownCharOrHighSurrogate", Environment.GetResourceString(ArgumentOutOfRange_Range, &HD800, &HDBFF))
+        If Not Char.IsLowSurrogate(UnknownLowSurrogate) Then _
+            Throw Cor.NewArgumentOutOfRangeException("UnknownLowSurrogate", Environment.GetResourceString(ArgumentOutOfRange_Range, &HDC00, &HDFFF))
+        
+        Dim Utf32 As Long
+        Utf32 = Char.ConvertToUtf32(UnknownCharOrHighSurrogate, UnknownLowSurrogate)
+        
+        Throw Cor.NewEncoderFallbackException3( _
+            Environment.GetResourceString(Argument_InvalidCodePageConversionIndex, Utf32, Index), _
+            UnknownCharOrHighSurrogate, UnknownLowSurrogate, Index)
     End If
+    
+    Throw Cor.NewEncoderFallbackException2( _
+        Environment.GetResourceString(Argument_InvalidCodePageConversionIndex, UnknownCharOrHighSurrogate, Index), _
+        UnknownCharOrHighSurrogate, Index)
 End Function
 
 Public Function GetNextChar() As Integer
-    mFallbackIndex = mFallbackIndex + 1
-    mFallbackCount = mFallbackCount - 1
-    
-    If mFallbackCount >= 0 Then
-        GetNextChar = mDefaultString(mFallbackIndex)
-    End If
+    GetNextChar = 0
 End Function
 
 Public Function MovePrevious() As Boolean
-    If mFallbackIndex >= 0 Then
-        mFallbackCount = mFallbackCount + 1
-        mFallbackIndex = mFallbackIndex - 1
-        MovePrevious = True
-    End If
+    MovePrevious = False
 End Function
 
 Public Property Get Remaining() As Long
-    If mFallbackCount > 0 Then
-        Remaining = mFallbackCount
-    End If
+    Remaining = 0
 End Property
 
 Public Sub Reset()
-    mFallbackCount = -1
-    mFallbackIndex = -1
+    ' do nothing
 End Sub
+
 
 ''
 ' Determines whether the specified value passed in is equal to the current object.
@@ -116,70 +109,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Fallback As EncoderReplacementFallback)
-    mDefaultString = CorString.ToCharArray(Fallback.DefaultString & Fallback.DefaultString)
-End Sub
-
-Private Sub Class_Initialize()
-    Reset
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function UnknownCharFallback(ByVal UnknownChar As Long) As Boolean
-    UnknownChar = UnknownChar And &HFFFF&
-    
-    If mFallbackCount > 0 Then
-        Dim Ch As Long
-        Ch = UnknownChar
-        
-        If IsHighSurrogate(UnknownChar) And mFallbackCount >= 0 Then
-            If IsLowSurrogate(mDefaultString(mFallbackIndex + 1)) Then
-                Ch = ConvertToUtf32(UnknownChar, mDefaultString(mFallbackIndex + 1))
-            End If
-        End If
-        
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_RecursiveFallback, Ch), "Chars")
-    End If
-    
-    mFallbackIndex = -1
-    mFallbackCount = Len1D(mDefaultString) \ 2
-    UnknownCharFallback = mFallbackCount > 0
-End Function
-
-Private Function UnknownSurrogatePairFallback(ByVal UnknownHighSurrogate As Long, ByRef UnknownLowSurrogate As Variant) As Boolean
-    Dim High    As Long
-    Dim Low     As Long
-    
-    High = UnknownHighSurrogate And &HFFFF&
-    Low = CLng(UnknownLowSurrogate) And &HFFFF&
-    
-    If Not IsHighSurrogate(High) Then _
-        Throw Cor.NewArgumentOutOfRangeException("UnknownCharOrHighSurrogate", Environment.GetResourceString(ArgumentOutOfRange_Range, &HD800&, &HDBFF&))
-    If Not IsLowSurrogate(Low) Then _
-        Throw Cor.NewArgumentOutOfRangeException("UnknownLowSurrogate", Environment.GetResourceString(ArgumentOutOfRange_Range, &HDC00&, &HDFFF&))
-    If mFallbackCount > 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_RecursiveFallback, ConvertToUtf32(High, Low)), "Chars")
-    
-    mFallbackIndex = -1
-    mFallbackCount = Len1D(mDefaultString)
-    UnknownSurrogatePairFallback = mFallbackCount > 0
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   EncoderFallbackBuffer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function EncoderFallbackBuffer_Equals(Value As Variant) As Boolean
     EncoderFallbackBuffer_Equals = Equals(Value)
 End Function
 
-Private Function EncoderFallbackBuffer_Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional LowSurrogate As Variant, Optional ByVal Index As Long) As Boolean
-    EncoderFallbackBuffer_Fallback = Fallback(UnknownCharOrHighSurrogate, LowSurrogate, Index)
+Private Function EncoderFallbackBuffer_Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional UnknownLowSurrogate As Variant, Optional ByVal Index As Long) As Boolean
+    EncoderFallbackBuffer_Fallback = Fallback(UnknownCharOrHighSurrogate, UnknownLowSurrogate, Index)
 End Function
 
 Private Function EncoderFallbackBuffer_GetHashCode() As Long

@@ -139,6 +139,7 @@ Public Enum ResourceStringKey
     Argument_RecursiveFallback = 863
     Argument_InvalidHighSurrogate = 864
     Argument_InvalidLowSurrogate = 865
+    Argument_InvalidCodePageConversionIndex = 866
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901

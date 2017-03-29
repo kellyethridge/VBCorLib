@@ -658,3 +658,7 @@ End Property
 Public Property Get DecoderFallback() As DecoderFallbackStatic
     Set DecoderFallback = Statics.DecoderFallback
 End Property
+
+Public Property Get EncoderFallback() As EncoderFallbackStatic
+    Set EncoderFallback = Statics.EncoderFallback
+End Property

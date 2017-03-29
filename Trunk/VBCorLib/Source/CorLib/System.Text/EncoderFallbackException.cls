@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "DecoderFallbackException"
+Attribute VB_Name = "EncoderFallbackException"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -32,7 +32,7 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: DecoderFallbackException
+' Module: EncoderFallbackException
 '
 Option Explicit
 Implements IObject
@@ -40,20 +40,51 @@ Implements Exception
 Implements ArgumentException
 Implements SystemException
 
-Private Const PropBase          As String = "Base"
-Private Const PropBytesUnknown  As String = "BytesUnknown"
-Private Const PropIndex         As String = "Index"
+Private Const PropBase              As String = "Base"
+Private Const PropCharUnknown       As String = "CharUnknown"
+Private Const PropCharUnknownHigh   As String = "CharUnknownHigh"
+Private Const PropCharUnknownLow    As String = "CharUnknownLow"
+Private Const PropIndex             As String = "Index"
 
-Private mBase           As ExceptionBase
-Private mBytesUnknown() As Byte
-Private mIndex          As Long
+Private mBase               As ExceptionBase
+Private mCharUnknown        As Integer
+Private mCharUnknownHigh    As Integer
+Private mCharUnknownLow     As Integer
+Private mIndex              As Long
 
 
-
-Public Property Get BytesUnknown() As Byte()
-    BytesUnknown = mBytesUnknown
+''
+' Gets the unknown character that caused the exception.
+'
+' @return The character that cannot be encoded.
+'
+Public Property Get CharUnknown() As Integer
+    CharUnknown = mCharUnknown
 End Property
 
+''
+' Gets the unknown high character of the surrogate pair that caused the exception.
+'
+' @return The high surrogate character that cannot be encoded.
+'
+Public Property Get CharUnknownHigh() As Integer
+    CharUnknownHigh = mCharUnknownHigh
+End Property
+
+''
+' Gets the unknown low character of the surrogate pair that caused the exception.
+'
+' @return The low surrogate character that cannot be encoded.
+'
+Public Property Get CharUnknownLow() As Integer
+    CharUnknownLow = mCharUnknownLow
+End Property
+
+''
+' Gets the position of the character that the encoding failed.
+'
+' @return The the position of the character that cannot be encoded.
+'
 Public Property Get Index() As Long
     Index = mIndex
 End Property
@@ -241,10 +272,17 @@ Friend Sub Init(ByRef Message As String, ByVal InnerException As Exception)
     Set mBase.InnerException = InnerException
 End Sub
 
-Friend Sub Init2(ByRef Message As String, ByRef BytesUnknown() As Byte, ByVal Index As Long)
+Friend Sub Init2(ByRef Message As String, ByVal CharUnknown As Integer, ByVal Index As Long)
     mBase.Message = Message
-    mBytesUnknown = BytesUnknown
-    mIndex = mIndex
+    mCharUnknown = CharUnknown
+    mIndex = Index
+End Sub
+
+Friend Sub Init3(ByRef Message As String, ByVal CharUnknownHigh As Integer, ByVal CharUnknownLow As Integer, ByVal Index As Long)
+    mBase.Message = Message
+    mCharUnknownHigh = CharUnknownHigh
+    mCharUnknownLow = CharUnknownLow
+    mIndex = Index
 End Sub
 
 
@@ -253,22 +291,18 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     Set mBase = PropBag.ReadProperty(PropBase, Nothing)
+    mCharUnknown = PropBag.ReadProperty(PropCharUnknown, 0)
+    mCharUnknownHigh = PropBag.ReadProperty(PropCharUnknownHigh, 0)
+    mCharUnknownLow = PropBag.ReadProperty(PropCharUnknownLow, 0)
     mIndex = PropBag.ReadProperty(PropIndex, 0)
-    
-    Dim b As Variant
-    b = PropBag.ReadProperty(PropBytesUnknown)
-    If Not IsEmpty(b) Then
-        mBytesUnknown = b
-    End If
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     PropBag.WriteProperty PropBase, mBase
+    PropBag.WriteProperty PropCharUnknown, mCharUnknown, 0
+    PropBag.WriteProperty PropCharUnknownHigh, mCharUnknownHigh, 0
+    PropBag.WriteProperty PropCharUnknownLow, mCharUnknownLow, 0
     PropBag.WriteProperty PropIndex, mIndex
-    
-    If Not CorArray.IsNull(mBytesUnknown) Then
-        PropBag.WriteProperty PropBytesUnknown, mBytesUnknown
-    End If
 End Sub
 
 
@@ -458,4 +492,5 @@ End Property
 Private Function SystemException_ToString() As String
     SystemException_ToString = ToString
 End Function
+
 

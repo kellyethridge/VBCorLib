@@ -694,9 +694,9 @@ End Function
 ' <p>BigEnding = True: &HFE, &HFF<br>
 ' BigEnding = False: &HFF, &HFE</p>
 '
-Public Function NewUnicodeEncoding(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean) As UnicodeEncoding
+Public Function NewUnicodeEncoding(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean, Optional ByVal ThrowOnInvalidBytes As Boolean) As UnicodeEncoding
     Set NewUnicodeEncoding = New UnicodeEncoding
-    NewUnicodeEncoding.Init BigEndian, ByteOrderMark
+    NewUnicodeEncoding.Init BigEndian, ByteOrderMark, ThrowOnInvalidBytes
 End Function
 
 ''
@@ -1869,3 +1869,29 @@ Public Function NewEncoderReplacementFallbackBuffer(ByVal Fallback As EncoderRep
     Set NewEncoderReplacementFallbackBuffer = New EncoderReplacementFallbackBuffer
     NewEncoderReplacementFallbackBuffer.Init Fallback
 End Function
+
+Public Function NewEncoderFallbackException(ByRef Message As String, Optional ByVal InnerException As Exception) As EncoderFallbackException
+    Set NewEncoderFallbackException = New EncoderFallbackException
+    NewEncoderFallbackException.Init Message, InnerException
+End Function
+
+#If Release Then
+Friend Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Integer, ByVal Index As Long) As EncoderFallbackException
+#Else
+Public Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Integer, ByVal Index As Long) As EncoderFallbackException
+#End If
+    Set NewEncoderFallbackException2 = New EncoderFallbackException
+    NewEncoderFallbackException2.Init2 Message, CharUnknown, Index
+End Function
+
+#If Release Then
+Friend Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Integer, ByVal CharUnknownLow As Integer, ByVal Index As Long) As EncoderFallbackException
+#Else
+Public Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Integer, ByVal CharUnknownLow As Integer, ByVal Index As Long) As EncoderFallbackException
+#End If
+    Set NewEncoderFallbackException3 = New EncoderFallbackException
+    NewEncoderFallbackException3.Init3 Message, CharUnknownHigh, CharUnknownLow, Index
+End Function
+
+
+
