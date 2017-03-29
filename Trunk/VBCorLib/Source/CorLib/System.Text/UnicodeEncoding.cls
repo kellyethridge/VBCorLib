@@ -441,6 +441,10 @@ Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
     Dim CharCount As Currency
     CharCount = CCur(CLng(ByteCount \ 2)) + (ByteCount And 1) + 1
     
+    If DecoderFallback.MaxCharCount > 1 Then
+        CharCount = CharCount * DecoderFallback.MaxCharCount
+    End If
+    
     If CharCount > &H7FFFFFFF Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_GetCharCountOverflow
         
@@ -479,6 +483,7 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Range   As ListRange
     Dim Chars() As Integer
+    Dim Length  As Long
     
     If SAPtr(Bytes) = vbNullPtr Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
@@ -492,11 +497,15 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     If UBound(Bytes) - Range.Index + 1 < Range.Count Then _
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
-    GetString = String$(GetCharCountCore(Bytes, Range.Index, Range.Count), 0)
+    GetString = String$(GetMaxCharCount(Range.Count), 0)
     Chars = AllocChars(GetString)
     
     On Error GoTo Catch
-    GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0
+    Length = GetCharsCore(Bytes, Range.Index, Range.Count, Chars, 0)
+    
+    If Length <> Len(GetString) Then
+        GetString = Left$(GetString, Length)
+    End If
     
     GoSub Finally
     Exit Function
