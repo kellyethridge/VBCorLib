@@ -50,6 +50,7 @@ Implements IObject
 Implements Encoding
 Implements ICloneable
 
+Private mIsReadOnly         As Boolean
 Private mIsBigEndian        As Boolean
 Private mEmitBOM            As Boolean
 Private mCodePage           As Long
@@ -57,8 +58,15 @@ Private mDecoderFallback    As DecoderFallback
 Private mEncoderFallback    As EncoderFallback
 
 
+''
+' Creates a clone of the current Encoding instance.
+'
+' @return A cloned instance of a UnicodeEncoding object.
+' @remarks A cloned instance will have the read-only limitations removed.
+'
 Public Function Clone() As UnicodeEncoding
-    
+    Set Clone = New UnicodeEncoding
+    Clone.InitClone Me, mIsBigEndian, mEmitBOM
 End Function
 
 ''
@@ -160,19 +168,54 @@ Public Property Get WindowsCodePage() As Long
     WindowsCodePage = mCodePage
 End Property
 
+''
+' Returns the current DecoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="DecoderFallback.html">DecoderFallback</a>.
+' @remarks The default will return an instance of <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a>.
+'
 Public Property Get DecoderFallback() As DecoderFallback
     Set DecoderFallback = mDecoderFallback
 End Property
 
+''
+' Sets the <a href="DecoderFallback.html">DecoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
 Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+        
     Set mDecoderFallback = Value
 End Property
 
+''
+' Returns the current EncoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="EncoderFallback.html">EncoderFallback</a>.
+' @remarks The default will return an instance of <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a>.
+'
 Public Property Get EncoderFallback() As EncoderFallback
     Set EncoderFallback = mEncoderFallback
 End Property
 
+''
+' Sets the <a href="EncoderFallback.html">EncoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
+'
 Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    
     Set mEncoderFallback = Value
 End Property
 
@@ -497,15 +540,11 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     If UBound(Bytes) - Range.Index + 1 < Range.Count Then _
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
-    GetString = String$(GetMaxCharCount(Range.Count), 0)
+    GetString = String$(GetCharCountCore(Bytes, Range.Index, Range.Count), 0)
     Chars = AllocChars(GetString)
     
     On Error GoTo Catch
     Length = GetCharsCore(Bytes, Range.Index, Range.Count, Chars, 0)
-    
-    If Length <> Len(GetString) Then
-        GetString = Left$(GetString, Length)
-    End If
     
     GoSub Finally
     Exit Function
@@ -527,9 +566,9 @@ End Function
 ' functions identically to GetBytes.
 '
 Public Function GetEncoder() As Encoder
-    Dim Ret As New DefaultEncoder
-    Call Ret.Init(Me)
-    Set GetEncoder = Ret
+    Dim Encoder As New DefaultEncoder
+    Encoder.Init Me
+    Set GetEncoder = Encoder
 End Function
 
 ''
@@ -544,15 +583,16 @@ End Function
 ' of bytes to be decoded, picking up byte decoding where the orphaned byte left off.
 '
 Public Function GetDecoder() As Decoder
-    Dim Ret As New UnicodeDecoder
-    Call Ret.Init(mIsBigEndian)
-    Set GetDecoder = Ret
+    Dim Decoder As New UnicodeDecoder
+    Decoder.Init mIsBigEndian
+    Set GetDecoder = Decoder
 End Function
 
 ''
 ' Returns a string representation of this object instance.
 '
 ' @return String representing this instance.
+'
 Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
@@ -563,16 +603,15 @@ End Function
 '
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
+'
 Public Function Equals(ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        If Value Is Nothing Then Exit Function
-        
-        If TypeOf Value Is UnicodeEncoding Then
-            Dim en As UnicodeEncoding
-            Set en = Value
-            Equals = (en.GetHashCode = GetHashCode)
-        End If
-    End If
+    Dim Other As UnicodeEncoding
+    
+    On Error GoTo Catch
+    Set Other = Value
+    Equals = (Other.GetHashCode = GetHashCode)
+    
+Catch:
 End Function
 
 ''
@@ -581,9 +620,16 @@ End Function
 ' @return Pseudo-unique number identifying this instance.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = mCodePage Or CLng(IIf(mIsBigEndian, &H80000000, 0)) Or CLng(IIf(mEmitBOM, &H40000000, 0))
-End Function
+    GetHashCode = mCodePage
 
+    If mIsBigEndian Then
+        GetHashCode = GetHashCode Or &H80000000
+    End If
+    
+    If mEmitBOM Then
+        GetHashCode = GetHashCode Or &H40000000
+    End If
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -603,14 +649,20 @@ Friend Sub Init(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean, ByVa
     End If
 End Sub
 
-Friend Sub InitClone(ByVal Other As UnicodeEncoding)
-    
+Friend Sub InitClone(ByVal Other As UnicodeEncoding, ByVal IsBigEndian As Boolean, ByVal EmitBOM As Boolean)
+    Set mDecoderFallback = Other.DecoderFallback
+    Set mEncoderFallback = Other.EncoderFallback
+    mCodePage = Other.CodePage
+    mIsBigEndian = IsBigEndian
+    mEmitBOM = EmitBOM
+    mIsReadOnly = False
 End Sub
 
 Private Sub Class_InitProperties()
-    mCodePage = 1200
     Set mDecoderFallback = Cor.NewDecoderReplacementFallback(ChrW$(&HFFFD))
     Set mEncoderFallback = Cor.NewEncoderReplacementFallback(ChrW$(&HFFFD))
+    mCodePage = 1200
+    mIsReadOnly = True
 End Sub
 
 

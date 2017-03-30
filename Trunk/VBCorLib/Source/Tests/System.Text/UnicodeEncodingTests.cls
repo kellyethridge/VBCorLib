@@ -292,15 +292,8 @@ Public Sub GetByteCount_WithValues_ReturnsExpected2(ByRef Chars As Variant, ByVa
 End Sub
 
 
-
-
-
-
-
-
-
 Private Function MakeEncoding(Optional ByVal BigEndian As Boolean, Optional ByVal Replacement As String = "?") As UnicodeEncoding
-    Set MakeEncoding = Cor.NewUnicodeEncoding(BigEndian, True)
+    Set MakeEncoding = Cor.NewUnicodeEncoding(BigEndian, True).Clone
     Set MakeEncoding.EncoderFallback = Cor.NewEncoderReplacementFallback(Replacement)
 End Function
 
