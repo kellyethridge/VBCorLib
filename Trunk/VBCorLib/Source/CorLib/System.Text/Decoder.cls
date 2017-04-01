@@ -48,7 +48,7 @@ Option Explicit
 ' @param Count The number of bytes to be used in the decoding process.
 ' @return The number of characters that can be produced from <i>Count</i> number of bytes.
 '
-Public Function GetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long: End Function
+Public Function GetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long: End Function
 
 ''
 ' Returns the decoded unicode characters from a block of bytes.

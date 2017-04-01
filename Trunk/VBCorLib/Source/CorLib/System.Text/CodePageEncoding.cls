@@ -114,6 +114,14 @@ Private Property Get Encoding_DecoderFallback() As DecoderFallback
 
 End Property
 
+Private Property Set Encoding_EncoderFallback(ByVal Value As EncoderFallback)
+
+End Property
+
+Private Property Get Encoding_EncoderFallback() As EncoderFallback
+
+End Property
+
 Private Property Get Encoding_BodyName() As String
     Encoding_BodyName = Table.BodyName(mCodePage)
 End Property

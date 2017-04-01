@@ -77,8 +77,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -93,7 +93,7 @@ Private Function Decoder_Equals(Value As Variant) As Boolean
     Decoder_Equals = IObject_Equals(Value)
 End Function
 
-Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
+Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
     Dim Result As Long
     
     Result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
@@ -173,7 +173,7 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
 End Function
 
 Private Function Decoder_GetHashCode() As Long
-    Decoder_GetHashCode = IObject_GetHashcode
+    Decoder_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function Decoder_ToString() As String

@@ -100,7 +100,7 @@ Private Function Decoder_Equals(Value As Variant) As Boolean
     Decoder_Equals = IObject_Equals(Value)
 End Function
 
-Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
+Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
     Decoder_GetCharCount = mEncoding.GetCharCount(Bytes, Index, Count)
 End Function
 

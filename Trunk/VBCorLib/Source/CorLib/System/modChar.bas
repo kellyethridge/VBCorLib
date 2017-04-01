@@ -29,7 +29,15 @@ Attribute VB_Name = "modChar"
 ' The public facing Char class forwards calls to this module for clients of this library.
 '
 Option Explicit
+
 Private Const UnicodePlane1Start As Long = &H10000
+
+Public Const SurrogateStart     As Long = &HD800&
+Public Const SurrogateEnd       As Long = &HDFFF&
+Public Const HighSurrogateStart As Long = &HD800&
+Public Const HighSurrogateEnd   As Long = &HDBFF&
+Public Const LowSurrogateStart  As Long = &HDC00&
+Public Const LowSurrogateEnd    As Long = &HDFFF&
 
 
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
@@ -77,7 +85,7 @@ End Function
 
 Public Function IsHighSurrogate(ByVal c As Long) As Boolean
     Select Case c And &HFFFF&
-        Case &HD800& To &HDBFF&
+        Case HighSurrogateStart To HighSurrogateEnd
             IsHighSurrogate = True
     End Select
 End Function
@@ -93,7 +101,7 @@ End Function
 
 Public Function IsLowSurrogate(ByVal c As Long) As Boolean
     Select Case c And &HFFFF&
-        Case &HDC00& To &HDFFF&
+        Case LowSurrogateStart To LowSurrogateEnd
             IsLowSurrogate = True
     End Select
 End Function
@@ -115,7 +123,6 @@ Public Function IsSurrogate(ByVal c As Long) As Boolean
 End Function
 
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
-    
     If Not IsHighSurrogate(HighSurrogate) Then _
         Error.ArgumentOutOfRange "HighSurrogate", ArgumentOutOfRange_InvalidHighSurrogate
     If Not IsLowSurrogate(LowSurrogate) Then _
