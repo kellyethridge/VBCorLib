@@ -287,12 +287,10 @@ Private Sub AddSystemText()
         .Add New ASCIIEncodingTests
         .Add New UTF7EncodingTests
         .Add New UTF8EncodingTests
-'        .Add New TestUnicodeEncodingBig
         .Add New UnicodeEncodingTests
 '        .Add New TestDetermineEncoding
 '        .Add New TestEncoding437
         .Add New StringBuilderTests
-'        .Add New TestCustomFormatter
         
         
         AddTest .This
