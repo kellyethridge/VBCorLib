@@ -212,21 +212,36 @@ Public Function GetDecoder() As Decoder: End Function
 Public Function GetEncoder() As Encoder: End Function
 
 ''
-' Returns the <b>DecoderFallback</b> instance for the current Encoding object.
+' Returns the <a href="DecoderFallback.html">DecoderFallback</a> instance for the current Encoding object.
 '
-' @return An instance of a <b>DecoderFallback</b>.
-'
+' @return An instance of a <a href="DecoderFallback.html">DecoderFallback</a>.
 ' @see Encoding
 ' @see DecoderFallBack
 Public Property Get DecoderFallback() As DecoderFallback: End Property
 
 ''
-' Sets the <b>DecoderFallback</b> for the current Encoding object.
+' Sets the <a href="DecoderFallback.html">DecoderFallback</a> for the current Encoding object.
 '
-' @param Value The <b>DecoderFallback</b> object to set.
-' @remarks Assigning to a <i>read-only</i> Encoding object with cause an <b>InvalidOperationException</b> to be thrown.
+' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> object to set.
+' @remarks Assigning to a <i>read-only</i> Encoding object will cause an <a href="InvalidOperationException.html">InvalidOperationException</a> to be thrown.
 '
 Public Property Set DecoderFallback(ByVal Value As DecoderFallback): End Property
+
+''
+' Returns the <a href="EncodingFallback.html">EncodingFallback</a> for the current <a href="Encoding.html">Encoding</a> object.
+'
+' @Return The encoder fallback object for the current <a href="Encoding.html">Encoding</a> object.
+' @see Encoding
+' @see EncoderFallback
+Public Property Get EncoderFallback() As EncoderFallback: End Property
+
+''
+' Sets the <a href="EncoderFallback.html">EncoderFallback</a> for the current Encoding object.
+'
+' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> object to set.
+' @remarks Assigning to a <i>read-only</i> Encoding object will cause an <a href="InvalidOperationException.html">InvalidOperationException</a> to be thrown.
+'
+Public Property Set EncoderFallback(ByVal Value As EncoderFallback): End Property
 
 ''
 ' Returns the maximum number of bytes that can be created from a specific number of characters.

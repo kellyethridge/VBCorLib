@@ -388,7 +388,7 @@ Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Vari
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
     If Range.Count > 0 Then
-        GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
+        GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing)
     End If
 End Function
 
@@ -417,7 +417,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
     If Range.Count > 0 Then
-        ReDim Output(0 To GetCharCountCore(Bytes, Range.Index, Range.Count) - 1)
+        ReDim Output(0 To GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing) - 1)
         GetCharsCore Bytes, Range.Index, Range.Count, Output, 0
     Else
         Output = Cor.NewIntegers()
@@ -545,7 +545,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     If UBound(Bytes) - Range.Index + 1 < Range.Count Then _
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
-    GetString = String$(GetCharCountCore(Bytes, Range.Index, Range.Count), 0)
+    GetString = String$(GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing), 0)
     Chars = AllocChars(GetString)
     
     On Error GoTo Catch
@@ -589,7 +589,7 @@ End Function
 '
 Public Function GetDecoder() As Decoder
     Dim Decoder As New UnicodeDecoder
-    Decoder.Init mIsBigEndian
+    Decoder.Init Me
     Set GetDecoder = Decoder
 End Function
 
@@ -771,64 +771,85 @@ Private Function InsertChar(ByVal Ch As Long, ByRef Bytes() As Byte, ByVal ByteI
     InsertChar = ByteIndex + 2
 End Function
 
-Private Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
-    Dim CharCount   As Long
-    Dim ByteIndex   As Long
-    Dim ByteEnd     As Long
-    Dim LastByte    As Long
-    Dim LastChar    As Long
-    Dim ByteBuffer(0 To 1) As Byte
-    Dim FallbackBuffer As DecoderFallbackBuffer
-            
-    CharCount = Count \ 2
-    ByteIndex = Index
-    ByteEnd = ByteIndex + Count
-    LastByte = -1
+Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, ByVal Decoder As UnicodeDecoder) As Long
+    Dim CharCount       As Long
+    Dim ByteEnd         As Long
+    Dim LastByte        As Long
+    Dim LastChar        As Long
+    Dim FallbackBuffer  As DecoderFallbackBuffer
     
-    Do While ByteIndex < ByteEnd
+    ByteEnd = Index + Count
+    
+    If Decoder Is Nothing Then
+        LastByte = -1
+    Else
+        LastByte = Decoder.LastByte
+        LastChar = Decoder.LastChar
+    End If
+    
+    Do While Index < ByteEnd
         If LastByte < 0 Then
-            LastByte = Bytes(ByteIndex)
-            ByteIndex = ByteIndex + 1
+            LastByte = Bytes(Index)
+            Index = Index + 1
             
-            If ByteIndex >= ByteEnd Then
+            If Index >= ByteEnd Then
                 Exit Do
             End If
         End If
         
         Dim Ch As Long
         If mIsBigEndian Then
-            Ch = (LastByte * vbShift8Bits) Or Bytes(ByteIndex)
+            Ch = (LastByte * vbShift8Bits) Or Bytes(Index)
         Else
-            Ch = (Bytes(ByteIndex) * vbShift8Bits) Or LastByte
+            Ch = (Bytes(Index) * vbShift8Bits) Or LastByte
         End If
         
-        ByteIndex = ByteIndex + 1
+        Index = Index + 1
         LastByte = -1
         
         If IsSurrogate(Ch) Then
             If IsHighSurrogate(Ch) Then
                 If LastChar > 0 Then
-                    CharCount = CharCount - 1 + GetDecoderFallbackCount(LastChar, FallbackBuffer)
+                    ' we have two high surrogates in a row, so add fallback count for
+                    ' first surrogate only. We may still have a low surrogate to follow.
+                    CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer)
                 End If
                 
                 LastChar = Ch
             ElseIf LastChar = 0 Then
-                CharCount = CharCount - 1 + GetDecoderFallbackCount(Ch, FallbackBuffer)
+                ' we have a low surrogate with a missing previous high surrogate
+                ' so add fallback count.
+                CharCount = CharCount + GetDecoderFallbackCount(Ch, FallbackBuffer)
             Else
+                ' we have a valid surrogate pair so count two characters.
+                CharCount = CharCount + 2
                 LastChar = 0
             End If
         ElseIf LastChar > 0 Then
-            CharCount = CharCount - 1 + GetDecoderFallbackCount(LastChar, FallbackBuffer)
+            ' we have a regular character leaving a hanging high surrogate, so add fallback count
+            ' and count the regular character.
+            CharCount = CharCount + 1 + GetDecoderFallbackCount(LastChar, FallbackBuffer)
             LastChar = 0
+        Else
+            ' just a regular character
+            CharCount = CharCount + 1
         End If
     Loop
     
-    If LastChar > 0 Then
-        CharCount = CharCount - 1 + GetDecoderFallbackCount(LastChar, FallbackBuffer)
+    If Decoder Is Nothing Then
+        If LastChar > 0 Then
+            CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer)
+        End If
+    Else
+        Decoder.LastChar = LastChar
     End If
     
     If LastByte >= 0 Then
-        CharCount = CharCount + GetDecoderFallbackCount(LastByte, FallbackBuffer)
+        If Decoder Is Nothing Then
+            CharCount = CharCount + GetDecoderFallbackCount(LastByte, FallbackBuffer)
+        Else
+            Decoder.LastByte = LastByte
+        End If
     End If
     
     GetCharCountCore = CharCount
@@ -1093,6 +1114,14 @@ End Property
 
 Private Property Get Encoding_DecoderFallback() As DecoderFallback
     Set Encoding_DecoderFallback = DecoderFallback
+End Property
+
+Private Property Set Encoding_EncoderFallback(ByVal Value As EncoderFallback)
+    Set EncoderFallback = Value
+End Property
+
+Private Property Get Encoding_EncoderFallback() As EncoderFallback
+    Set Encoding_EncoderFallback = EncoderFallback
 End Property
 
 Private Property Get Encoding_BodyName() As String

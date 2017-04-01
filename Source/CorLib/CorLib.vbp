@@ -359,8 +359,8 @@ Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
 Class=EncoderFallbackException; System.Text\EncoderFallbackException.cls
 Class=EncoderExceptionFallbackBuffer; System.Text\EncoderExceptionFallbackBuffer.cls
 Class=EncoderExceptionFallback; System.Text\EncoderExceptionFallback.cls
-ResFile32="CorLib.RES"
 Class=EncoderFallbackStatic; System.Text\EncoderFallbackStatic.cls
+ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -402,7 +402,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=4
+Num=6
 
 [TASK1]
 Description=Implements IObject on Encoding
@@ -426,22 +426,18 @@ Comment=Encodings are read-only by default. Cloning an Encoding returns a read-w
 Description=Fix UnicodeEncoding serialization
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK5]
-Description=
-Status=
-Priority=
-AssignedTo=
-Comment=
+Description=Investigate Decoder.Flush
+Status=0
+Priority=1
 
 [TASK6]
-Description=
-Status=
-Priority=
+Description=Fully implement UnicodeEncoding.GetByteCountCore
+Status=0
+Priority=1
 AssignedTo=
-Comment=
+Comment=Failed to support Index/Count parameters.
 
 [TASK7]
 Description=

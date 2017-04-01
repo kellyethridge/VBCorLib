@@ -25,7 +25,7 @@ End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
-        Case "GetCharCount_WithValues_ReturnsExpected"
+        Case "GetCharCount_WithDefaultFallback_ReturnsExpected"
             Test.Use NewBytes(), 0
             Test.Use NewBytes(0), 1
             Test.Use NewBytes(0, 0), 1
@@ -42,6 +42,25 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&HFF, &HD8, &HFF, &HFF), 2
             Test.Use NewBytes(&H40, &HD8, &HFF, &HD8, &HFF, &H40), 3
             Test.Use NewBytes(&H40, &HDC, &HFF, &HD8, &HFF, &H40), 3
+            Test.Use NewBytes(&HD8, &H0, &HDC, &H0), 2
+            
+        Case "GetCharCount_WithEmptyFallback_ReturnsExpected"
+            Test.Use NewBytes(), 0
+            Test.Use NewBytes(0), 0
+            Test.Use NewBytes(0, 0), 1
+            Test.Use NewBytes(0, 0, 0), 1
+            Test.Use NewBytes(0, 0, 0, 0), 2
+            Test.Use NewBytes(&HFF), 0
+            Test.Use NewBytes(&HFF, &HFF), 1
+            Test.Use NewBytes(&HFF, &HFF, &HFF), 1
+            Test.Use NewBytes(&HFF, &HFF, &HFF, &HFF), 2
+            Test.Use NewBytes(&HD8), 0
+            Test.Use NewBytes(&HFF, &HD8), 0
+            Test.Use NewBytes(&H0, &HD8), 0
+            Test.Use NewBytes(&H40, &HFF, &HD8), 1
+            Test.Use NewBytes(&HFF, &HD8, &HFF, &HFF), 1
+            Test.Use NewBytes(&H40, &HD8, &HFF, &HD8, &HFF, &H40), 1
+            Test.Use NewBytes(&H40, &HDC, &HFF, &HD8, &HFF, &H40), 1
             Test.Use NewBytes(&HD8, &H0, &HDC, &H0), 2
             
         Case "GetChars_WithValues_ReturnsExpected"
@@ -267,7 +286,18 @@ Public Sub GetString_WithOddCountOf0xFF_ReturnsExpected()
     Assert.That Mid$(Actual, 2, 1), Iz.EqualTo(ChrW$(&HFFFD)), "1"
 End Sub
 
-Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)
+Public Sub GetCharCount_WithEmptyFallback_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)
+    Dim Enc As UnicodeEncoding
+    Set Enc = Encoding.Unicode.Clone
+    Set Enc.DecoderFallback = Cor.NewDecoderReplacementFallback("")
+    
+    Dim Actual As Long
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetCharCount_WithDefaultFallback_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)
     Dim Actual As Long
     
     Actual = Encoding.Unicode.GetCharCount(Bytes)
@@ -290,6 +320,7 @@ Public Sub GetByteCount_WithValues_ReturnsExpected2(ByRef Chars As Variant, ByVa
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
 
 
 Private Function MakeEncoding(Optional ByVal BigEndian As Boolean, Optional ByVal Replacement As String = "?") As UnicodeEncoding
