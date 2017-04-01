@@ -140,6 +140,7 @@ Public Enum ResourceStringKey
     Argument_InvalidHighSurrogate = 864
     Argument_InvalidLowSurrogate = 865
     Argument_InvalidCodePageConversionIndex = 866
+    Argument_EncodingConversionOverflowBytes = 867
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901

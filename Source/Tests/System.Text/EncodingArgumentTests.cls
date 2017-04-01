@@ -596,13 +596,14 @@ End Sub
 
 Public Sub GetCharsEx_WithNotEnoughCapacity_ThrowsArgumentException(ByVal Encoding As Encoding)
     Dim Bytes() As Byte
-    ReDim Bytes(0 To 3)
+    ReDim Bytes(0 To 8)
     Dim Chars(0 To 2) As Integer
     
     On Error Resume Next
-    Encoding.GetCharsEx Bytes, 0, 4, Chars, 0
+    Encoding.GetCharsEx Bytes, 0, 8, Chars, 0
     
-    AssertArgumentOutOfRangeException Err, "Chars"
+    Debug.Print Err.Description
+    AssertArgumentException Err, "Chars"
 End Sub
 
 Public Sub GetMaxByteCount_WithNegativeValue_ThrowsArgumentOutOfRangeException(ByVal Encoding As Encoding)
