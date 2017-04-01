@@ -40,6 +40,25 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+
+''
+' Returns a <a href="DecoderFallback.html">DecoderFallback</a> object for the current <a href="Decoder.html">Decoder</a> object.
+'
+' @return The current <a href="DecoderFallback.html">DecoderFallback</a> object.
+Public Property Get Fallback() As DecoderFallback: End Property
+
+''
+' Sets a <a href="DecoderFallback.html">DecoderFallback</a> object for the current <a href="Decoder.html">Decoder</a> object.
+'
+' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> object to set.
+Public Property Set Fallback(ByVal Value As DecoderFallback): End Property
+
+''
+' Returns a <a href="DecoderFallbackBuffer.html">DecoderFallbackBuffer</a> object associated with the current <a href="Decoder.html">Decoder</a> object.
+'
+' @return The associated <a href="DecoderFallbackBuffer.html">DecoderFallbackBuffer</a> object.
+Public Property Get FallbackBuffer() As DecoderFallbackBuffer: End Property
+
 ''
 ' Returns the number of characters a block of bytes can produce.
 '
@@ -47,7 +66,6 @@ Option Explicit
 ' @param Index The starting index in <i>Bytes</i> to begin decoding from.
 ' @param Count The number of bytes to be used in the decoding process.
 ' @return The number of characters that can be produced from <i>Count</i> number of bytes.
-'
 Public Function GetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long: End Function
 
 ''

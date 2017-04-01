@@ -321,6 +321,13 @@ Public Sub GetByteCount_WithValues_ReturnsExpected2(ByRef Chars As Variant, ByVa
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetByteCount_WithSubsetOfArray_ReturnsExpectedCount()
+    Dim Actual As Long
+    
+    Actual = MakeEncoding.GetByteCount("abcd", 1, 2)
+    
+    Assert.That Actual, Iz.EqualTo(4)
+End Sub
 
 
 Private Function MakeEncoding(Optional ByVal BigEndian As Boolean, Optional ByVal Replacement As String = "?") As UnicodeEncoding

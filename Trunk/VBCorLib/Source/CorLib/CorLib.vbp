@@ -402,7 +402,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=6
+Num=5
 
 [TASK1]
 Description=Implements IObject on Encoding
@@ -433,11 +433,11 @@ Status=0
 Priority=1
 
 [TASK6]
-Description=Fully implement UnicodeEncoding.GetByteCountCore
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
 AssignedTo=
-Comment=Failed to support Index/Count parameters.
+Comment=
 
 [TASK7]
 Description=
