@@ -77,6 +77,7 @@ Friend Property Let BytesInSequence(ByVal RHS As Long)
     mBytesInSequence = RHS
 End Property
 
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -99,6 +100,18 @@ End Function
 Private Function Decoder_Equals(Value As Variant) As Boolean
     Decoder_Equals = IObject_Equals(Value)
 End Function
+
+Private Property Set Decoder_Fallback(ByVal RHS As DecoderFallback)
+
+End Property
+
+Private Property Get Decoder_Fallback() As DecoderFallback
+
+End Property
+
+Private Property Get Decoder_FallbackBuffer() As DecoderFallbackBuffer
+
+End Property
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
     Decoder_GetCharCount = mEncoding.GetCharCount(Bytes, Index, Count)

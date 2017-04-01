@@ -34,16 +34,25 @@ Attribute VB_Exposed = False
 '
 ' Module: UnicodeDecoder
 '
+
+''
+' This a specific Decoder used by UnicodeEncoding.
+'
 Option Explicit
 Implements IObject
 Implements Decoder
 
-'Private Const CHAR_SIZE As Long = 2
-
 Private mEncoding       As UnicodeEncoding
+Private mFallback       As DecoderFallback
+Private mFallbackBuffer As DecoderFallbackBuffer
 Private mLastByte       As Long
 Private mLastChar       As Long
+Private mFlushing       As Boolean
 
+
+Friend Property Get Flushing() As Boolean
+    Flushing = mFlushing
+End Property
 
 Friend Property Get LastByte() As Long
     LastByte = mLastByte
@@ -71,6 +80,7 @@ End Sub
 
 Friend Sub Init(ByVal Encoding As UnicodeEncoding)
     Set mEncoding = Encoding
+    Set mFallback = mEncoding.DecoderFallback
 End Sub
 
 
@@ -97,6 +107,31 @@ Private Function Decoder_Equals(Value As Variant) As Boolean
     Decoder_Equals = IObject_Equals(Value)
 End Function
 
+Private Property Set Decoder_Fallback(ByVal Value As DecoderFallback)
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    If Not mFallbackBuffer Is Nothing Then
+        If mFallbackBuffer.Remaining > 0 Then
+            Error.Argument Argument_FallbackBufferNotEmpty, "Value"
+        End If
+    End If
+    
+    Set mFallback = Value
+    Set mFallbackBuffer = Nothing
+End Property
+
+Private Property Get Decoder_Fallback() As DecoderFallback
+    Set Decoder_Fallback = mFallback
+End Property
+
+Private Property Get Decoder_FallbackBuffer() As DecoderFallbackBuffer
+    If mFallbackBuffer Is Nothing Then
+        Set mFallbackBuffer = mFallback.CreateFallbackBuffer
+    End If
+    
+    Set Decoder_FallbackBuffer = mFallbackBuffer
+End Property
+
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
     If SAPtr(Bytes) = vbNullPtr Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
@@ -106,10 +141,10 @@ Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVa
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If UBound(Bytes) - Index + 1 < Count Then _
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
-            
+    
+    mFlushing = Flush
     Decoder_GetCharCount = mEncoding.GetCharCountCore(Bytes, Index, Count, Me)
     
-    ' need look to deeper
     If Flush Then
         mLastByte = -1
         mLastChar = 0
@@ -117,54 +152,7 @@ Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVa
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
-'    Dim Result As Long
-'    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-'    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
-'
-'    Result = VerifyArrayRange(SAPtr(Chars), CharIndex, InternalGetCharCount(ByteCount))
-'    Select Case Result
-'        Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
-'        Case Is <> NO_ERROR:                ThrowArrayRangeException Result, "Chars", CharIndex, "CharIndex", 0, vbNullString
-'    End Select
-'
-'    If mIsBigEndian Then
-'        Dim TotalBytes As Long
-'        If mLastByte >= 0 Then
-'            TotalBytes = ByteCount + 1
-'        Else
-'            TotalBytes = ByteCount
-'        End If
-'
-'        Dim Ch As Long
-'        Dim i As Long
-'        Do While i < TotalBytes
-'            If mLastByte >= 0 Then
-'                Ch = mLastByte * &H100
-'                i = i - 1
-'                mLastByte = -1
-'            Else
-'                Ch = Bytes(ByteIndex + i) * &H100
-'            End If
-'            i = i + 1
-'            Ch = Ch Or Bytes(ByteIndex + i)
-'            Chars(CharIndex) = AsWord(Ch)
-'            CharIndex = CharIndex + 1
-'            i = i + 1
-'        Loop
-'        If (TotalBytes And 1) = 1 Then mLastByte = Bytes(ByteIndex + ByteCount - 1)
-'        Decoder_GetChars = TotalBytes \ 2
-'    Else
-'        Dim Offset As Long
-'        If mLastByte >= 0 Then
-'            Chars(CharIndex) = mLastByte
-'            Offset = 1
-'        End If
-'        Call CopyMemory(ByVal VarPtr(Chars(CharIndex)) + Offset, Bytes(ByteIndex), ByteCount - Offset)
-'        mLastByte = -1
-'        If ((ByteCount + Offset) And 1) = 1 Then mLastByte = Bytes(ByteIndex + ByteCount - 1)
-'        Decoder_GetChars = (ByteCount + Offset) \ 2
-'    End If
-    
+
 End Function
 
 Private Function Decoder_GetHashCode() As Long
