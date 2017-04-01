@@ -186,10 +186,13 @@ End Property
 ' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
 ' being thrown. If a clone of the instance is made, then it will become read-write and allow the
 ' setting of the value.
+'
 Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
     If mIsReadOnly Then _
         Error.InvalidOperation InvalidOperation_ReadOnly
-        
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
     Set mDecoderFallback = Value
 End Property
 
@@ -215,6 +218,8 @@ End Property
 Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
     If mIsReadOnly Then _
         Error.InvalidOperation InvalidOperation_ReadOnly
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
     
     Set mEncoderFallback = Value
 End Property
@@ -353,7 +358,7 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     FreeChars LocalChars
     Return
@@ -752,6 +757,9 @@ Private Function InsertEncoderFallback(ByVal Ch As Long, ByRef Chars() As Intege
 End Function
 
 Private Function InsertChar(ByVal Ch As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
+    If ByteIndex + 1 > UBound(Bytes) Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(EncoderFallback)), "Bytes")
+    
     If Not mIsBigEndian Then
         Bytes(ByteIndex) = Ch And &HFF&
         Bytes(ByteIndex + 1) = (Ch And &HFF00&) \ vbShift8Bits
@@ -982,7 +990,7 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
             
             If CharIndex > CharEnd Then
                 ' handle small char buffer
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, "DecoderFallback"), "Chars")
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(DecoderFallback)), "Chars")
             End If
             
             Chars(CharIndex) = AsWord(Ch)
