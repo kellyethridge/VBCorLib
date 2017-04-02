@@ -88,6 +88,21 @@ Public Function GetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal B
 Public Sub Reset(): End Sub
 
 ''
+' Converts an array of encoded bytes to UTF-16 encoded characters and stores the result in a character array.
+'
+' @param Bytes The byte array to convert.
+' @param ByteIndex The starting position to convert in <i>Bytes</i>.
+' @param ByteCount The number of bytes to be converted.
+' @param Chars The char array to receive the converted characters.
+' @param CharIndex The starting position to place converted characters.
+' @param CharCount The maximum number of element of <i>chars</i> to use in the conversion.
+' @param Flush <b>True</b> to indicate that no further data is to be converted; otherwise, <b>False</b>.
+' @param BytesUsed When this method returns, contains the number of bytes that were used in the conversion. This parameter is passed uninitialized.
+' @param CharsUsed When this method returns, contains the number of characters from chars that were produced by the conversion. This parameter is passed uninitialized.
+' @param When this method returns, contains <b>True</b> if all the characters specified by byteCount were converted; otherwise, <b>False</b>. This parameter is passed uninitialized.
+Public Sub Convert(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByVal Flush As Boolean, ByRef BytesUsed As Long, ByRef CharsUsed As Long, ByRef Completed As Boolean): End Sub
+
+''
 ' Returns a string representation of this instance.
 '
 ' @return A string that describes this instance.

@@ -235,6 +235,118 @@ Public Sub FallbackBuffer_WhenCalled_ReturnsCachedInstance()
     Assert.That b1, Iz.SameAs(b2)
 End Sub
 
+Public Sub Convert_WithNullBytes_ThrowsArgumentNullException()
+    Dim Bytes() As Byte
+    Dim Chars(0) As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, 0, 0, Chars, 0, 0, False, 0, 0, False
+    
+    AssertArgumentNullException Err, "Bytes"
+End Sub
+
+Public Sub Convert_WithNullChars_ThrowsArgumentNullException()
+    Dim Bytes(0) As Byte
+    Dim Chars() As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, 0, 0, Chars, 0, 0, False, 0, 0, False
+    
+    AssertArgumentNullException Err, "Chars"
+End Sub
+
+Public Sub Convert_WithByteIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Bytes(0) As Byte
+    Dim Chars(0) As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, -1, 0, Chars, 0, 0, False, 0, 0, False
+
+    AssertArgumentOutOfRangeException Err, "ByteIndex"
+End Sub
+
+Public Sub Convert_WithByteCountNegative_ThrowsArgumentOutOfRangeException()
+    Dim Bytes(0) As Byte
+    Dim Chars(0) As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, 0, -1, Chars, 0, 0, False, 0, 0, False
+
+    AssertArgumentOutOfRangeException Err, "ByteCount"
+End Sub
+
+Public Sub Convert_WithCharIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Bytes(0) As Byte
+    Dim Chars(0) As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, 0, 0, Chars, -1, 0, False, 0, 0, False
+
+    AssertArgumentOutOfRangeException Err, "CharIndex"
+End Sub
+
+Public Sub Convert_WithCharCountNegative_ThrowsArgumentOutOfRangeException()
+    Dim Bytes(0) As Byte
+    Dim Chars(0) As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, 0, 0, Chars, 0, -1, False, 0, 0, False
+
+    AssertArgumentOutOfRangeException Err, "CharCount"
+End Sub
+
+Public Sub Convert_WithByteIndexAndByteCountMakeInvalidPosition_ThrowsArgumentOutOfRangeException()
+    Dim Bytes(0) As Byte
+    Dim Chars(0) As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, 0, 2, Chars, 0, 0, False, 0, 0, False
+
+    AssertArgumentOutOfRangeException Err, "Bytes"
+End Sub
+
+Public Sub Convert_WithCharIndexAndCharCountMakeInvalidPosition_ThrowsArgumentOutOfRangeException()
+    Dim Bytes(0) As Byte
+    Dim Chars(0) As Integer
+    Dim Decoder As Decoder
+    Set Decoder = MakeEmptyDecoder
+
+    On Error Resume Next
+    Decoder.Convert Bytes, 0, 1, Chars, 0, 2, False, 0, 0, False
+
+    AssertArgumentOutOfRangeException Err, "Chars"
+End Sub
+
+Public Sub Convert_WithSmallerChars_FillsChars()
+    Dim Bytes(0 To 10000) As Byte
+    Dim Chars(0 To 10000) As Integer
+    Dim Decoder As Decoder
+    Dim BytesUsed As Long
+    Dim CharsUsed As Long
+    Dim Completed As Boolean
+    
+    Set Decoder = Encoding.Unicode.GetDecoder
+    Decoder.Convert Bytes, 0, 10000, Chars, 0, 1000, True, BytesUsed, CharsUsed, Completed
+    
+    Assert.That Completed, Iz.False
+    Assert.That CharsUsed, Iz.EqualTo(625)
+    Assert.That BytesUsed, Iz.EqualTo(1250)
+End Sub
+
 
 Private Function MakeEmptyDecoder() As Decoder
     Dim Enc As UnicodeEncoding
@@ -243,4 +355,14 @@ Private Function MakeEmptyDecoder() As Decoder
     
     Set MakeEmptyDecoder = Enc.GetDecoder
 End Function
+
+
+
+
+
+
+
+
+
+
 

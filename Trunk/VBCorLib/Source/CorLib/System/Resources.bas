@@ -142,6 +142,7 @@ Public Enum ResourceStringKey
     Argument_InvalidCodePageConversionIndex = 866
     Argument_EncodingConversionOverflowBytes = 867
     Argument_FallbackBufferNotEmpty = 868
+    Argument_ConversionOverflow = 869
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
