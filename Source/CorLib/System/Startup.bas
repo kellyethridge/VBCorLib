@@ -42,7 +42,7 @@ Private Sub Main()
     InitWin32Api
     InitPublicFunctions
     InitcDateTimeHelpers
-    InitEncodingHelpers
+    InitEncoding
 End Sub
 
 ''

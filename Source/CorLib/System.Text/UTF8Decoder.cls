@@ -57,24 +57,24 @@ Friend Property Get BytesLeft() As Long
     BytesLeft = mBytesLeft
 End Property
 
-Friend Property Let BytesLeft(ByVal RHS As Long)
-    mBytesLeft = RHS
+Friend Property Let BytesLeft(ByVal Value As Long)
+    mBytesLeft = Value
 End Property
 
 Friend Property Get Char() As Integer
     Char = mChar
 End Property
 
-Friend Property Let Char(ByVal RHS As Integer)
-    mChar = RHS
+Friend Property Let Char(ByVal Value As Integer)
+    mChar = Value
 End Property
 
 Friend Property Get BytesInSequence() As Long
     BytesInSequence = mBytesInSequence
 End Property
 
-Friend Property Let BytesInSequence(ByVal RHS As Long)
-    mBytesInSequence = RHS
+Friend Property Let BytesInSequence(ByVal Value As Long)
+    mBytesInSequence = Value
 End Property
 
 
@@ -95,13 +95,17 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Decoder Interface
+'   Decoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Decoder_Convert(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByVal Flush As Boolean, BytesUsed As Long, CharsUsed As Long, Completed As Boolean)
+
+End Sub
+
 Private Function Decoder_Equals(Value As Variant) As Boolean
     Decoder_Equals = IObject_Equals(Value)
 End Function
 
-Private Property Set Decoder_Fallback(ByVal RHS As DecoderFallback)
+Private Property Set Decoder_Fallback(ByVal Value As DecoderFallback)
 
 End Property
 
