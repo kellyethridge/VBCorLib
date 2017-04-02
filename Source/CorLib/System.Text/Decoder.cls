@@ -65,6 +65,7 @@ Public Property Get FallbackBuffer() As DecoderFallbackBuffer: End Property
 ' @param Bytes The bytes to be used in decoding to characters.
 ' @param Index The starting index in <i>Bytes</i> to begin decoding from.
 ' @param Count The number of bytes to be used in the decoding process.
+' @param Flush Tells the <a href="Decoder.html">Decoder</a> to clear any state after the call.
 ' @return The number of characters that can be produced from <i>Count</i> number of bytes.
 Public Function GetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long: End Function
 
@@ -76,9 +77,15 @@ Public Function GetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal C
 ' @param ByteCount The number of bytes to be used in the decoding process.
 ' @param Chars The output array for the decoded unicode characters.
 ' @param CharIndex The starting index in the array to begin storing characters.
+' @param Flush Tells the <a href="Decoder.html">Decoder</a> to clear any state after the call.
 ' @return The number of characters actually decoded.
+Public Function GetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long: End Function
+
+''
+' Sets <a href="Decoder.html">Decoder</a> to initial value.
 '
-Public Function GetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long: End Function
+' @remarks This methods clears any internal state of the <a href="Decoder.html">Decoder</a> object. The method clears any state information preserved from a previous call to GetChars or Convert, including trailing bytes at the end of the previous data block.
+Public Sub Reset(): End Sub
 
 ''
 ' Returns a string representation of this instance.

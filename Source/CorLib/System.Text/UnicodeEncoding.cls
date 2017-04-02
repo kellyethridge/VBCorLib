@@ -418,7 +418,7 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     
     If Range.Count > 0 Then
         ReDim Output(0 To GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing) - 1)
-        GetCharsCore Bytes, Range.Index, Range.Count, Output, 0
+        GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
     Else
         Output = Cor.NewIntegers()
     End If
@@ -452,7 +452,7 @@ Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
     
     If ByteCount > 0 Then
-        GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
+        GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Nothing)
     End If
 End Function
 
@@ -549,7 +549,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     Chars = AllocChars(GetString)
     
     On Error GoTo Catch
-    Length = GetCharsCore(Bytes, Range.Index, Range.Count, Chars, 0)
+    Length = GetCharsCore(Bytes, Range.Index, Range.Count, Chars, 0, Nothing)
     
     GoSub Finally
     Exit Function
@@ -836,32 +836,20 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
         End If
     Loop
     
-    ' we could wrap all this with LastChar > 0 statement, but that
-    ' would create a bug by not clearing Decoder.LastChar when LastChar = 0.
     If Decoder Is Nothing Then
         If LastChar > 0 Then
+            CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
+        End If
+        If LastByte >= 0 Then
             CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
         End If
     ElseIf Decoder.Flushing Then
         If LastChar > 0 Then
             CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
         End If
-    Else
-        Decoder.LastChar = LastChar
-    End If
-    
-    ' similar to dealing with LastChar, we can't wrap all this with LastByte >= 0
-    ' because it will cause a similar bug of not clearing the Decoder.LastByte.
-    If Decoder Is Nothing Then
         If LastByte >= 0 Then
-            CharCount = CharCount + GetDecoderFallbackCount(LastByte, FallbackBuffer, Decoder)
+            CharCount = CharCount + GetDecoderFallbackCount(LastChar, FallbackBuffer, Decoder)
         End If
-    ElseIf Decoder.Flushing Then
-        If LastByte >= 0 Then
-            CharCount = CharCount + GetDecoderFallbackCount(LastByte, FallbackBuffer, Decoder)
-        End If
-    Else
-        Decoder.LastByte = LastByte
     End If
     
     GetCharCountCore = CharCount
@@ -965,7 +953,7 @@ Private Function GetEncoderFallbackCount(ByVal Ch As Integer, ByRef Chars() As I
     End If
 End Function
 
-Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
+Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Decoder As UnicodeDecoder) As Long
     Dim ByteEnd         As Long
     Dim CharStart       As Long
     Dim CharEnd         As Long
@@ -976,75 +964,96 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
     ByteEnd = ByteIndex + ByteCount
     CharStart = CharIndex
     CharEnd = UBound(Chars)
-    LastByte = -1
+    
+    If Decoder Is Nothing Then
+        LastByte = -1
+    Else
+        LastByte = Decoder.LastByte
+        LastChar = Decoder.LastChar
+    End If
     
     Do While ByteIndex < ByteEnd
         If LastByte < 0 Then
             LastByte = Bytes(ByteIndex)
             ByteIndex = ByteIndex + 1
-        Else
-            Dim Ch As Long
-            If mIsBigEndian Then
-                Ch = (LastByte * vbShift8Bits) Or Bytes(ByteIndex)
-            Else
-                Ch = (Bytes(ByteIndex) * vbShift8Bits) Or LastByte
+            
+            If ByteIndex >= ByteEnd Then
+                Exit Do
             End If
-            
-            ByteIndex = ByteIndex + 1
-            LastByte = -1
-            
-            If IsSurrogate(Ch) Then
-                If IsHighSurrogate(Ch) Then
-                    ' we have preceeding high surrogate followed
-                    ' by this high surrogate.
-                    If LastChar > 0 Then
-                        InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer
-                    End If
-                    
-                    LastChar = Ch
-                    GoTo Continue
-                ElseIf LastChar = 0 Then
-                    ' we have a low surrogate and expected the preceeding
-                    ' character to be a high surrogate.
-                    InsertDecoderFallback Ch, Chars, CharIndex, FallbackBuffer
-                    GoTo Continue
-                Else
-                    ' we have a valid surrogate pair.
-                    If CharIndex > CharEnd Then
-                        ' handle small char buffer
-                    End If
-                    
-                    Chars(CharIndex) = AsWord(LastChar)
-                    CharIndex = CharIndex + 1
-                    LastChar = 0
+        End If
+        
+        Dim Ch As Long
+        If mIsBigEndian Then
+            Ch = (LastByte * vbShift8Bits) Or Bytes(ByteIndex)
+        Else
+            Ch = (Bytes(ByteIndex) * vbShift8Bits) Or LastByte
+        End If
+        
+        ByteIndex = ByteIndex + 1
+        LastByte = -1
+        
+        If IsSurrogate(Ch) Then
+            If IsHighSurrogate(Ch) Then
+                ' we have preceeding high surrogate followed
+                ' by this high surrogate.
+                If LastChar > 0 Then
+                    InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer
                 End If
-            ElseIf LastChar > 0 Then
-                ' we have a preceeding high surrogate, but was not
-                ' followed by a low surrogate.
-                InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer
+                
+                LastChar = Ch
+                GoTo Continue
+            ElseIf LastChar = 0 Then
+                ' we have a low surrogate and expected the preceeding
+                ' character to be a high surrogate.
+                InsertDecoderFallback Ch, Chars, CharIndex, FallbackBuffer
+                GoTo Continue
+            Else
+                ' we have a valid surrogate pair.
+                If CharIndex > CharEnd Then _
+                    ThrowDecoderSmallConversionBuffer
+                
+                Chars(CharIndex) = AsWord(LastChar)
+                CharIndex = CharIndex + 1
                 LastChar = 0
             End If
-            
-            If CharIndex > CharEnd Then
-                ' handle small char buffer
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(DecoderFallback)), "Chars")
-            End If
-            
-            Chars(CharIndex) = AsWord(Ch)
-            CharIndex = CharIndex + 1
+        ElseIf LastChar > 0 Then
+            ' we have a preceeding high surrogate, but was not
+            ' followed by a low surrogate.
+            InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer
+            LastChar = 0
         End If
+        
+        If CharIndex > CharEnd Then _
+            ThrowDecoderSmallConversionBuffer
+        
+        Chars(CharIndex) = AsWord(Ch)
+        CharIndex = CharIndex + 1
         
 Continue:
     Loop
     
-    If LastChar > 0 Then
-        ' have an unmatched high surrogate, handle fallback
-        InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer
-    End If
-    
-    If LastByte >= 0 Then
-        ' have a partial char, handle fallback
-        InsertDecoderFallback LastByte, Chars, CharIndex, FallbackBuffer
+    If Decoder Is Nothing Then
+        If LastChar > 0 Then
+            ' have an unmatched high surrogate, handle fallback
+            InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer
+        End If
+        If LastByte >= 0 Then
+            ' have a partial char, handle fallback
+            InsertDecoderFallback LastByte, Chars, CharIndex, FallbackBuffer
+        End If
+    ElseIf Decoder.Flushing Then
+        If LastChar > 0 Then
+            ' have an unmatched high surrogate, handle fallback
+            InsertDecoderFallback LastChar, Chars, CharIndex, FallbackBuffer
+        End If
+        If LastByte >= 0 Then
+            ' have a partial char, handle fallback
+            InsertDecoderFallback LastByte, Chars, CharIndex, FallbackBuffer
+        End If
+    Else
+        ' save for next round
+        Decoder.LastChar = LastChar
+        Decoder.LastByte = LastByte
     End If
     
     GetCharsCore = CharIndex - CharStart
@@ -1069,7 +1078,7 @@ Private Sub InsertDecoderFallback(ByVal UnknownChar As Long, ByRef Chars() As In
         Dim Ch As Integer
         
         If CharIndex + FallbackBuffer.Remaining - 1 > UBound(Chars) Then _
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, "DecoderFallback"), "Chars")
+            ThrowDecoderSmallConversionBuffer
         
         Do While FallbackBuffer.Remaining > 0
             Ch = FallbackBuffer.GetNextChar
@@ -1077,6 +1086,10 @@ Private Sub InsertDecoderFallback(ByVal UnknownChar As Long, ByRef Chars() As In
             CharIndex = CharIndex + 1
         Loop
     End If
+End Sub
+
+Private Sub ThrowDecoderSmallConversionBuffer()
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(DecoderFallback)), "Chars")
 End Sub
 
 

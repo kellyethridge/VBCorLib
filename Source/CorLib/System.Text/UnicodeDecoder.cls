@@ -75,7 +75,7 @@ End Property
 '   Constructor
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    mLastByte = -1
+    Decoder_Reset
 End Sub
 
 Friend Sub Init(ByVal Encoding As UnicodeEncoding)
@@ -144,16 +144,17 @@ Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVa
     
     mFlushing = Flush
     Decoder_GetCharCount = mEncoding.GetCharCountCore(Bytes, Index, Count, Me)
-    
-    If Flush Then
-        mLastByte = -1
-        mLastChar = 0
-    End If
 End Function
 
-Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
-
+Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
+    mFlushing = Flush
+    Decoder_GetChars = mEncoding.GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
+
+Private Sub Decoder_Reset()
+    mLastByte = -1
+    mLastChar = 0
+End Sub
 
 Private Function Decoder_GetHashCode() As Long
     Decoder_GetHashCode = IObject_GetHashCode

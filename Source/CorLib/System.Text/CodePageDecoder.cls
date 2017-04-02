@@ -135,7 +135,7 @@ Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVa
     Decoder_GetCharCount = Offset + MultiByteToWideChar(mCodePage, 0, Bytes(Index), Count, ByVal 0&, 0)
 End Function
 
-Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
+Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
     Dim Result As Long
     
     Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
@@ -183,6 +183,10 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
     
     Decoder_GetChars = Offset + MultiByteToWideChar(mCodePage, 0, Bytes(ByteIndex), ByteCount, Chars(CharIndex), UBound(Chars) - CharIndex + 1)
 End Function
+
+Private Sub Decoder_Reset()
+
+End Sub
 
 Private Function Decoder_GetHashCode() As Long
     Decoder_GetHashCode = IObject_GetHashCode

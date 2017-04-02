@@ -89,9 +89,13 @@ Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVa
     Decoder_GetCharCount = mEncoding.GetCharCount(Bytes, Index, Count)
 End Function
 
-Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
+Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
     Decoder_GetChars = mEncoding.GetCharsEx(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
 End Function
+
+Private Sub Decoder_Reset()
+
+End Sub
 
 Private Function Decoder_GetHashCode() As Long
     Decoder_GetHashCode = IObject_GetHashCode
