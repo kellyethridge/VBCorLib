@@ -221,7 +221,7 @@ End Function
 Friend Sub ValidateCharRange(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long)
     ValidateArray Chars, Parameter_Chars
     
-    If CharIndex < LBound(Chars) Then
+    If CharIndex < LBound(Chars) Or (CharIndex > UBound(Chars) And Len1D(Chars) > 0) Then
         Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_LBound
     End If
     If CharCount < 0 Then
