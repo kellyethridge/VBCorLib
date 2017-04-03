@@ -360,8 +360,8 @@ Class=EncoderFallbackException; System.Text\EncoderFallbackException.cls
 Class=EncoderExceptionFallbackBuffer; System.Text\EncoderExceptionFallbackBuffer.cls
 Class=EncoderExceptionFallback; System.Text\EncoderExceptionFallback.cls
 Class=EncoderFallbackStatic; System.Text\EncoderFallbackStatic.cls
-ResFile32="CorLib.RES"
 Class=UnicodeEncoder; System.Text\UnicodeEncoder.cls
+ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -403,7 +403,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=5
+Num=3
 
 [TASK1]
 Description=Implements IObject on Encoding
@@ -424,14 +424,18 @@ Priority=1
 Comment=Encodings are read-only by default. Cloning an Encoding returns a read-write version.
 
 [TASK4]
-Description=Fix UnicodeEncoding serialization
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK5]
-Description=Investigate Decoder.Flush
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK6]
 Description=

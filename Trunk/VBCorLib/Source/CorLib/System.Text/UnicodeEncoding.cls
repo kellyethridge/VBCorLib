@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' A set of functions used to convert unicode characters to and from byte arrays.
+' A set of functions used to convert UTF-16 Unicode characters to and from byte arrays.
 '
 ' @remarks <p>This encoding can encode characters using big-endian or little-endian
 ' notation. The default is little-endian (least significant byte first).</p>
@@ -538,7 +538,6 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Range   As ListRange
     Dim Chars() As Integer
-    Dim Length  As Long
     
     If SAPtr(Bytes) = vbNullPtr Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
@@ -556,7 +555,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     Chars = AllocChars(GetString)
     
     On Error GoTo Catch
-    Length = GetCharsCore(Bytes, Range.Index, Range.Count, Chars, 0, Nothing)
+    GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0, Nothing
     
     GoSub Finally
     Exit Function
