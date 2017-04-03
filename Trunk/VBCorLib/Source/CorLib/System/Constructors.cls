@@ -1875,23 +1875,19 @@ Public Function NewEncoderFallbackException(ByRef Message As String, Optional By
     NewEncoderFallbackException.Init Message, InnerException
 End Function
 
-#If Release Then
-Friend Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Integer, ByVal Index As Long) As EncoderFallbackException
-#Else
 Public Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Integer, ByVal Index As Long) As EncoderFallbackException
-#End If
     Set NewEncoderFallbackException2 = New EncoderFallbackException
     NewEncoderFallbackException2.Init2 Message, CharUnknown, Index
 End Function
 
-#If Release Then
-Friend Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Integer, ByVal CharUnknownLow As Integer, ByVal Index As Long) As EncoderFallbackException
-#Else
 Public Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Integer, ByVal CharUnknownLow As Integer, ByVal Index As Long) As EncoderFallbackException
-#End If
     Set NewEncoderFallbackException3 = New EncoderFallbackException
     NewEncoderFallbackException3.Init3 Message, CharUnknownHigh, CharUnknownLow, Index
 End Function
 
+Friend Function NewDefaultDecoder(ByVal Encoding As Encoding) As DefaultDecoder
+    Set NewDefaultDecoder = New DefaultDecoder
+    NewDefaultDecoder.Init Encoding
+End Function
 
 

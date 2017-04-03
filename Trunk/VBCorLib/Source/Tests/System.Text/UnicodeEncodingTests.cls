@@ -329,6 +329,16 @@ Public Sub GetByteCount_WithSubsetOfArray_ReturnsExpectedCount()
     Assert.That Actual, Iz.EqualTo(4)
 End Sub
 
+Public Sub Serialization_WhenCalled_DoesNotDuplicateExceptionFallbacks()
+    Dim Original    As UnicodeEncoding
+    Dim Copy        As UnicodeEncoding
+    Set Original = Cor.NewUnicodeEncoding(False, False, True)
+    
+    Set Copy = Persist(Original)
+    
+    Assert.That Copy.DecoderFallback, Iz.SameAs(DecoderFallback.ExceptionFallback)
+    Assert.That Copy.EncoderFallback, Iz.SameAs(EncoderFallback.ExceptionFallback)
+End Sub
 
 Private Function MakeEncoding(Optional ByVal BigEndian As Boolean, Optional ByVal Replacement As String = "?") As UnicodeEncoding
     Set MakeEncoding = Cor.NewUnicodeEncoding(BigEndian, True).Clone

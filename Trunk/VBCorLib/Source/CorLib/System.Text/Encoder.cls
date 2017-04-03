@@ -11,31 +11,53 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2017 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: Encoder
+' Module: Encoder
 '
 
 ''
 ' Provides an interface for encoding unicode characters into bytes.
 '
 Option Explicit
+
+
+''
+' Returns an <a href="EncoderFallback.html">EncoderFallback</a> object for the current <b>Encoder</b> object.
+'
+' @return The <a href="EncoderFallback.html">EncoderFallback</a> associated with the current <b>Encoder</b> object.
+Public Property Get Fallback() As EncoderFallback: End Property
+
+''
+' Sets an <a href="EncoderFallback.html">EncoderFallback</a> object instance for the current <b>Encoder</b> object.
+'
+' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> object to be associated with the current <b>Encoder</b> object.
+Public Property Set Fallback(ByVal Value As EncoderFallback): End Property
+
+''
+' Return an <a href="EncoderFallbackBuffer.html">EncoderFallbackBuffer</a> object associated with current <b>Encoder</b> object.
+'
+' @return The <a href="EncoderFallbackBuffer.html">EncoderFallbackBuffer</a> object associated with the current <b>Encoder</b> object.
+Public Property Get FallbackBuffer() As EncoderFallbackBuffer: End Property
 
 ''
 ' Returns the number of encoded bytes the set of characters would produce.
@@ -62,6 +84,26 @@ Public Function GetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVa
 Public Function GetBytes(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long: End Function
 
 ''
+' Converts an array of Unicode characters to an encoded byte sequence and stores the result in an array of bytes.
+'
+' @param Chars An array of characters to be converted.
+' @param CharIndex The starting position to be converting in the <i>Chars</i> array.
+' @param CharCount The number of characters to be converted.
+' @param Bytes An array to received the converted characters.
+' @param ByteIndex The starting position to begin receiving converted characters.
+' @param ByteCount The number of bytes in the received buffer to be used.
+' @param Flush <b>True</b> if the characters have finished being converted; otherwise <b>False</b>.
+' @param CharsUsed The number characters actually converted from the <i>Chars</i> array.
+' @param BytesUsed The number bytes used for the encoding of the characters.
+' @param Completed <b>True</b> if the specificed <i>CharCount</i> had been reached in the conversion; otherwise <b>False</b>.
+Public Sub Convert(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByVal Flush As Boolean, ByRef CharsUsed As Long, ByRef BytesUsed As Long, ByRef Completed As Boolean): End Sub
+
+''
+' Clears the internal state of the encoder.
+'
+Public Sub Reset(): End Sub
+
+''
 ' Returns a string representation of this instance.
 '
 ' @return A string that describes this object instance.
@@ -74,7 +116,7 @@ Public Function ToString() As String: End Function
 ' @param value An object to be compared to this instance for equality.
 ' @return An indication of equality.
 '
-Public Function Equals(ByRef value As Variant) As Boolean: End Function
+Public Function Equals(ByRef Value As Variant) As Boolean: End Function
 
 ''
 ' Returns a pseudo-unique number to identify this instance.
