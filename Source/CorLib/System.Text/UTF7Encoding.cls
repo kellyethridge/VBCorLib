@@ -899,6 +899,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function Encoding_Clone() As Encoding
+
+End Function
+
 Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
 
 End Property
