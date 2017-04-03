@@ -361,6 +361,7 @@ Class=EncoderExceptionFallbackBuffer; System.Text\EncoderExceptionFallbackBuffer
 Class=EncoderExceptionFallback; System.Text\EncoderExceptionFallback.cls
 Class=EncoderFallbackStatic; System.Text\EncoderFallbackStatic.cls
 ResFile32="CorLib.RES"
+Class=UnicodeEncoder; System.Text\UnicodeEncoder.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"

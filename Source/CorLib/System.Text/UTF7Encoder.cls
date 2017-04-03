@@ -96,6 +96,22 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Encoder_Convert(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByVal Flush As Boolean, CharsUsed As Long, BytesUsed As Long, Completed As Boolean)
+
+End Sub
+
+Private Property Set Encoder_Fallback(ByVal RHS As EncoderFallback)
+
+End Property
+
+Private Property Get Encoder_Fallback() As EncoderFallback
+
+End Property
+
+Private Property Get Encoder_FallbackBuffer() As EncoderFallbackBuffer
+
+End Property
+
 Private Function Encoder_Equals(Value As Variant) As Boolean
     Encoder_Equals = IObject_Equals(Value)
 End Function
@@ -123,6 +139,10 @@ End Function
 Private Function Encoder_GetHashCode() As Long
     Encoder_GetHashCode = IObject_GetHashCode
 End Function
+
+Private Sub Encoder_Reset()
+
+End Sub
 
 Private Function Encoder_ToString() As String
     Encoder_ToString = IObject_ToString

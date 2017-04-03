@@ -1,7 +1,7 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-  Persistable = 0  'NotPersistable
+  Persistable = 1  'Persistable
   DataBindingBehavior = 0  'vbNone
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
@@ -37,6 +37,8 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements DecoderFallback
+
+Private Const DefaultStringProp As String = "DefaultString"
 
 Private mDefaultString As String
 
@@ -110,6 +112,18 @@ End Sub
 
 Private Sub Class_Initialize()
     Init "?"
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_ReadProperties(PropBag As PropertyBag)
+    mDefaultString = PropBag.ReadProperty(DefaultStringProp)
+End Sub
+
+Private Sub Class_WriteProperties(PropBag As PropertyBag)
+    PropBag.WriteProperty DefaultStringProp, mDefaultString
 End Sub
 
 

@@ -63,8 +63,6 @@ End Sub
 ' Common methods shared by Encoding implementations
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Sub DecoderConvert(ByVal Decoder As Decoder, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByVal Flush As Boolean, ByRef BytesUsed As Long, ByRef CharsUsed As Long, ByRef Completed As Boolean)
-    Debug.Assert Not Decoder Is Nothing
-    
     If SAPtr(Bytes) = vbNullPtr Or SAPtr(Chars) = vbNullPtr Then _
         Error.ArgumentNull IIf(SAPtr(Bytes) = vbNullPtr, "Bytes", "Chars"), ArgumentNull_Array
     If ByteIndex < LBound(Bytes) Or CharIndex < LBound(Chars) Then _
@@ -87,6 +85,34 @@ Public Sub DecoderConvert(ByVal Decoder As Decoder, ByRef Bytes() As Byte, ByVal
         
         Flush = False
         BytesUsed = BytesUsed \ 2
+    Loop
+    
+    Error.Argument Argument_ConversionOverflow
+End Sub
+
+Public Sub EncoderConvert(ByVal Encoder As Encoder, Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByVal Flush As Boolean, CharsUsed As Long, BytesUsed As Long, Completed As Boolean)
+    If SAPtr(Chars) = vbNullPtr Or SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull IIf(SAPtr(Chars) = vbNullPtr, "Chars", "Bytes"), ArgumentNull_Array
+    If CharIndex < LBound(Chars) Or ByteIndex < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange IIf(CharIndex < LBound(Chars), "CharIndex", "ByteIndex"), ArgumentOutOfRange_ArrayLB
+    If CharCount < 0 Or ByteCount < 0 Then _
+        Error.ArgumentOutOfRange IIf(CharCount < 0, "CharCount", "ByteCount"), ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Chars) - CharIndex + 1 < CharCount Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+    If UBound(Bytes) - ByteIndex + 1 < ByteCount Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+        
+    CharsUsed = CharCount
+    
+    Do While CharsUsed > 0
+        If Encoder.GetByteCount(Chars, CharIndex, CharsUsed, Flush) <= ByteCount Then
+            BytesUsed = Encoder.GetBytes(Chars, CharIndex, CharsUsed, Bytes, ByteIndex, Flush)
+            Completed = (CharsUsed = CharCount) And (Encoder.FallbackBuffer.Remaining = 0)
+            Exit Sub
+        End If
+        
+        Flush = False
+        CharsUsed = CharsUsed \ 2
     Loop
     
     Error.Argument Argument_ConversionOverflow
