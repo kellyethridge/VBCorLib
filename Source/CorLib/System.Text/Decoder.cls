@@ -38,6 +38,12 @@ Attribute VB_Exposed = True
 ''
 ' Provides an interface to be used in converting blocks of bytes into unicode characters.
 '
+' @remarks Using a <b>Decoder</b> is different than using a normal <a href="Encoding.html">Encoding</a>
+' because a <b>Decoder</b> can maintain state between calls. This allows a Decoder to decode characters
+' that span method calls where as an <a href="Encoding.html">Encoding</a> method calls have
+' no knowledge of previous data. A Decoder is useful in situation where unknown streams of data may need
+' to be processed in multiple chunks such as over a network.
+'
 Option Explicit
 
 
@@ -67,6 +73,14 @@ Public Property Get FallbackBuffer() As DecoderFallbackBuffer: End Property
 ' @param Count The number of bytes to be used in the decoding process.
 ' @param Flush Tells the <a href="Decoder.html">Decoder</a> to clear any state after the call.
 ' @return The number of characters that can be produced from <i>Count</i> number of bytes.
+' @remarks <p><b>GetCharCount</b> itself does not store state between method calls, but it will use
+' any stored state from a previous call to <a href="Decoder.GetChars.html">GetChars</a>. Typically
+' you would call this method immediately before calling <a href="Decoder.GetChars.html">GetChars</a>.</p>
+' <p>Call with <i>Flush</i> equals <b>True</b> when then last chunk of data is being processed. This will
+' ensure any characters that would normally have been stored as state for the next call will be processed
+' during this call. No state is ever stored by this method, but any hanging characters need to be processed
+' instead of being ignored.</p>
+'
 Public Function GetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long: End Function
 
 ''
@@ -79,6 +93,15 @@ Public Function GetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal C
 ' @param CharIndex The starting index in the array to begin storing characters.
 ' @param Flush Tells the <a href="Decoder.html">Decoder</a> to clear any state after the call.
 ' @return The number of characters actually decoded.
+' @remarks <p><b>GetChars</b> converts an array of bytes into Unicode characters. Since Unicode
+' characters could span a boundry between calls the method will store any state needed to resume
+' converting characters in the next call. This allows for unknown chunks of data to be to
+' converted without needed to enure each chunk contains complete characters. A typical scenario
+' would be streaming data from a network.</p>
+' <p>Because there is state stored between calls, the caller must inform the method that the last
+' chunk of data is being processed so the method can correctly account for any state that might
+' have persisted. This is achieved by passing <b>True</b> for the <i>Flush</i> parameter.
+'
 Public Function GetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long: End Function
 
 ''
@@ -100,6 +123,11 @@ Public Sub Reset(): End Sub
 ' @param BytesUsed When this method returns, contains the number of bytes that were used in the conversion. This parameter is passed uninitialized.
 ' @param CharsUsed When this method returns, contains the number of characters from chars that were produced by the conversion. This parameter is passed uninitialized.
 ' @param When this method returns, contains <b>True</b> if all the characters specified by byteCount were converted; otherwise, <b>False</b>. This parameter is passed uninitialized.
+' @remarks <p>The <b>Convert</b> method will attempt to convert up to <i>ByteCount</i> bytes but no more than would generate <i>CharCount</i> characters.</p>
+' <p>An optimized implementation would attempt to convert as many bytes as are available to create <i>CharCount</i> characters. The default implementation
+' simply tries to find a number of byte that when converted will fit in <i>CharCount</i> characters. If there are too many characters to fit then the number
+' of bytes used to calculate the number of characters is halved. This does not lead to an optimal solution as <i>CharCount</i> will usually not be achieved.</p>
+'
 Public Sub Convert(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByVal Flush As Boolean, ByRef BytesUsed As Long, ByRef CharsUsed As Long, ByRef Completed As Boolean): End Sub
 
 ''
