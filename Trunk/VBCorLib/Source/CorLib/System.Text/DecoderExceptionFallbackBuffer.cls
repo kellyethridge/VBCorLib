@@ -40,20 +40,11 @@ Implements DecoderFallbackBuffer
 
 
 Public Function Fallback(ByRef BytesUnknown() As Byte, ByVal Index As Long) As Boolean
-    Dim sb  As StringBuilder
-    Dim i   As Long
+    Dim Message As String
     
-    Set sb = StringBuilderCache.Acquire
+    Message = BuildMessage(BytesUnknown)
     
-    For i = LBound(BytesUnknown) To CorMath.Min(LBound(BytesUnknown), UBound(BytesUnknown))
-        sb.AppendFormat "[{:X2}]", BytesUnknown(i)
-    Next
-    
-    If i <= UBound(BytesUnknown) Then
-        sb.Append " ..."
-    End If
-    
-    Throw Cor.NewDecoderFallbackException2(Environment.GetResourceString(Argument_InvalidCodePageBytesIndex, StringBuilderCache.GetStringAndRelease(sb)), BytesUnknown, Index)
+    Throw Cor.NewDecoderFallbackException2(Environment.GetResourceString(Argument_InvalidCodePageBytesIndex, Message), BytesUnknown, Index)
 End Function
 
 Public Function GetNextChar() As Integer
@@ -78,6 +69,27 @@ End Function
 
 Public Function ToString() As String
     ToString = MyBase.ToString(Me)
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function BuildMessage(ByRef BytesUnknown() As Byte) As String
+    Dim sb  As StringBuilder
+    Dim i   As Long
+    
+    Set sb = StringBuilderCache.Acquire
+    
+    For i = LBound(BytesUnknown) To CorMath.Min(LBound(BytesUnknown), UBound(BytesUnknown))
+        sb.AppendFormat "[{:X2}]", BytesUnknown(i)
+    Next
+    
+    If i <= UBound(BytesUnknown) Then
+        sb.Append " ..."
+    End If
+    
+    BuildMessage = StringBuilderCache.GetStringAndRelease(sb)
 End Function
 
 

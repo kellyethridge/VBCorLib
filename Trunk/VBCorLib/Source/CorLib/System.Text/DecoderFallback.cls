@@ -46,7 +46,6 @@ Option Explicit
 ''
 ' When implemented in a derived class, initializes a new instance of the <a href="DecoderFallbackBuffer.html">DecoderFallbackBuffer</a> class.
 '
-'
 Public Function CreateFallbackBuffer() As DecoderFallbackBuffer: End Function
 
 ''
