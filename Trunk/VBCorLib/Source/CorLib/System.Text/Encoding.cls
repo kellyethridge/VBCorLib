@@ -45,9 +45,19 @@ Attribute VB_Exposed = True
 ' @see UTF7Encoding
 ' @see UnicodeEncoding
 ' @see ASCIIEncoding
+' @see UTF32Encoding
 '
 Option Explicit
 
+
+''
+' Returns a shallow copy of the current <a href="Encoding.html">Encoding</a> object.
+'
+' @return A copy of the <a href="Encoding.html">Encoding</a> object.
+' @remarks <p>An <a href="Encoding.html">Encoding</a> object is read-only by default.
+' A clone of the <a href="Encoding.html">Encoding</a> object will become writable.</p>
+'
+Public Function Clone() As Encoding: End Function
 
 ''
 ' Returns the encoding name to be used in with the mail agent body tags.

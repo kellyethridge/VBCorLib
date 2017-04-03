@@ -1194,6 +1194,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function Encoding_Clone() As Encoding
+    Set Encoding_Clone = Clone
+End Function
+
 Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
     Set DecoderFallback = Value
 End Property
