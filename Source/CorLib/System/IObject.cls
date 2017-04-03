@@ -101,7 +101,6 @@ Public Function Equals(ByRef Value As Variant) As Boolean: End Function
 ' End Function
 ' </pre>
 '
-'
 Public Function GetHashCode() As Long: End Function
 
 ''
