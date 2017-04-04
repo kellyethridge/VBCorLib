@@ -107,19 +107,23 @@ Public Function IsLowSurrogate(ByVal c As Long) As Boolean
 End Function
 
 Public Function IsSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    If IsHighSurrogateStr(s, Index) Then
-        IsSurrogateStr = True
-    ElseIf IsLowSurrogateStr(s, Index) Then
-        IsSurrogateStr = True
-    End If
+    If Index < 0 Or Index >= Len(s) Then _
+        Error.ArgumentOutOfRange "Index"
+    
+    Dim Ptr As Long
+    Ptr = StrPtr(s) + Index * vbSizeOfChar
+    
+    Select Case MemWord(Ptr) And &HFFFF&
+        Case SurrogateStart To SurrogateEnd
+            IsSurrogateStr = True
+    End Select
 End Function
 
 Public Function IsSurrogate(ByVal c As Long) As Boolean
-    If IsHighSurrogate(c) Then
-        IsSurrogate = True
-    ElseIf IsLowSurrogate(c) Then
-        IsSurrogate = True
-    End If
+    Select Case c And &HFFFF&
+        Case SurrogateStart To SurrogateEnd
+            IsSurrogate = True
+    End Select
 End Function
 
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long

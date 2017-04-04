@@ -89,7 +89,27 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HA0, True
             Test.Use 65, False
             
-        Case "IsHighSurrogate"
+        Case "IsSurrogate_WithValues_ReturnsExpected"
+            Test.Use 0, False
+            Test.Use &HD7FF, False
+            Test.Use &HD7FF&, False
+            Test.Use &HD800, True
+            Test.Use &HD800&, True
+            Test.Use &HDFFF, True
+            Test.Use &HDFFF&, True
+            Test.Use &HE000, False
+            Test.Use &HE000&, False
+            Test.Use &HFFFF, False
+            
+        Case "IsSurrogateStr_WithValues_ReturnsExpected"
+            Test.Use "a", False
+            Test.Use ChrW$(&HD7FF), False
+            Test.Use ChrW$(&HD800), True
+            Test.Use ChrW$(&HDFFF), True
+            Test.Use ChrW$(&HE000), False
+            Test.Use ChrW$(&HFFFF), False
+            
+        Case "IsHighSurrogate_WithValues_ReturnsExpected"
             Test.Use &HD800&, True
             Test.Use &HD800, True
             Test.Use &HD7FF&, False
@@ -99,7 +119,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HDC00&, False
             Test.Use &HDC00, False
             
-        Case "IsLowSurrogate"
+        Case "IsLowSurrogate_WithValues_ReturnsExpected"
             Test.Use &HDC00, True
             Test.Use &HDC00&, True
             Test.Use &HDFFF, True
@@ -209,7 +229,47 @@ Public Sub IsWhiteSpaceStr_WithEmptyString_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub IsHighSurrogate(ByVal Value As Long, ByVal Expected As Boolean)
+Public Sub IsSurrogate_WithValues_ReturnsExpected(ByVal Value As Long, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.IsSurrogate(Value)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsSurrogateStr_WithValues_ReturnsExpected(ByRef Value As String, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = Char.IsSurrogateStr(Value, 0)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsSurrogateStr_WithIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.IsSurrogateStr "a", -1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub IsSurrogateStr_WithIndexEqualToLengthOfString_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.IsSurrogateStr "abc", 3
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub IsSurrogateString_WithIndexGreaterThanLengthOfString_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    Char.IsSurrogateStr "abc", 4
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub IsHighSurrogate_WithValues_ReturnsExpected(ByVal Value As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
     Actual = Char.IsHighSurrogate(Value)
@@ -217,7 +277,7 @@ Public Sub IsHighSurrogate(ByVal Value As Long, ByVal Expected As Boolean)
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsLowSurrogate(ByVal Value As Long, ByVal Expected As Boolean)
+Public Sub IsLowSurrogate_WithValues_ReturnsExpected(ByVal Value As Long, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
     Actual = Char.IsLowSurrogate(Value)

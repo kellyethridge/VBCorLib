@@ -69,7 +69,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added DecoderFallback to Encoding interface.
 	* Added EncoderFallback to Encoding interface.
 	* Fixed UTF8Encoding to error on invalid surrogates.
-	* Fixed UnicodeEncoding GetChars/GetString/GetCharCount to correctly handle surrogates.
+	* Re-implemented UnicodeEncoding.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

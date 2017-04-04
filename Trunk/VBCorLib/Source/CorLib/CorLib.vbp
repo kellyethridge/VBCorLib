@@ -403,25 +403,27 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=3
+Num=1
 
 [TASK1]
-Description=Implements IObject on Encoding
-Status=0
-Priority=1
-Comment=Don't actualy implement IObject, just add the methods to be part of the Encoding interface.
-
-[TASK2]
-Description=Implements ICloneable on Encoding
-Status=0
-Priority=1
-Comment=Don't actually implement ICloneable, just add the method to be part of the Encoding interface.
-
-[TASK3]
 Description=Make Encodings read-only capable.
 Status=0
 Priority=1
 Comment=Encodings are read-only by default. Cloning an Encoding returns a read-write version.
+
+[TASK2]
+Description=
+Status=
+Priority=
+Comment=
+AssignedTo=
+
+[TASK3]
+Description=
+Status=
+Priority=
+Comment=
+AssignedTo=
 
 [TASK4]
 Description=
