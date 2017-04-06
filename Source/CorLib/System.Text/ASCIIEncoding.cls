@@ -585,30 +585,32 @@ Private Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long,
     Dim ByteEnd     As Long
     Dim Fallback    As EncoderFallbackBuffer
     
-    ByteStart = ByteIndex
-    ByteEnd = UBound(Bytes)
-    CharEnd = CharIndex + CharCount
-    
-    Do While CharIndex < CharEnd
-        Ch = Chars(CharIndex)
+    If Not TryGetBytesOptimized(Chars, CharIndex, CharCount, Bytes, ByteIndex, mEncoderFallback, GetBytesCore) Then
+        ByteStart = ByteIndex
+        ByteEnd = UBound(Bytes)
+        CharEnd = CharIndex + CharCount
         
-        Select Case Ch
-            ' we need to have a range because by using Integers to
-            ' represent unicode characters, we may deal with negative values.
-            Case ASCIIStart To ASCIIEnd
-                If ByteIndex > ByteEnd Then _
-                    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(mEncoderFallback)), "Bytes")
-                
-                Bytes(ByteIndex) = Ch
-                ByteIndex = ByteIndex + 1
-            Case Else
-                ByteIndex = InsertEncoderFallback(Ch, Bytes, ByteIndex, Fallback)
-        End Select
+        Do While CharIndex < CharEnd
+            Ch = Chars(CharIndex)
+            
+            Select Case Ch
+                ' we need to have a range because by using Integers to
+                ' represent unicode characters, we may deal with negative values.
+                Case ASCIIStart To ASCIIEnd
+                    If ByteIndex > ByteEnd Then _
+                        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(mEncoderFallback)), "Bytes")
+                    
+                    Bytes(ByteIndex) = Ch
+                    ByteIndex = ByteIndex + 1
+                Case Else
+                    ByteIndex = InsertEncoderFallback(Ch, Bytes, ByteIndex, Fallback)
+            End Select
+            
+            CharIndex = CharIndex + 1
+        Loop
         
-        CharIndex = CharIndex + 1
-    Loop
-    
-    GetBytesCore = ByteIndex - ByteStart
+        GetBytesCore = ByteIndex - ByteStart
+    End If
 End Function
 
 Private Function InsertEncoderFallback(ByVal Ch As Integer, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Fallback As EncoderFallbackBuffer) As Long
@@ -627,6 +629,39 @@ Private Function InsertEncoderFallback(ByVal Ch As Integer, ByRef Bytes() As Byt
     End If
     
     InsertEncoderFallback = ByteIndex
+End Function
+
+Private Function TryGetBytesOptimized(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Fallback As EncoderFallback, ByRef ByteCount As Long) As Boolean
+    Dim ReplacementChar As Integer
+    Dim i               As Long
+    Dim Ch              As Integer
+    
+    If TypeOf Fallback Is EncoderReplacementFallback And Fallback.MaxCharCount = 1 Then
+        Dim EncoderFallback As EncoderReplacementFallback
+        Set EncoderFallback = Fallback
+        ReplacementChar = Asc(EncoderFallback.DefaultString)
+        
+        If ReplacementChar >= ASCIIStart And ReplacementChar <= ASCIIEnd Then
+            If ByteIndex + CharCount - 1 > UBound(Bytes) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(mEncoderFallback)), "Bytes")
+            
+            For i = CharIndex To CharIndex + CharCount - 1
+                Ch = Chars(i)
+                
+                Select Case Ch
+                    Case ASCIIStart To ASCIIEnd
+                        Bytes(ByteIndex) = Ch
+                    Case Else
+                        Bytes(ByteIndex) = ReplacementChar
+                End Select
+                
+                ByteIndex = ByteIndex + 1
+            Next
+            
+            ByteCount = CharCount
+            TryGetBytesOptimized = True
+        End If
+    End If
 End Function
 
 Private Function GetCharCountCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long) As Long
