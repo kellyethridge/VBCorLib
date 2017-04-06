@@ -118,6 +118,59 @@ Public Sub EncoderConvert(ByVal Encoder As Encoder, Chars() As Integer, ByVal Ch
     Error.Argument Argument_ConversionOverflow
 End Sub
 
+Public Function ValidateGetBytes(ByRef Chars() As Integer, ByRef Index As Variant, ByRef Count As Variant) As ListRange
+    If SAPtr(Chars) = vbNullPtr Then _
+        Error.ArgumentNull "Chars", ArgumentNull_Array
+    
+    ValidateGetBytes = GetArrayRange(Chars, Index, Count)
+    
+    If ValidateGetBytes.Index < LBound(Chars) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If ValidateGetBytes.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Chars) - ValidateGetBytes.Index + 1 < ValidateGetBytes.Count Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+End Function
+
+Public Sub ValidateGetBytesEx(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long)
+    If SAPtr(Chars) = vbNullPtr Or SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull IIf(SAPtr(Chars) = vbNullPtr, "Chars", "Bytes"), ArgumentNull_Array
+    If CharIndex < LBound(Chars) Then _
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_ArrayLB
+    If ByteIndex < LBound(Bytes) Or (ByteIndex > UBound(Bytes) And Len1D(Bytes) > 0) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_Index
+    If CharCount < 0 Then _
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Chars) - CharIndex + 1 < CharCount Then _
+        Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
+End Sub
+
+Public Function ValidateGetChars(ByRef Bytes() As Byte, ByRef Index As Variant, ByRef Count As Variant) As ListRange
+    If SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    
+    ValidateGetChars = GetArrayRange(Bytes, Index, Count)
+    
+    If ValidateGetChars.Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If ValidateGetChars.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - ValidateGetChars.Index + 1 < ValidateGetChars.Count Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+End Function
+
+Public Sub ValidateGetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long)
+    If SAPtr(Bytes) = vbNullPtr Or SAPtr(Chars) = vbNullPtr Then _
+        Error.ArgumentNull IIf(SAPtr(Bytes) = vbNullPtr, "Bytes", "Chars"), ArgumentNull_Array
+    If ByteIndex < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_ArrayLB
+    If CharIndex < LBound(Chars) Or (CharIndex > UBound(Chars) And Len1D(Chars) > 0) Then _
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_Index
+    If ByteCount < 0 Then _
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - ByteIndex + 1 < ByteCount Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+End Sub
 
 ''
 ' Attaches either an Integer Array or a String to a Chars Integer
