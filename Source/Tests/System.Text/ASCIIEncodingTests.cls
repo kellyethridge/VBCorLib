@@ -44,11 +44,28 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "", 0
             Test.Use NewIntegers(97, 98, 99, 100), 4
             Test.Use NewIntegers(), 0
+            Test.Use NewIntegers(97, 98, 99, 100, 128), 5
+            Test.Use t("\xd800\xdc00"), 2
+            
+        Case "GetByteCount_WhenUsingEmptyFallback_ReturnsExpected"
+            Test.Use "abc", 3
+            Test.Use "", 0
+            Test.Use NewIntegers(97, 98, 99, 100), 4
+            Test.Use NewIntegers(), 0
+            Test.Use NewIntegers(97, 98, 99, 100, 128), 4
+            Test.Use t("\xd800\xdc00"), 0
             
         Case "GetCharCount_WithBytes_ReturnsExpected"
             Test.Use NewBytes(1), 1
             Test.Use NewBytes(1, 2, 3, 4, 5), 5
             Test.Use NewBytes(), 0
+            Test.Use NewBytes(1, 2, 3, 4, 160), 5
+        
+        Case "GetCharCount_WithEmptyFallback_ReturnsExpected"
+            Test.Use NewBytes(1), 1
+            Test.Use NewBytes(1, 2, 3, 4, 5), 5
+            Test.Use NewBytes(), 0
+            Test.Use NewBytes(1, 2, 3, 4, 160), 4
         
         Case "GetString_WithBytes_ReturnsExpected"
             Test.Use NewBytes(48, 49, 50), "012"
@@ -61,6 +78,22 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(255, 65, 128, 0), NewIntegers(63, 65, 63, 0)
         
     End Select
+End Sub
+
+Public Sub ZeroLengthArrays()
+    Dim Enc As New ASCIIEncoding
+    Enc.GetCharCount NewBytes()
+    Enc.GetChars NewBytes()
+    Enc.GetCharCount NewBytes, 0, 0
+    Enc.GetChars NewBytes(), 0, 0
+    Enc.GetCharsEx NewBytes(), 0, 0, NewIntegers(), 0
+    Enc.GetByteCount NewIntegers()
+    Enc.GetBytes NewIntegers()
+    Enc.GetByteCount NewIntegers(), 0, 0
+    Enc.GetBytes NewIntegers(), 0, 0
+    Enc.GetBytesEx NewIntegers(), 0, 0, NewBytes(), 0
+    Enc.GetByteCount ""
+    Enc.GetBytes ""
 End Sub
 
 Public Sub GetBytes_WithChars_ReturnsExpected(ByRef Chars As Variant, ByRef Expected() As Byte)
@@ -90,6 +123,17 @@ Public Sub GetByteCount_WithCharacters_ReturnsExpected(ByRef Chars As Variant, B
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetByteCount_WhenUsingEmptyFallback_ReturnsExpected(ByRef Chars As Variant, ByVal Expected As Long)
+    Dim Enc As ASCIIEncoding
+    Set Enc = Encoding.ASCII.Clone
+    Set Enc.EncoderFallback = Cor.NewEncoderReplacementFallback("")
+    
+    Dim Actual As Long
+    Actual = Enc.GetByteCount(Chars)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 Public Sub GetByteCount_WithIndexAndCount_ReturnsExpected()
     Dim Encoding As New ASCIIEncoding
     
@@ -97,15 +141,6 @@ Public Sub GetByteCount_WithIndexAndCount_ReturnsExpected()
     Actual = Encoding.GetByteCount(NewChars("a", "b", "c"), 1, 2)
     
     Assert.That Actual, Iz.EqualTo(2)
-End Sub
-
-Public Sub GetByteCount_WithString_ReturnsLengthOfString()
-    Dim Encoding As New ASCIIEncoding
-    
-    Dim Actual As Long
-    Actual = Encoding.GetByteCount("abcd")
-    
-    Assert.That Actual, Iz.EqualTo(4)
 End Sub
 
 Public Sub GetBytesEx_WithCharsThatFitIntoOutput_EncodesAllChars()
@@ -149,6 +184,17 @@ Public Sub GetCharCount_WithBytes_ReturnsExpected(ByRef Bytes() As Byte, ByVal E
     
     Dim Actual As Long
     Actual = Encoding.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetCharCount_WithEmptyFallback_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)
+    Dim Enc As ASCIIEncoding
+    Set Enc = Encoding.ASCII.Clone
+    Set Enc.DecoderFallback = Cor.NewDecoderReplacementFallback("")
+    
+    Dim Actual As Long
+    Actual = Enc.GetCharCount(Bytes)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
