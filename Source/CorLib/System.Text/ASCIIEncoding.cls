@@ -55,8 +55,11 @@ Option Explicit
 Implements IObject
 Implements Encoding
 
-Private Const ASCIIStart    As Long = 0
-Private Const ASCIIEnd      As Long = 127
+Private Const ASCIIStart            As Long = 0
+Private Const ASCIIEnd              As Long = 127
+Private Const IsReadOnlyProp        As String = "IsReadOnly"
+Private Const EncoderFallbackProp   As String = "EncoderFallback"
+Private Const DecoderFallbackProp   As String = "DecoderFallback"
 
 Private mIsReadOnly         As Boolean
 Private mEncoderFallback    As EncoderFallback
@@ -387,10 +390,21 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxCharCount(ByVal ByteCount As Long) As Long
+    Dim Result As Currency
+    
     If ByteCount < 0 Then _
         Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
-        
-    GetMaxCharCount = ByteCount
+    
+    Result = ByteCount
+    
+    If mDecoderFallback.MaxCharCount > 1 Then
+        Result = Result * mDecoderFallback.MaxCharCount
+    End If
+    
+    If Result > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_GetCharCountOverflow
+    
+    GetMaxCharCount = Result
 End Function
 
 ''
@@ -401,10 +415,21 @@ End Function
 ' @see Encoding
 '
 Public Function GetMaxByteCount(ByVal CharCount As Long) As Long
+    Dim Result As Currency
+    
     If CharCount < 0 Then _
         Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_NeedNonNegNum
-        
-    GetMaxByteCount = CharCount
+    
+    Result = CharCount + 1@
+    
+    If mEncoderFallback.MaxCharCount > 1 Then
+        Result = Result * mEncoderFallback.MaxCharCount
+    End If
+    
+    If Result > &H7FFFFFFF Then _
+        Error.ArgumentOutOfRange "CharCount", ArgumentOutOfRange_GetByteCountOverflow
+    
+    GetMaxByteCount = Result
 End Function
 
 ''
@@ -529,20 +554,41 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mEncoderFallback = Statics.EncoderFallback.ReplacementFallback
-    Set mDecoderFallback = Statics.DecoderFallback.ReplacementFallback
-    mIsReadOnly = True
-End Sub
-
 Friend Sub InitClone(ByVal Other As ASCIIEncoding)
     Set mEncoderFallback = Other.EncoderFallback
     Set mDecoderFallback = Other.DecoderFallback
     mIsReadOnly = False
 End Sub
 
+Private Sub Class_InitProperties()
+    Set mEncoderFallback = Statics.EncoderFallback.ReplacementFallback
+    Set mDecoderFallback = Statics.DecoderFallback.ReplacementFallback
+    mIsReadOnly = True
+End Sub
 
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_ReadProperties(PropBag As PropertyBag)
+    mIsReadOnly = PropBag.ReadProperty(IsReadOnlyProp)
+    Set mEncoderFallback = PropBag.ReadProperty(EncoderFallbackProp, Statics.EncoderFallback.ReplacementFallback)
+    Set mDecoderFallback = PropBag.ReadProperty(DecoderFallbackProp, Statics.DecoderFallback.ReplacementFallback)
+End Sub
+
+Private Sub Class_WriteProperties(PropBag As PropertyBag)
+    PropBag.WriteProperty IsReadOnlyProp, mIsReadOnly
+
+    If Not mEncoderFallback Is Statics.EncoderFallback.ReplacementFallback Then
+        PropBag.WriteProperty EncoderFallbackProp, mEncoderFallback
+    End If
+    If Not mDecoderFallback Is Statics.DecoderFallback.ReplacementFallback Then
+        PropBag.WriteProperty DecoderFallbackProp, mDecoderFallback
+    End If
+End Sub
+
+
+''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
