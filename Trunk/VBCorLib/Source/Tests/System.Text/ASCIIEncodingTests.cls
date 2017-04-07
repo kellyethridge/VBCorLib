@@ -77,6 +77,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(), NewIntegers()
             Test.Use NewBytes(255, 65, 128, 0), NewIntegers(63, 65, 63, 0)
         
+        Case "GetMaxByteCount_WithEncoderFallbackCharacter_ReturnsExpected"
+            Test.Use "?", 101
+            Test.Use "??", 202
+            Test.Use "", 101
+            
+        Case "GetMaxCharCount_WithDecoderFallbackCharacter_ReturnsExpected"
+            Test.Use "?", 100
+            Test.Use "??", 200
+            Test.Use "", 100
+            
     End Select
 End Sub
 
@@ -267,8 +277,67 @@ Public Sub GetCharsEx_WithSubsetSpecified_ReturnsSubset()
     Assert.That ActualChars, Iz.EqualTo(NewIntegers(0, 50, 51, 0, 0, 0))
 End Sub
 
+Public Sub GetMaxByteCount_WithEncoderFallbackCharacter_ReturnsExpected(ByVal Replacement As String, ByVal Expected As Long)
+    Dim Enc As Encoding
+    Set Enc = Encoding.ASCII.Clone
+    Set Enc.EncoderFallback = Cor.NewEncoderReplacementFallback(Replacement)
+    
+    Dim Actual As Long
+    Actual = Enc.GetMaxByteCount(100)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetMaxCharCount_WithDecoderFallbackCharacter_ReturnsExpected(ByVal Replacement As String, ByVal Expected As Long)
+    Dim Enc As Encoding
+    Set Enc = Encoding.ASCII.Clone
+    Set Enc.DecoderFallback = Cor.NewDecoderReplacementFallback(Replacement)
+    
+    Dim Actual As Long
+    Actual = Enc.GetMaxCharCount(100)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
+Public Sub GetMaxByteCount_WithZero_ReturnsOne()
+    Dim Actual As Long
+    
+    Actual = Encoding.ASCII.GetMaxByteCount(0)
+    
+    Assert.That Actual, Iz.EqualTo(1)
+End Sub
+
+Public Sub GetMaxByteCount_WithTooLargeValue_ThrowsArgumentOutOfRangeException()
+    Dim Enc As Encoding
+    Set Enc = Encoding.ASCII.Clone
+    Set Enc.EncoderFallback = Cor.NewEncoderReplacementFallback("??")
+    
+    On Error Resume Next
+    Enc.GetMaxByteCount &H7FFFFFFE
+    
+    AssertArgumentOutOfRangeException Err, "CharCount"
+End Sub
+
+Public Sub GetMaxCharCount_WithTooLargeValue_ThrowsArgumentOutOfRangeException()
+    Dim Enc As Encoding
+    Set Enc = Encoding.ASCII.Clone
+    Set Enc.DecoderFallback = Cor.NewDecoderReplacementFallback("??")
+    
+    On Error Resume Next
+    Enc.GetMaxCharCount &H7FFFFFFE
+    
+    AssertArgumentOutOfRangeException Err, "ByteCount"
+End Sub
+
+Public Sub Serialization_WithDefaultFallbacks_MaintainsReferenceToDefaults()
+    Dim Enc As New ASCIIEncoding
+    Dim Actual As ASCIIEncoding
+    
+    Set Actual = Persist(Enc)
+    
+    Assert.That Actual.EncoderFallback, Iz.SameAs(EncoderFallback.ReplacementFallback)
+    Assert.That Actual.DecoderFallback, Iz.SameAs(DecoderFallback.ReplacementFallback)
+End Sub
 
 
 

@@ -138,11 +138,11 @@ End Sub
 '   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty DefaultStringProp, mDefaultString, ""
+    mDefaultString = PropBag.ReadProperty(DefaultStringProp, "")
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    mDefaultString = PropBag.ReadProperty(DefaultStringProp, "")
+    PropBag.WriteProperty DefaultStringProp, mDefaultString, ""
 End Sub
 
 
