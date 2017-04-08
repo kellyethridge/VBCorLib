@@ -121,19 +121,19 @@ Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, B
     
     mFlush = Flush
     
-    Encoder_GetByteCount = mEncoding.InternalGetByteCount(Chars, Index, Count, Me)
+    Encoder_GetByteCount = mEncoding.GetByteCountCore(Chars, Index, Count, Me)
 End Function
 
 Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long
     Dim ByteCount As Long
     
     Encoding.ValidateCharRange Chars, CharIndex, CharCount
-    ByteCount = mEncoding.InternalGetByteCount(Chars, CharIndex, CharCount, Me)
+    ByteCount = mEncoding.GetByteCountCore(Chars, CharIndex, CharCount, Me)
     Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
     
     mFlush = Flush
     
-    Encoder_GetBytes = mEncoding.InternalGetBytes(Chars, CharIndex, CharCount, Bytes, ByteIndex, Me)
+    Encoder_GetBytes = mEncoding.GetBytesCore(Chars, CharIndex, CharCount, Bytes, ByteIndex, Me)
 End Function
 
 Private Function Encoder_GetHashCode() As Long
