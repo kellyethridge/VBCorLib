@@ -1,4 +1,4 @@
-Attribute VB_Name = "modPublicFunctions"
+Attribute VB_Name = "HelperFunctions"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -263,12 +263,6 @@ Public Function ReverseByteCopy(ByRef Bytes() As Byte) As Byte()
     
     ReverseByteCopy = Ret
 End Function
-
-'Public Function NewListRange(ByVal Index As Long, ByVal Count As Long) As ListRange
-'    NewListRange.Index = Index
-'    NewListRange.Count = Count
-'End Function
-
 
 
 ''

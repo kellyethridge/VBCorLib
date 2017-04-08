@@ -41,7 +41,7 @@ Private Sub Main()
     InitHelper
     InitWin32Api
     InitPublicFunctions
-    InitcDateTimeHelpers
+    InitGlobalization
     InitEncoding
 End Sub
 
