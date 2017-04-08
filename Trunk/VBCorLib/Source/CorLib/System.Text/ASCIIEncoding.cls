@@ -66,16 +66,36 @@ Private mEncoderFallback    As EncoderFallback
 Private mDecoderFallback    As DecoderFallback
 
 
-
+''
+' Creates a clone of the current Encoding instance.
+'
+' @return A cloned instance of a ASCIIEncoding object.
+' @remarks A cloned instance will have the read-only limitations removed.
+'
 Public Function Clone() As ASCIIEncoding
     Set Clone = New ASCIIEncoding
     Clone.InitClone Me
 End Function
 
+''
+' Returns the current EncoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="EncoderFallback.html">EncoderFallback</a>.
+' @remarks The default will return an instance of <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a>.
+'
 Public Property Get EncoderFallback() As EncoderFallback
     Set EncoderFallback = mEncoderFallback
 End Property
 
+''
+' Sets the <a href="EncoderFallback.html">EncoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
+'
 Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
     If mIsReadOnly Then _
         Error.InvalidOperation InvalidOperation_ReadOnly
@@ -85,10 +105,25 @@ Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
     Set mEncoderFallback = Value
 End Property
 
+''
+' Returns the current DecoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="DecoderFallback.html">DecoderFallback</a>.
+' @remarks The default will return an instance of <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a>.
+'
 Public Property Get DecoderFallback() As DecoderFallback
     Set DecoderFallback = mDecoderFallback
 End Property
 
+''
+' Sets the <a href="DecoderFallback.html">DecoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
+'
 Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
     If mIsReadOnly Then _
         Error.InvalidOperation InvalidOperation_ReadOnly
@@ -442,9 +477,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetEncoder() As Encoder
-    Dim Encoder As New DefaultEncoder
-    Encoder.Init Me
-    Set GetEncoder = Encoder
+    Set GetEncoder = Cor.NewDefaultEncoder(Me)
 End Function
 
 ''
@@ -460,9 +493,7 @@ End Function
 ' @see Encoding
 '
 Public Function GetDecoder() As Decoder
-    Dim Decoder As New DefaultDecoder
-    Decoder.Init Me
-    Set GetDecoder = Decoder
+    Set GetDecoder = Cor.NewDefaultDecoder(Me)
 End Function
 
 ''

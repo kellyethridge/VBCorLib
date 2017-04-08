@@ -271,9 +271,7 @@ Private Function Encoding_GetDecoder() As Decoder
 End Function
 
 Private Function Encoding_GetEncoder() As Encoder
-    Dim Ret As New DefaultEncoder
-    Call Ret.Init(Me)
-    Set Encoding_GetEncoder = Ret
+    Set Encoding_GetEncoder = Cor.NewDefaultEncoder(Me)
 End Function
 
 Private Function Encoding_GetHashCode() As Long
