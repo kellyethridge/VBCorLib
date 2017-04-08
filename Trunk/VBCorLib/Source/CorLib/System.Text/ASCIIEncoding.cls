@@ -149,7 +149,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get BodyName() As String
-    BodyName = "us-ascii"
+    BodyName = Table.BodyName(CodePage)
 End Property
 
 ''
@@ -169,7 +169,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get EncodingName() As String
-    EncodingName = "US-ASCII"
+    EncodingName = Table.EncodingName(CodePage)
 End Property
 
 ''
@@ -179,7 +179,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get HeaderName() As String
-    HeaderName = "us-ascii"
+    HeaderName = Table.HeaderName(CodePage)
 End Property
 
 ''
@@ -189,7 +189,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get IsBrowserDisplay() As Boolean
-    IsBrowserDisplay = False
+    IsBrowserDisplay = Table.IsBrowserDisplay(CodePage)
 End Property
 
 ''
@@ -199,7 +199,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get IsBrowserSave() As Boolean
-    IsBrowserSave = False
+    IsBrowserSave = Table.IsBrowserSave(CodePage)
 End Property
 
 ''
@@ -210,7 +210,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get IsMailNewsDisplay() As Boolean
-    IsMailNewsDisplay = True
+    IsMailNewsDisplay = Table.IsMailNewsDisplay(CodePage)
 End Property
 
 ''
@@ -220,7 +220,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get IsMailNewsSave() As Boolean
-    IsMailNewsSave = True
+    IsMailNewsSave = Table.IsMailNewsSave(CodePage)
 End Property
 
 ''
@@ -230,7 +230,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get WebName() As String
-    WebName = "us-ascii"
+    WebName = Table.WebName(CodePage)
 End Property
 
 ''
@@ -240,7 +240,7 @@ End Property
 ' @see Encoding
 '
 Public Property Get WindowsCodePage() As Long
-    WindowsCodePage = 1252
+    WindowsCodePage = Table.WindowsCodePage(CodePage)
 End Property
 
 ''
@@ -621,7 +621,11 @@ End Sub
 
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get Table() As EncodingTable
+    Set Table = Statics.Encoding.EncodingTable
+End Property
+
 Private Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
     Dim i           As Long
     Dim Ch          As Integer
