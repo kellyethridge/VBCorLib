@@ -163,16 +163,16 @@ End Property
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim Chrs()  As Integer
-    Dim Range   As ListRange
+    Dim LocalChars()    As Integer
+    Dim Range           As ListRange
     
     On Error GoTo Catch
     
-    Chrs = AsChars(Chars)
-    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
+    LocalChars = AsChars(Chars)
+    Range = ValidateGetBytes(LocalChars, Index, Count)
     
     If Range.Count > 0 Then
-        GetByteCount = InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing)
+        GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
     End If
     
     GoSub Finally
@@ -182,7 +182,7 @@ Catch:
     GoSub Finally
     Throw
 Finally:
-    FreeChars Chrs
+    FreeChars LocalChars
     Return
 End Function
 
@@ -198,18 +198,18 @@ End Function
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Dim Range       As ListRange
-    Dim Chrs()      As Integer
-    Dim Output()    As Byte
+    Dim Range           As ListRange
+    Dim LocalChars()    As Integer
+    Dim Output()        As Byte
     
     On Error GoTo Catch
     
-    Chrs = AsChars(Chars)
-    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
+    LocalChars = AsChars(Chars)
+    Range = ValidateGetBytes(LocalChars, Index, Count)
     
     If Range.Count > 0 Then
-        ReDim Output(0 To InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing) - 1)
-        InternalGetBytes Chrs, Range.Index, Range.Count, Output, 0, Nothing
+        ReDim Output(0 To GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing) - 1)
+        GetBytesCore LocalChars, Range.Index, Range.Count, Output, 0, Nothing
         GetBytes = Output
     Else
         GetBytes = Cor.NewBytes()
@@ -222,7 +222,7 @@ Catch:
     GoSub Finally
     Throw
 Finally:
-    FreeChars Chrs
+    FreeChars LocalChars
     Return
 End Function
 
@@ -243,19 +243,16 @@ End Function
 ' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    Dim Chrs()      As Integer
-    Dim Range       As ListRange
-    Dim ByteCount   As Long
+    Dim LocalChars()    As Integer
+    Dim Range           As ListRange
+    Dim ByteCount       As Long
     
-    Chrs = AsChars(Chars)
+    LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
     
-    Statics.Encoding.ValidateCharRange Chrs, CharIndex, CharCount
-    ByteCount = InternalGetByteCount(Chrs, CharIndex, CharCount, Nothing)
-    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
-    
-    GetBytesEx = InternalGetBytes(Chrs, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
+    ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
+    GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
     
     GoSub Finally
     Exit Function
@@ -264,7 +261,7 @@ Catch:
     GoSub Finally
     Throw
 Finally:
-    FreeChars Chrs
+    FreeChars LocalChars
     Return
 End Function
 
@@ -282,7 +279,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     Dim Result  As String
     Dim Output() As Integer
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    Range = ValidateGetChars(Bytes, Index, Count)
     Size = GetMaxCharCount(Range.Count)
     Result = SysAllocStringLen(0, Size)
     Output = AllocChars(Result)
@@ -308,9 +305,9 @@ End Function
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    Range = ValidateGetChars(Bytes, Index, Count)
     
-    GetCharCount = InternalGetCharCount(Bytes, Range.Index, Range.Count)
+    GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
 End Function
 
 ''
@@ -325,13 +322,13 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     Dim Range       As ListRange
     Dim Output()    As Integer
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    Range = ValidateGetChars(Bytes, Index, Count)
     
     If Range.Count > 0 Then
         ReDim Output(0 To GetMaxCharCount(Range.Count))
         
         Dim Size As Long
-        Size = InternalGetChars(Bytes, Range.Index, Range.Count, Output, 0, Nothing)
+        Size = GetCharsCore(Bytes, Range.Index, Range.Count, Output, 0, Nothing)
         If Size <> UBound(Output) + 1 Then
             ReDim Preserve Output(0 To Size - 1)
         End If
@@ -356,13 +353,8 @@ End Function
 ' GetMaxCharCount to determine a size that will hold the decoded bytes.
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim CharCount As Long
-    
-    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
-    CharCount = InternalGetCharCount(Bytes, ByteIndex, ByteCount)
-    Statics.Encoding.ValidateCharRange Chars, CharIndex, CharCount
-    
-    GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Nothing)
+    ValidateGetCharsEx Bytes, ByteIndex, ByteCount, Chars, CharIndex
+    GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Nothing)
 End Function
 
 ''
@@ -512,7 +504,7 @@ Friend Property Get AllowOptionals() As Boolean
     AllowOptionals = mAllowOptionals
 End Property
 
-Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF7Encoder) As Long
+Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF7Encoder) As Long
     Dim Bits                As Long
     Dim BitCount            As Long
     Dim maxCharIndex        As Long
@@ -636,10 +628,10 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal Index As Long, 
         End With
     End If
     
-    InternalGetBytes = ByteIndex - ByteStartIndex
+    GetBytesCore = ByteIndex - ByteStartIndex
 End Function
 
-Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF7Encoder) As Long
+Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF7Encoder) As Long
     Dim BitCount            As Long
     Dim maxCharIndex        As Long
     Dim Ch                  As Long
@@ -708,10 +700,10 @@ Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Lo
         BitCount = -1
     End If
     
-    InternalGetByteCount = ByteIndex
+    GetByteCountCore = ByteIndex
 End Function
 
-Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
+Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
     Dim InBase64    As Boolean
     Dim MaxIndex    As Long
     Dim CharCount   As Long
@@ -743,10 +735,10 @@ Friend Function InternalGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long,
         Index = Index + 1
     Loop
     
-    InternalGetCharCount = Int(Bits / 16) + CharCount
+    GetCharCountCore = Int(Bits / 16) + CharCount
 End Function
 
-Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF7Decoder) As Long
+Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF7Decoder) As Long
     Dim Bits            As Long
     Dim BitCount        As Long
     Dim b               As Byte
@@ -864,7 +856,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         Decoder.InBase64 = InBase64
     End If
     
-    InternalGetChars = CharIndex - CharStartIndex
+    GetCharsCore = CharIndex - CharStartIndex
 End Function
 
 

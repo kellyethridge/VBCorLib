@@ -132,10 +132,10 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
     Dim CharCount As Long
     
     Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
-    CharCount = mEncoding.InternalGetCharCount(Bytes, ByteIndex, ByteCount)
+    CharCount = mEncoding.GetCharCountCore(Bytes, ByteIndex, ByteCount)
     Encoding.ValidateCharRange Chars, CharIndex, CharCount
     
-    Decoder_GetChars = mEncoding.InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
+    Decoder_GetChars = mEncoding.GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
 
 Private Sub Decoder_Reset()
