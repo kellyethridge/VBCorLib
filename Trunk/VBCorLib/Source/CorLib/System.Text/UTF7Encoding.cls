@@ -507,11 +507,11 @@ End Property
 Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF7Encoder) As Long
     Dim Bits                As Long
     Dim BitCount            As Long
-    Dim maxCharIndex        As Long
+    Dim MaxCharIndex        As Long
     Dim MaxByteIndex        As Long
     Dim Ch                  As Long
     Dim ByteStartIndex      As Long
-    Dim directlyEncodable   As Boolean
+    Dim DirectlyEncodable   As Boolean
     
     
     If Not Encoder Is Nothing Then
@@ -524,11 +524,11 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVa
     End If
     
     ByteStartIndex = ByteIndex
-    maxCharIndex = Index + Count - 1
+    MaxCharIndex = Index + Count - 1
     MaxByteIndex = UBound(Bytes)
-    Do While Index <= maxCharIndex
+    Do While Index <= MaxCharIndex
         AsWord(Ch) = Chars(Index)
-        directlyEncodable = False
+        DirectlyEncodable = False
         If Ch < &H80 Then
             If mDirectlyEncodable(Ch) Then
                 If BitCount >= 0 Then
@@ -554,10 +554,10 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVa
                 Bytes(ByteIndex) = Ch
                 ByteIndex = ByteIndex + 1
                 BitCount = -1
-                directlyEncodable = True
+                DirectlyEncodable = True
             End If
         End If
-        If Not directlyEncodable Then
+        If Not DirectlyEncodable Then
             If Ch = vbPlusChar And BitCount < 0 Then
                 If ByteIndex > MaxByteIndex Then
                     SmallBufferError "Bytes"
@@ -633,9 +633,9 @@ End Function
 
 Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF7Encoder) As Long
     Dim BitCount            As Long
-    Dim maxCharIndex        As Long
+    Dim MaxCharIndex        As Long
     Dim Ch                  As Long
-    Dim directlyEncodable   As Boolean
+    Dim DirectlyEncodable   As Boolean
     Dim ByteIndex           As Long
     
     If Not Encoder Is Nothing Then
@@ -644,10 +644,10 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
         BitCount = -1
     End If
     
-    maxCharIndex = Index + Count - 1
-    Do While Index <= maxCharIndex
+    MaxCharIndex = Index + Count - 1
+    Do While Index <= MaxCharIndex
         AsWord(Ch) = Chars(Index)
-        directlyEncodable = False
+        DirectlyEncodable = False
         
         If Ch < &H80 Then
             If mDirectlyEncodable(Ch) Then
@@ -661,10 +661,10 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
                 
                 ByteIndex = ByteIndex + 1
                 BitCount = -1
-                directlyEncodable = True
+                DirectlyEncodable = True
             End If
         End If
-        If Not directlyEncodable Then
+        If Not DirectlyEncodable Then
             If Ch = vbPlusChar And BitCount < 0 Then
                 ByteIndex = ByteIndex + 2
             Else
@@ -745,7 +745,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     Dim InBase64        As Boolean
     Dim HasPlus         As Boolean
     Dim CharStartIndex  As Long
-    Dim maxCharIndex    As Long
+    Dim MaxCharIndex    As Long
     Dim MaxByteIndex    As Long
     
     If Not Decoder Is Nothing Then
@@ -758,7 +758,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     End If
     
     CharStartIndex = CharIndex
-    maxCharIndex = UBound(Chars)
+    MaxCharIndex = UBound(Chars)
     MaxByteIndex = ByteIndex + ByteCount - 1
     Do While ByteIndex <= MaxByteIndex
         b = Bytes(ByteIndex)
@@ -766,7 +766,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
         Select Case b
             Case vbMinusChar
                 If HasPlus Then
-                    If CharIndex > maxCharIndex Then
+                    If CharIndex > MaxCharIndex Then
                         SmallBufferError "Chars"
                     End If
                     
@@ -777,7 +777,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                     Bits = 0
                     InBase64 = False
                 Else
-                    If CharIndex > maxCharIndex Then
+                    If CharIndex > MaxCharIndex Then
                         SmallBufferError "Chars"
                     End If
                     
@@ -803,7 +803,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                         Bits = (Bits * &H40) Or Base64CharToBits(b)
                         BitCount = BitCount + 6
                     Else
-                        If CharIndex > maxCharIndex Then
+                        If CharIndex > MaxCharIndex Then
                             SmallBufferError "Chars"
                         End If
                         
@@ -814,7 +814,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                         InBase64 = False
                     End If
                 Else
-                    If CharIndex > maxCharIndex Then
+                    If CharIndex > MaxCharIndex Then
                         SmallBufferError "Chars"
                     End If
                     
@@ -824,7 +824,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 
                 HasPlus = False
             Case Else
-                If CharIndex > maxCharIndex Then
+                If CharIndex > MaxCharIndex Then
                     SmallBufferError "Chars"
                 End If
                 
@@ -836,7 +836,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 HasPlus = False
         End Select
         If BitCount >= 16 Then
-            If CharIndex > maxCharIndex Then
+            If CharIndex > MaxCharIndex Then
                 SmallBufferError "Chars"
             End If
             

@@ -16,9 +16,29 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 Implements ICategorizable
+Implements ITestCaseSource
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Text"
+End Sub
+
+Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
+    Select Case Test.MethodName
+        Case "GetByteCount_WithValues_ReturnsExpected"
+            Test.Use t("A\x2262\x0391."), 10
+            Test.Use t("Hi Mom -\x263A-!"), 19
+            Test.Use t("\x65E5\x672C\x8A9E"), 10
+            Test.Use t("Hi Mom \x263A!"), 15
+            
+    End Select
+End Sub
+
+Public Sub GetByteCount_WithValues_ReturnsExpected(ByRef s As String, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = Encoding.UTF7.GetByteCount(s)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub IsBrowswerDisplay_WhenCalled_ReturnsFalse()
@@ -271,6 +291,7 @@ Public Sub GetCharCount_WithValue_ReturnsExpected()
     Decoded = Encoding.UTF7.GetString(Bytes)
     Assert.That Decoded, Iz.EqualTo(Original)
 End Sub
+
 
 
 
