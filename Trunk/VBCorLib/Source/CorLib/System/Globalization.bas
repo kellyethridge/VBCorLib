@@ -1,4 +1,4 @@
-Attribute VB_Name = "CorDateTimeShared"
+Attribute VB_Name = "Globalization"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -20,11 +20,7 @@ Attribute VB_Name = "CorDateTimeShared"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: CorDateTimeShared
-'
-
-''
-' Provides some common functions for the CorDateTime class.
+' Module: Globalization
 '
 Option Explicit
 
@@ -42,10 +38,7 @@ Public DaysToMonthLeapYear()    As Long
 Public DaysToMonth()            As Long
 
 
-''
-' Initialize the values used by the CorDateTime class.
-'
-Public Sub InitcDateTimeHelpers()
+Public Sub InitGlobalization()
     DaysToMonth = Cor.NewLongs(0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365)
     DaysToMonthLeapYear = Cor.NewLongs(0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366)
 End Sub

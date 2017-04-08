@@ -1,4 +1,4 @@
-Attribute VB_Name = "RandomShared"
+Attribute VB_Name = "Randomization"
 'The MIT License (MIT)
 'Copyright (c) 2015 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "RandomShared"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: RandomShared
+' Module: Randomization
 '
 Option Explicit
 
