@@ -34,26 +34,6 @@ Public Type ListRange
     Count As Long
 End Type
 
-
-''
-' Converts only supported data types to a Long.
-' The supported data types are:
-'
-'       Long
-'       Integer
-'       Byte
-'
-' Any other data type will throw an exception.
-'
-Public Function CLong(ByRef Value As Variant) As Long
-    Select Case VarType(Value)
-        Case vbLong, vbInteger, vbByte
-            CLong = Value
-        Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(InvalidCast_FromTo, TypeName(Value), "Long"))
-    End Select
-End Function
-
 ''
 ' Returns an optional value or a default value if the optional value is missing.
 '
