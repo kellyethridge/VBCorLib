@@ -273,7 +273,7 @@ Friend Sub Init(ByVal Major As Long, ByVal Minor As Long, ByRef Build As Variant
     mMinor = Minor
     
     If Not IsMissing(Build) Then
-        mBuild = CLong(Build)
+        mBuild = Build
         
         If mBuild < 0 Then
             Error.ArgumentOutOfRange "Build", ArgumentOutOfRange_NeedNonNegNum
@@ -281,7 +281,7 @@ Friend Sub Init(ByVal Major As Long, ByVal Minor As Long, ByRef Build As Variant
     End If
     
     If Not IsMissing(Revision) Then
-        mRevision = CLong(Revision)
+        mRevision = Revision
         
         If mBuild = UnsetComponent Then _
             Error.Argument Argument_ParamRequired, "Build"
