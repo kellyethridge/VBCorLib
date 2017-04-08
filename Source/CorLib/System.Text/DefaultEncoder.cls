@@ -38,8 +38,9 @@ Option Explicit
 Implements IObject
 Implements Encoder
 
-Private mEncoding As Encoding
-Private mLastChar As Integer
+Private mEncoding       As Encoding
+Private mFallback       As EncoderFallback
+Private mFallbackBuffer As EncoderFallbackBuffer
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -47,6 +48,7 @@ Private mLastChar As Integer
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Encoding As Encoding)
     Set mEncoding = Encoding
+    Set mFallback = Encoding.EncoderFallback
 End Sub
 
 
@@ -70,19 +72,32 @@ End Function
 '   Encoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Encoder_Convert(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByVal Flush As Boolean, CharsUsed As Long, BytesUsed As Long, Completed As Boolean)
-
+    modEncoding.EncoderConvert mEncoding, Chars, CharIndex, CharCount, Bytes, ByteIndex, bytescount, Flush, CharsUsed, BytesUsed, Completed
 End Sub
 
-Private Property Set Encoder_Fallback(ByVal RHS As EncoderFallback)
-
+Private Property Set Encoder_Fallback(ByVal Value As EncoderFallback)
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    If Not mFallbackBuffer Is Nothing Then
+        If mFallbackBuffer.Remaining > 0 Then
+            Error.Argument Argument_FallbackBufferNotEmpty, "Value"
+        End If
+    End If
+    
+    Set mFallback = Value
+    Set mFallbackBuffer = Nothing
 End Property
 
 Private Property Get Encoder_Fallback() As EncoderFallback
-
+    Set Encoder_Fallback = mFallback
 End Property
 
 Private Property Get Encoder_FallbackBuffer() As EncoderFallbackBuffer
-
+    If mFallbackBuffer Is Nothing Then
+        Set mFallbackBuffer = mFallback.CreateFallbackBuffer
+    End If
+    
+    Set Encoder_FallbackBuffer = mFallbackBuffer
 End Property
 
 Private Function Encoder_Equals(Value As Variant) As Boolean
@@ -102,7 +117,9 @@ Private Function Encoder_GetHashCode() As Long
 End Function
 
 Private Sub Encoder_Reset()
-
+    If Not mFallbackBuffer Is Nothing Then
+        mFallbackBuffer.Reset
+    End If
 End Sub
 
 Private Function Encoder_ToString() As String

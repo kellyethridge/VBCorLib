@@ -1890,4 +1890,8 @@ Friend Function NewDefaultDecoder(ByVal Encoding As Encoding) As DefaultDecoder
     NewDefaultDecoder.Init Encoding
 End Function
 
+Friend Function NewDefaultEncoder(ByVal Encoding As Encoding) As DefaultEncoder
+    Set NewDefaultEncoder = New DefaultEncoder
+    NewDefaultEncoder.Init Encoding
+End Function
 
