@@ -148,20 +148,24 @@ End Function
 ''
 ' Returns an encoding for a specified codepage.
 '
-' @param CodePageOrName The codepage number or name to encoding with.
+' @param CodePageOrName The codepage number or name to encode with.
 ' @return An encoding for a specific codepage or name.
 '
 Public Function GetEncoding(ByRef CodePageOrName As Variant) As Encoding
     Dim cp As Long
     
     Select Case VarType(CodePageOrName)
-        Case vbString:                      cp = mEncodingTable.GetCodePage(CodePageOrName)
-        Case vbLong, vbInteger, vbByte:     cp = CodePageOrName
+        Case vbString
+            cp = mEncodingTable.GetCodePage(CStr(CodePageOrName))
+        Case vbLong, vbInteger, vbByte
+            cp = CodePageOrName
         Case Else
             Throw Cor.NewArgumentException("A Code Page or Encoding Name is required.", "CodePageOrName")
     End Select
     
-    If cp = 0 Then cp = GetACP
+    If cp = 0 Then
+        cp = GetACP
+    End If
     
     Select Case cp
         Case 1200:      Set GetEncoding = Me.Unicode
@@ -174,7 +178,7 @@ Public Function GetEncoding(ByRef CodePageOrName As Variant) As Encoding
                 Set GetEncoding = mEncodings(cp)
             Else
                 Set GetEncoding = NewCodePageEncoding(cp)
-                Call mEncodings.Add(cp, GetEncoding)
+                mEncodings.Add cp, GetEncoding
             End If
     End Select
 End Function
@@ -185,7 +189,7 @@ End Function
 ' @return An array of classes containing a minimal of information.
 '
 Public Function GetEncodings() As EncodingInfo()
-    GetEncodings = EncodingTable.GetEncodings
+    GetEncodings = mEncodingTable.GetEncodings
 End Function
 
 ''

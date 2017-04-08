@@ -67,7 +67,7 @@ End Property
 ' @return The body tag compatible encoding name.
 '
 Public Property Get BodyName() As String
-    BodyName = "utf-7"
+    BodyName = Table.BodyName(CodePage)
 End Property
 
 ''
@@ -76,7 +76,7 @@ End Property
 ' @return The registered encoding name.
 '
 Public Property Get WebName() As String
-    WebName = "utf-7"
+    WebName = Table.WebName(CodePage)
 End Property
 
 ''
@@ -85,7 +85,7 @@ End Property
 ' @return The header tag compatible encoding name.
 '
 Public Property Get HeaderName() As String
-    HeaderName = "utf-7"
+    HeaderName = Table.HeaderName(CodePage)
 End Property
 
 ''
@@ -103,7 +103,7 @@ End Property
 ' @return The Windows code page for this encoding.
 '
 Public Property Get WindowsCodePage() As Long
-    WindowsCodePage = 1200
+    WindowsCodePage = Table.WindowsCodePage(CodePage)
 End Property
 
 ''
@@ -112,7 +112,7 @@ End Property
 ' @return The encoding's name.
 '
 Public Property Get EncodingName() As String
-    EncodingName = "Unicode (UTF-7)"
+    EncodingName = Table.EncodingName(CodePage)
 End Property
 
 ''
@@ -121,7 +121,7 @@ End Property
 ' @return The indication for browser display capable.
 '
 Public Property Get IsBrowserDisplay() As Boolean
-    IsBrowserDisplay = False
+    IsBrowserDisplay = Table.IsBrowserDisplay(CodePage)
 End Property
 
 ''
@@ -130,7 +130,7 @@ End Property
 ' @return The indication for the browser saving capable.
 '
 Public Property Get IsBrowserSave() As Boolean
-    IsBrowserSave = False
+    IsBrowserSave = Table.IsBrowserSave(CodePage)
 End Property
 
 ''
@@ -140,7 +140,7 @@ End Property
 ' @return Indication for mail and news client capable.
 '
 Public Property Get IsMailNewsDisplay() As Boolean
-    IsMailNewsDisplay = True
+    IsMailNewsDisplay = Table.IsMailNewsDisplay(CodePage)
 End Property
 
 ''
@@ -149,7 +149,7 @@ End Property
 ' @return Indication for the mail and news clients to use this encoding for saving.
 '
 Public Property Get IsMailNewsSave() As Boolean
-    IsMailNewsSave = True
+    IsMailNewsSave = Table.IsMailNewsSave(CodePage)
 End Property
 
 ''
@@ -499,6 +499,14 @@ Private Sub Class_Initialize()
         mDirectlyEncodable(Choose(i, 9, 10, 13, 32, 39, 40, 41, 44, 45, 46, 47, 58, 63)) = True
     Next i
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Property Get Table() As EncodingTable
+    Set Table = Statics.Encoding.EncodingTable
+End Property
 
 Friend Property Get AllowOptionals() As Boolean
     AllowOptionals = mAllowOptionals

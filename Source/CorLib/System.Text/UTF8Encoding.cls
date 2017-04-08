@@ -76,7 +76,7 @@ End Property
 ' @return The body tag compatible encoding name.
 '
 Public Property Get BodyName() As String
-    BodyName = "utf-8"
+    BodyName = Table.BodyName(CodePage)
 End Property
 
 ''
@@ -85,7 +85,7 @@ End Property
 ' @return The registered encoding name.
 '
 Public Property Get WebName() As String
-    WebName = "utf-8"
+    WebName = Table.WebName(CodePage)
 End Property
 
 ''
@@ -94,7 +94,7 @@ End Property
 ' @return The header tag compatible encoding name.
 '
 Public Property Get HeaderName() As String
-    HeaderName = "utf-8"
+    HeaderName = Table.HeaderName(CodePage)
 End Property
 
 ''
@@ -112,7 +112,7 @@ End Property
 ' @return The Windows code page for this encoding.
 '
 Public Property Get WindowsCodePage() As Long
-    WindowsCodePage = 1200
+    WindowsCodePage = Table.WindowsCodePage(CodePage)
 End Property
 
 ''
@@ -121,7 +121,7 @@ End Property
 ' @return The encoding's name.
 '
 Public Property Get EncodingName() As String
-    EncodingName = "Unicode (UTF-8)"
+    EncodingName = Table.EncodingName(CodePage)
 End Property
 
 ''
@@ -130,7 +130,7 @@ End Property
 ' @return The indication for browser display capable.
 '
 Public Property Get IsBrowserDisplay() As Boolean
-    IsBrowserDisplay = True
+    IsBrowserDisplay = Table.IsBrowserDisplay(CodePage)
 End Property
 
 ''
@@ -139,7 +139,7 @@ End Property
 ' @return The indication for the browser saving capable.
 '
 Public Property Get IsBrowserSave() As Boolean
-    IsBrowserSave = True
+    IsBrowserSave = Table.IsBrowserSave(CodePage)
 End Property
 
 ''
@@ -149,7 +149,7 @@ End Property
 ' @return Indication for mail and news client capable.
 '
 Public Property Get IsMailNewsDisplay() As Boolean
-    IsMailNewsDisplay = True
+    IsMailNewsDisplay = Table.IsMailNewsDisplay(CodePage)
 End Property
 
 ''
@@ -158,7 +158,7 @@ End Property
 ' @return Indication for the mail and news clients to use this encoding for saving.
 '
 Public Property Get IsMailNewsSave() As Boolean
-    IsMailNewsSave = True
+    IsMailNewsSave = Table.IsMailNewsSave(CodePage)
 End Property
 
 ''
@@ -896,6 +896,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get Table() As EncodingTable
+    Set Table = Statics.Encoding.EncodingTable
+End Property
+
 Private Sub SmallBufferError(ByRef ParamName As String)
     Error.ArgumentOutOfRange ParamName, Argument_SmallConversionBuffer
 End Sub
