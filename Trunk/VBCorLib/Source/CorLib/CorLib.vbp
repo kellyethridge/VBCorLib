@@ -361,6 +361,8 @@ Class=EncoderExceptionFallbackBuffer; System.Text\EncoderExceptionFallbackBuffer
 Class=EncoderExceptionFallback; System.Text\EncoderExceptionFallback.cls
 Class=EncoderFallbackStatic; System.Text\EncoderFallbackStatic.cls
 Class=UnicodeEncoder; System.Text\UnicodeEncoder.cls
+Class=UTF7DecoderFallback; System.Text\UTF7DecoderFallback.cls
+Class=UTF7DecoderFallbackBuffer; System.Text\UTF7DecoderFallbackBuffer.cls
 ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
@@ -403,7 +405,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=1
+Num=2
 
 [TASK1]
 Description=Make Encodings read-only capable.
@@ -412,10 +414,10 @@ Priority=1
 Comment=Encodings are read-only by default. Cloning an Encoding returns a read-write version.
 
 [TASK2]
-Description=
-Status=
-Priority=
-Comment=
+Description=Fix StringBuilder.AppendChar
+Status=0
+Priority=1
+Comment=Update method to convert Char to Integer.
 AssignedTo=
 
 [TASK3]

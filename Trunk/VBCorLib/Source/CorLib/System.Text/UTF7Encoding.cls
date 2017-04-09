@@ -49,9 +49,92 @@ Option Explicit
 Implements IObject
 Implements Encoding
 
-Private mDirectlyEncodable()    As Boolean
-Private mAllowOptionals         As Boolean
+Private Const EncodableCharacters   As String = "\t\n\r '(),-./0123456789:?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+Private Const OptionalCharacters    As String = "!""#$%&*;<=>@[]^_`{|}"
 
+Private mIsReadOnly                     As Boolean
+Private mDirectlyEncodable(0 To 127)    As Boolean
+Private mAllowOptionals                 As Boolean
+Private mDecoderFallback                As DecoderFallback
+Private mEncoderFallback                As EncoderFallback
+
+
+
+''
+' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
+'
+' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
+'
+Public Property Get IsReadOnly() As Boolean
+    IsReadOnly = mIsReadOnly
+End Property
+
+''
+' Creates a clone of the current Encoding instance.
+'
+' @return A cloned instance of a <a href="UTF7Encoding.html">UTF7Encoding</a> object.
+' @remarks A cloned instance will have the read-only limitations removed.
+'
+Public Function Clone() As UTF7Encoding
+    Set Clone = New UTF7Encoding
+    Clone.InitClone mAllowOptionals
+End Function
+
+''
+' Returns the current EncoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="EncoderFallback.html">EncoderFallback</a>.
+' @remarks The default will return an instance of <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a>.
+'
+Public Property Get EncoderFallback() As EncoderFallback
+    Set EncoderFallback = mEncoderFallback
+End Property
+
+''
+' Sets the <a href="EncoderFallback.html">EncoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
+'
+Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mEncoderFallback = Value
+End Property
+
+''
+' Returns the current DecoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="DecoderFallback.html">DecoderFallback</a>.
+' @remarks The default will return an instance of <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a>.
+'
+Public Property Get DecoderFallback() As DecoderFallback
+    Set DecoderFallback = mDecoderFallback
+End Property
+
+''
+' Sets the <a href="DecoderFallback.html">DecoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
+'
+Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+        
+    Set mDecoderFallback = Value
+End Property
 
 ''
 ' Returns if the current encoding uses single-byte code points.
@@ -275,23 +358,24 @@ End Function
 '
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Range   As ListRange
-    Dim Size    As Long
-    Dim Result  As String
     Dim Output() As Integer
     
     Range = ValidateGetChars(Bytes, Index, Count)
-    Size = GetMaxCharCount(Range.Count)
-    Result = SysAllocStringLen(0, Size)
-    Output = AllocChars(Result)
-    Size = GetCharsEx(Bytes, Range.Index, Range.Count, Output, 0)
+    GetString = SysAllocStringLen(0, GetCharCountCore(Bytes, Range.Index, Range.Count))
+    Output = AllocChars(GetString)
     
-    If Len(Result) <> Size Then
-        GetString = Left$(Result, Size)
-    Else
-        GetString = Result
-    End If
+    On Error GoTo Catch
+    GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
     
+    GoSub Finally
+    Exit Function
+
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
     FreeChars Output
+    Return
 End Function
 
 ''
@@ -325,13 +409,8 @@ Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant,
     Range = ValidateGetChars(Bytes, Index, Count)
     
     If Range.Count > 0 Then
-        ReDim Output(0 To GetMaxCharCount(Range.Count))
-        
-        Dim Size As Long
-        Size = GetCharsCore(Bytes, Range.Index, Range.Count, Output, 0, Nothing)
-        If Size <> UBound(Output) + 1 Then
-            ReDim Preserve Output(0 To Size - 1)
-        End If
+        ReDim Output(0 To GetCharCountCore(Bytes, Range.Index, Range.Count) - 1)
+        GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
     Else
         Output = Cor.NewIntegers()
     End If
@@ -440,17 +519,13 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        If Value Is Nothing Then
-            Exit Function
-        End If
-        
-        If TypeOf Value Is UTF7Encoding Then
-            Dim Other As UTF7Encoding
-            Set Other = Value
-            Equals = (Other.AllowOptionals = mAllowOptionals)
-        End If
-    End If
+    Dim Other As UTF7Encoding
+    
+    On Error GoTo Catch
+    Set Other = Value
+    Equals = (Other.AllowOptionals = mAllowOptionals)
+    
+Catch:
 End Function
 
 ''
@@ -466,37 +541,42 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal AllowOptionals As Boolean)
-    Dim i As Long
-    
     If AllowOptionals Then
-        For i = 1 To 20
-            mDirectlyEncodable(Choose(i, 33, 34, 35, 36, 37, 38, 42, 59, 60, 61, 62, 64, 91, 93, 94, 95, 96, 123, 124, 125)) = True
-        Next i
+        InitEncodable OptionalCharacters
+        mAllowOptionals = True
     End If
-    mAllowOptionals = AllowOptionals
+End Sub
+
+Friend Sub InitClone(ByVal AllowOptionals As Boolean)
+    Init AllowOptionals
+    mIsReadOnly = False
 End Sub
 
 Private Sub Class_Initialize()
-    Dim i As Long
-    
-    ReDim mDirectlyEncodable(0 To 127)
-    For i = 0 To 25
-        mDirectlyEncodable(65 + i) = True
-        mDirectlyEncodable(97 + i) = True
-    Next i
-    For i = 0 To 9
-        mDirectlyEncodable(48 + i) = True
-    Next i
-    For i = 1 To 13
-        mDirectlyEncodable(Choose(i, 9, 10, 13, 32, 39, 40, 41, 44, 45, 46, 47, 58, 63)) = True
-    Next i
+    InitEncodable Funcs.t(EncodableCharacters)
+    Set mEncoderFallback = Cor.NewEncoderReplacementFallback("")
+    Set mDecoderFallback = New UTF7DecoderFallback
+    mIsReadOnly = True
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Property Get Table() As EncodingTable
+Private Sub InitEncodable(ByRef s As String)
+    Dim i       As Long
+    Dim Chars() As Integer
+    
+    Chars = AllocChars(s)
+    
+    For i = 0 To UBound(Chars)
+        mDirectlyEncodable(Chars(i)) = True
+    Next
+    
+    FreeChars Chars
+End Sub
+
+Private Property Get Table() As EncodingTable
     Set Table = Statics.Encoding.EncodingTable
 End Property
 
@@ -504,7 +584,7 @@ Friend Property Get AllowOptionals() As Boolean
     AllowOptionals = mAllowOptionals
 End Property
 
-Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByRef Encoder As UTF7Encoder) As Long
+Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UTF7Encoder) As Long
     Dim Bits                As Long
     Dim BitCount            As Long
     Dim MaxCharIndex        As Long
@@ -512,8 +592,7 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVa
     Dim Ch                  As Long
     Dim ByteStartIndex      As Long
     Dim DirectlyEncodable   As Boolean
-    
-    
+        
     If Not Encoder Is Nothing Then
         With Encoder
             Bits = .Bits
@@ -526,30 +605,31 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVa
     ByteStartIndex = ByteIndex
     MaxCharIndex = Index + Count - 1
     MaxByteIndex = UBound(Bytes)
+    
     Do While Index <= MaxCharIndex
-        AsWord(Ch) = Chars(Index)
+        Ch = Chars(Index) And &HFFFF&
         DirectlyEncodable = False
+        
         If Ch < &H80 Then
             If mDirectlyEncodable(Ch) Then
                 If BitCount >= 0 Then
                     If BitCount > 0 Then
-                        If ByteIndex > MaxByteIndex Then
-                            SmallBufferError "Bytes"
-                        End If
+                        If ByteIndex > MaxByteIndex Then _
+                            ThrowEncoderSmallConversionBuffer
                         
-                        Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - BitCount) And &H3F)
+                        Bytes(ByteIndex) = Base64Bytes((Bits * Powers(6 - BitCount)) And &H3F)
                         ByteIndex = ByteIndex + 1
                     End If
-                    If ByteIndex > MaxByteIndex Then
-                        SmallBufferError "Bytes"
-                    End If
+                    
+                    If ByteIndex > MaxByteIndex Then _
+                        ThrowEncoderSmallConversionBuffer
                     
                     Bytes(ByteIndex) = vbMinusChar
                     ByteIndex = ByteIndex + 1
                 End If
-                If ByteIndex > MaxByteIndex Then
-                    SmallBufferError "Bytes"
-                End If
+                
+                If ByteIndex > MaxByteIndex Then _
+                    ThrowEncoderSmallConversionBuffer
                 
                 Bytes(ByteIndex) = Ch
                 ByteIndex = ByteIndex + 1
@@ -557,38 +637,38 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVa
                 DirectlyEncodable = True
             End If
         End If
+        
         If Not DirectlyEncodable Then
             If Ch = vbPlusChar And BitCount < 0 Then
-                If ByteIndex > MaxByteIndex Then
-                    SmallBufferError "Bytes"
-                End If
+                If ByteIndex > MaxByteIndex Then _
+                    ThrowEncoderSmallConversionBuffer
                 
                 Bytes(ByteIndex) = vbPlusChar
                 Bytes(ByteIndex + 1) = vbMinusChar
                 ByteIndex = ByteIndex + 2
             Else
                 If BitCount < 0 Then
-                    If ByteIndex > MaxByteIndex Then
-                        SmallBufferError "Bytes"
-                    End If
+                    If ByteIndex > MaxByteIndex Then _
+                        ThrowEncoderSmallConversionBuffer
                     
                     Bytes(ByteIndex) = vbPlusChar
                     ByteIndex = ByteIndex + 1
                     BitCount = 0
                 End If
                 
-                Bits = (Bits * &H10000) Or Ch
+                Bits = (Bits * vbShift16Bits) Or Ch
                 BitCount = BitCount + 16
                 
                 Do While BitCount >= 6
                     BitCount = BitCount - 6
-                    If ByteIndex > MaxByteIndex Then
-                        SmallBufferError "Bytes"
-                    End If
                     
-                    Bytes(ByteIndex) = Base64Bytes(Helper.ShiftRight(Bits, BitCount) And &H3F)
+                    If ByteIndex > MaxByteIndex Then _
+                        ThrowEncoderSmallConversionBuffer
+                    
+                    Bytes(ByteIndex) = Base64Bytes((Bits \ (Powers(BitCount))) And &H3F)
                     ByteIndex = ByteIndex + 1
                 Loop
+                
                 Bits = Bits And (Powers(BitCount) - 1)
             End If
         End If
@@ -605,16 +685,15 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal Index As Long, ByVa
     
     If Flush And (BitCount >= 0) Then
         If BitCount > 0 Then
-            If ByteIndex > MaxByteIndex Then
-                SmallBufferError "Bytes"
-            End If
+            If ByteIndex > MaxByteIndex Then _
+                ThrowEncoderSmallConversionBuffer
             
-            Bytes(ByteIndex) = Base64Bytes(Helper.ShiftLeft(Bits, 6 - BitCount) And &H3F)
+            Bytes(ByteIndex) = Base64Bytes((Bits * Powers(6 - BitCount)) And &H3F)
             ByteIndex = ByteIndex + 1
         End If
-        If ByteIndex > MaxByteIndex Then
-            SmallBufferError "Bytes"
-        End If
+        
+        If ByteIndex > MaxByteIndex Then _
+            ThrowEncoderSmallConversionBuffer
         
         Bytes(ByteIndex) = vbMinusChar
         ByteIndex = ByteIndex + 1
@@ -636,7 +715,7 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     Dim MaxCharIndex        As Long
     Dim Ch                  As Long
     Dim DirectlyEncodable   As Boolean
-    Dim ByteIndex           As Long
+    Dim ByteCount           As Long
     
     If Not Encoder Is Nothing Then
         BitCount = Encoder.BitCount
@@ -646,38 +725,39 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     
     MaxCharIndex = Index + Count - 1
     Do While Index <= MaxCharIndex
-        AsWord(Ch) = Chars(Index)
+        Ch = Chars(Index) And &HFFFF&
         DirectlyEncodable = False
         
         If Ch < &H80 Then
             If mDirectlyEncodable(Ch) Then
-                If BitCount >= 0 Then
-                    If BitCount > 0 Then
-                        ByteIndex = ByteIndex + 1
-                    End If
-                    
-                    ByteIndex = ByteIndex + 1
+                If BitCount > 0 Then
+                    ByteCount = ByteCount + 3
+                ElseIf BitCount = 0 Then
+                    ByteCount = ByteCount + 2
+                Else
+                    ByteCount = ByteCount + 1
                 End If
                 
-                ByteIndex = ByteIndex + 1
                 BitCount = -1
                 DirectlyEncodable = True
             End If
         End If
+        
         If Not DirectlyEncodable Then
             If Ch = vbPlusChar And BitCount < 0 Then
-                ByteIndex = ByteIndex + 2
+                ByteCount = ByteCount + 2 ' 2 bytes for plus/minus combo
             Else
                 If BitCount < 0 Then
-                    ByteIndex = ByteIndex + 1
+                    ByteCount = ByteCount + 1
                     BitCount = 0
                 End If
                 
                 BitCount = BitCount + 16
-                Do While BitCount >= 6
-                    BitCount = BitCount - 6
-                    ByteIndex = ByteIndex + 1
-                Loop
+                
+                Dim t As Long
+                t = BitCount \ 6
+                ByteCount = ByteCount + t
+                BitCount = BitCount - t * 6
             End If
         End If
         
@@ -687,20 +767,19 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     Dim Flush As Boolean
     If Encoder Is Nothing Then
         Flush = True
-    Else
+    ElseIf Encoder.Flush Then
         Flush = Encoder.Flush
     End If
     
     If Flush And (BitCount >= 0) Then
         If BitCount > 0 Then
-            ByteIndex = ByteIndex + 1
+            ByteCount = ByteCount + 1
         End If
-        
-        ByteIndex = ByteIndex + 1
-        BitCount = -1
+
+        ByteCount = ByteCount + 1
     End If
     
-    GetByteCountCore = ByteIndex
+    GetByteCountCore = ByteCount
 End Function
 
 Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
@@ -708,7 +787,7 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
     Dim MaxIndex    As Long
     Dim CharCount   As Long
     Dim b           As Byte
-    Dim Bits        As Currency
+    Dim BitCount    As Currency
     
     MaxIndex = Index + Count
     Do While Index < MaxIndex
@@ -725,20 +804,20 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
                 CharCount = CharCount + 1
             End If
             
-            CharCount = CharCount + Int(Bits / 16)
-            Bits = 0
+            CharCount = CharCount + BitCount \ 16
+            BitCount = 0
             InBase64 = False
         Else
-            Bits = Bits + 6
+            BitCount = BitCount + 6
         End If
         
         Index = Index + 1
     Loop
     
-    GetCharCountCore = Int(Bits / 16) + CharCount
+    GetCharCountCore = CharCount + BitCount \ 16
 End Function
 
-Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF7Decoder) As Long
+Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Decoder As UTF7Decoder) As Long
     Dim Bits            As Long
     Dim BitCount        As Long
     Dim b               As Byte
@@ -760,15 +839,15 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     CharStartIndex = CharIndex
     MaxCharIndex = UBound(Chars)
     MaxByteIndex = ByteIndex + ByteCount - 1
+    
     Do While ByteIndex <= MaxByteIndex
         b = Bytes(ByteIndex)
         
         Select Case b
             Case vbMinusChar
                 If HasPlus Then
-                    If CharIndex > MaxCharIndex Then
-                        SmallBufferError "Chars"
-                    End If
+                    If CharIndex > MaxCharIndex Then _
+                        ThrowDecoderSmallConversionBuffer
                     
                     Chars(CharIndex) = vbPlusChar
                     CharIndex = CharIndex + 1
@@ -777,9 +856,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                     Bits = 0
                     InBase64 = False
                 Else
-                    If CharIndex > MaxCharIndex Then
-                        SmallBufferError "Chars"
-                    End If
+                    If CharIndex > MaxCharIndex Then _
+                        ThrowDecoderSmallConversionBuffer
                     
                     Chars(CharIndex) = vbMinusChar
                     CharIndex = CharIndex + 1
@@ -788,7 +866,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 HasPlus = False
             Case vbPlusChar
                 If InBase64 Then
-                    Bits = (Bits * &H40) Or Base64CharToBits(b)
+                    Bits = (Bits * vbShift6Bits) Or Base64CharToBits(b)
                     BitCount = BitCount + 6
                     HasPlus = False
                 Else
@@ -800,12 +878,11 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
             Case Is < &H80
                 If InBase64 Then
                     If Base64CharToBits(b) >= 0 Then
-                        Bits = (Bits * &H40) Or Base64CharToBits(b)
+                        Bits = (Bits * vbShift6Bits) Or Base64CharToBits(b)
                         BitCount = BitCount + 6
                     Else
-                        If CharIndex > MaxCharIndex Then
-                            SmallBufferError "Chars"
-                        End If
+                        If CharIndex > MaxCharIndex Then _
+                            ThrowDecoderSmallConversionBuffer
                         
                         Chars(CharIndex) = b
                         CharIndex = CharIndex + 1
@@ -814,9 +891,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                         InBase64 = False
                     End If
                 Else
-                    If CharIndex > MaxCharIndex Then
-                        SmallBufferError "Chars"
-                    End If
+                    If CharIndex > MaxCharIndex Then _
+                        ThrowDecoderSmallConversionBuffer
                     
                     Chars(CharIndex) = b
                     CharIndex = CharIndex + 1
@@ -824,9 +900,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 
                 HasPlus = False
             Case Else
-                If CharIndex > MaxCharIndex Then
-                    SmallBufferError "Chars"
-                End If
+                If CharIndex > MaxCharIndex Then _
+                    ThrowDecoderSmallConversionBuffer
                 
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
@@ -835,12 +910,12 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 InBase64 = False
                 HasPlus = False
         End Select
+        
         If BitCount >= 16 Then
-            If CharIndex > MaxCharIndex Then
-                SmallBufferError "Chars"
-            End If
+            If CharIndex > MaxCharIndex Then _
+                ThrowDecoderSmallConversionBuffer
             
-            Chars(CharIndex) = AsWord(Helper.ShiftRight(Bits, BitCount - 16) And &HFFFF&)
+            Chars(CharIndex) = AsWord((Bits \ Powers(BitCount - 16)) And &HFFFF&)
             CharIndex = CharIndex + 1
             BitCount = BitCount - 16
         End If
@@ -863,8 +938,12 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub SmallBufferError(ByRef ParamName As String)
-    Error.Argument Argument_SmallConversionBuffer, ParamName
+Private Sub ThrowEncoderSmallConversionBuffer()
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(EncoderFallback)), "Bytes")
+End Sub
+
+Private Sub ThrowDecoderSmallConversionBuffer()
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(DecoderFallback)), "Chars")
 End Sub
 
 
@@ -873,10 +952,17 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     Init PropBag.ReadProperty("AllowOptionals", False)
+    Set mEncoderFallback = PropBag.ReadProperty("EncoderFallback")
+    Set mDecoderFallback = PropBag.ReadProperty("DecoderFallback", New UTF7DecoderFallback)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     PropBag.WriteProperty "AllowOptionals", mAllowOptionals
+    PropBag.WriteProperty "EncoderFallback", mEncoderFallback
+    
+    If Not TypeOf mDecoderFallback Is UTF7DecoderFallback Then
+        PropBag.WriteProperty "DecoderFallback", mDecoderFallback
+    End If
 End Sub
 
 
@@ -899,24 +985,28 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function Encoding_Clone() As Encoding
+Private Property Get Encoding_IsReadOnly() As Boolean
+    Encoding_IsReadOnly = IsReadOnly
+End Property
 
+Private Function Encoding_Clone() As Encoding
+    Set Encoding_Clone = Clone
 End Function
 
 Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
-
+    Set DecoderFallback = Value
 End Property
 
 Private Property Get Encoding_DecoderFallback() As DecoderFallback
-
+    Set Encoding_DecoderFallback = DecoderFallback
 End Property
 
 Private Property Set Encoding_EncoderFallback(ByVal Value As EncoderFallback)
-
+    Set EncoderFallback = Value
 End Property
 
 Private Property Get Encoding_EncoderFallback() As EncoderFallback
-
+    Set Encoding_EncoderFallback = EncoderFallback
 End Property
 
 Private Property Get Encoding_BodyName() As String
