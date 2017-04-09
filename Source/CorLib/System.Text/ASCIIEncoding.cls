@@ -67,6 +67,15 @@ Private mDecoderFallback    As DecoderFallback
 
 
 ''
+' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
+'
+' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
+'
+Public Property Get IsReadOnly() As Boolean
+    IsReadOnly = mIsReadOnly
+End Property
+
+''
 ' Creates a clone of the current Encoding instance.
 '
 ' @return A cloned instance of a ASCIIEncoding object.
@@ -847,6 +856,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get Encoding_IsReadOnly() As Boolean
+    Encoding_IsReadOnly = IsReadOnly
+End Property
+
 Private Function Encoding_Clone() As Encoding
     Set Encoding_Clone = Clone
 End Function

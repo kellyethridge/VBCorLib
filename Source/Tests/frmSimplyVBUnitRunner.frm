@@ -286,6 +286,7 @@ Private Sub AddSystemText()
         .Add New EncodingArgumentTests
         .Add New ASCIIEncodingTests
         .Add New UTF7EncodingTests
+        .Add New UTF7EncoderTests
         .Add New UTF8EncodingTests
         .Add New UnicodeEncodingTests
         .Add New UnicodeDecoderTests

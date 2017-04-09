@@ -38,10 +38,12 @@ Option Explicit
 Implements IObject
 Implements Encoder
 
-Private mEncoding   As UTF7Encoding
-Private mFlush      As Boolean
-Private mBits       As Long
-Private mBitCount   As Long
+Private mEncoding       As UTF7Encoding
+Private mFallback       As EncoderFallback
+Private mFallbackBuffer As EncoderFallbackBuffer
+Private mFlush          As Boolean
+Private mBits           As Long
+Private mBitCount       As Long
 
 
 Friend Property Get Flush() As Boolean
@@ -97,19 +99,23 @@ End Function
 '   Encoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Encoder_Convert(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByVal Flush As Boolean, CharsUsed As Long, BytesUsed As Long, Completed As Boolean)
-
+    EncoderConvert Me, Chars, CharIndex, CharCount, Bytes, ByteIndex, ByteCount, Flush, CharsUsed, BytesUsed, Completed
 End Sub
 
-Private Property Set Encoder_Fallback(ByVal RHS As EncoderFallback)
-
+Private Property Set Encoder_Fallback(ByVal Value As EncoderFallback)
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mFallback = Value
+    Set mFallbackBuffer = Nothing
 End Property
 
 Private Property Get Encoder_Fallback() As EncoderFallback
-
+    Set Encoder_Fallback = mFallback
 End Property
 
 Private Property Get Encoder_FallbackBuffer() As EncoderFallbackBuffer
-
+    Set Encoder_FallbackBuffer = mFallbackBuffer
 End Property
 
 Private Function Encoder_Equals(Value As Variant) As Boolean
@@ -117,19 +123,15 @@ Private Function Encoder_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Flush As Boolean) As Long
-    Encoding.ValidateCharRange Chars, Index, Count
-    
+    ValidateEncoderGetByteCount Chars, Index, Count
+        
     mFlush = Flush
     
     Encoder_GetByteCount = mEncoding.GetByteCountCore(Chars, Index, Count, Me)
 End Function
 
 Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long
-    Dim ByteCount As Long
-    
-    Encoding.ValidateCharRange Chars, CharIndex, CharCount
-    ByteCount = mEncoding.GetByteCountCore(Chars, CharIndex, CharCount, Me)
-    Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
+    ValidateEncoderGetBytes Chars, CharIndex, CharCount, Bytes, ByteIndex
     
     mFlush = Flush
     
@@ -141,7 +143,13 @@ Private Function Encoder_GetHashCode() As Long
 End Function
 
 Private Sub Encoder_Reset()
-
+    mBits = 0
+    mBitCount = -1
+    mFlush = False
+    
+    If Not mFallbackBuffer Is Nothing Then
+        mFallbackBuffer.Reset
+    End If
 End Sub
 
 Private Function Encoder_ToString() As String

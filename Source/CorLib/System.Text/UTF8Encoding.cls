@@ -635,14 +635,14 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     Dim BytesLeft       As Long
     Dim PutChars        As Boolean
     Dim MaxIndex        As Long
-    Dim maxCharIndex    As Long
+    Dim MaxCharIndex    As Long
     
     PutChars = Not CorArray.IsNull(Chars)
     If PutChars Then
-        maxCharIndex = UBound(Chars)
+        MaxCharIndex = UBound(Chars)
         If CharIndex < LBound(Chars) Then _
             Throw Cor.NewArgumentOutOfRangeException("CharIndex", Environment.GetResourceString(ArgumentOutOfRange_LBound))
-        If CharIndex > maxCharIndex Then _
+        If CharIndex > MaxCharIndex Then _
             Throw Cor.NewArgumentOutOfRangeException("CharIndex", Environment.GetResourceString(ArgumentOutOfRange_UBound))
     End If
     If Not Decoder Is Nothing Then
@@ -663,7 +663,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 ByteStreamError ByteIndex
                 
             If PutChars Then
-                If CharIndex > maxCharIndex Then _
+                If CharIndex > MaxCharIndex Then _
                     SmallBufferError "Chars"
                 
                 Chars(CharIndex) = b
@@ -701,7 +701,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                     ByteStreamError ByteIndex
                     
                     If PutChars Then
-                        If CharIndex > maxCharIndex Then
+                        If CharIndex > MaxCharIndex Then
                             SmallBufferError "Chars"
                         End If
                         
@@ -728,7 +728,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         Case &H80 To &H7FF
                             If BytesLeft = 0 Then
                                 If PutChars Then
-                                    If CharIndex > maxCharIndex Then
+                                    If CharIndex > MaxCharIndex Then
                                         SmallBufferError "Chars"
                                     End If
                                     
@@ -743,7 +743,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                         Case Else
                             ByteStreamError ByteIndex
                             If PutChars Then
-                                If CharIndex > maxCharIndex Then
+                                If CharIndex > MaxCharIndex Then
                                     SmallBufferError "Chars"
                                 End If
                                 
@@ -762,7 +762,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                     Select Case BytesLeft
                         Case 0
                             If PutChars Then
-                                If CharIndex > maxCharIndex Then _
+                                If CharIndex > MaxCharIndex Then _
                                     SmallBufferError "Chars"
                                 
                                 Chars(CharIndex) = AsWord(Ch)
@@ -789,7 +789,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                             ByteStreamError ByteIndex
                         
                         If PutChars Then
-                            If CharIndex + 1 > maxCharIndex Then _
+                            If CharIndex + 1 > MaxCharIndex Then _
                                 SmallBufferError "Chars"
                             
                             Chars(CharIndex + 1) = AsWord(ls)   ' AsWord is used to shove the highest bit in
@@ -955,6 +955,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get Encoding_IsReadOnly() As Boolean
+
+End Property
+
 Private Function Encoding_Clone() As Encoding
 
 End Function

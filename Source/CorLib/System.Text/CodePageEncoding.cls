@@ -106,6 +106,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Encoding Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get Encoding_IsReadOnly() As Boolean
+
+End Property
+
 Private Function Encoding_Clone() As Encoding
 
 End Function

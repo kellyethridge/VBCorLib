@@ -30,6 +30,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("\x65E5\x672C\x8A9E"), 10
             Test.Use t("Hi Mom \x263A!"), 15
             
+        Case "GetCharCount_WithValues_ReturnsExpected"
+            Test.Use t("A\x2262\x0391.")
+            Test.Use t("Hi Mom -\x263A-!")
+            Test.Use t("\x65E5\x672C\x8A9E")
+            Test.Use t("Hi Mom \x263A!")
+        
     End Select
 End Sub
 
@@ -57,7 +63,7 @@ Public Sub IsMailNewsSave_WhenCalled_ReturnsTrue()
     Assert.That Encoding.UTF7.IsMailNewsSave, Iz.True
 End Sub
 
-Public Sub GetBytes_WithDirectlyEncodedCharacters_ReturnsExpected()
+Public Sub GetBytes_WithDirectlyEncodedCharacters_ReturnsEncoded()
     Dim Chars       As String
     Dim Actual()    As Byte
     Dim Encoding    As New UTF7Encoding
@@ -71,7 +77,7 @@ Public Sub GetBytes_WithDirectlyEncodedCharacters_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetBytesEx_WithDirectlyEncodedCharacters_ReturnsExpected()
+Public Sub GetBytesEx_WithDirectlyEncodedCharacters_ReturnsEncoded()
     Dim Chars()         As Integer
     Dim Actual(0 To 7)  As Byte
     Dim Count           As Long
@@ -87,7 +93,21 @@ Public Sub GetBytesEx_WithDirectlyEncodedCharacters_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetBytes_WithOptionalEncodedCharactersAllowed_ReturnsExpected()
+Public Sub GetBytes_WithAllFFFFCharacters_ReturnsEncoded()
+    Dim Chars       As String
+    Dim Actual()    As Byte
+    Dim Encoding    As New UTF7Encoding
+    
+    Chars = t("\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF\uFFFF")
+    
+    Actual = Encoding.GetBytes(Chars)
+    
+    Dim Expected() As Byte
+    Expected = NewBytes(43, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 47, 119, 45)
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetBytes_WithOptionalEncodedCharactersAllowed_ReturnsEncoded()
     Dim Encoding    As UTF7Encoding
     Dim Chars       As String
     Dim Actual()    As Byte
@@ -102,7 +122,7 @@ Public Sub GetBytes_WithOptionalEncodedCharactersAllowed_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetBytes_WithOptionalEncodedCharactersNotAllowed_ReturnsExpected()
+Public Sub GetBytes_WithOptionalEncodedCharactersNotAllowed_ReturnsEncoded()
     Dim Encoding    As UTF7Encoding
     Dim Chars       As String
     Dim Actual()    As Byte
@@ -117,7 +137,7 @@ Public Sub GetBytes_WithOptionalEncodedCharactersNotAllowed_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetBytes_WithShiftedCharacters_ReturnsExpected()
+Public Sub GetBytes_WithShiftedCharacters_ReturnsEncoded()
     Dim Encoding    As UTF7Encoding
     Dim Chars       As String
     Dim Actual()    As Byte
@@ -132,7 +152,7 @@ Public Sub GetBytes_WithShiftedCharacters_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetBytesEx_WithShiftedCharacters_ReturnsExpected()
+Public Sub GetBytesEx_WithShiftedCharacters_ReturnsEncoded()
     Dim Encoding        As UTF7Encoding
     Dim Chars()         As Integer
     Dim Actual(0 To 9)  As Byte
@@ -292,6 +312,24 @@ Public Sub GetCharCount_WithValue_ReturnsExpected()
     Assert.That Decoded, Iz.EqualTo(Original)
 End Sub
 
+Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef s As String)
+    Dim Bytes() As Byte
+    Dim Actual  As Long
+    Bytes = Encoding.UTF7.GetBytes(s)
+    
+    Actual = Encoding.UTF7.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Len(s))
+End Sub
+
+Public Sub Serialization()
+    Dim Actual As UTF7Encoding
+    
+    Set Actual = Persist(Encoding.UTF7)
+    
+    Assert.That Actual.EncoderFallback, Iz.Not.Nothing
+    Assert.That Actual.DecoderFallback, Iz.Not.Nothing
+End Sub
 
 
 

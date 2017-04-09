@@ -1360,7 +1360,11 @@ Public Function NewChars(ParamArray Values() As Variant) As Integer()
     
     Dim i As Long
     For i = 0 To UBound(Values)
-        Result(i) = AscW(Values(i))
+        If VarType(Values(i)) = vbString Then
+            Result(i) = AscW(Values(i))
+        Else
+            Result(i) = AsWord(CLng(Values(i)))
+        End If
     Next
     
     NewChars = Result

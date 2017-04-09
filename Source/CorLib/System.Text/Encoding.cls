@@ -51,6 +51,13 @@ Option Explicit
 
 
 ''
+' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
+'
+' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
+'
+Public Property Get IsReadOnly() As Boolean: End Property
+
+''
 ' Returns a shallow copy of the current <a href="Encoding.html">Encoding</a> object.
 '
 ' @return A copy of the <a href="Encoding.html">Encoding</a> object.
