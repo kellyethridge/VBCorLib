@@ -36,14 +36,55 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("\x65E5\x672C\x8A9E")
             Test.Use t("Hi Mom \x263A!")
         
-        Case "GetChars_WithValues_ReturnsExpected"
+        Case "GetChars_WithFallbacks_ReturnsExpected"
+            Test.Use NewBytes(45), NewChars(45)
             Test.Use NewBytes(65, 65), NewChars(65, 65)
             Test.Use NewBytes(&H80), NewChars(&H80)
             Test.Use NewBytes(43), NewChars()
+            Test.Use NewBytes(43, 45), NewChars(&H2B)
+            Test.Use NewBytes(43, 128), NewChars(128)
+            Test.Use NewBytes(43, 97, 128, 97, 97), NewChars(128, 97, 97)
+            Test.Use NewBytes(43, 97, 97, 128, 97), NewChars(128, 97)
+            Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), NewChars(128, 97)
+            Test.Use NewBytes(43, 97, 128, 65, 43, 97, 97), NewChars(128, 65)
+            Test.Use NewBytes(43, 43, 43), NewChars()
             
         Case "GetCharCount_WithFallbacks_ReturnsExpected"
             Test.Use NewBytes(43), 0
+            Test.Use NewBytes(45), 1
+            Test.Use NewBytes(43, 128), 1
+            Test.Use NewBytes(43, 97, 128, 97, 97), 3
+            Test.Use NewBytes(43, 97, 97, 128, 97), 2
+            Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), 2
+            Test.Use NewBytes(43, 97, 2), 1
+            Test.Use NewBytes(43, 97, 2, 43, 97), 1
+            Test.Use NewBytes(43, 97, 45), 0
+            Test.Use NewBytes(43, 43, 43), 0
         
+        Case "GetCharCount_WithEmptyFallbacks_ReturnsExpected"
+            Test.Use NewBytes(43), 0
+            Test.Use NewBytes(45), 1
+            Test.Use NewBytes(43, 128), 0
+            Test.Use NewBytes(43, 97, 128, 97, 97), 2
+            Test.Use NewBytes(43, 97, 97, 128, 97), 1
+            Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), 1
+            Test.Use NewBytes(43, 97, 2), 0
+            Test.Use NewBytes(43, 97, 2, 43, 97), 0
+            Test.Use NewBytes(43, 97, 45), 0
+            Test.Use NewBytes(43, 97, 128, 65, 43, 97, 97), 1
+        
+        Case "GetChars_WithEmptyFallbacks_ReturnsExpected"
+            Test.Use NewBytes(43), NewChars()
+            Test.Use NewBytes(45), NewChars(45)
+            Test.Use NewBytes(43, 128), NewChars()
+            Test.Use NewBytes(43, 97, 128, 97, 97), NewChars(97, 97)
+            Test.Use NewBytes(43, 97, 97, 128, 97), NewChars(97)
+            Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), NewChars(97)
+            Test.Use NewBytes(43, 97, 2), NewChars()
+            Test.Use NewBytes(43, 97, 2, 43, 97), NewChars()
+            Test.Use NewBytes(43, 97, 45), NewChars()
+            Test.Use NewBytes(43, 97, 128, 65, 43, 97, 97), NewChars(65)
+            
     End Select
 End Sub
 
@@ -55,10 +96,32 @@ Public Sub GetCharCount_WithFallbacks_ReturnsExpected(ByRef Bytes() As Byte, ByV
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
+Public Sub GetCharCount_WithEmptyFallbacks_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)
+    Dim Enc As Encoding
+    Dim Actual As Long
+    Set Enc = Encoding.UTF7.Clone
+    Set Enc.DecoderFallback = Cor.NewDecoderReplacementFallback("")
+    
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetChars_WithFallbacks_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
     Dim Actual() As Integer
     
     Actual = Encoding.UTF7.GetChars(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetChars_WithEmptyFallbacks_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
+    Dim Enc As Encoding
+    Dim Actual() As Integer
+    Set Enc = Encoding.UTF7.Clone
+    Set Enc.DecoderFallback = Cor.NewDecoderReplacementFallback("")
+    
+    Actual = Enc.GetChars(Bytes)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

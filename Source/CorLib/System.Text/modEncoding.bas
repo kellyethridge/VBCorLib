@@ -29,6 +29,7 @@ Private Const Base64Characters As String = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij
 ' Cache the Base64 encoded character lookup table for quick access.
 Public Base64CharToBits()   As Long
 Public Base64Bytes()        As Byte
+Public IsBase64Byte()       As Boolean
 
 
 ' Initialize the encoded character lookup table.
@@ -53,8 +54,12 @@ Public Sub InitEncoding()
     Base64CharToBits(47) = vbQuestionMarkChar
     
     ReDim Base64Bytes(0 To 63)
+    ReDim IsBase64Byte(0 To 127)
+    Dim Ch As Byte
     For i = 0 To Len(Base64Characters) - 1
-        Base64Bytes(i) = Asc(Mid$(Base64Characters, i + 1, 1))
+        Ch = Asc(Mid$(Base64Characters, i + 1, 1))
+        Base64Bytes(i) = Ch
+        IsBase64Byte(Ch) = True
     Next i
 End Sub
 

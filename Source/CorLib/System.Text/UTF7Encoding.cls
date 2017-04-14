@@ -790,6 +790,7 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
     Dim CharCount   As Long
     Dim b           As Byte
     Dim BitCount    As Currency
+    Dim Fallback    As DecoderFallbackBuffer
     
     MaxIndex = Index + Count
     Do While Index < MaxIndex
@@ -809,14 +810,41 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
             CharCount = CharCount + BitCount \ 16
             BitCount = 0
             InBase64 = False
+        ElseIf b < &H80 Then
+            ' check not valid base-64 character
+            If IsBase64Byte(b) Then
+                BitCount = BitCount + 6
+            Else
+                ' add fallback count
+                CharCount = CharCount + GetFallbackCharCount(b, Fallback)
+                BitCount = 0
+                InBase64 = False
+            End If
         Else
-            BitCount = BitCount + 6
+            ' add fallback count
+            CharCount = CharCount + GetFallbackCharCount(b, Fallback)
+            BitCount = 0
+            InBase64 = False
         End If
         
         Index = Index + 1
     Loop
     
     GetCharCountCore = CharCount + BitCount \ 16
+End Function
+
+Private Function GetFallbackCharCount(ByVal b As Byte, ByRef Fallback As DecoderFallbackBuffer) As Long
+    Dim BytesUnknown(0 To 0) As Byte
+    
+    If Fallback Is Nothing Then
+        Set Fallback = mDecoderFallback.CreateFallbackBuffer
+    End If
+    
+    BytesUnknown(0) = b
+    If Fallback.Fallback(BytesUnknown, 0) Then
+        GetFallbackCharCount = Fallback.Remaining
+        Fallback.Reset
+    End If
 End Function
 
 Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal Decoder As UTF7Decoder) As Long
@@ -828,6 +856,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     Dim CharStartIndex  As Long
     Dim MaxCharIndex    As Long
     Dim MaxByteIndex    As Long
+    Dim Fallback        As DecoderFallbackBuffer
     
     If Not Decoder Is Nothing Then
         With Decoder
@@ -902,11 +931,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 
                 HasPlus = False
             Case Else
-                If CharIndex > MaxCharIndex Then _
-                    ThrowDecoderSmallConversionBuffer
-                
-                Chars(CharIndex) = b
-                CharIndex = CharIndex + 1
+                CharIndex = InsertFallbackChars(b, Chars, CharIndex, Fallback)
                 BitCount = 0
                 Bits = 0
                 InBase64 = False
@@ -934,6 +959,27 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     End If
     
     GetCharsCore = CharIndex - CharStartIndex
+End Function
+
+Private Function InsertFallbackChars(ByVal b As Byte, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Fallback As DecoderFallbackBuffer) As Long
+    Dim BytesUnknown(0) As Byte
+    
+    If Fallback Is Nothing Then
+        Set Fallback = mDecoderFallback.CreateFallbackBuffer
+    End If
+    
+    BytesUnknown(0) = b
+    If Fallback.Fallback(BytesUnknown, 0) Then
+        Do While Fallback.Remaining > 0
+            If CharIndex > UBound(Chars) Then _
+                ThrowDecoderSmallConversionBuffer
+            
+            Chars(CharIndex) = Fallback.GetNextChar
+            CharIndex = CharIndex + 1
+        Loop
+    End If
+    
+    InsertFallbackChars = CharIndex
 End Function
 
 
