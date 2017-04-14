@@ -57,12 +57,13 @@ Private Const CodePageProp              As String = "CodePage"
 Private Const DecoderFallbackProp       As String = "DecoderFallback"
 Private Const EncoderFallbackProp       As String = "EncoderFallback"
 
-Private mIsReadOnly         As Boolean
-Private mIsBigEndian        As Boolean
-Private mEmitBOM            As Boolean
-Private mCodePage           As Long
-Private mDecoderFallback    As DecoderFallback
-Private mEncoderFallback    As EncoderFallback
+Private mIsReadOnly             As Boolean
+Private mIsBigEndian            As Boolean
+Private mEmitBOM                As Boolean
+Private mCodePage               As Long
+Private mDecoderFallback        As DecoderFallback
+Private mEncoderFallback        As EncoderFallback
+Private mBytesUnknown(0 To 1)   As Byte
 
 
 ''
@@ -1056,14 +1057,12 @@ Continue:
 End Function
 
 Private Sub InsertDecoderFallback(ByVal UnknownChar As Long, ByRef Chars() As Integer, ByRef CharIndex As Long, ByRef FallbackBuffer As DecoderFallbackBuffer, ByVal Decoder As Decoder)
-    Dim ByteBuffer(0 To 1) As Byte
-    
     If mIsBigEndian Then
-        ByteBuffer(0) = (UnknownChar \ vbShift8Bits) And &HFF
-        ByteBuffer(1) = UnknownChar And &HFF
+        mBytesUnknown(0) = (UnknownChar \ vbShift8Bits) And &HFF
+        mBytesUnknown(1) = UnknownChar And &HFF
     Else
-        ByteBuffer(0) = UnknownChar And &HFF
-        ByteBuffer(1) = (UnknownChar \ vbShift8Bits) And &HFF
+        mBytesUnknown(0) = UnknownChar And &HFF
+        mBytesUnknown(1) = (UnknownChar \ vbShift8Bits) And &HFF
     End If
     
     If FallbackBuffer Is Nothing Then
@@ -1074,7 +1073,7 @@ Private Sub InsertDecoderFallback(ByVal UnknownChar As Long, ByRef Chars() As In
         End If
     End If
     
-    If FallbackBuffer.Fallback(ByteBuffer, 0) Then
+    If FallbackBuffer.Fallback(mBytesUnknown, 0) Then
         Dim Ch As Integer
         
         If CharIndex + FallbackBuffer.Remaining - 1 > UBound(Chars) Then _
