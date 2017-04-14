@@ -64,6 +64,7 @@ Private Const DecoderFallbackProp   As String = "DecoderFallback"
 Private mIsReadOnly         As Boolean
 Private mEncoderFallback    As EncoderFallback
 Private mDecoderFallback    As DecoderFallback
+Private mBytesUnknown(0)    As Byte
 
 
 ''
@@ -815,15 +816,13 @@ Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, By
 End Function
 
 Private Function InsertDecoderChars(ByVal b As Byte, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Fallback As DecoderFallbackBuffer) As Long
-    Dim Bytes(0) As Byte
-    
     If Fallback Is Nothing Then
         Set Fallback = mDecoderFallback.CreateFallbackBuffer
     End If
     
-    Bytes(0) = b
+    mBytesUnknown(0) = b
     
-    If Fallback.Fallback(Bytes, 0) Then
+    If Fallback.Fallback(mBytesUnknown, 0) Then
         If CharIndex + Fallback.Remaining - 1 > UBound(Chars) Then _
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(mDecoderFallback)), "Chars")
         

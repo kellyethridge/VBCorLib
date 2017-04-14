@@ -57,7 +57,7 @@ Private mDirectlyEncodable(0 To 127)    As Boolean
 Private mAllowOptionals                 As Boolean
 Private mDecoderFallback                As DecoderFallback
 Private mEncoderFallback                As EncoderFallback
-
+Private mBytesUnknown(0 To 0)           As Byte
 
 
 ''
@@ -834,14 +834,12 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
 End Function
 
 Private Function GetFallbackCharCount(ByVal b As Byte, ByRef Fallback As DecoderFallbackBuffer) As Long
-    Dim BytesUnknown(0 To 0) As Byte
-    
     If Fallback Is Nothing Then
         Set Fallback = mDecoderFallback.CreateFallbackBuffer
     End If
     
-    BytesUnknown(0) = b
-    If Fallback.Fallback(BytesUnknown, 0) Then
+    mBytesUnknown(0) = b
+    If Fallback.Fallback(mBytesUnknown, 0) Then
         GetFallbackCharCount = Fallback.Remaining
         Fallback.Reset
     End If
@@ -962,14 +960,12 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
 End Function
 
 Private Function InsertFallbackChars(ByVal b As Byte, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Fallback As DecoderFallbackBuffer) As Long
-    Dim BytesUnknown(0) As Byte
-    
     If Fallback Is Nothing Then
         Set Fallback = mDecoderFallback.CreateFallbackBuffer
     End If
     
-    BytesUnknown(0) = b
-    If Fallback.Fallback(BytesUnknown, 0) Then
+    mBytesUnknown(0) = b
+    If Fallback.Fallback(mBytesUnknown, 0) Then
         Do While Fallback.Remaining > 0
             If CharIndex > UBound(Chars) Then _
                 ThrowDecoderSmallConversionBuffer
