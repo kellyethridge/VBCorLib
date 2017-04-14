@@ -404,12 +404,14 @@ End Function
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
     Dim Range       As ListRange
+    Dim CharCount   As Long
     Dim Output()    As Integer
     
     Range = ValidateGetChars(Bytes, Index, Count)
+    CharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
     
-    If Range.Count > 0 Then
-        ReDim Output(0 To GetCharCountCore(Bytes, Range.Index, Range.Count) - 1)
+    If CharCount > 0 Then
+        ReDim Output(0 To CharCount - 1)
         GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
     Else
         Output = Cor.NewIntegers()

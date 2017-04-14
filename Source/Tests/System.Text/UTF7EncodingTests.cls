@@ -36,7 +36,31 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("\x65E5\x672C\x8A9E")
             Test.Use t("Hi Mom \x263A!")
         
+        Case "GetChars_WithValues_ReturnsExpected"
+            Test.Use NewBytes(65, 65), NewChars(65, 65)
+            Test.Use NewBytes(&H80), NewChars(&H80)
+            Test.Use NewBytes(43), NewChars()
+            
+        Case "GetCharCount_WithFallbacks_ReturnsExpected"
+            Test.Use NewBytes(43), 0
+        
     End Select
+End Sub
+
+Public Sub GetCharCount_WithFallbacks_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = Encoding.UTF7.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
+    Dim Actual() As Integer
+    
+    Actual = Encoding.UTF7.GetChars(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub GetByteCount_WithValues_ReturnsExpected(ByRef s As String, ByVal Expected As Long)
