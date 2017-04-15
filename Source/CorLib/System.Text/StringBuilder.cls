@@ -101,34 +101,29 @@ Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Vari
 End Function
 
 ''
-' Appends a character a specified number of times to the end of string value.
+' Appends a Unicode character a specified number of times to the end of string value.
 '
-' @param Char The AscW character code to append.
+' @param Char The Unicode character code to append.
 ' @param Count The number of times to append the character.
 ' @return This instance of StringBuilder.
-' @remarks The character is a unicode value from -32767 to 65535. For values that
-' are greater than 32767 (&H7FFF), 65536 (&H10000) is subtracted from it to map the
-' character to a 16-bit Integer without overflowing.
 '
 Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1) As StringBuilder
+    Dim LocalChar As Integer
+    
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If Char < -&H7FFF& Or Char > &HFFFF& Then _
-        Throw Cor.NewArgumentOutOfRangeException("Char", "Char must be between -32767 and 65535 inclusively.")
     
-    If Char > &H7FFF& Then
-        Char = Char - &H10000
-    End If
-    
+    LocalChar = AsWord(Char)
     EnsureCapacity mLength + Count
     
     ' appending 1 character at a time happens 99%
     ' of the time, so optimize for it.
     If Count = 1 Then
-        mString(mLength) = Char
+        mString(mLength) = LocalChar
     Else
-        Fill mLength, Char, Count
+        Fill mLength, LocalChar, Count
     End If
+    
     mLength = mLength + Count
     Set AppendChar = Me
 End Function
