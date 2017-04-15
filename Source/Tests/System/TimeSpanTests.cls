@@ -49,13 +49,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         
         Case "Add_WithValues_ReturnsExpected"
             Test.Use TimeSpan.FromHours(4), TimeSpan.FromHours(5), TimeSpan.FromHours(9)
-            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), newtimespan(Minutes:=30, Seconds:=15)
+            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), Cor.NewTimeSpan(Minutes:=30, Seconds:=15)
             Test.Use TimeSpan.FromHours(4), TimeSpan.FromHours(-5), TimeSpan.FromHours(-1)
             Test.Use TimeSpan.FromHours(4), Nothing, TimeSpan.FromHours(4)
             
         Case "Subtract_WithValues_ReturnsExpected"
             Test.Use TimeSpan.FromHours(5), TimeSpan.FromHours(4), TimeSpan.FromHours(1)
-            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), newtimespan(Minutes:=29, Seconds:=45)
+            Test.Use TimeSpan.FromMinutes(30), TimeSpan.FromSeconds(15), Cor.NewTimeSpan(Minutes:=29, Seconds:=45)
             Test.Use TimeSpan.FromHours(-1), TimeSpan.FromHours(-4), TimeSpan.FromHours(3)
             Test.Use TimeSpan.FromHours(1), Nothing, TimeSpan.FromHours(1)
             
@@ -82,8 +82,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use TimeSpan.FromMilliseconds(1), "00:00:00.0010000"
             Test.Use TimeSpan.FromTicks(1), "00:00:00.0000001"
             Test.Use TimeSpan.FromTicks(10001), "00:00:00.0010001"
-            Test.Use newtimespan(102, 3, 4, 5, 10), "102.03:04:05.0100000"
-            Test.Use newtimespan(-2, -3, -4, -5, -10), "-2.03:04:05.0100000"
+            Test.Use NewTimeSpan(102, 3, 4, 5, 10), "102.03:04:05.0100000"
+            Test.Use NewTimeSpan(-2, -3, -4, -5, -10), "-2.03:04:05.0100000"
         
         Case "GetHashCode_WithValues_ReturnsExpected"
             Test.Use 0, 0, True
@@ -94,13 +94,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "TryParse_WithValues_ReturnsExpected"
             Test.Use "0", TimeSpan.Zero
-            Test.Use "   1:06:07  ", newtimespan(Hours:=1, Minutes:=6, Seconds:=7)
-            Test.Use "22:14:14", newtimespan(Hours:=22, Minutes:=14, Seconds:=14)
-            Test.Use "1.04:24:34", newtimespan(1, 4, 24, 34)
-            Test.Use "5:06:07.1", newtimespan(Hours:=5, Minutes:=6, Seconds:=7, Milliseconds:=100)
+            Test.Use "   1:06:07  ", NewTimeSpan(Hours:=1, Minutes:=6, Seconds:=7)
+            Test.Use "22:14:14", NewTimeSpan(Hours:=22, Minutes:=14, Seconds:=14)
+            Test.Use "1.04:24:34", NewTimeSpan(1, 4, 24, 34)
+            Test.Use "5:06:07.1", NewTimeSpan(Hours:=5, Minutes:=6, Seconds:=7, Milliseconds:=100)
             Test.Use "-7.15:35:41.7777777", TimeSpan.FromTicks(-6609417777777#)
             Test.Use "10", TimeSpan.FromDays(10)
-            Test.Use "2:3", newtimespan(Hours:=2, Minutes:=3)
+            Test.Use "2:3", NewTimeSpan(Hours:=2, Minutes:=3)
             
         Case "TryParse_WithValues_ReturnsExpected2"
             Test.Use "0", True
@@ -335,10 +335,9 @@ Public Sub CompareTo_WithNonTimeSpanValue_ThrowsArgumentException()
     Dim Span As IComparable
     Set Span = New TimeSpan
     
-    On Error GoTo errTrap
+    On Error Resume Next
     Span.CompareTo 1
     
-errTrap:
     AssertArgumentException Err, "Value"
 End Sub
 
@@ -403,20 +402,18 @@ End Sub
 Public Sub Parse_WithInvalidSource_ThrowsFormatError()
     Const InvalidSource As String = "a"
     
-    On Error GoTo errTrap
+    On Error Resume Next
     TimeSpan.Parse InvalidSource
     
-errTrap:
     WriteLine Err.Description
     AssertFormatException Err
 End Sub
 
 Public Sub Parse_WithOverflowValues_ThrowsOverflowException(ByVal s As String)
-    On Error GoTo errTrap
+    On Error Resume Next
     
     TimeSpan.Parse s
     
-errTrap:
     AssertOverflowException Err
 End Sub
 

@@ -731,7 +731,7 @@ library CorType {
         const LPSTR vbPathSeparator                = ";";
         const LPSTR vbVolumeSeparator              = ":";        
         const LPSTR vbDirectorySeparator           = "\\";
-        const LPSTR vbAltDirectorySeparator        = "/";        
+        const LPSTR vbAltDirectorySeparator        = "/";
     }
 
     [dllname("CorTypeName")]
@@ -769,23 +769,25 @@ library CorType {
 
     [dllname("CorTypeSize")]
     module CorTypeSize {
-        const long vbSizeOfByte            = 1;
-        const long vbSizeOfInteger         = 2;
-        const long vbSizeOfLong            = 4;
-        const long vbSizeOfSingle          = 4;
-        const long vbSizeOfDouble          = 8;
-        const long vbSizeOfCurrency        = 8;
-        const long vbSizeOfDecimal         = 16;
-        const long vbSizeOfBoolean         = 1;
-        const long vbSizeOfDate            = 8;
-        const long vbSizeOfSafeArray       = 16;
-        const long vbSizeOfSafeArrayBound  = 8;
-        const long vbSizeOfSafeArray1d     = 24;
-        const long vbSizeOfGuid            = 16;
-        const long vbSizeOfGuidSafeArray1d = 40;
-        const long vbSizeOfVariant         = 16;
-        const long vbSizeOfPtr             = 4;
-        const long vbSizeOfChar            = 2;        
+        const long vbSizeOfByte            	= 1;
+        const long vbSizeOfInteger         	= 2;
+        const long vbSizeOfLong            	= 4;
+        const long vbSizeOfSingle          	= 4;
+        const long vbSizeOfDouble          	= 8;
+        const long vbSizeOfCurrency        	= 8;
+        const long vbSizeOfDecimal         	= 16;
+        const long vbSizeOfBoolean         	= 1;
+        const long vbSizeOfDate            	= 8;
+        const long vbSizeOfSafeArray       	= 16;
+        const long vbSizeOfSafeArrayBound  	= 8;
+        const long vbSizeOfSafeArray1d     	= 24;
+        const long vbSizeOfGuid            	= 16;
+        const long vbSizeOfGuidSafeArray1d 	= 40;
+        const long vbSizeOfVariant         	= 16;
+        const long vbSizeOfPtr             	= 4;
+        const long vbSizeOfChar            	= 2;
+        const long vbBitsInChar				= 16;
+        const long vbBitsInBase64			= 6;
     }
 
     [dllname("CorVarType")]

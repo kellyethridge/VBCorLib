@@ -248,15 +248,13 @@ End Property
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
+        
+    LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
-    
-    LocalChars = AsChars(Chars)
     Range = ValidateGetBytes(LocalChars, Index, Count)
     
-    If Range.Count > 0 Then
-        GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
-    End If
+    GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
     
     GoSub Finally
     Exit Function
@@ -282,28 +280,24 @@ End Function
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim Range           As ListRange
+    Dim ByteCount       As Long
     Dim LocalChars()    As Integer
-    Dim Output()        As Byte
-    
-    On Error GoTo Catch
     
     LocalChars = AsChars(Chars)
-    Range = ValidateGetBytes(LocalChars, Index, Count)
     
-    If Range.Count > 0 Then
-        ReDim Output(0 To GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing) - 1)
-        GetBytesCore LocalChars, Range.Index, Range.Count, Output, 0, Nothing
-        GetBytes = Output
-    Else
-        GetBytes = Cor.NewBytes()
-    End If
+    On Error GoTo Catch
+    Range = ValidateGetBytes(LocalChars, Index, Count)
+        
+    ByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
+    SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
+    GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0, Nothing
     
     GoSub Finally
     Exit Function
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     FreeChars LocalChars
     Return
@@ -333,7 +327,6 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
-    
     ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
     GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
     
@@ -361,7 +354,7 @@ Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant
     Dim Output() As Integer
     
     Range = ValidateGetChars(Bytes, Index, Count)
-    GetString = SysAllocStringLen(0, GetCharCountCore(Bytes, Range.Index, Range.Count))
+    GetString = SysAllocStringLen(0, GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing))
     Output = AllocChars(GetString)
     
     On Error GoTo Catch
@@ -391,7 +384,7 @@ Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Vari
     
     Range = ValidateGetChars(Bytes, Index, Count)
     
-    GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
+    GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing)
 End Function
 
 ''
@@ -405,19 +398,12 @@ End Function
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
     Dim Range       As ListRange
     Dim CharCount   As Long
-    Dim Output()    As Integer
     
     Range = ValidateGetChars(Bytes, Index, Count)
-    CharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
     
-    If CharCount > 0 Then
-        ReDim Output(0 To CharCount - 1)
-        GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
-    Else
-        Output = Cor.NewIntegers()
-    End If
-    
-    GetChars = Output
+    CharCount = GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing)
+    SAPtr(GetChars) = SafeArrayCreateVectorEx(vbInteger, 0, CharCount)
+    GetCharsCore Bytes, Range.Index, Range.Count, GetChars, 0, Nothing
 End Function
 
 ''
@@ -754,12 +740,12 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
                     BitCount = 0
                 End If
                 
-                BitCount = BitCount + 16
+                BitCount = BitCount + vbBitsInChar
                 
                 Dim t As Long
                 t = BitCount \ 6
                 ByteCount = ByteCount + t
-                BitCount = BitCount - t * 6
+                BitCount = BitCount - t * vbBitsInBase64
             End If
         End If
         
@@ -784,15 +770,21 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
     GetByteCountCore = ByteCount
 End Function
 
-Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long) As Long
+Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, ByVal Decoder As UTF7Decoder) As Long
     Dim InBase64    As Boolean
     Dim MaxIndex    As Long
     Dim CharCount   As Long
     Dim b           As Byte
-    Dim BitCount    As Currency
+    Dim BitCount    As Long
     Dim Fallback    As DecoderFallbackBuffer
     
     MaxIndex = Index + Count
+    
+    If Not Decoder Is Nothing Then
+        BitCount = Decoder.BitCount
+        InBase64 = Decoder.InBase64
+    End If
+    
     Do While Index < MaxIndex
         b = Bytes(Index)
         
@@ -807,22 +799,22 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
                 CharCount = CharCount + 1
             End If
             
-            CharCount = CharCount + BitCount \ 16
+            CharCount = CharCount + BitCount \ vbBitsInChar
             BitCount = 0
             InBase64 = False
         ElseIf b < &H80 Then
             ' check not valid base-64 character
             If IsBase64Byte(b) Then
-                BitCount = BitCount + 6
+                BitCount = BitCount + vbBitsInBase64
             Else
                 ' add fallback count
-                CharCount = CharCount + GetFallbackCharCount(b, Fallback)
+                CharCount = CharCount + GetFallbackCharCount(b, Fallback, Decoder)
                 BitCount = 0
                 InBase64 = False
             End If
         Else
             ' add fallback count
-            CharCount = CharCount + GetFallbackCharCount(b, Fallback)
+            CharCount = CharCount + GetFallbackCharCount(b, Fallback, Decoder)
             BitCount = 0
             InBase64 = False
         End If
@@ -830,12 +822,16 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
         Index = Index + 1
     Loop
     
-    GetCharCountCore = CharCount + BitCount \ 16
+    GetCharCountCore = CharCount + BitCount \ vbBitsInChar
 End Function
 
-Private Function GetFallbackCharCount(ByVal b As Byte, ByRef Fallback As DecoderFallbackBuffer) As Long
+Private Function GetFallbackCharCount(ByVal b As Byte, ByRef Fallback As DecoderFallbackBuffer, ByVal Decoder As Decoder) As Long
     If Fallback Is Nothing Then
-        Set Fallback = mDecoderFallback.CreateFallbackBuffer
+        If Decoder Is Nothing Then
+            Set Fallback = mDecoderFallback.CreateFallbackBuffer
+        Else
+            Set Fallback = Decoder.FallbackBuffer
+        End If
     End If
     
     mBytesUnknown(0) = b
@@ -896,7 +892,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
             Case vbPlusChar
                 If InBase64 Then
                     Bits = (Bits * vbShift6Bits) Or Base64CharToBits(b)
-                    BitCount = BitCount + 6
+                    BitCount = BitCount + vbBitsInBase64
                     HasPlus = False
                 Else
                     Bits = 0
@@ -908,13 +904,9 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 If InBase64 Then
                     If Base64CharToBits(b) >= 0 Then
                         Bits = (Bits * vbShift6Bits) Or Base64CharToBits(b)
-                        BitCount = BitCount + 6
+                        BitCount = BitCount + vbBitsInBase64
                     Else
-                        If CharIndex > MaxCharIndex Then _
-                            ThrowDecoderSmallConversionBuffer
-                        
-                        Chars(CharIndex) = b
-                        CharIndex = CharIndex + 1
+                        CharIndex = InsertFallbackChars(b, Chars, CharIndex, Fallback, Decoder)
                         BitCount = 0
                         Bits = 0
                         InBase64 = False
@@ -929,7 +921,7 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 
                 HasPlus = False
             Case Else
-                CharIndex = InsertFallbackChars(b, Chars, CharIndex, Fallback)
+                CharIndex = InsertFallbackChars(b, Chars, CharIndex, Fallback, Decoder)
                 BitCount = 0
                 Bits = 0
                 InBase64 = False
@@ -940,9 +932,9 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
             If CharIndex > MaxCharIndex Then _
                 ThrowDecoderSmallConversionBuffer
             
-            Chars(CharIndex) = AsWord((Bits \ Powers(BitCount - 16)) And &HFFFF&)
+            Chars(CharIndex) = AsWord((Bits \ Powers(BitCount - vbBitsInChar)) And &HFFFF&)
             CharIndex = CharIndex + 1
-            BitCount = BitCount - 16
+            BitCount = BitCount - vbBitsInChar
         End If
         
         ByteIndex = ByteIndex + 1
@@ -959,9 +951,13 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     GetCharsCore = CharIndex - CharStartIndex
 End Function
 
-Private Function InsertFallbackChars(ByVal b As Byte, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Fallback As DecoderFallbackBuffer) As Long
+Private Function InsertFallbackChars(ByVal b As Byte, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Fallback As DecoderFallbackBuffer, ByVal Decoder As Decoder) As Long
     If Fallback Is Nothing Then
-        Set Fallback = mDecoderFallback.CreateFallbackBuffer
+        If Decoder Is Nothing Then
+            Set Fallback = mDecoderFallback.CreateFallbackBuffer
+        Else
+            Set Fallback = Decoder.FallbackBuffer
+        End If
     End If
     
     mBytesUnknown(0) = b

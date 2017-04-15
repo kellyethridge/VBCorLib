@@ -201,6 +201,30 @@ Public Sub ValidateEncoderGetBytes(ByRef Chars() As Integer, ByVal CharIndex As 
         Error.ArgumentOutOfRange "Chars", ArgumentOutOfRange_IndexCountBuffer
 End Sub
 
+Public Sub ValidateDecoderGetCharCount(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long)
+    If SAPtr(Bytes) = vbNullPtr Then _
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    If Index < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
+    If Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - Index + 1 < Count Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+End Sub
+
+Public Sub ValidateDecoderGetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long)
+    If SAPtr(Bytes) = vbNullPtr Or SAPtr(Chars) = vbNullPtr Then _
+        Error.ArgumentNull IIf(SAPtr(Bytes) = vbNullPtr, "Bytes", "Chars"), ArgumentNull_Array
+    If ByteIndex < LBound(Bytes) Then _
+        Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_ArrayLB
+    If CharIndex < LBound(Chars) Or (CharIndex > UBound(Chars) And Len1D(Chars) > 0) Then _
+        Error.ArgumentOutOfRange "CharIndex", ArgumentOutOfRange_Index
+    If ByteCount < 0 Then _
+        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
+    If UBound(Bytes) - ByteIndex + 1 < ByteCount Then _
+        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+End Sub
+
 ''
 ' Attaches either an Integer Array or a String to a Chars Integer
 ' array, allowing the same access type to both source types.
