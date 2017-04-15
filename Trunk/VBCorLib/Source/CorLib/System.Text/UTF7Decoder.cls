@@ -38,11 +38,13 @@ Option Explicit
 Implements IObject
 Implements Decoder
 
-Private mEncoding   As UTF7Encoding
-Private mInBase64   As Boolean
-Private mBits       As Long
-Private mBitCount   As Long
-Private mHasPlus    As Boolean
+Private mEncoding       As UTF7Encoding
+Private mFallback       As DecoderFallback
+Private mFallbackBuffer As DecoderFallbackBuffer
+Private mInBase64       As Boolean
+Private mBits           As Long
+Private mBitCount       As Long
+Private mHasPlus        As Boolean
 
 
 Friend Property Get InBase64() As Boolean
@@ -83,6 +85,7 @@ End Property
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Encoding As UTF7Encoding)
     Set mEncoding = Encoding
+    Set mFallback = Encoding.DecoderFallback
 End Sub
 
 
@@ -106,40 +109,51 @@ End Function
 '   Decoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Decoder_Convert(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByVal Flush As Boolean, BytesUsed As Long, CharsUsed As Long, Completed As Boolean)
-
+    modEncoding.DecoderConvert Me, Bytes, ByteIndex, ByteCount, Chars, CharIndex, CharCount, Flush, BytesUsed, CharsUsed, Completed
 End Sub
 
 Private Function Decoder_Equals(Value As Variant) As Boolean
     Decoder_Equals = IObject_Equals(Value)
 End Function
-Private Property Set Decoder_Fallback(ByVal RHS As DecoderFallback)
-
+Private Property Set Decoder_Fallback(ByVal Value As DecoderFallback)
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mFallback = Value
+    Set mFallbackBuffer = Nothing
 End Property
 
 Private Property Get Decoder_Fallback() As DecoderFallback
-
+    Set Decoder_Fallback = mFallback
 End Property
 
 Private Property Get Decoder_FallbackBuffer() As DecoderFallbackBuffer
-
+    If mFallbackBuffer Is Nothing Then
+        Set mFallbackBuffer = mFallback.CreateFallbackBuffer
+    End If
+    
+    Set Decoder_FallbackBuffer = mFallbackBuffer
 End Property
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
-    Decoder_GetCharCount = mEncoding.GetCharCount(Bytes, Index, Count)
+    ValidateDecoderGetCharCount Bytes, Index, Count
+    Decoder_GetCharCount = mEncoding.GetCharCountCore(Bytes, Index, Count, Me)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
-    Dim CharCount As Long
-    
-    Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
-    CharCount = mEncoding.GetCharCountCore(Bytes, ByteIndex, ByteCount)
-    Encoding.ValidateCharRange Chars, CharIndex, CharCount
-    
+    ValidateDecoderGetChars Bytes, ByteIndex, ByteCount, Chars, CharIndex
     Decoder_GetChars = mEncoding.GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
 
 Private Sub Decoder_Reset()
+    mInBase64 = False
+    mBits = 0
+    mBitCount = 0
+    mHasPlus = False
 
+    If Not mFallbackBuffer Is Nothing Then
+        mFallbackBuffer.Reset
+    End If
 End Sub
 
 Private Function Decoder_GetHashCode() As Long

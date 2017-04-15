@@ -31,11 +31,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("Hi Mom \x263A!"), 15
             
         Case "GetCharCount_WithValues_ReturnsExpected"
-            Test.Use t("A\x2262\x0391.")
-            Test.Use t("Hi Mom -\x263A-!")
-            Test.Use t("\x65E5\x672C\x8A9E")
-            Test.Use t("Hi Mom \x263A!")
-        
+            Test.Use NewBytes(65, 43, 73, 109, 73, 68, 107, 81, 45, 46), 4  ' "A\x2262\x0391."
+            Test.Use NewBytes(72, 105, 32, 77, 111, 109, 32, 45, 43, 74, 106, 111, 45, 45, 43, 65, 67, 69, 45), 11  ' "Hi Mom -\x263A-!"
+            Test.Use NewBytes(43, 90, 101, 86, 110, 76, 73, 113, 101, 45), 3    ' "\x65E5\x672C\x8A9E"
+            Test.Use NewBytes(72, 105, 32, 77, 111, 109, 32, 43, 74, 106, 111, 65, 73, 81, 45), 9   ' "Hi Mom \x263A!"
+            
         Case "GetChars_WithFallbacks_ReturnsExpected"
             Test.Use NewBytes(45), NewChars(45)
             Test.Use NewBytes(65, 65), NewChars(65, 65)
@@ -54,6 +54,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(45), 1
             Test.Use NewBytes(43, 128), 1
             Test.Use NewBytes(43, 97, 128, 97, 97), 3
+            Test.Use NewBytes(43, 97, 1, 97, 97), 3
             Test.Use NewBytes(43, 97, 97, 128, 97), 2
             Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), 2
             Test.Use NewBytes(43, 97, 2), 1
@@ -66,6 +67,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(45), 1
             Test.Use NewBytes(43, 128), 0
             Test.Use NewBytes(43, 97, 128, 97, 97), 2
+            Test.Use NewBytes(43, 97, 1, 97, 97), 2
             Test.Use NewBytes(43, 97, 97, 128, 97), 1
             Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), 1
             Test.Use NewBytes(43, 97, 2), 0
@@ -78,6 +80,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(45), NewChars(45)
             Test.Use NewBytes(43, 128), NewChars()
             Test.Use NewBytes(43, 97, 128, 97, 97), NewChars(97, 97)
+            Test.Use NewBytes(43, 97, 1, 97, 97), NewChars(97, 97)
             Test.Use NewBytes(43, 97, 97, 128, 97), NewChars(97)
             Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), NewChars(97)
             Test.Use NewBytes(43, 97, 2), NewChars()
@@ -399,14 +402,12 @@ Public Sub GetCharCount_WithValue_ReturnsExpected()
     Assert.That Decoded, Iz.EqualTo(Original)
 End Sub
 
-Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef s As String)
-    Dim Bytes() As Byte
+Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected As Long)
     Dim Actual  As Long
-    Bytes = Encoding.UTF7.GetBytes(s)
     
     Actual = Encoding.UTF7.GetCharCount(Bytes)
     
-    Assert.That Actual, Iz.EqualTo(Len(s))
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Serialization()

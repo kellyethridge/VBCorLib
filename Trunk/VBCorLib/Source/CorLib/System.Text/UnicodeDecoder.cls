@@ -137,28 +137,14 @@ Private Property Get Decoder_FallbackBuffer() As DecoderFallbackBuffer
 End Property
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
-    If SAPtr(Bytes) = vbNullPtr Then _
-        Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If Index < LBound(Bytes) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
-    If Count < 0 Then _
-        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    If UBound(Bytes) - Index + 1 < Count Then _
-        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    ValidateDecoderGetCharCount Bytes, Index, Count
     
     mFlushing = Flush
     Decoder_GetCharCount = mEncoding.GetCharCountCore(Bytes, Index, Count, Me)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
-    If SAPtr(Bytes) = vbNullPtr Then _
-        Error.ArgumentNull "Bytes", ArgumentNull_Array
-    If ByteIndex < LBound(Bytes) Or CharIndex < LBound(Chars) Then _
-        Error.ArgumentOutOfRange IIf(ByteIndex < LBound(Bytes), "ByteIndex", "CharIndex"), ArgumentOutOfRange_ArrayLB
-    If ByteCount < 0 Then _
-        Error.ArgumentOutOfRange "ByteCount", ArgumentOutOfRange_NeedNonNegNum
-    If UBound(Bytes) - ByteIndex + 1 < ByteCount Then _
-        Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
+    ValidateDecoderGetChars Bytes, ByteIndex, ByteCount, Chars, CharIndex
     
     mFlushing = Flush
     Decoder_GetChars = mEncoding.GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
