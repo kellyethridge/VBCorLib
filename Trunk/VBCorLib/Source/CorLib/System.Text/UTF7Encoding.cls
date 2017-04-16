@@ -942,10 +942,17 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
     Loop
     
     If Not Decoder Is Nothing Then
-        Decoder.BitCount = BitCount
-        Decoder.Bits = Bits
-        Decoder.HasPlus = HasPlus
-        Decoder.InBase64 = InBase64
+        If Decoder.Flush Then
+            Decoder.BitCount = 0
+            Decoder.Bits = 0
+            Decoder.HasPlus = False
+            Decoder.InBase64 = False
+        Else
+            Decoder.BitCount = BitCount
+            Decoder.Bits = Bits
+            Decoder.HasPlus = HasPlus
+            Decoder.InBase64 = InBase64
+        End If
     End If
     
     GetCharsCore = CharIndex - CharStartIndex
