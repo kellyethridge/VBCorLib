@@ -300,21 +300,18 @@ End Function
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
-    Dim Output()        As Byte
+    Dim ByteCount       As Long
+    
+    
+    LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
     
-    LocalChars = AsChars(Chars)
     Range = ValidateGetBytes(LocalChars, Index, Count)
+    ByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count)
+    SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
+    GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0
     
-    If Range.Count > 0 Then
-        ReDim Output(0 To GetByteCount(LocalChars, Range.Index, Range.Count) - 1)
-        GetBytesCore LocalChars, Range.Index, Range.Count, Output, 0
-        GetBytes = Output
-    Else
-        GetBytes = Cor.NewBytes()
-    End If
-
     GoSub Finally
     Exit Function
     
@@ -393,19 +390,15 @@ End Function
 ' @see Encoding
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
-    Dim Chars() As Integer
-    Dim Range   As ListRange
+    Dim Chars()     As Integer
+    Dim Range       As ListRange
+    Dim CharCount   As Long
     
     Range = ValidateGetChars(Bytes, Index, Count)
     
-    If Range.Count > 0 Then
-        ReDim Chars(0 To GetCharCount(Bytes, Range.Index, Range.Count) - 1)
-        GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0
-    Else
-        Chars = Cor.NewIntegers()
-    End If
-    
-    GetChars = Chars
+    CharCount = GetCharCountCore(Bytes, Range.Index, Range.Count)
+    SAPtr(GetChars) = SafeArrayCreateVectorEx(vbInteger, 0, CharCount)
+    GetCharsCore Bytes, Range.Index, Range.Count, GetChars, 0
 End Function
 
 ''

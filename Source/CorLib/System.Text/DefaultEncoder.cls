@@ -105,10 +105,12 @@ Private Function Encoder_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Flush As Boolean) As Long
+    ValidateEncoderGetByteCount Chars, Index, Count
     Encoder_GetByteCount = mEncoding.GetByteCount(Chars, Index, Count)
 End Function
 
 Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long
+    ValidateEncoderGetBytes Chars, CharIndex, CharCount, Bytes, ByteIndex
     Encoder_GetBytes = mEncoding.GetBytesEx(Chars, CharIndex, CharCount, Bytes, ByteIndex)
 End Function
 

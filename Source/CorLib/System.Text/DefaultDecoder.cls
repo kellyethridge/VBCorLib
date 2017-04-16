@@ -107,10 +107,12 @@ Private Property Get Decoder_FallbackBuffer() As DecoderFallbackBuffer
 End Property
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
+    ValidateDecoderGetCharCount Bytes, Index, Count
     Decoder_GetCharCount = mEncoding.GetCharCount(Bytes, Index, Count)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
+    ValidateDecoderGetChars Bytes, ByteIndex, ByteCount, Chars, CharIndex
     Decoder_GetChars = mEncoding.GetCharsEx(Bytes, ByteIndex, ByteCount, Chars, CharIndex)
 End Function
 

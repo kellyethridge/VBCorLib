@@ -405,7 +405,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=2
+Num=1
 
 [TASK1]
 Description=Make Encodings read-only capable.
@@ -414,10 +414,10 @@ Priority=1
 Comment=Encodings are read-only by default. Cloning an Encoding returns a read-write version.
 
 [TASK2]
-Description=Fix StringBuilder.AppendChar
-Status=0
-Priority=1
-Comment=Update method to convert Char to Integer.
+Description=
+Status=
+Priority=
+Comment=
 AssignedTo=
 
 [TASK3]
