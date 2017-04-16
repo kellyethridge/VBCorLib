@@ -48,6 +48,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(43, 97, 97, 128, 97, 43, 97), NewChars(128, 97)
             Test.Use NewBytes(43, 97, 128, 65, 43, 97, 97), NewChars(128, 65)
             Test.Use NewBytes(43, 43, 43), NewChars()
+            Test.Use NewBytes(43, 97, 97, 97, 45, 97, 97, 97), NewChars(&H69A6, 97, 97, 97)
             
         Case "GetCharCount_WithFallbacks_ReturnsExpected"
             Test.Use NewBytes(43), 0

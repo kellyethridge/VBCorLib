@@ -45,6 +45,7 @@ Private mInBase64       As Boolean
 Private mBits           As Long
 Private mBitCount       As Long
 Private mHasPlus        As Boolean
+Private mFlush          As Boolean
 
 
 Friend Property Get InBase64() As Boolean
@@ -77,6 +78,14 @@ End Property
 
 Friend Property Let HasPlus(ByVal Value As Boolean)
     mHasPlus = Value
+End Property
+
+Friend Property Get Flush() As Boolean
+    Flush = mFlush
+End Property
+
+Friend Property Let Flush(ByVal Value As Boolean)
+    mFlush = Value
 End Property
 
 
@@ -137,11 +146,15 @@ End Property
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
     ValidateDecoderGetCharCount Bytes, Index, Count
+    
+    mFlush = Flush
     Decoder_GetCharCount = mEncoding.GetCharCountCore(Bytes, Index, Count, Me)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
     ValidateDecoderGetChars Bytes, ByteIndex, ByteCount, Chars, CharIndex
+    
+    mFlush = Flush
     Decoder_GetChars = mEncoding.GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
 
@@ -150,7 +163,8 @@ Private Sub Decoder_Reset()
     mBits = 0
     mBitCount = 0
     mHasPlus = False
-
+    mFlush = False
+    
     If Not mFallbackBuffer Is Nothing Then
         mFallbackBuffer.Reset
     End If
