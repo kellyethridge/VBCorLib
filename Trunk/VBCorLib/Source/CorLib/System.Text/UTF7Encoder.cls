@@ -126,7 +126,6 @@ Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, B
     ValidateEncoderGetByteCount Chars, Index, Count
         
     mFlush = Flush
-    
     Encoder_GetByteCount = mEncoding.GetByteCountCore(Chars, Index, Count, Me)
 End Function
 
@@ -134,7 +133,6 @@ Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, B
     ValidateEncoderGetBytes Chars, CharIndex, CharCount, Bytes, ByteIndex
     
     mFlush = Flush
-    
     Encoder_GetBytes = mEncoding.GetBytesCore(Chars, CharIndex, CharCount, Bytes, ByteIndex, Me)
 End Function
 
