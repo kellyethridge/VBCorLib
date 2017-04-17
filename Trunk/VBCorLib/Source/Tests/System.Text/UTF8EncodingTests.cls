@@ -131,12 +131,57 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&HEF, &HBF, &HBE), 65534
             Test.Use NewBytes(&HEF, &HBF, &HBF), 65535
         
+        Case "GetByteCount_WithValues_ReturnsExpected"
+            Test.Use "", 0
+            Test.Use "abc", 3
+            Test.Use t("\x00"), 1
+            Test.Use t("\x7f"), 1
+            Test.Use t("\x80"), 2
+            Test.Use t("\x7ff"), 2
+            Test.Use t("\x800"), 3
+            Test.Use t("\xffff"), 3
+            Test.Use t("\xd800\xdc00"), 4
+            Test.Use t("\xdbff\xdfff"), 4
+            Test.Use t("\xd800\x80"), 5
+            Test.Use t("a\xd800"), 4
+            Test.Use t("\xd800a"), 4
+            Test.Use t("\xd800\xd800\xdc00"), 7
+            
+        Case "GetByteCount_WithFailingFallback_ReturnsExpected"
+            Test.Use t("\xd800"), 0
+            Test.Use t("\xdc00"), 0
+            Test.Use t("\xd800a"), 1
+            Test.Use t("a\xd800"), 1
+            Test.Use t("a\xd800a"), 2
+            Test.Use t("a\xdc00a"), 2
+            Test.Use t("\xd800\xd800\xdc00"), 4
+            
     End Select
 End Sub
 
 
 Public Sub Setup()
     Set mUTF8 = NewUTF8Encoding(True, True)
+End Sub
+
+Public Sub GetByteCount_WithFailingFallback_ReturnsExpected(ByRef s As String, ByVal Expected As Long)
+    Dim Enc As UTF8Encoding
+    Set Enc = Encoding.UTF8.Clone
+    Set Enc.EncoderFallback = New NullEncoderFallback
+    
+    Dim Actual As Long
+    Actual = Enc.GetByteCount(s)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetByteCount_WithValues_ReturnsExpected(ByRef s As String, ByVal Expected As Long)
+    Dim Enc As New UTF8Encoding
+    
+    Dim Actual As Long
+    Actual = Enc.GetByteCount(s)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub IsBrowserDisplay_WhenCalled_ReturnsTrue()
@@ -173,7 +218,7 @@ Public Sub GetBytes_WithTwoHighSurrogates_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     Encoding.GetBytes t("\uD800\uD800")
     
-    AssertArgumentException Err, "Chars"
+    AssertEncoderFallbackException Err
 End Sub
 
 Public Sub GetBytes_WithChars_ReturnsEncoded()
@@ -492,7 +537,7 @@ Public Sub SufficientByteArray2()
     
     On Error Resume Next
     NewUTF8Encoding(False, True).GetBytes NewIntegers(&HDF45, &HD808), 0, 2
-    AssertArgumentException Err, "Chars"
+    AssertEncoderFallbackException Err
 End Sub
 
 Public Sub DecoderFallbackSimple()

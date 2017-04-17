@@ -272,16 +272,16 @@ Friend Sub Init(ByRef Message As String, ByVal InnerException As Exception)
     Set mBase.InnerException = InnerException
 End Sub
 
-Friend Sub Init2(ByRef Message As String, ByVal CharUnknown As Integer, ByVal Index As Long)
+Friend Sub Init2(ByRef Message As String, ByVal CharUnknown As Long, ByVal Index As Long)
     mBase.Message = Message
-    mCharUnknown = CharUnknown
+    mCharUnknown = AsWord(CharUnknown)
     mIndex = Index
 End Sub
 
-Friend Sub Init3(ByRef Message As String, ByVal CharUnknownHigh As Integer, ByVal CharUnknownLow As Integer, ByVal Index As Long)
+Friend Sub Init3(ByRef Message As String, ByVal CharUnknownHigh As Long, ByVal CharUnknownLow As Long, ByVal Index As Long)
     mBase.Message = Message
-    mCharUnknownHigh = CharUnknownHigh
-    mCharUnknownLow = CharUnknownLow
+    mCharUnknownHigh = AsWord(CharUnknownHigh)
+    mCharUnknownLow = AsWord(CharUnknownLow)
     mIndex = Index
 End Sub
 

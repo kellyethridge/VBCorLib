@@ -573,13 +573,13 @@ End Function
 ' Returns a new UTF8Encoding object.
 '
 ' @param ShouldEmitUTF8Identifier Indicates whether or not the encoding should emit the preamble bytes in the GetPreamble method.
-' @param ShouldThrowException Signals whether or not the encoding should throw an
+' @param ThrowOnInvalidBytes Signals whether or not the encoding should throw an
 ' exception if the the source bytes are invalid for creating a character array.
-' @param The new UTF8Encoding object.
+' @return The new UTF8Encoding object.
 '
-Public Function NewUTF8Encoding(ByVal ShouldEmitUTF8Identifier As Boolean, Optional ByVal ShouldThrowException As Boolean) As UTF8Encoding
+Public Function NewUTF8Encoding(ByVal ShouldEmitUTF8Identifier As Boolean, Optional ByVal ThrowOnInvalidBytes As Boolean) As UTF8Encoding
     Set NewUTF8Encoding = New UTF8Encoding
-    NewUTF8Encoding.Init ShouldEmitUTF8Identifier, ShouldThrowException
+    NewUTF8Encoding.Init ShouldEmitUTF8Identifier, ThrowOnInvalidBytes
 End Function
 
 ''
@@ -1879,12 +1879,12 @@ Public Function NewEncoderFallbackException(ByRef Message As String, Optional By
     NewEncoderFallbackException.Init Message, InnerException
 End Function
 
-Public Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Integer, ByVal Index As Long) As EncoderFallbackException
+Public Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Long, ByVal Index As Long) As EncoderFallbackException
     Set NewEncoderFallbackException2 = New EncoderFallbackException
     NewEncoderFallbackException2.Init2 Message, CharUnknown, Index
 End Function
 
-Public Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Integer, ByVal CharUnknownLow As Integer, ByVal Index As Long) As EncoderFallbackException
+Public Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Long, ByVal CharUnknownLow As Long, ByVal Index As Long) As EncoderFallbackException
     Set NewEncoderFallbackException3 = New EncoderFallbackException
     NewEncoderFallbackException3.Init3 Message, CharUnknownHigh, CharUnknownLow, Index
 End Function
