@@ -57,9 +57,31 @@ Private Const CODE_PAGE As Long = 65001
 Private Const Prop_ThrowException = "ThrowException"
 Private Const Prop_ShouldEmitUTF8Identifier = "EmitBOM"
 
+Private mIsReadOnly                 As Boolean
 Private mThrowException             As Boolean
 Private mShouldEmitUTF8Identifier   As Boolean
+Private mEncoderFallback            As EncoderFallback
 
+
+''
+' When implemented in a derived class, gets a value indicating whether the current encoding is read-only.
+'
+' @return <b>true</b> if the current <a href="Encoding.html">Encoding</a> is read-only; otherwise, <b>false</b>. The default is <b>true</b>.
+'
+Public Property Get IsReadOnly() As Boolean
+    IsReadOnly = mIsReadOnly
+End Property
+
+''
+' Creates a clone of the current Encoding instance.
+'
+' @return A cloned instance of a <a href="UTF8Encoding.html">UTF8Encoding</a> object.
+' @remarks A cloned instance will have the read-only limitations removed.
+'
+Public Function Clone() As UTF8Encoding
+    Set Clone = New UTF8Encoding
+    Clone.InitClone Me
+End Function
 
 ''
 ' Returns if the current encoding uses single-byte code points.
@@ -162,6 +184,34 @@ Public Property Get IsMailNewsSave() As Boolean
 End Property
 
 ''
+' Returns the current EncoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="EncoderFallback.html">EncoderFallback</a>.
+' @remarks The default will return an instance of <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a>.
+'
+Public Property Get EncoderFallback() As EncoderFallback
+    Set EncoderFallback = mEncoderFallback
+End Property
+
+''
+' Sets the <a href="EncoderFallback.html">EncoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="EncoderFallback.html">EncoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
+'
+Public Property Set EncoderFallback(ByVal Value As EncoderFallback)
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mEncoderFallback = Value
+End Property
+
+''
 ' Returns the number of bytes that would be produced from the set of characters using this encoding.
 '
 ' @param Chars A set of characters used to calculated the number of bytes once encoded with this encoding.
@@ -169,19 +219,19 @@ End Property
 ' @param Count The number of characters to include in the calculation.
 ' @return The number of bytes that would be produced by encoding the set of characters.
 ' @remarks The <i>Chars</i> parameter will accept either a String or an Integer array. The Index
-' is zero based for both the String and Integer array, not 1 based like Mid$.
+' is zero based for <b>String</b>, not 1 based like Mid$.
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    Dim Chrs()  As Integer
-    Dim Range   As ListRange
+    Dim LocalChars()    As Integer
+    Dim Range           As ListRange
+    
+    LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
-    
-    Chrs = AsChars(Chars)
-    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
+    Range = ValidateGetBytes(LocalChars, Index, Count)
     
     If Range.Count > 0 Then
-        GetByteCount = InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing)
+        GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
     End If
     
     GoSub Finally
@@ -189,9 +239,9 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
-    FreeChars Chrs
+    FreeChars LocalChars
     Return
 End Function
 
@@ -217,7 +267,7 @@ Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant
     Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
     
     If Range.Count > 0 Then
-        ReDim Output(0 To InternalGetByteCount(Chrs, Range.Index, Range.Count, Nothing) - 1)
+        ReDim Output(0 To GetByteCountCore(Chrs, Range.Index, Range.Count, Nothing) - 1)
         InternalGetBytes Chrs, Range.Index, Range.Count, Output, 0, Nothing
         GetBytes = Output
     Else
@@ -261,7 +311,7 @@ Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVa
     On Error GoTo Catch
     
     Statics.Encoding.ValidateCharRange Chrs, CharIndex, CharCount
-    ByteCount = InternalGetByteCount(Chrs, CharIndex, CharCount, Nothing)
+    ByteCount = GetByteCountCore(Chrs, CharIndex, CharCount, Nothing)
     Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
     
     GetBytesEx = InternalGetBytes(Chrs, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
@@ -500,9 +550,24 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal ShouldEmitUTF8Identifier As Long, ByVal ShouldThrowException As Boolean)
+Friend Sub Init(ByVal ShouldEmitUTF8Identifier As Long, ByVal ThrowOnInvalidBytes As Boolean)
     mShouldEmitUTF8Identifier = ShouldEmitUTF8Identifier
-    mThrowException = ShouldThrowException
+    mThrowException = ThrowOnInvalidBytes
+    
+    If ThrowOnInvalidBytes Then
+        Set mEncoderFallback = Statics.EncoderFallback.ExceptionFallback
+    End If
+End Sub
+
+Friend Sub InitClone(ByVal Other As UTF8Encoding)
+    Set mEncoderFallback = Other.EncoderFallback
+    mShouldEmitUTF8Identifier = Other.EmitUTF8Identifier
+    mIsReadOnly = False
+End Sub
+
+Private Sub Class_InitProperties()
+    Set mEncoderFallback = Cor.NewEncoderReplacementFallback(ChrW$(&HFFFD))
+    mIsReadOnly = True
 End Sub
 
 
@@ -825,71 +890,94 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     InternalGetChars = CharCount
 End Function
 
-Friend Function InternalGetByteCount(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByRef Encoder As UTF8Encoder) As Long
-    Dim Ret As Long
-    Dim HasHighSurrogate As Boolean
+Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF8Encoder) As Long
+    Dim Ch          As Long
+    Dim ByteCount   As Long
+    Dim PrevChar    As Long
+    Dim Fallback    As EncoderFallbackBuffer
+    Dim InFallback  As Boolean
+    Dim MaxIndex    As Long
     
-    If Index < LBound(Chars) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Environment.GetResourceString(ArgumentOutOfRange_LBound))
-    If Count < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If Index + Count - 1 > UBound(Chars) Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
-
-    If Not Encoder Is Nothing Then HasHighSurrogate = (Encoder.HighSurrogateChar <> 0)
+    MaxIndex = Index + Count
     
-    Do While Count > 0
-        Select Case Chars(Index)
-            Case 0 To &H7F      ' ascii value
-                If HasHighSurrogate Then
-                    If mThrowException Then _
-                        Throw Cor.NewArgumentException("An incorrect low surrogate was found immediately after a high surrogate.", "Chars")
-                End If
-                Ret = Ret + 1
-            Case &H80 To &H7FF     ' 2 byte UTF-8 encoding
-                If HasHighSurrogate Then
-                    If mThrowException Then _
-                        Throw Cor.NewArgumentException("An incorrect low surrogate was found immediately after a high surrogate.", "Chars")
-                End If
-                Ret = Ret + 2
-            Case &HD800 To &HDBFF    ' high surrogate value
-                If HasHighSurrogate Then
-                    If mThrowException Then _
-                        Throw Cor.NewArgumentException("Second high surrogate in a row was found.", "Chars")
-                Else
-                    HasHighSurrogate = True
-                End If
-                Ret = Ret + 3
-            Case &HDC00 To &HDFFF   ' low surrogate value
-                If HasHighSurrogate Then
-                    Ret = Ret + 1
-                    HasHighSurrogate = False
-                Else
-                    If mThrowException Then _
-                        Throw Cor.NewArgumentException("Low surrogate was found without a precedding high surrogate.", "Chars")
-                    
-                    Ret = Ret + 3
-                End If
-            Case Else
-                Ret = Ret + 3
-        End Select
-        Index = Index + 1
-        Count = Count - 1
-    Loop
+    If Not Encoder Is Nothing Then
+        PrevChar = Encoder.HighSurrogateChar
+    End If
     
-    If HasHighSurrogate Then
-        If Not Encoder Is Nothing Then
-            If Encoder.Flush Then
-                If mThrowException Then _
-                    Throw Cor.NewArgumentException("A high surrogate character was not followed by a low surrogate character.", "Chars")
+    Do While Index < MaxIndex Or InFallback
+        If InFallback Then
+            If Fallback.Remaining > 0 Then
+                Ch = Fallback.GetNextChar And &HFFFF&
+            ElseIf Index < MaxIndex Then
+                Ch = Chars(Index) And &HFFFF&
+                Index = Index + 1
+                InFallback = False
+            Else
+                Exit Do
             End If
         Else
-            If mThrowException Then _
-                Throw Cor.NewArgumentException("Missing Low Surrogage.", "Chars")
+            Ch = Chars(Index) And &HFFFF&
+            Index = Index + 1
+        End If
+        
+        GoSub ProcessChar
+    Loop
+    
+    ' do we have a hanging high surrogate?
+    If PrevChar <> 0 Then
+        If FallbackUnknownChar(PrevChar, Fallback) Then
+            Do While Fallback.Remaining > 0
+                Ch = Fallback.GetNextChar And &HFFFF&
+                GoSub ProcessChar
+            Loop
         End If
     End If
     
-    InternalGetByteCount = Ret
+    GetByteCountCore = ByteCount
+    Exit Function
+    
+ProcessChar:
+    If PrevChar = 0 Then
+        Select Case Ch
+            Case 0 To &H7F  ' ASCII
+                ByteCount = ByteCount + 1
+            Case &H80 To &H7FF  ' 2-byte UTF8 encoded
+                ByteCount = ByteCount + 2
+            Case HighSurrogateStart To HighSurrogateEnd
+                PrevChar = Ch
+            Case LowSurrogateStart To LowSurrogateEnd
+                ' a low surrogate without a preceeding high surrogate
+                ' just fallback the low surrogate.
+                InFallback = FallbackUnknownChar(Ch, Fallback)
+            Case Else   ' 0800-FFFF excluding surrogates; 3-byte UTF8 encoded
+                ByteCount = ByteCount + 3
+        End Select
+    Else
+        Select Case Ch
+            Case LowSurrogateStart To LowSurrogateEnd
+                ' we have a surrogate pair
+                ByteCount = ByteCount + 4
+            Case Else
+                ' we have a high surrogate with no following low surrogate
+                ' so fallback the high surrogate. move the index back so
+                ' we will attempt to re-process the current character once
+                ' the fallback has completed.
+                Index = Index - 1
+                InFallback = FallbackUnknownChar(PrevChar, Fallback)
+        End Select
+        
+        PrevChar = 0
+    End If
+
+    Return
+End Function
+
+Private Function FallbackUnknownChar(ByVal UnknownChar As Long, ByRef Fallback As EncoderFallbackBuffer) As Boolean
+    If Fallback Is Nothing Then
+        Set Fallback = mEncoderFallback.CreateFallbackBuffer
+    End If
+    
+    FallbackUnknownChar = Fallback.Fallback(UnknownChar)
 End Function
 
 
@@ -960,7 +1048,7 @@ Private Property Get Encoding_IsReadOnly() As Boolean
 End Property
 
 Private Function Encoding_Clone() As Encoding
-
+    Set Encoding_Clone = Clone
 End Function
 
 Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
@@ -972,11 +1060,11 @@ Private Property Get Encoding_DecoderFallback() As DecoderFallback
 End Property
 
 Private Property Set Encoding_EncoderFallback(ByVal Value As EncoderFallback)
-
+    Set EncoderFallback = Value
 End Property
 
 Private Property Get Encoding_EncoderFallback() As EncoderFallback
-
+    Set Encoding_EncoderFallback = EncoderFallback
 End Property
 
 Private Property Get Encoding_BodyName() As String

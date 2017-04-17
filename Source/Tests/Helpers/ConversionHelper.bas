@@ -39,7 +39,7 @@ End Function
 
 Public Function TextToHex(ByRef s As String) As String
     Dim Bytes() As Byte
-    Bytes = Encoding.UTF8.GetBytes(s)
+    Bytes = Encoding.ASCII.GetBytes(s)
     
     Dim sb As New SimplyVBComp.StringBuilder
     Dim i As Long
