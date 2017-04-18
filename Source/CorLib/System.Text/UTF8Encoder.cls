@@ -111,7 +111,7 @@ Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, B
     Result = VerifyArrayRange(SAPtr(Chars), Index, Count)
     If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", Index, "Index", Count, "Count"
     
-    Encoder_GetByteCount = mEncoding.GetByteCountCore(Chars, Index, Count, Me)
+    Encoder_GetByteCount = mEncoding.GetBytesCore(Chars, Index, Count, NullBytes, 0, Me)
 End Function
 
 Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long
