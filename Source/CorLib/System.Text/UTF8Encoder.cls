@@ -115,13 +115,10 @@ Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, B
 End Function
 
 Private Function Encoder_GetBytes(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal Flush As Boolean) As Long
+    ValidateEncoderGetBytes Chars, CharIndex, CharCount, Bytes, ByteIndex
+    
     mFlush = Flush
-    
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Chars), CharIndex, CharCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount")
-    
-    Encoder_GetBytes = mEncoding.InternalGetBytes(Chars, CharIndex, CharCount, Bytes, ByteIndex, Me)
+    Encoder_GetBytes = mEncoding.GetBytesCore(Chars, CharIndex, CharCount, Bytes, ByteIndex, Me)
 End Function
 
 Private Function Encoder_GetHashCode() As Long
