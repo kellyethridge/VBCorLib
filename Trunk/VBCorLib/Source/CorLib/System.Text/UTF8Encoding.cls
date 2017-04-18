@@ -222,6 +222,7 @@ End Property
 ' is zero based for <b>String</b>, not 1 based like Mid$.
 '
 Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
+    Dim NullBytes()     As Byte
     Dim LocalChars()    As Integer
     Dim Range           As ListRange
     
@@ -231,7 +232,7 @@ Public Function GetByteCount(ByRef Chars As Variant, Optional ByRef Index As Var
     Range = ValidateGetBytes(LocalChars, Index, Count)
     
     If Range.Count > 0 Then
-        GetByteCount = GetByteCountCore(LocalChars, Range.Index, Range.Count, Nothing)
+        GetByteCount = GetBytesCore(LocalChars, Range.Index, Range.Count, NullBytes, 0, Nothing)
     End If
     
     GoSub Finally
@@ -257,31 +258,27 @@ End Function
 ' is zero based for both the String and Integer array, not 1 based like Mid$.
 '
 Public Function GetBytes(ByRef Chars As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    Dim Range       As ListRange
-    Dim Chrs()      As Integer
-    Dim Output()    As Byte
+    Dim Range           As ListRange
+    Dim LocalChars()    As Integer
+    Dim ByteCount       As Long
+    
+    LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
+    Range = ValidateGetBytes(LocalChars, Index, Count)
     
-    Chrs = AsChars(Chars)
-    Range = Statics.Encoding.ValidateOptionalCharRange(Chrs, Index, Count)
-    
-    If Range.Count > 0 Then
-        ReDim Output(0 To GetByteCountCore(Chrs, Range.Index, Range.Count, Nothing) - 1)
-        InternalGetBytes Chrs, Range.Index, Range.Count, Output, 0, Nothing
-        GetBytes = Output
-    Else
-        GetBytes = Cor.NewBytes()
-    End If
+    ByteCount = GetBytesCore(LocalChars, Range.Index, Range.Count, NullBytes, 0, Nothing)
+    SAPtr(GetBytes) = SafeArrayCreateVectorEx(vbByte, 0, ByteCount)
+    GetBytesCore LocalChars, Range.Index, Range.Count, GetBytes, 0, Nothing
     
     GoSub Finally
     Exit Function
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
-    FreeChars Chrs
+    FreeChars LocalChars
     Return
 End Function
 
@@ -302,19 +299,17 @@ End Function
 ' characters. Resizing of the resultant <i>Bytes</i> array may be necessary.
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
-    Dim Chrs()      As Integer
-    Dim Range       As ListRange
-    Dim ByteCount   As Long
+    Dim LocalChars()    As Integer
+    Dim Range           As ListRange
+    Dim ByteCount       As Long
     
-    Chrs = AsChars(Chars)
+    LocalChars = AsChars(Chars)
     
     On Error GoTo Catch
+    ValidateGetBytesEx LocalChars, CharIndex, CharCount, Bytes, ByteIndex
     
-    Statics.Encoding.ValidateCharRange Chrs, CharIndex, CharCount
-    ByteCount = GetByteCountCore(Chrs, CharIndex, CharCount, Nothing)
-    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
-    
-    GetBytesEx = InternalGetBytes(Chrs, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
+    ByteCount = GetBytesCore(LocalChars, CharIndex, CharCount, NullBytes, 0, Nothing)
+    GetBytesEx = GetBytesCore(LocalChars, CharIndex, CharCount, Bytes, ByteIndex, Nothing)
     
     GoSub Finally
     Exit Function
@@ -323,7 +318,7 @@ Catch:
     GoSub Finally
     Throw
 Finally:
-    FreeChars Chrs
+    FreeChars LocalChars
     Return
 End Function
 
@@ -608,15 +603,15 @@ Friend Function InternalGetBytes(ByRef Chars() As Integer, ByVal CharIndex As Lo
             Select Case Ch
                 Case &HDC00& To &HDFFF&
                     ' we have a surrogate pair.
-                    Dim pair As Long
+                    Dim Pair As Long
                     If ByteIndex + 4 > MaxByteIndex Then _
                         SmallBufferError "Bytes"
                     
-                    pair = ((HighSurrogateChar - HIGH_OFFSET) * &H400) + (Ch - LOW_OFFSET) + &H10000
-                    Bytes(ByteIndex + 3) = &H80 Or (pair And &H3F)
-                    Bytes(ByteIndex + 2) = &H80 Or ((pair \ &H40&) And &H3F)
-                    Bytes(ByteIndex + 1) = &H80 Or ((pair \ &H1000&) And &H3F)
-                    Bytes(ByteIndex) = &HF0 Or (pair \ &H40000)
+                    Pair = ((HighSurrogateChar - HIGH_OFFSET) * &H400) + (Ch - LOW_OFFSET) + &H10000
+                    Bytes(ByteIndex + 3) = &H80 Or (Pair And &H3F)
+                    Bytes(ByteIndex + 2) = &H80 Or ((Pair \ &H40&) And &H3F)
+                    Bytes(ByteIndex + 1) = &H80 Or ((Pair \ &H1000&) And &H3F)
+                    Bytes(ByteIndex) = &HF0 Or (Pair \ &H40000)
                     ByteIndex = ByteIndex + 4
                     HighSurrogateChar = 0
                 Case &HD800& To &HDBFF&
@@ -890,34 +885,42 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     InternalGetChars = CharCount
 End Function
 
-Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Encoder As UTF8Encoder) As Long
+Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UTF8Encoder) As Long
     Dim Ch          As Long
-    Dim ByteCount   As Long
     Dim PrevChar    As Long
     Dim Fallback    As EncoderFallbackBuffer
     Dim InFallback  As Boolean
     Dim MaxIndex    As Long
+    Dim StartIndex  As Long
+    Dim MaxByteIndex As Long
+    Dim PutBytes    As Boolean
     
-    MaxIndex = Index + Count
+    If SAPtr(Bytes) <> vbNullPtr Then
+        MaxByteIndex = UBound(Bytes)
+        PutBytes = True
+    End If
+    
+    StartIndex = ByteIndex
+    MaxIndex = CharIndex + CharCount
     
     If Not Encoder Is Nothing Then
         PrevChar = Encoder.HighSurrogateChar
     End If
     
-    Do While Index < MaxIndex Or InFallback
+    Do While CharIndex < MaxIndex Or InFallback
         If InFallback Then
             If Fallback.Remaining > 0 Then
                 Ch = Fallback.GetNextChar And &HFFFF&
-            ElseIf Index < MaxIndex Then
-                Ch = Chars(Index) And &HFFFF&
-                Index = Index + 1
+            ElseIf CharIndex < MaxIndex Then
+                Ch = Chars(CharIndex) And &HFFFF&
+                CharIndex = CharIndex + 1
                 InFallback = False
             Else
                 Exit Do
             End If
         Else
-            Ch = Chars(Index) And &HFFFF&
-            Index = Index + 1
+            Ch = Chars(CharIndex) And &HFFFF&
+            CharIndex = CharIndex + 1
         End If
         
         GoSub ProcessChar
@@ -933,16 +936,31 @@ Friend Function GetByteCountCore(ByRef Chars() As Integer, ByVal Index As Long, 
         End If
     End If
     
-    GetByteCountCore = ByteCount
+    GetBytesCore = ByteIndex - StartIndex
     Exit Function
     
 ProcessChar:
     If PrevChar = 0 Then
         Select Case Ch
             Case 0 To &H7F  ' ASCII
-                ByteCount = ByteCount + 1
+                If PutBytes Then
+                    If ByteIndex > MaxByteIndex Then _
+                        ThrowEncoderSmallConversionBuffer
+                    
+                    Bytes(ByteIndex) = Ch
+                End If
+                
+                ByteIndex = ByteIndex + 1
             Case &H80 To &H7FF  ' 2-byte UTF8 encoded
-                ByteCount = ByteCount + 2
+                If PutBytes Then
+                    If ByteIndex + 1 > MaxByteIndex Then _
+                        ThrowEncoderSmallConversionBuffer
+                    
+                    Bytes(ByteIndex) = &HC0 Or (Ch \ vbShift6Bits)
+                    Bytes(ByteIndex + 1) = &H80 Or (Ch And &H3F)
+                End If
+                
+                ByteIndex = ByteIndex + 2
             Case HighSurrogateStart To HighSurrogateEnd
                 PrevChar = Ch
             Case LowSurrogateStart To LowSurrogateEnd
@@ -950,25 +968,45 @@ ProcessChar:
                 ' just fallback the low surrogate.
                 InFallback = FallbackUnknownChar(Ch, Fallback)
             Case Else   ' 0800-FFFF excluding surrogates; 3-byte UTF8 encoded
-                ByteCount = ByteCount + 3
+                If PutBytes Then
+                    If ByteIndex + 2 > MaxByteIndex Then _
+                        ThrowEncoderSmallConversionBuffer
+                
+                    Bytes(ByteIndex) = &HE0 Or ((Ch \ &H1000&) And &HF)
+                    Bytes(ByteIndex + 1) = &H80 Or ((Ch \ vbShift6Bits) And &H3F)
+                    Bytes(ByteIndex + 2) = &H80 Or (Ch And &H3F)
+                End If
+                
+                ByteIndex = ByteIndex + 3
         End Select
     Else
         Select Case Ch
             Case LowSurrogateStart To LowSurrogateEnd
                 ' we have a surrogate pair
-                ByteCount = ByteCount + 4
+                If PutBytes Then
+                    Dim UnicodeChar As Long
+                    If ByteIndex + 3 > MaxByteIndex Then _
+                        ThrowEncoderSmallConversionBuffer
+                    
+                    UnicodeChar = ((PrevChar - HighSurrogateStart) * &H400) + (Ch - LowSurrogateStart) + &H10000
+                    Bytes(ByteIndex + 3) = &H80 Or (UnicodeChar And &H3F)
+                    Bytes(ByteIndex + 2) = &H80 Or ((UnicodeChar \ &H40&) And &H3F)
+                    Bytes(ByteIndex + 1) = &H80 Or ((UnicodeChar \ &H1000&) And &H3F)
+                    Bytes(ByteIndex) = &HF0 Or (UnicodeChar \ &H40000)
+                End If
+                
+                ByteIndex = ByteIndex + 4
             Case Else
                 ' we have a high surrogate with no following low surrogate
                 ' so fallback the high surrogate. move the index back so
                 ' we will attempt to re-process the current character once
                 ' the fallback has completed.
-                Index = Index - 1
+                CharIndex = CharIndex - 1
                 InFallback = FallbackUnknownChar(PrevChar, Fallback)
         End Select
         
         PrevChar = 0
     End If
-
     Return
 End Function
 
@@ -1003,6 +1041,14 @@ Private Sub ByteStreamError(ByVal Index As Long)
     If mThrowException Then
         Throw Cor.NewArgumentException(CorString.Format("An invalid byte was found at index {0}.", Index), "Bytes")
     End If
+End Sub
+
+Private Sub ThrowEncoderSmallConversionBuffer()
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowBytes, EncodingName, TypeName(EncoderFallback)), "Bytes")
+End Sub
+
+Private Sub ThrowDecoderSmallConversionBuffer()
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingConversionOverflowChars, EncodingName, TypeName(DecoderFallback)), "Chars")
 End Sub
 
 
