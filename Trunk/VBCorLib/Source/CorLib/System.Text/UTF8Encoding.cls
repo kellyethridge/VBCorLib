@@ -814,26 +814,10 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     
     ' do we have a hanging high surrogate?
     If Encoder Is Nothing Then
-        If PrevChar <> 0 Then
-            If FallbackUnknownChar(PrevChar, Fallback, Encoder) Then
-                Do While Fallback.Remaining > 0
-                    Ch = Fallback.GetNextChar And &HFFFF&
-                    GoSub ProcessChar
-                Loop
-            End If
-        End If
+        GoSub ProcessPrevChar
     Else
         If Encoder.Flush Then
-            If PrevChar <> 0 Then
-                If FallbackUnknownChar(PrevChar, Fallback, Encoder) Then
-                    Do While Fallback.Remaining > 0
-                        Ch = Fallback.GetNextChar And &HFFFF&
-                        GoSub ProcessChar
-                    Loop
-                End If
-                
-                PrevChar = 0
-            End If
+            GoSub ProcessPrevChar
         End If
     
         If PutBytes Then
@@ -843,6 +827,20 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     
     GetBytesCore = ByteIndex - StartIndex
     Exit Function
+    
+ProcessPrevChar:
+    If PrevChar <> 0 Then
+        If FallbackUnknownChar(PrevChar, Fallback, Encoder) Then
+            Do While Fallback.Remaining > 0
+                Ch = Fallback.GetNextChar And &HFFFF&
+                GoSub ProcessChar
+            Loop
+        End If
+        
+        PrevChar = 0
+    End If
+
+    Return
     
 ProcessChar:
     If PrevChar = 0 Then
@@ -912,6 +910,7 @@ ProcessChar:
         
         PrevChar = 0
     End If
+    
     Return
 End Function
 
