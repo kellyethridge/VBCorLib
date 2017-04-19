@@ -11,58 +11,60 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2017 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: UTF8Encoder
+' Module: UTF8Encoder
 '
-
-''
-' Private class returned by UTF8Encoding.GetEncoder
-'
-
 Option Explicit
 Implements IObject
 Implements Encoder
 
-Private mEncoding           As UTF8Encoding
-Private mHighSurrogateChar  As Long
-Private mFlush              As Boolean
+Private mEncoding       As UTF8Encoding
+Private mPrevChar       As Long
+Private mFlush          As Boolean
+Private mFallback       As EncoderFallback
+Private mFallbackBuffer As EncoderFallbackBuffer
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Encoding As UTF8Encoding)
-    Set mEncoding = Encoding
-End Sub
 
 Friend Property Get Flush() As Boolean
     Flush = mFlush
 End Property
 
-Friend Property Get HighSurrogateChar() As Long
-    HighSurrogateChar = mHighSurrogateChar
+Friend Property Get PrevChar() As Long
+    PrevChar = mPrevChar
 End Property
 
-Friend Property Let HighSurrogateChar(ByVal RHS As Long)
-    mHighSurrogateChar = RHS
+Friend Property Let PrevChar(ByVal Value As Long)
+    mPrevChar = Value
 End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Encoding As UTF8Encoding)
+    Set mEncoding = Encoding
+    Set mFallback = Encoding.EncoderFallback
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -85,19 +87,27 @@ End Function
 '   Encoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Encoder_Convert(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByVal Flush As Boolean, CharsUsed As Long, BytesUsed As Long, Completed As Boolean)
-
+    EncoderConvert Me, Chars, CharIndex, CharCount, Bytes, ByteIndex, ByteCount, Flush, CharsUsed, BytesUsed, Completed
 End Sub
 
-Private Property Set Encoder_Fallback(ByVal RHS As EncoderFallback)
-
+Private Property Set Encoder_Fallback(ByVal Value As EncoderFallback)
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+        
+    Set mFallback = Value
+    Set mFallbackBuffer = Nothing
 End Property
 
 Private Property Get Encoder_Fallback() As EncoderFallback
-
+    Set Encoder_Fallback = mFallback
 End Property
 
 Private Property Get Encoder_FallbackBuffer() As EncoderFallbackBuffer
-
+    If mFallbackBuffer Is Nothing Then
+        Set mFallbackBuffer = mFallback.CreateFallbackBuffer
+    End If
+    
+    Set Encoder_FallbackBuffer = mFallbackBuffer
 End Property
 
 Private Function Encoder_Equals(Value As Variant) As Boolean
@@ -105,12 +115,9 @@ Private Function Encoder_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function Encoder_GetByteCount(Chars() As Integer, ByVal Index As Long, ByVal Count As Long, ByVal Flush As Boolean) As Long
+    ValidateEncoderGetByteCount Chars, Index, Count
+    
     mFlush = Flush
-    
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Chars), Index, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Chars", Index, "Index", Count, "Count"
-    
     Encoder_GetByteCount = mEncoding.GetBytesCore(Chars, Index, Count, NullBytes, 0, Me)
 End Function
 

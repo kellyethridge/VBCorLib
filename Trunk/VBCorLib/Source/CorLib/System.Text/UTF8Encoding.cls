@@ -790,7 +790,7 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     MaxIndex = CharIndex + CharCount
     
     If Not Encoder Is Nothing Then
-        PrevChar = Encoder.HighSurrogateChar
+        PrevChar = Encoder.PrevChar
     End If
     
     Do While CharIndex < MaxIndex Or InFallback
@@ -813,12 +813,31 @@ Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, 
     Loop
     
     ' do we have a hanging high surrogate?
-    If PrevChar <> 0 Then
-        If FallbackUnknownChar(PrevChar, Fallback) Then
-            Do While Fallback.Remaining > 0
-                Ch = Fallback.GetNextChar And &HFFFF&
-                GoSub ProcessChar
-            Loop
+    If Encoder Is Nothing Then
+        If PrevChar <> 0 Then
+            If FallbackUnknownChar(PrevChar, Fallback, Encoder) Then
+                Do While Fallback.Remaining > 0
+                    Ch = Fallback.GetNextChar And &HFFFF&
+                    GoSub ProcessChar
+                Loop
+            End If
+        End If
+    Else
+        If Encoder.Flush Then
+            If PrevChar <> 0 Then
+                If FallbackUnknownChar(PrevChar, Fallback, Encoder) Then
+                    Do While Fallback.Remaining > 0
+                        Ch = Fallback.GetNextChar And &HFFFF&
+                        GoSub ProcessChar
+                    Loop
+                End If
+                
+                PrevChar = 0
+            End If
+        End If
+    
+        If PutBytes Then
+            Encoder.PrevChar = PrevChar
         End If
     End If
     
@@ -852,7 +871,7 @@ ProcessChar:
             Case LowSurrogateStart To LowSurrogateEnd
                 ' a low surrogate without a preceeding high surrogate
                 ' just fallback the low surrogate.
-                InFallback = FallbackUnknownChar(Ch, Fallback)
+                InFallback = FallbackUnknownChar(Ch, Fallback, Encoder)
             Case Else   ' 0800-FFFF excluding surrogates; 3-byte UTF8 encoded
                 If PutBytes Then
                     If ByteIndex + 2 > MaxByteIndex Then _
@@ -888,7 +907,7 @@ ProcessChar:
                 ' we will attempt to re-process the current character once
                 ' the fallback has completed.
                 CharIndex = CharIndex - 1
-                InFallback = FallbackUnknownChar(PrevChar, Fallback)
+                InFallback = FallbackUnknownChar(PrevChar, Fallback, Encoder)
         End Select
         
         PrevChar = 0
@@ -896,9 +915,13 @@ ProcessChar:
     Return
 End Function
 
-Private Function FallbackUnknownChar(ByVal UnknownChar As Long, ByRef Fallback As EncoderFallbackBuffer) As Boolean
+Private Function FallbackUnknownChar(ByVal UnknownChar As Long, ByRef Fallback As EncoderFallbackBuffer, ByVal Encoder As Encoder) As Boolean
     If Fallback Is Nothing Then
-        Set Fallback = mEncoderFallback.CreateFallbackBuffer
+        If Encoder Is Nothing Then
+            Set Fallback = mEncoderFallback.CreateFallbackBuffer
+        Else
+            Set Fallback = Encoder.FallbackBuffer
+        End If
     End If
     
     FallbackUnknownChar = Fallback.Fallback(UnknownChar)
