@@ -416,26 +416,16 @@ End Function
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Range       As ListRange
     Dim CharCount   As Long
-'    Dim Result      As String
-    Dim Output()    As Integer
+    Dim Chars()     As Integer
     
     Range = ValidateGetChars(Bytes, Index, Count)
     
-'    Size = GetMaxCharCount(Range.Count)
     CharCount = GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing)
     GetString = SysAllocStringLen(0, CharCount)
-    Output = AllocChars(GetString)
+    Chars = AllocChars(GetString)
     
     On Error GoTo Catch
-'    Size = GetCharsEx(Bytes, Range.Index, Range.Count, Output, 0)
-    
-'    If Len(Result) <> Size Then
-'        GetString = Left$(Result, Size)
-'    Else
-'        GetString = Result
-'    End If
-    
-    GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
+    GetCharsCore Bytes, Range.Index, Range.Count, Chars, 0, Nothing
     
     GoSub Finally
     Exit Function
@@ -444,7 +434,7 @@ Catch:
     GoSub Finally
     Throw
 Finally:
-    FreeChars Output
+    FreeChars Chars
     Return
 End Function
 
