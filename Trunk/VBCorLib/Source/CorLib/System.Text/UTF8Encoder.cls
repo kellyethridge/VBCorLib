@@ -133,7 +133,11 @@ Private Function Encoder_GetHashCode() As Long
 End Function
 
 Private Sub Encoder_Reset()
-
+    If Not mFallbackBuffer Is Nothing Then
+        mFallbackBuffer.Reset
+    End If
+    
+    mPrevChar = 0
 End Sub
 
 Private Function Encoder_ToString() As String

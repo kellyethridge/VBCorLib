@@ -61,6 +61,8 @@ Private mIsReadOnly                 As Boolean
 Private mThrowException             As Boolean
 Private mShouldEmitUTF8Identifier   As Boolean
 Private mEncoderFallback            As EncoderFallback
+Private mDecoderFallback            As DecoderFallback
+Private mBytesUnknown(0 To 1)       As Byte
 
 
 ''
@@ -181,6 +183,34 @@ End Property
 '
 Public Property Get IsMailNewsSave() As Boolean
     IsMailNewsSave = Table.IsMailNewsSave(CodePage)
+End Property
+
+''
+' Returns the current DecoderFallback instance used by the encoding.
+'
+' @return An object derived from <a href="DecoderFallback.html">DecoderFallback</a>.
+' @remarks The default will return an instance of <a href="DecoderReplacementFallback.html">DecoderReplacementFallback</a>.
+'
+Public Property Get DecoderFallback() As DecoderFallback
+    Set DecoderFallback = mDecoderFallback
+End Property
+
+''
+' Sets the <a href="DecoderFallback.html">DecoderFallback</a> to be used by this encoding instance.
+'
+' @param Value The <a href="DecoderFallback.html">DecoderFallback</a> instance to set.
+' @remarks By default an <a href="Encoding">Encoding</a> instance is marked as read-only and setting
+' this value will result in an <a href="InvalidOperationException.html">InvalidOperationException</a>
+' being thrown. If a clone of the instance is made, then it will become read-write and allow the
+' setting of the value.
+'
+Public Property Set DecoderFallback(ByVal Value As DecoderFallback)
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mDecoderFallback = Value
 End Property
 
 ''
@@ -333,10 +363,9 @@ End Function
 Public Function GetCharCount(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
+    Range = ValidateGetChars(Bytes, Index, Count)
     
-    Dim NullChars() As Integer
-    GetCharCount = InternalGetChars(Bytes, Range.Index, Range.Count, NullChars, 0, Nothing)
+    GetCharCount = GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing)
 End Function
 
 ''
@@ -349,23 +378,13 @@ End Function
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
     Dim Range       As ListRange
-    Dim Output()    As Integer
+    Dim CharCount   As Long
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
-    
-    If Range.Count > 0 Then
-        ReDim Output(0 To GetMaxCharCount(Range.Count))
+    Range = ValidateGetChars(Bytes, Index, Count)
         
-        Dim Size As Long
-        Size = InternalGetChars(Bytes, Range.Index, Range.Count, Output, 0, Nothing)
-        If Size <> UBound(Output) + 1 Then
-            ReDim Preserve Output(0 To Size - 1)
-        End If
-    Else
-        Output = Cor.NewIntegers()
-    End If
-    
-    GetChars = Output
+    CharCount = GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing)
+    SAPtr(GetChars) = SafeArrayCreateVectorEx(vbInteger, 0, CharCount)
+    GetCharsCore Bytes, Range.Index, Range.Count, GetChars, 0, Nothing
 End Function
 
 ''
@@ -382,10 +401,8 @@ End Function
 ' GetMaxCharCount to determine a size that will hold the decoded bytes.
 '
 Public Function GetCharsEx(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
-    Statics.Encoding.ValidateByteRange Bytes, ByteIndex, ByteCount
-    ValidateCharArray Chars
-    
-    GetCharsEx = InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Nothing)
+    ValidateGetCharsEx Bytes, ByteIndex, ByteCount, Chars, CharIndex
+    GetCharsEx = GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Nothing)
 End Function
 
 ''
@@ -398,23 +415,27 @@ End Function
 '
 Public Function GetString(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
     Dim Range       As ListRange
-    Dim Size        As Long
-    Dim Result      As String
+    Dim CharCount   As Long
+'    Dim Result      As String
     Dim Output()    As Integer
     
-    Range = Statics.Encoding.ValidateOptionalByteRange(Bytes, Index, Count)
-    Size = GetMaxCharCount(Range.Count)
-    Result = SysAllocStringLen(0, Size)
-    Output = AllocChars(Result)
+    Range = ValidateGetChars(Bytes, Index, Count)
+    
+'    Size = GetMaxCharCount(Range.Count)
+    CharCount = GetCharCountCore(Bytes, Range.Index, Range.Count, Nothing)
+    GetString = SysAllocStringLen(0, CharCount)
+    Output = AllocChars(GetString)
     
     On Error GoTo Catch
-    Size = GetCharsEx(Bytes, Range.Index, Range.Count, Output, 0)
+'    Size = GetCharsEx(Bytes, Range.Index, Range.Count, Output, 0)
     
-    If Len(Result) <> Size Then
-        GetString = Left$(Result, Size)
-    Else
-        GetString = Result
-    End If
+'    If Len(Result) <> Size Then
+'        GetString = Left$(Result, Size)
+'    Else
+'        GetString = Result
+'    End If
+    
+    GetCharsCore Bytes, Range.Index, Range.Count, Output, 0, Nothing
     
     GoSub Finally
     Exit Function
@@ -424,6 +445,7 @@ Catch:
     Throw
 Finally:
     FreeChars Output
+    Return
 End Function
 
 ''
@@ -551,6 +573,7 @@ Friend Sub Init(ByVal ShouldEmitUTF8Identifier As Long, ByVal ThrowOnInvalidByte
     
     If ThrowOnInvalidBytes Then
         Set mEncoderFallback = Statics.EncoderFallback.ExceptionFallback
+        Set mDecoderFallback = Statics.DecoderFallback.ExceptionFallback
     End If
 End Sub
 
@@ -562,6 +585,7 @@ End Sub
 
 Private Sub Class_InitProperties()
     Set mEncoderFallback = Cor.NewEncoderReplacementFallback(ChrW$(&HFFFD))
+    Set mDecoderFallback = Cor.NewDecoderReplacementFallback(ChrW$(&HFFFD))
     mIsReadOnly = True
 End Sub
 
@@ -573,7 +597,159 @@ Friend Property Get EmitUTF8Identifier() As Boolean
     EmitUTF8Identifier = mShouldEmitUTF8Identifier
 End Property
 
-Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF8Decoder) As Long
+Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, ByVal Decoder As UTF8Decoder) As Long
+    Dim MaxIndex        As Long
+    Dim CharCount       As Long
+    Dim EncLength       As Long
+    Dim BytesRemaining  As Long
+    Dim b               As Byte
+    Dim Char            As Long
+    Dim PrevChar        As Long
+    Dim Fallback        As DecoderFallbackBuffer
+    
+    MaxIndex = Index + Count
+    
+    Do While Index < MaxIndex
+        b = Bytes(Index)
+        
+        If EncLength = 0 Then
+            If b < &H80 Then
+                ' ASCII
+                CharCount = CharCount + 1
+                BytesRemaining = 0
+            ElseIf (b And &HE0) = &HC0 Then
+                ' 2-byte UTF8 encoding
+                Char = b And &H1F   ' decode 5 bits
+                EncLength = 2
+                BytesRemaining = 1
+            ElseIf (b And &HF0) = &HE0 Then
+                ' 3-byte UTF8 encoding
+                Char = b And &HF
+                EncLength = 3
+                BytesRemaining = 2
+            ElseIf (b And &HF8) = &HF0 Then
+                ' 4-byte (surrogate pair) UTF8 encoding
+                Char = b And &H7    ' decode 3 bits
+                EncLength = 4
+                BytesRemaining = 3
+            Else
+                ' add fallback length
+                CharCount = CharCount + GetDecoderFallbackCount(b, Fallback)
+                BytesRemaining = 0
+            End If
+        ElseIf (b And &HC0) <> &H80 Then
+            ' invalid for all multibyte encodings
+            ' add fallback for each byte encoded
+
+'            Dim TempIndex As Long
+'            TempIndex = Index - (EncLength - BytesRemaining)
+'
+'            Do While TempIndex < Index
+'                CharCount = CharCount + GetDecoderFallbackCount(Bytes(TempIndex), Fallback)
+'                TempIndex = TempIndex + 1
+'            Loop
+            GoSub FallbackDecodedBytes
+            
+            EncLength = 0
+            BytesRemaining = 0
+            Index = Index - 1
+        Else
+            Char = (Char * vbShift6Bits) Or (b And &H3F)
+            BytesRemaining = BytesRemaining - 1
+            
+            Select Case EncLength
+                Case 2 ' U+0080 - U+07FF
+                    If Char > &H7F And Char < &H800 Then
+                        CharCount = CharCount + 1
+                    Else
+                        Index = Index - 1
+                        CharCount = CharCount + GetDecoderFallbackCount(Bytes(Index), Fallback)
+                    End If
+                    
+                Case 3 ' U+0800 - U+FFFF
+                    If BytesRemaining = 1 Then
+                        ' check first 2 bytes conform
+                        If Char < &H20 Or IsSurrogate(Char * vbShift6Bits) Then
+                            ' first two bytes represent an invalid sequence for 3-byte encoding
+                            ' so do fallback for invalid 2-byte sequence and start new sequence.
+                            CharCount = CharCount + GetDecoderFallbackCount(Bytes(Index - 1), Fallback)
+                            BytesRemaining = 0
+                        End If
+                    Else
+                        ' no need to validate char because there is no invalid sequence that can make it this far.
+                        CharCount = CharCount + 1
+                    End If
+                    
+                Case 4 ' U+D800 - U+DBFF and U+DC00 - U+DFFF encoded as UTF-32 in 21 bits.
+                    If BytesRemaining = 0 Then
+                        ' we should have decoded both high and low surrogates.
+                        Dim HighSurrogate   As Long
+                        Dim LowSurrogate    As Long
+                        
+                        ' convert to two UTF-16 surrogates.
+                        LowSurrogate = (Char And &H3FF) + &HDC00&
+                        HighSurrogate = (Char \ vbShift10Bits) + &HD7C0&
+                        
+                        If IsHighSurrogate(HighSurrogate) Then
+                            If IsLowSurrogate(LowSurrogate) Then
+                                CharCount = CharCount + 2
+                            Else
+                                ' we have an invalid low surrogate and hanging high surrogate so fallback high surrogate
+                                ' and restart sequence with invalid low surrogate character bytes.
+                                CharCount = CharCount + GetDecoderFallbackCount(Bytes(Index - 3), Fallback)
+                                Index = Index - 2
+                            End If
+                        Else
+                            ' we have an invalid high surrogate, so fallback the first byte of the high surrogate
+                            ' then rollback index to start sequence with next by after start of original high surrogate sequence.
+                            CharCount = CharCount + GetDecoderFallbackCount(Bytes(Index - 3), Fallback)
+                            Index = Index - 3
+                        End If
+                    End If
+            End Select
+            
+            If BytesRemaining = 0 Then
+                EncLength = 0
+            End If
+        End If
+        
+        Index = Index + 1
+    Loop
+    
+    If BytesRemaining > 0 Then
+        ' didn't finish decoder character
+        GoSub FallbackDecodedBytes
+    End If
+    
+    GetCharCountCore = CharCount
+    Exit Function
+    
+FallbackDecodedBytes:
+    Dim TempIndex As Long
+    TempIndex = Index - (EncLength - BytesRemaining)
+    
+    Do While TempIndex < Index
+        CharCount = CharCount + GetDecoderFallbackCount(Bytes(TempIndex), Fallback)
+        TempIndex = TempIndex + 1
+    Loop
+    
+    Return
+End Function
+
+Private Function GetDecoderFallbackCount(ByVal ByteUnknown As Byte, ByRef Fallback As DecoderFallbackBuffer) As Long
+    If Fallback Is Nothing Then
+        Set Fallback = mDecoderFallback.CreateFallbackBuffer
+    End If
+    
+    mBytesUnknown(0) = ByteUnknown
+    
+    If Fallback.Fallback(mBytesUnknown, 0) Then
+        GetDecoderFallbackCount = Fallback.Remaining
+        Fallback.Reset
+    End If
+End Function
+
+Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByRef Decoder As UTF8Decoder) As Long
     Dim BytesInSequence As Long
     Dim b               As Byte
     Dim Ch              As Long
@@ -602,9 +778,10 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
     Do While ByteIndex < MaxIndex
         b = Bytes(ByteIndex)
         
-        ' only ascii an character will be 1 byte.   0xxxxxxx format
+        ' only an ASCII character will be 1 byte.   0xxxxxxx format
         If b < &H80 Then
             ' we were expecting more bytes to complete the sequence.
+            ' do fallback
             If BytesInSequence > 0 Then _
                 ByteStreamError ByteIndex
                 
@@ -615,6 +792,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 Chars(CharIndex) = b
                 CharIndex = CharIndex + 1
             End If
+            
             BytesLeft = 0
             BytesInSequence = 0
             CharCount = CharCount + 1
@@ -628,7 +806,9 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
                 BytesInSequence = BytesInSequence + 1
                 b = (b And &H7F) * 2
             Loop
+            
             BytesLeft = BytesInSequence - 1
+            
             Select Case BytesInSequence
                 Case 2      ' 110xxxxx format
                     Ch = Ch And &H1F
@@ -768,7 +948,7 @@ Friend Function InternalGetChars(ByRef Bytes() As Byte, ByVal ByteIndex As Long,
         End If
         Decoder.BytesInSequence = BytesInSequence
     End If
-    InternalGetChars = CharCount
+    GetCharsCore = CharCount
 End Function
 
 Friend Function GetBytesCore(ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal Encoder As UTF8Encoder) As Long

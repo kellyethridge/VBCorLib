@@ -126,7 +126,7 @@ Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVa
     Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
     If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount")
     
-    Decoder_GetChars = mEncoding.InternalGetChars(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
+    Decoder_GetChars = mEncoding.GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
 
 Private Sub Decoder_Reset()
