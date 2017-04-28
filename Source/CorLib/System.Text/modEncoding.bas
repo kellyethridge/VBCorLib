@@ -31,6 +31,7 @@ Public Base64CharToBits()   As Long
 Public Base64Bytes()        As Byte
 Public IsBase64Byte()       As Boolean
 Public NullBytes()          As Byte
+Public NullChars()          As Integer
 
 
 ' Initialize the encoded character lookup table.

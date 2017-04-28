@@ -78,8 +78,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&HF7, &HBF, &HBF)
             Test.Use NewBytes(&HF, &HBF, &HBF, &HBF)
             Test.Use NewBytes(&HFD, &HBF, &HBF, &HBF, &HBF)
-            
-        Case "T3_Malformed_3_LastContinuationMissing_Pass"
             Test.Use NewBytes(&HDF)
             Test.Use NewBytes(&HEF, &HBF)
             
@@ -156,12 +154,38 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use t("a\xdc00a"), 2
             Test.Use t("\xd800\xd800\xdc00"), 4
             
+        Case "GetCharCount_WithValues_ReturnsExpected"
+            Test.Use NewBytes(), 0
+            Test.Use NewBytes(&H41), 1 ' a
+            Test.Use NewBytes(&H41, &H42, &H43), 3 ' abc
+            Test.Use NewBytes(&HC0), 1
+            Test.Use NewBytes(&HC2, &H80), 1  ' U+0080
+            Test.Use NewBytes(&HC0, &H80), 2 ' 2-byte encoding of U+0000 is invalid
+            Test.Use NewBytes(223, 191), 1 ' U+07FF
+            Test.Use NewBytes(224, 160, 128), 1 ' U+0800
+            Test.Use NewBytes(239, 191, 191), 1 ' U+FFFF
+            Test.Use NewBytes(224, 159, 191), 2 ' U+07FF
+            Test.Use NewBytes(239, 191, 189), 1 ' U+FFFD
+            Test.Use NewBytes(&HED, &HA0, &H80), 2 ' U+D800
+            Test.Use NewBytes(240, 144, 128, 128), 2 ' U+D800 U+DC00
+            Test.Use NewBytes(240, 65), 2
+            Test.Use NewBytes(&H80), 1
+            Test.Use NewBytes(&HF6, &HB0, &H80, &H80), 4 ' U+D800 U+0000
+            
     End Select
 End Sub
 
-
 Public Sub Setup()
     Set mUTF8 = NewUTF8Encoding(True, True)
+End Sub
+
+Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByVal Expected)
+    Dim Enc As New UTF8Encoding
+    
+    Dim Actual As Long
+    Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub GetByteCount_WithFailingFallback_ReturnsExpected(ByRef s As String, ByVal Expected As Long)
@@ -325,7 +349,7 @@ Public Sub T2_Boundary_1_FirstPossibleSequence_Fail_5()
     Dim Actual As String
     Actual = mUTF8.GetString(data215)
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T2_Boundary_2_FirstPossibleSequence__Fail_6()
@@ -335,7 +359,7 @@ Public Sub T2_Boundary_2_FirstPossibleSequence__Fail_6()
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T2_Boundary_2_LastPossibleSequence_Pass(ByRef Data() As Byte, ByVal Expected As Long)
@@ -354,7 +378,7 @@ Public Sub T2_Boundary_2_LastPossibleSequence_Fail_4()
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T2_Boundary_2_LastPossibleSequence_Fail_5()
@@ -364,7 +388,7 @@ Public Sub T2_Boundary_2_LastPossibleSequence_Fail_5()
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T2_Boundary_2_LastPossibleSequence_Fail_6()
@@ -374,7 +398,7 @@ Public Sub T2_Boundary_2_LastPossibleSequence_Fail_6()
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T2_Boundary_3_Other_Pass(ByRef Data() As Byte, ByVal Expected As Long)
@@ -393,36 +417,28 @@ Public Sub T2_Boundary_3_Other_Fail_5()
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T3_Malformed_1_UnexpectedContinuation_3(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T3_Malformed_2_LonelyStart_3(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T3_Malformed_3_LastContinuationMissing(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
-End Sub
-
-Public Sub T3_Malformed_3_LastContinuationMissing_Pass(ByRef Data() As Byte)
-    Dim Actual As String
-     
-    Actual = mUTF8.GetString(Data)
-    
-    Assert.That Actual, Iz.Empty
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T3_Malformed_4_ConcatenationImcomplete()
@@ -433,49 +449,49 @@ Public Sub T3_Malformed_4_ConcatenationImcomplete()
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T3_Malformed_5_ImpossibleBytes(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T4_Overlong_1_ASCII_Slash(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T4_Overlong_2_MaximumBoundary(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T4_Overlong_3_NUL(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T5_IllegalCodePosition_1_UTF16Surrogates(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub T5_IllegalCodePosition_2_PairedUTF16Surrogates(ByRef Data() As Byte)
     On Error Resume Next
     mUTF8.GetString Data
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 ' MS Fx 1.1 passes this
@@ -516,7 +532,7 @@ Public Sub Bug77315()
     On Error Resume Next
     Enc.GetString NewBytes(&HED, &HA2, &H8C)
     
-    AssertArgumentException Err, "Bytes"
+    AssertDecoderFallbackException Err
 End Sub
 
 Public Sub SufficientByteArray2()

@@ -44,7 +44,7 @@ Public Function Fallback(ByRef BytesUnknown() As Byte, ByVal Index As Long) As B
     
     Message = BuildMessage(BytesUnknown)
     
-    Throw Cor.NewDecoderFallbackException2(Environment.GetResourceString(Argument_InvalidCodePageBytesIndex, Message), BytesUnknown, Index)
+    Throw Cor.NewDecoderFallbackException2(Environment.GetResourceString(Argument_InvalidCodePageBytesIndex, Message, Index), BytesUnknown, Index)
 End Function
 
 Public Function GetNextChar() As Integer
@@ -82,7 +82,7 @@ Private Function BuildMessage(ByRef BytesUnknown() As Byte) As String
     Set sb = StringBuilderCache.Acquire
     
     For i = LBound(BytesUnknown) To CorMath.Min(LBound(BytesUnknown), UBound(BytesUnknown))
-        sb.AppendFormat "[{:X2}]", BytesUnknown(i)
+        sb.AppendFormat "[{0:X2}]", BytesUnknown(i)
     Next
     
     If i <= UBound(BytesUnknown) Then
