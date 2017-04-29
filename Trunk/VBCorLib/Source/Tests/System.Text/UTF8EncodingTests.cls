@@ -156,8 +156,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "GetCharCount_WithValues_ReturnsExpected"
             Test.Use NewBytes(), 0
-            Test.Use NewBytes(&H41), 1 ' a
-            Test.Use NewBytes(&H41, &H42, &H43), 3 ' abc
+            Test.Use NewBytes(&H41), 1 ' A
+            Test.Use NewBytes(&H41, &H42, &H43), 3 ' ABC
             Test.Use NewBytes(&HC0), 1
             Test.Use NewBytes(&HC2, &H80), 1  ' U+0080
             Test.Use NewBytes(&HC0, &H80), 2 ' 2-byte encoding of U+0000 is invalid
@@ -172,6 +172,24 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewBytes(&H80), 1
             Test.Use NewBytes(&HF6, &HB0, &H80, &H80), 4 ' U+D800 U+0000
             
+        Case "GetChars_WithValues_ReturnsExpected"
+            Test.Use NewBytes(), NewIntegers()
+            Test.Use NewBytes(&H41), NewChars("A") ' A
+            Test.Use NewBytes(&H41, &H42, &H43), NewChars("A", "B", "C") ' ABC
+            Test.Use NewBytes(&HC0), NewChars(&HFFFD)
+            Test.Use NewBytes(&HC2, &H80), NewChars(&H80)  ' U+0080
+            Test.Use NewBytes(&HC0, &H80), NewChars(&HFFFD, &HFFFD) ' 2-byte encoding of U+0000 is invalid
+            Test.Use NewBytes(223, 191), NewChars(&H7FF) ' U+07FF
+            Test.Use NewBytes(224, 160, 128), NewChars(&H800) ' U+0800
+            Test.Use NewBytes(239, 191, 191), NewChars(&HFFFF) ' U+FFFF
+            Test.Use NewBytes(224, 159, 191), NewChars(&HFFFD, &HFFFD) ' U+07FF -> U+FFFD U+FFFD
+            Test.Use NewBytes(239, 191, 189), NewChars(&HFFFD) ' U+FFFD
+            Test.Use NewBytes(&HED, &HA0, &H80), NewChars(&HFFFD, &HFFFD) ' U+D800
+            Test.Use NewBytes(240, 144, 128, 128), NewChars(&HD800, &HDC00) ' U+D800 U+DC00
+            Test.Use NewBytes(240, 65), NewChars(&HFFFD, &H41)
+            Test.Use NewBytes(&H80), NewChars(&HFFFD)
+            Test.Use NewBytes(&HF6, &HB0, &H80, &H80), NewChars(&HFFFD, &HFFFD, &HFFFD, &HFFFD) ' U+D800 U+0000
+            
     End Select
 End Sub
 
@@ -184,6 +202,15 @@ Public Sub GetCharCount_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByVal 
     
     Dim Actual As Long
     Actual = Enc.GetCharCount(Bytes)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GetChars_WithValues_ReturnsExpected(ByRef Bytes() As Byte, ByRef Expected() As Integer)
+    Dim Enc As New UTF8Encoding
+    
+    Dim Actual() As Integer
+    Actual = Enc.GetChars(Bytes)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
