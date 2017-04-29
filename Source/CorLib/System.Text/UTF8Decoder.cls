@@ -11,47 +11,45 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2017 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: UTF8Decoder
-'
-
-''
-' Private class returned by UTF8Encoding.GetDecoder
+' Module: UTF8Decoder
 '
 Option Explicit
 Implements IObject
 Implements Decoder
 
 Private mEncoding           As UTF8Encoding
+Private mFlushing           As Boolean
 Private mBytesLeft          As Long
 Private mChar               As Long
 Private mBytesInSequence    As Long
+Private mFallback           As DecoderFallback
+Private mFallbackBuffer     As DecoderFallbackBuffer
 
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Encoding As UTF8Encoding)
-    Set mEncoding = Encoding
-End Sub
+Friend Property Get Flushing() As Boolean
+    Flushing = mFlushing
+End Property
 
 Friend Property Get BytesLeft() As Long
     BytesLeft = mBytesLeft
@@ -61,11 +59,11 @@ Friend Property Let BytesLeft(ByVal Value As Long)
     mBytesLeft = Value
 End Property
 
-Friend Property Get Char() As Integer
+Friend Property Get Char() As Long
     Char = mChar
 End Property
 
-Friend Property Let Char(ByVal Value As Integer)
+Friend Property Let Char(ByVal Value As Long)
     mChar = Value
 End Property
 
@@ -76,6 +74,23 @@ End Property
 Friend Property Let BytesInSequence(ByVal Value As Long)
     mBytesInSequence = Value
 End Property
+
+Friend Property Get FallbackBuffer() As DecoderFallbackBuffer
+    If mFallbackBuffer Is Nothing Then
+        Set mFallbackBuffer = mFallback.CreateFallbackBuffer
+    End If
+    
+    Set FallbackBuffer = mFallbackBuffer
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Sub Init(ByVal Encoding As UTF8Encoding)
+    Set mEncoding = Encoding
+    Set mFallback = Encoding.DecoderFallback
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -98,7 +113,7 @@ End Function
 '   Decoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Decoder_Convert(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByVal Flush As Boolean, BytesUsed As Long, CharsUsed As Long, Completed As Boolean)
-
+    DecoderConvert Me, Bytes, ByteIndex, ByteCount, Chars, CharIndex, CharCount, Flush, BytesUsed, CharsUsed, Completed
 End Sub
 
 Private Function Decoder_Equals(Value As Variant) As Boolean
@@ -106,31 +121,41 @@ Private Function Decoder_Equals(Value As Variant) As Boolean
 End Function
 
 Private Property Set Decoder_Fallback(ByVal Value As DecoderFallback)
-
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mFallback = Value
+    Set mFallbackBuffer = Nothing
 End Property
 
 Private Property Get Decoder_Fallback() As DecoderFallback
-
+    Set Decoder_Fallback = mFallback
 End Property
 
 Private Property Get Decoder_FallbackBuffer() As DecoderFallbackBuffer
-
+    Set Decoder_FallbackBuffer = FallbackBuffer
 End Property
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
-    Decoder_GetCharCount = mEncoding.GetCharCount(Bytes, Index, Count)
+    ValidateDecoderGetCharCount Bytes, Index, Count
+    mFlushing = Flush
+    Decoder_GetCharCount = mEncoding.GetCharsCore(Bytes, Index, Count, NullChars, 0, Me)
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount")
-    
+    ValidateDecoderGetChars Bytes, ByteIndex, ByteCount, Chars, CharIndex
+    mFlushing = Flush
     Decoder_GetChars = mEncoding.GetCharsCore(Bytes, ByteIndex, ByteCount, Chars, CharIndex, Me)
 End Function
 
 Private Sub Decoder_Reset()
-
+    If Not mFallbackBuffer Is Nothing Then
+        mFallbackBuffer.Reset
+    End If
+    
+    mChar = 0
+    mBytesInSequence = 0
+    mBytesLeft = 0
 End Sub
 
 Private Function Decoder_GetHashCode() As Long
