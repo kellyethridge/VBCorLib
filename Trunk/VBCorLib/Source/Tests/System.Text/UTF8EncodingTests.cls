@@ -593,7 +593,16 @@ Public Sub DecoderFallbackSimple()
     Assert.That e.GetString(NewBytes(183)), Iz.EqualTo(t("\ufffd")), "#3"
 End Sub
 
-
+Public Sub Serialization_WhenCalled_DoesNotDuplicateExceptionFallbacks()
+    Dim Original    As UTF8Encoding
+    Dim Copy        As UTF8Encoding
+    Set Original = Cor.NewUTF8Encoding(True, True)
+    
+    Set Copy = Persist(Original)
+    
+    Assert.That Copy.DecoderFallback, Iz.SameAs(DecoderFallback.ExceptionFallback)
+    Assert.That Copy.EncoderFallback, Iz.SameAs(EncoderFallback.ExceptionFallback)
+End Sub
 
 
 

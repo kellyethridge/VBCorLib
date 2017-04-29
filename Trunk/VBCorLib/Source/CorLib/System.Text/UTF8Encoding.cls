@@ -54,11 +54,12 @@ Implements Encoding
 
 Private Const CODE_PAGE As Long = 65001
 
-Private Const Prop_ThrowException = "ThrowException"
-Private Const Prop_ShouldEmitUTF8Identifier = "EmitBOM"
+Private Const EmitUTF8IdentifierProp    As String = "EmitBOM"
+Private Const IsReadOnlyProp            As String = "IsReadOnly"
+Private Const DecoderFallbackProp       As String = "DecoderFallback"
+Private Const EncoderFallbackProp       As String = "EncoderFallback"
 
 Private mIsReadOnly                 As Boolean
-Private mThrowException             As Boolean
 Private mShouldEmitUTF8Identifier   As Boolean
 Private mEncoderFallback            As EncoderFallback
 Private mDecoderFallback            As DecoderFallback
@@ -534,15 +535,15 @@ End Function
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 Public Function Equals(ByRef Value As Variant) As Boolean
-    If IsObject(Value) Then
-        If Value Is Nothing Then Exit Function
+    Dim Other As UTF8Encoding
+    
+    On Error GoTo Catch
+    Set Other = Value
+    Equals = Other.EmitUTF8Identifier = mShouldEmitUTF8Identifier And _
+        Other.DecoderFallback.Equals(mDecoderFallback) And _
+        Other.EncoderFallback.Equals(mEncoderFallback)
         
-        If TypeOf Value Is UTF8Encoding Then
-            Dim Other As UTF8Encoding
-            Set Other = Value
-            Equals = (mShouldEmitUTF8Identifier = Other.EmitUTF8Identifier)
-        End If
-    End If
+Catch:
 End Function
 
 ''
@@ -550,7 +551,10 @@ End Function
 '
 ' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = CODE_PAGE Or CLng(IIf(mShouldEmitUTF8Identifier, &H80000000, 0)) Or CLng(IIf(mThrowException, &H40000000, 0))
+    GetHashCode = CODE_PAGE Xor _
+                CLng(IIf(mShouldEmitUTF8Identifier, &H80000000, 0)) Xor _
+                mEncoderFallback.GetHashCode Xor _
+                mDecoderFallback.GetHashCode
 End Function
 
 
@@ -559,7 +563,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal ShouldEmitUTF8Identifier As Long, ByVal ThrowOnInvalidBytes As Boolean)
     mShouldEmitUTF8Identifier = ShouldEmitUTF8Identifier
-    mThrowException = ThrowOnInvalidBytes
     
     If ThrowOnInvalidBytes Then
         Set mEncoderFallback = Statics.EncoderFallback.ExceptionFallback
@@ -993,15 +996,25 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mThrowException = .ReadProperty(Prop_ThrowException, True)
-        mShouldEmitUTF8Identifier = .ReadProperty(Prop_ShouldEmitUTF8Identifier, True)
+        mShouldEmitUTF8Identifier = .ReadProperty(EmitUTF8IdentifierProp)
+        mIsReadOnly = .ReadProperty(IsReadOnlyProp)
+        Set mDecoderFallback = .ReadProperty(DecoderFallbackProp, Statics.DecoderFallback.ExceptionFallback)
+        Set mEncoderFallback = .ReadProperty(EncoderFallbackProp, Statics.EncoderFallback.ExceptionFallback)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty Prop_ThrowException, mThrowException
-        .WriteProperty Prop_ShouldEmitUTF8Identifier, mShouldEmitUTF8Identifier
+        .WriteProperty EmitUTF8IdentifierProp, mShouldEmitUTF8Identifier
+        .WriteProperty IsReadOnlyProp, mIsReadOnly
+        
+        If Not mDecoderFallback.Equals(Statics.DecoderFallback.ExceptionFallback) Then
+            .WriteProperty DecoderFallbackProp, mDecoderFallback
+        End If
+        
+        If Not mEncoderFallback.Equals(Statics.EncoderFallback.ExceptionFallback) Then
+            .WriteProperty EncoderFallbackProp, mEncoderFallback
+        End If
     End With
 End Sub
 
@@ -1026,7 +1039,7 @@ End Function
 '   Encoding
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Encoding_IsReadOnly() As Boolean
-    
+    Encoding_IsReadOnly = IsReadOnly
 End Property
 
 Private Function Encoding_Clone() As Encoding
@@ -1034,11 +1047,11 @@ Private Function Encoding_Clone() As Encoding
 End Function
 
 Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
-
+    Set DecoderFallback = Value
 End Property
 
 Private Property Get Encoding_DecoderFallback() As DecoderFallback
-
+    Set Encoding_DecoderFallback = DecoderFallback
 End Property
 
 Private Property Set Encoding_EncoderFallback(ByVal Value As EncoderFallback)
