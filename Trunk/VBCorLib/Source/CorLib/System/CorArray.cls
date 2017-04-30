@@ -458,7 +458,7 @@ End Sub
 ' @include "..\DocIncludes\CorArray.BinarySearch.html"
 Public Function BinarySearch(ByRef Arr As Variant, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
     ValidateArray Arr
-    BinarySearch = InternalBinarySearch(Arr, LBound(Arr), CorArray.LengthFirstDim(Arr), Value, Comparer)
+    BinarySearch = InternalBinarySearch(Arr, LBound(Arr), Len1D(Arr), Value, Comparer)
 End Function
 
 ''
@@ -699,11 +699,6 @@ Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) A
     Length = LengthCore(SafeArrayPtr, Dimension)
 End Function
 
-
-Friend Function LengthFirstDim(ByRef Arr As Variant) As Long
-    LengthFirstDim = UBound(Arr) - LBound(Arr) + 1
-End Function
-
 ''
 ' Returns the number of dimensions in the array.
 '
@@ -734,7 +729,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Ptr = ArrayPointer(Arr)
     
     Dim Range As ListRange
-    Range = OptionalStepRange(StartIndex, Count, LBound(Arr), LengthFirstDim(Arr), Parameter_StartIndex)
+    Range = OptionalStepRange(StartIndex, Count, LBound(Arr), Len1D(Arr), Parameter_StartIndex)
     
     If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds

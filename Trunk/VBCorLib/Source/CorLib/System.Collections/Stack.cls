@@ -274,7 +274,7 @@ Private Sub WriteRange(ByRef Source As Variant)
 End Sub
 
 Private Sub WriteArray(ByRef Source As Variant)
-    FillStack Source, CorArray.LengthFirstDim(Source)
+    FillStack Source, Len1D(Source)
 End Sub
 
 Private Sub WriteCollection(ByVal Source As Collection)
@@ -354,8 +354,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -115,7 +115,7 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As
     Dim Chars() As Integer
     
     ValidateByteArray InArray, Parameter_InArray
-    Range = OptionalStepRange(Offset, Length, LBound(InArray), CorArray.LengthFirstDim(InArray))
+    Range = OptionalStepRange(Offset, Length, LBound(InArray), Len1D(InArray))
     If Range.Index < LBound(InArray) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _

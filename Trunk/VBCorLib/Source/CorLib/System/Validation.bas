@@ -50,7 +50,7 @@ Public Function ValidateOptionalArrayRange(ByRef Arr As Variant, ByRef Index As 
                                                                                                                  Optional ByVal IndexParameter As ParameterResourceKey = Parameter_Index, _
                                                                                                                  Optional ByVal CountParameter As ParameterResourceKey = Parameter_Count) As ListRange
     ValidateArray Arr, ArrParameter
-    ValidateOptionalArrayRange = GetOptionalRange(Index, Count, LBound(Arr), CorArray.LengthFirstDim(Arr), IndexParameter, CountParameter)
+    ValidateOptionalArrayRange = GetOptionalRange(Index, Count, LBound(Arr), Len1D(Arr), IndexParameter, CountParameter)
     If ValidateOptionalArrayRange.Index < LBound(Arr) Then
         Error.ArgumentOutOfRange Environment.GetParameterName(IndexParameter), ArgumentOutOfRange_LBound
     End If
@@ -85,7 +85,7 @@ Public Function ValidateByteArrayOptionalRange(ByRef Bytes() As Byte, ByRef Inde
                                                                                                                       Optional ByVal IndexParameter As ParameterResourceKey = Parameter_Index, _
                                                                                                                       Optional ByVal CountParameter As ParameterResourceKey = Parameter_Count) As ListRange
     ValidateByteArray Bytes, BytesParameter
-    ValidateByteArrayOptionalRange = GetOptionalRange(Index, Count, LBound(Bytes), CorArray.LengthFirstDim(Bytes), IndexParameter, CountParameter)
+    ValidateByteArrayOptionalRange = GetOptionalRange(Index, Count, LBound(Bytes), Len1D(Bytes), IndexParameter, CountParameter)
     If ValidateByteArrayOptionalRange.Index < LBound(Bytes) Then
         Error.ArgumentOutOfRange Environment.GetParameterName(IndexParameter), ArgumentOutOfRange_LBound
     End If
@@ -120,7 +120,7 @@ Public Function ValidateCharArrayOptionalRange(ByRef Chars() As Integer, ByRef I
                                                                                                                          Optional ByVal IndexParameter As ParameterResourceKey = Parameter_Index, _
                                                                                                                          Optional ByVal CountParameter As ParameterResourceKey = Parameter_Count) As ListRange
     ValidateCharArray Chars, CharsParameter
-    ValidateCharArrayOptionalRange = GetOptionalRange(Index, Count, LBound(Chars), CorArray.LengthFirstDim(Chars), IndexParameter, CountParameter)
+    ValidateCharArrayOptionalRange = GetOptionalRange(Index, Count, LBound(Chars), Len1D(Chars), IndexParameter, CountParameter)
     If ValidateCharArrayOptionalRange.Index < LBound(Chars) Then
         Error.ArgumentOutOfRange Environment.GetParameterName(IndexParameter), ArgumentOutOfRange_LBound
     End If

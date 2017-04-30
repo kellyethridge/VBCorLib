@@ -305,7 +305,7 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
     ValidateArray Value, Parameter_Value
     
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, Count, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    Range = GetOptionalRange(StartIndex, Count, LBound(Value), Len1D(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound

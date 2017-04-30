@@ -255,7 +255,7 @@ End Sub
 Private Sub FromByteArray(ByRef Value As Variant)
     ValidateArray Value, Parameter_Value
     
-    If CorArray.LengthFirstDim(Value) <> vbSizeOfGuid Then _
+    If Len1D(Value) <> vbSizeOfGuid Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, vbSizeOfGuid))
     
     Dim Bytes() As Byte

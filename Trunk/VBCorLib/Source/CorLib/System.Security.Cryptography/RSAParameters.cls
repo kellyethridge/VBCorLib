@@ -364,7 +364,7 @@ Friend Function ToCspBlob(ByVal KeyNumber As Long) As Byte()
     Writer.WriteValue ReverseByteCopy(mExponent)
     
     Dim i As Long
-    i = 4 - CorArray.LengthFirstDim(mExponent)
+    i = 4 - Len1D(mExponent)
     Do While i > 0
         Writer.WriteValue CByte(0)
         i = i - 1

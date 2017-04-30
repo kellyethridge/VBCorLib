@@ -399,7 +399,7 @@ Private Sub WritePreamble()
         Exit Sub
     
     Bytes = mEncoding.GetPreamble
-    mStream.WriteBlock Bytes, LBound(Bytes), CorArray.LengthFirstDim(Bytes)
+    mStream.WriteBlock Bytes, LBound(Bytes), Len1D(Bytes)
 End Sub
 
 Private Sub InternalFlush(ByVal FlushStream As Boolean, ByVal FlushEncoder As Boolean)

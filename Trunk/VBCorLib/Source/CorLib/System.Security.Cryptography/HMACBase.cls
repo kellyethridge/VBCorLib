@@ -108,8 +108,8 @@ Public Sub SetKey(ByRef Key() As Byte)
         Error.ArgumentNull "Key", ArgumentNull_Array
     
     ' We copy the array to ensure a zero-based array.
-    mKey = CorArray.CreateInstance(vbByte, CorArray.LengthFirstDim(Key))
-    Buffer.BlockCopy Key, 0, mKey, 0, CorArray.LengthFirstDim(Key)
+    mKey = CorArray.CreateInstance(vbByte, Len1D(Key))
+    Buffer.BlockCopy Key, 0, mKey, 0, Len1D(Key)
     Initialize
 End Sub
 
@@ -244,7 +244,7 @@ End Sub
 
 Private Sub EndHash(ByRef Hash() As Byte)
     mHashAlgorithm.TransformBlock mKeyOpad, 0, mKeySize, mKeyOpad, 0
-    mHashAlgorithm.TransformFinalBlock Hash, 0, CorArray.LengthFirstDim(Hash)
+    mHashAlgorithm.TransformFinalBlock Hash, 0, Len1D(Hash)
     mHashStarted = False
 End Sub
 
@@ -264,7 +264,7 @@ Private Sub ExpandKey()
     InitNullKey
     
     Dim K0() As Byte
-    Select Case CorArray.LengthFirstDim(mKey)
+    Select Case Len1D(mKey)
         Case Is < mKeySize
             K0 = mKey
             ReDim Preserve K0(0 To mKeySize - 1)

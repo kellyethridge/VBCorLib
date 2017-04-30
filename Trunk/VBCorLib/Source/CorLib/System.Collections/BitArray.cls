@@ -134,7 +134,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
             MaskOffLastElement Arr, Index, BitsPerByte
             
         Case vbBooleanArray
-            If CorArray.LengthFirstDim(Arr) < mLength Then _
+            If Len1D(Arr) < mLength Then _
                 Error.Argument Argument_InvalidOffLen
             
             Dim Booleans() As Boolean
@@ -423,7 +423,7 @@ Friend Sub InitFromBytes(ByRef Bytes() As Byte)
     ValidateByteArray Bytes, Parameter_Bytes
     
     Dim Size As Long
-    Size = CorArray.LengthFirstDim(Bytes)
+    Size = Len1D(Bytes)
     Me.Length = Size * BitsPerByte
     CopyMemory mBits(0), Bytes(LBound(Bytes)), Size
 End Sub

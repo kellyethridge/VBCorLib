@@ -407,7 +407,7 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
         Error.ArgumentNull "Chars", ArgumentNull_Array
     
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, CharCount, LBound(Chars), CorArray.LengthFirstDim(Chars), Parameter_StartIndex, Parameter_CharCount)
+    Range = GetOptionalRange(StartIndex, CharCount, LBound(Chars), Len1D(Chars), Parameter_StartIndex, Parameter_CharCount)
     
     If Range.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
@@ -758,7 +758,7 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
     On Error GoTo Catch
     
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, CharCount, LBound(Value), CorArray.LengthFirstDim(Value), Parameter_StartIndex)
+    Range = GetOptionalRange(StartIndex, CharCount, LBound(Value), Len1D(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index

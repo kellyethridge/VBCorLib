@@ -240,7 +240,7 @@ Public Sub FlushFinalBlock()
         Error.NotSupported Cryptography_CryptoStream_FlushFinalBlockTwice
     
     mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, mBytesBuffered)
-    mStream.WriteBlock mOutputBuffer, 0, CorArray.LengthFirstDim(mOutputBuffer)
+    mStream.WriteBlock mOutputBuffer, 0, Len1D(mOutputBuffer)
     
     If TypeOf mStream Is CryptoStream Then
         Dim cs As CryptoStream
@@ -575,7 +575,7 @@ Private Function FillBuffer() As Boolean
         ' Using the TransformFinalBlock will strip away the padding from what we
         ' have left in our input buffer.
         mOutputBuffer = mTransform.TransformFinalBlock(mInputBuffer, 0, BytesRead)
-        mBytesBuffered = CorArray.LengthFirstDim(mOutputBuffer)
+        mBytesBuffered = Len1D(mOutputBuffer)
         mFinalTransformed = True
     End If
     
@@ -739,8 +739,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
