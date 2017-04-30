@@ -65,7 +65,7 @@ Private Const MaxDateAsDouble   As Double = 2958465.99998843
 Private Const NoChars           As Long = -1
 
 Private mStream         As Stream
-Private mEncoding       As Encoding
+Private mDecoder        As Decoder
 Private mBuffer()       As Byte
 Private mSingleChar(0)  As Integer
 
@@ -353,14 +353,39 @@ End Function
 ' to the string using the current Encoding system.</p>
 '
 Public Function ReadString() As String
-    VerifyIsOpen
-    
     Dim EncodedStringLength As Long
+    Dim EncodedBytes()      As Byte
+    Dim NumberOfBytesRead   As Long
+    Dim CharCount           As Long
+    Dim Chars()             As Integer
+    
+    VerifyIsOpen
     EncodedStringLength = ReadStringLength
     
     If EncodedStringLength > 0 Then
-        ReadString = ReadEncodedString(EncodedStringLength)
+        SAPtr(EncodedBytes) = SafeArrayCreateVectorEx(vbByte, 0, EncodedStringLength)
+        NumberOfBytesRead = mStream.ReadBlock(EncodedBytes, 0, EncodedStringLength)
+        
+        If NumberOfBytesRead < EncodedStringLength Then _
+            Throw New EndOfStreamException
+            
+        CharCount = mDecoder.GetCharCount(EncodedBytes, 0, NumberOfBytesRead, True)
+        ReadString = SysAllocStringLen(0, CharCount)
+        Chars = AllocChars(ReadString)
+        
+        On Error GoTo Catch
+        mDecoder.GetChars EncodedBytes, 0, NumberOfBytesRead, Chars, 0, True
     End If
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    FreeChars Chars
+    Return
 End Function
 
 ''
@@ -409,12 +434,12 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     If Not Stream.CanRead Then _
         Error.Argument Argument_ReadableStreamRequired
     
-    Set mStream = Stream
     If Encoding Is Nothing Then
-        Set mEncoding = New UTF8Encoding
-    Else
-        Set mEncoding = Encoding
+        Set Encoding = New UTF8Encoding
     End If
+    
+    Set mStream = Stream
+    Set mDecoder = Encoding.GetDecoder
 End Sub
 
 
@@ -522,7 +547,7 @@ Private Function ReadCharBytes(ByRef Chars() As Integer, ByVal Index As Long, By
         mBuffer(BufferPos) = SingleByte
         BufferPos = BufferPos + 1
         
-        NumberOfCharsRead = mEncoding.GetCharsEx(mBuffer, 0, BufferPos, Chars, Index)
+        NumberOfCharsRead = mDecoder.GetChars(mBuffer, BufferPos - 1, 1, Chars, Index)
         
         If NumberOfCharsRead > 0 Then
             TotalCharsRead = TotalCharsRead + NumberOfCharsRead
@@ -556,19 +581,6 @@ Private Function ReadStringLength() As Long
     End If
     
     ReadStringLength = StringLength
-End Function
-
-Private Function ReadEncodedString(ByVal StringLength As Long) As String
-    Dim EncodedBytes() As Byte
-    ReDim EncodedBytes(0 To StringLength - 1)
-    
-    Dim NumberOfBytesRead As Long
-    NumberOfBytesRead = mStream.ReadBlock(EncodedBytes, 0, StringLength)
-    
-    If NumberOfBytesRead < StringLength Then _
-        Throw New EndOfStreamException
-        
-    ReadEncodedString = mEncoding.GetString(EncodedBytes)
 End Function
 
 
