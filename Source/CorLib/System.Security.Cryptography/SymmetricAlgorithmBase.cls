@@ -300,7 +300,7 @@ Public Sub SetKey(ByRef RgbKey() As Byte)
         Error.ArgumentNull "Key", ArgumentNull_Array
         
     Dim Size As Long
-    Size = CorArray.LengthFirstDim(RgbKey)
+    Size = Len1D(RgbKey)
     
     If Not ValidKeySize(Size * 8) Then _
         Error.Argument Cryptography_InvalidKeySize, "Key"
@@ -374,7 +374,7 @@ Public Function CloneRgbKey(ByRef RgbKey As Variant) As Byte()
         Error.Cryptographic Cryptography_InvalidKeySize
         
     Dim Size As Long
-    Size = CorArray.LengthFirstDim(RgbKey)
+    Size = Len1D(RgbKey)
     If Not IsLegalSize(mLegalKeySizes, Size * 8) Then _
         Error.Cryptographic Cryptography_InvalidKeySize
     

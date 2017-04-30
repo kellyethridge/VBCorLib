@@ -57,13 +57,13 @@ End Function
 Friend Sub Init(ByVal q As Queue, ByVal Head As Long, ByRef Items() As Variant)
     Set mBase = Cor.NewEnumeratorBase(Head, q.Count, q)
     SAPtr(mItems) = SAPtr(Items)
-    mCapacity = CorArray.LengthFirstDim(mItems)
+    mCapacity = Len1D(mItems)
 End Sub
 
 Friend Sub InitClone(ByVal Base As EnumeratorBase, ByRef Items() As Variant)
     Set mBase = Base
     SAPtr(mItems) = SAPtr(Items)
-    mCapacity = CorArray.LengthFirstDim(mItems)
+    mCapacity = Len1D(mItems)
 End Sub
 
 Private Sub Class_Terminate()
@@ -78,8 +78,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String

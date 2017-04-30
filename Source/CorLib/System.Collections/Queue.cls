@@ -345,7 +345,7 @@ Private Sub WriteArray(ByRef Source As Variant)
     If CorArray.IsNull(Source) Then _
         Error.ArgumentNull "Source", ArgumentNull_Array
     
-    WriteCollection CorArray.LengthFirstDim(Source), Source
+    WriteCollection Len1D(Source), Source
 End Sub
 
 Private Sub WriteVBCollection(ByVal Source As Collection)

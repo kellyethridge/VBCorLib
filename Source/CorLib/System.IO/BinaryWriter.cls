@@ -173,7 +173,7 @@ Public Sub WriteChar(ByRef Value As Variant)
     
     Dim Bytes() As Byte
     Bytes = mEncoding.GetBytes(mSingleChar, 0, 1)
-    mOutStream.WriteBlock Bytes, 0, CorArray.LengthFirstDim(Bytes)
+    mOutStream.WriteBlock Bytes, 0, Len1D(Bytes)
 End Sub
 
 ''

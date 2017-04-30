@@ -626,7 +626,7 @@ Private Sub CopyToCore(ByRef Arr As Variant, ByVal ArrayIndex As Long, ByVal Enu
         Error.Argument Arg_RankMultiDimNotSupported, "Arr"
     If ArrayIndex < LBound(Arr) Then _
         Error.ArgumentOutOfRange "ArrayIndex", ArgumentOutOfRange_LBound
-    If ArrayIndex + mCount > CorArray.LengthFirstDim(Arr) Then _
+    If ArrayIndex + mCount > Len1D(Arr) Then _
         Error.Argument Arg_ArrayPlusOffTooSmall
     
     If mCount = 0 Then
