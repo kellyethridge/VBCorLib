@@ -39,20 +39,6 @@ Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
 
-''
-' Returns a pointer to the SafeArray structure.
-'
-' If a non-array type is passed in, then zero is returned.
-'
-' We no longer consider an empty array of objects or UDT's to
-' have been null originally. We now simply consider it an empty array.
-'
-Public Function GetArrayPointer(ByRef Arg As Variant) As Long
-    If IsArray(Arg) Then
-        GetArrayPointer = MemLong(VB6.vbaRefVarAry(Arg))
-    End If
-End Function
-
 Public Function VSAPtr(ByRef Value As Variant) As Long
     If Not IsArray(Value) Then _
         Error.Argument Argument_ArrayRequired
