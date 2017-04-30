@@ -148,7 +148,7 @@ End Sub
 Public Sub Constructor_WithenUS_ReturnsUsEnglish()
     Dim c As CultureInfo
 
-    Set c = Cor.NewCultureInfo("en-US")
+    Set c = Cor.NewCultureInfo("en-US", False)
     
     Assert.That c.LCID, Iz.EqualTo(1033)
     Assert.That c.Name, Iz.EqualTo("en-US")
@@ -190,10 +190,10 @@ Public Sub IsReadOnly_WhenCreatingNewInstance_ReturnsFalse()
     Assert.That c.NumberFormat.IsReadOnly, Iz.False
 End Sub
 
-Public Sub IsReadOnly_WithCurrentCulture_ReturnsTrue()
+Public Sub ReadOnly_WhenCalled_MarksCultureAsReadOnly()
     Dim c As CultureInfo
     
-    Set c = CultureInfo.CurrentCulture
+    Set c = CultureInfo.ReadOnly(NewCultureInfo("en-US"))
     
     Assert.That c.IsReadOnly, Iz.True
     Assert.That c.DateTimeFormat.IsReadOnly, Iz.True

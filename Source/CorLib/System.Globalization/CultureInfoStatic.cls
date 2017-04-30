@@ -103,6 +103,13 @@ Public Property Get CurrentCulture() As CultureInfo
     Set CurrentCulture = Thread.CurrentThread.CurrentCulture
 End Property
 
+Public Property Set CurrentCulter(ByVal Value As CultureInfo)
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+        
+    Set Thread.CurrentThread.CurrentCulture = Value
+End Property
+
 ''
 ' Returns a ReadOnly version of the invariant culture.
 '
