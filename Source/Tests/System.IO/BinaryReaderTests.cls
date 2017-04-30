@@ -80,6 +80,16 @@ Public Sub ReadBytes_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
+Public Sub ReadBytes_WithNoBytesRemainingInStream_ReturnsZeroLengthArray()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes())
+    
+    Dim Actual() As Byte
+    Actual = Reader.ReadBytes(1)
+    
+    Assert.That Actual, Iz.EqualTo(NewBytes())
+End Sub
+
 Public Sub ReadInt32_WhenCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&HFF, &H0, &H80, &H80))
@@ -219,14 +229,14 @@ Public Sub ReadChars_WhenMoreCharsRequestedThanAvailable_ReturnsAvailableChars()
     Assert.That Actual, Iz.EqualTo(NewIntegers(&H2030, &H65))
 End Sub
 
-Public Sub ReadChars_WithNoCharsRemaining_ThrowsEndOfStreamException()
+Public Sub ReadChars_WithNoCharsRemaining_ReturnsZeroLengthArray()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes)
     
-    On Error Resume Next
-    Reader.ReadChars 1
+    Dim Actual() As Integer
+    Actual = Reader.ReadChars(1)
     
-    AssertEndOfStreamException Err
+    Assert.That Actual, Iz.EqualTo(NewIntegers())
 End Sub
 
 Public Sub PeekChar_WhenCalled_ReturnsNextChar()
