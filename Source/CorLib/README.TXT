@@ -47,7 +47,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added StringComparer class with Ordinal and OrdinalIgnoreCase implementations.
 	* Removed IHashCodeProvider. *BREAKING*
 	* Added IEqualityComparer.
-	* Updated Hashtable to use IEqualityComparer instead of IHashCodeProvider/IComparer combonation. *BREAKING*
+	* Updated Hashtable to use IEqualityComparer instead of IHashCodeProvider/IComparer combination. *BREAKING*
 	* Converting as many ByVal string parameters to ByRef as possible. *POSSIBLE BREAKING*
 	* Fixed SHA512Managed and SHA384Managed to produce correct .NET 2.0 values instead of broken 1.0 values.
 	* Added EnumeratorBase to help easily build list enumerators.
@@ -70,6 +70,9 @@ version 3.0 (BREAKING CHANGES)
 	* Added EncoderFallback to Encoding interface.
 	* Fixed UTF8Encoding to error on invalid surrogates.
 	* Re-implemented UnicodeEncoding.
+	* Added LeaveOpen option to BinaryReader constructor.
+	* Fixed BinaryReader ReadChars and ReadBytes now return zero-length arrays if no data can be read instead of throwing an exception.
+	* Fixed BinaryReader to use Decoder instead of Encoding when reading data from stream so multi-byte characters are correctly read across reads.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
