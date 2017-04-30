@@ -221,6 +221,8 @@ Public Enum ResourceStringKey
     Cryptography_CryptoStream_FlushFinalBlockTwice = 509
     Cryptography_AddNullOrEmptyName = 510
     Cryptography_InvalidOID = 511
+    Cryptography_InvalidPaddingMode = 512
+    Cryptography_InvalidCipherMode = 513
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601

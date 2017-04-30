@@ -207,7 +207,7 @@ Public Property Let Mode(ByVal Value As CipherMode)
         Case CipherMode.CBC, CipherMode.ECB, CipherMode.OFB, CipherMode.CFB
             mMode = Value
         Case Else
-            Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
+            Error.Cryptographic Cryptography_InvalidCipherMode
     End Select
 End Property
 
@@ -232,7 +232,7 @@ Public Property Let Padding(ByVal Value As PaddingMode)
         Case PaddingMode.None, PaddingMode.ANSIX923, PaddingMode.ISO10126, PaddingMode.PKCS7, PaddingMode.Zeros
             mPadding = Value
         Case Else
-            Error.ArgumentOutOfRange "Padding", ArgumentOutOfRange_Enum
+            Error.Cryptographic Cryptography_InvalidPaddingMode
     End Select
 End Property
 

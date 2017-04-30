@@ -21,164 +21,123 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
     Cat.ForFixture "System.Security.Cryptography"
 End Sub
 
-Public Sub AddLegalBlockSizes()
-    Dim base As New SymmetricAlgorithmBase
-    base.AddLegalBlockSize 64, 64, 0
-    base.AddLegalBlockSize 128, 192, 64
+Public Sub AddLegalBlockSize_WhenCalled_AddsSizes()
+    Dim Base As New SymmetricAlgorithmBase
+    
+    Base.AddLegalBlockSize 64, 64, 0
+    Base.AddLegalBlockSize 128, 192, 64
     
     Dim b() As KeySizes
-    b = base.LegalBlockSizes
-    Assert.AreEqual 2, CorArray.Length(b)
-    Assert.AreEqual 64, b(0).MinSize
-    Assert.AreEqual 64, b(0).MaxSize
-    Assert.AreEqual 0, b(0).SkipSize
-    Assert.AreEqual 128, b(1).MinSize
-    Assert.AreEqual 192, b(1).MaxSize
-    Assert.AreEqual 64, b(1).SkipSize
+    b = Base.LegalBlockSizes
+    Assert.That CorArray.Length(b), Iz.EqualTo(2)
+    Assert.That b(0).MinSize, Iz.EqualTo(64)
+    Assert.That b(0).MaxSize, Iz.EqualTo(64)
+    Assert.That b(0).SkipSize, Iz.EqualTo(0)
+    Assert.That b(1).MinSize, Iz.EqualTo(128)
+    Assert.That b(1).MaxSize, Iz.EqualTo(192)
+    Assert.That b(1).SkipSize, Iz.EqualTo(64)
 End Sub
 
-Public Sub SetValidBlockSize()
-    Dim base As New SymmetricAlgorithmBase
-    base.AddLegalBlockSize 64, 192, 64
+Public Sub BlockSize_WhenSetToLegalSize_StoresValue()
+    Dim Base As New SymmetricAlgorithmBase
+    Base.AddLegalBlockSize 64, 192, 64
     
-    On Error GoTo errTrap
-    base.BlockSize = 192
-    Assert.AreEqual 192, base.BlockSize
-    Exit Sub
+    Base.BlockSize = 192
     
-errTrap:
-    Assert.Fail "BlockSize should be legal."
+    Assert.That Base.BlockSize, Iz.EqualTo(192)
 End Sub
 
-Public Sub SetInvalidBlockSize()
-    Dim base As New SymmetricAlgorithmBase
-    base.AddLegalBlockSize 64, 64, 0
+Public Sub BlockSize_WhenSetToIllegalSize_ThrowsCryptographicException()
+    Dim Base As New SymmetricAlgorithmBase
+    Base.AddLegalBlockSize 64, 64, 0
     
-    On Error GoTo errTrap
-    base.BlockSize = 128
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
-    
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type."
+    On Error Resume Next
+    Base.BlockSize = 128
+
+    AssertCryptographicException Err
 End Sub
 
-Public Sub AddLegalKeySizes()
-    Dim base As New SymmetricAlgorithmBase
-    base.AddLegalKeySize 64, 64, 0
-    base.AddLegalKeySize 128, 192, 64
+Public Sub KeySize_WhenSetToLegalSize_SetsValue()
+    Dim Base As New SymmetricAlgorithmBase
+    Base.AddLegalKeySize 64, 192, 64
     
-    Dim b() As KeySizes
-    b = base.LegalKeySizes
-    Assert.AreEqual 2, CorArray.Length(b)
-    Assert.AreEqual 64, b(0).MinSize
-    Assert.AreEqual 64, b(0).MaxSize
-    Assert.AreEqual 0, b(0).SkipSize
-    Assert.AreEqual 128, b(1).MinSize
-    Assert.AreEqual 192, b(1).MaxSize
-    Assert.AreEqual 64, b(1).SkipSize
+    Base.KeySize = 192
+
+    Assert.That Base.KeySize, Iz.EqualTo(192)
 End Sub
 
-Public Sub SetValidKeySize()
-    Dim base As New SymmetricAlgorithmBase
-    base.AddLegalKeySize 64, 192, 64
+Public Sub KeySize_WhenSetToIllegalValue_ThrowsCryptoGraphicException()
+    Dim Base As New SymmetricAlgorithmBase
+    Base.AddLegalKeySize 64, 64, 0
     
-    On Error GoTo errTrap
-    base.KeySize = 192
-    Assert.AreEqual 192, base.KeySize
-    Exit Sub
+    On Error Resume Next
+    Base.KeySize = 128
     
-errTrap:
-    Assert.Fail "KeySize should be legal."
+    AssertCryptographicException Err
 End Sub
 
-Public Sub SetInvalidKeySize()
-    Dim base As New SymmetricAlgorithmBase
-    base.AddLegalKeySize 64, 64, 0
+Public Sub GetIV_WhenUnset_GeneratesIV()
+    Dim Base As New SymmetricAlgorithmBase
+    Base.BlockSize = 64
     
-    On Error GoTo errTrap
-    base.KeySize = 128
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
+    Dim Actual() As Byte
+    Actual = Base.GetIV
     
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type."
+    Assert.That CorArray.Length(Actual), Iz.EqualTo(8)
+    Assert.That Actual, Iz.Not.EqualTo(NewBytes(0, 0, 0, 0, 0, 0, 0, 0))
 End Sub
 
-Public Sub GetIVWithOutSettingFirst()
-    Dim base As New SymmetricAlgorithmBase
-    base.BlockSize = 64
+Public Sub GetIV_AfterGenerating_ChangesFromOriginal()
+    Dim Base        As New SymmetricAlgorithmBase
+    Dim Original()  As Byte
+    Dim Actual()    As Byte
     
+    Base.BlockSize = 64
+    
+    Original = Base.GetIV
+    Base.GenerateIV
+    Actual = Base.GetIV
+    
+    Assert.That Actual, Iz.Not.EqualTo(Original)
+End Sub
+
+Public Sub SetIV_WhenCalled_StoresValue()
+    Dim Base As New SymmetricAlgorithmBase
     Dim IV() As Byte
-    IV = base.GetIV
-    Assert.AreEqual 8, CorArray.Length(IV)
+    IV = NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
+    Base.BlockSize = 64
+    
+    Base.SetIV IV
+    
+    Assert.AreEqual IV, Base.GetIV
 End Sub
 
-Public Sub GetIVBeforeAndAfterGenerating()
-    Dim base As New SymmetricAlgorithmBase
-    Dim IV1() As Byte
-    Dim IV2() As Byte
+Public Sub IV_WhenSetToInvalidLength_ThrowsCryptographicException()
+    Dim Base As New SymmetricAlgorithmBase
+    Base.BlockSize = 64
     
-    base.BlockSize = 64
-    
-    IV1 = base.GetIV
-    base.GenerateIV
-    IV2 = base.GetIV
-    
-    Assert.That IV1, Iz.Not.EqualTo(IV2)
+    On Error Resume Next
+    Base.SetIV NewBytes(1, 2, 3, 4)
+
+    AssertCryptographicException Err
 End Sub
 
-Public Sub SetIV()
-    Dim base As New SymmetricAlgorithmBase
+Public Sub IV_WhenSettingBlockSize_ShouldChange()
+    Dim Base As New SymmetricAlgorithmBase
     Dim IV() As Byte
-    IV = NewArray(vbByte, 1, 2, 3, 4, 5, 6, 7, 8)
-    base.BlockSize = 64
-    base.SetIV IV
     
-    Assert.AreEqual IV, base.GetIV
+    Base.BlockSize = 64
+    IV = Base.GetIV
+    Base.BlockSize = 64
+    
+    Assert.That IV, Iz.Not.EqualTo(Base.GetIV)
 End Sub
 
-Public Sub SetInvalidIVLength()
-    Dim base As New SymmetricAlgorithmBase
-    base.BlockSize = 64
+Public Sub Mode_WhenSetToInvalidCipherMode_ThrowsArgumentOutOfRangeException()
+    Dim Base As New SymmetricAlgorithmBase
     
-    Dim IV() As Byte
-    IV = NewArray(vbByte, 1, 2, 3, 4)
+    On Error Resume Next
+    Base.Mode = CTS
     
-    On Error GoTo errTrap
-    base.SetIV IV
-    On Error GoTo 0
-    Assert.Fail "An exception should be thrown."
-    
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type."
-End Sub
-
-Public Sub SettingBlockSizeShouldChangeIV()
-    Dim base As New SymmetricAlgorithmBase
-    base.BlockSize = 64
-    
-    Dim IV() As Byte
-    IV = base.GetIV
-    base.BlockSize = 64
-    Assert.That IV, Iz.Not.EqualTo(base.GetIV)
-End Sub
-
-Public Sub SetInvalidCipherMode()
-    Dim base As New SymmetricAlgorithmBase
-    On Error GoTo errTrap
-    base.Mode = CTS
-    On Error GoTo 0
-    Assert.Fail "An exception should be raised."
-    
-errTrap:
-    Dim Ex As Exception
-    Assert.IsTrue Catch(Ex), "An exception should be caught."
-    Assert.IsTrue TypeOf Ex Is CryptographicException, "Wrong exception type caught."
+    AssertCryptographicException Err
 End Sub
