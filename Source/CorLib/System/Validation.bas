@@ -28,7 +28,7 @@ Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal Parameter As Param
     If Not IsArray(Arr) Then _
         Error.Argument Argument_ArrayRequired, Environment.GetParameterName(Parameter)
         
-    ValidateArrayPtr GetArrayPointer(Arr), Parameter
+    ValidateArrayPtr VSAPtr(Arr), Parameter
 End Sub
 
 Public Sub ValidateArrayRange(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal ArrParameter As ParameterResourceKey = Parameter_Arr, _
