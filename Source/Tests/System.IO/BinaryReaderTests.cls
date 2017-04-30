@@ -21,6 +21,29 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
     Cat.ForFixture "System.IO"
 End Sub
 
+Public Sub CloseReader_WhenCalled_ClosesBaseStream()
+    Dim ms As New MemoryStream
+    Dim Reader As BinaryReader
+    Set Reader = NewBinaryReader(ms)
+    
+    On Error Resume Next
+    Reader.CloseReader
+    ms.WriteByte 1
+    
+    AssertObjectDisposedException Err
+End Sub
+
+Public Sub CloseReader_WithLeaveOpenOption_DoesNotCloseBaseStream()
+    Dim ms As New MemoryStream
+    Dim Reader As BinaryReader
+    Set Reader = NewBinaryReader(ms, LeaveOpen:=True)
+    
+    Reader.CloseReader
+    ms.WriteByte 1
+
+    Assert.That ms.ToArray(), Iz.EqualTo(NewBytes(1))
+End Sub
+
 Public Sub NewBinaryReader_WithNothingStream_ThrowsArgumentNullException()
     On Error Resume Next
     

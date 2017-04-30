@@ -294,6 +294,7 @@ Private Sub AddSystemText()
         .Add New UnicodeEncodingTests
         .Add New UnicodeDecoderTests
         .Add New UnicodeEncoderTests
+        .Add New EncodingInfoTests
 '        .Add New TestEncoding437
         .Add New StringBuilderTests
         

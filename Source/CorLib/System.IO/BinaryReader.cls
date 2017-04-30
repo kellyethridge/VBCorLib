@@ -65,6 +65,7 @@ Private Const MaxDateAsDouble   As Double = 2958465.99998843
 Private Const NoChars           As Long = -1
 
 Private mStream         As Stream
+Private mLeaveOpen      As Boolean
 Private mDecoder        As Decoder
 Private mBuffer()       As Byte
 Private mSingleChar(0)  As Integer
@@ -84,7 +85,10 @@ End Property
 '
 Public Sub CloseReader()
     If Not mStream Is Nothing Then
-        mStream.CloseStream
+        If Not mLeaveOpen Then
+            mStream.CloseStream
+        End If
+        
         Set mStream = Nothing
     End If
 End Sub
@@ -432,7 +436,7 @@ Private Sub Class_Initialize()
     ReDim mBuffer(0 To DefaultCapacity - 1)
 End Sub
 
-Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
+Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding, ByVal LeaveOpen As Boolean)
     If Stream Is Nothing Then _
         Error.ArgumentNull "Stream", ArgumentNull_Stream
     If Not Stream.CanRead Then _
@@ -444,6 +448,11 @@ Friend Sub Init(ByVal Stream As Stream, ByVal Encoding As Encoding)
     
     Set mStream = Stream
     Set mDecoder = Encoding.GetDecoder
+    mLeaveOpen = LeaveOpen
+End Sub
+
+Private Sub Class_Terminate()
+    CloseReader
 End Sub
 
 
