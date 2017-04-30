@@ -199,6 +199,16 @@ Public Sub ReadChar_WhenCalled_ReturnsChar()
     Assert.That Actual, Iz.EqualTo(&H2030)
 End Sub
 
+Public Sub ReadChar_WhenReadingASurrogateFromAPair_ThrowsArgumentException()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(240, 144, 128, 128)) ' UTF-8 U+D800 - U+DC00
+    
+    On Error Resume Next
+    Reader.ReadChar
+    
+    AssertArgumentException Err
+End Sub
+
 Public Sub ReadChars_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&HE2, &H80, &HB0))
