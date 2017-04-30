@@ -766,6 +766,12 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
             ' didn't finish decoding character
             GoSub FallbackDecodedBytes
         End If
+            
+        If PutChars Then
+            Decoder.BytesInSequence = 0
+            Decoder.Char = 0
+            Decoder.BytesLeft = 0
+        End If
     ElseIf PutChars Then
         ' store state for next call
         Decoder.BytesInSequence = EncLength
