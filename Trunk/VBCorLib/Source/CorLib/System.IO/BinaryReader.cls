@@ -161,24 +161,26 @@ End Function
 ' @param Count The number of bytes to read from the stream.
 ' @return A byte array containing the bytes read from the stream.
 ' @remarks If not enough bytes are in the stream, then the remaining
-' bytes are returned. If there are no bytes in the stream, then an
-' empty array is returned, not a null array.
+' bytes are returned. If there are no bytes in the stream, then a
+' zero-length array is returned, not a null array.
 '
 Public Function ReadBytes(ByVal Count As Long) As Byte()
-    VerifyIsOpen
+    Dim Bytes()             As Byte
+    Dim NumberOfBytesRead   As Long
+    
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
-    Dim Bytes() As Byte
+    VerifyIsOpen
+    
     If Count > 0 Then
         ReDim Bytes(0 To Count - 1)
         
-        Dim NumberOfBytesRead As Long
         NumberOfBytesRead = mStream.ReadBlock(Bytes, 0, Count)
         
-        If NumberOfBytesRead = 0 Then Exit Function
-        
-        If NumberOfBytesRead < Count Then
+        If NumberOfBytesRead = 0 Then
+            Bytes = Cor.NewBytes()
+        ElseIf NumberOfBytesRead < Count Then
             ReDim Preserve Bytes(0 To NumberOfBytesRead - 1)
         End If
     Else
@@ -195,27 +197,29 @@ End Function
 ' @return The array of characters decoded from the stream.
 ' @remarks If not enough characters could be decoded from the stream,
 ' then only the remaining characters are returned. If no characters
-' could be decoded, then an empty array is returned, not a null array.
+' could be decoded, then a zero-length array is returned, not a null array.
 '
 Public Function ReadChars(ByVal Count As Long) As Integer()
-    VerifyIsOpen
+    Dim Chars()             As Integer
+    Dim NumberOfCharsRead   As Long
+    
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
-    Dim Chars() As Integer
+    VerifyIsOpen
+    
     If Count > 0 Then
         ReDim Chars(0 To Count - 1)
         
-        Dim NumberOfCharsRead As Long
         NumberOfCharsRead = ReadCharBytes(Chars, 0, Count)
-        If NumberOfCharsRead = 0 Then _
-            Throw New EndOfStreamException
         
-        If NumberOfCharsRead < Count Then
+        If NumberOfCharsRead = 0 Then
+            Chars = Cor.NewChars()
+        ElseIf NumberOfCharsRead < Count Then
             ReDim Preserve Chars(0 To NumberOfCharsRead - 1)
         End If
     Else
-        Chars = Cor.NewIntegers()
+        Chars = Cor.NewChars()
     End If
     
     ReadChars = Chars
