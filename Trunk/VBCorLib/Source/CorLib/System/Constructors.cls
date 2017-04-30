@@ -843,12 +843,13 @@ End Function
 '
 ' @param Stream The stream to read the data from.
 ' @param Encoding The encoding system to be used to decode the bytes from the stream.
+' @param LeaveOpen The stream can optionally be left open after the reader has been closed.
 ' @return The new BinaryReader with the specified stream and encoding.
 ' @remarks If no Encoding is specified, then the reader uses an Encoding of New UTF8Encoding.
 '
-Public Function NewBinaryReader(ByVal Stream As Stream, Optional ByVal Encoding As Encoding) As BinaryReader
+Public Function NewBinaryReader(ByVal Stream As Stream, Optional ByVal Encoding As Encoding, Optional ByVal LeaveOpen As Boolean) As BinaryReader
     Set NewBinaryReader = New BinaryReader
-    NewBinaryReader.Init Stream, Encoding
+    NewBinaryReader.Init Stream, Encoding, LeaveOpen
 End Function
 
 ''

@@ -97,7 +97,7 @@ End Property
 Friend Function GetCodePage(ByRef Name As String) As Long
     Dim CodePage As Variant
     
-    CodePage = mCodePageByName(LCase$(Name))
+    CodePage = mCodePageByName(Name)
     
     If IsEmpty(CodePage) Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingNotSupported, Name), "Name")
@@ -106,23 +106,32 @@ Friend Function GetCodePage(ByRef Name As String) As Long
 End Function
 
 Friend Function GetEncodings() As EncodingInfo()
-    Dim Ret() As EncodingInfo
-    ReDim Ret(0 To UBound(mEncodingData))
+    Dim Encodings() As EncodingInfo
+    ReDim Encodings(0 To UBound(mEncodingData))
     
     Dim i As Long
-    For i = 0 To UBound(Ret)
-        Set Ret(i) = New EncodingInfo
+    For i = 0 To UBound(Encodings)
+        Set Encodings(i) = New EncodingInfo
+        
         With mEncodingData(i)
-            Call Ret(i).Init(.CodePage, .WebName, .EncodingName)
+            Encodings(i).Init .CodePage, .WebName, .EncodingName
         End With
     Next i
     
-    GetEncodings = Ret
+    GetEncodings = Encodings
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    LoadData
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetIndex(ByVal cp As Long) As Long
     If mIndexByCodePage.Contains(cp) Then
@@ -132,39 +141,34 @@ Private Function GetIndex(ByVal cp As Long) As Long
     End If
 End Function
 
-
 ' The byte stream is formatted using a BinaryWriter.
 ' The first item written is the number of encodings in
 ' the stream, as a vbLong. The order to read in each item
 ' of an encoding is the same as defined in DataItem at the top.
 Private Sub LoadData()
-    Dim b() As Byte
-    b = LoadResData(101, "ENCODINGDATA")
+    Dim Data()          As Byte
+    Dim ms              As MemoryStream
+    Dim Reader          As BinaryReader
+    Dim NumEncodings    As Long
     
-    Dim ms As MemoryStream
-    Set ms = Cor.NewMemoryStream(b, , , False)
-    
-    Dim Reader As BinaryReader
+    Data = LoadResData(101, "ENCODINGDATA")
+    Set ms = Cor.NewMemoryStream(Data, Writable:=False)
     Set Reader = Cor.NewBinaryReader(ms)
-    
-    Dim NumEncodings As Long
     NumEncodings = Reader.ReadInt32
+    
     ReDim mEncodingData(0 To NumEncodings - 1)
     
     Set mIndexByCodePage = New Hashtable
-    Set mCodePageByName = New Hashtable
+    Set mCodePageByName = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
     
     Dim i As Long
     For i = 0 To NumEncodings - 1
-        Call FillData(Reader, mEncodingData(i))
-        Call mIndexByCodePage.Add(mEncodingData(i).CodePage, i)
-        mCodePageByName(LCase$(mEncodingData(i).WebName)) = mEncodingData(i).CodePage
-        mCodePageByName(LCase$(mEncodingData(i).BodyName)) = mEncodingData(i).CodePage
-        mCodePageByName(LCase$(mEncodingData(i).EncodingName)) = mEncodingData(i).CodePage
+        FillData Reader, mEncodingData(i)
+        mIndexByCodePage.Add mEncodingData(i).CodePage, i
+        mCodePageByName(mEncodingData(i).WebName) = mEncodingData(i).CodePage
+        mCodePageByName(mEncodingData(i).BodyName) = mEncodingData(i).CodePage
+        mCodePageByName(mEncodingData(i).EncodingName) = mEncodingData(i).CodePage
     Next i
-
-    Call Reader.CloseReader
-    Call ms.CloseStream
 End Sub
 
 Private Sub FillData(ByVal Reader As BinaryReader, ByRef Data As DataItem)
@@ -183,9 +187,3 @@ Private Sub FillData(ByVal Reader As BinaryReader, ByRef Data As DataItem)
 End Sub
 
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Call LoadData
-End Sub
