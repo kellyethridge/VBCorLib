@@ -49,5 +49,8 @@ Public Property Get CurrentCulture() As CultureInfo
 End Property
 
 Public Property Set CurrentCulture(ByVal Value As CultureInfo)
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+        
     Set mCurrentCulture = Value
 End Property
