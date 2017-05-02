@@ -86,7 +86,7 @@ End Function
 Private Function StringComparer_GetHashCode(Obj As Variant) As Long
     If VarType(Obj) = vbString Then
         If mStringComparison = OrdinalIgnoreCase Then
-            StringComparer_GetHashCode = Object.GetHashCode(LCase$(Obj))
+            StringComparer_GetHashCode = Object.GetHashCode(UCase$(Obj))
             Exit Function
         End If
     End If
