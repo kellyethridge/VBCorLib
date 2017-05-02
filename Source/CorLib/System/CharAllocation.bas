@@ -57,16 +57,18 @@ Public Type CharBuffer
     Buffer      As SafeArray1d
 End Type
 
-Private mInited     As Boolean
-Private mBuckets()  As BufferBucket
+Private mInited         As Boolean
+Private mBuckets()      As BufferBucket
+Private mFastLaneBucket As BufferBucket
 
 
-Public Sub InitChars(ByRef Chars As CharBuffer, Optional ByRef s As String)
-    With Chars
+Public Sub InitChars(ByRef Buffer As CharBuffer, Optional ByRef s As String)
+    With Buffer
         .TablePtr = VarPtr(.TablePtr)
         ObjectPtr(.Self) = .TablePtr
         .ReleasePtr = FuncAddr(AddressOf ReleaseCharBuffer)
         SAPtr(.Chars) = VarPtr(.Buffer)
+        
         With .Buffer
             .cbElements = vbSizeOfChar
             .cDims = 1
@@ -77,40 +79,54 @@ Public Sub InitChars(ByRef Chars As CharBuffer, Optional ByRef s As String)
     End With
 End Sub
 
-Public Sub SetChars(ByRef Chars As CharBuffer, ByRef s As String)
-    With Chars.Buffer
+Public Sub SetChars(ByRef Buffer As CharBuffer, ByRef s As String)
+    With Buffer.Buffer
         .pvData = StrPtr(s)
         .cElements = Len(s)
     End With
 End Sub
 
-
 ''
 ' Allocates an Integer array backed by the String passed in.
 '
-' @param s The string to back an Integer array and allow access using Array syntax.
-' @return Returns an Integer array that points to the String structure passed in.
-' @remarks Once work is finished with the array, FreeChars must be called to remove
+' Once work is finished with the array, FreeChars must be called to remove
 ' any references to the original string value.
 '
 Public Function AllocChars(ByRef s As String) As Integer()
-    If Not mInited Then
-        InitBuckets
-        mInited = True
-    End If
-    
     Dim Index As Long
-    Index = FindAvailableBucketIndex
     
-    With mBuckets(Index)
-        .InUse = True
-        SAPtr(AllocChars) = .BufferPtr
+    ' >99% of the time only a single allocation will be in effect,
+    ' so create a fastlane to improve efficiency by removing the
+    ' need to call into a function and perform a look-up for an
+    ' empty bucket. This goes from an O(n) to O(1) efficiency.
+    If Not mFastLaneBucket.InUse Then
+        If mFastLaneBucket.BufferPtr = vbNullPtr Then
+            InitBucket mFastLaneBucket
+        End If
         
-        With .Buffer
-            .cElements = Len(s)
-            .pvData = StrPtr(s)
+        With mFastLaneBucket
+            .InUse = True
+            SAPtr(AllocChars) = .BufferPtr
+            
+            With .Buffer
+                .cElements = Len(s)
+                .pvData = StrPtr(s)
+            End With
         End With
-    End With
+    Else
+        Debug.Print "AllocChars: finding empty bucket"
+        Index = FindAvailableBucketIndex
+        
+        With mBuckets(Index)
+            .InUse = True
+            SAPtr(AllocChars) = .BufferPtr
+            
+            With .Buffer
+                .cElements = Len(s)
+                .pvData = StrPtr(s)
+            End With
+        End With
+    End If
 End Function
 
 ''
@@ -125,11 +141,6 @@ End Function
 ' any references to the original string or array.</p>
 '
 Public Function AsChars(ByRef v As Variant) As Integer()
-    If Not mInited Then
-        InitBuckets
-        mInited = True
-    End If
-    
     Select Case VarType(v)
         Case vbString
             ' Directly assigning a string pointer prevents a string from being copied.
@@ -157,10 +168,15 @@ End Function
 '
 Public Sub FreeChars(ByRef Chars() As Integer)
     Dim Index As Long
-    Index = FindAllocatedBucketIndex(Chars)
     
-    If Index >= 0 Then
-        mBuckets(Index).InUse = False
+    If SAPtr(Chars) = mFastLaneBucket.BufferPtr Then
+        mFastLaneBucket.InUse = False
+    Else
+        Index = FindAllocatedBucketIndex(Chars)
+        
+        If Index >= 0 Then
+            mBuckets(Index).InUse = False
+        End If
     End If
     
     SAPtr(Chars) = vbNullPtr
@@ -174,20 +190,29 @@ Private Sub InitBuckets()
     ReDim mBuckets(0 To BufferCapacity - 1)
 
     Dim i As Long
-    For i = 0 To BufferCapacity - 1
-        With mBuckets(i)
-            .Buffer.cbElements = 2
-            .Buffer.cDims = 1
-            .Buffer.cLocks = 1
-            .TablePtr = VarPtr(.TablePtr)
-            ObjectPtr(.Self) = .TablePtr
-            .ReleasePtr = FuncAddr(AddressOf ReleaseBufferBucket)
-            .BufferPtr = VarPtr(.Buffer)
-        End With
+    For i = 0 To UBound(mBuckets)
+        InitBucket mBuckets(i)
     Next
 End Sub
 
+Private Sub InitBucket(ByRef Bucket As BufferBucket)
+    With Bucket
+        .Buffer.cbElements = 2
+        .Buffer.cDims = 1
+        .Buffer.cLocks = 1
+        .TablePtr = VarPtr(.TablePtr)
+        ObjectPtr(.Self) = .TablePtr
+        .ReleasePtr = FuncAddr(AddressOf ReleaseBufferBucket)
+        .BufferPtr = VarPtr(.Buffer)
+    End With
+End Sub
+
 Private Function FindAvailableBucketIndex() As Long
+    If Not mInited Then
+        InitBuckets
+        mInited = True
+    End If
+
     Dim i As Long
     For i = 0 To BufferCapacity - 1
         If Not mBuckets(i).InUse Then
@@ -201,15 +226,18 @@ End Function
 
 Private Function FindAllocatedBucketIndex(ByRef Chars() As Integer) As Long
     Dim Ptr As Long
-    Ptr = SAPtr(Chars)
+    Dim i   As Long
     
-    Dim i As Long
-    For i = 0 To BufferCapacity - 1
-        If mBuckets(i).BufferPtr = Ptr Then
-            FindAllocatedBucketIndex = i
-            Exit Function
-        End If
-    Next
+    If mInited Then
+        Ptr = SAPtr(Chars)
+        
+        For i = 0 To BufferCapacity - 1
+            If mBuckets(i).BufferPtr = Ptr Then
+                FindAllocatedBucketIndex = i
+                Exit Function
+            End If
+        Next
+    End If
     
     FindAllocatedBucketIndex = -1
 End Function
