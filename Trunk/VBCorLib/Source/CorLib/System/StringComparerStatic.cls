@@ -34,16 +34,44 @@ Attribute VB_Exposed = True
 '
 ' Module: StringComparerStatic
 '
+
+''
+' Provides a set of <a href="StringComparer.html">StringComparer</a> objects implementing different string comparison rules.
+'
+' @see StringComparer
+'
 Option Explicit
 
 Private mOrdinal            As New OrdinalStringComparer
 Private mOrdinalIgnoreCase  As New OrdinalStringComparer
 
 
+''
+' Gets a <a href="StringComparer.html">StringComparer</a> object that provides case-sensitive string comparisons.
+'
+' @return A <a href="StringComparer.html">StringComparer</a> object that is case-sensitive.
+' @remarks The comparison is done in a similar fashion as using the standard equality check of two VisualBasic strings in a variant culture manner.
+' <p>The <a href="StringComparer.html">StringComparer</a> object can be retrieved using the following code.</p>
+' <pre>
+'   Dim c As StringComparer
+'   Set c = StringComparer.Ordinal
+' </pre>
+' <p>The instance of the <a href="StringComparer.html">StringComparer</a> object returned is a private class and simply implements the <a href="StringComparer.html">StringComparer</a> interface.</p>
 Public Property Get Ordinal() As StringComparer
     Set Ordinal = mOrdinal
 End Property
 
+''
+' Gets a <a href="StringComparer.html">StringComparer</a> object that provides case-insensitive string comparisons.
+'
+' @return A <a href="StringComparer.html">StringComparer</a> that is case-insensitive.
+' @remarks The comparison is done like using the <b>StrComp</b> function to check two VisualBasic strings in a variant culture manner.
+' <p>The <a href="StringComparer.html">StringComparer</a> object can be retrieved using the following code.</p>
+' <pre>
+'   Dim c As StringComparer
+'   Set c = StringComparer.OrdinalIgnoreCase
+' </pre>
+' <p>The instance of the <a href="StringComparer.html">StringComparer</a> object returned is a private class and simply implements the <a href="StringComparer.html">StringComparer</a> interface.</p>
 Public Property Get OrdinalIgnoreCase() As StringComparer
     Set OrdinalIgnoreCase = mOrdinalIgnoreCase
 End Property

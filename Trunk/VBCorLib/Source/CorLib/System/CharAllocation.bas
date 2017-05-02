@@ -114,7 +114,6 @@ Public Function AllocChars(ByRef s As String) As Integer()
             End With
         End With
     Else
-        Debug.Print "AllocChars: finding empty bucket"
         Index = FindAvailableBucketIndex
         
         With mBuckets(Index)
