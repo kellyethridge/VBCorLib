@@ -201,7 +201,7 @@ Private Sub Class_InitProperties()
     Set mBase = Cor.NewExceptionBase(Me, App)
 End Sub
 
-Friend Sub Init(ByRef Message As String, ByRef InnerException As Exception)
+Friend Sub Init(ByRef Message As String, ByVal InnerException As Exception)
     mBase.Message = Message
     Set mBase.InnerException = InnerException
 End Sub

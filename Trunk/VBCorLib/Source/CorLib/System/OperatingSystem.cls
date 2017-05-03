@@ -173,7 +173,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Platform As PlatformID, ByVal Version As Version, ByVal ServicePack As String)
+Friend Sub Init(ByVal Platform As PlatformID, ByVal Version As Version, ByRef ServicePack As String)
     mPlatformID = Platform
     Set mVersion = Version
     mServicePack = ServicePack

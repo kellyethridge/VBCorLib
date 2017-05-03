@@ -100,7 +100,7 @@ End Function
 ' @see Exception
 ' @remarks
 ' The default error number is 5-Invalid Procedure Call.
-Public Function NewException(ByVal Message As String, Optional ByVal ErrorNumber As Long = vbInvalidProcedureCall, Optional ByVal InnerException As Exception) As Exception
+Public Function NewException(ByRef Message As String, Optional ByVal ErrorNumber As Long = vbInvalidProcedureCall, Optional ByVal InnerException As Exception) As Exception
     Set NewException = New Exception
     NewException.Init Message, ErrorNumber, InnerException
 End Function
@@ -126,7 +126,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created UnauthorizedAccessException object.
 '
-Public Function NewUnauthorizedAccessException(ByVal Message As String, Optional ByVal InnerException As Exception) As UnauthorizedAccessException
+Public Function NewUnauthorizedAccessException(ByRef Message As String, Optional ByVal InnerException As Exception) As UnauthorizedAccessException
     Set NewUnauthorizedAccessException = New UnauthorizedAccessException
     NewUnauthorizedAccessException.Init Message, InnerException
 End Function
@@ -138,7 +138,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created NotSupportedException object.
 '
-Public Function NewNotSupportedException(ByVal Message As String, Optional ByVal InnerException As Exception) As NotSupportedException
+Public Function NewNotSupportedException(ByRef Message As String, Optional ByVal InnerException As Exception) As NotSupportedException
     Set NewNotSupportedException = New NotSupportedException
     NewNotSupportedException.Init Message, InnerException
 End Function
@@ -204,7 +204,7 @@ End Function
 '
 ' @see ArgumentNullException
 '
-Public Function NewArgumentNullException(Optional ByVal ParamName As String, Optional ByVal Message As String, Optional ByVal InnerException As Exception) As ArgumentNullException
+Public Function NewArgumentNullException(Optional ByRef ParamName As String, Optional ByRef Message As String, Optional ByVal InnerException As Exception) As ArgumentNullException
     Set NewArgumentNullException = New ArgumentNullException
     NewArgumentNullException.Init ParamName, Message, InnerException
 End Function
@@ -232,7 +232,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created InvalidCastException object.
 '
-Public Function NewInvalidCastException(ByVal Message As String, Optional ByVal InnerException As Exception) As InvalidCastException
+Public Function NewInvalidCastException(ByRef Message As String, Optional ByVal InnerException As Exception) As InvalidCastException
     Set NewInvalidCastException = New InvalidCastException
     NewInvalidCastException.Init Message, InnerException
 End Function
@@ -244,7 +244,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created IndexOutOfRangeException object.
 '
-Public Function NewIndexOutOfRangeException(ByVal Message As String, Optional ByVal InnerException As Exception) As IndexOutOfRangeException
+Public Function NewIndexOutOfRangeException(ByRef Message As String, Optional ByVal InnerException As Exception) As IndexOutOfRangeException
     Set NewIndexOutOfRangeException = New IndexOutOfRangeException
     NewIndexOutOfRangeException.Init Message, InnerException
 End Function
@@ -256,7 +256,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created RankException object.
 '
-Public Function NewRankException(ByVal Message As String, Optional ByVal InnerException As Exception) As RankException
+Public Function NewRankException(ByRef Message As String, Optional ByVal InnerException As Exception) As RankException
     Set NewRankException = New RankException
     NewRankException.Init Message, InnerException
 End Function
@@ -268,7 +268,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created InvalidOperationException object.
 '
-Public Function NewInvalidOperationException(ByVal Message As String, Optional ByVal InnerException As Exception) As InvalidOperationException
+Public Function NewInvalidOperationException(ByRef Message As String, Optional ByVal InnerException As Exception) As InvalidOperationException
     Set NewInvalidOperationException = New InvalidOperationException
     NewInvalidOperationException.Init Message, InnerException
 End Function
@@ -316,7 +316,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created SerializationException object.
 '
-Public Function NewSerializationException(ByVal Message As String, Optional ByVal InnerException As Exception) As SerializationException
+Public Function NewSerializationException(ByRef Message As String, Optional ByVal InnerException As Exception) As SerializationException
     Set NewSerializationException = New SerializationException
     NewSerializationException.Init Message, InnerException
 End Function
@@ -340,7 +340,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created ArrayTypeMismatchException object.
 '
-Public Function NewArrayTypeMismatchException(ByVal Message As String, Optional ByVal InnerException As Exception) As ArrayTypeMismatchException
+Public Function NewArrayTypeMismatchException(ByRef Message As String, Optional ByVal InnerException As Exception) As ArrayTypeMismatchException
     Set NewArrayTypeMismatchException = New ArrayTypeMismatchException
     NewArrayTypeMismatchException.Init Message, InnerException
 End Function
@@ -377,7 +377,7 @@ End Function
 ' @param Value The value to initialize all the bits to (True = 1, False = 0).
 ' @return A new BitArray object set to the specified length with the specified value.
 '
-Public Function NewBitArray(ByVal Length As Long, Optional ByVal Value As Boolean = False) As BitArray
+Public Function NewBitArray(ByVal Length As Long, Optional ByVal Value As Boolean) As BitArray
     Set NewBitArray = New BitArray
     NewBitArray.Init Length, Value
 End Function
@@ -400,7 +400,7 @@ End Function
 ' @param InnerException An exception that caused this exception.
 ' @return A fully created FormatException object.
 '
-Public Function NewFormatException(ByVal Message As String, Optional ByVal InnerException As Exception) As FormatException
+Public Function NewFormatException(ByRef Message As String, Optional ByVal InnerException As Exception) As FormatException
     Set NewFormatException = New FormatException
     NewFormatException.Init Message, InnerException
 End Function
@@ -487,7 +487,7 @@ End Function
 ' @param InnerException The exception that caused this exception.
 ' @return A new FileNotFoundException with the specified values.
 '
-Public Function NewFileNotFoundException(Optional ByVal FileName As String, Optional ByVal Message As String, Optional ByVal InnerException As Exception) As FileNotFoundException
+Public Function NewFileNotFoundException(Optional ByRef FileName As String, Optional ByRef Message As String, Optional ByVal InnerException As Exception) As FileNotFoundException
     Set NewFileNotFoundException = New FileNotFoundException
     NewFileNotFoundException.Init FileName, Message, InnerException
 End Function
@@ -500,7 +500,7 @@ End Function
 ' @param Share How should the file be shared with other processes.
 ' @return The new mapped view object.
 '
-Public Function NewMemoryMappedFile(ByVal Path As String, Optional ByVal Access As FileAccess = FileAccess.ReadAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As MemoryMappedFile
+Public Function NewMemoryMappedFile(ByRef Path As String, Optional ByVal Access As FileAccess = FileAccess.ReadAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As MemoryMappedFile
     Set NewMemoryMappedFile = New MemoryMappedFile
     NewMemoryMappedFile.Init Path, Access, Share
 End Function
@@ -540,7 +540,7 @@ End Function
 ' @param ServicePack A message describing a service pack.
 ' @return The new OperatingSystem object.
 '
-Public Function NewOperatingSystem(ByVal Platform As PlatformID, ByVal Version As Version, Optional ByVal ServicePack As String) As OperatingSystem
+Public Function NewOperatingSystem(ByVal Platform As PlatformID, ByVal Version As Version, Optional ByRef ServicePack As String) As OperatingSystem
     Set NewOperatingSystem = New OperatingSystem
     NewOperatingSystem.Init Platform, Version, ServicePack
 End Function
@@ -552,7 +552,7 @@ End Function
 ' @param InnerException The exception that caused this exception.
 ' @return The new PlatformNotSupportedException object.
 '
-Public Function NewPlatformNotSupportedException(ByVal Message As String, Optional ByVal InnerException As Exception) As PlatformNotSupportedException
+Public Function NewPlatformNotSupportedException(ByRef Message As String, Optional ByVal InnerException As Exception) As PlatformNotSupportedException
     Set NewPlatformNotSupportedException = New PlatformNotSupportedException
     NewPlatformNotSupportedException.Init Message, InnerException
 End Function
@@ -564,7 +564,7 @@ End Function
 ' @param InnerException The exception that caused this exception.
 ' @return The new PathTooLongException.
 '
-Public Function NewPathTooLongException(ByVal Message As String, Optional ByVal InnerException As Exception) As PathTooLongException
+Public Function NewPathTooLongException(ByRef Message As String, Optional ByVal InnerException As Exception) As PathTooLongException
     Set NewPathTooLongException = New PathTooLongException
     NewPathTooLongException.Init Message, InnerException
 End Function
@@ -601,7 +601,7 @@ End Function
 ' @param Message A human-readable message.
 ' @return The newly created ObjectDisposedException object.
 '
-Public Function NewObjectDisposedException(ByVal ObjectName As String, Optional ByVal Message As String) As ObjectDisposedException
+Public Function NewObjectDisposedException(ByRef ObjectName As String, Optional ByRef Message As String) As ObjectDisposedException
     Set NewObjectDisposedException = New ObjectDisposedException
     NewObjectDisposedException.Init ObjectName, Message
 End Function
@@ -626,7 +626,7 @@ End Function
 ' does not release the byte Buffer. The user still must maintain a reference to the
 ' array and keep it alive for the duration of the MemoryStream's life.
 '
-Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByVal Index As Variant, Optional ByVal Count As Variant, Optional ByVal Writable As Boolean = True, Optional ByVal Mode As BufferMode = ShareMode) As MemoryStream
+Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Writable As Boolean = True, Optional ByVal Mode As BufferMode = ShareMode) As MemoryStream
     Set NewMemoryStream = New MemoryStream
     NewMemoryStream.Init Buffer, Index, Count, Writable, Mode
 End Function
@@ -747,7 +747,7 @@ End Function
 ' @param InnerException The exception that caused this exception to be thrown.
 ' @return A new DirectoryNotFoundException object with the specified message and optional exception.
 '
-Public Function NewDirectoryNotFoundException(ByVal Message As String, Optional ByVal InnerException As Exception) As DirectoryNotFoundException
+Public Function NewDirectoryNotFoundException(ByRef Message As String, Optional ByVal InnerException As Exception) As DirectoryNotFoundException
     Set NewDirectoryNotFoundException = New DirectoryNotFoundException
     NewDirectoryNotFoundException.Init Message, InnerException
 End Function
@@ -833,7 +833,7 @@ End Function
 ' @remarks This exception can be thrown whenever an attempt to read passed the end of a stream
 ' is attempted. Such classes as BinaryReader may throw this exception if necessary.
 '
-Public Function NewEndOfStreamException(ByVal Message As String, Optional ByVal InnerException As Exception) As EndOfStreamException
+Public Function NewEndOfStreamException(ByRef Message As String, Optional ByVal InnerException As Exception) As EndOfStreamException
     Set NewEndOfStreamException = New EndOfStreamException
     NewEndOfStreamException.Init Message, InnerException
 End Function
@@ -860,7 +860,7 @@ End Function
 ' @return The new OverflowException object.
 ' @return This exception is thrown when a value may not fit into an existing datatype.
 '
-Public Function NewOverflowException(ByVal Message As String, Optional ByVal InnerException As Exception) As OverflowException
+Public Function NewOverflowException(ByRef Message As String, Optional ByVal InnerException As Exception) As OverflowException
     Set NewOverflowException = New OverflowException
     NewOverflowException.Init Message, InnerException
 End Function
@@ -904,7 +904,7 @@ End Function
 '
 ' @see ApplicationException
 '
-Public Function NewApplicationException(ByVal Message As String, Optional ByVal InnerException As Exception) As ApplicationException
+Public Function NewApplicationException(ByRef Message As String, Optional ByVal InnerException As Exception) As ApplicationException
     Set NewApplicationException = New ApplicationException
     NewApplicationException.Init Message, InnerException
 End Function
@@ -955,7 +955,7 @@ End Function
 ' @param Source A .RES filename, IResourceReader, or Stream object.
 ' @return A new ResourceSet.
 '
-Public Function NewResourceSet(ByVal CultureID As Variant, ByRef Source As Variant) As ResourceSet
+Public Function NewResourceSet(ByRef CultureID As Variant, ByRef Source As Variant) As ResourceSet
     Set NewResourceSet = New ResourceSet
     NewResourceSet.Init CultureID, Source
 End Function
@@ -971,7 +971,7 @@ End Function
 ' @see ResourceManager
 ' @see ResourceManagerStatic
 '
-Public Function NewResourceManager(ByRef Source As Variant) As ResourceManager
+Public Function NewResourceManager(ByRef Source As String) As ResourceManager
     Set NewResourceManager = New ResourceManager
     NewResourceManager.InitFromFile Source
 End Function
@@ -1012,7 +1012,7 @@ End Function
 ' @param FileName The path and name of the EXE or DLL from which to read the resources.
 ' @return A new WinResourceReader object.
 '
-Public Function NewWinResourceReader(ByVal FileName As String) As WinResourceReader
+Public Function NewWinResourceReader(ByRef FileName As String) As WinResourceReader
     Set NewWinResourceReader = New WinResourceReader
     NewWinResourceReader.Init FileName
 End Function
@@ -1049,7 +1049,7 @@ End Function
 ' @param DateValue The date to retrieve the time portion of.
 ' @return A TimeSpan object representing the time portion.
 '
-Public Function NewTime(ByVal DateValue As Variant) As TimeSpan
+Public Function NewTime(ByRef DateValue As Variant) As TimeSpan
     Select Case VarType(DateValue)
         Case vbDate
             Set NewTime = NewTimeSpan(Hours:=Hour(DateValue), Minutes:=Minute(DateValue), Seconds:=Second(DateValue))
@@ -1064,7 +1064,7 @@ End Function
 ' @param FileName The INI filename.
 ' @return The INIFile object.
 '
-Public Function NewINIFile(ByVal FileName As String) As INIFile
+Public Function NewINIFile(ByRef FileName As String) As INIFile
     Set NewINIFile = New INIFile
     NewINIFile.Init FileName
 End Function
@@ -1190,7 +1190,7 @@ End Function
 ' @param InnerException A reference to an exception that caused this exception.
 ' @return A new ExternalException object.
 '
-Public Function NewExternalException(ByVal Message As String, Optional ByVal InnerException As Exception) As ExternalException
+Public Function NewExternalException(ByRef Message As String, Optional ByVal InnerException As Exception) As ExternalException
     Set NewExternalException = New ExternalException
     NewExternalException.Init Message, InnerException
 End Function
@@ -1237,7 +1237,7 @@ End Function
 ' a CryptographicException.
 ' @see CryptographicException
 '
-Public Function NewCryptographicException(ByVal Message As String, Optional ByVal InnerException As Exception) As CryptographicException
+Public Function NewCryptographicException(ByRef Message As String, Optional ByVal InnerException As Exception) As CryptographicException
     Set NewCryptographicException = New CryptographicException
     NewCryptographicException.Init Message, InnerException
 End Function
@@ -1609,7 +1609,7 @@ End Function
 ' @return A new HMACBase object.
 ' @remarks This class implements many of the common routines used by HMAC classes.
 '
-Public Function NewHMACBase(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, Optional ByVal HashName As String, Optional ByRef Key As Variant) As HMACBase
+Public Function NewHMACBase(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, Optional ByRef HashName As String, Optional ByRef Key As Variant) As HMACBase
     Set NewHMACBase = New HMACBase
     NewHMACBase.Init HashAlgorithm, KeySize, HashName, Key
 End Function
@@ -1724,7 +1724,7 @@ End Function
 ' @return A new XmlSyntaxException object.
 ' @see XmlSyntaxException
 '
-Public Function NewXmlSyntaxException(Optional ByVal LineNumber As Variant, Optional ByVal Message As Variant, Optional ByVal InnerException As Exception) As XmlSyntaxException
+Public Function NewXmlSyntaxException(Optional ByRef LineNumber As Variant, Optional ByRef Message As Variant, Optional ByVal InnerException As Exception) As XmlSyntaxException
     Set NewXmlSyntaxException = New XmlSyntaxException
     NewXmlSyntaxException.Init LineNumber, Message, InnerException
 End Function
@@ -1736,7 +1736,7 @@ End Function
 ' @param StrTripleDES The name of the TripleDES implementation to be used.
 ' @return A new MACTripleDES object.
 '
-Public Function NewMACTripleDES(ByRef RgbKey() As Byte, Optional ByVal StrTripleDES As String) As MACTripleDES
+Public Function NewMACTripleDES(ByRef RgbKey() As Byte, Optional ByRef StrTripleDES As String) As MACTripleDES
     Set NewMACTripleDES = New MACTripleDES
     NewMACTripleDES.Init RgbKey, IfString(StrTripleDES, "3DES")
 End Function
@@ -1794,7 +1794,7 @@ Public Function BInt(ByRef Value As Variant) As BigInteger
             End If
             
         Case vbString
-            Set BInt = BigInteger.Parse(Value)
+            Set BInt = BigInteger.Parse(CStr(Value))
             
         Case Else
             Set BInt = NewBigInteger(Value)

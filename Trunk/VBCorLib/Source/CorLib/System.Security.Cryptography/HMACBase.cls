@@ -207,7 +207,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByVal HashName As String, ByRef Key As Variant)
+Friend Sub Init(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, ByRef HashName As String, ByRef Key As Variant)
     If HashAlgorithm Is Nothing Then _
         Throw Cor.NewArgumentNullException("HashAlgorithm")
     

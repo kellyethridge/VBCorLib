@@ -227,7 +227,7 @@ Private Sub Class_InitProperties()
     Set mBase = Cor.NewExceptionBase(Me, App)
 End Sub
 
-Friend Sub Init(ByRef ObjectName As String, ByVal Message As String)
+Friend Sub Init(ByRef ObjectName As String, ByRef Message As String)
     mBase.SetValue PropObjectName, ObjectName
     mBase.Message = Message
 End Sub

@@ -225,7 +225,7 @@ End Function
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
 '
-Public Function Parse(ByVal s As String) As BigInteger
+Public Function Parse(ByRef s As String) As BigInteger
     If Not TryParse(s, Parse) Then
         Throw Cor.NewArgumentException("Number could not be parsed.", "s")
     End If
