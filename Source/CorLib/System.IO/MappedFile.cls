@@ -204,7 +204,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal FileName As String, ByVal Access As FileAccess, ByVal Share As FileShare)
+Friend Sub Init(ByRef FileName As String, ByVal Access As FileAccess, ByVal Share As FileShare)
     If Len(FileName) = 0 Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EmptyPath), FileName)
     If Not File.Exists(FileName) Then _

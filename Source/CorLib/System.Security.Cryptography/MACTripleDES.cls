@@ -317,7 +317,7 @@ Private Sub Class_Initialize()
     mHashStream.Init 8
 End Sub
 
-Friend Sub Init(ByRef RgbKey() As Byte, ByVal StrTripleDES As String)
+Friend Sub Init(ByRef RgbKey() As Byte, ByRef StrTripleDES As String)
     On Error GoTo Catch
     Set mTripleDES = CryptoConfig.CreateFromName(StrTripleDES)
     SetKey RgbKey

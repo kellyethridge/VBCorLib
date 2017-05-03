@@ -198,11 +198,11 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Friend Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub InitFromFile(ByVal FileName As String)
+Friend Sub InitFromFile(ByRef FileName As String)
     mFiles = Cor.NewStrings(FileName)
 End Sub
 
-Friend Sub InitFromFolder(ByVal SearchPattern As String, ByVal ResourceDir As String)
+Friend Sub InitFromFolder(ByRef SearchPattern As String, ByRef ResourceDir As String)
     mFiles = Directory.GetFiles(ResourceDir, SearchPattern)
 End Sub
 
