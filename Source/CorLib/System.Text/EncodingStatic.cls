@@ -56,7 +56,7 @@ Private mUnicode            As UnicodeEncoding
 Private mBigEndianUnicode   As UnicodeEncoding
 Private mEncodings          As New Hashtable
 Private mEncodingTable      As New EncodingTable
-Private mDefault            As CodePageEncoding
+Private mDefault            As Encoding
 
 
 ''
@@ -65,7 +65,10 @@ Private mDefault            As CodePageEncoding
 ' @return Default system encoding.
 '
 Public Property Get Default() As Encoding
-    If mDefault Is Nothing Then Set mDefault = GetEncoding(0)
+    If mDefault Is Nothing Then
+        Set mDefault = GetEncoding(0)
+    End If
+    
     Set Default = mDefault
 End Property
 
@@ -76,7 +79,10 @@ End Property
 ' @remarks This encoding is declared as Cor.NewUnicodeEncoding(True, True).
 '
 Public Property Get BigEndianUnicode() As UnicodeEncoding
-    If mBigEndianUnicode Is Nothing Then Set mBigEndianUnicode = Cor.NewUnicodeEncoding(True, True)
+    If mBigEndianUnicode Is Nothing Then
+        Set mBigEndianUnicode = Cor.NewUnicodeEncoding(True, True)
+    End If
+    
     Set BigEndianUnicode = mBigEndianUnicode
 End Property
 
@@ -87,7 +93,10 @@ End Property
 ' @remarks This encoding is declared as Cor.NewUnicodeEncoding(False, True).
 '
 Public Property Get Unicode() As UnicodeEncoding
-    If mUnicode Is Nothing Then Set mUnicode = Cor.NewUnicodeEncoding(False, True)
+    If mUnicode Is Nothing Then
+        Set mUnicode = Cor.NewUnicodeEncoding(False, True)
+    End If
+    
     Set Unicode = mUnicode
 End Property
 
@@ -98,7 +107,10 @@ End Property
 ' @remarks This encoding is declared as New ASCIIEncoding.
 '
 Public Property Get ASCII() As ASCIIEncoding
-    If mASCII Is Nothing Then Set mASCII = New ASCIIEncoding
+    If mASCII Is Nothing Then
+        Set mASCII = New ASCIIEncoding
+    End If
+    
     Set ASCII = mASCII
 End Property
 
@@ -109,7 +121,10 @@ End Property
 ' @remarks This encoding is declared as New UTF7Encoding.
 '
 Public Property Get UTF7() As UTF7Encoding
-    If mUTF7 Is Nothing Then Set mUTF7 = New UTF7Encoding
+    If mUTF7 Is Nothing Then
+        Set mUTF7 = New UTF7Encoding
+    End If
+    
     Set UTF7 = mUTF7
 End Property
 
@@ -120,7 +135,10 @@ End Property
 ' @remarks This encoding is declared as Cor.NewUTF8Encoding(True)
 '
 Public Property Get UTF8() As UTF8Encoding
-    If mUTF8 Is Nothing Then Set mUTF8 = Cor.NewUTF8Encoding(True)
+    If mUTF8 Is Nothing Then
+        Set mUTF8 = Cor.NewUTF8Encoding(True)
+    End If
+    
     Set UTF8 = mUTF8
 End Property
 
@@ -134,15 +152,15 @@ End Property
 ' @param Count The number of bytes to be included in the decoding process.
 ' @return The encoded bytes.
 '
-Public Function Convert(ByVal srcEncoding As Encoding, ByVal dstEncoding As Encoding, ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
-    If srcEncoding Is Nothing Then _
-        Throw Cor.NewArgumentNullException("srcEncoding")
-    If dstEncoding Is Nothing Then _
-        Throw Cor.NewArgumentNullException("dstEncoding")
+Public Function Convert(ByVal SrcEncoding As Encoding, ByVal DstEncoding As Encoding, ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
+    If SrcEncoding Is Nothing Then _
+        Error.ArgumentNull "SrcEncoding"
+    If DstEncoding Is Nothing Then _
+        Error.ArgumentNull "DstEncoding"
     
     Dim Ch() As Integer
-    Ch = srcEncoding.GetChars(Bytes, Index, Count)
-    Convert = dstEncoding.GetBytes(Ch)
+    Ch = SrcEncoding.GetChars(Bytes, Index, Count)
+    Convert = DstEncoding.GetBytes(Ch)
 End Function
 
 ''
@@ -151,7 +169,7 @@ End Function
 ' @param CodePageOrName The codepage number or name to encode with.
 ' @return An encoding for a specific codepage or name.
 '
-Public Function GetEncoding(ByRef CodePageOrName As Variant) As Encoding
+Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal EncoderFallback As EncoderFallback, Optional ByVal DecoderFallback As DecoderFallback) As Encoding
     Dim cp As Long
     
     Select Case VarType(CodePageOrName)
@@ -179,6 +197,12 @@ Public Function GetEncoding(ByRef CodePageOrName As Variant) As Encoding
             Else
                 Set GetEncoding = NewCodePageEncoding(cp)
                 mEncodings.Add cp, GetEncoding
+            End If
+            
+            If Not EncoderFallback Is Nothing Or Not DecoderFallback Is Nothing Then
+                Set GetEncoding = GetEncoding.Clone
+                Set GetEncoding.EncoderFallback = IfObject(EncoderFallback, GetEncoding.EncoderFallback)
+                Set GetEncoding.DecoderFallback = IfObject(DecoderFallback, GetEncoding.DecoderFallback)
             End If
     End Select
 End Function
@@ -273,8 +297,14 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function NewCodePageEncoding(ByVal cp As Long) As CodePageEncoding
-    Set NewCodePageEncoding = New CodePageEncoding
-    NewCodePageEncoding.Init cp
+Private Function NewCodePageEncoding(ByVal CodePage As Long) As Encoding
+    Dim CodePageInfo As CPINFO
+    
+    If GetCPInfo(CodePage, CodePageInfo) = BOOL_FALSE Then _
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingNotSupported, CodePage))
+    
+    If CodePageInfo.MaxCharSize = 1 Then
+        Set NewCodePageEncoding = Cor.NewSBCSCodePageEncoding(CodePage)
+    End If
 End Function
 

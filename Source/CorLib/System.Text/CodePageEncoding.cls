@@ -43,16 +43,22 @@ Option Explicit
 Implements IObject
 Implements Encoding
 
+Private mIsReadOnly         As Boolean
+Private mCodePage           As Long
+Private mMaxCharSize        As Long
+Private mDecoderFallback    As DecoderFallback
+Private mEncoderFallback    As EncoderFallback
+Private mChars()            As Integer
+Private mCharsSA            As SafeArray1d
 
-Private mCodePage       As Long
-Private mMaxCharSize    As Long
-Private mChars()        As Integer
-Private mCharsSA        As SafeArray1d
 
+Friend Property Get CodePage() As Long
+    CodePage = mCodePage
+End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal CodePage As Long)
     Dim Info As CPINFO
@@ -64,9 +70,17 @@ Friend Sub Init(ByVal CodePage As Long)
     mMaxCharSize = Info.MaxCharSize
 End Sub
 
+Friend Sub InitClone(ByVal Other As CodePageEncoding)
+
+End Sub
+
+Private Sub Class_Terminate()
+    SAPtr(mChars) = 0
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Table() As EncodingTable
     Set Table = Statics.Encoding.EncodingTable
@@ -74,24 +88,16 @@ End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    SAPtr(mChars) = 0
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
-    If IsObject(Value) Then
-        If TypeOf Value Is Encoding Then
-            Dim ec As Encoding
-            Set ec = Value
-            IObject_Equals = (ec.CodePage = mCodePage)
-        End If
-    End If
+    Dim Other As CodePageEncoding
+    
+    On Error GoTo Catch
+    Set Other = Value
+    IObject_Equals = Other.CodePage = mCodePage
+    
+Catch:
 End Function
 
 Private Function IObject_GetHashCode() As Long
@@ -107,27 +113,39 @@ End Function
 '   Encoding Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Encoding_IsReadOnly() As Boolean
-
+    Encoding_IsReadOnly = mIsReadOnly
 End Property
 
 Private Function Encoding_Clone() As Encoding
-
+    Dim Clone As New CodePageEncoding
+    Clone.InitClone Me
+    Set Encoding_Clone = Clone
 End Function
 
 Private Property Set Encoding_DecoderFallback(ByVal Value As DecoderFallback)
-
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mDecoderFallback = Value
 End Property
 
 Private Property Get Encoding_DecoderFallback() As DecoderFallback
-
+    Set Encoding_DecoderFallback = mDecoderFallback
 End Property
 
 Private Property Set Encoding_EncoderFallback(ByVal Value As EncoderFallback)
-
+    If mIsReadOnly Then _
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+    
+    Set mEncoderFallback = Value
 End Property
 
 Private Property Get Encoding_EncoderFallback() As EncoderFallback
-
+    Set Encoding_EncoderFallback = mEncoderFallback
 End Property
 
 Private Property Get Encoding_BodyName() As String
@@ -147,20 +165,28 @@ Private Function Encoding_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function Encoding_GetByteCount(Chars As Variant, Optional Index As Variant, Optional Count As Variant) As Long
-    Call AttachChars(Chars, mChars, mCharsSA)
+    Dim LocalChars() As Integer
+    Dim Range           As ListRange
     
-    Dim ElemIndex   As Long
-    Dim ElemCount   As Long
-    Dim Result      As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    LocalChars = AsChars(Chars)
     
-    If mMaxCharSize = 1 Or ElemCount = 0 Then
-        Encoding_GetByteCount = ElemCount
+    On Error GoTo Catch
+    Range = ValidateGetBytes(LocalChars, Index, Count)
+    
+    If mMaxCharSize = 1 Or Range.Count = 0 Then
+        Encoding_GetByteCount = Range.Count
     Else
-        Encoding_GetByteCount = WideCharToMultiByte(mCodePage, 0, mChars(ElemIndex), ElemCount, vbNullString, 0, vbNullString, 0)
+        Encoding_GetByteCount = WideCharToMultiByte(mCodePage, 0, LocalChars(Range.Index), Range.Count, vbNullString, 0, vbNullString, 0)
     End If
-    SAPtr(mChars) = 0
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars LocalChars
 End Function
 
 Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, Optional Count As Variant) As Byte()

@@ -1900,3 +1900,8 @@ Friend Function NewDefaultEncoder(ByVal Encoding As Encoding) As DefaultEncoder
     NewDefaultEncoder.Init Encoding
 End Function
 
+Friend Function NewSBCSCodePageEncoding(ByVal CodePage As Long) As SBCSCodePageEncoding
+    Set NewSBCSCodePageEncoding = New SBCSCodePageEncoding
+    NewSBCSCodePageEncoding.Init CodePage
+End Function
+

@@ -850,6 +850,10 @@ library CorType {
 
     [dllname("kernel32.dll"), helpstring("Access to API functions within the Kernel32.dll system file.")]
     module Kernel32 {
+    	const long MB_PRECOMPOSED		= 0x1;
+    	const long WC_NO_BEST_FIT_CHARS	= 0x400;
+    	const long MB_ERR_INVALID_CHARS = 0x8;
+    	
         [entry("CloseHandle"), usesgetlasterror] long CloseHandle([in] long hObject);
         [entry("CopyFileW"), usesgetlasterror] long CopyFileW([in] LPWSTR Source, [in] LPWSTR Destination, [in] BOOL FailIfExists);
         [entry("RtlMoveMemory")] void CopyMemory([in] void * Destination,[in] void * Source, [in] long Length);
@@ -946,7 +950,7 @@ library CorType {
         [entry("QueryPerformanceCounter"), usesgetlasterror] long QueryPerformanceCounter([in] CURRENCY * lpPerformanceCount);
         [entry("QueryPerformanceFrequency"), usesgetlasterror] long QueryPerformanceFrequency([in] CURRENCY * lpFrequency);
         [entry("GetCPInfo"), usesgetlasterror] long GetCPInfo([in] long CodePage, [in] CPINFO * lpCPInfo);
-        [entry("WideCharToMultiByte"), usesgetlasterror] long WideCharToMultiByte([in] long CodePage, [in] long dwFlags, [in] short * lpWideCharStr, [in] long cchWideChar, [in] byte * lpMultiByteStr, [in] long cchMultiByte, [in] LPSTR lpDefaultChar, [in] long lpUsedDefaultChar);
+        [entry("WideCharToMultiByte"), usesgetlasterror] long WideCharToMultiByte([in] long CodePage, [in] long dwFlags, [in] void * lpWideCharStr, [in] long cchWideChar, [in] void * lpMultiByteStr, [in] long cchMultiByte, [in] void * lpDefaultChar, [in] long * lpUsedDefaultChar);
         [entry("GetCalendarInfoA"), usesgetlasterror] long GetCalendarInfo([in] long Locale, [in] long Calendar, [in] long CalType, [in] LPSTR lpCalData, [in] long cchData, [in] void * lpValue);
         [entry("GetVolumeInformationA"), usesgetlasterror] long GetVolumeInformation([in] LPSTR lpRootPathName, [in] LPSTR lpVolumeNameBuffer, [in] long nVolumeNameSize, [in] void * lpVolumeSerialNumber, [in] long * lpMaximumComponentLength, [in] long * lpFileSystemFlags, [in] LPSTR lpFileSystemNameBuffer, [in] long nFileSystemNameSize);
         [entry("SetVolumeLabelA"), usesgetlasterror] long SetVolumeLabel([in] LPSTR lpRootPathName, [in] LPSTR lpVolumeName);
