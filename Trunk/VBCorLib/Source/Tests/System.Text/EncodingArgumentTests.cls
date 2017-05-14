@@ -187,6 +187,7 @@ Private Sub AddEncodings(ByVal Test As TestCaseCollector)
     Test.Use New UTF7Encoding
     Test.Use New UTF8Encoding
     Test.Use New UnicodeEncoding
+    Test.Use Encoding.GetEncoding(437)
 End Sub
 
 
