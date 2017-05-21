@@ -1905,3 +1905,7 @@ Friend Function NewSBCSCodePageEncoding(ByVal CodePage As Long) As SBCSCodePageE
     NewSBCSCodePageEncoding.Init CodePage
 End Function
 
+Friend Function NewDBCSCodePageEncoding(ByVal CodePage As Long) As DBCSCodePageEncoding
+    Set NewDBCSCodePageEncoding = New DBCSCodePageEncoding
+    NewDBCSCodePageEncoding.Init CodePage
+End Function

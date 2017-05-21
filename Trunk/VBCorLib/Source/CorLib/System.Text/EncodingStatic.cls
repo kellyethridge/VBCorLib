@@ -198,13 +198,13 @@ Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal Enco
                 Set GetEncoding = NewCodePageEncoding(cp)
                 mEncodings.Add cp, GetEncoding
             End If
-            
-            If Not EncoderFallback Is Nothing Or Not DecoderFallback Is Nothing Then
-                Set GetEncoding = GetEncoding.Clone
-                Set GetEncoding.EncoderFallback = IfObject(EncoderFallback, GetEncoding.EncoderFallback)
-                Set GetEncoding.DecoderFallback = IfObject(DecoderFallback, GetEncoding.DecoderFallback)
-            End If
     End Select
+    
+    If Not EncoderFallback Is Nothing Or Not DecoderFallback Is Nothing Then
+        Set GetEncoding = GetEncoding.Clone
+        Set GetEncoding.EncoderFallback = IfObject(EncoderFallback, GetEncoding.EncoderFallback)
+        Set GetEncoding.DecoderFallback = IfObject(DecoderFallback, GetEncoding.DecoderFallback)
+    End If
 End Function
 
 ''
@@ -303,8 +303,11 @@ Private Function NewCodePageEncoding(ByVal CodePage As Long) As Encoding
     If GetCPInfo(CodePage, CodePageInfo) = BOOL_FALSE Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_EncodingNotSupported, CodePage))
     
-    If CodePageInfo.MaxCharSize = 1 Then
-        Set NewCodePageEncoding = Cor.NewSBCSCodePageEncoding(CodePage)
-    End If
+    Select Case CodePageInfo.MaxCharSize
+        Case 1
+            Set NewCodePageEncoding = Cor.NewSBCSCodePageEncoding(CodePage)
+        Case 2
+            Set NewCodePageEncoding = Cor.NewDBCSCodePageEncoding(CodePage)
+    End Select
 End Function
 

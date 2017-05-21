@@ -296,6 +296,8 @@ Private Sub AddSystemText()
         .Add New UnicodeEncoderTests
         .Add New EncodingInfoTests
         .Add New SBCSCodePageEncodingTests
+        .Add New DBCSCodePageEncodingTests
+        .Add New DBCSCodePageDecoderTests
         .Add New StringBuilderTests
         
         AddTest .This
