@@ -144,6 +144,8 @@ Public Enum ResourceStringKey
     Argument_FallbackBufferNotEmpty = 868
     Argument_ConversionOverflow = 869
     Argument_EncodingNotSupported = 870
+    Argument_InvalidCodePageBytes = 871
+    Argument_InvalidCodePageChars = 872
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901

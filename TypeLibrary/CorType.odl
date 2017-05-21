@@ -853,6 +853,7 @@ library CorType {
     	const long MB_PRECOMPOSED		= 0x1;
     	const long WC_NO_BEST_FIT_CHARS	= 0x400;
     	const long MB_ERR_INVALID_CHARS = 0x8;
+    	const long ERROR_NO_UNICODE_TRANSLATION = 0x459;
     	
         [entry("CloseHandle"), usesgetlasterror] long CloseHandle([in] long hObject);
         [entry("CopyFileW"), usesgetlasterror] long CopyFileW([in] LPWSTR Source, [in] LPWSTR Destination, [in] BOOL FailIfExists);
