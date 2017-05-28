@@ -75,7 +75,7 @@ End Property
 ' dealing with negative integer values that should map to positive long values.
 '
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
-    Compare = modChar.Compare(a, b)
+    Compare = CharMethods.Compare(a, b)
 End Function
 
 ''
@@ -88,7 +88,7 @@ End Function
 ' dealing with negative integer values that should map to positive long values.
 '
 Public Function Equals(ByVal a As Long, ByVal b As Long) As Boolean
-    Equals = modChar.Equals(a, b)
+    Equals = CharMethods.Equals(a, b)
 End Function
 
 ''
@@ -107,7 +107,7 @@ End Function
 ' </ul>
 ' </p>
 Public Function IsWhiteSpaceStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsWhiteSpaceStr = modChar.IsWhiteSpaceStr(s, Index)
+    IsWhiteSpaceStr = CharMethods.IsWhiteSpaceStr(s, Index)
 End Function
 
 ''
@@ -126,7 +126,7 @@ End Function
 ' dealing with negative integer values that should map to positive long values.</p>
 '
 Public Function IsWhiteSpace(ByVal c As Long) As Boolean
-    IsWhiteSpace = modChar.IsWhiteSpace(c)
+    IsWhiteSpace = CharMethods.IsWhiteSpace(c)
 End Function
 
 ''
@@ -147,7 +147,7 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsHighSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsHighSurrogateStr = modChar.IsHighSurrogateStr(s, Index)
+    IsHighSurrogateStr = CharMethods.IsHighSurrogateStr(s, Index)
 End Function
 
 ''
@@ -159,7 +159,7 @@ End Function
 ' dealing with negative integer values that should map to positive long values.</p>
 '
 Public Function IsHighSurrogate(ByVal c As Long) As Boolean
-    IsHighSurrogate = modChar.IsHighSurrogate(c)
+    IsHighSurrogate = CharMethods.IsHighSurrogate(c)
 End Function
 
 ''
@@ -180,7 +180,7 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsLowSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsLowSurrogateStr = modChar.IsLowSurrogateStr(s, Index)
+    IsLowSurrogateStr = CharMethods.IsLowSurrogateStr(s, Index)
 End Function
 
 ''
@@ -192,7 +192,7 @@ End Function
 ' dealing with negative integer values that should map to positive long values.</p>
 '
 Public Function IsLowSurrogate(ByVal c As Long) As Boolean
-    IsLowSurrogate = modChar.IsLowSurrogate(c)
+    IsLowSurrogate = CharMethods.IsLowSurrogate(c)
 End Function
 
 ''
@@ -211,7 +211,7 @@ End Function
 ' @see IsLowSurrogateStr
 '
 Public Function IsSurrogateStr(ByRef s As String, ByVal Index As Long) As Boolean
-    IsSurrogateStr = modChar.IsSurrogateStr(s, Index)
+    IsSurrogateStr = CharMethods.IsSurrogateStr(s, Index)
 End Function
 
 ''
@@ -230,7 +230,7 @@ End Function
 ' @see IsLowSurrogateStr
 '
 Public Function IsSurrogate(ByVal c As Long) As Boolean
-    IsSurrogate = modChar.IsSurrogate(c)
+    IsSurrogate = CharMethods.IsSurrogate(c)
 End Function
 
 ''
@@ -250,7 +250,7 @@ End Function
 ' </table>
 '
 Public Function ConvertToUtf32(ByVal HighSurrogate As Long, ByVal LowSurrogate As Long) As Long
-    ConvertToUtf32 = modChar.ConvertToUtf32(HighSurrogate, LowSurrogate)
+    ConvertToUtf32 = CharMethods.ConvertToUtf32(HighSurrogate, LowSurrogate)
 End Function
 
 ''
@@ -274,5 +274,5 @@ End Function
 ' </table>
 '
 Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Long
-    ConvertToUtf32Str = modChar.ConvertToUtf32Str(s, Index)
+    ConvertToUtf32Str = CharMethods.ConvertToUtf32Str(s, Index)
 End Function

@@ -197,7 +197,7 @@ Public Function TryParse(ByVal s As String, ByRef b As BigInteger) As Boolean
     End Select
     
     If TryParse Then
-        If n.Sign = Negative Then Call modBigMath.Negate(n)
+        If n.Sign = Negative Then Call Mathematics.Negate(n)
         
         Set b = New BigInteger
         Call b.InternalInitNumber(n)
@@ -405,14 +405,14 @@ Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
     
     If x.Sign = Sign.Negative Then
         Call x.CopyNumber(u)
-        Call modBigMath.Negate(u)
+        Call Mathematics.Negate(u)
     Else
         Call x.AttachNumber(u)
     End If
 
     If y.Sign = Sign.Negative Then
         Call y.CopyNumber(v)
-        Call modBigMath.Negate(v)
+        Call Mathematics.Negate(v)
     Else
         Call y.AttachNumber(v)
     End If
@@ -1152,8 +1152,8 @@ Private Function InternalDivide(ByRef dividend As BigInteger, ByRef divisor As B
     Dim xNumber As Number: Call dividend.CopyNumber(xNumber)
     Dim yNumber As Number: Call divisor.CopyNumber(yNumber)
     
-    If dividend.Sign = Sign.Negative Then Call modBigMath.Negate(xNumber)
-    If divisor.Sign = Sign.Negative Then Call modBigMath.Negate(yNumber)
+    If dividend.Sign = Sign.Negative Then Call Mathematics.Negate(xNumber)
+    If divisor.Sign = Sign.Negative Then Call Mathematics.Negate(yNumber)
     
     Dim quotientNumber()    As Integer
     Dim remainderNumber()   As Integer

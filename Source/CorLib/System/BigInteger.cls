@@ -52,7 +52,7 @@ Private Const HEX_CHARS As String = "0123456789abcdef0123456789ABCDEF"
 Private Const LOWER_HEX As Long = 1
 Private Const UPPER_HEX As Long = 17
 
-Private mNumber As modBigMath.Number
+Private mNumber As Mathematics.Number
 
 
 ''
@@ -191,7 +191,7 @@ Public Function Negate() As BigInteger
         Dim num As Number
         num = mNumber
         
-        Call modBigMath.Negate(num)
+        Call Mathematics.Negate(num)
         
         Set Negate = New BigInteger
         Call Negate.InternalInitNumber(num)
@@ -750,7 +750,7 @@ Private Function ToDecimalString(ByVal Count As Long) As String
     Dim Result As String
     Result = String$(Size + 1, 48)
     
-    If mNumber.Sign = Negative Then Call modBigMath.Negate(dividend)
+    If mNumber.Sign = Negative Then Call Mathematics.Negate(dividend)
     
     Dim i As Long
     i = Len(Result)

@@ -72,7 +72,7 @@ End Function
 '   Encoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Encoder_Convert(Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByVal Flush As Boolean, CharsUsed As Long, BytesUsed As Long, Completed As Boolean)
-    modEncoding.EncoderConvert mEncoding, Chars, CharIndex, CharCount, Bytes, ByteIndex, ByteCount, Flush, CharsUsed, BytesUsed, Completed
+    EncoderConvert mEncoding, Chars, CharIndex, CharCount, Bytes, ByteIndex, ByteCount, Flush, CharsUsed, BytesUsed, Completed
 End Sub
 
 Private Property Set Encoder_Fallback(ByVal Value As EncoderFallback)

@@ -1,4 +1,4 @@
-Attribute VB_Name = "modEncoding"
+Attribute VB_Name = "EncodingHelper"
 'The MIT License (MIT)
 'Copyright (c) 2017 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "modEncoding"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modEncoding
+' Module: EncodingHelper
 '
 Option Explicit
 
