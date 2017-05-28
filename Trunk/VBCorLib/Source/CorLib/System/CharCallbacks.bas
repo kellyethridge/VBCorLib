@@ -1,4 +1,4 @@
-Attribute VB_Name = "CharCallback"
+Attribute VB_Name = "CharCallbacks"
 'The MIT License (MIT)
 'Copyright (c) 2016 Kelly Ethridge
 '

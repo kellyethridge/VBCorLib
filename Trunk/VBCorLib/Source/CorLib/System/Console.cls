@@ -235,7 +235,7 @@ Private mOriginalError      As Boolean
 ' @return The type of break that caused the interuption.
 '
 Public Property Get BreakType() As ConsoleBreakType
-    BreakType = modConsoleCallbacks.BreakType
+    BreakType = ConsoleCallbacks.BreakType
 End Property
 
 ''
@@ -249,7 +249,7 @@ End Property
 ' this property when necessary to respond to any of the events.
 '
 Public Property Get Break() As Boolean
-    Break = modConsoleCallbacks.Break
+    Break = ConsoleCallbacks.Break
 End Property
 
 ''
@@ -260,7 +260,7 @@ End Property
 ' next console break can set it to true and be detected.
 '
 Public Property Let Break(ByVal RHS As Boolean)
-    modConsoleCallbacks.Break = RHS
+    ConsoleCallbacks.Break = RHS
 End Property
 
 ''

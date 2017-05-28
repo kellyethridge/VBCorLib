@@ -1,4 +1,4 @@
-Attribute VB_Name = "modChar"
+Attribute VB_Name = "CharMethods"
 'The MIT License (MIT)
 'Copyright (c) 2017 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "modChar"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modChar
+' Module: CharMethods
 '
 
 ''
@@ -43,7 +43,7 @@ Public Const LowSurrogateEnd    As Long = &HDFFF&
 Public Function Compare(ByVal a As Long, ByVal b As Long) As Long
     a = a And &HFFFF&
     b = b And &HFFFF&
-    
+
     If a < b Then
         Compare = -1
     ElseIf a > b Then

@@ -1,4 +1,4 @@
-Attribute VB_Name = "modBigMath"
+Attribute VB_Name = "Mathematics"
 'The MIT License (MIT)
 'Copyright (c) 2012 Kelly Ethridge
 '
@@ -20,7 +20,7 @@ Attribute VB_Name = "modBigMath"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: modBigMath
+' Module: Mathematics
 '
 
 ''
@@ -821,15 +821,15 @@ Private Function GradeSchoolDivideIDE(ByRef u As Number, ByRef v As Number, ByRe
     GradeSchoolDivideIDE = quotient
 End Function
 
-Private Function UInt32x16To32(ByVal X As Long, ByVal Y As Integer) As Long
-    Dim v As Currency: v = GetLong(Y)
-    Dim w As Currency: w = (v * X) * 0.0001@
+Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
+    Dim v As Currency: v = GetLong(y)
+    Dim w As Currency: w = (v * x) * 0.0001@
     Call CopyMemory(UInt32x16To32, w, 4)
 End Function
 
-Private Function UInt32Compare(ByVal X As Long, ByVal Y As Long) As Long
-    Dim u As Currency: Call CopyMemory(u, X, 4)
-    Dim v As Currency: Call CopyMemory(v, Y, 4)
+Private Function UInt32Compare(ByVal x As Long, ByVal y As Long) As Long
+    Dim u As Currency: Call CopyMemory(u, x, 4)
+    Dim v As Currency: Call CopyMemory(v, y, 4)
     UInt32Compare = Sgn(u - v)
 End Function
 
@@ -910,43 +910,43 @@ Private Function SinglePlaceDivideIDE(ByRef u() As Integer, ByVal Length As Long
     SinglePlaceDivideIDE = q
 End Function
 
-Public Function GetLong(ByVal X As Long) As Long
-    GetLong = X And &HFFFF&
+Public Function GetLong(ByVal x As Long) As Long
+    GetLong = x And &HFFFF&
 End Function
 
-Private Function UInt16x16To32(ByVal X As Long, ByVal Y As Long) As Long
-    Dim u As Currency: u = GetLong(X)
-    Dim v As Currency: v = GetLong(Y)
+Private Function UInt16x16To32(ByVal x As Long, ByVal y As Long) As Long
+    Dim u As Currency: u = GetLong(x)
+    Dim v As Currency: v = GetLong(y)
     Dim w As Currency: w = (u * v) * 0.0001@
     Call CopyMemory(UInt16x16To32, w, 4)
 End Function
 
-Private Function UInt32d16To32(ByVal X As Long, ByVal Y As Long) As Long
+Private Function UInt32d16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim d As Currency
-    Call CopyMemory(d, X, 4)
+    Call CopyMemory(d, x, 4)
     d = d * 10000@
-    UInt32d16To32 = Int(d / GetLong(Y))
+    UInt32d16To32 = Int(d / GetLong(y))
 End Function
 
-Private Function UInt32m16To32(ByVal X As Long, ByVal Y As Long) As Long
+Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim q As Currency
     Dim d As Currency
-    Dim v As Currency: v = GetLong(Y)
-    Call CopyMemory(d, X, 4)
+    Dim v As Currency: v = GetLong(y)
+    Call CopyMemory(d, x, 4)
     d = d * 10000@
     q = Int(d / v)
     UInt32m16To32 = d - q * v
 End Function
 
-Private Function Make32(ByVal X As Integer, ByVal Y As Integer) As Long
-    Make32 = LeftShift16(GetLong(X)) Or GetLong(Y)
+Private Function Make32(ByVal x As Integer, ByVal y As Integer) As Long
+    Make32 = LeftShift16(GetLong(x)) Or GetLong(y)
 End Function
 
-Private Function RightShift16(ByVal X As Long) As Long
-    RightShift16 = ((X And &HFFFF0000) \ &H10000) And &HFFFF&
+Private Function RightShift16(ByVal x As Long) As Long
+    RightShift16 = ((x And &HFFFF0000) \ &H10000) And &HFFFF&
 End Function
 
-Private Function LeftShift16(ByVal X As Long) As Long
-    If X And &H8000& Then LeftShift16 = &H80000000
-    LeftShift16 = LeftShift16 Or ((X And &H7FFF) * &H10000)
+Private Function LeftShift16(ByVal x As Long) As Long
+    If x And &H8000& Then LeftShift16 = &H80000000
+    LeftShift16 = LeftShift16 Or ((x And &H7FFF) * &H10000)
 End Function
