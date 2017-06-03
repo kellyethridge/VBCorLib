@@ -253,6 +253,25 @@ Private Sub Class_Terminate()
 End Sub
 
 
+Private Sub ValidateFileAccess(ByVal Access As FileAccess)
+    Select Case Access
+        Case 0, FileAccess.ReadAccess, FileAccess.ReadWriteAccess, FileAccess.WriteAccess
+            Exit Sub
+    End Select
+
+    Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
+End Sub
+
+Private Sub ValidateFileShare(ByVal Share As FileShare)
+    Select Case Share
+        Case FileShare.None, FileShare.ReadShare, FileShare.ReadWriteShare, FileShare.WriteShare
+            Exit Sub
+    End Select
+    
+    Error.ArgumentOutOfRange "Share", ArgumentOutOfRange_Enum
+End Sub
+
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IObject Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
