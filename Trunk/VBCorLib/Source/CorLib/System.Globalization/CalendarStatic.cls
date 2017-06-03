@@ -64,7 +64,7 @@ End Property
 ' @param Cal The Calendar to be used for specific calculations.
 ' @return The week of the year.
 '
-Friend Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek, ByVal Cal As Calendar) As Long
+Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     Dim FirstWeekLength As Long
     Dim Offset          As Long
     Dim dt              As CorDateTime
@@ -73,7 +73,7 @@ Friend Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekR
 
     Set dt = CorDateTime.GetDateTime(Time)
 
-    FirstWeekLength = FirstDayOfWeek - Cal.GetDayOfWeek(Cal.ToDateTime(Cal.GetYear(dt), 1, 1, 0, 0, 0, 0))
+    FirstWeekLength = FirstDayOfWeek - Calendar.GetDayOfWeek(Calendar.ToDateTime(Calendar.GetYear(dt), 1, 1, 0, 0, 0, 0))
     If FirstWeekLength < 0 Then FirstWeekLength = FirstWeekLength + 7
 
     Select Case Rule
@@ -82,7 +82,7 @@ Friend Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekR
         Case FirstFourDayWeek:      If FirstWeekLength >= 4 Then Offset = 1
     End Select
 
-    doy = Cal.GetDayOfYear(dt)
+    doy = Calendar.GetDayOfYear(dt)
     If doy > FirstWeekLength Then
         WholeWeeks = (doy - FirstWeekLength) \ 7
         If WholeWeeks * 7 + FirstWeekLength < doy Then Offset = Offset + 1
@@ -93,9 +93,9 @@ Friend Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekR
         Dim Year    As Long
         Dim Month   As Long
         
-        Year = Cal.GetYear(dt) - 1
-        Month = Cal.GetMonthsInYear(Year)
-        GetWeekOfYear = GetWeekOfYear(Cal.ToDateTime(Year, Month, Cal.GetDaysInMonth(Year, Month), 0, 0, 0, 0), Rule, FirstDayOfWeek, Cal)
+        Year = Calendar.GetYear(dt) - 1
+        Month = Calendar.GetMonthsInYear(Year)
+        GetWeekOfYear = GetWeekOfYear(Calendar, Calendar.ToDateTime(Year, Month, Calendar.GetDaysInMonth(Year, Month), 0, 0, 0, 0), Rule, FirstDayOfWeek)
     End If
 End Function
 

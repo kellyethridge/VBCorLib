@@ -323,7 +323,7 @@ Private Sub AddSystemGlobalization()
 '        .Add New TestHebrewCalendar
 '        .Add New TestJulianCalendar
 '        .Add New TestCodePageDecoder
-'        .Add New TestGregorianCalendar
+        .Add New GregorianCalendarTests
 '        .Add New TestHijriCalendar
         .Add New CultureInfoTests
         .Add New DateTimeFormatInfoTests

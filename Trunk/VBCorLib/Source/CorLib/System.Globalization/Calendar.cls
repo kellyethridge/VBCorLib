@@ -99,10 +99,24 @@ Public Property Get TwoDigitYearMax() As Long: End Property
 ''
 ' Sets the maximum 4-digit year that will be created from a 2-digit value.
 '
-' @param RHS The maximinum 4-digit year to be created.
+' @param Value The maximinum 4-digit year to be created.
 ' @remarks This value is used by the <i>ToFourDigitYear</i> method.
 '
-Public Property Let TwoDigitYearMax(ByVal RHS As Long): End Property
+Public Property Let TwoDigitYearMax(ByVal Value As Long): End Property
+
+''
+' Gets the earliest date and time supported by this <a href="Calendar.html">Calendar</a> object.
+'
+' @return The earliest date and time supported by this calendar.
+'
+Public Property Get MinSupportedDateTime() As CorDateTime: End Property
+
+''
+' Gets the latest date and time supported by this <a href="Calendar.html">Calendar</a> object.
+'
+' @return The lated date and time supported by this calendar.
+'
+Public Property Get MaxSupportedDateTime() As CorDateTime: End Property
 
 ''
 ' Returns a <b>CorDateTime</b> that is the specified number of days from the original Time.
