@@ -661,7 +661,7 @@ Private Function SetValueBinary(ByRef Name As String, ByRef Value As Variant) As
     If Not CorArray.IsNull(Value) Then
         Size = CorArray.Length(Value)
         If Size > 0 Then
-            lpData = MemLong(CorArray.ArrayPointer(Value) + PVDATA_OFFSET)
+            lpData = MemLong(SAPtrV(Value) + PVDATA_OFFSET)
         End If
     End If
     

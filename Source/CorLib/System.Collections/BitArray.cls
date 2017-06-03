@@ -138,7 +138,7 @@ Public Sub CopyTo(ByRef Arr As Variant, ByVal Index As Long)
                 Error.Argument Argument_InvalidOffLen
             
             Dim Booleans() As Boolean
-            SAPtr(Booleans) = CorArray.ArrayPointer(Arr)
+            SAPtr(Booleans) = SAPtrV(Arr)
             
             Dim i As Long
             For i = 0 To mLength - 1

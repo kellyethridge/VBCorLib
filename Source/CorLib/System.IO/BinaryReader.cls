@@ -496,7 +496,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Dim BufferPtr   As Long
     
     Range = ValidateOptionalArrayRange(Buffer, Index, Count, Parameter_Buffer)
-    BufferPtr = CorArray.ArrayPointer(Buffer)
+    BufferPtr = SAPtrV(Buffer)
     
     Select Case VarType(Buffer)
         Case vbByteArray

@@ -382,7 +382,7 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     
     On Error GoTo Catch
     Dim Bytes() As Byte
-    SAPtr(Bytes) = CorArray.ArrayPointer(Source)
+    SAPtr(Bytes) = SAPtrV(Source)
     mStream.WriteBlock Bytes, Range.Index, Range.Count
 
     GoSub Finally

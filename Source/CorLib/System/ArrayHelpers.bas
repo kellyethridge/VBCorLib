@@ -39,11 +39,11 @@ Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
 
-Public Function VSAPtr(ByRef Value As Variant) As Long
+Public Function SAPtrV(ByRef Value As Variant) As Long
     If Not IsArray(Value) Then _
         Error.Argument Argument_ArrayRequired
         
-    VSAPtr = MemLong(vbaRefVarAry(Value))
+    SAPtrV = MemLong(vbaRefVarAry(Value))
 End Function
 
 Public Function Len1D(ByRef Arr As Variant) As Long

@@ -165,7 +165,7 @@ End Function
 Public Sub DeleteView(ByRef View() As Byte)
     If SAPtr(View) = 0 Then Exit Sub
     
-    If MemLong(CorArray.ArrayPointer(View) + PVDATA_OFFSET) <> mViewHandle Then _
+    If MemLong(SAPtrV(View) + PVDATA_OFFSET) <> mViewHandle Then _
         Throw Cor.NewArgumentException("Array is not associated with mapped file view.", "View")
     
     SAPtr(View) = 0

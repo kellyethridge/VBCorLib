@@ -48,7 +48,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(LongArray).Expect True
             
             Erase ObjectArray
-            Test.Use(ObjectArray).Expect True
+            Test.Use(ObjectArray).Expect False
             
             Test.Use(Array()).Expect False
             

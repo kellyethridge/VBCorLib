@@ -150,7 +150,7 @@ Public Function AsChars(ByRef v As Variant) As Integer()
             
         Case vbIntegerArray
             ' Directly assigning an array pointer prevents the source array from being copied.
-            SAPtr(AsChars) = VSAPtr(v)
+            SAPtr(AsChars) = SAPtrV(v)
             
         Case Else
             Error.Argument Argument_CharArrayRequired
