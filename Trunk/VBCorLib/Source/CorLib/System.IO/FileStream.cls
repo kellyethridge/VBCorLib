@@ -950,6 +950,37 @@ Private Function InternalSeek(ByVal Offset As Currency, ByVal Origin As SeekOrig
     End With
 End Function
 
+Private Function GetFileModeDisplayName(ByVal Mode As FileMode) As String
+    Dim Result As String
+    
+    Select Case Mode
+        Case Append:        Result = "Append"
+        Case Create:        Result = "Create"
+        Case CreateNew:     Result = "CreateNew"
+        Case OpenExisting:  Result = "OpenExisting"
+        Case OpenOrCreate:  Result = "OpenOrCreate"
+        Case Truncate:      Result = "Truncate"
+        Case Else
+            Error.ArgumentOutOfRange "Mode", ArgumentOutOfRange_Enum
+    End Select
+    
+    GetFileModeDisplayName = Result
+End Function
+
+Private Function GetFileAccessDisplayName(ByVal Access As FileAccess) As String
+    Dim Result As String
+    
+    Select Case Access
+        Case 0:     Result = "DefaultAccess"
+        Case ReadAccess:        Result = "ReadAccess"
+        Case WriteAccess:       Result = "WriteAccess"
+        Case ReadWriteAccess:   Result = "ReadWriteAccess"
+        Case Else
+            Error.ArgumentOutOfRange "Access", ArgumentOutOfRange_Enum
+    End Select
+    
+    GetFileAccessDisplayName = Result
+End Function
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IObject
