@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2017 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: GregorianCalendar
+' Module: GregorianCalendar
 '
 
 ''
@@ -80,12 +83,12 @@ End Property
 ''
 ' Sets the calendar type that represents the language version.
 '
-' @param RHS The calendar type to set this instance to.
+' @param Value The calendar type to set this instance to.
 ' @remarks This value is only tracked with the calendar object. It
 ' does not apply languages to text values.
 '
-Public Property Let CalendarType(ByVal RHS As GregorianCalendarTypes)
-    mCalendarType = RHS
+Public Property Let CalendarType(ByVal Value As GregorianCalendarTypes)
+    mCalendarType = Value
 End Property
 
 ''
@@ -96,9 +99,7 @@ End Property
 ' array will have one element containing the value 1.
 '
 Public Property Get Eras() As Long()
-    Dim Ret(0) As Long
-    Ret(0) = 1
-    Eras = Ret
+    Eras = Cor.NewLongs(1)
 End Property
 
 ''
@@ -118,21 +119,39 @@ End Property
 ''
 ' Sets the maximum year to be created from a 2-digit year.
 '
-' @param RHS The new 4-digit year maximum a 2-digit year is converted to.
+' @param Value The new 4-digit year maximum a 2-digit year is converted to.
 ' @remarks The property allows a 2-digit year (0 to 99) to be converted to
 ' a 4-digit year(0001 to 9999). The 2-digit year of 99 does not necessarily
 ' corrispond to the largest year to be created. For example, for a maximum
 ' year of 2029, the value 99 would convert to 1999 and 0 would convert to 2000.
 ' The years 29 would become 2029 and 30 would become 1930.
 '
-Public Property Let TwoDigitYearMax(ByVal RHS As Long)
+Public Property Let TwoDigitYearMax(ByVal Value As Long)
     Const MinTwoDigitYear As Long = 100
     Const MaxTwoDigitYear As Long = 9999
     
-    If RHS < MinTwoDigitYear Or RHS > MaxTwoDigitYear Then _
+    If Value < MinTwoDigitYear Or Value > MaxTwoDigitYear Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, MinTwoDigitYear, MaxTwoDigitYear))
     
-    mTwoDigitYearMax = RHS
+    mTwoDigitYearMax = Value
+End Property
+
+''
+' Gets the earliest date and time supported by the <a href="GregorianCalendar.html">GregorianCalendar</a> object.
+'
+' @return The earliest date and time supported by the <a href="GregorianCalendar.html">GregordianCalendar</a> which is <a href="CorDateTimeStatic.Get.MinValue.html">CorDateTime.MinValue</a>.
+'
+Public Property Get MinSupportedDateTime() As CorDateTime
+    Set MinSupportedDateTime = CorDateTime.MinValue
+End Property
+
+''
+' Gets the latest date and time supported by the <a href="GregorianCalendar.html">GregorianCalendar</a> object.
+'
+' @return The latest date and time supported by the <a href="GregorianCalendar.html">GregordianCalendar</a> which is <a href="CorDateTimeStatic.Get.MaxValue.html">CorDateTime.MaxValue</a>.
+'
+Public Property Get MaxSupportedDateTime() As CorDateTime
+    Set MaxSupportedDateTime = CorDateTime.MaxValue
 End Property
 
 ''
@@ -215,7 +234,9 @@ End Function
 ' @return Returns a <b>cDateTime</b> with the specified number of Weeks added.
 '
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
-    Set AddWeeks = AddDays(Time, Weeks * 7)
+    Const DaysInWeek As Long = 7
+    
+    Set AddWeeks = AddDays(Time, Weeks * DaysInWeek)
 End Function
 
 ''
@@ -284,11 +305,15 @@ End Function
 ' and 366 days in a leap year.
 '
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    Call VerifyEra(Era)
+    Const DaysInLeapYear    As Long = 366
+    Const DaysInNormalYear  As Long = 365
+    
+    VerifyEra Era
+    
     If CorDateTime.IsLeapYear(Year) Then
-        GetDaysInYear = 366
+        GetDaysInYear = DaysInLeapYear
     Else
-        GetDaysInYear = 365
+        GetDaysInYear = DaysInNormalYear
     End If
 End Function
 
@@ -301,8 +326,7 @@ End Function
 ' the current era of AD. This returns a constant of 1.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    Dim dt As CorDateTime
-    Set dt = CorDateTime.GetDateTime(Time)    ' verifies we have a date
+    CorDateTime.GetDateTime Time   ' verifies we have a date
     GetEra = 1
 End Function
 
@@ -355,8 +379,8 @@ End Function
 ' @remarks The Gregorian calendar has 12 months in a year.
 '
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    Call VerifyEra(Era)
-    Call VerifyYear(Year)
+    VerifyEra Era
+    VerifyYear Year
     GetMonthsInYear = 12
 End Function
 
@@ -379,7 +403,7 @@ End Function
 ' @return The week that the date belongs to.
 '
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
-    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
+    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Me, Time, Rule, FirstDayOfWeek)
 End Function
 
 ''
@@ -403,13 +427,16 @@ End Function
 ' @remarks A leap day only exists in a leap year, such as Febuary 29th in the Gregorian calendar.
 '
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
-    Call VerifyEra(Era)
-    Call VerifyYear(Year)
-    Call VerifyMonth(Month)
+    Const MonthOfFebuary As Long = 2
+    
+    VerifyEra Era
+    VerifyYear Year
+    VerifyMonth Month
+    
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
     
-    If Month = 2 Then
+    If Month = MonthOfFebuary Then
         IsLeapDay = (Day = 29)
     End If
 End Function
@@ -425,9 +452,9 @@ End Function
 ' This always returns <b>False</b>.
 '
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
-    Call VerifyEra(Era)
-    Call VerifyYear(Year)
-    Call VerifyMonth(Month)
+    VerifyEra Era
+    VerifyYear Year
+    VerifyMonth Month
     
     IsLeapMonth = False
 End Function
@@ -442,8 +469,8 @@ End Function
 ' evenly divisible by 4, but not by 100, unless it is divisible by 400.
 '
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean
-    Call VerifyEra(Era)
-    Call VerifyYear(Year)
+    VerifyEra Era
+    VerifyYear Year
     
     IsLeapYear = CorDateTime.IsLeapYear(Year)
 End Function
@@ -462,7 +489,7 @@ End Function
 ' @return A Gregorian version of the date specified.
 '
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime
-    Call VerifyEra(Era)
+    VerifyEra Era
     Set ToDateTime = Cor.NewDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond)
 End Function
 
@@ -481,14 +508,18 @@ End Function
 ' 100 years which 2-digit years will fall. 00-99 will fall within 1930-2029.</p>
 '
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
+    Dim y As Long
+    
     If Year < 0 Or Year > 9999 Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
 
     If Year < 100 Then
-        Dim Y As Long
-        Y = Year Mod 100
-        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + Y
-        If Y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
+        y = Year Mod 100
+        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + y
+        
+        If y > mTwoDigitYearMax Mod 100 Then
+            ToFourDigitYear = ToFourDigitYear - 100
+        End If
     Else
         ToFourDigitYear = Year
     End If
@@ -522,37 +553,67 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal CalendarType As GregorianCalendarTypes)
     mCalendarType = CalendarType
 End Sub
 
+Private Sub Class_InitProperties()
+    mTwoDigitYearMax = Statics.Calendar.GetCalendarInfoInt32(CAL_GREGORIAN, CAL_ITWODIGITYEARMAX)
+    mCalendarType = GregorianCalendarTypes.Localized
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_ReadProperties(PropBag As PropertyBag)
+    With PropBag
+        mTwoDigitYearMax = .ReadProperty("TwoDigitYearMax")
+        mCalendarType = .ReadProperty("CalendarType")
+    End With
+End Sub
+
+Private Sub Class_WriteProperties(PropBag As PropertyBag)
+    PropBag.WriteProperty "TwoDigitYearMax", mTwoDigitYearMax
+    PropBag.WriteProperty "CalendarType", mCalendarType
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyEra(ByRef Era As Variant)
-    If IsMissing(Era) Then Exit Sub
+    If IsMissing(Era) Then
+        Exit Sub
+    End If
+    
     Select Case VarType(Era)
         Case vbLong, vbInteger, vbByte
-            If Era < 0 Or Era > 1 Then Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidEraValue), "Era")
+            If Era < 0 Or Era > 1 Then _
+                Error.Argument Argument_InvalidEraValue, "Era"
+            
         Case Else
             Throw Cor.NewInvalidCastException("An integer value is required.")
     End Select
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < 1 Or Year > 9999 Then Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999))
+    If Year < 1 Or Year > 9999 Then
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 9999))
+    End If
 End Sub
 
 Private Sub VerifyMonth(ByVal Month As Long)
-    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    If Month < 1 Or Month > 12 Then
+        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Calendar Interface
+'   Calendar
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function Calendar_AddDays(Time As Variant, ByVal Days As Long) As CorDateTime
     Set Calendar_AddDays = AddDays(Time, Days)
@@ -666,6 +727,14 @@ Private Function Calendar_IsLeapYear(ByVal Year As Long, Optional Era As Variant
     Calendar_IsLeapYear = IsLeapYear(Year, Era)
 End Function
 
+Private Property Get Calendar_MaxSupportedDateTime() As CorDateTime
+
+End Property
+
+Private Property Get Calendar_MinSupportedDateTime() As CorDateTime
+
+End Property
+
 Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As CorDateTime
     Set Calendar_ToDateTime = ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond, Era)
 End Function
@@ -678,8 +747,8 @@ Private Function Calendar_ToString() As String
     Calendar_ToString = ToString
 End Function
 
-Private Property Let Calendar_TwoDigitYearMax(ByVal RHS As Long)
-    TwoDigitYearMax = RHS
+Private Property Let Calendar_TwoDigitYearMax(ByVal Value As Long)
+    TwoDigitYearMax = Value
 End Property
 
 Private Property Get Calendar_TwoDigitYearMax() As Long
@@ -688,35 +757,14 @@ End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_InitProperties()
-    mTwoDigitYearMax = Statics.Calendar.GetCalendarInfoInt32(CAL_GREGORIAN, CAL_ITWODIGITYEARMAX)
-    mCalendarType = GregorianCalendarTypes.Localized
-End Sub
-
-Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    With PropBag
-        mTwoDigitYearMax = .ReadProperty("TwoDigitYearMax")
-        mCalendarType = .ReadProperty("CalendarType")
-    End With
-End Sub
-
-Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty("TwoDigitYearMax", mTwoDigitYearMax)
-    Call PropBag.WriteProperty("CalendarType", mCalendarType)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

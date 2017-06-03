@@ -327,8 +327,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -450,6 +450,14 @@ End Function
 Private Function Calendar_IsLeapYear(ByVal Year As Long, Optional Era As Variant) As Boolean
     Calendar_IsLeapYear = IsLeapYear(Year, Era)
 End Function
+
+Private Property Get Calendar_MaxSupportedDateTime() As CorDateTime
+
+End Property
+
+Private Property Get Calendar_MinSupportedDateTime() As CorDateTime
+
+End Property
 
 Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As CorDateTime
     Set Calendar_ToDateTime = ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond, Era)

@@ -203,10 +203,10 @@ Public Function ToFourDigitYear(ByVal Year As Long) As Long
             Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
             
         Case Is < 100
-            Dim Y As Long
-            Y = Year Mod 100
-            ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + Y
-            If Y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
+            Dim y As Long
+            y = Year Mod 100
+            ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + y
+            If y > mTwoDigitYearMax Mod 100 Then ToFourDigitYear = ToFourDigitYear - 100
             
         Case Is < MIN_THAIBUDDHISTYEAR, Is > MAX_THAIBUDDHISTYEAR
             Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_THAIBUDDHISTYEAR, MAX_THAIBUDDHISTYEAR))
@@ -384,6 +384,14 @@ Private Function Calendar_IsLeapYear(ByVal Year As Long, Optional Era As Variant
     Calendar_IsLeapYear = IsLeapYear(Year, Era)
 End Function
 
+Private Property Get Calendar_MaxSupportedDateTime() As CorDateTime
+
+End Property
+
+Private Property Get Calendar_MinSupportedDateTime() As CorDateTime
+
+End Property
+
 Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As CorDateTime
     Set Calendar_ToDateTime = ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond, Era)
 End Function
@@ -428,8 +436,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

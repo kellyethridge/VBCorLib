@@ -318,7 +318,6 @@ Class=Char; System\Char.cls
 Class=SafeFileHandle; Microsoft.Win32.SafeHandles\SafeFileHandle.cls
 Class=SafeHandle; Microsoft.Win32.SafeHandles\SafeHandle.cls
 Class=IWin32Api; Microsoft.Win32\IWin32Api.cls
-Module=FileFlagHelper; System.IO\FileFlagHelper.bas
 Module=CharAllocation; System\CharAllocation.bas
 Module=Delegation; System\Delegation.bas
 Module=ArrayHelpers; System\ArrayHelpers.bas
