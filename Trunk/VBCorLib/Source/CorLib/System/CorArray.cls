@@ -137,7 +137,7 @@ End Function
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     ValidateArray Arr
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim ElementIndex   As Long
     Dim ElementCount   As Long
@@ -193,7 +193,7 @@ Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) 
     ValidateArray Arr
     
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim LowerBound As Long
     LowerBound = LBound(Arr)
@@ -327,7 +327,7 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     ValidateArray Arr
     
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim ElemIndex As Long
     Dim ElemCount As Long
@@ -380,7 +380,7 @@ Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Lon
     ValidateArray Arr
     
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(Ptr)
@@ -422,7 +422,7 @@ Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
     ValidateArray Arr
     
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim ElemSize As Long
     ElemSize = SafeArrayGetElemsize(Ptr)
@@ -494,7 +494,7 @@ End Function
 Public Sub Clear(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long)
     Dim pSafeArray  As Long
     
-    pSafeArray = ArrayPointer(Arr)
+    pSafeArray = SAPtrV(Arr)
     If pSafeArray = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     If Index < LBound(Arr) Then _
@@ -565,12 +565,12 @@ End Sub
 '
 Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef DestinationArray As Variant, ByVal DestinationIndex As Long, ByVal Length As Long)
     Dim pSourceSafeArray As Long
-    pSourceSafeArray = ArrayPointer(SourceArray)
+    pSourceSafeArray = SAPtrV(SourceArray)
     If pSourceSafeArray = vbNullPtr Then _
         Error.ArgumentNull "SourceArray", ArgumentNull_Array
     
     Dim pDestinationSafeArray As Long
-    pDestinationSafeArray = ArrayPointer(DestinationArray)
+    pDestinationSafeArray = SAPtrV(DestinationArray)
     If pDestinationSafeArray = vbNullPtr Then _
         Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     
@@ -692,7 +692,9 @@ End Function
 '
 Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
     Dim SafeArrayPtr  As Long
-    SafeArrayPtr = ArrayPointer(Arr)
+    
+    SafeArrayPtr = SAPtrV(Arr)
+    
     If SafeArrayPtr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
@@ -706,7 +708,7 @@ End Function
 ' @return The number of dimension in the array.
 Public Function Rank(ByRef Arr As Variant) As Long
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     If Ptr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
@@ -726,7 +728,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     ValidateArray Arr
     
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim Range As ListRange
     Range = OptionalStepRange(StartIndex, Count, LBound(Arr), Len1D(Arr), Parameter_StartIndex)
@@ -762,7 +764,7 @@ End Function
 ' @param arr The array to test for initialization.
 ' @return Value indicating if the array is initialized.
 Public Function IsNull(ByRef Arr As Variant) As Boolean
-    IsNull = ArrayPointer(Arr) = vbNullPtr
+    IsNull = SAPtrV(Arr) = vbNullPtr
 End Function
 
 ''
@@ -779,7 +781,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     ValidateArray Arr
     
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -825,7 +827,7 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     ValidateArray Arr
     
     Dim Ptr As Long
-    Ptr = ArrayPointer(Arr)
+    Ptr = SAPtrV(Arr)
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
@@ -998,11 +1000,11 @@ Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index 
     Dim KeysPtr  As Long
     Dim ItemsPtr As Long
     
-    KeysPtr = ArrayPointer(Keys)
+    KeysPtr = SAPtrV(Keys)
     
     If Not IsEmpty(Items) Then
         ValidateArray Items, Parameter_Items
-        ItemsPtr = ArrayPointer(Items)
+        ItemsPtr = SAPtrV(Items)
         
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
@@ -1070,38 +1072,11 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Internal
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function ArrayPointer(ByRef Arg As Variant) As Long
-    Dim ArgType As Integer
-    ArgType = VariantType(Arg)
-    
-    If (ArgType And vbArray) = 0 Then _
-        Error.Argument Argument_ArrayRequired
-    
-    ArrayPointer = MemLong(VB6.vbaRefVarAry(Arg))
-    
-    ' HACK HACK HACK
-    '
-    ' When an uninitialized array of objects or UDTs is passed into a
-    ' function as a ByRef Variant, the array is initialized with just the
-    ' SafeArrayDescriptor, at which point, it is a valid array and can
-    ' be used by UBound and LBound after the call. So, now we're just
-    ' going to assume that any object or UDT array that has just the descriptor
-    ' allocated was Null to begin with. That means whenever an Object or UDT
-    ' array is passed to any CorArray method, it will technically never
-    ' be uninitialized, just zero-length.
-    Select Case ArgType And &HFF
-        Case vbObject, vbUserDefinedType
-            If UBound(Arg) < LBound(Arg) Then
-                ArrayPointer = vbNullPtr
-            End If
-    End Select
-End Function
-
 Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, ByVal Comparer As IComparer) As Long
     On Error GoTo Catch
     
     If Comparer Is Nothing Then
-        If TrySZBinarySearch(ArrayPointer(Arr), Value, Index, Length, InternalBinarySearch) Then
+        If TrySZBinarySearch(SAPtrV(Arr), Value, Index, Length, InternalBinarySearch) Then
             Exit Function
         End If
         
@@ -1139,15 +1114,17 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function LengthCore(ByVal SafeArrayPtr As Long, Optional ByVal Dimension As Long) As Long
+Private Function LengthCore(ByVal SafeArrayPtr As Long, ByVal Dimension As Long) As Long
+    Dim Rank            As Long
+    Dim ArrayBoundPtr   As Long
+    
     Debug.Assert SafeArrayPtr <> 0
     
-    Dim Rank As Long
     Rank = SafeArrayGetDim(SafeArrayPtr)
+    
     If Dimension > Rank Then _
         Error.IndexOutOfRange IndexOutOfRange_Dimension
     
-    Dim ArrayBoundPtr As Long
     ArrayBoundPtr = SafeArrayPtr + vbSizeOfSafeArray
     
     If Dimension < 1 Then
@@ -1202,7 +1179,7 @@ Private Sub AssignDefaultElementValue(ByRef Arr As Variant, ByRef RetVal As Vari
         Case vbVariant:     RetVal = Empty
         Case vbUserDefinedType
             Dim rec As IRecordInfo
-            Set rec = SafeArrayGetRecordInfo(CorArray.ArrayPointer(Arr))
+            Set rec = SafeArrayGetRecordInfo(SAPtrV(Arr))
             
             ' Set the datatype for the variant.
             VariantType(RetVal) = vbUserDefinedType

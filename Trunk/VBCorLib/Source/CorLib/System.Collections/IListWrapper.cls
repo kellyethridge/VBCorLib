@@ -62,18 +62,18 @@ End Sub
 Private Sub QuickSortList(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long
     Dim j As Long
-    Dim X As Variant
+    Dim x As Variant
     
     Do While Left < Right
         i = Left
         j = Right
-        Helper.MoveVariant X, mList((i + j) \ 2)
+        Helper.MoveVariant x, mList((i + j) \ 2)
         
         Do
-            Do While mComparer.Compare(mList(i), X) < 0
+            Do While mComparer.Compare(mList(i), x) < 0
                 i = i + 1
             Loop
-            Do While mComparer.Compare(mList(j), X) > 0
+            Do While mComparer.Compare(mList(j), x) > 0
                 j = j - 1
             Loop
             
@@ -220,7 +220,7 @@ Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal A
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
     Dim Result As Long
-    Result = VerifyArrayRange(CorArray.ArrayPointer(DstArray), ArrayIndex, Count)
+    Result = VerifyArrayRange(SAPtrV(DstArray), ArrayIndex, Count)
     If Result Then _
         ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
     
@@ -265,7 +265,7 @@ Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Option
 End Function
 
 Private Function ArrayList_GetHashCode() As Long
-    ArrayList_GetHashCode = IObject_GetHashcode
+    ArrayList_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
@@ -545,8 +545,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Object.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = ObjPtr(CUnk(Me))
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = ObjPtr(CUnk(Me))
 End Function
 
 Private Function IObject_ToString() As String

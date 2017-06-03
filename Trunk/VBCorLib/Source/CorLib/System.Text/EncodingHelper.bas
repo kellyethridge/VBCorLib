@@ -247,7 +247,7 @@ Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, B
             
         Case vbIntegerArray
             Dim CharPtr As Long
-            CharPtr = CorArray.ArrayPointer(Source)
+            CharPtr = SAPtrV(Source)
             If CharPtr = vbNullPtr Then _
                 Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Chars), Environment.GetResourceString(ArgumentNull_Array))
             If SafeArrayGetDim(CharPtr) > 1 Then _

@@ -429,7 +429,7 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IncrementKeySizeCapacity(ByRef Arr() As KeySizes)
-    If CorArray.IsNull(Arr) Then
+    If SAPtr(Arr) = vbNullPtr Then
         ReDim Arr(0)
     Else
         ReDim Preserve Arr(UBound(Arr) + 1)
@@ -442,7 +442,7 @@ Private Sub AddKeySize(ByRef Arr() As KeySizes, ByVal MinSize As Long, ByVal Max
 End Sub
 
 Private Function IsLegalSize(ByRef LegalSizes() As KeySizes, ByVal BitLength As Long) As Boolean
-    If CorArray.IsNull(LegalSizes) Then
+    If SAPtr(LegalSizes) = vbNullPtr Then
         IsLegalSize = True
         Exit Function
     End If

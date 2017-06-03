@@ -73,6 +73,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added LeaveOpen option to BinaryReader constructor.
 	* Fixed BinaryReader ReadChars and ReadBytes now return zero-length arrays if no data can be read instead of throwing an exception.
 	* Fixed BinaryReader to use Decoder instead of Encoding when reading data from stream so multi-byte characters are correctly read across reads.
+	* Changed CorArray.IsNull to return False for uninitialized array of objects because calling the method will initialize the array to an empty array. *BREAKING*
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

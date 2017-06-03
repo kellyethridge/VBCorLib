@@ -259,7 +259,7 @@ Private Sub FromByteArray(ByRef Value As Variant)
         Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_GuidArrayCtor, vbSizeOfGuid))
     
     Dim Bytes() As Byte
-    SAPtr(Bytes) = CorArray.ArrayPointer(Value)
+    SAPtr(Bytes) = SAPtrV(Value)
     CopyMemory mGuid, Bytes(LBound(Bytes)), vbSizeOfGuid
     SAPtr(Bytes) = vbNullPtr
 End Sub

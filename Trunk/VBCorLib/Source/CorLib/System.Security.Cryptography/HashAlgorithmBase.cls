@@ -322,7 +322,7 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     
     Dim Buffer() As Byte
     Dim Range As ListRange
-    SAPtr(Buffer) = CorArray.ArrayPointer(Source)
+    SAPtr(Buffer) = SAPtrV(Source)
     Range = ValidateByteArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
     HashCore Buffer, Range.Index, Range.Count
     
