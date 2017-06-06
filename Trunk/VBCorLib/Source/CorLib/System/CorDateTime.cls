@@ -779,6 +779,11 @@ Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
     mKind = Kind
 End Sub
 
+Friend Sub InitFromCorDateTime(ByVal d As CorDateTime, ByVal Kind As DateTimeKind)
+    mMilliseconds = d.TotalMilliseconds
+    mKind = Kind
+End Sub
+
 Friend Sub InitFromFileTime(ByVal Time As Currency, ByVal Kind As DateTimeKind)
     mMilliseconds = Time + MillisecondsTo1601
     mKind = Kind
