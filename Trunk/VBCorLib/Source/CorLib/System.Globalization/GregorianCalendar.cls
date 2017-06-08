@@ -39,7 +39,7 @@ Attribute VB_Exposed = True
 ' Provides methods for manipulating dates using the Gregorian calendar mathematics.
 '
 ' @remarks The Gregorian calendar recognizes an era of BC (Before Christ) and
-' AD (Anno Domino). The GregorianCalendar class only support the AD era (1).
+' AD (Anno Domino). The <b>GregorianCalendar</b> class only support the AD era (1).
 ' <p>The calendar supports the time from 01/01/0001 12:00:00AM to 12/31/9999 11:59:59PM.</p>
 ' <p>Only leap year is recognized and occurs every 4 years, except a year that is
 ' evenly divisible by 100. However, if it is divisible by 400 then it is a leap year.</p>
@@ -55,6 +55,15 @@ Implements Calendar
 
 Private Const MaxYear As Long = 9999
 
+''
+' Defines the different language versions of the Gregorian calendar.
+'
+' @param Arabic Refers to the Arabit version of the Gregorian calendar.
+' @param Localized Refers to the localized version of the Gregorian calendar, based on the language of the <a href="CultureInfo.html">CultureInfo</a>.
+' @param MiddleEastFrench Refers to the Middle East French version of the Gregorian calendar.
+' @param TransliteratedEnglish Refers to the transliterated English version of the Gregorian calendar.
+' @param TransliteratedFrench Refers to the transliterated French version of the Gregorian calendar.
+' @param USEnglish Refers to the U.S. English version of the Gregorian calendar.
 Public Enum GregorianCalendarTypes
     Localized = 1
     USEnglish = 2
@@ -71,7 +80,7 @@ Private mTempDateTime       As New CorDateTime
 
 
 ''
-' Returns the calendar type that represents the language version.
+' Returns the <a href="GegorianCalendar.GregorianCalendarTypes.html">GregorianCalendarTypes</a> that represents the language version.
 '
 ' @return The calendar type that represents the language version.
 ' @remarks This value is only tracked with the calendar object. It
@@ -82,14 +91,34 @@ Public Property Get CalendarType() As GregorianCalendarTypes
 End Property
 
 ''
-' Sets the calendar type that represents the language version.
+' Sets the <a href="GregorianCalendarTypes.html">GregorianCalendarTypes</a> that represents the language version.
 '
 ' @param Value The calendar type to set this instance to.
-' @remarks This value is only tracked with the calendar object. It
-' does not apply languages to text values.
+' @remarks <p>This value is only tracked with the calendar object. It
+' does not apply languages to text values.</p>
 '
+' <h4>Exceptions</h4>
+' <table style="width:auto">
+'   <tr>
+'       <th>Exception</th><th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td>The value of the specified operation is not a member of the <a href="GregorianCalendar.GregorianCalendarTypes.html">GregorianCalendarTypes</a> enumeration.</td>
+'   </tr>
+'   <tr>
+'       <td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+'       <td>In a let operation, the current instance is read-only.</td>
+'   </tr>
+' </table>
 Public Property Let CalendarType(ByVal Value As GregorianCalendarTypes)
-    mCalendarType = Value
+    Select Case Value
+        Case GregorianCalendarTypes.Localized, GregorianCalendarTypes.USEnglish, _
+             GregorianCalendarTypes.MiddleEastFrench To GregorianCalendarTypes.TransliteratedFrench
+            mCalendarType = Value
+        Case Else
+            Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_Enum
+    End Select
 End Property
 
 ''
@@ -162,7 +191,7 @@ End Property
 ' @return A <a href="CorDateTime.html">CorDateTime</a> object with the new date.
 ' @remarks Using this method works exactly like using the <b>AddDays</b>
 ' method on the <a href="CorDateTime.html">CorDateTime</a> objects.
-' <p>A new CorDateTime object is returned with the days added to the
+' <p>A new <a href="CorDateTime.html">CorDateTime</a> object is returned with the days added to the
 ' original <i>Time</i>. If a Date is passed in, a CorDateTime object is
 ' still returned.</p>
 ' <p>A negative value can be supplied for <i>Days</i>.</p>
@@ -174,7 +203,7 @@ End Function
 ''
 ' Adds a number of hours to the date provided.
 '
-' @param Time A Date or CorDateTime object to add a number of hours to.
+' @param Time A Date or <a href="CorDateTime.html">CorDateTime</a> object to add a number of hours to.
 ' @param Hours The number of hours to be added to the time portion of a date.
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of hours added.
 '
@@ -261,11 +290,11 @@ Public Function GetDayOfMonth(ByRef Time As Variant) As Long
 End Function
 
 ''
-' Returns the <b>DayOfWeek</b> enum of the specified date.
+' Returns the <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> enum of the specified date.
 '
 ' @param Time The date to retrieve the day of the week for.
-' @return A <b>DayOfWeek</b> enum representing the day of the week.
-' @remarks The <b>DayOfWeek</b> is Sunday and is 0-based. The Visual Basic
+' @return A <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> enum representing the day of the week.
+' @remarks The <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> is Sunday and is 0-based. The Visual Basic
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
@@ -301,8 +330,7 @@ End Function
 ' @param Year The year to retrieve the number of days of.
 ' @param Era The era the year exists in.
 ' @return The number of days in the year.
-' @remarks The gregorian calendar has 365 days in a normal year
-' and 366 days in a leap year.
+' @remarks The Gregorian calendar has 365 days in a normal year and 366 days in a leap year.
 '
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
     Const DaysInLeapYear    As Long = 366
@@ -322,8 +350,7 @@ End Function
 '
 ' @param Time The time to find the containing era of.
 ' @return The era for the time.
-' @remarks The <b>GregorianCalendar</b> class only supports
-' the current era of AD. This returns a constant of 1.
+' @remarks The <a href="GregorianCalendar.html">GregorianCalendar</a> class only supports the current era of AD. This returns a constant of 1.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
     GetDateTime Time   ' verifies we have a date
@@ -476,7 +503,7 @@ Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As
 End Function
 
 ''
-' Returns a Gregorian CorDateTime computed using the specific calendar rules.
+' Returns a Gregorian <a href="CorDateTime.html">CorDateTime</a> computed using the specific calendar rules.
 '
 ' @param Year The Year in the specific calendar type.
 ' @param Month The Month in the specific calendar type.
