@@ -41,6 +41,7 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements IObject
 Implements Encoding
+Implements ICloneable
 
 Private mCodePage           As Long
 Private mIsReadOnly         As Boolean
@@ -389,6 +390,14 @@ End Property
 Private Property Get Encoding_WindowsCodePage() As Long
     Encoding_WindowsCodePage = Table.WindowsCodePage(mCodePage)
 End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Encoding_Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

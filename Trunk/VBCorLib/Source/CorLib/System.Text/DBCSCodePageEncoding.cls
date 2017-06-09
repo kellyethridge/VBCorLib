@@ -34,9 +34,15 @@ Attribute VB_Exposed = False
 '
 ' Module: DBCSCodePageEncoding
 '
+
+''
+' This Encoding is used to encode/decode unicode characters that can be represented
+' with either one or two bytes.
+'
 Option Explicit
 Implements IObject
 Implements Encoding
+Implements ICloneable
 
 Private mCodePage           As Long
 Private mIsReadOnly         As Boolean
@@ -59,6 +65,10 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
             Flags = MB_ERR_INVALID_CHARS
         End If
     Else
+        ' though getting the char count will utilize any previously saved state
+        ' stored in the decoder, it will not actually store any state in the
+        ' decoder. Only the getting of chars will store any state.
+        
         If TypeOf Decoder.DecoderFallback Is DecoderExceptionFallback Then
             Flags = MB_ERR_INVALID_CHARS
         End If
@@ -66,11 +76,17 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
         LastByte = Decoder.LastByte
         
         If Count > 0 Then
+            ' if the last byte to be processed in Bytes is a leading byte and we are not going
+            ' to flush, then we expect that byte to be stored to be processed at the beginning
+            ' of the next call. So we won't count it during this call by reducing the number
+            ' of bytes that will be processed by one.
             If IsDBCSLeadByteEx(mCodePage, Bytes(Index + Count - 1)) And Not Decoder.Flushing Then
                 Count = Count - 1
             End If
         End If
         
+        ' if there was a leading byte stored in the previous call, then we will process it
+        ' here along with the first byte from Bytes as a 2-byte character.
         If LastByte >= 0 Then
             mLeadingBytes(0) = LastByte
             
@@ -83,12 +99,15 @@ Friend Function GetCharCountCore(ByRef Bytes() As Byte, ByVal Index As Long, ByV
             
             CharCount = CountChars(mLeadingBytes, 0, PartialCount, Flags)
             
+            ' adjust what bytes in Bytes to be processed.
             Index = Index + 1
             Count = Count - 1
         End If
     End If
     
     If Count > 0 Then
+        ' count the number of chars contained within Bytes using the
+        ' adjusted Index and Count values.
         CharCount = CharCount + CountChars(Bytes, Index, Count, Flags)
     End If
     
@@ -121,6 +140,9 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
         LastByte = Decoder.LastByte
         
         If ByteCount > 0 Then
+            ' if the last byte to be processed in Bytes is a leading byte and we are not going
+            ' to flush, then we store the last byte to be processed at the beginning
+            ' of the next call and exclude it from being processed during this call.
             If IsDBCSLeadByteEx(mCodePage, Bytes(ByteIndex + ByteCount - 1)) And Not Decoder.Flushing Then
                 Decoder.LastByte = Bytes(ByteIndex + ByteCount - 1)
                 ByteCount = ByteCount - 1
@@ -128,6 +150,9 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
         End If
         
         If LastByte >= 0 Then
+            ' if there was a leading byte previously stored, then we will process it
+            ' during this call along with the first byte in Bytes. The two bytes will
+            ' be processed as a 2-byte character.
             mLeadingBytes(0) = LastByte
             
             If ByteCount > 0 Then
@@ -142,6 +167,8 @@ Friend Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByV
                 CharIndex = CharIndex + CharCount
             End If
             
+            ' since the first byte was already used, we will adjust the
+            ' index and count to process the remaining bytes.
             ByteIndex = ByteIndex + 1
             ByteCount = ByteCount - 1
         End If
@@ -484,6 +511,14 @@ End Property
 Private Property Get Encoding_WindowsCodePage() As Long
     Encoding_WindowsCodePage = Table.WindowsCodePage(mCodePage)
 End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Encoding_Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

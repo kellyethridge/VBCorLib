@@ -51,6 +51,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements Encoding
+Implements ICloneable
 
 Private Const CODE_PAGE As Long = 65001
 
@@ -1023,6 +1024,14 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
         End If
     End With
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

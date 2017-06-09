@@ -78,6 +78,9 @@ Private Function ToString() As String
 End Function
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Encoding As Encoding)
     Set mEncoding = Encoding
     Set mDecoderFallback = Encoding.DecoderFallback
