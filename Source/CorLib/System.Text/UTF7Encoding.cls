@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements Encoding
+Implements ICloneable
 
 Private Const EncodableCharacters   As String = "\t\n\r '(),-./0123456789:?ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 Private Const OptionalCharacters    As String = "!""#$%&*;<=>@[]^_`{|}"
@@ -1011,6 +1012,14 @@ Private Sub Class_WriteProperties(PropBag As PropertyBag)
         PropBag.WriteProperty "DecoderFallback", mDecoderFallback
     End If
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
