@@ -324,7 +324,7 @@ Private Sub AddSystemGlobalization()
 '        .Add New TestJulianCalendar
 '        .Add New TestCodePageDecoder
         .Add New GregorianCalendarTests
-'        .Add New TestHijriCalendar
+        .Add New HijriCalendarTests
         .Add New CultureInfoTests
         .Add New DateTimeFormatInfoTests
         

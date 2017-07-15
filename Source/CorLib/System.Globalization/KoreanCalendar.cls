@@ -266,6 +266,22 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Calendar Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get Calendar_AlgorithmType() As CalendarAlgorithmType
+
+End Property
+
+Private Function Calendar_Clone() As Calendar
+
+End Function
+
+Private Property Get Calendar_DaysInYearBeforeMinSupportedYear() As Long
+
+End Property
+
+Private Property Get Calendar_IsReadOnly() As Boolean
+
+End Property
+
 Private Function Calendar_AddDays(Time As Variant, ByVal Days As Long) As CorDateTime
     Set Calendar_AddDays = AddDays(Time, Days)
 End Function

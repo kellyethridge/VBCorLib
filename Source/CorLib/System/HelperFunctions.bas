@@ -229,7 +229,8 @@ End Function
 '
 Public Function IsInteger(ByRef Value As Variant) As Boolean
     Select Case VarType(Value)
-        Case vbLong, vbInteger, vbByte: IsInteger = True
+        Case vbLong, vbInteger, vbByte
+            IsInteger = True
     End Select
 End Function
 
