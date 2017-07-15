@@ -146,6 +146,7 @@ Public Enum ResourceStringKey
     Argument_EncodingNotSupported = 870
     Argument_InvalidCodePageBytes = 871
     Argument_InvalidCodePageChars = 872
+    Argument_IntegerRequired = 873
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
@@ -197,6 +198,8 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_GetByteCountOverflow = 739
     ArgumentOutOfRange_InvalidHighSurrogate = 740
     ArgumentOutOfRange_InvalidLowSurrogate = 741
+    ArgumentOutOfRange_Day = 742
+    ArgumentOutOfRange_CalendarRange = 743
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?

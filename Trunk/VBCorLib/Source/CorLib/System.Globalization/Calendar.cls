@@ -77,6 +77,51 @@ Public Enum CalendarWeekRule
 End Enum
 
 ''
+' Specifies whether a calendar is solar-based, lunar-based, or lunisolar-based.
+'
+' @param LunarCalendar A lunar-based calendar.
+' @param LunisolarCalendar A lunisolar-based calendar.
+' @param SolarCalendar A solar-based calendar.
+' @param Unknown An unknown calendar basis.
+'
+Public Enum CalendarAlgorithmType
+    Unknown
+    SolarCalendar
+    LunarCalendar
+    LunisolarCalendar
+End Enum
+
+
+''
+' Gets a value indicating whether the current calendar is solar-based, lunar-based, or a combination of both.
+'
+' @return One of the <a href="Calendar.CalendarAlgorithmType.html">CalendarAlgorithmType<a/> values.
+'
+Public Property Get AlgorithmType() As CalendarAlgorithmType: End Property
+
+''
+' Creates a new object that is a copy of the current <a href="Calendar.html">Calendar</a> object.
+'
+' @return A copy of the <a href="Calendar.html">Calendar</a> object.
+'
+Public Function Clone() As Calendar: End Function
+
+''
+' Gets the number of days in the year that precedes the year that is specified by the <a href="Calendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a> property.
+'
+' @return The number of days in the year that precedes the year specified by <a href="Calendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a>.
+' @remarks This property returns a constant value of 365. Note that the property value can be overridden by classes implement the <a href="Calendar.html">Calendar</a> class interface.
+'
+Public Property Get DaysInYearBeforeMinSupportedYear() As Long: End Property
+
+''
+' Gets a value indicating whether this <a href="Calendar.html">Calendar</a> object is read-only.
+'
+' @return <b>True</b> if this <a href="Calendar.html">Calendar</a> object is read-only; otherwise, <b>False</b>.
+'
+Public Property Get IsReadOnly() As Boolean: End Property
+
+''
 ' Returns an list of the eras the calendar can represent.
 '
 ' @return A list of the eras for the calendar.
@@ -114,79 +159,79 @@ Public Property Get MinSupportedDateTime() As CorDateTime: End Property
 ''
 ' Gets the latest date and time supported by this <a href="Calendar.html">Calendar</a> object.
 '
-' @return The lated date and time supported by this calendar.
+' @return The latest date and time supported by this calendar.
 '
 Public Property Get MaxSupportedDateTime() As CorDateTime: End Property
 
 ''
-' Returns a <b>CorDateTime</b> that is the specified number of days from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> that is the specified number of days from the original Time.
 '
 ' @param Time The date inwhich to add the days to.
 ' @param Days The number of days to be added. This value can be negative.
-' @return The new <b>CorDateTime</b> with the days added or subtracted.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> with the days added or subtracted.
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>CorDateTime</b> this is the specified number of hours from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of hours from the original Time.
 '
 ' @param Time The time to add the specified number of hours to.
 ' @param Hours The number of hours to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>cDateTime</b> with the specified number of hours added.
+' @return Returns a <a href="CorDateTime.html"> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>CorDateTime</b> this is the specified number of Milliseconds from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Milliseconds from the original Time.
 '
 ' @param Time The time to add the specified number of Milliseconds to.
 ' @param Milliseconds The number of Milliseconds to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>CorDateTime</b> with the specified number of Milliseconds added.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime: End Function
 
 ''
-' Returns a <b>CorDateTime</b> this is the specified number of Minutes from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Minutes from the original Time.
 '
 ' @param Time The time to add the specified number of Minutes to.
 ' @param Minutes The number of Minutes to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>CorDateTime</b> with the specified number of Minutes added.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>CorDateTime</b> this is the specified number of Months from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Months from the original Time.
 '
 ' @param Time The time to add the specified number of Months to.
 ' @param Months The number of Months to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>CorDateTime</b> with the specified number of Months added.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Months added.
 '
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>CorDateTime</b> this is the specified number of Seconds from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Seconds from the original Time.
 '
 ' @param Time The time to add the specified number of Seconds to.
 ' @param Seconds The number of Seconds to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>CorDateTime</b> with the specified number of Seconds added.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>CorDateTime</b> this is the specified number of Weeks from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Weeks from the original Time.
 '
 ' @param Time The time to add the specified number of Weeks to.
 ' @param Weeks The number of Weeks to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>CorDateTime</b> with the specified number of Weeks added.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Weeks added.
 '
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime: End Function
 
 ''
-' Returns a <b>CorDateTime</b> this is the specified number of Years from the original Time.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Years from the original Time.
 '
 ' @param Time The time to add the specified number of Years to.
 ' @param Years The number of Years to be added to <i>Time</i>. This can be negative.
-' @return Returns a <b>CorDateTime</b> with the specified number of Years added.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Years added.
 '
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime: End Function
 
@@ -216,11 +261,11 @@ Public Function GetDayOfMonth(ByRef Time As Variant) As Long: End Function
 Public Function GetDayOfYear(ByRef Time As Variant) As Long: End Function
 
 ''
-' Returns the <b>DayOfWeek</b> enum of the specified date.
+' Returns the <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> enum of the specified date.
 '
 ' @param Time The date to retrieve the day of the week for.
-' @return A <b>DayOfWeek</b> enum representing the day of the week.
-' @remarks The <b>DayOfWeek</b> is Sunday and is 0-based. The Visual Basic
+' @return A <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> enum representing the day of the week.
+' @remarks The <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> is Sunday and is 0-based. The Visual Basic
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek: End Function
