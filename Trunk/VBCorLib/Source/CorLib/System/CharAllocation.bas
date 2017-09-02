@@ -104,27 +104,12 @@ Public Function AllocChars(ByRef s As String) As Integer()
             InitBucket mFastLaneBucket
         End If
         
-        With mFastLaneBucket
-            .InUse = True
-            SAPtr(AllocChars) = .BufferPtr
-            
-            With .Buffer
-                .cElements = Len(s)
-                .pvData = StrPtr(s)
-            End With
-        End With
+        FillBucket mFastLaneBucket, s
+        SAPtr(AllocChars) = mFastLaneBucket.BufferPtr
     Else
         Index = FindAvailableBucketIndex
-        
-        With mBuckets(Index)
-            .InUse = True
-            SAPtr(AllocChars) = .BufferPtr
-            
-            With .Buffer
-                .cElements = Len(s)
-                .pvData = StrPtr(s)
-            End With
-        End With
+        FillBucket mBuckets(Index), s
+        SAPtr(AllocChars) = mBuckets(Index).BufferPtr
     End If
 End Function
 
@@ -203,6 +188,17 @@ Private Sub InitBucket(ByRef Bucket As BufferBucket)
         ObjectPtr(.Self) = .TablePtr
         .ReleasePtr = FuncAddr(AddressOf ReleaseBufferBucket)
         .BufferPtr = VarPtr(.Buffer)
+    End With
+End Sub
+
+Private Sub FillBucket(ByRef Bucket As BufferBucket, ByRef s As String)
+    With Bucket
+        .InUse = True
+        
+        With .Buffer
+            .cElements = Len(s)
+            .pvData = StrPtr(s)
+        End With
     End With
 End Sub
 

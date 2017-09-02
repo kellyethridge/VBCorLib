@@ -321,10 +321,10 @@ Private Sub AddSystemGlobalization()
 '        .Add New TestKoreanCalendar
 '        .Add New TestJapaneseCalendar
 '        .Add New TestHebrewCalendar
-'        .Add New TestJulianCalendar
 '        .Add New TestCodePageDecoder
         .Add New GregorianCalendarTests
         .Add New HijriCalendarTests
+        .Add New JulianCalendarTests
         .Add New CultureInfoTests
         .Add New DateTimeFormatInfoTests
         

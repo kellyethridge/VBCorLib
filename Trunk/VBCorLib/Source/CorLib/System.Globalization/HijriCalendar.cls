@@ -457,7 +457,7 @@ End Function
 ' Returns the month of the specified time.
 '
 ' @param Time The time to retrieve the month from.
-' @return The month portion of the time.
+' @return The month portion of the <i>time</i>.
 '
 Public Function GetMonth(ByRef Time As Variant) As Long
     GetDateParts Time, MonthPart, , GetMonth
@@ -521,8 +521,27 @@ End Function
 ' @param Day The day to check if is a leap day.
 ' @param Era The era the year is in.
 ' @return Boolean indication if the day is a leap day.
-' @remarks A leap day only exists in a leap year, such as Febuary 29th in the Gregorian calendar.
-'
+' @remarks <p>In every 30-year cycle that ends with a year that is evenly divisible by 30, the 2nd, 5th, 7th, 10th, 13th, 16th, 18th, 21st, 24th, 26th, and 29th years are leap years. A common year has 354 days and a leap year has 355 days.</p>
+' <p>A leap day is a day that occurs only in a leap year. In the Hijri calendar, the 30th day of Zulhijjah is the only leap day.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td>
+'           <i>Year</i> is outside the range supported by the calendar.</br>
+'           -or-</br>
+'           <i>Month</i> is outside the range supported by the calendar.</br>
+'           -or-</br>
+'           <i>Day</i> is outside the range supported by the calendar.</br>
+'           -or-</br>
+'           <i>Era</i> is outside the range supported by the calendar.</br>
+'       </td>
+'   </tr>
+' </table>
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
     Dim MaxDays As Long
     
@@ -570,7 +589,7 @@ Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As
 End Function
 
 ''
-' Returns a Gregorian CorDateTime computed using the specific calendar rules.
+' Returns a Gregorian <a href="CorDateTime.html">CorDateTime</a> computed using the specific calendar rules.
 '
 ' @param Year The Year in the specific calendar type.
 ' @param Month The Month in the specific calendar type.
@@ -599,9 +618,9 @@ Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As
 End Function
 
 ''
-' Returns a 4-digit year from a 2-digit number.
+' Converts the specified year to a four-digit year by using the <a href="JulianCalendar.TwoDigitYearMax.get.html">TwoDigitYearMax</a> property to determine the appropriate century.
 '
-' @param Year The year to be converted to 4-digits.
+' @param A two-digit or four-digit integer that represents the year to convert.
 ' @return A 4-digit year in the specific calendar.
 ' @remarks A normal way of dealing with years is by refering to them as a
 ' 2-digit value. This is evident in the Gregorian calendar system. The
