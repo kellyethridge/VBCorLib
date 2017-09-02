@@ -545,24 +545,27 @@ Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As S
 End Function
 
 Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal StartIndex As Long, ByVal EndIndex As Long, ByVal Step As Long) As Long
-    Dim OfAnyChars() As Integer
+    Dim OfAnyChars()    As Integer
+    Dim Chars()         As Integer
+    Dim OfAnyLB         As Long
+    Dim OfAnyUB         As Long
+        
     OfAnyChars = AsChars(OfAny)
+    
+    On Error GoTo Finally
     If SAPtr(OfAnyChars) = vbNullPtr Then _
         Error.ArgumentNull "OfAny", ArgumentNull_Array
     
-    Dim Chars() As Integer
     Chars = AllocChars(s)
-        
-    Dim i       As Long
-    Dim OfAnyLB As Long
-    Dim OfAnyUB As Long
-    
     OfAnyLB = LBound(OfAnyChars)
     OfAnyUB = UBound(OfAnyChars)
+    
+    Dim i   As Long
+    Dim j   As Long
+    Dim Ch  As Integer
     For i = StartIndex To EndIndex Step Step
-        Dim Ch As Integer
         Ch = Chars(i)
-        Dim j As Long
+        
         For j = OfAnyLB To OfAnyUB
             If Ch = OfAnyChars(j) Then
                 IndexOfAnyCore = i
