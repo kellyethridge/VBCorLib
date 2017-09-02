@@ -143,6 +143,7 @@ End Function
 ' the operation has finished, we don't discard the CorDateTime object. It will be re-used in future
 ' method calls involving a VB Date value. This eliminates the constance creating/destroying of a
 ' CorDateTime object simply to retrieve or modify a VB Date value.
+'
 Friend Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
     Set AddDays = GetDateTime(Time).AddDays(Days)
 End Function
