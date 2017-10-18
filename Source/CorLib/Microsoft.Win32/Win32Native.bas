@@ -168,8 +168,6 @@ Public Function GetMessage(ByVal ErrorCode As Long) As String
     Dim Buf     As String
     Dim Size    As Long
     
-    Debug.Print "LastError: 0x" & Hex$(ErrorCode) & "(" & ErrorCode & ")"
-    
     Buf = String$(1024, vbNullChar)
     Size = FormatMessageA(FORMAT_MESSAGE_FLAGS, ByVal 0&, ErrorCode, 0, Buf, Len(Buf), ByVal 0&)
     

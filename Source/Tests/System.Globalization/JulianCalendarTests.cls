@@ -79,6 +79,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2004, 2, 29
             Test.Use 1000, 2, 28
             
+        Case "IsLeapDay_WithValue_ReturnsExpected"
+            Test.Use #2/28/1600#, False
+            Test.Use #2/29/1600#, True
+            Test.Use #3/29/1600#, False
+            
     End Select
 End Sub
 
@@ -248,6 +253,15 @@ Public Sub IsLeapYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal Expect
     
     Dim Actual As Boolean
     Actual = Calendar.IsLeapYear(Year)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsLeapDay_WithValue_ReturnsExpected(ByVal d As Date, ByVal Expected As Boolean)
+    Dim Calendar As New JulianCalendar
+    
+    Dim Actual As Boolean
+    Actual = Calendar.IsLeapDay(Year(d), Month(d), Day(d))
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

@@ -20,7 +20,7 @@ Attribute VB_Name = "ArrayHelpers"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: CorArrayHelper
+' Module: ArrayHelpers
 '
 
 ''

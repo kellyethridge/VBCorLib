@@ -229,6 +229,8 @@ Public Enum ResourceStringKey
     Cryptography_InvalidOID = 511
     Cryptography_InvalidPaddingMode = 512
     Cryptography_InvalidCipherMode = 513
+    Cryptography_InvalidKeyForState = 514
+    Cryptography_InvalidDSASignatureSize = 515
 
     Format_InvalidBase64Character = 600
     Format_InvalidNumberOfCharacters = 601
@@ -273,6 +275,8 @@ Public Enum ResourceStringKey
     Overflow_TimeSpan = 1300
     
     UnknownError_Num = 1500
+    
+    LastDllError = 10000
 End Enum
 
 Public Enum ParameterResourceKey

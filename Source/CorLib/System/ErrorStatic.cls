@@ -83,7 +83,15 @@ Friend Sub Format(ByVal Key As ResourceStringKey)
 End Sub
 
 Friend Sub Cryptographic(ByVal Key As ResourceStringKey)
-    Throw Cor.NewCryptographicException(Environment.GetResourceString(Key))
+    Dim Message As String
+    
+    If Key = LastDllError Then
+        Message = GetMessage(Err.LastDllError)
+    Else
+        Message = Environment.GetResourceString(Key)
+    End If
+    
+    Throw Cor.NewCryptographicException(Message)
 End Sub
 
 Friend Sub UnauthorizedAccess(ByVal Key As ResourceStringKey)

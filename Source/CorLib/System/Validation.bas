@@ -25,10 +25,19 @@ Attribute VB_Name = "Validation"
 Option Explicit
 
 Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal Parameter As ParameterResourceKey = Parameter_Arr)
+    Dim Ptr As Long
+    
     If Not IsArray(Arr) Then _
         Error.Argument Argument_ArrayRequired, Environment.GetParameterName(Parameter)
-        
-    ValidateArrayPtr SAPtrV(Arr), Parameter
+    
+    Ptr = SAPtrV(Arr)
+    
+    If Ptr = vbNullPtr Then
+        Error.ArgumentNull Environment.GetParameterName(Parameter), ArgumentNull_Array
+    End If
+    If SafeArrayGetDim(Ptr) <> 1 Then
+        Error.Rank
+    End If
 End Sub
 
 Public Sub ValidateArrayRange(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal ArrParameter As ParameterResourceKey = Parameter_Arr, _

@@ -24,6 +24,14 @@ Public Function HexToBytes(ByRef s As String, Optional ByVal Reverse As Boolean 
     HexToBytes = Bytes
 End Function
 
+Public Function BytesToHex(ByRef Bytes() As Byte) As String
+    Dim i As Long
+    
+    For i = LBound(Bytes) To UBound(Bytes)
+        BytesToHex = BytesToHex & Right$("0" & Hex$(Bytes(i)), 2)
+    Next
+End Function
+
 Public Function RepeatString(ByVal Pattern As String, ByVal Count As Long) As String
     Dim sb As New SimplyVBComp.StringBuilder
     Dim i As Long
