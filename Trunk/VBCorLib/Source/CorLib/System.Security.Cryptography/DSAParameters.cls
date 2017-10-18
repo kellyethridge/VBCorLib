@@ -49,6 +49,17 @@ Private Const PROP_Q        As String = "Q"
 Private Const PROP_SEED     As String = "Seed"
 Private Const PROP_Y        As String = "Y"
 
+Private Const SizeOfHeader      As Long = 8
+Private Const SizeOfDssPubKey   As Long = 8
+Private Const SizeOfQ           As Long = 20
+Private Const SizeOfX           As Long = 20
+Private Const SizeOfSeed        As Long = 20
+
+Private Type DssSeed
+    Counter As Long
+    seed()  As Byte
+End Type
+
 Private mCounter    As Long
 Private mG()        As Byte
 Private mJ()        As Byte
@@ -71,10 +82,10 @@ End Property
 ''
 ' Sets the Counter value for the DSA key.
 '
-' @param RHS The new Counter value.
+' @param Value The new Counter value.
 '
-Public Property Let Counter(ByVal RHS As Long)
-    mCounter = RHS
+Public Property Let Counter(ByVal Value As Long)
+    mCounter = Value
 End Property
 
 ''
@@ -89,10 +100,10 @@ End Property
 ''
 ' Sets the G parameter of the key.
 '
-' @param RHS The new G value.
+' @param Value The new G value.
 '
-Public Property Let g(ByRef RHS() As Byte)
-    mG = g
+Public Property Let g(ByRef Value() As Byte)
+    mG = Value
 End Property
 
 ''
@@ -107,10 +118,10 @@ End Property
 ''
 ' Sets the J parameter of the key.
 '
-' @param RHS The new J parameter.
+' @param Value The new J parameter.
 '
-Public Property Let j(ByRef RHS() As Byte)
-    mJ = RHS
+Public Property Let j(ByRef Value() As Byte)
+    mJ = Value
 End Property
 
 ''
@@ -125,10 +136,10 @@ End Property
 ''
 ' Sets the P parameter of the key.
 '
-' @param RHS The new P parameter.
+' @param Value The new P parameter.
 '
-Public Property Let p(ByRef RHS() As Byte)
-    mP = RHS
+Public Property Let p(ByRef Value() As Byte)
+    mP = Value
 End Property
 
 ''
@@ -143,10 +154,10 @@ End Property
 ''
 ' Sets the Q parameter of the key.
 '
-' @param RHS The new Q parameter.
+' @param Value The new Q parameter.
 '
-Public Property Let q(ByRef RHS() As Byte)
-    mQ = RHS
+Public Property Let q(ByRef Value() As Byte)
+    mQ = Value
 End Property
 
 ''
@@ -161,10 +172,10 @@ End Property
 ''
 ' Sets the Seed for the key.
 '
-' @param RHS The new Seed value.
+' @param Value The new Seed value.
 '
-Public Property Let seed(ByRef RHS() As Byte)
-    mSeed = RHS
+Public Property Let seed(ByRef Value() As Byte)
+    mSeed = Value
 End Property
 
 ''
@@ -179,10 +190,10 @@ End Property
 ''
 ' Sets the X parameter of the key.
 '
-' @param RHS The new X parameter.
+' @param Value The new X parameter.
 '
-Public Property Let x(ByRef RHS() As Byte)
-    mX = RHS
+Public Property Let x(ByRef Value() As Byte)
+    mX = Value
 End Property
 
 ''
@@ -197,236 +208,295 @@ End Property
 ''
 ' Sets the Y parameter of the key.
 '
-' @param RHS The new Y parameter.
+' @param Value The new Y parameter.
 '
-Public Property Let y(ByRef RHS() As Byte)
-    mY = RHS
+Public Property Let y(ByRef Value() As Byte)
+    mY = Value
 End Property
 
 ''
 ' Returns a boolean indicating if the value and this object
 ' instance are the same instance.
 '
-' @param value The value to test equality on.
+' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
-' @see IObject
-'
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
-' Returns a psuedo-unique number used to help identify this
-' object in memory. The current method is to return the value
-' obtained from ObjPtr. If a different method needs to be impelmented
-' then change the method here in this function.
+' Returns a pseudo-unique number identifying this instance.
 '
-' An override might be necessary if the hashcode should be
-' derived from a value contained within the class.
-'
+' @return Pseudo-unique number identifying this instance.
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 ''
 ' Returns a string representation of this object instance.
-' The default method simply returns the application name
-' and class name in which this class resides.
 '
-' A Person class may return the person's name instead.
-'
+' @return String representing this instance.
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
+Friend Sub FromPrivateKeyBlob(ByRef PrivateKeyBlob() As Byte, ByRef PublicKeyBlob() As Byte, ByRef ParameterJ() As Byte)
+    FromPublicKeyBlob PublicKeyBlob, ParameterJ
+    LoadPrivateParameter PrivateKeyBlob
+End Sub
 
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub FromCspBlob(ByRef PublicBlob() As Byte, ByRef PrivateBlob() As Byte)
-    Dim ms As MemoryStream
-    Dim MagicNumber As Long
+Friend Sub FromPublicKeyBlob(ByRef Blob() As Byte, ByRef ParameterJ() As Byte)
+    Dim Reader      As BinaryReader
+    Dim ByteLength  As Long
     
-    If CorArray.IsNull(PrivateBlob) Then
-        Set ms = Cor.NewMemoryStream(PublicBlob, Writable:=False)
-        MagicNumber = &H31535344
-    Else
-        Set ms = Cor.NewMemoryStream(PrivateBlob, Writable:=False)
-        MagicNumber = &H32535344
-        
-        ' Manually check for the public blob magic number.
-        If AsLong(PublicBlob(8)) <> &H31535344 Then
-            Throw Cor.NewCryptographicException("Invalid blob.")
-        End If
-    End If
-    
-    Dim Reader As BinaryReader
-    Set Reader = Cor.NewBinaryReader(ms)
-
-    ms.Position = 8
-    
-    ' Verify type of algorithm
-    If Reader.ReadInt32 <> MagicNumber Then _
-        Throw Cor.NewCryptographicException("Invalid blob.")
-    
-    Dim ByteLen As Long
-    ByteLen = Reader.ReadInt32 \ 8
-    
-    Dim pBytes() As Byte
-    Dim qBytes() As Byte
-    
-    pBytes = Reader.ReadBytes(ByteLen)
-    qBytes = Reader.ReadBytes(20)
-    
-    mP = ReverseByteCopy(pBytes)
-    mQ = ReverseByteCopy(qBytes)
-    mG = ReverseByteCopy(Reader.ReadBytes(ByteLen))
-    
-    If CorArray.IsNull(PrivateBlob) Then
-        mY = ReverseByteCopy(Reader.ReadBytes(ByteLen))
-    Else
-        mX = ReverseByteCopy(Reader.ReadBytes(20))
-    
-        ' We still need the Y parameter from the blob, but
-        ' we have to retrieve it manually.
-        ReDim mY(0 To ByteLen - 1)
-        Dim Index As Long
-        Index = CorArray.Length(PublicBlob) - (24 + ByteLen)
-        Buffer.BlockCopy PublicBlob, Index, mY, 0, ByteLen
-        CorArray.Reverse mY
-    End If
-    
-    ' Read DSSSEED structure
-    mCounter = Reader.ReadInt32
-    mSeed = ReverseByteCopy(Reader.ReadBytes(20))
-    
-    Call Reader.CloseReader
-    
-    ReDim Preserve pBytes(UBound(pBytes) + 2)   ' ensure we have a positive number
-    ReDim Preserve qBytes(UBound(qBytes) + 2)   ' ensure we have a positive number
-    
-    Dim pInt As BigInteger
-    Dim qInt As BigInteger
-    
-    Set pInt = Cor.BInt(pBytes)
-    Set qInt = Cor.BInt(qBytes)
-    Set pInt = pInt.Subtract(BigInteger.One).Divide(qInt)
-    mJ = ReverseByteCopy(pInt.ToArray)
+    Set Reader = MakeReader(Blob, SizeOfHeader)
+    ByteLength = ReadByteLength(Reader)
+    LoadPublicParameters Reader, ByteLength
+    mJ = ParameterJ
 End Sub
 
 Friend Function ToCspBlob() As Byte()
-    Dim ms As New MemoryStream
-    Dim Writer As BinaryWriter
-    Set Writer = Cor.NewBinaryWriter(ms)
-    
-    Dim BlobType As Byte
-    If CorArray.IsNull(mX) Then
-        BlobType = PUBLICKEYBLOB
-    ElseIf CorArray.Length(mX) = 0 Then
-        BlobType = PUBLICKEYBLOB
+    If IsPublicParameters Then
+        ToCspBlob = BuildPublicCspBlob
     Else
-        BlobType = PRIVATEKEYBLOB
+        ToCspBlob = BuildPrivateCspBlob
     End If
-    
-    ' Build BLOBHEADER structure
-    Call Writer.WriteValue(BlobType)
-    Call Writer.WriteValue(CByte(2))
-    Call Writer.WriteValue(CInt(0))
-    Call Writer.WriteValue(CALG_DSS_SIGN)
-    
-    ' Build DSSPUBKEY structure
-    Call Writer.WriteValue(CLng(IIf(BlobType = PUBLICKEYBLOB, &H31535344, &H32535344)))
-    Call Writer.WriteValue(CLng(CorArray.Length(mP) * 8))
-
-    Call Writer.WriteValue(ReverseByteCopy(mP))
-    Call Writer.WriteValue(ReverseByteCopy(mQ))
-    Call Writer.WriteValue(ReverseByteCopy(mG))
-    
-    If BlobType = PUBLICKEYBLOB Then
-        Call Writer.WriteValue(ReverseByteCopy(mY))
-    Else
-        Call Writer.WriteValue(ReverseByteCopy(mX))
-    End If
-    
-    ' Build DSSSEED structure
-    Call Writer.WriteValue(mCounter)
-    Call Writer.WriteValue(ReverseByteCopy(mSeed))
-    
-    ToCspBlob = ms.ToArray
 End Function
 
 Friend Function ToXmlString()
-    Dim sb As New StringBuilder
-    Call sb.AppendString("<DSAKeyValue>")
-    Call AddElement(sb, "P", mP)
-    Call AddElement(sb, "Q", mQ)
-    Call AddElement(sb, "G", mG)
-    Call AddElement(sb, "Y", mY)
-    Call AddElement(sb, "J", mJ)
-    Call AddElement(sb, "Seed", mSeed)
+    Dim Root As SecurityElement
+    Set Root = MakeXmlRoot
+    AddPublicXmlParameters Root
+    AddPrivateXmlParameters Root
     
-'    Dim Bytes(0 To 3) As Byte
-'    AsLong(Bytes(0)) = mCounter
-    Dim Bytes() As Byte
-    Bytes = BitConverter.GetBytes(mCounter)
-    
-    Dim i As Long
-    i = 3
-    Do While i >= 0
-        If Bytes(i) <> 0 Then Exit Do
-        i = i - 1
-    Loop
-    ReDim Preserve Bytes(0 To i)
-    
-    Call AddElement(sb, "PgenCounter", Bytes)
-    
-    If Not CorArray.IsNull(mX) Then
-        Call AddElement(sb, "X", mX)
-    End If
-    
-    Call sb.AppendString("</DSAKeyValue>")
-    
-    ToXmlString = sb.ToString
+    ToXmlString = Root.ToString
 End Function
 
-Friend Sub FromXmlString(ByVal Xml As String)
-    Dim Elements As SecurityElement
-    Set Elements = SecurityElement.FromString(Xml)
+Friend Sub FromXmlString(ByRef Xml As String)
+    Dim Root As SecurityElement
+    Set Root = GetXmlRoot(Xml)
+    ReadXmlParameters Root
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub LoadPrivateParameter(ByRef Blob() As Byte)
+    Dim Reader As BinaryReader
     
-    If Elements.Tag <> "DSAKeyValue" Then _
+    Set Reader = MakeReader(Blob, SizeOfHeader + SizeOfDssPubKey + CorArray.Length(mP) + SizeOfQ + CorArray.Length(mG))
+    mX = ReadBytesReverse(Reader, SizeOfX)
+End Sub
+
+Private Sub LoadPublicParameters(ByVal Reader As BinaryReader, ByVal ByteLength As Long)
+    Dim DssSeed     As DssSeed
+    
+    mP = ReadBytesReverse(Reader, ByteLength)
+    mQ = ReadBytesReverse(Reader, SizeOfQ)
+    mG = ReadBytesReverse(Reader, ByteLength)
+    mY = ReadBytesReverse(Reader, ByteLength)
+    DssSeed = ReadDssSeed(Reader)
+    mCounter = DssSeed.Counter
+    mSeed = DssSeed.seed
+End Sub
+
+Private Function MakeReader(ByRef Blob() As Byte, ByVal InitialPosition As Long) As BinaryReader
+    Dim Stream As MemoryStream
+    
+    Set Stream = Cor.NewMemoryStream(Blob, Writable:=False)
+    Stream.Position = InitialPosition
+    Set MakeReader = Cor.NewBinaryReader(Stream)
+End Function
+
+Private Function ReadBytesReverse(ByVal Reader As BinaryReader, ByVal Count As Long) As Byte()
+    Dim Bytes() As Byte
+    
+    Bytes = Reader.ReadBytes(Count)
+    CorArray.Reverse Bytes
+    ReadBytesReverse = Bytes
+End Function
+
+Private Function ReadByteLength(ByVal Reader As BinaryReader) As Long
+    Const BitsPerByte As Long = 8
+    Reader.ReadInt32
+    ReadByteLength = Reader.ReadInt32 \ BitsPerByte
+End Function
+
+Private Function ReadDssSeed(ByVal Reader As BinaryReader) As DssSeed
+    ReadDssSeed.Counter = Reader.ReadInt32
+    ReadDssSeed.seed = ReadBytesReverse(Reader, SizeOfSeed)
+End Function
+
+Private Property Get IsPublicParameters() As Boolean
+    IsPublicParameters = CorArray.IsNull(mX)
+End Property
+
+Private Function BuildPublicCspBlob() As Byte()
+    Dim ms      As New MemoryStream
+    Dim Writer  As BinaryWriter
+
+    Set Writer = Cor.NewBinaryWriter(ms)
+    WritePublicCspBlob Writer
+    BuildPublicCspBlob = ms.ToArray
+End Function
+
+Private Sub WritePublicCspBlob(ByVal Writer As BinaryWriter)
+    Const DSS1Chars As Long = &H31535344
+    WriteCspBlobHeader Writer, PublicKeyBlob, DSS1Chars
+    WriteCspBlobParameters Writer, mY
+End Sub
+
+Private Function BuildPrivateCspBlob() As Byte()
+    Dim ms      As New MemoryStream
+    Dim Writer  As BinaryWriter
+
+    Set Writer = Cor.NewBinaryWriter(ms)
+    WritePrivateCspBlob Writer
+    BuildPrivateCspBlob = ms.ToArray
+End Function
+
+Private Sub WritePrivateCspBlob(ByVal Writer As BinaryWriter)
+    Const DSS2Chars As Long = &H32535344
+    WriteCspBlobHeader Writer, PrivateKeyBlob, DSS2Chars
+    WriteCspBlobParameters Writer, mX
+End Sub
+
+Private Sub WriteCspBlobHeader(ByVal Writer As BinaryWriter, ByVal BlobType As Byte, ByVal DSSChars As Long)
+    Writer.WriteValue BlobType
+    Writer.WriteValue CByte(2)
+    Writer.WriteValue CInt(0)
+    Writer.WriteValue CALG_DSS_SIGN
+    Writer.WriteValue DSSChars
+    Writer.WriteValue CorArray.Length(mP) * 8
+End Sub
+
+Private Sub WriteCspBlobParameters(ByVal Writer As BinaryWriter, ByRef KeyParameter() As Byte)
+    Writer.WriteValue ReverseByteCopy(mP)
+    Writer.WriteValue ReverseByteCopy(mQ)
+    Writer.WriteValue ReverseByteCopy(mG)
+    Writer.WriteValue ReverseByteCopy(KeyParameter)
+    Writer.WriteValue mCounter
+    Writer.WriteValue ReverseByteCopy(mSeed)
+End Sub
+
+Private Function MakeXmlRoot() As SecurityElement
+    Set MakeXmlRoot = Cor.NewSecurityElement("DSAKeyValue")
+End Function
+
+Private Sub AddPublicXmlParameters(ByVal Root As SecurityElement)
+    Root.AddChild MakeXmlElement("P", mP)
+    Root.AddChild MakeXmlElement("Q", mQ)
+    Root.AddChild MakeXmlElement("G", mG)
+    Root.AddChild MakeXmlElement("Y", mY)
+    
+    AddXmlJParameter Root
+    
+    Root.AddChild MakeXmlElement("Seed", mSeed)
+    Root.AddChild MakeXmlElement("PgenCounter", GetTrimmedCounter)
+End Sub
+
+Private Sub AddXmlJParameter(ByVal Root As SecurityElement)
+    AddOptionalXmlParameter Root, "J", mJ
+End Sub
+
+Private Sub AddPrivateXmlParameters(ByVal Root As SecurityElement)
+    AddOptionalXmlParameter Root, "X", mX
+End Sub
+
+Private Sub AddOptionalXmlParameter(ByVal Root As SecurityElement, ByRef Tag As String, ByRef Value() As Byte)
+    If Not CorArray.IsNull(Value) Then
+        Root.AddChild MakeXmlElement(Tag, Value)
+    End If
+End Sub
+
+Private Function MakeXmlElement(ByRef Tag As String, ByRef Value() As Byte) As SecurityElement
+    Dim Xml As SecurityElement
+    
+    Set Xml = Cor.NewSecurityElement(Tag)
+    Xml.Text = Convert.ToBase64String(Value)
+    
+    Set MakeXmlElement = Xml
+End Function
+
+Private Function GetTrimmedCounter() As Byte()
+    Dim Bytes() As Byte
+    Dim i       As Long
+    
+    Bytes = BitConverter.GetBytes(mCounter)
+    i = UBound(Bytes)
+    
+    Do While i >= 0
+        If Bytes(i) <> 0 Then
+            Exit Do
+        End If
+        
+        i = i - 1
+    Loop
+    
+    ReDim Preserve Bytes(0 To i)
+
+    GetTrimmedCounter = Bytes
+End Function
+
+Private Function GetXmlRoot(ByRef Xml As String) As SecurityElement
+    Dim Root As SecurityElement
+    Set Root = SecurityElement.FromString(Xml)
+    
+    If Root.Tag <> "DSAKeyValue" Then _
         Throw Cor.NewCryptographicException("Invalid Xml string.")
+
+    Set GetXmlRoot = Root
+End Function
+
+Private Sub ReadXmlParameters(ByVal Root As SecurityElement)
+    mP = GetBytes(Root, "P")
+    mQ = GetBytes(Root, "Q")
+    mG = GetBytes(Root, "G")
+    mY = GetBytes(Root, "Y")
+    mJ = GetOptionalBytes(Root, "J")
+    mSeed = GetBytes(Root, "Seed")
+    mCounter = GetNumber(Root, "PgenCounter")
+    mX = GetOptionalBytes(Root, "X")
+End Sub
+
+Private Function GetNumber(ByVal Element As SecurityElement, ByRef Name As String) As Long
+    Dim Bytes() As Byte
     
-    mP = GetBytes(Elements, "P")
-    mQ = GetBytes(Elements, "Q")
-    mG = GetBytes(Elements, "G")
-    mY = GetBytes(Elements, "Y")
-    mSeed = GetBytes(Elements, "Seed")
-    mCounter = GetBytes(Elements, "PgenCounter")
-    mX = GetBytes(Elements, "X", False)
-    mJ = GetBytes(Elements, "J", False)
-End Sub
+    Bytes = GetBytes(Element, Name)
+    
+    Select Case CorArray.Length(Bytes)
+        Case 1
+            GetNumber = Bytes(0)
+        Case 2
+            GetNumber = BitConverter.ToInteger(Bytes, 0)
+        Case Else
+            GetNumber = BitConverter.ToLong(Bytes, 0)
+    End Select
+End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub AddElement(ByVal sb As StringBuilder, ByVal Tag As String, ByRef Bytes() As Byte)
-    Call sb.AppendFormat("<{0}>{1}</{0}>", Tag, Convert.ToBase64String(Bytes))
-End Sub
-
-Private Function GetBytes(ByVal Elements As SecurityElement, ByVal Name As String, Optional ByVal ThrowOnMissing As Boolean = True) As Byte()
+Private Function GetBytes(ByVal Root As SecurityElement, ByRef Tag As String) As Byte()
     Dim Text As String
     
-    Text = Elements.SearchForTextOfTag(Name)
-    If (Len(Text) = 0) And ThrowOnMissing Then _
+    Text = Root.SearchForTextOfTag(Tag)
+    If Len(Text) = 0 Then _
         Throw Cor.NewCryptographicException("Invalid Xml format.")
     
     GetBytes = Convert.FromBase64String(Text)
 End Function
 
+Private Function GetOptionalBytes(ByVal Root As SecurityElement, ByRef Tag As String) As Byte()
+    Dim Text As String
+    
+    Text = Root.SearchForTextOfTag(Tag)
+    If Len(Text) > 0 Then
+        GetOptionalBytes = Convert.FromBase64String(Text)
+    End If
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
@@ -442,19 +512,19 @@ End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty(PROP_COUNTER, mCounter)
-        Call .WriteProperty(PROP_G, mG)
-        Call .WriteProperty(PROP_J, mJ)
-        Call .WriteProperty(PROP_P, mP)
-        Call .WriteProperty(PROP_Q, mQ)
-        Call .WriteProperty(PROP_SEED, mSeed)
-        Call .WriteProperty(PROP_Y, mY)
+        .WriteProperty PROP_COUNTER, mCounter
+        .WriteProperty PROP_G, mG
+        .WriteProperty PROP_J, mJ
+        .WriteProperty PROP_P, mP
+        .WriteProperty PROP_Q, mQ
+        .WriteProperty PROP_SEED, mSeed
+        .WriteProperty PROP_Y, mY
     End With
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

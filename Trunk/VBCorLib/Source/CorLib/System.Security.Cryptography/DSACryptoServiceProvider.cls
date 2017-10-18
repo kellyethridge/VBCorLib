@@ -12,7 +12,7 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'The MIT License (MIT)
-'Copyright (c) 2012 Kelly Ethridge
+'Copyright (c) 2017 Kelly Ethridge
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,11 @@ Implements ICspAsymmetricAlgorithm
 
 Private Const DEF_KEYNUMBER     As Long = AT_SIGNATURE
 Private Const DEF_PROVIDERTYPE  As Long = PROV_DSS_DH
+Private Const SizeOfRComponent  As Long = 20
+Private Const SizeOfSComponent  As Long = 20
+Private Const SizeOfSignature   As Long = SizeOfRComponent + SizeOfSComponent
 
+Private mSha1               As New SHA1CryptoServiceProvider
 Private mProvider           As Long
 Private mKey                As Long
 Private mKeySize            As Long
@@ -63,8 +67,7 @@ Private mLegalKeySizes()    As KeySizes
 Private mRandomlyGenerated  As Boolean
 Private mPublicOnly         As Boolean
 Private mIsDisposed         As Boolean
-
-
+Private mParameterJ()       As Byte
 
 
 ''
@@ -73,9 +76,10 @@ Private mIsDisposed         As Boolean
 ' @return A CspKeyContainerInfo object.
 '
 Public Property Get CspKeyContainerInfo() As CspKeyContainerInfo
-    Call VerifyLoaded
-    
     Dim Params As CspParameters
+    
+    VerifyLoaded
+    
     Set Params = Cor.NewCspParameters(mProviderType, mProviderName, mKeyContainerName)
     Params.KeyNumber = mKeyNumber
     Params.Flags = mFlags
@@ -88,11 +92,10 @@ End Property
 ' Returns the name of the key exchange algorithm this instance represents.
 '
 ' @Return The name of the key exchange algorithm.
-' @remarks When an DSACryptoServiceProvider is created as a key exchange instead
-' of a signature service, this returns 'DSA-PKCS1-KeyEx', otherwise nothing is returned.
+' @remarks <a href="DSACryptoServiceProvider.html">DSACryptoServiceProvider</a> always returns an empty string.
 '
 Public Property Get KeyExchangeAlgorithm() As String
-    ' return nothing
+    KeyExchangeAlgorithm = ""
 End Property
 
 ''
@@ -108,11 +111,11 @@ End Property
 ''
 ' Sets the key size.
 '
-' @param RHS The new key size.
+' @param Value The new key size.
 ' @remarks This property has no affect on the key size. To set the key size, use the
 ' Cor.NewDSACryptoServiceProvider constructor.
 '
-Public Property Let KeySize(ByVal RHS As Long)
+Public Property Let KeySize(ByVal Value As Long)
     ' does nothing
 End Property
 
@@ -145,15 +148,15 @@ End Property
 ''
 ' Sets if the current key will be stored in the current provider container.
 '
-' @param RHS Set to True to save the key on exit, False to have the key be deleted.
+' @param Value Set to True to save the key on exit, False to have the key be deleted.
 ' @remarks By default this is set to False. If a container is specified using the
 ' Cor.NewDSACryptoServiceProvider, then this will be set to True.<br>
 ' <br>A key is stored in the container to allow for each retrieval by any other
 ' service that knows where the key is. Only 1 key is stored in a container, therefore,
 ' if multiple providers share the same container, then the key may become invalid.
 '
-Public Property Let PersistKeyInCsp(ByVal RHS As Boolean)
-    mPersistKeyInCsp = RHS
+Public Property Let PersistKeyInCsp(ByVal Value As Boolean)
+    mPersistKeyInCsp = Value
 End Property
 
 ''
@@ -164,7 +167,7 @@ End Property
 ' part is required to encrypt data. The private key is used to decrypt data.
 '
 Public Property Get PublicOnly() As Boolean
-    Call VerifyLoaded
+    VerifyLoaded
     PublicOnly = mPublicOnly
 End Property
 
@@ -181,8 +184,8 @@ End Property
 ' Releases any resources and disposes the DSA instance.
 '
 Public Sub Clear()
-    Call CryptoAPI.DestroyKey(mKey)
-    Call CryptoAPI.ReleaseContext(mProvider, Not mPersistKeyInCsp)
+    CryptoAPI.DestroyKey mKey
+    CryptoAPI.ReleaseContext mProvider, Not mPersistKeyInCsp
     
     mIsDisposed = True
 End Sub
@@ -195,20 +198,21 @@ End Sub
 ' @return A exported key blob structure.
 '
 Public Function ExportCspBlob(ByVal IncludePrivateParameters As Boolean) As Byte()
-    Call VerifyLoaded
+    Dim BlobType    As Long
+    Dim Size        As Long
+    Dim Blob()      As Byte
     
-    Dim BlobType As Long
-    BlobType = IIf(IncludePrivateParameters, PRIVATEKEYBLOB, PUBLICKEYBLOB)
+    VerifyLoaded
     
-    Dim Size As Long
+    BlobType = IIf(IncludePrivateParameters, PrivateKeyBlob, PublicKeyBlob)
+    
     If CryptExportKey(mKey, 0, BlobType, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        Error.Cryptographic LastDllError
     
-    Dim Blob() As Byte
     ReDim Blob(0 To Size - 1)
     
     If CryptExportKey(mKey, 0, BlobType, 0, Blob(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        Error.Cryptographic LastDllError
     
     ExportCspBlob = Blob
 End Function
@@ -223,11 +227,13 @@ End Function
 Public Function ExportParameters(ByVal IncludePrivateParameters As Boolean) As DSAParameters
     Set ExportParameters = New DSAParameters
     
-    If IncludePrivateParameters And (Not mPublicOnly) Then
-        Call ExportParameters.FromCspBlob(Me.ExportCspBlob(False), Me.ExportCspBlob(True))
+    If IncludePrivateParameters Then
+        If mPublicOnly Then _
+            Error.Cryptographic Cryptography_InvalidKeyForState
+        
+        ExportParameters.FromPrivateKeyBlob ExportCspBlob(True), ExportCspBlob(False), mParameterJ
     Else
-        Dim NullBytes() As Byte
-        Call ExportParameters.FromCspBlob(Me.ExportCspBlob(False), NullBytes)
+        ExportParameters.FromPublicKeyBlob ExportCspBlob(False), mParameterJ
     End If
 End Function
 
@@ -236,10 +242,10 @@ End Function
 '
 ' @param XmlString The XML string containing the key information.
 '
-Public Sub FromXmlString(ByVal XmlString As String)
+Public Sub FromXmlString(ByRef XmlString As String)
     Dim Params As New DSAParameters
-    Call Params.FromXmlString(XmlString)
-    Call ImportParameters(Params)
+    Params.FromXmlString XmlString
+    ImportParameters Params
 End Sub
 
 ''
@@ -249,15 +255,15 @@ End Sub
 '
 Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     If CorArray.IsNull(KeyBlob) Then _
-        Throw Cor.NewArgumentNullException("KeyBlob", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "KeyBlob", ArgumentNull_Array
     
-    Call VerifyLoaded(False)
-    Call DeleteKey
+    VerifyLoaded False
+    DeleteKey
+        
+    mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PublicKeyBlob)
     
-    mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
-    
-    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.Length(KeyBlob), 0, IIf(mPublicOnly, 0, CRYPT_EXPORTABLE), mKey) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+    If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.Length(KeyBlob), 0, IIfLong(mPublicOnly, 0, CRYPT_EXPORTABLE), mKey) = BOOL_FALSE Then _
+        Error.Cryptographic LastDllError
 End Sub
 
 ''
@@ -267,9 +273,10 @@ End Sub
 '
 Public Sub ImportParameters(ByVal Parameters As DSAParameters)
     If Parameters Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Parameters")
+        Error.ArgumentNull "Parameters"
     
-    Call ImportCspBlob(Parameters.ToCspBlob)
+    mParameterJ = Parameters.j
+    ImportCspBlob Parameters.ToCspBlob
 End Sub
 
 ''
@@ -281,8 +288,7 @@ End Sub
 ' @return A byte array representing the signature for the data.
 '
 Public Function SignData(ByRef InputStreamOrBuffer As Variant, Optional ByRef Offset As Variant, Optional ByRef Count As Variant) As Byte()
-    Dim HashObj As New SHA1CryptoServiceProvider
-    SignData = SignHash(HashObj.ComputeHash(InputStreamOrBuffer, Offset, Count), "sha1")
+    SignData = SignHash(mSha1.ComputeHash(InputStreamOrBuffer, Offset, Count), "sha1")
 End Function
 
 ''
@@ -293,32 +299,35 @@ End Function
 ' @return A byte array representing the signature for the hash value.
 ' @remarks Only SHA1 hash values are supported.
 '
-Public Function SignHash(ByRef RgbHash() As Byte, ByVal Str As String) As Byte()
-    Dim Hash As Long
+Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
+    Dim Hash        As Long
+    Dim Size        As Long
+    Dim Signature() As Byte
+    
+    If CorArray.IsNull(RgbHash) Then _
+        Error.ArgumentNull "RgbHash", ArgumentNull_Array
+    
+    On Error GoTo Catch
+    ReDim Signature(0 To SizeOfSignature - 1)
     Hash = SetHash(RgbHash, Str)
 
-    Dim Size As Long
-    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
-
-    Dim Signature() As Byte
-    ReDim Signature(0 To Size - 1)
+    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, Signature(0), SizeOfSignature) = BOOL_FALSE Then _
+        Error.Cryptographic LastDllError
     
-    If CryptSignHash(Hash, AT_SIGNATURE, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+    ' Reverse the r and s components to match SSL Big Endianness
+    CorArray.Reverse Signature, 0, SizeOfRComponent
+    CorArray.Reverse Signature, SizeOfRComponent, SizeOfSComponent
     
-    Call CryptDestroyHash(Hash)
-    
-    ' Reverse the sections to match the .NET implementation
-    Call CorArray.Reverse(Signature, 0, 20)
-    Call CorArray.Reverse(Signature, 20, 20)
-    
+    GoSub Finally
     SignHash = Signature
     Exit Function
 
-errTrap:
-    If Hash <> vbNullPtr Then Call CryptDestroyHash(Hash)
-    Call Throw
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    CryptDestroyHash Hash
+    Return
 End Function
 
 ''
@@ -342,10 +351,9 @@ End Function
 '
 Public Function VerifyData(ByRef RgbData() As Byte, ByRef Signature() As Byte) As Boolean
     If CorArray.IsNull(RgbData) Then _
-        Throw Cor.NewArgumentNullException("Buffer", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "RgbData", ArgumentNull_Array
     
-    Dim HashObj As New SHA1CryptoServiceProvider
-    VerifyData = VerifyHash(HashObj.ComputeHash(RgbData), "SHA1", Signature)
+    VerifyData = VerifyHash(mSha1.ComputeHash(RgbData), "SHA1", Signature)
 End Function
 
 ''
@@ -357,21 +365,26 @@ End Function
 ' @return Returns True if the signature is valid for the hash value, False otherwise.
 ' @remarks Only SHA1 hash values are supported.
 '
-Public Function VerifyHash(ByRef RgbHash() As Byte, ByVal Str As String, ByRef Signature() As Byte) As Boolean
-    If CorArray.IsNull(Signature) Then _
-        Throw Cor.NewArgumentNullException("Signature", Environment.GetResourceString(ArgumentNull_Array))
+Public Function VerifyHash(ByRef RgbHash() As Byte, ByRef Str As String, ByRef Signature() As Byte) As Boolean
+    Dim Hash        As Long
+    Dim RevSig()    As Byte
     
-    Dim Hash As Long
+    If CorArray.IsNull(RgbHash) Then _
+        Error.ArgumentNull "RgbHash", ArgumentNull_Array
+    If CorArray.IsNull(Signature) Then _
+        Error.ArgumentNull "Signature", ArgumentNull_Array
+    If CorArray.Length(Signature) <> SizeOfSignature Then _
+        Error.Cryptographic Cryptography_InvalidDSASignatureSize
+    
     Hash = SetHash(RgbHash, Str)
 
-    ' We need to reverse the two sections of the signature to deal with .NET's big-endian form.
-    Dim RevSig() As Byte
-    RevSig = Signature
-    Call CorArray.Reverse(RevSig, LBound(RevSig), 20)
-    Call CorArray.Reverse(RevSig, LBound(RevSig) + 20, 20)
+    ' We need to reverse the r and s components to match CryptoAPI little endianness.
+    RevSig = Signature ' make a copy to not alter caller's array.
+    CorArray.Reverse RevSig, LBound(RevSig), SizeOfRComponent
+    CorArray.Reverse RevSig, LBound(RevSig) + SizeOfRComponent, SizeOfSComponent
     
-    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(0), CorArray.Length(RevSig), mKey, vbNullString, 0))
-    Call CryptDestroyHash(Hash)
+    VerifyHash = CBool(CryptVerifySignature(Hash, RevSig(LBound(RevSig)), CorArray.Length(RevSig), mKey, vbNullString, 0))
+    CryptDestroyHash Hash
 End Function
 
 ''
@@ -406,7 +419,7 @@ End Function
 ' @see IObject
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Object.Equals(Me, Value)
+    Equals = MyBase.Equals(Me, Value)
 End Function
 
 ''
@@ -419,7 +432,7 @@ End Function
 ' derived from a value contained within the class.
 '
 Public Function GetHashCode() As Long
-    GetHashCode = ObjPtr(CUnk(Me))
+    GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 ''
@@ -430,16 +443,17 @@ End Function
 ' A Person class may return the person's name instead.
 '
 Public Function ToString() As String
-    ToString = Object.ToString(Me, App)
+    ToString = MyBase.ToString(Me, App)
 End Function
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'  Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal KeySize As Long, ByVal Params As CspParameters)
-    If KeySize > 0 Then mKeySize = KeySize
+    If KeySize > 0 Then
+        mKeySize = KeySize
+    End If
     
     If Not Params Is Nothing Then
         With Params
@@ -454,148 +468,6 @@ Friend Sub Init(ByVal KeySize As Long, ByVal Params As CspParameters)
     End If
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifyLoaded(Optional ByVal IncludeKey As Boolean = True)
-    If mIsDisposed Then _
-        Throw New ObjectDisposedException
-    
-    Call LoadProvider
-    
-    If IncludeKey Then
-        Call GenerateKey
-    End If
-End Sub
-
-''
-' This attempts to acquire a new provider and create a new key container
-' within the specified provider. If the container name doesn't exist, then
-' a random name will be created. If the container itself already exists,
-' then the existing container will be used instead of creating a new one.
-Private Sub LoadProvider()
-    If mProvider <> vbNullPtr Then Exit Sub
-    
-    Dim Flags As Long
-    If mFlags And CspProviderFlags.UseMachineKeyStore Then Flags = CRYPT_MACHINE_KEYSET
-    
-    mProvider = CryptoAPI.AcquireDSAContext(mKeyContainerName, mProviderName, mProviderType, Flags)
-End Sub
-
-Private Sub GenerateKey()
-    If mKey <> vbNullPtr Then Exit Sub
-    
-    If mFlags And UseExistingKey Then
-        ' Try to get an existing key.
-        If CryptGetUserKey(mProvider, mKeyNumber, mKey) <> BOOL_FALSE Then Exit Sub
-        
-        ' Something went wrong. If it's something other than
-        ' not finding the key, then it's bad, so fail.
-        If Err.LastDllError <> NTE_NO_KEY Then _
-            Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
-            
-        ' We didn't find an existing key, so continue and create a new one.
-    End If
-    
-    Dim Flags As Long
-    Flags = Helper.ShiftLeft(mKeySize, 16)  ' the key size is held in the upper 16-bits.
-    
-    ' We must specify to make the key archivable.
-    If mFlags And UseArchivableKey Then Flags = Flags Or CRYPT_ARCHIVABLE
-    
-    ' We must specify to NOT create an exportable key.
-    If (mFlags And UseNonExportableKey) = 0 Then Flags = Flags Or CRYPT_EXPORTABLE
-    
-    If Not CryptoAPI.SupportsAlgorithm(mProvider, CALG_DSS_SIGN) Then _
-        Throw Cor.NewCryptographicException("The Cryptography Service Provider (CSP) does not support the specified algorithm.")
-
-    ' Let'er rip! This can take a bit with large key sizes.
-    If CryptGenKey(mProvider, mKeyNumber, Flags, mKey) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
-End Sub
-
-Private Sub DeleteKey()
-    If mKey <> vbNullPtr Then
-        Call CryptDestroyKey(mKey)
-        mKey = vbNullPtr
-    End If
-End Sub
-
-Private Function SetHash(ByRef RgbHash() As Byte, ByVal Str As String) As Long
-    Call VerifyLoaded
-    
-    If CorArray.IsNull(RgbHash) Then _
-        Throw Cor.NewArgumentNullException("RgbHash", Environment.GetResourceString(ArgumentNull_Array))
-    
-    Select Case LCase$(Str)
-        Case "1.3.14.3.2.26", "sha", "sha1"
-        Case Else
-            Throw Cor.NewArgumentException("Hash OID not supported", "Str")
-    End Select
-    
-    If CorArray.Length(RgbHash) <> 20 Then _
-        Throw Cor.NewCryptographicException("Invalid hash length.")
-    
-    On Error GoTo errTrap
-    
-    Dim Hash As Long
-    If CryptCreateHash(mProvider, CALG_SHA1, 0, 0, Hash) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
-
-    If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = 0 Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
-
-    SetHash = Hash
-    Exit Function
-    
-errTrap:
-    If Hash <> vbNullPtr Then Call CryptDestroyHash(Hash)
-    
-    Throw
-End Function
-
-Private Function GetOID(ByVal HashObj As HashAlgorithm) As String
-    Dim OID As String
-    If TypeOf HashObj Is SHA1 Then
-        OID = "1.3.14.3.2.26"
-    End If
-    
-    GetOID = OID
-End Function
-
-Private Function GetHash(ByRef hAlg As Variant) As HashAlgorithm
-    Dim HashObj As HashAlgorithm
-    
-    Select Case VarType(hAlg)
-        Case vbString
-            Select Case LCase$(hAlg)
-                Case "1.3.14.3.2.26", "sha", "sha1":    Set HashObj = New SHA1CryptoServiceProvider
-                Case Else
-                    Throw Cor.NewArgumentException("Only SHA1 hash algorithm is supported.", "hAlg")
-            End Select
-            
-        Case vbObject
-            If hAlg Is Nothing Then _
-                Throw Cor.NewArgumentNullException("hAlg")
-            
-            If TypeOf hAlg Is SHA1 Then
-                Set HashObj = hAlg
-            Else
-                Throw Cor.NewArgumentException("Hash object must be SHA1 compatible.", "hAlg")
-            End If
-            
-        Case Else
-            Throw Cor.NewArgumentException("Invalid hash algorithm specified.", "hAlg")
-    End Select
-    
-    Set GetHash = HashObj
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     ReDim mLegalKeySizes(0)
     Set mLegalKeySizes(0) = Cor.NewKeySizes(512, 1024, 64)
@@ -605,16 +477,124 @@ Private Sub Class_Initialize()
 End Sub
 
 Private Sub Class_Terminate()
-    Call Clear
+    Clear
 End Sub
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'  Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub VerifyLoaded(Optional ByVal IncludeKey As Boolean = True)
+    If mIsDisposed Then _
+        Throw New ObjectDisposedException
+    
+    LoadProvider
+    
+    If IncludeKey Then
+        GenerateKey
+    End If
+End Sub
+
+''
+' This attempts to acquire a new provider and create a new key container
+' within the specified provider. If the container name doesn't exist, then
+' a random name will be created. If the container itself already exists,
+' then the existing container will be used instead of creating a new one.
+Private Sub LoadProvider()
+    Dim Flags As Long
+    
+    If mProvider <> vbNullPtr Then
+        Exit Sub
+    End If
+    
+    If mFlags And CspProviderFlags.UseMachineKeyStore Then
+        Flags = CRYPT_MACHINE_KEYSET
+    End If
+    
+    mProvider = CryptoAPI.AcquireDSAContext(mKeyContainerName, mProviderName, mProviderType, Flags)
+End Sub
+
+Private Sub GenerateKey()
+    If mKey <> vbNullPtr Then
+        Exit Sub
+    End If
+    
+    If mFlags And UseExistingKey Then
+        ' Try to get an existing key.
+        If CryptGetUserKey(mProvider, mKeyNumber, mKey) <> BOOL_FALSE Then
+            Exit Sub
+        End If
+        
+        ' Something went wrong. If it's something other than
+        ' not finding the key, then it's bad, so fail.
+        If Err.LastDllError <> NTE_NO_KEY Then _
+            Error.Cryptographic LastDllError
+            
+        ' We didn't find an existing key, so continue and create a new one.
+    End If
+    
+    Dim Flags As Long
+    Flags = Helper.ShiftLeft(mKeySize, 16)  ' the key size is held in the upper 16-bits.
+    
+    ' We must specify to make the key archivable.
+    If mFlags And UseArchivableKey Then
+        Flags = Flags Or CRYPT_ARCHIVABLE
+    End If
+    
+    ' We must specify to NOT create an exportable key.
+    If (mFlags And UseNonExportableKey) = 0 Then
+        Flags = Flags Or CRYPT_EXPORTABLE
+    End If
+    
+    If Not CryptoAPI.SupportsAlgorithm(mProvider, CALG_DSS_SIGN) Then _
+        Throw Cor.NewCryptographicException("The Cryptography Service Provider (CSP) does not support the specified algorithm.")
+
+    ' Let'er rip! This can take a bit with large key sizes.
+    If CryptGenKey(mProvider, mKeyNumber, Flags, mKey) = BOOL_FALSE Then _
+        Error.Cryptographic LastDllError
+End Sub
+
+Private Sub DeleteKey()
+    If mKey <> vbNullPtr Then
+        CryptDestroyKey mKey
+        mKey = vbNullPtr
+    End If
+End Sub
+
+Private Function SetHash(ByRef RgbHash() As Byte, ByRef Str As String) As Long
+    VerifyLoaded
+    
+    Select Case LCase$(Str)
+        Case "1.3.14.3.2.26", "sha", "sha1"
+        Case Else
+            Throw Cor.NewArgumentException("Invalid algorithm specified.")
+    End Select
+    
+    On Error GoTo Catch
+    
+    Dim Hash As Long
+    If CryptCreateHash(mProvider, CALG_SHA1, 0, 0, Hash) = BOOL_FALSE Then _
+        Error.Cryptographic LastDllError
+    If CryptSetHashParam(Hash, HP_HASHVAL, RgbHash(LBound(RgbHash)), 0) = 0 Then _
+        Error.Cryptographic LastDllError
+
+    SetHash = Hash
+    Exit Function
+    
+Catch:
+    If Hash <> vbNullPtr Then
+        CryptDestroyHash Hash
+    End If
+    
+    Throw
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   AsymmetricAlgorithm Interface
+'   AsymmetricAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AsymmetricAlgorithm_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function AsymmetricAlgorithm_Equals(Value As Variant) As Boolean
@@ -622,7 +602,7 @@ Private Function AsymmetricAlgorithm_Equals(Value As Variant) As Boolean
 End Function
 
 Private Sub AsymmetricAlgorithm_FromXmlString(ByRef XmlString As String)
-    Call FromXmlString(XmlString)
+    FromXmlString XmlString
 End Sub
 
 Private Function AsymmetricAlgorithm_GetHashCode() As Long
@@ -659,7 +639,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICspAsymmetricAlgorithm Interface
+'   ICspAsymmetricAlgorithm
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get ICspAsymmetricAlgorithm_CspKeyContainerInfo() As CspKeyContainerInfo
     Set ICspAsymmetricAlgorithm_CspKeyContainerInfo = CspKeyContainerInfo
@@ -670,12 +650,12 @@ Private Function ICspAsymmetricAlgorithm_ExportCspBlob(ByVal IncludePrivateParam
 End Function
 
 Private Sub ICspAsymmetricAlgorithm_ImportCspBlob(RawData() As Byte)
-    Call ImportCspBlob(RawData)
+    ImportCspBlob RawData
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -694,7 +674,7 @@ End Function
 '   DSA Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub DSA_Clear()
-    Call Clear
+    Clear
 End Sub
 
 Private Function DSA_Equals(Value As Variant) As Boolean
@@ -705,8 +685,8 @@ Private Function DSA_ExportParameters(ByVal IncludePrivateParameters As Boolean)
     Set DSA_ExportParameters = ExportParameters(IncludePrivateParameters)
 End Function
 
-Private Sub DSA_FromXmlString(ByVal XmlString As String)
-    Call FromXmlString(XmlString)
+Private Sub DSA_FromXmlString(ByRef XmlString As String)
+    FromXmlString XmlString
 End Sub
 
 Private Function DSA_GetHashCode() As Long
@@ -714,15 +694,15 @@ Private Function DSA_GetHashCode() As Long
 End Function
 
 Private Sub DSA_ImportParameters(ByVal Parameters As DSAParameters)
-    Call ImportParameters(Parameters)
+    ImportParameters Parameters
 End Sub
 
 Private Property Get DSA_KeyExchangeAlgorithm() As String
     DSA_KeyExchangeAlgorithm = KeyExchangeAlgorithm
 End Property
 
-Private Property Let DSA_KeySize(ByVal RHS As Long)
-    KeySize = RHS
+Private Property Let DSA_KeySize(ByVal Value As Long)
+    KeySize = Value
 End Property
 
 Private Property Get DSA_KeySize() As Long
