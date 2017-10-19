@@ -107,11 +107,11 @@ End Property
 ''
 ' Sets the key size.
 '
-' @param RHS The new key size.
+' @param Value The new key size.
 ' @remarks This property has no affect on the key size. To set the key size, use the
 ' Cor.NewRSACryptoServiceProvider constructor.
 '
-Public Property Let KeySize(ByVal RHS As Long)
+Public Property Let KeySize(ByVal Value As Long)
     ' does nothing
 End Property
 
@@ -144,15 +144,15 @@ End Property
 ''
 ' Sets if the current key will be stored in the current provider container.
 '
-' @param RHS Set to True to save the key on exit, False to have the key be deleted.
+' @param Value Set to True to save the key on exit, False to have the key be deleted.
 ' @remarks By default this is set to False. If a container is specified using the
 ' Cor.NewRSACryptoServiceProvider, then this will be set to True.<br>
 ' <br>A key is stored in the container to allow for each retrieval by any other
 ' service that knows where the key is. Only 1 key is stored in a container, therefore,
 ' if multiple providers share the same container, then the key may become invalid.
 '
-Public Property Let PersistKeyInCsp(ByVal RHS As Boolean)
-    mPersistKeyInCsp = RHS
+Public Property Let PersistKeyInCsp(ByVal Value As Boolean)
+    mPersistKeyInCsp = Value
 End Property
 
 ''
@@ -196,28 +196,34 @@ End Sub
 ' @return Returns the decrypted data.
 '
 Public Function Decrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
-    VerifyLoaded
+    Dim Flags       As Long
+    Dim Size        As Long
+    Dim Result()    As Byte
     
     If CorArray.IsNull(Rgb) Then _
-        Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Rgb", ArgumentNull_Array
     
-    Dim Flags As Long
-    If fOAEP Then Flags = CRYPT_OAEP
+    VerifyLoaded
     
-    Dim Size As Long
+    If fOAEP Then
+        Flags = CRYPT_OAEP
+    End If
+    
     Size = CorArray.Length(Rgb)
     
     ' We need to make a copy of the original array because we dont' want
     ' to alter its contents. Also, the copy is reversed in order to deal
     ' with .NET's Big-Endian form.
-    Dim Ret() As Byte
-    Ret = ReverseByteCopy(Rgb)
+    Result = ReverseByteCopy(Rgb)
     
-    If CryptDecrypt(mKey, 0, True, Flags, Ret(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+    If CryptDecrypt(mKey, 0, BOOL_TRUE, Flags, Result(0), Size) = BOOL_FALSE Then _
+        Error.Cryptographic LastDllError
     
-    ReDim Preserve Ret(0 To Size - 1)
-    Decrypt = Ret
+    If Size <> CorArray.Length(Result) Then
+        ReDim Preserve Result(0 To Size - 1)
+    End If
+    
+    Decrypt = Result
 End Function
 
 ''
@@ -239,28 +245,31 @@ End Function
 ' @param fOAEP A flag indicating if OAEP padding should be used, otherwise PKCS#1 v1.5 padding is used.
 '
 Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
-    VerifyLoaded
+    Dim Flags       As Long
+    Dim Size        As Long
+    Dim Result()    As Byte
     
     If CorArray.IsNull(Rgb) Then _
-        Throw Cor.NewArgumentNullException("Rgb", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Rgb", ArgumentNull_Array
     
-    Dim Flags As Long
-    If fOAEP Then Flags = CRYPT_OAEP
+    VerifyLoaded
     
-    Dim Size As Long
+    If fOAEP Then
+        Flags = CRYPT_OAEP
+    End If
+    
     Size = CorArray.Length(Rgb)
     
     ' We copy the original array so we don't alter the
     ' original array during the encryption process.
-    Dim Ret() As Byte
-    ReDim Ret(0 To mKeySize \ 8 - 1)
-    Buffer.BlockCopy Rgb, 0, Ret, 0, Size
+    ReDim Result(0 To mKeySize \ 8 - 1)
+    Buffer.BlockCopy Rgb, 0, Result, 0, Size
     
-    If CryptEncrypt(mKey, 0, True, Flags, Ret(0), Size, mKeySize \ 8) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+    If CryptEncrypt(mKey, 0, BOOL_TRUE, Flags, Result(0), Size, mKeySize \ 8) = BOOL_FALSE Then _
+        Error.Cryptographic LastDllError
     
     ' This is to remain compatible with .NET's big-endian form.
-    Encrypt = ReverseByteCopy(Ret)
+    Encrypt = ReverseByteCopy(Result)
 End Function
 
 ''
@@ -283,20 +292,21 @@ End Function
 ' @return An exported key blob structure.
 '
 Public Function ExportCspBlob(ByVal IncludePrivateParameters As Boolean) As Byte()
+    Dim BlobType    As Long
+    Dim Size        As Long
+    Dim Blob()      As Byte
+    
     VerifyLoaded
     
-    Dim BlobType As Long
-    BlobType = IIf(IncludePrivateParameters, PRIVATEKEYBLOB, PUBLICKEYBLOB)
+    BlobType = IIf(IncludePrivateParameters, PrivateKeyBlob, PublicKeyBlob)
     
-    Dim Size As Long
     If CryptExportKey(mKey, 0, BlobType, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        Error.Cryptographic LastDllError
     
-    Dim Blob() As Byte
     ReDim Blob(0 To Size - 1)
     
     If CryptExportKey(mKey, 0, BlobType, 0, Blob(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        Error.Cryptographic LastDllError
     
     ExportCspBlob = Blob
 End Function
@@ -331,15 +341,15 @@ End Sub
 '
 Public Sub ImportCspBlob(ByRef KeyBlob() As Byte)
     If CorArray.IsNull(KeyBlob) Then _
-        Throw Cor.NewArgumentNullException("KeyBlob", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "KeyBlob", ArgumentNull_Array
     
     VerifyLoaded False
     DeleteKey
     
     If CryptImportKey(mProvider, KeyBlob(LBound(KeyBlob)), CorArray.Length(KeyBlob), 0, CRYPT_EXPORTABLE, mKey) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        Error.Cryptographic LastDllError
     
-    mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PUBLICKEYBLOB)
+    mPublicOnly = (KeyBlob(LBound(KeyBlob)) = PublicKeyBlob)
 End Sub
 
 ''
@@ -349,7 +359,7 @@ End Sub
 '
 Public Sub ImportParameters(ByVal Parameters As RSAParameters)
     If Parameters Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Parameters")
+        Error.ArgumentNull "Parameters"
     
     ImportCspBlob Parameters.ToCspBlob(mKeyNumber)
 End Sub
@@ -392,24 +402,33 @@ End Function
 ' @see CryptoConfig
 '
 Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
-    ValidateByteArray RgbHash, Parameter_RgbHash
+    Dim Hash        As Long
+    Dim Size        As Long
+    Dim Signature() As Byte
     
-    Dim Hash As Long
+    If CorArray.IsNull(RgbHash) Then _
+        Error.ArgumentNull "RbgHash", ArgumentNull_Array
+        
     Hash = SetHash(RgbHash, Str)
 
-    Dim Size As Long
     If CryptSignHash(Hash, mKeyNumber, vbNullString, 0, ByVal 0&, Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        Error.Cryptographic LastDllError
 
-    Dim Signature() As Byte
     ReDim Signature(0 To Size - 1)
     
     If CryptSignHash(Hash, mKeyNumber, vbNullString, 0, Signature(0), Size) = BOOL_FALSE Then _
-        Throw Cor.NewCryptographicException(GetMessage(Err.LastDllError))
+        Error.Cryptographic LastDllError
     
-    CryptDestroyHash Hash
-    
+    GoSub Finally
     SignHash = ReverseByteCopy(Signature)
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    CryptDestroyHash Hash
+    Return
 End Function
 
 ''
