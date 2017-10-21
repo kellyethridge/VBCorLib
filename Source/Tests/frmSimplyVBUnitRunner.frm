@@ -125,8 +125,8 @@ Private Sub AddSystem()
             New ObjectToStringWithValuesTests)
         
         .Add NewSuite("Convert Tests", _
-            New ToBase64Tests, _
-            New FromBase64Tests)
+            New ConvertToBase64Tests, _
+            New ConvertFromBase64Tests)
     
         .Add NewSuite("CorArray Tests", _
             New CorArrayTests, _

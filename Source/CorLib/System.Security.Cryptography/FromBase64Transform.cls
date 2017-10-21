@@ -125,8 +125,9 @@ End Sub
 ' @return The number of bytes transformed.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    ValidateByteArray InputBuffer, Parameter_InputBuffer
-    ValidateByteArray OutputBuffer, Parameter_OutputBuffer
+    ValidateArray InputBuffer, NameOfInputBuffer
+    ValidateArray OutputBuffer, NameOfOutputBuffer
+    
     If InputOffset < LBound(InputBuffer) Then _
         Error.ArgumentOutOfRange "InputOffset", ArgumentOutOfRange_ArrayLB
     If InputCount < 0 Then _

@@ -111,20 +111,23 @@ Option Explicit
 ' @return A string containg the byte array encoded as base-64 characters.
 '
 Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As Variant, Optional ByRef Length As Variant, Optional ByVal InsertLineBreaks As Boolean = False) As String
+    ValidateArray InArray, NameOfInArray
+    
     Dim Range   As ListRange
     Dim Chars() As Integer
     
-    ValidateByteArray InArray, Parameter_InArray
-    Range = OptionalStepRange(Offset, Length, LBound(InArray), Len1D(InArray))
+    Range = MakeRange(InArray, Offset, Length, NameOfInArray, NameOfOffset, NameOfLength)
+    
+    ' we are doing custom validation because .NET throws an ArgumentOutOfRangeException
+    ' instead of an ArgumentException when Offset+Length > InArray size.
     If Range.Index < LBound(InArray) Then _
-        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Range.Count < 0 Then _
         Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
     If Range.Index + Range.Count - 1 > UBound(InArray) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_IndexLength
     
     ToBase64String = SysAllocStringLen(vbNullPtr, CalculateOutputLength(Range.Count, InsertLineBreaks))
-    
     Chars = AllocChars(ToBase64String)
     ToBase64CharArrayCore InArray, Range.Index, Range.Count, Chars, 0, InsertLineBreaks
     FreeChars Chars
@@ -146,8 +149,11 @@ End Function
 ' @remarks Added .NET 2.0 ability to insert linebreaks every 76 characters for MIME formatting.
 '
 Public Function ToBase64CharArray(ByRef InArray() As Byte, ByVal IndexIn As Long, ByVal Length As Long, ByRef OutArray() As Integer, ByVal IndexOut As Long, Optional ByVal InsertLineBreaks As Boolean = False) As Long
-    ValidateByteArray InArray, Parameter_InArray
-    ValidateCharArray OutArray, Parameter_OutArray
+    ValidateArray InArray, NameOfInArray
+    ValidateArray OutArray, NameOfOutArray
+    
+    ' we are doing custom validation because .NET throws an ArgumentOutOfRangeException
+    ' instead of an ArgumentException when IndexIn+Length > InArray size.
     If IndexIn < LBound(InArray) Then _
         Error.ArgumentOutOfRange "IndexIn", ArgumentOutOfRange_LBound
     If Length < 0 Then _

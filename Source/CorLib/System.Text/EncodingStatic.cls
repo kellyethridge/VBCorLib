@@ -261,7 +261,7 @@ Friend Sub ValidateCharRange(ByRef Chars As Variant, ByVal CharIndex As Long, By
 End Sub
 
 Friend Function ValidateOptionalByteRange(ByRef Bytes() As Byte, ByRef Index As Variant, ByRef Count As Variant) As ListRange
-    ValidateByteArray Bytes
+    ValidateArray Bytes, NameOfBytes
     
     ValidateOptionalByteRange = GetOptionalRange(Index, Count, LBound(Bytes), Len1D(Bytes))
     
@@ -280,7 +280,7 @@ Friend Function ValidateOptionalByteRange(ByRef Bytes() As Byte, ByRef Index As 
 End Function
 
 Friend Sub ValidateByteRange(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long)
-    ValidateByteArray Bytes
+    ValidateArray Bytes, NameOfBytes
     
     If (ByteIndex < LBound(Bytes) Or ByteIndex > UBound(Bytes)) And ByteCount > 0 Then
         Error.ArgumentOutOfRange "ByteIndex", ArgumentOutOfRange_LBound
