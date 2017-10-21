@@ -182,8 +182,10 @@ End Function
 ' @return A byte array that has been decoded from a base-64 character array.
 '
 Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As Long, ByVal Length As Long) As Byte()
-    ValidateCharArray InArray, Parameter_InArray
-    
+    ValidateArray InArray, NameOfInArray
+            
+    ' we are doing custom validation because .NET throws an ArgumentOutOfRangeException
+    ' instead of an ArgumentException when Offset+Length > InArray size.
     If Offset < LBound(InArray) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Length < 0 Then _

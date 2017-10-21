@@ -107,8 +107,8 @@ End Function
 ' fewer characters will be returned than <i>Count</i>.
 '
 Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
+    ValidateArrayRange Buffer, Index, Count, NameOfBuffer
     VerifyIsOpen
-    ValidateCharArrayRange Buffer, Index, Count, Parameter_Buffer
     
     If mPosition + Count > mLength Then
         Count = mLength - mPosition
