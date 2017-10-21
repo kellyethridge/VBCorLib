@@ -36,17 +36,6 @@ End Type
 
 
 ''
-' Returns an optional value or a default value if the optional value is missing.
-'
-Public Function OptionalLong(ByRef Value As Variant, ByVal Default As Long) As Long
-    If IsMissing(Value) Then
-        OptionalLong = Default
-    Else
-        OptionalLong = Value
-    End If
-End Function
-
-''
 ' Returns a pair of optional values, requiring both of them to be missing or present.
 '
 ' @param OptionalValue1 First value of the pair.
@@ -70,94 +59,55 @@ Public Function GetOptionalLongPair(ByRef OptionalValue1 As Variant, ByVal Defau
             ReturnValue1 = DefaultValue1
             ReturnValue2 = DefaultValue2
         Else
-            ReturnValue1 = OptionalLong(OptionalValue1, DefaultValue1)
-            ReturnValue2 = OptionalLong(OptionalValue2, DefaultValue2)
+            ReturnValue1 = CLngOrDefault(OptionalValue1, DefaultValue1)
+            ReturnValue2 = CLngOrDefault(OptionalValue2, DefaultValue2)
         End If
     Else
         GetOptionalLongPair = Argument_ParamRequired
     End If
 End Function
 
-Public Function GetArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant) As ListRange
-    Dim IndexIsMissing As Boolean
-    
-    IndexIsMissing = IsMissing(Index)
-    
-    If IsMissing(Count) = IndexIsMissing Then
-        If IndexIsMissing Then
-            GetArrayRange.Index = LBound(Arr)
-            GetArrayRange.Count = UBound(Arr) - LBound(Arr) + 1
-        Else
-            GetArrayRange.Index = Index
-            GetArrayRange.Count = Count
-        End If
-    Else
-        Error.Argument Argument_ParamRequired, IIf(IndexIsMissing, "Index", "Count")
-    End If
-End Function
-
-Public Function MakeRange(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As ListRange
+Public Function MakeArrayRange(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As ListRange
     If IsMissing(Index) Then
-        MakeRange.Index = LBound(Arr)
+        MakeArrayRange.Index = LBound(Arr)
     Else
-        MakeRange.Index = Index
+        MakeArrayRange.Index = Index
     End If
     
     If IsMissing(Count) Then
-        MakeRange.Count = UBound(Arr) - MakeRange.Index + 1
+        MakeArrayRange.Count = UBound(Arr) - MakeArrayRange.Index + 1
     Else
-        MakeRange.Count = Count
+        MakeArrayRange.Count = Count
     End If
 End Function
 
-Public Function GetOptionalRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ResourceStringKey = Parameter_Index, Optional ByVal CountParameter As ResourceStringKey = Parameter_Count) As ListRange
+Public Function MakeDefaultRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexName As ParameterName = NameOfIndex, Optional ByVal CountName As ParameterName = NameOfCount) As ListRange
     Dim IndexIsMissing As Boolean
     
     IndexIsMissing = IsMissing(Index)
     
-    If IndexIsMissing <> IsMissing(Count) Then
-        If IndexIsMissing Then _
-            Error.Argument Argument_ParamRequired, Environment.GetParameterName(IndexParameter)
-        
-        Error.Argument Argument_ParamRequired, Environment.GetParameterName(CountParameter)
-    End If
+    If IndexIsMissing <> IsMissing(Count) Then _
+        Error.Argument Argument_ParamRequired, Environment.GetParameterName(IIf(IndexIsMissing, IndexName, CountName))
     
     If IndexIsMissing Then
-        GetOptionalRange.Index = DefaultIndex
-        GetOptionalRange.Count = DefaultCount
+        MakeDefaultRange.Index = DefaultIndex
+        MakeDefaultRange.Count = DefaultCount
     Else
-        GetOptionalRange.Index = OptionalLong(Index, DefaultIndex)
-        GetOptionalRange.Count = OptionalLong(Count, DefaultCount)
+        MakeDefaultRange.Index = Index
+        MakeDefaultRange.Count = Count
     End If
 End Function
 
-Public Function OptionalStepRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ResourceStringKey = Parameter_Index, Optional ByVal CountParameter As ResourceStringKey = Parameter_Count) As ListRange
+Public Function MakeDefaultStepRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexName As ParameterName = NameOfIndex, Optional ByVal CountName As ParameterName = NameOfCount) As ListRange
     If IsMissing(Index) Then
-        OptionalStepRange.Index = DefaultIndex
-        
-        If IsMissing(Count) Then
-            OptionalStepRange.Count = DefaultCount
-        Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), Environment.GetResourceString(IndexParameter))
-        End If
+        If Not IsMissing(Count) Then _
+            Error.Argument Argument_ParamRequired, Environment.GetParameterName(IndexName)
+            
+        MakeDefaultStepRange.Index = DefaultIndex
+        MakeDefaultStepRange.Count = DefaultCount
     Else
-        OptionalStepRange.Index = CLng(Index)
-        OptionalStepRange.Count = OptionalLong(Count, DefaultCount - OptionalStepRange.Index)
-    End If
-End Function
-
-Public Function OptionalReverseStepRange(ByRef Index As Variant, ByRef Count As Variant, ByVal DefaultIndex As Long, ByVal DefaultCount As Long, Optional ByVal IndexParameter As ResourceStringKey = Parameter_Index, Optional ByVal CountParameter As ResourceStringKey = Parameter_Count) As ListRange
-    If IsMissing(Index) Then
-        OptionalReverseStepRange.Index = DefaultIndex
-        
-        If IsMissing(Count) Then
-            OptionalReverseStepRange.Count = DefaultCount
-        Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), Environment.GetResourceString(IndexParameter))
-        End If
-    Else
-        OptionalReverseStepRange.Index = CLng(Index)
-        OptionalReverseStepRange.Count = OptionalLong(Count, OptionalReverseStepRange.Index + 1)
+        MakeDefaultStepRange.Index = Index
+        MakeDefaultStepRange.Count = CLngOrDefault(Count, DefaultCount - MakeDefaultStepRange.Index)
     End If
 End Function
 

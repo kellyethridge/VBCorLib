@@ -324,7 +324,7 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     
     On Error GoTo Catch
     SAPtr(Buffer) = SAPtrV(Source)
-    Range = MakeRange(Source, Index, Count)
+    Range = MakeArrayRange(Source, Index, Count)
     HashCore Buffer, Range.Index, Range.Count
     
     GoSub Finally

@@ -657,7 +657,7 @@ Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As V
     
     Dim Range As ListRange
 
-    Range = MakeRange(Buffer, Index, Count)
+    Range = MakeArrayRange(Buffer, Index, Count)
     mIndex = Range.Index
     mCapacity = Range.Count
     mCanWrite = Writable

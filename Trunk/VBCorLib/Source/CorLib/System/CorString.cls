@@ -110,7 +110,7 @@ Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As 
     
     Dim Range As ListRange
     
-    Range = MakeRange(Chars, Index, Count)
+    Range = MakeArrayRange(Chars, Index, Count)
     
     If Range.Count = 0 Then
         FromCharArray = ""
@@ -187,7 +187,7 @@ End Function
 '
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, Length, 0, Len(s), Parameter_StartIndex, Parameter_Length)
+    Range = MakeDefaultRange(StartIndex, Length, 0, Len(s), Parameter_StartIndex, Parameter_Length)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -308,7 +308,7 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
     ValidateArray Value, Parameter_Value
     
     Dim Range As ListRange
-    Range = GetOptionalRange(StartIndex, Count, LBound(Value), Len1D(Value), Parameter_StartIndex)
+    Range = MakeDefaultRange(StartIndex, Count, LBound(Value), Len1D(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
@@ -340,7 +340,7 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
     Dim CharCount       As Long
     Dim RemovalCount    As Long
     CharCount = Len(s)
-    RemovalCount = OptionalLong(Count, CharCount - StartIndex)
+    RemovalCount = CLngOrDefault(Count, CharCount - StartIndex)
     
     If StartIndex < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -366,13 +366,9 @@ End Function
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
 Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    If Len(s) = 0 Then
-        IndexOfAny = -1
-        Exit Function
-    End If
-    
     Dim Range As ListRange
-    Range = OptionalStepRange(StartIndex, Count, 0, Len(s), Parameter_StartIndex)
+    
+    Range = MakeDefaultStepRange(StartIndex, Count, 0, Len(s), NameOfStartIndex)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -383,7 +379,11 @@ Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional B
     If Range.Index + Range.Count > Len(s) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
     
-    IndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index + Range.Count - 1, 1)
+    If Len(s) > 0 Then
+        IndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index + Range.Count - 1, 1)
+    Else
+        IndexOfAny = -1
+    End If
 End Function
 
 ''
@@ -398,13 +398,9 @@ End Function
 ' @remarks The indexing of <i>s</i> is zero-based.
 '
 Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    If Len(s) = 0 Then
-        LastIndexOfAny = -1
-        Exit Function
-    End If
-
     Dim Range As ListRange
-    Range = OptionalReverseStepRange(StartIndex, Count, Len(s) - 1, Len(s), Parameter_StartIndex)
+    
+    Range = MakeStringRange(s, StartIndex, Count)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -413,9 +409,12 @@ Public Function LastIndexOfAny(ByRef s As String, ByRef OfAny As Variant, Option
     If Range.Index - Range.Count + 1 < 0 Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_Count
     
-    LastIndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
+    If Len(s) > 0 Then
+        LastIndexOfAny = IndexOfAnyCore(s, OfAny, Range.Index, Range.Index - Range.Count + 1, -1)
+    Else
+        LastIndexOfAny = -1
+    End If
 End Function
-
 
 ''
 ' Inserts a string into an existing string, returning the result.
@@ -514,8 +513,21 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
+'   Private
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function MakeStringRange(ByRef s As String, ByRef StartIndex As Variant, ByRef Count As Variant) As ListRange
+    If IsMissing(StartIndex) Then
+        If Not IsMissing(Count) Then _
+            Error.Argument Argument_ParamRequired, "StartIndex"
+            
+        MakeStringRange.Index = Len(s) - 1
+        MakeStringRange.Count = Len(s)
+    Else
+        MakeStringRange.Index = StartIndex
+        MakeStringRange.Count = CLngOrDefault(Count, MakeStringRange.Index + 1)
+    End If
+End Function
+
 Private Sub InitComparisonStrings()
     With mComparisonHeader1
         .cbElements = vbSizeOfChar * 2

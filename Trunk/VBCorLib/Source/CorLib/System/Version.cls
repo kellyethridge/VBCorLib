@@ -176,7 +176,7 @@ Public Function ToString(Optional ByRef FieldCount As Variant) As String
     Dim MaxCount    As Long
     
     MaxCount = GetMaxFieldCount
-    Count = OptionalLong(FieldCount, MaxCount)
+    Count = CLngOrDefault(FieldCount, MaxCount)
     
     If Count < 0 Or Count > MaxCount Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(ArgumentOutOfRange_Bounds_Lower_Upper, 0, MaxCount), "FieldCount")
