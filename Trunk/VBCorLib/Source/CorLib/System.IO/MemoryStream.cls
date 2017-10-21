@@ -427,7 +427,7 @@ End Sub
 ' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
 '
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    ValidateByteArrayRange Buffer, Offset, Count, Parameter_Buffer, Parameter_Offset
+    ValidateArrayRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
     EnsureWritable
     EnsureOpen
     EnsureBuffer
@@ -482,7 +482,7 @@ End Sub
 ' <p>After reading from the stream, the current position will advance the number of byte as returend.</p>
 '
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
-    ValidateByteArrayRange Buffer, Offset, Count, Parameter_Buffer, Parameter_Offset
+    ValidateArrayRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
     EnsureOpen
     EnsureBuffer
     

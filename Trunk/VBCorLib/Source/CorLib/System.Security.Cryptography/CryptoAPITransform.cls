@@ -137,14 +137,14 @@ End Sub
 ' @remarks The InputCount must be an exact multiple of the InputBlockSize or an exception will be thrown.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
+    ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
+    ValidateArrayRange OutputBuffer, OutputOffset, InputCount, NameOfOutputBuffer, NameOfOutputOffset, NameOfInputOffset
+    
     ' During normal transformations, the number of bytes to be worked on must be
     ' an exact multiple of mBlockSize. There can be no partial blocks.
     If (InputCount <= 0) Or (InputCount Mod mBlockSize <> 0) Then _
         Throw Cor.NewArgumentException("Invalid value.", "InputCount")
     
-    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
-    ValidateByteArrayRange OutputBuffer, OutputOffset, InputCount, Parameter_OutputBuffer, Parameter_OutputOffset, Parameter_InputCount
-
     If mIsEncrypting Then
         TransformBlock = EncryptBlock(InputBuffer, InputOffset, InputCount, OutputBuffer, OutputOffset)
     Else
@@ -162,7 +162,7 @@ End Function
 ' @remarks Once a final block has been processed, the transform is reset to begin transforming new data.
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
+    ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
 
     If mIsEncrypting Then
         TransformFinalBlock = EncryptFinalBlock(InputBuffer, InputOffset, InputCount)
@@ -464,8 +464,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -494,9 +494,10 @@ End Function
 ' @return The number of byte actually read from the stream.
 '
 Public Function ReadBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
+    ValidateArrayRange Bytes, Offset, Count, NameOfBytes, NameOfOffset
+    
     VerifyCanRead
     VerifyIsOpen
-    ValidateByteArrayRange Bytes, Offset, Count, IndexParameter:=Parameter_Offset
     
     If Count = 0 Then
         Exit Function
@@ -647,9 +648,10 @@ End Sub
 ' any data in the buffer is written to the stream, followed by the data in <i>Buffer</i>.
 '
 Public Sub WriteBlock(ByRef Bytes() As Byte, ByVal Offset As Long, ByVal Count As Long)
+    ValidateArrayRange Bytes, Offset, Count, NameOfBytes, NameOfOffset
+    
     VerifyCanWrite
     VerifyIsOpen
-    ValidateByteArrayRange Bytes, Offset, Count, IndexParameter:=Parameter_Offset
     
     If Count = 0 Then
         Exit Sub
