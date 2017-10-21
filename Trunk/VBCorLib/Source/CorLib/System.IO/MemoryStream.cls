@@ -653,9 +653,11 @@ Private Sub Class_Initialize()
 End Sub
 
 Friend Sub Init(ByRef Buffer() As Byte, ByRef Index As Variant, ByRef Count As Variant, ByVal Writable As Boolean, ByVal Mode As BufferMode)
+    ValidateArrayRange Buffer, Index, Count, NameOfBuffer
+    
     Dim Range As ListRange
-    Range = ValidateByteArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
-        
+
+    Range = MakeRange(Buffer, Index, Count)
     mIndex = Range.Index
     mCapacity = Range.Count
     mCanWrite = Writable
