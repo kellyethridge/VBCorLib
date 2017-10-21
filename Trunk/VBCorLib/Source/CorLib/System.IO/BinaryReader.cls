@@ -112,6 +112,7 @@ Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As V
     If IsMissing(Buffer) Then
         Read = ReadOneChar
     Else
+        ValidateArrayRange Buffer, Index, Count, NameOfBuffer
         Read = ReadToBuffer(Buffer, Index, Count)
     End If
 End Function
@@ -495,7 +496,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Dim Range       As ListRange
     Dim BufferPtr   As Long
     
-    Range = ValidateOptionalArrayRange(Buffer, Index, Count, Parameter_Buffer)
+    Range = MakeRange(Buffer, Index, Count)
     BufferPtr = SAPtrV(Buffer)
     
     Select Case VarType(Buffer)
