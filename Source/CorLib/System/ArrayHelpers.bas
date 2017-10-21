@@ -40,9 +40,6 @@ Public SortComparer     As IComparer
 
 
 Public Function SAPtrV(ByRef Value As Variant) As Long
-    If Not IsArray(Value) Then _
-        Error.Argument Argument_ArrayRequired
-        
     SAPtrV = MemLong(vbaRefVarAry(Value))
 End Function
 

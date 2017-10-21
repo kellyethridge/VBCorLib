@@ -200,9 +200,7 @@ Public Function Decrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Dim Size        As Long
     Dim Result()    As Byte
     
-    If CorArray.IsNull(Rgb) Then _
-        Error.ArgumentNull "Rgb", ArgumentNull_Array
-    
+    ValidateArray Rgb, NameOfRgb
     VerifyLoaded
     
     If fOAEP Then
@@ -249,9 +247,7 @@ Public Function Encrypt(ByRef Rgb() As Byte, ByVal fOAEP As Boolean) As Byte()
     Dim Size        As Long
     Dim Result()    As Byte
     
-    If CorArray.IsNull(Rgb) Then _
-        Error.ArgumentNull "Rgb", ArgumentNull_Array
-    
+    ValidateArray Rgb, NameOfRgb
     VerifyLoaded
     
     If fOAEP Then

@@ -77,7 +77,7 @@ Public Sub Length_WithInvalidDimension_Throws()
     AssertIndexOutOfRangeException Err
 End Sub
 
-Public Sub Length_WithNonArray_Throws()
+Public Sub Length_WithNonArray_ThrowsArgumentException()
     Dim NotAnArray As Long
     
     On Error Resume Next
@@ -103,7 +103,7 @@ Public Function Rank_WithValues_ReturnsExpected(ByRef Arr As Variant) As Long
     Rank_WithValues_ReturnsExpected = CorArray.Rank(Arr)
 End Function
 
-Public Sub Rank_WithNullArray_Throws()
+Public Sub Rank_WithNullArray_ThrowsArgumentNullException()
     Dim NullArray() As Long
     
     On Error Resume Next
@@ -112,7 +112,7 @@ Public Sub Rank_WithNullArray_Throws()
     AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Sub Rank_WithNonArray_Throws()
+Public Sub Rank_WithNonArray_ThrowsArgumentException()
     Dim NotAnArray As Long
 
     On Error Resume Next
