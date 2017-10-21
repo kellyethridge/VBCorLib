@@ -230,7 +230,7 @@ End Property
 Friend Function ValidateOptionalCharRange(ByRef Chars As Variant, ByRef Index As Variant, ByRef Count As Variant) As ListRange
     ValidateArray Chars, Parameter_Chars
     
-    ValidateOptionalCharRange = GetOptionalRange(Index, Count, LBound(Chars), Len1D(Chars))
+    ValidateOptionalCharRange = MakeDefaultRange(Index, Count, LBound(Chars), Len1D(Chars))
 
     If ValidateOptionalCharRange.Count = 0 Then
         Exit Function
@@ -263,7 +263,7 @@ End Sub
 Friend Function ValidateOptionalByteRange(ByRef Bytes() As Byte, ByRef Index As Variant, ByRef Count As Variant) As ListRange
     ValidateArray Bytes, NameOfBytes
     
-    ValidateOptionalByteRange = GetOptionalRange(Index, Count, LBound(Bytes), Len1D(Bytes))
+    ValidateOptionalByteRange = MakeDefaultRange(Index, Count, LBound(Bytes), Len1D(Bytes))
     
     If ValidateOptionalByteRange.Count = 0 Then
         Exit Function

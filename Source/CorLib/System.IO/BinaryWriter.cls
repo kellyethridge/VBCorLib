@@ -321,7 +321,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Bytes() As Byte
     Dim Range   As ListRange
     
-    Range = MakeRange(Buffer, Index, Count)
+    Range = MakeArrayRange(Buffer, Index, Count)
     SAPtr(Bytes) = SAPtrV(Buffer)
     
     On Error GoTo Catch

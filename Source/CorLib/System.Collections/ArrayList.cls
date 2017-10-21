@@ -262,7 +262,7 @@ End Function
 ' @include "..\DocIncludes\ArrayList.CopyTo.html"
 Public Sub CopyTo(ByRef Arr As Variant, Optional ByRef ArrayIndex As Variant)
     ValidateArray Arr
-    CorArray.CopyEx mItems, 0, Arr, OptionalLong(ArrayIndex, LBound(Arr)), mCount
+    CorArray.CopyEx mItems, 0, Arr, CLngOrDefault(ArrayIndex, LBound(Arr)), mCount
 End Sub
 
 ''
@@ -315,7 +315,7 @@ End Function
 ' @include "..\DocIncludes\ArrayList.GetEnumerator.html"
 Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, 0, mCount)
+    Range = MakeDefaultRange(Index, Count, 0, mCount)
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
     If Range.Count < 0 Then _
@@ -373,7 +373,8 @@ End Function
 '
 Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
-    Range = OptionalStepRange(StartIndex, Count, 0, mCount, Parameter_StartIndex)
+    
+    Range = MakeDefaultStepRange(StartIndex, Count, 0, mCount, Parameter_StartIndex)
     
     If Range.Index > mCount Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index
@@ -516,8 +517,8 @@ End Property
 '
 Public Function LastIndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
-    Range.Index = OptionalLong(StartIndex, mCount - 1)
-    Range.Count = OptionalLong(Count, Range.Index + 1)
+    Range.Index = CLngOrDefault(StartIndex, mCount - 1)
+    Range.Count = CLngOrDefault(Count, Range.Index + 1)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -619,7 +620,7 @@ End Sub
 '
 Public Sub Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, 0, mCount)
+    Range = MakeDefaultRange(Index, Count, 0, mCount)
 
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
@@ -659,7 +660,7 @@ End Sub
 '
 Public Sub Sort(Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
     Dim Range As ListRange
-    Range = GetOptionalRange(Index, Count, 0, mCount)
+    Range = MakeDefaultRange(Index, Count, 0, mCount)
 
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum

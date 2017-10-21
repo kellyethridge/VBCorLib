@@ -126,10 +126,12 @@ Public Sub EncoderConvert(ByVal Encoder As Encoder, Chars() As Integer, ByVal Ch
 End Sub
 
 Public Function ValidateGetBytes(ByRef Chars() As Integer, ByRef Index As Variant, ByRef Count As Variant) As ListRange
-    If SAPtr(Chars) = vbNullPtr Then _
-        Error.ArgumentNull "Chars", ArgumentNull_Array
+    ValidateArray Chars, NameOfChars
     
-    ValidateGetBytes = GetArrayRange(Chars, Index, Count)
+    If IsMissing(Index) <> IsMissing(Count) Then _
+        Error.Argument Argument_ParamRequired, IIf(IsMissing(Index), "Index", "Count")
+        
+    ValidateGetBytes = MakeArrayRange(Chars, Index, Count)
     
     If ValidateGetBytes.Index < LBound(Chars) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB
@@ -153,10 +155,12 @@ Public Sub ValidateGetBytesEx(ByRef Chars() As Integer, ByVal CharIndex As Long,
 End Sub
 
 Public Function ValidateGetChars(ByRef Bytes() As Byte, ByRef Index As Variant, ByRef Count As Variant) As ListRange
-    If SAPtr(Bytes) = vbNullPtr Then _
-        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    ValidateArray Bytes, NameOfBytes
     
-    ValidateGetChars = GetArrayRange(Bytes, Index, Count)
+    If IsMissing(Index) <> IsMissing(Count) Then _
+        Error.Argument Argument_ParamRequired, IIf(IsMissing(Index), "Index", "Count")
+    
+    ValidateGetChars = MakeArrayRange(Bytes, Index, Count)
     
     If ValidateGetChars.Index < LBound(Bytes) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayLB

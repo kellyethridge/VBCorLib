@@ -141,8 +141,8 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
     
     Dim ElementIndex   As Long
     Dim ElementCount   As Long
-    ElementIndex = OptionalLong(Index, LBound(Arr))
-    ElementCount = OptionalLong(Count, UBound(Arr) - ElementIndex + 1)
+    ElementIndex = CLngOrDefault(Index, LBound(Arr))
+    ElementCount = CLngOrDefault(Count, UBound(Arr) - ElementIndex + 1)
     
     If ElementIndex < LBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound
@@ -331,8 +331,8 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     
     Dim ElemIndex As Long
     Dim ElemCount As Long
-    ElemIndex = OptionalLong(Index, UBound(Arr))
-    ElemCount = OptionalLong(Count, ElemIndex + 1)
+    ElemIndex = CLngOrDefault(Index, UBound(Arr))
+    ElemCount = CLngOrDefault(Count, ElemIndex + 1)
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayBounds
     If ElemCount < 0 Then _
@@ -739,7 +739,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Ptr = SAPtrV(Arr)
     
     Dim Range As ListRange
-    Range = OptionalStepRange(StartIndex, Count, LBound(Arr), Len1D(Arr), Parameter_StartIndex)
+    Range = MakeDefaultStepRange(StartIndex, Count, LBound(Arr), Len1D(Arr), Parameter_StartIndex)
     
     If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds
@@ -793,8 +793,8 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    ElemIndex = OptionalLong(StartIndex, UBound(Arr))
-    ElemCount = OptionalLong(Count, ElemIndex - LBound(Arr) + 1)
+    ElemIndex = CLngOrDefault(StartIndex, UBound(Arr))
+    ElemCount = CLngOrDefault(Count, ElemIndex - LBound(Arr) + 1)
     
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds
@@ -839,8 +839,8 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    ElemIndex = OptionalLong(Index, LBound(Arr))
-    ElemCount = OptionalLong(Count, UBound(Arr) - ElemIndex + 1)
+    ElemIndex = CLngOrDefault(Index, LBound(Arr))
+    ElemCount = CLngOrDefault(Count, UBound(Arr) - ElemIndex + 1)
     
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_LBound

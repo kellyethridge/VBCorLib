@@ -496,7 +496,7 @@ Private Function ReadToBuffer(ByRef Buffer As Variant, ByRef Index As Variant, B
     Dim Range       As ListRange
     Dim BufferPtr   As Long
     
-    Range = MakeRange(Buffer, Index, Count)
+    Range = MakeArrayRange(Buffer, Index, Count)
     BufferPtr = SAPtrV(Buffer)
     
     Select Case VarType(Buffer)

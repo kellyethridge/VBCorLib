@@ -24,6 +24,42 @@ Attribute VB_Name = "Validation"
 '
 Option Explicit
 
+Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, _
+                              Optional ByVal ArrName As ParameterName = NameOfArr, _
+                              Optional ByVal IndexName As ParameterName = NameOfIndex, _
+                              Optional ByVal CountName As ParameterName = NameOfCount)
+    ValidateArray Arr, ArrName
+    
+    Dim RangeIndex      As Long
+    Dim RangeCount      As Long
+    Dim IndexIsMissing  As Boolean
+    
+    IndexIsMissing = IsMissing(Index)
+    
+    If IndexIsMissing <> IsMissing(Count) Then
+        Error.Argument Argument_ParamRequired, Environment.GetParameterName(IIf(IndexIsMissing, IndexName, CountName))
+    End If
+    
+    If IndexIsMissing Then
+        Exit Sub
+    End If
+    
+    RangeIndex = Index
+    RangeCount = Count
+    
+    If RangeIndex < LBound(Arr) Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(IndexName), ArgumentOutOfRange_LBound
+    End If
+    
+    If RangeCount < 0 Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(CountName), ArgumentOutOfRange_NeedNonNegNum
+    End If
+    
+    If RangeIndex + RangeCount - 1 > UBound(Arr) Then
+        Error.Argument Argument_InvalidOffLen
+    End If
+End Sub
+
 Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal ArrName As ParameterName = NameOfArr)
     Dim Ptr As Long
     
@@ -39,39 +75,6 @@ Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal ArrName As Paramet
     
     If SafeArrayGetDim(Ptr) <> 1 Then
         Error.Rank
-    End If
-End Sub
-
-Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, _
-                              Optional ByVal ArrName As ParameterName = NameOfArr, _
-                              Optional ByVal IndexName As ParameterName = NameOfIndex, _
-                              Optional ByVal CountName As ParameterName = NameOfCount)
-    ValidateArray Arr, ArrName
-    
-    Dim RangeIndex      As Long
-    Dim RangeCount      As Long
-    Dim IndexIsMissing  As Boolean
-    
-    IndexIsMissing = IsMissing(Index)
-    
-    If IndexIsMissing <> IsMissing(Count) Then _
-        Error.Argument Argument_ParamRequired, Environment.GetParameterName(IIf(IndexIsMissing, IndexName, CountName))
-    
-    If Not IndexIsMissing Then
-        RangeIndex = Index
-        RangeCount = Count
-        
-        If RangeIndex < LBound(Arr) Then
-            Error.ArgumentOutOfRange Environment.GetParameterName(IndexName), ArgumentOutOfRange_LBound
-        End If
-        
-        If RangeCount < 0 Then
-            Error.ArgumentOutOfRange Environment.GetParameterName(CountName), ArgumentOutOfRange_NeedNonNegNum
-        End If
-        
-        If RangeIndex + RangeCount - 1 > UBound(Arr) Then
-            Error.Argument Argument_InvalidOffLen
-        End If
     End If
 End Sub
 
