@@ -206,19 +206,20 @@ End Function
 ' @return The final transformed data.
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
+    ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
 
-    Dim Result() As Byte
+    Dim Result()    As Byte
+    Dim Count       As Long
+    
     If (mBitCount \ 6) + InputCount < 4 Then
         Result = Cor.NewBytes()
     ElseIf mTermCount > 0 Then
-        ReDim Ret(0 To 1 - mTermCount)
+        ReDim Result(0 To 1 - mTermCount)
         TransformBlock InputBuffer, InputOffset, InputCount, Result, 0
     Else
         ReDim Result(0 To InputCount)
-        Dim Count As Long
-        
         Count = TransformBlock(InputBuffer, InputOffset, InputCount, Result, 0)
+        
         If Count > 0 Then
             ReDim Preserve Result(0 To Count - 1)
         Else

@@ -146,7 +146,7 @@ End Function
 ' bytes are transformed, then a zero-length array is returned, not a null array.</p>
 '
 Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long) As Byte()
-    ValidateByteArrayRange InputBuffer, InputOffset, InputCount, Parameter_InputBuffer, Parameter_InputOffset, Parameter_InputCount
+    ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
     
     Dim OutputBuffer() As Byte
     ReDim OutputBuffer(3)

@@ -44,12 +44,12 @@ Private Sub AddTests(ByVal Test As TestCaseCollector)
 End Sub
 
 Public Sub TransformFinalBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByRef Expected As String)
-    Dim csp         As New TripleDESCryptoServiceProvider
+    Dim Csp         As New TripleDESCryptoServiceProvider
     Dim Encryptor   As ICryptoTransform
     Dim Message()   As Byte
-    csp.Mode = CipherMode
-    csp.Padding = PaddingMode.Zeros
-    Set Encryptor = csp.CreateEncryptor(Encoding.ASCII.GetBytes(Key), Encoding.ASCII.GetBytes(IV))
+    Csp.Mode = CipherMode
+    Csp.Padding = PaddingMode.Zeros
+    Set Encryptor = Csp.CreateEncryptor(Encoding.ASCII.GetBytes(Key), Encoding.ASCII.GetBytes(IV))
     Message = Encoding.ASCII.GetBytes("This is the message to encrypt, it will be padded.")
 
     Dim Actual() As Byte
@@ -59,12 +59,12 @@ Public Sub TransformFinalBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode A
 End Sub
 
 Public Sub TransformBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As CipherMode, ByRef Key As String, ByRef IV As String, ByRef Expected As String)
-    Dim csp         As New TripleDESCryptoServiceProvider
+    Dim Csp         As New TripleDESCryptoServiceProvider
     Dim Encryptor   As ICryptoTransform
     Dim Message()   As Byte
-    csp.Mode = CipherMode
-    csp.Padding = PaddingMode.Zeros
-    Set Encryptor = csp.CreateEncryptor(Encoding.ASCII.GetBytes(Key), Encoding.ASCII.GetBytes(IV))
+    Csp.Mode = CipherMode
+    Csp.Padding = PaddingMode.Zeros
+    Set Encryptor = Csp.CreateEncryptor(Encoding.ASCII.GetBytes(Key), Encoding.ASCII.GetBytes(IV))
     Message = Encoding.ASCII.GetBytes("This is the message to encrypt, it will be padded.")
 
     Dim ms              As New MemoryStream
@@ -81,12 +81,12 @@ Public Sub TransformBlock_WithCipherMode_ReturnsExpected(ByVal CipherMode As Cip
 End Sub
 
 Public Sub TransformFinalBlock_WithPaddingMode_ReturnsExpected(ByVal Mode As PaddingMode, ByRef Expected As String)
-    Dim csp As New TripleDESCryptoServiceProvider
+    Dim Csp As New TripleDESCryptoServiceProvider
     Dim Encryptor As ICryptoTransform
     Dim Message() As Byte
-    csp.Mode = CipherMode.ECB
-    csp.Padding = Mode
-    Set Encryptor = csp.CreateEncryptor(Encoding.ASCII.GetBytes("12345678abcdefghstuvwxyz"), Encoding.ASCII.GetBytes("00000000"))
+    Csp.Mode = CipherMode.ECB
+    Csp.Padding = Mode
+    Set Encryptor = Csp.CreateEncryptor(Encoding.ASCII.GetBytes("12345678abcdefghstuvwxyz"), Encoding.ASCII.GetBytes("00000000"))
     Message = Encoding.ASCII.GetBytes("This is the message to encrypt, it will be padded.")
 
     Dim Actual() As Byte
@@ -96,59 +96,59 @@ Public Sub TransformFinalBlock_WithPaddingMode_ReturnsExpected(ByVal Mode As Pad
 End Sub
 
 Public Sub CreateEncryptor_WhenModeIsOFB_ThrowsCryptographicException()
-    Dim csp As New TripleDESCryptoServiceProvider
-    csp.Mode = CipherMode.OFB
+    Dim Csp As New TripleDESCryptoServiceProvider
+    Csp.Mode = CipherMode.OFB
 
     On Error Resume Next
-    csp.CreateEncryptor
+    Csp.CreateEncryptor
 
     AssertCryptographicException Err
 End Sub
 
 Public Sub CreateEncryptor_WhenModeIsCFBAndFeedbackSizeIsNot8_ThrowsCryptographicException()
-    Dim csp As New TripleDESCryptoServiceProvider
-    csp.Mode = CipherMode.CFB
-    csp.FeedbackSize = 16
+    Dim Csp As New TripleDESCryptoServiceProvider
+    Csp.Mode = CipherMode.CFB
+    Csp.FeedbackSize = 16
 
     On Error Resume Next
-    csp.CreateEncryptor
+    Csp.CreateEncryptor
 
     AssertCryptographicException Err
 End Sub
 
 Public Sub CreateEncryptor_WithECBModeAndKeyOnly_DoesNotThrow()
-    Dim csp As New TripleDESCryptoServiceProvider
-    csp.Mode = CipherMode.ECB
+    Dim Csp As New TripleDESCryptoServiceProvider
+    Csp.Mode = CipherMode.ECB
     
     On Error Resume Next
-    csp.CreateEncryptor csp.Key
+    Csp.CreateEncryptor Csp.Key
         
     AssertNoException Err
 End Sub
 
 Public Sub CreateEncryptor_WithNonECBModeAndKeyOnly_ThrowsArgumentException()
-    Dim csp As New TripleDESCryptoServiceProvider
-    csp.Mode = CipherMode.CBC
+    Dim Csp As New TripleDESCryptoServiceProvider
+    Csp.Mode = CipherMode.CBC
     
     On Error Resume Next
-    csp.CreateEncryptor csp.Key
+    Csp.CreateEncryptor Csp.Key
     
     AssertArgumentException Err, "RgbIV"
 End Sub
 
 Public Sub CreateEncryptor_WithIVOnly_ThrowsArgumentException()
-    Dim csp As New TripleDESCryptoServiceProvider
+    Dim Csp As New TripleDESCryptoServiceProvider
     
     On Error Resume Next
-    csp.CreateEncryptor RgbIV:=NewBytes()
+    Csp.CreateEncryptor RgbIV:=NewBytes()
     
     AssertArgumentException Err, "RgbKey"
 End Sub
 
 Public Sub TransformBlock_WithInputOffsetLessThanLBound_ThrowsArgumentOutOfRangeException()
-    Dim csp As New TripleDESCryptoServiceProvider
+    Dim Csp As New TripleDESCryptoServiceProvider
     Dim Encryptor As ICryptoTransform
-    Set Encryptor = csp.CreateEncryptor
+    Set Encryptor = Csp.CreateEncryptor
     Dim Message(5 To 12) As Byte
 
     On Error Resume Next
@@ -158,13 +158,13 @@ Public Sub TransformBlock_WithInputOffsetLessThanLBound_ThrowsArgumentOutOfRange
 End Sub
 
 Public Sub TransformBlock_WithInputCountLessThanZero_ThrowsArgumentException()
-    Dim csp As New TripleDESCryptoServiceProvider
+    Dim Csp As New TripleDESCryptoServiceProvider
     Dim Encryptor As ICryptoTransform
-    Set Encryptor = csp.CreateEncryptor
+    Set Encryptor = Csp.CreateEncryptor
     Dim Message(5 To 12) As Byte
 
     On Error Resume Next
-    Encryptor.TransformBlock Message, 4, -1, NewBytes(), 0
+    Encryptor.TransformBlock Message, 5, -1, NewBytes(), 0
 
     AssertArgumentException Err, "InputCount"
 End Sub
