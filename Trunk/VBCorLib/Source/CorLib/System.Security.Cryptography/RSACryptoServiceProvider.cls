@@ -403,7 +403,7 @@ Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
     Dim Signature() As Byte
     
     If CorArray.IsNull(RgbHash) Then _
-        Error.ArgumentNull "RbgHash", ArgumentNull_Array
+        Error.ArgumentNull "RgbHash", ArgumentNull_Array
         
     Hash = SetHash(RgbHash, Str)
 
