@@ -460,7 +460,7 @@ End Function
 ' @see SHA512Managed
 '
 Public Function VerifyData(ByRef Buffer() As Byte, ByRef hAlg As Variant, ByRef Signature() As Byte) As Boolean
-    ValidateByteArray Buffer, Parameter_Buffer
+    ValidateArray Buffer, NameOfBuffer
                   
     Dim HashObj As HashAlgorithm
     Set HashObj = GetHash(hAlg)
@@ -480,8 +480,8 @@ End Function
 ' @see CryptoConfig
 '
 Public Function VerifyHash(ByRef RgbHash() As Byte, ByRef Str As String, ByRef Signature() As Byte) As Boolean
-    ValidateByteArray RgbHash, Parameter_RgbHash
-    ValidateByteArray Signature, Parameter_Signature
+    ValidateArray RgbHash, NameOfRgbHash
+    ValidateArray Signature, NameOfSignature
     
     Dim Hash As Long
     Hash = SetHash(RgbHash, Str)

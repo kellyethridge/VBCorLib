@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "FromBase64Tests"
+Attribute VB_Name = "ConvertFromBase64Tests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' FromBase64Tests
+' ConvertFromBase64Tests
 '
 Option Explicit
 Implements ITestCaseSource

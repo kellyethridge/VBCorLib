@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "ToBase64Tests"
+Attribute VB_Name = "ConvertToBase64Tests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' ToBase64Tests
+' ConvertToBase64Tests
 '
 Option Explicit
 Implements ITestCaseSource
@@ -81,7 +81,7 @@ Public Sub ToBase64String_WithAllByteValuesAndInsertLineBreaks_ReturnsAllByteVal
     Assert.That Actual, Iz.EqualTo(AllByteValuesAsBase64WithLineBreaks)
 End Sub
 
-Public Sub ToBase64String_WithNullArray_Throws()
+Public Sub ToBase64String_WithNullArray_ThrowsArgumentNullException()
     Dim Bytes() As Byte
     
     On Error Resume Next
@@ -96,7 +96,7 @@ Public Sub ToBase64String_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeExcept
     On Error Resume Next
     Convert.ToBase64String Bytes, 0, 1
     
-    AssertArgumentOutOfRangeException Err, "Index"
+    AssertArgumentOutOfRangeException Err, "Offset"
 End Sub
 
 Public Sub ToBase64String_WithLengthLessThanZero_ThrowsArgumentOutOfRangeException()

@@ -98,7 +98,8 @@ End Property
 ' @remarks The length of the array cannot be less than 8 bytes.
 '
 Public Property Let Salt(ByRef Value() As Byte)
-    ValidateByteArray Value, Parameter_Value
+    ValidateArray Value, NameOfValue
+    
     If Len1D(Value) < 8 Then _
         Error.Argument Cryptography_PasswordDerivedBytes_FewBytesSalt, "Value"
     

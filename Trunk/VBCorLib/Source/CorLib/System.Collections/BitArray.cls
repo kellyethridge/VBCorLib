@@ -420,16 +420,16 @@ Friend Sub InitFromBooleans(ByRef Values() As Boolean)
 End Sub
 
 Friend Sub InitFromBytes(ByRef Bytes() As Byte)
-    ValidateByteArray Bytes, Parameter_Bytes
+    ValidateArray Bytes, NameOfBytes
     
     Dim Size As Long
-    Size = Len1D(Bytes)
-    Me.Length = Size * BitsPerByte
+    Size = CorArray.Length(Bytes)
+    Length = Size * BitsPerByte
     CopyMemory mBits(0), Bytes(LBound(Bytes)), Size
 End Sub
 
 Friend Sub InitFromLongs(ByRef Values() As Long)
-    ValidateArray Values, Parameter_Values
+    ValidateArray Values, NameOfValues
     
     mBits = Values
     mUBound = UBound(Values)
