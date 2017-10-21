@@ -319,3 +319,47 @@ Public Enum ParameterResourceKey
     Parameter_RgbHash = 2036
     Parameter_Signature = 2037
 End Enum
+
+Public Enum ParameterName
+    NameOfIndex = 2000
+    NameOfCount = 2001
+    NameOfStartIndex = 2002
+    NameOfChars = 2003
+    NameOfCharIndex = 2004
+    NameOfCharCount = 2005
+    NameOfByteIndex = 2006
+    NameOfBytes = 2007
+    NameOfByteCount = 2008
+    NameOfValue = 2009
+    NameOfArr = 2010
+    NameOfList = 2011
+    NameOfYear = 2012
+    NameOfMonth = 2013
+    NameOfLCID = 2014
+    NameOfTime = 2015
+    NameOfPath = 2016
+    NameOfDstArray = 2017
+    NameOfStream = 2018
+    NameOfBuffer = 2019
+    NameOfOutput = 2020
+    NameOfSource = 2021
+    NameOfLength = 2022
+    NameOfSourceArray = 2023
+    NameOfDestinationArray = 2024
+    NameOfKeys = 2025
+    NameOfItems = 2026
+    NameOfValues = 2027
+    NameOfInArray = 2028
+    NameOfOutArray = 2029
+    NameOfOffset = 2030
+    NameOfInputBuffer = 2031
+    NameOfInputOffset = 2032
+    NameOfInputCount = 2033
+    NameOfOutputBuffer = 2034
+    NameOfOutputOffset = 2035
+    NameOfRgbHash = 2036
+    NameOfSignature = 2037
+    NameOfRgb = 2038
+    NameOfKeyBlob = 2039
+End Enum
+

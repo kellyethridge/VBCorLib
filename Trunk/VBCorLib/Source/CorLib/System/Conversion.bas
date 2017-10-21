@@ -20,9 +20,17 @@ Attribute VB_Name = "Conversion"
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: Casts
+' Module: Conversion
 '
 Option Explicit
+
+Public Function CLngOrDefault(ByRef Value As Variant, ByVal Default As Long) As Long
+    If IsMissing(Value) Then
+        CLngOrDefault = Default
+    Else
+        CLngOrDefault = Value
+    End If
+End Function
 
 
 ' This is a set of casting routines used by function delegation calls.

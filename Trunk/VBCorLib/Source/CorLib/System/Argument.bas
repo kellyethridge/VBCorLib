@@ -34,6 +34,7 @@ Public Type ListRange
     Count As Long
 End Type
 
+
 ''
 ' Returns an optional value or a default value if the optional value is missing.
 '
@@ -92,6 +93,23 @@ Public Function GetArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRe
         End If
     Else
         Error.Argument Argument_ParamRequired, IIf(IndexIsMissing, "Index", "Count")
+    End If
+End Function
+
+Public Function MakeRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, _
+                          Optional ByVal ArrName As ParameterName, _
+                          Optional ByVal IndexName As ParameterName, _
+                          Optional ByVal CountName As ParameterName) As ListRange
+    If IsMissing(Index) Then
+        MakeRange.Index = LBound(Arr)
+    Else
+        MakeRange.Index = Index
+    End If
+    
+    If IsMissing(Count) Then
+        MakeRange.Count = UBound(Arr) - MakeRange.Index + 1
+    Else
+        MakeRange.Count = Count
     End If
 End Function
 

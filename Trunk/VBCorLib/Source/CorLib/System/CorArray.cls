@@ -480,7 +480,7 @@ End Function
 ' Other lowerbound: return = (Not (return - lowerbound)) + lowerbound<br>
 ' @include "..\DocIncludes\CorArray.BinarySearch.html"
 Public Function BinarySearchEx(ByRef Arr As Variant, ByVal Index As Long, ByVal Length As Long, ByRef Value As Variant, Optional ByVal Comparer As IComparer) As Long
-    ValidateArrayRange Arr, Index, Length, CountParameter:=Parameter_Length
+    ValidateArrayRange Arr, Index, Length, CountName:=NameOfLength
     BinarySearchEx = InternalBinarySearch(Arr, Index, Length, Value, Comparer)
 End Function
 
@@ -691,6 +691,9 @@ End Function
 ' @return The number of elements in the specified dimension or the entire array.
 '
 Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired
+    
     Dim SafeArrayPtr  As Long
     
     SafeArrayPtr = SAPtrV(Arr)
@@ -707,8 +710,13 @@ End Function
 ' @param Arr The array to retrieve the number of dimensions from.
 ' @return The number of dimension in the array.
 Public Function Rank(ByRef Arr As Variant) As Long
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired
+    
     Dim Ptr As Long
+    
     Ptr = SAPtrV(Arr)
+    
     If Ptr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
@@ -995,7 +1003,7 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
-    ValidateArrayRange Keys, Index, Length, Parameter_Keys, CountParameter:=Parameter_Length
+    ValidateArrayRange Keys, Index, Length, Parameter_Keys, CountName:=NameOfLength
     
     Dim KeysPtr  As Long
     Dim ItemsPtr As Long

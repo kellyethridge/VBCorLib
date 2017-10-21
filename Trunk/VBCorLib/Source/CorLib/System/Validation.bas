@@ -24,40 +24,78 @@ Attribute VB_Name = "Validation"
 '
 Option Explicit
 
-Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal Parameter As ParameterResourceKey = Parameter_Arr)
+Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal ArrName As ParameterName = NameOfArr)
     Dim Ptr As Long
     
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired, Environment.GetParameterName(Parameter)
+    If Not IsArray(Arr) Then
+        Error.Argument Argument_ArrayRequired, Environment.GetParameterName(ArrName)
+    End If
     
     Ptr = SAPtrV(Arr)
     
     If Ptr = vbNullPtr Then
-        Error.ArgumentNull Environment.GetParameterName(Parameter), ArgumentNull_Array
+        Error.ArgumentNull Environment.GetParameterName(ArrName), ArgumentNull_Array
     End If
+    
     If SafeArrayGetDim(Ptr) <> 1 Then
         Error.Rank
     End If
 End Sub
 
-Public Sub ValidateArrayRange(ByRef Arr As Variant, ByVal Index As Long, ByVal Count As Long, Optional ByVal ArrParameter As ParameterResourceKey = Parameter_Arr, _
-                                                                                              Optional ByVal IndexParameter As ParameterResourceKey = Parameter_Index, _
-                                                                                              Optional ByVal CountParameter As ParameterResourceKey = Parameter_Count)
-    ValidateArray Arr, ArrParameter
-    If Index < LBound(Arr) Then
-        Error.ArgumentOutOfRange Environment.GetParameterName(IndexParameter), ArgumentOutOfRange_LBound
+Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, _
+                              Optional ByVal ArrName As ParameterName = NameOfArr, _
+                              Optional ByVal IndexName As ParameterName = NameOfIndex, _
+                              Optional ByVal CountName As ParameterName = NameOfCount)
+    ValidateArray Arr, ArrName
+    
+    Dim RangeIndex      As Long
+    Dim RangeCount      As Long
+    Dim IndexIsMissing  As Boolean
+    
+    IndexIsMissing = IsMissing(Index)
+    
+    If IndexIsMissing = IsMissing(Count) Then
+        If Not IndexIsMissing Then
+            RangeIndex = Index
+            RangeCount = Count
+            
+            If RangeIndex < LBound(Arr) Then
+                Error.ArgumentOutOfRange Environment.GetParameterName(IndexName), ArgumentOutOfRange_LBound
+            End If
+            
+            If RangeCount < 0 Then
+                Error.ArgumentOutOfRange Environment.GetParameterName(CountName), ArgumentOutOfRange_NeedNonNegNum
+            End If
+            
+            If RangeIndex + RangeCount - 1 > UBound(Arr) Then
+                Error.Argument Argument_InvalidOffLen
+            End If
+        End If
+    Else
+        Error.Argument Argument_ParamRequired, Environment.GetParameterName(IIf(IndexIsMissing, IndexName, CountName))
     End If
-    If Count < 0 Then
-        Error.ArgumentOutOfRange Environment.GetParameterName(CountParameter), ArgumentOutOfRange_NeedNonNegNum
+End Sub
+
+Public Sub ValidateRange(ByRef Range As ListRange, ByRef Arr As Variant, _
+                         Optional ByVal IndexName As ParameterName = NameOfIndex, _
+                         Optional ByVal CountName As ParameterName = NameOfCount)
+    If Range.Index < LBound(Arr) Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(IndexName), ArgumentOutOfRange_LBound
     End If
-    If Index + Count - 1 > UBound(Arr) Then
+    
+    If Range.Count < 0 Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(CountName), ArgumentOutOfRange_NeedNonNegNum
+    End If
+    
+    If Range.Index + Range.Count - 1 > UBound(Arr) Then
         Error.Argument Argument_InvalidOffLen
     End If
 End Sub
 
-Public Function ValidateOptionalArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, Optional ByVal ArrParameter As ParameterResourceKey = Parameter_Arr, _
-                                                                                                                 Optional ByVal IndexParameter As ParameterResourceKey = Parameter_Index, _
-                                                                                                                 Optional ByVal CountParameter As ParameterResourceKey = Parameter_Count) As ListRange
+Public Function ValidateOptionalArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, _
+                              Optional ByVal ArrParameter As ParameterName = NameOfArr, _
+                              Optional ByVal IndexParameter As ParameterName = NameOfIndex, _
+                              Optional ByVal CountParameter As ParameterName = NameOfCount) As ListRange
     ValidateArray Arr, ArrParameter
     ValidateOptionalArrayRange = GetOptionalRange(Index, Count, LBound(Arr), Len1D(Arr), IndexParameter, CountParameter)
     If ValidateOptionalArrayRange.Index < LBound(Arr) Then
