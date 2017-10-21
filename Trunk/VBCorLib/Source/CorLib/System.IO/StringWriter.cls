@@ -148,8 +148,7 @@ End Sub
 ' to its text representation and embed it in a string.
 '
 Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    ValidateCharArrayOptionalRange Chars, Index, Count, Parameter_Chars
-    
+    ValidateArrayRange Chars, Index, Count, NameOfChars
     mSB.Append Chars, Index, Count
 End Sub
 
