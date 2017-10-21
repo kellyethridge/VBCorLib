@@ -116,7 +116,7 @@ Public Function ToBase64String(ByRef InArray() As Byte, Optional ByRef Offset As
     Dim Range   As ListRange
     Dim Chars() As Integer
     
-    Range = MakeRange(InArray, Offset, Length, NameOfInArray, NameOfOffset, NameOfLength)
+    Range = MakeRange(InArray, Offset, Length)
     
     ' we are doing custom validation because .NET throws an ArgumentOutOfRangeException
     ' instead of an ArgumentException when Offset+Length > InArray size.
@@ -183,6 +183,7 @@ End Function
 '
 Public Function FromBase64CharArray(ByRef InArray() As Integer, ByVal Offset As Long, ByVal Length As Long) As Byte()
     ValidateCharArray InArray, Parameter_InArray
+    
     If Offset < LBound(InArray) Then _
         Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_LBound
     If Length < 0 Then _

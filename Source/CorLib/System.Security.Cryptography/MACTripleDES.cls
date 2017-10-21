@@ -377,12 +377,12 @@ Private Sub ComputeHashOnStream(ByRef Source As Variant)
 End Sub
 
 Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    Dim Range As ListRange
-    Range = ValidateOptionalArrayRange(Source, Index, Count, Parameter_Source)
+    Dim Range   As ListRange
+    Dim Bytes() As Byte
     
     On Error GoTo Catch
-    Dim Bytes() As Byte
     SAPtr(Bytes) = SAPtrV(Source)
+    Range = MakeRange(Source, Index, Count)
     mStream.WriteBlock Bytes, Range.Index, Range.Count
 
     GoSub Finally
@@ -390,8 +390,7 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     
 Catch:
     GoSub Finally
-    Throw
-    Exit Sub
+    ThrowOrErr Err
 Finally:
     SAPtr(Bytes) = vbNullPtr
     Return

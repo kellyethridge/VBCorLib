@@ -147,6 +147,7 @@ End Function
 '
 Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     If IsArray(Value) Then
+        ValidateArrayRange Value, Index, Count, NameOfValue
         WriteArray Value, Index, Count
     Else
         WriteIntrinsic Value, Index, Count
@@ -304,8 +305,6 @@ Private Sub WriteString(ByRef Value As String)
 End Sub
 
 Private Sub WriteArray(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    ValidateArray Value, Parameter_Value
-    
     Select Case VarType(Value)
         Case vbByteArray
             WriteBytes Value, Index, Count
@@ -322,7 +321,7 @@ Private Sub WriteBytes(ByRef Buffer As Variant, Optional ByRef Index As Variant,
     Dim Bytes() As Byte
     Dim Range   As ListRange
     
-    Range = ValidateOptionalArrayRange(Buffer, Index, Count, Parameter_Buffer)
+    Range = MakeRange(Buffer, Index, Count)
     SAPtr(Bytes) = SAPtrV(Buffer)
     
     On Error GoTo Catch

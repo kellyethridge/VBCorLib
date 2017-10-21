@@ -96,10 +96,7 @@ Public Function GetArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRe
     End If
 End Function
 
-Public Function MakeRange(ByRef Arr As Variant, ByRef Index As Variant, ByRef Count As Variant, _
-                          Optional ByVal ArrName As ParameterName, _
-                          Optional ByVal IndexName As ParameterName, _
-                          Optional ByVal CountName As ParameterName) As ListRange
+Public Function MakeRange(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As ListRange
     If IsMissing(Index) Then
         MakeRange.Index = LBound(Arr)
     Else
