@@ -79,22 +79,6 @@ Public Sub ValidateCharArray(ByRef Chars() As Integer, Optional ByVal Parameter 
     ValidateArrayPtr SAPtr(Chars), Parameter
 End Sub
 
-Public Function ValidateCharArrayOptionalRange(ByRef Chars() As Integer, ByRef Index As Variant, ByRef Count As Variant, Optional ByVal CharsParameter As ParameterResourceKey = Parameter_Chars, _
-                                                                                                                         Optional ByVal IndexParameter As ParameterResourceKey = Parameter_Index, _
-                                                                                                                         Optional ByVal CountParameter As ParameterResourceKey = Parameter_Count) As ListRange
-    ValidateCharArray Chars, CharsParameter
-    ValidateCharArrayOptionalRange = GetOptionalRange(Index, Count, LBound(Chars), Len1D(Chars), IndexParameter, CountParameter)
-    If ValidateCharArrayOptionalRange.Index < LBound(Chars) Then
-        Error.ArgumentOutOfRange Environment.GetParameterName(IndexParameter), ArgumentOutOfRange_LBound
-    End If
-    If ValidateCharArrayOptionalRange.Count < 0 Then
-        Error.ArgumentOutOfRange Environment.GetParameterName(CountParameter), ArgumentOutOfRange_NeedNonNegNum
-    End If
-    If ValidateCharArrayOptionalRange.Index + ValidateCharArrayOptionalRange.Count - 1 > UBound(Chars) Then
-        Error.Argument Argument_InvalidOffLen
-    End If
-End Function
-
 Private Sub ValidateArrayPtr(ByVal Ptr As Long, ByVal Parameter As ParameterResourceKey)
     If Ptr = vbNullPtr Then
         Error.ArgumentNull Environment.GetParameterName(Parameter), ArgumentNull_Array

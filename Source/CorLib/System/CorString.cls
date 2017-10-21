@@ -106,8 +106,11 @@ End Function
 ' @return A string created from the chars in an integer array.
 '
 Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
+    ValidateArrayRange Chars, Index, Count, NameOfChars
+    
     Dim Range As ListRange
-    Range = ValidateCharArrayOptionalRange(Chars, Index, Count)
+    
+    Range = MakeRange(Chars, Index, Count)
     
     If Range.Count = 0 Then
         FromCharArray = ""
