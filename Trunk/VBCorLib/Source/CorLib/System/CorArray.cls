@@ -692,7 +692,7 @@ End Function
 '
 Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
     If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired
+        Error.Argument Argument_ArrayRequired, "Arr"
     
     Dim SafeArrayPtr  As Long
     
