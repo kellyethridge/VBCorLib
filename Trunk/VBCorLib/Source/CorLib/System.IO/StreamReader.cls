@@ -169,8 +169,8 @@ End Function
 ' @return The actual number of characters read.
 '
 Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
+    ValidateArrayRange Buffer, Index, Count, NameOfBuffer
     VerifyIsOpen
-    ValidateCharArrayRange Buffer, Index, Count, Parameter_Buffer
     
     Dim AvailableChars As Long
     ' We will loop until we have read the
