@@ -130,15 +130,28 @@ Public Sub Clear_WhenCalled_ThrowsNotSupportedException()
 End Sub
 
 Public Sub Clone_WhenCalled_ReturnsReadOnlyArrayList()
+    Dim Original As ArrayList
     Dim Clone As ArrayList
     Dim Actual As Boolean
     
-    With MakeList
-        Set Clone = .Clone
-        Actual = Clone.IsReadOnly
-    End With
+    Set Original = MakeList
+    Set Clone = Original.Clone
     
-    Assert.That Actual, Iz.True
+    Assert.That Clone.IsReadOnly, Iz.True
+    Assert.That Clone, Iz.EqualTo(Original)
+End Sub
+
+Public Sub Enumeration_WithList_IteratesList()
+    Dim List As ArrayList
+    Dim Value As Variant
+    
+    Set List = MakeList
+    
+    Dim Expected As New ArrayList
+    For Each Value In List
+        Expected.Add Value
+    Next
+    Assert.That Expected, Iz.EqualTo(Array(1, 2, 3))
 End Sub
 
 Private Function MakeList() As ArrayList

@@ -45,27 +45,46 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
+Implements IVersionableCollection
 
 Private mList As ArrayList
 
 
+Public Function NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+    Set NewEnum = CreateEnumerator(ArrayList_GetEnumerator)
+End Function
+
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList)
     Set mList = List
 End Sub
 
+Friend Sub InitClone(ByVal List As ArrayList)
+    Init List.Clone
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ArrayList Interface
+'   Private
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub ThrowNotSupported()
+    Error.NotSupported NotSupported_ReadOnlyCollection
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ArrayList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ArrayList_Add(Value As Variant) As Long
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Function
 
 Private Sub ArrayList_AddRange(c As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Function ArrayList_BinarySearch(Value As Variant, Optional ByVal Comparer As IComparer) As Long
@@ -77,7 +96,7 @@ Private Function ArrayList_BinarySearchEx(ByVal Index As Long, ByVal Count As Lo
 End Function
 
 Private Property Let ArrayList_Capacity(ByVal RHS As Long)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Property
 
 Private Property Get ArrayList_Capacity() As Long
@@ -85,13 +104,14 @@ Private Property Get ArrayList_Capacity() As Long
 End Property
 
 Private Sub ArrayList_Clear()
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Function ArrayList_Clone() As ArrayList
-    Dim Ret As New ReadOnlyArrayList
-    Call Ret.Init(mList.Clone)
-    Set ArrayList_Clone = Ret
+    Dim Clone As New ReadOnlyArrayList
+    
+    Clone.InitClone mList
+    Set ArrayList_Clone = Clone
 End Function
 
 Private Function ArrayList_Contains(Value As Variant) As Boolean
@@ -99,11 +119,11 @@ Private Function ArrayList_Contains(Value As Variant) As Boolean
 End Function
 
 Private Sub ArrayList_CopyTo(DstArray As Variant, Optional ArrayIndex As Variant)
-    Call mList.CopyTo(DstArray, ArrayIndex)
+    mList.CopyTo DstArray, ArrayIndex
 End Sub
 
 Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
-    Call mList.CopyToEx(Index, DstArray, ArrayIndex, Count)
+    mList.CopyToEx Index, DstArray, ArrayIndex, Count
 End Sub
 
 Private Property Get ArrayList_Count() As Long
@@ -115,30 +135,38 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
 End Function
 
 Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
-    Dim Result      As Long
-    Result = GetOptionalListRange(mList.Count, StartIndex, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, ElemIndex, "StartIndex", ElemCount, "Count", IsMissing(StartIndex))
+    Dim Range       As ListRange
+    Dim Enumerator  As New ArrayListEnumerator
+    
+    Range = GetOptionalRange(StartIndex, Count, 0, mList.Count)
+    
+    If Range.Index < 0 Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index + Range.Count > mList.Count Then _
+        Error.Argument Argument_InvalidOffLen
 
-    Dim Ret As New ArrayListEnumerator
-    Call Ret.Init(Me, ElemIndex, ElemCount)
-    Set ArrayList_GetEnumerator = Ret
+    Enumerator.Init Me, Range.Index, Range.Count
+    Set ArrayList_GetEnumerator = Enumerator
 End Function
 
 Private Function ArrayList_GetHashCode() As Long
-    ArrayList_GetHashCode = IObject_GetHashcode
+    ArrayList_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Function ArrayList_GetRange(ByVal Index As Long, ByVal Count As Long) As ArrayList
-    Dim Result As Long
-    Result = VerifyListRange(mList.Count, Index, Count)
-    If Result <> NO_ERROR Then Call ThrowListRangeException(Result, Index, "Index", Count, "Count")
+    Dim List As New RangedArrayList
+
+    If Index < 0 Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
+    If Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Index + Count > mList.Count Then _
+        Error.Argument Argument_InvalidOffLen
     
-    Dim Ret As RangedArrayList
-    Set Ret = New RangedArrayList
-    Call Ret.Init(Me, Index, Count)
-    Set ArrayList_GetRange = Ret
+    List.Init Me, Index, Count
+    Set ArrayList_GetRange = List
 End Function
 
 Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
@@ -146,11 +174,11 @@ Private Function ArrayList_IndexOf(Value As Variant, Optional ByRef StartIndex A
 End Function
 
 Private Sub ArrayList_Insert(ByVal Index As Long, Value As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Sub ArrayList_InsertRange(ByVal Index As Long, c As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Property Get ArrayList_IsFixedSize() As Boolean
@@ -162,15 +190,15 @@ Private Property Get ArrayList_IsReadOnly() As Boolean
 End Property
 
 Private Property Set ArrayList_Item(ByVal Index As Long, RHS As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Property
 
 Private Property Let ArrayList_Item(ByVal Index As Long, RHS As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Property
 
 Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(ArrayList_Item, mList(Index))
+    Helper.MoveVariant ArrayList_Item, mList(Index)
 End Property
 
 Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
@@ -182,27 +210,27 @@ Private Function ArrayList_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub ArrayList_Remove(Value As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Sub ArrayList_RemoveAt(ByVal Index As Long)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Sub ArrayList_Sort(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Comparer As IComparer)
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 Private Function ArrayList_ToArray(Optional ByVal ArrayType As VbVarType = 12&) As Variant
@@ -214,12 +242,12 @@ Private Function ArrayList_ToString() As String
 End Function
 
 Private Sub ArrayList_TrimToSize()
-    Throw Cor.NewNotSupportedException(Environment.GetResourceString(NotSupported_ReadOnlyCollection))
+    ThrowNotSupported
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = ArrayList_Clone
@@ -227,14 +255,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = MyBase.Equals(Me, Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = MyBase.GetHashCode(Me)
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
 Private Function IObject_ToString() As String
@@ -243,10 +271,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICollection Interface
+'   ICollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub ICollection_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call ArrayList_CopyTo(Arr, Index)
+    ArrayList_CopyTo Arr, Index
 End Sub
 
 Private Property Get ICollection_Count() As Long
@@ -263,7 +291,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = ArrayList_GetEnumerator
@@ -275,14 +303,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IList Interface
+'   IList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IList_Add(Value As Variant) As Long
     IList_Add = ArrayList_Add(Value)
 End Function
 
 Private Sub IList_Clear()
-    Call ArrayList_Clear
+    ArrayList_Clear
 End Sub
 
 Private Function IList_Contains(Value As Variant) As Boolean
@@ -290,7 +318,7 @@ Private Function IList_Contains(Value As Variant) As Boolean
 End Function
 
 Private Sub IList_CopyTo(Arr As Variant, ByVal Index As Long)
-    Call ArrayList_CopyTo(Arr, Index)
+    ArrayList_CopyTo Arr, Index
 End Sub
 
 Private Property Get IList_Count() As Long
@@ -306,7 +334,7 @@ Private Function IList_IndexOf(Value As Variant) As Long
 End Function
 
 Private Sub IList_Insert(ByVal Index As Long, Value As Variant)
-    Call ArrayList_Insert(Index, Value)
+    ArrayList_Insert Index, Value
 End Sub
 
 Private Property Get IList_IsFixedSize() As Boolean
@@ -326,7 +354,7 @@ Private Property Let IList_Item(ByVal Index As Long, Value As Variant)
 End Property
 
 Private Property Get IList_Item(ByVal Index As Long) As Variant
-    Call Helper.MoveVariant(IList_Item, ArrayList_Item(Index))
+    Helper.MoveVariant IList_Item, ArrayList_Item(Index)
 End Property
 
 Private Function IList_NewEnum() As stdole.IUnknown
@@ -334,11 +362,17 @@ Private Function IList_NewEnum() As stdole.IUnknown
 End Function
 
 Private Sub IList_Remove(Value As Variant)
-    Call ArrayList_Remove(Value)
+    ArrayList_Remove Value
 End Sub
 
 Private Sub IList_RemoveAt(ByVal Index As Long)
-    Call ArrayList_RemoveAt(Index)
+    ArrayList_RemoveAt Index
 End Sub
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IVersionableCollection
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Property Get IVersionableCollection_CurrentVersion() As Long
+    IVersionableCollection_CurrentVersion = GetCollectionVersion(mList)
+End Property
