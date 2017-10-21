@@ -46,7 +46,7 @@ Attribute VB_Exposed = True
 ' This class cannot be instantiated. It represents a set of static methods that
 ' are accessed through the name of the class; Buffer.*<br><br>
 ' <pre>
-' Buffer.BlockCopy <i>srCorArray</i>, <i>sourceindex</i>, <i>dstArray</i>, <i>destinationindex</i>, <i>Count</i><br>
+' Buffer.BlockCopy <i>SrcArray</i>, <i>SourceIndex</i>, <i>DstArray</i>, <i>DestinationIndex</i>, <i>Count</i><br>
 ' </pre>
 '
 Option Explicit
@@ -65,8 +65,15 @@ Option Explicit
 ' <p>The lowerbound of the arrays is ignored. The first byte is at index 0.</p>
 '
 Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef Destination As Variant, ByVal DestinationOffset As Long, ByVal Count As Long)
-    Dim SourcePtr As Long
-    Dim DestinationPtr As Long
+    If Not IsArray(Source) Then _
+        Error.Argument Argument_ArrayRequired, "Source"
+    If Not IsArray(Destination) Then _
+        Error.Argument Argument_ArrayRequired, "Destination"
+    
+    Dim SourcePtr           As Long
+    Dim DestinationPtr      As Long
+    Dim SourceLength        As Long
+    Dim DestinationLength   As Long
     
     SourcePtr = SAPtrV(Source)
     DestinationPtr = SAPtrV(Destination)
@@ -81,9 +88,6 @@ Public Sub BlockCopy(ByRef Source As Variant, ByVal SourceOffset As Long, ByRef 
         Error.ArgumentOutOfRange "DestinationOffset", ArgumentOutOfRange_NeedNonNegNum
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
-    
-    Dim SourceLength        As Long
-    Dim DestinationLength   As Long
     
     SourceLength = CorArray.Length(Source) * SafeArrayGetElemsize(SourcePtr)
     DestinationLength = CorArray.Length(Destination) * SafeArrayGetElemsize(DestinationPtr)
@@ -105,6 +109,9 @@ End Sub
 ' in the array and multiply it by the number of bytes each element
 ' is in length.
 Public Function ByteLength(ByRef Arr As Variant) As Long
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, "Arr"
+    
     Dim ArrayPtr As Long
     ArrayPtr = SAPtrV(Arr)
     
@@ -126,6 +133,9 @@ End Function
 ' <p>The lowerbound of the array is ignored. Index begins at 0.</p>
 '
 Public Function GetByte(ByRef Arr As Variant, ByVal Index As Long) As Byte
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, "Arr"
+    
     Dim ArrayPtr As Long
     ArrayPtr = SAPtrV(Arr)
     
@@ -149,6 +159,9 @@ End Function
 ' <p>The lowerbound of the array is ignored. Index begins at 0.</p>
 '
 Public Sub SetByte(ByRef Arr As Variant, ByVal Index As Long, ByVal Value As Byte)
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired, "Arr"
+    
     Dim ArrayPtr As Long
     ArrayPtr = SAPtrV(Arr)
     
