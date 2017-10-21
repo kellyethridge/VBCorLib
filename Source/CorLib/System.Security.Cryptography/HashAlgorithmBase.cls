@@ -82,7 +82,7 @@ End Property
 ''
 ' Computes the hash on a source in its entirety.
 '
-' @param Source The source of data compute the hash for. This can be a byte array or object implementing the Stream interface.
+' @param InputStreamOrBuffer The source of data compute the hash for. This can be a byte array or object implementing the Stream interface.
 ' @param Index The starting index in a byte array source. If the source is not a byte array, this argument is ignored.
 ' @param Count The number of bytes to compute the hash on. If the source is not a byte array, this argument is ignored.
 ' @return The hash value computed from the source provided.
@@ -90,16 +90,17 @@ End Property
 ' the stream no longer returns data.
 ' <p>If data has already been processed using TransformBlock, then that data will be included in the hashing process.</p>
 '
-Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
+Public Function ComputeHash(ByRef InputStreamOrBuffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte()
     VerifyNotDisposed
     
-    Select Case VarType(Source)
+    Select Case VarType(InputStreamOrBuffer)
         Case vbByteArray
-            ComputeHashOnBytes Source, Index, Count
+            ValidateArrayRange InputStreamOrBuffer, Index, Count, NameOfBuffer
+            ComputeHashOnBytes InputStreamOrBuffer, Index, Count
         Case vbObject
-            ComputeHashOnStream Source
+            ComputeHashOnStream InputStreamOrBuffer
         Case Else
-            Error.Argument Argument_ByteArrayOrStreamRequired, "Source"
+            Error.Argument Argument_ByteArrayOrStreamRequired, "InputStreamOrBuffer"
     End Select
     
     Dim Result() As Byte
@@ -318,12 +319,12 @@ Private Sub ComputeHashOnStream(ByRef Source As Variant)
 End Sub
 
 Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, ByRef Count As Variant)
-    On Error GoTo Catch
+    Dim Buffer()    As Byte
+    Dim Range       As ListRange
     
-    Dim Buffer() As Byte
-    Dim Range As ListRange
+    On Error GoTo Catch
     SAPtr(Buffer) = SAPtrV(Source)
-    Range = ValidateByteArrayOptionalRange(Buffer, Index, Count, Parameter_Buffer)
+    Range = MakeRange(Source, Index, Count)
     HashCore Buffer, Range.Index, Range.Count
     
     GoSub Finally
@@ -331,7 +332,7 @@ Private Sub ComputeHashOnBytes(ByRef Source As Variant, ByRef Index As Variant, 
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     SAPtr(Buffer) = vbNullPtr
     Return

@@ -75,22 +75,6 @@ Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRe
     End If
 End Sub
 
-Public Function ValidateByteArrayOptionalRange(ByRef Bytes() As Byte, ByRef Index As Variant, ByRef Count As Variant, Optional ByVal BytesParameter As ParameterResourceKey = Parameter_Bytes, _
-                                                                                                                      Optional ByVal IndexParameter As ParameterResourceKey = Parameter_Index, _
-                                                                                                                      Optional ByVal CountParameter As ParameterResourceKey = Parameter_Count) As ListRange
-    ValidateArray Bytes, BytesParameter
-    ValidateByteArrayOptionalRange = GetOptionalRange(Index, Count, LBound(Bytes), Len1D(Bytes), IndexParameter, CountParameter)
-    If ValidateByteArrayOptionalRange.Index < LBound(Bytes) Then
-        Error.ArgumentOutOfRange Environment.GetParameterName(IndexParameter), ArgumentOutOfRange_LBound
-    End If
-    If ValidateByteArrayOptionalRange.Count < 0 Then
-        Error.ArgumentOutOfRange Environment.GetParameterName(CountParameter), ArgumentOutOfRange_NeedNonNegNum
-    End If
-    If ValidateByteArrayOptionalRange.Index + ValidateByteArrayOptionalRange.Count - 1 > UBound(Bytes) Then
-        Error.Argument Argument_InvalidOffLen
-    End If
-End Function
-
 Public Sub ValidateCharArray(ByRef Chars() As Integer, Optional ByVal Parameter As ParameterResourceKey = Parameter_Chars)
     ValidateArrayPtr SAPtr(Chars), Parameter
 End Sub

@@ -113,7 +113,7 @@ Public Sub Clear(): End Sub
 ''
 ' Computes the hash on a source in its entirety.
 '
-' @param Source The source of data compute the hash for. This can be a byte array or object implementing the Stream interface.
+' @param InputStreamOrBuffer The source of data compute the hash for. This can be a byte array or object implementing the Stream interface.
 ' @param Index The starting index in a byte array source. If the source is not a byte array, this argument is ignored.
 ' @param Count The number of bytes to compute the hash on. If the source is not a byte array, this argument is ignored.
 ' @return The hash value computed from the source provided.
@@ -121,7 +121,7 @@ Public Sub Clear(): End Sub
 ' the stream no longer returns data.
 ' <p>If data has already been processed using TransformBlock, then that data will be included in the hashing process.</p>
 '
-Public Function ComputeHash(ByRef Source As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte(): End Function
+Public Function ComputeHash(ByRef InputStreamOrBuffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Byte(): End Function
 
 ''
 ' Returns if the Value is equal to this object instance.

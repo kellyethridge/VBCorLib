@@ -66,7 +66,7 @@ Public Sub ComputeHash_WithNonSupportedType_ThrowsArgumentException()
     On Error Resume Next
     Provider.ComputeHash InvalidType
     
-    AssertArgumentException Err, "Source"
+    AssertArgumentException Err, "InputStreamOrBuffer"
 End Sub
 
 Public Sub ComputeHash_WithByteArray_ReturnsExpected(ByVal Message As String, ByVal Digest As String)
