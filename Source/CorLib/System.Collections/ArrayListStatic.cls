@@ -59,9 +59,9 @@ Public Function ReadOnly(ByVal List As ArrayList) As ArrayList
     If List Is Nothing Then _
         Error.ArgumentNull "List"
     
-    Dim Ret As New ReadOnlyArrayList
-    Ret.Init List
-    Set ReadOnly = Ret
+    Dim Result As New ReadOnlyArrayList
+    Result.Init List
+    Set ReadOnly = Result
 End Function
 
 ''
