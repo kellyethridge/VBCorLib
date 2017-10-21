@@ -361,10 +361,10 @@ Public Sub CopyTo_WithIndex_CopiesToArray(ByVal Index As Long, ByRef Expected As
 End Sub
 
 Public Sub CopyTo_WithNullArray_ThrowsArgumentNullException()
-    On Error Resume Next
     Dim List As New SortedList
-    Dim NullArray() As DictionaryEntry
+    Dim NullArray() As Long
     
+    On Error Resume Next
     List.CopyTo NullArray, 0
     
     AssertArgumentNullException Err, "Arr"
