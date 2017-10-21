@@ -75,16 +75,3 @@ Public Sub ValidateArrayRange(ByRef Arr As Variant, ByRef Index As Variant, ByRe
     End If
 End Sub
 
-Public Sub ValidateCharArray(ByRef Chars() As Integer, Optional ByVal Parameter As ParameterResourceKey = Parameter_Chars)
-    ValidateArrayPtr SAPtr(Chars), Parameter
-End Sub
-
-Private Sub ValidateArrayPtr(ByVal Ptr As Long, ByVal Parameter As ParameterResourceKey)
-    If Ptr = vbNullPtr Then
-        Error.ArgumentNull Environment.GetParameterName(Parameter), ArgumentNull_Array
-    End If
-    If SafeArrayGetDim(Ptr) <> 1 Then
-        Error.Rank
-    End If
-End Sub
-
