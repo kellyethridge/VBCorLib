@@ -52,7 +52,6 @@ Class=DictionaryEntryTests; System.Collections\DictionaryEntryTests.cls
 Class=DirectoryTests; System.IO\DirectoryTests.cls
 Class=DirectoryInfoTests; System.IO\DirectoryInfoTests.cls
 Class=DriveInfoTests; System.IO\DriveInfoTests.cls
-Class=TestDSACryptoServiceProvider; TestDSACryptoServiceProvider.cls
 Class=TestEncoding437; TestEncoding437.cls
 Class=TestEnvironment; TestEnvironment.cls
 Class=ExceptionTests; System\ExceptionTests.cls
