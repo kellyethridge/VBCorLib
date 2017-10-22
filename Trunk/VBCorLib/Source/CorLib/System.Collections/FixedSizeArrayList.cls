@@ -113,7 +113,7 @@ End Function
 
 Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
     Dim Range As ListRange
-    Range = MakeDefaultRange(Index, Count, 0, mList.Count)
+    Range = MakeDefaultRange(Index, 0, Count, mList.Count)
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
     If Range.Count < 0 Then _

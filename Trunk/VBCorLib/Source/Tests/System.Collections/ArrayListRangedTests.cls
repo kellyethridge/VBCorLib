@@ -272,6 +272,56 @@ Public Sub LastIndexOf_WithValue_ReturnsExpected(ByVal Value As Long, ByVal Expe
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub LastIndexOf_WithMissingCount_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeRangedList()
+    
+    On Error Resume Next
+    List.LastIndexOf 1, 1
+    
+    AssertArgumentException Err, "Count"
+End Sub
+
+Public Sub LastIndexOf_WithMissingStartIndex_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeRangedList()
+    
+    On Error Resume Next
+    List.LastIndexOf 1, , 1
+    
+    AssertArgumentException Err, "StartIndex"
+End Sub
+
+Public Sub LastIndexOf_WithStartIndexPastEndOfList_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.LastIndexOf 1, List.Count, 1
+    
+    AssertArgumentOutOfRangeException Err, "StartIndex"
+End Sub
+
+Public Sub LastIndexOf_WithNegativeCount_ThrowArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.LastIndexOf 1, List.Count - 1, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub LastIndexOf_WithInvalidPositionWithinList_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.LastIndexOf 1, List.Count - 1, List.Count + 1
+    
+    AssertArgumentException Err, "Count"
+End Sub
+
 Public Sub RemoveAt_WithIndexZero_RemovesFirstElement()
     Dim List As ArrayList
     Dim Ranged As ArrayList
@@ -312,6 +362,56 @@ Public Sub Reverse_WhenCalled_ReversedElements()
     Assert.That List, Iz.EqualTo(Array(1, 2, 3, 2, 1, 4, 3, 4))
 End Sub
 
+Public Sub Reverse_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.Reverse -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub Reverse_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.Reverse 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Reverse_WithIndexAndCountExceedLength_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.Reverse 5, 6
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub Reverse_WithOnlyIndex_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.Reverse 1
+    
+    AssertArgumentException Err, "Count"
+End Sub
+
+Public Sub Reverse_WithOnlyCount_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeRangedList
+    
+    On Error Resume Next
+    List.Reverse , 1
+    
+    AssertArgumentException Err, "Index"
+End Sub
+
 Public Sub ToArray_WhenCalled_CopiesRangeToArray()
     Dim List As ArrayList
     Dim Ranged As ArrayList
@@ -334,6 +434,9 @@ Public Sub SetRanged_WhenCalled_OverritesValuesInRange()
     Assert.That List, Iz.EqualTo(Array(1, 2, "a", "b", 1, 2, 3, 4))
 End Sub
 
+Private Function MakeRangedList() As ArrayList
+    Set MakeRangedList = MakeFilledRanged(New ArrayList)
+End Function
 
 Private Function MakeFilledRanged(ByRef List As ArrayList) As ArrayList
     Set List = New ArrayList

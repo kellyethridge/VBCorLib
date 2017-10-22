@@ -78,3 +78,46 @@ Public Sub ValidateArray(ByRef Arr As Variant, Optional ByVal ArrName As Paramet
     End If
 End Sub
 
+Public Sub ValidateByteRange(ByRef Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, _
+                             Optional ByVal BytesName As ParameterName = NameOfBytes, _
+                             Optional ByVal IndexName As ParameterName = NameOfIndex, _
+                             Optional ByVal CountName As ParameterName = NameOfCount)
+    If SAPtr(Bytes) = vbNullPtr Then
+        Error.ArgumentNull Environment.GetParameterName(BytesName), ArgumentNull_Array
+    End If
+    
+    If Index < LBound(Bytes) Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(IndexName), ArgumentOutOfRange_LBound
+    End If
+    
+    If Count < 0 Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(CountName), ArgumentOutOfRange_NeedNonNegNum
+    End If
+    
+    If Index + Count - 1 > UBound(Bytes) Then
+        Error.Argument Argument_InvalidOffLen
+    End If
+End Sub
+
+Public Sub ValidateCharRange(ByRef Chars() As Integer, ByVal Index As Long, ByVal Count As Long, _
+                             Optional ByVal CharsName As ParameterName = NameOfChars, _
+                             Optional ByVal IndexName As ParameterName = NameOfIndex, _
+                             Optional ByVal CountName As ParameterName = NameOfCount)
+    If SAPtr(Chars) = vbNullPtr Then
+        Error.ArgumentNull Environment.GetParameterName(CharsName), ArgumentNull_Array
+    End If
+    
+    If Index < LBound(Chars) Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(IndexName), ArgumentOutOfRange_LBound
+    End If
+    
+    If Count < 0 Then
+        Error.ArgumentOutOfRange Environment.GetParameterName(CountName), ArgumentOutOfRange_NeedNonNegNum
+    End If
+    
+    If Index + Count - 1 > UBound(Chars) Then
+        Error.Argument Argument_InvalidOffLen
+    End If
+End Sub
+
+

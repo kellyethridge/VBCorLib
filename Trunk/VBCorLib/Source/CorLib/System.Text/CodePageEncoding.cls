@@ -194,9 +194,11 @@ Private Function Encoding_GetBytes(Chars As Variant, Optional Index As Variant, 
     
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim Result      As Long
-    Result = GetOptionalArrayRange(SAPtr(mChars), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Dim Range As ListRange
+    
+    Range = MakeArrayRange(mChars, Index, Count)
+    ElemIndex = Range.Index
+    ElemCount = Range.Count
     
     Dim Size As Long
     Size = Encoding_GetMaxByteCount(ElemCount)
@@ -219,20 +221,14 @@ End Function
 Private Function Encoding_GetBytesEx(Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, Bytes() As Byte, ByVal ByteIndex As Long) As Long
     Call AttachChars(Chars, mChars, mCharsSA)
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(mChars), CharIndex, CharCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Chars", CharIndex, "CharIndex", CharCount, "CharCount")
+    ValidateArrayRange mChars, CharIndex, CharCount, NameOfChars, NameOfCharIndex, NameOfCharCount
+    
     
     If CharCount > 0 Then
         Dim RequiredSize As Long
         RequiredSize = WideCharToMultiByte(mCodePage, 0, mChars(CharIndex), CharCount, 0, 0, vbNullString, 0)
-        
-        Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, RequiredSize)
-        Select Case Result
-            Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Bytes")
-            Case Is <> NO_ERROR:                Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", 0, vbNullString)
-        End Select
-        
+        ValidateArrayRange Bytes, ByteIndex, RequiredSize
+                
         Encoding_GetBytesEx = WideCharToMultiByte(mCodePage, 0, mChars(CharIndex), CharCount, Bytes(ByteIndex), CorArray.Length(Bytes), vbNullString, 0)
     End If
     SAPtr(mChars) = 0
@@ -241,10 +237,11 @@ End Function
 Private Function Encoding_GetCharCount(Bytes() As Byte, Optional Index As Variant, Optional Count As Variant) As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim Result      As Long
+    Dim Range As ListRange
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Byte", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Range = MakeArrayRange(Bytes, Index, Count)
+    ElemIndex = Range.Index
+    ElemCount = Range.Count
     
     If ElemCount = 0 Then Exit Function
     Encoding_GetCharCount = MultiByteToWideChar(mCodePage, 0, Bytes(ElemIndex), ElemCount, ByVal 0&, 0)
@@ -253,11 +250,12 @@ End Function
 Private Function Encoding_GetChars(Bytes() As Byte, Optional Index As Variant, Optional Count As Variant) As Integer()
     Dim ElemIndex As Long
     Dim ElemCount As Long
+    Dim Range As ListRange
     
-    Dim Result As Long
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
-    
+    Range = MakeArrayRange(Bytes, Index, Count)
+    ElemIndex = Range.Index
+    ElemCount = Range.Count
+        
     Dim Size As Long
     Size = Encoding_GetMaxCharCount(ElemCount)
     
@@ -275,19 +273,12 @@ Private Function Encoding_GetChars(Bytes() As Byte, Optional Index As Variant, O
 End Function
 
 Private Function Encoding_GetCharsEx(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount")
+    ValidateByteRange Bytes, ByteIndex, ByteCount, NameOfBytes, NameOfByteIndex, NameOfByteCount
     
     If ByteCount > 0 Then
         Dim RequiredSize As Long
         RequiredSize = MultiByteToWideChar(mCodePage, 0, Bytes(ByteIndex), ByteCount, ByVal 0&, 0)
-        
-        Result = VerifyArrayRange(SAPtr(Chars), CharIndex, RequiredSize)
-        Select Case Result
-            Case Argument_InvalidOffLen:   Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_SmallConversionBuffer), "Chars")
-            Case Is <> NO_ERROR:                Call ThrowArrayRangeException(Result, "Chars", CharIndex, "CharIndex", 0, vbNullString)
-        End Select
+        ValidateCharRange Chars, CharIndex, RequiredSize
         
         Encoding_GetCharsEx = MultiByteToWideChar(mCodePage, 0, Bytes(ByteIndex), ByteCount, Chars(CharIndex), CorArray.Length(Chars))
     End If
@@ -329,10 +320,11 @@ End Function
 Private Function Encoding_GetString(Bytes() As Byte, Optional Index As Variant, Optional Count As Variant) As String
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
-    Dim Result      As Long
+    Dim Range As ListRange
     
-    Result = GetOptionalArrayRange(SAPtr(Bytes), Index, ElemIndex, Count, ElemCount)
-    If Result <> NO_ERROR Then Call ThrowArrayRangeException(Result, "Bytes", ElemIndex, "Index", ElemCount, "Count", IsMissing(Index))
+    Range = MakeArrayRange(Bytes, Index, Count)
+    ElemIndex = Range.Index
+    ElemCount = Range.Count
     
     Dim Size As Long
     Size = Encoding_GetMaxCharCount(Count)

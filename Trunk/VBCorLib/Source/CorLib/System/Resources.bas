@@ -361,5 +361,6 @@ Public Enum ParameterName
     NameOfSignature = 2037
     NameOfRgb = 2038
     NameOfKeyBlob = 2039
+    NameOfArrayIndex = 2040
 End Enum
 

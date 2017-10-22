@@ -110,10 +110,7 @@ Private Property Get Decoder_FallbackBuffer() As DecoderFallbackBuffer
 End Property
 
 Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVal Count As Long, Optional ByVal Flush As Boolean) As Long
-    Dim Result As Long
-    
-    Result = VerifyArrayRange(SAPtr(Bytes), Index, Count)
-    If Result <> NO_ERROR Then ThrowArrayRangeException Result, "Bytes", Index, "Index", Count, "Count"
+    ValidateByteRange Bytes, Index, Count
     
     Dim Offset As Long
     If mLastByte >= 0 Then
@@ -140,11 +137,8 @@ Private Function Decoder_GetCharCount(Bytes() As Byte, ByVal Index As Long, ByVa
 End Function
 
 Private Function Decoder_GetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, Chars() As Integer, ByVal CharIndex As Long, Optional ByVal Flush As Boolean) As Long
-    Dim Result As Long
+    ValidateByteRange Bytes, ByteIndex, ByteCount, NameOfBytes, NameOfByteIndex, NameOfByteCount
     
-    Result = VerifyArrayRange(SAPtr(Bytes), ByteIndex, ByteCount)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "Bytes", ByteIndex, "ByteIndex", ByteCount, "ByteCount"
     If CorArray.IsNull(Chars) Then _
         Throw Cor.NewArgumentNullException("Chars", Environment.GetResourceString(ArgumentNull_Array))
     If CharIndex < LBound(Chars) Then _
