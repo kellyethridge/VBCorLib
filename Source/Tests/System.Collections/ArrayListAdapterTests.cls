@@ -365,6 +365,56 @@ Public Sub Reverse_WithSubset_ReversesSubset()
     Assert.That Adapter, Iz.EqualTo(Array(1, 2, 1, 4, 3, 2, 3, 4))
 End Sub
 
+Public Sub Reverse_WithNegativeIndex_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse -1, 1
+    
+    AssertArgumentOutOfRangeException Err, "Index"
+End Sub
+
+Public Sub Reverse_WithNegativeCount_ThrowsArgumentOutOfRangeException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub Reverse_WithIndexAndCountExceedLength_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse 5, 6
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub Reverse_WithOnlyIndex_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse 1
+    
+    AssertArgumentException Err, "Count"
+End Sub
+
+Public Sub Reverse_WithOnlyCount_ThrowsArgumentException()
+    Dim List As ArrayList
+    Set List = MakeFilledList
+    
+    On Error Resume Next
+    List.Reverse , 1
+    
+    AssertArgumentException Err, "Index"
+End Sub
+
 Public Sub IndexOf_WhenCalled_ReturnsExpected()
     Dim Adapter As ArrayList
     Set Adapter = MakeFilledAdapter
@@ -490,6 +540,10 @@ Public Sub Sort_WithSubset_SortsSubset()
     
     Assert.That Adapter, Iz.EqualTo(Array(1, 2, 1, 2, 3, 4, 3, 4))
 End Sub
+
+Private Function MakeFilledList() As ArrayList
+    Set MakeFilledList = MakeFilledAdapter
+End Function
 
 Private Function MakeFilledAdapter() As ArrayList
     Dim List As New ArrayList

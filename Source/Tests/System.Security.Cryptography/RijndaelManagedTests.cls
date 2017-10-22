@@ -63,6 +63,19 @@ Public Sub Encrypt_WithECBMode_ReturnsExpected(ByVal KeySize As Long, ByRef Expe
     Assert.That CipherText, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub Encrypt_WithNullInputBuffer_ThrowsArgumentNullException()
+    Dim Transform As ICryptoTransform
+    Dim Encryption As New RijndaelManaged
+    Dim Output(0) As Byte
+    
+    Set Transform = Encryption.CreateEncryptor
+    
+    On Error Resume Next
+    Transform.TransformBlock NullBytes, 0, 1, Output, 0
+    
+    AssertArgumentNullException Err, "InputBuffer"
+End Sub
+
 Public Sub Decrypt_WithECBMode_ReturnsExpected(ByVal KeySize As Long, ByRef CipherText() As Byte)
     Dim Transform As ICryptoTransform
     Set Transform = CreateTransform(KeySize, "CreateDecryptor")

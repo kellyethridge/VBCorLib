@@ -138,7 +138,7 @@ Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, O
     Dim Range       As ListRange
     Dim Enumerator  As New ArrayListEnumerator
     
-    Range = MakeDefaultRange(StartIndex, Count, 0, mList.Count)
+    Range = MakeDefaultRange(StartIndex, 0, Count, mList.Count)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum

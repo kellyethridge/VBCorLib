@@ -219,10 +219,7 @@ Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal A
     If Index + Count > mList.Count Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtrV(DstArray), ArrayIndex, Count)
-    If Result Then _
-        ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
+    ValidateArrayRange DstArray, ArrayIndex, Count, NameOfDstArray, NameOfArrayIndex
     
     Dim v As Variant
     Dim i As Long
@@ -414,45 +411,47 @@ Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
 End Sub
 
 Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    Dim ElemCount   As Long
-    Dim ElemIndex   As Long
+    Dim RangeIndex As Long
+    Dim RangeCount As Long
     
-    If GetOptionalLongPair(Index, 0, ElemIndex, Count, mList.Count, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + ElemCount > mList.Count Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
+    If IsMissing(Index) <> IsMissing(Count) Then _
+        Error.Argument Argument_ParamRequired, IIf(IsMissing(Index), "Index", "Count")
+    
+    RangeIndex = CLngOrDefault(Index, 0)
+    RangeCount = CLngOrDefault(Count, mList.Count)
+    
+    If RangeIndex < 0 Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
+    If RangeCount < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If RangeIndex + RangeCount > mList.Count Then _
+        Error.Argument Argument_InvalidOffLen
 
-    Dim t1 As Variant
-    Dim t2 As Variant
-    Dim i As Long
-    Dim j As Long
+    Dim t1  As Variant
+    Dim t2  As Variant
+    Dim i   As Long
+    Dim j   As Long
     
-    i = ElemIndex
-    j = ElemIndex + ElemCount - 1
+    i = RangeIndex
+    j = RangeIndex + RangeCount - 1
     
     Do While i < j
         Helper.MoveVariant t1, mList(i)
         Helper.MoveVariant t2, mList(j)
+        SetItem j, t1
+        SetItem i, t2
         
-        If IsObject(t1) Then
-            Set mList(j) = t1
-        Else
-            mList(j) = t1
-        End If
-        
-        If IsObject(t2) Then
-            Set mList(i) = t2
-        Else
-            mList(i) = t2
-        End If
-    
         i = i + 1
         j = j - 1
     Loop
+End Sub
+
+Private Sub SetItem(ByVal Index As Long, ByRef Value As Variant)
+    If IsObject(Value) Then
+        Set mList(Index) = Value
+    Else
+        mList(Index) = Value
+    End If
 End Sub
 
 Private Sub ArrayList_SetRange(ByVal Index As Long, c As Variant)

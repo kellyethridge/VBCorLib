@@ -180,10 +180,8 @@ Private Property Get Stream_Position() As Currency
 End Property
 
 Private Function Stream_ReadBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Buffer), Offset, Count)
-    If Result <> NO_ERROR Then _
-        Call ThrowArrayRangeException(Result, "Buffer", Offset, "Offset", Count, "Count")
+    ValidateByteRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
+    
     If Not mCanRead Then _
         Throw Cor.NewNotSupportedException("Stream does not support reading")
     
@@ -221,10 +219,8 @@ Private Function Stream_ToString() As String
 End Function
 
 Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtr(Buffer), Offset, Count)
-    If Result <> NO_ERROR Then _
-        Call ThrowArrayRangeException(Result, "Buffer", Offset, "Offset", Count, "Count")
+    ValidateByteRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
+    
     If Not mCanWrite Then _
         Throw Cor.NewNotSupportedException("The stream does not support writing.")
     

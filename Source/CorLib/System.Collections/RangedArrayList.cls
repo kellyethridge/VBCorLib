@@ -193,10 +193,8 @@ End Sub
 Private Sub ArrayList_CopyToEx(ByVal Index As Long, DstArray As Variant, ByVal ArrayIndex As Long, ByVal Count As Long)
     VerifyVersion
     
-    Dim Result As Long
-    Result = VerifyArrayRange(SAPtrV(DstArray), ArrayIndex, Count)
-    If Result <> NO_ERROR Then _
-        ThrowArrayRangeException Result, "DstArray", ArrayIndex, "ArrayIndex", Count, "Count"
+    ValidateArrayRange DstArray, ArrayIndex, Count, NameOfDstArray, NameOfArrayIndex
+    
     If Index < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If Count < 0 Then _
@@ -341,21 +339,22 @@ Private Property Get ArrayList_Item(ByVal Index As Long) As Variant
 End Property
 
 Private Function ArrayList_LastIndexOf(Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    Dim Range As ListRange
+    Dim Index As Long
+    
+    Range = MakeDefaultRange(StartIndex, mCount - 1, Count, mCount, NameOfStartIndex)
+    
+    If Range.Index >= mCount Then _
+        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_UBound
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index - Range.Count + 1 < 0 Then _
+        Error.Argument Argument_InvalidOffLen, "Count"
+    
     VerifyVersion
     
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
-    If GetOptionalLongPair(StartIndex, mCount - 1, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(StartIndex), "StartIndex", "Count"))
-    If ElemIndex >= mCount Then _
-        Throw Cor.NewArgumentOutOfRangeException("StartIndex", Environment.GetResourceString(ArgumentOutOfRange_UBound))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex - ElemCount + 1 < 0 Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen), "Count")
-
-    Dim Index As Long
-    Index = mList.LastIndexOf(Value, mIndex + ElemIndex, ElemCount)
+    Index = mList.LastIndexOf(Value, mIndex + Range.Index, Range.Count)
+    
     If Index >= 0 Then
         Index = Index - mIndex
     End If
@@ -404,21 +403,19 @@ Private Sub ArrayList_RemoveRange(ByVal Index As Long, ByVal Count As Long)
 End Sub
 
 Private Sub ArrayList_Reverse(Optional ByRef Index As Variant, Optional ByRef Count As Variant)
+    Dim Range As ListRange
+    
+    Range = MakeDefaultRange(Index, 0, Count, mCount)
+    
+    If Range.Index < 0 Then _
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
+    If Range.Index + Range.Count > mCount Then _
+        Error.Argument Argument_InvalidOffLen
+    
     VerifyVersion
-    
-    Dim ElemCount As Long
-    Dim ElemIndex As Long
-    
-    If GetOptionalLongPair(Index, 0, ElemIndex, Count, mCount, ElemCount) = Argument_ParamRequired Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ParamRequired), IIf(IsMissing(Index), "Index", "Count"))
-    If ElemIndex < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Index", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemCount < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Count", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If ElemIndex + ElemCount > mCount Then _
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
-    
-    mList.Reverse mIndex + ElemIndex, ElemCount
+    mList.Reverse mIndex + Range.Index, Range.Count
     mVersion = mVersion + 1
 End Sub
 

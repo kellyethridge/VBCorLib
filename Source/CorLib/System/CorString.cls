@@ -187,7 +187,7 @@ End Function
 '
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
     Dim Range As ListRange
-    Range = MakeDefaultRange(StartIndex, Length, 0, Len(s), Parameter_StartIndex, Parameter_Length)
+    Range = MakeDefaultRange(StartIndex, 0, Length, Len(s), Parameter_StartIndex, Parameter_Length)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -308,7 +308,7 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
     ValidateArray Value, Parameter_Value
     
     Dim Range As ListRange
-    Range = MakeDefaultRange(StartIndex, Count, LBound(Value), Len1D(Value), Parameter_StartIndex)
+    Range = MakeDefaultRange(StartIndex, LBound(Value), Count, Len1D(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_LBound
