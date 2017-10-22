@@ -326,7 +326,7 @@ Public Function ToString(ByRef Value() As Byte, Optional ByRef StartIndex As Var
         Error.ArgumentNull "Value", ArgumentNull_Array
     
     Dim Range As ListRange
-    Range = MakeDefaultStepRange(StartIndex, Count, LBound(Value), Len1D(Value), Parameter_StartIndex)
+    Range = MakeDefaultStepRange(StartIndex, LBound(Value), Count, Len1D(Value), Parameter_StartIndex)
     
     ValidateArrayArguments Value, Range.Index, Range.Count
     

@@ -739,7 +739,7 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
     Ptr = SAPtrV(Arr)
     
     Dim Range As ListRange
-    Range = MakeDefaultStepRange(StartIndex, Count, LBound(Arr), Len1D(Arr), Parameter_StartIndex)
+    Range = MakeDefaultStepRange(StartIndex, LBound(Arr), Count, Len1D(Arr), Parameter_StartIndex)
     
     If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_ArrayBounds

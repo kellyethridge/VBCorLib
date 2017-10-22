@@ -374,7 +374,7 @@ End Function
 Public Function IndexOf(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Range = MakeDefaultStepRange(StartIndex, Count, 0, mCount, Parameter_StartIndex)
+    Range = MakeDefaultStepRange(StartIndex, 0, Count, mCount, Parameter_StartIndex)
     
     If Range.Index > mCount Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_Index

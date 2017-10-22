@@ -368,7 +368,7 @@ End Function
 Public Function IndexOfAny(ByRef s As String, ByRef OfAny As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Range As ListRange
     
-    Range = MakeDefaultStepRange(StartIndex, Count, 0, Len(s), NameOfStartIndex)
+    Range = MakeDefaultStepRange(StartIndex, 0, Count, Len(s), NameOfStartIndex)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
