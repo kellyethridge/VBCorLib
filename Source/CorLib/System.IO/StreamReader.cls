@@ -155,6 +155,7 @@ End Function
 '
 Public Function Read() As Long
     Read = Peek
+    
     If Read <> -1 Then
         mCharIndex = mCharIndex + 1
     End If
@@ -169,42 +170,31 @@ End Function
 ' @return The actual number of characters read.
 '
 Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal Count As Long) As Long
-    ValidateArrayRange Buffer, Index, Count, NameOfBuffer
+    ValidateCharRange Buffer, Index, Count, NameOfBuffer
     VerifyIsOpen
     
-    Dim AvailableChars As Long
-    ' We will loop until we have read the
-    ' requested number of characters, if possible.
-    Do While Count > 0
-        ' If we have no more characters to read then get out.
-        If Not HaveChars Then _
-            Exit Function
-        
-        ' Calculate how many characters are available in the local buffer.
-        AvailableChars = mCharLength - mCharIndex
-        
-        ' If there are more characters available than we actaully need,
-        ' then trim back the number of characters to what we need.
-        If AvailableChars > Count Then
-            AvailableChars = Count
+    Dim AvailableChars  As Long
+    Dim CharsToRead     As Long
+    Dim CharsRemaining  As Long
+    Dim CharsRead       As Long
+    
+    CharsRemaining = Count
+    
+    Do While CharsRemaining > 0
+        If Not HaveChars Then
+            Exit Do
         End If
         
-        ' Copy the characters we need from the local buffer to the destination buffer.
-        CopyMemory Buffer(Index), mCharBuffer(mCharIndex), AvailableChars * 2
-        
-        ' Move the destination index out by the number of characters we copied.
-        Index = Index + AvailableChars
-        
-        ' Move the internal index out by the number of characters we copied.
-        ' This will be reset to 0 during the "HaveChars" function.
-        mCharIndex = mCharIndex + AvailableChars
-        
-        ' Calculate the amount left to read.
-        Count = Count - AvailableChars
-        
-        ' Calculate the amount read so far.
-        ReadBlock = ReadBlock + AvailableChars
+        AvailableChars = mCharLength - mCharIndex
+        CharsToRead = IIfLong(AvailableChars < CharsRemaining, AvailableChars, CharsRemaining)
+        CopyMemory Buffer(Index), mCharBuffer(mCharIndex), CharsToRead * vbSizeOfChar
+        Index = Index + CharsToRead
+        mCharIndex = mCharIndex + CharsToRead
+        CharsRemaining = CharsRemaining - CharsToRead
+        CharsRead = CharsRead + CharsToRead
     Loop
+    
+    ReadBlock = CharsRead
 End Function
 
 ''
@@ -369,6 +359,26 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal Deter
     If BufferSize <= 0 Then _
         Error.ArgumentOutOfRange "BufferSize", ArgumentOutOfRange_NeedPosNum
     
+    CreateStream Source
+    mDetermineEncoding = DetermineEncodingFromByteOrderMarks
+    Set mEncoding = IfObject(Encoding, Statics.Encoding.UTF8)
+    Set mDecoder = mEncoding.GetDecoder
+    mBufferSize = CorMath.Max(BufferSize, MinimumBufferSize)
+    mLeaveOpen = LeaveOpen
+    mIsOpen = True
+    
+    ReDim mByteBuffer(0 To mBufferSize - 1)
+End Sub
+
+Private Sub Class_Terminate()
+    CloseReader
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub CreateStream(ByRef Source As Variant)
     Select Case VarType(Source)
         Case vbObject
             If Source Is Nothing Then _
@@ -384,34 +394,8 @@ Friend Sub Init(ByRef Source As Variant, ByVal Encoding As Encoding, ByVal Deter
         Case Else
             Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
-    
-    mDetermineEncoding = DetermineEncodingFromByteOrderMarks
-    If Encoding Is Nothing Then
-        Set mEncoding = Statics.Encoding.UTF8
-    Else
-        Set mEncoding = Encoding
-    End If
-    Set mDecoder = mEncoding.GetDecoder
-    
-    If BufferSize < MinimumBufferSize Then
-        BufferSize = MinimumBufferSize
-    End If
-    
-    mBufferSize = BufferSize
-    ReDim mByteBuffer(0 To mBufferSize - 1)
-    
-    mLeaveOpen = LeaveOpen
-    mIsOpen = True
 End Sub
 
-Private Sub Class_Terminate()
-    CloseReader
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HaveChars() As Boolean
     ' This will be true when:
     ' - The buffer is empty
@@ -458,34 +442,45 @@ Private Function ReadBuffer() As Long
 End Function
 
 Private Sub DetermineEncoding()
-    If mByteLength < 2 Then Exit Sub    ' don't have enough bytes to determine anything.
+    Const UnicodeLittleEndianBOM    As Long = &HFEFF
+    Const UnicodeBigEndianBOM       As Long = &HFFFE
+    Const UTF8PartialBOM            As Long = &HBBEF
+    Const UTF8RemainingBOM          As Long = &HBF
+    Const UnicodeEncodingBOMLength  As Long = 2
+    Const UTF8EncodingBOMLength     As Long = 3
     
-    Select Case AsWord(mByteBuffer(0))
-        Case &HFEFF   ' Little-Endian UnicodeEncoding
-            Set mEncoding = Cor.NewUnicodeEncoding(False, False)
-            mByteIndex = 2
-            mByteLength = mByteLength - 2
-            
-        Case &HFFFE   ' Big-Endian UnicodeEncoding
-            Set mEncoding = Cor.NewUnicodeEncoding(True, False)
-            mByteIndex = 2
-            mByteLength = mByteLength - 2
-        
-        Case &HBBEF   ' possible UTF-8 encoding
-            If mByteLength < 3 Then Exit Sub    ' not quite enough bytes to determine if UTF-8 encoding.
-            If mByteBuffer(2) = &HBF Then Set mEncoding = Cor.NewUTF8Encoding(False, False)
-            mByteIndex = 3
-            mByteLength = mByteLength - 3
-    End Select
+    Dim FirstTwoBytes As Integer
     
-    ' We have either determined the encoding from the BOM, or
-    ' we are going to use the default encoding for the reader.
-    
-    ' Get the Decoder from the encoding now.
-    If Not mEncoding Is Nothing Then
-        Set mDecoder = mEncoding.GetDecoder
+    If mByteLength < 2 Then
+        Exit Sub    ' don't have enough bytes to determine anything.
     End If
-    
+        
+    FirstTwoBytes = AsWord(mByteBuffer(0))
+        
+    Select Case FirstTwoBytes
+        Case UnicodeLittleEndianBOM
+            SetEncodingFromBOM Cor.NewUnicodeEncoding(False, False), UnicodeEncodingBOMLength
+
+        Case UnicodeBigEndianBOM
+            SetEncodingFromBOM Cor.NewUnicodeEncoding(True, False), UnicodeEncodingBOMLength
+
+        Case UTF8PartialBOM
+            If mByteLength >= 3 Then
+                If mByteBuffer(2) = UTF8RemainingBOM Then
+                    SetEncodingFromBOM Cor.NewUTF8Encoding(False, False), UTF8EncodingBOMLength
+                End If
+            End If
+            
+        Case Else
+            mDetermineEncoding = False
+    End Select
+End Sub
+
+Private Sub SetEncodingFromBOM(ByVal Encoding As Encoding, ByVal BOMLength As Long)
+    Set mEncoding = Encoding
+    mByteIndex = BOMLength
+    mByteLength = mByteLength - BOMLength
+    Set mDecoder = mEncoding.GetDecoder
     mDetermineEncoding = False
 End Sub
 
