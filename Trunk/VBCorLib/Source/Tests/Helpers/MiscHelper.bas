@@ -37,3 +37,6 @@ End Function
 Public Property Get NullBytes() As Byte()
 End Property
 
+Public Property Get NullChars() As Integer()
+End Property
+
