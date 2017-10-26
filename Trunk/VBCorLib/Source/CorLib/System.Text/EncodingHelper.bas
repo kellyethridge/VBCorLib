@@ -231,37 +231,4 @@ Public Sub ValidateDecoderGetChars(Bytes() As Byte, ByVal ByteIndex As Long, ByV
         Error.ArgumentOutOfRange "Bytes", ArgumentOutOfRange_IndexCountBuffer
 End Sub
 
-''
-' Attaches either an Integer Array or a String to a Chars Integer
-' array, allowing the same access type to both source types.
-'
-' @param Source Either an Integer Array or a String to attach to.
-' @param Chars The array that will be used to access the elements in Source.
-' @param CharsSA The SafeArray structure used to represent Chars.
-'
-Public Function AttachChars(ByRef Source As Variant, ByRef Chars() As Integer, ByRef CharsSA As SafeArray1d) As Long
-    Select Case VarType(Source)
-        Case vbString
-            CharsSA.cElements = Len(Source)
-            CharsSA.pvData = StrPtr(Source)
-            CharsSA.cbElements = 2
-            CharsSA.cDims = 1
-            SAPtr(Chars) = VarPtr(CharsSA)
-            AttachChars = Len(Source)
-            
-        Case vbIntegerArray
-            Dim CharPtr As Long
-            CharPtr = SAPtrV(Source)
-            If CharPtr = vbNullPtr Then _
-                Throw Cor.NewArgumentNullException(Environment.GetResourceString(Parameter_Chars), Environment.GetResourceString(ArgumentNull_Array))
-            If SafeArrayGetDim(CharPtr) > 1 Then _
-                Throw Cor.NewRankException(Environment.GetResourceString(Rank_MultiDimNotSupported))
-            
-            SAPtr(Chars) = CharPtr
-            AttachChars = UBound(Chars) - LBound(Chars) + 1
-            
-        Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_CharArrayRequired), Environment.GetResourceString(Parameter_Chars))
-    End Select
-End Function
 
