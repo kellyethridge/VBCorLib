@@ -87,6 +87,32 @@ Public Sub CreateDirectory_WhenCalled_CreatesFolder()
     
 Catch:
     DeleteFolder FolderToCreate
+    Throw
+End Sub
+
+Public Sub CreateDirectory_WithTrailingDirectorySeparator_CreatesFolder()
+    Const SubFolder As String = "VBCorLib.Directory.CreateDirectory.Test"
+    Dim FolderToCreate As String
+    FolderToCreate = Path.Combine(Path.GetTempPath, SubFolder) & "\"
+    
+    On Error GoTo Catch
+    Directory.CreateDirectory FolderToCreate
+    
+    Dim Actual As Boolean
+    Actual = FolderExists(FolderToCreate)
+    Assert.That Actual, Iz.True
+    
+Catch:
+    DeleteFolder FolderToCreate
+    Throw
+End Sub
+
+Public Sub CreateDirectory_WithDirectorySeparator_ReturnsRootDirectoryInfo()
+    Dim Actual As DirectoryInfo
+    
+    Set Actual = Directory.CreateDirectory("\")
+    
+    Assert.That Actual.FullName, Iz.EqualTo("c:\").IgnoreCase
 End Sub
 
 Public Sub CreateDirectory_WhenCalled_ReturnsDirectoryInfo()
@@ -102,6 +128,7 @@ Public Sub CreateDirectory_WhenCalled_ReturnsDirectoryInfo()
 
 Catch:
     DeleteFolder FolderToCreate
+    Throw
 End Sub
 
 Public Sub CreateDirectory_WithEmptyPath_ThrowsArgumentException()
@@ -341,6 +368,14 @@ Public Sub Move_WhenCalled_MovesContents()
     Assert.That FileExists(Path.Combine(TargetFolder, "File.txt")), Iz.True
 End Sub
 
+Public Sub Move_WithNonExistingSource_ThrowsIOException()
+    On Error Resume Next
+    
+    Directory.Move "c:\SomeRandomeFile.txt", "c:\Target.txt"
+    
+    AssertIOException Err
+End Sub
+
 Public Sub CurrentDirectory_WhenCalled_IsSetAndRead()
     Dim OriginalCurrentDirectory As String
     OriginalCurrentDirectory = CurDir$
@@ -356,6 +391,14 @@ Public Sub CurrentDirectory_WhenCalled_IsSetAndRead()
     Assert.That Actual, Iz.EqualTo(NewFolder)
 Catch:
     ChDir OriginalCurrentDirectory
+End Sub
+
+Public Sub SetCurrentDirectory_WithNonExistingPath_ThrowsIOException()
+    On Error Resume Next
+    
+    Directory.SetCurrentDirectory "c:\SomeRandomDirectory"
+    
+    AssertIOException Err
 End Sub
 
 Private Function CreateFullPaths(ByVal Source As Variant) As Collection
