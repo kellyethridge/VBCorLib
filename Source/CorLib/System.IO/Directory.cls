@@ -69,34 +69,35 @@ Public Function CreateDirectory(ByRef Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
     
-    Dim FullPath As String
-    FullPath = Statics.Path.GetFullPath(Path)
+    Dim FullPath    As String
+    Dim PathParts() As String
+    Dim Paths       As New Stack
+    Dim NameIndex   As Long
     
-    If Len(FullPath) > 1 And CorString.LastChar(FullPath) = vbDirectorySeparatorChar Then
-        FullPath = Left$(FullPath, Len(FullPath) - 1)
+    If Len(Path) > 1 And Right$(Path, 1) = Statics.Path.DirectorySeparator Then
+        FullPath = Left$(Path, Len(Path) - 1)
+    Else
+        FullPath = Path
     End If
     
-    Dim DirectoryNames() As String
-    DirectoryNames = Split(FullPath, Statics.Path.DirectorySeparator)
+    FullPath = Statics.Path.GetFullPath(FullPath)
+    PathParts = Split(FullPath, Statics.Path.DirectorySeparator)
+    NameIndex = CorArray.Length(PathParts)
     
-    Dim i As Long
-    i = CorArray.Length(DirectoryNames)
-    Do
-        Dim TestDirectory As String
-        TestDirectory = CorString.Join(vbDirectorySeparator, DirectoryNames, 0, i)
-        If Directory.Exists(TestDirectory) Then
+    Do While NameIndex > 0
+        Dim SubFolder As String
+        SubFolder = CorString.Join(vbDirectorySeparator, PathParts, 0, NameIndex)
+        
+        If Directory.Exists(SubFolder) Then
             Exit Do
         End If
         
-        i = i - 1
-    Loop While i > 0
+        Paths.Push SubFolder
+        NameIndex = NameIndex - 1
+    Loop
 
-    Do While i <= UBound(DirectoryNames)
-        i = i + 1
-        Dim NewDirectory As String
-        NewDirectory = CorString.Join(Statics.Path.DirectorySeparator, DirectoryNames, 0, i)
-
-        If CreateDirectoryW(NewDirectory, ByVal 0&) = BOOL_FALSE Then
+    Do While Paths.Count > 0
+        If CreateDirectoryW(Paths.Pop, ByVal 0&) = BOOL_FALSE Then
             IOError.WinIOError Err.LastDllError
         End If
     Loop
@@ -172,7 +173,7 @@ Public Sub Delete(ByRef Path As String, Optional ByVal Recursive As Boolean = Fa
     
     If Api.RemoveDirectory(NormalizedPath) = BOOL_FALSE Then
         If Err.LastDllError <> ERROR_PATH_NOT_FOUND Then
-            IOError.WinIOError Err.LastDllError, Path
+            ThrowIOError Err.LastDllError, Path
         End If
     End If
 End Sub
@@ -249,12 +250,15 @@ End Function
 ' @return The current set directory.
 '
 Public Function GetCurrentDirectory() As String
-    Dim Result As String
-    Result = String$(Path.MaxPath, 0)
+    Dim Result  As String
+    Dim Size    As Long
     
-    Dim Size As Long
+    Result = String$(Path.MaxPath, 0)
     Size = Api.GetCurrentDirectory(Len(Result), Result)
-    If Size = 0 Then IOError.WinIOError Err.LastDllError
+    
+    If Size = 0 Then
+        ThrowIOError Err.LastDllError
+    End If
     
     GetCurrentDirectory = Left$(Result, Size)
 End Function
@@ -330,27 +334,23 @@ End Function
 ' @return The list of logical drives on this machine.
 '
 Public Function GetLogicalDrives() As String()
-    Dim Drives() As String
-    ReDim Drives(25) As String ' just allocate the maximum letters possible.
+    Dim Drives  As New ArrayList
+    Dim Mask    As Long
+    Dim Letter  As Long
     
-    Dim Mask As Long
+    Letter = vbUpperAChar
     Mask = CorType.GetLogicalDrives
     
-    Dim Letter As Long
-    Letter = vbUpperAChar
-    
-    Dim i As Long
-    Do While Mask <> 0
+    Do While Mask > 0
         If Mask And 1 Then
-            Drives(i) = Chr$(Letter) & ":\"
-            i = i + 1
+            Drives.Add Chr$(Letter) & ":\"
         End If
+        
         Letter = Letter + 1
         Mask = Mask \ 2
     Loop
-    
-    ReDim Preserve Drives(0 To i - 1)
-    GetLogicalDrives = Drives
+
+    GetLogicalDrives = Drives.ToArray(vbString)
 End Function
 
 ''
@@ -364,11 +364,12 @@ Public Function GetParent(ByRef Path As String) As DirectoryInfo
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"
 
-    Dim FullPath As String
-    FullPath = Statics.Path.GetFullPath(Path)
+    Dim FullPath    As String
+    Dim DirName     As String
     
-    Dim DirName As String
+    FullPath = Statics.Path.GetFullPath(Path)
     DirName = Statics.Path.GetDirectoryName(FullPath)
+    
     If Len(DirName) > 0 Then
         Set GetParent = Cor.NewDirectoryInfo(DirName)
     End If
@@ -400,13 +401,7 @@ Public Sub Move(ByRef SourceDirName As String, ByRef DestDirName As String)
         Throw Cor.NewIOException("Source and Destination directories must be on the same root drive.")
         
     If Api.MoveFile(FullSourceDirName, FullDestDirName) = BOOL_FALSE Then
-        Dim Result  As Long
-        Result = Err.LastDllError
-        If Result = ERROR_FILE_NOT_FOUND Then
-            IOError.WinIOError ERROR_PATH_NOT_FOUND, SourceDirName
-        Else
-            IOError.WinIOError Result
-        End If
+        ThrowIOError Err.LastDllError, SourceDirName
     End If
 End Sub
 
@@ -424,12 +419,7 @@ Public Sub SetCurrentDirectory(ByRef Path As String)
     FullPath = Statics.Path.GetFullPath(Path)
 
     If Not Win32Native.SetCurrentDirectory(FullPath) Then
-        Dim ErrorCode As Long
-        ErrorCode = Err.LastDllError
-        If ErrorCode = ERROR_FILE_NOT_FOUND Then
-            ErrorCode = ERROR_PATH_NOT_FOUND
-        End If
-        IOError.WinIOError ErrorCode, FullPath
+        ThrowIOError Err.LastDllError, FullPath
     End If
 End Sub
 
@@ -517,6 +507,14 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub ThrowIOError(ByVal ErrorCode As Long, Optional ByRef Path As String)
+    If ErrorCode = ERROR_FILE_NOT_FOUND Then
+        IOError.WinIOError ERROR_PATH_NOT_FOUND, Path
+    Else
+        IOError.WinIOError ErrorCode
+    End If
+End Sub
+
 Private Function OpenHandle(ByRef Path As String) As SafeFileHandle
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
