@@ -1822,7 +1822,7 @@ End Function
 
 Friend Function NewSafeFindHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFindHandle
     Set NewSafeFindHandle = New SafeFindHandle
-    NewSafeFindHandle.Init PreexistingHandle, OwnsHandle
+    NewSafeFindHandle.Constructor PreexistingHandle, OwnsHandle
 End Function
 
 Public Function NewSafeFileHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFileHandle

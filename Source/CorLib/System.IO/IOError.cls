@@ -37,6 +37,8 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Friend Sub WinIOError(ByVal ErrorCode As Long, Optional ByRef Path As String)
+    Debug.Assert ErrorCode <> 0
+    
     Select Case ErrorCode
         Case ERROR_PATH_NOT_FOUND
             If Len(Path) = 0 Then _
@@ -75,9 +77,9 @@ Friend Sub WinIOError(ByVal ErrorCode As Long, Optional ByRef Path As String)
         Case ERROR_FILE_EXISTS
             If Len(Path) > 0 Then _
                 Throw Cor.NewIOException(Environment.GetResourceString(IO_FileExists_Name, Path), MakeHRFromErrorCode(ErrorCode))
-            
+        
+        Case Else
+            Throw Cor.NewIOException(GetMessage(ErrorCode), MakeHRFromErrorCode(ErrorCode))
     End Select
-    
-    Throw Cor.NewIOException(GetMessage(ErrorCode), MakeHRFromErrorCode(ErrorCode))
 End Sub
 

@@ -41,6 +41,14 @@ Private WithEvents mBase As SafeHandle
 Attribute mBase.VB_VarHelpID = -1
 
 
+Friend Sub Constructor(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
+    Set mBase = Cor.NewSafeHandle(PreexistingHandle, OwnsHandle)
+End Sub
+
+Private Sub Class_Terminate()
+    CloseHandle
+End Sub
+
 Public Property Get IsInvalid() As Boolean
     IsInvalid = mBase.IsInvalid
 End Property
@@ -57,19 +65,6 @@ End Sub
 Public Property Get IsClosed() As Boolean
     IsClosed = mBase.IsClosed
 End Property
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
-    Set mBase = Cor.NewSafeHandle(PreexistingHandle, OwnsHandle)
-End Sub
-
-'''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    CloseHandle
-End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
