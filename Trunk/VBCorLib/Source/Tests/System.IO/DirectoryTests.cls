@@ -52,6 +52,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use SearchOption.TopDirectoryOnly, Array("SubFolder")
             Test.Use SearchOption.AllDirectories, Array("SubFolder", "SubFolder\SubSubFolder")
             
+        Case "GetFiles_WithInvalidSearchPattern_ThrowsArgumentException"
+            Test.Use "..\a"
+            Test.Use "../a"
+            Test.Use "abc.."
+            Test.Use "abc\..\efg"
+            Test.Use "a..b\..\def"
+            
     End Select
 End Sub
 
@@ -399,6 +406,14 @@ Public Sub SetCurrentDirectory_WithNonExistingPath_ThrowsIOException()
     Directory.SetCurrentDirectory "c:\SomeRandomDirectory"
     
     AssertIOException Err
+End Sub
+
+Public Sub GetFiles_WithInvalidSearchPattern_ThrowsArgumentException(ByVal Pattern As String)
+    On Error Resume Next
+    
+    Directory.GetFiles "c:\", Pattern
+    
+    AssertArgumentException Err
 End Sub
 
 Private Function CreateFullPaths(ByVal Source As Variant) As Collection

@@ -80,6 +80,7 @@ Public Enum ResourceStringKey
     Arg_RegKeyStrLenBug = 241
     Arg_RegSubKeyValueAbsent = 242
     Arg_RegInvalidKeyName = 243
+    Arg_InvalidSearchPattern = 244
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
@@ -214,6 +215,8 @@ Public Enum ResourceStringKey
     IO_SharingViolation_NoFileName = 409
     IO_SharingViolation_File = 410
     IO_FileExists_Name = 411
+    IO_SourceDestMustBeDifferent = 412
+    IO_SourceDestMustHaveSameRoot = 413
     
     Cryptography_HashNotYetFinalized = 500
     Cryptography_CSP_CFBSizeNotSupported = 501

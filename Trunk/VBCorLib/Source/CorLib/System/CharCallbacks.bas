@@ -64,3 +64,7 @@ End Function
 Public Function IsWhiteSpaceCallback(ByRef Char As Integer) As Boolean
     IsWhiteSpaceCallback = IsWhiteSpace(Char)
 End Function
+
+Public Function IsPeriodCallback(ByRef Char As Integer) As Boolean
+    IsPeriodCallback = Char = vbPeriodChar
+End Function

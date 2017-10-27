@@ -405,19 +405,19 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=2
+Num=1
 
 [TASK1]
-Description=Add error handling to CorString.IndexOfAnyCore
-Status=0
-Priority=1
-Comment=Current implementation can cause a memory leak if an error is thrown.
-
-[TASK2]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
 Status=0
 Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
+
+[TASK2]
+Description=
+Status=
+Priority=
+Comment=
 AssignedTo=
 
 [TASK3]
