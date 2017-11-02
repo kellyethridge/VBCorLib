@@ -66,7 +66,6 @@ Private Sub Form_Load()
     AddSystemNumerics
     AddSystemSecurity
     AddSystemDiagnostics
-    AddSystemThreading
 End Sub
 
 Private Sub AddSystemSecurity()
@@ -83,12 +82,6 @@ Private Sub AddSystemDiagnostics()
         
         AddTest .This
     End With
-End Sub
-
-Private Sub AddSystemThreading()
-'    With Sim.NewTestSuite("System.Threading")
-'        AddTest .This
-'    End With
 End Sub
 
 Private Sub AddSystem()
@@ -322,7 +315,6 @@ Private Sub AddSystemGlobalization()
 '        .Add New TestKoreanCalendar
 '        .Add New TestJapaneseCalendar
 '        .Add New TestHebrewCalendar
-'        .Add New TestCodePageDecoder
         .Add New GregorianCalendarTests
         .Add New HijriCalendarTests
         .Add New JulianCalendarTests
@@ -335,28 +327,29 @@ End Sub
 
 Private Sub AddSystemNumerics()
     With Sim.NewTestSuite("System.Numerics")
-        .Add NewSuite("BigInteger Tests", _
-            New VBAdditionTests, _
-            New VBBitTests, _
-            New VBComparisonTests, _
-            New VBCreateFromArraysTests, _
-            New VBCreateFromNumbersTests, _
-            New VBDivisionTests, _
-            New VBFactorialTests, _
-            New VBMultiplyTests, _
-            New VBParseBinaryTests, _
-            New VBParseDecimalTests, _
-            New VBParseHexTests, _
-            New VBPowTests, _
-            New VBRightShiftTests, _
-            New VBRndTests, _
-            New VBShiftLeftTests, _
-            New VBSquareRootTests, _
-            New VBSubtractionTests, _
-            New VBToBinaryStringTests, _
-            New VBToStringDecimalTests, _
-            New VBToStringHexTests, _
-            New VBUnaryTests)
+        .Add New BigIntegerTests
+'        .Add NewSuite("BigInteger Tests", _
+'            New VBAdditionTests, _
+'            New VBBitTests, _
+'            New VBComparisonTests, _
+'            New VBCreateFromArraysTests, _
+'            New VBCreateFromNumbersTests, _
+'            New VBDivisionTests, _
+'            New VBFactorialTests, _
+'            New VBMultiplyTests, _
+'            New VBParseBinaryTests, _
+'            New VBParseDecimalTests, _
+'            New VBParseHexTests, _
+'            New VBPowTests, _
+'            New VBRightShiftTests, _
+'            New VBRndTests, _
+'            New VBShiftLeftTests, _
+'            New VBSquareRootTests, _
+'            New VBSubtractionTests, _
+'            New VBToBinaryStringTests, _
+'            New VBToStringDecimalTests, _
+'            New VBToStringHexTests, _
+'            New VBUnaryTests)
         
         AddTest .This
     End With

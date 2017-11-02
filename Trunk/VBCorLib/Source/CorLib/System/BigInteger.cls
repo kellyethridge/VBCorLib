@@ -46,6 +46,7 @@ Attribute VB_Exposed = True
 ' However, Integers are never revealed outside of the class, only byte arrays.
 '
 Option Explicit
+Implements IObject
 Implements IComparable
 
 Private Const HEX_CHARS As String = "0123456789abcdef0123456789ABCDEF"
@@ -60,9 +61,26 @@ Private mNumber As Mathematics.Number
 '
 ' @return The value of type Sign representing the sign of the number.
 ' @remarks Returns -1 for negative, 0 for zero, 1 for positive.
-'
 Public Property Get Sign() As Sign
     Sign = mNumber.Sign
+End Property
+
+''
+' Returns if the value is equal to zero.
+'
+' @return <b>True</b> if the value is zero, otherwise <b>False</b>.
+Public Property Get IsZero() As Boolean
+    IsZero = mNumber.Sign = Zero
+End Property
+
+''
+' Returns if the value is equal to one.
+'
+' @return <b>True</b> if the value is one, otherwise <b>False</b>.
+Public Property Get IsOne() As Boolean
+    If mNumber.Sign = Positive And mNumber.Precision = 1 Then
+        IsOne = mNumber.Digits(0) = 1
+    End If
 End Property
 
 ''
@@ -73,7 +91,6 @@ End Property
 ' as part of the number. Those bytes are not represented in the precision.
 ' <p>Since a negative value can have an infinite number of leading &HFFFF values,
 ' only 1 (2 bytes) is counted if it is needed.</p>
-'
 Public Property Get Precision() As Long
     Dim Ret As Long
     
@@ -133,18 +150,26 @@ End Function
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
-Public Function ToString(Optional ByVal Format As String) As String
+Public Function ToString(Optional ByRef Format As String) As String
     Dim Specifier   As String
     Dim Count       As Long
-    Count = ParseFormatSpecifier(Format, Specifier)
-    If Count = 0 Then Count = 1
     
-    Select Case Specifier
-        Case "x":       ToString = ToHexString(Count, LOWER_HEX)
-        Case "X":       ToString = ToHexString(Count, UPPER_HEX)
-        Case "b", "B":  ToString = ToBinaryString(Count)
-        Case "d", "D":  ToString = ToDecimalString(Count)
-    End Select
+    If Len(Format) = 0 Then
+        ToString = ToDecimalString(1)
+    Else
+        Count = ParseFormatSpecifier(Format, Specifier)
+        
+        If Count = 0 Then
+            Count = 1
+        End If
+        
+        Select Case Specifier
+            Case "x":       ToString = ToHexString(Count, LOWER_HEX)
+            Case "X":       ToString = ToHexString(Count, UPPER_HEX)
+            Case "b", "B":  ToString = ToBinaryString(Count)
+            Case "d", "D":  ToString = ToDecimalString(Count)
+        End Select
+    End If
 End Function
 
 ''
@@ -170,8 +195,34 @@ End Function
 ' object. The BInt function is called to convert the other value to
 ' a BigInteger object before comparison.
 '
-Public Function Equals(ByVal Other As BigInteger) As Boolean
-    Equals = BigInteger.Equals(Me, Other)
+Public Function Equals(ByRef Value As Variant) As Boolean
+    On Error GoTo Catch
+    
+    Equals = BigInteger.Equals(Me, Value)
+    
+Catch:
+End Function
+
+Public Function GetHashCode() As Long
+    Dim Result As Long
+    Dim DoubleDigits() As Long
+    Dim Count As Long
+    
+    Result = mNumber.Sign Xor mNumber.Precision
+    SAPtr(DoubleDigits) = SAPtr(mNumber.Digits)
+    Count = mNumber.Precision \ 2
+    
+    Dim i As Long
+    For i = 0 To Count - 1
+        Result = Result Xor DoubleDigits(i)
+    Next
+    
+    If mNumber.Precision And 1 Then
+        Result = Result Xor mNumber.Digits(mNumber.Precision - 1)
+    End If
+    
+    SAPtr(DoubleDigits) = vbNullPtr
+    GetHashCode = Result
 End Function
 
 ''
@@ -191,10 +242,10 @@ Public Function Negate() As BigInteger
         Dim num As Number
         num = mNumber
         
-        Call Mathematics.Negate(num)
+        Mathematics.Negate num
         
         Set Negate = New BigInteger
-        Call Negate.InternalInitNumber(num)
+        Negate.InternalInitNumber2 num
     End If
 End Function
 
@@ -270,7 +321,7 @@ End Function
 ''
 ' Divides this BigInteger instance by the supplied divisor.
 '
-' @param value A numeric representation of the value to divide this instance by.
+' @param Divisor A numeric representation of the value to divide this instance by.
 ' @return A new instance of BigInteger containing the quotient value.
 ' @remarks This method accepts a BigInteger, one of VB's numeric values or
 ' a string to be parsed.
@@ -281,15 +332,15 @@ End Function
 ' Debug.Print b.ToString '' 2
 ' </pre>
 '
-Public Function Divide(ByVal Value As BigInteger) As BigInteger
-    Set Divide = BigInteger.Divide(Me, Value)
+Public Function Divide(ByVal Divisor As BigInteger) As BigInteger
+    Set Divide = BigInteger.Divide(Me, Divisor)
 End Function
 
 ''
 ' Divides this value by the value, returning the quotient and remainding.
 '
-' @param value A numeric representation of the value to divide this instance by.
-' @param remainder A reference to the variable to receive the remainder as a result of the division.
+' @param Divisor A numeric representation of the value to divide this instance by.
+' @param Remainder A reference to the variable to receive the remainder as a result of the division.
 ' @return A new instance of BigInteger containing the quotient value.
 ' @remarks This method accepts a BigInteger, one of VB's numeric values or
 ' a string to be parsed.
@@ -302,9 +353,8 @@ End Function
 ' Debug.Print q.ToString '' 2
 ' Debug.Print r.ToString '' 20
 ' </pre>
-'
-Public Function DivRem(ByVal Value As BigInteger, ByRef remainder As BigInteger) As BigInteger
-    Set DivRem = BigInteger.DivRem(Me, Value, remainder)
+Public Function DivRem(ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
+    Set DivRem = BigInteger.DivRem(Me, Divisor, Remainder)
 End Function
 
 ''
@@ -344,17 +394,17 @@ End Function
 ' the BigInteger instance, then the sign of the number is used. This will represent
 ' a negative number with infinite sign extension bits.
 '
-Public Function TestBit(ByVal bit As Long) As Boolean
-    If bit < 0 Then _
-        Call Err.Raise(5, , "Bit cannot be negative.")
+Public Function TestBit(ByVal Bit As Long) As Boolean
+    If Bit < 0 Then _
+        Error.ArgumentOutOfRange "Bit", ArgumentOutOfRange_NeedNonNegNum
     
     If mNumber.Precision = 0 Then Exit Function
     
     Dim Index As Long
-    Index = (bit And &HFFFFFFF0) \ &H10
+    Index = (Bit And &HFFFFFFF0) \ &H10
     
     If Index < mNumber.Precision Then
-        TestBit = mNumber.Digits(Index) And (PowersOf2(bit And &HF))
+        TestBit = mNumber.Digits(Index) And (PowersOf2(Bit And &HF))
     Else
         TestBit = (mNumber.Sign = Negative)
     End If
@@ -369,8 +419,8 @@ End Function
 ' of the BigInteger value, then the new value will be extended to
 ' include the bit being set.
 '
-Public Function SetBit(ByVal bit As Long) As BigInteger
-    Set SetBit = InternalSetBit(bit, True)
+Public Function SetBit(ByVal Bit As Long) As BigInteger
+    Set SetBit = InternalSetBit(Bit, True)
 End Function
 
 ''
@@ -379,8 +429,8 @@ End Function
 ' @param bit The bit to be set to 0.
 ' @return A new BigInteger value with the bit set to 0.
 '
-Public Function ClearBit(ByVal bit As Long) As BigInteger
-    Set ClearBit = InternalSetBit(bit, False)
+Public Function ClearBit(ByVal Bit As Long) As BigInteger
+    Set ClearBit = InternalSetBit(Bit, False)
 End Function
 
 ''
@@ -392,8 +442,8 @@ End Function
 ' of the BigInteger value, then the new value will be extended to
 ' include the bit being flipped.
 '
-Public Function FlipBit(ByVal bit As Long) As BigInteger
-    Set FlipBit = InternalSetBit(bit, Not TestBit(bit))
+Public Function FlipBit(ByVal Bit As Long) As BigInteger
+    Set FlipBit = InternalSetBit(Bit, Not TestBit(Bit))
 End Function
 
 ''
@@ -579,6 +629,11 @@ Friend Sub InternalInitNumber(ByRef n As Number)
     Call Normalize(mNumber.Precision - 1)
 End Sub
 
+Friend Sub InternalInitNumber2(ByRef n As Number)
+    CopyMemory mNumber, n, LenB(n)
+    ZeroMemory n, LenB(n)
+End Sub
+
 Friend Sub AttachNumber(ByRef n As Number)
     Call CopyMemory(n, mNumber, LenB(n))
 End Sub
@@ -590,12 +645,6 @@ End Sub
 Friend Sub CopyNumber(ByRef n As Number)
     n = mNumber
 End Sub
-
-Friend Property Get IsOne() As Boolean
-    If mNumber.Sign <> Positive Then Exit Property
-    If mNumber.Precision <> 1 Then Exit Property
-    IsOne = mNumber.Digits(0) = 1
-End Property
 
 Friend Property Get IsMinusOne() As Boolean
     If mNumber.Sign <> Negative Then Exit Property
@@ -732,6 +781,7 @@ Private Sub Normalize(Optional ByVal ub As Long = -1)
             Else
                 mNumber.Sign = Positive
             End If
+
             mNumber.Precision = ub + 1
 
     End Select
@@ -740,8 +790,8 @@ End Sub
 Private Function ToDecimalString(ByVal Count As Long) As String
     Const DIGITS_PER_INTEGER As Long = 5
     
-    Dim dividend As Number
-    dividend = mNumber
+    Dim Dividend As Number
+    Dividend = mNumber
     
     Dim Size As Long
     Size = mNumber.Precision * DIGITS_PER_INTEGER
@@ -750,14 +800,14 @@ Private Function ToDecimalString(ByVal Count As Long) As String
     Dim Result As String
     Result = String$(Size + 1, 48)
     
-    If mNumber.Sign = Negative Then Call Mathematics.Negate(dividend)
+    If mNumber.Sign = Negative Then Call Mathematics.Negate(Dividend)
     
     Dim i As Long
     i = Len(Result)
     
-    Do While dividend.Precision > 0
+    Do While Dividend.Precision > 0
         Dim R As Long
-        R = SingleInPlaceDivideBy10(dividend)
+        R = SingleInPlaceDivideBy10(Dividend)
         If R Then Mid$(Result, i, 1) = Chr$(48 + R)
         i = i - 1
     Loop
@@ -842,12 +892,12 @@ Private Function ToBinaryString(ByVal Count As Long) As String
     ToBinaryString = Mid$(Result, c + 1)
 End Function
 
-Private Function InternalSetBit(ByVal bit As Long, ByVal Value As Boolean) As BigInteger
-    If bit < 0 Then _
+Private Function InternalSetBit(ByVal Bit As Long, ByVal Value As Boolean) As BigInteger
+    If Bit < 0 Then _
         Call Err.Raise(5, , "Bit cannot be negative.")
 
     Dim Index As Long
-    Index = (bit And &HFFFFFFF0) \ &H10
+    Index = (Bit And &HFFFFFFF0) \ &H10
     
     Dim Number() As Integer
     
@@ -867,16 +917,16 @@ Private Function InternalSetBit(ByVal bit As Long, ByVal Value As Boolean) As Bi
     End If
     
     If Value Then
-        Number(Index) = Number(Index) Or PowersOf2(bit And &HF)
+        Number(Index) = Number(Index) Or PowersOf2(Bit And &HF)
     Else
-        Number(Index) = Number(Index) And (Not PowersOf2(bit And &HF))
+        Number(Index) = Number(Index) And (Not PowersOf2(Bit And &HF))
     End If
     
     Set InternalSetBit = New BigInteger
     Call InternalSetBit.InternalInit(Number)
 End Function
 
-Private Function ParseFormatSpecifier(ByVal Format As String, ByRef Specifier As String) As Long
+Private Function ParseFormatSpecifier(ByRef Format As String, ByRef Specifier As String) As Long
     If Len(Format) = 0 Then
         Specifier = "d"
         Exit Function
@@ -1023,6 +1073,25 @@ Private Function ShiftRightNumber(ByRef n As Number, ByVal BitCount As Long) As 
 End Function
 
 
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IComparable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparable_CompareTo(Value As Variant) As Long
     IComparable_CompareTo = CompareTo(Cor.BInt(Value))
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
+End Function
+
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
+End Function
+
+Private Function IObject_ToString() As String
+    IObject_ToString = ToString
 End Function
