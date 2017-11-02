@@ -74,7 +74,10 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed BinaryReader ReadChars and ReadBytes now return zero-length arrays if no data can be read instead of throwing an exception.
 	* Fixed BinaryReader to use Decoder instead of Encoding when reading data from stream so multi-byte characters are correctly read across reads.
 	* Changed CorArray.IsNull to return False for uninitialized array of objects because calling the method will initialize the array to an empty array. *BREAKING*
-
+	* Fixed BigInteger Negate. Would fail to return positive value for boundry aligned values such as 0x80000000.
+	* Fixed BigInteger Negate. Would fail to update precision when changing negative value to positive.
+	* Fixed BigInteger DevRem. When dividing by a negative value, remainder should still be positive.
+	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
 	* Updated ArrayList to include the ArrayList.Adapter method, wrapping an IList object.

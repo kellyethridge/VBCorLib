@@ -191,9 +191,12 @@ Public Function TryParse(ByVal s As String, ByRef b As BigInteger) As Boolean
     End If
 
     Select Case Mid$(s, StartIndex + 1, 2)
-        Case "&h", "&H", "0X", "0x":    TryParse = TryParseHex(s, StartIndex, n)
-        Case "0b", "0B":                TryParse = TryParseBinary(s, StartIndex, n)
-        Case Else:                      TryParse = TryParseDecimal(s, StartIndex, n)
+        Case "&h", "&H", "0X", "0x"
+            TryParse = TryParseHex(s, StartIndex, n)
+        Case "0b", "0B"
+            TryParse = TryParseBinary(s, StartIndex, n)
+        Case Else
+            TryParse = TryParseDecimal(s, StartIndex, n)
     End Select
     
     If TryParse Then
@@ -227,7 +230,7 @@ End Function
 '
 Public Function Parse(ByRef s As String) As BigInteger
     If Not TryParse(s, Parse) Then
-        Throw Cor.NewArgumentException("Number could not be parsed.", "s")
+        Error.Format Format_InvalidString
     End If
 End Function
 
@@ -443,8 +446,8 @@ End Function
 ' Debug.Print b.ToString '' 2
 ' </pre>
 '
-Public Function Divide(ByVal dividend As BigInteger, ByVal divisor As BigInteger) As BigInteger
-    Set Divide = InternalDivide(dividend, divisor, Nothing, False)
+Public Function Divide(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
+    Set Divide = InternalDivide(Dividend, Divisor, Nothing, False)
 End Function
 
 ''
@@ -464,9 +467,8 @@ End Function
 ' Debug.Print q.ToString '' 2
 ' Debug.Print r.ToString '' 20
 ' </pre>
-'
-Public Function DivRem(ByVal dividend As BigInteger, ByVal divisor As BigInteger, ByRef remainder As BigInteger) As BigInteger
-    Set DivRem = InternalDivide(dividend, divisor, remainder, True)
+Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
+    Set DivRem = InternalDivide(Dividend, Divisor, Remainder, True)
 End Function
 
 ''
@@ -482,9 +484,8 @@ End Function
 ' Set b = BigInteger.Modulus(b, BInt(40))
 ' Debug.Print b.ToString '' 20
 ' </pre>
-'
-Public Function Modulus(ByVal dividend As BigInteger, ByVal divisor As BigInteger) As BigInteger
-    Call InternalDivide(dividend, divisor, Modulus, True)
+Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
+    Call InternalDivide(Dividend, Divisor, Modulus, True)
 End Function
 
 ''
@@ -528,9 +529,9 @@ End Function
 ' a negative number with infinite sign extension bits.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function TestBit(ByVal x As BigInteger, ByVal bit As Long) As Boolean
+Public Function TestBit(ByVal x As BigInteger, ByVal Bit As Long) As Boolean
     If x Is Nothing Then Set x = mZero
-    TestBit = x.TestBit(bit)
+    TestBit = x.TestBit(Bit)
 End Function
 
 ''
@@ -544,9 +545,9 @@ End Function
 ' include the bit being set.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function SetBit(ByVal x As BigInteger, ByVal bit As Long) As BigInteger
+Public Function SetBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
     If x Is Nothing Then Set x = mZero
-    SetBit = x.SetBit(bit)
+    SetBit = x.SetBit(Bit)
 End Function
 
 ''
@@ -557,9 +558,9 @@ End Function
 ' @return A new BigInteger value with the bit set to 0.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function ClearBit(ByVal x As BigInteger, ByVal bit As Long) As BigInteger
+Public Function ClearBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
     If x Is Nothing Then Set x = mZero
-    Set ClearBit = x.ClearBit(bit)
+    Set ClearBit = x.ClearBit(Bit)
 End Function
 
 ''
@@ -573,9 +574,9 @@ End Function
 ' include the bit being flipped.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function FlipBit(ByVal x As BigInteger, ByVal bit As Long) As BigInteger
+Public Function FlipBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
     If x Is Nothing Then Set x = mZero
-    Set FlipBit = x.FlipBit(bit)
+    Set FlipBit = x.FlipBit(Bit)
 End Function
 
 ''
@@ -619,7 +620,9 @@ Public Function AndBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInte
         Number(i) = longNumber.Digits(i) And extDigit
     Next i
     
-    If longNumber.Sign = Negative Then Number(longNumber.Precision) = &HFFFF And extDigit
+    If longNumber.Sign = Negative Then
+        Number(longNumber.Precision) = &HFFFF And extDigit
+    End If
     
     Call x.DetachNumber(longNumber)
     Call y.DetachNumber(shortNumber)
@@ -713,7 +716,10 @@ Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInte
         Call x.AttachNumber(shortNumber)
         Call y.AttachNumber(longNumber)
     End If
-    If shortNumber.Sign = Sign.Negative Then extDigit = &HFFFF
+    If shortNumber.Sign = Sign.Negative Then
+        extDigit = &HFFFF
+    End If
+    
     ReDim Number(0 To longNumber.Precision)
     
     Dim i As Long
@@ -725,7 +731,9 @@ Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInte
         Number(i) = longNumber.Digits(i) Xor extDigit
     Next i
     
-    If longNumber.Sign = Negative Then Number(longNumber.Precision) = &HFFFF Xor extDigit
+    If longNumber.Sign = Negative Then
+        Number(longNumber.Precision) = &HFFFF Xor extDigit
+    End If
     
     Call x.DetachNumber(longNumber)
     Call y.DetachNumber(shortNumber)
@@ -787,7 +795,7 @@ Public Function Pow(ByVal baseValue As BigInteger, ByVal Exponent As BigInteger)
     If Exponent Is Nothing Then Set Exponent = mZero
 
     If Exponent.Sign = Sign.Negative Then _
-        Throw Cor.NewArgumentException("Exponent cannot be negative.", "exponent")
+        Error.ArgumentOutOfRange "Exponent", ArgumentOutOfRange_NeedNonNegNum
 
     If Exponent.Sign = Sign.Zero Then
         Set Pow = mOne
@@ -797,21 +805,26 @@ Public Function Pow(ByVal baseValue As BigInteger, ByVal Exponent As BigInteger)
         Exit Function
     End If
 
-    Dim y As BigInteger: Set y = mOne
-    Dim z As BigInteger: Set z = baseValue
-
-    Dim isOdd As Boolean
+    Dim y As BigInteger
+    Dim z As BigInteger
+    Dim IsOdd As Boolean
+    
+    Set y = mOne
+    Set z = baseValue
+    
     Do
-        isOdd = Exponent.TestBit(0)
+        IsOdd = Exponent.TestBit(0)
         Set Exponent = Exponent.ShiftRight(1)
 
-        If isOdd Then
+        If IsOdd Then
             Set y = Multiply(y, z)
-            If Exponent.Sign = Sign.Zero Then
+            
+            If Exponent.IsZero Then
                 Set Pow = y
                 Exit Function
             End If
         End If
+        
         Set z = Multiply(z, z)
     Loop
 End Function
@@ -984,28 +997,24 @@ End Function
 ''
 ' Calculates the factorial of an integer value.
 '
-' @param x The value to calculate the factorial of.
+' @param Value The value to calculate the factorial of.
 ' @return A BigInteger value of the factorial.
 '
-Public Function Factorial(ByVal x As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    
-    Select Case x.Sign
-        Case Sign.Zero
-            Set Factorial = mZero
-            Exit Function
-        
-        Case Sign.Negative
-            Set x = x.Negate
-    
-    End Select
-    
+Public Function Factorial(ByVal Value As BigInteger) As BigInteger
     Dim Result As BigInteger
+    
+    If Value Is Nothing Then
+        Set Value = mZero
+    End If
+    
+    If Value.Sign = Negative Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
+    
     Set Result = mOne
     
-    Do While Not (x.Sign = Sign.Zero)
-        Set Result = Result.Multiply(x)
-        Set x = x.Subtract(mOne)
+    Do While Not Value.IsZero
+        Set Result = Multiply(Result, Value)
+        Set Value = Subtract(Value, mOne)
     Loop
     
     Set Factorial = Result
@@ -1129,62 +1138,66 @@ Private Sub DivideByZeroError()
     Call Err.Raise(11)
 End Sub
 
-Private Function InternalDivide(ByRef dividend As BigInteger, ByRef divisor As BigInteger, ByRef remainder As BigInteger, ByVal includeRemainder As Boolean) As BigInteger
-    If dividend Is Nothing Then Set dividend = mZero
-    If divisor Is Nothing Then Set divisor = mZero
+Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef Remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
+    If Dividend Is Nothing Then Set Dividend = mZero
+    If Divisor Is Nothing Then Set Divisor = mZero
     
-    If divisor.Sign = Sign.Zero Then
+    If Divisor.Sign = Sign.Zero Then
         Call DivideByZeroError
-    ElseIf dividend.Sign = Sign.Zero Then
+    ElseIf Dividend.Sign = Sign.Zero Then
         Set InternalDivide = mZero
-        If includeRemainder Then Set remainder = mZero
+        If IncludeRemainder Then Set Remainder = mZero
         Exit Function
-    ElseIf divisor.IsOne Then
-        Set InternalDivide = dividend
-        If includeRemainder Then Set remainder = mZero
+    ElseIf Divisor.IsOne Then
+        Set InternalDivide = Dividend
+        If IncludeRemainder Then Set Remainder = mZero
         Exit Function
-    ElseIf divisor.IsMinusOne Then
-        Set InternalDivide = dividend.Negate
-        If includeRemainder Then Set remainder = mZero
+    ElseIf Divisor.IsMinusOne Then
+        Set InternalDivide = Dividend.Negate
+        If IncludeRemainder Then Set Remainder = mZero
         Exit Function
     End If
     
-    Dim xNumber As Number: Call dividend.CopyNumber(xNumber)
-    Dim yNumber As Number: Call divisor.CopyNumber(yNumber)
+    Dim xNumber As Number: Call Dividend.CopyNumber(xNumber)
+    Dim yNumber As Number: Call Divisor.CopyNumber(yNumber)
     
-    If dividend.Sign = Sign.Negative Then Call Mathematics.Negate(xNumber)
-    If divisor.Sign = Sign.Negative Then Call Mathematics.Negate(yNumber)
+    If Dividend.Sign = Sign.Negative Then Call Mathematics.Negate(xNumber)
+    If Divisor.Sign = Sign.Negative Then Call Mathematics.Negate(yNumber)
     
-    Dim quotientNumber()    As Integer
-    Dim remainderNumber()   As Integer
+    Dim QuotientNumber()    As Integer
+    Dim RemainderNumber()   As Integer
     
     If yNumber.Precision > 1 Then
-        quotientNumber = GradeSchoolDivide(xNumber, yNumber, remainderNumber, includeRemainder)
+        QuotientNumber = GradeSchoolDivide(xNumber, yNumber, RemainderNumber, IncludeRemainder)
     Else
         Dim R As Long
-        quotientNumber = SinglePlaceDivide(xNumber.Digits, xNumber.Precision, yNumber.Digits(0), R)
+        QuotientNumber = SinglePlaceDivide(xNumber.Digits, xNumber.Precision, yNumber.Digits(0), R)
         
-        If includeRemainder Then
-            ReDim remainderNumber(0)
-            remainderNumber(0) = R
+        If IncludeRemainder Then
+            ReDim RemainderNumber(0)
+            RemainderNumber(0) = R
         End If
     End If
     
-    If dividend.Sign <> divisor.Sign Then
-        Call ApplyTwosComplement(quotientNumber)
+    If Dividend.Sign <> Divisor.Sign Then
+        Call ApplyTwosComplement(QuotientNumber)
         
-        If includeRemainder Then
-            Call ApplyTwosComplement(remainderNumber)
+        If IncludeRemainder Then
+            Call ApplyTwosComplement(RemainderNumber)
         End If
     End If
     
-    If includeRemainder Then
-        Set remainder = New BigInteger
-        Call remainder.InternalInit(remainderNumber)
+    If IncludeRemainder Then
+        Set Remainder = New BigInteger
+        Remainder.InternalInit RemainderNumber
+                
+        If Remainder.Sign = Negative Then
+            Set Remainder = Negate(Remainder)
+        End If
     End If
     
     Set InternalDivide = New BigInteger
-    Call InternalDivide.InternalInit(quotientNumber)
+    Call InternalDivide.InternalInit(QuotientNumber)
 End Function
 
 Private Sub HookString(ByRef s As String)

@@ -226,6 +226,14 @@ Public Function AssertDecoderFallbackException(ByVal Err As ErrObject) As Decode
     Set AssertDecoderFallbackException = Ex
 End Function
 
+Public Sub AssertArithmeticException(ByVal Err As ErrObject)
+    Dim Ex As Exception
+    Set Ex = AssertExceptionThrown(Err)
+    If Not TypeOf Ex Is ArithmeticException Then
+        WrongException "ArithmeticException", Ex
+    End If
+End Sub
+
 Private Function AssertExceptionThrown(ByVal Err As ErrObject) As Exception
     If Not Catch(AssertExceptionThrown, Err) Then
         Assert.Fail "An exception should be thrown."
