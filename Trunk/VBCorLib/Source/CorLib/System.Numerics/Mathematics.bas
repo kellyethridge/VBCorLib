@@ -758,7 +758,7 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
         
         Do
             If qHat < &H10000 Then
-                If UInt32Compare(UInt32x16To32(qHat, v.Digits(n - 2)), LeftShift16(rHat) + (u.Digits(j + n - 2) And &HFFFF&)) <= 0 Then
+                If UInt32Compare(UInt32x16To32(qHat, v.Digits(n - 2)), Helper.ShiftLeft(rHat, 16) + (u.Digits(j + n - 2) And &HFFFF&)) <= 0 Then
                     Exit Do
                 End If
             End If
@@ -913,15 +913,10 @@ Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
 End Function
 
 Private Function Make32(ByVal x As Integer, ByVal y As Integer) As Long
-    Make32 = LeftShift16(x And &HFFFF&) Or (y And &HFFFF&)
+    Make32 = Helper.ShiftLeft(x And &HFFFF&, 16) Or (y And &HFFFF&)
 End Function
 
 Private Function RightShift16(ByVal x As Long) As Long
     RightShift16 = ((x And &HFFFF0000) \ &H10000) And &HFFFF&
-End Function
-
-Private Function LeftShift16(ByVal x As Long) As Long
-    If x And &H8000& Then LeftShift16 = &H80000000
-    LeftShift16 = LeftShift16 Or ((x And &H7FFF) * &H10000)
 End Function
 #End If
