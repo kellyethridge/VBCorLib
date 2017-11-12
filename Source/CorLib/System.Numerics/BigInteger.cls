@@ -826,46 +826,43 @@ Private Function ToDecimalString(ByVal Count As Long, ByVal FormatInfo As Number
     Const DIGITS_PER_INTEGER As Long = 5
     Dim Dividend    As Number
     Dim Size        As Long
+    Dim Chars()     As Integer
     Dim Output      As String
-    Dim i           As Long
+    Dim Pos         As Long
     
     Dividend = mNumber
-    Size = mNumber.Precision * DIGITS_PER_INTEGER
+    
+    If Dividend.Sign = Negative Then
+        Mathematics.Negate Dividend
+    End If
+        
+    Size = Dividend.Precision * DIGITS_PER_INTEGER
     
     If Count > Size Then
         Size = Count
     End If
     
     Output = String$(Size + 1, vbZeroChar)
+    Chars = AsChars(Output)
     
-    If mNumber.Sign = Negative Then
-        Mathematics.Negate Dividend
-    End If
-    
-    i = Len(Output)
+    Pos = Len(Output) - 1
     
     Do While Dividend.Precision > 0
-        Dim Result As Long
-        
-        Result = SingleInPlaceDivideBy10(Dividend)
-        
-        If Result Then
-            Mid$(Output, i, 1) = Chr$(vbZeroChar + Result)
-        End If
-        
-        i = i - 1
+        Chars(Pos) = SingleInPlaceDivideBy10(Dividend) + vbZeroChar
+        Pos = Pos - 1
     Loop
     
-    If Size - i < Count Then
-        i = Size - Count + 1
+    If Size - Pos < Count Then
+        Pos = Size - Count
     End If
     
     If mNumber.Sign = Negative Then
-        Mid$(Output, i, 1) = FormatInfo.NegativeSign
-        i = i - 1
+        Chars(Pos) = AscW(FormatInfo.NegativeSign)
+        Pos = Pos - 1
     End If
     
-    ToDecimalString = Mid$(Output, i + 1)
+    FreeChars Chars
+    ToDecimalString = Mid$(Output, Pos + 2)
 End Function
 
 Private Function ToHexString(ByVal Count As Long, Offset As Long) As String
