@@ -52,8 +52,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mChars()    As Integer
-Private mCharsSA    As SafeArray1d
 Private mZero       As BigInteger
 Private mOne        As BigInteger
 Private mMinusOne   As BigInteger
@@ -116,13 +114,15 @@ End Property
 ' If x > y then 1 is returned.<br>
 '
 Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
-    Dim xNumber As Number: Call x.AttachNumber(xNumber)
-    Dim yNumber As Number: Call y.AttachNumber(yNumber)
+    Dim xNumber As Number
+    Dim yNumber As Number
+    Dim Result  As Long
     
-    Dim Result As Long
+    x.AttachNumber xNumber
+    y.AttachNumber yNumber
     Result = xNumber.Sign - yNumber.Sign
     
     If Result = 0 Then
@@ -161,7 +161,7 @@ End Function
 ' Attemps to parse a string of characters of the specified base type.
 '
 ' @param s The string of characters to attempt to be parsed.
-' @param b The returning BigInteger object if the string was successfully parsed.
+' @param OutResult The returning BigInteger object if the string was successfully parsed.
 ' @return Returns True if the string was parsed, False otherwise.
 ' @remarks 3 base types are supported for parsing (Decimal, Hex, Binary.) The string
 ' must include a base type specifier for Hex and Binary. Decimal is the default.
@@ -178,32 +178,40 @@ End Function
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
 '
-Public Function TryParse(ByVal s As String, ByRef b As BigInteger) As Boolean
-    s = Trim$(s)
-    If Len(s) = 0 Then Exit Function
+Public Function TryParse(ByRef s As String, ByRef OutResult As BigInteger) As Boolean
+    Dim Trimmed     As String
+    Dim StartIndex  As Long
+    Dim n           As Number
     
-    Dim StartIndex As Long
-    Dim n As Number
+    Trimmed = CorString.Trim(s)
     
-    If Left$(s, 1) = "-" Then
+    If Len(Trimmed) = 0 Then
+        Exit Function
+    End If
+        
+    If Left$(Trimmed, 1) = "-" Then
         StartIndex = 1
         n.Sign = Negative
     End If
 
-    Select Case Mid$(s, StartIndex + 1, 2)
+    Select Case Mid$(Trimmed, StartIndex + 1, 2)
         Case "&h", "&H", "0X", "0x"
-            TryParse = TryParseHex(s, StartIndex, n)
+            TryParse = TryParseHex(Trimmed, StartIndex, n)
         Case "0b", "0B"
-            TryParse = TryParseBinary(s, StartIndex, n)
+            TryParse = TryParseBinary(Trimmed, StartIndex, n)
         Case Else
-            TryParse = TryParseDecimal(s, StartIndex, n)
+            TryParse = TryParseDecimal(Trimmed, StartIndex, n)
     End Select
     
     If TryParse Then
-        If n.Sign = Negative Then Call Mathematics.Negate(n)
+        If n.Sign = Negative Then
+            Mathematics.Negate n
+        End If
         
-        Set b = New BigInteger
-        Call b.InternalInitNumber(n)
+        Set OutResult = New BigInteger
+        OutResult.InternalInitNumber n
+    Else
+        Set OutResult = Nothing
     End If
 End Function
 
@@ -258,7 +266,7 @@ End Function
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
 Public Function ToString(ByVal x As BigInteger, Optional ByVal Format As String) As String
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     ToString = x.ToString(Format)
 End Function
 
@@ -275,7 +283,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function Negate(ByVal x As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     Set Negate = x.Negate
 End Function
 
@@ -289,7 +297,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function Absolute(ByVal x As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     Set Absolute = x.Absolute
 End Function
 
@@ -307,8 +315,8 @@ End Function
 ' </pre>
 '
 Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
     If x.Sign = Sign.Zero Then
         Set Add = y
@@ -318,17 +326,18 @@ Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
         Exit Function
     End If
     
-    Dim u As Number: Call x.AttachNumber(u)
-    Dim v As Number: Call y.AttachNumber(v)
+    Dim u       As Number
+    Dim v       As Number
+    Dim sum()   As Integer
     
-    Dim sum() As Integer
+    x.AttachNumber u
+    y.AttachNumber v
     sum = GradeSchoolAdd(u, v)
-    
-    Call x.DetachNumber(u)
-    Call y.DetachNumber(v)
+    x.DetachNumber u
+    y.DetachNumber v
     
     Set Add = New BigInteger
-    Call Add.InternalInit(sum)
+    Add.InternalInit sum
 End Function
 
 ''
@@ -345,8 +354,8 @@ End Function
 ' </pre>
 '
 Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
     If x.Sign = Sign.Zero Then
         Set Subtract = y.Negate
@@ -356,17 +365,18 @@ Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
         Exit Function
     End If
     
-    Dim u As Number: Call x.AttachNumber(u)
-    Dim v As Number: Call y.AttachNumber(v)
-
-    Dim difference() As Integer
+    Dim u               As Number
+    Dim v               As Number
+    Dim difference()    As Integer
+    
+    x.AttachNumber u
+    y.AttachNumber v
     difference = GradeSchoolSubtract(u, v)
-
-    Call x.DetachNumber(u)
-    Call y.DetachNumber(v)
+    x.DetachNumber u
+    y.DetachNumber v
     
     Set Subtract = New BigInteger
-    Call Subtract.InternalInit(difference)
+    Subtract.InternalInit difference
 End Function
 
 ''
@@ -383,8 +393,8 @@ End Function
 ' </pre>
 '
 Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
     If (x.Sign = Sign.Zero) Or (y.Sign = Sign.Zero) Then
         Set Multiply = mZero
@@ -407,28 +417,34 @@ Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
     Dim v As Number
     
     If x.Sign = Sign.Negative Then
-        Call x.CopyNumber(u)
-        Call Mathematics.Negate(u)
+        x.CopyNumber u
+        Mathematics.Negate u
     Else
-        Call x.AttachNumber(u)
+        x.AttachNumber u
     End If
 
     If y.Sign = Sign.Negative Then
-        Call y.CopyNumber(v)
-        Call Mathematics.Negate(v)
+        y.CopyNumber v
+        Mathematics.Negate v
     Else
-        Call y.AttachNumber(v)
+        y.AttachNumber v
     End If
     
     Dim product() As Integer
     product = GradeSchoolMultiply(u, v)
     
-    If x.Sign = Sign.Positive Then Call x.DetachNumber(u)
-    If y.Sign = Sign.Positive Then Call y.DetachNumber(v)
-    If x.Sign <> y.Sign Then Call ApplyTwosComplement(product)
+    If x.Sign = Sign.Positive Then
+        x.DetachNumber u
+    End If
+    If y.Sign = Sign.Positive Then
+        y.DetachNumber v
+    End If
+    If x.Sign <> y.Sign Then
+        ApplyTwosComplement product
+    End If
         
     Set Multiply = New BigInteger
-    Call Multiply.InternalInit(product)
+    Multiply.InternalInit product
 End Function
 
 
@@ -485,7 +501,7 @@ End Function
 ' Debug.Print b.ToString '' 20
 ' </pre>
 Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
-    Call InternalDivide(Dividend, Divisor, Modulus, True)
+    InternalDivide Dividend, Divisor, Modulus, True
 End Function
 
 ''
@@ -497,8 +513,8 @@ End Function
 ' @remarks Values of Nothing will be treated as zero.
 '
 Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
     If x.Sign = Sign.Zero And y.Sign = Sign.Zero Then
         Set GreatestCommonDivisor = mZero
@@ -530,7 +546,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function TestBit(ByVal x As BigInteger, ByVal Bit As Long) As Boolean
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     TestBit = x.TestBit(Bit)
 End Function
 
@@ -546,7 +562,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function SetBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     SetBit = x.SetBit(Bit)
 End Function
 
@@ -559,7 +575,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function ClearBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     Set ClearBit = x.ClearBit(Bit)
 End Function
 
@@ -575,7 +591,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function FlipBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     Set FlipBit = x.FlipBit(Bit)
 End Function
 
@@ -588,47 +604,51 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function AndBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
     If x.Sign = Sign.Zero Or y.Sign = Sign.Zero Then
         Set AndBits = mZero
         Exit Function
     End If
     
-    Dim extDigit    As Integer
+    Dim ExtDigit    As Integer
     Dim Number()    As Integer
-    Dim longNumber  As Number
-    Dim shortNumber As Number
+    Dim LongNumber  As Number
+    Dim ShortNumber As Number
     
     If x.Precision >= y.Precision Then
-        Call x.AttachNumber(longNumber)
-        Call y.AttachNumber(shortNumber)
+        x.AttachNumber LongNumber
+        y.AttachNumber ShortNumber
     Else
-        Call x.AttachNumber(shortNumber)
-        Call y.AttachNumber(longNumber)
+        x.AttachNumber ShortNumber
+        y.AttachNumber LongNumber
     End If
-    If shortNumber.Sign = Sign.Negative Then extDigit = &HFFFF
-    ReDim Number(0 To longNumber.Precision)
+    
+    If ShortNumber.Sign = Sign.Negative Then
+        ExtDigit = &HFFFF
+    End If
+    
+    ReDim Number(0 To LongNumber.Precision)
     
     Dim i As Long
-    For i = 0 To shortNumber.Precision - 1
-        Number(i) = longNumber.Digits(i) And shortNumber.Digits(i)
+    For i = 0 To ShortNumber.Precision - 1
+        Number(i) = LongNumber.Digits(i) And ShortNumber.Digits(i)
     Next i
     
-    For i = shortNumber.Precision To longNumber.Precision - 1
-        Number(i) = longNumber.Digits(i) And extDigit
+    For i = ShortNumber.Precision To LongNumber.Precision - 1
+        Number(i) = LongNumber.Digits(i) And ExtDigit
     Next i
     
-    If longNumber.Sign = Negative Then
-        Number(longNumber.Precision) = &HFFFF And extDigit
+    If LongNumber.Sign = Negative Then
+        Number(LongNumber.Precision) = &HFFFF And ExtDigit
     End If
     
-    Call x.DetachNumber(longNumber)
-    Call y.DetachNumber(shortNumber)
+    x.DetachNumber LongNumber
+    y.DetachNumber ShortNumber
     
     Set AndBits = New BigInteger
-    Call AndBits.InternalInit(Number)
+    AndBits.InternalInit Number
 End Function
 
 ''
@@ -640,8 +660,8 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function OrBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
     If x.Sign = Sign.Zero Then
         Set OrBits = y
@@ -651,37 +671,43 @@ Public Function OrBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteg
         Exit Function
     End If
     
-    Dim extDigit    As Integer
+    Dim ExtDigit    As Integer
     Dim Number()    As Integer
-    Dim longNumber  As Number
-    Dim shortNumber As Number
+    Dim LongNumber  As Number
+    Dim ShortNumber As Number
     
     If x.Precision >= y.Precision Then
-        Call x.AttachNumber(longNumber)
-        Call y.AttachNumber(shortNumber)
+        x.AttachNumber LongNumber
+        y.AttachNumber ShortNumber
     Else
-        Call x.AttachNumber(shortNumber)
-        Call y.AttachNumber(longNumber)
+        x.AttachNumber ShortNumber
+        y.AttachNumber LongNumber
     End If
-    If shortNumber.Sign = Sign.Negative Then extDigit = &HFFFF
-    ReDim Number(0 To longNumber.Precision)
+    
+    If ShortNumber.Sign = Sign.Negative Then
+        ExtDigit = &HFFFF
+    End If
+    
+    ReDim Number(0 To LongNumber.Precision)
     
     Dim i As Long
-    For i = 0 To shortNumber.Precision - 1
-        Number(i) = longNumber.Digits(i) Or shortNumber.Digits(i)
+    For i = 0 To ShortNumber.Precision - 1
+        Number(i) = LongNumber.Digits(i) Or ShortNumber.Digits(i)
     Next i
     
-    For i = shortNumber.Precision To longNumber.Precision - 1
-        Number(i) = longNumber.Digits(i) Or extDigit
+    For i = ShortNumber.Precision To LongNumber.Precision - 1
+        Number(i) = LongNumber.Digits(i) Or ExtDigit
     Next i
     
-    If longNumber.Sign = Negative Then Number(longNumber.Precision) = &HFFFF Or extDigit
+    If LongNumber.Sign = Negative Then
+        Number(LongNumber.Precision) = &HFFFF Or ExtDigit
+    End If
     
-    Call x.DetachNumber(longNumber)
-    Call y.DetachNumber(shortNumber)
+    x.DetachNumber LongNumber
+    y.DetachNumber ShortNumber
     
     Set OrBits = New BigInteger
-    Call OrBits.InternalInit(Number)
+    OrBits.InternalInit Number
 End Function
 
 ''
@@ -693,8 +719,8 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
-    If y Is Nothing Then Set y = mZero
+    ZeroIfNothing x
+    ZeroIfNothing y
     
     If x.Sign = Sign.Zero Then
         Set XorBits = y
@@ -704,42 +730,43 @@ Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInte
         Exit Function
     End If
     
-    Dim extDigit    As Integer
+    Dim ExtDigit    As Integer
     Dim Number()    As Integer
-    Dim longNumber  As Number
-    Dim shortNumber As Number
+    Dim LongNumber  As Number
+    Dim ShortNumber As Number
     
     If x.Precision >= y.Precision Then
-        Call x.AttachNumber(longNumber)
-        Call y.AttachNumber(shortNumber)
+        x.AttachNumber LongNumber
+        y.AttachNumber ShortNumber
     Else
-        Call x.AttachNumber(shortNumber)
-        Call y.AttachNumber(longNumber)
-    End If
-    If shortNumber.Sign = Sign.Negative Then
-        extDigit = &HFFFF
+        x.AttachNumber ShortNumber
+        y.AttachNumber LongNumber
     End If
     
-    ReDim Number(0 To longNumber.Precision)
+    If ShortNumber.Sign = Sign.Negative Then
+        ExtDigit = &HFFFF
+    End If
+    
+    ReDim Number(0 To LongNumber.Precision)
     
     Dim i As Long
-    For i = 0 To shortNumber.Precision - 1
-        Number(i) = longNumber.Digits(i) Xor shortNumber.Digits(i)
+    For i = 0 To ShortNumber.Precision - 1
+        Number(i) = LongNumber.Digits(i) Xor ShortNumber.Digits(i)
     Next i
     
-    For i = shortNumber.Precision To longNumber.Precision - 1
-        Number(i) = longNumber.Digits(i) Xor extDigit
+    For i = ShortNumber.Precision To LongNumber.Precision - 1
+        Number(i) = LongNumber.Digits(i) Xor ExtDigit
     Next i
     
-    If longNumber.Sign = Negative Then
-        Number(longNumber.Precision) = &HFFFF Xor extDigit
+    If LongNumber.Sign = Negative Then
+        Number(LongNumber.Precision) = &HFFFF Xor ExtDigit
     End If
     
-    Call x.DetachNumber(longNumber)
-    Call y.DetachNumber(shortNumber)
+    x.DetachNumber LongNumber
+    y.DetachNumber ShortNumber
     
     Set XorBits = New BigInteger
-    Call XorBits.InternalInit(Number)
+    XorBits.InternalInit Number
 End Function
 
 ''
@@ -751,7 +778,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function NotBits(ByVal x As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     
     If x.Sign = Sign.Zero Then
         Set NotBits = mMinusOne
@@ -767,7 +794,7 @@ Public Function NotBits(ByVal x As BigInteger) As BigInteger
     Next i
     
     Set NotBits = New BigInteger
-    Call NotBits.InternalInitNumber(xNumber)
+    NotBits.InternalInitNumber xNumber
 End Function
 
 ''
@@ -790,9 +817,9 @@ End Function
 ' @return Returns the baseValue^exponent result.
 ' @remarks Values of Nothing are treated as zero.
 '
-Public Function Pow(ByVal baseValue As BigInteger, ByVal Exponent As BigInteger) As BigInteger
-    If baseValue Is Nothing Then Set baseValue = mZero
-    If Exponent Is Nothing Then Set Exponent = mZero
+Public Function Pow(ByVal BaseValue As BigInteger, ByVal Exponent As BigInteger) As BigInteger
+    ZeroIfNothing BaseValue
+    ZeroIfNothing Exponent
 
     If Exponent.Sign = Sign.Negative Then _
         Error.ArgumentOutOfRange "Exponent", ArgumentOutOfRange_NeedNonNegNum
@@ -801,16 +828,16 @@ Public Function Pow(ByVal baseValue As BigInteger, ByVal Exponent As BigInteger)
         Set Pow = mOne
         Exit Function
     ElseIf Exponent.IsOne Then
-        Set Pow = baseValue
+        Set Pow = BaseValue
         Exit Function
     End If
 
-    Dim y As BigInteger
-    Dim z As BigInteger
-    Dim IsOdd As Boolean
+    Dim y       As BigInteger
+    Dim z       As BigInteger
+    Dim IsOdd   As Boolean
     
     Set y = mOne
-    Set z = baseValue
+    Set z = BaseValue
     
     Do
         IsOdd = Exponent.TestBit(0)
@@ -838,9 +865,9 @@ End Function
 ' @return Returns the modulus of the raised baseValue.
 ' <p>Values of Nothing are treated as zero.</p>
 '
-Public Function ModPow(ByVal baseValue As BigInteger, ByVal Exponent As BigInteger, ByVal m As BigInteger) As BigInteger
-    Set baseValue = Pow(baseValue, Exponent)
-    DivRem baseValue, m, ModPow
+Public Function ModPow(ByVal BaseValue As BigInteger, ByVal Exponent As BigInteger, ByVal m As BigInteger) As BigInteger
+    Set BaseValue = Pow(BaseValue, Exponent)
+    DivRem BaseValue, m, ModPow
 End Function
 
 ''
@@ -878,12 +905,12 @@ End Function
 ''
 ' Randomizes the Rnd function.
 '
-' @param num The number used to randomize the Rnd method.
+' @param Value The number used to randomize the Rnd method.
 ' @remarks This is provided because the VB Rnd function runs
 ' independently for each component.
 '
-Public Sub Randomize(Optional ByVal num As Variant)
-    Call VBA.Randomize(num)
+Public Sub Randomize(Optional ByRef Value As Variant)
+    VBA.Randomize Value
 End Sub
 
 ''
@@ -893,8 +920,8 @@ End Sub
 ' @remarks This is provided because the VB Rnd function runs
 ' independently for each component.
 '
-Public Sub SeedRnd(Optional ByVal seed As Variant)
-    Call VBA.Rnd(seed)
+Public Sub SeedRnd(Optional ByRef Seed As Variant)
+    VBA.Rnd Seed
 End Sub
 
 ''
@@ -905,32 +932,35 @@ End Sub
 ' @return A new BigInteger of a random value.
 '
 Public Function Rnd(ByVal Size As Long, Optional ByVal IsNegative As Boolean = False) As BigInteger
-    If Size < 0 Then Call Err.Raise(5, , "size cannot be negative")
+    If Size < 0 Then _
+        Error.ArgumentOutOfRange "Size", ArgumentOutOfRange_NeedNonNegNum
     
     If Size = 0 Then
         Set Rnd = mZero
         Exit Function
     End If
     
-    Dim wordCount As Long
-    wordCount = Size \ 2
+    Dim WordCount As Long
+    WordCount = Size \ 2
     
-    Dim ints() As Integer
-    ReDim ints(0 To wordCount)
+    Dim Ints() As Integer
+    ReDim Ints(0 To WordCount)
     
     Dim i As Long
-    For i = 0 To wordCount - 1
-        ints(i) = Int(VBA.Rnd * 65536) - 32768
+    For i = 0 To WordCount - 1
+        Ints(i) = Int(VBA.Rnd * 65536) - 32768
     Next i
     
     If Size And 1 Then
-        ints(wordCount) = VBA.Rnd * &H100
+        Ints(WordCount) = VBA.Rnd * &H100
     End If
     
-    If IsNegative Then Call ApplyTwosComplement(ints)
+    If IsNegative Then
+        ApplyTwosComplement Ints
+    End If
     
     Set Rnd = New BigInteger
-    Call Rnd.InternalInit(ints)
+    Rnd.InternalInit Ints
 End Function
 
 ''
@@ -943,10 +973,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function ShiftLeft(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
-    If x Is Nothing Then
-        Set x = mZero
-    End If
-    
+    ZeroIfNothing x
     Set ShiftLeft = x.ShiftLeft(BitCount)
 End Function
 
@@ -960,7 +987,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function ShiftRight(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     Set ShiftRight = x.ShiftRight(BitCount)
 End Function
 
@@ -971,7 +998,7 @@ End Function
 ' @Return The integer square root of the value.
 '
 Public Function SquareRoot(ByVal x As BigInteger) As BigInteger
-    If x Is Nothing Then Set x = mZero
+    ZeroIfNothing x
     
     If x.Sign = Sign.Zero Then
         Set SquareRoot = mZero
@@ -980,18 +1007,18 @@ Public Function SquareRoot(ByVal x As BigInteger) As BigInteger
         Set x = x.Negate
     End If
     
-    Dim estimate As BigInteger
-    Set estimate = x.ShiftRight(1).Add(mOne)
-    
+    Dim Estimate As BigInteger
     Dim n As BigInteger
-    Set n = x.Divide(estimate).Add(estimate).ShiftRight(1)
     
-    Do While Compare(n, estimate) < 0
-        Set estimate = n
-        Set n = x.Divide(estimate).Add(estimate).ShiftRight(1)
+    Set Estimate = x.ShiftRight(1).Add(mOne)
+    Set n = x.Divide(Estimate).Add(Estimate).ShiftRight(1)
+    
+    Do While Compare(n, Estimate) < 0
+        Set Estimate = n
+        Set n = x.Divide(Estimate).Add(Estimate).ShiftRight(1)
     Loop
     
-    Set SquareRoot = estimate
+    Set SquareRoot = Estimate
 End Function
 
 ''
@@ -1003,9 +1030,7 @@ End Function
 Public Function Factorial(ByVal Value As BigInteger) As BigInteger
     Dim Result As BigInteger
     
-    If Value Is Nothing Then
-        Set Value = mZero
-    End If
+    ZeroIfNothing Value
     
     If Value.Sign = Negative Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
@@ -1022,37 +1047,66 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    Set mZero = Cor.NewBigInteger(0)
+    Set mOne = Cor.NewBigInteger(1)
+    Set mMinusOne = Cor.NewBigInteger(-1)
+    Set mTen = Cor.NewBigInteger(10)
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
+    If RefValue Is Nothing Then
+        Set RefValue = mZero
+    End If
+End Sub
+
 Private Function TryParseDecimal(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
-    If Len(s) - StartIndex < 1 Then Exit Function
+    Dim Chars() As Integer
+    Dim ub As Long
     
-    Call HookString(s)
-    Dim ub As Long: ub = Len(s) \ 4 + 1
+    If Len(s) - StartIndex < 1 Then
+        Exit Function
+    End If
+    
+    Chars = AllocChars(s)
+    
+    ub = Len(s) \ 4 + 1
     ReDim n.Digits(0 To ub)
     
     Dim i As Long
-    For i = StartIndex To mCharsSA.cElements - 1
-        Select Case mChars(i)
+    For i = StartIndex To UBound(Chars)
+        Select Case Chars(i)
             Case 48 To 57
-                Call SingleInPlaceMultiply(n, 10)
-                Call SingleInPlaceAdd(n, mChars(i) - 48)
+                SingleInPlaceMultiply n, 10
+                SingleInPlaceAdd n, Chars(i) - 48
             Case Else
-                Exit Function
+                GoTo Finally
         End Select
     Next i
     
     n.Precision = n.Precision + 1   ' add one additional zero.
-    Call UnhookString
-    
     TryParseDecimal = True
+    
+Finally:
+    FreeChars Chars
 End Function
 
 Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
-    If Len(s) - StartIndex < 3 Then Exit Function
+    Dim Chars() As Integer
+    Dim ub      As Long
     
-    Call HookString(s)
-    Dim ub As Long: ub = (Len(s) - 2) \ 4 + 1
+    If Len(s) - StartIndex < 3 Then
+        Exit Function
+    End If
+    
+    Chars = AllocChars(s)
+    ub = (Len(s) - 2) \ 4 + 1
     ReDim n.Digits(0 To ub)
     
     Dim c As Long
@@ -1061,19 +1115,22 @@ Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef 
     Dim k As Long
     For i = Len(s) - 1 To 2 + StartIndex Step -1
         Dim Ch As Long
-        Select Case mChars(i)
-            Case 48 To 57:  Ch = mChars(i) - 48
-            Case 65 To 70:  Ch = mChars(i) - 55
-            Case 97 To 102: Ch = mChars(i) - 87
+        Select Case Chars(i)
+            Case 48 To 57
+                Ch = Chars(i) - 48
+            Case 65 To 70
+                Ch = Chars(i) - 55
+            Case 97 To 102
+                Ch = Chars(i) - 87
             Case Else
-                Exit Function
+                GoTo Finally
         End Select
         
         k = k + Ch * j
         j = j * 16
         
         If j = &H10000 Then
-            n.Digits(c) = GetInt(k)
+            n.Digits(c) = AsWord(k)
             k = 0
             j = 1
             c = c + 1
@@ -1081,23 +1138,32 @@ Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef 
     Next i
     
     If k Then
-        n.Digits(c) = GetInt(k)
+        n.Digits(c) = AsWord(k)
         c = c + 1
     End If
     
     n.Precision = c
-    Call UnhookString
-    
     TryParseHex = True
+    
+Finally:
+    FreeChars Chars
 End Function
 
 Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
-    If Len(s) - StartIndex < 3 Then Exit Function
+    Dim Chars() As Integer
+    Dim ub      As Long:
     
-    Call HookString(s)
+    If Len(s) - StartIndex < 3 Then
+        Exit Function
+    End If
     
-    Dim ub As Long: ub = (Len(s) - 2) \ 16 + 1
-    If ub = 0 Then ub = 1
+    Chars = AllocChars(s)
+    ub = (Len(s) - 2) \ 16 + 1
+    
+    If ub = 0 Then
+        ub = 1
+    End If
+    
     ReDim n.Digits(0 To ub)
     
     Dim c As Long
@@ -1106,10 +1172,11 @@ Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByR
     Dim k As Long
     For i = Len(s) - 1 To 2 + StartIndex Step -1
         Dim Ch As Long
-        Select Case mChars(i)
-            Case 48, 49: Ch = mChars(i) - 48
+        Select Case Chars(i)
+            Case 48, 49
+                Ch = Chars(i) - 48
             Case Else
-                Exit Function
+                GoTo Finally
         End Select
         
         k = k + Ch * j
@@ -1129,9 +1196,10 @@ Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByR
     End If
     
     n.Precision = c
-    Call UnhookString
-    
     TryParseBinary = True
+    
+Finally:
+    FreeChars Chars
 End Function
 
 Private Sub DivideByZeroError()
@@ -1139,30 +1207,43 @@ Private Sub DivideByZeroError()
 End Sub
 
 Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef Remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
-    If Dividend Is Nothing Then Set Dividend = mZero
-    If Divisor Is Nothing Then Set Divisor = mZero
+    ZeroIfNothing Dividend
+    ZeroIfNothing Divisor
     
     If Divisor.Sign = Sign.Zero Then
-        Call DivideByZeroError
+        DivideByZeroError
     ElseIf Dividend.Sign = Sign.Zero Then
         Set InternalDivide = mZero
-        If IncludeRemainder Then Set Remainder = mZero
+        If IncludeRemainder Then
+            Set Remainder = mZero
+        End If
         Exit Function
     ElseIf Divisor.IsOne Then
         Set InternalDivide = Dividend
-        If IncludeRemainder Then Set Remainder = mZero
+        If IncludeRemainder Then
+            Set Remainder = mZero
+        End If
         Exit Function
     ElseIf Divisor.IsMinusOne Then
         Set InternalDivide = Dividend.Negate
-        If IncludeRemainder Then Set Remainder = mZero
+        If IncludeRemainder Then
+            Set Remainder = mZero
+        End If
         Exit Function
     End If
     
-    Dim xNumber As Number: Call Dividend.CopyNumber(xNumber)
-    Dim yNumber As Number: Call Divisor.CopyNumber(yNumber)
+    Dim xNumber As Number
+    Dim yNumber As Number
     
-    If Dividend.Sign = Sign.Negative Then Call Mathematics.Negate(xNumber)
-    If Divisor.Sign = Sign.Negative Then Call Mathematics.Negate(yNumber)
+    Dividend.CopyNumber xNumber
+    Divisor.CopyNumber yNumber
+      
+    If Dividend.Sign = Sign.Negative Then
+        Mathematics.Negate xNumber
+    End If
+    If Divisor.Sign = Sign.Negative Then
+        Mathematics.Negate yNumber
+    End If
     
     Dim QuotientNumber()    As Integer
     Dim RemainderNumber()   As Integer
@@ -1180,10 +1261,10 @@ Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As B
     End If
     
     If Dividend.Sign <> Divisor.Sign Then
-        Call ApplyTwosComplement(QuotientNumber)
+        ApplyTwosComplement QuotientNumber
         
         If IncludeRemainder Then
-            Call ApplyTwosComplement(RemainderNumber)
+            ApplyTwosComplement RemainderNumber
         End If
     End If
     
@@ -1197,29 +1278,7 @@ Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As B
     End If
     
     Set InternalDivide = New BigInteger
-    Call InternalDivide.InternalInit(QuotientNumber)
+    InternalDivide.InternalInit QuotientNumber
 End Function
 
-Private Sub HookString(ByRef s As String)
-    mCharsSA.pvData = StrPtr(s)
-    mCharsSA.cElements = Len(s)
-    mCharsSA.cDims = 1
-    mCharsSA.cbElements = 2
-    SAPtr(mChars) = VarPtr(mCharsSA)
-End Sub
-
-Private Sub UnhookString()
-    SAPtr(mChars) = vbNullPtr
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mZero = Cor.NewBigInteger(0)
-    Set mOne = Cor.NewBigInteger(1)
-    Set mMinusOne = Cor.NewBigInteger(-1)
-    Set mTen = Cor.NewBigInteger(10)
-End Sub
 

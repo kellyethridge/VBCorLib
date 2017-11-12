@@ -348,6 +348,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, &HFFFE
             Test.Use &HFFFF0000, &HFFFF&
             
+        Case "Precision_WithValue_ReturnsExpected"
+            Test.Use 0, 0
+            Test.Use 1, 1
+            Test.Use &HFF, 1
+            Test.Use &H1FF, 2
+            Test.Use &HFFFFFF, 3
+            Test.Use &HFFFF, 2
+            Test.Use &HFFFFFFFF, 2
+            
     End Select
 End Sub
 
@@ -736,9 +745,17 @@ Public Sub Rnd_WithNegative_ReturnsNegativeRandomNumber()
     Assert.That Actual.Sign, Iz.EqualTo(Sign.Negative)
 End Sub
 
+Public Sub Precision_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = BInt(Value).Precision
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 
 Private Sub AssertNumber(ByVal Number As BigInteger, ByRef ExpectedBytes() As Byte, ByRef ExpectedSign As Sign, ByRef ExpectedPrecision As Long)
-    Assert.That Number.ToArray, Iz.EqualTo(ExpectedBytes)
+    Assert.That Number.ToByteArray, Iz.EqualTo(ExpectedBytes)
     Assert.That Number.Sign, Iz.EqualTo(ExpectedSign)
     Assert.That Number.Precision, Iz.EqualTo(ExpectedPrecision)
 End Sub
