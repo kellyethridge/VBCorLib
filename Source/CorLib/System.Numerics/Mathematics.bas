@@ -101,27 +101,27 @@ Public Function GradeSchoolSubtract(ByRef u As Number, ByRef v As Number) As Int
     If u.Sign = Negative Then uExtDigit = &HFFFF&
     If v.Sign = Negative Then vExtDigit = &HFFFF&
 
-    Dim difference() As Integer
+    Dim Difference() As Integer
     If u.Precision >= v.Precision Then
-        ReDim difference(0 To u.Precision)
+        ReDim Difference(0 To u.Precision)
     Else
-        ReDim difference(0 To v.Precision)
+        ReDim Difference(0 To v.Precision)
     End If
 
     Dim i       As Long
     Dim k       As Long
     Dim uDigit  As Long
     Dim vDigit  As Long
-    For i = 0 To UBound(difference)
+    For i = 0 To UBound(Difference)
         If i < u.Precision Then uDigit = u.Digits(i) And &HFFFF& Else uDigit = uExtDigit
         If i < v.Precision Then vDigit = v.Digits(i) And &HFFFF& Else vDigit = vExtDigit
         
         k = uDigit - vDigit + k ' this is the only change from addition
-        difference(i) = k And &HFFFF&
+        Difference(i) = k And &HFFFF&
         k = (k And &HFFFF0000) \ &H10000
     Next i
     
-    GradeSchoolSubtract = difference
+    GradeSchoolSubtract = Difference
 End Function
 
 ''
@@ -130,8 +130,8 @@ End Function
 ' Ref: The Art of Computer Programming 4.3.1.M
 '
 Public Function GradeSchoolMultiply(ByRef u As Number, ByRef v As Number) As Integer()
-    Dim product() As Integer
-    ReDim product(0 To u.Precision + v.Precision)
+    Dim Product() As Integer
+    ReDim Product(0 To u.Precision + v.Precision)
 
     Dim i As Long
     Dim j As Long
@@ -143,15 +143,15 @@ Public Function GradeSchoolMultiply(ByRef u As Number, ByRef v As Number) As Int
         k = 0
         
         For i = 0 To u.Precision - 1
-            k = d * (u.Digits(i) And &HFFFF&) + (product(i + j) And &HFFFF&) + k
-            product(i + j) = k And &HFFFF&
+            k = d * (u.Digits(i) And &HFFFF&) + (Product(i + j) And &HFFFF&) + k
+            Product(i + j) = k And &HFFFF&
             k = ((k And &HFFFF0000) \ &H10000) And &HFFFF&
         Next i
         
-        product(i + j) = k And &HFFFF&
+        Product(i + j) = k And &HFFFF&
     Next j
     
-    GradeSchoolMultiply = product
+    GradeSchoolMultiply = Product
 End Function
 
 ''
@@ -519,15 +519,15 @@ Public Sub ApplyTwosComplement(ByRef n() As Integer)
     Dim c As Long: c = 1
     Dim i As Long
     For i = 0 To UBound(n)
-        c = (GetLong(n(i) Xor &HFFFF)) + c
+        c = ((n(i) Xor &HFFFF) And &HFFFF&) + c
         n(i) = GetInt(c)
         c = RightShift16(c)
     Next i
 End Sub
 
 Public Function GradeSchoolMultiply(ByRef u As Number, ByRef v As Number) As Integer()
-    Dim product() As Integer
-    ReDim product(0 To u.Precision + v.Precision)
+    Dim Product() As Integer
+    ReDim Product(0 To u.Precision + v.Precision)
     
     Dim i As Long
     Dim j As Long
@@ -536,14 +536,14 @@ Public Function GradeSchoolMultiply(ByRef u As Number, ByRef v As Number) As Int
     For i = 0 To v.Precision - 1
         k = 0
         For j = 0 To u.Precision - 1
-            k = UInt16x16To32(v.Digits(i), u.Digits(j)) + GetLong(product(i + j)) + k
-            product(i + j) = GetInt(k)
+            k = UInt16x16To32(v.Digits(i), u.Digits(j)) + (Product(i + j) And &HFFFF&) + k
+            Product(i + j) = GetInt(k)
             k = RightShift16(k)
         Next j
-        product(i + j) = GetInt(k)
+        Product(i + j) = GetInt(k)
     Next i
     
-    GradeSchoolMultiply = product
+    GradeSchoolMultiply = Product
 End Function
 
 Public Sub SingleInPlaceMultiply(ByRef n As Number, ByVal Value As Long)
@@ -565,12 +565,15 @@ End Sub
 Public Sub SingleInPlaceAdd(ByRef n As Number, ByVal Value As Integer)
     Dim i As Long
     Dim k As Long
-    k = GetLong(Value)
+    
+    k = Value And &HFFFF&
     
     Do While k > 0
-        If i >= n.Precision Then n.Precision = n.Precision + 1
+        If i >= n.Precision Then
+            n.Precision = n.Precision + 1
+        End If
         
-        k = GetLong(n.Digits(i)) + k
+        k = (n.Digits(i) And &HFFFF&) + k
         n.Digits(i) = GetInt(k)
         k = RightShift16(k)
         i = i + 1
@@ -578,9 +581,11 @@ Public Sub SingleInPlaceAdd(ByRef n As Number, ByVal Value As Integer)
 End Sub
 
 Public Sub Negate(ByRef n As Number)
-    Dim k As Long: k = 1
+    Dim k As Long
     Dim i As Long
 
+    k = 1
+ 
     ' this is to handle situations like FFFF => FFFF0001.
     If n.Sign = Sign.Positive Then
         If n.Digits(n.Precision - 1) And &H8000 Then
@@ -599,7 +604,7 @@ Public Sub Negate(ByRef n As Number)
     End If
 
     For i = 0 To n.Precision - 1
-        k = k + GetLong(n.Digits(i) Xor &HFFFF)
+        k = k + ((n.Digits(i) Xor &HFFFF) And &HFFFF&)
         n.Digits(i) = GetInt(k)
         k = RightShift16(k)
     Next i
@@ -614,7 +619,7 @@ Public Function SingleInPlaceDivideBy10(ByRef n As Number) As Long
     Dim d As Long
 
     For i = n.Precision - 1 To 0 Step -1
-        R = (R * &H10000) + GetLong(n.Digits(i))
+        R = (R * &H10000) + (n.Digits(i) And &HFFFF&)
         d = R \ 10
         n.Digits(i) = GetInt(d)
         R = R - (d * 10)
@@ -650,9 +655,18 @@ Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer(
     Dim uDigit  As Long
     Dim vDigit  As Long
     For i = 0 To UBound(sum)
-        If i < u.Precision Then uDigit = GetLong(u.Digits(i)) Else uDigit = uExtDigit
-        If i < v.Precision Then vDigit = GetLong(v.Digits(i)) Else vDigit = vExtDigit
-
+        If i < u.Precision Then
+            uDigit = u.Digits(i) And &HFFFF&
+        Else
+            uDigit = uExtDigit
+        End If
+        
+        If i < v.Precision Then
+            vDigit = v.Digits(i) And &HFFFF&
+        Else
+            vDigit = vExtDigit
+        End If
+        
         k = uDigit + vDigit + k ' this is the only change for the subtraction
         sum(i) = GetInt(k)
         k = (k And &HFFFF0000) \ &H10000
@@ -662,33 +676,43 @@ Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer(
 End Function
 
 Public Function GradeSchoolSubtract(ByRef u As Number, ByRef v As Number) As Integer()
-    Dim uExtDigit As Long
-    Dim vExtDigit As Long
+    Dim uExtDigit       As Long
+    Dim vExtDigit       As Long
+    Dim Difference()    As Integer
 
     If u.Sign = Negative Then uExtDigit = &HFFFF&
     If v.Sign = Negative Then vExtDigit = &HFFFF&
 
-    Dim difference() As Integer
+    
     If u.Precision >= v.Precision Then
-        ReDim difference(0 To u.Precision)
+        ReDim Difference(0 To u.Precision)
     Else
-        ReDim difference(0 To v.Precision)
+        ReDim Difference(0 To v.Precision)
     End If
     
     Dim i       As Long
     Dim k       As Long
     Dim uDigit  As Long
     Dim vDigit  As Long
-    For i = 0 To UBound(difference)
-        If i < u.Precision Then uDigit = GetLong(u.Digits(i)) Else uDigit = uExtDigit
-        If i < v.Precision Then vDigit = GetLong(v.Digits(i)) Else vDigit = vExtDigit
+    For i = 0 To UBound(Difference)
+        If i < u.Precision Then
+            uDigit = u.Digits(i) And &HFFFF&
+        Else
+            uDigit = uExtDigit
+        End If
+        
+        If i < v.Precision Then
+            vDigit = v.Digits(i) And &HFFFF&
+        Else
+            vDigit = vExtDigit
+        End If
 
         k = uDigit - vDigit + k ' this is the only change for the addition
-        difference(i) = GetInt(k)
+        Difference(i) = GetInt(k)
         k = (k And &HFFFF0000) \ &H10000
     Next i
     
-    GradeSchoolSubtract = difference
+    GradeSchoolSubtract = Difference
 End Function
 
 Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
@@ -710,7 +734,7 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
     u.Precision = u.Precision + 1
         
     Dim d As Long
-    d = &H10000 \ (1 + GetLong(v.Digits(n - 1)))
+    d = &H10000 \ (1 + (v.Digits(n - 1) And &HFFFF&))
     
     If d > 1 Then
         SingleInPlaceMultiply u, d
@@ -724,7 +748,7 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
     vDigit = v.Digits(n - 1)
     
     Dim vDigit2 As Long
-    If n - 2 >= 0 Then vDigit2 = GetLong(v.Digits(n - 2))
+    If n - 2 >= 0 Then vDigit2 = v.Digits(n - 2) And &HFFFF&
     
     Dim qTimesu() As Integer
     ReDim qTimesu(0 To n)
@@ -741,13 +765,13 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
         
         Do
             If qHat < &H10000 Then
-                If UInt32Compare(UInt32x16To32(qHat, v.Digits(n - 2)), LeftShift16(rHat) + GetLong(u.Digits(j + n - 2))) <= 0 Then
+                If UInt32Compare(UInt32x16To32(qHat, v.Digits(n - 2)), LeftShift16(rHat) + (u.Digits(j + n - 2) And &HFFFF&)) <= 0 Then
                     Exit Do
                 End If
             End If
             
             qHat = qHat - 1
-            rHat = rHat + GetLong(vDigit)
+            rHat = rHat + (vDigit And &HFFFF&)
         Loop While rHat < &H10000
         
         Call SinglePlaceMultiply(v.Digits, n, qHat, qTimesu)
@@ -775,7 +799,7 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
 End Function
 
 Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
-    Dim v As Currency: v = GetLong(y)
+    Dim v As Currency: v = y And &HFFFF&
     Dim w As Currency: w = (v * x) * 0.0001@
     Call CopyMemory(UInt32x16To32, w, 4)
 End Function
@@ -810,9 +834,13 @@ Private Function MultiInPlaceSubtract(ByRef u() As Integer, ByVal StartIndex As 
     ubv = UBound(v)
     
     For i = StartIndex To UBound(u)
-        If j <= ubv Then d = GetLong(v(j)) Else d = 0
+        If j <= ubv Then
+            d = v(j) And &HFFFF&
+        Else
+            d = 0
+        End If
         
-        Result = Result + (GetLong(u(i)) - d) + k
+        Result = Result + ((u(i) And &HFFFF&) - d) + k
         
         If Result < 0 Then
             Result = Result + &H10000
@@ -838,9 +866,13 @@ Private Sub MultiInPlaceAdd(ByRef u() As Integer, ByVal StartIndex As Long, ByRe
     ubv = UBound(v)
     
     For i = StartIndex To UBound(u)
-        If j <= ubv Then d = GetLong(v(j)) Else d = 0
+        If j <= ubv Then
+            d = v(j) And &HFFFF&
+        Else
+            d = 0
+        End If
         
-        Result = Result + GetLong(u(i)) + d
+        Result = Result + (u(i) And &HFFFF&) + d
         u(i) = GetInt(Result)
         Result = RightShift16(Result)
         j = j + 1
@@ -854,7 +886,7 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
     Dim R As Long
     Dim i As Long
     For i = Length - 1 To 0 Step -1
-        R = R * &H10000 + GetLong(u(i))
+        R = R * &H10000 + (u(i) And &HFFFF&)
         q(i) = GetInt(UInt32d16To32(R, v))
         R = GetInt(UInt32m16To32(R, v))
     Next i
@@ -863,13 +895,9 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
     SinglePlaceDivide = q
 End Function
 
-Public Function GetLong(ByVal x As Long) As Long
-    GetLong = x And &HFFFF&
-End Function
-
 Private Function UInt16x16To32(ByVal x As Long, ByVal y As Long) As Long
-    Dim u As Currency: u = GetLong(x)
-    Dim v As Currency: v = GetLong(y)
+    Dim u As Currency: u = x And &HFFFF&
+    Dim v As Currency: v = y And &HFFFF&
     Dim w As Currency: w = (u * v) * 0.0001@
     Call CopyMemory(UInt16x16To32, w, 4)
 End Function
@@ -878,13 +906,13 @@ Private Function UInt32d16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim d As Currency
     Call CopyMemory(d, x, 4)
     d = d * 10000@
-    UInt32d16To32 = Int(d / GetLong(y))
+    UInt32d16To32 = Int(d / (y And &HFFFF&))
 End Function
 
 Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim q As Currency
     Dim d As Currency
-    Dim v As Currency: v = GetLong(y)
+    Dim v As Currency: v = y And &HFFFF&
     Call CopyMemory(d, x, 4)
     d = d * 10000@
     q = Int(d / v)
@@ -892,7 +920,7 @@ Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
 End Function
 
 Private Function Make32(ByVal x As Integer, ByVal y As Integer) As Long
-    Make32 = LeftShift16(GetLong(x)) Or GetLong(y)
+    Make32 = LeftShift16(x And &HFFFF&) Or (y And &HFFFF&)
 End Function
 
 Private Function RightShift16(ByVal x As Long) As Long
