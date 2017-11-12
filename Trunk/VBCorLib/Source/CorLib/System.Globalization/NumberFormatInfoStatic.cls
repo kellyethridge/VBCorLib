@@ -70,11 +70,14 @@ End Property
 ' the NumberFormatInfo object for the current culture is returned.
 '
 Public Function GetInstance(ByVal FormatProvider As IFormatProvider) As NumberFormatInfo
-    If Not FormatProvider Is Nothing Then
-        Set GetInstance = FormatProvider.GetFormat("NumberFormatInfo")
-        If GetInstance Is Nothing Then Set GetInstance = CurrentInfo
-    Else
+    If FormatProvider Is Nothing Then
         Set GetInstance = CurrentInfo
+    Else
+        Set GetInstance = FormatProvider.GetFormat("NumberFormatInfo")
+        
+        If GetInstance Is Nothing Then
+            Set GetInstance = CurrentInfo
+        End If
     End If
 End Function
 

@@ -423,10 +423,9 @@ End Sub
 Public Sub ToString_WithFormatting_ReturnsFormattedNumber(ByVal Value As Long, ByVal Format As String, ByVal Expected As String)
     Dim Number As BigInteger
     Dim Actual As String
-    
     Set Number = NewBigInteger(Value)
-    
-    Actual = Number.ToString(Format)
+        
+    Actual = Number.ToString(Format, FormatInfo)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
