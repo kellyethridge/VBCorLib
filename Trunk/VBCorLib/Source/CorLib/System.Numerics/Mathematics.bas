@@ -500,12 +500,10 @@ End Sub
 
 #Else
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   These are IDE safe versions of the math routines.
-'
-' These are called by the original routines if in the IDE.
+' These are IDE safe versions of the math routines.
 '
 ' The routines are not optimized, they are provided only to
-' allow the library to function safely in an IDE environment.
+' allow this library to function safely while in development.
 '
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Sub ApplyTwosComplement(ByRef n() As Integer)
@@ -792,14 +790,22 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
 End Function
 
 Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
-    Dim v As Currency: v = y And &HFFFF&
-    Dim w As Currency: w = (v * x) * 0.0001@
-    Call CopyMemory(UInt32x16To32, w, 4)
+    Dim v As Currency
+    Dim w As Currency
+    
+    v = y And &HFFFF&
+    w = (v * x) * 0.0001@
+    
+    UInt32x16To32 = AsLong(w)
 End Function
 
 Private Function UInt32Compare(ByVal x As Long, ByVal y As Long) As Long
-    Dim u As Currency: Call CopyMemory(u, x, 4)
-    Dim v As Currency: Call CopyMemory(v, y, 4)
+    Dim u As Currency
+    Dim v As Currency
+    
+    AsLong(u) = x
+    AsLong(v) = y
+     
     UInt32Compare = Sgn(u - v)
 End Function
 
@@ -889,15 +895,21 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
 End Function
 
 Private Function UInt16x16To32(ByVal x As Long, ByVal y As Long) As Long
-    Dim u As Currency: u = x And &HFFFF&
-    Dim v As Currency: v = y And &HFFFF&
-    Dim w As Currency: w = (u * v) * 0.0001@
-    Call CopyMemory(UInt16x16To32, w, 4)
+    Dim u As Currency
+    Dim v As Currency
+    Dim w As Currency
+    
+    u = x And &HFFFF&
+    v = y And &HFFFF&
+    w = (u * v) * 0.0001@
+      
+    UInt16x16To32 = AsLong(w)
 End Function
 
 Private Function UInt32d16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim d As Currency
-    Call CopyMemory(d, x, 4)
+
+    AsLong(d) = x
     d = d * 10000@
     UInt32d16To32 = Int(d / (y And &HFFFF&))
 End Function
@@ -905,8 +917,10 @@ End Function
 Private Function UInt32m16To32(ByVal x As Long, ByVal y As Long) As Long
     Dim q As Currency
     Dim d As Currency
-    Dim v As Currency: v = y And &HFFFF&
-    Call CopyMemory(d, x, 4)
+    Dim v As Currency
+    
+    v = y And &HFFFF&
+    AsLong(d) = x
     d = d * 10000@
     q = Int(d / v)
     UInt32m16To32 = d - q * v
