@@ -367,16 +367,16 @@ Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
     
     Dim u               As Number
     Dim v               As Number
-    Dim difference()    As Integer
+    Dim Difference()    As Integer
     
     x.AttachNumber u
     y.AttachNumber v
-    difference = GradeSchoolSubtract(u, v)
+    Difference = GradeSchoolSubtract(u, v)
     x.DetachNumber u
     y.DetachNumber v
     
     Set Subtract = New BigInteger
-    Subtract.InternalInit difference
+    Subtract.InternalInit Difference
 End Function
 
 ''
@@ -430,8 +430,8 @@ Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
         y.AttachNumber v
     End If
     
-    Dim product() As Integer
-    product = GradeSchoolMultiply(u, v)
+    Dim Product() As Integer
+    Product = GradeSchoolMultiply(u, v)
     
     If x.Sign = Sign.Positive Then
         x.DetachNumber u
@@ -440,11 +440,11 @@ Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
         y.DetachNumber v
     End If
     If x.Sign <> y.Sign Then
-        ApplyTwosComplement product
+        ApplyTwosComplement Product
     End If
         
     Set Multiply = New BigInteger
-    Multiply.InternalInit product
+    Multiply.InternalInit Product
 End Function
 
 
@@ -1183,7 +1183,7 @@ Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByR
         j = j * 2
         
         If j = &H10000 Then
-            n.Digits(c) = GetInt(k)
+            n.Digits(c) = AsWord(k)
             j = 1
             c = c + 1
             k = 0
@@ -1191,7 +1191,7 @@ Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByR
     Next i
     
     If k Then
-        n.Digits(c) = GetInt(k)
+        n.Digits(c) = AsWord(k)
         c = c + 1
     End If
     

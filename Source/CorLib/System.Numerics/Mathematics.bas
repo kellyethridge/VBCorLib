@@ -44,13 +44,6 @@ Public Type Number
 End Type
 
 
-Public Function GetInt(ByVal l As Long) As Integer
-    If l And &H8000& Then GetInt = &H8000
-    GetInt = GetInt Or (l And &H7FFF&)
-End Function
-
-
-
 #If Release Then
 ''
 ' This is the basic implementation of a gradeschool style
@@ -520,7 +513,7 @@ Public Sub ApplyTwosComplement(ByRef n() As Integer)
     Dim i As Long
     For i = 0 To UBound(n)
         c = ((n(i) Xor &HFFFF) And &HFFFF&) + c
-        n(i) = GetInt(c)
+        n(i) = AsWord(c)
         c = RightShift16(c)
     Next i
 End Sub
@@ -537,10 +530,10 @@ Public Function GradeSchoolMultiply(ByRef u As Number, ByRef v As Number) As Int
         k = 0
         For j = 0 To u.Precision - 1
             k = UInt16x16To32(v.Digits(i), u.Digits(j)) + (Product(i + j) And &HFFFF&) + k
-            Product(i + j) = GetInt(k)
+            Product(i + j) = AsWord(k)
             k = RightShift16(k)
         Next j
-        Product(i + j) = GetInt(k)
+        Product(i + j) = AsWord(k)
     Next i
     
     GradeSchoolMultiply = Product
@@ -552,12 +545,12 @@ Public Sub SingleInPlaceMultiply(ByRef n As Number, ByVal Value As Long)
     
     For i = 0 To n.Precision - 1
         k = UInt16x16To32(n.Digits(i), Value) + k
-        n.Digits(i) = GetInt(k)
+        n.Digits(i) = AsWord(k)
         k = RightShift16(k)
     Next i
     
     If k Then
-        n.Digits(n.Precision) = GetInt(k)
+        n.Digits(n.Precision) = AsWord(k)
         n.Precision = n.Precision + 1
     End If
 End Sub
@@ -574,7 +567,7 @@ Public Sub SingleInPlaceAdd(ByRef n As Number, ByVal Value As Integer)
         End If
         
         k = (n.Digits(i) And &HFFFF&) + k
-        n.Digits(i) = GetInt(k)
+        n.Digits(i) = AsWord(k)
         k = RightShift16(k)
         i = i + 1
     Loop
@@ -605,7 +598,7 @@ Public Sub Negate(ByRef n As Number)
 
     For i = 0 To n.Precision - 1
         k = k + ((n.Digits(i) Xor &HFFFF) And &HFFFF&)
-        n.Digits(i) = GetInt(k)
+        n.Digits(i) = AsWord(k)
         k = RightShift16(k)
     Next i
 
@@ -621,7 +614,7 @@ Public Function SingleInPlaceDivideBy10(ByRef n As Number) As Long
     For i = n.Precision - 1 To 0 Step -1
         R = (R * &H10000) + (n.Digits(i) And &HFFFF&)
         d = R \ 10
-        n.Digits(i) = GetInt(d)
+        n.Digits(i) = AsWord(d)
         R = R - (d * 10)
 
         If Not f Then
@@ -668,7 +661,7 @@ Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer(
         End If
         
         k = uDigit + vDigit + k ' this is the only change for the subtraction
-        sum(i) = GetInt(k)
+        sum(i) = AsWord(k)
         k = (k And &HFFFF0000) \ &H10000
     Next i
     
@@ -708,7 +701,7 @@ Public Function GradeSchoolSubtract(ByRef u As Number, ByRef v As Number) As Int
         End If
 
         k = uDigit - vDigit + k ' this is the only change for the addition
-        Difference(i) = GetInt(k)
+        Difference(i) = AsWord(k)
         k = (k And &HFFFF0000) \ &H10000
     Next i
     
@@ -784,7 +777,7 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
             Call MultiInPlaceAdd(u.Digits, j, v.Digits)
         End If
         
-        Quotient(j) = GetInt(qHat)
+        Quotient(j) = AsWord(qHat)
     Next j
     
     If IncludeRemainder Then
@@ -817,11 +810,11 @@ Private Sub SinglePlaceMultiply(ByRef u() As Integer, ByVal Length As Long, ByVa
     
     For i = 0 To Length - 1
         k = k + UInt32x16To32(v, u(i))
-        w(i) = GetInt(k)
+        w(i) = AsWord(k)
         k = RightShift16(k)
     Next i
 
-    w(Length) = GetInt(k)
+    w(Length) = AsWord(k)
 End Sub
 
 Private Function MultiInPlaceSubtract(ByRef u() As Integer, ByVal StartIndex As Long, ByRef v() As Integer) As Boolean
@@ -849,7 +842,7 @@ Private Function MultiInPlaceSubtract(ByRef u() As Integer, ByVal StartIndex As 
             k = 0
         End If
         
-        u(i) = GetInt(Result)
+        u(i) = AsWord(Result)
         Result = RightShift16(Result)
         j = j + 1
     Next i
@@ -873,7 +866,7 @@ Private Sub MultiInPlaceAdd(ByRef u() As Integer, ByVal StartIndex As Long, ByRe
         End If
         
         Result = Result + (u(i) And &HFFFF&) + d
-        u(i) = GetInt(Result)
+        u(i) = AsWord(Result)
         Result = RightShift16(Result)
         j = j + 1
     Next i
@@ -887,8 +880,8 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
     Dim i As Long
     For i = Length - 1 To 0 Step -1
         R = R * &H10000 + (u(i) And &HFFFF&)
-        q(i) = GetInt(UInt32d16To32(R, v))
-        R = GetInt(UInt32m16To32(R, v))
+        q(i) = AsWord(UInt32d16To32(R, v))
+        R = AsWord(UInt32m16To32(R, v))
     Next i
     
     Remainder = R
