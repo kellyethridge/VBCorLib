@@ -103,7 +103,12 @@ Public Property Get CurrentCulture() As CultureInfo
     Set CurrentCulture = Thread.CurrentThread.CurrentCulture
 End Property
 
-Public Property Set CurrentCulter(ByVal Value As CultureInfo)
+''
+' Sets the current culcture associated with this machine.
+'
+' @param Value The culture to bet set to.
+'
+Public Property Set CurrentCulture(ByVal Value As CultureInfo)
     If Value Is Nothing Then _
         Error.ArgumentNull "Value"
         
@@ -120,6 +125,7 @@ Public Property Get InvariantCulture() As CultureInfo
         Set mInvariantCulture = Cor.NewCultureInfo(INVARIANT_LCID)
         mInvariantCulture.MarkReadOnly
     End If
+    
     Set InvariantCulture = mInvariantCulture
 End Property
 

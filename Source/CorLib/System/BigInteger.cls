@@ -48,6 +48,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements IComparable
+Implements IFormattable
 
 Private Const HEX_CHARS As String = "0123456789abcdef0123456789ABCDEF"
 Private Const LOWER_HEX As Long = 1
@@ -156,17 +157,19 @@ End Function
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
-Public Function ToString(Optional ByRef Format As String) As String
+Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim Specifier   As String
     Dim Count       As Long
+    Dim FormatInfo  As NumberFormatInfo
     
     Count = ParseFormatSpecifier(Format, Specifier)
+    Set FormatInfo = NumberFormatInfo.GetInstance(Provider)
     
     Select Case Specifier
         Case "x":       ToString = ToHexString(Count, LOWER_HEX)
         Case "X":       ToString = ToHexString(Count, UPPER_HEX)
         Case "b", "B":  ToString = ToBinaryString(Count)
-        Case "d", "D":  ToString = ToDecimalString(Count)
+        Case "d", "D":  ToString = ToDecimalString(Count, FormatInfo)
     End Select
 End Function
 
@@ -819,7 +822,7 @@ Private Sub Normalize(Optional ByVal ub As Long = -1)
     End Select
 End Sub
 
-Private Function ToDecimalString(ByVal Count As Long) As String
+Private Function ToDecimalString(ByVal Count As Long, ByVal FormatInfo As NumberFormatInfo) As String
     Const DIGITS_PER_INTEGER As Long = 5
     Dim Dividend    As Number
     Dim Size        As Long
@@ -858,7 +861,7 @@ Private Function ToDecimalString(ByVal Count As Long) As String
     End If
     
     If mNumber.Sign = Negative Then
-        Mid$(Output, i, 1) = "-"
+        Mid$(Output, i, 1) = FormatInfo.NegativeSign
         i = i - 1
     End If
     
@@ -1148,6 +1151,14 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IComparable_CompareTo(Value As Variant) As Long
     IComparable_CompareTo = CompareTo(Cor.BInt(Value))
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IFormattable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IFormattable_ToString(Format As String, ByVal Provider As IFormatProvider) As String
+    IFormattable_ToString = ToString(Format, Provider)
 End Function
 
 

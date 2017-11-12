@@ -50,6 +50,7 @@ Public Function GetInt(ByVal l As Long) As Integer
 End Function
 
 
+
 #If Release Then
 ''
 ' This is the basic implementation of a gradeschool style
@@ -611,13 +612,13 @@ Public Function SingleInPlaceDivideBy10(ByRef n As Number) As Long
     Dim i As Long
     Dim f As Boolean
     Dim d As Long
-    
+
     For i = n.Precision - 1 To 0 Step -1
         R = (R * &H10000) + GetLong(n.Digits(i))
         d = R \ 10
         n.Digits(i) = GetInt(d)
         R = R - (d * 10)
-        
+
         If Not f Then
             If n.Digits(i) = 0 Then
                 n.Precision = n.Precision - 1
