@@ -1,16 +1,16 @@
 
 
-#### I'm submitting a bug report I'm submitting a feature request
+**I'm submitting a bug report I'm submitting a feature request**
 
     Library Version: major.minor.patch-pre
 
-#### Please tell us about your environment:
+**Please tell us about your environment:**
 
     Operating System: Windows [7|8|8.1|10]
 
-#### Current behavior:
+**Current behavior:**
 
-#### Expected/desired behavior:
+**Expected/desired behavior:**
 
     What is the expected behavior?
 
