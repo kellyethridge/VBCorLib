@@ -1,0 +1,1 @@
+VBCorLib is a Visual Basic 6 implementation of many classes found in the .NET framework. The classes within VBCorLib can be used nearly identically as the .NET counterpart. This allows for easy data sharing between a .NET application and VB6.
