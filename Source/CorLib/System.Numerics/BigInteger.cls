@@ -121,17 +121,35 @@ End Property
 '
 Public Function ToByteArray() As Byte()
     Dim Result()    As Byte
+    Dim MaxIndex    As Long
     Dim Size        As Long
+    Dim CopyCount   As Long
     
-    If mNumber.Precision = 0 Then
-        Result = Cor.NewBytes()
+    If mNumber.Sign = 0 Then
+        ReDim Result(0)
     Else
-        Size = Precision
+        MaxIndex = UBound(mNumber.Digits)
+        Size = (MaxIndex + 1) * 2
+        CopyCount = Size
         
+        If mNumber.Sign < 0 Then
+            If (mNumber.Digits(MaxIndex) And &HFF00) = 0 Then
+                Size = Size - 1
+                CopyCount = CopyCount - 1
+            End If
+        Else
+            If mNumber.Digits(MaxIndex) And &H8000 Then
+                Size = Size + 1
+            ElseIf (mNumber.Digits(MaxIndex) And &HFF80) = 0 Then
+                Size = Size - 1
+                CopyCount = CopyCount - 1
+            End If
+        End If
+    
         ReDim Result(0 To Size - 1)
-        Buffer.BlockCopy mNumber.Digits, 0, Result, 0, Size
+        CopyMemory Result(0), mNumber.Digits(0), CopyCount
     End If
-        
+    
     ToByteArray = Result
 End Function
 
@@ -639,7 +657,7 @@ End Property
 Friend Sub Init(ByRef Value As Variant)
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte
-            InitFromNumber Value
+            InitFromArray AsQByteArr(CLng(Value)).Bytes
         Case vbDouble, vbSingle
             InitFromFloat Value
         Case vbCurrency
@@ -675,26 +693,63 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub InitFromArray(ByRef Value As Variant)
-    Dim Size As Long
+    Dim ByteCount   As Long
+    Dim Bytes()     As Byte
+    Dim MaxIndex    As Long
+    Dim MinIndex    As Long
+    Dim Size        As Long
     
     If CorArray.IsNull(Value) Then
         Exit Sub
     End If
     
-    Size = Len1D(Value)
+    SAPtr(Bytes) = SAPtrV(Value)
+    MaxIndex = UBound(Value)
+    MinIndex = LBound(Value)
+    
+    Select Case Bytes(MaxIndex)
+        Case 0
+            ' remove all zeros; sign is positive
+            Do While MaxIndex >= MinIndex
+                If Bytes(MaxIndex) > 0 Then
+                    Exit Do
+                End If
+                
+                MaxIndex = MaxIndex - 1
+            Loop
+            
+            If MaxIndex >= MinIndex Then
+                mNumber.Sign = 1
+            End If
+        Case &HFF
+            ' remove all leading FF unless first non FF does not have high-bit set.
+            ' FFFFFF => FF
+            ' FFFF80 => 80
+            ' FFFF01 => FF01
+            Do While MaxIndex > MinIndex And Bytes(MaxIndex) = &HFF
+                If (Bytes(MaxIndex - 1) And &H80) = 0 Then
+                    Exit Do
+                End If
+                
+                MaxIndex = MaxIndex - 1
+            Loop
+            
+            mNumber.Sign = -1
+        Case &H80
+            ' leave; sign is negative
+            mNumber.Sign = -1
+        Case Else
+            mNumber.Sign = 1
+    End Select
+    
+    SAPtr(Bytes) = vbNullPtr
+    ByteCount = MaxIndex - MinIndex + 1
+    Size = CorMath.Ceiling(ByteCount / 2)
     
     If Size > 0 Then
-        ReDim mNumber.Digits(0 To CorMath.Ceiling(Size / 2) - 1)
-        
-        Buffer.BlockCopy Value, 0, mNumber.Digits, 0, Size
-        Normalize
+        ReDim mNumber.Digits(0 To Size - 1)
+        Buffer.BlockCopy Value, 0, mNumber.Digits, 0, ByteCount
     End If
-End Sub
-
-Private Sub InitFromNumber(ByVal Value As Long)
-    ReDim mNumber.Digits(0 To 1)
-    CopyMemory mNumber.Digits(0), Value, vbSizeOfLong
-    Normalize
 End Sub
 
 Private Sub InitFromFloat(ByVal Value As Double)
@@ -774,11 +829,11 @@ End Sub
 Private Sub Normalize(Optional ByVal ub As Long = -1)
     If ub < 0 Then ub = UBound(mNumber.Digits)
     If ub < 0 Then Exit Sub
-    
+
     Dim i As Long
     Select Case mNumber.Digits(ub)
         Case 0   ' we have a leading zero digit
-        
+
             ' now search for the first nonzero digit from the left.
             For i = ub - 1 To 0 Step -1
                 If mNumber.Digits(i) <> 0 Then
@@ -788,14 +843,14 @@ Private Sub Normalize(Optional ByVal ub As Long = -1)
                     Exit Sub
                 End If
             Next i
-            
+
             mNumber.Sign = Zero
             mNumber.Precision = 0
-    
+
         Case &HFFFF ' we have a leading negative
-            
+
             mNumber.Sign = Negative ' we know this for sure
-            
+
             For i = ub To 0 Step -1
                 If mNumber.Digits(i) <> &HFFFF Then
                     If mNumber.Digits(i) And &H8000 Then
@@ -806,10 +861,10 @@ Private Sub Normalize(Optional ByVal ub As Long = -1)
                     Exit Sub
                 End If
             Next i
-            
+
             ' the array was full of &HFFFF, we only need to represent one.
             mNumber.Precision = 1
-        
+
         Case Else
             If mNumber.Digits(ub) And &H8000 Then
                 mNumber.Sign = Negative
@@ -828,7 +883,7 @@ Private Function ToDecimalString(ByVal Count As Long, ByVal FormatInfo As Number
     Dim Size        As Long
     Dim Chars()     As Integer
     Dim Output      As String
-    Dim Pos         As Long
+    Dim pos         As Long
     
     Dividend = mNumber
     
@@ -845,24 +900,24 @@ Private Function ToDecimalString(ByVal Count As Long, ByVal FormatInfo As Number
     Output = String$(Size + 1, vbZeroChar)
     Chars = AsChars(Output)
     
-    Pos = Len(Output) - 1
+    pos = Len(Output) - 1
     
     Do While Dividend.Precision > 0
-        Chars(Pos) = SingleInPlaceDivideBy10(Dividend) + vbZeroChar
-        Pos = Pos - 1
+        Chars(pos) = SingleInPlaceDivideBy10(Dividend) + vbZeroChar
+        pos = pos - 1
     Loop
     
-    If Size - Pos < Count Then
-        Pos = Size - Count
+    If Size - pos < Count Then
+        pos = Size - Count
     End If
     
     If mNumber.Sign = Negative Then
-        Chars(Pos) = AscW(FormatInfo.NegativeSign)
-        Pos = Pos - 1
+        Chars(pos) = AscW(FormatInfo.NegativeSign)
+        pos = pos - 1
     End If
     
     FreeChars Chars
-    ToDecimalString = Mid$(Output, Pos + 2)
+    ToDecimalString = Mid$(Output, pos + 2)
 End Function
 
 Private Function ToHexString(ByVal Count As Long, Offset As Long) As String
