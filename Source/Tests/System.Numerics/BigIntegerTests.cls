@@ -54,13 +54,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 '            Test.Use NewBytes(0, 0, 0, &H80, &HFF, &HFF), NewBytes(0, 0, 0, &H80), Sign.Negative, 4
 '            Test.Use NewBytes(0, &H80), NewBytes(0, &H80), Sign.Negative, 2
             
-        Case "ToByteArray_WhenCalled_ReturnsExpected"
+        Case "NewBigInteger_WithLong_InitializesBigInteger"
             Test.Use 0, NewBytes(0), 0
             Test.Use 1, NewBytes(1), 1
             Test.Use 8, NewBytes(8), 1
             Test.Use -8, NewBytes(&HF8), -1
             Test.Use &H80, NewBytes(&H80, 0), 1
             Test.Use &H8000, NewBytes(0, &H80), -1
+            Test.Use &H80000000, NewBytes(0, 0, 0, &H80), -1
             Test.Use &HFF, NewBytes(&HFF, 0), 1
             Test.Use &HFF01, NewBytes(1, &HFF), -1
             Test.Use &HFFF, NewBytes(&HFF, &HF), 1
@@ -69,66 +70,107 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &H1FFFF, NewBytes(&HFF, &HFF, 1), 1
             Test.Use &HFFFFF, NewBytes(&HFF, &HFF, &HF), 1
             Test.Use &HFFFFFFFF, NewBytes(&HFF), -1
+            
+        Case "NewBigInteger_WithByteArray_InitializesBigInteger"
+            Test.Use NewBytes(), NewBytes(0), 0
             Test.Use NewBytes(&HFF), NewBytes(&HFF), -1
+            Test.Use NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), 1
+            
+        Case "NewBigInteger_WithDouble_InitializesBigInteger"
+            Test.Use 0#, NewBytes(0), 0
+            Test.Use 0.95, NewBytes(0), 0
+            Test.Use 1#, NewBytes(1), 1
+            Test.Use 1.9, NewBytes(1), 1
+            Test.Use 1.1, NewBytes(1), 1
+            Test.Use -1#, NewBytes(&HFF), -1
+            Test.Use 2#, NewBytes(2), 1
+            Test.Use -2#, NewBytes(&HFE), -1
+            Test.Use 1E+55, NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), 1
+            Test.Use -1E+55, NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &HFC, &HE, &H98, &H57, &H5A, &H98, &H97), -1
+            Test.Use 1E+16, NewBytes(&H0, &H0, &HC1, &H6F, &HF2, &H86, &H23), 1
+            Test.Use -1E+16, NewBytes(&H0, &H0, &H3F, &H90, &HD, &H79, &HDC), -1
+            Test.Use 1E-16, NewBytes(0), 0
+            Test.Use -1E-16, NewBytes(0), 0
+            Test.Use -4294901760#, NewBytes(&H0, &H0, &H1, &H0, &HFF), -1
+            
+        Case "NewBigInteger_WithCurrency_InitializesBigInteger"
+            Test.Use 0@, NewBytes(0), 0
+            Test.Use 1@, NewBytes(1), 1
+            Test.Use -1@, NewBytes(&HFF), -1
+            Test.Use 1.1@, NewBytes(1), 1
+            Test.Use -1.1@, NewBytes(&HFF), -1
+            Test.Use 0.9999@, NewBytes(0), 0
+            Test.Use -0.9999@, NewBytes(0), 0
+        
+        Case "NewBigInteger_WithDecimal_InitializesBigInteger"
+            Test.Use 1, NewBytes(1), 1
+            Test.Use -1, NewBytes(&HFF), -1
+            Test.Use "12345678901231234567890123.456789", NewBytes(&HCB, &HE4, &H5F, &H51, &HA2, &H7B, &H22, &H98, &H4C, &H36, &HA), 1
+            Test.Use "-12345678901231234567890123.456789", NewBytes(&H35, &H1B, &HA0, &HAE, &H5D, &H84, &HDD, &H67, &HB3, &HC9, &HF5), -1
 
-        Case "Parse_WithValue_ReturnsBigInteger"
-            Test.Use "12345678901234567890", NewBytes(&HD2, &HA, &H1F, &HEB, &H8C, &HA9, &H54, &HAB), Sign.Positive, 8
-            Test.Use "-12345678901234567890", NewBytes(&H2E, &HF5, &HE0, &H14, &H73, &H56, &HAB, &H54, &HFF, &HFF), Sign.Negative, 10
+        Case "Parse_WithValidValueForNumberStylesInteger_ReturnsBigInteger"
+            Test.Use "0", NewBytes(0), 0
+            Test.Use "1", NewBytes(&H1), 1
+            Test.Use "01", NewBytes(&H1), 1
+            Test.Use "-1", NewBytes(&HFF), -1
+            Test.Use " -1", NewBytes(&HFF), -1
+            Test.Use "-1 ", NewBytes(&HFF), -1
+            Test.Use " 1", NewBytes(&H1), 1
+            Test.Use "1 ", NewBytes(&H1), 1
+            Test.Use "+1", NewBytes(&H1), 1
+            Test.Use " +1", NewBytes(&H1), 1
+            Test.Use "+1 ", NewBytes(&H1), 1
+            Test.Use "255", NewBytes(&HFF, 0), 1
+            Test.Use "65535", NewBytes(&HFF, &HFF, 0), 1
+            Test.Use "  65536  ", NewBytes(0, 0, &H1), 1
+            Test.Use "  -65536  ", NewBytes(0, 0, &HFF), -1
+            Test.Use "  000000000000000000000255  ", NewBytes(&HFF, 0), 1
+            Test.Use "12345678901234567890", NewBytes(&HD2, &HA, &H1F, &HEB, &H8C, &HA9, &H54, &HAB, 0), 1
+            Test.Use "-12345678901234567890", NewBytes(&H2E, &HF5, &HE0, &H14, &H73, &H56, &HAB, &H54, &HFF), -1
             
-        Case "Parse_WithDecimalNumber_ReturnsBigInteger"
-            Test.Use "12345678901234567890"
-            Test.Use "-12345678901234567890"
+        Case "Parse_WithInvalidValueForNumberStylesInteger_ThrowsFormatException"
+            Test.Use "1 2"
+            Test.Use "- 12"
+            Test.Use "12-"
+            Test.Use "f"
+            Test.Use "(1)"
+            Test.Use "1,000"
+            Test.Use "1.0"
+            Test.Use "+ 12"
+            Test.Use "12+"
             
-        Case "TryParse_WithInvalidValue_ReturnsFalse"
-            Test.Use ""
-            Test.Use "z"
-            Test.Use "1234.123"
-            Test.Use "&h"
-            Test.Use "0xaa.a"
-            Test.Use "0b"
+        Case "Parse_WithInvalidValueForNumberStylesAllowParentheses_ThrowsFormatException"
+            Test.Use "-1"
+            Test.Use " (1)"
+            Test.Use "(1) "
+            Test.Use "( 1)"
+            Test.Use "(1 )"
+            Test.Use "(1"
+            Test.Use "1)"
             
-        Case "TryParse_WithValidValue_InitializesBigInteger"
-            Test.Use "0", NewBytes(), Sign.Zero, 0
-            Test.Use "1", NewBytes(&H1), Sign.Positive, 1
-            Test.Use "01", NewBytes(&H1), Sign.Positive, 1
-            Test.Use "-1", NewBytes(&HFF, &HFF), Sign.Negative, 2
-            Test.Use "65535", NewBytes(&HFF, &HFF), Sign.Positive, 2
-            Test.Use "  65536  ", NewBytes(0, 0, &H1), Sign.Positive, 3
-            Test.Use "  -65536  ", NewBytes(0, 0, &HFF, &HFF), Sign.Negative, 4
-            Test.Use "  000000000000000000000255  ", NewBytes(&HFF), Sign.Positive, 1
-            Test.Use "12345678901234567890", NewBytes(&HD2, &HA, &H1F, &HEB, &H8C, &HA9, &H54, &HAB), Sign.Positive, 8
-            Test.Use "-12345678901234567890", NewBytes(&H2E, &HF5, &HE0, &H14, &H73, &H56, &HAB, &H54, &HFF, &HFF), Sign.Negative, 10
-            Test.Use "&h0", NewBytes(), Sign.Zero, 0
-            Test.Use "&h00", NewBytes(), Sign.Zero, 0
-            Test.Use "&h1", NewBytes(1), Sign.Positive, 1
-            Test.Use "0x1", NewBytes(1), Sign.Positive, 1
-            Test.Use "&hff", NewBytes(&HFF), Sign.Positive, 1
-            Test.Use "0xff", NewBytes(&HFF), Sign.Positive, 1
-            Test.Use "0xffff", NewBytes(&HFF, &HFF), Sign.Negative, 2
-            Test.Use "0x0ffff", NewBytes(&HFF, &HFF), Sign.Negative, 2
-            Test.Use "0x0000ffff", NewBytes(&HFF, &HFF), Sign.Positive, 2
-            Test.Use "0x0000ffffffffffffffff", NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF), Sign.Positive, 8
-            Test.Use "&h80", NewBytes(&H80), Sign.Positive, 1
-            Test.Use "&hff80", NewBytes(&H80, &HFF), Sign.Negative, 2
-            Test.Use "&h8000", NewBytes(0, &H80), Sign.Negative, 2
-            Test.Use "&h00008000", NewBytes(0, &H80), Sign.Positive, 2
-            Test.Use "0x0000ff", NewBytes(&HFF), Sign.Positive, 1
-            Test.Use "0xff7fffff", NewBytes(&HFF, &HFF, &H7F, &HFF), Sign.Negative, 4
-            Test.Use "0x00000000", NewBytes(), Sign.Zero, 0
-            Test.Use "&h80000000", NewBytes(0, 0, 0, &H80), Sign.Negative, 4
-            Test.Use "&h800000000000", NewBytes(0, 0, 0, 0, 0, &H80), Sign.Negative, 6
-            Test.Use "-&h7fff", NewBytes(&H1, &H80), Sign.Negative, 2
-            Test.Use "-&h80000000", NewBytes(0, 0, 0, &H80), Sign.Negative, 4
-            Test.Use "0b0", NewBytes(), Sign.Zero, 0
-            Test.Use "0b1", NewBytes(1), Sign.Positive, 1
-            Test.Use "0b11", NewBytes(3), Sign.Positive, 1
-            Test.Use "0b1000", NewBytes(&H8), Sign.Positive, 1
-            Test.Use "0b1111", NewBytes(&HF), Sign.Positive, 1
-            Test.Use "0b111111111", NewBytes(&HFF, &H1), Sign.Positive, 2
-            Test.Use "0b10000000000000000000000000000000", NewBytes(0, 0, 0, &H80), Sign.Negative, 4
-            Test.Use "0b000000000000000010000000000000000000000000000000", NewBytes(0, 0, 0, &H80), Sign.Positive, 4
-            Test.Use "0b110000000000000000000000000000000", NewBytes(0, 0, 0, &H80, 1), Sign.Positive, 5
-            Test.Use "-0b111111100000000", NewBytes(0, &H81), Sign.Negative, 2
+'        Case "TryParse_WithValidHexValue_InitializesBigInteger"
+'            Test.Use "&h0", NewBytes(0), 0
+'            Test.Use "&h00", NewBytes(0), 0
+'            Test.Use "&h1", NewBytes(1), 1
+'            Test.Use "0x1", NewBytes(1), 1
+'            Test.Use "&hff", NewBytes(&HFF), -1
+'            Test.Use "0xff", NewBytes(&HFF), -1
+'            Test.Use "0xffff", NewBytes(&HFF, &HFF), -1
+'            Test.Use "0x0ffff", NewBytes(&HFF, &HFF), -1
+'            Test.Use "0x0000ffff", NewBytes(&HFF, &HFF, 0), 1
+'            Test.Use "0x0000ffffffffffffffff", NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, 0), 1
+'            Test.Use "&h80", NewBytes(&H80), -1
+'            Test.Use "&hff80", NewBytes(&H80), -1
+'            Test.Use "&h8000", NewBytes(0, &H80), -1
+'            Test.Use "&h00008000", NewBytes(0, &H80, 0), 1
+'            Test.Use "0x0000ff", NewBytes(&HFF, 0), 1
+'            Test.Use "0xff7fffff", NewBytes(&HFF, &HFF, &H7F, &HFF), -1
+'            Test.Use "0x00000000", NewBytes(), 0
+'            Test.Use "&h80000000", NewBytes(0, 0, 0, &H80), -1
+'            Test.Use "&h800000000000", NewBytes(0, 0, 0, 0, 0, &H80), -1
+'            Test.Use "&h7fff", NewBytes(&HFF, &H7F), 1
+'            Test.Use "&h80000000", NewBytes(0, 0, 0, &H80), -1
+            
         
         Case "ToString_WithNoFormatting_ReturnsDefault"
             Test.Use 0, "0"
@@ -138,6 +180,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1000000000, "-1000000000"
             Test.Use &H7FFFFFFF, "2147483647"
             Test.Use &H80000000, "-2147483648"
+            Test.Use &HFFFF0000, "-65536"
             
         Case "ToString_WithFormatting_ReturnsFormattedNumber"
             Test.Use 0, "d4", "0000"
@@ -187,31 +230,31 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &H7FFF, "B", "111111111111111"
             Test.Use &H7FFF, "b32", "00000000000000000111111111111111"
             
-        Case "Compare_WithWithValues_ReturnsExpected"
-            Test.Use(BInt(0), BInt(0)).Expect Iz.EqualTo(0)
-            Test.Use(Nothing, Nothing).Expect Iz.EqualTo(0)
-            Test.Use(Nothing, BInt(0)).Expect Iz.EqualTo(0)
-            Test.Use(BInt(0), Nothing).Expect Iz.EqualTo(0)
-            Test.Use(BInt(1), BInt(1)).Expect Iz.EqualTo(0)
-            Test.Use(BInt(1), BInt(0)).Expect Iz.Positive
-            Test.Use(BInt(0), BInt(1)).Expect Iz.Negative
-            Test.Use(BInt(-1), BInt(-10)).Expect Iz.Positive
-            Test.Use(BInt(-10), BInt(-1)).Expect Iz.Negative
-            Test.Use(BInt(-128), BInt(-129)).Expect Iz.Positive
-            Test.Use(BInt(&H80000000), BInt(&H7FFFFFFF)).Expect Iz.Negative
-            Test.Use(BInt(&H7FFFFFFF), BInt(&H80000000)).Expect Iz.Positive
-        
-        Case "Negate_WithValue_ReturnsExpected"
-            Test.Use BInt(0), BInt(0)
-            Test.Use BInt(1), BInt(-1)
-            Test.Use BInt(-1), BInt(1)
-            Test.Use BInt(Nothing), BInt(0)
-            Test.Use BInt(255), BInt(-255)
-            Test.Use BInt(-255), BInt(255)
-            Test.Use BInt(65535), BInt(-65535)
-            Test.Use BInt(&H80000000), BInt(2147483648#)
-            Test.Use BInt(&H8000), BInt(32768)
-        
+'        Case "Compare_WithWithValues_ReturnsExpected"
+'            Test.Use(BInt(0), BInt(0)).Expect Iz.EqualTo(0)
+'            Test.Use(Nothing, Nothing).Expect Iz.EqualTo(0)
+'            Test.Use(Nothing, BInt(0)).Expect Iz.EqualTo(0)
+'            Test.Use(BInt(0), Nothing).Expect Iz.EqualTo(0)
+'            Test.Use(BInt(1), BInt(1)).Expect Iz.EqualTo(0)
+'            Test.Use(BInt(1), BInt(0)).Expect Iz.Positive
+'            Test.Use(BInt(0), BInt(1)).Expect Iz.Negative
+'            Test.Use(BInt(-1), BInt(-10)).Expect Iz.Positive
+'            Test.Use(BInt(-10), BInt(-1)).Expect Iz.Negative
+'            Test.Use(BInt(-128), BInt(-129)).Expect Iz.Positive
+'            Test.Use(BInt(&H80000000), BInt(&H7FFFFFFF)).Expect Iz.Negative
+'            Test.Use(BInt(&H7FFFFFFF), BInt(&H80000000)).Expect Iz.Positive
+'
+'        Case "Negate_WithValue_ReturnsExpected"
+'            Test.Use BInt(0), BInt(0)
+'            Test.Use BInt(1), BInt(-1)
+'            Test.Use BInt(-1), BInt(1)
+'            Test.Use BInt(Nothing), BInt(0)
+'            Test.Use BInt(255), BInt(-255)
+'            Test.Use BInt(-255), BInt(255)
+'            Test.Use BInt(65535), BInt(-65535)
+'            Test.Use BInt(&H80000000), BInt(2147483648#)
+'            Test.Use BInt(&H8000), BInt(32768)
+
         Case "Absolute_WithValue_ReturnsExpected"
             Test.Use BInt(0), BInt(0)
             Test.Use BInt(1), BInt(1)
@@ -368,16 +411,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, 0
             Test.Use 1, &HFFFE
             Test.Use &HFFFF0000, &HFFFF&
-            
-        Case "Precision_WithValue_ReturnsExpected"
-            Test.Use 0, 0
-            Test.Use 1, 1
-            Test.Use &HFF, 1
-            Test.Use &H1FF, 2
-            Test.Use &HFFFFFF, 3
-            Test.Use &HFFFF, 2
-            Test.Use &HFFFFFFFF, 2
-            
+                       
 '        Case "ToByteArray_WhenCalled_ReturnsRoundTrippable"
 '            Test.Use "12345678901234567890"
 '            Test.Use "-12345678901234567890"
@@ -385,14 +419,36 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 '            Test.Use "0x7fffffffffffffff"
 '            Test.Use "0xffffffffffffffffff"
         
-        
+        Case "Equals_WithValues_ReturnsExpected"
+            Test.Use 0, 0, True
+            Test.Use 1, 1, True
+            Test.Use 1, 2, False
+            Test.Use 2, 1, False
+            Test.Use -1, -1, True
+            Test.Use 1, -1, False
+            Test.Use -1, 1, False
+            Test.Use &H7FFFFFFF, &H7FFFFFFF, True
+            Test.Use &H7FFFFFFF, &H80000000, False
+            Test.Use &HFFFFFFFF, &H80000000, False
+            Test.Use &H80000000, &HFFFFFFFF, False
+            Test.Use &H80000000, &H80000000, True
+            Test.Use &H80000001, 1, False
+            Test.Use 1, &H80000001, False
+            Test.Use -123456789012345#, -123456789012345#, True
+            Test.Use -123456789012345#, 123456789012345#, False
+            Test.Use 123456789012345#, -123456789012345#, False
+            
     End Select
+End Sub
+
+Public Sub Setup()
+    ClearException
 End Sub
 
 Public Sub BigInteger_WhenCreated_InitializesToZero()
     Dim Number As New BigInteger
     
-    AssertNumber Number, NewBytes(), Sign.Zero, 0
+    AssertNumber Number, NewBytes(0), 0
 End Sub
 
 Public Sub NewBigInteger_WhenInitialized_InitializesBigInteger(ByRef Value As Variant, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Sign, ByVal ExpectedPrecision As Long)
@@ -400,54 +456,47 @@ Public Sub NewBigInteger_WhenInitialized_InitializesBigInteger(ByRef Value As Va
     
     Set Number = NewBigInteger(Value)
     
-    AssertNumber Number, ExpectedBytes, ExpectedSign, ExpectedPrecision
+    AssertNumber Number, ExpectedBytes, ExpectedSign
 End Sub
 
-Public Sub Parse_WithValue_ReturnsBigInteger(ByVal s As String, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Sign, ByVal ExpectedPrecision As Long)
-    Dim Number As BigInteger
-    
-    Set Number = BigInteger.Parse(s)
-    
-    AssertNumber Number, ExpectedBytes, ExpectedSign, ExpectedPrecision
-End Sub
-
-Public Sub Parse_WithDecimalNumber_ReturnsBigInteger(ByVal s As String)
-    Dim Number As BigInteger
-    
-    Set Number = BigInteger.Parse(s)
-    
-    Assert.That Number.ToString, Iz.EqualTo(s)
-End Sub
-
-Public Sub Parse_WithHexNumber_ReturnsBigInteger(ByVal s As String, ByVal Expected As String)
-    
-End Sub
-
-Public Sub Parse_WithInvalidValue_ThrowsFormatException()
+Public Sub NewBigInteger_WithNullArray_ThrowsArgumentNullException()
     On Error Resume Next
     
-    BigInteger.Parse "hello"
+    NewBigInteger NullBytes
+    
+    AssertArgumentNullException Err, "Value"
+End Sub
+
+Public Sub Parse_WithValidValueForNumberStylesInteger_ReturnsBigInteger(ByVal s As String, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual As BigInteger
+    
+    Set Actual = BigInteger.Parse(s, NumberStyles.Integer)
+    
+    AssertNumber Actual, ExpectedBytes, ExpectedSign
+End Sub
+
+Public Sub Parse_WithInvalidValueForNumberStylesInteger_ThrowsFormatException(ByVal s As String)
+    On Error Resume Next
+    
+    BigInteger.Parse s, NumberStyles.Integer
     
     AssertFormatException Err
 End Sub
 
-Public Sub TryParse_WithInvalidValue_ReturnsFalse(ByVal s As String)
-    Dim Result As BigInteger
-    Dim Actual As Boolean
+Public Sub Parse_WithValidValueForNumberStylesAllowParentheses_ReturnsBigInteger()
+    Dim Actual As BigInteger
     
-    Actual = BigInteger.TryParse(s, Result)
+    Set Actual = BigInteger.Parse("(1)", NumberStyles.AllowParentheses)
     
-    Assert.That Actual, Iz.False
+    AssertNumber Actual, NewBytes(&HFF), -1
 End Sub
 
-Public Sub TryParse_WithValidValue_InitializesBigInteger(ByVal s As String, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Sign, ByVal ExpectedPrecision As Long)
-    Dim Number As BigInteger
-    Dim Actual As Boolean
+Public Sub Parse_WithInvalidValueForNumberStylesAllowParentheses_ThrowsFormatException(ByVal s As String)
+    On Error Resume Next
     
-    Actual = BigInteger.TryParse(s, Number)
+    BigInteger.Parse s, NumberStyles.AllowParentheses
     
-    Assert.That Actual, Iz.True
-    AssertNumber Number, ExpectedBytes, ExpectedSign, ExpectedPrecision
+    AssertFormatException Err
 End Sub
 
 Public Sub ToString_WithNoFormatting_ReturnsDefault(ByVal Value As Long, ByVal Expected As String)
@@ -645,6 +694,22 @@ Public Sub ShiftRight_WhenShiftingAllBitsForPositiveValue_ReturnsZero()
     Assert.That Actual, Equals(BigInteger.Zero)
 End Sub
 
+Public Sub ShiftRight_WithOne_ReturnsZero()
+    Dim Actual As BigInteger
+    
+    Set Actual = BInt(1).ShiftRight(1)
+    
+    Assert.That Actual.IsZero, Iz.True
+End Sub
+
+Public Sub ShiftRight_WhenAlreadyShiftedAllBits_ReturnsZero()
+    Dim Actual As BigInteger
+    
+    Set Actual = BInt(1).ShiftRight(1).ShiftRight(1)
+    
+    Assert.That Actual.IsZero, Iz.True
+End Sub
+
 Public Sub ShiftRight_WhenShiftingAllBitsForNegativeValue_ReturnsMinusOne()
     Dim Actual As BigInteger
     
@@ -682,7 +747,7 @@ Public Sub ShiftLeft_WhenShiftingAllBits_ShiftsBits()
     
     Set Actual = BInt(&HFFFF&).ShiftLeft(16)
     
-    Assert.That Actual, Equals(BInt("0x0000ffff0000"))
+    Assert.That Actual, Equals(BInt(NewBytes(0, 0, &HFF, &HFF, 0)))
 End Sub
 
 Public Sub ShiftLeft_WhenShiftingNegativeOne_ReturnsMinus65536()
@@ -807,9 +872,85 @@ Public Sub ToByteArray_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef 
     Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
 End Sub
 
+Public Sub NewBigInteger_WithLong_InitializesBigInteger(ByVal Value As Long, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual() As Byte
+    Dim ActualSign As Long
+    
+    Dim Number As BigInteger
+    Set Number = NewBigInteger(Value)
+    
+    Actual = Number.ToByteArray
+    ActualSign = Number.Sign
+    
+    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
+    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
+End Sub
 
-Private Sub AssertNumber(ByVal Number As BigInteger, ByRef ExpectedBytes() As Byte, ByRef ExpectedSign As Sign, ByRef ExpectedPrecision As Long)
+Public Sub NewBigInteger_WithDouble_InitializesBigInteger(ByVal Value As Double, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual() As Byte
+    Dim ActualSign As Long
+    
+    Dim Number As BigInteger
+    Set Number = NewBigInteger(Value)
+    
+    Actual = Number.ToByteArray
+    ActualSign = Number.Sign
+    
+    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
+    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
+End Sub
+
+Public Sub NewBigInteger_WithByteArray_InitializesBigInteger(ByRef Value() As Byte, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual() As Byte
+    Dim ActualSign As Long
+    
+    Dim Number As BigInteger
+    Set Number = NewBigInteger(Value)
+    
+    Actual = Number.ToByteArray
+    ActualSign = Number.Sign
+    
+    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
+    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
+End Sub
+
+Public Sub NewBigInteger_WithCurrency_InitializesBigInteger(ByVal Value As Currency, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual() As Byte
+    Dim ActualSign As Long
+    
+    Dim Number As BigInteger
+    Set Number = NewBigInteger(Value)
+    
+    Actual = Number.ToByteArray
+    ActualSign = Number.Sign
+    
+    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
+    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
+End Sub
+
+Public Sub NewBigInteger_WithDecimal_InitializesBigInteger(ByRef Value As Variant, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual() As Byte
+    Dim ActualSign As Long
+    
+    Dim Number As BigInteger
+    Set Number = NewBigInteger(CDec(Value))
+    
+    Actual = Number.ToByteArray
+    ActualSign = Number.Sign
+    
+    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
+    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
+End Sub
+
+Public Sub Equals_WithValues_ReturnsExpected(ByRef a As Variant, ByRef b As Variant, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = BInt(a).Equals(BInt(b))
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Private Sub AssertNumber(ByVal Number As BigInteger, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
     Assert.That Number.ToByteArray, Iz.EqualTo(ExpectedBytes)
     Assert.That Number.Sign, Iz.EqualTo(ExpectedSign)
-    Assert.That Number.Precision, Iz.EqualTo(ExpectedPrecision)
 End Sub

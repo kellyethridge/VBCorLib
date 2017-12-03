@@ -160,7 +160,7 @@ End Function
 ''
 ' Attemps to parse a string of characters of the specified base type.
 '
-' @param s The string of characters to attempt to be parsed.
+' @param Value The string of characters to attempt to be parsed.
 ' @param OutResult The returning BigInteger object if the string was successfully parsed.
 ' @return Returns True if the string was parsed, False otherwise.
 ' @remarks 3 base types are supported for parsing (Decimal, Hex, Binary.) The string
@@ -177,39 +177,28 @@ End Function
 ' Debug.Print b.ToString("X") '' 8001
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
-'
-Public Function TryParse(ByRef s As String, ByRef OutResult As BigInteger) As Boolean
-    Dim Trimmed     As String
-    Dim StartIndex  As Long
-    Dim n           As Number
-    
-    Trimmed = CorString.Trim(s)
-    
-    If Len(Trimmed) = 0 Then
-        Exit Function
-    End If
-        
-    If Left$(Trimmed, 1) = "-" Then
-        StartIndex = 1
-        n.Sign = Negative
-    End If
+Public Function TryParse(ByRef Value As String, ByRef OutResult As BigInteger) As Boolean
+    TryParse = TryParseEx(Value, NumberStyles.Integer, Nothing, OutResult)
+End Function
 
-    Select Case Mid$(Trimmed, StartIndex + 1, 2)
-        Case "&h", "&H", "0X", "0x"
-            TryParse = TryParseHex(Trimmed, StartIndex, n)
-        Case "0b", "0B"
-            TryParse = TryParseBinary(Trimmed, StartIndex, n)
-        Case Else
-            TryParse = TryParseDecimal(Trimmed, StartIndex, n)
-    End Select
+''
+' Tries to convert the string representation of a number in a specified style and culture-specific format to its BigInteger equivalent, and returns a value that indicates whether the conversion succeeded.
+'
+' @param Value The string representation of a number. The string is interpreted using the style specified by style.
+' @param Style A bitwise combination of enumeration values that indicates the style elements that can be present in value. A typical value to specify is NumberStyles.Integer.
+' @param Provider An object that supplies culture-specific formatting information about value.
+' @param OutResult When this method returns, contains the BigInteger equivalent to the number that is contained in value, or BigInteger.Zero if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
+Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
+    Dim Trimmed As String
+    Dim Result  As Number
+    Dim Info    As NumberFormatInfo
     
-    If TryParse Then
-        If n.Sign = Negative Then
-            Mathematics.Negate n
-        End If
-        
+    Set Info = NumberFormatInfo.GetInstance(Provider)
+    
+    If TryParseDecimal(Value, Style, Info, Result) Then
         Set OutResult = New BigInteger
-        OutResult.InternalInitNumber n
+        OutResult.InternalInitNumber Result
+        TryParseEx = True
     Else
         Set OutResult = Nothing
     End If
@@ -218,7 +207,7 @@ End Function
 ''
 ' Attemps to parse a string of characters of the specified base type.
 '
-' @param s The string of characters to attempt to be parsed.
+' @param Value The string of characters to attempt to be parsed.
 ' @return Returns an instance of BigInteger containing the parsed value.
 ' @remarks If the string could not be parsed, an exception is thrown.
 ' <p>3 base types are supported for parsing (Decimal, Hex, Binary.) The string
@@ -236,9 +225,9 @@ End Function
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
 '
-Public Function Parse(ByRef s As String) As BigInteger
-    If Not TryParse(s, Parse) Then
-        Error.Format Format_InvalidString
+Public Function Parse(ByRef Value As String, Optional ByVal Style As NumberStyles = NumberStyles.Integer, Optional ByVal Provider As IFormatProvider) As BigInteger
+    If Not TryParseEx(Value, Style, Provider, Parse) Then
+        Error.Format Format_ParseBigInteger
     End If
 End Function
 
@@ -483,8 +472,8 @@ End Function
 ' Debug.Print q.ToString '' 2
 ' Debug.Print r.ToString '' 20
 ' </pre>
-Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
-    Set DivRem = InternalDivide(Dividend, Divisor, Remainder, True)
+Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger, ByRef remainder As BigInteger) As BigInteger
+    Set DivRem = InternalDivide(Dividend, Divisor, remainder, True)
 End Function
 
 ''
@@ -920,8 +909,8 @@ End Sub
 ' @remarks This is provided because the VB Rnd function runs
 ' independently for each component.
 '
-Public Sub SeedRnd(Optional ByRef Seed As Variant)
-    VBA.Rnd Seed
+Public Sub SeedRnd(Optional ByRef seed As Variant)
+    VBA.Rnd seed
 End Sub
 
 ''
@@ -1066,42 +1055,110 @@ Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
     End If
 End Sub
 
-Private Function TryParseDecimal(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
+Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As Number) As Boolean
     Dim Chars() As Integer
-    Dim ub As Long
+    Dim MaxSize As Long
+    Dim i       As Long
+    Dim Ch      As Long
+    Dim InWhiteSpace        As Boolean
+    Dim MissingClosingParen As Boolean
+    Dim NegativeSign        As Long
+    Dim PositiveSign        As Long
+    Dim FoundSign           As Boolean
     
-    If Len(s) - StartIndex < 1 Then
-        Exit Function
-    End If
-    
+    NegativeSign = Asc(Info.NegativeSign)
+    PositiveSign = Asc(Info.PositiveSign)
     Chars = AllocChars(s)
+    MaxSize = Len(s) \ 4
+    ReDim n.Digits(0 To MaxSize)
+    n.Sign = 1
     
-    ub = Len(s) \ 4 + 1
-    ReDim n.Digits(0 To ub)
-    
-    Dim i As Long
-    For i = StartIndex To UBound(Chars)
-        Select Case Chars(i)
-            Case 48 To 57
+    For i = 0 To UBound(Chars)
+        Ch = Chars(i)
+        
+        Select Case Ch
+            Case vbZeroChar To vbNineChar
+                If InWhiteSpace Then
+                    GoTo Finally
+                End If
+                
                 SingleInPlaceMultiply n, 10
-                SingleInPlaceAdd n, Chars(i) - 48
+                SingleInPlaceAdd n, Ch - vbZeroChar
+            Case NegativeSign
+                If (Style And NumberStyles.AllowParentheses) <> 0 Or _
+                    (n.Precision > 0) Then
+                    GoTo Finally
+                End If
+                
+                n.Sign = -1
+                FoundSign = True
+            Case PositiveSign
+                If n.Precision > 0 Then
+                    GoTo Finally
+                End If
+                
+                FoundSign = True
+            Case &H9, &HA, &HB, &HC, &HD, &H20
+                Select Case n.Precision
+                    Case 0
+                        If (Style And NumberStyles.AllowLeadingWhite) = 0 Then
+                            GoTo Finally
+                        End If
+                    
+                        InWhiteSpace = FoundSign
+                    Case Else
+                        If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
+                            GoTo Finally
+                        End If
+                
+                        InWhiteSpace = True
+                End Select
+            Case vbOpenParenChar
+                If i > 0 Or Style <> NumberStyles.AllowParentheses Then
+                    GoTo Finally
+                End If
+                
+                MissingClosingParen = True
+            Case vbCloseParenChar
+                If (Style And NumberStyles.AllowParentheses) = 0 Or _
+                    (Not MissingClosingParen) Then
+                    GoTo Finally
+                End If
+                
+                n.Sign = -1
+                MissingClosingParen = False
             Case Else
                 GoTo Finally
         End Select
-    Next i
+    Next
     
-    n.Precision = n.Precision + 1   ' add one additional zero.
+    If MissingClosingParen Then
+        GoTo Finally
+    End If
+    
+    Select Case n.Precision
+        Case 0
+            Erase n.Digits
+            n.Sign = 0
+        Case Is < UBound(n.Digits) + 1
+            ReDim Preserve n.Digits(0 To n.Precision - 1)
+    End Select
+    
+    If n.Sign = -1 Then
+        ApplyTwosComplement n.Digits
+    End If
+    
     TryParseDecimal = True
     
 Finally:
     FreeChars Chars
 End Function
 
-Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
+Private Function TryParseHex(ByRef s As String, ByRef n As Number) As Boolean
     Dim Chars() As Integer
     Dim ub      As Long
     
-    If Len(s) - StartIndex < 3 Then
+    If Len(s) < 3 Then
         Exit Function
     End If
     
@@ -1111,13 +1168,15 @@ Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef 
     
     Dim c As Long
     Dim i As Long
-    Dim j As Long: j = 1
+    Dim j As Long
     Dim k As Long
-    For i = Len(s) - 1 To 2 + StartIndex Step -1
+    
+    j = 1
+    For i = Len(s) - 1 To 2 Step -1
         Dim Ch As Long
         Select Case Chars(i)
-            Case 48 To 57
-                Ch = Chars(i) - 48
+            Case vbZeroChar To vbNineChar
+                Ch = Chars(i) - vbZeroChar
             Case 65 To 70
                 Ch = Chars(i) - 55
             Case 97 To 102
@@ -1206,7 +1265,7 @@ Private Sub DivideByZeroError()
     Call Err.Raise(11)
 End Sub
 
-Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef Remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
+Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
     ZeroIfNothing Dividend
     ZeroIfNothing Divisor
     
@@ -1215,19 +1274,19 @@ Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As B
     ElseIf Dividend.Sign = Sign.Zero Then
         Set InternalDivide = mZero
         If IncludeRemainder Then
-            Set Remainder = mZero
+            Set remainder = mZero
         End If
         Exit Function
     ElseIf Divisor.IsOne Then
         Set InternalDivide = Dividend
         If IncludeRemainder Then
-            Set Remainder = mZero
+            Set remainder = mZero
         End If
         Exit Function
     ElseIf Divisor.IsMinusOne Then
         Set InternalDivide = Dividend.Negate
         If IncludeRemainder Then
-            Set Remainder = mZero
+            Set remainder = mZero
         End If
         Exit Function
     End If
@@ -1269,11 +1328,11 @@ Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As B
     End If
     
     If IncludeRemainder Then
-        Set Remainder = New BigInteger
-        Remainder.InternalInit RemainderNumber
+        Set remainder = New BigInteger
+        remainder.InternalInit RemainderNumber
                 
-        If Remainder.Sign = Negative Then
-            Set Remainder = Negate(Remainder)
+        If remainder.Sign = Negative Then
+            Set remainder = Negate(remainder)
         End If
     End If
     

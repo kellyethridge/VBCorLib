@@ -124,6 +124,7 @@ Public Function ToByteArray() As Byte()
     Dim MaxIndex    As Long
     Dim Size        As Long
     Dim CopyCount   As Long
+    Dim SetHighBits As Boolean
     
     If mNumber.Sign = 0 Then
         ReDim Result(0)
@@ -133,10 +134,21 @@ Public Function ToByteArray() As Byte()
         CopyCount = Size
         
         If mNumber.Sign < 0 Then
-            If (mNumber.Digits(MaxIndex) And &HFF00) = 0 Then
-                Size = Size - 1
-                CopyCount = CopyCount - 1
-            End If
+            ' if the negative bits extend through the upper 8 bits
+            ' of the last digit we don't want to copy those 8 bits.
+            Select Case mNumber.Digits(MaxIndex) And &HFF80
+                Case &HFF80, &H80
+                    ' we don't need the leading &hFF or &h0 so scale
+                    ' back the result and number of bytes to be copied.
+                    Size = Size - 1
+                    CopyCount = CopyCount - 1
+                Case Is >= 0
+                    ' we are negative but have not high bit set so
+                    ' we are going to add one byte to the output and
+                    ' set it to &hFF.
+                    Size = Size + 1
+                    SetHighBits = True
+            End Select
         Else
             If mNumber.Digits(MaxIndex) And &H8000 Then
                 Size = Size + 1
@@ -148,8 +160,12 @@ Public Function ToByteArray() As Byte()
     
         ReDim Result(0 To Size - 1)
         CopyMemory Result(0), mNumber.Digits(0), CopyCount
+        
+        If SetHighBits Then
+            Result(Size - 1) = &HFF
+        End If
     End If
-    
+        
     ToByteArray = Result
 End Function
 
@@ -377,8 +393,8 @@ End Function
 ' Debug.Print q.ToString '' 2
 ' Debug.Print r.ToString '' 20
 ' </pre>
-Public Function DivRem(ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
-    Set DivRem = BigInteger.DivRem(Me, Divisor, Remainder)
+Public Function DivRem(ByVal Divisor As BigInteger, ByRef remainder As BigInteger) As BigInteger
+    Set DivRem = BigInteger.DivRem(Me, Divisor, remainder)
 End Function
 
 ''
@@ -541,7 +557,7 @@ End Function
 ' @remarks If BitCount is negative, then a left shift is performed.
 '
 Public Function ShiftRight(ByVal BitCount As Long) As BigInteger
-    If (BitCount = 0) Or (mNumber.Sign = Zero) Then
+    If (BitCount = 0) Or IsZero Then
         Set ShiftRight = Me
         Exit Function
     End If
@@ -564,7 +580,7 @@ Public Function ShiftRight(ByVal BitCount As Long) As BigInteger
     End If
     
     Set ShiftRight = New BigInteger
-    ShiftRight.InternalInit ShiftRightNumber(mNumber, BitCount)
+    ShiftRight.InitShiftRight mNumber, BitCount
 End Function
 
 ''
@@ -580,11 +596,12 @@ Public Function ShiftLeft(ByVal BitCount As Long) As BigInteger
         Exit Function
     End If
     
-    If BitCount < 0 Then
-        Set ShiftLeft = ShiftRight(-BitCount)
+    Set ShiftLeft = New BigInteger
+    
+    If BitCount > 0 Then
+        ShiftLeft.InitShiftLeft mNumber, BitCount
     Else
-        Set ShiftLeft = New BigInteger
-        ShiftLeft.InternalInit ShiftLeftNumber(mNumber, BitCount)
+        ShiftLeft.InitShiftRight mNumber, -BitCount
     End If
 End Function
 
@@ -657,7 +674,7 @@ End Property
 Friend Sub Init(ByRef Value As Variant)
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte
-            InitFromArray AsQByteArr(CLng(Value)).Bytes
+            InitFromLong Value
         Case vbDouble, vbSingle
             InitFromFloat Value
         Case vbCurrency
@@ -665,22 +682,45 @@ Friend Sub Init(ByRef Value As Variant)
         Case vbDecimal
             InitFromDecimal Value
         Case vbByte Or vbArray
+            If CorArray.IsNull(Value) Then _
+                Error.ArgumentNull "Value"
+        
             InitFromArray Value
         Case Else
             Throw Cor.NewArgumentException("Cannot initialize BigInteger from specified value.")
     End Select
+    
+    If mNumber.Sign <> 0 Then
+        mNumber.Precision = UBound(mNumber.Digits) + 1
+    End If
 End Sub
 
-Friend Sub InternalInit(ByRef b() As Integer)
-    SAPtr(mNumber.Digits) = SAPtr(b)
-    SAPtr(b) = vbNullPtr
+Friend Sub InitShiftLeft(ByRef Number As Number, ByVal ShiftCount As Long)
+    Debug.Assert ShiftCount > 0 And Number.Sign <> 0
+    mNumber.Sign = Number.Sign
+    mNumber.Digits = ShiftLeftNumber(Number.Digits, ShiftCount)
+    mNumber.Precision = UBound(mNumber.Digits) + 1
+    TrimLeadingPadding
+End Sub
+
+Friend Sub InitShiftRight(ByRef Number As Number, ByVal ShiftCount As Long)
+    Debug.Assert ShiftCount > 0 And Number.Sign <> 0
+    mNumber.Sign = Number.Sign
+    mNumber.Digits = ShiftRightNumber(Number.Digits, ShiftCount)
+    mNumber.Precision = UBound(mNumber.Digits) + 1
+    TrimLeadingPadding
+End Sub
+
+Friend Sub InternalInit(ByRef Bytes() As Integer)
+    SAPtr(mNumber.Digits) = SAPtr(Bytes)
+    SAPtr(Bytes) = vbNullPtr
     Normalize
 End Sub
 
 Friend Sub InternalInitNumber(ByRef n As Number)
     CopyMemory mNumber, n, LenB(n)
     ZeroMemory n, LenB(n)
-    Normalize mNumber.Precision - 1
+'    Normalize mNumber.Precision - 1
 End Sub
 
 Friend Sub InternalInitNumber2(ByRef n As Number)
@@ -692,24 +732,53 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub InitFromLong(ByVal Value As Long)
+    Dim IsSingleDigit As Boolean
+    
+    Select Case Sgn(Value)
+        Case Is < 0
+            mNumber.Sign = -1
+            IsSingleDigit = (Value And &HFFFF8000) = &H8000
+        Case Is > 0
+            mNumber.Sign = 1
+            IsSingleDigit = (Value And &HFFFF0000) = 0
+        Case Else
+            Exit Sub
+    End Select
+    
+    If IsSingleDigit Then
+        ReDim mNumber.Digits(0 To 0)
+        mNumber.Digits(0) = AsWord(Value)
+    Else
+        ReDim mNumber.Digits(0 To 1)
+        AsLong(mNumber.Digits(0)) = Value
+    End If
+End Sub
+
 Private Sub InitFromArray(ByRef Value As Variant)
+    Dim Bytes() As Byte
+    
+    If Len1D(Value) = 0 Then
+        Exit Sub
+    End If
+
+    SAPtr(Bytes) = SAPtrV(Value)
+    InitFromBytes Bytes
+    SAPtr(Bytes) = vbNullPtr
+End Sub
+
+Private Sub InitFromBytes(ByRef Bytes() As Byte)
     Dim ByteCount   As Long
-    Dim Bytes()     As Byte
     Dim MaxIndex    As Long
     Dim MinIndex    As Long
     Dim Size        As Long
     
-    If CorArray.IsNull(Value) Then
-        Exit Sub
-    End If
-    
-    SAPtr(Bytes) = SAPtrV(Value)
-    MaxIndex = UBound(Value)
-    MinIndex = LBound(Value)
+    MaxIndex = UBound(Bytes)
+    MinIndex = LBound(Bytes)
     
     Select Case Bytes(MaxIndex)
         Case 0
-            ' remove all zeros; sign is positive
+            ' remove all zeros; sign is positive or zero
             Do While MaxIndex >= MinIndex
                 If Bytes(MaxIndex) > 0 Then
                     Exit Do
@@ -742,88 +811,143 @@ Private Sub InitFromArray(ByRef Value As Variant)
             mNumber.Sign = 1
     End Select
     
-    SAPtr(Bytes) = vbNullPtr
     ByteCount = MaxIndex - MinIndex + 1
     Size = CorMath.Ceiling(ByteCount / 2)
     
     If Size > 0 Then
         ReDim mNumber.Digits(0 To Size - 1)
-        Buffer.BlockCopy Value, 0, mNumber.Digits, 0, ByteCount
+        CopyMemory mNumber.Digits(0), Bytes(MinIndex), ByteCount
+        
+        If mNumber.Sign = -1 Then
+            If (mNumber.Digits(Size - 1) And &HFF80) = &H80 Then
+                mNumber.Digits(Size - 1) = mNumber.Digits(Size - 1) Or &HFF00
+            End If
+        End If
     End If
 End Sub
 
 Private Sub InitFromFloat(ByVal Value As Double)
-    Dim IsNegative   As Boolean
-    Dim Exponent     As Long
-    Dim Bytes()      As Byte
-    
-    Bytes = BitConverter.GetBytes(Value)
-    IsNegative = Bytes(7) And &H80
-    Exponent = (Bytes(7) And &H7F) * &H10 Or ((Bytes(6) And &HF0) \ &H10)
+    Dim Exponent    As Long
+    Dim InputDigits As QWordArray
+        
+    Value = Fix(Value)
+    InputDigits = AsQWordArr(Value)
+    mNumber.Sign = Sgn(Int(Value))
+    Exponent = (InputDigits.Words(3) And &H7FF0) \ &H10
     
     If Exponent = 0 Then
         Exit Sub
     End If
-        
+
     ' remove the sign bit and exponent values, and
     ' add the leading 1 back to the number.
-    Bytes(6) = (Bytes(6) And &HF) Or &H10
-    Bytes(7) = 0
-    
-    ReDim mNumber.Digits(0 To 3)
-    mNumber.Precision = 4
-    CopyMemory mNumber.Digits(0), Bytes(0), vbSizeOfDouble
-    
+    InputDigits.Words(3) = (InputDigits.Words(3) And &HF) Or &H10
+
     If Exponent > &H433 Then
-        mNumber.Digits = ShiftLeftNumber(mNumber, Exponent - &H433)
+        mNumber.Digits = ShiftLeftNumber(InputDigits.Words, Exponent - &H433)
     Else
-        mNumber.Digits = ShiftRightNumber(mNumber, &H433 - Exponent)
+        mNumber.Digits = ShiftRightNumber(InputDigits.Words, &H433 - Exponent)
     End If
 
-    If IsNegative Then
+    If mNumber.Sign < 0 Then
         ApplyTwosComplement mNumber.Digits
     End If
     
-    Normalize
+    TrimLeadingPadding
 End Sub
 
 Private Sub InitFromCurrency(ByVal Value As Currency)
+    Value = Fix(Value) * 0.0001@
     ReDim mNumber.Digits(0 To 3)
-    Value = Value * 0.0001@
-    CopyMemory mNumber.Digits(0), Value, vbSizeOfCurrency
-    Normalize
+    AsCurr(mNumber.Digits(0)) = Value
+    mNumber.Sign = Sgn(Value)
+    TrimLeadingPadding
 End Sub
 
-' VB Decimal layout<br>
-' bytes 0-1: Variant datatype information<br>
-' bytes 2: precision<br>
-' bytes 3: sign (&h80 is negative)<br>
-' bytes 4-7: the 32 highest bits in the 96bit value<br>
-' bytes 8-11: the 32 lowest bits in the 96bit value<br>
-' bytes 12-15: the 32 middle bits in the 96bit value<br>
-' <br>
-' .NET Decimal layout<br>
-' bytes 0-3: the 32 lowest bits in the 96bit value<br>
-' bytes 4-7: the 32 middle bits in the 96bit value<br>
-' bytes 8-11: the 32 highest bits in the 96bit value<br>
-' bytes 12-13: unused (zero)<br>
-' bytes 14: precision<br>
-' bytes 15: sign (&h80 is negative)<br>
-
+' VB Decimal layout
+' bytes 0-1: Variant datatype information
+' bytes 2: precision
+' bytes 3: sign (&h80 is negative)
+' bytes 4-7: the 32 highest bits in the 96bit value
+' bytes 8-11: the 32 lowest bits in the 96bit value
+' bytes 12-15: the 32 middle bits in the 96bit value
+'
+' .NET Decimal layout
+' bytes 0-3: the 32 lowest bits in the 96bit value
+' bytes 4-7: the 32 middle bits in the 96bit value
+' bytes 8-11: the 32 highest bits in the 96bit value
+' bytes 12-13: unused (zero)
+' bytes 14: precision
+' bytes 15: sign (&h80 is negative)
 Private Sub InitFromDecimal(ByRef Value As Variant)
-    Dim Bytes()     As Byte
-    Dim IsNegative  As Boolean
+    Dim Ptr As Long
     
-    ReDim mNumber.Digits(0 To 7)
-    Bytes = BitConverter.GetBytes(Int(Value))
-    CopyMemory mNumber.Digits(0), Bytes(0), 12
-    IsNegative = Bytes(15) = &H80
+    Value = Fix(Value)
+    Ptr = VarPtr(Value)
+    ReDim mNumber.Digits(0 To 5)
+    AsLong(mNumber.Digits(0)) = MemLong(Ptr + 8)
+    AsLong(mNumber.Digits(2)) = MemLong(Ptr + 12)
+    AsLong(mNumber.Digits(4)) = MemLong(Ptr + 4)
+    mNumber.Sign = Sgn(Value)
     
-    If IsNegative Then
+    If mNumber.Sign < 0 Then
         ApplyTwosComplement mNumber.Digits
     End If
     
-    Normalize
+    TrimLeadingPadding
+End Sub
+
+Private Sub TrimLeadingPadding()
+    If mNumber.Sign < 0 Then
+        TrimNegativeDigits
+    Else
+        TrimLeadingZeros
+    End If
+End Sub
+
+Private Sub TrimNegativeDigits()
+    Dim Index As Long
+            
+    Index = UBound(mNumber.Digits)
+    ' remove leading FFFF unless first non FFFF does not have high bit set.
+    ' FFFFFFFFFFFF => FFFF
+    ' FFFFFFFF8000 => 8000
+    ' FFFFFFFF0001 => FFFF0001
+    Do While Index > 0 And mNumber.Digits(Index) = &HFFFF
+        If (mNumber.Digits(Index - 1) And &H8000) = 0 Then
+            Exit Do
+        End If
+        
+        Index = Index - 1
+    Loop
+            
+    ReDim Preserve mNumber.Digits(0 To Index)
+    mNumber.Precision = Index + 1
+End Sub
+
+Private Sub TrimLeadingZeros()
+    Dim StartIndex  As Long
+    Dim Index       As Long
+    
+    StartIndex = UBound(mNumber.Digits)
+    Index = StartIndex
+    
+    Do While Index >= 0
+        If mNumber.Digits(Index) <> 0 Then
+            Exit Do
+        End If
+        
+        Index = Index - 1
+    Loop
+    
+    If Index < 0 Then
+        Erase mNumber.Digits
+        mNumber.Sign = 0
+        mNumber.Precision = 0
+    ElseIf Index < StartIndex Then
+        ReDim Preserve mNumber.Digits(0 To Index)
+        mNumber.Precision = Index + 1
+    End If
 End Sub
 
 Private Sub Normalize(Optional ByVal ub As Long = -1)
@@ -887,8 +1011,9 @@ Private Function ToDecimalString(ByVal Count As Long, ByVal FormatInfo As Number
     
     Dividend = mNumber
     
-    If Dividend.Sign = Negative Then
-        Mathematics.Negate Dividend
+    If Dividend.Sign = -1 Then
+'        Mathematics.Negate Dividend
+        Mathematics.ApplyTwosComplement Dividend.Digits
     End If
         
     Size = Dividend.Precision * DIGITS_PER_INTEGER
@@ -1087,23 +1212,21 @@ Finally:
     Return
 End Function
 
-Private Function ShiftLeftNumber(ByRef n As Number, ByVal BitCount As Long) As Integer()
-    Dim WordCount As Long
-    Dim RemainingBits As Long
-    Dim NewPrecision As Long
-    Dim NewNumber() As Integer
+Private Function ShiftLeftNumber(ByRef Digits() As Integer, ByVal BitCount As Long) As Integer()
+    Dim WholeWords      As Long
+    Dim RemainingBits   As Long
+    Dim Size            As Long
+    Dim NewSize         As Long
+    Dim NewNumber()     As Integer
     
-    WordCount = (BitCount And &HFFFFFFF0) \ &H10
+    Size = Len1D(Digits)
+    WholeWords = (BitCount And &HFFFFFFF0) \ &H10
     RemainingBits = BitCount And &HF
-    NewPrecision = n.Precision + WordCount
-    ReDim NewNumber(0 To NewPrecision)
-    
-    If n.Sign = Negative Then
-        NewNumber(NewPrecision) = &HFFFF
-    End If
+    NewSize = Size + WholeWords + IIfLong(RemainingBits > 0, 1, 0)
+    ReDim NewNumber(0 To NewSize - 1)
     
     If RemainingBits = 0 Then
-        CopyMemory NewNumber(WordCount), n.Digits(0), n.Precision * 2
+        CopyMemory NewNumber(WholeWords), Digits(0), Size * 2
     Else
         Dim LowerMask   As Long
         Dim UpperMask   As Long
@@ -1115,47 +1238,48 @@ Private Function ShiftLeftNumber(ByRef n As Number, ByVal BitCount As Long) As I
         RShift = PowersOf2(16 - RemainingBits) And &HFFFF&
         LShift = PowersOf2(RemainingBits) And &HFFFF&
            
-        Dim SrcInt      As Integer
-        Dim DstInt      As Integer
+        Dim SrcInt      As Long
+        Dim DstInt      As Long
         Dim i           As Long
         Dim j           As Long
 
-        i = WordCount
+        i = WholeWords
         Do
-            SrcInt = n.Digits(j)
-            NewNumber(i) = DstInt Or AsWord(((SrcInt And &HFFFF&) And LowerMask) * LShift)
-            DstInt = ((SrcInt And &HFFFF&) And UpperMask) \ RShift
+            SrcInt = Digits(j) And &HFFFF&
+            DstInt = DstInt Or ((SrcInt And LowerMask) * LShift)
+            
+            #If Release Then
+            NewNumber(i) = DstInt
+            #Else
+            NewNumber(i) = AsWord(DstInt)
+            #End If
+            
+            DstInt = (SrcInt And UpperMask) \ RShift
             i = i + 1
             j = j + 1
-        Loop While j < n.Precision
+        Loop While j < Size
         
-        If n.Sign = Negative Then
-            DstInt = DstInt Or AsWord(&H10000 - LShift)
-        End If
-               
         NewNumber(i) = DstInt
     End If
 
     ShiftLeftNumber = NewNumber
 End Function
 
-Private Function ShiftRightNumber(ByRef n As Number, ByVal BitCount As Long) As Integer()
+Private Function ShiftRightNumber(ByRef Digits() As Integer, ByVal BitCount As Long) As Integer()
     Dim WordCount       As Long
     Dim RemainingBits   As Long
     Dim NewPrecision    As Long
     Dim NewNumber()     As Integer
+    Dim Size            As Long
     
+    Size = Len1D(Digits)
     WordCount = (BitCount And &HFFFFFFF0) \ &H10
     RemainingBits = BitCount And &HF
-    NewPrecision = n.Precision - WordCount
-    ReDim NewNumber(0 To NewPrecision)
-    
-    If n.Sign = Negative Then
-        NewNumber(NewPrecision) = &HFFFF
-    End If
+    NewPrecision = Size - WordCount
+    ReDim NewNumber(0 To NewPrecision - 1)
     
     If RemainingBits = 0 Then
-        CopyMemory NewNumber(0), n.Digits(WordCount), NewPrecision * 2
+        CopyMemory NewNumber(0), Digits(WordCount), NewPrecision * 2
     Else
         Dim LowerMask   As Long
         Dim UpperMask   As Long
@@ -1173,24 +1297,20 @@ Private Function ShiftRightNumber(ByRef n As Number, ByVal BitCount As Long) As 
         Dim j           As Long
         
         j = WordCount
-        SrcInt = n.Digits(j)
+        SrcInt = Digits(j)
         Do
             DstInt = ((SrcInt And &HFFFF&) And UpperMask) \ RShift
             j = j + 1
             
-            If j = n.Precision Then
+            If j = Size Then
                 Exit Do
             End If
             
-            SrcInt = n.Digits(j)
+            SrcInt = Digits(j)
             NewNumber(i) = DstInt Or AsWord(((SrcInt And &HFFFF&) And LowerMask) * LShift)
             i = i + 1
         Loop
             
-        If n.Sign = Negative Then
-            DstInt = DstInt Or AsWord(&H10000 - LShift)
-        End If
-        
         NewNumber(i) = DstInt
     End If
 

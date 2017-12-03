@@ -40,9 +40,264 @@ Option Explicit
 Public Type Number
     Digits()    As Integer
     Precision   As Long
-    Sign        As CorLib.Sign
+    Sign        As Long
 End Type
 
+Public Function ShiftRightInt32(ByVal Value As Long, ByVal ShiftCount As Long) As Long
+    ' by Jost Schwider, jost@schwider.de, 20010928
+    If ShiftCount = 0 Then
+        ShiftRightInt32 = Value
+    Else
+        If Value And &H80000000 Then
+            Value = (Value And &H7FFFFFFF) \ 2 Or &H40000000
+            ShiftCount = ShiftCount - 1
+        End If
+        
+        Select Case ShiftCount
+            Case 0&:  ShiftRightInt32 = Value
+            Case 1&:  ShiftRightInt32 = Value \ &H2&
+            Case 2&:  ShiftRightInt32 = Value \ &H4&
+            Case 3&:  ShiftRightInt32 = Value \ &H8&
+            Case 4&:  ShiftRightInt32 = Value \ &H10&
+            Case 5&:  ShiftRightInt32 = Value \ &H20&
+            Case 6&:  ShiftRightInt32 = Value \ &H40&
+            Case 7&:  ShiftRightInt32 = Value \ &H80&
+            Case 8&:  ShiftRightInt32 = Value \ &H100&
+            Case 9&:  ShiftRightInt32 = Value \ &H200&
+            Case 10&: ShiftRightInt32 = Value \ &H400&
+            Case 11&: ShiftRightInt32 = Value \ &H800&
+            Case 12&: ShiftRightInt32 = Value \ &H1000&
+            Case 13&: ShiftRightInt32 = Value \ &H2000&
+            Case 14&: ShiftRightInt32 = Value \ &H4000&
+            Case 15&: ShiftRightInt32 = Value \ &H8000&
+            Case 16&: ShiftRightInt32 = Value \ &H10000
+            Case 17&: ShiftRightInt32 = Value \ &H20000
+            Case 18&: ShiftRightInt32 = Value \ &H40000
+            Case 19&: ShiftRightInt32 = Value \ &H80000
+            Case 20&: ShiftRightInt32 = Value \ &H100000
+            Case 21&: ShiftRightInt32 = Value \ &H200000
+            Case 22&: ShiftRightInt32 = Value \ &H400000
+            Case 23&: ShiftRightInt32 = Value \ &H800000
+            Case 24&: ShiftRightInt32 = Value \ &H1000000
+            Case 25&: ShiftRightInt32 = Value \ &H2000000
+            Case 26&: ShiftRightInt32 = Value \ &H4000000
+            Case 27&: ShiftRightInt32 = Value \ &H8000000
+            Case 28&: ShiftRightInt32 = Value \ &H10000000
+            Case 29&: ShiftRightInt32 = Value \ &H20000000
+            Case 30&: ShiftRightInt32 = Value \ &H40000000
+            Case 31&: ShiftRightInt32 = &H0&
+        End Select
+    End If
+End Function
+
+Public Function ShiftRightInt64(ByRef Value As DLong, ByVal ShiftCount As Long) As DLong
+    Dim BitsToMove As Long
+    
+    If ShiftCount < 64 Then
+        If ShiftCount < 32 Then
+            ShiftRightInt64.LoDWord = ShiftRightInt32(Value.LoDWord, ShiftCount)
+            BitsToMove = Value.HiDWord And (Powers(ShiftCount) - 1)
+            ShiftRightInt64.LoDWord = ShiftRightInt64.LoDWord Or ShiftLeftInt32(BitsToMove, 32 - ShiftCount)
+            ShiftRightInt64.HiDWord = ShiftRightInt32(Value.HiDWord, ShiftCount)
+        Else
+            ShiftRightInt64.LoDWord = ShiftRightInt32(Value.HiDWord, ShiftCount - 32)
+        End If
+    End If
+End Function
+
+Public Function ShiftLeftInt32(ByVal Value As Long, ByVal ShiftCount As Long) As Long
+' by Jost Schwider, jost@schwider.de, 20011001
+    Select Case ShiftCount
+        Case 0&
+            ShiftLeftInt32 = Value
+        Case 1&
+            If Value And &H40000000 Then
+              ShiftLeftInt32 = (Value And &H3FFFFFFF) * &H2& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3FFFFFFF) * &H2&
+            End If
+        Case 2&
+            If Value And &H20000000 Then
+              ShiftLeftInt32 = (Value And &H1FFFFFFF) * &H4& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1FFFFFFF) * &H4&
+            End If
+        Case 3&
+            If Value And &H10000000 Then
+              ShiftLeftInt32 = (Value And &HFFFFFFF) * &H8& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &HFFFFFFF) * &H8&
+            End If
+        Case 4&
+            If Value And &H8000000 Then
+              ShiftLeftInt32 = (Value And &H7FFFFFF) * &H10& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H7FFFFFF) * &H10&
+            End If
+        Case 5&
+            If Value And &H4000000 Then
+              ShiftLeftInt32 = (Value And &H3FFFFFF) * &H20& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3FFFFFF) * &H20&
+            End If
+        Case 6&
+            If Value And &H2000000 Then
+              ShiftLeftInt32 = (Value And &H1FFFFFF) * &H40& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1FFFFFF) * &H40&
+            End If
+        Case 7&
+            If Value And &H1000000 Then
+              ShiftLeftInt32 = (Value And &HFFFFFF) * &H80& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &HFFFFFF) * &H80&
+            End If
+        Case 8&
+            If Value And &H800000 Then
+              ShiftLeftInt32 = (Value And &H7FFFFF) * &H100& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H7FFFFF) * &H100&
+            End If
+        Case 9&
+            If Value And &H400000 Then
+              ShiftLeftInt32 = (Value And &H3FFFFF) * &H200& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3FFFFF) * &H200&
+            End If
+        Case 10&
+            If Value And &H200000 Then
+              ShiftLeftInt32 = (Value And &H1FFFFF) * &H400& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1FFFFF) * &H400&
+            End If
+        Case 11&
+            If Value And &H100000 Then
+              ShiftLeftInt32 = (Value And &HFFFFF) * &H800& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &HFFFFF) * &H800&
+            End If
+        Case 12&
+            If Value And &H80000 Then
+              ShiftLeftInt32 = (Value And &H7FFFF) * &H1000& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H7FFFF) * &H1000&
+            End If
+        Case 13&
+            If Value And &H40000 Then
+              ShiftLeftInt32 = (Value And &H3FFFF) * &H2000& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3FFFF) * &H2000&
+            End If
+        Case 14&
+            If Value And &H20000 Then
+              ShiftLeftInt32 = (Value And &H1FFFF) * &H4000& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1FFFF) * &H4000&
+            End If
+        Case 15&
+            If Value And &H10000 Then
+              ShiftLeftInt32 = (Value And &HFFFF&) * &H8000& Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &HFFFF&) * &H8000&
+            End If
+        Case 16&
+            If Value And &H8000& Then
+              ShiftLeftInt32 = (Value And &H7FFF&) * &H10000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H7FFF&) * &H10000
+            End If
+        Case 17&
+            If Value And &H4000& Then
+              ShiftLeftInt32 = (Value And &H3FFF&) * &H20000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3FFF&) * &H20000
+            End If
+        Case 18&
+            If Value And &H2000& Then
+              ShiftLeftInt32 = (Value And &H1FFF&) * &H40000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1FFF&) * &H40000
+            End If
+        Case 19&
+            If Value And &H1000& Then
+              ShiftLeftInt32 = (Value And &HFFF&) * &H80000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &HFFF&) * &H80000
+            End If
+        Case 20&
+            If Value And &H800& Then
+              ShiftLeftInt32 = (Value And &H7FF&) * &H100000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H7FF&) * &H100000
+            End If
+        Case 21&
+            If Value And &H400& Then
+              ShiftLeftInt32 = (Value And &H3FF&) * &H200000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3FF&) * &H200000
+            End If
+        Case 22&
+            If Value And &H200& Then
+              ShiftLeftInt32 = (Value And &H1FF&) * &H400000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1FF&) * &H400000
+            End If
+        Case 23&
+            If Value And &H100& Then
+              ShiftLeftInt32 = (Value And &HFF&) * &H800000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &HFF&) * &H800000
+            End If
+        Case 24&
+            If Value And &H80& Then
+              ShiftLeftInt32 = (Value And &H7F&) * &H1000000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H7F&) * &H1000000
+            End If
+        Case 25&
+            If Value And &H40& Then
+              ShiftLeftInt32 = (Value And &H3F&) * &H2000000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3F&) * &H2000000
+            End If
+        Case 26&
+            If Value And &H20& Then
+              ShiftLeftInt32 = (Value And &H1F&) * &H4000000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1F&) * &H4000000
+            End If
+        Case 27&
+            If Value And &H10& Then
+              ShiftLeftInt32 = (Value And &HF&) * &H8000000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &HF&) * &H8000000
+            End If
+        Case 28&
+            If Value And &H8& Then
+              ShiftLeftInt32 = (Value And &H7&) * &H10000000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H7&) * &H10000000
+            End If
+        Case 29&
+            If Value And &H4& Then
+              ShiftLeftInt32 = (Value And &H3&) * &H20000000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H3&) * &H20000000
+            End If
+        Case 30&
+            If Value And &H2& Then
+              ShiftLeftInt32 = (Value And &H1&) * &H40000000 Or &H80000000
+            Else
+              ShiftLeftInt32 = (Value And &H1&) * &H40000000
+            End If
+        Case 31&
+            If Value And &H1& Then
+              ShiftLeftInt32 = &H80000000
+            Else
+              ShiftLeftInt32 = &H0&
+            End If
+    End Select
+End Function
 
 #If Release Then
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -61,7 +316,7 @@ End Type
 Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer()
     Dim uExtDigit   As Long
     Dim vExtDigit   As Long
-    Dim Sum()       As Integer
+    Dim sum()       As Integer
 
     If u.Sign = Negative Then
         uExtDigit = &HFFFF&
@@ -72,14 +327,14 @@ Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer(
     End If
 
     If u.Precision >= v.Precision Then
-        ReDim Sum(0 To u.Precision)
+        ReDim sum(0 To u.Precision)
     Else
-        ReDim Sum(0 To v.Precision)
+        ReDim sum(0 To v.Precision)
     End If
 
     Dim i As Long
     Dim k As Long
-    For i = 0 To UBound(Sum)
+    For i = 0 To UBound(sum)
         Dim uDigit  As Long
         Dim vDigit  As Long
         
@@ -96,11 +351,11 @@ Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer(
         End If
         
         k = uDigit + vDigit + k ' this is the only change from subtraction
-        Sum(i) = k And &HFFFF&
+        sum(i) = k And &HFFFF&
         k = (k And &HFFFF0000) \ &H10000
     Next i
     
-    GradeSchoolAdd = Sum
+    GradeSchoolAdd = sum
 End Function
 
 ''
@@ -195,7 +450,7 @@ End Function
 '
 ' Ref: The Art of Computer Programming 4.3.1.D
 '
-Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
+Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
     Dim n As Long
     Dim m As Long
     Dim d As Long
@@ -207,8 +462,8 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
     ' return a 0 quotient and the dividend as the remainder, if needed.
     If m < 0 Then
         If IncludeRemainder Then
-            ReDim Remainder(0 To u.Precision)
-            CopyMemory Remainder(0), u.Digits(0), u.Precision * 2
+            ReDim remainder(0 To u.Precision)
+            CopyMemory remainder(0), u.Digits(0), u.Precision * 2
         End If
         
         GradeSchoolDivide = Cor.NewIntegers()
@@ -327,9 +582,9 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
     ' ** D8 Start **
     If IncludeRemainder Then
         If d > 1 Then
-            Remainder = SinglePlaceDivide(u.Digits, n, d)
+            remainder = SinglePlaceDivide(u.Digits, n, d)
         Else
-            Remainder = u.Digits
+            remainder = u.Digits
         End If
     End If
     ' ** D8 End **
@@ -522,7 +777,7 @@ End Sub
 ''
 ' Divides an array by a single digit (16bit) value, returning the quotient and remainder.
 '
-Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef Remainder As Long) As Integer()
+Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef remainder As Long) As Integer()
     Dim R   As Long
     Dim q() As Integer
     Dim q2  As Long
@@ -554,7 +809,7 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
         End If
     Next
     
-    Remainder = R
+    remainder = R
     SinglePlaceDivide = q
 End Function
 
@@ -632,8 +887,8 @@ Public Sub SingleInPlaceMultiply(ByRef n As Number, ByVal Value As Long)
 End Sub
 
 Public Sub SingleInPlaceAdd(ByRef n As Number, ByVal Value As Integer)
-    Dim i As Long
     Dim k As Long
+    Dim i As Long
     
     k = Value And &HFFFF&
     
@@ -708,7 +963,7 @@ End Function
 Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer()
     Dim uExtDigit   As Long
     Dim vExtDigit   As Long
-    Dim Sum()       As Integer
+    Dim sum()       As Integer
 
     If u.Sign = Negative Then
         uExtDigit = &HFFFF&
@@ -719,14 +974,14 @@ Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer(
     End If
 
     If u.Precision >= v.Precision Then
-        ReDim Sum(0 To u.Precision)
+        ReDim sum(0 To u.Precision)
     Else
-        ReDim Sum(0 To v.Precision)
+        ReDim sum(0 To v.Precision)
     End If
     
     Dim i As Long
     Dim k As Long
-    For i = 0 To UBound(Sum)
+    For i = 0 To UBound(sum)
         Dim uDigit  As Long
         Dim vDigit  As Long
         
@@ -743,11 +998,11 @@ Public Function GradeSchoolAdd(ByRef u As Number, ByRef v As Number) As Integer(
         End If
         
         k = uDigit + vDigit + k ' this is the only change for the subtraction
-        Sum(i) = AsWord(k)
+        sum(i) = AsWord(k)
         k = (k And &HFFFF0000) \ &H10000
     Next i
     
-    GradeSchoolAdd = Sum
+    GradeSchoolAdd = sum
 End Function
 
 Public Function GradeSchoolSubtract(ByRef u As Number, ByRef v As Number) As Integer()
@@ -795,7 +1050,7 @@ Public Function GradeSchoolSubtract(ByRef u As Number, ByRef v As Number) As Int
     GradeSchoolSubtract = Difference
 End Function
 
-Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
+Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
     Dim n As Long
     Dim m As Long
     Dim d As Long
@@ -805,8 +1060,8 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
      
     If m < 0 Then
         If IncludeRemainder Then
-            ReDim Remainder(0 To u.Precision)
-            CopyMemory Remainder(0), u.Digits(0), u.Precision * 2
+            ReDim remainder(0 To u.Precision)
+            CopyMemory remainder(0), u.Digits(0), u.Precision * 2
         End If
         
         GradeSchoolDivide = Cor.NewIntegers()
@@ -877,9 +1132,9 @@ Public Function GradeSchoolDivide(ByRef u As Number, ByRef v As Number, ByRef Re
     
     If IncludeRemainder Then
         If d > 1 Then
-            Remainder = SinglePlaceDivide(u.Digits, n, d)
+            remainder = SinglePlaceDivide(u.Digits, n, d)
         Else
-            Remainder = u.Digits
+            remainder = u.Digits
         End If
     End If
     
@@ -975,7 +1230,7 @@ Private Sub MultiInPlaceAdd(ByRef u() As Integer, ByVal StartIndex As Long, ByRe
     Next i
 End Sub
 
-Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef Remainder As Long) As Integer()
+Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef remainder As Long) As Integer()
     Dim q() As Integer
     ReDim q(0 To Length)
     
@@ -987,7 +1242,7 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
         R = AsWord(UInt32m16To32(R, v))
     Next i
     
-    Remainder = R
+    remainder = R
     SinglePlaceDivide = q
 End Function
 
