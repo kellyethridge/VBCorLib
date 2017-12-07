@@ -107,7 +107,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, NewBytes(&HFF), -1
             Test.Use "12345678901231234567890123.456789", NewBytes(&HCB, &HE4, &H5F, &H51, &HA2, &H7B, &H22, &H98, &H4C, &H36, &HA), 1
             Test.Use "-12345678901231234567890123.456789", NewBytes(&H35, &H1B, &HA0, &HAE, &H5D, &H84, &HDD, &H67, &HB3, &HC9, &HF5), -1
-
+            
         Case "Parse_WithValidValueForNumberStylesInteger_ReturnsBigInteger"
             Test.Use "0", NewBytes(0), 0
             Test.Use "1", NewBytes(&H1), 1
@@ -125,6 +125,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "  65536  ", NewBytes(0, 0, &H1), 1
             Test.Use "  -65536  ", NewBytes(0, 0, &HFF), -1
             Test.Use "  000000000000000000000255  ", NewBytes(&HFF, 0), 1
+            Test.Use "  -000000000000000000000255  ", NewBytes(&H1, &HFF), -1
             Test.Use "12345678901234567890", NewBytes(&HD2, &HA, &H1F, &HEB, &H8C, &HA9, &H54, &HAB, 0), 1
             Test.Use "-12345678901234567890", NewBytes(&H2E, &HF5, &HE0, &H14, &H73, &H56, &HAB, &H54, &HFF), -1
             
@@ -132,12 +133,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1 2"
             Test.Use "- 12"
             Test.Use "12-"
-            Test.Use "f"
+            Test.Use "F"
             Test.Use "(1)"
             Test.Use "1,000"
             Test.Use "1.0"
             Test.Use "+ 12"
             Test.Use "12+"
+            Test.Use "$12"
+            Test.Use "1e+10"
             
         Case "Parse_WithInvalidValueForNumberStylesAllowParentheses_ThrowsFormatException"
             Test.Use "-1"
@@ -147,6 +150,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "(1 )"
             Test.Use "(1"
             Test.Use "1)"
+            Test.Use "-(1)"
+            Test.Use "(-1)"
             
 '        Case "TryParse_WithValidHexValue_InitializesBigInteger"
 '            Test.Use "&h0", NewBytes(0), 0
@@ -948,9 +953,4 @@ Public Sub Equals_WithValues_ReturnsExpected(ByRef a As Variant, ByRef b As Vari
     Actual = BInt(a).Equals(BInt(b))
     
     Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Private Sub AssertNumber(ByVal Number As BigInteger, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
-    Assert.That Number.ToByteArray, Iz.EqualTo(ExpectedBytes)
-    Assert.That Number.Sign, Iz.EqualTo(ExpectedSign)
 End Sub

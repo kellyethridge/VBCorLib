@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#4.0#0"; "SimplyVBUnit.Component.ocx"
+Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#5.0#0"; "SimplyVBUnit.Component.ocx"
 Begin VB.Form frmSimplyVBUnitRunner 
    Caption         =   "Simply VB Unit"
    ClientHeight    =   7080
@@ -326,10 +326,15 @@ Private Sub AddSystemGlobalization()
 End Sub
 
 Private Sub AddSystemNumerics()
-    With Sim.NewTestSuite("System.Numerics")
-        .Add New BigIntegerTests
-        AddTest .This
-    End With
+    AddTest Sim.NewTestSuite("System.Numerics") _
+        .Add(New BigIntegerTests) _
+        .Add(Sim.NewTestSuite("BigInteger Parsing") _
+            .Add(New BIntNumberStylesNoneTests, "NumberStyles.None") _
+            .Add(New BIntNumberStylesAllowLeadingSignTests, "NumberStyles.AllowLeadingSign") _
+            .Add(New BIntNumberStylesAllowLeadingWhiteTests, "NumberStyles.AllowLeadingWhite") _
+            .Add(New BIntNumberStylesAllowTrailingWhiteTests, "NumberStyles.AllowTrailingWhite") _
+            .Add(New BIntNumberStylesAllowCurrencySymbolTests, "NumberStyles.AllowCurrencySymbol") _
+            .Add(New BIntNumberStylesAllowTrailingSignTests, "NumberStyles.AllowTrailingSign"))
 End Sub
 
 Private Function NewSuite(ByVal Name As String, ParamArray Fixtures() As Variant) As TestSuite

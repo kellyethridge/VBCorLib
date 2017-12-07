@@ -186,7 +186,7 @@ End Function
 '
 ' @param Value The string representation of a number. The string is interpreted using the style specified by style.
 ' @param Style A bitwise combination of enumeration values that indicates the style elements that can be present in value. A typical value to specify is NumberStyles.Integer.
-' @param Provider An object that supplies culture-specific formatting information about value.
+' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
 ' @param OutResult When this method returns, contains the BigInteger equivalent to the number that is contained in value, or BigInteger.Zero if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
 Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
     Dim Trimmed As String
@@ -1056,18 +1056,20 @@ Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
 End Sub
 
 Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As Number) As Boolean
-    Dim Chars() As Integer
-    Dim MaxSize As Long
-    Dim i       As Long
-    Dim Ch      As Long
+    Dim Chars()             As Integer
+    Dim MaxSize             As Long
+    Dim i                   As Long
+    Dim Ch                  As Long
     Dim InWhiteSpace        As Boolean
     Dim MissingClosingParen As Boolean
-    Dim NegativeSign        As Long
-    Dim PositiveSign        As Long
+    Dim NegativeSign        As Integer
+    Dim PositiveSign        As Integer
+    Dim CurrencySymbol      As Integer
     Dim FoundSign           As Boolean
     
-    NegativeSign = Asc(Info.NegativeSign)
-    PositiveSign = Asc(Info.PositiveSign)
+    NegativeSign = AscW(Info.NegativeSign)
+    PositiveSign = AscW(Info.PositiveSign)
+    CurrencySymbol = AscW(Info.CurrencySymbol)
     Chars = AllocChars(s)
     MaxSize = Len(s) \ 4
     ReDim n.Digits(0 To MaxSize)
@@ -1081,38 +1083,46 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 If InWhiteSpace Then
                     GoTo Finally
                 End If
+                If (n.Precision > 0) And FoundSign Then
+                    GoTo Finally
+                End If
                 
                 SingleInPlaceMultiply n, 10
                 SingleInPlaceAdd n, Ch - vbZeroChar
             Case NegativeSign
-                If (Style And NumberStyles.AllowParentheses) <> 0 Or _
-                    (n.Precision > 0) Then
-                    GoTo Finally
+                If n.Precision = 0 Then
+                    If (Style And NumberStyles.AllowLeadingSign) = 0 Then
+                        GoTo Finally
+                    End If
+                Else
+                    If (Style And NumberStyles.AllowTrailingSign) = 0 Then
+                        GoTo Finally
+                    End If
+                    FoundSign = True
                 End If
                 
                 n.Sign = -1
-                FoundSign = True
             Case PositiveSign
-                If n.Precision > 0 Then
-                    GoTo Finally
+                If n.Precision = 0 Then
+                    If (Style And NumberStyles.AllowLeadingSign) = 0 Then
+                        GoTo Finally
+                    End If
+                Else
+                    If (Style And NumberStyles.AllowTrailingSign) = 0 Then
+                        GoTo Finally
+                    End If
+                    FoundSign = True
                 End If
+            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
+                If n.Precision = 0 Then
+                    If (Style And NumberStyles.AllowLeadingWhite) = 0 Then
+                        GoTo Finally
+                    End If
                 
-                FoundSign = True
-            Case &H9, &HA, &HB, &HC, &HD, &H20
-                Select Case n.Precision
-                    Case 0
-                        If (Style And NumberStyles.AllowLeadingWhite) = 0 Then
-                            GoTo Finally
-                        End If
-                    
-                        InWhiteSpace = FoundSign
-                    Case Else
-                        If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
-                            GoTo Finally
-                        End If
-                
-                        InWhiteSpace = True
-                End Select
+                    InWhiteSpace = FoundSign
+                Else
+                    InWhiteSpace = True
+                End If
             Case vbOpenParenChar
                 If i > 0 Or Style <> NumberStyles.AllowParentheses Then
                     GoTo Finally
@@ -1120,17 +1130,26 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 
                 MissingClosingParen = True
             Case vbCloseParenChar
-                If (Style And NumberStyles.AllowParentheses) = 0 Or _
-                    (Not MissingClosingParen) Then
+                If (Style And NumberStyles.AllowParentheses) = 0 Or (Not MissingClosingParen) Then
                     GoTo Finally
                 End If
                 
                 n.Sign = -1
                 MissingClosingParen = False
+            Case CurrencySymbol
+                If (Style And NumberStyles.AllowCurrencySymbol) = 0 Then
+                    GoTo Finally
+                End If
             Case Else
                 GoTo Finally
         End Select
     Next
+    
+    If InWhiteSpace Then
+        If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
+            GoTo Finally
+        End If
+    End If
     
     If MissingClosingParen Then
         GoTo Finally
