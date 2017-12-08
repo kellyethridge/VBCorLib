@@ -336,7 +336,9 @@ Private Sub AddSystemNumerics()
             .Add(New BIntNumberStylesAllowCurrencySymbolTests, "NumberStyles.AllowCurrencySymbol") _
             .Add(New BIntNumberStylesAllowTrailingSignTests, "NumberStyles.AllowTrailingSign") _
             .Add(New BIntNumberStylesAllowDecimalPointTests, "NumberStyles.AllowDecimalPoint") _
-            .Add(New BIntNumberStylesAllowThousandsTests, "NumberStyles.AllowThousands"))
+            .Add(New BIntNumberStylesAllowThousandsTests, "NumberStyles.AllowThousands") _
+            .Add(New BIntNumberStylesAllowParenthesesTests, "NumberStyles.AllowParentheses") _
+            .Add(New BIntParseNumberStylesComboTests, "NumberStyles Combinations"))
 End Sub
 
 Private Function NewSuite(ByVal Name As String, ParamArray Fixtures() As Variant) As TestSuite

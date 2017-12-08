@@ -1074,6 +1074,7 @@ End Sub
 Friend Sub InitClone(ByRef Props As PropsType)
     mProps = Props
     mLoaded = True
+    mProps.IsReadOnly = False
 End Sub
 
 Private Sub Class_Terminate()

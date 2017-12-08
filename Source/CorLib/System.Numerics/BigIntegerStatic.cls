@@ -1061,7 +1061,6 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Const FoundAfter        As Long = 2
     Const FoundDuring       As Long = 3
     Dim Chars()             As Integer
-    Dim MaxSize             As Long
     Dim i                   As Long
     Dim Ch                  As Long
     Dim InWhiteSpace        As Boolean
@@ -1070,20 +1069,24 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Dim PositiveSign        As Integer
     Dim CurrencySymbol      As Integer
     Dim Thousands           As Integer
+    Dim CurrencyThousands   As Integer
     Dim DecimalPoint        As Integer
+    Dim CurrencyPoint       As Integer
     Dim FoundDigit          As Boolean
     Dim FoundCurrency       As Long
     Dim FoundSign           As Long
     Dim FoundDecimal        As Boolean
+    Dim FoundClosingParen   As Boolean
     
     NegativeSign = AscW(Info.NegativeSign)
     PositiveSign = AscW(Info.PositiveSign)
     CurrencySymbol = AscW(Info.CurrencySymbol)
     DecimalPoint = AscW(Info.NumberDecimalSeparator)
+    CurrencyPoint = AscW(Info.CurrencyDecimalSeparator)
     Thousands = AscW(Info.NumberGroupSeparator)
+    CurrencyThousands = AscW(Info.CurrencyGroupSeparator)
     Chars = AllocChars(s)
-    MaxSize = Len(s) \ 4
-    ReDim n.Digits(0 To MaxSize)
+    ReDim n.Digits(0 To Len(s) \ 4)
     n.Sign = 1
     
     For i = 0 To UBound(Chars)
@@ -1104,7 +1107,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 
                 FoundDigit = True
             Case NegativeSign, PositiveSign
-                If FoundSign <> NotFound Then
+                If (FoundSign <> NotFound) Or NeedsClosingParen Then
                     GoTo Finally
                 End If
                 
@@ -1127,7 +1130,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 End If
             Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
                 If Not FoundDigit Then
-                    If (Style And NumberStyles.AllowLeadingWhite) = 0 Then
+                    If ((Style And NumberStyles.AllowLeadingWhite) = 0) Or NeedsClosingParen Then
                         GoTo Finally
                     End If
                 
@@ -1136,7 +1139,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     InWhiteSpace = True
                 End If
             Case vbOpenParenChar
-                If i > 0 Or Style <> NumberStyles.AllowParentheses Then
+                If ((Style And NumberStyles.AllowParentheses) = 0) Or (FoundSign <> NotFound) Then
                     GoTo Finally
                 End If
                 
@@ -1148,21 +1151,34 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 
                 n.Sign = -1
                 NeedsClosingParen = False
+                FoundClosingParen = True
             Case CurrencySymbol
                 If ((Style And NumberStyles.AllowCurrencySymbol) = 0) Or (FoundCurrency <> NotFound) Then
                     GoTo Finally
                 End If
                 
                 FoundCurrency = IIfLong(n.Precision = 0, FoundBefore, FoundAfter)
-            Case DecimalPoint
-                If ((Style And NumberStyles.AllowDecimalPoint) = 0) Or FoundDecimal Or (Not FoundDigit) Then
+            Case DecimalPoint, CurrencyPoint
+                If ((Style And NumberStyles.AllowDecimalPoint) = 0) Or FoundDecimal Or FoundClosingParen Then
                     GoTo Finally
                 End If
                 
+                If FoundCurrency Then
+                    If Ch = DecimalPoint Then
+                        GoTo Finally
+                    End If
+                End If
+                
                 FoundDecimal = True
-            Case Thousands
+            Case Thousands, CurrencyThousands
                 If ((Style And NumberStyles.AllowThousands) = 0) Or (Not FoundDigit) Then
                     GoTo Finally
+                End If
+                
+                If FoundCurrency Then
+                    If Ch = Thousands Then
+                        GoTo Finally
+                    End If
                 End If
             Case Else
                 GoTo Finally
