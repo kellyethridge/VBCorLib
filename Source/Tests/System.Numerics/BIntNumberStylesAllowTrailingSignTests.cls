@@ -46,6 +46,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1 1"
             Test.Use "1+1"
             Test.Use "1-1"
+            Test.Use "++1"
+            Test.Use "1++"
+            Test.Use "--1"
+            Test.Use "1--"
             
     End Select
 End Sub

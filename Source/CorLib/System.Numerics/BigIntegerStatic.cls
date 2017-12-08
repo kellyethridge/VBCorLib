@@ -1056,20 +1056,31 @@ Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
 End Sub
 
 Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As Number) As Boolean
+    Const NotFound          As Long = 0
+    Const FoundBefore       As Long = 1
+    Const FoundAfter        As Long = 2
+    Const FoundDuring       As Long = 3
     Dim Chars()             As Integer
     Dim MaxSize             As Long
     Dim i                   As Long
     Dim Ch                  As Long
     Dim InWhiteSpace        As Boolean
-    Dim MissingClosingParen As Boolean
+    Dim NeedsClosingParen   As Boolean
     Dim NegativeSign        As Integer
     Dim PositiveSign        As Integer
     Dim CurrencySymbol      As Integer
-    Dim FoundSign           As Boolean
+    Dim Thousands           As Integer
+    Dim DecimalPoint        As Integer
+    Dim FoundDigit          As Boolean
+    Dim FoundCurrency       As Long
+    Dim FoundSign           As Long
+    Dim FoundDecimal        As Boolean
     
     NegativeSign = AscW(Info.NegativeSign)
     PositiveSign = AscW(Info.PositiveSign)
     CurrencySymbol = AscW(Info.CurrencySymbol)
+    DecimalPoint = AscW(Info.NumberDecimalSeparator)
+    Thousands = AscW(Info.NumberGroupSeparator)
     Chars = AllocChars(s)
     MaxSize = Len(s) \ 4
     ReDim n.Digits(0 To MaxSize)
@@ -1080,41 +1091,42 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
         
         Select Case Ch
             Case vbZeroChar To vbNineChar
-                If InWhiteSpace Then
-                    GoTo Finally
-                End If
-                If (n.Precision > 0) And FoundSign Then
+                If (FoundCurrency = FoundAfter) Or (FoundSign = FoundAfter) Or InWhiteSpace Then
                     GoTo Finally
                 End If
                 
-                SingleInPlaceMultiply n, 10
-                SingleInPlaceAdd n, Ch - vbZeroChar
-            Case NegativeSign
-                If n.Precision = 0 Then
+                If Not FoundDecimal Then
+                    SingleInPlaceMultiply n, 10
+                    SingleInPlaceAdd n, Ch - vbZeroChar
+                ElseIf Ch <> vbZeroChar Then
+                    GoTo Finally
+                End If
+                
+                FoundDigit = True
+            Case NegativeSign, PositiveSign
+                If FoundSign <> NotFound Then
+                    GoTo Finally
+                End If
+                
+                If Not FoundDigit Then
                     If (Style And NumberStyles.AllowLeadingSign) = 0 Then
                         GoTo Finally
                     End If
+                    
+                    FoundSign = FoundBefore
                 Else
                     If (Style And NumberStyles.AllowTrailingSign) = 0 Then
                         GoTo Finally
                     End If
-                    FoundSign = True
+                    
+                    FoundSign = FoundAfter
                 End If
                 
-                n.Sign = -1
-            Case PositiveSign
-                If n.Precision = 0 Then
-                    If (Style And NumberStyles.AllowLeadingSign) = 0 Then
-                        GoTo Finally
-                    End If
-                Else
-                    If (Style And NumberStyles.AllowTrailingSign) = 0 Then
-                        GoTo Finally
-                    End If
-                    FoundSign = True
+                If Ch = NegativeSign Then
+                    n.Sign = -1
                 End If
             Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
-                If n.Precision = 0 Then
+                If Not FoundDigit Then
                     If (Style And NumberStyles.AllowLeadingWhite) = 0 Then
                         GoTo Finally
                     End If
@@ -1128,16 +1140,28 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                     GoTo Finally
                 End If
                 
-                MissingClosingParen = True
+                NeedsClosingParen = True
             Case vbCloseParenChar
-                If (Style And NumberStyles.AllowParentheses) = 0 Or (Not MissingClosingParen) Then
+                If (Style And NumberStyles.AllowParentheses) = 0 Or (Not NeedsClosingParen) Then
                     GoTo Finally
                 End If
                 
                 n.Sign = -1
-                MissingClosingParen = False
+                NeedsClosingParen = False
             Case CurrencySymbol
-                If (Style And NumberStyles.AllowCurrencySymbol) = 0 Then
+                If ((Style And NumberStyles.AllowCurrencySymbol) = 0) Or (FoundCurrency <> NotFound) Then
+                    GoTo Finally
+                End If
+                
+                FoundCurrency = IIfLong(n.Precision = 0, FoundBefore, FoundAfter)
+            Case DecimalPoint
+                If ((Style And NumberStyles.AllowDecimalPoint) = 0) Or FoundDecimal Or (Not FoundDigit) Then
+                    GoTo Finally
+                End If
+                
+                FoundDecimal = True
+            Case Thousands
+                If ((Style And NumberStyles.AllowThousands) = 0) Or (Not FoundDigit) Then
                     GoTo Finally
                 End If
             Case Else
@@ -1151,7 +1175,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
         End If
     End If
     
-    If MissingClosingParen Then
+    If NeedsClosingParen Then
         GoTo Finally
     End If
     
@@ -1222,59 +1246,6 @@ Private Function TryParseHex(ByRef s As String, ByRef n As Number) As Boolean
     
     n.Precision = c
     TryParseHex = True
-    
-Finally:
-    FreeChars Chars
-End Function
-
-Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
-    Dim Chars() As Integer
-    Dim ub      As Long:
-    
-    If Len(s) - StartIndex < 3 Then
-        Exit Function
-    End If
-    
-    Chars = AllocChars(s)
-    ub = (Len(s) - 2) \ 16 + 1
-    
-    If ub = 0 Then
-        ub = 1
-    End If
-    
-    ReDim n.Digits(0 To ub)
-    
-    Dim c As Long
-    Dim i As Long
-    Dim j As Long: j = 1
-    Dim k As Long
-    For i = Len(s) - 1 To 2 + StartIndex Step -1
-        Dim Ch As Long
-        Select Case Chars(i)
-            Case 48, 49
-                Ch = Chars(i) - 48
-            Case Else
-                GoTo Finally
-        End Select
-        
-        k = k + Ch * j
-        j = j * 2
-        
-        If j = &H10000 Then
-            n.Digits(c) = AsWord(k)
-            j = 1
-            c = c + 1
-            k = 0
-        End If
-    Next i
-    
-    If k Then
-        n.Digits(c) = AsWord(k)
-        c = c + 1
-    End If
-    
-    n.Precision = c
-    TryParseBinary = True
     
 Finally:
     FreeChars Chars
