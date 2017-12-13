@@ -1061,7 +1061,8 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Const FoundAfter        As Long = 2
     Const FoundDuring       As Long = 3
     Dim Chars()             As Integer
-    Dim i                   As Long
+    Dim Index               As Long
+    Dim MaxIndex            As Long
     Dim Ch                  As Long
     Dim InWhiteSpace        As Boolean
     Dim NeedsClosingParen   As Boolean
@@ -1077,6 +1078,8 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Dim FoundSign           As Long
     Dim FoundDecimal        As Boolean
     Dim FoundClosingParen   As Boolean
+    Dim FoundExponent       As Boolean
+    Dim Exponent            As Long
     
     NegativeSign = AscW(Info.NegativeSign)
     PositiveSign = AscW(Info.PositiveSign)
@@ -1086,11 +1089,12 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Thousands = AscW(Info.NumberGroupSeparator)
     CurrencyThousands = AscW(Info.CurrencyGroupSeparator)
     Chars = AllocChars(s)
+    MaxIndex = UBound(Chars)
     ReDim n.Digits(0 To Len(s) \ 4)
     n.Sign = 1
     
-    For i = 0 To UBound(Chars)
-        Ch = Chars(i)
+    Do While Index <= MaxIndex
+        Ch = Chars(Index)
         
         Select Case Ch
             Case vbZeroChar To vbNineChar
@@ -1180,10 +1184,26 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                         GoTo Finally
                     End If
                 End If
+            Case vbLowerEChar, vbUpperEChar
+                If ((Style And NumberStyles.AllowExponent) = 0) Or FoundExponent Then
+                    GoTo Finally
+                End If
+            
+                If Not TryParseExponent(Chars, Index, Exponent) Then
+                    GoTo Finally
+                End If
+                
+                ' we understand that parsing the exponent will advance the index passed the end of the digits
+                ' and that we will be advancing the index as well, in effect advancing it twice, so we need
+                ' to counter that last advancement.
+                Index = Index - 1
+                FoundExponent = True
             Case Else
                 GoTo Finally
         End Select
-    Next
+        
+        Index = Index + 1
+    Loop
     
     If InWhiteSpace Then
         If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
@@ -1193,6 +1213,16 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     
     If NeedsClosingParen Then
         GoTo Finally
+    End If
+    
+    If FoundExponent Then
+        n.Precision = n.Precision + Exponent \ 4
+        ReDim Preserve n.Digits(0 To n.Precision)
+        
+        Do While Exponent > 0
+            SingleInPlaceMultiply n, 10
+            Exponent = Exponent - 1
+        Loop
     End If
     
     Select Case n.Precision
@@ -1211,6 +1241,36 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     
 Finally:
     FreeChars Chars
+End Function
+
+Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long, ByRef Exponent As Long) As Boolean
+    Dim Ch          As Integer
+    Dim MaxIndex    As Long
+    
+    MaxIndex = UBound(Chars)
+    Index = Index + 1
+    
+    If Index > MaxIndex Then
+        Exit Function
+    End If
+    
+    If Chars(Index) = vbPlusChar Then
+        Index = Index + 1
+    End If
+    
+    Do While Index <= MaxIndex
+        Ch = Chars(Index)
+        
+        Select Case Ch
+            Case vbZeroChar To vbNineChar
+                Exponent = Exponent * 10 + (Ch - vbZeroChar)
+                TryParseExponent = True
+            Case Else
+                Exit Function
+        End Select
+        
+        Index = Index + 1
+    Loop
 End Function
 
 Private Function TryParseHex(ByRef s As String, ByRef n As Number) As Boolean
