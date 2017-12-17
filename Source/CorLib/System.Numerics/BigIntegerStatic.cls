@@ -189,19 +189,26 @@ End Function
 ' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
 ' @param OutResult When this method returns, contains the BigInteger equivalent to the number that is contained in value, or BigInteger.Zero if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
 Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
-    Dim Trimmed As String
     Dim Result  As Number
     Dim Info    As NumberFormatInfo
     
-    Set Info = NumberFormatInfo.GetInstance(Provider)
+    Set OutResult = Nothing
     
-    If TryParseDecimal(Value, Style, Info, Result) Then
+    If IsHexSpecifier(Style) Then
+        TryParseEx = TryParseHex(Value, Style, Result)
+    Else
+        Set Info = NumberFormatInfo.GetInstance(Provider)
+        TryParseEx = TryParseDecimal(Value, Style, Info, Result)
+    End If
+    
+    If TryParseEx Then
         Set OutResult = New BigInteger
         OutResult.InternalInitNumber Result
-        TryParseEx = True
-    Else
-        Set OutResult = Nothing
     End If
+End Function
+
+Private Function IsHexSpecifier(ByVal Style As NumberStyles) As Boolean
+    IsHexSpecifier = (Style And NumberStyles.AllowHexSpecifier)
 End Function
 
 ''
@@ -1064,7 +1071,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Dim Index               As Long
     Dim MaxIndex            As Long
     Dim Ch                  As Long
-    Dim InWhiteSpace        As Boolean
+    Dim InWhitespace        As Boolean
     Dim NeedsClosingParen   As Boolean
     Dim NegativeSign        As Integer
     Dim PositiveSign        As Integer
@@ -1080,6 +1087,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Dim FoundClosingParen   As Boolean
     Dim FoundExponent       As Boolean
     Dim Exponent            As Long
+    Dim DecimalPlaces       As Long
     
     NegativeSign = AscW(Info.NegativeSign)
     PositiveSign = AscW(Info.PositiveSign)
@@ -1090,23 +1098,36 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     CurrencyThousands = AscW(Info.CurrencyGroupSeparator)
     Chars = AllocChars(s)
     MaxIndex = UBound(Chars)
-    ReDim n.Digits(0 To Len(s) \ 4)
     n.Sign = 1
+    ReDim n.Digits(0 To Len(s) \ 4)
     
     Do While Index <= MaxIndex
         Ch = Chars(Index)
         
         Select Case Ch
             Case vbZeroChar To vbNineChar
-                If (FoundCurrency = FoundAfter) Or (FoundSign = FoundAfter) Or InWhiteSpace Then
+                If (FoundCurrency = FoundAfter) Or (FoundSign = FoundAfter) Or InWhitespace Then
                     GoTo Finally
                 End If
                 
                 If Not FoundDecimal Then
                     SingleInPlaceMultiply n, 10
                     SingleInPlaceAdd n, Ch - vbZeroChar
-                ElseIf Ch <> vbZeroChar Then
-                    GoTo Finally
+                Else
+                    If Style And NumberStyles.AllowExponent Then
+                        ' we are allowing a possible exponent value to be parsed,
+                        ' so if we have encountered a decimal point, we need to
+                        ' continue parsing digits and also count how many
+                        ' decimal places we have gone.
+                        SingleInPlaceMultiply n, 10
+                        SingleInPlaceAdd n, Ch - vbZeroChar
+                        
+                        DecimalPlaces = DecimalPlaces + 1
+                    Else
+                        If Ch <> vbZeroChar Then
+                            GoTo Finally
+                        End If
+                    End If
                 End If
                 
                 FoundDigit = True
@@ -1138,9 +1159,9 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                         GoTo Finally
                     End If
                 
-                    InWhiteSpace = FoundSign
+                    InWhitespace = FoundSign
                 Else
-                    InWhiteSpace = True
+                    InWhitespace = True
                 End If
             Case vbOpenParenChar
                 If ((Style And NumberStyles.AllowParentheses) = 0) Or (FoundSign <> NotFound) Then
@@ -1205,7 +1226,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
         Index = Index + 1
     Loop
     
-    If InWhiteSpace Then
+    If InWhitespace Then
         If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
             GoTo Finally
         End If
@@ -1216,10 +1237,14 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     End If
     
     If FoundExponent Then
+        If Exponent < DecimalPlaces Then
+            GoTo Finally
+        End If
+    
         n.Precision = n.Precision + Exponent \ 4
         ReDim Preserve n.Digits(0 To n.Precision)
         
-        Do While Exponent > 0
+        Do While Exponent - DecimalPlaces > 0
             SingleInPlaceMultiply n, 10
             Exponent = Exponent - 1
         Loop
@@ -1273,54 +1298,104 @@ Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long,
     Loop
 End Function
 
-Private Function TryParseHex(ByRef s As String, ByRef n As Number) As Boolean
-    Dim Chars() As Integer
-    Dim ub      As Long
-    
-    If Len(s) < 3 Then
-        Exit Function
-    End If
+Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByRef n As Number) As Boolean
+    Const vbLowerHexOffset As Long = 87
+    Const vbUpperHexOffset As Long = 55
+    Dim Chars()     As Integer
+    Dim MaxSize     As Long
+    Dim UpperIndex  As Long
+    Dim InWhitespace As Boolean
+    Dim FoundDigits As Boolean
     
     Chars = AllocChars(s)
-    ub = (Len(s) - 2) \ 4 + 1
-    ReDim n.Digits(0 To ub)
+    UpperIndex = UBound(Chars)
+    MaxSize = Len(s) \ 4 + IIfLong(Len(s) Mod 4, 1, 0)
+    ReDim n.Digits(0 To MaxSize - 1)
     
     Dim c As Long
     Dim i As Long
     Dim j As Long
     Dim k As Long
+    Dim Ch As Long
     
     j = 1
-    For i = Len(s) - 1 To 2 Step -1
-        Dim Ch As Long
+    For i = UpperIndex To LBound(Chars) Step -1
         Select Case Chars(i)
-            Case vbZeroChar To vbNineChar
+            Case vbZeroChar
+                Ch = 0
+                FoundDigits = True
+            Case vbOneChar To vbNineChar
                 Ch = Chars(i) - vbZeroChar
-            Case 65 To 70
-                Ch = Chars(i) - 55
-            Case 97 To 102
-                Ch = Chars(i) - 87
+                n.Sign = 1
+                FoundDigits = True
+            Case vbLowerAChar To vbLowerFChar
+                Ch = Chars(i) - vbLowerHexOffset
+                n.Sign = 1
+                FoundDigits = True
+            Case vbUpperAChar To vbUpperFChar
+                Ch = Chars(i) - vbUpperHexOffset
+                n.Sign = 1
+                FoundDigits = True
+            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
+                If ((Style And NumberStyles.AllowLeadingWhite) = 0) And FoundDigits Then
+                    GoTo Finally
+                End If
+                
+                If ((Style And NumberStyles.AllowTrailingWhite) = 0) And Not FoundDigits Then
+                    GoTo Finally
+                End If
+                
+                GoTo Continue
             Case Else
                 GoTo Finally
         End Select
         
         k = k + Ch * j
-        j = j * 16
+        j = j * vbShift4Bits
         
         If j = &H10000 Then
-            n.Digits(c) = AsWord(k)
+            #If Release Then
+                n.Digits(c) = k
+            #Else
+                n.Digits(c) = AsWord(k)
+            #End If
+            
             k = 0
             j = 1
             c = c + 1
         End If
+        
+Continue:
     Next i
     
     If k Then
-        n.Digits(c) = AsWord(k)
+        #If Release Then
+            n.Digits(c) = k
+        #Else
+            n.Digits(c) = AsWord(k)
+        #End If
+
         c = c + 1
     End If
     
     n.Precision = c
+    
+    If n.Sign Then
+        Ch = n.Digits(n.Precision - 1)
+            
+        If (Ch And &H8000) = &H8000 Then
+            n.Sign = -1
+        ElseIf (Ch And &HF800) = &H800 Then
+            n.Sign = -1
+            n.Digits(n.Precision - 1) = Ch Or &HF000
+        ElseIf (Ch And &HFF80) = &H80 Then
+            n.Sign = -1
+        ElseIf (Ch And &HFFF8) = &H8 Then
+            n.Sign = -1
+            n.Digits(n.Precision - 1) = Ch Or &HFFF0
+        End If
+    End If
+    
     TryParseHex = True
     
 Finally:

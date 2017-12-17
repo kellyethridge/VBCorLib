@@ -129,7 +129,7 @@ Public Function ToByteArray() As Byte()
     If mNumber.Sign = 0 Then
         ReDim Result(0)
     Else
-        MaxIndex = UBound(mNumber.Digits)
+        MaxIndex = mNumber.Precision - 1
         Size = (MaxIndex + 1) * 2
         CopyCount = Size
         

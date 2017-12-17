@@ -34,7 +34,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "-255", NewBytes(&H1, &HFF), -1
             Test.Use "+1", NewBytes(1), 1
             Test.Use "+255", NewBytes(&HFF, &H0), 1
-            
+            Test.Use "-2048", NewBytes(0, &HF8), -1
+
         Case "Parse_WithInvalidValue_ThrowsFormatException"
             Test.Use " -1"
             Test.Use "- 1"
