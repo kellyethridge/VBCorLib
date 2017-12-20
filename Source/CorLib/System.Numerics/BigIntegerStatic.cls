@@ -117,8 +117,8 @@ Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
     ZeroIfNothing x
     ZeroIfNothing y
     
-    Dim xNumber As Number
-    Dim yNumber As Number
+    Dim xNumber As BigNumber
+    Dim yNumber As BigNumber
     Dim Result  As Long
     
     x.AttachNumber xNumber
@@ -189,7 +189,7 @@ End Function
 ' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
 ' @param OutResult When this method returns, contains the BigInteger equivalent to the number that is contained in value, or BigInteger.Zero if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
 Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
-    Dim Result  As Number
+    Dim Result  As BigNumber
     Dim Info    As NumberFormatInfo
     
     Set OutResult = Nothing
@@ -322,8 +322,8 @@ Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
         Exit Function
     End If
     
-    Dim u       As Number
-    Dim v       As Number
+    Dim u       As BigNumber
+    Dim v       As BigNumber
     Dim sum()   As Integer
     
     x.AttachNumber u
@@ -361,8 +361,8 @@ Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
         Exit Function
     End If
     
-    Dim u               As Number
-    Dim v               As Number
+    Dim u               As BigNumber
+    Dim v               As BigNumber
     Dim Difference()    As Integer
     
     x.AttachNumber u
@@ -409,19 +409,19 @@ Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInt
         Exit Function
     End If
     
-    Dim u As Number
-    Dim v As Number
+    Dim u As BigNumber
+    Dim v As BigNumber
     
     If x.Sign = Sign.Negative Then
         x.CopyNumber u
-        Mathematics.Negate u
+        BigNumberMath.Negate u
     Else
         x.AttachNumber u
     End If
 
     If y.Sign = Sign.Negative Then
         y.CopyNumber v
-        Mathematics.Negate v
+        BigNumberMath.Negate v
     Else
         y.AttachNumber v
     End If
@@ -610,8 +610,8 @@ Public Function AndBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInte
     
     Dim ExtDigit    As Integer
     Dim Number()    As Integer
-    Dim LongNumber  As Number
-    Dim ShortNumber As Number
+    Dim LongNumber  As BigNumber
+    Dim ShortNumber As BigNumber
     
     If x.Precision >= y.Precision Then
         x.AttachNumber LongNumber
@@ -669,8 +669,8 @@ Public Function OrBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteg
     
     Dim ExtDigit    As Integer
     Dim Number()    As Integer
-    Dim LongNumber  As Number
-    Dim ShortNumber As Number
+    Dim LongNumber  As BigNumber
+    Dim ShortNumber As BigNumber
     
     If x.Precision >= y.Precision Then
         x.AttachNumber LongNumber
@@ -728,8 +728,8 @@ Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInte
     
     Dim ExtDigit    As Integer
     Dim Number()    As Integer
-    Dim LongNumber  As Number
-    Dim ShortNumber As Number
+    Dim LongNumber  As BigNumber
+    Dim ShortNumber As BigNumber
     
     If x.Precision >= y.Precision Then
         x.AttachNumber LongNumber
@@ -781,7 +781,7 @@ Public Function NotBits(ByVal x As BigInteger) As BigInteger
         Exit Function
     End If
     
-    Dim xNumber As Number
+    Dim xNumber As BigNumber
     x.CopyNumber xNumber
         
     Dim i As Long
@@ -1062,7 +1062,7 @@ Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
     End If
 End Sub
 
-Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As Number) As Boolean
+Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As BigNumber) As Boolean
     Const NotFound          As Long = 0
     Const FoundBefore       As Long = 1
     Const FoundAfter        As Long = 2
@@ -1298,7 +1298,7 @@ Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long,
     Loop
 End Function
 
-Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByRef n As Number) As Boolean
+Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByRef n As BigNumber) As Boolean
     Const vbLowerHexOffset As Long = 87
     Const vbUpperHexOffset As Long = 55
     Dim Chars()     As Integer
@@ -1432,17 +1432,17 @@ Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As B
         Exit Function
     End If
     
-    Dim xNumber As Number
-    Dim yNumber As Number
+    Dim xNumber As BigNumber
+    Dim yNumber As BigNumber
     
     Dividend.CopyNumber xNumber
     Divisor.CopyNumber yNumber
       
     If Dividend.Sign = Sign.Negative Then
-        Mathematics.Negate xNumber
+        BigNumberMath.Negate xNumber
     End If
     If Divisor.Sign = Sign.Negative Then
-        Mathematics.Negate yNumber
+        BigNumberMath.Negate yNumber
     End If
     
     Dim QuotientNumber()    As Integer

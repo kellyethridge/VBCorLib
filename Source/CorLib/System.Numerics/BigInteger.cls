@@ -54,7 +54,7 @@ Private Const HEX_CHARS As String = "0123456789abcdef0123456789ABCDEF"
 Private Const LOWER_HEX As Long = 1
 Private Const UPPER_HEX As Long = 17
 
-Private mNumber As Mathematics.Number
+Private mNumber As BigNumber
 
 
 ''
@@ -280,10 +280,10 @@ Public Function Negate() As BigInteger
     If mNumber.Sign = Zero Then
         Set Negate = Me
     Else
-        Dim Copy As Number
+        Dim Copy As BigNumber
         
         Copy = mNumber
-        Mathematics.Negate Copy
+        BigNumberMath.Negate Copy
         Set Negate = New BigInteger
         Negate.InternalInitNumber2 Copy
     End If
@@ -649,15 +649,15 @@ Public Function Factorial() As BigInteger
 End Function
 
 
-Friend Sub AttachNumber(ByRef n As Number)
+Friend Sub AttachNumber(ByRef n As BigNumber)
     CopyMemory n, mNumber, LenB(n)
 End Sub
 
-Friend Sub DetachNumber(ByRef n As Number)
+Friend Sub DetachNumber(ByRef n As BigNumber)
     ZeroMemory n, LenB(n)
 End Sub
 
-Friend Sub CopyNumber(ByRef n As Number)
+Friend Sub CopyNumber(ByRef n As BigNumber)
     n = mNumber
 End Sub
 
@@ -695,7 +695,7 @@ Friend Sub Init(ByRef Value As Variant)
     End If
 End Sub
 
-Friend Sub InitShiftLeft(ByRef Number As Number, ByVal ShiftCount As Long)
+Friend Sub InitShiftLeft(ByRef Number As BigNumber, ByVal ShiftCount As Long)
     Debug.Assert ShiftCount > 0 And Number.Sign <> 0
     mNumber.Sign = Number.Sign
     mNumber.Digits = ShiftLeftNumber(Number.Digits, ShiftCount)
@@ -703,7 +703,7 @@ Friend Sub InitShiftLeft(ByRef Number As Number, ByVal ShiftCount As Long)
     TrimLeadingPadding
 End Sub
 
-Friend Sub InitShiftRight(ByRef Number As Number, ByVal ShiftCount As Long)
+Friend Sub InitShiftRight(ByRef Number As BigNumber, ByVal ShiftCount As Long)
     Debug.Assert ShiftCount > 0 And Number.Sign <> 0
     mNumber.Sign = Number.Sign
     mNumber.Digits = ShiftRightNumber(Number.Digits, ShiftCount)
@@ -717,13 +717,13 @@ Friend Sub InternalInit(ByRef Bytes() As Integer)
     Normalize
 End Sub
 
-Friend Sub InternalInitNumber(ByRef n As Number)
+Friend Sub InternalInitNumber(ByRef n As BigNumber)
     CopyMemory mNumber, n, LenB(n)
     ZeroMemory n, LenB(n)
 '    Normalize mNumber.Precision - 1
 End Sub
 
-Friend Sub InternalInitNumber2(ByRef n As Number)
+Friend Sub InternalInitNumber2(ByRef n As BigNumber)
     CopyMemory mNumber, n, LenB(n)
     ZeroMemory n, LenB(n)
 End Sub
@@ -1003,7 +1003,7 @@ End Sub
 
 Private Function ToDecimalString(ByVal Count As Long, ByVal FormatInfo As NumberFormatInfo) As String
     Const DIGITS_PER_INTEGER As Long = 5
-    Dim Dividend    As Number
+    Dim Dividend    As BigNumber
     Dim Size        As Long
     Dim Chars()     As Integer
     Dim Output      As String
@@ -1012,8 +1012,7 @@ Private Function ToDecimalString(ByVal Count As Long, ByVal FormatInfo As Number
     Dividend = mNumber
     
     If Dividend.Sign = -1 Then
-'        Mathematics.Negate Dividend
-        Mathematics.ApplyTwosComplement Dividend.Digits
+        BigNumberMath.ApplyTwosComplement Dividend.Digits
     End If
         
     Size = Dividend.Precision * DIGITS_PER_INTEGER
