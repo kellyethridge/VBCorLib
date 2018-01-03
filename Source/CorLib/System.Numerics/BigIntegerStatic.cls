@@ -1066,7 +1066,6 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Const NotFound          As Long = 0
     Const FoundBefore       As Long = 1
     Const FoundAfter        As Long = 2
-    Const FoundDuring       As Long = 3
     Dim Chars()             As Integer
     Dim Index               As Long
     Dim MaxIndex            As Long
@@ -1304,7 +1303,6 @@ Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByR
     Dim Chars()     As Integer
     Dim MaxSize     As Long
     Dim UpperIndex  As Long
-    Dim InWhitespace As Boolean
     Dim FoundDigits As Boolean
     
     Chars = AllocChars(s)

@@ -24,36 +24,6 @@ End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
-'        Case "NewBigInteger_WhenInitialized_InitializesBigInteger"
-'            Test.Use 0, NewBytes(), Sign.Zero, 0
-'            Test.Use 1, NewBytes(1), Sign.Positive, 1
-'            Test.Use &HFFFFFFFF, NewBytes(&HFF, &HFF), Sign.Negative, 2
-'            Test.Use &H8000&, NewBytes(0, &H80), Sign.Positive, 2
-'            Test.Use &H8000, NewBytes(0, &H80), Sign.Negative, 2
-'            Test.Use &HFF8000, NewBytes(0, &H80, &HFF), Sign.Positive, 3
-'            Test.Use &HFFFF8000, NewBytes(0, &H80), Sign.Negative, 2
-'            Test.Use &H7FFF, NewBytes(&HFF, &H7F), Sign.Positive, 2
-'            Test.Use &HFF7FFF, NewBytes(&HFF, &H7F, &HFF), Sign.Positive, 3
-'            Test.Use &HFFFF7FFF, NewBytes(&HFF, &H7F, &HFF, &HFF), Sign.Negative, 4
-'            Test.Use &HFF, NewBytes(&HFF), Sign.Positive, 1
-'            Test.Use 1#, NewBytes(1), Sign.Positive, 1
-'            Test.Use -1#, NewBytes(&HFF, &HFF), Sign.Negative, 2
-'            Test.Use 0#, NewBytes(), Sign.Zero, 0
-'            Test.Use 0.95, NewBytes(), Sign.Zero, 0
-'            Test.Use 1@, NewBytes(1), Sign.Positive, 1
-'            Test.Use -1@, NewBytes(&HFF, &HFF), Sign.Negative, 2
-'            Test.Use CDec("1"), NewBytes(1), Sign.Positive, 1
-'            Test.Use CDec("-1"), NewBytes(&HFF, &HFF), Sign.Negative, 2
-'            Test.Use CDec("12345678901231234567890123.456789"), NewBytes(&HCB, &HE4, &H5F, &H51, &HA2, &H7B, &H22, &H98, &H4C, &H36, &HA), Sign.Positive, 11
-'            Test.Use NullBytes, NewBytes(), Sign.Zero, 0
-'            Test.Use NewBytes(), NewBytes(), Sign.Zero, 0
-'            Test.Use NewBytes(1), NewBytes(1), Sign.Positive, 1
-'            Test.Use NewBytes(1, 0, 0, 0, 0, 0, 0, 0, 0), NewBytes(1), Sign.Positive, 1
-'            Test.Use NewBytes(&HFF, &HFF), NewBytes(&HFF, &HFF), Sign.Negative, 2
-'            Test.Use NewBytes(0, 0, 0, 0, &HFF), NewBytes(0, 0, 0, 0, &HFF), Sign.Positive, 5
-'            Test.Use NewBytes(0, 0, 0, &H80, &HFF, &HFF), NewBytes(0, 0, 0, &H80), Sign.Negative, 4
-'            Test.Use NewBytes(0, &H80), NewBytes(0, &H80), Sign.Negative, 2
-            
         Case "NewBigInteger_WithLong_InitializesBigInteger"
             Test.Use 0, NewBytes(0), 0
             Test.Use 1, NewBytes(1), 1
@@ -73,7 +43,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
         Case "NewBigInteger_WithByteArray_InitializesBigInteger"
             Test.Use NewBytes(), NewBytes(0), 0
+            Test.Use NewBytes(&H80), NewBytes(&H80), -1
             Test.Use NewBytes(&HFF), NewBytes(&HFF), -1
+            Test.Use NewBytes(&HFF, &HFF), NewBytes(&HFF), -1
             Test.Use NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), NewBytes(&H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H4, &HF1, &H67, &HA8, &HA5, &H67, &H68), 1
             
         Case "NewBigInteger_WithDouble_InitializesBigInteger"
@@ -153,30 +125,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "-(1)"
             Test.Use "(-1)"
             
-'        Case "TryParse_WithValidHexValue_InitializesBigInteger"
-'            Test.Use "&h0", NewBytes(0), 0
-'            Test.Use "&h00", NewBytes(0), 0
-'            Test.Use "&h1", NewBytes(1), 1
-'            Test.Use "0x1", NewBytes(1), 1
-'            Test.Use "&hff", NewBytes(&HFF), -1
-'            Test.Use "0xff", NewBytes(&HFF), -1
-'            Test.Use "0xffff", NewBytes(&HFF, &HFF), -1
-'            Test.Use "0x0ffff", NewBytes(&HFF, &HFF), -1
-'            Test.Use "0x0000ffff", NewBytes(&HFF, &HFF, 0), 1
-'            Test.Use "0x0000ffffffffffffffff", NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, 0), 1
-'            Test.Use "&h80", NewBytes(&H80), -1
-'            Test.Use "&hff80", NewBytes(&H80), -1
-'            Test.Use "&h8000", NewBytes(0, &H80), -1
-'            Test.Use "&h00008000", NewBytes(0, &H80, 0), 1
-'            Test.Use "0x0000ff", NewBytes(&HFF, 0), 1
-'            Test.Use "0xff7fffff", NewBytes(&HFF, &HFF, &H7F, &HFF), -1
-'            Test.Use "0x00000000", NewBytes(), 0
-'            Test.Use "&h80000000", NewBytes(0, 0, 0, &H80), -1
-'            Test.Use "&h800000000000", NewBytes(0, 0, 0, 0, 0, &H80), -1
-'            Test.Use "&h7fff", NewBytes(&HFF, &H7F), 1
-'            Test.Use "&h80000000", NewBytes(0, 0, 0, &H80), -1
-            
-        
         Case "ToString_WithNoFormatting_ReturnsDefault"
             Test.Use 0, "0"
             Test.Use 1, "1"
@@ -357,24 +305,43 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HFFFF0000, 16, True
             Test.Use &HFFFF0000, 31, True
             Test.Use &HFFFF0000, 32, True
-            Test.Use "0x0000ffff0000", 31, True
-            Test.Use "0x0000ffff0000", 32, False
+            Test.Use "4294901760", 31, True
+            Test.Use "4294901760", 32, False
             
         Case "SetBit_WithValue_SetsExpectedBit"
-            Test.Use 0, 0, &H1
-            Test.Use 0, 1, &H2
-            Test.Use 0, 2, &H4
-            Test.Use 1, 7, &H81
-            Test.Use 0, 16, &H10000
-            Test.Use 0, 31, &H80000000
-            Test.Use 0, 32, "0x100000000"
+            Test.Use 0, 0, NewBytes(1), 1
+            Test.Use 0, 15, NewBytes(0, &H80, 0), 1
+            Test.Use 0, 16, NewBytes(0, 0, 1), 1
+            Test.Use 1, 0, NewBytes(1), 1
+            Test.Use 1, 1, NewBytes(3), 1
+            Test.Use &H10000, 0, NewBytes(1, 0, 1), 1
+            Test.Use 0, 31, NewBytes(0, 0, 0, &H80, 0), 1
+            Test.Use 0, 32, NewBytes(0, 0, 0, 0, 1), 1
+            Test.Use 1, 16, NewBytes(1, 0, 1), 1
+            Test.Use -1, 0, NewBytes(&HFF), -1
+            Test.Use -1, 16, NewBytes(&HFF), -1
             
         Case "ClearBit_WithValue_ClearsExpectedBit"
-            Test.Use &HFFFF, 0, &HFFFE
-            Test.Use &HFFFF, 15, &H7FFF
-            Test.Use &HFFFFFFFF, 16, &HFFFEFFFF
-            Test.Use &HFFFFFFFF, 31, &H7FFFFFFF
-            Test.Use &H7FFFFFFF, 32, &H7FFFFFFF
+            Test.Use &HFFFF, 0, NewBytes(&HFE), -1
+            Test.Use &HFFFF, 15, NewBytes(&HFF, &H7F, &HFF), -1
+            Test.Use &HFFFFFFFF, 16, NewBytes(&HFF, &HFF, &HFE), -1
+            Test.Use &HFFFFFFFF, 31, NewBytes(&HFF, &HFF, &HFF, &H7F, &HFF), -1
+            Test.Use &HFFFFFFFF, 32, NewBytes(&HFF, &HFF, &HFF, &HFF, &HFE), -1
+            Test.Use &H7FFFFFFF, 32, NewBytes(&HFF, &HFF, &HFF, &H7F), 1
+            Test.Use 0, 0, NewBytes(0), 0
+            Test.Use 1, 0, NewBytes(0), 0
+            Test.Use 2, 0, NewBytes(&H2), 1
+            Test.Use 3, 0, NewBytes(&H2), 1
+            Test.Use &H10001, 0, NewBytes(&H0, &H0, &H1), 1
+            Test.Use &H8001&, 0, NewBytes(&H0, &H80, 0), 1
+            Test.Use &H8001&, 15, NewBytes(1), 1
+            Test.Use &H8000&, 15, NewBytes(0), 0
+            Test.Use &H10001, 16, NewBytes(1), 1
+            Test.Use 1, 16, NewBytes(1), 1
+            Test.Use -1, 0, NewBytes(&HFE), -1
+            Test.Use -1, 7, NewBytes(&H7F, &HFF), -1
+            Test.Use -1, 15, NewBytes(&HFF, &H7F, &HFF), -1
+            Test.Use -1, 16, NewBytes(&HFF, &HFF, &HFE), -1
             
         Case "AndBits_WithValue_ReturnsAndedValue"
             Test.Use 0, 0, 0
@@ -417,13 +384,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, &HFFFE
             Test.Use &HFFFF0000, &HFFFF&
                        
-'        Case "ToByteArray_WhenCalled_ReturnsRoundTrippable"
-'            Test.Use "12345678901234567890"
-'            Test.Use "-12345678901234567890"
-'            Test.Use "0xffffffffffffffff"
-'            Test.Use "0x7fffffffffffffff"
-'            Test.Use "0xffffffffffffffffff"
-        
         Case "Equals_WithValues_ReturnsExpected"
             Test.Use 0, 0, True
             Test.Use 1, 1, True
@@ -771,20 +731,38 @@ Public Sub TestBit_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Bit A
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub SetBit_WithValue_SetsExpectedBit(ByRef Value As Variant, ByVal Bit As Long, ByRef Expected As Variant)
+Public Sub SetBit_WithNegativeValue_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    BInt(1).SetBit -1
+    
+    AssertArgumentOutOfRangeException Err, "Bit"
+End Sub
+
+Public Sub SetBit_WithValue_SetsExpectedBit(ByRef Value As Variant, ByVal Bit As Long, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
     Dim Actual As BigInteger
     
     Set Actual = BInt(Value).SetBit(Bit)
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual.ToByteArray, Iz.EqualTo(ExpectedBytes), "Wrong byte array"
+    Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign), "Wrong sign"
 End Sub
 
-Public Sub ClearBit_WithValue_ClearsExpectedBit(ByRef Value As Variant, ByVal Bit As Long, ByRef Expected As Variant)
+Public Sub ClearBit_WithNegativeValue_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    BInt(1).ClearBit -1
+    
+    AssertArgumentOutOfRangeException Err, "Bit"
+End Sub
+
+Public Sub ClearBit_WithValue_ClearsExpectedBit(ByRef Value As Variant, ByVal Bit As Long, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
     Dim Actual As BigInteger
     
     Set Actual = BInt(Value).ClearBit(Bit)
     
-    Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Actual.ToByteArray, Iz.EqualTo(ExpectedBytes), "Wrong byte array"
+    Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign), "Wrong sign"
 End Sub
 
 Public Sub AndBits_WithValue_ReturnsAndedValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
@@ -861,20 +839,6 @@ Public Sub Precision_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Exp
     Actual = BInt(Value).Precision
     
     Assert.That Actual, Iz.EqualTo(Expected)
-End Sub
-
-Public Sub ToByteArray_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
-    Dim Actual() As Byte
-    Dim ActualSign As Long
-    
-    Dim Number As BigInteger
-    Set Number = NewBigInteger(Value)
-    
-    Actual = Number.ToByteArray
-    ActualSign = Number.Sign
-    
-    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
-    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
 End Sub
 
 Public Sub NewBigInteger_WithLong_InitializesBigInteger(ByVal Value As Long, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)

@@ -50,11 +50,17 @@ Implements IObject
 Implements IComparable
 Implements IFormattable
 
+Private Const BytesPerDigit As Long = vbSizeOfInteger
 Private Const HEX_CHARS As String = "0123456789abcdef0123456789ABCDEF"
 Private Const LOWER_HEX As Long = 1
 Private Const UPPER_HEX As Long = 17
 
 Private mNumber As BigNumber
+
+Private Type Digit
+    Index As Long
+    Value As Long
+End Type
 
 
 ''
@@ -438,16 +444,12 @@ Public Function TestBit(ByVal Bit As Long) As Boolean
     If Bit < 0 Then _
         Error.ArgumentOutOfRange "Bit", ArgumentOutOfRange_NeedNonNegNum
     
-    Dim Index As Long
+    Dim Digit As Digit
     
-    If mNumber.Precision = 0 Then
-        Exit Function
-    End If
+    Digit = MakeDigit(Bit)
     
-    Index = (Bit And &HFFFFFFF0) \ &H10
-    
-    If Index < mNumber.Precision Then
-        TestBit = mNumber.Digits(Index) And (PowersOf2(Bit And &HF))
+    If Digit.Index < mNumber.Precision Then
+        TestBit = mNumber.Digits(Digit.Index) And Digit.Value
     Else
         TestBit = (mNumber.Sign = Negative)
     End If
@@ -463,7 +465,35 @@ End Function
 ' include the bit being set.
 '
 Public Function SetBit(ByVal Bit As Long) As BigInteger
-    Set SetBit = InternalSetBit(Bit, True)
+    If Bit < 0 Then _
+        Error.ArgumentOutOfRange "Bit", ArgumentOutOfRange_NeedNonNegNum
+    
+    Dim Digit   As Digit
+    Dim Number  As BigNumber
+    
+    Digit = MakeDigit(Bit)
+    Number.Sign = mNumber.Sign
+    
+    If Digit.Index < mNumber.Precision Then
+        Number.Digits = mNumber.Digits
+        Number.Precision = mNumber.Precision
+    ElseIf mNumber.Sign <> -1 Then
+        ReDim Number.Digits(0 To Digit.Index)
+        Number.Precision = Digit.Index + 1
+        Number.Sign = 1
+        
+        If Not IsZero Then
+            CopyMemory Number.Digits(0), mNumber.Digits(0), mNumber.Precision * BytesPerDigit
+        End If
+    Else
+        Set SetBit = Me
+        Exit Function
+    End If
+    
+    Number.Digits(Digit.Index) = Number.Digits(Digit.Index) Or Digit.Value
+    
+    Set SetBit = New BigInteger
+    SetBit.InitBigNumber Number
 End Function
 
 ''
@@ -471,9 +501,65 @@ End Function
 '
 ' @param Bit The bit to be set to 0.
 ' @return A new BigInteger value with the bit set to 0.
-'
+' @remarks Bit is a zero-based index. The first bit is 0.
 Public Function ClearBit(ByVal Bit As Long) As BigInteger
-    Set ClearBit = InternalSetBit(Bit, False)
+    If Bit < 0 Then _
+        Error.ArgumentOutOfRange "Bit", ArgumentOutOfRange_NeedNonNegNum
+    
+    Dim Digit   As Digit
+    Dim Number  As BigNumber
+
+    If IsZero Then
+        Set ClearBit = BigInteger.Zero
+        Exit Function
+    End If
+    
+    Digit = MakeDigit(Bit)
+    Number.Sign = mNumber.Sign
+    
+    If Digit.Index < mNumber.Precision Then
+        Number.Digits = mNumber.Digits
+        Number.Precision = mNumber.Precision
+    ElseIf Sign = -1 Then
+        ReDim Number.Digits(0 To Digit.Index)
+        CopyMemory Number.Digits(0), mNumber.Digits(0), mNumber.Precision * BytesPerDigit
+        FillMemory Number.Digits(mNumber.Precision), (Digit.Index - mNumber.Precision + 1) * BytesPerDigit, &HFF
+        Number.Precision = Digit.Index + 1
+    Else
+        Set ClearBit = Me
+        Exit Function
+    End If
+    
+    Number.Digits(Digit.Index) = Number.Digits(Digit.Index) And (Not Digit.Value)
+    
+    Set ClearBit = CreateNormalizedBigInteger(Number)
+End Function
+
+Private Function MakeDigit(ByVal Bit As Long) As Digit
+    MakeDigit.Index = (Bit And &H7FFFFFF0) \ vbShift4Bits
+    MakeDigit.Value = PowersOf2(Bit And &HF)
+End Function
+
+Private Function CreateNormalizedBigInteger(ByRef Number As BigNumber) As BigInteger
+    Number.Precision = FindPrecision(Number)
+    
+    If Number.Precision = 0 Then
+        Set CreateNormalizedBigInteger = BigInteger.Zero
+    Else
+        Set CreateNormalizedBigInteger = New BigInteger
+        CreateNormalizedBigInteger.InitBigNumber Number
+    End If
+End Function
+
+Private Function FindPrecision(ByRef Number As BigNumber) As Long
+    Dim i As Long
+    
+    For i = Number.Precision - 1 To 0 Step -1
+        If Number.Digits(i) <> 0 Then
+            FindPrecision = i + 1
+            Exit Function
+        End If
+    Next
 End Function
 
 ''
@@ -486,7 +572,11 @@ End Function
 ' include the bit being flipped.
 '
 Public Function FlipBit(ByVal Bit As Long) As BigInteger
-    Set FlipBit = InternalSetBit(Bit, Not TestBit(Bit))
+    If TestBit(Bit) Then
+        Set FlipBit = ClearBit(Bit)
+    Else
+        Set FlipBit = SetBit(Bit)
+    End If
 End Function
 
 ''
@@ -695,6 +785,11 @@ Friend Sub Init(ByRef Value As Variant)
     End If
 End Sub
 
+Friend Sub InitBigNumber(ByRef n As BigNumber)
+    CopyMemory mNumber, n, LenB(n)
+    ZeroMemory n, LenB(n)
+End Sub
+
 Friend Sub InitShiftLeft(ByRef Number As BigNumber, ByVal ShiftCount As Long)
     Debug.Assert ShiftCount > 0 And Number.Sign <> 0
     mNumber.Sign = Number.Sign
@@ -720,7 +815,6 @@ End Sub
 Friend Sub InternalInitNumber(ByRef n As BigNumber)
     CopyMemory mNumber, n, LenB(n)
     ZeroMemory n, LenB(n)
-'    Normalize mNumber.Precision - 1
 End Sub
 
 Friend Sub InternalInitNumber2(ByRef n As BigNumber)
@@ -1123,42 +1217,6 @@ Private Function ToBinaryString(ByVal Count As Long) As String
     End If
     
     ToBinaryString = Mid$(Output, c + 1)
-End Function
-
-Private Function InternalSetBit(ByVal Bit As Long, ByVal Value As Boolean) As BigInteger
-    If Bit < 0 Then _
-        Error.ArgumentOutOfRange "Bit", ArgumentOutOfRange_NeedNonNegNum
-
-    Dim Index As Long
-    Dim Number() As Integer
-    
-    Index = (Bit And &HFFFFFFF0) \ &H10
-    
-    If (Value = False) And (mNumber.Sign <> Negative) Then
-        Set InternalSetBit = Me
-        Exit Function
-    End If
-    
-    If Index < mNumber.Precision Then
-        ReDim Number(0 To mNumber.Precision - 1)
-        CopyMemory Number(0), mNumber.Digits(0), mNumber.Precision * 2
-    Else
-        ReDim Number(0 To Index)
-        CopyMemory Number(0), mNumber.Digits(0), mNumber.Precision * 2
-        
-        If mNumber.Sign = Negative Then
-            FillMemory Number(mNumber.Precision), (Index - mNumber.Precision + 1) * 2, &HFF
-        End If
-    End If
-    
-    If Value Then
-        Number(Index) = Number(Index) Or PowersOf2(Bit And &HF)
-    Else
-        Number(Index) = Number(Index) And (Not PowersOf2(Bit And &HF))
-    End If
-    
-    Set InternalSetBit = New BigInteger
-    InternalSetBit.InternalInit Number
 End Function
 
 Private Function ParseFormatSpecifier(ByRef Format As String, ByRef OutSpecifier As String) As Long
