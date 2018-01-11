@@ -299,6 +299,23 @@ Public Function ShiftLeftInt32(ByVal Value As Long, ByVal ShiftCount As Long) As
     End Select
 End Function
 
+Public Function Equals(ByRef x As BigNumber, ByRef y As BigNumber) As Boolean
+    If x.Sign <> y.Sign Then
+        Exit Function
+    ElseIf x.Precision <> y.Precision Then
+        Exit Function
+    End If
+    
+    Dim i As Long
+    For i = 0 To x.Precision - 1
+        If x.Digits(i) <> y.Digits(i) Then
+            Exit Function
+        End If
+    Next
+    
+    Equals = True
+End Function
+
 #If Release Then
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '

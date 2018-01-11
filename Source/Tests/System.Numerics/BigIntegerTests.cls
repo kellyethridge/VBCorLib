@@ -125,6 +125,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "-(1)"
             Test.Use "(-1)"
             
+        
+            
         Case "ToString_WithNoFormatting_ReturnsDefault"
             Test.Use 0, "0"
             Test.Use 1, "1"
@@ -403,6 +405,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -123456789012345#, -123456789012345#, True
             Test.Use -123456789012345#, 123456789012345#, False
             Test.Use 123456789012345#, -123456789012345#, False
+            Test.Use 0, Nothing, True
+            Test.Use Nothing, 0, True
+            Test.Use Nothing, Nothing, True
             
     End Select
 End Sub
@@ -920,7 +925,15 @@ End Sub
 Public Sub Equals_WithValues_ReturnsExpected(ByRef a As Variant, ByRef b As Variant, ByVal Expected As Boolean)
     Dim Actual As Boolean
     
-    Actual = BInt(a).Equals(BInt(b))
+    Actual = BigInteger.Equals(BInt(a), BInt(b))
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Equals_WithNothing_ReturnsTrue()
+    Dim Actual As Boolean
+    
+    Actual = BigInteger.Zero.Equals(Nothing)
+    
+    Assert.That Actual, Iz.True
 End Sub

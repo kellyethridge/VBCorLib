@@ -237,11 +237,17 @@ End Function
 ' a BigInteger object before comparison.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    On Error GoTo Catch
+    Dim Other As BigInteger
     
-    Equals = BigInteger.Equals(Me, Value)
+    On Error GoTo Catch
+    Set Other = ValueOrZero(Value)
+    Equals = Other.EqualNumbers(mNumber)
     
 Catch:
+End Function
+
+Friend Function EqualNumbers(ByRef Other As BigNumber) As Boolean
+    EqualNumbers = BigNumberMath.Equals(mNumber, Other)
 End Function
 
 ''
@@ -841,6 +847,14 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ValueOrZero(ByVal Value As BigInteger) As BigInteger
+    If Value Is Nothing Then
+        Set ValueOrZero = BigInteger.Zero
+    Else
+        Set ValueOrZero = Value
+    End If
+End Function
+
 Private Sub InitFromLong(ByVal Value As Long)
     Dim IsSingleDigit As Boolean
     

@@ -154,7 +154,11 @@ End Function
 ' @remarks If Nothing is passed in, it is treated as zero.
 '
 Public Function Equals(ByVal x As BigInteger, ByVal y As BigInteger) As Boolean
-    Equals = (Compare(x, y) = 0)
+'    Equals = (Compare(x, y) = 0)
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
+    
+    Equals = x.Equals(y)
 End Function
 
 ''
