@@ -222,9 +222,13 @@ End Function
 ' If this instance < other then -1 is returned<br>
 ' If this instance = other then 0 is returned<br>
 ' If this instance > other then 1 is returned.<br>
-'
 Public Function CompareTo(ByVal Other As BigInteger) As Long
-    CompareTo = BigInteger.Compare(Me, Other)
+    Set Other = ValueOrZero(Other)
+    CompareTo = -Other.CompareToNumber(mNumber)
+End Function
+
+Friend Function CompareToNumber(ByRef Other As BigNumber) As Long
+    CompareToNumber = BigNumberMath.Compare(mNumber, Other)
 End Function
 
 ''
@@ -241,13 +245,13 @@ Public Function Equals(ByRef Value As Variant) As Boolean
     
     On Error GoTo Catch
     Set Other = ValueOrZero(Value)
-    Equals = Other.EqualNumbers(mNumber)
+    Equals = Other.EqualToNumber(mNumber)
     
 Catch:
 End Function
 
-Friend Function EqualNumbers(ByRef Other As BigNumber) As Boolean
-    EqualNumbers = BigNumberMath.Equals(mNumber, Other)
+Friend Function EqualToNumber(ByRef Other As BigNumber) As Boolean
+    EqualToNumber = BigNumberMath.Equals(mNumber, Other)
 End Function
 
 ''

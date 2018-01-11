@@ -112,37 +112,10 @@ End Property
 ' If x < y then -1 is returned<br>
 ' If x = y then 0 is returned<br>
 ' If x > y then 1 is returned.<br>
-'
 Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    Dim xNumber As BigNumber
-    Dim yNumber As BigNumber
-    Dim Result  As Long
-    
-    x.AttachNumber xNumber
-    y.AttachNumber yNumber
-    Result = xNumber.Sign - yNumber.Sign
-    
-    If Result = 0 Then
-        Result = xNumber.Precision - yNumber.Precision
-        
-        If Result = 0 Then
-            Dim i As Long
-            For i = xNumber.Precision - 1 To 0 Step -1
-                Result = (xNumber.Digits(i) And &HFFFF&) - (yNumber.Digits(i) And &HFFFF&)
-                If Result <> 0 Then Exit For
-            Next i
-        Else
-            Result = xNumber.Sign * Result
-        End If
-    End If
-    
-    x.DetachNumber xNumber
-    y.DetachNumber yNumber
-    
-    Compare = Sgn(Result)
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
+    Compare = x.CompareTo(y)
 End Function
 
 ''
@@ -154,10 +127,8 @@ End Function
 ' @remarks If Nothing is passed in, it is treated as zero.
 '
 Public Function Equals(ByVal x As BigInteger, ByVal y As BigInteger) As Boolean
-'    Equals = (Compare(x, y) = 0)
     Set x = ValueOrZero(x)
     Set y = ValueOrZero(y)
-    
     Equals = x.Equals(y)
 End Function
 

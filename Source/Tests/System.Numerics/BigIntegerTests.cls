@@ -183,30 +183,30 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &H7FFF, "B", "111111111111111"
             Test.Use &H7FFF, "b32", "00000000000000000111111111111111"
             
-'        Case "Compare_WithWithValues_ReturnsExpected"
-'            Test.Use(BInt(0), BInt(0)).Expect Iz.EqualTo(0)
-'            Test.Use(Nothing, Nothing).Expect Iz.EqualTo(0)
-'            Test.Use(Nothing, BInt(0)).Expect Iz.EqualTo(0)
-'            Test.Use(BInt(0), Nothing).Expect Iz.EqualTo(0)
-'            Test.Use(BInt(1), BInt(1)).Expect Iz.EqualTo(0)
-'            Test.Use(BInt(1), BInt(0)).Expect Iz.Positive
-'            Test.Use(BInt(0), BInt(1)).Expect Iz.Negative
-'            Test.Use(BInt(-1), BInt(-10)).Expect Iz.Positive
-'            Test.Use(BInt(-10), BInt(-1)).Expect Iz.Negative
-'            Test.Use(BInt(-128), BInt(-129)).Expect Iz.Positive
-'            Test.Use(BInt(&H80000000), BInt(&H7FFFFFFF)).Expect Iz.Negative
-'            Test.Use(BInt(&H7FFFFFFF), BInt(&H80000000)).Expect Iz.Positive
-'
-'        Case "Negate_WithValue_ReturnsExpected"
-'            Test.Use BInt(0), BInt(0)
-'            Test.Use BInt(1), BInt(-1)
-'            Test.Use BInt(-1), BInt(1)
-'            Test.Use BInt(Nothing), BInt(0)
-'            Test.Use BInt(255), BInt(-255)
-'            Test.Use BInt(-255), BInt(255)
-'            Test.Use BInt(65535), BInt(-65535)
-'            Test.Use BInt(&H80000000), BInt(2147483648#)
-'            Test.Use BInt(&H8000), BInt(32768)
+        Case "Compare_WithWithValues_ReturnsExpected"
+            Test.Use(BInt(0), BInt(0)).Expect Iz.EqualTo(0)
+            Test.Use(Nothing, Nothing).Expect Iz.EqualTo(0)
+            Test.Use(Nothing, BInt(0)).Expect Iz.EqualTo(0)
+            Test.Use(BInt(0), Nothing).Expect Iz.EqualTo(0)
+            Test.Use(BInt(1), BInt(1)).Expect Iz.EqualTo(0)
+            Test.Use(BInt(1), BInt(0)).Expect Iz.Positive
+            Test.Use(BInt(0), BInt(1)).Expect Iz.Negative
+            Test.Use(BInt(-1), BInt(-10)).Expect Iz.Positive
+            Test.Use(BInt(-10), BInt(-1)).Expect Iz.Negative
+            Test.Use(BInt(-128), BInt(-129)).Expect Iz.Positive
+            Test.Use(BInt(&H80000000), BInt(&H7FFFFFFF)).Expect Iz.Negative
+            Test.Use(BInt(&H7FFFFFFF), BInt(&H80000000)).Expect Iz.Positive
+
+        Case "Negate_WithValue_ReturnsExpected"
+            Test.Use BInt(0), BInt(0)
+            Test.Use BInt(1), BInt(-1)
+            Test.Use BInt(-1), BInt(1)
+            Test.Use BInt(Nothing), BInt(0)
+            Test.Use BInt(255), BInt(-255)
+            Test.Use BInt(-255), BInt(255)
+            Test.Use BInt(65535), BInt(-65535)
+            Test.Use BInt(&H80000000), BInt(2147483648#)
+            Test.Use BInt(&H8000), BInt(32768)
 
         Case "Absolute_WithValue_ReturnsExpected"
             Test.Use BInt(0), BInt(0)

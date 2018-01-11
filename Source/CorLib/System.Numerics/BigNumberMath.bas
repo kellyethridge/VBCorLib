@@ -316,6 +316,30 @@ Public Function Equals(ByRef x As BigNumber, ByRef y As BigNumber) As Boolean
     Equals = True
 End Function
 
+Public Function Compare(ByRef x As BigNumber, ByRef y As BigNumber) As Long
+    Dim Result As Long
+    
+    Result = x.Sign - y.Sign
+    
+    If Result = 0 Then
+        Result = x.Precision - y.Precision
+        
+        If Result = 0 Then
+            Dim i As Long
+            For i = x.Precision - 1 To 0 Step -1
+                Result = (x.Digits(i) And &HFFFF&) - (y.Digits(i) And &HFFFF&)
+                If Result <> 0 Then
+                    Exit For
+                End If
+            Next i
+        Else
+            Result = x.Sign * Result
+        End If
+    End If
+    
+    Compare = Sgn(Result)
+End Function
+
 #If Release Then
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '
