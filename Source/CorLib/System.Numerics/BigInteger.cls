@@ -801,7 +801,7 @@ Friend Sub InitBigNumber(ByRef n As BigNumber)
 End Sub
 
 Friend Sub InitNotBits(ByRef Other As BigNumber)
-    ReDim mNumber.Digits(0 To Other.Precision - 1)
+    ReDim mNumber.Digits(0 To Other.Precision) ' keep one extra digit incase we need to add leading negative FFFF.
     mNumber.Precision = Other.Precision
     mNumber.Sign = -Other.Sign
     
@@ -809,6 +809,15 @@ Friend Sub InitNotBits(ByRef Other As BigNumber)
     For i = 0 To mNumber.Precision - 1
         mNumber.Digits(i) = Not Other.Digits(i)
     Next i
+    
+    If mNumber.Sign = -1 Then
+        If (mNumber.Digits(mNumber.Precision - 1) And &H8000) = 0 Then
+            mNumber.Digits(mNumber.Precision) = &HFFFF
+            mNumber.Precision = mNumber.Precision + 1
+        End If
+    Else
+        TrimLeadingZeros
+    End If
 End Sub
 
 Friend Sub InitShiftLeft(ByRef Other As BigNumber, ByVal ShiftCount As Long)

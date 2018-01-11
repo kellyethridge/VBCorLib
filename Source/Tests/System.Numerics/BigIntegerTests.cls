@@ -125,8 +125,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "-(1)"
             Test.Use "(-1)"
             
-        
-            
         Case "ToString_WithNoFormatting_ReturnsDefault"
             Test.Use 0, "0"
             Test.Use 1, "1"
@@ -381,11 +379,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HFFFF, &HFFFF8000, &H7FFF
             
         Case "NotBits_WhenCalled_ReturnsExpected"
-            Test.Use 0, NewBytes(&HFF), -1
-            Test.Use -1, NewBytes(0), 0
-            Test.Use 1, NewBytes(&HFE), -1
-            Test.Use &HFFFF0000, NewBytes(&HFF, &HFF, &H0), 1
-            Test.Use &HFFFF&, NewBytes(&H0, &H0, &HFF), -1
+            Test.Use 0, -1
+            Test.Use -1, 0
+            Test.Use 1, -2
+            Test.Use &HFFFF0000, 65535
+            Test.Use &HFFFF&, -65536
                        
         Case "Equals_WithValues_ReturnsExpected"
             Test.Use 0, 0, True
@@ -803,17 +801,22 @@ Public Sub XorBits_WithValue_ReturnsXoredValue(ByRef Value1 As Variant, ByRef Va
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
 
-Public Sub NotBits_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
-    Dim Actual() As Byte
-    Dim ActualSign As Long
-    Dim Number As BigInteger
+Public Sub NotBits_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
+'    Dim Actual() As Byte
+'    Dim ActualSign As Long
+'    Dim Number As BigInteger
+'
+'    Set Number = NewBigInteger(Value).NotBits
+'    Actual = Number.ToByteArray
+'    ActualSign = Number.Sign
+'
+'    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
+'    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
+    Dim Actual As BigInteger
     
-    Set Number = NewBigInteger(Value).NotBits
-    Actual = Number.ToByteArray
-    ActualSign = Number.Sign
+    Set Actual = BInt(Value).NotBits
     
-    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
-    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
+    Assert.That Actual, Equals(BInt(Expected))
 End Sub
 
 Public Sub Rnd_WhenCalled_ReturnsRandomNumber()
