@@ -945,29 +945,27 @@ End Function
 ''
 ' Performs a left shift operation on the BigInteger instance.
 '
-' @param x The BigInteger to shift left.
-' @param bitCount The number of bits the value is to be shifted left.
+' @param Value The BigInteger to shift left.
+' @param BitCount The number of bits the value is to be shifted left.
 ' @return Returns a new BigInteger instance containing the shifted value.
 ' @remarks If bitCount is negative, then a right shift is performed.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function ShiftLeft(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
-    ZeroIfNothing x
-    Set ShiftLeft = x.ShiftLeft(BitCount)
+Public Function ShiftLeft(ByVal Value As BigInteger, ByVal BitCount As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set ShiftLeft = Value.ShiftLeft(BitCount)
 End Function
 
 ''
 ' Performs a bit shifting operation to the the right.
 '
-' @param x The BigInteger to shift right.
-' @param bitCount The number of bits the BigInteger value is to be shifted.
+' @param Value The BigInteger to shift right.
+' @param BitCount The number of bits the BigInteger value is to be shifted.
 ' @return Returns a new BigInteger instance containing the bit shifted value.
 ' @remarks If bitCount is negative, then a left shift is performed.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function ShiftRight(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
-    ZeroIfNothing x
-    Set ShiftRight = x.ShiftRight(BitCount)
+Public Function ShiftRight(ByVal Value As BigInteger, ByVal BitCount As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set ShiftRight = Value.ShiftRight(BitCount)
 End Function
 
 ''

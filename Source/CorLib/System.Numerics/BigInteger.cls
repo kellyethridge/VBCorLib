@@ -654,20 +654,17 @@ End Function
 ' @param BitCount The number of bits the BigInteger value is to be shifted.
 ' @return Returns a new BigInteger instance containing the bit shifted value.
 ' @remarks If BitCount is negative, then a left shift is performed.
-'
 Public Function ShiftRight(ByVal BitCount As Long) As BigInteger
     If (BitCount = 0) Or IsZero Then
         Set ShiftRight = Me
         Exit Function
-    End If
-    
-    If BitCount < 0 Then
+    ElseIf BitCount < 0 Then
         Set ShiftRight = ShiftLeft(-BitCount)
         Exit Function
     End If
     
     Dim WordCount As Long
-    WordCount = (BitCount And &HFFFFFFF0) \ &H10
+    WordCount = (BitCount And &HFFFFFFF0) \ vbShift4Bits
 
     If WordCount >= mNumber.Precision Then
         If mNumber.Sign = Negative Then
@@ -688,9 +685,8 @@ End Function
 ' @param BitCount The number of bits the value is to be shifted left.
 ' @return Returns a new BigInteger instance containing the shifted value.
 ' @remarks If BitCount is negative, then a right shift is performed.
-'
 Public Function ShiftLeft(ByVal BitCount As Long) As BigInteger
-    If (BitCount = 0) Or (mNumber.Sign = Zero) Then
+    If (BitCount = 0) Or IsZero Then
         Set ShiftLeft = Me
         Exit Function
     End If
@@ -703,7 +699,6 @@ Public Function ShiftLeft(ByVal BitCount As Long) As BigInteger
         ShiftLeft.InitShiftRight mNumber, -BitCount
     End If
 End Function
-
 
 ''
 ' Returns the integer square root of a BigInteger.
@@ -810,18 +805,18 @@ Friend Sub InitNotBits(ByRef Other As BigNumber)
     Next i
 End Sub
 
-Friend Sub InitShiftLeft(ByRef Number As BigNumber, ByVal ShiftCount As Long)
-    Debug.Assert ShiftCount > 0 And Number.Sign <> 0
-    mNumber.Sign = Number.Sign
-    mNumber.Digits = ShiftLeftNumber(Number.Digits, ShiftCount)
+Friend Sub InitShiftLeft(ByRef Other As BigNumber, ByVal ShiftCount As Long)
+    Debug.Assert ShiftCount > 0 And Other.Sign <> 0
+    mNumber.Sign = Other.Sign
+    mNumber.Digits = ShiftLeftNumber(Other.Digits, ShiftCount)
     mNumber.Precision = UBound(mNumber.Digits) + 1
     TrimLeadingPadding
 End Sub
 
-Friend Sub InitShiftRight(ByRef Number As BigNumber, ByVal ShiftCount As Long)
-    Debug.Assert ShiftCount > 0 And Number.Sign <> 0
-    mNumber.Sign = Number.Sign
-    mNumber.Digits = ShiftRightNumber(Number.Digits, ShiftCount)
+Friend Sub InitShiftRight(ByRef Other As BigNumber, ByVal ShiftCount As Long)
+    Debug.Assert ShiftCount > 0 And Other.Sign <> 0
+    mNumber.Sign = Other.Sign
+    mNumber.Digits = ShiftRightNumber(Other.Digits, ShiftCount)
     mNumber.Precision = UBound(mNumber.Digits) + 1
     TrimLeadingPadding
 End Sub
