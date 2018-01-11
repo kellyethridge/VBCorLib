@@ -616,7 +616,16 @@ End Function
 ' @return A new BigInteger value containing the performed bitwise NOT result.
 '
 Public Function NotBits() As BigInteger
-    Set NotBits = BigInteger.NotBits(Me)
+    If IsZero Then
+        Set NotBits = BigInteger.MinusOne
+        Exit Function
+    ElseIf IsMinusOne Then
+        Set NotBits = BigInteger.Zero
+        Exit Function
+    End If
+    
+    Set NotBits = New BigInteger
+    NotBits.InitNotBits mNumber
 End Function
 
 ''
@@ -752,7 +761,7 @@ Friend Sub CopyNumber(ByRef n As BigNumber)
 End Sub
 
 Friend Property Get IsMinusOne() As Boolean
-    If mNumber.Sign = Negative And mNumber.Precision = 1 Then
+    If mNumber.Sign = -1 And mNumber.Precision = 1 Then
         IsMinusOne = mNumber.Digits(0) = -1
     End If
 End Property
@@ -788,6 +797,17 @@ End Sub
 Friend Sub InitBigNumber(ByRef n As BigNumber)
     CopyMemory mNumber, n, LenB(n)
     ZeroMemory n, LenB(n)
+End Sub
+
+Friend Sub InitNotBits(ByRef Other As BigNumber)
+    ReDim mNumber.Digits(0 To Other.Precision - 1)
+    mNumber.Precision = Other.Precision
+    mNumber.Sign = -Other.Sign
+    
+    Dim i As Long
+    For i = 0 To mNumber.Precision - 1
+        mNumber.Digits(i) = Not Other.Digits(i)
+    Next i
 End Sub
 
 Friend Sub InitShiftLeft(ByRef Number As BigNumber, ByVal ShiftCount As Long)
@@ -829,16 +849,15 @@ End Sub
 Private Sub InitFromLong(ByVal Value As Long)
     Dim IsSingleDigit As Boolean
     
-    Select Case Sgn(Value)
-        Case Is < 0
-            mNumber.Sign = -1
-            IsSingleDigit = (Value And &HFFFF8000) = &H8000
-        Case Is > 0
-            mNumber.Sign = 1
-            IsSingleDigit = (Value And &HFFFF0000) = 0
-        Case Else
-            Exit Sub
-    End Select
+    If Value < 0 Then
+        mNumber.Sign = -1
+        IsSingleDigit = (Value And &HFFFF8000) = &H8000
+    ElseIf Value > 0 Then
+        mNumber.Sign = 1
+        IsSingleDigit = (Value And &HFFFF0000) = 0
+    Else
+        Exit Sub
+    End If
     
     If IsSingleDigit Then
         ReDim mNumber.Digits(0 To 0)

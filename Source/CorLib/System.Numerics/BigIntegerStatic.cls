@@ -768,29 +768,12 @@ End Function
 ''
 ' Peforms a bitwise NOT of this BigInteger instance.
 '
-' @param x The BigInteger to perform the NOT operation on.
-' @param value The value to perform the bitwise NOT on.
+' @param Value The BigInteger to perform the NOT operation on.
 ' @return A new BigInteger value containing the performed bitwise NOT result.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function NotBits(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
-    
-    If x.Sign = Sign.Zero Then
-        Set NotBits = mMinusOne
-        Exit Function
-    End If
-    
-    Dim xNumber As BigNumber
-    x.CopyNumber xNumber
-        
-    Dim i As Long
-    For i = 0 To xNumber.Precision - 1
-        xNumber.Digits(i) = Not xNumber.Digits(i)
-    Next i
-    
-    Set NotBits = New BigInteger
-    NotBits.InternalInitNumber xNumber
+Public Function NotBits(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set NotBits = Value.NotBits
 End Function
 
 ''
@@ -1061,6 +1044,14 @@ Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
         Set RefValue = mZero
     End If
 End Sub
+
+Private Function ValueOrZero(ByVal Value As BigInteger) As BigInteger
+    If Value Is Nothing Then
+        Set ValueOrZero = mZero
+    Else
+        Set ValueOrZero = Value
+    End If
+End Function
 
 Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As BigNumber) As Boolean
     Const NotFound          As Long = 0
