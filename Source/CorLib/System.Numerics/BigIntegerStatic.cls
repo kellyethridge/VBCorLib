@@ -216,8 +216,8 @@ End Function
 ''
 ' Returns a human readable string of characters representing the number.
 '
-' @param x The BigInteger to create a string from.
-' @param format The specific numerical format wish to have the number displayed as.
+' @param Value The BigInteger to create a string from.
+' @param Format The specific numerical format wish to have the number displayed as.
 ' @return The numeric value of the number in the specified format.
 ' @remarks "X" and "x" for hex in either upper or lowercase. "B" or "b" for a binary
 ' representation of 1's and 0's. Everything else defaults to a decimal display.
@@ -236,15 +236,15 @@ End Function
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
-Public Function ToString(ByVal x As BigInteger, Optional ByVal Format As String) As String
-    ZeroIfNothing x
-    ToString = x.ToString(Format)
+Public Function ToString(ByVal Value As BigInteger, Optional ByRef Format As String) As String
+    Set Value = ValueOrZero(Value)
+    ToString = Value.ToString(Format)
 End Function
 
 ''
 ' Returns the opposite signed value of this BigInteger instance.
 '
-' @param x The value to be negated.
+' @param Value The value to be negated.
 ' @return Returns a BigInteger instance containing the opposite signed value.
 ' @remarks Negative values are represented as a Twos Complement number, unlike
 ' other systems used to represent a negative value. Any negation requires
@@ -253,23 +253,23 @@ End Function
 ' the transition to using BigInteger values.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function Negate(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
-    Set Negate = x.Negate
+Public Function Negate(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set Negate = Value.Negate
 End Function
 
 ''
 ' Returns the absolute (positive or zero) value of this instance.
 '
-' @param x The BigInteger value to return the absolute value of.
+' @param Value The BigInteger value to return the absolute value of.
 ' @return Returns a positive (or zero) value of the current BigInteger instance.
 ' @remarks If the value is already positive or zero, then the same object instance
 ' is returned. If the value is negative, then the negated value is returned.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function Absolute(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
-    Set Absolute = x.Absolute
+Public Function Absolute(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set Absolute = Value.Absolute
 End Function
 
 ''
@@ -286,8 +286,8 @@ End Function
 ' </pre>
 '
 Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
     
     If x.Sign = Sign.Zero Then
         Set Add = y
@@ -325,8 +325,8 @@ End Function
 ' </pre>
 '
 Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
     
     If x.Sign = Sign.Zero Then
         Set Subtract = y.Negate
@@ -364,8 +364,8 @@ End Function
 ' </pre>
 '
 Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
     
     If (x.Sign = Sign.Zero) Or (y.Sign = Sign.Zero) Then
         Set Multiply = mZero
@@ -434,7 +434,7 @@ End Function
 ' </pre>
 '
 Public Function Divide(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
-    Set Divide = InternalDivide(Dividend, Divisor, Nothing, False)
+    Set Divide = DivideCore(Dividend, Divisor, Nothing, False)
 End Function
 
 ''
@@ -455,7 +455,7 @@ End Function
 ' Debug.Print r.ToString '' 20
 ' </pre>
 Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger, ByRef remainder As BigInteger) As BigInteger
-    Set DivRem = InternalDivide(Dividend, Divisor, remainder, True)
+    Set DivRem = DivideCore(Dividend, Divisor, remainder, True)
 End Function
 
 ''
@@ -472,7 +472,7 @@ End Function
 ' Debug.Print b.ToString '' 20
 ' </pre>
 Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
-    InternalDivide Dividend, Divisor, Modulus, True
+    DivideCore Dividend, Divisor, Modulus, True
 End Function
 
 ''
@@ -484,8 +484,8 @@ End Function
 ' @remarks Values of Nothing will be treated as zero.
 '
 Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
     
     If x.Sign = Sign.Zero And y.Sign = Sign.Zero Then
         Set GreatestCommonDivisor = mZero
@@ -508,7 +508,7 @@ End Function
 ''
 ' Tests a specific bit in the BigInteger number to determine if it is set (1) or not (0).
 '
-' @param x The BigInteger number to test the bit of.
+' @param Value The BigInteger number to test the bit of.
 ' @param bit The bit to be tested.
 ' @return Returns True if the bit is set (1), false if it is not (0).
 ' @remarks The max value for bit is 2147483647. If the bit value is larger than
@@ -516,15 +516,15 @@ End Function
 ' a negative number with infinite sign extension bits.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function TestBit(ByVal x As BigInteger, ByVal Bit As Long) As Boolean
-    ZeroIfNothing x
-    TestBit = x.TestBit(Bit)
+Public Function TestBit(ByVal Value As BigInteger, ByVal Bit As Long) As Boolean
+    Set Value = ValueOrZero(Value)
+    TestBit = Value.TestBit(Bit)
 End Function
 
 ''
 ' Sets the specified bit of the BigInteger instance to 1.
 '
-' @param x The BigInteger value to set the bit on.
+' @param Value The BigInteger value to set the bit on.
 ' @param bit The bit to be set to 1.
 ' @return A new BigInteger value with the bit set to 1.
 ' @remarks If the bit specified is larger than the current instance
@@ -532,28 +532,28 @@ End Function
 ' include the bit being set.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function SetBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    ZeroIfNothing x
-    SetBit = x.SetBit(Bit)
+Public Function SetBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    SetBit = Value.SetBit(Bit)
 End Function
 
 ''
 ' Clears the specified bit of the BigInteger instance to 0.
 '
-' @param x The BigInteger value to clear the bit on.
+' @param Value The BigInteger value to clear the bit on.
 ' @param bit The bit to be set to 0.
 ' @return A new BigInteger value with the bit set to 0.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function ClearBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    ZeroIfNothing x
-    Set ClearBit = x.ClearBit(Bit)
+Public Function ClearBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set ClearBit = Value.ClearBit(Bit)
 End Function
 
 ''
 ' Flips the specified bit, toggling between True and False.
 '
-' @param x The BigInteger value to flip the bit on.
+' @param Value The BigInteger value to flip the bit on.
 ' @param bit The bit to toggle.
 ' @return A new BigInteger with the specified bit flipped.
 ' @remarks If the bit specified is larger than the current instance
@@ -561,9 +561,9 @@ End Function
 ' include the bit being flipped.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function FlipBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    ZeroIfNothing x
-    Set FlipBit = x.FlipBit(Bit)
+Public Function FlipBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set FlipBit = Value.FlipBit(Bit)
 End Function
 
 ''
@@ -575,8 +575,8 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function AndBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
     
     If x.Sign = Sign.Zero Or y.Sign = Sign.Zero Then
         Set AndBits = mZero
@@ -631,8 +631,8 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function OrBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
     
     If x.Sign = Sign.Zero Then
         Set OrBits = y
@@ -690,8 +690,8 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+    Set x = ValueOrZero(x)
+    Set y = ValueOrZero(y)
     
     If x.Sign = Sign.Zero Then
         Set XorBits = y
@@ -772,8 +772,8 @@ End Function
 ' @remarks Values of Nothing are treated as zero.
 '
 Public Function Pow(ByVal BaseValue As BigInteger, ByVal Exponent As BigInteger) As BigInteger
-    ZeroIfNothing BaseValue
-    ZeroIfNothing Exponent
+    Set BaseValue = ValueOrZero(BaseValue)
+    Set Exponent = ValueOrZero(Exponent)
 
     If Exponent.Sign = Sign.Negative Then _
         Error.ArgumentOutOfRange "Exponent", ArgumentOutOfRange_NeedNonNegNum
@@ -946,28 +946,28 @@ End Function
 ''
 ' Returns the integer square root of a BigInteger.
 '
-' @param x The value to calculate the integer square root for.
+' @param Value The value to calculate the integer square root for.
 ' @Return The integer square root of the value.
 '
-Public Function SquareRoot(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
+Public Function SquareRoot(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
     
-    If x.Sign = Sign.Zero Then
+    If Value.Sign = Sign.Zero Then
         Set SquareRoot = mZero
         Exit Function
-    ElseIf x.Sign = Negative Then
-        Set x = x.Negate
+    ElseIf Value.Sign = Negative Then
+        Set Value = Value.Negate
     End If
     
     Dim Estimate As BigInteger
     Dim n As BigInteger
     
-    Set Estimate = x.ShiftRight(1).Add(mOne)
-    Set n = x.Divide(Estimate).Add(Estimate).ShiftRight(1)
+    Set Estimate = Value.ShiftRight(1).Add(mOne)
+    Set n = Value.Divide(Estimate).Add(Estimate).ShiftRight(1)
     
     Do While Compare(n, Estimate) < 0
         Set Estimate = n
-        Set n = x.Divide(Estimate).Add(Estimate).ShiftRight(1)
+        Set n = Value.Divide(Estimate).Add(Estimate).ShiftRight(1)
     Loop
     
     Set SquareRoot = Estimate
@@ -982,7 +982,7 @@ End Function
 Public Function Factorial(ByVal Value As BigInteger) As BigInteger
     Dim Result As BigInteger
     
-    ZeroIfNothing Value
+    Set Value = ValueOrZero(Value)
     
     If Value.Sign = Negative Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
@@ -1012,12 +1012,6 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
-    If RefValue Is Nothing Then
-        Set RefValue = mZero
-    End If
-End Sub
-
 Private Function ValueOrZero(ByVal Value As BigInteger) As BigInteger
     If Value Is Nothing Then
         Set ValueOrZero = mZero
@@ -1365,29 +1359,29 @@ Finally:
 End Function
 
 Private Sub DivideByZeroError()
-    Call Err.Raise(11)
+    Err.Raise 11
 End Sub
 
-Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
-    ZeroIfNothing Dividend
-    ZeroIfNothing Divisor
+Private Function DivideCore(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
+    Set Dividend = ValueOrZero(Dividend)
+    Set Divisor = ValueOrZero(Divisor)
     
     If Divisor.Sign = Sign.Zero Then
         DivideByZeroError
     ElseIf Dividend.Sign = Sign.Zero Then
-        Set InternalDivide = mZero
+        Set DivideCore = mZero
         If IncludeRemainder Then
             Set remainder = mZero
         End If
         Exit Function
     ElseIf Divisor.IsOne Then
-        Set InternalDivide = Dividend
+        Set DivideCore = Dividend
         If IncludeRemainder Then
             Set remainder = mZero
         End If
         Exit Function
     ElseIf Divisor.IsMinusOne Then
-        Set InternalDivide = Dividend.Negate
+        Set DivideCore = Dividend.Negate
         If IncludeRemainder Then
             Set remainder = mZero
         End If
@@ -1439,8 +1433,8 @@ Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As B
         End If
     End If
     
-    Set InternalDivide = New BigInteger
-    InternalDivide.InternalInit QuotientNumber
+    Set DivideCore = New BigInteger
+    DivideCore.InternalInit QuotientNumber
 End Function
 
 
