@@ -346,12 +346,8 @@ End Function
 
 Friend Function AddTo(ByRef Other As BigNumber) As BigInteger
     Set AddTo = New BigInteger
-    AddTo.AddTogether mNumber, Other
+    AddTo.InitAdd mNumber, Other
 End Function
-
-Friend Sub AddTogether(ByRef x As BigNumber, ByRef y As BigNumber)
-    GradeSchoolAdd x, y, mNumber
-End Sub
 
 ''
 ' Subtracts a value to this instance of BigInteger.
@@ -368,7 +364,20 @@ End Sub
 ' </pre>
 '
 Public Function Subtract(ByVal Value As BigInteger) As BigInteger
-    Set Subtract = BigInteger.Subtract(Me, Value)
+    Set Value = ValueOrZero(Value)
+    
+    If IsZero Then
+        Set Subtract = Value.Negate
+    ElseIf Value.IsZero Then
+        Set Subtract = Me
+    Else
+        Set Subtract = Value.SubtractFrom(mNumber)
+    End If
+End Function
+
+Friend Function SubtractFrom(ByRef Other As BigNumber) As BigInteger
+    Set SubtractFrom = New BigInteger
+    SubtractFrom.InitSubtract Other, mNumber
 End Function
 
 ''
@@ -812,6 +821,14 @@ Friend Sub Init(ByRef Value As Variant)
     If mNumber.Sign <> 0 Then
         mNumber.Precision = UBound(mNumber.Digits) + 1
     End If
+End Sub
+
+Friend Sub InitAdd(ByRef x As BigNumber, ByRef y As BigNumber)
+    GradeSchoolAdd x, y, mNumber
+End Sub
+
+Friend Sub InitSubtract(ByRef x As BigNumber, ByRef y As BigNumber)
+    GradeSchoolSubtract x, y, mNumber
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)

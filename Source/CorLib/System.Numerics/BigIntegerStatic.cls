@@ -301,31 +301,9 @@ End Function
 ' Set b = BigInteger.Subtract(BInt(100), BInt(150))
 ' Debug.Print b.ToString '' -50
 ' </pre>
-'
 Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
     Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
-    
-    If x.Sign = Sign.Zero Then
-        Set Subtract = y.Negate
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set Subtract = x
-        Exit Function
-    End If
-    
-    Dim u               As BigNumber
-    Dim v               As BigNumber
-    Dim Difference()    As Integer
-    
-    x.AttachNumber u
-    y.AttachNumber v
-    Difference = GradeSchoolSubtract(u, v)
-    x.DetachNumber u
-    y.DetachNumber v
-    
-    Set Subtract = New BigInteger
-    Subtract.InternalInit Difference
+    Set Subtract = x.Subtract(y)
 End Function
 
 ''

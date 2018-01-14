@@ -133,72 +133,11 @@ Public Sub GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Resu
         Result.Digits(i) = AsWord(k)
 #End If
         
-        k = (k And &H7FFF0000) \ vbShift16Bits
+        k = (k And &HFFFF0000) \ vbShift16Bits
     Next i
     
     Normalize Result
 End Sub
-
-
-Private Sub Normalize(ByRef mNumber As BigNumber)
-    Dim ub  As Long
-    Dim i   As Long
-    
-    ub = UBound(mNumber.Digits)
-
-    Select Case mNumber.Digits(ub)
-        Case 0   ' we have a leading zero digit
-
-            ' now search for the first nonzero digit from the left.
-            For i = ub - 1 To 0 Step -1
-                If mNumber.Digits(i) <> 0 Then
-                    ' we found a nonzero digit, so set the number
-                    mNumber.Sign = Positive     ' we know it's positive because of the leading zero
-                    mNumber.Precision = i + 1   ' set the number of digits
-                    Exit Sub
-                End If
-            Next i
-
-            mNumber.Sign = Zero
-            mNumber.Precision = 0
-
-        Case &HFFFF ' we have a leading negative
-
-            mNumber.Sign = Negative ' we know this for sure
-
-            For i = ub To 0 Step -1
-                If mNumber.Digits(i) <> &HFFFF Then
-                    If mNumber.Digits(i) And &H8000 Then
-                        mNumber.Precision = i + 1
-                    Else
-                        mNumber.Precision = i + 2
-                    End If
-                    Exit Sub
-                End If
-            Next i
-
-            ' the array was full of &HFFFF, we only need to represent one.
-            mNumber.Precision = 1
-
-        Case Else
-            If mNumber.Digits(ub) And &H8000 Then
-                mNumber.Sign = Negative
-            Else
-                mNumber.Sign = Positive
-            End If
-
-            mNumber.Precision = ub + 1
-    End Select
-End Sub
-
-#If Release Then
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'
-' These Release methods must be compiled with Interger Overflow
-' checks off. The methods must also pass all tests once compiled.
-'
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 
 ''
 ' This is the basic implementation of a gradeschool style
@@ -206,10 +145,9 @@ End Sub
 '
 ' Ref: The Art of Computer Programming 4.3.1.S
 '
-Public Function GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber) As Integer()
-    Dim uExtDigit   As Long
-    Dim vExtDigit    As Long
-    Dim Difference() As Integer
+Public Sub GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
+    Dim uExtDigit As Long
+    Dim vExtDigit As Long
 
     If u.Sign = Negative Then
         uExtDigit = &HFFFF&
@@ -218,16 +156,16 @@ Public Function GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber) 
     If v.Sign = Negative Then
         vExtDigit = &HFFFF&
     End If
-
+    
     If u.Precision >= v.Precision Then
-        ReDim Difference(0 To u.Precision)
+        ReDim Result.Digits(0 To u.Precision)
     Else
-        ReDim Difference(0 To v.Precision)
+        ReDim Result.Digits(0 To v.Precision)
     End If
-
-    Dim i       As Long
-    Dim k       As Long
-    For i = 0 To UBound(Difference)
+    
+    Dim i As Long
+    Dim k As Long
+    For i = 0 To UBound(Result.Digits)
         Dim uDigit  As Long
         Dim vDigit  As Long
         
@@ -242,14 +180,82 @@ Public Function GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber) 
         Else
             vDigit = vExtDigit
         End If
+
+        k = uDigit - vDigit + k
         
-        k = uDigit - vDigit + k ' this is the only change from addition
-        Difference(i) = k And &HFFFF&
-        k = (k And &HFFFF0000) \ &H10000
+#If Release Then
+        Result.Digits(i) = k And &HFFFF&
+#Else
+        Result.Digits(i) = AsWord(k)
+#End If
+
+        k = (k And &HFFFF0000) \ vbShift16Bits
     Next i
     
-    GradeSchoolSubtract = Difference
-End Function
+    Normalize Result
+End Sub
+
+
+Private Sub Normalize(ByRef Number As BigNumber)
+    Dim ub  As Long
+    Dim i   As Long
+    
+    ub = UBound(Number.Digits)
+
+    Select Case Number.Digits(ub)
+        Case 0   ' we have a leading zero digit
+
+            ' now search for the first nonzero digit from the left.
+            For i = ub - 1 To 0 Step -1
+                If Number.Digits(i) <> 0 Then
+                    ' we found a nonzero digit, so set the number
+                    Number.Sign = Positive     ' we know it's positive because of the leading zero
+                    Number.Precision = i + 1   ' set the number of digits
+                    Exit Sub
+                End If
+            Next i
+
+            Number.Sign = Zero
+            Number.Precision = 0
+
+        Case &HFFFF ' we have a leading negative
+
+            Number.Sign = Negative ' we know this for sure
+
+            For i = ub To 0 Step -1
+                If Number.Digits(i) <> &HFFFF Then
+                    If Number.Digits(i) And &H8000 Then
+                        Number.Precision = i + 1
+                    Else
+                        Number.Precision = i + 2
+                    End If
+                    Exit Sub
+                End If
+            Next i
+
+            ' the array was full of &HFFFF, we only need to represent one.
+            Number.Precision = 1
+
+        Case Else
+            If Number.Digits(ub) And &H8000 Then
+                Number.Sign = Negative
+            Else
+                Number.Sign = Positive
+            End If
+
+            Number.Precision = ub + 1
+    End Select
+End Sub
+
+#If Release Then
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'
+' These Release methods must be compiled with Interger Overflow
+' checks off. The methods must also pass all tests once compiled.
+'
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+
 
 ''
 ' This is a straight forward implementation of Knuth's algorithm.
@@ -802,50 +808,7 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
     SingleInPlaceDivideBy10 = R
 End Function
 
-Public Function GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber) As Integer()
-    Dim uExtDigit       As Long
-    Dim vExtDigit       As Long
-    Dim Difference()    As Integer
 
-    If u.Sign = Negative Then
-        uExtDigit = &HFFFF&
-    End If
-    
-    If v.Sign = Negative Then
-        vExtDigit = &HFFFF&
-    End If
-    
-    If u.Precision >= v.Precision Then
-        ReDim Difference(0 To u.Precision)
-    Else
-        ReDim Difference(0 To v.Precision)
-    End If
-    
-    Dim i As Long
-    Dim k As Long
-    For i = 0 To UBound(Difference)
-        Dim uDigit  As Long
-        Dim vDigit  As Long
-        
-        If i < u.Precision Then
-            uDigit = u.Digits(i) And &HFFFF&
-        Else
-            uDigit = uExtDigit
-        End If
-        
-        If i < v.Precision Then
-            vDigit = v.Digits(i) And &HFFFF&
-        Else
-            vDigit = vExtDigit
-        End If
-
-        k = uDigit - vDigit + k ' this is the only change for the addition
-        Difference(i) = AsWord(k)
-        k = (k And &HFFFF0000) \ &H10000
-    Next i
-    
-    GradeSchoolSubtract = Difference
-End Function
 
 Public Function GradeSchoolDivide(ByRef u As BigNumber, ByRef v As BigNumber, ByRef remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
     Dim n As Long
