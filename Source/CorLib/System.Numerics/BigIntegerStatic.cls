@@ -284,7 +284,6 @@ End Function
 ' Set b = BigInteger.Add(BInt(100), BInt(150))
 ' Debug.Print b.ToString '' 250
 ' </pre>
-'
 Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
     Set x = ValueOrZero(x)
     Set Add = x.Add(y)

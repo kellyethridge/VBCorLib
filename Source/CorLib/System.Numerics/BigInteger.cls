@@ -311,7 +311,6 @@ End Function
 ' @return Returns a positive (or zero) value of the current BigInteger instance.
 ' @remarks If the value is already positive or zero, then the same object instance
 ' is returned. If the value is negative, then the negated value is returned.
-'
 Public Function Absolute() As BigInteger
     If mNumber.Sign = Negative Then
         Set Absolute = Negate
@@ -333,19 +332,16 @@ End Function
 ' Set b = b.Add(BInt(150))
 ' Debug.Print b.ToString '' 250
 ' </pre>
-'
 Public Function Add(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
 
     If IsZero Then
         Set Add = Value
-        Exit Function
     ElseIf Value.IsZero Then
         Set Add = Me
-        Exit Function
+    Else
+        Set Add = Value.AddTo(mNumber)
     End If
-
-    Set Add = Value.AddTo(mNumber)
 End Function
 
 Friend Function AddTo(ByRef Other As BigNumber) As BigInteger

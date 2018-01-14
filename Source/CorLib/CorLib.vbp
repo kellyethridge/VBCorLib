@@ -364,6 +364,7 @@ Class=DBCSCodePageEncoding; System.Text\DBCSCodePageEncoding.cls
 Class=DBCSCodePageDecoder; System.Text\DBCSCodePageDecoder.cls
 Module=BigNumberMath; System.Numerics\BigNumberMath.bas
 ResFile32="CorLib.RES"
+Module=Mathematics; System.Numerics\Mathematics.bas
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
