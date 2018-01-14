@@ -335,8 +335,27 @@ End Function
 ' </pre>
 '
 Public Function Add(ByVal Value As BigInteger) As BigInteger
-    Set Add = BigInteger.Add(Me, Value)
+    Set Value = ValueOrZero(Value)
+
+    If IsZero Then
+        Set Add = Value
+        Exit Function
+    ElseIf Value.IsZero Then
+        Set Add = Me
+        Exit Function
+    End If
+
+    Set Add = Value.AddTo(mNumber)
 End Function
+
+Friend Function AddTo(ByRef Other As BigNumber) As BigInteger
+    Set AddTo = New BigInteger
+    AddTo.AddTogether mNumber, Other
+End Function
+
+Friend Sub AddTogether(ByRef x As BigNumber, ByRef y As BigNumber)
+    GradeSchoolAdd x, y, mNumber
+End Sub
 
 ''
 ' Subtracts a value to this instance of BigInteger.
@@ -1132,7 +1151,6 @@ Private Sub Normalize(Optional ByVal ub As Long = -1)
             End If
 
             mNumber.Precision = ub + 1
-
     End Select
 End Sub
 

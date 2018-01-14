@@ -287,28 +287,7 @@ End Function
 '
 Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
     Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
-    
-    If x.Sign = Sign.Zero Then
-        Set Add = y
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set Add = x
-        Exit Function
-    End If
-    
-    Dim u       As BigNumber
-    Dim v       As BigNumber
-    Dim sum()   As Integer
-    
-    x.AttachNumber u
-    y.AttachNumber v
-    sum = GradeSchoolAdd(u, v)
-    x.DetachNumber u
-    y.DetachNumber v
-    
-    Set Add = New BigInteger
-    Add.InternalInit sum
+    Set Add = x.Add(y)
 End Function
 
 ''

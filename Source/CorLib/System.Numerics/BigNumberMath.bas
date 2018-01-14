@@ -340,6 +340,57 @@ Public Function Compare(ByRef x As BigNumber, ByRef y As BigNumber) As Long
     Compare = Sgn(Result)
 End Function
 
+Private Sub Normalize(ByRef mNumber As BigNumber)
+    Dim ub  As Long
+    Dim i   As Long
+    
+    ub = UBound(mNumber.Digits)
+
+    Select Case mNumber.Digits(ub)
+        Case 0   ' we have a leading zero digit
+
+            ' now search for the first nonzero digit from the left.
+            For i = ub - 1 To 0 Step -1
+                If mNumber.Digits(i) <> 0 Then
+                    ' we found a nonzero digit, so set the number
+                    mNumber.Sign = Positive     ' we know it's positive because of the leading zero
+                    mNumber.Precision = i + 1   ' set the number of digits
+                    Exit Sub
+                End If
+            Next i
+
+            mNumber.Sign = Zero
+            mNumber.Precision = 0
+
+        Case &HFFFF ' we have a leading negative
+
+            mNumber.Sign = Negative ' we know this for sure
+
+            For i = ub To 0 Step -1
+                If mNumber.Digits(i) <> &HFFFF Then
+                    If mNumber.Digits(i) And &H8000 Then
+                        mNumber.Precision = i + 1
+                    Else
+                        mNumber.Precision = i + 2
+                    End If
+                    Exit Sub
+                End If
+            Next i
+
+            ' the array was full of &HFFFF, we only need to represent one.
+            mNumber.Precision = 1
+
+        Case Else
+            If mNumber.Digits(ub) And &H8000 Then
+                mNumber.Sign = Negative
+            Else
+                mNumber.Sign = Positive
+            End If
+
+            mNumber.Precision = ub + 1
+    End Select
+End Sub
+
 #If Release Then
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '
@@ -354,10 +405,9 @@ End Function
 '
 ' Ref: The Art of Computer Programming 4.3.1.A
 '
-Public Function GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber) As Integer()
+Public Sub GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
     Dim uExtDigit   As Long
     Dim vExtDigit   As Long
-    Dim sum()       As Integer
 
     If u.Sign = Negative Then
         uExtDigit = &HFFFF&
@@ -368,14 +418,14 @@ Public Function GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber) As In
     End If
 
     If u.Precision >= v.Precision Then
-        ReDim sum(0 To u.Precision)
+        ReDim Result.Digits(0 To u.Precision)
     Else
-        ReDim sum(0 To v.Precision)
+        ReDim Result.Digits(0 To v.Precision)
     End If
 
     Dim i As Long
     Dim k As Long
-    For i = 0 To UBound(sum)
+    For i = 0 To UBound(Result.Digits)
         Dim uDigit  As Long
         Dim vDigit  As Long
         
@@ -392,12 +442,12 @@ Public Function GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber) As In
         End If
         
         k = uDigit + vDigit + k ' this is the only change from subtraction
-        sum(i) = k And &HFFFF&
-        k = (k And &HFFFF0000) \ &H10000
+        Result.Digits(i) = k And &HFFFF&
+        k = (k And &H7FFF0000) \ vbShift16Bits
     Next i
     
-    GradeSchoolAdd = sum
-End Function
+    Normalize Result
+End Sub
 
 ''
 ' This is the basic implementation of a gradeschool style
@@ -1001,10 +1051,9 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
     SingleInPlaceDivideBy10 = R
 End Function
 
-Public Function GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber) As Integer()
+Public Sub GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
     Dim uExtDigit   As Long
     Dim vExtDigit   As Long
-    Dim sum()       As Integer
 
     If u.Sign = Negative Then
         uExtDigit = &HFFFF&
@@ -1015,14 +1064,14 @@ Public Function GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber) As In
     End If
 
     If u.Precision >= v.Precision Then
-        ReDim sum(0 To u.Precision)
+        ReDim Result.Digits(0 To u.Precision)
     Else
-        ReDim sum(0 To v.Precision)
+        ReDim Result.Digits(0 To v.Precision)
     End If
     
     Dim i As Long
     Dim k As Long
-    For i = 0 To UBound(sum)
+    For i = 0 To UBound(Result.Digits)
         Dim uDigit  As Long
         Dim vDigit  As Long
         
@@ -1039,12 +1088,12 @@ Public Function GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber) As In
         End If
         
         k = uDigit + vDigit + k ' this is the only change for the subtraction
-        sum(i) = AsWord(k)
-        k = (k And &HFFFF0000) \ &H10000
+        Result.Digits(i) = AsWord(k)
+        k = (k And &H7FFF0000) \ vbShift16Bits
     Next i
     
-    GradeSchoolAdd = sum
-End Function
+    Normalize Result
+End Sub
 
 Public Function GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber) As Integer()
     Dim uExtDigit       As Long
