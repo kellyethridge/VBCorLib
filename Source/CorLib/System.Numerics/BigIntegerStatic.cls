@@ -321,57 +321,7 @@ End Function
 '
 Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
     Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
-    
-    If (x.Sign = Sign.Zero) Or (y.Sign = Sign.Zero) Then
-        Set Multiply = mZero
-        Exit Function
-    ElseIf x.IsOne Then
-        Set Multiply = y
-        Exit Function
-    ElseIf y.IsOne Then
-        Set Multiply = x
-        Exit Function
-    ElseIf x.IsMinusOne Then
-        Set Multiply = y.Negate
-        Exit Function
-    ElseIf y.IsMinusOne Then
-        Set Multiply = x.Negate
-        Exit Function
-    End If
-    
-    Dim u As BigNumber
-    Dim v As BigNumber
-    
-    If x.Sign = Sign.Negative Then
-        x.CopyNumber u
-        BigNumberMath.Negate u
-    Else
-        x.AttachNumber u
-    End If
-
-    If y.Sign = Sign.Negative Then
-        y.CopyNumber v
-        BigNumberMath.Negate v
-    Else
-        y.AttachNumber v
-    End If
-    
-    Dim Product() As Integer
-    Product = GradeSchoolMultiply(u, v)
-    
-    If x.Sign = Sign.Positive Then
-        x.DetachNumber u
-    End If
-    If y.Sign = Sign.Positive Then
-        y.DetachNumber v
-    End If
-    If x.Sign <> y.Sign Then
-        ApplyTwosComplement Product
-    End If
-        
-    Set Multiply = New BigInteger
-    Multiply.InternalInit Product
+    Set Multiply = x.Multiply(y)
 End Function
 
 
@@ -1351,10 +1301,10 @@ Private Function DivideCore(ByRef Dividend As BigInteger, ByRef Divisor As BigIn
     Divisor.CopyNumber yNumber
       
     If Dividend.Sign = Sign.Negative Then
-        BigNumberMath.Negate xNumber
+'        BigNumberMath.Negate xNumber
     End If
     If Divisor.Sign = Sign.Negative Then
-        BigNumberMath.Negate yNumber
+'        BigNumberMath.Negate yNumber
     End If
     
     Dim QuotientNumber()    As Integer

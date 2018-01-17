@@ -83,6 +83,45 @@ Public Function Compare(ByRef x As BigNumber, ByRef y As BigNumber) As Long
     Compare = Sgn(Result)
 End Function
 
+Public Sub Negate(ByRef n As BigNumber, ByRef Result As BigNumber)
+    ReDim Result.Digits(0 To n.Precision)
+    CopyMemory Result.Digits(0), n.Digits(0), n.Precision * 2
+    Result.Sign = n.Sign
+    Result.Precision = n.Precision
+    NegateInPlace Result
+End Sub
+
+Private Sub NegateInPlace(ByRef n As BigNumber)
+    Dim k As Long
+    Dim i As Long
+ 
+    Debug.Assert n.Precision <= UBound(n.Digits)
+ 
+    n.Sign = 0 - n.Sign
+    k = 1
+    
+    For i = 0 To n.Precision - 1
+        k = k + ((n.Digits(i) Xor &HFFFF) And &HFFFF&)
+        
+#If Relese Then
+        n.Digits(i) = k And &HFFFF&
+#Else
+        n.Digits(i) = AsWord(k)
+#End If
+    
+        k = (k And &HFFFF0000) \ vbShift16Bits
+    Next
+
+    If n.Sign = -1 Then
+        If (n.Digits(n.Precision - 1) And &H8000) = 0 Then
+            n.Digits(n.Precision) = &HFFFF
+            n.Precision = n.Precision + 1
+        End If
+    ElseIf n.Sign = 1 Then
+        Normalize n
+    End If
+End Sub
+
 ''
 ' This is the basic implementation of a gradeschool style
 ' addition of two n-place numbers.
@@ -195,18 +234,100 @@ Public Sub GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber, ByRef
     Normalize Result
 End Sub
 
+''
+' This is a straight forward implementation of Knuth's algorithm.
+'
+' Ref: The Art of Computer Programming 4.3.1.M
+'
+Public Sub GradeSchoolMultiply(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
+    Debug.Assert u.Sign <> 0
+    Debug.Assert v.Sign <> 0
+    
+    If u.Sign = -1 Then
+        If v.Sign = -1 Then
+            MultiplyNegatives u, v, Result
+        Else
+            MultiplyByNegative v, u, Result
+        End If
+    ElseIf v.Sign = -1 Then
+        MultiplyByNegative u, v, Result
+    Else
+        MultiplyPositives u, v, Result
+    End If
+End Sub
+
+
+Private Sub MultiplyNegatives(ByRef n1 As BigNumber, ByRef n2 As BigNumber, ByRef Result As BigNumber)
+    Dim u As BigNumber
+    Dim v As BigNumber
+    
+    Debug.Assert n1.Sign = -1
+    Debug.Assert n2.Sign = -1
+    
+    Negate n1, u
+    Negate n2, v
+    MultiplyPositives u, v, Result
+End Sub
+
+Private Sub MultiplyByNegative(ByRef u As BigNumber, ByRef Negative As BigNumber, ByRef Result As BigNumber)
+    Dim v As BigNumber
+    
+    Debug.Assert u.Sign = 1
+    Debug.Assert Negative.Sign = -1
+    
+    Negate Negative, v
+    MultiplyPositives u, v, Result
+    NegateInPlace Result
+End Sub
+
+Private Sub MultiplyPositives(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
+    Dim i As Long
+    Dim j As Long
+    Dim k As Long
+    Dim d As Long
+    
+    Debug.Assert u.Sign = 1
+    Debug.Assert v.Sign = 1
+    
+    ReDim Result.Digits(0 To u.Precision + v.Precision)
+    
+    For i = 0 To v.Precision - 1
+        k = 0
+        d = v.Digits(i) And &HFFFF&
+        
+        For j = 0 To u.Precision - 1
+#If Release Then
+            k = d * (u.Digits(j) And &HFFFF&) + (Result.Digits(i + j) And &HFFFF&) + k
+            Result.Digits(i + j) = k And &HFFFF&
+            k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
+#Else
+            k = UInt16x16To32(d, u.Digits(j)) + (Result.Digits(i + j) And &HFFFF&) + k
+            Result.Digits(i + j) = AsWord(k)
+            k = RightShift16(k)
+#End If
+        Next
+        
+#If Release Then
+        Result.Digits(i + j) = k And &HFFFF&
+#Else
+        Result.Digits(i + j) = AsWord(k)
+#End If
+    Next
+    
+    Normalize Result
+End Sub
 
 Private Sub Normalize(ByRef Number As BigNumber)
-    Dim ub  As Long
+    Dim Max As Long
     Dim i   As Long
     
-    ub = UBound(Number.Digits)
+    Max = UBound(Number.Digits)
 
-    Select Case Number.Digits(ub)
+    Select Case Number.Digits(Max)
         Case 0   ' we have a leading zero digit
 
             ' now search for the first nonzero digit from the left.
-            For i = ub - 1 To 0 Step -1
+            For i = Max - 1 To 0 Step -1
                 If Number.Digits(i) <> 0 Then
                     ' we found a nonzero digit, so set the number
                     Number.Sign = Positive     ' we know it's positive because of the leading zero
@@ -222,7 +343,7 @@ Private Sub Normalize(ByRef Number As BigNumber)
 
             Number.Sign = Negative ' we know this for sure
 
-            For i = ub To 0 Step -1
+            For i = Max To 0 Step -1
                 If Number.Digits(i) <> &HFFFF Then
                     If Number.Digits(i) And &H8000 Then
                         Number.Precision = i + 1
@@ -237,13 +358,13 @@ Private Sub Normalize(ByRef Number As BigNumber)
             Number.Precision = 1
 
         Case Else
-            If Number.Digits(ub) And &H8000 Then
+            If Number.Digits(Max) And &H8000 Then
                 Number.Sign = Negative
             Else
                 Number.Sign = Positive
             End If
 
-            Number.Precision = ub + 1
+            Number.Precision = Max + 1
     End Select
 End Sub
 
@@ -257,36 +378,7 @@ End Sub
 
 
 
-''
-' This is a straight forward implementation of Knuth's algorithm.
-'
-' Ref: The Art of Computer Programming 4.3.1.M
-'
-Public Function GradeSchoolMultiply(ByRef u As BigNumber, ByRef v As BigNumber) As Integer()
-    Dim Product()   As Integer
-    Dim i           As Long
-    Dim j           As Long
-    Dim k           As Long
-    
-    ReDim Product(0 To u.Precision + v.Precision)
-    
-    For j = 0 To v.Precision - 1
-        Dim d As Long
-        
-        d = v.Digits(j) And &HFFFF&
-        k = 0
-        
-        For i = 0 To u.Precision - 1
-            k = d * (u.Digits(i) And &HFFFF&) + (Product(i + j) And &HFFFF&) + k
-            Product(i + j) = k And &HFFFF&
-            k = ((k And &HFFFF0000) \ &H10000) And &HFFFF&
-        Next i
-        
-        Product(i + j) = k And &HFFFF&
-    Next j
-    
-    GradeSchoolMultiply = Product
-End Function
+
 
 ''
 ' This is an implementation of Knuth's algorithm.
@@ -468,39 +560,6 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
 
     SingleInPlaceDivideBy10 = R
 End Function
-
-''
-' Performs a Two's Complement on the number, effectively negating it.
-'
-' The number buffer is modified by this routine. It will also reallocate
-' the buffer if necessary.
-'
-Public Sub Negate(ByRef n As BigNumber)
-    ' this is to handle situations like FFFF => FFFF0001.
-    If n.Sign = Positive Then
-        If n.Digits(n.Precision - 1) And &H8000 Then
-            If n.Precision > UBound(n.Digits) Then
-                ReDim Preserve n.Digits(0 To n.Precision)
-            End If
-            
-            n.Digits(n.Precision) = 0
-            n.Precision = n.Precision + 1
-        End If
-    End If
-
-    Dim k As Long
-    Dim i As Long
-    
-    k = 1
-    
-    For i = 0 To n.Precision - 1
-        k = k + ((n.Digits(i) Xor &HFFFF) And &HFFFF&)
-        n.Digits(i) = k And &HFFFF&
-        k = (k And &HFFFF0000) \ &H10000
-    Next i
-
-    n.Sign = 0 - n.Sign
-End Sub
 
 ''
 ' Performs a single in-place multiplication within the original array.
@@ -695,28 +754,7 @@ Public Sub ApplyTwosComplement(ByRef n() As Integer)
     Next
 End Sub
 
-Public Function GradeSchoolMultiply(ByRef u As BigNumber, ByRef v As BigNumber) As Integer()
-    Dim Product()   As Integer
-    Dim i           As Long
-    Dim j           As Long
-    Dim k           As Long
-        
-    ReDim Product(0 To u.Precision + v.Precision)
-    
-    For i = 0 To v.Precision - 1
-        k = 0
-        
-        For j = 0 To u.Precision - 1
-            k = UInt16x16To32(v.Digits(i), u.Digits(j)) + (Product(i + j) And &HFFFF&) + k
-            Product(i + j) = AsWord(k)
-            k = RightShift16(k)
-        Next j
-        
-        Product(i + j) = AsWord(k)
-    Next
-    
-    GradeSchoolMultiply = Product
-End Function
+
 
 Public Sub SingleInPlaceMultiply(ByRef n As BigNumber, ByVal Value As Long)
     Dim k As Long
@@ -752,37 +790,7 @@ Public Sub SingleInPlaceAdd(ByRef n As BigNumber, ByVal Value As Integer)
     Loop
 End Sub
 
-Public Sub Negate(ByRef n As BigNumber)
-    Dim k As Long
-    Dim i As Long
 
-    k = 1
- 
-    ' this is to handle situations like FFFF => FFFF0001.
-    If n.Sign = Sign.Positive Then
-        If n.Digits(n.Precision - 1) And &H8000 Then
-            If n.Precision > UBound(n.Digits) Then
-                ReDim Preserve n.Digits(0 To n.Precision)
-            End If
-
-            n.Digits(n.Precision) = 0
-            n.Precision = n.Precision + 1
-        End If
-    ElseIf n.Sign = Negative Then
-        If n.Precision > 1 And n.Digits(n.Precision - 1) = &HFFFF Then
-            n.Precision = n.Precision - 1
-            n.Digits(n.Precision) = 0
-        End If
-    End If
-
-    For i = 0 To n.Precision - 1
-        k = k + ((n.Digits(i) Xor &HFFFF) And &HFFFF&)
-        n.Digits(i) = AsWord(k)
-        k = RightShift16(k)
-    Next
-
-    n.Sign = 0 - n.Sign
-End Sub
 
 Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
     Dim R As Long

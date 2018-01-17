@@ -293,17 +293,14 @@ End Function
 ' the transition to using BigInteger values.
 '
 Public Function Negate() As BigInteger
-    If mNumber.Sign = Zero Then
+    If IsZero Then
         Set Negate = Me
     Else
-        Dim Copy As BigNumber
-        
-        Copy = mNumber
-        BigNumberMath.Negate Copy
         Set Negate = New BigInteger
-        Negate.InternalInitNumber2 Copy
+        Negate.InitNegate mNumber
     End If
 End Function
+
 
 ''
 ' Returns the absolute (positive or zero) value of this instance.
@@ -395,7 +392,26 @@ End Function
 ' </pre>
 '
 Public Function Multiply(ByVal Value As BigInteger) As BigInteger
-    Set Multiply = BigInteger.Multiply(Me, Value)
+    Set Value = ValueOrZero(Value)
+    
+    If IsZero Or Value.IsZero Then
+        Set Multiply = BigInteger.Zero
+    ElseIf IsOne Then
+        Set Multiply = Value
+    ElseIf Value.IsOne Then
+        Set Multiply = Me
+    ElseIf IsMinusOne Then
+        Set Multiply = Value.Negate
+    ElseIf Value.IsMinusOne Then
+        Set Multiply = Negate
+    Else
+        Set Multiply = Value.MultiplyBy(mNumber)
+    End If
+End Function
+
+Friend Function MultiplyBy(ByRef Value As BigNumber) As BigInteger
+    Set MultiplyBy = New BigInteger
+    MultiplyBy.InitMultiply mNumber, Value
 End Function
 
 ''
@@ -823,12 +839,20 @@ Friend Sub Init(ByRef Value As Variant)
     End If
 End Sub
 
+Friend Sub InitNegate(ByRef Value As BigNumber)
+    BigNumberMath.Negate Value, mNumber
+End Sub
+
 Friend Sub InitAdd(ByRef x As BigNumber, ByRef y As BigNumber)
     GradeSchoolAdd x, y, mNumber
 End Sub
 
 Friend Sub InitSubtract(ByRef x As BigNumber, ByRef y As BigNumber)
     GradeSchoolSubtract x, y, mNumber
+End Sub
+
+Friend Sub InitMultiply(ByRef x As BigNumber, ByRef y As BigNumber)
+    GradeSchoolMultiply x, y, mNumber
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)

@@ -198,15 +198,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use(BInt(&H7FFFFFFF), BInt(&H80000000)).Expect Iz.Positive
 
         Case "Negate_WithValue_ReturnsExpected"
-            Test.Use BInt(0), BInt(0)
-            Test.Use BInt(1), BInt(-1)
-            Test.Use BInt(-1), BInt(1)
-            Test.Use BInt(Nothing), BInt(0)
-            Test.Use BInt(255), BInt(-255)
-            Test.Use BInt(-255), BInt(255)
-            Test.Use BInt(65535), BInt(-65535)
-            Test.Use BInt(&H80000000), BInt(2147483648#)
-            Test.Use BInt(&H8000), BInt(32768)
+            Test.Use 0, 0
+            Test.Use 1, -1
+            Test.Use -1, 1
+            Test.Use Nothing, 0
+            Test.Use 255, -255
+            Test.Use -255, 255
+            Test.Use 65535, -65535
+            Test.Use -65535, 65535
+            Test.Use &H80000000, 2147483648#
+            Test.Use &H8000, 32768
 
         Case "Absolute_WithValue_ReturnsExpected"
             Test.Use BInt(0), BInt(0)
@@ -253,7 +254,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "-12345678901234567890", "-12345678901234567890", "152415787532388367501905199875019052100"
             Test.Use "-12345678901234567890", "12345678901234567890", "-152415787532388367501905199875019052100"
             Test.Use "12345678901234567890", "-12345678901234567890", "-152415787532388367501905199875019052100"
-        
+            Test.Use "-12345678901234567890", "2", "-24691357802469135780"
+            Test.Use "2", "-12345678901234567890", "-24691357802469135780"
+                    
         Case "Divide_WithValues_ReturnsExpected"
             Test.Use 0, 1, 0
             Test.Use 4, 2, 2
@@ -497,12 +500,12 @@ Public Function Compare_WithWithValues_ReturnsExpected(ByVal x As BigInteger, By
     Compare_WithWithValues_ReturnsExpected = Actual
 End Function
 
-Public Sub Negate_WithValue_ReturnsExpected(ByVal Number As BigInteger, ByVal Expected As BigInteger)
+Public Sub Negate_WithValue_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = Number.Negate
+    Set Actual = BInt(Value).Negate
     
-    Assert.That Actual, Equals(Expected)
+    Assert.That Actual, Equals(BInt(Expected))
 End Sub
 
 Public Sub Negate_WhenNegativeToPositive_ShouldSetPrecision()
