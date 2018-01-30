@@ -196,7 +196,7 @@ Public Sub GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber, ByRef
         vExtDigit = &HFFFF&
     End If
     
-    If u.Precision >= v.Precision Then
+    If u.Precision > v.Precision Then
         ReDim Result.Digits(0 To u.Precision)
     Else
         ReDim Result.Digits(0 To v.Precision)
@@ -256,7 +256,6 @@ Public Sub GradeSchoolMultiply(ByRef u As BigNumber, ByRef v As BigNumber, ByRef
     End If
 End Sub
 
-
 Private Sub MultiplyNegatives(ByRef n1 As BigNumber, ByRef n2 As BigNumber, ByRef Result As BigNumber)
     Dim u As BigNumber
     Dim v As BigNumber
@@ -290,6 +289,8 @@ Private Sub MultiplyPositives(ByRef u As BigNumber, ByRef v As BigNumber, ByRef 
     Debug.Assert v.Sign = 1
     
     ReDim Result.Digits(0 To u.Precision + v.Precision)
+    Result.Sign = 1
+    Result.Precision = UBound(Result.Digits)
     
     For i = 0 To v.Precision - 1
         k = 0
@@ -317,6 +318,249 @@ Private Sub MultiplyPositives(ByRef u As BigNumber, ByRef v As BigNumber, ByRef 
     Normalize Result
 End Sub
 
+''
+' This is an implementation of Knuth's algorithm.
+'
+' As simple as division would seem to be in the real world, implementing it at such
+' a low level has its own sets of problems. After careful study of Knuth's algorithm
+' I finally came up with the following implmentation. The steps in the book are
+' marked inline with the code as close as possible.
+'
+' Ref: The Art of Computer Programming 4.3.1.D
+'
+Public Sub GradeSchoolDivide(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    If Dividend.Sign = -1 Then
+        If Divisor.Sign = -1 Then
+            DivideNegatives Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+        Else
+            DivideNegativeDividend Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+        End If
+    ElseIf Divisor.Sign = -1 Then
+        DivideByNegativeDivisor Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+    Else
+        DividePositives Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+    End If
+End Sub
+
+Private Sub DivideNegativeDividend(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    Dim u As BigNumber
+    
+    Debug.Assert Dividend.Sign = -1
+    Debug.Assert Divisor.Sign = 1
+    
+    Negate Dividend, u
+    DivideToNegative u, Divisor, Quotient, Remainder, IncludeRemainder
+End Sub
+
+Private Sub DivideByNegativeDivisor(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    Dim v As BigNumber
+    
+    Debug.Assert Dividend.Sign = 1
+    Debug.Assert Divisor.Sign = -1
+    
+    Negate Divisor, v
+    DivideToNegative Dividend, v, Quotient, Remainder, IncludeRemainder
+End Sub
+
+Private Sub DivideToNegative(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    DividePositives Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+    NegateInPlace Quotient
+    
+    If IncludeRemainder Then
+        NegateInPlace Remainder
+    End If
+End Sub
+
+Private Sub DivideNegatives(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    Dim u As BigNumber
+    Dim v As BigNumber
+    
+    Negate Dividend, u
+    Negate Divisor, v
+    DividePositives u, v, Quotient, Remainder, IncludeRemainder
+End Sub
+
+Private Sub DividePositives(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    Quotient.Sign = 1
+    
+    If v.Precision = 1 Then
+        Dim R As Long
+        Quotient.Digits = SinglePlaceDivide(u.Digits, u.Precision, v.Digits(0), R)
+        Quotient.Precision = UBound(Quotient.Digits) + 1
+        Normalize Quotient
+        
+        If IncludeRemainder Then
+            ReDim Remainder.Digits(1)
+            
+            If R Then
+                Remainder.Digits(0) = R
+                Remainder.Sign = 1
+                Remainder.Precision = 1
+            End If
+        End If
+        Exit Sub
+    End If
+    
+    Dim n As Long
+    Dim m As Long
+    Dim d As Long
+    
+    Debug.Assert u.Sign = 1
+    Debug.Assert v.Sign = 1
+    
+    n = v.Precision
+    m = u.Precision - n
+     
+    ' test if the divisor is shorter than the dividend, if so then just
+    ' return a 0 quotient and the dividend as the remainder, if needed.
+    If m < 0 Then
+        If IncludeRemainder Then
+            ReDim Remainder.Digits(0 To u.Precision)
+            CopyMemory Remainder.Digits(0), u.Digits(0), u.Precision * 2
+        End If
+        
+        Quotient.Digits = Cor.NewIntegers()
+        Exit Sub
+    End If
+    
+    ' ** D1 Start **
+    If (u.Precision - 1) = UBound(u.Digits) Then
+        ReDim Preserve u.Digits(0 To u.Precision)
+    End If
+    
+    u.Digits(u.Precision) = 0
+    u.Precision = u.Precision + 1
+        
+    d = &H10000 \ (1 + (v.Digits(n - 1) And &HFFFF&))
+    
+    If d > 1 Then
+        SingleInPlaceMultiply u, d
+        SingleInPlaceMultiply v, d
+    End If
+    ' ** D1 End **
+    
+'    Dim Quotient() As Integer
+'    ReDim Quotient(0 To m + 1)
+    ReDim Quotient.Digits(0 To m + 1)
+    
+    Dim vDigit  As Long
+    Dim vDigit2 As Long
+    
+    ' this is the Vn-1 digit used repeatedly in step D3.
+    vDigit = v.Digits(n - 1) And &HFFFF&
+    
+    ' this is the Vn-2 digit used repeatedly in step D3.
+    If n - 2 >= 0 Then
+        vDigit2 = v.Digits(n - 2) And &HFFFF&
+    End If
+    
+    Dim qTimesu() As Integer
+    ReDim qTimesu(0 To n)
+    
+#If Release Then
+    ' this is an optimistic caching to be used incase
+    ' a negative value is encountered. the same value
+    ' will always be used regardless, so cache it here.
+    Dim q2 As Long
+    Dim r2 As Long
+    
+    q2 = &H7FFFFFFF \ vDigit
+    r2 = &H7FFFFFFF - (q2 * vDigit) + 1
+#End If
+
+    Dim j       As Long
+    Dim rHat    As Long
+    Dim qHat    As Long
+    For j = m To 0 Step -1
+        Dim WordU As Long
+        
+        ' ** D3 Start **
+#If Release Then
+        ' since we are shifting left, it is possible that we could turn wordu
+        ' into a negative value and will need to deal with it differently later on.
+        WordU = ((u.Digits(j + n) And &HFFFF&) * vbShift16Bits) Or (u.Digits(j + n - 1) And &HFFFF&)
+        
+        ' we have to deal with dividing negatives. They need to work like unsigned.
+        If WordU And &H80000000 Then
+            Dim q1 As Long
+            q1 = (WordU And &H7FFFFFFF) \ vDigit
+            rHat = (WordU And &H7FFFFFFF) - (q1 * vDigit) + r2
+            
+            If rHat >= vDigit Then
+                q1 = q1 + 1
+                rHat = rHat - vDigit
+            End If
+
+            qHat = q1 + q2
+        Else
+            qHat = WordU \ vDigit
+            rHat = WordU - qHat * vDigit
+        End If
+#Else
+        WordU = Make32(u.Digits(j + n), u.Digits(j + n - 1))
+        qHat = UInt32d16To32(WordU, vDigit)
+        rHat = UInt32m16To32(WordU, vDigit)
+#End If
+
+        Do
+            If qHat < &H10000 Then
+#If Release Then
+                Dim qHatDigits As Long
+                Dim rHatDigits As Long
+
+                qHatDigits = (qHat * (v.Digits(n - 2) And &HFFFF&))
+                rHatDigits = (rHat * &H10000) + (u.Digits(j + n - 2) And &HFFFF&)
+                
+                If (qHatDigits - &H80000000) <= (rHatDigits - &H80000000) Then
+                    Exit Do
+                End If
+#Else
+                If UInt32Compare(UInt32x16To32(qHat, v.Digits(n - 2)), Helper.ShiftLeft(rHat, 16) + (u.Digits(j + n - 2) And &HFFFF&)) <= 0 Then
+                    Exit Do
+                End If
+#End If
+            End If
+            
+            qHat = qHat - 1
+            rHat = rHat + (vDigit And &HFFFF&)
+        Loop While rHat < &H10000
+        ' ** D3 End **
+        
+        ' ** D4 Start **
+        SinglePlaceMultiply v.Digits, n, qHat, qTimesu
+        
+        Dim Borrowed As Boolean
+        Borrowed = MultiInPlaceSubtract(u.Digits, j, qTimesu)
+        ' ** D4 End **
+        
+        ' ** D5 Start **
+        If Borrowed Then
+            ' ** D6 Start **
+            qHat = qHat - 1
+            MultiInPlaceAdd u.Digits, j, v.Digits
+            ' ** D6 End **
+        End If
+        ' ** D5 End **
+        
+        Quotient.Digits(j) = AsWord(qHat)
+    Next
+    ' ** D2 End **
+    
+    Normalize Quotient
+    
+    ' ** D8 Start **
+    If IncludeRemainder Then
+        If d > 1 Then
+            Remainder.Digits = SinglePlaceDivide(u.Digits, n, d)
+        Else
+            Remainder.Digits = u.Digits
+        End If
+        
+        Normalize Remainder
+    End If
+    ' ** D8 End **
+End Sub
+
 Private Sub Normalize(ByRef Number As BigNumber)
     Dim Max As Long
     Dim i   As Long
@@ -330,6 +574,14 @@ Private Sub Normalize(ByRef Number As BigNumber)
             For i = Max - 1 To 0 Step -1
                 If Number.Digits(i) <> 0 Then
                     ' we found a nonzero digit, so set the number
+                    Number.Precision = i + 1   ' set the number of digits
+                    
+                    If Number.Sign = Negative Then
+                        If (Number.Digits(i) And &H8000) = 0 Then
+                            Number.Digits(Number.Precision) = &HFFFF
+                            Number.Precision = Number.Precision + 1
+                        End If
+                    End If
                     Number.Sign = Positive     ' we know it's positive because of the leading zero
                     Number.Precision = i + 1   ' set the number of digits
                     Exit Sub
@@ -375,162 +627,6 @@ End Sub
 ' checks off. The methods must also pass all tests once compiled.
 '
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
-
-
-
-
-''
-' This is an implementation of Knuth's algorithm.
-'
-' As simple as division would seem to be in the real world, implementing it at such
-' a low level has its own sets of problems. After careful study of Knuth's algorithm
-' I finally came up with the following implmentation. The steps in the book are
-' marked inline with the code as close as possible.
-'
-' Ref: The Art of Computer Programming 4.3.1.D
-'
-Public Function GradeSchoolDivide(ByRef u As BigNumber, ByRef v As BigNumber, ByRef remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
-    Dim n As Long
-    Dim m As Long
-    Dim d As Long
-    
-    n = v.Precision
-    m = u.Precision - n
-      
-    ' test if the divisor is shorter than the dividend, if so then just
-    ' return a 0 quotient and the dividend as the remainder, if needed.
-    If m < 0 Then
-        If IncludeRemainder Then
-            ReDim remainder(0 To u.Precision)
-            CopyMemory remainder(0), u.Digits(0), u.Precision * 2
-        End If
-        
-        GradeSchoolDivide = Cor.NewIntegers()
-        Exit Function
-    End If
-    
-    ' ** D1 Start **
-    If (u.Precision - 1) = UBound(u.Digits) Then
-        ReDim Preserve u.Digits(0 To u.Precision)
-    End If
-    
-    u.Digits(u.Precision) = 0
-    u.Precision = u.Precision + 1
-
-    d = &H10000 \ (1 + (v.Digits(n - 1) And &HFFFF&))
-    
-    If d > 1 Then
-        SingleInPlaceMultiply u, d
-        SingleInPlaceMultiply v, d
-    End If
-    ' ** D1 End **
-    
-    Dim Quotient() As Integer
-    ReDim Quotient(0 To m + 1)
-    
-    Dim vDigit  As Long
-    Dim vDigit2 As Long
-    
-    ' this is the Vn-1 digit used repeatedly in step D3.
-    vDigit = v.Digits(n - 1) And &HFFFF&
-    
-    ' this is the Vn-2 digit used repeatedly in step D3.
-    If n - 2 >= 0 Then
-        vDigit2 = v.Digits(n - 2) And &HFFFF&
-    End If
-    
-    Dim qXu() As Integer    ' cache the array to prevent constant allocate/deallocate
-    ReDim qXu(0 To n)       ' the array will be reused for multiplication
-    
-    ' this is an optimistic caching to be used incase
-    ' a negative value is encountered. the same value
-    ' will always be used regardless, so cache it here.
-    Dim q2 As Long
-    Dim r2 As Long
-    q2 = &H7FFFFFFF \ vDigit
-    r2 = &H7FFFFFFF - (q2 * vDigit) + 1
-    
-    Dim j       As Long
-    Dim rHat    As Long
-    Dim qHat    As Long
-    
-    ' ** D2 Start **
-    For j = m To 0 Step -1
-        Dim WordU As Long
-        
-        ' ** D3 Start **
-        ' since we are shifting left, it is possible that we could turn wordu
-        ' into a negative value and will need to deal with it differently later on.
-        WordU = ((u.Digits(j + n) And &HFFFF&) * &H10000) Or (u.Digits(j + n - 1) And &HFFFF&)
-        
-        ' We have to deal with dividing negatives. They need to work like unsigned.
-        If WordU And &H80000000 Then
-            Dim q1 As Long
-            q1 = (WordU And &H7FFFFFFF) \ vDigit
-            rHat = (WordU And &H7FFFFFFF) - (q1 * vDigit) + r2
-            
-            If rHat >= vDigit Then
-                q1 = q1 + 1
-                rHat = rHat - vDigit
-            End If
-
-            qHat = q1 + q2
-        Else
-            qHat = WordU \ vDigit
-            rHat = WordU - qHat * vDigit
-        End If
-        
-        Do
-            If qHat < &H10000 Then
-                Dim qHatDigits As Long
-                Dim rHatDigits As Long
-
-                qHatDigits = (qHat * (v.Digits(n - 2) And &HFFFF&))
-                rHatDigits = (rHat * &H10000) + (u.Digits(j + n - 2) And &HFFFF&)
-                
-                If (qHatDigits - &H80000000) <= (rHatDigits - &H80000000) Then
-                    Exit Do
-                End If
-            End If
-            
-            qHat = qHat - 1
-            rHat = rHat + vDigit
-        Loop While rHat < &H10000
-        ' ** D3 End **
-        
-        ' ** D4 Start **
-        SinglePlaceMultiply v.Digits, n, qHat, qXu
-        
-        Dim Borrowed As Boolean
-        Borrowed = MultiInPlaceSubtract(u.Digits, j, qXu)
-        ' ** D4 End **
-        
-        ' ** D5 Start **
-        If Borrowed Then
-            ' ** D6 Start **
-            qHat = qHat - 1
-            MultiInPlaceAdd u.Digits, j, v.Digits
-            ' ** D6 End **
-        End If
-        ' ** D5 End **
-        
-        Quotient(j) = qHat And &HFFFF&
-    Next j
-    ' ** D2 End **
-    
-    ' ** D8 Start **
-    If IncludeRemainder Then
-        If d > 1 Then
-            remainder = SinglePlaceDivide(u.Digits, n, d)
-        Else
-            remainder = u.Digits
-        End If
-    End If
-    ' ** D8 End **
-    
-    GradeSchoolDivide = Quotient
-End Function
 
 ''
 ' Performs a single in-place division by 10, returning the remainder.
@@ -684,7 +780,7 @@ End Sub
 ''
 ' Divides an array by a single digit (16bit) value, returning the quotient and remainder.
 '
-Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef remainder As Long) As Integer()
+Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef Remainder As Long) As Integer()
     Dim R   As Long
     Dim q() As Integer
     Dim q2  As Long
@@ -716,7 +812,7 @@ Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, By
         End If
     Next
     
-    remainder = R
+    Remainder = R
     SinglePlaceDivide = q
 End Function
 
@@ -753,8 +849,6 @@ Public Sub ApplyTwosComplement(ByRef n() As Integer)
         c = RightShift16(c)
     Next
 End Sub
-
-
 
 Public Sub SingleInPlaceMultiply(ByRef n As BigNumber, ByVal Value As Long)
     Dim k As Long
@@ -814,99 +908,6 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
     Next
 
     SingleInPlaceDivideBy10 = R
-End Function
-
-
-
-Public Function GradeSchoolDivide(ByRef u As BigNumber, ByRef v As BigNumber, ByRef remainder() As Integer, ByVal IncludeRemainder As Boolean) As Integer()
-    Dim n As Long
-    Dim m As Long
-    Dim d As Long
-    
-    n = v.Precision
-    m = u.Precision - n
-     
-    If m < 0 Then
-        If IncludeRemainder Then
-            ReDim remainder(0 To u.Precision)
-            CopyMemory remainder(0), u.Digits(0), u.Precision * 2
-        End If
-        
-        GradeSchoolDivide = Cor.NewIntegers()
-        Exit Function
-    End If
-    
-    If (u.Precision - 1) = UBound(u.Digits) Then
-        ReDim Preserve u.Digits(0 To u.Precision)
-    End If
-    
-    u.Digits(u.Precision) = 0
-    u.Precision = u.Precision + 1
-        
-    d = &H10000 \ (1 + (v.Digits(n - 1) And &HFFFF&))
-    
-    If d > 1 Then
-        SingleInPlaceMultiply u, d
-        SingleInPlaceMultiply v, d
-    End If
-    
-    Dim Quotient() As Integer
-    ReDim Quotient(0 To m + 1)
-    
-    Dim vDigit As Integer
-    vDigit = v.Digits(n - 1)
-    
-    Dim vDigit2 As Long
-    If n - 2 >= 0 Then
-        vDigit2 = v.Digits(n - 2) And &HFFFF&
-    End If
-    
-    Dim qTimesu() As Integer
-    ReDim qTimesu(0 To n)
-    
-    Dim j       As Long
-    Dim rHat    As Long
-    Dim qHat    As Long
-    For j = m To 0 Step -1
-        Dim WordU As Long
-        
-        WordU = Make32(u.Digits(j + n), u.Digits(j + n - 1))
-        qHat = UInt32d16To32(WordU, vDigit)
-        rHat = UInt32m16To32(WordU, vDigit)
-        
-        Do
-            If qHat < &H10000 Then
-                If UInt32Compare(UInt32x16To32(qHat, v.Digits(n - 2)), Helper.ShiftLeft(rHat, 16) + (u.Digits(j + n - 2) And &HFFFF&)) <= 0 Then
-                    Exit Do
-                End If
-            End If
-            
-            qHat = qHat - 1
-            rHat = rHat + (vDigit And &HFFFF&)
-        Loop While rHat < &H10000
-        
-        SinglePlaceMultiply v.Digits, n, qHat, qTimesu
-        
-        Dim borrow As Boolean
-        borrow = MultiInPlaceSubtract(u.Digits, j, qTimesu)
-        
-        If borrow Then
-            qHat = qHat - 1
-            MultiInPlaceAdd u.Digits, j, v.Digits
-        End If
-        
-        Quotient(j) = AsWord(qHat)
-    Next
-    
-    If IncludeRemainder Then
-        If d > 1 Then
-            remainder = SinglePlaceDivide(u.Digits, n, d)
-        Else
-            remainder = u.Digits
-        End If
-    End If
-    
-    GradeSchoolDivide = Quotient
 End Function
 
 Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
@@ -998,19 +999,19 @@ Private Sub MultiInPlaceAdd(ByRef u() As Integer, ByVal StartIndex As Long, ByRe
     Next i
 End Sub
 
-Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef remainder As Long) As Integer()
+Public Function SinglePlaceDivide(ByRef u() As Integer, ByVal Length As Long, ByVal v As Long, Optional ByRef Remainder As Long) As Integer()
     Dim q() As Integer
     ReDim q(0 To Length)
     
     Dim R As Long
     Dim i As Long
     For i = Length - 1 To 0 Step -1
-        R = R * &H10000 + (u(i) And &HFFFF&)
+        R = R * vbShift16Bits + (u(i) And &HFFFF&)
         q(i) = AsWord(UInt32d16To32(R, v))
         R = AsWord(UInt32m16To32(R, v))
     Next i
     
-    remainder = R
+    Remainder = R
     SinglePlaceDivide = q
 End Function
 

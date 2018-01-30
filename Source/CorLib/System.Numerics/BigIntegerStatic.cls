@@ -128,7 +128,6 @@ End Function
 '
 Public Function Equals(ByVal x As BigInteger, ByVal y As BigInteger) As Boolean
     Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
     Equals = x.Equals(y)
 End Function
 
@@ -340,7 +339,8 @@ End Function
 ' </pre>
 '
 Public Function Divide(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
-    Set Divide = DivideCore(Dividend, Divisor, Nothing, False)
+    Set Dividend = ValueOrZero(Dividend)
+    Set Divide = Dividend.Divide(Divisor)
 End Function
 
 ''
@@ -360,8 +360,9 @@ End Function
 ' Debug.Print q.ToString '' 2
 ' Debug.Print r.ToString '' 20
 ' </pre>
-Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger, ByRef remainder As BigInteger) As BigInteger
-    Set DivRem = DivideCore(Dividend, Divisor, remainder, True)
+Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
+    Set Dividend = ValueOrZero(Dividend)
+    Set DivRem = Dividend.DivRem(Divisor, Remainder)
 End Function
 
 ''
@@ -378,7 +379,8 @@ End Function
 ' Debug.Print b.ToString '' 20
 ' </pre>
 Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
-    DivideCore Dividend, Divisor, Modulus, True
+    Set Dividend = ValueOrZero(Dividend)
+    Dividend.DivRem Divisor, Modulus
 End Function
 
 ''
@@ -1263,84 +1265,3 @@ Continue:
 Finally:
     FreeChars Chars
 End Function
-
-Private Sub DivideByZeroError()
-    Err.Raise 11
-End Sub
-
-Private Function DivideCore(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
-    Set Dividend = ValueOrZero(Dividend)
-    Set Divisor = ValueOrZero(Divisor)
-    
-    If Divisor.Sign = Sign.Zero Then
-        DivideByZeroError
-    ElseIf Dividend.Sign = Sign.Zero Then
-        Set DivideCore = mZero
-        If IncludeRemainder Then
-            Set remainder = mZero
-        End If
-        Exit Function
-    ElseIf Divisor.IsOne Then
-        Set DivideCore = Dividend
-        If IncludeRemainder Then
-            Set remainder = mZero
-        End If
-        Exit Function
-    ElseIf Divisor.IsMinusOne Then
-        Set DivideCore = Dividend.Negate
-        If IncludeRemainder Then
-            Set remainder = mZero
-        End If
-        Exit Function
-    End If
-    
-    Dim xNumber As BigNumber
-    Dim yNumber As BigNumber
-    
-    Dividend.CopyNumber xNumber
-    Divisor.CopyNumber yNumber
-      
-    If Dividend.Sign = Sign.Negative Then
-'        BigNumberMath.Negate xNumber
-    End If
-    If Divisor.Sign = Sign.Negative Then
-'        BigNumberMath.Negate yNumber
-    End If
-    
-    Dim QuotientNumber()    As Integer
-    Dim RemainderNumber()   As Integer
-    
-    If yNumber.Precision > 1 Then
-        QuotientNumber = GradeSchoolDivide(xNumber, yNumber, RemainderNumber, IncludeRemainder)
-    Else
-        Dim R As Long
-        QuotientNumber = SinglePlaceDivide(xNumber.Digits, xNumber.Precision, yNumber.Digits(0), R)
-        
-        If IncludeRemainder Then
-            ReDim RemainderNumber(0)
-            RemainderNumber(0) = R
-        End If
-    End If
-    
-    If Dividend.Sign <> Divisor.Sign Then
-        ApplyTwosComplement QuotientNumber
-        
-        If IncludeRemainder Then
-            ApplyTwosComplement RemainderNumber
-        End If
-    End If
-    
-    If IncludeRemainder Then
-        Set remainder = New BigInteger
-        remainder.InternalInit RemainderNumber
-                
-        If remainder.Sign = Negative Then
-            Set remainder = Negate(remainder)
-        End If
-    End If
-    
-    Set DivideCore = New BigInteger
-    DivideCore.InternalInit QuotientNumber
-End Function
-
-

@@ -429,7 +429,25 @@ End Function
 ' </pre>
 '
 Public Function Divide(ByVal Divisor As BigInteger) As BigInteger
-    Set Divide = BigInteger.Divide(Me, Divisor)
+    Set Divisor = ValueOrZero(Divisor)
+    
+    If Divisor.IsZero Then _
+        Throw New DivideByZeroException
+    
+    If IsZero Then
+        Set Divide = Me
+    ElseIf Divisor.IsOne Then
+        Set Divide = Me
+    ElseIf Divisor.IsMinusOne Then
+        Set Divide = Negate
+    Else
+        Set Divide = Divisor.DivideInto(mNumber)
+    End If
+End Function
+
+Friend Function DivideInto(ByRef Dividend As BigNumber) As BigInteger
+    Set DivideInto = New BigInteger
+    DivideInto.InitDivide Dividend, mNumber
 End Function
 
 ''
@@ -449,8 +467,29 @@ End Function
 ' Debug.Print q.ToString '' 2
 ' Debug.Print r.ToString '' 20
 ' </pre>
-Public Function DivRem(ByVal Divisor As BigInteger, ByRef remainder As BigInteger) As BigInteger
-    Set DivRem = BigInteger.DivRem(Me, Divisor, remainder)
+Public Function DivRem(ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
+    Set Divisor = ValueOrZero(Divisor)
+    
+    If Divisor.IsZero Then _
+        Throw New DivideByZeroException
+    
+    If IsZero Then
+        Set DivRem = Me
+        Set Remainder = Me
+    ElseIf Divisor.IsOne Then
+        Set DivRem = Me
+        Set Remainder = BigInteger.Zero
+    ElseIf Divisor.IsMinusOne Then
+        Set DivRem = Negate
+        Set Remainder = BigInteger.Zero
+    Else
+        Set DivRem = Divisor.DivRemInto(mNumber, Remainder)
+    End If
+End Function
+
+Friend Function DivRemInto(ByRef Dividend As BigNumber, ByRef Remainder As BigInteger) As BigInteger
+    Set DivRemInto = New BigInteger
+    DivRemInto.InitDivQuotient Dividend, mNumber, Remainder
 End Function
 
 ''
@@ -466,7 +505,6 @@ End Function
 ' Set b = b.Modulus(BInt(40))
 ' Debug.Print b.ToString '' 20
 ' </pre>
-'
 Public Function Modulus(ByVal Value As BigInteger) As BigInteger
     Set Modulus = BigInteger.Modulus(Me, Value)
 End Function
@@ -853,6 +891,21 @@ End Sub
 
 Friend Sub InitMultiply(ByRef x As BigNumber, ByRef y As BigNumber)
     GradeSchoolMultiply x, y, mNumber
+End Sub
+
+Friend Sub InitDivide(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
+    Dim Remainder As BigNumber ' just used for filler
+    
+    GradeSchoolDivide Dividend, Divisor, mNumber, Remainder, False
+End Sub
+
+Friend Sub InitDivQuotient(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Remainder As BigInteger)
+    Set Remainder = New BigInteger
+    Remainder.InitDivRemainder Dividend, Divisor, mNumber
+End Sub
+
+Friend Sub InitDivRemainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber)
+    GradeSchoolDivide Dividend, Divisor, Quotient, mNumber, True
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)

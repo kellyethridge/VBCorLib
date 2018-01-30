@@ -272,10 +272,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "-12345678901234567890", "12345678901234567890", -1
             Test.Use "12345678901234567890", "-12345678901234567890", -1
             
-        Case "DevRem_WithValues_ReturnsExpected"
+        Case "DivRem_WithValues_ReturnsExpected"
             Test.Use 10, 5, 2, 0
             Test.Use 12, 5, 2, 2
-            Test.Use 12, -5, -2, 2
+            Test.Use 12, -5, -2, -2
             Test.Use "12345678901234567890", "123456789012345", "100000", "67890"
         
         Case "Pow_WithValues_ReturnsExpected"
@@ -578,7 +578,7 @@ Public Sub Divide_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByR
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
 
-Public Sub DevRem_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedQuotient As Variant, ByRef ExpectedRemainder As Variant)
+Public Sub DivRem_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedQuotient As Variant, ByRef ExpectedRemainder As Variant)
     Dim Dividend As BigInteger
     Dim Divisor As BigInteger
     Dim Remainder As BigInteger
@@ -626,13 +626,13 @@ Public Sub Pow_WithNegativeExponent_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err, "Exponent"
 End Sub
 
-Public Sub SquareRoot_WithValue_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
-    Dim Actual As BigInteger
-    
-    Set Actual = BInt(Value).SquareRoot
-    
-    Assert.That Actual, Equals(BInt(Expected))
-End Sub
+'Public Sub SquareRoot_WithValue_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
+'    Dim Actual As BigInteger
+'
+'    Set Actual = BInt(Value).SquareRoot
+'
+'    Assert.That Actual, Equals(BInt(Expected))
+'End Sub
 
 Public Sub ShiftRight_WhenShiftingZeroBits_ReturnsOriginalValue()
     Dim Actual As BigInteger
@@ -942,4 +942,20 @@ Public Sub Equals_WithNothing_ReturnsTrue()
     Actual = BigInteger.Zero.Equals(Nothing)
     
     Assert.That Actual, Iz.True
+End Sub
+
+Public Sub Divide_WithDivisorOfZero_ThrowsDivideByZeroException()
+    On Error Resume Next
+    
+    BInt(10).Divide BigInteger.Zero
+    
+    AssertDivideByZeroException Err
+End Sub
+
+Public Sub DivRem_WithDivisorOfZero_ThrowsDivideByZeroException()
+    On Error Resume Next
+    
+    BInt(10).DivRem BigInteger.Zero, Nothing
+    
+    AssertDivideByZeroException Err
 End Sub
