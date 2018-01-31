@@ -860,10 +860,12 @@ End Function
 Public Function SquareRoot(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     
-    If Value.Sign = Sign.Zero Then
+    If Value.Sign = 0 Then
         Set SquareRoot = mZero
         Exit Function
-    ElseIf Value.Sign = Negative Then
+    End If
+    
+    If Value.Sign = -1 Then
         Set Value = Value.Negate
     End If
     

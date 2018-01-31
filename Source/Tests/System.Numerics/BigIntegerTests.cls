@@ -271,6 +271,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "12345678901234567890", "12345678901234567890", 1
             Test.Use "-12345678901234567890", "12345678901234567890", -1
             Test.Use "12345678901234567890", "-12345678901234567890", -1
+            Test.Use "123456789012345678901234567", "11111111061111", "11111111061111"
             
         Case "DivRem_WithValues_ReturnsExpected"
             Test.Use 10, 5, 2, 0
@@ -576,6 +577,8 @@ Public Sub Divide_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByR
     Set Actual = Dividend.Divide(Divisor)
     
     Assert.That Actual, Equals(BInt(Expected))
+    Assert.That Dividend, Equals(BInt(DividendValue))
+    Assert.That Divisor, Equals(BInt(DivisorValue))
 End Sub
 
 Public Sub DivRem_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedQuotient As Variant, ByRef ExpectedRemainder As Variant)
@@ -626,13 +629,13 @@ Public Sub Pow_WithNegativeExponent_ThrowsArgumentOutOfRangeException()
     AssertArgumentOutOfRangeException Err, "Exponent"
 End Sub
 
-'Public Sub SquareRoot_WithValue_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
-'    Dim Actual As BigInteger
-'
-'    Set Actual = BInt(Value).SquareRoot
-'
-'    Assert.That Actual, Equals(BInt(Expected))
-'End Sub
+Public Sub SquareRoot_WithValue_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
+    Dim Actual As BigInteger
+
+    Set Actual = BInt(Value).SquareRoot
+
+    Assert.That Actual, Equals(BInt(Expected))
+End Sub
 
 Public Sub ShiftRight_WhenShiftingZeroBits_ReturnsOriginalValue()
     Dim Actual As BigInteger
@@ -805,16 +808,6 @@ Public Sub XorBits_WithValue_ReturnsXoredValue(ByRef Value1 As Variant, ByRef Va
 End Sub
 
 Public Sub NotBits_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
-'    Dim Actual() As Byte
-'    Dim ActualSign As Long
-'    Dim Number As BigInteger
-'
-'    Set Number = NewBigInteger(Value).NotBits
-'    Actual = Number.ToByteArray
-'    ActualSign = Number.Sign
-'
-'    Assert.That Actual, Iz.EqualTo(ExpectedBytes)
-'    Assert.That ActualSign, Iz.EqualTo(ExpectedSign)
     Dim Actual As BigInteger
     
     Set Actual = BInt(Value).NotBits

@@ -344,26 +344,30 @@ End Sub
 
 Private Sub DivideNegativeDividend(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
     Dim u As BigNumber
+    Dim v As BigNumber
     
     Debug.Assert Dividend.Sign = -1
     Debug.Assert Divisor.Sign = 1
     
     Negate Dividend, u
-    DivideToNegative u, Divisor, Quotient, Remainder, IncludeRemainder
+    v = Divisor
+    DivideToNegative u, v, Quotient, Remainder, IncludeRemainder
 End Sub
 
 Private Sub DivideByNegativeDivisor(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    Dim u As BigNumber
     Dim v As BigNumber
     
     Debug.Assert Dividend.Sign = 1
     Debug.Assert Divisor.Sign = -1
     
+    u = Dividend
     Negate Divisor, v
-    DivideToNegative Dividend, v, Quotient, Remainder, IncludeRemainder
+    DivideToNegative u, v, Quotient, Remainder, IncludeRemainder
 End Sub
 
 Private Sub DivideToNegative(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
-    DividePositives Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+    DivideCore Dividend, Divisor, Quotient, Remainder, IncludeRemainder
     NegateInPlace Quotient
     
     If IncludeRemainder Then
@@ -377,10 +381,19 @@ Private Sub DivideNegatives(ByRef Dividend As BigNumber, ByRef Divisor As BigNum
     
     Negate Dividend, u
     Negate Divisor, v
-    DividePositives u, v, Quotient, Remainder, IncludeRemainder
+    DivideCore u, v, Quotient, Remainder, IncludeRemainder
 End Sub
 
-Private Sub DividePositives(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+Private Sub DividePositives(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+    Dim u As BigNumber
+    Dim v As BigNumber
+    
+    u = Dividend
+    v = Divisor
+    DivideCore u, v, Quotient, Remainder, IncludeRemainder
+End Sub
+
+Private Sub DivideCore(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
     Quotient.Sign = 1
     
     If v.Precision = 1 Then
