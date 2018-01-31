@@ -506,7 +506,14 @@ End Function
 ' Debug.Print b.ToString '' 20
 ' </pre>
 Public Function Modulus(ByVal Value As BigInteger) As BigInteger
-    Set Modulus = BigInteger.Modulus(Me, Value)
+'    Set Modulus = BigInteger.Modulus(Me, Value)
+    Set Value = ValueOrZero(Value)
+    Set Modulus = Value.ModulusOf(mNumber)
+End Function
+
+Friend Function ModulusOf(ByRef Dividend As BigNumber) As BigInteger
+    Set ModulusOf = New BigInteger
+    ModulusOf.InitModulus Dividend, mNumber
 End Function
 
 ''
@@ -894,9 +901,8 @@ Friend Sub InitMultiply(ByRef x As BigNumber, ByRef y As BigNumber)
 End Sub
 
 Friend Sub InitDivide(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
-    Dim Remainder As BigNumber ' just used for filler
-    
-    GradeSchoolDivide Dividend, Divisor, mNumber, Remainder, False
+    Dim PlaceHolder As BigNumber
+    GradeSchoolDivide Dividend, Divisor, mNumber, PlaceHolder, False
 End Sub
 
 Friend Sub InitDivQuotient(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Remainder As BigInteger)
@@ -906,6 +912,11 @@ End Sub
 
 Friend Sub InitDivRemainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber)
     GradeSchoolDivide Dividend, Divisor, Quotient, mNumber, True
+End Sub
+
+Friend Sub InitModulus(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
+    Dim PlaceHolder As BigNumber
+    GradeSchoolDivide Dividend, Divisor, PlaceHolder, mNumber, True
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)

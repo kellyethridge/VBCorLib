@@ -114,7 +114,6 @@ End Property
 ' If x > y then 1 is returned.<br>
 Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
     Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
     Compare = x.CompareTo(y)
 End Function
 
@@ -380,7 +379,7 @@ End Function
 ' </pre>
 Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
     Set Dividend = ValueOrZero(Dividend)
-    Dividend.DivRem Divisor, Modulus
+    Set Modulus = Dividend.Modulus(Divisor)
 End Function
 
 ''
@@ -395,7 +394,7 @@ Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteg
     Set x = ValueOrZero(x)
     Set y = ValueOrZero(y)
     
-    If x.Sign = Sign.Zero And y.Sign = Sign.Zero Then
+    If x.IsZero And y.IsZero Then
         Set GreatestCommonDivisor = mZero
         Exit Function
     End If
@@ -404,8 +403,8 @@ Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteg
     Set y = y.Absolute
     
     Dim R As BigInteger
-    Do While y.Sign <> Sign.Zero
-        Set R = Modulus(x, y)
+    Do While Not y.IsZero
+        Set R = x.Modulus(y)
         Set x = y
         Set y = R
     Loop
