@@ -495,7 +495,7 @@ End Function
 ''
 ' Performs a modulus operation, returning the remainder.
 '
-' @param Value A numeric representation of the value to divide this instance by.
+' @param Divisor A numeric representation of the value to divide this instance by.
 ' @return The modulus (remainder) of the division.
 ' @remarks This method accepts a BigInteger, one of VB's numeric values or
 ' a string to be parsed.
@@ -505,15 +505,18 @@ End Function
 ' Set b = b.Modulus(BInt(40))
 ' Debug.Print b.ToString '' 20
 ' </pre>
-Public Function Modulus(ByVal Value As BigInteger) As BigInteger
-'    Set Modulus = BigInteger.Modulus(Me, Value)
-    Set Value = ValueOrZero(Value)
-    Set Modulus = Value.ModulusOf(mNumber)
+Public Function Remainder(ByVal Divisor As BigInteger) As BigInteger
+    Set Divisor = ValueOrZero(Divisor)
+    
+    If Divisor.IsZero Then _
+        Throw New DivideByZeroException
+    
+    Set Remainder = Divisor.RemainderOf(mNumber)
 End Function
 
-Friend Function ModulusOf(ByRef Dividend As BigNumber) As BigInteger
-    Set ModulusOf = New BigInteger
-    ModulusOf.InitModulus Dividend, mNumber
+Friend Function RemainderOf(ByRef Dividend As BigNumber) As BigInteger
+    Set RemainderOf = New BigInteger
+    RemainderOf.InitRemainder Dividend, mNumber
 End Function
 
 ''
@@ -889,20 +892,19 @@ Friend Sub InitNegate(ByRef Value As BigNumber)
 End Sub
 
 Friend Sub InitAdd(ByRef x As BigNumber, ByRef y As BigNumber)
-    GradeSchoolAdd x, y, mNumber
+    BigNumberMath.Add x, y, mNumber
 End Sub
 
 Friend Sub InitSubtract(ByRef x As BigNumber, ByRef y As BigNumber)
-    GradeSchoolSubtract x, y, mNumber
+    BigNumberMath.Subtract x, y, mNumber
 End Sub
 
 Friend Sub InitMultiply(ByRef x As BigNumber, ByRef y As BigNumber)
-    GradeSchoolMultiply x, y, mNumber
+    BigNumberMath.Multiply x, y, mNumber
 End Sub
 
 Friend Sub InitDivide(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
-    Dim PlaceHolder As BigNumber
-    GradeSchoolDivide Dividend, Divisor, mNumber, PlaceHolder, False
+    BigNumberMath.Divide Dividend, Divisor, mNumber
 End Sub
 
 Friend Sub InitDivQuotient(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Remainder As BigInteger)
@@ -911,12 +913,11 @@ Friend Sub InitDivQuotient(ByRef Dividend As BigNumber, ByRef Divisor As BigNumb
 End Sub
 
 Friend Sub InitDivRemainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber)
-    GradeSchoolDivide Dividend, Divisor, Quotient, mNumber, True
+    BigNumberMath.DivRem Dividend, Divisor, Quotient, mNumber
 End Sub
 
-Friend Sub InitModulus(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
-    Dim PlaceHolder As BigNumber
-    GradeSchoolDivide Dividend, Divisor, PlaceHolder, mNumber, True
+Friend Sub InitRemainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
+    BigNumberMath.Remainder Dividend, Divisor, mNumber
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)

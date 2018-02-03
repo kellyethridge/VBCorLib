@@ -279,10 +279,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 12, -5, -2, -2
             Test.Use "12345678901234567890", "123456789012345", "100000", "67890"
         
-        Case "Modulus_WithValues_ReturnsExpected"
+        Case "Remainder_WithValues_ReturnsExpected"
             Test.Use 10, 5, 0
             Test.Use 10, 3, 1
             Test.Use 0, 2, 0
+            Test.Use -5, 2, -1
+            Test.Use 5, -2, 1
+            Test.Use -5, -2, -1
         
         Case "Pow_WithValues_ReturnsExpected"
             Test.Use 0, 0, 1
@@ -427,14 +430,6 @@ Public Sub BigInteger_WhenCreated_InitializesToZero()
     Dim Number As New BigInteger
     
     AssertNumber Number, NewBytes(0), 0
-End Sub
-
-Public Sub NewBigInteger_WhenInitialized_InitializesBigInteger(ByRef Value As Variant, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Sign, ByVal ExpectedPrecision As Long)
-    Dim Number As BigInteger
-    
-    Set Number = NewBigInteger(Value)
-    
-    AssertNumber Number, ExpectedBytes, ExpectedSign
 End Sub
 
 Public Sub NewBigInteger_WithNullArray_ThrowsArgumentNullException()
@@ -958,7 +953,7 @@ Public Sub DivRem_WithDivisorOfZero_ThrowsDivideByZeroException()
     AssertDivideByZeroException Err
 End Sub
 
-Public Sub Modulus_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedValue As Variant)
+Public Sub Remainder_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedValue As Variant)
     Dim Dividend As BigInteger
     Dim Divisor As BigInteger
     Dim Actual As BigInteger
@@ -966,7 +961,7 @@ Public Sub Modulus_WithValues_ReturnsExpected(ByRef DividendValue As Variant, By
     Set Dividend = BInt(DividendValue)
     Set Divisor = BInt(DivisorValue)
     
-    Set Actual = Dividend.Modulus(Divisor)
+    Set Actual = Dividend.Remainder(Divisor)
     
     Assert.That Actual, Equals(BInt(ExpectedValue))
 End Sub

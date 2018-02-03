@@ -128,7 +128,7 @@ End Sub
 '
 ' Ref: The Art of Computer Programming 4.3.1.A
 '
-Public Sub GradeSchoolAdd(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
+Public Sub Add(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
     Dim uExtDigit   As Long
     Dim vExtDigit   As Long
 
@@ -184,7 +184,7 @@ End Sub
 '
 ' Ref: The Art of Computer Programming 4.3.1.S
 '
-Public Sub GradeSchoolSubtract(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
+Public Sub Subtract(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
     Dim uExtDigit As Long
     Dim vExtDigit As Long
 
@@ -239,7 +239,7 @@ End Sub
 '
 ' Ref: The Art of Computer Programming 4.3.1.M
 '
-Public Sub GradeSchoolMultiply(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
+Public Sub Multiply(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Result As BigNumber)
     Debug.Assert u.Sign <> 0
     Debug.Assert v.Sign <> 0
     
@@ -318,31 +318,41 @@ Private Sub MultiplyPositives(ByRef u As BigNumber, ByRef v As BigNumber, ByRef 
     Normalize Result
 End Sub
 
-''
-' This is an implementation of Knuth's algorithm.
-'
-' As simple as division would seem to be in the real world, implementing it at such
-' a low level has its own sets of problems. After careful study of Knuth's algorithm
-' I finally came up with the following implmentation. The steps in the book are
-' marked inline with the code as close as possible.
-'
-' Ref: The Art of Computer Programming 4.3.1.D
-'
-Public Sub GradeSchoolDivide(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+Public Sub Divide(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber)
+    Dim Remainder As BigNumber
+    DivideNumbers Dividend, Divisor, Quotient, Remainder, False
+End Sub
+
+Public Sub DivRem(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber)
+    DivideNumbers Dividend, Divisor, Quotient, Remainder, True
+End Sub
+
+Public Sub Remainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Result As BigNumber)
+    Dim Quotient As BigNumber
+    DivideNumbers Dividend, Divisor, Quotient, Result, True
+    
+    If Result.Sign <> 0 Then
+        If Result.Sign <> Dividend.Sign Then
+            NegateInPlace Result
+        End If
+    End If
+End Sub
+
+Private Sub DivideNumbers(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
     If Dividend.Sign = -1 Then
         If Divisor.Sign = -1 Then
             DivideNegatives Dividend, Divisor, Quotient, Remainder, IncludeRemainder
         Else
-            DivideNegativeDividend Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+            DivideNegativeByPositive Dividend, Divisor, Quotient, Remainder, IncludeRemainder
         End If
     ElseIf Divisor.Sign = -1 Then
-        DivideByNegativeDivisor Dividend, Divisor, Quotient, Remainder, IncludeRemainder
+        DividePositiveByNegative Dividend, Divisor, Quotient, Remainder, IncludeRemainder
     Else
         DividePositives Dividend, Divisor, Quotient, Remainder, IncludeRemainder
     End If
 End Sub
 
-Private Sub DivideNegativeDividend(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+Private Sub DivideNegativeByPositive(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
     Dim u As BigNumber
     Dim v As BigNumber
     
@@ -354,7 +364,7 @@ Private Sub DivideNegativeDividend(ByRef Dividend As BigNumber, ByRef Divisor As
     DivideToNegative u, v, Quotient, Remainder, IncludeRemainder
 End Sub
 
-Private Sub DivideByNegativeDivisor(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
+Private Sub DividePositiveByNegative(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
     Dim u As BigNumber
     Dim v As BigNumber
     
@@ -393,6 +403,16 @@ Private Sub DividePositives(ByRef Dividend As BigNumber, ByRef Divisor As BigNum
     DivideCore u, v, Quotient, Remainder, IncludeRemainder
 End Sub
 
+''
+' This is an implementation of Knuth's algorithm.
+'
+' As simple as division would seem to be in the real world, implementing it at such
+' a low level has its own sets of problems. After careful study of Knuth's algorithm
+' I finally came up with the following implmentation. The steps in the book are
+' marked inline with the code as close as possible.
+'
+' Ref: The Art of Computer Programming 4.3.1.D
+'
 Private Sub DivideCore(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotient As BigNumber, ByRef Remainder As BigNumber, ByVal IncludeRemainder As Boolean)
     Quotient.Sign = 1
     

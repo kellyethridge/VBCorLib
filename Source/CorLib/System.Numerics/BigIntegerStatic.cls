@@ -365,7 +365,7 @@ Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger
 End Function
 
 ''
-' Returns the modulus (remainder) of division between two BigInteger values.
+' Returns the remainder of division between two BigInteger values.
 '
 ' @param dividend The value to be divided.
 ' @param divisor The value to divide by.
@@ -374,12 +374,12 @@ End Function
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = BInt(100)
-' Set b = BigInteger.Modulus(b, BInt(40))
+' Set b = BigInteger.Remainder(b, BInt(40))
 ' Debug.Print b.ToString '' 20
 ' </pre>
-Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
+Public Function Remainder(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
     Set Dividend = ValueOrZero(Dividend)
-    Set Modulus = Dividend.Modulus(Divisor)
+    Set Remainder = Dividend.Remainder(Divisor)
 End Function
 
 ''
@@ -404,7 +404,7 @@ Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteg
     
     Dim R As BigInteger
     Do While Not y.IsZero
-        Set R = x.Modulus(y)
+        Set R = x.Remainder(y)
         Set x = y
         Set y = R
     Loop
