@@ -967,16 +967,6 @@ Friend Sub InternalInit(ByRef Bytes() As Integer)
     Normalize
 End Sub
 
-Friend Sub InternalInitNumber(ByRef n As BigNumber)
-    CopyMemory mNumber, n, LenB(n)
-    ZeroMemory n, LenB(n)
-End Sub
-
-Friend Sub InternalInitNumber2(ByRef n As BigNumber)
-    CopyMemory mNumber, n, LenB(n)
-    ZeroMemory n, LenB(n)
-End Sub
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers

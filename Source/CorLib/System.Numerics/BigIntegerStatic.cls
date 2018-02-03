@@ -176,7 +176,7 @@ Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, B
     
     If TryParseEx Then
         Set OutResult = New BigInteger
-        OutResult.InternalInitNumber Result
+        OutResult.InitBigNumber Result
     End If
 End Function
 
