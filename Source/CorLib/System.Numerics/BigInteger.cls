@@ -683,8 +683,19 @@ End Function
 ' @param Value The value to perform the bitwise AND with.
 ' @return A new BigInteger value containing the performed bitwise AND result.
 '
-Public Function AndBits(ByVal Value As BigInteger) As BigInteger
-    Set AndBits = BigInteger.AndBits(Me, Value)
+Public Function BitwiseAnd(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    
+    If IsZero Or Value.IsZero Then
+        Set BitwiseAnd = BigInteger.Zero
+    Else
+        Set BitwiseAnd = Value.AndWith(mNumber)
+    End If
+End Function
+
+Friend Function AndWith(ByRef Left As BigNumber) As BigInteger
+    Set AndWith = New BigInteger
+    AndWith.InitBitwiseAnd Left, mNumber
 End Function
 
 ''
@@ -918,6 +929,10 @@ End Sub
 
 Friend Sub InitRemainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
     BigNumberMath.Remainder Dividend, Divisor, mNumber
+End Sub
+
+Friend Sub InitBitwiseAnd(ByRef Left As BigNumber, ByRef Right As BigNumber)
+    BigNumberMath.BitwiseAnd Left, Right, mNumber
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)

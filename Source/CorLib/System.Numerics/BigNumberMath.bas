@@ -594,7 +594,44 @@ Private Sub DivideCore(ByRef u As BigNumber, ByRef v As BigNumber, ByRef Quotien
     ' ** D8 End **
 End Sub
 
-Private Sub Normalize(ByRef Number As BigNumber)
+Public Sub BitwiseAnd(ByRef Left As BigNumber, ByRef Right As BigNumber, ByRef Result As BigNumber)
+    If Left.Precision >= Right.Precision Then
+        BitwiseAndCore Right, Left, Result
+    Else
+        BitwiseAndCore Left, Right, Result
+    End If
+End Sub
+
+Private Sub BitwiseAndCore(ByRef ShortNumber As BigNumber, ByRef LongNumber As BigNumber, ByRef Result As BigNumber)
+    Dim ExtDigit    As Integer
+        
+    If ShortNumber.Sign = -1 Then
+        ExtDigit = &HFFFF
+        Result.Precision = LongNumber.Precision
+    Else
+        Result.Precision = ShortNumber.Precision
+    End If
+    
+    ReDim Result.Digits(0 To Result.Precision)
+    
+    Dim i As Long
+    For i = 0 To ShortNumber.Precision - 1
+        Result.Digits(i) = LongNumber.Digits(i) And ShortNumber.Digits(i)
+    Next i
+            
+    For i = ShortNumber.Precision To Result.Precision - 1
+        Result.Digits(i) = LongNumber.Digits(i) And ExtDigit
+    Next i
+    
+    If LongNumber.Sign = -1 Then
+        Result.Digits(Result.Precision) = &HFFFF And ExtDigit
+        Result.Precision = Result.Precision + 1
+    End If
+    
+    Normalize Result
+End Sub
+
+Public Sub Normalize(ByRef Number As BigNumber)
     Dim Max As Long
     Dim i   As Long
     

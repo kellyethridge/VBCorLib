@@ -476,57 +476,14 @@ End Function
 ''
 ' Peforms a bitwise AND operation, returning the result.
 '
-' @param x The left hand value of the AND operation.
-' @param y The right hand value of the AND operation.
+' @param Left The left hand value of the AND operation.
+' @param Right The right hand value of the AND operation.
 ' @return A new BigInteger value containing the performed bitwise AND result.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function AndBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
-    
-    If x.Sign = Sign.Zero Or y.Sign = Sign.Zero Then
-        Set AndBits = mZero
-        Exit Function
-    End If
-    
-    Dim ExtDigit    As Integer
-    Dim Number()    As Integer
-    Dim LongNumber  As BigNumber
-    Dim ShortNumber As BigNumber
-    
-    If x.Precision >= y.Precision Then
-        x.AttachNumber LongNumber
-        y.AttachNumber ShortNumber
-    Else
-        x.AttachNumber ShortNumber
-        y.AttachNumber LongNumber
-    End If
-    
-    If ShortNumber.Sign = Sign.Negative Then
-        ExtDigit = &HFFFF
-    End If
-    
-    ReDim Number(0 To LongNumber.Precision)
-    
-    Dim i As Long
-    For i = 0 To ShortNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) And ShortNumber.Digits(i)
-    Next i
-    
-    For i = ShortNumber.Precision To LongNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) And ExtDigit
-    Next i
-    
-    If LongNumber.Sign = Negative Then
-        Number(LongNumber.Precision) = &HFFFF And ExtDigit
-    End If
-    
-    x.DetachNumber LongNumber
-    y.DetachNumber ShortNumber
-    
-    Set AndBits = New BigInteger
-    AndBits.InternalInit Number
+Public Function BitwiseAnd(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseAnd = Left.BitwiseAnd(Right)
 End Function
 
 ''
@@ -667,7 +624,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function AndNotBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set AndNotBits = AndBits(x, NotBits(y))
+    Set AndNotBits = BitwiseAnd(x, NotBits(y))
 End Function
 
 ''

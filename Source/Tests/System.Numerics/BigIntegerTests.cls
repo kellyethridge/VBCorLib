@@ -355,7 +355,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1, 15, NewBytes(&HFF, &H7F, &HFF), -1
             Test.Use -1, 16, NewBytes(&HFF, &HFF, &HFE), -1
             
-        Case "AndBits_WithValue_ReturnsAndedValue"
+        Case "BitwiseAnd_WithValue_ReturnsAndedValue"
             Test.Use 0, 0, 0
             Test.Use &HFF00, &HFF, 0
             Test.Use &HFF, &HFF00, 0
@@ -364,6 +364,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &H1FFFF, &HFFFF0000, &H10000
             Test.Use &HFFFF0000, &HFFFF, &HFFFF0000
             Test.Use &HFFFF, &HFFFF0000, &HFFFF0000
+            Test.Use "72057594037927935", &HFF, &HFF
             
         Case "AndNotBits_WithValue_ReturnsAndNottedValue"
             Test.Use 0, 0, 0
@@ -775,10 +776,10 @@ Public Sub ClearBit_WithValue_ClearsExpectedBit(ByRef Value As Variant, ByVal Bi
     Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign), "Wrong sign"
 End Sub
 
-Public Sub AndBits_WithValue_ReturnsAndedValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
+Public Sub BitwiseAnd_WithValue_ReturnsAndedValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value1).AndBits(BInt(Value2))
+    Set Actual = BInt(Value1).BitwiseAnd(BInt(Value2))
     
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
