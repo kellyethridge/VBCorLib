@@ -1,3 +1,4 @@
 Source/CorLib/doc
 Binaries
 *.vbw
+/Source/Tests/CorLib.Tests.config
