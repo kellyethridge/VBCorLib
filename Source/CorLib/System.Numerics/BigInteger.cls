@@ -767,8 +767,9 @@ End Function
 ' @param Value The value that will be NOTted to perform the bitwise AND with.
 ' @return A new BigInteger value containing the performed bitwise AND/NOT result.
 '
-Public Function AndNotBits(ByVal Value As BigInteger) As BigInteger
-    Set AndNotBits = BigInteger.AndNotBits(Me, Value)
+Public Function BitwiseAndNot(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set BitwiseAndNot = BitwiseAnd(Value.BitwiseNot)
 End Function
 
 ''

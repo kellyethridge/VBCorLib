@@ -529,8 +529,9 @@ End Function
 ' @return A new BigInteger value containing the performed bitwise result.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function AndNotBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set AndNotBits = BitwiseAnd(x, BitwiseNot(y))
+Public Function BitwiseAndNot(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseAndNot = Left.BitwiseAndNot(Right)
 End Function
 
 ''
