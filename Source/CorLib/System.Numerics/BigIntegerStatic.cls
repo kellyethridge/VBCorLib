@@ -500,60 +500,14 @@ End Function
 ''
 ' Peforms a bitwise XOR operation, returning the result.
 '
-' @param x The left hand value of the XOR operation.
-' @param y The right hand value of the XOR operation.
+' @param Left The left hand value of the XOR operation.
+' @param Right The right hand value of the XOR operation.
 ' @return A new BigInteger value containing the performed bitwise XOR result.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
-    
-    If x.Sign = Sign.Zero Then
-        Set XorBits = y
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set XorBits = x
-        Exit Function
-    End If
-    
-    Dim ExtDigit    As Integer
-    Dim Number()    As Integer
-    Dim LongNumber  As BigNumber
-    Dim ShortNumber As BigNumber
-    
-    If x.Precision >= y.Precision Then
-        x.AttachNumber LongNumber
-        y.AttachNumber ShortNumber
-    Else
-        x.AttachNumber ShortNumber
-        y.AttachNumber LongNumber
-    End If
-    
-    If ShortNumber.Sign = Sign.Negative Then
-        ExtDigit = &HFFFF
-    End If
-    
-    ReDim Number(0 To LongNumber.Precision)
-    
-    Dim i As Long
-    For i = 0 To ShortNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Xor ShortNumber.Digits(i)
-    Next i
-    
-    For i = ShortNumber.Precision To LongNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Xor ExtDigit
-    Next i
-    
-    If LongNumber.Sign = Negative Then
-        Number(LongNumber.Precision) = &HFFFF Xor ExtDigit
-    End If
-    
-    x.DetachNumber LongNumber
-    y.DetachNumber ShortNumber
-    
-    Set XorBits = New BigInteger
-    XorBits.InternalInit Number
+Public Function BitwiseXor(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseXor = Left.BitwiseXor(Right)
 End Function
 
 ''

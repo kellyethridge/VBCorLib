@@ -385,7 +385,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HFFFF&, &HFFFF, -1
             Test.Use &HFFFF, &HFFFF&, -1
             
-        Case "XorBits_WithValue_ReturnsXoredValue"
+        Case "BitwiseXor_WithValue_ReturnsXoredValue"
             Test.Use 0, 0, 0
             Test.Use 0, &HFFFF, &HFFFF
             Test.Use &HFFFF, 0, &HFFFF
@@ -806,10 +806,10 @@ Public Sub BitwiseOr_WithValue_ReturnsOredValue(ByRef Value1 As Variant, ByRef V
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
 
-Public Sub XorBits_WithValue_ReturnsXoredValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
+Public Sub BitwiseXor_WithValue_ReturnsXoredValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value1).XorBits(BInt(Value2))
+    Set Actual = BInt(Value1).BitwiseXor(BInt(Value2))
     
     Assert.That Actual, Equals(BInt(Expected))
 End Sub

@@ -727,8 +727,21 @@ End Function
 ' @param Value The value to perform the bitwise XOR with.
 ' @return A new BigInteger value containing the performed bitwise XOR result.
 '
-Public Function XorBits(ByVal Value As BigInteger) As BigInteger
-    Set XorBits = BigInteger.XorBits(Me, Value)
+Public Function BitwiseXor(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    
+    If IsZero Then
+        Set BitwiseXor = Value
+    ElseIf Value.IsZero Then
+        Set BitwiseXor = Me
+    Else
+        Set BitwiseXor = Value.BitwiseXorWith(mNumber)
+    End If
+End Function
+
+Friend Function BitwiseXorWith(ByRef Left As BigNumber) As BigInteger
+    Set BitwiseXorWith = New BigInteger
+    BitwiseXorWith.InitBitwiseXor Left, mNumber
 End Function
 
 ''
@@ -950,6 +963,10 @@ End Sub
 
 Friend Sub InitBitwiseOr(ByRef Left As BigNumber, ByRef Right As BigNumber)
     BigNumberMath.BitwiseOr Left, Right, mNumber
+End Sub
+
+Friend Sub InitBitwiseXor(ByRef Left As BigNumber, ByRef Right As BigNumber)
+    BigNumberMath.BitwiseXor Left, Right, mNumber
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)
