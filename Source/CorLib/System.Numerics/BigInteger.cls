@@ -505,18 +505,18 @@ End Function
 ' Set b = b.Modulus(BInt(40))
 ' Debug.Print b.ToString '' 20
 ' </pre>
-Public Function Remainder(ByVal Divisor As BigInteger) As BigInteger
+Public Function Modulus(ByVal Divisor As BigInteger) As BigInteger
     Set Divisor = ValueOrZero(Divisor)
     
     If Divisor.IsZero Then _
         Throw New DivideByZeroException
     
-    Set Remainder = Divisor.RemainderOf(mNumber)
+    Set Modulus = Divisor.ModulusOf(mNumber)
 End Function
 
-Friend Function RemainderOf(ByRef Dividend As BigNumber) As BigInteger
-    Set RemainderOf = New BigInteger
-    RemainderOf.InitRemainder Dividend, mNumber
+Friend Function ModulusOf(ByRef Dividend As BigNumber) As BigInteger
+    Set ModulusOf = New BigInteger
+    ModulusOf.InitModulus Dividend, mNumber
 End Function
 
 ''
@@ -953,7 +953,7 @@ Friend Sub InitDivRemainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNum
     BigNumberMath.DivRem Dividend, Divisor, Quotient, mNumber
 End Sub
 
-Friend Sub InitRemainder(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
+Friend Sub InitModulus(ByRef Dividend As BigNumber, ByRef Divisor As BigNumber)
     BigNumberMath.Remainder Dividend, Divisor, mNumber
 End Sub
 

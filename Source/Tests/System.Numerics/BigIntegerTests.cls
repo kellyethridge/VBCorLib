@@ -279,7 +279,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 12, -5, -2, -2
             Test.Use "12345678901234567890", "123456789012345", "100000", "67890"
         
-        Case "Remainder_WithValues_ReturnsExpected"
+        Case "Modulus_WithValues_ReturnsExpected"
             Test.Use 10, 5, 0
             Test.Use 10, 3, 1
             Test.Use 0, 2, 0
@@ -960,7 +960,7 @@ Public Sub DivRem_WithDivisorOfZero_ThrowsDivideByZeroException()
     AssertDivideByZeroException Err
 End Sub
 
-Public Sub Remainder_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedValue As Variant)
+Public Sub Modulus_WithValues_ReturnsExpected(ByRef DividendValue As Variant, ByRef DivisorValue As Variant, ByRef ExpectedValue As Variant)
     Dim Dividend As BigInteger
     Dim Divisor As BigInteger
     Dim Actual As BigInteger
@@ -968,7 +968,7 @@ Public Sub Remainder_WithValues_ReturnsExpected(ByRef DividendValue As Variant, 
     Set Dividend = BInt(DividendValue)
     Set Divisor = BInt(DivisorValue)
     
-    Set Actual = Dividend.Remainder(Divisor)
+    Set Actual = Dividend.Modulus(Divisor)
     
     Assert.That Actual, Equals(BInt(ExpectedValue))
 End Sub

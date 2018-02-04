@@ -377,9 +377,9 @@ End Function
 ' Set b = BigInteger.Remainder(b, BInt(40))
 ' Debug.Print b.ToString '' 20
 ' </pre>
-Public Function Remainder(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
+Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
     Set Dividend = ValueOrZero(Dividend)
-    Set Remainder = Dividend.Remainder(Divisor)
+    Set Modulus = Dividend.Modulus(Divisor)
 End Function
 
 ''
@@ -404,7 +404,7 @@ Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteg
     
     Dim R As BigInteger
     Do While Not y.IsZero
-        Set R = x.Remainder(y)
+        Set R = x.Modulus(y)
         Set x = y
         Set y = R
     Loop
