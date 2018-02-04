@@ -693,6 +693,26 @@ Private Sub BitwiseXorCore(ByRef ShortNumber As BigNumber, ByRef LongNumber As B
     Normalize Result
 End Sub
 
+Public Sub BitwiseNot(ByRef Value As BigNumber, ByRef Result As BigNumber)
+    If Value.Sign = 1 Then
+        ReDim Result.Digits(0 To Value.Precision)
+        Result.Digits(Value.Precision) = &HFFFF
+        Result.Precision = Value.Precision + 1
+        Result.Sign = -1
+    Else
+        ReDim Result.Digits(0 To Value.Precision - 1)
+        Result.Precision = Value.Precision
+        Result.Sign = 1
+    End If
+    
+    Dim i As Long
+    For i = 0 To Value.Precision - 1
+        Result.Digits(i) = Not Value.Digits(i)
+    Next i
+    
+    Normalize Result
+End Sub
+
 Public Sub Normalize(ByRef Number As BigNumber)
     Dim Max As Long
     Dim i   As Long

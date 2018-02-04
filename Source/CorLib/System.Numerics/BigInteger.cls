@@ -750,17 +750,15 @@ End Function
 ' @param Value The value to perform the bitwise NOT with.
 ' @return A new BigInteger value containing the performed bitwise NOT result.
 '
-Public Function NotBits() As BigInteger
+Public Function BitwiseNot() As BigInteger
     If IsZero Then
-        Set NotBits = BigInteger.MinusOne
-        Exit Function
+        Set BitwiseNot = BigInteger.MinusOne
     ElseIf IsMinusOne Then
-        Set NotBits = BigInteger.Zero
-        Exit Function
+        Set BitwiseNot = BigInteger.Zero
+    Else
+        Set BitwiseNot = New BigInteger
+        BitwiseNot.InitBitwiseNot mNumber
     End If
-    
-    Set NotBits = New BigInteger
-    NotBits.InitNotBits mNumber
 End Function
 
 ''
@@ -974,24 +972,8 @@ Friend Sub InitBigNumber(ByRef n As BigNumber)
     ZeroMemory n, LenB(n)
 End Sub
 
-Friend Sub InitNotBits(ByRef Other As BigNumber)
-    ReDim mNumber.Digits(0 To Other.Precision) ' keep one extra digit incase we need to add leading negative FFFF.
-    mNumber.Precision = Other.Precision
-    mNumber.Sign = -Other.Sign
-    
-    Dim i As Long
-    For i = 0 To mNumber.Precision - 1
-        mNumber.Digits(i) = Not Other.Digits(i)
-    Next i
-    
-    If mNumber.Sign = -1 Then
-        If (mNumber.Digits(mNumber.Precision - 1) And &H8000) = 0 Then
-            mNumber.Digits(mNumber.Precision) = &HFFFF
-            mNumber.Precision = mNumber.Precision + 1
-        End If
-    Else
-        TrimLeadingZeros
-    End If
+Friend Sub InitBitwiseNot(ByRef Value As BigNumber)
+    BigNumberMath.BitwiseNot Value, mNumber
 End Sub
 
 Friend Sub InitShiftLeft(ByRef Other As BigNumber, ByVal ShiftCount As Long)
@@ -1030,7 +1012,7 @@ End Function
 
 Private Sub InitFromLong(ByVal Value As Long)
     Dim IsSingleDigit As Boolean
-    
+
     If Value < 0 Then
         mNumber.Sign = -1
         IsSingleDigit = (Value And &HFFFF8000) = &H8000
@@ -1040,7 +1022,7 @@ Private Sub InitFromLong(ByVal Value As Long)
     Else
         Exit Sub
     End If
-    
+
     If IsSingleDigit Then
         ReDim mNumber.Digits(0 To 0)
         mNumber.Digits(0) = AsWord(Value)

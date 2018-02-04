@@ -516,9 +516,9 @@ End Function
 ' @param Value The BigInteger to perform the NOT operation on.
 ' @return A new BigInteger value containing the performed bitwise NOT result.
 ' <p>Values of Nothing will be treated as zero.</p>
-Public Function NotBits(ByVal Value As BigInteger) As BigInteger
+Public Function BitwiseNot(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
-    Set NotBits = Value.NotBits
+    Set BitwiseNot = Value.BitwiseNot
 End Function
 
 ''
@@ -530,7 +530,7 @@ End Function
 ' <p>Values of Nothing will be treated as zero.</p>
 '
 Public Function AndNotBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set AndNotBits = BitwiseAnd(x, NotBits(y))
+    Set AndNotBits = BitwiseAnd(x, BitwiseNot(y))
 End Function
 
 ''

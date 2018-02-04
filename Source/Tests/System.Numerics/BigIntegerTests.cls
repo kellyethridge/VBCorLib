@@ -397,12 +397,17 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &H7FFF, &HFFFF0000, &HFFFF7FFF
             Test.Use &HFFFF, &HFFFF8000, &H7FFF
             
-        Case "NotBits_WhenCalled_ReturnsExpected"
+        Case "BitwiseNote_WhenCalled_ReturnsExpected"
             Test.Use 0, -1
             Test.Use -1, 0
             Test.Use 1, -2
             Test.Use &HFFFF0000, 65535
             Test.Use &HFFFF&, -65536
+            Test.Use &HFF00, &HFF
+            Test.Use &HFF, &HFF00
+            Test.Use -255, 254
+            Test.Use 254, -255
+            Test.Use &H7FFFFFFF, &H80000000
                        
         Case "Equals_WithValues_ReturnsExpected"
             Test.Use 0, 0, True
@@ -814,10 +819,10 @@ Public Sub BitwiseXor_WithValue_ReturnsXoredValue(ByRef Value1 As Variant, ByRef
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
 
-Public Sub NotBits_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
+Public Sub BitwiseNote_WhenCalled_ReturnsExpected(ByRef Value As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value).NotBits
+    Set Actual = BInt(Value).BitwiseNot
     
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
