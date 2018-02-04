@@ -631,6 +631,35 @@ Private Sub BitwiseAndCore(ByRef ShortNumber As BigNumber, ByRef LongNumber As B
     Normalize Result
 End Sub
 
+Public Sub BitwiseOr(ByRef Left As BigNumber, ByRef Right As BigNumber, ByRef Result As BigNumber)
+    If Left.Precision >= Right.Precision Then
+        BitwiseOrCore Right, Left, Result
+    Else
+        BitwiseOrCore Left, Right, Result
+    End If
+End Sub
+
+Private Sub BitwiseOrCore(ByRef ShortNumber As BigNumber, ByRef LongNumber As BigNumber, ByRef Result As BigNumber)
+    Dim ExtDigit    As Integer
+    
+    If ShortNumber.Sign = -1 Then
+        ExtDigit = &HFFFF
+    End If
+    
+    ReDim Result.Digits(0 To LongNumber.Precision - 1)
+    
+    Dim i As Long
+    For i = 0 To ShortNumber.Precision - 1
+        Result.Digits(i) = LongNumber.Digits(i) Or ShortNumber.Digits(i)
+    Next i
+    
+    For i = ShortNumber.Precision To LongNumber.Precision - 1
+        Result.Digits(i) = LongNumber.Digits(i) Or ExtDigit
+    Next i
+    
+    Normalize Result
+End Sub
+
 Public Sub Normalize(ByRef Number As BigNumber)
     Dim Max As Long
     Dim i   As Long

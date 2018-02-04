@@ -689,13 +689,13 @@ Public Function BitwiseAnd(ByVal Value As BigInteger) As BigInteger
     If IsZero Or Value.IsZero Then
         Set BitwiseAnd = BigInteger.Zero
     Else
-        Set BitwiseAnd = Value.AndWith(mNumber)
+        Set BitwiseAnd = Value.BitwiseAndWith(mNumber)
     End If
 End Function
 
-Friend Function AndWith(ByRef Left As BigNumber) As BigInteger
-    Set AndWith = New BigInteger
-    AndWith.InitBitwiseAnd Left, mNumber
+Friend Function BitwiseAndWith(ByRef Left As BigNumber) As BigInteger
+    Set BitwiseAndWith = New BigInteger
+    BitwiseAndWith.InitBitwiseAnd Left, mNumber
 End Function
 
 ''
@@ -704,8 +704,21 @@ End Function
 ' @param Value The value to perform the bitwise OR with.
 ' @return A new BigInteger value containing the performed bitwise OR result.
 '
-Public Function OrBits(ByVal Value As BigInteger) As BigInteger
-    Set OrBits = BigInteger.OrBits(Me, Value)
+Public Function BitwiseOr(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    
+    If IsZero Then
+        Set BitwiseOr = Value
+    ElseIf Value.IsZero Then
+        Set BitwiseOr = Me
+    Else
+        Set BitwiseOr = Value.BitwiseOrWith(mNumber)
+    End If
+End Function
+
+Friend Function BitwiseOrWith(ByRef Left As BigNumber) As BigInteger
+    Set BitwiseOrWith = New BigInteger
+    BitwiseOrWith.InitBitwiseOr Left, mNumber
 End Function
 
 ''
@@ -933,6 +946,10 @@ End Sub
 
 Friend Sub InitBitwiseAnd(ByRef Left As BigNumber, ByRef Right As BigNumber)
     BigNumberMath.BitwiseAnd Left, Right, mNumber
+End Sub
+
+Friend Sub InitBitwiseOr(ByRef Left As BigNumber, ByRef Right As BigNumber)
+    BigNumberMath.BitwiseOr Left, Right, mNumber
 End Sub
 
 Friend Sub InitBigNumber(ByRef n As BigNumber)

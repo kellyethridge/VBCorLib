@@ -480,7 +480,6 @@ End Function
 ' @param Right The right hand value of the AND operation.
 ' @return A new BigInteger value containing the performed bitwise AND result.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
 Public Function BitwiseAnd(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
     Set BitwiseAnd = Left.BitwiseAnd(Right)
@@ -489,60 +488,13 @@ End Function
 ''
 ' Peforms a bitwise OR operation, returning the result.
 '
-' @param x The left hand value of the OR operation.
-' @param y The right hand value of the OR operation.
+' @param Left The left hand value of the OR operation.
+' @param Right The right hand value of the OR operation.
 ' @return A new BigInteger value containing the performed bitwise OR result.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function OrBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
-    
-    If x.Sign = Sign.Zero Then
-        Set OrBits = y
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set OrBits = x
-        Exit Function
-    End If
-    
-    Dim ExtDigit    As Integer
-    Dim Number()    As Integer
-    Dim LongNumber  As BigNumber
-    Dim ShortNumber As BigNumber
-    
-    If x.Precision >= y.Precision Then
-        x.AttachNumber LongNumber
-        y.AttachNumber ShortNumber
-    Else
-        x.AttachNumber ShortNumber
-        y.AttachNumber LongNumber
-    End If
-    
-    If ShortNumber.Sign = Sign.Negative Then
-        ExtDigit = &HFFFF
-    End If
-    
-    ReDim Number(0 To LongNumber.Precision)
-    
-    Dim i As Long
-    For i = 0 To ShortNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Or ShortNumber.Digits(i)
-    Next i
-    
-    For i = ShortNumber.Precision To LongNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Or ExtDigit
-    Next i
-    
-    If LongNumber.Sign = Negative Then
-        Number(LongNumber.Precision) = &HFFFF Or ExtDigit
-    End If
-    
-    x.DetachNumber LongNumber
-    y.DetachNumber ShortNumber
-    
-    Set OrBits = New BigInteger
-    OrBits.InternalInit Number
+Public Function BitwiseOr(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseOr = Left.BitwiseOr(Right)
 End Function
 
 ''

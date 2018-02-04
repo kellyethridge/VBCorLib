@@ -372,13 +372,19 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HFFFF, &HFFFF, 0
             Test.Use &HFFFF, 0, &HFFFF
         
-        Case "OrBits_WithValue_ReturnsOredValue"
+        Case "BitwiseOr_WithValue_ReturnsOredValue"
             Test.Use 0, 0, 0
             Test.Use &HFF00, &HFF, &HFFFF
             Test.Use &HFF, &HFF00, &HFFFF
             Test.Use &H80000000, &H1, &H80000001
             Test.Use &H1, &H80000000, &H80000001
-        
+            Test.Use &HFFFF0000, &HFFFF, -1
+            Test.Use &HFFFF, &HFFFF0000, -1
+            Test.Use &HFF0000, &HFFFF, -1
+            Test.Use &HFFFF, &HFF0000, -1
+            Test.Use &HFFFF&, &HFFFF, -1
+            Test.Use &HFFFF, &HFFFF&, -1
+            
         Case "XorBits_WithValue_ReturnsXoredValue"
             Test.Use 0, 0, 0
             Test.Use 0, &HFFFF, &HFFFF
@@ -792,10 +798,10 @@ Public Sub AndNotBits_WithValue_ReturnsAndNottedValue(ByRef Value1 As Variant, B
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
 
-Public Sub OrBits_WithValue_ReturnsOredValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
+Public Sub BitwiseOr_WithValue_ReturnsOredValue(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value1).OrBits(BInt(Value2))
+    Set Actual = BInt(Value1).BitwiseOr(BInt(Value2))
     
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
