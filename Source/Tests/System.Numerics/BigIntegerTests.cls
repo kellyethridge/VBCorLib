@@ -431,6 +431,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Nothing, 0, True
             Test.Use Nothing, Nothing, True
             
+        Case "IsEven_WithValue_ReturnsExpected"
+            Test.Use 0, True
+            Test.Use 1, False
+            Test.Use -1, False
+            Test.Use 2, True
+            Test.Use -2, True
+            
     End Select
 End Sub
 
@@ -976,4 +983,12 @@ Public Sub Modulus_WithValues_ReturnsExpected(ByRef DividendValue As Variant, By
     Set Actual = Dividend.Modulus(Divisor)
     
     Assert.That Actual, Equals(BInt(ExpectedValue))
+End Sub
+
+Public Sub IsEven_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = BInt(Value).IsEven
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

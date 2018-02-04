@@ -85,8 +85,24 @@ End Property
 '
 ' @return <b>True</b> if the value is one, otherwise <b>False</b>.
 Public Property Get IsOne() As Boolean
-    If mNumber.Sign = Positive And mNumber.Precision = 1 Then
+    If mNumber.Sign = 1 And mNumber.Precision = 1 Then
         IsOne = mNumber.Digits(0) = 1
+    End If
+End Property
+
+''
+' Returns if the value is an even number.
+'
+' @return <b>True</b> if the value is even, otherwise <b>False</b>.
+' @remarks This is equivalent to the expression:
+' <pre>
+' value.Modulus(2) = 0
+' </pre>
+Public Property Get IsEven() As Boolean
+    If mNumber.Sign = 0 Then
+        IsEven = True
+    Else
+        IsEven = (mNumber.Digits(0) And &H1) = 0
     End If
 End Property
 
