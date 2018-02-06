@@ -713,6 +713,28 @@ Public Sub BitwiseNot(ByRef Value As BigNumber, ByRef Result As BigNumber)
     Normalize Result
 End Sub
 
+Public Sub Rnd(ByVal Size As Long, ByVal IsNegative As Boolean, ByRef Result As BigNumber)
+    Dim WordCount As Long
+    
+    WordCount = Size \ 2
+    ReDim Result.Digits(0 To WordCount)
+    Result.Precision = WordCount
+    Result.Sign = 1
+    
+    Dim i As Long
+    For i = 0 To WordCount - 1
+        Result.Digits(i) = Int(VBA.Rnd * 65536) - 32768
+    Next i
+    
+    If Size And 1 Then
+        Result.Digits(WordCount) = VBA.Rnd * 256
+    End If
+    
+    If IsNegative Then
+        NegateInPlace Result
+    End If
+End Sub
+
 Public Sub Normalize(ByRef Number As BigNumber)
     Dim Max As Long
     Dim i   As Long

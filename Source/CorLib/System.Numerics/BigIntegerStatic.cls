@@ -662,30 +662,10 @@ Public Function Rnd(ByVal Size As Long, Optional ByVal IsNegative As Boolean = F
     
     If Size = 0 Then
         Set Rnd = mZero
-        Exit Function
+    Else
+        Set Rnd = New BigInteger
+        Rnd.InitRnd Size, IsNegative
     End If
-    
-    Dim WordCount As Long
-    WordCount = Size \ 2
-    
-    Dim Ints() As Integer
-    ReDim Ints(0 To WordCount)
-    
-    Dim i As Long
-    For i = 0 To WordCount - 1
-        Ints(i) = Int(VBA.Rnd * 65536) - 32768
-    Next i
-    
-    If Size And 1 Then
-        Ints(WordCount) = VBA.Rnd * &H100
-    End If
-    
-    If IsNegative Then
-        ApplyTwosComplement Ints
-    End If
-    
-    Set Rnd = New BigInteger
-    Rnd.InternalInit Ints
 End Function
 
 ''

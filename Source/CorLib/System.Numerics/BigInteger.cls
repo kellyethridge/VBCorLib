@@ -984,6 +984,10 @@ Friend Sub InitBitwiseXor(ByRef Left As BigNumber, ByRef Right As BigNumber)
     BigNumberMath.BitwiseXor Left, Right, mNumber
 End Sub
 
+Friend Sub InitRnd(ByVal Size As Long, ByVal IsNegative As Boolean)
+    BigNumberMath.Rnd Size, IsNegative, mNumber
+End Sub
+
 Friend Sub InitBigNumber(ByRef n As BigNumber)
     CopyMemory mNumber, n, LenB(n)
     ZeroMemory n, LenB(n)
@@ -1007,12 +1011,6 @@ Friend Sub InitShiftRight(ByRef Other As BigNumber, ByVal ShiftCount As Long)
     mNumber.Digits = ShiftRightNumber(Other.Digits, ShiftCount)
     mNumber.Precision = UBound(mNumber.Digits) + 1
     TrimLeadingPadding
-End Sub
-
-Friend Sub InternalInit(ByRef Bytes() As Integer)
-    SAPtr(mNumber.Digits) = SAPtr(Bytes)
-    SAPtr(Bytes) = vbNullPtr
-    Normalize
 End Sub
 
 

@@ -94,7 +94,7 @@ End Sub
 ' @remarks The number will be equal to or greater than 0.0 and less than 1.0.
 ' The number will never equal 1.0.
 Public Function NextDouble() As Double
-    NextDouble = Rnd
+    NextDouble = VBA.Rnd
 End Function
 
 ''
@@ -131,8 +131,8 @@ Private Sub Class_Initialize()
     InitRandom
 End Sub
 
-Friend Sub Init(ByVal Seed As Long)
-    Rnd Seed
+Friend Sub Init(ByVal seed As Long)
+    VBA.Rnd seed
 End Sub
 
 
@@ -140,7 +140,7 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function NextNumber(ByVal MinValue As Long, ByVal MaxValue As Long) As Long
-    NextNumber = Int(Rnd * (MaxValue - MinValue)) + MinValue
+    NextNumber = Int(VBA.Rnd * (MaxValue - MinValue)) + MinValue
 End Function
 
 
@@ -151,8 +151,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
