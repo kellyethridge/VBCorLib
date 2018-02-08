@@ -438,6 +438,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 2, True
             Test.Use -2, True
             
+        Case "GreatestCommonDivisor_WithValues_ReturnsExpected"
+            Test.Use 10, 5, 5
+            Test.Use 5, 10, 5
+            Test.Use -10, 5, 5
+            Test.Use -10, -5, 5
+            Test.Use 10, 3, 1
+            Test.Use 0, 5, 5
+            Test.Use 5, 0, 5
+            Test.Use 0, 0, 0
+            
     End Select
 End Sub
 
@@ -991,4 +1001,12 @@ Public Sub IsEven_WithValue_ReturnsExpected(ByRef Value As Variant, ByVal Expect
     Actual = BInt(Value).IsEven
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub GreatestCommonDivisor_WithValues_ReturnsExpected(ByRef Left As Variant, ByRef Right As Variant, ByRef Expected As Variant)
+    Dim Actual As BigInteger
+    
+    Set Actual = BigInteger.GreatestCommonDivisor(BInt(Left), BInt(Right))
+    
+    Assert.That Actual, Equals(BInt(Expected))
 End Sub

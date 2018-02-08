@@ -282,16 +282,16 @@ End Function
 ' Set b = BigInteger.Add(BInt(100), BInt(150))
 ' Debug.Print b.ToString '' 250
 ' </pre>
-Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set x = ValueOrZero(x)
-    Set Add = x.Add(y)
+Public Function Add(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Add = Left.Add(Right)
 End Function
 
 ''
 ' Subtracts one BigInteger value from another, returning the difference.
 '
-' @param x The minuend value to be subracted from.
-' @param y The subtrahend value to subtract from the minuend value.
+' @param Left The minuend value to be subracted from.
+' @param Right The subtrahend value to subtract from the minuend value.
 ' @return The difference of the two values.
 ' @remarks Values of Nothing will be treated as zero.
 ' <pre>
@@ -299,16 +299,16 @@ End Function
 ' Set b = BigInteger.Subtract(BInt(100), BInt(150))
 ' Debug.Print b.ToString '' -50
 ' </pre>
-Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set x = ValueOrZero(x)
-    Set Subtract = x.Subtract(y)
+Public Function Subtract(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Subtract = Left.Subtract(Right)
 End Function
 
 ''
 ' Multiplies BigInteger values, returning their product.
 '
-' @param x The multiplicand to be multiplied.
-' @param y The multiplier to multiply by.
+' @param Left The multiplicand to be multiplied.
+' @param Right The multiplier to multiply by.
 ' @return The product of the two values.
 ' @remarks Values of Nothing will be treated as zero.
 ' <pre>
@@ -317,9 +317,9 @@ End Function
 ' Debug.Print b.ToString '' 15000
 ' </pre>
 '
-Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set x = ValueOrZero(x)
-    Set Multiply = x.Multiply(y)
+Public Function Multiply(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Multiply = Left.Multiply(Right)
 End Function
 
 
@@ -385,31 +385,30 @@ End Function
 ''
 ' Returns the greatest common divisor between the two BigInteger values.
 '
-' @param x One of the values to find the GCD of.
-' @param y One of the values to find the GCD of.
+' @param Left One of the values to find the GCD of.
+' @param Right One of the values to find the GCD of.
 ' @return Returns the GCD for two given values.
 ' @remarks Values of Nothing will be treated as zero.
 '
-Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set x = ValueOrZero(x)
-    Set y = ValueOrZero(y)
+Public Function GreatestCommonDivisor(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Right = ValueOrZero(Right)
     
-    If x.IsZero And y.IsZero Then
-        Set GreatestCommonDivisor = mZero
-        Exit Function
+    If Left.IsZero And Right.IsZero Then
+        Set GreatestCommonDivisor = BigInteger.Zero
+    Else
+        Set Left = Left.Absolute
+        Set Right = Right.Absolute
+    
+        Dim Result As BigInteger
+        Do While Not Right.IsZero
+            Set Result = Left.Modulus(Right)
+            Set Left = Right
+            Set Right = Result
+        Loop
+    
+        Set GreatestCommonDivisor = Left
     End If
-    
-    Set x = x.Absolute
-    Set y = y.Absolute
-    
-    Dim R As BigInteger
-    Do While Not y.IsZero
-        Set R = x.Modulus(y)
-        Set x = y
-        Set y = R
-    Loop
-
-    Set GreatestCommonDivisor = x
 End Function
 
 ''
