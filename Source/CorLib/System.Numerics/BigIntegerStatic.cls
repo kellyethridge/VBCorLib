@@ -536,42 +536,44 @@ End Function
 ''
 ' Raise a base value to the specified power.
 '
-' @param baseValue The value to be raised to a specified power.
-' @param exponent The power to raise the value to.
+' @param Value The value to be raised to a specified power.
+' @param Exponent The power to raise the value to.
 ' @return Returns the baseValue^exponent result.
 ' @remarks Values of Nothing are treated as zero.
 '
-Public Function Pow(ByVal BaseValue As BigInteger, ByVal Exponent As BigInteger) As BigInteger
-    Set BaseValue = ValueOrZero(BaseValue)
-    Set Exponent = ValueOrZero(Exponent)
-
-    If Exponent.Sign = Sign.Negative Then _
+Public Function Pow(ByVal Value As BigInteger, ByVal Exponent As Long) As BigInteger
+    If Exponent < 0 Then _
         Error.ArgumentOutOfRange "Exponent", ArgumentOutOfRange_NeedNonNegNum
+    
+    Set Value = ValueOrZero(Value)
+    
+    Select Case Exponent
+        Case 0
+            Set Pow = mOne
+        Case 1
+            Set Pow = Value
+        Case Else
+            Set Pow = CalculatePow(Value, Exponent)
+    End Select
+End Function
 
-    If Exponent.Sign = Sign.Zero Then
-        Set Pow = mOne
-        Exit Function
-    ElseIf Exponent.IsOne Then
-        Set Pow = BaseValue
-        Exit Function
-    End If
-
+Private Function CalculatePow(ByVal Value As BigInteger, ByVal Exponent As Long) As BigInteger
     Dim y       As BigInteger
     Dim z       As BigInteger
     Dim IsOdd   As Boolean
     
     Set y = mOne
-    Set z = BaseValue
+    Set z = Value
     
     Do
-        IsOdd = Exponent.TestBit(0)
-        Set Exponent = Exponent.ShiftRight(1)
-
+        IsOdd = Exponent And 1
+        Exponent = Exponent \ vbShift1Bit
+    
         If IsOdd Then
             Set y = Multiply(y, z)
             
-            If Exponent.IsZero Then
-                Set Pow = y
+            If Exponent = 0 Then
+                Set CalculatePow = y
                 Exit Function
             End If
         End If

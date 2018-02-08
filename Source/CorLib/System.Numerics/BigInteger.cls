@@ -794,7 +794,7 @@ End Function
 ' @param Exponent The value to raise the BigInteger value to.
 ' @return Returns the BigInteger value raised to the specified power.
 '
-Public Function Pow(ByVal Exponent As BigInteger) As BigInteger
+Public Function Pow(ByVal Exponent As Long) As BigInteger
     Set Pow = BigInteger.Pow(Me, Exponent)
 End Function
 

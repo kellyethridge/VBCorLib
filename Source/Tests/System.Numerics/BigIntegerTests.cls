@@ -645,7 +645,7 @@ End Sub
 Public Sub Pow_WithValues_ReturnsExpected(ByVal Value As Long, ByVal Exponent As Long, ByRef Expected As Variant)
     Dim Actual As BigInteger
     
-    Set Actual = BInt(Value).Pow(BInt(Exponent))
+    Set Actual = BInt(Value).Pow(Exponent)
     
     Assert.That Actual, Equals(BInt(Expected))
 End Sub
@@ -653,7 +653,7 @@ End Sub
 Public Sub Pow_WithNegativeExponent_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
-    BigInteger.Pow BInt(2), BInt(-2)
+    BigInteger.Pow BInt(2), -2
     
     AssertArgumentOutOfRangeException Err, "Exponent"
 End Sub
