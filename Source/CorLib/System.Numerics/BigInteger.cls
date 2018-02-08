@@ -892,19 +892,6 @@ Public Function Factorial() As BigInteger
     Set Factorial = BigInteger.Factorial(Me)
 End Function
 
-
-Friend Sub AttachNumber(ByRef n As BigNumber)
-    CopyMemory n, mNumber, LenB(n)
-End Sub
-
-Friend Sub DetachNumber(ByRef n As BigNumber)
-    ZeroMemory n, LenB(n)
-End Sub
-
-Friend Sub CopyNumber(ByRef n As BigNumber)
-    n = mNumber
-End Sub
-
 Friend Property Get IsMinusOne() As Boolean
     If mNumber.Sign = -1 And mNumber.Precision = 1 Then
         IsMinusOne = mNumber.Digits(0) = -1
