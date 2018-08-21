@@ -214,19 +214,10 @@ End Function
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim Specifier   As String
-    Dim Count       As Long
     Dim FormatInfo  As NumberFormatInfo
     
-    Count = ParseFormatSpecifier(Format, Specifier)
     Set FormatInfo = NumberFormatInfo.GetInstance(Provider)
-    
-    Select Case Specifier
-        Case "x":       ToString = ToHexString(Count, LOWER_HEX)
-        Case "X":       ToString = ToHexString(Count, UPPER_HEX)
-        Case "b", "B":  ToString = ToBinaryString(Count)
-        Case "d", "D":  ToString = ToDecimalString(Count, FormatInfo)
-    End Select
+    ToString = FormatInfo.FormatBigNumber(mNumber, Format)
 End Function
 
 ''
@@ -1415,12 +1406,12 @@ Private Function ParseFormatSpecifier(ByRef Format As String, ByRef OutSpecifier
     On Error GoTo Catch
     Chars = AllocChars(Format)
     
-    Select Case Chars(0)
-        Case vbLowerXChar, vbUpperXChar, vbLowerBChar, vbUpperBChar, vbLowerDChar, vbUpperDChar
+'    Select Case Chars(0)
+'        Case vbLowerXChar, vbUpperXChar, vbLowerBChar, vbUpperBChar, vbLowerDChar, vbUpperDChar
             OutSpecifier = Chr$(Chars(0))
-        Case Else
-            Error.Format Format_InvalidString
-    End Select
+'        Case Else
+'            Error.Format Format_InvalidString
+'    End Select
             
     Dim Result  As Long
     Dim i       As Long
