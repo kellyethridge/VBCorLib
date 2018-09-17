@@ -112,37 +112,9 @@ End Property
 ' If x < y then -1 is returned<br>
 ' If x = y then 0 is returned<br>
 ' If x > y then 1 is returned.<br>
-'
 Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    Dim xNumber As Number
-    Dim yNumber As Number
-    Dim Result  As Long
-    
-    x.AttachNumber xNumber
-    y.AttachNumber yNumber
-    Result = xNumber.Sign - yNumber.Sign
-    
-    If Result = 0 Then
-        Result = xNumber.Precision - yNumber.Precision
-        
-        If Result = 0 Then
-            Dim i As Long
-            For i = xNumber.Precision - 1 To 0 Step -1
-                Result = (xNumber.Digits(i) And &HFFFF&) - (yNumber.Digits(i) And &HFFFF&)
-                If Result <> 0 Then Exit For
-            Next i
-        Else
-            Result = xNumber.Sign * Result
-        End If
-    End If
-    
-    x.DetachNumber xNumber
-    y.DetachNumber yNumber
-    
-    Compare = Sgn(Result)
+    Set x = ValueOrZero(x)
+    Compare = x.CompareTo(y)
 End Function
 
 ''
@@ -154,13 +126,14 @@ End Function
 ' @remarks If Nothing is passed in, it is treated as zero.
 '
 Public Function Equals(ByVal x As BigInteger, ByVal y As BigInteger) As Boolean
-    Equals = (Compare(x, y) = 0)
+    Set x = ValueOrZero(x)
+    Equals = x.Equals(y)
 End Function
 
 ''
 ' Attemps to parse a string of characters of the specified base type.
 '
-' @param s The string of characters to attempt to be parsed.
+' @param Value The string of characters to attempt to be parsed.
 ' @param OutResult The returning BigInteger object if the string was successfully parsed.
 ' @return Returns True if the string was parsed, False otherwise.
 ' @remarks 3 base types are supported for parsing (Decimal, Hex, Binary.) The string
@@ -177,48 +150,44 @@ End Function
 ' Debug.Print b.ToString("X") '' 8001
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
-'
-Public Function TryParse(ByRef s As String, ByRef OutResult As BigInteger) As Boolean
-    Dim Trimmed     As String
-    Dim StartIndex  As Long
-    Dim n           As Number
-    
-    Trimmed = CorString.Trim(s)
-    
-    If Len(Trimmed) = 0 Then
-        Exit Function
-    End If
-        
-    If Left$(Trimmed, 1) = "-" Then
-        StartIndex = 1
-        n.Sign = Negative
-    End If
+Public Function TryParse(ByRef Value As String, ByRef OutResult As BigInteger) As Boolean
+    TryParse = TryParseEx(Value, NumberStyles.Integer, Nothing, OutResult)
+End Function
 
-    Select Case Mid$(Trimmed, StartIndex + 1, 2)
-        Case "&h", "&H", "0X", "0x"
-            TryParse = TryParseHex(Trimmed, StartIndex, n)
-        Case "0b", "0B"
-            TryParse = TryParseBinary(Trimmed, StartIndex, n)
-        Case Else
-            TryParse = TryParseDecimal(Trimmed, StartIndex, n)
-    End Select
+''
+' Tries to convert the string representation of a number in a specified style and culture-specific format to its BigInteger equivalent, and returns a value that indicates whether the conversion succeeded.
+'
+' @param Value The string representation of a number. The string is interpreted using the style specified by style.
+' @param Style A bitwise combination of enumeration values that indicates the style elements that can be present in value. A typical value to specify is NumberStyles.Integer.
+' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
+' @param OutResult When this method returns, contains the BigInteger equivalent to the number that is contained in value, or BigInteger.Zero if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
+Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
+    Dim Result  As BigNumber
+    Dim Info    As NumberFormatInfo
     
-    If TryParse Then
-        If n.Sign = Negative Then
-            Mathematics.Negate n
-        End If
-        
-        Set OutResult = New BigInteger
-        OutResult.InternalInitNumber n
+    Set OutResult = Nothing
+    
+    If IsHexSpecifier(Style) Then
+        TryParseEx = TryParseHex(Value, Style, Result)
     Else
-        Set OutResult = Nothing
+        Set Info = NumberFormatInfo.GetInstance(Provider)
+        TryParseEx = TryParseDecimal(Value, Style, Info, Result)
     End If
+    
+    If TryParseEx Then
+        Set OutResult = New BigInteger
+        OutResult.InitBigNumber Result
+    End If
+End Function
+
+Private Function IsHexSpecifier(ByVal Style As NumberStyles) As Boolean
+    IsHexSpecifier = (Style And NumberStyles.AllowHexSpecifier)
 End Function
 
 ''
 ' Attemps to parse a string of characters of the specified base type.
 '
-' @param s The string of characters to attempt to be parsed.
+' @param Value The string of characters to attempt to be parsed.
 ' @return Returns an instance of BigInteger containing the parsed value.
 ' @remarks If the string could not be parsed, an exception is thrown.
 ' <p>3 base types are supported for parsing (Decimal, Hex, Binary.) The string
@@ -236,17 +205,17 @@ End Function
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
 '
-Public Function Parse(ByRef s As String) As BigInteger
-    If Not TryParse(s, Parse) Then
-        Error.Format Format_InvalidString
+Public Function Parse(ByRef Value As String, Optional ByVal Style As NumberStyles = NumberStyles.Integer, Optional ByVal Provider As IFormatProvider) As BigInteger
+    If Not TryParseEx(Value, Style, Provider, Parse) Then
+        Error.Format Format_ParseBigInteger
     End If
 End Function
 
 ''
 ' Returns a human readable string of characters representing the number.
 '
-' @param x The BigInteger to create a string from.
-' @param format The specific numerical format wish to have the number displayed as.
+' @param Value The BigInteger to create a string from.
+' @param Format The specific numerical format wish to have the number displayed as.
 ' @return The numeric value of the number in the specified format.
 ' @remarks "X" and "x" for hex in either upper or lowercase. "B" or "b" for a binary
 ' representation of 1's and 0's. Everything else defaults to a decimal display.
@@ -265,15 +234,15 @@ End Function
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
 '
-Public Function ToString(ByVal x As BigInteger, Optional ByVal Format As String) As String
-    ZeroIfNothing x
-    ToString = x.ToString(Format)
+Public Function ToString(ByVal Value As BigInteger, Optional ByRef Format As String) As String
+    Set Value = ValueOrZero(Value)
+    ToString = Value.ToString(Format)
 End Function
 
 ''
 ' Returns the opposite signed value of this BigInteger instance.
 '
-' @param x The value to be negated.
+' @param Value The value to be negated.
 ' @return Returns a BigInteger instance containing the opposite signed value.
 ' @remarks Negative values are represented as a Twos Complement number, unlike
 ' other systems used to represent a negative value. Any negation requires
@@ -282,23 +251,23 @@ End Function
 ' the transition to using BigInteger values.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function Negate(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
-    Set Negate = x.Negate
+Public Function Negate(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set Negate = Value.Negate
 End Function
 
 ''
 ' Returns the absolute (positive or zero) value of this instance.
 '
-' @param x The BigInteger value to return the absolute value of.
+' @param Value The BigInteger value to return the absolute value of.
 ' @return Returns a positive (or zero) value of the current BigInteger instance.
 ' @remarks If the value is already positive or zero, then the same object instance
 ' is returned. If the value is negative, then the negated value is returned.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function Absolute(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
-    Set Absolute = x.Absolute
+Public Function Absolute(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set Absolute = Value.Absolute
 End Function
 
 ''
@@ -313,38 +282,16 @@ End Function
 ' Set b = BigInteger.Add(BInt(100), BInt(150))
 ' Debug.Print b.ToString '' 250
 ' </pre>
-'
-Public Function Add(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    If x.Sign = Sign.Zero Then
-        Set Add = y
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set Add = x
-        Exit Function
-    End If
-    
-    Dim u       As Number
-    Dim v       As Number
-    Dim sum()   As Integer
-    
-    x.AttachNumber u
-    y.AttachNumber v
-    sum = GradeSchoolAdd(u, v)
-    x.DetachNumber u
-    y.DetachNumber v
-    
-    Set Add = New BigInteger
-    Add.InternalInit sum
+Public Function Add(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Add = Left.Add(Right)
 End Function
 
 ''
 ' Subtracts one BigInteger value from another, returning the difference.
 '
-' @param x The minuend value to be subracted from.
-' @param y The subtrahend value to subtract from the minuend value.
+' @param Left The minuend value to be subracted from.
+' @param Right The subtrahend value to subtract from the minuend value.
 ' @return The difference of the two values.
 ' @remarks Values of Nothing will be treated as zero.
 ' <pre>
@@ -352,38 +299,16 @@ End Function
 ' Set b = BigInteger.Subtract(BInt(100), BInt(150))
 ' Debug.Print b.ToString '' -50
 ' </pre>
-'
-Public Function Subtract(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    If x.Sign = Sign.Zero Then
-        Set Subtract = y.Negate
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set Subtract = x
-        Exit Function
-    End If
-    
-    Dim u               As Number
-    Dim v               As Number
-    Dim Difference()    As Integer
-    
-    x.AttachNumber u
-    y.AttachNumber v
-    Difference = GradeSchoolSubtract(u, v)
-    x.DetachNumber u
-    y.DetachNumber v
-    
-    Set Subtract = New BigInteger
-    Subtract.InternalInit Difference
+Public Function Subtract(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Subtract = Left.Subtract(Right)
 End Function
 
 ''
 ' Multiplies BigInteger values, returning their product.
 '
-' @param x The multiplicand to be multiplied.
-' @param y The multiplier to multiply by.
+' @param Left The multiplicand to be multiplied.
+' @param Right The multiplier to multiply by.
 ' @return The product of the two values.
 ' @remarks Values of Nothing will be treated as zero.
 ' <pre>
@@ -392,59 +317,9 @@ End Function
 ' Debug.Print b.ToString '' 15000
 ' </pre>
 '
-Public Function Multiply(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    If (x.Sign = Sign.Zero) Or (y.Sign = Sign.Zero) Then
-        Set Multiply = mZero
-        Exit Function
-    ElseIf x.IsOne Then
-        Set Multiply = y
-        Exit Function
-    ElseIf y.IsOne Then
-        Set Multiply = x
-        Exit Function
-    ElseIf x.IsMinusOne Then
-        Set Multiply = y.Negate
-        Exit Function
-    ElseIf y.IsMinusOne Then
-        Set Multiply = x.Negate
-        Exit Function
-    End If
-    
-    Dim u As Number
-    Dim v As Number
-    
-    If x.Sign = Sign.Negative Then
-        x.CopyNumber u
-        Mathematics.Negate u
-    Else
-        x.AttachNumber u
-    End If
-
-    If y.Sign = Sign.Negative Then
-        y.CopyNumber v
-        Mathematics.Negate v
-    Else
-        y.AttachNumber v
-    End If
-    
-    Dim Product() As Integer
-    Product = GradeSchoolMultiply(u, v)
-    
-    If x.Sign = Sign.Positive Then
-        x.DetachNumber u
-    End If
-    If y.Sign = Sign.Positive Then
-        y.DetachNumber v
-    End If
-    If x.Sign <> y.Sign Then
-        ApplyTwosComplement Product
-    End If
-        
-    Set Multiply = New BigInteger
-    Multiply.InternalInit Product
+Public Function Multiply(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Multiply = Left.Multiply(Right)
 End Function
 
 
@@ -463,7 +338,8 @@ End Function
 ' </pre>
 '
 Public Function Divide(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
-    Set Divide = InternalDivide(Dividend, Divisor, Nothing, False)
+    Set Dividend = ValueOrZero(Dividend)
+    Set Divide = Dividend.Divide(Divisor)
 End Function
 
 ''
@@ -484,11 +360,12 @@ End Function
 ' Debug.Print r.ToString '' 20
 ' </pre>
 Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger, ByRef Remainder As BigInteger) As BigInteger
-    Set DivRem = InternalDivide(Dividend, Divisor, Remainder, True)
+    Set Dividend = ValueOrZero(Dividend)
+    Set DivRem = Dividend.DivRem(Divisor, Remainder)
 End Function
 
 ''
-' Returns the modulus (remainder) of division between two BigInteger values.
+' Returns the remainder of division between two BigInteger values.
 '
 ' @param dividend The value to be divided.
 ' @param divisor The value to divide by.
@@ -497,47 +374,47 @@ End Function
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = BInt(100)
-' Set b = BigInteger.Modulus(b, BInt(40))
+' Set b = BigInteger.Remainder(b, BInt(40))
 ' Debug.Print b.ToString '' 20
 ' </pre>
 Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger) As BigInteger
-    InternalDivide Dividend, Divisor, Modulus, True
+    Set Dividend = ValueOrZero(Dividend)
+    Set Modulus = Dividend.Modulus(Divisor)
 End Function
 
 ''
 ' Returns the greatest common divisor between the two BigInteger values.
 '
-' @param x One of the values to find the GCD of.
-' @param y One of the values to find the GCD of.
+' @param Left One of the values to find the GCD of.
+' @param Right One of the values to find the GCD of.
 ' @return Returns the GCD for two given values.
 ' @remarks Values of Nothing will be treated as zero.
 '
-Public Function GreatestCommonDivisor(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
+Public Function GreatestCommonDivisor(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set Right = ValueOrZero(Right)
     
-    If x.Sign = Sign.Zero And y.Sign = Sign.Zero Then
-        Set GreatestCommonDivisor = mZero
-        Exit Function
+    If Left.IsZero And Right.IsZero Then
+        Set GreatestCommonDivisor = BigInteger.Zero
+    Else
+        Set Left = Left.Absolute
+        Set Right = Right.Absolute
+    
+        Dim Result As BigInteger
+        Do While Not Right.IsZero
+            Set Result = Left.Modulus(Right)
+            Set Left = Right
+            Set Right = Result
+        Loop
+    
+        Set GreatestCommonDivisor = Left
     End If
-    
-    Set x = x.Absolute
-    Set y = y.Absolute
-    
-    Dim R As BigInteger
-    Do While y.Sign <> Sign.Zero
-        Set R = Modulus(x, y)
-        Set x = y
-        Set y = R
-    Loop
-
-    Set GreatestCommonDivisor = x
 End Function
 
 ''
 ' Tests a specific bit in the BigInteger number to determine if it is set (1) or not (0).
 '
-' @param x The BigInteger number to test the bit of.
+' @param Value The BigInteger number to test the bit of.
 ' @param bit The bit to be tested.
 ' @return Returns True if the bit is set (1), false if it is not (0).
 ' @remarks The max value for bit is 2147483647. If the bit value is larger than
@@ -545,15 +422,15 @@ End Function
 ' a negative number with infinite sign extension bits.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function TestBit(ByVal x As BigInteger, ByVal Bit As Long) As Boolean
-    ZeroIfNothing x
-    TestBit = x.TestBit(Bit)
+Public Function TestBit(ByVal Value As BigInteger, ByVal Bit As Long) As Boolean
+    Set Value = ValueOrZero(Value)
+    TestBit = Value.TestBit(Bit)
 End Function
 
 ''
 ' Sets the specified bit of the BigInteger instance to 1.
 '
-' @param x The BigInteger value to set the bit on.
+' @param Value The BigInteger value to set the bit on.
 ' @param bit The bit to be set to 1.
 ' @return A new BigInteger value with the bit set to 1.
 ' @remarks If the bit specified is larger than the current instance
@@ -561,28 +438,28 @@ End Function
 ' include the bit being set.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function SetBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    ZeroIfNothing x
-    SetBit = x.SetBit(Bit)
+Public Function SetBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    SetBit = Value.SetBit(Bit)
 End Function
 
 ''
 ' Clears the specified bit of the BigInteger instance to 0.
 '
-' @param x The BigInteger value to clear the bit on.
+' @param Value The BigInteger value to clear the bit on.
 ' @param bit The bit to be set to 0.
 ' @return A new BigInteger value with the bit set to 0.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function ClearBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    ZeroIfNothing x
-    Set ClearBit = x.ClearBit(Bit)
+Public Function ClearBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set ClearBit = Value.ClearBit(Bit)
 End Function
 
 ''
 ' Flips the specified bit, toggling between True and False.
 '
-' @param x The BigInteger value to flip the bit on.
+' @param Value The BigInteger value to flip the bit on.
 ' @param bit The bit to toggle.
 ' @return A new BigInteger with the specified bit flipped.
 ' @remarks If the bit specified is larger than the current instance
@@ -590,211 +467,57 @@ End Function
 ' include the bit being flipped.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function FlipBit(ByVal x As BigInteger, ByVal Bit As Long) As BigInteger
-    ZeroIfNothing x
-    Set FlipBit = x.FlipBit(Bit)
+Public Function FlipBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set FlipBit = Value.FlipBit(Bit)
 End Function
 
 ''
 ' Peforms a bitwise AND operation, returning the result.
 '
-' @param x The left hand value of the AND operation.
-' @param y The right hand value of the AND operation.
+' @param Left The left hand value of the AND operation.
+' @param Right The right hand value of the AND operation.
 ' @return A new BigInteger value containing the performed bitwise AND result.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function AndBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    If x.Sign = Sign.Zero Or y.Sign = Sign.Zero Then
-        Set AndBits = mZero
-        Exit Function
-    End If
-    
-    Dim ExtDigit    As Integer
-    Dim Number()    As Integer
-    Dim LongNumber  As Number
-    Dim ShortNumber As Number
-    
-    If x.Precision >= y.Precision Then
-        x.AttachNumber LongNumber
-        y.AttachNumber ShortNumber
-    Else
-        x.AttachNumber ShortNumber
-        y.AttachNumber LongNumber
-    End If
-    
-    If ShortNumber.Sign = Sign.Negative Then
-        ExtDigit = &HFFFF
-    End If
-    
-    ReDim Number(0 To LongNumber.Precision)
-    
-    Dim i As Long
-    For i = 0 To ShortNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) And ShortNumber.Digits(i)
-    Next i
-    
-    For i = ShortNumber.Precision To LongNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) And ExtDigit
-    Next i
-    
-    If LongNumber.Sign = Negative Then
-        Number(LongNumber.Precision) = &HFFFF And ExtDigit
-    End If
-    
-    x.DetachNumber LongNumber
-    y.DetachNumber ShortNumber
-    
-    Set AndBits = New BigInteger
-    AndBits.InternalInit Number
+Public Function BitwiseAnd(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseAnd = Left.BitwiseAnd(Right)
 End Function
 
 ''
 ' Peforms a bitwise OR operation, returning the result.
 '
-' @param x The left hand value of the OR operation.
-' @param y The right hand value of the OR operation.
+' @param Left The left hand value of the OR operation.
+' @param Right The right hand value of the OR operation.
 ' @return A new BigInteger value containing the performed bitwise OR result.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function OrBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    If x.Sign = Sign.Zero Then
-        Set OrBits = y
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set OrBits = x
-        Exit Function
-    End If
-    
-    Dim ExtDigit    As Integer
-    Dim Number()    As Integer
-    Dim LongNumber  As Number
-    Dim ShortNumber As Number
-    
-    If x.Precision >= y.Precision Then
-        x.AttachNumber LongNumber
-        y.AttachNumber ShortNumber
-    Else
-        x.AttachNumber ShortNumber
-        y.AttachNumber LongNumber
-    End If
-    
-    If ShortNumber.Sign = Sign.Negative Then
-        ExtDigit = &HFFFF
-    End If
-    
-    ReDim Number(0 To LongNumber.Precision)
-    
-    Dim i As Long
-    For i = 0 To ShortNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Or ShortNumber.Digits(i)
-    Next i
-    
-    For i = ShortNumber.Precision To LongNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Or ExtDigit
-    Next i
-    
-    If LongNumber.Sign = Negative Then
-        Number(LongNumber.Precision) = &HFFFF Or ExtDigit
-    End If
-    
-    x.DetachNumber LongNumber
-    y.DetachNumber ShortNumber
-    
-    Set OrBits = New BigInteger
-    OrBits.InternalInit Number
+Public Function BitwiseOr(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseOr = Left.BitwiseOr(Right)
 End Function
 
 ''
 ' Peforms a bitwise XOR operation, returning the result.
 '
-' @param x The left hand value of the XOR operation.
-' @param y The right hand value of the XOR operation.
+' @param Left The left hand value of the XOR operation.
+' @param Right The right hand value of the XOR operation.
 ' @return A new BigInteger value containing the performed bitwise XOR result.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function XorBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    ZeroIfNothing x
-    ZeroIfNothing y
-    
-    If x.Sign = Sign.Zero Then
-        Set XorBits = y
-        Exit Function
-    ElseIf y.Sign = Sign.Zero Then
-        Set XorBits = x
-        Exit Function
-    End If
-    
-    Dim ExtDigit    As Integer
-    Dim Number()    As Integer
-    Dim LongNumber  As Number
-    Dim ShortNumber As Number
-    
-    If x.Precision >= y.Precision Then
-        x.AttachNumber LongNumber
-        y.AttachNumber ShortNumber
-    Else
-        x.AttachNumber ShortNumber
-        y.AttachNumber LongNumber
-    End If
-    
-    If ShortNumber.Sign = Sign.Negative Then
-        ExtDigit = &HFFFF
-    End If
-    
-    ReDim Number(0 To LongNumber.Precision)
-    
-    Dim i As Long
-    For i = 0 To ShortNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Xor ShortNumber.Digits(i)
-    Next i
-    
-    For i = ShortNumber.Precision To LongNumber.Precision - 1
-        Number(i) = LongNumber.Digits(i) Xor ExtDigit
-    Next i
-    
-    If LongNumber.Sign = Negative Then
-        Number(LongNumber.Precision) = &HFFFF Xor ExtDigit
-    End If
-    
-    x.DetachNumber LongNumber
-    y.DetachNumber ShortNumber
-    
-    Set XorBits = New BigInteger
-    XorBits.InternalInit Number
+Public Function BitwiseXor(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseXor = Left.BitwiseXor(Right)
 End Function
 
 ''
 ' Peforms a bitwise NOT of this BigInteger instance.
 '
-' @param x The BigInteger to perform the NOT operation on.
-' @param value The value to perform the bitwise NOT on.
+' @param Value The BigInteger to perform the NOT operation on.
 ' @return A new BigInteger value containing the performed bitwise NOT result.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function NotBits(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
-    
-    If x.Sign = Sign.Zero Then
-        Set NotBits = mMinusOne
-        Exit Function
-    End If
-    
-    Dim xNumber As Number
-    x.CopyNumber xNumber
-        
-    Dim i As Long
-    For i = 0 To xNumber.Precision - 1
-        xNumber.Digits(i) = Not xNumber.Digits(i)
-    Next i
-    
-    Set NotBits = New BigInteger
-    NotBits.InternalInitNumber xNumber
+Public Function BitwiseNot(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set BitwiseNot = Value.BitwiseNot
 End Function
 
 ''
@@ -805,49 +528,52 @@ End Function
 ' @return A new BigInteger value containing the performed bitwise result.
 ' <p>Values of Nothing will be treated as zero.</p>
 '
-Public Function AndNotBits(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
-    Set AndNotBits = AndBits(x, NotBits(y))
+Public Function BitwiseAndNot(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
+    Set Left = ValueOrZero(Left)
+    Set BitwiseAndNot = Left.BitwiseAndNot(Right)
 End Function
 
 ''
 ' Raise a base value to the specified power.
 '
-' @param baseValue The value to be raised to a specified power.
-' @param exponent The power to raise the value to.
+' @param Value The value to be raised to a specified power.
+' @param Exponent The power to raise the value to.
 ' @return Returns the baseValue^exponent result.
 ' @remarks Values of Nothing are treated as zero.
 '
-Public Function Pow(ByVal BaseValue As BigInteger, ByVal Exponent As BigInteger) As BigInteger
-    ZeroIfNothing BaseValue
-    ZeroIfNothing Exponent
-
-    If Exponent.Sign = Sign.Negative Then _
+Public Function Pow(ByVal Value As BigInteger, ByVal Exponent As Long) As BigInteger
+    If Exponent < 0 Then _
         Error.ArgumentOutOfRange "Exponent", ArgumentOutOfRange_NeedNonNegNum
+    
+    Set Value = ValueOrZero(Value)
+    
+    Select Case Exponent
+        Case 0
+            Set Pow = mOne
+        Case 1
+            Set Pow = Value
+        Case Else
+            Set Pow = CalculatePow(Value, Exponent)
+    End Select
+End Function
 
-    If Exponent.Sign = Sign.Zero Then
-        Set Pow = mOne
-        Exit Function
-    ElseIf Exponent.IsOne Then
-        Set Pow = BaseValue
-        Exit Function
-    End If
-
+Private Function CalculatePow(ByVal Value As BigInteger, ByVal Exponent As Long) As BigInteger
     Dim y       As BigInteger
     Dim z       As BigInteger
     Dim IsOdd   As Boolean
     
     Set y = mOne
-    Set z = BaseValue
+    Set z = Value
     
     Do
-        IsOdd = Exponent.TestBit(0)
-        Set Exponent = Exponent.ShiftRight(1)
-
+        IsOdd = Exponent And 1
+        Exponent = Exponent \ vbShift1Bit
+    
         If IsOdd Then
             Set y = Multiply(y, z)
             
-            If Exponent.IsZero Then
-                Set Pow = y
+            If Exponent = 0 Then
+                Set CalculatePow = y
                 Exit Function
             End If
         End If
@@ -920,8 +646,8 @@ End Sub
 ' @remarks This is provided because the VB Rnd function runs
 ' independently for each component.
 '
-Public Sub SeedRnd(Optional ByRef Seed As Variant)
-    VBA.Rnd Seed
+Public Sub SeedRnd(Optional ByRef seed As Variant)
+    VBA.Rnd seed
 End Sub
 
 ''
@@ -937,85 +663,65 @@ Public Function Rnd(ByVal Size As Long, Optional ByVal IsNegative As Boolean = F
     
     If Size = 0 Then
         Set Rnd = mZero
-        Exit Function
+    Else
+        Set Rnd = New BigInteger
+        Rnd.InitRnd Size, IsNegative
     End If
-    
-    Dim WordCount As Long
-    WordCount = Size \ 2
-    
-    Dim Ints() As Integer
-    ReDim Ints(0 To WordCount)
-    
-    Dim i As Long
-    For i = 0 To WordCount - 1
-        Ints(i) = Int(VBA.Rnd * 65536) - 32768
-    Next i
-    
-    If Size And 1 Then
-        Ints(WordCount) = VBA.Rnd * &H100
-    End If
-    
-    If IsNegative Then
-        ApplyTwosComplement Ints
-    End If
-    
-    Set Rnd = New BigInteger
-    Rnd.InternalInit Ints
 End Function
 
 ''
 ' Performs a left shift operation on the BigInteger instance.
 '
-' @param x The BigInteger to shift left.
-' @param bitCount The number of bits the value is to be shifted left.
+' @param Value The BigInteger to shift left.
+' @param BitCount The number of bits the value is to be shifted left.
 ' @return Returns a new BigInteger instance containing the shifted value.
 ' @remarks If bitCount is negative, then a right shift is performed.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function ShiftLeft(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
-    ZeroIfNothing x
-    Set ShiftLeft = x.ShiftLeft(BitCount)
+Public Function ShiftLeft(ByVal Value As BigInteger, ByVal BitCount As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set ShiftLeft = Value.ShiftLeft(BitCount)
 End Function
 
 ''
 ' Performs a bit shifting operation to the the right.
 '
-' @param x The BigInteger to shift right.
-' @param bitCount The number of bits the BigInteger value is to be shifted.
+' @param Value The BigInteger to shift right.
+' @param BitCount The number of bits the BigInteger value is to be shifted.
 ' @return Returns a new BigInteger instance containing the bit shifted value.
 ' @remarks If bitCount is negative, then a left shift is performed.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
-Public Function ShiftRight(ByVal x As BigInteger, ByVal BitCount As Long) As BigInteger
-    ZeroIfNothing x
-    Set ShiftRight = x.ShiftRight(BitCount)
+Public Function ShiftRight(ByVal Value As BigInteger, ByVal BitCount As Long) As BigInteger
+    Set Value = ValueOrZero(Value)
+    Set ShiftRight = Value.ShiftRight(BitCount)
 End Function
 
 ''
 ' Returns the integer square root of a BigInteger.
 '
-' @param x The value to calculate the integer square root for.
+' @param Value The value to calculate the integer square root for.
 ' @Return The integer square root of the value.
 '
-Public Function SquareRoot(ByVal x As BigInteger) As BigInteger
-    ZeroIfNothing x
+Public Function SquareRoot(ByVal Value As BigInteger) As BigInteger
+    Set Value = ValueOrZero(Value)
     
-    If x.Sign = Sign.Zero Then
+    If Value.Sign = 0 Then
         Set SquareRoot = mZero
         Exit Function
-    ElseIf x.Sign = Negative Then
-        Set x = x.Negate
+    End If
+    
+    If Value.Sign = -1 Then
+        Set Value = Value.Negate
     End If
     
     Dim Estimate As BigInteger
     Dim n As BigInteger
     
-    Set Estimate = x.ShiftRight(1).Add(mOne)
-    Set n = x.Divide(Estimate).Add(Estimate).ShiftRight(1)
+    Set Estimate = Value.ShiftRight(1).Add(mOne)
+    Set n = Value.Divide(Estimate).Add(Estimate).ShiftRight(1)
     
     Do While Compare(n, Estimate) < 0
         Set Estimate = n
-        Set n = x.Divide(Estimate).Add(Estimate).ShiftRight(1)
+        Set n = Value.Divide(Estimate).Add(Estimate).ShiftRight(1)
     Loop
     
     Set SquareRoot = Estimate
@@ -1030,7 +736,7 @@ End Function
 Public Function Factorial(ByVal Value As BigInteger) As BigInteger
     Dim Result As BigInteger
     
-    ZeroIfNothing Value
+    Set Value = ValueOrZero(Value)
     
     If Value.Sign = Negative Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
@@ -1060,225 +766,348 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub ZeroIfNothing(ByRef RefValue As BigInteger)
-    If RefValue Is Nothing Then
-        Set RefValue = mZero
+Private Function ValueOrZero(ByVal Value As BigInteger) As BigInteger
+    If Value Is Nothing Then
+        Set ValueOrZero = mZero
+    Else
+        Set ValueOrZero = Value
     End If
-End Sub
+End Function
 
-Private Function TryParseDecimal(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
-    Dim Chars() As Integer
-    Dim ub As Long
+Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As BigNumber) As Boolean
+    Const NotFound          As Long = 0
+    Const FoundBefore       As Long = 1
+    Const FoundAfter        As Long = 2
+    Dim Chars()             As Integer
+    Dim Index               As Long
+    Dim MaxIndex            As Long
+    Dim Ch                  As Long
+    Dim InWhitespace        As Boolean
+    Dim NeedsClosingParen   As Boolean
+    Dim NegativeSign        As Integer
+    Dim PositiveSign        As Integer
+    Dim CurrencySymbol      As Integer
+    Dim Thousands           As Integer
+    Dim CurrencyThousands   As Integer
+    Dim DecimalPoint        As Integer
+    Dim CurrencyPoint       As Integer
+    Dim FoundDigit          As Boolean
+    Dim FoundCurrency       As Long
+    Dim FoundSign           As Long
+    Dim FoundDecimal        As Boolean
+    Dim FoundClosingParen   As Boolean
+    Dim FoundExponent       As Boolean
+    Dim Exponent            As Long
+    Dim DecimalPlaces       As Long
     
-    If Len(s) - StartIndex < 1 Then
-        Exit Function
-    End If
-    
+    NegativeSign = AscW(Info.NegativeSign)
+    PositiveSign = AscW(Info.PositiveSign)
+    CurrencySymbol = AscW(Info.CurrencySymbol)
+    DecimalPoint = AscW(Info.NumberDecimalSeparator)
+    CurrencyPoint = AscW(Info.CurrencyDecimalSeparator)
+    Thousands = AscW(Info.NumberGroupSeparator)
+    CurrencyThousands = AscW(Info.CurrencyGroupSeparator)
     Chars = AllocChars(s)
+    MaxIndex = UBound(Chars)
+    n.Sign = 1
+    ReDim n.Digits(0 To Len(s) \ 4)
     
-    ub = Len(s) \ 4 + 1
-    ReDim n.Digits(0 To ub)
-    
-    Dim i As Long
-    For i = StartIndex To UBound(Chars)
-        Select Case Chars(i)
-            Case 48 To 57
-                SingleInPlaceMultiply n, 10
-                SingleInPlaceAdd n, Chars(i) - 48
+    Do While Index <= MaxIndex
+        Ch = Chars(Index)
+        
+        Select Case Ch
+            Case vbZeroChar To vbNineChar
+                If (FoundCurrency = FoundAfter) Or (FoundSign = FoundAfter) Or InWhitespace Then
+                    GoTo Finally
+                End If
+                
+                If Not FoundDecimal Then
+                    SingleInPlaceMultiply n, 10
+                    SingleInPlaceAdd n, Ch - vbZeroChar
+                Else
+                    If Style And NumberStyles.AllowExponent Then
+                        ' we are allowing a possible exponent value to be parsed,
+                        ' so if we have encountered a decimal point, we need to
+                        ' continue parsing digits and also count how many
+                        ' decimal places we have gone.
+                        SingleInPlaceMultiply n, 10
+                        SingleInPlaceAdd n, Ch - vbZeroChar
+                        
+                        DecimalPlaces = DecimalPlaces + 1
+                    Else
+                        If Ch <> vbZeroChar Then
+                            GoTo Finally
+                        End If
+                    End If
+                End If
+                
+                FoundDigit = True
+            Case NegativeSign, PositiveSign
+                If (FoundSign <> NotFound) Or NeedsClosingParen Then
+                    GoTo Finally
+                End If
+                
+                If Not FoundDigit Then
+                    If (Style And NumberStyles.AllowLeadingSign) = 0 Then
+                        GoTo Finally
+                    End If
+                    
+                    FoundSign = FoundBefore
+                Else
+                    If (Style And NumberStyles.AllowTrailingSign) = 0 Then
+                        GoTo Finally
+                    End If
+                    
+                    FoundSign = FoundAfter
+                End If
+                
+                If Ch = NegativeSign Then
+                    n.Sign = -1
+                End If
+            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
+                If Not FoundDigit Then
+                    If ((Style And NumberStyles.AllowLeadingWhite) = 0) Or NeedsClosingParen Then
+                        GoTo Finally
+                    End If
+                
+                    InWhitespace = FoundSign
+                Else
+                    InWhitespace = True
+                End If
+            Case vbOpenParenChar
+                If ((Style And NumberStyles.AllowParentheses) = 0) Or (FoundSign <> NotFound) Then
+                    GoTo Finally
+                End If
+                
+                NeedsClosingParen = True
+            Case vbCloseParenChar
+                If (Style And NumberStyles.AllowParentheses) = 0 Or (Not NeedsClosingParen) Then
+                    GoTo Finally
+                End If
+                
+                n.Sign = -1
+                NeedsClosingParen = False
+                FoundClosingParen = True
+            Case CurrencySymbol
+                If ((Style And NumberStyles.AllowCurrencySymbol) = 0) Or (FoundCurrency <> NotFound) Then
+                    GoTo Finally
+                End If
+                
+                FoundCurrency = IIfLong(n.Precision = 0, FoundBefore, FoundAfter)
+            Case DecimalPoint, CurrencyPoint
+                If ((Style And NumberStyles.AllowDecimalPoint) = 0) Or FoundDecimal Or FoundClosingParen Then
+                    GoTo Finally
+                End If
+                
+                If FoundCurrency Then
+                    If Ch = DecimalPoint Then
+                        GoTo Finally
+                    End If
+                End If
+                
+                FoundDecimal = True
+            Case Thousands, CurrencyThousands
+                If ((Style And NumberStyles.AllowThousands) = 0) Or (Not FoundDigit) Then
+                    GoTo Finally
+                End If
+                
+                If FoundCurrency Then
+                    If Ch = Thousands Then
+                        GoTo Finally
+                    End If
+                End If
+            Case vbLowerEChar, vbUpperEChar
+                If ((Style And NumberStyles.AllowExponent) = 0) Or FoundExponent Then
+                    GoTo Finally
+                End If
+            
+                If Not TryParseExponent(Chars, Index, Exponent) Then
+                    GoTo Finally
+                End If
+                
+                ' we understand that parsing the exponent will advance the index passed the end of the digits
+                ' and that we will be advancing the index as well, in effect advancing it twice, so we need
+                ' to counter that last advancement.
+                Index = Index - 1
+                FoundExponent = True
             Case Else
                 GoTo Finally
         End Select
-    Next i
+        
+        Index = Index + 1
+    Loop
     
-    n.Precision = n.Precision + 1   ' add one additional zero.
+    If InWhitespace Then
+        If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
+            GoTo Finally
+        End If
+    End If
+    
+    If NeedsClosingParen Then
+        GoTo Finally
+    End If
+    
+    If FoundExponent Then
+        If Exponent < DecimalPlaces Then
+            GoTo Finally
+        End If
+    
+        n.Precision = n.Precision + Exponent \ 4
+        ReDim Preserve n.Digits(0 To n.Precision)
+        
+        Do While Exponent - DecimalPlaces > 0
+            SingleInPlaceMultiply n, 10
+            Exponent = Exponent - 1
+        Loop
+    End If
+    
+    Select Case n.Precision
+        Case 0
+            Erase n.Digits
+            n.Sign = 0
+        Case Is < UBound(n.Digits) + 1
+            ReDim Preserve n.Digits(0 To n.Precision - 1)
+    End Select
+    
+    If n.Sign = -1 Then
+        ApplyTwosComplement n.Digits
+    End If
+    
     TryParseDecimal = True
     
 Finally:
     FreeChars Chars
 End Function
 
-Private Function TryParseHex(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
-    Dim Chars() As Integer
-    Dim ub      As Long
+Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long, ByRef Exponent As Long) As Boolean
+    Dim Ch          As Integer
+    Dim MaxIndex    As Long
     
-    If Len(s) - StartIndex < 3 Then
+    MaxIndex = UBound(Chars)
+    Index = Index + 1
+    
+    If Index > MaxIndex Then
         Exit Function
     End If
     
+    If Chars(Index) = vbPlusChar Then
+        Index = Index + 1
+    End If
+    
+    Do While Index <= MaxIndex
+        Ch = Chars(Index)
+        
+        Select Case Ch
+            Case vbZeroChar To vbNineChar
+                Exponent = Exponent * 10 + (Ch - vbZeroChar)
+                TryParseExponent = True
+            Case Else
+                Exit Function
+        End Select
+        
+        Index = Index + 1
+    Loop
+End Function
+
+Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByRef n As BigNumber) As Boolean
+    Const vbLowerHexOffset As Long = 87
+    Const vbUpperHexOffset As Long = 55
+    Dim Chars()     As Integer
+    Dim MaxSize     As Long
+    Dim UpperIndex  As Long
+    Dim FoundDigits As Boolean
+    
     Chars = AllocChars(s)
-    ub = (Len(s) - 2) \ 4 + 1
-    ReDim n.Digits(0 To ub)
+    UpperIndex = UBound(Chars)
+    MaxSize = Len(s) \ 4 + IIfLong(Len(s) Mod 4, 1, 0)
+    ReDim n.Digits(0 To MaxSize - 1)
     
     Dim c As Long
     Dim i As Long
-    Dim j As Long: j = 1
+    Dim j As Long
     Dim k As Long
-    For i = Len(s) - 1 To 2 + StartIndex Step -1
-        Dim Ch As Long
+    Dim Ch As Long
+    
+    j = 1
+    For i = UpperIndex To LBound(Chars) Step -1
         Select Case Chars(i)
-            Case 48 To 57
-                Ch = Chars(i) - 48
-            Case 65 To 70
-                Ch = Chars(i) - 55
-            Case 97 To 102
-                Ch = Chars(i) - 87
+            Case vbZeroChar
+                Ch = 0
+                FoundDigits = True
+            Case vbOneChar To vbNineChar
+                Ch = Chars(i) - vbZeroChar
+                n.Sign = 1
+                FoundDigits = True
+            Case vbLowerAChar To vbLowerFChar
+                Ch = Chars(i) - vbLowerHexOffset
+                n.Sign = 1
+                FoundDigits = True
+            Case vbUpperAChar To vbUpperFChar
+                Ch = Chars(i) - vbUpperHexOffset
+                n.Sign = 1
+                FoundDigits = True
+            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
+                If ((Style And NumberStyles.AllowLeadingWhite) = 0) And FoundDigits Then
+                    GoTo Finally
+                End If
+                
+                If ((Style And NumberStyles.AllowTrailingWhite) = 0) And Not FoundDigits Then
+                    GoTo Finally
+                End If
+                
+                GoTo Continue
             Case Else
                 GoTo Finally
         End Select
         
         k = k + Ch * j
-        j = j * 16
+        j = j * vbShift4Bits
         
         If j = &H10000 Then
-            n.Digits(c) = AsWord(k)
+            #If Release Then
+                n.Digits(c) = k
+            #Else
+                n.Digits(c) = AsWord(k)
+            #End If
+            
             k = 0
             j = 1
             c = c + 1
         End If
+        
+Continue:
     Next i
     
     If k Then
-        n.Digits(c) = AsWord(k)
+        #If Release Then
+            n.Digits(c) = k
+        #Else
+            n.Digits(c) = AsWord(k)
+        #End If
+
         c = c + 1
     End If
     
     n.Precision = c
+    
+    If n.Sign Then
+        Ch = n.Digits(n.Precision - 1)
+            
+        If (Ch And &H8000) = &H8000 Then
+            n.Sign = -1
+        ElseIf (Ch And &HF800) = &H800 Then
+            n.Sign = -1
+            n.Digits(n.Precision - 1) = Ch Or &HF000
+        ElseIf (Ch And &HFF80) = &H80 Then
+            n.Sign = -1
+        ElseIf (Ch And &HFFF8) = &H8 Then
+            n.Sign = -1
+            n.Digits(n.Precision - 1) = Ch Or &HFFF0
+        End If
+    End If
+    
     TryParseHex = True
     
 Finally:
     FreeChars Chars
 End Function
-
-Private Function TryParseBinary(ByRef s As String, ByVal StartIndex As Long, ByRef n As Number) As Boolean
-    Dim Chars() As Integer
-    Dim ub      As Long:
-    
-    If Len(s) - StartIndex < 3 Then
-        Exit Function
-    End If
-    
-    Chars = AllocChars(s)
-    ub = (Len(s) - 2) \ 16 + 1
-    
-    If ub = 0 Then
-        ub = 1
-    End If
-    
-    ReDim n.Digits(0 To ub)
-    
-    Dim c As Long
-    Dim i As Long
-    Dim j As Long: j = 1
-    Dim k As Long
-    For i = Len(s) - 1 To 2 + StartIndex Step -1
-        Dim Ch As Long
-        Select Case Chars(i)
-            Case 48, 49
-                Ch = Chars(i) - 48
-            Case Else
-                GoTo Finally
-        End Select
-        
-        k = k + Ch * j
-        j = j * 2
-        
-        If j = &H10000 Then
-            n.Digits(c) = AsWord(k)
-            j = 1
-            c = c + 1
-            k = 0
-        End If
-    Next i
-    
-    If k Then
-        n.Digits(c) = AsWord(k)
-        c = c + 1
-    End If
-    
-    n.Precision = c
-    TryParseBinary = True
-    
-Finally:
-    FreeChars Chars
-End Function
-
-Private Sub DivideByZeroError()
-    Call Err.Raise(11)
-End Sub
-
-Private Function InternalDivide(ByRef Dividend As BigInteger, ByRef Divisor As BigInteger, ByRef Remainder As BigInteger, ByVal IncludeRemainder As Boolean) As BigInteger
-    ZeroIfNothing Dividend
-    ZeroIfNothing Divisor
-    
-    If Divisor.Sign = Sign.Zero Then
-        DivideByZeroError
-    ElseIf Dividend.Sign = Sign.Zero Then
-        Set InternalDivide = mZero
-        If IncludeRemainder Then
-            Set Remainder = mZero
-        End If
-        Exit Function
-    ElseIf Divisor.IsOne Then
-        Set InternalDivide = Dividend
-        If IncludeRemainder Then
-            Set Remainder = mZero
-        End If
-        Exit Function
-    ElseIf Divisor.IsMinusOne Then
-        Set InternalDivide = Dividend.Negate
-        If IncludeRemainder Then
-            Set Remainder = mZero
-        End If
-        Exit Function
-    End If
-    
-    Dim xNumber As Number
-    Dim yNumber As Number
-    
-    Dividend.CopyNumber xNumber
-    Divisor.CopyNumber yNumber
-      
-    If Dividend.Sign = Sign.Negative Then
-        Mathematics.Negate xNumber
-    End If
-    If Divisor.Sign = Sign.Negative Then
-        Mathematics.Negate yNumber
-    End If
-    
-    Dim QuotientNumber()    As Integer
-    Dim RemainderNumber()   As Integer
-    
-    If yNumber.Precision > 1 Then
-        QuotientNumber = GradeSchoolDivide(xNumber, yNumber, RemainderNumber, IncludeRemainder)
-    Else
-        Dim R As Long
-        QuotientNumber = SinglePlaceDivide(xNumber.Digits, xNumber.Precision, yNumber.Digits(0), R)
-        
-        If IncludeRemainder Then
-            ReDim RemainderNumber(0)
-            RemainderNumber(0) = R
-        End If
-    End If
-    
-    If Dividend.Sign <> Divisor.Sign Then
-        ApplyTwosComplement QuotientNumber
-        
-        If IncludeRemainder Then
-            ApplyTwosComplement RemainderNumber
-        End If
-    End If
-    
-    If IncludeRemainder Then
-        Set Remainder = New BigInteger
-        Remainder.InternalInit RemainderNumber
-                
-        If Remainder.Sign = Negative Then
-            Set Remainder = Negate(Remainder)
-        End If
-    End If
-    
-    Set InternalDivide = New BigInteger
-    InternalDivide.InternalInit QuotientNumber
-End Function
-
-

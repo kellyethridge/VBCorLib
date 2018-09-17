@@ -657,6 +657,11 @@ library CorType {
     [dllname("CorChar")]
     module CorChar {
         const short vbTerminator                   = 0;
+        const short vbTabChar					   = 9;
+        const short vbLfChar					   = 0xA;
+        const short vbVtChar					   = 0xB;
+        const short vbFfChar					   = 0xC;
+        const short vbCrChar 					   = 0xD;
         const short vbOpenParenChar                = 0x28;
         const short vbCloseParenChar               = 0x29;
         const short vbHyphenChar                   = 0x2D;

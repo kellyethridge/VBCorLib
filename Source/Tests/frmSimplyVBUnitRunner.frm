@@ -1,5 +1,5 @@
 VERSION 5.00
-Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#4.0#0"; "SimplyVBUnit.Component.ocx"
+Object = "{7983BD3B-752A-43EA-9BFF-444BBA1FC293}#5.0#0"; "SimplyVBUnit.Component.ocx"
 Begin VB.Form frmSimplyVBUnitRunner 
    Caption         =   "Simply VB Unit"
    ClientHeight    =   7080
@@ -326,33 +326,21 @@ Private Sub AddSystemGlobalization()
 End Sub
 
 Private Sub AddSystemNumerics()
-    With Sim.NewTestSuite("System.Numerics")
-        .Add New BigIntegerTests
-'        .Add NewSuite("BigInteger Tests", _
-'            New VBAdditionTests, _
-'            New VBBitTests, _
-'            New VBComparisonTests, _
-'            New VBCreateFromArraysTests, _
-'            New VBCreateFromNumbersTests, _
-'            New VBDivisionTests, _
-'            New VBFactorialTests, _
-'            New VBMultiplyTests, _
-'            New VBParseBinaryTests, _
-'            New VBParseDecimalTests, _
-'            New VBParseHexTests, _
-'            New VBPowTests, _
-'            New VBRightShiftTests, _
-'            New VBRndTests, _
-'            New VBShiftLeftTests, _
-'            New VBSquareRootTests, _
-'            New VBSubtractionTests, _
-'            New VBToBinaryStringTests, _
-'            New VBToStringDecimalTests, _
-'            New VBToStringHexTests, _
-'            New VBUnaryTests)
-        
-        AddTest .This
-    End With
+    AddTest Sim.NewTestSuite("System.Numerics") _
+        .Add(New BigIntegerTests) _
+        .Add(Sim.NewTestSuite("BigInteger Parsing") _
+            .Add(New BIntNumberStylesNoneTests, "NumberStyles.None") _
+            .Add(New BIntNumberStylesAllowLeadingSignTests, "NumberStyles.AllowLeadingSign") _
+            .Add(New BIntNumberStylesAllowLeadingWhiteTests, "NumberStyles.AllowLeadingWhite") _
+            .Add(New BIntNumberStylesAllowTrailingWhiteTests, "NumberStyles.AllowTrailingWhite") _
+            .Add(New BIntNumberStylesAllowCurrencySymbolTests, "NumberStyles.AllowCurrencySymbol") _
+            .Add(New BIntNumberStylesAllowTrailingSignTests, "NumberStyles.AllowTrailingSign") _
+            .Add(New BIntNumberStylesAllowDecimalPointTests, "NumberStyles.AllowDecimalPoint") _
+            .Add(New BIntNumberStylesAllowThousandsTests, "NumberStyles.AllowThousands") _
+            .Add(New BIntNumberStylesAllowParenthesesTests, "NumberStyles.AllowParentheses") _
+            .Add(New BIntParseNumberStylesComboTests, "NumberStyles Combinations") _
+            .Add(New BIntNumberStylesAllowExponentTests, "NumberStyles.AllowExponent") _
+            .Add(New BIntNumberStylesAllowHexSpecifierTests, "NumberStyles.AllowHexSpecifier"))
 End Sub
 
 Private Function NewSuite(ByVal Name As String, ParamArray Fixtures() As Variant) As TestSuite

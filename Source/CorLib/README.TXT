@@ -78,6 +78,7 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed BigInteger Negate. Would fail to update precision when changing negative value to positive.
 	* Fixed BigInteger DevRem. When dividing by a negative value, remainder should still be positive.
 	* Renamed BigInteger.ToArray to BigInteger.ToByteArray to match the .net method name. *BREAKING*
+	* Updated BigInteger.Parse to match .NET implementation closely. Now utilizes the NumberStyles enum.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

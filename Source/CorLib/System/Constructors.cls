@@ -1890,6 +1890,16 @@ Public Function NewEncoderFallbackException3(ByRef Message As String, ByVal Char
     NewEncoderFallbackException3.Init3 Message, CharUnknownHigh, CharUnknownLow, Index
 End Function
 
+Public Function NewArithmeticException(ByRef Message As String, Optional ByVal InnerException As Exception) As ArithmeticException
+    Set NewArithmeticException = New ArithmeticException
+    NewArithmeticException.Init Message, InnerException
+End Function
+
+Public Function NewDivideByZeroException(ByRef Message As String, Optional ByVal InnerException As Exception) As DivideByZeroException
+    Set NewDivideByZeroException = New DivideByZeroException
+    NewDivideByZeroException.Init Message, InnerException
+End Function
+
 Friend Function NewDefaultDecoder(ByVal Encoding As Encoding) As DefaultDecoder
     Set NewDefaultDecoder = New DefaultDecoder
     NewDefaultDecoder.Init Encoding
@@ -1909,3 +1919,4 @@ Friend Function NewDBCSCodePageEncoding(ByVal CodePage As Long) As DBCSCodePageE
     Set NewDBCSCodePageEncoding = New DBCSCodePageEncoding
     NewDBCSCodePageEncoding.Init CodePage
 End Function
+

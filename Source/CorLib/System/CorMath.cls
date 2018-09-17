@@ -113,10 +113,9 @@ End Function
 ' @param b The divosor.
 ' @param Remainder The variable to place the remainder of the division.
 ' @return The quotient of the division.
-'
-Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef remainder As Long) As Long
+Public Function DivRem(ByVal a As Long, ByVal b As Long, ByRef Remainder As Long) As Long
     DivRem = a \ b
-    remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
+    Remainder = a - (b * DivRem)    ' this is about 2x faster than Mod.
 End Function
 
 ''
@@ -148,11 +147,11 @@ End Property
 ' the maximum value.
 ' <p>If both values are equavalent then <b>X</b> is returned.</p>
 '
-Public Function Max(ByRef X As Variant, ByRef Y As Variant) As Variant
-    If IsGtOrEq(X, Y) Then
-        VariantCopyInd Max, X
+Public Function Max(ByRef x As Variant, ByRef y As Variant) As Variant
+    If IsGtOrEq(x, y) Then
+        VariantCopyInd Max, x
     Else
-        VariantCopyInd Max, Y
+        VariantCopyInd Max, y
     End If
 End Function
 
@@ -193,11 +192,11 @@ End Function
 ' the minimum value.
 ' <p>If both values are equavalent then <b>X</b> is returned.</p>
 '
-Public Function Min(ByRef X As Variant, ByRef Y As Variant) As Variant
-    If IsLtOrEq(X, Y) Then
-        VariantCopyInd Min, X
+Public Function Min(ByRef x As Variant, ByRef y As Variant) As Variant
+    If IsLtOrEq(x, y) Then
+        VariantCopyInd Min, x
     Else
-        VariantCopyInd Min, Y
+        VariantCopyInd Min, y
     End If
 End Function
 
@@ -254,7 +253,7 @@ End Function
 ' @return The hyberbolic cosine.
 '
 Public Function Cosh(ByVal d As Double) As Double
-    Cosh = (exp(d) + exp(-d)) / 2
+    Cosh = (Exp(d) + Exp(-d)) / 2
 End Function
 
 ''
@@ -264,7 +263,7 @@ End Function
 ' @return The hyberbolic sine.
 '
 Public Function Sinh(ByVal d As Double) As Double
-    Sinh = (exp(d) - exp(-d)) / 2
+    Sinh = (Exp(d) - Exp(-d)) / 2
 End Function
 
 ''
@@ -277,8 +276,8 @@ Public Function Tanh(ByVal d As Double) As Double
     Dim PosExp As Double
     Dim NegExp As Double
     
-    PosExp = exp(d)
-    NegExp = exp(-d)
+    PosExp = Exp(d)
+    NegExp = Exp(-d)
     
     Tanh = (PosExp - NegExp) / (PosExp + NegExp)
 End Function
@@ -311,11 +310,11 @@ End Function
 ' @param y A devisor.
 ' @return The remainder of the division.
 '
-Public Function IEEERemainder(ByVal X As Double, ByVal Y As Double) As Double
+Public Function IEEERemainder(ByVal x As Double, ByVal y As Double) As Double
     Dim Ret As Double
-    Ret = (X - (Y * Round(X / Y)))
+    Ret = (x - (y * Round(x / y)))
     
-    If (Ret = 0#) And (X < 0#) Then
+    If (Ret = 0#) And (x < 0#) Then
         Ret = mNegativeZero
     End If
     
@@ -354,30 +353,30 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function IsGtOrEq(ByRef X As Variant, ByRef Y As Variant) As Boolean
-    Select Case VarType(X)
+Private Function IsGtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
+    Select Case VarType(x)
         Case vbObject
-            If Not IsObject(Y) Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+            If Not IsObject(y) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
             
-            IsGtOrEq = Comparer.Default.Compare(X, Y) >= 0
-        Case VarType(Y)
-            IsGtOrEq = X >= Y
+            IsGtOrEq = Comparer.Default.Compare(x, y) >= 0
+        Case VarType(y)
+            IsGtOrEq = x >= y
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
     End Select
 End Function
 
-Private Function IsLtOrEq(ByRef X As Variant, ByRef Y As Variant) As Boolean
-    Select Case VarType(X)
+Private Function IsLtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
+    Select Case VarType(x)
         Case vbObject
-            If Not IsObject(Y) Then _
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+            If Not IsObject(y) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
             
-            IsLtOrEq = Comparer.Default.Compare(X, Y) <= 0
-        Case VarType(Y)
-            IsLtOrEq = X <= Y
+            IsLtOrEq = Comparer.Default.Compare(x, y) <= 0
+        Case VarType(y)
+            IsLtOrEq = x <= y
         Case Else
-            Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(X)), "Y")
+            Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
     End Select
 End Function
