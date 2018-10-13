@@ -1022,12 +1022,29 @@ Friend Function Format(ByRef Value As Variant, Optional ByRef FormatText As Stri
 End Function
 
 Friend Function FormatBigNumber(ByRef Value As BigNumber, ByRef Format As String) As String
-    Dim Specifiers  As Specifiers
-    Dim Number      As NumberType
+    Const MaxDigitsPerElement       As Long = 5
+    Const ExponentCeremonyLength    As Long = 12
+    Const DigitsPerCommaSeparator   As Long = 3
+    Dim Specifiers As Specifiers
+    Dim MaxLength  As Long
     
     VerifyLoaded
     ClearOutput
     Specifiers = ParseSpecifiers(Format)
+    
+    MaxLength = Value.Precision * MaxDigitsPerElement + ExponentCeremonyLength + (Value.Precision \ DigitsPerCommaSeparator)
+    
+    If MaxLength > Len1D(mDefaultOutput.Buffer) Then
+        Dim LargeOutput As OutputBuffer
+        ReDim LargeOutput.Buffer(0 To MaxLength)
+        FormatBigNumber = BigNumberToString(Value, Specifiers, Format, LargeOutput)
+    Else
+        FormatBigNumber = BigNumberToString(Value, Specifiers, Format, mDefaultOutput)
+    End If
+End Function
+
+Private Function BigNumberToString(ByRef Value As BigNumber, ByRef Specifiers As Specifiers, ByRef Format As String, ByRef Output As OutputBuffer) As String
+    Dim Number As NumberType
     
     If Specifiers.Format <> CustomSpecifier And _
         Specifiers.Format <> HexUpperSpecifier And _
@@ -1037,45 +1054,44 @@ Friend Function FormatBigNumber(ByRef Value As BigNumber, ByRef Format As String
     
     Select Case Specifiers.Format
         Case FormatSpecifier.GeneralLowerSpecifier
-            FormatGeneralInteger Number, 0, vbLowerEChar, mDefaultOutput
+            FormatGeneralInteger Number, 0, vbLowerEChar, Output
         Case FormatSpecifier.GeneralUpperSpecifier
-            FormatGeneralInteger Number, 0, vbUpperEChar, mDefaultOutput
+            FormatGeneralInteger Number, 0, vbUpperEChar, Output
         Case FormatSpecifier.CurrencyLowerSpecifier, FormatSpecifier.CurrencyUpperSpecifier
-            FormatCurrency Number, Specifiers.Precision, mDefaultOutput
+            FormatCurrency Number, Specifiers.Precision, Output
         Case FormatSpecifier.DecimalUpperSpecifier, FormatSpecifier.DecimalLowerSpecifier
-            FormatDecimal Number, Specifiers.Precision, mDefaultOutput
+            FormatDecimal Number, Specifiers.Precision, Output
         Case FormatSpecifier.ExponentLowerSpecifier
-            FormatExponentInt32 Number, Specifiers.Precision, vbLowerEChar, mDefaultOutput
+            FormatExponentInt32 Number, Specifiers.Precision, vbLowerEChar, Output
         Case FormatSpecifier.ExponentUpperSpecifier
-            FormatExponentInt32 Number, Specifiers.Precision, vbUpperEChar, mDefaultOutput
+            FormatExponentInt32 Number, Specifiers.Precision, vbUpperEChar, Output
         Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
-            FormatFixedDouble Number, Specifiers.Precision, mDefaultOutput
+            FormatFixedDouble Number, Specifiers.Precision, Output
         Case FormatSpecifier.NumberUpperSpecifier, FormatSpecifier.NumberLowerSpecifier
-            FormatNumber Number, Specifiers.Precision, mDefaultOutput
+            FormatNumber Number, Specifiers.Precision, Output
         Case FormatSpecifier.PercentUpperSpecifier, FormatSpecifier.PercentLowerSpecifier
             If Number.Precision > 0 Then
                 Number.DecimalPosition = Number.DecimalPosition + 2
             End If
             
             If Specifiers.Precision = UnknownPrecision Then
-                FormatPercent Number, mProps.PercentDecimalDigits, mDefaultOutput
+                FormatPercent Number, mProps.PercentDecimalDigits, Output
             Else
-                FormatPercent Number, Specifiers.Precision, mDefaultOutput
+                FormatPercent Number, Specifiers.Precision, Output
             End If
         Case FormatSpecifier.HexLowerSpecifier, FormatSpecifier.HexUpperSpecifier
-            FormatBigNumber = FormatHexBigNumber(Value, Specifiers, mDefaultOutput)
-'            FormatBigNumber = SysAllocStringLen(VarPtr(mDefaultOutput.Buffer(mDefaultOutput.Position + 1)), DefaultOutputSize - mDefaultOutput.Position - 1)
+            BigNumberToString = FormatHexBigNumber(Value, Specifiers, Output)
             Exit Function
             
         Case Else
-            FormatBigNumber = Format
+            BigNumberToString = Format
             Exit Function
     End Select
     
-    If mDefaultOutput.Position = 0 Then
-        FormatBigNumber = "0"
+    If Output.Position = 0 Then
+        BigNumberToString = "0"
     Else
-        FormatBigNumber = SysAllocStringLen(VarPtr(mDefaultOutput.Buffer(0)), mDefaultOutput.Position)
+        BigNumberToString = SysAllocStringLen(VarPtr(Output.Buffer(0)), Output.Position)
     End If
 End Function
 
