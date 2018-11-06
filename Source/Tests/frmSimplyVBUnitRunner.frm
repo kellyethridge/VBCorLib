@@ -314,7 +314,7 @@ Private Sub AddSystemGlobalization()
 '        .Add New TestTaiwanCalendar
 '        .Add New TestKoreanCalendar
 '        .Add New TestJapaneseCalendar
-'        .Add New TestHebrewCalendar
+        .Add New HebrewCalendarTests
         .Add New GregorianCalendarTests
         .Add New HijriCalendarTests
         .Add New JulianCalendarTests

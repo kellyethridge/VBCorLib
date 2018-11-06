@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2018 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: HebrewCalendar
+' Module: HebrewCalendar
 '
 
 ''
@@ -64,42 +67,66 @@ Private Const MilliSecondsPerDay      As Currency = MillisecondsPerHour * HoursP
 Private Const PARTS_PER_HOUR            As Long = 1080
 
 Private Const MIN_MILLISECONDS          As Currency = 49914748800000@
-Private Const MaxMilliseconds          As Currency = 70678396799999@
+Private Const MaxMilliseconds           As Currency = 70678396799999@
 Private Const MIN_HEBREWYEAR            As Long = 5343
-Private Const MAX_HEBREWYEAR            As Long = 6000
+Private Const MAX_HEBREWYEAR            As Long = 5999
 
 Private mTwoDigitYearMax As Long
 
+''
+' Gets a value that indicates whether the current calendar is solar-based, lunar-based, or a combination of both.
+'
+' @return Always returns <a href="Calendar.CalendarAlgorithmType.html">CalendarAlgorithmType.SolarCalendar</a>.
+'
+Public Property Get AlgorithmType() As CalendarAlgorithmType
+    AlgorithmType = LunisolarCalendar
+End Property
 
 Public Property Get Eras() As Long()
-    Dim Ret(0) As Long
-    Ret(0) = HebrewCalendar.HebrewEra
-    Eras = Ret
+    Eras = Cor.NewLongs(HebrewCalendar.HebrewEra)
 End Property
 
 Public Property Get TwoDigitYearMax() As Long
     TwoDigitYearMax = mTwoDigitYearMax
 End Property
 
-Public Property Let TwoDigitYearMax(ByVal RHS As Long)
-    VerifyYear RHS
-    mTwoDigitYearMax = RHS
+Public Property Let TwoDigitYearMax(ByVal Value As Long)
+    VerifyYear Value
+    mTwoDigitYearMax = Value
+End Property
+
+''
+' Gets the earliest date and time supported by the <a href="HebrewCalendar.html">HebrewCalendar</a> object.
+'
+' @return The earliest date and time supported by the <a href="HebrewCalendar.html">HebrewCalendar</a> which is January 1, 1583.
+'
+Public Property Get MinSupportedDateTime() As CorDateTime
+    Set MinSupportedDateTime = Cor.NewDateTime(1583, 1, 1)
+End Property
+
+''
+' Gets the latest date and time supported by the <a href="HebrewCalendar.html">HebrewCalendar</a> object.
+'
+' @return The latest date and time supported by the <a href="HebrewCalendar.html">HebrewCalendar</a> which is September 29, 2239.
+'
+Public Property Get MaxSupportedDateTime() As CorDateTime
+    Set MaxSupportedDateTime = Cor.NewDateTime(2239, 9, 29)
 End Property
 
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = CorDateTime.GetDateTime(Time).AddDays(Days)
+    Set AddDays = Statics.Calendar.GetDateTime(Time).AddDays(Days)
 End Function
 
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = CorDateTime.GetDateTime(Time).AddHours(Hours)
+    Set AddHours = Statics.Calendar.GetDateTime(Time).AddHours(Hours)
 End Function
 
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = CorDateTime.GetDateTime(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = Statics.Calendar.GetDateTime(Time).AddMilliseconds(Milliseconds)
 End Function
 
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = CorDateTime.GetDateTime(Time).AddMinutes(Minutes)
+    Set AddMinutes = Statics.Calendar.GetDateTime(Time).AddMinutes(Minutes)
 End Function
 
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
@@ -153,7 +180,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
 End Function
 
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = CorDateTime.GetDateTime(Time).AddSeconds(Seconds)
+    Set AddSeconds = Statics.Calendar.GetDateTime(Time).AddSeconds(Seconds)
 End Function
 
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
@@ -204,7 +231,7 @@ Public Function GetYear(ByRef Time As Variant) As Long
 End Function
 
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
-    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
+    GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Me, Time, Rule, FirstDayOfWeek)
 End Function
 
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
@@ -253,9 +280,11 @@ End Function
 
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
     If IsLeapYear(Year, Era) Then
-        If Month = 6 Then IsLeapDay = (Day = 30)
-    Else
-        IsLeapDay = IsLeapMonth(Year, Month)
+        If Month = 6 Then
+            IsLeapDay = (Day = 30)
+        Else
+            IsLeapDay = IsLeapMonth(Year, Month)
+        End If
     End If
 End Function
 
@@ -333,7 +362,9 @@ Private Sub VerifyEra(ByRef Era As Variant)
 End Sub
 
 Private Sub VerifyYear(ByVal Year As Long)
-    If Year < MIN_HEBREWYEAR Or Year > MAX_HEBREWYEAR Then Throw Cor.NewArgumentOutOfRangeException("Year", "Hebrew year must be between 5343 and 6000.")
+    If (Year < MIN_HEBREWYEAR Or Year > MAX_HEBREWYEAR) And Year <> 99 Then
+        Throw Cor.NewArgumentOutOfRangeException("Year", "Hebrew year must be between 5343 and 6000.")
+    End If
 End Sub
 
 Private Sub VerifyMonthYear(ByVal Month As Long, ByVal Year As Long)
@@ -550,16 +581,12 @@ End Function
 '   Calendar Interface
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Calendar_AlgorithmType() As CalendarAlgorithmType
-
+    Calendar_AlgorithmType = AlgorithmType
 End Property
 
 Private Function Calendar_Clone() As Calendar
 
 End Function
-
-Private Property Get Calendar_DaysInYearBeforeMinSupportedYear() As Long
-
-End Property
 
 Private Property Get Calendar_IsReadOnly() As Boolean
 
@@ -678,11 +705,11 @@ Private Function Calendar_IsLeapYear(ByVal Year As Long, Optional Era As Variant
 End Function
 
 Private Property Get Calendar_MaxSupportedDateTime() As CorDateTime
-
+    Set Calendar_MaxSupportedDateTime = MaxSupportedDateTime
 End Property
 
 Private Property Get Calendar_MinSupportedDateTime() As CorDateTime
-
+    Set Calendar_MinSupportedDateTime = MinSupportedDateTime
 End Property
 
 Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As CorDateTime
@@ -697,8 +724,8 @@ Private Function Calendar_ToString() As String
     Calendar_ToString = ToString
 End Function
 
-Private Property Let Calendar_TwoDigitYearMax(ByVal RHS As Long)
-    TwoDigitYearMax = RHS
+Private Property Let Calendar_TwoDigitYearMax(ByVal Value As Long)
+    TwoDigitYearMax = Value
 End Property
 
 Private Property Get Calendar_TwoDigitYearMax() As Long

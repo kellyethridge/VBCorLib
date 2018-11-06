@@ -73,15 +73,6 @@ Public Property Get AlgorithmType() As CalendarAlgorithmType
 End Property
 
 ''
-' Gets the number of days in the year that precedes the year that is specified by the <a href="JulianCalendar.get.MinSupportedDateTime.html">MinSupportedDateTime</a> property.
-'
-' @returns The property returns a constant value of 365.
-'
-Public Property Get DaysInYearBeforeMinSupportedYear() As Long
-    DaysInYearBeforeMinSupportedYear = 365
-End Property
-
-''
 ' Gets the list of eras in the <a href="JulianCalendar.html">JulianCalendar</a>.
 '
 ' @returns An array of integers that represents the eras in the <a href="JulianCalendar.html">JulianCalendar</a>.
@@ -765,10 +756,6 @@ End Property
 Private Function Calendar_Clone() As Calendar
     Set Calendar_Clone = Clone
 End Function
-
-Private Property Get Calendar_DaysInYearBeforeMinSupportedYear() As Long
-    Calendar_DaysInYearBeforeMinSupportedYear = DaysInYearBeforeMinSupportedYear
-End Property
 
 Private Property Get Calendar_IsReadOnly() As Boolean
     Calendar_IsReadOnly = IsReadOnly

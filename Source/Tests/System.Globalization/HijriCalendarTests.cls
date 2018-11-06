@@ -103,7 +103,6 @@ Public Sub ConstantProperties_WhenCalled_ReturnsExpected()
     Dim Calendar As New HijriCalendar
     
     Assert.That Calendar.AlgorithmType, Iz.EqualTo(CalendarAlgorithmType.LunarCalendar)
-    Assert.That Calendar.DaysInYearBeforeMinSupportedYear, Iz.EqualTo(354)
     Assert.That Calendar.MaxSupportedDateTime, Equals(NewDateTime(9999, 12, 31, 23, 59, 59, 999))
     Assert.That Calendar.MinSupportedDateTime, Equals(#7/18/622#)
 End Sub

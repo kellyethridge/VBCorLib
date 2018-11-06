@@ -192,7 +192,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function GetDateTime(ByRef Time As Variant) As CorDateTime
+Friend Function GetDateTime(ByRef Time As Variant) As CorDateTime
     Select Case VarType(Time)
         Case vbObject
             If Time Is Nothing Then _
@@ -211,3 +211,4 @@ Private Function GetDateTime(ByRef Time As Variant) As CorDateTime
 
     Set GetDateTime = mTempDateTime
 End Function
+

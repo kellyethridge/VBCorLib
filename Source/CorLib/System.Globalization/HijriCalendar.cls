@@ -109,16 +109,6 @@ Public Function Clone() As HijriCalendar
 End Function
 
 ''
-' Gets the number of days in the year that precedes the year that is specified by the <a href="HijriCalendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a> property.
-'
-' @return The number of days in the year that precedes the year specified by <a href="HijriCalendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a>.
-' @remarks This property returns a constant value of 354.
-'
-Public Property Get DaysInYearBeforeMinSupportedYear() As Long
-    DaysInYearBeforeMinSupportedYear = 354
-End Property
-
-''
 ' Gets a value indicating whether this <a href="HijriCalendar.html">HijriCalendar</a> object is read-only.
 '
 ' @return <b>True</b> if this <a href="HijriCalendar.html">HijriCalendar</a> object is read-only; otherwise, <b>False</b>.
@@ -831,10 +821,6 @@ End Property
 Private Function Calendar_Clone() As Calendar
     Set Calendar_Clone = Clone
 End Function
-
-Private Property Get Calendar_DaysInYearBeforeMinSupportedYear() As Long
-    Calendar_DaysInYearBeforeMinSupportedYear = DaysInYearBeforeMinSupportedYear
-End Property
 
 Private Property Get Calendar_IsReadOnly() As Boolean
     Calendar_IsReadOnly = IsReadOnly

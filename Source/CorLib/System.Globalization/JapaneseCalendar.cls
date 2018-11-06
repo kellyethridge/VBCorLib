@@ -347,10 +347,6 @@ Private Function Calendar_Clone() As Calendar
 
 End Function
 
-Private Property Get Calendar_DaysInYearBeforeMinSupportedYear() As Long
-
-End Property
-
 Private Property Get Calendar_IsReadOnly() As Boolean
 
 End Property

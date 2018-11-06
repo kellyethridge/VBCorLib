@@ -107,14 +107,6 @@ Public Property Get AlgorithmType() As CalendarAlgorithmType: End Property
 Public Function Clone() As Calendar: End Function
 
 ''
-' Gets the number of days in the year that precedes the year that is specified by the <a href="Calendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a> property.
-'
-' @return The number of days in the year that precedes the year specified by <a href="Calendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a>.
-' @remarks This property returns a constant value of 365. Note that the property value can be overridden by classes implement the <a href="Calendar.html">Calendar</a> class interface.
-'
-Public Property Get DaysInYearBeforeMinSupportedYear() As Long: End Property
-
-''
 ' Gets a value indicating whether this <a href="Calendar.html">Calendar</a> object is read-only.
 '
 ' @return <b>True</b> if this <a href="Calendar.html">Calendar</a> object is read-only; otherwise, <b>False</b>.
