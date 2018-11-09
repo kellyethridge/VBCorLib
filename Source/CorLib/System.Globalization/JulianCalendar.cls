@@ -349,7 +349,7 @@ End Function
 ' @param Time The time to retrieve the milliseconds from.
 ' @return The millisecond portion of the <i>Time</i>.
 '
-Public Function GetMilliseconds(ByRef Time As Variant) As Double
+Public Function GetMilliseconds(ByRef Time As Variant) As Long
     GetMilliseconds = Statics.Calendar.GetMilliseconds(Time)
 End Function
 
@@ -481,6 +481,14 @@ Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional By
     IsLeapMonth = False
 End Function
 
+''
+' Returns a boolean indicating if the specific day is a leap day.
+'
+' @param Year The year the day is in.
+' @param Month The month the day is in.
+' @param Day The day to check if is a leap day.
+' @param Era The era the year is in.
+' @return Boolean indication if the day is a leap day.
 ' @remarks <p>Unlike the Gregorian calendar, the Julian calendar defines a leap year as a year that is evenly divisible by four with no exceptions. Therefore, the calendar is inaccurate by one day every 128 years. For example, the year 1999 was not a leap year, but the year 2000 was. A common year has 365 days and a leap year has 366 days.</p>
 ' <p>A leap day is a day that occurs only in a leap year. In the Julian calendar, the 29th day of February is the only leap day.</p>
 ' <h4>Exceptions</h4>

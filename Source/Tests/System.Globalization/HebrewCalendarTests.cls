@@ -104,7 +104,47 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/1/2000#, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Sunday, 16
             Test.Use #1/1/2000#, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday, 16
             
+        Case "GetDaysInYear_WithYear_ReturnsExpected"
+            Test.Use 5500, 355
+            Test.Use 5502, 383
+            Test.Use 5550, 353
+            Test.Use 5343, 355
+            Test.Use 5999, 385
+            Test.Use 5763, 385
+            Test.Use 5762, 354
+            
+        Case "AddYears_WithInvalidValue_ThrowsArgumentOutOfRangeException"
+            Test.Use #12/31/1582 11:59:59 PM#
+            Test.Use #9/30/2239#
+            
     End Select
+End Sub
+
+Public Sub IsReadOnly_WhenNew_ReturnsFalse()
+    Dim Calendar As New HebrewCalendar
+    
+    Assert.That Calendar.IsReadOnly, Iz.False
+End Sub
+
+Public Sub IsReadOnly_WhenMadeReadOnly_ReturnsTrue()
+    Dim cal As New HebrewCalendar
+    
+    Dim Actual As Calendar
+    Set Actual = CorLib.Calendar.ReadOnly(cal)
+    
+    Assert.That Actual.IsReadOnly, Iz.True
+End Sub
+
+Public Sub TestSerialization()
+    Dim Calendar As New HebrewCalendar
+    Calendar.TwoDigitYearMax = 99
+    Set Calendar = HebrewCalendar.ReadOnly(Calendar)
+    
+    Dim Actual As Calendar
+    Set Actual = Persist(Calendar)
+    
+    Assert.That Actual.IsReadOnly, Iz.False
+    Assert.That Actual.TwoDigitYearMax, Iz.EqualTo(99)
 End Sub
 
 Public Sub TwoDigitYearMax_WithDefault_Returns5790()
@@ -162,6 +202,15 @@ Public Sub ToFourDigitYear_WithTwoDigitYearMaxOf5729_ReturnsExpected(ByVal Year 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub ToFourDigitYear_WithLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Calendar As New HebrewCalendar
+    
+    On Error Resume Next
+    Calendar.ToFourDigitYear -1
+    
+    AssertArgumentOutOfRangeException Err, "Year"
+End Sub
+
 Public Sub Eras_WhenCalled_ReturnsArrayOfOne()
     Dim Calendar As New HebrewCalendar
     
@@ -186,7 +235,10 @@ Public Sub MaxSupportedDateTime_WhenCalled_ReturnsDateTimeMaxValue()
     Dim Actual As CorDateTime
     Set Actual = Calendar.MaxSupportedDateTime
     
-    Assert.That Actual, Equals(#9/29/2239#)
+    Dim Expected As CorDateTime
+    Set Expected = NewDateTime(2239, 9, 29, 23, 59, 59, 999)
+    Set Expected = CorDateTime.FromMilliseconds(Expected.TotalMilliseconds + 0.9999@)
+    Assert.That Actual, Equals(Expected)
 End Sub
 
 Public Sub GetProperties_WhenCalled_ReturnsExpected()
@@ -227,6 +279,15 @@ Public Sub AddMethods_WhenCalled_ReturnsExpected()
     Assert.That Calendar.AddWeeks(d, 5), Equals(#2/5/1800#), "#9"
 End Sub
 
+Public Sub AddYears_WithInvalidValue_ThrowsArgumentOutOfRangeException(ByVal Time As Date)
+    Dim Calendar As New HebrewCalendar
+    
+    On Error Resume Next
+    Calendar.AddYears Time, 1
+    
+    AssertArgumentOutOfRangeException Err, "Time"
+End Sub
+
 Public Sub Kind_WhenAddMethodCalled_ReturnsUnspecified()
     Dim Calendar As New HebrewCalendar
     Dim d As CorDateTime
@@ -251,6 +312,15 @@ Public Sub GetDaysInMonth_WithMonthInNonLeapYear_ReturnsExpected(ByVal Month As 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetDaysInYear_WithYear_ReturnsExpected(ByVal Year As Long, ByVal Expected As Long)
+    Dim Calendar As New HebrewCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetDaysInYear(Year)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
 Public Sub GetDaysInMonth_WithMonthInLeapYear_ReturnsExpected(ByVal Month As Long, ByVal Expected As Long)
     Dim Calendar As New HebrewCalendar
     
@@ -260,6 +330,19 @@ Public Sub GetDaysInMonth_WithMonthInLeapYear_ReturnsExpected(ByVal Month As Lon
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub GetDaysInMonth_MonoBug76252()
+    Dim Calendar    As New HebrewCalendar
+    Dim Year        As Long
+    
+    Year = Calendar.GetYear(#9/1/2005#)
+    Assert.That Year, Iz.EqualTo(5765)
+    
+    Dim Actual As Long
+    Actual = Calendar.GetDaysInMonth(Year, 13, 1)
+    
+    Assert.That Actual, Iz.EqualTo(29)
+End Sub
+
 Public Sub IsLeapYear_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Expected As Boolean)
     Dim Calendar As New HebrewCalendar
     
@@ -267,6 +350,15 @@ Public Sub IsLeapYear_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Expec
     Actual = Calendar.IsLeapYear(Year)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsLeapYear_With99_ThrowsArgumentOutOfRangeException()
+    Dim Calendar As New HebrewCalendar
+    
+    On Error Resume Next
+    Calendar.IsLeapYear 99
+    
+    AssertArgumentOutOfRangeException Err, "Year"
 End Sub
 
 Public Sub IsLeapMonth_WithValues_ReturnsExpected(ByVal Month As Long, ByVal Expected As Boolean)
@@ -285,6 +377,15 @@ Public Sub IsLeapDay_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Month 
     Actual = Calendar.IsLeapDay(Year, Month, Day)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub IsLeapDay_WithInvalidDayValue_ThrowsArgumentOutOfRangeException()
+    Dim Calendar As New HebrewCalendar
+    
+    On Error Resume Next
+    Calendar.IsLeapDay 5343, 1, 50
+    
+    AssertArgumentOutOfRangeException Err, "Day"
 End Sub
 
 Public Sub GetWeekOfYear_WithValues_ReturnsExpected(ByVal d As Date, ByVal Rule As CalendarWeekRule, ByVal dow As DayOfWeek, ByVal Expected As Long)

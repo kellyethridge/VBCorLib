@@ -42,6 +42,10 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mMinSupportedDateTime As CorDateTime
+Private mMaxSupportedDateTime As CorDateTime
+
+
 ''
 ' Returns the current era of the Hebrew calendar.
 '
@@ -50,3 +54,40 @@ Option Explicit
 Public Property Get HebrewEra() As Long
     HebrewEra = 1
 End Property
+
+''
+' Returns a read-only version of the specified <a href="HebrewCalendar.html">Calendar</a> object.
+'
+' @param Calendar A Calendar object.
+' @returns Returns the same calendar if it is read-only, otherwise returns a read-only clone.
+'
+Public Function ReadOnly(ByVal Calendar As HebrewCalendar) As HebrewCalendar
+    If Calendar Is Nothing Then _
+        Error.ArgumentNull "Calendar"
+        
+    If Calendar.IsReadOnly Then
+        Set ReadOnly = Calendar
+    Else
+        Set ReadOnly = Calendar.Clone
+        ReadOnly.MarkReadOnly
+    End If
+End Function
+
+Friend Property Get MaxSupportedDateTime() As CorDateTime
+    Set MaxSupportedDateTime = mMaxSupportedDateTime
+End Property
+
+Friend Property Get MinSupportedDateTime() As CorDateTime
+    Set MinSupportedDateTime = mMinSupportedDateTime
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    Dim dt As CorDateTime
+    Set dt = Cor.NewDateTime(2239, 9, 29, 23, 59, 59, 999)
+    Set mMaxSupportedDateTime = CorDateTime.FromMilliseconds(dt.TotalMilliseconds + 0.9999@)
+    Set mMinSupportedDateTime = Cor.NewDateTime(1583, 1, 1)
+End Sub

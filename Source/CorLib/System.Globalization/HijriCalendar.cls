@@ -429,7 +429,7 @@ End Function
 ' @param Time The time to retrieve the milliseconds from.
 ' @return The millisecond portion of the time.
 '
-Public Function GetMilliseconds(ByRef Time As Variant) As Double
+Public Function GetMilliseconds(ByRef Time As Variant) As Long
     GetMilliseconds = Statics.Calendar.GetMilliseconds(Time)
 End Function
 

@@ -60,15 +60,30 @@ Public Property Get CurrentEra() As Long
 End Property
 
 ''
-' Many of the calendars calculate the week of the year the same way,
-' so wrap up a function here to let them all share.
+' Returns a read-only version of the specified <a href="Calendar.html">Calendar</a> object.
 '
-' @param Calendar The Calendar to be used for specific calculations.
-' @param Time The Date to calculate the week of the year from.
-' @param Rule How to determine what the first week of the year is.
-' @param FirstDayOfWeek Which day of the week is the start of the week.
-' @return The week of the year.
+' @param Calendar The <a href="Calendar.html">Calendar</a> object.
+' @return The <a href="Calendar.html">Calendar</a> object specified by the calendar parameter, if calendar is read-only.<br/>
+' -or-<br/>
+' A read-only memberwise clone of the <a href="Calendar.html">Calendar</a> object specified by <i>calendar</i>, if <i>calendar</i> is not read-only.
 '
+Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
+    If Calendar Is Nothing Then _
+        Error.ArgumentNull "Calendar"
+    
+    If Calendar.IsReadOnly Then
+        Set ReadOnly = Calendar
+    Else
+        If TypeOf Calendar Is HebrewCalendar Then
+            Set ReadOnly = HebrewCalendar.ReadOnly(Calendar)
+        End If
+    End If
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Common base Calendar functions
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     Dim FirstWeekLength As Long
     Dim Offset          As Long
@@ -122,13 +137,28 @@ Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant,
     End If
 End Function
 
-''
-' Gets a numeric value from the system calendar settings.
-'
-' @param Cal The calendar to get the value from.
-' @param CalType The type of value to get from the calendar.
-' @return The numeric value from the calendar on the system.
-'
+Friend Function ToFourDigitYear(ByVal Calendar As Calendar, ByVal Year As Long) As Long
+    Dim y As Long
+    
+    If Year < 0 Then _
+        Error.ArgumentOutOfRange "Year", ArgumentOutOfRange_NeedNonNegNum
+    
+    If Year < 100 Then
+        y = Year Mod 100
+        ToFourDigitYear = (Calendar.TwoDigitYearMax \ 100) * 100 + y
+        
+        If y > Calendar.TwoDigitYearMax Mod 100 Then
+            ToFourDigitYear = ToFourDigitYear - 100
+        End If
+    Else
+        ToFourDigitYear = Year
+    End If
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetCalendarInfoInt32(ByVal Cal As Long, ByVal CalType As Long) As Long
     If GetCalendarInfo(LOCALE_USER_DEFAULT, Cal, CalType Or CAL_RETURN_NUMBER, vbNullString, 0, GetCalendarInfoInt32) = BOOL_FALSE Then
         Error.Win32Error Err.LastDllError
@@ -176,7 +206,7 @@ Friend Function GetSecond(ByRef Time As Variant) As Long
     GetSecond = GetDateTime(Time).Second
 End Function
 
-Friend Function GetMilliseconds(ByRef Time As Variant) As Double
+Friend Function GetMilliseconds(ByRef Time As Variant) As Long
     GetMilliseconds = GetDateTime(Time).Millisecond
 End Function
 
@@ -188,10 +218,6 @@ Friend Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
     GetDayOfWeek = GetDateTime(Time).DayOfWeek
 End Function
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetDateTime(ByRef Time As Variant) As CorDateTime
     Select Case VarType(Time)
         Case vbObject

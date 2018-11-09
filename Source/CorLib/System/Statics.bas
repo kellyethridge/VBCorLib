@@ -34,6 +34,7 @@ Public Type NullVersionableCollection
     Instance As New IVersionableCollection
 End Type
 
+Public Missing                  As Variant
 Public Cor                      As New Constructors
 Public Object                   As New ObjectStatic
 Public CorArray                 As New CorArray
