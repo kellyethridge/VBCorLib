@@ -148,6 +148,7 @@ Public Enum ResourceStringKey
     Argument_InvalidCodePageBytes = 871
     Argument_InvalidCodePageChars = 872
     Argument_IntegerRequired = 873
+    Argument_ResultCalendarRange = 874
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901

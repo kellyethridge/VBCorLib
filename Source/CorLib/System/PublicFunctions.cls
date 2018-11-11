@@ -268,3 +268,7 @@ End Function
 Public Function GetCollectionVersion(ByVal Obj As Object) As Long
     GetCollectionVersion = Enumeration.GetCollectionVersion(Obj)
 End Function
+
+Public Function CDateTime(ByRef Value As Variant) As CorDateTime
+    Set CDateTime = Conversion.CDateTime(Value)
+End Function

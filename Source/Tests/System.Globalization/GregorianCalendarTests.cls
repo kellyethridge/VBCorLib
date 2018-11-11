@@ -76,6 +76,41 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
+Public Sub AlgorithmType_WhenCalled_ReturnsSolarCalendar()
+    Dim Calendar As New GregorianCalendar
+    
+    Assert.That Calendar.AlgorithmType, Iz.EqualTo(CalendarAlgorithmType.SolarCalendar)
+End Sub
+
+Public Sub Clone_WhenCalled_ReturnsWritableClone()
+    Dim Calendar As GregorianCalendar
+    Set Calendar = Cor.NewGregorianCalendar(MiddleEastFrench)
+    Calendar.TwoDigitYearMax = 5400
+    Set Calendar = GregorianCalendar.ReadOnly(Calendar)
+    
+    Dim Actual As GregorianCalendar
+    Set Actual = Calendar.Clone
+    
+    Assert.That Actual.TwoDigitYearMax, Iz.EqualTo(5400)
+    Assert.That Actual.CalendarType, Iz.EqualTo(GregorianCalendarTypes.MiddleEastFrench)
+    Assert.That Actual.IsReadOnly, Iz.False
+End Sub
+
+Public Sub IsReadOnly_WhenNew_ReturnsFalse()
+    Dim Calendar As New GregorianCalendar
+    
+    Assert.That Calendar.IsReadOnly, Iz.False
+End Sub
+
+Public Sub IsReadOnly_WhenMadeReadOnly_ReturnsTrue()
+    Dim Cal As New GregorianCalendar
+    
+    Dim Actual As Calendar
+    Set Actual = CorLib.Calendar.ReadOnly(Cal)
+    
+    Assert.That Actual.IsReadOnly, Iz.True
+End Sub
+
 Public Sub TwoDigitYearMax_WithDefault_Returns2029()
     Dim Calendar As New GregorianCalendar
     
@@ -101,6 +136,26 @@ Public Sub TwoDigitYearMax_WithMaxYearPlusOne_ThrowsArgumentOutOfRangeException(
     Calendar.TwoDigitYearMax = 10000
     
     AssertArgumentOutOfRangeException Err, "Year"
+End Sub
+
+Public Sub TwoDigitYearMax_WhenReadOnly_ThrowsInvalidOperationException()
+    Dim Calendar As New GregorianCalendar
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
+    
+    On Error Resume Next
+    Calendar.TwoDigitYearMax = 99
+    
+    AssertInvalidOperationException Err
+End Sub
+
+Public Sub CalendarType_WhenReadOnly_ThrowsInvalidOperationException()
+    Dim Calendar As New GregorianCalendar
+    Set Calendar = GregorianCalendar.ReadOnly(Calendar)
+    
+    On Error Resume Next
+    Calendar.CalendarType = Arabic
+    
+    AssertInvalidOperationException Err
 End Sub
 
 Public Sub ToFourDigitYear_WithTwoDigitYearMaxOf99_ReturnsExpected(ByVal Year As Long, ByVal Expected As Long)
@@ -150,6 +205,20 @@ Public Sub MaxSupportedDateTime_WhenCalled_ReturnsDateTimeMaxValue()
     Assert.That Actual, Equals(CorDateTime.MaxValue)
 End Sub
 
+Public Sub TestSerialization()
+    Dim Calendar As New GregorianCalendar
+    Calendar.TwoDigitYearMax = 99
+    Calendar.CalendarType = Arabic
+    Set Calendar = GregorianCalendar.ReadOnly(Calendar)
+    
+    Dim Actual As GregorianCalendar
+    Set Actual = Persist(Calendar)
+    
+    Assert.That Actual.IsReadOnly, Iz.False
+    Assert.That Actual.TwoDigitYearMax, Iz.EqualTo(99)
+    Assert.That Actual.CalendarType, Iz.EqualTo(GregorianCalendarTypes.Arabic)
+End Sub
+
 Public Sub GetProperties_WhenCalled_ReturnsExpected()
     Const d As Date = #1/2/2001 1:20:35 PM#
     Dim Calendar As New GregorianCalendar
@@ -186,15 +255,28 @@ Public Sub AddMethods_WhenCalled_ReturnsExpected()
     Assert.That Calendar.AddWeeks(d, 5), Equals(NewDate(#2/5/100#)), "#8"
 End Sub
 
+Public Sub AddYears_WithInvalidResult_ThrowsArgumentException()
+    Dim Calendar As New GregorianCalendar
+    
+    On Error Resume Next
+    Calendar.AddYears #1/1/2000#, 9000
+    
+    AssertArgumentException Err
+End Sub
+
 Public Sub Kind_WhenAddMethodCalled_ReturnsUnspecified()
     Dim Calendar As New GregorianCalendar
     Dim d As CorDateTime
-    Set d = NewDate(#1/1/100#, UtcKind)
+    Set d = NewDate(#1/1/1800#, UtcKind)
     
-    Dim Actual As CorDateTime
-    Set Actual = Calendar.AddDays(d, 1)
-    
-    Assert.That Actual.Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind)
+    Assert.That Calendar.AddDays(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#1"
+    Assert.That Calendar.AddMonths(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#2"
+    Assert.That Calendar.AddYears(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#3"
+    Assert.That Calendar.AddHours(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#4"
+    Assert.That Calendar.AddMinutes(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#5"
+    Assert.That Calendar.AddSeconds(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#6"
+    Assert.That Calendar.AddMilliseconds(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#7"
+    Assert.That Calendar.AddWeeks(d, 1).Kind, Iz.EqualTo(DateTimeKind.UnspecifiedKind), "#8"
 End Sub
 
 Public Sub GetDaysInMonth_WithMonthValue_ReturnsExpected(ByVal Month As Long, ByVal Expected As Long)
@@ -215,6 +297,24 @@ Public Sub GetDaysInMonth_WithFebuaryInLeapYear_Returns29()
     Assert.That Actual, Iz.EqualTo(29)
 End Sub
 
+Public Sub GetDaysInYear_WhenNonLeapYear_Returns365()
+    Dim Calendar As New GregorianCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetDaysInYear(2018)
+    
+    Assert.That Actual, Iz.EqualTo(365)
+End Sub
+
+Public Sub GetDaysInYear_WhenIsLeapYear_Returns366()
+    Dim Calendar As New GregorianCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetDaysInYear(2004)
+    
+    Assert.That Actual, Iz.EqualTo(366)
+End Sub
+
 Public Sub IsLeapYear_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Expected As Boolean)
     Dim Calendar As New GregorianCalendar
     
@@ -224,11 +324,11 @@ Public Sub IsLeapYear_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Expec
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub IsLeapMonth_WithValues_ReturnsFalse(ByVal Year As Long, ByVal Month As Long)
+Public Sub IsLeapMonth_WhenIsLeapYear_ReturnsFalse()
     Dim Calendar As New GregorianCalendar
     
     Dim Actual As Boolean
-    Actual = Calendar.IsLeapMonth(Year, Month)
+    Actual = Calendar.IsLeapMonth(2004, 2)
     
     Assert.That Actual, Iz.False
 End Sub

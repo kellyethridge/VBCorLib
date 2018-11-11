@@ -120,6 +120,24 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
+Public Sub AlgorithmType_WhenCalled_ReturnsLunisolarCalendar()
+    Dim Calendar As New HebrewCalendar
+    
+    Assert.That Calendar.AlgorithmType, Iz.EqualTo(CalendarAlgorithmType.LunisolarCalendar)
+End Sub
+
+Public Sub Clone_WhenCalled_ReturnsWritableClone()
+    Dim Calendar As New HebrewCalendar
+    Calendar.TwoDigitYearMax = 5400
+    Set Calendar = HebrewCalendar.ReadOnly(Calendar)
+    
+    Dim Actual As HebrewCalendar
+    Set Actual = Calendar.Clone
+    
+    Assert.That Actual.TwoDigitYearMax, Iz.EqualTo(5400)
+    Assert.That Actual.IsReadOnly, Iz.False
+End Sub
+
 Public Sub IsReadOnly_WhenNew_ReturnsFalse()
     Dim Calendar As New HebrewCalendar
     

@@ -45,8 +45,6 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mTempDateTime As New CorDateTime
-
 
 ''
 ' Returns the current era for any calendar class.
@@ -76,6 +74,8 @@ Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
     Else
         If TypeOf Calendar Is HebrewCalendar Then
             Set ReadOnly = HebrewCalendar.ReadOnly(Calendar)
+        ElseIf TypeOf Calendar Is GregorianCalendar Then
+            Set ReadOnly = GregorianCalendar.ReadOnly(Calendar)
         End If
     End If
 End Function
@@ -155,6 +155,12 @@ Friend Function ToFourDigitYear(ByVal Calendar As Calendar, ByVal Year As Long) 
     End If
 End Function
 
+Friend Sub CheckAddResult(ByVal Milliseconds As Currency, ByVal MinValue As CorDateTime, ByVal MaxValue As CorDateTime)
+    If Milliseconds < MinValue.TotalMilliseconds Or Milliseconds > MaxValue.TotalMilliseconds Then
+        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ResultCalendarRange, MinValue, MaxValue))
+    End If
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
@@ -166,7 +172,7 @@ Friend Function GetCalendarInfoInt32(ByVal Cal As Long, ByVal CalType As Long) A
 End Function
 
 ''
-' Common Calendar methods
+' Common date methods
 '
 ' These methods support both Date and CorDateTime. When a Date value is passed in it must
 ' be converted to a CorDateTime object before manipulation/investigation can begin. However, once the
@@ -174,6 +180,14 @@ End Function
 ' method calls involving a VB Date value. This eliminates the constance creating/destroying of a
 ' CorDateTime object simply to retrieve or modify a VB Date value.
 '
+Friend Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
+    Set AddYears = GetDateTime(Time).AddYears(Years)
+End Function
+
+Friend Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
+    Set AddMonths = GetDateTime(Time).AddMonths(Months)
+End Function
+
 Friend Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
     Set AddDays = GetDateTime(Time).AddDays(Days)
 End Function
@@ -218,23 +232,31 @@ Friend Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
     GetDayOfWeek = GetDateTime(Time).DayOfWeek
 End Function
 
+Friend Function GetDayOfMonth(ByRef Time As Variant) As Long
+    GetDayOfMonth = GetDateTime(Time).Day
+End Function
+
 Friend Function GetDateTime(ByRef Time As Variant) As CorDateTime
+    Dim Milliseconds As Currency
+    
     Select Case VarType(Time)
         Case vbObject
             If Time Is Nothing Then _
                 Error.Argument Argument_DateRequired
                 
             If TypeOf Time Is CorDateTime Then
-                mTempDateTime.InitFromCorDateTime Time, UnspecifiedKind
+                Dim dt As CorDateTime
+                Set dt = Time
+                Milliseconds = dt.TotalMilliseconds
             Else
                 Error.Argument Argument_DateRequired
             End If
         Case vbDate
-            mTempDateTime.InitFromDate Time, UnspecifiedKind
+            Milliseconds = CorDateTime.GetMilliseconds(Time)
         Case Else
             Error.Argument Argument_DateRequired
     End Select
 
-    Set GetDateTime = mTempDateTime
+    Set GetDateTime = CorDateTime.FromMilliseconds(Milliseconds, UnspecifiedKind)
 End Function
 

@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements Calendar
+Implements ICloneable
 
 Private Const PROP_TWODIGITYEARMAX As String = "TwoDigitYearMax"
 
@@ -71,7 +72,7 @@ Private mTwoDigitYearMax    As Long
 ''
 ' Gets a value that indicates whether the current calendar is solar-based, lunar-based, or a combination of both.
 '
-' @return Always returns <a href="Calendar.CalendarAlgorithmType.html">CalendarAlgorithmType.SolarCalendar</a>.
+' @return Always returns <a href="Calendar.CalendarAlgorithmType.html">CalendarAlgorithmType.LunisolarCalendar</a>.
 '
 Public Property Get AlgorithmType() As CalendarAlgorithmType
     AlgorithmType = LunisolarCalendar
@@ -883,7 +884,15 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -899,7 +908,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Calendar Interface
+'   Calendar
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Calendar_AlgorithmType() As CalendarAlgorithmType
     Calendar_AlgorithmType = AlgorithmType
