@@ -324,7 +324,7 @@ End Function
 ' @return An integer that represents the era in the specified Date or <a href="CorDateTime.html">CorDateTime</a>. The return value is always <a href="HebrewCalendarStatic.Get.HebrewEra.html">HebrewEra</a>.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    Statics.Calendar.GetDateTime Time   ' verifies we have a date.
+    CDateTime Time   ' verifies we have a date.
     GetEra = HebrewCalendar.HebrewEra
 End Function
 
