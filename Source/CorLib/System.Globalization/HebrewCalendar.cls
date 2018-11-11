@@ -177,7 +177,7 @@ End Property
 ' @return The <a href="CorDateTime.html">CorDateTime</a> that results from adding the specified number of days to the specified <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = Statics.Calendar.GetDateTime(Time).AddDays(Days)
+    Set AddDays = CDateTimeUnspecifiedKind(Time).AddDays(Days)
 End Function
 
 ''
@@ -188,7 +188,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = Statics.Calendar.GetDateTime(Time).AddHours(Hours)
+    Set AddHours = CDateTimeUnspecifiedKind(Time).AddHours(Hours)
 End Function
 
 ''
@@ -199,7 +199,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = Statics.Calendar.GetDateTime(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = CDateTimeUnspecifiedKind(Time).AddMilliseconds(Milliseconds)
 End Function
 
 ''
@@ -210,7 +210,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = Statics.Calendar.GetDateTime(Time).AddMinutes(Minutes)
+    Set AddMinutes = CDateTimeUnspecifiedKind(Time).AddMinutes(Minutes)
 End Function
 
 ''
@@ -232,7 +232,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
         Exit Function
     End If
     
-    ms = Statics.Calendar.GetDateTime(Time).TotalMilliseconds
+    ms = CDateTime(Time).TotalMilliseconds
     TOD = Modulus(ms, MilliSecondsPerDay)
     GetDateParts ms, Complete, Year, Month, Day
     Month = ToDotNetMonth(Year, Month)
@@ -281,7 +281,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = Statics.Calendar.GetDateTime(Time).AddSeconds(Seconds)
+    Set AddSeconds = CDateTimeUnspecifiedKind(Time).AddSeconds(Seconds)
 End Function
 
 ''
@@ -308,7 +308,7 @@ Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateT
     Dim Day     As Long
     Dim ms      As Currency
     
-    ms = Statics.Calendar.GetDateTime(Time).TotalMilliseconds
+    ms = CDateTimeUnspecifiedKind(Time).TotalMilliseconds
     GetDateParts ms, Complete, Year, Month, Day
     
     Month = ToDotNetMonth(Year, Month)
@@ -335,7 +335,7 @@ End Function
 ' @return The hour portion of the <i>Time</i>.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = Statics.Calendar.GetDateTime(Time).Hour
+    GetHour = CDateTime(Time).Hour
 End Function
 
 ''
@@ -345,7 +345,7 @@ End Function
 ' @return The millisecond portion of the <i>Time</i>.
 '
 Public Function GetMilliseconds(ByRef Time As Variant) As Long
-    GetMilliseconds = Statics.Calendar.GetMilliseconds(Time)
+    GetMilliseconds = CDateTime(Time).Millisecond
 End Function
 
 ''
@@ -355,7 +355,7 @@ End Function
 ' @return The second portion of the <i>Time</i>.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = Statics.Calendar.GetSecond(Time)
+    GetSecond = CDateTime(Time).Second
 End Function
 
 ''
@@ -365,7 +365,7 @@ End Function
 ' @return The minute portion of the <i>Time</i>.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = Statics.Calendar.GetMinute(Time)
+    GetMinute = CDateTime(Time).Minute
 End Function
 
 ''
@@ -375,7 +375,7 @@ End Function
 ' @return The month portion of the <i>Time</i>.
 '
 Public Function GetMonth(ByRef Time As Variant) As Long
-    GetDateParts Statics.Calendar.GetDateTime(Time).TotalMilliseconds, MonthPart, , GetMonth
+    GetDateParts CDateTime(Time).TotalMilliseconds, MonthPart, , GetMonth
 End Function
 
 ''
@@ -385,7 +385,7 @@ End Function
 ' @return The year portion of the <i>Time</i>.
 '
 Public Function GetYear(ByRef Time As Variant) As Long
-    GetDateParts Statics.Calendar.GetDateTime(Time).TotalMilliseconds, YearPart, GetYear
+    GetDateParts CDateTime(Time).TotalMilliseconds, YearPart, GetYear
 End Function
 
 ''
@@ -449,7 +449,7 @@ End Function
 ' @return An integer from 1 to 30 that represents the day of the month in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function GetDayOfMonth(ByRef Time As Variant) As Long
-    GetDateParts Statics.Calendar.GetDateTime(Time).TotalMilliseconds, DayPart, , , GetDayOfMonth
+    GetDateParts CDateTime(Time).TotalMilliseconds, DayPart, , , GetDayOfMonth
 End Function
 
 ''
@@ -461,7 +461,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = Statics.Calendar.GetDateTime(Time).DayOfWeek
+    GetDayOfWeek = CDateTime(Time).DayOfWeek
 End Function
 
 ''
@@ -471,7 +471,7 @@ End Function
 ' @return An integer from 1 to 385 that represents the day of the year in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function GetDayOfYear(ByRef Time As Variant) As Long
-    GetDateParts Statics.Calendar.GetDateTime(Time).TotalMilliseconds, DayOfTheYear, , , , GetDayOfYear
+    GetDateParts CDateTime(Time).TotalMilliseconds, DayOfTheYear, , , , GetDayOfYear
 End Function
 
 ''
@@ -863,7 +863,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub InitClone(ByVal TwoDigitYearMax As Long)
     mTwoDigitYearMax = TwoDigitYearMax
-    mIsReadOnly = False
 End Sub
 
 Private Sub Class_InitProperties()
