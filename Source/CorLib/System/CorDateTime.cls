@@ -48,7 +48,7 @@ Attribute VB_Exposed = True
 ' </pre>
 '
 ' @see Constructors
-' @see cDateTimeStatic
+' @see CorDateTimeStatic
 ' @see DateTimeFormatInfo
 ' @see TimeSpan
 ' @see IComparable
@@ -84,22 +84,20 @@ Private mKind           As DateTimeKind
 
 
 ''
-' Returns the kind of CorDateTime.
+' Returns the <a href="CorDateTimeStatic.DateTimeKind.html">DateTimeKind</a> of <a href="CorDateTime.html">CorDateTime</a>.
 '
-' @return The kind.
-' @remarks A <b>cDateTime</b> can be Universal Coordinated Time (UTC),
-' local time, or unspecified.
+' @return The <a href="CorDateTimeStatic.DateTimeKind.html">DateTimeKind</a>.
+' @remarks A <a href="CorDateTime.html">CorDateTime</a> can be Universal Coordinated Time (UTC), local time, or unspecified.
 '
 Public Property Get Kind() As DateTimeKind
     Kind = mKind
 End Property
 
 ''
-' Returns if this CorDateTime instance is currently in daylight savings time.
+' Returns if this <a href="CorDateTime.html">CorDateTime</a> instance is currently in daylight savings time.
 '
 ' @return If this instance is in daylight savings.
-' @remarks This uses the current time zone settings of the system to
-' determine when daylight savings should be.
+' @remarks This uses the current time zone settings of the system to determine when daylight savings should be.
 '
 Public Property Get IsDayLightSavingsTime() As Boolean
     IsDayLightSavingsTime = TimeZone.CurrentTimeZone.IsDayLightSavingTime(Me)
@@ -168,8 +166,7 @@ End Property
 ' Returns the day within the calendar year.
 '
 ' @return The day within the year.
-' @remarks The value is calculated using the Gregorian calendar,
-' and will range from 1-365 or 1-366 for leap years.
+' @remarks The value is calculated using the Gregorian calendar, and will range from 1-365 or 1-366 for leap years.
 '
 Public Property Get DayOfYear() As Long
     GetDateParts DayOfTheYear, DayOfYear:=DayOfYear
@@ -179,7 +176,7 @@ End Property
 ' Returns the day of the week for the current date.
 '
 ' @return The day of the week.
-' @remarks The DayOfWeekEnum is zero based and therefore not
+' @remarks The <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> is zero based and therefore not
 ' directly compatible with vbDayOfWeek. 1 must be added to
 ' align to the 1-based values of vbDayOfWeek.
 '
@@ -269,11 +266,10 @@ Public Property Get TimeOfDay() As TimeSpan
 End Property
 
 ''
-' Adds a specified amount of time to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified amount of time to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param Value The amount of time to add.
-' @return The new date object containing the new calculated time.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> object containing the new calculated time.
 '
 Public Function Add(ByRef Value As TimeSpan) As CorDateTime
     If Value Is Nothing Then _
@@ -283,11 +279,10 @@ Public Function Add(ByRef Value As TimeSpan) As CorDateTime
 End Function
 
 ''
-' Adds a specified number of milliseconds to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of milliseconds to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param value The number of milliseconds to add.
-' @return The new date containing the new calculated time.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> containing the new calculated time.
 '
 Public Function AddMilliseconds(ByVal Value As Double) As CorDateTime
     If Value < 0# Then
@@ -303,44 +298,40 @@ Public Function AddMilliseconds(ByVal Value As Double) As CorDateTime
 End Function
 
 ''
-' Adds a specified number of days to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of days to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param value The number of days to add.
-' @return The new CorDateTime containing the calculated value.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> containing the calculated value.
 '
 Public Function AddDays(ByVal Value As Double) As CorDateTime
     Set AddDays = AddMilliseconds(Value * MilliSecondsPerDay)
 End Function
 
 ''
-' Adds a specified number of hours to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of hours to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param value The number of hours to add.
-' @return The new CorDateTime instance containing the calculated value.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> instance containing the calculated value.
 '
 Public Function AddHours(ByVal Value As Double) As CorDateTime
     Set AddHours = AddMilliseconds(Value * MillisecondsPerHour)
 End Function
 
 ''
-' Adds a specified number of minutes to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of minutes to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param value The number of minutes to add.
-' @return The new CorDateTime instance containing the calculated value.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> instance containing the calculated value.
 '
 Public Function AddMinutes(ByVal Value As Double) As CorDateTime
     Set AddMinutes = AddMilliseconds(Value * MillisecondsPerMinute)
 End Function
 
 ''
-' Adds a specified number of months to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of months to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param Months The number of months to be added.
-' @return The new CorDateTime instance containing the calculated value.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> instance containing the calculated value.
 ' @remarks If the new month does not have as many days in it as the
 ' original month, then the day is set to the last day of the new month
 ' if it exceeds the maximum number of days for the new month.
@@ -359,13 +350,13 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
     Dim Day     As Long
     GetDateParts Complete, Year, Month, Day
     
-    Dim yearsToAdd  As Long
-    Dim monthsToAdd As Long
+    Dim YearsToAdd  As Long
+    Dim MonthsToAdd As Long
     
-    yearsToAdd = CorMath.DivRem(Months, MonthsPerYear, monthsToAdd)
+    YearsToAdd = CorMath.DivRem(Months, MonthsPerYear, MonthsToAdd)
     
-    Month = Month + monthsToAdd
-    Year = Year + yearsToAdd
+    Month = Month + MonthsToAdd
+    Year = Year + YearsToAdd
     Select Case Month
         Case Is < 1
             Month = Month + MonthsPerYear
@@ -385,22 +376,20 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
 End Function
 
 ''
-' Adds a specified number of seconds to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of seconds to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param value The number of seconds to be added.
-' @return The new CorDateTime instance containing the calculated value.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> instance containing the calculated value.
 '
 Public Function AddSeconds(ByVal Value As Double) As CorDateTime
     Set AddSeconds = AddMilliseconds(Value * MillisecondsPerSecond)
 End Function
 
 ''
-' Adds a specified number of ticks to the current date, returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of ticks to the current date, returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param value The number of ticks to be added.
-' @return the new CorDateTime instance containing the calcuated value.
+' @return the new <a href="CorDateTime.html">CorDateTime</a> instance containing the calcuated value.
 '
 Public Function AddTicks(ByRef Value As Variant) As CorDateTime
     Dim DecimalValue As Variant
@@ -413,57 +402,56 @@ Public Function AddTicks(ByRef Value As Variant) As CorDateTime
 End Function
 
 ''
-' Adds a specified number of years to the current date., returning a
-' new CorDateTime instance with the calcuated value.
+' Adds a specified number of years to the current date., returning a new <a href="CorDateTime.html">CorDateTime</a> instance with the calcuated value.
 '
 ' @param value The number of years to be added.
-' @return The new CorDateTime instance containing the calculated value.
+' @return The new <a href="CorDateTime.html">CorDateTime</a> instance containing the calculated value.
 '
 Public Function AddYears(ByVal Value As Long) As CorDateTime
     Set AddYears = AddMonths(Value * MonthsPerYear)
 End Function
 
 ''
-' Compares this instance to a passed in CorDateTime instance.
+' Compares this instance to a passed in Date or <a href="CorDateTime.html">CorDateTime</a> instance.
 '
-' @param value The CorDateTime or Date value to compare against this instance.
+' @param Value The Date or <a href="CorDateTime.html">CorDateTime</a> value to compare against this instance.
 ' @return A value indicating the relation to the passed in value. Negative
 ' indicates this instance is less than the argument, zero indicates the two
 ' values are equal, and positive indicates this value is greater than the
 ' argument.
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Dim ms As Currency
+    Dim Other As CorDateTime
     
     Select Case VarType(Value)
         Case vbObject
-            If Value Is Nothing Then _
-                Error.ArgumentNull "Value"
-            If Not TypeOf Value Is CorDateTime Then _
-                Error.Argument Argument_DateRequired, "Value"
-                
-            Dim Other As CorDateTime
-            Set Other = Value
-            ms = Other.TotalMilliseconds
+            If Value Is Nothing Then
+                CompareTo = 1
+                Exit Function
+            End If
             
+            If TypeOf Value Is CorDateTime Then
+                Set Other = Value
+            Else
+                Error.Argument Arg_MustBeDateTime
+            End If
         Case vbDate
-            ms = CorDateTime.GetMilliseconds(Value)
-        
+            Set Other = CorDateTime.FromOADate(Value)
         Case Else
-            Error.Argument Argument_DateRequired, "Value"
+            Error.Argument Arg_MustBeDateTime
     End Select
     
-    If mMilliseconds < ms Then
+    If mMilliseconds < Other.TotalMilliseconds Then
         CompareTo = -1
-    ElseIf mMilliseconds > ms Then
+    ElseIf mMilliseconds > Other.TotalMilliseconds Then
         CompareTo = 1
     End If
 End Function
 
 ''
-' Converts the CorDateTime to a FileTime representation, adjusting for timezone.
+' Converts the <a href="CorDateTime.html">CorDateTime</a> to a FileTime representation, adjusting for timezone.
 '
-' @return The filetime representation of the CorDateTime.
+' @return The filetime representation of the <a href="CorDateTime.html">CorDateTime</a>.
 ' @remarks FileTime values cannot be less than 1/1/1601 12:00:00AM.
 '
 Public Function ToFileTime() As Currency
@@ -471,9 +459,9 @@ Public Function ToFileTime() As Currency
 End Function
 
 ''
-' Converts the CorDateTime to a FileTime representation, ignoring the timezone offset.
+' Converts the <a href="CorDateTime.html">CorDateTime</a> to a FileTime representation, ignoring the timezone offset.
 '
-' @return The filetime representation of the CorDateTime.
+' @return The filetime representation of the <a href="CorDateTime.html">CorDateTime</a>.
 ' @remarks FileTime values cannot be less than 1/1/1601 12:00:00AM.
 '
 Public Function ToFileTimeUtc() As Currency
@@ -494,9 +482,9 @@ Public Function ToFileTimeUtc() As Currency
 End Function
 
 ''
-' Returns a CorDateTime with the timezone offset applied to this instance.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> with the timezone offset applied to this instance.
 '
-' @return The CorDateTime object with the timezone offset applied.
+' @return The <a href="CorDateTime.html">CorDateTime</a> object with the timezone offset applied.
 '
 Public Function ToLocalTime() As CorDateTime
     If mKind = LocalKind Then
@@ -507,9 +495,9 @@ Public Function ToLocalTime() As CorDateTime
 End Function
 
 ''
-' Returns a CorDateTime with the timezone offset removed from this instance.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> with the timezone offset removed from this instance.
 '
-' @return The CorDateTime object with the timezone offset removed.
+' @return The <a href="CorDateTime.html">CorDateTime</a> object with the timezone offset removed.
 '
 Public Function ToUniversalTime() As CorDateTime
     If mKind = UtcKind Then
@@ -520,7 +508,7 @@ Public Function ToUniversalTime() As CorDateTime
 End Function
 
 ''
-' Formats a CorDateTime object or Date value in the pattern specified by
+' Formats a <a href="CorDateTime.html">CorDateTime</a> object or Date value in the pattern specified by
 ' the formatting command. If no command is specified, then 'G' is assumed.
 ' If the command cannot be found, then a custom pattern is assumed.
 '
@@ -597,7 +585,7 @@ End Function
 ''
 ' Returns a 64-bit representation of the time and kind.
 '
-' @return 64-bit representation of the CorDateTime
+' @return 64-bit representation of the <a href="CorDateTime.html">CorDateTime</a>
 ' @remarks The upper 2 bits are used to represent the DateTimeKind
 ' of the object, the lower 62-bits are used to represent the ticks.
 '
@@ -614,31 +602,33 @@ Public Function ToBinary() As Currency
 End Function
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same date.
+' Returns a boolean indicating if the value and this object instance are the same date.
 '
 ' @param value The value to compare equality to.
 ' @return Boolean indicating equality.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
-    Equals = Statics.CorDateTime.Equals(Me, Value)
+    On Error GoTo Catch
+    
+    Equals = Convert.ToDateTime(Value).TotalMilliseconds = mMilliseconds
+
+Catch:
 End Function
 
 ''
-' Subtracts either a CorDateTime instance or a TimeSpan instance from this
+' Subtracts either a <a href="CorDateTime.html">CorDateTime</a> instance or a <a href="TimeSpan.html">TimeSpan</a> instance from this
 ' CorDateTime instance.
 '
-' @param value A CorDateTime or TimeSpan object to subtract from this instance.
-' @return If subtracting a CorDateTime object from this, then a TimeSpan
-' representing the difference in time between the two is returned. If subtracting
-' a TimeSpan object from this instance, then a new CorDateTime with a difference
-' of the TimeSpan obect from this instance is returned.
+' @param value A <a href="CorDateTime.html">CorDateTime</a> or <a href="TimeSpan.html">TimeSpan</a> object to subtract from this instance.
+' @return If subtracting a <a href="CorDateTime.html">CorDateTime</a> object from this, then a <a href="TimeSpan.html">TimeSpan</a>
+' representing the difference in time between the two is returned. If subtracting a <a href="TimeSpan.html">TimeSpan</a> object from this instance, then a new <a href="CorDateTime.html">CorDateTime</a> with a difference
+' of the <a href="TimeSpan.html">TimeSpan</a> obect from this instance is returned.
 '
 Public Function Subtract(ByRef Value As Variant) As Object
     Select Case VarType(Value)
         Case vbObject
             If Value Is Nothing Then _
-                Error.ArgumentNull "Value", ArgumentNull_Generic
+                Error.ArgumentNull "Value"
             
             If TypeOf Value Is TimeSpan Then
                 Dim ts As TimeSpan
@@ -670,86 +660,86 @@ Public Function GetHashCode() As Long
 End Function
 
 ''
-' Determines if this instance is greater than another CorDateTime object.
+' Determines if this instance is greater than another <a href="CorDateTime.html">CorDateTime</a> object.
 '
-' @param dt The CorDateTime object to compare against.
-' @return Returns True if this object is greater than the dt object.
-' @remarks This is provided for quick comparisions of two CorDateTime objects.
+' @param Value The <a href="CorDateTime.html">CorDateTime</a> object to compare against.
+' @return Returns True if this object is greater than the <i>Value</i> object.
+' @remarks This is provided for quick comparisions of two <a href="CorDateTime.html">CorDateTime</a> objects.
 '
-Public Function GreaterThan(ByVal dt As CorDateTime) As Boolean
-    If dt Is Nothing Then
+Public Function GreaterThan(ByVal Value As CorDateTime) As Boolean
+    If Value Is Nothing Then
         GreaterThan = True
     Else
-        GreaterThan = (mMilliseconds > dt.TotalMilliseconds)
+        GreaterThan = (mMilliseconds > Value.TotalMilliseconds)
     End If
 End Function
 
 ''
-' Determines if this instance is less than another CorDateTime object.
+' Determines if this instance is less than another <a href="CorDateTime.html">CorDateTime</a> object.
 '
-' @param dt The CorDateTime object to compare against.
-' @return Returns True if this object is less than the dt object.
-' @remarks This is provided for quick comprisons of two CorDateTime Objects.
+' @param Value The <a href="CorDateTime.html">CorDateTime</a> object to compare against.
+' @return Returns True if this object is less than the <i>Value</i> object.
+' @remarks This is provided for quick comprisons of two <a href="CorDateTime.html">CorDateTime</a> Objects.
 '
-Public Function LessThan(ByVal dt As CorDateTime) As Boolean
-    If Not dt Is Nothing Then
-        LessThan = (mMilliseconds < dt.TotalMilliseconds)
+Public Function LessThan(ByVal Value As CorDateTime) As Boolean
+    If Not Value Is Nothing Then
+        LessThan = (mMilliseconds < Value.TotalMilliseconds)
     End If
 End Function
 
 ''
-' Determines if this instance is greater than or equal to another CorDateTime object.
+' Determines if this instance is greater than or equal to another <a href="CorDateTime.html">CorDateTime</a> object.
 '
-' @param dt The CorDateTime object to compare against.
-' @return Returns True if this object is greater than or equal to the dt object.
-' @remarks This is provided for quick comprisons of two CorDateTime Objects.
+' @param Value The <a href="CorDateTime.html">CorDateTime</a> object to compare against.
+' @return Returns True if this object is greater than or equal to the <i>Value</i> object.
+' @remarks This is provided for quick comprisons of two <a href="CorDateTime.html">CorDateTime</a> Objects.
 '
-Public Function GreaterThanOrEqualTo(ByVal dt As CorDateTime) As Boolean
-    If dt Is Nothing Then
+Public Function GreaterThanOrEqualTo(ByVal Value As CorDateTime) As Boolean
+    If Value Is Nothing Then
         GreaterThanOrEqualTo = True
     Else
-        GreaterThanOrEqualTo = (mMilliseconds >= dt.TotalMilliseconds)
+        GreaterThanOrEqualTo = (mMilliseconds >= Value.TotalMilliseconds)
     End If
 End Function
 
 ''
-' Determines if this instance is less than or equal to another CorDateTime object.
+' Determines if this instance is less than or equal to another <a href="CorDateTime.html">CorDateTime</a> object.
 '
-' @param dt The CorDateTime object to compare against.
-' @return Returns True if this object is less than or equal to the dt object.
-' @remarks This is provided for quick comprisons of two CorDateTime Objects.
+' @param Value The <a href="CorDateTime.html">CorDateTime</a> object to compare against.
+' @return Returns True if this object is less than or equal to the <i>Value</i> object.
+' @remarks This is provided for quick comprisons of two <a href="CorDateTime.html">CorDateTime</a> Objects.
 '
-Public Function LessThanOrEqualTo(ByVal dt As CorDateTime) As Boolean
-    If Not dt Is Nothing Then
-        LessThanOrEqualTo = (mMilliseconds <= dt.TotalMilliseconds)
+Public Function LessThanOrEqualTo(ByVal Value As CorDateTime) As Boolean
+    If Not Value Is Nothing Then
+        LessThanOrEqualTo = (mMilliseconds <= Value.TotalMilliseconds)
     End If
 End Function
 
 ''
-' Determines if this instance is equal to another CorDateTime object.
+' Determines if this instance is equal to another <a href="CorDateTime.html">CorDateTime</a> object.
 '
-' @param dt The CorDateTime object to compare against.
-' @return Returns True if this object is equal to the dt object.
-' @remarks This is provided for quick comprisons of two CorDateTime Objects.
+' @param Value The <a href="CorDateTime.html">CorDateTime</a> object to compare against.
+' @return Returns True if this object is equal to the <i>Value</i> object.
+' @remarks This is provided for quick comprisons of two <a href="CorDateTime.html">CorDateTime</a> Objects.
 '
-Public Function EqualTo(ByVal dt As CorDateTime) As Boolean
-    If Not dt Is Nothing Then
-        EqualTo = (mMilliseconds = dt.TotalMilliseconds)
+Public Function EqualTo(ByVal Value As CorDateTime) As Boolean
+    If Not Value Is Nothing Then
+        EqualTo = (mMilliseconds = Value.TotalMilliseconds)
     End If
 End Function
 
 ''
-' Determines if this instance is not equal to another CorDateTime object.
+' Determines if this instance is not equal to another <a href="CorDateTime.html">CorDateTime</a> object.
 '
-' @param dt The CorDateTime object to compare against.
-' @return Returns True if this object is not equal to the dt object.
-' @remarks This is provided for quick comprisons of two CorDateTime Objects.
+' @param Value The <a href="CorDateTime.html">CorDateTime</a> object to compare against.
+' @return Returns True if this object is not equal to the <i>Value</i> object.
+' @remarks This is provided for quick comprisons of two <a href="CorDateTime.html">CorDateTime</a> Objects.
 '
-Public Function NotEqualTo(ByVal dt As CorDateTime) As Boolean
-    If dt Is Nothing Then
+Public Function NotEqualTo(ByVal Value As CorDateTime) As Boolean
+    If Value Is Nothing Then
         NotEqualTo = True
     Else
-        NotEqualTo = (mMilliseconds <> dt.TotalMilliseconds)
+        NotEqualTo = (mMilliseconds <> Value.TotalMilliseconds)
     End If
 End Function
 
@@ -826,16 +816,16 @@ Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year
     If Years100 = 4 Then Years100 = 3   ' leap year
     Days = Days - Years100 * DaysPer100Years
     
-    Dim years4 As Long
-    years4 = Days \ DaysPer4Years
-    Days = Days - years4 * DaysPer4Years
+    Dim Years4 As Long
+    Years4 = Days \ DaysPer4Years
+    Days = Days - Years4 * DaysPer4Years
     
     Dim Years As Long
     Years = Days \ 365
     If Years = 4 Then Years = 3 ' leap year
     
     ' Return the Year.
-    Year = Years400 * 400 + Years100 * 100 + years4 * 4 + Years + 1
+    Year = Years400 * 400 + Years100 * 100 + Years4 * 4 + Years + 1
     If DatePart = YearPart Then Exit Sub
     
     Days = Days - Years * DaysPerYear
@@ -846,7 +836,7 @@ Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year
     
     ' Month will be set in the CalculateDay method.
     ' Day is set to the result of CalculateDays.
-    If Years = 3 And (Years100 = 3 Or years4 <> 24) Then
+    If Years = 3 And (Years100 = 3 Or Years4 <> 24) Then
         Day = CalculateDay(Days, Month, DaysToMonthLeapYear) + 1
     Else
         Day = CalculateDay(Days, Month, DaysToMonth) + 1

@@ -211,6 +211,35 @@ Public Sub NewDate_WhenCalled_CreatesInstance()
     Assert.That Actual.Millisecond, Iz.EqualTo(0)
 End Sub
 
+Public Sub SpecifyKind_WhenSameAsCurrentValue_ReturnsPassedInInstance()
+    Dim dt As CorDateTime
+    Set dt = NewDate(#1/1/2000#, LocalKind)
+    
+    Dim Actual As CorDateTime
+    Set Actual = CorDateTime.SpecifyKind(dt, LocalKind)
+    
+    Assert.That Actual, Iz.SameAs(dt)
+End Sub
+
+Public Sub SpecifyKind_WhenDifferentAsCurrentValue_ReturnsNewInstance()
+    Dim dt As CorDateTime
+    Set dt = NewDate(#1/1/2000#, LocalKind)
+    
+    Dim Actual As CorDateTime
+    Set Actual = CorDateTime.SpecifyKind(dt, UtcKind)
+    
+    Assert.That Actual, Iz.Not.SameAs(dt)
+    Assert.That Actual.Kind, Iz.EqualTo(UtcKind)
+End Sub
+
+Public Sub SpecifyKind_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    CorDateTime.SpecifyKind Nothing, UtcKind
+    
+    AssertArgumentNullException Err, "Value"
+End Sub
+
 Public Sub ToOADate_WithDefaultDate_ReturnsMidnight()
     Dim SUT As New CorDateTime
     
@@ -242,12 +271,32 @@ Public Sub FromOADate_WithValue_ReturnsDateTime(ByVal d As Date)
     Assert.That Actual.Millisecond, Iz.EqualTo(0)
 End Sub
 
+Public Sub MinValue_WhenCalled_ReturnsJanuaryFirstYearOne()
+    Dim Actual As CorDateTime
+    
+    Set Actual = CorDateTime.MinValue
+    
+    Assert.That Actual, Equals(NewDateTime(1, 1, 1))
+End Sub
+
+Public Sub MaxValue_WhenCalled_ReturnsLastMomentOfYear9999()
+    Dim Actual As CorDateTime
+    
+    Set Actual = CorDateTime.MaxValue
+    
+    Const MaxMilliseconds As Currency = 315537897599999.9999@
+    Dim Expected As CorDateTime
+    Set Expected = CorDateTime.FromMilliseconds(MaxMilliseconds)
+
+    Assert.That Actual, Equals(Expected)
+End Sub
+
 Public Sub Equals_WithValues_ReturnsExpected(ByVal Other As Variant, ByVal Expected As Boolean)
     Dim SUT As CorDateTime
     Set SUT = NewDateTime(2004, 1, 2, 3, 4, 5)
     
     Dim Actual As Boolean
-    Actual = CorDateTime.Equals(SUT, Other)
+    Actual = SUT.Equals(Other)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -315,7 +364,7 @@ Public Sub TimeOfDay_WhenCalled_ReturnsExpected()
     Set Actual = NewDateTime(2004, 1, 1, 6, 10, 15, 100).TimeOfDay
     
     Dim Expected As TimeSpan
-    Set Expected = newtimespan(Hours:=6, Minutes:=10, Seconds:=15, Milliseconds:=100)
+    Set Expected = NewTimeSpan(Hours:=6, Minutes:=10, Seconds:=15, Milliseconds:=100)
     Assert.That Actual, Equals(Expected)
 End Sub
 
@@ -441,12 +490,12 @@ Public Sub CompareTo_WithValues_ReturnsExpected(ByRef Other As Variant, ByVal Ex
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub CompareTo_WithNothing_ThrowsArgumentNullException()
-    On Error Resume Next
+Public Sub CompareTo_WithNothing_Returns1()
+    Dim Actual As Long
     
-    NewDate(#1/1/2001#).CompareTo Nothing
+    Actual = CorDateTime.MinValue.CompareTo(Nothing)
     
-    AssertArgumentNullException Err, "Value"
+    Assert.That Actual, Iz.EqualTo(1)
 End Sub
 
 Public Sub CompareTo_WithUnsupportedType_ThrowsArgumentException()
@@ -454,7 +503,7 @@ Public Sub CompareTo_WithUnsupportedType_ThrowsArgumentException()
     
     NewDate(#1/1/2001#).CompareTo Empty
     
-    AssertArgumentException Err, "Value"
+    AssertArgumentException Err
 End Sub
 
 Public Sub Subtract_WithTimeSpans_ReturnsExpected(ByVal TimeSpanToSubtract As TimeSpan, ByVal Expected As CorDateTime)

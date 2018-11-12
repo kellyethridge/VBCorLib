@@ -119,7 +119,8 @@ Private Sub AddSystem()
         
         .Add NewSuite("Convert Tests", _
             New ConvertToBase64Tests, _
-            New ConvertFromBase64Tests)
+            New ConvertFromBase64Tests, _
+            New ConvertTests)
     
         .Add NewSuite("CorArray Tests", _
             New CorArrayTests, _
@@ -133,6 +134,7 @@ Private Sub AddSystem()
             New CorArrayFindTests)
     
         .Add New PublicFunctionsTests
+        
         AddTest .This
     End With
 End Sub

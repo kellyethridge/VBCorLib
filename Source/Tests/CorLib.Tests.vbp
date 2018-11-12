@@ -204,6 +204,7 @@ Class=BIntNumberStylesAllowParenthesesTests; System.Numerics\BIntNumberStylesAll
 Class=BIntNumberStylesAllowExponentTests; System.Numerics\BIntNumberStylesAllowExponentTests.cls
 Class=BIntNumberStylesAllowHexSpecifierTests; System.Numerics\BIntNumberStylesAllowHexSpecifierTests.cls
 ResFile32="CorLib.Tests.RES"
+Class=ConvertTests; System\ConvertTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

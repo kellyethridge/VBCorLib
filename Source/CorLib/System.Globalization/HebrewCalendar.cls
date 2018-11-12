@@ -829,7 +829,7 @@ End Sub
 
 Private Function GetFixedDays(ByRef Time As Variant) As Long
     Dim ms As Currency
-    ms = Statics.Calendar.GetTotalMilliseconds(Time)
+    ms = CDateTime(Time).TotalMilliseconds
     GetFixedDays = Int(ms / MilliSecondsPerDay) + 1
 End Function
 

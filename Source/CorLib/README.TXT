@@ -79,6 +79,8 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed BigInteger DevRem. When dividing by a negative value, remainder should still be positive.
 	* Renamed BigInteger.ToArray to BigInteger.ToByteArray to match the .net method name. *BREAKING*
 	* Updated BigInteger.Parse to match .NET implementation closely. Now utilizes the NumberStyles enum.
+	* Fixed CorDateTime.MaxValue to include max ticks.
+	* Fixed HebrewCalendar to correctly identity all days in leap month as a leap day.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

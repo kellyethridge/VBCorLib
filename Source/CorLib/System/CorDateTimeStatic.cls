@@ -36,27 +36,28 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Represents methods to create CorDateTime objects from various data sources.
+' Represents methods to create <a href="CorDateTime.html">CorDateTime</a> objects from various data sources.
 '
-' @remarks These methods are considered static. The <b>cDateTimeStatic</b> cannot
-' be directly instantiated. Use these methods withe <b>cDateTime.*</b> syntax.
+' @remarks These methods are considered static. The <a href="CorDateTimeStatic.html">CorDateTimeStatic</a> cannot be directly instantiated.
+' to access the methods use the <b>CorDateTime</b> qualifier (e.g. CorDateTime.MaxValue.)
 ' <pre>
 ' Dim dt As CorDateTime
 ' Set dt = CorDateTime.FromOADate(#1/1/2001 8:30:00 AM#)
 '
-' ' A quicker way to create a <b>cDateTime</b> object is to use the <b>NewDate</b> method.
+' ' A quicker way to create a <a href="CorDateTime.html">CorDateTime</a> object is to use the <a href="Constructors.NewDate.html">NewDate</a> <a href="Constructors.html">constructor</a>.
 ' Set dt = NewDate(#1/1/2001 8:30:00 AM#)
 ' </pre>
-' This will create a new instance of <b>cDateTime</b> with the supplied date value.
+' This will create a new instance of <a href="CorDateTime.html">CorDateTime</a> with the supplied date value.
 ' @see CorDateTime
 '
 Option Explicit
 
-' we put this here instead of CorDateTime to prevent conflicts with
-' the CorDateTime.DayOfWeek property.
+Private Const MinMilliseconds As Currency = 0
+Private Const MaxMilliseconds As Currency = 315537897599999.9999@
+
 
 ''
-' This enumeration represents the days of the week as used by CorDateTime and Calendars.
+' This enumeration represents the days of the week as used by <a href="CorDateTime.html">CorDateTime</a> and <a href="Calendar.html">Calendars</a>.
 '
 ' @param Sunday 0
 ' @param Monday 1
@@ -77,7 +78,7 @@ Public Enum DayOfWeek
 End Enum
 
 ''
-' Used to specify the type of CorDateTime object.
+' Used to specify the type of <a href="CorDateTime.html">CorDateTime</a> object.
 '
 ' @param UnspecifiedKind 0
 ' @param UtcKind 1
@@ -101,7 +102,7 @@ Private mMaxValue           As CorDateTime
 ' @param Year The year to test for leap year.
 ' @return Indication of leap year.
 ' @remarks Only the Gregorian calendar is supported through the
-' CorDateTime functions. To determine leap years for other calendar
+' <a href="CorDateTime.html">CorDateTime</a> functions. To determine leap years for other calendar
 ' types, an instance of the specific calendar will need to be used.
 ' <p>If the year is evenly divisible by 4 or 400 and not by 100
 ' then it is a leap year.</p>
@@ -135,11 +136,11 @@ Public Function DaysInMonth(ByVal Year As Long, ByVal Month As Long) As Long
 End Function
 
 ''
-' Returns a CorDateTime object from a VB Date value.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> object from a VB Date value.
 '
 ' @param d The standard VB Date value.
-' @param Kind Specifies whether the CorDateTime is a UTC, Local, or unspecified time type.
-' @return The CorDateTime representation of the date.
+' @param Kind Specifies whether the <a href="CorDateTime.html">CorDateTime</a> is a UTC, Local, or unspecified time type.
+' @return The <a href="CorDateTime.html">CorDateTime</a> representation of the date.
 '
 Public Function FromOADate(ByVal d As Date, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As CorDateTime
     Set FromOADate = New CorDateTime
@@ -147,10 +148,10 @@ Public Function FromOADate(ByVal d As Date, Optional ByVal Kind As DateTimeKind 
 End Function
 
 ''
-' Creates a <b>cDateTime</b> object from an operating system file timestamp.
+' Creates a <a href="CorDateTime.html">CorDateTime</a> object from an operating system file timestamp.
 '
 ' @param time The file time in UTC time.
-' @return The CorDateTime of the file time converted to local time from UTC time.
+' @return The <a href="CorDateTime.html">CorDateTime</a> of the file time converted to local time from UTC time.
 ' @remarks Time is a 64-bit integer representing a Windows file timestamp. Using
 ' a Currency datatype means the timestamp is represented as milliseconds with the
 ' fraction representing ticks of a millisecond. No conversion if performed. The
@@ -165,10 +166,10 @@ Public Function FromFileTime(ByVal Time As Currency) As CorDateTime
 End Function
 
 ''
-' Returns a CorDateTime object from a FileTime value.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> object from a FileTime value.
 '
 ' @param time The file time in UTC time.
-' @return The CorDateTime of the file time in UTC time.
+' @return The <a href="CorDateTime.html">CorDateTime</a> of the file time in UTC time.
 '
 Public Function FromFileTimeUtc(ByVal Time As Currency) As CorDateTime
     If Time < 0 Then _
@@ -179,13 +180,12 @@ Public Function FromFileTimeUtc(ByVal Time As Currency) As CorDateTime
 End Function
 
 ''
-' Returns a CorDateTime object from milliseconds.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> object from milliseconds.
 '
 ' @param ms The number of milliseconds the time is equal to.
-' @param Kind Specifies whether the CorDateTime is a UTC, Local, or unspecified time type.
-' @return The CorDateTime object converted from milliseconds.
-' @remarks Since a Currency can be passed in, the fractional portion
-' can be used to represent the number ticks (1/10000 ms) in the date.
+' @param Kind Specifies whether the <a href="CorDateTime.html">CorDateTime</a> is a UTC, Local, or unspecified time type.
+' @return The <a href="CorDateTime.html">CorDateTime</a> object converted from milliseconds.
+' @remarks Since a Currency can be passed in, the fractional portion can be used to represent the number ticks (1/10000 ms) in the date.
 '
 Public Function FromMilliseconds(ByVal ms As Currency, Optional ByVal Kind As DateTimeKind = UnspecifiedKind) As CorDateTime
     Set FromMilliseconds = New CorDateTime
@@ -193,84 +193,81 @@ Public Function FromMilliseconds(ByVal ms As Currency, Optional ByVal Kind As Da
 End Function
 
 ''
-' Returns a CorDateTime that represents the current time on the local machine.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> that represents the current time on the local machine.
 '
-' @return The CorDateTime object representing the current time on the local machine.
-' @remarks This method uses GetLocalTime which has a resolution down to the
+' @return The <a href="CorDateTime.html">CorDateTime</a> object representing the current time on the local machine.
+' @remarks This method uses Windows GetLocalTime which has a resolution down to the
 ' milliseconds. If the milliseconds is not wanted, then either the Millisecond
-' must be subtracted for the instance, or use CorDateTime.FromOADate(Now).
+' must be subtracted from the instance, or use <a href="CorDateTimeStatic.FromOADate.html">CorDateTime.FromOADate</a> passing the VB Now value.
 '
-Public Function Now() As CorDateTime
+Public Property Get Now() As CorDateTime
     Dim LocalTime As SYSTEMTIME
+    
     GetLocalTime LocalTime
+    
     With LocalTime
         Set Now = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds, Kind:=LocalKind)
     End With
-End Function
+End Property
 
 ''
-' Returns a CorDateTime that represents the current time with the UTC offset.
+' Returns a <a href="CorDateTime.html">CorDateTime</a> that represents the current time with the UTC offset.
 '
-' @return The CorDateTime object representing the current time with the UTC offset.
-' @remarks This method uses GetSystemTime which has a resolution down to the
-' milliseconds. There is no direct VB equivalent.
+' @return The <a href="CorDateTime.html">CorDateTime</a> object representing the current time with the UTC offset.
+' @remarks This method uses Windows GetSystemTime which has a resolution down to the milliseconds. There is no direct VB equivalent.
 '
-Public Function UtcNow() As CorDateTime
+Public Property Get UtcNow() As CorDateTime
     Dim UtcTime As SYSTEMTIME
+    
     GetSystemTime UtcTime
+    
     With UtcTime
         Set UtcNow = Cor.NewDateTime(.wYear, .wMonth, .wDay, .wHour, .wMinute, .wSecond, .wMilliseconds, Kind:=UtcKind)
     End With
-End Function
+End Property
 
 ''
-' Returns a CorDateTime that represents only the current date. The time
+' Returns a <a href="CorDateTime.html">CorDateTime</a> that represents only the current date. The time
 ' portion is not present.
 '
-' @return The CorDateTime representing the date.
+' @return The <a href="CorDateTime.html">CorDateTime</a> representing the date.
 ' @remarks The time is still there, just is only 12:00AM.
 '
-Public Function Today() As CorDateTime
+Public Property Get Today() As CorDateTime
     Dim LocalTime As SYSTEMTIME
+    
     GetLocalTime LocalTime
+    
     With LocalTime
         Set Today = Cor.NewDateTime(.wYear, .wMonth, .wDay, Kind:=LocalKind)
     End With
-End Function
+End Property
 
 ''
-' Returns the minimum CorDateTime representation.
+' Returns the minimum <a href="CorDateTime.html">CorDateTime</a> representation.
 '
-' @return The minimum CorDateTime.
-' @remarks The minimum CorDateTime is 1/1/0001 12:00:00 AM.
+' @return The minimum <a href="CorDateTime.html">CorDateTime</a>.
+' @remarks The minimum <a href="CorDateTime.html">CorDateTime</a> is 1/1/0001 12:00:00 AM.
 '
 Public Property Get MinValue() As CorDateTime
-    If mMinValue Is Nothing Then
-        Set mMinValue = Cor.NewDateTime(1, 1, 1)
-    End If
-    
     Set MinValue = mMinValue
 End Property
 
 ''
-' Returns the maximum CorDateTime representation.
+' Returns the maximum <a href="CorDateTime.html">CorDateTime</a> representation.
 '
-' @return The maximum CorDateTime.
-' @remarks The maximum CorDateTime is "12/31/9999 11:59:59 PM".
+' @return The maximum <a href="CorDateTime.html">CorDateTime</a>.
+' @remarks The maximum <a href="CorDateTime.html">CorDateTime</a> is "12/31/9999 11:59:59 PM".
 '
 Public Property Get MaxValue() As CorDateTime
-    If mMaxValue Is Nothing Then
-        Set mMaxValue = Cor.NewDateTime(9999, 12, 31, 23, 59, 59, 999)
-    End If
-    
     Set MaxValue = mMaxValue
 End Property
 
 ''
-' Parses a string representation of a date into a CorDateTime object.
+' Parses a string representation of a date into a <a href="CorDateTime.html">CorDateTime</a> object.
 '
 ' @param s The date string to be parsed.
-' @return A CorDateTime object created from the date string.
+' @return A <a href="CorDateTime.html">CorDateTime</a> object created from the date string.
 ' @remarks The parse method simply uses CDate to parse the string.
 '
 Public Function Parse(ByRef s As String) As CorDateTime
@@ -278,7 +275,7 @@ Public Function Parse(ByRef s As String) As CorDateTime
 End Function
 
 ''
-' Attempts to parse a string representation of a date into a CorDateTime object.
+' Attempts to parse a string representation of a date into a <a href="CorDateTime.html">CorDateTime</a> object.
 '
 ' @param s The date string to be parsed.
 ' @param result The parameter to place the parsed date into.
@@ -293,14 +290,12 @@ Catch:
 End Function
 
 ''
-' Creates a CorDateTime object from a 64-bit currency value.
+' Creates a <a href="CorDateTime.html">CorDateTime</a> object from a 64-bit currency value.
 '
-' @param Value The value to initialize the CorDateTime with.
-' @return A new CorDateTime object.
-' @remarks The 64-bit value contains both the time in 100-nanosecond
-' increments and the DateTimeKind value used to determine if the
-' value is a UTC, Local Time, or unspecified time.
-' <p>The upper 2-bits represent the DateTimeKind value.</p>
+' @param Value The value to initialize the <a href="CorDateTime.html">CorDateTime</a> with.
+' @return A new <a href="CorDateTime.html">CorDateTime</a> object.
+' @remarks The 64-bit value contains both the time in 100-nanosecond increments and the <a href="CorDateTimeStatic.DateTimeKind.html">DateTimeKind</a> value used to determine if the value is a UTC, Local Time, or unspecified time.
+' <p>The upper 2-bits represent the <a href="CorDateTimeStatic.DateTimeKind.html">DateTimeKind</a> value.</p>
 '
 Public Function FromBinary(ByVal Value As Currency) As CorDateTime
     Set FromBinary = New CorDateTime
@@ -308,30 +303,40 @@ Public Function FromBinary(ByVal Value As Currency) As CorDateTime
 End Function
 
 ''
-' Creates a new CorDateTime object with the specified DateTimeKind.
+' Creates a new <a href="CorDateTime.html">CorDateTime</a> object with the specified <a href="CorDateTimeStatic.DateTimeKind.html">DateTimeKind</a>.
 '
-' @param Value The CorDateTime to convert to a specific kind.
-' @param Kind Specifies whether the CorDateTime is a UTC, Local, or unspecified time type.
-' @return A new CorDateTime with the original date and new kind.
+' @param Value The <a href="CorDateTime.html">CorDateTime</a> to convert to a specific kind.
+' @param Kind Specifies whether the <a href="CorDateTime.html">CorDateTime</a> is a UTC, Local, or unspecified time type.
+' @return A new <a href="CorDateTime.html">CorDateTime</a> with the original date and new kind.
 '
 Public Function SpecifyKind(ByVal Value As CorDateTime, ByVal Kind As DateTimeKind) As CorDateTime
-    Set SpecifyKind = New CorDateTime
-    SpecifyKind.InitFromMilliseconds Value.TotalMilliseconds, Kind
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
+
+    If Value.Kind <> Kind Then
+        Set SpecifyKind = New CorDateTime
+        SpecifyKind.InitFromMilliseconds Value.TotalMilliseconds, Kind
+    Else
+        Set SpecifyKind = Value
+    End If
 End Function
 
+''
+' Returns a value indicating whether two Date or <a href="CorDateTime.html">CorDateTime</a> instances have the same date and time value.
+'
+' @param t1 The first Date or <a href="CorDateTime.html">CorDateTime</a> to compare.
+' @param t2 The second Date or <a href="CorDateTime.html">CorDateTime</a> to compare.
+' @return <b>true</b> if their values are equal; otherwise, <b>false</b>
+' @remarks t1 and t2 are equal if their <a href="CorDateTime.Get.TotalMilliseconds.html">TotalMilliseconds</a> property values are equal. Their <a href="CorDateTime.Get.Kind.html">Kind</a> property values are not considered in the test for equality.
+'
 Public Function Equals(ByRef t1 As Variant, ByRef t2 As Variant) As Boolean
-    Dim MS1 As Currency
-    Dim MS2 As Currency
+    Dim d1 As CorDateTime
+    Dim d2 As CorDateTime
     
-    If Not TryGetMilliseconds(t1, MS1) Then
-        Exit Function
-    End If
+    Set d1 = Convert.ToDateTime(t1)
+    Set d2 = Convert.ToDateTime(t2)
     
-    If Not TryGetMilliseconds(t2, MS2) Then
-        Exit Function
-    End If
-    
-    Equals = MS1 = MS2
+    Equals = d1.TotalMilliseconds = d2.TotalMilliseconds
 End Function
 
 Friend Function GetMilliseconds(ByVal d As Date) As Currency
@@ -380,30 +385,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mDaysInMonth = Cor.NewLongs(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
+    Set mMinValue = FromMilliseconds(MinMilliseconds)
+    Set mMaxValue = FromMilliseconds(MaxMilliseconds)
 End Sub
 
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function TryGetMilliseconds(ByRef Value As Variant, ByRef Result As Currency) As Boolean
-    Select Case VarType(Value)
-        Case vbDate
-            Result = GetMilliseconds(Value)
-            TryGetMilliseconds = True
-        
-        Case vbObject
-            If Value Is Nothing Then
-                Exit Function
-            End If
-            
-            If TypeOf Value Is CorDateTime Then
-                Result = GetMillisecondsFromDateTime(Value)
-                TryGetMilliseconds = True
-            End If
-    End Select
-End Function
-
-Private Function GetMillisecondsFromDateTime(ByVal d As CorDateTime) As Currency
-    GetMillisecondsFromDateTime = d.TotalMilliseconds
-End Function

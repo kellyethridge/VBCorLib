@@ -87,13 +87,11 @@ End Function
 Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     Dim FirstWeekLength As Long
     Dim Offset          As Long
-    Dim dt              As CorDateTime
     Dim WholeWeeks      As Long
     Dim doy             As Long
 
-    Set dt = CorDateTime.GetDateTime(Time)
-
-    FirstWeekLength = FirstDayOfWeek - Calendar.GetDayOfWeek(Calendar.ToDateTime(Calendar.GetYear(dt), 1, 1, 0, 0, 0, 0))
+    FirstWeekLength = FirstDayOfWeek - Calendar.GetDayOfWeek(Calendar.ToDateTime(Calendar.GetYear(Time), 1, 1, 0, 0, 0, 0))
+    
     If FirstWeekLength < 0 Then
         FirstWeekLength = FirstWeekLength + 7
     End If
@@ -115,7 +113,8 @@ Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant,
             End If
     End Select
 
-    doy = Calendar.GetDayOfYear(dt)
+    doy = Calendar.GetDayOfYear(Time)
+    
     If doy > FirstWeekLength Then
         WholeWeeks = (doy - FirstWeekLength) \ 7
         
@@ -125,12 +124,13 @@ Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant,
     End If
 
     GetWeekOfYear = WholeWeeks + Offset
+    
     If GetWeekOfYear = 0 Then
         Dim Year    As Long
         Dim Month   As Long
         Dim Day     As Long
         
-        Year = Calendar.GetYear(dt) - 1
+        Year = Calendar.GetYear(Time) - 1
         Month = Calendar.GetMonthsInYear(Year)
         Day = Calendar.GetDaysInMonth(Year, Month)
         GetWeekOfYear = GetWeekOfYear(Calendar, Calendar.ToDateTime(Year, Month, Day, 0, 0, 0, 0), Rule, FirstDayOfWeek)
@@ -238,12 +238,12 @@ End Function
 
 Friend Function GetDateTime(ByRef Time As Variant) As CorDateTime
     Dim Milliseconds As Currency
-    
+
     Select Case VarType(Time)
         Case vbObject
             If Time Is Nothing Then _
                 Error.Argument Argument_DateRequired
-                
+
             If TypeOf Time Is CorDateTime Then
                 Dim dt As CorDateTime
                 Set dt = Time
