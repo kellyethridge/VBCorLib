@@ -278,7 +278,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
         Throw Cor.NewArgumentOutOfRangeException("Months", Environment.GetResourceString(ArgumentOutOfRange_Range, -120000, 120000))
     
     If Months = 0 Then
-        Set AddMonths = CorDateTime.GetDateTime(Time)
+        Set AddMonths = Convert.ToDateTime(Time)
         Exit Function
     End If
     
@@ -409,7 +409,7 @@ End Function
 ' @return The era for the time.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    CorDateTime.GetDateTime Time
+    Convert.ToDateTime Time
     GetEra = 1
 End Function
 

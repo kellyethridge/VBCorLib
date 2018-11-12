@@ -1044,18 +1044,13 @@ Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As Console
 End Function
 
 ''
-' Returns a new TimeSpan representing the time portion of the date.
+' Returns a new <a href="TimeSpan.html">TimeSpan</a> representing the time portion of the date.
 '
 ' @param DateValue The date to retrieve the time portion of.
-' @return A TimeSpan object representing the time portion.
+' @return A <a href="TimeSpan.html">TimeSpan</a> object representing the time portion.
 '
 Public Function NewTime(ByRef DateValue As Variant) As TimeSpan
-    Select Case VarType(DateValue)
-        Case vbDate
-            Set NewTime = NewTimeSpan(Hours:=Hour(DateValue), Minutes:=Minute(DateValue), Seconds:=Second(DateValue))
-        Case Else
-            Set NewTime = CorDateTime.GetDateTime(DateValue).TimeOfDay
-    End Select
+    Set NewTime = Convert.ToDateTime(DateValue).TimeOfDay
 End Function
 
 ''

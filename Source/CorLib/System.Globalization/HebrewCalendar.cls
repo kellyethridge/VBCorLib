@@ -228,7 +228,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
     Dim ms      As Currency
     
     If Months = 0 Then
-        Set AddMonths = CorDateTime.GetDateTime(Time)
+        Set AddMonths = Convert.ToDateTime(Time)
         Exit Function
     End If
     

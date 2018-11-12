@@ -353,33 +353,6 @@ Friend Function GetMilliseconds(ByVal d As Date) As Currency
 End Function
 
 
-''
-' This is used to get a valid CorDateTime value.
-'
-' @param d The value to conver to CorDateTime
-' @return A CorDateTime value.
-' @remarks If d is already a CorDateTime object, then it is returned.
-' If d is a Date value, then a new CorDateTime object is created.
-'
-Friend Function GetDateTime(ByRef d As Variant) As CorDateTime
-    Select Case VarType(d)
-        Case vbObject
-            If d Is Nothing Then _
-                Error.Argument Argument_DateRequired
-                
-            If TypeOf d Is CorDateTime Then
-                Set GetDateTime = d
-            Else
-                Error.Argument Argument_DateRequired
-            End If
-        Case vbDate
-            Set GetDateTime = FromOADate(d)
-        Case Else
-            Error.Argument Argument_DateRequired
-    End Select
-End Function
-
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
