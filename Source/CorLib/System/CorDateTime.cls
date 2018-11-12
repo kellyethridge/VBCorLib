@@ -341,7 +341,7 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
         Throw Cor.NewArgumentOutOfRangeException("Months", "Months must be between -120000 and 120000 inclusively.")
     
     If Months = 0 Then
-        Set AddMonths = Me
+        Set AddMonths = CorDateTime.FromMilliseconds(mMilliseconds, mKind)
         Exit Function
     End If
     

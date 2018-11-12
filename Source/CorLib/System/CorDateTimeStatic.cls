@@ -355,31 +355,31 @@ Friend Function DateToMilliseconds(ByVal d As Date) As Currency
 End Function
 
 Friend Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
-    Set AddYears = Convert.ToDateTime(Time).AddYears(Years)
+    Set AddYears = CachedDateTime(Time).AddYears(Years)
 End Function
 
 Friend Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
-    Set AddMonths = Convert.ToDateTime(Time).AddMonths(Months)
+    Set AddMonths = CachedDateTime(Time).AddMonths(Months)
 End Function
 
 Friend Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = Convert.ToDateTime(Time).AddDays(Days)
+    Set AddDays = CachedDateTime(Time).AddDays(Days)
 End Function
 
 Friend Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = Convert.ToDateTime(Time).AddHours(Hours)
+    Set AddHours = CachedDateTime(Time).AddHours(Hours)
 End Function
 
 Friend Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = Convert.ToDateTime(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = CachedDateTime(Time).AddMilliseconds(Milliseconds)
 End Function
 
 Friend Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = Convert.ToDateTime(Time).AddMinutes(Minutes)
+    Set AddMinutes = CachedDateTime(Time).AddMinutes(Minutes)
 End Function
 
 Friend Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = Convert.ToDateTime(Time).AddSeconds(Seconds)
+    Set AddSeconds = CachedDateTime(Time).AddSeconds(Seconds)
 End Function
 
 Friend Function GetHour(ByRef Time As Variant) As Long
@@ -436,12 +436,12 @@ Private Function CachedDateTime(ByRef Time As Variant) As CorDateTime
                 Set dt = Time
                 Milliseconds = dt.TotalMilliseconds
             Else
-                Error.Argument Argument_DateRequired
+                Error.Argument Arg_MustBeDateTime
             End If
         Case vbDate
             Milliseconds = DateToMilliseconds(Time)
         Case Else
-            Error.Argument Argument_DateRequired
+            Error.Argument Arg_MustBeDateTime
     End Select
 
     mCachedDateTime.InitFromMilliseconds Milliseconds, UnspecifiedKind
