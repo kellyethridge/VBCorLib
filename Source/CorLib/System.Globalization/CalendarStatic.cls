@@ -45,6 +45,8 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mCachedDateTime As New CorDateTime
+
 
 ''
 ' Returns the current era for any calendar class.
@@ -171,92 +173,4 @@ Friend Function GetCalendarInfoInt32(ByVal Cal As Long, ByVal CalType As Long) A
     End If
 End Function
 
-''
-' Common date methods
-'
-' These methods support both Date and CorDateTime. When a Date value is passed in it must
-' be converted to a CorDateTime object before manipulation/investigation can begin. However, once the
-' the operation has finished, we don't discard the CorDateTime object. It will be re-used in future
-' method calls involving a VB Date value. This eliminates the constance creating/destroying of a
-' CorDateTime object simply to retrieve or modify a VB Date value.
-'
-Friend Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
-    Set AddYears = GetDateTime(Time).AddYears(Years)
-End Function
-
-Friend Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
-    Set AddMonths = GetDateTime(Time).AddMonths(Months)
-End Function
-
-Friend Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = GetDateTime(Time).AddDays(Days)
-End Function
-
-Friend Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = GetDateTime(Time).AddHours(Hours)
-End Function
-
-Friend Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = GetDateTime(Time).AddMilliseconds(Milliseconds)
-End Function
-
-Friend Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = GetDateTime(Time).AddMinutes(Minutes)
-End Function
-
-Friend Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = GetDateTime(Time).AddSeconds(Seconds)
-End Function
-
-Friend Function GetHour(ByRef Time As Variant) As Long
-    GetHour = GetDateTime(Time).Hour
-End Function
-
-Friend Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = GetDateTime(Time).Minute
-End Function
-
-Friend Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = GetDateTime(Time).Second
-End Function
-
-Friend Function GetMilliseconds(ByRef Time As Variant) As Long
-    GetMilliseconds = GetDateTime(Time).Millisecond
-End Function
-
-Friend Function GetTotalMilliseconds(ByRef Time As Variant) As Currency
-    GetTotalMilliseconds = GetDateTime(Time).TotalMilliseconds
-End Function
-
-Friend Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = GetDateTime(Time).DayOfWeek
-End Function
-
-Friend Function GetDayOfMonth(ByRef Time As Variant) As Long
-    GetDayOfMonth = GetDateTime(Time).Day
-End Function
-
-Friend Function GetDateTime(ByRef Time As Variant) As CorDateTime
-    Dim Milliseconds As Currency
-
-    Select Case VarType(Time)
-        Case vbObject
-            If Time Is Nothing Then _
-                Error.Argument Argument_DateRequired
-
-            If TypeOf Time Is CorDateTime Then
-                Dim dt As CorDateTime
-                Set dt = Time
-                Milliseconds = dt.TotalMilliseconds
-            Else
-                Error.Argument Argument_DateRequired
-            End If
-        Case vbDate
-            Milliseconds = CorDateTime.GetMilliseconds(Time)
-        Case Else
-            Error.Argument Argument_DateRequired
-    End Select
-
-    Set GetDateTime = CorDateTime.FromMilliseconds(Milliseconds, UnspecifiedKind)
-End Function
 

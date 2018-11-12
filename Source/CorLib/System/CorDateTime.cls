@@ -642,7 +642,7 @@ Public Function Subtract(ByRef Value As Variant) As Object
                 Error.Argument Argument_InvalidDateSubtraction, "Value"
             End If
         Case vbDate
-            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.GetMilliseconds(Value))
+            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.DateToMilliseconds(Value))
         Case Else
             Error.Argument Argument_InvalidDateSubtraction, "Value"
     End Select
@@ -765,7 +765,7 @@ Friend Sub InitFromMilliseconds(ByVal ms As Currency, ByVal Kind As DateTimeKind
 End Sub
 
 Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
-    mMilliseconds = Statics.CorDateTime.GetMilliseconds(d)
+    mMilliseconds = Statics.CorDateTime.DateToMilliseconds(d)
     mKind = Kind
 End Sub
 

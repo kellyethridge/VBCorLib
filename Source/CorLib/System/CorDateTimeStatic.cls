@@ -94,6 +94,7 @@ End Enum
 Private mDaysInMonth()      As Long
 Private mMinValue           As CorDateTime
 Private mMaxValue           As CorDateTime
+Private mCachedDateTime     As New CorDateTime
 
 
 ''
@@ -339,7 +340,7 @@ Public Function Equals(ByRef t1 As Variant, ByRef t2 As Variant) As Boolean
     Equals = d1.TotalMilliseconds = d2.TotalMilliseconds
 End Function
 
-Friend Function GetMilliseconds(ByVal d As Date) As Currency
+Friend Function DateToMilliseconds(ByVal d As Date) As Currency
     Const MillisecondsTo1899 As Currency = 59926435200000#
     Dim Days As Currency
     
@@ -349,7 +350,64 @@ Friend Function GetMilliseconds(ByVal d As Date) As Currency
     Else
         Days = Fix(d * MilliSecondsPerDay + 0.5)
     End If
-    GetMilliseconds = Days + MillisecondsTo1899
+    
+    DateToMilliseconds = Days + MillisecondsTo1899
+End Function
+
+Friend Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
+    Set AddYears = Convert.ToDateTime(Time).AddYears(Years)
+End Function
+
+Friend Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
+    Set AddMonths = Convert.ToDateTime(Time).AddMonths(Months)
+End Function
+
+Friend Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
+    Set AddDays = Convert.ToDateTime(Time).AddDays(Days)
+End Function
+
+Friend Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
+    Set AddHours = Convert.ToDateTime(Time).AddHours(Hours)
+End Function
+
+Friend Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
+    Set AddMilliseconds = Convert.ToDateTime(Time).AddMilliseconds(Milliseconds)
+End Function
+
+Friend Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
+    Set AddMinutes = Convert.ToDateTime(Time).AddMinutes(Minutes)
+End Function
+
+Friend Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
+    Set AddSeconds = Convert.ToDateTime(Time).AddSeconds(Seconds)
+End Function
+
+Friend Function GetHour(ByRef Time As Variant) As Long
+    GetHour = CachedDateTime(Time).Hour
+End Function
+
+Friend Function GetMinute(ByRef Time As Variant) As Long
+    GetMinute = CachedDateTime(Time).Minute
+End Function
+
+Friend Function GetSecond(ByRef Time As Variant) As Long
+    GetSecond = CachedDateTime(Time).Second
+End Function
+
+Friend Function GetMilliseconds(ByRef Time As Variant) As Long
+    GetMilliseconds = CachedDateTime(Time).Millisecond
+End Function
+
+Friend Function GetTotalMilliseconds(ByRef Time As Variant) As Currency
+    GetTotalMilliseconds = CachedDateTime(Time).TotalMilliseconds
+End Function
+
+Friend Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
+    GetDayOfWeek = CachedDateTime(Time).DayOfWeek
+End Function
+
+Friend Function GetDayOfMonth(ByRef Time As Variant) As Long
+    GetDayOfMonth = CachedDateTime(Time).Day
 End Function
 
 
@@ -362,3 +420,31 @@ Private Sub Class_Initialize()
     Set mMaxValue = FromMilliseconds(MaxMilliseconds)
 End Sub
 
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function CachedDateTime(ByRef Time As Variant) As CorDateTime
+    Dim Milliseconds As Currency
+
+    Select Case VarType(Time)
+        Case vbObject
+            If Time Is Nothing Then
+                Milliseconds = 0
+            ElseIf TypeOf Time Is CorDateTime Then
+                Dim dt As CorDateTime
+                Set dt = Time
+                Milliseconds = dt.TotalMilliseconds
+            Else
+                Error.Argument Argument_DateRequired
+            End If
+        Case vbDate
+            Milliseconds = DateToMilliseconds(Time)
+        Case Else
+            Error.Argument Argument_DateRequired
+    End Select
+
+    mCachedDateTime.InitFromMilliseconds Milliseconds, UnspecifiedKind
+
+    Set CachedDateTime = mCachedDateTime
+End Function

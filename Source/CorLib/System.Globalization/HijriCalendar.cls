@@ -223,7 +223,7 @@ End Property
 ' @return The <a href="CorDateTime.html">CorDateTime</a> that results from adding the specified number of days to the specified <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = Statics.Calendar.AddDays(Time, Days)
+    Set AddDays = CorDateTime.AddDays(Time, Days)
 End Function
 
 ''
@@ -234,7 +234,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html"> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = Statics.Calendar.AddHours(Time, Hours)
+    Set AddHours = CorDateTime(Time, Hours)
 End Function
 
 ''
@@ -245,7 +245,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = Statics.Calendar.AddMilliseconds(Time, Milliseconds)
+    Set AddMilliseconds = CorDateTime.AddMilliseconds(Time, Milliseconds)
 End Function
 
 ''
@@ -256,7 +256,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = Statics.Calendar.AddMinutes(Time, Minutes)
+    Set AddMinutes = CorDateTime.AddMinutes(Time, Minutes)
 End Function
 
 ''
@@ -293,7 +293,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
     
     FixedDays = GetFixedDaysFromParts(Year, Month, Day)
     
-    ms = Statics.Calendar.GetTotalMilliseconds(Time)
+    ms = CorDateTime.GetTotalMilliseconds(Time)
     Set AddMonths = CorDateTime.FromMilliseconds(MilliSecondsPerDay * FixedDays + Modulus(ms, MilliSecondsPerDay))
 End Function
 
@@ -305,7 +305,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = Statics.Calendar.AddSeconds(Time, Seconds)
+    Set AddSeconds = CorDateTime.AddSeconds(Time, Seconds)
 End Function
 
 ''
@@ -316,7 +316,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Weeks added.
 '
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
-    Set AddWeeks = Statics.Calendar.AddDays(Time, Weeks * DaysPerWeek)
+    Set AddWeeks = CorDateTime.AddDays(Time, Weeks * DaysPerWeek)
 End Function
 
 ''
@@ -359,7 +359,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = Statics.Calendar.GetDayOfWeek(Time)
+    GetDayOfWeek = CorDateTime.GetDayOfWeek(Time)
 End Function
 
 ''
@@ -420,7 +420,7 @@ End Function
 ' @return The hour portion of the time.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = Statics.Calendar.GetHour(Time)
+    GetHour = CorDateTime.GetHour(Time)
 End Function
 
 ''
@@ -430,7 +430,7 @@ End Function
 ' @return The millisecond portion of the time.
 '
 Public Function GetMilliseconds(ByRef Time As Variant) As Long
-    GetMilliseconds = Statics.Calendar.GetMilliseconds(Time)
+    GetMilliseconds = CorDateTime.GetMilliseconds(Time)
 End Function
 
 ''
@@ -440,7 +440,7 @@ End Function
 ' @return The minute portion of the time.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = Statics.Calendar.GetMinute(Time)
+    GetMinute = CorDateTime.GetMinute(Time)
 End Function
 
 ''
@@ -478,7 +478,7 @@ End Function
 ' @return The second portion of the time.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = Statics.Calendar.GetSecond(Time)
+    GetSecond = CorDateTime.GetSecond(Time)
 End Function
 
 ''
@@ -705,7 +705,7 @@ End Sub
 Private Function GetFixedDays(ByRef Time As Variant) As Long
     Dim TimeInMilliseconds As Currency
     
-    TimeInMilliseconds = Statics.Calendar.GetTotalMilliseconds(Time)
+    TimeInMilliseconds = CorDateTime.GetTotalMilliseconds(Time)
     
     If TimeInMilliseconds < Statics.HijriCalendar.MinDateTime.TotalMilliseconds Or _
        TimeInMilliseconds > Statics.HijriCalendar.MaxDateTime.TotalMilliseconds Then
