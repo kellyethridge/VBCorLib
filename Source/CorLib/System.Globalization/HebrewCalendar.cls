@@ -177,7 +177,7 @@ End Property
 ' @return The <a href="CorDateTime.html">CorDateTime</a> that results from adding the specified number of days to the specified <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = CDateTimeUnspecifiedKind(Time).AddDays(Days)
+    Set AddDays = CorDateTime.AddDays(Time, Days)
 End Function
 
 ''
@@ -188,7 +188,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = CDateTimeUnspecifiedKind(Time).AddHours(Hours)
+    Set AddHours = CorDateTime.AddHours(Time, Hours)
 End Function
 
 ''
@@ -199,7 +199,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = CDateTimeUnspecifiedKind(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = CorDateTime.AddMilliseconds(Time, Milliseconds)
 End Function
 
 ''
@@ -210,7 +210,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = CDateTimeUnspecifiedKind(Time).AddMinutes(Minutes)
+    Set AddMinutes = CorDateTime.AddMinutes(Time, Minutes)
 End Function
 
 ''
@@ -232,7 +232,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
         Exit Function
     End If
     
-    ms = CDateTime(Time).TotalMilliseconds
+    ms = CorDateTime.GetTotalMilliseconds(Time)
     TOD = Modulus(ms, MilliSecondsPerDay)
     GetDateParts ms, Complete, Year, Month, Day
     Month = ToDotNetMonth(Year, Month)
@@ -281,7 +281,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = CDateTimeUnspecifiedKind(Time).AddSeconds(Seconds)
+    Set AddSeconds = CorDateTime.AddSeconds(Time, Seconds)
 End Function
 
 ''
@@ -308,7 +308,7 @@ Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateT
     Dim Day     As Long
     Dim ms      As Currency
     
-    ms = CDateTimeUnspecifiedKind(Time).TotalMilliseconds
+    ms = CorDateTime.GetTotalMilliseconds(Time)
     GetDateParts ms, Complete, Year, Month, Day
     
     Month = ToDotNetMonth(Year, Month)
@@ -324,7 +324,7 @@ End Function
 ' @return An integer that represents the era in the specified Date or <a href="CorDateTime.html">CorDateTime</a>. The return value is always <a href="HebrewCalendarStatic.Get.HebrewEra.html">HebrewEra</a>.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    CDateTime Time   ' verifies we have a date.
+    CorDateTime.Validate Time
     GetEra = HebrewCalendar.HebrewEra
 End Function
 
@@ -335,7 +335,7 @@ End Function
 ' @return The hour portion of the <i>Time</i>.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = CDateTime(Time).Hour
+    GetHour = CorDateTime.GetHour(Time)
 End Function
 
 ''
@@ -345,7 +345,7 @@ End Function
 ' @return The millisecond portion of the <i>Time</i>.
 '
 Public Function GetMilliseconds(ByRef Time As Variant) As Long
-    GetMilliseconds = CDateTime(Time).Millisecond
+    GetMilliseconds = CorDateTime.GetMilliseconds(Time)
 End Function
 
 ''
@@ -355,7 +355,7 @@ End Function
 ' @return The second portion of the <i>Time</i>.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = CDateTime(Time).Second
+    GetSecond = CorDateTime.GetSecond(Time)
 End Function
 
 ''
@@ -365,7 +365,7 @@ End Function
 ' @return The minute portion of the <i>Time</i>.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = CDateTime(Time).Minute
+    GetMinute = CorDateTime.GetMinute(Time)
 End Function
 
 ''
@@ -375,7 +375,7 @@ End Function
 ' @return The month portion of the <i>Time</i>.
 '
 Public Function GetMonth(ByRef Time As Variant) As Long
-    GetDateParts CDateTime(Time).TotalMilliseconds, MonthPart, , GetMonth
+    GetDateParts CorDateTime.GetTotalMilliseconds(Time), MonthPart, , GetMonth
 End Function
 
 ''
@@ -385,7 +385,7 @@ End Function
 ' @return The year portion of the <i>Time</i>.
 '
 Public Function GetYear(ByRef Time As Variant) As Long
-    GetDateParts CDateTime(Time).TotalMilliseconds, YearPart, GetYear
+    GetDateParts CorDateTime.GetTotalMilliseconds(Time), YearPart, GetYear
 End Function
 
 ''
@@ -449,7 +449,7 @@ End Function
 ' @return An integer from 1 to 30 that represents the day of the month in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function GetDayOfMonth(ByRef Time As Variant) As Long
-    GetDateParts CDateTime(Time).TotalMilliseconds, DayPart, , , GetDayOfMonth
+    GetDateParts CorDateTime.GetTotalMilliseconds(Time), DayPart, , , GetDayOfMonth
 End Function
 
 ''
@@ -461,7 +461,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = CDateTime(Time).DayOfWeek
+    GetDayOfWeek = CorDateTime.GetDayOfWeek(Time)
 End Function
 
 ''
@@ -471,7 +471,7 @@ End Function
 ' @return An integer from 1 to 385 that represents the day of the year in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function GetDayOfYear(ByRef Time As Variant) As Long
-    GetDateParts CDateTime(Time).TotalMilliseconds, DayOfTheYear, , , , GetDayOfYear
+    GetDateParts CorDateTime.GetTotalMilliseconds(Time), DayOfTheYear, , , , GetDayOfYear
 End Function
 
 ''
@@ -829,7 +829,7 @@ End Sub
 
 Private Function GetFixedDays(ByRef Time As Variant) As Long
     Dim ms As Currency
-    ms = CDateTime(Time).TotalMilliseconds
+    ms = CorDateTime.GetTotalMilliseconds(Time)
     GetFixedDays = Int(ms / MilliSecondsPerDay) + 1
 End Function
 

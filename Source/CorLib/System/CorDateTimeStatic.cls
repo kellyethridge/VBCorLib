@@ -410,6 +410,22 @@ Friend Function GetDayOfMonth(ByRef Time As Variant) As Long
     GetDayOfMonth = CachedDateTime(Time).Day
 End Function
 
+Friend Function GetDayOfYear(ByRef Time As Variant) As Long
+    GetDayOfYear = CachedDateTime(Time).DayOfYear
+End Function
+
+Friend Function GetMonth(ByRef Time As Variant) As Long
+    GetMonth = CachedDateTime(Time).Month
+End Function
+
+Friend Function GetYear(ByRef Time As Variant) As Long
+    GetYear = CachedDateTime(Time).Year
+End Function
+
+Friend Sub Validate(ByRef Time As Variant)
+    CachedDateTime Time
+End Sub
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors

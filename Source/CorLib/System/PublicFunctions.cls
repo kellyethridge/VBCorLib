@@ -264,11 +264,25 @@ Public Function CObj(ByVal Obj As Object) As Object
     Set CObj = Obj
 End Function
 
-
+''
+' Returns the collection version for a collection that implements IVersionableCollection.
+'
+' @param Obj The collection to retrieve the version from.
+' @return The collection version.
+' @remark The collection must maintain its own versioning.
+' <p>This method does not throw an exception for unsupported values.</p>
+'
 Public Function GetCollectionVersion(ByVal Obj As Object) As Long
     GetCollectionVersion = Enumeration.GetCollectionVersion(Obj)
 End Function
 
+''
+' Converts a value to a CorDateTimeObject.
+'
+' @param Value The value to be converted to a<a href="CorDateTime.html">CorDateTime</a> object.
+' @return The converted value.
+' @remark This is a short-cut version of <a href="Convert.ToDateTime.html">Convert.ToDateTime</a>.
+'
 Public Function CDateTime(ByRef Value As Variant) As CorDateTime
-    Set CDateTime = Conversion.CDateTime(Value)
+    Set CDateTime = Convert.ToDateTime(Value)
 End Function

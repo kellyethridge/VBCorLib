@@ -103,10 +103,10 @@ Public Sub IsReadOnly_WhenNew_ReturnsFalse()
 End Sub
 
 Public Sub IsReadOnly_WhenMadeReadOnly_ReturnsTrue()
-    Dim Cal As New GregorianCalendar
+    Dim cal As New GregorianCalendar
     
     Dim Actual As Calendar
-    Set Actual = CorLib.Calendar.ReadOnly(Cal)
+    Set Actual = CorLib.Calendar.ReadOnly(cal)
     
     Assert.That Actual.IsReadOnly, Iz.True
 End Sub

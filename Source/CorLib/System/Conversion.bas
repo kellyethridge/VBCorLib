@@ -32,17 +32,6 @@ Public Function CLngOrDefault(ByRef Value As Variant, ByVal Default As Long) As 
     End If
 End Function
 
-Public Function CDateTime(ByRef Value As Variant) As CorDateTime
-    Set CDateTime = Convert.ToDateTime(Value)
-End Function
-
-Public Function CDateTimeUnspecifiedKind(ByRef Value As Variant) As CorDateTime
-    Dim Result As CorDateTime
-    
-    Set Result = CDateTime(Value)
-    Set CDateTimeUnspecifiedKind = CorDateTime.SpecifyKind(Result, UnspecifiedKind)
-End Function
-
 
 ' This is a set of casting routines used by function delegation calls.
 ' They allow a virtual casting routine to be selected and called without

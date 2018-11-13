@@ -54,7 +54,9 @@ Implements IObject
 Implements Calendar
 Implements ICloneable
 
-Private Const MaxYear As Long = 9999
+Private Const PropTwoDigitYearMax   As String = "TwoDigitYearMax"
+Private Const PropCalendarType      As String = "CalendarType"
+Private Const MaxYear               As Long = 9999
 
 ''
 ' Defines the different language versions of the Gregorian calendar.
@@ -225,12 +227,11 @@ End Property
 ' @remarks Using this method works exactly like using the <b>AddDays</b>
 ' method on the <a href="CorDateTime.html">CorDateTime</a> objects.
 ' <p>A new <a href="CorDateTime.html">CorDateTime</a> object is returned with the days added to the
-' original <i>Time</i>. If a Date is passed in, a CorDateTime object is
-' still returned.</p>
+' original <i>Time</i>. If a Date is passed in, a CorDateTime object is still returned.</p>
 ' <p>A negative value can be supplied for <i>Days</i>.</p>
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = CDateTimeUnspecifiedKind(Time).AddDays(Days)
+    Set AddDays = CorDateTime.AddDays(Time, Days)
 End Function
 
 ''
@@ -241,7 +242,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = CDateTimeUnspecifiedKind(Time).AddHours(Hours)
+    Set AddHours = CorDateTime.AddHours(Time, Hours)
 End Function
 
 ''
@@ -252,7 +253,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = CDateTimeUnspecifiedKind(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = CorDateTime.AddMilliseconds(Time, Milliseconds)
 End Function
 
 ''
@@ -263,7 +264,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = CDateTimeUnspecifiedKind(Time).AddMinutes(Minutes)
+    Set AddMinutes = CorDateTime.AddMinutes(Time, Minutes)
 End Function
 
 ''
@@ -274,7 +275,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Months added.
 '
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
-    Set AddMonths = CDateTimeUnspecifiedKind(Time).AddMonths(Months)
+    Set AddMonths = CorDateTime.AddMonths(Time, Months)
 End Function
 
 ''
@@ -285,7 +286,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = CDateTimeUnspecifiedKind(Time).AddSeconds(Seconds)
+    Set AddSeconds = CorDateTime.AddSeconds(Time, Seconds)
 End Function
 
 ''
@@ -309,17 +310,17 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Years added.
 '
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
-    Set AddYears = CDateTimeUnspecifiedKind(Time).AddYears(Years)
+    Set AddYears = CorDateTime.AddYears(Time, Years)
 End Function
 
 ''
 ' Returns the day of the months for the specified date.
 '
-' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> inwhich to retrieve the day of the month.
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to retrieve the day of the month from.
 ' @return The day of the month for the specified date.
 '
 Public Function GetDayOfMonth(ByRef Time As Variant) As Long
-    GetDayOfMonth = CDateTime(Time).Day
+    GetDayOfMonth = CorDateTime.GetDayOfMonth(Time)
 End Function
 
 ''
@@ -331,7 +332,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = CDateTime(Time).DayOfWeek
+    GetDayOfWeek = CorDateTime.GetDayOfWeek(Time)
 End Function
 
 ''
@@ -341,7 +342,7 @@ End Function
 ' @return The day of the year.
 '
 Public Function GetDayOfYear(ByRef Time As Variant) As Long
-    GetDayOfYear = CDateTime(Time).DayOfYear
+    GetDayOfYear = CorDateTime.GetDayOfYear(Time)
 End Function
 
 ''
@@ -386,7 +387,7 @@ End Function
 ' @remarks The <a href="GregorianCalendar.html">GregorianCalendar</a> class only supports the current era of AD. This returns a constant of 1.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    CDateTime Time   ' verifies we have a date
+    Convert.ToDateTime Time   ' verifies we have a date
     GetEra = 1
 End Function
 
@@ -397,7 +398,7 @@ End Function
 ' @return The hour portion of the time.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = CDateTime(Time).Hour
+    GetHour = CorDateTime.GetHour(Time)
 End Function
 
 ''
@@ -407,7 +408,7 @@ End Function
 ' @return The millisecond portion of the time.
 '
 Public Function GetMilliseconds(ByRef Time As Variant) As Double
-    GetMilliseconds = CDateTime(Time).Millisecond
+    GetMilliseconds = CorDateTime.GetMilliseconds(Time)
 End Function
 
 ''
@@ -417,7 +418,7 @@ End Function
 ' @return The minute portion of the time.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = CDateTime(Time).Minute
+    GetMinute = CorDateTime.GetMinute(Time)
 End Function
 
 ''
@@ -427,7 +428,7 @@ End Function
 ' @return The month portion of the time.
 '
 Public Function GetMonth(ByRef Time As Variant) As Long
-    GetMonth = CDateTime(Time).Month
+    GetMonth = CorDateTime.GetMonth(Time)
 End Function
 
 ''
@@ -451,7 +452,7 @@ End Function
 ' @return The second portion of the time.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = CDateTime(Time).Second
+    GetSecond = CorDateTime.GetSecond(Time)
 End Function
 
 ''
@@ -473,7 +474,7 @@ End Function
 ' @return The year portion of the time.
 '
 Public Function GetYear(ByRef Time As Variant) As Long
-    GetYear = CDateTime(Time).Year
+    GetYear = CorDateTime.GetYear(Time)
 End Function
 
 ''
@@ -623,13 +624,13 @@ End Sub
 '   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    mTwoDigitYearMax = PropBag.ReadProperty("TwoDigitYearMax")
-    mCalendarType = PropBag.ReadProperty("CalendarType")
+    mTwoDigitYearMax = PropBag.ReadProperty(PropTwoDigitYearMax)
+    mCalendarType = PropBag.ReadProperty(PropCalendarType)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty "TwoDigitYearMax", mTwoDigitYearMax
-    PropBag.WriteProperty "CalendarType", mCalendarType
+    PropBag.WriteProperty PropTwoDigitYearMax, mTwoDigitYearMax
+    PropBag.WriteProperty PropCalendarType, mCalendarType
 End Sub
 
 
