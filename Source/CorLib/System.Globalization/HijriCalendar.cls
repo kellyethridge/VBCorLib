@@ -48,7 +48,10 @@ Implements IObject
 Implements Calendar
 Implements ICloneable
 
-Private Const DefaultTwoDigitYearMax As Long = 1451
+Private Const DefaultTwoDigitYearMax    As Long = 1451
+Private Const PropTwoDigitYearMax       As String = "TwoDigitYearMax"
+Private Const PropHijriAdjustment       As String = "HijriAdjustment"
+
 
 ' Number of Gregorian days to 7/18/622.
 ' This is 2 days after the start of the Hijri calendar to
@@ -161,6 +164,7 @@ End Property
 ' </table>
 Public Property Let HijriAdjustment(ByVal Value As Long)
     VerifyWritable
+    
     If Value < -2 Or Value > 2 Then _
         Throw Cor.NewArgumentOutOfRangeException("HijriAdjustment", Environment.GetResourceString(ArgumentOutOfRange_Range, -2, 2), Value)
     
@@ -234,7 +238,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html"> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = CorDateTime(Time, Hours)
+    Set AddHours = CorDateTime.AddHours(Time, Hours)
 End Function
 
 ''
@@ -409,7 +413,7 @@ End Function
 ' @return The era for the time.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    Convert.ToDateTime Time
+    CorDateTime.Validate Time
     GetEra = 1
 End Function
 
@@ -592,23 +596,24 @@ End Function
 ' @return A Gregorian version of the date specified.
 '
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime
-    Dim ms As Currency
-    Dim DaysInMonth As Long
+    Dim Milliseconds    As Currency
+    Dim DaysInMonth     As Long
     
     DaysInMonth = GetDaysInMonth(Year, Month, Era)
+    
     If Day < 1 Or Day > DaysInMonth Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Day, DaysInMonth, Month))
     
-    ms = GetFixedDaysFromParts(Year, Month, Day) * MilliSecondsPerDay
+    Milliseconds = GetFixedDaysFromParts(Year, Month, Day) * MilliSecondsPerDay
     
-    If ms < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:="Invalid Year, Month, or Day for this calendar")
+    If Milliseconds < 0 Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_BadYearMonthDay
         
-    Set ToDateTime = CorDateTime.FromMilliseconds(ms + Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond)
+    Set ToDateTime = CorDateTime.FromMilliseconds(Milliseconds + Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond)
 End Function
 
 ''
-' Converts the specified year to a four-digit year by using the <a href="JulianCalendar.TwoDigitYearMax.get.html">TwoDigitYearMax</a> property to determine the appropriate century.
+' Converts the specified year to a four-digit year by using the <a href="HijriCalendar.TwoDigitYearMax.get.html">TwoDigitYearMax</a> property to determine the appropriate century.
 '
 ' @param A two-digit or four-digit integer that represents the year to convert.
 ' @return A 4-digit year in the specific calendar.
@@ -622,21 +627,10 @@ End Function
 ' 100 years which 2-digit years will fall. 00-99 will fall within 1930-2029.</p>
 '
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
-    Dim y As Long
-    
     If Year < 0 Or Year > MaxYear Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
-
-    If Year < 100 Then
-        y = Year Mod 100
-        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + y
-        
-        If y > mTwoDigitYearMax Mod 100 Then
-            ToFourDigitYear = ToFourDigitYear - 100
-        End If
-    Else
-        ToFourDigitYear = Year
-    End If
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, MaxYear))
+    
+    ToFourDigitYear = Statics.Calendar.ToFourDigitYear(Me, Year)
 End Function
 
 ''
@@ -669,6 +663,11 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function CloneReadOnly() As HijriCalendar
+    Set CloneReadOnly = New HijriCalendar
+    CloneReadOnly.InitReadOnlyClone Me
+End Function
+
 Private Sub VerifyWritable()
     If mIsReadOnly Then
         Error.InvalidOperation InvalidOperation_ReadOnly
@@ -676,15 +675,11 @@ Private Sub VerifyWritable()
 End Sub
 
 Private Sub ValidateEra(ByRef Era As Variant)
-    Select Case VarType(Era)
-        Case IsInteger(Err)
-            If Era < Statics.Calendar.CurrentEra Or Era > Statics.HijriCalendar.HijriEra Then
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidEraValue), "Era")
-            End If
-        Case vbMissing
-            ' do nothing
+    Select Case CLngOrDefault(Era, Statics.Calendar.CurrentEra)
+        Case HijriCalendar.HijriEra, Statics.Calendar.CurrentEra
+            ' all good
         Case Else
-            Error.Argument Argument_IntegerRequired
+            Error.Argument Argument_InvalidEraValue, "Era"
     End Select
 End Sub
 
@@ -759,13 +754,16 @@ End Sub
 Private Sub Class_Initialize()
     mTwoDigitYearMax = DefaultTwoDigitYearMax
     mMonthDays = Cor.NewLongs(0, 30, 59, 89, 118, 148, 177, 207, 236, 266, 295, 325, 355)
-    mIsReadOnly = True
 End Sub
 
 Friend Sub InitClone(ByVal Other As HijriCalendar)
     mHijriAdjustment = Other.HijriAdjustment
     mTwoDigitYearMax = Other.TwoDigitYearMax
-    mIsReadOnly = False
+End Sub
+
+Friend Sub InitReadOnlyClone(ByVal Other As HijriCalendar)
+    InitClone Other
+    mIsReadOnly = True
 End Sub
 
 
@@ -774,15 +772,15 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mTwoDigitYearMax = .ReadProperty("TwoDigitYearMax")
-        mHijriAdjustment = .ReadProperty("HijriAdjustment")
+        mTwoDigitYearMax = .ReadProperty(PropTwoDigitYearMax)
+        mHijriAdjustment = .ReadProperty(PropHijriAdjustment)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty "TwoDigitYearMax", mTwoDigitYearMax
-        .WriteProperty "HijriAdjustment", mHijriAdjustment
+        .WriteProperty PropTwoDigitYearMax, mTwoDigitYearMax
+        .WriteProperty PropHijriAdjustment, mHijriAdjustment
     End With
 End Sub
 
