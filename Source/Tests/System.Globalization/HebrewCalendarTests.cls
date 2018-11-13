@@ -117,6 +117,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #12/31/1582 11:59:59 PM#
             Test.Use #9/30/2239#
             
+        Case "ToDateTime_WithInvalidYear_ThrowsArgumentOutOfRangeException"
+            Test.Use 5342
+            Test.Use 6000
+            
     End Select
 End Sub
 
@@ -413,4 +417,24 @@ Public Sub GetWeekOfYear_WithValues_ReturnsExpected(ByVal d As Date, ByVal Rule 
     Actual = Calendar.GetWeekOfYear(d, Rule, dow)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToDateTime_WithInvalidYear_ThrowsArgumentOutOfRangeException(ByVal Year As Long)
+    Dim Calendar As New HebrewCalendar
+    
+    On Error Resume Next
+    Calendar.ToDateTime Year, 1, 1, 1, 1, 1, 1
+    
+    AssertArgumentOutOfRangeException Err
+End Sub
+
+Public Sub ToDateTime_WithValidValue_ReturnGregorianDateTime()
+    Dim Calendar As New HebrewCalendar
+    
+    Dim Actual As CorDateTime
+    Set Actual = Calendar.ToDateTime(5500, 1, 1, 1, 1, 1, 1)
+    
+    Dim Expected As CorDateTime
+    Set Expected = NewDateTime(1739, 10, 3, 1, 1, 1, 1)
+    Assert.That Actual, Equals(Expected)
 End Sub

@@ -344,3 +344,7 @@ Public Sub ToFourDigitYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal E
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+Public Sub TwoDigitYearMax_WhenNew_Returns()
+
+End Sub
