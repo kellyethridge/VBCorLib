@@ -614,6 +614,11 @@ Friend Sub InitClone(ByVal Other As GregorianCalendar)
     mCalendarType = Other.CalendarType
 End Sub
 
+Friend Sub InitReadOnlyClone(ByVal Other As GregorianCalendar)
+    InitClone Other
+    mIsReadOnly = True
+End Sub
+
 Private Sub Class_InitProperties()
     mTwoDigitYearMax = Statics.Calendar.GetCalendarInfoInt32(CAL_GREGORIAN, CAL_ITWODIGITYEARMAX)
     mCalendarType = GregorianCalendarTypes.Localized
@@ -637,9 +642,10 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub MarkReadOnly()
-    mIsReadOnly = True
-End Sub
+Friend Function CloneReadOnly() As GregorianCalendar
+    Set CloneReadOnly = New GregorianCalendar
+    CloneReadOnly.InitReadOnlyClone Me
+End Function
 
 Private Sub VerifyWritable()
     If IsReadOnly Then

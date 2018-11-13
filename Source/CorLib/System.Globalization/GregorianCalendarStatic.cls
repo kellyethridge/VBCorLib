@@ -64,8 +64,7 @@ Public Function ReadOnly(ByVal Calendar As GregorianCalendar) As GregorianCalend
     If Calendar.IsReadOnly Then
         Set ReadOnly = Calendar
     Else
-        Set ReadOnly = Calendar.Clone
-        ReadOnly.MarkReadOnly
+        Set ReadOnly = Calendar.CloneReadOnly
     End If
 End Function
 
