@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides static methods for the <b>JulianCalendar</b> class.
+' Provides static methods for the <a href="JulianCalendar.html">JulianCalendar</a> class.
 '
 ' @see JulianCalendar
 '
@@ -50,3 +50,20 @@ Option Explicit
 Public Property Get JulianEra() As Long
     JulianEra = 1
 End Property
+
+''
+' Returns a read-only version of the specified <a href="JulianCalendar.html">Calendar</a> object.
+'
+' @param Calendar A Calendar object.
+' @returns Returns the same calendar if it is read-only, otherwise returns a read-only clone.
+'
+Public Function ReadOnly(ByVal Calendar As JulianCalendar) As JulianCalendar
+    If Calendar Is Nothing Then _
+        Error.ArgumentNull "Calendar"
+    
+    If Calendar.IsReadOnly Then
+        Set ReadOnly = Calendar
+    Else
+        Set ReadOnly = Calendar.CloneReadOnly
+    End If
+End Function

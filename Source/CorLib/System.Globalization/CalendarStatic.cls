@@ -78,6 +78,8 @@ Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
             Set ReadOnly = HebrewCalendar.ReadOnly(Calendar)
         ElseIf TypeOf Calendar Is GregorianCalendar Then
             Set ReadOnly = GregorianCalendar.ReadOnly(Calendar)
+        ElseIf TypeOf Calendar Is JulianCalendar Then
+            Set ReadOnly = JulianCalendar.ReadOnly(Calendar)
         End If
     End If
 End Function

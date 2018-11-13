@@ -151,6 +151,7 @@ End Property
 ' </table>
 Public Property Let TwoDigitYearMax(ByVal Value As Long)
     VerifyWritable
+    
     If Value < 99 Or Value > MaxYear Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 99, MaxYear))
     
@@ -373,7 +374,7 @@ End Function
 ' @return The number of days in the year.
 '
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    VerifyEra Era
+    ValidateEra Era
     
     If IsLeapYear(Year) Then
         GetDaysInYear = 366
@@ -411,8 +412,8 @@ End Function
 ' @return The number of months in the year.
 '
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    VerifyEra Era
-    VerifyYear Year
+    ValidateEra Era
+    ValidateYear Year
     
     GetMonthsInYear = 12
 End Function
@@ -426,9 +427,9 @@ End Function
 ' @param Era The time period inwhich the year exists.
 '
 Public Function GetDaysInMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Long
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     GetDaysInMonth = CorDateTime.DaysInMonth(Year, Month)
 End Function
@@ -441,8 +442,8 @@ End Function
 ' @return Boolean indication if the year is a leap year.
 '
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyEra Era
-    VerifyYear Year
+    ValidateEra Era
+    ValidateYear Year
     
     IsLeapYear = ((Year Mod 4) = 0)
 End Function
@@ -474,9 +475,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     IsLeapMonth = False
 End Function
@@ -511,12 +512,10 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
-    
-    If Day < 1 Or Day > GetDaysInMonth(Year, Month, Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month, Era)))
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
+    ValidateDay Year, Month, Day
     
     If Month = 2 Then
         If IsLeapYear(Year, Era) Then
@@ -539,15 +538,15 @@ End Function
 ' @return A Gregorian version of the date specified.
 '
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByVal Era As Variant) As CorDateTime
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     ' Julian calendar start at #1/3/0001# in the Gregorian calendar.
     If Year = 1 And Month = 1 And Day < 3 Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_BadYearMonthDay
-    If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Day, GetDaysInMonth(Year, Month), Month))
+    
+    ValidateDay Year, Month, Day
     
     Set ToDateTime = CorDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MilliSecondsPerDay + TotalTime(Hour, Minute, Second, Millisecond))
 End Function
@@ -626,34 +625,41 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function CloneReadOnly() As JulianCalendar
+    Set CloneReadOnly = New JulianCalendar
+    CloneReadOnly.InitReadOnlyClone mTwoDigitYearMax
+End Function
+
 Private Sub VerifyWritable()
     If mIsReadOnly Then
         Error.InvalidOperation InvalidOperation_ReadOnly
     End If
 End Sub
 
-Private Sub VerifyEra(ByRef Era As Variant)
-    Select Case VarType(Era)
-        Case vbLong, vbInteger, vbByte
-            If Era <> JulianCalendar.JulianEra Then
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidEraValue), "Era")
-            End If
-        Case vbMissing
-            ' do nothing
+Private Sub ValidateEra(ByRef Era As Variant)
+    Select Case CLngOrDefault(Era, Statics.Calendar.CurrentEra)
+        Case Statics.Calendar.CurrentEra, JulianCalendar.JulianEra
+            ' all good
         Case Else
-            Throw Cor.NewInvalidCastException("An integer value is required.")
+            Error.Argument Argument_InvalidEraValue, "Era"
     End Select
 End Sub
 
-Private Sub VerifyYear(ByVal Year As Long)
+Private Sub ValidateYear(ByVal Year As Long)
     If Year < 1 Or Year > MaxYear Then
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MaxYear))
     End If
 End Sub
 
-Private Sub VerifyMonth(ByVal Month As Long)
+Private Sub ValidateMonth(ByVal Month As Long)
     If Month < 1 Or Month > 12 Then
         Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    End If
+End Sub
+
+Private Sub ValidateDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long)
+    If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then
+        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Day, GetDaysInMonth(Year, Month), Month))
     End If
 End Sub
 
@@ -706,11 +712,11 @@ Private Function TotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     End If
     
     If Year < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Error.ArgumentOutOfRange "Year", ArgumentOutOfRange_ValidValues
     If Month < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Error.ArgumentOutOfRange "Month", ArgumentOutOfRange_ValidValues
     If Day < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Error.ArgumentOutOfRange "Day", ArgumentOutOfRange_ValidValues
     
     Dim Days As Long
     If IsLeapYear(Year) Then
@@ -733,12 +739,15 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub InitClone(ByVal TwoDigitYearMax As Long)
     mTwoDigitYearMax = TwoDigitYearMax
-    mIsReadOnly = False
+End Sub
+
+Friend Sub InitReadOnlyClone(ByVal TwoDigitYearMax As Long)
+    InitClone TwoDigitYearMax
+    mIsReadOnly = True
 End Sub
 
 Private Sub Class_InitProperties()
     mTwoDigitYearMax = DefaultTwoDigitYearMax
-    mIsReadOnly = True
 End Sub
 
 

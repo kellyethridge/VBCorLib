@@ -124,7 +124,6 @@ End Sub
 
 Public Sub TwoDigitYearMax_WithInvalidValue_ThrowsArgumentOutOfRangeException(ByVal InvalidValue As Long)
     Dim Calendar As New JulianCalendar
-    Set Calendar = Calendar.Clone
     
     On Error Resume Next
     Calendar.TwoDigitYearMax = InvalidValue
@@ -134,7 +133,6 @@ End Sub
 
 Public Sub TwoDigitYearMax_WithMinValidValue_SetsValue()
     Dim Calendar As New JulianCalendar
-    Set Calendar = Calendar.Clone
     
     Calendar.TwoDigitYearMax = 99
     
@@ -143,7 +141,6 @@ End Sub
 
 Public Sub TwoDigitYearMax_WithMaxValidValue_SetsValue()
     Dim Calendar As New JulianCalendar
-    Set Calendar = Calendar.Clone
     
     Calendar.TwoDigitYearMax = 9999
     
@@ -152,7 +149,6 @@ End Sub
 
 Public Sub TestSerialization()
     Dim Calendar As New JulianCalendar
-    Set Calendar = Calendar.Clone
     Calendar.TwoDigitYearMax = 500
     
     Dim Actual As Calendar
@@ -282,5 +278,13 @@ Public Sub ToFourDigitYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal E
     Actual = Calendar.ToFourDigitYear(Year)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ReadOnly_WhenCalled_MarksCalendarReadOnly()
+    Dim Calendar As New JulianCalendar
+    
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
+    
+    Assert.That Calendar.IsReadOnly, Iz.True
 End Sub
 
