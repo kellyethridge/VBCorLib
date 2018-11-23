@@ -34,6 +34,12 @@ Attribute VB_Exposed = True
 '
 ' Module: JapaneseCalendarStatic
 '
+
+''
+' Provides static methods for the <a href="JapaneseCalendar.html">JapaneseCalendar</a> class.
+'
+' @see JapaneseCalendar
+'
 Option Explicit
 
 Private mMinSupportedDateTime As CorDateTime

@@ -620,9 +620,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub MarkReadOnly()
-    mIsReadOnly = True
-End Sub
+Friend Function CloneReadOnly() As HebrewCalendar
+    Set CloneReadOnly = New HebrewCalendar
+    CloneReadOnly.InitReadOnlyClone mTwoDigitYearMax
+End Function
 
 Private Sub VerifyWritable()
     If IsReadOnly Then
@@ -863,6 +864,11 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub InitClone(ByVal TwoDigitYearMax As Long)
     mTwoDigitYearMax = TwoDigitYearMax
+End Sub
+
+Friend Sub InitReadOnlyClone(ByVal TwoDigitYearMax As Long)
+    InitClone TwoDigitYearMax
+    mIsReadOnly = True
 End Sub
 
 Private Sub Class_InitProperties()

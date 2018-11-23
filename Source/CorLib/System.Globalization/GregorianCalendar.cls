@@ -231,7 +231,7 @@ End Property
 ' <p>A negative value can be supplied for <i>Days</i>.</p>
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = CorDateTime.AddDays(Time, Days)
+    Set AddDays = Statics.Calendar.AddDays(Me, Time, Days)
 End Function
 
 ''
@@ -242,7 +242,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = CorDateTime.AddHours(Time, Hours)
+    Set AddHours = Statics.Calendar.AddHours(Me, Time, Hours)
 End Function
 
 ''
@@ -253,7 +253,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = CorDateTime.AddMilliseconds(Time, Milliseconds)
+    Set AddMilliseconds = Statics.Calendar.AddMilliseconds(Me, Time, Milliseconds)
 End Function
 
 ''
@@ -264,7 +264,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = CorDateTime.AddMinutes(Time, Minutes)
+    Set AddMinutes = Statics.Calendar.AddMinutes(Me, Time, Minutes)
 End Function
 
 ''
@@ -275,7 +275,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Months added.
 '
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
-    Set AddMonths = CorDateTime.AddMonths(Time, Months)
+    Set AddMonths = Statics.Calendar.AddMonths(Me, Time, Months)
 End Function
 
 ''
@@ -286,7 +286,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = CorDateTime.AddSeconds(Time, Seconds)
+    Set AddSeconds = Statics.Calendar.AddSeconds(Me, Time, Seconds)
 End Function
 
 ''
@@ -297,9 +297,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Weeks added.
 '
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
-    Const DaysInWeek As Long = 7
-    
-    Set AddWeeks = AddDays(Time, Weeks * DaysInWeek)
+    Set AddWeeks = AddDays(Time, Weeks * DaysPerWeek)
 End Function
 
 ''
@@ -310,7 +308,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Years added.
 '
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
-    Set AddYears = CorDateTime.AddYears(Time, Years)
+    Set AddYears = Statics.Calendar.AddYears(Me, Time, Years)
 End Function
 
 ''

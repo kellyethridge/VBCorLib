@@ -238,12 +238,6 @@ Friend Sub ValidateDateTime(ByVal Calendar As Calendar, ByVal Value As CorDateTi
     ValidateAddResult Calendar, Value.TotalMilliseconds
 End Sub
 
-Private Sub ValidateAddResult(ByVal Calendar As Calendar, ByVal Milliseconds As Currency)
-    If Milliseconds < Calendar.MinSupportedDateTime.TotalMilliseconds Or Milliseconds > Calendar.MaxSupportedDateTime.TotalMilliseconds Then
-        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_CalendarRange, Calendar.MinSupportedDateTime, Calendar.MaxSupportedDateTime))
-    End If
-End Sub
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
@@ -272,5 +266,9 @@ Private Function AddCore(ByVal Calendar As Calendar, ByRef Time As Variant, ByVa
     Set AddCore = CorDateTime.FromMilliseconds(Milliseconds)
 End Function
 
-
+Private Sub ValidateAddResult(ByVal Calendar As Calendar, ByVal Milliseconds As Currency)
+    If Milliseconds < Calendar.MinSupportedDateTime.TotalMilliseconds Or Milliseconds > Calendar.MaxSupportedDateTime.TotalMilliseconds Then
+        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_CalendarRange, Calendar.MinSupportedDateTime, Calendar.MaxSupportedDateTime))
+    End If
+End Sub
 

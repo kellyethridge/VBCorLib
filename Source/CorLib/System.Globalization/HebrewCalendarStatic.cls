@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides static methods for the <b>HebrewCalendar</b> class.
+' Provides static methods for the <a href="HebrewCalendar.html">HebrewCalendar</a> class.
 '
 ' @see HebrewCalendar
 '
@@ -68,8 +68,7 @@ Public Function ReadOnly(ByVal Calendar As HebrewCalendar) As HebrewCalendar
     If Calendar.IsReadOnly Then
         Set ReadOnly = Calendar
     Else
-        Set ReadOnly = Calendar.Clone
-        ReadOnly.MarkReadOnly
+        Set ReadOnly = Calendar.CloneReadOnly
     End If
 End Function
 

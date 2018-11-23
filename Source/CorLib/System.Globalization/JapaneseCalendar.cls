@@ -36,8 +36,9 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides functions for manipulate Japanese dates.
+' Provides functions for manipulating Japanese dates.
 '
+' @see JapaneseCalendarStatic
 ' @see Calendar
 '
 Option Explicit
@@ -45,6 +46,7 @@ Implements IObject
 Implements Calendar
 Implements ICloneable
 
+Private Const PropTwoDigitYearMax       As String = "TwoDigitYearMax"
 Private Const DefaultTwoDigitYearMax    As Long = 99
 Private Const MaxYear                   As Long = 8011
 Private Const MinEra                    As Long = 1
@@ -596,7 +598,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function CloneReadOnly() As JapaneseCalendar
     Set CloneReadOnly = New JapaneseCalendar
@@ -672,11 +674,11 @@ End Sub
 '   Serialization
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    mTwoDigitYearMax = PropBag.ReadProperty("TwoDigitYearMax")
+    mTwoDigitYearMax = PropBag.ReadProperty(PropTwoDigitYearMax)
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    PropBag.WriteProperty "TwoDigitYearMax", mTwoDigitYearMax
+    PropBag.WriteProperty PropTwoDigitYearMax, mTwoDigitYearMax
 End Sub
 
 
