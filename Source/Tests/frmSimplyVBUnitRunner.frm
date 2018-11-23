@@ -314,7 +314,7 @@ Private Sub AddSystemGlobalization()
     With Sim.NewTestSuite("System.Globalization")
 '        .Add New TestThaiBuddhistCalendar
 '        .Add New TestTaiwanCalendar
-'        .Add New TestKoreanCalendar
+        .Add New KoreanCalendarTests
         .Add New JapaneseCalendarTests
         .Add New HebrewCalendarTests
         .Add New GregorianCalendarTests

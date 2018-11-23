@@ -84,6 +84,8 @@ Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
             Set ReadOnly = HijriCalendar.ReadOnly(Calendar)
         ElseIf TypeOf Calendar Is JapaneseCalendar Then
             Set ReadOnly = JapaneseCalendar.ReadOnly(Calendar)
+        ElseIf TypeOf Calendar Is KoreanCalendar Then
+            Set ReadOnly = KoreanCalendar.ReadOnly(Calendar)
         End If
     End If
 End Function
