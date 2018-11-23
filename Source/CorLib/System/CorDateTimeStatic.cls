@@ -340,20 +340,6 @@ Public Function Equals(ByRef t1 As Variant, ByRef t2 As Variant) As Boolean
     Equals = d1.TotalMilliseconds = d2.TotalMilliseconds
 End Function
 
-Friend Function DateToMilliseconds(ByVal d As Date) As Currency
-    Const MillisecondsTo1899 As Currency = 59926435200000#
-    Dim Days As Currency
-    
-    If d < 0# Then
-        Days = Fix(d * MilliSecondsPerDay - 0.5)
-        Days = Days - Modulus(Days, MilliSecondsPerDay) * 2
-    Else
-        Days = Fix(d * MilliSecondsPerDay + 0.5)
-    End If
-    
-    DateToMilliseconds = Days + MillisecondsTo1899
-End Function
-
 Friend Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
     Set AddYears = CachedDateTime(Time).AddYears(Years)
 End Function
@@ -362,11 +348,11 @@ Friend Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
     Set AddMonths = CachedDateTime(Time).AddMonths(Months)
 End Function
 
-Friend Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
+Friend Function AddDays(ByRef Time As Variant, ByVal Days As Double) As CorDateTime
     Set AddDays = CachedDateTime(Time).AddDays(Days)
 End Function
 
-Friend Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
+Friend Function AddHours(ByRef Time As Variant, ByVal Hours As Double) As CorDateTime
     Set AddHours = CachedDateTime(Time).AddHours(Hours)
 End Function
 
@@ -374,11 +360,11 @@ Friend Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Dou
     Set AddMilliseconds = CachedDateTime(Time).AddMilliseconds(Milliseconds)
 End Function
 
-Friend Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
+Friend Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Double) As CorDateTime
     Set AddMinutes = CachedDateTime(Time).AddMinutes(Minutes)
 End Function
 
-Friend Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
+Friend Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Double) As CorDateTime
     Set AddSeconds = CachedDateTime(Time).AddSeconds(Seconds)
 End Function
 
@@ -425,6 +411,29 @@ End Function
 Friend Sub Validate(ByRef Time As Variant)
     CachedDateTime Time
 End Sub
+
+Friend Function GetTotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long
+    If Year = 0 And Month = 0 And Day = 0 Then
+        Exit Function
+    End If
+    
+    If Year < 1 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+    If Month < 1 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+    If Day < 1 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+    
+    Dim Days As Long
+    If CorDateTime.IsLeapYear(Year) Then
+        Days = DaysToMonthLeapYear(Month - 1)
+    Else
+        Days = DaysToMonth(Month - 1)
+    End If
+    
+    Year = Year - 1
+    GetTotalDays = (Day - 1) + Days + 365 * Year + (Year \ 4) - ((Year \ 100) - (Year \ 400))
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

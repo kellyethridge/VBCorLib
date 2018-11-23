@@ -485,10 +485,10 @@ End Function
 ' @param Day The day to check if is a leap day.
 ' @param Era The era the year is in.
 ' @return Boolean indication if the day is a leap day.
-' @remarks A leap day only exists in a leap year, such as Febuary 29th in the Gregorian calendar.
+' @remarks A leap day only exists in a leap year, such as February 29th in the Gregorian calendar.
 '
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
-    Const MonthOfFebuary As Long = 2
+    Const MonthOfFebruary As Long = 2
     
     ValidateEra Era
     ValidateYear Year
@@ -497,7 +497,7 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
     
-    If Month = MonthOfFebuary Then
+    If Month = MonthOfFebruary Then
         IsLeapDay = (Day = 29)
     End If
 End Function

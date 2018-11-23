@@ -204,6 +204,8 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_Day = 742
     ArgumentOutOfRange_CalendarRange = 743
     ArgumentOutOfRange_BadYearMonthDay = 744
+    ArgumentOutOfRange_AddValue = 745
+    ArgumentOutOfRange_Era = 746
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?

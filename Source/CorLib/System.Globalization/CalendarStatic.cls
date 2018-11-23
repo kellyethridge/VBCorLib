@@ -82,6 +82,8 @@ Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
             Set ReadOnly = JulianCalendar.ReadOnly(Calendar)
         ElseIf TypeOf Calendar Is HijriCalendar Then
             Set ReadOnly = HijriCalendar.ReadOnly(Calendar)
+        ElseIf TypeOf Calendar Is JapaneseCalendar Then
+            Set ReadOnly = JapaneseCalendar.ReadOnly(Calendar)
         End If
     End If
 End Function
@@ -161,9 +163,84 @@ Friend Function ToFourDigitYear(ByVal Calendar As Calendar, ByVal Year As Long) 
     End If
 End Function
 
-Friend Sub CheckAddResult(ByVal Milliseconds As Currency, ByVal MinValue As CorDateTime, ByVal MaxValue As CorDateTime)
-    If Milliseconds < MinValue.TotalMilliseconds Or Milliseconds > MaxValue.TotalMilliseconds Then
-        Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_ResultCalendarRange, MinValue, MaxValue))
+Friend Function AddYears(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Years As Long) As CorDateTime
+    Set AddYears = AddMonths(Calendar, Time, Years * MonthsPerYear)
+End Function
+
+Friend Function AddMonths(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Months As Long) As CorDateTime
+    If Months < -120000 Or Months > 120000 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Months", "Months must be between -120000 and 120000 inclusively.")
+    
+    mCachedDateTime.InitFromDateOrDateTime Time, UnspecifiedKind
+    
+    If Months = 0 Then
+        Set AddMonths = CorDateTime.FromMilliseconds(mCachedDateTime.TotalMilliseconds)
+        Exit Function
+    End If
+    
+    Dim Year    As Long
+    Dim Month   As Long
+    Dim Day     As Long
+    mCachedDateTime.GetDateParts Complete, Year, Month, Day
+    
+    Dim YearsToAdd  As Long
+    Dim MonthsToAdd As Long
+    
+    YearsToAdd = CorMath.DivRem(Months, MonthsPerYear, MonthsToAdd)
+    
+    Month = Month + MonthsToAdd
+    Year = Year + YearsToAdd
+    
+    Select Case Month
+        Case Is < 1
+            Month = Month + MonthsPerYear
+            Year = Year - 1
+        Case Is > MonthsPerYear
+            Month = Month - MonthsPerYear
+            Year = Year + 1
+    End Select
+    
+    Dim MaxDays As Long
+    MaxDays = CorDateTime.DaysInMonth(Year, Month)
+    
+    If Day > MaxDays Then
+        Day = MaxDays
+    End If
+    
+    Dim Milliseconds As Currency
+    Milliseconds = CorDateTime.GetTotalDays(Year, Month, Day) * MilliSecondsPerDay + Modulus(mCachedDateTime.TotalMilliseconds, MilliSecondsPerDay)
+    ValidateAddResult Calendar, Milliseconds
+    
+    Set AddMonths = CorDateTime.FromMilliseconds(Milliseconds)
+End Function
+
+Friend Function AddDays(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddDays = AddCore(Calendar, Time, Value * MilliSecondsPerDay)
+End Function
+
+Friend Function AddHours(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddHours = AddCore(Calendar, Time, Value * MillisecondsPerHour)
+End Function
+
+Friend Function AddMinutes(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddMinutes = AddCore(Calendar, Time, Value * MillisecondsPerMinute)
+End Function
+
+Friend Function AddSeconds(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddSeconds = AddCore(Calendar, Time, Value * MillisecondsPerSecond)
+End Function
+
+Friend Function AddMilliseconds(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Double) As CorDateTime
+    Set AddMilliseconds = AddCore(Calendar, Time, Value)
+End Function
+
+Friend Sub ValidateDateTime(ByVal Calendar As Calendar, ByVal Value As CorDateTime)
+    ValidateAddResult Calendar, Value.TotalMilliseconds
+End Sub
+
+Private Sub ValidateAddResult(ByVal Calendar As Calendar, ByVal Milliseconds As Currency)
+    If Milliseconds < Calendar.MinSupportedDateTime.TotalMilliseconds Or Milliseconds > Calendar.MaxSupportedDateTime.TotalMilliseconds Then
+        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_CalendarRange, Calendar.MinSupportedDateTime, Calendar.MaxSupportedDateTime))
     End If
 End Sub
 
@@ -176,5 +253,24 @@ Friend Function GetCalendarInfoInt32(ByVal Cal As Long, ByVal CalType As Long) A
         Error.Win32Error Err.LastDllError
     End If
 End Function
+
+Private Function AddCore(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Double) As CorDateTime
+    Dim Milliseconds As Currency
+    
+    If Value < 0# Then
+        Value = Fix(Value - 0.5)
+    Else
+        Value = Fix(Value + 0.5)
+    End If
+    
+    If Value < -MaxMilliseconds Or Value > MaxMilliseconds Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_AddValue
+        
+    Milliseconds = CorDateTime.GetTotalMilliseconds(Time) + CCur(Value)
+    ValidateAddResult Calendar, Milliseconds
+    
+    Set AddCore = CorDateTime.FromMilliseconds(Milliseconds)
+End Function
+
 
 

@@ -372,7 +372,7 @@ Public Function AddMonths(ByVal Months As Long) As CorDateTime
         Day = MaxDays
     End If
     
-    Set AddMonths = CorDateTime.FromMilliseconds(GetTotalDays(Year, Month, Day) * MilliSecondsPerDay + Modulus(mMilliseconds, MilliSecondsPerDay), mKind)
+    Set AddMonths = CorDateTime.FromMilliseconds(CorDateTime.GetTotalDays(Year, Month, Day) * MilliSecondsPerDay + Modulus(mMilliseconds, MilliSecondsPerDay), mKind)
 End Function
 
 ''
@@ -642,7 +642,7 @@ Public Function Subtract(ByRef Value As Variant) As Object
                 Error.Argument Argument_InvalidDateSubtraction, "Value"
             End If
         Case vbDate
-            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - CorDateTime.DateToMilliseconds(Value))
+            Set Subtract = TimeSpan.FromMilliseconds(mMilliseconds - DateToMilliseconds(Value))
         Case Else
             Error.Argument Argument_InvalidDateSubtraction, "Value"
     End Select
@@ -749,7 +749,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, ByVal Calendar As Calendar, ByVal Kind As DateTimeKind)
     If Calendar Is Nothing Then
-        mMilliseconds = GetTotalDays(Year, Month, Day) * MilliSecondsPerDay + GetTotalMilliseconds(Hour, Minute, Second, Millisecond)
+        mMilliseconds = CorDateTime.GetTotalDays(Year, Month, Day) * MilliSecondsPerDay + GetTotalMilliseconds(Hour, Minute, Second, Millisecond)
     Else
         mMilliseconds = Calendar.ToDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond).TotalMilliseconds
     End If
@@ -765,13 +765,27 @@ Friend Sub InitFromMilliseconds(ByVal ms As Currency, ByVal Kind As DateTimeKind
 End Sub
 
 Friend Sub InitFromDate(ByVal d As Date, ByVal Kind As DateTimeKind)
-    mMilliseconds = Statics.CorDateTime.DateToMilliseconds(d)
+    mMilliseconds = DateToMilliseconds(d)
     mKind = Kind
 End Sub
 
 Friend Sub InitFromCorDateTime(ByVal d As CorDateTime, ByVal Kind As DateTimeKind)
-    mMilliseconds = d.TotalMilliseconds
+    If Not d Is Nothing Then
+        mMilliseconds = d.TotalMilliseconds
+    End If
+    
     mKind = Kind
+End Sub
+
+Friend Sub InitFromDateOrDateTime(ByRef Time As Variant, ByVal Kind As DateTimeKind)
+    Select Case VarType(Time)
+        Case vbObject
+            InitFromCorDateTime Time, Kind
+        Case vbDate
+            InitFromDate Time, Kind
+        Case Else
+            Error.Argument Arg_MustBeDateTime
+    End Select
 End Sub
 
 Friend Sub InitFromFileTime(ByVal Time As Currency, ByVal Kind As DateTimeKind)
@@ -853,27 +867,8 @@ Private Function CalculateDay(ByVal Days As Long, ByRef Month As Long, ByRef Mon
     Do While Months(Month) <= Days
         Month = Month + 1
     Loop
+    
     CalculateDay = Days - Months(Month - 1)
-End Function
-
-Private Function GetTotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long
-    If Year = 0 And Month = 0 And Day = 0 Then Exit Function
-    If Year < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
-    If Month < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
-    If Day < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
-    
-    Dim Days As Long
-    If CorDateTime.IsLeapYear(Year) Then
-        Days = DaysToMonthLeapYear(Month - 1)
-    Else
-        Days = DaysToMonth(Month - 1)
-    End If
-    
-    Year = Year - 1
-    GetTotalDays = (Day - 1) + Days + 365 * Year + (Year \ 4) - ((Year \ 100) - (Year \ 400))
 End Function
 
 Private Function GetTotalMilliseconds(ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long) As Currency
