@@ -555,7 +555,7 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Public Function CloneReadOnly() As KoreanCalendar
+Friend Function CloneReadOnly() As KoreanCalendar
     Set CloneReadOnly = New KoreanCalendar
     CloneReadOnly.InitReadOnlyClone Me
 End Function
