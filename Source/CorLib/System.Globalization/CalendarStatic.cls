@@ -86,6 +86,8 @@ Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
             Set ReadOnly = JapaneseCalendar.ReadOnly(Calendar)
         ElseIf TypeOf Calendar Is KoreanCalendar Then
             Set ReadOnly = KoreanCalendar.ReadOnly(Calendar)
+        ElseIf TypeOf Calendar Is TaiwanCalendar Then
+            Set ReadOnly = ReadOnlyTaiwanCalendar(Calendar)
         End If
     End If
 End Function
@@ -273,4 +275,8 @@ Private Sub ValidateAddResult(ByVal Calendar As Calendar, ByVal Milliseconds As 
         Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_CalendarRange, Calendar.MinSupportedDateTime, Calendar.MaxSupportedDateTime))
     End If
 End Sub
+
+Private Function ReadOnlyTaiwanCalendar(ByVal Calendar As TaiwanCalendar) As Calendar
+    Set ReadOnlyTaiwanCalendar = Calendar.CloneReadOnly
+End Function
 

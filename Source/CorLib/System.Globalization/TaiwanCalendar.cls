@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2018 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: TaiwanCalendar
+' Module: TaiwanCalendar
 '
 
 ''
@@ -41,108 +44,313 @@ Option Explicit
 Implements IObject
 Implements Calendar
 
-Private Const MIN_TAIWANYEAR    As Long = 1
-Private Const MAX_TAIWANYEAR    As Long = 8088
-Private Const YEAR_OFFSET       As Long = 1911
+Private Const PropTwoDigitYearMax   As String = "TwoDigitYearMax"
+Private Const MinTaiwanYear         As Long = 1
+Private Const MaxTaiwanYear         As Long = 8088
+Private Const YearOffset            As Long = 1911
 
-Private mTwoDigitYearMax As Long
+Private mMinSupportedDateTime   As CorDateTime
+Private mTwoDigitYearMax        As Long
+Private mIsReadOnly             As Boolean
 
 
-Public Property Get Eras() As Long()
-    Dim Ret(0) As Long
-    Ret(0) = 1
-    Eras = Ret
+''
+' Creates a new object that is a copy of the current <a href="TaiwanCalendar.html">TaiwanCalendar</a> object.
+'
+' @return A copy of the <a href="TaiwanCalendar.html">TaiwanCalendar</a> object.
+' @remarks The clone will always be a non-readonly version.
+'
+Public Function Clone() As TaiwanCalendar
+    Set Clone = New TaiwanCalendar
+    Clone.InitClone Me
+End Function
+
+''
+' Gets a value that indicates whether the current calendar is solar-based, lunar-based, or a combination of both.
+'
+' @return Always returns <a href="Calendar.CalendarAlgorithmType.html">CalendarAlgorithmType.SolarCalendar</a>.
+'
+Public Property Get AlgorithmType() As CalendarAlgorithmType
+    AlgorithmType = SolarCalendar
 End Property
 
+''
+' Gets a value indicating whether this <a href="TaiwanCalendar.html">TaiwanCalendar</a> object is read-only.
+'
+' @return <b>True</b> if this <a href="TaiwanCalendar.html">TaiwanCalendar</a> object is read-only; otherwise, <b>False</b>.
+'
+Public Property Get IsReadOnly() As Boolean
+    IsReadOnly = mIsReadOnly
+End Property
+
+''
+' Gets a list of eras in the <a href="TaiwanCalendar.html">TaiwanCalendar</a>.
+'
+' @return An array of integers that represents the eras in the <a href="TaiwanCalendar.html">TaiwanCalendar</a>.
+' @remarks The <a href="TaiwanCalendar.html">TaiwanCalendar</a> class recognizes only the current era. This property always returns an array with only one element.
+'
+Public Property Get Eras() As Long()
+    Eras = Cor.NewLongs(1)
+End Property
+
+''
+' Gets the last year of a 100-year range that can be represented by a 2-digit year.
+'
+' @return The last year of a 100-year range that can be represented by a 2-digit year.
+' @remarks Because the year in the Taiwan calendar is typically less than four digits long, this implementation returns 99 by default and does not affect the return value of <a href="TaiwanCalendar.ToFourDigitYear.html">ToFourDigitYear</a>.
+'
 Public Property Get TwoDigitYearMax() As Long
     TwoDigitYearMax = mTwoDigitYearMax
 End Property
 
-Public Property Let TwoDigitYearMax(ByVal RHS As Long)
-    If RHS < 100 Or RHS > MAX_TAIWANYEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 100, MAX_TAIWANYEAR))
+''
+' Sets the last year of a 100-year range that can be represented by a 2-digit year.
+'
+' @return The last year of a 100-year range that can be represented by a 2-digit year.
+' @remarks
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td>
+'           The value specified in a set operation is less than 99.<br/>
+'           -or-<br/>
+'           The value specified in a set operation is greater than <b>MaxSupportedDateTime.Year</b>.
+'       </td>
+'   </tr>
+'   <tr>
+'       <td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+'       <td>In a set operation, the current instance is read-only.</td>
+' </table>
+' <p>Because the year in the Taiwan calendar is typically less than four digits long, this implementation returns 99 by default and does not affect the return value of <a href="TaiwanCalendar.ToFourDigitYear.html">ToFourDigitYear</a>.</p>
+'
+Public Property Let TwoDigitYearMax(ByVal Value As Long)
+    VerifyWritable
     
-    mTwoDigitYearMax = RHS
+    If Value < 99 Or Value > MaxTaiwanYear Then _
+        Throw Cor.NewArgumentOutOfRangeException("Value", Environment.GetResourceString(ArgumentOutOfRange_Range, 99, MaxTaiwanYear))
+    
+    mTwoDigitYearMax = Value
 End Property
 
+''
+' Gets the earliest date and time supported by the <a href="TaiwanCalendar.html">TaiwanCalendar</a> class.
+'
+' @return The earliest date and time supported by the <a href="TaiwanCalendar.html">TaiwanCalendar</a> class, which is equivalent to the first moment of January 1, 1912 C.E. in the Gregorian calendar.
+'
+Public Property Get MinSupportedDateTime() As CorDateTime
+    Set MinSupportedDateTime = mMinSupportedDateTime
+End Property
+
+''
+' Gets the latest date and time supported by the <a href="TaiwanCalendar.html">TaiwanCalendar</a> class.
+'
+' @return The latest date and time supported by the <a href="TaiwanCalendar.html">TaiwanCalendar</a> class, which is equivalent to the last moment of December 31, 9999 C.E. in the Gregorian calendar.
+'
+Public Property Get MaxSupportedDateTime() As CorDateTime
+    Set MaxSupportedDateTime = CorDateTime.MaxValue
+End Property
+
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> that is the specified number of days away from the specified <a href="CorDateTime.html">CorDateTime</a>.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to add days to.
+' @param Days The number of days to add.
+' @return The <a href="CorDateTime.html">CorDateTime</a> that results from adding the specified number of days to the specified <a href="CorDateTime.html">CorDateTime</a>.
+'
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = Convert.ToDateTime(Time).AddDays(Days)
+    Set AddDays = Statics.Calendar.AddDays(Me, Time, Days)
 End Function
 
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of hours from the original Time.
+'
+' @param Time The time to add the specified number of hours to.
+' @param Hours The number of hours to be added to <i>Time</i>. This can be negative.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of hours added.
+'
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = Convert.ToDateTime(Time).AddHours(Hours)
+    Set AddHours = Statics.Calendar.AddHours(Me, Time, Hours)
 End Function
 
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Milliseconds from the original Time.
+'
+' @param Time The time to add the specified number of Milliseconds to.
+' @param Milliseconds The number of Milliseconds to be added to <i>Time</i>. This can be negative.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
+'
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = Convert.ToDateTime(Time).AddMilliseconds(Milliseconds)
+    Set AddMilliseconds = Statics.Calendar.AddMilliseconds(Me, Time, Milliseconds)
 End Function
 
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Minutes from the original Time.
+'
+' @param Time The time to add the specified number of Minutes to.
+' @param Minutes The number of Minutes to be added to <i>Time</i>. This can be negative.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
+'
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = Convert.ToDateTime(Time).AddMinutes(Minutes)
+    Set AddMinutes = Statics.Calendar.AddMinutes(Me, Time, Minutes)
 End Function
 
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Months from the original Time.
+'
+' @param Time The time to add the specified number of Months to.
+' @param Months The number of Months to be added to <i>Time</i>. This can be negative.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Months added.
+'
 Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDateTime
-    Set AddMonths = Convert.ToDateTime(Time).AddMonths(Months)
+    Set AddMonths = Statics.Calendar.AddMonths(Me, Time, Months)
 End Function
 
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Seconds from the original Time.
+'
+' @param Time The time to add the specified number of Seconds to.
+' @param Seconds The number of Seconds to be added to <i>Time</i>. This can be negative.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
+'
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = Convert.ToDateTime(Time).AddSeconds(Seconds)
+    Set AddSeconds = Statics.Calendar.AddSeconds(Me, Time, Seconds)
 End Function
 
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Weeks from the original Time.
+'
+' @param Time The time to add the specified number of Weeks to.
+' @param Weeks The number of Weeks to be added to <i>Time</i>. This can be negative.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Weeks added.
+'
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
-    Set AddWeeks = AddDays(Time, Weeks * 7)
+    Set AddWeeks = AddDays(Time, Weeks * DaysPerWeek)
 End Function
 
+''
+' Returns a <a href="CorDateTime.html">CorDateTime</a> this is the specified number of Years from the original Time.
+'
+' @param Time The time to add the specified number of Years to.
+' @param Years The number of Years to be added to <i>Time</i>. This can be negative.
+' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Years added.
+'
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
-    Set AddYears = Convert.ToDateTime(Time).AddYears(Years)
+    Set AddYears = Statics.Calendar.AddYears(Me, Time, Years)
 End Function
 
+''
+' Returns the day of the months for the specified date.
+'
+' @param Time The date inwhich to retrieve the day of the month.
+' @return An integer from 1 to 31 that represents the day of the month in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
+'
 Public Function GetDayOfMonth(ByRef Time As Variant) As Long
     GetDayOfMonth = Convert.ToDateTime(Time).Day
 End Function
 
+''
+' Returns the <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> enum of the specified date.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to read the day of the week from.
+' @return A <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> enum representing the day of the week.
+' @remarks The <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> is Sunday and is 0-based. The Visual Basic
+' enum vbDayOfWeek is 1-based.
+'
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
     GetDayOfWeek = Convert.ToDateTime(Time).DayOfWeek
 End Function
 
+''
+' Returns the day of the year for the specified date.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to read the day of the year from.
+' @return An integer from 1 to 366 that represents the day of the year in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
+'
 Public Function GetDayOfYear(ByRef Time As Variant) As Long
     GetDayOfYear = Convert.ToDateTime(Time).DayOfYear
 End Function
 
+''
+' Returns the number of days in the specified month.
+'
+' @param Year The year inwhich the month exists. This is used by calendars that have months that change based on the year, such as leap years.
+' @param Month The month to retrieve the number of days of.
+' @param Era The time period inwhich the year exists.
+'
 Public Function GetDaysInMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Long
     Year = GetGregorianYear(Year, Era)
     GetDaysInMonth = CorDateTime.DaysInMonth(Year, Month)
 End Function
 
+''
+' Returns the number of days in the specified year.
+'
+' @param Year The year to retrieve the number of days of.
+' @param Era The era the year exists in.
+' @return The number of days in the year.
+'
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    Year = GetGregorianYear(Year, Era)
-    If CorDateTime.IsLeapYear(Year) Then
+    If IsLeapYear(Year) Then
         GetDaysInYear = 366
     Else
         GetDaysInYear = 365
     End If
 End Function
 
+''
+' Returns the era in the specified <a href="CorDateTime.html">CorDateTime</a>.
+'
+' @param The <a href="CorDateTime.html">CorDateTime</a> to read.
+' @return An integer that represents the era in the specified <a href="CorDateTime.html">CorDateTime</a>.
+' @remarks The <a href="TaiwanCalendar.html">TaiwanCalendar</a> class recognizes only the current era.
+'
 Public Function GetEra(ByRef Time As Variant) As Long
-    Dim dt As CorDateTime
-    Set dt = Convert.ToDateTime(Time)    ' verifies we have a date
+    CorDateTime.Validate Time
     GetEra = 1
 End Function
 
+''
+' Returns the hour of the specified time.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to retrieve the hour from.
+' @return The hour portion of the time.
+'
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = Convert.ToDateTime(Time).Hour
+    GetHour = CorDateTime.GetHour(Time)
 End Function
 
+''
+' Returns the milliseconds of the specified time.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to retrieve the milliseconds from.
+' @return The millisecond portion of the time.
+'
 Public Function GetMilliseconds(ByRef Time As Variant) As Double
-    GetMilliseconds = Convert.ToDateTime(Time).Millisecond
+    GetMilliseconds = CorDateTime.GetMilliseconds(Time)
 End Function
 
+''
+' Returns the minute of the specified time.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to retrieve the minute from.
+' @return The minute portion of the time.
+'
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = Convert.ToDateTime(Time).Minute
+    GetMinute = CorDateTime.GetMinute(Time)
 End Function
 
+''
+' Returns the month of the specified time.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to retrieve the month from.
+' @return The month portion of the time.
+'
 Public Function GetMonth(ByRef Time As Variant) As Long
-    GetMonth = Convert.ToDateTime(Time).Month
+    GetMonth = CorDateTime.GetMonth(Time)
 End Function
 
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
@@ -150,20 +358,43 @@ Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Varian
     GetMonthsInYear = 12
 End Function
 
+''
+' Returns the second of the specified time.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to retrieve the second from.
+' @return The second portion of the time.
+'
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = Convert.ToDateTime(Time).Second
+    GetSecond = CorDateTime.GetSecond(Time)
 End Function
 
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function
 
+''
+' Returns the year of the specified time.
+'
+' @param Time The time to retrieve the year from.
+' @return The year portion of the time.
+'
 Public Function GetYear(ByRef Time As Variant) As Long
-    GetYear = Convert.ToDateTime(Time).Year - YEAR_OFFSET
+    GetYear = CorDateTime.GetYear(Time) - YearOffset
 End Function
 
+''
+' Returns a boolean indicating if the specific day is a leap day.
+'
+' @param Year The year the day is in.
+' @param Month The month the day is in.
+' @param Day The day to check if is a leap day.
+' @param Era The era the year is in.
+' @return Boolean indication if the day is a leap day.
+' @remarks A leap day only exists in a leap year, such as February 29th in the Taiwan calendar.
+'
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
-    Call VerifyMonth(Month)
+    VerifyMonth Month
+    
     If Day < 1 Or Day > GetDaysInMonth(Year, Month, Era) Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
     
@@ -172,25 +403,64 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
     End If
 End Function
 
+''
+' Returns a boolean indicating if the specific month is a leap month.
+'
+' @param Year The year the month is in.
+' @param Month The month to check if it is a leap month.
+' @param Era The era the year is in.
+' @return Boolean indication if the month is a leap month.
+' @remarks A leap month only exists in a leap year, such as Adar II in the Hebrew calendar.
+' This always returns <b>False</b>.
+'
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
-    Year = GetGregorianYear(Year, Era)
-    Call VerifyMonth(Month)
+    GetGregorianYear Year, Era
+    VerifyMonth Month
     
     IsLeapMonth = False
 End Function
 
+''
+' Returns a boolean indicating if the specific year is a leap year.
+'
+' @param Year The year to check if is a leap year.
+' @param Era The era the year is in.
+' @return Boolean indication if the year is a leap year.
+' @remarks A leap year in the Korean calendar occurs when the year is
+' evenly divisible by 4, but not by 100, unless it is divisible by 400.
+'
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean
     IsLeapYear = CorDateTime.IsLeapYear(GetGregorianYear(Year, Era))
 End Function
 
+''
+' Returns a Gregorian <a href="CorDateTime.html">CorDateTime</a> computed using the specific calendar rules.
+'
+' @param Year The Year in the specific calendar type.
+' @param Month The Month in the specific calendar type.
+' @param Day The Day in the specific calendar type.
+' @param Hour The hour for the new time.
+' @param Minute The minute for the new time.
+' @param Second The second for the new time.
+' @param Millisecond The milliseconds for the new time.
+' @param Era The era the year is in.
+' @return A Gregorian version of the date specified.
+'
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime
     Year = GetGregorianYear(Year, Era)
     Set ToDateTime = Cor.NewDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond)
 End Function
 
+''
+' Returns a 4-digit year from a 2-digit number.
+'
+' @param Year The year to be converted to 4-digits.
+' @return A 4-digit year in the specific calendar.
+' @remarks Because the year in the Taiwan calendar is typically less than four digits long, this implementation always returns the value of the year parameter.
+'
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
-    If Year < MIN_TAIWANYEAR Or Year > MAX_TAIWANYEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_TAIWANYEAR, MAX_TAIWANYEAR))
+    If Year < MinTaiwanYear Or Year > MaxTaiwanYear Then _
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MinTaiwanYear, MaxTaiwanYear))
     
     ToFourDigitYear = Year
 End Function
@@ -223,44 +493,87 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function CloneReadOnly() As TaiwanCalendar
+    Set CloneReadOnly = New TaiwanCalendar
+    CloneReadOnly.InitReadOnlyClone Me
+End Function
+
+Private Sub VerifyWritable()
+    If IsReadOnly Then
+        Error.InvalidOperation InvalidOperation_ReadOnly
+    End If
+End Sub
+
 Private Sub VerifyEra(ByRef Era As Variant)
-    If IsMissing(Era) Then Exit Sub
-    Select Case VarType(Era)
-        Case vbLong, vbInteger, vbByte
-            If Era < 0 Or Era > 1 Then Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidEraValue), "Era")
+    Select Case CLngOrDefault(Era, Statics.Calendar.CurrentEra)
+        Case 1, Statics.Calendar.CurrentEra
+            ' all good
         Case Else
-            Throw Cor.NewInvalidCastException("An integer value is required.")
+            Error.Argument Argument_InvalidEraValue, "Era"
     End Select
 End Sub
 
 Private Function GetGregorianYear(ByVal Year As Long, ByRef Era As Variant) As Long
-    Call VerifyEra(Era)
-    If Year < MIN_TAIWANYEAR Or Year > MAX_TAIWANYEAR Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MIN_TAIWANYEAR, MAX_TAIWANYEAR))
+    VerifyEra Era
     
-    GetGregorianYear = Year + YEAR_OFFSET
+    If Year < MinTaiwanYear Or Year > MaxTaiwanYear Then _
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MinTaiwanYear, MaxTaiwanYear))
+    
+    GetGregorianYear = Year + YearOffset
 End Function
 
 Private Sub VerifyMonth(ByVal Month As Long)
-    If Month < 1 Or Month > 12 Then Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    If Month < 1 Or Month > 12 Then
+        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Calendar Interface
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_InitProperties()
+    mTwoDigitYearMax = Statics.Calendar.GetCalendarInfoInt32(CAL_TAIWAN, CAL_ITWODIGITYEARMAX)
+    Set mMinSupportedDateTime = Cor.NewDateTime(1912, 1, 1)
+End Sub
+
+Friend Sub InitClone(ByVal Other As TaiwanCalendar)
+    mTwoDigitYearMax = Other.TwoDigitYearMax
+End Sub
+
+Friend Sub InitReadOnlyClone(ByVal Other As TaiwanCalendar)
+    InitClone Other
+    mIsReadOnly = True
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Serialization
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_ReadProperties(PropBag As PropertyBag)
+    mTwoDigitYearMax = PropBag.ReadProperty(PropTwoDigitYearMax)
+End Sub
+
+Private Sub Class_WriteProperties(PropBag As PropertyBag)
+    PropBag.WriteProperty PropTwoDigitYearMax, mTwoDigitYearMax
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Calendar
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Property Get Calendar_AlgorithmType() As CalendarAlgorithmType
-
+    Calendar_AlgorithmType = AlgorithmType
 End Property
 
 Private Function Calendar_Clone() As Calendar
-
+    Set Calendar_Clone = Clone
 End Function
 
 Private Property Get Calendar_IsReadOnly() As Boolean
-
+    Calendar_IsReadOnly = IsReadOnly
 End Property
 
 Private Function Calendar_AddDays(Time As Variant, ByVal Days As Long) As CorDateTime
@@ -376,11 +689,11 @@ Private Function Calendar_IsLeapYear(ByVal Year As Long, Optional Era As Variant
 End Function
 
 Private Property Get Calendar_MaxSupportedDateTime() As CorDateTime
-
+    Set Calendar_MaxSupportedDateTime = MaxSupportedDateTime
 End Property
 
 Private Property Get Calendar_MinSupportedDateTime() As CorDateTime
-
+    Set Calendar_MinSupportedDateTime = MinSupportedDateTime
 End Property
 
 Private Function Calendar_ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional Era As Variant) As CorDateTime
@@ -405,23 +718,7 @@ End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_InitProperties()
-    mTwoDigitYearMax = 99
-End Sub
-
-Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    mTwoDigitYearMax = PropBag.ReadProperty("TwoDigitYearMax")
-End Sub
-
-Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    Call PropBag.WriteProperty("TwoDigitYearMax", mTwoDigitYearMax)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
