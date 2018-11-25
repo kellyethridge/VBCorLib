@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements Calendar
+Implements ICloneable
 
 Private Const MaxYear                   As Long = 9999
 Private Const DefaultTwoDigitYearMax    As Long = 2029
@@ -918,6 +919,14 @@ End Property
 Private Property Let Calendar_TwoDigitYearMax(ByVal Value As Long)
     TwoDigitYearMax = Value
 End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

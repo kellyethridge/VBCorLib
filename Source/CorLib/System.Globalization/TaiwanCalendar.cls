@@ -43,6 +43,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements Calendar
+Implements ICloneable
 
 Private Const PropTwoDigitYearMax   As String = "TwoDigitYearMax"
 Private Const MinTaiwanYear         As Long = 1
@@ -748,6 +749,14 @@ End Property
 Private Property Get Calendar_TwoDigitYearMax() As Long
     Calendar_TwoDigitYearMax = TwoDigitYearMax
 End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
