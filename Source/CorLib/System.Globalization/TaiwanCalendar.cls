@@ -282,6 +282,10 @@ End Function
 ' @param Era The time period inwhich the year exists.
 '
 Public Function GetDaysInMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
+    
     Year = GetGregorianYear(Year, Era)
     GetDaysInMonth = CorDateTime.DaysInMonth(Year, Month)
 End Function
@@ -294,6 +298,8 @@ End Function
 ' @return The number of days in the year.
 '
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    
     If IsLeapYear(Year) Then
         GetDaysInYear = 366
     Else
@@ -353,8 +359,17 @@ Public Function GetMonth(ByRef Time As Variant) As Long
     GetMonth = CorDateTime.GetMonth(Time)
 End Function
 
+''
+' Returns the number of months in the specified year in the specified era.
+'
+' @param Year An integer that represents the year.
+' @param Era An integer that represents the era.
+' @return The number of months in the specified year in the specified era.
+' @remarks This calendar will always return 12.
+'
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    Year = GetGregorianYear(Year, Era)
+    ValidateEra Era
+    ValidateYear Year
     GetMonthsInYear = 12
 End Function
 
@@ -368,6 +383,14 @@ Public Function GetSecond(ByRef Time As Variant) As Long
     GetSecond = CorDateTime.GetSecond(Time)
 End Function
 
+''
+' Returns the week of the year that includes the date in the specified Date or <a href="CorDateTime.html">CorDateTime</a>.
+'
+' @param Time The Date or <a href="CorDateTime.html">CorDateTime</a> to read.
+' @param Rule One of the <a href="Calendar.CalendarWeekRule.html>CalendarWeekRule</a> values that defines a calendar week.
+' @param FirstDayOfWeek One of the <a href="CorDateTimeStatic.DayOfWeek.html">DayOfWeek</a> values that represents the first day of the week.
+' @return A 1-based positive integer that represents the week of the year that includes the date in the <i>time</i> parameter.
+'
 Public Function GetWeekOfYear(ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     GetWeekOfYear = Statics.Calendar.GetWeekOfYear(Time, Rule, FirstDayOfWeek, Me)
 End Function
@@ -393,7 +416,9 @@ End Function
 ' @remarks A leap day only exists in a leap year, such as February 29th in the Taiwan calendar.
 '
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     If Day < 1 Or Day > GetDaysInMonth(Year, Month, Era) Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
@@ -414,8 +439,9 @@ End Function
 ' This always returns <b>False</b>.
 '
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
-    GetGregorianYear Year, Era
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     IsLeapMonth = False
 End Function
@@ -430,6 +456,8 @@ End Function
 ' evenly divisible by 4, but not by 100, unless it is divisible by 400.
 '
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean
+    ValidateEra Era
+    ValidateYear Year
     IsLeapYear = CorDateTime.IsLeapYear(GetGregorianYear(Year, Era))
 End Function
 
@@ -447,6 +475,10 @@ End Function
 ' @return A Gregorian version of the date specified.
 '
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
+    
     Year = GetGregorianYear(Year, Era)
     Set ToDateTime = Cor.NewDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond)
 End Function
@@ -506,7 +538,7 @@ Private Sub VerifyWritable()
     End If
 End Sub
 
-Private Sub VerifyEra(ByRef Era As Variant)
+Private Sub ValidateEra(ByRef Era As Variant)
     Select Case CLngOrDefault(Era, Statics.Calendar.CurrentEra)
         Case 1, Statics.Calendar.CurrentEra
             ' all good
@@ -515,20 +547,21 @@ Private Sub VerifyEra(ByRef Era As Variant)
     End Select
 End Sub
 
-Private Function GetGregorianYear(ByVal Year As Long, ByRef Era As Variant) As Long
-    VerifyEra Era
-    
-    If Year < MinTaiwanYear Or Year > MaxTaiwanYear Then _
+Private Sub ValidateYear(ByVal Year As Long)
+    If Year < MinTaiwanYear Or Year > MaxTaiwanYear Then
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MinTaiwanYear, MaxTaiwanYear))
-    
-    GetGregorianYear = Year + YearOffset
-End Function
+    End If
+End Sub
 
-Private Sub VerifyMonth(ByVal Month As Long)
+Private Sub ValidateMonth(ByVal Month As Long)
     If Month < 1 Or Month > 12 Then
         Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
     End If
 End Sub
+
+Private Function GetGregorianYear(ByVal Year As Long, ByRef Era As Variant) As Long
+    GetGregorianYear = Year + YearOffset
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
