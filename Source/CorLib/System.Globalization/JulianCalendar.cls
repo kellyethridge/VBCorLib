@@ -402,7 +402,7 @@ End Function
 ' @return The era for the <i>Time</i>.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    Convert.ToDateTime Time
+    CorDateTime.Validate Time
     GetEra = 1
 End Function
 
@@ -568,21 +568,10 @@ End Function
 ' 100 years which 2-digit years will fall. 00-99 will fall within 1930-2029.</p>
 '
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
-    Dim y As Long
-    
-    If Year < 0 Or Year > MaxYear Then _
+    If Year > MaxYear Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, MaxYear))
 
-    If Year < 100 Then
-        y = Year Mod 100
-        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + y
-        
-        If y > mTwoDigitYearMax Mod 100 Then
-            ToFourDigitYear = ToFourDigitYear - 100
-        End If
-    Else
-        ToFourDigitYear = Year
-    End If
+    ToFourDigitYear = Statics.Calendar.ToFourDigitYear(Me, Year)
 End Function
 
 ''
