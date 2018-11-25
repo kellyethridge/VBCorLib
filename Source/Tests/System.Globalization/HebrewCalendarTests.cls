@@ -133,7 +133,7 @@ End Sub
 Public Sub Clone_WhenCalled_ReturnsWritableClone()
     Dim Calendar As New HebrewCalendar
     Calendar.TwoDigitYearMax = 5400
-    Set Calendar = HebrewCalendar.ReadOnly(Calendar)
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
     
     Dim Actual As HebrewCalendar
     Set Actual = Calendar.Clone
@@ -160,7 +160,7 @@ End Sub
 Public Sub TestSerialization()
     Dim Calendar As New HebrewCalendar
     Calendar.TwoDigitYearMax = 99
-    Set Calendar = HebrewCalendar.ReadOnly(Calendar)
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
     
     Dim Actual As Calendar
     Set Actual = Persist(Calendar)

@@ -52,19 +52,3 @@ Public Property Get KoreanEra() As Long
     KoreanEra = 1
 End Property
 
-''
-' Returns a read-only version of the specified <a href="KoreanCalendar.html">Calendar</a> object.
-'
-' @param Calendar A Calendar object.
-' @returns Returns the same calendar if it is read-only, otherwise returns a read-only clone.
-'
-Public Function ReadOnly(ByVal Calendar As KoreanCalendar) As KoreanCalendar
-    If Calendar Is Nothing Then _
-        Error.ArgumentNull "Calendar"
-        
-    If Calendar.IsReadOnly Then
-        Set ReadOnly = Calendar
-    Else
-        Set ReadOnly = Calendar.CloneReadOnly
-    End If
-End Function

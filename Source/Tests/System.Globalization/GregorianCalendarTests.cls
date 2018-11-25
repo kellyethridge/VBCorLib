@@ -86,7 +86,7 @@ Public Sub Clone_WhenCalled_ReturnsWritableClone()
     Dim Calendar As GregorianCalendar
     Set Calendar = Cor.NewGregorianCalendar(MiddleEastFrench)
     Calendar.TwoDigitYearMax = 5400
-    Set Calendar = GregorianCalendar.ReadOnly(Calendar)
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
     
     Dim Actual As GregorianCalendar
     Set Actual = Calendar.Clone
@@ -150,7 +150,7 @@ End Sub
 
 Public Sub CalendarType_WhenReadOnly_ThrowsInvalidOperationException()
     Dim Calendar As New GregorianCalendar
-    Set Calendar = GregorianCalendar.ReadOnly(Calendar)
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
     
     On Error Resume Next
     Calendar.CalendarType = Arabic
@@ -209,7 +209,7 @@ Public Sub TestSerialization()
     Dim Calendar As New GregorianCalendar
     Calendar.TwoDigitYearMax = 99
     Calendar.CalendarType = Arabic
-    Set Calendar = GregorianCalendar.ReadOnly(Calendar)
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
     
     Dim Actual As GregorianCalendar
     Set Actual = Persist(Calendar)

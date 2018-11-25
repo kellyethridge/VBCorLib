@@ -376,17 +376,6 @@ Public Property Get HijriCalendar() As HijriCalendarStatic
 End Property
 
 ''
-' Returns a reference used to access static methods of the <a href="JapaneseCalendar.html">JapaneseCalendar</a> class.
-'
-' @return A reference that can be used to access static methods of the <a href="JapaneseCalendar.html">JapaneseCalendar</a> class.
-' @see JapaneseCalendar
-' @see JapaneseCalendarStatic
-'
-Public Property Get JapaneseCalendar() As JapaneseCalendarStatic
-    Set JapaneseCalendar = Statics.JapaneseCalendar
-End Property
-
-''
 ' Returns a reference used to access static methods of the <b>Calendar</b> class.
 '
 ' @return A reference that can be used to access static methods of the <b>Calendar</b> class.

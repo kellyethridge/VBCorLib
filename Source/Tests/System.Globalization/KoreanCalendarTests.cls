@@ -287,7 +287,7 @@ End Sub
 Public Sub Clone_WhenCalled_ReturnsWritableClone()
     Dim Calendar As New KoreanCalendar
     Calendar.TwoDigitYearMax = 5400
-    Set Calendar = KoreanCalendar.ReadOnly(Calendar)
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
 
     Dim Actual As KoreanCalendar
     Set Actual = Calendar.Clone
@@ -299,7 +299,7 @@ End Sub
 Public Sub TestSerialization()
     Dim Calendar As New KoreanCalendar
     Calendar.TwoDigitYearMax = 5400
-    Set Calendar = KoreanCalendar.ReadOnly(Calendar)
+    Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
     
     Dim Actual As Calendar
     Set Actual = Persist(Calendar)

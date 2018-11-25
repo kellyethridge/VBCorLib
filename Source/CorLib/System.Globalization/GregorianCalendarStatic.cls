@@ -51,20 +51,4 @@ Public Property Get ADEra() As Long
     ADEra = 1
 End Property
 
-''
-' Returns a read-only version of the specified <a href="GregorianCalendar.html">Calendar</a> object.
-'
-' @param Calendar A Calendar object.
-' @returns Returns the same calendar if it is read-only, otherwise returns a read-only clone.
-'
-Public Function ReadOnly(ByVal Calendar As GregorianCalendar) As GregorianCalendar
-    If Calendar Is Nothing Then _
-        Error.ArgumentNull "Calendar"
-        
-    If Calendar.IsReadOnly Then
-        Set ReadOnly = Calendar
-    Else
-        Set ReadOnly = Calendar.CloneReadOnly
-    End If
-End Function
 

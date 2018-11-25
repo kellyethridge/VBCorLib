@@ -60,6 +60,7 @@ Private Type EraInfo
     Milliseconds    As Currency
 End Type
 
+Private mMinSupportedDateTime As CorDateTime
 Private mTwoDigitYearMax    As Long
 Private mEraInfos()         As EraInfo
 Private mIsReadOnly         As Boolean
@@ -175,7 +176,7 @@ End Property
 ' @return The earliest date and time supported by the <a href="JapaneseCalendar.html">JapaneseCalendar</a> which is September 8, 1868 C.E in the Gregorian calendar.
 '
 Public Property Get MinSupportedDateTime() As CorDateTime
-    Set MinSupportedDateTime = JapaneseCalendar.MinSupportedDateTime
+    Set MinSupportedDateTime = mMinSupportedDateTime
 End Property
 
 ''
@@ -656,6 +657,7 @@ End Sub
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
+    Set mMinSupportedDateTime = Cor.NewDateTime(1868, 9, 8)
     mTwoDigitYearMax = DefaultTwoDigitYearMax
     InitEraInfos
 End Sub

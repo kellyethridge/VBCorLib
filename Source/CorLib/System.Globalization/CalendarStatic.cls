@@ -74,18 +74,18 @@ Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
     If Calendar.IsReadOnly Then
         Set ReadOnly = Calendar
     Else
-        If TypeOf Calendar Is HebrewCalendar Then
-            Set ReadOnly = HebrewCalendar.ReadOnly(Calendar)
-        ElseIf TypeOf Calendar Is GregorianCalendar Then
-            Set ReadOnly = GregorianCalendar.ReadOnly(Calendar)
+        If TypeOf Calendar Is GregorianCalendar Then
+            Set ReadOnly = ReadOnlyGregorianCalendar(Calendar)
+        ElseIf TypeOf Calendar Is HebrewCalendar Then
+            Set ReadOnly = ReadOnlyHebrewCalendar(Calendar)
         ElseIf TypeOf Calendar Is JulianCalendar Then
-            Set ReadOnly = JulianCalendar.ReadOnly(Calendar)
+            Set ReadOnly = ReadOnlyJulianCalendar(Calendar)
         ElseIf TypeOf Calendar Is HijriCalendar Then
-            Set ReadOnly = HijriCalendar.ReadOnly(Calendar)
+            Set ReadOnly = ReadOnlyHijriCalendar(Calendar)
         ElseIf TypeOf Calendar Is JapaneseCalendar Then
-            Set ReadOnly = JapaneseCalendar.ReadOnly(Calendar)
+            Set ReadOnly = ReadOnlyJapaneseCalendar(Calendar)
         ElseIf TypeOf Calendar Is KoreanCalendar Then
-            Set ReadOnly = KoreanCalendar.ReadOnly(Calendar)
+            Set ReadOnly = ReadOnlyKoreanCalendar(Calendar)
         ElseIf TypeOf Calendar Is TaiwanCalendar Then
             Set ReadOnly = ReadOnlyTaiwanCalendar(Calendar)
         ElseIf TypeOf Calendar Is ThaiBuddhistCalendar Then
@@ -286,5 +286,29 @@ End Function
 
 Private Function ReadOnlyThaiBuddhistCalendar(ByVal Calendar As ThaiBuddhistCalendar) As Calendar
     Set ReadOnlyThaiBuddhistCalendar = Calendar.CloneReadOnly
+End Function
+
+Private Function ReadOnlyKoreanCalendar(ByVal Calendar As KoreanCalendar) As Calendar
+    Set ReadOnlyKoreanCalendar = Calendar.CloneReadOnly
+End Function
+
+Private Function ReadOnlyJapaneseCalendar(ByVal Calendar As JapaneseCalendar) As Calendar
+    Set ReadOnlyJapaneseCalendar = Calendar.CloneReadOnly
+End Function
+
+Private Function ReadOnlyHijriCalendar(ByVal Calendar As HijriCalendar) As Calendar
+    Set ReadOnlyHijriCalendar = Calendar.CloneReadOnly
+End Function
+
+Private Function ReadOnlyJulianCalendar(ByVal Calendar As JulianCalendar) As Calendar
+    Set ReadOnlyJulianCalendar = Calendar.CloneReadOnly
+End Function
+
+Private Function ReadOnlyHebrewCalendar(ByVal Calendar As HebrewCalendar) As Calendar
+    Set ReadOnlyHebrewCalendar = Calendar.CloneReadOnly
+End Function
+
+Private Function ReadOnlyGregorianCalendar(ByVal Calendar As GregorianCalendar) As Calendar
+    Set ReadOnlyGregorianCalendar = Calendar.CloneReadOnly
 End Function
 

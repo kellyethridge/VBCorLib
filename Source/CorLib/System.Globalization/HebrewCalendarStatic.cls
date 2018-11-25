@@ -55,23 +55,6 @@ Public Property Get HebrewEra() As Long
     HebrewEra = 1
 End Property
 
-''
-' Returns a read-only version of the specified <a href="HebrewCalendar.html">Calendar</a> object.
-'
-' @param Calendar A Calendar object.
-' @returns Returns the same calendar if it is read-only, otherwise returns a read-only clone.
-'
-Public Function ReadOnly(ByVal Calendar As HebrewCalendar) As HebrewCalendar
-    If Calendar Is Nothing Then _
-        Error.ArgumentNull "Calendar"
-        
-    If Calendar.IsReadOnly Then
-        Set ReadOnly = Calendar
-    Else
-        Set ReadOnly = Calendar.CloneReadOnly
-    End If
-End Function
-
 Friend Property Get MaxSupportedDateTime() As CorDateTime
     Set MaxSupportedDateTime = mMaxSupportedDateTime
 End Property
