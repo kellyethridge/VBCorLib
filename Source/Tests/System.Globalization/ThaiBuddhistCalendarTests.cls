@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "TaiwanCalendarTests"
+Attribute VB_Name = "ThaiBuddhistCalendarTests"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' TaiwanCalendarTests
+' ThaiBuddhistCalendarTests
 '
 Option Explicit
 Implements ICategorizable
@@ -26,11 +26,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     Select Case Test.MethodName
         Case "TwoDigitYearMax_WithBoundryValue_SetsValue"
             Test.Use 99
-            Test.Use 8088
-    
+            Test.Use 10542
+            
         Case "TwoDigitYearMax_WhenSetWithInvalidValue_ThrowsArgumentOutOfRangeException"
             Test.Use 98
-            Test.Use 8089
+            Test.Use 10543
             
         Case "GetDaysInMonth_WithMonthValue_ReturnsExpected"
             Test.Use 1, 31
@@ -46,48 +46,48 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 11, 30
             Test.Use 12, 31
             
+        Case "GetDaysInYear_WithYear_ReturnsExpected"
+            Test.Use 1914, 365
+            Test.Use 1915, 366
+            
         Case "IsLeapYear_WithValues_ReturnsExpected"
-            Test.Use 92, False
-            Test.Use 93, True
-            Test.Use 94, False
+            Test.Use 1914, False
+            Test.Use 1915, True
+            Test.Use 1916, False
             
         Case "IsLeapDay_WithValues_ReturnsExpected"
-            Test.Use 92, 2, 28, False
-            Test.Use 93, 2, 29, True
-            
-        Case "GetDaysInYear_WithYear_ReturnsExpected"
-            Test.Use 92, 365
-            Test.Use 93, 366
+            Test.Use 1915, 2, 28, False
+            Test.Use 1915, 2, 29, True
             
         Case "ToDateTime_WhenCalledWithDateTimeBoundry_ReturnsGregorianDateTime"
-            Test.Use 1, 1, 1, NewDateTime(1912, 1, 1)
-            Test.Use 8088, 12, 31, NewDateTime(9999, 12, 31)
+            Test.Use 544, 1, 1, NewDateTime(1, 1, 1)
+            Test.Use 10542, 12, 31, NewDateTime(9999, 12, 31)
             
         Case "ToDateTime_WithValueOutOfSupportedRange_ThrowsArgumentOutOfRangeException"
-            Test.Use 0, 12, 31
-            Test.Use 8089, 1, 1
-        
+            Test.Use 543, 12, 31
+            Test.Use 10543, 1, 1
+            
         Case "ToFourDigitYear_WithValue_ReturnsExpected"
-            Test.Use 1, 1
+            Test.Use 1, 2501
             Test.Use 8088, 8088
             
     End Select
 End Sub
 
 Public Sub AlgorithmType_WhenCalled_ReturnsSolarCalendar()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Assert.That Calendar.AlgorithmType, Iz.EqualTo(CalendarAlgorithmType.SolarCalendar)
 End Sub
 
 Public Sub IsReadOnly_WhenCreated_ReturnsFalse()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Assert.That Calendar.IsReadOnly, Iz.False
 End Sub
 
 Public Sub Era_WhenCalled_ReturnsOneEra()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual() As Long
     Actual = Calendar.Eras
@@ -95,14 +95,14 @@ Public Sub Era_WhenCalled_ReturnsOneEra()
     Assert.That Actual, Iz.EqualTo(NewLongs(1))
 End Sub
 
-Public Sub TwoDigitYearMax_WhenNew_Returns99()
-    Dim Calendar As New TaiwanCalendar
+Public Sub TwoDigitYearMax_WhenNew_Returns2572()
+    Dim Calendar As New ThaiBuddhistCalendar
     
-    Assert.That Calendar.TwoDigitYearMax, Iz.EqualTo(99)
+    Assert.That Calendar.TwoDigitYearMax, Iz.EqualTo(2572)
 End Sub
 
 Public Sub TwoDigitYearMax_WithBoundryValue_SetsValue(ByVal Value As Long)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Calendar.TwoDigitYearMax = Value
     
@@ -110,7 +110,7 @@ Public Sub TwoDigitYearMax_WithBoundryValue_SetsValue(ByVal Value As Long)
 End Sub
 
 Public Sub TwoDigitYearMax_WhenSetWithInvalidValue_ThrowsArgumentOutOfRangeException(ByVal InvalidValue As Long)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     On Error Resume Next
     Calendar.TwoDigitYearMax = InvalidValue
@@ -119,16 +119,16 @@ Public Sub TwoDigitYearMax_WhenSetWithInvalidValue_ThrowsArgumentOutOfRangeExcep
 End Sub
 
 Public Sub MinSupportedDateTime_WhenCalled_ReturnsDateTimeMinValue()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As CorDateTime
     Set Actual = Calendar.MinSupportedDateTime
     
-    Assert.That Actual, Equals(#1/1/1912#)
+    Assert.That Actual, Equals(NewDateTime(1, 1, 1))
 End Sub
 
 Public Sub MaxSupportedDateTime_WhenCalled_ReturnsDateTimeMaxValue()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As CorDateTime
     Set Actual = Calendar.MaxSupportedDateTime
@@ -140,7 +140,7 @@ End Sub
 
 Public Sub AddMethods_WhenCalled_ReturnsExpected()
     Const d As Date = #1/1/2900#
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
 
     Assert.That Calendar.AddYears(d, 1), Equals(#1/1/2901#), "AddYears #1"
     Assert.That Calendar.AddYears(d, -1), Equals(#1/1/2899#), "AddYears #2"
@@ -157,7 +157,7 @@ Public Sub AddMethods_WhenCalled_ReturnsExpected()
 End Sub
 
 Public Sub AddMilliseconds_WhenResultIsLessThanMinSupported_ThrowsArgumentException()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     On Error Resume Next
     Calendar.AddMilliseconds Calendar.MinSupportedDateTime, -1
@@ -166,7 +166,7 @@ Public Sub AddMilliseconds_WhenResultIsLessThanMinSupported_ThrowsArgumentExcept
 End Sub
 
 Public Sub AddMilliseconds_WhenResultGreaterThanMaxSupported_ThrowsArgumentException()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     On Error Resume Next
     Calendar.AddMilliseconds Calendar.MaxSupportedDateTime, 1
@@ -175,7 +175,7 @@ Public Sub AddMilliseconds_WhenResultGreaterThanMaxSupported_ThrowsArgumentExcep
 End Sub
 
 Public Sub AddMonths_WhenResultIsLessThanMinSupported_ThrowsArgumentException()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     On Error Resume Next
     Calendar.AddMonths Calendar.MinSupportedDateTime, -1
@@ -184,7 +184,7 @@ Public Sub AddMonths_WhenResultIsLessThanMinSupported_ThrowsArgumentException()
 End Sub
 
 Public Sub AddMonths_WhenResultGreaterThanMaxSupported_ThrowsArgumentException()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     On Error Resume Next
     Calendar.AddMonths Calendar.MaxSupportedDateTime, 1
@@ -194,11 +194,11 @@ End Sub
 
 Public Sub GetProperties_WhenCalled_ReturnsExpected()
     Dim d As CorDateTime
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Set d = NewDateTime(2200, 1, 2, 13, 20, 35, 100)
     
-    Assert.That Calendar.GetYear(d), Iz.EqualTo(289), "#1"
+    Assert.That Calendar.GetYear(d), Iz.EqualTo(2743), "#1"
     Assert.That Calendar.GetMonth(d), Iz.EqualTo(1), "#2"
     Assert.That Calendar.GetDayOfMonth(d), Iz.EqualTo(2), "#3"
     Assert.That Calendar.GetHour(d), Iz.EqualTo(13), "#4"
@@ -210,7 +210,7 @@ Public Sub GetProperties_WhenCalled_ReturnsExpected()
 End Sub
 
 Public Sub GetDaysInMonth_WithMonthValue_ReturnsExpected(ByVal Month As Long, ByVal Expected As Long)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As Long
     Actual = Calendar.GetDaysInMonth(1912, Month)
@@ -219,16 +219,16 @@ Public Sub GetDaysInMonth_WithMonthValue_ReturnsExpected(ByVal Month As Long, By
 End Sub
 
 Public Sub GetDaysInMonth_WithFebuaryInLeapYear_Returns29()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As Long
-    Actual = Calendar.GetDaysInMonth(93, 2)
+    Actual = Calendar.GetDaysInMonth(1915, 2)
     
     Assert.That Actual, Iz.EqualTo(29)
 End Sub
 
 Public Sub GetDaysInYear_WithYear_ReturnsExpected(ByVal Year As Long, ByVal Expected As Long)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As Long
     Actual = Calendar.GetDaysInYear(Year)
@@ -237,7 +237,7 @@ Public Sub GetDaysInYear_WithYear_ReturnsExpected(ByVal Year As Long, ByVal Expe
 End Sub
 
 Public Sub IsLeapYear_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Expected As Boolean)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As Boolean
     Actual = Calendar.IsLeapYear(Year)
@@ -246,7 +246,7 @@ Public Sub IsLeapYear_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Expec
 End Sub
 
 Public Sub IsLeapDay_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Expected As Boolean)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As Boolean
     Actual = Calendar.IsLeapDay(Year, Month, Day)
@@ -255,7 +255,7 @@ Public Sub IsLeapDay_WithValues_ReturnsExpected(ByVal Year As Long, ByVal Month 
 End Sub
 
 Public Sub ToDateTime_WhenCalledWithDateTimeBoundry_ReturnsGregorianDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Expected As CorDateTime)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As CorDateTime
     Set Actual = Calendar.ToDateTime(Year, Month, Day, 0, 0, 0, 0)
@@ -264,7 +264,7 @@ Public Sub ToDateTime_WhenCalledWithDateTimeBoundry_ReturnsGregorianDateTime(ByV
 End Sub
 
 Public Sub ToDateTime_WithValueOutOfSupportedRange_ThrowsArgumentOutOfRangeException(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     On Error Resume Next
     Calendar.ToDateTime Year, Month, Day, 0, 0, 0, 0
@@ -273,7 +273,7 @@ Public Sub ToDateTime_WithValueOutOfSupportedRange_ThrowsArgumentOutOfRangeExcep
 End Sub
 
 Public Sub ToFourDigitYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal Expected As Long)
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     Dim Actual As Long
     Actual = Calendar.ToFourDigitYear(Year)
@@ -282,16 +282,16 @@ Public Sub ToFourDigitYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal E
 End Sub
 
 Public Sub ToFourDigitYear_WithInvalidValue_ThrowsArgumentOutOfRangeException()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     
     On Error Resume Next
-    Calendar.ToFourDigitYear 8089
+    Calendar.ToFourDigitYear 10543
     
     AssertArgumentOutOfRangeException Err, "Year"
 End Sub
 
 Public Sub Clone_WhenCalled_ReturnsWritableClone()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     Calendar.TwoDigitYearMax = 5400
     Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
 
@@ -303,7 +303,7 @@ Public Sub Clone_WhenCalled_ReturnsWritableClone()
 End Sub
 
 Public Sub IsReadOnly_WhenMadeReadOnly_ReturnsTrue()
-    Dim cal As New TaiwanCalendar
+    Dim cal As New ThaiBuddhistCalendar
     
     Dim Actual As Calendar
     Set Actual = CorLib.Calendar.ReadOnly(cal)
@@ -312,7 +312,7 @@ Public Sub IsReadOnly_WhenMadeReadOnly_ReturnsTrue()
 End Sub
 
 Public Sub TestSerialization()
-    Dim Calendar As New TaiwanCalendar
+    Dim Calendar As New ThaiBuddhistCalendar
     Calendar.TwoDigitYearMax = 5400
     Set Calendar = CorLib.Calendar.ReadOnly(Calendar)
     

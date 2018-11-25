@@ -88,6 +88,10 @@ Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
             Set ReadOnly = KoreanCalendar.ReadOnly(Calendar)
         ElseIf TypeOf Calendar Is TaiwanCalendar Then
             Set ReadOnly = ReadOnlyTaiwanCalendar(Calendar)
+        ElseIf TypeOf Calendar Is ThaiBuddhistCalendar Then
+            Set ReadOnly = ReadOnlyThaiBuddhistCalendar(Calendar)
+        Else
+            Throw New NotSupportedException
         End If
     End If
 End Function
@@ -278,5 +282,9 @@ End Sub
 
 Private Function ReadOnlyTaiwanCalendar(ByVal Calendar As TaiwanCalendar) As Calendar
     Set ReadOnlyTaiwanCalendar = Calendar.CloneReadOnly
+End Function
+
+Private Function ReadOnlyThaiBuddhistCalendar(ByVal Calendar As ThaiBuddhistCalendar) As Calendar
+    Set ReadOnlyThaiBuddhistCalendar = Calendar.CloneReadOnly
 End Function
 
