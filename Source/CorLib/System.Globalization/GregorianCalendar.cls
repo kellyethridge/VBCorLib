@@ -368,9 +368,7 @@ Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant)
     Const DaysInLeapYear    As Long = 366
     Const DaysInNormalYear  As Long = 365
     
-    ValidateEra Era
-    
-    If CorDateTime.IsLeapYear(Year) Then
+    If IsLeapYear(Year, Era) Then
         GetDaysInYear = DaysInLeapYear
     Else
         GetDaysInYear = DaysInNormalYear
@@ -385,7 +383,7 @@ End Function
 ' @remarks The <a href="GregorianCalendar.html">GregorianCalendar</a> class only supports the current era of AD. This returns a constant of 1.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    Convert.ToDateTime Time   ' verifies we have a date
+    CorDateTime.Validate Time
     GetEra = 1
 End Function
 
