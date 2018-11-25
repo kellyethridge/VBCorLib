@@ -498,6 +498,18 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
 End Function
 
 ''
+' Calculates the leap month for a specified year and era.
+'
+' @param Year A year.
+' @param Era An era.
+' @return Always 0 because the <a href="JapaneseCalendar.html">JapaneseCalendar</a> does not recognize leap months.
+'
+Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long
+    GetGregorianYear Year, GetCurrentEra(Era)
+    GetLeapMonth = 0
+End Function
+
+''
 ' Returns the week of the year that the specified date belongs to.
 '
 ' @param Time The date to find the week it belongs.
@@ -793,6 +805,10 @@ End Function
 
 Private Function Calendar_GetHour(Time As Variant) As Long
     Calendar_GetHour = GetHour(Time)
+End Function
+
+Private Function Calendar_GetLeapMonth(ByVal Year As Long, Optional Era As Variant) As Long
+    Calendar_GetLeapMonth = GetLeapMonth(Year, Era)
 End Function
 
 Private Function Calendar_GetMilliseconds(Time As Variant) As Double

@@ -288,3 +288,11 @@ Public Sub ReadOnly_WhenCalled_MarksCalendarReadOnly()
     Assert.That Calendar.IsReadOnly, Iz.True
 End Sub
 
+Public Sub GetLeapMonth_WhenCalled_ReturnsZero()
+    Dim Calendar As New JulianCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetLeapMonth(2004)
+    
+    Assert.That Actual, Iz.EqualTo(0)
+End Sub

@@ -527,6 +527,20 @@ Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As 
 End Function
 
 ''
+' Calculates the leap month for a specified year and era.
+'
+' @param Year A year.
+' @param Era An era.
+' @return Always 0 because the <a href="JulianCalendar.html">JulianCalendar</a> does not recognize leap months.
+'
+Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    ValidateYear Year
+    
+    GetLeapMonth = 0
+End Function
+
+''
 ' Returns a Gregorian <a href="CorDateTime.html">CorDateTime</a> computed using the specific calendar rules.
 '
 ' @param Year The Year in the specific calendar type.
@@ -839,6 +853,10 @@ End Function
 
 Private Function Calendar_GetHour(Time As Variant) As Long
     Calendar_GetHour = GetHour(Time)
+End Function
+
+Private Function Calendar_GetLeapMonth(ByVal Year As Long, Optional Era As Variant) As Long
+    Calendar_GetLeapMonth = GetLeapMonth(Year, Era)
 End Function
 
 Private Function Calendar_GetMilliseconds(Time As Variant) As Double

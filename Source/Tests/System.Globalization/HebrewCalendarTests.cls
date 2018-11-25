@@ -121,6 +121,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 5342
             Test.Use 6000
             
+        Case "GetLeapMonth_WithValue_ReturnsExpected"
+            Test.Use 5762, 1, 0
+            Test.Use 5763, 1, 7
+            
     End Select
 End Sub
 
@@ -437,4 +441,13 @@ Public Sub ToDateTime_WithValidValue_ReturnGregorianDateTime()
     Dim Expected As CorDateTime
     Set Expected = NewDateTime(1739, 10, 3, 1, 1, 1, 1)
     Assert.That Actual, Equals(Expected)
+End Sub
+
+Public Sub GetLeapMonth_WithValue_ReturnsExpected(ByVal Year As Long, ByRef Era As Variant, ByVal Expected As Long)
+    Dim Calendar As New HebrewCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetLeapMonth(Year, Era)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

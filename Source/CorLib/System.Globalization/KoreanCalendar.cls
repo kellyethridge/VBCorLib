@@ -288,6 +288,10 @@ End Function
 ' @param Era The time period inwhich the year exists.
 '
 Public Function GetDaysInMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
+    
     Year = GetGregorianYear(Year, Era)
     GetDaysInMonth = CorDateTime.DaysInMonth(Year, Month)
 End Function
@@ -300,6 +304,9 @@ End Function
 ' @return The number of days in the year.
 '
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    ValidateYear Year
+    
     Year = GetGregorianYear(Year, Era)
     
     If IsLeapYear(Year) Then
@@ -370,7 +377,9 @@ End Function
 ' @remarks The Korean calendar has 12 months in a year.
 '
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    GetGregorianYear Year, Era
+    ValidateEra Era
+    ValidateYear Year
+    
     GetMonthsInYear = 12
 End Function
 
@@ -417,7 +426,9 @@ End Function
 ' @remarks A leap day only exists in a leap year, such as February 29th in the Korean calendar.
 '
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, GetDaysInMonth(Year, Month)))
@@ -438,8 +449,9 @@ End Function
 ' This always returns <b>False</b>.
 '
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
-    GetGregorianYear Year, Era
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     IsLeapMonth = False
 End Function
@@ -458,6 +470,19 @@ Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As
 End Function
 
 ''
+' Calculates the leap month for a specified year and era.
+'
+' @param Year A year.
+' @param Era An era.
+' @return Always 0 because the <a href="KoreanCalendar.html">KoreanCalendar</a> calendar does not recognize leap months.
+'
+Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    ValidateYear Year
+    GetLeapMonth = 0
+End Function
+
+''
 ' Returns a Gregorian <a href="CorDateTime.html">CorDateTime</a> computed using the specific calendar rules.
 '
 ' @param Year The Year in the specific calendar type.
@@ -471,6 +496,10 @@ End Function
 ' @return A Gregorian version of the date specified.
 '
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
+    
     Year = GetGregorianYear(Year, Era)
     Set ToDateTime = Cor.NewDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond)
     Statics.Calendar.ValidateDateTime Me, ToDateTime
@@ -567,7 +596,7 @@ Private Sub VerifyWritable()
     End If
 End Sub
 
-Private Sub VerifyEra(ByRef Era As Variant)
+Private Sub ValidateEra(ByRef Era As Variant)
     Select Case CLngOrDefault(Era, Statics.Calendar.CurrentEra)
         Case KoreanCalendar.KoreanEra, Statics.Calendar.CurrentEra
             ' all good
@@ -576,20 +605,21 @@ Private Sub VerifyEra(ByRef Era As Variant)
     End Select
 End Sub
 
-Private Function GetGregorianYear(ByVal Year As Long, ByRef Era As Variant) As Long
-    VerifyEra Era
-    
-    If Year < MinKoreanYear Or Year > MaxKoreanYear Then _
+Private Sub ValidateYear(ByVal Year As Long)
+    If Year < MinKoreanYear Or Year > MaxKoreanYear Then
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, MinKoreanYear, MaxKoreanYear))
-    
-    GetGregorianYear = Year - YEAR_OFFSET
-End Function
+    End If
+End Sub
 
-Private Sub VerifyMonth(ByVal Month As Long)
+Private Sub ValidateMonth(ByVal Month As Long)
     If Month < 1 Or Month > 12 Then
         Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
     End If
 End Sub
+
+Private Function GetGregorianYear(ByVal Year As Long, ByRef Era As Variant) As Long
+    GetGregorianYear = Year - YEAR_OFFSET
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -677,6 +707,10 @@ End Function
 
 Private Function Calendar_GetHour(Time As Variant) As Long
     Calendar_GetHour = GetHour(Time)
+End Function
+
+Private Function Calendar_GetLeapMonth(ByVal Year As Long, Optional Era As Variant) As Long
+    Calendar_GetLeapMonth = GetLeapMonth(Year, Era)
 End Function
 
 Private Function Calendar_GetMilliseconds(Time As Variant) As Double

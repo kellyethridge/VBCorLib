@@ -330,3 +330,12 @@ Public Sub IsLeapMonth_WhenCalled_AlwaysReturnsFalse()
     
     Assert.That Calendar.IsLeapMonth(1, 2), Iz.False
 End Sub
+
+Public Sub GetLeapMonth_WhenCalled_ReturnsZero()
+    Dim Calendar As New JapaneseCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetLeapMonth(2004)
+    
+    Assert.That Actual, Iz.EqualTo(0)
+End Sub

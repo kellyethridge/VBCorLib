@@ -345,6 +345,20 @@ Public Sub ToFourDigitYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal E
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub TwoDigitYearMax_WhenNew_Returns()
+Public Sub TwoDigitYearMax_WhenNew_Returns1451()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.TwoDigitYearMax
+    
+    Assert.That Actual, Iz.EqualTo(1451)
+End Sub
 
+Public Sub GetLeapMonth_WhenCalled_ReturnsZero()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetLeapMonth(2)
+    
+    Assert.That Actual, Iz.EqualTo(0)
 End Sub
