@@ -187,41 +187,6 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
 End Function
 
 ''
-' Attempts to return an LCID from the specified source.
-'
-' CultureInfo:      Returns the LCID.
-' vbLong:           Returns the value.
-' vbString:         Assumes culture name, loads culture, returning LCID.
-'
-Public Function GetLanguageID(ByRef CultureID As Variant) As Long
-    Dim Info As CultureInfo
-    
-    If IsMissing(CultureID) Then
-        GetLanguageID = CultureInfo.CurrentCulture.LCID
-    Else
-        Select Case VarType(CultureID)
-            Case vbObject
-                If TypeOf CultureID Is CultureInfo Then
-                    Set Info = CultureID
-                    GetLanguageID = Info.LCID
-                Else
-                    Throw Cor.NewArgumentException("CultureInfo object required.", "CultureID")
-                End If
-            
-            Case vbLong, vbInteger, vbByte
-                GetLanguageID = CultureID
-            
-            Case vbString
-                Set Info = Cor.NewCultureInfo(CultureID)
-                GetLanguageID = Info.LCID
-                
-            Case Else
-                Throw Cor.NewArgumentException("CultureInfo object, Name or Language ID required.")
-        End Select
-    End If
-End Function
-
-''
 ' Returns if the value is an integer value datatype.
 '
 ' @param Value The value to determine if is an integer datatype.

@@ -66,4 +66,3 @@ Public Function ReadFile(ByVal FileName As String) As String
     Line Input #FileNumber, ReadFile
     Close #FileNumber
 End Function
-

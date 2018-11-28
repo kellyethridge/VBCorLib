@@ -82,6 +82,10 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed CorDateTime.MaxValue to include max ticks.
 	* Fixed HebrewCalendar to correctly identity all days in leap month as a leap day.
 	* Added Convert.ToDateTime method.
+	* Renamed ResByteEncoder to BinaryResourceEncoder. *BREAKING*
+	* Renamed ResBitMapEncoder to BitMapResourceEncoder. *BREAKING*
+	* Fixed BitMapResourceEncoder Encode. Was crashing because of an inproper pointer being passed to an API.
+	* Fixed Object.GetHashCode. Would crash with vbNullString.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

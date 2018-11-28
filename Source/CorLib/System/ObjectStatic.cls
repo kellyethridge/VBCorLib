@@ -233,6 +233,11 @@ Private Function HashString(ByRef Value As Variant) As Long
     Dim Length  As Long
     
     Ptr = StrPtr(Value)
+    
+    If Ptr = vbNullPtr Then
+        Exit Function
+    End If
+    
     Length = MemLong(Ptr - 4) \ 2
     mCharBuffer.Buffer.pvData = Ptr
     mCharBuffer.Buffer.cElements = Length

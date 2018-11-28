@@ -176,13 +176,13 @@ Friend Sub Init(ByRef Source As Variant)
     Set mWriter = Cor.NewBinaryWriter(mStream)
     
     Call AddEncoder(New ResStringTableEncoder)
-    Call AddEncoder(New ResBitMapEncoder)
+    Call AddEncoder(New BitMapResourceEncoder)
     Call AddEncoder(New ResIconEncoder)
     Call AddEncoder(New ResIconGroupEncoder)
     Call AddEncoder(New ResCursorEncoder)
     Call AddEncoder(New ResCursorGroupEncoder)
     
-    Set mDefaultEncoder = New ResByteEncoder
+    Set mDefaultEncoder = New BinaryResourceEncoder
 End Sub
 
 

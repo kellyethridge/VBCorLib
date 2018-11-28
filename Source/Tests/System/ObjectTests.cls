@@ -101,3 +101,8 @@ Public Sub GetHashCode_WithTwoReferencesToSameObjectInstance_ReturnsSameValue()
     
     Assert.That Actual, Iz.True
 End Sub
+
+Public Sub GetHashCode_WithEmptyAndNullString_ReturnsZero()
+    Assert.That Object.GetHashCode(""), Iz.EqualTo(0)
+    Assert.That Object.GetHashCode(vbNullString), Iz.EqualTo(0)
+End Sub

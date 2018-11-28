@@ -237,7 +237,9 @@ End Sub
 
 Private Sub AddSystemResources()
     With Sim.NewTestSuite("System.Resources")
-'        .Add New TestResourceKey
+        .Add New ResourceKeyTests
+        .Add New BinaryResourceEncoderTests
+        .Add New BitMapResourceEncoderTests
 '        .Add New TestResourceWriter
 '        .Add New TestResourceManager
 '        .Add New TestResourceSet

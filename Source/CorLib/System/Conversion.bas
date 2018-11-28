@@ -32,6 +32,14 @@ Public Function CLngOrDefault(ByRef Value As Variant, ByVal Default As Long) As 
     End If
 End Function
 
+Public Function CVarOrDefault(ByRef Value As Variant, ByRef Default As Variant) As Variant
+    If IsMissing(Value) Then
+        CVarOrDefault = Default
+    Else
+        CVarOrDefault = Value
+    End If
+End Function
+
 
 ' This is a set of casting routines used by function delegation calls.
 ' They allow a virtual casting routine to be selected and called without

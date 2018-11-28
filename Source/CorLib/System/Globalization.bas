@@ -88,3 +88,36 @@ Public Function InitDateTime(ByVal dt As CorDateTime, ByRef Time As Variant) As 
 
     Set InitDateTime = dt
 End Function
+
+''
+' Attempts to return an LCID from the specified source.
+'
+' CultureInfo:      Returns the LCID.
+' vbLong:           Returns the value.
+' vbString:         Assumes culture name, loads culture, returning LCID.
+'
+Public Function GetLanguageID(ByRef CultureID As Variant) As Long
+    Dim Info As CultureInfo
+    
+    If IsMissing(CultureID) Then
+        GetLanguageID = CultureInfo.CurrentCulture.LCID
+    Else
+        Select Case VarType(CultureID)
+            Case vbObject
+                If CultureID Is Nothing Then _
+                    Error.Argument Argument_InvalidLanguageIdSource
+                If Not TypeOf CultureID Is CultureInfo Then _
+                    Error.Argument Argument_InvalidLanguageIdSource
+                    
+                Set Info = CultureID
+                GetLanguageID = Info.LCID
+            Case vbLong, vbInteger, vbByte
+                GetLanguageID = CultureID
+            Case vbString
+                Set Info = Cor.NewCultureInfo(CultureID)
+                GetLanguageID = Info.LCID
+            Case Else
+                Error.Argument Argument_InvalidLanguageIdSource
+        End Select
+    End If
+End Function

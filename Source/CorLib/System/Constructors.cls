@@ -1155,15 +1155,15 @@ End Function
 ''
 ' Creates a new object used to uniquely identify a resource.
 '
-' @param Name The name of the resource being identified.
+' @param ResourceName The name of the resource being identified.
 ' @param ResourceType The type of resource being identified.
 ' @param LanguageID The Locale ID associated with the resource.
 ' @return An object that can be used to uniquely identify a resource.
 ' @remarks Name and ResourceType can be a string or number.
 '
-Public Function NewResourceKey(ByRef Name As Variant, ByRef ResourceType As Variant, ByVal LanguageID As Long) As ResourceKey
+Public Function NewResourceKey(ByRef ResourceName As Variant, ByRef ResourceType As Variant, ByVal LanguageID As Long) As ResourceKey
     Set NewResourceKey = New ResourceKey
-    NewResourceKey.Init Name, ResourceType, LanguageID
+    NewResourceKey.Init ResourceName, ResourceType, LanguageID
 End Function
 
 ''

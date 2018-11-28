@@ -150,6 +150,8 @@ Public Enum ResourceStringKey
     Argument_InvalidCodePageChars = 872
     Argument_IntegerRequired = 873
     Argument_ResultCalendarRange = 874
+    Argument_InvalidLanguageIdSource = 875
+    Argument_InvalidResourceNameOrType = 876
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
@@ -372,3 +374,21 @@ Public Enum ParameterName
     NameOfArrayIndex = 2040
 End Enum
 
+Public Sub ValidateResourceName(ByRef ResourceName As Variant)
+    If Not IsValidResourceNameOrType(ResourceName) Then
+        Error.Argument Argument_InvalidResourceNameOrType, "ResourceName"
+    End If
+End Sub
+
+Public Sub ValidateResourceType(ByRef ResourceType As Variant)
+    If Not IsValidResourceNameOrType(ResourceType) Then
+        Error.Argument Argument_InvalidResourceNameOrType, "ResourceType"
+    End If
+End Sub
+
+Private Function IsValidResourceNameOrType(ByRef Value As Variant) As Boolean
+    Select Case VarType(Value)
+        Case vbString, vbLong, vbInteger, vbByte
+            IsValidResourceNameOrType = True
+    End Select
+End Function
