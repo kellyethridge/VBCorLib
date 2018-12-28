@@ -68,8 +68,6 @@ Public Sub GetEncodedResource_WhenCalled_ReturnsKeyAndValue()
     Assert.That Value(0), Iz.EqualTo(40)    ' just check for correct bitmap data header size.
 End Sub
 
-
-
 Private Function LoadPicture(ByVal FileName As String) As StdPicture
     Set LoadPicture = VB.LoadPicture(MakeFilePath(FileName))
 End Function

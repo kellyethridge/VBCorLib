@@ -175,12 +175,12 @@ Friend Sub Init(ByRef Source As Variant)
 
     Set mWriter = Cor.NewBinaryWriter(mStream)
     
-    Call AddEncoder(New ResStringTableEncoder)
+    Call AddEncoder(New CursorResourceGroupEncoder)
+    Call AddEncoder(New IconResourceGroupEncoder)
+    Call AddEncoder(New CursorResourceEncoder)
+    Call AddEncoder(New IconResourceEncoder)
     Call AddEncoder(New BitMapResourceEncoder)
-    Call AddEncoder(New ResIconEncoder)
-    Call AddEncoder(New ResIconGroupEncoder)
-    Call AddEncoder(New ResCursorEncoder)
-    Call AddEncoder(New ResCursorGroupEncoder)
+    Call AddEncoder(New StringResourceEncoder)
     
     Set mDefaultEncoder = New BinaryResourceEncoder
 End Sub
@@ -223,6 +223,11 @@ Private Sub WriteEncodedResources(ByVal Encoder As IResourceEncoder)
 End Sub
 
 Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data As Variant)
+Const RESOURCEFLAG_MOVEABLE As Integer = &H10
+Const RESOURCEFLAG_PURE As Integer = &H20
+Const RESOURCEFLAG_DISCARDABLE As Integer = &H1000
+Const MEMORY_FLAGS As Integer = RESOURCEFLAG_MOVEABLE Or RESOURCEFLAG_PURE Or RESOURCEFLAG_DISCARDABLE
+
     Dim EncodedName() As Byte
     Dim EncodedType() As Byte
     Dim i As Long
@@ -264,8 +269,8 @@ Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data As Variant)
     
     ' MemoryFlags is zero. Must be a vbInteger
     ' so we will write 2 bytes.
-    Call mWriter.WriteValue(0)
-    'Call mWriter.WriteValue(&H3010)
+'    Call mWriter.WriteValue(0)
+    Call mWriter.WriteValue(MEMORY_FLAGS)
     
     ' The LanguageID must be 2 bytes, also.
     Call mWriter.WriteValue(CInt(Key.LanguageID))

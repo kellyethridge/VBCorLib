@@ -240,6 +240,14 @@ Private Sub AddSystemResources()
         .Add New ResourceKeyTests
         .Add New BinaryResourceEncoderTests
         .Add New BitMapResourceEncoderTests
+        .Add New CursorResourceEncoderTests
+        .Add New IconResourceEncoderTests
+        .Add New StringResourceEncoderTests
+        .Add New PictureResourceInfoTests
+        .Add New PictureResourceGroupTests
+        .Add New CursorResourceGroupEncoderTests
+        .Add New IconResourceGroupEncoderTests
+        
 '        .Add New TestResourceWriter
 '        .Add New TestResourceManager
 '        .Add New TestResourceSet

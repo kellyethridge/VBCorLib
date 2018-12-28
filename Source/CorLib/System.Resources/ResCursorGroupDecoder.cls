@@ -44,7 +44,7 @@ Option Explicit
 Implements IResourceDecoder
 
 Private mKey    As ResourceKey
-Private mGroup  As ResPictureGroup
+Private mGroup  As PictureResourceGroup
 
 
 ''
@@ -63,7 +63,7 @@ Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
         Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
 
     Set mKey = Key
-    Set mGroup = New ResPictureGroup
+    Set mGroup = New PictureResourceGroup
     Call mGroup.InitFromBytes(Bytes)
     Decode = 1
 End Function

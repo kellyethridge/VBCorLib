@@ -17,6 +17,7 @@ Class=CryptoStreamSpy; CryptoStreamSpy.cls
 Class=Count; Count.cls
 Class=NullEncoderFallbackBuffer; NullEncoderFallbackBuffer.cls
 Class=NullEncoderFallback; NullEncoderFallback.cls
+Class=FakePictureResourceInfo; FakePictureResourceInfo.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"

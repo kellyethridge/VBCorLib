@@ -1173,9 +1173,9 @@ End Function
 ' @param GroupType The type of resource the group represents.
 ' @return A group of container for a specific resource type.
 '
-Public Function NewResPictureGroup(ByVal GroupType As PictureGroupTypes) As ResPictureGroup
-    Set NewResPictureGroup = New ResPictureGroup
-    NewResPictureGroup.InitNew GroupType
+Public Function NewPictureResourceGroup(ByVal GroupType As PictureGroupTypes) As PictureResourceGroup
+    Set NewPictureResourceGroup = New PictureResourceGroup
+    NewPictureResourceGroup.Init GroupType
 End Function
 
 ''
@@ -1913,5 +1913,10 @@ End Function
 Friend Function NewDBCSCodePageEncoding(ByVal CodePage As Long) As DBCSCodePageEncoding
     Set NewDBCSCodePageEncoding = New DBCSCodePageEncoding
     NewDBCSCodePageEncoding.Init CodePage
+End Function
+
+Public Function NewPictureResourceInfo(ByVal ResourceId As Long, ByVal Resource As IPicture) As PictureResourceInfo
+    Set NewPictureResourceInfo = New PictureResourceInfo
+    NewPictureResourceInfo.Init ResourceId, Resource
 End Function
 
