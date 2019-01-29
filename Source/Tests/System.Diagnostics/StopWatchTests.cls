@@ -21,6 +21,14 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
     Cat.ForFixture "System.Diagnostics"
 End Sub
 
+Public Sub IsHighResolution_WhenCalled_ReturnsTrue()
+    Assert.That StopWatch.IsHighResolution, Iz.True
+End Sub
+
+Public Sub Frequency_WhenCalled_ReturnsNonZero()
+    Assert.That StopWatch.Frequency, Iz.Not.EqualTo(0)
+End Sub
+
 Public Sub IsRunning_WhenStopped_ReturnsFalse()
     Dim sw As New StopWatch
     

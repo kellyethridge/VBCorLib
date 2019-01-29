@@ -102,7 +102,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     mIsHighResolution = (QueryPerformanceFrequency(mFrequency) <> BOOL_FALSE)
