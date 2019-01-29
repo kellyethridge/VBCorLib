@@ -56,14 +56,14 @@ Implements IEnumerable
 Implements IResourceReader
 
 Private Type ResourceHeader
-    DataSize As Long
-    HeaderSize As Long
-    ResourceType As Variant
-    ResourceName As Variant
-    DataVersion As Long
-    MemoryFlags As Integer
-    LanguageID As Integer
-    Version As Long
+    DataSize        As Long
+    HeaderSize      As Long
+    ResourceType    As Variant
+    ResourceName    As Variant
+    DataVersion     As Long
+    MemoryFlags     As Integer
+    LanguageID      As Integer
+    Version         As Long
     Characteristics As Long
 End Type
 
@@ -89,7 +89,7 @@ Private mResourceCount      As Long
 '
 Public Sub AddDecoder(ByVal DecoderToAdd As IResourceDecoder)
     If DecoderToAdd Is Nothing Then _
-        Throw Cor.NewArgumentNullException("DecoderToAdd")
+        Error.ArgumentNull "DecoderToAdd"
     
     ' This will replace any existing decoder of the same decode type.
     Dim DecodeType As Variant
@@ -117,10 +117,10 @@ End Sub
 ' as a unique identifier is not recommended.
 '
 Public Function GetEnumerator() As IDictionaryEnumerator
-    Call VerifyReader
+    VerifyReader
     
     Dim Ret As New ResourceEnumerator
-    Call Ret.Init(Me, mEntries)
+    Ret.Init Me, mEntries
     Set GetEnumerator = Ret
 End Function
 
@@ -186,11 +186,27 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef Source As Variant)
     Set mReader = Cor.NewBinaryReader(GetStream(Source, OpenExisting, ReadAccess))
-    Call VerifyResourceFile
+    VerifyResourceFile
+End Sub
+
+Private Sub Class_Initialize()
+    Set mDecoders = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
+    
+    ' Add our known set of decoders.
+    AddDecoder New StringResourceTableDecoder
+    AddDecoder New BitMapResourceDecoder
+    AddDecoder New IconResourceDecoder
+    AddDecoder New IconResourceGroupDecoder
+    AddDecoder New CursorResourceDecoder
+    AddDecoder New CursorResourceGroupDecoder
+End Sub
+
+Private Sub Class_Terminate()
+    CloseReader
 End Sub
 
 
@@ -198,8 +214,11 @@ End Sub
 '   Private Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyReader()
-    If mReader Is Nothing Then Throw Cor.NewInvalidOperationException("The Reader is closed and cannot be accessed.")
-    Call LoadResources
+    If mReader Is Nothing Then
+        Throw Cor.NewInvalidOperationException("The Reader is closed and cannot be accessed.")
+    End If
+    
+    LoadResources
 End Sub
 
 Private Function GetNextResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean
@@ -210,13 +229,13 @@ Private Function GetNextResource(ByRef ReturnKey As ResourceKey, ByRef ReturnVal
     End If
     
     Dim Header As ResourceHeader
-    Call GetNextResourceHeader(Header)
+    GetNextResourceHeader Header
     
     Set ReturnKey = Cor.NewResourceKey(Header.ResourceName, Header.ResourceType, Header.LanguageID)
     
     Dim Data() As Byte
     Data = CorArray.CreateInstance(vbByte, Header.DataSize)
-    Call mReader.Read(Data, 0, Header.DataSize)
+    mReader.Read Data, 0, Header.DataSize
     
     If mDecoders.Contains(Header.ResourceType) Then
         ' If someone can interpret the byte data, let them.
@@ -247,28 +266,32 @@ Private Sub LoadResources()
     Set mEntries = New ArrayList
     
     Do While HasMoreResources
-        Dim Key As ResourceKey
-        Dim Value As Variant
-        If Not GetNextResource(Key, Value) Then Exit Do
-        Call mEntries.Add(Cor.NewDictionaryEntry(Key, Value))
+        Dim Key     As ResourceKey
+        Dim Value   As Variant
+        
+        If Not GetNextResource(Key, Value) Then
+            Exit Do
+        End If
+        
+        mEntries.Add Cor.NewDictionaryEntry(Key, Value)
     Loop
 End Sub
 
 Private Sub VerifyResourceFile()
     ' A .RES file has atleast one empty 32byte header.
-    If mReader.BaseStream.Length < 32 Then Call ResourceError
+    If mReader.BaseStream.Length < 32 Then ResourceError
     
     ' DataSize should be 0.
-    If mReader.ReadInt32 <> 0 Then Call ResourceError
+    If mReader.ReadInt32 <> 0 Then ResourceError
     
     ' HeaderSize should be 32.
-    If mReader.ReadInt32 <> 32 Then Call ResourceError
+    If mReader.ReadInt32 <> 32 Then ResourceError
     
     ' ResourceType should be &H0000FFFF
-    If mReader.ReadInt32 <> &HFFFF& Then Call ResourceError
+    If mReader.ReadInt32 <> &HFFFF& Then ResourceError
     
     ' ResourceName should be &H0000FFFF
-    If mReader.ReadInt32 <> &HFFFF& Then Call ResourceError
+    If mReader.ReadInt32 <> &HFFFF& Then ResourceError
     
     ' We are pretty sure this is a valid .RES file, so
     ' move to the beginning of the next entry, which
@@ -286,7 +309,6 @@ End Sub
 ' identify the name or type and returns the appropriate value.
 '
 Private Function GetOrdinalOrName() As Variant
-    
     ' Get the first 2 bytes.
     Dim Ch As Integer
     Ch = mReader.ReadInt16
@@ -299,24 +321,20 @@ Private Function GetOrdinalOrName() As Variant
         ' The first 2 bytes represent a character,
         ' we need to append characters until we hit a null.
         
-        ' We don't want to keep creating a new builder
-        ' for every resource in the file, so use Static.
-        Static NameBuilder As New StringBuilder
-        
-        ' And just set the length to reset the builder.
-        NameBuilder.Length = 0
+        Dim NameBuilder As StringBuilder
+        Set NameBuilder = StringBuilderCache.Acquire
         
         ' Keep doing this until we reach a terminating null.
         Do While Ch <> 0
             ' Append the first character we retrieved.
-            Call NameBuilder.AppendChar(Ch)
+            NameBuilder.AppendChar Ch
             
             ' And get the next character.
             Ch = mReader.ReadInt16
         Loop
         
         ' Return the name.
-        GetOrdinalOrName = NameBuilder.ToString
+        GetOrdinalOrName = StringBuilderCache.GetStringAndRelease(NameBuilder)
     End If
 End Function
 
@@ -325,7 +343,10 @@ Private Sub DWordAlignStreamPosition()
     
     With mReader.BaseStream
         CurrentPosition = .Position
-        If (CurrentPosition Mod 4) <> 0 Then Call .SeekPosition(4 - (CurrentPosition Mod 4), SeekOrigin.FromCurrent)
+        
+        If (CurrentPosition Mod 4) <> 0 Then
+            .SeekPosition 4 - (CurrentPosition Mod 4), SeekOrigin.FromCurrent
+        End If
     End With
 End Sub
 
@@ -342,7 +363,7 @@ Private Sub GetNextResourceHeader(ByRef Header As ResourceHeader)
         
         ' We need to DWord align the stream position because the
         ' name of the resource may have left us out of alignment.
-        Call DWordAlignStreamPosition
+        DWordAlignStreamPosition
         
         .DataVersion = mReader.ReadInt32
         .MemoryFlags = mReader.ReadInt16
@@ -357,34 +378,14 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-'    Set mDecoders = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, Comparer:=New CaseInsensitiveComparer)
-    Debug.Assert False
-    
-    ' Add our known set of decoders.
-    Call AddDecoder(New ResStringTableDecoder)
-    Call AddDecoder(New ResBitmapDecoder)
-    Call AddDecoder(New ResIconDecoder)
-    Call AddDecoder(New ResIconGroupDecoder)
-    Call AddDecoder(New ResCursorDecoder)
-    Call AddDecoder(New ResCursorGroupDecoder)
-End Sub
-
-Private Sub Class_Terminate()
-    Call CloseReader
-End Sub
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
@@ -393,7 +394,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -405,10 +406,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IResourceReader Interface
+'   IResourceReader
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IResourceReader_CloseReader()
-    Call CloseReader
+    CloseReader
 End Sub
 
 Private Function IResourceReader_GetEnumerator() As IDictionaryEnumerator

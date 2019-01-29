@@ -12,11 +12,12 @@ Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 '
-' BitMapResourceEncoderTests
+' BitmapResourceEncoderTests
 '
 Option Explicit
 Implements ICategorizable
 Implements ITestCaseSource
+
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Resources"
@@ -35,7 +36,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Encode_WithUnsupportedValue_ReturnsFalse(ByRef UnsupportedValue As Variant)
-    Dim Encoder As New BitMapResourceEncoder
+    Dim Encoder As New BitmapResourceEncoder
     
     Dim Actual As Boolean
     Actual = Encoder.Encode(UnsupportedValue, "Test")
@@ -44,7 +45,7 @@ Public Sub Encode_WithUnsupportedValue_ReturnsFalse(ByRef UnsupportedValue As Va
 End Sub
 
 Public Sub Encode_WithBitMap_Encodes()
-    Dim Encoder As New BitMapResourceEncoder
+    Dim Encoder As New BitmapResourceEncoder
     
     Dim Actual As Boolean
     Actual = Encoder.Encode(LoadPicture("balloon.bmp"), "Test")
@@ -53,11 +54,11 @@ Public Sub Encode_WithBitMap_Encodes()
 End Sub
 
 Public Sub GetEncodedResource_WhenCalled_ReturnsKeyAndValue()
-    Dim Encoder As New BitMapResourceEncoder
+    Dim Encoder As New BitmapResourceEncoder
     Encoder.Encode LoadPicture("balloon.bmp"), "Test"
 
     Dim Key As ResourceKey
-    Dim Value As Variant
+    Dim Value() As Byte
     Assert.That Encoder.GetEncodedResource(Key, Value), Iz.True
     
     Assert.That Key.ResourceName, Iz.EqualTo("Test")

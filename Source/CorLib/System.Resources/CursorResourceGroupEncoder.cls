@@ -109,7 +109,7 @@ End Function
 ' @remarks This function can be called multiple times to retrieve multiple resources.
 ' As long as a resource is returned, <b>True</b> will be returned, otherwise <b>False</b> will be returned.
 '
-Public Function GetEncodedResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean
+Public Function GetEncodedResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue() As Byte) As Boolean
     If mIterator Is Nothing Then
         Set mIterator = mResources.GetEnumerator
     End If
@@ -137,7 +137,7 @@ Private Function IResourceEncoder_Encode(Value As Variant, ResourceName As Varia
     IResourceEncoder_Encode = Encode(Value, ResourceName, ResourceType, LanguageID)
 End Function
 
-Private Function IResourceEncoder_GetEncodedResource(ReturnKey As ResourceKey, ReturnValue As Variant) As Boolean
+Private Function IResourceEncoder_GetEncodedResource(ReturnKey As ResourceKey, ReturnValue() As Byte) As Boolean
     IResourceEncoder_GetEncodedResource = GetEncodedResource(ReturnKey, ReturnValue)
 End Function
 

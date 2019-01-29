@@ -32,7 +32,7 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: BitMapResourceEncoder
+' Module: BitmapResourceEncoder
 '
 
 ''
@@ -116,7 +116,7 @@ End Function
 ' @remarks This function can be called multiple times to retrieve multiple resources.
 ' As long as thre is a resource to be returned, <b>True</b> will be returned, otherwise <b>False</b> will be returned.
 '
-Public Function GetEncodedResource(ByRef OutKey As ResourceKey, ByRef OutValue As Variant) As Boolean
+Public Function GetEncodedResource(ByRef OutKey As ResourceKey, ByRef OutValue() As Byte) As Boolean
     If mIterator Is Nothing Then
         Set mIterator = mResources.GetEnumerator
     End If
@@ -144,7 +144,7 @@ Private Function IResourceEncoder_Encode(Value As Variant, ResourceName As Varia
     IResourceEncoder_Encode = Encode(Value, ResourceName, ResourceType, LanguageID)
 End Function
 
-Private Function IResourceEncoder_GetEncodedResource(OutKey As ResourceKey, OutValue As Variant) As Boolean
+Private Function IResourceEncoder_GetEncodedResource(OutKey As ResourceKey, OutValue() As Byte) As Boolean
     IResourceEncoder_GetEncodedResource = GetEncodedResource(OutKey, OutValue)
 End Function
 

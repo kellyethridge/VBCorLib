@@ -54,7 +54,7 @@ Public Sub GetEncodedResource_WithDefaultResourceType_ReturnsResourceKey()
     Encoder.Encode NewBytes(1), "Bytes"
     
     Dim ActualKey As ResourceKey
-    Dim ActualValue As Variant
+    Dim ActualValue() As Byte
     Assert.That Encoder.GetEncodedResource(ActualKey, ActualValue), Iz.True
     
     Assert.That ActualKey.ResourceName, Iz.EqualTo("Bytes")
@@ -66,7 +66,7 @@ Public Sub GetEncodedResource_WithSpecifiedResourceType_ReturnsResourceKey()
     Encoder.Encode NewBytes(1), "Bytes", 1234
     
     Dim ActualKey As ResourceKey
-    Dim ActualValue As Variant
+    Dim ActualValue() As Byte
     Assert.That Encoder.GetEncodedResource(ActualKey, ActualValue), Iz.True
     
     Assert.That ActualKey.ResourceName, Iz.EqualTo("Bytes")
@@ -78,7 +78,7 @@ Public Sub GetEncodedResource_WhenCalled_ReturnsValue()
     Encoder.Encode NewBytes(1), "Bytes", 1234
     
     Dim ActualKey As ResourceKey
-    Dim ActualValue As Variant
+    Dim ActualValue() As Byte
     Assert.That Encoder.GetEncodedResource(ActualKey, ActualValue), Iz.True
 
     Assert.That ActualValue, Iz.EqualTo(NewBytes(1))
@@ -87,7 +87,7 @@ End Sub
 Public Sub GetEncodedResource_WhenAllResourcedReturns_ReturnsFalse()
     Dim Encoder As New BinaryResourceEncoder
     Dim Key As ResourceKey
-    Dim Value As Variant
+    Dim Value() As Byte
     Encoder.Encode NewBytes(1), "Bytes", 1234
     Encoder.GetEncodedResource Key, Value
 

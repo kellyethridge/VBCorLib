@@ -226,12 +226,12 @@ Private Sub Class_Initialize()
     Debug.Assert False
     
     ' Add our known set of decoders.
-    Call AddDecoder(New ResStringTableDecoder)
-    Call AddDecoder(New ResBitmapDecoder)
-    Call AddDecoder(New ResIconDecoder)
-    Call AddDecoder(New ResIconGroupDecoder)
-    Call AddDecoder(New ResCursorDecoder)
-    Call AddDecoder(New ResCursorGroupDecoder)
+'    Call AddDecoder(New ResStringTableDecoder)
+'    Call AddDecoder(New ResBitmapDecoder)
+'    Call AddDecoder(New ResIconDecoder)
+'    Call AddDecoder(New ResIconGroupDecoder)
+'    Call AddDecoder(New ResCursorDecoder)
+'    Call AddDecoder(New ResCursorGroupDecoder)
 End Sub
 
 

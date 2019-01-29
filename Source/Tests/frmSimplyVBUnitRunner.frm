@@ -247,8 +247,9 @@ Private Sub AddSystemResources()
         .Add New PictureResourceGroupTests
         .Add New CursorResourceGroupEncoderTests
         .Add New IconResourceGroupEncoderTests
-        
-'        .Add New TestResourceWriter
+        .Add New ResourceWriterTests
+
+
 '        .Add New TestResourceManager
 '        .Add New TestResourceSet
 '        .Add New TestResourceReader

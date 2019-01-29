@@ -42,11 +42,9 @@ Option Explicit
 Implements IObject
 Implements IResourceWriter
 
-Private mStream             As Stream
-Private mWriter             As BinaryWriter
-Private mEncoders           As New ArrayList
-Private mDefaultEncoder     As IResourceEncoder
-Private mIsAlreadyGenerated As Boolean
+Private mWriter     As BinaryWriter
+Private mEncoders   As New ArrayList
+Private mGenerated  As Boolean
 
 
 ''
@@ -58,17 +56,16 @@ Private mIsAlreadyGenerated As Boolean
 ' list. This gives the most recent encoders first chance at encoding values.
 '
 Public Sub AddEncoder(ByVal EncoderToAdd As IResourceEncoder)
-    Call VerifyNotGenerated
-    Call VerifyOpen
+    VerifyNotGenerated
     
     If EncoderToAdd Is Nothing Then _
-        Throw Cor.NewArgumentNullException("EncoderToAdd")
+        Error.ArgumentNull "EncoderToAdd"
     
-    Call EncoderToAdd.Reset
+    EncoderToAdd.Reset
     
     ' We insert the encoder at the beginning of the list
     ' to allow it to have the first shot at encoding data.
-    Call mEncoders.Insert(0, EncoderToAdd)
+    mEncoders.Insert 0, EncoderToAdd
 End Sub
 
 ''
@@ -80,41 +77,30 @@ End Sub
 ' @param LanguageID The Locale ID associated with the resource.
 '
 Public Sub AddResource(ByRef Value As Variant, ByRef ResourceName As Variant, Optional ByRef ResourceType As Variant, Optional ByRef LanguageID As Variant)
-    Call VerifyNotGenerated
-    Call VerifyOpen
-    
-    If IsArray(Value) Then
-        If VarType(Value) = vbByteArray Then
-            If IsMissing(ResourceType) Then
-                Throw Cor.NewArgumentException("A ResourceType must be supplied for Byte Arrays.", "ResourceType")
-            End If
-        Else
-            Throw Cor.NewArgumentException("Only Byte Arrays are supported.", "Value")
-        End If
-    End If
-    
-    Call EncodeResource(Value, ResourceName, ResourceType, LanguageID)
+    VerifyNotGenerated
+    EncodeResource Value, ResourceName, ResourceType, LanguageID
 End Sub
 
 ''
 ' Creates a .RES file from the added resources.
 '
 Public Sub Generate()
-    Call VerifyNotGenerated
-    Call VerifyOpen
-       
-    mIsAlreadyGenerated = True
-    Call WriteResources
+    VerifyNotGenerated
+    WriteResources
+    mGenerated = True
 End Sub
 
 ''
 ' Closes the writer.
 '
 Public Sub CloseWriter()
-    If Not mStream Is Nothing Then
-        Call mWriter.CloseWriter
+    If Not mWriter Is Nothing Then
+        If Not mGenerated Then
+            Generate
+        End If
+        
+        mWriter.CloseWriter
         Set mWriter = Nothing
-        Set mStream = Nothing
     End If
 End Sub
 
@@ -155,194 +141,169 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mEncoders.Add New BinaryResourceEncoder
+    mEncoders.Add New StringResourceEncoder
+    mEncoders.Add New BitMapResourceEncoder
+    mEncoders.Add New CursorResourceEncoder
+    mEncoders.Add New CursorResourceGroupEncoder
+    mEncoders.Add New IconResourceEncoder
+    mEncoders.Add New IconResourceGroupEncoder
+End Sub
+
 Friend Sub Init(ByRef Source As Variant)
+    Set mWriter = Cor.NewBinaryWriter(GetStream(Source))
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function GetStream(ByRef Source As Variant) As Stream
     Select Case VarType(Source)
         Case vbString
             ' We will overwrite any existing file.
-            Set mStream = Cor.NewFileStream(CStr(Source), FileMode.Create)
+            Set GetStream = Cor.NewFileStream(CStr(Source), FileMode.Create)
         Case vbObject
-            If TypeOf Source Is Stream Then
-                Set mStream = Source
-                If Not mStream.CanRead Then Throw Cor.NewArgumentException("The Stream must support reading.", "Source")
-            Else
-                Throw Cor.NewArgumentException("Source must implement Stream interface", "Source")
-            End If
+            If Source Is Nothing Then _
+                Error.ArgumentNull "Source"
+            If Not TypeOf Source Is Stream Then _
+                Error.Argument Argument_InvalidStreamSource, "Source"
+                
+            Set GetStream = Source
+            
+            If Not GetStream.CanWrite Then _
+                Error.Argument Argument_StreamNotWritable, "Source"
         Case Else
-            Throw Cor.NewArgumentException("Source must be a file path or file stream.", "Source")
+            Error.Argument Argument_InvalidStreamSource, "Source"
     End Select
-
-    Set mWriter = Cor.NewBinaryWriter(mStream)
-    
-    Call AddEncoder(New CursorResourceGroupEncoder)
-    Call AddEncoder(New IconResourceGroupEncoder)
-    Call AddEncoder(New CursorResourceEncoder)
-    Call AddEncoder(New IconResourceEncoder)
-    Call AddEncoder(New BitMapResourceEncoder)
-    Call AddEncoder(New StringResourceEncoder)
-    
-    Set mDefaultEncoder = New BinaryResourceEncoder
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifyOpen()
-    If mStream Is Nothing Then Throw Cor.NewInvalidOperationException("The writer has been closed.")
-End Sub
+End Function
 
 Private Sub VerifyNotGenerated()
-    If mIsAlreadyGenerated Then Throw Cor.NewInvalidOperationException("Resources have already been generated.")
+    If mGenerated Then
+        Error.InvalidOperation InvalidOperation_ResourceWriterSaved
+    End If
 End Sub
 
 Private Sub WriteResources()
-    ' Write a blank entry. This identifies the .RES file.
-    Call WriteResource(Cor.NewResourceKey(0, 0, 0), Cor.NewBytes())
-    
     Dim Encoder As IResourceEncoder
-    For Each Encoder In mEncoders
-        Call WriteEncodedResources(Encoder)
-    Next Encoder
     
-    ' And add any default encoded resources.
-    Call WriteEncodedResources(mDefaultEncoder)
+    WriteBlankHeader
+    
+    For Each Encoder In mEncoders
+        WriteEncodedResources Encoder
+    Next Encoder
+End Sub
+
+Private Sub WriteBlankHeader()
+    mWriter.WriteValue Cor.NewBytes(0, 0, 0, 0, &H20, 0, 0, 0, &HFF, &HFF, 0, 0, &HFF, &HFF, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 End Sub
 
 Private Sub WriteEncodedResources(ByVal Encoder As IResourceEncoder)
-    Dim Key As ResourceKey
-    Dim Data As Variant
+    Dim Key     As ResourceKey
+    Dim Data()  As Byte
     
     ' Each encoder may have multiple resources that
     ' need to be written, so we will keep writing
     ' them from the encoder until it says done.
     Do While Encoder.GetEncodedResource(Key, Data)
-        Call WriteResource(Key, Data)
+        WriteResource Key, Data
     Loop
 End Sub
 
-Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data As Variant)
-Const RESOURCEFLAG_MOVEABLE As Integer = &H10
-Const RESOURCEFLAG_PURE As Integer = &H20
-Const RESOURCEFLAG_DISCARDABLE As Integer = &H1000
-Const MEMORY_FLAGS As Integer = RESOURCEFLAG_MOVEABLE Or RESOURCEFLAG_PURE Or RESOURCEFLAG_DISCARDABLE
-
-    Dim EncodedName() As Byte
-    Dim EncodedType() As Byte
-    Dim i As Long
+Private Sub WriteResource(ByRef Key As ResourceKey, ByRef Data() As Byte)
+    Const RESOURCEFLAG_MOVEABLE As Integer = &H10
+    Const RESOURCEFLAG_PURE As Integer = &H20
+    Const RESOURCEFLAG_DISCARDABLE As Integer = &H1000
+    Const MEMORY_FLAGS As Integer = RESOURCEFLAG_MOVEABLE Or RESOURCEFLAG_PURE Or RESOURCEFLAG_DISCARDABLE
+    Const MinHeaderSize As Long = 24
     
-    If VarType(Data) <> vbByteArray Then _
-        Throw Cor.NewInvalidCastException("Resource Encoder must return a Byte Array.")
+    Dim i As Long
+    Dim EncodedName()           As Byte
+    Dim EncodedType()           As Byte
+    Dim EncodedTypeAndNameSize  As Long
     
     ' Write the number of bytes in the data portion of the resource.
-    Call mWriter.WriteValue(CorArray.Length(Data))
+    mWriter.WriteValue CorArray.Length(Data)
     
     ' Calculate the size of the header. Requires the
     ' length of the resource type and name.
     EncodedType = EncodeStringOrInt(Key.ResourceType)
     EncodedName = EncodeStringOrInt(Key.ResourceName)
-    
-    Dim EncodedTypeAndNameSize As Long
     EncodedTypeAndNameSize = CorArray.Length(EncodedName) + CorArray.Length(EncodedType)
-    
     
     ' 24 is the size of the header without the name and type,
     ' so that is our base size to start with.
-    Call mWriter.WriteValue(24 + EncodedTypeAndNameSize + GetDWordAlignedOffset(EncodedTypeAndNameSize))
-    
-    ' Write the resource type.
-    Call mWriter.WriteValue(EncodedType)
-    
-    ' Write the resource name or ordinal.
-    Call mWriter.WriteValue(EncodedName)
+    mWriter.WriteValue MinHeaderSize + EncodedTypeAndNameSize + ComputeDWordAlignedOffset(EncodedTypeAndNameSize)
+    mWriter.WriteValue EncodedType
+    mWriter.WriteValue EncodedName
     
     ' We must DWord align after both the resource name
     ' and resource type have been written.
-    For i = 1 To GetDWordAlignedOffset(EncodedTypeAndNameSize)
-        Call mWriter.WriteValue(CByte(0))
+    For i = 1 To ComputeDWordAlignedOffset(EncodedTypeAndNameSize)
+        mWriter.WriteValue CByte(0)
     Next i
     
     ' DataVersion is zero. Must be a vbLong though
     ' so we will write 4 bytes.
-    Call mWriter.WriteValue(0&)
+    mWriter.WriteValue CLng(0)
     
-    ' MemoryFlags is zero. Must be a vbInteger
-    ' so we will write 2 bytes.
-'    Call mWriter.WriteValue(0)
-    Call mWriter.WriteValue(MEMORY_FLAGS)
+    mWriter.WriteValue MEMORY_FLAGS
     
     ' The LanguageID must be 2 bytes, also.
-    Call mWriter.WriteValue(CInt(Key.LanguageID))
+    mWriter.WriteValue CInt(Key.LanguageID)
     
     ' Version is zero and 4 bytes.
-    Call mWriter.WriteValue(0&)
+    mWriter.WriteValue CLng(0)
     
     ' Characteristics is zero and 4 bytes.
-    Call mWriter.WriteValue(0&)
+    mWriter.WriteValue CLng(0)
     
     ' Write the resource data.
-    Call mWriter.WriteValue(Data)
+    mWriter.WriteValue Data
 
     ' DWord align the end of the entry for the next entry.
-    For i = 1 To GetDWordAlignedOffset(CorArray.Length(Data))
-        Call mWriter.WriteValue(CByte(0))
+    For i = 1 To ComputeDWordAlignedOffset(CorArray.Length(Data))
+        mWriter.WriteValue CByte(0)
     Next i
 End Sub
 
-Private Function GetDWordAlignedOffset(ByVal Size As Long) As Long
+Private Function ComputeDWordAlignedOffset(ByVal Size As Long) As Long
     If (Size Mod 4) <> 0 Then
-        GetDWordAlignedOffset = 4 - (Size Mod 4)
+        ComputeDWordAlignedOffset = 4 - (Size Mod 4)
     End If
 End Function
 
 Private Function EncodeStringOrInt(ByRef Value As Variant) As Byte()
     If VarType(Value) = vbString Then
-        ' VB will assign a string to a byte array, copying each
-        ' 2-byte character to 2 bytes in the array.
-        Dim Ret() As Byte
-        
-        ' We include 2 bytes for terminating null.
-        ReDim Ret(0 To LenB(Value) + 1)
-        Call CopyMemory(Ret(0), ByVal StrPtr(Value), LenB(Value))
-        EncodeStringOrInt = Ret
-        Exit Function
+        EncodeStringOrInt = CStr(Value) & Chr$(0)
     Else
-        ' we assume a numeric value. It must be within
-        ' the range of vbInteger values.
-        '
         ' A numeric name is identified by being a DWord with the
         ' lower 16-bits being &HFFFF.
         Dim ID As Long
-        AsWord(ID) = Value  ' removes the negative bit.
-        EncodeStringOrInt = BitConverter.GetBytes(Helper.ShiftLeft(ID, 16) Or &HFFFF&)
+        ID = CLng(Value) And &HFFFF&
+        EncodeStringOrInt = BitConverter.GetBytes(ShiftLeftInt32(ID, 16) Or &HFFFF&)
     End If
 End Function
 
 Private Sub EncodeResource(ByRef Value As Variant, ByRef ResourceName As Variant, ByRef ResourceType As Variant, ByRef LanguageID As Variant)
-    Dim Encoded As Boolean
-    Encoded = False
     Dim Encoder As IResourceEncoder
+    
     For Each Encoder In mEncoders
-        ' Give the encoder a shot, if it succeeds, then
-        ' move on to the next resource to be encoded.
+        ' Give the encoder a shot.
         If Encoder.Encode(Value, ResourceName, ResourceType, LanguageID) Then
-            Encoded = True
-            Exit For
+            Exit Sub
         End If
-    Next Encoder
+    Next
 
-    ' The default encoder will only work for byte arrays.
-    If Not Encoded Then
-        If Not mDefaultEncoder.Encode(Value, ResourceName, ResourceType, LanguageID) Then
-            Throw Cor.NewArgumentException("Resource type is not supported.")
-        End If
-    End If
+    Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_UnsupportedResourceType, TypeName(Value)))
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -357,18 +318,17 @@ Private Function IObject_ToString() As String
 End Function
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IResourceWriter Interface
+'   IResourceWriter
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IResourceWriter_AddResource(Value As Variant, ResourceName As Variant, Optional ResourceType As Variant, Optional LanguageID As Variant)
-    Call AddResource(Value, ResourceName, ResourceType, LanguageID)
+    AddResource Value, ResourceName, ResourceType, LanguageID
 End Sub
 
 Private Sub IResourceWriter_CloseWriter()
-    Call CloseWriter
+    CloseWriter
 End Sub
 
 Private Sub IResourceWriter_Generate()
-    Call Generate
+    Generate
 End Sub

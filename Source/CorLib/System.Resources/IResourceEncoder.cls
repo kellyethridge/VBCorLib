@@ -70,5 +70,4 @@ Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Op
 ' @return Returns <b>True</b> if a resource has been returned, <b>False</b> otherwise.
 ' @remarks This function should not throw an exception. If there are no more resources to be returned, then False should just be returned.
 '
-Public Function GetEncodedResource(ByRef OutKey As ResourceKey, ByRef OutValue As Variant) As Boolean: End Function
-
+Public Function GetEncodedResource(ByRef OutKey As ResourceKey, ByRef OutValue() As Byte) As Boolean: End Function

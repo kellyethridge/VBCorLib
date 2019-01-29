@@ -98,7 +98,7 @@ End Function
 ' @return If we have returned something, Return True, otherwise return False.
 ' @remarks Each resource can contain up to 16 of the strings previously encoded.
 '
-Public Function GetEncodedResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean
+Public Function GetEncodedResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue() As Byte) As Boolean
     Dim Block As StringResourceBlock
     
     If mIterator Is Nothing Then
@@ -159,7 +159,7 @@ Private Function IResourceEncoder_Encode(Value As Variant, ResourceName As Varia
     IResourceEncoder_Encode = Encode(Value, ResourceName, ResourceType, LanguageID)
 End Function
 
-Private Function IResourceEncoder_GetEncodedResource(ReturnKey As ResourceKey, ReturnValue As Variant) As Boolean
+Private Function IResourceEncoder_GetEncodedResource(ReturnKey As ResourceKey, ReturnValue() As Byte) As Boolean
     IResourceEncoder_GetEncodedResource = GetEncodedResource(ReturnKey, ReturnValue)
 End Function
 

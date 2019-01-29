@@ -61,7 +61,7 @@ Public Sub GetEncodedResource_WhenEncodedFromStdPicture_ReturnsKeyAndValue()
     Encoder.Encode LoadCursor, "Test"
 
     Dim Key As ResourceKey
-    Dim Value As Variant
+    Dim Value() As Byte
     Assert.That Encoder.GetEncodedResource(Key, Value), Iz.True
     
     Assert.That Key.ResourceName, Iz.EqualTo("Test")
@@ -92,7 +92,7 @@ Public Sub GetEncodedResource_WhenEncodedFromPictureHandle_ReturnsKeyAndValue()
     Encoder.Encode Handle, "Test"
 
     Dim Key As ResourceKey
-    Dim Value As Variant
+    Dim Value() As Byte
     Assert.That Encoder.GetEncodedResource(Key, Value), Iz.True
     
     Assert.That Key.ResourceName, Iz.EqualTo("Test")
