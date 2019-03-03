@@ -215,6 +215,7 @@ Module=ResourceHelper; System.Resources\ResourceHelper.bas
 Class=CursorResourceGroupEncoderTests; System.Resources\CursorResourceGroupEncoderTests.cls
 Class=IconResourceGroupEncoderTests; System.Resources\IconResourceGroupEncoderTests.cls
 ResFile32="CorLib.Tests.RES"
+Class=IconResourceDecoderTests; System.Resources\IconResourceDecoderTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

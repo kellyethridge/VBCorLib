@@ -154,6 +154,7 @@ Public Enum ResourceStringKey
     Argument_InvalidLanguageIdSource = 875
     Argument_InvalidResourceNameOrType = 876
     Argument_MaxStringLength = 877
+    Argument_InvalidResourceKeyType = 878
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901

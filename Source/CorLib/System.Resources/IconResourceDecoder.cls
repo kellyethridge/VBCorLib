@@ -11,32 +11,34 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2019 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: ResIconDecoder
+' Module: IconResourceDecoder
 '
 
 ''
 ' Decodes an icon from a .RES formatted byte array.
 '
-' @remarks This takes a byte array formatted like that in a .RES file
-' and extracts the Icon picture.
+' @remarks This takes a byte array formatted like that in a .RES file and extracts the Icon picture.
 ' @see ResourceReader
 ' @see WinResourceReader
 '
@@ -55,7 +57,6 @@ Private mKey    As ResourceKey
 Private mIcon   As StdPicture
 
 
-
 ''
 ' Decodes a byte array into a <b>StdPicture</b> that represents an icon.
 '
@@ -65,12 +66,12 @@ Private mIcon   As StdPicture
 '
 Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     If Key Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Key")
+        Error.ArgumentNull "Key"
     If CorArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
     If Key.ResourceType <> ResourceTypes.IconResource Then _
-        Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
-        
+        Error.Argument Argument_InvalidResourceKeyType, "Key"
+    
     Set mIcon = CreateIcon(Bytes)
     If Not mIcon Is Nothing Then
         Set mKey = Key
@@ -97,7 +98,9 @@ End Function
 ' @remarks Once a resource has been returned, that resource is never returned again.
 '
 Public Function GetResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean
-    If mKey Is Nothing Then Exit Function
+    If mKey Is Nothing Then
+        Exit Function
+    End If
     
     Set ReturnKey = mKey
     Set ReturnValue = mIcon
@@ -110,18 +113,21 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateIcon(ByRef Bytes() As Byte) As StdPicture
-    Dim hr As Long
-    hr = CreateIconFromResource(Bytes(0), CorArray.Length(Bytes), True, &H30000)
-    If hr = 0 Then Exit Function
+    Dim Handle As Long
+    Handle = CreateIconFromResource(Bytes(LBound(Bytes)), CorArray.Length(Bytes), BOOL_TRUE, &H30000)
+    
+    If Handle = 0 Then
+        Exit Function
+    End If
     
     Dim NewIcon As PictDesc
     With NewIcon
         .cbSizeofStruct = LenB(NewIcon)
         .picType = vbPicTypeIcon
-        .hImage = hr
+        .hImage = Handle
         .xExt = AsLong(Bytes(4))
         .yExt = AsLong(Bytes(8))
     End With
@@ -133,14 +139,14 @@ Private Function CreateIcon(ByRef Bytes() As Byte) As StdPicture
     End With
     
     Dim Unk As IUnknown
-    If OleCreatePictureIndirect(NewIcon, UnkIID, True, Unk) = S_OK Then
+    If OleCreatePictureIndirect(NewIcon, UnkIID, BOOL_TRUE, Unk) = S_OK Then
         Set CreateIcon = Unk
     End If
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IResourceDecoder Interface
+'   IResourceDecoder
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IResourceDecoder_Decode(ByVal Key As ResourceKey, Bytes() As Byte) As Long
     IResourceDecoder_Decode = Decode(Key, Bytes)
