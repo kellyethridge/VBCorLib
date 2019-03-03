@@ -248,11 +248,10 @@ Private Sub AddSystemResources()
         .Add New CursorResourceGroupEncoderTests
         .Add New IconResourceGroupEncoderTests
         .Add New ResourceWriterTests
-
-
+        .Add New ResourceSetTests
+        .Add New ResourceReaderTests
+        
 '        .Add New TestResourceManager
-'        .Add New TestResourceSet
-'        .Add New TestResourceReader
         
         AddTest .This
     End With

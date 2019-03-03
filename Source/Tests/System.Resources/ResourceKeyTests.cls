@@ -26,13 +26,16 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     Select Case Test.MethodName
         Case "Equals_WithNumericResourceNameAndType_ReturnsExpected"
             Test.Use 1, 2, 3, True
+            Test.Use 1&, 2&, 3&, True
+            Test.Use 1&, 2, 3, True
+            Test.Use 1, 2&, 3, True
             Test.Use 1, 2, 0, True
             Test.Use 0, 2, 3, False
             Test.Use 1, 0, 3, False
             Test.Use 1, 2, -1, False
             Test.Use "1", 2, 3, False
             Test.Use 1, "2", 3, False
-                        
+            
         Case "Equals_WithStringResourceNameAndType_ReturnsExpected"
             Test.Use "Name", "2", 3, True
             Test.Use "Name", "2", 0, True

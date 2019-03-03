@@ -118,6 +118,7 @@ End Sub
 '
 Public Function GetEnumerator() As IDictionaryEnumerator
     VerifyReader
+    LoadResources
     
     Dim Ret As New ResourceEnumerator
     Ret.Init Me, mEntries
@@ -217,8 +218,6 @@ Private Sub VerifyReader()
     If mReader Is Nothing Then
         Throw Cor.NewInvalidOperationException("The Reader is closed and cannot be accessed.")
     End If
-    
-    LoadResources
 End Sub
 
 Private Function GetNextResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean
@@ -272,7 +271,7 @@ Private Sub LoadResources()
         If Not GetNextResource(Key, Value) Then
             Exit Do
         End If
-        
+
         mEntries.Add Cor.NewDictionaryEntry(Key, Value)
     Loop
 End Sub

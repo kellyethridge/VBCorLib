@@ -53,7 +53,7 @@ Private mEntry      As DictionaryEntry
 Friend Sub Init(ByVal Reader As IResourceReader, ByVal Entries As ArrayList)
     Set mReader = Reader
     Set mEntries = Entries
-    Call IDictionaryEnumerator_Reset
+    IDictionaryEnumerator_Reset
 End Sub
 
 

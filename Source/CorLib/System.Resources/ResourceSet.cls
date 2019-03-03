@@ -88,14 +88,12 @@ End Function
 ' @return A resource string, or an empty string if not found.
 '
 Public Function GetString(ByRef ResourceName As Variant) As String
-    Dim Ret As Variant
-    Helper.MoveVariant Ret, GetObject(ResourceName, ResourceTypes.StringResource)
+    Dim Resource As Variant
+    Helper.MoveVariant Resource, GetObject(ResourceName, ResourceTypes.StringResource)
     
-    If IsEmpty(Ret) Then
-        Exit Function
+    If Not IsEmpty(Resource) Then
+        GetString = Resource
     End If
-    
-    GetString = Ret
 End Function
 
 ''
@@ -132,8 +130,7 @@ Attribute NewEnum.VB_MemberFlags = "40"
 End Function
 
 ''
-' Returns the name of the type of resource reader to use with
-' this specifici <b>ResourceSet</b>
+' Returns the name of the type of resource reader to use with this specific <a href="ResourceSet.html">ResourceSet</a>.
 '
 ' @return The name of a resource reader type.
 '
@@ -142,8 +139,7 @@ Public Function GetDefaultReader() As String
 End Function
 
 ''
-' Returns the name of the type of resource writer to use with
-' this specifici <b>ResourceSet</b>
+' Returns the name of the type of resource writer to use with this specific <a href="ResourceSet.html">ResourceSet</a>
 '
 ' @return The name of a resource writer type.
 '
@@ -196,15 +192,15 @@ End Sub
 Private Sub LoadResources(ByVal Reader As IResourceReader)
     Set mResources = New Hashtable
     
-    Dim de As DictionaryEntry
-    For Each de In Reader
+    Dim Entry As DictionaryEntry
+    For Each Entry In Reader
         Dim Key As ResourceKey
-        Set Key = de.Key
+        Set Key = Entry.Key
         
         If Key.LanguageID = mLanguageID Then
-            mResources.Add de.Key, de.Value
+            mResources.Add Entry.Key, Entry.Value
         End If
-    Next de
+    Next
 End Sub
 
 Friend Sub AddResource(ByVal Key As ResourceKey, ByRef Data As Variant)

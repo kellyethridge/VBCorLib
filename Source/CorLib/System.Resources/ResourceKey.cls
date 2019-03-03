@@ -207,12 +207,10 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function EqualStringOrInt(ByRef x As Variant, ByRef y As Variant) As Boolean
-    If VarType(x) <> VarType(y) Then
-        Exit Function
-    End If
-    
     If VarType(x) = vbString Then
-        EqualStringOrInt = CorString.EqualsV(x, y, OrdinalIgnoreCase)
+        If VarType(y) = vbString Then
+            EqualStringOrInt = CorString.EqualsV(x, y, OrdinalIgnoreCase)
+        End If
     Else
         EqualStringOrInt = (x = y)
     End If

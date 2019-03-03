@@ -66,7 +66,6 @@ Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
     Set mBase = Cor.NewSafeHandle(PreexistingHandle, OwnsHandle)
 End Sub
 
-'''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Terminate()
     CloseHandle
 End Sub
