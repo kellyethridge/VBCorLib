@@ -250,6 +250,7 @@ Private Sub AddSystemResources()
         .Add New ResourceWriterTests
         .Add New ResourceSetTests
         .Add New IconResourceDecoderTests
+        .Add New IconResourceGroupDecoderTests
         
 '        .Add New ResourceReaderTests
         

@@ -45,7 +45,6 @@ Implements IObject
 
 Private Const SIZEOF_NEWHEADER  As Long = 6
 Private Const SIZEOF_RESDIR     As Long = 14
-Private Const RES_ICON          As Long = 1
 
 ''
 ' The list of picture types supported.
@@ -150,22 +149,23 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub InitFromBytes(ByRef Bytes() As Byte)
-    mGroupType = IIf(AsWord(Bytes(2)) = RES_ICON, PictureGroupTypes.IconGroup, PictureGroupTypes.CursorGroup)
+    Dim Source  As MemoryStream
+    Dim Reader  As BinaryReader
+    Dim Count   As Long
     
-    Dim Count As Long
-    Count = AsWord(Bytes(4))
+    Set Source = Cor.NewMemoryStream(Bytes, Writable:=False)
+    Set Reader = Cor.NewBinaryReader(Source)
+    Reader.ReadInt16 ' first two bytes are not used
+    mGroupType = IIf(Reader.ReadInt16 = vbResIcon, PictureGroupTypes.IconGroup, PictureGroupTypes.CursorGroup)
+    Count = Reader.ReadInt16
     
-    Dim Index As Long
-    Index = SIZEOF_NEWHEADER   ' Skip the header
-    
-    Dim i As Long
-    For i = 1 To Count
+    Do While Count > 0
         Dim Info As PictureResourceInfo
         Set Info = New PictureResourceInfo
-        
-        Index = Info.Parse(mGroupType, Index, Bytes)
-        Call mItems.Add(Info)
-    Next i
+        Info.InitFromReader IconGroup, Reader
+        mItems.Add Info
+        Count = Count - 1
+    Loop
 End Sub
 
 Friend Sub Init(ByVal GroupType As PictureGroupTypes)

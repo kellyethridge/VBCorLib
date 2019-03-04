@@ -169,9 +169,11 @@ Friend Function Parse(ByVal ResType As PictureGroupTypes, ByVal Index As Long, B
         mWidth = Bytes(Index)
         mHeight = Bytes(Index + 1)
         mColorCount = Bytes(Index + 2)
+        mResourceType = IconResource
     Else
         mWidth = AsWord(Bytes(Index))
         mHeight = AsWord(Bytes(Index + 2))
+        mResourceType = CursorResource
     End If
     
     Index = Index + 4
@@ -182,7 +184,9 @@ Friend Function Parse(ByVal ResType As PictureGroupTypes, ByVal Index As Long, B
     mBitCount = BitConverter.ToInteger(Bytes, Index)
     Index = Index + 2
     
-    If ResType = CursorGroup Then mColorCount = Powers(mBitCount)
+    If ResType = CursorGroup Then
+        mColorCount = Powers(mBitCount)
+    End If
     
     mBytesInRes = BitConverter.ToLong(Bytes, Index)
     Index = Index + 4
@@ -190,6 +194,17 @@ Friend Function Parse(ByVal ResType As PictureGroupTypes, ByVal Index As Long, B
     mResourceID = BitConverter.ToInteger(Bytes, Index)
     Parse = Index + 2
 End Function
+
+Friend Sub InitFromReader(ByVal ResourceType As PictureGroupTypes, ByVal Reader As BinaryReader)
+    mResourceType = ResourceType
+    mWidth = Reader.ReadByte
+    mHeight = Reader.ReadByte
+    mColorCount = Reader.ReadInt16
+    mPlanes = Reader.ReadInt16
+    mBitCount = Reader.ReadInt16
+    mBytesInRes = Reader.ReadInt32
+    mResourceID = Reader.ReadInt16
+End Sub
 
 Friend Sub Init(ByVal ResourceId As Long, ByVal Resource As IPicture, Optional ByVal ResourceType As PictureGroupTypes)
     Dim Info    As ICONINFO
