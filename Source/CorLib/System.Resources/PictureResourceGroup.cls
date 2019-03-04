@@ -43,8 +43,6 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private Const SIZEOF_NEWHEADER  As Long = 6
-Private Const SIZEOF_RESDIR     As Long = 14
 
 ''
 ' The list of picture types supported.
@@ -162,7 +160,7 @@ Friend Sub InitFromBytes(ByRef Bytes() As Byte)
     Do While Count > 0
         Dim Info As PictureResourceInfo
         Set Info = New PictureResourceInfo
-        Info.InitFromReader IconGroup, Reader
+        Info.InitFromReader mGroupType, Reader
         mItems.Add Info
         Count = Count - 1
     Loop

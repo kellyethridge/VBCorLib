@@ -164,39 +164,16 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Function Parse(ByVal ResType As PictureGroupTypes, ByVal Index As Long, ByRef Bytes() As Byte) As Long
-    If ResType = IconGroup Then
-        mWidth = Bytes(Index)
-        mHeight = Bytes(Index + 1)
-        mColorCount = Bytes(Index + 2)
-        mResourceType = IconResource
-    Else
-        mWidth = AsWord(Bytes(Index))
-        mHeight = AsWord(Bytes(Index + 2))
-        mResourceType = CursorResource
-    End If
-    
-    Index = Index + 4
-    
-    mPlanes = BitConverter.ToInteger(Bytes, Index)
-    Index = Index + 2
-    
-    mBitCount = BitConverter.ToInteger(Bytes, Index)
-    Index = Index + 2
-    
-    If ResType = CursorGroup Then
-        mColorCount = Powers(mBitCount)
-    End If
-    
-    mBytesInRes = BitConverter.ToLong(Bytes, Index)
-    Index = Index + 4
-    
-    mResourceID = BitConverter.ToInteger(Bytes, Index)
-    Parse = Index + 2
-End Function
-
 Friend Sub InitFromReader(ByVal ResourceType As PictureGroupTypes, ByVal Reader As BinaryReader)
-    mResourceType = ResourceType
+    If ResourceType = IconGroup Then
+        InitIcon Reader
+    Else
+        InitCursor Reader
+    End If
+End Sub
+
+Private Sub InitIcon(ByVal Reader As BinaryReader)
+    mResourceType = IconResource
     mWidth = Reader.ReadByte
     mHeight = Reader.ReadByte
     mColorCount = Reader.ReadInt16
@@ -204,6 +181,17 @@ Friend Sub InitFromReader(ByVal ResourceType As PictureGroupTypes, ByVal Reader 
     mBitCount = Reader.ReadInt16
     mBytesInRes = Reader.ReadInt32
     mResourceID = Reader.ReadInt16
+End Sub
+
+Private Sub InitCursor(ByVal Reader As BinaryReader)
+    mResourceType = CursorResource
+    mWidth = Reader.ReadInt16
+    mHeight = Reader.ReadInt16
+    mPlanes = Reader.ReadInt16
+    mBitCount = Reader.ReadInt16
+    mBytesInRes = Reader.ReadInt32
+    mResourceID = Reader.ReadInt16
+    mColorCount = Powers(mBitCount)
 End Sub
 
 Friend Sub Init(ByVal ResourceId As Long, ByVal Resource As IPicture, Optional ByVal ResourceType As PictureGroupTypes)

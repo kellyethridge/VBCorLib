@@ -38,7 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' Decodes a CursorGroup resource.
 '
-' @remarks This returns a <b>ResPictureGroup</b> object when decoded.
+' @remarks This returns a <a href="PictureResourceGroup.html">PictureResourceGroup</a> object when decoded.
 '
 ' @see ResourceReader
 ' @see WinResourceReader
@@ -51,7 +51,7 @@ Private mGroup  As PictureResourceGroup
 
 
 ''
-' Decodes a byte array into a <b>ResPictureGroup</b> that represents a cursor group.
+' Decodes a byte array into a <a href="PictureResourceGroup.html">PictureResourceGroup</a> that represents a cursor group.
 '
 ' @param Key The identifier for the cursor group.
 ' @param Bytes The bytes to be decoded into a cursor group.
@@ -63,7 +63,7 @@ Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
     If Key.ResourceType <> ResourceTypes.GroupCursor Then _
-        Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
+        Error.Argument Argument_InvalidResourceKeyType, "Key"
 
     Set mKey = Key
     Set mGroup = New PictureResourceGroup
@@ -74,7 +74,7 @@ End Function
 ''
 ' Returns the type of resource this decoder supports.
 '
-' @return This decoder returns <b>ResourceTypes.GroupCursor</b>.
+' @return This decoder returns <a href="ResourceKey.ResourceTypes.html">ResourceTypes.GroupCursor</a>.
 ' @see ResourceTypes
 '
 Public Function GetDecodeType() As Variant
@@ -96,10 +96,8 @@ Public Function GetResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As
     
     Set ReturnKey = mKey
     Set ReturnValue = mGroup
-    
     Set mKey = Nothing
     Set mGroup = Nothing
-    
     GetResource = True
 End Function
 

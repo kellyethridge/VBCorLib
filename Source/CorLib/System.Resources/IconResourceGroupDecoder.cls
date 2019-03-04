@@ -50,7 +50,6 @@ Private mKey    As ResourceKey
 Private mGroup  As PictureResourceGroup
 
 
-
 ''
 ' Decodes a byte array into a <a href="PictureResourceGroup.html">PictureResourceGroup</a> that represents an icon group.
 '

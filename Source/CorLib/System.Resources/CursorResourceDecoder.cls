@@ -73,7 +73,7 @@ Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     If CorArray.IsNull(Bytes) Then _
         Error.ArgumentNull "Bytes", ArgumentNull_Array
     If Key.ResourceType <> ResourceTypes.CursorResource Then _
-        Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
+        Error.Argument Argument_InvalidResourceKeyType, "Key"
         
     Set mCursor = CreateCursor(Bytes)
     
@@ -120,21 +120,21 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateCursor(ByRef Bytes() As Byte) As StdPicture
-    Dim hr          As Long
+    Dim Handle      As Long
     Dim NewCursor   As PictDesc
     Dim UnkIID      As VBGUID
     Dim Unk         As IUnknown
     
-    hr = CreateIconFromResource(Bytes(LBound(Bytes)), CorArray.Length(Bytes), False, &H30000)
+    Handle = CreateIconFromResource(Bytes(LBound(Bytes)), CorArray.Length(Bytes), BOOL_FALSE, &H30000)
     
-    If hr = 0 Then
+    If Handle = 0 Then
         Exit Function
     End If
     
     With NewCursor
         .cbSizeofStruct = LenB(NewCursor)
         .picType = vbPicTypeIcon
-        .hImage = hr
+        .hImage = Handle
         .xExt = AsLong(Bytes(4))
         .yExt = AsLong(Bytes(8))
     End With
@@ -144,7 +144,7 @@ Private Function CreateCursor(ByRef Bytes() As Byte) As StdPicture
         .Data4(7) = &H46
     End With
 
-    If OleCreatePictureIndirect(NewCursor, UnkIID, True, Unk) = S_OK Then
+    If OleCreatePictureIndirect(NewCursor, UnkIID, BOOL_TRUE, Unk) = S_OK Then
         Set CreateCursor = Unk
     End If
 End Function

@@ -251,6 +251,8 @@ Private Sub AddSystemResources()
         .Add New ResourceSetTests
         .Add New IconResourceDecoderTests
         .Add New IconResourceGroupDecoderTests
+        .Add New CursorResourceDecoderTests
+        .Add New CursorResourceGroupDecoderTests
         
 '        .Add New ResourceReaderTests
         

@@ -116,14 +116,17 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreateIcon(ByRef Bytes() As Byte) As StdPicture
-    Dim Handle As Long
+    Dim Handle  As Long
+    Dim NewIcon As PictDesc
+    Dim UnkIID  As VBGUID
+    Dim Unk     As IUnknown
+    
     Handle = CreateIconFromResource(Bytes(LBound(Bytes)), CorArray.Length(Bytes), BOOL_TRUE, &H30000)
     
     If Handle = 0 Then
         Exit Function
     End If
     
-    Dim NewIcon As PictDesc
     With NewIcon
         .cbSizeofStruct = LenB(NewIcon)
         .picType = vbPicTypeIcon
@@ -132,13 +135,11 @@ Private Function CreateIcon(ByRef Bytes() As Byte) As StdPicture
         .yExt = AsLong(Bytes(8))
     End With
     
-    Dim UnkIID As VBGUID
     With UnkIID
         .Data4(0) = &HC0
         .Data4(7) = &H46
     End With
     
-    Dim Unk As IUnknown
     If OleCreatePictureIndirect(NewIcon, UnkIID, BOOL_TRUE, Unk) = S_OK Then
         Set CreateIcon = Unk
     End If
