@@ -994,7 +994,7 @@ library CorType {
         const long CLOCKS_OFFSET        = 8;
         const long CELEMENTS_OFFSET     = 16;
 
-        [entry("OleLoadPicture")] HRESULT OleLoadPicture([in] IStream * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
+        [entry("OleLoadPicture")] long OleLoadPicture([in] IStream * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
         [entry("SafeArrayCopyData")] HRESULT SafeArrayCopyData([in] long psaSource, [in] long psaTarget);
         [entry("SafeArrayCreate")] long SafeArrayCreate([in] VBA.vbVarType vt, [in] long cDims, [in] SafeArrayBound * rgsaBounds);
         [entry("SafeArrayCreateVector")] long SafeArrayCreateVector([in] VBA.vbVarType vt, [in] long lLbound, [in] long cElements);

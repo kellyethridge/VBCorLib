@@ -254,6 +254,7 @@ Private Sub AddSystemResources()
         .Add New CursorResourceDecoderTests
         .Add New CursorResourceGroupDecoderTests
         .Add New StringResourceDecoderTests
+        .Add New BitmapResourceDecoderTests
         
 '        .Add New ResourceReaderTests
         

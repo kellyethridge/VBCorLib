@@ -45,8 +45,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IResourceDecoder
 
-Private Const RESTYPE_BITMAP            As Long = 2
-Private Const SIZEOF_BITMAPFILEHEADER   As Long = 14
+Private Const SIZEOF_BITMAPFILEHEADER As Long = 14
 
 Private mKey    As ResourceKey
 Private mBitmap As StdPicture
@@ -64,19 +63,18 @@ Private mBitmap As StdPicture
 '
 Public Function Decode(ByVal Key As ResourceKey, Bytes() As Byte) As Long
     If Key Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Key")
+        Error.ArgumentNull "Key"
     If CorArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
-    If Key.ResourceType <> RESTYPE_BITMAP Then _
-        Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
+    If Key.ResourceType <> ResourceTypes.BitmapResource Then _
+        Error.Argument Argument_InvalidResourceKeyType, "Key"
     
     Set mBitmap = CreatePicture(Bytes)
     
-    If mBitmap Is Nothing Then _
-        Throw Cor.NewArgumentException("Could not decode resource.", "Bytes")
-    
-    Set mKey = Key
-    Decode = 1
+    If Not mBitmap Is Nothing Then
+        Set mKey = Key
+        Decode = 1
+    End If
 End Function
 
 ''
@@ -86,7 +84,7 @@ End Function
 ' @see ResourceTypes
 '
 Public Function GetDecodeType() As Variant
-    GetDecodeType = RESTYPE_BITMAP
+    GetDecodeType = ResourceTypes.BitmapResource
 End Function
 
 ''
@@ -100,13 +98,14 @@ End Function
 ' @see ResourceKey
 '
 Public Function GetResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean
-    If mKey Is Nothing Then Exit Function
+    If mKey Is Nothing Then
+        Exit Function
+    End If
     
     Set ReturnKey = mKey
     Set ReturnValue = mBitmap
     
-    ' Set these to nothing because we
-    ' only return them once.
+    ' Set these to nothing because we only return them once.
     Set mKey = Nothing
     Set mBitmap = Nothing
     
@@ -118,19 +117,22 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
+    Dim ByteIndex       As Long
     Dim ByteCountOffset As Long
+    
+    ByteIndex = LBound(Bytes)
     
     ' Create a Stream to write the data to, so we can read
     ' from it creating a bitmap picture.
     Dim Stream As IStream
-    CreateStreamOnHGlobal 0, True, Stream
+    CreateStreamOnHGlobal 0, BOOL_TRUE, Stream
     
     ' We need to insert a BITMAPFILEHEADER so that
     ' the OleLoadPicture will work correctly, only
     ' if the BITMAPFILEHEADER isn't already there.
     '
     ' The first 2 bytes of the header spell BM.
-    If Bytes(0) <> &H42 Or Bytes(1) <> &H4D Then
+    If Bytes(ByteIndex) <> &H42 Or Bytes(ByteIndex + 1) <> &H4D Then
         ' The bitmap data begins immediatley after the
         ' BITMAPFILEHEADER, BITMAPINFOHEADER and any
         ' RGBQUAD structures. There are no RGBQUAD
@@ -145,13 +147,13 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
         Const COLORSUSED_OFFSET As Long = 32
         
         Dim ColorsUsed As Long
-        ColorsUsed = AsLong(Bytes(COLORSUSED_OFFSET))
+        ColorsUsed = AsLong(Bytes(ByteIndex + COLORSUSED_OFFSET))
         
         ' If ColorsUsed is 0 then the maximum number
         ' of colors is used based on the bits-per-pixel.
         If ColorsUsed = 0 Then
             Dim BitCount As Long
-            BitCount = AsWord(Bytes(BITCOUNT_OFFSET))
+            BitCount = AsWord(Bytes(ByteIndex + BITCOUNT_OFFSET))
             ColorsUsed = Powers(BitCount)
         End If
         
@@ -175,7 +177,7 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
         AsLong(BmpHeader(10)) = DataStartOffset
         
         ' Shove our header onto the Stream before we shove the data.
-        Stream.Write VarPtr(BmpHeader(0)), SIZEOF_BITMAPFILEHEADER, 0&
+        Stream.Write BmpHeader(0), SIZEOF_BITMAPFILEHEADER, 0&
         
         ' We need to count an additional 14 bytes if we have
         ' inserted our own header information.
@@ -183,7 +185,7 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
     End If
     
     ' Shove the data onto the stream.
-    Stream.Write VarPtr(Bytes(0)), CorArray.Length(Bytes), 0&
+    Stream.Write Bytes(ByteIndex), CorArray.Length(Bytes), 0&
     
     ' Move back to the start of the stream for reading.
     Stream.Seek 0, STREAM_SEEK_SET, 0&
@@ -199,7 +201,7 @@ Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
     ' Load the picture from the stream, creating an IPicture object. We simply
     ' assign it to an IUnknown object for ease.
     Dim Unk As IUnknown
-    OleLoadPicture Stream, CorArray.Length(Bytes) + ByteCountOffset, True, UnkIID, Unk
+    OleLoadPicture Stream, 0, BOOL_TRUE, UnkIID, Unk
     
     ' Return it, casting to a StdPicture object.
     Set CreatePicture = Unk

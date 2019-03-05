@@ -220,6 +220,7 @@ Class=CursorResourceDecoderTests; System.Resources\CursorResourceDecoderTests.cl
 Class=CursorResourceGroupDecoderTests; System.Resources\CursorResourceGroupDecoderTests.cls
 ResFile32="CorLib.Tests.RES"
 Class=StringResourceDecoderTests; System.Resources\StringResourceDecoderTests.cls
+Class=BitmapResourceDecoderTests; System.Resources\BitmapResourceDecoderTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""
