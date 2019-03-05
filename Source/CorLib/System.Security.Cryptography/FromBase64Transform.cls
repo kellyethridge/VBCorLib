@@ -165,7 +165,7 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
             mBitCount = mBitCount + 6
             
             If mBitCount <> 24 Then
-                mBits = mBits * &H40&
+                mBits = mBits * vbShift6Bits
             Else
                 Dim NewOffset As Long
                 NewOffset = OutputOffset + (2 - mTermCount)
@@ -173,15 +173,15 @@ Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As
                     SmallBufferError "OutputBuffer"
                 End If
                 
-                OutputBuffer(OutputOffset) = (mBits And &HFF0000) \ &H10000
+                OutputBuffer(OutputOffset) = (mBits And &HFF0000) \ vbShift16Bits
                 
                 Select Case mTermCount
                     Case 0
                         OutputBuffer(OutputOffset + 2) = mBits And &HFF&
-                        OutputBuffer(OutputOffset + 1) = (mBits And &HFF00&) \ &H100&
+                        OutputBuffer(OutputOffset + 1) = (mBits And &HFF00&) \ vbShift8Bits
 
                     Case 1
-                        OutputBuffer(OutputOffset + 1) = (mBits And &HFF00&) \ &H100&
+                        OutputBuffer(OutputOffset + 1) = (mBits And &HFF00&) \ vbShift8Bits
 
                 End Select
                 
