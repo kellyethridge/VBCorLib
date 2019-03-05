@@ -198,7 +198,7 @@ Private Sub Class_Initialize()
     Set mDecoders = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
     
     ' Add our known set of decoders.
-    AddDecoder New StringResourceTableDecoder
+    AddDecoder New StringResourceDecoder
     AddDecoder New BitMapResourceDecoder
     AddDecoder New IconResourceDecoder
     AddDecoder New IconResourceGroupDecoder

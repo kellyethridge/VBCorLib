@@ -6,7 +6,7 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "StringResourceTableDecoder"
+Attribute VB_Name = "StringResourceDecoder"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
@@ -32,7 +32,7 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: StringResourceTableDecoder
+' Module: StringResourceDecoder
 '
 
 ''
@@ -43,10 +43,8 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IResourceDecoder
 
-Private mStrings(15)    As String
-Private mKeys(15)       As ResourceKey
-Private mIndex          As Long
-Private mKey            As ResourceKey
+Private mStrings    As Queue
+Private mKeys       As Queue
 
 
 ''
@@ -60,27 +58,28 @@ Private mKey            As ResourceKey
 '
 Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
     If Key Is Nothing Then _
-        Throw Cor.NewArgumentNullException("Key")
+        Error.ArgumentNull "Key"
     If CorArray.IsNull(Bytes) Then _
-        Throw Cor.NewArgumentNullException("Bytes", Environment.GetResourceString(ArgumentNull_Array))
+        Error.ArgumentNull "Bytes", ArgumentNull_Array
     If Key.ResourceType <> ResourceTypes.StringResource Then _
-        Throw Cor.NewArgumentException("Invalid resource type to decode.", "Key")
+        Error.Argument Argument_InvalidResourceKeyType, "Key"
         
-    Set mKey = Key
+    Set mStrings = New Queue
+    Set mKeys = New Queue
     
     Dim StringId As Long
-    ' ResourceName should be a number.
-    StringId = (CLng(mKey.ResourceName) - 1) * 16
+    ' ResourceName is the string block number. We push out the block number
+    ' 4 bits to make room to add the ids of the individual strings within the
+    ' block. There are 16 strings in a block, including null strings. The
+    ' resulting key for each string in the block will be a combination of the
+    ' block number (upper 12 bits) and the string index within the block (lower 4 bits).
+    StringId = (CLng(Key.ResourceName) - 1) * vbShift4Bits
     
-    ' we need to reset this because this decoder may
-    ' decode multiple times.
-    mIndex = 0
+    Dim ByteIndex       As Long
+    Dim MaxByteIndex    As Long
     
-    Dim MaxByteIndex As Long
+    ByteIndex = LBound(Bytes)
     MaxByteIndex = UBound(Bytes)
-    
-    Dim Count As Long
-    Dim ByteIndex As Long
     
     ' Loop through all the bytes in pairs, as characters,
     ' building the block of 16 strings from the table.
@@ -91,27 +90,18 @@ Public Function Decode(ByVal Key As ResourceKey, ByRef Bytes() As Byte) As Long
         
         ' We have a string, so append all the characters.
         If StringLength > 0 Then
-            Dim Builder As StringBuilder
-            Set Builder = StringBuilderCache.Acquire
+            Dim s As String
+            s = Encoding.Unicode.GetString(Bytes, ByteIndex, StringLength * vbSizeOfChar)
+            ByteIndex = ByteIndex + LenB(s)
             
-            Dim i As Long
-            For i = 1 To StringLength
-                Builder.AppendChar BitConverter.ToInteger(Bytes, ByteIndex)
-                ByteIndex = ByteIndex + 2
-            Next i
-            
-            mStrings(mIndex) = StringBuilderCache.GetStringAndRelease(Builder)
-            Set mKeys(mIndex) = Cor.NewResourceKey(StringId, ResourceTypes.StringResource, mKey.LanguageID)
-            Count = Count + 1
-        Else
-            mStrings(mIndex) = vbNullString
-            Set mKeys(mIndex) = Nothing
+            mStrings.Enqueue s
+            mKeys.Enqueue Cor.NewResourceKey(StringId, ResourceTypes.StringResource, Key.LanguageID)
         End If
-        mIndex = mIndex + 1
+        
         StringId = StringId + 1
     Loop
     
-    Decode = Count
+    Decode = mStrings.Count
 End Function
 
 ''
@@ -135,15 +125,11 @@ End Function
 ' @see ResourceKey
 '
 Public Function GetResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean
-    Do While mIndex > 0
-        mIndex = mIndex - 1
-        If Not mKeys(mIndex) Is Nothing Then
-            Set ReturnKey = mKeys(mIndex)
-            ReturnValue = mStrings(mIndex)
-            GetResource = True
-            Exit Function
-        End If
-    Loop
+    If mStrings.Count > 0 Then
+        Set ReturnKey = mKeys.Dequeue
+        ReturnValue = mStrings.Dequeue
+        GetResource = True
+    End If
 End Function
 
 
