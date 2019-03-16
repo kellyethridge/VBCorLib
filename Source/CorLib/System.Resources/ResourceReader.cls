@@ -112,7 +112,7 @@ End Sub
 ' objects. The value property in the <b>DictionaryEntry</b> object
 ' returns a <b>Win32Resource</b> object which contains details about
 ' the specific resource found in the .RES file.
-' The <i>Key</b> property returns the ID for the specific resource.
+' The <b>Key</b> property returns the ID for the specific resource.
 ' The Keys may not be unique across all resources, os using the Key
 ' as a unique identifier is not recommended.
 '
@@ -133,7 +133,7 @@ End Function
 ' objects. The value property in the <b>DictionaryEntry</b> object
 ' returns a <b>Win32Resource</b> object which contains details about
 ' the specific resource found in the .RES file.
-' The <i>Key</b> property returns the ID for the specific resource.
+' The <b>Key</b> property returns the ID for the specific resource.
 ' The Keys may not be unique across all resources, os using the Key
 ' as a unique identifier is not recommended.
 '
@@ -146,7 +146,7 @@ End Function
 ''
 ' Closes the reader and releases any resources.
 '
-' @remarks <b>Close</b> can be called safely multiple times.
+' @remarks <b>CloseReader</b> can be called safely multiple times.
 '
 Public Sub CloseReader()
     If Not mReader Is Nothing Then
@@ -212,7 +212,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyReader()
     If mReader Is Nothing Then

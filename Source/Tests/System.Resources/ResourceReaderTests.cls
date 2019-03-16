@@ -17,47 +17,36 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements ICategorizable
 
-Private mReader As ResourceReader
-
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.Resources"
 End Sub
 
-Public Sub Setup()
-    Set mReader = Cor.NewResourceReader(Path.Combine(App.Path, "VBCorLibTests.res"))
+Public Sub GetEnumerator_WhenCalled_ReturnsEnumerableResources()
+    Dim Resources As New Hashtable
+    Dim Reader As ResourceReader
+    Dim Enumerator As IDictionaryEnumerator
+    
+    Set Reader = Cor.NewResourceReader(Path.Combine(App.Path, "CorLib.Tests.RES"))
+    Set Enumerator = Reader.GetEnumerator
+    
+    Do While Enumerator.MoveNext
+        Resources.Add Enumerator.Key, Enumerator.Value
+    Loop
+    
+    AssertResourceExists Resources, 101, StringResource, 1033
+    AssertResourceExists Resources, 101, ResourceTypes.GroupIcon, 1033
+    AssertResourceExists Resources, 1, ResourceTypes.IconResource, 1033
+    AssertResourceExists Resources, 101, ResourceTypes.GroupCursor, 1033
+    AssertResourceExists Resources, 1, ResourceTypes.CursorResource, 1033
+    AssertResourceExists Resources, 101, "CUSTOM", 1033
+    Assert.That Resources(Cor.NewResourceKey(101, ResourceTypes.StringResource, 1033)), Iz.EqualTo("hello")
 End Sub
 
-Public Sub Teardown()
-    mReader.CloseReader
-End Sub
-
-Public Sub TestEnumStrings()
+Private Sub AssertResourceExists(ByVal Resources As Hashtable, ByRef ResourceName As Variant, ByRef ResourceType As Variant, ByVal LanguageId As Long)
     Dim Key As ResourceKey
-    Dim s As String
-    Dim de As DictionaryEntry
     
-    For Each de In mReader
-        Assert.IsTrue VarType(de.Key) = vbObject
-        Assert.IsTrue TypeOf de.Key Is ResourceKey
-        
-        Set Key = de.Key
-        Debug.Print "{" & Key.ToString & "} = ";
-        Select Case Key.ResourceType
-            Case 6
-                Debug.Print de.Value
-            Case 2
-                Debug.Print "Bitmap"
-            Case 14
-                Debug.Print "Icon Group"
-            Case 3
-                Debug.Print "Icon"
-            Case 1
-                Debug.Print "Cursor"
-            Case 12
-                Debug.Print "Cursor Group"
-        End Select
-    Next de
-    
+    Set Key = Cor.NewResourceKey(ResourceName, ResourceType, LanguageId)
+    Assert.That Resources.ContainsKey(Key), Iz.True
 End Sub
 
 

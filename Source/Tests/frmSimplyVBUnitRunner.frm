@@ -255,10 +255,9 @@ Private Sub AddSystemResources()
         .Add New CursorResourceGroupDecoderTests
         .Add New StringResourceDecoderTests
         .Add New BitmapResourceDecoderTests
-        
-'        .Add New ResourceReaderTests
-        
-'        .Add New TestResourceManager
+        .Add New ResourceReaderTests
+        .Add New ResourceManagerTests
+        .Add New WinResourceReaderTests
         
         AddTest .This
     End With
