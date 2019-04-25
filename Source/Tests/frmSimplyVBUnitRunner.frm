@@ -103,11 +103,12 @@ Private Sub AddSystem()
         .Add New GuidTests
         .Add New BitConverterTests
         .Add New CorDateTimeTests
-        .Add New TestEnvironment
         .Add New TimeZoneTests
         .Add New TimeSpanTests
         .Add New ArrayConstructorTests
         .Add New StringComparerTests
+        .Add New EnvironmentTests
+        .Add New OperatingSystemTests
         
         .Add NewSuite("Object Tests", _
             New ObjectBaseTests, _

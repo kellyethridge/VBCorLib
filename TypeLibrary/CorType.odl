@@ -14,6 +14,7 @@ library CorType {
     typedef short WORD;
     typedef long  LPVOID;
     typedef currency curr;
+    typedef short Char;
 
     //
     // Public Enums
@@ -1184,6 +1185,7 @@ library CorType {
 
 
         [entry("GetUserNameA"), usesgetlasterror] long GetUserNameA([in] LPSTR lpBuffer, [in] long * nSize);
+        [entry("GetUserNameW"), usesgetlasterror] long GetUserNameW([in] LPWSTR lpBuffer, [in] long * nSize);
         [entry("CryptAcquireContextA"), usesgetlasterror] long CryptAcquireContext([in] long * hProv, [in] LPSTR pszContainer, [in] LPSTR pszProvider, [in] long dwProvType, [in] long dwFlags);
         [entry("CryptReleaseContext"), usesgetlasterror] long CryptReleaseContext([in] long hProv, [in] long dwFlags);
         [entry("CryptGenRandom"), usesgetlasterror] long CryptGenRandom([in] long hProv, [in] long dwLen, [in] void * pbBuffer);

@@ -155,6 +155,7 @@ Public Enum ResourceStringKey
     Argument_InvalidResourceNameOrType = 876
     Argument_MaxStringLength = 877
     Argument_InvalidResourceKeyType = 878
+    Argument_StringZeroLength = 879
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
@@ -270,6 +271,7 @@ Public Enum ResourceStringKey
     InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple = 1109
     InvalidOperation_RegRemoveSubKey = 1110
     InvalidOperation_ResourceWriterSaved = 1111
+    InvalidOperation_GetVersion = 1112
     
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001

@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2019 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: OperatingSystem
+' Module: OperatingSystem
 '
 
 ''
@@ -43,29 +46,26 @@ Implements IObject
 Implements ICloneable
 
 
-
 ''
 ' The identification for the specific Windows platforms.
 '
-' @param Win32NT Identification for Windows NT4.0, 2000, XP, Server 2003,
-' and future NT platforms.
-' @param Win32S Identification for legacy Windows systems that are 16bit,
-' but allowed to access 32bit functionality.
+' @param Win32S Identification for legacy Windows systems that are 16bit, but allowed to access 32bit functionality.
 ' @param Win32Windows Identification for Windows 95, 98, ME platforms.
+' @param Win32NT Identification for Windows NT4.0, 2000, XP, Server 2003, and future NT platforms.
 ' @param WinCE Identification for Windows CE which runs on handheld PDA's.
 '
 Public Enum PlatformID
-   Win32NT = 2
-   Win32S = 0
-   Win32Windows = 1
-   WinCE = 3
+    Win32S
+    Win32Windows
+    Win32NT
+    WinCE
 End Enum
 
 
 Private mPlatformID     As PlatformID
 Private mVersion        As Version
-Private mLoaded         As Boolean
 Private mServicePack    As String
+Private mVersionString  As String
 
 
 ''
@@ -74,7 +74,6 @@ Private mServicePack    As String
 ' @remarks An empty string is always returned on Windows 95, 98, and ME.
 '
 Public Property Get ServicePack() As String
-    Call VerifyLoaded
     ServicePack = mServicePack
 End Property
 
@@ -84,7 +83,6 @@ End Property
 ' @return The current operating system running.
 '
 Public Property Get Platform() As PlatformID
-    Call VerifyLoaded
     Platform = mPlatformID
 End Property
 
@@ -94,7 +92,6 @@ End Property
 ' @return The operating system version.
 '
 Public Property Get Version() As Version
-    Call VerifyLoaded
     Set Version = mVersion
 End Property
 
@@ -104,9 +101,44 @@ End Property
 ' @return The clone of the OperatingSystem object.
 '
 Public Function Clone() As OperatingSystem
-    Call VerifyLoaded
-    Set Clone = Cor.NewOperatingSystem(mPlatformID, mVersion.Clone, mServicePack)
+    Set Clone = Cor.NewOperatingSystem(mPlatformID, mVersion, mServicePack)
 End Function
+
+''
+' Gets the concatenated string representation of the platform identifier, version, and service pack that are currently installed on the operating system.
+'
+' @return The string representation of the values returned by the <a href="OperatingSystem.get.Platform.html">Platform</a>, <a href="OperatingSystem.get.Version.html">Version</a>, and <a href="OperatingSystem.get.ServicePack.html">ServicePack</a> properties.
+'
+Public Property Get VersionString() As String
+    Dim OSName As String
+    
+    If Len(mVersionString) = 0 Then
+        Select Case mPlatformID
+            Case PlatformID.Win32NT
+                OSName = "Microsoft Windows NT"
+            Case PlatformID.Win32S
+                OSName = "Microsoft Win32S"
+            Case PlatformID.Win32Windows
+                If mVersion.Major = 4 And mVersion.Minor = 0 Then
+                    OSName = "Microsoft Windows 95"
+                Else
+                    OSName = "Microsoft Windows 98"
+                End If
+            Case PlatformID.WinCE
+                OSName = "Microsoft Windows CE"
+            Case Else
+                OSName = "<unknown>"
+        End Select
+        
+        If Len(mServicePack) = 0 Then
+            mVersionString = CorString.Format("{0} {1}", OSName, mVersion)
+        Else
+            mVersionString = CorString.Format("{0} {1} {2}", OSName, mVersion.ToString(3), mServicePack)
+        End If
+    End If
+    
+    VersionString = mVersionString
+End Property
 
 ''
 ' Returns a string representation of the current operating system.
@@ -114,39 +146,7 @@ End Function
 ' @return String representing this instance.
 '
 Public Function ToString() As String
-    Call VerifyLoaded
-    
-    Dim Ret As String
-    Select Case mPlatformID
-        Case Win32NT
-            If mVersion.Major = 5 Then
-                Select Case mVersion.Minor
-                    Case 0:     Ret = "Microsoft Windows 2000"
-                    Case 1:     Ret = "Microsoft Windows XP"
-                    Case 2:     Ret = "Microsoft Windows Server 2003 family"
-                    Case Else:  Ret = "Microsoft Windows NT"
-                End Select
-            Else
-                Ret = "Microsoft Windows NT"
-            End If
-        Case Win32S
-            Ret = "Microsoft Win32s"
-        Case Win32Windows
-            Select Case mVersion.Minor
-                Case 0:     Ret = "Microsoft Windows 95"
-                Case 10:    Ret = "Micorosft Windows 98"
-                Case 90:    Ret = "Micorsoft Windows ME"
-                Case Else:  Ret = "Microsoft Windows32"
-            End Select
-        Case WinCE
-            Ret = "Microsoft WinCE"
-    End Select
-    
-    If Len(mServicePack) > 0 Then
-        ToString = Ret & " " & mVersion.ToString(3) & " " & mServicePack
-    Else
-        ToString = Ret & " " & mVersion.ToString
-    End If
+    ToString = VersionString
 End Function
 
 ''
@@ -171,43 +171,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Platform As PlatformID, ByVal Version As Version, ByRef ServicePack As String)
-    mPlatformID = Platform
-    Set mVersion = Version
-    mServicePack = ServicePack
-    mLoaded = True
-End Sub
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub VerifyLoaded()
-    If mLoaded Then Exit Sub
-    
-    Dim Info As OSVERSIONINFOA
-    Info.dwOSVersionInfoSize = Len(Info)
-    If GetVersionExA(Info) = BOOL_FALSE Then _
-        Throw Cor.NewInvalidOperationException("Could not load Operating System information.")
-    
-    ' We are on an NT platform so we can get extra information
-    If Info.dwPlatformId = PlatformID.Win32NT Then
-        Dim infoex As OSVERSIONINFOEXA
-        infoex.dwOSVersionInfoSize = Len(infoex)
-        If GetVersionExA(infoex) = BOOL_FALSE Then _
-            Throw Cor.NewInvalidOperationException("Could not load Operating System information.")
-        
-        Dim ServicePack As String
-        ServicePack = StrConv(infoex.szCSDVersion, vbUnicode)
-        ServicePack = SysAllocString(StrPtr(ServicePack))
-    End If
-    Call Init(Info.dwPlatformId, Cor.NewVersion(Info.dwMajorVersion, Info.dwMinorVersion, Info.dwBuildNumber, Helper.ShiftLeft(infoex.wServicePackMajor, 16) Or infoex.wServicePackMinor), ServicePack)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
@@ -215,20 +179,25 @@ Private Sub Class_ReadProperties(PropBag As PropertyBag)
         Set mVersion = .ReadProperty("Version", Nothing)
         mServicePack = .ReadProperty("ServicePack", "")
     End With
-    mLoaded = True
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        Call .WriteProperty("PlateformID", mPlatformID)
-        Call .WriteProperty("Version", mVersion)
-        Call .WriteProperty("ServicePack", mServicePack)
+        .WriteProperty "PlateformID", mPlatformID
+        .WriteProperty "Version", mVersion
+        .WriteProperty "ServicePack", mServicePack
     End With
+End Sub
+
+Friend Sub Init(ByVal Platform As PlatformID, ByVal Version As Version, ByRef ServicePack As String)
+    mPlatformID = Platform
+    Set mVersion = Version
+    mServicePack = ServicePack
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -244,7 +213,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ICloneable Interface
+'   ICloneable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ICloneable_Clone() As Object
     Set ICloneable_Clone = Clone

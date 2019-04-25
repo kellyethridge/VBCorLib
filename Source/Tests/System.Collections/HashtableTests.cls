@@ -47,6 +47,7 @@ Public Sub Count_WithEmptyHashtable_ReturnsZero()
     Actual = Table.Count
     
     Assert.That Actual, Iz.EqualTo(0)
+    Assert.That AsDictionary(Table).Count, Iz.EqualTo(0)
 End Sub
 
 Public Sub Add_WithItemAndKey_AddsToTable(ByRef Key As Variant, ByRef Value As Variant)
@@ -56,6 +57,8 @@ Public Sub Add_WithItemAndKey_AddsToTable(ByRef Key As Variant, ByRef Value As V
     
     Assert.That Table.Count, Iz.EqualTo(1)
     Assert.That Table(Key), Iz.EqualTo(Value)
+    Assert.That AsDictionary(Table).Count, Iz.EqualTo(1)
+    Assert.That AsDictionary(Table)(Key), Iz.EqualTo(Value)
 End Sub
 
 Public Sub Add_WithManyItems_AddsManyItems()
@@ -262,4 +265,7 @@ Public Sub CopyTo_WithIndexAndListCountGreaterThanUBound_ThrowsArgumentException
     AssertArgumentException Err
 End Sub
 
+Private Function AsDictionary(ByVal Table As Hashtable) As IDictionary
+    Set AsDictionary = Table
+End Function
 

@@ -421,31 +421,19 @@ End Function
 ' argument.
 '
 Public Function CompareTo(ByRef Value As Variant) As Long
-    Dim Other As CorDateTime
-    
-    Select Case VarType(Value)
-        Case vbObject
-            If Value Is Nothing Then
-                CompareTo = 1
-                Exit Function
-            End If
-            
-            If TypeOf Value Is CorDateTime Then
-                Set Other = Value
-            Else
-                Error.Argument Arg_MustBeDateTime
-            End If
-        Case vbDate
-            Set Other = CorDateTime.FromOADate(Value)
-        Case Else
-            Error.Argument Arg_MustBeDateTime
-    End Select
-    
-    If mMilliseconds < Other.TotalMilliseconds Then
-        CompareTo = -1
-    ElseIf mMilliseconds > Other.TotalMilliseconds Then
-        CompareTo = 1
+    If VarType(Value) = vbObject Then
+        If Value Is Nothing Then
+            CompareTo = 1
+            Exit Function
+        End If
     End If
+    
+    Select Case Statics.CorDateTime.GetTotalMilliseconds(Value)
+        Case Is < mMilliseconds
+            CompareTo = 1
+        Case Is > mMilliseconds
+            CompareTo = -1
+    End Select
 End Function
 
 ''
@@ -535,14 +523,8 @@ End Function
 '
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim Info As DateTimeFormatInfo
-    If Not Provider Is Nothing Then
-        Set Info = Provider.GetFormat(vbDateTimeFormatInfo)
-    End If
     
-    If Info Is Nothing Then
-        Set Info = CultureInfo.CurrentCulture.DateTimeFormat
-    End If
-    
+    Set Info = DateTimeFormatInfo.GetInstance(Provider)
     ToString = Info.Format(Me, Format)
 End Function
 
@@ -609,9 +591,7 @@ End Function
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
     On Error GoTo Catch
-    
-    Equals = Convert.ToDateTime(Value).TotalMilliseconds = mMilliseconds
-
+    Equals = Statics.CorDateTime.GetTotalMilliseconds(Value) = mMilliseconds
 Catch:
 End Function
 

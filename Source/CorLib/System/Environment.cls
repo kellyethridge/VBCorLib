@@ -46,7 +46,8 @@ Attribute VB_Exposed = True
 ' </pre>
 '
 Option Explicit
-
+Private Declare Function IsWow64Process Lib "kernel32.dll" (ByVal Handle As Long, ByRef IsWow64 As Long) As Long
+Private Declare Function GetCurrentProcess Lib "kernel32.dll" () As Long
 
 Private Const ERR_PATHNOTFOUND              As Long = 76
 Private Const MAX_COMPUTERNAME_LENGTH       As Long = 31
@@ -63,57 +64,105 @@ Private Const ERROR_ENVVAR_NOT_FOUND        As Long = 203&
 ' This enum represents a list of folders accessible using <i>GetFolderPath</i>.
 ' These definitions are from the Microsoft Dot NET 1.1 MSDN Library.
 '
+' @param AdminTools The file system directory that is used to store administrative tools for an individual user. The Microsoft Management Console (MMC) will save customized consoles to this directory, and it will roam with the user.
 ' @param ApplicationData The directory that serves as a common repository for application-specific data for the current roaming user.
 ' A roaming user works on more than one computer on a network. A roaming user's profile is kept on a server on the network and is loaded onto a system when the user logs on.
+' @param CDBurning The file system directory that acts as a staging area for files waiting to be written to a CD.
+' @param CommonAdminTools The file system directory that contains administrative tools for all users of the computer.
 ' @param CommonApplicationData The directory that serves as a common repository for application-specific data that is used by all users.
-' @param CommonProgramFiles The directory for components that are shared across applications.
+' @param CommonDesktopDirectory The file system directory that contains files and folders that appear on the desktop for all users. This special folder is valid only for Windows NT systems.
+' @param CommonDocuments The file system directory that contains documents that are common to all users. This special folder is valid for Windows NT systems, Windows 95, and Windows 98 systems with Shfolder.dll installed.
+' @param CommonMusic The file system directory that serves as a repository for music files common to all users.
+' @param CommonOemLinks This value is recognized in Windows Vista for backward compatibility, but the special folder itself is no longer used.
+' @param CommonPictures The file system directory that serves as a repository for image files common to all users.
+' @param CommonPrograms A folder for components that are shared across applications. This special folder is valid only for Windows NT, Windows 2000, and Windows XP systems.
+' @param CommonProgramFiles The directory for components that are shared across applications. To get the x86 common program files directory on a non-x86 system, use the ProgramFilesX86 member.
+' @param CommonProgramFilesX86 The <b>Program Files</b> folder.
+' @param CommonStartMenu The file system directory that contains the programs and folders that appear on the Start menu for all users. This special folder is valid only for Windows NT systems.
+' @param CommonStartup The file system directory that contains the programs that appear in the Startup folder for all users. This special folder is valid only for Windows NT systems.
+' @param CommonTemplates The file system directory that contains the templates that are available to all users. This special folder is valid only for Windows NT systems.
+' @param CommonVideos The file system directory that serves as a repository for video files common to all users.
 ' @param Cookies The directory that serves as a common repository for Internet cookies.
 ' @param Desktop The logical Desktop rather than the physical file system location.
 ' @param DesktopDirectory The directory used to physically store file objects on the desktop.
 ' Do not confuse this directory with the desktop folder itself, which is a virtual folder.
 ' @param Favorites The directory that serves as a common repository for the user's favorite items.
+' @param Fonts A virtual folder that contains fonts.
 ' @param History The directory that serves as a common repository for Internet history items.
 ' @param InternetCache The directory that serves as a common repository for temporary Internet files.
 ' @param LocalApplicationData The directory that serves as a common repository for application-specific data that is used by the current, non-roaming user.
-' @param MyComputer The "My Computer" folder.
-' @param MyMusic The "My Music" folder.
-' @param MyPictures The "My Pictures" folder.
+' @param LocalizedResources The file system directory that contains localized resource data.
+' @param MyComputer The <b>My Computer</b> folder.
+' @param MyDocuments The <b>My Documents</b> folder. This member is equivalent to <b>Personal</b>.
+' @param MyMusic The <b>My Music</b> folder.
+' @param MyPictures The <b>My Pictures</b> folder.
+' @param MyVideos The file system directory that serves as a repository for videos that belong to a user.
+' @param NetworkShortcuts A file system directory that contains the link objects that may exist in the <b>My Network Places</b> virtual folder.
 ' @param Personal The directory that serves as a common repository for documents (My Documents).
+' @param PrinterShortcuts The file system directory that contains the link objects that can exist in the Printers virtual folder.
 ' @param ProgramFiles The program files folder.
+' @param ProgramFilexX86 The <b>Program Files</b> folder. On an x86 system, passing the <b>ProgramFilesX86</b> member to the <a href="Environment.GetFolderPath.html">Environment.GetFolderPath</b> method returns an empty string; use the <b>ProgramFiles</b> member instead. You can determine whether Windows is a 32-bit operating system by calling the Environment.Is64BitOperatingSystem property.
 ' @param Programs The directory that contains the user's program groups.
 ' @param Recent The directory that contains the user's most recently used documents.
+' @param Resources The file system directory that contains resource data.
 ' @param SendTo The directory that contains the Send To menu items.
 ' @param StartMenu The directory that contains the Start menu items.
 ' @param Startup The directory that corresponds to the user's Startup program group.
 ' The system starts these programs whenever a user logs on or starts Windows NT or later, or starts Windows 98.
 ' @param SystemDir The system directory.
+' @param SystemX86 The Windows <b>System</b> folder.
 ' @param Templates The directory that serves as a common repository for document templates.
+' @param UserProfile The user's profile folder. Applications should not create files or folders at this level; they should put their data under the locations referred to by <b>ApplicationData</b>.
 ' @param Windows The windows directory.
 '
 Public Enum SpecialFolder
-   ApplicationData = &H1A
-   CommonApplicationData = &H23
-   CommonProgramFiles = &H2B
-   Cookies = &H21
-   Desktop = &H0
-   DesktopDirectory = &H10
-   Favorites = &H6
-   History = &H22
-   InternetCache = &H20
-   LocalApplicationData = &H1C
-   MyComputer = &H11
-   MyMusic = &HD
-   MyPictures = &H27
-   Personal = &H5
-   ProgramFiles = &H26
-   Programs = &H2
-   Recent = &H8
-   SendTo = &H9
-   StartMenu = &HB
-   Startup = &H7
-   SystemDir = &H25
-   Templates = &H15
-   Windows = &H24
+    AdminTools = Win32Native.CSIDL_ADMINTOOLS
+    ApplicationData = Win32Native.CSIDL_APPDATA
+    CDBurning = Win32Native.CSIDL_CDBURN_AREA
+    CommonAdminTools = Win32Native.CSIDL_COMMON_ADMINTOOLS
+    CommonApplicationData = Win32Native.CSIDL_COMMON_APPDATA
+    CommonDesktopDirectory = Win32Native.CSIDL_COMMON_DESKTOPDIRECTORY
+    CommonDocuments = Win32Native.CSIDL_COMMON_DOCUMENTS
+    CommonMusic = Win32Native.CSIDL_COMMON_MUSIC
+    CommonOemLinks = Win32Native.CSIDL_COMMON_OEM_LINKS
+    CommonPictures = Win32Native.CSIDL_COMMON_PICTURES
+    CommonPrograms = Win32Native.CSIDL_COMMON_PROGRAMS
+    CommonProgramFiles = Win32Native.CSIDL_PROGRAM_FILES_COMMON
+    CommonProgramFilesX86 = Win32Native.CSIDL_PROGRAM_FILES_COMMONX86
+    CommonStartMenu = Win32Native.CSIDL_COMMON_STARTMENU
+    CommonStartup = Win32Native.CSIDL_COMMON_STARTUP
+    CommonTemplates = Win32Native.CSIDL_COMMON_TEMPLATES
+    CommonVideos = Win32Native.CSIDL_COMMON_VIDEO
+    Cookies = Win32Native.CSIDL_COOKIES
+    Desktop = Win32Native.CSIDL_DESKTOP
+    DesktopDirectory = Win32Native.CSIDL_DESKTOPDIRECTORY
+    Fonts = Win32Native.CSIDL_FONTS
+    Favorites = Win32Native.CSIDL_FAVORITES
+    History = Win32Native.CSIDL_HISTORY
+    InternetCache = Win32Native.CSIDL_INTERNET_CACHE
+    LocalApplicationData = Win32Native.CSIDL_LOCAL_APPDATA
+    LocalizedResources = Win32Native.CSIDL_RESOURCES_LOCALIZED
+    MyComputer = Win32Native.CSIDL_DRIVES
+    MyDocuments = Win32Native.CSIDL_PERSONAL
+    MyMusic = Win32Native.CSIDL_MYMUSIC
+    MyPictures = Win32Native.CSIDL_MYPICTURES
+    MyVideos = Win32Native.CSIDL_MYVIDEO
+    NetworkShortcuts = Win32Native.CSIDL_NETHOOD
+    Personal = Win32Native.CSIDL_PERSONAL
+    PrinterShortcuts = Win32Native.CSIDL_PRINTHOOD
+    ProgramFiles = Win32Native.CSIDL_PROGRAM_FILES
+    ProgramFilesX86 = Win32Native.CSIDL_PROGRAM_FILESX86
+    Programs = Win32Native.CSIDL_PROGRAMS
+    Recent = Win32Native.CSIDL_RECENT
+    Resources = Win32Native.CSIDL_RESOURCES
+    SendTo = Win32Native.CSIDL_SENDTO
+    StartMenu = Win32Native.CSIDL_STARTMENU
+    Startup = Win32Native.CSIDL_STARTUP
+    SystemDir = Win32Native.CSIDL_SYSTEM
+    SystemX86 = Win32Native.CSIDL_SYSTEMX86
+    Templates = Win32Native.CSIDL_TEMPLATES
+    UserProfile = Win32Native.CSIDL_PROFILE
+    Windows = Win32Native.CSIDL_WINDOWS
 End Enum
 
 ''
@@ -134,10 +183,22 @@ Public Enum EnvironmentVariableTarget
     User = 2
 End Enum
 
+Private mOSVersion As OperatingSystem
 
-Private mOSVersion  As New OperatingSystem
 
-
+''
+' Determines whether the current operating system is a 64-bit operating system.
+'
+' @return <b>True</b> if the operating system is 64-bit; otherwise, <b>False</b>.
+Public Property Get Is64BitOperatingSystem() As Boolean
+    Dim Result As Long
+    
+    If IsWow64Process(GetCurrentProcess, Result) = BOOL_FALSE Then
+        Error.Win32Error Err.LastDllError
+    End If
+    
+    Is64BitOperatingSystem = CBool(Result)
+End Property
 
 ''
 ' Returns the command specified when executing the current application,
@@ -163,8 +224,8 @@ End Property
 '
 ' @param RHS The new directory to change to.
 '
-Public Property Let CurrentDirectory(ByVal RHS As String)
-    Call Directory.SetCurrentDirectory(RHS)
+Public Property Let CurrentDirectory(ByVal Value As String)
+    Directory.SetCurrentDirectory Value
 End Property
 
 ''
@@ -173,15 +234,16 @@ End Property
 ' @return The name of the local computer.
 '
 Public Property Get MachineName() As String
-    Dim Size As Long
+    Dim Size    As Long
+    Dim Buffer  As String
+    
     Size = MAX_COMPUTERNAME_LENGTH + 1
+    Buffer = String$(Size, 0)
     
-    Dim Ret As String
-    Ret = String$(Size, 0)
-    If Api.GetComputerName(Ret, Size) = BOOL_FALSE Then _
+    If GetComputerNameW(Buffer, Size) = BOOL_FALSE Then _
         Throw Cor.NewInvalidOperationException(GetMessage(Err.LastDllError))
-    
-    MachineName = Left$(Ret, Size)
+        
+    MachineName = Left$(Buffer, Size)
 End Property
 
 ''
@@ -200,6 +262,31 @@ End Property
 ' @return The OperatingSystem object that represents the current OS.
 '
 Public Property Get OSVersion() As OperatingSystem
+    Dim Info        As OSVERSIONINFOW
+    Dim InfoEx      As OSVERSIONINFOEXW
+    Dim ServicePack As String
+    Dim Version     As Version
+
+    If mOSVersion Is Nothing Then
+        Info.dwOSVersionInfoSize = Len(Info)
+        
+        If GetVersionExW(Info) = BOOL_FALSE Then _
+            Error.InvalidOperation InvalidOperation_GetVersion
+        
+        ' We are on an NT platform so we can get extra information
+        If Info.dwPlatformId = PlatformID.Win32NT Then
+            InfoEx.dwOSVersionInfoSize = Len(InfoEx)
+            
+            If GetVersionExW(InfoEx) = BOOL_FALSE Then _
+                Error.InvalidOperation InvalidOperation_GetVersion
+            
+            ServicePack = SysAllocString(VarPtr(InfoEx.szCSDVersion(0)))
+        End If
+        
+        Set Version = Cor.NewVersion(Info.dwMajorVersion, Info.dwMinorVersion, Info.dwBuildNumber, Helper.ShiftLeft(InfoEx.wServicePackMajor, 16) Or InfoEx.wServicePackMinor)
+        Set mOSVersion = Cor.NewOperatingSystem(Info.dwPlatformId, Version, ServicePack)
+    End If
+    
     Set OSVersion = mOSVersion
 End Property
 
@@ -210,12 +297,15 @@ End Property
 ' @remarks Generally this will be C:\Windows\System32 or C:\Winnt\System32 for NT4 system.
 '
 Public Property Get SystemDirectory() As String
-    Dim Ret As String
-    Ret = String$(MAX_PATH + 1, 0)
-    
+    Dim Path As String
     Dim Size As Long
-    Size = Api.GetSystemDirectory(Ret, Len(Ret))
-    If Size > 0 Then SystemDirectory = Left$(Ret, Size)
+    
+    Path = String$(MAX_PATH + 1, 0)
+    Size = GetSystemDirectoryW(Path, Len(Path))
+    
+    If Size > 0 Then
+        SystemDirectory = Left$(Path, Size)
+    End If
 End Property
 
 ''
@@ -240,7 +330,6 @@ End Property
 ' and will throw a <b>PlatformNotSupportedException</b> exception.
 '
 Public Property Get UserDomainName() As String
-    Const NameSamCompatible As Long = 2
     Dim Size        As Long
     Dim DomainName  As String
     Dim Sid         As String
@@ -249,7 +338,7 @@ Public Property Get UserDomainName() As String
     Size = 1024
     DomainName = String$(Size, 0)
     
-    If Win32Native.GetUserNameEx(NameSamCompatible, DomainName, Size) <> BOOL_FALSE Then
+    If GetUserNameExW(NameSamCompatible, DomainName, Size) Then
         Dim i As Long
         i = InStr(DomainName, "\")
 
@@ -262,7 +351,7 @@ Public Property Get UserDomainName() As String
     Size = 1024
     Sid = String$(Size, 0)
     
-    If Win32Native.LookupAccountName(vbNullString, UserName, Sid, Size, DomainName, Size, 0) = BOOL_FALSE Then
+    If LookupAccountNameW(vbNullString, UserName, Sid, Size, DomainName, Size, 0) = BOOL_FALSE Then
         IOError.WinIOError Err.LastDllError
     End If
     
@@ -282,7 +371,8 @@ Public Property Get UserInteractive() As Boolean
     
     If OSVersion.Platform = Win32NT Then
         hObj = GetProcessWindowStation
-        If Win32Native.GetUserObjectInformation(hObj, UOI_FLAGS, VarPtr(Info), LenB(Info), 0&) Then
+        
+        If GetUserObjectInformationW(hObj, UOI_FLAGS, VarPtr(Info), LenB(Info), 0&) Then
             UserInteractive = (Info.dwFlags And WSF_VISIBLE)
         End If
     Else
@@ -296,12 +386,15 @@ End Property
 ' @return The currently logged in user's name.
 '
 Public Property Get UserName() As String
+    Dim Name As String
     Dim Size As Long
-    Size = UNLEN + 1
     
-    Dim Ret As String
-    Ret = String$(Size, 0)
-    If GetUserNameA(Ret, Size) <> BOOL_FALSE Then UserName = Left$(Ret, Size - 1)
+    Size = UNLEN + 1
+    Name = String$(Size, 0)
+    
+    If GetUserNameW(Name, Size) Then
+        UserName = Left$(Name, Size - 1)
+    End If
 End Property
 
 ''
@@ -315,6 +408,7 @@ Public Property Get WorkingSet() As Currency
     Dim Counters As PROCESS_MEMORY_COUNTERS
     
     Counters.cb = LenB(Counters)
+    
     If GetProcessMemoryInfo(GetCurrentProcess, Counters, Counters.cb) Then
         WorkingSet = Counters.WorkingSetSize
     End If
@@ -328,23 +422,24 @@ End Property
 ' @remarks The environment variables are tagged using %.
 ' A string such as 'My OS is %OS%.' would become 'My OS is Windows_NT.' for NT machines.
 '
-Public Function ExpandEnvironmentVariables(ByVal Name As String) As String
+Public Function ExpandEnvironmentVariables(ByRef Name As String) As String
     Const DEF_SIZE As Long = 1024
+    Dim Buffer  As String
+    Dim Size    As Long
     
-    If Len(Name) = 0 Then Exit Function
-    
-    Dim Buf As String
-    Buf = SysAllocStringLen(0, DEF_SIZE)
-    
-    Dim Size As Long
-    Size = Api.ExpandEnvironmentStrings(Name, Buf, DEF_SIZE)
-    
-    If Size > DEF_SIZE Then
-        Buf = SysAllocStringLen(0, Size)
-        Size = Api.ExpandEnvironmentStrings(Name, Buf, Size)
+    If Len(Name) = 0 Then
+        Exit Function
     End If
     
-    ExpandEnvironmentVariables = Left$(Buf, Size - 1)
+    Buffer = String$(DEF_SIZE, 0)
+    Size = ExpandEnvironmentStringsW(Name, Buffer, DEF_SIZE)
+    
+    If Size > DEF_SIZE Then
+        Buffer = SysAllocStringLen(0, Size)
+        Size = ExpandEnvironmentStringsW(Name, Buffer, Size)
+    End If
+    
+    ExpandEnvironmentVariables = Left$(Buffer, Size - 1)
 End Function
 
 ''
@@ -365,28 +460,27 @@ End Function
 ' @param Line The string to parse the arguments from.
 ' @return An array of arguments.
 '
-Public Function ParseCommandLineArgs(ByVal Line As String) As String()
-    Line = Trim$(Line)
-    Dim Length As Long
-    Length = Len(Line)
-    
-    If Length = 0 Then
-        ParseCommandLineArgs = Cor.NewStrings
-        Exit Function
-    End If
-    
-    Dim Arguments As New ArrayList
-    
-    Dim Chars() As Integer
-    Chars = CorString.ToCharArray(Line)
-    
+Public Function ParseCommandLineArgs(ByRef Line As String) As String()
+    Dim Length      As Long
+    Dim Arguments   As New ArrayList
+    Dim Chars()     As Integer
     Dim ArgBuffer() As Integer
-    ReDim ArgBuffer(0 To Length - 1)
-    
     Dim ArgIndex    As Long
     Dim Escaped     As Boolean
     Dim Quoted      As Boolean
     Dim Index       As Long
+
+    Line = Trim$(Line)
+    Length = Len(Line)
+
+    If Length = 0 Then
+        ParseCommandLineArgs = Cor.NewStrings
+        Exit Function
+    End If
+
+    Chars = CorString.ToCharArray(Line)
+    ReDim ArgBuffer(0 To Length - 1)
+
     Do While Index < Length
         Select Case Chars(Index)
             Case vbBackslashChar
@@ -403,7 +497,7 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     ' We only support escaping double quotes.
                     Escaped = True
                 End If
-            
+
             Case vbQuoteChar
                 If Escaped Then
                     ' We are escaping a quote, so it is to
@@ -412,17 +506,17 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     ArgBuffer(ArgIndex) = vbQuoteChar
                     ArgIndex = ArgIndex + 1
                     Escaped = False
-                    
+
                     ' We don't end a quoted argument with
                     ' an escaped quote, so let the Quoted
                     ' flag remain as is.
-                    
+
                 ElseIf Quoted Then
                     ' We are already in quotes, and so we need
                     ' to determine if we have two quotes in a row.
                     ' If so, then one double quote will be added
                     ' to the argument as if it were escaped.
-                    
+
                     ' Do we have enough character left?
                     If Index + 1 < Length Then
                         ' We have enough, so check for 2nd quote.
@@ -432,30 +526,29 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                             ArgIndex = ArgIndex + 1
                         End If
                     End If
-                    
+
                     Quoted = False
                 Else
                     ' We are starting a quoted section
                     Quoted = True
                 End If
-                
+
             Case vbSpaceChar
                 If Escaped Then
                     ArgBuffer(ArgIndex) = vbBackslashChar
                     ArgIndex = ArgIndex + 1
                     Escaped = False
                 End If
-                
+
                 If Quoted Then
                     ' Being quoted, so include spaces in the argument.
                     ArgBuffer(ArgIndex) = vbSpaceChar
                     ArgIndex = ArgIndex + 1
                 Else
-                    ' Done with the argument, so add it to the list.
-                    Call Arguments.Add(SysAllocStringLen(VarPtr(ArgBuffer(0)), ArgIndex))
+                    Arguments.Add CorString.FromCharArray(ArgBuffer, 0, ArgIndex)
                     ArgIndex = 0
                 End If
-                
+
             Case Else
                 ' If we were escaped, but didn't make use of it
                 ' then we need to include that backslash in the ouput.
@@ -464,14 +557,14 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
                     ArgIndex = ArgIndex + 1
                     Escaped = False
                 End If
-                
+
                 ArgBuffer(ArgIndex) = Chars(Index)
                 ArgIndex = ArgIndex + 1
         End Select
-        
+
         Index = Index + 1
     Loop
-    
+
     ' If a backslash was the last character in the line, then
     ' it was escaped, but now we need to include it since there
     ' are no more characters.
@@ -479,9 +572,11 @@ Public Function ParseCommandLineArgs(ByVal Line As String) As String()
         ArgBuffer(ArgIndex) = vbBackslashChar
         ArgIndex = ArgIndex + 1
     End If
-                
-    If ArgIndex > 0 Then Call Arguments.Add(SysAllocStringLen(VarPtr(ArgBuffer(0)), ArgIndex))
-    
+
+    If ArgIndex > 0 Then
+        Arguments.Add CorString.FromCharArray(ArgBuffer, 0, ArgIndex)
+    End If
+
     ParseCommandLineArgs = Arguments.ToArray(vbString)
 End Function
 
@@ -495,41 +590,48 @@ End Function
 ' <p>A Target of Process will retrieve the variable from the current process. Other
 ' targets will retrieve the variable value from the registry.</p>
 '
-Public Function GetEnvironmentVariable(ByVal Name As String, Optional ByVal Target As EnvironmentVariableTarget = EnvironmentVariableTarget.Process) As String
-    Dim rk As RegistryKey
+Public Function GetEnvironmentVariable(ByRef Name As String, Optional ByVal Target As EnvironmentVariableTarget = EnvironmentVariableTarget.Process) As String
+    Dim Key     As RegistryKey
+    Dim Size    As Long
+    Dim Buf     As String
+    Dim Result  As Long
     
     Select Case Target
         Case EnvironmentVariableTarget.Process
             ' use the GetEnvironmentVariable api to allow for realtime
             ' updating of the environment variables for the current
             ' process. VB's Environ does not reflect variable changes.
-            Dim Size As Long
             Size = 128
             Do
-                Dim Buf As String
                 Buf = String$(Size, 0)
-                Size = Api.GetEnvironmentVariable(Name, Buf, Len(Buf))
+                Size = GetEnvironmentVariableW(Name, Buf, Size)
+                
                 If Size = 0 Then
-                    Dim Result As Long
                     Result = Err.LastDllError
-                    If Result = ERROR_ENVVAR_NOT_FOUND Or (Result = 0) Then Exit Function
+                    
+                    If Result = ERROR_ENVVAR_NOT_FOUND Or Result = 0 Then
+                        Exit Function
+                    End If
+                    
                     Error.Win32Error Result
                 End If
             Loop While Size > Len(Buf)
+            
             GetEnvironmentVariable = Left$(Buf, Size)
-            
         Case EnvironmentVariableTarget.Machine
-            Call VerifyNTMachine
-            Set rk = Registry.LocalMachine.OpenSubKey("system\currentcontrolset\control\session manager\environment")
-            GetEnvironmentVariable = rk.GetValue(Name, vbNullString)
-            
+            Set Key = Registry.LocalMachine.OpenSubKey("System\CurrentControlSet\Control\Session Manager\Environment")
+
+            If Not Key Is Nothing Then
+                GetEnvironmentVariable = Key.GetValue(Name, vbNullString)
+            End If
         Case EnvironmentVariableTarget.User
-            Call VerifyNTMachine
-            Set rk = Registry.CurrentUser.OpenSubKey("environment")
-            GetEnvironmentVariable = rk.GetValue(Name, vbNullString)
+            Set Key = Registry.CurrentUser.OpenSubKey("Environment")
             
+            If Not Key Is Nothing Then
+                GetEnvironmentVariable = Key.GetValue(Name, vbNullString)
+            End If
         Case Else
-            Throw Cor.NewArgumentException("Invalid Target value.", "Target")
+            Error.ArgumentOutOfRange "Target", ArgumentOutOfRange_Enum
     End Select
 End Function
 
@@ -550,13 +652,17 @@ Public Function GetEnvironmentVariables(Optional ByVal Target As EnvironmentVari
         ' use the GetEnvironmentStrings api to allow for realtime
         ' updating of the environment variables for the current
         ' process. VB's Environ does not reflect variable changes.
-        Set Ret = InternalGetEnvironmentVariables
+        Set Ret = GetEnvironmentVariablesForProcess
     Else
-        Call VerifyNTMachine
+        VerifyNTMachine
+        
         Select Case Target
-            Case EnvironmentVariableTarget.Machine: Set rk = Registry.LocalMachine.OpenSubKey("system\currentcontrolset\control\session manager\environment")
-            Case EnvironmentVariableTarget.User:    Set rk = Registry.CurrentUser.OpenSubKey("environment")
-            Case Else: Throw Cor.NewArgumentException("Invalid Target value.", "Target")
+            Case EnvironmentVariableTarget.Machine
+                Set rk = Registry.LocalMachine.OpenSubKey("system\currentcontrolset\control\session manager\environment")
+            Case EnvironmentVariableTarget.User
+                Set rk = Registry.CurrentUser.OpenSubKey("environment")
+            Case Else
+                Throw Cor.NewArgumentException("Invalid Target value.", "Target")
         End Select
         
         Dim Names() As String
@@ -564,7 +670,12 @@ Public Function GetEnvironmentVariables(Optional ByVal Target As EnvironmentVari
         
         Dim i As Long
         For i = 0 To UBound(Names)
-            Call Ret.Add(Names(i), rk.GetValue(Names(i)))
+            Dim Key     As String
+            Dim Value   As String
+            
+            Key = Names(i)
+            Value = rk.GetValue(Key)
+            Ret.Add Key, Value
         Next i
     End If
     
@@ -581,7 +692,7 @@ Public Function GetFolderPath(ByVal Folder As SpecialFolder) As String
     Dim Buf As String
     
     Buf = String$(MAX_PATH, 0)
-    Call SHGetFolderPath(0, Folder, 0, 0, Buf)
+    SHGetFolderPath 0, Folder, 0, 0, Buf
     GetFolderPath = SysAllocString(StrPtr(Buf))
 End Function
 
@@ -605,9 +716,9 @@ End Function
 ' region will set the values in the registry.
 ' <p>by setting the value to an empty string, the variable will be deleted.</p>
 '
-Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal Value As String, Optional ByVal Target As EnvironmentVariableTarget = Process)
+Public Sub SetEnvironmentVariable(ByRef Variable As String, ByRef Value As String, Optional ByVal Target As EnvironmentVariableTarget = Process)
     If Len(Variable) = 0 Then _
-        Throw Cor.NewArgumentException("Variable name cannot be an empty string.", "Variable")
+        Error.Argument Argument_StringZeroLength, "Variable"
     If InStr(Variable, "=") > 0 Then _
         Throw Cor.NewArgumentException("Variable name cannot contain an equal '=' sign.", "Variable")
     If Len(Variable) > 255 Then _
@@ -617,13 +728,12 @@ Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal Value As Strin
     
     Select Case Target
         Case EnvironmentVariableTarget.Process
-            If Api.SetEnvironmentVariable(Variable, Value) = BOOL_FALSE Then _
+            If SetEnvironmentVariableW(Variable, Value) = BOOL_FALSE Then _
                 Throw Cor.NewArgumentException(GetMessage(Err.LastDllError), "Value")
                 
         Case EnvironmentVariableTarget.Machine, EnvironmentVariableTarget.User
-            Call VerifyNTMachine
-            
             Dim rk As RegistryKey
+            
             If Target = EnvironmentVariableTarget.Machine Then
                 Set rk = Registry.LocalMachine.OpenSubKey("system\currentcontrolset\control\session manager\environment", True)
             Else
@@ -631,13 +741,12 @@ Public Sub SetEnvironmentVariable(ByVal Variable As String, ByVal Value As Strin
             End If
             
             If Len(Value) > 0 Then
-                Call rk.SetValue(Variable, Value)
+                rk.SetValue Variable, Value
             Else
-                Call rk.DeleteValue(Variable, False)
+                rk.DeleteValue Variable, False
             End If
             
-            Call SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, StrPtr("Environment"), SMTO_NORMAL, 1000, 0)
-            
+            SendMessageTimeout HWND_BROADCAST, WM_SETTINGCHANGE, 0, StrPtr("Environment"), SMTO_NORMAL, 1000, 0
         Case Else
             Throw Cor.NewArgumentException("Invalid target specified.", "Target")
     End Select
@@ -651,7 +760,7 @@ End Sub
 Public Property Get ProcessorCount() As Long
     Dim Info As SYSTEM_INFO
     
-    Call GetSystemInfo(Info)
+    GetSystemInfo Info
     ProcessorCount = Info.dwNumberOfProcessors
 End Property
 
@@ -679,7 +788,7 @@ Friend Sub VerifyNTMachine()
 End Sub
 
 Friend Function IsNT() As Boolean
-    IsNT = (mOSVersion.Platform = Win32NT)
+    IsNT = (OSVersion.Platform = Win32NT)
 End Function
 
 
@@ -690,22 +799,36 @@ End Function
 ' we need to use the GetEnvironmentStrings API method instead of
 ' iterating through the variables using Environ because Environ
 ' does not reflect changes to the variables after the application starts.
-Private Function InternalGetEnvironmentVariables() As IDictionary
-    Dim Strings() As String
-    Strings() = Split(Api.GetEnvironmentStrings, vbNullChar)
+Private Function GetEnvironmentVariablesForProcess() As Hashtable
+    Dim Variables               As New Hashtable
+    Dim EnvironmentStringsPtr   As Long
+
+    EnvironmentStringsPtr = GetEnvironmentStringsW
     
-    Dim Ret As New Hashtable
-    Dim i   As Long
-    For i = 0 To UBound(Strings)
-        If Asc(Strings(i)) <> vbEqualChar Then
-            Dim Parts() As String
-            Parts = Split(Strings(i), "=")
-            
-            Call Ret.Add(Trim$(Parts(0)), Trim$(Parts(1)))
+    If EnvironmentStringsPtr = vbNullPtr Then _
+        Throw New OutOfMemoryException
+        
+    Dim s       As String
+    Dim Ptr     As Long
+    Dim Parts() As String
+    
+    Ptr = EnvironmentStringsPtr
+    
+    Do
+        s = SysAllocString(Ptr)
+
+        If Len(s) = 0 Then
+            Exit Do
+        ElseIf AscW(s) <> vbEqualChar Then
+            Parts = Split(s, "=", 2)
+            Variables.Add Parts(0), Parts(1)
         End If
-    Next i
     
-    Set InternalGetEnvironmentVariables = Ret
+        Ptr = Ptr + LenB(s) + vbSizeOfChar
+    Loop
+
+    FreeEnvironmentStringsW EnvironmentStringsPtr
+    Set GetEnvironmentVariablesForProcess = Variables
 End Function
 
 

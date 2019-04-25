@@ -110,7 +110,43 @@ Public Sub Reset_WhenCalled_RestartsEnumeration()
     Assert.That Actual.Value, Iz.EqualTo(1)
 End Sub
 
+Public Sub ForEach_WhenCalled_EnumeratesHashtable()
+    Dim Table As New Hashtable
+    Dim Keys As New Collection
+    Dim Values As New Collection
+    Dim Entry As DictionaryEntry
+    
+    Table.Add "a", 1
+    
+    For Each Entry In Table
+        Keys.Add Entry.Key
+        Values.Add Entry.Value
+    Next
+    
+    Assert.That Keys, Iz.EquivalentTo(Array("a"))
+    Assert.That Values, Iz.EquivalentTo(Array(1))
+End Sub
 
+Public Sub ForEach_WhenCalledAsDictionary_EnumeratesDictionary()
+    Dim Table As New Hashtable
+    Dim Keys As New Collection
+    Dim Values As New Collection
+    Dim Entry As DictionaryEntry
+    
+    Table.Add "a", 1
+    
+    For Each Entry In AsDictionary(Table)
+        Keys.Add Entry.Key
+        Values.Add Entry.Value
+    Next
+    
+    Assert.That Keys, Iz.EquivalentTo(Array("a"))
+    Assert.That Values, Iz.EquivalentTo(Array(1))
+End Sub
+
+Private Function AsDictionary(ByVal Table As Hashtable) As IDictionary
+    Set AsDictionary = Table
+End Function
 
 Private Function MakeEnumerator() As IEnumerator
     Dim Table As New Hashtable
