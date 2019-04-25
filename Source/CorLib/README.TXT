@@ -87,6 +87,7 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed BitMapResourceEncoder Encode. Was crashing because of an inproper pointer being passed to an API.
 	* Fixed Object.GetHashCode. Would crash with vbNullString.
 	* Added new SpecialFolder enums defined in .NET 4.
+	* Added Environment.Is64BitOperatingSystem method.
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
