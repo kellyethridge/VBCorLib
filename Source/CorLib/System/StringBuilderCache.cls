@@ -36,20 +36,28 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Private mCache As New Stack
-
+Private mCache      As Stack
+Private mFastlane   As StringBuilder
 
 Private Sub Class_Initialize()
-    mCache.Push New StringBuilder
-    mCache.Push New StringBuilder
+    Set mCache = New Stack
+    Set mFastlane = New StringBuilder
 End Sub
 
-Friend Function Acquire() As StringBuilder
-    If mCache.Count = 0 Then
-        Set Acquire = New StringBuilder
+Friend Function Acquire(Optional ByVal Capacity As Long = 128) As StringBuilder
+    If Not mFastlane Is Nothing Then
+        Set Acquire = mFastlane
+        Set mFastlane = Nothing
+    ElseIf mCache.Count = 0 Then
+        Set Acquire = Cor.NewStringBuilder(Capacity:=Capacity)
     Else
         Set Acquire = mCache.Pop
-        Acquire.Length = 0
+    End If
+
+    Acquire.Length = 0
+    
+    If Capacity > Acquire.Capacity Then
+        Acquire.Capacity = Capacity
     End If
 End Function
 
@@ -66,7 +74,11 @@ End Function
 Friend Sub Release(ByVal Builder As StringBuilder)
     Debug.Assert Not Builder Is Nothing
     
-    mCache.Push Builder
+    If mFastlane Is Nothing Then
+        Set mFastlane = Builder
+    Else
+        mCache.Push Builder
+    End If
 End Sub
 
 

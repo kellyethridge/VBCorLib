@@ -642,7 +642,7 @@ End Function
 ' Count will override this value.
 ' @return A new StringBuilder with s already placed in the buffer.
 '
-Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Capacity As Long = 512) As StringBuilder
+Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Capacity As Long = 128) As StringBuilder
     Set NewStringBuilder = New StringBuilder
     NewStringBuilder.Init s, StartIndex, Count, Capacity
 End Function

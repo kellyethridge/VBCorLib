@@ -334,7 +334,6 @@ Public Property Get UserDomainName() As String
     Dim DomainName  As String
     Dim Sid         As String
     
-    VerifyNTMachine
     Size = 1024
     DomainName = String$(Size, 0)
     
@@ -654,8 +653,6 @@ Public Function GetEnvironmentVariables(Optional ByVal Target As EnvironmentVari
         ' process. VB's Environ does not reflect variable changes.
         Set Ret = GetEnvironmentVariablesForProcess
     Else
-        VerifyNTMachine
-        
         Select Case Target
             Case EnvironmentVariableTarget.Machine
                 Set rk = Registry.LocalMachine.OpenSubKey("system\currentcontrolset\control\session manager\environment")
