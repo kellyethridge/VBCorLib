@@ -45,12 +45,11 @@ Option Explicit
 Implements IObject
 Implements TextWriter
 
-Private mSB         As New StringBuilder
+Private mOutput     As New StringBuilder
 Private mProvider   As IFormatProvider
 Private mEncoding   As New UnicodeEncoding
 Private mNewLine    As String
 Private mIsClosed   As Boolean
-
 
 
 ''
@@ -119,7 +118,7 @@ End Sub
 ' @return The StringBuilder being used to write to the string.
 '
 Public Function GetStringBuilder() As StringBuilder
-    Set GetStringBuilder = mSB
+    Set GetStringBuilder = mOutput
 End Function
 
 ''
@@ -149,7 +148,7 @@ End Sub
 '
 Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     ValidateArrayRange Chars, Index, Count, NameOfChars
-    mSB.Append Chars, Index, Count
+    mOutput.Append Chars, Index, Count
 End Sub
 
 ''
@@ -178,7 +177,7 @@ End Sub
 '
 Public Sub WriteLineChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     WriteChars Chars, Index, Count
-    mSB.AppendString mNewLine
+    mOutput.AppendString mNewLine
 End Sub
 
 ''
@@ -186,7 +185,7 @@ End Sub
 '
 ' @return String representing this instance.
 Public Function ToString() As String
-    ToString = mSB.ToString
+    ToString = mOutput.ToString
 End Function
 
 ''
@@ -216,7 +215,7 @@ Private Sub Class_Initialize()
 End Sub
 
 Friend Sub Init(ByVal sb As StringBuilder, ByVal Provider As IFormatProvider)
-    Set mSB = sb
+    Set mOutput = sb
     Set mProvider = Provider
 End Sub
 
@@ -230,41 +229,43 @@ Private Sub VerifyIsOpen()
     End If
 End Sub
 
+Private Sub WriteLineCore(ByRef Args() As Variant)
+    Dim Length As Long
+    
+    VerifyIsOpen
+    
+    On Error GoTo Catch
+    Length = Len1D(Args)
+
+    If Length > 0 Then
+        Dim Shifted() As Variant
+        Shifted = ShiftArguments(Args)
+        WriteCore Args(LBound(Args)), Shifted
+    End If
+
+    mOutput.AppendString mNewLine
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeArguments Shifted
+    Return
+End Sub
+
 Private Sub WriteCore(ByRef Value As Variant, ByRef Args() As Variant)
     VerifyIsOpen
     
     Dim s As String
     s = Object.ToString(Value, Provider:=FormatProvider)
     
-    If SAPtr(Args) = vbNullPtr Then
-        mSB.AppendString s
-    ElseIf UBound(Args) < LBound(Args) Then
-        mSB.AppendString s
+    If Len1D(Args) = 0 Then
+        mOutput.AppendString s
     Else
-        mSB.InternalAppendFormat FormatProvider, s, Args
+        mOutput.InternalAppendFormat FormatProvider, s, Args
     End If
-End Sub
-
-Private Sub WriteLineCore(ByRef Args() As Variant)
-    VerifyIsOpen
-    
-    Dim ub  As Long
-    ub = UBound(Args)
-    
-    If ub >= 0 Then
-        Dim s As String
-        s = Object.ToString(Args(0), Provider:=FormatProvider)
-        
-        If ub > 0 Then
-            CopyMemory Args(0), Args(1), (ub - LBound(Args)) * vbSizeOfVariant
-            ZeroMemory Args(ub), vbSizeOfVariant
-            mSB.InternalAppendFormat FormatProvider, s, Args
-        Else
-            mSB.AppendString s
-        End If
-    End If
-    
-    mSB.AppendString mNewLine
 End Sub
 
 

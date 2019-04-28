@@ -272,6 +272,7 @@ Public Enum ResourceStringKey
     InvalidOperation_RegRemoveSubKey = 1110
     InvalidOperation_ResourceWriterSaved = 1111
     InvalidOperation_GetVersion = 1112
+    InvalidOperation_ConsoleReadKeyOnFile = 1113
     
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
@@ -381,8 +382,8 @@ Public Enum ParameterName
 End Enum
 
 Private Declare Function DeleteObject Lib "gdi32.dll" (ByVal hObject As Long) As Long
-Private Declare Function GetDC Lib "user32.dll" (ByVal hwnd As Long) As Long
-Private Declare Function ReleaseDC Lib "user32.dll" (ByVal hwnd As Long, ByVal hdc As Long) As Long
+Private Declare Function GetDC Lib "user32.dll" (ByVal Hwnd As Long) As Long
+Private Declare Function ReleaseDC Lib "user32.dll" (ByVal Hwnd As Long, ByVal hdc As Long) As Long
 Private Declare Function GetDIBits Lib "gdi32.dll" (ByVal aHDC As Long, ByVal hBitmap As Long, ByVal nStartScan As Long, ByVal nNumScans As Long, ByRef lpBits As Any, ByRef lpBI As BITMAPINFO, ByVal wUsage As Long) As Long
 
 Public Type BITMAPINFOHEADER

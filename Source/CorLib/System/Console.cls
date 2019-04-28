@@ -78,9 +78,7 @@ Private Declare Function GetConsoleScreenBufferInfo Lib "kernel32.dll" (ByVal hC
 Private Declare Function SetConsoleScreenBufferSize Lib "kernel32.dll" (ByVal hConsoleOutput As Long, ByRef dwSize As Any) As Long
 Private Declare Function CreateConsoleScreenBuffer Lib "kernel32.dll" (ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, ByRef lpSecurityAttributes As Any, ByVal dwFlags As Long, ByRef lpScreenBufferData As Any) As Long
 Private Declare Function SetConsoleActiveScreenBuffer Lib "kernel32.dll" (ByVal hConsoleOutput As Long) As Long
-Private Declare Function SetConsoleTitleA Lib "kernel32.dll" (ByVal lpConsoleTitle As String) As Long
 Private Declare Function SetConsoleTitleW Lib "kernel32.dll" (ByVal lpConsoleTitle As Long) As Long
-Private Declare Function GetConsoleTitleA Lib "kernel32.dll" (ByVal lpConsoleTitle As String, ByVal nSize As Long) As Long
 Private Declare Function GetConsoleTitleW Lib "kernel32.dll" (ByVal lpConsoleTitle As Long, ByVal nSize As Long) As Long
 Private Declare Function GetLargestConsoleWindowSize Lib "kernel32.dll" (ByVal hConsoleOutput As Long) As COORD
 Private Declare Function SetConsoleTextAttribute Lib "kernel32.dll" (ByVal hConsoleOutput As Long, ByVal wAttributes As Long) As Long
@@ -255,12 +253,12 @@ End Property
 ''
 ' Sets the break flag.
 '
-' @param RHS The break flag value.
+' @param Value The break flag value.
 ' @remarks Set Break to false once it has been handled so the
 ' next console break can set it to true and be detected.
 '
-Public Property Let Break(ByVal RHS As Boolean)
-    ConsoleCallbacks.Break = RHS
+Public Property Let Break(ByVal Value As Boolean)
+    ConsoleCallbacks.Break = Value
 End Property
 
 ''
@@ -270,12 +268,14 @@ End Property
 ' @remarks The default Error writer writes to the Console error output.
 '
 Public Property Get Error() As TextWriter
+    Dim Writer As StreamWriter
+    
     If mError Is Nothing Then
-        Dim Writer As StreamWriter
         Set Writer = Cor.NewStreamWriter(OpenStandardError, Encoding.GetEncoding(GetConsoleOutputCP))
         Writer.AutoFlush = True
         Set mError = Writer
     End If
+    
     Set Error = mError
 End Property
 
@@ -287,12 +287,14 @@ End Property
 ' on the screen. The output can be redirected to a new Stream using SetOut.
 '
 Public Property Get Out() As TextWriter
+    Dim Writer As StreamWriter
+    
     If mOutput Is Nothing Then
-        Dim Writer As StreamWriter
         Set Writer = Cor.NewStreamWriter(OpenStandardOutput, Encoding.GetEncoding(GetConsoleOutputCP))
         Writer.AutoFlush = True
         Set mOutput = Writer
     End If
+    
     Set Out = mOutput
 End Property
 
@@ -304,7 +306,10 @@ End Property
 ' be changed by using the SetIn function.
 '
 Public Property Get In_() As TextReader
-    If mInput Is Nothing Then Set mInput = Cor.NewStreamReader(OpenStandardInput, Encoding.GetEncoding(GetConsoleCP), False)
+    If mInput Is Nothing Then
+        Set mInput = Cor.NewStreamReader(OpenStandardInput, Encoding.GetEncoding(GetConsoleCP), False)
+    End If
+    
     Set In_ = mInput
 End Property
 
@@ -349,27 +354,37 @@ End Function
 ' <p>Keys that do not trigger this method to return are ALT, SHIFT, CONTROL, CAPS-LOCK, SCROLL-LOCK, and NUM-LOCK.</p>
 '
 Public Function ReadKey(Optional ByVal Intercept As Boolean = False) As ConsoleKeyInfo
-    If Not InternalReadKey(ReadKey) Then
+    If Not ReadKeyCore(ReadKey) Then
         Do
             Dim Result  As Long
             Dim NumRead As Long
-            Result = ReadConsoleInput(mInputHandle, mKeyPressHistory, 1, NumRead)
-            If Result = 0 Or NumRead = 0 Then _
-                Throw Cor.NewInvalidOperationException("Could not read from the console window.")
+            Dim ReRead  As Boolean
             
-            Dim ReRead As Boolean
+            Result = ReadConsoleInput(mInputHandle, mKeyPressHistory, 1, NumRead)
+            
+            If Result = 0 Or NumRead = 0 Then _
+                Statics.Error.InvalidOperation InvalidOperation_ConsoleReadKeyOnFile
+            
             ReRead = (mKeyPressHistory.EventType <> KEY_EVENT)
-            If Not ReRead Then ReRead = (mKeyPressHistory.KeyEvent.bKeyDown = BOOL_FALSE)
+            
+            If Not ReRead Then
+                ReRead = (mKeyPressHistory.KeyEvent.bKeyDown = BOOL_FALSE)
+            End If
+            
             If Not ReRead And (mKeyPressHistory.KeyEvent.uChar = 0) Then
                 Select Case mKeyPressHistory.KeyEvent.wVirtualKeyCode
-                    Case vbKeyShift, vbKeyMenu, vbKeyControl, vbKeyNumlock, vbKeyScrollLock, vbKeyCapital: ReRead = True
+                    Case vbKeyShift, vbKeyMenu, vbKeyControl, vbKeyNumlock, vbKeyScrollLock, vbKeyCapital
+                        ReRead = True
                 End Select
             End If
         Loop While ReRead
-        InternalReadKey ReadKey
+        
+        ReadKeyCore ReadKey
     End If
     
-    If Not Intercept Then Call WriteValue(ChrW$(mKeyPressHistory.KeyEvent.uChar))
+    If Not Intercept Then
+        WriteValue ChrW$(mKeyPressHistory.KeyEvent.uChar)
+    End If
 End Function
 
 ''
@@ -379,7 +394,7 @@ End Function
 '
 Public Sub SetOut(ByVal NewOut As TextWriter)
     If NewOut Is Nothing Then _
-        Throw Cor.NewArgumentNullException("NewOut", "Cannot set output to Nothing.")
+        Statics.Error.ArgumentNull "NewOut"
     
     Set mOutput = NewOut
     mOriginalOut = False
@@ -392,7 +407,7 @@ End Sub
 '
 Public Sub SetIn(ByVal NewIn As TextReader)
     If NewIn Is Nothing Then _
-        Throw Cor.NewArgumentNullException("NewIn", "Cannot set input to Nothing.")
+        Statics.Error.ArgumentNull "NewIn"
         
     Set mInput = NewIn
 End Sub
@@ -404,7 +419,7 @@ End Sub
 '
 Public Sub SetError(ByVal NewError As TextWriter)
     If NewError Is Nothing Then _
-        Throw Cor.NewArgumentNullException("NewError", "Cannot set error output to Nothing.")
+        Statics.Error.ArgumentNull "NewError"
         
     Set mError = NewError
     mOriginalError = False
@@ -452,8 +467,8 @@ End Function
 ' @include "..\DocIncludes\Console.WriteLine.html"
 Public Sub WriteLine(ParamArray Values() As Variant)
     Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(12))
-    Call InternalWriteLine(a)
+    Helper.Swap4 ByVal ArrPtr(a), ByVal Helper.DerefEBP(12)
+    WriteLineCore a
 End Sub
 
 ''
@@ -466,8 +481,8 @@ End Sub
 ' @include "..\DocIncludes\Console.WriteValue.html"
 Public Sub WriteValue(ByRef Value As Variant, ParamArray Args() As Variant)
     Dim a() As Variant
-    Call Helper.Swap4(ByVal ArrPtr(a), ByVal Helper.DerefEBP(16))
-    Call InternalWriteValue(Value, a)
+    Helper.Swap4 ByVal ArrPtr(a), ByVal Helper.DerefEBP(16)
+    WriteCore Value, a
 End Sub
 
 ''
@@ -484,9 +499,9 @@ Public Sub Beep(Optional ByVal Frequency As Long = 800, Optional ByVal Duration 
     If Frequency < MinFrequency Or Frequency > MaxFrequency Then _
         Throw Cor.NewArgumentOutOfRangeException("Frequency", Environment.GetResourceString(ArgumentOutOfRange_BeepFrequency, MinFrequency, MaxFrequency))
     If Duration < MinDuration Then _
-        Throw Cor.NewArgumentOutOfRangeException("Duration", Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
-    
-    If BeepAPI(Frequency, Duration) = BOOL_FALSE Then Throw Cor.NewSystemException(GetMessage(Err.LastDllError))
+        Statics.Error.ArgumentOutOfRange "Duration", ArgumentOutOfRange_NeedPosNum
+    If BeepAPI(Frequency, Duration) = BOOL_FALSE Then _
+        Throw Cor.NewSystemException(GetMessage(Err.LastDllError))
 End Sub
 
 ''
@@ -503,51 +518,55 @@ End Sub
 '
 Public Sub SetWindowSize(ByVal Width As Long, ByVal Height As Long)
     If Width <= 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Width", Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
+        Statics.Error.ArgumentOutOfRange "Width", ArgumentOutOfRange_NeedPosNum
     If Height <= 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Height", Environment.GetResourceString(ArgumentOutOfRange_NeedPosNum))
+        Statics.Error.ArgumentOutOfRange "Height", ArgumentOutOfRange_NeedPosNum
     
     With GetBufferInfo
         Dim ExpandBuffer    As Boolean
         Dim NewBufferSize   As COORD
         
         NewBufferSize = .dwSize
+        
         Select Case .srWindow.Left + Width
             Case Is > MaxWindowSize
-                Throw Cor.NewArgumentOutOfRangeException("Width", Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferSize))
-                
+                Statics.Error.ArgumentOutOfRange "Width", ArgumentOutOfRange_ConsoleBufferSize
             Case Is > .dwSize.x
                 NewBufferSize.x = .srWindow.Left + Width
                 ExpandBuffer = True
         End Select
+        
         Select Case .srWindow.Top + Height
             Case Is > MaxWindowSize
-                Throw Cor.NewArgumentOutOfRangeException("Height", Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferSize))
-                
+                Statics.Error.ArgumentOutOfRange "Height", ArgumentOutOfRange_ConsoleBufferSize
             Case Is > .dwSize.y
                 NewBufferSize.y = .srWindow.Top + Height
                 ExpandBuffer = True
         End Select
         
         If ExpandBuffer Then
-            If SetConsoleScreenBufferSize(mOutputHandle, ByVal AsLong(NewBufferSize)) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+            If SetConsoleScreenBufferSize(mOutputHandle, ByVal AsLong(NewBufferSize)) = BOOL_FALSE Then _
+                Statics.Error.Win32Error Err.LastDllError
         End If
         
         Dim NewWindowSize As SMALL_RECT
         NewWindowSize = .srWindow
         NewWindowSize.Right = .srWindow.Left + Width - 1
         NewWindowSize.Bottom = .srWindow.Top + Height - 1
+        
         If SetConsoleWindowInfo(mOutputHandle, True, NewWindowSize) = BOOL_FALSE Then
             Dim e As Long
             e = Err.LastDllError
             
             If ExpandBuffer Then
                 ' restore buffer to original size
-                If SetConsoleScreenBufferSize(mOutputHandle, ByVal AsLong(.dwSize)) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+                If SetConsoleScreenBufferSize(mOutputHandle, ByVal AsLong(.dwSize)) = BOOL_FALSE Then _
+                    Statics.Error.Win32Error Err.LastDllError
             End If
             
             Dim WindowSize As COORD
             WindowSize = GetLargestConsoleWindowSize(mOutputHandle)
+            
             If Width > WindowSize.x Then _
                 Throw Cor.NewArgumentOutOfRangeException("Width", Environment.GetResourceString(ArgumentOutOfRange_ConsoleWindowSize_Size, WindowSize.x))
             If Height > WindowSize.y Then _
@@ -567,25 +586,23 @@ End Sub
 ' the window outside of the screen buffer.
 '
 Public Sub SetWindowPosition(ByVal Left As Long, ByVal Top As Long)
-    If Left < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Left", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    If Top < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Top", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
-    
     With GetBufferInfo
-        If Left + (.srWindow.Right - .srWindow.Left + 1) > .dwSize.x Then _
-            Throw Cor.NewArgumentOutOfRangeException("Left", Environment.GetResourceString(ArgumentOutOfRange_ConsoleWindowPos))
-        If Top + (.srWindow.Bottom - .srWindow.Top + 1) > .dwSize.y Then _
-            Throw Cor.NewArgumentOutOfRangeException("Top", Environment.GetResourceString(ArgumentOutOfRange_ConsoleWindowPos))
+        If Left < 0 Or Left + (.srWindow.Right - .srWindow.Left + 1) > .dwSize.x Then _
+            Statics.Error.ArgumentOutOfRange "Left", ArgumentOutOfRange_ConsoleWindowPos
+        If Top < 0 Or Top + (.srWindow.Bottom - .srWindow.Top + 1) > .dwSize.y Then _
+            Statics.Error.ArgumentOutOfRange "Top", ArgumentOutOfRange_ConsoleWindowPos
         
         Dim NewPosition As SMALL_RECT
         NewPosition.Left = Left
         NewPosition.Top = Top
+        
         With .srWindow
             NewPosition.Right = Left + (.Right - .Left)
             NewPosition.Bottom = Top + (.Bottom - .Top)
         End With
-        If SetConsoleWindowInfo(mOutputHandle, True, NewPosition) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+        
+        If SetConsoleWindowInfo(mOutputHandle, True, NewPosition) = BOOL_FALSE Then _
+            Statics.Error.Win32Error Err.LastDllError
     End With
 End Sub
 
@@ -596,24 +613,22 @@ End Sub
 ' @param height The height in characters of the buffer.
 '
 Public Sub SetBufferSize(ByVal Width As Long, ByVal Height As Long)
-    If Width < 1 Or Width > MaxWindowSize Then _
-        Throw Cor.NewArgumentOutOfRangeException("Width", "Width must be between 1 and 32767.")
-    If Height < 1 Or Height > MaxWindowSize Then _
-        Throw Cor.NewArgumentOutOfRangeException("Height", "Height must be between 1 and 32767.")
+    Dim NewSize As COORD
     
     With GetBufferInfo.srWindow
-        If Width < .Right - .Left + 1 Then _
-            Throw Cor.NewArgumentOutOfRangeException("Width", Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferLessThanWindowSize))
-        If Height < .Bottom - .Top + 1 Then _
-            Throw Cor.NewArgumentOutOfRangeException("Height", Environment.GetResourceString(ArgumentOutOfRange_ConsoleBufferLessThanWindowSize))
+        If Width < .Right - .Left + 1 Or Width > MaxWindowSize Then _
+            Statics.Error.ArgumentOutOfRange "Width", ArgumentOutOfRange_ConsoleBufferLessThanWindowSize
+        If Height < .Bottom - .Top + 1 Or Height > MaxWindowSize Then _
+            Statics.Error.ArgumentOutOfRange "Height", ArgumentOutOfRange_ConsoleBufferLessThanWindowSize
     End With
     
-    Dim NewSize As COORD
     With NewSize
         .x = Width
         .y = Height
     End With
-    If SetConsoleScreenBufferSize(mOutputHandle, ByVal AsLong(NewSize)) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    
+    If SetConsoleScreenBufferSize(mOutputHandle, ByVal AsLong(NewSize)) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Sub
 
 ''
@@ -628,10 +643,10 @@ End Property
 ''
 ' Sets the width of the underlying screen buffer in characters.
 '
-' @param RHS The new width of the screen buffer.
+' @param Value The new width of the screen buffer.
 '
-Public Property Let BufferWidth(ByVal RHS As Long)
-    Call SetBufferSize(RHS, BufferHeight)
+Public Property Let BufferWidth(ByVal Value As Long)
+    SetBufferSize Value, BufferHeight
 End Property
 
 ''
@@ -646,10 +661,10 @@ End Property
 ''
 ' Sets the height of the underlying screen buffer in characters.
 '
-' @param RHS The new height of the screen buffer.
+' @param Value The new height of the screen buffer.
 '
-Public Property Let BufferHeight(ByVal RHS As Long)
-    Call SetBufferSize(BufferWidth, RHS)
+Public Property Let BufferHeight(ByVal Value As Long)
+    SetBufferSize BufferWidth, Value
 End Property
 
 ''
@@ -671,11 +686,11 @@ End Property
 ' Sets the left coordinate of the console window within the screen buffer
 ' in character columns.
 '
-' @param RHS The new left position.
+' @param Value The new left position.
 ' @remarks The view window maitains the original size.
 '
-Public Property Let WindowLeft(ByVal RHS As Long)
-    Call SetWindowPosition(RHS, WindowTop)
+Public Property Let WindowLeft(ByVal Value As Long)
+    SetWindowPosition Value, WindowTop
 End Property
 
 ''
@@ -690,10 +705,10 @@ End Property
 ''
 ' Sets the top of the viewable windwo within the screen buffer.
 '
-' @param RHS The new top position in characters, starting with 0.
+' @param Value The new top position in characters, starting with 0.
 '
-Public Property Let WindowTop(ByVal RHS As Long)
-    Call SetWindowPosition(WindowLeft, RHS)
+Public Property Let WindowTop(ByVal Value As Long)
+    SetWindowPosition WindowLeft, Value
 End Property
 
 ''
@@ -710,10 +725,10 @@ End Property
 ''
 ' Sets the width of the viewable window within the screen buffer.
 '
-' @param RHS The new width of the window in characters.
+' @param Value The new width of the window in characters.
 '
-Public Property Let WindowWidth(ByVal RHS As Long)
-    Call SetWindowSize(RHS, WindowHeight)
+Public Property Let WindowWidth(ByVal Value As Long)
+    SetWindowSize Value, WindowHeight
 End Property
 
 ''
@@ -730,10 +745,10 @@ End Property
 ''
 ' Sets the height of the viewable window in the screen buffer.
 '
-' @param RHS The new window height in characters.
+' @param Value The new window height in characters.
 '
-Public Property Let WindowHeight(ByVal RHS As Long)
-    Call SetWindowSize(WindowWidth, RHS)
+Public Property Let WindowHeight(ByVal Value As Long)
+    SetWindowSize WindowWidth, Value
 End Property
 
 ''
@@ -761,43 +776,40 @@ End Property
 ' @remarks This method support Unicode characters on NT platforms.
 '
 Public Property Get Title() As String
-    Dim Buf As String
-    Dim Size As Long
+    Dim Buf     As String
+    Dim Size    As Long
     
     Buf = String$(MaxTitleLength, 0)
-    If Environment.IsNT Then
-        Size = GetConsoleTitleW(StrPtr(Buf), MaxTitleLength)
-    Else
-        Size = GetConsoleTitleA(Buf, MaxTitleLength)
-    End If
+    Size = GetConsoleTitleW(StrPtr(Buf), MaxTitleLength)
+    
     Select Case Size
         Case 0
             Dim e As Long
             e = Err.LastDllError
             If e <> 0 Then Statics.Error.Win32Error e
         Case Is > MaxTitleLength
-            Throw Cor.NewInvalidOperationException("Cannot retrieve title longer that 24500 characters.")
+            Statics.Error.InvalidOperation ArgumentOutOfRange_ConsoleTitleTooLong
     End Select
+    
     Title = Left$(Buf, Size)
 End Property
 
 ''
 ' Sets the title for the console of the current process.
 '
-' @param RHS The title to set the console to.
+' @param Value The title to set the console to.
 ' @remarks This method supports Unicode characters on NT platforms.
 '
-Public Property Let Title(ByVal RHS As String)
-    If Len(RHS) > MaxTitleLength Then _
-        Throw Cor.NewArgumentOutOfRangeException("Title", Environment.GetResourceString(ArgumentOutOfRange_ConsoleTitleTooLong))
+Public Property Let Title(ByVal Value As String)
+    If Len(Value) > MaxTitleLength Then _
+        Statics.Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_ConsoleTitleTooLong
     
-    If CorString.IsNull(RHS) Then RHS = ""
-    
-    If Environment.IsNT Then
-        If SetConsoleTitleW(StrPtr(RHS)) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
-    Else
-        If SetConsoleTitleA(RHS) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If CorString.IsNull(Value) Then
+        Value = ""
     End If
+    
+    If SetConsoleTitleW(StrPtr(Value)) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Property
 
 ''
@@ -815,15 +827,16 @@ End Property
 ''
 ' Sets the background color.
 '
-' @param RHS The new background color.
+' @param Value The new background color.
 ' @remarks The new background color will only affect text displayed
 ' after the changing of the background color.
 '
-Public Property Let BackgroundColor(ByVal RHS As ConsoleColor)
-    If RHS < 0 Or RHS > 15 Then _
-        Throw Cor.NewArgumentOutOfRangeException("BackgroundColor", Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
+Public Property Let BackgroundColor(ByVal Value As ConsoleColor)
+    If Value < 0 Or Value > 15 Then _
+        Statics.Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_ConsoleColor
     
-    If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFF0F) Or (RHS * &H10)) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFF0F) Or (Value * &H10)) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Property
 
 ''
@@ -840,15 +853,16 @@ End Property
 ''
 ' Sets the foreground color.
 '
-' @param RHS The new foreground color.
+' @param Value The new foreground color.
 ' @remarks The new foreground color will only affect text that is
 ' displayed after the color has been changed.
 '
-Public Property Let ForegroundColor(ByVal RHS As ConsoleColor)
-    If RHS < 0 Or RHS > 15 Then _
-        Throw Cor.NewArgumentOutOfRangeException("ForegroundColor", Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
+Public Property Let ForegroundColor(ByVal Value As ConsoleColor)
+    If Value < 0 Or Value > 15 Then _
+        Statics.Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_ConsoleColor
     
-    If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFFF0) Or RHS) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFFF0) Or Value) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Property
 
 ''
@@ -861,9 +875,9 @@ End Property
 Public Sub SetCursorPosition(ByVal Left As Long, ByVal Top As Long)
     With GetBufferInfo.dwSize
         If Left < 0 Or Left >= .x Then _
-            Throw Cor.NewArgumentOutOfRangeException("Left", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "Left", ArgumentOutOfRange_OutsideConsoleBoundry
         If Top < 0 Or Top >= .y Then _
-            Throw Cor.NewArgumentOutOfRangeException("Top", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "Top", ArgumentOutOfRange_OutsideConsoleBoundry
     End With
     
     Dim NewPosition As COORD
@@ -871,7 +885,8 @@ Public Sub SetCursorPosition(ByVal Left As Long, ByVal Top As Long)
         .x = Left
         .y = Top
     End With
-    If SetConsoleCursorPosition(mOutputHandle, ByVal AsLong(NewPosition)) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If SetConsoleCursorPosition(mOutputHandle, ByVal AsLong(NewPosition)) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Sub
 
 ''
@@ -886,10 +901,10 @@ End Property
 ''
 ' Sets the left coordinate of the cursor position.
 '
-' @param RHS The new left coordinate.
+' @param Value The new left coordinate.
 '
-Public Property Let CursorLeft(ByVal RHS As Long)
-    Call SetCursorPosition(RHS, CursorTop)
+Public Property Let CursorLeft(ByVal Value As Long)
+    SetCursorPosition Value, CursorTop
 End Property
 
 ''
@@ -904,10 +919,10 @@ End Property
 ''
 ' Sets the top coordinate for the cursor position
 '
-' @param RHS The top coordinate.
+' @param Value The top coordinate.
 '
-Public Property Let CursorTop(ByVal RHS As Long)
-    Call SetCursorPosition(CursorLeft, RHS)
+Public Property Let CursorTop(ByVal Value As Long)
+    SetCursorPosition CursorLeft, Value
 End Property
 
 ''
@@ -924,20 +939,22 @@ End Property
 ''
 ' Sets the size (height) of the cursor.
 '
-' @param RHS The new cursor size.
+' @param Value The new cursor size.
 ' @remarks the size of the cursor is a value 1 to 100, 1 being
 ' 1% the full block, and 100 being 100% a full block.
 '
-Public Property Let CursorSize(ByVal RHS As Long)
-    If RHS < 1 Or RHS > 100 Then _
-        Throw Cor.NewArgumentOutOfRangeException("CursorSize", Environment.GetResourceString(ArgumentOutOfRange_CursorSize))
+Public Property Let CursorSize(ByVal Value As Long)
+    If Value < 1 Or Value > 100 Then _
+        Statics.Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_CursorSize
     
     Dim Info As CONSOLE_CURSOR_INFO
     With Info
         .bVisible = GetCursorInfo.bVisible
-        .dwSize = RHS
+        .dwSize = Value
     End With
-    If SetConsoleCursorInfo(mOutputHandle, Info) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    
+    If SetConsoleCursorInfo(mOutputHandle, Info) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Property
 
 ''
@@ -952,16 +969,18 @@ End Property
 ''
 ' Sets if the cursor is visible or not.
 '
-' @param RHS The visibility of the cursor.
+' @param Value The visibility of the cursor.
 '
-Public Property Let CursorVisible(ByVal RHS As Boolean)
+Public Property Let CursorVisible(ByVal Value As Boolean)
     Dim Info As CONSOLE_CURSOR_INFO
     
     With Info
-        .bVisible = RHS
+        .bVisible = Value
         .dwSize = CursorSize
     End With
-    If SetConsoleCursorInfo(mOutputHandle, Info) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    
+    If SetConsoleCursorInfo(mOutputHandle, Info) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Property
 
 ''
@@ -974,9 +993,12 @@ Public Sub Clear()
     End With
     
     Dim StartPosition As COORD
-    If FillConsoleOutputCharacter(mOutputHandle, 32, CharsToWrite, ByVal AsLong(StartPosition), 0) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
-    If FillConsoleOutputAttribute(mOutputHandle, GetBufferInfo.wAttributes, CharsToWrite, ByVal AsLong(StartPosition), 0) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
-    If SetConsoleCursorPosition(mOutputHandle, ByVal AsLong(StartPosition)) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If FillConsoleOutputCharacter(mOutputHandle, vbSpaceChar, CharsToWrite, ByVal AsLong(StartPosition), 0) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
+    If FillConsoleOutputAttribute(mOutputHandle, GetBufferInfo.wAttributes, CharsToWrite, ByVal AsLong(StartPosition), 0) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
+    If SetConsoleCursorPosition(mOutputHandle, ByVal AsLong(StartPosition)) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Sub
 
 ''
@@ -999,20 +1021,22 @@ Public Sub MoveBufferArea(ByVal SourceLeft As Long, ByVal SourceTop As Long, ByV
     
     With GetBufferInfo.dwSize
         If SourceLeft < 0 Or SourceLeft >= .x Then _
-            Throw Cor.NewArgumentOutOfRangeException("SourceLeft", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "SourceLeft", ArgumentOutOfRange_OutsideConsoleBoundry
         If SourceTop < 0 Or SourceTop >= .y Then _
-            Throw Cor.NewArgumentOutOfRangeException("SourceTop", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "SourceTop", ArgumentOutOfRange_OutsideConsoleBoundry
         If SourceWidth < 0 Or SourceWidth > (.x - SourceLeft) Then _
-            Throw Cor.NewArgumentOutOfRangeException("SourceWidth", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "SourceWidth", ArgumentOutOfRange_OutsideConsoleBoundry
         If SourceWidth < 0 Or SourceWidth > (.y - SourceTop) Then _
-            Throw Cor.NewArgumentOutOfRangeException("SourceHeight", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "SourceHeight", ArgumentOutOfRange_OutsideConsoleBoundry
         If TargetLeft < 0 Or TargetLeft >= .x Then _
-            Throw Cor.NewArgumentOutOfRangeException("TargetLeft", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "TargetLeft", ArgumentOutOfRange_OutsideConsoleBoundry
         If TargetTop < 0 Or TargetTop >= .y Then _
-            Throw Cor.NewArgumentOutOfRangeException("TargetTop", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "TargetTop", ArgumentOutOfRange_OutsideConsoleBoundry
     End With
         
-    If SourceWidth = 0 Or SourceHeight = 0 Then Exit Sub
+    If SourceWidth = 0 Or SourceHeight = 0 Then
+        Exit Sub
+    End If
     
     ReDim Buffer(SourceWidth * SourceHeight - 1)
     With BufferSize
@@ -1025,9 +1049,10 @@ Public Sub MoveBufferArea(ByVal SourceLeft As Long, ByVal SourceTop As Long, ByV
         .Top = SourceTop
         .Bottom = SourceTop + SourceHeight - 1
     End With
-    If ReadConsoleOutput(mOutputHandle, Buffer(0), ByVal AsLong(BufferSize), ByVal 0&, Region) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If ReadConsoleOutput(mOutputHandle, Buffer(0), ByVal AsLong(BufferSize), ByVal 0&, Region) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
     
-    Call InternalFillArea(SourceLeft, SourceTop, SourceWidth, SourceHeight, SourceChar, SourceForeColor, SourceBackColor)
+    FillAreaCore SourceLeft, SourceTop, SourceWidth, SourceHeight, SourceChar, SourceForeColor, SourceBackColor
     
     With Region
         .Left = TargetLeft
@@ -1035,7 +1060,9 @@ Public Sub MoveBufferArea(ByVal SourceLeft As Long, ByVal SourceTop As Long, ByV
         .Top = TargetTop
         .Bottom = TargetTop + SourceHeight - 1
     End With
-    If WriteConsoleOutput(mOutputHandle, Buffer(0), ByVal AsLong(BufferSize), ByVal 0&, Region) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    
+    If WriteConsoleOutput(mOutputHandle, Buffer(0), ByVal AsLong(BufferSize), ByVal 0&, Region) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Sub
 
 ''
@@ -1052,16 +1079,16 @@ End Sub
 Public Sub FillBufferArea(ByVal Left As Long, ByVal Top As Long, ByVal Width As Long, ByVal Height As Long, Optional ByVal FillChar As Variant = " ", Optional ByVal Forecolor As ConsoleColor = ConsoleColor.CurrentColor, Optional ByVal BackColor As ConsoleColor = ConsoleColor.CurrentColor)
     With GetBufferInfo.dwSize
         If Left < 0 Or Left >= .x Then _
-            Throw Cor.NewArgumentOutOfRangeException("Left", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "Left", ArgumentOutOfRange_OutsideConsoleBoundry
         If Top < 0 Or Top >= .y Then _
-            Throw Cor.NewArgumentOutOfRangeException("Top", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "Top", ArgumentOutOfRange_OutsideConsoleBoundry
         If Width < 0 Or Width > (.x - Left) Then _
-            Throw Cor.NewArgumentOutOfRangeException("Width", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "Width", ArgumentOutOfRange_OutsideConsoleBoundry
         If Width < 0 Or Width > (.y - Top) Then _
-            Throw Cor.NewArgumentOutOfRangeException("Height", Environment.GetResourceString(ArgumentOutOfRange_OutsideConsoleBoundry))
+            Statics.Error.ArgumentOutOfRange "Height", ArgumentOutOfRange_OutsideConsoleBoundry
     End With
 
-    Call InternalFillArea(Left, Top, Width, Height, FillChar, Forecolor, BackColor)
+    FillAreaCore Left, Top, Width, Height, FillChar, Forecolor, BackColor
 End Sub
 
 ''
@@ -1075,7 +1102,7 @@ End Sub
 ' @param BackColor The color to set the text background color to in the cleared area.
 '
 Public Sub ClearBufferArea(ByVal Left As Long, ByVal Top As Long, ByVal Width As Long, ByVal Height As Long, Optional ByVal Forecolor As ConsoleColor = ConsoleColor.CurrentColor, Optional ByVal BackColor As ConsoleColor = ConsoleColor.CurrentColor)
-    Call FillBufferArea(Left, Top, Width, Height, " ", Forecolor, BackColor)
+    FillBufferArea Left, Top, Width, Height, " ", Forecolor, BackColor
 End Sub
 
 ''
@@ -1085,7 +1112,8 @@ End Sub
 ' will be set to ConsoleColor.Gray.
 '
 Public Sub ResetColor()
-    If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFF00) Or ConsoleColor.Gray) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If SetConsoleTextAttribute(mOutputHandle, (GetBufferInfo.wAttributes And &HFF00) Or ConsoleColor.Gray) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Sub
 
 ''
@@ -1100,25 +1128,25 @@ End Property
 ''
 ' Sets the encoding for the console output.
 '
-' @param RHS The new encoding used for output to the console.
+' @param Value The new encoding used for output to the console.
 ' @remarks This is only supported on Windows NT machines.
 '
-Public Property Set OutputEncoding(ByVal RHS As Encoding)
-    If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("OutputEncoding", "Cannot set output encoding to Nothing.")
+Public Property Set OutputEncoding(ByVal Value As Encoding)
+    If Value Is Nothing Then _
+        Statics.Error.ArgumentNull "Value"
         
-    Call Environment.VerifyNTMachine
-    
     If (Not mOutput Is Nothing) And (mOriginalOut = True) Then
         mOutput.Flush
         Set mOutput = Nothing
     End If
+    
     If (Not mError Is Nothing) And (mOriginalError = True) Then
         mError.Flush
         Set mError = Nothing
     End If
     
-    If SetConsoleOutputCP(RHS.CodePage) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If SetConsoleOutputCP(Value.CodePage) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Property
 
 ''
@@ -1133,16 +1161,16 @@ End Property
 ''
 ' Sets the encoding used during input from the console.
 '
-' @param RHS The new encoding used for input from the console.
+' @param Value The new encoding used for input from the console.
 ' @remarks This is only supported on Windows NT machines.
 '
-Public Property Set InputEncoding(ByVal RHS As Encoding)
-    If RHS Is Nothing Then _
-        Throw Cor.NewArgumentNullException("InputEncoding", "Cannot set input encoding to Nothing.")
+Public Property Set InputEncoding(ByVal Value As Encoding)
+    If Value Is Nothing Then _
+        Statics.Error.ArgumentNull "Value"
         
-    Call Environment.VerifyNTMachine
-    
-    If SetConsoleCP(RHS.CodePage) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If SetConsoleCP(Value.CodePage) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
+        
     Set mInput = Nothing
 End Property
 
@@ -1185,15 +1213,21 @@ Public Property Get KeyAvailable() As Boolean
     End If
     
     Do
-        If PeekConsoleInput(mInputHandle, Record, 1, NumRead) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
-        If NumRead = 0 Then Exit Property
+        If PeekConsoleInput(mInputHandle, Record, 1, NumRead) = BOOL_FALSE Then _
+            Statics.Error.Win32Error Err.LastDllError
+            
+        If NumRead = 0 Then
+            Exit Property
+        End If
+        
         If Record.EventType = KEY_EVENT And Record.KeyEvent.bKeyDown = BOOL_TRUE Then
             KeyAvailable = True
             Exit Property
         End If
         
         ' nothing matched what we expected, so read it and discard.
-        If ReadConsoleInput(mInputHandle, Record, 1, NumRead) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+        If ReadConsoleInput(mInputHandle, Record, 1, NumRead) = BOOL_FALSE Then _
+            Statics.Error.Win32Error Err.LastDllError
     Loop
 End Property
 
@@ -1203,77 +1237,91 @@ End Property
 ' @return The state of management for Control+C.
 '
 Public Property Get TreatControlCAsInput() As Boolean
-    Dim modes As Long
-    If GetConsoleMode(mInputHandle, modes) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
-    TreatControlCAsInput = (modes And ENABLE_PROCESSED_INPUT)
+    Dim Modes As Long
+    
+    If GetConsoleMode(mInputHandle, Modes) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
+        
+    TreatControlCAsInput = (Modes And ENABLE_PROCESSED_INPUT)
 End Property
 
 ''
 ' Sets if the Control+C combination is managed by the system or returned as keyboard input.
 '
-' @param RHS Flag indicating if the system should manage Control+C or not.
+' @param Value Flag indicating if the system should manage Control+C or not.
 '
-Public Property Let TreatControlCAsInput(ByVal RHS As Boolean)
-    Dim modes As Long
-    If GetConsoleMode(mInputHandle, modes) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
-    If RHS Then
-        modes = modes Or ENABLE_PROCESSED_INPUT
+Public Property Let TreatControlCAsInput(ByVal Value As Boolean)
+    Dim Modes As Long
+    
+    If GetConsoleMode(mInputHandle, Modes) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
+        
+    If Value Then
+        Modes = Modes Or ENABLE_PROCESSED_INPUT
     Else
-        modes = modes And (Not ENABLE_PROCESSED_INPUT)
+        Modes = Modes And (Not ENABLE_PROCESSED_INPUT)
     End If
-    If SetConsoleMode(mInputHandle, modes) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    
+    If SetConsoleMode(mInputHandle, Modes) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetConsoleStream(ByVal Handle As Long, ByVal Access As FileAccess) As Stream
     Dim Ret As New ConsoleStream
-    Call Ret.Init(Handle, Access)
+    Ret.Init Handle, Access
     Set GetConsoleStream = Ret
 End Function
 
-Private Sub InternalWrite(ByVal Value As String, ByRef Args() As Variant, ByVal NewLine As Boolean)
-    If Not CorArray.IsNull(Args) Then
-        If UBound(Args) >= 0 Then Value = CorString.FormatArray(Value, Args)
+Private Sub WriteLineCore(ByRef Args() As Variant)
+    Dim Length As Long
+    
+    On Error GoTo Catch
+    Length = Len1D(Args)
+
+    If Length > 0 Then
+        Dim Shifted() As Variant
+        Shifted = ShiftArguments(Args)
+        WriteCore Args(LBound(Args)), Shifted
     End If
-    If NewLine Then Value = Value & Out.NewLine
-    Call Out.WriteValue(Value)
+
+    Out.WriteValue Environment.NewLine
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeArguments Shifted
+    Return
 End Sub
 
-Private Sub InternalWriteLine(ByRef Args() As Variant)
-    Dim ub  As Long
-    Dim s   As String
-    
-    ub = UBound(Args)
-    
-    If ub >= 0 Then s = Object.ToString(Args(0))
-    If ub > 0 Then
-        Dim i As Long
-        For i = 1 To ub
-            Call Helper.MoveVariant(Args(i - 1), Args(i))
-        Next i
+Private Sub WriteCore(ByRef Value As Variant, ByRef Args() As Variant)
+    If Len1D(Args) = 0 Then
+        Out.WriteValue Value
     Else
-        Erase Args
+        Dim Format  As String
+        Dim Text    As String
+        
+        Format = Object.ToString(Value)
+        Text = CorString.FormatArrayEx(Out.FormatProvider, Format, Args)
+        Out.WriteValue Text
     End If
-    
-    Call InternalWrite(s, Args, True)
-End Sub
-
-Private Sub InternalWriteValue(ByRef Value As Variant, ByRef Args() As Variant)
-    InternalWrite Convert.ToString(Value), Args, False
 End Sub
 
 Private Sub Init()
     mOwnsConsole = (AllocConsole <> BOOL_FALSE)
-    Call Sleep(10)     ' give it time to be created
+    Sleep 10 ' give it time to be created
     
     If InDebugger Then
-        Call DisableCloseButton
+        DisableCloseButton
     End If
     
-    Call SetConsoleCtrlHandler(AddressOf ControlBreakHandler, True)
+    SetConsoleCtrlHandler AddressOf ControlBreakHandler, True
     mOutputHandle = GetStdHandle(STD_OUTPUT_HANDLE)
     mInputHandle = GetStdHandle(STD_INPUT_HANDLE)
     mErrorHandle = GetStdHandle(STD_ERROR_HANDLE)
@@ -1283,106 +1331,121 @@ Private Sub Init()
 End Sub
 
 Private Sub DisableCloseButton()
-    Dim oldTitle As String
-    oldTitle = Me.Title
+    Dim OldTitle    As String
+    Dim Pid         As Long
+    Dim NewTitle    As String
+    Dim hwnd        As Long
     
-    Dim pid As Long
-    pid = GetCurrentProcessId()
-    
-    Dim newTitle As String
-    newTitle = oldTitle & pid
-    
-    Me.Title = newTitle
-    Call Sleep(40)
-    
-    Dim hwnd As Long
-    hwnd = FindWindow(vbNullString, newTitle)
-    
-    Me.Title = oldTitle
+    OldTitle = Me.Title
+    Pid = GetCurrentProcessId()
+    NewTitle = OldTitle & Pid
+    Me.Title = NewTitle
+    Sleep 40
+    hwnd = FindWindow(vbNullString, NewTitle)
+    Me.Title = OldTitle
     
     If hwnd <> vbNullPtr Then
         Dim hMenu As Long
         hMenu = GetSystemMenu(hwnd, False)
-        Call RemoveMenu(hMenu, SC_CLOSE, MF_BYCOMMAND)
+        RemoveMenu hMenu, SC_CLOSE, MF_BYCOMMAND
     End If
 End Sub
 
 Private Function GetBufferInfo() As CONSOLE_SCREEN_BUFFER_INFO
-    If GetConsoleScreenBufferInfo(mOutputHandle, GetBufferInfo) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If GetConsoleScreenBufferInfo(mOutputHandle, GetBufferInfo) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Function
 
 Private Function GetCursorInfo() As CONSOLE_CURSOR_INFO
-    If GetConsoleCursorInfo(mOutputHandle, GetCursorInfo) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If GetConsoleCursorInfo(mOutputHandle, GetCursorInfo) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Function
 
-Private Function InternalReadKey(ByRef RetVal As ConsoleKeyInfo) As Boolean
-    Const ALT_KEYS As Long = 3
-    Const SHIFT_KEYS As Long = 16
-    Const CTRL_KEYS As Long = 12
+Private Function ReadKeyCore(ByRef RetVal As ConsoleKeyInfo) As Boolean
+    Const ALT_KEYS      As Long = 3
+    Const SHIFT_KEYS    As Long = 16
+    Const CTRL_KEYS     As Long = 12
     
-    If mKeyPressHistory.EventType <> KEY_EVENT Then Exit Function
+    If mKeyPressHistory.EventType <> KEY_EVENT Then
+        Exit Function
+    End If
     
     With mKeyPressHistory.KeyEvent
         .wRepeatCount = .wRepeatCount - 1
-        If .wRepeatCount = 0 Then mKeyPressHistory.EventType = NO_EVENT
+        
+        If .wRepeatCount = 0 Then
+            mKeyPressHistory.EventType = NO_EVENT
+        End If
+        
         Set RetVal = Cor.NewConsoleKeyInfo(.uChar, .wVirtualKeyCode, .dwControlKeyState And SHIFT_KEYS, .dwControlKeyState And ALT_KEYS, .dwControlKeyState And CTRL_KEYS)
     End With
     
-    InternalReadKey = True
+    ReadKeyCore = True
 End Function
 
-Private Sub InternalFillArea(ByVal Left As Long, ByVal Top As Long, ByVal Width As Long, ByVal Height As Long, ByRef FillChar As Variant, ByVal Forecolor As ConsoleColor, ByVal BackColor As ConsoleColor)
-    
+Private Sub FillAreaCore(ByVal Left As Long, ByVal Top As Long, ByVal Width As Long, ByVal Height As Long, ByRef FillChar As Variant, ByVal Forecolor As ConsoleColor, ByVal BackColor As ConsoleColor)
     Select Case Forecolor
-        Case ConsoleColor.CurrentColor: Forecolor = ForegroundColor
+        Case ConsoleColor.CurrentColor
+            Forecolor = ForegroundColor
         Case Is < 0, Is > 15
-            Throw Cor.NewArgumentOutOfRangeException("ForeColor", Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
+            Statics.Error.ArgumentOutOfRange "ForeColor", ArgumentOutOfRange_ConsoleColor
     End Select
 
     Select Case BackColor
-        Case ConsoleColor.CurrentColor: BackColor = BackgroundColor
+        Case ConsoleColor.CurrentColor
+            BackColor = BackgroundColor
         Case Is < 0, Is > 15
-            Throw Cor.NewArgumentOutOfRangeException("BackColor", Environment.GetResourceString(ArgumentOutOfRange_ConsoleColor))
+            Statics.Error.ArgumentOutOfRange "BackColor", ArgumentOutOfRange_ConsoleColor
     End Select
     
-    If Width = 0 Or Height = 0 Then Exit Sub
+    If Width = 0 Or Height = 0 Then
+        Exit Sub
+    End If
     
     Dim FillByte As Byte
     Select Case VarType(FillChar)
         Case vbString
-            If Len(FillChar) = 0 Then Exit Sub
+            If Len(FillChar) = 0 Then
+                Exit Sub
+            End If
+            
             FillByte = Asc(FillChar)
-        
-        Case vbLong, vbInteger, vbByte:     FillByte = FillChar
+        Case vbLong, vbInteger, vbByte
+            FillByte = FillChar
         Case Else
             Throw Cor.NewArgumentException("Invalid fill Character", "FillChar")
     End Select
 
     If Len(FillChar) > 0 Then
-        Dim TextColor As Long
-        TextColor = (BackColor * &H10) Or Forecolor
+        Dim TextColor   As Long
+        Dim ClearCoord  As COORD
         
-        Dim ClearCoord As COORD
+        TextColor = (BackColor * &H10) Or Forecolor
         ClearCoord.x = Left
         
         Dim i As Long
         For i = 0 To Height - 1
             ClearCoord.y = Top + i
-            If FillConsoleOutputCharacter(mOutputHandle, FillByte, Width, ByVal AsLong(ClearCoord), 0) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
-            If FillConsoleOutputAttribute(mOutputHandle, TextColor, Width, ByVal AsLong(ClearCoord), 0) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+            If FillConsoleOutputCharacter(mOutputHandle, FillByte, Width, ByVal AsLong(ClearCoord), 0) = BOOL_FALSE Then _
+                Statics.Error.Win32Error Err.LastDllError
+            If FillConsoleOutputAttribute(mOutputHandle, TextColor, Width, ByVal AsLong(ClearCoord), 0) = BOOL_FALSE Then _
+                Statics.Error.Win32Error Err.LastDllError
         Next i
     End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    Call Init
+    Init
 End Sub
 
 Private Sub Class_Terminate()
-    Call SetConsoleCtrlHandler(AddressOf ControlBreakHandler, False)
-    If mOwnsConsole Then Call FreeConsole
+    SetConsoleCtrlHandler AddressOf ControlBreakHandler, False
+    
+    If mOwnsConsole Then
+        FreeConsole
+    End If
 End Sub
