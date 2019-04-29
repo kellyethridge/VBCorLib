@@ -300,16 +300,13 @@ Public Sub SetKey(ByRef RgbKey() As Byte)
         Error.ArgumentNull "Key", ArgumentNull_Array
         
     Dim Size As Long
+    
     Size = Len1D(RgbKey)
     
     If Not ValidKeySize(Size * 8) Then _
         Error.Argument Cryptography_InvalidKeySize, "Key"
     
-    Dim Ex As Exception
-    RaiseEvent CheckForWeakKey(RgbKey, Ex)
-    If Not Ex Is Nothing Then
-        Throw Ex
-    End If
+    OnCheckForWeakKey RgbKey
     
     ' We do this so we have a zero-based key array.
     ReDim mKey(0 To Size - 1)
@@ -373,21 +370,17 @@ Public Function CloneRgbKey(ByRef RgbKey As Variant) As Byte()
     If CorArray.IsNull(RgbKey) Then _
         Error.Cryptographic Cryptography_InvalidKeySize
         
-    Dim Size As Long
+    Dim Size        As Long
+    Dim Result()    As Byte
+    
     Size = Len1D(RgbKey)
+    
     If Not IsLegalSize(mLegalKeySizes, Size * 8) Then _
         Error.Cryptographic Cryptography_InvalidKeySize
     
-    Dim Result() As Byte
     ReDim Result(0 To Size - 1)
     Buffer.BlockCopy RgbKey, 0, Result, 0, Size
-    
-    Dim Ex As Exception
-    RaiseEvent CheckForWeakKey(Result, Ex)
-    If Not Ex Is Nothing Then
-        Throw Ex
-    End If
-    
+    OnCheckForWeakKey Result
     CloneRgbKey = Result
 End Function
 
@@ -408,12 +401,14 @@ Public Function CloneRgbIV(ByRef RgbIV As Variant) As Byte()
     If VarType(RgbIV) <> vbByteArray Then _
         Error.Argument Argument_ByteArrayRequired, "RgbIV"
     
-    Dim Result() As Byte
+    Dim Result()    As Byte
+    Dim Size        As Long
+    
     If CorArray.IsNull(RgbIV) Then
         Result = CryptoHelper.GetRandomBytes(mBlockSize \ 8)
     Else
-        Dim Size As Long
         Size = CorArray.Length(RgbIV)
+        
         If (Size * 8) <> mBlockSize Then _
             Error.Cryptographic Cryptography_InvalidIVSize
         
@@ -455,6 +450,14 @@ Private Function IsLegalSize(ByRef LegalSizes() As KeySizes, ByVal BitLength As 
         End If
     Next i
 End Function
+
+Private Sub OnCheckForWeakKey(ByRef Key() As Byte)
+    RaiseEvent CheckForWeakKey(Key, Ex)
+    
+    If Not Ex Is Nothing Then
+        Throw Ex
+    End If
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

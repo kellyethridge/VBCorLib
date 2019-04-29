@@ -212,6 +212,7 @@ Private Sub AddSystemSecurityCryptography()
         .Add New DSAParametersTests
 
         .Add New SymmetricAlgorithmBaseTests
+        .Add New SymmetricAlgorithmBaseKeyTests
         .Add New CryptoStreamTests
         .Add NewSuite("DESCryptoServiceProvider Tests", _
             New DESCryptoServiceProviderTests, _
