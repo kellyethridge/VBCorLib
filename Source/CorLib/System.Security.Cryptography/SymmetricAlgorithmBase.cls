@@ -452,6 +452,8 @@ Private Function IsLegalSize(ByRef LegalSizes() As KeySizes, ByVal BitLength As 
 End Function
 
 Private Sub OnCheckForWeakKey(ByRef Key() As Byte)
+    Dim Ex As Exception
+    
     RaiseEvent CheckForWeakKey(Key, Ex)
     
     If Not Ex Is Nothing Then

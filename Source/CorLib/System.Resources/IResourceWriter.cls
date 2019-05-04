@@ -54,12 +54,16 @@ Option Explicit
 Public Sub AddResource(ByRef Value As Variant, ByRef ResourceName As Variant, Optional ByRef ResourceType As Variant, Optional ByRef LanguageID As Variant): End Sub
 
 ''
-' Creates the resource collection from the set of resources added to the writer.
+' Writes all the resources added by the <a href="IResourceWriter.AddResource.html">AddResource</a> method to the output file or stream.
 '
+' @remarks <b>Generate</b> does not close the output file or output stream. Instead, consider calling the Close method.
+' <b>Generate</b> is useful when you want to create a resource file, but you don't want to close the output stream.
+' <b>Generate</b> can be called only once. After you call <b>Generate</b>, all <a href="IResourceWriter.html">IResourceWriter</a> methods other than <a href="IResourceWriter.CloseWriter.html">CloseWriter</b> will throw an exception.
 Public Sub Generate(): End Sub
 
 ''
-' Closes the resource writer.
+' Closes the underlying resource file or stream, ensuring all the data has been written to the file.
 '
+' @remarks If necessary, <b>CloseWriter</b> will call the <a href="IResourceWriter.Generate.html">Generate</a> method to output the resources to the underlying file or stream before closing it.
 Public Sub CloseWriter(): End Sub
 

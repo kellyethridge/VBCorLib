@@ -156,6 +156,8 @@ Public Enum ResourceStringKey
     Argument_MaxStringLength = 877
     Argument_InvalidResourceKeyType = 878
     Argument_StringZeroLength = 879
+    Argument_EmptyIniSection = 880
+    Argument_EmptyIniKey = 881
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901

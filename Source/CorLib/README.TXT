@@ -89,6 +89,8 @@ version 3.0 (BREAKING CHANGES)
 	* Added new SpecialFolder enums defined in .NET 4.
 	* Added Environment.Is64BitOperatingSystem method.
 	* Added StringBuilder.Clear method.
+	* Renamed BinaryReader "ReadLong" and "ReadInteger" methods to "ReadInt32" and "ReadInt16" to align with .NET methods. *BREAKING*
+	* Renamed IniFile "GetLong" and "GetInteger" methods to "GetInt32" and "GetInt16" to more align with .NET naming. *BREAKING*
 	
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

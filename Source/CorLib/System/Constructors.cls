@@ -1059,9 +1059,9 @@ End Function
 ' @param FileName The INI filename.
 ' @return The INIFile object.
 '
-Public Function NewINIFile(ByRef FileName As String) As INIFile
-    Set NewINIFile = New INIFile
-    NewINIFile.Init FileName
+Public Function NewIniFile(ByRef FileName As String) As INIFile
+    Set NewIniFile = New INIFile
+    NewIniFile.Init FileName
 End Function
 
 ''
@@ -1918,5 +1918,10 @@ End Function
 Public Function NewPictureResourceInfo(ByVal ResourceId As Long, ByVal Resource As IPicture) As PictureResourceInfo
     Set NewPictureResourceInfo = New PictureResourceInfo
     NewPictureResourceInfo.Init ResourceId, Resource
+End Function
+
+Public Function NewIniResourceWriter(ByRef FileName As String, ByRef Section As String) As IniResourceWriter
+    Set NewIniResourceWriter = New IniResourceWriter
+    NewIniResourceWriter.Init FileName, Section
 End Function
 

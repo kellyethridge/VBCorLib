@@ -275,7 +275,8 @@ Private Sub AddSystemIO()
         .Add New StreamReaderTests
         .Add New MemoryMappedFileTests
         .Add New FileNotFoundExceptionTests
-'        .Add New TestINIFile
+        .Add New IniFileTests
+        .Add New IniResourceWriterTests
         .Add New DriveInfoTests
         .Add New StringReaderTests
         .Add New StringWriterTests

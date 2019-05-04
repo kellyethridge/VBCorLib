@@ -112,6 +112,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "aa:bb", False
             Test.Use "00:aa", False
             Test.Use "0:00.aa", False
+            Test.Use "", False
             
         Case "Parse_WithOverflowValues_ThrowsOverflowException"
             Test.Use "1:100"
