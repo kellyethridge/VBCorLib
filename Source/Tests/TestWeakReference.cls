@@ -22,22 +22,21 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
 End Sub
 
 Public Sub TestWeakness()
-    Dim strong As StrongRef
-    Dim weak As WeakRef
+    Dim Strong As StrongRef
+    Dim Weak As WeakRef
     
-    Set strong = New StrongRef
-    Set weak = New WeakRef
-    Set strong.Reference = weak
-    Set weak.Reference = strong
+    Set Strong = New StrongRef
+    Set Weak = New WeakRef
+    Set Strong.Reference = Weak
+    Set Weak.Reference = Strong
     
-    Assert.IsNotNothing strong.Reference, "Target should not be Nothing."
+    Assert.IsNotNothing Strong.Reference, "Target should not be Nothing."
     
-    UseStrongRef strong
+    UseStrongRef Strong
     
-    strong.AssertAlive
-    Set weak = Nothing
-    strong.AssertDead
-    
+    Strong.AssertAlive
+    Set Weak = Nothing
+    Strong.AssertDead
 End Sub
 
 Private Sub UseStrongRef(ByVal Ref As StrongRef)

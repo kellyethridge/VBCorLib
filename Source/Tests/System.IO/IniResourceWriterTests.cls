@@ -86,7 +86,6 @@ Public Sub AddResource_OnceGenerated_ThrowsInvalidOperationException()
     AssertInvalidOperationException Err
 End Sub
 
-
 Private Function MakeWriter() As IniResourceWriter
     Set MakeWriter = Cor.NewIniResourceWriter(mBuilder.CreateFile("File.ini"), "Section1")
 End Function

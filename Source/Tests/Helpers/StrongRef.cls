@@ -22,11 +22,10 @@ Private mWeak As WeakReference
 Public Property Get Reference() As WeakRef
     Set Reference = mWeak.Target
 End Property
+
 Public Property Set Reference(ByVal RHS As WeakRef)
     Set mWeak.Target = RHS
 End Property
-
-
 
 Public Sub AssertDead()
     Assert.IsFalse mWeak.IsAlive, "Reference should be dead."
@@ -38,4 +37,8 @@ End Sub
 
 Private Sub Class_Initialize()
     Set mWeak = New WeakReference
+End Sub
+
+Private Sub Class_Terminate()
+    Debug.Print "StrongRef: Terminate"
 End Sub

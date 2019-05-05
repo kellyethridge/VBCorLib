@@ -41,10 +41,10 @@ Public Sub GetString_WhenCalled_ReturnsStoredValue()
 End Sub
 
 Public Sub GetString_WithNonExistingValue_ReturnsEmpty()
-    Dim Ini As IniFile
-    Set Ini = MakeIniFile
+    Dim IniFile As IniFile
+    Set IniFile = MakeIniFile
     
-    Assert.That Ini.GetString("Test", "Value"), Iz.Empty
+    Assert.That IniFile.GetString("Test", "Value"), Iz.Empty
 End Sub
 
 Public Sub GetString_WhenMissingWithDefaultValue_ReturnsDefaultValue()

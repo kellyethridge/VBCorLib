@@ -1057,12 +1057,17 @@ End Function
 ' Returns an object used to manipulate an INI file.
 '
 ' @param FileName The INI filename.
-' @return The INIFile object.
+' @return The IniFile object.
 '
-Public Function NewIniFile(ByRef FileName As String) As INIFile
-    Set NewIniFile = New INIFile
+Public Function NewIniFile(ByRef FileName As String) As IniFile
+#If False Then
+    Dim IniFile
+#End If
+    
+    Set NewIniFile = New IniFile
     NewIniFile.Init FileName
 End Function
+
 
 ''
 ' Creates a new Ticker.

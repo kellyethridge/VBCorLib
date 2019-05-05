@@ -57,13 +57,17 @@ Attribute VB_Exposed = True
 ' </pre>
 ' </p>
 '
-' @see INISectionWriter
+' @see IniResourceWriter
 '
 Option Explicit
 Implements IObject
 
 Private mFileName   As String
 Private mAutoFlush  As Boolean
+
+#If False Then
+    Dim IniFile
+#End If
 
 
 ''
