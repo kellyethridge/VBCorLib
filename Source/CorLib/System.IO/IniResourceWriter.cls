@@ -89,9 +89,9 @@ End Sub
 ''
 ' Creates a section within an INI file.
 '
-' @remarks All existing key-value pairs already in the specified
-' section of the INI file will be removed.
-'
+' @remarks All existing key-value pairs already in the specified section of the INI file will be removed.
+' <p>The <b>Generate</b> method is called implicitly by the <b>CloseWriter</b> method if it is not called by your application code.</p>
+' <p><b>Generate</b> can be called only once. After you call <b>Generate</b>, all <a href="IniResourceWriter.html">IniResourceWriter</a> methods other than <a href="IniResourceWriter.CloseWriter.html">CloseWriter</b> will throw an exception.</p>
 Public Sub Generate()
     Dim sb      As New StringBuilder
     Dim Entry   As DictionaryEntry
@@ -102,10 +102,10 @@ Public Sub Generate()
        sb.Append Entry.Key
        sb.AppendChar vbEqualChar
        sb.Append Entry.Value
-       sb.AppendChar 0
+       sb.AppendString vbNullChar
     Next
     
-    sb.AppendChar 0
+    sb.AppendString vbNullChar
     
     If WritePrivateProfileSectionW(mSection, sb.ToString, mFileName) = BOOL_FALSE Then _
         IOError.WinIOError Err.LastDllError

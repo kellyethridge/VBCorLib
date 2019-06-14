@@ -799,7 +799,7 @@ End Sub
 
 Friend Sub GetDateParts(ByVal DatePart As DatePartPrecision, Optional ByRef Year As Long, Optional ByRef Month As Long, Optional ByRef Day As Long, Optional ByRef DayOfYear As Long)
     Dim Days As Long
-    Days = Int(mMilliseconds / MilliSecondsPerDay)
+    Days = Int(Int(mMilliseconds) / MilliSecondsPerDay)
     
     Dim Years400 As Long
     Years400 = Days \ DaysPer400Years

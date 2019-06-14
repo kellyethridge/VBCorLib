@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = True
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2004 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2019 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: WeakReference
+' Module: WeakReference
 '
 
 ''
@@ -54,8 +57,6 @@ Public Event Disposed()
 
 
 Private mPtrWeak                As Long
-Private mIsChild                As Boolean
-Private mChildWeakReferences    As New Collection
 
 
 
@@ -80,11 +81,6 @@ End Property
 ' @param RHS Strong object to create a weak reference to.
 '
 Public Property Set Target(ByVal RHS As Object)
-    If IsChild Then
-        If Not RHS Is Nothing Then Throw Cor.NewInvalidOperationException("Can only set Target to Nothing on a child WeakReference.")
-    End If
-    
-    Call Dispose
     Call Init(RHS)
 End Property
 
@@ -126,120 +122,13 @@ Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
-''
-' Creates a new weak reference without allocating addition
-' resources to maintain reference integrity.
-'
-' @return A child version of the parent weak reference.
-' @remarks If multiple weak references want to be maintained
-' on a single object, creating child weak references is the
-' most efficient method.
-' <p>You cannot set the target to anything other than Nothing
-' on a child weak reference. This is to preserve the integerity
-' of the controlling weak reference and the referenced object.</p>
-' <p>If the controlling weak reference loses reference to the
-' Target object, all child weak references will also lose reference.</p>
-'
-Public Function CreateChild() As WeakReference
-    If IsChild Then _
-        Throw Cor.NewInvalidOperationException("Child reference cannot create child reference.")
-    
-    Set CreateChild = New WeakReference
-    Call mChildWeakReferences.Add(CreateChild, CStr(CreateChild.GetHashCode))
-    Call CreateChild.InitChild(mPtrWeak)
-End Function
-
-''
-' Returns if this isnstance of WeakReference is a child.
-'
-' @return Returns True if this instance was created using
-' <i>Object.CreateChild</i>, otherwise False.
-'
-Public Property Get IsChild() As Boolean
-    IsChild = mIsChild
-End Property
-
-''
-' Releases the reference to the Target object.
-'
-' @param ChildrenOnly True is this instance is the controlling
-' WeakReference and only the children are to be disposed of.
-' @remarks This allows the weak reference and its children to be
-' disconnected from the Target object. The children themselves can
-' be disposed of without disposing the controlling WeakReference.
-'
-Public Sub Dispose(Optional ByVal ChildrenOnly As Boolean = False)
-    If Not IsAlive Then Exit Sub
-    
-    ' Are we the controlling WeakReference and are
-    ' disposing everything, not just our children?
-    If (Not IsChild) And (Not ChildrenOnly) Then
-        ' We are the controlling WeakReference, so
-        ' Set the ".pOwner" to Nothing. This will
-        ' signal the Release method that we are no
-        ' longer maintaining a weak reference.
-        MemLong(mPtrWeak + 24) = vbNullPtr
-        
-        ' And now set our flag to "Dead"
-        mPtrWeak = vbNullPtr
-    ElseIf IsChild Then
-        ' Children always dispose of there weak reference.
-        mPtrWeak = vbNullPtr
-    End If
-    
-    ' Only the controller will have a collection of kids.
-    Dim Child As WeakReference
-    For Each Child In mChildWeakReferences
-        Call Child.Dispose
-    Next Child
-    
-    ' Now that they are all disposed, get rid of them.
-    Set mChildWeakReferences = New Collection
-    
-    ' All WeakRefernece objects, including the children
-    ' will raise an event on disposing.
-    RaiseEvent Disposed
-End Sub
-
-''
-' Releases any dead child WeakReferences.
-'
-' @remarks This releases any children that may have been disposed
-' by calling Dispose on the child WeakReference and not through
-' the Dispose through the controlling WeakReference object.
-'
-Public Sub ClearDeadReferences()
-    Dim Child As WeakReference
-    Dim NewChildren As Collection
-    Set NewChildren = New Collection
-    
-    For Each Child In mChildWeakReferences
-        If Child.IsAlive Then Call NewChildren.Add(Child, CStr(Child.GetHashCode))
-    Next Child
-    
-    Set mChildWeakReferences = NewChildren
-End Sub
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Target As Object)
     If Target Is Nothing Then Exit Sub
     mPtrWeak = InitWeakReference(Me, Target)
-End Sub
-
-Friend Sub InitChild(ByVal ptr As Long)
-    mPtrWeak = ptr
-    mIsChild = True
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    Call Dispose
 End Sub
 
 

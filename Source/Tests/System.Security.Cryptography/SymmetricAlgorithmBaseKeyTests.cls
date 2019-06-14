@@ -72,8 +72,10 @@ Public Sub SetKey_WithWeakKeyFlag_ThrowsExpectedException()
 
     On Error Resume Next
     Base.SetKey Key
+    On Error GoTo 0
     
     Assert.That TakeException, Iz.SameAs(mEx)
+    Assert.Pass
 End Sub
 
 Public Sub SetKey_WithInvalidKeyLength_ThrowsArgumentException()

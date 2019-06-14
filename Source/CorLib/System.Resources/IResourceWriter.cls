@@ -57,8 +57,8 @@ Public Sub AddResource(ByRef Value As Variant, ByRef ResourceName As Variant, Op
 ' Writes all the resources added by the <a href="IResourceWriter.AddResource.html">AddResource</a> method to the output file or stream.
 '
 ' @remarks <b>Generate</b> does not close the output file or output stream. Instead, consider calling the Close method.
-' <b>Generate</b> is useful when you want to create a resource file, but you don't want to close the output stream.
-' <b>Generate</b> can be called only once. After you call <b>Generate</b>, all <a href="IResourceWriter.html">IResourceWriter</a> methods other than <a href="IResourceWriter.CloseWriter.html">CloseWriter</b> will throw an exception.
+' <p><b>Generate</b> is useful when you want to create a resource file, but you don't want to close the output stream.</p>
+' <p><b>Generate</b> can be called only once. After you call <b>Generate</b>, all <a href="IResourceWriter.html">IResourceWriter</a> methods other than <a href="IResourceWriter.CloseWriter.html">CloseWriter</b> will throw an exception.</p>
 Public Sub Generate(): End Sub
 
 ''

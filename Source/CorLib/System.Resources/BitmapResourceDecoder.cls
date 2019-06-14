@@ -44,8 +44,16 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 Implements IResourceDecoder
-
 Private Const SIZEOF_BITMAPFILEHEADER As Long = 14
+Private Const GMEM_MOVEABLE As Long = &H2
+
+Private Type BITMAPFILEHEADER
+    bfType As Integer
+    bfSize As Long
+    bfReserved1 As Integer
+    bfReserved2 As Integer
+    bfOffBits As Long
+End Type
 
 Private mKey    As ResourceKey
 Private mBitmap As StdPicture
@@ -118,94 +126,123 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function CreatePicture(ByRef Bytes() As Byte) As StdPicture
     Dim ByteIndex       As Long
-    Dim ByteCountOffset As Long
-    
+    Dim Size            As Long
+    Dim hMem            As Long
+    Dim lpMem           As Long
+    Dim Stream          As IUnknown
+
     ByteIndex = LBound(Bytes)
-    
-    ' Create a Stream to write the data to, so we can read
-    ' from it creating a bitmap picture.
-    Dim Stream As IStream
-    CreateStreamOnHGlobal 0, BOOL_TRUE, Stream
-    
-    ' We need to insert a BITMAPFILEHEADER so that
-    ' the OleLoadPicture will work correctly, only
-    ' if the BITMAPFILEHEADER isn't already there.
-    '
-    ' The first 2 bytes of the header spell BM.
-    If Bytes(ByteIndex) <> &H42 Or Bytes(ByteIndex + 1) <> &H4D Then
-        ' The bitmap data begins immediatley after the
-        ' BITMAPFILEHEADER, BITMAPINFOHEADER and any
-        ' RGBQUAD structures. There are no RGBQUAD
-        ' structures for 24bit pictures.
-        Dim DataStartOffset As Long
-        
-        ' All offsets include the BITMAPFILEHEADER(14) and BITMAPINFOHEADER(40)
-        ' so start the offset with that.
-        DataStartOffset = 54
-        
-        Const BITCOUNT_OFFSET   As Long = 14
-        Const COLORSUSED_OFFSET As Long = 32
-        
-        Dim ColorsUsed As Long
-        ColorsUsed = AsLong(Bytes(ByteIndex + COLORSUSED_OFFSET))
-        
-        ' If ColorsUsed is 0 then the maximum number
-        ' of colors is used based on the bits-per-pixel.
-        If ColorsUsed = 0 Then
-            Dim BitCount As Long
-            BitCount = AsWord(Bytes(ByteIndex + BITCOUNT_OFFSET))
-            ColorsUsed = Powers(BitCount)
-        End If
-        
-        ' Add the RGBQUAD structure offset.
-        DataStartOffset = DataStartOffset + ColorsUsed * 4
-        
-        ' The BITMAPFILEHEADER gets aligned within
-        ' the datatypes which misaligns the datatypes
-        ' with what the Stream expects. So, we build
-        ' the header by hand.
-        Dim BmpHeader(SIZEOF_BITMAPFILEHEADER - 1) As Byte
-        
-        ' Spell "BM"
-        BmpHeader(0) = vbUpperBChar
-        BmpHeader(1) = vbUpperMChar
-        
-        ' Bytes 3-6 contain the size of the file in bytes.
-        AsLong(BmpHeader(2)) = CorArray.Length(Bytes) + SIZEOF_BITMAPFILEHEADER
-        
-        ' Bytes 11-14 contain the offset to the data bytes.
-        AsLong(BmpHeader(10)) = DataStartOffset
-        
-        ' Shove our header onto the Stream before we shove the data.
-        Stream.Write BmpHeader(0), SIZEOF_BITMAPFILEHEADER, 0&
-        
-        ' We need to count an additional 14 bytes if we have
-        ' inserted our own header information.
-        ByteCountOffset = SIZEOF_BITMAPFILEHEADER
+    Size = Len1D(Bytes)
+
+    If Not HasBitmapHeader(Bytes) Then
+        ' if the original data does not have a header
+        ' then we will be adding our own, so bump up
+        ' the needed memory allocation.
+        Size = Size + SIZEOF_BITMAPFILEHEADER
     End If
-    
-    ' Shove the data onto the stream.
-    Stream.Write Bytes(ByteIndex), CorArray.Length(Bytes), 0&
-    
-    ' Move back to the start of the stream for reading.
-    Stream.Seek 0, STREAM_SEEK_SET, 0&
-    
-    ' We setup a guid to match the interface we want the
-    ' OleLoadPicture to create for the return picture object.
-    Dim UnkIID As VBGUID
-    With UnkIID
-        .Data4(0) = &HC0
-        .Data4(7) = &H46
-    End With
-    
-    ' Load the picture from the stream, creating an IPicture object. We simply
-    ' assign it to an IUnknown object for ease.
-    Dim Unk As IUnknown
-    OleLoadPicture Stream, 0, BOOL_TRUE, UnkIID, Unk
-    
+
+    ' lets get that memory
+    hMem = GlobalAlloc(GMEM_MOVEABLE, Size)
+
+    If hMem Then
+        ' we lock the memory and get its location
+        ' so we can copy our data to it.
+        lpMem = GlobalLock(hMem)
+
+        If lpMem Then
+            ' if the original data has a bitmap header
+            ' included, then just copy the data to the
+            ' allocated memory. Otherwise, we will need
+            ' to add our own header first, then add the data.
+            If HasBitmapHeader(Bytes) Then
+                CopyMemory ByVal lpMem, Bytes(ByteIndex), Size
+            Else
+                AddBitmapHeader lpMem, Bytes
+                CopyMemory ByVal (lpMem + SIZEOF_BITMAPFILEHEADER), Bytes(ByteIndex), Len1D(Bytes)
+            End If
+
+            GlobalUnlock lpMem
+
+            ' we'll create a stream using the memory we filled with our
+            ' image as a backing store for the stream. Then we'll just
+            ' create a picture from the stream.
+            If CreateStreamOnHGlobal(hMem, BOOL_FALSE, Stream) = S_OK Then
+                Dim UnkIID As VBGUID
+                With UnkIID
+                    .Data4(0) = &HC0
+                    .Data4(7) = &H46
+                End With
+
+                Dim Unk As IUnknown
+                OleLoadPicture Stream, Size, BOOL_FALSE, UnkIID, Unk
+            End If
+        End If
+
+        GlobalFree hMem
+    End If
+
     ' Return it, casting to a StdPicture object.
     Set CreatePicture = Unk
 End Function
+
+Private Function HasBitmapHeader(ByRef Bytes() As Byte) As Boolean
+    Dim ByteIndex As Long
+    
+    ByteIndex = LBound(Bytes)
+    HasBitmapHeader = Bytes(ByteIndex) = vbUpperBChar And Bytes(ByteIndex + 1) = vbUpperMChar
+End Function
+
+' The bitmap data begins immediatley after the
+' BITMAPFILEHEADER, BITMAPINFOHEADER and any
+' RGBQUAD structures. There are no RGBQUAD
+' structures for 24bit pictures.
+Private Sub AddBitmapHeader(ByVal lpMem As Long, ByRef Bytes() As Byte)
+    Dim DataStartOffset As Long
+    Dim ByteIndex       As Long
+    
+    ByteIndex = LBound(Bytes)
+    
+    ' All offsets include the BITMAPFILEHEADER(14) and BITMAPINFOHEADER(40)
+    ' so start the offset with that.
+    DataStartOffset = 54
+    
+    Const BITCOUNT_OFFSET   As Long = 14
+    Const COLORSUSED_OFFSET As Long = 32
+    
+    Dim ColorsUsed As Long
+    ColorsUsed = AsLong(Bytes(ByteIndex + COLORSUSED_OFFSET))
+    
+    ' If ColorsUsed is 0 then the maximum number
+    ' of colors is used based on the bits-per-pixel.
+    If ColorsUsed = 0 Then
+        Dim BitCount As Long
+        BitCount = AsWord(Bytes(ByteIndex + BITCOUNT_OFFSET))
+        ColorsUsed = Powers(BitCount)
+    End If
+    
+    ' Add the RGBQUAD structure offset.
+    DataStartOffset = DataStartOffset + ColorsUsed * 4
+    
+    ' The BITMAPFILEHEADER gets aligned within
+    ' the datatypes which misaligns the datatypes
+    ' with what the Stream expects. So, we build
+    ' the header by hand.
+    Dim BmpHeader(SIZEOF_BITMAPFILEHEADER - 1) As Byte
+    
+    ' Spell "BM"
+    BmpHeader(0) = vbUpperBChar
+    BmpHeader(1) = vbUpperMChar
+    
+    ' Bytes 3-6 contain the size of the file in bytes.
+    AsLong(BmpHeader(2)) = CorArray.Length(Bytes) + SIZEOF_BITMAPFILEHEADER
+    
+    ' Bytes 11-14 contain the offset to the data bytes.
+    AsLong(BmpHeader(10)) = DataStartOffset
+        
+        ' Shove our header onto the Stream before we shove the data.
+'        Stream.Write BmpHeader(0), SIZEOF_BITMAPFILEHEADER, 0&
+    CopyMemory ByVal lpMem, BmpHeader(0), SIZEOF_BITMAPFILEHEADER
+End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

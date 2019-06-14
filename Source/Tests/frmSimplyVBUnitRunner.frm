@@ -54,7 +54,7 @@ Option Explicit
 
 Private Sub Form_Load()
     SkipUnsupportedTimeZone = False
-
+    
     AddMicrosoftWin32
     AddSystem
     AddSystemCollections
@@ -136,7 +136,7 @@ Private Sub AddSystem()
     
         .Add New PublicFunctionsTests
 '        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
-        .Add New TestWeakReference
+'        .Add New WeakReferenceTests
         
         AddTest .This
     End With
@@ -380,6 +380,7 @@ End Function
 
 Private Sub Form_Initialize()
     Me.UIRunner1.Init App
+    Me.UIRunner1.AddListener New OutputLogger
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)

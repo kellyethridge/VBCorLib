@@ -604,7 +604,6 @@ Public Sub GetCharsEx_WithNotEnoughCapacity_ThrowsArgumentException(ByVal Encodi
     On Error Resume Next
     Encoding.GetCharsEx Bytes, 0, 8, Chars, 0
     
-    Debug.Print Err.Description
     AssertArgumentException Err, "Chars"
 End Sub
 

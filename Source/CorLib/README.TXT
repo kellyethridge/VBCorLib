@@ -80,18 +80,22 @@ version 3.0 (BREAKING CHANGES)
 	* Renamed BigInteger.ToArray to BigInteger.ToByteArray to match the .net method name. *BREAKING*
 	* Updated BigInteger.Parse to match .NET implementation closely. Now utilizes the NumberStyles enum.
 	* Fixed CorDateTime.MaxValue to include max ticks.
-	* Fixed HebrewCalendar to correctly identity all days in leap month as a leap day.
+	* Fixed HebrewCalendar to correctly identify all days in leap month as a leap day.
 	* Added Convert.ToDateTime method.
 	* Renamed ResByteEncoder to BinaryResourceEncoder. *BREAKING*
 	* Renamed ResBitMapEncoder to BitMapResourceEncoder. *BREAKING*
-	* Fixed BitMapResourceEncoder Encode. Was crashing because of an inproper pointer being passed to an API.
+	* Fixed BitMapResourceEncoder Encode. Was crashing because of an improper pointer being passed to an API.
 	* Fixed Object.GetHashCode. Would crash with vbNullString.
-	* Added new SpecialFolder enums defined in .NET 4.
+	* Added additional SpecialFolder enums defined in .NET 4.
 	* Added Environment.Is64BitOperatingSystem method.
 	* Added StringBuilder.Clear method.
 	* Renamed BinaryReader "ReadLong" and "ReadInteger" methods to "ReadInt32" and "ReadInt16" to align with .NET methods. *BREAKING*
 	* Renamed IniFile "GetLong" and "GetInteger" methods to "GetInt32" and "GetInt16" to more align with .NET naming. *BREAKING*
-	
+	* Renamed IniSectionWriter to IniResourceWriter. *BREAKING*
+	* Implemented IResourceWriter.CloseWriter in IniResourceWriter.
+	* Fixed tests that would break when run against a compiled VBCorLib.
+	* Fixed BitMapResourceDecoder. Was crashing when compiled because of improper release of resources.
+
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
 	* Updated ArrayList to include the ArrayList.Adapter method, wrapping an IList object.

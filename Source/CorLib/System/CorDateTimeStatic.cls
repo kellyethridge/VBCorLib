@@ -331,13 +331,22 @@ End Function
 ' @remarks t1 and t2 are equal if their <a href="CorDateTime.Get.TotalMilliseconds.html">TotalMilliseconds</a> property values are equal. Their <a href="CorDateTime.Get.Kind.html">Kind</a> property values are not considered in the test for equality.
 '
 Public Function Equals(ByRef t1 As Variant, ByRef t2 As Variant) As Boolean
-    Dim d1 As CorDateTime
-    Dim d2 As CorDateTime
+'    Dim d1 As CorDateTime
+'    Dim d2 As CorDateTime
+'
+'    Set d1 = Convert.ToDateTime(t1)
+'    Set d2 = Convert.ToDateTime(t2)
+'
+'    Equals = d1.TotalMilliseconds = d2.TotalMilliseconds
+    Dim ms1 As Currency
+    Dim ms2 As Currency
     
-    Set d1 = Convert.ToDateTime(t1)
-    Set d2 = Convert.ToDateTime(t2)
+    On Error GoTo Catch
+    ms1 = GetTotalMilliseconds(t1)
+    ms2 = GetTotalMilliseconds(t2)
+    Equals = ms1 = ms2
     
-    Equals = d1.TotalMilliseconds = d2.TotalMilliseconds
+Catch:
 End Function
 
 Friend Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime

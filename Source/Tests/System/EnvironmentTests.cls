@@ -139,25 +139,13 @@ Public Sub GetEnvironmentVariables_WithMachine_ReturnsVariablesForMachine()
     
     Set Variables = Environment.GetEnvironmentVariables(Machine)
     
-    Dim Entry As DictionaryEntry
-    For Each Entry In Variables
-        Debug.Print Entry.Key & ": " & Entry.Value
-    Next
-    
     Assert.That Variables.Keys, Has.Member("path").IgnoreCase
-    ' this could fail on other developer machines
-    Assert.That Environ("Path"), Iz.StringContaining(Variables("Path"))
 End Sub
 
 Public Sub GetEnvironmentVariables_WithProcess_ReturnsVariablesForProcess()
     Dim Variables As IDictionary
     
     Set Variables = Environment.GetEnvironmentVariables
-    
-    Dim Entry As DictionaryEntry
-    For Each Entry In Variables
-        Debug.Print Entry.Key & ": " & Entry.Value
-    Next
     
     Assert.That Variables.Keys, Has.Member("path").IgnoreCase
 End Sub

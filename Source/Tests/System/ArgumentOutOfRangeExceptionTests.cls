@@ -132,6 +132,7 @@ Public Sub CatchArgumentOutOfRange_WithArgumentOutOfRangeThrown_CatchesException
     On Error Resume Next
     Dim Ex As New ArgumentOutOfRangeException
     Throw Ex
+    On Error GoTo 0
     
     Dim Actual As Boolean
     Dim ActualEx As ArgumentOutOfRangeException
@@ -139,11 +140,13 @@ Public Sub CatchArgumentOutOfRange_WithArgumentOutOfRangeThrown_CatchesException
     
     Assert.That Actual, Iz.True
     Assert.That ActualEx, Iz.SameAs(Ex)
+    Assert.Pass
 End Sub
 
 Public Sub CatchArgumentOutOfRange_WithNonArgumentOutOfRangeThrown_DoesNotCatch()
     On Error Resume Next
     Throw New SystemException
+    On Error GoTo 0
     
     Dim Actual As Boolean
     Dim ActualEx As ArgumentOutOfRangeException
@@ -151,4 +154,5 @@ Public Sub CatchArgumentOutOfRange_WithNonArgumentOutOfRangeThrown_DoesNotCatch(
     
     Assert.That Actual, Iz.False
     Assert.That ActualEx, Iz.Nothing
+    Assert.Pass
 End Sub

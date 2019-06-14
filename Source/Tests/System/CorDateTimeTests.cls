@@ -44,6 +44,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Null, False
             Test.Use Nothing, False
             Test.Use Empty, False
+            Test.Use 3, False
+            
+        Case "Equals_WithMultipleArguments_ReturnsExpected"
+            Test.Use #1/2/2001#, True
+            Test.Use #1/1/2001#, False
+            Test.Use NewDateTime(2001, 1, 2), True
+            Test.Use 3, False
                    
         Case "IsLeapYear_WithValue_ReturnsExpected"
             Test.Use 2015, False
@@ -297,6 +304,14 @@ Public Sub Equals_WithValues_ReturnsExpected(ByVal Other As Variant, ByVal Expec
     
     Dim Actual As Boolean
     Actual = SUT.Equals(Other)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Equals_WithMultipleArguments_ReturnsExpected(ByVal Other As Variant, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorDateTime.Equals(#1/2/2001#, Other)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

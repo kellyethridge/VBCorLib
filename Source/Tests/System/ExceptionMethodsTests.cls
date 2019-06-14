@@ -43,6 +43,7 @@ Public Sub Catch_WhenExceptionThrown_ReturnsThrownException()
     On Error Resume Next
     Dim Ex As New Exception
     Throw Ex
+    On Error GoTo 0
     
     Dim ActualEx As Exception
     Dim Actual As Boolean
@@ -50,6 +51,7 @@ Public Sub Catch_WhenExceptionThrown_ReturnsThrownException()
     
     Assert.That Actual, Iz.True
     Assert.That ActualEx, Iz.SameAs(Ex)
+    Assert.Pass
 End Sub
 
 Public Sub Catch_WithNoException_ReturnsNothing()
@@ -78,6 +80,7 @@ Public Sub Catch_WithThrownErrObject_ReturnsCorrispondingException()
     Err.Description = "Mine"
     Err.Source = "Source"
     Throw Err
+    On Error GoTo 0
     
     Dim Actual As Boolean
     Dim ActualEx As Exception
@@ -87,6 +90,7 @@ Public Sub Catch_WithThrownErrObject_ReturnsCorrispondingException()
     Assert.That ActualEx.ErrorNumber, Iz.EqualTo(20)
     Assert.That ActualEx.Message, Iz.EqualTo("Mine")
     Assert.That ActualEx.Source, Iz.EqualTo("Source")
+    Assert.Pass
 End Sub
 
 Public Sub Catch_FromErrObject_ReturnsCaughtException()
@@ -108,32 +112,38 @@ Public Sub PeekException_WithThrownException_ReturnsException()
     On Error Resume Next
     Dim Ex As New ArgumentException
     Throw Ex
+    On Error GoTo 0
     
     Dim Actual As Exception
     Set Actual = PeekException
     
     Assert.That Actual, Iz.SameAs(Ex)
+    Assert.Pass
 End Sub
 
 Public Sub PeekException_WhenCalled_DoesNotClearException()
     On Error Resume Next
     Throw New Exception
+    On Error GoTo 0
     
     PeekException
     
     Assert.That PeekException, Iz.Not.Nothing
+    Assert.Pass
 End Sub
 
 Public Sub TakeException_WhenCalled_ReturnsAndClearsException()
     On Error Resume Next
     Dim Ex As New Exception
     Throw Ex
+    On Error GoTo 0
     
     Dim Actual As Exception
     Set Actual = TakeException
     
     Assert.That Actual, Iz.SameAs(Ex)
     Assert.That PeekException, Iz.Nothing
+    Assert.Pass
 End Sub
 
 
