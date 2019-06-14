@@ -1,5 +1,5 @@
 Type=Exe
-Reference=*\G{6B9FD8C5-96AD-403D-B391-DCDAC5A9A849}#1.0#0#..\..\Binaries\VBCorLib3.dll#VB.EXT: CorLib 3.0
+Reference=*\A..\CorLib\CorLib.vbp
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorType.tlb#VB.EXT: VBCorLib 3.0 Type Library
 Reference=*\G{923925AC-1013-4D27-9FB1-4FF0B3B47BA2}#4.0#0#..\..\..\..\..\..\..\WINDOWS\SysWow64\SimplyVBUnitType.tlb#SimplyVBUnit Type Library 4.0
