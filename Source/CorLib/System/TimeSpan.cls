@@ -51,6 +51,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements IComparable
+Implements IFormattable
 
 Private Const PropMilliseconds      As String = "Milliseconds"
 Private Const DefaultMilliseconds   As Long = 0
@@ -226,7 +227,7 @@ End Function
 ' @remarks A string representation is in the form of [-][d.]hh:mm:ss[.ff]
 ' where the bracketed fields are optional. The optional fields will be
 ' included in the string their value is not zero, or the TimeSpan is negative.
-Public Function ToString() As String
+Public Function ToString(Optional ByRef Format As String, Optional ByVal FormatProvider As IFormatProvider) As String
     Dim Output As StringBuilder
     Set Output = StringBuilderCache.Acquire
     
@@ -330,6 +331,14 @@ End Sub
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     PropBag.WriteProperty PropMilliseconds, mMilliseconds
 End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IFormattable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IFormattable_ToString(Format As String, ByVal Provider As IFormatProvider) As String
+    IFormattable_ToString = ToString(Format, Provider)
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

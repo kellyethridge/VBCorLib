@@ -44,9 +44,9 @@ Private Const IID_IProvideClassInfo_Data1   As Long = &HB196B283
 
 ' our lightweight object that replaces the existing VTable.
 Public Type WeakRefHookType
-    VTable(3)       As Long
+    VTable(2)       As Long
     pOriginalVTable As Long
-    Target          As IProvideClassInfo
+    Target          As IVBUnknown
     pOwner          As Long
 End Type
 
@@ -78,12 +78,12 @@ Private mWeak As WeakSafeArray
 ' @param owner The WeakReference object that maintains the hook and returns a strong reference.
 ' @param Target The object to maintain a weak reference to without keeping it alive in memory.
 '
-Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As IUnknown) As Long
+Public Function TrackReference(ByVal Target As IUnknown) As Long
     Dim Weak As WeakRefHookType
-    If mWeak.pVTable = 0 Then
-        IID_IProvideClassInfo = GUIDFromString("{B196B283-BAB4-101A-B69C-00AA00341D07}")
-        IID_IUnknown = GUIDFromString("{00000000-0000-0000-C000-000000000046}")
-        
+'    If mWeak.pVTable = 0 Then
+''        IID_IProvideClassInfo = GUIDFromString("{B196B283-BAB4-101A-B69C-00AA00341D07}")
+'        IID_IUnknown = GUIDFromString("{00000000-0000-0000-C000-000000000046}")
+'
 '        With mWeak
 '            .pRelease = FuncAddr(AddressOf WeakReferenceArray_Release)
 '            .pVTable = VarPtr(.pVTable)
@@ -96,7 +96,7 @@ Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As 
 '                .cElements = 1
 '            End With
 '        End With
-    End If
+'    End If
     
     Dim pUnk As Long
     Dim Key As Variant
@@ -105,7 +105,7 @@ Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As 
     Key = mTrackers(pUnk)
     
     If Not IsEmpty(Key) Then
-        InitWeakReference = Key
+        TrackReference = Key
         Exit Function
     End If
         
@@ -123,9 +123,9 @@ Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As 
         .VTable(0) = FuncAddr(AddressOf WeakReference_QueryInterface)
         .VTable(1) = FuncAddr(AddressOf WeakReference_AddRef)
         .VTable(2) = FuncAddr(AddressOf WeakReference_Release)
-        .VTable(3) = FuncAddr(AddressOf WeakReference_GetClassInfo)
+'        .VTable(3) = FuncAddr(AddressOf WeakReference_GetClassInfo)
         
-        Set Target = Nothing
+'        Set Target = Nothing
         
 '        MemLong(VarPtr(.Target)) = pUnk
         VTablePtr(.Target) = pUnk
@@ -138,7 +138,20 @@ Public Function InitWeakReference(ByVal Owner As WeakReference, ByVal Target As 
     CopyMemory ByVal This, Weak, LenB(Weak)
     ZeroMemory Weak, LenB(Weak)
     mTrackers.Add pUnk, This
-    InitWeakReference = This
+    TrackReference = This
+End Function
+
+Public Function GetReference(ByVal TrackerKey As Long) As IUnknown
+    Dim WeakPtr As Variant
+    
+    WeakPtr = mTrackers(TrackerKey)
+    
+    If Not IsEmpty(WeakPtr) Then
+        Dim Unk As IUnknown
+        ObjectPtr(Unk) = WeakPtr
+        Set GetReference = Unk
+        ObjectPtr(Unk) = vbNullPtr
+    End If
 End Function
 
 ''
@@ -161,22 +174,23 @@ Private Function WeakReference_QueryInterface(ByRef This As Long, ByRef riid As 
         This = .pOriginalVTable
         WeakReference_QueryInterface = .Target.QueryInterface(riid, pvObj)
         
-        If pvObj <> 0 Then
-            If pvObj = VarPtr(This) Then
-                Dim fOK As Boolean
-                Select Case riid.Data1
-                    Case IID_IUnknown_Data1
-                        fOK = CBool(IsEqualGUID(riid, IID_IUnknown))
-                    Case IID_IProvideClassInfo_Data1
-                        fOK = CBool(IsEqualGUID(riid, IID_IProvideClassInfo))
-                End Select
-                If Not fOK Then
-                    .Target.Release
-                    pvObj = 0
-                    WeakReference_QueryInterface = E_NOINTERFACE
-                End If
-            End If
-        End If
+'        If pvObj <> 0 Then
+'            If pvObj = VarPtr(This) Then
+'                Dim fOK As Boolean
+'                Select Case riid.Data1
+'                    Case IID_IUnknown_Data1
+'                        fOK = CBool(IsEqualGUID(riid, IID_IUnknown))
+'                    Case IID_IProvideClassInfo_Data1
+'                        fOK = CBool(IsEqualGUID(riid, IID_IProvideClassInfo))
+'                End Select
+'
+'                If Not fOK Then
+'                    .Target.Release
+'                    pvObj = 0
+'                    WeakReference_QueryInterface = E_NOINTERFACE
+'                End If
+'            End If
+'        End If
     End With
     This = OldVTable
 End Function
@@ -210,9 +224,9 @@ End Function
 '
 Private Function WeakReference_Release(ByRef This As Long) As Long
     Dim OldVTable As Long
-    OldVTable = This
     
     With mWeak
+        OldVTable = This
         .SA.pvData = This
     
         With .WeakRef(0)
@@ -226,13 +240,15 @@ Private Function WeakReference_Release(ByRef This As Long) As Long
                 This = OldVTable
             Else
                 ObjectPtr(.Target) = 0
+                
                 If .pOwner <> 0 Then
                     Dim Owner As WeakReference
                     ObjectPtr(Owner) = .pOwner
                     ObjectPtr(Owner) = 0
                     .pOwner = 0
                 End If
-                Call CoTaskMemFree(This)
+                                
+                CoTaskMemFree This
             End If
         End With
     End With
@@ -247,19 +263,19 @@ End Function
 ' @param ppTypeInfo A pointer to the ITypeInfo object.
 ' @return Error codes.
 '
-Private Function WeakReference_GetClassInfo(ByRef This As Long, ByRef ppTypeInfo As Long) As Long
-    Dim OldVTable As Long
-    OldVTable = This
-    
-    mWeak.SA.pvData = This
-    
-    With mWeak.WeakRef(0)
-        This = .pOriginalVTable
-        WeakReference_GetClassInfo = .Target.GetClassInfo(ppTypeInfo)
-    End With
-    
-    This = OldVTable
-End Function
+'Private Function WeakReference_GetClassInfo(ByRef This As Long, ByRef ppTypeInfo As Long) As Long
+'    Dim OldVTable As Long
+'    OldVTable = This
+'
+'    mWeak.SA.pvData = This
+'
+'    With mWeak.WeakRef(0)
+'        This = .pOriginalVTable
+'        WeakReference_GetClassInfo = .Target.GetClassInfo(ppTypeInfo)
+'    End With
+'
+'    This = OldVTable
+'End Function
 
 
 ''

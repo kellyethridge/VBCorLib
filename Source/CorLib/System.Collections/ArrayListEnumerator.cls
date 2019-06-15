@@ -44,21 +44,24 @@ Implements IEnumerator
 Implements ICloneable
 
 Private mBase As EnumeratorBase
+Private mStartIndex As Long
+Private mCount      As Long
 Private mList As ArrayList
 
 
 Public Function NewEnum() As IUnknown
 Attribute NewEnum.VB_UserMemId = -4
-Attribute NewEnum.VB_MemberFlags = "40"
-    Set NewEnum = CreateEnumerator(Me)
+    Set NewEnum = CreateEnumerator(Cor.NewArrayListEnumerator(mList, mStartIndex, mCount))
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
-    Set mBase = Cor.NewEnumeratorBase(Index, Count, List)
+Friend Sub Init(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Count As Long)
+    Set mBase = Cor.NewEnumeratorBase(StartIndex, Count, List)
+    mStartIndex = StartIndex
+    mCount = Count
     Set mList = List
 End Sub
 

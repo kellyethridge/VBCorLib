@@ -215,20 +215,21 @@ Public Sub GetEnumerator_WhenCalled_ReturnsEnumerableSequence()
     Assert.That Actual.MoveNext, Iz.False
 End Sub
 
-Public Sub GetEnumerater_WithSubset_REturnsEnumerableSubset()
+Public Sub GetEnumerater_WithSubset_ReturnsEnumerableSubset()
     Dim Adapter As ArrayList
     Set Adapter = MakeFilledAdapter
     
     Dim Actual As IEnumerator
     Set Actual = Adapter.GetEnumerator(2, 3)
     
-    Assert.That Actual.MoveNext, Iz.True
-    Assert.That Actual.Current, Iz.EqualTo(3)
-    Assert.That Actual.MoveNext, Iz.True
-    Assert.That Actual.Current, Iz.EqualTo(4)
-    Assert.That Actual.MoveNext, Iz.True
-    Assert.That Actual.Current, Iz.EqualTo(1)
-    Assert.That Actual.MoveNext, Iz.False
+    Assert.That Actual, Iz.EqualTo(Array(3, 4, 1))
+'    Assert.That Actual.MoveNext, Iz.True
+'    Assert.That Actual.Current, Iz.EqualTo(3)
+'    Assert.That Actual.MoveNext, Iz.True
+'    Assert.That Actual.Current, Iz.EqualTo(4)
+'    Assert.That Actual.MoveNext, Iz.True
+'    Assert.That Actual.Current, Iz.EqualTo(1)
+'    Assert.That Actual.MoveNext, Iz.False
 End Sub
 
 Public Sub Insert_WithArray_InsertsValues()

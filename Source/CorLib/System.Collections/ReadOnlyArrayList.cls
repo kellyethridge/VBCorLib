@@ -134,14 +134,14 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As IEnumerator
     Dim Range       As ListRange
     Dim Enumerator  As New ArrayListEnumerator
-    
-    Range = MakeDefaultRange(StartIndex, 0, Count, mList.Count)
-    
+
+    Range = MakeDefaultRange(Index, 0, Count, mList.Count)
+
     If Range.Index < 0 Then _
-        Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
+        Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_NeedNonNegNum
     If Range.Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     If Range.Index + Range.Count > mList.Count Then _

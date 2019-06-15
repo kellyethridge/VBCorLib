@@ -111,7 +111,7 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As IEnumerator
     Dim Range As ListRange
     Range = MakeDefaultRange(Index, 0, Count, mList.Count)
     If Range.Index < 0 Then _
@@ -121,9 +121,7 @@ Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Option
     If Range.Index + Range.Count > mList.Count Then _
         Error.Argument Argument_InvalidOffLen
     
-    Dim Ret As New ArrayListEnumerator
-    Ret.Init Me, Range.Index, Range.Count
-    Set ArrayList_GetEnumerator = Ret
+    Set ArrayList_GetEnumerator = Cor.NewArrayListEnumerator(Me, Range.Index, Range.Count)
 End Function
 
 Private Function ArrayList_GetHashCode() As Long

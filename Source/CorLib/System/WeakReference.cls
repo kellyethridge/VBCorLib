@@ -49,15 +49,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-''
-' This event is raised when a controlling WeakReference loses
-' reference to the underlying Target object.
-'
-Public Event Disposed()
-
-
-Private mPtrWeak                As Long
-
+Private mPtrWeak As Long
 
 
 ''
@@ -65,14 +57,8 @@ Private mPtrWeak                As Long
 '
 ' @return Strong referenced object.
 '
-Public Property Get Target() As Object
-    If Not IsAlive Then _
-        Throw Cor.NewInvalidOperationException("Object reference has already been terminated.")
-    
-    Dim Ret As IUnknown
-    ObjectPtr(Ret) = MemLong(mPtrWeak + 20)
-    Set Target = Ret
-    ObjectPtr(Ret) = 0
+Public Property Get Target() As IUnknown
+    Set Target = GetReference(mPtrWeak)
 End Property
 
 ''
@@ -80,8 +66,8 @@ End Property
 '
 ' @param RHS Strong object to create a weak reference to.
 '
-Public Property Set Target(ByVal RHS As Object)
-    Call Init(RHS)
+Public Property Set Target(ByVal Value As IUnknown)
+    Init Value
 End Property
 
 ''
@@ -90,7 +76,7 @@ End Property
 ' @return Status of the weak referenced object.
 '
 Public Property Get IsAlive() As Boolean
-    IsAlive = mPtrWeak <> vbNullPtr
+    IsAlive = Not Target Is Nothing
 End Property
 
 ''
@@ -126,14 +112,17 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Target As Object)
-    If Target Is Nothing Then Exit Sub
-    mPtrWeak = InitWeakReference(Me, Target)
+Friend Sub Init(ByVal Target As IUnknown)
+    If Target Is Nothing Then
+        Exit Sub
+    End If
+    
+    mPtrWeak = TrackReference(Target)
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

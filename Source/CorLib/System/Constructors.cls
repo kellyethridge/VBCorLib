@@ -309,6 +309,11 @@ Public Function NewArrayList(Optional ByVal Comparer As IComparer, Optional ByRe
     NewArrayList.Init Comparer, Source
 End Function
 
+Friend Function NewArrayListEnumerator(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Count As Long) As ArrayListEnumerator
+    Set NewArrayListEnumerator = New ArrayListEnumerator
+    NewArrayListEnumerator.Init List, StartIndex, Count
+End Function
+
 ''
 ' Creates a new SerializationException object.
 '
@@ -388,7 +393,7 @@ End Function
 ' @param Target The object to maintain a weak reference to.
 ' @return A new WeakReference object.
 '
-Public Function NewWeakReference(ByVal Target As Object) As WeakReference
+Public Function NewWeakReference(ByVal Target As IUnknown) As WeakReference
     Set NewWeakReference = New WeakReference
     NewWeakReference.Init Target
 End Function
