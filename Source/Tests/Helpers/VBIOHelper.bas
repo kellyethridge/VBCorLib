@@ -1,6 +1,19 @@
 Attribute VB_Name = "VBIOHelper"
 Option Explicit
 
+Private mOriginalPath As String
+
+Public Sub SetupTestPath()
+    mOriginalPath = App.Path
+    ChDrive "c"
+    ChDir "c:\windows"
+End Sub
+
+Public Sub RestoreOriginalPath()
+    ChDrive Left$(mOriginalPath, 1)
+    ChDir mOriginalPath
+End Sub
+
 Public Function FolderExists(ByRef Folder As String) As Boolean
     On Error GoTo Finally
     
