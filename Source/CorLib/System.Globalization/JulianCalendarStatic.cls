@@ -36,7 +36,7 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides static methods for the <b>JulianCalendar</b> class.
+' Provides static methods for the <a href="JulianCalendar.html">JulianCalendar</a> class.
 '
 ' @see JulianCalendar
 '
@@ -50,3 +50,4 @@ Option Explicit
 Public Property Get JulianEra() As Long
     JulianEra = 1
 End Property
+

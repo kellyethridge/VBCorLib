@@ -117,7 +117,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTime(ByRef Value As Variant)
-    Set CreationTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
+    Set CreationTimeUtc = Convert.ToDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -126,7 +126,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Set CreationTime(ByRef Value As Variant)
-    Set CreationTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
+    Set CreationTimeUtc = Convert.ToDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -144,7 +144,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let CreationTimeUtc(ByRef Value As Variant)
-    Set CreationTimeUtc = CorDateTime.GetDateTime(Value)
+    Set CreationTimeUtc = Convert.ToDateTime(Value)
 End Property
 
 ''
@@ -172,7 +172,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastAccessTime(ByRef Value As Variant)
-    Set LastAccessTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
+    Set LastAccessTimeUtc = Convert.ToDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -181,7 +181,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Set LastAccessTime(ByRef Value As Variant)
-    Set LastAccessTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
+    Set LastAccessTimeUtc = Convert.ToDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -199,7 +199,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new UTC time.
 '
 Public Property Let LastAccessTimeUtc(ByRef Value As Variant)
-    Set LastAccessTimeUtc = CorDateTime.GetDateTime(Value)
+    Set LastAccessTimeUtc = Convert.ToDateTime(Value)
 End Property
 
 ''
@@ -227,7 +227,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTime(ByRef Value As Variant)
-    Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
+    Set LastWriteTimeUtc = Convert.ToDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -236,7 +236,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Set LastWriteTime(ByRef Value As Variant)
-    Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value).ToUniversalTime
+    Set LastWriteTimeUtc = Convert.ToDateTime(Value).ToUniversalTime
 End Property
 
 ''
@@ -254,7 +254,7 @@ End Property
 ' @param Value A Date or CorDateTime object of the new time.
 '
 Public Property Let LastWriteTimeUtc(ByRef Value As Variant)
-    Set LastWriteTimeUtc = CorDateTime.GetDateTime(Value)
+    Set LastWriteTimeUtc = Convert.ToDateTime(Value)
 End Property
 
 ''
@@ -586,8 +586,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

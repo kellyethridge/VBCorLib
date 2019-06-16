@@ -174,28 +174,12 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
     Select Case ValueType
         Case vbLong, vbInteger, vbByte, vbDouble, vbSingle
             Dim NumberFormatter As NumberFormatInfo
-            If Not Provider Is Nothing Then
-                Set NumberFormatter = Provider.GetFormat(vbNumberFormatInfo)
-            End If
-            
-            If NumberFormatter Is Nothing Then
-                Set NumberFormatter = NumberFormatInfo.CurrentInfo
-            End If
-            
-            Debug.Assert Not NumberFormatter Is Nothing
+            Set NumberFormatter = NumberFormatInfo.GetInstance(Provider)
             ToString = NumberFormatter.Format(Value, Format)
             
         Case vbDate
             Dim DateFormatter As DateTimeFormatInfo
-            If Not Provider Is Nothing Then
-                Set DateFormatter = Provider.GetFormat(vbDateTimeFormatInfo)
-            End If
-            
-            If DateFormatter Is Nothing Then
-                Set DateFormatter = DateTimeFormatInfo.CurrentInfo
-            End If
-            
-            Debug.Assert Not DateFormatter Is Nothing
+            Set DateFormatter = DateTimeFormatInfo.GetInstance(Provider)
             mDateAsDateTime.InitFromDate Value, UnspecifiedKind
             ToString = DateFormatter.Format(mDateAsDateTime, Format)
             
@@ -233,6 +217,11 @@ Private Function HashString(ByRef Value As Variant) As Long
     Dim Length  As Long
     
     Ptr = StrPtr(Value)
+    
+    If Ptr = vbNullPtr Then
+        Exit Function
+    End If
+    
     Length = MemLong(Ptr - 4) \ 2
     mCharBuffer.Buffer.pvData = Ptr
     mCharBuffer.Buffer.cElements = Length

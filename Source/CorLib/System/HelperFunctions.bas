@@ -40,20 +40,14 @@ Public Sub InitPublicFunctions()
 End Sub
 
 ''
-' Helper function to retrieve the return value of the AddressOf method.
+' Retrieves the return value of the AddressOf method.
 '
 ' @param pfn Value supplied using AddressOf.
 ' @return The value returned from AddressOf.
-' @remarks The only way to retrieve the value returned from a call to
-' AddressOf is to use the AddressOf function when supplying parameter
-' values to a function call. By calling this function and using the
-' AddressOf method to supply the parameter, the address of the function
-' can be obtained.
+' @remarks This allows us to obtain the result of the VB AddressOf method.
 '
-' <h4>Example</h4>
-' <pre>
-' pfn = FuncAddr(AddressOf MyFunction)
-' </pre>
+' Example:
+'   pfn = FuncAddr(AddressOf MyFunction)
 '
 Public Function FuncAddr(ByVal pfn As Long) As Long
     FuncAddr = pfn
@@ -98,17 +92,6 @@ Public Function StrongPtr(ByVal Ptr As Long) As IUnknown
 End Function
 
 ''
-' Modulus method used for large values held within currency datatypes.
-'
-' @param x The value to be divided.
-' @param y The value used to divide.
-' @return The remainder of the division.
-'
-Public Function Modulus(ByVal x As Currency, ByVal y As Currency) As Currency
-  Modulus = x - (y * Fix(x / y))
-End Function
-
-''
 ' returns an integer value from the system locale settings.
 '
 ' @param LCID The locale identifier.
@@ -127,18 +110,21 @@ End Function
 ' @return The value retrieved from the system for the specified locale.
 '
 Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As String
-    Dim Buf     As String
-    Dim Size    As Long
+    Dim Buf         As String
+    Dim Size        As Long
+    Dim ErrorCode   As Long
     
     Size = 128
     Do
         Buf = String$(Size, vbNullChar)
         Size = GetLocaleInfoW(LCID, LCType, Buf, Size)
-        If Size > 0 Then _
+        
+        If Size > 0 Then
             Exit Do
-                
-        Dim ErrorCode As Long
+        End If
+        
         ErrorCode = Err.LastDllError
+        
         If ErrorCode <> ERROR_INSUFFICIENT_BUFFER Then _
             Error.Win32Error ErrorCode
             
@@ -147,8 +133,6 @@ Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As Str
     
     GetLocaleString = Left$(Buf, Size - 1)
 End Function
-
-
 
 ''
 ' Attempts to create a Stream object based on the source.
@@ -187,99 +171,22 @@ Public Function GetStream(ByRef Source As Variant, ByVal Mode As FileMode, Optio
 End Function
 
 ''
-' Attempts to return an LCID from the specified source.
-'
-' CultureInfo:      Returns the LCID.
-' vbLong:           Returns the value.
-' vbString:         Assumes culture name, loads culture, returning LCID.
-'
-Public Function GetLanguageID(ByRef CultureID As Variant) As Long
-    Dim Info As CultureInfo
-    
-    If IsMissing(CultureID) Then
-        GetLanguageID = CultureInfo.CurrentCulture.LCID
-    Else
-        Select Case VarType(CultureID)
-            Case vbObject
-                If TypeOf CultureID Is CultureInfo Then
-                    Set Info = CultureID
-                    GetLanguageID = Info.LCID
-                Else
-                    Throw Cor.NewArgumentException("CultureInfo object required.", "CultureID")
-                End If
-            
-            Case vbLong, vbInteger, vbByte
-                GetLanguageID = CultureID
-            
-            Case vbString
-                Set Info = Cor.NewCultureInfo(CultureID)
-                GetLanguageID = Info.LCID
-                
-            Case Else
-                Throw Cor.NewArgumentException("CultureInfo object, Name or Language ID required.")
-        End Select
-    End If
-End Function
-
-''
-' Returns if the value is an integer value datatype.
-'
-' @param Value The value to determine if is an integer datatype.
-' @return Returns True if the value is an integer datatype, False otherwise.
-'
-Public Function IsInteger(ByRef Value As Variant) As Boolean
-    Select Case VarType(Value)
-        Case vbLong, vbInteger, vbByte
-            IsInteger = True
-    End Select
-End Function
-
-Public Function SwapEndian(ByVal Value As Long) As Long
-    SwapEndian = (((Value And &HFF000000) \ &H1000000) And &HFF&) Or _
-                 ((Value And &HFF0000) \ &H100&) Or _
-                 ((Value And &HFF00&) * &H100&) Or _
-                 ((Value And &H7F&) * &H1000000)
-    If (Value And &H80&) Then SwapEndian = SwapEndian Or &H80000000
-End Function
-
-Public Function RRotate(ByVal Value As Long, ByVal Count As Long) As Long
-    RRotate = Helper.ShiftRight(Value, Count) Or Helper.ShiftLeft(Value, 32 - Count)
-End Function
-
-Public Function LRotate(ByVal Value As Long, ByVal Count As Long) As Long
-    LRotate = Helper.ShiftLeft(Value, Count) Or Helper.ShiftRight(Value, 32 - Count)
-End Function
-
-Public Function ReverseByteCopy(ByRef Bytes() As Byte) As Byte()
-    Dim ub As Long
-    ub = UBound(Bytes)
-    
-    Dim Ret() As Byte
-    ReDim Ret(0 To ub)
-    
-    Dim i As Long
-    For i = 0 To ub
-        Ret(i) = Bytes(ub - i)
-    Next i
-    
-    ReverseByteCopy = Ret
-End Function
-
-
-''
 ' Initializes an array for quick powers of 2 lookup.
 '
 Private Sub InitPowers()
     Dim i As Long
+    
     For i = 0 To 30
         Powers(i) = 2 ^ i
     Next i
+    
     Powers(31) = &H80000000
 End Sub
 
 Private Sub InitPowersOf2()
-    ReDim PowersOf2(0 To 15)
     Dim i As Long
+    ReDim PowersOf2(0 To 15)
+    
     For i = 0 To 14
         PowersOf2(i) = 2 ^ i
     Next i

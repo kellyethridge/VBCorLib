@@ -279,3 +279,31 @@ Public Function ShiftLeftInt32(ByVal Value As Long, ByVal ShiftCount As Long) As
             End If
     End Select
 End Function
+
+Public Function RRotate(ByVal Value As Long, ByVal Count As Long) As Long
+    RRotate = Helper.ShiftRight(Value, Count) Or Helper.ShiftLeft(Value, 32 - Count)
+End Function
+
+Public Function LRotate(ByVal Value As Long, ByVal Count As Long) As Long
+    LRotate = Helper.ShiftLeft(Value, Count) Or Helper.ShiftRight(Value, 32 - Count)
+End Function
+
+''
+' Modulus method used for large values held within currency datatypes.
+'
+' @param x The value to be divided.
+' @param y The value used to divide.
+' @return The remainder of the division.
+'
+Public Function Modulus(ByVal x As Currency, ByVal y As Currency) As Currency
+  Modulus = x - (y * Fix(x / y))
+End Function
+
+Public Function SwapEndian(ByVal Value As Long) As Long
+    SwapEndian = (((Value And &HFF000000) \ &H1000000) And &HFF&) Or _
+                 ((Value And &HFF0000) \ &H100&) Or _
+                 ((Value And &HFF00&) * &H100&) Or _
+                 ((Value And &H7F&) * &H1000000)
+    If (Value And &H80&) Then SwapEndian = SwapEndian Or &H80000000
+End Function
+

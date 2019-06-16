@@ -33,6 +33,33 @@ Public Type ListRange
     Count As Long
 End Type
 
+Private mShiftedArgumentsSA As SafeArray1d
+
+Public Function ShiftArguments(ByRef Args() As Variant) As Variant()
+    Dim Length As Long
+    
+    Length = Len1D(Args)
+    
+    With mShiftedArgumentsSA
+        .cbElements = vbSizeOfVariant
+        .cDims = 1
+        .cLocks = 1
+        
+        If Length > 1 Then
+            .pvData = VarPtr(Args(LBound(Args) + 1))
+            .cElements = Length - 1
+        Else
+            .cbElements = 0
+        End If
+    End With
+    
+    SAPtr(ShiftArguments) = VarPtr(mShiftedArgumentsSA)
+End Function
+
+Public Sub FreeArguments(ByRef Arguments() As Variant)
+    mShiftedArgumentsSA.pvData = vbNullPtr
+    SAPtr(Arguments) = vbNullPtr
+End Sub
 
 Public Function MakeArrayRange(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As ListRange
     If IsMissing(Index) Then

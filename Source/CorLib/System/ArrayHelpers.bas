@@ -47,6 +47,22 @@ Public Function Len1D(ByRef Arr As Variant) As Long
     Len1D = UBound(Arr) - LBound(Arr) + 1
 End Function
 
+
+Public Function ReverseByteCopy(ByRef Bytes() As Byte) As Byte()
+    Dim ub As Long
+    ub = UBound(Bytes)
+    
+    Dim Ret() As Byte
+    ReDim Ret(0 To ub)
+    
+    Dim i As Long
+    For i = 0 To ub
+        Ret(i) = Bytes(ub - i)
+    Next i
+    
+    ReverseByteCopy = Ret
+End Function
+
 ' Attempt to use a specialized search for a specific data type.
 Public Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByVal StartIndex As Long, ByVal Length As Long, ByRef RetVal As Long) As Boolean
     Select Case SafeArrayGetVartype(pSA)

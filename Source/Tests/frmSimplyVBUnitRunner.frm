@@ -54,7 +54,7 @@ Option Explicit
 
 Private Sub Form_Load()
     SkipUnsupportedTimeZone = False
-
+    
     AddMicrosoftWin32
     AddSystem
     AddSystemCollections
@@ -103,11 +103,12 @@ Private Sub AddSystem()
         .Add New GuidTests
         .Add New BitConverterTests
         .Add New CorDateTimeTests
-        .Add New TestEnvironment
         .Add New TimeZoneTests
         .Add New TimeSpanTests
         .Add New ArrayConstructorTests
         .Add New StringComparerTests
+        .Add New EnvironmentTests
+        .Add New OperatingSystemTests
         
         .Add NewSuite("Object Tests", _
             New ObjectBaseTests, _
@@ -119,7 +120,8 @@ Private Sub AddSystem()
         
         .Add NewSuite("Convert Tests", _
             New ConvertToBase64Tests, _
-            New ConvertFromBase64Tests)
+            New ConvertFromBase64Tests, _
+            New ConvertTests)
     
         .Add NewSuite("CorArray Tests", _
             New CorArrayTests, _
@@ -133,6 +135,9 @@ Private Sub AddSystem()
             New CorArrayFindTests)
     
         .Add New PublicFunctionsTests
+'        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
+'        .Add New WeakReferenceTests
+        
         AddTest .This
     End With
 End Sub
@@ -208,6 +213,7 @@ Private Sub AddSystemSecurityCryptography()
         .Add New DSAParametersTests
 
         .Add New SymmetricAlgorithmBaseTests
+        .Add New SymmetricAlgorithmBaseKeyTests
         .Add New CryptoStreamTests
         .Add NewSuite("DESCryptoServiceProvider Tests", _
             New DESCryptoServiceProviderTests, _
@@ -235,11 +241,27 @@ End Sub
 
 Private Sub AddSystemResources()
     With Sim.NewTestSuite("System.Resources")
-'        .Add New TestResourceKey
-'        .Add New TestResourceWriter
-'        .Add New TestResourceManager
-'        .Add New TestResourceSet
-'        .Add New TestResourceReader
+        .Add New ResourceKeyTests
+        .Add New BinaryResourceEncoderTests
+        .Add New BitMapResourceEncoderTests
+        .Add New CursorResourceEncoderTests
+        .Add New IconResourceEncoderTests
+        .Add New StringResourceEncoderTests
+        .Add New PictureResourceInfoTests
+        .Add New PictureResourceGroupTests
+        .Add New CursorResourceGroupEncoderTests
+        .Add New IconResourceGroupEncoderTests
+        .Add New ResourceWriterTests
+        .Add New ResourceSetTests
+        .Add New IconResourceDecoderTests
+        .Add New IconResourceGroupDecoderTests
+        .Add New CursorResourceDecoderTests
+        .Add New CursorResourceGroupDecoderTests
+        .Add New StringResourceDecoderTests
+        .Add New BitmapResourceDecoderTests
+        .Add New ResourceReaderTests
+        .Add New ResourceManagerTests
+        .Add New WinResourceReaderTests
         
         AddTest .This
     End With
@@ -254,7 +276,8 @@ Private Sub AddSystemIO()
         .Add New StreamReaderTests
         .Add New MemoryMappedFileTests
         .Add New FileNotFoundExceptionTests
-'        .Add New TestINIFile
+        .Add New IniFileTests
+        .Add New IniResourceWriterTests
         .Add New DriveInfoTests
         .Add New StringReaderTests
         .Add New StringWriterTests
@@ -310,11 +333,11 @@ End Sub
 
 Private Sub AddSystemGlobalization()
     With Sim.NewTestSuite("System.Globalization")
-'        .Add New TestThaiBuddhistCalendar
-'        .Add New TestTaiwanCalendar
-'        .Add New TestKoreanCalendar
-'        .Add New TestJapaneseCalendar
-'        .Add New TestHebrewCalendar
+        .Add New ThaiBuddhistCalendarTests
+        .Add New TaiwanCalendarTests
+        .Add New KoreanCalendarTests
+        .Add New JapaneseCalendarTests
+        .Add New HebrewCalendarTests
         .Add New GregorianCalendarTests
         .Add New HijriCalendarTests
         .Add New JulianCalendarTests
@@ -357,6 +380,7 @@ End Function
 
 Private Sub Form_Initialize()
     Me.UIRunner1.Init App
+    Me.UIRunner1.AddListener New OutputLogger
 End Sub
 
 Private Sub Form_KeyDown(KeyCode As Integer, Shift As Integer)

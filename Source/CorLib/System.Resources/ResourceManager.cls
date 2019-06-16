@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2019 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: ResourceManager
+' Module: ResourceManager
 '
 
 ''
@@ -70,6 +73,7 @@ Public Function GetObject(ByRef ResourceName As Variant, ByRef ResourceType As V
     
     Dim rs As ResourceSet
     Set rs = InternalGetResourceSet(LangID, False)
+    
     If rs Is Nothing Then
         Dim c As CultureInfo
         Set c = Cor.NewCultureInfo(LangID)
@@ -90,7 +94,7 @@ Public Function GetObject(ByRef ResourceName As Variant, ByRef ResourceType As V
         ' So we won't search any other sets, even if the
         ' specific value doesn't exist in this one, because
         ' the culture was actually specificed.
-        Call Helper.MoveVariant(GetObject, rs.GetObject(ResourceName, ResourceType))
+        Helper.MoveVariant GetObject, rs.GetObject(ResourceName, ResourceType)
     ElseIf ResourceType = ResourceTypes.StringResource Then
         GetObject = GetFallbackString(ResourceName)
     Else
@@ -104,7 +108,7 @@ Public Function GetObject(ByRef ResourceName As Variant, ByRef ResourceType As V
             Dim Entry As DictionaryEntry
             For Each Entry In rs
                 If InvariantCultureKey.Equals(Entry.Key) Then
-                    Call Helper.MoveVariant(GetObject, Entry.Value)
+                    Helper.MoveVariant GetObject, Entry.Value
                     Exit Function
                 End If
             Next Entry
@@ -150,7 +154,10 @@ End Sub
 ' that specific culture.
 '
 Public Function GetEnumerator() As IDictionaryEnumerator
-    If mResourceSets Is Nothing Then Call LoadResources
+    If mResourceSets Is Nothing Then
+        LoadResources
+    End If
+    
     Set GetEnumerator = mResourceSets.GetEnumerator
 End Function
 
@@ -196,7 +203,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub InitFromFile(ByRef FileName As String)
     mFiles = Cor.NewStrings(FileName)
@@ -208,7 +215,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub LoadResources()
     Set mResourceSets = New Hashtable
@@ -217,7 +224,7 @@ Private Sub LoadResources()
     ' to load the resources from each, one by one.
     Dim i As Long
     For i = 0 To UBound(mFiles)
-        Call LoadResource(GetResourceReader(mFiles(i)))
+        LoadResource GetResourceReader(mFiles(i))
     Next i
 End Sub
 
@@ -225,7 +232,7 @@ Private Sub LoadResource(ByVal Reader As IResourceReader)
     ' An error may be thrown here because the readers
     ' files do not validate their source file until
     ' the first attempt at iterating resources.
-    On Error GoTo errTrap
+    On Error GoTo Finally
     
     ' Iterate the reader and load the resources locally.
     ' The resources are separated into individual resource
@@ -235,12 +242,12 @@ Private Sub LoadResource(ByVal Reader As IResourceReader)
         Dim Key As ResourceKey
         Set Key = Entry.Key
         With InternalGetResourceSet(Key.LanguageID, True)
-            Call .AddResource(Key, Entry.Value)
+            .AddResource Key, Entry.Value
         End With
     Next Entry
         
-errTrap:
-    Call Reader.CloseReader
+Finally:
+    Reader.CloseReader
 End Sub
 
 ''
@@ -257,7 +264,7 @@ Private Function GetResourceReader(ByRef FileName As String) As IResourceReader
     ' resources within the executable file.
     If Handle <> NULL_HANDLE Then
         Dim WinRes As New WinResourceReader
-        Call WinRes.InitFromHandle(Handle)
+        WinRes.InitFromHandle Handle
         Set GetResourceReader = WinRes
     Else
         ' We believe we have a file of the .RES format.
@@ -266,14 +273,16 @@ Private Function GetResourceReader(ByRef FileName As String) As IResourceReader
 End Function
 
 Private Function InternalGetResourceSet(ByVal LangID As Long, ByVal AddMissing As Boolean) As ResourceSet
-    If mResourceSets Is Nothing Then Call LoadResources
+    If mResourceSets Is Nothing Then
+        LoadResources
+    End If
     
     If mResourceSets.Contains(LangID) Then
         Set InternalGetResourceSet = mResourceSets(LangID)
     ElseIf AddMissing Then
         Set InternalGetResourceSet = New ResourceSet
         InternalGetResourceSet.LanguageID = LangID
-        Call mResourceSets.Add(LangID, InternalGetResourceSet)
+        mResourceSets.Add LangID, InternalGetResourceSet
     End If
 End Function
 
@@ -323,7 +332,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -339,7 +348,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator

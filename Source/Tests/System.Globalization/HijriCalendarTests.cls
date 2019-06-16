@@ -96,21 +96,39 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #5/12/628#, DayOfWeek.Friday, 51
             Test.Use #5/13/628#, DayOfWeek.Friday, 1
             
+        Case "ToFourDigitYear_WithValue_ReturnsExpected"
+            Test.Use 100, 100
+            Test.Use 50, 1450
+            
     End Select
 End Sub
 
-Public Sub ConstantProperties_WhenCalled_ReturnsExpected()
+Public Sub AlgorithmType_WhenCalled_ReturnsLunarCalendar()
     Dim Calendar As New HijriCalendar
     
     Assert.That Calendar.AlgorithmType, Iz.EqualTo(CalendarAlgorithmType.LunarCalendar)
-    Assert.That Calendar.DaysInYearBeforeMinSupportedYear, Iz.EqualTo(354)
-    Assert.That Calendar.MaxSupportedDateTime, Equals(NewDateTime(9999, 12, 31, 23, 59, 59, 999))
-    Assert.That Calendar.MinSupportedDateTime, Equals(#7/18/622#)
+End Sub
+
+Public Sub MinSupportedDateTime_WhenCalled_ReturnsDateTimeMinValue()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As CorDateTime
+    Set Actual = Calendar.MinSupportedDateTime
+    
+    Assert.That Actual, Equals(#7/18/622#)
+End Sub
+
+Public Sub MaxSupportedDateTime_WhenCalled_ReturnsDateTimeMaxValue()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As CorDateTime
+    Set Actual = Calendar.MaxSupportedDateTime
+    
+    Assert.That Actual, Equals(CorDateTime.MaxValue)
 End Sub
 
 Public Sub HijriAdjustment_WithOutOfRangeValues_ThrowsArgumentOutOfRangeException(ByVal Value As Long)
     Dim Calendar As New HijriCalendar
-    Set Calendar = Calendar.Clone
     
     On Error Resume Next
     Calendar.HijriAdjustment = Value
@@ -130,7 +148,6 @@ End Sub
 Public Sub ToDateTime_WithHijriAdjustment_ReturnsExpected(ByVal Adjustment As Long, ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Expected As Date)
     Dim Calendar    As New HijriCalendar
     Dim Actual      As CorDateTime
-    Set Calendar = Calendar.Clone
     
     Calendar.HijriAdjustment = Adjustment
     Set Actual = Calendar.ToDateTime(Year, Month, Day, 1, 1, 1, 1).DateOnly
@@ -254,6 +271,94 @@ Public Sub GetWeekOfYear_WithFirstDayRule_ReturnsExpected(ByVal d As Date, ByVal
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub TestSerialization()
+    Dim Calendar As New HijriCalendar
+    Calendar.HijriAdjustment = 1
+    Calendar.TwoDigitYearMax = 1000
+    
+    Dim Actual As HijriCalendar
+    Set Actual = Persist(Calendar)
+    
+    Assert.That Actual.HijriAdjustment, Iz.EqualTo(1)
+    Assert.That Actual.TwoDigitYearMax, Iz.EqualTo(1000)
+End Sub
 
+Public Sub IsReadOnly_WhenNew_ReturnsFalse()
+    Dim Calendar As New HijriCalendar
+    
+    Assert.That Calendar.IsReadOnly, Iz.False
+End Sub
 
+Public Sub ReadOnly_WhenCalled_ReturnsReadOnlyInstance()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As Calendar
+    Set Actual = CorLib.Calendar.ReadOnly(Calendar)
+    
+    Assert.That Actual.IsReadOnly, Iz.True
+End Sub
 
+Public Sub AddMethods_WhenCalled_ReturnsExpected()
+    Const d As Date = #1/1/1800#
+    Dim Calendar As New HijriCalendar
+
+    Assert.That Calendar.AddYears(d, 1), Equals(#12/21/1800#), "#1"
+    Assert.That Calendar.AddMonths(d, 1), Equals(#1/30/1800#), "#2"
+    Assert.That Calendar.AddMonths(d, -1), Equals(#12/2/1799#), "#3"
+    Assert.That Calendar.AddDays(d, 1), Equals(#1/2/1800#), "#4"
+    Assert.That Calendar.AddHours(d, 1), Equals(#1/1/1800 1:00:00 AM#), "#5"
+    Assert.That Calendar.AddMinutes(d, 1), Equals(#1/1/1800 12:01:00 AM#), "#6"
+    Assert.That Calendar.AddSeconds(d, 1), Equals(#1/1/1800 12:00:01 AM#), "#7"
+    Assert.That Calendar.AddMilliseconds(d, 1), Equals(NewDateTime(1800, 1, 1, Millisecond:=1)), "#8"
+    Assert.That Calendar.AddWeeks(d, 5), Equals(#2/5/1800#), "#9"
+End Sub
+
+Public Sub GetProperties_WhenCalled_ReturnsExpected()
+    Const d As Date = #1/2/2200 1:20:35 PM#
+    Dim Calendar As New HijriCalendar
+    
+    Assert.That Calendar.GetYear(d), Iz.EqualTo(1626), "#1"
+    Assert.That Calendar.GetMonth(d), Iz.EqualTo(11), "#2"
+    Assert.That Calendar.GetDayOfMonth(d), Iz.EqualTo(16), "#3"
+    Assert.That Calendar.GetHour(d), Iz.EqualTo(13), "#4"
+    Assert.That Calendar.GetMinute(d), Iz.EqualTo(20), "#5"
+    Assert.That Calendar.GetSecond(d), Iz.EqualTo(35), "#6"
+    Assert.That Calendar.GetDayOfWeek(d), Iz.EqualTo(DayOfWeek.Thursday), "#7"
+    Assert.That Calendar.GetDayOfYear(d), Iz.EqualTo(311), "#8"
+End Sub
+
+Public Sub GetMilliseconds_WhenCalled_ReturnsMillisecondsPart()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetMilliseconds(NewDateTime(Second:=1, Millisecond:=50))
+    
+    Assert.That Actual, Iz.EqualTo(50)
+End Sub
+
+Public Sub ToFourDigitYear_WithValue_ReturnsExpected(ByVal Year As Long, ByVal Expected As Long)
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.ToFourDigitYear(Year)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub TwoDigitYearMax_WhenNew_Returns1451()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.TwoDigitYearMax
+    
+    Assert.That Actual, Iz.EqualTo(1451)
+End Sub
+
+Public Sub GetLeapMonth_WhenCalled_ReturnsZero()
+    Dim Calendar As New HijriCalendar
+    
+    Dim Actual As Long
+    Actual = Calendar.GetLeapMonth(2)
+    
+    Assert.That Actual, Iz.EqualTo(0)
+End Sub

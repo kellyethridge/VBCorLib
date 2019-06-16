@@ -1,14 +1,14 @@
 VERSION 1.0 CLASS
 BEGIN
   MultiUse = -1  'True
-  Persistable = 1  'Persistable
+  Persistable = 0  'NotPersistable
   DataBindingBehavior = 0  'vbNone
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
 Attribute VB_Name = "ResourceKey"
 Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = True
+Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
 'The MIT License (MIT)
@@ -108,9 +108,7 @@ Private mHashCode       As Long
 ' Returns the Name or ID of the resource.
 '
 ' @remarks A String or Numeric value.
-' @remarks A resource can have an identification as either
-' a string name or a numeric value. A string name of "101"
-' is not the same as a numeric value of 101.
+' @remarks A resource can have an identification as either a string name or a numeric value. A string name of "101" is not the same as a numeric value of 101.
 '
 Public Property Get ResourceName() As Variant
     ResourceName = mResourceName
@@ -120,9 +118,7 @@ End Property
 ' Returns the Name or ID of the resource type.
 '
 ' @return A String or Numeric value.
-' @remarks A resource can be a type that is defined by the
-' system. A system type is numeric. A custom resource type
-' usually uses a name for the type.
+' @remarks A resource can be a type that is defined by the system. A system type is numeric. A custom resource type usually uses a name for the type.
 '
 Public Property Get ResourceType() As Variant
     ResourceType = mResourceType
@@ -142,24 +138,32 @@ End Property
 '
 ' @param Value The value to compare to this object instance.
 ' @return Returns True if the value and object are equal, otherwise False.
-' @remarks The value is equal if it is a <b>ResourceKey</b> with the
-' same <b>LanguageID</b>, <b>ResourceName</b>, and <b>ResourceType</b>.
+' @remarks The value is equal if it is a <a href="ResourceKey.html">ResourceKey</a> with the same
+' <a href="ResourceKey.Get.LanguageID.html">LanguageID</a>, <a href="ResourceKey.Get.ResourceName.html">ResourceName</a>, and <a href="ResourceKey.Get.ResourceType.html">ResourceType</a>.
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
     If IsObject(Value) Then
-        If Value Is Nothing Then Exit Function
+        If Value Is Nothing Then
+            Exit Function
+        End If
         
         If TypeOf Value Is ResourceKey Then
-            Dim ResKey As ResourceKey
-            Set ResKey = Value
+            Dim Other As ResourceKey
+            Set Other = Value
             
             ' If either key is INVARIANT then we
             ' don't bother comparing the language ID's.
-            If ResKey.LanguageID <> 0 And mLanguageID <> 0 Then
-                If ResKey.LanguageID <> mLanguageID Then Exit Function
+            If Other.LanguageID <> 0 And mLanguageID <> 0 Then
+                If Other.LanguageID <> mLanguageID Then
+                    Exit Function
+                End If
             End If
-            If Not EqualStringOrInt(ResKey.ResourceName, mResourceName) Then Exit Function
-            Equals = EqualStringOrInt(ResKey.ResourceType, mResourceType)
+            
+            If Not EqualStringOrInt(Other.ResourceName, mResourceName) Then
+                Exit Function
+            End If
+            
+            Equals = EqualStringOrInt(Other.ResourceType, mResourceType)
         End If
     End If
 End Function
@@ -168,7 +172,7 @@ End Function
 ' Returns a pseudo-unique hashcode that represents this object.
 '
 ' @return A pseudo-unique hashcode that represents this object.
-' @remarks The <b>ResourceName</b>, <b>ResourceType</b>, and <b>LanguageID</b>
+' @remarks The <a href="ResourceKey.Get.LanguageID.html">LanguageID</a>, <a href="ResourceKey.Get.ResourceName.html">ResourceName</a>, and <a href="ResourceKey.Get.ResourceType.html">ResourceType</a>
 ' are all used to create the hashcode.
 '
 Public Function GetHashCode() As Long
@@ -186,41 +190,33 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef ResourceName As Variant, ByRef ResourceType As Variant, ByVal LanguageID As Long)
-    mLanguageID = LanguageID
+    ValidateResourceName ResourceName
+    ValidateResourceType ResourceType
     
-    Call SetStringOrInt(ResourceName, mResourceName)
-    Call SetStringOrInt(ResourceType, mResourceType)
-    Call SetHashCode
+    mResourceName = ResourceName
+    mResourceType = ResourceType
+    mLanguageID = LanguageID
+    InitHashCode
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub SetStringOrInt(ByRef Source As Variant, ByRef Destination As Variant)
-    Select Case VarType(Source)
-        Case vbString
-            Destination = Source
-        Case vbLong, vbInteger, vbByte
-            Destination = CLng(Source)
-        Case Else
-            Throw Cor.NewArgumentException("Name and ResourceType must be either a String or a Number.")
-    End Select
-End Sub
-
-Private Function EqualStringOrInt(ByRef X As Variant, ByRef Y As Variant) As Boolean
-    If VarType(X) <> VarType(Y) Then Exit Function
-    If VarType(X) = vbString Then
-        EqualStringOrInt = (StrComp(X, Y, vbTextCompare) = 0)
+Private Function EqualStringOrInt(ByRef x As Variant, ByRef y As Variant) As Boolean
+    If VarType(x) = vbString Then
+        If VarType(y) = vbString Then
+            EqualStringOrInt = CorString.EqualsV(x, y, OrdinalIgnoreCase)
+        End If
     Else
-        EqualStringOrInt = (X = Y)
+        EqualStringOrInt = (x = y)
     End If
 End Function
 
-Private Sub SetHashCode()
+Private Sub InitHashCode()
     mHashCode = GetHashedValue(mResourceName) Xor GetHashedValue(mResourceType) Xor mLanguageID
 End Sub
 
@@ -234,34 +230,14 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_ReadProperties(PropBag As PropertyBag)
-    With PropBag
-        mResourceName = .ReadProperty("Name")
-        mResourceType = .ReadProperty("Type")
-        mLanguageID = .ReadProperty("LCID")
-    End With
-End Sub
-
-Private Sub Class_WriteProperties(PropBag As PropertyBag)
-    With PropBag
-        Call .WriteProperty("Name", mResourceName)
-        Call .WriteProperty("Type", mResourceType)
-        Call .WriteProperty("LCID", mLanguageID)
-    End With
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

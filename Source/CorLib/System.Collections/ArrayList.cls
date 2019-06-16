@@ -313,7 +313,7 @@ End Function
 ' parameters, the GetEnumerator must be called instead of simply passing the object
 ' to the For..Each. This allows for a portion of the list to be enumerated.
 ' @include "..\DocIncludes\ArrayList.GetEnumerator.html"
-Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
+Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As IEnumerator
     Dim Range As ListRange
     Range = MakeDefaultRange(Index, 0, Count, mCount)
     If Range.Index < 0 Then _
@@ -323,9 +323,7 @@ Public Function GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Co
     If Range.Index + Range.Count > mCount Then _
         Error.Argument Argument_InvalidOffLen
 
-    Dim Ret As New ArrayListEnumerator
-    Ret.Init Me, Range.Index, Range.Count
-    Set GetEnumerator = Ret
+    Set GetEnumerator = Cor.NewArrayListEnumerator(Me, Range.Index, Range.Count)
 End Function
 
 ''

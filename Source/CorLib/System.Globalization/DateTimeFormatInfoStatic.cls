@@ -97,20 +97,14 @@ End Function
 ' @remarks If the provider does not have a DateTimeFormatInfo object, then Nothing is returned.
 '
 Public Function GetInstance(ByVal FormatProvider As IFormatProvider) As DateTimeFormatInfo
-    If Not FormatProvider Is Nothing Then
-        If TypeOf FormatProvider Is CultureInfo Then
-            Dim CultureProvider As CultureInfo
-            Set CultureProvider = FormatProvider
-            Set GetInstance = CultureProvider.DateTimeFormat
-        ElseIf TypeOf FormatProvider Is DateTimeFormatInfo Then
-            Set GetInstance = FormatProvider
-        Else
-            Set GetInstance = FormatProvider.GetFormat(vbDateTimeFormatInfo)
-        End If
-    End If
-            
-    If GetInstance Is Nothing Then
+    If FormatProvider Is Nothing Then
         Set GetInstance = CurrentInfo
+    Else
+        Set GetInstance = FormatProvider.GetFormat(vbDateTimeFormatInfo)
+        
+        If GetInstance Is Nothing Then
+            Set GetInstance = CurrentInfo
+        End If
     End If
 End Function
 

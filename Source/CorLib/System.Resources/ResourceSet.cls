@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2019 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: ResourceSet
+' Module: ResourceSet
 '
 
 ''
@@ -70,12 +73,12 @@ End Property
 ' a ResourceTypes enum value.
 '
 Public Function GetObject(ByRef ResourceName As Variant, ByRef ResourceType As Variant) As Variant
-    Call VerifyOpen
+    VerifyOpen
     
     Dim Key As ResourceKey
     Set Key = Cor.NewResourceKey(ResourceName, ResourceType, mLanguageID)
     
-    Call Helper.MoveVariant(GetObject, mResources(Key))
+    Helper.MoveVariant GetObject, mResources(Key)
 End Function
 
 ''
@@ -85,10 +88,12 @@ End Function
 ' @return A resource string, or an empty string if not found.
 '
 Public Function GetString(ByRef ResourceName As Variant) As String
-    Dim Ret As Variant
-    Call Helper.MoveVariant(Ret, GetObject(ResourceName, ResourceTypes.StringResource))
-    If IsEmpty(Ret) Then Exit Function
-    GetString = Ret
+    Dim Resource As Variant
+    Helper.MoveVariant Resource, GetObject(ResourceName, ResourceTypes.StringResource)
+    
+    If Not IsEmpty(Resource) Then
+        GetString = Resource
+    End If
 End Function
 
 ''
@@ -103,7 +108,7 @@ End Function
 ' The <i>Key</b> property returns the ID for the specific resource.
 '
 Public Function GetEnumerator() As IDictionaryEnumerator
-    Call VerifyOpen
+    VerifyOpen
     Set GetEnumerator = mResources.GetEnumerator
 End Function
 
@@ -125,23 +130,21 @@ Attribute NewEnum.VB_MemberFlags = "40"
 End Function
 
 ''
-' Returns the name of the type of resource reader to use with
-' this specifici <b>ResourceSet</b>
+' Returns the name of the type of resource reader to use with this specific <a href="ResourceSet.html">ResourceSet</a>.
 '
 ' @return The name of a resource reader type.
 '
 Public Function GetDefaultReader() As String
-    GetDefaultReader = "VBCorLib.ResourceReader"
+    GetDefaultReader = "CorLib.ResourceReader"
 End Function
 
 ''
-' Returns the name of the type of resource writer to use with
-' this specifici <b>ResourceSet</b>
+' Returns the name of the type of resource writer to use with this specific <a href="ResourceSet.html">ResourceSet</a>
 '
 ' @return The name of a resource writer type.
 '
 Public Function GetDefaultWriter() As String
-    GetDefaultWriter = "VBCorLib.ResourceWriter"
+    GetDefaultWriter = "CorLib.ResourceWriter"
 End Function
 
 ''
@@ -179,62 +182,71 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef CultureID As Variant, ByRef Source As Variant)
     mLanguageID = GetLanguageID(CultureID)
-    Call LoadResources(GetReader(Source))
+    LoadResources GetReader(Source)
 End Sub
 
 Private Sub LoadResources(ByVal Reader As IResourceReader)
     Set mResources = New Hashtable
     
-    Dim de As DictionaryEntry
-    For Each de In Reader
+    Dim Entry As DictionaryEntry
+    For Each Entry In Reader
         Dim Key As ResourceKey
-        Set Key = de.Key
+        Set Key = Entry.Key
+        
         If Key.LanguageID = mLanguageID Then
-            Call mResources.Add(de.Key, de.Value)
+            mResources.Add Entry.Key, Entry.Value
         End If
-    Next de
+    Next
 End Sub
 
 Friend Sub AddResource(ByVal Key As ResourceKey, ByRef Data As Variant)
-    If mResources Is Nothing Then Set mResources = New Hashtable
-    Call mResources.Add(Key, Data)
+    If mResources Is Nothing Then
+        Set mResources = New Hashtable
+    End If
+    
+    mResources.Add Key, Data
 End Sub
 
 Friend Function GetResourceSet() As Hashtable
     Set GetResourceSet = mResources
 End Function
 
-Friend Property Let LanguageID(ByVal RHS As Long)
-    mLanguageID = RHS
+Friend Property Let LanguageID(ByVal Value As Long)
+    mLanguageID = Value
 End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyOpen()
-    If mResources Is Nothing Then Throw Cor.NewInvalidOperationException("ResourceSet is closed.")
+    If mResources Is Nothing Then
+        Throw Cor.NewInvalidOperationException("ResourceSet is closed.")
+    End If
 End Sub
 
 Private Function GetReader(ByRef Source As Variant) As IResourceReader
     If IsObject(Source) Then
         If Source Is Nothing Then _
-            Throw Cor.NewArgumentNullException("Source")
+            Error.ArgumentNull "Source"
             
         If TypeOf Source Is IResourceReader Then
             Set GetReader = Source
         End If
     End If
-    If GetReader Is Nothing Then Set GetReader = Cor.NewResourceReader(Source)
+    
+    If GetReader Is Nothing Then
+        Set GetReader = Cor.NewResourceReader(Source)
+    End If
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -250,7 +262,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator

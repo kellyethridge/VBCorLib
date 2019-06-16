@@ -38,11 +38,16 @@ End Property
 Private Sub Main()
     SetInIDE
     SetInDebugger
+    InitMissing
     InitHelper
     InitWin32Api
     InitPublicFunctions
     InitGlobalization
     InitEncoding
+End Sub
+
+Private Sub InitMissing(Optional ByRef Value As Variant)
+    Missing = Value
 End Sub
 
 ''

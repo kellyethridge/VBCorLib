@@ -61,7 +61,7 @@ Public Sub Throw(Optional ByVal Ex As Object)
             Set ErrObj = Ex
             Set mException = CreateException(ErrObj.Description, ErrObj.Number, ErrObj.Source, ErrObj.HelpFile)
         Else
-            Set mException = Cor.NewSystemException("Invalid Throw argument. Must be an Exception type or ErrObject.")
+            Set mException = Cor.NewArgumentException("Must be an Exception type or ErrObject.", "Ex")
         End If
     End If
     

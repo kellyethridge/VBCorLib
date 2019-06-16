@@ -112,6 +112,7 @@ Public Sub CatchArgument_WithArgumentThrown_CatchesException()
     On Error Resume Next
     Dim Ex As New ArgumentException
     Throw Ex
+    On Error GoTo 0
     
     Dim Actual As Boolean
     Dim ActualEx As ArgumentException
@@ -119,11 +120,13 @@ Public Sub CatchArgument_WithArgumentThrown_CatchesException()
     
     Assert.That Actual, Iz.True
     Assert.That ActualEx, Iz.SameAs(Ex)
+    Assert.Pass
 End Sub
 
 Public Sub CatchArgument_WithNonArgumentThrown_DoesNotCatch()
     On Error Resume Next
     Throw New SystemException
+    On Error GoTo 0
     
     Dim Actual As Boolean
     Dim ActualEx As ArgumentException
@@ -131,6 +134,7 @@ Public Sub CatchArgument_WithNonArgumentThrown_DoesNotCatch()
     
     Assert.That Actual, Iz.False
     Assert.That ActualEx, Iz.Nothing
+    Assert.Pass
 End Sub
 
 

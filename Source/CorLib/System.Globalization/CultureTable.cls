@@ -97,13 +97,13 @@ Friend Function GetString(ByVal LCID As Integer, ByVal Index As Long) As String
     On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)
     
-    Dim pos As Long
-    pos = mStringPoolAddress + mCulture(0).Strings(Index)
-    GetString = SysAllocString(pos)
+    Dim Pos As Long
+    Pos = mStringPoolAddress + mCulture(0).Strings(Index)
+    GetString = SysAllocString(Pos)
     Exit Function
     
 Catch:
-    Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
+    UnsupportedLCIDError LCID
 End Function
 
 Friend Function GetStringArray(ByVal LCID As Integer, ByVal Index As Long) As String()
@@ -112,15 +112,15 @@ Friend Function GetStringArray(ByVal LCID As Integer, ByVal Index As Long) As St
                                                 ' since it will return Empty and fail to assign.
     ' Move to the start of the array elements.
     ' The first 2-bytes represent the number of elements.
-    Dim pos As Long
-    pos = mStringPoolAddress + mCulture(0).Strings(Index)
+    Dim Pos As Long
+    Pos = mStringPoolAddress + mCulture(0).Strings(Index)
     
     ' Get number of array elements
     Dim Count As Long
-    Count = MemWord(pos)
+    Count = MemWord(Pos)
     
     ' Move to next set of bytes
-    pos = pos + 2
+    Pos = Pos + 2
     
     Dim Ret() As String
     ReDim Ret(0 To Count - 1)
@@ -130,17 +130,17 @@ Friend Function GetStringArray(ByVal LCID As Integer, ByVal Index As Long) As St
     Dim i As Long
     For i = 0 To Count - 1
         ' Get the string. SysAllocString goes until it find a null character.
-        Ret(i) = SysAllocString(pos)
+        Ret(i) = SysAllocString(Pos)
         
         ' Skip the string characters plus 2 bytes for the terminating character.
-        pos = pos + LenB(Ret(i)) + 2
+        Pos = Pos + LenB(Ret(i)) + 2
     Next i
     
     GetStringArray = Ret
     Exit Function
     
 Catch:
-    Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
+    UnsupportedLCIDError LCID
 End Function
 
 Friend Function GetNumber(ByVal LCID As Integer, ByVal Index As Long) As Integer
@@ -150,19 +150,19 @@ Friend Function GetNumber(ByVal LCID As Integer, ByVal Index As Long) As Integer
     Exit Function
     
 Catch:
-    Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
+    UnsupportedLCIDError LCID
 End Function
 
 Friend Function GetNumberArray(ByVal LCID As Integer, ByVal Index As Long) As Long()
     On Error GoTo Catch
     mCultureSA.pvData = mCulturesByLCID(LCID)
     
-    Dim pos As Long
-    pos = mStringPoolAddress + mCulture(0).Strings(Index)
+    Dim Pos As Long
+    Pos = mStringPoolAddress + mCulture(0).Strings(Index)
     
     Dim Count As Long
-    Count = MemWord(pos)
-    pos = pos + 2
+    Count = MemWord(Pos)
+    Pos = Pos + 2
     
     Dim Ret() As Long
     ReDim Ret(0 To Count - 1)
@@ -173,16 +173,16 @@ Friend Function GetNumberArray(ByVal LCID As Integer, ByVal Index As Long) As Lo
         ' to retrieve it as a string and skip the appropriate
         ' number of characters to the next number.
         Dim s As String
-        s = SysAllocString(pos)
+        s = SysAllocString(Pos)
         Ret(i) = CLng(s)
-        pos = pos + LenB(s) + 2
+        Pos = Pos + LenB(s) + 2
     Next i
     
     GetNumberArray = Ret
     Exit Function
     
 Catch:
-    Throw Cor.NewArgumentException("Culture is not supported.", "LCID")
+    UnsupportedLCIDError LCID
 End Function
 
 Friend Function GetCultureID(ByVal Name As String) As Long
@@ -248,6 +248,10 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub UnsupportedLCIDError(ByVal LCID As Integer)
+    Throw Cor.NewArgumentException("Culture '" & LCID & "' is not supported.", "LCID")
+End Sub
+
 Private Function IsInstalled(ByVal LCID As Long) As Boolean
     IsInstalled = IsValidLocale(LCID, LCID_INSTALLED)
 End Function
@@ -264,22 +268,20 @@ Private Sub Load()
 End Sub
 
 Private Sub LoadLCIDLookup()
-    Set mCulturesByLCID = New Hashtable
-    
-    Dim pos As Long
-    pos = mBaseAddress + SIZEOF_HEADER
-    
+    Dim Index         As Long
     Dim CultureSize As Long
+    Dim NumCultures As Long
+
+    Set mCulturesByLCID = New Hashtable
+    Index = mBaseAddress + SIZEOF_HEADER
     CultureSize = MemLong(mBaseAddress + SIZEOF_CULTURE_OFFSET)
     mCultureSA.cbElements = CultureSize
-    
-    Dim NumCultures As Long
     NumCultures = MemLong(mBaseAddress + CULTURE_COUNT_OFFSET)
     
     Do While NumCultures > 0
-        mCultureSA.pvData = pos
-        mCulturesByLCID.Add mCulture(0).Numbers(ILCID), pos
-        pos = pos + CultureSize
+        mCultureSA.pvData = Index
+        mCulturesByLCID(mCulture(0).Numbers(ILCID)) = Index
+        Index = Index + CultureSize
         NumCultures = NumCultures - 1
     Loop
 End Sub

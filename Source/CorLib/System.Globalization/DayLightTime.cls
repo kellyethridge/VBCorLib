@@ -115,8 +115,8 @@ Friend Sub Init(ByRef StartTime As Variant, ByRef EndTime As Variant, ByVal Delt
         Set Delta = TimeSpan.Zero
     End If
     Set mDelta = Delta
-    Set mStartTime = CorDateTime.GetDateTime(StartTime)
-    Set mEndTime = CorDateTime.GetDateTime(EndTime)
+    Set mStartTime = Convert.ToDateTime(StartTime)
+    Set mEndTime = Convert.ToDateTime(EndTime)
 End Sub
 
 
@@ -147,8 +147,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

@@ -54,9 +54,15 @@ Private mIndex      As Long
 Private mCount      As Long
 
 
+Public Function NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+Attribute NewEnum.VB_MemberFlags = "40"
+    Set NewEnum = ArrayList_NewEnum
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As ArrayList, ByVal Index As Long, ByVal Count As Long)
     Set mList = List
@@ -104,7 +110,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   ArrayList Interface
+'   ArrayList
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function ArrayList_Add(Value As Variant) As Long
     VerifyVersion
@@ -214,22 +220,22 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As IEnumerator
     VerifyVersion
     
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    
+
     ElemIndex = CLngOrDefault(Index, 0)
     ElemCount = CLngOrDefault(Count, mCount - ElemIndex)
-    
+
     If ElemIndex < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Count", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mCount Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
-    
+
     Dim Ret As New ArrayListEnumerator
     Ret.Init Me, ElemIndex, ElemCount
     Set ArrayList_GetEnumerator = Ret

@@ -48,8 +48,15 @@ Private mList       As IList
 Private mComparer   As IComparer
 
 
+Public Function NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+Attribute NewEnum.VB_MemberFlags = "40"
+    Set NewEnum = ArrayList_NewEnum
+End Function
+
+
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal List As IList)
     Set mList = List
@@ -57,7 +64,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub QuickSortList(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long
@@ -242,23 +249,21 @@ Private Function ArrayList_Equals(Value As Variant) As Boolean
     ArrayList_Equals = IObject_Equals(Value)
 End Function
 
-Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Object
+Private Function ArrayList_GetEnumerator(Optional ByRef Index As Variant, Optional ByRef Count As Variant) As IEnumerator
     Dim ElemCount   As Long
     Dim ElemIndex   As Long
-    
+
     ElemIndex = CLngOrDefault(Index, 0)
     ElemCount = CLngOrDefault(Count, mList.Count - ElemIndex)
-    
+
     If ElemIndex < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Index", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemCount < 0 Then _
         Throw Cor.NewArgumentOutOfRangeException("Count", Environment.GetResourceString(ArgumentOutOfRange_NeedNonNegNum))
     If ElemIndex + ElemCount > mList.Count Then _
         Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidOffLen))
-    
-    Dim Ret As New ArrayListEnumerator
-    Ret.Init Me, ElemIndex, ElemCount
-    Set ArrayList_GetEnumerator = Ret
+
+    Set ArrayList_GetEnumerator = Cor.NewArrayListEnumerator(Me, ElemIndex, ElemCount)
 End Function
 
 Private Function ArrayList_GetHashCode() As Long

@@ -14,6 +14,7 @@ library CorType {
     typedef short WORD;
     typedef long  LPVOID;
     typedef currency curr;
+    typedef short Char;
 
     //
     // Public Enums
@@ -971,6 +972,10 @@ library CorType {
         [entry("GetModuleFileNameW"), usesgetlasterror] long GetModuleFileNameW([in] long hModule, [in] LPWSTR lpFileName, [in] long nSize);
         [entry("GetCurrentProcessId")] long GetCurrentProcessId();
         [entry("VirtualProtect"), usesgetlasterror] long VirtualProtect([in] void * lpAddress, [in] long dwSize, [in] long flNewProtect, [in] long * lpflOldProtect);
+    	[entry("GlobalAlloc")] long GlobalAlloc([in] long wFlags, [in] long dwBytes);
+    	[entry("GlobalFree")] long GlobalFree([in] long hMem);
+    	[entry("GlobalLock")] long GlobalLock([in] long hMem);
+    	[entry("GlobalUnlock")] long GlobalUnlock([in] long hMem);    	
     }
 
     [dllname("oleaut32.dll"), helpstring("Access to API functions within the Oleaut32.dll system file.")]
@@ -994,7 +999,7 @@ library CorType {
         const long CLOCKS_OFFSET        = 8;
         const long CELEMENTS_OFFSET     = 16;
 
-        [entry("OleLoadPicture")] HRESULT OleLoadPicture([in] IStream * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
+        [entry("OleLoadPicture")] long OleLoadPicture([in] IUnknown * pStream, [in] long lSize, [in] BOOL fRunmode, [in] VBGUID * riid, [in] void * ppvObj);
         [entry("SafeArrayCopyData")] HRESULT SafeArrayCopyData([in] long psaSource, [in] long psaTarget);
         [entry("SafeArrayCreate")] long SafeArrayCreate([in] VBA.vbVarType vt, [in] long cDims, [in] SafeArrayBound * rgsaBounds);
         [entry("SafeArrayCreateVector")] long SafeArrayCreateVector([in] VBA.vbVarType vt, [in] long lLbound, [in] long cElements);
@@ -1026,7 +1031,7 @@ library CorType {
         [entry("CoCreateGuid")] HRESULT CoCreateGuid([out, retval] VBGUID * RetVal);
         [entry("CoTaskMemAlloc")] long CoTaskMemAlloc([in] long cb);
         [entry("CoTaskMemFree")] void CoTaskMemFree([in] long pv);
-        [entry("CreateStreamOnHGlobal")] void CreateStreamOnHGlobal([in] long hGlobal, [in] BOOL fDeleteOnRelease, [in, out] IStream ** Stream);
+        [entry("CreateStreamOnHGlobal")] long CreateStreamOnHGlobal([in] long hGlobal, [in] BOOL fDeleteOnRelease, [in] void * Stream);
         [entry("IIDFromString")] HRESULT GUIDFromString([in] LPWSTR lpsz, [out, retval] VBGUID * RetVal);
         [entry("IsEqualGUID")] long IsEqualGUID([in] void * rguid1, [in] void * rguid2);
         [entry("StringFromGUID2")] long StringFromGUID2([in] VBGUID * rguid, [in] LPWSTR lpsz, [in] long cbMax);
@@ -1184,6 +1189,7 @@ library CorType {
 
 
         [entry("GetUserNameA"), usesgetlasterror] long GetUserNameA([in] LPSTR lpBuffer, [in] long * nSize);
+        [entry("GetUserNameW"), usesgetlasterror] long GetUserNameW([in] LPWSTR lpBuffer, [in] long * nSize);
         [entry("CryptAcquireContextA"), usesgetlasterror] long CryptAcquireContext([in] long * hProv, [in] LPSTR pszContainer, [in] LPSTR pszProvider, [in] long dwProvType, [in] long dwFlags);
         [entry("CryptReleaseContext"), usesgetlasterror] long CryptReleaseContext([in] long hProv, [in] long dwFlags);
         [entry("CryptGenRandom"), usesgetlasterror] long CryptGenRandom([in] long hProv, [in] long dwLen, [in] void * pbBuffer);

@@ -35,7 +35,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1234.567, "1234.567" & vbCrLf
             Test.Use #2/2/2004 3:00:00 PM#, "2/2/2004 3:00:00 PM" & vbCrLf
             Test.Use NewInt32(55), "55" & vbCrLf
-        
+            
     End Select
 End Sub
 

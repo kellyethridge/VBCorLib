@@ -158,14 +158,19 @@ End Sub
 
 Private Function NextNonDigit() As Integer
     Dim i As Long
-    For i = mIndex To mBuffer.Buffer.cElements - 1
-        Select Case mBuffer.Chars(i)
-            Case vbZeroChar To vbNineChar
-            Case Else
-                NextNonDigit = mBuffer.Chars(i)
-                Exit Function
-        End Select
-    Next i
+    
+    If mBuffer.Buffer.cElements > 0 Then
+        For i = mIndex To mBuffer.Buffer.cElements - 1
+            Select Case mBuffer.Chars(i)
+                Case vbZeroChar To vbNineChar
+                Case Else
+                    NextNonDigit = mBuffer.Chars(i)
+                    Exit Function
+            End Select
+        Next
+    Else
+        NextNonDigit = -1
+    End If
 End Function
 
 Private Function TryParseTime(ByRef Milliseconds As Currency) As Boolean

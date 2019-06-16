@@ -39,11 +39,13 @@ Attribute VB_Exposed = False
 ' This is a <b>Stream</b> wrapper around the console input and output methods.
 '
 Option Explicit
+Implements IObject
 Implements Stream
 
-Private mHandle     As Long
-Private mCanRead    As Boolean
-Private mCanWrite   As Boolean
+Private mHandle         As Long
+Private mCanRead        As Boolean
+Private mCanWrite       As Boolean
+Private mSingleByte(0)  As Byte
 
 
 
@@ -58,24 +60,46 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = MyBase.Equals(Me, Value)
+End Function
+
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = MyBase.GetHashCode(Me)
+End Function
+
+Private Function IObject_ToString() As String
+    IObject_ToString = MyBase.ToString(Me, App)
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Stream
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function Stream_BeginRead(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Ret As StreamAsyncResult
     
     Set Ret = Cor.NewStreamAsyncResult(State)
-    On Error GoTo errTrap
+    On Error GoTo Catch
+    
     With Ret
         .BytesRead = Stream_ReadBlock(Buffer, Offset, Count)
         .IsCompleted = True
         .IsReadType = True
     End With
     
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
-
-errTrap:
+    If Not Callback Is Nothing Then
+        Callback.Execute Ret
+    End If
+    
+Catch:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
+    If Catch(Ex, Err) Then
+        Set Ret.Exception = Ex
+    End If
+    
     Set Stream_BeginRead = Ret
 End Function
 
@@ -83,18 +107,25 @@ Private Function Stream_BeginWrite(Buffer() As Byte, ByVal Offset As Long, ByVal
     Dim Ret As StreamAsyncResult
     
     Set Ret = Cor.NewStreamAsyncResult(State)
-    On Error GoTo errTrap:
+    On Error GoTo Catch
+    
     With Ret
         .CompletedSynchronously = True
         .IsCompleted = True
     End With
-    Call Stream_WriteBlock(Buffer, Offset, Count)
     
-    If Not Callback Is Nothing Then Call Callback.Execute(Ret)
+    Stream_WriteBlock Buffer, Offset, Count
     
-errTrap:
+    If Not Callback Is Nothing Then
+        Callback.Execute Ret
+    End If
+    
+Catch:
     Dim Ex As Exception
-    If Catch(Ex, Err) Then Set Ret.Exception = Ex
+    If Catch(Ex, Err) Then
+        Set Ret.Exception = Ex
+    End If
+    
     Set Stream_BeginWrite = Ret
 End Function
 
@@ -126,13 +157,15 @@ Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
         Throw Cor.NewArgumentNullException("AsyncResult", "AsyncResult object is required.")
     If Not TypeOf AsyncResult Is StreamAsyncResult Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
+    
     Set Result = AsyncResult
+    
     If Not Result.IsReadType Then _
         Throw Cor.NewArgumentException("AsyncResult object is not part of this stream.", "AsyncResult")
     If Result.EndCalled Then _
         Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
-    
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    If Not Result.Exception Is Nothing Then _
+        Throw Result.Exception
     
     Stream_EndRead = Result.BytesRead
 End Function
@@ -150,13 +183,12 @@ Private Sub Stream_EndWrite(ByVal AsyncResult As IAsyncResult)
     If Result.EndCalled Then _
         Throw Cor.NewInvalidOperationException("The EndRead has already been called.")
 
-    If Not Result.Exception Is Nothing Then Throw Result.Exception
+    If Not Result.Exception Is Nothing Then _
+        Throw Result.Exception
 End Sub
 
 Private Function Stream_Equals(Value As Variant) As Boolean
-    If IsObject(Value) Then
-        Stream_Equals = (Value Is Me)
-    End If
+    Stream_Equals = IObject_Equals(Value)
 End Function
 
 Private Sub Stream_Flush()
@@ -164,7 +196,7 @@ Private Sub Stream_Flush()
 End Sub
 
 Private Function Stream_GetHashCode() As Long
-    Stream_GetHashCode = ObjPtr(CUnk(Me))
+    Stream_GetHashCode = IObject_GetHashCode
 End Function
 
 Private Property Get Stream_Length() As Currency
@@ -185,25 +217,24 @@ Private Function Stream_ReadBlock(Buffer() As Byte, ByVal Offset As Long, ByVal 
     If Not mCanRead Then _
         Throw Cor.NewNotSupportedException("Stream does not support reading")
     
-    If ReadFile(mHandle, Buffer(Offset), Count, Stream_ReadBlock, ByVal 0&) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If ReadFile(mHandle, Buffer(Offset), Count, Stream_ReadBlock, ByVal 0&) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Function
 
 Private Function Stream_ReadByte() As Long
-    Dim b(0) As Byte
-    
-    If Stream_ReadBlock(b, 0, 1) > 0 Then
-        Stream_ReadByte = b(0)
+    If Stream_ReadBlock(mSingleByte, 0, 1) > 0 Then
+        Stream_ReadByte = mSingleByte(0)
     Else
         Stream_ReadByte = -1
     End If
 End Function
 
 Private Property Let Stream_ReadTimeout(ByVal RHS As Long)
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 Private Property Get Stream_ReadTimeout() As Long
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 Private Function Stream_SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
@@ -215,7 +246,7 @@ Private Sub Stream_SetLength(ByVal Value As Currency)
 End Sub
 
 Private Function Stream_ToString() As String
-    Stream_ToString = Object.ToString(Me, App)
+    Stream_ToString = IObject_ToString
 End Function
 
 Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
@@ -224,19 +255,19 @@ Private Sub Stream_WriteBlock(Buffer() As Byte, ByVal Offset As Long, ByVal Coun
     If Not mCanWrite Then _
         Throw Cor.NewNotSupportedException("The stream does not support writing.")
     
-    If WriteFile(mHandle, Buffer(Offset), Count, 0, ByVal 0&) = BOOL_FALSE Then Statics.Error.Win32Error Err.LastDllError
+    If WriteFile(mHandle, Buffer(Offset), Count, 0, ByVal 0&) = BOOL_FALSE Then _
+        Statics.Error.Win32Error Err.LastDllError
 End Sub
 
 Private Sub Stream_WriteByte(ByVal Value As Byte)
-    Dim b(0) As Byte
-    b(0) = Value
-    Call Stream_WriteBlock(b, 0, 1)
+    mSingleByte(0) = Value
+    Stream_WriteBlock mSingleByte, 0, 1
 End Sub
 
 Private Property Let Stream_WriteTimeout(ByVal RHS As Long)
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property
 
 Private Property Get Stream_WriteTimeout() As Long
-    Throw Cor.NewInvalidOperationException(Environment.GetResourceString(InvalidOperation_Timeouts))
+    Error.InvalidOperation InvalidOperation_Timeouts
 End Property

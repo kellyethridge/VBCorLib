@@ -287,6 +287,32 @@ Public Function ToString(ByRef Value As Variant, Optional ByVal Provider As IFor
     ToString = Object.ToString(Value, Provider:=Provider)
 End Function
 
+''
+' Converts the value of the specified object to a <a href="CorDateTime.html">CorDateTime</a> object, using the specified culture-specific formatting information.
+'
+' @param Value Value to be converted.
+' @param Provider An object that supplies culture-specific formatting information.
+' @return The date and time equivalent of the value of <i>value</i>, or the date and time equivalent of <a href="CorDateTimeStatic.MinValue.html">CorDateTime.MinValue</a> if <i>value</i> is <b>Nothing</b>.
+'
+Public Function ToDateTime(ByRef Value As Variant, Optional ByVal Provider As IFormatProvider) As CorDateTime
+    Select Case VarType(Value)
+        Case vbObject
+            If Value Is Nothing Then
+                Set ToDateTime = CorDateTime.MinValue
+            ElseIf TypeOf Value Is CorDateTime Then
+                Set ToDateTime = Value
+            Else
+                Throw New InvalidCastException
+            End If
+        Case vbDate
+            Set ToDateTime = CorDateTime.FromOADate(Value)
+        Case vbString
+            Set ToDateTime = CorDateTime.Parse(CStr(Value))
+        Case Else
+            Throw New InvalidCastException
+    End Select
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Private Helpers

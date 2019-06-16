@@ -11,25 +11,28 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2019 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: WinResourceReader
+' Module: WinResourceReader
 '
 
 ''
@@ -93,7 +96,7 @@ End Sub
 '
 Public Sub CloseReader()
     Set mEntries = Nothing
-    Call FreeLibrary(mFileHandle)
+    FreeLibrary mFileHandle
     mFileHandle = NULL_HANDLE
 End Sub
 
@@ -110,10 +113,11 @@ End Sub
 ' as a unique identifier is not recommended.
 '
 Public Function GetEnumerator() As IDictionaryEnumerator
-    Call VerifyReader
+    VerifyReader
+    LoadResources
     
     Dim Ret As New ResourceEnumerator
-    Call Ret.Init(Me, mEntries)
+    Ret.Init Me, mEntries
     Set GetEnumerator = Ret
 End Function
 
@@ -163,8 +167,20 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    Set mDecoders = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
+    
+    ' Add our known set of decoders.
+    AddDecoder New StringResourceDecoder
+    AddDecoder New BitMapResourceDecoder
+    AddDecoder New IconResourceDecoder
+    AddDecoder New IconResourceGroupDecoder
+    AddDecoder New CursorResourceDecoder
+    AddDecoder New CursorResourceGroupDecoder
+End Sub
+
 Friend Sub Init(ByRef FileName As String)
     If Not File.Exists(FileName) Then _
         Throw Cor.NewFileNotFoundException(FileName)
@@ -184,59 +200,47 @@ Friend Sub AddResource(ByVal Key As ResourceKey, ByRef Bytes() As Byte)
         Dim Decoder As IResourceDecoder
         Set Decoder = mDecoders(Key.ResourceType)
         
-        Call Decoder.Decode(Key, Bytes)
+        Decoder.Decode Key, Bytes
         
         ' And get all the resources from this set of bytes.
         Dim ReturnValue As Variant
         Do While Decoder.GetResource(Key, ReturnValue)
-            Call mEntries.Add(Cor.NewDictionaryEntry(Key, ReturnValue))
+            mEntries.Add Cor.NewDictionaryEntry(Key, ReturnValue)
         Loop
     Else
         ' Couldn't decode the bytes, so just store them.
-        Call mEntries.Add(Cor.NewDictionaryEntry(Key, Bytes))
+        mEntries.Add Cor.NewDictionaryEntry(Key, Bytes)
     End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub VerifyReader()
-    If mFileHandle = NULL_HANDLE Then Throw Cor.NewInvalidOperationException("The Reader is closed and cannot be accessed.")
-    If mEntries Is Nothing Then Call LoadResources
+    If mFileHandle = NULL_HANDLE Then
+        Throw Cor.NewInvalidOperationException("The Reader is closed and cannot be accessed.")
+    End If
 End Sub
 
 Private Sub LoadResources()
-    Set mEntries = New ArrayList
-    
-    If EnumResourceTypes(mFileHandle, AddressOf EnumResTypeProc, VarPtr(Me)) = BOOL_FALSE Then
-        Call CloseReader
+    If mEntries Is Nothing Then
+        Set mEntries = New ArrayList
         
-        Dim Ex As Exception
-        If Catch(Ex) Then Throw Ex
+        If EnumResourceTypes(mFileHandle, AddressOf EnumResTypeProc, VarPtr(Me)) = BOOL_FALSE Then
+            CloseReader
+            
+            Dim Ex As Exception
+            If Catch(Ex) Then
+                Throw Ex
+            End If
+        End If
     End If
 End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-'    Set mDecoders = Cor.NewHashtable(hcp:=New CaseInsensitiveHashCodePrvdr, Comparer:=New CaseInsensitiveComparer)
-    Debug.Assert False
-    
-    ' Add our known set of decoders.
-    Call AddDecoder(New ResStringTableDecoder)
-    Call AddDecoder(New ResBitmapDecoder)
-    Call AddDecoder(New ResIconDecoder)
-    Call AddDecoder(New ResIconGroupDecoder)
-    Call AddDecoder(New ResCursorDecoder)
-    Call AddDecoder(New ResCursorGroupDecoder)
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
@@ -252,7 +256,7 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IEnumerable Interface
+'   IEnumerable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IEnumerable_GetEnumerator() As IEnumerator
     Set IEnumerable_GetEnumerator = GetEnumerator
@@ -264,10 +268,10 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IResourceReader Interface
+'   IResourceReader
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub IResourceReader_CloseReader()
-    Call CloseReader
+    CloseReader
 End Sub
 
 Private Function IResourceReader_GetEnumerator() As IDictionaryEnumerator

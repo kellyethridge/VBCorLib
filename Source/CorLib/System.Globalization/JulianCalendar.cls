@@ -44,6 +44,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 Implements Calendar
+Implements ICloneable
 
 Private Const MaxYear                   As Long = 9999
 Private Const DefaultTwoDigitYearMax    As Long = 2029
@@ -70,15 +71,6 @@ Private mTwoDigitYearMax    As Long
 '
 Public Property Get AlgorithmType() As CalendarAlgorithmType
     AlgorithmType = SolarCalendar
-End Property
-
-''
-' Gets the number of days in the year that precedes the year that is specified by the <a href="JulianCalendar.get.MinSupportedDateTime.html">MinSupportedDateTime</a> property.
-'
-' @returns The property returns a constant value of 365.
-'
-Public Property Get DaysInYearBeforeMinSupportedYear() As Long
-    DaysInYearBeforeMinSupportedYear = 365
 End Property
 
 ''
@@ -160,6 +152,7 @@ End Property
 ' </table>
 Public Property Let TwoDigitYearMax(ByVal Value As Long)
     VerifyWritable
+    
     If Value < 99 Or Value > MaxYear Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 99, MaxYear))
     
@@ -174,7 +167,7 @@ End Property
 ' @return The <a href="CorDateTime.html">CorDateTime</a> that results from adding the specified number of days to the specified <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = Statics.Calendar.AddDays(Time, Days)
+    Set AddDays = Statics.Calendar.AddDays(Me, Time, Days)
 End Function
 
 ''
@@ -185,7 +178,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html"> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = Statics.Calendar.AddHours(Time, Hours)
+    Set AddHours = Statics.Calendar.AddHours(Me, Time, Hours)
 End Function
 
 ''
@@ -196,7 +189,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = Statics.Calendar.AddMilliseconds(Time, Milliseconds)
+    Set AddMilliseconds = Statics.Calendar.AddMilliseconds(Me, Time, Milliseconds)
 End Function
 
 ''
@@ -207,7 +200,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = Statics.Calendar.AddMinutes(Time, Minutes)
+    Set AddMinutes = Statics.Calendar.AddMinutes(Me, Time, Minutes)
 End Function
 
 ''
@@ -230,7 +223,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
         Throw Cor.NewArgumentOutOfRangeException("Months", Environment.GetResourceString(ArgumentOutOfRange_Range, -120000, 120000))
     
     If Months = 0 Then
-        Set AddMonths = CorDateTime.GetDateTime(Time)
+        Set AddMonths = Convert.ToDateTime(Time)
         Exit Function
     End If
 
@@ -254,9 +247,10 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
         Day = MaxDays
     End If
     
-    TOD = Statics.Calendar.GetTotalMilliseconds(Time)
+    TOD = CorDateTime.GetTotalMilliseconds(Time)
     
     Set AddMonths = CorDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MilliSecondsPerDay + Modulus(TOD, MilliSecondsPerDay))
+    Statics.Calendar.ValidateDateTime Me, AddMonths
 End Function
 
 ''
@@ -267,7 +261,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = Statics.Calendar.AddSeconds(Time, Seconds)
+    Set AddSeconds = Statics.Calendar.AddSeconds(Me, Time, Seconds)
 End Function
 
 ''
@@ -278,7 +272,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Weeks added.
 '
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
-    Set AddWeeks = Statics.Calendar.AddDays(Time, Weeks * 7)
+    Set AddWeeks = AddDays(Time, Weeks * DaysPerWeek)
 End Function
 
 ''
@@ -289,7 +283,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Years added.
 '
 Public Function AddYears(ByRef Time As Variant, ByVal Years As Long) As CorDateTime
-    Set AddYears = AddMonths(Time, Years * 12)
+    Set AddYears = AddMonths(Time, Years * MonthsPerYear)
 End Function
 
 ''
@@ -329,7 +323,7 @@ End Function
 ' @return The hour portion of the <i>Time</i>.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = Statics.Calendar.GetHour(Time)
+    GetHour = CorDateTime.GetHour(Time)
 End Function
 
 ''
@@ -339,7 +333,7 @@ End Function
 ' @return The minute portion of the <i>Time</i>.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = Statics.Calendar.GetMinute(Time)
+    GetMinute = CorDateTime.GetMinute(Time)
 End Function
 
 ''
@@ -349,7 +343,7 @@ End Function
 ' @return The second portion of the <i>Time</i>.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = Statics.Calendar.GetSecond(Time)
+    GetSecond = CorDateTime.GetSecond(Time)
 End Function
 
 ''
@@ -358,8 +352,8 @@ End Function
 ' @param Time The time to retrieve the milliseconds from.
 ' @return The millisecond portion of the <i>Time</i>.
 '
-Public Function GetMilliseconds(ByRef Time As Variant) As Double
-    GetMilliseconds = Statics.Calendar.GetMilliseconds(Time)
+Public Function GetMilliseconds(ByRef Time As Variant) As Long
+    GetMilliseconds = CorDateTime.GetMilliseconds(Time)
 End Function
 
 ''
@@ -371,7 +365,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = Statics.Calendar.GetDayOfWeek(Time)
+    GetDayOfWeek = CorDateTime.GetDayOfWeek(Time)
 End Function
 
 ''
@@ -382,7 +376,7 @@ End Function
 ' @return The number of days in the year.
 '
 Public Function GetDaysInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    VerifyEra Era
+    ValidateEra Era
     
     If IsLeapYear(Year) Then
         GetDaysInYear = 366
@@ -408,7 +402,7 @@ End Function
 ' @return The era for the <i>Time</i>.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    CorDateTime.GetDateTime Time
+    CorDateTime.Validate Time
     GetEra = 1
 End Function
 
@@ -420,8 +414,8 @@ End Function
 ' @return The number of months in the year.
 '
 Public Function GetMonthsInYear(ByVal Year As Long, Optional ByRef Era As Variant) As Long
-    VerifyEra Era
-    VerifyYear Year
+    ValidateEra Era
+    ValidateYear Year
     
     GetMonthsInYear = 12
 End Function
@@ -435,9 +429,9 @@ End Function
 ' @param Era The time period inwhich the year exists.
 '
 Public Function GetDaysInMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Long
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     GetDaysInMonth = CorDateTime.DaysInMonth(Year, Month)
 End Function
@@ -450,8 +444,8 @@ End Function
 ' @return Boolean indication if the year is a leap year.
 '
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyEra Era
-    VerifyYear Year
+    ValidateEra Era
+    ValidateYear Year
     
     IsLeapYear = ((Year Mod 4) = 0)
 End Function
@@ -483,13 +477,21 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     IsLeapMonth = False
 End Function
 
+''
+' Returns a boolean indicating if the specific day is a leap day.
+'
+' @param Year The year the day is in.
+' @param Month The month the day is in.
+' @param Day The day to check if is a leap day.
+' @param Era The era the year is in.
+' @return Boolean indication if the day is a leap day.
 ' @remarks <p>Unlike the Gregorian calendar, the Julian calendar defines a leap year as a year that is evenly divisible by four with no exceptions. Therefore, the calendar is inaccurate by one day every 128 years. For example, the year 1999 was not a leap year, but the year 2000 was. A common year has 365 days and a leap year has 366 days.</p>
 ' <p>A leap day is a day that occurs only in a leap year. In the Julian calendar, the 29th day of February is the only leap day.</p>
 ' <h4>Exceptions</h4>
@@ -512,18 +514,30 @@ End Function
 '   </tr>
 ' </table>
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
-    
-    If Day < 1 Or Day > GetDaysInMonth(Year, Month, Era) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", CorString.Format("Day must be between 1 and {0} inclusively.", GetDaysInMonth(Year, Month, Era)))
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
+    ValidateDay Year, Month, Day
     
     If Month = 2 Then
         If IsLeapYear(Year, Era) Then
             IsLeapDay = (Day = 29)
         End If
     End If
+End Function
+
+''
+' Calculates the leap month for a specified year and era.
+'
+' @param Year A year.
+' @param Era An era.
+' @return Always 0 because the <a href="JulianCalendar.html">JulianCalendar</a> does not recognize leap months.
+'
+Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    ValidateYear Year
+    
+    GetLeapMonth = 0
 End Function
 
 ''
@@ -540,15 +554,15 @@ End Function
 ' @return A Gregorian version of the date specified.
 '
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByVal Era As Variant) As CorDateTime
-    VerifyEra Era
-    VerifyYear Year
-    VerifyMonth Month
+    ValidateEra Era
+    ValidateYear Year
+    ValidateMonth Month
     
     ' Julian calendar start at #1/3/0001# in the Gregorian calendar.
     If Year = 1 And Month = 1 And Day < 3 Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_BadYearMonthDay
-    If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Day, GetDaysInMonth(Year, Month), Month))
+    
+    ValidateDay Year, Month, Day
     
     Set ToDateTime = CorDateTime.FromMilliseconds(TotalDays(Year, Month, Day) * MilliSecondsPerDay + TotalTime(Hour, Minute, Second, Millisecond))
 End Function
@@ -568,21 +582,10 @@ End Function
 ' 100 years which 2-digit years will fall. 00-99 will fall within 1930-2029.</p>
 '
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
-    Dim y As Long
-    
-    If Year < 0 Or Year > MaxYear Then _
+    If Year > MaxYear Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, MaxYear))
 
-    If Year < 100 Then
-        y = Year Mod 100
-        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + y
-        
-        If y > mTwoDigitYearMax Mod 100 Then
-            ToFourDigitYear = ToFourDigitYear - 100
-        End If
-    Else
-        ToFourDigitYear = Year
-    End If
+    ToFourDigitYear = Statics.Calendar.ToFourDigitYear(Me, Year)
 End Function
 
 ''
@@ -627,34 +630,41 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function CloneReadOnly() As JulianCalendar
+    Set CloneReadOnly = New JulianCalendar
+    CloneReadOnly.InitReadOnlyClone mTwoDigitYearMax
+End Function
+
 Private Sub VerifyWritable()
     If mIsReadOnly Then
         Error.InvalidOperation InvalidOperation_ReadOnly
     End If
 End Sub
 
-Private Sub VerifyEra(ByRef Era As Variant)
-    Select Case VarType(Era)
-        Case vbLong, vbInteger, vbByte
-            If Era <> JulianCalendar.JulianEra Then
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidEraValue), "Era")
-            End If
-        Case vbMissing
-            ' do nothing
+Private Sub ValidateEra(ByRef Era As Variant)
+    Select Case CLngOrDefault(Era, Statics.Calendar.CurrentEra)
+        Case Statics.Calendar.CurrentEra, JulianCalendar.JulianEra
+            ' all good
         Case Else
-            Throw Cor.NewInvalidCastException("An integer value is required.")
+            Error.Argument Argument_InvalidEraValue, "Era"
     End Select
 End Sub
 
-Private Sub VerifyYear(ByVal Year As Long)
+Private Sub ValidateYear(ByVal Year As Long)
     If Year < 1 Or Year > MaxYear Then
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, MaxYear))
     End If
 End Sub
 
-Private Sub VerifyMonth(ByVal Month As Long)
+Private Sub ValidateMonth(ByVal Month As Long)
     If Month < 1 Or Month > 12 Then
         Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_Range, 1, 12))
+    End If
+End Sub
+
+Private Sub ValidateDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long)
+    If Day < 1 Or Day > GetDaysInMonth(Year, Month) Then
+        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Day, GetDaysInMonth(Year, Month), Month))
     End If
 End Sub
 
@@ -664,7 +674,7 @@ Private Sub GetDateParts(ByRef Time As Variant, ByVal DatePart As DatePartPrecis
     Dim Years4      As Long
     Dim Years       As Long
     
-    ms = Statics.Calendar.GetTotalMilliseconds(Time)
+    ms = CorDateTime.GetTotalMilliseconds(Time)
     FixedDays = Int(ms / MilliSecondsPerDay) + 2  ' Julian calendar starts 2 days after Gregorian #1/3/0001#
     Years4 = FixedDays \ DaysPer4Years
     FixedDays = FixedDays - Years4 * DaysPer4Years
@@ -707,11 +717,11 @@ Private Function TotalDays(ByVal Year As Long, ByVal Month As Long, ByVal Day As
     End If
     
     If Year < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Error.ArgumentOutOfRange "Year", ArgumentOutOfRange_ValidValues
     If Month < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Month", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Error.ArgumentOutOfRange "Month", ArgumentOutOfRange_ValidValues
     If Day < 1 Then _
-        Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_ValidValues))
+        Error.ArgumentOutOfRange "Day", ArgumentOutOfRange_ValidValues
     
     Dim Days As Long
     If IsLeapYear(Year) Then
@@ -734,12 +744,15 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub InitClone(ByVal TwoDigitYearMax As Long)
     mTwoDigitYearMax = TwoDigitYearMax
-    mIsReadOnly = False
+End Sub
+
+Friend Sub InitReadOnlyClone(ByVal TwoDigitYearMax As Long)
+    InitClone TwoDigitYearMax
+    mIsReadOnly = True
 End Sub
 
 Private Sub Class_InitProperties()
     mTwoDigitYearMax = DefaultTwoDigitYearMax
-    mIsReadOnly = True
 End Sub
 
 
@@ -765,10 +778,6 @@ End Property
 Private Function Calendar_Clone() As Calendar
     Set Calendar_Clone = Clone
 End Function
-
-Private Property Get Calendar_DaysInYearBeforeMinSupportedYear() As Long
-    Calendar_DaysInYearBeforeMinSupportedYear = DaysInYearBeforeMinSupportedYear
-End Property
 
 Private Property Get Calendar_IsReadOnly() As Boolean
     Calendar_IsReadOnly = IsReadOnly
@@ -846,6 +855,10 @@ Private Function Calendar_GetHour(Time As Variant) As Long
     Calendar_GetHour = GetHour(Time)
 End Function
 
+Private Function Calendar_GetLeapMonth(ByVal Year As Long, Optional Era As Variant) As Long
+    Calendar_GetLeapMonth = GetLeapMonth(Year, Era)
+End Function
+
 Private Function Calendar_GetMilliseconds(Time As Variant) As Double
     Calendar_GetMilliseconds = GetMilliseconds(Time)
 End Function
@@ -913,6 +926,14 @@ End Property
 Private Property Let Calendar_TwoDigitYearMax(ByVal Value As Long)
     TwoDigitYearMax = Value
 End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   ICloneable
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function ICloneable_Clone() As Object
+    Set ICloneable_Clone = Clone
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

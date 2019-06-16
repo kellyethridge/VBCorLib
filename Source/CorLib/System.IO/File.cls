@@ -369,7 +369,7 @@ End Sub
 ' @param CreationTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetCreationTime(ByRef Path As String, ByRef CreationTime As Variant)
-    SetCreationTimeUtc Path, CorDateTime.GetDateTime(CreationTime).ToUniversalTime
+    SetCreationTimeUtc Path, Convert.ToDateTime(CreationTime).ToUniversalTime
 End Sub
 
 ''
@@ -391,7 +391,7 @@ End Sub
 ' @param LastAccessTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastAccessTime(ByRef Path As String, ByRef LastAccessTime As Variant)
-    SetLastAccessTimeUtc Path, CorDateTime.GetDateTime(LastAccessTime).ToUniversalTime
+    SetLastAccessTimeUtc Path, Convert.ToDateTime(LastAccessTime).ToUniversalTime
 End Sub
 
 ''
@@ -413,7 +413,7 @@ End Sub
 ' @param LastWriteTime A Date or CorDateTime object of the new time.
 '
 Public Sub SetLastWriteTime(ByRef Path As String, ByRef LastWriteTime As Variant)
-    SetLastWriteTimeUtc Path, CorDateTime.GetDateTime(LastWriteTime).ToUniversalTime
+    SetLastWriteTimeUtc Path, Convert.ToDateTime(LastWriteTime).ToUniversalTime
 End Sub
 
 ''
@@ -599,7 +599,7 @@ Private Function GetFileDataFallback(ByRef Path As String, ByRef Data As WIN32_F
 End Function
 
 Private Function GetFileTimeUtc(ByRef Time As Variant) As Currency
-    GetFileTimeUtc = CorDateTime.GetDateTime(Time).ToFileTimeUtc
+    GetFileTimeUtc = Convert.ToDateTime(Time).ToFileTimeUtc
 End Function
 
 Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long, ByVal LastAccessTimePtr As Long, ByVal LastWriteTimePtr As Long)

@@ -117,7 +117,7 @@ Public Function GetInstance(ByVal FormatProvider As IFormatProvider) As NumberFo
     If FormatProvider Is Nothing Then
         Set GetInstance = CurrentInfo
     Else
-        Set GetInstance = FormatProvider.GetFormat("NumberFormatInfo")
+        Set GetInstance = FormatProvider.GetFormat(vbNumberFormatInfo)
         
         If GetInstance Is Nothing Then
             Set GetInstance = CurrentInfo

@@ -136,52 +136,103 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use &HFFFF0000, "-65536"
             
         Case "ToString_WithFormatting_ReturnsFormattedNumber"
-            Test.Use 0, "d4", "0000"
-            Test.Use &H8000&, "d1", "32768"
-            Test.Use &H8000, "d1", "-32768"
-            Test.Use &H8000&, "d10", "0000032768"
-            Test.Use &H8000&, "d5", "32768"
-            Test.Use &H8000&, "d6", "032768"
-            Test.Use &H8000, "d0", "-32768"
-            Test.Use &H8000, "d6", "-032768"
-            Test.Use &H8000, "d5", "-32768"
-            Test.Use 0, "x", "0"
+            ' Unspecified Format
+            Test.Use 0, "", "0"
+            Test.Use 1, "", "1"
+            Test.Use -1, "", "-1"
+            Test.Use 100, "", "100"
+            Test.Use &H7FFFFFFF, "", "2147483647"
+            Test.Use &H80000000, "", "-2147483648"
+            
+            ' General Format (.NET ignores g formatting rules and just displays the whole number)
+            Test.Use 0, "g", "0"
+            Test.Use 1, "g", "1"
+            Test.Use -1, "g", "-1"
+            Test.Use &H7FFFFFFF, "g", "2147483647"
+            Test.Use &H80000000, "g", "-2147483648"
+            Test.Use 0, "g0", "0"
+            Test.Use 1, "g0", "1"
+            Test.Use -1, "g0", "-1"
+            Test.Use &H7FFFFFFF, "g0", "2147483647"
+            Test.Use &H80000000, "g0", "-2147483648"
+            Test.Use 0, "g5", "0"
+            Test.Use 1, "g5", "1"
+            Test.Use -1, "g5", "-1"
+            Test.Use &H7FFFFFFF, "g5", "2147483647"
+            Test.Use &H80000000, "g5", "-2147483648"
+            Test.Use 12345, "ggg", "ggg"
+        
+            ' Currency Format
+            Test.Use 1, "c", "$1.00"
+            Test.Use 1, "c0", "$1"
+            Test.Use 1, "c1", "$1.0"
+            Test.Use 1, "c3", "$1.000"
+            Test.Use -1, "c", "($1.00)"
+            Test.Use 12345, "c", "$12,345.00"
+            Test.Use "12345678901234567890", "c4", "$12,345,678,901,234,567,890.0000"
+            
+            ' Decimal Format
+            Test.Use 1, "d", "1"
+            Test.Use 1, "d1", "1"
+            Test.Use 1, "d2", "01"
+            Test.Use -1, "d2", "-01"
+            
+            ' Exponent Format
+            Test.Use 1, "e", "1.000000e+000"
+            Test.Use 1, "e0", "1e+000"
+            Test.Use 1, "e1", "1.0e+000"
+            Test.Use 10, "e", "1.000000e+001"
+            Test.Use 10, "e0", "1e+001"
+            Test.Use 10, "e1", "1.0e+001"
+            Test.Use -1, "e", "-1.000000e+000"
+            Test.Use 19, "e0", "2e+001"
+            Test.Use 12345, "e", "1.234500e+004"
+            Test.Use -12345, "e4", "-1.2345e+004"
+            Test.Use 12345, "e3", "1.235e+004"
+            Test.Use 12345, "E1", "1.2E+004"
+            Test.Use 0, "e", "0.000000e+000"
+            Test.Use 123456789, "e4", "1.2346e+008"
+            
+            ' Fixed Format
+            Test.Use 0, "f", "0.00"
+            Test.Use 1, "f", "1.00"
+            Test.Use 100, "f", "100.00"
+            Test.Use 1234, "f", "1234.00"
+            Test.Use -1234, "f", "-1234.00"
+            Test.Use 1234, "f4", "1234.0000"
+            Test.Use 1234, "f0", "1234"
+            
+            ' Number Format
+            Test.Use 0, "n", "0.00"
+            Test.Use 1, "n", "1.00"
+            Test.Use 100, "n", "100.00"
+            Test.Use 1234, "n", "1,234.00"
+            Test.Use 1234, "n0", "1,234"
+            Test.Use -1234, "n", "-1,234.00"
+            Test.Use 1234, "n4", "1,234.0000"
+            Test.Use 123, "n", "123.00"
+            
+            ' Percentage Format
+            Test.Use 0, "p", "0.00 %"
+            Test.Use 1, "p", "100.00 %"
+            Test.Use 156, "p", "15,600.00 %"
+            
+            ' Hex Format
             Test.Use 0, "X", "0"
-            Test.Use 0, "x4", "0000"
-            Test.Use 10, "x", "a"
-            Test.Use 10, "X", "A"
-            Test.Use 1000000000, "X", "3B9ACA00"
-            Test.Use -1000000000, "x", "c4653600"
-            Test.Use 2147483647, "x", "7fffffff"
-            Test.Use -2147483648#, "x", "80000000"
-            Test.Use &HFFFF8000, "x", "8000"
-            Test.Use &HFFFF8000, "x5", "f8000"
-            Test.Use &HFFFF8000, "x8", "ffff8000"
-            Test.Use &HFFFF8000, "x4", "8000"
-            Test.Use &HFFFF7FFF, "x", "ffff7fff"
-            Test.Use &HFFFF7FFF, "x9", "fffff7fff"
-            Test.Use &HFFFF8001, "x", "8001"
-            Test.Use &HFFFF8001, "x8", "ffff8001"
-            Test.Use &H7FFF, "x4", "7fff"
-            Test.Use &H7FFF, "x5", "07fff"
-            Test.Use &H7FFF, "x8", "00007fff"
-            Test.Use &HFFFF0000, "x", "ffff0000"
-            Test.Use &HFFFF0000, "x8", "ffff0000"
-            Test.Use 0, "b", "0"
-            Test.Use 0, "b4", "0000"
-            Test.Use 0, "b8", "00000000"
-            Test.Use 1, "b", "1"
-            Test.Use 1, "b2", "01"
-            Test.Use 1, "b4", "0001"
-            Test.Use 3, "b", "11"
-            Test.Use 3, "b6", "000011"
-            Test.Use 128, "b", "10000000"
-            Test.Use &H8080, "b", "1000000010000000"
-            Test.Use &H8080, "b20", "11111000000010000000"
-            Test.Use -1, "b", "1111111111111111"
-            Test.Use -1, "b32", "11111111111111111111111111111111"
-            Test.Use &H7FFF, "B", "111111111111111"
-            Test.Use &H7FFF, "b32", "00000000000000000111111111111111"
+            Test.Use 0, "x2", "00"
+            Test.Use 1, "x", "1"
+            Test.Use 1, "x2", "01"
+            Test.Use 255, "x", "0ff"
+            Test.Use 255, "X", "0FF"
+            Test.Use 255, "X4", "00FF"
+            Test.Use -1, "x", "f"
+            Test.Use -1, "X", "F"
+            Test.Use -1, "x5", "fffff"
+            Test.Use &H8000, "x", "8000"
+            Test.Use &H1111, "x", "1111"
+            Test.Use &HA, "x", "0a"
+            Test.Use &HFFF80000, "x", "80000"
+            Test.Use &HFFF80000, "x8", "fff80000"
             
         Case "Compare_WithWithValues_ReturnsExpected"
             Test.Use(BInt(0), BInt(0)).Expect Iz.EqualTo(0)
@@ -512,10 +563,10 @@ Public Sub ToString_WithNoFormatting_ReturnsDefault(ByVal Value As Long, ByVal E
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub ToString_WithFormatting_ReturnsFormattedNumber(ByVal Value As Long, ByVal Format As String, ByVal Expected As String)
+Public Sub ToString_WithFormatting_ReturnsFormattedNumber(ByVal Value As Variant, ByVal Format As String, ByVal Expected As String)
     Dim Number As BigInteger
     Dim Actual As String
-    Set Number = NewBigInteger(Value)
+    Set Number = BInt(Value)
         
     Actual = Number.ToString(Format)
     

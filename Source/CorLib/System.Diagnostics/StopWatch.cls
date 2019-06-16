@@ -195,21 +195,26 @@ End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Private Helpers
+'   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function GetElapsedTime() As Currency
     Dim Ret As Currency
     Ret = mElapsedTime
     
-    If mIsRunning Then Ret = Ret + (StopWatch.InternalGetTimeStamp - mStartCount)
-    If mIsHighRes Then Ret = Ret * mFreqMultiplier
+    If mIsRunning Then
+        Ret = Ret + (StopWatch.InternalGetTimeStamp - mStartCount)
+    End If
+    
+    If mIsHighRes Then
+        Ret = Ret * mFreqMultiplier
+    End If
     
     GetElapsedTime = Ret
 End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
     If StopWatch.IsHighResolution Then
@@ -220,7 +225,7 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IObject Interface
+'   IObject
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)

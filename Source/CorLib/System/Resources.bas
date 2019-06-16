@@ -81,6 +81,8 @@ Public Enum ResourceStringKey
     Arg_RegSubKeyValueAbsent = 242
     Arg_RegInvalidKeyName = 243
     Arg_InvalidSearchPattern = 244
+    Arg_MustBeDateTime = 245
+    Arg_UnsupportedResourceType = 246
     
     Argument_MultiDimNotSupported = 105
     Argument_InvalidOffLen = 800
@@ -114,7 +116,7 @@ Public Enum ResourceStringKey
     Argument_InvalidValueType = 833 '?
     Argument_InvalidFileModeAndAccessCombo = 834 '?
     Argument_InvalidSeekOffset = 835 '?
-    Argument_InvalidStreamSource = 836 '?
+    Argument_InvalidStreamSource = 836
     Argument_NotEnumerable = 837 '?
     Argument_PathUriFormatNotSupported = 839
     Argument_ImplementIComparable = 840
@@ -148,6 +150,14 @@ Public Enum ResourceStringKey
     Argument_InvalidCodePageBytes = 871
     Argument_InvalidCodePageChars = 872
     Argument_IntegerRequired = 873
+    Argument_ResultCalendarRange = 874
+    Argument_InvalidLanguageIdSource = 875
+    Argument_InvalidResourceNameOrType = 876
+    Argument_MaxStringLength = 877
+    Argument_InvalidResourceKeyType = 878
+    Argument_StringZeroLength = 879
+    Argument_EmptyIniSection = 880
+    Argument_EmptyIniKey = 881
     
     ArgumentNull_Array = 900
     ArgumentNull_Buffer = 901
@@ -202,6 +212,8 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_Day = 742
     ArgumentOutOfRange_CalendarRange = 743
     ArgumentOutOfRange_BadYearMonthDay = 744
+    ArgumentOutOfRange_AddValue = 745
+    ArgumentOutOfRange_Era = 746
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
@@ -260,6 +272,9 @@ Public Enum ResourceStringKey
     InvalidOperation_WrongAsyncResultOrEndReadCalledMultiple = 1108
     InvalidOperation_WrongAsyncResultOrEndWriteCalledMultiple = 1109
     InvalidOperation_RegRemoveSubKey = 1110
+    InvalidOperation_ResourceWriterSaved = 1111
+    InvalidOperation_GetVersion = 1112
+    InvalidOperation_ConsoleReadKeyOnFile = 1113
     
     NotSupported_ReadOnlyCollection = 1000
     NotSupported_FixedSizeCollection = 1001
@@ -367,4 +382,334 @@ Public Enum ParameterName
     NameOfKeyBlob = 2039
     NameOfArrayIndex = 2040
 End Enum
+
+Private Declare Function DeleteObject Lib "gdi32.dll" (ByVal hObject As Long) As Long
+Private Declare Function GetDC Lib "user32.dll" (ByVal Hwnd As Long) As Long
+Private Declare Function ReleaseDC Lib "user32.dll" (ByVal Hwnd As Long, ByVal hdc As Long) As Long
+Private Declare Function GetDIBits Lib "gdi32.dll" (ByVal aHDC As Long, ByVal hBitmap As Long, ByVal nStartScan As Long, ByVal nNumScans As Long, ByRef lpBits As Any, ByRef lpBI As BITMAPINFO, ByVal wUsage As Long) As Long
+
+Public Type BITMAPINFOHEADER
+    biSize          As Long
+    biWidth         As Long
+    biHeight        As Long
+    biPlanes        As Integer
+    biBitCount      As Integer
+    biCompression   As Long
+    biSizeImage     As Long
+    biXPelsPerMeter As Long
+    biYPelsPerMeter As Long
+    biClrUsed       As Long
+    biClrImportant  As Long
+End Type
+
+Private Type BITMAPINFO
+    bmiHeader As BITMAPINFOHEADER
+    bmiColors(1 To 256) As Long
+End Type
+
+Public Function CursorResourceFromHandle(ByVal Handle As Long) As Byte()
+    Dim Result() As Byte
+    
+    If SaveHICONtoArray(Handle, Result, False) Then
+        CursorResourceFromHandle = Result
+    End If
+End Function
+
+Public Function IconResourceFromHandle(ByVal Handle As Long) As Byte()
+    Dim Result() As Byte
+    
+    If SaveHICONtoArray(Handle, Result, True) Then
+        IconResourceFromHandle = Result
+    End If
+End Function
+
+Public Sub ValidateResourceName(ByRef ResourceName As Variant)
+    If Not IsValidResourceNameOrType(ResourceName) Then
+        Error.Argument Argument_InvalidResourceNameOrType, "ResourceName"
+    End If
+End Sub
+
+Public Sub ValidateResourceType(ByRef ResourceType As Variant)
+    If Not IsValidResourceNameOrType(ResourceType) Then
+        Error.Argument Argument_InvalidResourceNameOrType, "ResourceType"
+    End If
+End Sub
+
+Private Function IsValidResourceNameOrType(ByRef Value As Variant) As Boolean
+    Select Case VarType(Value)
+        Case vbString, vbLong, vbInteger, vbByte
+            IsValidResourceNameOrType = True
+    End Select
+End Function
+
+' using LaVolpe's method for converting an icon or cursor to a byte array vs getting
+' an IPicture to save itself out because his method produces a much better result.
+'
+' http://www.vbforums.com/showthread.php?637452-vb6-Icon-Handle-to-File-Array
+'
+Private Function SaveHICONtoArray(ByVal hIcon As Long, OutArray() As Byte, ByVal IsIcon As Boolean) As Boolean
+
+    ' Function takes an HICON handle and converts it to 1,4,8,24, or 32 bit icon file format
+    ' If return value is False, outArray() contents are undefined
+    ' Note: Bit reduction is in play. Example: If original source for HICON was 24 bit
+    '   and it can be reduced/saved as 8 bit or lower without color loss, it will.
+    ' Note: The end result's quality should be identical to HICON
+    '       XP and above required to show/save 32bpp alphablended icons correctly
+    '       This routine not coded to save icons in PNG format (Vista and above)
+
+    Dim Bits() As Long, pow2(0 To 8) As Long
+    Dim tDC As Long, maskScan As Long, clrScan As Long
+    Dim x As Long, y As Long, clrOffset As Long, bNewColor As Boolean
+    Dim palIndex As Long, palShift As Long, palPtr As Long, lPrevPal As Long
+    Dim ICI As ICONINFO, BHI As BITMAPINFO
+    
+    If hIcon = 0& Then Exit Function
+    If GetIconInfo(hIcon, ICI) = 0& Then Exit Function
+    
+    If IsIcon <> CBool(ICI.fIcon = BOOL_TRUE) Then
+        Exit Function
+    End If
+    
+    ' A properly formatted icon file will contain this information:
+    ' :: 6 byte ICONDIRECTORY structure
+    ' :: 16 byte ICONDIRECTORYENTRY structure
+    ' If stored in PNG format then
+    '    :: The entire PNG
+    ' Else
+    '    :: 40 byte BITMAPINFOHEADER structure
+    '    If paletted then: Palette entries, each in BGRA format
+    '    :: Color data packed & word-aligned per Bitcount of 1,4,8,24,32 bits per pixel
+    '    :: 1-bit word-aligned Mask data, even if mask not used (i.e., 32bpp)
+    '    Size of any single icon's file can be calculated as:
+    '    FileSize = 62 + NrPaletteEntries*4 + (ByteAlignOnWord(BitCount,Width) + ByteAlignOnWord(1,Width))*Height)
+    ' Icon sizes are limited to maximum dimensions of 256x256
+    
+    On Error GoTo Catch_Exception
+    tDC = GetDC(0&)
+    With BHI.bmiHeader
+        .biSize = 40&
+        If ICI.hbmColor = 0& Then  ' black and white icon (rare, but so easy)
+            If GetDIBits(tDC, ICI.hbmMask, 0, 0&, ByVal 0&, BHI, 0&) Then
+                .biClrUsed = 2&                 ' should be filled in, but ensure it is so
+                .biClrImportant = .biClrUsed    ' should be filled in, but ensure it is so
+                .biCompression = 0&
+                .biSizeImage = 0&
+                BHI.bmiColors(2) = vbWhite      ' set 2nd palette entry to white
+                ' size array to the entire icon file format, includes Icon Directory structure, bitmap header, palette, & mask
+                ReDim OutArray(0 To ByteAlignOnWord(1, .biWidth) * .biHeight + 69&)
+                ' this next call gets the entire icon data; just need to fill in the directory a bit further down this routine
+                If GetDIBits(tDC, ICI.hbmMask, 0, BHI.bmiHeader.biHeight, OutArray(70), BHI, 0&) = 0& Then
+                    .biBitCount = 0
+                Else
+                    .biClrUsed = 2&                 ' fill in; last GetDIBits call erased it
+                    .biClrImportant = .biClrUsed    ' fill in; last GetDIBits call erased it
+                    .biHeight = .biHeight \ 2&      ' set to real height, not height*2 as is now
+                End If
+            End If
+            DeleteObject ICI.hbmMask: ICI.hbmMask = 0& ' destroy; no longer needed
+        
+        Else    ' color icon vs black & white
+            If GetDIBits(tDC, ICI.hbmColor, 0, 0&, ByVal 0&, BHI, 0&) Then
+                .biBitCount = 32
+                .biCompression = 0&
+                .biClrImportant = 0&
+                .biClrUsed = 0&
+                .biSizeImage = 0&
+                ReDim Bits(0 To .biWidth * .biHeight - 1&) ' number colors we will process
+                If GetDIBits(tDC, ICI.hbmColor, 0, .biHeight, Bits(0), BHI, 0&) = 0 Then
+                    .biBitCount = 0
+                Else
+                    ' determine if this icon can be paletted or not; fast routine for small images (256x256 or less)
+                    lPrevPal = Bits(x) Xor 1&                       ' forces mismatch in loop start
+                    For y = x To .biWidth * .biHeight - 1&          ' process each color
+                        If Bits(y) <> lPrevPal Then
+                            If (Bits(y) And &HFF000000) Then        ' uses alpha channel; 32bpp
+                                .biClrImportant = 0&                ' we can abort loop; won't be paletted
+                                .biBitCount = 32
+                                Exit For
+                                
+                            ElseIf .biBitCount = 32 Then                ' continue processing else identified as potential 24bpp icon
+                                palIndex = FindColor(BHI.bmiColors(), Bits(y), .biClrImportant, bNewColor) ' have we seen this color?
+                                If bNewColor Then                       ' if not, add to our palette
+                                    If .biClrImportant = 256& Then      ' max'd out on palette entries; treat as 24bpp
+                                        .biBitCount = 24                ' but don't exit loop cause we don't know now
+                                        .biClrImportant = 0&            ' if it is not a 32bpp icon
+                                        
+                                    Else                                ' prepare to add to our palette if new
+                                        .biClrImportant = .biClrImportant + 1&
+                                        If palIndex < .biClrImportant Then  ' keep our palette in ascending order for binary search
+                                            CopyMemory BHI.bmiColors(palIndex + 1&), BHI.bmiColors(palIndex), (.biClrImportant - palIndex) * 4&
+                                        End If
+                                        BHI.bmiColors(palIndex) = Bits(y) ' add color now
+                                    End If
+                                End If
+                            End If
+                            lPrevPal = Bits(y) ' track for faster looping
+                        End If
+                    Next
+                    maskScan = ByteAlignOnWord(1, .biWidth) ' scan width for the mask portion of this icon
+                    
+                    If .biClrImportant Then                ' then can be paletted
+                        Select Case .biClrImportant        ' set destination bit count
+                            Case Is < 3:    .biBitCount = 1
+                            Case Is < 17:   .biBitCount = 4
+                            Case Else:      .biBitCount = 8
+                        End Select
+                        pow2(0) = 1&                                ' setup a power of two lookup table
+                        For y = pow2(0) To .biBitCount
+                            pow2(y) = pow2(y - 1&) * 2&
+                        Next
+                        clrScan = ByteAlignOnWord(.biBitCount, .biWidth)    ' scan width of destination's color data
+                        .biClrUsed = pow2(.biBitCount)                      ' how many palette entries we will provide
+                        .biSizeImage = clrScan * .biHeight                  ' new size of color data
+                        clrOffset = .biClrUsed * 4& + 62&                   ' where color data starts
+                        ' size array to the entire icon file format, includes Icon Directory structure, bitmap header, palette, & mask
+                        ReDim OutArray(0 To .biSizeImage + maskScan * .biHeight + clrOffset - 1&)
+                        
+                        lPrevPal = Bits(x) Xor 1&                   ' forces mismatch when loop starts
+                        For y = x To .biHeight - 1&                 ' start packing the palette indexes into bytes
+                            palShift = 8& - .biBitCount             ' 1st position of byte where palette index will be written
+                            palPtr = clrOffset + y * clrScan        ' position where that byte will start for current row
+                            For x = x To x + .biWidth - 1&          ' process each row of the source bitmap
+                                ' locate the color in our palette & subtract one (palette is 1-based, indexes are 0-based)
+                                If lPrevPal <> Bits(x) Then
+                                    palIndex = FindColor(BHI.bmiColors(), Bits(x), .biClrImportant, bNewColor) - 1&
+                                    lPrevPal = Bits(x) ' track for faster looping
+                                End If
+                                OutArray(palPtr) = OutArray(palPtr) Or (palIndex * pow2(palShift)) ' pack the index
+                                If palShift = 0& Then               ' done with this byte
+                                    palPtr = palPtr + 1&            ' move destination to next byte
+                                    palShift = 8& - .biBitCount     ' reset the position where next index will be written
+                                Else
+                                    palShift = palShift - .biBitCount ' adjust position where next index will be written
+                                End If
+                            Next
+                        Next
+                    
+                    Else ' 24 or 32 bit color
+                            
+                        .biSizeImage = ByteAlignOnWord(.biBitCount, .biWidth) * .biHeight ' size of color data
+                        ' size array to the entire icon file format, includes Icon Directory structure, bitmap header
+                        ReDim OutArray(0 To .biSizeImage + maskScan * .biHeight + 61&)
+                        If .biBitCount = 32 Then    ' just copy the entire bitmap to our array
+                            CopyMemory OutArray(62), Bits(x), .biSizeImage
+                        Else
+                            ' we can loop & transfer 3 of 4 bytes for each pixel or just call the API one more time
+                            Call GetDIBits(tDC, ICI.hbmColor, 0&, .biHeight, OutArray(62), BHI, 0&)
+                        End If
+                    End If
+                    Erase Bits()
+                End If
+            End If
+        End If
+    End With
+        
+    If BHI.bmiHeader.biBitCount Then
+        With BHI.bmiHeader
+            ' let's build the icon structure (22 bytes for single icon)
+            ' 6 byte ICONDIRECTORY
+            '   Integer: Reserved; must be zero
+            '   Integer: Type. 1=Icon, 2=Cursor
+            '   Integer: Count. Number ico/cur in this resource
+            ' 16 BYTE ICONDIRECTORYENTRY
+            ' -------- 1 of these for each ico/cur in resource. ICO entry differs from CUR entry
+            '   Byte: Width; 256=0
+            '   Byte: Height; 256=0
+            '   Byte: Color Count; 256=0 & 16-32bit = 0
+            '   Byte: Reserved; must be 0
+            '   Integer: Planes; must be 1
+            '   Integer: Bitcount
+            '   Long: Number of bytes for this entry's ico/cur data
+            '   Long: Offset into resource where ico/cur data starts
+            OutArray(2) = IIf(IsIcon, 1, 2)                      ' type: icon
+            OutArray(4) = 1                                      ' count
+            If .biWidth < 256& Then OutArray(6) = .biWidth       ' width
+            If .biHeight < 256& Then OutArray(7) = .biHeight     ' height
+            If .biClrUsed < 256& Then OutArray(8) = .biClrUsed   ' color count
+            OutArray(10) = IIf(IsIcon, 1, ICI.XHotSpot)           ' planes
+            OutArray(12) = IIf(IsIcon, .biBitCount, ICI.YHotSpot) ' bitcount
+            CopyMemory OutArray(14), CLng(UBound(OutArray) - 21&), 4& ' bytes in resource
+            OutArray(18) = 22                                    ' offset into directory where BHI starts
+            .biHeight = .biHeight + .biHeight                    ' icon's store height*2 in bitmap header
+        End With
+        ' copy the bitmap header & palette, if used
+        CopyMemory OutArray(OutArray(18)), BHI, BHI.bmiHeader.biClrUsed * 4& + BHI.bmiHeader.biSize
+        
+        ' done with the icon directory, now to the mask portion
+        If ICI.hbmMask Then
+            BHI.bmiColors(1) = vbBlack: BHI.bmiColors(2) = vbWhite      ' set up black/white palette
+            With BHI.bmiHeader                                          ' set up bitmapinfo header
+                .biBitCount = 1
+                .biClrUsed = 2&
+                .biClrImportant = .biClrUsed
+                .biHeight = .biHeight \ 2&
+                .biSizeImage = 0&
+                palPtr = UBound(OutArray) - maskScan * .biHeight + 1&    ' location where mask will be written
+            End With
+            GetDIBits tDC, ICI.hbmMask, 0&, BHI.bmiHeader.biHeight, OutArray(palPtr), BHI, 0& ' get the mask
+        End If
+        SaveHICONtoArray = True
+    End If
+    
+Catch_Exception:
+    ReleaseDC 0&, tDC
+    If ICI.hbmColor Then DeleteObject ICI.hbmColor
+    If ICI.hbmMask Then DeleteObject ICI.hbmMask
+    
+End Function
+
+Private Function FindColor(ByRef PaletteItems() As Long, ByVal Color As Long, ByVal Count As Long, ByRef isNew As Boolean) As Long
+
+    ' MODIFIED BINARY SEARCH ALGORITHM -- Divide and conquer.
+    ' Binary search algorithms are about the fastest on the planet, but
+    ' its biggest disadvantage is that the array must already be sorted.
+    ' Ex: binary search can find a value among 1 million values between 1 and 20 iterations
+    
+    ' [in] PaletteItems(). Long Array to search within. Array must be 1-bound
+    ' [in] Color. A value to search for. Order is always ascending
+    ' [in] Count. Number of items in PaletteItems() to compare against
+    ' [out] isNew. If Color not found, isNew is True else False
+    ' [out] Return value: The Index where Color was found or where the new Color should be inserted
+
+    Dim ub As Long, lb As Long
+    Dim newIndex As Long
+    
+    If Count = 0& Then
+        FindColor = 1&
+        isNew = True
+        Exit Function
+    End If
+    
+    ub = Count
+    lb = 1&
+    
+    Do Until lb > ub
+        newIndex = lb + ((ub - lb) \ 2&)
+        Select Case PaletteItems(newIndex) - Color
+        Case 0& ' match found
+            Exit Do
+        Case Is > 0& ' new color is lower in sort order
+            ub = newIndex - 1&
+        Case Else ' new color is higher in sort order
+            lb = newIndex + 1&
+        End Select
+    Loop
+
+    If lb > ub Then  ' color was not found
+            
+        If Color > PaletteItems(newIndex) Then newIndex = newIndex + 1&
+        isNew = True
+        
+    Else
+        isNew = False
+    End If
+    
+    FindColor = newIndex
+
+End Function
+
+Private Function ByteAlignOnWord(ByVal bitDepth As Long, ByVal Width As Long) As Long
+    ' function to align any bit depth on dWord boundaries
+    ByteAlignOnWord = (((Width * bitDepth) + &H1F&) And Not &H1F&) \ &H8&
+End Function
 

@@ -11,30 +11,33 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = True
-'    CopyRight (c) 2005 Kelly Ethridge
+'The MIT License (MIT)
+'Copyright (c) 2018 Kelly Ethridge
 '
-'    This file is part of VBCorLib.
+'Permission is hereby granted, free of charge, to any person obtaining a copy
+'of this software and associated documentation files (the "Software"), to deal
+'in the Software without restriction, including without limitation the rights to
+'use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of
+'the Software, and to permit persons to whom the Software is furnished to do so,
+'subject to the following conditions:
 '
-'    VBCorLib is free software; you can redistribute it and/or modify
-'    it under the terms of the GNU Library General Public License as published by
-'    the Free Software Foundation; either version 2.1 of the License, or
-'    (at your option) any later version.
+'The above copyright notice and this permission notice shall be included in all
+'copies or substantial portions of the Software.
 '
-'    VBCorLib is distributed in the hope that it will be useful,
-'    but WITHOUT ANY WARRANTY; without even the implied warranty of
-'    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-'    GNU Library General Public License for more details.
+'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+'INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+'PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+'FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+'OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+'DEALINGS IN THE SOFTWARE.
 '
-'    You should have received a copy of the GNU Library General Public License
-'    along with Foobar; if not, write to the Free Software
-'    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 '
-'    Module: IResourceEncoder
+' Module: IResourceEncoder
 '
 
 ''
 ' Provides an interface for classes to be used to encode data
-' into byte arrays used by the <b>ResourceWriter</b>.
+' into byte arrays used by the <a href="ResourceWriter.html">ResourceWriter</a>.
 '
 ' @remarks An encoder needs to hold multiple encoded resources. Once all resources
 ' have been encoded, each resource will be requested one at a time. The same
@@ -51,27 +54,20 @@ Public Sub Reset(): End Sub
 ' Encodes a value into a byte array for later retrieval.
 '
 ' @param Value The value to be encoded into a resource compatible byte array.
-' @param ResourceName The identifier for the specific resource. Should be
-' converted to a string or numeric value.
-' @param ResourceType The type of resource. This can be a string or numeric value.
-' If the is value is not supplied, then an attempt to determine the type should
-' be made based on the Value itself.
-' @param LanguageID The Locale identifier this resource belongs to. If this value
-' is not supplied, then the current culture's LCID should be used.
-' @return Returns True if the encoder accepted and encoded the value, False otherwise.
-' @remarks This function should not throw an exception. If the encoder cannot
-' handle the the value for encoding, it should just return False.
+' @param ResourceName The identifier for the specific resource. Should be converted to a string or numeric value.
+' @param ResourceType The type of resource. This can be a string or numeric value. If the is value is not supplied, then an attempt to determine the type should be made based on the Value itself.
+' @param LanguageID The Locale identifier this resource belongs to. If this value is not supplied, then the current culture's LCID should be used.
+' @return Returns <b>True</b> if the encoder accepted and encoded the value, <b>False</b> otherwise.
+' @remarks This function should not throw an exception. If the encoder cannot handle the the value for encoding, it should just return <b>False</b>.
 '
 Public Function Encode(ByRef Value As Variant, ByRef ResourceName As Variant, Optional ByRef ResourceType As Variant, Optional ByRef LanguageID As Variant) As Boolean: End Function
 
 ''
 ' Returns the next available resource from the encoder.
 '
-' @param ReturnKey This is the unique identifier for the resource to be returned.
-' @param ReturnValue A byte array representing the encoded resource value.
-' @return Returns True if a resource has been returned, False otherwise.
-' @remarks This function should not throw an exception. If there are not more
-' resources to be returned, then False should just be returned.
+' @param OutKey This is the unique identifier for the resource to be returned.
+' @param OutValue A byte array representing the encoded resource value.
+' @return Returns <b>True</b> if a resource has been returned, <b>False</b> otherwise.
+' @remarks This function should not throw an exception. If there are no more resources to be returned, then False should just be returned.
 '
-Public Function GetEncodedResource(ByRef ReturnKey As ResourceKey, ByRef ReturnValue As Variant) As Boolean: End Function
-
+Public Function GetEncodedResource(ByRef OutKey As ResourceKey, ByRef OutValue() As Byte) As Boolean: End Function

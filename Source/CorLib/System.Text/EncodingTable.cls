@@ -169,6 +169,8 @@ Private Sub LoadData()
         mCodePageByName(mEncodingData(i).BodyName) = mEncodingData(i).CodePage
         mCodePageByName(mEncodingData(i).EncodingName) = mEncodingData(i).CodePage
     Next i
+    
+    Reader.CloseReader
 End Sub
 
 Private Sub FillData(ByVal Reader As BinaryReader, ByRef Data As DataItem)

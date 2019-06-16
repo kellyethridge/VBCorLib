@@ -156,15 +156,15 @@ Public Function TransformFinalBlock(ByRef InputBuffer() As Byte, ByVal InputOffs
             OutputBuffer = Cor.NewBytes()
             
         Case 1
-            OutputBuffer(0) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ 4)
-            OutputBuffer(1) = Base64Bytes((InputBuffer(InputOffset) And &H3) * &H10)
+            OutputBuffer(0) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ vbShift2Bits)
+            OutputBuffer(1) = Base64Bytes((InputBuffer(InputOffset) And &H3) * vbShift4Bits)
             OutputBuffer(2) = vbEqualChar
             OutputBuffer(3) = vbEqualChar
         
         Case 2
-            OutputBuffer(0) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ 4)
-            OutputBuffer(1) = Base64Bytes(((InputBuffer(InputOffset) And &H3) * &H10) Or ((InputBuffer(InputOffset + 1) And &HF0) \ &H10))
-            OutputBuffer(2) = Base64Bytes((InputBuffer(InputOffset + 1) And &HF) * 4)
+            OutputBuffer(0) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ vbShift2Bits)
+            OutputBuffer(1) = Base64Bytes(((InputBuffer(InputOffset) And &H3) * vbShift4Bits) Or ((InputBuffer(InputOffset + 1) And &HF0) \ vbShift4Bits))
+            OutputBuffer(2) = Base64Bytes((InputBuffer(InputOffset + 1) And &HF) * vbShift2Bits)
             OutputBuffer(3) = vbEqualChar
     
         Case 3
@@ -218,9 +218,9 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub TransformBlockCore(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long)
-    OutputBuffer(OutputOffset) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ 4)
-    OutputBuffer(OutputOffset + 1) = Base64Bytes(((InputBuffer(InputOffset) And &H3) * &H10) Or ((InputBuffer(InputOffset + 1) And &HF0) \ &H10))
-    OutputBuffer(OutputOffset + 2) = Base64Bytes(((InputBuffer(InputOffset + 1) And &HF) * 4) Or ((InputBuffer(InputOffset + 2) And &HC0) \ &H40))
+    OutputBuffer(OutputOffset) = Base64Bytes((InputBuffer(InputOffset) And &HFC) \ vbShift2Bits)
+    OutputBuffer(OutputOffset + 1) = Base64Bytes(((InputBuffer(InputOffset) And &H3) * vbShift4Bits) Or ((InputBuffer(InputOffset + 1) And &HF0) \ vbShift4Bits))
+    OutputBuffer(OutputOffset + 2) = Base64Bytes(((InputBuffer(InputOffset + 1) And &HF) * vbShift2Bits) Or ((InputBuffer(InputOffset + 2) And &HC0) \ vbShift6Bits))
     OutputBuffer(OutputOffset + 3) = Base64Bytes(InputBuffer(InputOffset + 2) And &H3F)
 End Sub
 

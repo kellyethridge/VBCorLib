@@ -25,10 +25,12 @@ Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollecto
 End Sub
 
 Public Sub Setup()
+    SetupTestPath
     Set mBuilder = New IOHelper
 End Sub
 
 Public Sub Teardown()
+    RestoreOriginalPath
     Set mBuilder = Nothing
 End Sub
 

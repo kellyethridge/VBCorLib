@@ -794,14 +794,6 @@ Public Sub Normalize(ByRef Number As BigNumber)
     End Select
 End Sub
 
-#If Release Then
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'
-' These Release methods must be compiled with Interger Overflow
-' checks off. The methods must also pass all tests once compiled.
-'
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-
 ''
 ' Performs a single in-place division by 10, returning the remainder.
 '
@@ -816,7 +808,13 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
     For i = n.Precision - 1 To 0 Step -1
         R = (R * &H10000) + (n.Digits(i) And &HFFFF&)
         d = R \ 10
+
+#If Release Then
         n.Digits(i) = d And &HFFFF&
+#Else
+        n.Digits(i) = AsWord(d)
+#End If
+
         R = R - (d * 10)
 
         If Not f Then
@@ -826,10 +824,22 @@ Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
                 f = True
             End If
         End If
-    Next i
+    Next
+
+    If n.Precision = 0 Then
+        n.Sign = 0
+    End If
 
     SingleInPlaceDivideBy10 = R
 End Function
+
+#If Release Then
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'
+' These Release methods must be compiled with Interger Overflow
+' checks off. The methods must also pass all tests once compiled.
+'
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
 ''
 ' Performs a single in-place multiplication within the original array.
@@ -1057,32 +1067,6 @@ Public Sub SingleInPlaceAdd(ByRef n As BigNumber, ByVal Value As Integer)
         i = i + 1
     Loop
 End Sub
-
-
-
-Public Function SingleInPlaceDivideBy10(ByRef n As BigNumber) As Long
-    Dim R As Long
-    Dim i As Long
-    Dim f As Boolean
-    Dim d As Long
-
-    For i = n.Precision - 1 To 0 Step -1
-        R = (R * &H10000) + (n.Digits(i) And &HFFFF&)
-        d = R \ 10
-        n.Digits(i) = AsWord(d)
-        R = R - (d * 10)
-
-        If Not f Then
-            If n.Digits(i) = 0 Then
-                n.Precision = n.Precision - 1
-            Else
-                f = True
-            End If
-        End If
-    Next
-
-    SingleInPlaceDivideBy10 = R
-End Function
 
 Private Function UInt32x16To32(ByVal x As Long, ByVal y As Integer) As Long
     Dim v As Currency

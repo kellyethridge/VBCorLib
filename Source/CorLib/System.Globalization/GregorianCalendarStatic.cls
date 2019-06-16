@@ -50,3 +50,5 @@ Option Explicit
 Public Property Get ADEra() As Long
     ADEra = 1
 End Property
+
+

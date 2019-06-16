@@ -309,6 +309,11 @@ Public Function NewArrayList(Optional ByVal Comparer As IComparer, Optional ByRe
     NewArrayList.Init Comparer, Source
 End Function
 
+Friend Function NewArrayListEnumerator(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Count As Long) As ArrayListEnumerator
+    Set NewArrayListEnumerator = New ArrayListEnumerator
+    NewArrayListEnumerator.Init List, StartIndex, Count
+End Function
+
 ''
 ' Creates a new SerializationException object.
 '
@@ -388,7 +393,7 @@ End Function
 ' @param Target The object to maintain a weak reference to.
 ' @return A new WeakReference object.
 '
-Public Function NewWeakReference(ByVal Target As Object) As WeakReference
+Public Function NewWeakReference(ByVal Target As IUnknown) As WeakReference
     Set NewWeakReference = New WeakReference
     NewWeakReference.Init Target
 End Function
@@ -642,7 +647,7 @@ End Function
 ' Count will override this value.
 ' @return A new StringBuilder with s already placed in the buffer.
 '
-Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Capacity As Long = 512) As StringBuilder
+Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Capacity As Long = 128) As StringBuilder
     Set NewStringBuilder = New StringBuilder
     NewStringBuilder.Init s, StartIndex, Count, Capacity
 End Function
@@ -1044,30 +1049,30 @@ Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As Console
 End Function
 
 ''
-' Returns a new TimeSpan representing the time portion of the date.
+' Returns a new <a href="TimeSpan.html">TimeSpan</a> representing the time portion of the date.
 '
 ' @param DateValue The date to retrieve the time portion of.
-' @return A TimeSpan object representing the time portion.
+' @return A <a href="TimeSpan.html">TimeSpan</a> object representing the time portion.
 '
 Public Function NewTime(ByRef DateValue As Variant) As TimeSpan
-    Select Case VarType(DateValue)
-        Case vbDate
-            Set NewTime = NewTimeSpan(Hours:=Hour(DateValue), Minutes:=Minute(DateValue), Seconds:=Second(DateValue))
-        Case Else
-            Set NewTime = CorDateTime.GetDateTime(DateValue).TimeOfDay
-    End Select
+    Set NewTime = Convert.ToDateTime(DateValue).TimeOfDay
 End Function
 
 ''
 ' Returns an object used to manipulate an INI file.
 '
 ' @param FileName The INI filename.
-' @return The INIFile object.
+' @return The IniFile object.
 '
-Public Function NewINIFile(ByRef FileName As String) As INIFile
-    Set NewINIFile = New INIFile
-    NewINIFile.Init FileName
+Public Function NewIniFile(ByRef FileName As String) As IniFile
+#If False Then
+    Dim IniFile
+#End If
+    
+    Set NewIniFile = New IniFile
+    NewIniFile.Init FileName
 End Function
+
 
 ''
 ' Creates a new Ticker.
@@ -1160,15 +1165,15 @@ End Function
 ''
 ' Creates a new object used to uniquely identify a resource.
 '
-' @param Name The name of the resource being identified.
+' @param ResourceName The name of the resource being identified.
 ' @param ResourceType The type of resource being identified.
 ' @param LanguageID The Locale ID associated with the resource.
 ' @return An object that can be used to uniquely identify a resource.
 ' @remarks Name and ResourceType can be a string or number.
 '
-Public Function NewResourceKey(ByRef Name As Variant, ByRef ResourceType As Variant, ByVal LanguageID As Long) As ResourceKey
+Public Function NewResourceKey(ByRef ResourceName As Variant, ByRef ResourceType As Variant, ByVal LanguageID As Long) As ResourceKey
     Set NewResourceKey = New ResourceKey
-    NewResourceKey.Init Name, ResourceType, LanguageID
+    NewResourceKey.Init ResourceName, ResourceType, LanguageID
 End Function
 
 ''
@@ -1178,9 +1183,9 @@ End Function
 ' @param GroupType The type of resource the group represents.
 ' @return A group of container for a specific resource type.
 '
-Public Function NewResPictureGroup(ByVal GroupType As PictureGroupTypes) As ResPictureGroup
-    Set NewResPictureGroup = New ResPictureGroup
-    NewResPictureGroup.InitNew GroupType
+Public Function NewPictureResourceGroup(ByVal GroupType As PictureGroupTypes) As PictureResourceGroup
+    Set NewPictureResourceGroup = New PictureResourceGroup
+    NewPictureResourceGroup.Init GroupType
 End Function
 
 ''
@@ -1918,5 +1923,15 @@ End Function
 Friend Function NewDBCSCodePageEncoding(ByVal CodePage As Long) As DBCSCodePageEncoding
     Set NewDBCSCodePageEncoding = New DBCSCodePageEncoding
     NewDBCSCodePageEncoding.Init CodePage
+End Function
+
+Public Function NewPictureResourceInfo(ByVal ResourceId As Long, ByVal Resource As IPicture) As PictureResourceInfo
+    Set NewPictureResourceInfo = New PictureResourceInfo
+    NewPictureResourceInfo.Init ResourceId, Resource
+End Function
+
+Public Function NewIniResourceWriter(ByRef FileName As String, ByRef Section As String) As IniResourceWriter
+    Set NewIniResourceWriter = New IniResourceWriter
+    NewIniResourceWriter.Init FileName, Section
 End Function
 

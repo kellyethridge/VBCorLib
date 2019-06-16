@@ -525,7 +525,7 @@ Private Sub ThrowIOError(ByVal ErrorCode As Long, Optional ByRef Path As String)
 End Sub
 
 Private Function GetFileTimeUtc(ByRef Time As Variant) As Currency
-    GetFileTimeUtc = CorDateTime.GetDateTime(Time).ToFileTimeUtc
+    GetFileTimeUtc = Convert.ToDateTime(Time).ToFileTimeUtc
 End Function
 
 Private Function GetFileSystemEntriesCore(ByRef InitialPath As String, ByRef SearchPattern As String, ByVal EntriesToInclude As SystemEntryTypes, ByVal SearchOpt As SearchOption) As String()

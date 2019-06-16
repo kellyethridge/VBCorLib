@@ -33,13 +33,12 @@ Private mBreak      As Boolean
 Private mBreakType  As ConsoleBreakType
 
 
-
 Public Property Get Break() As Boolean
     Break = mBreak
 End Property
 
-Public Property Let Break(ByVal RHS As Boolean)
-    mBreak = RHS
+Public Property Let Break(ByVal Value As Boolean)
+    mBreak = Value
 End Property
 
 Public Property Get BreakType() As ConsoleBreakType

@@ -97,7 +97,7 @@ End Function
 Public Function IsDayLightSavingTime(ByRef Time As Variant, Optional ByVal dayLightTimes As DayLightTime) As Boolean
     Dim dt As CorDateTime
     
-    Set dt = CorDateTime.GetDateTime(Time)
+    Set dt = Convert.ToDateTime(Time)
     If dayLightTimes Is Nothing Then Set dayLightTimes = GetDayLightTimes(dt.Year)
     
     With dayLightTimes
@@ -122,7 +122,7 @@ End Function
 ' @return The local time converted from the UTC time.
 Public Function ToLocalTime(ByRef Time As Variant) As CorDateTime
     Dim d As CorDateTime
-    Set d = CorDateTime.GetDateTime(Time)
+    Set d = Convert.ToDateTime(Time)
     
     If d.Kind = LocalKind Then
         Set ToLocalTime = d
@@ -138,7 +138,7 @@ End Function
 ' @return The UTC time converted from the local time.
 Public Function ToUniversalTime(ByRef Time As Variant) As CorDateTime
     Dim d As CorDateTime
-    Set d = CorDateTime.GetDateTime(Time)
+    Set d = Convert.ToDateTime(Time)
     
     If d.Kind = UtcKind Then
         Set ToUniversalTime = d
@@ -243,8 +243,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

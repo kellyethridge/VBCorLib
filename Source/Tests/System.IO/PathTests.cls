@@ -18,7 +18,7 @@ Option Explicit
 Implements ITestCaseSource
 Implements ICategorizable
 
-Private mOriginalDir    As String
+Private mOriginalPath   As String
 Private mBuilder        As IOHelper
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
@@ -177,13 +177,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
 End Sub
 
 Public Sub Setup()
-    mOriginalDir = CurDir
-    ChDir "c:\windows"
+    SetupTestPath
     Set mBuilder = New IOHelper
 End Sub
 
 Public Sub Teardown()
-    ChDir mOriginalDir
+    RestoreOriginalPath
     Set mBuilder = Nothing
 End Sub
 

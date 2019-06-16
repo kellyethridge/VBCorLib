@@ -45,7 +45,7 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mTempDateTime As New CorDateTime
+Private mCachedDateTime As New CorDateTime
 
 
 ''
@@ -60,25 +60,54 @@ Public Property Get CurrentEra() As Long
 End Property
 
 ''
-' Many of the calendars calculate the week of the year the same way,
-' so wrap up a function here to let them all share.
+' Returns a read-only version of the specified <a href="Calendar.html">Calendar</a> object.
 '
-' @param Calendar The Calendar to be used for specific calculations.
-' @param Time The Date to calculate the week of the year from.
-' @param Rule How to determine what the first week of the year is.
-' @param FirstDayOfWeek Which day of the week is the start of the week.
-' @return The week of the year.
+' @param Calendar The <a href="Calendar.html">Calendar</a> object.
+' @return The <a href="Calendar.html">Calendar</a> object specified by the calendar parameter, if calendar is read-only.<br/>
+' -or-<br/>
+' A read-only memberwise clone of the <a href="Calendar.html">Calendar</a> object specified by <i>calendar</i>, if <i>calendar</i> is not read-only.
 '
+Public Function ReadOnly(ByVal Calendar As Calendar) As Calendar
+    If Calendar Is Nothing Then _
+        Error.ArgumentNull "Calendar"
+    
+    If Calendar.IsReadOnly Then
+        Set ReadOnly = Calendar
+    Else
+        If TypeOf Calendar Is GregorianCalendar Then
+            Set ReadOnly = ReadOnlyGregorianCalendar(Calendar)
+        ElseIf TypeOf Calendar Is HebrewCalendar Then
+            Set ReadOnly = ReadOnlyHebrewCalendar(Calendar)
+        ElseIf TypeOf Calendar Is JulianCalendar Then
+            Set ReadOnly = ReadOnlyJulianCalendar(Calendar)
+        ElseIf TypeOf Calendar Is HijriCalendar Then
+            Set ReadOnly = ReadOnlyHijriCalendar(Calendar)
+        ElseIf TypeOf Calendar Is JapaneseCalendar Then
+            Set ReadOnly = ReadOnlyJapaneseCalendar(Calendar)
+        ElseIf TypeOf Calendar Is KoreanCalendar Then
+            Set ReadOnly = ReadOnlyKoreanCalendar(Calendar)
+        ElseIf TypeOf Calendar Is TaiwanCalendar Then
+            Set ReadOnly = ReadOnlyTaiwanCalendar(Calendar)
+        ElseIf TypeOf Calendar Is ThaiBuddhistCalendar Then
+            Set ReadOnly = ReadOnlyThaiBuddhistCalendar(Calendar)
+        Else
+            Throw New NotSupportedException
+        End If
+    End If
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Common base Calendar functions
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Rule As CalendarWeekRule, ByVal FirstDayOfWeek As DayOfWeek) As Long
     Dim FirstWeekLength As Long
     Dim Offset          As Long
-    Dim dt              As CorDateTime
     Dim WholeWeeks      As Long
     Dim doy             As Long
 
-    Set dt = CorDateTime.GetDateTime(Time)
-
-    FirstWeekLength = FirstDayOfWeek - Calendar.GetDayOfWeek(Calendar.ToDateTime(Calendar.GetYear(dt), 1, 1, 0, 0, 0, 0))
+    FirstWeekLength = FirstDayOfWeek - Calendar.GetDayOfWeek(Calendar.ToDateTime(Calendar.GetYear(Time), 1, 1, 0, 0, 0, 0))
+    
     If FirstWeekLength < 0 Then
         FirstWeekLength = FirstWeekLength + 7
     End If
@@ -100,7 +129,8 @@ Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant,
             End If
     End Select
 
-    doy = Calendar.GetDayOfYear(dt)
+    doy = Calendar.GetDayOfYear(Time)
+    
     If doy > FirstWeekLength Then
         WholeWeeks = (doy - FirstWeekLength) \ 7
         
@@ -110,104 +140,175 @@ Friend Function GetWeekOfYear(ByVal Calendar As Calendar, ByRef Time As Variant,
     End If
 
     GetWeekOfYear = WholeWeeks + Offset
+    
     If GetWeekOfYear = 0 Then
         Dim Year    As Long
         Dim Month   As Long
         Dim Day     As Long
         
-        Year = Calendar.GetYear(dt) - 1
+        Year = Calendar.GetYear(Time) - 1
         Month = Calendar.GetMonthsInYear(Year)
         Day = Calendar.GetDaysInMonth(Year, Month)
         GetWeekOfYear = GetWeekOfYear(Calendar, Calendar.ToDateTime(Year, Month, Day, 0, 0, 0, 0), Rule, FirstDayOfWeek)
     End If
 End Function
 
-''
-' Gets a numeric value from the system calendar settings.
-'
-' @param Cal The calendar to get the value from.
-' @param CalType The type of value to get from the calendar.
-' @return The numeric value from the calendar on the system.
-'
+Friend Function ToFourDigitYear(ByVal Calendar As Calendar, ByVal Year As Long) As Long
+    Dim y As Long
+    
+    If Year < 0 Then _
+        Error.ArgumentOutOfRange "Year", ArgumentOutOfRange_NeedNonNegNum
+    
+    If Year < 100 Then
+        y = Year Mod 100
+        ToFourDigitYear = (Calendar.TwoDigitYearMax \ 100) * 100 + y
+        
+        If y > Calendar.TwoDigitYearMax Mod 100 Then
+            ToFourDigitYear = ToFourDigitYear - 100
+        End If
+    Else
+        ToFourDigitYear = Year
+    End If
+End Function
+
+Friend Function AddYears(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Years As Long) As CorDateTime
+    Set AddYears = AddMonths(Calendar, Time, Years * MonthsPerYear)
+End Function
+
+Friend Function AddMonths(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Months As Long) As CorDateTime
+    If Months < -120000 Or Months > 120000 Then _
+        Throw Cor.NewArgumentOutOfRangeException("Months", "Months must be between -120000 and 120000 inclusively.")
+    
+    mCachedDateTime.InitFromDateOrDateTime Time, UnspecifiedKind
+    
+    If Months = 0 Then
+        Set AddMonths = CorDateTime.FromMilliseconds(mCachedDateTime.TotalMilliseconds)
+        Exit Function
+    End If
+    
+    Dim Year    As Long
+    Dim Month   As Long
+    Dim Day     As Long
+    mCachedDateTime.GetDateParts Complete, Year, Month, Day
+    
+    Dim YearsToAdd  As Long
+    Dim MonthsToAdd As Long
+    
+    YearsToAdd = CorMath.DivRem(Months, MonthsPerYear, MonthsToAdd)
+    
+    Month = Month + MonthsToAdd
+    Year = Year + YearsToAdd
+    
+    Select Case Month
+        Case Is < 1
+            Month = Month + MonthsPerYear
+            Year = Year - 1
+        Case Is > MonthsPerYear
+            Month = Month - MonthsPerYear
+            Year = Year + 1
+    End Select
+    
+    Dim MaxDays As Long
+    MaxDays = CorDateTime.DaysInMonth(Year, Month)
+    
+    If Day > MaxDays Then
+        Day = MaxDays
+    End If
+    
+    Dim Milliseconds As Currency
+    Milliseconds = CorDateTime.GetTotalDays(Year, Month, Day) * MilliSecondsPerDay + Modulus(mCachedDateTime.TotalMilliseconds, MilliSecondsPerDay)
+    ValidateAddResult Calendar, Milliseconds
+    
+    Set AddMonths = CorDateTime.FromMilliseconds(Milliseconds)
+End Function
+
+Friend Function AddDays(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddDays = AddCore(Calendar, Time, Value * MilliSecondsPerDay)
+End Function
+
+Friend Function AddHours(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddHours = AddCore(Calendar, Time, Value * MillisecondsPerHour)
+End Function
+
+Friend Function AddMinutes(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddMinutes = AddCore(Calendar, Time, Value * MillisecondsPerMinute)
+End Function
+
+Friend Function AddSeconds(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Long) As CorDateTime
+    Set AddSeconds = AddCore(Calendar, Time, Value * MillisecondsPerSecond)
+End Function
+
+Friend Function AddMilliseconds(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Double) As CorDateTime
+    Set AddMilliseconds = AddCore(Calendar, Time, Value)
+End Function
+
+Friend Sub ValidateDateTime(ByVal Calendar As Calendar, ByVal Value As CorDateTime)
+    ValidateAddResult Calendar, Value.TotalMilliseconds
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Function GetCalendarInfoInt32(ByVal Cal As Long, ByVal CalType As Long) As Long
     If GetCalendarInfo(LOCALE_USER_DEFAULT, Cal, CalType Or CAL_RETURN_NUMBER, vbNullString, 0, GetCalendarInfoInt32) = BOOL_FALSE Then
         Error.Win32Error Err.LastDllError
     End If
 End Function
 
-''
-' Common Calendar methods
-'
-' These methods support both Date and CorDateTime. When a Date value is passed in it must
-' be converted to a CorDateTime object before manipulation/investigation can begin. However, once the
-' the operation has finished, we don't discard the CorDateTime object. It will be re-used in future
-' method calls involving a VB Date value. This eliminates the constance creating/destroying of a
-' CorDateTime object simply to retrieve or modify a VB Date value.
-'
-Friend Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = GetDateTime(Time).AddDays(Days)
+Private Function AddCore(ByVal Calendar As Calendar, ByRef Time As Variant, ByVal Value As Double) As CorDateTime
+    Dim Milliseconds As Currency
+    
+    If Value < 0# Then
+        Value = Fix(Value - 0.5)
+    Else
+        Value = Fix(Value + 0.5)
+    End If
+    
+    If Value < -MaxMilliseconds Or Value > MaxMilliseconds Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_AddValue
+        
+    Milliseconds = CorDateTime.GetTotalMilliseconds(Time) + CCur(Value)
+    ValidateAddResult Calendar, Milliseconds
+    
+    Set AddCore = CorDateTime.FromMilliseconds(Milliseconds)
 End Function
 
-Friend Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = GetDateTime(Time).AddHours(Hours)
+Private Sub ValidateAddResult(ByVal Calendar As Calendar, ByVal Milliseconds As Currency)
+    If Milliseconds < Calendar.MinSupportedDateTime.TotalMilliseconds Or Milliseconds > Calendar.MaxSupportedDateTime.TotalMilliseconds Then
+        Throw Cor.NewArgumentOutOfRangeException(Environment.GetResourceString(ArgumentOutOfRange_CalendarRange, Calendar.MinSupportedDateTime, Calendar.MaxSupportedDateTime))
+    End If
+End Sub
+
+Private Function ReadOnlyTaiwanCalendar(ByVal Calendar As TaiwanCalendar) As Calendar
+    Set ReadOnlyTaiwanCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = GetDateTime(Time).AddMilliseconds(Milliseconds)
+Private Function ReadOnlyThaiBuddhistCalendar(ByVal Calendar As ThaiBuddhistCalendar) As Calendar
+    Set ReadOnlyThaiBuddhistCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = GetDateTime(Time).AddMinutes(Minutes)
+Private Function ReadOnlyKoreanCalendar(ByVal Calendar As KoreanCalendar) As Calendar
+    Set ReadOnlyKoreanCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = GetDateTime(Time).AddSeconds(Seconds)
+Private Function ReadOnlyJapaneseCalendar(ByVal Calendar As JapaneseCalendar) As Calendar
+    Set ReadOnlyJapaneseCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function GetHour(ByRef Time As Variant) As Long
-    GetHour = GetDateTime(Time).Hour
+Private Function ReadOnlyHijriCalendar(ByVal Calendar As HijriCalendar) As Calendar
+    Set ReadOnlyHijriCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = GetDateTime(Time).Minute
+Private Function ReadOnlyJulianCalendar(ByVal Calendar As JulianCalendar) As Calendar
+    Set ReadOnlyJulianCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = GetDateTime(Time).Second
+Private Function ReadOnlyHebrewCalendar(ByVal Calendar As HebrewCalendar) As Calendar
+    Set ReadOnlyHebrewCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function GetMilliseconds(ByRef Time As Variant) As Double
-    GetMilliseconds = GetDateTime(Time).Millisecond
+Private Function ReadOnlyGregorianCalendar(ByVal Calendar As GregorianCalendar) As Calendar
+    Set ReadOnlyGregorianCalendar = Calendar.CloneReadOnly
 End Function
 
-Friend Function GetTotalMilliseconds(ByRef Time As Variant) As Currency
-    GetTotalMilliseconds = GetDateTime(Time).TotalMilliseconds
-End Function
-
-Friend Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = GetDateTime(Time).DayOfWeek
-End Function
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function GetDateTime(ByRef Time As Variant) As CorDateTime
-    Select Case VarType(Time)
-        Case vbObject
-            If Time Is Nothing Then _
-                Error.Argument Argument_DateRequired
-                
-            If TypeOf Time Is CorDateTime Then
-                mTempDateTime.InitFromCorDateTime Time, UnspecifiedKind
-            Else
-                Error.Argument Argument_DateRequired
-            End If
-        Case vbDate
-            mTempDateTime.InitFromDate Time, UnspecifiedKind
-        Case Else
-            Error.Argument Argument_DateRequired
-    End Select
-
-    Set GetDateTime = mTempDateTime
-End Function

@@ -112,6 +112,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "aa:bb", False
             Test.Use "00:aa", False
             Test.Use "0:00.aa", False
+            Test.Use "", False
             
         Case "Parse_WithOverflowValues_ThrowsOverflowException"
             Test.Use "1:100"
@@ -149,6 +150,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Nothing, TimeSpan.FromHours(1), False
             Test.Use Nothing, TimeSpan.Zero, False
             Test.Use TimeSpan.Zero, Nothing, False
+        
+        Case "NewTime_WhenCalledWithValues_ReturnsExpected"
+            Test.Use #1:30:40 AM#, NewTimeSpan(0, 1, 30, 40)
+            Test.Use "1:30:40 am", NewTimeSpan(0, 1, 30, 40)
+            Test.Use NewDate(#1:30:40 AM#), NewTimeSpan(0, 1, 30, 40)
             
     End Select
 End Sub
@@ -159,6 +165,14 @@ Public Sub Constructor_WhenCalled_InitsToZero()
     Set Span = New TimeSpan
     
     Assert.That Span.TotalMilliseconds, Iz.EqualTo(0)
+End Sub
+
+Public Sub NewTime_WhenCalledWithValues_ReturnsExpected(ByRef Value As Variant, ByVal Expected As TimeSpan)
+    Dim Actual As TimeSpan
+    
+    Set Actual = NewTime(Value)
+    
+    Assert.That Actual, Equals(Expected)
 End Sub
 
 Public Sub Zero_WhenCalled_ReturnsTimeSpanOfZero()

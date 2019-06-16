@@ -456,7 +456,7 @@ Public Function Equals(ByRef a As String, ByRef b As String, Optional ByVal Comp
         Case StringComparison.Ordinal
             Equals = OrdinalEquals(StrPtr(a), StrPtr(b))
         Case StringComparison.OrdinalIgnoreCase
-            Equals = OrdinalIgnoreCaseEquals(StrPtr(a), StrPtr(b))
+            Equals = OrdinalEqualsIgnoreCase(StrPtr(a), StrPtr(b))
         Case Else
             Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
     End Select
@@ -467,7 +467,7 @@ Friend Function EqualsV(ByRef a As Variant, ByRef b As Variant, Optional ByVal C
         Case StringComparison.Ordinal
             EqualsV = OrdinalEquals(StrPtr(a), StrPtr(b))
         Case StringComparison.OrdinalIgnoreCase
-            EqualsV = OrdinalIgnoreCaseEquals(StrPtr(a), StrPtr(b))
+            EqualsV = OrdinalEqualsIgnoreCase(StrPtr(a), StrPtr(b))
         Case Else
             Error.ArgumentOutOfRange "ComparisonType", ArgumentOutOfRange_Enum
     End Select
@@ -866,7 +866,7 @@ BailOut:
 End Function
 
 ' Adapted and modified from Chris Lucas XBeat/VBSpeed implementation
-Private Function OrdinalIgnoreCaseEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
+Private Function OrdinalEqualsIgnoreCase(ByVal Ptr1 As Long, ByVal Ptr2 As Long) As Boolean
     Dim i       As Long
     Dim SLen    As Long
     Dim SLen2   As Long
@@ -888,7 +888,7 @@ Private Function OrdinalIgnoreCaseEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long)
     End If
     
     If SLen = 0 Then
-        OrdinalIgnoreCaseEquals = True
+        OrdinalEqualsIgnoreCase = True
         Exit Function
     End If
     
@@ -1009,7 +1009,7 @@ Private Function OrdinalIgnoreCaseEquals(ByVal Ptr1 As Long, ByVal Ptr2 As Long)
         End If
     End If
 
-    OrdinalIgnoreCaseEquals = True
+    OrdinalEqualsIgnoreCase = True
 End Function
 
 Private Function CheckChars(ByRef s As String, ByVal SuccessfulState As Boolean, ByVal Predicate As Long) As Boolean

@@ -50,7 +50,7 @@ Option Explicit
 Implements IObject
 
 Private Const DefaultFillChar   As Integer = vbSpaceChar
-Private Const DefaultCapacity   As Long = 512
+Private Const DefaultCapacity   As Long = 128
 Private Const OpenBraceChar     As Long = 123
 Private Const CloseBraceChar    As Long = 125
 Private Const BytesPerChar      As Long = 2
@@ -361,6 +361,17 @@ Public Function GetHashCode() As Long
 End Function
 
 ''
+' Removes all characters from the current <a href="StringBuilder.html">StringBuilder</a> instance.
+'
+' @return An object whose <a href="StringBuilder.get.Length.html">Length</a> is 0 (zero).
+' @remarks <b>Clear</b> is a convenience method that is equivalent to setting the Length property of the current instance to 0 (zero).
+'
+Public Function Clear() As StringBuilder
+    Length = 0
+    Set Clear = Me
+End Function
+
+''
 ' Inserts a string into the current string value.
 '
 ' @param index The index in the string value to start inserting the new string.
@@ -533,6 +544,15 @@ End Function
 '
 Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As String
     Dim Range As ListRange
+    
+    ' 99% of the calls will be to retrieve the entire string,
+    ' so we do a quick check instead of going through the full
+    ' optional argument gambit.
+    If IsMissing(StartIndex) And IsMissing(Length) Then
+        ToString = SysAllocStringLen(mStringPtr, mLength)
+        Exit Function
+    End If
+    
     Range = MakeDefaultRange(StartIndex, 0, Length, mLength, Parameter_StartIndex, Parameter_Length)
     
     If Range.Index < 0 Then _

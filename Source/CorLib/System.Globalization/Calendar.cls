@@ -107,14 +107,6 @@ Public Property Get AlgorithmType() As CalendarAlgorithmType: End Property
 Public Function Clone() As Calendar: End Function
 
 ''
-' Gets the number of days in the year that precedes the year that is specified by the <a href="Calendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a> property.
-'
-' @return The number of days in the year that precedes the year specified by <a href="Calendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a>.
-' @remarks This property returns a constant value of 365. Note that the property value can be overridden by classes implement the <a href="Calendar.html">Calendar</a> class interface.
-'
-Public Property Get DaysInYearBeforeMinSupportedYear() As Long: End Property
-
-''
 ' Gets a value indicating whether this <a href="Calendar.html">Calendar</a> object is read-only.
 '
 ' @return <b>True</b> if this <a href="Calendar.html">Calendar</a> object is read-only; otherwise, <b>False</b>.
@@ -381,7 +373,7 @@ Public Function GetYear(ByRef Time As Variant) As Long: End Function
 ' @param Day The day to check if is a leap day.
 ' @param Era The era the year is in.
 ' @return Boolean indication if the day is a leap day.
-' @remarks A leap day only exists in a leap year, such as Febuary 29th in the Gregorian calendar.
+' @remarks A leap day only exists in a leap year, such as February 29th in the Gregorian calendar.
 '
 Public Function IsLeapDay(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, Optional ByRef Era As Variant) As Boolean: End Function
 
@@ -404,6 +396,18 @@ Public Function IsLeapMonth(ByVal Year As Long, ByVal Month As Long, Optional By
 ' @return Boolean indication if the year is a leap year.
 '
 Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As Boolean: End Function
+
+''
+' Calculates the leap month for a specified year and era.
+'
+' @param Year A year.
+' @param Era An era.
+' @return A positive integer that indicates the leap month in the specified year and era.<br/>
+' -or-<br/>
+' Zero if this calendar does not support a leap month or if the year and era parameters do not specify a leap year.
+' @remarks In a calendar that supports the notion of a leap month, the leap month can occur either after a particular month or after any month in a year. For example, the <a href="Calendar.GetMonth.html">GetMonth(DateTime)</a> method returns a number between 1 and 13 that indicates the month associated with a specified date. If there is a leap month between the eighth and ninth months of the year, the <a href="Calendar.GetMonth.html">GetMonth(DateTime)</a> method returns 8 for the eighth month, 9 for the leap eighth month, and 10 for the ninth month.
+'
+Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long: End Function
 
 ''
 ' Returns a Gregorian CorDateTime computed using the specific calendar rules.

@@ -73,7 +73,56 @@ Option Explicit
 'Public Const ERROR_ALREADY_EXISTS       As Long = &HB7
 'Public Const ERROR_FILENAME_EXCED_RANGE As Long = &HCE
 
+Public Const CSIDL_ADMINTOOLS               As Long = &H30
+Public Const CSIDL_CDBURN_AREA              As Long = &H3B
+Public Const CSIDL_COMMON_ADMINTOOLS        As Long = &H2F
+Public Const CSIDL_COMMON_DOCUMENTS         As Long = &H2E
+Public Const CSIDL_COMMON_MUSIC             As Long = &H35
+Public Const CSIDL_COMMON_OEM_LINKS         As Long = &H3A
+Public Const CSIDL_COMMON_PICTURES          As Long = &H36
+Public Const CSIDL_COMMON_STARTMENU         As Long = &H16
+Public Const CSIDL_COMMON_PROGRAMS          As Long = &H17
+Public Const CSIDL_COMMON_STARTUP           As Long = &H18
+Public Const CSIDL_COMMON_DESKTOPDIRECTORY  As Long = &H19
+Public Const CSIDL_COMMON_TEMPLATES         As Long = &H2D
+Public Const CSIDL_COMMON_VIDEO             As Long = &H37
+Public Const CSIDL_FONTS                    As Long = &H14
+Public Const CSIDL_MYVIDEO                  As Long = &HE
+Public Const CSIDL_NETHOOD                  As Long = &H13
+Public Const CSIDL_PRINTHOOD                As Long = &H1B
+Public Const CSIDL_PROFILE                  As Long = &H28
+Public Const CSIDL_PROGRAM_FILES_COMMONX86  As Long = &H2C
+Public Const CSIDL_PROGRAM_FILESX86         As Long = &H2A
+Public Const CSIDL_RESOURCES                As Long = &H38
+Public Const CSIDL_RESOURCES_LOCALIZED      As Long = &H39
+Public Const CSIDL_SYSTEMX86                As Long = &H29
+Public Const CSIDL_WINDOWS                  As Long = &H24
+Public Const CSIDL_APPDATA                  As Long = &H1A
+Public Const CSIDL_COMMON_APPDATA           As Long = &H23
+Public Const CSIDL_LOCAL_APPDATA            As Long = &H1C
+Public Const CSIDL_COOKIES                  As Long = &H21
+Public Const CSIDL_FAVORITES                As Long = &H6
+Public Const CSIDL_HISTORY                  As Long = &H22
+Public Const CSIDL_INTERNET_CACHE           As Long = &H20
+Public Const CSIDL_PROGRAMS                 As Long = &H2
+Public Const CSIDL_RECENT                   As Long = &H8
+Public Const CSIDL_SENDTO                   As Long = &H9
+Public Const CSIDL_STARTMENU                As Long = &HB
+Public Const CSIDL_STARTUP                  As Long = &H7
+Public Const CSIDL_SYSTEM                   As Long = &H25
+Public Const CSIDL_TEMPLATES                As Long = &H15
+Public Const CSIDL_DESKTOPDIRECTORY         As Long = &H10
+Public Const CSIDL_PERSONAL                 As Long = &H5
+Public Const CSIDL_PROGRAM_FILES            As Long = &H26
+Public Const CSIDL_PROGRAM_FILES_COMMON     As Long = &H2B
+Public Const CSIDL_DESKTOP                  As Long = &H0
+Public Const CSIDL_DRIVES                   As Long = &H11
+Public Const CSIDL_MYMUSIC                  As Long = &HD
+Public Const CSIDL_MYPICTURES               As Long = &H27
 
+Public Enum ExtendedNameFormat
+    NameSamCompatible = 2
+End Enum
 
 Private Type FileNameBuffer
     Buffer As String * 32000
@@ -131,16 +180,12 @@ Public Function GetModuleFileName(ByVal hModule As Long, ByRef lpFileName As Str
     GetModuleFileName = GetModuleFileNameW(hModule, lpFileName, nSize)
 End Function
 
-Public Function GetUserNameEx(ByVal NameFormat As Long, ByRef lpNameBuffer As String, ByRef nSize As Long) As Long
-    GetUserNameEx = GetUserNameExW(NameFormat, lpNameBuffer, nSize)
+Public Function VBGetUserNameEx(ByVal NameFormat As ExtendedNameFormat, ByRef lpNameBuffer As String, ByRef nSize As Long) As Boolean
+    VBGetUserNameEx = CBool(GetUserNameExW(NameFormat, lpNameBuffer, nSize))
 End Function
 
 Public Function LookupAccountName(ByVal lpSystemName As String, ByVal lpAccountName As String, ByRef Sid As String, ByRef cbSid As Long, ByRef ReferencedDomainName As String, ByRef cbReferencedDomainName As Long, ByRef peUse As Long) As Long
     LookupAccountName = LookupAccountNameW(lpSystemName, lpAccountName, StrPtr(Sid), cbSid, ReferencedDomainName, cbReferencedDomainName, peUse)
-End Function
-
-Public Function GetProcessWindowStation() As Long
-    GetProcessWindowStation = CorType.GetProcessWindowStation
 End Function
 
 Public Function GetUserObjectInformation(ByVal hObj As Long, ByVal nIndex As Long, ByVal pvInfo As Long, ByVal nLength As Long, ByRef lpnLengthNeeded As Long) As Long
@@ -149,7 +194,7 @@ End Function
 
 Public Function GetSystemMenu(ByVal hwnd As Long, ByVal bRevert As Boolean) As Long
     Dim BoolRevert As BOOL
-    BoolRevert = IIf(bRevert, BOOL_TRUE, BOOL_FALSE)
+    BoolRevert = IIfLong(bRevert, BOOL_TRUE, BOOL_FALSE)
     GetSystemMenu = CorType.GetSystemMenu(hwnd, BoolRevert)
 End Function
 
@@ -159,6 +204,10 @@ End Function
 
 Public Function SetCurrentDirectory(ByRef PathName As String) As Boolean
     SetCurrentDirectory = (SetCurrentDirectoryW(PathName) <> BOOL_FALSE)
+End Function
+
+Public Function VBSetEnvironmentVariable(ByRef Variable As String, ByRef Value As String) As Boolean
+    VBSetEnvironmentVariable = CBool(SetEnvironmentVariableW(Variable, Value))
 End Function
 
 Public Function GetMessage(ByVal ErrorCode As Long) As String

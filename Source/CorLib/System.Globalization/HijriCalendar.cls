@@ -48,7 +48,10 @@ Implements IObject
 Implements Calendar
 Implements ICloneable
 
-Private Const DefaultTwoDigitYearMax As Long = 1451
+Private Const DefaultTwoDigitYearMax    As Long = 1451
+Private Const PropTwoDigitYearMax       As String = "TwoDigitYearMax"
+Private Const PropHijriAdjustment       As String = "HijriAdjustment"
+
 
 ' Number of Gregorian days to 7/18/622.
 ' This is 2 days after the start of the Hijri calendar to
@@ -109,16 +112,6 @@ Public Function Clone() As HijriCalendar
 End Function
 
 ''
-' Gets the number of days in the year that precedes the year that is specified by the <a href="HijriCalendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a> property.
-'
-' @return The number of days in the year that precedes the year specified by <a href="HijriCalendar.Get.MinSupportedDateTime.html">MinSupportedDateTime</a>.
-' @remarks This property returns a constant value of 354.
-'
-Public Property Get DaysInYearBeforeMinSupportedYear() As Long
-    DaysInYearBeforeMinSupportedYear = 354
-End Property
-
-''
 ' Gets a value indicating whether this <a href="HijriCalendar.html">HijriCalendar</a> object is read-only.
 '
 ' @return <b>True</b> if this <a href="HijriCalendar.html">HijriCalendar</a> object is read-only; otherwise, <b>False</b>.
@@ -171,6 +164,7 @@ End Property
 ' </table>
 Public Property Let HijriAdjustment(ByVal Value As Long)
     VerifyWritable
+    
     If Value < -2 Or Value > 2 Then _
         Throw Cor.NewArgumentOutOfRangeException("HijriAdjustment", Environment.GetResourceString(ArgumentOutOfRange_Range, -2, 2), Value)
     
@@ -233,7 +227,7 @@ End Property
 ' @return The <a href="CorDateTime.html">CorDateTime</a> that results from adding the specified number of days to the specified <a href="CorDateTime.html">CorDateTime</a>.
 '
 Public Function AddDays(ByRef Time As Variant, ByVal Days As Long) As CorDateTime
-    Set AddDays = Statics.Calendar.AddDays(Time, Days)
+    Set AddDays = Statics.Calendar.AddDays(Me, Time, Days)
 End Function
 
 ''
@@ -244,7 +238,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html"> with the specified number of hours added.
 '
 Public Function AddHours(ByRef Time As Variant, ByVal Hours As Long) As CorDateTime
-    Set AddHours = Statics.Calendar.AddHours(Time, Hours)
+    Set AddHours = Statics.Calendar.AddHours(Me, Time, Hours)
 End Function
 
 ''
@@ -255,7 +249,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Milliseconds added.
 '
 Public Function AddMilliseconds(ByRef Time As Variant, ByVal Milliseconds As Double) As CorDateTime
-    Set AddMilliseconds = Statics.Calendar.AddMilliseconds(Time, Milliseconds)
+    Set AddMilliseconds = Statics.Calendar.AddMilliseconds(Me, Time, Milliseconds)
 End Function
 
 ''
@@ -266,7 +260,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Minutes added.
 '
 Public Function AddMinutes(ByRef Time As Variant, ByVal Minutes As Long) As CorDateTime
-    Set AddMinutes = Statics.Calendar.AddMinutes(Time, Minutes)
+    Set AddMinutes = Statics.Calendar.AddMinutes(Me, Time, Minutes)
 End Function
 
 ''
@@ -288,7 +282,7 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
         Throw Cor.NewArgumentOutOfRangeException("Months", Environment.GetResourceString(ArgumentOutOfRange_Range, -120000, 120000))
     
     If Months = 0 Then
-        Set AddMonths = CorDateTime.GetDateTime(Time)
+        Set AddMonths = Convert.ToDateTime(Time)
         Exit Function
     End If
     
@@ -303,8 +297,9 @@ Public Function AddMonths(ByRef Time As Variant, ByVal Months As Long) As CorDat
     
     FixedDays = GetFixedDaysFromParts(Year, Month, Day)
     
-    ms = Statics.Calendar.GetTotalMilliseconds(Time)
+    ms = CorDateTime.GetTotalMilliseconds(Time)
     Set AddMonths = CorDateTime.FromMilliseconds(MilliSecondsPerDay * FixedDays + Modulus(ms, MilliSecondsPerDay))
+    Statics.Calendar.ValidateDateTime Me, AddMonths
 End Function
 
 ''
@@ -315,7 +310,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Seconds added.
 '
 Public Function AddSeconds(ByRef Time As Variant, ByVal Seconds As Long) As CorDateTime
-    Set AddSeconds = Statics.Calendar.AddSeconds(Time, Seconds)
+    Set AddSeconds = Statics.Calendar.AddSeconds(Me, Time, Seconds)
 End Function
 
 ''
@@ -326,7 +321,7 @@ End Function
 ' @return Returns a <a href="CorDateTime.html">CorDateTime</a> with the specified number of Weeks added.
 '
 Public Function AddWeeks(ByRef Time As Variant, ByVal Weeks As Long) As CorDateTime
-    Set AddWeeks = Statics.Calendar.AddDays(Time, Weeks * DaysPerWeek)
+    Set AddWeeks = Statics.Calendar.AddDays(Me, Time, Weeks * DaysPerWeek)
 End Function
 
 ''
@@ -369,7 +364,7 @@ End Function
 ' enum vbDayOfWeek is 1-based.
 '
 Public Function GetDayOfWeek(ByRef Time As Variant) As DayOfWeek
-    GetDayOfWeek = Statics.Calendar.GetDayOfWeek(Time)
+    GetDayOfWeek = CorDateTime.GetDayOfWeek(Time)
 End Function
 
 ''
@@ -419,7 +414,7 @@ End Function
 ' @return The era for the time.
 '
 Public Function GetEra(ByRef Time As Variant) As Long
-    CorDateTime.GetDateTime Time
+    CorDateTime.Validate Time
     GetEra = 1
 End Function
 
@@ -430,7 +425,7 @@ End Function
 ' @return The hour portion of the time.
 '
 Public Function GetHour(ByRef Time As Variant) As Long
-    GetHour = Statics.Calendar.GetHour(Time)
+    GetHour = CorDateTime.GetHour(Time)
 End Function
 
 ''
@@ -439,8 +434,8 @@ End Function
 ' @param Time The time to retrieve the milliseconds from.
 ' @return The millisecond portion of the time.
 '
-Public Function GetMilliseconds(ByRef Time As Variant) As Double
-    GetMilliseconds = Statics.Calendar.GetMilliseconds(Time)
+Public Function GetMilliseconds(ByRef Time As Variant) As Long
+    GetMilliseconds = CorDateTime.GetMilliseconds(Time)
 End Function
 
 ''
@@ -450,7 +445,7 @@ End Function
 ' @return The minute portion of the time.
 '
 Public Function GetMinute(ByRef Time As Variant) As Long
-    GetMinute = Statics.Calendar.GetMinute(Time)
+    GetMinute = CorDateTime.GetMinute(Time)
 End Function
 
 ''
@@ -488,7 +483,7 @@ End Function
 ' @return The second portion of the time.
 '
 Public Function GetSecond(ByRef Time As Variant) As Long
-    GetSecond = Statics.Calendar.GetSecond(Time)
+    GetSecond = CorDateTime.GetSecond(Time)
 End Function
 
 ''
@@ -589,6 +584,20 @@ Public Function IsLeapYear(ByVal Year As Long, Optional ByRef Era As Variant) As
 End Function
 
 ''
+' Calculates the leap month for a specified year and era.
+'
+' @param Year A year.
+' @param Era An era.
+' @return Always 0 because the <a href="HijriCalendar.html">HijriCalendar</a> does not recognize leap months.
+'
+Public Function GetLeapMonth(ByVal Year As Long, Optional ByRef Era As Variant) As Long
+    ValidateEra Era
+    ValidateYear Year
+    
+    GetLeapMonth = 0
+End Function
+
+''
 ' Returns a Gregorian <a href="CorDateTime.html">CorDateTime</a> computed using the specific calendar rules.
 '
 ' @param Year The Year in the specific calendar type.
@@ -602,23 +611,24 @@ End Function
 ' @return A Gregorian version of the date specified.
 '
 Public Function ToDateTime(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long, ByVal Hour As Long, ByVal Minute As Long, ByVal Second As Long, ByVal Millisecond As Long, Optional ByRef Era As Variant) As CorDateTime
-    Dim ms As Currency
-    Dim DaysInMonth As Long
+    Dim Milliseconds    As Currency
+    Dim DaysInMonth     As Long
     
     DaysInMonth = GetDaysInMonth(Year, Month, Era)
+    
     If Day < 1 Or Day > DaysInMonth Then _
         Throw Cor.NewArgumentOutOfRangeException("Day", Environment.GetResourceString(ArgumentOutOfRange_Day, DaysInMonth, Month))
     
-    ms = GetFixedDaysFromParts(Year, Month, Day) * MilliSecondsPerDay
+    Milliseconds = GetFixedDaysFromParts(Year, Month, Day) * MilliSecondsPerDay
     
-    If ms < 0 Then _
-        Throw Cor.NewArgumentOutOfRangeException(Message:="Invalid Year, Month, or Day for this calendar")
+    If Milliseconds < 0 Then _
+        Error.ArgumentOutOfRange "", ArgumentOutOfRange_BadYearMonthDay
         
-    Set ToDateTime = CorDateTime.FromMilliseconds(ms + Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond)
+    Set ToDateTime = CorDateTime.FromMilliseconds(Milliseconds + Hour * MillisecondsPerHour + Minute * MillisecondsPerMinute + Second * MillisecondsPerSecond + Millisecond)
 End Function
 
 ''
-' Converts the specified year to a four-digit year by using the <a href="JulianCalendar.TwoDigitYearMax.get.html">TwoDigitYearMax</a> property to determine the appropriate century.
+' Converts the specified year to a four-digit year by using the <a href="HijriCalendar.TwoDigitYearMax.get.html">TwoDigitYearMax</a> property to determine the appropriate century.
 '
 ' @param A two-digit or four-digit integer that represents the year to convert.
 ' @return A 4-digit year in the specific calendar.
@@ -632,21 +642,10 @@ End Function
 ' 100 years which 2-digit years will fall. 00-99 will fall within 1930-2029.</p>
 '
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
-    Dim y As Long
-    
     If Year < 0 Or Year > MaxYear Then _
-        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 9999))
-
-    If Year < 100 Then
-        y = Year Mod 100
-        ToFourDigitYear = (mTwoDigitYearMax \ 100) * 100 + y
-        
-        If y > mTwoDigitYearMax Mod 100 Then
-            ToFourDigitYear = ToFourDigitYear - 100
-        End If
-    Else
-        ToFourDigitYear = Year
-    End If
+        Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, MaxYear))
+    
+    ToFourDigitYear = Statics.Calendar.ToFourDigitYear(Me, Year)
 End Function
 
 ''
@@ -679,6 +678,11 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Friend Function CloneReadOnly() As HijriCalendar
+    Set CloneReadOnly = New HijriCalendar
+    CloneReadOnly.InitReadOnlyClone Me
+End Function
+
 Private Sub VerifyWritable()
     If mIsReadOnly Then
         Error.InvalidOperation InvalidOperation_ReadOnly
@@ -686,15 +690,11 @@ Private Sub VerifyWritable()
 End Sub
 
 Private Sub ValidateEra(ByRef Era As Variant)
-    Select Case VarType(Era)
-        Case IsInteger(Err)
-            If Era < Statics.Calendar.CurrentEra Or Era > Statics.HijriCalendar.HijriEra Then
-                Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidEraValue), "Era")
-            End If
-        Case vbMissing
-            ' do nothing
+    Select Case CLngOrDefault(Era, Statics.Calendar.CurrentEra)
+        Case HijriCalendar.HijriEra, Statics.Calendar.CurrentEra
+            ' all good
         Case Else
-            Error.Argument Argument_IntegerRequired
+            Error.Argument Argument_InvalidEraValue, "Era"
     End Select
 End Sub
 
@@ -715,7 +715,7 @@ End Sub
 Private Function GetFixedDays(ByRef Time As Variant) As Long
     Dim TimeInMilliseconds As Currency
     
-    TimeInMilliseconds = Statics.Calendar.GetTotalMilliseconds(Time)
+    TimeInMilliseconds = CorDateTime.GetTotalMilliseconds(Time)
     
     If TimeInMilliseconds < Statics.HijriCalendar.MinDateTime.TotalMilliseconds Or _
        TimeInMilliseconds > Statics.HijriCalendar.MaxDateTime.TotalMilliseconds Then
@@ -769,13 +769,16 @@ End Sub
 Private Sub Class_Initialize()
     mTwoDigitYearMax = DefaultTwoDigitYearMax
     mMonthDays = Cor.NewLongs(0, 30, 59, 89, 118, 148, 177, 207, 236, 266, 295, 325, 355)
-    mIsReadOnly = True
 End Sub
 
 Friend Sub InitClone(ByVal Other As HijriCalendar)
     mHijriAdjustment = Other.HijriAdjustment
     mTwoDigitYearMax = Other.TwoDigitYearMax
-    mIsReadOnly = False
+End Sub
+
+Friend Sub InitReadOnlyClone(ByVal Other As HijriCalendar)
+    InitClone Other
+    mIsReadOnly = True
 End Sub
 
 
@@ -784,15 +787,15 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        mTwoDigitYearMax = .ReadProperty("TwoDigitYearMax")
-        mHijriAdjustment = .ReadProperty("HijriAdjustment")
+        mTwoDigitYearMax = .ReadProperty(PropTwoDigitYearMax)
+        mHijriAdjustment = .ReadProperty(PropHijriAdjustment)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty "TwoDigitYearMax", mTwoDigitYearMax
-        .WriteProperty "HijriAdjustment", mHijriAdjustment
+        .WriteProperty PropTwoDigitYearMax, mTwoDigitYearMax
+        .WriteProperty PropHijriAdjustment, mHijriAdjustment
     End With
 End Sub
 
@@ -831,10 +834,6 @@ End Property
 Private Function Calendar_Clone() As Calendar
     Set Calendar_Clone = Clone
 End Function
-
-Private Property Get Calendar_DaysInYearBeforeMinSupportedYear() As Long
-    Calendar_DaysInYearBeforeMinSupportedYear = DaysInYearBeforeMinSupportedYear
-End Property
 
 Private Property Get Calendar_IsReadOnly() As Boolean
     Calendar_IsReadOnly = IsReadOnly
@@ -910,6 +909,10 @@ End Function
 
 Private Function Calendar_GetHour(Time As Variant) As Long
     Calendar_GetHour = GetHour(Time)
+End Function
+
+Private Function Calendar_GetLeapMonth(ByVal Year As Long, Optional Era As Variant) As Long
+    Calendar_GetLeapMonth = GetLeapMonth(Year, Era)
 End Function
 
 Private Function Calendar_GetMilliseconds(Time As Variant) As Double
