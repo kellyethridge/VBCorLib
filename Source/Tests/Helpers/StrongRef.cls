@@ -28,11 +28,11 @@ Public Property Set Reference(ByVal RHS As WeakRef)
 End Property
 
 Public Sub AssertDead()
-    Assert.IsFalse mWeak.IsAlive, "Reference should be dead."
+    Assert.IsFalse mWeak.IsAlive, "WeakReference should be dead."
 End Sub
 
 Public Sub AssertAlive()
-    Assert.IsTrue mWeak.IsAlive, "Reference should be alive."
+    Assert.IsTrue mWeak.IsAlive, "WeakReference should be alive."
 End Sub
 
 Private Sub Class_Initialize()

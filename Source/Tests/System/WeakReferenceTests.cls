@@ -24,7 +24,8 @@ End Sub
 Public Sub TestWeakness()
     Dim Strong As StrongRef
     Dim Weak As WeakRef
-
+    Dim Reference As New WeakReference
+    
     Set Strong = New StrongRef
     Set Weak = New WeakRef
     Set Strong.Reference = Weak

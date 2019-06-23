@@ -49,7 +49,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private mPtrWeak As Long
+Private mKey As Long
 
 
 ''
@@ -57,17 +57,21 @@ Private mPtrWeak As Long
 '
 ' @return Strong referenced object.
 '
-Public Property Get Target() As IUnknown
-    Set Target = GetReference(mPtrWeak)
+Public Property Get Target() As Object
+    Set Target = ResolveTarget(mKey)
 End Property
 
 ''
 ' Sets the target object to keep a weak reference to.
 '
-' @param RHS Strong object to create a weak reference to.
+' @param Value Strong object to create a weak reference to.
 '
-Public Property Set Target(ByVal Value As IUnknown)
-    Init Value
+Public Property Set Target(ByVal Value As Object)
+    If Value Is Nothing Then
+        mKey = vbNullPtr
+    Else
+        mKey = InitWeakReference(Value)
+    End If
 End Property
 
 ''
@@ -76,7 +80,7 @@ End Property
 ' @return Status of the weak referenced object.
 '
 Public Property Get IsAlive() As Boolean
-    IsAlive = Not Target Is Nothing
+    IsAlive = TargetIsAlive(mKey)
 End Property
 
 ''
@@ -112,12 +116,8 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Target As IUnknown)
-    If Target Is Nothing Then
-        Exit Sub
-    End If
-    
-    mPtrWeak = TrackReference(Target)
+Friend Sub Init(ByVal Target As Object)
+    Set Me.Target = Target
 End Sub
 
 
@@ -135,3 +135,5 @@ End Function
 Private Function IObject_ToString() As String
     IObject_ToString = ToString
 End Function
+
+

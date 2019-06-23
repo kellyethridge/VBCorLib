@@ -27,6 +27,10 @@ Public Property Set Reference(ByVal RHS As StrongRef)
     Set mStrong = RHS
 End Property
 
+Public Sub DoSomething()
+    Debug.Print "Doing something"
+End Sub
+
 Private Sub Class_Terminate()
     Debug.Print "WeakRef: Terminate"
 End Sub

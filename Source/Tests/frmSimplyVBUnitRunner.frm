@@ -136,7 +136,7 @@ Private Sub AddSystem()
     
         .Add New PublicFunctionsTests
 '        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
-'        .Add New WeakReferenceTests
+        .Add New WeakReferenceTests
         
         AddTest .This
     End With
