@@ -44,6 +44,12 @@ Public Function SCur(ByVal Value As Long) As Currency
     SCur = 0.0001@ * Value
 End Function
 
+Public Function AsUnknown(ByRef Value As Variant) As IUnknown
+    If IsObject(Value) Then
+        Set AsUnknown = Value
+    End If
+End Function
+
 
 ' This is a set of casting routines used by function delegation calls.
 ' They allow a virtual casting routine to be selected and called without

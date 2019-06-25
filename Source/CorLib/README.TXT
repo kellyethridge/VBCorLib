@@ -95,6 +95,7 @@ version 3.0 (BREAKING CHANGES)
 	* Implemented IResourceWriter.CloseWriter in IniResourceWriter.
 	* Fixed tests that would break when run against a compiled VBCorLib.
 	* Fixed BitMapResourceDecoder. Was crashing when compiled because of improper release of resources.
+	* Removed WeakReference class because it is severely limited and unstable.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -388,17 +388,6 @@ Public Function NewBitArray(ByVal Length As Long, Optional ByVal Value As Boolea
 End Function
 
 ''
-' Creates a new WeakReference object.
-'
-' @param Target The object to maintain a weak reference to.
-' @return A new WeakReference object.
-'
-Public Function NewWeakReference(ByVal Target As IUnknown) As WeakReference
-    Set NewWeakReference = New WeakReference
-    NewWeakReference.Init Target
-End Function
-
-''
 ' Creates a new FormatException object.
 '
 ' @param Message A human-readable message explaining the exception.

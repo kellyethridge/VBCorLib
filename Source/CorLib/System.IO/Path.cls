@@ -226,7 +226,7 @@ End Function
 ' <p>If Path1 does not end with a directory separator, one will be inserted.</p>
 ' <p>This function does not verify that the paths exist.</p>
 '
-Public Function Combine(ByRef Path1 As String, ByRef Path2 As String) As String
+Public Function Combine(ByRef Path1 As String, ByRef Path2 As String, Optional ByRef Path3 As String, Optional ByRef Path4 As String) As String
     CheckValidPathChars Path1
     
     If IsPathRooted(Path2) Then
@@ -247,6 +247,10 @@ Public Function Combine(ByRef Path1 As String, ByRef Path2 As String) As String
     Else
         Combine = Path1 & vbDirectorySeparator & Path2
     End If
+End Function
+
+Public Function CombineArray(ByRef Paths() As String) As String
+
 End Function
 
 ''
