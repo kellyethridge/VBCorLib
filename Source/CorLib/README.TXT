@@ -96,6 +96,9 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed tests that would break when run against a compiled VBCorLib.
 	* Fixed BitMapResourceDecoder. Was crashing when compiled because of improper release of resources.
 	* Removed WeakReference class because it is severely limited and unstable.
+	* Added CorArray.IsNullOrEmpty method.
+	* Added optional parameters to Path.Combine method.
+	* Added Path.CombineArray method.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

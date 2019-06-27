@@ -270,7 +270,7 @@ Public Function GetCurrentDirectory() As String
     Dim Result  As String
     Dim Size    As Long
     
-    Result = String$(Path.MaxPath, 0)
+    Result = String$(MAX_PATH, 0)
     Size = Api.GetCurrentDirectory(Len(Result), Result)
     
     If Size = 0 Then

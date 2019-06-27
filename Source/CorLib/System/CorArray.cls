@@ -770,9 +770,22 @@ End Function
 ' Returns if an array variable is uninitialized.
 '
 ' @param arr The array to test for initialization.
-' @return Value indicating if the array is initialized.
+' @return Returns <b>True</b> if the array is uninitialized, <b>False</b> otherwise.
 Public Function IsNull(ByRef Arr As Variant) As Boolean
     IsNull = SAPtrV(Arr) = vbNullPtr
+End Function
+
+''
+' Returns if the array variable is unitialized(null) or empty(no elements).
+'
+' @param Arr The array to inspectd.
+' @return Returns <b>True</b> if the array is unitialized or has zero elements, <b>False</b> otherwise.
+Public Function IsNullOrEmpty(ByRef Arr As Variant) As Boolean
+    If IsNull(Arr) Then
+        IsNullOrEmpty = True
+    ElseIf Length(Arr) = 0 Then
+        IsNullOrEmpty = True
+    End If
 End Function
 
 ''

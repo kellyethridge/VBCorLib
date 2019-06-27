@@ -59,16 +59,46 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "file", False
             
         Case "Combine_WithValues_ReturnsExpected"
-            Test.Use "a", "\b", "\b"
-            Test.Use "a/", "b", "a/b"
-            Test.Use "a", "b", "a\b"
-            Test.Use "a:", "b", "a:b"
-            Test.Use "c:\", "*.txt", "c:\*.txt"
-            Test.Use "", "*.txt", "*.txt"
-            Test.Use "", "", ""
-            Test.Use "a", "", "a"
-            Test.Use "", "b", "b"
+            Test.Use "a", "\b", "", "", "\b"
+            Test.Use "a/", "b", "", "", "a/b"
+            Test.Use "a", "b", "", "", "a\b"
+            Test.Use "a:", "b", "", "", "a:b"
+            Test.Use "c:\", "*.txt", "", "", "c:\*.txt"
+            Test.Use "", "*.txt", "", "", "*.txt"
+            Test.Use "", "", "", "", ""
+            Test.Use "a", "", "", "", "a"
+            Test.Use "", "b", "", "", "b"
+            Test.Use "a", "b", "c", "", "a\b\c"
+            Test.Use "a", "b", "c", "d", "a\b\c\d"
+            Test.Use "a", "b", "", "d", "a\b\d"
+            Test.Use "a", "b", "c:\", "d", "c:\d"
+            Test.Use "a", "b:\", "c:\", "d", "c:\d"
+            Test.Use "a", "\b", "c", "d", "\b\c\d"
+            Test.Use "a", "\b", "\c", "d", "\c\d"
+            Test.Use "a", "\b", "c", "\d", "\d"
+            Test.Use "", "", "c", "d", "c\d"
+            Test.Use "a", "..", "b", "", "a\..\b"
             
+        Case "CombineArray_WithValues_ReturnsExpected"
+            Test.Use "a", "\b", "", "", "\b"
+            Test.Use "a/", "b", "", "", "a/b"
+            Test.Use "a", "b", "", "", "a\b"
+            Test.Use "a:", "b", "", "", "a:b"
+            Test.Use "c:\", "*.txt", "", "", "c:\*.txt"
+            Test.Use "", "*.txt", "", "", "*.txt"
+            Test.Use "", "", "", "", ""
+            Test.Use "a", "", "", "", "a"
+            Test.Use "", "b", "", "", "b"
+            Test.Use "a", "b", "c", "", "a\b\c"
+            Test.Use "a", "b", "c", "d", "a\b\c\d"
+            Test.Use "a", "b", "", "d", "a\b\d"
+            Test.Use "a", "b", "c:\", "d", "c:\d"
+            Test.Use "a", "b:\", "c:\", "d", "c:\d"
+            Test.Use "a", "\b", "c", "d", "\b\c\d"
+            Test.Use "a", "\b", "\c", "d", "\c\d"
+            Test.Use "a", "\b", "c", "\d", "\d"
+            Test.Use "", "", "c", "d", "c\d"
+                    
         Case "GetDirectoryName_WithValidPath_ReturnsExpected"
             Test.Use "c:\abc", "c:\"
             Test.Use "c:\abc\", "c:\abc"
@@ -228,13 +258,26 @@ Public Sub HasExtension_WithValue_ReturnsExpected(ByVal PathToCheck As String, B
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Combine_WithValues_ReturnsExpected(ByVal Path1 As String, ByVal Path2 As String, ByVal Expected As String)
+Public Sub Combine_WithValues_ReturnsExpected(ByVal Path1 As String, ByVal Path2 As String, ByVal Path3 As String, ByVal Path4 As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = Path.Combine(Path1, Path2)
+    Actual = Path.Combine(Path1, Path2, Path3, Path4)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+Public Sub CombineArray_WithValues_ReturnsExpected(ByVal Path1 As String, ByVal Path2 As String, ByVal Path3 As String, ByVal Path4 As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Parts() As String
+    
+    Parts = Cor.NewStrings(Path1, Path2, Path3, Path4)
+    
+    Actual = Path.CombineArray(Parts)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+
 
 Public Sub GetDirectoryName_WithValidPath_ReturnsExpected(ByVal PathToUse As String, ByVal Expected As String)
     Dim Actual As String
