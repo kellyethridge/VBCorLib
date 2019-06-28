@@ -175,12 +175,12 @@ Public Function Subtract(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Tim
     End With
 End Function
 
-Public Function CompareTo(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Long
+Public Function Compare(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Long
     With GetMilliseconds(Left, Right)
         If .Left < .Right Then
-            CompareTo = -1
+            Compare = -1
         ElseIf .Left > .Right Then
-            CompareTo = 1
+            Compare = 1
         End If
     End With
 End Function

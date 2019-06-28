@@ -99,6 +99,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added CorArray.IsNullOrEmpty method.
 	* Added optional parameters to Path.Combine method.
 	* Added Path.CombineArray method.
+	* Renamed incorrectly spelled static method TimeSpan.CompareTo to TimeSpan.Compare.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

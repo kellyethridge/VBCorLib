@@ -209,7 +209,7 @@ End Property
 ' <br><br>
 ' If <b>Nothing</b> is passed in 1 is returned.
 Public Function CompareTo(ByRef Value As TimeSpan) As Long
-    CompareTo = TimeSpan.CompareTo(Me, Value)
+    CompareTo = TimeSpan.Compare(Me, Value)
 End Function
 
 ''
