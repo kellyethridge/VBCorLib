@@ -158,6 +158,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "'hh"
             Test.Use "dd%"
             Test.Use "dd\"
+            Test.Use "ddddddddd"
+            Test.Use "hhh"
+            Test.Use "mmm"
+            Test.Use "sss"
+            Test.Use "ffffffff"
+            Test.Use "FFFFFFFF"
             
         Case "GetHashCode_WithValues_ReturnsExpected"
             Test.Use 0, 0, True

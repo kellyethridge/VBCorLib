@@ -25,7 +25,11 @@ Attribute VB_Name = "TimeSpanFormatter"
 
 Option Explicit
 
-Private Const MaxFractionWidth As Long = 7
+Private Const MaxDayWidth       As Long = 8
+Private Const MaxHourWidth      As Long = 2
+Private Const MaxMinuteWidth    As Long = 2
+Private Const MaxSecondWidth    As Long = 2
+Private Const MaxFractionWidth  As Long = 7
 
 Private Enum FormatType
     Standard
@@ -138,21 +142,27 @@ Private Sub FormatCustom()
                     Count = 1
                 Case vbLowerDChar
                     Count = CountChars(mFormatChars, vbLowerDChar, Index)
+                    If Count > MaxDayWidth Then FormatError
                     AppendComponent mDays, Count
                 Case vbLowerHChar
                     Count = CountChars(mFormatChars, vbLowerHChar, Index)
+                    If Count > MaxHourWidth Then FormatError
                     AppendComponent mHours, Count
                 Case vbLowerMChar
                     Count = CountChars(mFormatChars, vbLowerMChar, Index)
+                    If Count > MaxMinuteWidth Then FormatError
                     AppendComponent mMinutes, Count
                 Case vbLowerSChar
                     Count = CountChars(mFormatChars, vbLowerSChar, Index)
+                    If Count > MaxSecondWidth Then FormatError
                     AppendComponent mSeconds, Count
                 Case vbLowerFChar
                     Count = CountChars(mFormatChars, vbLowerFChar, Index)
+                    If Count > MaxFractionWidth Then FormatError
                     AppendFraction Count, False
                 Case vbUpperFChar
                     Count = CountChars(mFormatChars, vbUpperFChar, Index)
+                    If Count > MaxFractionWidth Then FormatError
                     AppendFraction Count, True
                 Case vbSingleQuoteChar
                     Count = AppendStringLiteral(Index)
@@ -167,6 +177,10 @@ Private Sub FormatCustom()
     If InWholeMode Or InEscapeMode Then
         Error.Format Format_InvalidString
     End If
+End Sub
+
+Private Sub FormatError()
+    Error.Format Format_InvalidString
 End Sub
 
 Private Function AppendStringLiteral(ByVal Index As Long) As Long
