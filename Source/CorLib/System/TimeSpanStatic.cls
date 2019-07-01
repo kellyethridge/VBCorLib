@@ -42,10 +42,11 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mParser         As New TimeSpanParser
-Private mZero           As New TimeSpan
-Private mMaxValue       As TimeSpan
-Private mMinValue       As TimeSpan
+Private mParser     As New TimeSpanParser
+Private mFormatter  As New TimeSpanFormatter
+Private mZero       As New TimeSpan
+Private mMaxValue   As TimeSpan
+Private mMinValue   As TimeSpan
 
 Private Type OperandMilliseconds
     Left    As Currency
@@ -226,7 +227,7 @@ End Function
 ' @return Returns True if the string is successfully parsed, false otherwise.
 ' @remarks This method does not raise an error if the string cannot be parsed.
 '
-Public Function TryParse(ByVal s As String, ByRef Result As TimeSpan) As Boolean
+Public Function TryParse(ByRef s As String, ByRef Result As TimeSpan) As Boolean
     TryParse = mParser.TryParse(s, Result)
 End Function
 
@@ -240,6 +241,21 @@ Public Function FromDate(ByRef Value As Variant) As TimeSpan
     Dim dt As CorDateTime
     Set dt = Convert.ToDateTime(Value)
     Set FromDate = dt.TimeOfDay
+End Function
+
+''
+' Converts the value of the current <a href="TimeSpan.html">TimeSpan</a> object to its equivalent string representation by using the specified format and culture-specific formatting information.
+'
+' @param ts The <a href="TimeSpan.html">TimeSpan</a> to be converted to a string.
+' @param Format A standard or custom <a href="TimeSpan.html">TimeSpan</a> format string.
+' @param FormatProvider An object that supplies culture-specific formatting information.
+' @return The string representation of the current <a href="TimeSpan.html">TimeSpan</a> value, as specified by <i>Format</i> and <i>FormatProvider</i>.
+Public Function ToString(ByVal ts As TimeSpan, Optional ByRef Format As String, Optional ByVal FormatProvider As IFormatProvider) As String
+    If ts Is Nothing Then
+        Set ts = mZero
+    End If
+    
+    ToString = mFormatter.Format(ts.TotalMilliseconds, Format, FormatProvider)
 End Function
 
 

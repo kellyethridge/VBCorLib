@@ -221,14 +221,14 @@ Public Function Negate() As TimeSpan
 End Function
 
 ''
-' Returns a string representation of the duration.
+' Converts the value of the current <a href="TimeSpan.html">TimeSpan</a> object to its equivalent string representation by using the specified format and culture-specific formatting information.
 '
-' @return String representing the duration.
-' @remarks A string representation is in the form of [-][d.]hh:mm:ss[.ff]
-' where the bracketed fields are optional. The optional fields will be
-' included in the string their value is not zero, or the TimeSpan is negative.
+' @param ts The <a href="TimeSpan.html">TimeSpan</a> to be converted to a string.
+' @param Format A standard or custom <a href="TimeSpan.html">TimeSpan</a> format string.
+' @param FormatProvider An object that supplies culture-specific formatting information.
+' @return The string representation of the current <a href="TimeSpan.html">TimeSpan</a> value, as specified by <i>Format</i> and <i>FormatProvider</i>.
 Public Function ToString(Optional ByRef Format As String, Optional ByVal FormatProvider As IFormatProvider) As String
-    ToString = TimeSpanFormatter.FormatTimeSpan(mMilliseconds, Format, FormatProvider)
+    ToString = TimeSpan.ToString(Me, Format, FormatProvider)
 End Function
 
 ''

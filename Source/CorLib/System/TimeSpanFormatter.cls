@@ -1,4 +1,16 @@
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+  Persistable = 0  'NotPersistable
+  DataBindingBehavior = 0  'vbNone
+  DataSourceBehavior  = 0  'vbNone
+  MTSTransactionMode  = 0  'NotAnMTSObject
+END
 Attribute VB_Name = "TimeSpanFormatter"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 'The MIT License (MIT)
 'Copyright (c) 2019 Kelly Ethridge
 '
@@ -22,9 +34,7 @@ Attribute VB_Name = "TimeSpanFormatter"
 '
 ' Module: TimeSpanFormatter
 '
-
 Option Explicit
-
 Private Const MaxDayWidth       As Long = 8
 Private Const MaxHourWidth      As Long = 2
 Private Const MaxMinuteWidth    As Long = 2
@@ -47,7 +57,7 @@ Private mSeconds            As Long
 Private mFraction           As Long
 
 
-Public Function FormatTimeSpan(ByVal TotalMilliseconds As Currency, ByRef FormatString As String, ByVal FormatProvider As IFormatProvider) As String
+Friend Function Format(ByVal TotalMilliseconds As Currency, ByRef FormatString As String, ByVal FormatProvider As IFormatProvider) As String
     InitComponents TotalMilliseconds
     Set mOutput = StringBuilderCache.Acquire
     
@@ -69,7 +79,7 @@ Public Function FormatTimeSpan(ByVal TotalMilliseconds As Currency, ByRef Format
     End Select
     
     GoSub Finally
-    FormatTimeSpan = StringBuilderCache.GetStringAndRelease(mOutput)
+    Format = StringBuilderCache.GetStringAndRelease(mOutput)
     Exit Function
     
 Catch:
@@ -109,7 +119,7 @@ Private Sub FormatCustom()
         If InWholeMode Then
             Select Case mFormatChars(Index)
                 Case vbPercentChar
-                    Error.Format Format_InvalidString
+                    FormatError
                 Case vbLowerDChar
                     AppendComponent mDays, 1
                 Case vbLowerHChar
@@ -123,7 +133,7 @@ Private Sub FormatCustom()
                 Case vbUpperFChar
                     AppendFraction 1, True
                 Case Else
-                    Error.Format Format_InvalidString
+                    FormatError
             End Select
         
             InWholeMode = False
@@ -167,7 +177,7 @@ Private Sub FormatCustom()
                 Case vbSingleQuoteChar
                     Count = AppendStringLiteral(Index)
                 Case Else
-                    Error.Format Format_InvalidString
+                    FormatError
             End Select
             
             Index = Index + Count
@@ -175,7 +185,7 @@ Private Sub FormatCustom()
     Loop
     
     If InWholeMode Or InEscapeMode Then
-        Error.Format Format_InvalidString
+        FormatError
     End If
 End Sub
 
@@ -209,7 +219,6 @@ End Function
 Private Sub FormatStandard(ByVal FormatType As FormatType, ByVal Provider As IFormatProvider)
     If mTotalMilliseconds < 0 Then
         mOutput.AppendChar vbMinusChar
-        mTotalMilliseconds = -mTotalMilliseconds
     End If
     
     If mDays <> 0 Or FormatType = Full Then
@@ -266,8 +275,8 @@ Private Sub AppendComponent(ByVal Component As Long, ByVal Width As Long)
 End Sub
 
 Private Sub AppendFraction(ByVal Width As Long, ByVal Minimize As Boolean)
-    Dim CharsToChop As Long
-    Dim ChoppedValue As Long
+    Dim CharsToChop     As Long
+    Dim ChoppedValue    As Long
     
     CharsToChop = MaxFractionWidth - Width
     ChoppedValue = mFraction
@@ -290,6 +299,4 @@ Private Sub AppendFraction(ByVal Width As Long, ByVal Minimize As Boolean)
     
     AppendComponent ChoppedValue, Width
 End Sub
-
-
 
