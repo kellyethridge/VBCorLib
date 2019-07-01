@@ -73,18 +73,86 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use TimeSpan.FromHours(6), -1
             Test.Use Nothing, 1
             
-        Case "ToString_WhenCalled_ReturnsExpected"
-            Test.Use TimeSpan.Zero, "00:00:00"
-            Test.Use TimeSpan.FromDays(1), "1.00:00:00"
-            Test.Use TimeSpan.FromHours(1), "01:00:00"
-            Test.Use TimeSpan.FromMinutes(1), "00:01:00"
-            Test.Use TimeSpan.FromSeconds(1), "00:00:01"
-            Test.Use TimeSpan.FromMilliseconds(1), "00:00:00.0010000"
-            Test.Use TimeSpan.FromTicks(1), "00:00:00.0000001"
-            Test.Use TimeSpan.FromTicks(10001), "00:00:00.0010001"
-            Test.Use NewTimeSpan(102, 3, 4, 5, 10), "102.03:04:05.0100000"
-            Test.Use NewTimeSpan(-2, -3, -4, -5, -10), "-2.03:04:05.0100000"
+        Case "ToString_WithFormat_ReturnsExpected"
+            Test.Use TimeSpan.Zero, "", "00:00:00"
+            Test.Use TimeSpan.FromDays(1), "", "1.00:00:00"
+            Test.Use TimeSpan.FromHours(1), "", "01:00:00"
+            Test.Use TimeSpan.FromMinutes(1), "", "00:01:00"
+            Test.Use TimeSpan.FromSeconds(1), "", "00:00:01"
+            Test.Use TimeSpan.FromMilliseconds(1), "", "00:00:00.0010000"
+            Test.Use TimeSpan.FromTicks(1), "", "00:00:00.0000001"
+            Test.Use TimeSpan.FromTicks(10001), "", "00:00:00.0010001"
+            Test.Use NewTimeSpan(102, 3, 4, 5, 10), "", "102.03:04:05.0100000"
+            Test.Use NewTimeSpan(-2, -3, -4, -5, -10), "", "-2.03:04:05.0100000"
         
+            Test.Use TimeSpan.Zero, "c", "00:00:00"
+            Test.Use TimeSpan.FromDays(1), "c", "1.00:00:00"
+            Test.Use TimeSpan.FromHours(1), "c", "01:00:00"
+            Test.Use TimeSpan.FromMinutes(1), "c", "00:01:00"
+            Test.Use TimeSpan.FromSeconds(1), "c", "00:00:01"
+            Test.Use TimeSpan.FromMilliseconds(1), "c", "00:00:00.0010000"
+            Test.Use TimeSpan.FromTicks(1), "c", "00:00:00.0000001"
+            Test.Use TimeSpan.FromTicks(10001), "c", "00:00:00.0010001"
+            Test.Use NewTimeSpan(102, 3, 4, 5, 10), "c", "102.03:04:05.0100000"
+            Test.Use NewTimeSpan(-2, -3, -4, -5, -10), "c", "-2.03:04:05.0100000"
+        
+            Test.Use TimeSpan.Zero, "g", "0:00:00"
+            Test.Use TimeSpan.FromDays(1), "g", "1:0:00:00"
+            Test.Use TimeSpan.FromHours(1), "g", "1:00:00"
+            Test.Use TimeSpan.FromMinutes(1), "g", "0:01:00"
+            Test.Use TimeSpan.FromSeconds(1), "g", "0:00:01"
+            Test.Use TimeSpan.FromMilliseconds(10), "g", "0:00:00.01"
+            Test.Use TimeSpan.FromTicks(1), "g", "0:00:00.0000001"
+            Test.Use TimeSpan.FromTicks(10010), "g", "0:00:00.001001"
+            Test.Use NewTimeSpan(102, 3, 4, 5, 10), "g", "102:3:04:05.01"
+        
+            Test.Use TimeSpan.Zero, "G", "0:00:00:00.0000000"
+            Test.Use TimeSpan.FromDays(1), "G", "1:00:00:00.0000000"
+            Test.Use TimeSpan.FromMilliseconds(10), "G", "0:00:00:00.0100000"
+            
+            Test.Use TimeSpan.FromDays(24), "dd", "24"
+            Test.Use TimeSpan.FromDays(24), "ddd", "024"
+            Test.Use TimeSpan.FromDays(24), "%dd", "2424"
+            Test.Use TimeSpan.FromDays(2), "%d", "2"
+            Test.Use TimeSpan.FromHours(13), "hh", "13"
+            Test.Use TimeSpan.FromHours(3), "hh", "03"
+            Test.Use TimeSpan.FromHours(3), "%h", "3"
+            Test.Use TimeSpan.FromHours(13), "%h", "13"
+            Test.Use TimeSpan.FromHours(3), "%hhh", "303"
+            Test.Use TimeSpan.FromMinutes(13), "mm", "13"
+            Test.Use TimeSpan.FromMinutes(3), "mm", "03"
+            Test.Use TimeSpan.FromMinutes(3), "%m", "3"
+            Test.Use TimeSpan.FromMinutes(13), "%m", "13"
+            Test.Use TimeSpan.FromMinutes(3), "%mmm", "303"
+            Test.Use TimeSpan.FromSeconds(13), "ss", "13"
+            Test.Use TimeSpan.FromSeconds(3), "ss", "03"
+            Test.Use TimeSpan.FromSeconds(3), "%s", "3"
+            Test.Use TimeSpan.FromSeconds(13), "%s", "13"
+            Test.Use TimeSpan.FromSeconds(3), "%sss", "303"
+            Test.Use TimeSpan.FromTicks(1234567), "%f", "1"
+            Test.Use TimeSpan.FromTicks(1234567), "fffffff", "1234567"
+            Test.Use TimeSpan.FromTicks(1234567), "%ffffffff", "11234567"
+            Test.Use TimeSpan.FromTicks(1), "%f", "0"
+            Test.Use TimeSpan.FromTicks(1), "fffffff", "0000001"
+            Test.Use TimeSpan.FromTicks(1), "%ffffffff", "00000001"
+            Test.Use TimeSpan.FromTicks(1234567), "%F", "1"
+            Test.Use TimeSpan.FromTicks(1234567), "FFFFFFF", "1234567"
+            Test.Use TimeSpan.FromTicks(1234567), "%FFFFFFFF", "11234567"
+            Test.Use TimeSpan.Zero, "%F", ""
+            Test.Use TimeSpan.FromTicks(1234000), "FFFFFFF", "1234"
+            Test.Use TimeSpan.FromTicks(1234), "FFFFFFF", "0001234"
+            Test.Use TimeSpan.FromTicks(1234), "FFFFFF", "000123"
+            Test.Use TimeSpan.FromHours(5), "h\.h", "5.5"
+            Test.Use TimeSpan.FromHours(5), "h\%h", "5%5"
+            Test.Use TimeSpan.FromHours(5), "'hh'", "hh"
+            Test.Use Cor.NewTimeSpan(1, 2, 3, 4, 5).Add(TimeSpan.FromTicks(100)), "d\.hh\:mm\:ss\.fffffff", "1.02:03:04.0050100"
+            Test.Use Cor.NewTimeSpan(1, 2, 3, 4, 5).Add(TimeSpan.FromTicks(100)), "d\.hh\:mm\:ss\.FFFFFFF", "1.02:03:04.00501"
+            
+        Case "ToString_WithFormatAndProvider_ReturnsExpected"
+            Test.Use "c", "2.03:04:05.0060000"
+            Test.Use "g", "2:3:04:05,006"
+            Test.Use "G", "2:03:04:05,0060000"
+            
         Case "GetHashCode_WithValues_ReturnsExpected"
             Test.Use 0, 0, True
             Test.Use 1, 1, True
@@ -365,12 +433,55 @@ Public Sub CompareTo_WhenSpanIsZeroAndValueIsNothing_Returns0()
     Assert.That Actual, Iz.EqualTo(0)
 End Sub
 
-Public Sub ToString_WhenCalled_ReturnsExpected(ByVal Span As TimeSpan, ByVal Expected As String)
+Public Sub ToString_WithFormat_ReturnsExpected(ByVal Span As TimeSpan, ByVal Format As String, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = Span.ToString
+    Actual = Span.ToString(Format)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithUnsupportedFormatCharactor_ThrowsFormatException()
+    On Error Resume Next
+    
+    TimeSpan.Zero.ToString "a"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub ToString_WithMissingStringLiteralEndingQuote_ThrowsFormatException()
+    On Error Resume Next
+    
+    TimeSpan.Zero.ToString "'hh"
+    
+    AssertFormatException Err
+End Sub
+
+Public Sub ToString_WithFormatAndProvider_ReturnsExpected(ByVal Format As String, ByVal Expected As String)
+    Dim Span        As TimeSpan
+    Dim Provider    As CultureInfo
+    Dim Actual      As String
+    
+    Set Span = Cor.NewTimeSpan(2, 3, 4, 5, 6)
+    Set Provider = Cor.NewCultureInfo("fr-FR")
+    
+    Actual = Span.ToString(Format, Provider)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithUserOverrideFormatProvider_ShouldNotUseOverride()
+    Dim Span        As TimeSpan
+    Dim Provider    As CultureInfo
+    Dim Actual      As String
+    
+    Set Span = Cor.NewTimeSpan(2, 3, 4, 5, 6)
+    Set Provider = Cor.NewCultureInfo("fr-FR")
+    Provider.NumberFormat.NumberDecimalSeparator = "@"
+    
+    Actual = Span.ToString("g", Provider)
+    
+    Assert.That Actual, Iz.EqualTo("2:3:04:05,006")
 End Sub
 
 Public Sub GetHashCode_WithValues_ReturnsExpected(ByVal Milliseconds1 As Currency, ByVal Milliseconds2 As Currency, ByVal Expected As Boolean)

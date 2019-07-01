@@ -185,22 +185,37 @@ Public Function Compare(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Long
     End With
 End Function
 
+''
+' Returns a boolean indicating if the <i>Left</i> <a href="TimeSpan.html">TimeSpan</a> instance is equal to the <i>Right</i> instance.
+'
+' @param Left The <a href="TimeSpan.html">TimeSpan</a> on the left-hand side of the equality.
+' @param Right The <a href="TimeSpan.html">TimeSpan</a> on the right-hand side of the equality.
+' @return Returns <b>True</b> if the <i>Left</i> instance is equal to the <i>Right</i> instance, <b>False</b> otherwise.
+' @remarks This method will treat a value of <b>Nothing</b> as zero.
 Public Function Equals(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    With GetMilliseconds(Left, Right)
-        Equals = .Left = .Right
-    End With
+    Equals = Compare(Left, Right) = 0
 End Function
 
+''
+' Returns a boolean indicating if the <i>Left</i> <a href="TimeSpan.html">TimeSpan</a> instance is less-than the <i>Right</i> instance.
+'
+' @param Left The <a href="TimeSpan.html">TimeSpan</a> on the left-hand side of the equality.
+' @param Right The <a href="TimeSpan.html">TimeSpan</a> on the right-hand side of the equality.
+' @return Returns <b>True</b> if the <i>Left</i> instance is less-than the <i>Right</i> instance, <b>False</b> otherwise.
+' @remarks This method will treat a value of <b>Nothing</b> as zero.
 Public Function LessThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    With GetMilliseconds(Left, Right)
-        LessThan = .Left < .Right
-    End With
+    LessThan = Compare(Left, Right) < 0
 End Function
 
+''
+' Returns a boolean indicating if the <i>Left</i> <a href="TimeSpan.html">TimeSpan</a> instance is greater-than the <i>Right</i> instance.
+'
+' @param Left The <a href="TimeSpan.html">TimeSpan</a> on the left-hand side of the equality.
+' @param Right The <a href="TimeSpan.html">TimeSpan</a> on the right-hand side of the equality.
+' @return Returns <b>True</b> if the <i>Left</i> instance is greater-than the <i>Right</i> instance, <b>False</b> otherwise.
+' @remarks This method will treat a value of <b>Nothing</b> as zero.
 Public Function GreaterThan(ByRef Left As TimeSpan, ByRef Right As TimeSpan) As Boolean
-    With GetMilliseconds(Left, Right)
-        GreaterThan = .Left > .Right
-    End With
+    GreaterThan = Compare(Left, Right) > 0
 End Function
 
 ''

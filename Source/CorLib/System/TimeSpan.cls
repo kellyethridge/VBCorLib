@@ -228,44 +228,7 @@ End Function
 ' where the bracketed fields are optional. The optional fields will be
 ' included in the string their value is not zero, or the TimeSpan is negative.
 Public Function ToString(Optional ByRef Format As String, Optional ByVal FormatProvider As IFormatProvider) As String
-    Dim Output As StringBuilder
-    Set Output = StringBuilderCache.Acquire
-    
-    Dim ms As Currency
-    ms = mMilliseconds
-    If ms < 0 Then
-        Output.AppendChar vbMinusChar
-        ms = -ms
-    End If
-    
-    Dim Days As Long
-    Days = Int(ms / MilliSecondsPerDay)
-    If Days <> 0 Then
-        Output.Append Days
-        Output.AppendChar vbPeriodChar
-    End If
-
-    AppendComponent Output, Int(ms / MillisecondsPerHour) Mod HoursPerDay, 2
-    Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MillisecondsPerMinute) Mod MinutesPerHour, 2
-    Output.AppendChar vbColonChar
-    AppendComponent Output, Int(ms / MillisecondsPerSecond) Mod SecondsPerMinute, 2
-    
-    Dim MillisecondComponent    As Long
-    Dim TicksComponent          As Long
-    MillisecondComponent = Modulus(ms, MillisecondsPerSecond)
-    TicksComponent = (mMilliseconds - Int(mMilliseconds)) * TicksPerMillisecond
-    
-    If MillisecondComponent <> 0 Then
-        Output.AppendChar vbPeriodChar
-        AppendComponent Output, MillisecondComponent, 3
-        AppendComponent Output, TicksComponent, 4
-    ElseIf TicksComponent <> 0 Then
-        Output.AppendChar vbPeriodChar
-        AppendComponent Output, TicksComponent, 7
-    End If
-    
-    ToString = StringBuilderCache.GetStringAndRelease(Output)
+    ToString = TimeSpanFormatter.Format(mMilliseconds, Format, FormatProvider)
 End Function
 
 ''
@@ -288,17 +251,9 @@ Public Function GetHashCode() As Long
     End With
 End Function
 
-Public Function LessThan(ByRef Other As TimeSpan) As Boolean
-    LessThan = TimeSpan.LessThan(Me, Other)
-End Function
-
-Public Function GreaterThan(ByRef Other As TimeSpan) As Boolean
-    GreaterThan = TimeSpan.GreaterThan(Me, Other)
-End Function
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Friend Interface
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal Days As Long, ByVal Hours As Long, ByVal Minutes As Long, ByVal Seconds As Long, ByVal Milliseconds As Long)
     InitFromMilliseconds (Days * MilliSecondsPerDay) + (Hours * MillisecondsPerHour) + (Minutes * MillisecondsPerMinute) + (Seconds * MillisecondsPerSecond) + Milliseconds
@@ -306,18 +261,6 @@ End Sub
 
 Friend Sub InitFromMilliseconds(ByVal Value As Currency)
     mMilliseconds = Value
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Helpers
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub AppendComponent(ByRef Output As StringBuilder, ByVal Component As Long, ByVal Width As Long)
-    Dim ComponentString As String
-    ComponentString = Component
-    
-    Output.AppendChar vbZeroChar, Width - Len(ComponentString)
-    Output.AppendString ComponentString
 End Sub
 
 

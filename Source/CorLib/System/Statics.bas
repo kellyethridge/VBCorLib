@@ -108,4 +108,5 @@ Public NullVersionableCollection As NullVersionableCollection
 Public StringComparer           As New StringComparerStatic
 Public RSACryptoServiceProvider As New RSACryptoServiceProviderStatic
 Public Funcs                    As New PublicFunctions
+Public TimeSpanFormatter        As New TimeSpanFormatter
 

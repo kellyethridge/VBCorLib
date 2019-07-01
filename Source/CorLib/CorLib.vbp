@@ -364,6 +364,7 @@ Module=Mathematics; System.Numerics\Mathematics.bas
 Class=DivideByZeroException; System\DivideByZeroException.cls
 Class=IconResourceEncoder; System.Resources\IconResourceEncoder.cls
 ResFile32="CorLib.RES"
+Class=TimeSpanFormatter; System\TimeSpanFormatter.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"

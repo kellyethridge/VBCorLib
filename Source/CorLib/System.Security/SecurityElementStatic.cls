@@ -66,12 +66,6 @@ Private mIndex              As Long
 ' </pre>
 '
 Public Function Escape(ByRef Text As String) As String
-    Const vbAmpersandChar       As Integer = 38
-    Const vbLeftCheveronChar    As Integer = 60
-    Const vbRightCheveronChar   As Integer = 62
-    Const vbDoubleQuoteChar     As Integer = 34
-    Const vbSingleQuoteChar     As Integer = 39
-    
     Dim Chars() As Integer
     Dim Output  As StringBuilder
     Dim i       As Long

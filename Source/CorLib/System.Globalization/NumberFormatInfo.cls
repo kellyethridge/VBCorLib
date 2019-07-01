@@ -290,6 +290,7 @@ Private Type PropsType
     PositiveInfinitySymbol      As String
     NegativeInfinitySymbol      As String
     IsReadOnly                  As Boolean
+    LCID                        As Long
 End Type
 
 Private Type OutputBuffer
@@ -1000,6 +1001,10 @@ Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
 
+Friend Property Get LCID() As Long
+    LCID = mProps.LCID
+End Property
+
 Friend Function Format(ByRef Value As Variant, Optional ByRef FormatText As String) As String
     VerifyLoaded
     
@@ -1124,6 +1129,7 @@ End Sub
 
 Friend Sub InitCultureInfo(ByVal Info As CultureInfo)
     Load Info.LCID, Info.UseUserOverride
+    
     If Info.IsReadOnly Then
         MarkReadOnly
     End If
@@ -1210,6 +1216,7 @@ End Sub
 
 Private Sub LoadCommon(ByVal LCID As Long)
     With mProps
+        .LCID = LCID
         .NaNSymbol = CultureTable.GetString(LCID, SNANSYMBOL)
         .PositiveInfinitySymbol = CultureTable.GetString(LCID, SPOSITIVEINFINITYSYMBOL)
         .NegativeInfinitySymbol = CultureTable.GetString(LCID, SNEGATIVEINFINITYSYMBOL)

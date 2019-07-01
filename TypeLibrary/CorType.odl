@@ -738,6 +738,11 @@ library CorType {
         const LPSTR vbVolumeSeparator              = ":";        
         const LPSTR vbDirectorySeparator           = "\\";
         const LPSTR vbAltDirectorySeparator        = "/";
+        const short vbSingleQuoteChar			   = 0x27;
+        const short vbAmpersandChar				   = 0x26;
+        const short vbLeftCheveronChar			   = 0x3C;
+        const short vbRightCheveronChar			   = 0x3E;
+        const short vbDoubleQuoteChar			   = 0x22;
     }
 
     [dllname("CorTypeName")]

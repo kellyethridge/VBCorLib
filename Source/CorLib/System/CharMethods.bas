@@ -161,3 +161,20 @@ Public Function ConvertToUtf32Str(ByRef s As String, ByVal Index As Long) As Lon
     End If
 End Function
 
+Public Function CountChars(ByRef Chars() As Integer, ByVal CharToCount As Integer, ByVal StartIndex As Long) As Long
+    Dim Count       As Long
+    Dim MaxIndex    As Long
+    
+    MaxIndex = UBound(Chars)
+    
+    Do While StartIndex <= MaxIndex
+        If Chars(StartIndex) <> CharToCount Then
+            Exit Do
+        End If
+        
+        Count = Count + 1
+        StartIndex = StartIndex + 1
+    Loop
+    
+    CountChars = Count
+End Function
