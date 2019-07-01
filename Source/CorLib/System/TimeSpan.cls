@@ -228,7 +228,7 @@ End Function
 ' where the bracketed fields are optional. The optional fields will be
 ' included in the string their value is not zero, or the TimeSpan is negative.
 Public Function ToString(Optional ByRef Format As String, Optional ByVal FormatProvider As IFormatProvider) As String
-    ToString = TimeSpanFormatter.Format(mMilliseconds, Format, FormatProvider)
+    ToString = TimeSpanFormatter.FormatTimeSpan(mMilliseconds, Format, FormatProvider)
 End Function
 
 ''

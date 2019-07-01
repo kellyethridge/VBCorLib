@@ -1,16 +1,4 @@
-VERSION 1.0 CLASS
-BEGIN
-  MultiUse = -1  'True
-  Persistable = 0  'NotPersistable
-  DataBindingBehavior = 0  'vbNone
-  DataSourceBehavior  = 0  'vbNone
-  MTSTransactionMode  = 0  'NotAnMTSObject
-END
 Attribute VB_Name = "TimeSpanFormatter"
-Attribute VB_GlobalNameSpace = False
-Attribute VB_Creatable = False
-Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
 'The MIT License (MIT)
 'Copyright (c) 2019 Kelly Ethridge
 '
@@ -37,6 +25,8 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
+Private Const MaxFractionWidth As Long = 7
+
 Private Enum FormatType
     Standard
     Minimum
@@ -46,16 +36,14 @@ End Enum
 Private mFormatChars()      As Integer
 Private mOutput             As StringBuilder
 Private mTotalMilliseconds  As Currency
-Private mDays            As Long
-Private mHours           As Long
-Private mMinutes         As Long
-Private mSeconds         As Long
-Private mMilliseconds    As Long
-Private mTicks           As Long
+Private mDays               As Long
+Private mHours              As Long
+Private mMinutes            As Long
+Private mSeconds            As Long
 Private mFraction           As Long
 
 
-Friend Function Format(ByVal TotalMilliseconds As Currency, ByRef FormatString As String, ByVal FormatProvider As IFormatProvider) As String
+Public Function FormatTimeSpan(ByVal TotalMilliseconds As Currency, ByRef FormatString As String, ByVal FormatProvider As IFormatProvider) As String
     InitComponents TotalMilliseconds
     Set mOutput = StringBuilderCache.Acquire
     
@@ -77,7 +65,7 @@ Friend Function Format(ByVal TotalMilliseconds As Currency, ByRef FormatString A
     End Select
     
     GoSub Finally
-    Format = StringBuilderCache.GetStringAndRelease(mOutput)
+    FormatTimeSpan = StringBuilderCache.GetStringAndRelease(mOutput)
     Exit Function
     
 Catch:
@@ -89,7 +77,9 @@ Finally:
 End Function
 
 Private Sub InitComponents(ByVal TotalMilliseconds As Currency)
-    Dim ms As Currency
+    Dim Milliseconds    As Long
+    Dim Ticks           As Long
+    Dim ms              As Currency
     
     mTotalMilliseconds = TotalMilliseconds
     ms = Abs(TotalMilliseconds)
@@ -97,9 +87,9 @@ Private Sub InitComponents(ByVal TotalMilliseconds As Currency)
     mHours = Int(ms / MillisecondsPerHour) Mod HoursPerDay
     mMinutes = Int(ms / MillisecondsPerMinute) Mod MinutesPerHour
     mSeconds = Int(ms / MillisecondsPerSecond) Mod SecondsPerMinute
-    mMilliseconds = Modulus(ms, MillisecondsPerSecond)
-    mTicks = (ms - Int(ms)) * TicksPerMillisecond
-    mFraction = mMilliseconds * 10000 + mTicks
+    Milliseconds = Modulus(ms, MillisecondsPerSecond)
+    Ticks = (ms - Int(ms)) * TicksPerMillisecond
+    mFraction = Milliseconds * 10000 + Ticks
 End Sub
 
 Private Sub FormatCustom()
@@ -173,6 +163,10 @@ Private Sub FormatCustom()
             Index = Index + Count
         End If
     Loop
+    
+    If InWholeMode Or InEscapeMode Then
+        Error.Format Format_InvalidString
+    End If
 End Sub
 
 Private Function AppendStringLiteral(ByVal Index As Long) As Long
@@ -215,16 +209,12 @@ Private Sub FormatStandard(ByVal FormatType As FormatType, ByVal Provider As IFo
     mOutput.AppendChar vbColonChar
     AppendComponent mSeconds, 2
     
-    If mMilliseconds <> 0 Or FormatType = Full Then
+    If mFraction <> 0 Or FormatType = Full Then
         mOutput.AppendString GetFractionSeparator(FormatType, Provider)
-        AppendComponent mMilliseconds, 3
-        AppendComponent mTicks, 4
-    ElseIf mTicks <> 0 Or FormatType = Full Then
-        mOutput.AppendString GetFractionSeparator(FormatType, Provider)
-        AppendComponent mTicks, 7
+        AppendComponent mFraction, MaxFractionWidth
     End If
     
-    If (FormatType = Minimum) And (mMilliseconds Or mTicks) Then
+    If (FormatType = Minimum) And (mFraction) Then
         Dim NewLength As Long
         
         NewLength = mOutput.Length
@@ -265,7 +255,7 @@ Private Sub AppendFraction(ByVal Width As Long, ByVal Minimize As Boolean)
     Dim CharsToChop As Long
     Dim ChoppedValue As Long
     
-    CharsToChop = 7 - Width
+    CharsToChop = MaxFractionWidth - Width
     ChoppedValue = mFraction
     
     Do While CharsToChop
@@ -286,4 +276,6 @@ Private Sub AppendFraction(ByVal Width As Long, ByVal Minimize As Boolean)
     
     AppendComponent ChoppedValue, Width
 End Sub
+
+
 

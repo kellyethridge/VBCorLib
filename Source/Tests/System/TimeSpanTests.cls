@@ -153,6 +153,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "g", "2:3:04:05,006"
             Test.Use "G", "2:03:04:05,0060000"
             
+        Case "ToString_WithInvalidForamt_ThrowsFormatException"
+            Test.Use "a"
+            Test.Use "'hh"
+            Test.Use "dd%"
+            Test.Use "dd\"
+            
         Case "GetHashCode_WithValues_ReturnsExpected"
             Test.Use 0, 0, True
             Test.Use 1, 1, True
@@ -441,18 +447,10 @@ Public Sub ToString_WithFormat_ReturnsExpected(ByVal Span As TimeSpan, ByVal For
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub ToString_WithUnsupportedFormatCharactor_ThrowsFormatException()
+Public Sub ToString_WithInvalidForamt_ThrowsFormatException(ByVal InvalidFormat As String)
     On Error Resume Next
     
-    TimeSpan.Zero.ToString "a"
-    
-    AssertFormatException Err
-End Sub
-
-Public Sub ToString_WithMissingStringLiteralEndingQuote_ThrowsFormatException()
-    On Error Resume Next
-    
-    TimeSpan.Zero.ToString "'hh"
+    TimeSpan.Zero.ToString InvalidFormat
     
     AssertFormatException Err
 End Sub
