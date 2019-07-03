@@ -51,27 +51,11 @@ Implements IObject
 
 Private Const DefaultFillChar   As Integer = vbSpaceChar
 Private Const DefaultCapacity   As Long = 128
-Private Const OpenBraceChar     As Long = 123
-Private Const CloseBraceChar    As Long = 125
-Private Const BytesPerChar      As Long = 2
 
-
-' module wide scope
-Private mStringPtr  As Long
-Private mStringSA   As SafeArray1d
 Private mString()   As Integer
 Private mCapacity   As Long
 Private mLength     As Long
 Private mFillChar   As Integer
-
-' used by Replace
-Private OldStr()    As Integer
-Private BufStr()    As Integer
-Private OldStrSA    As SafeArray1d
-Private BufStrSA    As SafeArray1d
-
-' used by AppendFormat
-Private mChars      As CharBuffer
 
 
 ''
@@ -89,10 +73,8 @@ Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Vari
     Select Case VarType(Value)
         Case vbIntegerArray
             AppendCharsValue Value, StartIndex, Count
-            
         Case vbString
             AppendStringValue Value, StartIndex, Count
-            
         Case Else
             AppendString Object.ToString(Value)
     End Select
@@ -225,7 +207,7 @@ Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByV
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_OffsetOut
     
     If Count > 0 Then
-        CopyMemory Destination(DestinationIndex), ByVal mStringPtr + SourceIndex * BytesPerChar, Count * BytesPerChar
+        CopyMemory Destination(DestinationIndex), mString(SourceIndex), Count * vbSizeOfChar
     End If
 End Sub
 
@@ -248,19 +230,12 @@ Public Property Let Capacity(ByVal Value As Long)
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
     
     If Value <> mCapacity Then
-        Dim Ptr As Long
-        Ptr = CoTaskMemAlloc(Value * BytesPerChar)
-        If Ptr = vbNullPtr Then _
-            Throw New OutOfMemoryException
-        
-        If mLength > 0 Then
-            CopyMemory ByVal Ptr, ByVal mStringPtr, mLength * BytesPerChar
+        If Value > 0 Then
+            ReDim Preserve mString(0 To Value - 1)
+        Else
+            Erase mString
+            SAPtr(mString) = SafeArrayCreateVector(vbString, 0, 0)
         End If
-        
-        CoTaskMemFree mStringPtr
-        mStringPtr = Ptr
-        mStringSA.pvData = Ptr
-        mCapacity = Value
     End If
 End Property
 
@@ -300,9 +275,11 @@ End Property
 ' @return The capacity after the call is complete.
 '
 Public Function EnsureCapacity(ByVal RequiredCapacity As Long) As Long
+    Dim NewCapacity As Long
+    
     If RequiredCapacity > mCapacity Then
-        Dim NewCapacity As Long
         NewCapacity = mCapacity * 2
+        
         If NewCapacity >= RequiredCapacity Then
             Capacity = NewCapacity
         Else
@@ -380,25 +357,27 @@ End Function
 ' @return This instance of StringBuilder
 '
 Public Function Insert(ByVal Index As Long, ByRef Value As Variant, Optional ByVal Count As Long = 1) As StringBuilder
+    Dim s As String
+    Dim l As Long
+    
     If Index < 0 Or Index > mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     If Count < 0 Then _
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NeedNonNegNum
     
-    Dim s As String
     s = Object.ToString(Value)
-    Dim l As Long
     l = Len(s)
+    
     If l > 0 And Count > 0 Then
         InsertSpace Index, l * Count
-        l = l * BytesPerChar
-        Index = Index * BytesPerChar
+        
         Do While Count > 0
-            CopyMemory ByVal mStringPtr + Index, ByVal StrPtr(s), l
+            CopyMemory mString(Index), ByVal StrPtr(s), l * vbSizeOfChar
             Index = Index + l
             Count = Count - 1
         Loop
     End If
+    
     Set Insert = Me
 End Function
 
@@ -429,7 +408,7 @@ Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optio
     
     If Range.Count > 0 Then
         InsertSpace Index, Range.Count
-        CopyMemory mString(Index), Chars(Range.Index), Range.Count * BytesPerChar
+        CopyMemory mString(Index), Chars(Range.Index), Range.Count * vbSizeOfChar
     End If
     
     Set InsertChars = Me
@@ -459,8 +438,10 @@ Public Property Let Length(ByVal Value As Long)
         If Value > mCapacity Then
             EnsureCapacity Value
         End If
+        
         Fill mLength, mFillChar, mCapacity - mLength
     End If
+    
     mLength = Value
 End Property
 
@@ -481,9 +462,10 @@ Public Function Remove(ByVal StartIndex As Long, ByVal Length As Long) As String
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
     
     If Length > 0 Then
-        CopyMemory ByVal mStringPtr + StartIndex * 2, ByVal mStringPtr + (StartIndex + Length) * BytesPerChar, (mLength - (StartIndex + Length)) * BytesPerChar
+        CopyMemory mString(StartIndex), mString(StartIndex + Length), (mLength - (StartIndex + Length)) * vbSizeOfChar
         mLength = mLength - Length
     End If
+    
     Set Remove = Me
 End Function
 
@@ -498,10 +480,14 @@ End Function
 ' @remarks Use index and count to replace the old value with a substring of the new value. index is zero-based.
 '
 Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
+    Dim Range           As ListRange
+    Dim MatchCount      As Long
+    Dim MatchIndexes()  As Long
+    Dim NewLength       As Long
+    
     If Len(OldValue) = 0 Then _
         Error.Argument Argument_EmptyName, "OldValue"
     
-    Dim Range As ListRange
     Range = MakeDefaultRange(StartIndex, 0, Count, mLength, Parameter_StartIndex)
     
     If Range.Index < 0 Then _
@@ -511,12 +497,9 @@ Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Opti
     If Range.Index + Range.Count > mLength Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
     
-    Dim MatchCount      As Long
-    Dim MatchIndexes()  As Long
     MatchCount = FindMatches(OldValue, Range.Index, Range.Count, MatchIndexes)
 
     If MatchCount > 0 Then
-        Dim NewLength As Long
         NewLength = mLength - ((Len(OldValue) - Len(NewValue)) * MatchCount)
 
         Select Case NewLength
@@ -549,7 +532,7 @@ Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Le
     ' so we do a quick check instead of going through the full
     ' optional argument gambit.
     If IsMissing(StartIndex) And IsMissing(Length) Then
-        ToString = SysAllocStringLen(mStringPtr, mLength)
+        ToString = SysAllocStringLen(VarPtr(mString(0)), mLength)
         Exit Function
     End If
     
@@ -563,7 +546,7 @@ Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Le
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_Index
     
     If Range.Count > 0 Then
-        ToString = SysAllocStringLen(mStringPtr + Range.Index * BytesPerChar, Range.Count)
+        ToString = SysAllocStringLen(VarPtr(mString(Range.Index)), Range.Count)
     End If
 End Function
 
@@ -573,6 +556,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
     Dim Index               As Long
     Dim Max                 As Long
     Dim SubStringStart      As Long
+    Dim FormatChars()       As Integer
     
     ' See if the user wants to format anything their own way.
     If Not Provider Is Nothing Then
@@ -581,18 +565,20 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
     End If
     
     Max = Len(Format)
-    SetChars mChars, Format
+    FormatChars = AllocChars(Format)
+    
+    On Error GoTo Catch
     
     ' Parse normal substring.
     Do While Index < Max
-        Select Case mChars.Chars(Index)
-            Case OpenBraceChar
+        Select Case FormatChars(Index)
+            Case vbOpenBraceChar
                 ' potential escape or format info.
                 
                 If Index > SubStringStart Then
                     ' If we have some characters, just append them now
                     ' even if the "{" may be escaped. Most times it won't be.
-                    AppendCharsCore mChars.Chars, SubStringStart, Index - SubStringStart
+                    AppendCharsCore FormatChars, SubStringStart, Index - SubStringStart
                 End If
                 
                 Index = Index + 1
@@ -603,7 +589,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                 If Index = Max Then FormatError
                 
                 ' We have enough characters to test for possible escape.
-                If mChars.Chars(Index) = OpenBraceChar Then
+                If FormatChars(Index) = vbOpenBraceChar Then
                     ' escape it by setting the start of the substring to the second one.
                     SubStringStart = Index
                 Else
@@ -612,7 +598,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     Dim ArgFormatting   As String
                     
                     ' must be format info within a "{}", so call the parser for it.
-                    Index = ParseArgumentFormatting(Index, ArgIndex, ArgWidth, ArgFormatting)
+                    Index = ParseArgumentFormatting(FormatChars, Index, ArgIndex, ArgWidth, ArgFormatting)
                     If ArgIndex < 0 Or ArgIndex > UBound(Args) Then _
                         Throw Cor.NewFormatException("The argument index must be from 0 to " & UBound(Args) & ".")
                         
@@ -650,7 +636,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     SubStringStart = Index + 1
                     
                 End If
-            Case CloseBraceChar
+            Case vbCloseBraceChar
                 ' must be escaped or else it is a format error.
                 
                 Index = Index + 1
@@ -658,13 +644,13 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                 ' Need enough characters to test for escape.
                 If Index = Max Then FormatError
                 
-                If mChars.Chars(Index) = CloseBraceChar Then
+                If FormatChars(Index) = vbCloseBraceChar Then
                     ' escape it and add the substring to this point.
                     ' The substring ends one character back because we
                     ' don't want to include both "}}" in the substring.
                     If Index - 1 > SubStringStart Then
                         ' Append the current substring.
-                        AppendCharsCore mChars.Chars, SubStringStart, Index - SubStringStart - 1
+                        AppendCharsCore FormatChars, SubStringStart, Index - SubStringStart - 1
                     End If
                     SubStringStart = Index
                 Else
@@ -677,8 +663,18 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
     
     If Index > SubStringStart Then
         ' If we have some characters, just append them now.
-        AppendCharsCore mChars.Chars, SubStringStart, Index - SubStringStart
+        AppendCharsCore FormatChars, SubStringStart, Index - SubStringStart
     End If
+    
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
+    Throw
+Finally:
+    FreeChars FormatChars
+    Return
 End Sub
 
 
@@ -709,44 +705,19 @@ Friend Sub Init(ByRef s As String, ByRef StartIndex As Variant, ByRef Length As 
     End If
     
     If Capacity <> mCapacity Then
-        CoTaskMemFree mStringPtr
-        mStringPtr = CoTaskMemAlloc(Capacity * BytesPerChar)
-        mCapacity = Capacity
+        Me.Capacity = Capacity
     End If
       
     If ElemCount > 0 Then
-        CopyMemory ByVal mStringPtr, ByVal StrPtr(s) + ElemIndex * BytesPerChar, ElemCount * BytesPerChar
+        CopyMemory mString(0), ByVal StrPtr(s) + ElemIndex * vbSizeOfChar, ElemCount * vbSizeOfChar
         mLength = ElemCount
     End If
 End Sub
 
 Private Sub Class_Initialize()
     mFillChar = DefaultFillChar
-    mStringPtr = CoTaskMemAlloc(DefaultCapacity * BytesPerChar)
-    If mStringPtr = vbNullPtr Then _
-        Throw New OutOfMemoryException
     mCapacity = DefaultCapacity
-    
-    With OldStrSA
-        .cbElements = BytesPerChar
-        .cDims = 1
-        .cElements = &H7FFFFFFF
-    End With
-    SAPtr(OldStr) = VarPtr(OldStrSA)
-    BufStrSA = OldStrSA
-    SAPtr(BufStr) = VarPtr(BufStrSA)
-    mStringSA = OldStrSA
-    SAPtr(mString) = VarPtr(mStringSA)
-    mStringSA.pvData = mStringPtr
-    
-    InitChars mChars
-End Sub
-
-Private Sub Class_Terminate()
-    CoTaskMemFree mStringPtr
-    SAPtr(OldStr) = vbNullPtr
-    SAPtr(BufStr) = vbNullPtr
-    SAPtr(mString) = vbNullPtr
+    ReDim mString(0 To DefaultCapacity - 1)
 End Sub
 
 
@@ -770,14 +741,13 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef CharCount As Variant)
-    ValidateArray Value, Parameter_Value
-    
     Dim Chars() As Integer
+    Dim Range As ListRange
+    
+    ValidateArray Value, Parameter_Value
     Chars = AsChars(Value)
     
     On Error GoTo Catch
-    
-    Dim Range As ListRange
     Range = MakeDefaultRange(StartIndex, LBound(Value), CharCount, Len1D(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
@@ -833,7 +803,7 @@ Private Sub AppendCore(ByVal CharPtr As Long, ByVal StartIndex As Long, ByVal Ch
         Dim NewLength As Long
         NewLength = mLength + CharCount
         EnsureCapacity NewLength
-        CopyMemory mString(mLength), ByVal CharPtr + StartIndex * BytesPerChar, CharCount * BytesPerChar
+        CopyMemory mString(mLength), ByVal CharPtr + StartIndex * vbSizeOfChar, CharCount * vbSizeOfChar
         mLength = NewLength
     End If
 End Sub
@@ -858,7 +828,7 @@ Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
     
     If Index < mLength Then
         ' Create space in the string. The new space is uninitialized.
-        CopyMemory ByVal mStringPtr + (Index + Size) * BytesPerChar, ByVal mStringPtr + Index * BytesPerChar, (mLength - Index) * BytesPerChar
+        CopyMemory mString(Index + Size), mString(Index), (mLength - Index) * vbSizeOfChar
     End If
     
     mLength = NewLength
@@ -873,54 +843,51 @@ End Sub
 ' @param ArgFormat The format information used to determine formatting for the argument.
 ' @return The index of the terminating "}".
 '
-Private Function ParseArgumentFormatting(ByVal Index As Long, ByRef ArgIndex As Long, ByRef ArgWidth As Long, ByRef ArgFormat As String) As Long
+Private Function ParseArgumentFormatting(ByRef FormatChars() As Integer, ByVal Index As Long, ByRef ArgIndex As Long, ByRef ArgWidth As Long, ByRef ArgFormat As String) As Long
     Dim Max As Long
-    Max = mChars.Buffer.cElements
+    
+    Max = UBound(FormatChars) + 1
     
     ' Get the argument index.
-    ArgIndex = ParseNumber(Index)
+    ArgIndex = ParseNumber(FormatChars, Index)
+    Index = ConsumeSpaces(FormatChars, Index)
     
-    Index = ConsumeSpaces(Index)
-    
-    With mChars
-        ' Check if a column size is being defined.
-        If .Chars(Index) = vbCommaChar Then
-            Index = ConsumeSpaces(Index + 1)
-            
-            ' Get the column width and aligment. Remember
-            ' negative values mean align left in the column.
-            ArgWidth = ParseNumber(Index)
-            
-            Index = ConsumeSpaces(Index)
-        Else
-            ' Make sure they know there was no width specified.
-            ArgWidth = 0
-        End If
+    If FormatChars(Index) = vbCommaChar Then
+        Index = ConsumeSpaces(FormatChars, Index + 1)
         
-        ' Check if formatting is being specified.
-        If .Chars(Index) = vbColonChar Then
-            Dim StartIndex As Long
-            
-            ' everything from here to the "}" is part of the argument formatting.
+        ' Get the column width and aligment.
+        ' Negative values mean align left in the column.
+        ArgWidth = ParseNumber(FormatChars, Index)
+        Index = ConsumeSpaces(FormatChars, Index)
+    Else
+        ' Make sure they know there was no width specified.
+        ArgWidth = 0
+    End If
+    
+    ' Check if formatting is being specified.
+    If FormatChars(Index) = vbColonChar Then
+        Dim StartIndex As Long
+        
+        ' everything from here to the "}" is part of the argument formatting.
+        Index = Index + 1
+        StartIndex = Index
+        Do
+            ' can never reach the end until after a "}".
+            If Index = Max Then FormatError
+            If FormatChars(Index) = vbCloseBraceChar Then
+                ArgFormat = SysAllocStringLen(VarPtr(FormatChars(StartIndex)), Index - StartIndex)
+                Exit Do
+            End If
             Index = Index + 1
-            StartIndex = Index
-            Do
-                ' can never reach the end until after a "}".
-                If Index = Max Then FormatError
-                If .Chars(Index) = CloseBraceChar Then
-                    ArgFormat = SysAllocStringLen(VarPtr(.Chars(StartIndex)), Index - StartIndex)
-                    Exit Do
-                End If
-                Index = Index + 1
-            Loop
-        Else
-            ' Make sure we let them know that no formatting was supplied.
-            ArgFormat = vbNullString
-        End If
-        
-        ' if we get here we should have reached the closing "}".
-        If .Chars(Index) <> CloseBraceChar Then FormatError
-    End With
+        Loop
+    Else
+        ' Make sure we let them know that no formatting was supplied.
+        ArgFormat = vbNullString
+    End If
+    
+    ' if we get here we should have reached the closing "}".
+    If FormatChars(Index) <> vbCloseBraceChar Then FormatError
+    
     ParseArgumentFormatting = Index
 End Function
 
@@ -931,14 +898,19 @@ End Function
 ' @return The index of the first character after the contiguous
 ' stream of spaces have been consumed.
 '
-Private Function ConsumeSpaces(ByVal Index As Long) As Long
-    Dim Max As Long
-    Max = mChars.Buffer.cElements
+Private Function ConsumeSpaces(ByRef Chars() As Integer, ByVal Index As Long) As Long
+    Dim MaxIndex As Long
+    
+    MaxIndex = UBound(Chars)
     
     Do
         ' Can never hit the end consuming spaces.
-        If Index = Max Then FormatError
-        If mChars.Chars(Index) <> vbSpaceChar Then Exit Do
+        If Index > MaxIndex Then FormatError
+        
+        If Chars(Index) <> vbSpaceChar Then
+            Exit Do
+        End If
+        
         Index = Index + 1
     Loop
     
@@ -952,24 +924,24 @@ End Function
 ' @return The number that was parsed.
 ' @remarks The Index is passed by Reference and will be altered.
 '
-Private Function ParseNumber(ByRef Index As Long) As Long
-    Dim Max As Long
-    Max = mChars.Buffer.cElements
-    
+Private Function ParseNumber(ByRef Chars() As Integer, ByRef Index As Long) As Long
+    Dim MaxIndex As Long
     Dim Sign As Long
-    Sign = 1
-    
     Dim FirstCharIndex As Long
-    FirstCharIndex = Index
-    
     Dim Number      As Long
     Dim NumberFound As Boolean
+    
+    MaxIndex = UBound(Chars)
+    Sign = 1
+    FirstCharIndex = Index
+    
     Do
         ' We can never hit the end parsing a number.
-        If Index = Max Then FormatError
+        If Index > MaxIndex Then FormatError
         
         Dim Ch As Integer
-        Ch = mChars.Chars(Index)
+        Ch = Chars(Index)
+        
         Select Case Ch
             Case vbZeroChar To vbNineChar
                 ' Keep adding digits to the number
@@ -983,6 +955,7 @@ Private Function ParseNumber(ByRef Index As Long) As Long
                 ' we have reached the end of the number, so exit.
                 Exit Do
         End Select
+        
         Index = Index + 1
     Loop
     
@@ -997,50 +970,53 @@ End Function
 '
 ' Returns the number of matches found.
 Private Function FindMatches(ByRef OldValue As String, ByVal StartIndex As Long, ByVal Count As Long, ByRef MatchIndexes() As Long) As Long
-    OldStrSA.pvData = StrPtr(OldValue)
-    OldStrSA.cElements = Len(OldValue)
+    Dim MatchCount      As Long
+    Dim OldValueLength  As Long
+    Dim OldChars()      As Integer
+    Dim FirstOldChar    As Integer
+    Dim Matched         As Boolean
+    
+    ReDim MatchIndexes(0 To 4)
+    OldValueLength = Len(OldValue)
+    OldChars = AllocChars(OldValue)
     
     ' We'll cache this since we'll be hitting it constantly.
-    Dim FirstOldValueChar As Long
-    FirstOldValueChar = OldStr(0)
+    FirstOldChar = OldChars(0)
     
     ' Don't need to search at the end if the old value
     ' can't fit. If the end matches the old value, then
     ' the inner loop will finish out the matching.
-    Count = Count - OldStrSA.cElements + 1
-    
-    Dim MatchCount As Long
-    ReDim MatchIndexes(0 To mLength)
-    
+    Count = Count - OldValueLength + 1
+        
     ' Loop through the current StringBuilder string trying to find
     ' all the matches against the old value to be replaced. If a
     ' match is found, then the index to that match is stored for
     ' future usage when replacing the matched old values with the new.
     Do While Count > 0
         ' Found the start of a possible match.
-        If mString(StartIndex) = FirstOldValueChar Then
+        If mString(StartIndex) = FirstOldChar Then
             ' We'll be opitmistic and assume a match.
-            Dim Matched As Boolean
             Matched = True
-            
-            ' We optimistically save the index now
-            ' because we'll be changing it while
-            ' matching occurs.
-            MatchIndexes(MatchCount) = StartIndex
             
             ' Start with the second character.
             Dim i As Long
-            For i = 1 To OldStrSA.cElements - 1
-                If mString(StartIndex + i) <> OldStr(i) Then
+            For i = 1 To OldValueLength - 1
+                If mString(StartIndex + i) <> OldChars(i) Then
                     Matched = False
                     Exit For
                 End If
-            Next i
-                
+            Next
+            
             If Matched Then
+                If MatchCount > UBound(MatchIndexes) Then
+                    ' like .NET we'll grow faster initially, but slow down later.
+                    ReDim Preserve MatchIndexes(0 To (UBound(MatchIndexes) + 1) * 3 \ 2 + 4)
+                End If
+                
+                MatchIndexes(MatchCount) = StartIndex
                 MatchCount = MatchCount + 1
-                StartIndex = StartIndex + OldStrSA.cElements - 1
-                Count = Count - OldStrSA.cElements + 1
+                StartIndex = StartIndex + OldValueLength - 1
+                Count = Count - OldValueLength + 1
             End If
         End If
         
@@ -1048,6 +1024,7 @@ Private Function FindMatches(ByRef OldValue As String, ByVal StartIndex As Long,
         Count = Count - 1
     Loop
 
+    FreeChars OldChars
     FindMatches = MatchCount
 End Function
 
@@ -1058,10 +1035,10 @@ End Function
 ' no change in the size of the final string.
 '
 Private Sub ReplaceEqualLength(ByRef NewValue As String, ByRef MatchIndexes() As Long, ByVal MatchCount As Long)
-    Dim NewValuePtr As Long
-    NewValuePtr = StrPtr(NewValue)
+    Dim NewValuePtr     As Long
+    Dim AmountToCopy    As Long
     
-    Dim AmountToCopy As Long
+    NewValuePtr = StrPtr(NewValue)
     AmountToCopy = LenB(NewValue)
     
     Dim i As Long
@@ -1077,7 +1054,7 @@ End Sub
 ' any original text that needs to end up in the final string.
 '
 Private Sub ReplaceSmallerLength(ByRef NewValue As String, ByRef MatchIndexes() As Long, ByVal MatchCount As Long, ByVal OldValueLength As Long)
-    ReplaceMatches mStringPtr, mStringPtr, NewValue, MatchIndexes, MatchCount, OldValueLength
+    ReplaceMatches mString, mString, NewValue, MatchIndexes, MatchCount, OldValueLength
 End Sub
 
 ''
@@ -1090,17 +1067,12 @@ End Sub
 '
 Private Sub ReplaceLargerLength(ByRef NewValue As String, ByRef MatchIndexes() As Long, ByVal MatchCount As Long, ByVal OldValueLength As Long, ByVal NewLength As Long)
     Dim NewCapacity As Long
+    Dim NewString() As Integer
+    
     NewCapacity = CorMath.Max(NewLength, mCapacity)
-    
-    Dim NewBuffer As Long
-    NewBuffer = CoTaskMemAlloc(NewCapacity * BytesPerChar)
-    If NewBuffer = vbNullPtr Then Throw New OutOfMemoryException
-    
-    ReplaceMatches mStringPtr, NewBuffer, NewValue, MatchIndexes, MatchCount, OldValueLength
-    
-    CoTaskMemFree mStringPtr
-    mStringPtr = NewBuffer
-    mStringSA.pvData = NewBuffer
+    ReDim NewString(0 To NewCapacity - 1)
+    ReplaceMatches mString, NewString, NewValue, MatchIndexes, MatchCount, OldValueLength
+    Helper.Swap4 ByVal ArrPtr(mString), ByVal ArrPtr(NewString)
     mCapacity = NewCapacity
 End Sub
 
@@ -1108,12 +1080,13 @@ End Sub
 ' Performs the replacement of old values with new values, copying the unaltered text from the
 ' source buffer and placing the final unaltered text plus newly replaced text in the destination buffer.
 '
-Private Sub ReplaceMatches(ByVal lpSourceBuffer As Long, ByVal lpDestBuffer As Long, ByRef NewValue As String, ByRef MatchIndexes() As Long, ByVal MatchCount As Long, ByVal OldValueLength As Long)
+Private Sub ReplaceMatches(ByRef SourceBuffer() As Integer, ByRef DestBuffer() As Integer, ByRef NewValue As String, ByRef MatchIndexes() As Long, ByVal MatchCount As Long, ByVal OldValueLength As Long)
     Dim NewValuePtr As Long
-    NewValuePtr = StrPtr(NewValue)
-    
     Dim NewValueLen As Long
-    NewValueLen = LenB(NewValue)
+    Dim DestIndex   As Long
+    
+    NewValuePtr = StrPtr(NewValue)
+    NewValueLen = Len(NewValue)
     
     Dim OriginalIndex   As Long
     Dim AmountToCopy    As Long
@@ -1122,19 +1095,19 @@ Private Sub ReplaceMatches(ByVal lpSourceBuffer As Long, ByVal lpDestBuffer As L
         AmountToCopy = MatchIndexes(i) - OriginalIndex
         
         If AmountToCopy > 0 Then
-            CopyMemory ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * BytesPerChar), AmountToCopy * BytesPerChar
-            lpDestBuffer = lpDestBuffer + AmountToCopy * 2
+            CopyMemory DestBuffer(DestIndex), SourceBuffer(OriginalIndex), AmountToCopy * vbSizeOfChar
+            DestIndex = DestIndex + AmountToCopy
         End If
         
         If NewValueLen > 0 Then
-            CopyMemory ByVal lpDestBuffer, ByVal NewValuePtr, NewValueLen
-            lpDestBuffer = lpDestBuffer + NewValueLen
+            CopyMemory DestBuffer(DestIndex), ByVal NewValuePtr, NewValueLen * vbSizeOfChar
+            DestIndex = DestIndex + NewValueLen
         End If
         
         OriginalIndex = OriginalIndex + AmountToCopy + OldValueLength
     Next i
     
     If OriginalIndex < mLength Then
-        CopyMemory ByVal lpDestBuffer, ByVal lpSourceBuffer + (OriginalIndex * BytesPerChar), (mLength - OriginalIndex) * BytesPerChar
+        CopyMemory DestBuffer(DestIndex), SourceBuffer(OriginalIndex), (mLength - OriginalIndex) * vbSizeOfChar
     End If
 End Sub

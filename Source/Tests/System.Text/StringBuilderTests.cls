@@ -51,6 +51,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "hahahahahahahahahaha", "ha", "blahblah", "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah"
             Test.Use "blahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblahblah", "blahblah", "ha", "hahahahahahahahahaha"
             Test.Use "abcabcabc", "abcf", "", "abcabcabc"
+            Test.Use "aaaaaaaaab", "aaaaaaaab", "1", "a1"
+            Test.Use "aabaabaaaa", "aabaaa", "1", "aab1a"
             
         Case "AppendString_WithValue_AppendText"
             Test.Use "bye", "hellobye"

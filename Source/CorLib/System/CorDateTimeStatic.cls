@@ -417,6 +417,10 @@ Friend Function GetYear(ByRef Time As Variant) As Long
     GetYear = CachedDateTime(Time).Year
 End Function
 
+Friend Function GetTimeOfDay(ByRef Time As Variant) As TimeSpan
+    Set GetTimeOfDay = CachedDateTime(Time).TimeOfDay
+End Function
+
 Friend Sub Validate(ByRef Time As Variant)
     CachedDateTime Time
 End Sub

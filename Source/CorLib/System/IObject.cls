@@ -68,7 +68,7 @@ Option Explicit
 ' <p><b>What should Equals when</b><br>
 ' <table>
 '   <tr>
-'       <th width="50%">What should Equals return when</td><th>Returns</td>
+'       <th width="50%">What should Equals return when</th><th>Returns</th>
 '   </tr>
 '   <tr>
 '       <td>Two Variables Point to the same object</td><td>True</td>

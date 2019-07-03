@@ -570,7 +570,13 @@ Public Sub GreaterThan_WithValues_ReturnsExpected(ByVal Left As TimeSpan, ByVal 
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-
+Public Sub FromDate_WhenCalled_ReturnsTimePortion()
+    Dim Actual As TimeSpan
+    
+    Set Actual = TimeSpan.FromDate(#1/1/2001 8:30:00 AM#)
+    
+    Assert.That Actual.TotalHours, Iz.EqualTo(8.5)
+End Sub
 
 
 
