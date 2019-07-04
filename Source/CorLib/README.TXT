@@ -101,6 +101,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added Path.CombineArray method.
 	* Renamed incorrectly spelled static method TimeSpan.CompareTo to TimeSpan.Compare.
 	* Added formatting functionality to TimeSpan.ToString method.
+	* Added StringBuilder.AppendFormatArray and StringBuilder.AppendFormatArrayEx methods.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -256,6 +256,7 @@ Public Enum ResourceStringKey
     Format_UnrecognizedEscapeSequence = 606
     Format_ParseBigInteger = 607
     Format_BadQuote = 608
+    Format_IndexOutOfRange = 609
     
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301

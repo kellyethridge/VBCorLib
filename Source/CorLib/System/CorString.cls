@@ -555,7 +555,7 @@ Private Function FormatCore(ByRef Provider As IFormatProvider, ByRef Format As S
     
     Dim Output As StringBuilder
     Set Output = StringBuilderCache.Acquire
-    Output.InternalAppendFormat Provider, Format, Args
+    Output.AppendFormatArrayEx Provider, Format, Args
     FormatCore = StringBuilderCache.GetStringAndRelease(Output)
 End Function
 

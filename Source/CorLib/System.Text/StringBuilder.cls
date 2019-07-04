@@ -59,16 +59,14 @@ Private mFillChar   As Integer
 
 
 ''
-' Appends a string to the current string value.
+' Appends the string representation of the specified value to this instance.
 '
-' @param Value Value to be appended.
-' @param StartIndex A zero-based index of the first character to start appending from in the string.
-' @param Count The number of characters from the string to append.
-' @return This instance of StringBuilder.
-' @remarks This version of Append attempts to convert to the value using the
-' <b>Convert.ToString</b> method. This will allow for objects that impelement
-' <b>IObject</b> or <b>IFormattable</b> to be converted to a string value.
-'
+' @param Value The value to be appended.
+' @param StartIndex A zero-based index of the first character in the string representation to begin appending from.
+' @param Count The number of characters from the string representation to append.
+' @return A refernece to this instance after the append operation has completed.
+' @remarks This version of <b>Append(Value)</b> attempts to convert to the value using <h href="ObjectStatic.html">Object.ToString(Value)</a>.
+' This will allow for objects that implement <a href="IObject.html">IObject</a> or <a href="IFormattable.html">IFormattable</a> to be converted to a string value using additional information.
 Public Function Append(ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     Select Case VarType(Value)
         Case vbIntegerArray
@@ -88,7 +86,8 @@ End Function
 ' @param Char The Unicode character code to append.
 ' @param Count The number of times to append the character.
 ' @return This instance of StringBuilder.
-'
+' @remarks <p>The <b>AppendChar(Char)</b> method modifies the existing instance of this class; it does not return a new class instance.</p>
+' <p>The <i>Char</i> argument accepts a <b>Long</b> datatype, however, it converts the value to an <b>Integer</b> by taking only the lower 16 bits.</p>
 Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1) As StringBuilder
     Dim LocalChar As Integer
     
@@ -111,59 +110,68 @@ Public Function AppendChar(ByVal Char As Long, Optional ByVal Count As Long = 1)
 End Function
 
 ''
-' Appends a string with formatted arguments.
+' Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
 '
-' @param format The string to append that contains formatting information.
-' @param args The arguments to be formatted into the string.
+' @param Format The composite format string containing formatting information.
+' @param Args The arguments to be formatted into the string.
 ' @return This instance of StringBuilder.
-' @remarks
-' <p>The format string can embed indexes into the args parameter to indicate where
-' a value should be placed. The way to indicate an index is through an argument index enclosed
-' in braces {N}. N is the parameter index beginning with zero.</p>
-' <br><p>Some arguments may handle additional formatting commands. Please refer to their
-' documentation for more information.</p>
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
 ' @include "..\DocIncludes\StringBuilder.AppendFormat.html"
 Public Function AppendFormat(ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(16)
-    InternalAppendFormat Nothing, Format, SwappedArgs
-    Set AppendFormat = Me
+    Set AppendFormat = AppendFormatArrayEx(Nothing, Format, SwappedArgs)
 End Function
 
 ''
-' Appends a string with formatted arguments using the supplied provider.
+' Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a single argument.
 '
-' @param provider A custom formatting object that formats the arguments.
-' @param Format The string to append that contains formatting information.
-' @param args The arguments to be formatted into the string.
+' @param Provider A custom formatting object that formats the arguments.
+' @param Format The composite format string containing formatting information.
+' @param Args The arguments to be formatted into the string.
 ' @return This instance of StringBuilder.
-' @remarks
-' <p>The format string can embed indexes into the args parameter to indicate where
-' a value should be placed. The way to indicate an index is through an argument index enclosed
-' in braces {N}. N is the parameter index beginning with zero.</p>
-' <br><p>Some arguments may handle additional formatting commands. Please refer to their
-' documentation for more information.</p>
-' <br><p>The supplied provider can format specific arguments unknown to the system. It can also
-' delegate formatting of system-known arguments to another StringBuilder (usually CorString.Format)
-' to provide default formatting of known types and format only specific types.
+' @remarks <p>This method uses the composite formatting feature of VBCorLib to convert the value of an object to its text representation and embed that representation in the current <a href="StringBuilder.html">StringBuilder</a> object.</p>
+' <p>The <i>Format</i> parameter consists of zero or more runs of text intermixed with zero or more indexed placeholders, called format items, that correspond to values in the parameter list of this method. The formatting process replaces each format item with the string representation of the corresponding value.</p>
+' <p>The syntax of a format item is as follows:</p>
+' <p>{<i>index</i>[,<i>length</i>][:<i>formatString</i>]}</p>
+' <p>Elements in square brackets are optional. The following table describes each element.</p>
+' <table>
+'    <tr>
+'        <th>Element</th><th>Description</th>
+'    </tr>
+'    <tr>
+'        <td><i>index</i></td><td>The zero-based position in the parameter list of the object to be formatted. If the object specified by <i>index</i> is <b>Nothing</b>, the format item is replaced by an empty string. If there is no parameter in the <i>index</i> position, a <a href="FormatException.html">FormatException</a> is thrown.</td>
+'    </tr>
+'    <tr>
+'        <td>,<i>length</i></td><td>The minimum number of characters in the string representation of the parameter. If positive, the parameter is right-aligned; if negative, it is left-aligned.</td>
+'    </tr>
+'    <tr>
+'        <td>:<i>formatString</i></td><td>A standard or custom format string that is supported by the parameter.</td>
+'    </tr>
+' </table>
+' <p>The provider parameter specifies an <a href="IFormatProvider.html">IFormatProvider</a> implementation that can provide formatting information for the objects in <i>args</i>. provider can be any of the following:</p>
+' <ul>
+'       <li>A <a href="CultureInfo.html">CultureInfo</a> object that provides culture-specific formatting information.</li>
+'       <li>A <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides culture-specific formatting information for numeric values in <i>Args</i>.</li>
+'       <li>A <a href="DateTimeFormatInfo.html">DateTimeFormatInfo</a> object that provides culture-specific formatting information for date and time values in <i>Args</i>.</li>
+'       <li>A custom <a href="IFormatProvider.html">IFormatProvider</a> implementation that provides formatting information for one or more of the objects in <i>Args</i>. Typically, such an implementation also implements the <a href="ICustomFormatter.html">ICustomFormatter</a> interface.</li>
+' </ul>
+' <p>If the <i>Provider</i> parameter is <b>Nothing</b>, format provider information is obtained from the current culture.</p>
+' <p><i>Args</i> represents the objects to be formatted. Each format item in <i>Format</i> is replaced with the string representation of the corresponding object in <i>args</i>. If the format item includes <i>formatString</i> and the corresponding object in <i>Args</i> implements the <a href="IFormattable.html">IFormattable</a> interface, then <b>Args(index).ToString(formatString, provider)</b> defines the formatting. Otherwise, <b>Object.ToString(Args(index))</b> defines the formatting.</p>
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
-'
 Public Function AppendFormatEx(ByRef Provider As IFormatProvider, ByRef Format As String, ParamArray Args() As Variant) As StringBuilder
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(20)
-    InternalAppendFormat Provider, Format, SwappedArgs
-    Set AppendFormatEx = Me
+    Set AppendFormatEx = AppendFormatArrayEx(Provider, Format, SwappedArgs)
 End Function
 
 ''
-' Appends the supplied string and a Carriage-Return/Linefeed to the end of the StringBuilder.
+' Appends the supplied string and a Carriage-Return/Linefeed to the end of the <a href="StringBuilder.html">StringBuilder</a>.
 '
 ' @param s The string to append to the builder, followed by a Carraige-Return/Linefeed.
-' @return A reference to this instance of StringBuilder.
-'
+' @return A reference to this instance of <a href="StringBuilder.html">StringBuilder</a>.
 Public Function AppendLine(Optional ByRef s As String) As StringBuilder
     If LenB(s) > 0 Then
         AppendString s
@@ -177,21 +185,18 @@ End Function
 ' This function is designed to append strings quickly.
 '
 ' @param s The string value to be appended.
-' @remarks This method appends the entire string to the end of the
-' StringBuilder. There is no return reference to the StringBuilder.
-'
+' @remarks This method appends the entire string to the end of the <a href="StringBuilder.html">StringBuilder</a>. There is no instance returned.
 Public Sub AppendString(ByRef s As String)
     AppendCore StrPtr(s), 0, Len(s)
 End Sub
 
 ''
-' Copies a set of characters from the StringBuilder into a character array.
+' Copies a set of characters from the <a href="StringBuilder.html">StringBuilder</a> into a character array.
 '
-' @param SourceIndex The starting index in the StringBuilder to be copying from (0-based).
+' @param SourceIndex The starting index in the <a href="StringBuilder.html">StringBuilder</a> to be copying from (0-based).
 ' @param Destination The character array to copy to.
 ' @param DestinationIndex The start index to begin placing characters in to.
 ' @param Count The number of characters to copy.
-'
 Public Sub CopyTo(ByVal SourceIndex As Long, ByRef Destination() As Integer, ByVal DestinationIndex As Long, ByVal Count As Long)
     If SourceIndex < 0 Or SourceIndex > mLength Then _
         Error.ArgumentOutOfRange "SourceIndex", ArgumentOutOfRange_Index
@@ -215,7 +220,8 @@ End Sub
 ' Returns the buffer size of the string value.
 '
 ' @return Value indicating the amount of memory allocated in characters.
-'
+' @remarks The capacity of the current instance is how much memory is currently allocated for containing
+' the current string representation. It is not the length of the string itself.
 Public Property Get Capacity() As Long
     Capacity = mCapacity
 End Property
@@ -224,7 +230,8 @@ End Property
 ' Sets the amount of memory allocated in characters.
 '
 ' @param Value The number of characters to allocate.
-'
+' @remarks The capacity of the current instance is how much memory is currently allocated for containing
+' the current string representation. It is not the length of the string itself.
 Public Property Let Capacity(ByVal Value As Long)
     If Value < mLength Then _
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_SmallCapacity
@@ -244,8 +251,7 @@ End Property
 '
 ' @param Index The index from the string value to return the character.
 ' @return The character in the string at the specified index.
-' @remarks Index is zero-base.
-'
+' @remarks <i>Index</i> is zero-base.
 Public Property Get Chars(ByVal Index As Long) As Integer
 Attribute Chars.VB_UserMemId = 0
     If Index < 0 Or Index >= mLength Then _
@@ -257,10 +263,11 @@ End Property
 ''
 ' Sets a character in the string value.
 '
-' @param index The index into the string value to set the character.
-' @param char The character to set.
-' @remarks index is zero-based.
-'
+' @param Index The index into the string value to set the character.
+' @param Char The character to set.
+' @remarks <p><i>Index</i> is zero-based.</p>
+' <p>Setting a character can only replace an existing character. A character cannot be appended using this method.
+' To append a character use <a href="StringBuilder.AppendChar.html">StringBuilder.AppendChar</a>.</p>
 Public Property Let Chars(ByVal Index As Long, ByVal Char As Integer)
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -271,9 +278,10 @@ End Property
 ''
 ' Ensures that the internal buffer has atleast the requested amount.
 '
-' @param requiredCapacity The minimum amount of characters to be allocated.
+' @param RequiredCapacity The minimum amount of characters to be allocated.
 ' @return The capacity after the call is complete.
-'
+' @remarks When <i>RequiredCapacity</i> is larger than the current capacity, The new capacity is
+' calculated as double the current capacity. If the new capacity is still smaller than <i>RequiredCapacity</i>, <i>RequiredCapacity</i> becomes the new capacity.
 Public Function EnsureCapacity(ByVal RequiredCapacity As Long) As Long
     Dim NewCapacity As Long
     
@@ -291,12 +299,11 @@ Public Function EnsureCapacity(ByVal RequiredCapacity As Long) As Long
 End Function
 
 ''
-' Returns a boolean indicating if the value and this object
-' instance are the same instance.
+' Returns a boolean indicating if the value and this object instance are the same instance.
 '
 ' @param value The value to test equality on.
 ' @return Boolean indicating equality.
-'
+' @remarks This implementation simply delegates to <a href="ObjectStatic.Equals.html">Object.Equals</a>.
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function
@@ -304,8 +311,8 @@ End Function
 ''
 ' Returns the fill character used to pad empty space.
 '
-' @return An Integer representing the AscW of the character.
-'
+' @return An <b>Integer</b> representing the <b>AscW</b> of the character.
+' @remarks The return type is a <b>Variant</b> with a sub-type <i>Integer</i>.
 Public Property Get FillCharacter() As Variant
     FillCharacter = mFillChar
 End Property
@@ -313,10 +320,21 @@ End Property
 ''
 ' Sets the fill character used to pad empty space.
 '
-' @param Value The character as either a String or Integer value.
-' @remarks The new value can be either String, in which case the
-' first characters is used, or it can be a number.
-'
+' @param Value The character used to as padding of empty space.
+' @remarks <p>The property accepts <b>String</b>, <b>Long</b>, <b>Integer</b>, and <b>Byte</b> datatypes.</p>
+' <p>The datatypes are converted using the following methods:</p>
+' <table style="width: auto">
+'   <tr>
+'       <th>Datatype</th>
+'       <th>Method</th>
+'   </tr>
+'   <tr>
+'        <td><b>String</b></td><td><b>AscW(</b><i>Value</i><b>)</b></td>
+'   </tr>
+'   <tr>
+'        <td><b>Long</b>,<b>Integer</b>,<b>Byte</b></td><td><b>AscW(ChrW$(</b><i>Value</i><b>))</b></td>
+'   </tr>
+' </table>
 Public Property Let FillCharacter(ByRef Value As Variant)
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte
@@ -332,7 +350,7 @@ End Property
 ' Returns a pseudo-unique number identifying this instance.
 '
 ' @return Pseudo-unique number identifying this instance.
-'
+' @remarks This implementation simply delegates to <a href="ObjectStatic.GetHashCode.html">Object.GetHashCode</a>.
 Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
@@ -342,7 +360,6 @@ End Function
 '
 ' @return An object whose <a href="StringBuilder.get.Length.html">Length</a> is 0 (zero).
 ' @remarks <b>Clear</b> is a convenience method that is equivalent to setting the Length property of the current instance to 0 (zero).
-'
 Public Function Clear() As StringBuilder
     Length = 0
     Set Clear = Me
@@ -355,7 +372,6 @@ End Function
 ' @param value The string to be inserted.
 ' @param count The number of times to insert the string.
 ' @return This instance of StringBuilder
-'
 Public Function Insert(ByVal Index As Long, ByRef Value As Variant, Optional ByVal Count As Long = 1) As StringBuilder
     Dim s As String
     Dim l As Long
@@ -388,8 +404,7 @@ End Function
 ' @param Chars The characters to be inserted.
 ' @param Startindex The index in the Characters to start inserting from.
 ' @param CharCount The number of characters to be inserted.
-' @return This instance of StringBuilder.
-'
+' @return This instance of <a href="StringBuilder.html">StringBuilder</a>.
 Public Function InsertChars(ByVal Index As Long, ByRef Chars() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef CharCount As Variant) As StringBuilder
     If Index < 0 Or Index > mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
@@ -418,7 +433,6 @@ End Function
 ' Returns the length of the current string value.
 '
 ' @return The length of the string value.
-'
 Public Property Get Length() As Long
     Length = mLength
 End Property
@@ -428,8 +442,7 @@ End Property
 '
 ' @param Value The length of the string value.
 ' @remarks If the new value is longer than the current length, then the
-' new space is padded with FillCharacter (default 32).
-'
+' new space is padded with <a href="StringBuilder.set.FillCharacter.html">FillCharacter</a> (default 32).
 Public Property Let Length(ByVal Value As Long)
     If Value < 0 Then _
         Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NegativeLength
@@ -450,9 +463,8 @@ End Property
 '
 ' @param StartIndex The index in the string value to start removing from.
 ' @param Length The number of characters to remove from the string value.
-' @return This instance of StringBuilder.
+' @return This instance of <a href="StringBuilder.html">StringBuilder</a>.
 ' @remarks StartIndex is zero-based.
-'
 Public Function Remove(ByVal StartIndex As Long, ByVal Length As Long) As StringBuilder
     If StartIndex < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_StartIndex
@@ -474,11 +486,10 @@ End Function
 '
 ' @param OldValue The substring to be replaced.
 ' @param NewValue The string to replace the old string with.
-' @param StartIndex The index of the start of the substring in the StringBuilder object.
-' @param count The number of characters in the StringBuilder object substring.
-' @return This instance of StringBuilder.
-' @remarks Use index and count to replace the old value with a substring of the new value. index is zero-based.
-'
+' @param StartIndex The index of the start of the substring in the <a href="StringBuilder.html">StringBuilder</a> object.
+' @param count The number of characters in the <a href="StringBuilder.html">StringBuilder</a> object substring.
+' @return This instance of <a href="StringBuilder.html">StringBuilder</a>.
+' @remarks Use <i>StartIndex</i> and <i>Count</i> to replace the old value with a substring of the new value. <i>StartIndex</i> is zero-based.
 Public Function Replace(ByRef OldValue As String, ByRef NewValue As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As StringBuilder
     Dim Range           As ListRange
     Dim MatchCount      As Long
@@ -520,11 +531,10 @@ End Function
 ''
 ' Returns the current version of the string value.
 '
-' @param startindex The index to start the return substring from.
-' @param length The number of characters to return in the string.
-' @return A string or substring representing the internal string of the builder.
-' @remarks startindex is zero-based.
-'
+' @param StartIndex The index to start the return substring from.
+' @param Length The number of characters to return in the string.
+' @return A string or substring representing the internal string of <a href="StringBuilder.html">StringBuilder</a>.
+' @remarks <i>StartIndex</i> is zero-based.
 Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As String
     Dim Range As ListRange
     
@@ -550,7 +560,71 @@ Public Function ToString(Optional ByRef StartIndex As Variant, Optional ByRef Le
     End If
 End Function
 
-Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant)
+''
+' Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter array.
+' @param Format A composite format string (see Remarks).
+' @param Args An array of values to format.
+' @return A reference to this instance after the append operation has completed. After the append operation, this instance contains any data that existed before the operation, suffixed by a copy of <i>Format</i> where any format specification is replaced by the string representation of the corresponding object argument.
+' @remarks <p>This method uses the composite formatting feature of VBCorLib to convert the value of an object to its text representation and embed that representation in the current <a href="StringBuilder.html">StringBuilder</a> object.</p>
+' <p>The <i>Format</i> parameter consists of zero or more runs of text intermixed with zero or more indexed placeholders, called format items, that correspond to values in the parameter list of this method. The formatting process replaces each format item with the string representation of the corresponding value.</p>
+' <p>The syntax of a format item is as follows:</p>
+' <p>{<i>index</i>[,<i>length</i>][:<i>formatString</i>]}</p>
+' <p>Elements in square brackets are optional. The following table describes each element.</p>
+' <table>
+'    <tr>
+'        <th>Element</th><th>Description</th>
+'    </tr>
+'    <tr>
+'        <td><i>index</i></td><td>The zero-based position in the parameter list of the object to be formatted. If the object specified by <i>index</i> is <b>Nothing</b>, the format item is replaced by an empty string. If there is no parameter in the <i>index</i> position, a <a href="FormatException.html">FormatException</a> is thrown.</td>
+'    </tr>
+'    <tr>
+'        <td>,<i>length</i></td><td>The minimum number of characters in the string representation of the parameter. If positive, the parameter is right-aligned; if negative, it is left-aligned.</td>
+'    </tr>
+'    <tr>
+'        <td>:<i>formatString</i></td><td>A standard or custom format string that is supported by the parameter.</td>
+'    </tr>
+' </table>
+' <p><i>Args</i> represents the objects to be formatted. Each format item in <i>Format</i> is replaced with the string representation of the corresponding object in <i>args</i>. If the format item includes <i>formatString</i> and the corresponding object in <i>Args</i> implements the <a href="IFormattable.html">IFormattable</a> interface, then <b>Args(index).ToString(formatString, provider)</b> defines the formatting. Otherwise, <b>Object.ToString(Args(index))</b> defines the formatting.</p>
+Public Function AppendFormatArray(ByRef Format As String, ByRef Args() As Variant) As StringBuilder
+    Set AppendFormatArray = AppendFormatArrayEx(Nothing, Format, Args)
+End Function
+
+''
+' Appends the string returned by processing a composite format string, which contains zero or more format items, to this instance. Each format item is replaced by the string representation of a corresponding argument in a parameter array using a specified format provider.
+'
+' @param Provider An object that supplies culture-specific formatting information.
+' @param Format A composite format string (see Remarks).
+' @param Args An array of values to format.
+' @return A reference to this instance after the append operation has completed. After the append operation, this instance contains any data that existed before the operation, suffixed by a copy of <i>Format</i> where any format specification is replaced by the string representation of the corresponding object argument.
+' @remarks <p>This method uses the composite formatting feature of VBCorLib to convert the value of an object to its text representation and embed that representation in the current <a href="StringBuilder.html">StringBuilder</a> object.</p>
+' <p>The <i>Format</i> parameter consists of zero or more runs of text intermixed with zero or more indexed placeholders, called format items, that correspond to values in the parameter list of this method. The formatting process replaces each format item with the string representation of the corresponding value.</p>
+' <p>The syntax of a format item is as follows:</p>
+' <p>{<i>index</i>[,<i>length</i>][:<i>formatString</i>]}</p>
+' <p>Elements in square brackets are optional. The following table describes each element.</p>
+' <table>
+'    <tr>
+'        <th>Element</th><th>Description</th>
+'    </tr>
+'    <tr>
+'        <td><i>index</i></td><td>The zero-based position in the parameter list of the object to be formatted. If the object specified by <i>index</i> is <b>Nothing</b>, the format item is replaced by an empty string. If there is no parameter in the <i>index</i> position, a <a href="FormatException.html">FormatException</a> is thrown.</td>
+'    </tr>
+'    <tr>
+'        <td>,<i>length</i></td><td>The minimum number of characters in the string representation of the parameter. If positive, the parameter is right-aligned; if negative, it is left-aligned.</td>
+'    </tr>
+'    <tr>
+'        <td>:<i>formatString</i></td><td>A standard or custom format string that is supported by the parameter.</td>
+'    </tr>
+' </table>
+' <p>The provider parameter specifies an <a href="IFormatProvider.html">IFormatProvider</a> implementation that can provide formatting information for the objects in <i>args</i>. provider can be any of the following:</p>
+' <ul>
+'       <li>A <a href="CultureInfo.html">CultureInfo</a> object that provides culture-specific formatting information.</li>
+'       <li>A <a href="NumberFormatInfo.html">NumberFormatInfo</a> object that provides culture-specific formatting information for numeric values in <i>Args</i>.</li>
+'       <li>A <a href="DateTimeFormatInfo.html">DateTimeFormatInfo</a> object that provides culture-specific formatting information for date and time values in <i>Args</i>.</li>
+'       <li>A custom <a href="IFormatProvider.html">IFormatProvider</a> implementation that provides formatting information for one or more of the objects in <i>Args</i>. Typically, such an implementation also implements the <a href="ICustomFormatter.html">ICustomFormatter</a> interface.</li>
+' </ul>
+' <p>If the <i>Provider</i> parameter is <b>Nothing</b>, format provider information is obtained from the current culture.</p>
+' <p><i>Args</i> represents the objects to be formatted. Each format item in <i>Format</i> is replaced with the string representation of the corresponding object in <i>args</i>. If the format item includes <i>formatString</i> and the corresponding object in <i>Args</i> implements the <a href="IFormattable.html">IFormattable</a> interface, then <b>Args(index).ToString(formatString, provider)</b> defines the formatting. Otherwise, <b>Object.ToString(Args(index))</b> defines the formatting.</p>
+Public Function AppendFormatArrayEx(ByVal Provider As IFormatProvider, ByRef Format As String, ByRef Args() As Variant) As StringBuilder
     Dim CustomFormatter     As ICustomFormatter
     Dim HasCustomFormatter  As Boolean
     Dim Index               As Long
@@ -600,7 +674,7 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
                     ' must be format info within a "{}", so call the parser for it.
                     Index = ParseArgumentFormatting(FormatChars, Index, ArgIndex, ArgWidth, ArgFormatting)
                     If ArgIndex < 0 Or ArgIndex > UBound(Args) Then _
-                        Throw Cor.NewFormatException("The argument index must be from 0 to " & UBound(Args) & ".")
+                        Error.Format Format_IndexOutOfRange
                         
                     ' append formatted argument here.
                     Dim s As String
@@ -666,8 +740,9 @@ Friend Sub InternalAppendFormat(ByVal Provider As IFormatProvider, ByRef Format 
         AppendCharsCore FormatChars, SubStringStart, Index - SubStringStart
     End If
     
+    Set AppendFormatArrayEx = Me
     GoSub Finally
-    Exit Sub
+    Exit Function
     
 Catch:
     GoSub Finally
@@ -675,7 +750,7 @@ Catch:
 Finally:
     FreeChars FormatChars
     Return
-End Sub
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -759,22 +834,24 @@ Private Sub AppendCharsValue(ByRef Value As Variant, ByRef StartIndex As Variant
 
     AppendCharsCore Chars, Range.Index, Range.Count
     
-    FreeChars Chars
+    GoSub Finally
     Exit Sub
 
 Catch:
-    FreeChars Chars
+    GoSub Finally
     Throw
+Finally:
+    FreeChars Chars
+    Return
 End Sub
 
 Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Variant, ByRef Count As Variant)
     Dim ValuePtr    As Long
     Dim ValueLength As Long
+    Dim Range       As ListRange
 
     ValuePtr = StrPtr(Value)
     ValueLength = Len(Value)
-
-    Dim Range As ListRange
     Range = MakeDefaultRange(StartIndex, 0, Count, ValueLength, Parameter_StartIndex)
 
     If Range.Index < 0 Then _
@@ -788,19 +865,20 @@ Private Sub AppendStringValue(ByRef Value As Variant, ByRef StartIndex As Varian
 End Sub
 
 Private Sub AppendCharsCore(ByRef Chars() As Integer, ByVal StartIndex As Long, ByVal CharCount As Long)
+    Dim FirstElementPtr As Long
+    
     Debug.Assert SAPtr(Chars) <> vbNullPtr
     
     If CharCount > 0 Then
-        Dim FirstElementPtr As Long
         FirstElementPtr = VarPtr(Chars(LBound(Chars)))
-        
         AppendCore FirstElementPtr, StartIndex, CharCount
     End If
 End Sub
 
 Private Sub AppendCore(ByVal CharPtr As Long, ByVal StartIndex As Long, ByVal CharCount As Long)
+    Dim NewLength As Long
+    
     If CharCount > 0 Then
-        Dim NewLength As Long
         NewLength = mLength + CharCount
         EnsureCapacity NewLength
         CopyMemory mString(mLength), ByVal CharPtr + StartIndex * vbSizeOfChar, CharCount * vbSizeOfChar
@@ -822,8 +900,8 @@ End Sub
 
 Private Sub InsertSpace(ByVal Index As Long, ByVal Size As Long)
     Dim NewLength As Long
-    NewLength = mLength + Size
     
+    NewLength = mLength + Size
     EnsureCapacity NewLength
     
     If Index < mLength Then

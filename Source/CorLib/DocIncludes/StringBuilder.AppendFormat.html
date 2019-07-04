@@ -1,4 +1,24 @@
-@remarks <h4>Example</h4>
+@remarks <p>This method uses the composite formatting feature of VBCorLib to convert the value of an object to its text representation and embed that representation in the current <a href="StringBuilder.html">StringBuilder</a> object.</p>
+<p>The <i>Format</i> parameter consists of zero or more runs of text intermixed with zero or more indexed placeholders, called format items, that correspond to values in the parameter list of this method. The formatting process replaces each format item with the string representation of the corresponding value.</p>
+<p>The syntax of a format item is as follows:</p>
+<p>{<i>index</i>[,<i>length</i>][:<i>formatString</i>]}</p>
+<p>Elements in square brackets are optional. The following table describes each element.</p>
+<table>
+   <tr>
+       <th>Element</th><th>Description</th>
+   </tr>
+   <tr>
+       <td><i>index</i></td><td>The zero-based position in the parameter list of the object to be formatted. If the object specified by <i>index</i> is <b>Nothing</b>, the format item is replaced by an empty string. If there is no parameter in the <i>index</i> position, a <a href="FormatException.html">FormatException</a> is thrown.</td>
+   </tr>
+   <tr>
+       <td>,<i>length</i></td><td>The minimum number of characters in the string representation of the parameter. If positive, the parameter is right-aligned; if negative, it is left-aligned.</td>
+   </tr>
+   <tr>
+       <td>:<i>formatString</i></td><td>A standard or custom format string that is supported by the parameter.</td>
+   </tr>
+</table>
+<p><i>Args</i> represents the objects to be formatted. Each format item in <i>Format</i> is replaced with the string representation of the corresponding object in <i>args</i>. If the format item includes <i>formatString</i> and the corresponding object in <i>Args</i> implements the <a href="IFormattable.html">IFormattable</a> interface, then <b>Args(index).ToString(formatString, provider)</b> defines the formatting. Otherwise, <b>Object.ToString(Args(index))</b> defines the formatting.</p>
+<h4>Example</h4>
 <pre>
 '' This example uses the <b>AppendFormat</b> method to insert
 '' values into the string with formatting information. The
@@ -10,22 +30,22 @@ Private Sub Main()
     '' Indicates the index of the supplied
     '' arguments to be inserted into the string.
     sb.AppendFormat "My name {0}.", "Kelly"
-    sb.Append vbCrLf
+    sb.AppendLine
     
     '' Insert an integer value that is 5 digits
     '' in length, prepending leading zeros if necessary.
     sb.AppendFormat "A number with leading zeros: {0:d5}.", 23
-    sb.Append vbCrLf
+    sb.AppendLine
     
     '' Inserts the value into a column of 10 characters
     '' with alignment to the right of the column.
     sb.AppendFormat "Right aligned 10 character column: '{0,10}'.", "right"
-    sb.Append vbCrLf
+    sb.AppendLine
     
     '' Inserts the value into a column of 10 characters
     '' with alignment fo the left of the column.
     sb.AppendFormat "Left aligned 10 character column: '{0,-10}'.", "left"
-    sb.Append vbCrLf
+    sb.AppendLine
     
     '' To prevent the insertion of an argument and allow
     '' for curly braces to be inserted into the string, two
@@ -34,7 +54,7 @@ Private Sub Main()
     sb.AppendFormat "Use two braces to put a single brace in the output without formatting. {{0}}", "No Used"
     
     '' Display the contents of the StringBuilder
-    Console.WriteLine sb.ToString
+    Console.WriteLine sb
     
     '' Wait for user to press enter
     Console.ReadLine
