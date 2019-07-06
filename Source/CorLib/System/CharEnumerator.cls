@@ -208,12 +208,13 @@ End Sub
 Private Sub InitChars(ByRef s As String, ByVal CopyString As Boolean)
     If CopyString Then
         mString = s
-        mChars = AllocChars(mString)
         mCopyString = True
     Else
-        mString = StringRef(s)
-        mChars = AllocChars(s)
+'        mString = StringRef(s)
+        StringPtr(mString) = StrPtr(s)
     End If
+
+    mChars = AllocChars(mString)
 End Sub
 
 
