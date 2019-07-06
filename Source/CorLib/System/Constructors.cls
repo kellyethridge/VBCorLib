@@ -866,14 +866,13 @@ End Function
 ' @param CopyString Indicates if the enumerator should create a copy of the passed
 ' in string, or use the existing string in memory.
 ' @return A CharEnumerator used to iterate over each character of a String.
-' @remarks By default <b>CharEnumerator</b> makes a copy of the passed in
+' @remarks By default <a href="CharEnumerator.html">CharEnumerator</a> makes a copy of the passed in
 ' String. The original string can be changed as normal. If <i>CopyString</i> is set
 ' to False, then the original string must not change or go out of scope for the
-' duration of the <b>CharEnumerator</b> object's existance. By telling <b>CharEnumerator</b>
+' duration of the <a href="CharEnumerator.html">CharEnumerator</a> object's existance. By telling <a href="CharEnumerator.html">CharEnumerator</a>
 ' to not make a copy of the original string, memory is not allocated for the string,
 ' which can be helpful for large strings.
-'
-Public Function NewCharEnumerator(ByRef s As String, Optional ByVal CopyString As Boolean = True) As CharEnumerator
+Public Function NewCharEnumerator(ByRef s As String, Optional ByVal CopyString As Boolean) As CharEnumerator
     Set NewCharEnumerator = New CharEnumerator
     NewCharEnumerator.Init s, CopyString
 End Function

@@ -89,9 +89,10 @@ Implements IObject
 Implements IEnumerator
 Implements ICloneable
 
-Private mBase   As EnumeratorBase
-Private mBuffer As CharBuffer
-Private mString As String
+Private mBase       As EnumeratorBase
+Private mString     As String
+Private mChars()    As Integer
+Private mCopyString As Boolean
 
 
 
@@ -109,7 +110,6 @@ Attribute NewEnum.VB_MemberFlags = "40"
     Set NewEnum = CreateEnumerator(Me)
 End Function
 
-
 ''
 ' This returns the current item of the enumeration. The current
 ' item is called after a successful MoveNext.
@@ -120,7 +120,7 @@ End Function
 ' corrisponding positive value, add &h10000 (65536) to the value.
 '
 Public Property Get Current() As Integer
-    Current = mBuffer.Chars(mBase.Index)
+    Current = mChars(mBase.Index)
 End Property
 
 ''
@@ -150,14 +150,8 @@ End Sub
 ' <p>The original string will always be copied when a clone is created.</p>
 '
 Public Function Clone() As CharEnumerator
-    Dim Ret As New CharEnumerator
-    Dim s   As String
-    
-    StringPtr(s) = mBuffer.Buffer.pvData
-    Ret.InitClone mBase.Clone, s
-    StringPtr(s) = vbNullPtr
-    
-    Set Clone = Ret
+    Set Clone = New CharEnumerator
+    Clone.InitClone mBase.Clone, mString, mCopyString
 End Function
 
 ''
@@ -195,19 +189,31 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef s As String, ByVal CopyString As Boolean)
     Set mBase = Cor.NewEnumeratorBase(0, Len(s))
+    InitChars s, CopyString
+End Sub
+
+Friend Sub InitClone(ByVal Base As EnumeratorBase, ByRef s As String, ByVal CopyString As Boolean)
+    Set mBase = Base
+    InitChars s, CopyString
+End Sub
+
+Private Sub Class_Terminate()
+    FreeChars mChars
     
-    If CopyString Then
-        mString = s
-        InitChars mBuffer, mString
-    Else
-        InitChars mBuffer, s
+    If Not mCopyString Then
+        StringPtr(mString) = vbNullPtr
     End If
 End Sub
 
-Friend Sub InitClone(ByVal Base As EnumeratorBase, ByRef s As String)
-    Set mBase = Base
-    mString = s
-    InitChars mBuffer, s
+Private Sub InitChars(ByRef s As String, ByVal CopyString As Boolean)
+    If CopyString Then
+        mString = s
+        mChars = AllocChars(mString)
+        mCopyString = True
+    Else
+        mString = StringRef(s)
+        mChars = AllocChars(s)
+    End If
 End Sub
 
 
@@ -226,8 +232,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String
