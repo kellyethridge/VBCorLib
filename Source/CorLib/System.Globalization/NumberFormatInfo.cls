@@ -1402,7 +1402,8 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
             FormatGeneralInteger mNumber, Specifiers.Precision, vbUpperEChar, mDefaultOutput
             
         Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
-            FormatFixedDouble mNumber, Specifiers.Precision, mDefaultOutput
+'            FormatFixedDouble mNumber, Specifiers.Precision, mDefaultOutput
+            FormatFixedInt32 mNumber, Specifiers.Precision, mDefaultOutput
             
         Case FormatSpecifier.DecimalUpperSpecifier, FormatSpecifier.DecimalLowerSpecifier
             FormatDecimal mNumber, Specifiers.Precision, mDefaultOutput
@@ -2295,12 +2296,12 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
     End With
 End Sub
 
-Private Sub FormatFixedInt32(ByVal FormatPrecision As Long, ByRef Output As OutputBuffer)
+Private Sub FormatFixedInt32(ByRef Number As NumberType, ByVal FormatPrecision As Long, ByRef Output As OutputBuffer)
     If FormatPrecision = UnknownPrecision Then
         FormatPrecision = mProps.NumberDecimalDigits
     End If
     
-    With mNumber
+    With Number
         If .IsNegative Then
             AppendString mProps.NegativeSign, Output
         End If
