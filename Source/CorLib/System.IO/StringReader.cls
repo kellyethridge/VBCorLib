@@ -45,11 +45,11 @@ Option Explicit
 Implements IObject
 Implements TextReader
 
-Private mString         As String
-Private mStringBuffer   As CharBuffer
-Private mIsClosed       As Boolean
-Private mPosition       As Long
-Private mLength         As Long
+Private mString     As String
+Private mChars()    As Integer
+Private mIsClosed   As Boolean
+Private mPosition   As Long
+Private mLength     As Long
 
 
 ''
@@ -73,7 +73,7 @@ Public Function Peek() As Long
     VerifyIsOpen
     
     If mPosition < mLength Then
-        AsWord(Peek) = mStringBuffer.Chars(mPosition)
+        AsWord(Peek) = mChars(mPosition)
     Else
         Peek = -1
     End If
@@ -114,7 +114,7 @@ Public Function ReadBlock(ByRef Buffer() As Integer, ByVal Index As Long, ByVal 
         Count = mLength - mPosition
     End If
     
-    CopyMemory Buffer(Index), mStringBuffer.Chars(mPosition), Count * vbSizeOfChar
+    CopyMemory Buffer(Index), mChars(mPosition), Count * vbSizeOfChar
     ReadBlock = Count
 End Function
 
@@ -138,7 +138,7 @@ Public Function ReadLine() As String
     Dim i As Long
     i = mPosition
     Do While mPosition < mLength
-        Select Case mStringBuffer.Chars(mPosition)
+        Select Case mChars(mPosition)
             Case vbReturnChar, vbLineFeedChar: Exit Do
         End Select
         mPosition = mPosition + 1
@@ -153,12 +153,12 @@ Public Function ReadLine() As String
     
     ReadLine = Mid$(mString, i + 1, mPosition - i)
     
-    If mStringBuffer.Chars(mPosition) = vbReturnChar Then
+    If mChars(mPosition) = vbReturnChar Then
         ' consume the found terminator.
         mPosition = mPosition + 1
         ' if a Cr was followed by an Lf then consume the Lf
         If mPosition < mLength Then
-            If mStringBuffer.Chars(mPosition) = vbLineFeedChar Then
+            If mChars(mPosition) = vbLineFeedChar Then
                 mPosition = mPosition + 1
             End If
         End If
@@ -223,7 +223,11 @@ Friend Sub Init(ByRef s As String, ByVal IsOwner As Boolean)
     End If
     
     mLength = Len(mString)
-    InitChars mStringBuffer, mString
+    mChars = AllocChars(mString)
+End Sub
+
+Private Sub Class_Terminate()
+    FreeChars mChars
 End Sub
 
 
