@@ -309,7 +309,7 @@ Private mProps              As PropsType
 Private mPtrNumberBuffer    As Long
 Private mNumber             As NumberType
 Private mDefaultOutput      As OutputBuffer
-Private mFormatSpecifier    As CharBuffer
+
 
 
 ''
@@ -1114,12 +1114,10 @@ Private Sub Class_Initialize()
     End With
     
     mPtrNumberBuffer = CoTaskMemAlloc(40)
-    If mPtrNumberBuffer = vbNullPtr Then _
-        Throw New OutOfMemoryException
+    
+    If mPtrNumberBuffer = vbNullPtr Then Err.Raise 7
     
     SAPtr(mNumber.Digits) = VarPtr(mNumber.DigitsSA)
-    
-    InitChars mFormatSpecifier
     ReDim mDefaultOutput.Buffer(0 To DefaultOutputSize - 1)
 End Sub
 
@@ -1469,26 +1467,28 @@ Private Sub FormatExponentInt32(ByRef Number As NumberType, ByVal FormatPrecisio
 End Sub
 
 Private Sub FormatNumber(ByRef Number As NumberType, ByVal FormatPrecision As Long, ByRef Output As OutputBuffer)
+    Dim Pattern         As String
+    Dim PatternChars()  As Integer
+    
     If FormatPrecision = UnknownPrecision Then
         FormatPrecision = mProps.NumberDecimalDigits
     End If
     
     RoundNumber Number, Number.DecimalPosition + FormatPrecision
     
-    Dim Pattern As String
     If Number.IsNegative Then
         Pattern = mNumberNegativePatterns(mProps.NumberNegativePattern)
     Else
         Pattern = "#"
     End If
     
-    InitChars mFormatSpecifier, Pattern
+    PatternChars = AllocChars(Pattern)
     
     Dim i   As Long
     Dim Ch  As Integer
     With mProps
-        For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Chars(i)
+        For i = 0 To UBound(PatternChars)
+            Ch = PatternChars(i)
             
             Select Case Ch
                 Case vbPoundChar
@@ -1500,29 +1500,33 @@ Private Sub FormatNumber(ByRef Number As NumberType, ByVal FormatPrecision As Lo
             End Select
         Next i
     End With
+    
+    FreeChars PatternChars
 End Sub
 
 Private Sub FormatCurrency(ByRef Number As NumberType, ByVal DecimalPlaces As Long, ByRef Output As OutputBuffer)
+    Dim Pattern         As String
+    Dim PatternChars()  As Integer
+    
     If DecimalPlaces = UnknownPrecision Then
         DecimalPlaces = mProps.CurrencyDecimalDigits
     End If
     
     RoundNumber Number, Number.DecimalPosition + DecimalPlaces
     
-    Dim Pattern As String
     If Number.IsNegative Then
         Pattern = mCurrencyNegativePatterns(mProps.CurrencyNegativePattern)
     Else
         Pattern = mCurrencyPositivePatterns(mProps.CurrencyPositivePattern)
     End If
     
-    InitChars mFormatSpecifier, Pattern
+    PatternChars = AllocChars(Pattern)
     
     Dim i   As Long
     Dim Ch  As Integer
     With mProps
-        For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Chars(i)
+        For i = 0 To UBound(PatternChars)
+            Ch = PatternChars(i)
             Select Case Ch
                 Case vbPoundChar
                     FormatGroups Number, DecimalPlaces, .CurrencyGroupSizes, .CurrencyGroupSeparator, .CurrencyDecimalSeparator, Output
@@ -1535,23 +1539,27 @@ Private Sub FormatCurrency(ByRef Number As NumberType, ByVal DecimalPlaces As Lo
             End Select
         Next i
     End With
+    
+    FreeChars PatternChars
 End Sub
 
 Private Sub FormatPercent(ByRef Number As NumberType, ByVal DecimalPlaces As Long, ByRef Output As OutputBuffer)
-    Dim Pattern As String
+    Dim Pattern         As String
+    Dim PatternChars()  As Integer
+    
     If Number.IsNegative Then
         Pattern = mPercentNegativePatterns(mProps.PercentNegativePattern)
     Else
         Pattern = mPercentPositivePatterns(mProps.PercentPositivePattern)
     End If
     
-    InitChars mFormatSpecifier, Pattern
+    PatternChars = AllocChars(Pattern)
     
     Dim i   As Long
     Dim Ch  As Integer
     With mProps
-        For i = 0 To Len(Pattern) - 1
-            Ch = mFormatSpecifier.Chars(i)
+        For i = 0 To UBound(PatternChars)
+            Ch = PatternChars(i)
             Select Case Ch
                 Case vbPoundChar
                     FormatGroups Number, DecimalPlaces, .PercentGroupSizes, .PercentGroupSeparator, .PercentDecimalSeparator, Output
@@ -1564,6 +1572,8 @@ Private Sub FormatPercent(ByRef Number As NumberType, ByVal DecimalPlaces As Lon
             End Select
         Next i
     End With
+    
+    FreeChars PatternChars
 End Sub
 
 ''
@@ -2005,7 +2015,9 @@ End Sub
 ' 99 in Precision. We indicate no digits were supplied by using -1.
 '
 Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As FormatType, ByRef FormatPrecision As Long)
-    Dim FormatLength As Long
+    Dim FormatChars()   As Integer
+    Dim FormatLength    As Long
+
     FormatLength = Len(Format)
     
     ' A valid format specifier is 1 to 3 characters long.
@@ -2019,23 +2031,23 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
             FormatPrecision = UnknownPrecision
             
         Case Else
-            InitChars mFormatSpecifier, Format
-            FormatType = mFormatSpecifier.Chars(0)
+            FormatChars = AllocChars(Format)
+            FormatType = FormatChars(0)
             
             Select Case FormatType
                 Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
                     ' We've got a format letter, so attempt to get any precision digits.
                     If FormatLength = 1 Then
                         FormatPrecision = UnknownPrecision
-                        Exit Sub
+                        GoTo Finally
                     End If
                     
                     FormatPrecision = 0   ' we need to reset this because it's a ByRef variable.
                     
                     Dim Ch  As Long
                     Dim i   As Long
-                    For i = 1 To FormatLength - 1
-                        Ch = mFormatSpecifier.Chars(i)
+                    For i = 1 To UBound(FormatChars)
+                        Ch = FormatChars(i)
                         
                         Select Case Ch
                             Case vbZeroChar To vbNineChar
@@ -2043,20 +2055,25 @@ Private Sub GetFormatSpecifierParts(ByRef Format As String, ByRef FormatType As 
                             Case Else
                                 FormatType = CustomFormat
                                 FormatPrecision = UnknownPrecision
-                                Exit Sub
+                                GoTo Finally
                         End Select
                     Next i
                     
                 Case Else
                     FormatType = CustomFormat
                     FormatPrecision = UnknownPrecision
-                    Exit Sub
+                    GoTo Finally
             End Select
     End Select
+    
+Finally:
+    FreeChars FormatChars
 End Sub
 
 Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
-    Dim FormatLength As Long
+    Dim FormatChars()   As Integer
+    Dim FormatLength    As Long
+    
     FormatLength = Len(Format)
     
     Select Case FormatLength
@@ -2069,22 +2086,22 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
             ParseSpecifiers.Precision = UnknownPrecision
             
         Case Else
-            InitChars mFormatSpecifier, Format
+            FormatChars = AllocChars(Format)
             
-            Select Case mFormatSpecifier.Chars(0)
+            Select Case FormatChars(0)
                 Case vbLowerAChar To vbLowerZChar, vbUpperAChar To vbUpperZChar
-                    ParseSpecifiers.Format = mFormatSpecifier.Chars(0)
+                    ParseSpecifiers.Format = FormatChars(0)
                     
                     If FormatLength = 1 Then
                         ParseSpecifiers.Precision = UnknownPrecision
-                        Exit Function
+                        GoTo Finally
                     End If
                     
                     Dim Precision   As Long
                     Dim Ch          As Long
                     Dim i           As Long
-                    For i = 1 To FormatLength - 1
-                        Ch = mFormatSpecifier.Chars(i)
+                    For i = 1 To UBound(FormatChars)
+                        Ch = FormatChars(i)
                         
                         Select Case Ch
                             Case vbZeroChar To vbNineChar
@@ -2092,7 +2109,7 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                             Case Else
                                 ParseSpecifiers.Format = CustomSpecifier
                                 ParseSpecifiers.Precision = UnknownPrecision
-                                Exit Function
+                                GoTo Finally
                         End Select
                     Next i
                     
@@ -2102,6 +2119,9 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                     ParseSpecifiers.Precision = UnknownPrecision
             End Select
     End Select
+    
+Finally:
+    FreeChars FormatChars
 End Function
 
 ''
