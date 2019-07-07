@@ -42,6 +42,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1234.1234@
             Test.Use CDec("123421346876234143.2343243")
             Test.Use "abc"
+            Test.Use ChrW$(&H7FFF) & ChrW$(&H7FFF) & ChrW$(&H7FFF) & ChrW$(&H7FFF) & ChrW$(&H7FFF) & ChrW$(&H7FFF)
         
         Case "Equals_WithValues_ReturnsExpected"
             Test.Use Nothing, Nothing, True

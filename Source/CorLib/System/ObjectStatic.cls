@@ -40,8 +40,9 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
-Private mCharBuffer     As CharBuffer
 Private mDateAsDateTime As CorDateTime
+Private mCharBuffer As SafeArray1d
+Private mChars()    As Integer
 
 
 ''
@@ -213,22 +214,12 @@ End Function
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Function HashString(ByRef Value As Variant) As Long
-    Dim Ptr     As Long
-    Dim Length  As Long
-    
-    Ptr = StrPtr(Value)
-    
-    If Ptr = vbNullPtr Then
-        Exit Function
-    End If
-    
-    Length = MemLong(Ptr - 4) \ 2
-    mCharBuffer.Buffer.pvData = Ptr
-    mCharBuffer.Buffer.cElements = Length
+    mCharBuffer.cElements = Len(Value)
+    mCharBuffer.pvData = StrPtr(Value)
     
     Dim i As Long
-    For i = 0 To Length - 1
-        HashString = ((HashString * 16) + mCharBuffer.Chars(i)) And &H3FFFFFF
+    For i = 0 To UBound(mChars)
+        HashString = (HashString And &H3FFFFFF) * vbShift4Bits + mChars(i)
     Next
 End Function
 
@@ -237,6 +228,15 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_Initialize()
-    InitChars mCharBuffer
+    With mCharBuffer
+        .cDims = 1
+        .cbElements = 2
+    End With
+    
+    SAPtr(mChars) = VarPtr(mCharBuffer)
     Set mDateAsDateTime = New CorDateTime
+End Sub
+
+Private Sub Class_Terminate()
+    SAPtr(mChars) = vbNullPtr
 End Sub

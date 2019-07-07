@@ -79,7 +79,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
     Select Case NextNonDigit()
         Case vbColonChar
             If Not TryParseTime(Result) Then
-                GoTo Exit
+                GoTo Finally
             End If
     
         Case vbZeroChar To vbNineChar, vbPeriodChar, vbNullPtr
@@ -87,7 +87,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
             Dim DaysParsed As Long
             
             If Not TryParseNumber(MaxDays, DaysParsed) Then
-                GoTo Exit
+                GoTo Finally
             End If
             
             Result = Result + DaysParsed * MilliSecondsPerDay
@@ -97,7 +97,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
                 
                 Dim TimeParsed As Currency
                 If Not TryParseTime(TimeParsed) Then
-                    GoTo Exit
+                    GoTo Finally
                 End If
                 
                 Result = Result + TimeParsed
@@ -105,7 +105,7 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
             
         Case Else
             mError = FormatError
-            GoTo Exit
+            GoTo Finally
     End Select
     
     SkipBlanks
@@ -115,13 +115,13 @@ Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
             mError = ParseError.FormatError
         End If
         
-        GoTo Exit
+        GoTo Finally
     End If
     
     Set RetVal = TimeSpan.FromMilliseconds(Result * Sign)
     TryParse = True
     
-Exit:
+Finally:
     FreeChars mChars
 End Function
 
