@@ -18,7 +18,6 @@ Option Explicit
 Implements ICategorizable
 
 Private mIO As IOHelper
-Private File As MemoryMappedFile
 
 Private Sub ICategorizable_Categorize(ByVal Cat As SimplyVBComp.CategoryCollector)
     Cat.ForFixture "System.IO"

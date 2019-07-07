@@ -80,6 +80,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "Trim_WithValues_ReturnsExpected"
             Test.Use "", WhiteSpaces, ""
             Test.Use WhiteSpaces & "hello" & WhiteSpaces, WhiteSpaces, "hello"
+            Test.Use WhiteSpaces & "hello" & WhiteSpaces, WhiteSpaceChars, "hello"
             Test.Use "hello" & WhiteSpaces, "helo", WhiteSpaces
             Test.Use WhiteSpaces & "hello", "helo", WhiteSpaces
             Test.Use "hello", "helo", ""

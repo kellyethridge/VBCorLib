@@ -239,7 +239,6 @@ Public Sub NewStack_WithElements_PushesElementsOnStack(ByVal Source As Variant)
 End Sub
 
 Public Sub NewStack_WithAnArray_DoesNotAlterArray()
-    Dim SUT As Stack
     Dim Source As Variant
     Source = Array(1, 2, 3)
     

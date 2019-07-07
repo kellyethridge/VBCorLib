@@ -82,10 +82,6 @@ Public Function FixedSize(ByVal List As ArrayList) As ArrayList
     Set FixedSize = Ret
 End Function
 
-Public Function FixedSizeList(ByVal List As IList) As IList
-
-End Function
-
 ''
 ' Creates a new ArrayList and fills it with the supplied value the specified number of times.
 '

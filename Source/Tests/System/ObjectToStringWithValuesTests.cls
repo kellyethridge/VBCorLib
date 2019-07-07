@@ -188,83 +188,83 @@ End Sub
 
 Public Sub ToString_WithNumberNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As NumberNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.NumberNegativePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.NumberNegativePattern = Pattern
     
-    Actual = Object.ToString(Value, "n", info)
+    Actual = Object.ToString(Value, "n", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCurrencyNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.CurrencyNegativePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.CurrencyNegativePattern = Pattern
     
-    Actual = Object.ToString(Value, "c", info)
+    Actual = Object.ToString(Value, "c", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCurrencyPositivePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As CurrencyPositivePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.CurrencyPositivePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.CurrencyPositivePattern = Pattern
     
-    Actual = Object.ToString(Value, "c", info)
+    Actual = Object.ToString(Value, "c", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithPercentNegativePattern_ReturnsExpected(ByVal Value As Variant, ByVal Pattern As PercentNegativePatterns, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
-    info.PercentNegativePattern = Pattern
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Info.PercentNegativePattern = Pattern
     
-    Actual = Object.ToString(Value, "p", info)
+    Actual = Object.ToString(Value, "p", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCustomCurrencyGroupSizes_ReturnsCustomGrouping(ByVal Value As Double, ByRef GroupSizes As Variant, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
     Dim Groups() As Long
     Groups = GroupSizes
-    info.CurrencyGroupSizes = Groups
+    Info.CurrencyGroupSizes = Groups
     
-    Actual = Object.ToString(Value, "c", info)
+    Actual = Object.ToString(Value, "c", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCustomNumberGroupSizes_ReturnsCustomGrouping(ByVal Value As Double, ByRef GroupSizes As Variant, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
     Dim Groups() As Long
     Groups = GroupSizes
-    info.NumberGroupSizes = Groups
+    Info.NumberGroupSizes = Groups
     
-    Actual = Object.ToString(Value, "n", info)
+    Actual = Object.ToString(Value, "n", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub ToString_WithCustomPercentageGroupSizes_ReturnsCustomGrouping(ByVal Value As Variant, ByRef GroupSizes As Variant, ByVal Expected As String)
     Dim Actual As String
-    Dim info As NumberFormatInfo
-    Set info = Cor.NewCultureInfo("en-US", False).NumberFormat
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US", False).NumberFormat
     Dim Groups() As Long
     Groups = GroupSizes
-    info.PercentGroupSizes = Groups
+    Info.PercentGroupSizes = Groups
     
-    Actual = Object.ToString(Value, "p", info)
+    Actual = Object.ToString(Value, "p", Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
@@ -276,10 +276,4 @@ Public Sub ToString_WithIntegerUsingFormat_ReturnsExpected(ByVal Value As Intege
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
-
-Private Function MakeImaginary(ByVal Value As Double) As Double
-    On Error Resume Next
-    MakeImaginary = Value / 0#
-    On Error GoTo 0
-End Function
 
