@@ -1334,19 +1334,19 @@ Private Sub DisableCloseButton()
     Dim OldTitle    As String
     Dim Pid         As Long
     Dim NewTitle    As String
-    Dim hwnd        As Long
+    Dim Hwnd        As Long
     
     OldTitle = Me.Title
     Pid = GetCurrentProcessId()
     NewTitle = OldTitle & Pid
     Me.Title = NewTitle
     Sleep 40
-    hwnd = FindWindow(vbNullString, NewTitle)
+    Hwnd = FindWindow(vbNullString, NewTitle)
     Me.Title = OldTitle
     
-    If hwnd <> vbNullPtr Then
+    If Hwnd <> vbNullPtr Then
         Dim hMenu As Long
-        hMenu = GetSystemMenu(hwnd, False)
+        hMenu = GetSystemMenu(Hwnd, False)
         RemoveMenu hMenu, SC_CLOSE, MF_BYCOMMAND
     End If
 End Sub

@@ -197,7 +197,7 @@ Public Function GetAttributes(ByRef Path As String) As FileAttributes
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    GetAttributes = Api.GetFileAttributes(FullPath)
+    GetAttributes = GetFileAttributesW(FullPath)
     If GetAttributes = INVALID_FILE_ATTRIBUTES Then
         IOError.WinIOError Err.LastDllError, FullPath
     End If
@@ -357,7 +357,7 @@ Public Sub SetAttributes(ByRef Path As String, ByVal Attributes As FileAttribute
     Dim FullPath As String
     FullPath = Statics.Path.GetFullPath(Path)
     
-    If Api.SetFileAttributes(FullPath, Attributes) = BOOL_FALSE Then
+    If SetFileAttributesW(FullPath, Attributes) = BOOL_FALSE Then
         IOError.WinIOError Err.LastDllError, FullPath
     End If
 End Sub

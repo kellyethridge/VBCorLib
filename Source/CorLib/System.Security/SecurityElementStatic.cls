@@ -72,8 +72,7 @@ Public Function Escape(ByRef Text As String) As String
     Dim Ch      As Integer
     
     Chars = AllocChars(Text)
-    Set Output = StringBuilderCache.Acquire
-    Output.Capacity = LenB(Text)
+    Set Output = StringBuilderCache.Acquire(LenB(Text))
     
     For i = 0 To UBound(Chars)
         Ch = Chars(i)

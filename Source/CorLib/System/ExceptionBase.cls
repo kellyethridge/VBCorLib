@@ -360,7 +360,6 @@ Private Property Get Values() As Hashtable
     Set Values = mValues
 End Property
 
-
 Private Property Get Subclass() As Exception
     Set Subclass = StrongPtr(mSubclassPtr)
 End Property

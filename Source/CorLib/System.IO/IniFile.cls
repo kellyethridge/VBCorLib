@@ -350,7 +350,7 @@ Public Function GetTimeSpan(ByRef Section As String, ByRef Key As String, Option
     
     If Not TimeSpan.TryParse(s, GetTimeSpan) Then
         If IsDate(s) Then
-            Set GetTimeSpan = TimeSpan.FromDate(s)
+            Set GetTimeSpan = TimeSpan.FromDate(CDate(s))
         Else
             Set GetTimeSpan = IfObject(Default, TimeSpan.Zero)
         End If

@@ -330,6 +330,7 @@ End Property
 ' and will throw a <b>PlatformNotSupportedException</b> exception.
 '
 Public Property Get UserDomainName() As String
+    Const NameSamCompatible As Long = 2
     Dim Size        As Long
     Dim DomainName  As String
     Dim Sid         As String

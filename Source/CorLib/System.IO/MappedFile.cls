@@ -233,7 +233,7 @@ Friend Sub Init(ByRef FileName As String, ByVal Access As FileAccess, ByVal Shar
     mFileHandle = CreateFileW(FileName, Access, Share, ByVal 0&, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0)
     If mFileHandle = INVALID_HANDLE Then IOError.WinIOError Err.LastDllError, FileName
     
-    mMapHandle = Api.CreateFileMapping(mFileHandle, 0, PageAccess, 0, 0, vbNullString)
+    mMapHandle = CreateFileMappingW(mFileHandle, ByVal 0, PageAccess, 0, 0, vbNullString)
     If mMapHandle = vbNullPtr Then IOError.WinIOError Err.LastDllError, FileName
     
     mViewHandle = MapViewOfFile(mMapHandle, MapAccess, 0, 0, 0)

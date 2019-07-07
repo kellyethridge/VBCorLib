@@ -128,7 +128,7 @@ Public Function GetLocaleString(ByVal LCID As Long, ByVal LCType As Long) As Str
         If ErrorCode <> ERROR_INSUFFICIENT_BUFFER Then _
             Error.Win32Error ErrorCode
             
-        Size = Api.GetLocaleInfo(LCID, LCType, vbNullString, 0)
+        Size = GetLocaleInfoW(LCID, LCType, vbNullString, 0)
     Loop
     
     GetLocaleString = Left$(Buf, Size - 1)
