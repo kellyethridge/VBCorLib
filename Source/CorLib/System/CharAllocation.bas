@@ -41,50 +41,15 @@ Option Explicit
 Private Const BufferCapacity As Long = 16
 
 Private Type BufferBucket
-    TablePtr    As Long
-    Self        As IUnknown
-    ReleasePtr  As Long
     Buffer      As SafeArray1d
     BufferPtr   As Long
     InUse       As Boolean
-End Type
-
-Public Type CharBuffer
-    TablePtr    As Long
-    Self        As IUnknown
-    ReleasePtr  As Long
-    Chars()     As Integer
-    Buffer      As SafeArray1d
 End Type
 
 Private mInited         As Boolean
 Private mBuckets()      As BufferBucket
 Private mFastLaneBucket As BufferBucket
 
-
-Public Sub InitChars(ByRef Buffer As CharBuffer, Optional ByRef s As String)
-    With Buffer
-        .TablePtr = VarPtr(.TablePtr)
-        ObjectPtr(.Self) = .TablePtr
-        .ReleasePtr = FuncAddr(AddressOf ReleaseCharBuffer)
-        SAPtr(.Chars) = VarPtr(.Buffer)
-        
-        With .Buffer
-            .cbElements = vbSizeOfChar
-            .cDims = 1
-            .cLocks = 1
-            .pvData = StrPtr(s)
-            .cElements = Len(s)
-        End With
-    End With
-End Sub
-
-Public Sub SetChars(ByRef Buffer As CharBuffer, ByRef s As String)
-    With Buffer.Buffer
-        .pvData = StrPtr(s)
-        .cElements = Len(s)
-    End With
-End Sub
 
 ''
 ' Allocates an Integer array backed by the String passed in.
@@ -184,9 +149,6 @@ Private Sub InitBucket(ByRef Bucket As BufferBucket)
         .Buffer.cbElements = 2
         .Buffer.cDims = 1
         .Buffer.cLocks = 1
-        .TablePtr = VarPtr(.TablePtr)
-        ObjectPtr(.Self) = .TablePtr
-        .ReleasePtr = FuncAddr(AddressOf ReleaseBufferBucket)
         .BufferPtr = VarPtr(.Buffer)
     End With
 End Sub
@@ -216,7 +178,7 @@ Private Function FindAvailableBucketIndex() As Long
         End If
     Next
     
-    Debug.Assert False
+    Debug.Assert False ' should not need to increase capacity. possible recursive error.
 End Function
 
 Private Function FindAllocatedBucketIndex(ByRef Chars() As Integer) As Long
@@ -235,17 +197,4 @@ Private Function FindAllocatedBucketIndex(ByRef Chars() As Integer) As Long
     End If
     
     FindAllocatedBucketIndex = -1
-End Function
-
-Private Function ReleaseBufferBucket(ByRef This As BufferBucket) As Long
-    This.Buffer.pvData = vbNullPtr
-    This.Buffer.cElements = 0
-    This.Buffer.cLocks = 0
-End Function
-
-Private Function ReleaseCharBuffer(ByRef This As CharBuffer) As Long
-    This.Buffer.pvData = vbNullPtr
-    This.Buffer.cElements = 0
-    This.Buffer.cLocks = 0
-    SAPtr(This.Chars) = vbNullPtr
 End Function
