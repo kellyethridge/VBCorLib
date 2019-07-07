@@ -49,7 +49,6 @@ Option Explicit
 Private Declare Function IsWow64Process Lib "kernel32.dll" (ByVal Handle As Long, ByRef IsWow64 As Long) As Long
 Private Declare Function GetCurrentProcess Lib "kernel32.dll" () As Long
 
-Private Const ERR_PATHNOTFOUND              As Long = 76
 Private Const MAX_COMPUTERNAME_LENGTH       As Long = 31
 Private Const UNLEN                         As Long = 256
 Private Const UOI_FLAGS                     As Long = 1

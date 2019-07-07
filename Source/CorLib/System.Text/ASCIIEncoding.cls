@@ -390,7 +390,6 @@ End Function
 ' @see Encoding
 '
 Public Function GetChars(ByRef Bytes() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Integer()
-    Dim Chars()     As Integer
     Dim Range       As ListRange
     Dim CharCount   As Long
     
@@ -784,7 +783,6 @@ End Function
 Private Function GetCharsCore(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long) As Long
     Dim b           As Byte
     Dim ByteEnd     As Long
-    Dim CharCount   As Long
     Dim Fallback    As DecoderFallbackBuffer
     
     ByteEnd = ByteIndex + ByteCount

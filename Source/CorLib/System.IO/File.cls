@@ -619,12 +619,6 @@ Private Sub SetFileTimeCore(ByRef Path As String, ByVal CreationTimePtr As Long,
     End With
 End Sub
 
-Private Function GetFileTimePtr(ByRef Time As Variant) As Long
-    If Not IsEmpty(Time) Then
-        GetFileTimePtr = VarPtr(Time) + 8
-    End If
-End Function
-
 Private Sub FillFileData(ByRef Path As String, ByRef Data As WIN32_FILE_ATTRIBUTE_DATA)
     If Len(Path) = 0 Then _
         Error.Argument Argument_EmptyPath, "Path"

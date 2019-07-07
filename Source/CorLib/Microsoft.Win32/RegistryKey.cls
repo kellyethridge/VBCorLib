@@ -86,7 +86,6 @@ Option Explicit
 Implements IObject
 
 Private Const REG_OPTION_NON_VOLATILE   As Long = 0
-Private Const DEFAULT_VALUE_NAME        As String = ""
 Private Const MaxKeyLength              As Long = 255
 Private Const MaxValueNameLength        As Long = 16383
 

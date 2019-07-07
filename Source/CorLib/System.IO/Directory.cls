@@ -42,7 +42,6 @@ Option Explicit
 
 Private Const FILE_FLAG_BACKUP_SEMANTICS        As Long = &H2000000
 Private Const ERROR_NO_MORE_FILES               As Long = 18&
-Private Const DOUBLE_PERIOD                     As Long = &H2E002E
 
 Private Enum SystemEntryTypes
     FileEntry = 1

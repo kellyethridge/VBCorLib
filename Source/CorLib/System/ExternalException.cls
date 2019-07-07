@@ -40,8 +40,6 @@ Implements IObject
 Implements Exception
 Implements SystemException
 
-Private Const DefaultHResult    As Long = E_FAIL   ' Invalid procedure call or argument
-Private Const DefaultMessage    As String = "External component has thrown an exception."
 Private Const BaseProperty      As String = "Base"
 
 Private mBase As CorLib.ExceptionBase

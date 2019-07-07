@@ -52,8 +52,6 @@ Implements Exception
 Implements SystemException
 
 Private Const BaseProperty     As String = "Base"
-Private Const DefaultMessage   As String = "System Error."
-Private Const DefaultHResult   As Long = COR_E_ARITHMETIC
 
 Private mBase As ExceptionBase
 

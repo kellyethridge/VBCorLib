@@ -636,8 +636,8 @@ Private Function NormalizePath(ByRef Path As String, ByVal FullCheck As Boolean)
     MaxIndex = UBound(PathChars)
     
     Do While Index <= MaxIndex
-        If ProcessPreSigCharSegment(PathChars, NewBuffer, FullCheck, Index) Then
-            ProcessSigCharSegment PathChars, NewBuffer, FullCheck, Index
+        If ProcessPreSigCharSegment(PathChars, NewBuffer, Index) Then
+            ProcessSigCharSegment PathChars, NewBuffer, Index
         End If
     Loop
     
@@ -706,7 +706,7 @@ Private Sub PrepareForVolumeLabel(ByRef PathChars() As Integer, ByRef Index As L
     End If
 End Sub
 
-Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByVal FullCheck As Boolean, ByRef Index As Long) As Boolean
+Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByRef Index As Long) As Boolean
     Dim pos             As Long
     Dim Ch              As Integer
     Dim MaxIndex        As Long
@@ -769,7 +769,7 @@ Private Function ProcessPreSigCharSegment(ByRef PathChars() As Integer, ByVal Ne
     ProcessPreSigCharSegment = FoundSigChar
 End Function
 
-Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByVal FullCheck As Boolean, ByRef Index As Long)
+Private Sub ProcessSigCharSegment(ByRef PathChars() As Integer, ByVal NewBuffer As PathHelper, ByRef Index As Long)
     Dim pos         As Long
     Dim Ch          As Integer
     Dim MaxIndex    As Long

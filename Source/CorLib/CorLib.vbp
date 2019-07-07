@@ -314,7 +314,6 @@ Module=CharAllocation; System\CharAllocation.bas
 Module=Delegation; System\Delegation.bas
 Module=ArrayHelpers; System\ArrayHelpers.bas
 Class=ErrorStatic; System\ErrorStatic.cls
-Class=NumberStatic; System\Number.cls
 Module=Validation; System\Validation.bas
 Class=CaseInsensitiveComparerStatic; System.Collections\CaseInsensitiveComparerStatic.cls
 Class=PathHelper; System.IO\PathHelper.cls

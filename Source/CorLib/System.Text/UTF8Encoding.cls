@@ -332,7 +332,6 @@ End Function
 '
 Public Function GetBytesEx(ByRef Chars As Variant, ByVal CharIndex As Long, ByVal CharCount As Long, ByRef Bytes() As Byte, ByVal ByteIndex As Long) As Long
     Dim LocalChars()    As Integer
-    Dim Range           As ListRange
     Dim ByteCount       As Long
     
     LocalChars = AsChars(Chars)

@@ -337,10 +337,6 @@ Public Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As 
     TrySZSort = True
 End Function
 
-Public Function TrySZSortWithItems(ByVal KeysPtr As Long, ByVal Left As Long, ByVal Right As Long, ByVal ItemsPtr) As Boolean
-
-End Function
-
 Public Sub SetSortKeys(ByVal pSA As Long)
     CopyMemory mSortKeys.SA, ByVal pSA, vbSizeOfSafeArray1d
     Select Case mSortKeys.SA.cbElements

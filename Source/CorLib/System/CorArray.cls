@@ -1083,12 +1083,6 @@ Finally:
     Return
 End Sub
 
-Private Sub CleanUpSortRoutine()
-    ClearSortKeys
-    ClearSortItems
-    Set SortComparer = Nothing
-End Sub
-
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Internal

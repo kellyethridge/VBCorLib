@@ -150,7 +150,7 @@ Public Sub WriteValue(ByRef Value As Variant, Optional ByRef Index As Variant, O
         ValidateArrayRange Value, Index, Count, NameOfValue
         WriteArray Value, Index, Count
     Else
-        WriteIntrinsic Value, Index, Count
+        WriteIntrinsic Value
     End If
 End Sub
 
@@ -242,7 +242,7 @@ Private Sub WriteStringLength(ByVal Length As Long)
     WriteByte LengthRemaining
 End Sub
 
-Private Sub WriteIntrinsic(ByRef Value As Variant, ByRef Index As Variant, ByRef Count As Variant)
+Private Sub WriteIntrinsic(ByRef Value As Variant)
     Select Case VarType(Value)
         Case vbBoolean:     WriteBoolean Value
         Case vbByte:        WriteByte Value

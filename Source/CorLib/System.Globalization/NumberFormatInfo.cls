@@ -88,8 +88,6 @@ Private Const DefaultDoublePrecision    As Long = 15
 Private Const DefaultSinglePrecision    As Long = 7
 Private Const DefaultExponentPrecision  As Long = 6
 
-Private Const NO_DIGITS             As Long = -1
-
 Private Const SCALE_NAN             As Long = &H80000000
 Private Const SCALE_INF             As Long = &H7FFFFFFF
 
@@ -1774,8 +1772,6 @@ Private Sub FormatHex(ByRef Value As Variant, ByRef Specifiers As Specifiers, By
 End Sub
 
 Private Function FormatHexBigNumber(ByRef Number As BigNumber, ByRef Specifiers As Specifiers, ByRef Output As OutputBuffer) As String
-    Const DIGITS_PER_INTEGER As Long = 4
-
     Dim CharCount       As Long
     Dim HexCharOffset   As Long
     

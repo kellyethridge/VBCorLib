@@ -1168,7 +1168,6 @@ library CorType {
         const long MF_BYCOMMAND            = 0x0;
 
 
-        [entry("GetUserNameA"), usesgetlasterror] long GetUserNameA([in] LPSTR lpBuffer, [in] long * nSize);
         [entry("GetUserNameW"), usesgetlasterror] long GetUserNameW([in] LPWSTR lpBuffer, [in] long * nSize);
         [entry("CryptAcquireContextA"), usesgetlasterror] long CryptAcquireContext([in] long * hProv, [in] LPSTR pszContainer, [in] LPSTR pszProvider, [in] long dwProvType, [in] long dwFlags);
         [entry("CryptReleaseContext"), usesgetlasterror] long CryptReleaseContext([in] long hProv, [in] long dwFlags);

@@ -220,9 +220,9 @@ Attribute Item.VB_UserMemId = 0
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
     
-    Dim bit As Long
-    Index = GetBitIndex(Index, bit)
-    Item = CBool(mBits(Index) And bit)
+    Dim Bit As Long
+    Index = GetBitIndex(Index, Bit)
+    Item = CBool(mBits(Index) And Bit)
 End Property
 
 ''
@@ -237,12 +237,12 @@ Public Property Let Item(ByVal Index As Long, ByVal Value As Boolean)
     If Index < 0 Or Index >= mLength Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_Index
 
-    Dim bit As Long
-    Index = GetBitIndex(Index, bit)
+    Dim Bit As Long
+    Index = GetBitIndex(Index, Bit)
     If Value Then
-        mBits(Index) = mBits(Index) Or bit
+        mBits(Index) = mBits(Index) Or Bit
     Else
-        mBits(Index) = mBits(Index) And (Not bit)
+        mBits(Index) = mBits(Index) And (Not Bit)
     End If
     mVersion = mVersion + 1
 End Property
@@ -270,7 +270,6 @@ Public Property Let Length(ByVal Value As Long)
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
     
     If Value <> mLength Then
-        Dim LastElementIndex As Long
         mUBound = (Value - 1) \ BitsPerLong
         ReDim Preserve mBits(0 To mUBound)
         mLength = Value
@@ -483,9 +482,9 @@ Private Function GetMask(ByVal LastMaskBit As Long) As Long
     GetMask = Mask
 End Function
 
-Private Function GetBitIndex(ByVal Index As Long, ByRef bit As Long) As Long
+Private Function GetBitIndex(ByVal Index As Long, ByRef Bit As Long) As Long
     GetBitIndex = Index \ BitsPerLong
-    bit = Powers(Index - GetBitIndex * BitsPerLong)
+    Bit = Powers(Index - GetBitIndex * BitsPerLong)
 End Function
 
 

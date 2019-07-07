@@ -70,10 +70,8 @@ Private Const DaysPer30Years        As Long = 10631
 Private Const YearRoundingBias      As Long = 10646
 
 ' This is 4/3/9666 in fixed days, the maximum valid Hijri date.
-Private Const MaxFixedDays          As Long = 3530161
 Private Const MaxYear               As Long = 9666
 Private Const MaxShortMonth         As Long = 4
-Private Const MaxShortDay           As Long = 3
 Private Const MonthsPerYear         As Long = 12
 
 Private Const SecondsPerMinute      As Long = 60

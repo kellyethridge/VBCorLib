@@ -51,16 +51,13 @@ Implements IComparable
 Implements IFormattable
 
 Private Const BytesPerDigit As Long = vbSizeOfInteger
-Private Const HEX_CHARS As String = "0123456789abcdef0123456789ABCDEF"
-Private Const LOWER_HEX As Long = 1
-Private Const UPPER_HEX As Long = 17
-
-Private mNumber As BigNumber
 
 Private Type Digit
     Index As Long
     Value As Long
 End Type
+
+Private mNumber As BigNumber
 
 
 ''

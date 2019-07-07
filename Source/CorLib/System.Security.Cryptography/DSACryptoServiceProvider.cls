@@ -301,7 +301,6 @@ End Function
 '
 Public Function SignHash(ByRef RgbHash() As Byte, ByRef Str As String) As Byte()
     Dim Hash        As Long
-    Dim Size        As Long
     Dim Signature() As Byte
     
     If CorArray.IsNull(RgbHash) Then _

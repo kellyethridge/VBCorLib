@@ -76,8 +76,6 @@ Private Declare Function SetConsoleWindowInfo Lib "kernel32.dll" (ByVal hConsole
 Private Declare Function GetStdHandle Lib "kernel32.dll" (ByVal nStdHandle As Long) As Long
 Private Declare Function GetConsoleScreenBufferInfo Lib "kernel32.dll" (ByVal hConsoleOutput As Long, ByRef lpConsoleScreenBufferInfo As CONSOLE_SCREEN_BUFFER_INFO) As Long
 Private Declare Function SetConsoleScreenBufferSize Lib "kernel32.dll" (ByVal hConsoleOutput As Long, ByRef dwSize As Any) As Long
-Private Declare Function CreateConsoleScreenBuffer Lib "kernel32.dll" (ByVal dwDesiredAccess As Long, ByVal dwShareMode As Long, ByRef lpSecurityAttributes As Any, ByVal dwFlags As Long, ByRef lpScreenBufferData As Any) As Long
-Private Declare Function SetConsoleActiveScreenBuffer Lib "kernel32.dll" (ByVal hConsoleOutput As Long) As Long
 Private Declare Function SetConsoleTitleW Lib "kernel32.dll" (ByVal lpConsoleTitle As Long) As Long
 Private Declare Function GetConsoleTitleW Lib "kernel32.dll" (ByVal lpConsoleTitle As Long, ByVal nSize As Long) As Long
 Private Declare Function GetLargestConsoleWindowSize Lib "kernel32.dll" (ByVal hConsoleOutput As Long) As COORD
@@ -102,7 +100,6 @@ Private Declare Function FindWindow Lib "user32.dll" Alias "FindWindowA" (ByVal 
 Private Const STD_OUTPUT_HANDLE         As Long = -11&
 Private Const STD_INPUT_HANDLE          As Long = -10&
 Private Const STD_ERROR_HANDLE          As Long = -12&
-Private Const CONSOLE_TEXTMODE_BUFFER   As Long = 1
 Private Const MaxTitleLength            As Long = 24500
 Private Const MaxWindowSize             As Long = &H7FFF
 Private Const KEY_EVENT                 As Long = &H1

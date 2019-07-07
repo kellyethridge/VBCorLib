@@ -841,12 +841,6 @@ Private Sub GetDateParts(ByVal ms As Currency, ByVal DatePart As DatePartPrecisi
     DayOfYear = FixedDays - GetFixedDaysFromParts(Year, 7, 1) + 1
 End Sub
 
-Private Function GetFixedDays(ByRef Time As Variant) As Long
-    Dim ms As Currency
-    ms = CorDateTime.GetTotalMilliseconds(Time)
-    GetFixedDays = Int(ms / MilliSecondsPerDay) + 1
-End Function
-
 Private Function GetFixedDaysFromParts(ByVal Year As Long, ByVal Month As Long, ByVal Day As Long) As Long
     Dim i           As Long
     Dim DayCount    As Long

@@ -46,8 +46,6 @@ Implements Exception
 Implements SystemException
 
 Private Const PropBase As String = "Base"
-Private Const DEF_MESSAGE As String = "The requested amount of memory could not be allocated."
-Private Const DEF_HRESULT As Long = COR_E_OUTOFMEMORY
 
 Private mBase As ExceptionBase
 

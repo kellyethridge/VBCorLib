@@ -72,8 +72,6 @@ Private Const MaxMilliseconds       As Currency = DaysTo10000 * MilliSecondsPerD
 Private Const DaysTo1601            As Currency = DaysPer400Years * 4
 Private Const MillisecondsTo1601    As Currency = DaysTo1601 * MilliSecondsPerDay
 
-Private Const MinFiletime           As Currency = 50491123200000@
-
 
 ' Currency works perfectly as the 64bit Integer in .NET. Even though the
 ' time is represented in milliseconds here, the fractional portion is exactly

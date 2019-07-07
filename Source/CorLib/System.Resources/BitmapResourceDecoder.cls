@@ -47,14 +47,6 @@ Implements IResourceDecoder
 Private Const SIZEOF_BITMAPFILEHEADER As Long = 14
 Private Const GMEM_MOVEABLE As Long = &H2
 
-Private Type BITMAPFILEHEADER
-    bfType As Integer
-    bfSize As Long
-    bfReserved1 As Integer
-    bfReserved2 As Integer
-    bfOffBits As Long
-End Type
-
 Private mKey    As ResourceKey
 Private mBitmap As StdPicture
 

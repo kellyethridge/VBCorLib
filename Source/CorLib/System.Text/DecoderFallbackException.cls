@@ -244,7 +244,7 @@ End Sub
 Friend Sub Init2(ByRef Message As String, ByRef BytesUnknown() As Byte, ByVal Index As Long)
     mBase.Message = Message
     mBytesUnknown = BytesUnknown
-    mIndex = mIndex
+    mIndex = Index
 End Sub
 
 

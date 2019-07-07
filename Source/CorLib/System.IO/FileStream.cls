@@ -61,24 +61,7 @@ Option Explicit
 Implements IObject
 Implements Stream
 
-Private Const DefaultAccess As Long = 0
 Private Const MinBufferSize As Long = 8
-
-'Private Const FILE_ATTRIBUTE_NORMAL     As Long = &H80
-'Private Const FILE_TYPE_DISK            As Long = 1
-'Private Const INVALID_SET_FILE_POINTER  As Long = -1
-'Private Const INVALID_FILE_SIZE         As Long = -1
-'Private Const ERROR_BROKEN_PIPE         As Long = 109
-
-'Public Type NativeOverlapped
-'    InternalLow     As Long
-'    InternalHigh    As Long
-'    OffsetLow       As Long
-'    OffsetHigh      As Long
-'    EventHandle     As Long
-'    CallbackHandle  As Long
-'End Type
-
 
 
 ''
