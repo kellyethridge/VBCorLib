@@ -102,6 +102,7 @@ version 3.0 (BREAKING CHANGES)
 	* Renamed incorrectly spelled static method TimeSpan.CompareTo to TimeSpan.Compare.
 	* Added formatting functionality to TimeSpan.ToString method.
 	* Added StringBuilder.AppendFormatArray and StringBuilder.AppendFormatArrayEx methods.
+	* Changed StringReader contructor to accept parameter indicating of string should be copied, replacing parameter indicating string should be stolen. *BREAKING*
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

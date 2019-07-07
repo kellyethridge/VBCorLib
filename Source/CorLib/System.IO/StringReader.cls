@@ -47,6 +47,7 @@ Implements TextReader
 
 Private mString     As String
 Private mChars()    As Integer
+Private mCopyString As Boolean
 Private mIsClosed   As Boolean
 Private mPosition   As Long
 Private mLength     As Long
@@ -215,11 +216,12 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByRef s As String, ByVal IsOwner As Boolean)
-    If IsOwner Then
-        Helper.Swap4 ByVal VarPtr(s), mString
-    Else
+Friend Sub Init(ByRef s As String, ByVal CopyString As Boolean)
+    If CopyString Then
         mString = s
+        mCopyString = True
+    Else
+        StringPtr(mString) = StrPtr(s)
     End If
     
     mLength = Len(mString)
@@ -228,6 +230,10 @@ End Sub
 
 Private Sub Class_Terminate()
     FreeChars mChars
+    
+    If Not mCopyString Then
+        StringPtr(mString) = vbNullPtr
+    End If
 End Sub
 
 

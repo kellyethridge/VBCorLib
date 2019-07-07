@@ -715,9 +715,9 @@ End Function
 ' @remarks If <i>IsOwner</i> is True, then the variable passed into as <i>s</i>
 ' will become an empty string after the object is constructed.
 '
-Public Function NewStringReader(ByRef s As String, Optional ByVal IsOwner As Boolean) As StringReader
+Public Function NewStringReader(ByRef s As String, Optional ByVal CopyString As Boolean) As StringReader
     Set NewStringReader = New StringReader
-    NewStringReader.Init s, IsOwner
+    NewStringReader.Init s, CopyString
 End Function
 
 ''
