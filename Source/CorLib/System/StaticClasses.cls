@@ -662,3 +662,11 @@ End Property
 Public Property Get EncoderFallback() As EncoderFallbackStatic
     Set EncoderFallback = Statics.EncoderFallback
 End Property
+
+Public Property Get MemoryMappedFile() As MemoryMappedFileStatic
+    Set MemoryMappedFile = Statics.MemoryMappedFile
+End Property
+
+Public Property Get Int64() As Int64Static
+    Set Int64 = Statics.Int64
+End Property

@@ -173,6 +173,10 @@ Public Function Exists(ByRef Path As String) As Boolean
     Dim Data        As WIN32_FILE_ATTRIBUTE_DATA
     Dim FullPath    As String
     
+    If Len(Path) = 0 Then
+        Exit Function
+    End If
+    
     FullPath = Statics.Path.GetFullPath(Path)
     
     If GetFileData(FullPath, Data) = NO_ERROR Then

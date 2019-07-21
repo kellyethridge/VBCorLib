@@ -103,6 +103,11 @@ version 3.0 (BREAKING CHANGES)
 	* Added formatting functionality to TimeSpan.ToString method.
 	* Added StringBuilder.AppendFormatArray and StringBuilder.AppendFormatArrayEx methods.
 	* Changed StringReader contructor to accept parameter indicating of string should be copied, replacing parameter indicating string should be stolen. *BREAKING*
+	* Fixed CorDateTime.ToAODAte. Would round to incorrect time when having enough milliseconds.
+	* Added Int64 user-defined type.
+	* Added user-defined type support in ObjectStatic.
+	* Re-implemented MemoryMappedFile to create a MemoryMappedViewAccessor.
+	* Added MemoryMappedViewAccessor to access mapped views of a file.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

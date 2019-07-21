@@ -121,7 +121,6 @@ Public Sub Add_WithDifferentKeyDataTypes_ThrowsInvalidOperation()
     List.Add 1, "a"
     List.Add 2&, "b"
     
-    Debug.Print Err.Description
     AssertInvalidOperationException Err
 End Sub
 

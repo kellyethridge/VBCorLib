@@ -119,10 +119,17 @@ Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData A
     Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
 End Function
 
-Public Function GetSystemMenu(ByVal Hwnd As Long, ByVal bRevert As Boolean) As Long
+Public Function SafeCreateFileMapping(ByVal FileHandle As Long, ByVal Protect As Long, ByVal CapacityHigh As Long, ByVal CapacityLow As Long, ByRef MapName As String) As SafeFileHandle
+    Dim Handle As Long
+    
+    Handle = CreateFileMappingW(FileHandle, ByVal 0&, Protect, CapacityHigh, CapacityLow, MapName)
+    Set SafeCreateFileMapping = Cor.NewSafeFileHandle(Handle, True)
+End Function
+
+Public Function GetSystemMenu(ByVal hwnd As Long, ByVal bRevert As Boolean) As Long
     Dim BoolRevert As BOOL
     BoolRevert = IIfLong(bRevert, BOOL_TRUE, BOOL_FALSE)
-    GetSystemMenu = CorType.GetSystemMenu(Hwnd, BoolRevert)
+    GetSystemMenu = CorType.GetSystemMenu(hwnd, BoolRevert)
 End Function
 
 Public Function GetMessage(ByVal ErrorCode As Long) As String

@@ -40,8 +40,13 @@ Public Function CVarOrDefault(ByRef Value As Variant, ByRef Default As Variant) 
     End If
 End Function
 
-Public Function SCur(ByVal Value As Long) As Currency
-    SCur = 0.0001@ * Value
+Public Function CInt64(ByRef Value As Variant) As Int64
+    Select Case VarType(Value)
+        Case vbCurrency
+            AssignQWord 0.0001@ * CCur(Int(Value)), CInt64
+        Case Else
+            Throw New InvalidCastException
+    End Select
 End Function
 
 Public Function AsUnknown(ByRef Value As Variant) As IUnknown

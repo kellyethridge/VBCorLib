@@ -61,6 +61,7 @@ Private Sub Form_Load()
     AddSystemSecurityCryptography
     AddSystemResources
     AddSystemIO
+    AddSystemIOMemoryMappedFiles
     AddSystemText
     AddSystemGlobalization
     AddSystemNumerics
@@ -136,6 +137,7 @@ Private Sub AddSystem()
     
         .Add New PublicFunctionsTests
 '        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
+        .Add New Int64Tests
         
         AddTest .This
     End With
@@ -273,7 +275,6 @@ Private Sub AddSystemIO()
         .Add New FileInfoTests
         .Add New FileTests
         .Add New StreamReaderTests
-        .Add New MemoryMappedFileTests
         .Add New FileNotFoundExceptionTests
         .Add New IniFileTests
         .Add New IniResourceWriterTests
@@ -286,6 +287,15 @@ Private Sub AddSystemIO()
         .Add New PathTests
         .Add New FileStreamTests
         .Add New StreamWriterTests
+        
+        AddTest .This
+    End With
+End Sub
+
+Private Sub AddSystemIOMemoryMappedFiles()
+    With Sim.NewTestSuite("System.IO.MemoryMappedFiles")
+        .Add New MemoryMappedFileTests
+        .Add New MemoryMappedViewAccessorTests
         
         AddTest .This
     End With

@@ -421,6 +421,10 @@ Friend Function GetTimeOfDay(ByRef Time As Variant) As TimeSpan
     Set GetTimeOfDay = CachedDateTime(Time).TimeOfDay
 End Function
 
+Friend Function GetOADate(ByRef Time As Variant) As Date
+    GetOADate = CachedDateTime(Time).ToOADate
+End Function
+
 Friend Sub Validate(ByRef Time As Variant)
     CachedDateTime Time
 End Sub
@@ -478,6 +482,8 @@ Private Function CachedDateTime(ByRef Time As Variant) As CorDateTime
             End If
         Case vbDate
             Milliseconds = DateToMilliseconds(Time)
+        Case vbCurrency
+            Milliseconds = Time
         Case Else
             Error.Argument Arg_MustBeDateTime
     End Select

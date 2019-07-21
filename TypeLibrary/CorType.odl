@@ -10,11 +10,15 @@ library CorType {
 
     // This is just for internal use.
     typedef unsigned char byte;
-    typedef long  DWORD;
-    typedef short WORD;
-    typedef long  LPVOID;
+    typedef long  	DWORD;
+    typedef long 	HANDLE;
+    typedef short 	WORD;
+    typedef long  	LPVOID;
+    typedef long 	LPCVOID;
     typedef currency curr;
-    typedef short Char;
+    typedef short 	Char;
+	typedef DWORD 	HREFTYPE;
+	typedef LPWSTR 	LPCTSTR;
 
     //
     // Public Enums
@@ -24,7 +28,6 @@ library CorType {
         BOOL_FALSE  = 0,
         BOOL_TRUE   = 1
     } BOOL;
-
 
     typedef enum STGC {
         STGC_DEFAULT                = 0,
@@ -247,6 +250,7 @@ library CorType {
     } ICONINFO;
 
     typedef struct SYSTEM_INFO {
+    	DWORD dwOemID;
         DWORD dwPageSize;
         LPVOID lpMinimumApplicationAddress;
         LPVOID lpMaximumApplicationAddress;
@@ -258,7 +262,39 @@ library CorType {
         WORD wProcessorRevision;
     } SYSTEM_INFO;
 
+	typedef struct TYPEDESC {
+		HREFTYPE hRefType;
+		WORD vt;
+	} TYPEDESC;
 
+	typedef struct PARAMDESC {
+		DWORD pparamdescex;
+		WORD wParamFlags;
+	} PARAMDESC;
+
+	typedef struct ELEMDESC {
+		TYPEDESC tdesc;
+		PARAMDESC paramdesc;
+	} ELEMDESC;
+
+	typedef struct VARDESC {
+		DWORD memid;
+		DWORD lpstrSchema;
+		DWORD lpvarValue;
+		ELEMDESC elemdescVar;
+		WORD wVarFlags;
+		DWORD varkind;
+	} VARDESC;
+
+	typedef struct MEMORY_BASIC_INFORMATION {
+		DWORD BaseAddress;
+		DWORD AllocationBase;
+		DWORD AllocationProtect;
+		DWORD RegionSize;
+		DWORD State;
+		DWORD Protect;
+		DWORD lType;
+	} MEMORY_BASIC_INFORMATION;
 #pragma pack()
 
 
@@ -289,6 +325,51 @@ library CorType {
         long Release();
     };
 
+  typedef struct TYPEATTR {
+    VBGUID guid;
+    long lcid;
+    DWORD dwReserved;
+    long memidConstructor;
+    long memidDestructor;
+    long lpstrSchema;
+    long cbSizeInstance;
+    long typekind;
+    WORD cFuncs;
+    WORD cVars;
+    WORD cImplTypes;
+    WORD cbSizeVft;
+    WORD cbAlignment;
+    WORD wTypeFlags;
+    WORD wMajorVerNum;
+    WORD wMinorVerNum;
+    long tdescAlias;
+    long idldescType;
+  } TYPEATTR;
+
+    [uuid(00020401-0000-0000-C000-000000000046), odl]
+	interface ITypeInfo : IUnknown
+	{
+		HRESULT GetTypeAttr ([in] long * ppTypeAttr);
+		HRESULT GetTypeComp ([out] long **ppTComp);
+		HRESULT GetFuncDesc ([in] long index,[out] long **ppFuncDesc);
+		HRESULT GetVarDesc ([in] long index,[in] long * ppVarDesc);
+		HRESULT GetNames ([in] long memid,[out] BSTR *rgBstrNames,[in] long cMaxNames,[out] long *pcNames);
+		HRESULT GetRefTypeOfImplType ([in] long index,[out] long *pRefType);
+		HRESULT GetImplTypeFlags ([in] long index,[out] INT *pImplTypeFlags);
+		HRESULT GetIDsOfNames ([in] long *rgszNames,[in] long cNames,[out] long *pMemId);
+		HRESULT Invoke ([in] long pvInstance,[in] long memid,[in] WORD wFlags,[in, out] long *pDispParams,[out] VARIANT *pVarResult,[out] long *pExcepInfo,[out] long *puArgErr);
+		HRESULT GetDocumentation ([in] long memid,[out] BSTR *pBstrName,[out] BSTR *pBstrDocString,[out] DWORD *pdwHelpContext,[out] BSTR *pBstrHelpFile);
+		HRESULT GetDllEntry ([in] long memid,[in] long invKind,[out] BSTR *pBstrDllName,[out] BSTR *pBstrName,[out] WORD *pwOrdinal);
+		HRESULT GetRefTypeInfo ([in] long hRefType,[out] ITypeInfo **ppTInfo);
+		HRESULT AddressOfMember ([in] long memid,[in] long invKind,[out] void *ppv);
+		HRESULT CreateInstance ([in] IUnknown *pUnkOuter,[in] long riid,[out] void *ppvObj);
+		HRESULT GetMops ([in] long memid,[out] BSTR *pBstrMops);
+		HRESULT GetContainingTypeLib ([out] long **ppTLib,[out] long *pIndex);
+		void ReleaseTypeAttr ([in] long pTypeAttr);
+		void ReleaseFuncDesc ([in] long pFuncDesc);
+		void ReleaseVarDesc ([in] long pVarDesc);
+	};
+
     [uuid(55A2F2D0-8919-11D0-818F-00A0C90FFFC3), odl]
     interface IRecordInfo : IUnknown
     {
@@ -298,12 +379,12 @@ library CorType {
         HRESULT GetGuid([out, retval] VBGUID * RetVal);
         HRESULT GetName([out, retval] BSTR * RetVal);
         HRESULT GetSize([out, retval] long * RetVal);
-        HRESULT GetTypeInfo([out, retval] long * RetVal);
+        HRESULT GetTypeInfo([out, retval] ITypeInfo ** RetVal);
         HRESULT GetField([in] long pvData, [in] LPWSTR szFieldName, [out, retval] VARIANT * RetVal);
         HRESULT GetFieldNoCopy([in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField, [in] long * ppvDataCArray);
         HRESULT PutField([in] long wFlags, [in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField);
         HRESULT PutFieldNoCopy([in] long wFlags, [in] long pvData, [in] LPWSTR szFieldName, [in] VARIANT * pvarField);
-        HRESULT GetFieldNames([in] long * pcNames, [in] BSTR * rgBstrNames);
+        HRESULT GetFieldNames([in] long * pcNames, [in] void * rgBstrNames);
         BOOL IsMatchingType([in] IRecordInfo * pRecordInfo);
         long RecordCreate();
         HRESULT RecordCreateCopy([in] long * pvSource, [out, retval] long * RetVal);
@@ -386,9 +467,7 @@ library CorType {
     //
 
     [dllname("Win32Constants")]
-    module Win32Constants {
-        const long PAGE_EXECUTE_READWRITE = 0x40;
-        
+    module Win32Constants {        
         const long MAX_PATH_A           = 0x00000104;
         const long MAX_PATH_W           = 0x00007FFF;
         
@@ -425,6 +504,8 @@ library CorType {
         const long PAGE_READONLY              = 0x2;
         const long PAGE_READWRITE             = 0x4;
         const long PAGE_WRITECOPY             = 0x8;
+        const long PAGE_EXECUTE_READ 		  = 0x20;
+        const long PAGE_EXECUTE_READWRITE 	  = 0x40;
         const long INVALID_HANDLE             = -1;
         const long FILE_SHARE_READ            = 1;
         const long FILE_SHARE_WRITE           = 2;
@@ -437,6 +518,8 @@ library CorType {
         const long SECTION_ALL_ACCESS         = 983071;   // STANDARD_RIGHTS_REQUIRED Or SECTION_QUERY Or SECTION_MAP_WRITE Or SECTION_MAP_READ Or SECTION_MAP_EXECUTE Or SECTION_EXTEND_SIZE
         const long FILE_MAP_READ              = 0x4;      // SECTION_MAP_READ
         const long FILE_MAP_ALL_ACCESS        = 983071;   // SECTION_ALL_ACCESS
+        const long FILE_MAP_COPY     		  = 0x1;
+		const long FILE_MAP_EXECUTE  		  = 0x32;
         const long NULL_HANDLE                = 0;
 
         const long NO_ERROR                   = 0x0;
@@ -799,6 +882,7 @@ library CorType {
         const long vbSizeOfChar            	= 2;
         const long vbBitsInChar				= 16;
         const long vbBitsInBase64			= 6;
+        const long vbSizeOfInt64		    = 8;
     }
 
     [dllname("CorVarType")]
@@ -871,7 +955,7 @@ library CorType {
         [entry("RtlMoveMemory")] void CopyMemory([in] void * Destination,[in] void * Source, [in] long Length);
         [entry("CreateDirectoryW"), usesgetlasterror] long CreateDirectoryW([in] LPWSTR PathName, [in] void * SecurityAttributes);
         [entry("CreateFileW"), usesgetlasterror] long CreateFileW([in] LPWSTR FileName, [in] long DesiredAccess, [in] long ShareMode, [in] void * SecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile);
-        [entry("CreateFileMappingW"), usesgetlasterror] long CreateFileMappingW([in] long hFile, [in] void * SecurityAttributes, [in] long Protect, [in] long MaximumSizeHigh, [in] long MaximumSizeLow, [in] LPWSTR Name);
+        [entry("CreateFileMappingW"), usesgetlasterror] HANDLE CreateFileMappingW([in] HANDLE hFile, [in] void * lpFileMappingAttributes, [in] DWORD flProtect, [in] DWORD dwMaximumSizeHigh, [in] DWORD dwMaximumSizeLow, [in] LPCTSTR lpName);
         [entry("DeleteFileW"), usesgetlasterror] long DeleteFileW([in] LPWSTR FileName);
         [entry("EnumResourceLanguagesW"), usesgetlasterror] long EnumResourceLanguages([in] long hModule, [in] long lpType, [in] long lpName, [in] long lpEnumFunc, [in] long lParam);
         [entry("EnumResourceNamesW"), usesgetlasterror] long EnumResourceNames([in] long hModule, [in] long lpType, [in] long lpEnumFunc, [in] long lParam);
@@ -913,7 +997,7 @@ library CorType {
         [entry("LockFile"), usesgetlasterror] long LockFile([in] long hFile, [in] long dwFileOffsetLow, [in] long dwFileOffsetHigh, [in] long nNumberOfBytesToLockLow, [in] long nNumberOfBytesToLockHigh);
         [entry("LockResource")] long LockResource([in] long hResData);
         [entry("lstrlen")] long lstrlen([in] long lpString);
-        [entry("MapViewOfFile"), usesgetlasterror] long MapViewOfFile([in] long hFileMappingObject, [in] long dwDesiredAccess, [in] long dwFileOffsetHigh, [in] long dwFileOffsetLow, [in] long dwNumberOfBytesToMap);
+        [entry("MapViewOfFile"), usesgetlasterror] LPVOID MapViewOfFile([in] HANDLE hFileMappingObject, [in] DWORD dwDesiredAccess, [in] DWORD dwFileOffsetHigh, [in] DWORD dwFileOffsetLow, [in] DWORD dwNumberOfBytesToMap);
         [entry("MoveFileW"), usesgetlasterror] long MoveFileW([in] LPWSTR ExistingFileName, [in] LPWSTR NewFileName);
         [entry("ReadFile"), usesgetlasterror] long ReadFile([in] long hFile, [in] void * lpBuffer, [in] long nNumberOfBytesToRead, [in] long * lpNumberOfBytesRead, [in] void * lpOverlapped);
         [entry("RemoveDirectoryW"), usesgetlasterror] long RemoveDirectoryW([in] LPWSTR PathName);
@@ -925,7 +1009,8 @@ library CorType {
         [entry("SetFileTime"), usesgetlasterror] long SetFileTime([in] long hFile, [in] void * lpCreationTime, [in] void * lpLastAccessTime, [in] void * lpLastWriteTime);
         [entry("SizeofResource"), usesgetlasterror] long SizeofResource([in] long hModule, [in] long hResInfo);
         [entry("UnlockFile"), usesgetlasterror] long UnlockFile([in] long hFile, [in] long dwFileOffsetLow, [in] long dwFileOffsetHigh, [in] long nNumberOfBytesToUnlockLow, [in] long nNumberOfBytesToUnlockHigh);
-        [entry("UnmapViewOfFile"), usesgetlasterror] long UnmapViewOfFile([in] long lpBaseAddress);
+        [entry("UnmapViewOfFile"), usesgetlasterror] BOOL UnmapViewOfFile([in] LPCVOID lpBaseAddress);
+        [entry("FlushViewOfFile"), usesgetlasterror] BOOL FlushViewOfFile([in] LPCVOID lpBaseAddress, [in] DWORD dwNumberOfBytesToFlush);
         [entry("WriteFile"), usesgetlasterror] long WriteFile([in] long hFile, [in] void * lpBuffer, [in] long nNumberOfBytesToWrite, [in] long * lpNumberOfBytesWritten, [in] void * lpOverlapped);
         [entry("RtlZeroMemory")] void ZeroMemory([in] void * Destination, [in] long Length);
         [entry("WritePrivateProfileStringW"), usesgetlasterror] long WritePrivateProfileStringW([in] LPWSTR lpAppName, [in] LPWSTR lpKeyName, [in] LPWSTR lpString, [in] LPWSTR lpFileName);
@@ -955,7 +1040,8 @@ library CorType {
     	[entry("GlobalAlloc")] long GlobalAlloc([in] long wFlags, [in] long dwBytes);
     	[entry("GlobalFree")] long GlobalFree([in] long hMem);
     	[entry("GlobalLock")] long GlobalLock([in] long hMem);
-    	[entry("GlobalUnlock")] long GlobalUnlock([in] long hMem);    	
+    	[entry("GlobalUnlock")] long GlobalUnlock([in] long hMem);
+    	[entry("VirtualQuery")] DWORD VirtualQuery([in] LPCVOID lpAddress, [in] MEMORY_BASIC_INFORMATION* lpBuffer, [in] DWORD dwLength);
     }
 
     [dllname("oleaut32.dll"), helpstring("Access to API functions within the Oleaut32.dll system file.")]
@@ -1003,8 +1089,13 @@ library CorType {
     [dllname("ole32.dll"), helpstring("Access to API functions within the Ole32.dll system file.")]
     module Ole32 {
         const long VARIANTDATA_OFFSET   = 8;
+        const long VARIANTRECORD_OFFSET = 12;
         const long VT_BYREF             = 0x4000;
         const long PICTYPE_BITMAP       = 1;
+		const long VT_PTR 				= 0x001A;
+		const long VT_SAFEARRAY			= 0x001B;
+		const long VT_USERDEFINEDTYPE	= 0x001D;
+		const long VT_CARRAY			= 0x001C;
 
         [entry("CLSIDFromProgID")] HRESULT CLSIDFromProgID([in] LPWSTR ProgID, [out, retval] VBGUID * RetVal);
         [entry("CLSIDFromString")] HRESULT CLSIDFromString([in] LPWSTR lpSz, [out, retval] VBGUID * RetVal);

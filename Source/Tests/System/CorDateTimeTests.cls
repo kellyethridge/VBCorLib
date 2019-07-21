@@ -264,6 +264,17 @@ Public Sub ToOADate_WithValues_ReturnsExpected(ByVal Expected As Date)
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub ToOADate_WithFractionalPortion_RoundsCorrectly()
+    Const Milliseconds As Currency = 108481890561884.3912@
+    Dim dt As CorDateTime
+    Dim Actual As Date
+    
+    Set dt = CorDateTime.FromMilliseconds(Milliseconds)
+    Actual = dt.ToOADate
+    
+    Assert.That Actual, Iz.EqualTo(#8/28/3438 10:29:21 AM#)
+End Sub
+
 Public Sub FromOADate_WithValue_ReturnsDateTime(ByVal d As Date)
     Dim Actual As CorDateTime
         
@@ -756,21 +767,4 @@ Public Sub ToString_WithFractionsOfSecond_ReturnsExpected(ByVal Format As String
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

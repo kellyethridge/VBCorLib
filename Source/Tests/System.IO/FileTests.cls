@@ -40,6 +40,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "AFolder", False
             Test.Use "AFolder\NonExistingFile.txt", False
             Test.Use "AFolder\SubFile.txt", True
+            Test.Use "", False
             
         Case "Exists_WithParentNavigation_ReturnsExpected"
             Test.Use "File.txt", False

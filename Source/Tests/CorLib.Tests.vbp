@@ -2,7 +2,7 @@ Type=Exe
 Reference=*\A..\CorLib\CorLib.vbp
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorType.tlb#VB.EXT: VBCorLib 3.0 Type Library
-Reference=*\G{923925AC-1013-4D27-9FB1-4FF0B3B47BA2}#4.0#0#..\..\..\..\..\..\..\WINDOWS\SysWow64\SimplyVBUnitType.tlb#SimplyVBUnit Type Library 4.0
+Reference=*\G{3E4F7CEC-C640-49F1-80D9-8DD42421CB1B}#5.0#0#..\..\..\SimplyVBUnit\TypeLibrary\SimplyVBUnitType.tlb#SimplyVBUnit 5.0 Type Library
 Reference=*\G{CDFFA366-1D4F-43F9-B4BF-5438BC7C7D29}#1.1#0#..\..\TypeLibrary\vbvm6lib.tlb#Visual Basic 6 Virtual Machine Type Library 1.1 by Michel Rutten - Declarations and aliases for (undocumented) functions in the VB6 runtime library.
 Reference=*\A..\Fakes\Fakes.vbp
 Object={7983BD3B-752A-43EA-9BFF-444BBA1FC293}#5.0#0; SimplyVBUnit.Component.ocx
@@ -74,7 +74,7 @@ Class=JapaneseCalendarTests; System.Globalization\JapaneseCalendarTests.cls
 Class=JulianCalendarTests; System.Globalization\JulianCalendarTests.cls
 Class=KoreanCalendarTests; System.Globalization\KoreanCalendarTests.cls
 Class=MACTripleDESTests; System.Security.Cryptography\MACTripleDESTests.cls
-Class=MemoryMappedFileTests; System.IO\MemoryMappedFileTests.cls
+Class=MemoryMappedFileTests; System.IO.MemoryMappedFiles\MemoryMappedFileTests.cls
 Class=CorMathTests; System\CorMathTests.cls
 Class=MD5CryptoServiceProviderTests; System.Security.Cryptography\MD5CryptoServiceProviderTests.cls
 Class=MemoryStreamTests; System.IO\MemoryStreamTests.cls
@@ -221,6 +221,8 @@ Class=OperatingSystemTests; System\OperatingSystemTests.cls
 Class=ConsoleTests; System\ConsoleTests.cls
 Class=IniResourceWriterTests; System.IO\IniResourceWriterTests.cls
 Class=OutputLogger; OutputLogger.cls
+Class=MemoryMappedViewAccessorTests; System.IO.MemoryMappedFiles\MemoryMappedViewAccessorTests.cls
+Class=Int64Tests; System\Int64Tests.cls
 ResFile32="CorLib.Tests.RES"
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
@@ -255,3 +257,6 @@ DebugStartupOption=0
 
 [MS Transaction Server]
 AutoRefresh=1
+
+[Rubberduck]
+ProjectId=782689e4-0fc4-4aff-bd01-a1fc9388e906

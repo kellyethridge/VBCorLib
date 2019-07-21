@@ -39,7 +39,6 @@ Attribute VB_Exposed = True
 ' Provides default implementations of the IObject interface.
 '
 Option Explicit
-
 Private mDateAsDateTime As CorDateTime
 Private mCharBuffer As SafeArray1d
 Private mChars()    As Integer
@@ -58,33 +57,26 @@ Private mChars()    As Integer
 '     GetHashCode = MyBase.GetHashCode(Me)
 ' End Function
 ' </pre>
-'
 Public Function GetHashCode(ByRef Value As Variant) As Long
     Select Case VarType(Value)
         Case vbLong, vbInteger, vbByte, vbBoolean
             GetHashCode = CLng(Value)
-        
         Case vbString
             GetHashCode = HashString(Value)
-        
         Case vbDouble
             With AsDLong(CDbl(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-        
         Case vbSingle
             GetHashCode = AsLong(CSng(Value))
-        
         Case vbDate
             With AsDLong(CDate(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-        
         Case vbCurrency
             With AsDLong(CCur(Value))
                 GetHashCode = .LoDWord Xor .HiDWord
             End With
-        
         Case vbObject, vbDataObject
             If Value Is Nothing Then
                 Exit Function
@@ -97,7 +89,6 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             Else
                 GetHashCode = ObjPtr(CUnk(Value))
             End If
-        
         Case vbDecimal
             With AsDWord(Value)
                 GetHashCode = .HiWord
@@ -105,6 +96,8 @@ Public Function GetHashCode(ByRef Value As Variant) As Long
             With MemDLong(VarPtr(Value) + 8)
                 GetHashCode = GetHashCode Xor .LoDWord Xor .HiDWord
             End With
+        Case vbUserDefinedType
+            GetHashCode = HashUdt(Value)
     End Select
 End Function
 
@@ -145,6 +138,10 @@ Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
                     Equals = (ObjA Is ObjB)
                 End If
             End If
+        Case vbUserDefinedType
+            If VarType(ObjB) = vbUserDefinedType Then
+                Equals = UdtEquals(ObjA, ObjB)
+            End If
         Case vbNull
             Equals = IsNull(ObjB)
         Case vbEmpty
@@ -177,13 +174,11 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
             Dim NumberFormatter As NumberFormatInfo
             Set NumberFormatter = NumberFormatInfo.GetInstance(Provider)
             ToString = NumberFormatter.Format(Value, Format)
-            
         Case vbDate
             Dim DateFormatter As DateTimeFormatInfo
             Set DateFormatter = DateTimeFormatInfo.GetInstance(Provider)
             mDateAsDateTime.InitFromDate Value, UnspecifiedKind
             ToString = DateFormatter.Format(mDateAsDateTime, Format)
-            
         Case vbObject
             If Not Value Is Nothing Then
                 If TypeOf Value Is IFormattable Then
@@ -198,7 +193,8 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                     ToString = TypeName(Value)
                 End If
             End If
-            
+        Case vbUserDefinedType
+            ToString = TypeName(Value)
         Case vbEmpty
             ToString = "Empty"
         Case vbNull
@@ -221,6 +217,91 @@ Private Function HashString(ByRef Value As Variant) As Long
     For i = 0 To UBound(mChars)
         HashString = (HashString And &H3FFFFFF) * vbShift4Bits + mChars(i)
     Next
+End Function
+
+Private Function HashUdt(ByRef Value As Variant) As Long
+    Dim Record As IRecordInfo
+    Dim FieldNameCount  As Long
+    Dim Result As Long
+    
+    ObjectPtr(Record) = MemLong(VarPtr(Value) + VARIANTRECORD_OFFSET)
+    Record.GetFieldNames FieldNameCount, ByVal vbNullPtr
+    
+    If FieldNameCount > 0 Then
+        Dim FieldNames()    As String
+        Dim ValuePtr        As Long
+        
+        ReDim FieldNames(0 To FieldNameCount - 1)
+        Record.GetFieldNames FieldNameCount, FieldNames(0)
+        ValuePtr = MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)
+                                
+        On Error GoTo Catch
+                                
+        Dim i As Long
+        For i = 0 To FieldNameCount - 1
+            Result = Result Xor GetHashCode(Record.GetField(ValuePtr, FieldNames(i)))
+        Next
+    End If
+    
+    HashUdt = Result
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    ObjectPtr(Record) = vbNullPtr
+    Return
+End Function
+
+Private Function UdtEquals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
+    Dim ObjARecord As IRecordInfo
+    Dim ObjBRecord As IRecordInfo
+    
+    ObjectPtr(ObjARecord) = MemLong(VarPtr(ObjA) + VARIANTRECORD_OFFSET)
+    ObjectPtr(ObjBRecord) = MemLong(VarPtr(ObjB) + VARIANTRECORD_OFFSET)
+    
+    On Error GoTo Catch
+    
+    If ObjARecord.IsMatchingType(ObjBRecord) Then
+        Dim FieldNameCount  As Long
+
+        ObjARecord.GetFieldNames FieldNameCount, ByVal vbNullPtr
+        
+        If FieldNameCount > 0 Then
+            Dim FieldNames()    As String
+            Dim ObjAPtr         As Long
+            Dim ObjBPtr         As Long
+            
+            ReDim FieldNames(0 To FieldNameCount - 1)
+            ObjARecord.GetFieldNames FieldNameCount, FieldNames(0)
+            ObjAPtr = MemLong(VarPtr(ObjA) + VARIANTDATA_OFFSET)
+            ObjBPtr = MemLong(VarPtr(ObjB) + VARIANTDATA_OFFSET)
+                                    
+            Dim i As Long
+            For i = 0 To FieldNameCount - 1
+                If Not Equals(ObjARecord.GetField(ObjAPtr, FieldNames(i)), ObjARecord.GetField(ObjBPtr, FieldNames(i))) Then
+                    GoSub Finally
+                    Exit Function
+                End If
+            Next
+        End If
+        
+        UdtEquals = True
+    End If
+    
+    GoSub Finally
+    Exit Function
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    ObjectPtr(ObjARecord) = vbNullPtr
+    ObjectPtr(ObjBRecord) = vbNullPtr
+    Return
 End Function
 
 

@@ -486,17 +486,9 @@ Public Function NewFileNotFoundException(Optional ByRef FileName As String, Opti
     NewFileNotFoundException.Init FileName, Message, InnerException
 End Function
 
-''
-' Creates a memory-mapped view of a file.
-'
-' @param Path The file to be mapped to memory.
-' @param Access The access to this mapping of the file.
-' @param Share How should the file be shared with other processes.
-' @return The new mapped view object.
-'
-Public Function NewMemoryMappedFile(ByRef Path As String, Optional ByVal Access As FileAccess = FileAccess.ReadAccess, Optional ByVal Share As FileShare = FileShare.ReadShare) As MemoryMappedFile
+Friend Function NewMemoryMappedFile(ByVal Handle As SafeFileHandle, ByVal Stream As FileStream, ByVal LeaveOpen As Boolean) As MemoryMappedFile
     Set NewMemoryMappedFile = New MemoryMappedFile
-    NewMemoryMappedFile.Init Path, Access, Share
+    NewMemoryMappedFile.Init Handle, Stream, LeaveOpen
 End Function
 
 ''
@@ -1923,3 +1915,13 @@ Public Function NewIniResourceWriter(ByRef FileName As String, ByRef Section As 
     NewIniResourceWriter.Init FileName, Section
 End Function
 
+''
+' Returns a new instance of <a href="Int64Type.Int64.html">Int64</a>.
+'
+' @param Low The least significant 32-bits of the integer value.
+' @param High The most significant 32-bits of the integer value.
+' @return An <a href="Int64Type.Int64.html">Int64</a> integer value.
+Public Function NewInt64(ByVal Low As Long, ByVal High As Long) As Int64
+    NewInt64.HighInt32 = High
+    NewInt64.LowInt32 = Low
+End Function

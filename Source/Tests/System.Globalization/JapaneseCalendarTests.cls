@@ -288,7 +288,6 @@ Public Sub ToDateTime_WithValueOutOfSupportedRange_ThrowsArgumentOutOfRangeExcep
     On Error Resume Next
     Calendar.ToDateTime Year, Month, Day, 1, 1, 1, 1, Era
     
-    Debug.Print Err.Description
     AssertArgumentOutOfRangeException Err
 End Sub
 

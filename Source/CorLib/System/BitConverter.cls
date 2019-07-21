@@ -103,54 +103,54 @@ End Function
 ' bytes 15: sign (&h80 is negative)<br>
 '
 Public Function GetBytes(ByRef Value As Variant) As Byte()
-    Dim Ret() As Byte
+    Dim Result() As Byte
 
     ' We use SafeArrayCreateVectorEx because the array descriptor
     ' and data are allocated all in one shot, where as using
     ' ReDim will cause two heap memory allocations.
     Select Case VarType(Value)
         Case vbLong
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 4)
-            AsLong(Ret(0)) = CLng(Value)
-            
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 4)
+            AsLong(Result(0)) = CLng(Value)
         Case vbBoolean
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 1)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 1)
+            
             If Value Then
-                Ret(0) = 1
+                Result(0) = 1
             End If
-            
         Case vbInteger
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 2)
-            AsWord(Ret(0)) = CInt(Value)
-            
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 2)
+            AsWord(Result(0)) = CInt(Value)
         Case vbByte
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 1)
-            Ret(0) = CByte(Value)
-            
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 1)
+            Result(0) = CByte(Value)
         Case vbDouble, vbDate
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 8)
-            AsDouble(Ret(0)) = CDbl(Value)
-            
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 8)
+            AsDouble(Result(0)) = CDbl(Value)
         Case vbCurrency
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 8)
-            AsCurr(Ret(0)) = CCur(Value)
-            
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 8)
+            AsCurr(Result(0)) = CCur(Value)
         Case vbSingle
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 4)
-            AsSingle(Ret(0)) = CSng(Value)
-            
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 4)
+            AsSingle(Result(0)) = CSng(Value)
         Case vbDecimal
-            Dim ptrDec As Long
-            Dim ptrRet As Long
+            Dim PtrSrc As Long
+            Dim PtrDst As Long
             
-            SAPtr(Ret) = SafeArrayCreateVectorEx(vbByte, 0, 16)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfDecimal)
+            PtrDst = VarPtr(Result(0))
+            PtrSrc = VarPtr(Value)
             
+            ' this would be an extremely rare occurrence since a decimal
+            ' datatype can only exist within a variant variable. The passed
+            ' in parameter would literally need to be a second variant
+            ' variable containing a reference to a decimal variant variable.
             If VariantType(Value) And VT_BYREF Then
-                ptrDec = MemLong(VarPtr(Value) + 8)
-            Else
-                ptrDec = VarPtr(Value)
+                ' if a value was passed by reference we need to
+                ' dereference the memory address stored in the
+                ' passed in variant value.
+                PtrSrc = MemLong(PtrSrc + VARIANTDATA_OFFSET)
             End If
-            ptrRet = VarPtr(Ret(0))
             
             ' VB Decimal layout
             ' bytes 0-1: Variant datatype information
@@ -165,15 +165,14 @@ Public Function GetBytes(ByRef Value As Variant) As Byte()
             ' bytes 8-11: the 32 highest bits in the 96bit value
             ' bytes 12-13: unused (zero)
             ' bytes 14-15: precision and sign bytes
-            MemCurr(ptrRet) = MemCurr(ptrDec + 8)       ' map VB lowest and middle bits to .NET lowest and middle bits
-            MemLong(ptrRet + 8) = MemLong(ptrDec + 4)   ' map VB highest bits to .NET highest bits
-            ' In .NET the precision and sign bytes are last.
-            ' we don't copy the type information from the variant.
-            MemWord(ptrRet + 14) = MemWord(ptrDec + 2)
+            AssignQWord ByVal PtrSrc + 8, ByVal PtrDst      ' map VB lowest and middle bits to .NET lowest and middle bits
+            AssignDWord ByVal PtrSrc + 4, ByVal PtrDst + 8  ' map VB highest bits to .NET highest bits
+            AssignWord ByVal PtrSrc + 2, ByVal PtrDst + 14  ' In .NET the precision and sign bytes are last. We don't copy the type information from the variant.
         Case Else
             Throw Cor.NewNotSupportedException("Only intrinsic value types are supported.")
     End Select
-    GetBytes = Ret
+    
+    GetBytes = Result
 End Function
 
 ''

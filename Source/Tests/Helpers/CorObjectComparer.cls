@@ -14,6 +14,6 @@ Attribute VB_Exposed = False
 Option Explicit
 Implements SimplyVBUnitType.IEqualityComparer
 
-Private Function IEqualityComparer_Equals(X As Variant, Y As Variant) As Boolean
-    IEqualityComparer_Equals = Object.Equals(X, Y)
+Private Function IEqualityComparer_Equals(x As Variant, y As Variant) As Boolean
+    IEqualityComparer_Equals = Object.Equals(x, y)
 End Function

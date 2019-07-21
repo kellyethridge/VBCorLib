@@ -113,22 +113,21 @@ End Property
 Public Function ToOADate() As Date
     Const DaysTo1899 As Long = 693593
     
-    If mMilliseconds = 0@ Then Exit Function
+    If mMilliseconds = 0@ Then
+        Exit Function
+    End If
     
     If mMilliseconds < MilliSecondsPerDay Then
         ToOADate = 1# * mMilliseconds / MilliSecondsPerDay
     Else
         Dim Days As Double
-        Days = Int(mMilliseconds / MilliSecondsPerDay)
+
+        Days = Int(mMilliseconds / MilliSecondsPerDay) - DaysTo1899
         
-        Dim Time As Double
-        Time = (mMilliseconds - (Days * MilliSecondsPerDay)) / MilliSecondsPerDay
-        
-        Days = Days - DaysTo1899
         If Days < 0# Then
-            ToOADate = Days - Time
+            ToOADate = Days - TimeSerial(Hour, Minute, Second)
         Else
-            ToOADate = Days + Time
+            ToOADate = Days + TimeSerial(Hour, Minute, Second)
         End If
     End If
 End Function

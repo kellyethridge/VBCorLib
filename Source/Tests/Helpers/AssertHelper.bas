@@ -10,16 +10,16 @@ Public Sub AssertKeySizes(ByVal Actual As KeySizes, ByVal ExpectedMin As Long, B
 End Sub
 
 Public Sub AssertPacificTimeZone()
-    Dim info As TIME_ZONE_INFORMATION
+    Dim Info As TIME_ZONE_INFORMATION
     Dim Result As Long
     
-    Result = GetTimeZoneInformation(info)
+    Result = GetTimeZoneInformation(Info)
     If Result = TIME_ZONE_ID_INVALID Then
         Assert.Fail "Could not discover time zone information"
     End If
     
     Dim StandardName As String
-    StandardName = SysAllocString(VarPtr(info.StandardName(0)))
+    StandardName = SysAllocString(VarPtr(Info.StandardName(0)))
     
     If StandardName <> "Pacific Standard Time" Then
         If SkipUnsupportedTimeZone Then
@@ -39,6 +39,7 @@ Public Function AssertArgumentException(ByVal Err As ErrObject, Optional ByRef P
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
     If Not TypeOf Ex Is ArgumentException Then
+'    If TypeName(Ex) <> "ArgumentException" Then
         WrongException "ArgumentException", Ex
     End If
     

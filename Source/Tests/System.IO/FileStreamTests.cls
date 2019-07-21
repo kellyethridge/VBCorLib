@@ -291,7 +291,7 @@ Public Sub Position_WhenSet_MovesToFilePosition(ByVal NewPosition As Long, ByVal
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub Position_ToBeforeStartOfStream_ThrowsArgumentException()
+Public Sub Position_ToBeforeStartOfStream_ThrowsArgumentOutOfRangeException()
     Dim FileName As String
     FileName = mBuilder.CreateFile(Data:="12345")
         
@@ -301,7 +301,7 @@ Public Sub Position_ToBeforeStartOfStream_ThrowsArgumentException()
     End With
     
     WriteLine Err.Description
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub Position_WhenSetBeforeStartOfAppendPoint_ThrowsIOException()
