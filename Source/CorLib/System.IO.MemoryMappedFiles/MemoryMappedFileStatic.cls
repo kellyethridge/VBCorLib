@@ -116,9 +116,9 @@ Public Function CreateFromFile(ByRef Path As String, Optional ByVal Mode As File
     If Access < MemoryMappedFileAccess.ReadWrite Or Access > MemoryMappedFileAccess.ReadWriteExecute Then _
         Error.ArgumentOutOfRange "Access"
     If Mode = FileMode.Append Then _
-        Error.Argument Argument_NewMMFAppendModeNotAllowed
+        Error.Argument Argument_NewMMFAppendModeNotAllowed, "Mode"
     If Access = MemoryMappedFileAccess.WriteOnly Then _
-        Error.Argument Argument_NewMMFWriteAccessNotAllowed
+        Error.Argument Argument_NewMMFWriteAccessNotAllowed, "Access"
     
     Existed = File.Exists(Path)
     Set Stream = Cor.NewFileStream(Path, Mode, GetFileAccess(Access), FileShare.None)

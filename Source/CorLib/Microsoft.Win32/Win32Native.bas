@@ -73,11 +73,6 @@ Public Const CSIDL_DRIVES                   As Long = &H11
 Public Const CSIDL_MYMUSIC                  As Long = &HD
 Public Const CSIDL_MYPICTURES               As Long = &H27
 
-Private Type FileNameBuffer
-    Buffer As String * 32000
-End Type
-
-Private FileName As FileNameBuffer
 
 Public Function MakeHRFromErrorCode(ByVal ErrorCode As Long)
     MakeHRFromErrorCode = &H80070000 Or ErrorCode

@@ -103,7 +103,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Int64s(0) = Cor.NewInt64(&H90123456, &H12345678)
             Int64s(1) = Cor.NewInt64(&H90123456, &H12345678)
             Test.Use Int64s, Cor.NewBytes(&H56, &H34, &H12, &H90, &H78, &H56, &H34, &H12, &H56, &H34, &H12, &H90, &H78, &H56, &H34, &H12)
-            
+        
     End Select
 End Sub
 
@@ -113,19 +113,6 @@ End Sub
 
 Public Sub Teardown()
     Set mIOHelper = Nothing
-End Sub
-
-Public Sub CanWrite_WithReadOnlyAccess_ReturnsFalse()
-    Dim MappedFile  As MemoryMappedFile
-    Dim Accessor    As MemoryMappedViewAccessor
-    Dim Actual      As Boolean
-    
-    Set MappedFile = MakeEmptyMappedFile
-    Set Accessor = MappedFile.CreateViewAccessor(Access:=MemoryMappedFileAccess.ReadOnly)
-    
-    Actual = Accessor.CanWrite
-    
-    Assert.That Actual, Iz.False
 End Sub
 
 Public Sub ReadByte_WithInvalidPosition_ThrowsArgumentOutOfRangeException(ByVal InvalidPosition As Long)
@@ -470,12 +457,12 @@ Public Sub WriteArray_WithArray_WritesExpected(ByRef Value As Variant, ByRef Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Private Function MakeEmptyMappedFile() As MemoryMappedFile
+Private Function MakeEmptyMappedFile(Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
     Dim Data(0 To 99) As Byte
     Set MakeEmptyMappedFile = MakeMappedFile(Data)
 End Function
 
-Private Function MakeMappedFileWithData() As MemoryMappedFile
+Private Function MakeMappedFileWithData(Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
     Dim Data(0 To 99) As Byte
     Dim i As Long
     
@@ -486,9 +473,9 @@ Private Function MakeMappedFileWithData() As MemoryMappedFile
     Set MakeMappedFileWithData = MakeMappedFile(Data)
 End Function
 
-Private Function MakeMappedFile(ByRef Data() As Byte) As MemoryMappedFile
+Private Function MakeMappedFile(ByRef Data() As Byte, Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
     mIOHelper.CreateBinaryFile "File.txt", Data
-    Set MakeMappedFile = MemoryMappedFile.CreateFromFile(mIOHelper.TempFileName)
+    Set MakeMappedFile = MemoryMappedFile.CreateFromFile(mIOHelper.TempFileName, Access:=Access)
 End Function
 
 Private Function ReadBytes(ByVal Offset As Long, ByVal Count As Long) As Byte()

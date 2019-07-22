@@ -520,6 +520,7 @@ library CorType {
         const long FILE_MAP_ALL_ACCESS        = 983071;   // SECTION_ALL_ACCESS
         const long FILE_MAP_COPY     		  = 0x1;
 		const long FILE_MAP_EXECUTE  		  = 0x32;
+		const long FILE_MAP_WRITE			  = 0x2;
         const long NULL_HANDLE                = 0;
 
         const long NO_ERROR                   = 0x0;

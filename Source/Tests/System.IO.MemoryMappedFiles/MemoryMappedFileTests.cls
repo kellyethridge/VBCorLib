@@ -29,6 +29,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "CreateFromFile_WithInvalidAccessValue_ThrowsArgumentOutOfRangeException"
             Test.Use -1
             Test.Use 6
+            
     End Select
 End Sub
 
@@ -69,7 +70,7 @@ Public Sub CreateFromFile_WithFileModeAppend_ThrowsArgumentException()
     
     MemoryMappedFile.CreateFromFile "c:\abc", FileMode.Append
     
-    AssertArgumentException Err
+    AssertArgumentException Err, "Mode"
 End Sub
 
 Public Sub CreateFromFile_WithMemoryMappedFileAccessWriteOnly_ThrowsArgumentException()
@@ -77,7 +78,7 @@ Public Sub CreateFromFile_WithMemoryMappedFileAccessWriteOnly_ThrowsArgumentExce
     
     MemoryMappedFile.CreateFromFile "c:\abc", Access:=WriteOnly
     
-    AssertArgumentException Err
+    AssertArgumentException Err, "Access"
 End Sub
 
 Public Sub CreateFromFile_WithDefaultCapacityAndZeroLengthFile_ThrowsArgumentException()
@@ -136,9 +137,10 @@ Public Sub CreateViewAccessor_WithNegativeSize_ThrowsArgumentOutOfRangeException
     AssertArgumentOutOfRangeException Err, "Size"
 End Sub
 
-Private Function MakeMemoryMappedFile() As MemoryMappedFile
+
+Private Function MakeMemoryMappedFile(Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
     mIO.CreateFile Data:=Space$(1000)
-    Set MakeMemoryMappedFile = MemoryMappedFile.CreateFromFile(mIO.TempFileName)
+    Set MakeMemoryMappedFile = MemoryMappedFile.CreateFromFile(mIO.TempFileName, Access:=Access)
 End Function
 
 

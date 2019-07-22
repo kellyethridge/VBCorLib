@@ -47,6 +47,7 @@ Private mViewAddress    As Long
 Private mStartIndex     As Long
 Private mViewData()     As Byte
 Private mViewDataSA     As SafeArray1d
+Private mCanRead        As Boolean
 Private mCanWrite       As Boolean
 Private mCapacity       As Long
 Private mOffset         As Currency
@@ -64,9 +65,8 @@ End Property
 ' Determines whether the accessor is readable.
 '
 ' @return <b>True</b> if the accessor is readable; otherwise, <b>False</b>.
-' @remarks This will always return <b>True</b> if the accessor is successfully created.
 Public Property Get CanRead() As Boolean
-    CanRead = True
+    CanRead = mCanRead
 End Property
 
 ''
@@ -104,6 +104,9 @@ End Property
 '   </tr>
 ' </table>
 Public Function ReadByte(ByVal Position As Long) As Byte
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+        
     Position = GetSafeIndex(Position, vbSizeOfByte)
     ReadByte = mViewData(Position)
 End Function
@@ -128,6 +131,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadBoolean(ByVal Position As Long) As Boolean
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     ReadBoolean = ReadByte(Position) <> 0
 End Function
 
@@ -152,6 +158,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadChar(ByVal Position As Long) As Integer
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     ReadChar = ReadInt16(Position)
 End Function
 
@@ -176,6 +185,9 @@ End Function
 ' </table>
 
 Public Function ReadInt16(ByVal Position As Long) As Integer
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     Position = GetSafeIndex(Position, vbSizeOfInteger)
     ReadInt16 = AsWord(mViewData(Position))
 End Function
@@ -200,6 +212,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadInt32(ByVal Position As Long) As Long
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     Position = GetSafeIndex(Position, vbSizeOfLong)
     ReadInt32 = AsLong(mViewData(Position))
 End Function
@@ -224,6 +239,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadInt64(ByVal Position As Long) As Int64
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     Position = GetSafeIndex(Position, vbSizeOfInt64)
     AssignQWord mViewData(Position), ReadInt64
 End Function
@@ -250,6 +268,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadCurrency(ByVal Position As Long) As Currency
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     Position = GetSafeIndex(Position, vbSizeOfCurrency)
     ReadCurrency = AsCurr(mViewData(Position))
 End Function
@@ -274,6 +295,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadDouble(ByVal Position As Long) As Double
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     Position = GetSafeIndex(Position, vbSizeOfDouble)
     ReadDouble = AsDouble(mViewData(Position))
 End Function
@@ -298,6 +322,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadSingle(ByVal Position As Long) As Single
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     Position = GetSafeIndex(Position, vbSizeOfSingle)
     ReadSingle = AsSingle(mViewData(Position))
 End Function
@@ -322,6 +349,9 @@ End Function
 '   </tr>
 ' </table>
 Public Function ReadDecimal(ByVal Position As Long) As Variant
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
+    
     Position = GetSafeIndex(Position, vbSizeOfDecimal)
     ReadDecimal = BitConverter.ToDecimal(mViewData, Position)
 End Function
@@ -355,6 +385,9 @@ Public Sub Read(ByVal Position As Long, ByRef Structure As Variant)
     Dim RecordPtr   As Long
     Dim Size        As Long
     Dim Ptr         As Long
+    
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
     
     Select Case VarType(Structure)
         Case vbBoolean
@@ -431,6 +464,9 @@ Public Function ReadArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Of
     Dim SizeOfType  As Long
     
     ValidateArrayRange Arr, Offset, Count, NameOfOffset
+    
+    If Not CanRead Then _
+        Error.NotSupported NotSupported_Reading
     
     Select Case VarType(Arr) And &HFF
         Case vbBoolean
@@ -555,7 +591,7 @@ Public Sub WriteValue(ByVal Position As Long, ByRef Value As Variant)
         Case vbDate
             ' .NET stores dates as 64-bit integers. we do the same thing here.
             Position = GetSafeIndex(Position, vbSizeOfCurrency)
-            AsCurr(mViewData(Position)) = CorDateTime.GetTotalMilliseconds(Value)
+            AsCurr(mViewData(Position)) = DateToMilliseconds(Value)
         Case vbSingle
             Position = GetSafeIndex(Position, vbSizeOfSingle)
             AsSingle(mViewData(Position)) = Value
@@ -836,16 +872,24 @@ Private Function GetDesiredAccess(ByVal Access As MemoryMappedFileAccess) As Lon
     Select Case Access
         Case MemoryMappedFileAccess.ReadWrite
             GetDesiredAccess = FILE_MAP_ALL_ACCESS
+            mCanRead = True
             mCanWrite = True
         Case MemoryMappedFileAccess.ReadOnly
             GetDesiredAccess = FILE_MAP_READ
+            mCanRead = True
         Case MemoryMappedFileAccess.CopyOnWrite
             GetDesiredAccess = FILE_MAP_COPY
+            mCanRead = True
             mCanWrite = True
         Case MemoryMappedFileAccess.ReadExecute
             GetDesiredAccess = FILE_MAP_READ Or FILE_MAP_EXECUTE
+            mCanRead = True
         Case MemoryMappedFileAccess.ReadWriteExecute
             GetDesiredAccess = FILE_MAP_ALL_ACCESS Or FILE_MAP_EXECUTE
+            mCanRead = True
+            mCanWrite = True
+        Case MemoryMappedFileAccess.WriteOnly
+            GetDesiredAccess = FILE_MAP_WRITE
             mCanWrite = True
         Case Else
             Error.ArgumentOutOfRange "Access"
