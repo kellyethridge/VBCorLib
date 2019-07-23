@@ -24,6 +24,14 @@ Attribute VB_Name = "Mathematics"
 '
 Option Explicit
 
+Public Powers(31)   As Long
+Public PowersOf2()  As Integer
+
+Public Sub InitMathematics()
+    InitPowers
+    InitPowersOf2
+End Sub
+
 Public Function ShiftRightInt32(ByVal Value As Long, ByVal ShiftCount As Long) As Long
     ' by Jost Schwider, jost@schwider.de, 20010928
     If ShiftCount = 0 Then
@@ -306,4 +314,29 @@ Public Function SwapEndian(ByVal Value As Long) As Long
                  ((Value And &H7F&) * &H1000000)
     If (Value And &H80&) Then SwapEndian = SwapEndian Or &H80000000
 End Function
+
+''
+' Initializes an array for quick powers of 2 lookup.
+'
+Private Sub InitPowers()
+    Dim i As Long
+    
+    For i = 0 To 30
+        Powers(i) = 2 ^ i
+    Next i
+    
+    Powers(31) = &H80000000
+End Sub
+
+Private Sub InitPowersOf2()
+    Dim i As Long
+    ReDim PowersOf2(0 To 15)
+    
+    For i = 0 To 14
+        PowersOf2(i) = 2 ^ i
+    Next i
+    
+    PowersOf2(15) = &H8000
+End Sub
+
 

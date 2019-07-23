@@ -166,7 +166,10 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
     ValueType = VarType(Value)
     
     If ValueType = vbVariant Then
-        ValueType = MemLong(MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)) And &HFF
+        ' when the datatype is a variant, it contains a reference to the
+        ' actual value, so we must dereference again to that value to
+        ' get the actual datatype.
+        ValueType = MemLong(DataPtr(Value)) And &HFF
     End If
     
     Select Case ValueType

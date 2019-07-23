@@ -39,15 +39,6 @@ Private mSortKeys       As SortItems
 Public SortComparer     As IComparer
 
 
-Public Function SAPtrV(ByRef Value As Variant) As Long
-    SAPtrV = MemLong(vbaRefVarAry(Value))
-End Function
-
-Public Function Len1D(ByRef Arr As Variant) As Long
-    Len1D = UBound(Arr) - LBound(Arr) + 1
-End Function
-
-
 Public Function ReverseByteCopy(ByRef Bytes() As Byte) As Byte()
     Dim ub As Long
     ub = UBound(Bytes)

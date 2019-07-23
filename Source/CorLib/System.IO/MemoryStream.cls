@@ -175,7 +175,7 @@ Catch:
         Set Result.Exception = Ex
     End If
     
-    mAsyncPtr = ObjPtr(Result)
+    mAsyncPtr = WeakPtr(Result)
     Set BeginRead = Result
 End Function
 
@@ -217,7 +217,7 @@ Catch:
         Set Result.Exception = Ex
     End If
     
-    mAsyncPtr = ObjPtr(Result)
+    mAsyncPtr = WeakPtr(Result)
     Set BeginWrite = Result
 End Function
 

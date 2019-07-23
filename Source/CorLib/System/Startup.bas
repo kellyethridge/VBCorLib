@@ -40,7 +40,7 @@ Private Sub Main()
     SetInDebugger
     InitMissing
     InitHelper
-    InitPublicFunctions
+    InitMathematics
     InitGlobalization
     InitEncoding
 End Sub

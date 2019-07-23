@@ -701,6 +701,16 @@ Public Sub AppendFormat_WithMultiplePlaceHolders_FormatsEach()
     Assert.That Actual, Iz.EqualTo("a b")
 End Sub
 
+Public Sub AppendFormat_WithObjectPlaceHolder_FormatsObject()
+    Dim sb As New StringBuilder
+    Dim Span As Variant
+    
+    Set Span = TimeSpan.Zero
+    sb.AppendFormat "{0}", Span
+    
+    Assert.That sb.ToString, Iz.EqualTo("00:00:00")
+End Sub
+
 Public Sub AppendFormat_WithRepeatedPlaceHolder_RepeatsFormat()
     Dim sb As New StringBuilder
     
