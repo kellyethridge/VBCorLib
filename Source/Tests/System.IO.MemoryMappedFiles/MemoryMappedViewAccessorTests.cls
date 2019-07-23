@@ -260,12 +260,28 @@ Public Sub ReadDecimal_WhenReadingFromPosition88_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(CDec("30757950549943697627242191192"))
 End Sub
 
-Public Sub ReadInt64_WhenReadingFromBeginning_Returns506097522914230528()
+Public Sub ReadInt64_WhenReadingFromBeginning_ReturnsExpected()
     Dim MappedFile  As MemoryMappedFile
     Dim Accessor    As MemoryMappedViewAccessor
     Dim Actual      As Int64
     
     Set MappedFile = MakeMappedFileWithData
+    Set Accessor = MappedFile.CreateViewAccessor
+    
+    Actual = Accessor.ReadInt64(0)
+
+    Assert.That Actual, Iz.EqualTo(NewInt64(&H3020100, &H7060504))
+End Sub
+
+Public Sub ReadInt64_WhenUsingSuppliedFileStream_ReadsExpected()
+    Dim FileStream  As FileStream
+    Dim MappedFile  As MemoryMappedFile
+    Dim Accessor    As MemoryMappedViewAccessor
+    Dim Actual      As Int64
+    
+    mIOHelper.CreateBinaryFile Data:=MakeData
+    Set FileStream = Cor.NewFileStream(mIOHelper.TempFileName, FileMode.OpenExisting)
+    Set MappedFile = MemoryMappedFile.CreateFromFileStream(FileStream, vbNullString, 0, MemoryMappedFileAccess.ReadWrite, True)
     Set Accessor = MappedFile.CreateViewAccessor
     
     Actual = Accessor.ReadInt64(0)
@@ -463,14 +479,7 @@ Private Function MakeEmptyMappedFile(Optional ByVal Access As MemoryMappedFileAc
 End Function
 
 Private Function MakeMappedFileWithData(Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
-    Dim Data(0 To 99) As Byte
-    Dim i As Long
-    
-    For i = LBound(Data) To UBound(Data)
-        Data(i) = i Mod 256
-    Next
-    
-    Set MakeMappedFileWithData = MakeMappedFile(Data)
+    Set MakeMappedFileWithData = MakeMappedFile(MakeData)
 End Function
 
 Private Function MakeMappedFile(ByRef Data() As Byte, Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
@@ -488,4 +497,14 @@ Private Function ReadBytes(ByVal Offset As Long, ByVal Count As Long) As Byte()
     End With
 End Function
 
+Private Function MakeData() As Byte()
+    Dim Data(0 To 99) As Byte
+    Dim i As Long
+    
+    For i = LBound(Data) To UBound(Data)
+        Data(i) = i Mod 256
+    Next
+
+    MakeData = Data
+End Function
 

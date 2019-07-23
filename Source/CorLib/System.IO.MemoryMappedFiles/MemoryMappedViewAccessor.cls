@@ -381,11 +381,6 @@ End Function
 '   </tr>
 ' </table>
 Public Sub Read(ByVal Position As Long, ByRef Structure As Variant)
-    Dim Record      As IRecordInfo
-    Dim RecordPtr   As Long
-    Dim Size        As Long
-    Dim Ptr         As Long
-    
     If Not CanRead Then _
         Error.NotSupported NotSupported_Reading
     
@@ -409,18 +404,19 @@ Public Sub Read(ByVal Position As Long, ByRef Structure As Variant)
         Case vbDecimal
             Structure = ReadDecimal(Position)
         Case vbUserDefinedType
-            RecordPtr = MemLong(VarPtr(Structure) + 12)
-            ObjectPtr(Record) = RecordPtr
-            
-            On Error GoTo Catch
-            ValidateStructure Record.GetTypeInfo
-            Size = Record.GetSize
-            Position = GetSafeIndex(Position, Size)
-            Ptr = MemLong(VarPtr(Structure) + VARIANTDATA_OFFSET)
-            CopyMemory ByVal Ptr, mViewData(Position), Size
+            ReadUdt Position, Structure
         Case Else
             Error.Argument Argument_InvalidStructure, "Structure"
     End Select
+End Sub
+
+Private Sub ReadUdt(ByVal Position As Long, ByRef Structure As Variant)
+    Dim Record  As IRecordInfo
+    
+    On Error GoTo Catch
+    ObjectPtr(Record) = RecordPtr(Structure)
+    ValidateStructure Record.GetTypeInfo
+    ReadData Position, DataPtr(Structure), Record.GetSize
     
     GoSub Finally
     Exit Sub
@@ -459,39 +455,29 @@ End Sub
 '   </tr>
 ' </table>
 Public Function ReadArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Offset As Long, ByVal Count As Long) As Long
-    Dim Ptr         As Long
-    Dim pvData      As Long
+    Dim DataType    As VbVarType
     Dim SizeOfType  As Long
     
     ValidateArrayRange Arr, Offset, Count, NameOfOffset
-    
+        
     If Not CanRead Then _
         Error.NotSupported NotSupported_Reading
     
-    Select Case VarType(Arr) And &HFF
+    DataType = CorVarType(Arr)
+    
+    Select Case DataType
+        Case vbByte, vbInteger, vbLong, vbCurrency, vbSingle, vbDouble
+            SizeOfType = SizeOf(DataType)
         Case vbBoolean
             ReadArray = ReadBooleanArray(Position, Arr, Offset, Count)
             Exit Function
-        Case vbByte
-            SizeOfType = vbSizeOfByte
-        Case vbInteger
-            SizeOfType = vbSizeOfInteger
-        Case vbLong
-            SizeOfType = vbSizeOfLong
-        Case vbCurrency
-            SizeOfType = vbSizeOfCurrency
         Case vbDate
             ReadArray = ReadDateArray(Position, Arr, Offset, Count)
             Exit Function
-        Case vbSingle
-            SizeOfType = vbSizeOfSingle
-        Case vbDouble
-            SizeOfType = vbSizeOfDouble
         Case vbUserDefinedType
             Dim Record As IRecordInfo
             
-            Ptr = SAPtrV(Arr)
-            Set Record = SafeArrayGetRecordInfo(Ptr)
+            Set Record = SafeArrayGetRecordInfo(SAPtrV(Arr))
             ValidateStructure Record.GetTypeInfo
             SizeOfType = Record.GetSize
         Case Else
@@ -499,12 +485,14 @@ Public Function ReadArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Of
     End Select
     
     Count = CorMath.Min(Count, (mCapacity - Position) \ SizeOfType)
-    Position = GetSafeIndex(Position, Count * SizeOfType)
-    Ptr = SAPtrV(Arr)
-    pvData = MemLong(Ptr + PVDATA_OFFSET) + Offset * SizeOfType
-    CopyMemory ByVal pvData, mViewData(Position), Count * SizeOfType
+    ReadData Position, ElementPtr(Arr, Offset, SizeOfType), Count * SizeOfType
     ReadArray = Count
 End Function
+
+Private Sub ReadData(ByVal Position As Long, ByVal DataPtr As Long, ByVal Count As Long)
+    Position = GetSafeIndex(Position, Count)
+    CopyMemory ByVal DataPtr, mViewData(Position), Count
+End Sub
 
 ' VB Boolean is two bytes, however to match how .NET deals with
 ' reading booleans through the accessor, we only use one
@@ -610,24 +598,20 @@ End Sub
 Private Sub WriteDecimal(ByVal Position As Long, ByRef Value As Variant)
     Dim Data() As Byte
     
-    Position = GetSafeIndex(Position, vbSizeOfDecimal)
     Data = BitConverter.GetBytes(Value)
-    CopyMemory mViewData(Position), Data(0), vbSizeOfDecimal
+    WriteData Position, VarPtr(Data(0)), vbSizeOfDecimal
 End Sub
 
 Private Sub WriteUdt(ByVal Position As Long, ByRef Value As Variant)
     Dim Record  As IRecordInfo
     Dim Size    As Long
-    Dim Ptr     As Long
-    
-    ObjectPtr(Record) = MemLong(VarPtr(Value) + VARIANTRECORD_OFFSET)
-    
+        
     On Error GoTo Catch
+    ObjectPtr(Record) = RecordPtr(Value)
     ValidateStructure Record.GetTypeInfo
-    Size = Record.GetSize
-    Position = GetSafeIndex(Position, Size)
-    Ptr = MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)
-    CopyMemory mViewData(Position), ByVal Ptr, Size
+    WriteData Position, DataPtr(Value), Record.GetSize
+    
+    GoSub Finally
     Exit Sub
     
 Catch:
@@ -670,8 +654,6 @@ End Sub
 '    </tr>
 ' </table>
 Public Sub WriteArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Offset As Long, ByVal Count As Long)
-    Dim Ptr         As Long
-    Dim pvData      As Long
     Dim SizeOfType  As Long
     Dim DataType    As VbVarType
     
@@ -682,9 +664,11 @@ Public Sub WriteArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Offset
     If Position < 0 Then _
         Error.ArgumentOutOfRange "Position", ArgumentOutOfRange_NeedNonNegNum
     
-    DataType = VarType(Arr) And &HFF
+    DataType = CorVarType(Arr)
     
     Select Case DataType
+        Case vbByte, vbInteger, vbLong, vbCurrency, vbSingle, vbDouble
+            SizeOfType = SizeOf(DataType)
         Case vbBoolean
             WriteBooleanArray Position, Arr, Offset, Count
             Exit Sub
@@ -694,23 +678,22 @@ Public Sub WriteArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Offset
         Case vbVariant
             WriteVariantArray Position, Arr, Offset, Count
             Exit Sub
-        Case vbByte, vbInteger, vbLong, vbCurrency, vbSingle, vbDouble
-            SizeOfType = SizeOf(DataType)
         Case vbUserDefinedType
             Dim Record As IRecordInfo
             
-            Ptr = SAPtrV(Arr)
-            Set Record = SafeArrayGetRecordInfo(Ptr)
+            Set Record = SafeArrayGetRecordInfo(SAPtrV(Arr))
             ValidateStructure Record.GetTypeInfo
             SizeOfType = Record.GetSize
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_TypeNotSupported, TypeName(Arr)), "Arr")
     End Select
     
-    Position = GetSafeIndex(Position, Count * SizeOfType)
-    Ptr = SAPtrV(Arr)
-    pvData = MemLong(Ptr + PVDATA_OFFSET) + Offset * SizeOfType
-    CopyMemory mViewData(Position), ByVal pvData, Count * SizeOfType
+    WriteData Position, ElementPtr(Arr, Offset, SizeOfType), Count * SizeOfType
+End Sub
+
+Private Sub WriteData(ByVal Position As Long, ByVal DataPtr As Long, ByVal Count As Long)
+    Position = GetSafeIndex(Position, Count)
+    CopyMemory mViewData(Position), ByVal DataPtr, Count
 End Sub
 
 Private Sub WriteBooleanArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Offset As Long, ByVal Count As Long)
@@ -724,12 +707,14 @@ Private Sub WriteBooleanArray(ByVal Position As Long, ByRef Arr As Variant, ByVa
     Next
 End Sub
 
+' .NET represents dates as a 64-bit integer (ticks). So when we write dates to the view, we will
+' also write a 64-bit integer for compatability. We use Currency as the 64-bit number for dates,
+' though we call it milliseconds and have fractions of a millisecond. It's still binarily
+' consistent with .NET's representation.
 Private Sub WriteDateArray(ByVal Position As Long, ByRef Arr As Variant, ByVal Offset As Long, ByVal Count As Long)
-    Dim pvData  As Long
-    Dim i       As Long
+    Dim i As Long
     
     Position = GetSafeIndex(Position, Count * vbSizeOfDate)
-    pvData = MemLong(SAPtrV(Arr) + PVDATA_OFFSET) + Offset * vbSizeOfDate
     
     For i = 0 To Count - 1
         AsCurr(mViewData(Position + i * vbSizeOfDate)) = CorDateTime.GetTotalMilliseconds(Arr(Offset + i))
@@ -762,7 +747,6 @@ End Sub
 ' @param Value The value to compare to the current object.
 ' @return <b>True</b> if the specified value is equal to the current object; otherwise, <b>False</b>.
 ' @see IObject
-'
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
 End Function
@@ -772,7 +756,6 @@ End Function
 '
 ' @return A hash code for the current object.
 ' @see IObject
-'
 Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
 End Function
@@ -782,7 +765,6 @@ End Function
 '
 ' @return A string the represents the current object.
 ' @see IObject
-'
 Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
 End Function
@@ -815,7 +797,7 @@ Friend Sub Init(ByVal MappingHandle As SafeFileHandle, ByVal Offset As Currency,
     End If
     
     With CInt64(PageAlignedOffset)
-        mViewAddress = MapViewOfFile(mMappingHandle.DangerousGetHandle, GetDesiredAccess(Access), .HighInt32, .LowInt32, Size)
+        mViewAddress = MapViewOfFile(mMappingHandle.DangerousGetHandle, GetDesiredAccess(Access), .HighPart, .LowPart, Size)
     End With
     
     If mViewAddress = vbNullPtr Then _

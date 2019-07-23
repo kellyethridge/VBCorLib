@@ -43,7 +43,7 @@ End Function
 Public Function CInt64(ByRef Value As Variant) As Int64
     Select Case VarType(Value)
         Case vbCurrency
-            AssignQWord 0.0001@ * CCur(Int(Value)), CInt64
+            AsCurr(CInt64) = 0.0001@ * CCur(Int(Value))
         Case Else
             Throw New InvalidCastException
     End Select

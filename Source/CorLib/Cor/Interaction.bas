@@ -48,37 +48,3 @@ Public Function IIfLong(ByVal Expression As Boolean, ByVal TruePart As Long, ByV
     End If
 End Function
 
-Public Function IsPicture(ByRef Value As Variant) As Boolean
-    Dim Pic As IPicture
-    
-    On Error GoTo Catch
-    Set Pic = Value
-    IsPicture = Not Pic Is Nothing
-    
-Catch:
-End Function
-
-Public Function IsPictureResourceGroup(ByRef Value As Variant) As Boolean
-    Dim Group As PictureResourceGroup
-    
-    On Error GoTo Catch
-    Set Group = Value
-    IsPictureResourceGroup = Not Group Is Nothing
-    
-Catch:
-End Function
-
-Public Function IsInteger(ByRef Value As Variant) As Boolean
-    ' we use VBVM6.VariantType because VarType will cause objects
-    ' that have a default property to return the default value.
-    ' If the default property happens to return a numeric value
-    ' it will give a false positive here.
-    Select Case CorVarType(Value)
-        Case vbLong, vbInteger, vbByte
-            IsInteger = True
-    End Select
-End Function
-
-Public Function CorVarType(ByRef Value As Variant) As VbVarType
-    CorVarType = VariantType(Value) And &HFF ' we mask because VariantType will include BY_REF (&h4000) flag if it exists.
-End Function

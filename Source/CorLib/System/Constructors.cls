@@ -1918,10 +1918,10 @@ End Function
 ''
 ' Returns a new instance of <a href="Int64Type.Int64.html">Int64</a>.
 '
-' @param Low The least significant 32-bits of the integer value.
-' @param High The most significant 32-bits of the integer value.
-' @return An <a href="Int64Type.Int64.html">Int64</a> integer value.
-Public Function NewInt64(ByVal Low As Long, ByVal High As Long) As Int64
-    NewInt64.HighInt32 = High
-    NewInt64.LowInt32 = Low
+' @param LowPart The least significant 32-bits of the integer value.
+' @param HighPart The most significant 32-bits of the integer value.
+' @return An <a href="Int64Static.Int64.html">Int64</a> integer value.
+Public Function NewInt64(ByVal LowPart As Long, ByVal HighPart As Long) As Int64
+    NewInt64.HighPart = HighPart
+    NewInt64.LowPart = LowPart
 End Function

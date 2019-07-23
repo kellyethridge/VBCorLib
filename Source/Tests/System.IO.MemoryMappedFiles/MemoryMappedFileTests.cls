@@ -30,6 +30,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1
             Test.Use 6
             
+        Case "CreateFromFileStream_WithOutOfRangeAccessValue_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use 6
+        
+        Case "CreateFromFileStream_WithOutOfRangeHandleInheritability_ThrowsArgumentOutOfRangeException"
+            Test.Use -1
+            Test.Use 2
+                        
     End Select
 End Sub
 
@@ -137,10 +145,127 @@ Public Sub CreateViewAccessor_WithNegativeSize_ThrowsArgumentOutOfRangeException
     AssertArgumentOutOfRangeException Err, "Size"
 End Sub
 
+Public Sub CreateViewAccessor_WhenCalled_ReturnsAccessor()
+    Dim File As MemoryMappedFile
+    Dim Accessor As MemoryMappedViewAccessor
+    
+    Set File = MakeMemoryMappedFile
+    Set Accessor = File.CreateViewAccessor
+    
+    Assert.That Accessor, Iz.Not.Nothing
+End Sub
+
+Public Sub CreateFromFileStream_WithNothing_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    MemoryMappedFile.CreateFromFileStream Nothing, vbNullString, 0, MemoryMappedFileAccess.ReadWrite, True
+    
+    AssertArgumentNullException Err, "FileStream"
+End Sub
+
+Public Sub CreateFromFileStream_WithEmptyMapName_ThrowsArgumentException()
+    On Error Resume Next
+
+    MemoryMappedFile.CreateFromFileStream MakeFileStream, "", 0, MemoryMappedFileAccess.ReadWrite, True
+
+    AssertArgumentException Err
+End Sub
+
+Public Sub CreateFromFileStream_WithNegativeCapacity_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    MemoryMappedFile.CreateFromFileStream MakeFileStream, vbNullString, -1, MemoryMappedFileAccess.ReadWrite, True
+    
+    AssertArgumentOutOfRangeException Err, "Capacity"
+End Sub
+
+Public Sub CreateFromFileStream_WithOutOfRangeAccessValue_ThrowsArgumentOutOfRangeException(ByVal InvalidValue As MemoryMappedFileAccess)
+    On Error Resume Next
+    
+    MemoryMappedFile.CreateFromFileStream MakeFileStream, vbNullString, 0, InvalidValue, True
+    
+    AssertArgumentOutOfRangeException Err, "Access"
+End Sub
+
+Public Sub CreateFromFileStream_WithDefaultCapacityAndZeroLengthFile_ThrowsArgumentException()
+    Dim Stream As FileStream
+    mIO.CreateFile
+    Set Stream = Cor.NewFileStream(mIO.TempFileName, OpenExisting)
+    On Error Resume Next
+    
+    MemoryMappedFile.CreateFromFileStream Stream, vbNullString, 0, MemoryMappedFileAccess.ReadWrite, True
+        
+    AssertArgumentException Err
+End Sub
+
+Public Sub CreateFromFileStream_WithWriteOnlyAccess_ThrowsArgumentException()
+    On Error Resume Next
+    
+    MemoryMappedFile.CreateFromFileStream MakeFileStream, vbNullString, 0, MemoryMappedFileAccess.WriteOnly, True
+    
+    AssertArgumentException Err, "Access"
+End Sub
+
+Public Sub CreateFromFileStream_WithReadOnlyAccessAndCapacityGreaterThanStreamLength_ThrowsArgumentException()
+    Dim Stream As FileStream
+    Set Stream = MakeFileStream
+    On Error Resume Next
+    
+    MemoryMappedFile.CreateFromFileStream Stream, vbNullString, Stream.Length + 1, MemoryMappedFileAccess.ReadOnly, True
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub CreateFromFileStream_WithCapacityLessThanStreamLength_ThrowsArgumentException()
+    Dim Stream As FileStream
+    Set Stream = MakeFileStream
+    On Error Resume Next
+    
+    MemoryMappedFile.CreateFromFileStream Stream, vbNullString, Stream.Length - 1, MemoryMappedFileAccess.ReadWrite, True
+    
+    AssertArgumentOutOfRangeException Err, "Capacity"
+End Sub
+
+Public Sub CreateViewAccessor_WhenUsingSuppliedFileStream_ReturnsAccessor()
+    Dim File As MemoryMappedFile
+    Dim Stream As FileStream
+    Dim Accessor As MemoryMappedViewAccessor
+    
+    Set Stream = MakeFileStream
+    Set File = MemoryMappedFile.CreateFromFileStream(Stream, vbNullString, 0, MemoryMappedFileAccess.ReadWrite, True)
+    
+    Set Accessor = File.CreateViewAccessor
+    
+    Assert.That Accessor, Iz.Not.Nothing
+End Sub
+
+Public Sub CreateViewAccessor_WithOffset_ReturnsAccessorUsingOffset()
+    Dim File As MemoryMappedFile
+    Dim Accessor As MemoryMappedViewAccessor
+    
+    Set File = MakeMemoryMappedFile
+    Set Accessor = File.CreateViewAccessor(10)
+    
+    Assert.That Accessor.ReadInt64(0), Iz.EqualTo(NewInt64(&HD0C0B0A, &H11100F0E))
+End Sub
 
 Private Function MakeMemoryMappedFile(Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
-    mIO.CreateFile Data:=Space$(1000)
+    mIO.CreateBinaryFile Data:=MakeData
     Set MakeMemoryMappedFile = MemoryMappedFile.CreateFromFile(mIO.TempFileName, Access:=Access)
 End Function
 
+Private Function MakeFileStream() As FileStream
+    mIO.CreateBinaryFile Data:=MakeData
+    Set MakeFileStream = Cor.NewFileStream(mIO.TempFileName, OpenExisting)
+End Function
 
+Private Function MakeData() As Byte()
+    Dim Data(0 To 99) As Byte
+    Dim i As Long
+    
+    For i = LBound(Data) To UBound(Data)
+        Data(i) = i Mod 256
+    Next
+
+    MakeData = Data
+End Function

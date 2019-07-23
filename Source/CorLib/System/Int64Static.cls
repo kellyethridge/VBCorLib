@@ -43,11 +43,11 @@ Option Explicit
 ''
 ' Represents a 64-bit signed integer.
 '
-' @param Low The least significant 32-bits of the integer value.
-' @param High The most significant 32-bits of the integer value.
+' @param LowPart The least significant 32-bits of the integer value.
+' @param HighPart The most significant 32-bits of the integer value.
 Public Type Int64
-    LowInt32    As Long ' the ordering is important to remain consistant with memory layout of a 64-bit integer.
-    HighInt32   As Long
+    LowPart     As Long ' the ordering is important to remain consistant with memory layout of a 64-bit integer.
+    HighPart    As Long
 End Type
 
 
@@ -58,6 +58,6 @@ End Type
 ' @param Int64B The second value to compare.
 ' @return <b>True</b> if the values are equal; otherwise, <b>False</b>.
 Public Function Equals(ByRef Int64A As Int64, ByRef Int64B As Int64) As Boolean
-    Equals = (Int64A.HighInt32 = Int64B.HighInt32) And (Int64A.LowInt32 = Int64B.LowInt32)
+    Equals = (Int64A.HighPart = Int64B.HighPart) And (Int64A.LowPart = Int64B.LowPart)
 End Function
 

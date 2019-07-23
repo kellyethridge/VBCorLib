@@ -58,6 +58,7 @@ Public Enum MemoryMappedFileAccess
     ReadWriteExecute
 End Enum
 
+
 ''
 ' Creates a memory-mapped file that has the specified access mode, name, capacity, and access type from a file on disk.
 '
@@ -120,6 +121,7 @@ Public Function CreateFromFile(ByRef Path As String, Optional ByVal Mode As File
     If Access = MemoryMappedFileAccess.WriteOnly Then _
         Error.Argument Argument_NewMMFWriteAccessNotAllowed, "Access"
     
+    Capacity = Int(Capacity)
     Existed = File.Exists(Path)
     Set Stream = Cor.NewFileStream(Path, Mode, GetFileAccess(Access), FileShare.None)
     
@@ -130,7 +132,7 @@ Public Function CreateFromFile(ByRef Path As String, Optional ByVal Mode As File
     
     If Capacity = 0 Then
         Capacity = Stream.Length
-    ElseIf Stream.Length > Capacity Then
+    ElseIf Capacity < Stream.Length Then
         CleanupFile Stream, Existed, Path
         Error.ArgumentOutOfRange "Capacity", ArgumentOutOfRange_CapacityGEFileSizeRequired
     ElseIf Capacity > Stream.Length And Access = MemoryMappedFileAccess.ReadOnly Then
@@ -139,7 +141,7 @@ Public Function CreateFromFile(ByRef Path As String, Optional ByVal Mode As File
     End If
 
     On Error GoTo Catch
-    Set Handle = CreateCore(Stream.SafeFileHandle, MapName, Access, Capacity)
+    Set Handle = CreateCore(Stream.SafeFileHandle, MapName, Capacity, Access)
     Set CreateFromFile = Cor.NewMemoryMappedFile(Handle, Stream, False)
     Exit Function
 
@@ -148,14 +150,47 @@ Catch:
     ThrowOrErr Err
 End Function
 
-Private Function CreateCore(ByVal FileHandle As SafeFileHandle, ByRef MapName As String, ByVal Access As MemoryMappedFileAccess, ByVal Capacity As Currency) As SafeFileHandle
-    Dim Handle          As SafeFileHandle
-    Dim CapacityHiLow   As DLong
-    Dim ErrCode         As Long
+Public Function CreateFromFileStream(ByVal FileStream As FileStream, ByRef MapName As String, ByVal Capacity As Currency, ByVal Access As MemoryMappedFileAccess, ByVal LeaveOpen As Boolean) As MemoryMappedFile
+    Dim Handle As SafeFileHandle
     
-    Capacity = Capacity / 10000@ ' move all bits to start at zero bit.
-    CapacityHiLow = AsDLong(Capacity)
-    Set Handle = SafeCreateFileMapping(FileHandle.DangerousGetHandle, GetPageAccess(Access), CapacityHiLow.HiDWord, CapacityHiLow.LoDWord, MapName)
+    If FileStream Is Nothing Then _
+        Error.ArgumentNull "FileStream"
+    If Not CorString.IsNull(MapName) And Len(MapName) = 0 Then _
+        Error.Argument Argument_MapNameEmptyString
+    If Capacity < 0 Then _
+        Error.ArgumentOutOfRange "Capacity", ArgumentOutOfRange_PositiveOrDefaultCapacityRequired
+    If Access < MemoryMappedFileAccess.ReadWrite Or Access > MemoryMappedFileAccess.ReadWriteExecute Then _
+        Error.ArgumentOutOfRange "Access"
+    
+    Capacity = Int(Capacity)
+    
+    If Capacity = 0 And FileStream.Length = 0 Then _
+        Error.Argument Argument_EmptyFile
+    If Access = MemoryMappedFileAccess.WriteOnly Then _
+        Error.Argument Argument_NewMMFWriteAccessNotAllowed, "Access"
+    
+    FileStream.Flush
+    
+    If Capacity = 0 Then
+        Capacity = FileStream.Length
+    End If
+    
+    If Capacity < FileStream.Length Then _
+        Error.ArgumentOutOfRange "Capacity", ArgumentOutOfRange_CapacityGEFileSizeRequired
+    If Capacity > FileStream.Length And Access = MemoryMappedFileAccess.ReadOnly Then _
+        Error.Argument Argument_ReadAccessWithLargeCapacity
+    
+    Set Handle = CreateCore(FileStream.SafeFileHandle, MapName, Capacity, Access)
+    Set CreateFromFileStream = Cor.NewMemoryMappedFile(Handle, FileStream, LeaveOpen)
+End Function
+
+Private Function CreateCore(ByVal FileHandle As SafeFileHandle, ByRef MapName As String, ByVal Capacity As Currency, ByVal Access As MemoryMappedFileAccess) As SafeFileHandle
+    Dim Handle      As SafeFileHandle
+    Dim Capacity64  As Int64
+    Dim ErrCode     As Long
+    
+    Capacity64 = CInt64(Capacity)
+    Set Handle = SafeCreateFileMapping(FileHandle.DangerousGetHandle, GetPageAccess(Access), Capacity64.HighPart, Capacity64.LowPart, MapName)
     ErrCode = Err.LastDllError
     
     If Not Handle.IsInvalid And ErrCode = ERROR_ALREADY_EXISTS Then
