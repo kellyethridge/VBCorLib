@@ -50,16 +50,66 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private mHandle     As SafeFileHandle
+Private mHandle     As SafeMemoryMappedFileHandle
 Private mStream     As FileStream
 Private mLeaveOpen  As Boolean
+
+''
+' Specifies access capabilities and restrictions for a memory-mapped file or view.
+'
+' @param CopyOnWrite Read and write access to the file, with the restriction that any write operations will not be seen by other processes.
+' @param ReadOnly Read-only access to the file.
+' @param ReadExecute Read access to the file that can store and run executable code.
+' @param ReadWrite Read and write access to the file.
+' @param ReadWriteExecute Read and write access to the file that can store and run executable code.
+' @param WriteOnly Write-only access to file.
+Public Enum MemoryMappedFileAccess
+    ReadWrite = 0
+    ReadOnly
+    WriteOnly   ' WriteOnly is valid only when creating views and not when creating MemoryMappedFiles
+    CopyOnWrite
+    ReadExecute
+    ReadWriteExecute
+End Enum
+
+''
+' Specifies access rights to a memory-mapped file that is not associated with a file on disk.
+'
+' @param CopyOnWrite The right to read and write to a file with the restriction that write operations will not be seen by other processes.
+' @param [Write] The right to add data to a file or remove data from a file.
+' @param Read The right to open and copy a file as read-only.
+' @param Execute The right to run an application file.
+' @param Delete The right to delete a file.
+' @param ReadPermissions The right to open and copy access and audit rules from a file. This does not include the right to read data, file system attributes, or extended file system attributes.
+' @param ChangePermissions The right to change the security and audit rules associated with a file.
+' @param TakeOwnership The right to change the owner of a file.
+' @param ReadWrite The right to open and copy a file, and the right to add data to a file or remove data from a file.
+' @param ReadExecute The right to open and copy a folder or file as read-only, and to run application files. This right includes the <b>Read</b> right and the <b>Execute</b> right.
+' @param ReadWriteExecute The right to open and copy a file, the right to add data to a file or remove data from a file, and the right to run an application file.
+' @param FullControl The right to exert full control over a file, and to modify access control and audit rules. This value represents the right to do anything with a file and is the combination of all rights in this enumeration.
+' @param AccessSystemSecurity The right to get or set permissions on a file.
+Public Enum MemoryMappedFileRights
+    CopyOnWrite = &H1
+    [Write] = &H2
+    Read = &H4
+    Execute = &H8
+    Delete = &H10000
+    ReadPermissions = &H20000
+    ChangePermissions = &H40000
+    TakeOwnership = &H80000
+    ReadWrite = MemoryMappedFileRights.Read Or MemoryMappedFileRights.Write
+    ReadExecute = MemoryMappedFileRights.Read Or MemoryMappedFileRights.Execute
+    ReadWriteExecute = MemoryMappedFileRights.Read Or MemoryMappedFileRights.Write Or MemoryMappedFileRights.Execute
+    FullControl = MemoryMappedFileRights.CopyOnWrite Or MemoryMappedFileRights.Read Or MemoryMappedFileRights.Write Or MemoryMappedFileRights.Execute Or MemoryMappedFileRights.Delete Or MemoryMappedFileRights.ReadPermissions Or MemoryMappedFileRights.ChangePermissions Or MemoryMappedFileRights.TakeOwnership
+    AccessSystemSecurity = &H1000000
+End Enum
 
 
 ''
 ' Gets the file handle of a memory-mapped file.
 '
 ' @return The handle to the memory-mapped file.
-Public Property Get SafeMemoryMappedFileHandle() As SafeFileHandle
+Public Property Get SafeMemoryMappedFileHandle() As SafeMemoryMappedFileHandle
     Set SafeMemoryMappedFileHandle = mHandle
 End Property
 
@@ -96,6 +146,44 @@ Public Function CreateViewAccessor(Optional ByVal Offset As Currency, Optional B
 End Function
 
 ''
+' Creates a stream that maps to a view of the memory-mapped file, and that has the specified offset, size, and access type.
+'
+' @param Offset The byte at which to start the view.
+' @param Size The size of the view. Specify 0 (zero) to create a view that starts at offset and ends approximately at the end of the memory-mapped file.
+' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file. The default is <a href="MemoryMappedFile.MemoryMappedFileAccess.html">ReadWrite</a>.
+' @return A stream of memory that has the specified characteristics.
+' @remarks <p>You can use the stream returned by this method for sequential access to a memory-mapped file, such as for inter-process communications.</p>
+' <p>To create a complete view of the memory-mapped file, specify 0 (zero) for the <i>Size</i> parameter. If you do this, the size of the view might be smaller or larger than the size of the source file on disk. This is because views are provided in units of system pages, and the size of the view is rounded up to the next system page size.</p>
+' <h4>Exceptions</h4>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'       <td>
+'           <i>Offset</i> or <i>Size</i> is a negative value.<br/>
+'           -or-<br/>
+'           <i>Access</i> is not a valid <a href="MemoryMappedFile.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> enumeration value.
+'       </td>
+'       <td><a href="UnauthorizedAccessException.html">UnauthorizedAccessException</a></td><td><i>Access</i> is invalid for the memory-mapped file.</td>
+'   </tr>
+' </table>
+Public Function CreateViewStream(Optional ByVal Offset As Currency, Optional ByVal Size As Long, Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedViewStream
+    If Offset < 0 Then _
+        Error.ArgumentOutOfRange "Offset", ArgumentOutOfRange_NeedNonNegNum
+    If Size < 0 Then _
+        Error.ArgumentOutOfRange "Size", ArgumentOutOfRange_PositiveOrDefaultSizeRequired
+    If Access < MemoryMappedFileAccess.ReadWrite Or Access > MemoryMappedFileAccess.ReadWriteExecute Then _
+        Error.ArgumentOutOfRange "Access"
+    
+    Set CreateViewStream = New MemoryMappedViewStream
+    CreateViewStream.Init mHandle, Offset, Size, Access
+End Function
+
+''
 ' Returns a string representation of this object instance.
 '
 ' @return String representing this instance.
@@ -128,7 +216,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal Handle As SafeFileHandle, ByVal Stream As FileStream, ByVal LeaveOpen As Boolean)
+Friend Sub Init(ByVal Handle As SafeMemoryMappedFileHandle, ByVal Stream As FileStream, ByVal LeaveOpen As Boolean)
     Set mHandle = Handle
     Set mStream = Stream
     mLeaveOpen = LeaveOpen
@@ -136,7 +224,9 @@ End Sub
 
 Private Sub Class_Terminate()
     If Not mLeaveOpen Then
-        mStream.CloseStream
+        If Not mStream Is Nothing Then
+            mStream.CloseStream
+        End If
     End If
 End Sub
 

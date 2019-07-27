@@ -296,6 +296,7 @@ Private Sub AddSystemIOMemoryMappedFiles()
     With Sim.NewTestSuite("System.IO.MemoryMappedFiles")
         .Add New MemoryMappedFileTests
         .Add New MemoryMappedViewAccessorTests
+        .Add New MemoryMappedViewStreamTests
         
         AddTest .This
     End With

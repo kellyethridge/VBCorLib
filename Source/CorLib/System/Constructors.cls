@@ -486,7 +486,7 @@ Public Function NewFileNotFoundException(Optional ByRef FileName As String, Opti
     NewFileNotFoundException.Init FileName, Message, InnerException
 End Function
 
-Friend Function NewMemoryMappedFile(ByVal Handle As SafeFileHandle, ByVal Stream As FileStream, ByVal LeaveOpen As Boolean) As MemoryMappedFile
+Friend Function NewMemoryMappedFile(ByVal Handle As SafeMemoryMappedFileHandle, Optional ByVal Stream As FileStream, Optional ByVal LeaveOpen As Boolean) As MemoryMappedFile
     Set NewMemoryMappedFile = New MemoryMappedFile
     NewMemoryMappedFile.Init Handle, Stream, LeaveOpen
 End Function
@@ -1807,7 +1807,7 @@ End Function
 
 Friend Function NewSafeFindHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFindHandle
     Set NewSafeFindHandle = New SafeFindHandle
-    NewSafeFindHandle.Constructor PreexistingHandle, OwnsHandle
+    NewSafeFindHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
 Public Function NewSafeFileHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFileHandle
@@ -1924,4 +1924,9 @@ End Function
 Public Function NewInt64(ByVal LowPart As Long, ByVal HighPart As Long) As Int64
     NewInt64.HighPart = HighPart
     NewInt64.LowPart = LowPart
+End Function
+
+Friend Function NewSafeMemoryMappedFileHandle(ByVal Handle As Long) As SafeMemoryMappedFileHandle
+    Set NewSafeMemoryMappedFileHandle = New SafeMemoryMappedFileHandle
+    NewSafeMemoryMappedFileHandle.Init Handle
 End Function

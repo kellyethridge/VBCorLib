@@ -592,6 +592,28 @@ Public Sub SetLength_WithTrucateThenExpand_OverwritesContentsWithZeros()
     Assert.That ms.ToArray, Iz.EqualTo(NewBytes(1, 2, 0, 0, 0))
 End Sub
 
+Public Sub Position_WhenSetWithClosedStream_ThrowsObjectDisposedException()
+    Dim ms As New MemoryStream
+        
+    ms.CloseStream
+    
+    On Error Resume Next
+    ms.Position = 1
+    
+    AssertObjectDisposedException Err
+End Sub
+
+Public Sub Position_WhenReadWithClosedStream_ThrowsObjectDisposedException()
+    Dim ms As New MemoryStream
+    Dim p As Long
+    
+    ms.CloseStream
+    
+    On Error Resume Next
+    p = ms.Position
+    
+    AssertObjectDisposedException Err
+End Sub
 
 
 Private Function MakeMemoryStream() As MemoryStream

@@ -40,31 +40,13 @@ Attribute VB_Exposed = True
 ' @see MemoryMappedFile
 Option Explicit
 
-''
-' Specifies access capabilities and restrictions for a memory-mapped file or view.
-'
-' @param CopyOnWrite Read and write access to the file, with the restriction that any write operations will not be seen by other processes.
-' @param ReadOnly Read-only access to the file.
-' @param ReadExecute Read access to the file that can store and run executable code.
-' @param ReadWrite Read and write access to the file.
-' @param ReadWriteExecute Read and write access to the file that can store and run executable code.
-' @param WriteOnly Write-only access to file.
-Public Enum MemoryMappedFileAccess
-    ReadWrite = 0
-    ReadOnly
-    WriteOnly   ' WriteOnly is valid only when creating views and not when creating MemoryMappedFiles
-    CopyOnWrite
-    ReadExecute
-    ReadWriteExecute
-End Enum
-
 
 ''
 ' Creates a memory-mapped file that has the specified access mode, name, capacity, and access type from a file on disk.
 '
 ' @param Path The path to the file to map.
 ' @param Mode Access mode; can be any of the <a href="FileStream.FileMode.html">FileMode</a> enumeration values except <a href="FileStream.FileMode.html">Append</a>.
-' @param MapName A name to assign to the memory-mapped file.
+' @param MapName A name to assign to the memory-mapped file. Specify <b>vbNullString</b> to rename unnamed.
 ' @param Capacity The maximum size, in bytes, to allocate to the memory-mapped file. Specify 0 to set the capacity to the size of the file on disk.
 ' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file.
 ' @return A memory-mapped file that has the specified characteristics.
@@ -80,12 +62,12 @@ End Enum
 '       <td><a href="ArgumentException.html">ArgumentException</a></td>
 '       <td>
 '           <i>MapName</i> is an empty string.<br/>
-'           -or-
+'           -or-<br/>
 '           <i>Access</i> is not an allowed value.<br/>
 '           -or-<br/>
 '           <i>Path</i> specifies an empty file.<br/>
 '           -or-<br/>
-'           <i>Access</i> is specified as <a href="MemoryMappedFileStatic.MemoryMappedFileAccess.html">ReadOnly</a> and <i>Capacity</i> is greater than the size of the file indicated by <i>Path</i>.<br/>
+'           <i>Access</i> is specified as <a href="MemoryMappedFile.MemoryMappedFileAccess.html">ReadOnly</a> and <i>Capacity</i> is greater than the size of the file indicated by <i>Path</i>.<br/>
 '           -or-<br/>
 '           <i>Mode</i> is <a href="FileStream.FileMode.html">Append</a>.
 '       </td>
@@ -99,7 +81,7 @@ End Enum
 '           -or-<br/>
 '           <i>Capacity</i> is zero, and the size of the file on disk is also zero.<br/>
 '           -or-<br/>
-'           <i>Access</i> is not a defined <a href="MemoryMappedFileStatic.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> value.<br/>
+'           <i>Access</i> is not a defined <a href="MemoryMappedFile.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> value.<br/>
 '           -or-<br/>
 '           The size of the file indicated by <i>Path</i> is greater than <i>Capacity</i>.
 '       </td>
@@ -108,7 +90,7 @@ End Enum
 Public Function CreateFromFile(ByRef Path As String, Optional ByVal Mode As FileMode = FileMode.OpenExisting, Optional ByRef MapName As String, Optional ByVal Capacity As Currency, Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
     Dim Existed As Boolean
     Dim Stream  As FileStream
-    Dim Handle  As SafeFileHandle
+    Dim Handle  As SafeMemoryMappedFileHandle
     
     If Not CorString.IsNull(MapName) And Len(MapName) = 0 Then _
         Error.Argument Argument_MapNameEmptyString
@@ -150,8 +132,56 @@ Catch:
     ThrowOrErr Err
 End Function
 
+''
+' Creates a memory-mapped file that has the specified name, capacity, access type, and disposal requirement from a file on disk.
+'
+' @param FileStream The <i>FileStream</i> to the file to map.
+' @param MapName A name to assign to the memory-mapped file. Specify <b>vbNullString</b> to leave mapping unnamed.
+' @param Capacity The maximum size, in bytes, to allocate to the memory-mapped file. Specify 0 to set the capacity to the size of the file on disk.
+' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file. <p>This parameter can't be set to <a href="MemoryMappedFile.MemoryMappedFileAccess.html">WriteOnly</a>.</p>
+' @param LeaveOpen <b>True</b> to not dispose fileStream after the <a href="MemoryMappedFile.html">MemoryMappedFile</a> is closed; <b>False</b> to dispose <i>FileStream</i>.
+' @return A memory-mapped file that has the specified characteristics.
+' @remarks If <i>Capacity</i> is larger than the size of the file on disk, the file on disk is increased to match the specified capacity even if no data is written to the memory-mapped file. To prevent this from occurring, specify 0 (zero) for the default capacity, which will internally set <i>Capacity</i> to the size of the file on disk.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentException.html">ArgumentException</a></td>
+'       <td>
+'           <i>MapName</i> is an empty string.<br/>
+'           -or-<br/>
+'           <i>Capacity</i> and the length of the file are zero.<br/>
+'           -or-<br/>
+'           <i>Access</i> is set to the <a href="MemoryMappedFile.MemoryMappedFileAccess.html">WriteOnly</a> enumeration value, which is not allowed.<br/>
+'           -or-<br/>
+'           <i>Access</> is set to the <a href="MemoryMappedFile.MemoryMappedFileAccess.html">ReadOnly</a> enumeration value and <i>Capacity</i> is larger than file size.
+'       </td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>FileStream</i> is <b>Nothing</b>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>Capacity</i> is less than zero.<br/>
+'           -or-<br/>
+'           <i>Capacity</i> is less than the file size.<br/>
+'           -or-<br/>
+'           <i>Access</i> is not a valid <a href="MemoryMappedFile.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> enumeration value.<br/>
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td><i>FileStream</i> was closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td><i>MapName</i> already exists.</td>
+'    </tr>
+' </table>
 Public Function CreateFromFileStream(ByVal FileStream As FileStream, ByRef MapName As String, ByVal Capacity As Currency, ByVal Access As MemoryMappedFileAccess, ByVal LeaveOpen As Boolean) As MemoryMappedFile
-    Dim Handle As SafeFileHandle
+    Dim Handle As SafeMemoryMappedFileHandle
     
     If FileStream Is Nothing Then _
         Error.ArgumentNull "FileStream"
@@ -184,20 +214,202 @@ Public Function CreateFromFileStream(ByVal FileStream As FileStream, ByRef MapNa
     Set CreateFromFileStream = Cor.NewMemoryMappedFile(Handle, FileStream, LeaveOpen)
 End Function
 
-Private Function CreateCore(ByVal FileHandle As SafeFileHandle, ByRef MapName As String, ByVal Capacity As Currency, ByVal Access As MemoryMappedFileAccess) As SafeFileHandle
-    Dim Handle      As SafeFileHandle
+''
+' Creates a memory-mapped file that has the specified capacity and access type in system memory.
+'
+' @param MapName A name to assign to the memory-mapped file.
+' @param Capacity The maximum size, in bytes, to allocate to the memory-mapped file.
+' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file. The default is <a href="MemoryMappedFile.MemoryMappedFileAccess.html">ReadWrite</a>.
+' @return A memory-mapped file that has the specified characteristics.
+' @remarks Use this method to create a memory-mapped file that is not persisted (that is, not associated with a file on disk), which you can use to share data between processes.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentException.html">ArgumentException</a></td>
+'       <td>
+'           <i>MapName</i> is an empty string.<br/>
+'           -or-<br/>
+'           <i>Access</i> is set to write-only with the <a href="MemoryMappedFile.MemoryMappedFileAccess.html">WriteOnly</a> enumeration value.
+'       </td>
+'   </tr>
+'    <tr>
+'       <td></td>
+'       <td>
+'           <i>Capacity</i> is less than or equal to zero.<br/>
+'           -or-<br/>
+'           <i>Access</i> is not a valid <a href="MemoryMappedFile.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> enumeration value.
+'       </td>
+'    </tr>
+' </table>
+Public Function CreateNew(ByRef MapName As String, ByVal Capacity As Currency, Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
+    Dim Handle As SafeMemoryMappedFileHandle
+    
+    If Not CorString.IsNull(MapName) And Len(MapName) = 0 Then _
+        Error.Argument Argument_MapNameEmptyString
+    
+    Capacity = Int(Capacity)
+    
+    If Capacity <= 0 Then _
+        Error.ArgumentOutOfRange "Capacity", ArgumentOutOfRange_NeedPosNum
+    If Access < MemoryMappedFileAccess.ReadWrite Or Access > MemoryMappedFileAccess.ReadWriteExecute Then _
+        Error.ArgumentOutOfRange "Access"
+    If Access = MemoryMappedFileAccess.WriteOnly Then _
+        Error.Argument Argument_NewMMFWriteAccessNotAllowed, "Access"
+
+    Set Handle = CreateCore(Cor.NewSafeFileHandle(-1, True), MapName, Capacity, Access)
+    Set CreateNew = Cor.NewMemoryMappedFile(Handle)
+End Function
+
+''
+' Opens an existing memory-mapped file that has the specified name in system memory.
+'
+' @param MapName The name of the memory-mapped file to open.
+' @param DesiredAccessRights One of the enumeration values that specifies the access rights to apply to the memory-mapped file.
+' @return A memory-mapped file that has the specified name.
+' @remarks The memory-mapped file can be either a persisted memory-mapped file (associated with a file on disk) or non persisted.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>MapName</i> is an empty string.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>MapName</i> is <b>vbNullString</b>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>DesiredAccessRights</i> is not a valid <a href="MemoryMappedFile.MemoryMappedFileRights.html">MemoryMappedFileRights</a> enumeration value.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="FileNotFoundException.html">FileNotFoundException</td><td>The file specified for <i>MapName</i> does not exist.</td>
+'    </tr>
+' </table>
+Public Function OpenExisting(ByRef MapName As String, Optional ByVal DesiredAccessRights As MemoryMappedFileRights = MemoryMappedFileRights.ReadWrite) As MemoryMappedFile
+    Dim Handle As SafeMemoryMappedFileHandle
+    
+    If CorString.IsNull(MapName) Then _
+        Error.ArgumentNull "MapName"
+    If Len(MapName) = 0 Then _
+        Error.Argument Argument_MapNameEmptyString
+    If (DesiredAccessRights And Not (MemoryMappedFileRights.FullControl Or MemoryMappedFileRights.AccessSystemSecurity)) <> 0 Then _
+        Error.ArgumentOutOfRange "DesiredAccessRights"
+    
+    Set Handle = OpenCore(MapName, DesiredAccessRights, False)
+    Set OpenExisting = Cor.NewMemoryMappedFile(Handle)
+End Function
+
+''
+' Creates or opens a memory-mapped file that has the specified capacity and access type in system memory.
+'
+' @param MapName A name to assign to the memory-mapped file.
+' @param Capacity The maximum size, in bytes, to allocate to the memory-mapped file.
+' @param Access One of the enumeration values that specifies the type of access allowed to the memory-mapped file. The default is <a href="MemoryMappedFile.MemoryMappedFileAccess.html">ReadWrite</a>.
+' @return A memory-mapped file that has the specified characteristics.
+' @remarks Use this method to create or open a memory-mapped file that is not persisted (that is, not associated with a file on disk), which you can use to share data between processes.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentException.html">ArgumentException</a></td><td><i>MapName</i> is an empty string.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>MapName is <b>vbNullString</b>.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>Capacity</i> is greater than the size of the logical address space.<br/>
+'           -or-<br/>
+'           <i>Capacity</i> is less than or equal to zero.<br/>
+'           -or-<br/>
+'           <i>Access</i> is not a valid <a href="MemoryMappedFile.MemoryMappedFileAccess.html">MemoryMappedFileAccess</a> enumeration value.
+'        </td>
+'    </tr>
+' </table>
+Public Function CreateOrOpen(ByRef MapName As String, ByVal Capacity As Currency, Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
+    Dim Handle As SafeMemoryMappedFileHandle
+    
+    If CorString.IsNull(MapName) Then _
+        Error.ArgumentNull "MapName"
+    If Len(MapName) = 0 Then _
+        Error.Argument Argument_MapNameEmptyString
+    
+    Capacity = Int(Capacity)
+    
+    If Capacity <= 0 Then _
+        Error.ArgumentOutOfRange "Capacity", ArgumentOutOfRange_NeedPosNum
+    If Access < MemoryMappedFileAccess.ReadWrite Or Access > MemoryMappedFileAccess.ReadWriteExecute Then _
+        Error.ArgumentOutOfRange "Access"
+    
+    If Access = MemoryMappedFileAccess.WriteOnly Then
+        Set Handle = OpenCore(MapName, Access, True)
+    Else
+        Set Handle = OpenOrCreateCore(MapName, Capacity, Access)
+    End If
+    
+    Set CreateOrOpen = Cor.NewMemoryMappedFile(Handle)
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function OpenOrCreateCore(ByRef MapName As String, ByVal Capacity As Currency, ByVal Access As MemoryMappedFileAccess) As SafeMemoryMappedFileHandle
+    Dim Handle      As SafeMemoryMappedFileHandle
     Dim Capacity64  As Int64
-    Dim ErrCode     As Long
+    Dim LastError   As Long
+    
+    Capacity64 = CInt64(Capacity)
+    Set Handle = SafeCreateFileMapping(-1, GetPageAccess(Access), Capacity64.HighPart, Capacity64.LowPart, MapName)
+    LastError = Err.LastDllError
+    
+    If Handle.IsInvalid And (LastError <> ERROR_ALREADY_EXISTS) Then
+        Error.Win32Error LastError
+    End If
+    
+    Set OpenOrCreateCore = Handle
+End Function
+
+Private Function OpenCore(ByRef MapName As String, ByVal Access As MemoryMappedFileRights, ByVal IsCreateOrOpen As Boolean) As SafeMemoryMappedFileHandle
+    Dim Handle      As SafeMemoryMappedFileHandle
+    Dim LastError   As Long
+    
+    Set Handle = SafeOpenFileMapping(MapName, Access)
+    LastError = Err.LastDllError
+    
+    If Handle.IsInvalid Then
+        If IsCreateOrOpen And (LastError = ERROR_FILE_NOT_FOUND) Then _
+            Error.Argument Argument_NewMMFWriteAccessNotAllowed, "Access"
+        
+        IOError.WinIOError LastError
+    End If
+    
+    Set OpenCore = Handle
+End Function
+
+Private Function CreateCore(ByVal FileHandle As SafeFileHandle, ByRef MapName As String, ByVal Capacity As Currency, ByVal Access As MemoryMappedFileAccess) As SafeMemoryMappedFileHandle
+    Dim Handle      As SafeMemoryMappedFileHandle
+    Dim Capacity64  As Int64
+    Dim LastError     As Long
     
     Capacity64 = CInt64(Capacity)
     Set Handle = SafeCreateFileMapping(FileHandle.DangerousGetHandle, GetPageAccess(Access), Capacity64.HighPart, Capacity64.LowPart, MapName)
-    ErrCode = Err.LastDllError
+    LastError = Err.LastDllError
     
-    If Not Handle.IsInvalid And ErrCode = ERROR_ALREADY_EXISTS Then
+    If Not Handle.IsInvalid And LastError = ERROR_ALREADY_EXISTS Then
         Handle.CloseHandle
-        IOError.WinIOError ErrCode
+        IOError.WinIOError LastError
     ElseIf Handle.IsInvalid Then
-        IOError.WinIOError ErrCode
+        IOError.WinIOError LastError
     End If
     
     Set CreateCore = Handle

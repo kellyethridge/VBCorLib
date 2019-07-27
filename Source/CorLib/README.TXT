@@ -108,6 +108,8 @@ version 3.0 (BREAKING CHANGES)
 	* Added user-defined type support in ObjectStatic.
 	* Re-implemented MemoryMappedFile to create a MemoryMappedViewAccessor.
 	* Added MemoryMappedViewAccessor to access mapped views of a file.
+	* Fixed MemoryStream. Should through ObjectDisposedException when reading Position property when closed.
+	* Re-implemented MemoryMappedFile to align with .NET 4.0.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

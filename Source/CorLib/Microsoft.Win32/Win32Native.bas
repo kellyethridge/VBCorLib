@@ -114,11 +114,18 @@ Public Function SafeFindFirstFile(ByRef FileName As String, ByRef FindFileData A
     Set SafeFindFirstFile = Cor.NewSafeFindHandle(FileHandle, True)
 End Function
 
-Public Function SafeCreateFileMapping(ByVal FileHandle As Long, ByVal Protect As Long, ByVal CapacityHigh As Long, ByVal CapacityLow As Long, ByRef MapName As String) As SafeFileHandle
+Public Function SafeCreateFileMapping(ByVal FileHandle As Long, ByVal Protect As Long, ByVal CapacityHigh As Long, ByVal CapacityLow As Long, ByRef MapName As String) As SafeMemoryMappedFileHandle
     Dim Handle As Long
     
     Handle = CreateFileMappingW(FileHandle, ByVal 0&, Protect, CapacityHigh, CapacityLow, MapName)
-    Set SafeCreateFileMapping = Cor.NewSafeFileHandle(Handle, True)
+    Set SafeCreateFileMapping = Cor.NewSafeMemoryMappedFileHandle(Handle)
+End Function
+
+Public Function SafeOpenFileMapping(ByRef MapName As String, ByVal DesiredAccess As Long) As SafeMemoryMappedFileHandle
+    Dim Handle As Long
+    
+    Handle = OpenFileMappingW(DesiredAccess, BOOL_FALSE, MapName)
+    Set SafeOpenFileMapping = Cor.NewSafeMemoryMappedFileHandle(Handle)
 End Function
 
 Public Function GetSystemMenu(ByVal hwnd As Long, ByVal bRevert As Boolean) As Long

@@ -6,13 +6,13 @@ BEGIN
   DataSourceBehavior  = 0  'vbNone
   MTSTransactionMode  = 0  'NotAnMTSObject
 END
-Attribute VB_Name = "SafeFindHandle"
+Attribute VB_Name = "SafeMemoryMappedFileHandle"
 Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = False
-Attribute VB_Exposed = False
+Attribute VB_Exposed = True
 'The MIT License (MIT)
-'Copyright (c) 2015 Kelly Ethridge
+'Copyright (c) 2019 Kelly Ethridge
 '
 'Permission is hereby granted, free of charge, to any person obtaining a copy
 'of this software and associated documentation files (the "Software"), to deal
@@ -32,39 +32,87 @@ Attribute VB_Exposed = False
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: SafeFindHandle
+' Module: SafeMemoryMappedFileHandle
+'
+
+''
+' Provides a safe handle that represents a memory-mapped file for sequential access.
 '
 Option Explicit
+Implements IObject
 Implements SafeHandle
 
 Private WithEvents mBase As SafeHandle
 Attribute mBase.VB_VarHelpID = -1
 
 
-
+''
+' When overridden in a derived class, gets a value indicating whether the handle value is invalid.
+'
+' @return <b>True</b> if the handle value is invalid; otherwise, <b>False</b>.
 Public Property Get IsInvalid() As Boolean
     IsInvalid = mBase.IsInvalid
 End Property
 
+''
+' Returns the value of the handle field.
+'
+' @return An <b>Long</b> representing the value of the handle field.
 Public Function DangerousGetHandle() As Long
-Attribute DangerousGetHandle.VB_UserMemId = 0
     DangerousGetHandle = mBase.DangerousGetHandle
 End Function
 
+''
+' Marks the handle for releasing and freeing resources.
 Public Sub CloseHandle()
     mBase.CloseHandle
 End Sub
 
+''
+' Gets a value indicating whether the handle is closed.
+'
+' @return <b>True</b> if the handle is closed; otherwise, <b>False</b>.
 Public Property Get IsClosed() As Boolean
     IsClosed = mBase.IsClosed
 End Property
+
+''
+' Determines whether the specified value passed in is equal to the current object.
+'
+' @param Value The value to compare to the current object.
+' @return <b>True</b> if the specified value is equal to the current object; otherwise, <b>False</b>.
+' @see IObject
+'
+Public Function Equals(ByRef Value As Variant) As Boolean
+    Equals = MyBase.Equals(Me, Value)
+End Function
+
+''
+' Serves as the default hash function.
+'
+' @return A hash code for the current object.
+' @see IObject
+'
+Public Function GetHashCode() As Long
+    GetHashCode = MyBase.GetHashCode(Me)
+End Function
+
+''
+' Returns a string that represents the current object.
+'
+' @return A string the represents the current object.
+' @see IObject
+'
+Public Function ToString() As String
+    ToString = MyBase.ToString(Me, App)
+End Function
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean)
-    Set mBase = Cor.NewSafeHandle(PreexistingHandle, OwnsHandle)
+Friend Sub Init(ByVal PreexistingHandle As Long)
+    Set mBase = Cor.NewSafeHandle(PreexistingHandle, True, True)
 End Sub
 
 Private Sub Class_Terminate()
@@ -73,10 +121,26 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   IObject
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IObject_Equals(Value As Variant) As Boolean
+    IObject_Equals = Equals(Value)
+End Function
+
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
+End Function
+
+Private Function IObject_ToString() As String
+    IObject_ToString = ToString
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   SafeHandle
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub mBase_ReleaseHandle()
-    FindClose DangerousGetHandle
+    CorType.CloseHandle DangerousGetHandle
 End Sub
 
 Private Sub SafeHandle_CloseHandle()

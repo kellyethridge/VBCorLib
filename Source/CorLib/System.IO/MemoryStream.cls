@@ -92,7 +92,6 @@ Private mAsyncPtr       As Long
 ' Returns if the MemoryStream object supports timeout events.
 '
 ' @return Always returns False.
-'
 Public Property Get CanTimeout() As Boolean
     CanTimeout = False
 End Property
@@ -102,7 +101,6 @@ End Property
 '
 ' @return The timeout duration in milliseconds.
 ' @remarks This always throws an InvalidOperationException.
-'
 Public Property Get ReadTimeout() As Long
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
@@ -112,7 +110,6 @@ End Property
 '
 ' @param Value The new duration in milliseconds
 ' @remarks This always throws an InvalidOperationException.
-'
 Public Property Let ReadTimeout(ByVal Value As Long)
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
@@ -122,7 +119,6 @@ End Property
 '
 ' @return The timeout duration in milliseconds.
 ' @remarks This always throws an InvalidOperationException.
-'
 Public Property Get WriteTimeout() As Long
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
@@ -132,7 +128,6 @@ End Property
 '
 ' @param Value The new timeout duration in milliseconds.
 ' @remarks This always throws an InvalidOperationException.
-'
 Public Property Let WriteTimeout(ByVal Value As Long)
     Error.InvalidOperation InvalidOperation_Timeouts
 End Property
@@ -155,7 +150,6 @@ End Property
 ' stream does not have enough bytes, the read will copy less bytes than Count.</p>
 ' <p>If an exception has occurred during the read, it will not be thrown until the
 ' EndRead is executed.
-'
 Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Result As StreamAsyncResult
     Set Result = Cor.NewStreamAsyncResult(State)
@@ -197,7 +191,6 @@ End Function
 ' <i>Buffer</i> does not have enough bytes, an exception will be thrown in the EndWrite method.</p>
 ' <p>If an exception has occurred during the read, it will not be thrown until the
 ' EndRead is executed.
-'
 Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Result As StreamAsyncResult
     Set Result = Cor.NewStreamAsyncResult(State)
@@ -232,7 +225,6 @@ End Function
 ' used with the MemoryStream. Instead use the Read Method.</p>
 ' <p>If any exceptions were caused during the reading then they will be thrown
 ' during the call to EndRead.</p>
-'
 Public Function EndRead(ByVal AsyncResult As IAsyncResult) As Long
     If AsyncResult Is Nothing Then _
         Error.ArgumentNull "AsyncResult"
@@ -264,7 +256,6 @@ End Function
 ' used with the MemoryStream. Instead use the WriteBlock Method.</p>
 ' <p>If any exceptions were caused during the reading then they will be thrown
 ' during the call to EndRead.</p>
-'
 Public Sub EndWrite(ByVal AsyncResult As IAsyncResult)
     If AsyncResult Is Nothing Then _
         Throw Cor.NewArgumentNullException("AsyncResult")
@@ -289,7 +280,6 @@ End Sub
 '
 ' @return The status of the ability to read the stream.
 ' @remarks If the MemoryStream is open, then it can be read. If it is closed, it cannot be read.
-'
 Public Property Get CanRead() As Boolean
     CanRead = Not mIsClosed
 End Property
@@ -301,7 +291,6 @@ End Property
 ' @remarks If the stream was created from a user-supplied array, then the user
 ' will determine if the stream is allowed to be written to. Otherwise, the stream
 ' is always writable while it is open.
-'
 Public Property Get CanWrite() As Boolean
     CanWrite = mCanWrite And (Not mIsClosed)
 End Property
@@ -311,7 +300,6 @@ End Property
 '
 ' @return The status of the ability to seek a position within the stream.
 ' @remarks If the MemoryStream is open, then it is seekable, otherwise it is not.
-'
 Public Property Get CanSeek() As Boolean
     CanSeek = Not mIsClosed
 End Property
@@ -323,7 +311,6 @@ End Property
 ' @remarks If the the capacity is reached while writing, then the capacity
 ' will be expanded, unless the underlying byte array is user-supplied. In
 ' this case, an exception will be thrown if the capacity is changed.
-'
 Public Property Get Capacity() As Long
     Capacity = mCapacity
 End Property
@@ -335,7 +322,6 @@ End Property
 ' @remarks The capacity cannot be set less than the current length of
 ' the stream. If the underlying byte array is user-supplied, then an
 ' exception will be thrown if the capacity is modified.
-'
 Public Property Let Capacity(ByVal Value As Long)
     If Not mExpandable Then _
         Error.NotSupported NotSupported_MemoryStreamNotExpandable
@@ -364,7 +350,6 @@ End Property
 ' @remarks The length of the stream differs from the capacity in that the
 ' capacity is the amount of allocated memory used to store the stream, and the
 ' length is the number of bytes used from within the allocated memory.
-'
 Public Property Get Length() As Currency
     Length = mLength
 End Property
@@ -376,8 +361,8 @@ End Property
 ' @remarks The position is the index at which the next read or write
 ' will occur. Position is alway zero based, even if a user-supplied
 ' array is not.
-'
 Public Property Get Position() As Currency
+    EnsureOpen
     Position = mPosition
 End Property
 
@@ -388,7 +373,6 @@ End Property
 ' @remarks The position is the index at which the next read or write
 ' will occur. Position is always zero based, even if a user-supplied
 ' array is not.
-'
 Public Property Let Position(ByVal Value As Currency)
     Value = Int(Value)
     If Value < 0 Then _
@@ -403,7 +387,6 @@ End Property
 '
 ' @remarks If a user-supplied array is being used, it will be released
 ' at this point. The user then may modify the array as normal.
-'
 Public Sub CloseStream()
     If mIsClosed Then Exit Sub
     
@@ -425,7 +408,6 @@ End Sub
 ' the stream will expand if possible. If the underlying stream is a user-supplied
 ' byte array, then an exception will occur if the capacity is reached.</p>
 ' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
-'
 Public Sub WriteBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long)
     ValidateArrayRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
     EnsureWritable
@@ -454,7 +436,6 @@ End Sub
 ' user-supply byte array, then the capacity cannot be modified and an
 ' exception will be thrown.</p>
 ' <p>The stream must be open to write to it, otherwise an exception will be thrown.</p>
-'
 Public Sub WriteByte(ByVal Value As Byte)
     EnsureWritable
     EnsureOpen
@@ -480,7 +461,6 @@ End Sub
 ' remaining bytes will be read.</p>
 ' <p>The stream must be open to read from it, otherwise an exception will be thrown.</p>
 ' <p>After reading from the stream, the current position will advance the number of byte as returend.</p>
-'
 Public Function ReadBlock(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long) As Long
     ValidateArrayRange Buffer, Offset, Count, NameOfBuffer, NameOfOffset
     EnsureOpen
@@ -501,10 +481,8 @@ End Function
 '
 ' @return The byte value from the current position in the stream.
 ' @remarks <p>The stream must be open for read from it, otherwise an exception will be thrown.</p>
-' <p>If the end of the stream is reached during a read, then a value of
-' -1 is returned.</p>
+' <p>If the end of the stream is reached during a read, then a value of -1 is returned.</p>
 ' <p>Each read from the stream will advance the position one byte.</p>
-'
 Public Function ReadByte() As Long
     If mPosition >= mLength Then
         ReadByte = -1
@@ -527,7 +505,6 @@ End Function
 ' The position can be set passed the end of the stream. This will cause the stream to be
 ' expanded on the next access. If the stream expansion is not supported an exception
 ' will be thrown. This may be the case when using a user-supplied byte array.</p>
-'
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Loc As SeekOrigin) As Currency
     Offset = Int(Offset)
     Select Case Loc
@@ -553,7 +530,6 @@ End Function
 ' The size of the stream can be changed to withing the origin size of the user-supplied
 ' byte array. If a length greater than the original array size is set, then an exception
 ' is thrown.</p>
-'
 Public Sub SetLength(ByVal Value As Currency)
     EnsureWritable
     
@@ -580,7 +556,6 @@ End Sub
 ' @remarks If the underlying stream is a user-supplied byte array, then only
 ' that portion determined by Count when the stream was created is returned, not
 ' the entire array.
-'
 Public Function ToArray() As Byte()
     EnsureBuffer
     
@@ -596,7 +571,6 @@ End Function
 
 ''
 ' This has no purpose in a MemoryStream
-'
 Public Sub Flush()
     ' just here for consistency
 End Sub
@@ -605,7 +579,6 @@ End Sub
 ' Writes the underlying stream to another stream.
 '
 ' @param Stream The stream to write the underlying stream to.
-'
 Public Sub WriteTo(ByVal Stream As Stream)
     If Stream Is Nothing Then _
         Error.ArgumentNull "Stream", ArgumentNull_Stream

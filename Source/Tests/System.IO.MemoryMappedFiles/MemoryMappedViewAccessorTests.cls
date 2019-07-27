@@ -473,16 +473,16 @@ Public Sub WriteArray_WithArray_WritesExpected(ByRef Value As Variant, ByRef Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Private Function MakeEmptyMappedFile(Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
+Private Function MakeEmptyMappedFile(Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
     Dim Data(0 To 99) As Byte
     Set MakeEmptyMappedFile = MakeMappedFile(Data)
 End Function
 
-Private Function MakeMappedFileWithData(Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
+Private Function MakeMappedFileWithData(Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
     Set MakeMappedFileWithData = MakeMappedFile(MakeData)
 End Function
 
-Private Function MakeMappedFile(ByRef Data() As Byte, Optional ByVal Access As MemoryMappedFileAccess = ReadWrite) As MemoryMappedFile
+Private Function MakeMappedFile(ByRef Data() As Byte, Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
     mIOHelper.CreateBinaryFile "File.txt", Data
     Set MakeMappedFile = MemoryMappedFile.CreateFromFile(mIOHelper.TempFileName, Access:=Access)
 End Function

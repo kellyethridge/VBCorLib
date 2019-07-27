@@ -224,6 +224,7 @@ Class=OutputLogger; OutputLogger.cls
 Class=MemoryMappedViewAccessorTests; System.IO.MemoryMappedFiles\MemoryMappedViewAccessorTests.cls
 Class=Int64Tests; System\Int64Tests.cls
 ResFile32="CorLib.Tests.RES"
+Class=MemoryMappedViewStreamTests; System.IO.MemoryMappedFiles\MemoryMappedViewStreamTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

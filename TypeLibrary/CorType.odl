@@ -957,6 +957,7 @@ library CorType {
         [entry("CreateDirectoryW"), usesgetlasterror] long CreateDirectoryW([in] LPWSTR PathName, [in] void * SecurityAttributes);
         [entry("CreateFileW"), usesgetlasterror] long CreateFileW([in] LPWSTR FileName, [in] long DesiredAccess, [in] long ShareMode, [in] void * SecurityAttributes, [in] long CreationDisposition, [in] long FlagsAndAttributes, [in] long hTemplateFile);
         [entry("CreateFileMappingW"), usesgetlasterror] HANDLE CreateFileMappingW([in] HANDLE hFile, [in] void * lpFileMappingAttributes, [in] DWORD flProtect, [in] DWORD dwMaximumSizeHigh, [in] DWORD dwMaximumSizeLow, [in] LPCTSTR lpName);
+        [entry("OpenFileMappingW"), usesgetlasterror] HANDLE OpenFileMappingW([in] DWORD DesiredAccess, [in] BOOL bInheritHandle, [in] LPWSTR lpName);
         [entry("DeleteFileW"), usesgetlasterror] long DeleteFileW([in] LPWSTR FileName);
         [entry("EnumResourceLanguagesW"), usesgetlasterror] long EnumResourceLanguages([in] long hModule, [in] long lpType, [in] long lpName, [in] long lpEnumFunc, [in] long lParam);
         [entry("EnumResourceNamesW"), usesgetlasterror] long EnumResourceNames([in] long hModule, [in] long lpType, [in] long lpEnumFunc, [in] long lParam);

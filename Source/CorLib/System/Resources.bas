@@ -300,6 +300,7 @@ Public Enum ResourceStringKey
     NotSupported_FileStreamOnNonFiles = 1006
     NotSupported_Reading = 1007
     NotSupported_Writing = 1008
+    NotSupported_MMViewStreamsFixedLength = 1009
     
     ObjectDisposed_StreamClosed = 1200
     ObjectDisposed_FileNotOpen = 1201

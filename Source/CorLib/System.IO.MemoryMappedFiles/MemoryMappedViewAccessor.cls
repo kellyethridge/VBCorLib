@@ -42,7 +42,7 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
-Private mMappingHandle  As SafeFileHandle
+Private mMappingHandle  As SafeMemoryMappedFileHandle
 Private mViewAddress    As Long
 Private mStartIndex     As Long
 Private mViewData()     As Byte
@@ -625,10 +625,10 @@ End Sub
 ''
 ' Writes structures of the type from an array passed into the accessor.
 '
-' @param The number of bytes into the accessor at which to begin writing.
-' @param The array to write into the accessor.
-' @param The index in <i>Arr</i> to start writing from.
-' @param The number of structures in <i>Arr</i> to write.
+' @param Position The number of bytes into the accessor at which to begin writing.
+' @param Arr The array to write into the accessor.
+' @param Offset The index in <i>Arr</i> to start writing from.
+' @param Count The number of structures in <i>Arr</i> to write.
 ' @remarks
 ' <h4>Exceptions</h4>
 ' <table style="width: auto">
@@ -773,7 +773,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal MappingHandle As SafeFileHandle, ByVal Offset As Currency, ByVal Size As Long, ByVal Access As MemoryMappedFileAccess)
+Friend Sub Init(ByVal MappingHandle As SafeMemoryMappedFileHandle, ByVal Offset As Currency, ByVal Size As Long, ByVal Access As MemoryMappedFileAccess)
     Dim PageAlignedOffset As Currency
     Dim Info As SYSTEM_INFO
     
