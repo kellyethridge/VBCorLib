@@ -773,6 +773,40 @@ Public Sub CloseStream()
 End Sub
 
 ''
+' Reads the bytes from the current stream and writes them to another stream.
+'
+' @param Destination The stream to which the contents of the current stream will be copied.
+' @param BufferSize The size of the buffer. This value must be greater than zero. The default size is 81920.
+' @remarks Copying begins at the current position in the current stream, and does not reset the position of the destination stream after the copy operation is complete.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Destination</i> is <b>Nothing</b>.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="NotSupportedException.html">NotSupportedException</a></td>
+'        <td>
+'           The current stream does not support reading.<br/>
+'           -or-<br/>
+'           <i>Destination</i> does not support writing.
+'        </td>
+'    </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>Either the current stream or <i>Destination</i> were closed before the CopyTo method was called.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurred.</td>
+'    </tr>
+' </table>
+Public Sub CopyTo(ByVal Destination As Stream, Optional ByVal BufferSize As Long = 81920)
+    Statics.Stream.CopyTo Me, Destination, BufferSize
+End Sub
+
+''
 ' Returns a string representation of this object instance.
 '
 ' @return String representing this instance.
@@ -1012,6 +1046,10 @@ End Property
 
 Private Sub Stream_CloseStream()
     CloseStream
+End Sub
+
+Private Sub Stream_CopyTo(ByVal Destination As Stream, Optional ByVal BufferSize As Long = 81920)
+    CopyTo Destination, BufferSize
 End Sub
 
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long

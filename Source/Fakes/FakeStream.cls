@@ -55,6 +55,10 @@ Private Sub Stream_CloseStream()
     IsClosed = True
 End Sub
 
+Private Sub Stream_CopyTo(ByVal Destination As CorLib.Stream, Optional ByVal BufferSize As Long = 81920)
+
+End Sub
+
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
 
 End Function

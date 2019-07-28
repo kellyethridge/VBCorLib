@@ -91,6 +91,10 @@ Private Sub Stream_CloseStream()
 
 End Sub
 
+Private Sub Stream_CopyTo(ByVal Destination As Stream, Optional ByVal BufferSize As Long = 81920)
+
+End Sub
+
 Private Function Stream_EndRead(ByVal AsyncResult As IAsyncResult) As Long
 
 End Function

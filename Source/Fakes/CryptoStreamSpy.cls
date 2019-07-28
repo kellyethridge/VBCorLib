@@ -47,6 +47,10 @@ Private Sub CryptoStream_CloseStream()
 
 End Sub
 
+Private Sub CryptoStream_CopyTo(ByVal Destination As CorLib.Stream, Optional ByVal BufferSize As Long = 81920)
+
+End Sub
+
 Private Function CryptoStream_EndRead(ByVal AsyncResult As CorLib.IAsyncResult) As Long
 
 End Function
@@ -152,6 +156,10 @@ Private Property Get Stream_CanWrite() As Boolean
 End Property
 
 Private Sub Stream_CloseStream()
+
+End Sub
+
+Private Sub Stream_CopyTo(ByVal Destination As CorLib.Stream, Optional ByVal BufferSize As Long = 81920)
 
 End Sub
 
