@@ -413,20 +413,9 @@ End Sub
 Private Sub ReadUdt(ByVal Position As Long, ByRef Structure As Variant)
     Dim Record  As IRecordInfo
     
-    On Error GoTo Catch
-    ObjectPtr(Record) = RecordPtr(Structure)
+    Set Record = GetRecordInfo(Structure)
     ValidateStructure Record.GetTypeInfo
     ReadData Position, DataPtr(Structure), Record.GetSize
-    
-    GoSub Finally
-    Exit Sub
-    
-Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
-    ObjectPtr(Record) = vbNullPtr
-    Return
 End Sub
 
 ''
@@ -606,20 +595,9 @@ Private Sub WriteUdt(ByVal Position As Long, ByRef Value As Variant)
     Dim Record  As IRecordInfo
     Dim Size    As Long
         
-    On Error GoTo Catch
-    ObjectPtr(Record) = RecordPtr(Value)
+    Set Record = GetRecordInfo(Value)
     ValidateStructure Record.GetTypeInfo
     WriteData Position, DataPtr(Value), Record.GetSize
-    
-    GoSub Finally
-    Exit Sub
-    
-Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
-    ObjectPtr(Record) = vbNullPtr
-    Return
 End Sub
 
 ''

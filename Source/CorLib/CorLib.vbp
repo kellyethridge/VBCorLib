@@ -408,7 +408,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=1
+Num=6
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -417,37 +417,35 @@ Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
 
 [TASK2]
-Description=
-Status=
-Priority=
-Comment=
-AssignedTo=
+Description=Rename BitConverter methods to match .net
+Status=0
+Priority=1
+Comment=Methods such as ToLong should be changed to ToInt32 to match .net
 
 [TASK3]
-Description=
-Status=
-Priority=
-Comment=
-AssignedTo=
+Description=Change BinaryReader/BinaryWriter Date methods to use milliseconds instead of Double.
+Status=0
+Priority=1
+Comment=This will break these two methods logically.
 
 [TASK4]
-Description=
-Status=
-Priority=
+Description=Add Int64 support to BitConverter class
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 
 [TASK5]
-Description=
-Status=
-Priority=
+Description=Add Int64 support to Object.ToString
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 
 [TASK6]
-Description=
-Status=
-Priority=
+Description=Add Int64 manipulation methods to Int64Static
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 

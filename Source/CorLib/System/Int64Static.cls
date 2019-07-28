@@ -80,9 +80,8 @@ End Function
 Private Function GetGuid(ByRef Value As Variant) As VBGUID
     Dim Record As IRecordInfo
     
-    ObjectPtr(Record) = RecordPtr(Value)
+    Set Record = GetRecordInfo(Value)
     GetGuid = Record.GetGuid
-    ObjectPtr(Record) = vbNullPtr
 End Function
 
 

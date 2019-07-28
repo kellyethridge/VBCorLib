@@ -370,7 +370,7 @@ library CorType {
 		void ReleaseVarDesc ([in] long pVarDesc);
 	};
 
-    [uuid(55A2F2D0-8919-11D0-818F-00A0C90FFFC3), odl]
+    [uuid(0000002F-0000-0000-C000-000000000046), odl]
     interface IRecordInfo : IUnknown
     {
         HRESULT RecordInit([in] long pvNew);

@@ -264,20 +264,18 @@ Private Sub WriteIntrinsic(ByRef Value As Variant)
             WriteString CStr(Value)
         Case vbDecimal
             WriteDecimal Value
-        Case vbUserDefinedType
-            WriteInt64 Value
         Case Else
-            Error.Argument Argument_NeedIntrinsicType, "Value"
+            If Statics.Int64.IsInt64(Value) Then
+                WriteInt64 Value
+            Else
+                Error.Argument Argument_NeedIntrinsicType, "Value"
+            End If
     End Select
 End Sub
 
 Private Sub WriteInt64(ByRef Value As Variant)
-    If Statics.Int64.IsInt64(Value) Then
-        WriteInt32 Value.LowPart
-        WriteInt32 Value.HighPart
-    Else
-        Error.Argument Argument_NeedIntrinsicType, "Value"
-    End If
+    WriteInt32 Value.LowPart
+    WriteInt32 Value.HighPart
 End Sub
 
 Private Sub WriteBoolean(ByVal Value As Boolean)

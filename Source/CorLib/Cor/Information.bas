@@ -23,6 +23,9 @@ Attribute VB_Name = "Information"
 ' Module: Information
 '
 
+''
+' Functions used to retrieve information about variables.
+'
 Option Explicit
 
 
@@ -112,6 +115,19 @@ End Function
 ' The IRecordInfo address is held in bytes 12-15 of a 16-byte variant.
 Public Function RecordPtr(ByRef Value As Variant) As Long
     RecordPtr = MemLong(VarPtr(Value) + VARIANTRECORD_OFFSET)
+End Function
+
+' Returns an IRecordInfo for a UDT.
+'
+' This method returns Nothing is the value is not a UDT.
+Public Function GetRecordInfo(ByRef Value As Variant) As IRecordInfo
+    Dim Obj As IUnknown
+    
+    If VarType(Value) = vbUserDefinedType Then
+        ObjectPtr(Obj) = RecordPtr(Value)
+        Set GetRecordInfo = Obj
+        ObjectPtr(Obj) = vbNullPtr
+    End If
 End Function
 
 ' Retrieves a pointer to the first element of an array.

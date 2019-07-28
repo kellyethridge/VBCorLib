@@ -227,7 +227,7 @@ Private Function HashUdt(ByRef Value As Variant) As Long
     Dim FieldNameCount  As Long
     Dim Result As Long
     
-    ObjectPtr(Record) = MemLong(VarPtr(Value) + VARIANTRECORD_OFFSET)
+    Set Record = GetRecordInfo(Value)
     Record.GetFieldNames FieldNameCount, ByVal vbNullPtr
     
     If FieldNameCount > 0 Then
@@ -236,9 +236,7 @@ Private Function HashUdt(ByRef Value As Variant) As Long
         
         ReDim FieldNames(0 To FieldNameCount - 1)
         Record.GetFieldNames FieldNameCount, FieldNames(0)
-        ValuePtr = MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)
-                                
-        On Error GoTo Catch
+        ValuePtr = DataPtr(Value)
                                 
         Dim i As Long
         For i = 0 To FieldNameCount - 1
@@ -247,26 +245,14 @@ Private Function HashUdt(ByRef Value As Variant) As Long
     End If
     
     HashUdt = Result
-    
-    GoSub Finally
-    Exit Function
-    
-Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
-    ObjectPtr(Record) = vbNullPtr
-    Return
 End Function
 
 Private Function UdtEquals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
     Dim ObjARecord As IRecordInfo
     Dim ObjBRecord As IRecordInfo
     
-    ObjectPtr(ObjARecord) = MemLong(VarPtr(ObjA) + VARIANTRECORD_OFFSET)
-    ObjectPtr(ObjBRecord) = MemLong(VarPtr(ObjB) + VARIANTRECORD_OFFSET)
-    
-    On Error GoTo Catch
+    Set ObjARecord = GetRecordInfo(ObjA)
+    Set ObjBRecord = GetRecordInfo(ObjB)
     
     If ObjARecord.IsMatchingType(ObjBRecord) Then
         Dim FieldNameCount  As Long
@@ -280,13 +266,12 @@ Private Function UdtEquals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Bool
             
             ReDim FieldNames(0 To FieldNameCount - 1)
             ObjARecord.GetFieldNames FieldNameCount, FieldNames(0)
-            ObjAPtr = MemLong(VarPtr(ObjA) + VARIANTDATA_OFFSET)
-            ObjBPtr = MemLong(VarPtr(ObjB) + VARIANTDATA_OFFSET)
-                                    
+            ObjAPtr = DataPtr(ObjA)
+            ObjBPtr = DataPtr(ObjB)
+
             Dim i As Long
             For i = 0 To FieldNameCount - 1
                 If Not Equals(ObjARecord.GetField(ObjAPtr, FieldNames(i)), ObjARecord.GetField(ObjBPtr, FieldNames(i))) Then
-                    GoSub Finally
                     Exit Function
                 End If
             Next
@@ -294,17 +279,6 @@ Private Function UdtEquals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Bool
         
         UdtEquals = True
     End If
-    
-    GoSub Finally
-    Exit Function
-    
-Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
-    ObjectPtr(ObjARecord) = vbNullPtr
-    ObjectPtr(ObjBRecord) = vbNullPtr
-    Return
 End Function
 
 
