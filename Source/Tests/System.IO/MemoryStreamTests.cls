@@ -603,6 +603,15 @@ Public Sub Position_WhenSetWithClosedStream_ThrowsObjectDisposedException()
     AssertObjectDisposedException Err
 End Sub
 
+Public Sub Position_WhenSetLargerThanMaxInt32Value_ThrowsArgumentOutOfRangeException()
+    Dim ms As New MemoryStream
+    
+    On Error Resume Next
+    ms.Position = 2147483648@
+    
+    AssertArgumentOutOfRangeException Err, "Value"
+End Sub
+
 Public Sub Position_WhenReadWithClosedStream_ThrowsObjectDisposedException()
     Dim ms As New MemoryStream
     Dim p As Long

@@ -74,6 +74,7 @@ Public Enum BufferMode
 End Enum
 
 Private Const DefaultCapacity As Long = 256
+Private Const MaxStreamLength As Long = 2147483647
 
 Private mMode           As BufferMode
 Private mBufferSet      As Boolean
@@ -152,6 +153,10 @@ End Property
 ' EndRead is executed.
 Public Function BeginRead(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Result As StreamAsyncResult
+    
+    If Not CanRead Then _
+        Error.NotSupported Argument_StreamNotReadable
+    
     Set Result = Cor.NewStreamAsyncResult(State)
     
     On Error GoTo Catch
@@ -193,6 +198,10 @@ End Function
 ' EndRead is executed.
 Public Function BeginWrite(ByRef Buffer() As Byte, ByVal Offset As Long, ByVal Count As Long, Optional ByVal Callback As AsyncCallback, Optional ByRef State As Variant) As IAsyncResult
     Dim Result As StreamAsyncResult
+    
+    If Not CanWrite Then _
+        Error.NotSupported NotSupported_UnwritableStream
+    
     Set Result = Cor.NewStreamAsyncResult(State)
     
     On Error GoTo Catch
@@ -379,6 +388,10 @@ Public Property Let Position(ByVal Value As Currency)
         Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_NeedNonNegNum
     
     EnsureOpen
+    
+    If Value > MaxStreamLength Then _
+        Error.ArgumentOutOfRange "Value", ArgumentOutOfRange_StreamLength
+        
     mPosition = Value
 End Property
 
