@@ -242,30 +242,108 @@ Public Function ReadBoolean() As Boolean
 End Function
 
 ''
-' Reads 4 bytes from the stream and returns them as a Long datatype.
+' Reads an 8-byte signed integer from the current stream and advances the current position of the stream by eight bytes.
 '
-' @return A Long datatype read from the stream.
+' @return An 8-byte signed integer read from the current stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
+Public Function ReadInt64() As Int64
+    FillBuffer vbSizeOfInt64
+    AssignQWord mBuffer(0), ReadInt64
+End Function
+
+''
+' Reads an 4-byte signed integer from the current stream and advances the current position of the stream by four bytes.
 '
+' @return An 4-byte signed integer read from the current stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
 Public Function ReadInt32() As Long
     FillBuffer vbSizeOfLong
     ReadInt32 = AsLong(mBuffer(0))
 End Function
 
 ''
-' Reads 2 bytes from the stream and returns them as an Integer datatype.
+' Reads an 2-byte signed integer from the current stream and advances the current position of the stream by two bytes.
 '
-' @return An Integer datatype read from the stream.
-'
+' @return An 2-byte signed integer read from the current stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
 Public Function ReadInt16() As Integer
     FillBuffer vbSizeOfInteger
     ReadInt16 = AsWord(mBuffer(0))
 End Function
 
 ''
-' Reads 8 bytes from the stream and returns them as a Double datatype.
+' Reads an 8-byte floating point value from the current stream and advances the current position of the stream by eight bytes.
 '
-' @return A Double datatype read from the stream.
-'
+' @return An 8-byte floating point value read from the current stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
 Public Function ReadDouble() As Double
     FillBuffer vbSizeOfDouble
     ReadDouble = AsDouble(mBuffer(0))
@@ -276,7 +354,7 @@ End Function
 '
 ' @return A Date datatype read from the stream.
 ' @remarks It is possible to read a combination of 8 bytes that
-' convert into an invalid Date. This will cause and Overflow error.
+' convert into an invalid Date. This will cause an <a href="OverflowException.html">OverflowException</a>.
 '
 Public Function ReadDate() As Date
     Dim PotentialDate As Double
@@ -289,20 +367,54 @@ Public Function ReadDate() As Date
 End Function
 
 ''
-' Reads 8 bytes from the stream and returns them as a Currency datatype.
+' Reads an 8-byte Currency value from the current stream and advances the current position of the stream by eight bytes.
 '
-' @return A Currency datatype.
-'
+' @return An 8-byte Currency value read from the current stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
 Public Function ReadCurrency() As Currency
     FillBuffer vbSizeOfCurrency
     ReadCurrency = AsCurr(mBuffer(0))
 End Function
 
 ''
-' Reads 4 bytes from the stream and returns them as a Single datatype.
+' Reads an 4-byte floating point value from the current stream and advances the current position of the stream by four bytes.
 '
-' @return A Single datatype.
-'
+' @return An 4-byte floating point value read from the current stream.
+' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
+' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="EndOfStreamException.html">EndOfStreamException</a></td><td>The end of the stream is reached.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ObjectDisposedException.html">ObjectDisposedException</a></td><td>The stream is closed.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="IOException.html">IOException</a></td><td>An I/O error occurs.</td>
+'    </tr>
+' </table>
 Public Function ReadSingle() As Single
     FillBuffer vbSizeOfSingle
     ReadSingle = AsSingle(mBuffer(0))

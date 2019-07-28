@@ -113,6 +113,16 @@ Public Sub ReadBytes_WithNoBytesRemainingInStream_ReturnsZeroLengthArray()
     Assert.That Actual, Iz.EqualTo(NewBytes())
 End Sub
 
+Public Sub ReadInt64_WhenCalled_ReturnsExpected()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(1, 2, 3, 4, 5, 6, 7, 8))
+    
+    Dim Actual As Int64
+    Actual = Reader.ReadInt64
+    
+    Assert.That Actual, Iz.EqualTo(NewInt64(&H4030201, &H8070605))
+End Sub
+
 Public Sub ReadInt32_WhenCalled_ReturnsExpected()
     Dim Reader As BinaryReader
     Set Reader = MakeReader(NewBytes(&HFF, &H0, &H80, &H80))

@@ -365,8 +365,8 @@ Class=Int64Static; System\Int64Static.cls
 Module=Information; Cor\Information.bas
 Class=SafeMemoryMappedFileHandle; Microsoft.Win32.SafeHandles\SafeMemoryMappedFileHandle.cls
 Class=MemoryMappedViewStream; System.IO.MemoryMappedFiles\MemoryMappedViewStream.cls
-ResFile32="CorLib.RES"
 Class=IVersionable; System.Collections\IVersionable.cls
+ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -408,7 +408,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=2
+Num=1
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -417,9 +417,9 @@ Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
 
 [TASK2]
-Description=Validate MemoryStream.SeekPosition parameters
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
 Comment=
 AssignedTo=
 

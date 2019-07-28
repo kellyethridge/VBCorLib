@@ -110,6 +110,9 @@ version 3.0 (BREAKING CHANGES)
 	* Added MemoryMappedViewAccessor to access mapped views of a file.
 	* Fixed MemoryStream. Should through ObjectDisposedException when reading Position property when closed.
 	* Re-implemented MemoryMappedFile to align with .NET 4.0.
+	* Added CopyTo method to Stream interface to align with .NET 4.0.
+	* Renamed IVersionableCollection interface to IVersionable.
+	* Added ReadInt64 to BinaryReader to support Int64 structure.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
