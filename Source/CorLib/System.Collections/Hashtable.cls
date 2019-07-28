@@ -54,7 +54,7 @@ Implements IDictionary
 Implements ICollection
 Implements IEnumerable
 Implements ICloneable
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const PropCount                 As String = "Count"
 Private Const PropKey                   As String = "Key"
@@ -890,6 +890,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

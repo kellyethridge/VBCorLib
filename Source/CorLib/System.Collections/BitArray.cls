@@ -57,7 +57,7 @@ Implements IObject
 Implements IEnumerable
 Implements ICollection
 Implements ICloneable
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const PropUBound        As String = "Ubound"
 Private Const PropLength        As String = "Length"
@@ -573,6 +573,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

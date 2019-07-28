@@ -42,7 +42,7 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
-Implements IVersionableCollection
+Implements IVersionable
 
 Private mList       As IList
 Private mComparer   As IComparer
@@ -661,6 +661,6 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = GetCollectionVersion(mList)
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = GetCollectionVersion(mList)
 End Property

@@ -55,7 +55,7 @@ Implements ICollection
 Implements IEnumerable
 Implements ICloneable
 Implements IList
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const PropCount             As String = "Count"
 Private Const PropCapacity          As String = "Capacity"
@@ -1039,8 +1039,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   IVersionableCollection
+'   IVersionable
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

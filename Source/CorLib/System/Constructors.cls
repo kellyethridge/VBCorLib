@@ -1825,7 +1825,7 @@ Public Function NewDriveNotFoundException(ByRef Message As String, Optional ByVa
     NewDriveNotFoundException.Init Message, InnerException
 End Function
 
-Public Function NewEnumeratorBase(ByVal StartIndex As Long, ByVal Length As Long, Optional ByVal Collection As IVersionableCollection) As EnumeratorBase
+Public Function NewEnumeratorBase(ByVal StartIndex As Long, ByVal Length As Long, Optional ByVal Collection As IVersionable) As EnumeratorBase
     Set NewEnumeratorBase = New EnumeratorBase
     NewEnumeratorBase.Init StartIndex, Length, Collection
 End Function

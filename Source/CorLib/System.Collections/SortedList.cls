@@ -52,7 +52,7 @@ Implements IObject
 Implements IEnumerable
 Implements ICollection
 Implements IDictionary
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const DefaultCapacity   As Long = 16
 Private Const PropCount         As String = "Count"
@@ -778,6 +778,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

@@ -64,9 +64,9 @@ End Function
 Public Function GetCollectionVersion(ByVal Obj As Object) As Long
     On Error GoTo TypeMismatch
     
-    Dim Versioned As IVersionableCollection
+    Dim Versioned As IVersionable
     Set Versioned = Obj
-    GetCollectionVersion = Versioned.CurrentVersion
+    GetCollectionVersion = Versioned.Version
     
 TypeMismatch:
 End Function

@@ -30,8 +30,8 @@ Attribute VB_Name = "Statics"
 '
 Option Explicit
 
-Public Type NullVersionableCollection
-    Instance As New IVersionableCollection
+Public Type NullVersionable
+    Instance As New IVersionable
 End Type
 
 Public Missing                  As Variant
@@ -103,7 +103,7 @@ Public MyBase                   As New ObjectBase
 Public Char                     As New Char
 Public Error                    As New ErrorStatic
 Public IOError                  As New IOError
-Public NullVersionableCollection As NullVersionableCollection
+Public NullVersionable          As NullVersionable
 Public StringComparer           As New StringComparerStatic
 Public RSACryptoServiceProvider As New RSACryptoServiceProviderStatic
 Public Funcs                    As New PublicFunctions

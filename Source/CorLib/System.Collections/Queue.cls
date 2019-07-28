@@ -46,7 +46,7 @@ Implements IObject
 Implements ICloneable
 Implements ICollection
 Implements IEnumerable
-Implements IVersionableCollection
+Implements IVersionable
 
 Private Const DefaultCapacity       As Long = 16
 Private Const ItemPropertyFormat    As String = "Item{0}"
@@ -469,6 +469,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   IVersionableCollection
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Property Get IVersionableCollection_CurrentVersion() As Long
-    IVersionableCollection_CurrentVersion = mVersion
+Private Property Get IVersionable_Version() As Long
+    IVersionable_Version = mVersion
 End Property

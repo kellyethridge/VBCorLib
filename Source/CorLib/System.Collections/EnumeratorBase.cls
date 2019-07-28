@@ -40,7 +40,7 @@ Implements ICloneable
 Private mLength         As Long
 Private mCount          As Long
 Private mStartIndex     As Long
-Private mCollection     As IVersionableCollection
+Private mCollection     As IVersionable
 Private mVersion        As Long
 
 
@@ -73,23 +73,23 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Friend Sub Init(ByVal StartIndex As Long, ByVal Length As Long, ByVal Collection As IVersionableCollection)
+Friend Sub Init(ByVal StartIndex As Long, ByVal Length As Long, ByVal Collection As IVersionable)
     If Length < 0 Then _
         Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
     
     mLength = Length
     mStartIndex = StartIndex
     mCount = -1
-    Set mCollection = IfObject(Collection, NullVersionableCollection.Instance)
-    mVersion = mCollection.CurrentVersion
+    Set mCollection = IfObject(Collection, NullVersionable.Instance)
+    mVersion = mCollection.Version
 End Sub
 
-Friend Sub InitClone(ByVal StartIndex As Long, ByVal Length As Long, ByVal Count As Long, ByVal Collection As IVersionableCollection)
+Friend Sub InitClone(ByVal StartIndex As Long, ByVal Length As Long, ByVal Count As Long, ByVal Collection As IVersionable)
     mStartIndex = StartIndex
     mLength = Length
     mCount = Count
     Set mCollection = Collection
-    mVersion = mCollection.CurrentVersion
+    mVersion = mCollection.Version
 End Sub
 
 
@@ -97,7 +97,7 @@ End Sub
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub EnsureUnchangedVersion()
-    If mCollection.CurrentVersion <> mVersion Then
+    If mCollection.Version <> mVersion Then
         Error.InvalidOperation InvalidOperation_VersionError
     End If
 End Sub
