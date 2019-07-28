@@ -113,6 +113,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added CopyTo method to Stream interface to align with .NET 4.0.
 	* Renamed IVersionableCollection interface to IVersionable.
 	* Added ReadInt64 to BinaryReader to support Int64 structure.
+	* Added support for Int64 to BinaryWriter.WriteValue method.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

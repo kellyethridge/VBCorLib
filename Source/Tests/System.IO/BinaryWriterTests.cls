@@ -39,6 +39,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use False, NewBytes(0)
             Test.Use NewBytes(1, 2, 3), NewBytes(1, 2, 3)
             Test.Use NewIntegers(Asc("a"), &H2030, Asc("c")), NewBytes(&H61, &HE2, &H80, &HB0, &H63)
+            Test.Use NewInt64(&H4030201, &H8070605), NewBytes(1, 2, 3, 4, 5, 6, 7, 8)
             
         Case "WriteChar_WithValues_WritesExpected"
             Test.Use ChrW(&H2030), NewBytes(&HE2, &H80, &HB0)
@@ -117,6 +118,17 @@ Public Sub WriteValue_WithUnsupportArrayType_ThrowsArgumentException()
     On Error Resume Next
     Writer.WriteValue UnsupportedArray
 
+    AssertArgumentException Err
+End Sub
+
+Public Sub WriteValue_WithUnsupportedUDT_ThrowsArgumentException()
+    Dim Unsupported As SimpleStructure
+    Dim Writer As BinaryWriter
+    Set Writer = Cor.NewBinaryWriter(New MemoryStream)
+    
+    On Error Resume Next
+    Writer.WriteValue Unsupported
+    
     AssertArgumentException Err
 End Sub
 

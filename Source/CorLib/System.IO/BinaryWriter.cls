@@ -244,19 +244,40 @@ End Sub
 
 Private Sub WriteIntrinsic(ByRef Value As Variant)
     Select Case VarType(Value)
-        Case vbBoolean:     WriteBoolean Value
-        Case vbByte:        WriteByte Value
-        Case vbLong:        WriteInt32 Value
-        Case vbSingle:      WriteSingle Value
-        Case vbInteger:     WriteInt16 Value
-        Case vbDouble:      WriteDouble Value
-        Case vbDate:        WriteDate Value
-        Case vbCurrency:    WriteCurrency Value
-        Case vbString:      WriteString CStr(Value)
-        Case vbDecimal:     WriteDecimal Value
+        Case vbBoolean
+            WriteBoolean Value
+        Case vbByte
+            WriteByte Value
+        Case vbLong
+            WriteInt32 Value
+        Case vbSingle
+            WriteSingle Value
+        Case vbInteger
+            WriteInt16 Value
+        Case vbDouble
+            WriteDouble Value
+        Case vbDate
+            WriteDate Value
+        Case vbCurrency
+            WriteCurrency Value
+        Case vbString
+            WriteString CStr(Value)
+        Case vbDecimal
+            WriteDecimal Value
+        Case vbUserDefinedType
+            WriteInt64 Value
         Case Else
             Error.Argument Argument_NeedIntrinsicType, "Value"
     End Select
+End Sub
+
+Private Sub WriteInt64(ByRef Value As Variant)
+    If Statics.Int64.IsInt64(Value) Then
+        WriteInt32 Value.LowPart
+        WriteInt32 Value.HighPart
+    Else
+        Error.Argument Argument_NeedIntrinsicType, "Value"
+    End If
 End Sub
 
 Private Sub WriteBoolean(ByVal Value As Boolean)

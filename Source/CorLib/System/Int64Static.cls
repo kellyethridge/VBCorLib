@@ -40,6 +40,9 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mInt64Guid As VBGUID
+
+
 ''
 ' Represents a 64-bit signed integer.
 '
@@ -61,3 +64,32 @@ Public Function Equals(ByRef Int64A As Int64, ByRef Int64B As Int64) As Boolean
     Equals = (Int64A.HighPart = Int64B.HighPart) And (Int64A.LowPart = Int64B.LowPart)
 End Function
 
+Friend Function IsInt64(ByRef Value As Variant) As Boolean
+    Dim OtherGuid As VBGUID
+    
+    If VarType(Value) = vbUserDefinedType Then
+        OtherGuid = GetGuid(Value)
+        IsInt64 = IsEqualGUID(mInt64Guid, OtherGuid)
+    End If
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function GetGuid(ByRef Value As Variant) As VBGUID
+    Dim Record As IRecordInfo
+    
+    ObjectPtr(Record) = RecordPtr(Value)
+    GetGuid = Record.GetGuid
+    ObjectPtr(Record) = vbNullPtr
+End Function
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    Dim Value As Int64
+    mInt64Guid = GetGuid(Value)
+End Sub
