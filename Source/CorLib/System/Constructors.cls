@@ -611,7 +611,6 @@ End Function
 ' buffer is actually accessable. The buffer cannot be increased in size. The stream
 ' does not release the byte Buffer. The user still must maintain a reference to the
 ' array and keep it alive for the duration of the MemoryStream's life.
-'
 Public Function NewMemoryStream(ByRef Buffer() As Byte, Optional ByRef Index As Variant, Optional ByRef Count As Variant, Optional ByVal Writable As Boolean = True, Optional ByVal Mode As BufferMode = ShareMode) As MemoryStream
     Set NewMemoryStream = New MemoryStream
     NewMemoryStream.Init Buffer, Index, Count, Writable, Mode
@@ -620,14 +619,11 @@ End Function
 ''
 ' Returns a new StringBuilder with user specified settings and starting string.
 '
-' @param s A string to be inititially placed in the builder. If this is specified, then
-' Capacity will be set to no less than Count.
+' @param s A string to be inititially placed in the builder. If this is specified, then <a href="StringBuilder.set.Capacity.html">Capacity</a> will be set to no less than <i>Count</i>.
 ' @param StartIndex The starting index in s to begin placing into the buffer.
-' @param Count The number of characters in s to place into the buffer.
-' @param Capacity The capacity of the internal buffer. If this is less than Count, then
-' Count will override this value.
-' @return A new StringBuilder with s already placed in the buffer.
-'
+' @param Count The number of characters in <i>s</i> to place into the buffer.
+' @param Capacity The capacity of the internal buffer. If this is less than <i>Count</i>, then <i>Count</i> will override this value.
+' @return A new <a href="StringBuilder.html">StringBuilder</a> with <i>s</i> already placed in the buffer.
 Public Function NewStringBuilder(Optional ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant, Optional ByVal Capacity As Long = 128) As StringBuilder
     Set NewStringBuilder = New StringBuilder
     NewStringBuilder.Init s, StartIndex, Count, Capacity
@@ -643,7 +639,6 @@ End Function
 ' @param BufferSize The number of bytes used to cache reads and writes from the physical file.
 ' @param UseAsync Flag used to open the file in asyncronous mode (currently not supported).
 ' @return The new FileStream opened to the specified file.
-'
 Public Function NewFileStream(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess, Optional ByVal Share As FileShare = FileShare.ReadShare, Optional ByVal BufferSize As Long = 4096, Optional ByVal UseAsync As Boolean = False) As FileStream
     If Access = 0 Then
         If Mode = FileMode.Append Then
@@ -664,7 +659,6 @@ End Function
 ' @param Access The access allowed to the file for this FileStream.
 ' @param BufferSize The number of bytes used to cache reads and writes from the physical file.
 ' @return The new FileStream opened to the specified file.
-'
 Public Function NewFileStreamWithHandle(ByVal Handle As SafeFileHandle, ByVal Access As FileAccess, Optional ByVal BufferSize As Long = 4096) As FileStream
     Set NewFileStreamWithHandle = New FileStream
     NewFileStreamWithHandle.InitWithHandle Handle, Access, BufferSize
@@ -675,11 +669,11 @@ End Function
 '
 ' @param BigEndian Indicates if the byte order for a character should be high byte first (default is low byte first.)
 ' @param ByteOrderMark Indicates whether or not the encoding should emit the preamble bytes in the GetPreamble method.
+' @param ThrowOnInvalidBytes <b>True</b> to specify that an exception should be thrown when an invalid encoding is detected; otherwise, <b>False</b>.
 ' @return The new UnicodeEncoding object.
 ' @remarks If ByteOrderMark is True then the GetPreamble will emit one of the following byte arrays.
 ' <p>BigEnding = True: &HFE, &HFF<br>
 ' BigEnding = False: &HFF, &HFE</p>
-'
 Public Function NewUnicodeEncoding(ByVal BigEndian As Boolean, ByVal ByteOrderMark As Boolean, Optional ByVal ThrowOnInvalidBytes As Boolean) As UnicodeEncoding
     Set NewUnicodeEncoding = New UnicodeEncoding
     NewUnicodeEncoding.Init BigEndian, ByteOrderMark, ThrowOnInvalidBytes
@@ -692,7 +686,6 @@ End Function
 ' StringWriter to start with an already created string.
 ' @param provider An object that provided formatting information for numbers and dates.
 ' @return The new StringWriter object.
-'
 Public Function NewStringWriter(Optional ByVal sb As StringBuilder, Optional ByVal Provider As IFormatProvider) As StringWriter
     Set NewStringWriter = New StringWriter
     NewStringWriter.Init sb, Provider
@@ -702,11 +695,12 @@ End Function
 ' Returns a new StringReader object.
 '
 ' @param s The string to be read from.
-' @param IsOwner Tells StringReader to steal the string from the source.
+' @param CopyString Indicates that <a href="StringReader.html">StringReader</a> should copy the string or reference the original.
 ' @return The new StringReader object.
-' @remarks If <i>IsOwner</i> is True, then the variable passed into as <i>s</i>
-' will become an empty string after the object is constructed.
-'
+' @remarks By default the parameter <i>s</i> is referenced internally. This requires the original holder of the
+' string variable to remain valid until <a href="StringReader.html">StringReader</a> has been disposed. If the
+' original string cannot be maintained, then passing <b>True</b> for <i>CopyString</i> will cause <a href="StringReader.html">StringReader</a>
+' to make a copy of the source string to prevent and string deallocation issues.
 Public Function NewStringReader(ByRef s As String, Optional ByVal CopyString As Boolean) As StringReader
     Set NewStringReader = New StringReader
     NewStringReader.Init s, CopyString
@@ -720,7 +714,6 @@ End Function
 ' @remarks When a <b>DirectoryInfo</b> object is created, there is no
 ' attempt at verifying the <i>Path</i>. Only when an attempt to manipulate
 ' the actual directroy is the path validated.
-'
 Public Function NewDirectoryInfo(ByRef Path As String) As DirectoryInfo
     Set NewDirectoryInfo = New DirectoryInfo
     NewDirectoryInfo.Init Path

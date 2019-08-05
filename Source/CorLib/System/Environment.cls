@@ -100,7 +100,7 @@ Private Const ERROR_ENVVAR_NOT_FOUND        As Long = 203&
 ' @param Personal The directory that serves as a common repository for documents (My Documents).
 ' @param PrinterShortcuts The file system directory that contains the link objects that can exist in the Printers virtual folder.
 ' @param ProgramFiles The program files folder.
-' @param ProgramFilexX86 The <b>Program Files</b> folder. On an x86 system, passing the <b>ProgramFilesX86</b> member to the <a href="Environment.GetFolderPath.html">Environment.GetFolderPath</b> method returns an empty string; use the <b>ProgramFiles</b> member instead. You can determine whether Windows is a 32-bit operating system by calling the Environment.Is64BitOperatingSystem property.
+' @param ProgramFilesX86 The <b>Program Files</b> folder. On an x86 system, passing the <b>ProgramFilesX86</b> member to the <a href="Environment.GetFolderPath.html">Environment.GetFolderPath</b> method returns an empty string; use the <b>ProgramFiles</b> member instead. You can determine whether Windows is a 32-bit operating system by calling the Environment.Is64BitOperatingSystem property.
 ' @param Programs The directory that contains the user's program groups.
 ' @param Recent The directory that contains the user's most recently used documents.
 ' @param Resources The file system directory that contains resource data.
@@ -213,7 +213,6 @@ End Property
 ' Returns the current directy of the executing application.
 '
 ' @return The current directory.
-'
 Public Property Get CurrentDirectory() As String
     CurrentDirectory = Directory.GetCurrentDirectory
 End Property
@@ -221,8 +220,7 @@ End Property
 ''
 ' Sets the current directory for the executing application.
 '
-' @param RHS The new directory to change to.
-'
+' @param Value The new directory to change to.
 Public Property Let CurrentDirectory(ByVal Value As String)
     Directory.SetCurrentDirectory Value
 End Property

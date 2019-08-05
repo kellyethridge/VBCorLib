@@ -188,7 +188,9 @@ End Function
 ' Attemps to parse a string of characters of the specified base type.
 '
 ' @param Value The string of characters to attempt to be parsed.
-' @return Returns an instance of BigInteger containing the parsed value.
+' @param Style A bitwise combination of the enumeration values that specify the permitted format of <i>Value</i>.
+' @param Provider An object that provides culture-specific formatting information about <i>Value</i>.
+' @return Returns an instance of <a href="BigInteger.html">BigInteger</a> containing the parsed value.
 ' @remarks If the string could not be parsed, an exception is thrown.
 ' <p>3 base types are supported for parsing (Decimal, Hex, Binary.) The string
 ' must include a base type specifier for Hex and Binary. Decimal is the default.</p>
@@ -204,7 +206,6 @@ End Function
 ' Debug.Print b.ToString("X") '' 8001
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
-'
 Public Function Parse(ByRef Value As String, Optional ByVal Style As NumberStyles = NumberStyles.Integer, Optional ByVal Provider As IFormatProvider) As BigInteger
     If Not TryParseEx(Value, Style, Provider, Parse) Then
         Error.Format Format_ParseBigInteger
@@ -273,10 +274,10 @@ End Function
 ''
 ' Adds two BigInteger value instances together, returning the sum.
 '
-' @param x The augend to be added to.
-' @param y The addend to add to the augend.
-' @return The sum of the two values.
-' @remarks Values of Nothing will be treated as zero.
+' @param Left The first value to add.
+' @param Right The second value to add.
+' @return The sum of <i>Left</i> and <i>Right</i>.
+' @remarks Values of <b>Nothing</b> will be treated as zero.
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = BigInteger.Add(BInt(100), BInt(150))
@@ -523,11 +524,10 @@ End Function
 ''
 ' Peforms a bitwise AND operation after NOTting the second operand, returning the result.
 '
-' @param x The left hand value of the operation.
-' @param y The right hand value to be NOTted for the operation.
+' @param Left The left hand value of the operation.
+' @param Right The right hand value to be NOTted for the operation.
 ' @return A new BigInteger value containing the performed bitwise result.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
 Public Function BitwiseAndNot(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
     Set BitwiseAndNot = Left.BitwiseAndNot(Right)
@@ -540,7 +540,6 @@ End Function
 ' @param Exponent The power to raise the value to.
 ' @return Returns the baseValue^exponent result.
 ' @remarks Values of Nothing are treated as zero.
-'
 Public Function Pow(ByVal Value As BigInteger, ByVal Exponent As Long) As BigInteger
     If Exponent < 0 Then _
         Error.ArgumentOutOfRange "Exponent", ArgumentOutOfRange_NeedNonNegNum

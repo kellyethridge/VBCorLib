@@ -54,6 +54,7 @@ Public Property Get Remaining() As Long: End Property
 '
 ' @param UnknownCharOrHighSurrogate Can be a non-surrogate charactor or a high surrogate of a surrogate pair.
 ' @param UnknownLowSurrogate The low surrogate matched with the high surrogate of the surrogate pair.
+' @param Index The index position of the surrogate pair in the input buffer.
 ' @return <b>true</b> if the fallback buffer can process <i>UnknownCharOrHighSurrogate</i> as a non-surrogate or
 ' process <em>UnknownCharOrHighSurrogate</em> and <em>LowSurrogate</em> as a surrogate pair; <b>false</b> if the fallback buffer ignores the characters.
 '

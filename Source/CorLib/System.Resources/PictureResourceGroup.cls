@@ -92,12 +92,10 @@ End Property
 ''
 ' Adds a picture to the group.
 '
-' @param ResourceID The numeric ID of the picture resource to be included in the group.
-' @param Pic The picture to be added to the group.
-' @remarks The Pic value is not added to the resource. It is only
+' @param Resource The picture to be added to the group.
+' @remarks The picture resource value is not added to the resource. It is only
 ' used to obtain information about the picture. The actual picture
 ' resource needs to be added to the <a href="ResourceWriter.html">ResourceWriter</a> independently.
-'
 Public Sub Add(ByVal Resource As PictureResourceInfo)
     If Resource Is Nothing Then _
         Error.ArgumentNull "Resource"

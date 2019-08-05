@@ -122,12 +122,11 @@ Public Sub Reset(): End Sub
 ' @param Flush <b>True</b> to indicate that no further data is to be converted; otherwise, <b>False</b>.
 ' @param BytesUsed When this method returns, contains the number of bytes that were used in the conversion. This parameter is passed uninitialized.
 ' @param CharsUsed When this method returns, contains the number of characters from chars that were produced by the conversion. This parameter is passed uninitialized.
-' @param When this method returns, contains <b>True</b> if all the characters specified by byteCount were converted; otherwise, <b>False</b>. This parameter is passed uninitialized.
+' @param Completed When this method returns, contains <b>True</b> if all the characters specified by byteCount were converted; otherwise, <b>False</b>. This parameter is passed uninitialized.
 ' @remarks <p>The <b>Convert</b> method will attempt to convert up to <i>ByteCount</i> bytes but no more than would generate <i>CharCount</i> characters.</p>
 ' <p>An optimized implementation would attempt to convert as many bytes as are available to create <i>CharCount</i> characters. The default implementation
 ' simply tries to find a number of byte that when converted will fit in <i>CharCount</i> characters. If there are too many characters to fit then the number
 ' of bytes used to calculate the number of characters is halved. This does not lead to an optimal solution as <i>CharCount</i> will usually not be achieved.</p>
-'
 Public Sub Convert(ByRef Bytes() As Byte, ByVal ByteIndex As Long, ByVal ByteCount As Long, ByRef Chars() As Integer, ByVal CharIndex As Long, ByVal CharCount As Long, ByVal Flush As Boolean, ByRef BytesUsed As Long, ByRef CharsUsed As Long, ByRef Completed As Boolean): End Sub
 
 ''

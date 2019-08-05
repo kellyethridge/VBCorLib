@@ -191,7 +191,8 @@ End Function
 ''
 ' Returns a human readable string of characters representing the number.
 '
-' @param format The specific numerical format wish to have the number displayed as.
+' @param Format The specific numerical format wish to have the number displayed as.
+' @param Provider An object that supplies culture-specific formatting information about this instance.
 ' @return The numeric value of the number in the specified format.
 ' @remarks "X" and "x" for hex in either upper or lowercase. "B" or "b" for a binary
 ' representation of 1's and 0's. Everything else defaults to a decimal display.
@@ -238,7 +239,7 @@ End Function
 ''
 ' Determines if this BigInteger instance is equal to the other value.
 '
-' @param other The other value to determine if this instance is equal to.
+' @param Value The value to determine if this instance is equal to.
 ' @return Returns True if this object and the other value are equal, False otherwise.
 ' @remarks The other value accepts a String, Number, Byte Array, or BigInteger
 ' object. The BInt function is called to convert the other value to

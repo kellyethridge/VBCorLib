@@ -570,7 +570,7 @@ End Function
 ''
 ' Converts the specified year to a four-digit year by using the <a href="JulianCalendar.TwoDigitYearMax.get.html">TwoDigitYearMax</a> property to determine the appropriate century.
 '
-' @param A two-digit or four-digit integer that represents the year to convert.
+' @param Year A two-digit or four-digit integer that represents the year to convert.
 ' @return A 4-digit year in the specific calendar.
 ' @remarks A normal way of dealing with years is by refering to them as a
 ' 2-digit value. This is evident in the Gregorian calendar system. The
@@ -580,7 +580,6 @@ End Function
 ' to 4-digit.
 ' <p>A max year of 2029 will cause a minimum year of 1930. These two years represent
 ' 100 years which 2-digit years will fall. 00-99 will fall within 1930-2029.</p>
-'
 Public Function ToFourDigitYear(ByVal Year As Long) As Long
     If Year > MaxYear Then _
         Throw Cor.NewArgumentOutOfRangeException("Year", Environment.GetResourceString(ArgumentOutOfRange_Range, 0, MaxYear))

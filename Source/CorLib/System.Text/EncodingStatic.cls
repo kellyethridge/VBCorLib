@@ -166,9 +166,10 @@ End Function
 ''
 ' Returns an encoding for a specified codepage.
 '
-' @param CodePageOrName The codepage number or name to encode with.
+' @param CodePageOrName The codepage number or name to encode with or 0 (zero) to use the default encoding.
+' @param EncoderFallback An object that provides an error-handling procedure when a character cannot be encoded with the current encoding.
+' @param DecoderFallback An object that provides an error-handling procedure when a byte sequence cannot be decoded with the current encoding.
 ' @return An encoding for a specific codepage or name.
-'
 Public Function GetEncoding(ByRef CodePageOrName As Variant, Optional ByVal EncoderFallback As EncoderFallback, Optional ByVal DecoderFallback As DecoderFallback) As Encoding
     Dim cp As Long
     

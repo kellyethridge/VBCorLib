@@ -62,11 +62,11 @@ Option Explicit
 ' @param AllowThousands Indicates that the numeric string can have group separators, such as symbols that separate hundreds from thousands. If the NumberStyles value includes the AllowCurrencySymbol flag and the string to be parsed includes a currency symbol, the valid group separator character is determined by the NumberFormatInfo.CurrencyGroupSeparator property, and the number of digits in each group is determined by the NumberFormatInfo.CurrencyGroupSizes property. Otherwise, the valid group separator character is determined by the NumberFormatInfo.NumberGroupSeparator property, and the number of digits in each group is determined by the NumberFormatInfo.NumberGroupSizes property.
 ' @param AllowTrailingSign Indicates that the numeric string can have a trailing sign. Valid trailing sign characters are determined by the NumberFormatInfo.PositiveSign and NumberFormatInfo.NegativeSign properties.
 ' @param AllowTrailingWhite Indicates that trailing white-space characters can be present in the parsed string. Valid white-space characters have the Unicode values U+0009, U+000A, U+000B, U+000C, U+000D, and U+0020. Note that this is a subset of the characters for which the Char.IsWhiteSpace method returns true.
-' @param Any Indicates that all styles except AllowHexSpecifier are used. This is a composite number style.
-' @param Currency Indicates that all styles except AllowExponent and AllowHexSpecifier are used. This is a composite number style.
+' @param [Any] Indicates that all styles except AllowHexSpecifier are used. This is a composite number style.
+' @param [Currency] Indicates that all styles except AllowExponent and AllowHexSpecifier are used. This is a composite number style.
 ' @param Float Indicates that the AllowLeadingWhite, AllowTrailingWhite, AllowLeadingSign, AllowDecimalPoint, and AllowExponent styles are used. This is a composite number style.
 ' @param HexNumber Indicates that the AllowLeadingWhite, AllowTrailingWhite, and AllowHexSpecifier styles are used. This is a composite number style.
-' @param Integer Indicates that the AllowLeadingWhite, AllowTrailingWhite, and AllowLeadingSign styles are used. This is a composite number style.
+' @param [Integer] Indicates that the AllowLeadingWhite, AllowTrailingWhite, and AllowLeadingSign styles are used. This is a composite number style.
 ' @param None Indicates that no style elements, such as leading or trailing white space, thousands separators, or a decimal separator, can be present in the parsed string. The string to be parsed must consist of integral decimal digits only.
 ' @param Number Indicates that the AllowLeadingWhite, AllowTrailingWhite, AllowLeadingSign, AllowTrailingSign, AllowDecimalPoint, and AllowThousands styles are used. This is a composite number style.
 Public Enum NumberStyles
