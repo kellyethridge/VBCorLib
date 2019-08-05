@@ -133,6 +133,14 @@ Public Function GetBytes(ByRef Value As Variant) As Byte()
         Case vbSingle
             SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 4)
             AsSingle(Result(0)) = CSng(Value)
+        Case vbUserDefinedType
+            If Not IsInt64(Value) Then _
+                Throw Cor.NewNotSupportedException("Only intrinsic value types are supported.")
+                
+            Dim Ptr As Long
+            Ptr = DataPtr(Value)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 8)
+            AssignQWord ByVal Ptr, Result(0)
         Case vbDecimal
             Dim PtrSrc As Long
             Dim PtrDst As Long
@@ -185,7 +193,7 @@ End Function
 ' a non-zero value, True is returned, otherwise, False is returned.
 '
 Public Function ToBoolean(ByRef Value() As Byte, ByVal StartIndex As Long) As Boolean
-    ValidateArrayArguments Value, StartIndex, 1
+    ValidateArrayArguments Value, StartIndex, vbSizeOfByte
     ToBoolean = (Value(StartIndex) > 0)
 End Function
 
@@ -197,7 +205,7 @@ End Function
 ' @return Double datatype representation of the 8 bytes used in the array.
 '
 Public Function ToDouble(ByRef Value() As Byte, ByVal StartIndex As Long) As Double
-    ValidateArrayArguments Value, StartIndex, 8
+    ValidateArrayArguments Value, StartIndex, vbSizeOfDouble
     ToDouble = AsDouble(Value(StartIndex))
 End Function
 
@@ -211,7 +219,7 @@ End Function
 ' raise an error due to the 8 bytes used represent an invalid date range.
 '
 Public Function ToDate(ByRef Value() As Byte, ByVal StartIndex As Long) As Date
-    ValidateArrayArguments Value, StartIndex, 8
+    ValidateArrayArguments Value, StartIndex, vbSizeOfDate
     ToDate = AsDouble(Value(StartIndex))
 End Function
 
@@ -223,7 +231,7 @@ End Function
 ' @return Integer datatype representation of the 2 bytes used in the array.
 '
 Public Function ToInteger(ByRef Value() As Byte, ByVal StartIndex As Long) As Integer
-    ValidateArrayArguments Value, StartIndex, 2
+    ValidateArrayArguments Value, StartIndex, vbSizeOfInteger
     ToInteger = AsWord(Value(StartIndex))
 End Function
 
@@ -233,10 +241,21 @@ End Function
 ' @param Value The array of bytes used to create a Long from.
 ' @param StartIndex The starting byte in the array to create a Long from.
 ' @return Long datatype representation of the 4 bytes used in the array.
-'
 Public Function ToLong(ByRef Value() As Byte, ByVal StartIndex As Long) As Long
-    ValidateArrayArguments Value, StartIndex, 4
+    ValidateArrayArguments Value, StartIndex, vbSizeOfLong
     ToLong = AsLong(Value(StartIndex))
+End Function
+
+''
+' Returns a 64-bit signed integer converted from eight bytes at a specified position in a byte array.
+'
+' @param Value An array of bytes.
+' @param StartIndex The starting position within <i>Value</i>.
+' @return A 64-bit signed integer formed by eight bytes beginning at <i>StartIndex</i>.
+' @remarks The <b>ToInt64</b> method converts the bytes from index <i>StartIndex</i> to <i>StartIndex</i> + 7 to a <a href="Int64Static.Int64.html">Int64</a> value. The order of bytes in the array must be little-endian.
+Public Function ToInt64(ByRef Value() As Byte, ByVal StartIndex As Long) As Int64
+    ValidateArrayArguments Value, StartIndex, vbSizeOfInt64
+    AssignQWord Value(StartIndex), ToInt64
 End Function
 
 ''
@@ -247,7 +266,7 @@ End Function
 ' @return Single datatype representation of the 4 bytes used in the array.
 '
 Public Function ToSingle(ByRef Value() As Byte, ByVal StartIndex As Long) As Single
-    ValidateArrayArguments Value, StartIndex, 4
+    ValidateArrayArguments Value, StartIndex, vbSizeOfSingle
     ToSingle = AsSingle(Value(StartIndex))
 End Function
 
@@ -259,7 +278,7 @@ End Function
 ' @return Currency datatype representation of the 8 bytes used in the array.
 '
 Public Function ToCurrency(ByRef Value() As Byte, ByVal StartIndex As Long) As Currency
-    ValidateArrayArguments Value, StartIndex, 8
+    ValidateArrayArguments Value, StartIndex, vbSizeOfCurrency
     ToCurrency = AsCurr(Value(StartIndex))
 End Function
 
@@ -289,7 +308,7 @@ End Function
 ' If the sign byte is non-zero, then the Decimal will be set as negative.<br>
 '
 Public Function ToDecimal(ByRef Value() As Byte, ByVal StartIndex As Long) As Variant
-    ValidateArrayArguments Value, StartIndex, 16
+    ValidateArrayArguments Value, StartIndex, vbSizeOfDecimal
     VariantType(ToDecimal) = vbDecimal
     
     ' check precision

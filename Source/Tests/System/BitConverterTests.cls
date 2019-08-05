@@ -45,6 +45,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/2/2001 8:30:45 AM#, NewBytes(&H9A, &H99, &H99, &H59, &HAB, &H3, &HE2, &H40)
             Test.Use CDec("12345.678911"), NewBytes(&H3F, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H6, &H0)
             Test.Use CDec("-12345.678911"), NewBytes(&H3F, &H1C, &HDC, &HDF, &H2, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H6, &H80)
+            Test.Use Int64.One, NewBytes(1, 0, 0, 0, 0, 0, 0, 0)
+            Test.Use Int64.MinusOne, NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF)
             
         Case "ToBoolean_WithValue_ReturnsExpected"
             Test.Use NewBytes(0), 0, False
@@ -193,5 +195,15 @@ Public Sub ToDecimal_WithValue_ReturnsExpected()
     Actual = BitConverter.ToDecimal(Bytes, 0)
     
     Assert.That Actual, Iz.EqualTo(CDec("12345.678911"))
+End Sub
+
+Public Sub ToInt64_WithValue_ReturnsExpected()
+    Dim Actual As Int64
+    Dim Bytes() As Byte
+    Bytes = NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &H7F)
+    
+    Actual = BitConverter.ToInt64(Bytes, 0)
+    
+    Assert.That Actual, Iz.EqualTo(Int64.MaxValue)
 End Sub
 
