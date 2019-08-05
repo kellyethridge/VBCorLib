@@ -44,6 +44,19 @@ Public Function CInt64(ByRef Value As Variant) As Int64
     Select Case VarType(Value)
         Case vbCurrency
             AsCurr(CInt64) = 0.0001@ * CCur(Int(Value))
+        Case vbLong, vbInteger, vbByte
+            CInt64.LowPart = CLng(Value)
+            
+            If CInt64.LowPart < 0 Then
+                CInt64.HighPart = &HFFFFFFFF
+            End If
+        Case vbString
+            CInt64 = Statics.Int64.Parse(CStr(Value))
+        Case vbUserDefinedType
+            If Not IsInt64(Value) Then _
+                Throw New InvalidCastException
+            
+            CInt64 = Value
         Case Else
             Throw New InvalidCastException
     End Select

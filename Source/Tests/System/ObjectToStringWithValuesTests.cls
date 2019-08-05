@@ -81,7 +81,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Null, "Null"
             
             ' UDT
-            Test.Use NewInt64(0, 0), "Int64"
+            Test.Use NewInt64(1, 0), "1"
             
         Case "ToString_WithIntegerUsingFormat_ReturnsExpected"
             Test.Use -1, "x", "ffff"

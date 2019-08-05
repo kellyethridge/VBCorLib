@@ -28,6 +28,8 @@ Attribute VB_Name = "Information"
 '
 Option Explicit
 
+Private mInt64Guid As VBGUID
+
 
 ' Retrieves the return value of the AddressOf method.
 '
@@ -61,6 +63,27 @@ Public Function SizeOf(ByVal DataType As VbVarType) As Long
             Error.ArgumentOutOfRange "DataType", ArgumentOutOfRange_Enum
     End Select
 End Function
+
+Public Function IsInt64(ByRef Value As Variant) As Boolean
+    Dim OtherGuid As VBGUID
+    
+    If mInt64Guid.Data1 = 0 Then
+        mInt64Guid = GetGuid(Statics.Int64.Zero)
+    End If
+    
+    If VarType(Value) = vbUserDefinedType Then
+        OtherGuid = GetGuid(Value)
+        IsInt64 = IsEqualGUID(mInt64Guid, OtherGuid)
+    End If
+End Function
+
+Private Function GetGuid(ByRef Value As Variant) As VBGUID
+    Dim Record As IRecordInfo
+    
+    Set Record = GetRecordInfo(Value)
+    GetGuid = Record.GetGuid
+End Function
+
 
 Public Function IsPicture(ByRef Value As Variant) As Boolean
     Dim Pic As IPicture
@@ -109,24 +132,16 @@ Public Function DataPtr(ByRef Value As Variant) As Long
     DataPtr = MemLong(VarPtr(Value) + VARIANTDATA_OFFSET)
 End Function
 
-' Retrieves the 32-bits within a variant that represent
-' a pointer to an IRecordInfo object.
-'
-' The IRecordInfo address is held in bytes 12-15 of a 16-byte variant.
-Public Function RecordPtr(ByRef Value As Variant) As Long
-    RecordPtr = MemLong(VarPtr(Value) + VARIANTRECORD_OFFSET)
-End Function
-
 ' Returns an IRecordInfo for a UDT.
 '
-' This method returns Nothing is the value is not a UDT.
+' This method returns Nothing if the value is not a UDT.
 Public Function GetRecordInfo(ByRef Value As Variant) As IRecordInfo
-    Dim Obj As IUnknown
+    Dim Record As IUnknown
     
     If VarType(Value) = vbUserDefinedType Then
-        ObjectPtr(Obj) = RecordPtr(Value)
-        Set GetRecordInfo = Obj
-        ObjectPtr(Obj) = vbNullPtr
+        ObjectPtr(Record) = MemLong(VarPtr(Value) + VARIANTRECORD_OFFSET)
+        Set GetRecordInfo = Record
+        ObjectPtr(Record) = vbNullPtr
     End If
 End Function
 
@@ -171,10 +186,12 @@ Public Function Len1D(ByRef Arr As Variant) As Long
     Len1D = UBound(Arr) - LBound(Arr) + 1
 End Function
 
+' Returns a consistant pointer to an object regardless of which interface is used.
 Public Function WeakPtr(ByVal Obj As IUnknown) As Long
     WeakPtr = ObjPtr(Obj)
 End Function
 
+' Returns a strong reference based on an object pointer.
 Public Function StrongPtr(ByVal Ptr As Long) As IUnknown
     Dim Obj As IUnknown
     ObjectPtr(Obj) = Ptr

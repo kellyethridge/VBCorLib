@@ -117,7 +117,15 @@ Public Function Compare(ByRef a As Variant, ByRef b As Variant) As Long
                     Exit Function
                 End If
             End If
-            
+        
+        Case vbUserDefinedType
+            If BVarType = vbUserDefinedType Then
+                If IsInt64(a) And IsInt64(b) Then
+                    Compare = CallFunc_T_T_Long(AddressOf Int64Compare, DataPtr(a), DataPtr(b))
+                    Exit Function
+                End If
+            End If
+        
         Case BVarType
             If a < b Then
                 Compare = -1
@@ -160,8 +168,8 @@ Private Function IObject_Equals(Value As Variant) As Boolean
     IObject_Equals = Equals(Value)
 End Function
 
-Private Function IObject_GetHashcode() As Long
-    IObject_GetHashcode = GetHashCode
+Private Function IObject_GetHashCode() As Long
+    IObject_GetHashCode = GetHashCode
 End Function
 
 Private Function IObject_ToString() As String

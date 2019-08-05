@@ -366,6 +366,7 @@ Module=Information; Cor\Information.bas
 Class=SafeMemoryMappedFileHandle; Microsoft.Win32.SafeHandles\SafeMemoryMappedFileHandle.cls
 Class=MemoryMappedViewStream; System.IO.MemoryMappedFiles\MemoryMappedViewStream.cls
 Class=IVersionable; System.Collections\IVersionable.cls
+Module=Int64Callbacks; System\Int64Callbacks.bas
 ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
@@ -432,29 +433,24 @@ Comment=This will break these two methods logically.
 Description=Add Int64 support to BitConverter class
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK5]
-Description=Add Int64 support to Object.ToString
+Description=Add ReadDate method to MemoryMappedViewAccessor
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK6]
-Description=Add Int64 manipulation methods to Int64Static
+Description=Add range check in CorDateTime.ToOADate method
 Status=0
 Priority=1
-AssignedTo=
-Comment=
+Comment=We should throw an OverflowException instead of letting the assignment to a Date variable raise an error.
 
 [TASK7]
 Description=
 Status=
 Priority=
-AssignedTo=
 Comment=
+AssignedTo=
 
 [TASK8]
 Description=

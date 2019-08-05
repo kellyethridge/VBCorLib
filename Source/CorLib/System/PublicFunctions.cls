@@ -286,3 +286,12 @@ End Function
 Public Function CDateTime(ByRef Value As Variant) As CorDateTime
     Set CDateTime = Convert.ToDateTime(Value)
 End Function
+
+''
+' Converts a value to a 64-bit signed integer.
+'
+' @param Value The value to be converted
+' @return Returns a 64-bit signed integer.
+Public Function CInt64(ByRef Value As Variant) As Int64
+    CInt64 = Conversion.CInt64(Value)
+End Function

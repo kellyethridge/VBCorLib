@@ -1003,7 +1003,7 @@ Friend Property Get LCID() As Long
     LCID = mProps.LCID
 End Property
 
-Friend Function Format(ByRef Value As Variant, Optional ByRef FormatText As String) As String
+Friend Function Format(ByRef Value As Variant, ByRef FormatText As String) As String
     VerifyLoaded
     
     Dim vt As Long
@@ -1022,6 +1022,68 @@ Friend Function Format(ByRef Value As Variant, Optional ByRef FormatText As Stri
         Case Else
             Format = Value
     End Select
+End Function
+
+Friend Function FormatInt64(ByRef Value As Int64, ByRef Format As String) As String
+    Dim Specifiers As Specifiers
+    
+    VerifyLoaded
+    ClearOutput
+    Specifiers = ParseSpecifiers(Format)
+    FormatInt64 = Int64ToString(Value, Specifiers, Format)
+End Function
+
+Private Function Int64ToString(ByRef Value As Int64, ByRef Specifiers As Specifiers, ByRef Format As String) As String
+    Dim Number As NumberType
+    
+    If Specifiers.Format <> CustomSpecifier And _
+        Specifiers.Format <> HexUpperSpecifier And _
+        Specifiers.Format <> HexLowerSpecifier Then
+        Int64ToNumber Value, Number
+    End If
+    
+    Select Case Specifiers.Format
+        Case FormatSpecifier.GeneralLowerSpecifier
+            FormatGeneralInteger Number, 19, vbLowerEChar, mDefaultOutput
+        Case FormatSpecifier.GeneralUpperSpecifier
+            FormatGeneralInteger Number, 19, vbUpperEChar, mDefaultOutput
+        Case FormatSpecifier.CurrencyLowerSpecifier, FormatSpecifier.CurrencyUpperSpecifier
+            FormatCurrency Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.DecimalUpperSpecifier, FormatSpecifier.DecimalLowerSpecifier
+            FormatDecimal Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.ExponentLowerSpecifier
+            FormatExponentInt32 Number, Specifiers.Precision, vbLowerEChar, mDefaultOutput
+        Case FormatSpecifier.ExponentUpperSpecifier
+            FormatExponentInt32 Number, Specifiers.Precision, vbUpperEChar, mDefaultOutput
+        Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
+            FormatFixedDouble Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.NumberUpperSpecifier, FormatSpecifier.NumberLowerSpecifier
+            FormatNumber Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.PercentUpperSpecifier, FormatSpecifier.PercentLowerSpecifier
+            If Number.Precision > 0 Then
+                Number.DecimalPosition = Number.DecimalPosition + 2
+            End If
+            
+            If Specifiers.Precision = UnknownPrecision Then
+                FormatPercent Number, mProps.PercentDecimalDigits, mDefaultOutput
+            Else
+                FormatPercent Number, Specifiers.Precision, mDefaultOutput
+            End If
+        Case FormatSpecifier.HexLowerSpecifier, FormatSpecifier.HexUpperSpecifier
+            FormatHexInt64 Value, Specifiers, mDefaultOutput
+            Int64ToString = SysAllocStringLen(VarPtr(mDefaultOutput.Buffer(mDefaultOutput.Position)), DefaultOutputSize - mDefaultOutput.Position)
+            Exit Function
+            
+        Case Else
+            Int64ToString = Format
+            Exit Function
+    End Select
+    
+    If mDefaultOutput.Position = 0 Then
+        Int64ToString = "0"
+    Else
+        Int64ToString = SysAllocStringLen(VarPtr(mDefaultOutput.Buffer(0)), mDefaultOutput.Position)
+    End If
 End Function
 
 Friend Function FormatBigNumber(ByRef Value As BigNumber, ByRef Format As String) As String
@@ -1397,29 +1459,20 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
     Select Case Specifiers.Format
         Case FormatSpecifier.GeneralLowerSpecifier
             FormatGeneralInteger mNumber, Specifiers.Precision, vbLowerEChar, mDefaultOutput
-            
         Case FormatSpecifier.GeneralUpperSpecifier
             FormatGeneralInteger mNumber, Specifiers.Precision, vbUpperEChar, mDefaultOutput
-            
         Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
-'            FormatFixedDouble mNumber, Specifiers.Precision, mDefaultOutput
             FormatFixedInt32 mNumber, Specifiers.Precision, mDefaultOutput
-            
         Case FormatSpecifier.DecimalUpperSpecifier, FormatSpecifier.DecimalLowerSpecifier
             FormatDecimal mNumber, Specifiers.Precision, mDefaultOutput
-            
         Case FormatSpecifier.NumberUpperSpecifier, FormatSpecifier.NumberLowerSpecifier
             FormatNumber mNumber, Specifiers.Precision, mDefaultOutput
-            
         Case FormatSpecifier.CurrencyUpperSpecifier, FormatSpecifier.CurrencyLowerSpecifier
             FormatCurrency mNumber, Specifiers.Precision, mDefaultOutput
-            
         Case FormatSpecifier.ExponentLowerSpecifier
             FormatExponentInt32 mNumber, Specifiers.Precision, vbLowerEChar, mDefaultOutput
-            
         Case FormatSpecifier.ExponentUpperSpecifier
             FormatExponentInt32 mNumber, Specifiers.Precision, vbUpperEChar, mDefaultOutput
-        
         Case FormatSpecifier.PercentUpperSpecifier, FormatSpecifier.PercentLowerSpecifier
             If mNumber.Precision > 0 Then
                 mNumber.DecimalPosition = mNumber.DecimalPosition + 2
@@ -1430,12 +1483,10 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
             Else
                 FormatPercent mNumber, Specifiers.Precision, mDefaultOutput
             End If
-
         Case FormatSpecifier.HexLowerSpecifier, FormatSpecifier.HexUpperSpecifier
             FormatHex Value, Specifiers, mDefaultOutput
             FormatInt32 = SysAllocStringLen(VarPtr(mDefaultOutput.Buffer(mDefaultOutput.Position)), DefaultOutputSize - mDefaultOutput.Position)
             Exit Function
-        
         Case Else
             If Value < 0 Then
                 FormatInt32 = mProps.NegativeSign & VBA.Format$(Abs(Value), Format)
@@ -1772,6 +1823,45 @@ Private Sub FormatHex(ByRef Value As Variant, ByRef Specifiers As Specifiers, By
     Output.Position = Output.Position + 1
 End Sub
 
+Private Sub FormatHexInt64(ByRef Value As Int64, ByRef Specifiers As Specifiers, ByRef Output As OutputBuffer)
+    Dim Digits      As Long
+    Dim CaseOffset  As Long
+    Dim Ch          As Integer
+    Dim HexValue    As Int64
+    
+    HexValue = Value
+
+    If Specifiers.Precision = UnknownPrecision Then
+        Digits = 1
+    Else
+        Digits = Specifiers.Precision
+    End If
+    
+    CaseOffset = Specifiers.Format - 33
+    Output.Position = DefaultOutputSize - 1
+    
+    Do While Not Statics.Int64.IsZero(HexValue)
+        Ch = HexValue.LowPart And &HF
+        
+        If Ch > 9 Then
+            Output.Buffer(Output.Position) = Ch + CaseOffset  ' add the offset to upper or lower 'a-f' or 'A-F'.
+        Else
+            Output.Buffer(Output.Position) = vbZeroChar + Ch
+        End If
+        
+        Output.Position = Output.Position - 1
+        HexValue = Statics.Int64.ShiftRight(HexValue, 4)
+    Loop
+    
+    ' Add leading zeros if needed.
+    Do While Output.Position >= DefaultOutputSize - Digits
+        Output.Buffer(Output.Position) = vbZeroChar
+        Output.Position = Output.Position - 1
+    Loop
+    
+    Output.Position = Output.Position + 1
+End Sub
+
 Private Function FormatHexBigNumber(ByRef Number As BigNumber, ByRef Specifiers As Specifiers, ByRef Output As OutputBuffer) As String
     Dim CharCount       As Long
     Dim HexCharOffset   As Long
@@ -2002,6 +2092,7 @@ Private Sub BigNumberToNumber(ByRef Value As BigNumber, ByRef Result As NumberTy
     CopyMemory Result.Digits(0), Result.Digits(Index + 1), Result.Precision + 1
 End Sub
 
+
 ''
 ' This will parse the format type and optional numerical value.
 '
@@ -2194,6 +2285,57 @@ Private Sub Int32ToNumber(ByVal Value As Long)
             .Digits(.Precision - 1) = vbEightChar
         End If
     End With
+End Sub
+
+Private Sub Int64ToNumber(ByRef Value As Int64, ByRef Number As NumberType)
+    Dim DigitIndex As Long
+    Dim Ten As Int64
+    Dim Remainder As Int64
+    Dim v As Int64
+    Dim IsMaxNeg As Boolean
+        
+    v = Value
+    
+    If v.HighPart < 0 Then
+        If v.HighPart = &H80000000 And v.LowPart = 0 Then
+            IsMaxNeg = True
+            v.LowPart = 1
+        End If
+        
+        v = Statics.Int64.Negate(v)
+    End If
+        
+    Ten.LowPart = 10
+    ReDim Number.Digits(0 To 19)
+    Number.IsNegative = Value.HighPart < 0
+    
+    Do While Not Statics.Int64.IsZero(v)
+        v = Statics.Int64.DivRem(v, Ten, Remainder)
+        Number.Digits(DigitIndex) = Remainder.LowPart + vbZeroChar
+        DigitIndex = DigitIndex + 1
+    Loop
+        
+    Number.DecimalPosition = DigitIndex
+    Number.Precision = DigitIndex
+    
+    If Number.Precision > 0 Then
+        Dim i As Long
+        Dim j As Long
+        Dim t As Byte
+        
+        j = Number.Precision - 1
+        
+        For i = 0 To (Number.Precision \ 2) - 1
+            t = Number.Digits(i)
+            Number.Digits(i) = Number.Digits(j)
+            Number.Digits(j) = t
+            j = j - 1
+        Next
+
+        If IsMaxNeg Then
+            Number.Digits(Number.Precision - 1) = vbEightChar
+        End If
+    End If
 End Sub
 
 Private Sub DoubleToNumber(ByVal Value As Double, ByVal FormatPrecision As Long)

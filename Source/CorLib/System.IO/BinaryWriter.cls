@@ -265,7 +265,7 @@ Private Sub WriteIntrinsic(ByRef Value As Variant)
         Case vbDecimal
             WriteDecimal Value
         Case Else
-            If Statics.Int64.IsInt64(Value) Then
+            If IsInt64(Value) Then
                 WriteInt64 Value
             Else
                 Error.Argument Argument_NeedIntrinsicType, "Value"

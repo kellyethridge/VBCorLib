@@ -162,7 +162,8 @@ End Function
 ' @see IFormatProvider
 '
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim ValueType As VbVarType
+    Dim ValueType   As VbVarType
+    
     ValueType = VarType(Value)
     
     If ValueType = vbVariant Then
@@ -197,7 +198,11 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
                 End If
             End If
         Case vbUserDefinedType
-            ToString = TypeName(Value)
+            If IsInt64(Value) Then
+                ToString = CallFunc_T_T_T_String(AddressOf Int64ToString, DataPtr(Value), VarPtr(Format), VarPtr(Provider))
+            Else
+                ToString = TypeName(Value)
+            End If
         Case vbEmpty
             ToString = "Empty"
         Case vbNull

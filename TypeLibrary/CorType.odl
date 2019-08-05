@@ -450,6 +450,13 @@ library CorType {
         boolean Invoke([in] void * Arg1, [in] void * Arg2);
     };
 
+    [uuid(0518B469-C3FB-4708-AD81-F63C57A0F6A3), odl]
+    interface Func_T_T_T_String : IUnknown
+    {
+        BSTR Invoke([in] void * Arg1, [in] void * Arg2, [in] void * Arg3);
+    };
+
+
     [uuid(B196B283-BAB4-101A-B69C-00AA00341D07), odl]
     interface IProvideClassInfo :IVBUnknown
     {
