@@ -34,7 +34,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use CDec(1.1), NewBytes(&HB, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H0, &H1, &H0)
             Test.Use "hello", NewBytes(&H5, &H68, &H65, &H6C, &H6C, &H6F)
             Test.Use "", NewBytes(0)
-            Test.Use #1/1/2001 8:30:00 AM#, NewBytes(&H55, &H55, &H55, &H55, &H8B, &H3, &HE2, &H40)
+            Test.Use #1/1/2001 8:30:00 AM#, NewBytes(&H0, &H34, &H1A, &H2A, &HE4, &H41, &HC2, &H8)
             Test.Use True, NewBytes(1)
             Test.Use False, NewBytes(0)
             Test.Use NewBytes(1, 2, 3), NewBytes(1, 2, 3)

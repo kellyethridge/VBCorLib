@@ -307,7 +307,10 @@ Private Sub WriteDouble(ByVal Value As Double)
 End Sub
 
 Private Sub WriteDate(ByVal Value As Date)
-    mOutStream.WriteBlock AsOByteArr(Value).Bytes, 0, vbSizeOfDate
+    Dim Milliseconds As Currency
+    
+    Milliseconds = CorDateTime.GetTotalMilliseconds(Value)
+    WriteCurrency Milliseconds
 End Sub
 
 Private Sub WriteCurrency(ByVal Value As Currency)

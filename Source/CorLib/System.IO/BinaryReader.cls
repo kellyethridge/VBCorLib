@@ -355,15 +355,8 @@ End Function
 ' @return A Date datatype read from the stream.
 ' @remarks It is possible to read a combination of 8 bytes that
 ' convert into an invalid Date. This will cause an <a href="OverflowException.html">OverflowException</a>.
-'
 Public Function ReadDate() As Date
-    Dim PotentialDate As Double
-    PotentialDate = ReadDouble
-    
-    If PotentialDate < MinDateAsDouble Or PotentialDate > MaxDateAsDouble Then _
-        Throw New OverflowException
-        
-    ReadDate = PotentialDate
+    ReadDate = CorDateTime.GetOADate(ReadCurrency)
 End Function
 
 ''

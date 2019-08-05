@@ -110,28 +110,31 @@ Public Function GetBytes(ByRef Value As Variant) As Byte()
     ' ReDim will cause two heap memory allocations.
     Select Case VarType(Value)
         Case vbLong
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 4)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfLong)
             AsLong(Result(0)) = CLng(Value)
         Case vbBoolean
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 1)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfByte)
             
             If Value Then
                 Result(0) = 1
             End If
         Case vbInteger
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 2)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfInteger)
             AsWord(Result(0)) = CInt(Value)
         Case vbByte
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 1)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfByte)
             Result(0) = CByte(Value)
-        Case vbDouble, vbDate
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 8)
+        Case vbDouble
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfDouble)
             AsDouble(Result(0)) = CDbl(Value)
+        Case vbDate
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfCurrency)
+            AssignQWord CorDateTime.GetTotalMilliseconds(Value), Result(0)
         Case vbCurrency
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 8)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfCurrency)
             AsCurr(Result(0)) = CCur(Value)
         Case vbSingle
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 4)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfSingle)
             AsSingle(Result(0)) = CSng(Value)
         Case vbUserDefinedType
             If Not IsInt64(Value) Then _
@@ -139,7 +142,7 @@ Public Function GetBytes(ByRef Value As Variant) As Byte()
                 
             Dim Ptr As Long
             Ptr = DataPtr(Value)
-            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, 8)
+            SAPtr(Result) = SafeArrayCreateVectorEx(vbByte, 0, vbSizeOfInt64)
             AssignQWord ByVal Ptr, Result(0)
         Case vbDecimal
             Dim PtrSrc As Long
@@ -219,8 +222,10 @@ End Function
 ' raise an error due to the 8 bytes used represent an invalid date range.
 '
 Public Function ToDate(ByRef Value() As Byte, ByVal StartIndex As Long) As Date
-    ValidateArrayArguments Value, StartIndex, vbSizeOfDate
-    ToDate = AsDouble(Value(StartIndex))
+    Dim Milliseconds As Currency
+    
+    Milliseconds = ToCurrency(Value, StartIndex)
+    ToDate = CorDateTime.GetOADate(Milliseconds)
 End Function
 
 ''

@@ -175,12 +175,22 @@ End Sub
 
 Public Sub ReadDate_WhenCalled_ReturnsExpected()
     Dim Reader As BinaryReader
-    Set Reader = MakeReader(NewBytes(&HAB, &HAA, &HAA, &HAA, &HEA, &H5E, &HE2, &H40))
+    Set Reader = MakeReader(NewBytes(&H90, &HE7, &HD3, &HCC, &H7F, &H42, &HC2, &H8))
     
     Dim Actual As Date
     Actual = Reader.ReadDate
     
-    Assert.That Actual, Iz.EqualTo(#1/2/2003 8:00:00 AM#)
+    Assert.That Actual, Iz.EqualTo(#1/2/2001 3:04:05 AM#)
+End Sub
+
+Public Sub ReadDate_WithZeroMilliseconds_ReturnsDefaultDate()
+    Dim Reader As BinaryReader
+    Set Reader = MakeReader(NewBytes(0, 0, 0, 0, 0, 0, 0, 0))
+    
+    Dim Actual As Date
+    Actual = Reader.ReadDate
+    
+    Assert.That Actual, Iz.EqualTo(#12:00:00 AM#)
 End Sub
 
 Public Sub ReadCurrency_WhenCalled_ReturnsExpected()

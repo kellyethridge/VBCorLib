@@ -112,8 +112,14 @@ version 3.0 (BREAKING CHANGES)
 	* Re-implemented MemoryMappedFile to align with .NET 4.0.
 	* Added CopyTo method to Stream interface to align with .NET 4.0.
 	* Renamed IVersionableCollection interface to IVersionable.
-	* Added ReadInt64 to BinaryReader to support Int64 structure.
+	* Added ReadInt64 to BinaryReader to support Int64 structure.	
 	* Added support for Int64 to BinaryWriter.WriteValue method.
+	* Renamed BitConverter class ToLong and ToInteger to ToInt32 and ToInt16 to match .NET. *BREAKING*
+	* Changed BinaryReader.ReadDate to read binary data that represents ticks to match .NET. *BREAKING*
+	* Changed BinaryWriter.WriteDate to write binary data that represents ticks to match .NET. *BREAKING*
+	* Changed BitConverter class to handle Date as ticks to match .NET. *BREAKING*
+	* Added Int64 static methods for manipulating and creating an Int64 data-type.
+	* Added CInt64 for easy conversion to Int64 data-type.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

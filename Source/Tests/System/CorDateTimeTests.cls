@@ -275,6 +275,14 @@ Public Sub ToOADate_WithFractionalPortion_RoundsCorrectly()
     Assert.That Actual, Iz.EqualTo(#8/28/3438 10:29:21 AM#)
 End Sub
 
+Public Sub ToOADate_WithOutOfRangeMilliseconds_ThrowsOverflowException()
+    On Error Resume Next
+    
+    Cor.NewDateTime(100, 1, 1, 0, 0, 0, 0).AddTicks(-1).ToOADate
+    
+    AssertOverflowException Err
+End Sub
+
 Public Sub FromOADate_WithValue_ReturnsDateTime(ByVal d As Date)
     Dim Actual As CorDateTime
         

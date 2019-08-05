@@ -409,7 +409,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=4
+Num=2
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -418,21 +418,23 @@ Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
 
 [TASK2]
-Description=Change BinaryReader/BinaryWriter Date methods to use milliseconds instead of Double.
-Status=0
-Priority=1
-Comment=This will break these two methods logically.
-
-[TASK3]
 Description=Add ReadDate method to MemoryMappedViewAccessor
 Status=0
 Priority=1
 
+[TASK3]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
+
 [TASK4]
-Description=Add range check in CorDateTime.ToOADate method
-Status=0
-Priority=1
-Comment=We should throw an OverflowException instead of letting the assignment to a Date variable raise an error.
+Description=
+Status=
+Priority=
+Comment=
+AssignedTo=
 
 [TASK5]
 Description=
