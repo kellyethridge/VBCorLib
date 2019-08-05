@@ -107,22 +107,22 @@ Public Sub ToDate_WithValue_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(#5/2/1900 10:48:00 AM#)
 End Sub
 
-Public Sub ToInteger_WithValue_ReturnsExpected()
+Public Sub ToInt16_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&H55, &H66)
     
     Dim Actual As Integer
-    Actual = BitConverter.ToInteger(Bytes, 0)
+    Actual = BitConverter.ToInt16(Bytes, 0)
     
     Assert.That Actual, Iz.EqualTo(&H6655)
 End Sub
 
-Public Sub ToLong_WithValue_ReturnsExpected()
+Public Sub ToInt32_WithValue_ReturnsExpected()
     Dim Bytes() As Byte
     Bytes = NewBytes(&H55, &H66, &H77, &H88)
     
     Dim Actual As Long
-    Actual = BitConverter.ToLong(Bytes, 0)
+    Actual = BitConverter.ToInt32(Bytes, 0)
     
     Assert.That Actual, Iz.EqualTo(&H88776655)
 End Sub

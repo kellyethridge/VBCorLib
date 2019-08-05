@@ -230,9 +230,9 @@ End Function
 ' @param StartIndex The starting byte in the array to create an integer from.
 ' @return Integer datatype representation of the 2 bytes used in the array.
 '
-Public Function ToInteger(ByRef Value() As Byte, ByVal StartIndex As Long) As Integer
+Public Function ToInt16(ByRef Value() As Byte, ByVal StartIndex As Long) As Integer
     ValidateArrayArguments Value, StartIndex, vbSizeOfInteger
-    ToInteger = AsWord(Value(StartIndex))
+    ToInt16 = AsWord(Value(StartIndex))
 End Function
 
 ''
@@ -241,9 +241,9 @@ End Function
 ' @param Value The array of bytes used to create a Long from.
 ' @param StartIndex The starting byte in the array to create a Long from.
 ' @return Long datatype representation of the 4 bytes used in the array.
-Public Function ToLong(ByRef Value() As Byte, ByVal StartIndex As Long) As Long
+Public Function ToInt32(ByRef Value() As Byte, ByVal StartIndex As Long) As Long
     ValidateArrayArguments Value, StartIndex, vbSizeOfLong
-    ToLong = AsLong(Value(StartIndex))
+    ToInt32 = AsLong(Value(StartIndex))
 End Function
 
 ''
