@@ -206,6 +206,19 @@ Public Sub ReadInt32_WhenReadingFromBeginning_Returns50462976()
     Assert.That Actual, Iz.EqualTo(50462976)
 End Sub
 
+Public Sub ReadDate_WhenReadingFromBeginning_ReturnsExpected()
+    Dim MappedFile  As MemoryMappedFile
+    Dim Accessor    As MemoryMappedViewAccessor
+    Dim Actual      As Date
+    
+    Set MappedFile = MakeMappedFileWithData
+    Set Accessor = MappedFile.CreateViewAccessor
+    
+    Actual = Accessor.ReadDate(0)
+
+    Assert.That Actual, Iz.EqualTo(#10/5/1604 12:31:31 AM#)
+End Sub
+
 Public Sub ReadCurrency_WhenReadingFromBeginning_Returns50609752291423Point0528()
     Dim MappedFile  As MemoryMappedFile
     Dim Accessor    As MemoryMappedViewAccessor
@@ -473,12 +486,12 @@ Public Sub WriteArray_WithArray_WritesExpected(ByRef Value As Variant, ByRef Exp
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Private Function MakeEmptyMappedFile(Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
+Private Function MakeEmptyMappedFile() As MemoryMappedFile
     Dim Data(0 To 99) As Byte
     Set MakeEmptyMappedFile = MakeMappedFile(Data)
 End Function
 
-Private Function MakeMappedFileWithData(Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
+Private Function MakeMappedFileWithData() As MemoryMappedFile
     Set MakeMappedFileWithData = MakeMappedFile(MakeData)
 End Function
 

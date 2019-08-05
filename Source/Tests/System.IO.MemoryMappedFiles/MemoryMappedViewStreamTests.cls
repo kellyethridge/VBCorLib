@@ -132,12 +132,7 @@ Public Sub CanSeek_WhenStreamIsClosed_ReturnsFalse()
     Assert.That Actual, Iz.False
 End Sub
 
-Private Function MakeEmptyMappedFile(Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
-    Dim Data(0 To 99) As Byte
-    Set MakeEmptyMappedFile = MakeMappedFile(Data)
-End Function
-
-Private Function MakeMappedFileWithData(Optional ByVal Access As MemoryMappedFileAccess = MemoryMappedFileAccess.ReadWrite) As MemoryMappedFile
+Private Function MakeMappedFileWithData() As MemoryMappedFile
     Set MakeMappedFileWithData = MakeMappedFile(MakeData)
 End Function
 

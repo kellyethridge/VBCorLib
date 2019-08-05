@@ -51,7 +51,7 @@ Public Function CInt64(ByRef Value As Variant) As Int64
                 CInt64.HighPart = &HFFFFFFFF
             End If
         Case vbString
-            CInt64 = Statics.Int64.ParseEx(CStr(Value))
+            CInt64 = Statics.Int64.Parse(CStr(Value))
         Case vbUserDefinedType
             If Not IsInt64(Value) Then _
                 Throw New InvalidCastException

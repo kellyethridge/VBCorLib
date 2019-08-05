@@ -247,6 +247,36 @@ Public Function ReadInt64(ByVal Position As Long) As Int64
 End Function
 
 ''
+' Read a Date from the accessor.
+'
+' @param Position The number of bytes into the accessor at which to begin reading.
+' @return The value to be read.
+' @remarks <p>The <b>ReadDate</b> method reads 64-bits as <b>Ticks</b> to represent the <b>Date</b>. This
+' means that there is a possible invalid date value read. This would cause an <a href="OverflowException.html">OverflowException</a> to be thrown.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentException.html">ArgumentException</a></td><td>There are not enough bytes after <i>Position</i> to read a value.</td>
+'   </tr>
+'   <tr>
+'       <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td><td><i>Position</i> is less than zero or greater than the capacity of the accessor.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="OverflowException.html">OverflowException</a></td><td>A value was read that cannot be represented as a valid OLE Automation Date.</td>
+'    </tr>
+' </table>
+Public Function ReadDate(ByVal Position As Long) As Date
+    Dim Milliseconds As Currency
+    
+    Milliseconds = ReadCurrency(Position)
+    ReadDate = CorDateTime.GetOADate(Milliseconds)
+End Function
+
+''
 ' Reads a 64-bit currency from the accessor.
 '
 ' @param Position The number of bytes into the accessor at which to begin reading.
@@ -593,7 +623,6 @@ End Sub
 
 Private Sub WriteUdt(ByVal Position As Long, ByRef Value As Variant)
     Dim Record  As IRecordInfo
-    Dim Size    As Long
         
     Set Record = GetRecordInfo(Value)
     ValidateStructure Record.GetTypeInfo

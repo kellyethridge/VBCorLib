@@ -639,7 +639,6 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal MappingHandle As SafeMemoryMappedFileHandle, ByVal Offset As Currency, ByVal Size As Long, ByVal Access As MemoryMappedFileAccess)
     Dim PageAlignedOffset As Currency
-    Dim Capacity As Long
     Dim StartIndex As Long
     Dim Info As SYSTEM_INFO
     

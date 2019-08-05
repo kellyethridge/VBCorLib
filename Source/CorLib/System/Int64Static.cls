@@ -1096,7 +1096,6 @@ Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByR
     
     Dim Chars()     As Integer
     Dim FoundDigits As Boolean
-    Dim c As Long
     Dim i As Long
     Dim j As Long
     Dim k As Long

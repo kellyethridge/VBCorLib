@@ -60,8 +60,6 @@ Option Explicit
 Implements IObject
 
 Private Const DefaultCapacity   As Long = 16
-Private Const MinDateAsDouble   As Double = -657434#
-Private Const MaxDateAsDouble   As Double = 2958465.99998843
 Private Const NoChars           As Long = -1
 
 Private mStream         As Stream

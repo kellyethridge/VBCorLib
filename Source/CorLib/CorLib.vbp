@@ -409,7 +409,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=2
+Num=1
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -418,9 +418,11 @@ Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
 
 [TASK2]
-Description=Add ReadDate method to MemoryMappedViewAccessor
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK3]
 Description=
