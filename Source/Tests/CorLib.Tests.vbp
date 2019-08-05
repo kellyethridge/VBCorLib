@@ -225,6 +225,7 @@ Class=MemoryMappedViewAccessorTests; System.IO.MemoryMappedFiles\MemoryMappedVie
 Class=Int64Tests; System\Int64Tests.cls
 Class=MemoryMappedViewStreamTests; System.IO.MemoryMappedFiles\MemoryMappedViewStreamTests.cls
 ResFile32="CorLib.Tests.RES"
+Class=ConsoleKeyInfoTests; System\ConsoleKeyInfoTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

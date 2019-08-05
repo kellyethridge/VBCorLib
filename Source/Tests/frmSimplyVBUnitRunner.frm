@@ -136,6 +136,7 @@ Private Sub AddSystem()
             New CorArrayFindTests)
     
         .Add New PublicFunctionsTests
+        .Add New ConsoleKeyInfoTests
 '        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
         .Add New Int64Tests
         

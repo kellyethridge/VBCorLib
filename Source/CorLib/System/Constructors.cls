@@ -1007,15 +1007,14 @@ Public Function NewDriveInfo(ByRef Name As String) As DriveInfo
 End Function
 
 ''
-' Returns a new ConsoleKeyInfo object that represents the state of a key press.
+' Initializes a new <a href="ConsoleKeyInfo.html">ConsoleKeyInfo</a> object that represents the state of a key press.
 '
-' @param KeyChar The Asc value of the key pressed.
-' @param Key The key code of the pressed key.
-' @param Shift Whether the shift key was pressed.
-' @param Alt Wheter the alt key was pressed.
-' @param Control Whether the control key was pressed.
+' @param KeyChar The Unicode character that corresponds to the <i>Key</i> parameter.
+' @param Key The console key that corresponds to the <i>KeyChar</i> parameter.
+' @param Shift <b>True<b/> to indicate that a SHIFT key was pressed; otherwise, <b>False</b>.
+' @param Alt <b>True<b/> to indicate that a ALT key was pressed; otherwise, <b>False</b>.
+' @param Control <b>True<b/> to indicate that a CTRL key was pressed; otherwise, <b>False</b>.
 ' @return A new ConsoleKeyInfo object.
-'
 Public Function NewConsoleKeyInfo(ByVal KeyChar As Integer, ByVal Key As ConsoleKey, ByVal Shift As Boolean, ByVal Alt As Boolean, ByVal Control As Boolean) As ConsoleKeyInfo
     Set NewConsoleKeyInfo = New ConsoleKeyInfo
     NewConsoleKeyInfo.Init KeyChar, Key, Shift, Alt, Control
