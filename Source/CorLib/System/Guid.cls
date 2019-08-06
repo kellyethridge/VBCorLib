@@ -41,8 +41,11 @@ Attribute VB_Exposed = True
 ' @remarks A GUID is a 128-bit integer (16 bytes) that can be used across all
 ' computers and networks wherever a unique identifier is required. Such an identifier
 ' has a very low probability of being duplicated.
+' <p>A new <b>Guid</b> can be created using the <a href="Constructors.NewGuid.html">NewGuid</a> method
+' or one of the factory methods in <a href="GuidStatic.html">GuidStatic</a>.
 '
 ' @see GuidStatic
+' @see Constructors
 '
 Option Explicit
 Implements IObject
@@ -55,6 +58,12 @@ Private Const PropData3         As String = "Data3"
 Private Const PropData4         As String = "Data4"
 Private Const PropIsReadOnly    As String = "IsReadOnly"
 
+''
+' FormatOptions
+'
+' @param None none
+' @param Dashes dashes
+' @param Closure closure
 Private Enum FormatOptions
     None = 0
     Dashes = 1
@@ -83,7 +92,6 @@ Private mIsReadOnly As Boolean
 ' is not immutable.</p>
 '
 Public Property Get Handle() As Long
-Attribute Handle.VB_MemberFlags = "40"
     If mIsReadOnly Then
         mGuidCopy = mGuid
         Handle = VarPtr(mGuidCopy)

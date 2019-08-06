@@ -1782,41 +1782,121 @@ End Function
 ' Initializes a new instance of a Collection with items.
 '
 ' @param Values The values to initialize the collection with.
-' @return A new initialized collection.
-'
+' @return Returns a collection containing items in <i>Values</i> parameter.
 Public Function NewCollection(ParamArray Values() As Variant) As Collection
-    Set NewCollection = New Collection
     Dim Value As Variant
+    
+    Set NewCollection = New Collection
+    
     For Each Value In Values
         NewCollection.Add Value
     Next
 End Function
 
+''
+' Initializes a new instance of the <a href="Guid.html">Guid</a> object by using the specified array of bytes, string, or memory pointer.
+'
+' @param Value An array of bytes, string, or memory pointer.
+' @return A <a href="Guid.html">Guid</a> initialized with values from <i>Value</i>.
+' @remarks <p>A new <a href="Guid.html">Guid</a> can be initialized from a specified array of bytes, string, or memory pointer.</p>
+' <table style="width: auto">
+'   <tr>
+'       <th>Data Type</th>
+'       <th>Description</th>
+'   </tr>
+'   <tr>
+'        <td>String</td>
+'        <td>
+'           <p>A string that contains a GUID in one of the following formats ("d" represents a hexadecimal digit whose case is ignored):</p>
+'           <p>32 contiguous Digits:</p>
+'           <p>dddddddddddddddddddddddddddddddd</p>
+'           <p>-or-</p>
+'           <p>Groups of 8, 4, 4, 4, and 12 digits with hyphens between the groups. The entire GUID can optionally be enclosed in matching braces or parentheses:</p>
+'           <p>dddddddd -dddd - dddd - dddd - dddddddddddd</p>
+'           <p>-or-</p>
+'           <p>{dddddddd-dddd-dddd-dddd-dddddddddddd}</p>
+'           <p>-or-</p>
+'           <p>(dddddddd-dddd-dddd-dddd-dddddddddddd)</p>
+'           <p>-or-</p>
+'           <p>Groups of 8, 4, and 4 digits, and a subset of eight groups of 2 digits, with each group prefixed by "0x" or "0X", and separated by commas. The entire GUID, as well as the subset, is enclosed in matching braces:</p>
+'           <p>{0xdddddddd, 0xdddd, 0xdddd,{0xdd,0xdd,0xdd,0xdd,0xdd,0xdd,0xdd,0xdd}}</p>
+'           <p>All braces, commas, and "0x" prefixes are required. All embedded spaces are ignored. All leading zeros in a group are ignored.</p>
+'        </td>
+'   </tr>
+'    <tr>
+'        <td>Byte Array</td><td>A 16-element byte array containing values with which to initialize the GUID.</td>
+'    </tr>
+'    <tr>
+'        <td>Long</td><td>A pointer to a memory location to read 16 consecutive bytes with which to initialize the GUID.</td>
+'    </tr>
+' </table>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td>byte array is <b>null</b>.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>byte array is not 16 bytes long.</td>
+'    </tr>
+'    <tr>
+'        <td><a href="FormatException.html">FormatException</a></td><td>string format is invalid.</td>
+'    </tr>
+' </table>
 Public Function NewGuid(ByRef Value As Variant) As Guid
     Set NewGuid = New Guid
     NewGuid.Init Value
 End Function
 
+' for internal use
 Friend Function NewSafeFindHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFindHandle
     Set NewSafeFindHandle = New SafeFindHandle
     NewSafeFindHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
+''
+' Initializes a new instance of the <a href="SafeFileHandle.html">SafeFileHandle</a> class.
+'
+' @param PreexistingHandle An <b>Long</b> pointer that represents the pre-existing handle to use.
+' @param OwnsHandle <b>True</b> to reliably release the handle during the finalization phase; <b>False</b> to prevent reliable release (not recommended).
+' @return A new instance of the <a href="SafeFileHandle.html">SafeFileHandle</a> class.
 Public Function NewSafeFileHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean) As SafeFileHandle
     Set NewSafeFileHandle = New SafeFileHandle
     NewSafeFileHandle.Init PreexistingHandle, OwnsHandle
 End Function
 
+''
+' Initializes a new instance of the <a href="SafeHandle.html">SafeHandle</a> class.
+'
+' @param PreexistingHandle An <b>Long</b> pointer that represents the pre-existing handle to use.
+' @param OwnsHandle <b>True</b> to reliably release the handle during the finalization phase; <b>False</b> to prevent reliable release (not recommended).
+' @return A new instance of the <a href="SafeHandle.html">SafeHandle</a> class.
+' @remarks The <a href="SafeHandle.html">SafeHandle</a> class is used as base class through composition for managing specific handles.
 Public Function NewSafeHandle(ByVal PreexistingHandle As Long, ByVal OwnsHandle As Boolean, Optional ByVal ZeroIsInvalid = False) As SafeHandle
     Set NewSafeHandle = New SafeHandle
     NewSafeHandle.Init PreexistingHandle, OwnsHandle, ZeroIsInvalid
 End Function
 
+''
+' Initializes a new instance of the <a href="DriveNotFoundException.html">DriveNotFoundException</a> class with the specified error message and a reference to the inner exception that is the cause of this exception.
+'
+' @param Message The error message that explains the reason for the exception.
+' @param InnerException The exception that is the cause of the current exception. If the <i>InnerException</i> parameter is not <b>Nothing</b>, the current exception is raised in a <b>Catch</b> block that handles the inner exception.
 Public Function NewDriveNotFoundException(ByRef Message As String, Optional ByVal InnerException As Exception) As DriveNotFoundException
     Set NewDriveNotFoundException = New DriveNotFoundException
     NewDriveNotFoundException.Init Message, InnerException
 End Function
 
+''
+' Initializes a new instance of <a href="EnumeratorBase.html">EnumeratorBase</a>.
+'
+' @param StartIndex The starting position within a list of items to be enumerated.
+' @param Length The number of items to be enumerated from the starting position.
+' @param Collection An object that implements <a href="IVersionable.html">IVersionable</a> to track version changes of a collection.
+' @return A base class used to manage the iteration of an index.
 Public Function NewEnumeratorBase(ByVal StartIndex As Long, ByVal Length As Long, Optional ByVal Collection As IVersionable) As EnumeratorBase
     Set NewEnumeratorBase = New EnumeratorBase
     NewEnumeratorBase.Init StartIndex, Length, Collection

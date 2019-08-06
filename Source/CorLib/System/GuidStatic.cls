@@ -63,15 +63,24 @@ Private mIDispatchGuid  As Guid
 ' Returns a guid that is guaranteed to be all zeros.
 '
 ' @return A zero value guid.
-'
 Public Property Get EmptyGuid() As Guid
     Set EmptyGuid = mEmptyGuid
 End Property
 
+''
+' A constant <a href="Guid.html">Guid</a> representing the <b>IUnknown</b> interface UUID.
+'
+' @return The <b>IUnknown</b> interface guid.
+' @remarks The <b>IUnknown</b> UUID is {00000000-0000-0000-C000-000000000046}.
 Public Property Get IUnknownGuid() As Guid
     Set IUnknownGuid = mIUnknownGuid
 End Property
 
+''
+' A constant <a href="Guid.html">Guid</a> representing the <b>IDispatch</b> interface UUID.
+'
+' @return The <b>IDispatch</b> interface guid.
+' @remarks the <b>IDispatch</b> UUID is {00020400-0000-0000-C000-000000000046}.
 Public Property Get IDispatchGuid() As Guid
     Set IDispatchGuid = mIDispatchGuid
 End Property
@@ -87,6 +96,13 @@ Public Function NewGuid() As Guid
     NewGuid.InitReadOnly CoCreateGuid
 End Function
 
+''
+' Converts the string representation of a GUID to the equivalent <a href="Guid.html">Guid</a> object, provided that the string is in the specified format.
+'
+' @param InputString The GUID to convert.
+' @param Format One of the following specifiers that indicates the exact format to use when interpreting <i>StringInput</i>: "N", "D", "B", "P", or "X".
+' @param Result The structure that will contain the parsed value. If the method returns <b>True</b>, <i>Result</i> contains a valid <a href="Guid.html">Guid</a>. If the method returns <b>False</b>, result equals <a href="GuidStatic.get.Empty.html">Guid.Empty</a>.
+' @return <b>True</b> if the parse operation was successful; otherwise, <b>False</b>.
 Public Function TryParseExact(ByRef InputString As String, ByRef Format As String, ByRef Result As Guid) As Boolean
     Dim Output      As VBGUID
     Dim FormatCh    As Integer
@@ -104,6 +120,12 @@ Public Function TryParseExact(ByRef InputString As String, ByRef Format As Strin
     End If
 End Function
 
+''
+' Converts the string representation of a GUID to the equivalent <a href="Guid.html">Guid</a> object.
+'
+' @param InputString The GUID to convert.
+' @param Result The structure that will contain the parsed value. If the method returns <b>True</b>, <i>Result</i> contains a valid <a href="Guid.html">Guid</a>. If the method returns <b>False</b>, result equals <a href="GuidStatic.get.EmptyGuid.html">Guid.EmptyGuid</a>.
+' @return <b>True</b> if the parse operation was successful; otherwise, <b>False</b>.
 Public Function TryParse(ByRef InputString As String, ByRef Result As Guid) As Boolean
     Dim Output As VBGUID
     
@@ -117,21 +139,24 @@ Public Function TryParse(ByRef InputString As String, ByRef Result As Guid) As B
 End Function
 
 ''
-' Parses a string representation of a guid, returning a <b>Guid</b>
-' containing the parsed value.
+' Converts the string representation of a GUID to the equivalent <a href="Guid.html">Guid</a> object.
 '
-' @param s The guid string to be parsed.
-' @param LockGuid Locks the guids handle.
-' @return A <b>Guid</b> set to the parsed value.
-'
-Public Function Parse(ByRef s As String) As Guid
-    If Not TryParse(s, Parse) Then
+' @param InputString The string to convert.
+' @return A <a href="Guid.html">Guid</a> object of the parsed value.
+Public Function Parse(ByRef InputString As String) As Guid
+    If Not TryParse(InputString, Parse) Then
         mParser.ThrowError
     End If
 End Function
 
-Public Function ParseExact(ByRef s As String, ByRef Format As String) As Guid
-    If Not TryParseExact(s, Format, ParseExact) Then
+''
+' Converts the string representation of a GUID to the equivalent <a href="Guid.html">Guid</a> object.
+'
+' @param InputString The string to convert.
+' @param Format One of the following specifiers that indicates the exact format to use when interpreting <i>StringInput</i>: "N", "D", "B", "P", or "X".
+' @return A <a href="Guid.html">Guid</a> object of the parsed value.
+Public Function ParseExact(ByRef InputString As String, ByRef Format As String) As Guid
+    If Not TryParseExact(InputString, Format, ParseExact) Then
         mParser.ThrowError
     End If
 End Function
@@ -144,7 +169,6 @@ End Function
 ' @param c A value representing xxxxxxxx-xxxx-1234-xxxx-xxxxxxxxxxxx
 ' @param d An array representing xxxxxxxx-xxxx-xxxx-1234-123456789012
 ' @return A new guid initialized to the values and byte array specified.
-'
 Public Function FromParts(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByRef d() As Byte) As Guid
     Dim g As VBGUID
     g.Data1 = a
@@ -177,23 +201,22 @@ End Function
 ' @param j A Byte
 ' @param k A Byte
 ' @return A new guid initialized to the values and bytes specified.
-'
 Public Function FromValues(ByVal a As Long, ByVal b As Integer, ByVal c As Integer, ByVal d As Byte, ByVal e As Byte, ByVal f As Byte, ByVal g As Byte, ByVal h As Byte, ByVal i As Byte, ByVal j As Byte, ByVal k As Byte) As Guid
-    Dim X As VBGUID
-    X.Data1 = a
-    X.Data2 = b
-    X.Data3 = c
-    X.Data4(0) = d
-    X.Data4(1) = e
-    X.Data4(2) = f
-    X.Data4(3) = g
-    X.Data4(4) = h
-    X.Data4(5) = i
-    X.Data4(6) = j
-    X.Data4(7) = k
+    Dim x As VBGUID
+    x.Data1 = a
+    x.Data2 = b
+    x.Data3 = c
+    x.Data4(0) = d
+    x.Data4(1) = e
+    x.Data4(2) = f
+    x.Data4(3) = g
+    x.Data4(4) = h
+    x.Data4(5) = i
+    x.Data4(6) = j
+    x.Data4(7) = k
     
     Set FromValues = New Guid
-    FromValues.InitReadOnly X
+    FromValues.InitReadOnly x
 End Function
 
 ''
@@ -204,7 +227,6 @@ End Function
 ' @remarks This is to allow the passing of a Guid object around an
 ' application without allowing the guid to be modified through the
 ' Handle property, which allows direct access to the guid structure.
-'
 Public Function ReadOnly(ByVal g As Guid) As Guid
     If g Is Nothing Then _
         Error.ArgumentNull "g", ArgumentNull_Generic

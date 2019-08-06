@@ -34,6 +34,16 @@ Attribute VB_Exposed = True
 '
 ' Module: EnumeratorBase
 '
+
+''
+' Used to manage an enumeration index into a set of items.
+'
+' @remarks Use this class to handle the starting, advancing and finishing of an index.
+' <p>The class itself does not access a list of items. Instead, it manages an index into a list of items
+' that are being enumerated. It deals with ensuring the enumeration starts correctly and when
+' the enumeration has finished.</p>
+' <p>To create a new instance use the <a href="Constructors.NewEnumeratorBase.html">NewEnumeratorBase</a> method.</p>
+' @see Constructors
 Option Explicit
 Implements ICloneable
 
@@ -44,6 +54,24 @@ Private mCollection     As IVersionable
 Private mVersion        As Long
 
 
+''
+' Advances the current index, returning if the advancement succeeded.
+'
+' @return <b>True</b> if the index was advanced; otherwise <b>False</b>.
+' @remarks <b>MoveNext</b> will return <b>False</b> when the enumeration
+' initially finishes. If additional calls are made to <b>MoveNext</b> an
+' <a href="InvalidOperationException.html">InvalidOperationException</a>
+' will be thrown.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td><td>The enumeration has already finished.</td>
+'   </tr>
+' </table>
 Public Function MoveNext() As Boolean
     EnsureUnchangedVersion
     EnsureNotFinished
@@ -52,10 +80,33 @@ Public Function MoveNext() As Boolean
     MoveNext = mCount < mLength
 End Function
 
+''
+' Resets the index back to the initial starting position.
 Public Sub Reset()
     mCount = -1
 End Sub
 
+''
+' Gets the current index.
+'
+' @return The current index.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="InvalidOperationException.html">InvalidOperationException</a></td>
+'        <td>
+'           Attempted to get the current index before enumeration has started.<br/>
+'           -or-<br/>
+'           Attempted to get the current index after enumeration has finished.<br/>
+'           -or-<br/>
+'           The underlying collection has changed.
+'        </td>
+'   </tr>
+' </table>
 Public Property Get Index() As Long
     EnsureUnchangedVersion
     EnsureStarted
@@ -64,6 +115,10 @@ Public Property Get Index() As Long
     Index = mStartIndex + mCount
 End Property
 
+''
+' Creates a new instance of the enumerator base at the current index position.
+'
+' @return Returns a clone of the current enumerator base class.
 Public Function Clone() As EnumeratorBase
     Set Clone = New EnumeratorBase
     Clone.InitClone mStartIndex, mLength, mCount, mCollection

@@ -270,7 +270,19 @@ End Function
 '
 ' @param a The first value to be added.
 ' @param b The second value to be added.
-' @return The sum of <i>a</b> and <i>b</i>.
+' @return The sum of <i>a</i> and <i>b</i>.
+' @remarks An example:
+'<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Dim</span> a <span style="color: #0000ff">As</span> Int64
+'<span style="color: #0000ff">Dim</span> b <span style="color: #0000ff">As</span> Int64
+'<span style="color: #0000ff">Dim</span> c <span style="color: #0000ff">as</span> Int64
+'
+'a = CInt64(12345)
+'b = CInt64(99233)
+'
+'c = Int64.Add(a, b)
+'
+'Debug.Print Int64.ToString(c)
+'</pre></div>
 Public Function Add(ByRef a As Int64, ByRef b As Int64) As Int64
     AsCurr(Add) = AsCurr(a) + AsCurr(b)
 End Function

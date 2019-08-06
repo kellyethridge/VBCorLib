@@ -34,6 +34,10 @@ Attribute VB_Exposed = True
 '
 ' Module: DriveNotFoundException
 '
+
+''
+' The exception that is thrown when trying to access a drive or share that is not available.
+'
 Option Explicit
 Implements IObject
 Implements Exception
@@ -55,7 +59,6 @@ End Property
 ' @return The Uniform Resource Name (URN) or Uniform Resource Locator (URL).
 ' @remarks The return value, which represents a help file, is a URN or URL. For example, the HelpLink value could be:<br>
 ' "http://www.myhelpsite.com"
-'
 Public Property Get HelpLink() As String
     HelpLink = mBase.HelpLink
 End Property
@@ -66,7 +69,6 @@ End Property
 ' @param Value Set the Uniform Resource Name (URN) or Uniform Resource Locator (URL).
 ' @remarks The return value, which represents a help file, is a URN or URL. For example, the HelpLink value could be:<br>
 ' "http://www.myhelpsite.com"
-'
 Public Property Let HelpLink(ByRef Value As String)
     mBase.HelpLink = Value
 End Property
@@ -75,10 +77,8 @@ End Property
 ' Gets the HRESULT, a coded numerical value that is assigned to a specific exception.
 '
 ' @return The value of the associated HResult.
-' @remarks An HResult is associated with an error result code. This allows for VB specific
-' error codes to be returned.
+' @remarks This returns the constant COR_E_DIRECTORYNOTFOUND (&H80070003).
 ' @see Exception
-'
 Public Property Get HResult() As Long
     HResult = COR_E_DIRECTORYNOTFOUND
 End Property
@@ -87,7 +87,7 @@ End Property
 ' Returns the VB error number associated with this exception instance.
 '
 ' @return A VB error that matches the number return by <b>Err.Number</b>.
-'
+' @remarks This returns the constant 76 (Path Not Found).
 Public Property Get ErrorNumber() As Long
     ErrorNumber = vbPathNotFound
 End Property
@@ -99,7 +99,6 @@ End Property
 ' @remarks The source of an exception generally will contain the name of
 ' the function being called when the exception was thrown. This is to help
 ' narrow down exactly where the exception had occurred.
-'
 Public Property Get Source() As String
     Source = mBase.Source
 End Property
@@ -111,7 +110,6 @@ End Property
 ' @remarks The source of an exception generally will contain the name of
 ' the function being called when the exception was thrown. This is to help
 ' narrow down exactly where the exception had occurred.
-'
 Public Property Let Source(ByRef Value As String)
     mBase.Source = Value
 End Property
@@ -125,7 +123,6 @@ End Property
 ' is related to the exception that is being thrown. The message should
 ' be human readable.
 ' <p>This property can be set in the constructor <b>NewException</b>.
-'
 Public Property Get Message() As String
     Message = GetExceptionMessage(mBase, Arg_DriveNotFoundException)
 End Property
@@ -137,7 +134,6 @@ End Property
 ' @remarks when an exception is thrown and that exception causes another
 ' exception to be thrown, then the <b>InnerException</b> of the new <b>Exception</b>
 ' object should contain the exception that caused it to be thrown.
-'
 Public Property Get InnerException() As Exception
     Set InnerException = mBase.InnerException
 End Property
@@ -145,16 +141,15 @@ End Property
 ''
 ' Gets the original exception that caused the chain of exceptions to occur.
 '
-' @return The <b>Exception</b> that caused the chain of exceptions to occur.
+' @return The <a href="Exception.html">Exception</a> that caused the chain of exceptions to occur.
 ' @remarks If exceptions set their <b>InnerException</b> to a previously thrown
 ' exception, then a chain of exceptions can be created. Using this function will
 ' traverse that chain of exceptions until the original exception is reached. That
 ' exception with then be returned to the caller.
-' <p>When an <b>InnerException</b> of Nothing is reached, then then the exception object is returned
+' <p>When an <a href="DriveNotFoundException.get.InnerException.html">InnerException</a> of Nothing is reached, then then the exception object is returned
 ' as the base exception because it did not have an inner exception, so it is assumed that
 ' the exception object is the last in the chain and therefore the cause of the
 ' chain of exceptions being iterated.
-'
 Public Function GetBaseException() As Exception
     Set GetBaseException = mBase.GetBaseException
 End Function
@@ -166,7 +161,6 @@ End Function
 ' @remarks A general format might look like this:<br>
 ' VBCorLib.SystemException: An Error has occurred.
 ' <p>A listing of all inner exceptions will be included in the return value.</p>
-'
 Public Function ToString() As String
     ToString = mBase.ToString(Message)
 End Function
