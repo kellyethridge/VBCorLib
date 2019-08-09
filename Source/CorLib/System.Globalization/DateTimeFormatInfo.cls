@@ -1012,8 +1012,9 @@ Private Function CustomFormat(ByRef dt As CorDateTime, ByRef Pattern As String) 
     Exit Function
     
 Catch:
+    GoSub Finally
     StringBuilderCache.Release sb
-    Throw
+    ThrowOrErr Err
 Finally:
     FreeChars PatternChars
     Return
