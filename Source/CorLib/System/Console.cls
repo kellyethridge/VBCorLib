@@ -762,8 +762,8 @@ End Property
 '
 ' @return The largest possible window height.
 '
-Public Property Get largestWindowHeight() As Long
-    largestWindowHeight = GetLargestConsoleWindowSize(mOutputHandle).y
+Public Property Get LargestWindowHeight() As Long
+    LargestWindowHeight = GetLargestConsoleWindowSize(mOutputHandle).y
 End Property
 
 ''
@@ -783,7 +783,10 @@ Public Property Get Title() As String
         Case 0
             Dim e As Long
             e = Err.LastDllError
-            If e <> 0 Then Statics.Error.Win32Error e
+            
+            If e <> 0 Then
+                Statics.Error.Win32Error e
+            End If
         Case Is > MaxTitleLength
             Statics.Error.InvalidOperation ArgumentOutOfRange_ConsoleTitleTooLong
     End Select
@@ -1331,19 +1334,19 @@ Private Sub DisableCloseButton()
     Dim OldTitle    As String
     Dim Pid         As Long
     Dim NewTitle    As String
-    Dim Hwnd        As Long
+    Dim hwnd        As Long
     
     OldTitle = Me.Title
     Pid = GetCurrentProcessId()
     NewTitle = OldTitle & Pid
     Me.Title = NewTitle
     Sleep 40
-    Hwnd = FindWindow(vbNullString, NewTitle)
+    hwnd = FindWindow(vbNullString, NewTitle)
     Me.Title = OldTitle
     
-    If Hwnd <> vbNullPtr Then
+    If hwnd <> vbNullPtr Then
         Dim hMenu As Long
-        hMenu = GetSystemMenu(Hwnd, False)
+        hMenu = GetSystemMenu(hwnd, False)
         RemoveMenu hMenu, SC_CLOSE, MF_BYCOMMAND
     End If
 End Sub

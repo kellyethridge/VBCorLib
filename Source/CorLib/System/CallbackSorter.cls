@@ -45,7 +45,6 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
-Private mDelegate       As Delegate
 Private mComparer       As Func_T_T_Long
 Private mHasSortItems   As Boolean
 Private mSortItems      As SortItems
@@ -64,9 +63,12 @@ Private mPivotBuffer    As Long
 
 
 Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Long, ByVal Right As Long, ByVal AddressOfCallback As Long)
-    mDelegate.pfn = AddressOfCallback
+    Set mComparer = NewDelegate(AddressOfCallback)
+    
+    On Error GoTo Catch
+    
     If pSAItems <> 0 Then
-        Call InitSortItems(pSAItems)
+        InitSortItems pSAItems
     Else
         mHasSortItems = False
     End If
@@ -74,63 +76,82 @@ Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Lon
     Select Case SafeArrayGetElemsize(pSAKeys)
         Case 1
             SAPtr(mInt8) = pSAKeys
-            Call SortInt8(Left, Right)
+            SortInt8 Left, Right
         Case 2
             SAPtr(mInt16) = pSAKeys
-            Call SortInt16(Left, Right)
+            SortInt16 Left, Right
         Case 4
             SAPtr(mInt32) = pSAKeys
-            Call SortInt32(Left, Right)
+            SortInt32 Left, Right
         Case 8
             SAPtr(mInt64) = pSAKeys
-            Call SortInt64(Left, Right)
+            SortInt64 Left, Right
         Case 16
             SAPtr(mInt128) = pSAKeys
-            Call SortInt128(Left, Right)
+            SortInt128 Left, Right
         Case Else
             With mKeyItems
-                Call CopyMemory(.SA, ByVal pSAKeys, vbSizeOfSafeArray1d)
+                CopyMemory .SA, ByVal pSAKeys, vbSizeOfSafeArray1d
                 mElemSize = .SA.cbElements
                 mPivotBuffer = CoTaskMemAlloc(mElemSize)
                 .Buffer = CoTaskMemAlloc(mElemSize)
                 mPVData = .SA.pvData
-                Call SortAny(Left, Right)
-                Call CoTaskMemFree(.Buffer)
-                Call CoTaskMemFree(mPivotBuffer)
+                SortAny Left, Right
+                CoTaskMemFree .Buffer
+                CoTaskMemFree mPivotBuffer
             End With
     End Select
     
     If mSortItems.Buffer Then
-        Call CoTaskMemFree(mSortItems.Buffer)
+        CoTaskMemFree mSortItems.Buffer
         mSortItems.Buffer = 0
     End If
+    
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    Set mComparer = Nothing
+    Return
 End Sub
 
 Private Sub InitSortItems(ByVal pSA As Long)
-    Call CopyMemory(mSortItems.SA, ByVal pSA, vbSizeOfSafeArray1d)
+    CopyMemory mSortItems.SA, ByVal pSA, vbSizeOfSafeArray1d
+    
     Select Case mSortItems.SA.cbElements
         Case 1, 2, 4, 8, 16
-        Case Else: mSortItems.Buffer = CoTaskMemAlloc(mSortItems.SA.cbElements)
+        Case Else
+            mSortItems.Buffer = CoTaskMemAlloc(mSortItems.SA.cbElements)
     End Select
+    
     mHasSortItems = True
 End Sub
 
 Private Sub SortInt8(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Byte, t As Byte
+    
     Do While Left < Right
         i = Left: j = Right: x = mInt8((i + j) \ 2)
         Do
             Do While mComparer.Invoke(mInt8(i), x) < 0: i = i + 1: Loop
             Do While mComparer.Invoke(mInt8(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = mInt8(i): mInt8(i) = mInt8(j): mInt8(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            
+            If i < j Then
+                t = mInt8(i): mInt8(i) = mInt8(j): mInt8(j) = t
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call SortInt8(Left, j)
+            If Left < j Then SortInt8 Left, j
             Left = i
         Else
-            If i < Right Then Call SortInt8(i, Right)
+            If i < Right Then SortInt8 i, Right
             Right = j
         End If
     Loop
@@ -138,20 +159,26 @@ End Sub
 
 Private Sub SortInt16(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Integer, t As Integer
+    
     Do While Left < Right
         i = Left: j = Right: x = mInt16((i + j) \ 2)
         Do
             Do While mComparer.Invoke(mInt16(i), x) < 0: i = i + 1: Loop
             Do While mComparer.Invoke(mInt16(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = mInt16(i): mInt16(i) = mInt16(j): mInt16(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            
+            If i < j Then
+                t = mInt16(i): mInt16(i) = mInt16(j): mInt16(j) = t
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call SortInt16(Left, j)
+            If Left < j Then SortInt16 Left, j
             Left = i
         Else
-            If i < Right Then Call SortInt16(i, Right)
+            If i < Right Then SortInt16 i, Right
             Right = j
         End If
     Loop
@@ -159,20 +186,26 @@ End Sub
 
 Private Sub SortInt32(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Long, t As Long
+    
     Do While Left < Right
         i = Left: j = Right: x = mInt32((i + j) \ 2)
         Do
             Do While mComparer.Invoke(mInt32(i), x) < 0: i = i + 1: Loop
             Do While mComparer.Invoke(mInt32(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = mInt32(i): mInt32(i) = mInt32(j): mInt32(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            
+            If i < j Then
+                t = mInt32(i): mInt32(i) = mInt32(j): mInt32(j) = t
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call SortInt32(Left, j)
+            If Left < j Then SortInt32 Left, j
             Left = i
         Else
-            If i < Right Then Call SortInt32(i, Right)
+            If i < Right Then SortInt32 i, Right
             Right = j
         End If
     Loop
@@ -180,20 +213,26 @@ End Sub
 
 Private Sub SortInt64(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Currency, t As Currency
+    
     Do While Left < Right
         i = Left: j = Right: x = mInt64((i + j) \ 2)
         Do
             Do While mComparer.Invoke(mInt64(i), x) < 0: i = i + 1: Loop
             Do While mComparer.Invoke(mInt64(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then t = mInt64(i): mInt64(i) = mInt64(j): mInt64(j) = t: If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            
+            If i < j Then
+                t = mInt64(i): mInt64(i) = mInt64(j): mInt64(j) = t
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call SortInt64(Left, j)
+            If Left < j Then SortInt64 Left, j
             Left = i
         Else
-            If i < Right Then Call SortInt64(i, Right)
+            If i < Right Then SortInt64 i, Right
             Right = j
         End If
     Loop
@@ -201,20 +240,27 @@ End Sub
 
 Private Sub SortInt128(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long, x As Variant
+    
     Do While Left < Right
-        i = Left: j = Right: Call CopyMemory(x, mInt128((i + j) \ 2), 16)
+        i = Left: j = Right: CopyMemory x, mInt128((i + j) \ 2), 16
+        
         Do
             Do While mComparer.Invoke(mInt128(i), x) < 0: i = i + 1: Loop
             Do While mComparer.Invoke(mInt128(j), x) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then Call Helper.Swap16(mInt128(i), mInt128(j)): If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            
+            If i < j Then
+                Helper.Swap16 mInt128(i), mInt128(j)
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call SortInt128(Left, j)
+            If Left < j Then SortInt128 Left, j
             Left = i
         Else
-            If i < Right Then Call SortInt128(i, Right)
+            If i < Right Then SortInt128 i, Right
             Right = j
         End If
     Loop
@@ -223,20 +269,26 @@ End Sub
 
 Private Sub SortAny(ByVal Left As Long, ByVal Right As Long)
     Dim i As Long, j As Long: Dim PivotBuffer As Long
+    
     Do While Left < Right
-        i = Left: j = Right: Call CopyMemory(ByVal mPivotBuffer, ByVal mPVData + ((i + j) \ 2) * mElemSize, mElemSize)
+        i = Left: j = Right: CopyMemory ByVal mPivotBuffer, ByVal mPVData + ((i + j) \ 2) * mElemSize, mElemSize
         Do
             Do While mComparer.Invoke(ByVal mPVData + i * mElemSize, ByVal mPivotBuffer) < 0: i = i + 1: Loop
             Do While mComparer.Invoke(ByVal mPVData + j * mElemSize, ByVal mPivotBuffer) > 0: j = j - 1: Loop
             If i > j Then Exit Do
-            If i < j Then Call SwapSortItems(mKeyItems, i, j): If mHasSortItems Then Call SwapSortItems(mSortItems, i, j)
+            
+            If i < j Then
+                SwapSortItems mKeyItems, i, j
+                If mHasSortItems Then SwapSortItems mSortItems, i, j
+            End If
+            
             i = i + 1: j = j - 1
         Loop While i <= j
         If j - Left <= Right - i Then
-            If Left < j Then Call SortAny(Left, j)
+            If Left < j Then SortAny Left, j
             Left = i
         Else
-            If i < Right Then Call SortAny(i, Right)
+            If i < Right Then SortAny i, Right
             Right = j
         End If
     Loop
@@ -244,12 +296,8 @@ End Sub
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   class Events
+'   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Initialize()
-    Set mComparer = InitDelegate(mDelegate)
-End Sub
-
 Private Sub Class_Terminate()
     SAPtr(mInt8) = vbNullPtr
     SAPtr(mInt16) = vbNullPtr
