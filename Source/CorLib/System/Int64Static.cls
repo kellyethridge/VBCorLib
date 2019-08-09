@@ -50,6 +50,8 @@ Public Type Int64
     HighPart    As Long
 End Type
 
+Private mParser As New Int64Parser
+
 
 ''
 ' Represents the smallest possible value of an <a href="Int64Static.Int64.html">Int64</a>. This field is constant.
@@ -271,18 +273,6 @@ End Function
 ' @param a The first value to be added.
 ' @param b The second value to be added.
 ' @return The sum of <i>a</i> and <i>b</i>.
-' @remarks An example:
-'<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Dim</span> a <span style="color: #0000ff">As</span> Int64
-'<span style="color: #0000ff">Dim</span> b <span style="color: #0000ff">As</span> Int64
-'<span style="color: #0000ff">Dim</span> c <span style="color: #0000ff">as</span> Int64
-'
-'a = CInt64(12345)
-'b = CInt64(99233)
-'
-'c = Int64.Add(a, b)
-'
-'Debug.Print Int64.ToString(c)
-'</pre></div>
 Public Function Add(ByRef a As Int64, ByRef b As Int64) As Int64
     AsCurr(Add) = AsCurr(a) + AsCurr(b)
 End Function
@@ -513,7 +503,12 @@ End Function
 ' <p>The <i>s</i> parameter is interpreted using the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.Integer</a> style. In addition to decimal digits, only leading and trailing spaces together with a leading sign are allowed. To explicitly define the style elements that can be present in <i>s</i>, use <a href="Int64Static.ParseEx.html">Int64.ParseEx(String, NumberStyles)</a> or the <a href="Int64Static.ParseEx.html">Int64.Parse(String, NumberStyles, IFormatProvider)</a> method.</p>
 Public Function Parse(ByRef s As String) As Int64
     If Not TryParse(s, Parse) Then
-        Error.Format Format_InvalidString
+        Select Case mParser.Error
+            Case ParseError.FormatError
+                Error.Format Format_InvalidString
+            Case ParseError.OverflowError
+                Throw New OverflowException
+        End Select
     End If
 End Function
 
@@ -567,7 +562,9 @@ End Function
 ' </table>
 Public Function ParseEx(ByRef s As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider) As Int64
     If Not TryParseEx(s, Style, Provider, ParseEx) Then
-        Error.Format Format_InvalidString
+        If mParser.Error = FormatError Then
+            Error.Format Format_InvalidString
+        End If
     End If
 End Function
 
@@ -651,26 +648,7 @@ End Function
 '    </tr>
 ' </table>
 Public Function TryParseEx(ByRef s As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef Result As Int64) As Boolean
-    Dim Info As NumberFormatInfo
-    
-    Result.LowPart = 0
-    Result.HighPart = 0
-    
-    If IsHexSpecifier(Style) Then
-        TryParseEx = TryParseHex(s, Style, Result)
-    Else
-        Set Info = NumberFormatInfo.GetInstance(Provider)
-        TryParseEx = TryParseDecimal(s, Style, Info, Result)
-    End If
-    
-    If Not TryParseEx Then
-        Result.LowPart = 0
-        Result.HighPart = 0
-    End If
-End Function
-
-Private Function IsHexSpecifier(ByVal Style As NumberStyles) As Boolean
-    IsHexSpecifier = (Style And NumberStyles.AllowHexSpecifier)
+    TryParseEx = mParser.TryParse(s, Style, Provider, Result)
 End Function
 
 
@@ -840,353 +818,4 @@ Private Function MaxByteBit(ByVal Value As Byte) As Long
     End If
 End Function
 
-Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As Int64) As Boolean
-    Const NotFound          As Long = 0
-    Const FoundBefore       As Long = 1
-    Const FoundAfter        As Long = 2
-    Dim Chars()             As Integer
-    Dim Index               As Long
-    Dim MaxIndex            As Long
-    Dim Ch                  As Long
-    Dim InWhitespace        As Boolean
-    Dim NeedsClosingParen   As Boolean
-    Dim NegativeSign        As Integer
-    Dim PositiveSign        As Integer
-    Dim CurrencySymbol      As Integer
-    Dim Thousands           As Integer
-    Dim CurrencyThousands   As Integer
-    Dim DecimalPoint        As Integer
-    Dim CurrencyPoint       As Integer
-    Dim FoundDigit          As Boolean
-    Dim FoundCurrency       As Long
-    Dim FoundSign           As Long
-    Dim FoundDecimal        As Boolean
-    Dim FoundClosingParen   As Boolean
-    Dim FoundExponent       As Boolean
-    Dim Exponent            As Long
-    Dim DecimalPlaces       As Long
-    Dim Ten                 As Int64
-    Dim Char64              As Int64
-    Dim IsNegative          As Boolean
-    Dim IsMaxValue          As Boolean
-    
-    Ten.LowPart = 10
-    NegativeSign = AscW(Info.NegativeSign)
-    PositiveSign = AscW(Info.PositiveSign)
-    CurrencySymbol = AscW(Info.CurrencySymbol)
-    DecimalPoint = AscW(Info.NumberDecimalSeparator)
-    CurrencyPoint = AscW(Info.CurrencyDecimalSeparator)
-    Thousands = AscW(Info.NumberGroupSeparator)
-    CurrencyThousands = AscW(Info.CurrencyGroupSeparator)
-    Chars = AllocChars(s)
-    MaxIndex = UBound(Chars)
-    
-    On Error GoTo Catch
-    
-    Do While Index <= MaxIndex
-        Ch = Chars(Index)
-        
-        Select Case Ch
-            Case vbZeroChar To vbNineChar
-                If IsMaxValue Then _
-                    Throw New OverflowException
-                
-                If (FoundCurrency = FoundAfter) Or (FoundSign = FoundAfter) Or InWhitespace Then
-                    GoTo Finish
-                End If
-                
-                If Not FoundDecimal Then
-                    n = Multiply(n, Ten)
-                    
-                    If IsNegative Then
-                        If n.HighPart = &H7FFFFFFF Then
-                            If n.LowPart = &HFFFFFFF8 Then
-                                Select Case Ch
-                                    Case vbEightChar
-                                        IsMaxValue = True
-                                        GoTo Continue
-                                    Case vbNineChar
-                                        Throw New OverflowException
-                                End Select
-                            End If
-                        End If
-                    End If
-                    
-                    Char64.LowPart = Ch - vbZeroChar
-                    n = Add(n, Char64)
-                Else
-                    If Style And NumberStyles.AllowExponent Then
-                        ' we are allowing a possible exponent value to be parsed,
-                        ' so if we have encountered a decimal point, we need to
-                        ' continue parsing digits and also count how many
-                        ' decimal places we have gone.
-                        n = Multiply(n, Ten)
-                        Char64.LowPart = Ch - vbZeroChar
-                        n = Add(n, Char64)
-                        DecimalPlaces = DecimalPlaces + 1
-                    Else
-                        If Ch <> vbZeroChar Then
-                            GoTo Finish
-                        End If
-                    End If
-                End If
-                
-                FoundDigit = True
-            Case NegativeSign, PositiveSign
-                If (FoundSign <> NotFound) Or NeedsClosingParen Then
-                    GoTo Finish
-                End If
-                
-                If Not FoundDigit Then
-                    If (Style And NumberStyles.AllowLeadingSign) = 0 Then
-                        GoTo Finish
-                    End If
-                    
-                    FoundSign = FoundBefore
-                Else
-                    If (Style And NumberStyles.AllowTrailingSign) = 0 Then
-                        GoTo Finish
-                    End If
-                    
-                    FoundSign = FoundAfter
-                End If
-                
-                If Ch = NegativeSign Then
-                    IsNegative = True
-                End If
-            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
-                If Not FoundDigit Then
-                    If ((Style And NumberStyles.AllowLeadingWhite) = 0) Or NeedsClosingParen Then
-                        GoTo Finish
-                    End If
-                
-                    InWhitespace = FoundSign
-                Else
-                    InWhitespace = True
-                End If
-            Case vbOpenParenChar
-                If ((Style And NumberStyles.AllowParentheses) = 0) Or (FoundSign <> NotFound) Then
-                    GoTo Finish
-                End If
-                
-                NeedsClosingParen = True
-            Case vbCloseParenChar
-                If (Style And NumberStyles.AllowParentheses) = 0 Or (Not NeedsClosingParen) Then
-                    GoTo Finish
-                End If
-                
-                IsNegative = True
-                NeedsClosingParen = False
-                FoundClosingParen = True
-            Case CurrencySymbol
-                If ((Style And NumberStyles.AllowCurrencySymbol) = 0) Or (FoundCurrency <> NotFound) Then
-                    GoTo Finish
-                End If
-                
-                FoundCurrency = IIfLong(IsZero(n), FoundBefore, FoundAfter)
-            Case DecimalPoint, CurrencyPoint
-                If ((Style And NumberStyles.AllowDecimalPoint) = 0) Or FoundDecimal Or FoundClosingParen Then
-                    GoTo Finish
-                End If
-                
-                If FoundCurrency Then
-                    If Ch = DecimalPoint Then
-                        GoTo Finish
-                    End If
-                End If
-                
-                FoundDecimal = True
-            Case Thousands, CurrencyThousands
-                If ((Style And NumberStyles.AllowThousands) = 0) Or (Not FoundDigit) Then
-                    GoTo Finish
-                End If
-                
-                If FoundCurrency Then
-                    If Ch = Thousands Then
-                        GoTo Finish
-                    End If
-                End If
-            Case vbLowerEChar, vbUpperEChar
-                If ((Style And NumberStyles.AllowExponent) = 0) Or FoundExponent Then
-                    GoTo Finish
-                End If
-            
-                If Not TryParseExponent(Chars, Index, Exponent) Then
-                    GoTo Finish
-                End If
-                
-                ' we understand that parsing the exponent will advance the index passed the end of the digits
-                ' and that we will be advancing the index as well, in effect advancing it twice, so we need
-                ' to counter that last advancement.
-                Index = Index - 1
-                FoundExponent = True
-            Case Else
-                GoTo Finish
-        End Select
-        
-Continue:
-        Index = Index + 1
-    Loop
-    
-    If InWhitespace Then
-        If (Style And NumberStyles.AllowTrailingWhite) = 0 Then
-            GoTo Finish
-        End If
-    End If
-    
-    If NeedsClosingParen Then
-        GoTo Finish
-    End If
-    
-    If FoundExponent Then
-        If Exponent < DecimalPlaces Then
-            GoTo Finish
-        End If
-    
-        Do While Exponent - DecimalPlaces > 0
-            n = Multiply(n, Ten)
-            Exponent = Exponent - 1
-        Loop
-    End If
-    
-    If IsNegative Then
-        If IsMaxValue Then
-            n.HighPart = &H80000000
-            n.LowPart = 0
-        Else
-            n = Negate(n)
-        End If
-    End If
-    
-    TryParseDecimal = True
-    
-Finish:
-    GoSub Finally
-    Exit Function
-    
-Catch:
-    GoSub Finally
-    ThrowOrErr Err
-Finally:
-    FreeChars Chars
-    Return
-End Function
 
-Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long, ByRef Exponent As Long) As Boolean
-    Dim Ch          As Integer
-    Dim MaxIndex    As Long
-    
-    MaxIndex = UBound(Chars)
-    Index = Index + 1
-    
-    If Index > MaxIndex Then
-        Exit Function
-    End If
-    
-    If Chars(Index) = vbPlusChar Then
-        Index = Index + 1
-    End If
-    
-    Do While Index <= MaxIndex
-        Ch = Chars(Index)
-        
-        Select Case Ch
-            Case vbZeroChar To vbNineChar
-                Exponent = Exponent * 10 + (Ch - vbZeroChar)
-                TryParseExponent = True
-            Case Else
-                Exit Function
-        End Select
-        
-        Index = Index + 1
-    Loop
-End Function
-
-Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByRef n As Int64) As Boolean
-    Const vbLowerHexOffset As Long = 87
-    Const vbUpperHexOffset As Long = 55
-    
-    Dim Chars()     As Integer
-    Dim FoundDigits As Boolean
-    Dim i As Long
-    Dim j As Long
-    Dim k As Long
-    Dim Ch As Long
-    Dim Section As Long
-    
-    Chars = AllocChars(s)
-    j = 1
-    Section = 1
-    
-    For i = UBound(Chars) To LBound(Chars) Step -1
-        Select Case Chars(i)
-            Case vbZeroChar
-                Ch = 0
-                FoundDigits = True
-            Case vbOneChar To vbNineChar
-                Ch = Chars(i) - vbZeroChar
-                FoundDigits = True
-            Case vbLowerAChar To vbLowerFChar
-                Ch = Chars(i) - vbLowerHexOffset
-                FoundDigits = True
-            Case vbUpperAChar To vbUpperFChar
-                Ch = Chars(i) - vbUpperHexOffset
-                FoundDigits = True
-            Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
-                If ((Style And NumberStyles.AllowLeadingWhite) = 0) And FoundDigits Then
-                    GoTo Finally
-                End If
-
-                If ((Style And NumberStyles.AllowTrailingWhite) = 0) And Not FoundDigits Then
-                    GoTo Finally
-                End If
-
-                GoTo Continue
-            Case Else
-                GoTo Finally
-        End Select
-
-        k = k Or (Ch * j)
-        j = j * vbShift4Bits
-
-        If j = vbShift16Bits Then
-            Select Case Section
-                Case 1
-                    n.LowPart = k
-                Case 2
-                    n.LowPart = n.LowPart Or ShiftLeftInt32(k, 16)
-                Case 3
-                    n.HighPart = k
-                Case 4
-                    n.HighPart = n.HighPart Or ShiftLeftInt32(k, 16)
-                Case Else
-                    GoTo Finally
-            End Select
-            
-            Section = Section + 1
-            j = 1
-            k = 0
-        End If
-
-Continue:
-    Next i
-
-    If k Then
-        Select Case Section
-            Case 1
-                n.LowPart = k
-            Case 2
-                n.LowPart = n.LowPart Or ShiftLeftInt32(k, 16)
-            Case 3
-                n.HighPart = k
-            Case 4
-                n.HighPart = n.HighPart Or ShiftLeftInt32(k, 16)
-            Case Else
-                GoTo Finally
-        End Select
-    End If
-    TryParseHex = True
-
-Finally:
-    FreeChars Chars
-End Function

@@ -368,6 +368,7 @@ Class=MemoryMappedViewStream; System.IO.MemoryMappedFiles\MemoryMappedViewStream
 Class=IVersionable; System.Collections\IVersionable.cls
 Module=Int64Callbacks; System\Int64Callbacks.bas
 ResFile32="CorLib.RES"
+Class=Int64Parser; System\Int64Parser.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"

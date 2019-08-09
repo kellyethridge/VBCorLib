@@ -630,3 +630,21 @@ Public Sub CInt64_WithValues_ReturnsExpected(ByRef Value As Variant, ByRef Expec
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
+
+Public Sub Parse_WithTooManyDigits_ThrowsOverflowException()
+    Const M As String = "9223372036854775807"
+    On Error Resume Next
+    
+    Int64.Parse M & "0"
+    
+    AssertOverflowException Err
+End Sub
+
+Public Sub Parse_WithOneMoreThanMaxValue_ThrowsOverflowException()
+    Const M As String = "9223372036854775809"
+    On Error Resume Next
+    
+    Int64.Parse M
+    
+    AssertOverflowException Err
+End Sub
