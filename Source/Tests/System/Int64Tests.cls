@@ -289,6 +289,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "8000000000000000", Int64.MinValue
             Test.Use "7fffffffffffffff", Int64.MaxValue
             
+        Case "TryParse_WithHexPrefix_ReturnsExpected"
+            Test.Use "&h0", Int64.Zero
+            Test.Use "&h00000000", Int64.Zero
+            Test.Use "&h1", Int64.One
+            Test.Use "0x7f", NewInt64(&H7F, 0)
+            Test.Use "0x100", NewInt64(&H100, 0)
+            Test.Use "0Xf", NewInt64(&HF, 0)
+            Test.Use "0Xffffffff", NewInt64(&HFFFFFFFF, 0)
+            Test.Use "0xffffffffffffffff", Int64.MinusOne
+            Test.Use "&H8000000000000000", Int64.MinValue
+            Test.Use "&H7fffffffffffffff", Int64.MaxValue
+            
         Case "ParseEx_WithInvalidValueAndAllowHexSpecifier_ThrowsFormatException"
             Test.Use "-1"
             Test.Use " 1"
@@ -595,6 +607,14 @@ Public Sub TryParseEx_WithAllowHexSpecifier_ReturnsExpected(ByVal s As String, B
     Dim Actual As Int64
     
     Assert.That Int64.TryParseEx(s, AllowHexSpecifier, Nothing, Actual), Iz.True
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub TryParse_WithHexPrefix_ReturnsExpected(ByVal s As String, ByRef Expected As Int64)
+    Dim Actual As Int64
+    
+    Assert.That Int64.TryParse(s, Actual), Iz.True
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

@@ -46,12 +46,13 @@ End Property
 
 Friend Function TryParse(ByRef s As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef Result As Int64) As Boolean
     Dim Info As NumberFormatInfo
+    Dim HasPrefix As Boolean
     
     Result.LowPart = 0
     Result.HighPart = 0
     
-    If IsHexSpecifier(Style) Then
-        TryParse = TryParseHex(s, Style, Result)
+    If IsHexSpecifier(s, Style, HasPrefix) Then
+        TryParse = TryParseHex(s, HasPrefix, Style, Result)
     Else
         Set Info = NumberFormatInfo.GetInstance(Provider)
         TryParse = TryParseDecimal(s, Style, Info, Result)
@@ -63,8 +64,14 @@ Friend Function TryParse(ByRef s As String, ByVal Style As NumberStyles, ByVal P
     End If
 End Function
 
-Private Function IsHexSpecifier(ByVal Style As NumberStyles) As Boolean
-    IsHexSpecifier = (Style And NumberStyles.AllowHexSpecifier)
+Private Function IsHexSpecifier(ByRef s As String, ByVal Style As NumberStyles, ByRef HasPrefix As Boolean) As Boolean
+    Select Case Left$(s, 2)
+        Case "&h", "&H", "0x", "0X"
+            HasPrefix = True
+            IsHexSpecifier = True
+        Case Else
+            IsHexSpecifier = (Style And NumberStyles.AllowHexSpecifier)
+    End Select
 End Function
 
 Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles, ByVal Info As NumberFormatInfo, ByRef n As Int64) As Boolean
@@ -348,7 +355,7 @@ Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long,
     Loop
 End Function
 
-Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByRef n As Int64) As Boolean
+Private Function TryParseHex(ByRef s As String, ByVal HasPrefix As Boolean, ByVal Style As NumberStyles, ByRef n As Int64) As Boolean
     Const vbLowerHexOffset As Long = 87
     Const vbUpperHexOffset As Long = 55
     
@@ -359,12 +366,14 @@ Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByR
     Dim k As Long
     Dim Ch As Long
     Dim Section As Long
+    Dim MinIndex As Long
     
+    MinIndex = IIfLong(HasPrefix, 2, 0)
     Chars = AllocChars(s)
     j = 1
     Section = 1
     
-    For i = UBound(Chars) To LBound(Chars) Step -1
+    For i = UBound(Chars) To MinIndex Step -1
         Select Case Chars(i)
             Case vbZeroChar
                 Ch = 0
