@@ -136,19 +136,9 @@ End Function
 ' @param Value The string of characters to attempt to be parsed.
 ' @param OutResult The returning BigInteger object if the string was successfully parsed.
 ' @return Returns True if the string was parsed, False otherwise.
-' @remarks 3 base types are supported for parsing (Decimal, Hex, Binary.) The string
-' must include a base type specifier for Hex and Binary. Decimal is the default.
-' <p>
-' Hex Specifiers: 0x, 0X, &h, &H - (0xFF, 0XFF, &hFF, &HFF) <br>
-' Binary Specifiers: 0b, 0B - (0b00001111, 0B000011111) <br>
-' </p>
-' Anything else will default to Decimal.<br>
-' "-" is supported for all types of parsing.
-' <pre>
-' Dim b As BigInteger
-' Debug.Print BigInteger.TryParse("-&H7FFF", b) '' True
-' Debug.Print b.ToString("X") '' 8001
-' </pre>
+' @remarks 2 base types are supported for parsing; Decimal and Hex. The string
+' must include a base type specifier for Hex. Decimal is the default.
+' <p>Hex Prefix Specifiers: 0x, 0X, &h, &H</p>
 ' <p>Parsing is not case sensitive.</p>
 Public Function TryParse(ByRef Value As String, ByRef OutResult As BigInteger) As Boolean
     TryParse = TryParseEx(Value, NumberStyles.Integer, Nothing, OutResult)
@@ -162,13 +152,14 @@ End Function
 ' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
 ' @param OutResult When this method returns, contains the BigInteger equivalent to the number that is contained in value, or BigInteger.Zero if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
 Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
-    Dim Result  As BigNumber
-    Dim Info    As NumberFormatInfo
+    Dim Result      As BigNumber
+    Dim Info        As NumberFormatInfo
+    Dim HasPrefix   As Boolean
     
     Set OutResult = Nothing
     
-    If IsHexSpecifier(Style) Then
-        TryParseEx = TryParseHex(Value, Style, Result)
+    If IsHexSpecifier(Value, Style, HasPrefix) Then
+        TryParseEx = TryParseHex(Value, HasPrefix, Style, Result)
     Else
         Set Info = NumberFormatInfo.GetInstance(Provider)
         TryParseEx = TryParseDecimal(Value, Style, Info, Result)
@@ -180,8 +171,14 @@ Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, B
     End If
 End Function
 
-Private Function IsHexSpecifier(ByVal Style As NumberStyles) As Boolean
-    IsHexSpecifier = (Style And NumberStyles.AllowHexSpecifier)
+Private Function IsHexSpecifier(ByRef Value As String, ByVal Style As NumberStyles, ByRef HasPrefix As Boolean) As Boolean
+    Select Case Left$(Value, 2)
+        Case "&h", "&H", "0x", "0X"
+            HasPrefix = True
+            IsHexSpecifier = True
+        Case Else
+            IsHexSpecifier = (Style And NumberStyles.AllowHexSpecifier)
+    End Select
 End Function
 
 ''
@@ -192,18 +189,15 @@ End Function
 ' @param Provider An object that provides culture-specific formatting information about <i>Value</i>.
 ' @return Returns an instance of <a href="BigInteger.html">BigInteger</a> containing the parsed value.
 ' @remarks If the string could not be parsed, an exception is thrown.
-' <p>3 base types are supported for parsing (Decimal, Hex, Binary.) The string
-' must include a base type specifier for Hex and Binary. Decimal is the default.</p>
+' <p>3 base types are supported for parsing (Decimal, Hex.) The string
+' must include a base type specifier for Hex. Decimal is the default.</p>
 ' <p>
-' Hex Specifiers: 0x, 0X, &h, &H - (0xFF, 0XFF, &hFF, &HFF) <br>
-' Binary Specifiers: 0b, 0B - (0b00001111, 0B000011111) <br>
+' Hex Specifiers: 0x, 0X, &h, &H - (0xFF, 0XFF, &hFF, &HFF)
 ' </p>
-' Anything else will default to Decimal.<br>
-' "-" is supported for all types of parsing.
 ' <pre>
 ' Dim b As BigInteger
-' Set b = BigInteger.Parse("-&H7FFF")
-' Debug.Print b.ToString("X") '' 8001
+' Set b = BigInteger.Parse("&H7FFF")
+' Debug.Print b.ToString("X") '' 7FFF
 ' </pre>
 ' <p>Parsing is not case sensitive.</p>
 Public Function Parse(ByRef Value As String, Optional ByVal Style As NumberStyles = NumberStyles.Integer, Optional ByVal Provider As IFormatProvider) As BigInteger
@@ -218,10 +212,9 @@ End Function
 ' @param Value The BigInteger to create a string from.
 ' @param Format The specific numerical format wish to have the number displayed as.
 ' @return The numeric value of the number in the specified format.
-' @remarks "X" and "x" for hex in either upper or lowercase. "B" or "b" for a binary
-' representation of 1's and 0's. Everything else defaults to a decimal display.
+' @remarks "X" and "x" for hex in either upper or lowercase. Everything else defaults to a decimal display.
 ' <p>The specifier can also contain a number of mininum digits to be displayed. If
-' the value isn't long enough to reach the mininum digits, then leading 0's, 1's, or
+' the value isn't long enough to reach the mininum digits, then leading 0's or
 ' FF's will be added to the beginning of the output.</p>
 ' <pre>
 ' Dim b As BigInteger
@@ -230,11 +223,8 @@ End Function
 ' Debug.Print b.ToString("d")  '' -200
 ' Debug.Print b.ToString("x8") '' ffffff38
 ' Debug.Print b.ToString("x")  '' ff38
-' Debug.Print b.ToString("b8") '' 1111111100111000
-' Debug.Print b.ToString("b")  '' 1111111100111000
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
-'
 Public Function ToString(ByVal Value As BigInteger, Optional ByRef Format As String) As String
     Set Value = ValueOrZero(Value)
     ToString = Value.ToString(Format)
@@ -251,7 +241,6 @@ End Function
 ' with how users of VB already deal with negative numbers, helping to ease
 ' the transition to using BigInteger values.
 ' <p>Values of Nothing will be treated as zero.</p>
-'
 Public Function Negate(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     Set Negate = Value.Negate
@@ -1008,17 +997,21 @@ Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long,
     Loop
 End Function
 
-Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByRef n As BigNumber) As Boolean
+Private Function TryParseHex(ByRef s As String, ByVal HasPrefix As Boolean, ByVal Style As NumberStyles, ByRef n As BigNumber) As Boolean
     Const vbLowerHexOffset As Long = 87
     Const vbUpperHexOffset As Long = 55
     Dim Chars()     As Integer
     Dim MaxSize     As Long
+    Dim MinIndex    As Long
     Dim UpperIndex  As Long
     Dim FoundDigits As Boolean
+    Dim Length      As Long
     
+    MinIndex = IIfLong(HasPrefix, 2, 0)
+    Length = Len(s) - MinIndex
     Chars = AllocChars(s)
     UpperIndex = UBound(Chars)
-    MaxSize = Len(s) \ 4 + IIfLong(Len(s) Mod 4, 1, 0)
+    MaxSize = (Length) \ 4 + IIfLong(Length Mod 4, 1, 0)
     ReDim n.Digits(0 To MaxSize - 1)
     
     Dim c As Long
@@ -1028,7 +1021,7 @@ Private Function TryParseHex(ByRef s As String, ByVal Style As NumberStyles, ByR
     Dim Ch As Long
     
     j = 1
-    For i = UpperIndex To LBound(Chars) Step -1
+    For i = UpperIndex To MinIndex Step -1
         Select Case Chars(i)
             Case vbZeroChar
                 Ch = 0

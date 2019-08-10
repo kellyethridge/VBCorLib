@@ -194,10 +194,9 @@ End Function
 ' @param Format The specific numerical format wish to have the number displayed as.
 ' @param Provider An object that supplies culture-specific formatting information about this instance.
 ' @return The numeric value of the number in the specified format.
-' @remarks "X" and "x" for hex in either upper or lowercase. "B" or "b" for a binary
-' representation of 1's and 0's. Everything else defaults to a decimal display.
+' @remarks "X" and "x" for hex in either upper or lowercase. Everything else defaults to a decimal display.
 ' <p>The specifier can also contain a number of mininum digits to be displayed. If
-' the value isn't long enough to reach the mininum digits, then leading 0's, 1's, or
+' the value isn't long enough to reach the mininum digits, then leading 0's or
 ' FF's will be added to the beginning of the output.</p>
 ' <pre>
 ' Dim b As BigInteger
@@ -206,11 +205,8 @@ End Function
 ' Debug.Print b.ToString("d")  '' -200
 ' Debug.Print b.ToString("x8") '' ffffff38
 ' Debug.Print b.ToString("x")  '' ff38
-' Debug.Print b.ToString("b8") '' 1111111100111000
-' Debug.Print b.ToString("b")  '' 1111111100111000
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
-'
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim FormatInfo  As NumberFormatInfo
     

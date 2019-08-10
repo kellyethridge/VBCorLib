@@ -68,7 +68,21 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "1)"
             Test.Use "1e+"
             Test.Use "1e-"
-            
+        
+        Case "Parse_WithHexPrefix_ReturnsExpected"
+            Test.Use "&h0", NewBytes(0), 0
+            Test.Use "&h00000000", NewBytes(0), 0
+            Test.Use "&H1", NewBytes(1), 1
+            Test.Use "&h7f", NewBytes(&H7F), 1
+            Test.Use "&h100", NewBytes(0, 1), 1
+            Test.Use "0xf", NewBytes(&HFF), -1
+            Test.Use "&hff", NewBytes(&HFF), -1
+            Test.Use "&h8", NewBytes(&HF8), -1
+            Test.Use "0X80", NewBytes(&H80), -1
+            Test.Use "&h800", NewBytes(0, &HF8), -1
+            Test.Use "&h8000", NewBytes(0, &H80), -1
+            Test.Use "&h80000", NewBytes(0, 0, &HF8), -1
+            Test.Use "&h10000", NewBytes(0, 0, 1), 1
     End Select
 End Sub
 
@@ -86,6 +100,14 @@ Public Sub Parse_WithInvalidValue_ThrowsFormatException(ByVal s As String)
     BigInteger.Parse s, NumberStyles.AllowHexSpecifier
     
     AssertFormatException Err
+End Sub
+
+Public Sub Parse_WithHexPrefix_ReturnsExpected(ByVal s As String, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual As BigInteger
+    
+    Set Actual = BigInteger.Parse(s)
+    
+    AssertNumber Actual, ExpectedBytes, ExpectedSign
 End Sub
 
 
