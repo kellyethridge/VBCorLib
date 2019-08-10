@@ -63,7 +63,12 @@ Private mFunc_T_T_T_StringDel As Delegate
 '
 ' @param pfn The address to function to be called.
 ' @return A lightweight COM object used to call a function.
-'
+' @remarks When using this method of delegate creation by a class that will live for the
+' duration of an application, the class should unhook the reference using ObjectPtr instead
+' of letting the reference be set to Nothing and causing a call to the Release method in this
+' module. This is to prevent a possible call to the Release method after this module has been
+' deallocated during the tear-down phase of an application, since the delegate may be deallocated
+' after this module.
 Public Function NewDelegate(ByVal pfn As Long) As IUnknown
     Dim This As Long
     
@@ -79,6 +84,18 @@ Public Function NewDelegate(ByVal pfn As Long) As IUnknown
     ObjectPtr(NewDelegate) = This
 End Function
 
+''
+' Initializes an existing delegate light-weight object with an optional function pointer.
+'
+' @param Struct The delegate object to be initialized.
+' @param pfn The initial function pointer the delegate will be set to.
+' @return An object reference to the delegate passed in.
+' @remarks When using this method of delegate creation by a class that will live for the
+' duration of an application, the class should unhook the reference using ObjectPtr instead
+' of letting the reference be set to Nothing and causing a call to the Release method in this
+' module. This is to prevent a possible call to the Release method after this module has been
+' deallocated during the tear-down phase of an application, since the delegate may be deallocated
+' after this module.
 Public Function InitDelegate(ByRef Struct As Delegate, Optional ByVal pfn As Long) As IUnknown
     Init
     Struct.pfn = pfn

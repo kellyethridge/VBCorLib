@@ -112,14 +112,14 @@ Private Function SZBinarySearch(ByVal ArrayPtr As Long, ByVal pValue As Long, By
     Dim pvData      As Long
     Dim pLowElem    As Long
     Dim pHighElem   As Long
-    Dim Delegate    As Delegate
+    Dim ComparerDel As Delegate
     Dim Comparer    As Func_T_T_Long
     
     ElemSize = SafeArrayGetElemsize(ArrayPtr)
     pvData = MemLong(ArrayPtr + PVDATA_OFFSET)
     pLowElem = Index - SafeArrayGetLBound(ArrayPtr, 1)
     pHighElem = pLowElem + Count - 1
-    Set Comparer = InitDelegate(Delegate, ComparerAddress)
+    Set Comparer = InitDelegate(ComparerDel, ComparerAddress)
     
     Dim pMiddleElem As Long
     Do While pLowElem <= pHighElem

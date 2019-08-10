@@ -45,6 +45,7 @@ Attribute VB_Exposed = False
 '
 Option Explicit
 
+Private mComparerDel    As Delegate
 Private mComparer       As Func_T_T_Long
 Private mHasSortItems   As Boolean
 Private mSortItems      As SortItems
@@ -63,7 +64,7 @@ Private mPivotBuffer    As Long
 
 
 Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Long, ByVal Right As Long, ByVal AddressOfCallback As Long)
-    Set mComparer = NewDelegate(AddressOfCallback)
+    Set mComparer = InitDelegate(mComparerDel, AddressOfCallback)
     
     On Error GoTo Catch
     

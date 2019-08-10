@@ -81,11 +81,12 @@ Implements IObject
 '
 Public Event Elapsed(ByRef Data As Variant)
 
-Private mInterval   As Long
-Private mAutoReset  As Boolean
-Private mTimerId    As Long
-Private mData       As Variant
-Private mCallback   As Action_T_T
+Private mInterval       As Long
+Private mAutoReset      As Boolean
+Private mTimerId        As Long
+Private mData           As Variant
+Private mCallbackDel    As Delegate
+Private mCallback       As Action_T_T
 
 
 ''
@@ -273,7 +274,7 @@ Friend Sub Init(ByVal Interval As Long, ByRef Data As Variant, ByVal AutoReset A
     VariantCopyInd mData, Data
     
     If AddressOfCallback <> vbNullPtr Then
-        Set mCallback = NewDelegate(AddressOfCallback)
+        Set mCallback = InitDelegate(mCallbackDel, AddressOfCallback)
     End If
 End Sub
 
@@ -283,6 +284,7 @@ End Sub
 
 Private Sub Class_Terminate()
     StopTicker
+    ObjectPtr(mCallback) = vbNullPtr
 End Sub
 
 

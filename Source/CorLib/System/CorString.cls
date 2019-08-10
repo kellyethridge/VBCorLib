@@ -490,10 +490,6 @@ Friend Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
     CharAt = MemWord(StrPtr(s) + Index * 2)
 End Function
 
-Friend Function AnyChars(ByRef s As String, ByVal Predicate As Long) As Boolean
-    AnyChars = CheckChars(s, True, Predicate)
-End Function
-
 Friend Function AllChars(ByRef s As String, ByVal Predicate As Long) As Boolean
     AllChars = CheckChars(s, False, Predicate)
 End Function
@@ -509,6 +505,17 @@ End Sub
 
 Private Sub Class_Terminate()
     ReleaseComparisonStrings
+    
+    ' Normally we could let light-weight delegate object release
+    ' on their own, but, this class will be kept alive for the
+    ' duration of the application, so when the delegation object
+    ' is finally release, the Delegation module may have already
+    ' be deallocated, removing the Release function the delegate
+    ' object would have called. Since the delegation object is
+    ' owned by this class, no memory needs deallocating, so we
+    ' can just unhook the object pointer instead and let the
+    ' normal class tear-down take care of the allocated delegate.
+    ObjectPtr(mCharChecker) = vbNullPtr
 End Sub
 
 
