@@ -902,6 +902,11 @@ Friend Sub Init(ByRef Value As Variant)
                 Error.ArgumentNull "Value"
         
             InitFromArray Value
+        Case vbUserDefinedType
+            If Not IsInt64(Value) Then _
+                Throw Cor.NewArgumentException("Cannot initialize BigInteger from specified value.")
+        
+            InitFromInt64 Value
         Case Else
             Throw Cor.NewArgumentException("Cannot initialize BigInteger from specified value.")
     End Select
@@ -1017,6 +1022,50 @@ Private Sub InitFromLong(ByVal Value As Long)
         ReDim mNumber.Digits(0 To 1)
         AsLong(mNumber.Digits(0)) = Value
     End If
+End Sub
+
+Private Sub InitFromInt64(ByRef Value As Variant)
+    Dim HighPart    As Long
+    Dim LowPart     As Long
+    Dim Digits      As Long
+    
+    HighPart = Value.HighPart
+    LowPart = Value.LowPart
+    
+    If HighPart < 0 Then
+        mNumber.Sign = -1
+        
+        If HighPart = -1 Then
+            Digits = IIfLong((LowPart And &HFFFF8000) = &H8000, 1, 2)
+        Else
+            Digits = IIfLong((HighPart And &HFFFF8000) = &H8000, 3, 4)
+        End If
+    ElseIf HighPart Or LowPart Then
+        mNumber.Sign = 1
+        
+        If HighPart = 0 Then
+            Digits = IIfLong((LowPart And &HFFFF0000) = 0, 1, 2)
+        Else
+            Digits = IIfLong((HighPart And &HFFFF0000) = 0, 3, 4)
+        End If
+    Else
+        Exit Sub
+    End If
+    
+    ReDim mNumber.Digits(0 To Digits - 1)
+    
+    Select Case Digits
+        Case 1
+            mNumber.Digits(0) = AsWord(LowPart)
+        Case 2
+            AsLong(mNumber.Digits(0)) = LowPart
+        Case 3
+            AsLong(mNumber.Digits(0)) = LowPart
+            mNumber.Digits(2) = AsWord(HighPart)
+        Case 4
+            AsLong(mNumber.Digits(0)) = LowPart
+            AsLong(mNumber.Digits(2)) = HighPart
+    End Select
 End Sub
 
 Private Sub InitFromArray(ByRef Value As Variant)

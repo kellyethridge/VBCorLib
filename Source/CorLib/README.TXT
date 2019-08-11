@@ -120,6 +120,7 @@ version 3.0 (BREAKING CHANGES)
 	* Changed BitConverter class to handle Date as ticks to match .NET. *BREAKING*
 	* Added Int64 static methods for manipulating and creating an Int64 data-type.
 	* Added CInt64 for easy conversion to Int64 data-type.
+	* Added support for BigInteger to be initialized from an Int64.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

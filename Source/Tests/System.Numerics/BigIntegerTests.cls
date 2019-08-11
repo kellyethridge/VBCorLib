@@ -80,6 +80,22 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "12345678901231234567890123.456789", NewBytes(&HCB, &HE4, &H5F, &H51, &HA2, &H7B, &H22, &H98, &H4C, &H36, &HA), 1
             Test.Use "-12345678901231234567890123.456789", NewBytes(&H35, &H1B, &HA0, &HAE, &H5D, &H84, &HDD, &H67, &HB3, &HC9, &HF5), -1
             
+        Case "NewBigInteger_WithInt64_InitializesBigInteger"
+            Test.Use Int64.Zero, NewBytes(0), 0
+            Test.Use Int64.One, NewBytes(1), 1
+            Test.Use Int64.MinusOne, NewBytes(&HFF), -1
+            Test.Use CInt64(&H8000), NewBytes(0, &H80), -1
+            Test.Use CInt64(-&H800000), NewBytes(0, 0, &H80), -1
+            Test.Use CInt64(&H80000000), NewBytes(0, 0, 0, &H80), -1
+            Test.Use CInt64("0xFFFF"), NewBytes(&HFF, &HFF, 0), 1
+            Test.Use CInt64("0xFFFFFF"), NewBytes(&HFF, &HFF, &HFF, 0), 1
+            Test.Use CInt64("0xFFFFFFFF"), NewBytes(&HFF, &HFF, &HFF, &HFF, 0), 1
+            Test.Use CInt64("0xFFFFFFFFFF"), NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, 0), 1
+            Test.Use CInt64("0xffffffffffffffff"), NewBytes(&HFF), -1
+            Test.Use CInt64("0x8000000000000000"), NewBytes(0, 0, 0, 0, 0, 0, 0, &H80), -1
+            Test.Use CInt64("0xffff800000000000"), NewBytes(0, 0, 0, 0, 0, &H80), -1
+            Test.Use CInt64("0x7fffffffffffffff"), NewBytes(&HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &HFF, &H7F), 1
+            
         Case "Parse_WithValidValueForNumberStylesInteger_ReturnsBigInteger"
             Test.Use "0", NewBytes(0), 0
             Test.Use "1", NewBytes(&H1), 1
@@ -1060,4 +1076,13 @@ Public Sub GreatestCommonDivisor_WithValues_ReturnsExpected(ByRef Left As Varian
     Set Actual = BigInteger.GreatestCommonDivisor(BInt(Left), BInt(Right))
     
     Assert.That Actual, Equals(BInt(Expected))
+End Sub
+
+Public Sub NewBigInteger_WithInt64_InitializesBigInteger(ByRef Value As Variant, ByRef ExpectedBytes() As Byte, ByVal ExpectedSign As Long)
+    Dim Actual As BigInteger
+    
+    Set Actual = Cor.NewBigInteger(Value)
+    
+    Assert.That Actual.ToByteArray, Iz.EqualTo(ExpectedBytes), "#1"
+    Assert.That Actual.Sign, Iz.EqualTo(ExpectedSign)
 End Sub
