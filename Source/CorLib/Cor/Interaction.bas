@@ -48,3 +48,22 @@ Public Function IIfLong(ByVal Expression As Boolean, ByVal TruePart As Long, ByV
     End If
 End Function
 
+Public Sub SwapByte(ByRef a As Byte, ByRef b As Byte)
+    Dim t As Byte
+    t = a: a = b: b = t
+End Sub
+
+Public Sub SwapInteger(ByRef a As Integer, ByRef b As Integer)
+    Dim t As Integer
+    t = a: a = b: b = t
+End Sub
+
+Public Sub SwapLong(ByRef a As Long, ByRef b As Long)
+    Dim t As Long
+    t = a: a = b: b = t
+End Sub
+
+Public Sub SwapCurrency(ByRef a As Currency, ByRef b As Currency)
+    Dim t As Currency
+    t = a: a = b: b = t
+End Sub

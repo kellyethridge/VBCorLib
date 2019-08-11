@@ -850,7 +850,8 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     Dim ElemCount   As Long
     Dim Element1Ptr As Long
     Dim Element2Ptr As Long
-        
+    Dim Swapper     As Action_T_T
+    
     ValidateArray Arr
     ElemIndex = CLngOrDefault(Index, LBound(Arr))
     ElemCount = CLngOrDefault(Count, UBound(Arr) - ElemIndex + 1)
@@ -867,20 +868,14 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     Element2Ptr = Element1Ptr + (ElemCount - 1) * Info.ElementSize
     
     Select Case Info.ElementSize
-        Case 1, 2, 4, 8, 16
-            Do While Element1Ptr < Element2Ptr
-                Select Case Info.ElementSize
-                    Case 1: Helper.Swap1 ByVal Element1Ptr, ByVal Element2Ptr
-                    Case 2: Helper.Swap2 ByVal Element1Ptr, ByVal Element2Ptr
-                    Case 4: Helper.Swap4 ByVal Element1Ptr, ByVal Element2Ptr
-                    Case 8: Helper.Swap8 ByVal Element1Ptr, ByVal Element2Ptr
-                    Case 16: Helper.Swap16 ByVal Element1Ptr, ByVal Element2Ptr
-                End Select
-                
-                Element1Ptr = Element1Ptr + Info.ElementSize
-                Element2Ptr = Element2Ptr - Info.ElementSize
-            Loop
-            
+        Case 1
+            Set Swapper = NewDelegate(AddressOf SwapByte)
+        Case 2
+            Set Swapper = NewDelegate(AddressOf SwapInteger)
+        Case 4
+            Set Swapper = NewDelegate(AddressOf SwapLong)
+        Case 8
+            Set Swapper = NewDelegate(AddressOf SwapCurrency)
         Case Else
             Dim TempPtr As Long
             TempPtr = CoTaskMemAlloc(Info.ElementSize)
@@ -894,7 +889,14 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
             Loop
             
             CoTaskMemFree TempPtr
+            Exit Sub
     End Select
+    
+    Do While Element1Ptr < Element2Ptr
+        Swapper.Invoke ByVal Element1Ptr, ByVal Element2Ptr
+        Element1Ptr = Element1Ptr + Info.ElementSize
+        Element2Ptr = Element2Ptr - Info.ElementSize
+    Loop
 End Sub
 
 ''
