@@ -56,7 +56,13 @@ Private Type GuidSafeArray1d
     SA      As SafeArray1d
 End Type
 
-Private CallbackSorter          As New CallbackSorter
+Private Type ArrayInfo
+    SAPtr       As Long
+    DataPtr     As Long
+    ElementSize As Long
+End Type
+
+Private CallbackSorter As New CallbackSorter
 
 
 ''
@@ -135,12 +141,13 @@ End Function
 '
 ' @include "..\DocIncludes\CorArray.Find.html"
 Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
-    ValidateArray Arr
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
+    Dim Info As ArrayInfo
     Dim ElementIndex   As Long
     Dim ElementCount   As Long
+    Dim ElementPtr As Long
+    Dim Predicate As Func_T_Boolean
+    
+    ValidateArray Arr
     ElementIndex = CLngOrDefault(Index, LBound(Arr))
     ElementCount = CLngOrDefault(Count, UBound(Arr) - ElementIndex + 1)
     
@@ -150,14 +157,9 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
     If ElementIndex + ElementCount - 1 > UBound(Arr) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_UBound
-    
-    Dim ElementSize As Long
-    ElementSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim ElementPtr As Long
-    ElementPtr = MemLong(Ptr + PVDATA_OFFSET) + (ElementIndex - LBound(Arr)) * ElementSize
-    
-    Dim Predicate As Func_T_Boolean
+        
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr + (ElementIndex - LBound(Arr)) * Info.ElementSize
     Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
@@ -166,7 +168,8 @@ Public Function FindIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long
             FindIndex = ElementIndex + i - 1
             Exit Function
         End If
-        ElementPtr = ElementPtr + ElementSize
+        
+        ElementPtr = ElementPtr + Info.ElementSize
     Next
     
     FindIndex = LBound(Arr) - 1
@@ -190,90 +193,97 @@ End Function
 '
 ' @include "..\DocIncludes\CorArray.Find.html"
 Public Function FindAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Variant
-    ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim LowerBound As Long
-    LowerBound = LBound(Arr)
-    
-    Dim Count As Long
-    Count = UBound(Arr) - LowerBound + 1
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET)
-    
-    Dim Predicate As Func_T_Boolean
-    Set Predicate = NewDelegate(AddressOfPredicate)
-    
-    ' iterate each array element, passing the memory address
-    ' to the user supplied AddressOf callback. This will appear
-    ' as a ByRef parameter of the array's datatype in the callback.
-    Dim i                   As Long
+    Dim Info                As ArrayInfo
     Dim MatchCount          As Long
     Dim MatchedIndexes()    As Long
     
+    ValidateArray Arr
+    GetArrayInfo Arr, Info
+    MatchedIndexes = FindAllMatches(Arr, Info, AddressOfPredicate, MatchCount)
+    
+    Select Case VarType(Arr) And &HFF
+        Case vbObject
+            SetFindAllObjectResult Arr, Info, MatchedIndexes, MatchCount, FindAll
+        Case vbUserDefinedType
+            SetFindAllUdtResult Arr, Info, MatchedIndexes, MatchCount, FindAll
+        Case Else
+            SetFindAllResult Arr, Info, MatchedIndexes, MatchCount, FindAll
+    End Select
+End Function
+
+Private Function FindAllMatches(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByVal AddressOfPredicate As Long, ByRef MatchCount As Long) As Long()
+    Dim ElementPtr          As Long
+    Dim Predicate           As Func_T_Boolean
+    Dim MatchedIndexes()    As Long
+    
     ReDim MatchedIndexes(0 To 31)
-    For i = LowerBound To LowerBound + Count - 1
-        If Predicate.Invoke(ByVal pElem) Then
+    ElementPtr = Info.DataPtr
+    Set Predicate = NewDelegate(AddressOfPredicate)
+
+    ' iterate each array element, passing the memory address
+    ' to the user supplied AddressOf callback. This will appear
+    ' as a ByRef parameter of the array's datatype in the callback.
+    Dim i As Long
+    For i = LBound(Arr) To UBound(Arr)
+        If Predicate.Invoke(ByVal ElementPtr) Then
             If MatchCount > UBound(MatchedIndexes) Then
                 ReDim Preserve MatchedIndexes(0 To MatchCount * 2 - 1)
             End If
+            
             MatchedIndexes(MatchCount) = i
             MatchCount = MatchCount + 1
         End If
-        pElem = pElem + ElemSize
+        
+        ElementPtr = ElementPtr + Info.ElementSize
     Next i
     
-    Dim Ret         As Variant
-    Dim ArrayType   As Long
-    
-    ArrayType = VarType(Arr) And &HFF   ' knock off the vbArray bit.
-    Select Case ArrayType
-        Case vbObject
-            ' as an array of objects, we create a new array using the
-            ' same Guid value as that of the original array.
-            VariantType(Ret) = vbObject Or vbArray
-            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, Ptr - vbSizeOfGuid)
-            
-            For i = 0 To MatchCount - 1
-                Set Ret(i) = Arr(MatchedIndexes(i))
-            Next i
-            
-        Case vbUserDefinedType
-            Dim UDT As IRecordInfo
-            Set UDT = SafeArrayGetRecordInfo(Ptr)    ' gets an object used to manipulate a UDT.
-            
-            Dim pvData  As Long
-            pvData = MemLong(Ptr + PVDATA_OFFSET)
-            
-            Dim pReturnSafeArray As Long
-            pReturnSafeArray = SafeArrayCreateVectorEx(vbUserDefinedType, 0, MatchCount, ObjPtr(UDT))
-            
-            Dim pDstElem As Long
-            pDstElem = MemLong(pReturnSafeArray + PVDATA_OFFSET)
-            
-            For i = 0 To MatchCount - 1
-                UDT.RecordCopy pvData + (MatchedIndexes(i) - LowerBound) * ElemSize, pDstElem
-                pDstElem = pDstElem + ElemSize
-            Next i
-            
-            VariantType(Ret) = vbUserDefinedType Or vbArray
-            MemLong(VarPtr(Ret) + VARIANTDATA_OFFSET) = pReturnSafeArray
-            
-        Case Else
-            Ret = CreateInstance(ArrayType, MatchCount)
-            For i = 0 To MatchCount - 1
-                Ret(i) = Arr(MatchedIndexes(i))
-            Next i
-    End Select
-    
-    FindAll = Ret
+    FindAllMatches = MatchedIndexes
 End Function
+
+Private Sub SetFindAllObjectResult(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByRef MatchedIndexes() As Long, ByVal MatchCount As Long, ByRef Result As Variant)
+    Dim i As Long
+    
+    ' as an array of objects, we create a new array using the
+    ' same Guid value as that of the original array.
+    VariantType(Result) = vbObject Or vbArray
+    MemLong(VarPtr(Result) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(vbObject, 0, MatchCount, Info.SAPtr - vbSizeOfGuid)
+    
+    For i = 0 To MatchCount - 1
+        Set Result(i) = Arr(MatchedIndexes(i))
+    Next i
+End Sub
+
+Private Sub SetFindAllResult(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByRef MatchedIndexes() As Long, ByVal MatchCount As Long, ByRef Result As Variant)
+    Dim i As Long
+    
+    VariantType(Result) = VarType(Arr)
+    MemLong(VarPtr(Result) + VARIANTDATA_OFFSET) = SafeArrayCreateVectorEx(VarType(Arr) And &HFF, 0, MatchCount, Info.SAPtr - vbSizeOfGuid)
+
+    For i = 0 To MatchCount - 1
+        Result(i) = Arr(MatchedIndexes(i))
+    Next i
+End Sub
+
+Private Sub SetFindAllUdtResult(ByRef Arr As Variant, ByRef Info As ArrayInfo, ByRef MatchedIndexes() As Long, ByVal MatchCount As Long, ByRef Result As Variant)
+    Dim Record As IRecordInfo
+    Dim pReturnSafeArray As Long
+    Dim pDstElem As Long
+    Dim LowerBound As Long
+    Dim i As Long
+    
+    Set Record = SafeArrayGetRecordInfo(Info.SAPtr)    ' gets an object used to manipulate a UDT.
+    pReturnSafeArray = SafeArrayCreateVectorEx(vbUserDefinedType, 0, MatchCount, ObjPtr(Record))
+    pDstElem = MemLong(pReturnSafeArray + PVDATA_OFFSET)
+    LowerBound = LBound(Arr)
+    
+    For i = 0 To MatchCount - 1
+        Record.RecordCopy Info.DataPtr + (MatchedIndexes(i) - LowerBound) * Info.ElementSize, pDstElem
+        pDstElem = pDstElem + Info.ElementSize
+    Next i
+    
+    VariantType(Result) = vbUserDefinedType Or vbArray
+    MemLong(VarPtr(Result) + VARIANTDATA_OFFSET) = pReturnSafeArray
+End Sub
 
 ''
 ' Finds the last occurence of a matched element in the array.
@@ -324,15 +334,16 @@ End Function
 '
 ' @include "..\DocIncludes\CorArray.Find.html"
 Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As Long, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
+    Dim Info        As ArrayInfo
+    Dim ElementPtr  As Long
+    Dim Predicate   As Func_T_Boolean
+    Dim ElemIndex   As Long
+    Dim ElemCount   As Long
+    
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim ElemIndex As Long
-    Dim ElemCount As Long
     ElemIndex = CLngOrDefault(Index, UBound(Arr))
     ElemCount = CLngOrDefault(Count, ElemIndex + 1)
+    
     If ElemIndex < LBound(Arr) Or ElemIndex > UBound(Arr) Then _
         Error.ArgumentOutOfRange "Index", ArgumentOutOfRange_ArrayBounds
     If ElemCount < 0 Then _
@@ -340,23 +351,20 @@ Public Function FindLastIndex(ByRef Arr As Variant, ByVal AddressOfPredicate As 
     If ElemIndex - ElemCount + 1 < LBound(Arr) Then _
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
-    
-    Dim Predicate As Func_T_Boolean
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr + (ElemIndex - LBound(Arr)) * Info.ElementSize
     Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = ElemCount To 1 Step -1
-        If Predicate.Invoke(ByVal pElem) Then
+        If Predicate.Invoke(ByVal ElementPtr) Then
             FindLastIndex = LBound(Arr) + i - 1
             Exit Function
         End If
-        pElem = pElem - ElemSize
+        
+        ElementPtr = ElementPtr - Info.ElementSize
     Next i
+    
     FindLastIndex = LBound(Arr) - 1
 End Function
 
@@ -377,28 +385,24 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Function TrueForAll(ByRef Arr As Variant, ByVal AddressOfPredicate As Long) As Boolean
+    Dim Info        As ArrayInfo
+    Dim ElementPtr  As Long
+    Dim Predicate   As Func_T_Boolean
+        
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET)
-    
-    Dim Predicate As Func_T_Boolean
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr
     Set Predicate = NewDelegate(AddressOfPredicate)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        If Not Predicate.Invoke(ByVal pElem) Then
+        If Not Predicate.Invoke(ByVal ElementPtr) Then
             Exit Function
         End If
         
-        pElem = pElem + ElemSize
+        ElementPtr = ElementPtr + Info.ElementSize
     Next i
+    
     TrueForAll = True
 End Function
 
@@ -419,24 +423,19 @@ End Function
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub ForEach(ByRef Arr As Variant, ByVal AddressOfAction As Long)
+    Dim Info        As ArrayInfo
+    Dim ElementPtr  As Long
+    Dim Action      As Action_T
+    
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
-    
-    Dim pElem As Long
-    pElem = MemLong(Ptr + PVDATA_OFFSET)
-    
-    Dim Action As Action_T
+    GetArrayInfo Arr, Info
+    ElementPtr = Info.DataPtr
     Set Action = NewDelegate(AddressOfAction)
     
     Dim i As Long
     For i = LBound(Arr) To UBound(Arr)
-        Action.Invoke ByVal pElem
-        pElem = pElem + ElemSize
+        Action.Invoke ByVal ElementPtr
+        ElementPtr = ElementPtr + Info.ElementSize
     Next i
 End Sub
 
@@ -691,17 +690,17 @@ End Function
 ' @return The number of elements in the specified dimension or the entire array.
 '
 Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
+    Dim Ptr As Long
+    
     If Not IsArray(Arr) Then _
         Error.Argument Argument_ArrayRequired, "Arr"
     
-    Dim SafeArrayPtr  As Long
+    Ptr = SAPtrV(Arr)
     
-    SafeArrayPtr = SAPtrV(Arr)
-    
-    If SafeArrayPtr = vbNullPtr Then _
+    If Ptr = vbNullPtr Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    Length = LengthCore(SafeArrayPtr, Dimension)
+    Length = LengthCore(Ptr, Dimension)
 End Function
 
 ''
@@ -710,11 +709,11 @@ End Function
 ' @param Arr The array to retrieve the number of dimensions from.
 ' @return The number of dimension in the array.
 Public Function Rank(ByRef Arr As Variant) As Long
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired
-    
     Dim Ptr As Long
     
+    If Not IsArray(Arr) Then _
+        Error.Argument Argument_ArrayRequired
+        
     Ptr = SAPtrV(Arr)
     
     If Ptr = vbNullPtr Then _
@@ -733,12 +732,10 @@ End Function
 ' @return Value indicating the index the value was found. If a value of less that
 ' the lower-bounds is returned, then the value was not found in the array.
 Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
+    Dim Ptr     As Long
+    Dim Range   As ListRange
+        
     ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
-    Dim Range As ListRange
     Range = MakeDefaultStepRange(StartIndex, LBound(Arr), Count, Len1D(Arr), Parameter_StartIndex)
     
     If Range.Index < LBound(Arr) Or Range.Index > UBound(Arr) Then _
@@ -747,6 +744,8 @@ Public Function IndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional B
         Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_Count
     
     On Error GoTo Catch
+    Ptr = SAPtrV(Arr)
+    
     If TrySZIndexOf(Ptr, Value, Range.Index, Range.Count, IndexOf) Then
         Exit Function
     End If
@@ -799,13 +798,11 @@ End Function
 ' then one less than the lower bound of the array is returned.
 '
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
-    ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
+    Dim Ptr         As Long
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
+    
+    ValidateArray Arr
     ElemIndex = CLngOrDefault(StartIndex, UBound(Arr))
     ElemCount = CLngOrDefault(Count, ElemIndex - LBound(Arr) + 1)
     
@@ -817,6 +814,8 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
         Error.ArgumentOutOfRange "", ArgumentOutOfRange_LBound
     
     On Error GoTo Catch
+    Ptr = SAPtrV(Arr)
+    
     If TrySZLastIndexOf(Ptr, Value, ElemIndex, ElemCount, LastIndexOf) Then
         Exit Function
     End If
@@ -826,6 +825,7 @@ Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Option
             LastIndexOf = ElemIndex
             Exit Function
         End If
+        
         ElemIndex = ElemIndex - 1
         ElemCount = ElemCount - 1
     Loop
@@ -845,13 +845,13 @@ End Function
 ' @param Count The number of elements to reverse in the array.
 '
 Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
-    ValidateArray Arr
-    
-    Dim Ptr As Long
-    Ptr = SAPtrV(Arr)
-    
+    Dim Info        As ArrayInfo
     Dim ElemIndex   As Long
     Dim ElemCount   As Long
+    Dim Element1Ptr As Long
+    Dim Element2Ptr As Long
+        
+    ValidateArray Arr
     ElemIndex = CLngOrDefault(Index, LBound(Arr))
     ElemCount = CLngOrDefault(Count, UBound(Arr) - ElemIndex + 1)
     
@@ -862,41 +862,38 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
     If ElemIndex + ElemCount - 1 > UBound(Arr) Then _
         Error.Argument Argument_InvalidOffLen
     
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(Ptr)
+    GetArrayInfo Arr, Info
+    Element1Ptr = Info.DataPtr + (ElemIndex - LBound(Arr)) * Info.ElementSize
+    Element2Ptr = Element1Ptr + (ElemCount - 1) * Info.ElementSize
     
-    Dim pLowElem As Long
-    pLowElem = MemLong(Ptr + PVDATA_OFFSET) + (ElemIndex - LBound(Arr)) * ElemSize
-    
-    Dim pHighElem As Long
-    pHighElem = pLowElem + (ElemCount - 1) * ElemSize
-    
-    Select Case ElemSize
+    Select Case Info.ElementSize
         Case 1, 2, 4, 8, 16
-            Do While pLowElem < pHighElem
-                Select Case ElemSize
-                    Case 1: Helper.Swap1 ByVal pLowElem, ByVal pHighElem
-                    Case 2: Helper.Swap2 ByVal pLowElem, ByVal pHighElem
-                    Case 4: Helper.Swap4 ByVal pLowElem, ByVal pHighElem
-                    Case 8: Helper.Swap8 ByVal pLowElem, ByVal pHighElem
-                    Case 16: Helper.Swap16 ByVal pLowElem, ByVal pHighElem
+            Do While Element1Ptr < Element2Ptr
+                Select Case Info.ElementSize
+                    Case 1: Helper.Swap1 ByVal Element1Ptr, ByVal Element2Ptr
+                    Case 2: Helper.Swap2 ByVal Element1Ptr, ByVal Element2Ptr
+                    Case 4: Helper.Swap4 ByVal Element1Ptr, ByVal Element2Ptr
+                    Case 8: Helper.Swap8 ByVal Element1Ptr, ByVal Element2Ptr
+                    Case 16: Helper.Swap16 ByVal Element1Ptr, ByVal Element2Ptr
                 End Select
-                pLowElem = pLowElem + ElemSize
-                pHighElem = pHighElem - ElemSize
+                
+                Element1Ptr = Element1Ptr + Info.ElementSize
+                Element2Ptr = Element2Ptr - Info.ElementSize
             Loop
             
         Case Else
-            Dim pSwapBuffer As Long
-            pSwapBuffer = CoTaskMemAlloc(ElemSize)
+            Dim TempPtr As Long
+            TempPtr = CoTaskMemAlloc(Info.ElementSize)
             
-            Do While pLowElem < pHighElem
-                CopyMemory ByVal pSwapBuffer, ByVal pLowElem, ElemSize
-                CopyMemory ByVal pLowElem, ByVal pHighElem, ElemSize
-                CopyMemory ByVal pHighElem, ByVal pSwapBuffer, ElemSize
-                pLowElem = pLowElem + ElemSize
-                pHighElem = pHighElem - ElemSize
+            Do While Element1Ptr < Element2Ptr
+                CopyMemory ByVal TempPtr, ByVal Element1Ptr, Info.ElementSize
+                CopyMemory ByVal Element1Ptr, ByVal Element2Ptr, Info.ElementSize
+                CopyMemory ByVal Element2Ptr, ByVal TempPtr, Info.ElementSize
+                Element1Ptr = Element1Ptr + Info.ElementSize
+                Element2Ptr = Element2Ptr - Info.ElementSize
             Loop
-            CoTaskMemFree pSwapBuffer
+            
+            CoTaskMemFree TempPtr
     End Select
 End Sub
 
@@ -925,9 +922,7 @@ Public Sub Sort(ByRef Arr As Variant, Optional ByRef Comparer As Variant)
     If IsNull(Arr) Then _
         Error.ArgumentNull "Arr", ArgumentNull_Array
     
-    Dim Length As Long
-    Length = UBound(Arr) - LBound(Arr) + 1
-    SortKeyEx Arr, Empty, LBound(Arr), Length, Comparer
+    SortKeyEx Arr, Empty, LBound(Arr), Len1D(Arr), Comparer
 End Sub
 
 ''
@@ -986,9 +981,7 @@ Public Sub SortKey(ByRef Keys As Variant, ByRef Items As Variant, Optional ByRef
     If IsNull(Keys) Then _
         Error.ArgumentNull "Keys", ArgumentNull_Array
     
-    Dim Length As Long
-    Length = UBound(Keys) - LBound(Keys) + 1
-    SortKeyEx Keys, Items, LBound(Keys), Length, Comparer
+    SortKeyEx Keys, Items, LBound(Keys), Len1D(Keys), Comparer
 End Sub
 
 ''
@@ -1016,22 +1009,21 @@ End Sub
 ' any specific sub-type within the variants of the array.</p>
 '
 Public Sub SortKeyEx(ByRef Keys As Variant, ByRef Items As Variant, ByVal Index As Long, ByVal Length As Long, Optional ByRef Comparer As Variant)
-    ValidateArrayRange Keys, Index, Length, Parameter_Keys, CountName:=NameOfLength
-    
     Dim KeysPtr  As Long
     Dim ItemsPtr As Long
-    
+        
+    ValidateArrayRange Keys, Index, Length, Parameter_Keys, CountName:=NameOfLength
     KeysPtr = SAPtrV(Keys)
     
     If Not IsEmpty(Items) Then
         ValidateArray Items, Parameter_Items
-        ItemsPtr = SAPtrV(Items)
         
         ' Items array must match the Keys array in size and bounds.
         If (LBound(Keys) <> LBound(Items)) Or _
            (UBound(Keys) <> UBound(Items)) Then _
             Error.Argument Argument_MatchingBounds
         
+        ItemsPtr = SAPtrV(Items)
         SetSortItems ItemsPtr
     End If
     
@@ -1211,18 +1203,15 @@ Private Sub AssignDefaultElementValue(ByRef Arr As Variant, ByRef RetVal As Vari
 End Sub
 
 ' Value types can be copied quickly using CopyMemory.
-'
-Private Sub CopyValueTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
-    Dim ElemSize As Long
-    ElemSize = SafeArrayGetElemsize(srcpSA)
+Private Sub CopyValueTypes(ByVal SrcSAPtr As Long, ByVal SourceIndex As Long, ByVal DstSAPtr As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
+    Dim ElementSize     As Long
+    Dim SrcElementPtr   As Long
+    Dim DstElementPtr   As Long
     
-    Dim pSrcElem As Long
-    pSrcElem = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - SafeArrayGetLBound(srcpSA, 1)) * ElemSize
-    
-    Dim pDstElem As Long
-    pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(dstpSA, 1)) * ElemSize
-    
-    CopyMemory ByVal pDstElem, ByVal pSrcElem, Length * ElemSize
+    ElementSize = SafeArrayGetElemsize(SrcSAPtr)
+    SrcElementPtr = MemLong(SrcSAPtr + PVDATA_OFFSET) + (SourceIndex - SafeArrayGetLBound(SrcSAPtr, 1)) * ElementSize
+    DstElementPtr = MemLong(DstSAPtr + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(DstSAPtr, 1)) * ElementSize
+    CopyMemory ByVal DstElementPtr, ByVal SrcElementPtr, Length * ElementSize
 End Sub
 
 ' Copies reference types, dealing with possible overlapping source and destination regions.
@@ -1278,77 +1267,67 @@ Private Sub CopyReferenceTypes(ByVal srcpSA As Long, ByVal SourceIndex As Long, 
     SafeArrayCopyData VarPtr(srcSA.SA), VarPtr(dstSA.SA)
 End Sub
 
-Private Sub CopyWithCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long, ByVal pfn As Long)
-    Dim srcSize As Long
-    srcSize = SafeArrayGetElemsize(srcpSA)
+Private Sub CopyWithCast(ByVal SrcSAPtr As Long, ByVal SourceIndex As Long, ByVal DstSAPtr As Long, ByVal DestinationIndex As Long, ByVal Length As Long, ByVal pfn As Long)
+    Dim SrcSize     As Long
+    Dim Src         As Long
+    Dim DstSize     As Long
+    Dim Dst         As Long
+    Dim Assigner    As Action_T_T
     
-    Dim srcLb   As Long
-    srcLb = SafeArrayGetLBound(srcpSA, 1)
-    
-    Dim src     As Long
-    src = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - srcLb) * srcSize
-    
-    Dim dstSize As Long
-    dstSize = SafeArrayGetElemsize(dstpSA)
-    
-    Dim dstLb   As Long
-    dstLb = SafeArrayGetLBound(dstpSA, 1)
-    
-    Dim dst     As Long
-    dst = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - dstLb) * dstSize
-    
-    Dim Assigner As Action_T_T
+    SrcSize = SafeArrayGetElemsize(SrcSAPtr)
+    Src = MemLong(SrcSAPtr + PVDATA_OFFSET) + (SourceIndex - SafeArrayGetLBound(SrcSAPtr, 1)) * SrcSize
+    DstSize = SafeArrayGetElemsize(DstSAPtr)
+    Dst = MemLong(DstSAPtr + PVDATA_OFFSET) + (DestinationIndex - SafeArrayGetLBound(DstSAPtr, 1)) * DstSize
     Set Assigner = NewDelegate(pfn)
     
     Do While Length > 0
-        Assigner.Invoke ByVal dst, ByVal src
-        src = src + srcSize
-        dst = dst + dstSize
+        Assigner.Invoke ByVal Dst, ByVal Src
+        Src = Src + SrcSize
+        Dst = Dst + DstSize
         Length = Length - 1
     Loop
 End Sub
 
 ' Copies objects and checks for compatible interfaces during the copy.
 '
-Private Sub CopyObjectTypesCast(ByVal srcpSA As Long, ByVal SourceIndex As Long, ByVal dstpSA As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
+Private Sub CopyObjectTypesCast(ByVal SrcSAPtr As Long, ByVal SourceIndex As Long, ByVal DstSAPtr As Long, ByVal DestinationIndex As Long, ByVal Length As Long)
     Const SizeOfPointer As Long = 4
-    Dim SrcLowerBound As Long
-    SrcLowerBound = SafeArrayGetLBound(srcpSA, 1)
     
-    Dim DstLowerBound As Long
-    DstLowerBound = SafeArrayGetLBound(dstpSA, 1)
+    Dim SrcLowerBound   As Long
+    Dim DstLowerBound   As Long
+    Dim SrcElementPtr   As Long
+    Dim DstElementPtr   As Long
+    Dim DstGuidPtr      As Long
     
-    Dim pSrcElem As Long
-    pSrcElem = MemLong(srcpSA + PVDATA_OFFSET) + (SourceIndex - SrcLowerBound) * SizeOfPointer
-    
-    Dim pDstElem As Long
-    pDstElem = MemLong(dstpSA + PVDATA_OFFSET) + (DestinationIndex - DstLowerBound) * SizeOfPointer
-    
-    Dim pDstGuid As Long
-    pDstGuid = dstpSA - vbSizeOfGuid
+    SrcLowerBound = SafeArrayGetLBound(SrcSAPtr, 1)
+    DstLowerBound = SafeArrayGetLBound(DstSAPtr, 1)
+    SrcElementPtr = MemLong(SrcSAPtr + PVDATA_OFFSET) + (SourceIndex - SrcLowerBound) * SizeOfPointer
+    DstElementPtr = MemLong(DstSAPtr + PVDATA_OFFSET) + (DestinationIndex - DstLowerBound) * SizeOfPointer
+    DstGuidPtr = DstSAPtr - vbSizeOfGuid
     
     Dim pObj    As Long
     Dim SrcObj  As IVBUnknown
     Dim DstObj  As IVBUnknown
     Do While Length > 0
-        ObjectPtr(SrcObj) = MemLong(pSrcElem)
+        ObjectPtr(SrcObj) = MemLong(SrcElementPtr)
         pObj = 0
+        
         If Not SrcObj Is Nothing Then
-            If SrcObj.QueryInterface(ByVal pDstGuid, pObj) = E_NOINTERFACE Then
+            If SrcObj.QueryInterface(ByVal DstGuidPtr, pObj) = E_NOINTERFACE Then
                 ObjectPtr(SrcObj) = vbNullPtr
                 ObjectPtr(DstObj) = vbNullPtr
                 Throw Cor.NewArrayTypeMismatchException(Environment.GetResourceString(ArrayTypeMismatch_Incompatible))
             End If
         End If
         
-        ObjectPtr(DstObj) = MemLong(pDstElem)
+        ObjectPtr(DstObj) = MemLong(DstElementPtr)
         If Not DstObj Is Nothing Then
             DstObj.Release
         End If
-        MemLong(pDstElem) = pObj
+        MemLong(DstElementPtr) = pObj
         
-        pSrcElem = pSrcElem + SizeOfPointer
-        pDstElem = pDstElem + SizeOfPointer
+        SrcElementPtr = SrcElementPtr + SizeOfPointer
+        DstElementPtr = DstElementPtr + SizeOfPointer
         Length = Length - 1
     Loop
     
@@ -1362,6 +1341,7 @@ End Sub
 '
 Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType As VbVarType) As Long
     Dim Ret As Long
+    
     Select Case srcType
         Case vbLong
             Select Case dstType
@@ -1435,6 +1415,7 @@ Private Function GetAssigningFunction(ByVal srcType As VbVarType, ByVal dstType 
                 Case vbCurrency:                Ret = FuncAddr(AddressOf NarrowVariantToCurrency)
             End Select
     End Select
+    
     GetAssigningFunction = Ret
 End Function
 
@@ -1445,5 +1426,10 @@ Private Sub SetCopyArrayDescriptor(ByRef desc As SafeArray1d, ByVal Index As Lon
     End With
 End Sub
 
+Private Sub GetArrayInfo(ByRef Arr As Variant, ByRef Info As ArrayInfo)
+    Info.SAPtr = SAPtrV(Arr)
+    Info.DataPtr = MemLong(Info.SAPtr + PVDATA_OFFSET)
+    Info.ElementSize = SafeArrayGetElemsize(Info.SAPtr)
+End Sub
 
 
