@@ -100,14 +100,14 @@ Public Sub ComputeHash_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException
     AssertArgumentOutOfRangeException Err, "Index"
 End Sub
 
-Public Sub ComputeHash_WithCountLessThanZero_ThrowsArgumentException()
+Public Sub ComputeHash_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Provider As New SHA1CryptoServiceProvider
     Dim Message(5 To 10) As Byte
     
     On Error Resume Next
     Provider.ComputeHash Message, 5, -1
     
-    AssertArgumentException Err, "Count"
+    AssertArgumentOutOfRangeException Err, "Count"
 End Sub
 
 Public Sub ComputeHash_WithCountGreaterThanBufferLength_ThrowsArgumentException()

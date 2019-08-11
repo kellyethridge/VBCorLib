@@ -38,8 +38,8 @@ End Sub
 Public Function AssertArgumentException(ByVal Err As ErrObject, Optional ByRef ParamName As String) As ArgumentException
     Dim Ex As Exception
     Set Ex = AssertExceptionThrown(Err)
-    If Not TypeOf Ex Is ArgumentException Then
-'    If TypeName(Ex) <> "ArgumentException" Then
+
+    If TypeName(Ex) <> "ArgumentException" Then
         WrongException "ArgumentException", Ex
     End If
     

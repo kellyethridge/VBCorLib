@@ -137,13 +137,14 @@ End Sub
 ' @remarks The InputCount must be an exact multiple of the InputBlockSize or an exception will be thrown.
 '
 Public Function TransformBlock(ByRef InputBuffer() As Byte, ByVal InputOffset As Long, ByVal InputCount As Long, ByRef OutputBuffer() As Byte, ByVal OutputOffset As Long) As Long
-    ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
-    ValidateArrayRange OutputBuffer, OutputOffset, InputCount, NameOfOutputBuffer, NameOfOutputOffset, NameOfInputOffset
-    
     ' During normal transformations, the number of bytes to be worked on must be
     ' an exact multiple of mBlockSize. There can be no partial blocks.
     If (InputCount <= 0) Or (InputCount Mod mBlockSize <> 0) Then _
         Throw Cor.NewArgumentException("Invalid value.", "InputCount")
+    
+    ValidateArrayRange InputBuffer, InputOffset, InputCount, NameOfInputBuffer, NameOfInputOffset, NameOfInputCount
+    ValidateArrayRange OutputBuffer, OutputOffset, InputCount, NameOfOutputBuffer, NameOfOutputOffset, NameOfInputOffset
+    
     
     If mIsEncrypting Then
         TransformBlock = EncryptBlock(InputBuffer, InputOffset, InputCount, OutputBuffer, OutputOffset)

@@ -209,8 +209,12 @@ Friend Function AddMonths(ByVal Calendar As Calendar, ByRef Time As Variant, ByV
     End Select
     
     Dim MaxDays As Long
-    MaxDays = CorDateTime.DaysInMonth(Year, Month)
-    
+    If CorDateTime.IsLeapYear(Year) Then
+        MaxDays = DaysToMonthLeapYear(Month) - DaysToMonthLeapYear(Month - 1)
+    Else
+        MaxDays = DaysToMonth(Month) - DaysToMonth(Month - 1)
+    End If
+        
     If Day > MaxDays Then
         Day = MaxDays
     End If

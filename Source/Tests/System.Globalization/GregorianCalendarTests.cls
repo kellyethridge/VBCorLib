@@ -73,6 +73,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use #1/1/2000#, CalendarWeekRule.FirstFourDayWeek, DayOfWeek.Sunday, 52
             Test.Use #1/1/2000#, CalendarWeekRule.FirstFullWeek, DayOfWeek.Sunday, 52
         
+        Case "AddMonths_WithValues_ReturnsExpected"
+            Test.Use #12/1/2001#, 1, #1/1/2002#
+            Test.Use #12/31/2001#, 1, #1/31/2002#
+            Test.Use #1/31/2001#, 1, #2/28/2001#
+            Test.Use #1/1/2002#, -1, #12/1/2001#
+            Test.Use #1/31/2002#, -1, #12/31/2001#
+            Test.Use #2/28/2001#, -1, #1/28/2001#
+            
     End Select
 End Sub
 
@@ -255,13 +263,22 @@ Public Sub AddMethods_WhenCalled_ReturnsExpected()
     Assert.That Calendar.AddWeeks(d, 5), Equals(NewDate(#2/5/100#)), "#8"
 End Sub
 
-Public Sub AddYears_WithInvalidResult_ThrowsArgumentException()
+Public Sub AddMonths_WithValues_ReturnsExpected(ByVal d As Date, ByVal Months As Long, ByVal Expected As Date)
+    Dim Calendar As New GregorianCalendar
+    Dim Actual As CorDateTime
+    
+    Set Actual = Calendar.AddMonths(d, Months)
+    
+    Assert.That Actual, Equals(NewDate(Expected))
+End Sub
+
+Public Sub AddYears_WithInvalidResult_ThrowsArgumentOutOfRangeException()
     Dim Calendar As New GregorianCalendar
     
     On Error Resume Next
     Calendar.AddYears #1/1/2000#, 9000
     
-    AssertArgumentException Err
+    AssertArgumentOutOfRangeException Err
 End Sub
 
 Public Sub Kind_WhenAddMethodCalled_ReturnsUnspecified()
