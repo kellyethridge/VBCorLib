@@ -67,3 +67,7 @@ Public Sub SwapCurrency(ByRef a As Currency, ByRef b As Currency)
     Dim t As Currency
     t = a: a = b: b = t
 End Sub
+
+Public Sub SwapVariant(ByRef a As Variant, ByRef b As Variant)
+    Helper.Swap16 a, b
+End Sub

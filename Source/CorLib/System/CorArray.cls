@@ -876,6 +876,8 @@ Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Option
             Set Swapper = NewDelegate(AddressOf SwapLong)
         Case 8
             Set Swapper = NewDelegate(AddressOf SwapCurrency)
+        Case 16
+            Set Swapper = NewDelegate(AddressOf SwapVariant)
         Case Else
             Dim TempPtr As Long
             TempPtr = CoTaskMemAlloc(Info.ElementSize)
