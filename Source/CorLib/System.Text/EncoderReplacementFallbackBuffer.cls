@@ -47,6 +47,33 @@ Private mFallbackCount      As Long
 Private mFallbackIndex      As Long
 
 
+''
+' Indicates whether a replacement string can be used when an input surrogate pair cannot be encoded, or whether the surrogate pair can be ignored. Parameters specify the surrogate pair and the index position of the pair in the input.
+'
+' @param UnknownCharOrHighSurrogate The high surrogate of the input pair.
+' @param UnknownLowSurrogate The low surrogate of the input pair.
+' @param Index The index position of the surrogate pair in the input buffer.
+' @return <b>True</b> if the replacement string is not empty; <b>False</b> if the replacement string is empty.
+' @remarks <p>The <a href="Encoding.GetBytes.html">GetBytes</a> and <a href="Encoder.Convert.html">Convert</a> methods call <b>Fallback</b> if they encounter an unknown
+' character in their input. If the return value of <b>Fallback</b> is <b>True</b>, the calling method can invoke the <a href="EncoderReplacementFallbackBuffer.GetNextChar.html">GetNextChar</a> method to obtain each character in the replacement fallback buffer.</p>
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentException.html">ArgumentException</a></td><td>This method is called again before the <a href="EncoderReplacementFallbackBuffer.GetNextChar.html">GetNextChar</a> method has read all the replacement string characters.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           The value of <i>CharUnknownHigh</i> is less than U+D800 or greater than U+D8FF.<br/>
+'           -or-<br/>
+'           The value of <i>CharUnknownLow</i> is less than U+DC00 or greater than U+DFFF.
+'        </td>
+'    </tr>
+' </table>
 Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRef UnknownLowSurrogate As Variant, Optional ByVal Index As Long) As Boolean
     If IsMissing(UnknownLowSurrogate) Then
         Fallback = UnknownCharFallback(UnknownCharOrHighSurrogate)
@@ -55,6 +82,12 @@ Public Function Fallback(ByVal UnknownCharOrHighSurrogate As Long, Optional ByRe
     End If
 End Function
 
+''
+' Retrieves the next character in the replacement fallback buffer.
+'
+' @return The next Unicode character in the replacement fallback buffer that the application can encode.
+' @remarks The <a href="Encoding.GetBytes.html">GetBytes</a> and <a href="Encoder.Convert.html">Convert</a> methods call <a href="EncoderReplacementFallbackBuffer.Fallback.html">Fallback</a> if they encounter an unknown surrogate pair or character in their input.
+' If the return value of <a href="EncoderReplacementFallbackBuffer.Fallback.html">Fallback</a> is <b>True</b>, the calling method can invoke <b>GetNextChar</b> to obtain each character in the replacement fallback buffer.
 Public Function GetNextChar() As Integer
     mFallbackIndex = mFallbackIndex + 1
     mFallbackCount = mFallbackCount - 1
@@ -64,6 +97,10 @@ Public Function GetNextChar() As Integer
     End If
 End Function
 
+''
+' Causes the next call to the <a href="EncoderReplacementFallbackBuffer.GetNextChar.html>GetNextChar</a> method to access the character position in the replacement fallback buffer prior to the current character position.
+'
+' @return <b>True</b> if the <b>MovePrevious</b> operation was successful; otherwise, <b>False</b>.
 Public Function MovePrevious() As Boolean
     If mFallbackIndex >= 0 Then
         mFallbackCount = mFallbackCount + 1
@@ -72,12 +109,20 @@ Public Function MovePrevious() As Boolean
     End If
 End Function
 
+''
+' Gets the number of characters in the replacement fallback buffer that remain to be processed.
+'
+' @return The number of characters in the replacement fallback buffer that have not yet been processed.
 Public Property Get Remaining() As Long
     If mFallbackCount > 0 Then
         Remaining = mFallbackCount
     End If
 End Property
 
+''
+' Initializes all internal state information and data in this instance of <a href="EncoderReplacementFallbackBuffer.html">EncoderReplacementFallbackBuffer</a>.
+'
+' @remarks The <b>Reset</b> method discards any persisted state information and data that govern emitting a replacement string. Unpredictable results occur if the encoding operation continues after the <b>Reset</b> method is invoked.
 Public Sub Reset()
     mFallbackCount = -1
     mFallbackIndex = -1

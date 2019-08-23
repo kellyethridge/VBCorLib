@@ -616,7 +616,17 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByVal CalendarType As GregorianCalendarTypes)
-    mCalendarType = CalendarType
+    Select Case CalendarType
+        Case GregorianCalendarTypes.Arabic, _
+             GregorianCalendarTypes.Localized, _
+             GregorianCalendarTypes.MiddleEastFrench, _
+             GregorianCalendarTypes.TransliteratedEnglish, _
+             GregorianCalendarTypes.TransliteratedFrench, _
+             GregorianCalendarTypes.USEnglish
+            mCalendarType = CalendarType
+        Case Else
+            Error.ArgumentOutOfRange "CalendarType", ArgumentOutOfRange_Enum
+    End Select
 End Sub
 
 Friend Sub InitClone(ByVal Other As GregorianCalendar)

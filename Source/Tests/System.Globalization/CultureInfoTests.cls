@@ -24,13 +24,13 @@ End Sub
 
 Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseCollector)
     Select Case Test.MethodName
-        Case "Constructor_WithUseUserOverride_ReturnsExpected"
+        Case "NewCultureInfo_WithUseUserOverride_ReturnsExpected"
             Test.Use True
             Test.Use False
             
         Case "Contstructor_WithEmptyString_ReturnsInvariant"
             Test.Use ""
-            Test.Use CultureInfo.InvariantCulture.LCID
+            Test.Use CultureInfo.InvariantCulture.lcid
             
         Case "IsNeutralCulture_WithValues_ReturnsExpected"
             Test.Use "en", True
@@ -39,18 +39,18 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Sub Constructor_WithIdentifier2067_ReturnsCultureInfo()
+Public Sub NewCultureInfo_WithIdentifier2067_ReturnsCultureInfo()
     Dim Info As CultureInfo
     
     Set Info = Cor.NewCultureInfo(2067)
     
     Assert.That Info.IsReadOnly, Iz.False, "Should be read-only."
-    Assert.That Info.LCID, Iz.EqualTo(2067)
+    Assert.That Info.lcid, Iz.EqualTo(2067)
     Assert.That Info.Name, Iz.EqualTo("nl-BE")
     Assert.That Info.UseUserOverride, Iz.True, "Should be user override."
 End Sub
 
-Public Sub Constructor_WithNegativeIdentifier_ThrowsArgumentOutOfRangeException()
+Public Sub NewCultureInfo_WithNegativeIdentifier_ThrowsArgumentOutOfRangeException()
     On Error Resume Next
     
     Cor.NewCultureInfo -1
@@ -58,24 +58,32 @@ Public Sub Constructor_WithNegativeIdentifier_ThrowsArgumentOutOfRangeException(
     AssertArgumentOutOfRangeException Err, "LCID"
 End Sub
 
-Public Sub Constructor_WithCultureName_ReturnsCultureInfo()
+Public Sub NewCultureInfo_WithCultureName_ReturnsCultureInfo()
     Dim Info As CultureInfo
     
     Set Info = Cor.NewCultureInfo("nl-BE")
     
     Assert.That Info.IsReadOnly, Iz.False
-    Assert.That Info.LCID, Iz.EqualTo(2067)
+    Assert.That Info.lcid, Iz.EqualTo(2067)
     Assert.That Info.Name, Iz.EqualTo("nl-BE")
     Assert.That Info.UseUserOverride, Iz.True
 End Sub
 
-Public Sub Constructor_WithUseUserOverride_ReturnsExpected(ByVal UseUserOverride As Boolean)
+Public Sub NewCultureInfo_WithName_IsNotCaseSensitive()
+    Dim Info As CultureInfo
+    
+    Set Info = Cor.NewCultureInfo("nl-be")
+    
+    Assert.That Info.lcid, Iz.EqualTo(2067)
+End Sub
+
+Public Sub NewCultureInfo_WithUseUserOverride_ReturnsExpected(ByVal UseUserOverride As Boolean)
     Dim Info As CultureInfo
     
     Set Info = Cor.NewCultureInfo(2067, UseUserOverride)
     
     Assert.That Info.IsReadOnly, Iz.False
-    Assert.That Info.LCID, Iz.EqualTo(2067)
+    Assert.That Info.lcid, Iz.EqualTo(2067)
     Assert.That Info.Name, Iz.EqualTo("nl-BE")
     Assert.That Info.UseUserOverride, Iz.EqualTo(UseUserOverride)
 End Sub
@@ -109,7 +117,7 @@ Public Sub OptionalCalendars_WhenCalled_DoesNotReturnNull()
         
         Dim Actual() As Calendar
         Actual = Culture.OptionalCalendars
-        Assert.That CorArray.IsNull(Actual), Iz.False, Culture.LCID & " " & Culture.Name
+        Assert.That CorArray.IsNull(Actual), Iz.False, Culture.lcid & " " & Culture.Name
     Next
 End Sub
 
@@ -128,7 +136,7 @@ Public Sub Contstructor_WithEmptyString_ReturnsInvariant(ByVal NameOrLCID As Var
 
     Set c = Cor.NewCultureInfo(NameOrLCID)
     
-    Assert.That c.LCID, Iz.EqualTo(&H7F)
+    Assert.That c.lcid, Iz.EqualTo(&H7F)
     Assert.That c.Name, Iz.Empty
     Assert.That c.EnglishName, Iz.EqualTo("Invariant Language (Invariant Country)")
     Assert.That c.DisplayName, Iz.EqualTo("Invariant Language (Invariant Country)")
@@ -145,12 +153,12 @@ Public Sub Contstructor_WithEmptyString_ReturnsInvariant(ByVal NameOrLCID As Var
     Assert.That c.NumberFormat.NumberGroupSizes, Iz.EqualTo(Array(3))
 End Sub
 
-Public Sub Constructor_WithenUS_ReturnsUsEnglish()
+Public Sub NewCultureInfo_WithenUS_ReturnsUsEnglish()
     Dim c As CultureInfo
 
     Set c = Cor.NewCultureInfo("en-US", False)
     
-    Assert.That c.LCID, Iz.EqualTo(1033)
+    Assert.That c.lcid, Iz.EqualTo(1033)
     Assert.That c.Name, Iz.EqualTo("en-US")
     Assert.That c.EnglishName, Iz.EqualTo("English (United States)")
     Assert.That c.DisplayName, Iz.EqualTo("English (United States)")

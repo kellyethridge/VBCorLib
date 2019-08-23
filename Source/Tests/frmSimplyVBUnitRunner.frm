@@ -110,7 +110,7 @@ Private Sub AddSystem()
         .Add New StringComparerTests
         .Add New EnvironmentTests
         .Add New OperatingSystemTests
-        
+
         .Add NewSuite("Object Tests", _
             New ObjectBaseTests, _
             New ObjectTests, _
@@ -118,12 +118,12 @@ Private Sub AddSystem()
             New ObjectToStringWithLongsTests, _
             New ObjectToStringWithSinglesTests, _
             New ObjectToStringWithValuesTests)
-        
+
         .Add NewSuite("Convert Tests", _
             New ConvertToBase64Tests, _
             New ConvertFromBase64Tests, _
             New ConvertTests)
-    
+
         .Add NewSuite("CorArray Tests", _
             New CorArrayTests, _
             New CorArrayCopyTests, _
@@ -134,7 +134,8 @@ Private Sub AddSystem()
             New CorArrayLastIndexOfTests, _
             New CorArrayCreateInstanceTests, _
             New CorArrayFindTests)
-    
+        .Add New CorArrayTests
+
         .Add New PublicFunctionsTests
         .Add New ConsoleKeyInfoTests
 '        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
@@ -169,11 +170,11 @@ Private Sub AddSystemCollections()
         .Add NewSuite("Queue Tests", _
             New QueueTests, _
             New QueueEnumeratorTests)
-                
+
         .Add NewSuite("Stack Tests", _
             New StackTests, _
             New StackEnumeratorTests)
-        
+
         .Add NewSuite("Hashtable Tests", _
             New HashtableTests, _
             New HashtableEnumeratorTests, _

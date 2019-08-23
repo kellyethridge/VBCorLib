@@ -378,9 +378,7 @@ Command32=""
 Name="CorLib"
 HelpContextID="0"
 Description="VB.EXT: CorLib 3.0"
-CompatibleMode="2"
-CompatibleEXE32="..\..\Binaries\Compatibility\VBCorLib3.bin"
-VersionCompatible32="1"
+CompatibleMode="1"
 MajorVer=3
 MinorVer=0
 RevisionVer=0
@@ -392,7 +390,7 @@ VersionCompanyName="Home"
 VersionFileDescription="VB.EXT Core Class Library"
 VersionLegalCopyright="Copyright Kelly Ethridge"
 VersionProductName="VB.EXT: CorLib 3.0"
-CondComp="Release = 1"
+CondComp="Release = 0"
 CompilationType=0
 OptimizationType=0
 FavorPentiumPro(tm)=0

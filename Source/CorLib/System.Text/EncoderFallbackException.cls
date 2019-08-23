@@ -34,6 +34,10 @@ Attribute VB_Exposed = True
 '
 ' Module: EncoderFallbackException
 '
+
+''
+' The exception that is thrown when an encoder fallback operation fails. This class cannot be inherited.
+'
 Option Explicit
 Implements IObject
 Implements Exception

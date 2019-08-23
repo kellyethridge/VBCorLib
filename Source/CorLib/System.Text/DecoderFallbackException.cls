@@ -34,6 +34,10 @@ Attribute VB_Exposed = True
 '
 ' Module: DecoderFallbackException
 '
+
+''
+' The exception that is thrown when a decoder fallback operation fails.
+'
 Option Explicit
 Implements IObject
 Implements Exception
@@ -49,11 +53,20 @@ Private mBytesUnknown() As Byte
 Private mIndex          As Long
 
 
-
+''
+' Gets the input byte sequence that caused the exception.
+'
+' @return The input byte array that cannot be decoded.
+' @remarks The application uses the <a href="DecoderFallbackException.get.Index.html">Index</a> property to get the position in the input byte array of the byte that cannot be decoded.
 Public Property Get BytesUnknown() As Byte()
     BytesUnknown = mBytesUnknown
 End Property
 
+''
+' Gets the index position in the input byte sequence of the byte that caused the exception.
+'
+' @return The index position in the input byte array of the byte that cannot be decoded. The index position is zero-based.
+' @remarks The application uses the <a href="DecoderFallbackException.get.BytesUnknown.html">BytesUnknown</a> property to retrieve the input byte array that contains the byte that cannot be decoded.
 Public Property Get Index() As Long
     Index = mIndex
 End Property

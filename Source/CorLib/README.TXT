@@ -121,6 +121,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added Int64 static methods for manipulating and creating an Int64 data-type.
 	* Added CInt64 for easy conversion to Int64 data-type.
 	* Added support for BigInteger to be initialized from an Int64.
+	* Fixed NewCultureInfo(String). Should not be case-sensitive.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

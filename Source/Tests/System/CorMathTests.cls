@@ -124,43 +124,43 @@ End Sub
 
 Public Sub Min_WithValues_ReturnsExpected(ByRef Value1 As Variant, ByRef Value2 As Variant, ByRef Expected As Variant)
     Dim Actual As Variant
-    
+
     MoveVariant Actual, Min(Value1, Value2)
-    
+
     Assert.That Actual, Equals(Expected)
 End Sub
 
 Public Sub Max_WithNonComparable_ThrowsArgumentException()
     On Error Resume Next
-    
+
     Max Me, New CorMathTests
-    
+
     AssertArgumentException Err
 End Sub
 
 Public Sub DivRem_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long, ByVal ExpectedQ As Long, ByVal ExpectedR As Long)
     Dim ActualQ As Long
     Dim ActualR As Long
-    
+
     ActualQ = DivRem(a, b, ActualR)
-    
+
     Assert.That ActualQ, Iz.EqualTo(ExpectedQ)
     Assert.That ActualR, Iz.EqualTo(ExpectedR)
 End Sub
 
 Public Sub MinIn_WithValues_ReturnsExpected(ByRef List As Variant, ByRef Expected As Variant)
     Dim Actual As Variant
-    
+
     MoveVariant Actual, MinIn(List)
-    
+
     Assert.That Actual, Equals(Expected)
 End Sub
 
 Public Sub MaxIn_WithValues_ReturnsExpected(ByRef List As Variant, ByRef Expected As Variant)
     Dim Actual As Variant
-    
+
     MoveVariant Actual, MaxIn(List)
-    
+
     Assert.That Actual, Equals(Expected)
 End Sub
 

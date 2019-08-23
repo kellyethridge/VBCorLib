@@ -184,16 +184,19 @@ Catch:
     UnsupportedLCIDError LCID
 End Function
 
-Friend Function GetCultureID(ByVal Name As String) As Long
+Friend Function GetCultureID(ByRef Name As String) As Long
     Dim ID As Variant
     
     If mNamesToLCID Is Nothing Then
-        Set mNamesToLCID = New Hashtable
+        Set mNamesToLCID = Cor.NewHashtable(EqualityComparer:=StringComparer.OrdinalIgnoreCase)
+        
         For Each ID In mCulturesByLCID.Keys
             mNamesToLCID.Add GetString(ID, SNAME), ID
         Next ID
     End If
+    
     ID = mNamesToLCID(Name)
+    
     If Not IsEmpty(ID) Then
         GetCultureID = ID
     End If

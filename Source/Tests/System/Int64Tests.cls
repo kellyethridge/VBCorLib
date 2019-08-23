@@ -366,7 +366,32 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 1, Int64.One
             Test.Use -1, Int64.MinusOne
             Test.Use "-1", Int64.MinusOne
+            Test.Use CCur(1), Int64.One
+            Test.Use CCur(1.5), NewInt64(2, 0)
+            Test.Use CCur(-1), Int64.MinusOne
+            Test.Use CCur(-1.5), NewInt64(-2, &HFFFFFFFF)
             Test.Use Int64.One, Int64.One
+            Test.Use CDec("9223372036854775807"), Int64.MaxValue
+            Test.Use CDec("9223372036854775806.6"), Int64.MaxValue
+            Test.Use CDec("9223372036854775806.5"), NewInt64(&HFFFFFFFE, &H7FFFFFFF)
+            Test.Use CDec("9223372036854775806"), NewInt64(&HFFFFFFFE, &H7FFFFFFF)
+            Test.Use CDec("-9223372036854775806"), NewInt64(&H2, &H80000000)
+            Test.Use CDec("-9223372036854775808"), Int64.MinValue
+            Test.Use CDec("-9223372036854775808.5"), Int64.MinValue
+            Test.Use CDec("0"), Int64.Zero
+            Test.Use CDec("1"), Int64.One
+            Test.Use CDec("-1"), Int64.MinusOne
+            Test.Use CDec("-2"), NewInt64(&HFFFFFFFE, &HFFFFFFFF)
+            Test.Use 9.22337203685477E+18, CInt64("9223372036854769700")
+            Test.Use -9.22337203685477E+18, CInt64("-9223372036854769700")
+            Test.Use 0.922337203685477, CInt64(1)
+            Test.Use 9.22337203685477E-02, CInt64(0)
+            
+        Case "CInt64_WithTooLargeValue_ThrowsOverflowException"
+            Test.Use CDec("9223372036854775808")
+            Test.Use CDec("-9223372036854775809")
+            Test.Use 9.22337203685478E+18
+            Test.Use 9.22337203685477E+19
             
     End Select
 End Sub
@@ -649,6 +674,14 @@ Public Sub CInt64_WithValues_ReturnsExpected(ByRef Value As Variant, ByRef Expec
     Actual = CInt64(Value)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub CInt64_WithTooLargeValue_ThrowsOverflowException(ByRef Value As Variant)
+    On Error Resume Next
+    
+    CInt64 Value
+    
+    AssertOverflowException Err
 End Sub
 
 Public Sub Parse_WithTooManyDigits_ThrowsOverflowException()

@@ -34,6 +34,19 @@ Attribute VB_Exposed = True
 '
 ' Module: EncoderReplacementFallback
 '
+
+''
+' Provides a failure handling mechanism, called a fallback, for an input character that cannot be converted to an output byte sequence. The fallback uses a user-specified replacement string instead of the original input character.
+'
+' @remarks <p>A common reason for an encoding or decoding operation to fail is if the underlying encoding class does not provide a mapping between a character and an equivalent byte sequence. For example
+' , an <a href="ASCIIEncoding.html">ASCIIEncoding</a> object cannot encode a character having a Unicode code point value that is outside the range U+0000 to U+007F. If the input character cannot be converted
+ 'to an output byte sequence, a <b>EncoderReplacementFallback</b> object substitutes a specified replacement string for the original input character. The conversion process encodes the replacement string and then continues to process the remainder of the original input.</p>
+' <p>The replacement string used by an <b>EncoderReplacementFallback</b> object is determined by the call to its class constructor. Two options are available:</p>
+' <ul>
+' <li>Replacement with the default character. If you call the <b>New EncoderReplacementFallback()</b> constructor, the replacement character is "?" (U+003F).</li>
+' <li>Replacement with a string of your choice. If you call the <a href="Constructors.NewEncoderReplacementFallback.html">NewEncoderReplacementFallback(String)</a> constructor, you provide the replacement string.</li>
+' </ul>
+' <p>If you choose a fallback string to use with this class, make sure that the string is composed entirely of characters that can be encoded in the target encoding. Otherwise, a recursive fallback results, causing an <a href="ArgumentException.html">ArgumentException</a>.</p>
 Option Explicit
 Implements IObject
 Implements EncoderFallback
@@ -43,14 +56,26 @@ Private Const DefaultStringProp As String = "DefaultString"
 Private mDefaultString As String
 
 
+''
+' Gets the replacement string that is the value of the <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a> object.
+'
+' @return A substitute string that is used in place of an input character that cannot be encoded.
 Public Property Get DefaultString() As String
     DefaultString = mDefaultString
 End Property
 
+''
+' Creates a <a href="EncoderFallbackBuffer.html">EncoderFallbackBuffer</a> object that is initialized with the replacement string of this <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a> object.
+'
+' @return A <a href="EncoderFallbackBuffer.html">EncoderFallbackBuffer</a> object equal to this <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a> object.
 Public Function CreateFallbackBuffer() As EncoderFallbackBuffer
     Set CreateFallbackBuffer = Cor.NewEncoderReplacementFallbackBuffer(Me)
 End Function
 
+''
+' Gets the number of characters in the replacement string for the <a href="EncoderReplacementFallback.html">EncoderReplacementFallback</a> object.
+'
+' @return The number of characters in the string used in place of an input character that cannot be encoded.
 Public Property Get MaxCharCount() As Long
     MaxCharCount = Len(mDefaultString)
 End Property

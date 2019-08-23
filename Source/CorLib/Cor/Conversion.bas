@@ -24,6 +24,8 @@ Attribute VB_Name = "Conversion"
 '
 Option Explicit
 
+
+
 Public Function CLngOrDefault(ByRef Value As Variant, ByVal Default As Long) As Long
     If IsMissing(Value) Then
         CLngOrDefault = Default
@@ -43,20 +45,17 @@ End Function
 Public Function CInt64(ByRef Value As Variant) As Int64
     Select Case VarType(Value)
         Case vbCurrency
-            AsCurr(CInt64) = 0.0001@ * CCur(Int(Value))
+            Statics.Int64.CurrencyToInt64 Value, CInt64
         Case vbLong, vbInteger, vbByte
-            CInt64.LowPart = CLng(Value)
-            
-            If CInt64.LowPart < 0 Then
-                CInt64.HighPart = &HFFFFFFFF
-            End If
+            Statics.Int64.Int32ToInt64 Value, CInt64
         Case vbString
             CInt64 = Statics.Int64.Parse(CStr(Value))
+        Case vbDouble, vbSingle
+            Statics.Int64.DoubleToInt64 Value, CInt64
         Case vbUserDefinedType
-            If Not IsInt64(Value) Then _
-                Throw New InvalidCastException
-            
-            CInt64 = Value
+            Statics.Int64.Int64ToInt64 Value, CInt64
+        Case vbDecimal
+            Statics.Int64.DecimalToInt64 Value, CInt64
         Case Else
             Throw New InvalidCastException
     End Select

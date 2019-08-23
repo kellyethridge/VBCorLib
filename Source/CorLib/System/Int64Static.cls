@@ -651,6 +651,87 @@ Public Function TryParseEx(ByRef s As String, ByVal Style As NumberStyles, ByVal
     TryParseEx = mParser.TryParse(s, Style, Provider, Result)
 End Function
 
+Friend Sub CurrencyToInt64(ByVal Value As Currency, ByRef Result As Int64)
+    AsCurr(Result) = 0.0001@ * Round(Value)
+End Sub
+
+Friend Sub Int32ToInt64(ByVal Value As Long, ByRef Result As Int64)
+    Result.LowPart = Value
+    
+    If Value < 0 Then
+        Result.HighPart = &HFFFFFFFF
+    End If
+End Sub
+
+Friend Sub Int64ToInt64(ByRef Value As Variant, ByRef Result As Int64)
+    If Not IsInt64(Value) Then _
+        Throw New InvalidCastException
+    
+    Result = Value
+End Sub
+
+Friend Sub DecimalToInt64(ByRef Value As Variant, ByRef Result As Int64)
+    Dim WholeDecimal As Variant
+    
+    WholeDecimal = Round(Value)
+    
+    If WholeDecimal > CDec("9223372036854775807") Or WholeDecimal < CDec("-9223372036854775808") Then _
+        Throw New OverflowException
+    
+    AssignQWord ByVal VarPtr(WholeDecimal) + VARIANTDATA_OFFSET, Result
+    
+    If Sgn(WholeDecimal) = -1 Then
+        If Not Equals(Result, MinValue) Then
+            Result = Negate(Result)
+        End If
+    End If
+End Sub
+
+Friend Sub DoubleToInt64(ByVal Value As Double, ByRef Result As Int64)
+    Dim Digits()        As Byte
+    Dim DigitsSA        As SafeArray1d
+    Dim IsNegative      As BOOL
+    Dim DecimalPosition As Long
+    Dim Ten             As Int64
+    Dim Char64          As Int64
+    
+    Value = Round(Value)
+    
+    If Value > 9.22337203685477E+18 Then _
+        Throw New OverflowException
+    
+    Ten.LowPart = 10
+    DigitsSA.cbElements = 1
+    DigitsSA.cDims = 1
+    DigitsSA.cElements = 20
+    DigitsSA.pvData = Helper.Ecvt(Value, 20, DecimalPosition, IsNegative)
+    SAPtr(Digits) = VarPtr(DigitsSA)
+    
+    On Error GoTo Catch
+    
+    Dim Index As Long
+    For Index = 0 To DecimalPosition - 1
+        Result = Multiply(Result, Ten)
+        Char64.LowPart = Digits(Index) - vbZeroChar
+        Result = Add(Result, Char64)
+    Next
+    
+    If IsNegative = BOOL_TRUE Then
+        Result = Negate(Result)
+    End If
+    
+    GoSub Finally
+    Exit Sub
+    
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
+Finally:
+    SAPtr(Digits) = vbNullPtr
+    Return
+End Sub
+
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers

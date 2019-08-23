@@ -1,11 +1,10 @@
 Type=Exe
-Reference=*\G{C9119EE8-F836-4951-A53C-5E0547F97759}#2.0#0#..\..\Binaries\Compiled\VBCorLib3.dll#VB.EXT: CorLib 3.0
+Reference=*\A..\CorLib\CorLib.vbp
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorType.tlb#VB.EXT: VBCorLib 3.0 Type Library
-Reference=*\G{3E4F7CEC-C640-49F1-80D9-8DD42421CB1B}#5.0#0#..\..\..\SimplyVBUnit\TypeLibrary\SimplyVBUnitType.tlb#SimplyVBUnit 5.0 Type Library
+Reference=*\G{3E4F7CEC-C640-49F1-80D9-8DD42421CB1B}#5.0#0#..\..\..\..\..\..\..\WINDOWS\SysWow64\SimplyVBUnitType.tlb#SimplyVBUnit 5.0 Type Library
 Reference=*\G{CDFFA366-1D4F-43F9-B4BF-5438BC7C7D29}#1.1#0#..\..\TypeLibrary\vbvm6lib.tlb#Visual Basic 6 Virtual Machine Type Library 1.1 by Michel Rutten - Declarations and aliases for (undocumented) functions in the VB6 runtime library.
 Reference=*\A..\Fakes\Fakes.vbp
-Object={7983BD3B-752A-43EA-9BFF-444BBA1FC293}#5.0#0; SimplyVBUnit.Component.ocx
 Class=UnicodeEncodingTests; System.Text\UnicodeEncodingTests.cls
 Class=UTF8EncodingTests; System.Text\UTF8EncodingTests.cls
 Class=VersionTests; System\VersionTests.cls
@@ -226,6 +225,7 @@ Class=Int64Tests; System\Int64Tests.cls
 Class=MemoryMappedViewStreamTests; System.IO.MemoryMappedFiles\MemoryMappedViewStreamTests.cls
 Class=ConsoleKeyInfoTests; System\ConsoleKeyInfoTests.cls
 ResFile32="CorLib.Tests.RES"
+Object={7983BD3B-752A-43EA-9BFF-444BBA1FC293}#5.0#0; SimplyVBUnit.Component.ocx
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""
@@ -234,8 +234,8 @@ Command32=""
 Name="CorLibTests"
 HelpContextID="0"
 CompatibleMode="0"
-MajorVer=2
-MinorVer=3
+MajorVer=3
+MinorVer=0
 RevisionVer=0
 AutoIncrementVer=0
 ServerSupportFiles=0
@@ -262,3 +262,13 @@ AutoRefresh=1
 
 [Rubberduck]
 ProjectId=782689e4-0fc4-4aff-bd01-a1fc9388e906
+
+[TaskList]
+Num=1
+
+[TASK1]
+Description=Update DriveInfo constructor to validate like .NET
+Status=0
+Priority=1
+AssignedTo=
+Comment=

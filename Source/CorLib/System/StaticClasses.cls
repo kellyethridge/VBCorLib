@@ -73,11 +73,10 @@ End Enum
 
 
 ''
-' Returns a object containing all of the parameterized constructors
-' available within the VBCorLib library.
+' Returns a object containing all of the parameterized constructors available within the VBCorLib library.
 '
 ' @return A object containing all of the constructors in VBCorLib.
-' @see constructors
+' @see Constructors
 '
 Public Property Get Cor() As Constructors
     Set Cor = Statics.Cor
@@ -635,7 +634,11 @@ Public Property Get Thread() As ThreadStatic
     Set Thread = Statics.Thread
 End Property
 
-Public Property Get EqualityComparer() As IEqualityComparer
+''
+' Gets a reference to <a href="EqualityComparerStatic.html">EqualityComparerStatic</a>.
+'
+' @return A reference to <a href="EqualityComparerStatic.html">EqualityComparerStatic</a>.
+Public Property Get EqualityComparer() As EqualityComparerStatic
     Set EqualityComparer = Statics.EqualityComparer
 End Property
 

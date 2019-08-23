@@ -427,7 +427,7 @@ Friend Sub Init(ByRef NameOrLCID As Variant, ByVal UseUserOverride As Boolean)
         Case vbString
             If Len(NameOrLCID) > 0 Then
                 If CultureTable.IsLoaded Then
-                    ID = CultureTable.GetCultureID(NameOrLCID)
+                    ID = CultureTable.GetCultureID(CStr(NameOrLCID))
                 End If
             Else
                 ID = INVARIANT_LCID

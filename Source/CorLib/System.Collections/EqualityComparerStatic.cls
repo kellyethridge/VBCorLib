@@ -34,10 +34,22 @@ Attribute VB_Exposed = True
 '
 ' Module: EqualityComparerStatic
 '
+
+''
+' Provides static methods to support <a href="IEqualityComparer.html">IEqualityComparer</a> interface.
+'
 Option Explicit
 
 Private mDefault As New EqualityComparer
 
+''
+' Returns a default equality comparer.
+'
+' @return A default equality comparer.
+' @remarks <p>The default <a href="IEqualityComparer.html">IEqualityComparer</a> implementation
+' simply forwards the <a href="IEqualityComparer.Equals.html">Equals</a> and <a href="IEqualityComparer.GetHashCode.html">GetHashCode</a>
+' methods to the <a href="ObjectStatic.Equals.html">Object.Equals</a> and <a href="ObjectStatic.GetHashCode.html">Object.GetHashCode</a> methods.</p>
+' <p>Access this property using <b>EqualityComparer.Default</b>.
 Public Property Get Default() As IEqualityComparer
     Set Default = mDefault
 End Property
