@@ -274,7 +274,17 @@ End Function
 ' @param b The second value to be added.
 ' @return The sum of <i>a</i> and <i>b</i>.
 Public Function Add(ByRef a As Int64, ByRef b As Int64) As Int64
+#If Release Then
+    Add.LowPart = a.LowPart + b.LowPart
+    
+    If (Add.LowPart - &H80000000) < (a.LowPart - &H80000000) Then
+        Add.HighPart = a.HighPart + b.HighPart + 1
+    Else
+        Add.HighPart = a.HighPart + b.HighPart
+    End If
+#Else
     AsCurr(Add) = AsCurr(a) + AsCurr(b)
+#End If
 End Function
 
 ''
@@ -284,7 +294,17 @@ End Function
 ' @param b The value to be subtracted.
 ' @return The difference of <i>a</i> and <i>b</i>.
 Public Function Subtract(ByRef a As Int64, ByRef b As Int64) As Int64
+#If Release Then
+    Subtract.LowPart = a.LowPart - b.LowPart
+    
+    If (Subtract.LowPart + &H80000000) > (a.LowPart + &H80000000) Then
+        Subtract.HighPart = a.HighPart - b.HighPart - 1
+    Else
+        Subtract.HighPart = a.HighPart - b.HighPart
+    End If
+#Else
     AsCurr(Subtract) = AsCurr(a) - AsCurr(b)
+#End If
 End Function
 
 ''

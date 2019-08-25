@@ -287,7 +287,7 @@ Public Property Get Out() As TextWriter
     Dim Writer As StreamWriter
     
     If mOutput Is Nothing Then
-        Set Writer = Cor.NewStreamWriter(OpenStandardOutput, Encoding.GetEncoding(GetConsoleOutputCP))
+        Set Writer = Cor.NewStreamWriter(OpenStandardOutput, Encoding:=Encoding.GetEncoding(GetConsoleOutputCP))
         Writer.AutoFlush = True
         Set mOutput = Writer
     End If
@@ -1294,7 +1294,7 @@ Private Sub WriteLineCore(ByRef Args() As Variant)
     
 Catch:
     GoSub Finally
-    Throw
+    ThrowOrErr Err
 Finally:
     FreeArguments Shifted
     Return

@@ -55,9 +55,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewChars("A", "B"), NewBytes(&H41, &H42)
         
         Case "GetBytesEx_WithValues_ReturnsExpected"
-            Test.Use NewChars(), NewBytes()
-            Test.Use NewChars("A"), NewBytes(&H41)
-            Test.Use NewChars("A", "B"), NewBytes(&H41, &H42)
+            Test.Use NewChars(), NewBytes(), 0
+            Test.Use NewChars("A"), NewBytes(&H41), 1
+            Test.Use NewChars("A", "B"), NewBytes(&H41, &H42), 2
         
     End Select
 End Sub
@@ -125,7 +125,7 @@ Public Sub GetBytes_WithValues_ReturnsExpected(ByRef Chars() As Integer, ByRef E
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub GetBytesEx_WithValues_ReturnsExpected(ByRef Chars() As Integer, ByRef Expected() As Byte)
+Public Sub GetBytesEx_WithValues_ReturnsExpected(ByRef Chars() As Integer, ByRef Expected() As Byte, ByVal ExpectedLength As Long)
     Dim En As Encoding
     Set En = MakeEncoding
     
@@ -135,6 +135,7 @@ Public Sub GetBytesEx_WithValues_ReturnsExpected(ByRef Chars() As Integer, ByRef
     ActualLength = En.GetBytesEx(Chars, 0, CorArray.Length(Chars), Actual, 0)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+    Assert.That ActualLength, Iz.EqualTo(ExpectedLength)
 End Sub
 
 Public Sub GetBytes_WithUntranslatableCharacter_ThrowsEncoderFallbackException()

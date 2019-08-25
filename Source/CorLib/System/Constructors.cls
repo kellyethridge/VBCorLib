@@ -1002,7 +1002,6 @@ Public Function NewIniFile(ByRef FileName As String) As IniFile
     NewIniFile.Init FileName
 End Function
 
-
 ''
 ' Creates a new <a href="Ticker.html">Ticker</a>.
 '
@@ -1032,29 +1031,21 @@ End Function
 ' @param ArrayElements The values to be put into the new array.
 ' @return An array of the specified datatype and containing the array elements with conversion,
 ' or an empty array if no elements are defined.
-' <p>Elements of a size that are a multiple of 4 will not create a new array
-' when being returned. All other datatype sizes will cause a new array
-' to be created.</p>
-'
 Public Function NewArray(ByVal ElementType As VbVarType, ParamArray ArrayElements() As Variant) As Variant
     Dim Length As Long
-    Length = UBound(ArrayElements) + 1
+    Dim Args() As Variant
     
-    Dim Ret As Variant
-    Ret = CorArray.CreateInstance(ElementType, Length)
+    Length = UBound(ArrayElements) + 1
+    Helper.MoveVariant NewArray, CorArray.CreateInstance(ElementType, Length)
     
     If Length > 0 Then
-        Dim Args() As Variant
         Helper.Swap4 ByVal ArrPtr(Args), ByVal Helper.DerefEBP(16)
-        
-        CorArray.CopyEx Args, 0, Ret, 0, Length
+        CorArray.CopyEx Args, 0, NewArray, 0, Length
     End If
-    
-    NewArray = Ret
 End Function
 
 ''
-' Creates a new base utility class that can be contained within an exception class.
+' Creates a new <a href="ExceptionBase.html">ExceptionBase</a> object that can be contained within an exception class.
 '
 ' @param Subclass The containing exception class that will contain this object instance.
 ' @param Message An understandable message that describes the exception being thrown.
@@ -1067,49 +1058,45 @@ End Function
 ' class inside the exception class, the exception class can delegate calls to this class
 ' for standard handling.
 ' <p>If additional values need to be maintained, then this class also supports the ability
-' to set and get additional values using a String name as the key. The <b>ArgumentException</b>
+' to set and get additional values using a string name as the key. The<a href="ArgumentException.html">ArgumentException</a>
 ' class uses this to hold the name of the parameter that caused the exception.</p>
 ' <p>This class is persistable and will also attempt to persist the custom values that
 ' have been added to it. If the persistence fails, then an error will occur.</p>
-'
+' @see ExceptionBase
 Public Function NewExceptionBase(ByVal Subclass As Exception, Optional ByVal AppObject As Object) As ExceptionBase
     Set NewExceptionBase = New ExceptionBase
     NewExceptionBase.Init Subclass, AppObject
 End Function
 
 ''
-' Creates a new Queue initialized with the elements in the collection.
+' Creates a new <a href="Queue.html">Queue</a> initialized with the elements in the collection.
 '
 ' @param Source The elements to place in the queue upon creation.
-' @return A Queue object with the elements placed in it.
-' @remarks The <em>Source</em> parameter can be a VBA.Collection, ICollection object or an Array.
-'
+' @return A <a href="Queue.html">Queue</a> object with the elements placed in it.
+' @remarks The <i>Source</i> parameter can be a <b>VBA.Collection</b>, <a href="ICollection.html">ICollection</a> object, or an <b>array</b>.
 Public Function NewQueue(ByRef Source As Variant) As Queue
     Set NewQueue = New Queue
     NewQueue.Init Source
 End Function
 
 ''
-' Creates a new object used to uniquely identify a resource.
+' Creates a new <a href="ResourceKey.html">ResourceKey</a> object used to uniquely identify a resource.
 '
 ' @param ResourceName The name of the resource being identified.
 ' @param ResourceType The type of resource being identified.
 ' @param LanguageID The Locale ID associated with the resource.
 ' @return An object that can be used to uniquely identify a resource.
-' @remarks Name and ResourceType can be a string or number.
-'
+' @remarks <i>ResourceName</i> and <i>ResourceType</i> can be a string or number.
 Public Function NewResourceKey(ByRef ResourceName As Variant, ByRef ResourceType As Variant, ByVal LanguageID As Long) As ResourceKey
     Set NewResourceKey = New ResourceKey
     NewResourceKey.Init ResourceName, ResourceType, LanguageID
 End Function
 
 ''
-' Creates a picture group object used to contain information
-' about resources that are grouped together.
+' Creates a picture group object used to contain information about resources that are grouped together.
 '
 ' @param GroupType The type of resource the group represents.
-' @return A group of container for a specific resource type.
-'
+' @return A group container for a specific resource type.
 Public Function NewPictureResourceGroup(ByVal GroupType As PictureGroupTypes) As PictureResourceGroup
     Set NewPictureResourceGroup = New PictureResourceGroup
     NewPictureResourceGroup.Init GroupType
@@ -1128,170 +1115,163 @@ Public Function NewExternalException(ByRef Message As String, Optional ByVal Inn
 End Function
 
 ''
-' Creates a new CspParameters object.
+' Creates a new <a href="CspParameters.html">CspParameters</a> object.
 '
 ' @param TypeIn The type code used to specify the kind of provider to create.
 ' @param ProviderNameIn The provider name.
 ' @param ContainerNameIn The provider container name.
-' @return Returns a new CspParameters object.
-'
+' @return Returns a new <a href="CspParameters.html">CspParameters</a> object with the specified parameters.
 Public Function NewCspParameters(ByVal TypeIn As Long, Optional ByRef ProviderNameIn As String, Optional ByRef ContainerNameIn As String) As CspParameters
     Set NewCspParameters = New CspParameters
     NewCspParameters.Init TypeIn, ProviderNameIn, ContainerNameIn
 End Function
 
 ''
-' Creates a new random number generator that uses a crypto service provider to generate random numbers.
+' Creates a new <a href="RNGCryptoServiceProvider.html">RNGCryptoServiceProvider</a> that uses a crypto service provider to generate random numbers.
 '
 ' @param CspParams Parameters used to allow a specific crypto service provider to be used instead of the default.
-' @return A new RNGCryptoServiceProvider object that generated random numbers using a crypto service provider.
-' @remarks Crypto service providers generally produce a more random set of numbers than the standard
-' Windows API set of random number generators. This is because cryptography depends a great deal on
-' go random number generation to be effective.
+' @return A new <a href="RNGCryptoServiceProvider.html">RNGCryptoServiceProvider</a> object that generated random numbers using a crypto service provider.
+' @remarks Crypto-service providers generally produce a more random set of numbers than the standard
+' Windows API set of random number generators. This is because cryptography depends a great deal on random number generation to be effective.
 ' <p>The default provider will be one of Microsoft's cryptography service providers such as
 ' "Microsoft Base Cryptographic Provider v1.0" or "Microsoft Enhanced Cryptographic Provider v1.0."</p>
-' <p>Using the <b>CspParams</b> allows for a specific or custom provider to be used instead of the
-' Microsoft providers.</p>
+' <p>Using the <i>CspParams</i> allows for a specific or custom provider to be used instead of the Microsoft providers.</p>
 ' @see RNGCryptoServiceProvider
-'
 Public Function NewRNGCryptoServiceProvider(ByVal CspParams As CspParameters) As RNGCryptoServiceProvider
     Set NewRNGCryptoServiceProvider = New RNGCryptoServiceProvider
     NewRNGCryptoServiceProvider.Init CspParams
 End Function
 
 ''
-' Creates a new CryptographicException object.
+' Creates a new <a href="CryptographicException.html">CryptographicException</a> object.
 '
 ' @param Message The message contained within the exception object.
 ' @param InnerException A reference to an exception that may have cause this exception to occur.
-' @return A new CryptoGraphicException object.
-' @remarks Most of the exceptions that occur within the cryptography set of classes will be
-' a CryptographicException.
+' @return A new <a href="CryptographicException.html">CryptoGraphicException</a> object.
+' @remarks Most of the exceptions that occur within the cryptography set of classes will be a <a href="CryptographicException.html">CryptographicException</a>.
 ' @see CryptographicException
-'
 Public Function NewCryptographicException(ByRef Message As String, Optional ByVal InnerException As Exception) As CryptographicException
     Set NewCryptographicException = New CryptographicException
     NewCryptographicException.Init Message, InnerException
 End Function
 
 ''
-' Creates a new KeySizes object with the Min, Max and Skip sizes defined.
+' Creates a new <a href="KeySizes.html">KeySizes</a> object with the <a href="KeySizes.Get.MinSize.html">MinSize</a>,
+' <a href="KeySizes.Get.MaxSize.html">MaxSize</a>, and <a href="KeySizes.Get.SkipSize.html">SkipSize</a> properties defined.
 '
-' @param MinSize The smallest key size defined by this KeySizes instance.
-' @param MaxSize The largest key size defined by this KeySizes instance.
-' @param SkipSize The step size from MinSize to MaxSize of legal key sizes
+' @param MinSize The smallest key size defined by this <a href="KeySizes.html">KeySizes</a> instance.
+' @param MaxSize The largest key size defined by this <a href="KeySizes.html">KeySizes</a> instance.
+' @param SkipSize The step size from <a href="KeySizes.Get.MinSize.html">MinSize</a> to <a href="KeySizes.Get.MaxSize.html">MaxSize</a> of legal key sizes
 ' between the smallest and largest legal key sizes in this instance.
-' @return A new KeySizes object with the Min, Max and Skip sizes defined.
-' @remarks A KeySizes object represents a set of legal key sizes. It defines all the possible
+' @return A new <a href="KeySizes.html">KeySizes</a> object with the <a href="KeySizes.Get.MinSize.html">MinSize</a>, <a href="KeySizes.Get.MaxSize.html">MaxSize</a>, and <a href="KeySizes.Get.SkipSize.html">SkipSize</a> properties defined.
+' @remarks A <a href="KeySizes.html">KeySizes</a> object represents a set of legal key sizes. It defines all the possible
 ' legal key sizes by defining the smallest and largest key sizes allows, then defining a step
 ' size used to calculate the additional legal key sizes between the smallest and largest key sizes.
 ' <p>If the smallest key size is 64 and the largest key size is 128 and a skip size of 32 is defined,
 ' then all possible legal key sizes are from 64 to 128 in increments of 32. In this case, the valid
 ' key sizes are 64, 96 and 128.</p>
 ' @see KeySizes
-'
 Public Function NewKeySizes(ByVal MinSize As Long, ByVal MaxSize As Long, ByVal SkipSize As Long) As KeySizes
     Set NewKeySizes = New KeySizes
     NewKeySizes.Init MinSize, MaxSize, SkipSize
 End Function
 
 ''
-' Creates a new FromBase64Transform object used to convert base64 characters to plain text.
+' Creates a new <a href="FromBase64Transform.html">FromBase64Transform</a> object used to convert base64 characters to plain text.
 '
 ' @param WhiteSpaces Determines how whitespace should be handled during the transformation process.
-' @return A new FromBase64Transfrom object.
+' @return A new <a href="FromBase64Transform.html">FromBase64Transfrom</a> object.
 ' @see FromBase64Transform
-'
 Public Function NewFromBase64Transform(ByVal WhiteSpaces As FromBase64TransformMode) As FromBase64Transform
     Set NewFromBase64Transform = New FromBase64Transform
     NewFromBase64Transform.Init WhiteSpaces
 End Function
 
 ''
-' Creates a new CryptoStream object used to read or write transformed data to or from an underlying stream.
+' Creates a new <a href="CryptoStream.html">CryptoStream</a> object used to read or write transformed data to or from an underlying stream.
 '
 ' @param Stream The underlying stream to read or write the transformed data.
 ' @param Transform The object used to transfrom data to or from plain text.
-' @param Mode Sets the CryptoStream to be either in read mode or write mode.
-' @return A new CryptoStream object.
+' @param Mode Sets the <a href="CryptoStream.html">CryptoStream</a> to be either in read mode or write mode.
+' @return A new <a href="CryptoStream.html">CryptoStream</a> object.
 ' @see CryptoStream
-'
 Public Function NewCryptoStream(ByVal Stream As Stream, ByVal Transform As ICryptoTransform, ByVal Mode As CryptoStreamMode) As CryptoStream
     Set NewCryptoStream = New CryptoStream
     NewCryptoStream.Init Stream, Transform, Mode
 End Function
 
 ''
-' Returns an array of Longs generated from the values passed in.
+' Returns an array of <b>Longs</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to a Long or an exception will occur.
+' @remarks The values need to be convertable to a <b>Long</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewLongs(ParamArray Values() As Variant) As Long()
-    Dim Ret() As Long
-    SAPtr(Ret) = SafeArrayCreateVector(vbLong, 0, UBound(Values) + 1)
-    
+    Dim Result() As Long
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbLong, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewLongs = Ret
+    NewLongs = Result
 End Function
 
 ''
-' Returns an array of Bytes generated from the values passed in.
+' Returns an array of <b>Bytes</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to a byte or an exception will occur.
+' @remarks The values need to be convertable to a <b>Byte</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewBytes(ParamArray Values() As Variant) As Byte()
-    Dim Ret() As Byte
-    SAPtr(Ret) = SafeArrayCreateVector(vbByte, 0, UBound(Values) + 1)
-    
+    Dim Result() As Byte
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbByte, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewBytes = Ret
+    NewBytes = Result
 End Function
 
 ''
-' Returns an array of Integers generated from the values passed in.
+' Returns an array of <b>Integers</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to an Integer or an exception will occur.
+' @remarks The values need to be convertable to an <b>Integer</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewIntegers(ParamArray Values() As Variant) As Integer()
-    Dim Ret() As Integer
-    SAPtr(Ret) = SafeArrayCreateVector(vbInteger, 0, UBound(Values) + 1)
-    
+    Dim Result() As Integer
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbInteger, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewIntegers = Ret
+    NewIntegers = Result
 End Function
 
 ''
-' Returns an array of Integers representing the ASCII values of the strings passed in.
+' Returns an array of type <b>Integer</b> representing the ASCII values of the strings or char passed in.
 '
-' @param Values A series of string values to be converted to ASCII values.
+' @param Values A series of string or char values to be converted to ASCII values.
 ' @remarks The values must be strings.
 '
 Public Function NewChars(ParamArray Values() As Variant) As Integer()
     Dim Result() As Integer
+    Dim i As Long
+    
     SAPtr(Result) = SafeArrayCreateVector(vbInteger, 0, UBound(Values) + 1)
     
-    Dim i As Long
     For i = 0 To UBound(Values)
         If VarType(Values(i)) = vbString Then
             Result(i) = AscW(Values(i))
@@ -1304,380 +1284,363 @@ Public Function NewChars(ParamArray Values() As Variant) As Integer()
 End Function
 
 ''
-' Returns an array of Strings generated from the values passed in.
+' Returns an array of type <b>String</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to a String or an exception will occur.
+' @remarks The values need to be convertable to a <b>String</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewStrings(ParamArray Values() As Variant) As String()
-    Dim Ret() As String
-    SAPtr(Ret) = SafeArrayCreateVector(vbString, 0, UBound(Values) + 1)
-    
+    Dim Result() As String
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbString, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewStrings = Ret
+    NewStrings = Result
 End Function
 
 ''
-' Returns an array of Singles generated from the values passed in.
+' Returns an array of type <b>Single</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to a Single or an exception will occur.
+' @remarks The values need to be convertable to a <b>Single</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewSingles(ParamArray Values() As Variant) As Single()
-    Dim Ret() As Single
-    SAPtr(Ret) = SafeArrayCreateVector(vbSingle, 0, UBound(Values) + 1)
-    
+    Dim Result() As Single
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbSingle, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewSingles = Ret
+    NewSingles = Result
 End Function
 
 ''
-' Returns an array of Doubles generated from the values passed in.
+' Returns an array of type <b>Double</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to a Double or an exception will occur.
+' @remarks The values need to be convertable to a <b>Double</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewDoubles(ParamArray Values() As Variant) As Double()
-    Dim Ret() As Double
-    SAPtr(Ret) = SafeArrayCreateVector(vbDouble, 0, UBound(Values) + 1)
-    
+    Dim Result() As Double
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbDouble, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewDoubles = Ret
+    NewDoubles = Result
 End Function
 
 ''
-' Returns an array of Decimals generated from the values passed in.
+' Returns an array of type <b>Decimal</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to a Decimal or an exception will occur.
+' @remarks The values need to be convertable to a <b>Decimal</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewDecimals(ParamArray Values() As Variant) As Variant()
-    Dim Ret() As Variant
-    SAPtr(Ret) = SafeArrayCreateVector(vbVariant, 0, UBound(Values) + 1)
-    
+    Dim Result() As Variant
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbVariant, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = CDec(Values(i))
+        Result(i) = CDec(Values(i))
     Next
     
-    NewDecimals = Ret
+    NewDecimals = Result
 End Function
 
 ''
-' Returns an array of Date values generated from the values passed in.
+' Returns an array of type <b>Date</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to dates or an exception will occur.
+' @remarks The values need to be convertable to <b>Date</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewDates(ParamArray Values() As Variant) As Date()
-    Dim Ret() As Date
-    SAPtr(Ret) = SafeArrayCreateVector(vbDate, 0, UBound(Values) + 1)
-    
+    Dim Result() As Date
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbDate, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewDates = Ret
+    NewDates = Result
 End Function
 
 ''
-' Returns an array of Currency values generated from the values passed in.
+' Returns an array of type <b>Currency</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to Currency or an exception will occur.
+' @remarks The values need to be convertable to <b>Currency</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewCurrencies(ParamArray Values() As Variant) As Currency()
-    Dim Ret() As Currency
-    SAPtr(Ret) = SafeArrayCreateVector(vbCurrency, 0, UBound(Values) + 1)
-    
+    Dim Result() As Currency
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbCurrency, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewCurrencies = Ret
+    NewCurrencies = Result
 End Function
 
 ''
-' Returns an array of Boolean values generated from the values passed in.
+' Returns an array of type <b>Boolean</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks The values need to be convertable to a boolean or an exception will occur.
+' @remarks The values need to be convertable to a <b>Boolean</b> or an exception will occur.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewBooleans(ParamArray Values() As Variant) As Boolean()
-    Dim Ret() As Boolean
-    SAPtr(Ret) = SafeArrayCreateVector(vbBoolean, 0, UBound(Values) + 1)
-    
+    Dim Result() As Boolean
     Dim i As Long
+    
+    SAPtr(Result) = SafeArrayCreateVector(vbBoolean, 0, UBound(Values) + 1)
+    
     For i = 0 To UBound(Values)
-        Ret(i) = Values(i)
+        Result(i) = Values(i)
     Next
     
-    NewBooleans = Ret
+    NewBooleans = Result
 End Function
 
 ''
-' Returns a Variant array containing the values passed in.
+' Returns an array of type <b>Variant</b> containing the values passed in.
 '
 ' @param Values The values to create the array from.
-' @remarks This is the same as using the Array function.
+' @remarks This is the same as using the <b>Array</b> function.
 ' <p>The array is zero-based.</p>
 ' <p>If no values are passed in then an empty array is returned, not a null array.</p>
-'
 Public Function NewVariants(ParamArray Values() As Variant) As Variant()
     NewVariants = Values
 End Function
 
 ''
-' Creates a new CspKeyContainerInfo object.
+' Creates a new <a href="CspKeyContainerInfo.html">CspKeyContainerInfo</a> object.
 '
 ' @param Parameters The parameters used to derive information from.
-' @return A new CspKeyContainerInfo object.
+' @return A new <a href="CspKeyContainerInfo.html">CspKeyContainerInfo</a> object.
 ' @remarks This object is usually created by crypto service provider. Instantiating an
 ' object directly may result in property throwing an exception when accessed.
-'
 Public Function NewCspKeyContainerInfo(ByVal Parameters As CspParameters) As CspKeyContainerInfo
     Set NewCspKeyContainerInfo = New CspKeyContainerInfo
     NewCspKeyContainerInfo.Init Parameters
 End Function
 
 ''
-' Creates a new Rfc2898DeriveBytes object.
+' Creates a new <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> object.
 '
-' @param Password This can be a String password or a Byte array.
-' @param Salt This can be a Byte array to be used as salt or an Integer value indicating the size of the salt to be generated.
+' @param Password This can be a <b>String</b> password or a <b>Byte</b> array.
+' @param Salt This can be a <b>Byte</b> array to be used as salt or an <b>Integer</b> value indicating the size of the salt to be generated.
 ' @param Iterations The number of times the operation should be performed when generating a password.
-' @return A new Rfc2898DeriveBytes object.
-' @remarks This is used to create Byte array passwords from standard plain text passwords.
-'
+' @return A new <a href="Rfc2898DeriveBytes.html">Rfc2898DeriveBytes</a> object.
+' @remarks This is used to create <b>Byte</b> array passwords from standard plain text passwords.
 Public Function NewRfc2898DeriveBytes(ByRef Password As Variant, ByRef Salt As Variant, Optional ByVal Iterations As Long = 1000) As Rfc2898DeriveBytes
     Set NewRfc2898DeriveBytes = New Rfc2898DeriveBytes
     NewRfc2898DeriveBytes.Init Password, Salt, Iterations
 End Function
 
 ''
-' Creates a base classed used by hash algorithms.
+' Creates a <a href="HashAlgorithmBase.html">HashAlgorithmBase</a> object used by hash algorithms.
 '
 ' @param Callback Used to call back into the specifics of an algorithm implementation.
 ' @param KeepWeakReference Indicates if the base class should maintain a weak reference to the
-' Callback object to prevent a circular reference from occuring if the Callback object is the same
+' <i>Callback</i> object to prevent a circular reference from occuring if the <i>Callback</i> object is the same
 ' object as the one instantiating this instance.
 ' @param UseBuffer Indicates if the internal buffering mechanism in the base class should be used,
-' or if all data should be passed to the Callback object to allow custom buffering.
+' or if all data should be passed to the <i>Callback</i> object to allow custom buffering.
 ' @param BlockSize The size of the byte block that is processed at a time by the specific algorithm
 ' using this base class. This is to help with the buffering.
-' @return A new HashAlgorithmBase object.
+' @return A new <a href="HashAlgorithmBase.html">HashAlgorithmBase</a> object.
 ' @remarks This base class can handle most hash algorithm implementation requirement except for the
-' specifics of a hash algorithm. That is where the Callback is used.
+' specifics of a hash algorithm. That is where the <i>Callback</i> is used.
 ' @see HashAlgorithmBase
-'
 Public Function NewHashAlgorithmBase(ByVal Callback As IHashAlgorithm, Optional ByVal KeepWeakReference As Boolean, Optional ByVal UseBuffer As Boolean, Optional ByVal BlockSize As Long) As HashAlgorithmBase
     Set NewHashAlgorithmBase = New HashAlgorithmBase
     NewHashAlgorithmBase.Init Callback, KeepWeakReference, UseBuffer, BlockSize
 End Function
 
 ''
-' Creates a new CryptoAPIHash object.
+' Creates a new <a href="CryptoAPIHash.html">CryptoAPIHash</a> object.
 '
 ' @param HashAlg The algorithm of the hash to be used.
 ' @param HashSize The size of the hash output.
-' @return A new CryptoAPIHash object.
-' @remarks A CryptoAPIHash object is an implementation of the IHashAlgorithm callback that
-' uses the CryptoAPI hash routines.
+' @return A new <a href="CryptoAPIHash.html">CryptoAPIHash</a> object.
+' @remarks A <a href="CryptoAPIHash.html">CryptoAPIHash</a> object is an implementation of the
+' <a href="IHashAlgorithm.html">IHashAlgorithm</a> callback that uses the CryptoAPI hash routines.
 ' @see CryptoAPIHash
-'
 Public Function NewCryptoAPIHash(ByVal HashAlg As Long, ByVal HashSize As Long) As CryptoAPIHash
     Set NewCryptoAPIHash = New CryptoAPIHash
     NewCryptoAPIHash.Init HashAlg, HashSize
 End Function
 
 ''
-' Creates a new HMACSHA1 object.
+' Creates a new <a href="HMACSHA1.html">HMACSHA1</a> object.
 '
 ' @param Key The key used to sign the message.
-' @param UseManagedSha1 Indicates if the SHA1Managed or SHA1CryptoServiceProvider should be used.
-' @return A new HMACSHA1 object.
+' @param UseManagedSha1 Indicates if the <a href="SHA1Managed.html">SHA1Managed</a> or <a href="SHA1CryptoServiceProvider.html">SHA1CryptoServiceProvider</a> should be used.
+' @return A new <a href="HMACSHA1.html">HMACSHA1</a> object.
 ' @see HMACSHA1
-'
 Public Function NewHMACSHA1(ByRef Key() As Byte, Optional ByVal UseManagedSha1 As Boolean = False) As HMACSHA1
     Set NewHMACSHA1 = New HMACSHA1
     NewHMACSHA1.Init Key, UseManagedSha1
 End Function
 
 ''
-' Creates a base class that can be used as a base implementation of an HMAC class.
+' Creates a <a href="HMACBase.html">HMACBase</a> object that can be used as a base implementation of an <a href="HMAC.html">HMAC</a> class.
 '
-' @param HashAlgorithm An instance of an algorithm to be used Hash Message Authentication Code.
+' @param HashAlgorithm An instance of an algorithm to be used for Hash Message Authentication Code.
 ' @param KeySize The size of the key to be used for signing the message.
 ' @param HashName The name of the hash being used.
 ' @param Key The key used to sign the message.
-' @return A new HMACBase object.
-' @remarks This class implements many of the common routines used by HMAC classes.
-'
+' @return A new <a href="HMACBase.html">HMACBase</a> object.
+' @remarks This class implements many of the common routines used by <a href="HMAC.html">HMAC</a> classes.
 Public Function NewHMACBase(ByVal HashAlgorithm As HashAlgorithm, ByVal KeySize As Long, Optional ByRef HashName As String, Optional ByRef Key As Variant) As HMACBase
     Set NewHMACBase = New HMACBase
     NewHMACBase.Init HashAlgorithm, KeySize, HashName, Key
 End Function
 
 ''
-' Creates a new HMACSHA256 object.
+' Creates a new <a href="HMACSHA256.html">HMACSHA256</a> object.
 '
 ' @param Key The key used to sign the message.
-' @return A new HMACSHA256 object.
+' @return A new <a href="HMACSHA256.html">HMACSHA256</a> object.
 ' @see HMACSHA256
-'
 Public Function NewHMACSHA256(ByRef Key() As Byte) As HMACSHA256
     Set NewHMACSHA256 = New HMACSHA256
     NewHMACSHA256.Init Key
 End Function
 
 ''
-' Creates a new HMACSHA384 object.
+' Creates a new <a href="HMACSHA384.html">HMACSHA384</a> object.
 '
 ' @param Key The key used to sign the message.
-' @return A new HMACSHA384 object.
+' @return A new <a href="HMACSHA384.html">HMACSHA384</a> object.
 ' @see HMACSHA384
-'
 Public Function NewHMACSHA384(ByRef Key() As Byte) As HMACSHA384
     Set NewHMACSHA384 = New HMACSHA384
     NewHMACSHA384.Init Key
 End Function
 
 ''
-' Creates a new HMACSHA512 object.
+' Creates a new <a href="HMACSHA512.html">HMACSHA512</a> object.
 '
 ' @param Key The key used to sign the message.
-' @return A new HMACSHA512 object.
+' @return A new <a href="HMACSHA512.html">HMACSHA512</a> object.
 ' @see HMACSHA512
-'
 Public Function NewHMACSHA512(ByRef Key() As Byte) As HMACSHA512
     Set NewHMACSHA512 = New HMACSHA512
     NewHMACSHA512.Init Key
 End Function
 
 ''
-' Creates a new HMACMD5 object.
+' Creates a new <a href="HMACMD5.html">HMACMD5</a> object.
 '
 ' @param Key The key used to sign the message.
-' @return A new HMACMD5 object.
+' @return A new <a href="HMACMD5.html">HMACMD5</a> object.
 ' @see HMACMD5
-'
 Public Function NewHMACMD5(ByRef Key() As Byte) As HMACMD5
     Set NewHMACMD5 = New HMACMD5
     NewHMACMD5.Init Key
 End Function
 
 ''
-' Creates a new HMACRIPEMD160 object.
+' Creates a new <a href="HMACRIPEMD160.html">HMACRIPEMD160</a> object.
 '
 ' @param Key The key used to sign the message.
-' @return A new HMACRIPEMD160 object.
+' @return A new <a href="HMACRIPEMD160.html">HMACRIPEMD160</a> object.
 ' @see HMACRIPEMD160
-'
 Public Function NewHMACRIPEMD160(ByRef Key() As Byte) As HMACRIPEMD160
     Set NewHMACRIPEMD160 = New HMACRIPEMD160
     NewHMACRIPEMD160.Init Key
 End Function
 
 ''
-' Creates a new RSACryptoServiceProvider object.
+' Creates a new <a href="RSACryptoServiceProvider.html">RSACryptoServiceProvider</a> object.
 '
 ' @param KeySize The size of the key used by the service provider.
-' @param Parameters A CspParameters object used to specify custom service provider options.
-' @return A new RSACryptoServiceProvider.
+' @param Parameters A <a href="CspParameters.html">CspParameters</a> object used to specify custom service provider options.
+' @return A new <a href="RSACryptoServiceProvider.html">RSACryptoServiceProvider</a>.
 ' @remarks The key size can is 384bit to 512bit for non-high encryption machines and 384bit to 16384bit for high encryption machines.
 ' @see RSACryptoServiceProvider
-'
 Public Function NewRSACryptoServiceProvider(Optional ByVal KeySize As Long, Optional ByVal Parameters As CspParameters) As RSACryptoServiceProvider
     Set NewRSACryptoServiceProvider = New RSACryptoServiceProvider
     NewRSACryptoServiceProvider.Init KeySize, Parameters
 End Function
 
 ''
-' Creates a new DSACryptoServiceProvider object.
+' Creates a new <a href="DSACryptoServiceProvider.html">DSACryptoServiceProvider</a> object.
 '
 ' @param KeySize The key size in bits. This can be from 384bits to 1024bits.
-' @param Parameters A CspParameters object used to specify custom service provider options.
-' @return A new DSACryptoServiceProvider object.
+' @param Parameters A <a href="CspParameters.html">CspParameters</a> object used to specify custom service provider options.
+' @return A new <a href="DSACryptoServiceProvider.html">DSACryptoServiceProvider</a> object.
 ' @see DSACryptoServiceProvider
-'
 Public Function NewDSACryptoServiceProvider(Optional ByVal KeySize As Long, Optional ByVal Parameters As CspParameters) As DSACryptoServiceProvider
     Set NewDSACryptoServiceProvider = New DSACryptoServiceProvider
     NewDSACryptoServiceProvider.Init KeySize, Parameters
 End Function
 
 ''
-' Creates a new SecurityElement object.
+' Creates a new <a href="SecurityElement.html">SecurityElement</a> object.
 '
 ' @param Tag The name of the security element.
 ' @param Text The text within the element tags.
-' @return A new SecurityElement object.
-' @remarks A SecurityElement is a simple version of an XML tag with attributes and text.
+' @return A new <a href="SecurityElement.html">SecurityElement</a> object.
+' @remarks A <a href="SecurityElement.html">SecurityElement</a> is a simple version of an XML tag with attributes and text.
 ' @see SecurityElement
-'
 Public Function NewSecurityElement(ByRef Tag As String, Optional ByRef Text As String) As SecurityElement
     Set NewSecurityElement = New SecurityElement
     NewSecurityElement.Init Tag, Text
 End Function
 
 ''
-' Creates a new XmlSyntaxException object.
+' Creates a new <a href="XmlSyntaxException.html">XmlSyntaxException</a> object.
 '
 ' @param LineNumber The number in the Xml string the exception occurred.
 ' @param Message The exception message.
 ' @param InnerException The exception that caused this exception to occur.
-' @return A new XmlSyntaxException object.
-' @see XmlSyntaxException
-'
+' @return A new <a href="XmlSyntaxException.html">XmlSyntaxException</a> object.
+' @see XmlSyntaxException'
 Public Function NewXmlSyntaxException(Optional ByRef LineNumber As Variant, Optional ByRef Message As Variant, Optional ByVal InnerException As Exception) As XmlSyntaxException
     Set NewXmlSyntaxException = New XmlSyntaxException
     NewXmlSyntaxException.Init LineNumber, Message, InnerException
 End Function
 
 ''
-' Creates a new MACTripleDES object.
+' Creates a new <a href="MACTripleDES.html">MACTripleDES</a> object.
 '
-' @param RgbKey The key to be used by the implementation of the TripleDES algorithm.
-' @param StrTripleDES The name of the TripleDES implementation to be used.
-' @return A new MACTripleDES object.
-'
+' @param RgbKey The key to be used by the implementation of the <a href="TripleDES.html">TripleDES</a> algorithm.
+' @param StrTripleDES The name of the <a href="TripleDES.html">TripleDES</a> implementation to be used. The default is "3DES".
+' @return A new <a href="MACTripleDES.html">MACTripleDES</a> object.
 Public Function NewMACTripleDES(ByRef RgbKey() As Byte, Optional ByRef StrTripleDES As String) As MACTripleDES
     Set NewMACTripleDES = New MACTripleDES
     NewMACTripleDES.Init RgbKey, IfString(StrTripleDES, "3DES")
 End Function
 
 ''
-' Creates a new BigInteger instance.
+' Creates a new <a href="BigInteger.html">BigInteger</a> instance.
 '
-' @param value The value to intialize a new instance of <b>BitInteger</b> to.
-' @return A new BigInteger instance containing the specified value.
+' @param value The value to intialize a new instance of <a href="BigInteger.html">BigInteger</a> to.
+' @return A new <a href="BigInteger.html">BigInteger</a> instance containing the specified value.
 ' @remarks The follow datatypes are supported:<br>
 ' vbLong<br>
 ' vbInteger<br>
@@ -1686,18 +1649,18 @@ End Function
 ' vbSingle<br>
 ' vbCurrency<br>
 ' vbDecimal<br>
-' vbByte Or vbArray<br>
-'
+' vbByte Array<br>
+' <a href="Int64Static.Int64.html">Int64</a>
 Public Function NewBigInteger(ByRef Value As Variant) As BigInteger
     Set NewBigInteger = New BigInteger
     NewBigInteger.Init Value
 End Function
 
 ''
-' Attempts to convert a value to a valid BigInteger instance.
+' Attempts to convert a value to a valid <a href="BigInteger.html">BigInteger</a> instance.
 '
-' @param value The value to be converted to BigInteger.
-' @return A new BigInteger instance representing the converted value.
+' @param value The value to be converted to <a href="BigInteger.html">BigInteger</a>.
+' @return A new <a href="BigInteger.html">BigInteger</a> instance representing the converted value.
 ' @remarks The follow datatypes are supported:<br>
 ' vbString<br>
 ' vbLong<br>
@@ -1707,15 +1670,15 @@ End Function
 ' vbSingle<br>
 ' vbCurrency<br>
 ' vbDecimal<br>
-' vbByte Or vbArray<br>
+' vbByte Array<br>
+' <a href="Int64Static.Int64.html">Int64</a>
 ' BigInteger (returns same instance)<br>
 ' Nothing (returns BigInteger.Zero)<br>
 '
 ' <pre>
 ' Dim b As BigInteger
-' Set b = BInt(<i>somevalue</i>)
+' Set b = BInt(12345)
 ' </pre>
-'
 Public Function BInt(ByRef Value As Variant) As BigInteger
     Select Case VarType(Value)
         Case vbObject, vbDataObject
@@ -1734,7 +1697,7 @@ Public Function BInt(ByRef Value As Variant) As BigInteger
 End Function
 
 ''
-' Initializes a new instance of a Collection with items.
+' Initializes a new instance of a <b>Collection</b> with items.
 '
 ' @param Values The values to initialize the collection with.
 ' @return Returns a collection containing items in <i>Values</i> parameter.
@@ -1951,6 +1914,31 @@ Public Function NewEncoderFallbackException(ByRef Message As String, Optional By
 End Function
 
 ''
+' Initializes a new instance of the <a href="EncoderFallbackException.html">EncoderFallbackException</a> class. Parameters specify the error message, unknown character, and index.
+'
+' @param Message An error message.
+' @param CharUnknown The unknown character that caused the exception.
+' @param Index The index the unknown character was encountered.
+' @return A new instance of the <a href="EncoderFallbackException.html">EncoderFallbackException</a> class.
+Public Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Long, ByVal Index As Long) As EncoderFallbackException
+    Set NewEncoderFallbackException2 = New EncoderFallbackException
+    NewEncoderFallbackException2.Init2 Message, CharUnknown, Index
+End Function
+
+''
+' Initializes a new instance of the <a href="EncoderFallbackException.html">EncoderFallbackException</a> class. Parameters specify the error message, high surrogate, low surrogate, and Index.
+'
+' @param Message An error message.
+' @param CharUnknownHigh The high surrogate of the unknown character.
+' @param CharUnknownLow The low surrogate of the unknown character.
+' @param Index The index the unknown character was encountered.
+' @return A new instance of the <a href="EncoderFallbackException.html">EncoderFallbackException</a> class.
+Public Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Long, ByVal CharUnknownLow As Long, ByVal Index As Long) As EncoderFallbackException
+    Set NewEncoderFallbackException3 = New EncoderFallbackException
+    NewEncoderFallbackException3.Init3 Message, CharUnknownHigh, CharUnknownLow, Index
+End Function
+
+''
 ' Initializes a new instance of the <a href="ArithmeticException.html">ArithmeticException</a> class with a specified error message and a reference to the inner exception that is the cause of this exception.
 '
 ' @param Message The error message that explains the reason for the exception.
@@ -2032,16 +2020,6 @@ End Function
 Friend Function NewDBCSCodePageEncoding(ByVal CodePage As Long) As DBCSCodePageEncoding
     Set NewDBCSCodePageEncoding = New DBCSCodePageEncoding
     NewDBCSCodePageEncoding.Init CodePage
-End Function
-
-Friend Function NewEncoderFallbackException2(ByRef Message As String, ByVal CharUnknown As Long, ByVal Index As Long) As EncoderFallbackException
-    Set NewEncoderFallbackException2 = New EncoderFallbackException
-    NewEncoderFallbackException2.Init2 Message, CharUnknown, Index
-End Function
-
-Friend Function NewEncoderFallbackException3(ByRef Message As String, ByVal CharUnknownHigh As Long, ByVal CharUnknownLow As Long, ByVal Index As Long) As EncoderFallbackException
-    Set NewEncoderFallbackException3 = New EncoderFallbackException
-    NewEncoderFallbackException3.Init3 Message, CharUnknownHigh, CharUnknownLow, Index
 End Function
 
 Friend Function NewArrayListEnumerator(ByVal List As ArrayList, ByVal StartIndex As Long, ByVal Count As Long) As ArrayListEnumerator

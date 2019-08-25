@@ -36,20 +36,18 @@ Attribute VB_Exposed = True
 '
 
 ''
-' Provides methods used to manipulate BigInteger objects.
+' Provides methods used to manipulate <a href="BigInteger.html">BigInteger</a> objects.
 '
-' @remarks The methods provided by this class are accessed through the
-' convention of <i><b>BigInteger.MethodName</b></i>.
+' @remarks The methods provided by this class are accessed through the convention of <b>BigInteger.</i>MethodName</i></b>.
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = BigInteger.Rnd(128)
 ' Set b = BigInteger.Pow(b, BInt(3))
 ' </pre>
-' <p>Most of these methods exist in the <b>BitInteger</b> class and can be used
-' directly with <b>BigInteger</b> objects. The primary advantage of using the
-' methods defined in this class is that a value of Nothing can be passed in and
+' <p>Most of these methods exist in the <a href="BigInteger.html">BigInteger</a> class and can be used
+' directly with <a href="BigInteger.html">BigInteger</a> objects. The primary advantage of using the
+' methods defined in this class is that a value of <b>Nothing</b> can be passed in and
 ' will be treated as a value of 0.
-'
 Option Explicit
 
 Private mZero       As BigInteger
@@ -59,72 +57,88 @@ Private mTen        As BigInteger
 
 
 ''
-' Returns a shared BigInteger instance with the value of 0.
+' Returns a shared <a href="BigInteger.html">BigInteger</a> instance with the value of 0.
 '
 ' @return Returns a shared instance of the value of 0.
-' @remarks This is to reduce the creation of multiple instances
-' of values that are commonly used.
-'
+' @remarks This is to reduce the creation of multiple instances of values that are commonly used.
 Public Property Get Zero() As BigInteger
     Set Zero = mZero
 End Property
 
 ''
-' Returns a shared BigInteger instance with the value of 1.
+' Returns a shared <a href="BigInteger.html">BigInteger</a> instance with the value of 1.
 '
 ' @return Returns a shared instance of the value of 1.
-' @remarks This is to reduce the creation of multiple instances
-' of values that are commonly used.
-'
+' @remarks This is to reduce the creation of multiple instances of values that are commonly used.
 Public Property Get One() As BigInteger
     Set One = mOne
 End Property
 
 ''
-' Returns a shared BigInteger instance with the value of -1.
+' Returns a shared <a href="BigInteger.html">BigInteger</a> instance with the value of -1.
 '
 ' @return Returns a shared instance of the value of -1.
-' @remarks This is to reduce the creation of multiple instances
-' of values that are commonly used.
-'
+' @remarks This is to reduce the creation of multiple instances of values that are commonly used.
 Public Property Get MinusOne() As BigInteger
     Set MinusOne = mMinusOne
 End Property
 
 ''
-' Returns a shared BigInteger instance with the value of 10.
+' Returns a shared <a href="BigInteger.html">BigInteger</a> instance with the value of 10.
 '
 ' @return Returns a shared instance of the value of 10.
-' @remarks This is to reduce the creation of multiple instances
-' of values that are commonly used.
-'
+' @remarks This is to reduce the creation of multiple instances of values that are commonly used.
 Public Property Get Ten() As BigInteger
     Set Ten = mTen
 End Property
 
 ''
-' Compares two BigInteger instance to each other returning their relation.
+' Compares two <a href="BigInteger.html">BigInteger</a> instances to each other returning their relation.
 '
 ' @param x The left handed value to be compared to.
 ' @param y The right handed value to be compared to.
 ' @return Returns the relation between to the two numbers.<br>
-' @remarks If Nothing is passed in, it is treated as zero.<br>
-' If x < y then -1 is returned<br>
-' If x = y then 0 is returned<br>
-' If x > y then 1 is returned.<br>
-Public Function Compare(ByVal x As BigInteger, ByVal y As BigInteger) As Long
-    Set x = ValueOrZero(x)
-    Compare = x.CompareTo(y)
+' @remarks If <b>Nothing</b> is passed in, it is treated as zero.<br>
+' <table style="width: auto">
+'   <tr>
+'       <th>Value</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td>Less than zero</td><td><i>Left</i> is less than <i>Right</i>.</td>
+'   </tr>
+'    <tr>
+'        <td>Zero</td><td><i>Left<i/> equals <i>Right</i>.</td>
+'    </tr>
+'    <tr>
+'        <td>Greater than zero</td><td><i>Left</i> is greater than <i>Right</i>.</td>
+'    </tr>
+' </table>
+' <pre>
+' Dim a As BigInteger, b As BigInteger, Relation As String
+' Set a = BInt(1)
+' Set b = BInt(2)
+'
+' Select Case BigInteger.Compare(a, b)
+'     Case Is < 0: Relation = "<"
+'     Case Is > 0: Relation = ">"
+'     Case Else: Relation = "="
+' End Select
+'
+' Console.WriteLine "{0} {1} {2}", a, Relation, b
+' </pre>
+Public Function Compare(ByVal Left As BigInteger, ByVal Right As BigInteger) As Long
+    Set Left = ValueOrZero(Left)
+    Compare = Left.CompareTo(Right)
 End Function
 
 ''
-' Returns the equality of two BigInteger values.
+' Returns the equality of two <a href="BigInteger.html">BigInteger</a> values.
 '
 ' @param x The left handed value to test for equality.
 ' @param y The right handed value to test for equality.
-' @return Returns True if the values are equal, False otherwise.
-' @remarks If Nothing is passed in, it is treated as zero.
-'
+' @return <b>True</b> if the values are equal, <b>False</b> otherwise.
+' @remarks If <b>Nothing</b> is passed in, it is treated as zero.
 Public Function Equals(ByVal x As BigInteger, ByVal y As BigInteger) As Boolean
     Set x = ValueOrZero(x)
     Equals = x.Equals(y)
@@ -133,9 +147,9 @@ End Function
 ''
 ' Attemps to parse a string of characters of the specified base type.
 '
-' @param Value The string of characters to attempt to be parsed.
-' @param OutResult The returning BigInteger object if the string was successfully parsed.
-' @return Returns True if the string was parsed, False otherwise.
+' @param Value The string of characters to parse.
+' @param OutResult The returning <a href="BigInteger.html">BigInteger</a> object if the string was successfully parsed.
+' @return <b>True</b> if the string was parsed, <b>False</b> otherwise.
 ' @remarks 2 base types are supported for parsing; Decimal and Hex. The string
 ' must include a base type specifier for Hex. Decimal is the default.
 ' <p>Hex Prefix Specifiers: 0x, 0X, &h, &H</p>
@@ -145,12 +159,12 @@ Public Function TryParse(ByRef Value As String, ByRef OutResult As BigInteger) A
 End Function
 
 ''
-' Tries to convert the string representation of a number in a specified style and culture-specific format to its BigInteger equivalent, and returns a value that indicates whether the conversion succeeded.
+' Tries to convert the string representation of a number in a specified style and culture-specific format to its <a href="BigInteger.html">BigInteger</a> equivalent, and returns a value that indicates whether the conversion succeeded.
 '
 ' @param Value The string representation of a number. The string is interpreted using the style specified by style.
 ' @param Style A bitwise combination of enumeration values that indicates the style elements that can be present in value. A typical value to specify is NumberStyles.Integer.
 ' @param Provider An object that supplies culture-specific formatting information about value. If Nothing is passed in the current CultureInfo will be used.
-' @param OutResult When this method returns, contains the BigInteger equivalent to the number that is contained in value, or BigInteger.Zero if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
+' @param OutResult When this method returns, contains the <a href="BigInteger.html">BigInteger</a> equivalent to the number that is contained in value, or <a href="BigInteger.Get.Zero.html">BigInteger.Zero</a> if the conversion failed. The conversion fails if thevalue parameter is null or is not in a format that is compliant withstyle. This parameter is passed uninitialized.
 Public Function TryParseEx(ByRef Value As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef OutResult As BigInteger) As Boolean
     Dim Result      As BigNumber
     Dim Info        As NumberFormatInfo
@@ -209,7 +223,7 @@ End Function
 ''
 ' Returns a human readable string of characters representing the number.
 '
-' @param Value The BigInteger to create a string from.
+' @param Value The <a href="BigInteger.html">BigInteger</a> to create a string from.
 ' @param Format The specific numerical format wish to have the number displayed as.
 ' @return The numeric value of the number in the specified format.
 ' @remarks "X" and "x" for hex in either upper or lowercase. Everything else defaults to a decimal display.
@@ -231,16 +245,16 @@ Public Function ToString(ByVal Value As BigInteger, Optional ByRef Format As Str
 End Function
 
 ''
-' Returns the opposite signed value of this BigInteger instance.
+' Returns the opposite signed value of this <a href="BigInteger.html">BigInteger</a> instance.
 '
 ' @param Value The value to be negated.
-' @return Returns a BigInteger instance containing the opposite signed value.
-' @remarks Negative values are represented as a Twos Complement number, unlike
+' @return Returns a <a href="BigInteger.html">BigInteger</a> instance containing the opposite signed value.
+' @remarks Negative values are represented as a twos-complement number, unlike
 ' other systems used to represent a negative value. Any negation requires
-' the Twos Complement algorithm to be applied to the number. This keeps in step
+' the twos-complement algorithm to be applied to the number. This keeps in step
 ' with how users of VB already deal with negative numbers, helping to ease
 ' the transition to using BigInteger values.
-' <p>Values of Nothing will be treated as zero.</p>
+' <p>If <i>Value</i> is <b>Nothing</b> it will be treated as zero.</p>
 Public Function Negate(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     Set Negate = Value.Negate
@@ -249,19 +263,18 @@ End Function
 ''
 ' Returns the absolute (positive or zero) value of this instance.
 '
-' @param Value The BigInteger value to return the absolute value of.
-' @return Returns a positive (or zero) value of the current BigInteger instance.
+' @param Value The <a href="BigInteger.html">BigInteger</a> value to return the absolute value of.
+' @return Returns a positive (or zero) value of the current <a href="BigInteger.html">BigInteger</a> instance.
 ' @remarks If the value is already positive or zero, then the same object instance
 ' is returned. If the value is negative, then the negated value is returned.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' <p><i>Value</i> is <b>Nothing</b> it will be treated as zero.</p>
 Public Function Absolute(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     Set Absolute = Value.Absolute
 End Function
 
 ''
-' Adds two BigInteger value instances together, returning the sum.
+' Adds two <a href="BigInteger.html">BigInteger</a> value instances together, returning the sum.
 '
 ' @param Left The first value to add.
 ' @param Right The second value to add.
@@ -278,12 +291,12 @@ Public Function Add(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigI
 End Function
 
 ''
-' Subtracts one BigInteger value from another, returning the difference.
+' Subtracts one <a href="BigInteger.html">BigInteger</a> value from another, returning the difference.
 '
 ' @param Left The minuend value to be subracted from.
 ' @param Right The subtrahend value to subtract from the minuend value.
 ' @return The difference of the two values.
-' @remarks Values of Nothing will be treated as zero.
+' @remarks Values of <b>Nothing</b> will be treated as zero.
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = BigInteger.Subtract(BInt(100), BInt(150))
@@ -295,18 +308,17 @@ Public Function Subtract(ByVal Left As BigInteger, ByVal Right As BigInteger) As
 End Function
 
 ''
-' Multiplies BigInteger values, returning their product.
+' Multiplies <a href="BigInteger.html">BigInteger</a> values, returning their product.
 '
 ' @param Left The multiplicand to be multiplied.
 ' @param Right The multiplier to multiply by.
 ' @return The product of the two values.
-' @remarks Values of Nothing will be treated as zero.
+' @remarks Values of <b>Nothing</b> will be treated as zero.
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = BigInteger.Multiply(BInt(100), BInt(150))
 ' Debug.Print b.ToString '' 15000
 ' </pre>
-'
 Public Function Multiply(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
     Set Multiply = Left.Multiply(Right)
@@ -314,12 +326,12 @@ End Function
 
 
 ''
-' Divides one BigInteger value by another, returning the quotient.
+' Divides one <a href="BigInteger.html">BigInteger</a> value by another, returning the quotient.
 '
-' @param dividend The BigInteger value to be divided.
-' @param divisor The BigInteger value to divide by.
+' @param dividend The <a href="BigInteger.html">BigInteger</a> value to be divided.
+' @param divisor The <a href="BigInteger.html">BigInteger</a> value to divide by.
 ' @return The quotient of the division.
-' @remarks Values of Nothing will be treated as zero.
+' @remarks Values of <b>Nothing</b> will be treated as zero.
 ' <p>Integer division is applied, there is no rounding values. This method discards the remainder.</p>
 ' <pre>
 ' Dim b As BigInteger
@@ -333,13 +345,13 @@ Public Function Divide(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger
 End Function
 
 ''
-' Divides one BigInteger value by another, returning both the quotient and remainder.
+' Divides one <a href="BigInteger.html">BigInteger</a> value by another, returning both the quotient and remainder.
 '
-' @param dividend The BigInteger value to be divided.
-' @param divisor The BigInteger value to divide by.
+' @param dividend The <a href="BigInteger.html">BigInteger</a> value to be divided.
+' @param divisor The <a href="BigInteger.html">BigInteger</a> value to divide by.
 ' @param remainder A variable to place the remainder in to.
 ' @return The quotient of the division.
-' @remarks Values of Nothing will be treated as zero.
+' @remarks Values of <b>Nothing</b> will be treated as zero.
 ' <pre>
 ' Dim b As BigInteger
 ' Dim r As BigInteger
@@ -355,12 +367,12 @@ Public Function DivRem(ByVal Dividend As BigInteger, ByVal Divisor As BigInteger
 End Function
 
 ''
-' Returns the remainder of division between two BigInteger values.
+' Returns the remainder of division between two <a href="BigInteger.html">BigInteger</a> values.
 '
 ' @param dividend The value to be divided.
 ' @param divisor The value to divide by.
 ' @return Returns the remainder portion of the division operation.
-' @remarks Values of Nothing will be treated as zero.
+' @remarks Values of <b>Nothing</b> will be treated as zero.
 ' <pre>
 ' Dim b As BigInteger
 ' Set b = BInt(100)
@@ -373,13 +385,12 @@ Public Function Modulus(ByVal Dividend As BigInteger, ByVal Divisor As BigIntege
 End Function
 
 ''
-' Returns the greatest common divisor between the two BigInteger values.
+' Returns the greatest common divisor between the two <a href="BigInteger.html">BigInteger</a> values.
 '
 ' @param Left One of the values to find the GCD of.
 ' @param Right One of the values to find the GCD of.
 ' @return Returns the GCD for two given values.
-' @remarks Values of Nothing will be treated as zero.
-'
+' @remarks Values of <b>Nothing</b> will be treated as zero.
 Public Function GreatestCommonDivisor(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
     Set Right = ValueOrZero(Right)
@@ -402,45 +413,41 @@ Public Function GreatestCommonDivisor(ByVal Left As BigInteger, ByVal Right As B
 End Function
 
 ''
-' Tests a specific bit in the BigInteger number to determine if it is set (1) or not (0).
+' Tests a specific bit in the <a href="BigInteger.html">BigInteger</a> number to determine if it is set (1) or not (0).
 '
-' @param Value The BigInteger number to test the bit of.
+' @param Value The <a href="BigInteger.html">BigInteger</a> number to test the bit of.
 ' @param bit The bit to be tested.
 ' @return Returns True if the bit is set (1), false if it is not (0).
 ' @remarks The max value for bit is 2147483647. If the bit value is larger than
-' the BigInteger instance, then the sign of the number is used. This will represent
+' the <a href="BigInteger.html">BigInteger</a> instance, then the sign of the number is used. This will represent
 ' a negative number with infinite sign extension bits.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function TestBit(ByVal Value As BigInteger, ByVal Bit As Long) As Boolean
     Set Value = ValueOrZero(Value)
     TestBit = Value.TestBit(Bit)
 End Function
 
 ''
-' Sets the specified bit of the BigInteger instance to 1.
+' Sets the specified bit of the <a href="BigInteger.html">BigInteger</a> instance to 1.
 '
-' @param Value The BigInteger value to set the bit on.
+' @param Value The <a href="BigInteger.html">BigInteger</a> value to set the bit on.
 ' @param bit The bit to be set to 1.
-' @return A new BigInteger value with the bit set to 1.
+' @return A new <a href="BigInteger.html">BigInteger</a> value with the bit set to 1.
 ' @remarks If the bit specified is larger than the current instance
-' of the BigInteger value, then the new value will be extended to
-' include the bit being set.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' of the <a href="BigInteger.html">BigInteger</a> value, then the new value will be extended to include the bit being set.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function SetBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
     Set Value = ValueOrZero(Value)
     SetBit = Value.SetBit(Bit)
 End Function
 
 ''
-' Clears the specified bit of the BigInteger instance to 0.
+' Clears the specified bit of the <a href="BigInteger.html">BigInteger</a> instance to 0.
 '
-' @param Value The BigInteger value to clear the bit on.
+' @param Value The <a href="BigInteger.html">BigInteger</a> value to clear the bit on.
 ' @param bit The bit to be set to 0.
-' @return A new BigInteger value with the bit set to 0.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' @return A new <a href="BigInteger.html">BigInteger</a> value with the bit set to 0.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function ClearBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
     Set Value = ValueOrZero(Value)
     Set ClearBit = Value.ClearBit(Bit)
@@ -449,14 +456,13 @@ End Function
 ''
 ' Flips the specified bit, toggling between True and False.
 '
-' @param Value The BigInteger value to flip the bit on.
+' @param Value The <a href="BigInteger.html">BigInteger</a> value to flip the bit on.
 ' @param bit The bit to toggle.
-' @return A new BigInteger with the specified bit flipped.
+' @return A new <a href="BigInteger.html">BigInteger</a> with the specified bit flipped.
 ' @remarks If the bit specified is larger than the current instance
-' of the BigInteger value, then the new value will be extended to
+' of the <a href="BigInteger.html">BigInteger</a> value, then the new value will be extended to
 ' include the bit being flipped.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function FlipBit(ByVal Value As BigInteger, ByVal Bit As Long) As BigInteger
     Set Value = ValueOrZero(Value)
     Set FlipBit = Value.FlipBit(Bit)
@@ -467,8 +473,8 @@ End Function
 '
 ' @param Left The left hand value of the AND operation.
 ' @param Right The right hand value of the AND operation.
-' @return A new BigInteger value containing the performed bitwise AND result.
-' <p>Values of Nothing will be treated as zero.</p>
+' @return A new <a href="BigInteger.html">BigInteger</a> value containing the performed bitwise AND result.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function BitwiseAnd(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
     Set BitwiseAnd = Left.BitwiseAnd(Right)
@@ -479,8 +485,8 @@ End Function
 '
 ' @param Left The left hand value of the OR operation.
 ' @param Right The right hand value of the OR operation.
-' @return A new BigInteger value containing the performed bitwise OR result.
-' <p>Values of Nothing will be treated as zero.</p>
+' @return A new <a href="BigInteger.html">BigInteger</a> value containing the performed bitwise OR result.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function BitwiseOr(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
     Set BitwiseOr = Left.BitwiseOr(Right)
@@ -491,20 +497,19 @@ End Function
 '
 ' @param Left The left hand value of the XOR operation.
 ' @param Right The right hand value of the XOR operation.
-' @return A new BigInteger value containing the performed bitwise XOR result.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' @return A new <a href="BigInteger.html">BigInteger</a> value containing the performed bitwise XOR result.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function BitwiseXor(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
     Set BitwiseXor = Left.BitwiseXor(Right)
 End Function
 
 ''
-' Peforms a bitwise NOT of this BigInteger instance.
+' Peforms a bitwise NOT of this <a href="BigInteger.html">BigInteger</a> instance.
 '
-' @param Value The BigInteger to perform the NOT operation on.
-' @return A new BigInteger value containing the performed bitwise NOT result.
-' <p>Values of Nothing will be treated as zero.</p>
+' @param Value The <a href="BigInteger.html">BigInteger</a> to perform the NOT operation on.
+' @return A new <a href="BigInteger.html">BigInteger</a> value containing the performed bitwise NOT result.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function BitwiseNot(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     Set BitwiseNot = Value.BitwiseNot
@@ -515,7 +520,7 @@ End Function
 '
 ' @param Left The left hand value of the operation.
 ' @param Right The right hand value to be NOTted for the operation.
-' @return A new BigInteger value containing the performed bitwise result.
+' @return A new <a href="BigInteger.html">BigInteger</a> value containing the performed bitwise result.
 ' <p>Values of Nothing will be treated as zero.</p>
 Public Function BitwiseAndNot(ByVal Left As BigInteger, ByVal Right As BigInteger) As BigInteger
     Set Left = ValueOrZero(Left)
@@ -528,7 +533,7 @@ End Function
 ' @param Value The value to be raised to a specified power.
 ' @param Exponent The power to raise the value to.
 ' @return Returns the baseValue^exponent result.
-' @remarks Values of Nothing are treated as zero.
+' @remarks Values of <b>Nothing</b> are treated as zero.
 Public Function Pow(ByVal Value As BigInteger, ByVal Exponent As Long) As BigInteger
     If Exponent < 0 Then _
         Error.ArgumentOutOfRange "Exponent", ArgumentOutOfRange_NeedNonNegNum
@@ -571,27 +576,25 @@ Private Function CalculatePow(ByVal Value As BigInteger, ByVal Exponent As Long)
 End Function
 
 ''
-' Performs a modulo on a BigInteger value raised to a power. b = (x^y) mod z.
+' Performs a modulo on a <a href="BigInteger.html">BigInteger</a> value raised to a power. b = (x^y) mod z.
 '
 ' @param baseValue The value to be raised to the power of the exponent.
 ' @param exponent The power to raise the baseValue to.
 ' @param m The modulus value to perform on the raised baseValue.
 ' @return Returns the modulus of the raised baseValue.
-' <p>Values of Nothing are treated as zero.</p>
-'
+' <p>Values of <p>Nothing</p> are treated as zero.</p>
 Public Function ModPow(ByVal BaseValue As BigInteger, ByVal Exponent As BigInteger, ByVal m As BigInteger) As BigInteger
     Set BaseValue = Pow(BaseValue, Exponent)
     DivRem BaseValue, m, ModPow
 End Function
 
 ''
-' Returns the mininum of the two BigInteger values.
+' Returns the mininum of the two <a href="BigInteger.html">BigInteger</a> values.
 '
 ' @param x One of the two values to be tested.
 ' @param y One of the two values to be tested.
 ' @return If x is less or equal to y, then x is returned, otherwise y is returned.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function Min(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
     If Compare(x, y) <= 0 Then
         Set Min = x
@@ -601,13 +604,12 @@ Public Function Min(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
 End Function
 
 ''
-' Returns the maximum of the two BigInteger values.
+' Returns the maximum of the two <a href="BigInteger.html">BigInteger</a> values.
 '
 ' @param x One of the two values to be tested.
 ' @param y One of the two values to be tested.
 ' @return If x is equal or greater than y, then x is returned, otherwise y is returned.
-' <p>Values of Nothing will be treated as zero.</p>
-'
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function Max(ByVal x As BigInteger, ByVal y As BigInteger) As BigInteger
     If Compare(x, y) >= 0 Then
         Set Max = x
@@ -622,7 +624,6 @@ End Function
 ' @param Value The number used to randomize the Rnd method.
 ' @remarks This is provided because the VB Rnd function runs
 ' independently for each component.
-'
 Public Sub Randomize(Optional ByRef Value As Variant)
     VBA.Randomize Value
 End Sub
@@ -633,18 +634,16 @@ End Sub
 ' @param seed The number to be used as the seed.
 ' @remarks This is provided because the VB Rnd function runs
 ' independently for each component.
-'
 Public Sub SeedRnd(Optional ByRef seed As Variant)
     VBA.Rnd seed
 End Sub
 
 ''
-' Generates a random BigInteger number of the specified size.
+' Generates a random <a href="BigInteger.html">BigInteger</a> number of the specified size.
 '
 ' @param size The size of the number in bytes.
 ' @param IsNegative Indicates if a negative random number should be generated.
-' @return A new BigInteger of a random value.
-'
+' @return A new <a href="BigInteger.html">BigInteger</a> of a random value.
 Public Function Rnd(ByVal Size As Long, Optional ByVal IsNegative As Boolean = False) As BigInteger
     If Size < 0 Then _
         Error.ArgumentOutOfRange "Size", ArgumentOutOfRange_NeedNonNegNum
@@ -658,13 +657,13 @@ Public Function Rnd(ByVal Size As Long, Optional ByVal IsNegative As Boolean = F
 End Function
 
 ''
-' Performs a left shift operation on the BigInteger instance.
+' Performs a left shift operation on the <a href="BigInteger.html">BigInteger</a> instance.
 '
-' @param Value The BigInteger to shift left.
+' @param Value The <a href="BigInteger.html">BigInteger</a> to shift left.
 ' @param BitCount The number of bits the value is to be shifted left.
-' @return Returns a new BigInteger instance containing the shifted value.
-' @remarks If bitCount is negative, then a right shift is performed.
-' <p>Values of Nothing will be treated as zero.</p>
+' @return Returns a new <a href="BigInteger.html">BigInteger</a> instance containing the shifted value.
+' @remarks If BitCount is negative, then a right shift is performed.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function ShiftLeft(ByVal Value As BigInteger, ByVal BitCount As Long) As BigInteger
     Set Value = ValueOrZero(Value)
     Set ShiftLeft = Value.ShiftLeft(BitCount)
@@ -673,22 +672,21 @@ End Function
 ''
 ' Performs a bit shifting operation to the the right.
 '
-' @param Value The BigInteger to shift right.
-' @param BitCount The number of bits the BigInteger value is to be shifted.
-' @return Returns a new BigInteger instance containing the bit shifted value.
-' @remarks If bitCount is negative, then a left shift is performed.
-' <p>Values of Nothing will be treated as zero.</p>
+' @param Value The <a href="BigInteger.html">BigInteger</a> to shift right.
+' @param BitCount The number of bits the <a href="BigInteger.html">BigInteger</a> value is to be shifted.
+' @return Returns a new <a href="BigInteger.html">BigInteger</a> instance containing the bit shifted value.
+' @remarks If BitCount is negative, then a left shift is performed.
+' <p>Values of <b>Nothing</b> will be treated as zero.</p>
 Public Function ShiftRight(ByVal Value As BigInteger, ByVal BitCount As Long) As BigInteger
     Set Value = ValueOrZero(Value)
     Set ShiftRight = Value.ShiftRight(BitCount)
 End Function
 
 ''
-' Returns the integer square root of a BigInteger.
+' Returns the integer square root of a <a href="BigInteger.html">BigInteger</a>.
 '
 ' @param Value The value to calculate the integer square root for.
 ' @Return The integer square root of the value.
-'
 Public Function SquareRoot(ByVal Value As BigInteger) As BigInteger
     Set Value = ValueOrZero(Value)
     
@@ -716,11 +714,10 @@ Public Function SquareRoot(ByVal Value As BigInteger) As BigInteger
 End Function
 
 ''
-' Calculates the factorial of an integer value.
+' Calculates the factorial of a <a href="BigInteger.html">BigInteger</a> value.
 '
 ' @param Value The value to calculate the factorial of.
-' @return A BigInteger value of the factorial.
-'
+' @return A <a href="BigInteger.html">BigInteger</a> value of the factorial.
 Public Function Factorial(ByVal Value As BigInteger) As BigInteger
     Dim Result As BigInteger
     

@@ -81,6 +81,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Int64.MinusOne, Int64.MinusOne, Int64.Zero
             Test.Use Int64.MinusOne, Int64.One, NewInt64(&HFFFFFFFE, &HFFFFFFFF)
             Test.Use Int64.One, Int64.MinusOne, NewInt64(2, 0)
+            Test.Use NewInt64(&H0, &H1), Int64.One, NewInt64(&HFFFFFFFF, &H0)
+            Test.Use NewInt64(&HFFFFFFFF, &H1), Int64.One, NewInt64(&HFFFFFFFE, &H1)
+            Test.Use NewInt64(&H0, &H1), NewInt64(&HFFFFFFFF, 0), Int64.One
+            Test.Use NewInt64(&H0, &HFFFFFFFF), NewInt64(&H1, 0), NewInt64(&HFFFFFFFF, &HFFFFFFFE)
             
         Case "Multiply_WithValues_ReturnsExpected"
             Test.Use Int64.Zero, Int64.Zero, Int64.Zero
