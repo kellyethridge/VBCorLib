@@ -2288,30 +2288,30 @@ Private Sub Int32ToNumber(ByVal Value As Long)
 End Sub
 
 Private Sub Int64ToNumber(ByRef Value As Int64, ByRef Number As NumberType)
-    Dim DigitIndex As Long
-    Dim Ten As Int64
-    Dim Remainder As Int64
-    Dim v As Int64
-    Dim IsMaxNeg As Boolean
+    Dim DigitIndex  As Long
+    Dim Words       As QWordArray
+    Dim IsMaxNeg    As Boolean
         
-    v = Value
-    
-    If v.HighPart < 0 Then
-        If v.HighPart = &H80000000 And v.LowPart = 0 Then
+    If Value.HighPart < 0 Then
+        Number.IsNegative = BOOL_TRUE
+        
+        If Value.HighPart = &H80000000 And Value.LowPart = 0 Then
             IsMaxNeg = True
-            v.LowPart = 1
+            Words.Words(0) = &HFFFF
+            Words.Words(1) = &HFFFF
+            Words.Words(2) = &HFFFF
+            Words.Words(3) = &H7FFF
+        Else
+            AssignQWord Statics.Int64.Negate(Value), Words
         End If
-        
-        v = Statics.Int64.Negate(v)
+    Else
+        AssignQWord Value, Words
     End If
         
-    Ten.LowPart = 10
     ReDim Number.Digits(0 To 19)
-    Number.IsNegative = Value.HighPart < 0
     
-    Do While Not Statics.Int64.IsZero(v)
-        v = Statics.Int64.DivRem(v, Ten, Remainder)
-        Number.Digits(DigitIndex) = Remainder.LowPart + vbZeroChar
+    Do While (Words.Words(0) Or Words.Words(1) Or Words.Words(2) Or Words.Words(3)) <> 0
+        Number.Digits(DigitIndex) = InPlaceDivideBy10(Words) + vbZeroChar
         DigitIndex = DigitIndex + 1
     Loop
         
@@ -2337,6 +2337,27 @@ Private Sub Int64ToNumber(ByRef Value As Int64, ByRef Number As NumberType)
         End If
     End If
 End Sub
+
+Private Function InPlaceDivideBy10(ByRef Value As QWordArray) As Long
+    Dim r As Long
+    Dim i As Long
+    Dim d As Long
+
+    For i = 3 To 0 Step -1
+        r = (r * vbShift16Bits) + (Value.Words(i) And &HFFFF&)
+        d = r \ 10
+
+#If Release Then
+        Value.Words(i) = d And &HFFFF&
+#Else
+        Value.Words(i) = AsWord(d)
+#End If
+
+        r = r - (d * 10)
+    Next
+
+    InPlaceDivideBy10 = r
+End Function
 
 Private Sub DoubleToNumber(ByVal Value As Double, ByVal FormatPrecision As Long)
     ClearOutput

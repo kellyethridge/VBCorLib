@@ -363,7 +363,7 @@ Public Function DivRem(ByRef Dividend As Int64, ByRef Divisor As Int64, ByRef Re
     
     Remainder.HighPart = 0
     Remainder.LowPart = 0
-    
+
     ' perform a couple of quick checks that have an easy result.
     If IsZero(Dividend) Then
         Exit Function
@@ -371,7 +371,7 @@ Public Function DivRem(ByRef Dividend As Int64, ByRef Divisor As Int64, ByRef Re
         DivRem = Dividend
         Exit Function
     End If
-    
+
     If Divisor.HighPart And &H80000000 Then
         If Dividend.HighPart And &H80000000 Then
             DivideCore Negate(Dividend), Negate(Divisor), DivRem, Remainder
@@ -752,7 +752,6 @@ Finally:
 End Sub
 
 
-
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -764,7 +763,7 @@ End Sub
 Private Sub MultiplyPositives(ByRef a As Int64, ByRef b As Int64, ByRef Result As Int64)
     Dim u As QWordArray
     Dim v As QWordArray
-    Dim r As QWordArray
+    Dim R As QWordArray
     Dim i As Long
     Dim j As Long
     Dim k As Long
@@ -779,18 +778,18 @@ Private Sub MultiplyPositives(ByRef a As Int64, ByRef b As Int64, ByRef Result A
                 
         For j = 0 To 3
 #If Release Then
-            k = d * (u.Words(j) And &HFFFF&) + (r.Words(j) And &HFFFF&) + k
-            r.Words(j) = k And &HFFFF&
+            k = d * (u.Words(j) And &HFFFF&) + (R.Words(j) And &HFFFF&) + k
+            R.Words(j) = k And &HFFFF&
             k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
 #Else
-            k = UInt16x16To32(d, u.Words(j)) + (r.Words(j) And &HFFFF&) + k
-            r.Words(j) = AsWord(k)
+            k = UInt16x16To32(d, u.Words(j)) + (R.Words(j) And &HFFFF&) + k
+            R.Words(j) = AsWord(k)
             k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
 #End If
         Next
     Next
     
-    AssignQWord r, Result
+    AssignQWord R, Result
 End Sub
 
 #If Not Release Then
@@ -854,7 +853,21 @@ Private Sub DivideCore(ByRef Dividend As Int64, ByRef Divisor As Int64, ByRef Qu
 End Sub
 
 Private Sub InPlaceSubtract(ByRef a As Int64, ByRef b As Int64)
+#If Release Then
+    Dim LowPart As Long
+    
+    LowPart = a.LowPart - b.LowPart
+    
+    If (LowPart + &H80000000) > (a.LowPart + &H80000000) Then
+        a.HighPart = a.HighPart - b.HighPart - 1
+    Else
+        a.HighPart = a.HighPart - b.HighPart
+    End If
+    
+    a.LowPart = LowPart
+#Else
     AsCurr(a) = AsCurr(a) - AsCurr(b)
+#End If
 End Sub
 
 Private Sub InPlaceShiftLeftOne(ByRef Value As Int64)
