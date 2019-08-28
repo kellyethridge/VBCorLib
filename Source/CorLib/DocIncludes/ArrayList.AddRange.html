@@ -27,57 +27,51 @@ elements, then a <b>Queue</b> is filled with additional elements that
 will be added to the <b>ArrayList</b> using AddRange.
 <pre>
 Private Sub Main()
-    Dim list As New ArrayList
+    Dim List As New ArrayList
     
     '' add several elements to the ArrayList
-    list.Add "Humpty"
-    list.Add "Dumpty"
-    list.Add "sat"
-    list.Add "on"
-    list.Add "a"
-    list.Add "wall."
+    List.Add "Humpty"
+    List.Add "Dumpty"
+    List.Add "sat"
+    List.Add "on"
+    List.Add "a"
+    List.Add "wall."
     
     '' Display the contents of the ArrayList
     Console.WriteLine "The ArrayList initially contains:"
-    PrintValues list
+    PrintValues List
     
-    Dim que As New Queue
-    que.Enqueue "Humpty"
-    que.Enqueue "Dumpty"
-    que.Enqueue "had"
-    que.Enqueue "a"
-    que.Enqueue "great"
-    que.Enqueue "fall."
+    Dim Que As New Queue
+    Que.Enqueue "Humpty"
+    Que.Enqueue "Dumpty"
+    Que.Enqueue "had"
+    Que.Enqueue "a"
+    Que.Enqueue "great"
+    Que.Enqueue "fall."
     
     '' Display the contents of the Queue
     Console.WriteLine "The Queue initially contains:"
-    PrintValues que
+    PrintValues Que
     
     '' Add the elements in the Queue to the ArrayList
-    list.AddRange que
+    List.AddRange Que
     
     '' Display the new contents of the ArrayList
     Console.WriteLine "The ArrayList with the elements from the Queue:"
-    PrintValues list
+    PrintValues List
     
-    '' Wait for user to press return key
-    Console.ReadLine
-    
+    Console.ReadKey
 End Sub
 
-Private Sub PrintValues(ByVal en As IEnumerable)
-    Const Space As String = " "
-    
-    Dim value As Variant
+Private Sub PrintValues(ByVal Source As IEnumerable)
+    Dim Value As Variant
     
     Console.WriteValue vbTab
     
-    '' Iterate over the list
-    For Each value In en
-        '' Write each value onto the same line
-        Console.WriteValue value
-        Console.WriteValue Space
-    Next value
+    For Each Value In Source
+        Console.WriteValue "{0} ", Value
+    Next Value
+    
     Console.WriteLine
 End Sub
 

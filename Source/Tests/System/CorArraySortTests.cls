@@ -74,16 +74,6 @@ Public Sub Sort_WithMultiDimensionArray_ThrowsRankException()
     AssertRankException Err
 End Sub
 
-'Public Sub Sort_WithNonComparableValues_ThrowsInvalidOperationException()
-'    Dim Arr As Variant
-'    Arr = Array(3, 2, "4", 1)
-'
-'    On Error Resume Next
-'    CorArray.Sort Arr
-'
-'    AssertInvalidOperationException Err
-'End Sub
-
 Public Sub Sort_WithInvalidComparer_ThrowsArgumentException()
     Dim Arr(0) As Long
     
@@ -121,15 +111,6 @@ Public Sub Sort_WithCallback_SortsItems(ByRef Items As Variant, ByVal Callback A
     Assert.That Items, Iz.Ordered
 End Sub
 
-'Public Sub Sort_WithCallback_SortsStrings()
-'    Dim a() As String
-'    a = NewStrings("c", "d", "a", "B", "A")
-'
-'    CorArray.Sort a, AddressOf CompareStringsAscending
-'
-'    Assert.That a, Iz.Ordered
-'End Sub
-
 Public Sub Sort_WithUDTsUsingCallback_SortsUDTs()
     Dim a(4) As VBGUID
     a(0).Data1 = 3
@@ -143,6 +124,18 @@ Public Sub Sort_WithUDTsUsingCallback_SortsUDTs()
     Assert.That a, Iz.Ordered.Using(New VBGuidComparer)
 End Sub
 
+Public Sub Sort_LargeUdtsUsingCallback_SortsUdts()
+    Dim Udts(4) As LargeUdt
+    Udts(0).Value = 3
+    Udts(1).Value = 2
+    Udts(2).Value = 4
+    Udts(3).Value = 1
+    Udts(4).Value = 6
+    
+    CorArray.Sort Udts, AddressOf CompareLargeUdts
+    
+    Assert.That Udts, Iz.Ordered.Using(New LargeUdtComparer)
+End Sub
 
 Public Sub Sort_WithNonZeroLBound_SortsValues()
     Dim Arr(5 To 9) As Long

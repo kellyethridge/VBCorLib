@@ -68,7 +68,7 @@ Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Lon
     
     On Error GoTo Catch
     
-    If pSAItems <> 0 Then
+    If pSAItems <> vbNullPtr Then
         InitSortItems pSAItems
     Else
         mHasSortItems = False
@@ -94,19 +94,12 @@ Friend Sub Sort(ByVal pSAKeys As Long, ByVal pSAItems As Long, ByVal Left As Lon
             With mKeyItems
                 CopyMemory .SA, ByVal pSAKeys, vbSizeOfSafeArray1d
                 mElemSize = .SA.cbElements
+                mPVData = .SA.pvData
                 mPivotBuffer = CoTaskMemAlloc(mElemSize)
                 .Buffer = CoTaskMemAlloc(mElemSize)
-                mPVData = .SA.pvData
                 SortAny Left, Right
-                CoTaskMemFree .Buffer
-                CoTaskMemFree mPivotBuffer
             End With
     End Select
-    
-    If mSortItems.Buffer Then
-        CoTaskMemFree mSortItems.Buffer
-        mSortItems.Buffer = 0
-    End If
     
     GoSub Finally
     Exit Sub
@@ -115,6 +108,27 @@ Catch:
     GoSub Finally
     ThrowOrErr Err
 Finally:
+    SAPtr(mInt8) = vbNullPtr
+    SAPtr(mInt16) = vbNullPtr
+    SAPtr(mInt32) = vbNullPtr
+    SAPtr(mInt64) = vbNullPtr
+    SAPtr(mInt128) = vbNullPtr
+    
+    If mSortItems.Buffer Then
+        CoTaskMemFree mSortItems.Buffer
+        mSortItems.Buffer = vbNullPtr
+    End If
+    
+    If mPivotBuffer Then
+        CoTaskMemFree mPivotBuffer
+        mPivotBuffer = vbNullPtr
+    End If
+    
+    If mKeyItems.Buffer Then
+        CoTaskMemFree mKeyItems.Buffer
+        mKeyItems.Buffer = vbNullPtr
+    End If
+    
     Set mComparer = Nothing
     Return
 End Sub
@@ -293,16 +307,4 @@ Private Sub SortAny(ByVal Left As Long, ByVal Right As Long)
             Right = j
         End If
     Loop
-End Sub
-
-
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-'   Constructors
-'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub Class_Terminate()
-    SAPtr(mInt8) = vbNullPtr
-    SAPtr(mInt16) = vbNullPtr
-    SAPtr(mInt32) = vbNullPtr
-    SAPtr(mInt64) = vbNullPtr
-    SAPtr(mInt128) = vbNullPtr
 End Sub

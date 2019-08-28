@@ -1,0 +1,34 @@
+<pre>
+Private Sub Main()
+    Dim List As New ArrayList
+    List.AddRange Array(1, 2, 3)
+    
+    Console.WriteLine "Initial contents of ArrayList"
+    PrintList List
+    
+    List(1) = "Changed"
+    
+    Console.WriteLine "Updated contents of ArrayList"
+    PrintList List
+    
+    Console.ReadKey
+End Sub
+
+Private Sub PrintList(ByVal List As ArrayList)
+    Dim Item As Variant
+    
+    Console.WriteValue vbTab
+
+    For Each Item In List
+        Console.WriteValue "{0} ", Item
+    Next
+    
+    Console.WriteLine
+End Sub
+
+'' The output is:
+'' Initial contents of ArrayList
+''     1 2 3
+'' Updated contents of ArrayList
+''     1 Changed 3
+</pre>

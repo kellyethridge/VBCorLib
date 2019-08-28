@@ -52,84 +52,88 @@ Public Function FindInt32Callback(ByRef Value As Int32) As Boolean
     FindInt32Callback = Value.Value = CLng(FindCallbackValue)
 End Function
 
-Public Function CompareLongs(ByRef X As Long, ByRef Y As Long) As Long
-    If X > Y Then
+Public Function CompareLongs(ByRef x As Long, ByRef y As Long) As Long
+    If x > y Then
         CompareLongs = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         CompareLongs = -1
     End If
 End Function
 
-Public Function CompareIntegers(ByRef X As Integer, ByRef Y As Integer) As Long
-    If X > Y Then
+Public Function CompareIntegers(ByRef x As Integer, ByRef y As Integer) As Long
+    If x > y Then
         CompareIntegers = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         CompareIntegers = -1
     End If
 End Function
 
-Public Function CompareStrings(ByRef X As String, ByRef Y As String) As Long
-    CompareStrings = StrComp(X, Y, vbBinaryCompare)
+Public Function CompareStrings(ByRef x As String, ByRef y As String) As Long
+    CompareStrings = StrComp(x, y, vbBinaryCompare)
 End Function
 
-Public Function CompareDoubles(ByRef X As Double, ByRef Y As Double) As Long
-    If X > Y Then
+Public Function CompareDoubles(ByRef x As Double, ByRef y As Double) As Long
+    If x > y Then
         CompareDoubles = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         CompareDoubles = -1
     End If
 End Function
 
-Public Function CompareSingles(ByRef X As Single, ByRef Y As Single) As Long
-    If X > Y Then
+Public Function CompareSingles(ByRef x As Single, ByRef y As Single) As Long
+    If x > y Then
         CompareSingles = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         CompareSingles = -1
     End If
 End Function
 
-Public Function CompareBytes(ByRef X As Byte, ByRef Y As Byte) As Long
-    If X > Y Then
+Public Function CompareBytes(ByRef x As Byte, ByRef y As Byte) As Long
+    If x > y Then
         CompareBytes = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         CompareBytes = -1
     End If
 End Function
 
-Public Function CompareBooleans(ByRef X As Boolean, ByRef Y As Boolean) As Long
-    If X > Y Then
+Public Function CompareBooleans(ByRef x As Boolean, ByRef y As Boolean) As Long
+    If x > y Then
         CompareBooleans = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         CompareBooleans = -1
     End If
 End Function
 
-Public Function CompareDates(ByRef X As Date, ByRef Y As Date) As Long
-    CompareDates = DateDiff("s", Y, X)
+Public Function CompareDates(ByRef x As Date, ByRef y As Date) As Long
+    CompareDates = DateDiff("s", y, x)
 End Function
 
-Public Function CompareCurrencies(ByRef X As Currency, ByRef Y As Currency) As Long
-    If X > Y Then
+Public Function CompareCurrencies(ByRef x As Currency, ByRef y As Currency) As Long
+    If x > y Then
         CompareCurrencies = 1
-    ElseIf X < Y Then
+    ElseIf x < y Then
         CompareCurrencies = -1
     End If
 End Function
 
-Public Function CompareVariants(ByRef X As Variant, ByRef Y As Variant) As Long
-    CompareVariants = Comparer.Default.Compare(X, Y)
+Public Function CompareVariants(ByRef x As Variant, ByRef y As Variant) As Long
+    CompareVariants = Comparer.Default.Compare(x, y)
 End Function
 
-Public Function CompareComparables(ByRef X As Object, ByRef Y As Variant) As Long
+Public Function CompareComparables(ByRef x As Object, ByRef y As Variant) As Long
     Dim XComparable As IComparable
-    Set XComparable = X
-    CompareComparables = XComparable.CompareTo(Y)
+    Set XComparable = x
+    CompareComparables = XComparable.CompareTo(y)
 End Function
 
-Public Function CompareVBGuids(ByRef X As VBGUID, ByRef Y As VBGUID) As Long
-    If X.Data1 < Y.Data1 Then
+Public Function CompareVBGuids(ByRef x As VBGUID, ByRef y As VBGUID) As Long
+    If x.Data1 < y.Data1 Then
         CompareVBGuids = -1
-    ElseIf X.Data1 > Y.Data1 Then
+    ElseIf x.Data1 > y.Data1 Then
         CompareVBGuids = 1
     End If
+End Function
+
+Public Function CompareLargeUdts(ByRef x As LargeUdt, ByRef y As LargeUdt) As Long
+    CompareLargeUdts = CompareLongs(x.Value, y.Value)
 End Function

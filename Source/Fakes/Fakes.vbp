@@ -19,6 +19,7 @@ Class=NullEncoderFallbackBuffer; NullEncoderFallbackBuffer.cls
 Class=NullEncoderFallback; NullEncoderFallback.cls
 Class=FakePictureResourceInfo; FakePictureResourceInfo.cls
 Class=FakeStructures; FakeStructures.cls
+Class=FakeTypes; FakeTypes.cls
 Startup="(None)"
 Command32=""
 Name="Fakes"

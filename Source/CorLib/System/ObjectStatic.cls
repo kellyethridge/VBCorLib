@@ -106,8 +106,9 @@ End Function
 '
 ' @param ObjA The first value to compare with.
 ' @param ObjB The second value to compare.
-' @return Returns True if the value and the object are the same instance, False otherwise.
-'
+' @return <b>True</b> if the value and the object are the same instance; <b>False</b> otherwise.
+' @remarks The two values must be of the same data-type to successfully be compared. For example
+' a <b>vbLong</b> value of 1 will not be considered equal to a <b>vbInteger</b> value of 1.
 Public Function Equals(ByRef ObjA As Variant, ByRef ObjB As Variant) As Boolean
     Dim Obj As IObject
     
