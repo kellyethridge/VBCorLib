@@ -99,12 +99,10 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
     Dim FoundExponent       As Boolean
     Dim Exponent            As Long
     Dim DecimalPlaces       As Long
-    Dim Ten                 As Int64
     Dim Char64              As Int64
     Dim IsNegative          As Boolean
     Dim IsMaxValue          As Boolean
     
-    Ten.LowPart = 10
     NegativeSign = AscW(Info.NegativeSign)
     PositiveSign = AscW(Info.PositiveSign)
     CurrencySymbol = AscW(Info.CurrencySymbol)
@@ -125,20 +123,7 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 End If
                 
                 If Not FoundDecimal Then
-                    ' For each digit we will multiply by ten then
-                    ' add the digit to the current number. Since
-                    ' multiplying by ten is the same as shifting
-                    ' the number left 3 bits (X8) and shifting
-                    ' the number by 1 byte (X2) and summing the
-                    ' results, we do a check here to see if
-                    ' multiplying by 8 will push any upper bits
-                    ' into the high-bit or off the end of the number.
-                    ' If that happens, then we will have overflowed.
-                    If n.HighPart And &H70000000 Then
-                        GoTo OverflowError
-                    End If
-                
-                    n = Statics.Int64.Multiply(n, Ten)
+                    CheckedInPlaceMultiplyBy10 n
                     
                     ' After multiplying by ten we want to simply
                     ' add the digit to the current number. However,
@@ -167,17 +152,15 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                         End If
                     End If
                     
-                    Char64.LowPart = Ch - vbZeroChar
-                    n = Statics.Int64.Add(n, Char64)
+                    InPlaceAdd n, Ch - vbZeroChar
                 Else
                     If Style And NumberStyles.AllowExponent Then
                         ' we are allowing a possible exponent value to be parsed,
                         ' so if we have encountered a decimal point, we need to
                         ' continue parsing digits and also count how many
                         ' decimal places we have gone.
-                        n = Statics.Int64.Multiply(n, Ten)
-                        Char64.LowPart = Ch - vbZeroChar
-                        n = Statics.Int64.Add(n, Char64)
+                        CheckedInPlaceMultiplyBy10 n
+                        InPlaceAdd n, Ch - vbZeroChar
                         DecimalPlaces = DecimalPlaces + 1
                     Else
                         If Ch <> vbZeroChar Then
@@ -299,7 +282,7 @@ Continue:
         End If
     
         Do While Exponent - DecimalPlaces > 0
-            n = Statics.Int64.Multiply(n, Ten)
+            CheckedInPlaceMultiplyBy10 n
             Exponent = Exponent - 1
         Loop
     End If
@@ -324,6 +307,47 @@ OverflowError:
 Finally:
     FreeChars Chars
 End Function
+
+Private Sub CheckedInPlaceMultiplyBy10(ByRef n As Int64)
+    Dim Words As QWordArray
+    Dim k As Long
+    Dim i As Long
+    
+    AssignQWord n, Words
+    
+    For i = 0 To 3
+        k = (Words.Words(i) And &HFFFF&) * 10 + (((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&)
+        
+#If Release Then
+        Words.Words(i) = k And &HFFFF&
+#Else
+        Words.Words(i) = AsWord(k)
+#End If
+    Next
+    
+    If k And &HFFFF8000 Then _
+        Throw New OverflowException
+        
+    AssignQWord Words, n
+End Sub
+
+Private Sub InPlaceAdd(ByRef n As Int64, ByVal Value As Long)
+#If Release Then
+    Dim LowPart As Long
+        
+    Debug.Assert Value >= 0 And Value <= 9
+    
+    LowPart = n.LowPart + Value
+    
+    If (LowPart - &H80000000) < (n.LowPart - &H80000000) Then
+        n.HighPart = n.HighPart + 1
+    End If
+    
+    n.LowPart = LowPart
+#Else
+    AsCurr(n) = AsCurr(n) + AsCurr(Value)
+#End If
+End Sub
 
 Private Function TryParseExponent(ByRef Chars() As Integer, ByRef Index As Long, ByRef Exponent As Long) As Boolean
     Dim Ch          As Integer

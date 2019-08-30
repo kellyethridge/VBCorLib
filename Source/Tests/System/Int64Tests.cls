@@ -397,6 +397,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 9.22337203685478E+18
             Test.Use 9.22337203685477E+19
             
+        Case "Parse_WithMoreThanMaxValue_ThrowsOverflowException"
+            Test.Use "9223372036854775808"
+            Test.Use "9223372036854775809"
+            Test.Use "9223372036854775810"
+            Test.Use "9223372036854775817"
+            Test.Use "9223372036854775818"
+            Test.Use "9223372036854775820"
+            
     End Select
 End Sub
 
@@ -697,11 +705,10 @@ Public Sub Parse_WithTooManyDigits_ThrowsOverflowException()
     AssertOverflowException Err
 End Sub
 
-Public Sub Parse_WithOneMoreThanMaxValue_ThrowsOverflowException()
-    Const M As String = "9223372036854775809"
+Public Sub Parse_WithMoreThanMaxValue_ThrowsOverflowException(ByVal s As String)
     On Error Resume Next
     
-    Int64.Parse M
+    Int64.Parse s
     
     AssertOverflowException Err
 End Sub
