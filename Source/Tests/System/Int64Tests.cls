@@ -304,6 +304,10 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "0xffffffffffffffff", Int64.MinusOne
             Test.Use "&H8000000000000000", Int64.MinValue
             Test.Use "&H7fffffffffffffff", Int64.MaxValue
+            Test.Use "&H7fffffffffffffff", Int64.MaxValue
+            Test.Use "&H07fffffffffffffff", Int64.MaxValue
+            Test.Use "&H00007fffffffffffffff", Int64.MaxValue
+            Test.Use "&H000007fffffffffffffff", Int64.MaxValue
             
         Case "ParseEx_WithInvalidValueAndAllowHexSpecifier_ThrowsFormatException"
             Test.Use "-1"
@@ -404,6 +408,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "9223372036854775817"
             Test.Use "9223372036854775818"
             Test.Use "9223372036854775820"
+            Test.Use "&h1ffffffffffffffff"
             
     End Select
 End Sub

@@ -311,6 +311,7 @@ Public Enum ResourceStringKey
     ObjectDisposed_RegKeyClosed = 1205
     
     Overflow_TimeSpan = 1300
+    Overflow_Int64 = 1301
     
     UnknownError_Num = 1500
     

@@ -37,7 +37,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private mError      As ParseError
+Private mError As ParseError
 
 
 Friend Property Get Error() As ParseError
@@ -48,6 +48,7 @@ Friend Function TryParse(ByRef s As String, ByVal Style As NumberStyles, ByVal P
     Dim Info As NumberFormatInfo
     Dim HasPrefix As Boolean
     
+    mError = ParseError.None
     Result.LowPart = 0
     Result.HighPart = 0
     
@@ -326,7 +327,7 @@ Private Sub CheckedInPlaceMultiplyBy10(ByRef n As Int64)
     Next
     
     If k And &HFFFF8000 Then _
-        Throw New OverflowException
+        Throw Cor.NewOverflowException(Environment.GetResourceString(Overflow_Int64))
         
     AssignQWord Words, n
 End Sub
@@ -400,6 +401,10 @@ Private Function TryParseHex(ByRef s As String, ByVal HasPrefix As Boolean, ByVa
     For i = UBound(Chars) To MinIndex Step -1
         Select Case Chars(i)
             Case vbZeroChar
+                If Section > 4 Then
+                    GoTo Continue
+                End If
+                
                 Ch = 0
                 FoundDigits = True
             Case vbOneChar To vbNineChar
@@ -413,16 +418,16 @@ Private Function TryParseHex(ByRef s As String, ByVal HasPrefix As Boolean, ByVa
                 FoundDigits = True
             Case vbTabChar, vbLfChar, vbVtChar, vbFfChar, vbCrChar, vbSpaceChar
                 If ((Style And NumberStyles.AllowLeadingWhite) = 0) And FoundDigits Then
-                    GoTo Finally
+                    GoTo FormatError
                 End If
 
                 If ((Style And NumberStyles.AllowTrailingWhite) = 0) And Not FoundDigits Then
-                    GoTo Finally
+                    GoTo FormatError
                 End If
 
                 GoTo Continue
             Case Else
-                GoTo Finally
+                GoTo FormatError
         End Select
 
         k = k Or (Ch * j)
@@ -439,7 +444,7 @@ Private Function TryParseHex(ByRef s As String, ByVal HasPrefix As Boolean, ByVa
                 Case 4
                     n.HighPart = n.HighPart Or ShiftLeftInt32(k, 16)
                 Case Else
-                    GoTo Finally
+                    GoTo OverflowError
             End Select
             
             Section = Section + 1
@@ -461,11 +466,16 @@ Continue:
             Case 4
                 n.HighPart = n.HighPart Or ShiftLeftInt32(k, 16)
             Case Else
-                GoTo Finally
+                GoTo OverflowError
         End Select
     End If
     TryParseHex = True
-
+    
+FormatError:
+    mError = ParseError.FormatError
+    GoTo Finally
+OverflowError:
+    mError = ParseError.OverflowError
 Finally:
     FreeChars Chars
 End Function

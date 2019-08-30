@@ -64,7 +64,7 @@ End Property
 Friend Function TryParse(ByRef s As String, ByRef RetVal As TimeSpan) As Boolean
     Dim Sign    As Long
     Dim Result  As Currency
-        
+    
     Init s
     NextChar
     SkipBlanks
