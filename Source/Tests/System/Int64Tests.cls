@@ -69,11 +69,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Int64.Zero, Int64.Zero, Int64.Zero
             Test.Use Int64.Zero, Int64.One, Int64.One
             Test.Use NewInt64(&HFFFFFFFF, 0), Int64.One, NewInt64(0, &H1)
+            Test.Use Int64.One, NewInt64(&HFFFFFFFF, 0), NewInt64(0, &H1)
+            Test.Use NewInt64(&H7FFFFFFF, 0), Int64.One, NewInt64(&H80000000, &H0)
+            Test.Use Int64.One, NewInt64(&H7FFFFFFF, 0), NewInt64(&H80000000, &H0)
             Test.Use NewInt64(&HFFFFFFFF, 0), NewInt64(&HFFFFFFFF, 0), NewInt64(&HFFFFFFFE, &H1)
             Test.Use Int64.MinusOne, Int64.One, Int64.Zero
             Test.Use Int64.One, Int64.MinusOne, Int64.Zero
             Test.Use Int64.MinusOne, Int64.MinusOne, NewInt64(&HFFFFFFFE, &HFFFFFFFF)
             Test.Use NewInt64(0, 1), NewInt64(&H80000000, &HFFFFFFFF), NewInt64(&H80000000, 0)
+            Test.Use NewInt64(&H80000000, &HFFFFFFFF), NewInt64(0, 1), NewInt64(&H80000000, 0)
             
         Case "Subract_WithValues_ReturnsExpected"
             Test.Use Int64.Zero, Int64.Zero, Int64.Zero
