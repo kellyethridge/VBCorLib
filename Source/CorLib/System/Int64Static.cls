@@ -523,12 +523,7 @@ End Function
 ' <p>The <i>s</i> parameter is interpreted using the <a href="NumberFormatInfoStatic.NumberStyles.html">NumberStyles.Integer</a> style. In addition to decimal digits, only leading and trailing spaces together with a leading sign are allowed. To explicitly define the style elements that can be present in <i>s</i>, use <a href="Int64Static.ParseEx.html">Int64.ParseEx(String, NumberStyles)</a> or the <a href="Int64Static.ParseEx.html">Int64.Parse(String, NumberStyles, IFormatProvider)</a> method.</p>
 Public Function Parse(ByRef s As String) As Int64
     If Not TryParse(s, Parse) Then
-        Select Case mParser.Error
-            Case ParseError.FormatError
-                Error.Format Format_InvalidString
-            Case ParseError.OverflowError
-                Throw New OverflowException
-        End Select
+        mParser.ThrowError
     End If
 End Function
 
@@ -582,9 +577,7 @@ End Function
 ' </table>
 Public Function ParseEx(ByRef s As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider) As Int64
     If Not TryParseEx(s, Style, Provider, ParseEx) Then
-        If mParser.Error = FormatError Then
-            Error.Format Format_InvalidString
-        End If
+        mParser.ThrowError
     End If
 End Function
 
@@ -763,7 +756,7 @@ End Sub
 Private Sub MultiplyPositives(ByRef a As Int64, ByRef b As Int64, ByRef Result As Int64)
     Dim u As QWordArray
     Dim v As QWordArray
-    Dim R As QWordArray
+    Dim r As QWordArray
     Dim i As Long
     Dim j As Long
     Dim k As Long
@@ -778,18 +771,18 @@ Private Sub MultiplyPositives(ByRef a As Int64, ByRef b As Int64, ByRef Result A
                 
         For j = 0 To 3
 #If Release Then
-            k = d * (u.Words(j) And &HFFFF&) + (R.Words(j) And &HFFFF&) + k
-            R.Words(j) = k And &HFFFF&
+            k = d * (u.Words(j) And &HFFFF&) + (r.Words(j) And &HFFFF&) + k
+            r.Words(j) = k And &HFFFF&
             k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
 #Else
-            k = UInt16x16To32(d, u.Words(j)) + (R.Words(j) And &HFFFF&) + k
-            R.Words(j) = AsWord(k)
+            k = UInt16x16To32(d, u.Words(j)) + (r.Words(j) And &HFFFF&) + k
+            r.Words(j) = AsWord(k)
             k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
 #End If
         Next
     Next
     
-    AssignQWord R, Result
+    AssignQWord r, Result
 End Sub
 
 #If Not Release Then

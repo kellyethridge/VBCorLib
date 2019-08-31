@@ -40,9 +40,14 @@ Option Explicit
 Private mError As ParseError
 
 
-Friend Property Get Error() As ParseError
-    Error = mError
-End Property
+Friend Sub ThrowError()
+    Select Case mError
+        Case ParseError.FormatError
+            Error.Format Format_InvalidString
+        Case ParseError.OverflowError
+            Throw Cor.NewOverflowException(Environment.GetResourceString(Overflow_Int64))
+    End Select
+End Sub
 
 Friend Function TryParse(ByRef s As String, ByVal Style As NumberStyles, ByVal Provider As IFormatProvider, ByRef Result As Int64) As Boolean
     Dim Info As NumberFormatInfo
@@ -124,7 +129,9 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                 End If
                 
                 If Not FoundDecimal Then
-                    CheckedInPlaceMultiplyBy10 n
+                    If Not CheckedInPlaceMultiplyBy10(n) Then
+                        GoTo Finally
+                    End If
                     
                     ' After multiplying by ten we want to simply
                     ' add the digit to the current number. However,
@@ -160,7 +167,10 @@ Private Function TryParseDecimal(ByRef s As String, ByVal Style As NumberStyles,
                         ' so if we have encountered a decimal point, we need to
                         ' continue parsing digits and also count how many
                         ' decimal places we have gone.
-                        CheckedInPlaceMultiplyBy10 n
+                        If Not CheckedInPlaceMultiplyBy10(n) Then
+                            GoTo Finally
+                        End If
+                        
                         InPlaceAdd n, Ch - vbZeroChar
                         DecimalPlaces = DecimalPlaces + 1
                     Else
@@ -309,7 +319,7 @@ Finally:
     FreeChars Chars
 End Function
 
-Private Sub CheckedInPlaceMultiplyBy10(ByRef n As Int64)
+Private Function CheckedInPlaceMultiplyBy10(ByRef n As Int64) As Boolean
     Dim Words As QWordArray
     Dim k As Long
     Dim i As Long
@@ -326,11 +336,14 @@ Private Sub CheckedInPlaceMultiplyBy10(ByRef n As Int64)
 #End If
     Next
     
-    If k And &HFFFF8000 Then _
-        Throw Cor.NewOverflowException(Environment.GetResourceString(Overflow_Int64))
-        
     AssignQWord Words, n
-End Sub
+    
+    If k And &HFFFF8000 Then
+        mError = ParseError.OverflowError
+    Else
+        CheckedInPlaceMultiplyBy10 = True
+    End If
+End Function
 
 Private Sub InPlaceAdd(ByRef n As Int64, ByVal Value As Long)
 #If Release Then

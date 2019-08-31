@@ -400,6 +400,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use CDec("-9223372036854775809")
             Test.Use 9.22337203685478E+18
             Test.Use 9.22337203685477E+19
+            Test.Use "9999999999999999999999999"
             
         Case "Parse_WithMoreThanMaxValue_ThrowsOverflowException"
             Test.Use "9223372036854775808"
@@ -409,6 +410,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "9223372036854775818"
             Test.Use "9223372036854775820"
             Test.Use "&h1ffffffffffffffff"
+            Test.Use "9999999999999999999999999"
             
     End Select
 End Sub
