@@ -115,7 +115,7 @@ Public Sub GetCommandLineArgs_WhenCalled_ReturnsArgs()
     
     Assert.That CorArray.Length(Actual), Iz.EqualTo(2)
     Assert.That Actual(0), Iz.StringEnding("vb6.exe").IgnoreCase
-    Assert.That Actual(1), Iz.StringEnding("corlib.solution.vbg").IgnoreCase
+    Assert.That Actual(1), Iz.StringEnding("corlib.solution.vbg").IgnoreCase.OrElse.StringEnding("corlib.tests.solution.vbg").IgnoreCase
 End Sub
 
 Public Sub GetFolderPath_WithWindows_ReturnsWindowsPath()
