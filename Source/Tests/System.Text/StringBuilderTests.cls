@@ -57,7 +57,6 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
         Case "AppendString_WithValue_AppendText"
             Test.Use "bye", "hellobye"
             Test.Use "", "hello"
-            
     End Select
 End Sub
 

@@ -44,7 +44,7 @@ Attribute VB_Exposed = True
 ' the number of bytes have been read, they are assembled into the requested
 ' datatype, advancing the position in the stream the required number of bytes.</p>
 ' <p>Characters can be read from the Stream using the provided Encoding system.
-' The default encoding system is equal to New UTF8Encoding.</p>
+' The default encoding system is equal to New <a href="UTF8Encoding.html">UTF8Encoding</a>.</p>
 ' <p>To create a new <b>BinaryReader</b> use the public constructor.
 ' <pre>
 ' Set reader = Cor.NewBinaryReader(MyFileStream)
@@ -70,16 +70,16 @@ Private mSingleChar(0)  As Integer
 
 
 ''
-' Returns the underlying Stream being read by the Reader.
+' Returns the underlying <a href="Stream.html">Stream</a> being read by the Reader.
 '
-' @return The underlying Stream.
+' @return The underlying <a href="Stream.html">Stream</a>.
 '
 Public Property Get BaseStream() As Stream
     Set BaseStream = mStream
 End Property
 
 ''
-' Closes the reader and underlying Stream.
+' Closes the reader and underlying <a href="Stream.html">Stream</a>.
 '
 Public Sub CloseReader()
     If Not mStream Is Nothing Then
@@ -99,13 +99,7 @@ End Sub
 ' @param Index The first index in <i>Buffer</i> to start writing data.
 ' @param Count The number of elements to be written to the array.
 ' @return The actual number of elements written to the array. This could be less than the requested amount.
-' @remarks If a Byte array is passed in, then the bytes from the underlying stream are
-' copied to the array. If an Integer array is passed in, then enough bytes are read from
-' the stream to produce the requested number of decoded characters. The decoded characters
-' are placed in the array starting at <i>Index</i>.
-' <p>If all parameters are missing then a single character will be decoded from the stream and returned.</p>
-' <p>All parameters must either be missing or supplied or an exception is thrown.</p>
-'
+' @include "..\DocIncludes\BinaryReader.Read.html"
 Public Function Read(Optional ByRef Buffer As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As Long
     If IsMissing(Buffer) Then
         Read = ReadOneChar
@@ -267,9 +261,9 @@ Public Function ReadInt64() As Int64
 End Function
 
 ''
-' Reads an 4-byte signed integer from the current stream and advances the current position of the stream by four bytes.
+' Reads a 4-byte signed integer from the current stream and advances the current position of the stream by four bytes.
 '
-' @return An 4-byte signed integer read from the current stream.
+' @return A 4-byte signed integer read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
 ' <h4>Exceptions</h4>
@@ -385,9 +379,9 @@ Public Function ReadCurrency() As Currency
 End Function
 
 ''
-' Reads an 4-byte floating point value from the current stream and advances the current position of the stream by four bytes.
+' Reads a 4-byte floating point value from the current stream and advances the current position of the stream by four bytes.
 '
-' @return An 4-byte floating point value read from the current stream.
+' @return A 4-byte floating point value read from the current stream.
 ' @remarks <a href="BinaryReader.html">BinaryReader</a> does not restore the file position after an unsuccessful read.
 ' <p><a href="BinaryReader.html">BinaryReader</a> reads this data type in little-endian format.</p>
 ' <h4>Exceptions</h4>
@@ -504,7 +498,7 @@ End Function
 ' Returns a string representation of this object instance.
 '
 ' @return String representing this instance.
-' @IObject
+' @see IObject
 '
 Public Function ToString() As String
     ToString = MyBase.ToString(Me, App)
@@ -516,7 +510,7 @@ End Function
 '
 ' @param value The value to compare equalit to.
 ' @return Boolean indicating equality.
-' @IObject
+' @see IObject
 '
 Public Function Equals(ByRef Value As Variant) As Boolean
     Equals = MyBase.Equals(Me, Value)
@@ -526,7 +520,7 @@ End Function
 ' Returns a pseudo-unique number identifying this instance.
 '
 ' @return Pseudo-unique number identifying this instance.
-' @IObject
+' @see IObject
 '
 Public Function GetHashCode() As Long
     GetHashCode = MyBase.GetHashCode(Me)
@@ -624,7 +618,7 @@ Private Function ReadToByteBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     
 Catch:
     GoSub Finally
-    Throw Err
+    ThrowOrErr Err
 Finally:
     SAPtr(Buffer) = vbNullPtr
     Return
@@ -642,7 +636,7 @@ Private Function ReadToCharBuffer(ByVal BufferPtr As Long, ByRef BufferRange As 
     
 Catch:
     GoSub Finally
-    Throw Err
+    ThrowOrErr Err
 Finally:
     SAPtr(Buffer) = vbNullPtr
     Return

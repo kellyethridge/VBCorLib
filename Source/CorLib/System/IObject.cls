@@ -38,15 +38,7 @@ Attribute VB_Exposed = True
 ''
 ' This is the base interface to allow objects to be utilized throughout most of VBCorLib.
 '
-' @remarks The <b>IObject</b> interface is utilized by many of the
-' classes in VBCorLib. By implementing this interface in new classes, those
-' classes help VBCorLib to perform specific tasks better. Such tasks include
-' searching for a value.
-' <p>If this interface is implemented, then the same methods should be
-' implemented in the normal public interface to maintain consistency.</p>
-' <p>If a class is not expected to be used by VBCorLib, then implementing
-' this interface is not necessary.</p>
-'
+' @include "..\DocIncludes\IObject.html"
 Option Explicit
 
 ''
@@ -55,28 +47,7 @@ Option Explicit
 '
 ' @param value The value to compare this instance against for equality.
 ' @return Boolean indicating the equality of this instance and the value.
-' @remarks <p>This should be overridden to provide the type of equality
-' checking that is appropriate for each class.  Most classes simply
-' check to see if the value is the same object instance as this object,
-' meaning, they are both the same object in memory. CorDateTime checks to
-' see if the value has the same date as this instance, and TimeSpan
-' checks to see if the value has the same number of milliseconds as this
-' instance to determine equality.</p>
-' <p>This method should not throw an exception if the wrong datatype is
-' supplied. Instead, it should just return <i>False</i> to indicate that
-' the value is not equal to this object instance.</p>
-' <p><b>What should Equals when</b><br>
-' <table>
-'   <tr>
-'       <th width="50%">What should Equals return when</th><th>Returns</th>
-'   </tr>
-'   <tr>
-'       <td>Two Variables Point to the same object</td><td>True</td>
-'   </tr>
-'   <tr>
-'       <td>Two objects represent the same internal value</td><td>True</td>
-'   </tr>
-' </table>
+' @include "..\DocIncludes\IObject.Equals.html"
 Public Function Equals(ByRef Value As Variant) As Boolean: End Function
 
 ''

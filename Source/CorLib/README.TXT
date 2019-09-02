@@ -122,6 +122,9 @@ version 3.0 (BREAKING CHANGES)
 	* Added CInt64 for easy conversion to Int64 data-type.
 	* Added support for BigInteger to be initialized from an Int64.
 	* Fixed NewCultureInfo(String). Should not be case-sensitive.
+	* Fixed BinaryWriter.SeekPostion. Was not returning new position.
+	* Fixed BinaryWriter.WriteChar. Was not converting large 32-bit values to 16-bit correctly.
+	* Added charactor formatting for Long, Integer, Byte, and Int64 to Object.ToString method. '$' forces the numeric value to converted to a character.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -152,6 +152,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
+Public Sub ToString_WithInt64AsCharacter_ReturnsCharacter()
+    Dim Actual As String
+    
+    Actual = Object.ToString(NewInt64(50, 1), "$")
+    
+    Assert.That Actual, Iz.EqualTo("2")
+End Sub
+
 Public Sub ToString_WithValuesUsingDefaultFormatting_ReturnsExpected(ByRef Value As Variant, ByVal Expected As String)
     Dim Actual As String
     

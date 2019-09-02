@@ -88,7 +88,7 @@ End Sub
 ' @return The final position in the stream.
 '
 Public Function SeekPosition(ByVal Offset As Currency, ByVal Origin As SeekOrigin) As Currency
-    mOutStream.SeekPosition Offset, Origin
+    SeekPosition = mOutStream.SeekPosition(Offset, Origin)
 End Function
 
 ''
@@ -157,22 +157,24 @@ End Sub
 ''
 ' Writes a character to the underlying stream.
 '
-' @param Value The character to be written. This can be a string or numeric value.
-' @remarks The character is encoded and the byte array is written to the Stream.
+' @param Value The character to be written. This can be a string or a numeric value.
+' @remarks The character is encoded and the byte array is written to the stream.
 '
 Public Sub WriteChar(ByRef Value As Variant)
+    Dim Bytes() As Byte
+    
     Select Case VarType(Value)
         Case vbString
+            If Len(Value) = 0 Then _
+                Error.Argument Argument_StringZeroLength
+                
             mSingleChar(0) = AscW(CStr(Value))
-            
         Case vbLong, vbInteger, vbByte
-            mSingleChar(0) = CInt(Value)
-            
+            mSingleChar(0) = AsWord(CLng(Value))
         Case Else
             Throw Cor.NewArgumentException(Environment.GetResourceString(Argument_InvalidValueType, "String or Integer"), "Value")
     End Select
     
-    Dim Bytes() As Byte
     Bytes = mEncoding.GetBytes(mSingleChar, 0, 1)
     mOutStream.WriteBlock Bytes, 0, Len1D(Bytes)
 End Sub

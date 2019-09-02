@@ -1,0 +1,42 @@
+@remarks If a Byte array is passed in, then the bytes from the underlying stream are
+copied to the array. If an Integer array is passed in, then enough bytes are read from
+the stream to produce the requested number of decoded characters. The decoded characters
+are placed in the array starting at <i>Index</i>.
+<p>The position within the stream is advanced based on the <a href="Encoding.html">Encoding</a> being used.</p>
+<p>If all parameters are missing then a single character will be decoded from the stream and returned.</p>
+<p>All parameters must either be missing or supplied or an exception is thrown.</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Private</span> <span style="color: #0000ff">Sub</span> ReadExample()
+    <span style="color: #0000ff">Dim</span> Bytes(0 <span style="color: #0000ff">To</span> 1) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Byte</span>
+    <span style="color: #0000ff">Dim</span> Chars(0 <span style="color: #0000ff">To</span> 1) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Integer</span>
+    <span style="color: #0000ff">Dim</span> Reader <span style="color: #0000ff">As</span> BinaryReader
+    
+    <span style="color: #0000ff">Set</span> Reader = NewBinaryReader(NewMemoryStream(NewBytes(49, 50, 51, 194, 163, 54), Mode:=CopyMode))
+    
+    Console.WriteLine <span style="color: #a31515">&quot;Reads next character&quot;</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Next character: {0}({0:$})&quot;</span>, Reader.Read
+    Console.WriteLine
+    
+    Console.WriteLine <span style="color: #a31515">&quot;Read next two bytes&quot;</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Bytes read: {0}&quot;</span>, Reader.Read(Bytes, 0, 2)
+    Console.WriteLine <span style="color: #a31515">&quot;Bytes: {0}, {1}&quot;</span>, Bytes(0), Bytes(1)
+    Console.WriteLine
+    
+    Console.WriteLine <span style="color: #a31515">&quot;Read next two characters&quot;</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Characters read: {0}&quot;</span>, Reader.Read(Chars, 0, 2)
+    Console.WriteLine <span style="color: #a31515">&quot;Characters: {0}({0:$}), {1:$}&quot;</span>, Chars(0), Chars(1)
+    
+    Console.ReadKey
+
+    <span style="color: #008000">&#39; outputs:</span>
+    <span style="color: #008000">&#39; Reads next character</span>
+    <span style="color: #008000">&#39; Next character: 49(1)</span>
+    <span style="color: #008000">&#39;</span>
+    <span style="color: #008000">&#39; Read next two bytes</span>
+    <span style="color: #008000">&#39; Bytes read: 2</span>
+    <span style="color: #008000">&#39; Bytes: 50, 51</span>
+    <span style="color: #008000">&#39;</span>
+    <span style="color: #008000">&#39; Read next two characters</span>
+    <span style="color: #008000">&#39; Characters read: 2</span>
+    <span style="color: #008000">&#39; Characters: 163(£), 6</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

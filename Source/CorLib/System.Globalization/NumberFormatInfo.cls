@@ -242,6 +242,7 @@ Private Enum FormatSpecifier
     CurrencyLowerSpecifier = 99     ' c
     PercentUpperSpecifier = 80      ' P
     PercentLowerSpecifier = 112     ' p
+    CharSpecifier = vbDollarChar    ' $
 End Enum
 
 Private Type Specifiers
@@ -1036,6 +1037,11 @@ End Function
 Private Function Int64ToString(ByRef Value As Int64, ByRef Specifiers As Specifiers, ByRef Format As String) As String
     Dim Number As NumberType
     
+    If Specifiers.Format = CharSpecifier Then
+        Int64ToString = ChrW$(AsWord(Value.LowPart))
+        Exit Function
+    End If
+    
     If Specifiers.Format <> CustomSpecifier And _
         Specifiers.Format <> HexUpperSpecifier And _
         Specifiers.Format <> HexLowerSpecifier Then
@@ -1449,6 +1455,11 @@ Private Function FormatInt32(ByRef Value As Variant, ByRef Format As String) As 
     Dim Specifiers As Specifiers
     
     Specifiers = ParseSpecifiers(Format)
+    
+    If Specifiers.Format = CharSpecifier Then
+        FormatInt32 = ChrW$(AsWord(CLng(Value)))
+        Exit Function
+    End If
     
     If Specifiers.Format <> CustomSpecifier And _
         Specifiers.Format <> HexUpperSpecifier And _
@@ -2168,11 +2179,9 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
         Case 0
             ParseSpecifiers.Format = GeneralUpperSpecifier
             ParseSpecifiers.Precision = UnknownPrecision
-            
         Case Is > 3
             ParseSpecifiers.Format = CustomSpecifier
             ParseSpecifiers.Precision = UnknownPrecision
-            
         Case Else
             FormatChars = AllocChars(Format)
             
@@ -2203,8 +2212,12 @@ Private Function ParseSpecifiers(ByRef Format As String) As Specifiers
                     
                     ParseSpecifiers.Precision = Precision
                 Case Else
-                    ParseSpecifiers.Format = CustomSpecifier
-                    ParseSpecifiers.Precision = UnknownPrecision
+                    If Len(Format) = 1 And Asc(Format) = vbDollarChar Then
+                        ParseSpecifiers.Format = CharSpecifier
+                    Else
+                        ParseSpecifiers.Format = CustomSpecifier
+                        ParseSpecifiers.Precision = UnknownPrecision
+                    End If
             End Select
     End Select
     

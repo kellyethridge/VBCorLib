@@ -162,6 +162,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Int64.MinusOne, "c", "($1.00)"
             Test.Use NewInt64(&H90123456, &H12345678), "X", "1234567890123456"
             Test.Use NewInt64(&HF, &HF), "X16", "0000000F0000000F"
+            Test.Use NewInt64(49, 0), "$", "1"
             
         Case "TryParse_WithValidValues_ReturnsExpected"
             Test.Use "0", Int64.Zero

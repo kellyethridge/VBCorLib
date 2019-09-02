@@ -47,7 +47,7 @@ Attribute VB_Exposed = True
 ' <p>Most of these methods exist in the <a href="BigInteger.html">BigInteger</a> class and can be used
 ' directly with <a href="BigInteger.html">BigInteger</a> objects. The primary advantage of using the
 ' methods defined in this class is that a value of <b>Nothing</b> can be passed in and
-' will be treated as a value of 0.
+' will be treated as a value of 0.</p>
 Option Explicit
 
 Private mZero       As BigInteger

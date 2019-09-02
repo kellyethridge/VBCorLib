@@ -642,6 +642,12 @@ Public Property Get EqualityComparer() As EqualityComparerStatic
     Set EqualityComparer = Statics.EqualityComparer
 End Property
 
+''
+' Gets a reference to <a href="ObjectBase.html">ObjectBase</a>.
+'
+' @return A reference to <a href="ObjectBase.html">ObjectBase</a>.
+' @remarks The <a href="ObjectBase.html">ObjectBase</a> object provides default
+' implementations of the methods in the <a href="IObject.html">IObject</a> interface.
 Public Property Get MyBase() As ObjectBase
     Set MyBase = Statics.MyBase
 End Property

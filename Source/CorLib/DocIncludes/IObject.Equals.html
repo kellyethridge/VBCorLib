@@ -1,0 +1,80 @@
+@remarks <p>The <b>Equals</b> method is used to check for equality between two objects. It is up to each object to perform the equality check through the <b>Equals</b> so <b>VBCorLib</b> can function correctly when handling objects.</p>
+<p>The <b>Equals</b> method should be overridden to provide the type of equality checking that is appropriate for each class.  Most classes simply check to see if the value is the same object instance as this object, meaning, they are both the same object in memory. For example <a href="CorDateTime.html">CorDateTime</a> checks for equality by comparing the dates of the two objects. And <a href="TimeSpan.html">TimeSpan</a> checks to see if the value has the same number of milliseconds to determine equality.</p>
+<p>This method should not throw an exception. If a value passed in cannot be used for comparison then <b>False</b> should be returned.</p>
+<h4>Examples</h4>
+<p>The following code example demonstrates an implementation of the <b>Equals</b> method that may be more appropriate than the default method.</p>
+<p>A Point class is created with the <a href="IObject.html">IObject</a> interface appropriate for the class.</p>
+<b>Point.cls</b>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Option</span> Explicit
+<span style="color: #0000ff">Implements</span> IObject
+
+<span style="color: #0000ff">Public</span> X <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+<span style="color: #0000ff">Public</span> Y <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> Copy() <span style="color: #0000ff">As</span> Point
+    <span style="color: #0000ff">Set</span> Copy = <span style="color: #0000ff">New</span> Point
+    Copy.X = X
+    Copy.Y = Y
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> Equals(<span style="color: #0000ff">ByRef</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    <span style="color: #0000ff">Dim</span> Other <span style="color: #0000ff">As</span> Point
+    
+    <span style="color: #008000">&#39; we check for equality by comparing the X and Y</span>
+    <span style="color: #008000">&#39; values from the other Point object.</span>
+    <span style="color: #0000ff">On</span> <span style="color: #0000ff">Error</span> <span style="color: #0000ff">GoTo</span> <span style="color: #0000ff">Catch</span>
+    <span style="color: #0000ff">Set</span> Other = Value
+    Equals = Other.X = X <span style="color: #0000ff">And</span> Other.Y = Y
+    
+<span style="color: #0000ff">Catch</span>:
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> GetHashCode() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    <span style="color: #008000">&#39; generate a hashcode using fields that are</span>
+    <span style="color: #008000">&#39; used to represent this Point object.</span>
+    GetHashCode = LShift(X, 1) <span style="color: #0000ff">Xor</span> Y
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Public</span> <span style="color: #0000ff">Function</span> ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #008000">&#39; output a string representation of this Point object.</span>
+    ToString = CorString.Format(<span style="color: #a31515">&quot;({0}, {1})&quot;</span>, X, Y)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #008000">&#39; IObject Interface</span>
+<span style="color: #008000">&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;&#39;</span>
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_Equals(Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>) <span style="color: #0000ff">As</span> <span style="color: #2b91af">Boolean</span>
+    IObject_Equals = Equals(Value)
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_GetHashCode() <span style="color: #0000ff">As</span> <span style="color: #2b91af">Long</span>
+    IObject_GetHashCode = GetHashCode
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+
+<span style="color: #0000ff">Private</span> <span style="color: #0000ff">Function</span> IObject_ToString() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    IObject_ToString = ToString
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Function</span>
+</pre></div>
+<b>modMain.bas</b>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> P1 <span style="color: #0000ff">As</span> <span style="color: #0000ff">New</span> Point
+    <span style="color: #0000ff">Dim</span> P2 <span style="color: #0000ff">As</span> Point
+    
+    P1.X = 1
+    P1.Y = 2
+    
+    <span style="color: #0000ff">Set</span> P2 = P1.Copy
+    
+    Console.WriteLine P1 <span style="color: #0000ff">Is</span> P2
+    Console.WriteLine <span style="color: #2b91af">Object</span>.Equals(P1, P2)
+    Console.WriteLine <span style="color: #a31515">&quot;P1&#39;s value is: {0}&quot;</span>, P1
+    Console.ReadKey
+    
+<span style="color: #008000">&#39; This example produces the following output:</span>
+<span style="color: #008000">&#39; False</span>
+<span style="color: #008000">&#39; True</span>
+<span style="color: #008000">&#39; P1&#39;s value is: (1, 2)</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>
