@@ -180,7 +180,7 @@ Public Sub WriteChars(ByRef Chars() As Integer, Optional ByRef Index As Variant,
         Error.ArgumentNull "Chars", ArgumentNull_Array
         
     Dim Output As String
-    Output = CorString.FromCharArray(Chars, Index, Count)
+    Output = Cor.NewString(Chars, Index, Count)
     WriteCore Output
     
     If mAutoFlush Then
@@ -218,7 +218,7 @@ End Sub
 Public Sub WriteLineChars(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     VerifyIsOpen
     
-    WriteCore CorString.FromCharArray(Chars, Index, Count)
+    WriteCore Cor.NewString(Chars, Index, Count)
     WriteCore mNewLine
     
     If mAutoFlush Then

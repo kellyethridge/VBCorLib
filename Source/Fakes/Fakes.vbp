@@ -1,7 +1,7 @@
 Type=OleDll
+Reference=*\A..\CorLib\CorLib.vbp
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorType.tlb#VB.EXT: VBCorLib Type Library 3.0
-Reference=*\G{5236F507-C89A-42D5-8E9B-290D9EF6C5F9}#1.0#0#..\..\Binaries\Compiled\VBCorLib3.dll#VB.EXT: CorLib 3.0
 Class=FakeCustomFormatter; FakeCustomFormatter.cls
 Class=Int32; Int32.cls
 Class=Int32Formattable; Int32Formattable.cls

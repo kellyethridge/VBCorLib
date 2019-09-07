@@ -542,7 +542,7 @@ Public Function ParseCommandLineArgs(ByRef Line As String) As String()
                     ArgBuffer(ArgIndex) = vbSpaceChar
                     ArgIndex = ArgIndex + 1
                 Else
-                    Arguments.Add CorString.FromCharArray(ArgBuffer, 0, ArgIndex)
+                    Arguments.Add Cor.NewString(ArgBuffer, 0, ArgIndex)
                     ArgIndex = 0
                 End If
 
@@ -571,7 +571,7 @@ Public Function ParseCommandLineArgs(ByRef Line As String) As String()
     End If
 
     If ArgIndex > 0 Then
-        Arguments.Add CorString.FromCharArray(ArgBuffer, 0, ArgIndex)
+        Arguments.Add Cor.NewString(ArgBuffer, 0, ArgIndex)
     End If
 
     ParseCommandLineArgs = Arguments.ToArray(vbString)

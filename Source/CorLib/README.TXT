@@ -55,7 +55,8 @@ version 3.0 (BREAKING CHANGES)
 	* CorString.Join method signature changed to match .NET. *BREAKING*
 	* CorString.Join Separator is now required.
 	* CorString.Join improved to support any array or enumerable collection of items.
-	* Added Restart to StopWatch class.
+	* Added CorString.IsNullOrWhiteSpace method.
+	* Added Restart method to StopWatch class.
 	* Removed RSAParameters InverseQ property from serialization process.
 	* Updated SecurityElement Attributes property to match .NET characteristics.
 	* Fixed SecurityElement AddAttributes. Should throw ArgumentException when adding duplicate attribute name.
@@ -125,6 +126,7 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed BinaryWriter.SeekPostion. Was not returning new position.
 	* Fixed BinaryWriter.WriteChar. Was not converting large 32-bit values to 16-bit correctly.
 	* Added charactor formatting for Long, Integer, Byte, and Int64 to Object.ToString method. '$' forces the numeric value to converted to a character.
+	* Replaced CorString.FromCharArray with NewString constructor.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -1983,7 +1983,7 @@ Public Function NewIniResourceWriter(ByRef FileName As String, ByRef Section As 
 End Function
 
 ''
-' Returns a new instance of <a href="Int64Type.Int64.html">Int64</a>.
+' Returns an initialized instance of <a href="Int64Type.Int64.html">Int64</a>.
 '
 ' @param LowPart The least significant 32-bits of the integer value.
 ' @param HighPart The most significant 32-bits of the integer value.
@@ -1991,6 +1991,45 @@ End Function
 Public Function NewInt64(ByVal LowPart As Long, ByVal HighPart As Long) As Int64
     NewInt64.HighPart = HighPart
     NewInt64.LowPart = LowPart
+End Function
+
+''
+' Initializes a new <b>String</b> to the value indicated by an array of Unicode characters, a starting character position within that array, and a length.
+'
+' @param Value An array of Unicode characters.
+' @param StartIndex The starting position within <i>Value</i>. Defaults to start of <i>Value</i>.
+' @param Length The number of characters within <i>Value</i> to use. Defaults to using from <i>StartIndex</i> to end of array.
+' @return A <b>String</b> initialized from the characters in <i>Value</i>.
+' @remarks
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Value</i> is <b>Nothing</b>.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>StartIndex</i> or <i>Length</i> is less than zero.<br/>
+'           -or-<br/>
+'           The sum of <i>StartIndex</i> and <i>Length</i> is greater than the number of elements in <i>Value</i>.
+'        </td>
+'    </tr>
+' </table>
+Public Function NewString(ByRef Value() As Integer, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As String
+    Dim Range As ListRange
+    
+    ValidateArrayRange Value, StartIndex, Length, NameOfValue, NameOfStartIndex, NameOfLength
+    Range = MakeArrayRange(Value, StartIndex, Length)
+    
+    If Range.Count = 0 Then
+        NewString = ""
+    Else
+        NewString = SysAllocStringLen(VarPtr(Value(Range.Index)), Range.Count)
+    End If
 End Function
 
 

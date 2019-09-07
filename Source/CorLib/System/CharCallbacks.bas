@@ -28,12 +28,6 @@ Attribute VB_Name = "CharCallbacks"
 '
 Option Explicit
 
-Private Const vbLeftCheveronChar    As Long = 60
-Private Const vbRightCheveronChar   As Long = 62
-Private Const vbSpaceChar           As Long = 32
-Private Const vbQuoteChar           As Long = 34
-
-
 Public Function IsValidTagCallback(ByRef Char As Integer) As Boolean
     Select Case Char
         Case vbLeftCheveronChar, vbRightCheveronChar, vbSpaceChar
@@ -59,10 +53,6 @@ Public Function IsValidAttributeValueCallback(ByRef Char As Integer) As Boolean
     End Select
     
     IsValidAttributeValueCallback = True
-End Function
-
-Public Function IsWhiteSpaceCallback(ByRef Char As Integer) As Boolean
-    IsWhiteSpaceCallback = IsWhiteSpace(Char)
 End Function
 
 Public Function IsPeriodCallback(ByRef Char As Integer) As Boolean

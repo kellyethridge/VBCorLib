@@ -28,11 +28,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "Hello", NewIntegers(Asc("H"), Asc("e"), Asc("l"), Asc("l"), Asc("o"))
             Test.Use "", NewIntegers()
             
-        Case "FromCharArray_WithArrayOfCharacters_ReturnsExpected"
+        Case "NewString_WithArrayOfCharacters_ReturnsExpected"
             Test.Use NewIntegers(Asc("H"), Asc("e"), Asc("l"), Asc("l"), Asc("o")), "Hello"
             Test.Use NewIntegers(), ""
         
-        Case "IsEmptyOrWhitespace_WithValues_ReturnsExpected"
+        Case "IsNullOrWhitespace_WithValues_ReturnsExpected"
             Test.Use "", True
             Test.Use "a", False
             Test.Use " ", True
@@ -182,7 +182,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     End Select
 End Sub
 
-Public Sub IsEmptyOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
+Public Sub IsNullOrWhitespace_WithValues_ReturnsExpected(ByVal s As String, ByVal Expected As Boolean)
     Dim Actual As Boolean
 
     Actual = CorString.IsNullOrWhiteSpace(s)
@@ -246,55 +246,55 @@ Public Sub ToCharArray_WithStartIndexAndLengthGreaterThanTheSizeOfCharsArray_Thr
     AssertArgumentOutOfRangeException Err
 End Sub
 
-Public Sub FromCharArray_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersToConvert() As Integer, ByVal Expected As String)
+Public Sub NewString_WithArrayOfCharacters_ReturnsExpected(ByRef CharactersToConvert() As Integer, ByVal Expected As String)
     Dim Actual As String
     
-    Actual = CorString.FromCharArray(CharactersToConvert)
+    Actual = Cor.NewString(CharactersToConvert)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
-Public Sub FromCharArray_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+Public Sub NewString_WithIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
     Dim Chars(1 To 10) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray Chars, 0, 1
+    NewString Chars, 0, 1
     
-    AssertArgumentOutOfRangeException Err, "Index"
+    AssertArgumentOutOfRangeException Err, "StartIndex"
 End Sub
 
-Public Sub FromCharArray_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+Public Sub NewString_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
     Dim Chars(0) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray Chars, 0, -1
+    NewString Chars, 0, -1
     
-    AssertArgumentOutOfRangeException Err, "Count"
+    AssertArgumentOutOfRangeException Err, "Length"
 End Sub
 
-Public Sub FromCharArray_WithIndexAndCountBeyondUBound_ThrowsArgumentExceptin()
+Public Sub NewString_WithIndexAndCountBeyondUBound_ThrowsArgumentExceptin()
     Dim Chars(0 To 5) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray Chars, 1, 6
+    NewString Chars, 1, 6
     
     AssertArgumentException Err
 End Sub
 
-Public Sub FromCharArray_WithNullArray_ThrowsArgumentNullException()
+Public Sub NewString_WithNullArray_ThrowsArgumentNullException()
     Dim NullChars() As Integer
     
     On Error Resume Next
-    CorString.FromCharArray NullChars
+    NewString NullChars
     
-    AssertArgumentNullException Err, "Chars"
+    AssertArgumentNullException Err, "Value"
 End Sub
 
-Public Sub FromCharArray_WithMultiDimArray_ThrowsRankException()
+Public Sub NewString_WithMultiDimArray_ThrowsRankException()
     Dim MultiDim(0, 0) As Integer
     
     On Error Resume Next
-    CorString.FromCharArray MultiDim
+    NewString MultiDim
     
     AssertRankException Err
 End Sub

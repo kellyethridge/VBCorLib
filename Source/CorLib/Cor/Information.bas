@@ -64,6 +64,9 @@ Public Function SizeOf(ByVal DataType As VbVarType) As Long
     End Select
 End Function
 
+' simply compares the UUID of the passed in UDT against
+' the UUID of the VBCorLib.Int64 UDT. Any UDT that can be
+' passed as a variant will always have a UUID defined.
 Public Function IsInt64(ByRef Value As Variant) As Boolean
     Dim OtherGuid As VBGUID
     

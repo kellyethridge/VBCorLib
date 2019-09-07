@@ -57,7 +57,6 @@ Option Explicit
 '
 ' @param Ordinal Specifies a case-sensitive string comparison.
 ' @param OrdinalIgnoreCase Specifies a case-insensitive string comparison.
-'
 Public Enum StringComparison
     Ordinal = 4
     OrdinalIgnoreCase = 5
@@ -75,47 +74,36 @@ Private mCharChecker            As Func_T_Boolean
 ' Returns if the string is null.
 '
 ' @param s The string to be tested for null.
-' @return Indication if the string is null.
-' @remarks If the string is null it will return True. An empty string
-' will return false. A null string is equal to StrPtr(s) = 0.
-'
+' @return <b>True</b> if the string pointer is null, <b>False</b> otherwise.
+' @include "..\DocIncludes\CorString.IsNull.html"
 Public Function IsNull(ByRef s As String) As Boolean
     IsNull = (StrPtr(s) = vbNullPtr)
 End Function
 
 ''
-' Returns if the string is empty or contains only white-space.
+' Returns if the string is null, empty or contains only white-space characters.
 '
 ' @param s The string to be tested for white-space.
-' @return If the string has a length of zero or contains only white-space then True is returned, othersize False.
-'
+' @return <b>True</b> if the string has a length of zero or contains only white-space, <b>False</b> otherwise.
+' @include "..\DocIncludes\CorString.IsNullOrWhiteSpace.html"
 Public Function IsNullOrWhiteSpace(ByRef s As String) As Boolean
+    Dim Chars() As Integer
+    Dim i As Long
+    
     If LenB(s) = 0 Then
         IsNullOrWhiteSpace = True
     Else
-        IsNullOrWhiteSpace = ContainsOnlyWhiteSpace(s)
-    End If
-End Function
+        Chars = AllocChars(s)
+        
+        For i = 0 To Len(s) - 1
+            If Not IsWhiteSpace(Chars(i)) Then
+                FreeChars Chars
+                Exit Function
+            End If
+        Next
 
-''
-' Returns a string from the characters in an integer array.
-'
-' @param Chars The array to create the string from.
-' @param Index The starting index in the array.
-' @param Count The number of characters to use.
-' @return A string created from the chars in an integer array.
-'
-Public Function FromCharArray(ByRef Chars() As Integer, Optional ByRef Index As Variant, Optional ByRef Count As Variant) As String
-    ValidateArrayRange Chars, Index, Count, NameOfChars
-    
-    Dim Range As ListRange
-    
-    Range = MakeArrayRange(Chars, Index, Count)
-    
-    If Range.Count = 0 Then
-        FromCharArray = ""
-    Else
-        FromCharArray = SysAllocStringLen(VarPtr(Chars(Range.Index)), Range.Count)
+        FreeChars Chars
+        IsNullOrWhiteSpace = True
     End If
 End Function
 
@@ -143,7 +131,6 @@ End Function
 ' @return A formatted string.
 ' @see NumberFormatInfo
 ' @see DateTimeFormatInfo
-'
 Public Function FormatEx(ByVal Provider As IFormatProvider, ByRef FormatText As String, ParamArray Args() As Variant) As String
     Dim SwappedArgs() As Variant
     Helper.Swap4 ByVal ArrPtr(SwappedArgs), ByVal Helper.DerefEBP(20)
@@ -186,8 +173,10 @@ End Function
 ' @return An array containing the converted characters from the string.
 '
 Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Variant, Optional ByRef Length As Variant) As Integer()
-    Dim Range As ListRange
-    Range = MakeDefaultRange(StartIndex, 0, Length, Len(s), Parameter_StartIndex, Parameter_Length)
+    Dim Range   As ListRange
+    Dim Chars() As Integer
+    
+    Range = MakeDefaultRange(StartIndex, 0, Length, Len(s), NameOfStartIndex, NameOfLength)
     
     If Range.Index < 0 Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_NeedNonNegNum
@@ -196,7 +185,6 @@ Public Function ToCharArray(ByRef s As String, Optional ByRef StartIndex As Vari
     If Range.Index + Range.Count > Len(s) Then _
         Error.ArgumentOutOfRange "StartIndex", ArgumentOutOfRange_IndexCount
     
-    Dim Chars() As Integer
     If Range.Count > 0 Then
         ReDim Chars(0 To Range.Count - 1)
         CopyMemory Chars(0), ByVal StrPtr(s) + Range.Index * vbSizeOfChar, Range.Count * vbSizeOfChar
@@ -300,14 +288,14 @@ End Function
 ' @return A string containing elements joined from the array separated by the delimiter.
 '
 Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As String
+    Dim Range As ListRange
+    
     If IsObject(Value) Then
         Join = JoinCollection(Separator, Value)
         Exit Function
     End If
     
     ValidateArray Value, Parameter_Value
-    
-    Dim Range As ListRange
     Range = MakeDefaultRange(StartIndex, LBound(Value), Count, Len1D(Value), Parameter_StartIndex)
     
     If Range.Index < LBound(Value) Then _
@@ -339,6 +327,8 @@ End Function
 Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByRef Count As Variant) As String
     Dim CharCount       As Long
     Dim RemovalCount    As Long
+    Dim SPtr As Long
+    
     CharCount = Len(s)
     RemovalCount = CLngOrDefault(Count, CharCount - StartIndex)
     
@@ -349,7 +339,6 @@ Public Function Remove(ByRef s As String, ByVal StartIndex As Long, Optional ByR
     If StartIndex + RemovalCount > Len(s) Then _
         Error.ArgumentOutOfRange "", Argument_InvalidOffLen
     
-    Dim SPtr As Long
     SPtr = StrPtr(s)
     Remove = SysAllocStringLen(SPtr, CharCount - RemovalCount)
     CopyMemory ByVal StrPtr(Remove) + StartIndex * vbSizeOfChar, ByVal SPtr + (StartIndex + RemovalCount) * vbSizeOfChar, (CharCount - (StartIndex + RemovalCount)) * vbSizeOfChar
@@ -426,10 +415,13 @@ End Function
 ' @remarks Index is zero-based.
 '
 Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value As String) As String
+    Dim ValueLength As Long
+    Dim SourcePtr As Long
+    Dim TargetPtr As Long
+       
     If StartIndex < 0 Or StartIndex > Len(s) Then _
         Error.ArgumentOutOfRange "StartIndex"
     
-    Dim ValueLength As Long
     ValueLength = Len(Value)
     
     If ValueLength = 0 Then
@@ -437,15 +429,12 @@ Public Function Insert(ByRef s As String, ByVal StartIndex As Long, ByRef Value 
         Exit Function
     End If
     
-    Dim SourcePtr As Long
-    Dim TargetPtr As Long
-    
     SourcePtr = StrPtr(s)
     Insert = SysAllocStringLen(ByVal 0&, ValueLength + Len(s))
     TargetPtr = StrPtr(Insert)
+    ValueLength = ValueLength * vbSizeOfChar
+    StartIndex = StartIndex * vbSizeOfChar
     
-    ValueLength = ValueLength * 2
-    StartIndex = StartIndex * 2
     CopyMemory ByVal TargetPtr, ByVal SourcePtr, StartIndex
     CopyMemory ByVal TargetPtr + StartIndex, ByVal StrPtr(Value), ValueLength
     CopyMemory ByVal TargetPtr + StartIndex + ValueLength, ByVal SourcePtr + StartIndex, LenB(Insert) - (StartIndex + ValueLength)
@@ -475,19 +464,20 @@ End Function
 
 Friend Function LastChar(ByRef s As String) As Integer
     Dim Length As Long
+    Dim LastCharIndex As Long
+    
     Length = Len(s)
     
     If Length > 0 Then
-        Dim LastCharIndex As Long
         LastCharIndex = Length - 1
-        LastChar = MemWord(StrPtr(s) + LastCharIndex * 2)
+        LastChar = MemWord(StrPtr(s) + LastCharIndex * vbSizeOfChar)
     End If
 End Function
 
 Friend Function CharAt(ByRef s As String, ByVal Index As Long) As Integer
     Debug.Assert Index >= 0 And Index < Len(s)
     
-    CharAt = MemWord(StrPtr(s) + Index * 2)
+    CharAt = MemWord(StrPtr(s) + Index * vbSizeOfChar)
 End Function
 
 Friend Function AllChars(ByRef s As String, ByVal Predicate As Long) As Boolean
@@ -509,7 +499,7 @@ Private Sub Class_Terminate()
     ' Normally we could let light-weight delegate object release
     ' on their own, but, this class will be kept alive for the
     ' duration of the application, so when the delegation object
-    ' is finally release, the Delegation module may have already
+    ' is finally released, the Delegation module may have already
     ' be deallocated, removing the Release function the delegate
     ' object would have called. Since the delegation object is
     ' owned by this class, no memory needs deallocating, so we
@@ -572,12 +562,12 @@ Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal
     Dim OfAnyLB         As Long
     Dim OfAnyUB         As Long
         
+    On Error GoTo Catch
     OfAnyChars = AsChars(OfAny)
     
-    On Error GoTo Finally
     If SAPtr(OfAnyChars) = vbNullPtr Then _
         Error.ArgumentNull "OfAny", ArgumentNull_Array
-    
+        
     Chars = AllocChars(s)
     OfAnyLB = LBound(OfAnyChars)
     OfAnyUB = UBound(OfAnyChars)
@@ -591,16 +581,23 @@ Private Function IndexOfAnyCore(ByRef s As String, ByRef OfAny As Variant, ByVal
         For j = OfAnyLB To OfAnyUB
             If Ch = OfAnyChars(j) Then
                 IndexOfAnyCore = i
-                GoTo Finally
+                GoSub Finally
+                Exit Function
             End If
         Next
     Next
     
     IndexOfAnyCore = -1
+    GoSub Finally
+    Exit Function
     
+Catch:
+    GoSub Finally
+    ThrowOrErr Err
 Finally:
     FreeChars OfAnyChars
     FreeChars Chars
+    Return
 End Function
 
 Private Function TrimCore(ByRef s As String, ByRef TrimChars As Variant, ByVal TrimHead As Boolean, ByVal TrimTail As Boolean) As String
@@ -711,10 +708,6 @@ Finally:
     FreeChars Chars
 End Function
 
-Private Function ContainsOnlyWhiteSpace(ByRef s As String) As Boolean
-    ContainsOnlyWhiteSpace = AllChars(s, AddressOf IsWhiteSpaceCallback)
-End Function
-
 Private Function CharCount(ByRef s As String, ByVal Char As Integer) As Long
     If LenB(s) > 0 Then
         Dim Chars() As Integer
@@ -750,12 +743,12 @@ End Function
 
 Private Function JoinVariants(ByRef Separator As String, ByRef Value As Variant, ByRef Range As ListRange) As String
     Dim SubStrings() As String
-    ReDim SubStrings(0 To Range.Count - 1)
-    
     Dim Variants() As Variant
+    Dim i As Long
+    
+    ReDim SubStrings(0 To Range.Count - 1)
     SAPtr(Variants) = SAPtrV(Value)
     
-    Dim i As Long
     For i = 0 To Range.Count - 1
         SubStrings(i) = Object.ToString(Variants(Range.Index + i))
     Next
@@ -777,15 +770,16 @@ Private Function JoinArray(ByRef Separator As String, ByRef Value As Variant, By
 End Function
 
 Private Function JoinCollection(ByRef Separator As String, ByVal Value As Object) As String
-    If Value Is Nothing Then _
-        Error.ArgumentNull "Value"
-    
     Dim AppendSeparator As Boolean
     Dim Item            As Variant
     Dim ResultBuilder   As StringBuilder
-    Set ResultBuilder = StringBuilderCache.Acquire
+    
+    If Value Is Nothing Then _
+        Error.ArgumentNull "Value"
     
     On Error GoTo NonEnumerable
+    Set ResultBuilder = StringBuilderCache.Acquire
+    
     For Each Item In Value
         If AppendSeparator Then
             ResultBuilder.AppendString Separator
