@@ -244,6 +244,34 @@ Public Function Compare(ByRef a As Int64, ByRef b As Int64) As Long
 End Function
 
 ''
+' Returns the larger of two 64-bit signed integers.
+'
+' @param Val1 The first of two 64-bit signed integers to compare.
+' @param Val2 The second of two 64-bit signed integers to compare.
+' @return Parameter <i>Val1</i> or <i>Val2</i>, which ever is larger.
+Public Function Max(ByRef Val1 As Int64, ByRef Val2 As Int64) As Int64
+    If Compare(Val1, Val2) > 0 Then
+        Max = Val1
+    Else
+        Max = Val2
+    End If
+End Function
+
+''
+' Returns the smaller of two 64-bit signed integers.
+'
+' @param Val1 The first of two 64-bit signed integers to compare.
+' @param Val2 The second of two 64-bit signed integers to compare.
+' @return Parameter <i>Val1</i> or <i>Val2</i>, which ever is smaller.
+Public Function Min(ByRef Val1 As Int64, ByRef Val2 As Int64) As Int64
+    If Compare(Val1, Val2) < 0 Then
+        Min = Val1
+    Else
+        Min = Val2
+    End If
+End Function
+
+''
 ' Returns a new <a href="Int64Static.Int64.html">Int64</a> whose value is the negated value of <i>Value</i>.
 '
 ' @param Value The value to be negated.
@@ -748,12 +776,12 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Sub MultiplyByNegative(ByRef a As Int64, ByRef Negative As Int64, ByRef Result As Int64)
+Friend Sub MultiplyByNegative(ByRef a As Int64, ByRef Negative As Int64, ByRef Result As Int64)
     MultiplyPositives a, Negate(Negative), Result
     Result = Negate(Result)
 End Sub
 
-Private Sub MultiplyPositives(ByRef a As Int64, ByRef b As Int64, ByRef Result As Int64)
+Friend Sub MultiplyPositives(ByRef a As Int64, ByRef b As Int64, ByRef Result As Int64)
     Dim u As QWordArray
     Dim v As QWordArray
     Dim r As QWordArray
@@ -761,24 +789,26 @@ Private Sub MultiplyPositives(ByRef a As Int64, ByRef b As Int64, ByRef Result A
     Dim j As Long
     Dim k As Long
     Dim d As Long
-        
+    
     u = AsQWordArr(a)
     v = AsQWordArr(b)
     
     For i = 0 To 3
         k = 0
         d = v.Words(i) And &HFFFF&
-                
+        
         For j = 0 To 3
+            If i + j < 4 Then
 #If Release Then
-            k = d * (u.Words(j) And &HFFFF&) + (r.Words(j) And &HFFFF&) + k
-            r.Words(j) = k And &HFFFF&
-            k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
+                k = d * (u.Words(j) And &HFFFF&) + (r.Words(i + j) And &HFFFF&) + k
+                r.Words(i + j) = k And &HFFFF&
+                k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
 #Else
-            k = UInt16x16To32(d, u.Words(j)) + (r.Words(j) And &HFFFF&) + k
-            r.Words(j) = AsWord(k)
-            k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
+                k = UInt16x16To32(d, u.Words(j)) + (r.Words(i + j) And &HFFFF&) + k
+                r.Words(i + j) = AsWord(k)
+                k = ((k And &HFFFF0000) \ vbShift16Bits) And &HFFFF&
 #End If
+            End If
         Next
     Next
     

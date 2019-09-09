@@ -97,18 +97,19 @@ Public Function IsNullOrWhiteSpace(ByRef s As String) As Boolean
         
         For i = 0 To Len(s) - 1
             If Not IsWhiteSpace(Chars(i)) Then
-                FreeChars Chars
-                Exit Function
+                GoTo Finally
             End If
         Next
 
-        FreeChars Chars
         IsNullOrWhiteSpace = True
     End If
+    
+Finally:
+    FreeChars Chars
 End Function
 
 ''
-' Formats a string by replacing each argument with the formatted equivalent.
+' Replaces the format item in a specified string with the string representation of a corresponding value in ParamArray arguments.
 '
 ' @param FormatText The string containing formatting information.
 ' @param args A list of arguments to use in replacing the formatting information.

@@ -127,6 +127,8 @@ version 3.0 (BREAKING CHANGES)
 	* Fixed BinaryWriter.WriteChar. Was not converting large 32-bit values to 16-bit correctly.
 	* Added charactor formatting for Long, Integer, Byte, and Int64 to Object.ToString method. '$' forces the numeric value to converted to a character.
 	* Replaced CorString.FromCharArray with NewString constructor.
+	* Added BigMul to CorMath class.
+	* Added Int64 support to CorMath.Max and CorMath.Min methods.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

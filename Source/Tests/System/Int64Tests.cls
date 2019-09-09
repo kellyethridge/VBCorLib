@@ -97,6 +97,9 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Int64.One, Int64.MinusOne, Int64.MinusOne
             Test.Use Int64.MinusOne, Int64.One, Int64.MinusOne
             Test.Use Int64.MinusOne, Int64.MinusOne, Int64.One
+            Test.Use NewInt64(&H7FFFFFFF, 0), NewInt64(&H7FFFFFFF, 0), NewInt64(&H1, &H3FFFFFFF)
+            Test.Use NewInt64(&HFFFFFFFF, &H3FFFFFFF), NewInt64(2, 0), NewInt64(&HFFFFFFFE, &H7FFFFFFF)
+            Test.Use NewInt64(2, 0), NewInt64(&HFFFFFFFF, &H3FFFFFFF), NewInt64(&HFFFFFFFE, &H7FFFFFFF)
             
         Case "Divide_WithValues_ReturnsExpected"
             Test.Use Int64.One, Int64.One, Int64.One
@@ -417,6 +420,14 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use "&h1ffffffffffffffff"
             Test.Use "9999999999999999999999999"
             
+        Case "Max_WithValues_ReturnsExpected"
+            Test.Use Int64.One, Int64.MinusOne, Int64.One
+            Test.Use Int64.MinusOne, Int64.One, Int64.One
+            
+        Case "Min_WithValues_ReturnsExpected"
+            Test.Use Int64.One, Int64.MinusOne, Int64.MinusOne
+            Test.Use Int64.MinusOne, Int64.One, Int64.MinusOne
+        
     End Select
 End Sub
 
@@ -723,4 +734,20 @@ Public Sub Parse_WithMoreThanMaxValue_ThrowsOverflowException(ByVal s As String)
     Int64.Parse s
     
     AssertOverflowException Err
+End Sub
+
+Public Sub Max_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+    Dim Actual As Int64
+    
+    Actual = Int64.Max(a, b)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Min_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, ByRef Expected As Int64)
+    Dim Actual As Int64
+    
+    Actual = Int64.Min(a, b)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

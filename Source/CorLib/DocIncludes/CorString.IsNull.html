@@ -1,0 +1,19 @@
+@remarks <p>This method is not synonymous with checking the length of a string for zero
+using the <b>Len</b> method. This method checks if the string parameter points to any
+kind of string, including an empty string (""). A null string is uninitialized.</p>
+<h4>Examples</h4>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> s <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    
+    s = vbNullString <span style="color: #008000">&#39; redundant, but illistrates null pointer.</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Is Null: {0}&quot;</span>, CorString.IsNull(s)
+    
+    s = <span style="color: #a31515">&quot;&quot;</span>
+    Console.WriteLine <span style="color: #a31515">&quot;Is Null: {0}&quot;</span>, CorString.IsNull(s)
+    Console.ReadKey
+    
+<span style="color: #008000">&#39; The example outputs:</span>
+<span style="color: #008000">&#39; Is Null: True</span>
+<span style="color: #008000">&#39; Is Null: False</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

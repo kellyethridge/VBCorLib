@@ -39,11 +39,12 @@ Attribute VB_Exposed = True
 ' Provides extended math functionality.
 '
 ' @remarks The functions in this class are global. To access them simply call
-' the functions directly as any normal function. The MathExt class does not need
+' the functions directly as any normal function. The CorMath class does not need
 ' to be referenced.
 '
 ' <pre>
 ' Debug.Print PI
+' Debug.Print Max(1, 2)
 ' </pre>
 '
 Option Explicit
@@ -341,6 +342,39 @@ Public Function CRad(ByVal Degrees As Double) As Double
     CRad = corPI * Degrees / 180#
 End Function
 
+''
+' Produces the full product of two 32-bit numbers.
+'
+' @param a The first number to multiply.
+' @param b The second number to multiply.
+' @return The number containing the product of the specified numbers.
+Public Function BigMul(ByVal a As Long, ByVal b As Long) As Int64
+    Dim a64 As Int64
+    Dim b64 As Int64
+    
+    If a < 0 Then
+        If b < 0 Then
+            a64.LowPart = -a
+            b64.LowPart = -b
+            Statics.Int64.MultiplyPositives a64, b64, BigMul
+        Else
+            a64.LowPart = a
+            a64.HighPart = -1
+            b64.LowPart = b
+            Statics.Int64.MultiplyByNegative b64, a64, BigMul
+        End If
+    ElseIf b < 0 Then
+        a64.LowPart = a
+        b64.LowPart = b
+        b64.HighPart = -1
+        Statics.Int64.MultiplyByNegative a64, b64, BigMul
+    Else
+        a64.LowPart = a
+        b64.LowPart = b
+        Statics.Int64.MultiplyPositives a64, b64, BigMul
+    End If
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -360,6 +394,11 @@ Private Function IsGtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
             
             IsGtOrEq = Comparer.Default.Compare(x, y) >= 0
+        Case vbUserDefinedType
+            If (Not IsInt64(x)) Or (Not IsInt64(y)) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, "Int64"))
+            
+            IsGtOrEq = CallFunc_T_T_Long(AddressOf Int64Compare, DataPtr(x), DataPtr(y)) >= 0
         Case VarType(y)
             IsGtOrEq = x >= y
         Case Else
@@ -374,6 +413,11 @@ Private Function IsLtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
                 Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, TypeName(x)), "Y")
             
             IsLtOrEq = Comparer.Default.Compare(x, y) <= 0
+        Case vbUserDefinedType
+            If (Not IsInt64(x)) Or (Not IsInt64(y)) Then _
+                Throw Cor.NewArgumentException(Environment.GetResourceString(Arg_MustBeOfType, "Int64"))
+            
+            IsLtOrEq = CallFunc_T_T_Long(AddressOf Int64Compare, DataPtr(x), DataPtr(y)) <= 0
         Case VarType(y)
             IsLtOrEq = x <= y
         Case Else

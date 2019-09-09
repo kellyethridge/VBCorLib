@@ -1,0 +1,27 @@
+@remarks <p><b>IsNullOrWhiteSpace</b> is a convenience method that is similar to the following code, except that it offers better performance:</p>
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%">Len(CorString.Trim(s)) = 0
+</pre></div>
+<p>White-space characters are defined by the Unicode standard. The <b>IsNullOrWhiteSpace</b> method interprets any character that returns a value of true when it is passed to the <a href="Char.IsWhiteSpace.html">Char.IsWhiteSpace</a> method as a white-space character.</p>
+<h4>Examples</h4>
+The following example creates a string array, and then passes each element of the array to the <b>IsNullOrWhiteSpace</b> method.
+<!-- HTML generated using hilite.me --><div style="background: #ffffff; overflow:auto;width:auto;border:solid gray;border-width:.1em .1em .1em .8em;padding:.2em .6em;"><pre style="margin: 0; line-height: 125%"><span style="color: #0000ff">Public</span> <span style="color: #0000ff">Sub</span> Main()
+    <span style="color: #0000ff">Dim</span> Values() <span style="color: #0000ff">As</span> <span style="color: #2b91af">String</span>
+    <span style="color: #0000ff">Dim</span> Value <span style="color: #0000ff">As</span> <span style="color: #2b91af">Variant</span>
+    
+    Values = NewStrings(vbNullString, <span style="color: #a31515">&quot;&quot;</span>, <span style="color: #a31515">&quot;ABCDE&quot;</span>, Space$(20), t(<span style="color: #a31515">&quot;  \t  &quot;</span>), <span style="color: #2b91af">String</span><span style="border: 1px solid #FF0000">$</span>(&amp;H2000, 10))
+    
+    <span style="color: #0000ff">For</span> <span style="color: #0000ff">Each</span> Value <span style="color: #0000ff">In</span> Values
+        Console.WriteLine CorString.IsNullOrWhiteSpace(<span style="color: #0000ff">CStr</span>(Value))
+    <span style="color: #0000ff">Next</span>
+    
+    Console.ReadKey
+    
+<span style="color: #008000">&#39; The example displays the following output:</span>
+<span style="color: #008000">&#39; True</span>
+<span style="color: #008000">&#39; True</span>
+<span style="color: #008000">&#39; False</span>
+<span style="color: #008000">&#39; True</span>
+<span style="color: #008000">&#39; True</span>
+<span style="color: #008000">&#39; True</span>
+<span style="color: #0000ff">End</span> <span style="color: #0000ff">Sub</span>
+</pre></div>

@@ -32,3 +32,4 @@ End Function
 Public Function Int64ToString(ByRef Value As Int64, ByRef Format As String, ByRef Provider As IFormatProvider) As String
     Int64ToString = Statics.Int64.ToString(Value, Format, Provider)
 End Function
+
