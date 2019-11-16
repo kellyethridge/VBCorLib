@@ -1020,6 +1020,9 @@ Friend Function Format(ByRef Value As Variant, ByRef FormatText As String) As St
             Format = FormatDouble(Value, FormatText)
         Case vbSingle
             Format = FormatSingle(Value, FormatText)
+        Case vbDecimal
+            ' FormatVBDecimal
+            Format = Value
         Case Else
             Format = Value
     End Select
