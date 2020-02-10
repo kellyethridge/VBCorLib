@@ -524,6 +524,9 @@ End Property
 Public Property Let PercentGroupSizes(ByRef RHS As Variant)
     VerifyWritable
     VerifyLoaded
+    
+    ' TODO: fix or explain the Variant data-type used.
+    
     If CorArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException("PercentGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
@@ -869,6 +872,9 @@ End Property
 Public Property Let NumberGroupSizes(ByRef RHS As Variant)
     VerifyWritable
     VerifyLoaded
+    
+    ' TODO: fix or explain the Variant data-type used.
+
     If CorArray.IsNull(RHS) Then _
         Throw Cor.NewArgumentNullException("NumberGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
@@ -1021,8 +1027,7 @@ Friend Function Format(ByRef Value As Variant, ByRef FormatText As String) As St
         Case vbSingle
             Format = FormatSingle(Value, FormatText)
         Case vbDecimal
-            ' FormatVBDecimal
-            Format = Value
+            Format = FormatVBDecimal(Value, FormatText)
         Case Else
             Format = Value
     End Select
@@ -1040,7 +1045,7 @@ End Function
 Private Function Int64ToString(ByRef Value As Int64, ByRef Specifiers As Specifiers, ByRef Format As String) As String
     Dim Number As NumberType
     
-    If Specifiers.Format = CharSpecifier Then
+    If Specifiers.Format = FormatSpecifier.CharSpecifier Then
         Int64ToString = ChrW$(AsWord(Value.LowPart))
         Exit Function
     End If
@@ -1309,6 +1314,129 @@ Private Function ParseGroupSizes(ByRef Source As String) As Long()
     ParseGroupSizes = Result
 End Function
 
+Private Function FormatVBDecimal(ByRef Value As Variant, ByRef Format As String) As String
+    Dim Specifiers As Specifiers
+    Dim Number As NumberType
+    
+    VerifyLoaded
+    ClearOutput
+    Specifiers = ParseSpecifiers(Format)
+    FormatVBDecimal = DecimalToString(Value, Specifiers, Format)
+End Function
+
+Private Function DecimalToString(ByRef Value As Variant, ByRef Specifiers As Specifiers, ByRef Format As String) As String
+    Dim Number  As NumberType
+    Dim ExpChar As Integer
+    
+    If Specifiers.Format = HexLowerSpecifier Or Specifiers.Format = HexUpperSpecifier Then _
+        Error.Format Format_BadFormatSpecifier
+    
+    If Specifiers.Format <> CustomSpecifier Then
+        DecimalToNumber Value, 29, Number
+    End If
+    
+    Select Case Specifiers.Format
+        Case FormatSpecifier.GeneralLowerSpecifier, FormatSpecifier.GeneralUpperSpecifier
+            ExpChar = IIfLong(Specifiers.Format = FormatSpecifier.GeneralLowerSpecifier, vbLowerEChar, vbUpperEChar)
+        
+            If Specifiers.Precision = UnknownPrecision Or Specifiers.Precision = 0 Then
+                Specifiers.Precision = 29
+            End If
+        
+            RoundNumber Number, Specifiers.Precision
+            FormatGeneralDouble Number, Specifiers.Precision, -29, ExpChar, mDefaultOutput
+        Case FormatSpecifier.CurrencyLowerSpecifier, FormatSpecifier.CurrencyUpperSpecifier
+            FormatCurrency Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.DecimalUpperSpecifier, FormatSpecifier.DecimalLowerSpecifier
+            FormatDecimal Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.ExponentLowerSpecifier
+            FormatExponentInt32 Number, Specifiers.Precision, vbLowerEChar, mDefaultOutput
+        Case FormatSpecifier.ExponentUpperSpecifier
+            FormatExponentInt32 Number, Specifiers.Precision, vbUpperEChar, mDefaultOutput
+        Case FormatSpecifier.FixedUpperSpecifier, FormatSpecifier.FixedLowerSpecifier
+            FormatFixedDouble Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.NumberUpperSpecifier, FormatSpecifier.NumberLowerSpecifier
+            FormatNumber Number, Specifiers.Precision, mDefaultOutput
+        Case FormatSpecifier.PercentUpperSpecifier, FormatSpecifier.PercentLowerSpecifier
+            If Specifiers.Precision = UnknownPrecision Then
+                Specifiers.Precision = mProps.PercentDecimalDigits
+            End If
+            
+            If Number.Precision > 0 Then
+                Number.DecimalPosition = Number.DecimalPosition + 2
+            End If
+            
+            RoundNumber Number, Specifiers.Precision + Number.DecimalPosition
+            FormatPercent Number, Specifiers.Precision, mDefaultOutput
+        Case Else
+            DecimalToString = Format
+            Exit Function
+    End Select
+    
+    If mDefaultOutput.Position = 0 Then
+        DecimalToString = "0"
+    Else
+        DecimalToString = SysAllocStringLen(VarPtr(mDefaultOutput.Buffer(0)), mDefaultOutput.Position)
+    End If
+End Function
+
+Private Sub DecimalToNumber(ByRef Value As Variant, ByVal Precision As Long, ByRef Result As NumberType)
+    Dim DigitIndex  As Long
+    Dim IsMaxNeg    As Boolean
+    Dim Bits()      As Integer
+    Dim PtrSrc      As Long
+    
+    ReDim Bits(0 To 5)
+    
+    Result.IsNegative = IIfLong(Value < 0, BOOL_TRUE, BOOL_FALSE)
+    PtrSrc = VarPtr(Value)
+    
+    ' this would be an extremely rare occurrence since a decimal
+    ' datatype can only exist within a variant variable. The passed
+    ' in parameter would literally need to be a second variant
+    ' variable containing a reference to a decimal variant variable.
+    If VariantType(Value) And VT_BYREF Then
+        ' if a value was passed by reference we need to
+        ' dereference the memory address stored in the
+        ' passed in variant value.
+        PtrSrc = MemLong(PtrSrc + VARIANTDATA_OFFSET)
+    End If
+    
+    ' VB Decimal layout
+    ' bytes 0-1: Variant datatype information
+    ' bytes 2-3: precision and sign bytes
+    ' bytes 4-7: the 32 highest bits in the 96bit value
+    ' bytes 8-11: the 32 lowest bits in the 96bit value
+    ' bytes 12-15: the 32 middle bits in the 96bit value
+    AssignQWord ByVal PtrSrc + 8, Bits(0) ' map VB lowest and middle bits to .NET lowest and middle bits
+    AssignDWord ByVal PtrSrc + 4, Bits(4) ' map VB highest bits to .NET highest bits
+            
+    ReDim Result.Digits(0 To 29)
+    
+    Do While ((Bits(0) Or Bits(1) Or Bits(2) Or Bits(3) Or Bits(4) Or Bits(5)) <> 0) And (DigitIndex < Precision)
+        Result.Digits(DigitIndex) = InPlaceDivideBy10(Bits) + vbZeroChar
+        DigitIndex = DigitIndex + 1
+    Loop
+    
+    Result.DecimalPosition = DigitIndex - MemByte(PtrSrc + 2)
+    Result.Precision = DigitIndex
+    
+    If Result.Precision > 0 Then
+        Dim i As Long
+        Dim j As Long
+        Dim t As Byte
+        
+        j = Result.Precision - 1
+        
+        For i = 0 To (Result.Precision \ 2) - 1
+            t = Result.Digits(i)
+            Result.Digits(i) = Result.Digits(j)
+            Result.Digits(j) = t
+            j = j - 1
+        Next
+    End If
+End Sub
+
 Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As String
     Dim FormatPrecision As Long
     Dim FormatType      As Long
@@ -1352,7 +1480,7 @@ Private Function FormatSingle(ByVal Value As Single, ByRef Format As String) As 
             End If
             
             RoundNumber mNumber, FormatPrecision
-            FormatGeneralDouble mNumber.Precision, FormatType - 2, mDefaultOutput
+            FormatGeneralDouble mNumber, mNumber.Precision, -3, FormatType - 2, mDefaultOutput
         
         Case PercentFormat
             If FormatPrecision = UnknownPrecision Then
@@ -1425,7 +1553,7 @@ Private Function FormatDouble(ByVal Value As Double, ByRef Format As String) As 
             End If
             
             RoundNumber mNumber, FormatPrecision
-            FormatGeneralDouble FormatPrecision, FormatType - 2, mDefaultOutput
+            FormatGeneralDouble mNumber, FormatPrecision, -3, FormatType - 2, mDefaultOutput
         
         Case PercentFormat
             If FormatPrecision = UnknownPrecision Then
@@ -2327,7 +2455,7 @@ Private Sub Int64ToNumber(ByRef Value As Int64, ByRef Number As NumberType)
     ReDim Number.Digits(0 To 19)
     
     Do While (Words.Words(0) Or Words.Words(1) Or Words.Words(2) Or Words.Words(3)) <> 0
-        Number.Digits(DigitIndex) = InPlaceDivideBy10(Words) + vbZeroChar
+        Number.Digits(DigitIndex) = InPlaceDivideBy10(Words.Words) + vbZeroChar
         DigitIndex = DigitIndex + 1
     Loop
         
@@ -2354,19 +2482,19 @@ Private Sub Int64ToNumber(ByRef Value As Int64, ByRef Number As NumberType)
     End If
 End Sub
 
-Private Function InPlaceDivideBy10(ByRef Value As QWordArray) As Long
+Private Function InPlaceDivideBy10(ByRef Bits() As Integer) As Long
     Dim r As Long
     Dim i As Long
     Dim d As Long
 
-    For i = 3 To 0 Step -1
-        r = (r * vbShift16Bits) + (Value.Words(i) And &HFFFF&)
+    For i = UBound(Bits) To 0 Step -1
+        r = (r * vbShift16Bits) + (Bits(i) And &HFFFF&)
         d = r \ 10
 
 #If Release Then
-        Value.Words(i) = d And &HFFFF&
+        Bits(i) = d And &HFFFF&
 #Else
-        Value.Words(i) = AsWord(d)
+        Bits(i) = AsWord(d)
 #End If
 
         r = r - (d * 10)
@@ -2428,8 +2556,8 @@ Private Sub FormatGeneralInteger(ByRef Number As NumberType, ByVal FormatPrecisi
     End If
 End Sub
 
-Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As Integer, ByRef Output As OutputBuffer)
-    With mNumber
+Private Sub FormatGeneralDouble(ByRef Number As NumberType, ByVal FormatPrecision As Long, ByVal ExpThreshold As Long, ByVal ExpChar As Integer, ByRef Output As OutputBuffer)
+    With Number
         If .IsNegative Then
             AppendString mProps.NegativeSign, Output
         End If
@@ -2438,7 +2566,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
         DP = .DecimalPosition
         
         Dim HasExponent As Boolean
-        If FormatPrecision < .DecimalPosition Or .DecimalPosition < -3 Then
+        If FormatPrecision < .DecimalPosition Or .DecimalPosition < ExpThreshold Then
             HasExponent = True
             DP = 1
         ElseIf DP <= 0 Then
@@ -2466,7 +2594,7 @@ Private Sub FormatGeneralDouble(ByVal FormatPrecision As Long, ByVal ExpChar As 
             Ch = .Digits(i)
         Loop
         If HasExponent Then
-            AppendExponent mNumber, .DecimalPosition - 1, ExpChar, 2, Output
+            AppendExponent Number, .DecimalPosition - 1, ExpChar, 2, Output
         Else
             For i = i To .DecimalPosition - 1
                 AppendChar vbZeroChar, Output

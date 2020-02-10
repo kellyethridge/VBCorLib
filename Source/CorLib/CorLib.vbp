@@ -378,9 +378,7 @@ Command32=""
 Name="CorLib"
 HelpContextID="0"
 Description="VB.EXT: CorLib 3.0"
-CompatibleMode="2"
-CompatibleEXE32="..\..\Binaries\Compatibility\VBCorLib3.bin"
-VersionCompatible32="1"
+CompatibleMode="1"
 MajorVer=3
 MinorVer=0
 RevisionVer=0
@@ -412,7 +410,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=1
+Num=2
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -421,11 +419,11 @@ Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
 
 [TASK2]
-Description=
-Status=
-Priority=
+Description=Address group size properties in NumberFormatInfo
+Status=0
+Priority=1
 AssignedTo=
-Comment=
+Comment=Several group size properties, such as PercentGroupSizes, use a type Variant as the property data-type, however, use a Long() in the underlying member.  They either need to be changed to their corrisponding array data-type or given an explanation for the decision for using Variant.
 
 [TASK3]
 Description=
