@@ -175,7 +175,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
     End If
     
     Select Case ValueType
-        Case vbLong, vbInteger, vbByte, vbDouble, vbSingle
+        Case vbLong, vbInteger, vbByte, vbDouble, vbSingle, vbDecimal
             Set NumberFormatter = NumberFormatInfo.GetInstance(Provider)
             ToString = NumberFormatter.Format(Value, Format)
         Case vbDate

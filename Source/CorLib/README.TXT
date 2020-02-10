@@ -129,6 +129,8 @@ version 3.0 (BREAKING CHANGES)
 	* Replaced CorString.FromCharArray with NewString constructor.
 	* Added BigMul to CorMath class.
 	* Added Int64 support to CorMath.Max and CorMath.Min methods.
+	* Added .NET style formatting to Decimal data-type.
+	* Changed data-type for NumberFormatInfo.PercentGroupSizes and NumberFormatInfo.NumberGroupSizes properties from Variant to Long().	
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

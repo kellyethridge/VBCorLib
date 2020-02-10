@@ -1,5 +1,5 @@
 Type=Exe
-Reference=*\G{AD80B8C1-637E-45D4-8355-D2D46678D664}#1.0#0#..\..\Binaries\Compiled\VBCorLib3.dll#VB.EXT: CorLib 3.0
+Reference=*\A..\CorLib\CorLib.vbp
 Reference=*\G{00020430-0000-0000-C000-000000000046}#2.0#0#..\..\..\..\..\..\..\Windows\SysWOW64\stdole2.tlb#OLE Automation
 Reference=*\G{1F852AFD-5C0A-46D0-8AA1-4319E8EF72C0}#3.0#0#..\..\TypeLibrary\CorType.tlb#VB.EXT: VBCorLib 3.0 Type Library
 Reference=*\G{3E4F7CEC-C640-49F1-80D9-8DD42421CB1B}#5.0#0#..\..\..\..\..\..\..\WINDOWS\SysWow64\SimplyVBUnitType.tlb#SimplyVBUnit 5.0 Type Library
@@ -226,6 +226,7 @@ Class=Int64Tests; System\Int64Tests.cls
 Class=MemoryMappedViewStreamTests; System.IO.MemoryMappedFiles\MemoryMappedViewStreamTests.cls
 Class=ConsoleKeyInfoTests; System\ConsoleKeyInfoTests.cls
 Class=LargeUdtComparer; System\LargeUdtComparer.cls
+Class=ObjectToStringWithDecimalsTests; System\ObjectToStringWithDecimalsTests.cls
 ResFile32="CorLib.Tests.RES"
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"

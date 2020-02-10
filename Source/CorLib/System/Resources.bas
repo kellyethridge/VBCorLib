@@ -271,6 +271,7 @@ Public Enum ResourceStringKey
     Format_ParseBigInteger = 607
     Format_BadQuote = 608
     Format_IndexOutOfRange = 609
+    Format_BadFormatSpecifier = 610
     
     IndexOutOfRange_Dimension = 300
     IndexOutOfRange_ArrayBounds = 301
