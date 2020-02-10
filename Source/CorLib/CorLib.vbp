@@ -410,7 +410,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=2
+Num=1
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -419,11 +419,11 @@ Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
 
 [TASK2]
-Description=Address group size properties in NumberFormatInfo
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
 AssignedTo=
-Comment=Several group size properties, such as PercentGroupSizes, use a type Variant as the property data-type, however, use a Long() in the underlying member.  They either need to be changed to their corrisponding array data-type or given an explanation for the decision for using Variant.
+Comment=
 
 [TASK3]
 Description=

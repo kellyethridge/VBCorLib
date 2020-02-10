@@ -347,13 +347,13 @@ End Property
 ''
 ' Sets the negative infinity representation.
 '
-' @param RHS The new string that represents negative infinity.
+' @param Value The new string that represents negative infinity.
 ' @remarks Negative infinity is achieved by dividing a negative
 ' number by zero. The default is "-Infinity".
-Public Property Let NegativeInfinitySymbol(ByRef RHS As String)
+Public Property Let NegativeInfinitySymbol(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.NegativeInfinitySymbol = RHS
+    mProps.NegativeInfinitySymbol = Value
 End Property
 
 ''
@@ -370,13 +370,13 @@ End Property
 ''
 ' Sets the positive infinity representation.
 '
-' @param RHS The new string representation of positive infinity.
+' @param Value The new string representation of positive infinity.
 ' @remarks Positive infinity is achieved by dividing a positive
 ' number by zero. The default is "Infinity".
-Public Property Let PositiveInfinitySymbol(ByRef RHS As String)
+Public Property Let PositiveInfinitySymbol(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.PositiveInfinitySymbol = RHS
+    mProps.PositiveInfinitySymbol = Value
 End Property
 
 ''
@@ -397,17 +397,17 @@ End Property
 ''
 ' Sets the permille representation.
 '
-' @param RHS The new permille string representation.
+' @param Value The new permille string representation.
 ' @remarks From From <a href="http://mathworld.wolfram.com/Permil.html">MathWorld</a><br>
 ' The use of permille (a.k.a. parts per thousand) is a way of
 ' expressing ratios in terms of whole numbers. Given a ratio or fraction,
 ' it is converted to a permil-age by multiplying by 1000 and appending a "‰" (Unicode &H2030).
 ' For example, if an investment grows from a number P=13.00 to a number A=22.50,
 ' then A is 22.50/13.00=1.7308 times as much as P, or 1730.8‰.
-Public Property Let PerMilleSymbol(ByRef RHS As String)
+Public Property Let PerMilleSymbol(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.PerMilleSymbol = RHS
+    mProps.PerMilleSymbol = Value
 End Property
 
 ''
@@ -424,13 +424,13 @@ End Property
 ''
 ' Sets the string representation for Not-A-Number.
 '
-' @param RHS The new string NaN representation.
+' @param Value The new string NaN representation.
 ' @remarks Not-A-Number is achieved by dividing zero by zero. The default
 ' NaN symbol is "NaN".
-Public Property Let NaNSymbol(ByRef RHS As String)
+Public Property Let NaNSymbol(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.NaNSymbol = RHS
+    mProps.NaNSymbol = Value
 End Property
 
 ''
@@ -444,11 +444,11 @@ End Property
 ''
 ' Sets the decimal symbol for percent formatted numbers.
 '
-' @param RHS The new decimal symbol.
-Public Property Let PercentDecimalSeparator(ByRef RHS As String)
+' @param Value The new decimal symbol.
+Public Property Let PercentDecimalSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.PercentDecimalSeparator = RHS
+    mProps.PercentDecimalSeparator = Value
 End Property
 
 ''
@@ -473,7 +473,7 @@ End Property
 ''
 ' Sets the number of digits after the decimal point for percent formatted numbers.
 '
-' @param RHS The number of digits to display after the decimal point.
+' @param Value The number of digits to display after the decimal point.
 ' @remarks <p>This is used when a specifier of "p" is used with no
 ' associated digits (ie "p5").</p>
 ' <p>If the number is less than the precision
@@ -483,13 +483,13 @@ End Property
 ' <p>If the specified number of digits is larger than the precision of
 ' value, then the formatted value will be padded with zeros.</p>
 ' <p>The default number of digits is 2.</p>
-Public Property Let PercentDecimalDigits(ByVal RHS As Long)
+Public Property Let PercentDecimalDigits(ByVal Value As Long)
     VerifyWritable
     VerifyLoaded
-    If RHS < 0 Or RHS > 99 Then _
+    If Value < 0 Or Value > 99 Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99))
         
-    mProps.PercentDecimalDigits = RHS
+    mProps.PercentDecimalDigits = Value
 End Property
 
 ''
@@ -504,7 +504,7 @@ End Property
 ' cause a number 1234567890 to be formatted as 1,2,3,4,5,67,890. Once the last
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
-Public Property Get PercentGroupSizes() As Variant
+Public Property Get PercentGroupSizes() As Long()
     VerifyLoaded
     PercentGroupSizes = mProps.PercentGroupSizes
 End Property
@@ -512,7 +512,7 @@ End Property
 ''
 ' Sets the group sizes for percent formatted numbers.
 '
-' @param RHS A vbLong array containing the grouping sizes.
+' @param Value A vbLong array containing the grouping sizes.
 ' @remarks A group size is the number of digits that are to be groupsed together
 ' before being separated by the group separator symbol. Generally the group sizes
 ' is an array of one element having a value of 3.
@@ -521,17 +521,15 @@ End Property
 ' cause a number 1234567890 to be formatted as 1,2,3,4,5,67,890. Once the last
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
-Public Property Let PercentGroupSizes(ByRef RHS As Variant)
+Public Property Let PercentGroupSizes(ByRef Value() As Long)
     VerifyWritable
     VerifyLoaded
     
-    ' TODO: fix or explain the Variant data-type used.
-    
-    If CorArray.IsNull(RHS) Then _
+    If CorArray.IsNull(Value) Then _
         Throw Cor.NewArgumentNullException("PercentGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
-    VerifyGroupSizes RHS
-    mProps.PercentGroupSizes = RHS
+    VerifyGroupSizes Value
+    mProps.PercentGroupSizes = Value
 End Property
 
 ''
@@ -547,12 +545,12 @@ End Property
 ''
 ' Sets the negative pattern to be used in formatting negative percent numbers.
 '
-' @param RHS The pattern to be used.
+' @param Value The pattern to be used.
 '
-Public Property Let PercentNegativePattern(ByVal RHS As PercentNegativePatterns)
+Public Property Let PercentNegativePattern(ByVal Value As PercentNegativePatterns)
     VerifyWritable
     VerifyLoaded
-    mProps.PercentNegativePattern = RHS
+    mProps.PercentNegativePattern = Value
 End Property
 
 ''
@@ -570,12 +568,12 @@ End Property
 ''
 ' Sets the group separator for a percent formatted number.
 '
-' @param RHS The symbol used as a group separator defined by the group sizes.
+' @param Value The symbol used as a group separator defined by the group sizes.
 '
-Public Property Let PercentGroupSeparator(ByRef RHS As String)
+Public Property Let PercentGroupSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.PercentGroupSeparator = RHS
+    mProps.PercentGroupSeparator = Value
 End Property
 
 ''
@@ -591,12 +589,12 @@ End Property
 ''
 ' Set the percent symbol used in percent formatted numbers.
 '
-' @param RHS The symbol to be used in percent formatted numbers.
+' @param Value The symbol to be used in percent formatted numbers.
 '
-Public Property Let PercentSymbol(ByRef RHS As String)
+Public Property Let PercentSymbol(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.PercentSymbol = RHS
+    mProps.PercentSymbol = Value
 End Property
 
 ''
@@ -612,12 +610,12 @@ End Property
 ''
 ' Sets the pattern to be used in formatting positive percent numbers.
 '
-' @param RHS The pattern to be used.
+' @param Value The pattern to be used.
 '
-Public Property Let PercentPositivePattern(ByVal RHS As PercentPositivePatterns)
+Public Property Let PercentPositivePattern(ByVal Value As PercentPositivePatterns)
     VerifyWritable
     VerifyLoaded
-    mProps.PercentPositivePattern = RHS
+    mProps.PercentPositivePattern = Value
 End Property
 
 ''
@@ -633,12 +631,12 @@ End Property
 ''
 ' Sets the decimal separator used in formatting numbers into currency.
 '
-' @param RHS The decimal separator to be used in formatting.
+' @param Value The decimal separator to be used in formatting.
 '
-Public Property Let CurrencyDecimalSeparator(ByRef RHS As String)
+Public Property Let CurrencyDecimalSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.CurrencyDecimalSeparator = RHS
+    mProps.CurrencyDecimalSeparator = Value
 End Property
 
 ''
@@ -654,14 +652,14 @@ End Property
 ''
 ' Sets the default number of digits to be shown after the decimal separator.
 '
-' @param RHS The default number of digits to be shown after the decimal separator.
+' @param Value The default number of digits to be shown after the decimal separator.
 '
-Public Property Let CurrencyDecimalDigits(ByVal RHS As Long)
+Public Property Let CurrencyDecimalDigits(ByVal Value As Long)
     VerifyWritable
     VerifyLoaded
-    If RHS < 0 Or RHS > 99 Then _
+    If Value < 0 Or Value > 99 Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99))
-    mProps.CurrencyDecimalDigits = RHS
+    mProps.CurrencyDecimalDigits = Value
 End Property
 
 ''
@@ -684,7 +682,7 @@ End Property
 ''
 ' Sets an array of longs which represent a set of group sizes before being comma separated.
 '
-' @param RHS An array of longs that are the group sizes.
+' @param Value An array of longs that are the group sizes.
 ' @remarks <p>Each element represents the number of digits that will be grouped
 ' together before a comma separator is inserted. Each element is used once
 ' to specify the group size, then the next element is used for the next group
@@ -693,13 +691,13 @@ End Property
 ' <p>If a 0 is specified for a group size, it can only be the last size in the array.
 ' A 0 as the last group size will prevent the remaining digits from being separated.</p>
 '
-Public Property Let CurrencyGroupSizes(ByRef RHS() As Long)
+Public Property Let CurrencyGroupSizes(ByRef Value() As Long)
     VerifyWritable
     VerifyLoaded
-    If CorArray.IsNull(RHS) Then _
+    If CorArray.IsNull(Value) Then _
         Throw Cor.NewArgumentNullException("CurrencyGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
-    VerifyAndSetGroupSizes RHS, mProps.CurrencyGroupSizes
+    VerifyAndSetGroupSizes Value, mProps.CurrencyGroupSizes
 End Property
 
 ''
@@ -715,12 +713,12 @@ End Property
 ''
 ' Sets the numeric pattern to be used when formatting negative values.
 '
-' @param RHS The pattern to be used when formatting.
+' @param Value The pattern to be used when formatting.
 '
-Public Property Let CurrencyNegativePattern(ByVal RHS As CurrencyNegativePatterns)
+Public Property Let CurrencyNegativePattern(ByVal Value As CurrencyNegativePatterns)
     VerifyWritable
     VerifyLoaded
-    mProps.CurrencyNegativePattern = RHS
+    mProps.CurrencyNegativePattern = Value
 End Property
 
 ''
@@ -738,14 +736,14 @@ End Property
 ''
 ' Sets the group separator to be used when separating digits.
 '
-' @param RHS The separator to be used when separating digits.
+' @param Value The separator to be used when separating digits.
 ' @remarks Generally a comma is the group separator. However, in some
 ' parts of the world, a comma is not used.
 '
-Public Property Let CurrencyGroupSeparator(ByRef RHS As String)
+Public Property Let CurrencyGroupSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.CurrencyGroupSeparator = RHS
+    mProps.CurrencyGroupSeparator = Value
 End Property
 
 ''
@@ -763,14 +761,14 @@ End Property
 ''
 ' Sets the currency symbol to be used.
 '
-' @param RHS The currency symbol to be used when formatting currency.
+' @param Value The currency symbol to be used when formatting currency.
 ' @remarks In the US the symbol is the dollar sign '$', in other parts
 ' of the world, other symbols are used.
 '
-Public Property Let CurrencySymbol(ByRef RHS As String)
+Public Property Let CurrencySymbol(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.CurrencySymbol = RHS
+    mProps.CurrencySymbol = Value
 End Property
 
 ''
@@ -786,12 +784,12 @@ End Property
 ''
 ' Sets the formatting pattern to be used for positive currency values.
 '
-' @param RHS The formatting pattern to be used with positive currency values.
+' @param Value The formatting pattern to be used with positive currency values.
 '
-Public Property Let CurrencyPositivePattern(ByVal RHS As CurrencyPositivePatterns)
+Public Property Let CurrencyPositivePattern(ByVal Value As CurrencyPositivePatterns)
     VerifyWritable
     VerifyLoaded
-    mProps.CurrencyPositivePattern = RHS
+    mProps.CurrencyPositivePattern = Value
 End Property
 
 ''
@@ -808,13 +806,13 @@ End Property
 ''
 ' Sets the separator charactor for a group of numbers.
 '
-' @param RHS The character to be used when separating groups of numbers.
+' @param Value The character to be used when separating groups of numbers.
 ' This is typically a comma.
 '
-Public Property Let NumberGroupSeparator(ByRef RHS As String)
+Public Property Let NumberGroupSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.NumberGroupSeparator = RHS
+    mProps.NumberGroupSeparator = Value
 End Property
 
 ''
@@ -830,14 +828,14 @@ End Property
 ''
 ' Sets the pattern to be used when formatting negative numbers.
 '
-' @param RHS The new pattern to be used.
+' @param Value The new pattern to be used.
 '
-Public Property Let NumberNegativePattern(ByVal RHS As NumberNegativePatterns)
+Public Property Let NumberNegativePattern(ByVal Value As NumberNegativePatterns)
     VerifyWritable
     VerifyLoaded
-    If RHS < 0 Or RHS > 4 Then _
+    If Value < 0 Or Value > 4 Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Index))
-    mProps.NumberNegativePattern = RHS
+    mProps.NumberNegativePattern = Value
 End Property
 
 ''
@@ -852,7 +850,7 @@ End Property
 ' cause a number 1234567890 to be formatted as 1,2,3,4,5,67,890. Once the last
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
-Public Property Get NumberGroupSizes() As Variant
+Public Property Get NumberGroupSizes() As Long()
     VerifyLoaded
     NumberGroupSizes = mProps.NumberGroupSizes
 End Property
@@ -860,7 +858,7 @@ End Property
 ''
 ' Sets the group sizes for formatted numbers.
 '
-' @param RHS A vbLong array containing the grouping sizes.
+' @param Value A vbLong array containing the grouping sizes.
 ' @remarks A group size is the number of digits that are to be grouped together
 ' before being separated by the group separator symbol. Generally the group sizes
 ' is an array of one element having a value of 3.
@@ -869,17 +867,15 @@ End Property
 ' cause a number 1234567890 to be formatted as 1,2,3,4,5,67,890. Once the last
 ' group size has been reached, it is repeatedly used in grouping the remaining digits.</p>
 '
-Public Property Let NumberGroupSizes(ByRef RHS As Variant)
+Public Property Let NumberGroupSizes(ByRef Value() As Long)
     VerifyWritable
     VerifyLoaded
     
-    ' TODO: fix or explain the Variant data-type used.
-
-    If CorArray.IsNull(RHS) Then _
+    If CorArray.IsNull(Value) Then _
         Throw Cor.NewArgumentNullException("NumberGroupSizes", Environment.GetResourceString(ArgumentNull_Array))
     
-    VerifyGroupSizes RHS
-    mProps.NumberGroupSizes = RHS
+    VerifyGroupSizes Value
+    mProps.NumberGroupSizes = Value
 End Property
 
 ''
@@ -895,14 +891,14 @@ End Property
 ''
 ' Sets the default number of digits to be appended after the decimal point.
 '
-' @param RHS The number of digits to be appended after the decimal point.
+' @param Value The number of digits to be appended after the decimal point.
 '
-Public Property Let NumberDecimalDigits(ByVal RHS As Long)
+Public Property Let NumberDecimalDigits(ByVal Value As Long)
     VerifyWritable
     VerifyLoaded
-    If RHS < 0 Or RHS > 99 Then _
+    If Value < 0 Or Value > 99 Then _
         Throw Cor.NewArgumentOutOfRangeException("Value", Message:=Environment.GetResourceString(ArgumentOutOfRange_Range, 0, 99))
-    mProps.NumberDecimalDigits = RHS
+    mProps.NumberDecimalDigits = Value
 End Property
 
 ''
@@ -918,12 +914,12 @@ End Property
 ''
 ' Sets the character to be used as the decimal point.
 '
-' @param RHS The new character to be used as the decimal point.
+' @param Value The new character to be used as the decimal point.
 '
-Public Property Let NumberDecimalSeparator(ByRef RHS As String)
+Public Property Let NumberDecimalSeparator(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.NumberDecimalSeparator = RHS
+    mProps.NumberDecimalSeparator = Value
 End Property
 
 ''
@@ -939,12 +935,12 @@ End Property
 ''
 ' Sets the negative symbol to be used for negative numbers.
 '
-' @param RHS The new negative symbol.
+' @param Value The new negative symbol.
 '
-Public Property Let NegativeSign(ByRef RHS As String)
+Public Property Let NegativeSign(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.NegativeSign = RHS
+    mProps.NegativeSign = Value
 End Property
 
 ''
@@ -960,12 +956,12 @@ End Property
 ''
 ' Sets the positive symbol.
 '
-' @param RHS The new positive symbol.
+' @param Value The new positive symbol.
 '
-Public Property Let PositiveSign(ByRef RHS As String)
+Public Property Let PositiveSign(ByRef Value As String)
     VerifyWritable
     VerifyLoaded
-    mProps.PositiveSign = RHS
+    mProps.PositiveSign = Value
 End Property
 
 ''
