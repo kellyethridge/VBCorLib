@@ -163,11 +163,17 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
             ' Custom Format
             Test.Use CDec(1), "aa2", "aa2"
+            Test.Use CDec(1.1), "#.00", "1.10"
+            Test.Use CDec(-1.1), "#.00", "-1.10"
             
         Case "ToString_WithHexSpecifier_ThrowsFormatException"
             Test.Use "x"
             Test.Use "X"
             
+        Case "ToString_WithCustomNegativeFormat_ReturnsExpected"
+            Test.Use -12.34, "0", "^12"
+            Test.Use -12.34, "0.00", "^12.34"
+            Test.Use -12.34, "0;(#.##)", "(12.34)"
     End Select
 End Sub
 
@@ -186,4 +192,27 @@ Public Sub ToString_WithHexSpecifier_ThrowsFormatException(ByVal Format As Strin
     
 Catch:
     AssertFormatException Err
+End Sub
+
+Public Sub ToString_WithCustomNegativeSign_UsesCustomNegativeSign()
+    Dim Info As CultureInfo
+    Dim Actual As String
+    
+    Set Info = Cor.NewCultureInfo("en-US")
+    Info.NumberFormat.NegativeSign = "^"
+    
+    Actual = Object.ToString(CDec(-1.1), "#.00", Info)
+    
+    Assert.That Actual, Iz.EqualTo("^1.10")
+End Sub
+
+Public Sub ToString_WithCustomNegativeFormat_ReturnsExpected(ByVal Value As Variant, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US").NumberFormat
+    Info.NegativeSign = "^"
+    
+    Actual = Object.ToString(CDec(Value), Format, Info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

@@ -163,7 +163,6 @@ End Function
 ' @see IFormatProvider
 Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
     Dim ValueType As VbVarType
-    Dim NumberFormatter As NumberFormatInfo
     
     ValueType = VarType(Value)
     
@@ -176,8 +175,7 @@ Public Function ToString(ByRef Value As Variant, Optional ByRef Format As String
     
     Select Case ValueType
         Case vbLong, vbInteger, vbByte, vbDouble, vbSingle, vbDecimal
-            Set NumberFormatter = NumberFormatInfo.GetInstance(Provider)
-            ToString = NumberFormatter.Format(Value, Format)
+            ToString = NumberFormatter.Format(Value, Format, Provider)
         Case vbDate
             Dim DateFormatter As DateTimeFormatInfo
             Set DateFormatter = DateTimeFormatInfo.GetInstance(Provider)

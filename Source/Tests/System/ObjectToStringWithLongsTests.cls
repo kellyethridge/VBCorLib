@@ -129,13 +129,19 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             ' Custom Format
             Test.Use 48, "k00", "k48"
             Test.Use 48, "$00", "$48"
-            
+                        
         Case "ToString_WithLongsUsingDefaultFormat_ReturnsExpected"
             Test.Use 0&, "0"
             Test.Use 1&, "1"
             Test.Use -1&, "-1"
             Test.Use &H7FFFFFFF, "2147483647"
             Test.Use &H80000000, "-2147483648"
+            
+        Case "ToString_WithCustomNegativeFormat_ReturnsExpected"
+            Test.Use -12, "0", "^12"
+            Test.Use -12, "0.00", "^12.00"
+            Test.Use -12, "0;(#)", "(12)"
+            
     End Select
 End Sub
 
@@ -175,5 +181,16 @@ Public Sub ToString_WithLongUsingModifiedGroupSize_ReturnsExpected2()
     Actual = Object.ToString(1, "n", Info)
     
     Assert.That Actual, Iz.EqualTo("1.00")
+End Sub
+
+Public Sub ToString_WithCustomNegativeFormat_ReturnsExpected(ByVal Value As Long, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US").NumberFormat
+    Info.NegativeSign = "^"
+    
+    Actual = Object.ToString(Value, Format, Info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 

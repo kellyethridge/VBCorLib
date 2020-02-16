@@ -109,4 +109,5 @@ Public RSACryptoServiceProvider As New RSACryptoServiceProviderStatic
 Public Funcs                    As New PublicFunctions
 Public MemoryMappedFile         As New MemoryMappedFileStatic
 Public Int64                    As New Int64Static
+Public NumberFormatter          As New NumberFormatter
 

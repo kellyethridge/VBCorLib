@@ -63,6 +63,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 0.0012345!, "e", "1.234500e-003"
             Test.Use 0.0012345!, "e3", "1.235e-003"
             Test.Use 1.2345E-20!, "e7", "1.2345000e-020"
+            Test.Use 1.2345E-20!, "E7", "1.2345000E-020"
             
             ' Number Format
             Test.Use 1.23!, "n", "1.23"
@@ -118,6 +119,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -1.401298E-45, "-1.401298E-45"
             Test.Use -3.402823E+38, "-3.402823E+38"
 
+        Case "ToString_WithCustomNegativeFormat_ReturnsExpected"
+            Test.Use -12.34, "0", "^12"
+            Test.Use -12.34, "0.00", "^12.34"
+            Test.Use -12.34, "0;(#.##)", "(12.34)"
+            
     End Select
 End Sub
 
@@ -173,3 +179,13 @@ Public Sub ToString_WithSingleAsNegativeInfinity_ReturnsNegativeInfinity()
     Assert.That Actual, Iz.EqualTo("-Infinity")
 End Sub
 
+Public Sub ToString_WithCustomNegativeFormat_ReturnsExpected(ByVal Value As Single, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US").NumberFormat
+    Info.NegativeSign = "^"
+    
+    Actual = Object.ToString(Value, Format, Info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub

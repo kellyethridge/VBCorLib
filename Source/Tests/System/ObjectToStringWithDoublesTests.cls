@@ -164,6 +164,11 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 123#, "p", "12,300.00 %"
             Test.Use 1.23123123E+20, "p5", "12,312,312,300,000,000,000,000.00000 %"
             
+            ' Custom Format
+            Test.Use CDec(1), "aa2", "aa2"
+            Test.Use CDec(1.1), "#.00", "1.10"
+            Test.Use CDec(-1.1), "#.00", "-1.10"
+            
         Case "ToString_WithDoublesDefaultFormat_ReturnsExpected"
             Test.Use 0#, "0"
             Test.Use 1#, "1"
@@ -177,6 +182,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 4.94065645841247E-324, "4.94065645841247E-324"
             Test.Use -1.79769313486231E+308, "-1.79769313486231E+308"
             Test.Use -4.94065645841247E-324, "-4.94065645841247E-324"
+            
+        Case "ToString_WithCustomNegativeFormat_ReturnsExpected"
+            Test.Use -12.34, "0", "^12"
+            Test.Use -12.34, "0.00", "^12.34"
+            Test.Use -12.34, "0;(#.##)", "(12.34)"
+            
     End Select
 End Sub
 
@@ -245,3 +256,25 @@ errTrap:
     Assert.IsTrue TypeOf Ex Is FormatException, "Wrong exception type caught."
 End Sub
 
+Public Sub ToString_WithCustomNegativeSign_UsesCustomNegativeSign()
+    Dim Info As CultureInfo
+    Dim Actual As String
+    
+    Set Info = Cor.NewCultureInfo("en-US")
+    Info.NumberFormat.NegativeSign = "^"
+    
+    Actual = Object.ToString(-1.1, "#.00", Info)
+    
+    Assert.That Actual, Iz.EqualTo("^1.10")
+End Sub
+
+Public Sub ToString_WithCustomNegativeFormat_ReturnsExpected(ByVal Value As Double, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US").NumberFormat
+    Info.NegativeSign = "^"
+    
+    Actual = Object.ToString(Value, Format, Info)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub

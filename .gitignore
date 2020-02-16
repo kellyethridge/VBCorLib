@@ -5,3 +5,4 @@ Binaries
 *.SCC
 *.log
 *.tmp
+/Source/Tests/TestOutput.txt

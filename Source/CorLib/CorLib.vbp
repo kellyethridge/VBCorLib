@@ -369,6 +369,7 @@ Module=Int64Callbacks; System\Int64Callbacks.bas
 Class=Int64Parser; System\Int64Parser.cls
 Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
 ResFile32="CorLib.RES"
+Class=NumberFormatter; System.Globalization\NumberFormatter.cls
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"

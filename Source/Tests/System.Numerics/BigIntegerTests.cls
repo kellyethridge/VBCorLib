@@ -361,7 +361,8 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 10, 10, "10000000000"
             Test.Use -2, 3, -8
             Test.Use -2, 4, 16
-            
+            Test.Use 2, 100, "1267650600228229401496703205376"
+                        
         Case "SquareRoot_WithValue_ReturnsExpected"
             Test.Use 4, 2
             Test.Use 15, 3

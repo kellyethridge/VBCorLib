@@ -40,6 +40,10 @@ Attribute VB_Exposed = True
 '
 Option Explicit
 
+Private mMaxDecimalValue As Variant
+Private mMinDecimalValue As Variant
+
+
 ''
 ' Represents a 64-bit signed integer.
 '
@@ -191,10 +195,7 @@ End Function
 '   </tr>
 ' </table>
 Public Function ToString(ByRef Value As Int64, Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim FormatInfo  As NumberFormatInfo
-    
-    Set FormatInfo = NumberFormatInfo.GetInstance(Provider)
-    ToString = FormatInfo.FormatInt64(Value, Format)
+    ToString = NumberFormatter.FormatInt64(Value, Format, Provider)
 End Function
 
 
@@ -716,7 +717,7 @@ Friend Sub DecimalToInt64(ByRef Value As Variant, ByRef Result As Int64)
     
     WholeDecimal = Round(Value)
     
-    If WholeDecimal > CDec("9223372036854775807") Or WholeDecimal < CDec("-9223372036854775808") Then _
+    If WholeDecimal > mMaxDecimalValue Or WholeDecimal < mMinDecimalValue Then _
         Throw New OverflowException
     
     AssignQWord ByVal VarPtr(WholeDecimal) + VARIANTDATA_OFFSET, Result
@@ -770,6 +771,15 @@ Catch:
 Finally:
     SAPtr(Digits) = vbNullPtr
     Return
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    mMaxDecimalValue = CDec("9223372036854775807")
+    mMinDecimalValue = CDec("-9223372036854775808")
 End Sub
 
 
@@ -954,5 +964,4 @@ Private Function MaxByteBit(ByVal Value As Byte) As Long
         MaxByteBit = 1
     End If
 End Function
-
 

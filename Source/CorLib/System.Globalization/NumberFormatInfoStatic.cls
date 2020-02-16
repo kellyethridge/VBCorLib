@@ -89,6 +89,12 @@ Public Enum NumberStyles
     HexNumber = 515
 End Enum
 
+Private mCurrencyPositivePatterns() As String
+Private mCurrencyNegativePatterns() As String
+Private mNumberNegativePatterns()   As String
+Private mPercentPositivePatterns()  As String
+Private mPercentNegativePatterns()  As String
+
 
 ''
 ' Returns the NumberFormatInfo object of the threads current culture.
@@ -143,3 +149,42 @@ Public Function ReadOnly(ByVal Info As NumberFormatInfo) As NumberFormatInfo
     End If
 End Function
 
+Friend Property Get NumberNegativePatterns(ByVal Index As Long) As String
+    NumberNegativePatterns = mNumberNegativePatterns(Index)
+End Property
+
+Friend Property Get CurrencyPositivePatterns(ByVal Index As Long) As String
+    CurrencyPositivePatterns = mCurrencyPositivePatterns(Index)
+End Property
+
+Friend Property Get CurrencyNegativePatterns(ByVal Index As Long) As String
+    CurrencyNegativePatterns = mCurrencyNegativePatterns(Index)
+End Property
+
+Friend Property Get PercentPositivePatterns(ByVal Index As Long) As String
+    PercentPositivePatterns = mPercentPositivePatterns(Index)
+End Property
+
+Friend Property Get PercentNegativePatterns(ByVal Index As Long) As String
+    PercentNegativePatterns = mPercentNegativePatterns(Index)
+End Property
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Constructors
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub Class_Initialize()
+    InitPatterns
+End Sub
+
+
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+'   Helpers
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Sub InitPatterns()
+    mNumberNegativePatterns = Cor.NewStrings("(#)", "-#", "- #", "#-", "# -")
+    mCurrencyNegativePatterns = Cor.NewStrings("($#)", "-$#", "$-#", "$#-", "(#$)", "-#$", "#-$", "#$-", "-# $", "-$ #", "# $-", "$ #-", "$ -#", "#- $", "($ #)", "(# $)")
+    mCurrencyPositivePatterns = Cor.NewStrings("$#", "#$", "$ #", "# $")
+    mPercentNegativePatterns = Cor.NewStrings("-# %", "-#%", "-%#", "%-#", "%#-", "#-%", "#%-", "-% #", "# %-", "% #-", "% -#", "#- %")
+    mPercentPositivePatterns = Cor.NewStrings("# %", "#%", "%#", "% n")
+End Sub

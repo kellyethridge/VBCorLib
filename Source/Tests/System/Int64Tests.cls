@@ -428,6 +428,13 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use Int64.One, Int64.MinusOne, Int64.MinusOne
             Test.Use Int64.MinusOne, Int64.One, Int64.MinusOne
         
+        Case "ToString_WithCustomNegativeFormat_ReturnsExpected"
+            Test.Use -12, "0", "^12"
+            Test.Use -12, "0.00", "^12.00"
+            Test.Use -12, "0;(#)", "(12)"
+            Test.Use 12, "0", "12"
+            Test.Use 12, "0.00", "12.00"
+            Test.Use 12, "0;(#)", "12"
     End Select
 End Sub
 
@@ -748,6 +755,17 @@ Public Sub Min_WithValues_ReturnsExpected(ByRef a As Int64, ByRef b As Int64, By
     Dim Actual As Int64
     
     Actual = Int64.Min(a, b)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToString_WithCustomNegativeFormat_ReturnsExpected(ByVal Value As Long, ByVal Format As String, ByVal Expected As String)
+    Dim Actual As String
+    Dim Info As NumberFormatInfo
+    Set Info = Cor.NewCultureInfo("en-US").NumberFormat
+    Info.NegativeSign = "^"
+    
+    Actual = Object.ToString(CInt64(Value), Format, Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

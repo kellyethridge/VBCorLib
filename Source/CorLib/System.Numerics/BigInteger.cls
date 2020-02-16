@@ -207,10 +207,7 @@ End Function
 ' </pre>
 ' <p>If no format is specified, the default of "d" is used.</p>
 Public Function ToString(Optional ByRef Format As String, Optional ByVal Provider As IFormatProvider) As String
-    Dim FormatInfo  As NumberFormatInfo
-    
-    Set FormatInfo = NumberFormatInfo.GetInstance(Provider)
-    ToString = FormatInfo.FormatBigNumber(mNumber, Format)
+    ToString = NumberFormatter.FormatBigNumber(mNumber, Format, Provider)
 End Function
 
 ''
