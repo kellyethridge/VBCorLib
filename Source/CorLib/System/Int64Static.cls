@@ -150,11 +150,21 @@ End Function
 '   </tr>
 ' </table>
 Public Function Sign(ByRef Value As Int64) As Long
-    If Value.HighPart And &H80000000 Then
+    If IsNegative(Value) Then
         Sign = -1
     ElseIf Not IsZero(Value) Then
         Sign = 1
     End If
+End Function
+
+''
+' Returns if an <a href="Int64Static.Int64.html">Int64</a> value is negative.
+'
+' @param Value The <a href="Int64Static.Int64.html">Int64</a> value to check negative for.
+' @return <b>True</b> if the value is negative, <b>False</b> otherwise.
+' @remarks An <a href="Int64Static.Int64.html">Int64</a> is negative if the high bit of <a href="Int64Static.Int64.html">Int64.HighPart</a> is set.
+Public Function IsNegative(ByRef Value As Int64) As Boolean
+    IsNegative = Value.HighPart And &H80000000
 End Function
 
 ''
@@ -198,6 +208,25 @@ Public Function ToString(ByRef Value As Int64, Optional ByRef Format As String, 
     ToString = NumberFormatter.FormatInt64(Value, Format, Provider)
 End Function
 
+''
+' Converts an <a href="Int64Static.Int64.html">Int64</a> value to a type <b>Decimal</b>.
+'
+' @param Value The <a href="Int64Static.Int64.html">Int64</a> value to be converted to a <b>Decimal</b>.
+' @return The <b>Decimal</b> value of the <a href="Int64Static.Int64.html">Int64</a>.
+Public Function ToDecimal(ByRef Value As Int64) As Variant
+    Const NegativeDecimalType As Long = vbDecimal Or &H80000000
+    Dim Ptr As Long
+    
+    Ptr = VarPtr(ToDecimal)
+        
+    If IsNegative(Value) Then
+        MemLong(Ptr) = NegativeDecimalType
+        AssignQWord Negate(Value), ByVal Ptr + VARIANTDATA_OFFSET
+    Else
+        MemLong(Ptr) = vbDecimal
+        AssignQWord Value, ByVal Ptr + VARIANTDATA_OFFSET
+    End If
+End Function
 
 ''
 ' Compares two <a href="Int64Static.Int64.html">Int64</a> values and returns a value indicating whether one is less than, equal to, or greater than the other.

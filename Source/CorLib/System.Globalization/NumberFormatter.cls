@@ -301,26 +301,15 @@ Private Function Int64ToString(ByRef Value As Int64, ByRef Specifiers As Specifi
             Exit Function
             
         Case Else
-            Dim DecimalValue    As Variant
-            Dim DecimalValuePtr As Long
+            Dim DecimalValue As Variant
             
-            DecimalValuePtr = VarPtr(DecimalValue)
-            MemWord(DecimalValuePtr) = vbDecimal
-            
-            If Statics.Int64.Sign(Value) < 0 Then
-                Dim NegatedValue As Int64
-                
-                NegatedValue = Statics.Int64.Negate(Value)
-                AssignQWord NegatedValue, ByVal DecimalValuePtr + VARIANTDATA_OFFSET
-                
+            DecimalValue = Statics.Int64.ToDecimal(Value)
+
+            If DecimalValue < 0 Then
                 If InStr(1, Format, ";") = 0 Then
-                    Int64ToString = mFormatInfo.NegativeSign & VBA.Format$(DecimalValue, Format)
+                    Int64ToString = mFormatInfo.NegativeSign & VBA.Format$(Abs(DecimalValue), Format)
                     Exit Function
                 End If
-                
-                MemByte(DecimalValuePtr + 3) = &H80
-            Else
-                AssignQWord Value, ByVal DecimalValuePtr + VARIANTDATA_OFFSET
             End If
             
             Int64ToString = VBA.Format$(DecimalValue, Format)

@@ -132,6 +132,8 @@ version 3.0 (BREAKING CHANGES)
 	* Added .NET style formatting to Decimal data-type.
 	* Changed data-type for NumberFormatInfo.PercentGroupSizes and NumberFormatInfo.NumberGroupSizes properties from Variant to Long().
 	* Improved support for custom numeric formatting when using Object.ToString method.
+	* Added Int64.ToDecimal method.
+	* Added Int64.IsNegative method.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

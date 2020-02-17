@@ -435,6 +435,12 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use 12, "0", "12"
             Test.Use 12, "0.00", "12.00"
             Test.Use 12, "0;(#)", "12"
+            
+        Case "ToDecimal_WithValues_ReturnsExpected"
+            Test.Use Int64.Zero, CDec(0)
+            Test.Use Int64.One, CDec(1)
+            Test.Use Int64.MinusOne, CDec(-1)
+            
     End Select
 End Sub
 
@@ -768,4 +774,12 @@ Public Sub ToString_WithCustomNegativeFormat_ReturnsExpected(ByVal Value As Long
     Actual = Object.ToString(CInt64(Value), Format, Info)
     
     Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub ToDecimal_WithValues_ReturnsExpected(ByRef Value As Int64, ByRef Expected As Variant)
+    Dim Actual As Variant
+    
+    Actual = Int64.ToDecimal(Value)
+    
+    Assert.That Actual, Iz.EqualTo(CDec(Expected)).Strict
 End Sub
