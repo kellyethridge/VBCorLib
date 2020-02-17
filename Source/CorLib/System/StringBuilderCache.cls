@@ -46,8 +46,7 @@ End Sub
 
 Friend Function Acquire(Optional ByVal Capacity As Long = 128) As StringBuilder
     If Not mFastlane Is Nothing Then
-        Set Acquire = mFastlane
-        Set mFastlane = Nothing
+        Helper.Swap4 Acquire, mFastlane
     ElseIf mCache.Count = 0 Then
         Set Acquire = Cor.NewStringBuilder(Capacity:=Capacity)
     Else
@@ -75,7 +74,7 @@ Friend Sub Release(ByVal Builder As StringBuilder)
     Debug.Assert Not Builder Is Nothing
     
     If mFastlane Is Nothing Then
-        Set mFastlane = Builder
+        Helper.Swap4 Builder, mFastlane
     Else
         mCache.Push Builder
     End If

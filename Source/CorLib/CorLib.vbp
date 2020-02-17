@@ -368,8 +368,8 @@ Class=IVersionable; System.Collections\IVersionable.cls
 Module=Int64Callbacks; System\Int64Callbacks.bas
 Class=Int64Parser; System\Int64Parser.cls
 Class=EncoderReplacementFallback; System.Text\EncoderReplacementFallback.cls
-ResFile32="CorLib.RES"
 Class=NumberFormatter; System.Globalization\NumberFormatter.cls
+ResFile32="CorLib.RES"
 Startup="Sub Main"
 HelpFile=""
 Title="CorLib"
@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=1
+Num=17
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -420,88 +420,78 @@ Priority=1
 Comment=Add tests to exercise when mTermCount > 0 in TransformFinalBlock method.
 
 [TASK2]
-Description=
-Status=
-Priority=
-AssignedTo=
-Comment=
+Description=Visit TimeZone class
+Status=0
+Priority=1
+Comment=Check tests and API for parity.
 
 [TASK3]
-Description=
-Status=
-Priority=
-AssignedTo=
-Comment=
+Description=TimeZoneInfo class
+Status=0
+Priority=1
+Comment=Investigate implementation.
 
 [TASK4]
-Description=
-Status=
-Priority=
-Comment=
-AssignedTo=
+Description=PasswordDeriveBytes class
+Status=0
+Priority=1
+Comment=Investigate implementation.
 
 [TASK5]
-Description=
-Status=
-Priority=
-Comment=
-AssignedTo=
+Description=NewDecimals
+Status=0
+Priority=1
+Comment=ensure Int64 is supported.
 
 [TASK6]
-Description=
-Status=
-Priority=
-Comment=
-AssignedTo=
+Description=Add CorString.Concat method
+Status=0
+Priority=1
 
 [TASK7]
-Description=
-Status=
-Priority=
-Comment=
-AssignedTo=
+Description=Add CorString.CopyTo method
+Status=0
+Priority=1
 
 [TASK8]
-Description=
-Status=
-Priority=
-AssignedTo=
-Comment=
+Description=Add CorString.EndsWith and CorString.StartsWith
+Status=0
+Priority=1
 
 [TASK9]
-Description=
-Status=
-Priority=
+Description=Add CorString.Split method
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 
 [TASK10]
-Description=
-Status=
-Priority=
+Description=Add TimeSpan.Multiply method
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 
 [TASK11]
-Description=
-Status=
-Priority=
+Description=Add TimeSpan.Divide method
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 
 [TASK12]
-Description=
-Status=
-Priority=
+Description=Add CorMath.Clamp method
+Status=0
+Priority=1
 AssignedTo=
 Comment=
 
 [TASK13]
-Description=
-Status=
-Priority=
+Description=Consider adding CorMathF class
+Status=0
+Priority=1
 AssignedTo=
-Comment=
+Comment=This class would have corrisponding methods to CorMath except the arguments and results would be of type Single instead of Double.
 
 [MS Transaction Server]
 AutoRefresh=1
@@ -520,3 +510,31 @@ RevisionVersion=0
 
 [Rubberduck]
 ProjectId=f2a7fbaa-ee7b-481f-8d3a-8e2e11f4b57d
+
+[TASK14]
+Description=Update BitConverter.DoubleToInt64Bits to return Int64
+Status=0
+Priority=1
+AssignedTo=
+Comment=
+
+[TASK15]
+Description=Update BitConverter.Int64BitsToDouble to accept Int64
+Status=0
+Priority=1
+AssignedTo=
+Comment=
+
+[TASK16]
+Description=Add corrisponding 32bit<->Single methods to BitConverter
+Status=0
+Priority=1
+AssignedTo=
+Comment=
+
+[TASK17]
+Description=Consider renaming CorArray.Length back to GetLength
+Status=0
+Priority=1
+AssignedTo=
+Comment=

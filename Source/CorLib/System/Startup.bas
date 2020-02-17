@@ -36,10 +36,10 @@ Public Property Get InDebugger() As Boolean
 End Property
 
 Private Sub Main()
+    InitHelper
     SetInIDE
     SetInDebugger
     InitMissing
-    InitHelper
     InitMathematics
     InitGlobalization
     InitEncoding
