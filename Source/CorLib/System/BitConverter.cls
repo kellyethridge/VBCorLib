@@ -49,29 +49,26 @@ Option Explicit
 
 
 ''
-' Converts the bit representation of a Double to a Currency.
+' Converts the bit representation of a Double to an <a href="Int64Static.Int64.html">Int64</a>.
 '
-' @param Value The Double bits to convert to Currency bits.
-' @return The bit representation from the Double.
-' @remarks This does not convert a Double value to that of a
-' Currency value (like using CCur). This will copy the 64 bits
-' of the Double variable to the 64 bits of the Currency variable.
-'
-Public Function DoubleToInt64Bits(ByVal Value As Double) As Currency
-    DoubleToInt64Bits = AsCurr(Value)
+' @param Value The Double bits to convert to <a href="Int64Static.Int64.html">Int64</a> bits.
+' @return The <a href="Int64Static.Int64.html">Int64</a> bit representation from the Double.
+' @remarks This does not convert a Double value to that of a <a href="Int64Static.Int64.html">Int64</a> value (like using CInt64).
+' This will copy the 64 bits of the Double variable to the 64 bits of the <a href="Int64Static.Int64.html">Int64</a> variable.
+Public Function DoubleToInt64Bits(ByVal Value As Double) As Int64
+    AssignQWord Value, DoubleToInt64Bits
 End Function
 
 ''
-' Converts the bit representation of a Currencty to a Double.
+' Converts the bit representation of a <a href="Int64Static.Int64.html">Int64</a> to a Double.
 '
-' @param Value The Currency bits to conver to Double bits.
-' @return The bit representation from a Currency datatype.
-' @remarks This does not convert a Currency to that of a
+' @param Value The <a href="Int64Static.Int64.html">Int64</a> bits to conver to Double bits.
+' @return The bit representation from a <a href="Int64Static.Int64.html">Int64</a> data-type.
+' @remarks This does not convert a <a href="Int64Static.Int64.html">Int64</a> to that of a
 ' Double value (like using CDbl). This will copy the 64 bits
-' of the Currency variable to the 64 bits of the Double variable.
-'
-Public Function Int64BitsToDouble(ByVal Value As Currency) As Double
-    Int64BitsToDouble = AsDouble(Value)
+' of the <a href="Int64Static.Int64.html">Int64</a> variable to the 64 bits of the Double variable.
+Public Function Int64BitsToDouble(ByRef Value As Int64) As Double
+    AssignQWord Value, Int64BitsToDouble
 End Function
 
 ''

@@ -207,3 +207,18 @@ Public Sub ToInt64_WithValue_ReturnsExpected()
     Assert.That Actual, Iz.EqualTo(Int64.MaxValue)
 End Sub
 
+Public Sub DoubleToInt64Bits_WhenCalled_ReturnsInt64Bits()
+    Dim Actual As Int64
+    
+    Actual = BitConverter.DoubleToInt64Bits(4294967295#)
+    
+    Assert.That Actual, Iz.EqualTo(CInt64("0x41EFFFFFFFE00000"))
+End Sub
+
+Public Sub Int64BitsToDouble_WhenCalled_ReturnsDouble()
+    Dim Actual As Double
+    
+    Actual = BitConverter.Int64BitsToDouble(CInt64("0x41EFFFFFFFE00000"))
+    
+    Assert.That Actual, Iz.EqualTo(4294967295#).Within(0.1)
+End Sub

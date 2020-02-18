@@ -134,6 +134,7 @@ version 3.0 (BREAKING CHANGES)
 	* Improved support for custom numeric formatting when using Object.ToString method.
 	* Added Int64.ToDecimal method.
 	* Added Int64.IsNegative method.
+	* Changed BitConverter.DoubleToInt64Bits and BitConverter.Int64BitsToDouble to use Int64 data-type instead of Currency.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

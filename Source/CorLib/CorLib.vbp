@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=17
+Num=18
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -462,35 +462,26 @@ Priority=1
 Description=Add CorString.Split method
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK10]
 Description=Add TimeSpan.Multiply method
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK11]
 Description=Add TimeSpan.Divide method
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK12]
 Description=Add CorMath.Clamp method
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK13]
 Description=Consider adding CorMathF class
 Status=0
 Priority=1
-AssignedTo=
 Comment=This class would have corrisponding methods to CorMath except the arguments and results would be of type Single instead of Double.
 
 [MS Transaction Server]
@@ -513,14 +504,14 @@ ProjectId=f2a7fbaa-ee7b-481f-8d3a-8e2e11f4b57d
 
 [TASK14]
 Description=Update BitConverter.DoubleToInt64Bits to return Int64
-Status=0
+Status=2
 Priority=1
 AssignedTo=
 Comment=
 
 [TASK15]
 Description=Update BitConverter.Int64BitsToDouble to accept Int64
-Status=0
+Status=2
 Priority=1
 AssignedTo=
 Comment=
@@ -529,12 +520,15 @@ Comment=
 Description=Add corrisponding 32bit<->Single methods to BitConverter
 Status=0
 Priority=1
-AssignedTo=
-Comment=
 
 [TASK17]
-Description=Consider renaming CorArray.Length back to GetLength
+Description=Add CorArray.GetLength
 Status=0
 Priority=1
-AssignedTo=
-Comment=
+Comment=This method would be to get the length for a specific dimension like .NET.
+
+[TASK18]
+Description=Remove dimensions from CorArray.Length
+Status=0
+Priority=1
+Comment=Following .NET this method would return the length across all dimensions.
