@@ -411,7 +411,7 @@ Friend Sub InitFromBooleans(ByRef Values() As Boolean)
     
     Dim i   As Long
     Dim lb  As Long
-    Me.Length = CorArray.Length(Values, 1)
+    Me.Length = CorArray.GetLength(Values, 1)
     lb = LBound(Values)
     For i = 0 To mLength - 1
         Item(i) = Values(lb + i)

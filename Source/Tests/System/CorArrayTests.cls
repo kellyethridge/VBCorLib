@@ -26,31 +26,20 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
     Dim LongArray()     As Long
     Dim Var             As Variant
     Dim ObjectArray()   As Object
+    Dim OneDimension(1 To 10)  As Long
+    Dim TwoDimension(1 To 10, 1 To 5) As Long
+    Dim NullArray() As Long
     
     Select Case Test.MethodName
         Case "Length_WithValue_ReturnsExpected"
-            Test.Use(Array()).Expect 0
-            
-            ReDim LongArray(1 To 10)
-            Test.Use(LongArray).Expect 10
-            
-            ReDim LongArray(1 To 10, 1 To 15)
-            Test.Use(LongArray).Expect 150
-        
-            ReDim LongArray(1 To 10, 1 To 15)
-            Test.Use(LongArray, 2).Expect 15
-    
-            ReDim Var(1 To 10) As Long
-            Test.Use(Var).Expect 10
+            Test.Use Array(), 0
+            Test.Use OneDimension, 10
+            Test.Use TwoDimension, 50
             
         Case "IsNull_WithValue_ReturnsExpected"
-            Erase LongArray
-            Test.Use(LongArray).Expect True
-
-            Erase ObjectArray
-            Test.Use(ObjectArray).Expect False
-            
-            Test.Use(Array()).Expect False
+            Test.Use NullArray, True
+            Test.Use OneDimension, False
+            Test.Use Array(), False
             
         Case "Rank_WithValues_ReturnsExpected"
             ReDim LongArray(0)
@@ -61,20 +50,53 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             
             ReDim Var(0, 0, 0) As Long
             Test.Use(Var).Expect 3
+            
+        Case "GetLength_WithDimension_ReturnsExpected"
+            Test.Use 1, 1
+            Test.Use 2, 2
+            Test.Use 3, 3
+        
+        Case "GetLength_WithInvalidDimensions_ThrowsIndexOutOfRangeException"
+            Test.Use 0
+            Test.Use 2
+            
     End Select
 End Sub
 
-Public Function Length_WithValue_ReturnsExpected(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
-    Length_WithValue_ReturnsExpected = CorArray.Length(Arr, Dimension)
-End Function
+Public Sub GetLength_WithDimension_ReturnsExpected(ByVal Dimension As Long, ByVal Expected As Long)
+    Dim Arr() As Long
+    Dim Actual As Long
+    
+    ReDim Arr(0, 1, 2)
+    
+    Actual = CorArray.GetLength(Arr, Dimension)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 
-Public Sub Length_WithInvalidDimension_Throws()
-    Dim Arr(1 To 10, 1 To 15)
-
+Public Sub GetLength_WithInvalidDimensions_ThrowsIndexOutOfRangeException(ByVal InvalidDimension As Long)
+    Dim Arr() As Long
+    ReDim Arr(0)
+    
     On Error Resume Next
-    CorArray.Length Arr, 3
-
+    CorArray.GetLength Arr, InvalidDimension
+    
     AssertIndexOutOfRangeException Err
+End Sub
+
+Public Sub GetLength_WithNonArray_ThrowsArgumentException()
+    On Error Resume Next
+    CorArray.GetLength 1, 1
+    
+    AssertArgumentException Err
+End Sub
+
+Public Sub Length_WithValue_ReturnsExpected(ByRef Arr As Variant, ByVal Expected As Long)
+    Dim Actual As Long
+    
+    Actual = CorArray.Length(Arr)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub Length_WithNonArray_ThrowsArgumentException()
@@ -95,9 +117,13 @@ Public Sub Length_WithUninitializedArray_Throws()
     AssertArgumentNullException Err, "Arr"
 End Sub
 
-Public Function IsNull_WithValue_ReturnsExpected(ByRef Arr As Variant) As Boolean
-    IsNull_WithValue_ReturnsExpected = CorArray.IsNull(Arr)
-End Function
+Public Sub IsNull_WithValue_ReturnsExpected(ByRef Arr As Variant, ByVal Expected As Boolean)
+    Dim Actual As Boolean
+    
+    Actual = CorArray.IsNull(Arr)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
 '
 'Public Function Rank_WithValues_ReturnsExpected(ByRef Arr As Variant) As Long
 '    Rank_WithValues_ReturnsExpected = CorArray.Rank(Arr)

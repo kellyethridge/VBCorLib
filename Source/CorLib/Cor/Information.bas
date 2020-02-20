@@ -182,9 +182,19 @@ Public Function SAPtrV(ByRef Value As Variant) As Long
     SAPtrV = MemLong(vbaRefVarAry(Value))
 End Function
 
+Public Function GetValidSAPtr(ByRef Value As Variant, Optional ByVal ParamName As ParameterName = NameOfArr) As Long
+    If Not IsArray(Value) Then _
+        Error.Argument Argument_ArrayRequired, Environment.GetParameterName(ParamName)
+    
+    GetValidSAPtr = MemLong(vbaRefVarAry(Value))
+    
+    If GetValidSAPtr = vbNullPtr Then _
+        Error.ArgumentNull Environment.GetParameterName(ParamName), ArgumentNull_Array
+End Function
+
 ' This is for high-speed array length length retrieval without validation.
 ' Only one dimensional arrays are assumed. If there are more than one dimension
-' possible, this method should not be used. Instead use CorArray.Length.
+' possible, this method should not be used. Instead use CorArray.Length or CorArray.GetLength.
 Public Function Len1D(ByRef Arr As Variant) As Long
     Len1D = UBound(Arr) - LBound(Arr) + 1
 End Function

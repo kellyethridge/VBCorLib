@@ -574,9 +574,9 @@ Public Sub CopyEx(ByRef SourceArray As Variant, ByVal SourceIndex As Long, ByRef
         Error.ArgumentNull "DestinationArray", ArgumentNull_Array
     
     Dim SourceLength As Long
-    SourceLength = LengthCore(pSourceSafeArray, 0)
+    SourceLength = LengthCore(pSourceSafeArray)
     Dim DestinationLength As Long
-    DestinationLength = LengthCore(pDestinationSafeArray, 0)
+    DestinationLength = LengthCore(pDestinationSafeArray)
     
     If Length < 0 Then _
         Error.ArgumentOutOfRange "Length", ArgumentOutOfRange_NeedNonNegNum
@@ -682,25 +682,37 @@ Public Function CreateInstance(ByVal ElementType As VbVarType, Optional ByVal Le
 End Function
 
 ''
-' Returns the number of elements in the specified dimension. If 0 is
-' specified, this returns the total number of elements in the array.
+' Gets a 32-bit integer that represents the total number of elements in all dimensions of the array.
 '
-' @param arr The array to retrieve the number of elements from.
-' @param dimension (Optional) the specific dimension to get the number of elements.
-' @return The number of elements in the specified dimension or the entire array.
-'
-Public Function Length(ByRef Arr As Variant, Optional ByVal Dimension As Long) As Long
+' @param Arr The array to retrieve the number of elements from.
+' @return A 32-bit integer that represents the total number of elements in all the dimensions of the Array; zero if there are no elements in the array.
+Public Function Length(ByRef Arr As Variant) As Long
     Dim Ptr As Long
     
-    If Not IsArray(Arr) Then _
-        Error.Argument Argument_ArrayRequired, "Arr"
+    Ptr = GetValidSAPtr(Arr)
+    Length = LengthCore(Ptr)
+End Function
+
+''
+' Gets a 32-bit integer that represents the number of elements in the specified dimension of the array.
+'
+' @param Arr The array to get the dimension length from.
+' @param Dimension A one-based dimension of the array whose length needs to be determined.
+' @return A 32-bit integer that represents the number of elements in the specified dimension.
+' @include "..\DocIncludes\CorArray.GetLength.html"
+Public Function GetLength(ByRef Arr As Variant, ByVal Dimension As Long) As Long
+    Dim ArrayPtr    As Long
+    Dim Rank        As Long
+    Dim BoundPtr    As Long
     
-    Ptr = SAPtrV(Arr)
+    ArrayPtr = GetValidSAPtr(Arr)
+    Rank = SafeArrayGetDim(ArrayPtr)
     
-    If Ptr = vbNullPtr Then _
-        Error.ArgumentNull "Arr", ArgumentNull_Array
+    If Dimension < 1 Or Dimension > Rank Then _
+        Error.IndexOutOfRange IndexOutOfRange_Dimension
     
-    Length = LengthCore(Ptr, Dimension)
+    BoundPtr = ArrayPtr + vbSizeOfSafeArray + (Rank - Dimension) * vbSizeOfSafeArrayBound
+    GetLength = MemLong(BoundPtr)
 End Function
 
 ''
@@ -796,7 +808,6 @@ End Function
 ' @param Count The number of elements to search, starting from startindex.
 ' @return Value indicating the index the value was found. If no value was found,
 ' then one less than the lower bound of the array is returned.
-'
 Public Function LastIndexOf(ByRef Arr As Variant, ByRef Value As Variant, Optional ByRef StartIndex As Variant, Optional ByRef Count As Variant) As Long
     Dim Ptr         As Long
     Dim ElemIndex   As Long
@@ -843,7 +854,6 @@ End Function
 ' @param Arr The array to reverse.
 ' @param Index The starting element to begin reversing elements.
 ' @param Count The number of elements to reverse in the array.
-'
 Public Sub Reverse(ByRef Arr As Variant, Optional ByRef Index As Variant, Optional ByRef Count As Variant)
     Dim Info        As ArrayInfo
     Dim ElemIndex   As Long
@@ -1125,46 +1135,33 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-Private Function LengthCore(ByVal SafeArrayPtr As Long, ByVal Dimension As Long) As Long
+Private Function LengthCore(ByVal SafeArrayPtr As Long) As Long
     Dim Rank            As Long
     Dim ArrayBoundPtr   As Long
     
     Debug.Assert SafeArrayPtr <> 0
     
     Rank = SafeArrayGetDim(SafeArrayPtr)
-    
-    If Dimension > Rank Then _
-        Error.IndexOutOfRange IndexOutOfRange_Dimension
-    
     ArrayBoundPtr = SafeArrayPtr + vbSizeOfSafeArray
     
-    If Dimension < 1 Then
-        ' optimize for 99% of calls
-        If Rank = 1 Then
-            LengthCore = MemLong(ArrayBoundPtr)
-        Else
-            LengthCore = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
-        End If
+    ' optimize for 99% of calls
+    If Rank = 1 Then
+        LengthCore = MemLong(ArrayBoundPtr)
     Else
-        LengthCore = GetDimensionSize(ArrayBoundPtr, Rank, Dimension)
+        LengthCore = CalculateProductOfDimensions(ArrayBoundPtr, Rank)
     End If
 End Function
 
 Private Function CalculateProductOfDimensions(ByVal ArrayBoundPtr As Long, ByVal Rank As Long) As Long
-    Dim Result As Long
+    Dim Ptr     As Long
+    Dim Result  As Long
     
     Result = 1
-    Dim Ptr As Long
     For Ptr = ArrayBoundPtr To ArrayBoundPtr + (vbSizeOfSafeArrayBound * (Rank - 1)) Step vbSizeOfSafeArrayBound
         Result = Result * MemLong(Ptr)
     Next
 
     CalculateProductOfDimensions = Result
-End Function
-
-Private Function GetDimensionSize(ByVal ArrayBoundPtr As Long, ByVal Rank As Long, ByVal Dimension As Long) As Long
-    ArrayBoundPtr = ArrayBoundPtr + (Rank - Dimension) * vbSizeOfSafeArrayBound
-    GetDimensionSize = MemLong(ArrayBoundPtr)
 End Function
 
 ''

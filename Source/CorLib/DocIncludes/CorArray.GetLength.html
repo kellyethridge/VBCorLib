@@ -1,0 +1,22 @@
+@remarks <p>An example of <b>GetLength</b> is <i>GetLength(1)</i>, which returns the number of elements in the first dimension of the array.</p>
+<h4>Exceptions</h4>
+<table style="width: auto">
+	<tr>
+		<th>Exception</th>
+		<th>Condition</th>
+	</tr>
+	<tr>
+		<td><a href="ArgumentException.html">ArgumentException</a></td><td><i>Arr</i> is not an array.</td>
+	</tr>
+	<tr>
+		<td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Arr</i> is an uninitialized array.</td>
+	</tr>
+	<tr>
+		<td><a href="IndexOutOfRangeException.html">IndexOutOfRangeException</a></td>
+		<td>
+			<i>Dimension</i> is less than one.<br/>
+			-or-<br/>
+			<i>Dimension</i> is greater than rank.
+		</td>
+	</tr>
+</table>
