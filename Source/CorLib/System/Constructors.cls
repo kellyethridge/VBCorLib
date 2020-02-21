@@ -1221,6 +1221,28 @@ Public Function NewLongs(ParamArray Values() As Variant) As Long()
 End Function
 
 ''
+' Returns an array of <a href="Int64Static.Int64.html">Int64</a> generated from the values passed in.
+'
+' @param Values The values to create the array from.
+' @remarks The values need to be convertable to a <a href="Int64Static.Int64.html">Int64</a> or an exception will occur.
+' <p>The array is zero-based.</p>
+' <p>If no values are passed in then an empty array is returned, not a null array.</p>
+Public Function NewInt64s(ParamArray Values() As Variant) As Int64()
+    Dim Result() As Int64
+    Dim Info As IRecordInfo
+    Dim i As Long
+    
+    Set Info = GetRecordInfo(Statics.Int64.Zero)
+    SAPtr(Result) = SafeArrayCreateVectorEx(vbUserDefinedType, 0, UBound(Values) + 1, ObjPtr(Info))
+    
+    For i = 0 To UBound(Values)
+        Result(i) = CInt64(Values(i))
+    Next
+    
+    NewInt64s = Result
+End Function
+
+''
 ' Returns an array of <b>Bytes</b> generated from the values passed in.
 '
 ' @param Values The values to create the array from.

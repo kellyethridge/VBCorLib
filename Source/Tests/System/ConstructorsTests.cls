@@ -29,3 +29,11 @@ Public Sub NewDecimals_WithInt64_ReturnsDecimalArray()
     Assert.That Actual, Iz.EqualTo(Array(CDec(1))).Strict
 End Sub
 
+Public Sub NewInt64s_WhenCalled_ReturnsInt64Array()
+    Dim Actual() As Int64
+    
+    Actual = NewInt64s(1, 2, 3)
+    
+    Assert.That Actual, Iz.EqualTo(Array(CInt64(1), CInt64(2), CInt64(3)))
+End Sub
+
