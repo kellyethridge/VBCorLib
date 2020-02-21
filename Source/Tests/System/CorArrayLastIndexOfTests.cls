@@ -35,6 +35,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewStrings("4", "2", "3", "4", "5", "6"), "4", 3
             Test.Use NewDates(#4/1/2001#, #2/1/2001#, #3/1/2001#, #4/1/2001#, #5/1/2001#, #6/1/2001#), #4/1/2001#, 3
             Test.Use NewVariants("4", "2", "3", "4", "5", "6"), "4", 3
+            Test.Use NewInt64s(4, 2, 3, 4, 5, 6), 4, 3
             
             Dim Arr(2) As Int32
             Set Arr(0) = NewInt32(1)

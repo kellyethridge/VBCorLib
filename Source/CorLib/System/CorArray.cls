@@ -1111,8 +1111,10 @@ Friend Function InternalBinarySearch(ByRef Arr As Variant, ByVal Index As Long, 
     
     LowIndex = Index
     HighIndex = LowIndex + Length - 1
+    
     Do While LowIndex <= HighIndex
         MiddleIndex = (LowIndex + HighIndex) \ 2
+        
         Select Case Comparer.Compare(Arr(MiddleIndex), Value)
             Case 0
                 InternalBinarySearch = MiddleIndex

@@ -25,7 +25,6 @@ Attribute VB_Name = "Conversion"
 Option Explicit
 
 
-
 Public Function CLngOrDefault(ByRef Value As Variant, ByVal Default As Long) As Long
     If IsMissing(Value) Then
         CLngOrDefault = Default

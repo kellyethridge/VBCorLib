@@ -42,6 +42,7 @@ Option Explicit
 
 Private mMaxDecimalValue As Variant
 Private mMinDecimalValue As Variant
+Private mInt64Guid       As VBGUID
 
 
 ''
@@ -801,6 +802,14 @@ Finally:
     SAPtr(Digits) = vbNullPtr
     Return
 End Sub
+
+Friend Property Get Int64Guid() As VBGUID
+    If mInt64Guid.Data1 = 0 Then
+        mInt64Guid = GetGuid(Statics.Int64.Zero)
+    End If
+    
+    Int64Guid = mInt64Guid
+End Property
 
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''

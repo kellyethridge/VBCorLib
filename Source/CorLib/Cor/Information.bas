@@ -28,8 +28,6 @@ Attribute VB_Name = "Information"
 '
 Option Explicit
 
-Private mInt64Guid As VBGUID
-
 
 ' Retrieves the return value of the AddressOf method.
 '
@@ -70,23 +68,25 @@ End Function
 Public Function IsInt64(ByRef Value As Variant) As Boolean
     Dim OtherGuid As VBGUID
     
-    If mInt64Guid.Data1 = 0 Then
-        mInt64Guid = GetGuid(Statics.Int64.Zero)
-    End If
-    
     If VarType(Value) = vbUserDefinedType Then
         OtherGuid = GetGuid(Value)
-        IsInt64 = IsEqualGUID(mInt64Guid, OtherGuid)
+        IsInt64 = IsEqualGUID(Statics.Int64.Int64Guid, OtherGuid)
     End If
 End Function
 
-Private Function GetGuid(ByRef Value As Variant) As VBGUID
+Public Function IsInt64Array(ByVal pSA As Long) As Boolean
+    Dim Info As IRecordInfo
+    
+    Set Info = SafeArrayGetRecordInfo(pSA)
+    IsInt64Array = IsEqualGUID(Info.GetGuid, Statics.Int64.Int64Guid)
+End Function
+
+Public Function GetGuid(ByRef Value As Variant) As VBGUID
     Dim Record As IRecordInfo
     
     Set Record = GetRecordInfo(Value)
     GetGuid = Record.GetGuid
 End Function
-
 
 Public Function IsPicture(ByRef Value As Variant) As Boolean
     Dim Pic As IPicture

@@ -67,9 +67,16 @@ Public Function TrySZBinarySearch(ByVal pSA As Long, ByRef Value As Variant, ByV
         Case vbDate:                    RetVal = SZBinarySearch(pSA, VarPtr(CDate(Value)), StartIndex, Length, AddressOf SZCompareDates)
         Case vbBoolean:                 RetVal = SZBinarySearch(pSA, VarPtr(CBool(Value)), StartIndex, Length, AddressOf SZCompareBooleans)
         Case vbByte:                    RetVal = SZBinarySearch(pSA, VarPtr(CByte(Value)), StartIndex, Length, AddressOf SZCompareBytes)
+        Case vbUserDefinedType
+            If IsInt64Array(pSA) Then
+                RetVal = SZBinarySearch(pSA, VarPtr(CInt64(Value)), StartIndex, Length, AddressOf SZCompareCurrencies)
+            Else
+                Exit Function
+            End If
         Case Else
             Exit Function
     End Select
+    
     TrySZBinarySearch = True
 End Function
 
@@ -85,8 +92,16 @@ Public Function TrySZIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVal St
         Case vbByte:                    RetVal = SZIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualBytes)
         Case vbBoolean:                 RetVal = SZIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualBooleans)
         Case vbCurrency:                RetVal = SZIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualCurrencies)
-        Case Else: Exit Function
+        Case vbUserDefinedType
+            If IsInt64Array(pSA) Then
+                RetVal = SZIndexOf(pSA, VarPtr(CInt64(Value)), StartIndex, Count, AddressOf EqualCurrencies)
+            Else
+                Exit Function
+            End If
+        Case Else
+            Exit Function
     End Select
+    
     TrySZIndexOf = True
 End Function
 
@@ -102,8 +117,16 @@ Public Function TrySZLastIndexOf(ByVal pSA As Long, ByRef Value As Variant, ByVa
         Case vbByte:                    RetVal = SZLastIndexOf(pSA, VarPtr(CByte(Value)), StartIndex, Count, AddressOf EqualBytes)
         Case vbBoolean:                 RetVal = SZLastIndexOf(pSA, VarPtr(CBool(Value)), StartIndex, Count, AddressOf EqualBooleans)
         Case vbCurrency:                RetVal = SZLastIndexOf(pSA, VarPtr(CCur(Value)), StartIndex, Count, AddressOf EqualCurrencies)
-        Case Else: Exit Function
+        Case vbUserDefinedType
+            If IsInt64Array(pSA) Then
+                RetVal = SZLastIndexOf(pSA, VarPtr(CInt64(Value)), StartIndex, Count, AddressOf EqualCurrencies)
+            Else
+                Exit Function
+            End If
+        Case Else
+            Exit Function
     End Select
+    
     TrySZLastIndexOf = True
 End Function
 
@@ -307,6 +330,7 @@ End Function
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Public Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As Long) As Boolean
     Dim pfn As Long
+    
     Select Case SafeArrayGetVartype(pSA) And &HFF
         Case vbLong:                    pfn = FuncAddr(AddressOf QuickSortLong)
         Case vbString:                  pfn = FuncAddr(AddressOf QuickSortString)
@@ -318,7 +342,15 @@ Public Function TrySZSort(ByVal pSA As Long, ByVal Left As Long, ByVal Right As 
         Case vbByte:                    pfn = FuncAddr(AddressOf QuickSortByte)
         Case vbCurrency:                pfn = FuncAddr(AddressOf QuickSortCurrency)
         Case vbBoolean:                 pfn = FuncAddr(AddressOf QuickSortBoolean)
-        Case Else: Exit Function
+        Case vbUserDefinedType
+            If IsInt64Array(pSA) Then
+                ' we can sort Int64 as Currency because they are both a signed 64-bit number.
+                pfn = FuncAddr(AddressOf QuickSortCurrency)
+            Else
+                Exit Function
+            End If
+        Case Else
+            Exit Function
     End Select
     
     Dim Sorter As Action_T_T_T

@@ -34,6 +34,7 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use NewStrings("c", "d", "a", "B", "A")
             Test.Use NewDates(#5/1/2001#, #4/1/2001#, #6/1/2001#, #3/1/2001#)
             Test.Use NewVariants(7, 8, 9, 6, 5, 4, 1, 3, 2)
+            Test.Use NewInt64s(7, 8, 9, 6, 5, 4, 1, 3, 2)
             
         Case "Sort_WithCallback_SortsItems"
             Test.Use NewBytes(7, 8, 9, 6, 5, 4, 1, 3, 2), AddressOf CompareBytes
@@ -52,7 +53,7 @@ End Sub
 Public Sub Sort_WithPrimitives_SortsAscending(ByRef Arr As Variant)
     CorArray.Sort Arr
     
-    Assert.That Arr, Iz.Ordered
+    Assert.That Arr, Iz.Ordered.Using(New CorObjectComparer)
 End Sub
 
 Public Sub Sort_WithNullArray_ThrowsArgumentNullException()
