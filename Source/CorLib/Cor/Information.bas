@@ -109,10 +109,6 @@ Catch:
 End Function
 
 Public Function IsInteger(ByRef Value As Variant) As Boolean
-    ' we use VBVM6.VariantType because VarType will cause objects
-    ' that have a default property to return the default value.
-    ' If the default property happens to return a numeric value
-    ' it will give a false positive here.
     Select Case CorVarType(Value)
         Case vbLong, vbInteger, vbByte
             IsInteger = True

@@ -97,6 +97,15 @@ Private Sub ITestCaseSource_GetTestCases(ByVal Test As SimplyVBComp.TestCaseColl
             Test.Use -10, 20, CInt64(-200)
             Test.Use -10, -20, CInt64(200)
             Test.Use &H7FFFFFFF, &H7FFFFFFF, CInt64("4611686014132420609")
+            
+        Case "Clamp_WithValues_ReturnsExpected"
+            Test.Use 5, 1, 10, 5
+            Test.Use 0, 1, 10, 1
+            Test.Use 11, 1, 10, 10
+            Test.Use CInt64(5), CInt64(1), CInt64(10), CInt64(5)
+            Test.Use CInt64(0), CInt64(1), CInt64(10), CInt64(1)
+            Test.Use CInt64(11), CInt64(1), CInt64(10), CInt64(10)
+            
     End Select
 End Sub
 
@@ -178,6 +187,14 @@ Public Sub BigMul_WithValues_ReturnsExpected(ByVal a As Long, ByVal b As Long, B
     Dim Actual As Int64
     
     Actual = BigMul(a, b)
+    
+    Assert.That Actual, Iz.EqualTo(Expected)
+End Sub
+
+Public Sub Clamp_WithValues_ReturnsExpected(ByRef Value As Variant, ByRef Min As Variant, ByRef Max As Variant, ByRef Expected As Variant)
+    Dim Actual As Variant
+    
+    Actual = CorMath.Clamp(Value, Min, Max)
     
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub

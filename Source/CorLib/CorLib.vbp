@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=16
+Num=15
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -474,15 +474,15 @@ Status=0
 Priority=1
 
 [TASK12]
-Description=Add CorMath.Clamp method
-Status=0
-Priority=1
-
-[TASK13]
 Description=Consider adding CorMathF class
 Status=0
 Priority=1
 Comment=This class would have corrisponding methods to CorMath except the arguments and results would be of type Single instead of Double.
+
+[TASK13]
+Description=Add corrisponding 32bit<->Single methods to BitConverter
+Status=0
+Priority=1
 
 [MS Transaction Server]
 AutoRefresh=1
@@ -503,20 +503,22 @@ RevisionVersion=0
 ProjectId=f2a7fbaa-ee7b-481f-8d3a-8e2e11f4b57d
 
 [TASK14]
-Description=Add corrisponding 32bit<->Single methods to BitConverter
-Status=0
-Priority=1
-
-[TASK15]
 Description=Remove dimensions from CorArray.Length
 Status=0
 Priority=1
 Comment=Following .NET this method would return the length across all dimensions.
 
-[TASK16]
+[TASK15]
 Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
 Status=0
 Priority=1
+
+[TASK16]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK17]
 Description=

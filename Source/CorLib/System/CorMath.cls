@@ -375,6 +375,45 @@ Public Function BigMul(ByVal a As Long, ByVal b As Long) As Int64
     End If
 End Function
 
+''
+' Returns value clamped to the inclusive range of <i>Min</i> and <i>Max</i>.
+'
+' @param Value The value to be clamped.
+' @param Min The lower bound of the result.
+' @param Max The upper bound of the result.
+' @return Returns <i>Value</i> if between <i>Min</i> and <i>Max</i>.<br/>
+' -or-<br/>
+' <i>Min</i> if <i>Value</i> is less than.<br/>
+' -or-<br/>
+' <i>Max</i> if <i>Value</i> is greater than.
+Public Function Clamp(ByRef Value As Variant, ByRef Min As Variant, ByRef Max As Variant) As Variant
+    Dim Value64 As Int64
+    Dim Min64 As Int64
+    Dim Max64 As Int64
+    
+    If IsAnyInt64(Value, Min, Max) Then
+        Value64 = CInt64(Value)
+        Min64 = CInt64(Min)
+        Max64 = CInt64(Max)
+        
+        If Statics.Int64.Compare(Value64, Min64) < 0 Then
+            Clamp = Min64
+        ElseIf Statics.Int64.Compare(Value64, Max64) > 0 Then
+            Clamp = Max64
+        Else
+            Clamp = Value
+        End If
+    Else
+        If Value < Min Then
+            Clamp = Min
+        ElseIf Value > Max Then
+            Clamp = Max
+        Else
+            Clamp = Value
+        End If
+    End If
+End Function
+
 
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Constructors
@@ -387,6 +426,16 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 '   Helpers
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+Private Function IsAnyInt64(ByRef a As Variant, ByRef b As Variant, ByRef c As Variant) As Boolean
+    If IsInt64(a) Then
+        IsAnyInt64 = True
+    ElseIf IsInt64(b) Then
+        IsAnyInt64 = True
+    Else
+        IsAnyInt64 = IsInt64(c)
+    End If
+End Function
+
 Private Function IsGtOrEq(ByRef x As Variant, ByRef y As Variant) As Boolean
     Select Case VarType(x)
         Case vbObject

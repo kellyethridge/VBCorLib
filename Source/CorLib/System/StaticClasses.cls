@@ -109,7 +109,7 @@ End Property
 ''
 ' Returns an object used to access the <a href="CorMath.html">CorMath</a> methods.
 '
-' @return A reference
+' @return A reference to a <a href="CorMath.html">CorMath</a> object.
 Public Property Get CorMath() As CorMath
     Set CorMath = Statics.CorMath
 End Property
