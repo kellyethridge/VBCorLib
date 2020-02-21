@@ -139,6 +139,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added CorArray.Length method to return total of all elements in an array to match .NET.
 	* Added CorMath.Clamp method.
 	* Added BitConverter.Int64BitsToCurrency and BitConverter.CurrencyToInt64Bits methods.
+	* Added Int64 support in NewDecimals method.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

@@ -228,6 +228,7 @@ Class=ConsoleKeyInfoTests; System\ConsoleKeyInfoTests.cls
 Class=LargeUdtComparer; System\LargeUdtComparer.cls
 Class=ObjectToStringWithDecimalsTests; System\ObjectToStringWithDecimalsTests.cls
 ResFile32="CorLib.Tests.RES"
+Class=ConstructorsTests; System\ConstructorsTests.cls
 IconForm="frmSimplyVBUnitRunner"
 Startup="frmSimplyVBUnitRunner"
 HelpFile=""

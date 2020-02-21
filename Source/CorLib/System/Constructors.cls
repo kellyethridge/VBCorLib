@@ -1357,7 +1357,11 @@ Public Function NewDecimals(ParamArray Values() As Variant) As Variant()
     SAPtr(Result) = SafeArrayCreateVector(vbVariant, 0, UBound(Values) + 1)
     
     For i = 0 To UBound(Values)
-        Result(i) = CDec(Values(i))
+        If IsInt64(Values(i)) Then
+            Result(i) = Statics.Int64.ToDecimal(CInt64(Values(i)))
+        Else
+            Result(i) = CDec(Values(i))
+        End If
     Next
     
     NewDecimals = Result

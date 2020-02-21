@@ -141,6 +141,7 @@ Private Sub AddSystem()
         .Add New ConsoleKeyInfoTests
 '        .Add New ConsoleTests ' we exclude them here to prevent a console from being displayed
         .Add New Int64Tests
+        .Add New ConstructorsTests
         
         AddTest .This
     End With
