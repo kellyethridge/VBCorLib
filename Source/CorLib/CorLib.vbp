@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=15
+Num=14
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -503,15 +503,16 @@ RevisionVersion=0
 ProjectId=f2a7fbaa-ee7b-481f-8d3a-8e2e11f4b57d
 
 [TASK14]
-Description=Remove dimensions from CorArray.Length
-Status=0
-Priority=1
-Comment=Following .NET this method would return the length across all dimensions.
-
-[TASK15]
 Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
 Status=0
 Priority=1
+
+[TASK15]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK16]
 Description=

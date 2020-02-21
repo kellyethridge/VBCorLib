@@ -72,6 +72,29 @@ Public Function Int64BitsToDouble(ByRef Value As Int64) As Double
 End Function
 
 ''
+' Converts the bit representation of a Currency to an <a href="Int64Static.Int64.html">Int64</a>.
+'
+' @param Value The Currency bits to convert to <a href="Int64Static.Int64.html">Int64</a> bits.
+' @return The <a href="Int64Static.Int64.html">Int64</a> bit representation from the Currency.
+' @remarks This does not convert a Currency value to that of a <a href="Int64Static.Int64.html">Int64</a> value (like using CInt64).
+' This will copy the 64 bits of the Currency variable to the 64 bits of the <a href="Int64Static.Int64.html">Int64</a> variable.
+Public Function CurrencyToInt64Bits(ByVal Value As Currency) As Int64
+    AssignQWord Value, CurrencyToInt64Bits
+End Function
+
+''
+' Converts the bit representation of a <a href="Int64Static.Int64.html">Int64</a> to a Currency.
+'
+' @param Value The <a href="Int64Static.Int64.html">Int64</a> bits to conver to Currency bits.
+' @return The bit representation from a <a href="Int64Static.Int64.html">Int64</a> data-type.
+' @remarks This does not convert a <a href="Int64Static.Int64.html">Int64</a> to that of a
+' Currency value (like using CCur). This will copy the 64 bits
+' of the <a href="Int64Static.Int64.html">Int64</a> variable to the 64 bits of the Currency variable.
+Public Function Int64BitsToCurrency(ByRef Value As Int64) As Currency
+    AssignQWord Value, Int64BitsToCurrency
+End Function
+
+''
 ' Returns a byte array representation of the datatype value.
 '
 ' @param value The datatype to be converted to a byte array.

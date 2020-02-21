@@ -222,3 +222,19 @@ Public Sub Int64BitsToDouble_WhenCalled_ReturnsDouble()
     
     Assert.That Actual, Iz.EqualTo(4294967295#).Within(0.1)
 End Sub
+
+Public Sub CurrencyToInt64Bits_WhenCalled_ReturnsInt64Bits()
+    Dim Actual As Int64
+    
+    Actual = BitConverter.CurrencyToInt64Bits(858993.4593@)
+    
+    Assert.That Actual, Iz.EqualTo(CInt64("0x0000000200000001"))
+End Sub
+
+Public Sub Int64BitsToCurrency_WhenCalled_ReturnsCurrency()
+    Dim Actual As Currency
+    
+    Actual = BitConverter.Int64BitsToCurrency(CInt64("0x0000000200000001"))
+    
+    Assert.That Actual, Iz.EqualTo(858993.4593@)
+End Sub
