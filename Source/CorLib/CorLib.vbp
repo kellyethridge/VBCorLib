@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=14
+Num=13
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -438,49 +438,48 @@ Priority=1
 Comment=Investigate implementation.
 
 [TASK5]
-Description=NewDecimals
-Status=0
-Priority=1
-Comment=ensure Int64 is supported.
-
-[TASK6]
 Description=Add CorString.Concat method
 Status=0
 Priority=1
 
-[TASK7]
+[TASK6]
 Description=Add CorString.CopyTo method
 Status=0
 Priority=1
 
-[TASK8]
+[TASK7]
 Description=Add CorString.EndsWith and CorString.StartsWith
 Status=0
 Priority=1
 
-[TASK9]
+[TASK8]
 Description=Add CorString.Split method
 Status=0
 Priority=1
 
-[TASK10]
+[TASK9]
 Description=Add TimeSpan.Multiply method
 Status=0
 Priority=1
 
-[TASK11]
+[TASK10]
 Description=Add TimeSpan.Divide method
 Status=0
 Priority=1
 
-[TASK12]
+[TASK11]
 Description=Consider adding CorMathF class
 Status=0
 Priority=1
 Comment=This class would have corrisponding methods to CorMath except the arguments and results would be of type Single instead of Double.
 
-[TASK13]
+[TASK12]
 Description=Add corrisponding 32bit<->Single methods to BitConverter
+Status=0
+Priority=1
+
+[TASK13]
+Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
 Status=0
 Priority=1
 
@@ -503,9 +502,11 @@ RevisionVersion=0
 ProjectId=f2a7fbaa-ee7b-481f-8d3a-8e2e11f4b57d
 
 [TASK14]
-Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
-Status=0
-Priority=1
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [TASK15]
 Description=
