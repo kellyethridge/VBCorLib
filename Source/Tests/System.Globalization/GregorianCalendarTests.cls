@@ -119,13 +119,17 @@ Public Sub IsReadOnly_WhenMadeReadOnly_ReturnsTrue()
     Assert.That Actual.IsReadOnly, Iz.True
 End Sub
 
-Public Sub TwoDigitYearMax_WithDefault_Returns2029()
+Public Sub TwoDigitYearMax_WithDefault_ReturnsWindowsValue()
     Dim Calendar As New GregorianCalendar
-    
+    Dim Expected As Long
     Dim Actual As Long
+    
     Actual = Calendar.TwoDigitYearMax
     
-    Assert.That Actual, Iz.EqualTo(2029)
+    ' since the windows TwoDigitMaxYear seems to change every 20 years, we will just
+    ' have to retrieve it and make user we return the same value.
+    GetCalendarInfo LOCALE_USER_DEFAULT, CAL_GREGORIAN, CAL_ITWODIGITYEARMAX Or CAL_RETURN_NUMBER, vbNullString, 0, Expected
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TwoDigitYearMax_WithMinYearMinusOne_ThrowsArgumentOutOfRangeException()

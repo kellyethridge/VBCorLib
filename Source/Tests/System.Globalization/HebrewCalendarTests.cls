@@ -173,13 +173,17 @@ Public Sub TestSerialization()
     Assert.That Actual.TwoDigitYearMax, Iz.EqualTo(99)
 End Sub
 
-Public Sub TwoDigitYearMax_WithDefault_Returns5790()
+Public Sub TwoDigitYearMax_WithDefault_ReturnsWindowsValue()
     Dim Calendar As New HebrewCalendar
-    
+    Dim Expected As Long
     Dim Actual As Long
+    
     Actual = Calendar.TwoDigitYearMax
     
-    Assert.That Actual, Iz.EqualTo(5790)
+    ' since the windows TwoDigitMaxYear seems to change every 20 years, we will just
+    ' have to retrieve it and make user we return the same value.
+    GetCalendarInfo LOCALE_USER_DEFAULT, CAL_HEBREW, CAL_ITWODIGITYEARMAX Or CAL_RETURN_NUMBER, vbNullString, 0, Expected
+    Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
 Public Sub TwoDigitYearMax_WithMinYearMinusOne_ThrowsArgumentOutOfRangeException()
