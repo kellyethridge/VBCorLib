@@ -97,7 +97,7 @@ End Property
 ' @remarks This uses the current time zone settings of the system to determine when daylight savings should be.
 '
 Public Property Get IsDayLightSavingsTime() As Boolean
-    IsDayLightSavingsTime = TimeZone.CurrentTimeZone.IsDayLightSavingTime(Me)
+    IsDayLightSavingsTime = TimeZone.CurrentTimeZone.IsDaylightSavingTime(Me)
 End Property
 
 ''

@@ -32,12 +32,12 @@ Attribute VB_Exposed = True
 'DEALINGS IN THE SOFTWARE.
 '
 '
-' Module: DayLightTime
+' Module: DaylightTime
 '
 
 ''
-' Represents the start and end times for a daylight savings period, and the
-' difference between daylight savings time and standard time.
+' Represents the start and end times for a daylight saving period, and the
+' difference between daylight saving time and standard time.
 '
 ' @see Constructors
 ' @see TimeZone
@@ -46,36 +46,37 @@ Attribute VB_Exposed = True
 Option Explicit
 Implements IObject
 
+Private Const StartTimeProp As String = "StartTime"
+Private Const EndTimeProp   As String = "EndTime"
+Private Const DeltaProp     As String = "Delta"
+
 Private mDelta      As TimeSpan
 Private mStartTime  As CorDateTime
 Private mEndTime    As CorDateTime
 
 
 ''
-' Returns the date for when the daylight savings period starts.
+' Returns the date for when the daylight saving period starts.
 '
-' @return The date of the start of daylight savings.
-'
+' @return The date of the start of daylight saving.
 Public Property Get StartTime() As CorDateTime
     Set StartTime = mStartTime
 End Property
 
 ''
-' Returns the date for when the daylight savings period ends.
+' Returns the date for when the daylight saving period ends.
 '
-' @return The date of the end of daylight savings.
-'
+' @return The date of the end of daylight saving.
 Public Property Get EndTime() As CorDateTime
     Set EndTime = mEndTime
 End Property
 
 ''
-' Returns the difference between stadard time and daylight savings.
+' Returns the difference between stadard time and daylight saving.
 '
-' @return The difference between stadard time and daylight savings.
+' @return The difference between stadard time and daylight saving.
 ' @remarks This is the amount to change the current time when switching
-' between standard and daylight savings time.
-'
+' between standard and daylight saving time.
 Public Property Get Delta() As TimeSpan
     Set Delta = mDelta
 End Property
@@ -111,10 +112,7 @@ End Function
 '   Constructors
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Friend Sub Init(ByRef StartTime As Variant, ByRef EndTime As Variant, ByVal Delta As TimeSpan)
-    If Delta Is Nothing Then
-        Set Delta = TimeSpan.Zero
-    End If
-    Set mDelta = Delta
+    Set mDelta = IfObject(Delta, TimeSpan.Zero)
     Set mStartTime = Convert.ToDateTime(StartTime)
     Set mEndTime = Convert.ToDateTime(EndTime)
 End Sub
@@ -125,17 +123,17 @@ End Sub
 '''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 Private Sub Class_ReadProperties(PropBag As PropertyBag)
     With PropBag
-        Set mStartTime = .ReadProperty("StartTime")
-        Set mEndTime = .ReadProperty("EndTime")
-        Set mDelta = .ReadProperty("Delta")
+        Set mStartTime = .ReadProperty(StartTimeProp)
+        Set mEndTime = .ReadProperty(EndTimeProp)
+        Set mDelta = .ReadProperty(DeltaProp)
     End With
 End Sub
 
 Private Sub Class_WriteProperties(PropBag As PropertyBag)
     With PropBag
-        .WriteProperty "StartTime", mStartTime
-        .WriteProperty "EndTime", mEndTime
-        .WriteProperty "Delta", mDelta
+        .WriteProperty StartTimeProp, mStartTime
+        .WriteProperty EndTimeProp, mEndTime
+        .WriteProperty DeltaProp, mDelta
     End With
 End Sub
 

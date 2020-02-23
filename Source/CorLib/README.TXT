@@ -15,7 +15,6 @@ version 3.0 (BREAKING CHANGES)
 	* Updated CorArray.CreateInstance to support multi-dimension arrays with selected 0 lengths.
 	* Removed ciArrayTypes. Replaced with VbVarType. *BREAKING*
 	* Removed CorArray.NewArray. *BREAKING*
-	* Renamed CorArray.GetLength to CorArray.Length.
 	* Renamed CorArray.GetRank to CorArray.Rank.
 	* Fixed missing floating point leading zero before decimal.
 	* Fixed max negative Long not displaying correct number.
@@ -109,7 +108,7 @@ version 3.0 (BREAKING CHANGES)
 	* Added user-defined type support in ObjectStatic.
 	* Re-implemented MemoryMappedFile to create a MemoryMappedViewAccessor.
 	* Added MemoryMappedViewAccessor to access mapped views of a file.
-	* Fixed MemoryStream. Should through ObjectDisposedException when reading Position property when closed.
+	* Fixed MemoryStream. Should throw ObjectDisposedException when reading Position property when closed.
 	* Re-implemented MemoryMappedFile to align with .NET 4.0.
 	* Added CopyTo method to Stream interface to align with .NET 4.0.
 	* Renamed IVersionableCollection interface to IVersionable.
@@ -141,6 +140,8 @@ version 3.0 (BREAKING CHANGES)
 	* Added BitConverter.Int64BitsToCurrency and BitConverter.CurrencyToInt64Bits methods.
 	* Added Int64 support in NewDecimals method.
 	* Added NewInt64s array constructor.
+	* Added IsDaylightSavingTime to TimeZoneStatic to match .NET.
+	* Removed optional daylightTimes parameter from TimeZone to match .NET.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.
