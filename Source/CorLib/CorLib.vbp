@@ -411,7 +411,7 @@ ThreadingModel=1
 DebugStartupOption=0
 
 [TaskList]
-Num=13
+Num=11
 
 [TASK1]
 Description=Add tests for FromBase64Transform.TransformFinalBlock
@@ -468,21 +468,23 @@ Priority=1
 Comment=This class would have corrisponding methods to CorMath except the arguments and results would be of type Single instead of Double.
 
 [TASK11]
-Description=Add corrisponding 32bit<->Single methods to BitConverter
-Status=0
-Priority=1
-
-[TASK12]
 Description=Add CryptDeriveKey method to Rfc2898DeriveBytes class
 Status=0
 Priority=1
 
-[TASK13]
-Description=Fix File.OpenFile method
-Status=0
-Priority=1
+[TASK12]
+Description=
+Status=
+Priority=
 AssignedTo=
-Comment=An invalid Access value error occurs when letting the default of -1 be used. It should be zero.
+Comment=
+
+[TASK13]
+Description=
+Status=
+Priority=
+AssignedTo=
+Comment=
 
 [MS Transaction Server]
 AutoRefresh=1

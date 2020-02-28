@@ -143,6 +143,8 @@ version 3.0 (BREAKING CHANGES)
 	* Added IsDaylightSavingTime to TimeZoneStatic to match .NET.
 	* Removed optional daylightTimes parameter from TimeZone to match .NET.
 	* Added global public function t() used to replace escaped character sequences with literal versions.
+	* Added BitConverter.SingleToInt32Bits and BitConverter.Int32BitsToSingle method pair.
+	* Added CorString.CopyTo method.
 
 version 2.3
 	* Updated ASM code to not trigger DEP protection.

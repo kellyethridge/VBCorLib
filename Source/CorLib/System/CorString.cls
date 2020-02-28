@@ -305,6 +305,56 @@ Public Function Join(ByRef Separator As String, ByRef Value As Variant, Optional
 End Function
 
 ''
+' Copies a specified number of characters from a specified position in a string to a specified position in an array of Unicode characters.
+'
+' @param Source The string to copy the characters from.
+' @param SourceIndex The zero-based index of the first character to copy.
+' @param Destination An array of Unicode characters to which characters in the string are copied.
+' @param DestinationIndex The index in <i>Destination</i> as which the copy operation begins.
+' @param Count The number of characters in the string to copy to <i>Destination</i>.
+' <h4>Exceptions</h4>
+' <table style="width: auto">
+'   <tr>
+'       <th>Exception</th>
+'       <th>Condition</th>
+'   </tr>
+'   <tr>
+'        <td><a href="ArgumentNullException.html">ArgumentNullException</a></td><td><i>Destination</i> is <b>null</b>.</td>
+'   </tr>
+'    <tr>
+'        <td><a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a></td>
+'        <td>
+'           <i>SourceIndex</i> or <i>Count</i> is negative.<br/>
+'           -or-<br/>
+'           <i>DestinationIndex</i> is less than the lower-bound of <i>Destination</i>.<br/>
+'           -or-<br/>
+'           <i>Count</i> is greater than the length of the substring from <i>StartIndex</i> to the end of the string.<br/>
+'           -or-<br/>
+'           <i>Count</i> is greater than the length of the subarray from <i>DestinationIndex</i> to the upper-bound of the <i>Destination</i> array.
+'        </td>
+'    </tr>
+' </table>
+' @remarks This method copies <i>Count</i> characters from the <i>SourceIndex</i> position of <i>Source</i> to the <i>DestinationIndex</i> position of destination character array.
+' This method does not resize the destination character array; it must have a sufficient number of elements to accommodate the copied characters or the method throws an <a href="ArgumentOutOfRangeException.html">ArgumentOutOfRangeException</a>.
+' <p><i>SourceIndex</i> is zero-based, and <i>DestinationIndex</i> is lower-bound based.</p>
+Public Sub CopyTo(ByRef Source As String, ByVal SourceIndex As Long, ByRef Destination() As Integer, ByVal DestinationIndex As Long, ByVal Count As Long)
+    If CorArray.IsNull(Destination) Then _
+        Error.ArgumentNull "Destination", ArgumentNull_Array
+    If SourceIndex < 0 Then _
+        Error.ArgumentOutOfRange "SourceIndex", ArgumentOutOfRange_Index
+    If DestinationIndex < LBound(Destination) Then _
+        Error.ArgumentOutOfRange "DestinationIndex", ArgumentOutOfRange_LBound
+    If Count < 0 Then _
+        Error.ArgumentOutOfRange "Count", ArgumentOutOfRange_NegativeCount
+    If SourceIndex + Count > Len(Source) Then _
+        Error.ArgumentOutOfRange "SourceIndex", ArgumentOutOfRange_IndexCount
+    If DestinationIndex + Count - 1 > UBound(Destination) Then _
+        Error.ArgumentOutOfRange "DestinationIndex", ArgumentOutOfRange_UBound
+    
+    CopyMemory Destination(DestinationIndex), ByVal StrPtr(Source) + SourceIndex * vbSizeOfChar, Count * vbSizeOfChar
+End Sub
+
+''
 ' Removes a substring from the string, returning a new string with the gap filled with the remaining characters.
 '
 ' @param s The string to remove characters from.

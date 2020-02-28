@@ -49,49 +49,69 @@ Option Explicit
 
 
 ''
-' Converts the bit representation of a Double to an <a href="Int64Static.Int64.html">Int64</a>.
+' Converts the specified double-precision floating point number to 64-bit signed integer.
 '
-' @param Value The Double bits to convert to <a href="Int64Static.Int64.html">Int64</a> bits.
-' @return The <a href="Int64Static.Int64.html">Int64</a> bit representation from the Double.
-' @remarks This does not convert a Double value to that of a <a href="Int64Static.Int64.html">Int64</a> value (like using CInt64).
-' This will copy the 64 bits of the Double variable to the 64 bits of the <a href="Int64Static.Int64.html">Int64</a> variable.
+' @param Value The number to convert.
+' @return A 64-bit signed integer whose value is equivalent to <i>Value</i>.
+' @remarks This copies the 64-bit representation of a double-precision floating point number
+' to a 64-bit integer. It does not attempt to convert the value similar to using <a href="PublicFunctions.CInt64.html">CInt64</a>.
 Public Function DoubleToInt64Bits(ByVal Value As Double) As Int64
-    AssignQWord Value, DoubleToInt64Bits
+    AsDouble(DoubleToInt64Bits) = Value
 End Function
 
 ''
-' Converts the bit representation of a <a href="Int64Static.Int64.html">Int64</a> to a Double.
+' Converts the specified 64-bit signed integer to a double-precision floating point number.
 '
-' @param Value The <a href="Int64Static.Int64.html">Int64</a> bits to conver to Double bits.
-' @return The bit representation from a <a href="Int64Static.Int64.html">Int64</a> data-type.
-' @remarks This does not convert a <a href="Int64Static.Int64.html">Int64</a> to that of a
-' Double value (like using CDbl). This will copy the 64 bits
-' of the <a href="Int64Static.Int64.html">Int64</a> variable to the 64 bits of the Double variable.
+' @param Value The number to convert.
+' @return A double-precision floating point number whose value is equivalent to <i>Value</i>.
+' @remarks This copies the 64-bits of the <i>Value</i> parameter to double-precision value.
+' <p>Typically, <i>Value</i> is an integer that is returned by the <a href="BitConverter.DoubleToInt64Bits.html">DoubleToInt64Bits</a> method.</p>
 Public Function Int64BitsToDouble(ByRef Value As Int64) As Double
-    AssignQWord Value, Int64BitsToDouble
+    Int64BitsToDouble = AsDouble(Value)
 End Function
 
 ''
-' Converts the bit representation of a Currency to an <a href="Int64Static.Int64.html">Int64</a>.
+' Converts the specified single-precision floating point number to 32-bit signed integer.
 '
-' @param Value The Currency bits to convert to <a href="Int64Static.Int64.html">Int64</a> bits.
-' @return The <a href="Int64Static.Int64.html">Int64</a> bit representation from the Currency.
-' @remarks This does not convert a Currency value to that of a <a href="Int64Static.Int64.html">Int64</a> value (like using CInt64).
-' This will copy the 64 bits of the Currency variable to the 64 bits of the <a href="Int64Static.Int64.html">Int64</a> variable.
+' @param Value The number to convert.
+' @return A 32-bit signed integer whose value is equivalent to <i>Value</i>.
+' @remarks This copies the 32-bit representation of a single-precision floating point number
+' to a 32-bit integer. It does not attempt to convert the value similar to using <b>CLng</b>.
+Public Function SingleToInt32Bits(ByVal Value As Single) As Long
+    SingleToInt32Bits = AsLong(Value)
+End Function
+
+''
+' Converts the specified 32-bit signed integer to a single-precision floating point number.
+'
+' @param Value The number to convert.
+' @return A single-precision floating point number whose value is equivalent to <i>Value</i>.
+' @remarks This copies the 32-bits of the <i>Value</i> parameter to single-precision value.
+' <p>Typically, <i>Value</i> is an integer that is returned by the <a href="BitConverter.SingleToInt32Bits.html">SingleToInt32Bits</a> method.</p>
+Public Function Int32BitsToSingle(ByVal Value As Long) As Single
+    Int32BitsToSingle = AsSingle(Value)
+End Function
+
+''
+' Converts the specified currency number to 64-bit signed integer.
+'
+' @param Value The number to convert.
+' @return A 64-bit signed integer whose value is equivalent to <i>Value</i>.
+' @remarks This copies the 64-bit representation of a currency number to a 64-bit integer.
+' It does not attempt to convert the value similar to using <a href="PublicFunctions.CInt64.html">CInt64</a>.
 Public Function CurrencyToInt64Bits(ByVal Value As Currency) As Int64
-    AssignQWord Value, CurrencyToInt64Bits
+    AsCurr(CurrencyToInt64Bits) = Value
 End Function
 
 ''
-' Converts the bit representation of a <a href="Int64Static.Int64.html">Int64</a> to a Currency.
+' Converts the specified 64-bit signed integer to a currency number.
 '
-' @param Value The <a href="Int64Static.Int64.html">Int64</a> bits to conver to Currency bits.
-' @return The bit representation from a <a href="Int64Static.Int64.html">Int64</a> data-type.
-' @remarks This does not convert a <a href="Int64Static.Int64.html">Int64</a> to that of a
-' Currency value (like using CCur). This will copy the 64 bits
-' of the <a href="Int64Static.Int64.html">Int64</a> variable to the 64 bits of the Currency variable.
+' @param Value The number to convert.
+' @return A currency number whose value is equivalent to <i>Value</i>.
+' @remarks This copies the 64-bits of the <i>Value</i> parameter to currency value.
+' <p>Typically, <i>Value</i> is an integer that is returned by the <a href="BitConverter.CurrencyToInt64Bits.html">CurrencyToInt64Bits</a> method.</p>
 Public Function Int64BitsToCurrency(ByRef Value As Int64) As Currency
-    AssignQWord Value, Int64BitsToCurrency
+    Int64BitsToCurrency = AsCurr(Value)
 End Function
 
 ''

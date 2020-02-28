@@ -430,9 +430,27 @@ Public Sub AppendAllText_WithExistingFile_AppendToEndOfFile()
     Assert.That Actual, Iz.EqualTo("abcdef")
 End Sub
 
+Public Sub OpenFile_WithModeAppendAndDefaultAccess_ReturnsFileStreamWithWriteAccessOnly()
+    Dim Actual As FileStream
+    
+    mBuilder.CreateFile Data:="abc"
+    
+    Set Actual = File.OpenFile(mBuilder.TempFileName, FileMode.Append)
+    
+    Assert.That Actual.CanWrite, Iz.True
+    Assert.That Actual.CanRead, Iz.False
+End Sub
 
-
-
+Public Sub OpenFile_WithModeOpenExistingAndDefaultAccess_ReturnsFileStreamWithReadWriteAccess()
+    Dim Actual As FileStream
+    
+    mBuilder.CreateFile Data:="abc"
+    
+    Set Actual = File.OpenFile(mBuilder.TempFileName, FileMode.OpenExisting)
+    
+    Assert.That Actual.CanWrite, Iz.True
+    Assert.That Actual.CanRead, Iz.True
+End Sub
 
 
 

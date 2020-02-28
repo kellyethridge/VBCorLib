@@ -308,7 +308,7 @@ End Sub
 ' @param Share The access allowed for other processes.
 ' @return A FileStream object of the specified file.
 '
-Public Function OpenFile(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess = -1, Optional ByVal Share As FileShare = FileShare.None) As FileStream
+Public Function OpenFile(ByRef Path As String, ByVal Mode As FileMode, Optional ByVal Access As FileAccess, Optional ByVal Share As FileShare = FileShare.None) As FileStream
     Set OpenFile = Cor.NewFileStream(Path, Mode, Access, Share)
 End Function
 

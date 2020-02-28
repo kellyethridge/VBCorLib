@@ -702,6 +702,84 @@ Public Sub Equals_WithValues_ReturnsExpected(ByVal a As String, ByVal b As Strin
     Assert.That Actual, Iz.EqualTo(Expected)
 End Sub
 
+Public Sub CopyTo_WithNullDestination_ThrowsArgumentNullException()
+    On Error Resume Next
+    
+    CorString.CopyTo "", 0, NullChars, 0, 0
+    
+    AssertArgumentNullException Err, "Destination"
+End Sub
+
+Public Sub CopyTo_WithSourceIndexLessThanZero_ThrowsArgumentOutOfRangeException()
+    On Error Resume Next
+    
+    CorString.CopyTo "", -1, NewChars(), 0, 0
+    
+    AssertArgumentOutOfRangeException Err, "SourceIndex"
+End Sub
+
+Public Sub CopyTo_WithDestinationIndexLessThanLBound_ThrowsArgumentOutOfRangeException()
+    Dim Dest(1 To 2) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "a", 0, Dest, 0, 1
+    
+    AssertArgumentOutOfRangeException Err, "DestinationIndex"
+End Sub
+
+Public Sub CopyTo_WithCountLessThanZero_ThrowsArgumentOutOfRangeException()
+    Dim Dest(0) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "a", 0, Dest, 0, -1
+    
+    AssertArgumentOutOfRangeException Err, "Count"
+End Sub
+
+Public Sub CopyTo_WithStartIndexPlusCountPassedEndOfString_ThrowsArgumentOutOfRangeException()
+    Dim Dest(10) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "123", 0, Dest, 0, 4
+    
+    AssertArgumentOutOfRangeException Err, "SourceIndex"
+End Sub
+
+Public Sub CopyTo_WithDestinationIndexPlusCountPassedEndOfArray_ThrowsArgumentOutOfRangeException()
+    Dim Dest(10) As Integer
+    On Error Resume Next
+    
+    CorString.CopyTo "123", 0, Dest, 9, 3
+    
+    AssertArgumentOutOfRangeException Err, "DestinationIndex"
+End Sub
+
+Public Sub CopyTo_WhenCoveringEntireString_CopiesAllCharacters()
+    Dim Dest(3) As Integer
+    
+    CorString.CopyTo "1234", 0, Dest, 0, 4
+    
+    Assert.That Dest, Iz.EqualTo(NewChars("1", "2", "3", "4"))
+End Sub
+
+Public Sub CopyTo_WhenCoveringSubString_CopiesSubStringCharacters()
+    Dim Dest(3) As Integer
+    
+    CorString.CopyTo "1234", 1, Dest, 0, 2
+    
+    Assert.That Dest, Iz.EqualTo(NewChars("2", "3", 0, 0))
+End Sub
+
+Public Sub CopyTo_WhenCopyingToNonStartOfArray_CopiesToDestination()
+    Dim Dest(3) As Integer
+    
+    CorString.CopyTo "1234", 1, Dest, 2, 2
+    
+    Assert.That Dest, Iz.EqualTo(NewChars(0, 0, "2", "3"))
+End Sub
+
+
+
 
 Private Property Get WhiteSpaces() As String
     WhiteSpaces = ChrW$(&H20) & ChrW$(&HD) & ChrW$(&H9) & ChrW$(&HA) & ChrW$(&HB) & ChrW$(&HC) & ChrW$(&H85) & ChrW$(&HA0) & ChrW$(&H1680) & ChrW$(&H180E) & _

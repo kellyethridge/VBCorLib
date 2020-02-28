@@ -238,3 +238,19 @@ Public Sub Int64BitsToCurrency_WhenCalled_ReturnsCurrency()
     
     Assert.That Actual, Iz.EqualTo(858993.4593@)
 End Sub
+
+Public Sub SingleToInt32Bits_WhenCalled_ReturnsInt32Bits()
+    Dim Actual As Long
+    
+    Actual = BitConverter.SingleToInt32Bits(1.2)
+    
+    Assert.That Actual, Iz.EqualTo(1067030938)
+End Sub
+
+Public Sub Int32BitsToSingle_WhenCalled_ReturnsConvertedSingle()
+    Dim Actual As Single
+    
+    Actual = BitConverter.Int32BitsToSingle(1067030938)
+    
+    Assert.That Actual, Iz.EqualTo(CSng(1.2)).Strict
+End Sub

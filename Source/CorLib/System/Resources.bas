@@ -228,6 +228,7 @@ Public Enum ResourceStringKey
     ArgumentOutOfRange_CapacityLargerThanLogicalAddressSpaceNotAllowed = 750
     ArgumentOutOfRange_PositionLessThanCapacityRequired = 751
     ArgumentOutOfRange_StreamLength = 752
+    ArgumentOutOfRange_NegativeCount = 753
     
     IOException_Exception = 400 '?
     IO_AlreadyExists_Name = 401 '?
